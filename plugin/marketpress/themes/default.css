@@ -1,0 +1,88 @@
+/*
+MarketPress Theme: Default
+*/
+div.mp_product_meta {
+  clear: both;
+  width: 100%;
+}
+form.mp_buy_form {
+  float: right;
+}
+form.mp_product_price {
+  float: left;
+}
+a.mp_link_addcart:link, a.mp_link_buynow:link {
+  float: right;
+  font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
+  text-decoration: none;
+  background-color: #EEEEEE;
+  color: #333333;
+  padding: 0px 9px 0px 9px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+a.mp_link_addcart:hover, a.mp_link_buynow:hover {
+  border-color: #ccc;
+}
+
+#mp_cart_updated_msg {
+  background-color:#FFFFE0;
+  border-color:#E6DB55;
+  -moz-border-radius:3px 3px 3px 3px;
+  border-style:solid;
+  border-width:1px;
+  margin:10px 0px;
+  padding: .5em;
+}
+div.mp_checkout_error {
+  background-color:#FFEBE8;
+  border-color:#CC0000;
+  -moz-border-radius:3px 3px 3px 3px;
+  border-style:solid;
+  border-width:1px;
+  margin:10px 0px;
+  padding: .5em;
+}
+table.mp_cart_login td, table.mp_cart_contents td, table.mp_cart_shipping td {
+  vertical-align: middle;
+}
+td.mp_cart_subtotal_lbl {
+  text-align: right;
+}
+td.mp_cart_col_quant input {
+  margin: 0;
+  text-align: center;
+}
+td.mp_cart_col_updatecart input {
+  margin: 0;
+}
+table.mp_cart_shipping input, table.mp_cart_shipping select {
+  margin: 0;
+}
+p.mp_cart_direct_checkout, p.mp_cart_login_msg {
+  text-align: right;
+  font-size: 80%;
+  margin-bottom: 5px;
+}
+a.mp_cart_direct_checkout_link {
+  font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
+  text-decoration: none;
+  background-color: #EEEEEE;
+  color: #333333;
+  padding: 4px 9px 4px 9px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+a.mp_cart_direct_checkout_link:hover {
+  border-color: #ccc;
+}

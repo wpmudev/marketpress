@@ -1,0 +1,135 @@
+<?php
+/*
+MarketPress Example Shipping Plugin Template
+Plugin URI: http://premium.wpmudev.org/project/e-commerce
+Description: Community eCommerce for WordPress, WPMU, and BuddyPress
+Author: Aaron Edwards (Incsub)
+Author URI: http://uglyrobot.com
+
+Copyright 2009-2010 Incsub (http://incsub.com)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+class My_Plugin_Name extends MP_Shipping_API {
+
+  //private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
+  var $plugin_name = 'my-plugin-name';
+  
+  //public name of your method, for lists and such.
+  var $public_name = '';
+  
+  //set to true if you need to use the shipping_metabox() method to add per-product shipping options
+  var $use_metabox = false;
+
+  /**
+   * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
+   */
+  function on_creation() {
+    //declare here for translation
+    $this->public_name = __('My Plugin', 'mp');
+	}
+
+  /**
+   * Echo anything you want to add to the top of the shipping screen
+   */
+	function before_shipping_form() {
+
+  }
+  
+  /**
+   * Echo anything you want to add to the bottom of the shipping screen
+   */
+	function after_shipping_form() {
+
+  }
+  
+  /**
+   * Echo a table row with any extra shipping fields you need to add to the form
+   */
+	function extra_shipping_field() {
+
+  }
+  
+  /**
+   * Use this to process any additional field you may add. Use the $_POST global,
+   *  and be sure to save it to both the cookie and usermeta if logged in.
+   */
+	function process_shipping_form() {
+
+  }
+	
+	/**
+   * Echo a settings meta box with whatever settings you need for you shipping module.
+   *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
+   *  You can access saved settings via $settings array.
+   */
+	function shipping_settings_box($settings) {
+
+  }
+  
+  /**
+   * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
+   *  array. Don't forget to return!
+   */
+	function process_shipping_settings($settings) {
+
+    return $settings;
+  }
+  
+  /**
+   * Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
+   *
+   * @param array $shipping_meta, the contents of the post meta. Use to retrieve any previously saved product meta
+   * @param array $settings, access saved settings via $settings array.
+   */
+	function shipping_metabox($shipping_meta, $settings) {
+
+  }
+
+  /**
+   * Save any per-product shipping fields from the shipping metabox using update_post_meta
+   *
+   * @param array $shipping_meta, save anything from the $_POST global
+   * return array $shipping_meta
+   */
+	function save_shipping_metabox($shipping_meta) {
+
+    return $shipping_meta;
+  }
+  
+  /**
+   * Use this function to return your calculated price as an integer or float
+   *
+   * @param int $price, always 0. Modify this and return
+   * @param float $total, cart total after any coupons and before tax
+   * @param array $cart, the contents of the shopping cart for advanced calculations
+   * @param string $address1
+   * @param string $address2
+   * @param string $city
+   * @param string $state, state/province/region
+   * @param string $zip, postal code
+   * @param string $country, ISO 3166-1 alpha-2 country code
+   *
+   * return float $price
+   */
+	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
+    return $price;
+  }
+
+}
+
+//register plugin - uncomment to register
+//mp_register_shipping_plugin( 'My_Plugin_Name', 'my-plugin-name', __('My Plugin', 'mp') );
+?>

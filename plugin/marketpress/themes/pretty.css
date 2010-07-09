@@ -1,0 +1,29 @@
+/*
+MarketPress Theme: Pretty - Don't Use, Not Finished
+*/
+div.mp_product_meta {
+  clear: both;
+  width: 100%;
+}
+form.mp_buy_form {
+  float: right;
+}
+form.mp_product_price {
+  float: left;
+}
+a.mp_link_addcart:link, a.mp_link_buynow:link {
+  float: right;
+  font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
+  text-decoration: none;
+  background-color: #EEEEEE;
+  color: #333333;
+  padding: 0px 9px 0px 9px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+ a.mp_link_addcart:hover, a.mp_link_buynow:hover { border-color: #ccc; }
