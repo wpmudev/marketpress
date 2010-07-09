@@ -14,8 +14,15 @@ jQuery(document).ready(function($) {
   }
   //add item to cart
   $("input.mp_button_addcart").click(function() {
+    var input = $(this);
     $.post(MP_Ajax.ajaxUrl, $(this).parents('form.mp_buy_form').serialize(), function(data) {
-      $("div.mp_cart_widget").html(data);
+      var result = data.split('||', 2)
+      if (result[0] && result[0] == 'error') {
+        alert(result[1]);
+      } else {
+        $(input).parents('form.mp_buy_form').html(MP_Ajax.successMsg).css("color", "green");
+        $("div.mp_cart_widget").html(data);
+      }
       mp_empty_cart(); //re-init empty script as the widget was reloaded
     });
     return false;

@@ -62,8 +62,11 @@ class MarketPress {
     //load template functions
     require_once( $this->plugin_dir . 'template-functions.php' );
     
+    //load shortcodes
+    include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
+    
     //load BuddyPress class if needed
-    //add_action( 'bp_init', array(&$this, 'load_bp_features') );
+    add_action( 'bp_init', array(&$this, 'load_bp_features') );
     
     //load sitewide features if WPMU
     if ($this->sitewide) {
@@ -154,6 +157,7 @@ class MarketPress {
       'currency' => 'USD',
       'curr_symbol_position' => 1,
       'disable_cart' => 0,
+      'inventory_threshhold' => 3,
       'store_theme' => 'default',
       'product_img_height' => 150,
       'product_img_width' => 150,
@@ -273,7 +277,7 @@ Thanks again!", 'mp')
       $this->sitewide = true;
       $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress/';
       $this->plugin_url = WPMU_PLUGIN_URL . '/marketpress/';
-  	} else if (!is_multisite() && defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/' . basename(__FILE__))) {
+  	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/' . basename(__FILE__))) {
       $this->sitewide = false;
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/';
       $this->plugin_url = WP_PLUGIN_URL . '/marketpress/';
@@ -434,7 +438,7 @@ Thanks again!", 'mp')
     wp_enqueue_script( 'mp-store-js', $this->plugin_url . 'js/store.js', array('jquery'), $this->version );
 
     // declare the variables we need to access in js
-    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp') ) );
+    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp') ) );
   }
   
   //loads the jquery lightbox plugin
@@ -1123,10 +1127,13 @@ Thanks again!", 'mp')
 		$columns['title'] = __('Product Name', 'mp');
 		$columns['sku'] = __('SKU', 'mp');
 		$columns['pricing'] = __('Price', 'mp');
-		$columns['shipping'] = __('Shipping', 'mp');
 		$columns['product_categories'] = __('Product Categories', 'mp');
 		$columns['product_tags'] = __('Product Tags', 'mp');
-		$columns['sales'] = __('Sales', 'mp');
+		
+		if (!$settings['disable_cart']) {
+  		$columns['sales'] = __('Sales', 'mp');
+  		$columns['stock'] = __('Stock', 'mp');
+    }
 
     /*
     if ( !in_array( $post_status, array('pending', 'draft', 'future') ) )
@@ -1162,10 +1169,6 @@ Thanks again!", 'mp')
         }
 				break;
 				
-      case "shipping":
-				echo $meta["shipping"][0];
-				break;
-				
 			case "product_categories":
 				$categories = get_the_terms(0, "product_category");
 				$categories_html = array();
@@ -1194,6 +1197,22 @@ Thanks again!", 'mp')
 
       case "sales":
 				echo number_format_i18n(($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0);
+				break;
+
+      case "stock":
+				if ($meta["mp_track_inventory"][0]) {
+          $inventory = ($meta["mp_inventory"][0]) ? $meta["mp_inventory"][0] : 0;
+          if ($inventory == 0)
+            $class = 'mp-inv-out';
+          else if ($inventory <= $settings['inventory_threshhold'])
+            $class = 'mp-inv-warn';
+          else
+            $class = 'mp-inv-full';
+            
+          echo '<span class="' . $class . '">' . number_format_i18n($inventory) . '</span>';
+        } else {
+          _e('N/A', 'mp');
+        }
 				break;
 				
       case "reviews":
@@ -1349,6 +1368,10 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_sku', preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['mp_sku']));
       update_post_meta($post_id, 'mp_track_inventory', (isset($_POST['mp_track_inventory'])) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', (int)$_POST['mp_inventory']);
+      //if changing delete flag so emails will be sent again
+      if ( (int)$_POST['mp_inventory'] != $meta['mp_track_inventory'][0] )
+        delete_post_meta($product_id, 'mp_stock_email_sent', 1);
+      
       update_post_meta($post_id, 'mp_product_link', esc_url_raw($_POST['mp_product_link']));
       
       //set sales count to zero if none set
@@ -1377,14 +1400,12 @@ Thanks again!", 'mp')
       <label title="<?php _e('Stock Keeping Unit - Your custom Product ID number', 'mp'); ?>"><?php _e('SKU', 'mp'); ?>:<br /><input type="text" size="12" id="mp_sku" name="mp_sku" value="<?php echo esc_attr($meta["mp_sku"][0]); ?>" /></label>
     </div>
     
-    <!--
     <?php if (!$settings['disable_cart']) { ?>
     <div class="alignleft">
       <label><input type="checkbox" id="mp_track_inventory" name="mp_track_inventory" value="1"<?php checked($meta["mp_track_inventory"][0]); ?>" /> <?php _e('Track Inventory', 'mp'); ?></label>
       <label id="mp_inventory_label"<?php echo ($meta["mp_track_inventory"][0]) ? '' : ' style="display: none;"'; ?>><?php _e('Quantity in Stock', 'mp'); ?>:<br /><input type="text" size="2" id="mp_inventory" name="mp_inventory" value="<?php echo esc_attr($meta["mp_inventory"][0]); ?>" /></label>
     </div>
     <?php } ?>
-    -->
     
     <div class="alignleft">
       <label title="<?php _e('Some examples are linking to a song/album in itunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
@@ -1643,6 +1664,21 @@ Thanks again!", 'mp')
         return false;
 
       $new_quantity = $cart[$product_id] + $quantity;
+            
+      //check stock
+      if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+        $stock = get_post_meta($product_id, 'mp_inventory', true);
+
+        if ($stock < $new_quantity) {
+          if ($no_ajax !== true) {
+            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock));
+            exit;
+          } else {
+            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock)) );
+            return false;
+          }
+        }
+      }
 
       //save items to cookie
       $cart[$product_id] = $new_quantity;
@@ -1653,10 +1689,20 @@ Thanks again!", 'mp')
       //process quantity updates
       if (is_array($_POST['quant'])) {
         foreach ($_POST['quant'] as $product_id => $quant) {
-          if (intval($quant))
+          if (intval($quant)) {
+            //check stock
+            if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+              $stock = get_post_meta($product_id, 'mp_inventory', true);
+              if ($stock < intval($quant)) {
+                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), number_format_i18n($stock), get_the_title($product_id)) );
+                continue;
+              }
+            }
+
             $cart[$product_id] = intval($quant);
-          else
+          } else {
             unset($cart[$product_id]);
+          }
         }
         //save items to cookie
         $this->set_cart_cookie($cart);
@@ -1887,7 +1933,8 @@ Thanks again!", 'mp')
   
   //called on checkout to create a new order
   function create_order($order_id, $cart, $shipping_info, $payment_info, $paid) {
-
+    $settings = get_option('mp_settings');
+    
     //order id can be null
     if (empty($order_id))
       $order_id = $this->generate_order_id();
@@ -1913,7 +1960,21 @@ Thanks again!", 'mp')
     foreach ($cart as $product_id => $data) {
       $items[] = $data['quantity'];
       
-      ///////////////////TODO adjust product stock quantities
+      //adjust product stock quantities
+      if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+        $stock = get_post_meta($product_id, 'mp_inventory', true);
+        $stock = $stock - $data['quantity'];
+        update_post_meta($product_id, 'mp_inventory', $stock);
+        
+        if ($stock <= $settings['inventory_threshold']) {
+          $this->low_stock_notification($product_id, $stock);
+        }
+      }
+      
+      //update sales count
+      $count = get_post_meta($product_id, 'mp_sales_count', true);
+      $count = $count + $data['quantity'];
+      update_post_meta($product_id, 'mp_sales_count', $count);
     }
 		$item_count = array_sum($items);
 
@@ -2198,6 +2259,32 @@ Thanks again!", 'mp')
     $msg = apply_filters( 'mp_shipped_order_notification', $msg );
 
     wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+  }
+  
+  //sends email to admin for low stock notification
+  function low_stock_notification($product_id, $stock) {
+    $settings = get_option('mp_settings');
+
+    //skip if sent already and not 0
+    if ( get_post_meta($product_id, 'mp_stock_email_sent', true) && $stock > 0 )
+      return;
+
+    $subject = __('Low Product Inventory Notification', 'mp');
+    $msg = __('This message is being sent to notify you of low stock of a product in your online store according to your preferences.
+
+Product: %s
+Current Inventory: %s
+Link: %s
+
+Edit Product: %s
+Notification Preferences: %s', 'mp');
+    $msg = sprintf($msg, get_the_title($product_id), number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
+    $msg = apply_filters( 'mp_low_stock_notification', $msg );
+
+    wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+    
+    //save so we don't send an email every time
+    update_post_meta($product_id, 'mp_stock_email_sent', 1);
   }
   
   //display currency symbol
@@ -2917,7 +3004,8 @@ Thanks again!", 'mp')
     		'presentation'  => __('Presentation', 'mp'),
     		'messages'      => __('Messages', 'mp'),
     		'shipping'      => __('Shipping', 'mp'),
-    		'gateways'      => __('Payments', 'mp')
+    		'gateways'      => __('Payments', 'mp'),
+    		'help'          => __('Help', 'mp')
     	);
     } else {
       $tabs = array( 'presentation'  => __('Presentation', 'mp') );
@@ -3162,7 +3250,14 @@ Thanks again!", 'mp')
             <h3 class='hndle'><span><?php _e('Miscellaneous Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
-        				<tr>
+        				<tr id="mp-inventory-setting">
+                <th scope="row"><?php _e('Inventory Warning Threshold', 'mp') ?></th>
+        				<td>
+        				<span class="description"><?php _e('At what low stock count do you want to be warned for products you have enabled inventory tracking for?', 'mp') ?></span><br />
+        				<input name="mp[inventory_threshhold]" type="text" value="<?php echo intval($settings['inventory_threshhold']); ?>" size="2" />
+                </td>
+                </tr>
+                <tr>
                 <th scope="row"><?php _e('Product Listings Only', 'mp') ?></th>
         				<td>
         				<label><input value="1" name="mp[disable_cart]" type="radio"<?php checked($settings['disable_cart'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
@@ -3948,10 +4043,10 @@ Thanks again!", 'mp')
         break;
         
         
-  		//---------------------------------------------------//
+      //---------------------------------------------------//
   		case "gateways":
         global $mp_gateway_plugins;
-        
+
         //save settings
         if (isset($_POST['gateway_settings'])) {
           echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
@@ -3967,10 +4062,10 @@ Thanks again!", 'mp')
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/credit-cards.png'; ?>" /></div>
         <h2><?php _e('Payment Settings', 'mp'); ?></h2>
         <div id="poststuff" class="metabox-holder">
-        
+
         <form id="mp-gateways-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=gateways">
           <input type="hidden" name="gateway_settings" value="1" />
-          
+
           <div id="mp_gateways" class="postbox">
             <h3 class='hndle'><span><?php _e('General Settings', 'mp') ?></span></h3>
             <div class="inside">
@@ -3988,12 +4083,12 @@ Thanks again!", 'mp')
               </table>
             </div>
           </div>
-          
+
           <?php
           //for adding additional settings for a payment gateway plugin
           do_action('mp_gateway_settings', $settings);
           ?>
-          
+
           <p class="submit">
             <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
           </p>
@@ -4002,6 +4097,111 @@ Thanks again!", 'mp')
         <?php
         break;
 
+
+  		//---------------------------------------------------//
+  		case "help":
+        ?>
+        <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/help.png'; ?>" /></div>
+        <h2><?php _e('MarketPress Help', 'mp'); ?></h2>
+        <div id="poststuff" class="metabox-holder">
+
+          <div class="postbox">
+            <h3 class='hndle'><span><?php _e('General Information', 'mp') ?></span></h3>
+            <div class="inside">
+              <?php _e('General help content goes here...', 'mp') ?>
+            </div>
+          </div>
+
+          <div class="postbox">
+            <h3 class='hndle'><span><?php _e('Shortcodes', 'mp') ?></span></h3>
+            <div class="inside">
+              <p><?php _e('Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply enter or paste them into your post or page content where you would like theme to appear. Optional attributes can be added in a format like <em>[shortcode attr1="value" attr2="value"]</em>.', 'mp') ?></p>
+              <table class="form-table">
+                <tr>
+        				<th scope="row"><?php _e('Product Tag Cloud', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_tag_cloud]</strong> -
+                  <span class="description"><?php _e('Displays a cloud or list of your product tags.', 'mp') ?></span>
+                  <a href="http://codex.wordpress.org/Template_Tags/wp_tag_cloud"><?php _e('Optional Attributes &raquo;', 'mp') ?></a>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Product Categories List', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_list_categories]</strong> -
+                  <span class="description"><?php _e('Displays an HTML list of your product categories.', 'mp') ?></span>
+                  <a href="http://codex.wordpress.org/Template_Tags/wp_list_categories"><?php _e('Optional Attributes &raquo;', 'mp') ?></a>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Product Categories Dropdown', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_dropdown_categories]</strong> -
+                  <span class="description"><?php _e('Displays an HTML dropdown of your product categories.', 'mp') ?></span>
+                  <a href="http://codex.wordpress.org/Template_Tags/wp_dropdown_categories"><?php _e('Optional Attributes &raquo;', 'mp') ?></a>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Popular Products List', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_popular_products]</strong> -
+                  <span class="description"><?php _e('Displays a list of popular products ordered by sales.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"number" - max number of products to display. Defaults to 5.', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_popular_products number="5"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Popular Products List', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_list_products]</strong> -
+                  <span class="description"><?php _e('Displays a list of products according to preference. Optional attributes default to the values in Presentation Settings -> Product List.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"paginate" - Whether to paginate the product list. This is useful to only show a subset.', 'mp') ?></li>
+                    <li><?php _e('"page" - The page number to display in the product list if "paginate" is set to true.', 'mp') ?></li>
+                    <li><?php _e('"per_page" - How many products to display in the product list if "paginate" is set to true.', 'mp') ?></li>
+                    <li><?php _e('"order_by" - What field to order products by. Can be: title, date, ID, author, price, sales, rand (random).', 'mp') ?></li>
+                    <li><?php _e('"order" - Direction to order products by. Can be: DESC, ASC', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_list_products paginate="true" page="1" per_page="10" order_by="price" order="DESC"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Store Links', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_cart_link]</strong> -
+                  <span class="description"><?php _e('Displays a link or url to the current shopping cart page.', 'mp') ?></span><br />
+                  <strong>[mp_store_link]</strong> -
+                  <span class="description"><?php _e('Displays a link or url to the current store page.', 'mp') ?></span><br />
+                  <strong>[mp_products_link]</strong> -
+                  <span class="description"><?php _e('Displays a link or url to the current products list page.', 'mp') ?></span><br />
+                  <strong>[mp_orderstatus_link]</strong> -
+                  <span class="description"><?php _e('Displays a link or url to the order status page.', 'mp') ?></span><br />
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"url" - Whether to return a clickable link or url. Can be: true, false. Defaults to showing link.', 'mp') ?></li>
+                    <li><?php _e('"link_text" - The text to show in the link.', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_cart_link link_text="Go here!"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <?php
+          //for adding additional help content boxes
+          do_action('mp_help_page', $settings);
+          ?>
+        </div>
+        <?php
+        break;
   	} //end switch
 
   	//hook to create a new admin screen.

@@ -21,10 +21,10 @@ table tr.coupon-inactive {
 .widefat th#thumbnail {
   width: 75px;
 }
-.widefat td.column-pricing, .widefat td.column-shipping, .widefat td.column-product_categories, .widefat td.column-product_tags, .widefat td.column-sales {
+.widefat td.column-pricing, .widefat td.column-shipping, .widefat td.column-product_categories, .widefat td.column-product_tags, .widefat td.column-sales, .widefat td.column-stock {
   vertical-align: middle;
 }
-.widefat th.column-sales, .widefat td.column-sales {
+.widefat th.column-sales, .widefat td.column-sales, .widefat th.column-stock, .widefat td.column-stock {
   width: 50px;
   text-align: center;
 }
@@ -32,6 +32,9 @@ table tr.coupon-inactive {
   padding-top:8px;
   width:4em;
 }
+span.mp-inv-out { color: red; }
+span.mp-inv-warn { color: orange; }
+span.mp-inv-full { color: green; }
 .widefat a.mp_order_status {
   line-height: 20px;
   height: 20px;
@@ -142,4 +145,8 @@ div#mp-target-countries {
 }
 .mp-pages-msgs .wp_themeSkin table.mceLayout {
   border: 1px #ccc solid;
+}
+ul.mp-shortcode-options {
+  list-style: disc outside none;
+  margin-left: 25px;
 }
