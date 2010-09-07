@@ -162,6 +162,8 @@ class MarketPress_Shortcodes {
    * @param int per_page Optional, How many products to display in the product list if $paginate is set to true.
    * @param string order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
    * @param string order Optional, Direction to order products by. Can be: DESC, ASC
+   * @param string category Optional, limit to a product category
+   * @param string tag Optional, limit to a product tag
    */
   function mp_list_products_sc($atts) {
     extract(shortcode_atts(array(
@@ -169,10 +171,12 @@ class MarketPress_Shortcodes {
   		'page' => '',
   		'per_page' => '',
   		'order_by' => '',
-  		'order' => ''
+  		'order' => '',
+  		'category' => '',
+  		'tag' => ''
   	), $atts));
 
-    return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order);
+    return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag);
   }
 
   /**

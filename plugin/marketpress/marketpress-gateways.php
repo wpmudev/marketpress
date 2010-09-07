@@ -204,7 +204,7 @@ if(!class_exists('MP_Gateway_API')) {
  *
  * @param string $plugin_name - the sanitized private name for your plugin
  * @param string $class_name - the case sensitive name of your plugin class
- * @param string $admin_name - name of your gateway, for the admin side.
+ * @param string $admin_name - pretty name of your gateway, for the admin side.
  */
 function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name) {
   global $mp_gateway_plugins;

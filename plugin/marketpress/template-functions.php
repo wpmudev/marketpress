@@ -1019,10 +1019,21 @@ function mp_order_status() {
  * @param int $per_page Optional, How many products to display in the product list if $paginate is set to true.
  * @param string $order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
  * @param string $order Optional, Direction to order products by. Can be: DESC, ASC
+ * @param string $category Optional, limit to a product category
+ * @param string $tag Optional, limit to a product tag
  */
-function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '' ) {
+function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '' ) {
   global $wp_query, $mp;
   $settings = get_option('mp_settings');
+
+  //setup taxonomy if applicable
+  if ($category) {
+    $taxonomy_query = '&product_category=' . sanitize_title($category);
+  } else if ($tag) {
+    $taxonomy_query = '&product_tag=' . sanitize_title($tag);
+  } else if ($wp_query->is_tax && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag')) {
+    $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
+  }
 
   //setup pagination
   $paged = false;
@@ -1075,7 +1086,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   }
 
   //The Query
-  $custom_query = new WP_Query('post_type=product' . $paginate_query . $order_by_query . $order_query);
+  $custom_query = new WP_Query('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 
   $content = '<div id="mp_product_list">';
 
@@ -1234,11 +1245,23 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = '' ) {
  * @param int $post_id The post_id for the product. Optional if in the loop
  */
 function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
-  global $id;
+  global $id, $mp;
   $post_id = ( NULL === $post_id ) ? $id : $post_id;
 
   $settings = get_option('mp_settings');
 
+  //check stock
+  if (get_post_meta($post_id, 'mp_track_inventory', true)) {
+    $stock = get_post_meta($post_id, 'mp_inventory', true);
+    $cart = $mp->get_cart_contents();
+    if ($stock <= $cart[$post_id])
+      $inventory = false;
+    else
+      $inventory = true;
+  } else {
+    $inventory = true;
+  }
+        
   //display an external link or form button
   if ($product_link = get_post_meta($post_id, 'mp_product_link', true)) {
 
@@ -1259,29 +1282,34 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   } else {
 
     $button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
-    $button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
+    
+    if ($inventory) {
+      $button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
 
-    if ($context == 'list') {
-      if ($settings['list_button_type'] == 'addcart') {
-        $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-        $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-      } else if ($settings['list_button_type'] == 'buynow') {
-        $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+      if ($context == 'list') {
+        if ($settings['list_button_type'] == 'addcart') {
+          $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+          $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+        } else if ($settings['list_button_type'] == 'buynow') {
+          $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+        }
+      } else {
+        //add quantity field
+        if ($settings['show_quantity']) {
+          $button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
+        }
+
+        if ($settings['product_button_type'] == 'addcart') {
+          $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+          $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+        } else if ($settings['product_button_type'] == 'buynow') {
+          $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+        }
       }
     } else {
-      //add quantity field
-      if ($settings['show_quantity']) {
-        $button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
-      }
-
-      if ($settings['product_button_type'] == 'addcart') {
-        $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-        $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-      } else if ($settings['product_button_type'] == 'buynow') {
-        $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
-      }
+      $button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
     }
-
+    
     $button .= '</form>';
   }
 

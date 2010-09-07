@@ -5,7 +5,7 @@ Version: 1.0
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
-Author URI: http://uglyrobot.com
+Author URI: http://premium.wpmudev.org
 
 Copyright 2009-2010 Incsub (http://incsub.com)
 
@@ -398,7 +398,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     	</script>
       <h3 class='hndle'><span><?php _e('PayPal Express Checkout Settings', 'mp'); ?></span></h3>
       <div class="inside">
-        <span class="description"><?php _e('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on the your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted">More Info &raquo;</a>', 'mp') ?></span>
+        <span class="description"><?php _e('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted">More Info &raquo;</a>', 'mp') ?></span>
         <table class="form-table">
           <tr>
   				<th scope="row"><?php _e('PayPal Site', 'mp') ?></th>
@@ -485,7 +485,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
         <tr>
 				<th scope="row"><?php _e('PayPal API Credentials', 'mp') ?></th>
 				<td>
-  				<span class="description"><?php _e('You must login to PayPal and create and API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_NVPAPIBasics#id084DN0AK0HS">Instructions &raquo;</a>', 'mp') ?></span>
+  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_NVPAPIBasics#id084DN0AK0HS">Instructions &raquo;</a>', 'mp') ?></span>
           <p><label><?php _e('API Username', 'mp') ?><br />
           <input value="<?php echo esc_attr($settings['gateways']['paypal-express']['api_user']); ?>" size="30" name="mp[gateways][paypal-express][api_user]" type="text" />
           </label></p>

@@ -63,14 +63,15 @@ class MarketPress {
     require_once( $this->plugin_dir . 'template-functions.php' );
     
     //load shortcodes
-    include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
+    if ( !is_admin() )
+      include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
     
     //load BuddyPress class if needed
     add_action( 'bp_init', array(&$this, 'load_bp_features') );
     
     //load sitewide features if WPMU
     if ($this->sitewide) {
-      //include_once( $this->plugin_dir . 'marketpress-wpmu.php' );
+      include_once( $this->plugin_dir . 'marketpress-ms.php' );
     }
     
     $settings = get_option('mp_settings');
@@ -105,6 +106,7 @@ class MarketPress {
 		add_action( 'admin_menu', array(&$this, 'add_menu_items') );
 		add_action( 'admin_print_styles', array(&$this, 'admin_css') );
 		add_action( 'admin_print_scripts', array(&$this, 'admin_script_post') );
+    add_action( 'admin_notices', array(&$this, 'admin_nopermalink_warning') );
 
 		//Meta boxes
 		add_action( 'add_meta_boxes_product', array(&$this, 'meta_boxes') );
@@ -252,10 +254,10 @@ Thanks again!", 'mp')
     add_option('mp_store_page', '', '', 'no');
     
     //create store page
-    $this->create_store_page();
+    add_action( 'init', array(&$this, 'create_store_page') );
     
-    //add action to flush rewrite rules after we've added them
-    add_action( 'generate_rewrite_rules', array(&$this, 'flush_rewrite') );
+    //add action to flush rewrite rules after we've added them for the first time
+    add_action( 'init', array(&$this, 'flush_rewrite') );
   }
   
   function localization() {
@@ -281,7 +283,9 @@ Thanks again!", 'mp')
       $this->sitewide = false;
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/';
       $this->plugin_url = WP_PLUGIN_URL . '/marketpress/';
-  	}
+  	} else {
+      wp_die(__('There was an issue determining where MarketPress is installed', 'mp'));
+    }
     
     //load data structures
 		require_once( $this->plugin_dir . 'marketpress-data.php' );
@@ -384,7 +388,13 @@ Thanks again!", 'mp')
 			exit();
 		}
 	}
-
+	
+  function admin_nopermalink_warning() {
+    //warns admins if permalinks are not enabled on the blog
+    if ( current_user_can('manage_options') && !get_option('permalink_structure') )
+      echo '<div class="error"><p>'.__('You must <a href="options-permalink.php">enable Pretty Permalinks</a> to use MarketPress!', 'mp').'</p></div>';
+	}
+	
   function add_menu_items() {
     $settings = get_option('mp_settings');
     
@@ -438,7 +448,7 @@ Thanks again!", 'mp')
     wp_enqueue_script( 'mp-store-js', $this->plugin_url . 'js/store.js', array('jquery'), $this->version );
 
     // declare the variables we need to access in js
-    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp') ) );
+    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('Out of Stock', 'mp') ) );
   }
   
   //loads the jquery lightbox plugin
@@ -710,7 +720,7 @@ Thanks again!", 'mp')
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
         $wp_query->is_singular = 1;
-        $wp_query->is_404 = null;
+        $wp_query->is_404 = false;
         $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
@@ -804,15 +814,45 @@ Thanks again!", 'mp')
 
       //if custom template exists load it
       if ($this->product_taxonomy_template = locate_template($templates)) {
+
+        //call a custom query posts for this listing
+        $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
+        
+        //setup pagination
+        if ($settings['paginate']) {
+          //figure out perpage
+          $paginate_query = '&posts_per_page='.$settings['per_page'];
+
+          //figure out page
+          if ($wp_query->query_vars['paged'])
+            $paginate_query .= '&paged='.intval($wp_query->query_vars['paged']);
+        } else {
+          $paginate_query = '&nopaging=true';
+        }
+
+        //get order by
+        if ($settings['order_by'] == 'price')
+          $order_by_query = '&meta_key=mp_price&orderby=mp_price';
+        else if ($settings['order_by'] == 'sales')
+          $order_by_query = '&meta_key=mp_sales_count&orderby=mp_sales_count';
+        else
+          $order_by_query = '&orderby='.$settings['order_by'];
+
+        //get order direction
+        $order_query = '&order='.$settings['order'];
+
+        //The Query
+        query_posts('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
+        
         add_filter( 'template_include', array(&$this, 'custom_product_taxonomy_template'));
       } else {
         //otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
-        //$wp_query->is_single = null;
-        //$wp_query->is_home = null;
-        //$wp_query->is_page = 1;
-        //$wp_query->is_404 = null;
-        add_filter( 'the_content', array(&$this, 'product_list_theme'), 99 );
-        add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
+        $wp_query->is_page = 1;
+        $wp_query->is_singular = 1;
+        $wp_query->is_404 = null;
+        $wp_query->post_count = 1;
+        add_filter( 'the_content', array(&$this, 'product_taxonomy_list_theme'), 99 );
+        add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
       }
       
       $is_shop_page = true;
@@ -822,6 +862,9 @@ Thanks again!", 'mp')
     if ($is_shop_page) {
       //fixes a nasty bug in BP theme's functions.php file which always loads the activity stream if not a normal page
       remove_all_filters('page_template');
+      
+      //prevents 404 for vitual pages
+      status_header( 200 );
       
       //load theme
       $this->load_store_theme();
@@ -1074,6 +1117,7 @@ Thanks again!", 'mp')
   
   //this is the default theme added to the order status page
   function orderstatus_theme($content) {
+    global $wp_query;
 
     mp_order_status();
     return $content;
@@ -1087,6 +1131,17 @@ Thanks again!", 'mp')
     $content .= mp_list_products(false);
     $content .= get_posts_nav_link();
     
+    return $content;
+  }
+  
+  //this is the default theme added to product taxonomies
+  function product_taxonomy_list_theme($content) {
+    $settings = get_option('mp_settings');
+    $content = $settings['msg']['product_list'];
+    $content .= get_posts_nav_link();
+    $content .= mp_list_products(false);
+    $content .= get_posts_nav_link();
+
     return $content;
   }
   
@@ -1618,7 +1673,7 @@ Thanks again!", 'mp')
   function get_cart_contents($cart = false) {
 
     //if not updateing cache
-    if (!$cart) {
+    if ($cart === false) {
       //check cache
       if ($this->cart_cache)
         return $this->cart_cache;
@@ -1671,12 +1726,21 @@ Thanks again!", 'mp')
 
         if ($stock < $new_quantity) {
           if ($no_ajax !== true) {
-            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock));
+            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id]));
             exit;
           } else {
-            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock)) );
+            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id])) );
             return false;
           }
+        }
+        //send ajax leftover stock
+        if ($no_ajax !== true) {
+          echo $stock-$new_quantity . '||';
+        }
+      } else {
+        //send ajax always stock if stock checking turned off
+        if ($no_ajax !== true) {
+          echo 1 . '||';
         }
       }
 
@@ -1694,7 +1758,7 @@ Thanks again!", 'mp')
             if (get_post_meta($product_id, 'mp_track_inventory', true)) {
               $stock = get_post_meta($product_id, 'mp_inventory', true);
               if ($stock < intval($quant)) {
-                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), number_format_i18n($stock), get_the_title($product_id)) );
+                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), number_format_i18n($stock-intval($quant)), get_the_title($product_id)) );
                 continue;
               }
             }
@@ -4115,7 +4179,7 @@ Notification Preferences: %s', 'mp');
           <div class="postbox">
             <h3 class='hndle'><span><?php _e('Shortcodes', 'mp') ?></span></h3>
             <div class="inside">
-              <p><?php _e('Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply enter or paste them into your post or page content where you would like theme to appear. Optional attributes can be added in a format like <em>[shortcode attr1="value" attr2="value"]</em>.', 'mp') ?></p>
+              <p><?php _e('Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1="value" attr2="value"]</em>.', 'mp') ?></p>
               <table class="form-table">
                 <tr>
         				<th scope="row"><?php _e('Product Tag Cloud', 'mp') ?></th>
@@ -4167,7 +4231,9 @@ Notification Preferences: %s', 'mp');
                     <li><?php _e('"per_page" - How many products to display in the product list if "paginate" is set to true.', 'mp') ?></li>
                     <li><?php _e('"order_by" - What field to order products by. Can be: title, date, ID, author, price, sales, rand (random).', 'mp') ?></li>
                     <li><?php _e('"order" - Direction to order products by. Can be: DESC, ASC', 'mp') ?></li>
-                    <li><?php _e('Example:', 'mp') ?> <em>[mp_list_products paginate="true" page="1" per_page="10" order_by="price" order="DESC"]</em></li>
+                    <li><?php _e('"category" - Limits list to a specific product category. Use the category Slug', 'mp') ?></li>
+                    <li><?php _e('"tag" - Limits list to a specific product tag. Use the tag Slug', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_list_products paginate="true" page="1" per_page="10" order_by="price" order="DESC" category="downloads"]</em></li>
                   </ul></p>
                 </td>
                 </tr>
@@ -4297,6 +4363,13 @@ class MarketPress_Product_List extends WP_Widget {
 
     /* setup our custom query */
 
+    //setup taxonomy if applicable
+    if ($instance['taxonomy_type'] == 'category') {
+      $taxonomy_query = '&product_category=' . $instance['taxonomy'];
+    } else if ($instance['taxonomy_type'] == 'tag') {
+      $taxonomy_query = '&product_tag=' . $instance['taxonomy'];
+    }
+
     //figure out perpage
     if (intval($instance['num_products']))
       $paginate_query = '&nopaging=true&posts_per_page='.intval($instance['num_products']).'&paged=1';
@@ -4323,7 +4396,7 @@ class MarketPress_Product_List extends WP_Widget {
     }
 
     //The Query
-    $custom_query = new WP_Query('post_type=product' . $paginate_query . $order_by_query . $order_query);
+    $custom_query = new WP_Query('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 
     //do we have products?
     if (count($custom_query->posts)) {
@@ -4371,6 +4444,8 @@ class MarketPress_Product_List extends WP_Widget {
 		$instance['num_products'] = intval($new_instance['num_products']);
 		$instance['order_by'] = $new_instance['order_by'];
 		$instance['order'] = $new_instance['order'];
+		$instance['taxonomy_type'] = $new_instance['taxonomy_type'];
+    $instance['taxonomy'] = ($instance['taxonomy_type']) ? sanitize_title($new_instance['taxonomy']) : '';
 		
     $instance['show_thumbnail'] = !empty($new_instance['show_thumbnail']) ? 1 : 0;
     $instance['size'] = !empty($new_instance['size']) ? intval($new_instance['size']) : 50;
@@ -4389,6 +4464,8 @@ class MarketPress_Product_List extends WP_Widget {
 		$num_products = intval($instance['num_products']);
 		$order_by = $instance['order_by'];
 		$order = $instance['order'];
+    $taxonomy_type = $instance['taxonomy_type'];
+    $taxonomy = $instance['taxonomy'];
 		
 		$show_thumbnail = isset( $instance['show_thumbnail'] ) ? (bool) $instance['show_thumbnail'] : false;
 		$size = !empty($instance['size']) ? intval($instance['size']) : 50;
@@ -4404,6 +4481,8 @@ class MarketPress_Product_List extends WP_Widget {
     <h3><?php _e('List Settings', 'mp'); ?></h3>
     <p>
     <label for="<?php echo $this->get_field_id('num_products'); ?>"><?php _e('Number of Products:', 'mp') ?> <input id="<?php echo $this->get_field_id('num_products'); ?>" name="<?php echo $this->get_field_name('num_products'); ?>" type="text" size="3" value="<?php echo $num_products; ?>" /></label><br />
+    </p>
+    <p>
     <label for="<?php echo $this->get_field_id('order_by'); ?>"><?php _e('Order Products By:', 'mp') ?><br />
     <select id="<?php echo $this->get_field_id('order_by'); ?>" name="<?php echo $this->get_field_name('order_by'); ?>">
       <option value="title"<?php selected($order_by, 'title') ?>><?php _e('Product Name', 'mp') ?></option>
@@ -4416,6 +4495,15 @@ class MarketPress_Product_List extends WP_Widget {
     </select><br />
     <label><input value="DESC" name="<?php echo $this->get_field_name('order'); ?>" type="radio"<?php checked($order, 'DESC') ?> /> <?php _e('Descending', 'mp') ?></label>
     <label><input value="ASC" name="<?php echo $this->get_field_name('order'); ?>" type="radio"<?php checked($order, 'ASC') ?> /> <?php _e('Ascending', 'mp') ?></label>
+    </p>
+    <p>
+    <label><?php _e('Taxonomy Filter:', 'mp') ?></label><br />
+    <select id="<?php echo $this->get_field_id('taxonomy_type'); ?>" name="<?php echo $this->get_field_name('taxonomy_type'); ?>">
+      <option value=""<?php selected($taxonomy_type, '') ?>><?php _e('No Filter', 'mp') ?></option>
+      <option value="category"<?php selected($taxonomy_type, 'category') ?>><?php _e('Category', 'mp') ?></option>
+      <option value="tag"<?php selected($taxonomy_type, 'tag') ?>><?php _e('Tag', 'mp') ?></option>
+    </select>
+    <input id="<?php echo $this->get_field_id('taxonomy'); ?>" name="<?php echo $this->get_field_name('taxonomy'); ?>" type="text" size="17" value="<?php echo $taxonomy; ?>" title="<?php _e('Enter the Slug', 'mp'); ?>" />
     </p>
     
     <h3><?php _e('Display Settings', 'mp'); ?></h3>

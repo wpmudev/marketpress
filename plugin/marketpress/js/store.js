@@ -13,22 +13,42 @@ jQuery(document).ready(function($) {
     });
   }
   //add item to cart
-  $("input.mp_button_addcart").click(function() {
-    var input = $(this);
-    $.post(MP_Ajax.ajaxUrl, $(this).parents('form.mp_buy_form').serialize(), function(data) {
-      var result = data.split('||', 2)
-      if (result[0] && result[0] == 'error') {
-        alert(result[1]);
-      } else {
-        $(input).parents('form.mp_buy_form').html(MP_Ajax.successMsg).css("color", "green");
-        $("div.mp_cart_widget").html(data);
-      }
-      mp_empty_cart(); //re-init empty script as the widget was reloaded
+  function mp_cart_listeners() {
+    $("input.mp_button_addcart").click(function() {
+      var input = $(this);
+      var formElm = $(input).parents('form.mp_buy_form');
+      var tempHtml = formElm.html();
+      var serializedForm = formElm.serialize();
+      formElm.html('<img src="'+MP_Ajax.imgUrl+'" alt="'+MP_Ajax.addingMsg+'" />');
+      $.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
+        var result = data.split('||', 2);
+        if (result[0] == 'error') {
+          alert(result[1]);
+          formElm.html(tempHtml);
+          mp_cart_listeners();
+        } else {
+          formElm.html('<span class="mp_adding_to_cart">'+MP_Ajax.successMsg+'</span>');
+          $("div.mp_cart_widget").html(result[1]);
+          if (result[0] > 0) {
+            formElm.fadeOut(2000, function(){
+              formElm.html(tempHtml).fadeIn('fast');
+              mp_cart_listeners();
+            });
+          } else {
+            formElm.fadeOut(2000, function(){
+              formElm.html('<span class="mp_no_stock">'+MP_Ajax.outMsg+'</span>').fadeIn('fast');
+              mp_cart_listeners();
+            });
+          }
+          mp_empty_cart(); //re-init empty script as the widget was reloaded
+        }
+      });
+      return false;
     });
-    return false;
-  });
+  }
   //add listeners
   mp_empty_cart();
+  mp_cart_listeners();
   
   //coupon codes
   $('#coupon-link').click(function() {

@@ -481,6 +481,7 @@ $this->currencies = array(
   "MUR"=> array("Mauritius, Rupees", "20a8"),
   "MXN"=> array("Mexico, Pesos", "24"),
   "MNT"=> array("Mongolia, Tugriks", "20ae"),
+  "MAD"=> array("Morocco, dirhams", "64, 68"),
   "MZN"=> array("Mozambique, Meticais", "4d, 54"),
   "NAD"=> array("Namibia, Dollars", "24"),
   "NPR"=> array("Nepal, Rupees", "20a8"),

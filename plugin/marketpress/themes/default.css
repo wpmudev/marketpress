@@ -29,6 +29,15 @@ a.mp_link_addcart:link, a.mp_link_buynow:link {
 a.mp_link_addcart:hover, a.mp_link_buynow:hover {
   border-color: #ccc;
 }
+del.mp_old_price {
+  margin-right: 5px;
+}
+form.mp_buy_form .mp_adding_to_cart {
+  color: green;
+}
+form.mp_buy_form .mp_no_stock {
+  color: red;
+}
 
 #mp_cart_updated_msg {
   background-color:#FFFFE0;

@@ -1,6 +1,6 @@
 <?php
 /*
-MarketPress WPMU Features
+MarketPress Multisite Features
 Version: 1.0
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
@@ -23,9 +23,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-class MarketPress_WPMU {
+class MarketPress_MS {
 
-	function MarketPress_WPMU() {
+	function MarketPress_MS() {
 		$this->__construct();
 	}
 	
@@ -44,7 +44,7 @@ class MarketPress_WPMU {
     global $mp;
     
     if ($mp->sitewide) {
-      $page = add_submenu_page('ms-admin.php', __('MarketPress Sitewide Options', 'mp'), __('MarketPress Options', 'mp'), 10, 'marketpress-ms', array(&$this, 'site_admin_page'));
+      $page = add_submenu_page('ms-admin.php', __('MarketPress Network Options', 'mp'), __('MarketPress Options', 'mp'), 10, 'marketpress-ms', array(&$this, 'super_admin_page'));
     }
     
     add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
@@ -63,7 +63,7 @@ class MarketPress_WPMU {
     //wp_enqueue_script( 'jquery-datepicker', $this->plugin_url . '/marketpress/datepicker/js/jquery-ui-1.7.2.custom.min.js', array('jquery'), $mp_version);
   }
 
-  function site_admin_page() {
+  function super_admin_page() {
     //double-check rights
     if(!is_super_admin()) {
   		echo "<p>" . __('Nice Try...', 'mp') . "</p>";  //If accessed properly, this message doesn't appear.
@@ -71,12 +71,12 @@ class MarketPress_WPMU {
   	}
     ?>
     <div class="wrap">
-    <h2><?php _e('MarketPress Sitewide Options', 'mp') ?></h2>
+    <h2><?php _e('MarketPress Network Options', 'mp') ?></h2>
 
     </div>
     <?php
   }
 }
-$mp_wpmu = &new MarketPress_WPMU();
+$mp_wpmu = &new MarketPress_MS();
 
 ?>
