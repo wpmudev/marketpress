@@ -43,6 +43,7 @@ class MarketPress_Shortcodes {
     add_shortcode( 'mp_store_link', array(&$this, 'mp_store_link_sc') );
     add_shortcode( 'mp_products_link', array(&$this, 'mp_products_link_sc') );
     add_shortcode( 'mp_orderstatus_link', array(&$this, 'mp_orderstatus_link_sc') );
+    add_shortcode( 'mp_store_navigation', array(&$this, 'mp_store_navigation_sc') );
     
 	}
 
@@ -233,6 +234,14 @@ class MarketPress_Shortcodes {
   	), $atts));
 
     return mp_orderstatus_link(false, $url, $link_text);
+  }
+  
+/**
+ * Returns the current store navigation links.
+ *
+ */
+  function mp_store_navigation_sc($atts) {
+    return mp_store_navigation(false);
   }
 
 }

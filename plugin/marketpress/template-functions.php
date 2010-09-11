@@ -1106,6 +1106,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
       //button
       $content .= mp_buy_button(false, 'list', $post->ID);
       $content .= '</div>';
+      
       $content .= '</div>';
     }
   } else {
@@ -1120,6 +1121,39 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     return $content;
 }
 
+
+/**
+ * Retrieve product's category list in either HTML list or custom format.
+ *
+ * @param int $product_id Optional. Post ID to retrieve categories.
+ * @param string $before Optional. Before list.
+ * @param string $sep Optional. Separate items using this.
+ * @param string $after Optional. After list.
+ */
+function mp_category_list( $product_id = false, $before = '', $sep = ', ', $after = '' ) {
+  $terms = get_the_term_list( $product_id, 'product_category', $before, $sep, $after );
+  if ( $terms )
+    return $terms;
+  else
+		return __( 'Uncatagorized', 'mp' );
+}
+
+
+/**
+ * Retrieve product's tag list in either HTML list or custom format.
+ *
+ * @param int $product_id Optional. Post ID to retrieve categories.
+ * @param string $before Optional. Before list.
+ * @param string $sep Optional. Separate items using this.
+ * @param string $after Optional. After list.
+ */
+function mp_tag_list( $product_id = false, $before = '', $sep = ', ', $after = '' ) {
+  $terms = get_the_term_list( $product_id, 'product_tag', $before, $sep, $after );
+  if ( $terms )
+    return $terms;
+  else
+		return __( 'No Tags', 'mp' );
+}
 
 /**
  * Display the classes for the product div.
@@ -1484,5 +1518,32 @@ function mp_orderstatus_link($echo = true, $url = false, $link_text = '') {
  */
 function mp_checkout_step_url($checkout_step) {
   return mp_cart_link(false, true) . trailingslashit($checkout_step);
+}
+
+/**
+ * Echos the current store navigation links.
+ *
+ * @param bool $echo Optional, whether to echo. Defaults to true
+ */
+function mp_store_navigation( $echo = true ) {
+  $settings = get_option('mp_settings');
+  
+  //navigation
+  if (!$settings['disable_cart']) {
+    $nav = '<ul class="mp_store_navigation">
+<li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
+<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>
+<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
+</ul>';
+  } else {
+    $nav = '<ul class="mp_store_navigation">
+<li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
+</ul>';
+  }
+  
+  if ($echo)
+    echo $nav;
+  else
+    return $nav;
 }
 ?>

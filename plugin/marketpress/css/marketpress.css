@@ -55,6 +55,9 @@ span.mp-inv-full { color: green; }
   background-image: url('../images/secure-payment-small.png');
 }
 
+div.mp-settings .postbox .hndle {
+  cursor: auto;
+}
 /*
 #mp-single-statuses span {
   line-height: 20px;

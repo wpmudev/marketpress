@@ -63,14 +63,13 @@ class MarketPress {
     require_once( $this->plugin_dir . 'template-functions.php' );
     
     //load shortcodes
-    if ( !is_admin() )
-      include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
+    include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
     
     //load BuddyPress class if needed
     add_action( 'bp_init', array(&$this, 'load_bp_features') );
     
     //load sitewide features if WPMU
-    if ($this->sitewide) {
+    if (is_multisite()) {
       include_once( $this->plugin_dir . 'marketpress-ms.php' );
     }
     
@@ -487,9 +486,19 @@ Thanks again!", 'mp')
     //insert new page if not existing
 		$page_count = $wpdb->get_var("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_name = '" . $settings['slugs']['store'] . "' AND post_type = 'page'");
 		if ( !$page_count ) {
-      $id = wp_insert_post( array('post_title' => __('Store', 'mp'), 'post_name' => $settings['slugs']['store'], 'post_status' => 'publish', 'post_type' => 'page') );
-			//$wpdb->query( "INSERT INTO " . $wpdb->posts . " ( post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt, post_status, comment_status, ping_status, post_password, post_name, to_ping, pinged, post_modified, post_modified_gmt, post_content_filtered, post_parent, guid, menu_order, post_type, post_mime_type, comment_count ) VALUES ( '" . $user_ID . "', '" . current_time( 'mysql' ) . "', '" . current_time( 'mysql' ) . "', '', '" . __('Store', 'mp') . "', '', 'publish', 'closed', 'closed', '', '" . $settings['slugs']['store'] . "', '', '', '" . current_time( 'mysql' ) . "', '" . current_time( 'mysql' ) . "', '', 0, '', 0, 'page', '', 0 )" );
-      update_option('mp_store_page', $id);
+		
+		  //default page content
+      $content  = '<p>' . __('Welcome to our online store! Feel free to browse around:', 'mp') . '</p>';
+      $content .= '[mp_store_navigation]';
+      $content .= '<p>' . __('Check out our most popular products:', 'mp') . '</p>';
+      $content .= '[mp_popular_products]';
+      $content .= '<p>' . __('Browse by category:', 'mp') . '</p>';
+      $content .= '[mp_list_categories]';
+      $content .= '<p>' . __('Browse by tag:', 'mp') . '</p>';
+      $content .= '[mp_tag_cloud]';
+      
+      $id = wp_insert_post( array('post_title' => __('Store', 'mp'), 'post_name' => $settings['slugs']['store'], 'post_status' => 'publish', 'post_type' => 'page', 'post_content' => $content ) );
+			update_option('mp_store_page', $id);
     }
   }
   
@@ -910,6 +919,22 @@ Thanks again!", 'mp')
     //sort the themes
     asort($theme_list);
     
+    //check network permissions
+    if (is_multisite()) {
+      $allowed_list = array();
+      $network_settings = get_site_option( 'mp_network_settings' );
+
+      foreach ($theme_list as $value => $name) {
+        if ($network_settings['allowed_themes'][$value] == 'full')
+          $allowed_list[$value] = $name;
+        else if (function_exists('is_supporter') && is_supporter() && $network_settings['allowed_themes'][$value] == 'supporter')
+          $allowed_list[$value] = $name;
+        else if (is_super_admin()) //super admins can access all installed themes
+          $allowed_list[$value] = $name;
+      }
+      $theme_list = $allowed_list;
+    }
+    
     echo '<select name="mp[store_theme]">';
     foreach ($theme_list as $value => $name) {
       ?><option value="<?php echo $value ?>"<?php selected($settings['store_theme'], $value) ?>><?php echo $name ?></option><?php
@@ -1072,37 +1097,15 @@ Thanks again!", 'mp')
     $content .= mp_product_price(false);
     $content .= mp_buy_button(false, 'single');
     $content .= '</div>';
+
+    $content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
+    //$content .= mp_tag_list($post->ID, '<div class="mp_product_tags">', ', ', '</div>');
     
     return $content;
   }
   
   //this is the default theme added to the checkout page
   function store_theme($content) {
-    $settings = get_option('mp_settings');
-    $store_url = home_url(trailingslashit($settings['slugs']['store']));
-    
-    //navigation
-    if (!$settings['disable_cart']) {
-      $content .= '<ul>
-	<li class="page_item"><a href="' . $store_url . $settings['slugs']['products'] . '/" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
-	<li class="page_item"><a href="' . $store_url . $settings['slugs']['cart'] . '/" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>
-	<li class="page_item"><a href="' . $store_url . $settings['slugs']['orderstatus'] . '/" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
-</ul>';
-    } else {
-      $content .= '<ul>
-	<li class="page_item"><a href="' . $store_url . $settings['slugs']['products'] . '/" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
-</ul>';
-    }
-    
-    //popular products
-    $content .= mp_popular_products(false);
-    
-    //Categories
-    $content .= mp_list_categories(false);
-    
-    //Tags
-    $content .= mp_tag_cloud(false);
-
     return $content;
   }
   
@@ -1225,29 +1228,11 @@ Thanks again!", 'mp')
 				break;
 				
 			case "product_categories":
-				$categories = get_the_terms(0, "product_category");
-				$categories_html = array();
-				if ($categories) {
-  				foreach ($categories as $category)
-  					array_push($categories_html, '<a href="' . get_term_link($category->slug, "product_category") . '">' . $category->name . '</a>');
-
-  				echo implode($categories_html, ", ");
-				} else {
-          _e('Uncategorized');
-        }
+        echo mp_category_list();
 				break;
 				
       case "product_tags":
-				$tags = get_the_terms(0, "product_tag");
-				$tags_html = array();
-				if ($tags) {
-  				foreach ($tags as $tag)
-  					array_push($tags_html, '<a href="' . get_term_link($tag->slug, "product_tag") . '">' . $tag->name . '</a>');
-
-  				echo implode($tags_html, ", ");
-				} else {
-          _e('No Tags');
-        }
+        echo mp_tag_list();
 				break;
 
       case "sales":
@@ -2039,6 +2024,9 @@ Thanks again!", 'mp')
       $count = get_post_meta($product_id, 'mp_sales_count', true);
       $count = $count + $data['quantity'];
       update_post_meta($product_id, 'mp_sales_count', $count);
+      
+      //for plugins into product sales
+      do_action( 'mp_product_sale', $product_id, $data );
     }
 		$item_count = array_sum($items);
 
@@ -2434,7 +2422,7 @@ Notification Preferences: %s', 'mp');
     <h2><?php echo sprintf(__('Order Details (%s)', 'mp'), esc_attr($order->post_title)); ?></h2>
     
     <form id="mp-single-order-form" action="<?php echo admin_url('edit.php'); ?>" method="get">
-    <div id="poststuff" class="metabox-holder has-right-sidebar">
+    <div id="poststuff" class="metabox-holder mp-settings has-right-sidebar">
     
     <div id="side-info-column" class="inner-sidebar">
     <div id='side-sortables' class='meta-box-sortables'>
@@ -3118,7 +3106,7 @@ Notification Preferences: %s', 'mp');
       	</script>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/settings.png'; ?>" /></div>
         <h2><?php _e('General Settings', 'mp'); ?></h2>
-        <div id="poststuff" class="metabox-holder">
+        <div id="poststuff" class="metabox-holder mp-settings">
 
         <form id="mp-main-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=main">
           <input type="hidden" name="marketplace_settings" value="1" />
@@ -3584,7 +3572,7 @@ Notification Preferences: %s', 'mp');
     			<?php if ( $coupon_navigation ) echo "<div class='tablenav-pages'>$coupon_navigation</div>"; ?>
     		</div>
     		
-    		<div id="poststuff" class="metabox-holder">
+    		<div id="poststuff" class="metabox-holder mp-settings">
     		
     		<div class="postbox">
           <h3 class='hndle'><span>
@@ -3692,7 +3680,7 @@ Notification Preferences: %s', 'mp');
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/my_work.png'; ?>" /></div>
         <h2><?php _e('Presentation Settings', 'mp'); ?></h2>
-        <div id="poststuff" class="metabox-holder">
+        <div id="poststuff" class="metabox-holder mp-settings">
         
         <form method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=presentation">
           <input type="hidden" name="marketplace_settings" value="1" />
@@ -3896,7 +3884,7 @@ Notification Preferences: %s', 'mp');
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/messages.png'; ?>" /></div>
         <h2><?php _e('Messages Settings', 'mp'); ?></h2>
-        <div id="poststuff" class="metabox-holder">
+        <div id="poststuff" class="metabox-holder mp-settings">
 
         <form id="mp-messages-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=messages">
           <input type="hidden" name="messages_settings" value="1" />
@@ -4050,7 +4038,7 @@ Notification Preferences: %s', 'mp');
       	</script>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/delivery.png'; ?>" /></div>
         <h2><?php _e('Shipping Settings', 'mp'); ?></h2>
-        <div id="poststuff" class="metabox-holder">
+        <div id="poststuff" class="metabox-holder mp-settings">
 
         <form id="mp-shipping-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=shipping">
           <input type="hidden" name="shipping_settings" value="1" />
@@ -4125,7 +4113,7 @@ Notification Preferences: %s', 'mp');
       	</script>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/credit-cards.png'; ?>" /></div>
         <h2><?php _e('Payment Settings', 'mp'); ?></h2>
-        <div id="poststuff" class="metabox-holder">
+        <div id="poststuff" class="metabox-holder mp-settings">
 
         <form id="mp-gateways-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=gateways">
           <input type="hidden" name="gateway_settings" value="1" />
@@ -4138,6 +4126,19 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Select Payment Gateway(s)', 'mp') ?></th>
         				<td>
                 <?php
+                //check network permissions
+                if (is_multisite()) {
+                  $network_settings = get_site_option( 'mp_network_settings' );
+                  foreach ((array)$mp_gateway_plugins as $code => $plugin) {
+                    if ($network_settings['allowed_gateways'][$code] == 'full') {
+                      $allowed_plugins[$code] = $plugin;
+                    } else if (function_exists('is_supporter') && is_supporter() && $network_settings['allowed_themes'][$code] == 'supporter') {
+                      $allowed_plugins[$code] = $plugin;
+                    }
+                  }
+                  $mp_gateway_plugins = $allowed_plugins;
+                }
+                
                 foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                   ?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, (array)$settings['gateways']['allowed'])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
                 }
@@ -4167,14 +4168,16 @@ Notification Preferences: %s', 'mp');
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/help.png'; ?>" /></div>
         <h2><?php _e('MarketPress Help', 'mp'); ?></h2>
-        <div id="poststuff" class="metabox-holder">
+        <div id="poststuff" class="metabox-holder mp-settings">
 
+          <!--
           <div class="postbox">
             <h3 class='hndle'><span><?php _e('General Information', 'mp') ?></span></h3>
             <div class="inside">
               <?php _e('General help content goes here...', 'mp') ?>
             </div>
           </div>
+          -->
 
           <div class="postbox">
             <h3 class='hndle'><span><?php _e('Shortcodes', 'mp') ?></span></h3>
@@ -4219,7 +4222,7 @@ Notification Preferences: %s', 'mp');
                 </td>
                 </tr>
                 <tr>
-        				<th scope="row"><?php _e('Popular Products List', 'mp') ?></th>
+        				<th scope="row"><?php _e('Products List', 'mp') ?></th>
         				<td>
                   <strong>[mp_list_products]</strong> -
                   <span class="description"><?php _e('Displays a list of products according to preference. Optional attributes default to the values in Presentation Settings -> Product List.', 'mp') ?></span>
@@ -4255,6 +4258,13 @@ Notification Preferences: %s', 'mp');
                     <li><?php _e('"link_text" - The text to show in the link.', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_cart_link link_text="Go here!"]</em></li>
                   </ul></p>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Store Navigation List', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_store_navigation]</strong> -
+                  <span class="description"><?php _e('Displays a list of links to your store pages.', 'mp') ?></span>
                 </td>
                 </tr>
               </table>
@@ -4445,7 +4455,7 @@ class MarketPress_Product_List extends WP_Widget {
 		$instance['order_by'] = $new_instance['order_by'];
 		$instance['order'] = $new_instance['order'];
 		$instance['taxonomy_type'] = $new_instance['taxonomy_type'];
-    $instance['taxonomy'] = ($instance['taxonomy_type']) ? sanitize_title($new_instance['taxonomy']) : '';
+    $instance['taxonomy'] = ($new_instance['taxonomy_type']) ? sanitize_title($new_instance['taxonomy']) : '';
 		
     $instance['show_thumbnail'] = !empty($new_instance['show_thumbnail']) ? 1 : 0;
     $instance['size'] = !empty($new_instance['size']) ? intval($new_instance['size']) : 50;
