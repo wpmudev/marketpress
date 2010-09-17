@@ -40,6 +40,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   //url for an submit button image for your checkout method. Displayed on checkout form if set
   var $method_button_img_url = '';
 
+  //whether or not ssl is needed for checkout page
+  var $force_ssl = false;
+
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
 
@@ -310,6 +313,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     }
   }
 	
+	/**
+   * Runs before page load incase you need to run any scripts before loading the success message page
+   */
+	function order_confirmation($order) {
+
+  }
+	
   /**
    * Filters the order confirmation email message body. You may want to append something to
    *  the message. Optional
@@ -332,7 +342,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
       $timestamp = key($statuses);
-      echo '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . htmlentities($status) . '</p>';
+      echo '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . esc_html($status) . '</p>';
     } else {
       echo '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
     }
@@ -560,9 +570,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $settings = get_option('mp_settings');
       
 			if ($settings['gateways']['paypal-express']['mode'] == 'sandbox') {
-				$domain = 'https://www.sandbox.paypal.com';
+        $domain = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 			} else {
-				$domain = 'https://www.paypal.com';
+				$domain = 'https://www.paypal.com/cgi-bin/webscr';
 			}
 
 			$req = 'cmd=_notify-validate';
@@ -572,57 +582,18 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$req .= '&' . $k . '=' . $v;
 			}
 
-			$header = 'POST /cgi-bin/webscr HTTP/1.0' . "\r\n"
-					. 'Content-Type: application/x-www-form-urlencoded' . "\r\n"
-					. 'Content-Length: ' . strlen($req) . "\r\n"
-					. "\r\n";
+      $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/{$mp->version}";
+      $args['body'] = $req;
+      $args['sslverify'] = false;
 
-			@set_time_limit(60);
-			if ($conn = @fsockopen($domain, 80, $errno, $errstr, 30)) {
-				fputs($conn, $header . $req);
-				socket_set_timeout($conn, 30);
+      //use built in WP http class to work with most server setups
+    	$response = wp_remote_post($domain, $args);
 
-				$response = '';
-				$close_connection = false;
-				while (true) {
-					if (feof($conn) || $close_connection) {
-						fclose($conn);
-						break;
-					}
-
-					$st = @fgets($conn, 4096);
-					if ($st === false) {
-						$close_connection = true;
-						continue;
-					}
-
-					$response .= $st;
-				}
-
-				$error = '';
-				$lines = explode("\n", str_replace("\r\n", "\n", $response));
-				// looking for: HTTP/1.1 200 OK
-				if (count($lines) == 0) $error = 'Response Error: Header not found';
-				else if (substr($lines[0], -7) != ' 200 OK') $error = 'Response Error: Unexpected HTTP response';
-				else {
-					// remove HTTP header
-					while (count($lines) > 0 && trim($lines[0]) != '') array_shift($lines);
-
-					// first line will be empty, second line will have the result
-					if (count($lines) < 2) $error = 'Response Error: No content found in transaction response';
-					else if (strtoupper(trim($lines[1])) != 'VERIFIED') $error = 'Response Error: Unexpected transaction response';
-				}
-
-				if ($error != '') {
-          header("HTTP/1.1 503 Service Unavailable");
-					echo $error;
-					exit;
-				}
-			} else {
-        //error connecting
+    	//check results
+    	if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200 || $response['body'] != 'VERIFIED') {
         header("HTTP/1.1 503 Service Unavailable");
-        echo 'Could not make a connection with fsockopen while verifying with PayPal: ' . $errstr;
-    		exit;
+        _e( 'There was a problem verifying the IPN string with PayPal. Please try again.', 'mp' );
+        exit;
       }
 
 			// process PayPal response
@@ -798,7 +769,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $nvpstr .= $detailstr;
     
 		//order details
-    $nvpstr .= "&PAYMENTREQUEST_0_DESC=" . urlencode(sprintf(__('%s Store Purchase', 'mp'), get_bloginfo('name'))); //cart name
+    $nvpstr .= "&PAYMENTREQUEST_0_DESC=" . urlencode(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
     $nvpstr .= "&PAYMENTREQUEST_0_AMT=" . $total; //cart total
 		$nvpstr .= "&PAYMENTREQUEST_0_INVNUM=" . $order_id;
 		$nvpstr .= "&PAYMENTREQUEST_0_ALLOWEDPAYMENTMETHOD=InstantPaymentOnly";

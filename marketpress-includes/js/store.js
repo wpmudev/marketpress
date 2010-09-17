@@ -2,9 +2,14 @@
 jQuery(document).ready(function($) {
   //empty cart
   function mp_empty_cart() {
+    if ($("a.mp_empty_cart").attr("onClick") != undefined) {
+      return;
+    }
+
     $("a.mp_empty_cart").click(function() {
       var answer = confirm(MP_Ajax.emptyCartMsg);
       if (answer) {
+        $(this).html('<img src="'+MP_Ajax.imgUrl+'" />');
         $.post(MP_Ajax.ajaxUrl, {action: 'mp-update-cart', empty_cart: 1}, function(data) {
           $("div.mp_cart_widget").html(data);
         });

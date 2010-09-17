@@ -24,11 +24,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-//------------------------------------------------------------------------//
-//---Config---------------------------------------------------------------//
-//------------------------------------------------------------------------//
-
-
 class MarketPress {
 
   var $version = '1.0';
@@ -75,15 +70,8 @@ class MarketPress {
     
     $settings = get_option('mp_settings');
 
-    if (!$settings['disable_cart']) {
-      //load shipping plugin API
-      require_once( $this->plugin_dir . 'marketpress-shipping.php' );
-      $this->load_shipping_plugins();
-      
-      //load gateway plugin API
-      require_once( $this->plugin_dir . 'marketpress-gateways.php' );
-      $this->load_gateway_plugins();
-    }
+    //load APIs and plugins
+		add_action( 'plugins_loaded', array(&$this, 'load_plugins') );
     
 		//localize the plugin
 		add_action( 'plugins_loaded', array(&$this, 'localization') );
@@ -114,6 +102,7 @@ class MarketPress {
 
 		//Templates and Rewrites
 		add_action( 'template_redirect', array(&$this, 'load_store_templates') );
+		add_action( 'template_redirect', array(&$this, 'load_store_theme') );
 		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
   	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
@@ -159,7 +148,7 @@ class MarketPress {
       'curr_symbol_position' => 1,
       'disable_cart' => 0,
       'inventory_threshhold' => 3,
-      'store_theme' => 'default',
+      'store_theme' => 'icons',
       'product_img_height' => 150,
       'product_img_width' => 150,
       'list_img_height' => 150,
@@ -190,9 +179,12 @@ class MarketPress {
         'method' => 'flat-rate'
       ),
       'gateways' => array (
-        'allowed' => array ( 'paypal-express' ),
         'paypal-express' => array (
           'locale' => 'US',
+          'currency' => 'USD',
+          'mode' => 'sandbox'
+        ),
+        'paypal-chained' => array (
           'currency' => 'USD',
           'mode' => 'sandbox'
         )
@@ -276,14 +268,18 @@ Thanks again!", 'mp')
     //setup proper directories
     if (is_multisite() && defined('WPMU_PLUGIN_URL') && defined('WPMU_PLUGIN_DIR') && file_exists(WPMU_PLUGIN_DIR . '/' . basename(__FILE__))) {
       $this->sitewide = true;
-      $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress/';
-      $this->plugin_url = WPMU_PLUGIN_URL . '/marketpress/';
+      $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress-includes/';
+      $this->plugin_url = WPMU_PLUGIN_URL . '/marketpress-includes/';
+  	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/marketpress/' . basename(__FILE__))) {
+      $this->sitewide = false;
+      $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/marketpress-includes/';
+      $this->plugin_url = WP_PLUGIN_URL . '/marketpress/marketpress-includes/';
   	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/' . basename(__FILE__))) {
       $this->sitewide = false;
-      $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/';
-      $this->plugin_url = WP_PLUGIN_URL . '/marketpress/';
+      $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress-includes/';
+      $this->plugin_url = WP_PLUGIN_URL . '/marketpress-includes/';
   	} else {
-      wp_die(__('There was an issue determining where MarketPress is installed', 'mp'));
+      wp_die(__('There was an issue determining where MarketPress is installed. Please reinstall.', 'mp'));
     }
     
     //load data structures
@@ -294,6 +290,20 @@ Thanks again!", 'mp')
   /* Only load code that needs BuddyPress to run once BP is loaded and initialized. */
   function load_bp_features() {
     include_once( $this->plugin_dir . 'marketpress-bp.php' );
+  }
+
+  function load_plugins() {
+    $settings = get_option('mp_settings');
+
+    if (!$settings['disable_cart']) {
+      //load shipping plugin API
+      require_once( $this->plugin_dir . 'marketpress-shipping.php' );
+      $this->load_shipping_plugins();
+
+      //load gateway plugin API
+      require_once( $this->plugin_dir . 'marketpress-gateways.php' );
+      $this->load_gateway_plugins();
+    }
   }
 
   function load_shipping_plugins() {
@@ -367,7 +377,7 @@ Thanks again!", 'mp')
 
   	//include them suppressing errors
   	foreach ($gateway_plugins as $file)
-      @include( $file );
+      include( $file );
 
     //load chosen plugin classes
     global $mp_gateway_plugins, $mp_gateway_active_plugins;
@@ -874,10 +884,6 @@ Thanks again!", 'mp')
       
       //prevents 404 for vitual pages
       status_header( 200 );
-      
-      //load theme
-      $this->load_store_theme();
-
     }
   }
   
@@ -977,13 +983,13 @@ Thanks again!", 'mp')
   
   //adds our links to theme nav menus using wp_list_pages()
   function filter_list_pages($list, $args) {
-  
+
     if ($args['depth'] == 1)
       return $list;
       
     $settings = get_option('mp_settings');
 
-    $temp_break = strpos($list, $store_url);
+    $temp_break = strpos($list, mp_store_link(false, true));
 
     //if we can't find the page for some reason skip
     if ($temp_break === false)
@@ -1121,7 +1127,7 @@ Thanks again!", 'mp')
   //this is the default theme added to the order status page
   function orderstatus_theme($content) {
     global $wp_query;
-
+    
     mp_order_status();
     return $content;
   }
@@ -1507,9 +1513,10 @@ Thanks again!", 'mp')
   }
   
   //returns the calculated price for shipping. Returns False if shipping address is not available
-  function shipping_price($format = false) {
+  function shipping_price($format = false, $cart = false) {
 
-    $cart = $this->get_cart_contents();
+    if (!$cart)
+      $cart = $this->get_cart_contents();
     
     //get total after any coupons
     $totals = array();
@@ -1549,11 +1556,12 @@ Thanks again!", 'mp')
   }
   
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
-  function tax_price($format = false) {
+  function tax_price($format = false, $cart = false) {
     $settings = get_option('mp_settings');
     
     //get current cart contents
-    $cart = $this->get_cart_contents();
+    if (!$cart)
+      $cart = $this->get_cart_contents();
 
     //get total after any coupons
     $totals = array();
@@ -1689,6 +1697,18 @@ Thanks again!", 'mp')
     
       $this->set_cart_cookie(array());
       
+      if ($no_ajax !== true) {
+        ?>
+    		<div class="mp_cart_empty">
+    			<?php _e('There are no items in your cart.', 'mp') ?>
+    		</div>
+    		<div id="mp_cart_actions_widget">
+    			<a class="mp_store_link" href="<?php mp_store_link(true, true); ?>"><?php _e('Browse Products &raquo;', 'mp') ?></a>
+    		</div>
+        <?php
+        exit;
+      }
+      
     } else if (isset($_POST['product_id'])) { //add a product to cart
     
       //new quantity
@@ -1720,12 +1740,12 @@ Thanks again!", 'mp')
         }
         //send ajax leftover stock
         if ($no_ajax !== true) {
-          echo $stock-$new_quantity . '||';
+          $return = $stock-$new_quantity . '||';
         }
       } else {
         //send ajax always stock if stock checking turned off
         if ($no_ajax !== true) {
-          echo 1 . '||';
+          $return = 1 . '||';
         }
       }
 
@@ -1733,6 +1753,13 @@ Thanks again!", 'mp')
       $cart[$product_id] = $new_quantity;
       $this->set_cart_cookie($cart);
       
+      //if running via ajax return updated cart and die
+      if ($no_ajax !== true) {
+        echo $return;
+        mp_show_cart('widget');
+        exit;
+      }
+
     } else if (isset($_POST['update_cart_submit'])) { //update cart contents
 
       //process quantity updates
@@ -1839,8 +1866,52 @@ Thanks again!", 'mp')
         update_user_meta($current_user->ID, 'mp_shipping_info', $_SESSION['mp_shipping_info']);
 
       //if no errors send to next checkout step
-      if ($this->checkout_error == false)
-        wp_safe_redirect(mp_checkout_step_url('checkout'));
+      if ($this->checkout_error == false) {
+      
+        //check for $0 checkout to skip gateways
+        
+        //loop through cart items
+        $cart = $this->get_cart_contents();
+        foreach ($cart as $product_id => $data) {
+          $totals[] = $data['price'] * $data['quantity'];
+        }
+    		$total = array_sum($totals);
+        //coupon line
+        if ( $coupon = $this->coupon_value($this->get_coupon_code(), $total) )
+          $total = $coupon['new_total'];
+        //shipping line
+        if ( ($shipping_price = $this->shipping_price()) !== false ) {
+          $total = $total + $shipping_price;
+        }
+        //tax line
+        if ( ($tax_price = $this->tax_price()) !== false ) {
+          $total = $total + $tax_price;
+        }
+        
+        if ($total > 0) {
+          wp_safe_redirect(mp_checkout_step_url('checkout'));
+          exit;
+        } else { //empty price, create order already
+        
+          //setup our payment details
+          $timestamp = time();
+          $order_id = $this->generate_order_id();
+          $settings = get_option('mp_settings');
+    		  $payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
+          $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
+    		  $payment_info['method'] = __('N/A - Free order', 'mp');
+    		  $payment_info['transaction_id'] = __('N/A', 'mp');
+    		  $payment_info['status'][$timestamp] = __('Completed', 'mp');
+    		  $payment_info['total'] = $total;
+    		  $payment_info['currency'] = $settings['currency'];
+    		  $_SESSION['mp_payment_method'] = 'manual'; //so we don't get an error message on confirmation page
+          $this->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
+          
+          //redirect to final page
+          wp_safe_redirect(mp_checkout_step_url('confirmation'));
+          exit;
+        }
+      }
         
     } else if (isset($_POST['mp_choose_gateway'])) { //check and save payment info
 
@@ -1850,24 +1921,22 @@ Thanks again!", 'mp')
       do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
 
       //if no errors send to next checkout step
-      if ($this->checkout_error == false)
+      if ($this->checkout_error == false) {
         wp_safe_redirect(mp_checkout_step_url('confirm-checkout'));
+        exit;
+      }
 
     } else if (isset($_POST['mp_payment_confirm'])) { //create order and process payment
 
       do_action( 'mp_payment_confirm_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
       
       //if no errors send to next checkout step
-      if ($this->checkout_error == false)
+      if ($this->checkout_error == false) {
         wp_safe_redirect(mp_checkout_step_url('confirmation'));
-
+        exit;
+      }
     }
 
-    //if running via ajax return updated cart and die
-    if ($no_ajax !== true) {
-      mp_show_cart('widget');
-      exit;
-    }
   }
   
   function cart_update_message($msg) {
@@ -2041,14 +2110,16 @@ Thanks again!", 'mp')
       
     //payment info
     add_post_meta($post_id, 'mp_order_total', $payment_info['total'], true);
-    add_post_meta($post_id, 'mp_shipping_total', $this->shipping_price(), true);
-    add_post_meta($post_id, 'mp_tax_total', $this->tax_price(), true);
+    add_post_meta($post_id, 'mp_shipping_total', $this->shipping_price(false, $cart), true);
+    add_post_meta($post_id, 'mp_tax_total', $this->tax_price(false, $cart), true);
     add_post_meta($post_id, 'mp_order_items', $item_count, true);
 
+    $timestamp = time();
+    add_post_meta($post_id, 'mp_received_time', $timestamp, true);
+
     //set paid time if we already have a confirmed payment
-    if ($paid && !get_post_meta($order->ID, 'mp_paid_time', true)) {
-      update_post_meta($order->ID, 'mp_paid_time', time());
-    }
+    if ($paid)
+      add_post_meta($post_id, 'mp_paid_time', $timestamp, true);
 
     //empty cart cookie
     $this->set_cart_cookie(array());
@@ -2219,7 +2290,7 @@ Thanks again!", 'mp')
     if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
       $order_info = __('Items:', 'mp') . "\n";
       foreach ($order->mp_cart_info as $product_id => $data) {
-        $order_info .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . $mp->format_currency('', $data['price']) . ' = '. $mp->format_currency('', $data['price'] * $data['quantity']) . "\n";
+        $order_info .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
       }
       $order_info .= "\n";
     }
@@ -2229,14 +2300,14 @@ Thanks again!", 'mp')
     }
     //shipping line
     if ( $order->mp_shipping_total ) {
-      $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . $mp->format_currency('', $order->mp_shipping_total);
+      $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($order->mp_shipping_total, 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //tax line
     if ( $order->mp_tax_total ) {
-      $order_info .= "\n" . __('Taxes:', 'mp') . ' ' . $mp->format_currency('', $order->mp_tax_total);
+      $order_info .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n($order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //total line
-    $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . $mp->format_currency('', $order->mp_order_total);
+    $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n($order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
     
     //// Shipping Info
     $shipping_info = __('Full Name:', 'mp') . ' ' . $order->mp_shipping_info['name'];
@@ -2255,7 +2326,7 @@ Thanks again!", 'mp')
     $payment_info = __('Payment Method:', 'mp') . ' ' . $order->mp_payment_info['gateway_public_name'];
     $payment_info .= "\n" . __('Payment Type:', 'mp') . ' ' . $order->mp_payment_info['method'];
     $payment_info .= "\n" . __('Transaction ID:', 'mp') . ' ' . $order->mp_payment_info['transaction_id'];
-    $payment_info .= "\n" . __('Payment Total:', 'mp') . ' ' . $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']) . ' ' . $order->mp_payment_info['currency'];
+    $payment_info .= "\n" . __('Payment Total:', 'mp') . ' ' . number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
     $payment_info .= "\n\n";
     if ($order->post_status == 'order_received') {
       $payment_info .= __('Your payment for this order is not yet complete. Here is the latest status:', 'mp') . "\n";
@@ -2485,7 +2556,7 @@ Notification Preferences: %s', 'mp');
         <div class="inside">
           <?php
           //get times
-          $received = mysql2date(get_option('date_format') . ' - ' . get_option('time_format'), $order->post_date);
+          $received = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
           if ($order->mp_paid_time)
             $paid = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
           if ($order->mp_shipped_time)
@@ -2742,8 +2813,6 @@ Notification Preferences: %s', 'mp');
     	if ( ( $_GET['action'] != -1 || $_GET['action2'] != -1 ) && ( isset($_GET['post']) || isset($_GET['ids']) ) ) {
     		$post_ids = isset($_GET['post']) ? array_map( 'intval', (array) $_GET['post'] ) : explode(',', $_GET['ids']);
     		$doaction = ($_GET['action'] != -1) ? $_GET['action'] : $_GET['action2'];
-    	} else {
-    		wp_redirect( admin_url("edit.php?page=marketpress-orders&post_type=product") );
     	}
 
     	switch ( $doaction ) {
@@ -2757,7 +2826,7 @@ Notification Preferences: %s', 'mp');
 
     				$received++;
     			}
-    			$sendback = add_query_arg('received', $received, $sendback);
+    			$msg = sprintf( _n( '%s order marked as Received.', '%s orders marked as Received.', $received, 'mp' ), number_format_i18n( $received ) );
     			break;
         case 'paid':
     			$paid = 0;
@@ -2769,7 +2838,7 @@ Notification Preferences: %s', 'mp');
 
     				$paid++;
     			}
-    			$sendback = add_query_arg('paid', $paid, $sendback);
+    			$msg = sprintf( _n( '%s order marked as Paid.', '%s orders marked as Paid.', $paid, 'mp' ), number_format_i18n( $paid ) );
     			break;
         case 'shipped':
     			$shipped = 0;
@@ -2781,7 +2850,7 @@ Notification Preferences: %s', 'mp');
 
     				$shipped++;
     			}
-    			$sendback = add_query_arg('shipped', $shipped, $sendback);
+    			$msg = printf( _n( '%s order marked as Shipped.', '%s orders marked as Shipped.', $shipped, 'mp' ), number_format_i18n( $shipped ) );
     			break;
         case 'closed':
     			$closed = 0;
@@ -2793,19 +2862,11 @@ Notification Preferences: %s', 'mp');
 
     				$closed++;
     			}
-    			$sendback = add_query_arg('closed', $closed, $sendback);
+    			$msg = printf( _n( '%s order Closed.', '%s orders Closed.', $closed, 'mp' ), number_format_i18n( $closed ) );
     			break;
 
     	}
 
-    	if ( isset($_GET['action']) )
-    		$sendback = remove_query_arg( array('action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status',  'post', 'bulk_edit', 'post_view'), $sendback );
-
-    	wp_redirect($sendback);
-    	exit();
-    } elseif ( ! empty($_GET['_wp_http_referer']) ) {
-    	 wp_redirect( remove_query_arg( array('_wp_http_referer', '_wpnonce'), stripslashes($_SERVER['REQUEST_URI']) ) );
-    	 exit;
     }
 
     $avail_post_stati = wp_edit_posts_query();
@@ -2822,33 +2883,9 @@ Notification Preferences: %s', 'mp');
     	printf( '<span class="subtitle">' . __('Search results for &#8220;%s&#8221;') . '</span>', get_search_query() ); ?>
     </h2>
 
-    <?php if ( isset($_GET['locked']) || isset($_GET['skipped']) || isset($_GET['updated']) || isset($_GET['received']) || isset($_GET['paid']) || isset($_GET['shipped']) || isset($_GET['closed']) ) { ?>
+    <?php if ( isset($msg) ) { ?>
     <div id="message" class="updated"><p>
-    <?php if ( isset($_GET['received']) && (int) $_GET['received'] ) {
-    	printf( _n( '%s order marked as Received.', '%s orders marked as Received.', $_GET['received'], 'mp' ), number_format_i18n( $_GET['received'] ) );
-    	unset($_GET['received']);
-    }
-
-    if ( isset($_GET['paid']) && (int) $_GET['paid'] ) {
-    	printf( _n( '%s order marked as Paid.', '%s orders marked as Paid.', $_GET['paid'], 'mp' ), number_format_i18n( $_GET['paid'] ) );
-    	unset($_GET['paid']);
-    }
-    
-    if ( isset($_GET['shipped']) && (int) $_GET['shipped'] ) {
-    	printf( _n( '%s order marked as Shipped.', '%s orders marked as Shipped.', $_GET['shipped'], 'mp' ), number_format_i18n( $_GET['shipped'] ) );
-    	unset($_GET['shipped']);
-    }
-    
-    if ( isset($_GET['closed']) && (int) $_GET['closed'] ) {
-    	printf( _n( '%s order Closed.', '%s orders Closed.', $_GET['closed'], 'mp' ), number_format_i18n( $_GET['closed'] ) );
-    	unset($_GET['closed']);
-    }
-
-    if ( isset($_GET['skipped']) && (int) $_GET['skipped'] )
-    	unset($_GET['skipped']);
-
-    $_SERVER['REQUEST_URI'] = remove_query_arg( array('locked', 'skipped', 'updated', 'received', 'paid', 'shipped', 'closed'), $_SERVER['REQUEST_URI'] );
-    ?>
+    <?php echo $msg; ?>
     </p></div>
     <?php } ?>
 
@@ -4425,7 +4462,7 @@ class MarketPress_Product_List extends WP_Widget {
           echo '<div class="mp_product_meta">';
           
           if ($instance['show_price'])
-            echo mp_product_price(false, $post->ID);
+            echo mp_product_price(false, $post->ID, '');
             
           if ($instance['show_button'])
             echo mp_buy_button(false, 'list', $post->ID);

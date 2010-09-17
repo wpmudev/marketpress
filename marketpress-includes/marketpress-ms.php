@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress_MS {
 
+  var $global_list_template;
   var $tag_template;
   var $category_template;
   
@@ -63,10 +64,13 @@ class MarketPress_MS {
     if ( ( get_site_option('mp_main_blog_only') && is_main_site() ) || !get_site_option('mp_main_blog_only') ) {
       //shortcodes
       add_shortcode( 'mp_list_global_products', array(&$this, 'mp_list_global_products_sc') );
+      add_shortcode( 'mp_global_categories_list', array(&$this, 'mp_global_categories_list_sc') );
+      add_shortcode( 'mp_global_tag_cloud', array(&$this, 'mp_global_tag_cloud_sc') );
       
       //widgets
       add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Global_Product_List");') );
       add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Global_Tag_Cloud_Widget");') );
+      add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Global_Category_List_Widget");') );
     }
 	}
 
@@ -119,11 +123,17 @@ class MarketPress_MS {
 		$default_settings = array(
       'main_blog' => 1,
       'allowed_gateways' => array(
-        'paypal-express' => 'full'
+        'paypal-express' => 'full',
+        'paypal-chained' => 'none',
+        'authorizenet-aim' => 'none',
+        'authorizenet-sim' => 'full',
+        'google-checkout' => 'full',
+        '2-checkout' => 'full'
       ),
       'allowed_themes' => array(
-        'default' => 'full',
-        'pretty' => 'full'
+        'classic' => 'full',
+        'modern' => 'full',
+        'icons' => 'full'
       ),
       'slugs' => array(
         'marketplace' => 'marketplace',
@@ -144,11 +154,16 @@ class MarketPress_MS {
 
     $new_rules = array();
 
-    //taxonomy list rewrites
+    //marketplace
+    $new_rules[$settings['slugs']['marketplace'] . '/?$'] = 'index.php?pagename=mp_global_products';
+    $new_rules[$settings['slugs']['marketplace'] . '/page/?([0-9]{1,})/?$'] = 'index.php?pagename=mp_global_products&paged=$matches[1]';
+
+    //categories
     $new_rules[$settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/?$'] = 'index.php?pagename=mp_global_categories';
     $new_rules[$settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/([^/]+)/?$'] = 'index.php?pagename=mp_global_categories&global_taxonomy=$matches[1]';
   	$new_rules[$settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/([^/]+)/page/?([0-9]{1,})/?$'] = 'index.php?pagename=mp_global_categories&global_taxonomy=$matches[1]&paged=$matches[2]';
 
+    //tags
     $new_rules[$settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/?$'] = 'index.php?pagename=mp_global_tags';
     $new_rules[$settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/([^/]+)/?$'] = 'index.php?pagename=mp_global_tags&global_taxonomy=$matches[1]';
     $new_rules[$settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/([^/]+)/page/?([0-9]{1,})/?$'] = 'index.php?pagename=mp_global_tags&global_taxonomy=$matches[1]&paged=$matches[2]';
@@ -169,6 +184,30 @@ class MarketPress_MS {
     global $wp_query, $mp;
     $settings = get_option('mp_network_settings');
     $is_shop_page = false;
+
+    //load proper theme for global products page
+    if ($wp_query->query_vars['pagename'] == 'mp_global_products') {
+
+      $templates[] = "mp_global_products.php";
+    	$templates[] = "mp_productlist.php";
+
+      //if custom template exists load it
+      if ($this->global_list_template = locate_template($templates)) {
+        add_filter( 'template_include', array(&$this, 'custom_product_list_template') );
+      } else {
+        //otherwise load the page template and use our own theme
+        $wp_query->is_page = 1;
+        $wp_query->is_singular = 1;
+        $wp_query->is_404 = false;
+        $wp_query->post_count = 1;
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
+        add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
+        add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
+        add_filter( 'the_content', array(&$this, 'product_list_theme'), 99 );
+      }
+
+      $is_shop_page = true;
+    }
 
     //load proper theme for order status page
     if ($wp_query->query_vars['pagename'] == 'mp_global_categories') {
@@ -241,6 +280,12 @@ class MarketPress_MS {
     }
   }
 
+
+  //filter the template
+  function custom_product_list_template($template) {
+    return $this->global_list_template;
+  }
+  
   //filter the template
   function custom_category_template($template) {
     return $this->category_template;
@@ -265,6 +310,10 @@ class MarketPress_MS {
     }
 
     switch ($wp_query->query_vars['pagename']) {
+      case 'mp_global_products':
+        return __('Marketplace Products', 'mp');
+        break;
+
       case 'mp_global_categories':
         if ($name)
           return sprintf( __('Products for: %s', 'mp'), esc_attr($name) );
@@ -283,7 +332,93 @@ class MarketPress_MS {
         return $title;
     }
   }
+  
+/* Leave for a future version
 
+  //adds our links to theme nav menus using wp_list_pages()
+  function filter_list_pages($list, $args) {
+
+    if ($args['depth'] == 1)
+      return $list;
+
+    $settings = get_option('mp_network_settings');
+    $store_link = home_url(trailingslashit($settings['slugs']['marketplace']));
+    $cats_link = home_url(trailingslashit($settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories']));
+    $tags_link = home_url(trailingslashit($settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags']));
+    
+    $temp_break = strpos($list, $store_link);
+
+    //if we can't find the page for some reason skip
+    if ($temp_break === false)
+      return $list;
+
+    $break = strpos($list, '</a>', $temp_break) + 4;
+
+    $nav = substr($list, 0, $break);
+
+    $nav .= '
+<ul>
+  <li class="page_item"><a href="' . $cats_link . '" title="' . __('Marketplace Product Categories', 'mp') . '">' . __('Marketplace Product Categories', 'mp') . '</a></li>
+	<li class="page_item"><a href="' . $tags_link . '" title="' . __('Marketplace Product Tags', 'mp') . '">' . __('Marketplace Product Tags', 'mp') . '</a></li>
+</ul>
+';
+
+    $nav .= substr($list, $break);
+
+    return $nav;
+  }
+
+  //adds our links to custom theme nav menus using wp_nav_menu()
+  function filter_nav_menu($list, $args) {
+
+    if ($args->depth == 1)
+      return $list;
+
+    $settings = get_option('mp_network_settings');
+    $store_link = home_url(trailingslashit($settings['slugs']['marketplace']));
+    $cats_link = home_url(trailingslashit($settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories']));
+    $tags_link = home_url(trailingslashit($settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags']));
+
+    $temp_break = strpos($list, $store_link);
+
+    //if we can't find the page for some reason skip
+    if ($temp_break === false)
+      return $list;
+
+    $break = strpos($list, '</a>', $temp_break) + 4;
+
+    $nav = substr($list, 0, $break);
+
+    $nav .= '
+<ul>
+  <li class="menu-item menu-item-type-post_type menu-item-object-page">' . $args->before . '<a href="' . $cats_link . '" title="' . __('Marketplace Product Categories', 'mp') . '">' . $args->link_before . __('Marketplace Product Categories', 'mp') . $args->link_after . '</a>' . $args->after . '</li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-page">' . $args->before . '<a href="' . $tags_link . '" title="' . __('Marketplace Product Tags', 'mp') . '">' . $args->link_before . __('Marketplace Product Tags', 'mp') . $args->link_after . '</a>' . $args->after . '</li>
+</ul>
+';
+
+    $nav .= substr($list, $break);
+
+    return $nav;
+  }
+*/
+
+  //this is the default theme added to the global product list page
+  function product_list_theme($content) {
+    global $wp_query;
+
+    $args = array();
+    $args['echo'] = false;
+    $args['per_page'] = 2;
+    //check for paging
+    if (get_query_var('paged'))
+      $args['page'] = intval(get_query_var('paged'));
+
+    $content = mp_list_global_products( $args );
+    //$content .= get_posts_nav_link();
+
+    return $content;
+  }
+  
   //this is the default theme added to the global categories page
   function global_categories_theme($content) {
     global $wp_query;
@@ -301,7 +436,7 @@ class MarketPress_MS {
       $content .= get_posts_nav_link();
       
     } else { //no category set, so show list
-      ////////////////////TODO
+      $content .= mp_global_categories_list( array( 'echo' => false ) );
     }
       
     return $content;
@@ -387,7 +522,7 @@ class MarketPress_MS {
           <div class="inside">
             <table class="form-table">
               <tr>
-      				<th scope="row"><?php _e('Limit Features To Main Blog', 'mp'); ?></th>
+      				<th scope="row"><?php _e('Limit Global Widgets/Shortcodes To Main Blog', 'mp'); ?></th>
       				<td>
       				<label><input value="1" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
               <label><input value="0" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 0) ?> /> <?php _e('No', 'mp') ?></label>
@@ -397,21 +532,22 @@ class MarketPress_MS {
           </div>
         </div>
         
-        <div id="mp_gateways" class="postbox">
+        <div class="postbox">
           <h3 class='hndle'><span><?php _e('Gateway Permissions', 'mp') ?></span> - <span class="description"><?php _e('Set payment gateway access permissions for network stores.', 'mp') ?></span></h3>
           <div class="inside">
             <table class="form-table">
               <?php
               foreach ((array)$mp_gateway_plugins as $code => $plugin) {
+                $allowed = ($settings['allowed_gateways'][$code]) ? $settings['allowed_gateways'][$code] : 'none';
               ?>
               <tr>
       				<th scope="row"><?php echo $plugin[1]; ?></th>
       				<td>
-              <label><input value="full" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($settings['allowed_gateways'][$code], 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
+              <label><input value="full" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
               <?php if (function_exists('is_supporter')) { ?>
-              <label><input value="supporter" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($settings['allowed_gateways'][$code], 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
+              <label><input value="supporter" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
               <?php } ?>
-              <label><input value="none" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($settings['allowed_gateways'][$code], 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
+              <label><input value="none" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
               </td>
               </tr>
               <?php } ?>
@@ -419,7 +555,12 @@ class MarketPress_MS {
           </div>
         </div>
         
-        <div id="mp_gateways" class="postbox">
+        <?php
+        //for adding additional settings via plugins
+        do_action('mp_network_gateway_settings', $settings);
+        ?>
+        
+        <div class="postbox">
           <h3 class='hndle'><span><?php _e('Theme Permissions', 'mp') ?></span> - <span class="description"><?php _e('Set theme access permissions for network stores.', 'mp') ?></span></h3>
           <div class="inside">
             <span class="description"><?php _e('For a custom css theme, save your css file with the "MarketPress Theme: NAME" header in the "/marketpress/css/themes/" folder and it will appear in this list so you may select it.', 'mp') ?></span>
@@ -449,15 +590,16 @@ class MarketPress_MS {
               asort($theme_list);
 
               foreach ($theme_list as $value => $name) {
+                $allowed = ($settings['allowed_themes'][$value]) ? $settings['allowed_themes'][$value] : 'full';
                 ?>
                 <tr>
         				<th scope="row"><?php echo $name; ?></th>
         				<td>
-                <label><input value="full" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($settings['allowed_themes'][$value], 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
+                <label><input value="full" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
                 <?php if (function_exists('is_supporter')) { ?>
-                <label><input value="supporter" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($settings['allowed_themes'][$value], 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
+                <label><input value="supporter" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
                 <?php } ?>
-                <label><input value="none" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($settings['allowed_themes'][$value], 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
+                <label><input value="none" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
                 </td>
                 </tr>
                 <?php
@@ -496,7 +638,7 @@ class MarketPress_MS {
         <div class="postbox">
           <h3 class='hndle'><span><?php _e('Shortcodes', 'mp') ?></span></h3>
           <div class="inside">
-            <p><?php _e('Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1="value" attr2="value"]</em>.', 'mp') ?></p>
+            <p><?php _e('Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1="value" attr2="value"]</em>. Note that depending on your preference above, you may only be able to use these on the main blog.', 'mp') ?></p>
             <table class="form-table">
               <tr>
       				<th scope="row"><?php _e('Global Products List', 'mp') ?></th>
@@ -521,6 +663,39 @@ class MarketPress_MS {
                   <li><?php _e('Example:', 'mp') ?> <em>[mp_list_global_products paginate="1" page="0" per_page="10" order_by="price" order="DESC" category="downloads"]</em></li>
                 </ul></p>
                 <span class="description"><?php _e('You may also use the mp_list_global_products() template function in your theme with the same arguments.', 'mp') ?></span>
+              </td>
+              </tr>
+              <tr>
+      				<th scope="row"><?php _e('Global Tag Cloud', 'mp') ?></th>
+      				<td>
+                <strong>[mp_global_tag_cloud]</strong> -
+                <span class="description"><?php _e('Displays global most used product tags in cloud format from network MarketPress stores.', 'mp') ?></span>
+                <p>
+                <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                <ul class="mp-shortcode-options">
+                  <li><?php _e('"limit" - Maximum amount of tags to display. Default: 45', 'mp') ?></li>
+                  <li><?php _e('"seperator" - String to seperate tags by, like a comma, etc.', 'mp') ?></li>
+                  <li><?php _e('Example:', 'mp') ?> <em>[mp_global_tag_cloud limit="55" seperator=", "]</em></li>
+                </ul></p>
+                <span class="description"><?php _e('You may also use the mp_global_tag_cloud() template function in your theme with the same arguments.', 'mp') ?></span>
+              </td>
+              </tr>
+              <tr>
+      				<th scope="row"><?php _e('Global Categories List', 'mp') ?></th>
+      				<td>
+                <strong>[mp_global_categories_list]</strong> -
+                <span class="description"><?php _e('Displays a network-wide HTML list of product categories according to preference.', 'mp') ?></span>
+                <p>
+                <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                <ul class="mp-shortcode-options">
+                  <li><?php _e('"limit" - Text to display for showing all categories. Default: 50', 'mp') ?></li>
+                  <li><?php _e('"order_by" - What column to use for ordering the categories. "count" or "name". Default: count', 'mp') ?></li>
+                  <li><?php _e('"order" - Direction to order products by. Can be: DESC, ASC. Default: DESC', 'mp') ?></li>
+                  <li><?php _e('"show_count" - Whether to show how many posts are in the category. Default: 0', 'mp') ?></li>
+                  <li><?php _e('"include" - What to show, "tags", "categories", or "both".', 'mp') ?></li>
+                  <li><?php _e('Example:', 'mp') ?> <em>[mp_global_categories_list limit="30" order_by="name" order="ASC" show_count="1" include="both"]</em></li>
+                </ul></p>
+                <span class="description"><?php _e('You may also use the mp_global_categories_list() template function in your theme with the same arguments.', 'mp') ?></span>
               </td>
               </tr>
             </table>
@@ -559,7 +734,7 @@ class MarketPress_MS {
       $this->delete_product($post_id);
       return;
     }
-		define( 'SAVEQUERIES', true );
+
 		//update or insert the product
 		$global_id = $wpdb->get_var("SELECT id FROM {$wpdb->base_prefix}mp_products WHERE site_id = {$wpdb->siteid} AND blog_id = {$wpdb->blogid} AND post_id = $post_id");
     if ($global_id) {
@@ -757,6 +932,51 @@ class MarketPress_MS {
     return mp_list_global_products( $args );
   }
   
+  /**
+   * Display the HTML list of global product categories.
+   *
+   * The list of arguments is below:
+   *     'limit' (string) - Text to display for showing all categories.
+   *     'order_by' (string) default is 'count' - What column to use for ordering the
+   * categories. 'count' or 'name'.
+   *     'order' (string) default is 'DESC' - What direction to order categories.
+   *     'show_count' (bool|int) default is 0 - Whether to show how many posts are
+   * in the category.
+   *     'include' (string) What to show, 'tags', 'categories', or 'both'.
+   *
+   * @param string|array $attr Optional. Override default arguments.
+   */
+  function mp_global_categories_list_sc($atts) {
+    $args = shortcode_atts($defaults = array(
+      'limit' => 50,
+  		'order_by' => 'count',
+      'order' => 'DESC',
+  		'show_count' => 0,
+  		'include' => 'categories'
+  	), $atts);
+
+    $args['echo'] = false;
+
+    return mp_global_categories_list( $args );
+  }
+  
+  /**
+   * Display Global Products tag cloud.
+   *
+   * @param limit Optional. How many tags to display.
+   * @param seperator Optional. String to seperate tags by.
+   * @param include Optional. What to show, 'tags', 'categories', or 'both'.
+   */
+  function mp_global_tag_cloud_sc($atts) {
+    extract( shortcode_atts(array(
+      'limit' => 45,
+  		'seperator' => '',
+  		'include' => 'both'
+  	), $atts) );
+
+    return mp_global_tag_cloud( false, $limit, $seperator, $include );
+  }
+  
 }
 $mp_wpmu = &new MarketPress_MS();
 
@@ -764,19 +984,90 @@ $mp_wpmu = &new MarketPress_MS();
 /*** Template Tags ***/
 
 /**
+ * Display or retrieve the HTML list of global product categories.
+ *
+ * The list of arguments is below:
+ *     'echo' (bool) - Whether to echo or return. default is echo
+ *     'limit' (string) - Text to display for showing all categories.
+ *     'order_by' (string) default is 'count' - What column to use for ordering the
+ * categories. 'count' or 'name'.
+ *     'order' (string) default is 'DESC' - What direction to order categories.
+ *     'show_count' (bool|int) default is 0 - Whether to show how many posts are
+ * in the category.
+ *     'include' (string) What to show, 'tags', 'categories', or 'both'.
+ *
+ * @param string|array $args Optional. Override default arguments.
+ */
+function mp_global_categories_list( $args = '' ) {
+  global $wpdb;
+  $settings = get_site_option( 'mp_network_settings' );
+  
+  $defaults = array(
+		'echo' => 1,
+    'limit' => 50,
+		'order_by' => 'count',
+    'order' => 'DESC',
+		'show_count' => 0,
+		'include' => 'categories'
+	);
+
+  $r = wp_parse_args( $args, $defaults );
+  extract( $r );
+
+  $order_by = ($order_by == 'name') ? $order_by : 'count';
+  $order = ($order == 'ASC') ? $order : 'DESC';
+  $limit = intval($limit);
+
+  //include categories as well
+  if ($include == 'tags')
+    $where = " WHERE t.type = 'product_tag'";
+  else if ($include == 'categories')
+    $where = " WHERE t.type = 'product_category'";
+
+  $tags = $wpdb->get_results( "SELECT name, slug, type, count(post_id) as count FROM {$wpdb->base_prefix}mp_terms t LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON t.term_id = r.term_id$where GROUP BY t.term_id ORDER BY $order_by $order LIMIT $limit", ARRAY_A );
+
+	if ( !$tags )
+		return;
+
+  //sort by name
+  foreach ($tags as $tag) {
+    if ($tag['type'] == 'product_category')
+      $link = network_home_url( $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
+    else if ($tag['type'] == 'product_tag')
+      $link = network_home_url( $settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/' . $tag['slug'] . '/' );
+
+    $list .= '<li><a href="' . $link . '" title="' . sprintf(__( '%d Products', 'mp' ), $tag['count']) . '">' . esc_attr( $tag['name'] );
+    if ($show_count)
+      $list .= ' - ' . $tag['count'];
+    $list .= "</a></li>\n";
+  }
+
+
+	if ( $echo )
+		echo '<ul id="mp_category_list">' . $list . '</ul>';
+
+	return '<ul id="mp_category_list">' . $list . '</ul>';
+}
+
+/**
  * Display Global Products tag cloud.
  *
  * @param bool $echo Optional. Whether or not to echo.
  * @param int $limit Optional. How many tags to display.
  * @param string $seperator Optional. String to seperate tags by.
- * @return array Generated tag cloud, only if no failures and 'array' is set for the 'format' argument.
+ * @param string $include Optional. What to show, 'tags', 'categories', or 'both'.
  */
-function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = '' ) {
+function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $include = 'both' ) {
   global $wpdb;
   $settings = get_site_option( 'mp_network_settings' );
 
   //include categories as well
-  $tags = $wpdb->get_results( "SELECT name, slug, type, count(post_id) as count FROM {$wpdb->base_prefix}mp_terms t LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON t.term_id = r.term_id GROUP BY t.term_id ORDER BY count DESC LIMIT $limit", ARRAY_A );
+  if ($include == 'tags')
+    $where = " WHERE t.type = 'product_tag'";
+  else if ($include == 'categories')
+    $where = " WHERE t.type = 'product_category'";
+  
+  $tags = $wpdb->get_results( "SELECT name, slug, type, count(post_id) as count FROM {$wpdb->base_prefix}mp_terms t LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON t.term_id = r.term_id$where GROUP BY t.term_id ORDER BY count DESC LIMIT $limit", ARRAY_A );
 
 	if ( !$tags )
 		return;
@@ -975,7 +1266,10 @@ function mp_list_global_products( $args = '' ) {
       //price
       if ($show_price) {
         switch_to_blog($product->blog_id);
-        $content .= mp_product_price(false, $product->post_id);
+        if ($context == 'widget')
+          $content .= mp_product_price(false, $product->post_id, ''); //no price label in widgets
+        else
+          $content .= mp_product_price(false, $product->post_id);
         restore_current_blog();
       }
 
@@ -1130,29 +1424,111 @@ class MarketPress_Global_Tag_Cloud_Widget extends WP_Widget {
 		if ( !empty($instance['title']) ) {
 			$title = $instance['title'];
 		} else {
-			$title = $tax->labels->name;
+			$title = __( 'Global Product Tags', 'mp' );
 		}
 		$title = apply_filters('widget_title', $title, $instance, $this->id_base);
 
 		echo $before_widget;
 		if ( $title )
 			echo $before_title . $title . $after_title;
-		echo '<div>';
-    mp_global_tag_cloud();
-		echo "</div>\n";
+
+    mp_global_tag_cloud( true, 45, '', $instance['taxonomy'] );
+
 		echo $after_widget;
 	}
 
 	function update( $new_instance, $old_instance ) {
 		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['taxonomy'] = stripslashes($new_instance['taxonomy']);
 		return $instance;
 	}
 
 	function form( $instance ) {
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Global Product Tags', 'mp'), 'taxonomy' => 'tags' ) );
 ?>
 	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
 	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $instance['title'])) {echo esc_attr( $instance['title'] );} ?>" /></p>
-	<?php
+  <p><label for="<?php echo $this->get_field_id('taxonomy'); ?>"><?php _e('Show:','mp') ?></label>
+  <select class="widefat" id="<?php echo $this->get_field_id('taxonomy'); ?>" name="<?php echo $this->get_field_name('taxonomy'); ?>">
+  <option value="tags" <?php selected($instance['taxonomy'], 'tags') ?>><?php _e('Product Tags','mp'); ?></option>
+  <option value="categories" <?php selected($instance['taxonomy'], 'categories') ?>><?php _e('Product Categories','mp'); ?></option>
+  <option value="both" <?php selected($instance['taxonomy'], 'both') ?>><?php _e('Both','mp'); ?></option>
+	</select></p>
+  <?php
+	}
+}
+
+//Product categories list
+class MarketPress_Global_Category_List_Widget extends WP_Widget {
+
+	function MarketPress_Global_Category_List_Widget() {
+		$widget_ops = array( 'classname' => 'mp_global_category_list_widget', 'description' => __( "Displays a network-wide HTML list of product categories from network MarketPress stores.") );
+		$this->WP_Widget('mp_global_category_list_widget', __('Global Product Category List', 'mp'), $widget_ops);
+	}
+
+	function widget( $args, $instance ) {
+		extract($args);
+
+		if ( !empty($instance['title']) ) {
+			$title = $instance['title'];
+		} else {
+			$title = __( 'Global Product Categories', 'mp' );
+		}
+		$title = apply_filters('widget_title', $title, $instance, $this->id_base);
+
+		echo $before_widget;
+		if ( $title )
+			echo $before_title . $title . $after_title;
+
+    mp_global_categories_list( $instance );
+
+		echo $after_widget;
+	}
+
+	function update( $new_instance, $old_instance ) {
+		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['include'] = stripslashes($new_instance['include']);
+		$instance['limit'] = intval($new_instance['limit']);
+		$instance['order_by'] = $new_instance['order_by'];
+		$instance['order'] = $new_instance['order'];
+    $instance['show_count'] = !empty($new_instance['show_count']) ? 1 : 0;
+		return $instance;
+	}
+
+	function form( $instance ) {
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Global Product Categories', 'mp'), 'order_by' => 'name', 'order' => 'ASC', 'limit' => 50, 'show_count' => 0, 'include' => 'categories' ) );
+    extract( $instance );
+?>
+	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
+	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $title )) {echo esc_attr( $title );} ?>" /></p>
+
+  <p>
+  <label for="<?php echo $this->get_field_id('order_by'); ?>"><?php _e('Order Categories By:', 'mp') ?><br />
+  <select id="<?php echo $this->get_field_id('order_by'); ?>" name="<?php echo $this->get_field_name('order_by'); ?>">
+    <option value="name"<?php selected($order_by, 'name') ?>><?php _e('Name', 'mp') ?></option>
+    <option value="count"<?php selected($order_by, 'count') ?>><?php _e('Product Count', 'mp') ?></option>
+  </select><br />
+  <label><input value="DESC" name="<?php echo $this->get_field_name('order'); ?>" type="radio"<?php checked($order, 'DESC') ?> /> <?php _e('Descending', 'mp') ?></label>
+  <label><input value="ASC" name="<?php echo $this->get_field_name('order'); ?>" type="radio"<?php checked($order, 'ASC') ?> /> <?php _e('Ascending', 'mp') ?></label>
+  </p>
+
+  <p>
+  <label for="<?php echo $this->get_field_id('limit'); ?>"><?php _e('Number of Categories:', 'mp') ?>
+  <input id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" size="3" value="<?php echo intval($limit); ?>" /></label><br />
+  </p>
+
+  <p>
+  <input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_count'); ?>" name="<?php echo $this->get_field_name('show_count'); ?>"<?php checked( $show_count ); ?> />
+	<label for="<?php echo $this->get_field_id('show_count'); ?>"><?php _e( 'Show product counts' ); ?></label>
+  </p>
+  
+  <p><label for="<?php echo $this->get_field_id('include'); ?>"><?php _e('Show:','mp') ?></label>
+  <select class="widefat" id="<?php echo $this->get_field_id('include'); ?>" name="<?php echo $this->get_field_name('include'); ?>">
+  <option value="tags" <?php selected($include, 'tags') ?>><?php _e('Product Tags','mp'); ?></option>
+  <option value="categories" <?php selected($include, 'categories') ?>><?php _e('Product Categories','mp'); ?></option>
+  <option value="both" <?php selected($include, 'both') ?>><?php _e('Both','mp'); ?></option>
+	</select></p>
+  <?php
 	}
 }
 ?>

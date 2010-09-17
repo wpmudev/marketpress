@@ -161,7 +161,7 @@ function mp_dropdown_categories( $echo = true, $args = '' ) {
  */
 function mp_popular_products( $echo = true, $num = 5 ) {
   //The Query
-  $custom_query = new WP_Query('post_type=product&posts_per_page='.intval($num).'&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value&order=DESC');
+  $custom_query = new WP_Query('post_type=product&post_status=publish&posts_per_page='.intval($num).'&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value&order=DESC');
 
   $content = '<ul id="mp_popular_products">';
 
@@ -205,7 +205,7 @@ function _mp_cart_table($cart, $type = 'checkout') {
       foreach ($cart as $product_id => $data) {
         $totals[] = $data['price'] * $data['quantity'];
         echo '<tr>';
-        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
+        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
         echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
         echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
         echo '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $product_id . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $product_id . '" /> ' . __('Remove', 'mp') . '</label></td>';
@@ -286,7 +286,7 @@ function _mp_cart_table($cart, $type = 'checkout') {
       foreach ($cart as $product_id => $data) {
         $totals[] = $data['price'] * $data['quantity'];
         echo '<tr>';
-        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
+        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
         echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
         echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
         echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
@@ -637,6 +637,11 @@ function _mp_cart_payment($type) {
     </form>
     <?php
   } else if ($type == 'confirm') {
+    //if skipping a step
+    if (empty($_SESSION['mp_payment_method'])) {
+      echo '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
+      return;
+    }
     ?>
     <form id="mp_payment_form" method="post" action="<?php echo mp_checkout_step_url('confirm-checkout'); ?>">
 
@@ -648,10 +653,10 @@ function _mp_cart_payment($type) {
     </form>
     <?php
   } else if ($type == 'confirmation') {
-  
-    //if coming to the page outside of normal process show cart
-    if (!$mp->get_order($_SESSION['mp_order'])) {
-      mp_show_cart('checkout');
+
+    //if skipping a step
+    if (empty($_SESSION['mp_payment_method'])) {
+      echo '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
       return;
     }
 
@@ -770,7 +775,7 @@ function mp_order_status() {
       <ul>
       <?php
       //get times
-      $received = mysql2date(get_option('date_format') . ' - ' . get_option('time_format'), $order->post_date);
+      $received = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
       if ($order->mp_paid_time)
         $paid = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
       if ($order->mp_shipped_time)
@@ -1086,7 +1091,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   }
 
   //The Query
-  $custom_query = new WP_Query('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
+  $custom_query = new WP_Query('post_type=product&post_status=publish' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 
   $content = '<div id="mp_product_list">';
 
@@ -1246,11 +1251,11 @@ function mp_get_product_class( $class = '', $post_id = null ) {
  * @param int $post_id The post_id for the product. Optional if in the loop
  * @param sting $label A label to prepend to the price. Defaults to "Price: "
  */
-function mp_product_price( $echo = true, $post_id = NULL, $label = '' ) {
+function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
   global $id, $mp;
   $post_id = ( NULL === $post_id ) ? $id : $post_id;
 
-  $label = ($label) ? $label : __('Price: ', 'mp');
+  $label = ($label === true) ? __('Price: ', 'mp') : $label;
 
   $settings = get_option('mp_settings');
 	$meta = get_post_custom($post_id);
