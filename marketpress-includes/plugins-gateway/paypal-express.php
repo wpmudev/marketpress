@@ -215,7 +215,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   					break;
   					
           case 'Failed':
-            $status = __('The payment has failed. This happens only if the payment was made from your customer’s bank account.', 'mp');
+            $status = __('The payment has failed. This happens only if the payment was made from your customer\'s bank account.', 'mp');
             $paid = false;
   					break;
 
@@ -615,7 +615,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					break;
 
         case 'Failed':
-          $status = __('The payment has failed. This happens only if the payment was made from your customer’s bank account.', 'mp');
+          $status = __('The payment has failed. This happens only if the payment was made from your customer\'s bank account.', 'mp');
           $paid = false;
 					break;
 					
