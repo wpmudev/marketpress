@@ -48,11 +48,8 @@ class MarketPress {
     //setup our variables
     $this->init_vars();
 
-    //activation hook only works in /plugins/ dir. Use when possible for efficiency
-    if ($this->sitewide)
-      $this->install();
-    else
-      register_activation_hook( __FILE__, array(&$this, 'install') );
+    //install plugin
+    $this->install();
 
     //load template functions
     require_once( $this->plugin_dir . 'template-functions.php' );

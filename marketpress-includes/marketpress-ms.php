@@ -61,7 +61,8 @@ class MarketPress_MS {
     }
 
     //check for main blog limits
-    if ( ( get_site_option('mp_main_blog_only') && is_main_site() ) || !get_site_option('mp_main_blog_only') ) {
+    $settings = get_site_option( 'mp_network_settings' );
+    if ( ( $settings['main_blog'] && is_main_site() ) || !$settings['main_blog'] ) {
       //shortcodes
       add_shortcode( 'mp_list_global_products', array(&$this, 'mp_list_global_products_sc') );
       add_shortcode( 'mp_global_categories_list', array(&$this, 'mp_global_categories_list_sc') );
