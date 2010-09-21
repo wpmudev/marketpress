@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.0
+Version: 1.0.1
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.0';
+  var $version = '1.0.1';
   var $sitewide;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -4669,8 +4669,6 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 		$current_taxonomy = 'product_tag';
 		if ( !empty($instance['title']) ) {
 			$title = $instance['title'];
-		} else {
-			$title = $tax->labels->name;
 		}
 		$title = apply_filters('widget_title', $title, $instance, $this->id_base);
 
@@ -4685,11 +4683,11 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 
 	function update( $new_instance, $old_instance ) {
 		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
-		$instance['taxonomy'] = 'product_tag';
 		return $instance;
 	}
 
 	function form( $instance ) {
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Product Tags', 'mp') ) );
 ?>
 	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
 	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $instance['title'])) {echo esc_attr( $instance['title'] );} ?>" /></p>
