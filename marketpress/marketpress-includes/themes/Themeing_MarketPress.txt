@@ -62,3 +62,20 @@ Advanced Themes:
     mp_tag.php
     mp_taxonomy.php
     mp_productlist.php
+
+  --------------------------------------------------
+  Global Listings - Will only work on main site/blog
+  --------------------------------------------------
+  Product List Page
+    mp_global_products.php
+    mp_productlist.php
+    
+  Product Category List Page
+    mp_global_category-CATEGORYSLUG.php
+    mp_global_category.php
+    mp_global_category_list.php
+    
+  Product Tag List Page
+    mp_global_tag-TAGSLUG.php
+    mp_global_tag.php
+    mp_global_tag_list.php

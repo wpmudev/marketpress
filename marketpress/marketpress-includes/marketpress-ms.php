@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Multisite Features
-Version: 1.0.1
+Version: 1.0.2
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -146,7 +146,7 @@ class MarketPress_MS {
     update_site_option( 'mp_network_settings', $default_settings );
     
     //add action to flush rewrite rules after we've added them for the first time
-    add_action( 'init', array(&$mp, 'flush_rewrite') );
+    add_action( 'init', array(&$mp, 'flush_rewrite'), 999 );
 
   }
 
@@ -317,14 +317,14 @@ class MarketPress_MS {
 
       case 'mp_global_categories':
         if ($name)
-          return sprintf( __('Products for: %s', 'mp'), esc_attr($name) );
+          return sprintf( __('Product Category: %s', 'mp'), esc_attr($name) );
         else
           return __('Marketplace Product Categories', 'mp');
         break;
         
       case 'mp_global_tags':
         if ($name)
-          return sprintf( __('Products for: %s', 'mp'), esc_attr($name) );
+          return sprintf( __('Product Tag: %s', 'mp'), esc_attr($name) );
         else
           return __('Marketplace Product Tags', 'mp');
         break;
@@ -1432,7 +1432,7 @@ class MarketPress_Global_Tag_Cloud_Widget extends WP_Widget {
 		if ( $title )
 			echo $before_title . $title . $after_title;
 
-    mp_global_tag_cloud( true, 45, '', $instance['taxonomy'] );
+    mp_global_tag_cloud( true, 45, ' ', $instance['taxonomy'] );
 
 		echo $after_widget;
 	}

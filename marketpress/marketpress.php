@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.0.1
+Version: 1.0.2
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -26,8 +26,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.0.1';
-  var $sitewide;
+  var $version = '1.0.2';
+  var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
   var $product_template;
@@ -74,7 +74,7 @@ class MarketPress {
 		add_action( 'plugins_loaded', array(&$this, 'localization') );
 
 		//custom post type
-    add_action( 'init', array(&$this, 'register_custom_posts') );
+    add_action( 'init', array(&$this, 'register_custom_posts'), 0 ); //super high priority
 		add_filter( 'request', array(&$this, 'handle_edit_screen_filter') );
 		
 		//edit products page
@@ -104,19 +104,19 @@ class MarketPress {
   	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
 		add_filter( 'wp_nav_menu_items', array(&$this, 'filter_nav_menu'), 10, 2 );
+		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
 		
 		//Payment gateway returns
 	  add_action( 'pre_get_posts', array(&$this, 'handle_gateway_returns'), 1 );
 		
 		//Store cart handling
     add_action( 'template_redirect', array(&$this, 'store_script') ); //only on front pages
-		//add_action( 'init', array(&$this, 'start_session') );
     /* use both actions so logged in and not logged in users can send this AJAX request */
     add_action( 'wp_ajax_nopriv_mp-update-cart', array(&$this, 'update_cart') );
     add_action( 'wp_ajax_mp-update-cart', array(&$this, 'update_cart') );
 		
 		//Relies on post thumbnails for products
-		add_theme_support( 'post-thumbnails' );
+		add_action( 'after_setup_theme', array(&$this, 'post_thumbnails'), 9999 );
 		
 		//Add widgets
 		if (!$settings['disable_cart'])
@@ -245,16 +245,18 @@ Thanks again!", 'mp')
     add_action( 'init', array(&$this, 'create_store_page') );
     
     //add action to flush rewrite rules after we've added them for the first time
-    add_action( 'init', array(&$this, 'flush_rewrite') );
+    add_action( 'init', array(&$this, 'flush_rewrite'), 999 );
   }
   
   function localization() {
     // Load up the localization file if we're using WordPress in a different language
   	// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
-  	if ($this->sitewide)
-      load_muplugin_textdomain( 'mp', '/marketpress/languages/' );
-  	else
-      load_plugin_textdomain( 'mp', false, '/marketpress/languages/' );
+  	if ($this->location == 'mu-plugins')
+      load_muplugin_textdomain( 'mp', '/marketpress-includes/languages/' );
+  	else if ($this->location == 'subfolder-plugins')
+      load_plugin_textdomain( 'mp', false, '/marketpress/marketpress-includes/languages/' );
+    else if ($this->location == 'plugins')
+      load_plugin_textdomain( 'mp', false, '/marketpress-includes/languages/' );
   	
   	//setup language code for jquery datepicker translation
   	$temp_locales = explode('_', get_locale());
@@ -264,15 +266,15 @@ Thanks again!", 'mp')
   function init_vars() {
     //setup proper directories
     if (is_multisite() && defined('WPMU_PLUGIN_URL') && defined('WPMU_PLUGIN_DIR') && file_exists(WPMU_PLUGIN_DIR . '/' . basename(__FILE__))) {
-      $this->sitewide = true;
+      $this->location = 'mu-plugins';
       $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress-includes/';
       $this->plugin_url = WPMU_PLUGIN_URL . '/marketpress-includes/';
   	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/marketpress/' . basename(__FILE__))) {
-      $this->sitewide = false;
+      $this->location = 'subfolder-plugins';
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/marketpress-includes/';
       $this->plugin_url = WP_PLUGIN_URL . '/marketpress/marketpress-includes/';
   	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/' . basename(__FILE__))) {
-      $this->sitewide = false;
+      $this->location = 'plugins';
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress-includes/';
       $this->plugin_url = WP_PLUGIN_URL . '/marketpress-includes/';
   	} else {
@@ -545,7 +547,6 @@ Thanks again!", 'mp')
     );
     register_post_type( 'product' , $args );
 
-
     //register the orders post type
     register_post_type( 'mp_order', array(
       'labels' => array('name' => __('Orders', 'mp'),
@@ -590,14 +591,27 @@ Thanks again!", 'mp')
   		'post_type'   => 'mp_order',
   		'public'      => false
   	) );
+  	
   }
   
+  //necessary to mod array directly rather than with add_theme_support() to play nice with other themes. See http://www.wptavern.com/forum/plugins-hacks/1751-need-help-enabling-post-thumbnails-custom-post-type.html
+  function post_thumbnails() {
+    global $_wp_theme_features;
+
+    if( !isset( $_wp_theme_features['post-thumbnails'] ) )
+        $_wp_theme_features['post-thumbnails'] = array( array( 'product' ) );
+    else if ( true === $_wp_theme_features['post-thumbnails'] )
+        $_wp_theme_features['post-thumbnails'] = array( array( 'post', 'page', 'product' ) );
+    else if ( is_array( $_wp_theme_features['post-thumbnails'] ) )
+        $_wp_theme_features['post-thumbnails'][0][] = 'product';
+  }
+
   // This function clears the rewrite rules and forces them to be regenerated
   function flush_rewrite() {
   	global $wp_rewrite;
   	$wp_rewrite->flush_rules();
   }
-  
+
   function add_rewrite_rules($rules){
     $settings = get_option('mp_settings');
 
@@ -619,6 +633,20 @@ Thanks again!", 'mp')
     $new_rules[$settings['slugs']['store'] . '/payment-return/(.+)'] = 'index.php?paymentgateway=$matches[1]';
     
   	return array_merge($new_rules, $rules);
+  }
+
+  //unfortunately some plugins flush rewrites before the init hook so they kill custom post type rewrites. This function verifies they are in the final array and flushes if not
+  function check_rewrite_rules($value) {
+    $settings = get_option('mp_settings');
+    
+    //prevent an infinite loop
+    if ( ! post_type_exists( 'product' ) )
+      return;
+
+    $array_key = $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/([^/]+)/page/?([0-9]{1,})/?$';
+  	if ( !array_key_exists($array_key, $value) ) {
+      $this->flush_rewrite();
+    }
   }
 
   function add_queryvars($vars) {
@@ -754,7 +782,7 @@ Thanks again!", 'mp')
 
       //if custom template exists load it
       if ($this->product_list_template = locate_template($templates)) {
-      
+
         //call a custom query posts for this listing
         //setup pagination
         if ($settings['paginate']) {
@@ -781,12 +809,12 @@ Thanks again!", 'mp')
 
         //The Query
         query_posts('post_type=product' . $paginate_query . $order_by_query . $order_query);
-        
+
         add_filter( 'template_include', array(&$this, 'custom_product_list_template') );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
+        //$wp_query->is_singular = 1;
         $wp_query->is_404 = null;
         $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
@@ -799,7 +827,7 @@ Thanks again!", 'mp')
     }
 
     //load proper theme for product category or tag listings
-    if ($wp_query->is_tax && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag')) {
+    if ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') {
       $templates = array();
       
       if ($wp_query->query_vars['taxonomy'] == 'product_category') {
@@ -859,14 +887,15 @@ Thanks again!", 'mp')
 
         //The Query
         query_posts('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
-        
+
         add_filter( 'template_include', array(&$this, 'custom_product_taxonomy_template'));
       } else {
         //otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
         $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
+        //$wp_query->is_singular = 1;
         $wp_query->is_404 = null;
         $wp_query->post_count = 1;
+        add_filter( 'the_title', array(&$this, 'page_title_output'), 99, 2 );
         add_filter( 'the_content', array(&$this, 'product_taxonomy_list_theme'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
       }
@@ -894,7 +923,7 @@ Thanks again!", 'mp')
       wp_enqueue_style( 'mp-store-theme', $this->plugin_url . 'themes/' . $settings['store_theme'] . '.css', false, $this->version );
 
   }
-  
+
   //list store themes in dropdown
   function store_themes_select() {
     $settings = get_option('mp_settings');
@@ -1062,6 +1091,17 @@ Thanks again!", 'mp')
     if (!empty($title) && $id === false)
       return $title;
 
+    //taxonomy pages
+    if (($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') && $wp_query->post->ID == $id) {
+      if ($wp_query->query_vars['taxonomy'] == 'product_category') {
+        $term = get_term_by('slug', get_query_var('product_category'), 'product_category');
+        return sprintf( __('Product Category: %s', 'mp'), $term->name );
+      } else if ($wp_query->query_vars['taxonomy'] == 'product_tag') {
+        $term = get_term_by('slug', get_query_var('product_tag'), 'product_tag');
+        return sprintf( __('Product Tag: %s', 'mp'), $term->name );
+      }
+    }
+
     switch ($wp_query->query_vars['pagename']) {
       case 'cart':
         if ($wp_query->query_vars['checkoutstep'] == 'shipping')
@@ -1133,7 +1173,6 @@ Thanks again!", 'mp')
   function product_list_theme($content) {
     $settings = get_option('mp_settings');
     $content .= $settings['msg']['product_list'];
-    $content .= get_posts_nav_link();
     $content .= mp_list_products(false);
     $content .= get_posts_nav_link();
     
@@ -1144,7 +1183,6 @@ Thanks again!", 'mp')
   function product_taxonomy_list_theme($content) {
     $settings = get_option('mp_settings');
     $content = $settings['msg']['product_list'];
-    $content .= get_posts_nav_link();
     $content .= mp_list_products(false);
     $content .= get_posts_nav_link();
 
@@ -1822,25 +1860,25 @@ Thanks again!", 'mp')
 
       //check checkout info
       if (!is_email($_POST['email']))
-    		$this->cart_checkout_error('Please enter a valid Email Address.', 'email');
+    		$this->cart_checkout_error( __('Please enter a valid Email Address.', 'mp'), 'email');
     		
       if (empty($_POST['name']))
-    		$this->cart_checkout_error('Please enter your Full Name.', 'name');
+    		$this->cart_checkout_error( __('Please enter your Full Name.', 'mp'), 'name');
 
       if (empty($_POST['address1']))
-    		$this->cart_checkout_error('Please enter your Street Address.', 'address1');
+    		$this->cart_checkout_error( __('Please enter your Street Address.', 'mp'), 'address1');
 
       if (empty($_POST['city']))
-    		$this->cart_checkout_error('Please enter your City.', 'city');
+    		$this->cart_checkout_error( __('Please enter your City.', 'mp'), 'city');
 
       if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
-        $this->cart_checkout_error('Please enter your State/Province/Region.', 'state');
+        $this->cart_checkout_error( __('Please enter your State/Province/Region.', 'mp'), 'state');
 
       if (empty($_POST['zip']))
-    		$this->cart_checkout_error('Please enter your Zip/Postal Code.', 'zip');
+    		$this->cart_checkout_error( __('Please enter your Zip/Postal Code.', 'mp'), 'zip');
 
       if (empty($_POST['country']) || strlen($_POST['country']) != 2)
-    		$this->cart_checkout_error('Please enter your Country.', 'country');
+    		$this->cart_checkout_error( __('Please enter your Country.', 'mp'), 'country');
 
       //for checkout plugins
       do_action( 'mp_shipping_process' );

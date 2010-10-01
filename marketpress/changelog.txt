@@ -1,0 +1,21 @@
+Plugin Name: MarketPress
+Author: Aaron Edwards (incsub)
+
+Change Log:
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+1.0.2 - 10/01/2010
+----------------------------------------------------------------------
+- Fixed bug with paging on product/taxonomy lists
+- Fixed title on taxonomy list pages
+- Hopefully added a workaround to detect and deal with poorly written plugins that flush rewrite rules before init
+- Fixed bug that incorrectly showed out of stock button when stock remained
+
+1.0.1 - 9/18/2010
+----------------------------------------------------------------------
+- Fixed bug in global listings that didn't show product thumbnails/prices
+
+1.0 - 9/11/2010
+----------------------------------------------------------------------
+- Initial Release

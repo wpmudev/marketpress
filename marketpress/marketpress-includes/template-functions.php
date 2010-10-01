@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Template Functions
-Version: 1.0.1
+Version: 1.0.2
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -1036,13 +1036,13 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     $taxonomy_query = '&product_category=' . sanitize_title($category);
   } else if ($tag) {
     $taxonomy_query = '&product_tag=' . sanitize_title($tag);
-  } else if ($wp_query->is_tax && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag')) {
+  } else if ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') {
     $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
   }
 
   //setup pagination
   $paged = false;
-  if ($paginate == true) {
+  if ($paginate) {
     $paged = true;
   } else if ($paginate === '') {
     if ($settings['paginate'])
@@ -1093,6 +1093,10 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   //The Query
   $custom_query = new WP_Query('post_type=product&post_status=publish' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 
+  //allows pagination links to work get_posts_nav_link()
+  if ($wp_query->max_num_pages == 0 || $taxonomy_query)
+    $wp_query->max_num_pages = $custom_query->max_num_pages;
+  
   $content = '<div id="mp_product_list">';
 
   if (count($custom_query->posts)) {
@@ -1293,14 +1297,14 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   if (get_post_meta($post_id, 'mp_track_inventory', true)) {
     $stock = get_post_meta($post_id, 'mp_inventory', true);
     $cart = $mp->get_cart_contents();
-    if ($stock <= $cart[$post_id])
+    if ($stock <= $cart[$post_id]['quantity'])
       $inventory = false;
     else
       $inventory = true;
   } else {
     $inventory = true;
   }
-        
+
   //display an external link or form button
   if ($product_link = get_post_meta($post_id, 'mp_product_link', true)) {
 
