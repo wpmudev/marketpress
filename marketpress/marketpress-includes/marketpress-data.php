@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Data Structures
-Version: 1.0.2
+Version: 1.0.3
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -528,6 +528,8 @@ $this->currencies = array(
   "UZS"=> array("Uzbekistan, Sums", "43b, 432"),
   "VEF"=> array("Venezuela, Bolivares Fuertes", "42, 73"),
   "VND"=> array("Vietnam, Dong", "20ab"),
+  "XAF"=> array("BEAC, CFA Francs", "46, 43, 46, 41"),
+  "XOF"=> array("BCEAO, CFA Francs", "46, 43, 46, 41"),
   "YER"=> array("Yemen, Rials", "fdfc"),
   "ZWD"=> array("Zimbabwe, Zimbabwe Dollars", "5a, 24")
 );

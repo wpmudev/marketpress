@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Payment Gateway Plugin Base Class
-Version: 1.0.2
+Version: 1.0.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)

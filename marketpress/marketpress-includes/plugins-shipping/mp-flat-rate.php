@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Flat-Rate Shipping Plugin
-Version: 1.0.1
+Version: 1.0.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -205,7 +205,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
     global $mp;
     ?>
     <label><?php _e('Extra Shipping Cost', 'mp'); ?>:<br />
-    <?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo ($shipping_meta['extra_cost']) ? round($shipping_meta['extra_cost'], 2) : '0.00'; ?>" />
+    <?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo ($shipping_meta['extra_cost']) ? $mp->display_currency($shipping_meta['extra_cost']) : '0.00'; ?>" />
     </label>
     <?php
   }

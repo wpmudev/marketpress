@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.0.2
+Version: 1.0.3
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.0.2';
+  var $version = '1.0.3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -350,11 +350,19 @@ Thanks again!", 'mp')
     if (isset($_POST['gateway_settings'])) {
       $settings = get_option('mp_settings');
       
-      //clear allowed array as it will be refilled
-      unset($settings['gateways']['allowed']);
+      //see if there are checkboxes checked
+      if ( isset( $_POST['mp'] ) ) {
       
-      //allow plugins to verify settings before saving
-      $settings = array_merge($settings, apply_filters('mp_gateway_settings_filter', $_POST['mp']));
+        //clear allowed array as it will be refilled
+        unset( $settings['gateways']['allowed'] );
+        
+        //allow plugins to verify settings before saving
+        $settings = array_merge($settings, apply_filters('mp_gateway_settings_filter', $_POST['mp']));
+      } else {
+        //blank array if no checkboxes
+        $settings['gateways']['allowed'] = array();
+      }
+
       update_option('mp_settings', $settings);
     }
     
@@ -1460,7 +1468,11 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_sales_count', $sale_count);
       
       //for shipping plugins to save their meta values
-      update_post_meta( $post_id, 'mp_shipping', apply_filters('mp_save_shipping_meta', $meta["mp_shipping"][0]) );
+      $mp_shipping = maybe_unserialize($meta["mp_shipping"][0]);
+      if ( !is_array($mp_shipping) )
+        $mp_shipping = array();
+
+      update_post_meta( $post_id, 'mp_shipping', apply_filters('mp_save_shipping_meta', $mp_shipping) );
       
       //for any other plugin to hook into
       do_action( 'mp_save_product_meta', $post_id, $meta );
@@ -1474,8 +1486,8 @@ Thanks again!", 'mp')
 		$meta = get_post_custom($post->ID);
     ?>
     <div class="alignleft">
-      <label><?php _e('Price', 'mp'); ?>:<br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_price" name="mp_price" value="<?php echo ($meta["mp_price"][0]) ? round($meta["mp_price"][0], 2) : '0.00'; ?>" /></label>
-      <label><?php _e('Sale Price', 'mp'); ?>:<br /><small><?php _e('When set this overrides the normal price.', 'mp'); ?></small><br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_sale_price" name="mp_sale_price" value="<?php echo ($meta["mp_sale_price"][0]) ? round($meta["mp_sale_price"][0], 2) : ''; ?>" /></label>
+      <label><?php _e('Price', 'mp'); ?>:<br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_price" name="mp_price" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></label>
+      <label><?php _e('Sale Price', 'mp'); ?>:<br /><small><?php _e('When set this overrides the normal price.', 'mp'); ?></small><br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_sale_price" name="mp_sale_price" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></label>
     </div>
     <div class="alignleft">
       <label title="<?php _e('Stock Keeping Unit - Your custom Product ID number', 'mp'); ?>"><?php _e('SKU', 'mp'); ?>:<br /><input type="text" size="12" id="mp_sku" name="mp_sku" value="<?php echo esc_attr($meta["mp_sku"][0]); ?>" /></label>
@@ -1503,9 +1515,10 @@ Thanks again!", 'mp')
     global $post;
     $settings = get_option('mp_settings');
 		$meta = get_post_custom($post->ID);
+		$mp_shipping = maybe_unserialize($meta["mp_shipping"][0]);
 		
 		//tie in for shipping plugins
-    do_action( 'mp_shipping_metabox', $meta["mp_shipping"][0], $settings );
+    do_action( 'mp_shipping_metabox', $mp_shipping, $settings );
   }
   
   //The Product Download meta box
@@ -1539,7 +1552,7 @@ Thanks again!", 'mp')
       $price = $meta["mp_price"][0];
     }
 
-    $price = round($price, 2);
+    $price = $this->display_currency($price);
 
     if ($format)
       return $this->format_currency('', $price);
@@ -2443,6 +2456,11 @@ Notification Preferences: %s', 'mp');
     
     //save so we don't send an email every time
     update_post_meta($product_id, 'mp_stock_email_sent', 1);
+  }
+  
+  //round and display currency with padded zeros
+  function display_currency( $amount ) {
+    return number_format( round( $amount, 2 ), 2, '.', '');
   }
   
   //display currency symbol

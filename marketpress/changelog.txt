@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.0.3 - 10/12/2010
+----------------------------------------------------------------------
+- Fixed fatal error when unchecking all gateways
+- Fixed error saving decimal in extra shipping
+- Fixed currency display decimals in admin fields
+
 1.0.2 - 10/01/2010
 ----------------------------------------------------------------------
 - Fixed bug with paging on product/taxonomy lists

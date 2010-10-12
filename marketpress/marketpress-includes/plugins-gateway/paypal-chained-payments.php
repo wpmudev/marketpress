@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress PayPal Chained Payments Gateway Plugin
-Version: 1.0.1
+Version: 1.0.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
