@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Template Functions
-Version: 1.0.3
+Version: 1.0.4
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)

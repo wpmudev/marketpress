@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Multisite Features
-Version: 1.0.3
+Version: 1.0.4
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -54,7 +54,7 @@ class MarketPress_MS {
     add_action( 'update_option_blog_public', array(&$this, 'public_update'), 16, 2 );
 
     //Templates and Rewrites
-    if (is_main_site()) {
+    if ( $this->is_main_site() ) {
   		add_action( 'template_redirect', array(&$this, 'load_marketplace_templates') );
   		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
     	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
@@ -62,7 +62,7 @@ class MarketPress_MS {
 
     //check for main blog limits
     $settings = get_site_option( 'mp_network_settings' );
-    if ( ( $settings['main_blog'] && is_main_site() ) || !$settings['main_blog'] ) {
+    if ( ( $settings['main_blog'] && $this->is_main_site() ) || !$settings['main_blog'] ) {
       //shortcodes
       add_shortcode( 'mp_list_global_products', array(&$this, 'mp_list_global_products_sc') );
       add_shortcode( 'mp_global_categories_list', array(&$this, 'mp_global_categories_list_sc') );
@@ -148,6 +148,16 @@ class MarketPress_MS {
     //add action to flush rewrite rules after we've added them for the first time
     add_action( 'init', array(&$mp, 'flush_rewrite'), 999 );
 
+  }
+
+  //wrapper function for checking if global marketpress blog. Define MP_ROOT_BLOG with a blog_id to override
+  function is_main_site() {
+    global $wpdb;
+    if ( defined( 'MP_ROOT_BLOG' ) ) {
+      return $wpdb->blogid == MP_ROOT_BLOG;
+    } else {
+      return is_main_site();
+    }
   }
 
   function add_rewrite_rules($rules){
@@ -981,6 +991,15 @@ class MarketPress_MS {
 }
 $mp_wpmu = &new MarketPress_MS();
 
+function mp_main_site_id() {
+  global $current_site;
+  if ( defined( 'MP_ROOT_BLOG' ) ) {
+    return MP_ROOT_BLOG;
+  } else {
+    return $current_site->blog_id;
+  }
+}
+
 
 /*** Template Tags ***/
 
@@ -1033,9 +1052,9 @@ function mp_global_categories_list( $args = '' ) {
   //sort by name
   foreach ($tags as $tag) {
     if ($tag['type'] == 'product_category')
-      $link = network_home_url( $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
+      $link = get_home_url( mp_main_site_id(), $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
     else if ($tag['type'] == 'product_tag')
-      $link = network_home_url( $settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/' . $tag['slug'] . '/' );
+      $link = get_home_url( mp_main_site_id(), $settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/' . $tag['slug'] . '/' );
 
     $list .= '<li><a href="' . $link . '" title="' . sprintf(__( '%d Products', 'mp' ), $tag['count']) . '">' . esc_attr( $tag['name'] );
     if ($show_count)
@@ -1076,9 +1095,9 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
   //sort by name
   foreach ($tags as $tag) {
     if ($tag['type'] == 'product_category')
-      $tag['link'] = network_home_url( $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
+      $tag['link'] = get_home_url( mp_main_site_id(), $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
     else if ($tag['type'] == 'product_tag')
-      $tag['link'] = network_home_url( $settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/' . $tag['slug'] . '/' );
+      $tag['link'] = get_home_url( mp_main_site_id(), $settings['slugs']['marketplace'] . '/' . $settings['slugs']['tags'] . '/' . $tag['slug'] . '/' );
       
     $sorted_tags[$tag['name']] = $tag;
   }

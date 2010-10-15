@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.0.3
+Version: 1.0.4
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -2872,11 +2872,7 @@ Notification Preferences: %s', 'mp');
     		case 'received':
     			$received = 0;
     			foreach( (array) $post_ids as $post_id ) {
-    				if ( !current_user_can($post_type_object->edit_cap, $post_id) )
-    					wp_die( __('You are not allowed to manage orders.', 'mp') );
-
     				$this->update_order_status($post_id, 'received');
-
     				$received++;
     			}
     			$msg = sprintf( _n( '%s order marked as Received.', '%s orders marked as Received.', $received, 'mp' ), number_format_i18n( $received ) );
@@ -2884,11 +2880,7 @@ Notification Preferences: %s', 'mp');
         case 'paid':
     			$paid = 0;
     			foreach( (array) $post_ids as $post_id ) {
-    				if ( !current_user_can($post_type_object->edit_cap, $post_id) )
-    					wp_die( __('You are not allowed to manage orders.', 'mp') );
-
     				$this->update_order_status($post_id, 'paid');
-
     				$paid++;
     			}
     			$msg = sprintf( _n( '%s order marked as Paid.', '%s orders marked as Paid.', $paid, 'mp' ), number_format_i18n( $paid ) );
@@ -2896,11 +2888,7 @@ Notification Preferences: %s', 'mp');
         case 'shipped':
     			$shipped = 0;
     			foreach( (array) $post_ids as $post_id ) {
-    				if ( !current_user_can($post_type_object->edit_cap, $post_id) )
-    					wp_die( __('You are not allowed to manage orders.', 'mp') );
-
     				$this->update_order_status($post_id, 'shipped');
-
     				$shipped++;
     			}
     			$msg = printf( _n( '%s order marked as Shipped.', '%s orders marked as Shipped.', $shipped, 'mp' ), number_format_i18n( $shipped ) );
@@ -2908,11 +2896,7 @@ Notification Preferences: %s', 'mp');
         case 'closed':
     			$closed = 0;
     			foreach( (array) $post_ids as $post_id ) {
-    				if ( !current_user_can($post_type_object->edit_cap, $post_id) )
-    					wp_die( __('You are not allowed to manage orders.', 'mp') );
-
     				$this->update_order_status($post_id, 'closed');
-
     				$closed++;
     			}
     			$msg = printf( _n( '%s order Closed.', '%s orders Closed.', $closed, 'mp' ), number_format_i18n( $closed ) );

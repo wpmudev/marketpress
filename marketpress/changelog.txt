@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.0.4 - 10/15/2010
+----------------------------------------------------------------------
+- Added support for MP_ROOT_BLOG define to change blog for global listings
+- Fixed permissions bug for changing order status
+
 1.0.3 - 10/12/2010
 ----------------------------------------------------------------------
 - Fixed fatal error when unchecking all gateways
