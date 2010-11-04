@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.0.4
+Version: 1.1
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.0.3';
+  var $version = '1.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -39,6 +39,7 @@ class MarketPress {
   var $language = '';
   var $checkout_error = false;
   var $cart_cache = false;
+  var $is_shop_page = false;
   
 	function MarketPress() {
 		$this->__construct();
@@ -681,7 +682,6 @@ Thanks again!", 'mp')
   function load_store_templates() {
     global $wp_query;
     $settings = get_option('mp_settings');
-    $is_shop_page = false;
 
     //load proper theme for single product page display
     if ($wp_query->is_single && $wp_query->query_vars['post_type'] == 'product') {
@@ -706,7 +706,7 @@ Thanks again!", 'mp')
         add_filter( 'the_content', array(&$this, 'product_theme'), 99 );
       }
       
-      $is_shop_page = true;
+      $this->is_shop_page = true;
       
       //enqueue lightbox on single product page
       $this->enqueue_lightbox();
@@ -727,7 +727,7 @@ Thanks again!", 'mp')
         add_filter( 'the_content', array(&$this, 'store_theme'), 99 );
       }
 
-      $is_shop_page = true;
+      $this->is_shop_page = true;
     }
 
     //load proper theme for checkout page
@@ -756,7 +756,7 @@ Thanks again!", 'mp')
         add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
       }
 
-      $is_shop_page = true;
+      $this->is_shop_page = true;
     }
     
     //load proper theme for order status page
@@ -779,7 +779,7 @@ Thanks again!", 'mp')
         add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
       }
 
-      $is_shop_page = true;
+      $this->is_shop_page = true;
     }
     
     //load proper theme for product listings
@@ -831,7 +831,7 @@ Thanks again!", 'mp')
         add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
       }
       
-      $is_shop_page = true;
+      $this->is_shop_page = true;
     }
 
     //load proper theme for product category or tag listings
@@ -908,11 +908,11 @@ Thanks again!", 'mp')
         add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
       }
       
-      $is_shop_page = true;
+      $this->is_shop_page = true;
     }
     
     //load shop specific items
-    if ($is_shop_page) {
+    if ($this->is_shop_page) {
       //fixes a nasty bug in BP theme's functions.php file which always loads the activity stream if not a normal page
       remove_all_filters('page_template');
       
@@ -1164,7 +1164,7 @@ Thanks again!", 'mp')
   function checkout_theme($content) {
     global $wp_query;
 
-    mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']);
+    mp_show_cart('checkout');
     
     return $content;
   }
@@ -1448,7 +1448,11 @@ Thanks again!", 'mp')
   
   //Save our post meta when a product is created or updated
 	function save_product_meta($post_id, $post = null) {
-		if ($post->post_type == "product") {
+    //skip quick edit
+    if ( defined('DOING_AJAX') )
+      return;
+      
+		if ( $post->post_type == "product" && isset( $_POST['mp_product_meta'] ) ) {
       $meta = get_post_custom($post_id);
       $price = round($_POST['mp_price'], 2);
       $price = ($price) ? $price : 0;
@@ -1485,6 +1489,7 @@ Thanks again!", 'mp')
     $settings = get_option('mp_settings');
 		$meta = get_post_custom($post->ID);
     ?>
+    <input type="hidden" name="mp_product_meta" value="1" />
     <div class="alignleft">
       <label><?php _e('Price', 'mp'); ?>:<br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_price" name="mp_price" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></label>
       <label><?php _e('Sale Price', 'mp'); ?>:<br /><small><?php _e('When set this overrides the normal price.', 'mp'); ?></small><br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_sale_price" name="mp_sale_price" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></label>
@@ -4206,7 +4211,7 @@ Notification Preferences: %s', 'mp');
                   foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                     if ($network_settings['allowed_gateways'][$code] == 'full') {
                       $allowed_plugins[$code] = $plugin;
-                    } else if (function_exists('is_supporter') && is_supporter() && $network_settings['allowed_themes'][$code] == 'supporter') {
+                    } else if (function_exists('is_supporter') && is_supporter() && $network_settings['allowed_gateways'][$code] == 'supporter') {
                       $allowed_plugins[$code] = $plugin;
                     }
                   }

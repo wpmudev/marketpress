@@ -5,6 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.1 - 11/10/2010
+----------------------------------------------------------------------
+- 2Checkout and Authorize.net beta gateways added
+- new mp_is_shop_page() template function http://premium.wpmudev.org/forums/topic/marketpressload_store_templates-should-make-is_shop_page-available
+- fixed bug not allowing limited gateways for supporters
+- lots of little bug fixes/improvements
+
 1.0.4 - 10/15/2010
 ----------------------------------------------------------------------
 - Added support for MP_ROOT_BLOG define to change blog for global listings

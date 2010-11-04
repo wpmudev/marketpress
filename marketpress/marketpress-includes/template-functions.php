@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Template Functions
-Version: 1.0.4
+Version: 1.1
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -695,6 +695,10 @@ function mp_show_cart($context = '', $checkoutstep = null) {
     	</div>
       <?php
     } else if ($context == 'checkout') {
+
+      if ( $checkoutstep == null )
+        $checkoutstep = get_query_var( 'checkoutstep' );
+        
       //generic error message context for plugins to hook into
       do_action( 'mp_checkout_error_checkout' );
       
@@ -1529,12 +1533,7 @@ function mp_checkout_step_url($checkout_step) {
   return mp_cart_link(false, true) . trailingslashit($checkout_step);
 }
 
-/**
- * Echos the current store navigation links.
- *
- * @param bool $echo Optional, whether to echo. Defaults to true
- */
-function mp_store_navigation( $echo = true ) {
+
   $settings = get_option('mp_settings');
   
   //navigation
@@ -1554,5 +1553,15 @@ function mp_store_navigation( $echo = true ) {
     echo $nav;
   else
     return $nav;
+}
+
+/**
+ * Echos the current store navigation links.
+ *
+ * @retuns bool whether current page is a MarketPress store page
+ */
+function mp_is_shop_page() {
+  global $mp;
+  return $mp->is_shop_page();
 }
 ?>
