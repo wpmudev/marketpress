@@ -1533,7 +1533,12 @@ function mp_checkout_step_url($checkout_step) {
   return mp_cart_link(false, true) . trailingslashit($checkout_step);
 }
 
-
+/**
+ * Echos the current store navigation links.
+ *
+ * @param bool $echo Optional, whether to echo. Defaults to true
+ */
+function mp_store_navigation( $echo = true ) {
   $settings = get_option('mp_settings');
   
   //navigation
