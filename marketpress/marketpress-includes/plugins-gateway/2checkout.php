@@ -263,22 +263,26 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     global $mp;
     
     $timestamp = time();
+    $total = $_POST['total'];
+    $hash = md5($this->API_Password + $this->API_Username + $_POST['order_number'] + $total);
     
-    $status = __('The order has been received', 'mp');
-    $paid = true;
+    if ($_POST['key'] == $hash) {
+      $status = __('The order has been received', 'mp');
+      $paid = true;
+      
+      $payment_info['gateway_public_name'] = $this->public_name;
+      $payment_info['gateway_private_name'] = $this->admin_name;
+      $payment_info['status'][$timestamp] = "paid";
+      $payment_info['total'] = $_POST['total'];
+      $payment_info['currency'] = $this->currencyCode;
+      $payment_info['transaction_id'] = $_POST['order_number'];  
+      $payment_info['method'] = "Credit Card";
     
-    $payment_info['gateway_public_name'] = $this->public_name;
-    $payment_info['gateway_private_name'] = $this->admin_name;
-    $payment_info['status'][$timestamp] = "paid";
-    $payment_info['total'] = $_POST['total'];
-    $payment_info['currency'] = $this->currencyCode;
-    $payment_info['transaction_id'] = $_POST['order_number'];  
-    $payment_info['method'] = "Credit Card";
+      $cart = $_SESSION['cart'];
+      $shipping_info = $_SESSION['shipping_info'];
     
-    $cart = $_SESSION['cart'];
-    $shipping_info = $_SESSION['shipping_info'];
-    
-    $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
+      $order = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
+    }
   }
   
   /**
