@@ -521,6 +521,8 @@ Thanks again!", 'mp')
   }
   
   function register_custom_posts() {
+    ob_start();
+    
     $settings = get_option('mp_settings');
     
     // Register custom taxonomy
@@ -1164,7 +1166,7 @@ Thanks again!", 'mp')
   function checkout_theme($content) {
     global $wp_query;
 
-    mp_show_cart('checkout');
+    mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']);
     
     return $content;
   }
@@ -2218,7 +2220,7 @@ Thanks again!", 'mp')
 
       //set cookie
       $expire = time() + 2592000; //1 month expire
-  		setcookie($cookie_id, serialize($orders), $expire, COOKIEPATH);
+      setcookie($cookie_id, serialize($orders), $expire, COOKIEPATH);
     }
 
     //send new order email

@@ -690,6 +690,10 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     }
   }
   
+  function order_confirmation($order) {
+    
+  }
+  
   /**
    * Echo a settings meta box with whatever settings you need for you gateway.
    *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".

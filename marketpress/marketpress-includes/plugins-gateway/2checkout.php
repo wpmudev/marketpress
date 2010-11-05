@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Authorize.net AIM Gateway Plugin
-Version: 1.1
+Version: 1.0
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: S H Mohanjith (Incsub)
@@ -61,6 +61,9 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $this->method_img_url = $mp->plugin_url . 'images/2co_logo.png';
     $this->method_button_img_url = $mp->plugin_url . 'images/2co.png';
+    
+    $this->currencyCode = $settings['gateways']['2checkout']['currency'];
+    
     
     $this->API_Username = $settings['gateways']['2checkout']['sid'];
     $this->API_Password = $settings['gateways']['2checkout']['secret_word'];
@@ -132,101 +135,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   function process_payment_form($cart, $shipping_info) {
     global $mp;
     
-
-    $timestamp = time();
-    $settings = get_option('mp_settings');
-
-    $url = "https://www.2checkout.com/checkout/purchase";
-
-    $params = array();
-
-    $params['sid'] = $this->API_Username;
-    $params['merchant_order_id'] = $mp->generate_order_id();
-    $params['return_url'] = mp_checkout_step_url('checkout');
-    $params['x_receipt_link_url'] = $this->ipn_url;
-    $params['skip_landing'] = '1';
-    $params['fixed'] = 'Y'; //keeps quantities from being changed
-    $params['currency_code'] = $this->currencyCode;
-
-    if ($this->SandboxFlag == 'sandbox') {
-      $params['demo'] = 'Y';
-    }
-
-    //2checkout shipping/billing info prefill
-    $params['card_holder_name'] = $shipping_info['name'];
-    $params['street_address'] = $shipping_info['address1'];
-    $params['street_address2'] = $shipping_info['address2'];
-    $params['city'] = $shipping_info['city'];
-    $params['state'] = $shipping_info['state'];
-    $params['zip'] = $shipping_info['zip'];
-    $params['country'] = $shipping_info['country'];
-    $params['email'] = $shipping_info['email'];
-    $params['phone'] = $shipping_info['phone'];
-    $params['ship_name'] = $shipping_info['name'];
-    $params['ship_street_address'] = $shipping_info['address1'];
-    $params['ship_street_address2'] = $shipping_info['address2'];
-    $params['ship_city'] = $shipping_info['city'];
-    $params['ship_state'] = $shipping_info['state'];
-    $params['ship_zip'] = $shipping_info['zip'];
-    $params['ship_country'] = $shipping_info['country'];
-
-    $totals = array();
-    $counter = 1;
-    $params['id_type'] = 1;
-    foreach ($cart as $product_id => $data) {
-      $totals[] = $data['price'] * $data['quantity'];
-
-
-      $params["c_prod_{$counter}"] = "{$data['SKU']},{$data['quantity']}";
-      $params["c_name_{$counter}"] = $data['name'];
-      $params["c_description_{$counter}"] = get_permalink($product_id);
-      $params["c_price_{$counter}"] = $data['price'];
-
-      $i++;
-    }
-
-    $total = array_sum($totals);
-
-    if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-      $total = $coupon['new_total'];
-    }
-
-    //shipping line
-    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-      $total = $total + $shipping_price;
-    }
-
-    //tax line
-    if ( ($tax_price = $mp->tax_price()) !== false ) {
-      $total = $total + $tax_price;
-    }
-
-    $params['total'] = $total;
-
-    $param_list = array();
-
-    foreach ($params as $k => $v) {
-      $param_list[] = "{$k}=".urlencode($v);
-    }
-
-    $param_str = implode('&', $param_list);
-
-    $timestamp = time();
-
-    $status = __('The order has been received.', 'mp');
-    $paid = false;
-
-    $payment_info['gateway_public_name'] = $this->public_name;
-    $payment_info['gateway_private_name'] = $this->admin_name;
-    $payment_info['status'][$timestamp] = "received";
-    $payment_info['total'] = $total;
-    $payment_info['currency'] = $this->currencyCode;
-
-    $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
-
-    wp_redirect("{$url}?{$param_str}");
-
-    exit(0);
+    $mp->generate_order_id();
   }
   
   /**
@@ -250,7 +159,76 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    */
   function process_payment($cart, $shipping_info) {
     global $mp;
+    
+    $timestamp = time();
+    $settings = get_option('mp_settings');
+    
+    $url = "https://www.2checkout.com/checkout/purchase";
+    // $url = "http://developers.2checkout.com/return_script";
+    
+    $params = array();
+    
+    $params['sid'] = $this->API_Username;
+    $params['cart_order_id'] = $_SESSION['mp_order'];
+    $params['x_receipt_link_url'] = mp_cart_link(false, true) . trailingslashit("confirmation");
+    $params['skip_landing'] = '1';
+    $params['currency_code'] = $this->currencyCode;
+    
+    if ($this->SandboxFlag == 'sandbox') {
+      $params['demo'] = 'Y';
+    }
+    
+    $totals = array();
+    $counter = 1;
+    
+    $params["id_type"] = 1;
+    
+    foreach ($cart as $product_id => $data) {
+      $totals[] = $data['price'] * $data['quantity'];
+      
+      $suffix = "_{$counter}";
+      
+      $sku = empty($data['SKU'])?$product_id:$data['SKU'];
+      $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
+      $params["c_name{$suffix}"] = $data['name'];
+      $params["c_description{$suffix}"] = get_permalink($product_id);
+      $params["c_price{$suffix}"] = $data['price'];
+      
+      $i++;
+    }
+    
+    $total = array_sum($totals);
+    
+    if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
+      $total = $coupon['new_total'];
+    }
 
+    //shipping line
+    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
+      $total = $total + $shipping_price;
+    }
+    
+    //tax line
+    if ( ($tax_price = $mp->tax_price()) !== false ) {
+      $total = $total + $tax_price;
+    }
+    
+    $params['total'] = $total;
+    
+    $param_list = array();
+    
+    foreach ($params as $k => $v) {
+      $param_list[] = "{$k}=".rawurlencode($v);
+    }
+    
+    $param_str = implode('&', $param_list);
+    
+    $_SESSION['cart'] = $cart;
+    $_SESSION['shipping_info'] = $shipping_info;
+    
+    wp_redirect("{$url}?{$param_str}");
+    
+    exit(0);
   }
   
   /**
@@ -279,6 +257,28 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     } else {
       echo '<p>' . sprintf(__('Your payment via 2Checkout for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
     }
+  }
+  
+  function order_confirmation($order) {
+    global $mp;
+    
+    $timestamp = time();
+    
+    $status = __('The order has been received', 'mp');
+    $paid = true;
+    
+    $payment_info['gateway_public_name'] = $this->public_name;
+    $payment_info['gateway_private_name'] = $this->admin_name;
+    $payment_info['status'][$timestamp] = "paid";
+    $payment_info['total'] = $_POST['total'];
+    $payment_info['currency'] = $this->currencyCode;
+    $payment_info['transaction_id'] = $_POST['order_number'];  
+    $payment_info['method'] = "Credit Card";
+    
+    $cart = $_SESSION['cart'];
+    $shipping_info = $_SESSION['shipping_info'];
+    
+    $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
   }
   
   /**
@@ -324,6 +324,38 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	      </p>
 	    </td>
 	  </tr>
+          <tr valign="top">
+        <th scope="row"><?php _e('2Checkout Currency', 'mp') ?></th>
+        <td>
+          <select name="mp[gateways][2checkout][currency]">
+          <?php
+          $sel_currency = ($settings['gateways']['2checkout']['currency']) ? $settings['gateways']['2checkout']['currency'] : $settings['currency'];
+          $currencies = array(
+                "ARS" => 'ARS - Argentina Peso',
+                "AUD" => 'AUD - Australian Dollar',
+		"BRL" => 'BRL - Brazilian Real',
+		"CAD" => 'CAD - Canadian Dollar',
+		"CHF" => 'CHF - Swiss Franc',
+		"DKK" => 'DKK - Danish Krone',
+		"EUR" => 'EUR - Euro',
+		"GBP" => 'GBP - British Pound',
+		"HKD" => 'HKD - Hong Kong Dollar',
+		"INR" => 'INR - Indian Rupee',
+		"JPY" => 'JPY - Japanese Yen',
+		"MXN" => 'MXN - Mexican Peso',
+		"NOK" => 'NOK - Norwegian Krone',
+		"NZD" => 'NZD - New Zealand Dollar',
+		"SEK" => 'SEK - Swedish Krona',
+		"USD" => 'USD - U.S. Dollar',
+          );
+
+          foreach ($currencies as $k => $v) {
+              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+          }
+          ?>
+          </select>
+        </td>
+        </tr>
         </table>
       </div>
     </div>

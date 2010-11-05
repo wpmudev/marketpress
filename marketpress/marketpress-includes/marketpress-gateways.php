@@ -53,16 +53,14 @@ if(!class_exists('MP_Gateway_API')) {
      * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
      */
     function on_creation() {
-
-		}
+    }
 
     /**
      * Echo fields you need to add to the payment screen, like your credit card info fields
      *
      * @param array $shipping_info. Contains shipping info and email in case you need it
      */
-		function payment_form($cart, $shipping_info) {
-
+    function payment_form($cart, $shipping_info) {
     }
     
     /**
@@ -163,6 +161,17 @@ if(!class_exists('MP_Gateway_API')) {
 		//creates the payment method selections
 		function _payment_form_wrapper($cart, $shipping_info) {
       global $mp, $mp_gateway_active_plugins;
+      
+      if ($this->force_ssl && !function_exists('wp_https_redirect'))
+      {
+	if ($_SERVER['HTTPS'] != "on" && preg_match('/^https/', get_option('siteurl')) == 0)
+	{
+	  $host_x = preg_split('/\//', get_option('siteurl'));
+	  $host = $host_x[2];  
+	  header("Location: https://". $host . $_SERVER['REQUEST_URI']); 
+	  exit(0);
+	}
+      }
       
       if (count((array)$mp_gateway_active_plugins) > 1 && $_SESSION['mp_payment_method'] != $this->plugin_name)
         $hidden = ' style="display:none;"';
