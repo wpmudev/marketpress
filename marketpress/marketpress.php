@@ -2226,7 +2226,7 @@ Thanks again!", 'mp')
     //send new order email
     $this->order_notification($order_id);
     
-    return $id;
+    return $order_id;
   }
   
   //returns the full order details as an object
