@@ -264,7 +264,12 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $timestamp = time();
     $total = $_POST['total'];
-    $hash = md5($this->API_Password + $this->API_Username + $_POST['order_number'] + $total);
+    
+    if ($this->SandboxFlag == 'sandbox') {
+      $hash = strtoupper(md5($this->API_Password . $this->API_Username . 1 . $total));
+    } else {
+      $hash = strtoupper(md5($this->API_Password . $this->API_Username . $_POST['order_number'] . $total));
+    }
     
     if ($_POST['key'] == $hash) {
       $status = __('The order has been received', 'mp');
@@ -415,7 +420,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	print 'Thank you very much for letting us know. REF: Not success';
 	exit(0);
       }
-      // print_r($this);
+      
       if ($this->SandboxFlag != 'sandbox') {
 	if (intval($total) >= $order->mp_order_total) {
 	  $payment_info = $order->mp_payment_info;
