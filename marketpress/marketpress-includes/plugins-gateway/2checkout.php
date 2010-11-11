@@ -164,7 +164,6 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $settings = get_option('mp_settings');
     
     $url = "https://www.2checkout.com/checkout/purchase";
-    // $url = "http://developers.2checkout.com/return_script";
     
     $params = array();
     
@@ -302,7 +301,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     ?>
     <div id="mp_2checkout" class="postbox">
-      <h3 class='hndle'><span><?php _e('2Checkout Settings', 'mp'); ?></span></h3>
+      <h3 class='handle'><span><?php _e('2Checkout Settings', 'mp'); ?></span></h3>
       <div class="inside">
         <span class="description"><?php _e('Resell your inventory via 2Checkout.com.', 'mp') ?></span>
         <table class="form-table">

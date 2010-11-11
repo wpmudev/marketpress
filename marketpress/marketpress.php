@@ -1711,16 +1711,19 @@ Thanks again!", 'mp')
 
     //set cookie
     $expire = time() + 2592000; //1 month expire
-		setcookie($cookie_id, serialize($cart), $expire, COOKIEPATH);
-		
-		//update cache
-		$this->get_cart_contents($cart);
+    setcookie($cookie_id, serialize($cart), $expire, COOKIEPATH);
+    
+    // Set the cookie variable as well, sometimes updating the cache doesn't work
+    $_COOKIE[$cookie_id] = serialize($cart);
+    
+    //update cache
+    $this->get_cart_contents($cart);
   }
   
   //returns the full array of cart contents
   function get_cart_contents($cart = false) {
 
-    //if not updateing cache
+    //if not updating cache
     if ($cart === false) {
       //check cache
       if ($this->cart_cache)
