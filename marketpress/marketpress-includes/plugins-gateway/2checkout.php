@@ -124,7 +124,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   }
   
   /**
-   * Use this to process any fields you added. Use the $_POST global,
+   * Use this to process any fields you added. Use the $_REQUEST global,
    *  and be sure to save it to both the $_SESSION and usermeta if logged in.
    *  DO NOT save credit card details to usermeta as it's not PCI compliant.
    *  Call $mp->cart_checkout_error($msg, $context); to handle errors. If no errors
@@ -262,24 +262,24 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     global $mp;
     
     $timestamp = time();
-    $total = $_POST['total'];
+    $total = $_REQUEST['total'];
     
     if ($this->SandboxFlag == 'sandbox') {
       $hash = strtoupper(md5($this->API_Password . $this->API_Username . 1 . $total));
     } else {
-      $hash = strtoupper(md5($this->API_Password . $this->API_Username . $_POST['order_number'] . $total));
+      $hash = strtoupper(md5($this->API_Password . $this->API_Username . $_REQUEST['order_number'] . $total));
     }
     
-    if ($_POST['key'] == $hash) {
+    if ($_REQUEST['key'] == $hash) {
       $status = __('The order has been received', 'mp');
       $paid = true;
       
       $payment_info['gateway_public_name'] = $this->public_name;
       $payment_info['gateway_private_name'] = $this->admin_name;
       $payment_info['status'][$timestamp] = "paid";
-      $payment_info['total'] = $_POST['total'];
+      $payment_info['total'] = $_REQUEST['total'];
       $payment_info['currency'] = $this->currencyCode;
-      $payment_info['transaction_id'] = $_POST['order_number'];  
+      $payment_info['transaction_id'] = $_REQUEST['order_number'];  
       $payment_info['method'] = "Credit Card";
     
       $cart = $_SESSION['cart'];
@@ -386,14 +386,14 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $settings = get_option('mp_settings');
     
-    if (isset($_POST['message_type']) && $_POST['message_type'] == 'INVOICE_STATUS_CHANGED') {
-      $sale_id = $_POST['sale_id'];
-      $tco_invoice_id = $_POST['invoice_id'];
-      $tco_vendor_order_id = $_POST['vendor_order_id'];
-      $tco_invoice_status = $_POST['invoice_status'];
-      $tco_hash = $_POST['md5_hash'];
-      $total = $_POST['invoice_list_amount'];
-      $payment_method = ucfirst($_POST['payment_type']);
+    if (isset($_REQUEST['message_type']) && $_REQUEST['message_type'] == 'INVOICE_STATUS_CHANGED') {
+      $sale_id = $_REQUEST['sale_id'];
+      $tco_invoice_id = $_REQUEST['invoice_id'];
+      $tco_vendor_order_id = $_REQUEST['vendor_order_id'];
+      $tco_invoice_status = $_REQUEST['invoice_status'];
+      $tco_hash = $_REQUEST['md5_hash'];
+      $total = $_REQUEST['invoice_list_amount'];
+      $payment_method = ucfirst($_REQUEST['payment_type']);
       
       $order = $mp->get_order($tco_vendor_order_id);
       
@@ -404,7 +404,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	exit(0);
       }
       
-      $calc_key = md5($sale_id.$settings['gateways']['2checkout']['sid'].$_POST['invoice_id'].$settings['gateways']['2checkout']['secret_word']);
+      $calc_key = md5($sale_id.$settings['gateways']['2checkout']['sid'].$_REQUEST['invoice_id'].$settings['gateways']['2checkout']['secret_word']);
       
       if (strtolower($tco_hash) != strtolower($calc_key)) {
 	header('HTTP/1.0 403 Forbidden');
@@ -413,7 +413,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	exit(0);
       }
       
-      if (strtolower($_POST['invoice_status']) != "deposited") {
+      if (strtolower($_REQUEST['invoice_status']) != "deposited") {
 	header('HTTP/1.0 200 OK');
 	header('Content-type: text/plain; charset=UTF-8');
 	print 'Thank you very much for letting us know. REF: Not success';
