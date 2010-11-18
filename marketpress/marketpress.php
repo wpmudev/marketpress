@@ -611,8 +611,6 @@ Thanks again!", 'mp')
 
     if( !isset( $_wp_theme_features['post-thumbnails'] ) )
         $_wp_theme_features['post-thumbnails'] = array( array( 'product' ) );
-    else if ( true === $_wp_theme_features['post-thumbnails'] )
-        $_wp_theme_features['post-thumbnails'] = array( array( 'post', 'page', 'product' ) );
     else if ( is_array( $_wp_theme_features['post-thumbnails'] ) )
         $_wp_theme_features['post-thumbnails'][0][] = 'product';
   }
