@@ -4463,11 +4463,12 @@ class MarketPress_Product_List extends WP_Widget {
     }
 
     //figure out perpage
-    if (intval($instance['num_products']))
-      $paginate_query = '&nopaging=true&posts_per_page='.intval($instance['num_products']).'&paged=1';
-    else
-      $paginate_query = '&nopaging=true&posts_per_page=10&paged=1';
-
+    if (isset($instance['num_products']) && intval($instance['num_products']) > 0) {
+      $paginate_query = '&posts_per_page='.intval($instance['num_products']).'&paged=1';
+    } else {
+      $paginate_query = '&posts_per_page=10&paged=1';
+    }
+    
     //get order by
     if ($instance['order_by']) {
       if ($instance['order_by'] == 'price')
@@ -4486,7 +4487,7 @@ class MarketPress_Product_List extends WP_Widget {
     } else {
       $order_query = '&orderby=DESC';
     }
-
+    
     //The Query
     $custom_query = new WP_Query('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 

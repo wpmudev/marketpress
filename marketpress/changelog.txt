@@ -8,6 +8,7 @@ Change Log:
 1.1.1 - 12/01/2010
 ----------------------------------------------------------------------
 - Fixed: post_thumbnails breaks themes
+- Fixed: Marketpress Product List widget displays all products
 
 1.1 - 11/10/2010
 ----------------------------------------------------------------------
