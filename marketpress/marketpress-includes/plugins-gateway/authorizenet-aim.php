@@ -325,25 +325,25 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $settings = get_option('mp_settings');
     
     if (!is_email($_POST['email']))
-      $this->cart_checkout_error('Please enter a valid Email Address.', 'email');
+      $mp->cart_checkout_error('Please enter a valid Email Address.', 'email');
     
     if (empty($_POST['name']))
-      $this->cart_checkout_error('Please enter your Full Name.', 'name');
+      $mp->cart_checkout_error('Please enter your Full Name.', 'name');
     
     if (empty($_POST['address1']))
-      $this->cart_checkout_error('Please enter your Street Address.', 'address1');
+      $mp->cart_checkout_error('Please enter your Street Address.', 'address1');
     
     if (empty($_POST['city']))
-      $this->cart_checkout_error('Please enter your City.', 'city');
+      $mp->cart_checkout_error('Please enter your City.', 'city');
     
     if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
-      $this->cart_checkout_error('Please enter your State/Province/Region.', 'state');
+      $mp->cart_checkout_error('Please enter your State/Province/Region.', 'state');
     
     if (empty($_POST['zip']))
-      $this->cart_checkout_error('Please enter your Zip/Postal Code.', 'zip');
+      $mp->cart_checkout_error('Please enter your Zip/Postal Code.', 'zip');
     
     if (empty($_POST['country']) || strlen($_POST['country']) != 2)
-      $this->cart_checkout_error('Please enter your Country.', 'country');
+      $mp->cart_checkout_error('Please enter your Country.', 'country');
     
     //for checkout plugins
     do_action( 'mp_billing_process' );

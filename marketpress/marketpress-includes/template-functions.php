@@ -1269,10 +1269,10 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 	$meta = get_post_custom($post_id);
 
 	if ($meta["mp_sale_price"][0]) {
-    $price = '<del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
-    $price .= $mp->format_currency('', $meta["mp_sale_price"][0]);
+    $price = '<span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
+    $price .= '<span class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
   } else {
-    $price = $mp->format_currency('', $meta["mp_price"][0]);
+    $price = '<span class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
   }
 
   $price = '<span class="mp_product_price">' . $label . $price . '</span>';
