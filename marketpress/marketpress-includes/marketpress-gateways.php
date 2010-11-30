@@ -181,9 +181,11 @@ if(!class_exists('MP_Gateway_API')) {
 
       echo '<p class="mp_cart_direct_checkout">';
       //if an img exists use that for submit button
-      if ($this->method_button_img_url)
+      /*
+       Per http://premium.wpmudev.org/forums/topic/payment-button-inconsistency#post-65419
+       if ($this->method_button_img_url)
         echo '<input type="image" name="mp_payment_submit" id="mp_payment_submit" src="' . $this->method_button_img_url . '" alt="' . __('Continue Checkout &raquo;', 'mp') . '" />';
-      else
+      else*/
         echo '<input type="submit" name="mp_payment_submit" id="mp_payment_submit" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
       echo '</p></div>';
     }
