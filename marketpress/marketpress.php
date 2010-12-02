@@ -4576,7 +4576,7 @@ class MarketPress_Product_List extends WP_Widget {
     <label for="<?php echo $this->get_field_id('num_products'); ?>"><?php _e('Number of Products:', 'mp') ?> <input id="<?php echo $this->get_field_id('num_products'); ?>" name="<?php echo $this->get_field_name('num_products'); ?>" type="text" size="3" value="<?php echo $num_products; ?>" /></label><br />
     </p>
     <p>
-    <label for="<?php echo $this->get_field_id('order_by'); ?>"><?php _e('Order Products By:', 'mp') ?><br />
+    <label for="<?php echo $this->get_field_id('order_by'); ?>"><?php _e('Order Products By:', 'mp') ?></label><br />
     <select id="<?php echo $this->get_field_id('order_by'); ?>" name="<?php echo $this->get_field_name('order_by'); ?>">
       <option value="title"<?php selected($order_by, 'title') ?>><?php _e('Product Name', 'mp') ?></option>
       <option value="date"<?php selected($order_by, 'date') ?>><?php _e('Publish Date', 'mp') ?></option>

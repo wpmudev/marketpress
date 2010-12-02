@@ -1412,7 +1412,7 @@ class MarketPress_Global_Product_List extends WP_Widget {
     </p>
 
     <p>
-    <label for="<?php echo $this->get_field_id('text'); ?>"><?php _e('Content To Show:', 'mp') ?><br />
+    <label for="<?php echo $this->get_field_id('text'); ?>"><?php _e('Content To Show:', 'mp') ?></label><br />
     <select id="<?php echo $this->get_field_id('text'); ?>" name="<?php echo $this->get_field_name('text'); ?>">
       <option value="none"<?php selected($text, 'none') ?>><?php _e('None', 'mp') ?></option>
       <option value="excerpt"<?php selected($text, 'excerpt') ?>><?php _e('Excerpt', 'mp') ?></option>
