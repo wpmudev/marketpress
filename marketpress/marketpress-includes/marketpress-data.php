@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Data Structures
-Version: 1.1
+Version: 1.1.2
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -328,7 +328,7 @@ $this->uk_counties = array("Aberdeenshire"=>"Aberdeenshire","Angus/Forfarshire"=
 "Buckinghamshire"=>"Buckinghamshire","Buteshire"=>"Buteshire","Caerphilly"=>"Caerphilly","Caithness"=>"Caithness",
 "Cambridgeshire"=>"Cambridgeshire","Cardiff"=>"Cardiff","Carmarthenshire"=>"Carmarthenshire",
 "Ceredigion"=>"Ceredigion","Cheshire"=>"Cheshire","Clackmannanshire"=>"Clackmannanshire",
-"Conwy"=>"Conwy","Cornwall"=>"Cornwall","Cromartyshire"=>"Cromartyshire","Cumberland"=>"Cumberland",
+"Conwy"=>"Conwy","Cornwall"=>"Cornwall","Cromartyshire"=>"Cromartyshire","Cumbria"=>"Cumbria",
 "Denbighshire"=>"Denbighshire","Derbyshire"=>"Derbyshire","Devon"=>"Devon","Dorset"=>"Dorset",
 "Dumfriesshire"=>"Dumfriesshire","Dunbartonshire/Dumbartonshire"=>"Dunbartonshire/Dumbartonshire",
 "Durham"=>"Durham","East Lothian/Haddingtonshire"=>"East Lothian/Haddingtonshire","Essex"=>"Essex","Fife"=>"Fife",
