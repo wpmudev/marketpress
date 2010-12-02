@@ -10,6 +10,7 @@ Change Log:
 - Fixed: MP html needs more css class names
 - Fixed: Make "Continue Checkout" button text only
 - Fixed: Unclosed label tags cause widget drag/drop issue in IE
+- Fixed: Store page content overwritten
 
 1.1.1 - 11/25/2010
 ----------------------------------------------------------------------

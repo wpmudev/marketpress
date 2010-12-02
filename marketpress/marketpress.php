@@ -497,8 +497,11 @@ Thanks again!", 'mp')
     
     //remove old page if updating
     if ($old_slug && $old_slug != $settings['slugs']['store']) {
-      $post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$old_slug' AND post_type = 'page'");
-      wp_delete_post( $post_id, true ); //deletes meta as well
+      $old_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$old_slug' AND post_type = 'page'");
+      $old_post = get_post($old_post_id);
+      
+      $old_post->post_name = $settings['slugs']['store'];
+      wp_update_post($old_post);
     }
     
     //insert new page if not existing
@@ -3119,6 +3122,8 @@ Notification Preferences: %s', 'mp');
   }
 
   function admin_page() {
+    global $wpdb;
+    
     //double-check rights
     if(!current_user_can('manage_options')) {
   		echo "<p>" . __('Nice Try...', 'mp') . "</p>";  //If accessed properly, this message doesn't appear.
@@ -3743,21 +3748,28 @@ Notification Preferences: %s', 'mp');
         //save settings
         if (isset($_POST['marketplace_settings'])) {
           //get old store slug
-          $old_slug = $settings['slugs']['store'];
+	  $old_slug = $settings['slugs']['store'];
           
           //filter slugs
           $_POST['mp']['slugs'] = array_map('sanitize_title', $_POST['mp']['slugs']);
-          
-          $settings = array_merge($settings, apply_filters('mp_presentation_settings_filter', $_POST['mp']));
-          update_option('mp_settings', $settings);
-          
-          //update store page
-          $this->create_store_page($old_slug);
-          
-          //flush rewrite rules due to product slugs
-          $this->flush_rewrite();
-          
-          echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
+	  
+	  // Fixing http://premium.wpmudev.org/forums/topic/store-page-content-overwritten
+	  $new_slug = $_POST['mp']['slugs']['store'];
+	  $new_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$new_slug' AND post_type = 'page'");
+	  
+	  if ($new_slug != $old_slug && $new_post_id != 0) {
+	    echo '<div class="error fade"><p>'.__('Store base URL conflicts with another page', 'mp').'</p></div>';
+	  } else {
+	    $settings = array_merge($settings, apply_filters('mp_presentation_settings_filter', $_POST['mp']));
+	    update_option('mp_settings', $settings);
+	    
+	    $this->create_store_page($old_slug);
+	    
+	    //flush rewrite rules due to product slugs
+	    $this->flush_rewrite();
+	    
+	    echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
+	  }
         }
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/my_work.png'; ?>" /></div>
@@ -3885,7 +3897,7 @@ Notification Preferences: %s', 'mp');
                   </select>
                   <label><input value="DESC" name="mp[order]" type="radio"<?php checked($settings['order'], 'DESC') ?> /> <?php _e('Descending', 'mp') ?></label>
                   <label><input value="ASC" name="mp[order]" type="radio"<?php checked($settings['order'], 'ASC') ?> /> <?php _e('Ascending', 'mp') ?></label>
-         				</td>
+         	  </td>
                 </tr>
               </table>
             </div>
