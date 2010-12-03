@@ -4514,7 +4514,7 @@ class MarketPress_Product_List extends WP_Widget {
           mp_product_image( true, 'widget', $post->ID, $instance['size'] );
           
         if ($instance['show_excerpt'])
-          echo '<div class="mp_product_content">' . $post->post_excerpt . '</div>';
+          echo '<div class="mp_product_content">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID) . '</div>';
 
         if ($instance['show_price'] || $instance['show_button']) {
           echo '<div class="mp_product_meta">';

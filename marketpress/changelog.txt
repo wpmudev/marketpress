@@ -11,6 +11,7 @@ Change Log:
 - Fixed: Make "Continue Checkout" button text only
 - Fixed: Unclosed label tags cause widget drag/drop issue in IE
 - Fixed: Store page content overwritten
+- Fixed: Product excerpts sometimes not showing in Product List Widget
 
 1.1.1 - 11/25/2010
 ----------------------------------------------------------------------
