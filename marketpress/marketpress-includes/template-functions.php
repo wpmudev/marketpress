@@ -1563,10 +1563,10 @@ function mp_store_navigation( $echo = true ) {
 /**
  * Echos the current store navigation links.
  *
- * @retuns bool whether current page is a MarketPress store page
+ * @retuns bool whether current page is a MarketPress store page.
  */
 function mp_is_shop_page() {
   global $mp;
-  return $mp->is_shop_page();
+  return $mp->is_shop_page;
 }
 ?>
