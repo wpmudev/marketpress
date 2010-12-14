@@ -80,7 +80,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
     global $mp;
     ?>
     <div id="mp_flat_rate" class="postbox">
-      <h3 class='hndle'><span><?php _e('Flate Rate Settings', 'mp'); ?></span></h3>
+      <h3 class='hndle'><span><?php _e('Flat Rate Settings', 'mp'); ?></span></h3>
       <div class="inside">
         <span class="description"><?php _e('Be sure to enter a shipping price for every option or those customers may get free shipping.', 'mp') ?></span>
         <table class="form-table">
