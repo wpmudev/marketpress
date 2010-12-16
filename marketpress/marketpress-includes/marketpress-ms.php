@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Multisite Features
-Version: 1.1
+Version: 1.1.2
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -205,6 +205,7 @@ class MarketPress_MS {
       //if custom template exists load it
       if ($this->global_list_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_product_list_template') );
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
@@ -235,6 +236,7 @@ class MarketPress_MS {
       //if custom template exists load it
       if ($this->category_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_category_template') );
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
@@ -264,6 +266,7 @@ class MarketPress_MS {
       //if custom template exists load it
       if ($this->tag_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_tag_template') );
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;

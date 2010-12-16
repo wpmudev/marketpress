@@ -748,6 +748,7 @@ Thanks again!", 'mp')
       //if custom template exists load it
       if ($this->checkout_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_checkout_template') );
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
@@ -771,6 +772,7 @@ Thanks again!", 'mp')
       //if custom template exists load it
       if ($this->orderstatus_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_orderstatus_template') );
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
@@ -822,6 +824,7 @@ Thanks again!", 'mp')
         query_posts('post_type=product' . $paginate_query . $order_by_query . $order_query);
 
         add_filter( 'template_include', array(&$this, 'custom_product_list_template') );
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         $wp_query->is_page = 1;
@@ -900,6 +903,7 @@ Thanks again!", 'mp')
         query_posts('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 
         add_filter( 'template_include', array(&$this, 'custom_product_taxonomy_template'));
+        add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
         $wp_query->is_page = 1;

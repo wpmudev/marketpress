@@ -5,13 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-1.1.2 - 12/05/2010
+1.1.2 - 12/15/2010
 ----------------------------------------------------------------------
 - Fixed: MP html needs more css class names
 - Fixed: Make "Continue Checkout" button text only
 - Fixed: Unclosed label tags cause widget drag/drop issue in IE
 - Fixed: Store page content overwritten
 - Fixed: Product excerpts sometimes not showing in Product List Widget
+- Fixed: When using custom templates page titles were not being filtered for virtual store pages
 
 1.1.1 - 11/25/2010
 ----------------------------------------------------------------------
