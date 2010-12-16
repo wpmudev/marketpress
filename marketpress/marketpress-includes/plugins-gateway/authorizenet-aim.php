@@ -69,6 +69,8 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $this->currencyCode = $settings['gateways']['authorizenet-aim']['currency'];
     $this->locale = $settings['gateways']['authorizenet-aim']['locale'];
     $this->version = "63.0"; //api version
+    
+    $this->force_ssl = true;
 
     //set api urls
     if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
@@ -88,16 +90,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     if (isset($_GET['cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
     }
-    if (!function_exists('wp_https_redirect'))
-    {
-      if ($_SERVER['HTTPS'] != "on" && preg_match('/^https/', get_option('siteurl')) == 0)
-      {
-        $host_x = preg_split('/\//', get_option('siteurl'));
-	$host = $host_x[2];  
-	header("Location: https://". $host . $_SERVER['REQUEST_URI']); 
-	exit(0);
-      }
-    }
+    
     $settings = get_option('mp_settings');
     $meta = get_user_meta($current_user->ID, 'mp_billing_info');
     

@@ -31,7 +31,7 @@ border: none;
 padding: 0px;
 }
 
-.mp_button_addcart, .mp_button_buynow, .mp_cart_col_updatecart input[type=submit], #mp_shipping_submit, #mp_payment_confirm {
+.mp_button_addcart, .mp_button_buynow, .mp_cart_col_updatecart input[type=submit], #mp_shipping_submit, #mp_payment_confirm, #mp_payment_submit {
 font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
 font-weight: bold;
 padding: 5px;
