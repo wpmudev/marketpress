@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.1.2
+Version: 1.1.3
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.1.2';
+  var $version = '1.1.3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
