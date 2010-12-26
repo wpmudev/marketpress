@@ -1255,7 +1255,7 @@ function mp_list_global_products( $args = '' ) {
       else
         $content .= '<div class="product type-product mp_product">';
 
-      $content .= '<h3 class="mp_product_name"><a href="' . $product->post_permalink . '">' . $product->post_title . '</a></h3>';
+      $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $product->ID ) . '">' . esc_attr($product->post_title) . '</a></h3>';
       $content .= '<div class="mp_product_content">';
       global $current_blog;
       if ($show_thumbnail) {
@@ -1296,7 +1296,7 @@ function mp_list_global_products( $args = '' ) {
       }
 
       //button
-      $content .= '<a class="mp_link_buynow" href="' . esc_url($product->post_permalink) . '">' .  __('Buy Now &raquo;', 'mp') . '</a>';
+      $content .= '<a class="mp_link_buynow" href="' . get_permalink($product->ID) . '">' .  __('Buy Now &raquo;', 'mp') . '</a>';
       $content .= '</div>';
 
       if ($as_list)
