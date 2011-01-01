@@ -8,6 +8,7 @@ Change Log:
 1.1.3 - 12/32/2010
 ----------------------------------------------------------------------
 - Fixed: Global MarketPress Permalink Updating Problems
+- Fixed: MarketPress check out page issues
 
 1.1.2 - 12/16/2010
 ----------------------------------------------------------------------

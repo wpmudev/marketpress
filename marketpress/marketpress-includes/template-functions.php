@@ -185,51 +185,49 @@ function mp_popular_products( $echo = true, $num = 5 ) {
 //Prints cart table, for internal use
 function _mp_cart_table($cart, $type = 'checkout') {
   global $mp;
+  $content = "";
   $settings = get_option('mp_settings');
   //get coupon code
   $coupon_code = $mp->get_coupon_code();
 
   if ($type == 'checkout-edit') {
-    do_action('mp_cart_updated_msg');
-    ?>
-    <form id="mp_cart_form" method="post" action="">
-    <table class="mp_cart_contents">
-      <thead><tr>
-        <th class="mp_cart_col_product" colspan="2"><?php _e('Item:', 'mp'); ?></th>
-        <th class="mp_cart_col_price"><?php _e('Price:', 'mp'); ?></th>
-        <th class="mp_cart_col_quant"><?php _e('Quantity:', 'mp'); ?></th>
-      </tr></thead>
-      <tbody>
-      <?php
+    $content .= apply_filters('mp_cart_updated_msg', '');
+    
+    $content .= '<form id="mp_cart_form" method="post" action="">';
+    $content .= '<table class="mp_cart_contents"><thead><tr>';
+    $content .= '<th class="mp_cart_col_product" colspan="2">'.__('Item:', 'mp').'</th>';
+    $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th>';
+    $content .= '<th class="mp_cart_col_quant">'.__('Quantity:', 'mp').'</th></tr></thead><tbody>';
+    
       $totals = array();
       foreach ($cart as $product_id => $data) {
         $totals[] = $data['price'] * $data['quantity'];
-        echo '<tr>';
-        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-        echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-        echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-        echo '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $product_id . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $product_id . '" /> ' . __('Remove', 'mp') . '</label></td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
+        $content .=  '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
+        $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+        $content .=  '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $product_id . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $product_id . '" /> ' . __('Remove', 'mp') . '</label></td>';
+        $content .=  '</tr>';
       }
       $total = array_sum($totals);
 
       
       //coupon line
       if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
-        echo '  <td>&nbsp;</td>';
-        echo '</tr>';
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Discount:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
-        echo '  <td class="mp_cart_remove_coupon"><a href="?remove_coupon=1">' . __('Remove Coupon &raquo;', 'mp') . '</a></td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
+        $content .=  '  <td>&nbsp;</td>';
+        $content .=  '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Discount:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
+        $content .=  '  <td class="mp_cart_remove_coupon"><a href="?remove_coupon=1">' . __('Remove Coupon &raquo;', 'mp') . '</a></td>';
+        $content .=  '</tr>';
         $total = $coupon['new_total'];
       } else {
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="4">
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="4">
             <a id="coupon-link" class="alignright" href="#coupon-code">' . __('Have a coupon code?', 'mp') . '</a>
             <div id="coupon-code" class="alignright" style="display: none;">
               <label for="coupon_code">' . __('Enter your code:', 'mp') . '</label>
@@ -237,73 +235,66 @@ function _mp_cart_table($cart, $type = 'checkout') {
               <input type="submit" name="update_cart_submit" value="' . __('Apply &raquo;', 'mp') . '" />
             </div>
         </td>';
-        echo '</tr>';
+        $content .=  '</tr>';
       }
 
       //shipping line
       if ( ($shipping_price = $mp->shipping_price()) !== false ) {
         if (has_filter( 'mp_shipping_method_lbl' ))
           $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
-        echo '  <td>' . $shipping_method . '</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
+        $content .=  '  <td>' . $shipping_method . '</td>';
+        $content .=  '</tr>';
         $total = $total + $shipping_price;
       }
       
       //tax line
       if ( ($tax_price = $mp->tax_price()) !== false ) {
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Taxes:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
-        echo '  <td>&nbsp;</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Taxes:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
+        $content .=  '  <td>&nbsp;</td>';
+        $content .=  '</tr>';
         $total = $total + $tax_price;
       }
       
-      echo '<tfoot><tr>';
-      echo '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
-      echo '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
-      echo '  <td class="mp_cart_col_updatecart"><input type="submit" name="update_cart_submit" value="' . __('Update Cart &raquo;', 'mp') . '" /></td>';
-      echo '</tr></tfoot>';
-      ?>
-      </tbody>
-    </table>
-    </form>
-    <?php
+      $content .=  '<tfoot><tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+      $content .=  '  <td class="mp_cart_col_updatecart"><input type="submit" name="update_cart_submit" value="' . __('Update Cart &raquo;', 'mp') . '" /></td>';
+      $content .=  '</tr></tfoot>';
+      
+      $content .= '</tbody></table></form>';
   } else if ($type == 'checkout') {
-    ?>
-    <table class="mp_cart_contents">
-      <thead><tr>
-        <th class="mp_cart_col_product" colspan="2"><?php _e('Item:', 'mp'); ?></th>
-        <th class="mp_cart_col_quant"><?php _e('Qty:', 'mp'); ?></th>
-        <th class="mp_cart_col_price"><?php _e('Price:', 'mp'); ?></th>
-      </tr></thead>
-      <tbody>
-      <?php
+    $content .= '<table class="mp_cart_contents"><thead><tr>';
+    $content .= '<th class="mp_cart_col_product" colspan="2">'.__('Item:', 'mp').'</th>';
+    $content .= '<th class="mp_cart_col_quant">'.__('Qty:', 'mp').'</th>';
+    $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th></tr></thead><tbody>';
+    
       $totals = array();
       foreach ($cart as $product_id => $data) {
         $totals[] = $data['price'] * $data['quantity'];
-        echo '<tr>';
-        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-        echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-        echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-        echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
+        $content .=  '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
+        $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+        $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+        $content .=  '</tr>';
       }
       $total = array_sum($totals);
 
       //coupon line
       if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
-        echo '</tr>';
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Discount:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
+        $content .=  '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Discount:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
+        $content .=  '</tr>';
         $total = $coupon['new_total'];
       }
 
@@ -311,61 +302,55 @@ function _mp_cart_table($cart, $type = 'checkout') {
       if ( ($shipping_price = $mp->shipping_price()) !== false ) {
         if (has_filter( 'mp_shipping_method_lbl' ))
           $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
-        echo '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
+        $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
+        $content .=  '</tr>';
         $total = $total + $shipping_price;
       }
 
       //tax line
       if ( ($tax_price = $mp->tax_price()) !== false ) {
-        echo '<tr>';
-        echo '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Taxes:', 'mp') . '</td>';
-        echo '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Taxes:', 'mp') . '</td>';
+        $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
+        $content .=  '</tr>';
         $total = $total + $tax_price;
       }
       
-      echo '<tr>';
-      echo '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Cart Total:', 'mp') . '</td>';
-      echo '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
-      echo '</tr>';
-      ?>
-      </tbody>
-    </table>
-    <?php
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Cart Total:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+      $content .=  '</tr>';
+      
+      $content .= '</tbody></table>';
+      
   } else if ($type == 'widget') {
-    ?>
-    <table class="mp_cart_contents_widget">
-      <thead><tr>
-        <th class="mp_cart_col_product" colspan="2"><?php _e('Item:', 'mp'); ?></th>
-        <th class="mp_cart_col_quant"><?php _e('Qty:', 'mp'); ?></th>
-        <th class="mp_cart_col_price"><?php _e('Price:', 'mp'); ?></th>
-      </tr></thead>
-      <tbody>
-      <?php
+    $content .= '<table class="mp_cart_contents_widget"><thead><tr>';
+    $content .= '<th class="mp_cart_col_product" colspan="2">'.__('Item:', 'mp').'</th>';
+    $content .= '<th class="mp_cart_col_quant">'.__('Qty:', 'mp').'</th>';
+    $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th></tr></thead><tbody>';
+    
       $totals = array();
       foreach ($cart as $product_id => $data) {
         $totals[] = $data['price'] * $data['quantity'];
-        echo '<tr>';
-        echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
-        echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-        echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-        echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-        echo '</tr>';
+        $content .=  '<tr>';
+        $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
+        $content .=  '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
+        $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+        $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+        $content .=  '</tr>';
       }
       $total = array_sum($totals);
 
-      echo '<tr>';
-      echo '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-      echo '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
-      echo '</tr>';
-      ?>
-      </tbody>
-    </table>
-    <?php
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+      $content .=  '</tr>';
+      
+      $content .= '</tbody></table>';
   }
+  return $content;
 }
 
 //Prints cart login/register form, for internal use
@@ -680,20 +665,21 @@ function _mp_cart_payment($type) {
  */
 function mp_show_cart($context = '', $checkoutstep = null) {
   global $mp;
-	$settings = get_option('mp_settings');
+  
+  $settings = get_option('mp_settings');
 
   $cart = $mp->get_cart_contents();
+  
+  $content = "";
 
   if ((is_array($cart) && count($cart)) || $checkoutstep == 'confirmation') {
 
     if ($context == 'widget') {
-      _mp_cart_table($cart, 'widget');
-      ?>
-      <div class="mp_cart_actions_widget">
-    		<a class="mp_empty_cart" href="<?php mp_cart_link(true, true); ?>?empty-cart=1" title="<?php _e('Empty your shopping cart', 'mp') ?>"><?php _e('Empty Cart', 'mp') ?></a>
-    		<a class="mp_checkout_link" href="<?php mp_cart_link(true, true); ?>" title="<?php _e('Go To Checkout Page', 'mp') ?>"><?php _e('Checkout &raquo;', 'mp') ?></a>
-    	</div>
-      <?php
+      $content .= _mp_cart_table($cart, 'widget');
+      $content .= '<div class="mp_cart_actions_widget">';
+      $content .= '<a class="mp_empty_cart" href="'.mp_cart_link(false, true).'?empty-cart=1" title="'.__('Empty your shopping cart', 'mp').'">'.__('Empty Cart', 'mp').'</a>';
+      $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
+      $content .= '</div>';
     } else if ($context == 'checkout') {
 
       if ( $checkoutstep == null )
@@ -717,7 +703,7 @@ function mp_show_cart($context = '', $checkoutstep = null) {
 
         case 'confirm-checkout':
           echo $settings['msg']['confirm_checkout'];
-          _mp_cart_table($cart, 'checkout');
+          echo _mp_cart_table($cart, 'checkout');
           _mp_cart_shipping(false);
           _mp_cart_payment('confirm');
           break;
@@ -729,13 +715,13 @@ function mp_show_cart($context = '', $checkoutstep = null) {
 
         default:
           echo $settings['msg']['cart'];
-          _mp_cart_table($cart, 'checkout-edit');
+          echo _mp_cart_table($cart, 'checkout-edit');
           _mp_cart_login();
           break;
       }
 
     } else {
-      _mp_cart_table($cart, 'checkout');
+      echo _mp_cart_table($cart, 'checkout');
       ?>
       <div class="mp_cart_actions">
     		<a class="mp_empty_cart" href="<?php mp_cart_link(true, true); ?>?empty-cart=1" title="<?php _e('Empty your shopping cart', 'mp') ?>"><?php _e('Empty Cart', 'mp') ?></a>
@@ -745,15 +731,10 @@ function mp_show_cart($context = '', $checkoutstep = null) {
     }
 
   } else {
-    ?>
-		<div class="mp_cart_empty">
-			<?php _e('There are no items in your cart.', 'mp') ?>
-		</div>
-		<div id="mp_cart_actions_widget">
-			<a class="mp_store_link" href="<?php mp_store_link(true, true); ?>"><?php _e('Browse Products &raquo;', 'mp') ?></a>
-		</div>
-    <?php
+    $content .= '<div class="mp_cart_empty">'.__('There are no items in your cart.', 'mp').'</div>';
+    $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="'.mp_store_link(false, true).'">'.__('Browse Products &raquo;', 'mp').'</a></div>';
   }
+  return $content;
 }
 
 

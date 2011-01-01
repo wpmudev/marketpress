@@ -1171,7 +1171,7 @@ Thanks again!", 'mp')
   function checkout_theme($content) {
     global $wp_query;
 
-    mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']);
+    $content = mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']).$content;
     
     return $content;
   }
@@ -1818,9 +1818,9 @@ Thanks again!", 'mp')
       
       //if running via ajax return updated cart and die
       if ($no_ajax !== true) {
+        $return .= mp_show_cart('widget');
         echo $return;
-        mp_show_cart('widget');
-        exit;
+	exit;
       }
 
     } else if (isset($_POST['update_cart_submit'])) { //update cart contents
@@ -2003,8 +2003,8 @@ Thanks again!", 'mp')
   }
   
   function cart_update_message($msg) {
-    $content = 'echo "<div id=\"mp_cart_updated_msg\">' . $msg . '</div>";';
-    add_action( 'mp_cart_updated_msg', create_function('', $content) );
+    $content = 'return "<div id=\"mp_cart_updated_msg\">' . $msg . '</div>";';
+    add_filter( 'mp_cart_updated_msg', create_function('', $content) );
   }
   
   function cart_checkout_error($msg, $context = 'checkout') {
@@ -4413,7 +4413,7 @@ class MarketPress_Shopping_Cart extends WP_Widget {
       echo '<div class="custom_text">' . $instance['custom_text'] . '</div>';
 
     echo '<div class="mp_cart_widget">';
-      mp_show_cart('widget');
+    echo mp_show_cart('widget');
     echo '</div>';
 
     echo $after_widget;
