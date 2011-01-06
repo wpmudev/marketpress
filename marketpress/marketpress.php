@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.1.3
+Version: 1.1.4
 Plugin URI: http://premium.wpmudev.org/project/marketpress
-Description: Community eCommerce for WordPress, WPMU, and BuddyPress
+Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
 Author URI: http://uglyrobot.com
 WDP ID: 144
 
-Copyright 2009-2010 Incsub (http://incsub.com)
+Copyright 2009-2011 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.1.3';
+  var $version = '1.1.4';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -59,7 +59,7 @@ class MarketPress {
     include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
     
     //load BuddyPress class if needed
-    add_action( 'bp_init', array(&$this, 'load_bp_features') );
+    //add_action( 'bp_init', array(&$this, 'load_bp_features') );
     
     //load sitewide features if WPMU
     if (is_multisite()) {
@@ -266,11 +266,7 @@ Thanks again!", 'mp')
   
   function init_vars() {
     //setup proper directories
-    if (is_multisite() && defined('WPMU_PLUGIN_URL') && defined('WPMU_PLUGIN_DIR') && file_exists(WPMU_PLUGIN_DIR . '/' . basename(__FILE__))) {
-      $this->location = 'mu-plugins';
-      $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress-includes/';
-      $this->plugin_url = WPMU_PLUGIN_URL . '/marketpress-includes/';
-  	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/marketpress/' . basename(__FILE__))) {
+    if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/marketpress/' . basename(__FILE__))) {
       $this->location = 'subfolder-plugins';
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/marketpress-includes/';
       $this->plugin_url = WP_PLUGIN_URL . '/marketpress/marketpress-includes/';
@@ -278,6 +274,10 @@ Thanks again!", 'mp')
       $this->location = 'plugins';
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress-includes/';
       $this->plugin_url = WP_PLUGIN_URL . '/marketpress-includes/';
+  	} else if (is_multisite() && defined('WPMU_PLUGIN_URL') && defined('WPMU_PLUGIN_DIR') && file_exists(WPMU_PLUGIN_DIR . '/' . basename(__FILE__))) {
+      $this->location = 'mu-plugins';
+      $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress-includes/';
+      $this->plugin_url = WPMU_PLUGIN_URL . '/marketpress-includes/';
   	} else {
       wp_die(__('There was an issue determining where MarketPress is installed. Please reinstall.', 'mp'));
     }
@@ -4759,4 +4759,16 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 	<?php
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////
+/* -------------------- Update Notifications Notice -------------------- */
+if ( !function_exists( 'wdp_un_check' ) ) {
+  add_action( 'admin_notices', 'wdp_un_check', 5 );
+  add_action( 'network_admin_notices', 'wdp_un_check', 5 );
+  function wdp_un_check() {
+    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
+      echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
+  }
+}
+/* --------------------------------------------------------------------- */
 ?>

@@ -1,26 +1,6 @@
 <?php
 /*
 MarketPress Multisite Features
-Version: 1.1.2
-Plugin URI: http://premium.wpmudev.org/project/marketpress
-Description: Community eCommerce for WordPress, WPMU, and BuddyPress
-Author: Aaron Edwards (Incsub)
-Author URI: http://uglyrobot.com
-
-Copyright 2009-2010 Incsub (http://incsub.com)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
-the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 class MarketPress_MS {
@@ -39,6 +19,7 @@ class MarketPress_MS {
     
     // Plug admin pages
 		add_action( 'admin_menu', array(&$this, 'add_menu_items') );
+		add_action( 'network_admin_menu', array(&$this, 'add_menu_items') );
 
     //index products
     add_action( 'save_post', array(&$this, 'index_product') );
@@ -480,10 +461,13 @@ class MarketPress_MS {
   }
 
   function add_menu_items() {
-    global $mp;
+    global $mp, $wp_version;
     
-    $page = add_submenu_page('ms-admin.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 10, 'marketpress-ms', array(&$this, 'super_admin_page'));
-    
+    if ( version_compare($wp_version, '3.0.9', '>') ) {
+      $page = add_submenu_page('settings.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 10, 'marketpress-ms', array(&$this, 'super_admin_page'));
+    } else {
+      $page = add_submenu_page('ms-admin.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 10, 'marketpress-ms', array(&$this, 'super_admin_page'));
+    }
     //add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
     //add_action( 'admin_print_styles-' . $page, array(&$this, 'admin_css_settings') );
   }
@@ -889,7 +873,11 @@ class MarketPress_MS {
   }
   
   function remove_blog($blog_id) {
-      }
+    global $wpdb, $current_site, $mp;
+
+    //delete all - note that reinstating the blog will not restore indexed products
+    $wpdb->query( "DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = $blog_id" );
+  }
   
   function public_update( $old_value, $value ) {
     global $wpdb;
@@ -1054,6 +1042,10 @@ function mp_global_categories_list( $args = '' ) {
 
   //sort by name
   foreach ($tags as $tag) {
+    //skip empty tags
+    if ( $tag['count'] == 0 )
+      continue;
+
     if ($tag['type'] == 'product_category')
       $link = get_home_url( mp_main_site_id(), $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
     else if ($tag['type'] == 'product_tag')
@@ -1097,6 +1089,10 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
 
   //sort by name
   foreach ($tags as $tag) {
+    //skip empty tags
+    if ( $tag['count'] == 0 )
+      continue;
+      
     if ($tag['type'] == 'product_category')
       $tag['link'] = get_home_url( mp_main_site_id(), $settings['slugs']['marketplace'] . '/' . $settings['slugs']['categories'] . '/' . $tag['slug'] . '/' );
     else if ($tag['type'] == 'product_tag')
@@ -1255,14 +1251,30 @@ function mp_list_global_products( $args = '' ) {
       else
         $content .= '<div class="product type-product mp_product">';
 
-      $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $product->ID ) . '">' . esc_attr($product->post_title) . '</a></h3>';
-      $content .= '<div class="mp_product_content">';
       global $current_blog;
-      if ($show_thumbnail) {
-        switch_to_blog($product->blog_id);
-        $content .= mp_product_image( false, $context, $product->post_id, $thumbnail_size );
-        restore_current_blog();
+      switch_to_blog($product->blog_id);
+
+      //grab permalink
+      $permalink = get_permalink( $product->ID );
+
+      //grab thumbnail
+      if ($show_thumbnail)
+        $thumbnail = mp_product_image( false, $context, $product->post_id, $thumbnail_size );
+        
+      //price
+      if ($show_price) {
+        if ($context == 'widget')
+          $price = mp_product_price(false, $product->post_id, ''); //no price label in widgets
+        else
+          $price = mp_product_price(false, $product->post_id);
       }
+      
+      restore_current_blog();
+
+      $content .= '<h3 class="mp_product_name"><a href="' . $permalink . '">' . esc_attr($product->post_title) . '</a></h3>';
+      $content .= '<div class="mp_product_content">';
+
+      $content .= $thumbnail;
 
       //show content
       if ($text == 'excerpt') {
@@ -1286,17 +1298,10 @@ function mp_list_global_products( $args = '' ) {
       $content .= '<div class="mp_product_meta">';
 
       //price
-      if ($show_price) {
-        switch_to_blog($product->blog_id);
-        if ($context == 'widget')
-          $content .= mp_product_price(false, $product->post_id, ''); //no price label in widgets
-        else
-          $content .= mp_product_price(false, $product->post_id);
-        restore_current_blog();
-      }
+      $content .= $price;
 
       //button
-      $content .= '<a class="mp_link_buynow" href="' . get_permalink($product->ID) . '">' .  __('Buy Now &raquo;', 'mp') . '</a>';
+      $content .= '<a class="mp_link_buynow" href="' . $permalink . '">' .  __('Buy Now &raquo;', 'mp') . '</a>';
       $content .= '</div>';
 
       if ($as_list)

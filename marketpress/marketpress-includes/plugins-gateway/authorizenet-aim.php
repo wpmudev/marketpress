@@ -1,26 +1,7 @@
 <?php
 /*
 MarketPress Authorize.net AIM Gateway Plugin
-Version: 1.0
-Plugin URI: http://premium.wpmudev.org/project/e-commerce
-Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: S H Mohanjith (Incsub)
-Author URI: http://premium.wpmudev.org
-
-Copyright 2009-2010 Incsub (http://incsub.com)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
-the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
@@ -760,7 +741,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
               
               <p>
 		<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
-                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
+                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
                 </label>
 	      </p>
               
