@@ -574,9 +574,9 @@ class MarketPress_MS {
                   if (($pos = strrpos($file, '.css')) !== false) {
                     $value = substr($file, 0, $pos);
                     if (is_readable("$theme_dir/$file")) {
-                      $theme_data = get_file_data( "$theme_dir/$file", array('MarketPress Theme' => '') );
+                      $theme_data = get_file_data( "$theme_dir/$file", array('name' => 'MarketPress Theme') );
                       if (is_array($theme_data))
-                        $theme_list[$value] = $theme_data['MarketPress Theme'];
+                        $theme_list[$value] = $theme_data['name'];
                     }
                   }
                 }
