@@ -235,12 +235,12 @@ You can track the latest status of your order here: TRACKINGURL
 Thanks again!", 'mp')
       )
     );
-    add_option('mp_settings', $default_settings);
-    add_option('mp_version', $this->version);
+    add_option( 'mp_settings', apply_filters( 'mp_default_settings', $default_settings ) );
+    add_option( 'mp_version', $this->version );
     
     //define settings that don't need to autoload for efficiency
-    add_option('mp_coupons', '', '', 'no');
-    add_option('mp_store_page', '', '', 'no');
+    add_option( 'mp_coupons', '', '', 'no' );
+    add_option( 'mp_store_page', '', '', 'no' );
     
     //create store page
     add_action( 'init', array(&$this, 'create_store_page') );
