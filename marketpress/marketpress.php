@@ -4235,7 +4235,7 @@ Notification Preferences: %s', 'mp');
         				<td>
                 <?php
                 //check network permissions
-                if (is_multisite()) {
+                if (is_multisite() && !is_main_site()) {
                   $network_settings = get_site_option( 'mp_network_settings' );
                   foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                     if ($network_settings['allowed_gateways'][$code] == 'full') {

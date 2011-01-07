@@ -526,7 +526,7 @@ class MarketPress_MS {
         </div>
         
         <div class="postbox">
-          <h3 class='hndle'><span><?php _e('Gateway Permissions', 'mp') ?></span> - <span class="description"><?php _e('Set payment gateway access permissions for network stores.', 'mp') ?></span></h3>
+          <h3 class='hndle'><span><?php _e('Gateway Permissions', 'mp') ?></span> - <span class="description"><?php _e('Set payment gateway access permissions for network stores. The main site will maintain access to all gateways.', 'mp') ?></span></h3>
           <div class="inside">
             <table class="form-table">
               <?php
