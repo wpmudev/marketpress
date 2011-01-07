@@ -1255,7 +1255,7 @@ function mp_list_global_products( $args = '' ) {
       switch_to_blog($product->blog_id);
 
       //grab permalink
-      $permalink = get_permalink( $product->ID );
+      $permalink = get_permalink( $product->post_id );
 
       //grab thumbnail
       if ($show_thumbnail)
