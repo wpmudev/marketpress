@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.1.5
+Version: 1.1.6
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.1.5';
+  var $version = '1.1.6';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -751,15 +751,16 @@ Thanks again!", 'mp')
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
-        $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
-        $wp_query->is_404 = null;
-        $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
       }
 
+      $wp_query->is_page = 1;
+      $wp_query->is_singular = 1;
+      $wp_query->is_404 = null;
+      $wp_query->post_count = 1;
+        
       $this->is_shop_page = true;
     }
     
@@ -775,15 +776,16 @@ Thanks again!", 'mp')
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
-        $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
-        $wp_query->is_404 = false;
-        $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
       }
 
+      $wp_query->is_page = 1;
+      $wp_query->is_singular = 1;
+      $wp_query->is_404 = false;
+      $wp_query->post_count = 1;
+      
       $this->is_shop_page = true;
     }
     
@@ -827,15 +829,16 @@ Thanks again!", 'mp')
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
-        $wp_query->is_page = 1;
-        //$wp_query->is_singular = 1;
-        $wp_query->is_404 = null;
-        $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_content', array(&$this, 'product_list_theme'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
       }
+      
+      $wp_query->is_page = 1;
+      //$wp_query->is_singular = 1;
+      $wp_query->is_404 = null;
+      $wp_query->post_count = 1;
       
       $this->is_shop_page = true;
     }
@@ -2906,15 +2909,15 @@ Notification Preferences: %s', 'mp');
     				$this->update_order_status($post_id, 'shipped');
     				$shipped++;
     			}
-    			$msg = printf( _n( '%s order marked as Shipped.', '%s orders marked as Shipped.', $shipped, 'mp' ), number_format_i18n( $shipped ) );
-    			break;
+    			$msg = sprintf( _n( '%s order marked as Shipped.', '%s orders marked as Shipped.', $shipped, 'mp' ), number_format_i18n( $shipped ) );
+          break;
         case 'closed':
     			$closed = 0;
     			foreach( (array) $post_ids as $post_id ) {
     				$this->update_order_status($post_id, 'closed');
     				$closed++;
     			}
-    			$msg = printf( _n( '%s order Closed.', '%s orders Closed.', $closed, 'mp' ), number_format_i18n( $closed ) );
+    			$msg = sprintf( _n( '%s order Closed.', '%s orders Closed.', $closed, 'mp' ), number_format_i18n( $closed ) );
     			break;
 
     	}
@@ -2936,7 +2939,7 @@ Notification Preferences: %s', 'mp');
     </h2>
 
     <?php if ( isset($msg) ) { ?>
-    <div id="message" class="updated"><p>
+    <div class="updated fade"><p>
     <?php echo $msg; ?>
     </p></div>
     <?php } ?>
@@ -3088,7 +3091,14 @@ Notification Preferences: %s', 'mp');
       	</tfoot>
 
       	<tbody>
-      <?php post_rows(); ?>
+      <?php
+        if ( function_exists('get_list_table') ) {
+          $wp_list_table = get_list_table('WP_Posts_List_Table');
+          $wp_list_table->display_rows();
+        } else {
+          post_rows();
+        }
+       ?>
       	</tbody>
       </table>
 

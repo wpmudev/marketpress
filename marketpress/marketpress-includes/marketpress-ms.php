@@ -189,10 +189,6 @@ class MarketPress_MS {
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
-        $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
-        $wp_query->is_404 = false;
-        $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
@@ -220,10 +216,6 @@ class MarketPress_MS {
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
-        $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
-        $wp_query->is_404 = false;
-        $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_content', array(&$this, 'global_categories_theme'), 99 );
@@ -250,10 +242,6 @@ class MarketPress_MS {
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
-        $wp_query->is_page = 1;
-        $wp_query->is_singular = 1;
-        $wp_query->is_404 = false;
-        $wp_query->post_count = 1;
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_content', array(&$this, 'global_tags_theme'), 99 );
@@ -264,6 +252,13 @@ class MarketPress_MS {
 
     //load shop specific items
     if ($is_shop_page) {
+    
+      //prevent query errors on virtual pages
+      $wp_query->is_page = 1;
+      $wp_query->is_singular = 1;
+      $wp_query->is_404 = false;
+      $wp_query->post_count = 1;
+        
       //fixes a nasty bug in BP theme's functions.php file which always loads the activity stream if not a normal page
       remove_all_filters('page_template');
 

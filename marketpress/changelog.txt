@@ -5,9 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-1.1.6 - x/xx/2011 - Aaron Edwards
+1.1.6 - 1/07/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Added 'mp_default_settings' filter to mod default settings array on new stores
+- Fixed http://premium.wpmudev.org/forums/topic/marketpress-template-page-mp_global_productsphp-works-but-browsers-title-says-page-not-found?replies=20#post-72045
+- Fixed major 3.1 Compatibility bug I missed on orders page
+- Fixed order status change success message on orders page
 
 1.1.5 - 1/07/2011 - Aaron Edwards
 ----------------------------------------------------------------------
