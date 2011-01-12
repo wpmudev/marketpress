@@ -144,6 +144,7 @@ class MarketPress {
       ),
       'currency' => 'USD',
       'curr_symbol_position' => 1,
+      'curr_decimal' => 1,
       'disable_cart' => 0,
       'inventory_threshhold' => 3,
       'store_theme' => 'icons',
@@ -2478,7 +2479,12 @@ Notification Preferences: %s', 'mp');
   
   //round and display currency with padded zeros
   function display_currency( $amount ) {
-    return number_format( round( $amount, 2 ), 2, '.', '');
+    $settings = get_option('mp_settings');
+    
+    if ( $settings['curr_decimal'] === 0 )
+      return number_format( round( $amount ) );
+    else
+      return number_format( round( $amount, 2 ), 2, '.', '');
   }
   
   //display currency symbol
@@ -3393,6 +3399,15 @@ Notification Preferences: %s', 'mp');
         				100<?php echo $this->format_currency($settings['currency']); ?></label><br />
         				<label><input value="4" name="mp[curr_symbol_position]" type="radio"<?php checked($settings['curr_symbol_position'], 4); ?>>
         				100 <?php echo $this->format_currency($settings['currency']); ?></label>
+                </td>
+                </tr>
+                <tr valign="top">
+                <th scope="row"><?php _e('Show Decimal in Prices', 'mp') ?></th>
+                <td>
+                <label><input value="1" name="mp[curr_decimal]" type="radio"<?php checked( ( ($settings['curr_decimal'] !== 0) ? 1 : 0 ), 1); ?>>
+        				<?php _e('Yes', 'mp') ?></label>
+        				<label><input value="0" name="mp[curr_decimal]" type="radio"<?php checked($settings['curr_decimal'], 0); ?>>
+        				<?php _e('No', 'mp') ?></label>
                 </td>
                 </tr>
               </table>
