@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.1.7 - 1/25/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Fixed 3.1 compatibility bug due to RC3 revertions
+- Added setting to display prices with no decimals
+
 1.1.6 - 1/07/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Added 'mp_default_settings' filter to mod default settings array on new stores
