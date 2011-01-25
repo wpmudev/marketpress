@@ -696,6 +696,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		$nvpstr .= "&ADDROVERRIDE=1";
 		$nvpstr .= "&NOSHIPPING=2";
 		$nvpstr .= "&LANDINGPAGE=Billing";
+		$nvpstr .= "&SOLUTIONTYPE=Sole";
 		$nvpstr .= "&PAYMENTREQUEST_0_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
 		$nvpstr .= "&LOCALECODE=" . $this->locale;
 		$nvpstr .= "&EMAIL=" . urlencode($shipping_info['email']);
