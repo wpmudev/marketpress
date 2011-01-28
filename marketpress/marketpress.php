@@ -1570,6 +1570,8 @@ Thanks again!", 'mp')
 
     $price = $this->display_currency($price);
 
+    $price = apply_filters( 'mp_product_price', $price, $product_id );
+
     if ($format)
       return $this->format_currency('', $price);
     else
@@ -1685,6 +1687,9 @@ Thanks again!", 'mp')
 
     if (empty($price))
       $price = 0;
+
+		//in case plugins want to override taxes, say for tax free products
+    $price = apply_filters( 'mp_tax_price', $price, $total, $cart );
 
     if ($format)
       return $this->format_currency('', $price);
@@ -1824,7 +1829,7 @@ Thanks again!", 'mp')
       if ($no_ajax !== true) {
         $return .= mp_show_cart('widget');
         echo $return;
-	exit;
+				exit;
       }
 
     } else if (isset($_POST['update_cart_submit'])) { //update cart contents
@@ -2162,7 +2167,7 @@ Thanks again!", 'mp')
       update_post_meta($product_id, 'mp_sales_count', $count);
 
       //for plugins into product sales
-      do_action( 'mp_product_sale', $product_id, $data );
+      do_action( 'mp_product_sale', $product_id, $data, $paid );
     }
 		$item_count = array_sum($items);
 
@@ -2185,8 +2190,10 @@ Thanks again!", 'mp')
     add_post_meta($post_id, 'mp_received_time', $timestamp, true);
 
     //set paid time if we already have a confirmed payment
-    if ($paid)
+    if ($paid) {
       add_post_meta($post_id, 'mp_paid_time', $timestamp, true);
+      do_action( 'mp_order_paid', $this->get_order($order_id) );
+		}
 
     //empty cart cookie
     $this->set_cart_cookie(array());
@@ -2237,6 +2244,9 @@ Thanks again!", 'mp')
 
     //send new order email
     $this->order_notification($order_id);
+
+    //hook for new orders
+    do_action( 'mp_new_order', $this->get_order($order_id) );
 
     return $order_id;
   }
@@ -2336,6 +2346,7 @@ Thanks again!", 'mp')
     if ($paid) {
       if ($order->post_status == 'order_received') {
         $this->update_order_status($order->ID, 'paid');
+        do_action( 'mp_order_paid', $order );
       } else {
         //update payment time if somehow it was skipped
         if (!get_post_meta($order->ID, 'mp_paid_time', true))
