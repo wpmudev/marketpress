@@ -645,7 +645,10 @@ function _mp_cart_payment($type) {
  */
 function mp_show_cart($context = '', $checkoutstep = null) {
   global $mp;
-  
+
+  if ( $checkoutstep == null )
+    $checkoutstep = get_query_var( 'checkoutstep' );
+        
   $settings = get_option('mp_settings');
 
   $cart = $mp->get_cart_contents();
@@ -661,9 +664,6 @@ function mp_show_cart($context = '', $checkoutstep = null) {
       $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
       $content .= '</div>';
     } else if ($context == 'checkout') {
-
-      if ( $checkoutstep == null )
-        $checkoutstep = get_query_var( 'checkoutstep' );
         
       //generic error message context for plugins to hook into
       do_action( 'mp_checkout_error_checkout' );
