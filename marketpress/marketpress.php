@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.1.7
+Version: 1.1.8
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.1.7';
+  var $version = '1.1.8';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -560,7 +560,7 @@ Thanks again!", 'mp')
         'query_var' => true,
         'supports' => $supports
     );
-    register_post_type( 'product' , $args );
+    register_post_type( 'product' , apply_filters( 'mp_register_post_type', $args ) );
 
     //register the orders post type
     register_post_type( 'mp_order', array(
@@ -2518,29 +2518,38 @@ Notification Preferences: %s', 'mp');
       $symbol = '&#x'.$symbol.';';
     }
 
+		//check decimal option
+    if ( $settings['curr_decimal'] === 0 ) {
+      $decimal_place = 0;
+      $zero = '0';
+		} else {
+      $decimal_place = 2;
+      $zero = '0.00';
+		}
+
     //format currency amount according to preference
     if ($amount) {
-
+    
       if ($settings['curr_symbol_position'] == 1 || !$settings['curr_symbol_position'])
-        return $symbol . number_format_i18n($amount, 2);
+        return $symbol . number_format_i18n($amount, $decimal_place);
       else if ($settings['curr_symbol_position'] == 2)
-        return $symbol . ' ' . number_format_i18n($amount, 2);
+        return $symbol . ' ' . number_format_i18n($amount, $decimal_place);
       else if ($settings['curr_symbol_position'] == 3)
-        return number_format_i18n($amount, 2) . $symbol;
+        return number_format_i18n($amount, $decimal_place) . $symbol;
       else if ($settings['curr_symbol_position'] == 4)
-        return number_format_i18n($amount, 2) . ' ' . $symbol;
+        return number_format_i18n($amount, $decimal_place) . ' ' . $symbol;
 
     } else if ($amount === false) {
       return $symbol;
     } else {
       if ($settings['curr_symbol_position'] == 1 || !$settings['curr_symbol_position'])
-        return $symbol . '0.00';
+        return $symbol . $zero;
       else if ($settings['curr_symbol_position'] == 2)
-        return $symbol . ' ' . '0.00';
+        return $symbol . ' ' . $zero;
       else if ($settings['curr_symbol_position'] == 3)
-        return '0.00' . $symbol;
+        return $zero . $symbol;
       else if ($settings['curr_symbol_position'] == 4)
-        return '0.00' . ' ' . $symbol;
+        return $zero . ' ' . $symbol;
     }
   }
 
