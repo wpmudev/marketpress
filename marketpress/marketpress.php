@@ -2492,7 +2492,7 @@ Notification Preferences: %s', 'mp');
   function display_currency( $amount ) {
     $settings = get_option('mp_settings');
 
-    if ( $settings['curr_decimal'] === 0 )
+    if ( $settings['curr_decimal'] === '0' )
       return number_format( round( $amount ) );
     else
       return number_format( round( $amount, 2 ), 2, '.', '');
@@ -2519,7 +2519,7 @@ Notification Preferences: %s', 'mp');
     }
 
 		//check decimal option
-    if ( $settings['curr_decimal'] === 0 ) {
+    if ( $settings['curr_decimal'] === '0' ) {
       $decimal_place = 0;
       $zero = '0';
 		} else {
