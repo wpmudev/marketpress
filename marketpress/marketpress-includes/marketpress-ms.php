@@ -398,7 +398,7 @@ class MarketPress_MS {
 
     $args = array();
     $args['echo'] = false;
-    $args['per_page'] = 2;
+
     //check for paging
     if (get_query_var('paged'))
       $args['page'] = intval(get_query_var('paged'));
