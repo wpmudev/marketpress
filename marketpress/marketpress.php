@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.1.8
+Version: 1.1.9
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.1.8';
+  var $version = '1.1.9';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -337,6 +337,9 @@ Thanks again!", 'mp')
   	foreach ($shipping_plugins as $file)
       @include_once( $file );
 
+		//allow plugins from an external location to register themselves
+		do_action('mp_load_shipping_plugins');
+
     //load chosen plugin class
     global $mp_shipping_plugins, $mp_shipping_active_plugin;
     $settings = get_option('mp_settings');
@@ -388,6 +391,9 @@ Thanks again!", 'mp')
   	foreach ($gateway_plugins as $file)
       include( $file );
 
+    //allow plugins from an external location to register themselves
+		do_action('mp_load_gateway_plugins');
+		
     //load chosen plugin classes
     global $mp_gateway_plugins, $mp_gateway_active_plugins;
     $settings = get_option('mp_settings');
