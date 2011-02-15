@@ -580,7 +580,7 @@ Thanks again!", 'mp')
       'description' => __('Orders from your MarketPress store.', 'mp'),
   		'public' => false,
   		'show_ui' => false,
-  		'capability_type' => 'page',
+  		'capability_type' => apply_filters( 'mp_orders_capability', 'page' ),
   		'hierarchical' => false,
   		'rewrite' => false,
   		'query_var' => false,
