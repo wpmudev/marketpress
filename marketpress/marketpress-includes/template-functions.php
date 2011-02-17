@@ -1522,12 +1522,26 @@ function mp_store_navigation( $echo = true ) {
 }
 
 /**
- * Echos the current store navigation links.
+ * Determine if on a MarketPress shop page
  *
  * @retuns bool whether current page is a MarketPress store page.
  */
 function mp_is_shop_page() {
   global $mp;
   return $mp->is_shop_page;
+}
+
+/**
+ * Determine if there are any items in the cart
+ *
+ * @retuns bool whether items are in the cart for the current user.
+ */
+function mp_items_in_cart() {
+  global $mp;
+	$cart = $mp->get_cart_contents();
+	if ((is_array($cart) && count($cart))
+  	return true;
+	else
+	  return false;
 }
 ?>
