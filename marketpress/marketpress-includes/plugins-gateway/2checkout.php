@@ -410,13 +410,13 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	  update_post_meta($order->ID, 'mp_payment_info', $payment_info);
 	  
 	  $mp->update_order_payment_status($tco_vendor_order_id, "paid", true);
+          
+          header('HTTP/1.0 200 OK');
+          header('Content-type: text/plain; charset=UTF-8');
+          print 'Thank you very much for letting us know';
+          exit(0);
 	}
       }
-      
-      header('HTTP/1.0 200 OK');
-      header('Content-type: text/plain; charset=UTF-8');
-      print 'Thank you very much for letting us know';
-      exit(0);
     }
   }
 }
