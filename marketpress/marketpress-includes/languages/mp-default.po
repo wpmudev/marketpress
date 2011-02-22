@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: marketpress\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-07 14:32-0600\n"
-"PO-Revision-Date: 2011-01-07 14:32-0600\n"
+"POT-Creation-Date: 2011-02-21 23:10-0600\n"
+"PO-Revision-Date: 2011-02-21 23:10-0600\n"
 "Last-Translator: Aaron Edwards <aaron@uglyrobot.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -14,67 +14,67 @@ msgstr ""
 "X-Poedit-SearchPath-0: C:\\Users\\Aaron\\Desktop\\UglyRobot Projects\\Incsub\\marketpress\\marketpress\n"
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:158
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:159
 msgid "store"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:159
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:160
 msgid "products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:160
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:161
 msgid "shopping-cart"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:161
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:162
 msgid "order-status"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:162
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:163
 msgid "category"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:163
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:164
 msgid "tag"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:192
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:193
 msgid "<p>If you have any questions about your order please do not hesitate to <a href=\"http://mysite.com/contact/\">contact us</a>.</p>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:194
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:195
 msgid "<p>Please enter your shipping information in the form below to proceed with your order.</p>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:195
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:196
 msgid "<p>Please choose your desired payment method.</p>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:196
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:197
 msgid "<p>You are almost done! Please do a final review of your order to make sure everything is correct then click the \"Confirm Payment\" button.</p>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:197
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:198
 msgid "<p>Thank you for your order! We appreciate your business, and please come back often to check out our new products.</p>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:200
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:201
 msgid "Your Order Confirmation (ORDERID)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:201
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:202
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -96,12 +96,12 @@ msgid ""
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:218
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:219
 msgid "Your Order Has Been Shipped! (ORDERID)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:219
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:220
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "\n"
@@ -123,87 +123,87 @@ msgid ""
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:282
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:283
 msgid "There was an issue determining where MarketPress is installed. Please reinstall."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:412
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:419
 msgid "You must <a href=\"options-permalink.php\">enable Pretty Permalinks</a> to use MarketPress!"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:426
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2936
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:433
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2990
 msgid "Manage Orders"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:429
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:436
 msgid "Store Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:468
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:475
 msgid "Are you sure you want to remove all items from your cart?"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:468
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:475
 msgid "Item(s) Added!"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:468
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:475
 msgid "Adding to your cart..."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:468
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:475
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:1318
 msgid "Out of Stock"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:487
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:494
 msgid "Product"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:488
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:495
 msgid "of"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:512
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:519
 msgid "Welcome to our online store! Feel free to browse around:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:514
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:521
 msgid "Check out our most popular products:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:516
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:523
 msgid "Browse by category:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:518
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:525
 msgid "Browse by tag:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:521
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:528
 msgid "Store"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:532
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1247
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4649
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4655
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:539
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1254
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4712
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4718
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:615
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1476
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1550
@@ -211,15 +211,15 @@ msgid "Product Categories"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:532
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3943
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:539
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4006
 msgid "Product Category"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:533
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1248
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4765
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:540
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1255
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4828
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:619
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1475
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1549
@@ -227,19 +227,19 @@ msgid "Product Tags"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:533
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3947
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:540
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4010
 msgid "Product Tag"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:538
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:539
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1049
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1057
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1087
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1095
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1142
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:545
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:546
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1056
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1064
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1094
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1102
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1149
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1130
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:1508
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:1514
@@ -247,582 +247,582 @@ msgid "Products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:540
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:547
 msgid "Create New"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:541
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:548
 msgid "Create New Product"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:542
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:549
 msgid "Edit Products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:543
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:568
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3553
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3640
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:550
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:575
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3616
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3703
 msgid "Edit"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:544
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:551
 msgid "New Product"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:545
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:549
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:552
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:556
 msgid "View Product"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:546
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:553
 msgid "Search Products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:547
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:554
 msgid "No Products Found"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:548
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:555
 msgid "No Products found in Trash"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:551
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:558
 msgid "Products for your MarketPress store."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:566
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:573
 msgid "Orders"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:567
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:574
 msgid "Order"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:569
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:576
 msgid "View Order"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:570
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2989
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2991
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:577
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3043
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3045
 msgid "Search Orders"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:571
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:578
 msgid "No Orders Found"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:573
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:580
 msgid "Orders from your MarketPress store."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:585
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1356
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1397
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2580
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2585
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2590
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2595
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3018
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3115
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:592
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1363
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1404
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2634
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2639
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2644
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2649
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3072
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3169
 msgid "Received"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:586
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:593
 #, php-format
 msgid "Received <span class=\"count\">(%s)</span>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:591
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1358
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1388
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1398
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2581
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2586
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2591
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2596
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3019
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3116
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:598
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1365
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1395
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1405
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2635
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2640
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2645
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2650
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3073
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3170
 msgid "Paid"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:592
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:599
 #, php-format
 msgid "Paid <span class=\"count\">(%s)</span>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:597
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1360
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1389
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1392
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:604
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1367
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1396
 #: Projects\Incsub\marketpress\marketpress/marketpress.php:1399
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2582
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2587
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2592
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2597
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3020
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3117
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1406
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2636
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2641
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2646
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2651
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3074
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3171
 msgid "Shipped"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:598
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:605
 #, php-format
 msgid "Shipped <span class=\"count\">(%s)</span>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:603
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1362
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1390
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1393
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1395
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2583
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2588
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2593
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2598
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3021
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3118
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:610
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1369
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1397
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1400
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1402
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2637
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2642
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2647
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2652
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3075
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3172
 msgid "Closed"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:604
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:611
 #, php-format
 msgid "Closed <span class=\"count\">(%s)</span>"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:993
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1000
 msgid "None - Custom theme template"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1050
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1088
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4409
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4443
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1057
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1095
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4472
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4506
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:1415
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:1509
 msgid "Shopping Cart"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1051
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1089
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1058
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1096
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:1510
 msgid "Order Status"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1116
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1123
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:309
 #, php-format
 msgid "Product Category: %s"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1119
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1126
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:316
 #, php-format
 msgid "Product Tag: %s"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1126
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2769
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1133
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2823
 msgid "Shipping Information"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1128
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2658
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1135
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2712
 msgid "Payment Information"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1130
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1137
 msgid "Confirm Your Purchase"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1132
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1139
 msgid "Order Confirmation"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1134
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1141
 msgid "Your Shopping Cart"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1138
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1145
 msgid "Track Your Order"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1162
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1169
 msgid "Categorized in "
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1215
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1222
 msgid "View all categories"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1243
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1250
 msgid "Thumbnail"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1244
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3904
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4607
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1251
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3967
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4670
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1394
 msgid "Product Name"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1245
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1508
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2718
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1252
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1515
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2772
 msgid "SKU"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1246
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1504
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2721
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1253
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1511
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2775
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:789
 msgid "Price"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1251
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1258
 msgid "Sales"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1252
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1259
 msgid "Stock"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1271
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1278
 msgid "Edit &raquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1313
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1433
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1969
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1320
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1440
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1981
 msgid "N/A"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1330
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1337
 msgid "Status"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1331
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1338
 msgid "Order ID"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1332
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1339
 msgid "Order Date"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1333
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1340
 msgid "From"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1334
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1341
 msgid "Items"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1335
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1453
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3159
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1342
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1460
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3213
 msgid "Shipping"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1336
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1343
 msgid "Tax"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1337
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3548
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3710
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1344
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3611
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3773
 msgid "Discount"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1338
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1345
 msgid "Total"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1364
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1371
 msgid "View Order Details"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1368
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1375
 msgid "Y/m/d g:i:s A"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1375
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1382
 #, php-format
 msgid "%s ago"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1377
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1384
 msgid "Y/m/d"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1384
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1391
 #, php-format
 msgid "View &#8220;%s&#8221;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1388
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1398
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2581
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2596
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1395
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1405
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2635
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2650
 msgid "Mark as Paid"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1389
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1392
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1396
 #: Projects\Incsub\marketpress\marketpress/marketpress.php:1399
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2582
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2587
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2597
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1406
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2636
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2641
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2651
 msgid "Mark as Shipped"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1390
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1393
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1395
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2583
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2588
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2593
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1397
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1400
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1402
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2637
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2642
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2647
 msgid "Mark as Closed"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1397
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2595
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1404
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2649
 msgid "Mark as Received"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1414
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1421
 #, php-format
 msgid "Regarding Your Order (%s)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1447
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1454
 msgid "Product Details"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1505
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1512
 msgid "Sale Price"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1505
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1512
 msgid "When set this overrides the normal price."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1508
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1515
 msgid "Stock Keeping Unit - Your custom Product ID number"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1513
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1520
 msgid "Track Inventory"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1514
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1521
 msgid "Quantity in Stock"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1519
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1526
 msgid "Some examples are linking to a song/album in itunes, or linking to a product on another site with your own affiliate link."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1519
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1526
 msgid "External Link"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1519
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1526
 msgid "When set this overrides the purchase button with a link to this URL."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1545
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1552
 msgid "File URL"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1546
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1553
 msgid "Upload File"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1769
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1781
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:714
 msgid "There are no items in your cart."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1772
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1784
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:715
 msgid "Browse Products &raquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1800
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1803
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1812
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1815
 #, php-format
 msgid "Sorry, we don't have enough of this item in stock. (%s remaining)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1839
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1851
 #, php-format
 msgid "Sorry, there is not enough stock for %s. (%s remaining)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1860
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1872
 msgid "Item(s) Removed"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1873
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1885
 msgid "Coupon Successfully Applied"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1875
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1887
 msgid "Invalid Coupon Code"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1888
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1900
 msgid "Coupon Removed"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1894
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1906
 msgid "Please enter a valid Email Address."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1897
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1909
 msgid "Please enter your Full Name."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1900
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1912
 msgid "Please enter your Street Address."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1903
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1915
 msgid "Please enter your City."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1906
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1918
 msgid "Please enter your State/Province/Region."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1909
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1921
 msgid "Please enter your Zip/Postal Code."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1912
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1924
 msgid "Please enter your Country."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1966
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1967
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1978
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1979
 msgid "Manual Checkout"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1968
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1980
 msgid "N/A - Free order"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:1970
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:1982
 msgid "Completed"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2357
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2375
 msgid "Items:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2365
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2746
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2383
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2800
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:813
 msgid "Coupon Discount:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2369
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2752
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2387
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2806
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:226
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:286
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:818
@@ -830,8 +830,8 @@ msgid "Shipping:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2373
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2758
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2391
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2812
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:236
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:295
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:823
@@ -839,14 +839,14 @@ msgid "Taxes:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2376
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2394
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:826
 msgid "Order Total:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2379
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2774
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2397
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2828
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:428
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:510
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:832
@@ -856,9 +856,9 @@ msgid "Full Name:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2380
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2771
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2784
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2398
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2825
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2838
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:434
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:515
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:837
@@ -868,8 +868,8 @@ msgid "Address:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2382
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2790
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2400
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2844
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:442
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:521
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:843
@@ -879,8 +879,8 @@ msgid "Address 2:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2383
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2796
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2401
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2850
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:449
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:527
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:849
@@ -890,8 +890,8 @@ msgid "City:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2385
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2802
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2403
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2856
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:455
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:533
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:855
@@ -901,8 +901,8 @@ msgid "State/Province/Region:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2386
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2808
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2404
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2862
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:461
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:539
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:861
@@ -912,8 +912,8 @@ msgid "Postal/Zip Code:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2387
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2813
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2405
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2867
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:467
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:544
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:866
@@ -923,8 +923,8 @@ msgid "Country:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2389
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2819
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2407
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2873
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:480
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:550
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:872
@@ -934,49 +934,72 @@ msgid "Phone Number:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2392
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2665
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2410
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2719
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:765
 msgid "Payment Method:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2393
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2411
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:769
 msgid "Payment Type:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2394
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2669
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2412
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2723
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:773
 msgid "Transaction ID:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2395
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2673
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2413
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2727
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:777
 msgid "Payment Total:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2398
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2416
 msgid "Your payment for this order is not yet complete. Here is the latest status:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2405
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2423
 msgid "Your payment for this order is complete."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2461
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2455
+msgid "New Order Notification: ORDERID"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2456
+#, php-format
+msgid ""
+"A new order (ORDERID) was created in your store:\n"
+"\n"
+"Order Information:\n"
+"ORDERINFO\n"
+"\n"
+"Shipping Information:\n"
+"SHIPPINGINFO\n"
+"\n"
+"Payment Information:\n"
+"PAYMENTINFO\n"
+"\n"
+"You can manage this order here: %s"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2501
 msgid "Low Product Inventory Notification"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2462
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2502
 #, php-format
 msgid ""
 "This message is being sent to notify you of low stock of a product in your online store according to your preferences.\n"
@@ -990,48 +1013,48 @@ msgid ""
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2532
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2586
 msgid "More Info &raquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2558
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2612
 msgid "Invalid Order ID"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2564
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2618
 #, php-format
 msgid "Order Details (%s)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2573
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2627
 msgid "Order Actions"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2576
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2630
 msgid "Change Order Status:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2617
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2671
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:877
 msgid "&laquo; Back"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2626
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2680
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:739
 msgid "Current Status"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2639
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2642
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2646
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2651
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2693
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2696
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2700
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2705
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:750
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:753
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:757
@@ -1039,73 +1062,73 @@ msgid "Received:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2641
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2645
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2650
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2695
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2699
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2704
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:752
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:756
 msgid "Paid:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2644
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2649
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2698
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2703
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:755
 msgid "Shipped:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2648
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2702
 msgid "Closed:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2661
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2715
 msgid "Payment Gateway:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2681
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2735
 msgid "Payment Transaction History"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2712
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2766
 msgid "Order Information"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2719
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2773
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:787
 msgid "Item"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2720
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2774
 msgid "Qantity"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2722
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2776
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:790
 msgid "Subtotal"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2738
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2792
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:805
 msgid "No products could be found for this order"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2762
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2816
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:244
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:302
 msgid "Cart Total:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2779
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2833
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:422
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:505
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:148
@@ -1114,205 +1137,206 @@ msgid "Email:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2825
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2879
 msgid "Cost:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2830
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2884
 msgid "Special Note:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2867
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2921
 msgid "Cheatin&#8217; uh?"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2896
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2950
 #, php-format
 msgid "%s order marked as Received."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2904
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2958
 #, php-format
 msgid "%s order marked as Paid."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2912
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2966
 #, php-format
 msgid "%s order marked as Shipped."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2920
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2974
 #, php-format
 msgid "%s order Closed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:2938
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:2992
 #, php-format
 msgid "Search results for &#8220;%s&#8221;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3007
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3061
 msgid "&laquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3008
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3062
 msgid "&raquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3017
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3114
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3071
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3168
 msgid "Change Status"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3038
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3092
 msgid "Show all dates"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3065
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3119
 #, php-format
 msgid "Displaying %s&#8211;%s of %s"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3128
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3182
 msgid "No Orders Yet"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3143
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3197
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:487
 msgid "Nice Try..."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3156
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3509
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3210
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3572
 msgid "Coupons"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3157
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3164
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3211
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3218
 msgid "Presentation"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3158
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3212
 msgid "Messages"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3160
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3214
 msgid "Payments"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3161
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3215
 msgid "Help"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3172
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3226
 msgid "General"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3198
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3785
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3984
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4125
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4212
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3252
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3848
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4047
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4188
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4275
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:502
 msgid "Settings saved."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3209
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3797
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4155
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4230
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3263
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3860
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4218
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4293
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:514
 msgid "General Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3216
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3270
 msgid "Location Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3218
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3272
 msgid "This is the base location that shipping and tax rates will be calculated from."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3221
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3275
 msgid "Base Country"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3259
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3313
 msgid "Base State/Province/Region"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3276
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3330
 msgid "Tax Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3284
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3338
 #, php-format
 msgid "%s Tax Rate"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3295
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3349
 #, php-format
 msgid "%s Total Tax Rate (VAT,GST,PST,HST)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3306
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3330
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3360
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3384
 msgid "VAT Tax Rate"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3317
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3371
 msgid "GST Tax Rate"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3339
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3393
 msgid "Country Total Tax Rate (VAT, GST, Etc.)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3345
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3399
 msgid "Tax Orders Outside Your Base Country?"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3347
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3359
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3416
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3827
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3845
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3877
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3895
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3401
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3413
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3456
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3479
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3890
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3908
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3940
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3958
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:520
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:730
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:757
@@ -1320,13 +1344,14 @@ msgid "Yes"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3348
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3360
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3417
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3828
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3846
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3878
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3896
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3402
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3414
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3458
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3480
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3891
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3909
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3941
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3959
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:521
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:731
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:758
@@ -1334,682 +1359,687 @@ msgid "No"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3357
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3411
 msgid "Apply Tax To Shipping Fees?"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3361
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3415
 msgid "Please see your local tax laws. Most areas charge tax on shipping fees."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3369
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3423
 msgid "Currency Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3371
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3425
 msgid "These preferences affect display only. Your payment gateway of choice may not support every currency listed here."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3374
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3428
 msgid "Store Currency"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3386
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3440
 msgid "Currency Symbol Position"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3403
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3453
+msgid "Show Decimal in Prices"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3466
 msgid "Miscellaneous Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3407
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3470
 msgid "Inventory Warning Threshold"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3409
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3472
 msgid "At what low stock count do you want to be warned for products you have enabled inventory tracking for?"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3414
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3477
 msgid "Product Listings Only"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3418
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3481
 msgid "This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the \"Buy Now\" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3431
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3957
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4111
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4198
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4266
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3494
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4020
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4174
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4261
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4329
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:699
 msgid "Save Changes"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3456
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3519
 msgid "Coupon(s) succesfully deleted."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3469
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3532
 msgid "Please enter a valid Coupon Code"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3473
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3536
 msgid "Please enter a valid Discount Amount"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3477
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3540
 msgid "Please choose a valid Discount Type"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3481
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3544
 msgid "Please enter a valid Start Date"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3485
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3548
 msgid "Please enter a valid End Date not earlier than the Start Date"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3492
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3555
 msgid "Coupon succesfully saved."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3510
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3573
 msgid "You can create, delete, or update coupon codes for your store here."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3537
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3600
 msgid "Delete"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3547
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3707
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3610
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3770
 msgid "Coupon Code"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3549
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3711
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3612
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3774
 msgid "Start Date"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3550
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3713
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3613
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3776
 msgid "Expire Date"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3551
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3614
 msgid "Used"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3552
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3615
 msgid "Remaining Uses"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3614
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3677
 msgid "No End"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3632
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3695
 msgid "Unlimited"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3653
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3716
 msgid "No coupons yet."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3682
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3745
 msgid "Edit Coupon"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3684
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3747
 msgid "Add Coupon"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3708
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3771
 msgid "Letters and Numbers only"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3714
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3777
 msgid "No end if blank"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3717
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3780
 msgid "Allowed Uses"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3718
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3781
 msgid "Unlimited if blank"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3748
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3811
 msgid "Save Coupon"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3775
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3838
 msgid "Store base URL conflicts with another page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3790
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3853
 msgid "Presentation Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3800
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3863
 msgid "Store Theme"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3803
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3866
 msgid "This option changes the built-in css styles for store pages."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3805
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3868
 msgid "For a custom css theme, save your css file with the \"MarketPress Theme: NAME\" header in the \"/marketpress/css/themes/\" folder and it will appear in this list so you may select it. You can also select \"None\" and create custom theme templates and css to make your own completely unique store design. More information on that <a href=\""
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3814
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3877
 msgid "Single Product Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3818
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3868
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3881
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3931
 msgid "Checkout Button Type"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3820
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3870
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3883
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3933
 msgid "Add To Cart"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3821
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3871
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3884
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3934
 msgid "Buy Now"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3825
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3888
 msgid "Show Quantity Option"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3832
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3895
 msgid "Product Image Size"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3834
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3884
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3897
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3947
 msgid "WP Thumbnail size"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3835
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3885
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3898
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3948
 msgid "WP Medium size"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3836
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3886
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3899
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3949
 msgid "WP Large size"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3837
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3887
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3900
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3950
 msgid "Custom"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3838
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3888
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3901
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3951
 msgid "Height"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3839
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3889
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3902
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3952
 msgid "Width"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3843
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3906
 msgid "Show Image Lightbox"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3847
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3910
 msgid "Makes clicking the single product image open an instant zoomed preview."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3855
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3918
 msgid "Product List Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3875
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3938
 msgid "Show Product Thumbnail"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3882
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3945
 msgid "Product Thumbnail Size"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3893
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3956
 msgid "Paginate Products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3897
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3960
 msgid "Products per page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3901
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3964
 msgid "Order Products By"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3905
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4608
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3968
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4671
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1393
 msgid "Publish Date"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3906
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4609
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3969
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4672
 msgid "Product ID"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3907
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4610
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3970
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4673
 msgid "Product Author"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3908
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4611
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3971
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4674
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1395
 msgid "Number of Sales"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3909
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4612
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3972
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4675
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1396
 msgid "Product Price"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3910
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4613
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3973
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4676
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1397
 msgid "Random"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3912
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4615
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3975
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4678
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1399
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1533
 msgid "Descending"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3913
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4616
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3976
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4679
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1400
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1534
 msgid "Ascending"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3921
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3984
 msgid "Store URL Slugs"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3923
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3986
 msgid "Customizes the url structure of your store"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3926
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3989
 msgid "Store Base"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3928
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3991
 msgid "This page will be created so you can change it's content and the order in which it appears in navigation menus if your theme supports it."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3931
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4333
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3994
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4396
 msgid "Products List"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3935
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4067
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:3998
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4130
 msgid "Shopping Cart Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3939
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4052
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4002
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4115
 msgid "Order Status Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:3994
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4057
 msgid "Messages Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4001
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4064
 msgid "Email Notifications"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4005
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4068
 msgid "New Order"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4007
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4070
 msgid "The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TRACKINGURL. No HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4008
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4019
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4071
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4082
 msgid "Subject:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4010
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4021
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4073
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4084
 msgid "Text:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4016
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4079
 msgid "Order Shipped"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4018
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4081
 msgid "The email text sent to your customer when you mark an order as \"Shipped\". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TRACKINGURL. No HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4031
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4094
 msgid "Store Pages"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4035
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4098
 msgid "Store Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4037
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4100
 msgid "The main store page is an actual page on your site. You can edit it here:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4040
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4103
 msgid "Edit Page &raquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4045
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4108
 msgid "Product Listing Pages"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4047
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4110
 msgid "Displayed at the top of the product listing pages. Optional, HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4054
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4117
 msgid "Displayed at the top of the Order Status page. Optional, HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4063
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4126
 msgid "Shopping Cart Pages"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4069
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4132
 msgid "Displayed at the top of the Shopping Cart page. Optional, HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4074
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4137
 msgid "Shipping Form Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4076
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4139
 msgid "Displayed at the top of the Shipping Form page. Optional, HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4081
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4144
 msgid "Payment Form Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4083
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4146
 msgid "Displayed at the top of the Payment Form page. Optional, HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4088
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4151
 msgid "Order Confirmation Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4090
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4153
 msgid "Displayed at the top of the final Order Confirmation page. HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4095
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4158
 msgid "Order Complete Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4097
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4160
 msgid "Displayed at the top of the page notifying customers of a successful order. HTML allowed."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4148
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4211
 msgid "Shipping Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4160
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4223
 msgid "Choose Target Countries"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4162
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4225
 msgid "Select:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4162
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4225
 msgid "All"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4162
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4225
 msgid "EU"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4162
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4225
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1420
 msgid "None"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4170
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4233
 msgid "These are the countries you will sell and ship to."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4175
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4238
 msgid "Select Shipping Method"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4178
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4241
 msgid "No Shipping"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4223
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4286
 msgid "Payment Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4234
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4297
 msgid "Select Payment Gateway(s)"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4278
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4341
 msgid "MarketPress Help"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4283
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4346
 msgid "General Information"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4285
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4348
 msgid "General help content goes here..."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4291
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4354
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:632
 msgid "Shortcodes"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4293
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4356
 msgid "Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1=\"value\" attr2=\"value\"]</em>."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4296
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4739
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4359
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4802
 msgid "Product Tag Cloud"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4299
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4362
 msgid "Displays a cloud or list of your product tags."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4300
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4308
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4316
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4363
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4371
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4379
 msgid "Optional Attributes &raquo;"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4304
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4367
 msgid "Product Categories List"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4307
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4370
 msgid "Displays an HTML list of your product categories."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4312
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4375
 msgid "Product Categories Dropdown"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4315
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4378
 msgid "Displays an HTML dropdown of your product categories."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4320
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4383
 msgid "Popular Products List"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4323
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4386
 msgid "Displays a list of popular products ordered by sales."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4325
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4338
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4363
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4388
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4401
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4426
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:642
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:667
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:682
@@ -2017,14 +2047,14 @@ msgid "Optional Attributes:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4327
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4390
 msgid "\"number\" - max number of products to display. Defaults to 5."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4328
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4347
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4367
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4391
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4410
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4430
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:656
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:671
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:689
@@ -2032,102 +2062,102 @@ msgid "Example:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4336
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4399
 msgid "Displays a list of products according to preference. Optional attributes default to the values in Presentation Settings -> Product List."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4340
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4403
 msgid "\"paginate\" - Whether to paginate the product list. This is useful to only show a subset."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4341
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4404
 msgid "\"page\" - The page number to display in the product list if \"paginate\" is set to true."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4342
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4405
 msgid "\"per_page\" - How many products to display in the product list if \"paginate\" is set to true."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4343
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4406
 msgid "\"order_by\" - What field to order products by. Can be: title, date, ID, author, price, sales, rand (random)."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4344
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4407
 msgid "\"order\" - Direction to order products by. Can be: DESC, ASC"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4345
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4408
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:649
 msgid "\"category\" - Limits list to a specific product category. Use the category Slug"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4346
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4409
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:650
 msgid "\"tag\" - Limits list to a specific product tag. Use the tag Slug"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4352
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4415
 msgid "Store Links"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4355
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4418
 msgid "Displays a link or url to the current shopping cart page."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4357
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4420
 msgid "Displays a link or url to the current store page."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4359
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4422
 msgid "Displays a link or url to the current products list page."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4361
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4424
 msgid "Displays a link or url to the order status page."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4365
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4428
 msgid "\"url\" - Whether to return a clickable link or url. Can be: true, false. Defaults to showing link."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4366
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4429
 msgid "\"link_text\" - The text to show in the link."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4372
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4435
 msgid "Store Navigation List"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4375
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4438
 msgid "Displays a list of links to your store pages."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4408
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4471
 msgid "Shows dynamic shopping cart contents along with a checkout button for your MarketPress store."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4449
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4595
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4719
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4767
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4512
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4658
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4782
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4830
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1381
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1471
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1524
@@ -2135,38 +2165,38 @@ msgid "Title:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4450
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4596
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4513
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4659
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1382
 msgid "Custom Text:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4455
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4630
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4518
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4693
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1413
 msgid "Show Thumbnail"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4456
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4631
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4519
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4694
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1414
 msgid "Thumbnail Size:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4465
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4528
 msgid "Shows a customizable list of products from your MarketPress store."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4466
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4529
 msgid "Product List"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4550
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4613
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1310
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1312
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:153
@@ -2175,110 +2205,110 @@ msgid "No Products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4579
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4642
 msgid "Our Products"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4600
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4663
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1386
 msgid "List Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4602
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4665
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1388
 msgid "Number of Products:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4605
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4668
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1391
 msgid "Order Products By:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4619
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4682
 msgid "Taxonomy Filter:"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4621
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4684
 msgid "No Filter"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4622
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4685
 msgid "Category"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4623
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4686
 msgid "Tag"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4625
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4688
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1404
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1408
 msgid "Enter the Slug"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4628
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4691
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1411
 msgid "Display Settings"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4634
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4697
 msgid "Show Excerpt"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4636
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4699
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1428
 msgid "Show Price"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4638
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4701
 msgid "Show Buy Button"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4648
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4711
 msgid "A list or dropdown of product categories from your MarketPress store."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4667
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4730
 msgid "Select Category"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4723
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4786
 msgid "Show as dropdown"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4726
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4789
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:1544
 msgid "Show product counts"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4729
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4792
 msgid "Show hierarchy"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4738
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4801
 msgid "Your most used product tags in cloud format from your MarketPress store."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress.php:4780
+#: Projects\Incsub\marketpress\marketpress/marketpress.php:4843
 msgid "Please install the latest version of <a href=\"http://premium.wpmudev.org/project/update-notifications/\" title=\"Download Now &raquo;\">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">More information &raquo;</a>"
 msgstr ""
 
@@ -2328,7 +2358,7 @@ msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/marketpress-ms.php:529
-msgid "Set payment gateway access permissions for network stores."
+msgid "Set payment gateway access permissions for network stores. The main site will maintain access to all gateways."
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
@@ -2797,25 +2827,25 @@ msgid "You may track the latest status of your order here:<br />%s"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:660
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:663
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:707
 msgid "Empty your shopping cart"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:660
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:663
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:707
 msgid "Empty Cart"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:661
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:664
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:708
 msgid "Go To Checkout Page"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:661
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:664
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/template-functions.php:708
 msgid "Checkout &raquo;"
 msgstr ""
@@ -3440,14 +3470,14 @@ msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:588
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:753
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:754
 #, php-format
 msgid "%s Store Purchase - Order ID: %s"
 msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:658
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:841
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:842
 msgid "There was a problem connecting to PayPal. Please try again."
 msgstr ""
 
@@ -3552,7 +3582,7 @@ msgstr ""
 
 #: C:\Users\Aaron\Desktop\UglyRobot
 #: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:43
-#: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:876
+#: Projects\Incsub\marketpress\marketpress/marketpress-includes/plugins-gateway/paypal-express.php:877
 msgid "PayPal Express Checkout"
 msgstr ""
 
