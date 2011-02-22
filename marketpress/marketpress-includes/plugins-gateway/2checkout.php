@@ -1,7 +1,26 @@
 <?php
 /*
 MarketPress Authorize.net AIM Gateway Plugin
+Version: 1.0
+Plugin URI: http://premium.wpmudev.org/project/e-commerce
+Description: Community eCommerce for WordPress, WPMU, and BuddyPress
 Author: S H Mohanjith (Incsub)
+Author URI: http://premium.wpmudev.org
+
+Copyright 2009-2010 Incsub (http://incsub.com)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 class MP_Gateway_2Checkout extends MP_Gateway_API {
@@ -43,12 +62,12 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $this->method_img_url = $mp->plugin_url . 'images/2co_logo.png';
     $this->method_button_img_url = $mp->plugin_url . 'images/2co.png';
     
-    $this->currencyCode = $settings['gateways']['2checkout']['currency'];
-    
-    
-    $this->API_Username = $settings['gateways']['2checkout']['sid'];
-    $this->API_Password = $settings['gateways']['2checkout']['secret_word'];
-    $this->SandboxFlag = $settings['gateways']['2checkout']['mode'];
+    if ( isset( $settings['gateways']['2checkout'] ) ) {
+        $this->currencyCode = $settings['gateways']['2checkout']['currency'];
+        $this->API_Username = $settings['gateways']['2checkout']['sid'];
+        $this->API_Password = $settings['gateways']['2checkout']['secret_word'];
+        $this->SandboxFlag  = $settings['gateways']['2checkout']['mode'];
+    }
   }
 
   /**
@@ -56,7 +75,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form($cart, $shipping_info) {
+  function payment_form($global_cart, $shipping_info) {
     global $mp;
     if (isset($_GET['2checkout_cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your 2Checkout transaction has been canceled.', 'mp') . '</div>';
@@ -113,7 +132,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment_form($cart, $shipping_info) {
+  function process_payment_form($global_cart, $shipping_info) {
     global $mp;
     
     $mp->generate_order_id();
@@ -125,7 +144,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function confirm_payment_form($cart, $shipping_info) {
+  function confirm_payment_form($global_cart, $shipping_info) {
     global $mp;
   }
 
@@ -138,7 +157,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment($cart, $shipping_info) {
+  function process_payment($global_cart, $shipping_info) {
     global $mp;
     
     $timestamp = time();
@@ -163,18 +182,20 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $params["id_type"] = 1;
     
-    foreach ($cart as $product_id => $data) {
-      $totals[] = $data['price'] * $data['quantity'];
-      
-      $suffix = "_{$counter}";
-      
-      $sku = empty($data['SKU'])?$product_id:$data['SKU'];
-      $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
-      $params["c_name{$suffix}"] = $data['name'];
-      $params["c_description{$suffix}"] = get_permalink($product_id);
-      $params["c_price{$suffix}"] = $data['price'];
-      
-      $i++;
+    foreach ($global_cart as $bid => $cart) {
+      foreach ($cart as $product_id => $data) {
+        $totals[] = $data['price'] * $data['quantity'];
+        
+        $suffix = "_{$counter}";
+        
+        $sku = empty($data['SKU'])?$product_id:$data['SKU'];
+        $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
+        $params["c_name{$suffix}"] = $data['name'];
+        $params["c_description{$suffix}"] = get_permalink($product_id);
+        $params["c_price{$suffix}"] = $data['price'];
+        
+        $i++;
+      }
     }
     
     $total = array_sum($totals);
@@ -203,7 +224,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $param_str = implode('&', $param_list);
     
-    $_SESSION['cart'] = $cart;
+    $_SESSION['cart'] = $global_cart;
     $_SESSION['shipping_info'] = $shipping_info;
     
     wp_redirect("{$url}?{$param_str}");
@@ -227,16 +248,18 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    */
   function order_confirmation_msg($order) {
     global $mp;
+    $content = '';
     if ($order->post_status == 'order_received') {
-      echo '<p>' . sprintf(__('Your payment via 2Checkout for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
+      $content .= '<p>' . sprintf(__('Your payment via 2Checkout for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
       $statuses = $order->mp_payment_info['status'];
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
       $timestamp = key($statuses);
-      echo '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . htmlentities($status) . '</p>';
+      $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . htmlentities($status) . '</p>';
     } else {
-      echo '<p>' . sprintf(__('Your payment via 2Checkout for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
+      $content .= '<p>' . sprintf(__('Your payment via 2Checkout for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
     }
+    return $content;
   }
   
   function order_confirmation($order) {
@@ -263,10 +286,10 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
       $payment_info['transaction_id'] = $_REQUEST['order_number'];  
       $payment_info['method'] = "Credit Card";
     
-      $cart = $_SESSION['cart'];
+      $global_cart = $_SESSION['cart'];
       $shipping_info = $_SESSION['shipping_info'];
     
-      $order = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
+      $order = $mp->create_order($_SESSION['mp_order'], $global_cart, $shipping_info, $payment_info, $paid);
     }
   }
   
@@ -360,7 +383,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   }
   
   /**
-   * TODO: Test 2CO INS
+   * INS and payment return
    */
   function process_ipn_return() {
     global $mp;

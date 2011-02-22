@@ -409,7 +409,7 @@ Thanks again!", 'mp')
     //listen for gateway IPN returns and tie them in to proper gateway plugin
 		if(!empty($wp_query->query_vars['paymentgateway'])) {
 			do_action( 'mp_handle_payment_return_' . $wp_query->query_vars['paymentgateway'] );
-			exit();
+			// exit();
 		}
 	}
 
