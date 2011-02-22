@@ -95,7 +95,7 @@ class MarketPress_MS {
     $table_3 = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}mp_term_relationships` (
                 `post_id` bigint(20) unsigned NOT NULL,
                 `term_id` bigint(20) unsigned NOT NULL,
-                KEY (`post_id`),
+                PRIMARY KEY ( `post_id` , `term_id` ),
                 KEY (`term_id`)
               ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
     $wpdb->query( $table_1 );
