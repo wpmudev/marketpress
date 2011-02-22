@@ -2450,6 +2450,27 @@ Thanks again!", 'mp')
     $msg = apply_filters( 'mp_order_notification', $msg );
 
     wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+    
+    //send message to admin
+    $subject = __('New Order Notification: ORDERID', 'mp');
+    $msg = __("A new order (ORDERID) was created in your store:
+
+Order Information:
+ORDERINFO
+
+Shipping Information:
+SHIPPINGINFO
+
+Payment Information:
+PAYMENTINFO
+
+You can manage this order here: %s", 'mp');
+
+    $subject = $this->filter_email($order, $subject);
+    $msg = $this->filter_email($order, $msg);
+		$msg = sprintf($msg, admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
+
+    wp_mail(get_option('admin_email'), $subject, $msg);
   }
 
   //sends email for orders marked as shipped
@@ -2466,6 +2487,7 @@ Thanks again!", 'mp')
     $msg = apply_filters( 'mp_shipped_order_notification', $msg );
 
     wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+    
   }
 
   //sends email to admin for low stock notification
@@ -2488,7 +2510,7 @@ Notification Preferences: %s', 'mp');
     $msg = sprintf($msg, get_the_title($product_id), number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
     $msg = apply_filters( 'mp_low_stock_notification', $msg );
 
-    wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+    wp_mail(get_option('admin_email'), $subject, $msg);
 
     //save so we don't send an email every time
     update_post_meta($product_id, 'mp_stock_email_sent', 1);
