@@ -1021,11 +1021,12 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   //get page details
   if ($paged) {
     //figure out perpage
-    if (intval($per_page))
+    if (intval($per_page)) {
       $paginate_query = '&posts_per_page='.intval($per_page);
-    else
+    } else {
       $paginate_query = '&posts_per_page='.$settings['per_page'];
-
+		}
+		
     //figure out page
     if ($wp_query->query_vars['paged'])
       $paginate_query .= '&paged='.intval($wp_query->query_vars['paged']);
@@ -1064,27 +1065,38 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   
   $content = '<div id="mp_product_list">';
 
-  if (count($custom_query->posts)) {
+  if ($last = count($custom_query->posts)) {
+    $count = 1;
     foreach ($custom_query->posts as $post) {
 
-      $content .= '<div '.mp_product_class(false, 'mp_product', $post->ID).'>';
+			//add last css class for styling grids
+			if ($count == $last)
+			  $class = array('mp_product', 'last-product');
+			else
+			  $class = 'mp_product';
+			  
+      $content .= '<div '.mp_product_class(false, $class, $post->ID).'>';
       $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
       $content .= '<div class="mp_product_content">';
-      $content .= mp_product_image( false, 'list', $post->ID );
-      $content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+      $product_content = mp_product_image( false, 'list', $post->ID );
+      $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+      $content .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
       $content .= '</div>';
 
       $content .= '<div class="mp_product_meta">';
       //price
-      $content .= mp_product_price(false, $post->ID);
+      $meta = mp_product_price(false, $post->ID);
       //button
-      $content .= mp_buy_button(false, 'list', $post->ID);
+      $meta .= mp_buy_button(false, 'list', $post->ID);
+      $content .= apply_filters( 'mp_product_list_meta', $meta, $post->ID );
       $content .= '</div>';
       
       $content .= '</div>';
+      
+      $count++;
     }
   } else {
-    $content .= __('No Products', 'mp');
+    $content .= '<div id="mp_no_products">' . apply_filters( 'mp_product_list_none', __('No Products', 'mp') ) . '</div>';
   }
 
   $content .= '</div>';
