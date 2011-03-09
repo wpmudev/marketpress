@@ -1071,7 +1071,7 @@ Thanks again!", 'mp')
   }
 
   //adds our links to custom theme nav menus using wp_nav_menu()
-  function filter_nav_menu($list, $args) {
+  function filter_nav_menu($list, $args = array()) {
 
     if ($args->depth == 1)
       return $list;
