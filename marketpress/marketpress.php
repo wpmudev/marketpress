@@ -2122,7 +2122,7 @@ Thanks again!", 'mp')
     }
 
     //save it to session
-    $_SESSION['mp_order'] = $order_id;
+    $_SESSION['mp_order'] = apply_filters( 'mp_order_id', $order_id ); //Very important to make sure order numbers are unique and not sequential if filtering
 
     return $order_id;
   }
@@ -4735,10 +4735,10 @@ class MarketPress_Categories_Widget extends WP_Widget {
 
 <script type='text/javascript'>
 /* <![CDATA[ */
-	var dropdown = document.getElementById("cat");
+	var dropdown = document.getElementById("mp_category_dropdown");
 	function onCatChange() {
 		if ( dropdown.options[dropdown.selectedIndex].value > 0 ) {
-			location.href = "<?php echo home_url(); ?>/?cat="+dropdown.options[dropdown.selectedIndex].value;
+			location.href = "<?php echo home_url(); ?>/?product_category="+dropdown.options[dropdown.selectedIndex].value;
 		}
 	}
 	dropdown.onchange = onCatChange;
@@ -4839,7 +4839,7 @@ if ( !function_exists( 'wdp_un_check' ) ) {
   add_action( 'admin_notices', 'wdp_un_check', 5 );
   add_action( 'network_admin_notices', 'wdp_un_check', 5 );
   function wdp_un_check() {
-    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
+    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'install_plugins' ) )
       echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
   }
 }
