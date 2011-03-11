@@ -142,15 +142,12 @@ if(!class_exists('MP_Gateway_API')) {
 		function _payment_form_wrapper($cart, $shipping_info) {
       global $mp, $mp_gateway_active_plugins;
       
-      if ($this->force_ssl && !function_exists('wp_https_redirect'))
-      {
-	if ($_SERVER['HTTPS'] != "on" && preg_match('/^https/', get_option('siteurl')) == 0)
-	{
-	  $host_x = preg_split('/\//', get_option('siteurl'));
-	  $host = $host_x[2];  
-	  header("Location: https://". $host . $_SERVER['REQUEST_URI']); 
-	  exit(0);
-	}
+    	// Redirect to https if forced to use SSL
+      if ($this->force_ssl && !function_exists('wp_https_redirect')) {
+			  if ( !is_ssl() ) {
+					wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+					exit();
+			  }
       }
       
       if (count((array)$mp_gateway_active_plugins) > 1 && $_SESSION['mp_payment_method'] != $this->plugin_name)
@@ -161,11 +158,9 @@ if(!class_exists('MP_Gateway_API')) {
 
       echo '<p class="mp_cart_direct_checkout">';
       //if an img exists use that for submit button
-      /*
-       Per http://premium.wpmudev.org/forums/topic/payment-button-inconsistency#post-65419
-       if ($this->method_button_img_url)
+      if ($this->method_button_img_url)
         echo '<input type="image" name="mp_payment_submit" id="mp_payment_submit" src="' . $this->method_button_img_url . '" alt="' . __('Continue Checkout &raquo;', 'mp') . '" />';
-      else*/
+      else
         echo '<input type="submit" name="mp_payment_submit" id="mp_payment_submit" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
       echo '</p></div>';
     }

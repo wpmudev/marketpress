@@ -41,7 +41,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $this->public_name = __('Credit Card', 'mp');
     
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
-    $this->method_button_img_url = $mp->plugin_url . 'images/credit_card_64.png';
+    $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
     
     //set credit card vars
     $this->API_Username = $settings['gateways']['authorizenet-aim']['api_user'];

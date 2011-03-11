@@ -252,7 +252,9 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
         $mp->cart_checkout_error( sprintf(__('There was a problem connecting to PayPal to check the status of your purchase. Please <a href="%s">check the status of your order here &raquo;</a>', 'mp') . $error, mp_orderstatus_link(false, true)) );
         return;
       }
-    }
+    } else {
+      $mp->set_cart_cookie(Array());
+		}
   }
 	
   /**
@@ -414,7 +416,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
         $req = $raw_post_data . '&cmd=_notify-validate';
       }
 
-      $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Adaptive Payments Plugin/{$mp->version}";
+      $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Chained Payments Plugin/{$mp->version}";
       $args['body'] = $req;
       $args['sslverify'] = false;
 
@@ -510,6 +512,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
         //succesful payment, create our order now
         $cart = get_transient('mp_order_' . $order_id . '_cart');
 			  $shipping_info = get_transient('mp_order_' . $order_id . '_shipping');
+			  //TODO: make saving order id into usermeta possible
         $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid);
         
         //if successful delete transients
@@ -647,7 +650,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
       'X-PAYPAL-REQUEST-RESPONSE-FORMAT' => 'NV',
       'X-PAYPAL-APPLICATION-ID' => $this->appId
     );
-  	$args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Adaptive Payments Plugin/{$mp->version}";
+  	$args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Chained Payments Plugin/{$mp->version}";
     $args['body'] = $nvpStr . '&requestEnvelope.errorLanguage=en_US';
     $args['sslverify'] = false;
     
