@@ -933,7 +933,7 @@ Thanks again!", 'mp')
       //fixes a nasty bug in BP theme's functions.php file which always loads the activity stream if not a normal page
       remove_all_filters('page_template');
 
-      //prevents 404 for vitual pages
+      //prevents 404 for virtual pages
       status_header( 200 );
     }
   }
@@ -1158,6 +1158,10 @@ Thanks again!", 'mp')
   function product_theme($content) {
     global $post;
 
+    //don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
+		  
     //add thumbnail
     $content = mp_product_image( false, 'single' ) . $content;
 
@@ -1174,29 +1178,43 @@ Thanks again!", 'mp')
 
   //this is the default theme added to the checkout page
   function store_theme($content) {
+    //don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
+		  
     return $content;
   }
 
   //this is the default theme added to the checkout page
   function checkout_theme($content) {
     global $wp_query;
-
-    $content = mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']).$content;
+    
+   	//don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
+		
+    $content = mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']);
 
     return $content;
   }
 
   //this is the default theme added to the order status page
   function orderstatus_theme($content) {
-    global $wp_query;
-
+    //don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
+		  
     mp_order_status();
     return $content;
   }
 
   //this is the default theme added to product listings
   function product_list_theme($content) {
-    $settings = get_option('mp_settings');
+		//don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
+
+		$settings = get_option('mp_settings');
     $content .= $settings['msg']['product_list'];
     $content .= mp_list_products(false);
     $content .= get_posts_nav_link();
@@ -1206,7 +1224,11 @@ Thanks again!", 'mp')
 
   //this is the default theme added to product taxonomies
   function product_taxonomy_list_theme($content) {
-    $settings = get_option('mp_settings');
+   	//don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
+		  
+		$settings = get_option('mp_settings');
     $content = $settings['msg']['product_list'];
     $content .= mp_list_products(false);
     $content .= get_posts_nav_link();
