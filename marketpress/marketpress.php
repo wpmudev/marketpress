@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.2.1
+Version: 1.2.2
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.2.1';
+  var $version = '1.2.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -1231,9 +1231,8 @@ Thanks again!", 'mp')
 
     if ( $current_screen->id == 'edit-product' ) {
       //Switches the product_category ids to slugs as you can't query custom taxonomys with ids
-      $cat = get_term_by('id', $request['term'], 'product_category');
+      $cat = get_term_by('id', $request['product_category'], 'product_category');
       $request['product_category'] = $cat->slug;
-      $request['term'] = $cat->slug;
     } else if ( $current_screen->id == 'product_page_marketpress-orders' && !isset($_GET['post_status']) ) {
       //set the post status when on "All" to everything but closed
       $request['post_status'] = 'order_received,order_paid,order_shipped';
@@ -2121,8 +2120,10 @@ Thanks again!", 'mp')
       $count = $wpdb->get_var("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_title = '" . $order_id . "' AND post_type = 'mp_order'");
     }
 
+    $order_id = apply_filters( 'mp_order_id', $order_id ); //Very important to make sure order numbers are unique and not sequential if filtering
+
     //save it to session
-    $_SESSION['mp_order'] = apply_filters( 'mp_order_id', $order_id ); //Very important to make sure order numbers are unique and not sequential if filtering
+    $_SESSION['mp_order'] = $order_id;
 
     return $order_id;
   }
