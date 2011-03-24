@@ -56,7 +56,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $settings = get_option('mp_settings');
     
     //set names here to be able to translate
-    $this->admin_name = __('2Checkout (Beta)', 'mp');
+    $this->admin_name = __('2Checkout', 'mp');
     $this->public_name = __('2Checkout', 'mp');
     
     $this->method_img_url = $mp->plugin_url . 'images/2co_logo.png';
@@ -85,42 +85,40 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     <?php
   }
   
-  function _print_year_dropdown($sel='', $pfp = false)
-  {
-          $localDate=getdate();
-          $minYear = $localDate["year"];
-          $maxYear = $minYear + 15;
-  
-          $output =  "<option value=''>--</option>";
-          for($i=$minYear; $i<$maxYear; $i++) {
-                  if ($pfp) {
-                          $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
-                          ">". $i ."</option>";
-                  } else {
-                          $output .= "<option value='". substr($i, 2, 2) ."'".($sel==(substr($i, 2, 2))?' selected':'').
-                  ">". $i ."</option>";
-                  }
-          }
-          return($output);
+  function _print_year_dropdown($sel='', $pfp = false) {
+    $localDate=getdate();
+    $minYear = $localDate["year"];
+    $maxYear = $minYear + 15;
+
+    $output =  "<option value=''>--</option>";
+    for($i=$minYear; $i<$maxYear; $i++) {
+            if ($pfp) {
+                    $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
+                    ">". $i ."</option>";
+            } else {
+                    $output .= "<option value='". substr($i, 2, 2) ."'".($sel==(substr($i, 2, 2))?' selected':'').
+            ">". $i ."</option>";
+            }
+    }
+    return($output);
   }
   
-  function _print_month_dropdown($sel='')
-  {
-          $output =  "<option value=''>--</option>";
-          $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
-          $output .=  "<option " . ($sel==2?' selected':'') . "  value='02'>02 - Feb</option>";
-          $output .=  "<option " . ($sel==3?' selected':'') . "  value='03'>03 - Mar</option>";
-          $output .=  "<option " . ($sel==4?' selected':'') . "  value='04'>04 - Apr</option>";
-          $output .=  "<option " . ($sel==5?' selected':'') . "  value='05'>05 - May</option>";
-          $output .=  "<option " . ($sel==6?' selected':'') . "  value='06'>06 - Jun</option>";
-          $output .=  "<option " . ($sel==7?' selected':'') . "  value='07'>07 - Jul</option>";
-          $output .=  "<option " . ($sel==8?' selected':'') . "  value='08'>08 - Aug</option>";
-          $output .=  "<option " . ($sel==9?' selected':'') . "  value='09'>09 - Sep</option>";
-          $output .=  "<option " . ($sel==10?' selected':'') . "  value='10'>10 - Oct</option>";
-          $output .=  "<option " . ($sel==11?' selected':'') . "  value='11'>11 - Nov</option>";
-          $output .=  "<option " . ($sel==12?' selected':'') . "  value='12'>12 - Doc</option>";
-  
-          return($output);
+  function _print_month_dropdown($sel='') {
+    $output =  "<option value=''>--</option>";
+    $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
+    $output .=  "<option " . ($sel==2?' selected':'') . "  value='02'>02 - Feb</option>";
+    $output .=  "<option " . ($sel==3?' selected':'') . "  value='03'>03 - Mar</option>";
+    $output .=  "<option " . ($sel==4?' selected':'') . "  value='04'>04 - Apr</option>";
+    $output .=  "<option " . ($sel==5?' selected':'') . "  value='05'>05 - May</option>";
+    $output .=  "<option " . ($sel==6?' selected':'') . "  value='06'>06 - Jun</option>";
+    $output .=  "<option " . ($sel==7?' selected':'') . "  value='07'>07 - Jul</option>";
+    $output .=  "<option " . ($sel==8?' selected':'') . "  value='08'>08 - Aug</option>";
+    $output .=  "<option " . ($sel==9?' selected':'') . "  value='09'>09 - Sep</option>";
+    $output .=  "<option " . ($sel==10?' selected':'') . "  value='10'>10 - Oct</option>";
+    $output .=  "<option " . ($sel==11?' selected':'') . "  value='11'>11 - Nov</option>";
+    $output .=  "<option " . ($sel==12?' selected':'') . "  value='12'>12 - Doc</option>";
+
+    return($output);
   }
   
   /**
@@ -312,12 +310,12 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	  <tr>
 	    <th scope="row"><?php _e('Mode', 'mp') ?></th>
 	    <td>
-              <p>
-                <select name="mp[gateways][2checkout][mode]">
-                  <option value="sandbox" <?php selected($settings['gateways']['2checkout']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-                  <option value="live" <?php selected($settings['gateways']['2checkout']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
-                </select>
-              </p>
+        <p>
+          <select name="mp[gateways][2checkout][mode]">
+            <option value="sandbox" <?php selected($settings['gateways']['2checkout']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
+            <option value="live" <?php selected($settings['gateways']['2checkout']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
+          </select>
+        </p>
 	    </td>
 	  </tr>
 	  <tr>
@@ -343,22 +341,22 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
           <?php
           $sel_currency = ($settings['gateways']['2checkout']['currency']) ? $settings['gateways']['2checkout']['currency'] : $settings['currency'];
           $currencies = array(
-                "ARS" => 'ARS - Argentina Peso',
-                "AUD" => 'AUD - Australian Dollar',
-		"BRL" => 'BRL - Brazilian Real',
-		"CAD" => 'CAD - Canadian Dollar',
-		"CHF" => 'CHF - Swiss Franc',
-		"DKK" => 'DKK - Danish Krone',
-		"EUR" => 'EUR - Euro',
-		"GBP" => 'GBP - British Pound',
-		"HKD" => 'HKD - Hong Kong Dollar',
-		"INR" => 'INR - Indian Rupee',
-		"JPY" => 'JPY - Japanese Yen',
-		"MXN" => 'MXN - Mexican Peso',
-		"NOK" => 'NOK - Norwegian Krone',
-		"NZD" => 'NZD - New Zealand Dollar',
-		"SEK" => 'SEK - Swedish Krona',
-		"USD" => 'USD - U.S. Dollar',
+            "ARS" => 'ARS - Argentina Peso',
+            "AUD" => 'AUD - Australian Dollar',
+						"BRL" => 'BRL - Brazilian Real',
+						"CAD" => 'CAD - Canadian Dollar',
+						"CHF" => 'CHF - Swiss Franc',
+						"DKK" => 'DKK - Danish Krone',
+						"EUR" => 'EUR - Euro',
+						"GBP" => 'GBP - British Pound',
+						"HKD" => 'HKD - Hong Kong Dollar',
+						"INR" => 'INR - Indian Rupee',
+						"JPY" => 'JPY - Japanese Yen',
+						"MXN" => 'MXN - Mexican Peso',
+						"NOK" => 'NOK - Norwegian Krone',
+						"NZD" => 'NZD - New Zealand Dollar',
+						"SEK" => 'SEK - Swedish Krona',
+						"USD" => 'USD - U.S. Dollar',
           );
 
           foreach ($currencies as $k => $v) {
@@ -402,47 +400,48 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
       $order = $mp->get_order($tco_vendor_order_id);
       
       if (!$order) {
-	header('HTTP/1.0 404 Not Found');
-	header('Content-type: text/plain; charset=UTF-8');
-	print 'Invoice not found';
-	exit(0);
+				header('HTTP/1.0 404 Not Found');
+				header('Content-type: text/plain; charset=UTF-8');
+				print 'Invoice not found';
+				exit(0);
       }
       
       $calc_key = md5($sale_id.$settings['gateways']['2checkout']['sid'].$_REQUEST['invoice_id'].$settings['gateways']['2checkout']['secret_word']);
       
       if (strtolower($tco_hash) != strtolower($calc_key)) {
-	header('HTTP/1.0 403 Forbidden');
-	header('Content-type: text/plain; charset=UTF-8');
-	print 'We were unable to authenticate the request';
-	exit(0);
+				header('HTTP/1.0 403 Forbidden');
+				header('Content-type: text/plain; charset=UTF-8');
+				print 'We were unable to authenticate the request';
+				exit(0);
       }
       
       if (strtolower($_REQUEST['invoice_status']) != "deposited") {
-	header('HTTP/1.0 200 OK');
-	header('Content-type: text/plain; charset=UTF-8');
-	print 'Thank you very much for letting us know. REF: Not success';
-	exit(0);
+				header('HTTP/1.0 200 OK');
+				header('Content-type: text/plain; charset=UTF-8');
+				print 'Thank you very much for letting us know. REF: Not success';
+				exit(0);
       }
       
       if ($this->SandboxFlag != 'sandbox') {
-	if (intval($total) >= $order->mp_order_total) {
-	  $payment_info = $order->mp_payment_info;
-	  $payment_info['transaction_id'] = $tco_invoice_id;  
-	  $payment_info['method'] = $payment_method;
-	  
-	  update_post_meta($order->ID, 'mp_payment_info', $payment_info);
-	  
-	  $mp->update_order_payment_status($tco_vendor_order_id, "paid", true);
-          
+				if (intval($total) >= $order->mp_order_total) {
+				  $payment_info = $order->mp_payment_info;
+				  $payment_info['transaction_id'] = $tco_invoice_id;
+				  $payment_info['method'] = $payment_method;
+
+				  update_post_meta($order->ID, 'mp_payment_info', $payment_info);
+
+				  $mp->update_order_payment_status($tco_vendor_order_id, "paid", true);
+
           header('HTTP/1.0 200 OK');
           header('Content-type: text/plain; charset=UTF-8');
           print 'Thank you very much for letting us know';
           exit(0);
-	}
+				}
       }
     }
   }
 }
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_2Checkout', '2checkout', __('2Checkout (Beta)', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_2Checkout', '2checkout', __('2Checkout', 'mp') );
+?>

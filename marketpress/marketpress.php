@@ -2431,9 +2431,14 @@ Thanks again!", 'mp')
 
     //// Payment Info
     $payment_info = __('Payment Method:', 'mp') . ' ' . $order->mp_payment_info['gateway_public_name'];
-    $payment_info .= "\n" . __('Payment Type:', 'mp') . ' ' . $order->mp_payment_info['method'];
-    $payment_info .= "\n" . __('Transaction ID:', 'mp') . ' ' . $order->mp_payment_info['transaction_id'];
-    $payment_info .= "\n" . __('Payment Total:', 'mp') . ' ' . number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
+
+		if ($order->mp_payment_info['method'])
+    	$payment_info .= "\n" . __('Payment Type:', 'mp') . ' ' . $order->mp_payment_info['method'];
+
+		if ($order->mp_payment_info['transaction_id'])
+			$payment_info .= "\n" . __('Transaction ID:', 'mp') . ' ' . $order->mp_payment_info['transaction_id'];
+
+		$payment_info .= "\n" . __('Payment Total:', 'mp') . ' ' . number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
     $payment_info .= "\n\n";
     if ($order->post_status == 'order_received') {
       $payment_info .= __('Your payment for this order is not yet complete. Here is the latest status:', 'mp') . "\n";
@@ -2446,12 +2451,15 @@ Thanks again!", 'mp')
       $payment_info .= __('Your payment for this order is complete.', 'mp');
     }
 
+		//total
+		$order_total = number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
+
     //tracking URL
     $tracking_url = mp_orderstatus_link(false, true) . $order->post_title . '/';
 
     //setup filters
-    $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TRACKINGURL');
-    $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $tracking_url);
+    $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL');
+    $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url);
 
     //replace
     $text = str_replace($search, $replace, $text);
@@ -2738,14 +2746,18 @@ Notification Preferences: %s', 'mp');
             <?php _e('Payment Gateway:', 'mp'); ?>
             <strong><?php echo $order->mp_payment_info['gateway_private_name']; ?></strong>
           </div>
+					<?php if ($order->mp_payment_info['method']) { ?>
           <div id="mp_payment_method" class="misc-pub-section">
-            <?php _e('Payment Method:', 'mp'); ?>
+            <?php _e('Payment Type:', 'mp'); ?>
             <strong><?php echo $order->mp_payment_info['method']; ?></strong>
           </div>
+          <?php } ?>
+          <?php if ($order->mp_payment_info['transaction_id']) { ?>
           <div id="mp_transaction" class="misc-pub-section">
             <?php _e('Transaction ID:', 'mp'); ?>
             <strong><?php echo $order->mp_payment_info['transaction_id']; ?></strong>
           </div>
+          <?php } ?>
           <div id="major-publishing-actions" class="misc-pub-section">
             <?php _e('Payment Total:', 'mp'); ?>
             <strong><?php echo $this->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']) . ' ' . $order->mp_payment_info['currency']; ?></strong>
@@ -3847,29 +3859,29 @@ Notification Preferences: %s', 'mp');
 
         //save settings
         if (isset($_POST['marketplace_settings'])) {
-          //get old store slug
-	  $old_slug = $settings['slugs']['store'];
+	        //get old store slug
+		  		$old_slug = $settings['slugs']['store'];
 
-          //filter slugs
-          $_POST['mp']['slugs'] = array_map('sanitize_title', $_POST['mp']['slugs']);
+	        //filter slugs
+	        $_POST['mp']['slugs'] = array_map('sanitize_title', $_POST['mp']['slugs']);
 
-	  // Fixing http://premium.wpmudev.org/forums/topic/store-page-content-overwritten
-	  $new_slug = $_POST['mp']['slugs']['store'];
-	  $new_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$new_slug' AND post_type = 'page'");
+				  // Fixing http://premium.wpmudev.org/forums/topic/store-page-content-overwritten
+				  $new_slug = $_POST['mp']['slugs']['store'];
+				  $new_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$new_slug' AND post_type = 'page'");
 
-	  if ($new_slug != $old_slug && $new_post_id != 0) {
-	    echo '<div class="error fade"><p>'.__('Store base URL conflicts with another page', 'mp').'</p></div>';
-	  } else {
-	    $settings = array_merge($settings, apply_filters('mp_presentation_settings_filter', $_POST['mp']));
-	    update_option('mp_settings', $settings);
+				  if ($new_slug != $old_slug && $new_post_id != 0) {
+				    echo '<div class="error fade"><p>'.__('Store base URL conflicts with another page', 'mp').'</p></div>';
+				  } else {
+				    $settings = array_merge($settings, apply_filters('mp_presentation_settings_filter', $_POST['mp']));
+				    update_option('mp_settings', $settings);
 
-	    $this->create_store_page($old_slug);
+				    $this->create_store_page($old_slug);
 
-	    //flush rewrite rules due to product slugs
-	    $this->flush_rewrite();
+				    //flush rewrite rules due to product slugs
+				    $this->flush_rewrite();
 
-	    echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
-	  }
+				    echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
+				  }
         }
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/my_work.png'; ?>" /></div>
@@ -4074,7 +4086,8 @@ Notification Preferences: %s', 'mp');
         $settings['email'] = array_map('stripslashes', $settings['email']);
 
         //enqueue visual editor
-        wp_tiny_mce(true, array("editor_selector" => "mp_msgs_txt"));
+        if (get_user_option('rich_editing') == 'true')
+        	wp_tiny_mce(true, array("editor_selector" => "mp_msgs_txt"));
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/messages.png'; ?>" /></div>
         <h2><?php _e('Messages Settings', 'mp'); ?></h2>
@@ -4090,22 +4103,22 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('New Order', 'mp'); ?></th>
         				<td>
-        				<span class="description"><?php _e('The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TRACKINGURL. No HTML allowed.', 'mp') ?></span><br />
+        				<span class="description"><?php _e('The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
                 <input class="mp_emails_sub" name="mp[email][new_order_subject]" value="<?php echo esc_attr($settings['email']['new_order_subject']); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
-                <textarea class="mp_emails_txt" name="mp[email][new_order_txt]"><?php echo htmlentities($settings['email']['new_order_txt']); ?></textarea>
+                <textarea class="mp_emails_txt" name="mp[email][new_order_txt]"><?php echo esc_textarea($settings['email']['new_order_txt']); ?></textarea>
                 </label>
                 </td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Shipped', 'mp'); ?></th>
         				<td>
-        				<span class="description"><?php _e('The email text sent to your customer when you mark an order as "Shipped". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TRACKINGURL. No HTML allowed.', 'mp') ?></span><br />
+        				<span class="description"><?php _e('The email text sent to your customer when you mark an order as "Shipped". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
                 <input class="mp_emails_sub" name="mp[email][shipped_order_subject]" value="<?php echo esc_attr($settings['email']['shipped_order_subject']); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
-                <textarea class="mp_emails_txt" name="mp[email][shipped_order_txt]"><?php echo htmlentities($settings['email']['shipped_order_txt']); ?></textarea>
+                <textarea class="mp_emails_txt" name="mp[email][shipped_order_txt]"><?php echo esc_textarea($settings['email']['shipped_order_txt']); ?></textarea>
                 </label>
                 </td>
                 </tr>

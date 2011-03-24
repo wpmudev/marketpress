@@ -110,7 +110,8 @@ class MarketPress_MS {
         'authorizenet-aim' => 'none',
         'authorizenet-sim' => 'full',
         'google-checkout' => 'full',
-        '2-checkout' => 'full'
+        '2-checkout' => 'full',
+        'manual-payment' => 'full'
       ),
       'allowed_themes' => array(
         'classic' => 'full',
