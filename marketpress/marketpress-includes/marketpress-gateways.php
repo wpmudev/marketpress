@@ -92,7 +92,7 @@ if(!class_exists('MP_Gateway_API')) {
      *
      * Don't forget to return!
      */
-		function order_confirmation_email($msg) {
+		function order_confirmation_email($msg, $order) {
       return $msg;
     }
     
@@ -196,7 +196,7 @@ if(!class_exists('MP_Gateway_API')) {
       add_action( 'mp_payment_submit_' . $this->plugin_name, array(&$this, 'process_payment_form'), 10, 2 );
       add_action( 'mp_checkout_confirm_payment_' . $this->plugin_name, array(&$this, 'confirm_payment_form'), 10, 2 );
       add_action( 'mp_payment_confirm_' . $this->plugin_name, array(&$this, 'process_payment'), 10, 2 );
-      add_filter( 'mp_order_notification_' . $this->plugin_name, array(&$this, 'order_confirmation_email') );
+      add_filter( 'mp_order_notification_' . $this->plugin_name, array(&$this, 'order_confirmation_email'), 10, 2 );
       add_action( 'mp_checkout_payment_pre_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation') );
       add_action( 'mp_checkout_payment_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation_msg') );
       add_action( 'mp_gateway_settings', array(&$this, 'gateway_settings_box') );

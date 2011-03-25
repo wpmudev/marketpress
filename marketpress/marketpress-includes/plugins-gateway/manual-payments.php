@@ -1,4 +1,9 @@
 <?php
+/*
+MarketPress Manual Payments Gateway Plugin
+Author: Aaron Edwards (Incsub)
+*/
+
 class MP_Gateway_ManualPayments extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
@@ -134,11 +139,12 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    *
    * Don't forget to return!
    */
-	function order_confirmation_email($msg) {
-	  $settings = get_option('mp_settings');
+	function order_confirmation_email($msg, $order) {
+    global $mp;
+		$settings = get_option('mp_settings');
 	  
 	  if (isset($settings['gateways']['manual-payments']['email']))
-		  $msg = $settings['gateways']['manual-payments']['email'];
+		  $msg = $mp->filter_email($order, $settings['gateways']['manual-payments']['email']);
 		else
 		  $msg = $settings['email']['new_order_txt'];
 		  
