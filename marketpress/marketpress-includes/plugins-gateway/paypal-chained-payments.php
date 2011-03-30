@@ -271,20 +271,22 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    * Echo any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
    */
-	function order_confirmation_msg($order) {
+  function order_confirmation_msg($content, $order) {
     global $mp;
-
+    
     //order should exist or have been created at this point
     if ($order->post_status == 'order_received') {
-      echo '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
+      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
       $statuses = $order->mp_payment_info['status'];
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
       $timestamp = key($statuses);
-      echo '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . esc_html($status) . '</p>';
+      $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . esc_html($status) . '</p>';
     } else {
-      echo '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
+      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
     }
+    
+    return $content;
   }
 	
 	/**

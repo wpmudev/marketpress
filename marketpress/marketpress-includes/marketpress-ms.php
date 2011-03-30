@@ -104,6 +104,7 @@ class MarketPress_MS {
 		
 		$default_settings = array(
       'main_blog' => 1,
+      'global_cart' => 1,
       'allowed_gateways' => array(
         'paypal-express' => 'full',
         'paypal-chained' => 'none',
@@ -516,11 +517,17 @@ class MarketPress_MS {
           <div class="inside">
             <table class="form-table">
               <tr>
-      				<th scope="row"><?php _e('Limit Global Widgets/Shortcodes To Main Blog', 'mp'); ?></th>
-      				<td>
-      				<label><input value="1" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-              <label><input value="0" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 0) ?> /> <?php _e('No', 'mp') ?></label>
-        			</td>
+      		<th scope="row"><?php _e('Limit Global Widgets/Shortcodes To Main Blog', 'mp'); ?></th>
+      		<td><label><input value="1" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+		    <label><input value="0" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        	</td>
+              </tr>
+	      <tr>
+      		<th scope="row"><?php _e('Global shopping cart', 'mp'); ?></th>
+      		<td>
+		  <label><input value="1" name="mp[global_cart]" type="radio"<?php checked($settings['global_cart'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+		  <label><input value="0" name="mp[global_cart]" type="radio"<?php checked($settings['global_cart'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        	</td>
               </tr>
             </table>
           </div>

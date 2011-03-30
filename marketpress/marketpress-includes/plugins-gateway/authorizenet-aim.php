@@ -43,21 +43,22 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
     $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
     
-    //set credit card vars
-    $this->API_Username = $settings['gateways']['authorizenet-aim']['api_user'];
-    $this->API_Password = $settings['gateways']['authorizenet-aim']['api_pass'];
-    $this->API_Signature = $settings['gateways']['authorizenet-aim']['api_sig'];
-    $this->currencyCode = $settings['gateways']['authorizenet-aim']['currency'];
-    $this->locale = $settings['gateways']['authorizenet-aim']['locale'];
     $this->version = "63.0"; //api version
-    
     $this->force_ssl = true;
-
-    //set api urls
-    if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
-      $this->API_Endpoint = "https://test.authorize.net/gateway/transact.dll";
-    } else {
-      $this->API_Endpoint = "https://secure.authorize.net/gateway/transact.dll";
+    
+    //set credit card vars
+    if ( isset( $settings['gateways']['authorizenet-aim'] ) ) {
+      $this->API_Username = $settings['gateways']['authorizenet-aim']['api_user'];
+      $this->API_Password = $settings['gateways']['authorizenet-aim']['api_pass'];
+      $this->API_Signature = $settings['gateways']['authorizenet-aim']['api_sig'];
+      $this->currencyCode = $settings['gateways']['authorizenet-aim']['currency'];
+      $this->locale = $settings['gateways']['authorizenet-aim']['locale'];
+      //set api urls
+      if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
+        $this->API_Endpoint = "https://test.authorize.net/gateway/transact.dll";
+      } else {
+        $this->API_Endpoint = "https://secure.authorize.net/gateway/transact.dll";
+      }
     }
   }
 
@@ -66,7 +67,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form($cart, $shipping_info) {
+  function payment_form($global_cart, $shipping_info) {
     global $mp;
     if (isset($_GET['cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
@@ -146,19 +147,19 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         <tbody>
         <tr>
           <td align="right"><?php _e('Email:', 'mp'); ?>*</td><td>
-        <?php do_action( 'mp_checkout_error_email' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_email' ); ?>
         <input size="35" name="email" type="text" value="<?php echo esc_attr($email); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Full Name:', 'mp'); ?>*</td><td>
-        <?php do_action( 'mp_checkout_error_name' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_name' ); ?>
         <input size="35" name="name" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Address:', 'mp'); ?>*</td><td>
-        <?php do_action( 'mp_checkout_error_address1' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_address1' ); ?>
         <input size="45" name="address1" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
         <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
         </td>
@@ -173,25 +174,25 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   
           <tr>
           <td align="right"><?php _e('City:', 'mp'); ?>*</td><td>
-        <?php do_action( 'mp_checkout_error_city' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_city' ); ?>
         <input size="25" name="city" type="text" value="<?php echo esc_attr($city); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('State/Province/Region:', 'mp'); ?>*</td><td>
-        <?php do_action( 'mp_checkout_error_state' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_state' ); ?>
         <input size="15" name="state" type="text" value="<?php echo esc_attr($state); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?>*</td><td>
-        <?php do_action( 'mp_checkout_error_zip' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_zip' ); ?>
         <input size="10" id="mp_zip" name="zip" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Country:', 'mp'); ?>*</td><td>
-          <?php do_action( 'mp_checkout_error_country' ); ?>
+          <?php echo apply_filters( 'mp_checkout_error_country' ); ?>
         <select id="mp_" name="country">
           <?php
           foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
@@ -210,7 +211,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
           <tr>
             <td align="right"><?php _e('Credit Card Number:', 'mp'); ?>*</td>
             <td>
-              <?php do_action( 'mp_checkout_error_card_num' ); ?>
+              <?php echo apply_filters( 'mp_checkout_error_card_num' ); ?>
               <input name="card_num" onkeyup="cc_card_pick('#cardimage', '#card_num');"
                id="card_num" class="credit_card_number input_field noautocomplete"
                type="text" size="22" maxlength="22" />
@@ -221,7 +222,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
           <tr>
             <td align="right"><?php _e('Expiration Date:', 'mp'); ?>*</td>
             <td>
-              <?php do_action( 'mp_checkout_error_exp' ); ?>
+              <?php echo apply_filters( 'mp_checkout_error_exp' ); ?>
               <label class="inputLabel" for="exp_month"><?php _e('Month', 'mp'); ?></label>
         <select name="exp_month" id="exp_month">
           <?php print $this->_print_month_dropdown(); ?>
@@ -235,7 +236,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
           
           <tr>
             <td align="right"><?php _e('Security Code:', 'mp'); ?></td>
-            <td><?php do_action( 'mp_checkout_error_card_code' ); ?>
+            <td><?php echo apply_filters( 'mp_checkout_error_card_code' ); ?>
             <input id="card_code" name="card_code" class="input_field noautocomplete"
                style="width: 70px;" type="text" size="4" maxlength="4" /></td>
           </tr>
@@ -294,7 +295,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment_form($cart, $shipping_info) {
+  function process_payment_form($global_cart, $shipping_info) {
     global $mp;
     $settings = get_option('mp_settings');
     
@@ -398,7 +399,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function confirm_payment_form($cart, $shipping_info) {
+  function confirm_payment_form($global_cart, $shipping_info) {
     global $mp;
     
     $settings = get_option('mp_settings');
@@ -416,72 +417,70 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       $country = $settings['base_country'];
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
 
-  ?>
-  <table class="mp_cart_billing">
-      <thead><tr>
-        <th><?php _e('Billing Information:', 'mp'); ?></th>
-        <th align="right"><a href="<?php echo mp_checkout_step_url('checkout'); ?>"><?php _e('&laquo; Edit', 'mp'); ?></a></th>
-      </tr></thead>
-      <tbody>
-      <tr>
-    	<td align="right"><?php _e('Email:', 'mp'); ?></td><td>
-      <?php echo esc_attr($email); ?></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Full Name:', 'mp'); ?></td><td>
-      <?php echo esc_attr($name); ?></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Address:', 'mp'); ?></td>
-      <td><?php echo esc_attr($address1); ?></td>
-    	</tr>
-
-      <?php if ($address2) { ?>
-    	<tr>
-    	<td align="right"><?php _e('Address 2:', 'mp'); ?></td>
-      <td><?php echo esc_attr($address2); ?></td>
-    	</tr>
-      <?php } ?>
-
-    	<tr>
-    	<td align="right"><?php _e('City:', 'mp'); ?></td>
-      <td><?php echo esc_attr($city); ?></td>
-    	</tr>
-
-    	<?php if ($state) { ?>
-    	<tr>
-    	<td align="right"><?php _e('State/Province/Region:', 'mp'); ?></td>
-      <td><?php echo esc_attr($state); ?></td>
-    	</tr>
-      <?php } ?>
-
-    	<tr>
-    	<td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?></td>
-      <td><?php echo esc_attr($zip); ?></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Country:', 'mp'); ?></td>
-      <td><?php echo $mp->countries[$country]; ?></td>
-    	</tr>
-
-      <?php if ($phone) { ?>
-    	<tr>
-    	<td align="right"><?php _e('Phone Number:', 'mp'); ?></td>
-      <td><?php echo esc_attr($phone); ?></td>
-    	</tr>
-      <?php } ?>
-      
-        <tr>
-    	  <td align="right"><?php _e('Payment method:', 'mp'); ?></td>
-          <td><?php print $this->_get_card_type($_SESSION['card_num']); ?> ending in <?php print substr($_SESSION['card_num'], strlen($_SESSION['card_num'])-4, 4); ?></td>
-    	</tr>
-
-      </tbody>
-    </table>
-  <?php
+    $content = '';
+    
+    $content .= '<table class="mp_cart_billing">';
+    $content .= '<thead><tr>';
+    $content .= '<th>'.__('Billing Information:', 'mp').'</th>';
+    $content .= '<th align="right"><a href="'. mp_checkout_step_url('checkout').'">'.__('&laquo; Edit', 'mp').'</a></th>';
+    $content .= '</tr></thead>';
+    $content .= '<tbody>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Email:', 'mp').'</td><td>';
+    $content .= esc_attr($email).'</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Full Name:', 'mp').'</td><td>';
+    $content .= esc_attr($name).'</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Address:', 'mp').'</td>';
+    $content .= '<td>'.esc_attr($address1).'</td>';
+    $content .= '</tr>';
+    
+    if ($address2) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Address 2:', 'mp').'</td>';
+      $content .= '<td>'.esc_attr($address2).'</td>';
+      $content .= '</tr>';
+    }
+  
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('City:', 'mp').'</td>';
+    $content .= '<td>'.esc_attr($city).'</td>';
+    $content .= '</tr>';
+    
+    if ($state) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'</td>';
+      $content .= '<td>'.esc_attr($state).'</td>';
+      $content .= '</tr>';
+    }
+    
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'</td>';
+    $content .= '<td>'.esc_attr($zip).'</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Country:', 'mp').'</td>';
+    $content .= '<td>'.$mp->countries[$country].'</td>';
+    $content .= '</tr>';
+    
+    if ($phone) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td>';
+      $content .= '<td>'.esc_attr($phone).'</td>';
+      $content .= '</tr>';
+    }
+    
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Payment method:', 'mp').'</td>';
+    $content .= '<td>'.$this->_get_card_type($_SESSION['card_num']).'ending in '. substr($_SESSION['card_num'], strlen($_SESSION['card_num'])-4, 4).'</td>';
+    $content .= '</tr>';
+    $content .= '</tbody>';
+    $content .= '</table>';
+    
+    return $content;
   }
 
   /**
@@ -493,7 +492,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment($cart, $shipping_info) {
+  function process_payment($global_cart, $shipping_info) {
     global $mp;
     
     $timestamp = time();
@@ -512,11 +511,16 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     
     $totals = array();
     
-    foreach ($cart as $product_id => $data) {
-      $totals[] = $data['price'] * $data['quantity'];
-      $payment->addLineItem($data['SKU'], $data['name'],
-        get_permalink($product_id), $data['quantity'], $data['price'], 1);
-      $i++;
+    foreach ($global_cart as $bid => $cart) {
+      foreach ($cart as $product_id => $variations) {
+        foreach ($variations as $variation => $data) {
+          $sku = empty($data['SKU'])?"{$product_id}{$variation}":$data['SKU'];
+          $totals[] = $data['price'] * $data['quantity'];
+          $payment->addLineItem($sku, $data['name'],
+            get_permalink($product_id), $data['quantity'], $data['price'], 1);
+          $i++;
+        }
+      }
     }
     $total = array_sum($totals);
 
@@ -629,7 +633,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       $payment_info['transaction_id'] = $payment->getTransactionID();
       
       //succesful payment, create our order now
-      $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
+      $result = $mp->create_order($_SESSION['mp_order'], $global_cart, $shipping_info, $payment_info, $paid);
     } else {
       $error = $payment->getResponseText();
       $mp->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp') , $error, mp_checkout_step_url('checkout')) );
@@ -650,18 +654,19 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    * Echo any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
    */
-  function order_confirmation_msg($order) {
+  function order_confirmation_msg($content, $order) {
     global $mp;
     if ($order->post_status == 'order_received') {
-      echo '<p>' . sprintf(__('Your credit card payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
+      $content .= '<p>' . sprintf(__('Your credit card payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
       $statuses = $order->mp_payment_info['status'];
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
       $timestamp = key($statuses);
-      echo '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . htmlentities($status) . '</p>';
+      $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . htmlentities($status) . '</p>';
     } else {
-      echo '<p>' . sprintf(__('Your credit card payment for this order totaling %s is complete. The credit card transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
+      $content .= '<p>' . sprintf(__('Your credit card payment for this order totaling %s is complete. The credit card transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
     }
+    return $content;
   }
   
   function order_confirmation($order) {
@@ -741,7 +746,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
               
               <p>
 		<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
-                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
+                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
                 </label>
 	      </p>
               
@@ -964,4 +969,3 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 
 //register payment gateway plugin
 mp_register_gateway_plugin( 'MP_Gateway_AuthorizeNet_AIM', 'authorizenet-aim', __('Authorize.net AIM Checkout (Beta)', 'mp') );
-?>

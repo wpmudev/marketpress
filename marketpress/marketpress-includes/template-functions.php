@@ -132,7 +132,6 @@ function mp_dropdown_categories( $echo = true, $args = '' ) {
     return $dropdown;
 }
 
-
 /**
  * Displays a list of popular products ordered by sales.
  *
@@ -163,15 +162,18 @@ function mp_popular_products( $echo = true, $num = 5 ) {
 
 
 //Prints cart table, for internal use
-function _mp_cart_table($cart, $type = 'checkout') {
-  global $mp;
+function _mp_cart_table($global_cart, $type = 'checkout') {
+  global $mp, $blog_id;
   $content = "";
   $settings = get_option('mp_settings');
+  $current_blog_id = $blog_id;
+  
   //get coupon code
   $coupon_code = $mp->get_coupon_code();
 
   if ($type == 'checkout-edit') {
     $content .= apply_filters('mp_cart_updated_msg', '');
+    $content .= apply_filters( 'mp_checkout_error_checkout', '' );
     
     $content .= '<form id="mp_cart_form" method="post" action="">';
     $content .= '<table class="mp_cart_contents"><thead><tr>';
@@ -179,35 +181,73 @@ function _mp_cart_table($cart, $type = 'checkout') {
     $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_quant">'.__('Quantity:', 'mp').'</th></tr></thead><tbody>';
     
-      $totals = array();
-      foreach ($cart as $product_id => $data) {
-        $totals[] = $data['price'] * $data['quantity'];
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-        $content .=  '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-        $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-        $content .=  '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $product_id . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $product_id . '" /> ' . __('Remove', 'mp') . '</label></td>';
-        $content .=  '</tr>';
+    $totals = array();
+    foreach ($global_cart as $bid => $cart) {
+      if (is_multisite()) {
+        switch_to_blog($bid);
       }
-      $total = array_sum($totals);
-
+      foreach ($cart as $product_id => $variations) {
+        $vc = 0;
+        
+        foreach ($variations as $variation => $data) {
+          $totals[] = $data['price'] * $data['quantity'];
+          
+          if ($vc == 0) {
+            $content .=  '<tr>';
+          } else {
+            $content .=  '<tr class="mp_sub_line">';
+          }
+          if ($settings['product_variations']) {
+            $colspan = 'colspan="3"';
+          } else {
+            $colspan = '';
+          }
+          if ($vc == 0) {
+            $content .=  '  <td class="mp_cart_col_thumb" >' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
+            $content .=  '  <td class="mp_cart_col_product_table" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
+            if ($settings['product_variations']) {
+              $content .=  '  </tr>';
+              $content .=  '  <tr class="mp_sub_line">';
+            }
+          }
+          if ($settings['product_variations']) {
+            $content .=  '  <td>&nbsp;</td>';
+            if ($variation == 0) {
+              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
+            } else {
+              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
+            }
+          }
+          
+          $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+          $content .=  '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $blog_id . ':' . $product_id . ':'.$variation.']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $blog_id . ':' . $product_id . ':'.$variation.'" /> ' . __('Remove', 'mp') . '</label></td>';
+          
+          $vc++;
+          $content .=  '</tr>';
+        }
+      }
+    }
+    if (is_multisite()) {
+      switch_to_blog($current_blog_id);
+    }
+    $total = array_sum($totals);
       
-      //coupon line
-      if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
-        $content .=  '  <td>&nbsp;</td>';
-        $content .=  '</tr>';
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Discount:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
-        $content .=  '  <td class="mp_cart_remove_coupon"><a href="?remove_coupon=1">' . __('Remove Coupon &raquo;', 'mp') . '</a></td>';
-        $content .=  '</tr>';
-        $total = $coupon['new_total'];
-      } else {
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="4">
+    //coupon line
+    if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
+      $content .=  '  <td>&nbsp;</td>';
+      $content .=  '</tr>';
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Discount:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
+      $content .=  '  <td class="mp_cart_remove_coupon"><a href="?remove_coupon=1">' . __('Remove Coupon &raquo;', 'mp') . '</a></td>';
+      $content .=  '</tr>';
+      $total = $coupon['new_total'];
+    } else {
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="4">
             <a id="coupon-link" class="alignright" href="#coupon-code">' . __('Have a coupon code?', 'mp') . '</a>
             <div id="coupon-code" class="alignright" style="display: none;">
               <label for="coupon_code">' . __('Enter your code:', 'mp') . '</label>
@@ -215,55 +255,90 @@ function _mp_cart_table($cart, $type = 'checkout') {
               <input type="submit" name="update_cart_submit" value="' . __('Apply &raquo;', 'mp') . '" />
             </div>
         </td>';
-        $content .=  '</tr>';
-      }
-
-      //shipping line
-      if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-        if (has_filter( 'mp_shipping_method_lbl' ))
-          $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
-        $content .=  '  <td>' . $shipping_method . '</td>';
-        $content .=  '</tr>';
-        $total = $total + $shipping_price;
-      }
+      $content .=  '</tr>';
+    }
+    
+    //shipping line
+    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
+      if (has_filter( 'mp_shipping_method_lbl' ))
+        $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
+      $content .=  '  <td>' . $shipping_method . '</td>';
+      $content .=  '</tr>';
+      $total = $total + $shipping_price;
+    }
+    
+    //tax line
+    if ( ($tax_price = $mp->tax_price()) !== false ) {
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Taxes:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
+      $content .=  '  <td>&nbsp;</td>';
+      $content .=  '</tr>';
+      $total = $total + $tax_price;
+    }
       
-      //tax line
-      if ( ($tax_price = $mp->tax_price()) !== false ) {
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Taxes:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
-        $content .=  '  <td>&nbsp;</td>';
-        $content .=  '</tr>';
-        $total = $total + $tax_price;
-      }
-      
-      $content .=  '<tfoot><tr>';
-      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
-      $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
-      $content .=  '  <td class="mp_cart_col_updatecart"><input type="submit" name="update_cart_submit" value="' . __('Update Cart &raquo;', 'mp') . '" /></td>';
-      $content .=  '</tr></tfoot>';
-      
-      $content .= '</tbody></table></form>';
+    $content .=  '<tfoot><tr>';
+    $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
+    $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+    $content .=  '  <td class="mp_cart_col_updatecart"><input type="submit" name="update_cart_submit" value="' . __('Update Cart &raquo;', 'mp') . '" /></td>';
+    $content .=  '</tr></tfoot>';
+    
+    $content .= '</tbody></table></form>';
   } else if ($type == 'checkout') {
     $content .= '<table class="mp_cart_contents"><thead><tr>';
     $content .= '<th class="mp_cart_col_product" colspan="2">'.__('Item:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_quant">'.__('Qty:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th></tr></thead><tbody>';
     
-      $totals = array();
-      foreach ($cart as $product_id => $data) {
-        $totals[] = $data['price'] * $data['quantity'];
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-        $content .=  '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-        $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-        $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-        $content .=  '</tr>';
+    $totals = array();
+    foreach ($global_cart as $bid => $cart) {
+      if (is_multisite()) {
+        switch_to_blog($bid);
       }
-      $total = array_sum($totals);
+      foreach ($cart as $product_id => $variations) {
+        $vc = 0;
+        foreach ($variations as $variation => $data) {
+          if ($vc == 0) {
+            $content .=  '<tr>';
+          } else {
+            $content .=  '<tr class="mp_sub_line">';
+          }
+          if ($settings['product_variations']) {
+            $colspan = 'colspan="3"';
+          } else {
+            $colspan = '';
+          }
+          if ($vc == 0) {
+            $content .=  '  <td class="mp_cart_col_thumb" >' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
+            $content .=  '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
+            if ($settings['product_variations']) {
+              $content .=  '  </tr>';
+              $content .=  '  <tr class="mp_sub_line">';
+            }
+          }
+          if ($settings['product_variations']) {
+            $content .=  '  <td>&nbsp;</td>';
+            if ($variation == 0) {
+              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
+            } else {
+              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
+            }
+          }
+          $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+          $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+          $vc++;
+          $content .=  '</tr>';
+          $totals[] = $data['price'] * $data['quantity'];
+        }
+      }
+    }
+    if (is_multisite()) {
+      switch_to_blog($current_blog_id);
+    }
+    $total = array_sum($totals);
 
       //coupon line
       if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
@@ -311,17 +386,52 @@ function _mp_cart_table($cart, $type = 'checkout') {
     $content .= '<th class="mp_cart_col_quant">'.__('Qty:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th></tr></thead><tbody>';
     
-      $totals = array();
-      foreach ($cart as $product_id => $data) {
-        $totals[] = $data['price'] * $data['quantity'];
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
-        $content .=  '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-        $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-        $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-        $content .=  '</tr>';
+    $totals = array();
+    foreach ($global_cart as $bid => $cart) {
+      if (is_multisite()) {
+        switch_to_blog($bid);
       }
-      $total = array_sum($totals);
+      foreach ($cart as $product_id => $variations) {
+        $vc = 0;
+        foreach ($variations as $variation => $data) {
+          $totals[] = $data['price'] * $data['quantity'];
+          if ($vc == 0) {
+            $content .=  '<tr>';
+          } else {
+            $content .=  '<tr class="mp_sub_line">';
+          }
+          if ($settings['product_variations']) {
+            $colspan = 'colspan="3"';
+          } else {
+            $colspan = '';
+          }
+          if ($vc == 0) {
+            $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
+            $content .=  '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
+            if ($settings['product_variations']) {
+              $content .=  '  </tr>';
+              $content .=  '  <tr class="mp_sub_line">';
+            }
+          }
+          if ($settings['product_variations']) {
+            $content .=  '  <td>&nbsp;</td>';
+            if ($variation == 0) {
+              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
+            } else {
+              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
+            }
+          }
+          $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+          $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+          $vc++;
+          $content .=  '</tr>';
+        }
+      }
+    }
+    if (is_multisite()) {
+      switch_to_blog($current_blog_id);
+    }
+    $total = array_sum($totals);
 
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
@@ -334,60 +444,60 @@ function _mp_cart_table($cart, $type = 'checkout') {
 }
 
 //Prints cart login/register form, for internal use
-function _mp_cart_login() {
+function _mp_cart_login($echo = true) {
   global $mp;
-
+  
+  $content = '';
   //don't show if logged in
   if (is_user_logged_in()) {
-    ?>
-    <p class="mp_cart_direct_checkout">
-      <a class="mp_cart_direct_checkout_link" href="<?php echo mp_checkout_step_url('shipping'); ?>"><?php _e('Checkout Now &raquo;', 'mp'); ?></a>
-    </p>
-    <?php
+    $content .= '<p class="mp_cart_direct_checkout">';
+    $content .= '<a class="mp_cart_direct_checkout_link" href="'.mp_checkout_step_url('shipping').'">'.__('Checkout Now &raquo;', 'mp').'</a>';
+    $content .= '</p>';
   } else {
-    ?>
-    <table class="mp_cart_login">
-      <thead><tr>
-        <th class="mp_cart_login"><?php _e('Have a User Account?', 'mp'); ?></th>
-        <th>&nbsp;</th>
-        <th><?php _e('Checkout Directly', 'mp'); ?></th>
-      </tr></thead>
-      <tbody>
-      <tr>
-        <td class="mp_cart_login">
-          <form name="loginform" id="loginform" action="<?php echo wp_login_url(); ?>" method="post">
-        		<label><?php _e('Username', 'mp'); ?><br />
-        		<input type="text" name="log" id="user_login" class="input" value="" size="20" /></label>
-            <br />
-        		<label><?php _e('Password', 'mp'); ?><br />
-        		<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" /></label>
-            <br />
-        		<input type="submit" name="wp-submit" id="mp_login_submit" value="<?php _e('Login and Checkout &raquo;', 'mp'); ?>" />
-        		<input type="hidden" name="redirect_to" value="<?php echo mp_checkout_step_url('shipping'); ?>" />
-          </form>
-        </td>
-        <td class="mp_cart_or_label"><?php _e('or', 'mp'); ?></td>
-        <td class="mp_cart_checkout">
-          <a class="mp_cart_direct_checkout_link" href="<?php echo mp_checkout_step_url('shipping'); ?>"><?php _e('Checkout Now &raquo;', 'mp'); ?></a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <?php
+    $content .= '<table class="mp_cart_login">';
+    $content .= '<thead><tr>';
+    $content .= '<th class="mp_cart_login">'.__('Have a User Account?', 'mp').'</th>';
+    $content .= '<th>&nbsp;</th>';
+    $content .= '<th>'.__('Checkout Directly', 'mp').'</th>';
+    $content .= '</tr></thead>';
+    $content .= '<tbody>';
+    $content .= '<tr>';
+    $content .= '<td class="mp_cart_login">';
+    $content .= '<form name="loginform" id="loginform" action="<?php echo wp_login_url(); ?>" method="post">';
+    $content .= '<label>'.__('Username', 'mp').'<br />';
+    $content .= '<input type="text" name="log" id="user_login" class="input" value="" size="20" /></label>';
+    $content .= '<br />';
+    $content .= '<label>'.__('Password', 'mp').'<br />';
+    $content .= '<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" /></label>';
+    $content .= '<br />';
+    $content .= '<input type="submit" name="wp-submit" id="mp_login_submit" value="'.__('Login and Checkout &raquo;', 'mp').'" />';
+    $content .= '<input type="hidden" name="redirect_to" value="'.mp_checkout_step_url('shipping').'" />';
+    $content .= '</form>';
+    $content .= '</td>';
+    $content .= '<td class="mp_cart_or_label">'.__('or', 'mp').'</td>';
+    $content .= '<td class="mp_cart_checkout">';
+    $content .= '<a class="mp_cart_direct_checkout_link" href="'.site_url('wp-login.php?action=register', 'login').'">'.__('Register Now To Checkout &raquo;', 'mp').'</a>';
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '</tbody>';
+    $content .= '</table>';
   }
+  if ($echo)
+    echo  $content;
+  else
+    return $content;
 }
 
 //Prints cart shipping form, for internal use
-function _mp_cart_shipping($editable = false) {
+function _mp_cart_shipping($editable = false, $echo = true) {
   global $mp, $current_user;
   $settings = get_option('mp_settings');
   
   $meta = get_user_meta($current_user->ID, 'mp_shipping_info');
   $meta = $meta[0]; //offset
-
   //get address
-  $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : $current_user->user_email;
-  $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname;
+  $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : isset($meta['email'])?$meta['email']:$current_user->user_email;
+  $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : isset($meta['name'])?$meta['name']:$current_user->user_firstname . ' ' . $current_user->user_lastname;
   $address1 = (!empty($_SESSION['mp_shipping_info']['address1'])) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
   $address2 = (!empty($_SESSION['mp_shipping_info']['address2'])) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
   $city = (!empty($_SESSION['mp_shipping_info']['city'])) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
@@ -397,244 +507,227 @@ function _mp_cart_shipping($editable = false) {
   if (!$country)
     $country = $settings['base_country'];
   $phone = (!empty($_SESSION['mp_shipping_info']['phone'])) ? $_SESSION['mp_shipping_info']['phone'] : $meta['phone'];
-
+  
+  $content = '';
   //don't show if logged in
   if (!is_user_logged_in() && $editable) {
-    ?>
-    <p class="mp_cart_login_msg">
-      <?php _e('Made a purchase here before?', 'mp'); ?> <a class="mp_cart_login_link" href="<?php echo wp_login_url(mp_checkout_step_url('checkout')); ?>"><?php _e('Login now to retrieve your saved info &raquo;', 'mp'); ?></a>
-    </p>
-    <?php
+    $content .= '<p class="mp_cart_login_msg">';
+    $content .= __('Made a purchase here before?', 'mp').' <a class="mp_cart_login_link" href="'.wp_login_url(mp_checkout_step_url('checkout')).'">'.__('Login now to retrieve your saved info &raquo;', 'mp').'</a>';
+    $content .= '</p>';
   }
 
   if ($editable) {
-    ?>
-    <form id="mp_shipping_form" method="post" action="">
+    $content .= '<form id="mp_shipping_form" method="post" action="">';
 
-    <?php do_action( 'mp_checkout_before_shipping' ); ?>
+    $content .= apply_filters( 'mp_checkout_before_shipping', '' );
 
-    <table class="mp_cart_shipping">
-      <thead><tr>
-        <th colspan="2"><?php _e('Enter Your Shipping Information:', 'mp'); ?></th>
-      </tr></thead>
-      <tbody>
-      <tr>
-    	<td align="right"><?php _e('Email:', 'mp'); ?>*</td><td>
-      <?php do_action( 'mp_checkout_error_email' ); ?>
-      <input size="35" name="email" type="text" value="<?php echo esc_attr($email); ?>" /></td>
-    	</tr>
+    $content .= '<table class="mp_cart_shipping">';
+    $content .= '<thead><tr>';
+    $content .= '<th colspan="2">'.__('Enter Your Shipping Information:', 'mp').'</th>';
+    $content .= '</tr></thead>';
+    $content .= '<tbody>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Email:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_email', '' );
+    $content .= '<input size="35" name="email" type="text" value="'.esc_attr($email).'" /></td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'. __('Full Name:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_name', '' );
+    $content .= '<input size="35" name="name" type="text" value="'.esc_attr($name).'" /> </td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'. __('Address:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_address1', '' );
+    $content .= '<input size="45" name="address1" type="text" value="'.esc_attr($address1).'" /><br />';
+    $content .= '<small><em>'. __('Street address, P.O. box, company name, c/o', 'mp').'</em></small>';
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'. __('Address 2:', 'mp').'&nbsp;</td><td>';
+    $content .= '<input size="45" name="address2" type="text" value="'.esc_attr($address2).'" /><br />';
+    $content .= '<small><em>'.__('Apartment, suite, unit, building, floor, etc.', 'mp').'</em></small>';
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('City:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_city', '' );
+    $content .= '<input size="25" name="city" type="text" value="'.esc_attr($city).'" /></td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_state', '' );
+    $content .= '<input size="15" name="state" type="text" value="'.esc_attr($state).'" /></td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_zip', '' );
+    $content .= '<input size="10" id="mp_zip" name="zip" type="text" value="'.esc_attr($zip).'" /></td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_country', '' );
+    $content .= '<select id="mp_country" name="country">';
+    foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
+      $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
+    }
+    $content .= '</select>';
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td><td>';
+    $content .= '<input size="20" name="phone" type="text" value="'.esc_attr($phone).'" /></td>';
+    $content .= '</tr>';
+    
+    $content .= apply_filters( 'mp_checkout_shipping_field', '' );
 
-    	<tr>
-    	<td align="right"><?php _e('Full Name:', 'mp'); ?>*</td><td>
-      <?php do_action( 'mp_checkout_error_name' ); ?>
-      <input size="35" name="name" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
-    	</tr>
+    $content .= '</tbody>';
+    $content .= '</table>';
 
-    	<tr>
-    	<td align="right"><?php _e('Address:', 'mp'); ?>*</td><td>
-      <?php do_action( 'mp_checkout_error_address1' ); ?>
-      <input size="45" name="address1" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
-      <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
-      </td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Address 2:', 'mp'); ?>&nbsp;</td><td>
-      <input size="45" name="address2" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
-      <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
-      </td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('City:', 'mp'); ?>*</td><td>
-      <?php do_action( 'mp_checkout_error_city' ); ?>
-      <input size="25" name="city" type="text" value="<?php echo esc_attr($city); ?>" /></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('State/Province/Region:', 'mp'); ?>*</td><td>
-      <?php do_action( 'mp_checkout_error_state' ); ?>
-      <input size="15" name="state" type="text" value="<?php echo esc_attr($state); ?>" /></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?>*</td><td>
-      <?php do_action( 'mp_checkout_error_zip' ); ?>
-      <input size="10" id="mp_zip" name="zip" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Country:', 'mp'); ?>*</td><td>
-    	<?php do_action( 'mp_checkout_error_country' ); ?>
-      <select id="mp_" name="country">
-        <?php
-        foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
-          ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
-        }
-        ?>
-      </select>
-      </td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Phone Number:', 'mp'); ?></td><td>
-      <input size="20" name="phone" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
-    	</tr>
-
-      <?php do_action( 'mp_checkout_shipping_field' ); ?>
-
-      </tbody>
-    </table>
-
-    <?php do_action( 'mp_checkout_after_shipping' ); ?>
-
-      <p class="mp_cart_direct_checkout">
-        <input type="submit" name="mp_shipping_submit" id="mp_shipping_submit" value="<?php _e('Continue Checkout &raquo;', 'mp'); ?>" />
-      </p>
-    </form>
-    <?php
+    $content .= apply_filters( 'mp_checkout_after_shipping', '' ); 
+    $content .= '<p class="mp_cart_direct_checkout">';
+    $content .= '<input type="submit" name="mp_shipping_submit" id="mp_shipping_submit" value="'.__('Continue Checkout &raquo;', 'mp').'" />';
+    $content .= '</p>';
+    $content .= '</form>';
   } else {
-    ?>
-    <table class="mp_cart_shipping">
-      <thead><tr>
-        <th><?php _e('Shipping Information:', 'mp'); ?></th>
-        <th align="right"><a href="<?php echo mp_checkout_step_url('shipping'); ?>"><?php _e('&laquo; Edit', 'mp'); ?></a></th>
-      </tr></thead>
-      <tbody>
-      <tr>
-    	<td align="right"><?php _e('Email:', 'mp'); ?></td><td>
-      <?php echo esc_attr($email); ?></td>
-    	</tr>
+    $content .= '<table class="mp_cart_shipping">';
+    $content .= '<thead><tr>';
+    $content .= '<th>'.__('Shipping Information:', 'mp').'</th>';
+    $content .= '<th align="right"><a href="'.mp_checkout_step_url('shipping').'">'.__('&laquo; Edit', 'mp').'</a></th>';
+    $content .= '</tr></thead>';
+    $content .= '<tbody>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Email:', 'mp').'</td><td>';
+    $content .= esc_attr($email).' </td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Full Name:', 'mp').'</td><td>';
+    $content .= esc_attr($name).'</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Address:', 'mp').'</td>';
+    $content .= '<td>'.esc_attr($address1).'</td>';
+    $content .= '</tr>';
+    
+    if ($address2) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Address 2:', 'mp').'</td>';
+      $content .= '<td>'.esc_attr($address2).'</td>';
+      $content .= '</tr>';
+    }
 
-    	<tr>
-    	<td align="right"><?php _e('Full Name:', 'mp'); ?></td><td>
-      <?php echo esc_attr($name); ?></td>
-    	</tr>
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('City:', 'mp').'</td>';
+    $content .= '<td>'.esc_attr($city).'</td>';
+    $content .= '</tr>';
 
-    	<tr>
-    	<td align="right"><?php _e('Address:', 'mp'); ?></td>
-      <td><?php echo esc_attr($address1); ?></td>
-    	</tr>
+    if ($state) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'</td>';
+      $content .= '<td>'.esc_attr($state).'</td>';
+      $content .= '</tr>';
+    }
 
-      <?php if ($address2) { ?>
-    	<tr>
-    	<td align="right"><?php _e('Address 2:', 'mp'); ?></td>
-      <td><?php echo esc_attr($address2); ?></td>
-    	</tr>
-      <?php } ?>
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'</td>';
+    $content .= '<td>'.esc_attr($zip).'</td>';
+    $content .= '</tr>';
 
-    	<tr>
-    	<td align="right"><?php _e('City:', 'mp'); ?></td>
-      <td><?php echo esc_attr($city); ?></td>
-    	</tr>
+    $content .= '<tr>';
+    $content .= '<td align="right">'.__('Country:', 'mp').'</td>';
+    $content .= '<td>'.$mp->countries[$country].'</td>';
+    $content .= '</tr>';
 
-    	<?php if ($state) { ?>
-    	<tr>
-    	<td align="right"><?php _e('State/Province/Region:', 'mp'); ?></td>
-      <td><?php echo esc_attr($state); ?></td>
-    	</tr>
-      <?php } ?>
+    if ($phone) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td>';
+      $content .= '<td>'.esc_attr($phone).'</td>';
+      $content .= '</tr>';
+    }
 
-    	<tr>
-    	<td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?></td>
-      <td><?php echo esc_attr($zip); ?></td>
-    	</tr>
-
-    	<tr>
-    	<td align="right"><?php _e('Country:', 'mp'); ?></td>
-      <td><?php echo $mp->countries[$country]; ?></td>
-    	</tr>
-
-      <?php if ($phone) { ?>
-    	<tr>
-    	<td align="right"><?php _e('Phone Number:', 'mp'); ?></td>
-      <td><?php echo esc_attr($phone); ?></td>
-    	</tr>
-      <?php } ?>
-
-      </tbody>
-    </table>
-    <?php
+    $content .= '</tbody>';
+    $content .= '</table>';
   }
-
+  
+  if ($echo) {
+    echo $content;
+  } else {
+    return $content;
+  }
 }
 
 //Prints cart payment gateway form, for internal use
-function _mp_cart_payment($type) {
+function _mp_cart_payment($type, $echo = true) {
   global $mp, $mp_gateway_active_plugins;
   $cart = $mp->get_cart_contents();
   
+  $content = '';
   if ($type == 'form') {
-    ?>
-    <form id="mp_payment_form" method="post" action="<?php echo mp_checkout_step_url('checkout'); ?>">
-
-    <?php if (count((array)$mp_gateway_active_plugins) == 1) { ?>
-      <input type="hidden" name="mp_choose_gateway" value="<?php echo $mp_gateway_active_plugins[0]->plugin_name; ?>" />
-    <?php } else if (count((array)$mp_gateway_active_plugins) > 1) { ?>
-      <table class="mp_cart_payment_methods">
-      <thead><tr>
-        <th><?php _e('Choose a Payment Method:', 'mp'); ?></th>
-      </tr></thead>
-      <tbody><tr><td>
-      <?php
+    $content = '<form id="mp_payment_form" method="post" action="'.mp_checkout_step_url('checkout').'">';
+    if (count((array)$mp_gateway_active_plugins) == 1) {
+      $content .= '<input type="hidden" name="mp_choose_gateway" value="'.$mp_gateway_active_plugins[0]->plugin_name.'" />';
+    } else if (count((array)$mp_gateway_active_plugins) > 1) {
+      $content .= '<table class="mp_cart_payment_methods">';
+      $content .= '<thead><tr>';
+      $content .= '<th>'.__('Choose a Payment Method:', 'mp').'</th>';
+      $content .= '</tr></thead>';
+      $content .= '<tbody><tr><td>';
       foreach ((array)$mp_gateway_active_plugins as $plugin) {
-        ?>
-        <label>
-        <input type="radio" class="mp_choose_gateway" name="mp_choose_gateway" value="<?php echo $plugin->plugin_name; ?>"<?php checked($_SESSION['mp_payment_method'], $plugin->plugin_name); ?> />
-        <?php
+        $content .= '<label>';
+        $content .= '<input type="radio" class="mp_choose_gateway" name="mp_choose_gateway" value="'.$plugin->plugin_name.'" '.checked($_SESSION['mp_payment_method'], $plugin->plugin_name, false).'/>';
         if ($plugin->method_img_url) {
-          echo '<img src="' . $plugin->method_img_url . '" alt="' . $plugin->public_name . '" />';
+          $content .= '<img src="' . $plugin->method_img_url . '" alt="' . $plugin->public_name . '" />';
         } else {
-          echo $plugin->public_name;
+          $content .= $plugin->public_name;
         }
-        ?></label>
-        <?php
+        $content .= '</label>';
       }
-      ?>
-      </td>
-      </tr>
-      </tbody>
-      </table>
-    <?php } ?>
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '</tbody>';
+      $content .= '</table>';
+    }
 
-      <?php do_action( 'mp_checkout_payment_form', $cart, $_SESSION['mp_shipping_info'] ); ?>
+    $content .= apply_filters( 'mp_checkout_payment_form', $cart, $_SESSION['mp_shipping_info'] );
 
-    </form>
-    <?php
+    $content .= '</form>';
   } else if ($type == 'confirm') {
     //if skipping a step
     if (empty($_SESSION['mp_payment_method'])) {
-      echo '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
+      $content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
       return;
     }
-    ?>
-    <form id="mp_payment_form" method="post" action="<?php echo mp_checkout_step_url('confirm-checkout'); ?>">
+    $content .= '<form id="mp_payment_form" method="post" action="'.mp_checkout_step_url('confirm-checkout').'">';
 
-      <?php do_action( 'mp_checkout_confirm_payment_' . $_SESSION['mp_payment_method'], $cart, $_SESSION['mp_shipping_info'] ); ?>
+    $content .= apply_filters( 'mp_checkout_confirm_payment_' . $_SESSION['mp_payment_method'], $cart, $_SESSION['mp_shipping_info'] );
 
-      <p class="mp_cart_direct_checkout">
-        <input type="submit" name="mp_payment_confirm" id="mp_payment_confirm" value="<?php _e('Confirm Payment &raquo;', 'mp'); ?>" />
-      </p>
-    </form>
-    <?php
+    $content .= '<p class="mp_cart_direct_checkout">';
+    $content .= '<input type="submit" name="mp_payment_confirm" id="mp_payment_confirm" value="'.__('Confirm Payment &raquo;', 'mp').'" />';
+    $content .= '</p>';
+    $content .= '</form>';
   } else if ($type == 'confirmation') {
 
     //if skipping a step
     if (empty($_SESSION['mp_payment_method'])) {
-      echo '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
-      return;
+      $content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
     }
-
+    
     //gateway plugin message hook
-    do_action( 'mp_checkout_payment_confirmation_' . $_SESSION['mp_payment_method'], $mp->get_order($_SESSION['mp_order']) );
+    $content .= apply_filters( 'mp_checkout_payment_confirmation_' . $_SESSION['mp_payment_method'], '', $mp->get_order($_SESSION['mp_order']) );
 
     //tracking information
     $track_link = '<a href="' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '">' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '</a>';
-    echo '<p>' . sprintf(__('You may track the latest status of your order here:<br />%s', 'mp'), $track_link) . '</p>';
+    $content .= '<p>' . sprintf(__('You may track the latest status of your order here:<br />%s', 'mp'), $track_link) . '</p>';
 
     //clear cart session vars
     unset($_SESSION['mp_payment_method']);
     unset($_SESSION['mp_order']);
+  }
+  
+  if ($echo) {
+    echo $content;
+  } else {
+    return $content;
   }
 }
 
@@ -645,15 +738,16 @@ function _mp_cart_payment($type) {
  */
 function mp_show_cart($context = '', $checkoutstep = null) {
   global $mp;
-
-  if ( $checkoutstep == null )
-    $checkoutstep = get_query_var( 'checkoutstep' );
-        
+  
   $settings = get_option('mp_settings');
-
+  $global_settings = get_site_option( 'mp_network_settings' );
+  
   $cart = $mp->get_cart_contents();
   
   $content = "";
+  
+  if ( $checkoutstep == null )
+    $checkoutstep = get_query_var( 'checkoutstep' );
 
   if ((is_array($cart) && count($cart)) || $checkoutstep == 'confirmation') {
 
@@ -661,62 +755,66 @@ function mp_show_cart($context = '', $checkoutstep = null) {
       $content .= _mp_cart_table($cart, 'widget');
       $content .= '<div class="mp_cart_actions_widget">';
       $content .= '<a class="mp_empty_cart" href="'.mp_cart_link(false, true).'?empty-cart=1" title="'.__('Empty your shopping cart', 'mp').'">'.__('Empty Cart', 'mp').'</a>';
-      $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
+      if ($global_settings['global_cart'] == 1) {
+        $content .= '<a class="mp_checkout_link" href="'.mp_global_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
+      } else {
+        $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
+      }
       $content .= '</div>';
     } else if ($context == 'checkout') {
         
       //generic error message context for plugins to hook into
-      do_action( 'mp_checkout_error_checkout' );
+      $content .= apply_filters( 'mp_checkout_error_checkout', '' );
       
       //handle checkout steps
       switch($checkoutstep) {
 
         case 'shipping':
-          echo $settings['msg']['shipping'];
-          _mp_cart_shipping(true);
+          $content .= $settings['msg']['shipping'];
+          $content .= _mp_cart_shipping(true, false);
           break;
 
         case 'checkout':
-          echo $settings['msg']['checkout'];
-          _mp_cart_payment('form');
+          $content .=  $settings['msg']['checkout'];
+          $content .= _mp_cart_payment('form', false);
           break;
 
         case 'confirm-checkout':
-          echo $settings['msg']['confirm_checkout'];
-          echo _mp_cart_table($cart, 'checkout');
-          _mp_cart_shipping(false);
-          _mp_cart_payment('confirm');
+          $content .=  $settings['msg']['confirm_checkout'];
+          $content .= _mp_cart_table($cart, 'checkout', false);
+          $content .= _mp_cart_shipping(false, false);
+          $content .= _mp_cart_payment('confirm', false);
           break;
 
         case 'confirmation':
-          echo $settings['msg']['success'];
-          _mp_cart_payment('confirmation');
+          $content .=  $settings['msg']['success'];
+          $content .= _mp_cart_payment('confirmation', false);
           break;
 
         default:
-          echo $settings['msg']['cart'];
-          echo _mp_cart_table($cart, 'checkout-edit');
-          _mp_cart_login();
+          $content .= $settings['msg']['cart'];
+          $content .= _mp_cart_table($cart, 'checkout-edit', false);
+          $content .= _mp_cart_login(false);
           break;
       }
 
     } else {
-      echo _mp_cart_table($cart, 'checkout');
-      ?>
-      <div class="mp_cart_actions">
-    		<a class="mp_empty_cart" href="<?php mp_cart_link(true, true); ?>?empty-cart=1" title="<?php _e('Empty your shopping cart', 'mp') ?>"><?php _e('Empty Cart', 'mp') ?></a>
-        <a class="mp_checkout_link" href="<?php mp_cart_link(true, true); ?>" title="<?php _e('Go To Checkout Page', 'mp') ?>"><?php _e('Checkout &raquo;', 'mp') ?></a>
-    	</div>
-      <?php
+      $content .= _mp_cart_table($cart, 'checkout');
+      $content .= '<div class="mp_cart_actions">';
+      $content .= '<a class="mp_empty_cart" href="'.mp_cart_link(false, true).'?empty-cart=1" title="'.__('Empty your shopping cart', 'mp').'">'.__('Empty Cart', 'mp').'</a>';
+      if ($global_settings['global_cart'] == 1) {
+        $content .= '<a class="mp_checkout_link" href="'.mp_global_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
+      } else {
+        $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
+      }
+      $content .= '</div>';
     }
-
   } else {
     $content .= '<div class="mp_cart_empty">'.__('There are no items in your cart.', 'mp').'</div>';
     $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="'.mp_store_link(false, true).'">'.__('Browse Products &raquo;', 'mp').'</a></div>';
   }
   return $content;
 }
-
 
 /**
  * Echos the order status page. Use in the mp_orderstatus.php template.
@@ -792,14 +890,49 @@ function mp_order_status() {
         <tbody>
         <?php
         if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
-          foreach ($order->mp_cart_info as $product_id => $data) {
-            echo '<tr>';
-            echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-            echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
-            echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-            echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
-            echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-            echo '</tr>';
+          foreach ($order->mp_cart_info as $bid => $cart) {
+            if (is_multisite()) {
+              switch_to_blog($bid);
+            }
+            foreach ($cart as $product_id => $variations) {
+              $vc = 0;
+              foreach ($variations as $variation => $data) {
+                if ($vc == 0) {
+                  echo '<tr>';
+                } else {
+                  echo '<tr class="mp_sub_line">';
+                }
+                if ($settings['product_variations']) {
+                  $colspan = 'colspan="4"';
+                } else {
+                  $colspan = '';
+                }
+                if ($vc == 0) {
+                  echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
+                  echo '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+                  if ($settings['product_variations']) {
+                    echo '  </tr>';
+                    echo '  <tr class="mp_sub_line">';
+                  }
+                }
+                if ($settings['product_variations']) {
+                  echo '  <td>&nbsp;</td>';
+                  if ($variation == 0) {
+                    echo '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
+                  } else {
+                    echo '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
+                  }
+                }
+                echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+                echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
+                echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+                echo '</tr>';
+                $vc++;
+              }
+            }
+          }
+          if (is_multisite()) {
+            switch_to_blog($current_blog_id);
           }
         } else {
           echo '<tr><td colspan="6">' . __('No products could be found for this order', 'mp') . '</td></tr>';
@@ -1435,6 +1568,27 @@ function mp_cart_link($echo = true, $url = false, $link_text = '') {
 }
 
 /**
+ * Echos the global shopping cart link.
+ * @param bool $echo Optional, whether to echo. Defaults to true
+ * @param bool $url Optional, whether to return a link or url. Defaults to show link.
+ * @param string $link_text Optional, text to show in link.
+ */
+function mp_global_cart_link($echo = true, $url = false, $link_text = '') {
+  $settings = get_option('mp_settings');
+  $link = get_home_url( 1, $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
+
+  if (!$url) {
+    $text = ($link_text) ? $link_text : __('Shopping Cart', 'mp');
+    $link = '<a href="' . $link . '" class="mp_cart_link">' . $text . '</a>';
+  }
+
+  if ($echo)
+    echo $link;
+  else
+    return $link;
+}
+
+/**
  * Echos the current store link.
  * @param bool $echo Optional, whether to echo. Defaults to true
  * @param bool $url Optional, whether to return a link or url. Defaults to show link.
@@ -1516,10 +1670,13 @@ function mp_store_navigation( $echo = true ) {
   
   //navigation
   if (!$settings['disable_cart']) {
-    $nav = '<ul class="mp_store_navigation">
-<li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
-<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>
-<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
+    $nav = '<ul class="mp_store_navigation"><li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
+    if ($global_settings['global_cart'] == 1) {
+      $nav .= '<li class="page_item"><a href="' . mp_global_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
+    } else {
+      $nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
+    }
+    $nav .= '<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
 </ul>';
   } else {
     $nav = '<ul class="mp_store_navigation">
@@ -1556,4 +1713,33 @@ function mp_items_in_cart() {
 	else
 	  return false;
 }
-?>
+
+/**
+ * Determine if there are any items in the cart
+ *
+ * @retuns bool whether items are in the cart for the current user.
+ */
+function mp_items_count_in_cart() {
+  global $mp;
+  
+  $global_cart = $mp->get_cart_contents();
+  
+  if (is_array($global_cart) && count($global_cart)) {
+    $count = 0;
+    
+    foreach ($global_cart as $cart) {
+      foreach ($cart as $variations) {
+        foreach ($variations as $item) {
+          $count += $item['quantity'];
+        }
+      }
+    }
+    return $count;
+  } else
+    return 0;
+}
+
+function mp_products_count() {
+  $custom_query = new WP_Query('post_type=product');
+  return $custom_query->post_count;
+}

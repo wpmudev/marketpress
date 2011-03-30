@@ -219,8 +219,9 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
    *
    * return float $price
    */
-	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
-    global $mp;
+  function calculate_shipping($price, $total, $global_cart, $address1, $address2, $city, $state, $zip, $country) {
+    global $mp, $blog_id;
+    $current_blog_id = $blog_id;
     $settings = get_option('mp_settings');
     
     switch ($settings['base_country']) {
@@ -237,7 +238,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
           $price = $settings['shipping']['flat-rate']['international'];
         }
         break;
-
+      
       case 'CA':
         if ($country == 'CA') {
           $price = $settings['shipping']['flat-rate']['in_country'];
@@ -267,20 +268,35 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
         }
         break;
     }
-
+    
+    $extras = array();
     //calculate extra shipping
-    foreach ($cart as $product_id => $data) {
-      $shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-      $extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
+    foreach ($global_cart as $bid => $cart) {
+      if (is_multisite()) {
+	switch_to_blog($bid);
+      }
+      foreach ($cart as $product_id => $variations) {
+	foreach ($variations as $variation => $data) {
+	  $variation_str = '';
+	  if ($variation_str == 1) {
+	    $variation_str = '_variation';
+	  }
+	  $shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
+	  $extras[] = $shipping_meta['extra'.$variation_str.'_cost'] * $data['quantity'];
+	}
+      }
     }
+    if (is_multisite()) {
+      switch_to_blog($current_blog_id);
+    }
+    
     $extra = array_sum($extras);
-
+    
     //merge
     $price = round($price + $extra, 2);
-
+    
     return $price;
   }
-
 }
 
 //register plugin

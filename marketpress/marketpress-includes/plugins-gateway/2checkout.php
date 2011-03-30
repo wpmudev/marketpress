@@ -225,9 +225,8 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    * Echo any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
    */
-  function order_confirmation_msg($order) {
+  function order_confirmation_msg($content, $order) {
     global $mp;
-    $content = '';
     if ($order->post_status == 'order_received') {
       $content .= '<p>' . sprintf(__('Your payment via 2Checkout for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
       $statuses = $order->mp_payment_info['status'];
