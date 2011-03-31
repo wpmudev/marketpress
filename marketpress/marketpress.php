@@ -1487,11 +1487,15 @@ Thanks again!", 'mp')
 
     //only add these boxes if orders are enabled
     if (!$settings['disable_cart']) {
+    
+      add_meta_box('mp-meta-variations', __('Product Variations', 'mp'), array(&$this, 'meta_variations'), 'product', 'normal', 'high');
+      
       //only display metabox if shipping plugin ties into it
       if ( has_action('mp_shipping_metabox') )
         add_meta_box('mp-meta-shipping', __('Shipping', 'mp'), array(&$this, 'meta_shipping'), 'product', 'normal', 'high');
 
-      //add_meta_box('mp-meta-download', __('Product Download', 'mp'), array(&$this, 'meta_download'), 'product', 'normal', 'high');
+			//for product downloads
+      add_meta_box('mp-meta-download', __('Product Download', 'mp'), array(&$this, 'meta_download'), 'product', 'normal', 'high');
     }
   }
 
@@ -1514,7 +1518,7 @@ Thanks again!", 'mp')
       if ( (int)$_POST['mp_inventory'] != $meta['mp_track_inventory'][0] )
         delete_post_meta($product_id, 'mp_stock_email_sent', 1);
 
-      update_post_meta($post_id, 'mp_product_link', esc_url_raw($_POST['mp_product_link']));
+      update_post_meta( $post_id, 'mp_product_link', esc_url_raw($_POST['mp_product_link']) );
 
       //set sales count to zero if none set
       $sale_count = ($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0;
@@ -1526,6 +1530,9 @@ Thanks again!", 'mp')
         $mp_shipping = array();
 
       update_post_meta( $post_id, 'mp_shipping', apply_filters('mp_save_shipping_meta', $mp_shipping) );
+      
+      //download url
+      update_post_meta( $post_id, 'mp_file', esc_url_raw($_POST['mp_file']) );
 
       //for any other plugin to hook into
       do_action( 'mp_save_product_meta', $post_id, $meta );
@@ -1555,7 +1562,7 @@ Thanks again!", 'mp')
     <?php } ?>
 
     <div class="alignleft">
-      <label title="<?php _e('Some examples are linking to a song/album in itunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
+      <label title="<?php _e('Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
       <input type="text" size="20" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"][0]); ?>" /></label>
     </div>
 
@@ -1563,7 +1570,66 @@ Thanks again!", 'mp')
     <div class="clear"></div>
     <?php
   }
+  
+  //The variations meta box
+  function meta_variations() {
+    global $post;
+    $settings = get_option('mp_settings');
+		$meta = get_post_custom($post->ID);
+		$mp_variations = maybe_unserialize($meta["mp_variations"]);
+		?>
+		<table class="widefat" id="mp_product_variations_table">
+			<thead>
+				<tr>
+					<th scope="col"><?php _e('Name', 'mp') ?></th>
+					<th scope="col"><?php _e('Price', 'mp') ?></th>
+					<th scope="col"><?php _e('Sale Price', 'mp') ?></th>
+					<th scope="col" class="mp_var_remove"></th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php
+			  if ($mp_variations) {
+	        foreach ($mp_variations as $variation) {
+		        ?>
+						<tr class="variation">
+							<td><input class="mp_var_name" type="text" name="mp_var_name[]" value="" /></td>
+							<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_price[]" value="<?php echo ($variation["price"]) ? $this->display_currency($variation["price"]) : '0.00'; ?>" /></td>
+							<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_sale_price[]" value="<?php echo ($variation["sale_price"]) ? $this->display_currency($variation["sale_price"]) : ''; ?>" /></td>
+							<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
+						</tr>
+						<tr><td colspan="3" id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?> &raquo;</a></td></tr>
+						<?php
+					}
+					?>
+					<tr><td colspan="4" id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?> &raquo;</a></td></tr>
+					<?php
+	      } else {
+	        ?>
+					<tr class="variation">
+						<td><input class="mp_var_name" type="text" name="mp_var_name[]" value="" /></td>
+						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_price[]" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></td>
+						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_sale_price[]" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></td>
+            <td class="mp_var_remove"></td>
+					</tr>
+     			<tr class="variation">
+						<td><input class="mp_var_name" type="text" name="mp_var_name[]" value="" /></td>
+						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_price[]" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></td>
+						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_sale_price[]" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></td>
+            <td class="mp_var_remove mp_var_remove_last"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
+					</tr>
+					<tr><td colspan="4" id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?> &raquo;</a></td></tr>
+					<?php
+	      }
+			?>
+			</tbody>
+		</table>
+		<?php
 
+		//tie in for plugins
+    do_action( 'mp_variations_metabox', $mp_shipping, $settings );
+  }
+  
   //The Shipping meta box
   function meta_shipping() {
     global $post;
@@ -1588,7 +1654,7 @@ Thanks again!", 'mp')
     if (is_multisite()) {
       echo '<span class="description">Allowed Filetypes: '.implode(', ', explode(' ', get_site_option('upload_filetypes'))).'</span>';
       if (is_super_admin()) {
-        echo '<p>Super Admin: You can change allowed filetypes for your network <a href="' . network_admin_url('ms-options.php#upload_filetypes') . '">here &raquo;</a></p>';
+        echo '<p>Super Admin: You can change allowed filetypes for your network <a href="' . network_admin_url('settings.php#upload_filetypes') . '">here &raquo;</a></p>';
       }
     }
 
@@ -1626,9 +1692,9 @@ Thanks again!", 'mp')
     $totals = array();
     foreach ($global_cart as $bid => $cart) {
       foreach ($cart as $product_id => $variations) {
-	foreach ($variations as $variation => $data) {
-	    $totals[] = $data['price'] * $data['quantity'];
-	}
+				foreach ($variations as $variation => $data) {
+				    $totals[] = $data['price'] * $data['quantity'];
+				}
       }
     }
     $total = array_sum($totals);
@@ -1698,9 +1764,9 @@ Thanks again!", 'mp')
       //get total after any coupons
       $totals = array();
       foreach ($cart as $product_id => $variations) {
-	foreach ($variations as $variation => $data) {
-	    $totals[] = $data['price'] * $data['quantity'];
-	}
+				foreach ($variations as $variation => $data) {
+				    $totals[] = $data['price'] * $data['quantity'];
+				}
       }
       
       $total = array_sum($totals);
@@ -1853,23 +1919,23 @@ Thanks again!", 'mp')
     $current_blog_id = $blog_id;
     foreach ($global_cart as $bid => $cart) {
       if (is_multisite()) {
-	switch_to_blog($bid);
+				switch_to_blog($bid);
       }
       $full_cart[$bid] = array();
       foreach ($cart as  $product_id => $variations) {
-	$product = get_post($product_id);
-	
-	if ( empty($product) ) {
-	  continue;
-	}
-	
-	foreach ($variations as $variation => $quantity) {
-	    if ($variation == 0) {
-		$full_cart[$bid][$product_id][$variation] = array('SKU' => get_post_meta($product_id, 'mp_sku', true), 'name' => $product->post_title, 'price' => $this->product_price($product_id), 'quantity' => $quantity);
-	    } else {
-		$full_cart[$bid][$product_id][$variation] = array('SKU' => get_post_meta($product_id, 'mp_variation_sku', true), 'name' => $product->post_title, 'price' => $this->product_variation_price($product_id), 'quantity' => $quantity);
-	    }
-	}
+				$product = get_post($product_id);
+
+				if ( empty($product) ) {
+				  continue;
+				}
+
+				foreach ($variations as $variation => $quantity) {
+					if ($variation == 0) {
+						$full_cart[$bid][$product_id][$variation] = array('SKU' => get_post_meta($product_id, 'mp_sku', true), 'name' => $product->post_title, 'price' => $this->product_price($product_id), 'quantity' => $quantity);
+					} else {
+						$full_cart[$bid][$product_id][$variation] = array('SKU' => get_post_meta($product_id, 'mp_variation_sku', true), 'name' => $product->post_title, 'price' => $this->product_variation_price($product_id), 'quantity' => $quantity);
+					}
+				}
 	
       }
     }
@@ -1921,8 +1987,8 @@ Thanks again!", 'mp')
       $variation = 0;
       $variation_str = '';
       if (isset($_POST['variation'])) {
-	$variation = $_POST['variation'];
-	$variation_str = '_variation';
+				$variation = $_POST['variation'];
+				$variation_str = '_variation';
       }
       
       $new_quantity = $cart[$product_id][$variation] + $quantity;
@@ -1956,7 +2022,7 @@ Thanks again!", 'mp')
       
       if ($quota && $quota < $new_quantity) {
         if ($no_ajax !== true) {
-	  echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title);
+	  			echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title);
           exit;
         } else {
           $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title) );
@@ -1966,7 +2032,7 @@ Thanks again!", 'mp')
       
       $variation = 0;
       if (isset($_POST['variation'])) {
-	$variation = $_POST['variation'];
+				$variation = $_POST['variation'];
       }
       
       $cart[$product_id][$variation] = $new_quantity;
@@ -1978,7 +2044,7 @@ Thanks again!", 'mp')
       if ($no_ajax !== true) {
         $return .= mp_show_cart('widget');
         echo $return;
-	exit;
+				exit;
       }
     } else if (isset($_POST['update_cart_submit'])) { //update cart contents
       $global_cart = $this->get_global_cart_cookie();
@@ -1986,14 +2052,14 @@ Thanks again!", 'mp')
       //process quantity updates
       if (is_array($_POST['quant'])) {
         foreach ($_POST['quant'] as $pbid => $quant) {
-	  list($bid, $product_id, $variation) = split(':', $pbid);
-	  if (is_multisite()) {
-	    switch_to_blog($bid);
-	  }
-	  $variation_str = '';
-	  if ($variation == 1) {
-	    $variation_str = '_variation';
-	  }
+				  list($bid, $product_id, $variation) = split(':', $pbid);
+				  if (is_multisite()) {
+				    switch_to_blog($bid);
+				  }
+				  $variation_str = '';
+				  if ($variation == 1) {
+				    $variation_str = '_variation';
+				  }
           if (intval($quant)) {
             //check stock
             if (get_post_meta($product_id, 'mp'.$variation_str.'_track_inventory', true)) {
@@ -2004,13 +2070,13 @@ Thanks again!", 'mp')
               }
             }
 	    
-	    $quota_tmp = get_post_meta($product_id, 'mp'.$variation_str.'_quota', false);
-	    $quota = $quota_tmp[0];
-	    if ($quota && $quota < $quant) {
-	      $product = get_post($product_id);
-	      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title) );
-	      return false;
-	    }
+				    $quota_tmp = get_post_meta($product_id, 'mp'.$variation_str.'_quota', false);
+				    $quota = $quota_tmp[0];
+				    if ($quota && $quota < $quant) {
+				      $product = get_post($product_id);
+				      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title) );
+				      return false;
+				    }
 	    
             $global_cart[$blog_id][$product_id][$variation] = intval($quant);
           } else {
@@ -2018,9 +2084,9 @@ Thanks again!", 'mp')
           }
         }
 	
-	if (is_multisite()) {
-	  switch_to_blog($current_blog_id);
-	}
+				if (is_multisite()) {
+				  switch_to_blog($current_blog_id);
+				}
 	
         //save items to cookie
         $this->set_global_cart_cookie($global_cart);
@@ -2029,15 +2095,15 @@ Thanks again!", 'mp')
       //remove items
       if (is_array($_POST['remove'])) {
         foreach ($_POST['remove'] as $pbid) {
-	  list($bid, $product_id, $variation) = split(':', $pbid);
-	  if (is_multisite()) {
-	    switch_to_blog($bid);
-	  }
+				  list($bid, $product_id, $variation) = split(':', $pbid);
+				  if (is_multisite()) {
+				    switch_to_blog($bid);
+				  }
           unset($global_cart[$blog_id][$product_id][$variation]);
         }
-	if (is_multisite()) {
-	  switch_to_blog($current_blog_id);
-	}
+				if (is_multisite()) {
+				  switch_to_blog($current_blog_id);
+				}
         //save items to cookie
         $this->set_global_cart_cookie($global_cart);
         $this->cart_update_message( __('Item(s) Removed', 'mp') );
@@ -2122,15 +2188,15 @@ Thanks again!", 'mp')
         //loop through cart items
         $global_cart = $this->get_cart_contents();
         foreach ($global_cart as $bid => $cart) {
-	  foreach ($cart as $product_id => $variations) {
-	    foreach ($variations as $data) {
-		$totals[] = $data['price'] * $data['quantity'];
-	    }
-	  }
+				  foreach ($cart as $product_id => $variations) {
+				    foreach ($variations as $data) {
+					$totals[] = $data['price'] * $data['quantity'];
+				    }
+				  }
         }
-    	if (is_array($totals)) {
-	  $total = array_sum($totals);
-	}
+	    	if (is_array($totals)) {
+				  $total = array_sum($totals);
+				}
         //coupon line
         if ( $coupon = $this->coupon_value($this->get_coupon_code(), $total) )
           $total = $coupon['new_total'];
@@ -2144,25 +2210,25 @@ Thanks again!", 'mp')
         }
 
         if ($total > 0) {
-	    if (count($settings['gateways']['allowed']) > 1) {
-	      wp_safe_redirect(mp_checkout_step_url('checkout'));
-	      exit;
-	    } else {
-	      $_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
-	      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
-	      //if no errors send to next checkout step
-	      if ($this->checkout_error == false) {
-		wp_safe_redirect(mp_checkout_step_url('confirm-checkout'));
-		exit;
-	      }
-	    }
+			    if (count($settings['gateways']['allowed']) > 1) {
+			      wp_safe_redirect(mp_checkout_step_url('checkout'));
+			      exit;
+			    } else {
+			      $_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
+			      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
+			      //if no errors send to next checkout step
+			      if ($this->checkout_error == false) {
+							wp_safe_redirect(mp_checkout_step_url('confirm-checkout'));
+							exit;
+			      }
+			    }
         } else { //empty price, create order already
 
           //setup our payment details
           $timestamp = time();
           $order_id = $this->generate_order_id();
           $settings = get_option('mp_settings');
-    	  $payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
+    	  	$payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
           $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
       	  $payment_info['method'][] = __('N/A - Free order', 'mp');
       	  $payment_info['transaction_id'][] = __('N/A', 'mp');
@@ -2170,10 +2236,10 @@ Thanks again!", 'mp')
       	  $payment_info['total'] = $total;
       	  $payment_info['currency'] = $settings['currency'];
       	  $_SESSION['mp_payment_method'] = 'manual'; //so we don't get an error message on confirmation page
-	  $this->create_order($order_id, $global_cart, $_SESSION['mp_shipping_info'], $payment_info, true);
+	  			$this->create_order($order_id, $global_cart, $_SESSION['mp_shipping_info'], $payment_info, true);
 	  
           //redirect to final page
-	  wp_safe_redirect(mp_checkout_step_url('confirmation'));
+	  			wp_safe_redirect(mp_checkout_step_url('confirmation'));
           exit;
         }
       }
@@ -2570,7 +2636,7 @@ Thanks again!", 'mp')
 			  'city' => $city,
 			  'state' => $state,
 			  'zip' => $zip,
-		          'country' => $country,
+		    'country' => $country,
 			  'phone' => $phone);
     
     update_user_meta($user_id, 'mp_billing_info', $billing_meta);
@@ -2656,62 +2722,62 @@ Thanks again!", 'mp')
     <h3><?php _e('Billing Info', WEB_INVOICE_TRANS_DOMAIN); ?></h3>
     <a name="mp_billing_info"></a>
     <table class="form-table">
-        <tr>
-          <th align="right"><label for="mp_billing_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_email', ''); ?>
-          <input size="35" id="mp_billing_info_email" name="mp_billing_info[email]" type="text" value="<?php echo esc_attr($email); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_name"><?php _e('Full Name:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_name', ''); ?>
-          <input size="35" id="mp_billing_info_name" name="mp_billing_info[name]" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_address1"><?php _e('Address:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_address1', ''); ?>
-          <input size="45" id="mp_billing_info_address1" name="mp_billing_info[address1]" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
-          <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
-          </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_address2"><?php _e('Address 2:', 'mp'); ?>&nbsp;</label></th><td>
-	  <?php echo apply_filters( 'mp_billing_info_error_address2', ''); ?>
-          <input size="45" id="mp_billing_info_address2" name="mp_billing_info[address2]" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
-          <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
-          </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_city"><?php _e('City:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_city', ''); ?>
-          <input size="25" id="mp_billing_info_city" name="mp_billing_info[city]" type="text" value="<?php echo esc_attr($city); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_state"><?php _e('State/Province/Region:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_state', ''); ?>
-          <input size="15" id="mp_billing_info_state" name="mp_billing_info[state]" type="text" value="<?php echo esc_attr($state); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_zip"><?php _e('Postal/Zip Code:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_zip', ''); ?>
-          <input size="10" id="mp_billing_info_zip" name="mp_billing_info[zip]" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_country"><?php _e('Country:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_country', ''); ?>
-          <select id="mp_billing_info_country" name="mp_billing_info[country]">
-            <?php
-            foreach ($settings['shipping']['allowed_countries'] as $code) {
-              ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
-            }
-            ?>
-          </select>
-          </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_billing_info_phone"><?php _e('Phone Number:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_billing_info_error_phone', ''); ?>
-	  <input size="20" id="mp_billing_info_phone" name="mp_billing_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
-        </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_email', ''); ?>
+        <input size="35" id="mp_billing_info_email" name="mp_billing_info[email]" type="text" value="<?php echo esc_attr($email); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_name"><?php _e('Full Name:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_name', ''); ?>
+        <input size="35" id="mp_billing_info_name" name="mp_billing_info[name]" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_address1"><?php _e('Address:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_address1', ''); ?>
+        <input size="45" id="mp_billing_info_address1" name="mp_billing_info[address1]" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
+        <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_address2"><?php _e('Address 2:', 'mp'); ?>&nbsp;</label></th><td>
+  			<?php echo apply_filters( 'mp_billing_info_error_address2', ''); ?>
+        <input size="45" id="mp_billing_info_address2" name="mp_billing_info[address2]" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
+        <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_city"><?php _e('City:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_city', ''); ?>
+        <input size="25" id="mp_billing_info_city" name="mp_billing_info[city]" type="text" value="<?php echo esc_attr($city); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_state"><?php _e('State/Province/Region:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_state', ''); ?>
+        <input size="15" id="mp_billing_info_state" name="mp_billing_info[state]" type="text" value="<?php echo esc_attr($state); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_zip"><?php _e('Postal/Zip Code:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_zip', ''); ?>
+        <input size="10" id="mp_billing_info_zip" name="mp_billing_info[zip]" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_country"><?php _e('Country:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_country', ''); ?>
+        <select id="mp_billing_info_country" name="mp_billing_info[country]">
+          <?php
+          foreach ($settings['shipping']['allowed_countries'] as $code) {
+            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
+          }
+          ?>
+        </select>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_phone"><?php _e('Phone Number:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_phone', ''); ?>
+  			<input size="20" id="mp_billing_info_phone" name="mp_billing_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
+      </tr>
     </table>
     <?php
     $meta = get_user_meta($user_id, 'mp_shipping_info');
@@ -2730,74 +2796,74 @@ Thanks again!", 'mp')
     $phone = (!empty($_SESSION['mp_shipping_info']['phone'])) ? $_SESSION['mp_shipping_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
     
     ?>
-    <h3><?php _e('Shipping Info', WEB_INVOICE_TRANS_DOMAIN); ?></h3>
+    <h3><?php _e('Shipping Info', 'mp'); ?></h3>
     <a name="mp_shipping_info"></a>
-    <span class="mp_action" ><a href="javascript:mp_copy_billing('mp_shipping_info');"><?php _e('Same as Billing', WEB_INVOICE_TRANS_DOMAIN); ?></a></span>
+    <span class="mp_action" ><a href="javascript:mp_copy_billing('mp_shipping_info');"><?php _e('Same as Billing', 'mp'); ?></a></span>
     <table class="form-table">
-	<tr>
-          <th align="right"><label for="mp_shipping_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_email', ''); ?>
-          <input size="35" id="mp_shipping_info_email" name="mp_shipping_info[email]" type="text" value="<?php echo esc_attr($email); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_name"><?php _e('Full Name:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_checkout_error_name', ''); ?>
-          <input size="35" id="mp_shipping_info_name" name="mp_shipping_info[name]" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_address1"><?php _e('Address:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_address1', ''); ?>
-          <input size="45" id="mp_shipping_info_address1" name="mp_shipping_info[address1]" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
-          <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
-          </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_address2"><?php _e('Address 2:', 'mp'); ?>&nbsp;</label></th><td>
-	  <?php echo apply_filters( 'mp_shipping_info_error_address2', ''); ?>
-          <input size="45" id="mp_shipping_info_address2" name="mp_shipping_info[address2]" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
-          <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
-          </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_city"><?php _e('City:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_city', ''); ?>
-          <input size="25" id="mp_shipping_info_city" name="mp_shipping_info[city]" type="text" value="<?php echo esc_attr($city); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_state"><?php _e('State/Province/Region:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_state', ''); ?>
-          <input size="15" id="mp_shipping_info_state" name="mp_shipping_info[state]" type="text" value="<?php echo esc_attr($state); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_zip"><?php _e('Postal/Zip Code:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_zip', ''); ?>
-          <input size="10" id="mp_shipping_info_zip" name="mp_shipping_info[zip]" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_country"><?php _e('Country:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_country', ''); ?>
-          <select id="mp_shipping_info_country" name="mp_shipping_info[country]">
-            <?php
-            foreach ($settings['shipping']['allowed_countries'] as $code) {
-              ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
-            }
-            ?>
-          </select>
-          </td>
-        </tr>
-        <tr>
-          <th align="right"><label for="mp_shipping_info_phone"><?php _e('Phone Number:', 'mp'); ?>&nbsp;</label></th><td>
-          <?php echo apply_filters( 'mp_shipping_info_error_phone', ''); ?>
-	  <input size="20" id="mp_shipping_info_phone" name="mp_shipping_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
-        </tr>
+			<tr>
+        <th align="right"><label for="mp_shipping_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_email', ''); ?>
+        <input size="35" id="mp_shipping_info_email" name="mp_shipping_info[email]" type="text" value="<?php echo esc_attr($email); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_name"><?php _e('Full Name:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_checkout_error_name', ''); ?>
+        <input size="35" id="mp_shipping_info_name" name="mp_shipping_info[name]" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_address1"><?php _e('Address:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_address1', ''); ?>
+        <input size="45" id="mp_shipping_info_address1" name="mp_shipping_info[address1]" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
+        <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_address2"><?php _e('Address 2:', 'mp'); ?>&nbsp;</label></th><td>
+  			<?php echo apply_filters( 'mp_shipping_info_error_address2', ''); ?>
+        <input size="45" id="mp_shipping_info_address2" name="mp_shipping_info[address2]" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
+        <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_city"><?php _e('City:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_city', ''); ?>
+        <input size="25" id="mp_shipping_info_city" name="mp_shipping_info[city]" type="text" value="<?php echo esc_attr($city); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_state"><?php _e('State/Province/Region:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_state', ''); ?>
+        <input size="15" id="mp_shipping_info_state" name="mp_shipping_info[state]" type="text" value="<?php echo esc_attr($state); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_zip"><?php _e('Postal/Zip Code:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_zip', ''); ?>
+        <input size="10" id="mp_shipping_info_zip" name="mp_shipping_info[zip]" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_country"><?php _e('Country:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_country', ''); ?>
+        <select id="mp_shipping_info_country" name="mp_shipping_info[country]">
+          <?php
+          foreach ($settings['shipping']['allowed_countries'] as $code) {
+            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
+          }
+          ?>
+        </select>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_shipping_info_phone"><?php _e('Phone Number:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_shipping_info_error_phone', ''); ?>
+  			<input size="20" id="mp_shipping_info_phone" name="mp_shipping_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
+      </tr>
     </table>
     <script type="text/javascript">
     function mp_copy_billing(prefix) {
-        _mp_profile_billing_fields = ['emal', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone'];
+      _mp_profile_billing_fields = ['emal', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone'];
 
-        for (_i=0; _i<_mp_profile_billing_fields.length; _i++) {
-                jQuery('form #'+prefix+'_'+_mp_profile_billing_fields[_i]).val(jQuery('form #mp_billing_info_'+_mp_profile_billing_fields[_i]).val());
-        }
+      for (_i=0; _i<_mp_profile_billing_fields.length; _i++) {
+        jQuery('form #'+prefix+'_'+_mp_profile_billing_fields[_i]).val(jQuery('form #mp_billing_info_'+_mp_profile_billing_fields[_i]).val());
+      }
     }
     </script>
     <?php
@@ -2960,7 +3026,7 @@ You can manage this order here: %s", 'mp');
 
     $subject = $this->filter_email($order, $settings['email']['shipped_order_subject']);
     $msg = $this->filter_email($order, $settings['email']['shipped_order_txt']);
-    $msg = apply_filters( 'mp_shipped_order_notification', $msg );
+    $msg = apply_filters( 'mp_shipped_order_notification', $msg, $order );
 
     wp_mail($order->mp_shipping_info['email'], $subject, $msg);
     
@@ -2984,7 +3050,7 @@ Link: %s
 Edit Product: %s
 Notification Preferences: %s', 'mp');
     $msg = sprintf($msg, get_the_title($product_id), number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
-    $msg = apply_filters( 'mp_low_stock_notification', $msg );
+    $msg = apply_filters( 'mp_low_stock_notification', $msg, $product_id );
 
     wp_mail(get_option('admin_email'), $subject, $msg);
 

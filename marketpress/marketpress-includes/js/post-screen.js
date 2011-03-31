@@ -2,8 +2,8 @@ jQuery(document).ready(function($) {
   var formfield;
 
   //open thickbox when button is clicked
-  jQuery('#mp_upload_button').click(function() {
-    formfield = jQuery('#mp_file');
+  $('#mp_upload_button').click(function() {
+    formfield = $('#mp_file');
 		tb_show('Upload A Product File', 'media-upload.php?TB_iframe=true');
 		return false;
 	});
@@ -13,8 +13,8 @@ jQuery(document).ready(function($) {
 	window.original_send_to_editor = window.send_to_editor;
 	window.send_to_editor = function(html){
 		if (formfield) {
-			fileurl = jQuery(html).attr('href');
-			jQuery(formfield).val(fileurl);
+			fileurl = $(html).attr('href');
+			$(formfield).val(fileurl);
       formfield = false;
 			tb_remove();
 		} else {
@@ -23,16 +23,49 @@ jQuery(document).ready(function($) {
 	};
 
   //remove formfield whenever thickbox is closed
-  jQuery('a.thickbox, #TB_overlay, #TB_imageOff, #TB_closeWindowButton, #TB_TopCloseWindowButton').click(function(){
+  $('a.thickbox, #TB_overlay, #TB_imageOff, #TB_closeWindowButton, #TB_TopCloseWindowButton').click(function(){
     formfield = false;
   });
 
   //checkbox toggle inventory field
-  jQuery('#mp_track_inventory').change(function(event){
+  $('#mp_track_inventory').change(function(event){
 		if(this.checked) {
-      jQuery('#mp_inventory_label').show();
+      $('#mp_inventory_label').show();
 		} else {
-      jQuery('#mp_inventory_label').hide();
+      $('#mp_inventory_label').hide();
     }
 	});
+
+	//setup del link html on load
+	var var_del_html = $('.variation:last .mp_var_remove').html();
+  $('.variation .mp_var_remove_last a').remove();
+  
+	//add new variation
+  $('#mp_add_vars').click(function() {
+
+    var var_html = '<tr class="variation">' + $('.variation:last').html() + '</tr>';
+    $('.variation:last .mp_var_remove a').remove();
+		$('.variation:last').after(var_html);
+		
+		//add back in remove link if missing
+		if ($('.variation:last .mp_var_remove').html() == '')
+      $('.variation:last .mp_var_remove').html(var_del_html);
+
+		//remove variation
+   	reg_remove_variation();
+		return false;
+	});
+
+	function reg_remove_variation() {
+		//remove variation
+	  $('.mp_var_remove a').click(function() {
+	    $('.variation:last').remove();
+	    //add back in remove link if missing
+			if ($('.variation').size() > 2 && $('.variation:last .mp_var_remove').html() == '')
+	      $('.variation:last .mp_var_remove').html(var_del_html);
+	    reg_remove_variation();
+			return false;
+		});
+	}
+	reg_remove_variation();
 });

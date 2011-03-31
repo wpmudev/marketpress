@@ -153,3 +153,22 @@ ul.mp-shortcode-options {
   list-style: disc outside none;
   margin-left: 25px;
 }
+.mp_var_name {
+	width: 100%;
+}
+td.mp_var_curr {
+	width: 75px;
+}
+#mp_add_vars {
+	text-align: right;
+}
+.mp_var_remove a {
+	color: red;
+	text-decoration: none;
+}
+td.mp_var_remove {
+	width: 3px;
+	padding: 0;
+	vertical-align: middle;
+	text-align: left;
+}
