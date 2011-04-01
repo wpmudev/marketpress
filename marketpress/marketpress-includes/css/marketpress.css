@@ -21,7 +21,7 @@ table tr.coupon-inactive {
 .widefat th#thumbnail {
   width: 75px;
 }
-.widefat td.column-pricing, .widefat td.column-shipping, .widefat td.column-product_categories, .widefat td.column-product_tags, .widefat td.column-sales, .widefat td.column-stock {
+.widefat td.column-pricing, .widefat td.column-shipping, .widefat td.column-product_categories, .widefat td.column-product_tags, .widefat td.column-sales, .widefat td.column-stock, .widefat td.column-sku, .widefat td.column-variations {
   vertical-align: middle;
 }
 .widefat th.column-sales, .widefat td.column-sales, .widefat th.column-stock, .widefat td.column-stock {
@@ -153,22 +153,56 @@ ul.mp-shortcode-options {
   list-style: disc outside none;
   margin-left: 25px;
 }
-.mp_var_name {
+
+.mp_var_col {
+	display: none;
+}
+.mp_var_col input, .mp_sku_col input {
 	width: 100%;
 }
-td.mp_var_curr {
+.mp_sku_col {
+	width: 120px;
+}
+td.mp_price_col {
 	width: 75px;
 }
+td.mp_sale_col {
+	width: 100px;
+}
+td.mp_price_col input, td.mp_sale_col input {
+	width: 65px;
+}
+td.mp_inv_col {
+	width: 100px;
+}
+td.mp_inv_col input {
+	width: 30px;
+	text-align: center;
+}
+
 #mp_add_vars {
 	text-align: right;
+	font-size: 14px;
+	margin-top: 5px;
+}
+#mp_add_vars a {
+  background: transparent url('../images/plus.gif') no-repeat scroll left center;
+  padding-left: 20px;
 }
 .mp_var_remove a {
-	color: red;
-	text-decoration: none;
+	text-indent: -9999px;
+	overflow: hidden;
+	background: transparent url('../images/remove.png') no-repeat scroll center center;
+	display: block;
+	width: 16px;
+	height: 16px;
 }
 td.mp_var_remove {
-	width: 3px;
-	padding: 0;
+	width: 16px;
 	vertical-align: middle;
 	text-align: left;
+}
+#mp_variation_message {
+	display: none;
+	margin-bottom: 5px;
 }

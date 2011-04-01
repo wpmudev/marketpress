@@ -155,7 +155,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * Echo any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
    */
-	function order_confirmation_msg($order) {
+	function order_confirmation_msg($content, $order) {
     global $mp;
     $settings = get_option('mp_settings');
     

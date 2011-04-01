@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 1.3.1
+Version: 2.0 Beta 1
 Plugin URI: http://premium.wpmudev.org/project/marketpress
 Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '1.3.1';
+  var $version = '2.0';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -92,7 +92,6 @@ class MarketPress {
 
 		//Meta boxes
 		add_action( 'add_meta_boxes_product', array(&$this, 'meta_boxes') );
-		add_action( 'add_meta_boxes_mp_order', array(&$this, 'meta_boxes') );
 		add_action( 'wp_insert_post', array(&$this, 'save_product_meta'), 10, 2 );
 
 		//Templates and Rewrites
@@ -131,7 +130,6 @@ class MarketPress {
 	}
 
   function install() {
-
     //skip if installed before
     if (get_option('mp_settings'))
       return;
@@ -1281,15 +1279,16 @@ Thanks again!", 'mp')
 		$columns['cb'] = '<input type="checkbox" />';
 		$columns['thumbnail'] = __('Thumbnail', 'mp');
 		$columns['title'] = __('Product Name', 'mp');
+		$columns['variations'] = __('Variations', 'mp');
 		$columns['sku'] = __('SKU', 'mp');
 		$columns['pricing'] = __('Price', 'mp');
+		if (!$settings['disable_cart']) {
+  		$columns['stock'] = __('Stock', 'mp');
+  		$columns['sales'] = __('Sales', 'mp');
+    }
 		$columns['product_categories'] = __('Product Categories', 'mp');
 		$columns['product_tags'] = __('Product Tags', 'mp');
 
-		if (!$settings['disable_cart']) {
-  		$columns['sales'] = __('Sales', 'mp');
-  		$columns['stock'] = __('Stock', 'mp');
-    }
 
     /*
     if ( !in_array( $post_status, array('pending', 'draft', 'future') ) )
@@ -1304,6 +1303,12 @@ Thanks again!", 'mp')
 		global $post;
 		$settings = get_option('mp_settings');
 		$meta = get_post_custom();
+    //unserialize
+    foreach ($meta as $key => $val) {
+		  $meta[$key] = maybe_unserialize($val[0]);
+		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+		    $meta[$key] = array($meta[$key]);
+		}
 
 		switch ($column) {
 			case "thumbnail":
@@ -1312,45 +1317,69 @@ Thanks again!", 'mp')
 				echo '</a>';
 				break;
 
+			case "variations":
+			  if (is_array($meta["mp_var_name"]) && count($meta["mp_var_name"]) > 1) {
+					foreach ($meta["mp_var_name"] as $value) {
+            echo esc_attr($value) . '<br />';
+					}
+				} else {
+					_e('N/A', 'mp');
+				}
+			  break;
+			  
       case "sku":
-				echo esc_attr($meta["mp_sku"][0]);
+			  if (is_array($meta["mp_var_name"])) {
+					foreach ((array)$meta["mp_sku"] as $value) {
+	          echo esc_attr($value) . '<br />';
+					}
+        } else {
+					_e('N/A', 'mp');
+				}
 				break;
 
       case "pricing":
-				if ($meta["mp_sale_price"][0]) {
-          echo '<del>'.$this->format_currency('', $meta["mp_price"][0]).'</del><br />';
-          echo $this->format_currency('', $meta["mp_sale_price"][0]);
+        if (is_array($meta["mp_price"])) {
+	        foreach ($meta["mp_price"] as $key => $value) {
+						if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
+		          echo '<del>'.$this->format_currency('', $value).'</del> ';
+		          echo $this->format_currency('', $meta["mp_sale_price"][$key]) . '<br />';
+		        } else {
+		          echo $this->format_currency('', $value) . '<br />';
+		        }
+	        }
         } else {
-          echo $this->format_currency('', $meta["mp_price"][0]);
-        }
+					echo $this->format_currency('', 0);
+				}
+				break;
+				
+      case "sales":
+				echo number_format_i18n(($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0);
 				break;
 
+      case "stock":
+				if ($meta["mp_track_inventory"]) {
+				  foreach ((array)$meta["mp_inventory"] as $value) {
+	          $inventory = ($value) ? $value : 0;
+	          if ($inventory == 0)
+	            $class = 'mp-inv-out';
+	          else if ($inventory <= $settings['inventory_threshhold'])
+	            $class = 'mp-inv-warn';
+	          else
+	            $class = 'mp-inv-full';
+
+	          echo '<span class="' . $class . '">' . number_format_i18n($inventory) . '</span><br />';
+          }
+        } else {
+          _e('N/A', 'mp');
+        }
+				break;
+				
 			case "product_categories":
         echo mp_category_list();
 				break;
 
       case "product_tags":
         echo mp_tag_list();
-				break;
-
-      case "sales":
-				echo number_format_i18n(($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0);
-				break;
-
-      case "stock":
-				if ($meta["mp_track_inventory"][0]) {
-          $inventory = ($meta["mp_inventory"][0]) ? $meta["mp_inventory"][0] : 0;
-          if ($inventory == 0)
-            $class = 'mp-inv-out';
-          else if ($inventory <= $settings['inventory_threshhold'])
-            $class = 'mp-inv-warn';
-          else
-            $class = 'mp-inv-full';
-
-          echo '<span class="' . $class . '">' . number_format_i18n($inventory) . '</span>';
-        } else {
-          _e('N/A', 'mp');
-        }
 				break;
 
       case "reviews":
@@ -1487,8 +1516,6 @@ Thanks again!", 'mp')
 
     //only add these boxes if orders are enabled
     if (!$settings['disable_cart']) {
-    
-      add_meta_box('mp-meta-variations', __('Product Variations', 'mp'), array(&$this, 'meta_variations'), 'product', 'normal', 'high');
       
       //only display metabox if shipping plugin ties into it
       if ( has_action('mp_shipping_metabox') )
@@ -1507,16 +1534,34 @@ Thanks again!", 'mp')
 
 		if ( $post->post_type == "product" && isset( $_POST['mp_product_meta'] ) ) {
       $meta = get_post_custom($post_id);
-      $price = round($_POST['mp_price'], 2);
-      $price = ($price) ? $price : 0;
-      update_post_meta($post_id, 'mp_price', $price);
-      update_post_meta($post_id, 'mp_sale_price', round($_POST['mp_sale_price'], 2));
-      update_post_meta($post_id, 'mp_sku', preg_replace('/[^a-zA-Z0-9_-]/', '', $_POST['mp_sku']));
+      foreach ($meta as $key => $val) {
+			  $meta[$key] = maybe_unserialize($val[0]);
+			  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+			    $meta[$key] = array($meta[$key]);
+			}
+
+      //price function
+      $func_curr = function($price) {
+	      $price = round($price, 2);
+	      return ($price) ? $price : 0;
+			};
+
+      //sku function
+      $func_sku = function($value) {
+	      return preg_replace('/[^a-zA-Z0-9_-]/', '', $value);
+			};
+
+      update_post_meta($post_id, 'mp_var_name', $_POST['mp_var_name']);
+      update_post_meta($post_id, 'mp_sku', array_map($func_sku, $_POST['mp_sku']));
+      update_post_meta($post_id, 'mp_price', array_map($func_curr, $_POST['mp_price']));
+      update_post_meta($post_id, 'mp_is_sale', (isset($_POST['mp_is_sale'])) ? 1 : 0);
+      update_post_meta($post_id, 'mp_sale_price', array_map($func_curr, $_POST['mp_sale_price']));
       update_post_meta($post_id, 'mp_track_inventory', (isset($_POST['mp_track_inventory'])) ? 1 : 0);
-      update_post_meta($post_id, 'mp_inventory', (int)$_POST['mp_inventory']);
-      //if changing delete flag so emails will be sent again
-      if ( (int)$_POST['mp_inventory'] != $meta['mp_track_inventory'][0] )
-        delete_post_meta($product_id, 'mp_stock_email_sent', 1);
+      update_post_meta($post_id, 'mp_inventory', array_map('intval', $_POST['mp_inventory']));
+
+			//if changing delete flag so emails will be sent again
+      if ( $_POST['mp_inventory'] != $meta['mp_inventory'] )
+        delete_post_meta($product_id, 'mp_stock_email_sent');
 
       update_post_meta( $post_id, 'mp_product_link', esc_url_raw($_POST['mp_product_link']) );
 
@@ -1544,90 +1589,71 @@ Thanks again!", 'mp')
     global $post;
     $settings = get_option('mp_settings');
 		$meta = get_post_custom($post->ID);
+  	//unserialize
+    foreach ($meta as $key => $val) {
+		  $meta[$key] = maybe_unserialize($val[0]);
+		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+		    $meta[$key] = array($meta[$key]);
+		}
     ?>
+    <span class="description" id="mp_variation_message"><?php _e('Note: Product variations are ignored for Downloadable or Externally Linked products', 'mp') ?></span>
     <input type="hidden" name="mp_product_meta" value="1" />
-    <div class="alignleft">
-      <label><?php _e('Price', 'mp'); ?>:<br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_price" name="mp_price" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></label>
-      <label><?php _e('Sale Price', 'mp'); ?>:<br /><small><?php _e('When set this overrides the normal price.', 'mp'); ?></small><br /><?php echo $this->format_currency(); ?><input type="text" size="6" id="mp_sale_price" name="mp_sale_price" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></label>
-    </div>
-    <div class="alignleft">
-      <label title="<?php _e('Stock Keeping Unit - Your custom Product ID number', 'mp'); ?>"><?php _e('SKU', 'mp'); ?>:<br /><input type="text" size="12" id="mp_sku" name="mp_sku" value="<?php echo esc_attr($meta["mp_sku"][0]); ?>" /></label>
-    </div>
-
-    <?php if (!$settings['disable_cart']) { ?>
-    <div class="alignleft">
-      <label><input type="checkbox" id="mp_track_inventory" name="mp_track_inventory" value="1"<?php checked($meta["mp_track_inventory"][0]); ?>" /> <?php _e('Track Inventory', 'mp'); ?></label>
-      <label id="mp_inventory_label"<?php echo ($meta["mp_track_inventory"][0]) ? '' : ' style="display: none;"'; ?>><?php _e('Quantity in Stock', 'mp'); ?>:<br /><input type="text" size="2" id="mp_inventory" name="mp_inventory" value="<?php echo esc_attr($meta["mp_inventory"][0]); ?>" /></label>
-    </div>
-    <?php } ?>
-
-    <div class="alignleft">
-      <label title="<?php _e('Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
-      <input type="text" size="20" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"][0]); ?>" /></label>
-    </div>
-
-    <?php do_action( 'mp_details_metabox' ); ?>
-    <div class="clear"></div>
-    <?php
-  }
-  
-  //The variations meta box
-  function meta_variations() {
-    global $post;
-    $settings = get_option('mp_settings');
-		$meta = get_post_custom($post->ID);
-		$mp_variations = maybe_unserialize($meta["mp_variations"]);
-		?>
-		<table class="widefat" id="mp_product_variations_table">
+    <table class="widefat" id="mp_product_variations_table">
 			<thead>
 				<tr>
-					<th scope="col"><?php _e('Name', 'mp') ?></th>
-					<th scope="col"><?php _e('Price', 'mp') ?></th>
-					<th scope="col"><?php _e('Sale Price', 'mp') ?></th>
+					<th scope="col" class="mp_var_col"><?php _e('Variation Name', 'mp') ?></th>
+					<th scope="col" class="mp_sku_col" title="<?php _e('Stock Keeping Unit - Your custom Product ID number', 'mp'); ?>"><?php _e('SKU', 'mp') ?></th>
+					<th scope="col" class="mp_price_col"><?php _e('Price', 'mp') ?></th>
+					<th scope="col" class="mp_sale_col"><label title="<?php _e('When checked these override the normal price.', 'mp'); ?>"><input type="checkbox" id="mp_is_sale" name="mp_is_sale" value="1"<?php checked($meta["mp_is_sale"], '1'); ?> /> <?php _e('Sale Price', 'mp') ?></label></th>
+					<th scope="col" class="mp_inv_col"><label title="<?php _e('When checked inventory tracking will be enabled.', 'mp'); ?>"><input type="checkbox" id="mp_track_inventory" name="mp_track_inventory" value="1"<?php checked($meta["mp_track_inventory"], '1'); ?> /> <?php _e('Inventory', 'mp') ?></label></th>
 					<th scope="col" class="mp_var_remove"></th>
 				</tr>
 			</thead>
 			<tbody>
 			<?php
-			  if ($mp_variations) {
-	        foreach ($mp_variations as $variation) {
+			  if ($meta["mp_price"]) {
+			    $count = 1;
+			    $last = count($meta["mp_price"]);
+	        foreach ($meta["mp_price"] as $key => $price) {
 		        ?>
 						<tr class="variation">
-							<td><input class="mp_var_name" type="text" name="mp_var_name[]" value="" /></td>
-							<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_price[]" value="<?php echo ($variation["price"]) ? $this->display_currency($variation["price"]) : '0.00'; ?>" /></td>
-							<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_sale_price[]" value="<?php echo ($variation["sale_price"]) ? $this->display_currency($variation["sale_price"]) : ''; ?>" /></td>
-							<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
+							<td class="mp_var_col"><input type="text" name="mp_var_name[]" value="<?php echo esc_attr($meta["mp_var_name"][$key]); ?>" /></td>
+							<td class="mp_sku_col"><input type="text" name="mp_sku[]" value="<?php echo esc_attr($meta["mp_sku"][$key]); ?>" /></td>
+							<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="<?php echo ($meta["mp_price"][$key]) ? $this->display_currency($meta["mp_price"][$key]) : '0.00'; ?>" /></td>
+							<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="<?php echo ($meta["mp_sale_price"][$key]) ? $this->display_currency($meta["mp_sale_price"][$key]) : $this->display_currency($meta["mp_price"][$key]); ?>" disabled="disabled" /></td>
+              <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="<?php echo intval($meta["mp_inventory"][$key]); ?>" disabled="disabled" /></td>
+							<td class="mp_var_remove">
+							<?php if ($count == $last) { ?><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a><?php } ?>
+							</td>
 						</tr>
-						<tr><td colspan="3" id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?> &raquo;</a></td></tr>
 						<?php
+						$count++;
 					}
-					?>
-					<tr><td colspan="4" id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?> &raquo;</a></td></tr>
-					<?php
 	      } else {
-	        ?>
+       		?>
 					<tr class="variation">
-						<td><input class="mp_var_name" type="text" name="mp_var_name[]" value="" /></td>
-						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_price[]" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></td>
-						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_sale_price[]" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></td>
-            <td class="mp_var_remove"></td>
+						<td class="mp_var_col"><input type="text" name="mp_var_name[]" value="" /></td>
+						<td class="mp_sku_col"><input type="text" name="mp_sku[]" value="" /></td>
+						<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="0.00" /></td>
+						<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="0.00" disabled="disabled" /></td>
+            <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
+						<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
 					</tr>
-     			<tr class="variation">
-						<td><input class="mp_var_name" type="text" name="mp_var_name[]" value="" /></td>
-						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_price[]" value="<?php echo ($meta["mp_price"][0]) ? $this->display_currency($meta["mp_price"][0]) : '0.00'; ?>" /></td>
-						<td class="mp_var_curr"><?php echo $this->format_currency(); ?><input type="text" size="6" name="mp_var_sale_price[]" value="<?php echo ($meta["mp_sale_price"][0]) ? $this->display_currency($meta["mp_sale_price"][0]) : ''; ?>" /></td>
-            <td class="mp_var_remove mp_var_remove_last"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
-					</tr>
-					<tr><td colspan="4" id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?> &raquo;</a></td></tr>
 					<?php
 	      }
 			?>
 			</tbody>
 		</table>
-		<?php
+		<div id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?></a></div>
 
-		//tie in for plugins
-    do_action( 'mp_variations_metabox', $mp_shipping, $settings );
+    <div id="mp_product_link_div">
+      <label title="<?php _e('Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
+      <input type="text" size="100" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"]); ?>" /></label>
+    </div>
+
+    <?php do_action( 'mp_details_metabox' ); ?>
+    <div class="clear"></div>
+    <?php
   }
   
   //The Shipping meta box
@@ -1662,16 +1688,25 @@ Thanks again!", 'mp')
   }
 
   //returns the calculated price adjusted for sales, formatted or not
-  function product_price($product_id, $format = false) {
+  function product_price($product_id, $variation = 0, $format = false) {
 
   	$meta = get_post_custom($product_id);
-
-  	if ($meta["mp_sale_price"][0]) {
-      $price = $meta["mp_sale_price"][0];
-    } else {
-      $price = $meta["mp_price"][0];
+    //unserialize
+    foreach ($meta as $key => $val) {
+		  $meta[$key] = maybe_unserialize($val[0]);
+		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+		    $meta[$key] = array($meta[$key]);
+		}
+		
+    if (is_array($meta["mp_price"])) {
+			if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$variation]) {
+        $price = $meta["mp_sale_price"][$variation];
+      } else {
+        $price = $meta["mp_price"][$variation];
+      }
     }
-
+    
+    $price = ($price) ? $price : 0;
     $price = $this->display_currency($price);
 
     $price = apply_filters( 'mp_product_price', $price, $product_id );
@@ -1731,7 +1766,9 @@ Thanks again!", 'mp')
 
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $global_cart = false) {
-    $settings = get_option('mp_settings');
+    global $blog_id;
+		$current_blog_id = $blog_id;
+		$settings = get_option('mp_settings');
 
     //get current cart contents
     if (!$global_cart)
@@ -1758,9 +1795,10 @@ Thanks again!", 'mp')
     //get total after any coupons
     $total_price = 0;
     foreach ($global_cart as $bid => $cart) {
-      if (is_multisite()) {
-	switch_to_blog($bid);
-      }
+
+			if (is_multisite())
+				switch_to_blog($bid);
+
       //get total after any coupons
       $totals = array();
       foreach ($cart as $product_id => $variations) {
@@ -1773,53 +1811,52 @@ Thanks again!", 'mp')
       
       $coupon_code = $this->get_coupon_code();
       if ( $coupon = $this->coupon_value($coupon_code, $total) )
-	$total = $coupon['new_total'];
+				$total = $coupon['new_total'];
   
       //add in shipping?
       if ( $settings['tax']['tax_shipping'] && ($shipping_price = $this->shipping_price()) )
-	$total = $total + $shipping_price;
+				$total = $total + $shipping_price;
   
       switch ($settings['base_country']) {
-	case 'US':
-	  //USA taxes are only for orders delivered inside the state
-	  if ($country == 'US' && $state == $settings['base_province'])
-	    $price = round($total * $settings['tax']['rate'], 2);
-	  break;
-  
-	case 'CA':
-	  //Canada tax is for all orders in country. We're assuming the rate is a combination of GST/PST/etc.
-	  if ($country == 'CA')
-	    $price = round($total * $settings['tax']['rate'], 2);
-	  break;
-  
-	case 'AU':
-	  //Australia taxes orders in country
-	  if ($country == 'AU')
-	    $price = round($total * $settings['tax']['rate'], 2);
-	  break;
-  
-	default:
-	  //EU countries charge VAT within the EU
-	  if ( in_array($settings['base_country'], $this->eu_countries) ) {
-	    if (in_array($country, $this->eu_countries))
-	      $price = round($total * $settings['tax']['rate'], 2);
-	  } else {
-	    //all other countries use the tax outside preference
-	    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country = $settings['base_country']))
-	      $price = round($total * $settings['tax']['rate'], 2);
-	  }
-	  break;
+				case 'US':
+				  //USA taxes are only for orders delivered inside the state
+				  if ($country == 'US' && $state == $settings['base_province'])
+				    $price = round($total * $settings['tax']['rate'], 2);
+				  break;
+
+				case 'CA':
+				  //Canada tax is for all orders in country. We're assuming the rate is a combination of GST/PST/etc.
+				  if ($country == 'CA')
+				    $price = round($total * $settings['tax']['rate'], 2);
+				  break;
+
+				case 'AU':
+				  //Australia taxes orders in country
+				  if ($country == 'AU')
+				    $price = round($total * $settings['tax']['rate'], 2);
+				  break;
+
+				default:
+				  //EU countries charge VAT within the EU
+				  if ( in_array($settings['base_country'], $this->eu_countries) ) {
+				    if (in_array($country, $this->eu_countries))
+				      $price = round($total * $settings['tax']['rate'], 2);
+				  } else {
+				    //all other countries use the tax outside preference
+				    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country = $settings['base_country']))
+				      $price = round($total * $settings['tax']['rate'], 2);
+				  }
+				  break;
       }
       if (empty($price))
-	$price = 0;
+				$price = 0;
       
       $price = apply_filters( 'mp_tax_price', $price, $total, $cart );
       $total_price += $price;
     }
     
-    if (is_multisite()) {
-      switch_to_blog($current_blog_id);
-    }
+    if (is_multisite())
+    	switch_to_blog($current_blog_id);
 
     if ($format)
       return $this->format_currency('', $total_price);
@@ -1835,7 +1872,7 @@ Thanks again!", 'mp')
     if (is_multisite()) {
       $settings = get_site_option('mp_network_settings');
       if ($settings['global_cart'] != 1) {
-	$cookie_id = 'mp_cart_' . $blog_id . '_' . COOKIEHASH;
+				$cookie_id = 'mp_cart_' . $blog_id . '_' . COOKIEHASH;
       }
     }
     if (isset($_COOKIE[$cookie_id])) {
@@ -1866,7 +1903,7 @@ Thanks again!", 'mp')
     if (is_multisite()) {
       $settings = get_site_option('mp_network_settings');
       if ($settings['global_cart'] != 1) {
-	$cookie_id = 'mp_cart_' . $blog_id . '_' . COOKIEHASH;
+				$cookie_id = 'mp_cart_' . $blog_id . '_' . COOKIEHASH;
       }
     }
     
@@ -1889,7 +1926,7 @@ Thanks again!", 'mp')
     if (is_multisite()) {
       $settings = get_site_option('mp_network_settings');
       if ($settings['global_cart'] == 1) {
-	$global_cart = $this->get_global_cart_cookie(); 
+				$global_cart = $this->get_global_cart_cookie();
       }
     }
     $global_cart[$blog_id] = $cart;
@@ -1904,6 +1941,7 @@ Thanks again!", 'mp')
   //returns the full array of cart contents
   function get_cart_contents($global_cart = false) {
     global $blog_id, $table_prefix;
+    $current_blog_id = $blog_id;
     
     //if not updating cache
     if ($global_cart === false) {
@@ -1916,32 +1954,55 @@ Thanks again!", 'mp')
     }
     
     $full_cart = array();
-    $current_blog_id = $blog_id;
     foreach ($global_cart as $bid => $cart) {
-      if (is_multisite()) {
+
+			if (is_multisite())
 				switch_to_blog($bid);
-      }
+      
       $full_cart[$bid] = array();
-      foreach ($cart as  $product_id => $variations) {
+      foreach ($cart as $product_id => $variations) {
 				$product = get_post($product_id);
 
 				if ( empty($product) ) {
 				  continue;
 				}
 
+        $full_cart[$bid][$product_id] = array();
 				foreach ($variations as $variation => $quantity) {
-					if ($variation == 0) {
-						$full_cart[$bid][$product_id][$variation] = array('SKU' => get_post_meta($product_id, 'mp_sku', true), 'name' => $product->post_title, 'price' => $this->product_price($product_id), 'quantity' => $quantity);
-					} else {
-						$full_cart[$bid][$product_id][$variation] = array('SKU' => get_post_meta($product_id, 'mp_variation_sku', true), 'name' => $product->post_title, 'price' => $this->product_variation_price($product_id), 'quantity' => $quantity);
+					//check stock
+          if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+						$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+	        	if ($stock[$variation] < $quantity) {
+	        	  $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of %1$s in stock. Your cart quantity has been changed to %2$s.", 'mp'), $product->post_title, number_format_i18n($stock[$variation])) );
+              $quantity = $stock[$variation];
+						}
 					}
+					
+					//check quota
+        	if (get_post_meta($product_id, 'mp_track_quota', true)) {
+	        	$quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
+			      if ($quota[$variation] && $quota[$variation] < $quantity) {
+		          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %1$s for %2$s. Your cart quantity has been changed to %1$s.", 'mp'), number_format_i18n($quota[$variation]), $product->post_title) );
+              $quantity = $quota[$variation];
+			      }
+		      }
+		      
+				  $skus = maybe_unserialize(get_post_meta($product_id, 'mp_sku', true));
+				  $var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
+				  if (is_array($var_names) && count($var_names) > 1)
+				    $name = $product->post_title . ': ' . $var_names[$variation];
+					else
+					  $name = $product->post_title;
+					  
+					$full_cart[$bid][$product_id][$variation] = array('SKU' => $skus[$variation], 'name' => $name, 'price' => $this->product_price($product_id, $variation), 'quantity' => $quantity);
 				}
 	
       }
     }
     
-    switch_to_blog($current_blog_id);
-    
+    if (is_multisite())
+    	switch_to_blog($current_blog_id);
+
     //save to cache
     $this->cart_cache = $full_cart;
     return $full_cart;
@@ -1949,9 +2010,9 @@ Thanks again!", 'mp')
 
   //receives a post and updates cookie variables for cart
   function update_cart($no_ajax = true) {
-    global $blog_id;
-    $current_blog_id = $blog_id;
-    $settings = get_option('mp_settings');
+		global $blog_id;
+		$current_blog_id = $blog_id;
+		$settings = get_option('mp_settings');
     
     $cart = $this->get_cart_cookie();
     
@@ -1971,44 +2032,36 @@ Thanks again!", 'mp')
       }
       
     } else if (isset($_POST['product_id'])) { //add a product to cart
-      //new quantity
-      if ($_POST['quantity'])
-        $quantity = intval($_POST['quantity']);
-      else
-        $quantity = 1;
-      
-      //if not valid product_id return
+
+			//if not valid product_id return
       $product_id = intval($_POST['product_id']);
       $product = get_post($product_id);
-      
       if (!$product)
         return false;
+
+			//get quantity
+      $quantity = (isset($_POST['quantity'])) ? intval($_POST['quantity']) : 1;
       
-      $variation = 0;
-      $variation_str = '';
-      if (isset($_POST['variation'])) {
-				$variation = $_POST['variation'];
-				$variation_str = '_variation';
-      }
+      //get variation
+      $variation = (isset($_POST['variation'])) ? intval($_POST['variation']) : 0;
       
       $new_quantity = $cart[$product_id][$variation] + $quantity;
       
       //check stock
-      if (get_post_meta($product_id, 'mp'.$variation_str.'_track_inventory', true)) {
-        $stock = get_post_meta($product_id, 'mp'.$variation_str.'_inventory', true);
-	
-        if ($stock < $new_quantity) {
+      if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+        $stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+        if ($stock[$variation] < $new_quantity) {
           if ($no_ajax !== true) {
-            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id]));
+            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id][$variation]));
             exit;
           } else {
-            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id])) );
+            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id][$variation])) );
             return false;
           }
         }
         //send ajax leftover stock
         if ($no_ajax !== true) {
-          $return = $stock-$new_quantity . '||';
+          $return = $stock[$variation]-$new_quantity . '||';
         }
       } else {
         //send ajax always stock if stock checking turned off
@@ -2017,22 +2070,17 @@ Thanks again!", 'mp')
         }
       }
       
-      $quota_tmp = get_post_meta($product_id, 'mp'.$variation_str.'_quota', false);
-      $quota = $quota_tmp[0];
-      
-      if ($quota && $quota < $new_quantity) {
-        if ($no_ajax !== true) {
-	  			echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title);
-          exit;
-        } else {
-          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title) );
-          return false;
-        }
-      }
-      
-      $variation = 0;
-      if (isset($_POST['variation'])) {
-				$variation = $_POST['variation'];
+      if (get_post_meta($product_id, 'mp_track_quota', true)) {
+	      $quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
+	      if ($quota[$variation] && $quota[$variation] < $new_quantity) {
+	        if ($no_ajax !== true) {
+		  			echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota[$variation]), $product->post_title);
+	          exit;
+	        } else {
+	          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota[$variation]), $product->post_title) );
+	          return false;
+	        }
+	      }
       }
       
       $cart[$product_id][$variation] = $new_quantity;
@@ -2053,41 +2101,37 @@ Thanks again!", 'mp')
       if (is_array($_POST['quant'])) {
         foreach ($_POST['quant'] as $pbid => $quant) {
 				  list($bid, $product_id, $variation) = split(':', $pbid);
-				  if (is_multisite()) {
+
+					if (is_multisite())
 				    switch_to_blog($bid);
-				  }
-				  $variation_str = '';
-				  if ($variation == 1) {
-				    $variation_str = '_variation';
-				  }
+
           if (intval($quant)) {
             //check stock
-            if (get_post_meta($product_id, 'mp'.$variation_str.'_track_inventory', true)) {
-              $stock = get_post_meta($product_id, 'mp'.$variation_str.'_inventory', true);
-              if ($stock < intval($quant)) {
-                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), number_format_i18n($stock-intval($quant)), get_the_title($product_id)) );
+            if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+              $stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+              if ($stock[$variation] < intval($quant)) {
+                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($stock[$variation]-intval($quant))) );
                 continue;
               }
             }
-	    
-				    $quota_tmp = get_post_meta($product_id, 'mp'.$variation_str.'_quota', false);
-				    $quota = $quota_tmp[0];
-				    if ($quota && $quota < $quant) {
-				      $product = get_post($product_id);
-				      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota), $product->post_title) );
-				      return false;
-				    }
-	    
+	          //check quota
+	    			if (get_post_meta($product_id, 'mp_track_quota', true)) {
+	            $quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
+					    if ($quota[$variation] && $quota[$variation] < intval($quant)) {
+					      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota[$variation]), get_the_title($product_id)) );
+	          		continue;
+					    }
+	          }
+	          
             $global_cart[$blog_id][$product_id][$variation] = intval($quant);
           } else {
             unset($global_cart[$blog_id][$product_id][$variation]);
           }
         }
 	
-				if (is_multisite()) {
-				  switch_to_blog($current_blog_id);
-				}
-	
+	    	if (is_multisite())
+    			switch_to_blog($current_blog_id);
+    			
         //save items to cookie
         $this->set_global_cart_cookie($global_cart);
       }
@@ -2096,14 +2140,9 @@ Thanks again!", 'mp')
       if (is_array($_POST['remove'])) {
         foreach ($_POST['remove'] as $pbid) {
 				  list($bid, $product_id, $variation) = split(':', $pbid);
-				  if (is_multisite()) {
-				    switch_to_blog($bid);
-				  }
           unset($global_cart[$blog_id][$product_id][$variation]);
         }
-				if (is_multisite()) {
-				  switch_to_blog($current_blog_id);
-				}
+
         //save items to cookie
         $this->set_global_cart_cookie($global_cart);
         $this->cart_update_message( __('Item(s) Removed', 'mp') );
@@ -2190,7 +2229,7 @@ Thanks again!", 'mp')
         foreach ($global_cart as $bid => $cart) {
 				  foreach ($cart as $product_id => $variations) {
 				    foreach ($variations as $data) {
-					$totals[] = $data['price'] * $data['quantity'];
+							$totals[] = $data['price'] * $data['quantity'];
 				    }
 				  }
         }

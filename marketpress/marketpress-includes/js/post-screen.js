@@ -27,18 +27,50 @@ jQuery(document).ready(function($) {
     formfield = false;
   });
 
-  //checkbox toggle inventory field
-  $('#mp_track_inventory').change(function(event){
-		if(this.checked) {
-      $('#mp_inventory_label').show();
+  //checkbox toggle sale field
+  if($('#mp_is_sale').is(':checked')) {
+    $('td.mp_sale_col input').removeAttr('disabled');
+	} else {
+    $('td.mp_sale_col input').attr('disabled', true);
+  }
+  $('#mp_is_sale').change(function() {
+    if(this.checked) {
+      $('td.mp_sale_col input').removeAttr('disabled');
 		} else {
-      $('#mp_inventory_label').hide();
+      $('td.mp_sale_col input').attr('disabled', true);
     }
 	});
 
+  //checkbox toggle inventory field
+  if($('#mp_track_inventory').is(':checked')) {
+    $('td.mp_inv_col input').removeAttr('disabled');
+	} else {
+    $('td.mp_inv_col input').attr('disabled', true);
+  }
+  $('#mp_track_inventory').change(function() {
+    if(this.checked) {
+      $('td.mp_inv_col input').removeAttr('disabled');
+		} else {
+      $('td.mp_inv_col input').attr('disabled', true);
+    }
+	});
+
+	//variation name hiding
+	function variation_check() {
+    if($('.variation').size() > 1) {
+      $('.mp_var_col').show();
+      $('#mp_variation_message').show();
+		} else {
+      $('.mp_var_col').hide();
+      $('#mp_variation_message').hide();
+    }
+	}
+  variation_check();
+
 	//setup del link html on load
 	var var_del_html = $('.variation:last .mp_var_remove').html();
-  $('.variation .mp_var_remove_last a').remove();
+	if ($('.variation').size() == 1)
+  	$('.variation:last .mp_var_remove a').remove();
   
 	//add new variation
   $('#mp_add_vars').click(function() {
@@ -48,9 +80,14 @@ jQuery(document).ready(function($) {
 		$('.variation:last').after(var_html);
 		
 		//add back in remove link if missing
-		if ($('.variation:last .mp_var_remove').html() == '')
+		if ($('.variation:last .mp_var_remove a'))
       $('.variation:last .mp_var_remove').html(var_del_html);
-
+    variation_check();
+    
+    $('.variation:last .mp_var_col input').val('').focus();
+    $('.variation:last .mp_sku_col input').val('');
+    $('.variation:last .mp_var_col input').val('');
+    
 		//remove variation
    	reg_remove_variation();
 		return false;
@@ -61,8 +98,10 @@ jQuery(document).ready(function($) {
 	  $('.mp_var_remove a').click(function() {
 	    $('.variation:last').remove();
 	    //add back in remove link if missing
-			if ($('.variation').size() > 2 && $('.variation:last .mp_var_remove').html() == '')
+			if ($('.variation').size() > 1 && $('.variation:last .mp_var_remove a'))
 	      $('.variation:last .mp_var_remove').html(var_del_html);
+	      
+      variation_check();
 	    reg_remove_variation();
 			return false;
 		});

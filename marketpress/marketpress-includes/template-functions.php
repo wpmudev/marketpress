@@ -172,7 +172,7 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
   $coupon_code = $mp->get_coupon_code();
 
   if ($type == 'checkout-edit') {
-    $content .= apply_filters('mp_cart_updated_msg', '');
+    $content .= apply_filters( 'mp_cart_updated_msg', '' );
     $content .= apply_filters( 'mp_checkout_error_checkout', '' );
     
     $content .= '<form id="mp_cart_form" method="post" action="">';
@@ -183,53 +183,26 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     
     $totals = array();
     foreach ($global_cart as $bid => $cart) {
-      if (is_multisite()) {
+
+			if (is_multisite())
         switch_to_blog($bid);
-      }
+
       foreach ($cart as $product_id => $variations) {
-        $vc = 0;
-        
         foreach ($variations as $variation => $data) {
           $totals[] = $data['price'] * $data['quantity'];
           
-          if ($vc == 0) {
-            $content .=  '<tr>';
-          } else {
-            $content .=  '<tr class="mp_sub_line">';
-          }
-          if ($settings['product_variations']) {
-            $colspan = 'colspan="3"';
-          } else {
-            $colspan = '';
-          }
-          if ($vc == 0) {
-            $content .=  '  <td class="mp_cart_col_thumb" >' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-            $content .=  '  <td class="mp_cart_col_product_table" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
-            if ($settings['product_variations']) {
-              $content .=  '  </tr>';
-              $content .=  '  <tr class="mp_sub_line">';
-            }
-          }
-          if ($settings['product_variations']) {
-            $content .=  '  <td>&nbsp;</td>';
-            if ($variation == 0) {
-              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
-            } else {
-              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
-            }
-          }
-          
+          $content .=  '<tr>';
+          $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-          $content .=  '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $blog_id . ':' . $product_id . ':'.$variation.']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $blog_id . ':' . $product_id . ':'.$variation.'" /> ' . __('Remove', 'mp') . '</label></td>';
-          
-          $vc++;
+          $content .=  '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $bid . ':' . $product_id . ':' . $variation . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $bid . ':' . $product_id . ':' . $variation . '" /> ' . __('Remove', 'mp') . '</label></td>';
           $content .=  '</tr>';
         }
       }
     }
-    if (is_multisite()) {
+    if (is_multisite())
       switch_to_blog($current_blog_id);
-    }
+
     $total = array_sum($totals);
       
     //coupon line
@@ -295,92 +268,71 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     
     $totals = array();
     foreach ($global_cart as $bid => $cart) {
-      if (is_multisite()) {
+
+			if (is_multisite())
         switch_to_blog($bid);
-      }
+
       foreach ($cart as $product_id => $variations) {
-        $vc = 0;
         foreach ($variations as $variation => $data) {
-          if ($vc == 0) {
-            $content .=  '<tr>';
-          } else {
-            $content .=  '<tr class="mp_sub_line">';
-          }
-          if ($settings['product_variations']) {
-            $colspan = 'colspan="3"';
-          } else {
-            $colspan = '';
-          }
-          if ($vc == 0) {
-            $content .=  '  <td class="mp_cart_col_thumb" >' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-            $content .=  '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-            if ($settings['product_variations']) {
-              $content .=  '  </tr>';
-              $content .=  '  <tr class="mp_sub_line">';
-            }
-          }
-          if ($settings['product_variations']) {
-            $content .=  '  <td>&nbsp;</td>';
-            if ($variation == 0) {
-              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
-            } else {
-              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
-            }
-          }
+          $content .=  '<tr>';
+          $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 75 ) . '</td>';
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-          $vc++;
           $content .=  '</tr>';
+          
           $totals[] = $data['price'] * $data['quantity'];
         }
       }
     }
-    if (is_multisite()) {
+    
+    if (is_multisite())
       switch_to_blog($current_blog_id);
-    }
+
     $total = array_sum($totals);
 
-      //coupon line
-      if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
-        $content .=  '</tr>';
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Discount:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
-        $content .=  '</tr>';
-        $total = $coupon['new_total'];
-      }
-
-      //shipping line
-      if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-        if (has_filter( 'mp_shipping_method_lbl' ))
-          $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
-        $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
-        $content .=  '</tr>';
-        $total = $total + $shipping_price;
-      }
-
-      //tax line
-      if ( ($tax_price = $mp->tax_price()) !== false ) {
-        $content .=  '<tr>';
-        $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Taxes:', 'mp') . '</td>';
-        $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
-        $content .=  '</tr>';
-        $total = $total + $tax_price;
-      }
-      
+    //coupon line
+    if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
       $content .=  '<tr>';
-      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Cart Total:', 'mp') . '</td>';
-      $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
       $content .=  '</tr>';
-      
-      $content .= '</tbody></table>';
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Discount:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
+      $content .=  '</tr>';
+      $total = $coupon['new_total'];
+    }
+
+    //shipping line
+    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
+      if (has_filter( 'mp_shipping_method_lbl' ))
+        $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
+      $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
+      $content .=  '</tr>';
+      $total = $total + $shipping_price;
+    }
+
+    //tax line
+    if ( ($tax_price = $mp->tax_price()) !== false ) {
+      $content .=  '<tr>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Taxes:', 'mp') . '</td>';
+      $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
+      $content .=  '</tr>';
+      $total = $total + $tax_price;
+    }
+    
+    $content .=  '<tr>';
+    $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Cart Total:', 'mp') . '</td>';
+    $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+    $content .=  '</tr>';
+    
+    $content .= '</tbody></table>';
       
   } else if ($type == 'widget') {
+  
     $content .= '<table class="mp_cart_contents_widget"><thead><tr>';
     $content .= '<th class="mp_cart_col_product" colspan="2">'.__('Item:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_quant">'.__('Qty:', 'mp').'</th>';
@@ -395,35 +347,11 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
         $vc = 0;
         foreach ($variations as $variation => $data) {
           $totals[] = $data['price'] * $data['quantity'];
-          if ($vc == 0) {
-            $content .=  '<tr>';
-          } else {
-            $content .=  '<tr class="mp_sub_line">';
-          }
-          if ($settings['product_variations']) {
-            $colspan = 'colspan="3"';
-          } else {
-            $colspan = '';
-          }
-          if ($vc == 0) {
-            $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
-            $content .=  '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a></td>';
-            if ($settings['product_variations']) {
-              $content .=  '  </tr>';
-              $content .=  '  <tr class="mp_sub_line">';
-            }
-          }
-          if ($settings['product_variations']) {
-            $content .=  '  <td>&nbsp;</td>';
-            if ($variation == 0) {
-              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
-            } else {
-              $content .=  '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
-            }
-          }
+          $content .=  '<tr>';
+          $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-          $vc++;
           $content .=  '</tr>';
         }
       }
@@ -1373,13 +1301,23 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 
   $settings = get_option('mp_settings');
 	$meta = get_post_custom($post_id);
-
-	if ($meta["mp_sale_price"][0]) {
-    $price = '<span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
-    $price .= '<span class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
-  } else {
-    $price = '<span class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
-  }
+  //unserialize
+  foreach ($meta as $key => $val) {
+	  $meta[$key] = maybe_unserialize($val[0]);
+	  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+	    $meta[$key] = array($meta[$key]);
+	}
+    
+  if (is_array($meta["mp_price"]) && count($meta["mp_price"]) == 1) {
+    if ($meta["mp_is_sale"] && $meta["mp_sale_price"][0]) {
+	    $price = '<span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
+	    $price .= '<span class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
+	  } else {
+	    $price = '<span class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
+	  }
+	} else {
+		return '';
+	}
 
   $price = '<span class="mp_product_price">' . $label . $price . '</span>';
 
@@ -1402,21 +1340,37 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   $post_id = ( NULL === $post_id ) ? $id : $post_id;
 
   $settings = get_option('mp_settings');
-
+  $meta = get_post_custom($post_id);
+  //unserialize
+  foreach ($meta as $key => $val) {
+	  $meta[$key] = maybe_unserialize($val[0]);
+	  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+	    $meta[$key] = array($meta[$key]);
+	}
+	
   //check stock
-  if (get_post_meta($post_id, 'mp_track_inventory', true)) {
-    $stock = get_post_meta($post_id, 'mp_inventory', true);
+  $no_inventory = array();
+  $all_out = false;
+  if ($meta['mp_track_inventory']) {
     $cart = $mp->get_cart_contents();
-    if ($stock <= $cart[$post_id]['quantity'])
-      $inventory = false;
-    else
-      $inventory = true;
-  } else {
-    $inventory = true;
+    if (is_array($cart[$post_id])) {
+	    foreach ($cart[$post_id] as $variation => $data) {
+	      if ($meta['mp_inventory'][$variation] <= $data['quantity'])
+	        $no_inventory[] = $variation;
+			}
+		} else {
+    	foreach ($meta['mp_inventory'] as $key => $stock) {
+	      if ($stock <= 0)
+	        $no_inventory[] = $key;
+			}
+		}
+		
+		if (count($no_inventory) >= count($meta["mp_price"]))
+		  $all_out = true;
   }
 
   //display an external link or form button
-  if ($product_link = get_post_meta($post_id, 'mp_product_link', true)) {
+  if ($product_link = $meta['mp_product_link'][0]) {
 
     if ($context == 'list') {
       if ($settings['list_button_type'] == 'addcart') {
@@ -1435,32 +1389,57 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   } else {
 
     $button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
-    
-    if ($inventory) {
-      $button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
 
-      if ($context == 'list') {
-        if ($settings['list_button_type'] == 'addcart') {
-          $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-          $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-        } else if ($settings['list_button_type'] == 'buynow') {
-          $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
-        }
-      } else {
-        //add quantity field
-        if ($settings['show_quantity']) {
-          $button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
-        }
-
-        if ($settings['product_button_type'] == 'addcart') {
-          $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-          $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-        } else if ($settings['product_button_type'] == 'buynow') {
-          $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
-        }
-      }
-    } else {
+    if ($all_out) {
       $button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
+    } else {
+
+	    $button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
+
+			//create select list if more than one variation
+		  if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1) {
+	      $variation_select = '<select class="mp_product_variations" name="variation">';
+				foreach ($meta["mp_price"] as $key => $value) {
+				  $disabled = (in_array($key, $no_inventory)) ? ' disabled="disabled"' : '';
+				  $variation_select .= '<option value="' . $key . '"' . $disabled . '>' . esc_html($meta["mp_var_name"][$key]) . ' - ';
+					if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
+		        $variation_select .= $mp->format_currency('', $meta["mp_sale_price"][$key]);
+		      } else {
+		        $variation_select .= $mp->format_currency('', $value);
+		      }
+		      $variation_select .= "</option>\n";
+		    }
+	      $variation_select .= "</select>&nbsp;\n";
+	 		} else {
+	      $button .= '<input type="hidden" name="variation" value="0" />';
+			}
+
+	    if ($context == 'list') {
+	      if ($variation_select) {
+        	$button .= '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Choose Option &raquo;', 'mp') . '</a>';
+	      } else if ($settings['list_button_type'] == 'addcart') {
+	        $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+	        $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+	      } else if ($settings['list_button_type'] == 'buynow') {
+	        $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+	      }
+	    } else {
+	    
+	      $button .= $variation_select;
+	      
+	      //add quantity field
+	      if ($settings['show_quantity']) {
+	        $button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
+	      }
+
+	      if ($settings['product_button_type'] == 'addcart') {
+	        $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+	        $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+	      } else if ($settings['product_button_type'] == 'buynow') {
+	        $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+	      }
+	    }
+	    
     }
     
     $button .= '</form>';

@@ -198,7 +198,7 @@ if(!class_exists('MP_Gateway_API')) {
       add_action( 'mp_payment_confirm_' . $this->plugin_name, array(&$this, 'process_payment'), 10, 2 );
       add_filter( 'mp_order_notification_' . $this->plugin_name, array(&$this, 'order_confirmation_email'), 10, 2 );
       add_action( 'mp_checkout_payment_pre_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation') );
-      add_filter( 'mp_checkout_payment_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation_msg'),10, 2 );
+      add_filter( 'mp_checkout_payment_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation_msg'), 10, 2 );
       add_action( 'mp_gateway_settings', array(&$this, 'gateway_settings_box') );
       add_filter( 'mp_gateway_settings_filter', array(&$this, 'process_gateway_settings') );
       add_action( 'mp_handle_payment_return_' . $this->plugin_name, array(&$this, 'process_ipn_return') );
