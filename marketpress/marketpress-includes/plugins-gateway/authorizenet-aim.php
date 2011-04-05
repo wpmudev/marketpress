@@ -24,6 +24,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
 
+	//whether if this is the only enabled gateway it can skip the payment_form step
+  var $skip_form = false;
+
   //credit card vars
   var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
     

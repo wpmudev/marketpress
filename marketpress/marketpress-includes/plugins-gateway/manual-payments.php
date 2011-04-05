@@ -27,6 +27,9 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
   
+	//whether if this is the only enabled gateway it can skip the payment_form step
+  var $skip_form = false;
+  
   /****** Below are the public methods you may overwrite via a plugin ******/
 
   /**

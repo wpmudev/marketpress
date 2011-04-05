@@ -24,6 +24,9 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
 
+	//whether if this is the only enabled gateway it can skip the payment_form step
+  var $skip_form = true;
+
   //credit card vars
   var $API_Username, $API_Password, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
     
@@ -61,9 +64,6 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     if (isset($_GET['2checkout_cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your 2Checkout transaction has been canceled.', 'mp') . '</div>';
     }
-    $settings = get_option('mp_settings');
-    ?>
-    <?php
   }
   
   function _print_year_dropdown($sel='', $pfp = false) {

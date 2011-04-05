@@ -27,6 +27,9 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
 
+	//whether if this is the only enabled gateway it can skip the payment_form step
+  var $skip_form = true;
+  
   //paypal vars
   var $API_Username, $API_Password, $API_Signature, $appId, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $paypalURL, $currencyCode, $locale;
     
@@ -78,11 +81,13 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   }
 
   /**
-   * Echo fields you need to add to the top of the payment screen, like your credit card info fields
+   * Echo fields you need to add to the payment screen, like your credit card info fields.
+   *  If you don't need to add form fields set $skip_form to true so this page can be skipped
+   *  at checkout.
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-	function payment_form($cart, $shipping_info) {
+  function payment_form($global_cart, $shipping_info) {
     if (isset($_GET['cancel']))
       echo '<div class="mp_checkout_error">' . __('Your PayPal transaction has been canceled.', 'mp') . '</div>';
   }
@@ -697,18 +702,30 @@ if ( is_multisite() ) {
     $admin_name = __('PayPal', 'mp');
 
   //register gateway plugin
-  mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', $admin_name );
+  mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', $admin_name, true );
   
   //tie into network settings form
 	add_action( 'mp_network_gateway_settings', 'mp_network_gateway_settings_box' );
 	
 	function mp_network_gateway_settings_box($settings) {
     global $mp;
-    
+        ?>
+    <script type="text/javascript">
+  	  jQuery(document).ready(function($) {
+        $("#gbl_gw_paypal-chained, #gw_full_paypal-chained, #gw_supporter_paypal-chained, #gw_none_paypal-chained").change(function() {
+          $("#mp-main-form").submit();
+    		});
+      });
+  	</script>
+		<?php
+		//skip if not enabled
+    if ($settings['allowed_gateways']['paypal-chained'] != 'full' && $settings['allowed_gateways']['paypal-chained'] != 'supporter' && $settings['global_gateway'] != 'paypal-chained')
+      $hide = true;
+
     if (!isset($settings['gateways']['paypal-chained']['msg']))
       $settings['gateways']['paypal-chained']['msg'] = __( 'Please be aware that we will deduct a ?% fee from the total of each transaction in addition to any fees PayPal may charge you. If for any reason you need to refund a customer for an order, please contact us with a screenshot of the refund receipt in your PayPal history as well as the Transaction ID of our fee deduction so we can issue you a refund. Thank you!', 'mp' );
     ?>
-    <div id="mp_paypal_adaptive" class="postbox">
+    <div id="mp_paypal_adaptive" class="postbox"<?php echo ($hide) ? ' style="display:none;"' : ''; ?>>
       <h3 class='hndle'><span><?php _e('PayPal Chained Payments Settings', 'mp'); ?></span></h3>
       <div class="inside">
         <span class="description"><?php _e('Using PayPal Chained Payments allows you as the multisite network owner to collect a predefined fee or percentage of all sales on network MarketPress stores! This is invisible to the customers who purchase items in a store, and all PayPal fees will be charged to the store owner. To use this option you must create API credentials, and you should make all other gateways unavailable or limited above.', 'mp') ?></span>

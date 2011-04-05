@@ -396,11 +396,20 @@ Thanks again!", 'mp')
     //load chosen plugin classes
     global $mp_gateway_plugins, $mp_gateway_active_plugins;
     $settings = get_option('mp_settings');
+    $network_settings = get_site_option( 'mp_network_settings' );
 
     foreach ((array)$mp_gateway_plugins as $code => $plugin) {
       $class = $plugin[0];
-      if ( in_array($code, (array)$settings['gateways']['allowed']) && class_exists($class) )
-        $mp_gateway_active_plugins[] = new $class;
+			//if global cart is enabled force it
+      if ( is_multisite() && $network_settings['global_cart'] ) {
+        if ( $code == $network_settings['global_gateway'] && class_exists($class) ) {
+          $mp_gateway_active_plugins[] = new $class;
+          break;
+				}
+      } else {
+	      if ( in_array($code, (array)$settings['gateways']['allowed']) && class_exists($class) )
+	        $mp_gateway_active_plugins[] = new $class;
+			}
     }
   }
 
@@ -657,13 +666,12 @@ Thanks again!", 'mp')
   function check_rewrite_rules($value) {
     $settings = get_option('mp_settings');
 
-    //prevent an infinite loop
+    //prevent an infinite loop by only
     if ( ! post_type_exists( 'product' ) )
-      return;
+      return $value;
 
-    $array_key = $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/([^/]+)/page/?([0-9]{1,})/?$';
-  	if ( !array_key_exists($array_key, $value) ) {
-      $this->flush_rewrite();
+		if ( !in_array('index.php?product=$matches[1]&paged=$matches[2]', $value) ) {
+			$this->flush_rewrite();
     }
   }
 
@@ -755,14 +763,14 @@ Thanks again!", 'mp')
       if ($this->checkout_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_checkout_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-	add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-	add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
-	add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-	add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99 );
         add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
       }
       
@@ -2249,17 +2257,32 @@ Thanks again!", 'mp')
         }
 
         if ($total > 0) {
-			    if (count($settings['gateways']['allowed']) > 1) {
+          //can we skip the payment form page?
+          $network_settings = get_site_option( 'mp_network_settings' );
+					if ( is_multisite() && $network_settings['global_cart'] ) {
+        		$skip = apply_filters('mp_payment_form_skip_' . $network_settings['global_gateway'], false);
+        		$global_cart = true;
+					} else {
+					  $skip = apply_filters('mp_payment_form_skip_' . $settings['gateways']['allowed'][0], false);
+        		$global_cart = false;
+					}
+			    if ( (!$global_cart && count((array)$settings['gateways']['allowed']) > 1) || !$skip ) {
 			      wp_safe_redirect(mp_checkout_step_url('checkout'));
 			      exit;
 			    } else {
-			      $_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
+			      if ( is_multisite() && $network_settings['global_cart'] )
+			      	$_SESSION['mp_payment_method'] = $network_settings['global_gateway'];
+						else
+			      	$_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
 			      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
 			      //if no errors send to next checkout step
 			      if ($this->checkout_error == false) {
 							wp_safe_redirect(mp_checkout_step_url('confirm-checkout'));
 							exit;
-			      }
+			      } else {
+              wp_safe_redirect(mp_checkout_step_url('checkout'));
+			      	exit;
+						}
 			    }
         } else { //empty price, create order already
 

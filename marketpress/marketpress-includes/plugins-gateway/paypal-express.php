@@ -26,6 +26,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
+
+  //whether if this is the only enabled gateway it can skip the payment_form step
+  var $skip_form = true;
   
   // Payment action
   var $payment_action = 'Sale';
@@ -60,7 +63,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   	    $this->currencyCode = $settings['gateways']['paypal-express']['currency'];
   	    $this->locale = $settings['gateways']['paypal-express']['locale'];
         $this->returnURL = mp_checkout_step_url('confirm-checkout');
-	    $this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
+	    	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
   	    $this->version = "63.0"; //api version
 
         //set api urls
@@ -74,8 +77,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     }
   }
 
-  /**
-   * Echo fields you need to add to the top of the payment screen, like your credit card info fields
+	/**
+   * Echo fields you need to add to the payment screen, like your credit card info fields.
+   *  If you don't need to add form fields set $skip_form to true so this page can be skipped
+   *  at checkout.
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
@@ -1087,5 +1092,5 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 }
 
 //register shipping plugin
-mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal-express', __('PayPal Express Checkout', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal-express', __('PayPal Express Checkout', 'mp'), true );
 ?>

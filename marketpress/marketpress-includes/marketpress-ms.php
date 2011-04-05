@@ -57,7 +57,7 @@ class MarketPress_MS {
 	}
 
   function install() {
-    global $wpdb, $mp;
+    global $wpdb, $current_site, $mp;
 
     //check if installed
     if ( get_site_option( "mp_network_settings" ) )
@@ -103,17 +103,20 @@ class MarketPress_MS {
 		$wpdb->query( $table_3 );
 		
 		$default_settings = array(
-      'main_blog' => 1,
-      'global_cart' => 1,
+      'main_blog' => $current_site->blog_id,
+      'global_cart' => 0,
       'allowed_gateways' => array(
         'paypal-express' => 'full',
         'paypal-chained' => 'none',
+        'paypal-pro' => 'none',
         'authorizenet-aim' => 'none',
         'authorizenet-sim' => 'full',
         'google-checkout' => 'full',
-        '2-checkout' => 'full',
-        'manual-payment' => 'full'
+        '2checkout' => 'full',
+        'manual-payment' => 'full',
+        'moneybookers' => 'full'
       ),
+			'global_gateway' => 'paypal-express',
       'allowed_themes' => array(
         'classic' => 'full',
         'modern' => 'full',
@@ -504,6 +507,9 @@ class MarketPress_MS {
       echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
     }
     $settings = get_site_option( 'mp_network_settings' );
+    
+    if (!isset($settings['global_cart']))
+      $settings['global_cart'] = 0;
     ?>
     <div class="wrap">
     <div class="icon32"><img src="<?php echo $mp->plugin_url . 'images/settings.png'; ?>" /></div>
@@ -512,28 +518,56 @@ class MarketPress_MS {
       <form id="mp-main-form" method="post" action="">
         <input type="hidden" name="marketplace_network_settings" value="1" />
 
+        <script type="text/javascript">
+      	  jQuery(document).ready(function($) {
+            $(".mp_change_submit").change(function() {
+              $("#mp-main-form").submit();
+        		});
+          });
+      	</script>
         <div class="postbox">
           <h3 class='hndle'><span><?php _e('General Settings', 'mp') ?></span></h3>
           <div class="inside">
             <table class="form-table">
               <tr>
-      		<th scope="row"><?php _e('Limit Global Widgets/Shortcodes To Main Blog', 'mp'); ?></th>
-      		<td><label><input value="1" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-		    <label><input value="0" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 0) ?> /> <?php _e('No', 'mp') ?></label>
-        	</td>
-              </tr>
-	      <tr>
-      		<th scope="row"><?php _e('Global shopping cart', 'mp'); ?></th>
-      		<td>
-		  <label><input value="1" name="mp[global_cart]" type="radio"<?php checked($settings['global_cart'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-		  <label><input value="0" name="mp[global_cart]" type="radio"<?php checked($settings['global_cart'], 0) ?> /> <?php _e('No', 'mp') ?></label>
-        	</td>
+			      		<th scope="row"><?php _e('Limit Global Widgets/Shortcodes To Main Blog', 'mp'); ?></th>
+			      		<td>
+									<label><input value="1" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+					    		<label><input value="0" name="mp[main_blog]" type="radio"<?php checked($settings['main_blog'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+			        	</td>
+			        </tr>
+				      <tr>
+			      		<th scope="row"><?php _e('Enable Global shopping cart', 'mp'); ?></th>
+			      		<td>
+								  <label><input class="mp_change_submit" value="1" name="mp[global_cart]" type="radio"<?php checked($settings['global_cart'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+								  <label><input class="mp_change_submit" value="0" name="mp[global_cart]" type="radio"<?php checked($settings['global_cart'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+			        	</td>
               </tr>
             </table>
           </div>
         </div>
-        
-        <div class="postbox">
+
+        <div class="postbox"<?php echo ($settings['global_cart']) ? '' : ' style="display:none;"'; ?>>
+          <h3 class='hndle'><span><?php _e('Global Gateway', 'mp') ?></span> - <span class="description"><?php _e('With the global cart enabled, you must select only one compatible gateway to be used network wide.', 'mp') ?></span></h3>
+          <div class="inside">
+            <table class="form-table">
+              <tr>
+      				<th scope="row"><?php _e('Select a Gateway', 'mp') ?></th>
+      				<td><?php
+              foreach ((array)$mp_gateway_plugins as $code => $plugin) {
+								//skip non global plugins
+								if (!$plugin[2])
+                  continue;
+              ?>
+              <label><input value="<?php echo $code; ?>" id="gbl_gw_<?php echo $code; ?>" name="mp[global_gateway]" type="radio"<?php checked($settings['global_gateway'], $code) ?> /> <?php echo $plugin[1]; ?></label><br />
+              <?php } ?>
+							</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="postbox"<?php echo ($settings['global_cart']) ? ' style="display:none;"' : ''; ?>>
           <h3 class='hndle'><span><?php _e('Gateway Permissions', 'mp') ?></span> - <span class="description"><?php _e('Set payment gateway access permissions for network stores. The main site will maintain access to all gateways.', 'mp') ?></span></h3>
           <div class="inside">
             <table class="form-table">
@@ -544,14 +578,16 @@ class MarketPress_MS {
               <tr>
       				<th scope="row"><?php echo $plugin[1]; ?></th>
       				<td>
-              <label><input value="full" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
+              <label><input value="full" id="gw_full_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
               <?php if (function_exists('is_supporter')) { ?>
-              <label><input value="supporter" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
+              <label><input value="supporter" id="gw_supporter_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
               <?php } ?>
-              <label><input value="none" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
+              <label><input value="none" id="gw_none_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
               </td>
               </tr>
-              <?php } ?>
+              <?php
+							}
+							?>
             </table>
           </div>
         </div>

@@ -27,6 +27,9 @@ if(!class_exists('MP_Gateway_API')) {
     //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
     var $ipn_url;
     
+    //whether if this is the only enabled gateway it can skip the payment_form step
+    var $skip_form = false;
+    
     /****** Below are the public methods you may overwrite via a plugin ******/
 
     /**
@@ -36,7 +39,9 @@ if(!class_exists('MP_Gateway_API')) {
     }
 
     /**
-     * Echo fields you need to add to the payment screen, like your credit card info fields
+     * Echo fields you need to add to the payment screen, like your credit card info fields.
+     *  If you don't need to add form fields set $skip_form to true so this page can be skipped
+     *  at checkout.
      *
      * @param array $shipping_info. Contains shipping info and email in case you need it
      */
@@ -137,7 +142,12 @@ if(!class_exists('MP_Gateway_API')) {
       $settings = get_option('mp_settings');
       $this->ipn_url = home_url($settings['slugs']['store'] . '/payment-return/' . $this->plugin_name);
     }
-		
+    
+		//populates ipn_url var
+		function _payment_form_skip($var) {
+			return $this->skip_form;
+    }
+    
 		//creates the payment method selections
 		function _payment_form_wrapper($cart, $shipping_info) {
       global $mp, $mp_gateway_active_plugins;
@@ -193,6 +203,7 @@ if(!class_exists('MP_Gateway_API')) {
 
       add_action( 'mp_checkout_payment_form', array(&$this, '_payment_form_wrapper'), 10, 2 );
       add_action( 'template_redirect', array(&$this, '_checkout_confirmation_hook') );
+      add_filter( 'mp_payment_form_skip_' . $this->plugin_name, array(&$this, '_payment_form_skip') );
       add_action( 'mp_payment_submit_' . $this->plugin_name, array(&$this, 'process_payment_form'), 10, 2 );
       add_filter( 'mp_checkout_confirm_payment_' . $this->plugin_name, array(&$this, 'confirm_payment_form'), 10, 2 );
       add_action( 'mp_payment_confirm_' . $this->plugin_name, array(&$this, 'process_payment'), 10, 2 );
@@ -213,16 +224,17 @@ if(!class_exists('MP_Gateway_API')) {
  * @param string $plugin_name - the sanitized private name for your plugin
  * @param string $class_name - the case sensitive name of your plugin class
  * @param string $admin_name - pretty name of your gateway, for the admin side.
+ * @param bool $global optional - whether the gateway supports global checkouts
  */
-function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name) {
+function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name, $global = false) {
   global $mp_gateway_plugins;
   
-  if(!is_array($mp_gateway_plugins)) {
+  if (!is_array($mp_gateway_plugins)) {
 		$mp_gateway_plugins = array();
 	}
 	
-	if(class_exists($class_name)) {
-		$mp_gateway_plugins[$plugin_name] = array($class_name, $admin_name);
+	if (class_exists($class_name)) {
+		$mp_gateway_plugins[$plugin_name] = array($class_name, $admin_name, $global);
 	} else {
 		return false;
 	}
