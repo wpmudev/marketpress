@@ -162,15 +162,19 @@ function mp_popular_products( $echo = true, $num = 5 ) {
 
 
 //Prints cart table, for internal use
-function _mp_cart_table($global_cart, $type = 'checkout') {
+function _mp_cart_table($type = 'checkout', $echo = false) {
   global $mp, $blog_id;
-  $content = "";
+  $blog_id = (is_multisite()) ? $blog_id : 1;
   $settings = get_option('mp_settings');
   $current_blog_id = $blog_id;
-  
-  //get coupon code
-  $coupon_code = $mp->get_coupon_code();
 
+	$global_cart = $mp->get_cart_contents();
+  if (!$mp->global_cart)  //get subset if needed
+  	$selected_cart[$blog_id] = $global_cart[$blog_id];
+  else
+    $selected_cart = $global_cart;
+  
+  $content = '';
   if ($type == 'checkout-edit') {
     $content .= apply_filters( 'mp_cart_updated_msg', '' );
     $content .= apply_filters( 'mp_checkout_error_checkout', '' );
@@ -182,7 +186,9 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     $content .= '<th class="mp_cart_col_quant">'.__('Quantity:', 'mp').'</th></tr></thead><tbody>';
     
     $totals = array();
-    foreach ($global_cart as $bid => $cart) {
+    $shipping_prices = array();
+    $tax_prices = array();
+    foreach ($selected_cart as $bid => $cart) {
 
 			if (is_multisite())
         switch_to_blog($bid);
@@ -199,13 +205,21 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
           $content .=  '</tr>';
         }
       }
+      
+      if ( ($shipping_price = $mp->shipping_price()) !== false )
+        $shipping_prices[] = $shipping_price;
+        
+      if ( ($tax_price = $mp->tax_price()) !== false )
+        $tax_prices[] = $tax_price;
     }
+    //go back to original blog
     if (is_multisite())
       switch_to_blog($current_blog_id);
 
     $total = array_sum($totals);
       
-    //coupon line
+    //coupon line TODO - figure out how to apply them on global checkout
+	  $coupon_code = $mp->get_coupon_code();
     if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
@@ -232,8 +246,8 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     }
     
     //shipping line
-    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-      if (has_filter( 'mp_shipping_method_lbl' ))
+    if ( $shipping_price = array_sum($shipping_prices) ) {
+      if (!$mp->global_cart && has_filter( 'mp_shipping_method_lbl' ))
         $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
@@ -244,7 +258,7 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     }
     
     //tax line
-    if ( ($tax_price = $mp->tax_price()) !== false ) {
+    if ( $tax_price = array_sum($tax_prices) ) {
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Taxes:', 'mp') . '</td>';
       $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
@@ -260,32 +274,42 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     $content .=  '</tr></tfoot>';
     
     $content .= '</tbody></table></form>';
+    
   } else if ($type == 'checkout') {
+  
     $content .= '<table class="mp_cart_contents"><thead><tr>';
     $content .= '<th class="mp_cart_col_product" colspan="2">'.__('Item:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_quant">'.__('Qty:', 'mp').'</th>';
     $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th></tr></thead><tbody>';
-    
+
     $totals = array();
-    foreach ($global_cart as $bid => $cart) {
+    $shipping_prices = array();
+    $tax_prices = array();
+    foreach ($selected_cart as $bid => $cart) {
 
 			if (is_multisite())
         switch_to_blog($bid);
 
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
+          $totals[] = $data['price'] * $data['quantity'];
+
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 75 ) . '</td>';
           $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
           $content .=  '</tr>';
-          
-          $totals[] = $data['price'] * $data['quantity'];
         }
       }
+
+      if ( ($shipping_price = $mp->shipping_price()) !== false )
+        $shipping_prices[] = $shipping_price;
+
+      if ( ($tax_price = $mp->tax_price()) !== false )
+        $tax_prices[] = $tax_price;
     }
-    
+    //go back to original blog
     if (is_multisite())
       switch_to_blog($current_blog_id);
 
@@ -305,18 +329,16 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     }
 
     //shipping line
-    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-      if (has_filter( 'mp_shipping_method_lbl' ))
-        $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
+    if ( $shipping_price = array_sum($shipping_prices) ) {
       $content .=  '<tr>';
-      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
+      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . '</td>';
       $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
       $content .=  '</tr>';
       $total = $total + $shipping_price;
     }
 
     //tax line
-    if ( ($tax_price = $mp->tax_price()) !== false ) {
+    if ( $tax_price = array_sum($tax_prices) ) {
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Taxes:', 'mp') . '</td>';
       $content .=  '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
@@ -339,12 +361,12 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
     $content .= '<th class="mp_cart_col_price">'.__('Price:', 'mp').'</th></tr></thead><tbody>';
     
     $totals = array();
-    foreach ($global_cart as $bid => $cart) {
-      if (is_multisite()) {
+    foreach ($selected_cart as $bid => $cart) {
+
+			if (is_multisite())
         switch_to_blog($bid);
-      }
+
       foreach ($cart as $product_id => $variations) {
-        $vc = 0;
         foreach ($variations as $variation => $data) {
           $totals[] = $data['price'] * $data['quantity'];
           $content .=  '<tr>';
@@ -356,23 +378,29 @@ function _mp_cart_table($global_cart, $type = 'checkout') {
         }
       }
     }
-    if (is_multisite()) {
+
+		if (is_multisite())
       switch_to_blog($current_blog_id);
-    }
+
     $total = array_sum($totals);
 
-      $content .=  '<tr>';
-      $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-      $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
-      $content .=  '</tr>';
-      
-      $content .= '</tbody></table>';
+    $content .=  '<tr>';
+    $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
+    $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
+    $content .=  '</tr>';
+    
+    $content .= '</tbody></table>';
   }
-  return $content;
+
+  if ($echo) {
+    echo $content;
+  } else {
+    return $content;
+  }
 }
 
 //Prints cart login/register form, for internal use
-function _mp_cart_login($echo = true) {
+function _mp_cart_login($echo = false) {
   global $mp;
   
   $content = '';
@@ -391,7 +419,7 @@ function _mp_cart_login($echo = true) {
     $content .= '<tbody>';
     $content .= '<tr>';
     $content .= '<td class="mp_cart_login">';
-    $content .= '<form name="loginform" id="loginform" action="<?php echo wp_login_url(); ?>" method="post">';
+    $content .= '<form name="loginform" id="loginform" action="' . wp_login_url() .'" method="post">';
     $content .= '<label>'.__('Username', 'mp').'<br />';
     $content .= '<input type="text" name="log" id="user_login" class="input" value="" size="20" /></label>';
     $content .= '<br />';
@@ -417,15 +445,15 @@ function _mp_cart_login($echo = true) {
 }
 
 //Prints cart shipping form, for internal use
-function _mp_cart_shipping($editable = false, $echo = true) {
+function _mp_cart_shipping($editable = false, $echo = false) {
   global $mp, $current_user;
   $settings = get_option('mp_settings');
   
   $meta = get_user_meta($current_user->ID, 'mp_shipping_info');
-  $meta = $meta[0]; //offset
+
   //get address
-  $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : isset($meta['email'])?$meta['email']:$current_user->user_email;
-  $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : isset($meta['name'])?$meta['name']:$current_user->user_firstname . ' ' . $current_user->user_lastname;
+  $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : isset($meta['email']) ? $meta['email']: $current_user->user_email;
+  $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname;
   $address1 = (!empty($_SESSION['mp_shipping_info']['address1'])) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
   $address2 = (!empty($_SESSION['mp_shipping_info']['address2'])) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
   $city = (!empty($_SESSION['mp_shipping_info']['city'])) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
@@ -517,7 +545,9 @@ function _mp_cart_shipping($editable = false, $echo = true) {
     $content .= '<input type="submit" name="mp_shipping_submit" id="mp_shipping_submit" value="'.__('Continue Checkout &raquo;', 'mp').'" />';
     $content .= '</p>';
     $content .= '</form>';
-  } else {
+    
+  } else { //is not editable
+  
     $content .= '<table class="mp_cart_shipping">';
     $content .= '<thead><tr>';
     $content .= '<th>'.__('Shipping Information:', 'mp').'</th>';
@@ -585,9 +615,15 @@ function _mp_cart_shipping($editable = false, $echo = true) {
 }
 
 //Prints cart payment gateway form, for internal use
-function _mp_cart_payment($type, $echo = true) {
-  global $mp, $mp_gateway_active_plugins;
-  $cart = $mp->get_cart_contents();
+function _mp_cart_payment($type, $echo = false) {
+  global $mp, $blog_id, $mp_gateway_active_plugins;
+  $blog_id = (is_multisite()) ? $blog_id : 1;
+
+	$global_cart = $mp->get_cart_contents();
+  if ($mp->global_cart)
+	  $cart = $global_cart;
+	else
+  	$cart = $global_cart[$blog_id];
   
   $content = '';
   if ($type == 'form') {
@@ -619,7 +655,9 @@ function _mp_cart_payment($type, $echo = true) {
     $content .= apply_filters( 'mp_checkout_payment_form', $cart, $_SESSION['mp_shipping_info'] );
 
     $content .= '</form>';
+    
   } else if ($type == 'confirm') {
+  
     //if skipping a step
     if (empty($_SESSION['mp_payment_method'])) {
       $content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
@@ -633,6 +671,7 @@ function _mp_cart_payment($type, $echo = true) {
     $content .= '<input type="submit" name="mp_payment_confirm" id="mp_payment_confirm" value="'.__('Confirm Payment &raquo;', 'mp').'" />';
     $content .= '</p>';
     $content .= '</form>';
+    
   } else if ($type == 'confirmation') {
 
     //if skipping a step
@@ -662,32 +701,26 @@ function _mp_cart_payment($type, $echo = true) {
 /**
  * Echos the current shopping cart contents. Use in the cart template.
  *
- * @param bool $context Optional. Possible values: widget, checkout
+ * @param string $context Optional. Possible values: widget, checkout
+ * @param string $checkoutstep Optional. Possible values: checkout-edit, shipping, checkout, confirm-checkout, confirmation
+ * @param bool $echo Optional. default true
  */
-function mp_show_cart($context = '', $checkoutstep = null) {
-  global $mp;
-  
+function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
+  global $mp, $blog_id;
   $settings = get_option('mp_settings');
-  $global_settings = get_site_option( 'mp_network_settings' );
-  
-  $cart = $mp->get_cart_contents();
-  
-  $content = "";
+
+  $content = '';
   
   if ( $checkoutstep == null )
     $checkoutstep = get_query_var( 'checkoutstep' );
 
-  if ((is_array($cart) && count($cart)) || $checkoutstep == 'confirmation') {
+  if ( mp_items_in_cart() || $checkoutstep == 'confirmation') {
 
     if ($context == 'widget') {
-      $content .= _mp_cart_table($cart, 'widget');
+      $content .= _mp_cart_table('widget');
       $content .= '<div class="mp_cart_actions_widget">';
       $content .= '<a class="mp_empty_cart" href="'.mp_cart_link(false, true).'?empty-cart=1" title="'.__('Empty your shopping cart', 'mp').'">'.__('Empty Cart', 'mp').'</a>';
-      if ($global_settings['global_cart'] == 1) {
-        $content .= '<a class="mp_checkout_link" href="'.mp_global_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
-      } else {
-        $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
-      }
+      $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
       $content .= '</div>';
     } else if ($context == 'checkout') {
         
@@ -699,49 +732,50 @@ function mp_show_cart($context = '', $checkoutstep = null) {
 
         case 'shipping':
           $content .= $settings['msg']['shipping'];
-          $content .= _mp_cart_shipping(true, false);
+          $content .= _mp_cart_shipping(true);
           break;
 
         case 'checkout':
           $content .=  $settings['msg']['checkout'];
-          $content .= _mp_cart_payment('form', false);
+          $content .= _mp_cart_payment('form');
           break;
 
         case 'confirm-checkout':
           $content .=  $settings['msg']['confirm_checkout'];
-          $content .= _mp_cart_table($cart, 'checkout', false);
-          $content .= _mp_cart_shipping(false, false);
-          $content .= _mp_cart_payment('confirm', false);
+          $content .= _mp_cart_table('checkout');
+          $content .= _mp_cart_shipping(false);
+          $content .= _mp_cart_payment('confirm');
           break;
 
         case 'confirmation':
           $content .=  $settings['msg']['success'];
-          $content .= _mp_cart_payment('confirmation', false);
+          $content .= _mp_cart_payment('confirmation');
           break;
 
         default:
           $content .= $settings['msg']['cart'];
-          $content .= _mp_cart_table($cart, 'checkout-edit', false);
+          $content .= _mp_cart_table('checkout-edit');
           $content .= _mp_cart_login(false);
           break;
       }
 
     } else {
-      $content .= _mp_cart_table($cart, 'checkout');
+      $content .= _mp_cart_table('checkout');
       $content .= '<div class="mp_cart_actions">';
       $content .= '<a class="mp_empty_cart" href="'.mp_cart_link(false, true).'?empty-cart=1" title="'.__('Empty your shopping cart', 'mp').'">'.__('Empty Cart', 'mp').'</a>';
-      if ($global_settings['global_cart'] == 1) {
-        $content .= '<a class="mp_checkout_link" href="'.mp_global_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
-      } else {
-        $content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
-      }
+			$content .= '<a class="mp_checkout_link" href="'.mp_cart_link(false, true).'" title="'.__('Go To Checkout Page', 'mp').'">'.__('Checkout &raquo;', 'mp').'</a>';
       $content .= '</div>';
     }
   } else {
     $content .= '<div class="mp_cart_empty">'.__('There are no items in your cart.', 'mp').'</div>';
     $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="'.mp_store_link(false, true).'">'.__('Browse Products &raquo;', 'mp').'</a></div>';
   }
-  return $content;
+
+  if ($echo) {
+    echo $content;
+  } else {
+    return $content;
+  }
 }
 
 /**
@@ -1526,35 +1560,23 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 }
 
 /**
- * Echos the current shopping cart link.
+ * Echos the current shopping cart link. If global cart is on reflects global location
  * @param bool $echo Optional, whether to echo. Defaults to true
  * @param bool $url Optional, whether to return a link or url. Defaults to show link.
  * @param string $link_text Optional, text to show in link.
  */
 function mp_cart_link($echo = true, $url = false, $link_text = '') {
-	$settings = get_option('mp_settings');
-  $link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
-
-  if (!$url) {
-    $text = ($link_text) ? $link_text : __('Shopping Cart', 'mp');
-    $link = '<a href="' . $link . '" class="mp_cart_link">' . $text . '</a>';
-  }
-
-  if ($echo)
-    echo $link;
-  else
-    return $link;
-}
-
-/**
- * Echos the global shopping cart link.
- * @param bool $echo Optional, whether to echo. Defaults to true
- * @param bool $url Optional, whether to return a link or url. Defaults to show link.
- * @param string $link_text Optional, text to show in link.
- */
-function mp_global_cart_link($echo = true, $url = false, $link_text = '') {
-  $settings = get_option('mp_settings');
-  $link = get_home_url( 1, $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
+	global $mp, $mp_wpmu;
+	
+	if ( $mp->global_cart && !$mp_wpmu->is_main_site() && function_exists('mp_main_site_id') ) {
+		switch_to_blog(mp_main_site_id());
+		$settings = get_option('mp_settings');
+		$link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
+		restore_current_blog();
+	} else {
+    $settings = get_option('mp_settings');
+		$link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
+	}
 
   if (!$url) {
     $text = ($link_text) ? $link_text : __('Shopping Cart', 'mp');
@@ -1645,16 +1667,12 @@ function mp_checkout_step_url($checkout_step) {
  * @param bool $echo Optional, whether to echo. Defaults to true
  */
 function mp_store_navigation( $echo = true ) {
-  $settings = get_option('mp_settings');
+	$settings = get_option('mp_settings');
   
   //navigation
   if (!$settings['disable_cart']) {
     $nav = '<ul class="mp_store_navigation"><li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
-    if ($global_settings['global_cart'] == 1) {
-      $nav .= '<li class="page_item"><a href="' . mp_global_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
-    } else {
-      $nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
-    }
+		$nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
     $nav .= '<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
 </ul>';
   } else {
@@ -1685,28 +1703,30 @@ function mp_is_shop_page() {
  * @retuns bool whether items are in the cart for the current user.
  */
 function mp_items_in_cart() {
-  global $mp;
-	$cart = $mp->get_cart_contents();
-	if (is_array($cart) && count($cart))
+	if (mp_items_count_in_cart())
   	return true;
 	else
 	  return false;
 }
 
 /**
- * Determine if there are any items in the cart
+ * Determine count of any items in the cart
  *
- * @retuns bool whether items are in the cart for the current user.
+ * @retuns int number of items that are in the cart for the current user.
  */
 function mp_items_count_in_cart() {
-  global $mp;
+  global $mp, $blog_id;
+  $blog_id = (is_multisite()) ? $blog_id : 1;
   
   $global_cart = $mp->get_cart_contents();
-  
-  if (is_array($global_cart) && count($global_cart)) {
-    $count = 0;
+  if (!$mp->global_cart)
+  	$selected_cart[$blog_id] = $global_cart[$blog_id];
+  else
+    $selected_cart = $global_cart;
     
-    foreach ($global_cart as $cart) {
+  if (is_array($selected_cart) && count($selected_cart)) {
+    $count = 0;
+    foreach ($selected_cart as $cart) {
       foreach ($cart as $variations) {
         foreach ($variations as $item) {
           $count += $item['quantity'];
@@ -1714,11 +1734,17 @@ function mp_items_count_in_cart() {
       }
     }
     return $count;
-  } else
+  } else {
     return 0;
+	}
 }
 
+/**
+ * Determine the number of published products
+ *
+ * @retuns int number of published products.
+ */
 function mp_products_count() {
-  $custom_query = new WP_Query('post_type=product');
+  $custom_query = new WP_Query('post_type=product&post_status=publish');
   return $custom_query->post_count;
 }

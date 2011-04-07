@@ -87,7 +87,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form($global_cart, $shipping_info) {
+  function payment_form($cart, $shipping_info) {
     if (isset($_GET['cancel']))
       echo '<div class="mp_checkout_error">' . __('Your PayPal transaction has been canceled.', 'mp') . '</div>';
   }
@@ -702,7 +702,7 @@ if ( is_multisite() ) {
     $admin_name = __('PayPal', 'mp');
 
   //register gateway plugin
-  mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', $admin_name, true );
+  mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', $admin_name );
   
   //tie into network settings form
 	add_action( 'mp_network_gateway_settings', 'mp_network_gateway_settings_box' );

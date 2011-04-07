@@ -30,6 +30,9 @@ if(!class_exists('MP_Gateway_API')) {
     //whether if this is the only enabled gateway it can skip the payment_form step
     var $skip_form = false;
     
+    //only required for global capable gateways. The maximum stores that can checkout at once
+    var $max_stores = 1;
+    
     /****** Below are the public methods you may overwrite via a plugin ******/
 
     /**

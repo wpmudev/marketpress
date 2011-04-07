@@ -14,6 +14,8 @@ class MarketPress_MS {
 	}
 	
   function __construct() {
+    global $mp;
+    
     //install script
     $this->install();
     
@@ -54,6 +56,10 @@ class MarketPress_MS {
       add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Global_Tag_Cloud_Widget");') );
       add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Global_Category_List_Widget");') );
     }
+    
+    //setup global cart property
+    if ( $settings['global_cart'] )
+    	$mp->global_cart = true;
 	}
 
   function install() {

@@ -40,6 +40,7 @@ class MarketPress {
   var $checkout_error = false;
   var $cart_cache = false;
   var $is_shop_page = false;
+  var $global_cart = false;
 
   function MarketPress() {
     $this->__construct();
@@ -401,7 +402,7 @@ Thanks again!", 'mp')
     foreach ((array)$mp_gateway_plugins as $code => $plugin) {
       $class = $plugin[0];
 			//if global cart is enabled force it
-      if ( is_multisite() && $network_settings['global_cart'] ) {
+      if ( $this->global_cart ) {
         if ( $code == $network_settings['global_gateway'] && class_exists($class) ) {
           $mp_gateway_active_plugins[] = new $class;
           break;
@@ -697,7 +698,7 @@ Thanks again!", 'mp')
 
   //scans post type at template_redirect to apply custom themeing to products
   function load_store_templates() {
-    global $wp_query;
+    global $wp_query, $mp_wpmu;
     $settings = get_option('mp_settings');
 
     //load proper theme for single product page display
@@ -749,13 +750,19 @@ Thanks again!", 'mp')
 
     //load proper theme for checkout page
     if ($wp_query->query_vars['pagename'] == 'cart') {
-
+			
       //init session for store pages
       $this->start_session();
 
       //process cart updates
       $this->update_cart();
 
+			//if global cart is on forward to main site checkout
+			if ( $this->global_cart && !$mp_wpmu->is_main_site() ) {
+				wp_redirect( mp_cart_link(false, true) );
+				exit;
+			}
+			
       //check for custom theme template
       $templates = array("mp_cart.php");
 
@@ -1061,13 +1068,9 @@ Thanks again!", 'mp')
 
     $nav = substr($list, 0, $break);
 
-    if (!$settings['disable_cart']) {
+    if ( !$settings['disable_cart'] ) {
       $nav .= '<ul><li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
-      if ($global_settings['global_cart'] == 1) {
-	$nav .= '<li class="page_item"><a href="' . mp_global_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
-      } else {
-	$nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
-      }
+			$nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
       $nav .= '<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
 </ul>
 ';
@@ -1210,7 +1213,7 @@ Thanks again!", 'mp')
   	if ( !in_the_loop() )
 		  return $content;
 		
-    $content = mp_show_cart('checkout', $wp_query->query_vars['checkoutstep']);
+    $content = mp_show_cart('checkout', $wp_query->query_vars['checkoutstep'], false);
 
     return $content;
   }
@@ -1727,19 +1730,23 @@ Thanks again!", 'mp')
 
   //returns the calculated price for shipping. Returns False if shipping address is not available
   function shipping_price($format = false, $global_cart = false) {
-
+		global $blog_id;
+		$blog_id = (is_multisite()) ? $blog_id : 1;
+		
     if (!$global_cart)
       $global_cart = $this->get_cart_contents();
 
+		//grab cart for just this blog
+		$cart = @$global_cart[$blog_id];
+
     //get total after any coupons
     $totals = array();
-    foreach ($global_cart as $bid => $cart) {
-      foreach ($cart as $product_id => $variations) {
-				foreach ($variations as $variation => $data) {
-				    $totals[] = $data['price'] * $data['quantity'];
-				}
-      }
+    foreach ($cart as $product_id => $variations) {
+			foreach ($variations as $variation => $data) {
+			    $totals[] = $data['price'] * $data['quantity'];
+			}
     }
+
     $total = array_sum($totals);
 
     $coupon_code = $this->get_coupon_code();
@@ -1756,11 +1763,11 @@ Thanks again!", 'mp')
     $country = ($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
 
     //check required fields
-    if ( empty($address1) || empty($city) || empty($state) || empty($zip) || empty($country) || !(is_array($global_cart) && count($global_cart)) )
+    if ( empty($address1) || empty($city) || empty($zip) || empty($country) || !(is_array($cart) && count($cart)) )
       return false;
 
     //shipping plugins tie into this to calculate their shipping cost
-    $price = apply_filters( 'mp_calculate_shipping', 0, $total, $global_cart, $address1, $address2, $city, $state, $zip, $country );
+    $price = apply_filters( 'mp_calculate_shipping', 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country );
 
     //boot if shipping plugin didn't return at least 0
     if (empty($price))
@@ -1775,13 +1782,16 @@ Thanks again!", 'mp')
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $global_cart = false) {
     global $blog_id;
-		$current_blog_id = $blog_id;
+    $blog_id = (is_multisite()) ? $blog_id : 1;
 		$settings = get_option('mp_settings');
 
     //get current cart contents
     if (!$global_cart)
       $global_cart = $this->get_cart_contents();
-      
+
+		//grab cart for just this blog
+		$cart = @$global_cart[$blog_id];
+		
     //get address
     $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info');
     
@@ -1794,126 +1804,99 @@ Thanks again!", 'mp')
     
     $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
     $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
-  
-    //check required fields
-    if ( empty($country) || !(is_array($global_cart) && count($global_cart)) || $total <= 0 ) {
-      return;
-    }
 
     //get total after any coupons
-    $total_price = 0;
-    foreach ($global_cart as $bid => $cart) {
-
-			if (is_multisite())
-				switch_to_blog($bid);
-
-      //get total after any coupons
-      $totals = array();
-      foreach ($cart as $product_id => $variations) {
-				foreach ($variations as $variation => $data) {
-				    $totals[] = $data['price'] * $data['quantity'];
-				}
-      }
-      
-      $total = array_sum($totals);
-      
-      $coupon_code = $this->get_coupon_code();
-      if ( $coupon = $this->coupon_value($coupon_code, $total) )
-				$total = $coupon['new_total'];
-  
-      //add in shipping?
-      if ( $settings['tax']['tax_shipping'] && ($shipping_price = $this->shipping_price()) )
-				$total = $total + $shipping_price;
-  
-      switch ($settings['base_country']) {
-				case 'US':
-				  //USA taxes are only for orders delivered inside the state
-				  if ($country == 'US' && $state == $settings['base_province'])
-				    $price = round($total * $settings['tax']['rate'], 2);
-				  break;
-
-				case 'CA':
-				  //Canada tax is for all orders in country. We're assuming the rate is a combination of GST/PST/etc.
-				  if ($country == 'CA')
-				    $price = round($total * $settings['tax']['rate'], 2);
-				  break;
-
-				case 'AU':
-				  //Australia taxes orders in country
-				  if ($country == 'AU')
-				    $price = round($total * $settings['tax']['rate'], 2);
-				  break;
-
-				default:
-				  //EU countries charge VAT within the EU
-				  if ( in_array($settings['base_country'], $this->eu_countries) ) {
-				    if (in_array($country, $this->eu_countries))
-				      $price = round($total * $settings['tax']['rate'], 2);
-				  } else {
-				    //all other countries use the tax outside preference
-				    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country = $settings['base_country']))
-				      $price = round($total * $settings['tax']['rate'], 2);
-				  }
-				  break;
-      }
-      if (empty($price))
-				$price = 0;
-      
-      $price = apply_filters( 'mp_tax_price', $price, $total, $cart );
-      $total_price += $price;
+    $totals = array();
+    foreach ($cart as $product_id => $variations) {
+			foreach ($variations as $variation => $data) {
+			  $totals[] = $data['price'] * $data['quantity'];
+			}
     }
     
-    if (is_multisite())
-    	switch_to_blog($current_blog_id);
+    $total = array_sum($totals);
+    
+    $coupon_code = $this->get_coupon_code();
+    if ( $coupon = $this->coupon_value($coupon_code, $total) )
+			$total = $coupon['new_total'];
+
+    //add in shipping?
+    if ( $settings['tax']['tax_shipping'] && ($shipping_price = $this->shipping_price()) )
+			$total = $total + $shipping_price;
+
+    //check required fields
+    if ( empty($country) || !(is_array($cart) && count($cart)) || $total <= 0 ) {
+      return false;
+    }
+
+    switch ($settings['base_country']) {
+			case 'US':
+			  //USA taxes are only for orders delivered inside the state
+			  if ($country == 'US' && $state == $settings['base_province'])
+			    $price = round($total * $settings['tax']['rate'], 2);
+			  break;
+
+			case 'CA':
+			  //Canada tax is for all orders in country. We're assuming the rate is a combination of GST/PST/etc.
+			  if ($country == 'CA')
+			    $price = round($total * $settings['tax']['rate'], 2);
+			  break;
+
+			case 'AU':
+			  //Australia taxes orders in country
+			  if ($country == 'AU')
+			    $price = round($total * $settings['tax']['rate'], 2);
+			  break;
+
+			default:
+			  //EU countries charge VAT within the EU
+			  if ( in_array($settings['base_country'], $this->eu_countries) ) {
+			    if (in_array($country, $this->eu_countries))
+			      $price = round($total * $settings['tax']['rate'], 2);
+			  } else {
+			    //all other countries use the tax outside preference
+			    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country = $settings['base_country']))
+			      $price = round($total * $settings['tax']['rate'], 2);
+			  }
+			  break;
+    }
+    if (empty($price))
+			$price = 0;
+    
+    $price = apply_filters( 'mp_tax_price', $price, $total, $cart );
 
     if ($format)
-      return $this->format_currency('', $total_price);
+      return $this->format_currency('', $price);
     else
-      return $total_price;
-  }
-
-  //returns contents of global shopping cart
-  function get_global_cart_cookie() {
-    global $blog_id;
-    $cookie_id = 'mp_cart_' . COOKIEHASH;
-    
-    if (is_multisite()) {
-      $settings = get_site_option('mp_network_settings');
-      if ($settings['global_cart'] != 1) {
-				$cookie_id = 'mp_cart_' . $blog_id . '_' . COOKIEHASH;
-      }
-    }
-    if (isset($_COOKIE[$cookie_id])) {
-      return unserialize($_COOKIE[$cookie_id]);
-    } else {
-      return array(1 => array());
-    }
+      return $price;
   }
 
   //returns contents of shopping cart cookie
-  function get_cart_cookie() {
+  function get_cart_cookie($all_blogs = false) {
     global $blog_id;
-    $settings = get_option('mp_settings');
-    $global_cart = $this->get_global_cart_cookie();
-    
-    if (isset($global_cart[$blog_id])) {
-      return $global_cart[$blog_id];
+    $blog_id = (is_multisite()) ? $blog_id : 1;
+
+    $cookie_id = 'mp_cart_' . COOKIEHASH;
+
+    if (isset($_COOKIE[$cookie_id])) {
+      $global_cart = unserialize($_COOKIE[$cookie_id]);
     } else {
-      return array();
+      $global_cart = array($blog_id => array());
     }
+    
+    if ($all_blogs) {
+      return $global_cart;
+    } else {
+	    if (isset($global_cart[$blog_id])) {
+	      return $global_cart[$blog_id];
+	    } else {
+	      return array();
+	    }
+		}
   }
   
   //saves global cart array to cookie
   function set_global_cart_cookie($global_cart) {
-    global $blog_id;
-    $settings = get_option('mp_settings');
     $cookie_id = 'mp_cart_' . COOKIEHASH;
-    if (is_multisite()) {
-      $settings = get_site_option('mp_network_settings');
-      if ($settings['global_cart'] != 1) {
-				$cookie_id = 'mp_cart_' . $blog_id . '_' . COOKIEHASH;
-      }
-    }
     
     //set cookie
     $expire = time() + 2592000; //1 month expire
@@ -1928,27 +1911,24 @@ Thanks again!", 'mp')
   
   //saves cart array to cookie
   function set_cart_cookie($cart) {
-    global $blog_id;
-    $global_cart = array();
+    global $blog_id, $mp_gateway_active_plugins;
+    $blog_id = (is_multisite()) ? $blog_id : 1;
     
-    if (is_multisite()) {
-      $settings = get_site_option('mp_network_settings');
-      if ($settings['global_cart'] == 1) {
-				$global_cart = $this->get_global_cart_cookie();
-      }
-    }
-    $global_cart[$blog_id] = $cart;
+    $global_cart = $this->get_cart_cookie(true);
     
-    if (count($global_cart) > 10) {
-      $this->cart_checkout_error(__("Sorry, due to limitations in the payment gateway it's not possible to checkout items from more than 10 stores.", 'mp'));
-    }
+    if ($this->global_cart && count($global_cart = $this->get_cart_cookie(true)) >= $mp_gateway_active_plugins[0]->max_stores && !isset($global_cart[$blog_id])) {
+      $this->cart_checkout_error(sprintf(__("Sorry, currently it's not possible to checkout with items from more than %s stores.", 'mp'), $mp_gateway_active_plugins[0]->max_stores));
+    } else {
+      $global_cart[$blog_id] = $cart;
+		}
+    
     //update cache
     $this->set_global_cart_cookie($global_cart);
   }
   
   //returns the full array of cart contents
   function get_cart_contents($global_cart = false) {
-    global $blog_id, $table_prefix;
+    global $blog_id;
     $current_blog_id = $blog_id;
     
     //if not updating cache
@@ -1958,7 +1938,7 @@ Thanks again!", 'mp')
         return $this->cart_cache;
       }
 
-      $global_cart = $this->get_global_cart_cookie();
+      $global_cart = $this->get_cart_cookie(true);
     }
     
     $full_cart = array();
@@ -2018,14 +1998,20 @@ Thanks again!", 'mp')
 
   //receives a post and updates cookie variables for cart
   function update_cart($no_ajax = true) {
-		global $blog_id;
+		global $blog_id, $mp_gateway_active_plugins;
+		$blog_id = (is_multisite()) ? $blog_id : 1;
 		$current_blog_id = $blog_id;
 		$settings = get_option('mp_settings');
     
     $cart = $this->get_cart_cookie();
     
     if (isset($_POST['empty_cart'])) { //empty cart contents
-      $this->set_global_cart_cookie(array());
+
+			//clear all blog products only if global checkout enabled
+			if ($this->global_cart)
+				$this->set_global_cart_cookie(array());
+			else
+			  $this->set_cart_cookie(array());
       
       if ($no_ajax !== true) {
         ?>
@@ -2053,6 +2039,18 @@ Thanks again!", 'mp')
       //get variation
       $variation = (isset($_POST['variation'])) ? intval($_POST['variation']) : 0;
       
+      //check max stores
+      if ($this->global_cart && count($global_cart = $this->get_cart_cookie(true)) >= $mp_gateway_active_plugins[0]->max_stores && !isset($global_cart[$blog_id])) {
+        if ($no_ajax !== true) {
+	  			echo 'error||' . sprintf(__("Sorry, currently it's not possible to checkout with items from more than %s stores.", 'mp'), $mp_gateway_active_plugins[0]->max_stores);
+          exit;
+        } else {
+          $this->cart_checkout_error(sprintf(__("Sorry, currently it's not possible to checkout with items from more than %s stores.", 'mp'), $mp_gateway_active_plugins[0]->max_stores));
+          return false;
+      	}
+    	}
+      
+      //calculate new quantity
       $new_quantity = $cart[$product_id][$variation] + $quantity;
       
       //check stock
@@ -2078,6 +2076,7 @@ Thanks again!", 'mp')
         }
       }
       
+      //check quotas
       if (get_post_meta($product_id, 'mp_track_quota', true)) {
 	      $quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
 	      if ($quota[$variation] && $quota[$variation] < $new_quantity) {
@@ -2103,7 +2102,7 @@ Thanks again!", 'mp')
 				exit;
       }
     } else if (isset($_POST['update_cart_submit'])) { //update cart contents
-      $global_cart = $this->get_global_cart_cookie();
+      $global_cart = $this->get_cart_cookie(true);
       
       //process quantity updates
       if (is_array($_POST['quant'])) {
@@ -2234,43 +2233,61 @@ Thanks again!", 'mp')
 
         //loop through cart items
         $global_cart = $this->get_cart_contents();
-        foreach ($global_cart as $bid => $cart) {
+			  if (!$this->global_cart)  //get subset if needed
+			  	$selected_cart[$blog_id] = $global_cart[$blog_id];
+			  else
+			    $selected_cart = $global_cart;
+
+				$totals = array();
+		    $shipping_prices = array();
+		    $tax_prices = array();
+        foreach ($selected_cart as $bid => $cart) {
+        
+          if (is_multisite())
+        		switch_to_blog($bid);
+        		
 				  foreach ($cart as $product_id => $variations) {
 				    foreach ($variations as $data) {
 							$totals[] = $data['price'] * $data['quantity'];
 				    }
 				  }
+		      if ( ($shipping_price = $mp->shipping_price()) !== false )
+		        $shipping_prices[] = $shipping_price;
+
+		      if ( ($tax_price = $mp->tax_price()) !== false )
+		        $tax_prices[] = $tax_price;
         }
-	    	if (is_array($totals)) {
-				  $total = array_sum($totals);
-				}
+        
+        //go back to original blog
+		    if (is_multisite())
+		      switch_to_blog($current_blog_id);
+        
+	    	$total = array_sum($totals);
+
         //coupon line
         if ( $coupon = $this->coupon_value($this->get_coupon_code(), $total) )
           $total = $coupon['new_total'];
-        //shipping line
-        if ( ($shipping_price = $this->shipping_price()) !== false ) {
-          $total = $total + $shipping_price;
-        }
-        //tax line
-        if ( ($tax_price = $this->tax_price()) !== false ) {
-          $total = $total + $tax_price;
-        }
+
+				//shipping
+        if ( $shipping_price = array_sum($shipping_prices) )
+		      $total = $total + $shipping_price;
+
+		    //tax line
+		    if ( $tax_price = array_sum($tax_prices) )
+		      $total = $total + $tax_price;
 
         if ($total > 0) {
           //can we skip the payment form page?
-          $network_settings = get_site_option( 'mp_network_settings' );
-					if ( is_multisite() && $network_settings['global_cart'] ) {
+					if ( $this->global_cart ) {
         		$skip = apply_filters('mp_payment_form_skip_' . $network_settings['global_gateway'], false);
-        		$global_cart = true;
 					} else {
 					  $skip = apply_filters('mp_payment_form_skip_' . $settings['gateways']['allowed'][0], false);
-        		$global_cart = false;
 					}
-			    if ( (!$global_cart && count((array)$settings['gateways']['allowed']) > 1) || !$skip ) {
+			    if ( (!$this->global_cart && count((array)$settings['gateways']['allowed']) > 1) || !$skip ) {
 			      wp_safe_redirect(mp_checkout_step_url('checkout'));
 			      exit;
 			    } else {
-			      if ( is_multisite() && $network_settings['global_cart'] )
+			      if ( $this->global_cart )
 			      	$_SESSION['mp_payment_method'] = $network_settings['global_gateway'];
 						else
 			      	$_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
@@ -2285,20 +2302,50 @@ Thanks again!", 'mp')
 						}
 			    }
         } else { //empty price, create order already
+					//loop through and create orders
+	        foreach ($selected_cart as $bid => $cart) {
+            $totals = array();
+	          if (is_multisite())
+	        		switch_to_blog($bid);
 
-          //setup our payment details
-          $timestamp = time();
-          $order_id = $this->generate_order_id();
-          $settings = get_option('mp_settings');
-    	  	$payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
-          $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
-      	  $payment_info['method'][] = __('N/A - Free order', 'mp');
-      	  $payment_info['transaction_id'][] = __('N/A', 'mp');
-      	  $payment_info['status'][$timestamp] = __('Completed', 'mp');
-      	  $payment_info['total'] = $total;
-      	  $payment_info['currency'] = $settings['currency'];
+					  foreach ($cart as $product_id => $variations) {
+					    foreach ($variations as $data) {
+								$totals[] = $data['price'] * $data['quantity'];
+					    }
+					  }
+            $total = array_sum($totals);
+
+		        //coupon line
+		        if ( $coupon = $this->coupon_value($this->get_coupon_code(), $total) )
+		          $total = $coupon['new_total'];
+
+						//shipping
+          	if ( ($shipping_price = $mp->shipping_price()) !== false )
+				      $total = $total + $shipping_price;
+
+				    //tax line
+        		if ( ($tax_price = $mp->tax_price()) !== false )
+				      $total = $total + $tax_price;
+				      
+            //setup our payment details
+	          $timestamp = time();
+	          $order_id = $this->generate_order_id();
+	          $settings = get_option('mp_settings');
+	    	  	$payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
+	          $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
+	      	  $payment_info['method'][] = __('N/A - Free order', 'mp');
+	      	  $payment_info['transaction_id'][] = __('N/A', 'mp');
+	      	  $payment_info['status'][$timestamp] = __('Completed', 'mp');
+	      	  $payment_info['total'] = $total;
+	      	  $payment_info['currency'] = $settings['currency'];
+		  			$this->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
+	        }
+
+	        //go back to original blog
+			    if (is_multisite())
+			      switch_to_blog($current_blog_id);
+			      
       	  $_SESSION['mp_payment_method'] = 'manual'; //so we don't get an error message on confirmation page
-	  			$this->create_order($order_id, $global_cart, $_SESSION['mp_shipping_info'], $payment_info, true);
 	  
           //redirect to final page
 	  			wp_safe_redirect(mp_checkout_step_url('confirmation'));
@@ -5095,7 +5142,7 @@ class MarketPress_Shopping_Cart extends WP_Widget {
       echo '<div class="custom_text">' . $instance['custom_text'] . '</div>';
 
     echo '<div class="mp_cart_widget">';
-    echo mp_show_cart('widget');
+    mp_show_cart('widget');
     echo '</div>';
 
     echo $after_widget;

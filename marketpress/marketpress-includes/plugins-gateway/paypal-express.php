@@ -30,6 +30,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   //whether if this is the only enabled gateway it can skip the payment_form step
   var $skip_form = true;
   
+  //only required for global capable gateways. The maximum stores that can checkout at once
+  var $max_stores = 10;
+  
   // Payment action
   var $payment_action = 'Sale';
 
@@ -627,13 +630,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
         </select>
 				</td>
         </tr>
-				<tr>
+				<tr<?php echo ($mp->global_cart) ? '' : ' style="display:none;"'; ?>>
 				<th scope="row"><?php _e('PayPal Merchant E-mail', 'mp') ?></th>
 				<td>
 				<input value="<?php echo esc_attr($settings['gateways']['paypal-express']['merchant_email']); ?>" size="30" name="mp[gateways][paypal-express][merchant_email]" type="text" />
 				</td>
         </tr>
-        <tr>
+        <tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : ''; ?>>
 				<th scope="row"><?php _e('PayPal API Credentials', 'mp') ?></th>
 				<td>
   				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_NVPAPIBasics#id084DN0AK0HS">Instructions &raquo;</a>', 'mp') ?></span>
@@ -653,7 +656,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				<td>
   				<span class="description"><?php _e('URL for an image you want to appear at the top left of the payment page. The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal recommends that you provide an image that is stored on a secure (https) server. If you do not specify an image, the business name is displayed.', 'mp') ?></span>
           <p>
-          <input value="<?php echo esc_attr($settings['gateways']['paypal-express']['header_img']); ?>" size="40" name="mp[gateways][paypal-express][header_img]" type="text" />
+          <input value="<?php echo esc_attr($settings['gateways']['paypal-express']['header_img']); ?>" size="80" name="mp[gateways][paypal-express][header_img]" type="text" />
           </p>
         </td>
         </tr>
