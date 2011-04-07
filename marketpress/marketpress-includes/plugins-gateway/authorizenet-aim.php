@@ -21,6 +21,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   //url for an submit button image for your checkout method. Displayed on checkout form if set
   var $method_button_img_url = '';
 
+  //whether or not ssl is needed for checkout page
+  var $force_ssl = true;
+
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
 
@@ -70,7 +73,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form($global_cart, $shipping_info) {
+  function payment_form($cart, $shipping_info) {
     global $mp;
     if (isset($_GET['cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
@@ -208,7 +211,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   
           <tr>
           <td align="right"><?php _e('Phone Number:', 'mp'); ?></td><td>
-        <input size="20" name="phone" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
+        	<input size="20" name="phone" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
           </tr>
           
           <tr>
@@ -218,23 +221,22 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
               <input name="card_num" onkeyup="cc_card_pick('#cardimage', '#card_num');"
                id="card_num" class="credit_card_number input_field noautocomplete"
                type="text" size="22" maxlength="22" />
-        <div class="hide_after_success nocard cardimage"  id="cardimage"
-             style="background: url(<?php echo $mp->plugin_url; ?>images/card_array.png) no-repeat;"></div></td>
+        		<div class="hide_after_success nocard cardimage"  id="cardimage" style="background: url(<?php echo $mp->plugin_url; ?>images/card_array.png) no-repeat;"></div></td>
           </tr>
           
           <tr>
             <td align="right"><?php _e('Expiration Date:', 'mp'); ?>*</td>
             <td>
-              <?php echo apply_filters( 'mp_checkout_error_exp' ); ?>
-              <label class="inputLabel" for="exp_month"><?php _e('Month', 'mp'); ?></label>
-        <select name="exp_month" id="exp_month">
-          <?php print $this->_print_month_dropdown(); ?>
-        </select>
-        <label class="inputLabel" for="exp_year"><?php _e('Year', 'mp'); ?></label>
-        <select name="exp_year" id="exp_year">
-          <?php print $this->_print_year_dropdown('', true); ?>
-        </select>
-        </td>
+            <?php echo apply_filters( 'mp_checkout_error_exp' ); ?>
+            <label class="inputLabel" for="exp_month"><?php _e('Month', 'mp'); ?></label>
+		        <select name="exp_month" id="exp_month">
+		          <?php print $this->_print_month_dropdown(); ?>
+		        </select>
+		        <label class="inputLabel" for="exp_year"><?php _e('Year', 'mp'); ?></label>
+		        <select name="exp_year" id="exp_year">
+		          <?php print $this->_print_year_dropdown('', true); ?>
+		        </select>
+		        </td>
           </tr>
           
           <tr>
@@ -251,42 +253,40 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     <?php
   }
   
-  function _print_year_dropdown($sel='', $pfp = false)
-  {
-          $localDate=getdate();
-          $minYear = $localDate["year"];
-          $maxYear = $minYear + 15;
-  
-          $output =  "<option value=''>--</option>";
-          for($i=$minYear; $i<$maxYear; $i++) {
-                  if ($pfp) {
-                          $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
-                          ">". $i ."</option>";
-                  } else {
-                          $output .= "<option value='". substr($i, 2, 2) ."'".($sel==(substr($i, 2, 2))?' selected':'').
-                  ">". $i ."</option>";
-                  }
-          }
-          return($output);
+  function _print_year_dropdown($sel='', $pfp = false) {
+    $localDate=getdate();
+    $minYear = $localDate["year"];
+    $maxYear = $minYear + 15;
+
+    $output =  "<option value=''>--</option>";
+    for($i=$minYear; $i<$maxYear; $i++) {
+            if ($pfp) {
+                    $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
+                    ">". $i ."</option>";
+            } else {
+                    $output .= "<option value='". substr($i, 2, 2) ."'".($sel==(substr($i, 2, 2))?' selected':'').
+            ">". $i ."</option>";
+            }
+    }
+    return($output);
   }
   
-  function _print_month_dropdown($sel='')
-  {
-          $output =  "<option value=''>--</option>";
-          $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
-          $output .=  "<option " . ($sel==2?' selected':'') . "  value='02'>02 - Feb</option>";
-          $output .=  "<option " . ($sel==3?' selected':'') . "  value='03'>03 - Mar</option>";
-          $output .=  "<option " . ($sel==4?' selected':'') . "  value='04'>04 - Apr</option>";
-          $output .=  "<option " . ($sel==5?' selected':'') . "  value='05'>05 - May</option>";
-          $output .=  "<option " . ($sel==6?' selected':'') . "  value='06'>06 - Jun</option>";
-          $output .=  "<option " . ($sel==7?' selected':'') . "  value='07'>07 - Jul</option>";
-          $output .=  "<option " . ($sel==8?' selected':'') . "  value='08'>08 - Aug</option>";
-          $output .=  "<option " . ($sel==9?' selected':'') . "  value='09'>09 - Sep</option>";
-          $output .=  "<option " . ($sel==10?' selected':'') . "  value='10'>10 - Oct</option>";
-          $output .=  "<option " . ($sel==11?' selected':'') . "  value='11'>11 - Nov</option>";
-          $output .=  "<option " . ($sel==12?' selected':'') . "  value='12'>12 - Doc</option>";
-  
-          return($output);
+  function _print_month_dropdown($sel='') {
+    $output =  "<option value=''>--</option>";
+    $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
+    $output .=  "<option " . ($sel==2?' selected':'') . "  value='02'>02 - Feb</option>";
+    $output .=  "<option " . ($sel==3?' selected':'') . "  value='03'>03 - Mar</option>";
+    $output .=  "<option " . ($sel==4?' selected':'') . "  value='04'>04 - Apr</option>";
+    $output .=  "<option " . ($sel==5?' selected':'') . "  value='05'>05 - May</option>";
+    $output .=  "<option " . ($sel==6?' selected':'') . "  value='06'>06 - Jun</option>";
+    $output .=  "<option " . ($sel==7?' selected':'') . "  value='07'>07 - Jul</option>";
+    $output .=  "<option " . ($sel==8?' selected':'') . "  value='08'>08 - Aug</option>";
+    $output .=  "<option " . ($sel==9?' selected':'') . "  value='09'>09 - Sep</option>";
+    $output .=  "<option " . ($sel==10?' selected':'') . "  value='10'>10 - Oct</option>";
+    $output .=  "<option " . ($sel==11?' selected':'') . "  value='11'>11 - Nov</option>";
+    $output .=  "<option " . ($sel==12?' selected':'') . "  value='12'>12 - Doc</option>";
+
+    return($output);
   }
   
   /**
@@ -298,7 +298,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment_form($global_cart, $shipping_info) {
+  function process_payment_form($cart, $shipping_info) {
     global $mp;
     $settings = get_option('mp_settings');
     
@@ -381,8 +381,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   function _get_card_type($number) {
     $num_length = strlen($number);
     
-    if ($num_length > 10 && preg_match('/[0-9]+/', $number) >= 1)
-    {
+    if ($num_length > 10 && preg_match('/[0-9]+/', $number) >= 1) {
       if((substr($number, 0, 1) == '4') && (($num_length == 13)||($num_length == 16))) {
         return "Visa";
       } else if((substr($number, 0, 1) == '5' && ((substr($number, 1, 1) >= '1') && (substr($number, 1, 1) <= '5'))) && ($num_length == 16)) {
@@ -402,7 +401,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function confirm_payment_form($global_cart, $shipping_info) {
+  function confirm_payment_form($cart, $shipping_info) {
     global $mp;
     
     $settings = get_option('mp_settings');
@@ -478,7 +477,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     
     $content .= '<tr>';
     $content .= '<td align="right">'.__('Payment method:', 'mp').'</td>';
-    $content .= '<td>'.$this->_get_card_type($_SESSION['card_num']).'ending in '. substr($_SESSION['card_num'], strlen($_SESSION['card_num'])-4, 4).'</td>';
+    $content .= '<td>'.$this->_get_card_type($_SESSION['card_num']).' ending in '. substr($_SESSION['card_num'], strlen($_SESSION['card_num'])-4, 4).'</td>';
     $content .= '</tr>';
     $content .= '</tbody>';
     $content .= '</table>';
@@ -495,7 +494,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment($global_cart, $shipping_info) {
+  function process_payment($cart, $shipping_info) {
     global $mp;
     
     $timestamp = time();
@@ -513,16 +512,13 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $payment->transaction($_SESSION['card_num']);
     
     $totals = array();
-    
-    foreach ($global_cart as $bid => $cart) {
-      foreach ($cart as $product_id => $variations) {
-        foreach ($variations as $variation => $data) {
-          $sku = empty($data['SKU'])?"{$product_id}{$variation}":$data['SKU'];
-          $totals[] = $data['price'] * $data['quantity'];
-          $payment->addLineItem($sku, $data['name'],
-            get_permalink($product_id), $data['quantity'], $data['price'], 1);
-          $i++;
-        }
+    foreach ($cart as $product_id => $variations) {
+      foreach ($variations as $variation => $data) {
+        $sku = empty($data['SKU']) ? "{$product_id}{$variation}" : $data['SKU'];
+        $totals[] = $data['price'] * $data['quantity'];
+        $payment->addLineItem($sku, $data['name'],
+          $data['url'], $data['quantity'], $data['price'], 1);
+        $i++;
       }
     }
     $total = array_sum($totals);
@@ -636,7 +632,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       $payment_info['transaction_id'] = $payment->getTransactionID();
       
       //succesful payment, create our order now
-      $result = $mp->create_order($_SESSION['mp_order'], $global_cart, $shipping_info, $payment_info, $paid);
+      $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
     } else {
       $error = $payment->getResponseText();
       $mp->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp') , $error, mp_checkout_step_url('checkout')) );
@@ -687,89 +683,89 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     <div id="mp_authorizenet-aim_express" class="postbox">
       <h3 class='hndle'><span><?php _e('Authorize.net AIM Settings', 'mp'); ?></span></h3>
       <div class="inside">
-        <span class="description"><?php _e('Authorize.net AIM is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. SSL certificate is required to use this gateway.', 'mp') ?></span>
+        <span class="description"><?php _e('Authorize.net AIM is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway. USD is the only currency supported by this gateway.', 'mp') ?></span>
         <table class="form-table">
-	  <tr>
-	    <th scope="row"><?php _e('Mode', 'mp') ?></th>
-	    <td>
-              <p>
-                <select name="mp[gateways][authorizenet-aim][mode]">
-                  <option value="sandbox" <?php selected($settings['gateways']['authorizenet-aim']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-                  <option value="live" <?php selected($settings['gateways']['authorizenet-aim']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
-                </select>
-              </p>
-	    </td>
-	  </tr>
-	  <tr>
-	    <th scope="row"><?php _e('Gateway Credentials', 'mp') ?></th>
-	    <td>
-              <span class="description"><?php print sprintf(__('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.authorize.net/support/merchant/Integration_Settings/Access_Settings.htm"); ?></span>
-	      <p>
-		<label><?php _e('Login ID', 'mp') ?><br />
-		  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_user']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_user]" type="text" />
-		</label>
-	      </p>
-	      <p>
-		<label><?php _e('Transaction Key', 'mp') ?><br />
-		  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_key']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_key]" type="text" />
-		</label>
-	      </p>
-	    </td>
-	  </tr>
-          <tr>
-	    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
-	    <td>
-	      <span class="description"><?php _e('Optional settings to control advanced options', 'mp') ?></span>
-              <p>
-                <label><a title="<?php _e('Authorize.net default is \',\'. Otherwise, get this from your credit card processor. If the transactions are not going through, this character is most likely wrong.', 'mp'); ?>"><?php _e('Delimiter Character', 'mp'); ?></a><br />
-                  <input value="<?php echo (empty($settings['gateways']['authorizenet-aim']['delim_char']))?",":esc_attr($settings['gateways']['authorizenet-aim']['delim_char']); ?>" size="2" name="mp[gateways][authorizenet-aim][delim_char]" type="text" />
-                </label>
-	      </p>
-              
-              <p>
-		<label><a title="<?php _e('Authorize.net default is blank. Otherwise, get this from your credit card processor. If the transactions are going through, but getting strange responses, this character is most likely wrong.', 'mp'); ?>"><?php _e('Encapsulation Character', 'mp'); ?></a><br />
-                  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['encap_char']); ?>" size="2" name="mp[gateways][authorizenet-aim][encap_char]" type="text" />
-                </label>
-              </p>
-              
-              <p>
-		<label><?php _e('Email Customer (on success):', 'mp'); ?><br />
-                  <select name="mp[gateways][authorizenet-aim][email_customer]">
-                    <option value="yes" <?php selected($settings['gateways']['authorizenet-aim']['email_customer'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
-                    <option value="no" <?php selected($settings['gateways']['authorizenet-aim']['email_customer'], 'no') ?>><?php _e('No', 'mp') ?></option>
-                  </select>
-                </label>
-              </p>
-              
-              <p>
-		<label><a title="<?php _e('This text will appear as the header of the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Header', 'mp'); ?></a><br/>
-                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['header_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['header_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][header_email_receipt]" type="text" />
-                </label>
-	      </p>
-              
-              <p>
-		<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
-                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
-                </label>
-	      </p>
-              
-              <p>
-		<label><a title="<?php _e('The payment gateway generated MD5 hash value that can be used to authenticate the transaction response. Not needed because responses are returned using an SSL connection.', 'mp'); ?>"><?php _e('Security: MD5 Hash', 'mp'); ?></a><br/>
-                  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['md5_hash']); ?>" size="32" name="mp[gateways][authorizenet-aim][md5_hash]" type="text" />
-                </label>
-              </p>
+				  <tr>
+				    <th scope="row"><?php _e('Mode', 'mp') ?></th>
+				    <td>
+			        <p>
+			          <select name="mp[gateways][authorizenet-aim][mode]">
+			            <option value="sandbox" <?php selected($settings['gateways']['authorizenet-aim']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
+			            <option value="live" <?php selected($settings['gateways']['authorizenet-aim']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
+			          </select>
+			        </p>
+				    </td>
+				  </tr>
+				  <tr>
+				    <th scope="row"><?php _e('Gateway Credentials', 'mp') ?></th>
+				    <td>
+			              <span class="description"><?php print sprintf(__('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.authorize.net/support/merchant/Integration_Settings/Access_Settings.htm"); ?></span>
+				      <p>
+					<label><?php _e('Login ID', 'mp') ?><br />
+					  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_user']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_user]" type="text" />
+					</label>
+				      </p>
+				      <p>
+					<label><?php _e('Transaction Key', 'mp') ?><br />
+					  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_key']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_key]" type="text" />
+					</label>
+				      </p>
+				    </td>
+				  </tr>
+			          <tr>
+				    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
+				    <td>
+				      <span class="description"><?php _e('Optional settings to control advanced options', 'mp') ?></span>
+			              <p>
+			                <label><a title="<?php _e('Authorize.net default is \',\'. Otherwise, get this from your credit card processor. If the transactions are not going through, this character is most likely wrong.', 'mp'); ?>"><?php _e('Delimiter Character', 'mp'); ?></a><br />
+			                  <input value="<?php echo (empty($settings['gateways']['authorizenet-aim']['delim_char']))?",":esc_attr($settings['gateways']['authorizenet-aim']['delim_char']); ?>" size="2" name="mp[gateways][authorizenet-aim][delim_char]" type="text" />
+			                </label>
+				      </p>
 
-              <p>
-		<label><a title="<?php _e('Request a delimited response from the payment gateway.', 'mp'); ?>"><?php _e('Delim Data:', 'mp'); ?></a><br/>
-                  <select name="mp[gateways][authorizenet-aim][delim_data]">
-                    <option value="yes" <?php selected($settings['gateways']['authorizenet-aim']['delim_data'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
-                    <option value="no" <?php selected($settings['gateways']['authorizenet-aim']['delim_data'], 'no') ?>><?php _e('No', 'mp') ?></option>
-                  </select>
-                </label>
-              </p>
-              
-	    </td>
-	  </tr>
+			              <p>
+					<label><a title="<?php _e('Authorize.net default is blank. Otherwise, get this from your credit card processor. If the transactions are going through, but getting strange responses, this character is most likely wrong.', 'mp'); ?>"><?php _e('Encapsulation Character', 'mp'); ?></a><br />
+			                  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['encap_char']); ?>" size="2" name="mp[gateways][authorizenet-aim][encap_char]" type="text" />
+			                </label>
+			              </p>
+
+			              <p>
+					<label><?php _e('Email Customer (on success):', 'mp'); ?><br />
+			                  <select name="mp[gateways][authorizenet-aim][email_customer]">
+			                    <option value="yes" <?php selected($settings['gateways']['authorizenet-aim']['email_customer'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
+			                    <option value="no" <?php selected($settings['gateways']['authorizenet-aim']['email_customer'], 'no') ?>><?php _e('No', 'mp') ?></option>
+			                  </select>
+			                </label>
+			              </p>
+
+			              <p>
+					<label><a title="<?php _e('This text will appear as the header of the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Header', 'mp'); ?></a><br/>
+			                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['header_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['header_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][header_email_receipt]" type="text" />
+			                </label>
+				      </p>
+
+			              <p>
+					<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
+			                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
+			                </label>
+				      </p>
+
+			              <p>
+					<label><a title="<?php _e('The payment gateway generated MD5 hash value that can be used to authenticate the transaction response. Not needed because responses are returned using an SSL connection.', 'mp'); ?>"><?php _e('Security: MD5 Hash', 'mp'); ?></a><br/>
+			                  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['md5_hash']); ?>" size="32" name="mp[gateways][authorizenet-aim][md5_hash]" type="text" />
+			                </label>
+			              </p>
+
+			              <p>
+					<label><a title="<?php _e('Request a delimited response from the payment gateway.', 'mp'); ?>"><?php _e('Delim Data:', 'mp'); ?></a><br/>
+			                  <select name="mp[gateways][authorizenet-aim][delim_data]">
+			                    <option value="yes" <?php selected($settings['gateways']['authorizenet-aim']['delim_data'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
+			                    <option value="no" <?php selected($settings['gateways']['authorizenet-aim']['delim_data'], 'no') ?>><?php _e('No', 'mp') ?></option>
+			                  </select>
+			                </label>
+			              </p>
+
+				    </td>
+				  </tr>
         </table>
       </div>
     </div>
@@ -972,3 +968,4 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 
 //register payment gateway plugin
 mp_register_gateway_plugin( 'MP_Gateway_AuthorizeNet_AIM', 'authorizenet-aim', __('Authorize.net AIM Checkout (Beta)', 'mp') );
+?>

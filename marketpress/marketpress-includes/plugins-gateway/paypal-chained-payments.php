@@ -598,8 +598,10 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$nvpstr .= "&memo=" . urlencode(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
     
 	  //loop through cart items
-    foreach ($cart as $product_id => $data) {
-      $totals[] = $data['price'] * $data['quantity'];
+    foreach ($cart as $product_id => $variations) {
+      foreach ($variations as $variation => $data) {
+      	$totals[] = $data['price'] * $data['quantity'];
+      }
     }
 		$total = array_sum($totals);
 

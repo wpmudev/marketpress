@@ -168,7 +168,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
   $settings = get_option('mp_settings');
   $current_blog_id = $blog_id;
 
-	$global_cart = $mp->get_cart_contents();
+	$global_cart = $mp->get_cart_contents(true);
   if (!$mp->global_cart)  //get subset if needed
   	$selected_cart[$blog_id] = $global_cart[$blog_id];
   else
@@ -199,7 +199,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
           
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
-          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . $data['url'] . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $bid . ':' . $product_id . ':' . $variation . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $bid . ':' . $product_id . ':' . $variation . '" /> ' . __('Remove', 'mp') . '</label></td>';
           $content .=  '</tr>';
@@ -296,7 +296,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 75 ) . '</td>';
-          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . $data['url'] . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
           $content .=  '</tr>';
@@ -371,7 +371,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
           $totals[] = $data['price'] * $data['quantity'];
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
-          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . get_permalink($product_id) . '">' . $data['name'] . '</a>';
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . $data['url'] . '">' . $data['name'] . '</a>';
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
           $content .=  '</tr>';
@@ -619,11 +619,7 @@ function _mp_cart_payment($type, $echo = false) {
   global $mp, $blog_id, $mp_gateway_active_plugins;
   $blog_id = (is_multisite()) ? $blog_id : 1;
 
-	$global_cart = $mp->get_cart_contents();
-  if ($mp->global_cart)
-	  $cart = $global_cart;
-	else
-  	$cart = $global_cart[$blog_id];
+	$cart = $mp->get_cart_contents($mp->global_cart);
   
   $content = '';
   if ($type == 'form') {
@@ -871,7 +867,7 @@ function mp_order_status() {
                 }
                 if ($vc == 0) {
                   echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-                  echo '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+                  echo '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . $data['url'] . '">' . esc_attr($data['name']) . '</a></td>';
                   if ($settings['product_variations']) {
                     echo '  </tr>';
                     echo '  <tr class="mp_sub_line">';
@@ -1718,7 +1714,7 @@ function mp_items_count_in_cart() {
   global $mp, $blog_id;
   $blog_id = (is_multisite()) ? $blog_id : 1;
   
-  $global_cart = $mp->get_cart_contents();
+  $global_cart = $mp->get_cart_contents(true);
   if (!$mp->global_cart)
   	$selected_cart[$blog_id] = $global_cart[$blog_id];
   else

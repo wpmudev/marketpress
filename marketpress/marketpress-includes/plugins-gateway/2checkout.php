@@ -1,6 +1,6 @@
 <?php
 /*
-MarketPress Authorize.net AIM Gateway Plugin
+MarketPress 2Checkout Gateway Plugin
 Author: S H Mohanjith (Incsub)
 */
 
@@ -21,6 +21,9 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   //url for an submit button image for your checkout method. Displayed on checkout form if set
   var $method_button_img_url = '';
 
+  //whether or not ssl is needed for checkout page
+  var $force_ssl = false;
+  
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
 
@@ -47,10 +50,10 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $this->method_button_img_url = $mp->plugin_url . 'images/2co.png';
     
     if ( isset( $settings['gateways']['2checkout'] ) ) {
-        $this->currencyCode = $settings['gateways']['2checkout']['currency'];
-        $this->API_Username = $settings['gateways']['2checkout']['sid'];
-        $this->API_Password = $settings['gateways']['2checkout']['secret_word'];
-        $this->SandboxFlag  = $settings['gateways']['2checkout']['mode'];
+      $this->currencyCode = $settings['gateways']['2checkout']['currency'];
+      $this->API_Username = $settings['gateways']['2checkout']['sid'];
+      $this->API_Password = $settings['gateways']['2checkout']['secret_word'];
+      $this->SandboxFlag  = $settings['gateways']['2checkout']['mode'];
     }
   }
 
@@ -59,47 +62,11 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form($global_cart, $shipping_info) {
+  function payment_form($cart, $shipping_info) {
     global $mp;
     if (isset($_GET['2checkout_cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your 2Checkout transaction has been canceled.', 'mp') . '</div>';
     }
-  }
-  
-  function _print_year_dropdown($sel='', $pfp = false) {
-    $localDate=getdate();
-    $minYear = $localDate["year"];
-    $maxYear = $minYear + 15;
-
-    $output =  "<option value=''>--</option>";
-    for($i=$minYear; $i<$maxYear; $i++) {
-            if ($pfp) {
-                    $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
-                    ">". $i ."</option>";
-            } else {
-                    $output .= "<option value='". substr($i, 2, 2) ."'".($sel==(substr($i, 2, 2))?' selected':'').
-            ">". $i ."</option>";
-            }
-    }
-    return($output);
-  }
-  
-  function _print_month_dropdown($sel='') {
-    $output =  "<option value=''>--</option>";
-    $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
-    $output .=  "<option " . ($sel==2?' selected':'') . "  value='02'>02 - Feb</option>";
-    $output .=  "<option " . ($sel==3?' selected':'') . "  value='03'>03 - Mar</option>";
-    $output .=  "<option " . ($sel==4?' selected':'') . "  value='04'>04 - Apr</option>";
-    $output .=  "<option " . ($sel==5?' selected':'') . "  value='05'>05 - May</option>";
-    $output .=  "<option " . ($sel==6?' selected':'') . "  value='06'>06 - Jun</option>";
-    $output .=  "<option " . ($sel==7?' selected':'') . "  value='07'>07 - Jul</option>";
-    $output .=  "<option " . ($sel==8?' selected':'') . "  value='08'>08 - Aug</option>";
-    $output .=  "<option " . ($sel==9?' selected':'') . "  value='09'>09 - Sep</option>";
-    $output .=  "<option " . ($sel==10?' selected':'') . "  value='10'>10 - Oct</option>";
-    $output .=  "<option " . ($sel==11?' selected':'') . "  value='11'>11 - Nov</option>";
-    $output .=  "<option " . ($sel==12?' selected':'') . "  value='12'>12 - Doc</option>";
-
-    return($output);
   }
   
   /**
@@ -111,7 +78,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment_form($global_cart, $shipping_info) {
+  function process_payment_form($cart, $shipping_info) {
     global $mp;
     
     $mp->generate_order_id();
@@ -123,7 +90,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function confirm_payment_form($global_cart, $shipping_info) {
+  function confirm_payment_form($cart, $shipping_info) {
     global $mp;
   }
 
@@ -136,7 +103,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
    *
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment($global_cart, $shipping_info) {
+  function process_payment($cart, $shipping_info) {
     global $mp;
     
     $timestamp = time();
@@ -150,6 +117,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $params['cart_order_id'] = $_SESSION['mp_order'];
     $params['x_receipt_link_url'] = mp_cart_link(false, true) . trailingslashit("confirmation");
     $params['skip_landing'] = '1';
+    $params['fixed'] = 'Y';
     $params['currency_code'] = $this->currencyCode;
     
     if ($this->SandboxFlag == 'sandbox') {
@@ -161,19 +129,22 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $params["id_type"] = 1;
     
-    foreach ($global_cart as $bid => $cart) {
-      foreach ($cart as $product_id => $data) {
-        $totals[] = $data['price'] * $data['quantity'];
-        
-        $suffix = "_{$counter}";
-        
-        $sku = empty($data['SKU'])?$product_id:$data['SKU'];
-        $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
-        $params["c_name{$suffix}"] = $data['name'];
-        $params["c_description{$suffix}"] = get_permalink($product_id);
-        $params["c_price{$suffix}"] = $data['price'];
-        
-        $i++;
+    foreach ($cart as $product_id => $variations) {
+      foreach ($variations as $variation => $data) {
+	      $totals[] = $data['price'] * $data['quantity'];
+
+	      $suffix = "_{$counter}";
+
+	      $sku = empty($data['SKU']) ? $product_id : $data['SKU'];
+	      $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
+	      $params["c_name{$suffix}"] = $data['name'];
+	      $params["c_description{$suffix}"] = $data['url'];
+	      $params["c_price{$suffix}"] = $data['price'];
+	      if ($data['download'])
+	      	$params["c_tangible{$suffix}"] = 'N';
+				else
+				  $params["c_tangible{$suffix}"] = 'Y';
+	      $i++;
       }
     }
     
@@ -186,6 +157,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
       $total = $total + $shipping_price;
+			$params['sh_cost'] = $shipping_price;
     }
     
     //tax line
@@ -202,9 +174,6 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     }
     
     $param_str = implode('&', $param_list);
-    
-    $_SESSION['cart'] = $global_cart;
-    $_SESSION['shipping_info'] = $shipping_info;
     
     wp_redirect("{$url}?{$param_str}");
     
@@ -264,10 +233,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
       $payment_info['transaction_id'] = $_REQUEST['order_number'];  
       $payment_info['method'] = "Credit Card";
     
-      $global_cart = $_SESSION['cart'];
-      $shipping_info = $_SESSION['shipping_info'];
-    
-      $order = $mp->create_order($_SESSION['mp_order'], $global_cart, $shipping_info, $payment_info, $paid);
+      $order = $mp->create_order($_SESSION['mp_order'], $mp->get_cart_contents, $_SESSION['mp_shipping_info'], $payment_info, $paid);
     }
   }
   
@@ -287,65 +253,65 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
       <div class="inside">
         <span class="description"><?php _e('Resell your inventory via 2Checkout.com.', 'mp') ?></span>
         <table class="form-table">
-	  <tr>
-	    <th scope="row"><?php _e('Mode', 'mp') ?></th>
-	    <td>
-        <p>
-          <select name="mp[gateways][2checkout][mode]">
-            <option value="sandbox" <?php selected($settings['gateways']['2checkout']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-            <option value="live" <?php selected($settings['gateways']['2checkout']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
-          </select>
-        </p>
-	    </td>
-	  </tr>
-	  <tr>
-	    <th scope="row"><?php _e('2Checkout Credentials', 'mp') ?></th>
-	    <td>
-              <span class="description"><?php print sprintf(__('You must login to 2Checkout vendor dashboard to obtain the seller ID and secret word. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.2checkout.com/community/blog/knowledge-base/suppliers/tech-support/3rd-party-carts/md5-hash-checking/where-do-i-set-up-the-secret-word"); ?></span>
-	      <p>
-		<label><?php _e('Seller ID', 'mp') ?><br />
-		  <input value="<?php echo esc_attr($settings['gateways']['2checkout']['sid']); ?>" size="30" name="mp[gateways][2checkout][sid]" type="text" />
-		</label>
-	      </p>
-	      <p>
-		<label><?php _e('Secret word', 'mp') ?><br />
-		  <input value="<?php echo esc_attr($settings['gateways']['2checkout']['secret_word']); ?>" size="30" name="mp[gateways][2checkout][secret_word]" type="text" />
-		</label>
-	      </p>
-	    </td>
-	  </tr>
+				  <tr>
+				    <th scope="row"><?php _e('Mode', 'mp') ?></th>
+				    <td>
+			        <p>
+			          <select name="mp[gateways][2checkout][mode]">
+			            <option value="sandbox" <?php selected($settings['gateways']['2checkout']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
+			            <option value="live" <?php selected($settings['gateways']['2checkout']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
+			          </select>
+			        </p>
+				    </td>
+				  </tr>
+				  <tr>
+				    <th scope="row"><?php _e('2Checkout Credentials', 'mp') ?></th>
+				    <td>
+			        <span class="description"><?php print sprintf(__('You must login to 2Checkout vendor dashboard to obtain the seller ID and secret word. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.2checkout.com/community/blog/knowledge-base/suppliers/tech-support/3rd-party-carts/md5-hash-checking/where-do-i-set-up-the-secret-word"); ?></span>
+				      <p>
+								<label><?php _e('Seller ID', 'mp') ?><br />
+								  <input value="<?php echo esc_attr($settings['gateways']['2checkout']['sid']); ?>" size="30" name="mp[gateways][2checkout][sid]" type="text" />
+								</label>
+				      </p>
+				      <p>
+								<label><?php _e('Secret word', 'mp') ?><br />
+								  <input value="<?php echo esc_attr($settings['gateways']['2checkout']['secret_word']); ?>" size="30" name="mp[gateways][2checkout][secret_word]" type="text" />
+								</label>
+				      </p>
+				    </td>
+				  </tr>
           <tr valign="top">
-        <th scope="row"><?php _e('2Checkout Currency', 'mp') ?></th>
-        <td>
-          <select name="mp[gateways][2checkout][currency]">
-          <?php
-          $sel_currency = ($settings['gateways']['2checkout']['currency']) ? $settings['gateways']['2checkout']['currency'] : $settings['currency'];
-          $currencies = array(
-            "ARS" => 'ARS - Argentina Peso',
-            "AUD" => 'AUD - Australian Dollar',
-						"BRL" => 'BRL - Brazilian Real',
-						"CAD" => 'CAD - Canadian Dollar',
-						"CHF" => 'CHF - Swiss Franc',
-						"DKK" => 'DKK - Danish Krone',
-						"EUR" => 'EUR - Euro',
-						"GBP" => 'GBP - British Pound',
-						"HKD" => 'HKD - Hong Kong Dollar',
-						"INR" => 'INR - Indian Rupee',
-						"JPY" => 'JPY - Japanese Yen',
-						"MXN" => 'MXN - Mexican Peso',
-						"NOK" => 'NOK - Norwegian Krone',
-						"NZD" => 'NZD - New Zealand Dollar',
-						"SEK" => 'SEK - Swedish Krona',
-						"USD" => 'USD - U.S. Dollar',
-          );
+	        <th scope="row"><?php _e('2Checkout Currency', 'mp') ?></th>
+	        <td>
+	          <select name="mp[gateways][2checkout][currency]">
+	          <?php
+	          $sel_currency = ($settings['gateways']['2checkout']['currency']) ? $settings['gateways']['2checkout']['currency'] : $settings['currency'];
+	          $currencies = array(
+	            "ARS" => 'ARS - Argentina Peso',
+	            "AUD" => 'AUD - Australian Dollar',
+							"BRL" => 'BRL - Brazilian Real',
+							"CAD" => 'CAD - Canadian Dollar',
+							"CHF" => 'CHF - Swiss Franc',
+							"DKK" => 'DKK - Danish Krone',
+							"EUR" => 'EUR - Euro',
+							"GBP" => 'GBP - British Pound',
+							"HKD" => 'HKD - Hong Kong Dollar',
+							"INR" => 'INR - Indian Rupee',
+							"JPY" => 'JPY - Japanese Yen',
+							"MXN" => 'MXN - Mexican Peso',
+							"NOK" => 'NOK - Norwegian Krone',
+							"NZD" => 'NZD - New Zealand Dollar',
+							"SEK" => 'SEK - Swedish Krona',
+							"USD" => 'USD - U.S. Dollar',
+	          );
 
-          foreach ($currencies as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
-          }
-          ?>
-          </select>
-        </td>
-        </tr>
+	          foreach ($currencies as $k => $v) {
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	          }
+	          ?>
+	          </select>
+	        </td>
+	        </tr>
         </table>
       </div>
     </div>

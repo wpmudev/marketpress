@@ -1729,15 +1729,11 @@ Thanks again!", 'mp')
   }
 
   //returns the calculated price for shipping. Returns False if shipping address is not available
-  function shipping_price($format = false, $global_cart = false) {
-		global $blog_id;
-		$blog_id = (is_multisite()) ? $blog_id : 1;
-		
-    if (!$global_cart)
-      $global_cart = $this->get_cart_contents();
+  function shipping_price($format = false, $cart = false) {
 
 		//grab cart for just this blog
-		$cart = @$global_cart[$blog_id];
+		if (!$cart)
+			$cart = $this->get_cart_contents();
 
     //get total after any coupons
     $totals = array();
@@ -1780,17 +1776,12 @@ Thanks again!", 'mp')
   }
 
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
-  function tax_price($format = false, $global_cart = false) {
-    global $blog_id;
-    $blog_id = (is_multisite()) ? $blog_id : 1;
+  function tax_price($format = false, $cart = false) {
 		$settings = get_option('mp_settings');
 
-    //get current cart contents
-    if (!$global_cart)
-      $global_cart = $this->get_cart_contents();
-
-		//grab cart for just this blog
-		$cart = @$global_cart[$blog_id];
+    //grab cart for just this blog
+    if (!$cart)
+			$cart = $this->get_cart_contents();
 		
     //get address
     $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info');
@@ -1871,7 +1862,7 @@ Thanks again!", 'mp')
   }
 
   //returns contents of shopping cart cookie
-  function get_cart_cookie($all_blogs = false) {
+  function get_cart_cookie($global = false) {
     global $blog_id;
     $blog_id = (is_multisite()) ? $blog_id : 1;
 
@@ -1883,7 +1874,7 @@ Thanks again!", 'mp')
       $global_cart = array($blog_id => array());
     }
     
-    if ($all_blogs) {
+    if ($global) {
       return $global_cart;
     } else {
 	    if (isset($global_cart[$blog_id])) {
@@ -1905,8 +1896,8 @@ Thanks again!", 'mp')
     // Set the cookie variable as well, sometimes updating the cache doesn't work
     $_COOKIE[$cookie_id] = serialize($global_cart);
     
-    //update cache
-    $this->get_cart_contents($global_cart);
+    //mark cache for updating
+    $this->cart_cache = false;
   }
   
   //saves cart array to cookie
@@ -1927,19 +1918,25 @@ Thanks again!", 'mp')
   }
   
   //returns the full array of cart contents
-  function get_cart_contents($global_cart = false) {
+  function get_cart_contents($global = false) {
     global $blog_id;
+    $blog_id = (is_multisite()) ? $blog_id : 1;
     $current_blog_id = $blog_id;
     
-    //if not updating cache
-    if ($global_cart === false) {
-      //check cache
-      if ($this->cart_cache) {
-        return $this->cart_cache;
-      }
-
-      $global_cart = $this->get_cart_cookie(true);
+    //check cache
+    if ($this->cart_cache) {
+      if ($global) {
+	      return $this->cart_cache;
+	    } else {
+		    if (isset($this->cart_cache[$blog_id])) {
+		      return $this->cart_cache[$blog_id];
+		    } else {
+		      return array();
+		    }
+			}
     }
+
+    $global_cart = $this->get_cart_cookie(true);
     
     $full_cart = array();
     foreach ($global_cart as $bid => $cart) {
@@ -1981,10 +1978,15 @@ Thanks again!", 'mp')
 				    $name = $product->post_title . ': ' . $var_names[$variation];
 					else
 					  $name = $product->post_title;
+
+					//get if downloadable
+          if ( $download_url = get_post_meta($product_id, 'mp_file', true) )
+            $download = array('url' => $download_url, 'downloaded' => 0);
+					else
+					  $download = false;
 					  
-					$full_cart[$bid][$product_id][$variation] = array('SKU' => $skus[$variation], 'name' => $name, 'price' => $this->product_price($product_id, $variation), 'quantity' => $quantity);
+					$full_cart[$bid][$product_id][$variation] = array('SKU' => $skus[$variation], 'name' => $name, 'url' => get_permalink($product_id), 'price' => $this->product_price($product_id, $variation), 'quantity' => $quantity, 'download' => $download);
 				}
-	
       }
     }
     
@@ -1993,7 +1995,16 @@ Thanks again!", 'mp')
 
     //save to cache
     $this->cart_cache = $full_cart;
-    return $full_cart;
+    
+    if ($global) {
+      return $full_cart;
+    } else {
+	    if (isset($full_cart[$blog_id])) {
+	      return $full_cart[$blog_id];
+	    } else {
+	      return array();
+	    }
+		}
   }
 
   //receives a post and updates cookie variables for cart
@@ -2232,7 +2243,7 @@ Thanks again!", 'mp')
         //check for $0 checkout to skip gateways
 
         //loop through cart items
-        $global_cart = $this->get_cart_contents();
+        $global_cart = $this->get_cart_contents(true);
 			  if (!$this->global_cart)  //get subset if needed
 			  	$selected_cart[$blog_id] = $global_cart[$blog_id];
 			  else
@@ -2291,7 +2302,7 @@ Thanks again!", 'mp')
 			      	$_SESSION['mp_payment_method'] = $network_settings['global_gateway'];
 						else
 			      	$_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
-			      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
+			      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents($this->global_cart), $_SESSION['mp_shipping_info'] );
 			      //if no errors send to next checkout step
 			      if ($this->checkout_error == false) {
 							wp_safe_redirect(mp_checkout_step_url('confirm-checkout'));
@@ -2329,7 +2340,6 @@ Thanks again!", 'mp')
 				      
             //setup our payment details
 	          $timestamp = time();
-	          $order_id = $this->generate_order_id();
 	          $settings = get_option('mp_settings');
 	    	  	$payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
 	          $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
@@ -2338,7 +2348,7 @@ Thanks again!", 'mp')
 	      	  $payment_info['status'][$timestamp] = __('Completed', 'mp');
 	      	  $payment_info['total'] = $total;
 	      	  $payment_info['currency'] = $settings['currency'];
-		  			$this->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
+		  			$this->create_order(false, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
 	        }
 
 	        //go back to original blog
@@ -2356,14 +2366,14 @@ Thanks again!", 'mp')
     } else if (isset($_POST['mp_choose_gateway'])) { //check and save payment info
       $_SESSION['mp_payment_method'] = $_POST['mp_choose_gateway'];
       //processing script is only for selected gateway plugin
-      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
+      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents($this->global_cart), $_SESSION['mp_shipping_info'] );
       //if no errors send to next checkout step
       if ($this->checkout_error == false) {
         wp_safe_redirect(mp_checkout_step_url('confirm-checkout'));
         exit;
       }
     } else if (isset($_POST['mp_payment_confirm'])) { //create order and process payment
-      do_action( 'mp_payment_confirm_' . $_SESSION['mp_payment_method'], $this->get_cart_contents(), $_SESSION['mp_shipping_info'] );
+      do_action( 'mp_payment_confirm_' . $_SESSION['mp_payment_method'], $this->get_cart_contents($this->global_cart), $_SESSION['mp_shipping_info'] );
 
       //if no errors send to next checkout step
       if ($this->checkout_error == false) {
@@ -2574,7 +2584,7 @@ Thanks again!", 'mp')
     $user_id = get_current_user_id();
     if ($user_id) { //save to user_meta if logged in
 
-      if (is_multisite()) {
+      if (is_multisite() && !$this->global_cart) {
         global $blog_id;
         $meta_id = 'mp_order_history_' . $blog_id;
       } else {
@@ -2583,12 +2593,12 @@ Thanks again!", 'mp')
 
       $orders = get_user_meta($user_id, $meta_id, true);
       $timestamp = time();
-      $orders[$timestamp] = array('id' => $order_id, 'total' => $payment_info['total']);
+      $orders[$timestamp] = array('id' => $order_id, 'blog_id' => $blog_id, 'total' => $payment_info['total']);
       update_user_meta($user_id, $meta_id, $orders);
 
     } else { //save to cookie instead
 
-      if (is_multisite()) {
+      if (is_multisite() && !$this->global_cart) {
         global $blog_id;
         $cookie_id = 'mp_order_history_' . $blog_id . '_' . COOKIEHASH;
       } else {
@@ -2599,7 +2609,7 @@ Thanks again!", 'mp')
         $orders = unserialize($_COOKIE[$cookie_id]);
 
       $timestamp = time();
-      $orders[$timestamp] = array('id' => $order_id, 'total' => $payment_info['total']);
+      $orders[$timestamp] = array('id' => $order_id, 'blog_id' => $blog_id, 'total' => $payment_info['total']);
 
       //set cookie
       $expire = time() + 2592000; //1 month expire
