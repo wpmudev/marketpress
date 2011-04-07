@@ -680,7 +680,7 @@ function _mp_cart_payment($type, $echo = false) {
 
     //tracking information
     $track_link = '<a href="' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '">' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '</a>';
-    $content .= '<p>' . sprintf(__('You may track the latest status of your order here:<br />%s', 'mp'), $track_link) . '</p>';
+    $content .= '<p>' . sprintf(__('You may track the latest status of your order(s) here:<br />%s', 'mp'), $track_link) . '</p>';
 
     //clear cart session vars
     unset($_SESSION['mp_payment_method']);

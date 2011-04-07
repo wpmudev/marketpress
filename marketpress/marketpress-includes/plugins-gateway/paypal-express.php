@@ -223,7 +223,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     
     //create order id for paypal invoice
     $order_id = $mp->generate_order_id();
-    
+    /*
     foreach ($global_cart as $bid => $cart) {
       foreach ($cart as $product_id => $data) {
 				if ('deal' == get_post_type($product_id)) {
@@ -231,7 +231,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				}
       }
     }
-    
+    */
     //set it up with PayPal
     $result = $this->SetExpressCheckout($global_cart, $shipping_info, $order_id);
     
@@ -488,7 +488,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     global $mp;
     
     if ($mp->global_cart) {
-
+		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
+			/* TODO - create a list of sep store orders
+	    foreach ($_SESSION['prs'] as $i => $pr) {
+		    $_SESSION['final_amts'][$i];
+		  }
+		  */
 		} else {
 	    if ($order->post_status == 'order_received') {
 	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
@@ -498,11 +503,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	      $timestamp = key($statuses);
 	      $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . esc_html($status) . '</p>';
 	    } else {
-	      if (count($order->mp_payment_info['transaction_id']) > 1) {
-					$content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction numbers are <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), join(', ', $order->mp_payment_info['transaction_id'])) . '</p>';
-	      } else {
-					$content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id'][0]) . '</p>';
-	      }
+	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
 	    }
 		}
     return $content;
