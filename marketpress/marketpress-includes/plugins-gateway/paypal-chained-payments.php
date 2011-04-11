@@ -85,6 +85,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    *  If you don't need to add form fields set $skip_form to true so this page can be skipped
    *  at checkout.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function payment_form($cart, $shipping_info) {
@@ -99,6 +100,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    *  Call $mp->cart_checkout_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment_form($cart, $shipping_info) {
@@ -109,6 +111,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    * Echo the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function confirm_payment_form($cart, $shipping_info) {
@@ -125,6 +128,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    *  Call $mp->cart_checkout_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment($cart, $shipping_info) {
@@ -137,7 +141,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
     $result = $this->Pay($cart, $shipping_info, $order_id);
 
     //check response
-		if ($result["responseEnvelope_ack"] == "Success" || $result["responseEnvelope_ack"] == "SuccessWithWarning")	{
+		if ($result["responseEnvelope_ack"] == "Success" || $result["responseEnvelope_ack"] == "SuccessWithWarning") {
 			$paykey = urldecode($result["payKey"]);
 			$_SESSION['PAYKEY'] = $paykey;
 			
@@ -707,11 +711,11 @@ if ( is_multisite() ) {
   mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', $admin_name );
   
   //tie into network settings form
-	add_action( 'mp_network_gateway_settings', 'mp_network_gateway_settings_box' );
+	add_action( 'mp_network_gateway_settings', 'pc_network_gateway_settings_box' );
 	
-	function mp_network_gateway_settings_box($settings) {
+	function pc_network_gateway_settings_box($settings) {
     global $mp;
-        ?>
+    ?>
     <script type="text/javascript">
   	  jQuery(document).ready(function($) {
         $("#gbl_gw_paypal-chained, #gw_full_paypal-chained, #gw_supporter_paypal-chained, #gw_none_paypal-chained").change(function() {

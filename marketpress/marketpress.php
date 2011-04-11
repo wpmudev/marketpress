@@ -62,6 +62,9 @@ class MarketPress {
     //load sitewide features if WPMU
     if (is_multisite()) {
       include_once( $this->plugin_dir . 'marketpress-ms.php' );
+      $network_settings = get_site_option( 'mp_network_settings' );
+	    if ( $network_settings['global_cart'] )
+	    	$this->global_cart = true;
     }
 
     $settings = get_option('mp_settings');
@@ -128,6 +131,7 @@ class MarketPress {
 		add_action('profile_update', array(&$this, 'user_profile_update'));
 		add_action('edit_user_profile', array(&$this, 'user_profile_fields'));
 		add_action('show_user_profile', array(&$this, 'user_profile_fields'));
+		
 	}
 
   function install() {
@@ -707,6 +711,10 @@ Thanks again!", 'mp')
       //check for custom theme templates
       $product_name = get_query_var('product');
       $product_id = (int) $wp_query->get_queried_object_id();
+      
+      //serve download if it exists
+      $this->serve_download($product_id);
+      
       $templates = array();
     	if ( $product_name )
     		$templates[] = "mp_product-$product_name.php";
@@ -758,7 +766,7 @@ Thanks again!", 'mp')
       $this->update_cart();
 
 			//if global cart is on forward to main site checkout
-			if ( $this->global_cart && !$mp_wpmu->is_main_site() ) {
+			if ( $this->global_cart && is_object($mp_wpmu) && !$mp_wpmu->is_main_site() ) {
 				wp_redirect( mp_cart_link(false, true) );
 				exit;
 			}
@@ -2702,6 +2710,52 @@ Thanks again!", 'mp')
     $order->post_status = $statuses[$new_status];
     wp_transition_post_status($statuses[$new_status], $old_status, $order);
   }
+
+  //returns formatted download url for a given product. Returns false if no download
+	function download_url($product_id, $order_id) {
+    $url = get_post_meta($product_id, 'mp_file', true);
+    if (!$url)
+      return false;
+      
+		return get_permalink($product_id) . "?orderid=$order_id";
+	}
+
+  //serves a downloadble product file
+  function serve_download($product_id) {
+		if (!isset($_GET['orderid']))
+		  return false;
+		  
+		$url = get_post_meta($product_id, 'mp_file', true);
+    if (!$url)
+      return false;
+
+		require_once(ABSPATH . '/wp-admin/includes/file.php');
+  
+    $url = 'http://test.net/files/2011/03/1.png';
+    $filename = basename($url);
+    $tmp = download_url($url);
+
+		if ( is_wp_error($tmp) ) {
+			@unlink($tmp);
+			return false;
+		}
+    
+	  if (file_exists($tmp)) {
+	    header('Content-Description: File Transfer');
+	    header('Content-Type: application/octet-stream');
+	    header('Content-Disposition: attachment; filename="'.$filename.'"');
+	    header('Content-Transfer-Encoding: binary');
+	    header('Expires: 0');
+	    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	    header('Pragma: public');
+	    header('Content-Length: ' . filesize($tmp));
+	    readfile($tmp);
+	    @unlink($tmp);
+	    exit;
+		}
+		
+		return false;
+	}
   
   // Update profile fields
   function user_profile_update() {
@@ -4955,6 +5009,7 @@ Notification Preferences: %s', 'mp');
         <form id="mp-gateways-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=gateways">
           <input type="hidden" name="gateway_settings" value="1" />
 
+					<?php if (!$this->global_cart) { ?>
           <div id="mp_gateways" class="postbox">
             <h3 class='hndle'><span><?php _e('General Settings', 'mp') ?></span></h3>
             <div class="inside">
@@ -4985,6 +5040,7 @@ Notification Preferences: %s', 'mp');
               </table>
             </div>
           </div>
+          <?php } ?>
 
           <?php
           //for adding additional settings for a payment gateway plugin
@@ -5141,6 +5197,9 @@ class MarketPress_Shopping_Cart extends WP_Widget {
 	function widget($args, $instance) {
 		global $mp;
 		$settings = get_option('mp_settings');
+
+    if ( get_query_var('pagename') == 'cart' )
+      return;
 
 		extract( $args );
 

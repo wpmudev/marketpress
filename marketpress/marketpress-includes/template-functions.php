@@ -1564,7 +1564,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 function mp_cart_link($echo = true, $url = false, $link_text = '') {
 	global $mp, $mp_wpmu;
 	
-	if ( $mp->global_cart && !$mp_wpmu->is_main_site() && function_exists('mp_main_site_id') ) {
+	if ( $mp->global_cart && is_object($mp_wpmu) && !$mp_wpmu->is_main_site() && function_exists('mp_main_site_id') ) {
 		switch_to_blog(mp_main_site_id());
 		$settings = get_option('mp_settings');
 		$link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );

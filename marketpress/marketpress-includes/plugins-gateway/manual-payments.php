@@ -49,6 +49,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   /**
    * Echo fields you need to add to the payment screen, like your credit card info fields
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function payment_form($cart, $shipping_info) {
@@ -64,6 +65,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    *  Call $mp->cart_checkout_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment_form($cart, $shipping_info) {
@@ -74,6 +76,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * Echo the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function confirm_payment_form($cart, $shipping_info) {
@@ -88,6 +91,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    *  Call $mp->cart_checkout_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment($cart, $shipping_info) {
@@ -240,7 +244,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   	$settings['gateways']['manual-payments']['name'] = wp_filter_nohtml_kses($settings['gateways']['manual-payments']['name']);
   	
 		//filter html if needed
-		if (current_user_can('unfiltered_html')) {
+		if (!current_user_can('unfiltered_html')) {
 			$settings['gateways']['manual-payments']['instructions'] = filter_post_kses($settings['gateways']['manual-payments']['instructions']);
 			$settings['gateways']['manual-payments']['confirmation'] = filter_post_kses($settings['gateways']['manual-payments']['confirmation']);
 		}
