@@ -213,6 +213,9 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     return $content;
   }
   
+  /**
+   * Runs before page load incase you need to run any scripts before loading the success message page
+   */
   function order_confirmation($order) {
     global $mp;
     
@@ -237,7 +240,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
       $payment_info['transaction_id'] = $_REQUEST['order_number'];  
       $payment_info['method'] = "Credit Card";
     
-      $order = $mp->create_order($_SESSION['mp_order'], $mp->get_cart_contents, $_SESSION['mp_shipping_info'], $payment_info, $paid);
+      $order = $mp->create_order($_SESSION['mp_order'], $mp->get_cart_contents(), $_SESSION['mp_shipping_info'], $payment_info, $paid);
     }
   }
   

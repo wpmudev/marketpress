@@ -26,7 +26,7 @@ class MarketPress_MS {
     //index products
     add_action( 'save_post', array(&$this, 'index_product') );
     add_action( 'delete_post', array(&$this, 'delete_product') );
-    add_action( 'mp_product_sale', array(&$this, 'record_sale'), 10, 2 );
+    add_action( 'mp_product_sale', array(&$this, 'record_sale'), 10, 4 );
     
     //handle blog changes
     add_action( 'make_spam_blog', array(&$this, 'remove_blog') );
@@ -927,7 +927,7 @@ class MarketPress_MS {
   }
   
   //updates the sales count when an order is made on a blog
-  function record_sale( $product_id, $data ) {
+  function record_sale( $product_id, $variation, $data, $paid ) {
     global $wpdb;
     
     $wpdb->query( "UPDATE {$wpdb->base_prefix}mp_products SET sales_count = (sales_count + {$data['quantity']}) WHERE site_id = {$wpdb->siteid} AND blog_id = {$wpdb->blogid} AND post_id = $product_id" );

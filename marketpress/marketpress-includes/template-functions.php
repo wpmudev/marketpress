@@ -844,58 +844,43 @@ function mp_order_status() {
           <th class="mp_cart_col_quant"><?php _e('Quantity', 'mp'); ?></th>
           <th class="mp_cart_col_price"><?php _e('Price', 'mp'); ?></th>
           <th class="mp_cart_col_subtotal"><?php _e('Subtotal', 'mp'); ?></th>
+          <th class="mp_cart_col_downloads"><?php _e('Download', 'mp'); ?></th>
         </tr></thead>
         <tbody>
         <?php
-        if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
-          foreach ($order->mp_cart_info as $bid => $cart) {
-            if (is_multisite()) {
-              switch_to_blog($bid);
+          if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+            foreach ($order->mp_cart_info as $product_id => $variations) {
+							//for compatibility for old orders from MP 1.0
+							if (isset($variations['name'])) {
+              	$data = $variations;
+                echo '<tr>';
+	              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
+	              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+	              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+	              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
+	              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+	              echo '  <td class="mp_cart_col_downloads"></td>';
+	              echo '</tr>';
+							} else {
+								foreach ($variations as $variation => $data) {
+		              echo '<tr>';
+		              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
+		              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+		              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
+		              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->ID))
+									  echo '  <td class="mp_cart_col_downloads"><a href="' . $download_url . '">' . __('Download &raquo;', 'mp') . '</a></td>';
+									else
+										echo '  <td class="mp_cart_col_downloads"></td>';
+		              echo '</tr>';
+								}
+							}
             }
-            foreach ($cart as $product_id => $variations) {
-              $vc = 0;
-              foreach ($variations as $variation => $data) {
-                if ($vc == 0) {
-                  echo '<tr>';
-                } else {
-                  echo '<tr class="mp_sub_line">';
-                }
-                if ($settings['product_variations']) {
-                  $colspan = 'colspan="4"';
-                } else {
-                  $colspan = '';
-                }
-                if ($vc == 0) {
-                  echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-                  echo '  <td class="mp_cart_col_product" '.$colspan.'><a href="' . $data['url'] . '">' . esc_attr($data['name']) . '</a></td>';
-                  if ($settings['product_variations']) {
-                    echo '  </tr>';
-                    echo '  <tr class="mp_sub_line">';
-                  }
-                }
-                if ($settings['product_variations']) {
-                  echo '  <td>&nbsp;</td>';
-                  if ($variation == 0) {
-                    echo '  <td class="mp_cart_col_product" >'. __('Variation 1','mp') . '</td>';
-                  } else {
-                    echo '  <td class="mp_cart_col_product" >'. __('Variation 2','mp') . '</td>';
-                  }
-                }
-                echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-                echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
-                echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-                echo '</tr>';
-                $vc++;
-              }
-            }
+          } else {
+            echo '<tr><td colspan="6">' . __('No products could be found for this order', 'mp') . '</td></tr>';
           }
-          if (is_multisite()) {
-            switch_to_blog($current_blog_id);
-          }
-        } else {
-          echo '<tr><td colspan="6">' . __('No products could be found for this order', 'mp') . '</td></tr>';
-        }
-        ?>
+          ?>
         </tbody>
       </table>
       <ul>

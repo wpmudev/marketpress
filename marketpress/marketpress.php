@@ -625,7 +625,6 @@ Thanks again!", 'mp')
   		'post_type'   => 'mp_order',
   		'public'      => false
   	) );
-
   }
 
   //necessary to mod array directly rather than with add_theme_support() to play nice with other themes. See http://www.wptavern.com/forum/plugins-hacks/1751-need-help-enabling-post-thumbnails-custom-post-type.html
@@ -1965,22 +1964,26 @@ Thanks again!", 'mp')
 					//check stock
           if (get_post_meta($product_id, 'mp_track_inventory', true)) {
 						$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+						if (!is_array($stock))
+					  	$stock[0] = $stock;
 	        	if ($stock[$variation] < $quantity) {
 	        	  $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of %1$s in stock. Your cart quantity has been changed to %2$s.", 'mp'), $product->post_title, number_format_i18n($stock[$variation])) );
               $quantity = $stock[$variation];
 						}
 					}
 					
-					//check quota
-        	if (get_post_meta($product_id, 'mp_track_quota', true)) {
-	        	$quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
-			      if ($quota[$variation] && $quota[$variation] < $quantity) {
-		          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %1$s for %2$s. Your cart quantity has been changed to %1$s.", 'mp'), number_format_i18n($quota[$variation]), $product->post_title) );
-              $quantity = $quota[$variation];
+					//check limit
+        	if (get_post_meta($product_id, 'mp_track_limit', true)) {
+	        	$limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+			      if ($limit[$variation] && $limit[$variation] < $quantity) {
+		          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %1$s for %2$s. Your cart quantity has been changed to %1$s.", 'mp'), number_format_i18n($limit[$variation]), $product->post_title) );
+              $quantity = $limit[$variation];
 			      }
 		      }
 		      
 				  $skus = maybe_unserialize(get_post_meta($product_id, 'mp_sku', true));
+				  if (!is_array($skus))
+						$skus[0] = $skus;
 				  $var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
 				  if (is_array($var_names) && count($var_names) > 1)
 				    $name = $product->post_title . ': ' . $var_names[$variation];
@@ -2075,6 +2078,8 @@ Thanks again!", 'mp')
       //check stock
       if (get_post_meta($product_id, 'mp_track_inventory', true)) {
         $stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+        if (!is_array($stock))
+					$stock[0] = $stock;
         if ($stock[$variation] < $new_quantity) {
           if ($no_ajax !== true) {
             echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id][$variation]));
@@ -2095,15 +2100,15 @@ Thanks again!", 'mp')
         }
       }
       
-      //check quotas
-      if (get_post_meta($product_id, 'mp_track_quota', true)) {
-	      $quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
-	      if ($quota[$variation] && $quota[$variation] < $new_quantity) {
+      //check limits
+      if (get_post_meta($product_id, 'mp_track_limit', true)) {
+	      $limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+	      if ($limit[$variation] && $limit[$variation] < $new_quantity) {
 	        if ($no_ajax !== true) {
-		  			echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota[$variation]), $product->post_title);
+		  			echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($limit[$variation]), $product->post_title);
 	          exit;
 	        } else {
-	          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota[$variation]), $product->post_title) );
+	          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($limit[$variation]), $product->post_title) );
 	          return false;
 	        }
 	      }
@@ -2135,16 +2140,18 @@ Thanks again!", 'mp')
             //check stock
             if (get_post_meta($product_id, 'mp_track_inventory', true)) {
               $stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+              if (!is_array($stock))
+								$stock[0] = $stock;
               if ($stock[$variation] < intval($quant)) {
                 $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($stock[$variation]-intval($quant))) );
                 continue;
               }
             }
-	          //check quota
-	    			if (get_post_meta($product_id, 'mp_track_quota', true)) {
-	            $quota = maybe_unserialize(get_post_meta($product_id, 'mp_quota', true));
-					    if ($quota[$variation] && $quota[$variation] < intval($quant)) {
-					      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($quota[$variation]), get_the_title($product_id)) );
+	          //check limit
+	    			if (get_post_meta($product_id, 'mp_track_limit', true)) {
+	            $limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+					    if ($limit[$variation] && $limit[$variation] < intval($quant)) {
+					      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($limit[$variation]), get_the_title($product_id)) );
 	          		continue;
 					    }
 	          }
@@ -2270,10 +2277,10 @@ Thanks again!", 'mp')
 							$totals[] = $data['price'] * $data['quantity'];
 				    }
 				  }
-		      if ( ($shipping_price = $mp->shipping_price()) !== false )
+		      if ( ($shipping_price = $this->shipping_price()) !== false )
 		        $shipping_prices[] = $shipping_price;
 
-		      if ( ($tax_price = $mp->tax_price()) !== false )
+		      if ( ($tax_price = $this->tax_price()) !== false )
 		        $tax_prices[] = $tax_price;
         }
         
@@ -2529,27 +2536,31 @@ Thanks again!", 'mp')
     add_post_meta($post_id, 'mp_payment_info', $payment_info, true);
 
     //loop through cart items
-    foreach ($cart as $product_id => $data) {
-      $items[] = $data['quantity'];
+    foreach ($cart as $product_id => $variations) {
+			foreach ($variations as $variation => $data) {
+	      $items[] = $data['quantity'];
 
-      //adjust product stock quantities
-      if (get_post_meta($product_id, 'mp_track_inventory', true)) {
-        $stock = get_post_meta($product_id, 'mp_inventory', true);
-        $stock = $stock - $data['quantity'];
-        update_post_meta($product_id, 'mp_inventory', $stock);
+	      //adjust product stock quantities
+	      if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+	        $stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+					if (!is_array($stock))
+					  $stock[0] = $stock;
+					$stock[$variation] = $stock[$variation] - $data['quantity'];
+	        update_post_meta($product_id, 'mp_inventory', $stock);
 
-        if ($stock <= $settings['inventory_threshold']) {
-          $this->low_stock_notification($product_id, $stock);
-        }
-      }
+	        if ($stock[$variation] <= $settings['inventory_threshold']) {
+	          $this->low_stock_notification($product_id, $variation, $stock[$variation]);
+	        }
+	      }//check stock
 
-      //update sales count
-      $count = get_post_meta($product_id, 'mp_sales_count', true);
-      $count = $count + $data['quantity'];
-      update_post_meta($product_id, 'mp_sales_count', $count);
+	      //update sales count
+	      $count = get_post_meta($product_id, 'mp_sales_count', true);
+	      $count = $count + $data['quantity'];
+	      update_post_meta($product_id, 'mp_sales_count', $count);
 
-      //for plugins into product sales
-      do_action( 'mp_product_sale', $product_id, $data, $paid );
+	      //for plugins into product sales
+	      do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
+			}
     }
 		$item_count = array_sum($items);
 
@@ -2712,7 +2723,7 @@ Thanks again!", 'mp')
   }
 
   //returns formatted download url for a given product. Returns false if no download
-	function download_url($product_id, $order_id) {
+	function get_download_url($product_id, $order_id) {
     $url = get_post_meta($product_id, 'mp_file', true);
     if (!$url)
       return false;
@@ -2731,7 +2742,6 @@ Thanks again!", 'mp')
 
 		require_once(ABSPATH . '/wp-admin/includes/file.php');
   
-    $url = 'http://test.net/files/2011/03/1.png';
     $filename = basename($url);
     $tmp = download_url($url);
 
@@ -3080,9 +3090,15 @@ Thanks again!", 'mp')
     //// order info
     if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
       $order_info = __('Items:', 'mp') . "\n";
-      foreach ($order->mp_cart_info as $product_id => $data) {
-        $order_info .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
-      }
+      foreach ($order->mp_cart_info as $product_id => $variations) {
+				foreach ($variations as $variation => $data) {
+	        $order_info .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+
+					//show download link if set
+					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->ID))
+	        	$order_info .= "\t" . __('Download: ', 'mp') . $download_url;
+				}
+			}
       $order_info .= "\n";
     }
     //coupon line
@@ -3206,12 +3222,18 @@ You can manage this order here: %s", 'mp');
   }
 
   //sends email to admin for low stock notification
-  function low_stock_notification($product_id, $stock) {
+  function low_stock_notification($product_id, $variation, $stock) {
     $settings = get_option('mp_settings');
 
     //skip if sent already and not 0
     if ( get_post_meta($product_id, 'mp_stock_email_sent', true) && $stock > 0 )
       return;
+      
+    $var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
+	  if (is_array($var_names) && count($var_names) > 1)
+	    $name = get_the_title($product_id) . ': ' . $var_names[$variation];
+		else
+		  $name = get_the_title($product_id);
 
     $subject = __('Low Product Inventory Notification', 'mp');
     $msg = __('This message is being sent to notify you of low stock of a product in your online store according to your preferences.
@@ -3222,7 +3244,7 @@ Link: %s
 
 Edit Product: %s
 Notification Preferences: %s', 'mp');
-    $msg = sprintf($msg, get_the_title($product_id), number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
+    $msg = sprintf($msg, $name, number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
     $msg = apply_filters( 'mp_low_stock_notification', $msg, $product_id );
 
     wp_mail(get_option('admin_email'), $subject, $msg);
@@ -3493,22 +3515,43 @@ Notification Preferences: %s', 'mp');
             <th class="mp_cart_col_quant"><?php _e('Qantity', 'mp'); ?></th>
             <th class="mp_cart_col_price"><?php _e('Price', 'mp'); ?></th>
             <th class="mp_cart_col_subtotal"><?php _e('Subtotal', 'mp'); ?></th>
+            <th class="mp_cart_col_downloads"><?php _e('Downloads', 'mp'); ?></th>
           </tr></thead>
           <tbody>
           <?php
           if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
-            foreach ($order->mp_cart_info as $product_id => $data) {
-              echo '<tr>';
-              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-              echo '  <td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
-              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
-              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
-              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-              echo '</tr>';
+            foreach ($order->mp_cart_info as $product_id => $variations) {
+							//for compatibility for old orders from MP 1.0
+							if (isset($variations['name'])) {
+              	$data = $variations;
+                echo '<tr>';
+	              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
+	              echo '  <td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
+	              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+	              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+	              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
+	              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+	              echo '  <td class="mp_cart_col_downloads">' . __('N/A', 'mp') . '</td>';
+	              echo '</tr>';
+							} else {
+								foreach ($variations as $variation => $data) {
+		              echo '<tr>';
+		              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
+		              echo '  <td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
+		              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
+		              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
+		              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+									if (is_array($data['download']))
+									  echo '  <td class="mp_cart_col_downloads">' . number_format_i18n($data['download']['downloaded']) . '</td>';
+									else
+										echo '  <td class="mp_cart_col_downloads">' . __('N/A', 'mp') . '</td>';
+		              echo '</tr>';
+								}
+							}
             }
           } else {
-            echo '<tr><td colspan="6">' . __('No products could be found for this order', 'mp') . '</td></tr>';
+            echo '<tr><td colspan="7">' . __('No products could be found for this order', 'mp') . '</td></tr>';
           }
           ?>
           </tbody>
