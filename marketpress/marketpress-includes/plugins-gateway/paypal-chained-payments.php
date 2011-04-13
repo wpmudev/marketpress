@@ -108,7 +108,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   }
   
   /**
-   * Echo the chosen payment details here for final confirmation. You probably don't need
+   * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
@@ -118,7 +118,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	  global $mp;
 
     //print payment details
-    echo '<a href="#" onclick="javascript:window.open(\'https://www.paypal.com/cgi-bin/webscr?cmd=xpt/Marketing/popup/OLCWhatIsPayPal-outside\',\'olcwhatispaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=400, height=350\');return false;"><img  src="https://www.paypal.com/en_US/i/bnr/horizontal_solution_PPeCheck.gif" border="0" alt="PayPal"></a>';
+    return '<a href="#" onclick="javascript:window.open(\'https://www.paypal.com/cgi-bin/webscr?cmd=xpt/Marketing/popup/OLCWhatIsPayPal-outside\',\'olcwhatispaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=400, height=350\');return false;"><img  src="https://www.paypal.com/en_US/i/bnr/horizontal_solution_PPeCheck.gif" border="0" alt="PayPal"></a>';
   }
 
   /**
@@ -277,8 +277,10 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   }
   
   /**
-   * Echo any html you want to show on the confirmation screen after checkout. This
+   * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
+   *
+   * Don't forget to return!
    */
   function order_confirmation_msg($content, $order) {
     global $mp;

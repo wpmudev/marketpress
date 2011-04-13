@@ -398,7 +398,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   }
   
   /**
-   * Echo the chosen payment details here for final confirmation. You probably don't need
+   * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
@@ -654,7 +654,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   }
   
   /**
-   * Echo any html you want to show on the confirmation screen after checkout. This
+   * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
    */
   function order_confirmation_msg($content, $order) {
@@ -672,6 +672,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     return $content;
   }
   
+  /**
+   * Runs before page load incase you need to run any scripts before loading the success message page
+   */
   function order_confirmation($order) {
     
   }
@@ -749,7 +752,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 
 			              <p>
 					<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
-			                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt'])?__('', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
+			                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt']) ? '' : esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
 			                </label>
 				      </p>
 

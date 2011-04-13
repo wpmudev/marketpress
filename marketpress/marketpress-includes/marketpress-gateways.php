@@ -67,7 +67,7 @@ if(!class_exists('MP_Gateway_API')) {
     }
     
     /**
-     * Echo the chosen payment details here for final confirmation. You probably don't need
+     * Return the chosen payment details here for final confirmation. You probably don't need
      *  to post anything in the form as it should be in your $_SESSION var already.
      *
      * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
@@ -109,9 +109,11 @@ if(!class_exists('MP_Gateway_API')) {
     }
     
     /**
-     * Echo any html you want to show on the confirmation screen after checkout. This
-     *  should be a payment details box and message.
-     */
+	   * Return any html you want to show on the confirmation screen after checkout. This
+	   *  should be a payment details box and message.
+	   *
+	   * Don't forget to return!
+	   */
 		function order_confirmation_msg($content, $order) {
       wp_die( __("You must override the order_confirmation_msg() method in your {$this->admin_name} payment gateway plugin!", 'mp') );
     }
@@ -228,8 +230,8 @@ if(!class_exists('MP_Gateway_API')) {
 /**
  * Use this function to register your gateway plugin class
  *
- * @param string $plugin_name - the sanitized private name for your plugin
  * @param string $class_name - the case sensitive name of your plugin class
+ * @param string $plugin_name - the sanitized private name for your plugin
  * @param string $admin_name - pretty name of your gateway, for the admin side.
  * @param bool $global optional - whether the gateway supports global checkouts
  */

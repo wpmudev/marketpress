@@ -315,7 +315,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
     $total = array_sum($totals);
 
-    //coupon line
+    //coupon line TODO - figure out how to apply them on global checkout
+	  $coupon_code = $mp->get_coupon_code();
     if ( $coupon = $mp->coupon_value($coupon_code, $total) ) {
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
@@ -449,8 +450,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
   global $mp, $current_user;
   $settings = get_option('mp_settings');
   
-  $meta = get_user_meta($current_user->ID, 'mp_shipping_info');
-
+  $meta = get_user_meta($current_user->ID, 'mp_shipping_info', true);
   //get address
   $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : isset($meta['email']) ? $meta['email']: $current_user->user_email;
   $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname;
@@ -657,7 +657,7 @@ function _mp_cart_payment($type, $echo = false) {
     //if skipping a step
     if (empty($_SESSION['mp_payment_method'])) {
       $content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
-      return;
+      return $content;
     }
     $content .= '<form id="mp_payment_form" method="post" action="'.mp_checkout_step_url('confirm-checkout').'">';
 
@@ -1636,7 +1636,7 @@ function mp_orderstatus_link($echo = true, $url = false, $link_text = '') {
 /**
  * Returns the current shopping cart link with checkout step.
  *
- * @param string $checkout_step
+ * @param string $checkoutstep. Possible values: checkout-edit, shipping, checkout, confirm-checkout, confirmation
  */
 function mp_checkout_step_url($checkout_step) {
   return mp_cart_link(false, true) . trailingslashit($checkout_step);

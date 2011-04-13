@@ -87,7 +87,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   }
   
   /**
-   * Echo the chosen payment details here for final confirmation. You probably don't need
+   * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
@@ -119,7 +119,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     $params['sid'] = $this->API_Username;
     $params['cart_order_id'] = $_SESSION['mp_order'];
-    $params['x_receipt_link_url'] = mp_cart_link(false, true) . trailingslashit("confirmation");
+    $params['x_receipt_link_url'] = mp_checkout_step_url('confirmation');
     $params['skip_landing'] = '1';
     $params['fixed'] = 'Y';
     $params['currency_code'] = $this->currencyCode;
@@ -195,8 +195,10 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   }
   
   /**
-   * Echo any html you want to show on the confirmation screen after checkout. This
+   * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
+   *
+   * Don't forget to return!
    */
   function order_confirmation_msg($content, $order) {
     global $mp;
@@ -234,7 +236,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
       
       $payment_info['gateway_public_name'] = $this->public_name;
       $payment_info['gateway_private_name'] = $this->admin_name;
-      $payment_info['status'][$timestamp] = "paid";
+      $payment_info['status'][$timestamp] = __("Paid", 'mp');
       $payment_info['total'] = $_REQUEST['total'];
       $payment_info['currency'] = $this->currencyCode;
       $payment_info['transaction_id'] = $_REQUEST['order_number'];  
@@ -290,7 +292,8 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
           <tr valign="top">
 	        <th scope="row"><?php _e('2Checkout Currency', 'mp') ?></th>
 	        <td>
-	          <select name="mp[gateways][2checkout][currency]">
+	          <span class="description"><?php _e('Selecting a currency other than that used for your store may cause problems at checkout.', 'mp'); ?></span><br />
+          	<select name="mp[gateways][2checkout][currency]">
 	          <?php
 	          $sel_currency = ($settings['gateways']['2checkout']['currency']) ? $settings['gateways']['2checkout']['currency'] : $settings['currency'];
 	          $currencies = array(

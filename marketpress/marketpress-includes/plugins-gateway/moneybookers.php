@@ -51,7 +51,6 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 			$this->API_Email = $settings['gateways']['moneybookers']['email'];
 			$this->confirmationNote = $settings['gateways']['moneybookers']['confirmationNote'];
       $this->API_Language = $settings['gateways']['moneybookers']['language'];
-      $this->SandboxFlag  = $settings['gateways']['moneybookers']['mode'];
     }
   }
 
@@ -66,45 +65,6 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
     if (isset($_GET['moneybookers_cancel'])) {
       echo '<div class="mp_checkout_error">' . __('Your Moneybookers transaction has been canceled.', 'mp') . '</div>';
     }
-    $settings = get_option('mp_settings');
-    ?>
-    <?php
-  }
-  
-  function _print_year_dropdown($sel='', $pfp = false) {
-    $localDate = getdate();
-    $minYear = $localDate["year"];
-    $maxYear = $minYear + 15;
-
-    $output =  "<option value=''>--</option>";
-    for ($i=$minYear; $i<$maxYear; $i++) {
-      if ($pfp) {
-        $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
-        ">". $i ."</option>";
-      } else {
-				$output .= "<option value='". substr($i, 2, 2) ."'".($sel==(substr($i, 2, 2))?' selected':'').
-				">". $i ."</option>";
-      }
-    }
-    return($output);
-  }
-  
-  function _print_month_dropdown($sel='') {
-    $output =  "<option value=''>--</option>";
-    $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
-    $output .=  "<option " . ($sel==2?' selected':'') . "  value='02'>02 - Feb</option>";
-    $output .=  "<option " . ($sel==3?' selected':'') . "  value='03'>03 - Mar</option>";
-    $output .=  "<option " . ($sel==4?' selected':'') . "  value='04'>04 - Apr</option>";
-    $output .=  "<option " . ($sel==5?' selected':'') . "  value='05'>05 - May</option>";
-    $output .=  "<option " . ($sel==6?' selected':'') . "  value='06'>06 - Jun</option>";
-    $output .=  "<option " . ($sel==7?' selected':'') . "  value='07'>07 - Jul</option>";
-    $output .=  "<option " . ($sel==8?' selected':'') . "  value='08'>08 - Aug</option>";
-    $output .=  "<option " . ($sel==9?' selected':'') . "  value='09'>09 - Sep</option>";
-    $output .=  "<option " . ($sel==10?' selected':'') . "  value='10'>10 - Oct</option>";
-    $output .=  "<option " . ($sel==11?' selected':'') . "  value='11'>11 - Nov</option>";
-    $output .=  "<option " . ($sel==12?' selected':'') . "  value='12'>12 - Dec</option>";
-
-    return($output);
   }
   
   /**
@@ -119,12 +79,10 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
    */
 	function process_payment_form($cart, $shipping_info) {
     global $mp;
-    
-    $mp->generate_order_id();
   }
   
   /**
-   * Echo the chosen payment details here for final confirmation. You probably don't need
+   * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
@@ -132,6 +90,8 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
    */
 	function confirm_payment_form($cart, $shipping_info) {
     global $mp;
+    //print payment details
+    return '<img src="'.$this->method_img_url.'" border="0" alt="'.__('Checkout with Moneybookers', 'mp').'">';
   }
 
   /**
@@ -152,47 +112,74 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
     
     $url = "https://www.moneybookers.com/app/payment.pl";
     
+    $order_id = $mp->generate_order_id();
+    
     $params = array();
-		$params['cart_order_id'] = $_SESSION['mp_order'];
+		$params['transaction_id'] = $order_id;
 		$params['pay_to_email'] = $this->API_Email;
 		$params['currency'] = $this->currencyCode;
 		$params['language'] = $this->API_Language;
-		$params['return_url'] = mp_cart_link(false, true) . trailingslashit("confirmation");
+		$params['return_url'] = mp_checkout_step_url('confirmation');
+		$params['return_url_text'] = __('Complete Checkout', 'mp');
+		$params['cancel_url'] = mp_checkout_step_url('checkout');
+		$params['status_url'] = $this->ipn_url;
 		$params['confirmation_note'] = $this->confirmationNote;
-
-    if ($this->SandboxFlag == 'sandbox') {
-      $params['demo'] = 'Y';
-    }
+		
+		if (isset($settings['gateways']['moneybookers']['logourl']) && !empty($settings['gateways']['moneybookers']['logourl']))
+			$params['logo_url'] = $settings['gateways']['moneybookers']['logourl'];
+			
+		if (isset($settings['gateways']['moneybookers']['business-name']) && !empty($settings['gateways']['moneybookers']['business-name']))
+			$params['recipient_description'] = $settings['gateways']['moneybookers']['business-name'];
+			
+    $params['pay_from_email'] = $shipping_info['email'];
+		$names = explode(' ', $shipping_info['name']);
+    $params['firstname'] = $names[0];
+    $params['lastname'] = $names[count($names)-1]; //grab last name
+    $params['address'] = $shipping_info['address1'];
+    $params['phone_number'] = $shipping_info['phone'];
+    $params['postal_code'] = $shipping_info['zip'];
+    $params['city'] = $shipping_info['city'];
+    $params['state'] = $shipping_info['state'];
     
     $totals = array();
-    $counter = 1;
-
-    foreach ($cart as $product_id => $data) {
-			$totals[] = $data['price'] * $data['quantity'];
-			$suffix = "{$counter}";
-
-			$sku = empty($data['SKU'])?$product_id:$data['SKU'];
-			$params["detail{$suffix}_text"] = $data['name'];
-			$params["detail{$suffix}_description"] = get_permalink($product_id);
-			$params["amount{$suffix}"] = $data['price'] * $data['quantity'];
-			$params["amount{$suffix}_description"] = "{$sku},{$data['quantity']}";
-			$i++;
+		$product_count = 0;
+    foreach ($cart as $product_id => $variations) {
+			foreach ($variations as $data) {
+				$totals[] = $data['price'] * $data['quantity'];
+				$product_count++;
+			}
     }
-    
+
+    $params["detail1_text"] = $order_id;
+		$params["detail1_description"] = __('Order ID:', 'mp');
+
     $total = array_sum($totals);
+    
+		$i = 2;
+    $params["amount{$i}"] = $total;
+		$params["amount{$i}_description"] = sprintf( __('Cart Subtotal for %d Items:', 'mp'), $product_count);
+		$i++;
     
     if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
       $total = $coupon['new_total'];
+			$params["detail2_text"] = $coupon['discount'];
+			$params["detail2_description"] = __('Coupon Discount:', 'mp');
     }
 
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
       $total = $total + $shipping_price;
+			$params["amount{$i}"] = $shipping_price;
+			$params["amount{$i}_description"] = __('Shipping & Handling:', 'mp');
+			$i++;
     }
     
     //tax line
     if ( ($tax_price = $mp->tax_price()) !== false ) {
       $total = $total + $tax_price;
+			$params["amount{$i}"] = $tax_price;
+			$params["amount{$i}_description"] = __('Taxes:', 'mp');
+			$i++;
     }
     
     $params['amount'] = $total;
@@ -205,8 +192,11 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
     
     $param_str = implode('&', $param_list);
     
-    wp_redirect("{$url}?{$param_str}");
+    //setup transients for ipn in case checkout doesn't redirect (ipn should come within 12 hrs!)
+		set_transient('mp_order_'. $order_id . '_cart', $cart, 60*60*12);
+		set_transient('mp_order_'. $order_id . '_shipping', $shipping_info, 60*60*12);
     
+    wp_redirect("{$url}?{$param_str}");
     exit(0);
   }
   
@@ -221,14 +211,16 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
   }
   
   /**
-   * Echo any html you want to show on the confirmation screen after checkout. This
+   * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
+   *
+   * Don't forget to return!
    */
 	function order_confirmation_msg($content, $order) {
     global $mp;
     $content = '';
     if ($order->post_status == 'order_received') {
-      $content .= '<p>' . sprintf(__('Your payment via Moneybookers for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
+      $content .= '<p>' . sprintf(__('Your payment via Moneybookers for this order totaling %s is in progress. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
       $statuses = $order->mp_payment_info['status'];
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
@@ -246,29 +238,51 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 	function order_confirmation($order) {
     global $mp;
     
-    $timestamp = time();
-    $total = $_REQUEST['total'];
-    
-    if ($this->SandboxFlag == 'sandbox') {
-      $hash = strtoupper(md5($this->API_Email . 1 . $total));
-    } else {
-      $hash = strtoupper(md5($this->API_Email . $_REQUEST['order_number'] . $total));
-    }
-    
-    if ($_REQUEST['key'] == $hash) {
-      $status = __('The order has been received', 'mp');
-      $paid = true;
-      
-      $payment_info['gateway_public_name'] = $this->public_name;
-      $payment_info['gateway_private_name'] = $this->admin_name;
-      $payment_info['status'][$timestamp] = "paid";
-      $payment_info['total'] = $_REQUEST['total'];
-      $payment_info['currency'] = $this->currencyCode;
-      $payment_info['transaction_id'] = $_REQUEST['order_number'];  
-      $payment_info['method'] = "Credit Card";
-    
-      $order = $mp->create_order($_SESSION['mp_order'], $mp->get_cart_contents(), $shipping_info, $payment_info, $paid);
-    }
+    //check if not created already by IPN, and create it
+    if (!$order) {
+      //get totals
+	    $cart = $mp->get_cart_contents();
+	    foreach ($cart as $product_id => $variations) {
+				foreach ($variations as $data) {
+					$totals[] = $data['price'] * $data['quantity'];
+				}
+	    }
+	    $total = array_sum($totals);
+
+	    if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
+	      $total = $coupon['new_total'];
+	    }
+
+	    //shipping line
+	    if ( ($shipping_price = $mp->shipping_price()) !== false ) {
+	      $total = $total + $shipping_price;
+	    }
+
+	    //tax line
+	    if ( ($tax_price = $mp->tax_price()) !== false ) {
+	      $total = $total + $tax_price;
+	    }
+
+	    $status = __('Received - The order has been received, awaiting payment.', 'mp');
+	    //setup our payment details
+		  $payment_info['gateway_public_name'] = $this->public_name;
+	    $payment_info['gateway_private_name'] = $this->admin_name;
+		  $payment_info['method'] = __('Moneybookers balance, Credit Card, or Instant Transfer', 'mp');
+		  $payment_info['transaction_id'] = $_SESSION['mp_order'];
+		  $timestamp = time();
+		  $payment_info['status'][$timestamp] = $status;
+		  $payment_info['total'] = $total;
+		  $payment_info['currency'] = $this->currencyCode;
+
+	    $order = $mp->create_order($_SESSION['mp_order'], $cart, $_SESSION['mp_shipping_info'], $payment_info, false);
+	    //if successful delete transients
+      if ($order) {
+        delete_transient('mp_order_' . $order_id . '_cart');
+        delete_transient('mp_order_' . $order_id . '_shipping');
+      }
+		} else {
+      $mp->set_cart_cookie(Array());
+		}
   }
   
   /**
@@ -278,108 +292,137 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
    */
   function gateway_settings_box($settings) {
     global $mp;
-    
-    $settings = get_option('mp_settings');
-    
     ?>
-    <div id="mp_2checkout" class="postbox">
+    <div id="mp_moneybookers" class="postbox">
       <h3 class='handle'><span><?php _e('Moneybookers Settings', 'mp'); ?></span></h3>
       <div class="inside">
         <span class="description"><?php _e('Resell your inventory via Moneybookers.com.', 'mp') ?></span>
         <table class="form-table">
-	  <tr>
-	    <th scope="row"><?php _e('Mode', 'mp') ?></th>
-	    <td>
-        <p>
-          <select name="mp[gateways][moneybookers][mode]">
-            <option value="sandbox" <?php selected($settings['gateways']['moneybookers']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-            <option value="live" <?php selected($settings['gateways']['moneybookers']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
-          </select>
-        </p>
-	    </td>
-	  </tr>
-	  <tr>
-	    <th scope="row"><?php _e('Moneybookers Credentials', 'mp') ?></th>
-	    <td>
-              <span class="description"><?php print sprintf(__('You must use your valid Moneybookers email. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.moneybookers.com/app/help.pl?s=m_paymentoptions"); ?></span>
-	      <p>
-		<label><?php _e('Seller Email', 'mp') ?><br />
-		  <input value="<?php echo esc_attr($settings['gateways']['moneybookers']['email']); ?>" size="30" name="mp[gateways][moneybookers][email]" type="text" />
-		</label>
-	      </p>
-	    </td>
-	  </tr>
-      <tr valign="top">
-        <th scope="row"><?php _e('Moneybookers Currency', 'mp') ?></th>
-        <td>
-          <select name="mp[gateways][moneybookers][currency]">
-          <?php
-          $sel_currency = ($settings['gateways']['moneybookers']['currency']) ? $settings['gateways']['moneybookers']['currency'] : $settings['currency'];
-          $currencies = array(
-            "ARS" => 'ARS - Argentina Peso',
-            "AUD" => 'AUD - Australian Dollar',
-						"BRL" => 'BRL - Brazilian Real',
-						"CAD" => 'CAD - Canadian Dollar',
-						"CHF" => 'CHF - Swiss Franc',
-						"DKK" => 'DKK - Danish Krone',
-						"EUR" => 'EUR - Euro',
-						"GBP" => 'GBP - British Pound',
-						"HKD" => 'HKD - Hong Kong Dollar',
-						"INR" => 'INR - Indian Rupee',
-						"JPY" => 'JPY - Japanese Yen',
-						"MXN" => 'MXN - Mexican Peso',
-						"NOK" => 'NOK - Norwegian Krone',
-						"NZD" => 'NZD - New Zealand Dollar',
-						"SEK" => 'SEK - Swedish Krona',
-						"USD" => 'USD - U.S. Dollar',
-          );
+			  <tr>
+			    <th scope="row"><label><?php _e('Moneybookers Email', 'mp') ?></label></th>
+			    <td>
+		        <span class="description"><?php print sprintf(__('You must use your valid Moneybookers merchant email. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.moneybookers.com/app/help.pl?s=m_paymentoptions"); ?></span><br />
+						<input value="<?php echo esc_attr($settings['gateways']['moneybookers']['email']); ?>" size="30" name="mp[gateways][moneybookers][email]" type="text" />
+			    </td>
+			  </tr>
+			  <tr>
+			    <th scope="row"><label><?php _e('Secret Word', 'mp') ?></label></th>
+			    <td>
+		        <span class="description"><?php print sprintf(__('The secret word must match the word submitted in the "Merchant Tools" section of your <a target="_blank" href="%s">Moneybookers account</a>.', 'mp'), "https://www.moneybookers.com/app/"); ?></span><br />
+						<input value="<?php echo esc_attr($settings['gateways']['moneybookers']['secret-word']); ?>" size="10" maxlength="10" name="mp[gateways][moneybookers][secret-word]" type="text" />
+			    </td>
+			  </tr>
+	      <tr valign="top">
+	        <th scope="row"><?php _e('Currency', 'mp') ?></th>
+	        <td>
+	          <span class="description"><?php _e('Selecting a currency other than that used for your store may cause problems at checkout.', 'mp'); ?></span><br />
+	          <select name="mp[gateways][moneybookers][currency]">
+	          <?php
+	          $sel_currency = ($settings['gateways']['moneybookers']['currency']) ? $settings['gateways']['moneybookers']['currency'] : $settings['currency'];
+	          $currencies = array(
+							"AED" => 'AED - Utd. Arab Emir. Dirham',
+	            "AUD" => 'AUD - Australian Dollar',
+							"BGN" => 'BGN - Bulgarian Leva',
+							"CAD" => 'CAD - Canadian Dollar',
+							"CHF" => 'CHF - Swiss Franc',
+							"CZK" => 'CZK - Czech Koruna',
+							"DKK" => 'DKK - Danish Krone',
+							"EEK" => 'EEK - Estonian Kroon',
+							"EUR" => 'EUR - Euro',
+							"GBP" => 'GBP - British Pound',
+							"HKD" => 'HKD - Hong Kong Dollar',
+							"HRK" => 'HRK - Croatian Kuna',
+							"HUF" => 'HUF - Hungarian Forint',
+							"ILS" => 'ILS - Israeli Shekel',
+							"INR" => 'INR - Indian Rupee',
+							"ISK" => 'ISK - Iceland Krona',
+							"JOD" => 'JOD - Jordanian Dinar',
+							"JPY" => 'JPY - Japanese Yen',
+							"KRW" => 'KRW - South-Korean Won',
+							"LTL" => 'LTL - Lithuanian Litas',
+							"LVL" => 'LVL - Latvian Lat',
+							"MAD" => 'MAD - Moroccan Dirham',
+							"MYR" => 'MYR - Malaysian Ringgit',
+							"NZD" => 'NZD - New Zealand Dollar',
+							"OMR" => 'OMR - Omani Rial',
+							"PLN" => 'PLN - Polish Zloty',
+							"QAR" => 'QAR - Qatari Rial',
+							"RON" => 'RON - Romanian Leu New',
+							"RSD" => 'RSD - Serbian dinar',
+							"SAR" => 'SAR - Saudi Riyal',
+							"SEK" => 'SEK - Swedish Krona',
+							"SGD" => 'SGD - Singapore Dollar',
+							"SKK" => 'SKK - Slovakian Koruna',
+							"THB" => 'THB - Thailand Baht',
+							"TND" => 'TND - Tunisian Dinar',
+							"TRY" => 'TRY - New Turkish Lira',
+							"TWD" => 'TWD - Taiwan Dollar',
+							"USD" => 'USD - U.S. Dollar',
+							"ZAR" => 'ZAR - South-African Rand'
+	          );
 
-          foreach ($currencies as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
-          }
-          ?>
-          </select>
-        </td>
-        </tr>
-		<tr valign="top">
-        <th scope="row"><?php _e('Moneybookers Language', 'mp') ?></th>
-        <td>
-          <select name="mp[gateways][moneybookers][language]">
-          <?php
-          $sel_language = ($settings['gateways']['moneybookers']['language']) ? $settings['gateways']['moneybookers']['language'] : $settings['language'];
-          $languages = array(
-            "EN" => 'EN - English',
-            "DE" => 'DE - German',
-						"FR" => 'FR - French',
-						"ES" => 'ES - Spanish',
-						"IT" => 'IT - Italian',
-						"PL" => 'PL - Polish',
-						"GR" => 'GR - Greek',
-						"RO" => 'RO - Romainian',
-						"RU" => 'RU - Russian',
-						"TR" => 'TR - Turkish',
-						"CN" => 'CN - Chinese',
-						"CZ" => 'CZ - Czech',
-						"NL" => 'NL - Dutch',
-						"DA" => 'DA - Danish',
-						"SV" => 'SV - Swedish',
-						"FI" => 'FI - Finnish',
-						"BG" => 'BG - Bulgarian'
-          );
+	          foreach ($currencies as $k => $v) {
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	          }
+	          ?>
+	          </select>
+	        </td>
+	        </tr>
+			<tr valign="top">
+	        <th scope="row"><?php _e('Language', 'mp') ?></th>
+	        <td>
+	          <select name="mp[gateways][moneybookers][language]">
+	          <?php
+	          $sel_language = ($settings['gateways']['moneybookers']['language']) ? $settings['gateways']['moneybookers']['language'] : $settings['language'];
+	          $languages = array(
+							"CN" => 'Chinese',
+							"CZ" => 'Czech',
+							"DA" => 'Danish',
+							"NL" => 'Dutch',
+	            "EN" => 'English',
+							"FI" => 'Finnish',
+							"FR" => 'French',
+	            "DE" => 'German',
+							"GR" => 'Greek',
+							"IT" => 'Italian',
+							"PL" => 'Polish',
+							"RO" => 'Romainian',
+							"RU" => 'Russian',
+							"ES" => 'Spanish',
+							"SV" => 'Swedish',
+							"TR" => 'Turkish'
+	          );
 
-          foreach ($languages as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_language ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
-          }
-          ?>
-          </select>
-        </td>
-        </tr>
-		<tr valign="top">
-        <th scope="row"><?php _e('Moneybookers Confirmation Note', 'mp') ?></th>
-        <td>
-			<textarea name="mp[gateways][moneybookers][confirmationNote]"></textarea>
-        </td>
-        </tr>
+	          foreach ($languages as $k => $v) {
+	              echo '		<option value="' . $k . '"' . ($k == $sel_language ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	          }
+	          ?>
+	          </select>
+	        </td>
+	        </tr>
+	        <th scope="row"><?php _e('Merchant Name (optional)', 'mp') ?></th>
+					<td>
+	  				<span class="description"><?php _e('The name of this store, which will be shown on the gateway. If no value is submitted, the account email will be shown as the recipient of the payment.', 'mp') ?></span>
+	          <p>
+	          <input value="<?php echo esc_attr($settings['gateways']['moneybookers']['business-name']); ?>" size="30" maxlength="30" name="mp[gateways][moneybookers][business-name]" type="text" />
+	          </p>
+	        </td>
+	        </tr>
+	        <th scope="row"><?php _e('Logo Image (optional)', 'mp') ?></th>
+					<td>
+	  				<span class="description"><?php _e('The URL of the logo which you would like to appear at the top of the payment form. The logo must be accessible via HTTPS otherwise it will not be shown. For best integration results we recommend that you use a logo with dimensions up to 200px in width and 50px in height.', 'mp') ?></span>
+	          <p>
+	          <input value="<?php echo esc_attr($settings['gateways']['moneybookers']['logourl']); ?>" size="80" maxlength="240" name="mp[gateways][moneybookers][logourl]" type="text" />
+	          </p>
+	        </td>
+	        </tr>
+					<tr valign="top">
+	        <th scope="row"><?php _e('Confirmation Note (optional)', 'mp') ?></th>
+	        <td>
+						<span class="description"><?php _e('Shown to the customer on the confirmation screen - the end step of the process - a note, confirmation number, or any other message. Line breaks <br> may be used for longer messages.', 'mp'); ?></span><br />
+	          <textarea class="mp_msgs_txt" name="mp[gateways][moneybookers][confirmationNote]"><?php echo esc_textarea($settings['gateways']['moneybookers']['confirmationNote']); ?></textarea>
+	        </td>
+	        </tr>
         </table>
       </div>
     </div>
@@ -399,63 +442,99 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
    */
   function process_ipn_return() {
     global $mp;
-    
     $settings = get_option('mp_settings');
     
-    if (isset($_REQUEST['message_type']) && $_REQUEST['message_type'] == 'INVOICE_STATUS_CHANGED') {
-      $sale_id = $_REQUEST['sale_id'];
-      $invoice_id = $_REQUEST['invoice_id'];
-      $vendor_order_id = $_REQUEST['vendor_order_id'];
-      $invoice_status = $_REQUEST['invoice_status'];
-      $hash = $_REQUEST['md5_hash'];
-      $total = $_REQUEST['invoice_list_amount'];
-      $payment_method = ucfirst($_REQUEST['payment_type']);
-      
-      $order = $mp->get_order($vendor_order_id);
-      
-      if (!$order) {
-				header('HTTP/1.0 404 Not Found');
-				header('Content-type: text/plain; charset=UTF-8');
-				print 'Invoice not found';
-				exit(0);
-      }
-      
-      $calc_key = md5($sale_id.$settings['gateways']['moneybookers']['sid'].$_REQUEST['invoice_id'].$settings['gateways']['moneybookers']['secret_word']);
-      
-      if (strtolower($hash) != strtolower($calc_key)) {
+    if ($_SERVER['HTTP_USER_AGENT'] != 'Moneybookers Merchant Payment Agent') {
+      header('HTTP/1.0 403 Forbidden');
+			exit('Invalid request');
+		}
+		
+    if (isset($_POST['transaction_id'])) {
+      $checksum = strtoupper(md5($_POST['merchant_id'] . $_POST['transaction_id'] . strtoupper(md5($settings['gateways']['moneybookers']['secret-word'])) . $_POST['mb_amount'] . $_POST['mb_currency'] . $_POST['status']));
+      if ($_POST['md5sig'] != $checksum) {
 				header('HTTP/1.0 403 Forbidden');
-				header('Content-type: text/plain; charset=UTF-8');
-				print 'We were unable to authenticate the request';
-				exit(0);
+				exit('We were unable to authenticate the request');
       }
       
-      if (strtolower($_REQUEST['invoice_status']) != "deposited") {
-				header('HTTP/1.0 200 OK');
-				header('Content-type: text/plain; charset=UTF-8');
-				print 'Thank you very much for letting us know. REF: Not success';
-				exit(0);
+      //setup our payment details
+		  $payment_info['gateway_public_name'] = $this->public_name;
+      $payment_info['gateway_private_name'] = $this->admin_name;
+		  $payment_info['method'] = isset($_POST['payment_type']) ? $_POST['payment_type'] : __('Moneybookers balance, Credit Card, or Instant Transfer', 'mp');
+		  $payment_info['transaction_id'] = isset($_POST['mb_transaction_id']) ? $_POST['mb_transaction_id'] : $_POST['transaction_id'];
+
+		  $timestamp = time();
+		  $order_id = $result["transaction_id"];
+
+      //setup status
+      switch ($_POST['status']) {
+
+				case '2':
+          $status = __('Processed - The payment has been completed, and the funds have been added successfully to your Moneybookers account balance.', 'mp');
+          $create_order = true;
+          $paid = true;
+					break;
+
+				case '0':
+					$status = __('Pending - The payment is pending. It can take 2-3 days for bank transfers to complete.', 'mp');
+					$create_order = true;
+          $paid = false;
+					break;
+
+				case '-1':
+					$status = __('Cancelled - The payment was cancelled manually by the sender in their online account history or was auto-cancelled after 14 days pending.', 'mp');
+					$create_order = false;
+          $paid = false;
+					break;
+
+				case '-2':
+					$status = __('Failed - The Credit Card or Direct Debit transaction was declined.', 'mp');
+					$create_order = false;
+          $paid = false;
+					break;
+
+				case '-3':
+          $status = __('Chargeback - A payment was reversed due to a chargeback. The funds have been removed from your account balance and returned to the buyer.', 'mp');
+          $create_order = false;
+          $paid = false;
+					break;
+
+				default:
+					// case: various error cases
+					$create_order = false;
+					$paid = false;
+			}
+
+      //status's are stored as an array with unix timestamp as key
+		  $payment_info['status'][$timestamp] = $status;
+		  $payment_info['total'] = $_POST['amount'];
+		  $payment_info['currency'] = $_POST['currency'];
+
+      if ($mp->get_order($order_id)) {
+        $mp->update_order_payment_status($order_id, $status, $paid);
+      } else if ($create_order) {
+        //succesful payment, create our order now
+        $cart = get_transient('mp_order_' . $order_id . '_cart');
+			  $shipping_info = get_transient('mp_order_' . $order_id . '_shipping');
+			  //TODO: make saving order_id into usermeta possible
+        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid);
+
+        //if successful delete transients
+        if ($success) {
+          delete_transient('mp_order_' . $order_id . '_cart');
+          delete_transient('mp_order_' . $order_id . '_shipping');
+        }
       }
       
-      if ($this->SandboxFlag != 'sandbox') {
-				if (intval($total) >= $order->mp_order_total) {
-				  $payment_info = $order->mp_payment_info;
-				  $payment_info['transaction_id'] = $invoice_id;
-				  $payment_info['method'] = $payment_method;
-
-				  update_post_meta($order->ID, 'mp_payment_info', $payment_info);
-
-				  $mp->update_order_payment_status($vendor_order_id, "paid", true);
-
-          header('HTTP/1.0 200 OK');
-          header('Content-type: text/plain; charset=UTF-8');
-          print 'Thank you very much for letting us know';
-          exit(0);
-				}
-      }
-    }
+      //if we get this far return success so ipns don't get resent
+      header('HTTP/1.0 200 OK');
+			exit('Successfully recieved!');
+    } else {
+      header('HTTP/1.0 403 Forbidden');
+			exit('Invalid request');
+		}
   }
 }
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_Moneybookers', 'moneybookers', __('Moneybookers', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_Moneybookers', 'moneybookers', __('Moneybookers (beta)', 'mp') );
 ?>

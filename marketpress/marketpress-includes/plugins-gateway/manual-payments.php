@@ -73,7 +73,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   }
   
   /**
-   * Echo the chosen payment details here for final confirmation. You probably don't need
+   * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
@@ -81,7 +81,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    */
 	function confirm_payment_form($cart, $shipping_info) {
   	global $mp;
-    
   }
 
   /**
@@ -159,14 +158,16 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   }
   
   /**
-   * Echo any html you want to show on the confirmation screen after checkout. This
+   * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
+   *
+   * Don't forget to return!
    */
 	function order_confirmation_msg($content, $order) {
     global $mp;
     $settings = get_option('mp_settings');
     
-    echo str_replace( 'TOTAL', $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $settings['gateways']['manual-payments']['confirmation'] );
+    return $content . str_replace( 'TOTAL', $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $settings['gateways']['manual-payments']['confirmation'] );
   }
 	
 	/**
