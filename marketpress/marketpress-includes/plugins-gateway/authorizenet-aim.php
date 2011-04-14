@@ -69,7 +69,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   }
 
   /**
-   * Echo fields you need to add to the top of the payment screen, like your credit card info fields
+   * Return fields you need to add to the top of the payment screen, like your credit card info fields
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
@@ -154,19 +154,19 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         <tbody>
         <tr>
           <td align="right"><?php _e('Email:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_email' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_email', '' ); ?>
         <input size="35" name="email" type="text" value="<?php echo esc_attr($email); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Full Name:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_name' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_name', '' ); ?>
         <input size="35" name="name" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Address:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_address1' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_address1', '' ); ?>
         <input size="45" name="address1" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
         <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
         </td>
@@ -181,25 +181,25 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   
           <tr>
           <td align="right"><?php _e('City:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_city' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_city', '' ); ?>
         <input size="25" name="city" type="text" value="<?php echo esc_attr($city); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('State/Province/Region:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_state' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_state', '' ); ?>
         <input size="15" name="state" type="text" value="<?php echo esc_attr($state); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_zip' ); ?>
+        <?php echo apply_filters( 'mp_checkout_error_zip', '' ); ?>
         <input size="10" id="mp_zip" name="zip" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
           </tr>
   
           <tr>
           <td align="right"><?php _e('Country:', 'mp'); ?>*</td><td>
-          <?php echo apply_filters( 'mp_checkout_error_country' ); ?>
+          <?php echo apply_filters( 'mp_checkout_error_country', '' ); ?>
         <select id="mp_" name="country">
           <?php
           foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
@@ -218,7 +218,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
           <tr>
             <td align="right"><?php _e('Credit Card Number:', 'mp'); ?>*</td>
             <td>
-              <?php echo apply_filters( 'mp_checkout_error_card_num' ); ?>
+              <?php echo apply_filters( 'mp_checkout_error_card_num', '' ); ?>
               <input name="card_num" onkeyup="cc_card_pick('#cardimage', '#card_num');"
                id="card_num" class="credit_card_number input_field noautocomplete"
                type="text" size="22" maxlength="22" />
@@ -228,7 +228,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
           <tr>
             <td align="right"><?php _e('Expiration Date:', 'mp'); ?>*</td>
             <td>
-            <?php echo apply_filters( 'mp_checkout_error_exp' ); ?>
+            <?php echo apply_filters( 'mp_checkout_error_exp', '' ); ?>
             <label class="inputLabel" for="exp_month"><?php _e('Month', 'mp'); ?></label>
 		        <select name="exp_month" id="exp_month">
 		          <?php print $this->_print_month_dropdown(); ?>
@@ -242,7 +242,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
           
           <tr>
             <td align="right"><?php _e('Security Code:', 'mp'); ?></td>
-            <td><?php echo apply_filters( 'mp_checkout_error_card_code' ); ?>
+            <td><?php echo apply_filters( 'mp_checkout_error_card_code', '' ); ?>
             <input id="card_code" name="card_code" class="input_field noautocomplete"
                style="width: 70px;" type="text" size="4" maxlength="4" /></td>
           </tr>

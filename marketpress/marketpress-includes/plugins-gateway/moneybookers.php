@@ -55,7 +55,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
   }
 
   /**
-   * Echo fields you need to add to the payment screen, like your credit card info fields
+   * Return fields you need to add to the payment screen, like your credit card info fields
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
@@ -419,8 +419,8 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 					<tr valign="top">
 	        <th scope="row"><?php _e('Confirmation Note (optional)', 'mp') ?></th>
 	        <td>
-						<span class="description"><?php _e('Shown to the customer on the confirmation screen - the end step of the process - a note, confirmation number, or any other message. Line breaks <br> may be used for longer messages.', 'mp'); ?></span><br />
-	          <textarea class="mp_msgs_txt" name="mp[gateways][moneybookers][confirmationNote]"><?php echo esc_textarea($settings['gateways']['moneybookers']['confirmationNote']); ?></textarea>
+						<span class="description"><?php _e('Shown to the customer on the confirmation screen - the end step of the process - a note, confirmation number, or any other message. Line breaks &lt;br&gt; may be used for longer messages.', 'mp'); ?></span><br />
+	          <textarea class="mp_emails_txt" name="mp[gateways][moneybookers][confirmationNote]"><?php echo esc_textarea($settings['gateways']['moneybookers']['confirmationNote']); ?></textarea>
 	        </td>
 	        </tr>
         </table>

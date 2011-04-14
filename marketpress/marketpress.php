@@ -701,7 +701,7 @@ Thanks again!", 'mp')
 
   //scans post type at template_redirect to apply custom themeing to products
   function load_store_templates() {
-    global $wp_query, $mp_wpmu;
+    global $wp_query, $mp_wpmu, $mp_gateway_active_plugins;
     $settings = get_option('mp_settings');
 
     //load proper theme for single product page display
@@ -768,6 +768,16 @@ Thanks again!", 'mp')
 			if ( $this->global_cart && is_object($mp_wpmu) && !$mp_wpmu->is_main_site() ) {
 				wp_redirect( mp_cart_link(false, true) );
 				exit;
+			}
+			
+			// Redirect to https if forced to use SSL by a payment gateway
+			foreach ((array)$mp_gateway_active_plugins as $plugin) {
+	      if ($plugin->force_ssl) {
+				  if ( !is_ssl() ) {
+						wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+						exit();
+				  }
+	      }
 			}
 			
       //check for custom theme template
@@ -2641,6 +2651,10 @@ Thanks again!", 'mp')
     //hook for new orders
     do_action( 'mp_new_order', $this->get_order($order_id) );
 
+		//if paid and the cart is only digital products mark it shipped
+		if ($paid && $this->download_only_cart($cart))
+		  $this->update_order_status($order_id, 'shipped');
+
     return $order_id;
   }
 
@@ -2722,6 +2736,17 @@ Thanks again!", 'mp')
     wp_transition_post_status($statuses[$new_status], $old_status, $order);
   }
 
+	//checks if a given cart is only downloadable products
+	function download_only_cart($cart) {
+		foreach ((array)$cart as $product_id => $variations) {
+			foreach ((array)$variations as $variation => $data) {
+				if (!is_array($data['download']))
+      		return false;
+			}
+		}
+		return true;
+	}
+
   //returns formatted download url for a given product. Returns false if no download
 	function get_download_url($product_id, $order_id) {
     $url = get_post_meta($product_id, 'mp_file', true);
@@ -2733,17 +2758,27 @@ Thanks again!", 'mp')
 
   //serves a downloadble product file
   function serve_download($product_id) {
-		if (!isset($_GET['orderid']))
-		  return false;
+    //get the order
+    $order = $this->get_order($_GET['orderid']);
+    if (!$order)
+      return false;
 		  
 		$url = get_post_meta($product_id, 'mp_file', true);
-    if (!$url)
-      return false;
+		
+		//get cart count
+		if (isset($order->mp_cart_info[$product_id][0]['download']))
+		  $download = $order->mp_cart_info[$product_id][0]['download'];
 
+		//if new url is not set try to grab it from the order history
+    if (!$url && isset($download['url']))
+      $url = $download['url'];
+		else
+			return false;
+		
 		require_once(ABSPATH . '/wp-admin/includes/file.php');
   
     $filename = basename($url);
-    $tmp = download_url($url);
+    $tmp = download_url($url); //we download the url so we can serve it via php, completely obfuscating original source
 
 		if ( is_wp_error($tmp) ) {
 			@unlink($tmp);
@@ -2761,6 +2796,12 @@ Thanks again!", 'mp')
 	    header('Content-Length: ' . filesize($tmp));
 	    readfile($tmp);
 	    @unlink($tmp);
+	    
+	    //attempt to record a download attempt
+	    if (isset($download['downloaded'])) {
+	    	$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
+      	update_post_meta($post_id, 'mp_cart_info', $order->mp_cart_info);
+			}
 	    exit;
 		}
 		
@@ -2963,8 +3004,7 @@ Thanks again!", 'mp')
       </tr>
     </table>
     <?php
-    $meta = get_user_meta($user_id, 'mp_shipping_info');
-    $meta = $meta[0];
+    $meta = get_user_meta($user_id, 'mp_shipping_info', true);
     
     $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
     $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : (!empty($meta['name'])?$meta['name']:$_SESSION['mp_shipping_info']['name']);
@@ -3070,6 +3110,10 @@ Thanks again!", 'mp')
       if ($order->post_status == 'order_received') {
         $this->update_order_status($order->ID, 'paid');
         do_action( 'mp_order_paid', $order );
+        
+        //if paid and the cart is only digital products mark it shipped
+				if ($this->download_only_cart($cart))
+				  $this->update_order_status($order->ID, 'shipped');
       } else {
         //update payment time if somehow it was skipped
         if (!get_post_meta($order->ID, 'mp_paid_time', true))
@@ -3096,7 +3140,7 @@ Thanks again!", 'mp')
 
 					//show download link if set
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->ID))
-	        	$order_info .= "\t" . __('Download: ', 'mp') . $download_url;
+	        	$order_info .= "\t" . __('Download: ', 'mp') . $download_url . "\n";
 				}
 			}
       $order_info .= "\n";
@@ -3212,6 +3256,10 @@ You can manage this order here: %s", 'mp');
     $order = $this->get_order($order_id);
     if (!$order)
       return false;
+
+    //if the cart is only digital products skip notification
+		if ($this->download_only_cart($order->mp_cart_info))
+    	return false;
 
     $subject = $this->filter_email($order, $settings['email']['shipped_order_subject']);
     $msg = $this->filter_email($order, $settings['email']['shipped_order_txt']);

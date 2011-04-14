@@ -47,7 +47,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	}
 
   /**
-   * Echo fields you need to add to the payment screen, like your credit card info fields
+   * Return fields you need to add to the payment screen, like your credit card info fields
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
@@ -55,7 +55,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   function payment_form($cart, $shipping_info) {
     global $mp;
     $settings = get_option('mp_settings');
-    echo ($settings['gateways']['manual-payments']['instructions']);
+    return $settings['gateways']['manual-payments']['instructions'];
   }
   
   /**

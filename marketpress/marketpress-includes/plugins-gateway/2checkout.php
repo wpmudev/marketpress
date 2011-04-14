@@ -58,7 +58,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   }
 
   /**
-   * Echo fields you need to add to the top of the payment screen, like your credit card info fields
+   * Return fields you need to add to the top of the payment screen, like your credit card info fields
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if $mp->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it

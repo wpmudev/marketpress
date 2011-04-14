@@ -81,7 +81,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   }
 
   /**
-   * Echo fields you need to add to the payment screen, like your credit card info fields.
+   * Return fields you need to add to the payment screen, like your credit card info fields.
    *  If you don't need to add form fields set $skip_form to true so this page can be skipped
    *  at checkout.
    *

@@ -648,7 +648,7 @@ function _mp_cart_payment($type, $echo = false) {
       $content .= '</table>';
     }
 
-    $content .= apply_filters( 'mp_checkout_payment_form', $cart, $_SESSION['mp_shipping_info'] );
+    $content .= apply_filters( 'mp_checkout_payment_form', '', $cart, $_SESSION['mp_shipping_info'] );
 
     $content .= '</form>';
     

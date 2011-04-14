@@ -42,7 +42,7 @@ if(!class_exists('MP_Gateway_API')) {
     }
 
     /**
-     * Echo fields you need to add to the payment screen, like your credit card info fields.
+     * Return fields you need to add to the payment screen, like your credit card info fields.
      *  If you don't need to add form fields set $skip_form to true so this page can be skipped
      *  at checkout.
      *
@@ -158,30 +158,20 @@ if(!class_exists('MP_Gateway_API')) {
     }
     
 		//creates the payment method selections
-		function _payment_form_wrapper($cart, $shipping_info) {
+		function _payment_form_wrapper($content, $cart, $shipping_info) {
       global $mp, $mp_gateway_active_plugins;
-      
-    	// Redirect to https if forced to use SSL
-      if ($this->force_ssl && !function_exists('wp_https_redirect')) {
-			  if ( !is_ssl() ) {
-					wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-					exit();
-			  }
-      }
       
       if (count((array)$mp_gateway_active_plugins) > 1 && $_SESSION['mp_payment_method'] != $this->plugin_name)
         $hidden = ' style="display:none;"';
         
-      echo '<div class="mp_gateway_form" id="' . $this->plugin_name . '"' . $hidden . '>';
-      $this->payment_form($cart, $shipping_info);
+      $content .= '<div class="mp_gateway_form" id="' . $this->plugin_name . '"' . $hidden . '>';
+      $content .= $this->payment_form($cart, $shipping_info);
 
-      echo '<p class="mp_cart_direct_checkout">';
-      //if an img exists use that for submit button
-      if ($this->method_button_img_url)
-        echo '<input type="image" name="mp_payment_submit" id="mp_payment_submit" src="' . $this->method_button_img_url . '" alt="' . __('Continue Checkout &raquo;', 'mp') . '" />';
-      else
-        echo '<input type="submit" name="mp_payment_submit" id="mp_payment_submit" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
-      echo '</p></div>';
+      $content .= '<p class="mp_cart_direct_checkout">';
+      $content .= '<input type="submit" name="mp_payment_submit" id="mp_payment_submit" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
+      $content .= '</p></div>';
+      
+      return $content;
     }
     
     //calls the order_confirmation() method on the correct page
@@ -210,7 +200,7 @@ if(!class_exists('MP_Gateway_API')) {
       if (empty($this->plugin_name) || empty($this->admin_name) || empty($this->public_name))
         wp_die( __("You must override all required vars in your {$this->admin_name} payment gateway plugin!", 'mp') );
 
-      add_action( 'mp_checkout_payment_form', array(&$this, '_payment_form_wrapper'), 10, 2 );
+      add_filter( 'mp_checkout_payment_form', array(&$this, '_payment_form_wrapper'), 10, 3 );
       add_action( 'template_redirect', array(&$this, '_checkout_confirmation_hook') );
       add_filter( 'mp_payment_form_skip_' . $this->plugin_name, array(&$this, '_payment_form_skip') );
       add_action( 'mp_payment_submit_' . $this->plugin_name, array(&$this, 'process_payment_form'), 10, 2 );
