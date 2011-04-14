@@ -151,6 +151,7 @@ class MarketPress {
       'curr_decimal' => 1,
       'disable_cart' => 0,
       'inventory_threshhold' => 3,
+      'max_downloads' => 5,
       'store_theme' => 'icons',
       'product_img_height' => 150,
       'product_img_width' => 150,
@@ -1642,11 +1643,10 @@ Thanks again!", 'mp')
   	//unserialize
     foreach ($meta as $key => $val) {
 		  $meta[$key] = maybe_unserialize($val[0]);
-		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file")
 		    $meta[$key] = array($meta[$key]);
 		}
     ?>
-    <span class="description" id="mp_variation_message"><?php _e('Note: Product variations are ignored for Downloadable or Externally Linked products', 'mp') ?></span>
     <input type="hidden" name="mp_product_meta" value="1" />
     <table class="widefat" id="mp_product_variations_table">
 			<thead>
@@ -1662,6 +1662,8 @@ Thanks again!", 'mp')
 			<tbody>
 			<?php
 			  if ($meta["mp_price"]) {
+			    //if download enabled only show first variation
+			    $meta["mp_price"] = (empty($meta["mp_file"]) && empty($meta["mp_product_link"])) ? $meta["mp_price"] : array($meta["mp_price"][0]);
 			    $count = 1;
 			    $last = count($meta["mp_price"]);
 	        foreach ($meta["mp_price"] as $key => $price) {
@@ -1694,8 +1696,12 @@ Thanks again!", 'mp')
 			?>
 			</tbody>
 		</table>
+		<?php if (empty($meta["mp_file"]) && empty($meta["mp_product_link"])) { ?>
 		<div id="mp_add_vars"><a href="#mp_product_variations_table"><?php _e('Add Variation', 'mp'); ?></a></div>
-
+		<?php } else { ?>
+    <span class="description" id="mp_variation_message"><?php _e('Product variations are not allowed for Downloadable or Externally Linked products.', 'mp') ?></span>
+    <?php } ?>
+    
     <div id="mp_product_link_div">
       <label title="<?php _e('Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
       <input type="text" size="100" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"]); ?>" /></label>
@@ -2004,11 +2010,11 @@ Thanks again!", 'mp')
 						}
 					}
 					
-					//check limit
-        	if (get_post_meta($product_id, 'mp_track_limit', true)) {
-	        	$limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+        	//check limit if tracking on or downloadable
+    			if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
+						$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
 			      if ($limit[$variation] && $limit[$variation] < $quantity) {
-		          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %1$s for %2$s. Your cart quantity has been changed to %1$s.", 'mp'), number_format_i18n($limit[$variation]), $product->post_title) );
+           		$this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s". Your cart quantity has been changed to %3$s.', 'mp'), number_format_i18n($limit[$variation]), $product->post_title, number_format_i18n($limit[$variation])) );
               $quantity = $limit[$variation];
 			      }
 		      }
@@ -2132,15 +2138,15 @@ Thanks again!", 'mp')
         }
       }
       
-      //check limits
-      if (get_post_meta($product_id, 'mp_track_limit', true)) {
-	      $limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+      //check limit if tracking on or downloadable
+    	if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
+				$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
 	      if ($limit[$variation] && $limit[$variation] < $new_quantity) {
 	        if ($no_ajax !== true) {
-		  			echo 'error||' . sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($limit[$variation]), $product->post_title);
+		  			echo 'error||' . sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), $product->post_title);
 	          exit;
 	        } else {
-	          $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($limit[$variation]), $product->post_title) );
+	          $this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), $product->post_title) );
 	          return false;
 	        }
 	      }
@@ -2176,15 +2182,15 @@ Thanks again!", 'mp')
 								$stock[0] = $stock;
               if ($stock[$variation] < intval($quant)) {
                 $left = (($stock[$variation]-intval($global_cart[$bid][$product_id][$variation])) < 0) ? 0 : ($stock[$variation]-intval($global_cart[$bid][$product_id][$variation]));
-                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($left)) );
+                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for "%s". (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($left)) );
                 continue;
               }
             }
-	          //check limit
-	    			if (get_post_meta($product_id, 'mp_track_limit', true)) {
-	            $limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
-					    if ($limit[$variation] && $limit[$variation] < intval($quant)) {
-					      $this->cart_checkout_error( sprintf(__("Sorry, there is a per order limit of %s for %s", 'mp'), number_format_i18n($limit[$variation]), get_the_title($product_id)) );
+          	//check limit if tracking on or downloadable
+    				if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
+							$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
+							if ($limit[$variation] && $limit[$variation] < intval($quant)) {
+					      $this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), get_the_title($product_id)) );
 	          		continue;
 					    }
 	          }
@@ -2786,7 +2792,9 @@ Thanks again!", 'mp')
 
   //serves a downloadble product file
   function serve_download($product_id) {
-    if (!isset($_GET['orderid']))
+    $settings = get_option('mp_settings');
+
+		if (!isset($_GET['orderid']))
       return false;
       
     //get the order
@@ -2809,6 +2817,11 @@ Thanks again!", 'mp')
       $url = $download['url'];
 		else if (!$url)
 			return false;
+		
+		//check for too many downloads
+		$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+		if (intval($download['downloaded']) >= $max_downloads)
+		  return false;
 		
 		require_once(ABSPATH . '/wp-admin/includes/file.php');
   
@@ -3430,6 +3443,7 @@ Notification Preferences: %s', 'mp');
       wp_die(__('Invalid Order ID', 'mp'));
 
     $settings = get_option('mp_settings');
+		$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
     ?>
     <div class="wrap">
     <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/shopping-cart.png'; ?>" /></div>
@@ -3624,7 +3638,7 @@ Notification Preferences: %s', 'mp');
 		              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
 		              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
 									if (is_array($data['download']))
-									  echo '  <td class="mp_cart_col_downloads">' . number_format_i18n($data['download']['downloaded']) . '</td>';
+									  echo '  <td class="mp_cart_col_downloads">' . number_format_i18n($data['download']['downloaded']) . (($data['download']['downloaded'] >= $max_downloads) ? __(' (Limit Reached)', 'mp') : '')  . '</td>';
 									else
 										echo '  <td class="mp_cart_col_downloads">' . __('N/A', 'mp') . '</td>';
 		              echo '</tr>';
@@ -4315,6 +4329,22 @@ Notification Preferences: %s', 'mp');
         				<span class="description"><?php _e('At what low stock count do you want to be warned for products you have enabled inventory tracking for?', 'mp') ?></span><br />
         				<input name="mp[inventory_threshhold]" type="text" value="<?php echo intval($settings['inventory_threshhold']); ?>" size="2" />
                 </td>
+                </tr>
+                <tr>
+                <tr id="mp-downloads-setting">
+                <th scope="row"><?php _e('Maximum Downloads', 'mp') ?></th>
+        				<td>
+        				<span class="description"><?php _e('How many times may a customer download a file they have purchased? (It\'s best to set this higher than one in case they have any problems downloading)', 'mp') ?></span><br />
+                <select name="mp[max_downloads]">
+								<?php
+								$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+								for ($i=1; $i<=100; $i++) {
+                  $selected = ($max_downloads == $i) ? ' selected="selected"' : '';
+			            echo '<option value="' . $i . '"' . $selected . '">' . $i . '</option>';
+			    			}
+								?>
+								</select>
+								</td>
                 </tr>
                 <tr>
                 <th scope="row"><?php _e('Product Listings Only', 'mp') ?></th>

@@ -813,6 +813,7 @@ function mp_order_status() {
       }
       
       $order_paid = $order->post_status != 'order_received';
+      $max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
       ?>
       </ul>
       
@@ -871,10 +872,15 @@ function mp_order_status() {
 		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
 		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
 									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->post_title)) {
-                    if ($order_paid)
-											echo '  <td class="mp_cart_col_downloads"><a href="' . $download_url . '">' . __('Download &raquo;', 'mp') . '</a></td>';
-										else
+                    if ($order_paid) {
+                      //check for too many downloads
+											if (intval($data['download']['downloaded']) < $max_downloads)
+												echo '  <td class="mp_cart_col_downloads"><a href="' . $download_url . '">' . __('Download&raquo;', 'mp') . '</a></td>';
+											else
+											  echo '  <td class="mp_cart_col_downloads">' . __('Limit Reached', 'mp') . '</td>';
+										} else {
 										  echo '  <td class="mp_cart_col_downloads">' . __('Awaiting Payment', 'mp') . '</td>';
+										}
 									} else {
 										echo '  <td class="mp_cart_col_downloads"></td>';
 									}

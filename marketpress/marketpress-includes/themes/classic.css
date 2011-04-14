@@ -169,3 +169,7 @@ padding: 10px;
 border: 1px solid #e2e2e2;
 background: #eeeeee;
 }
+
+td.mp_cart_col_downloads {
+font-size: 80%;
+}

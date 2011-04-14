@@ -59,10 +59,8 @@ jQuery(document).ready(function($) {
 	function variation_check() {
     if($('.variation').size() > 1) {
       $('.mp_var_col').show();
-      $('#mp_variation_message').show();
 		} else {
       $('.mp_var_col').hide();
-      $('#mp_variation_message').hide();
     }
 	}
   variation_check();

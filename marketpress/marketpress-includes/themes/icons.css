@@ -282,3 +282,7 @@ background: #eeeeee;
 -webkit-border-radius: 10px;
 border-radius: 10px;
 }
+
+td.mp_cart_col_downloads {
+font-size: 80%;
+}
