@@ -105,7 +105,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment($cart, $shipping_info) {
-    global $mp;
+    global $mp, $current_user;
     
     $timestamp = time();
     $settings = get_option('mp_settings');
@@ -195,6 +195,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
     //setup transients for ipn in case checkout doesn't redirect (ipn should come within 12 hrs!)
 		set_transient('mp_order_'. $order_id . '_cart', $cart, 60*60*12);
 		set_transient('mp_order_'. $order_id . '_shipping', $shipping_info, 60*60*12);
+		set_transient('mp_order_'. $order_id . '_userid', $current_user->ID, 60*60*12);
     
     wp_redirect("{$url}?{$param_str}");
     exit(0);
@@ -279,6 +280,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
       if ($order) {
         delete_transient('mp_order_' . $order_id . '_cart');
         delete_transient('mp_order_' . $order_id . '_shipping');
+				delete_transient('mp_order_' . $order_id . '_userid');
       }
 		} else {
       $mp->set_cart_cookie(Array());
@@ -515,13 +517,14 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
         //succesful payment, create our order now
         $cart = get_transient('mp_order_' . $order_id . '_cart');
 			  $shipping_info = get_transient('mp_order_' . $order_id . '_shipping');
-			  //TODO: make saving order_id into usermeta possible
-        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid);
+			  $user_id = get_transient('mp_order_' . $order_id . '_userid');
+        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id);
 
         //if successful delete transients
         if ($success) {
           delete_transient('mp_order_' . $order_id . '_cart');
           delete_transient('mp_order_' . $order_id . '_shipping');
+			  	delete_transient('mp_order_' . $order_id . '_userid');
         }
       }
       

@@ -857,8 +857,8 @@ function mp_order_status() {
 	              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
 	              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
 	              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-	              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
-	              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+	              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
+	              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
 	              echo '  <td class="mp_cart_col_downloads"></td>';
 	              echo '</tr>';
 							} else {
@@ -867,8 +867,8 @@ function mp_order_status() {
 		              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
 		              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-		              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
-		              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
+		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
 									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->ID))
 									  echo '  <td class="mp_cart_col_downloads"><a href="' . $download_url . '">' . __('Download &raquo;', 'mp') . '</a></td>';
 									else
@@ -1373,11 +1373,16 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 	      if ($meta['mp_inventory'][$variation] <= $data['quantity'])
 	        $no_inventory[] = $variation;
 			}
-		} else {
-    	foreach ($meta['mp_inventory'] as $key => $stock) {
-	      if ($stock <= 0)
+			foreach ($meta['mp_inventory'] as $key => $stock) {
+	      if (!in_array($key, $no_inventory) && $stock <= 0)
 	        $no_inventory[] = $key;
 			}
+		}
+		
+		//find out of stock items that aren't in the cart
+		foreach ($meta['mp_inventory'] as $key => $stock) {
+      if (!in_array($key, $no_inventory) && $stock <= 0)
+        $no_inventory[] = $key;
 		}
 		
 		if (count($no_inventory) >= count($meta["mp_price"]))

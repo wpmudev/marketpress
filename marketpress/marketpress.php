@@ -249,7 +249,10 @@ Thanks again!", 'mp')
 
     //create store page
     add_action( 'init', array(&$this, 'create_store_page') );
-
+    
+    //add cart widget to first sidebar
+    add_action( 'widgets_init', array(&$this, 'add_default_widget'), 11 );
+    
     //add action to flush rewrite rules after we've added them for the first time
     add_action( 'init', array(&$this, 'flush_rewrite'), 999 );
   }
@@ -509,6 +512,30 @@ Thanks again!", 'mp')
                     );
     wp_localize_script( 'jquery-lightbox', 'MP_Lightbox', $js_vars );
   }
+
+	//if cart widget is not in a sidebar, add it to the top of the first sidebar. Only runs at initial install
+	function add_default_widget() {
+    if (!is_active_widget(false, false, 'mp_cart_widget')) {
+      $sidebars_widgets = wp_get_sidebars_widgets();
+      if ( is_array($sidebars_widgets) ) {
+				foreach ( $sidebars_widgets as $sidebar => $widgets ) {
+					if ( 'wp_inactive_widgets' == $sidebar )
+						continue;
+
+					if ( is_array($widgets) ) {
+					  array_unshift($widgets, 'mp_cart_widget-1');
+					  $sidebars_widgets[$sidebar] = $widgets;
+						wp_set_sidebars_widgets( $sidebars_widgets );
+            $settings = array();
+						$settings[1] = array( 'title' => __('Shopping Cart', 'mp'), 'custom_text' => '', 'show_thumbnail' => 1, 'size' => 25 );
+						$settings['_multiwidget'] = 1;
+						update_option( 'widget_mp_cart_widget', $settings );
+            return true;
+					}
+				}
+			}
+    }
+	}
 
   //creates the store page on install and updates
   function create_store_page($old_slug = false) {
@@ -1569,22 +1596,17 @@ Thanks again!", 'mp')
 			}
 
       //price function
-      $func_curr = function($price) {
-	      $price = round($price, 2);
-	      return ($price) ? $price : 0;
-			};
+      $func_curr = '$price = round($price, 2);return ($price) ? $price : 0;';
 
       //sku function
-      $func_sku = function($value) {
-	      return preg_replace('/[^a-zA-Z0-9_-]/', '', $value);
-			};
+      $func_sku = 'return preg_replace("/[^a-zA-Z0-9_-]/", "", $value);';
 
       update_post_meta($post_id, 'mp_var_name', $_POST['mp_var_name']);
-      update_post_meta($post_id, 'mp_sku', array_map($func_sku, $_POST['mp_sku']));
-      update_post_meta($post_id, 'mp_price', array_map($func_curr, $_POST['mp_price']));
-      update_post_meta($post_id, 'mp_is_sale', (isset($_POST['mp_is_sale'])) ? 1 : 0);
-      update_post_meta($post_id, 'mp_sale_price', array_map($func_curr, $_POST['mp_sale_price']));
-      update_post_meta($post_id, 'mp_track_inventory', (isset($_POST['mp_track_inventory'])) ? 1 : 0);
+      update_post_meta($post_id, 'mp_sku', array_map(create_function('$value', $func_sku), $_POST['mp_sku']));
+      update_post_meta($post_id, 'mp_price', array_map(create_function('$price', $func_curr), $_POST['mp_price']));
+      update_post_meta($post_id, 'mp_is_sale', isset($_POST['mp_is_sale']) ? 1 : 0);
+      update_post_meta($post_id, 'mp_sale_price', array_map(create_function('$price', $func_curr), $_POST['mp_sale_price']));
+      update_post_meta($post_id, 'mp_track_inventory', isset($_POST['mp_track_inventory']) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', array_map('intval', $_POST['mp_inventory']));
 
 			//if changing delete flag so emails will be sent again
@@ -2092,10 +2114,10 @@ Thanks again!", 'mp')
 					$stock[0] = $stock;
         if ($stock[$variation] < $new_quantity) {
           if ($no_ajax !== true) {
-            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id][$variation]));
+            echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock[$variation]-$cart[$product_id][$variation]));
             exit;
           } else {
-            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock-$cart[$product_id][$variation])) );
+            $this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock[$variation]-$cart[$product_id][$variation])) );
             return false;
           }
         }
@@ -2131,7 +2153,7 @@ Thanks again!", 'mp')
 
       //if running via ajax return updated cart and die
       if ($no_ajax !== true) {
-        $return .= mp_show_cart('widget');
+        $return .= mp_show_cart('widget', false, false);
         echo $return;
 				exit;
       }
@@ -2521,7 +2543,7 @@ Thanks again!", 'mp')
   }
 
   //called on checkout to create a new order
-  function create_order($order_id, $cart, $shipping_info, $payment_info, $paid) {
+  function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false) {
     $settings = get_option('mp_settings');
 
     //order id can be null
@@ -2610,10 +2632,12 @@ Thanks again!", 'mp')
     }
 
     //save order history
-    $user_id = get_current_user_id();
+    if (!$user_id)
+    	$user_id = get_current_user_id();
+    	
     if ($user_id) { //save to user_meta if logged in
 
-      if (is_multisite() && !$this->global_cart) {
+      if (is_multisite()) {
         global $blog_id;
         $meta_id = 'mp_order_history_' . $blog_id;
       } else {
@@ -2622,12 +2646,12 @@ Thanks again!", 'mp')
 
       $orders = get_user_meta($user_id, $meta_id, true);
       $timestamp = time();
-      $orders[$timestamp] = array('id' => $order_id, 'blog_id' => $blog_id, 'total' => $payment_info['total']);
+      $orders[$timestamp] = array('id' => $order_id, 'total' => $payment_info['total']);
       update_user_meta($user_id, $meta_id, $orders);
 
     } else { //save to cookie instead
 
-      if (is_multisite() && !$this->global_cart) {
+      if (is_multisite()) {
         global $blog_id;
         $cookie_id = 'mp_order_history_' . $blog_id . '_' . COOKIEHASH;
       } else {
@@ -2638,10 +2662,10 @@ Thanks again!", 'mp')
         $orders = unserialize($_COOKIE[$cookie_id]);
 
       $timestamp = time();
-      $orders[$timestamp] = array('id' => $order_id, 'blog_id' => $blog_id, 'total' => $payment_info['total']);
+      $orders[$timestamp] = array('id' => $order_id, 'total' => $payment_info['total']);
 
       //set cookie
-      $expire = time() + 2592000; //1 month expire
+      $expire = time() + 31536000; //1 year expire
       setcookie($cookie_id, serialize($orders), $expire, COOKIEPATH);
     }
 
@@ -5313,17 +5337,17 @@ class MarketPress_Shopping_Cart extends WP_Widget {
 		$instance['title'] = wp_filter_nohtml_kses( $new_instance['title'] );
 		$instance['custom_text'] = wp_filter_kses( $new_instance['custom_text'] );
 		$instance['show_thumbnail'] = !empty($new_instance['show_thumbnail']) ? 1 : 0;
-    $instance['size'] = !empty($new_instance['size']) ? intval($new_instance['size']) : 50;
+    $instance['size'] = !empty($new_instance['size']) ? intval($new_instance['size']) : 25;
 
 		return $instance;
 	}
 
 	function form( $instance ) {
-    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Shopping Cart', 'mp'), 'custom_text' => '', 'show_thumbnail' => 1, 'size' => 50 ) );
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Shopping Cart', 'mp'), 'custom_text' => '', 'show_thumbnail' => 1, 'size' => 25 ) );
 		$title = $instance['title'];
 		$custom_text = $instance['custom_text'];
 		$show_thumbnail = isset( $instance['show_thumbnail'] ) ? (bool) $instance['show_thumbnail'] : false;
-		$size = !empty($instance['size']) ? intval($instance['size']) : 50;
+		$size = !empty($instance['size']) ? intval($instance['size']) : 25;
   ?>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'mp') ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" /></label></p>
 		<p><label for="<?php echo $this->get_field_id('custom_text'); ?>"><?php _e('Custom Text:', 'mp') ?><br />
