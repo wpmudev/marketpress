@@ -177,7 +177,6 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
   $content = '';
   if ($type == 'checkout-edit') {
     $content .= apply_filters( 'mp_cart_updated_msg', '' );
-    $content .= apply_filters( 'mp_checkout_error_checkout', '' );
     
     $content .= '<form id="mp_cart_form" method="post" action="">';
     $content .= '<table class="mp_cart_contents"><thead><tr>';
@@ -812,6 +811,8 @@ function mp_order_status() {
         echo '<li>' . __('Paid:', 'mp') . ' <strong>' . $paid . '</strong></li>';
         echo '<li>' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></li>';
       }
+      
+      $order_paid = $order->post_status != 'order_received';
       ?>
       </ul>
       
@@ -849,8 +850,8 @@ function mp_order_status() {
         <tbody>
         <?php
           if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
-            foreach ($order->mp_cart_info as $product_id => $variations) {
-							//for compatibility for old orders from MP 1.0
+						foreach ($order->mp_cart_info as $product_id => $variations) {
+							//for compatibility for old orders from MP 1.x
 							if (isset($variations['name'])) {
               	$data = $variations;
                 echo '<tr>';
@@ -869,10 +870,14 @@ function mp_order_status() {
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
 		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
-									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->ID))
-									  echo '  <td class="mp_cart_col_downloads"><a href="' . $download_url . '">' . __('Download &raquo;', 'mp') . '</a></td>';
-									else
+									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->post_title)) {
+                    if ($order_paid)
+											echo '  <td class="mp_cart_col_downloads"><a href="' . $download_url . '">' . __('Download &raquo;', 'mp') . '</a></td>';
+										else
+										  echo '  <td class="mp_cart_col_downloads">' . __('Awaiting Payment', 'mp') . '</td>';
+									} else {
 										echo '  <td class="mp_cart_col_downloads"></td>';
+									}
 		              echo '</tr>';
 								}
 							}

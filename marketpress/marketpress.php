@@ -2175,7 +2175,8 @@ Thanks again!", 'mp')
               if (!is_array($stock))
 								$stock[0] = $stock;
               if ($stock[$variation] < intval($quant)) {
-                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($stock[$variation]-intval($quant))) );
+                $left = (($stock[$variation]-intval($global_cart[$bid][$product_id][$variation])) < 0) ? 0 : ($stock[$variation]-intval($global_cart[$bid][$product_id][$variation]));
+                $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for %s. (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($left)) );
                 continue;
               }
             }
@@ -2378,11 +2379,11 @@ Thanks again!", 'mp')
 		          $total = $coupon['new_total'];
 
 						//shipping
-          	if ( ($shipping_price = $mp->shipping_price()) !== false )
+          	if ( ($shipping_price = $this->shipping_price()) !== false )
 				      $total = $total + $shipping_price;
 
 				    //tax line
-        		if ( ($tax_price = $mp->tax_price()) !== false )
+        		if ( ($tax_price = $this->tax_price()) !== false )
 				      $total = $total + $tax_price;
 				      
             //setup our payment details
@@ -2786,6 +2787,10 @@ Thanks again!", 'mp')
     $order = $this->get_order($_GET['orderid']);
     if (!$order)
       return false;
+
+		//check that order is paid
+    if ($order->post_status == 'order_received')
+      return false;
 		  
 		$url = get_post_meta($product_id, 'mp_file', true);
 		
@@ -2796,7 +2801,7 @@ Thanks again!", 'mp')
 		//if new url is not set try to grab it from the order history
     if (!$url && isset($download['url']))
       $url = $download['url'];
-		else
+		else if (!$url)
 			return false;
 		
 		require_once(ABSPATH . '/wp-admin/includes/file.php');
@@ -2810,7 +2815,7 @@ Thanks again!", 'mp')
 		}
     
 	  if (file_exists($tmp)) {
-	    header('Content-Description: File Transfer');
+			header('Content-Description: File Transfer');
 	    header('Content-Type: application/octet-stream');
 	    header('Content-Disposition: attachment; filename="'.$filename.'"');
 	    header('Content-Transfer-Encoding: binary');
@@ -2820,11 +2825,11 @@ Thanks again!", 'mp')
 	    header('Content-Length: ' . filesize($tmp));
 	    readfile($tmp);
 	    @unlink($tmp);
-	    
+
 	    //attempt to record a download attempt
-	    if (isset($download['downloaded'])) {
+			if (isset($download['downloaded'])) {
 	    	$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
-      	update_post_meta($post_id, 'mp_cart_info', $order->mp_cart_info);
+      	update_post_meta($order->ID, 'mp_cart_info', $order->mp_cart_info);
 			}
 	    exit;
 		}
@@ -2941,7 +2946,7 @@ Thanks again!", 'mp')
   }
   
   function user_profile_fields() {
-    global $mp, $current_user;
+    global $current_user;
     
     if (isset($_REQUEST['user_id'])) {
       $user_id = $_REQUEST['user_id'];
@@ -2951,9 +2956,7 @@ Thanks again!", 'mp')
     
     $settings = get_option('mp_settings');
     
-    $meta = get_user_meta($user_id, 'mp_billing_info');
-    $meta = $meta[0];
-    
+    $meta = get_user_meta($user_id, 'mp_billing_info', true);
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : $meta['email'];
     $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : $meta['name'];
     $address1 = (!empty($_SESSION['mp_billing_info']['address1'])) ? $_SESSION['mp_billing_info']['address1'] : $meta['address1'];
@@ -2967,7 +2970,7 @@ Thanks again!", 'mp')
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : $meta['phone'];
     
     ?>
-    <h3><?php _e('Billing Info', WEB_INVOICE_TRANS_DOMAIN); ?></h3>
+    <h3><?php _e('Billing Info', 'mp'); ?></h3>
     <a name="mp_billing_info"></a>
     <table class="form-table">
       <tr>
@@ -3015,7 +3018,7 @@ Thanks again!", 'mp')
         <select id="mp_billing_info_country" name="mp_billing_info[country]">
           <?php
           foreach ($settings['shipping']['allowed_countries'] as $code) {
-            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
+            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($this->countries[$code]); ?></option><?php
           }
           ?>
         </select>
@@ -3092,7 +3095,7 @@ Thanks again!", 'mp')
         <select id="mp_shipping_info_country" name="mp_shipping_info[country]">
           <?php
           foreach ($settings['shipping']['allowed_countries'] as $code) {
-            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
+            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($this->countries[$code]); ?></option><?php
           }
           ?>
         </select>
@@ -3163,7 +3166,7 @@ Thanks again!", 'mp')
 	        $order_info .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 					//show download link if set
-					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->ID))
+					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
 	        	$order_info .= "\t" . __('Download: ', 'mp') . $download_url . "\n";
 				}
 			}

@@ -13,6 +13,7 @@ Change Log:
 - Per order product limits - ALMOST DONE
 - Skipping payment form page if only one gateway allowed
 - Hide cart widget on cart pages
+- Add cart widget to sidebar on first install
 - Moneybookers gateway
 - Many many bugfixes
 
