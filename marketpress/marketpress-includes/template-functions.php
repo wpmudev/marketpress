@@ -1324,11 +1324,11 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
   //unserialize
   foreach ($meta as $key => $val) {
 	  $meta[$key] = maybe_unserialize($val[0]);
-	  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+	  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file")
 	    $meta[$key] = array($meta[$key]);
 	}
-    
-  if (is_array($meta["mp_price"]) && count($meta["mp_price"]) == 1) {
+
+  if ((is_array($meta["mp_price"]) && count($meta["mp_price"]) == 1) || !empty($meta["mp_file"])) {
     if ($meta["mp_is_sale"] && $meta["mp_sale_price"][0]) {
 	    $price = '<span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
 	    $price .= '<span class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
@@ -1364,7 +1364,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   //unserialize
   foreach ($meta as $key => $val) {
 	  $meta[$key] = maybe_unserialize($val[0]);
-	  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link")
+	  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file")
 	    $meta[$key] = array($meta[$key]);
 	}
 	
@@ -1395,7 +1395,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   }
 
   //display an external link or form button
-  if ($product_link = $meta['mp_product_link'][0]) {
+  if ($product_link = $meta['mp_product_link']) {
 
     if ($context == 'list') {
       if ($settings['list_button_type'] == 'addcart') {
@@ -1422,7 +1422,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 	    $button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
 
 			//create select list if more than one variation
-		  if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1) {
+		  if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1 && empty($meta["mp_file"])) {
 	      $variation_select = '<select class="mp_product_variations" name="variation">';
 				foreach ($meta["mp_price"] as $key => $value) {
 				  $disabled = (in_array($key, $no_inventory)) ? ' disabled="disabled"' : '';
@@ -1452,8 +1452,8 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 	    
 	      $button .= $variation_select;
 	      
-	      //add quantity field
-	      if ($settings['show_quantity']) {
+	      //add quantity field if not downloadable
+	      if ($settings['show_quantity'] && empty($meta["mp_file"])) {
 	        $button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
 	      }
 

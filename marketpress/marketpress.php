@@ -2686,8 +2686,11 @@ Thanks again!", 'mp')
   //returns the full order details as an object
   function get_order($order_id) {
     $id = (is_int($order_id)) ? $order_id : $this->order_to_post_id($order_id);
-    $order = get_post($id);
 
+    if (empty($id))
+      return false;
+      
+		$order = get_post($id);
     if (!$order)
       return false;
 
@@ -2783,9 +2786,12 @@ Thanks again!", 'mp')
 
   //serves a downloadble product file
   function serve_download($product_id) {
+    if (!isset($_GET['orderid']))
+      return false;
+      
     //get the order
     $order = $this->get_order($_GET['orderid']);
-    if (!$order)
+		if (!$order)
       return false;
 
 		//check that order is paid
