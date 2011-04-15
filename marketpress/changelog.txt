@@ -9,11 +9,13 @@ Change Log:
 ----------------------------------------------------------------------
 - Global carts/checkout - PayPal Express only compatible gateway currently
 - Downloadable Products
+- Limit download count per purchase
 - Product variations
-- Per order product limits - ALMOST DONE
+- Per order product limits
 - Skipping payment form page if only one gateway allowed
 - Hide cart widget on cart pages
 - Add cart widget to sidebar on first install
+- Option to force login to checkout
 - Moneybookers gateway
 - Many many bugfixes
 

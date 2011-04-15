@@ -152,6 +152,7 @@ class MarketPress {
       'disable_cart' => 0,
       'inventory_threshhold' => 3,
       'max_downloads' => 5,
+      'force_login' => 0,
       'store_theme' => 'icons',
       'product_img_height' => 150,
       'product_img_width' => 150,
@@ -453,6 +454,7 @@ Thanks again!", 'mp')
     $page = add_submenu_page('edit.php?post_type=product', __('Store Settings', 'mp'), __('Store Settings', 'mp'), 'manage_options', 'marketpress', array(&$this, 'admin_page'));
     add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
     add_action( 'admin_print_styles-' . $page, array(&$this, 'admin_css_settings') );
+    add_contextual_help($page, '<iframe src="http://premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="600px"></iframe>');
   }
 
   function admin_css() {
@@ -799,13 +801,21 @@ Thanks again!", 'mp')
 			}
 			
 			// Redirect to https if forced to use SSL by a payment gateway
-			foreach ((array)$mp_gateway_active_plugins as $plugin) {
-	      if ($plugin->force_ssl) {
-				  if ( !is_ssl() ) {
-						wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-						exit();
-				  }
-	      }
+			if (get_query_var('checkoutstep')) {
+				foreach ((array)$mp_gateway_active_plugins as $plugin) {
+		      if ($plugin->force_ssl) {
+					  if ( !is_ssl() ) {
+							wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+							exit();
+					  }
+		      }
+				}
+			}
+			
+			//force login if required
+			if (!is_user_logged_in() && $settings['force_login'] && get_query_var('checkoutstep')) {
+        wp_redirect( wp_login_url( mp_checkout_step_url( get_query_var('checkoutstep') ) ) );
+				exit();
 			}
 			
       //check for custom theme template
@@ -2264,6 +2274,11 @@ Thanks again!", 'mp')
 
       if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
         $this->cart_checkout_error( __('Please enter your State/Province/Region.', 'mp'), 'state');
+        
+      if ($_POST['country'] == 'US' && !array_key_exists(strtoupper($_POST['state']), $this->usa_states))
+        $this->cart_checkout_error( __('Please enter a valid two-letter State abbreviation.', 'mp'), 'state');
+			else
+			  $_POST['state'] = strtoupper($_POST['state']);
 
       if (empty($_POST['zip']))
     		$this->cart_checkout_error( __('Please enter your Zip/Postal Code.', 'mp'), 'zip');
@@ -4069,7 +4084,7 @@ Notification Preferences: %s', 'mp');
     		'messages'      => __('Messages', 'mp'),
     		'shipping'      => __('Shipping', 'mp'),
     		'gateways'      => __('Payments', 'mp'),
-    		'help'          => __('Help', 'mp')
+    		'shortcodes'          => __('Shortcodes', 'mp')
     	);
     } else {
       $tabs = array( 'presentation'  => __('Presentation', 'mp') );
@@ -4323,14 +4338,7 @@ Notification Preferences: %s', 'mp');
             <h3 class='hndle'><span><?php _e('Miscellaneous Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
-        				<tr id="mp-inventory-setting">
-                <th scope="row"><?php _e('Inventory Warning Threshold', 'mp') ?></th>
-        				<td>
-        				<span class="description"><?php _e('At what low stock count do you want to be warned for products you have enabled inventory tracking for?', 'mp') ?></span><br />
-        				<input name="mp[inventory_threshhold]" type="text" value="<?php echo intval($settings['inventory_threshhold']); ?>" size="2" />
-                </td>
-                </tr>
-                <tr>
+
                 <tr id="mp-downloads-setting">
                 <th scope="row"><?php _e('Maximum Downloads', 'mp') ?></th>
         				<td>
@@ -4345,6 +4353,15 @@ Notification Preferences: %s', 'mp');
 								?>
 								</select>
 								</td>
+                </tr>
+                <tr>
+                <th scope="row"><?php _e('Force Login', 'mp') ?></th>
+        				<td>
+        				<?php $force_login = ($settings['force_login']) ? 1 : 0; ?>
+        				<label><input value="1" name="mp[force_login]" type="radio"<?php checked($force_login, 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[force_login]" type="radio"<?php checked($force_login, 0) ?> /> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e('Whether or not customers must be registered and logged in to checkout. (Not recommended: Enabling this can lower conversions)', 'mp') ?></span>
+          			</td>
                 </tr>
                 <tr>
                 <th scope="row"><?php _e('Product Listings Only', 'mp') ?></th>
@@ -5211,17 +5228,17 @@ Notification Preferences: %s', 'mp');
 
 
   		//---------------------------------------------------//
-  		case "help":
+  		case "shortcodes":
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/help.png'; ?>" /></div>
-        <h2><?php _e('MarketPress Help', 'mp'); ?></h2>
+        <h2><?php _e('MarketPress Shortcodes', 'mp'); ?></h2>
         <div id="poststuff" class="metabox-holder mp-settings">
 
           <!--
           <div class="postbox">
             <h3 class='hndle'><span><?php _e('General Information', 'mp') ?></span></h3>
             <div class="inside">
-              <?php _e('General help content goes here...', 'mp') ?>
+              <iframe src="http://premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="400px"></iframe>
             </div>
           </div>
           -->

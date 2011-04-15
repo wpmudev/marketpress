@@ -402,6 +402,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 //Prints cart login/register form, for internal use
 function _mp_cart_login($echo = false) {
   global $mp;
+  $settings = get_option('mp_settings');
   
   $content = '';
   //don't show if logged in
@@ -414,7 +415,10 @@ function _mp_cart_login($echo = false) {
     $content .= '<thead><tr>';
     $content .= '<th class="mp_cart_login">'.__('Have a User Account?', 'mp').'</th>';
     $content .= '<th>&nbsp;</th>';
-    $content .= '<th>'.__('Checkout Directly', 'mp').'</th>';
+    if ($settings['force_login'])
+      $content .= '<th>'.__('Register To Checkout', 'mp').'</th>';
+		else
+      $content .= '<th>'.__('Checkout Directly', 'mp').'</th>';
     $content .= '</tr></thead>';
     $content .= '<tbody>';
     $content .= '<tr>';
@@ -432,8 +436,11 @@ function _mp_cart_login($echo = false) {
     $content .= '</td>';
     $content .= '<td class="mp_cart_or_label">'.__('or', 'mp').'</td>';
     $content .= '<td class="mp_cart_checkout">';
-    $content .= '<a class="mp_cart_direct_checkout_link" href="'.site_url('wp-login.php?action=register', 'login').'">'.__('Register Now To Checkout &raquo;', 'mp').'</a>';
-    $content .= '</td>';
+    if ($settings['force_login'])
+    	$content .= apply_filters('register', '<a class="mp_cart_direct_checkout_link" href="'.site_url('wp-login.php?action=register', 'login').'">'.__('Register Now To Checkout &raquo;', 'mp').'</a>');
+		else
+      $content .= '<a class="mp_cart_direct_checkout_link" href="' . mp_checkout_step_url('shipping') . '">' . __('Checkout Now &raquo;', 'mp') . '</a>';
+		$content .= '</td>';
     $content .= '</tr>';
     $content .= '</tbody>';
     $content .= '</table>';
