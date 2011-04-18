@@ -1352,7 +1352,7 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 		return '';
 	}
 
-  $price = '<span class="mp_product_price">' . $label . $price . '</span>';
+  $price = apply_filters( 'mp_product_price_tag', '<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label );
 
   if ($echo)
     echo $price;
@@ -1482,6 +1482,8 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
     
     $button .= '</form>';
   }
+
+  $button = apply_filters( 'mp_buy_button_tag', $button, $post_id, $context );
 
   if ($echo)
     echo $button;
