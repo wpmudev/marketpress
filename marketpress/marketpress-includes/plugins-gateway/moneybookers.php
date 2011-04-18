@@ -465,7 +465,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 		  $payment_info['transaction_id'] = isset($_POST['mb_transaction_id']) ? $_POST['mb_transaction_id'] : $_POST['transaction_id'];
 
 		  $timestamp = time();
-		  $order_id = $result["transaction_id"];
+    	$order_id = $_POST['transaction_id'];
 
       //setup status
       switch ($_POST['status']) {
