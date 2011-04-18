@@ -58,25 +58,25 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		
     //set paypal vars
     /** @todo Set all array keys to resolve Undefined indexes notice */;
-    if ( $mp->global_cart ) {
+    if ( $mp->global_cart )
       $settings = get_site_option( 'mp_network_settings' );
-      $this->API_Username = $settings['gateways']['paypal-express']['api_user'];
-	    $this->API_Password = $settings['gateways']['paypal-express']['api_pass'];
-	    $this->API_Signature = $settings['gateways']['paypal-express']['api_sig'];
-	    $this->currencyCode = $settings['gateways']['paypal-express']['currency'];
-	    $this->locale = $settings['gateways']['paypal-express']['locale'];
-      $this->returnURL = mp_checkout_step_url('confirm-checkout');
-    	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
-	    $this->version = "69.0"; //api version
+    
+    $this->API_Username = $settings['gateways']['paypal-express']['api_user'];
+    $this->API_Password = $settings['gateways']['paypal-express']['api_pass'];
+    $this->API_Signature = $settings['gateways']['paypal-express']['api_sig'];
+    $this->currencyCode = $settings['gateways']['paypal-express']['currency'];
+    $this->locale = $settings['gateways']['paypal-express']['locale'];
+    $this->returnURL = mp_checkout_step_url('confirm-checkout');
+  	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
+    $this->version = "69.0"; //api version
 
-      //set api urls
-    	if ($settings['gateways']['paypal-express']['mode'] == 'sandbox')	{
-    		$this->API_Endpoint = "https://api-3t.sandbox.paypal.com/nvp";
-    		$this->paypalURL = "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=";
-    	} else {
-    		$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
-    		$this->paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
-      }
+    //set api urls
+  	if ($settings['gateways']['paypal-express']['mode'] == 'sandbox')	{
+  		$this->API_Endpoint = "https://api-3t.sandbox.paypal.com/nvp";
+  		$this->paypalURL = "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=";
+  	} else {
+  		$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
+  		$this->paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
     }
   }
 
