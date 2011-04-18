@@ -99,8 +99,10 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	  $timestamp = time();
 	  
     $totals = array();
-    foreach ($cart as $product_id => $data) {
-      $totals[] = $data['price'] * $data['quantity'];
+    foreach ($cart as $product_id => $variations) {
+			foreach ($variations as $data) {
+      	$totals[] = $data['price'] * $data['quantity'];
+      }
     }
     $total = array_sum($totals);
 
