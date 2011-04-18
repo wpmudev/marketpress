@@ -281,6 +281,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
         $_SESSION['final_amt'] = 0;
 				$_SESSION['final_amts'] = array();
 				$_SESSION['prs'] = array();
+				$_SESSION['ipns'] = array();
 				// $_SESSION['seller_ids'] = array();
 				$_SESSION['seller_paypal_accounts'] = array();
 
@@ -291,6 +292,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				  $_SESSION['final_amt'] += $result['PAYMENTREQUEST_'.$i.'_AMT'];
 				  $_SESSION['final_amts'][] = $result['PAYMENTREQUEST_'.$i.'_AMT'];
 				  $_SESSION['prs'][] = $result['PAYMENTREQUEST_'.$i.'_PAYMENTREQUESTID'];
+				  $_SESSION['ipns'][] = $result['PAYMENTREQUEST_'.$i.'_NOTIFYURL'];
 				  //$_SESSION['seller_ids'][] = $result['PAYMENTREQUEST_'.$i.'_SELLERID'];
 				  $_SESSION['seller_paypal_accounts'][] = $result['PAYMENTREQUEST_'.$i.'_SELLERPAYPALACCOUNTID'];
 				}
@@ -336,8 +338,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     
     if (isset($_SESSION['token']) && isset($_SESSION['PayerID']) && isset($_SESSION['final_amt'])) {
       //attempt the final payment
-      $result = $this->DoExpressCheckoutPayment($_SESSION['token'], $_SESSION['PayerID'], $_SESSION['final_amts'], $_SESSION['seller_paypal_accounts'], $_SESSION['prs']);
-      
+      $result = $this->DoExpressCheckoutPayment($_SESSION['token'], $_SESSION['PayerID'], $_SESSION['final_amts'], $_SESSION['seller_paypal_accounts'], $_SESSION['ipns'], $_SESSION['prs']);
+
       //check response
       if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
       
@@ -853,14 +855,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
             '*' => ''
 						);
           $status = __('The payment is pending.', 'mp');
-          $status .= '<br />' . $pending_str[$result["PAYMENTINFO_0_PENDINGREASON"]];
+          $status .= '<br />' . $pending_str[$_POST["pending_reason"]];
           $paid = false;
 					break;
 
 				default:
 					// case: various error cases
 			}
-      $status = $result["PAYMENTINFO_0_PAYMENTSTATUS"] . ': '. $status;
+      $status = $_POST['payment_status'] . ': '. $status;
       
       //record transaction
       $mp->update_order_payment_status($_POST['invoice'], $status, $paid);
@@ -882,12 +884,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $blog_id = (is_multisite()) ? $blog_id : 1;
 	  $current_blog_id = $blog_id;
 
-	  if (!$mp->global_cart)
+	  if (!$mp->global_cart) {
 	  	$selected_cart[$blog_id] = $global_cart;
-	  else
+	  	$settings = get_option('mp_settings');
+	  } else {
 	    $selected_cart = $global_cart;
-    
-    $settings = get_option('mp_settings');
+      $settings = get_site_option( 'mp_network_settings' );
+    }
     
     $nvpstr = "";
     $nvpstr .= "&ReturnUrl=" . $this->returnURL;
@@ -1037,14 +1040,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	
 	
 	//Purpose: 	Prepares the parameters for the DoExpressCheckoutPayment API Call.
-	function DoExpressCheckoutPayment($token, $payer_id, $final_amts, $seller_paypal_accounts, $prs) {
+	function DoExpressCheckoutPayment($token, $payer_id, $final_amts, $seller_paypal_accounts, $ipns, $prs) {
 	  $nvpstr  = '&TOKEN=' . urlencode($token);
 	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
 	  foreach ($prs as $i => $pr) {
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_AMT=" . $final_amts[$i];
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_CURRENCYCODE=" . $this->currencyCode;
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_PAYMENTACTION=" . $this->payment_action;
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_NOTIFYURL=" . $this->ipn_url;
+	    $nvpstr .= "&PAYMENTREQUEST_{$i}_NOTIFYURL=" . $ipns[$i];
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_SELLERPAYPALACCOUNTID=" . $seller_paypal_accounts[$i];
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_PAYMENTREQUESTID=" . $prs[$i];
 	  }

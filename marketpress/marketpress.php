@@ -2571,6 +2571,8 @@ Thanks again!", 'mp')
     //order id can be null
     if (empty($order_id))
       $order_id = $this->generate_order_id();
+		else if ($this->get_order($order_id)) //don't continue if the order exists
+		  return false;
 
     //insert post type
     $order = array();
@@ -3197,11 +3199,11 @@ Thanks again!", 'mp')
       $order_info = __('Items:', 'mp') . "\n";
       foreach ($order->mp_cart_info as $product_id => $variations) {
 				foreach ($variations as $variation => $data) {
-	        $order_info .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+	        $order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 					//show download link if set
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
-	        	$order_info .= "\t" . __('Download: ', 'mp') . $download_url . "\n";
+	        	$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
 				}
 			}
       $order_info .= "\n";

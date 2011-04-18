@@ -223,6 +223,10 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
     global $mp;
     $settings = get_option('mp_settings');
     
+    //don't charge shipping if only digital products
+    if ( $mp->download_only_cart($cart) )
+      return 0;
+    
     switch ($settings['base_country']) {
       case 'US':
         if ($country == 'US') {
@@ -273,7 +277,8 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
     foreach ($cart as $product_id => $variations) {
 	    $shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
 			foreach ($variations as $variation => $data) {
-	      $extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
+			  if (!$data['download'])
+	      	$extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
 			}
     }
     $extra = array_sum($extras);
