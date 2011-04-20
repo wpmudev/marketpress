@@ -6,6 +6,8 @@ MarketPress Theme: Icons
 
 div.mp_product_meta {
 clear: both;
+overflow: hidden;
+margin-top: 10px;
 }
 
 form.mp_buy_form {
