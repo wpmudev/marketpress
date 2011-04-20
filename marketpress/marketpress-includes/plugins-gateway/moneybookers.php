@@ -264,7 +264,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 	      $total = $total + $tax_price;
 	    }
 
-	    $status = __('Received - The order has been received, awaiting payment.', 'mp');
+	    $status = __('Received - The order has been received, awaiting payment confirmation.', 'mp');
 	    //setup our payment details
 		  $payment_info['gateway_public_name'] = $this->public_name;
 	    $payment_info['gateway_private_name'] = $this->admin_name;

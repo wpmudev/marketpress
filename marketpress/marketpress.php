@@ -104,7 +104,7 @@ class MarketPress {
 		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
   	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
-		add_filter( 'wp_nav_menu_items', array(&$this, 'filter_nav_menu'), 10, 2 );
+		add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
 		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
 
 		//Payment gateway returns
@@ -1113,7 +1113,7 @@ Thanks again!", 'mp')
 
     $settings = get_option('mp_settings');
 
-    $temp_break = strpos($list, mp_store_link(false, true));
+    $temp_break = strpos($list, mp_store_link(false, true) . '"');
 
     //if we can't find the page for some reason skip
     if ($temp_break === false)
@@ -1124,15 +1124,15 @@ Thanks again!", 'mp')
     $nav = substr($list, 0, $break);
 
     if ( !$settings['disable_cart'] ) {
-      $nav .= '<ul><li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
-			$nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
-      $nav .= '<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
+      $nav .= '<ul class="children"><li class="page_item'. ((get_query_var('pagename') == 'product_list') ? ' current_page_item' : '') . '"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
+			$nav .= '<li class="page_item'. ((get_query_var('pagename') == 'cart') ? ' current_page_item' : '') . '"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
+      $nav .= '<li class="page_item'. ((get_query_var('pagename') == 'orderstatus') ? ' current_page_item' : '') . '"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
 </ul>
 ';
     } else {
       $nav .= '
 <ul>
-	<li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
+	<li class="page_item'. ((get_query_var('pagename') == 'product_list') ? ' current_page_item' : '') . '"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
 </ul>
 ';
     }
@@ -1143,40 +1143,61 @@ Thanks again!", 'mp')
 
   //adds our links to custom theme nav menus using wp_nav_menu()
   function filter_nav_menu($list, $args = array()) {
-
+    $settings = get_option('mp_settings');
+    
     if ($args->depth == 1)
       return $list;
 
-    $settings = get_option('mp_settings');
+		//find store page
+		$store_url = mp_store_link(false, true);
+		$store_page = get_option('mp_store_page');
+		foreach($list as $menu_item) {
+			if ($menu_item->ID == $store_page || $menu_item->url == $store_url) {
+				$store_object = $menu_item;
+				break;
+			}
+		}
 
-    $temp_break = strpos($list, mp_store_link(false, true));
+		if ($store_object) {
+		  $obj_products = clone $store_object;
+			$obj_products->title = __('Products', 'mp');
+			$obj_products->menu_item_parent = $store_object->ID;
+			$obj_products->ID = '99999999999';
+			$obj_products->db_id = '99999999999';
+			$obj_products->post_name = '99999999999';
+			$obj_products->url = mp_products_link(false, true);
+			$obj_products->current = (get_query_var('pagename') == 'product_list') ? true : false;
+			$obj_products->current_item_ancestor = (get_query_var('pagename') == 'product_list') ? true : false;
+			$list[] = $obj_products;
+		
+		  //if cart disabled return only the products menu item
+			if ($settings['disable_cart'])
+			  return $list;
+			
+		  $obj_cart = clone $store_object;
+			$obj_cart->title = __('Shopping Cart', 'mp');
+			$obj_cart->menu_item_parent = $store_object->ID;
+			$obj_cart->ID = '99999999999';
+			$obj_cart->db_id = '99999999999';
+			$obj_cart->post_name = '99999999999';
+			$obj_cart->url = mp_cart_link(false, true);
+			$obj_cart->current = (get_query_var('pagename') == 'cart') ? true : false;
+			$obj_cart->current_item_ancestor = (get_query_var('pagename') == 'cart') ? true : false;
+			$list[] = $obj_cart;
+			
+			$obj_order = clone $store_object;
+			$obj_order->title = __('Order Status', 'mp');
+			$obj_order->menu_item_parent = $store_object->ID;
+			$obj_order->ID = '99999999999';
+			$obj_order->db_id = '99999999999';
+			$obj_order->post_name = '99999999999';
+			$obj_order->url = mp_orderstatus_link(false, true);
+			$obj_order->current = (get_query_var('pagename') == 'orderstatus') ? true : false;
+			$obj_order->current_item_ancestor = (get_query_var('pagename') == 'orderstatus') ? true : false;
+			$list[] = $obj_order;
+		}
 
-    //if we can't find the page for some reason skip
-    if ($temp_break === false)
-      return $list;
-
-    $break = strpos($list, '</a>', $temp_break) + 4;
-
-    $nav = substr($list, 0, $break);
-
-    if (!$settings['disable_cart']) {
-      $nav .= '
-<ul class="sub-menu">
-	<li class="menu-item menu-item-type-post_type menu-item-object-page">' . $args->before . '<a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . $args->link_before . __('Products', 'mp') . $args->link_after . '</a>' . $args->after . '</li>
-	<li class="menu-item menu-item-type-post_type menu-item-object-page">' . $args->before . '<a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . $args->link_before . __('Shopping Cart', 'mp') . $args->link_after . '</a>' . $args->after . '</li>
-	<li class="menu-item menu-item-type-post_type menu-item-object-page">' . $args->before . '<a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . $args->link_before . __('Order Status', 'mp') . $args->link_after . '</a>' . $args->after . '</li>
-</ul>
-';
-    } else {
-      $nav .= '
-<ul class="sub-menu">
-	<li class="menu-item menu-item-type-post_type menu-item-object-page">' . $args->before . '<a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . $args->link_before . __('Products', 'mp') . $args->link_after . '</a>' . $args->after . '</li>
-</ul>
-';
-    }
-    $nav .= substr($list, $break);
-
-    return $nav;
+		return $list;
   }
   
   function wp_title_output($title, $id = false) {
