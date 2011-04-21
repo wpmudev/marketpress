@@ -1261,12 +1261,13 @@ Thanks again!", 'mp')
     //add thumbnail
     $content = mp_product_image( false, 'single' ) . $content;
 
-    $content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
-
+    
     $content .= '<div class="mp_product_meta">';
     $content .= mp_product_price(false);
     $content .= mp_buy_button(false, 'single');
     $content .= '</div>';
+
+	$content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
 
     //$content .= mp_tag_list($post->ID, '<div class="mp_product_tags">', ', ', '</div>');
 
