@@ -56,8 +56,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		$this->admin_name = __('Google Checkout (beta)', 'mp');
 		$this->public_name = __('Google Checkout', 'mp');
 		$this->method_img_url = $mp->plugin_url . 'images/google_checkout.gif';
-		$this->method_button_img_url = $mp->plugin_url . 'images/google_checkout-button.gif';
-		
+    $locale = ($this->currencyCode == 'USD') ? 'en_US' : 'en_GB';
 		/*
 		require_once($mp->plugin_dir .'plugins-gateway/google-checkout-library/googlecart.php');
 		require_once($mp->plugin_dir .'plugins-gateway/google-checkout-library/googleitem.php');
@@ -75,8 +74,10 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 			
 			if(strtolower($this->server_type) == "sandbox") {
 				$this->API_URL = "https://sandbox.google.com/checkout/";
+				$this->method_button_img_url = "http://checkout.google.com/buttons/checkout.gif?merchant_id={$this->API_Merchant_id}&w=180&h=46&style=trans&variant=text&loc=$locale";
 			} else {
-				$this->API_URL=  "https://checkout.google.com/";  
+				$this->API_URL=  "https://checkout.google.com/";
+				$this->method_button_img_url = "http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id={$this->API_Merchant_id}&w=180&h=46&style=trans&variant=text&loc=$locale";
 			}
 		}
 		
@@ -105,7 +106,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 	function payment_form($cart, $shipping_info) {
 		global $mp;
 		if (isset($_GET['googlecheckout_cancel'])) {
-		  echo '<div class="mp_checkout_error">' . __('Your Moneybookers transaction has been canceled.', 'mp') . '</div>';
+		  echo '<div class="mp_checkout_error">' . __('Your Google Checkout transaction has been canceled.', 'mp') . '</div>';
 		}
 	}
 	
@@ -129,9 +130,9 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		
 		$params = array();
 		$params['_type'] = 'checkout-shopping-cart';
-		$params['order_id'] = $order_id;
+		$params['shopping-cart.merchant-private-data'] = $order_id;
 		$params['checkout-flow-support.merchant-checkout-flow-support.edit-cart-url'] = mp_cart_link(false, true);
-		$params["checkout-flow-support.merchant-checkout-flow-support.continue-shopping-url"] = mp_checkout_step_url('confirmation');
+		$params["checkout-flow-support.merchant-checkout-flow-support.continue-shopping-url"] = mp_store_link(false, true);
 
     $params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.shipping-taxed"] = ($settings['tax']['tax_shipping']) ? 'true' : 'false';
     $params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.tax-areas.world-area-1"] = '';
@@ -195,19 +196,17 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		set_transient('mp_order_'. $order_id . '_cart', $cart, 60*60*12);
 		set_transient('mp_order_'. $order_id . '_userid', $current_user->ID, 60*60*12);
 		
-		$this->processGoogleCart($param_str, $url);
-
-    parse_str($this->response, $response);
-
+		$response = $this->google_api_request($param_str, $url);
 		if ($response['_type'] == 'checkout-redirect') {
       wp_redirect($response['redirect-url']);
 			exit;
 		} else {
+		  var_dump($response);
 			$mp->cart_checkout_error( sprintf(__('There was a problem setting up your purchase with Google Checkout. Please try again or <a href="%s">select a different payment method</a>.<br/>%s', 'mp'), mp_checkout_step_url('checkout'), @$response['error-message']) );
 		}
 	}
 	
-	function processGoogleCart($param_str, $url){
+	function google_api_request($param_str, $url){
 		global $mp;
 		$args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | Google Checkout Payment Plugin/{$mp->version}";
 		$args['body'] = $param_str;
@@ -219,15 +218,12 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
     //use built in WP http class to work with most server setups
     $response = wp_remote_post($url, $args);
 		if (is_array($response) && isset($response['body'])) {
-			$this->response = $response['body'];
+      parse_str($response['body'], $final_response);
+      return $final_response;
     } else {
-			$this->response = "";
-			$this->error = true;
-			return;
+			return false;
     }
 	}
-	
-	
 	
 	/**
    * Return the chosen payment details here for final confirmation. You probably don't need
@@ -239,10 +235,8 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 	function confirm_payment_form($cart, $shipping_info) {
 		global $mp;
 		//print payment details
-		return $this->googleCart->CustomCheckoutButtonCode("SMALL");
+  	return '<img src="' . $this->method_button_img_url . '" alt="'.__('Pay via Google Checkout', 'mp').'" />';
 	}
-	
-	
 	
 	/**
    * Filters the order confirmation email message body. You may want to append something to
@@ -262,17 +256,6 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
    */
 	function order_confirmation_msg($content, $order) {
 		global $mp;
-		$content = '';
-		if ($order->post_status == 'order_received') {
-		  $content .= '<p>' . sprintf(__('Your payment via Google Checkout for this order totaling %s is in progress. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
-		  $statuses = $order->mp_payment_info['status'];
-		  krsort($statuses); //sort with latest status at the top
-		  $status = reset($statuses);
-		  $timestamp = key($statuses);
-		  $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong>' . htmlentities($status) . '</p>';
-		} else {
-		  $content .= '<p>' . sprintf(__('Your payment via Google Checkout for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
-		}
 		return $content;
 	}
   
@@ -281,52 +264,6 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
    */
 	function order_confirmation($order) {
 		global $mp;
-		
-		//check if not created already by IPN, and create it
-		if (!$order) {
-		  //get totals
-			$cart = $mp->get_cart_contents();
-			foreach ($cart as $product_id => $variations) {
-					foreach ($variations as $data) {
-						$totals[] = $data['price'] * $data['quantity'];
-					}
-			}
-			$total = array_sum($totals);
-
-			if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-			  $total = $coupon['new_total'];
-			}
-
-			//shipping line
-			if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-			  $total = $total + $shipping_price;
-			}
-
-			//tax line
-			if ( ($tax_price = $mp->tax_price()) !== false ) {
-			  $total = $total + $tax_price;
-			}
-
-			$status = __('Received - The order has been received, awaiting payment confirmation.', 'mp');
-			//setup our payment details
-		  $payment_info['gateway_public_name'] = $this->public_name;
-			$payment_info['gateway_private_name'] = $this->admin_name;
-		  $payment_info['method'] = __('Google Checkout Payment', 'mp');
-		  $payment_info['transaction_id'] = $_SESSION['mp_order'];
-		  $timestamp = time();
-		  $payment_info['status'][$timestamp] = $status;
-		  $payment_info['total'] = $total;
-		  $payment_info['currency'] = $this->currencyCode;
-
-			$order = $mp->create_order($_SESSION['mp_order'], $cart, $_SESSION['mp_shipping_info'], $payment_info, false);
-			//if successful delete transients
-		  if ($order) {
-				delete_transient('mp_order_' . $order_id . '_cart');
-				delete_transient('mp_order_' . $order_id . '_shipping');
-		  }
-		} else {
-		  $mp->set_cart_cookie(Array());
-		}
 	}
 	
 	
@@ -337,7 +274,6 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
    */
   function gateway_settings_box($settings) {
     global $mp;
-        
     ?>
     <div id="mp_google_checkout" class="postbox">
       <h3 class='handle'><span><?php _e('Google Checkout Settings', 'mp'); ?></span></h3>
@@ -378,6 +314,18 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 				      </p>
 				    </td>
 				  </tr>
+					<tr>
+				    <th scope="row"><?php _e('Google Checkout API callback URL', 'mp') ?></th>
+				    <td>
+				    <span>
+				    <span class="description"><?php _e('You must setup your API callback URL in Google Checkout to be able to process orders.', 'mp') ?></span>
+          	<ul>
+							<li><?php _e('Login to the Integration page of your Merchant Center <a target="_blank" href="https://sandbox.google.com/checkout/sell/settings?section=Integration">sandbox</a> or <a target="_blank" href="https://checkout.google.com/sell/settings?section=Integration">production</a> account. (You must set it of each)', 'mp') ?></li>
+							<li><?php printf( __('Enter the URL for the web service in the <b>API callback URL</b> field: <strong>%s</strong>', 'mp'), $this->ipn_url); ?></li>
+							<li><?php _e('Indicate the format as "<b>Notification as Serial Number</b>" and use <b>API Version 2.0</b>.', 'mp') ?></li>
+							<li><?php _e('Save your settings.', 'mp') ?></li>
+						</td>
+				  </tr>
 	          <tr valign="top">
 	        <th scope="row"><?php _e('Google Checkout Currency', 'mp') ?></th>
 	        <td>
@@ -408,6 +356,121 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
    */
   function process_gateway_settings($settings) {
     return $settings;
+  }
+  
+  /**
+   * IPN and payment return
+   */
+  function process_ipn_return() {
+    global $mp;
+    $settings = get_option('mp_settings');
+
+    if (isset($_POST['serial-number'])) {
+
+	    $url = $this->API_URL . "api/checkout/v2/reportsForm/Merchant/" . $this->API_Merchant_id;
+			$param_str = '_type=notification-history-request&serial-number=' . urlencode($_POST['serial-number']);
+			$response = $this->google_api_request($param_str, $url);
+
+			if (!isset($response['_type'])) {
+				header('HTTP/1.0 403 Forbidden');
+				exit('We were unable to authenticate the request');
+      }
+
+			wp_mail('aaron@incsub.com', 'GC IPN', var_export($response, true));
+
+		  $timestamp = time();
+      $order_id = $response['google-order-number'];
+			$payment_status = (isset($response['financial-order-state'])) ? $response['financial-order-state'] : $response['new-financial-order-state'];
+
+			if ($payment_status) {
+			
+	      //setup status
+	      switch ($payment_status) {
+
+					case 'REVIEWING':
+	          $status = __('Reviewing - Google Checkout is reviewing the customer and order to see if it can be charged.', 'mp');
+	          $paid = false;
+						break;
+
+					case 'CHARGEABLE':
+						$status = __('Chargeable - You can now charge the order in your Google Checkout account.', 'mp');
+	          $paid = false;
+						break;
+
+					case 'PROCESSING':
+						$status = __('Processing - Google Checkout is processing your charge request.', 'mp');
+	          $paid = false;
+						break;
+
+					case 'CHARGED':
+						$status = __('Charged - The payment has been completed, and the funds have been added successfully to your Google Checkout account balance.', 'mp');
+	          $paid = true;
+						break;
+
+					case 'CANCELED':
+	          $status = __('Cancelled - The order was cancelled.', 'mp');
+	          $paid = false;
+						break;
+
+					default:
+						// case: various error cases
+						$status = $payment_status;
+						$paid = false;
+				}
+
+	      //status's are stored as an array with unix timestamp as key
+			  $payment_info['status'][$timestamp] = $status;
+
+	      if ($mp->get_order($order_id)) {
+	        $mp->update_order_payment_status($order_id, $status, $paid);
+	        //marked shipped
+		      if ($result['new-fulfillment-order-state'] == 'DELIVERED') {
+		        $mp->update_order_status($order_id, 'shipped');
+		      }
+	      } else if ($response['_type'] == 'new-order-notification') {
+	        //setup our payment details
+				  $payment_info['gateway_public_name'] = $this->public_name;
+		      $payment_info['gateway_private_name'] = $this->admin_name;
+				  $payment_info['method'] = __('Credit Card', 'mp');
+				  $payment_info['transaction_id'] = $order_id;
+				  $payment_info['total'] = floatval($result['order-total']);
+				  $payment_info['currency'] = $result['order-total_currency'];
+				  
+          $temp_id = $response['shopping-cart_merchant-private-data'];
+          
+	        //succesful payment, create our order now
+	        $cart = get_transient('mp_order_' . $temp_id . '_cart');
+				  $user_id = get_transient('mp_order_' . $temp_id . '_userid');
+				  
+				  //get shipping info
+				  $shipping_info['email'] = $result['buyer-shipping-address_email'];
+				  $shipping_info['name'] = $result['buyer-shipping-address_contact-name'];
+				  $shipping_info['address1'] = $result['buyer-shipping-address_address1'];
+				  $shipping_info['address2'] = $result['buyer-shipping-address_address2'];
+				  $shipping_info['city'] = $result['buyer-shipping-address_city'];
+				  $shipping_info['state'] = $result['buyer-shipping-address_region'];
+				  $shipping_info['zip'] = $result['buyer-shipping-address_postal-code'];
+				  $shipping_info['country'] = $result['buyer-shipping-address_country-code'];
+				  $shipping_info['phone'] = $result['buyer-shipping-address_phone'];
+				  
+	        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id);
+
+	        //if successful delete transients
+	        if ($success) {
+	          delete_transient('mp_order_' . $temp_id . '_cart');
+				  	delete_transient('mp_order_' . $temp_id . '_userid');
+	        }
+	      }
+	      
+			}
+			
+      //if we get this far return success so ipns don't get resent
+      header('HTTP/1.0 200 OK');
+			die('<notification-acknowledgment xmlns="http://checkout.google.com/schema/2" serial-number="' . $_POST['serial-number'] . '" />');
+    } else {
+      header('HTTP/1.0 403 Forbidden');
+			exit('Invalid request');
+		}
   }
 }
 

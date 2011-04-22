@@ -826,13 +826,13 @@ Thanks again!", 'mp')
         add_filter( 'template_include', array(&$this, 'custom_checkout_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
         add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
       }
       
@@ -854,10 +854,14 @@ Thanks again!", 'mp')
       if ($this->orderstatus_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_orderstatus_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
         add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
       }
 
@@ -1200,8 +1204,12 @@ Thanks again!", 'mp')
 		return $list;
   }
   
-  function wp_title_output($title, $id = false) {
-    return $this->page_title_output($title, true);
+  function wp_title_output($title, $sep, $seplocation) {
+    // Determines position of the separator and direction of the breadcrumb
+		if ( 'right' == $seplocation )
+			return $this->page_title_output($title, true) . " $sep ";
+		else
+		  return " $sep " . $this->page_title_output($title, true);
   }
 
   //filters the titles for our custom pages
