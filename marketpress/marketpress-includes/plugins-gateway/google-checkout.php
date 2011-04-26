@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Google Checkout Gateway Plugin
-Author: Paul K Abwonji
+Author: Aaron Edwards
 */
 
   
@@ -194,6 +194,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
     
 		//setup transients for ipn in case checkout doesn't redirect (ipn should come within 12 hrs!)
 		set_transient('mp_order_'. $order_id . '_cart', $cart, 60*60*12);
+		set_transient('mp_order_'. $order_id . '_shipping', $shipping_info, 60*60*12);
 		set_transient('mp_order_'. $order_id . '_userid', $current_user->ID, 60*60*12);
 		
 		$response = $this->google_api_request($param_str, $url);
@@ -376,7 +377,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 				exit('We were unable to authenticate the request');
       }
 
-			wp_mail('aaron@incsub.com', 'GC IPN', var_export($response, true));
+
 
 		  $timestamp = time();
       $order_id = $response['google-order-number'];
@@ -407,6 +408,11 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 	          $paid = true;
 						break;
 
+					case 'CHARGING':
+						$status = __('Charging - The credit card is being charged.', 'mp');
+	          $paid = false;
+						break;
+						
 					case 'CANCELED':
 	          $status = __('Cancelled - The order was cancelled.', 'mp');
 	          $paid = false;
@@ -424,7 +430,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 	      if ($mp->get_order($order_id)) {
 	        $mp->update_order_payment_status($order_id, $status, $paid);
 	        //marked shipped
-		      if ($result['new-fulfillment-order-state'] == 'DELIVERED') {
+		      if ($response['new-fulfillment-order-state'] == 'DELIVERED') {
 		        $mp->update_order_status($order_id, 'shipped');
 		      }
 	      } else if ($response['_type'] == 'new-order-notification') {
@@ -433,31 +439,34 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		      $payment_info['gateway_private_name'] = $this->admin_name;
 				  $payment_info['method'] = __('Credit Card', 'mp');
 				  $payment_info['transaction_id'] = $order_id;
-				  $payment_info['total'] = floatval($result['order-total']);
-				  $payment_info['currency'] = $result['order-total_currency'];
+				  $payment_info['total'] = $response['order-total'];
+				  $payment_info['currency'] = $response['order-total_currency'];
 				  
           $temp_id = $response['shopping-cart_merchant-private-data'];
           
 	        //succesful payment, create our order now
 	        $cart = get_transient('mp_order_' . $temp_id . '_cart');
+			  	$shipping_info = get_transient('mp_order_' . $temp_id . '_shipping');
 				  $user_id = get_transient('mp_order_' . $temp_id . '_userid');
 				  
+				  /*
 				  //get shipping info
-				  $shipping_info['email'] = $result['buyer-shipping-address_email'];
-				  $shipping_info['name'] = $result['buyer-shipping-address_contact-name'];
-				  $shipping_info['address1'] = $result['buyer-shipping-address_address1'];
-				  $shipping_info['address2'] = $result['buyer-shipping-address_address2'];
-				  $shipping_info['city'] = $result['buyer-shipping-address_city'];
-				  $shipping_info['state'] = $result['buyer-shipping-address_region'];
-				  $shipping_info['zip'] = $result['buyer-shipping-address_postal-code'];
-				  $shipping_info['country'] = $result['buyer-shipping-address_country-code'];
-				  $shipping_info['phone'] = $result['buyer-shipping-address_phone'];
-				  
+				  $shipping_info['email'] = $response['buyer-shipping-address_email'];
+				  $shipping_info['name'] = $response['buyer-shipping-address_contact-name'];
+				  $shipping_info['address1'] = $response['buyer-shipping-address_address1'];
+				  $shipping_info['address2'] = $response['buyer-shipping-address_address2'];
+				  $shipping_info['city'] = $response['buyer-shipping-address_city'];
+				  $shipping_info['state'] = $response['buyer-shipping-address_region'];
+				  $shipping_info['zip'] = $response['buyer-shipping-address_postal-code'];
+				  $shipping_info['country'] = $response['buyer-shipping-address_country-code'];
+				  $shipping_info['phone'] = $response['buyer-shipping-address_phone'];
+				  */
 	        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id);
 
-	        //if successful delete transients
+					//if successful delete transients
 	        if ($success) {
 	          delete_transient('mp_order_' . $temp_id . '_cart');
+        		delete_transient('mp_order_' . $temp_id . '_shipping');
 				  	delete_transient('mp_order_' . $temp_id . '_userid');
 	        }
 	      }

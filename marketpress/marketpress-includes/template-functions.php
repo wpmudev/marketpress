@@ -1410,19 +1410,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   //display an external link or form button
   if ($product_link = $meta['mp_product_link']) {
 
-    if ($context == 'list') {
-      if ($settings['list_button_type'] == 'addcart') {
-        $button = '<a class="mp_link_addcart" href="' . esc_url($product_link) . '">' . __('Add To Cart &raquo;', 'mp') . '</a>';
-      } else if ($settings['list_button_type'] == 'buynow') {
-        $button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
-      }
-    } else {
-      if ($settings['product_button_type'] == 'addcart') {
-        $button = '<a class="mp_link_addcart" href="' . esc_url($product_link) . '">' . __('Add To Cart &raquo;', 'mp') . '</a>';
-      } else if ($settings['product_button_type'] == 'buynow') {
-        $button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
-      }
-    }
+    $button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 
   } else {
 
