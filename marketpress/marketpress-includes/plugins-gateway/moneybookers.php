@@ -1,7 +1,7 @@
 <?php
 /*
 MarketPress Moneybookers Gateway Plugin
-Author: Paul K Abwonji
+Author: Aaron Edwards
 */
 
 class MP_Gateway_Moneybookers extends MP_Gateway_API {
