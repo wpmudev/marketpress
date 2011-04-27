@@ -43,7 +43,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $settings = get_option('mp_settings');
     
     //set names here to be able to translate
-    $this->admin_name = __('Authorize.net Checkout (Beta)', 'mp');
+    $this->admin_name = __('Authorize.net Checkout', 'mp');
     $this->public_name = __('Credit Card', 'mp');
     
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
@@ -974,5 +974,5 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 }
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_AuthorizeNet_AIM', 'authorizenet-aim', __('Authorize.net AIM Checkout (Beta)', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_AuthorizeNet_AIM', 'authorizenet-aim', __('Authorize.net AIM Checkout', 'mp') );
 ?>

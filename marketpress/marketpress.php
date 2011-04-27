@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.0 Beta 4
-Plugin URI: http://premium.wpmudev.org/project/marketpress
-Description: The complete WordPresss ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
+Version: 2.0
+Plugin URI: http://premium.wpmudev.org/project/e-commerce
+Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
 Author URI: http://uglyrobot.com
 WDP ID: 144
@@ -417,7 +417,7 @@ Thanks again!", 'mp')
           break;
 				}
       } else {
-	      if ( in_array($code, (array)$settings['gateways']['allowed']) && class_exists($class) )
+	      if ( in_array($code, (array)$settings['gateways']['allowed']) && class_exists($class) && !$plugin[3] )
 	        $mp_gateway_active_plugins[] = new $class;
 			}
     }
@@ -1072,7 +1072,7 @@ Thanks again!", 'mp')
     echo '<select name="mp[store_theme]">';
     foreach ($theme_list as $value => $name) {
       ?><option value="<?php echo $value ?>"<?php selected($settings['store_theme'], $value) ?>><?php echo $name ?></option><?php
-    }
+		}
     ?>
       <option value="none"<?php selected($settings['store_theme'], 'none') ?>><?php _e('None - Custom theme template', 'mp') ?></option>
     </select>
@@ -5236,8 +5236,12 @@ Notification Preferences: %s', 'mp');
                 }
 
                 foreach ((array)$mp_gateway_plugins as $code => $plugin) {
-                  ?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, (array)$settings['gateways']['allowed'])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
-                }
+                  if ($plugin[3]) { //if demo
+                  	?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>" disabled="disabled" /> <?php echo esc_attr($plugin[1]); ?></label> <a href="http://premium.wpmudev.org/project/e-commerce" title="<?php _e('Upgrade', 'mp'); ?> &raquo;"><?php _e('Pro Only &raquo;', 'mp'); ?></a><br /><?php
+									} else {
+                    ?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, (array)$settings['gateways']['allowed'])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
+									}
+								}
                 ?>
         				</td>
                 </tr>

@@ -225,7 +225,7 @@ if(!class_exists('MP_Gateway_API')) {
  * @param string $admin_name - pretty name of your gateway, for the admin side.
  * @param bool $global optional - whether the gateway supports global checkouts
  */
-function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name, $global = false) {
+function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name, $global = false, $demo = false) {
   global $mp_gateway_plugins;
   
   if (!is_array($mp_gateway_plugins)) {
@@ -233,7 +233,7 @@ function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name, $glo
 	}
 	
 	if (class_exists($class_name)) {
-		$mp_gateway_plugins[$plugin_name] = array($class_name, $admin_name, $global);
+		$mp_gateway_plugins[$plugin_name] = array($class_name, $admin_name, $global, $demo);
 	} else {
 		return false;
 	}

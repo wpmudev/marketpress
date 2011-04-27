@@ -3,7 +3,6 @@
 MarketPress Google Checkout Gateway Plugin
 Author: Aaron Edwards
 */
-
   
 class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 	//private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
@@ -202,7 +201,6 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
       wp_redirect($response['redirect-url']);
 			exit;
 		} else {
-		  var_dump($response);
 			$mp->cart_checkout_error( sprintf(__('There was a problem setting up your purchase with Google Checkout. Please try again or <a href="%s">select a different payment method</a>.<br/>%s', 'mp'), mp_checkout_step_url('checkout'), @$response['error-message']) );
 		}
 	}
