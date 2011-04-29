@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.0
+Version: 2.0.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -1952,7 +1952,7 @@ Thanks again!", 'mp')
     global $blog_id;
     $blog_id = (is_multisite()) ? $blog_id : 1;
 
-    $cookie_id = 'mp_cart_' . COOKIEHASH;
+    $cookie_id = 'mp_globalcart_' . COOKIEHASH;
 
     if (isset($_COOKIE[$cookie_id])) {
       $global_cart = unserialize($_COOKIE[$cookie_id]);
@@ -1973,7 +1973,7 @@ Thanks again!", 'mp')
   
   //saves global cart array to cookie
   function set_global_cart_cookie($global_cart) {
-    $cookie_id = 'mp_cart_' . COOKIEHASH;
+    $cookie_id = 'mp_globalcart_' . COOKIEHASH;
     
     //set cookie
     $expire = time() + 2592000; //1 month expire
