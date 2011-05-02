@@ -81,7 +81,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     }
     
     $settings = get_option('mp_settings');
-    $meta = get_user_meta($current_user->ID, 'mp_billing_info');
+    $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
     
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
     $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name'])?$meta['name']:$_SESSION['mp_shipping_info']['name']);
@@ -94,8 +94,8 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     if (!$country)
       $country = $settings['base_country'];
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
-    ?>
-      <style type="text/css">
+
+    $content = '<style type="text/css">
         .cardimage {
           height: 23px;
           width: 157px;
@@ -125,133 +125,132 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       <script type="text/javascript">
         function cc_card_pick(card_image, card_num){
           if (card_image == null) {
-                  card_image = '#cardimage';
+                  card_image = "#cardimage";
           }
           if (card_num == null) {
-                  card_num = '#card_num';
+                  card_num = "#card_num";
           }
   
           numLength = jQuery(card_num).val().length;
           number = jQuery(card_num).val();
           if (numLength > 10)
           {
-                  if((number.charAt(0) == '4') && ((numLength == 13)||(numLength==16))) { jQuery(card_image).removeClass(); jQuery(card_image).addClass('cardimage visa_card'); }
-                  else if((number.charAt(0) == '5' && ((number.charAt(1) >= '1') && (number.charAt(1) <= '5'))) && (numLength==16)) { jQuery(card_image).removeClass(); jQuery(card_image).addClass('cardimage mastercard'); }
-                  else if(number.substring(0,4) == "6011" && (numLength==16)) 	{ jQuery(card_image).removeClass(); jQuery(card_image).addClass('cardimage amex'); }
-                  else if((number.charAt(0) == '3' && ((number.charAt(1) == '4') || (number.charAt(1) == '7'))) && (numLength==15)) { jQuery(card_image).removeClass(); jQuery(card_image).addClass('cardimage discover_card'); }
-                  else { jQuery(card_image).removeClass(); jQuery(card_image).addClass('cardimage nocard'); }
+                  if((number.charAt(0) == "4") && ((numLength == 13)||(numLength==16))) { jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage visa_card"); }
+                  else if((number.charAt(0) == "5" && ((number.charAt(1) >= "1") && (number.charAt(1) <= "5"))) && (numLength==16)) { jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage mastercard"); }
+                  else if(number.substring(0,4) == "6011" && (numLength==16)) 	{ jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage amex"); }
+                  else if((number.charAt(0) == "3" && ((number.charAt(1) == "4") || (number.charAt(1) == "7"))) && (numLength==15)) { jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage discover_card"); }
+                  else { jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage nocard"); }
   
           }
         }
         jQuery(document).ready( function() {
           jQuery(".noautocomplete").attr("autocomplete", "off");
         });
-      </script>
-      <table class="mp_cart_billing">
+      </script>';
+    $content .= '<table class="mp_cart_billing">
         <thead><tr>
-          <th colspan="2"><?php _e('Enter Your Billing Information:', 'mp'); ?></th>
+          <th colspan="2">'.__('Enter Your Billing Information:', 'mp').'</th>
         </tr></thead>
         <tbody>
         <tr>
-          <td align="right"><?php _e('Email:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_email', '' ); ?>
-        <input size="35" name="email" type="text" value="<?php echo esc_attr($email); ?>" /></td>
+          <td align="right">'.__('Email:', 'mp').'*</td><td>
+        '.apply_filters( 'mp_checkout_error_email', '' ).'
+        <input size="35" name="email" type="text" value="'.esc_attr($email).'" /></td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('Full Name:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_name', '' ); ?>
-        <input size="35" name="name" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
+          <td align="right">'.__('Full Name:', 'mp').'*</td><td>
+        '.apply_filters( 'mp_checkout_error_name', '' ).'
+        <input size="35" name="name" type="text" value="'.esc_attr($name).'" /> </td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('Address:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_address1', '' ); ?>
-        <input size="45" name="address1" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
-        <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
+          <td align="right">'.__('Address:', 'mp').'*</td><td>
+        '.apply_filters( 'mp_checkout_error_address1', '' ).'
+        <input size="45" name="address1" type="text" value="'.esc_attr($address1).'" /><br />
+        <small><em>'.__('Street address, P.O. box, company name, c/o', 'mp').'</em></small>
         </td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('Address 2:', 'mp'); ?>&nbsp;</td><td>
-        <input size="45" name="address2" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
-        <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
+          <td align="right">'.__('Address 2:', 'mp').'&nbsp;</td><td>
+        <input size="45" name="address2" type="text" value="'.esc_attr($address2).'" /><br />
+        <small><em>'.__('Apartment, suite, unit, building, floor, etc.', 'mp').'</em></small>
         </td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('City:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_city', '' ); ?>
-        <input size="25" name="city" type="text" value="<?php echo esc_attr($city); ?>" /></td>
+          <td align="right">'.__('City:', 'mp').'*</td><td>
+        '.apply_filters( 'mp_checkout_error_city', '' ).'
+        <input size="25" name="city" type="text" value="'.esc_attr($city).'" /></td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('State/Province/Region:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_state', '' ); ?>
-        <input size="15" name="state" type="text" value="<?php echo esc_attr($state); ?>" /></td>
+          <td align="right">'.__('State/Province/Region:', 'mp').'*</td><td>
+        '.apply_filters( 'mp_checkout_error_state', '' ).'
+        <input size="15" name="state" type="text" value="'.esc_attr($state).'" /></td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?>*</td><td>
-        <?php echo apply_filters( 'mp_checkout_error_zip', '' ); ?>
-        <input size="10" id="mp_zip" name="zip" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
+          <td align="right">'.__('Postal/Zip Code:', 'mp').'*</td><td>
+        '.apply_filters( 'mp_checkout_error_zip', '' ).'
+        <input size="10" id="mp_zip" name="zip" type="text" value="'.esc_attr($zip).'" /></td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('Country:', 'mp'); ?>*</td><td>
-          <?php echo apply_filters( 'mp_checkout_error_country', '' ); ?>
-        <select id="mp_" name="country">
-          <?php
+          <td align="right">'.__('Country:', 'mp').'*</td><td>
+          '.apply_filters( 'mp_checkout_error_country', '' ).'
+        <select id="mp_" name="country">';
+
           foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
-            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($mp->countries[$code]); ?></option><?php
+            $content .= '<option value="'.$code.'"'.selected($country, $code).'>'.esc_attr($mp->countries[$code]).'</option>';
           }
-          ?>
-        </select>
+
+      $content .= '</select>
         </td>
           </tr>
   
           <tr>
-          <td align="right"><?php _e('Phone Number:', 'mp'); ?></td><td>
-        	<input size="20" name="phone" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
+          <td align="right">'.__('Phone Number:', 'mp').'</td><td>
+        	<input size="20" name="phone" type="text" value="'.esc_attr($phone).'" /></td>
           </tr>
           
           <tr>
-            <td align="right"><?php _e('Credit Card Number:', 'mp'); ?>*</td>
+            <td align="right">'.__('Credit Card Number:', 'mp').'*</td>
             <td>
-              <?php echo apply_filters( 'mp_checkout_error_card_num', '' ); ?>
-              <input name="card_num" onkeyup="cc_card_pick('#cardimage', '#card_num');"
+              '.apply_filters( 'mp_checkout_error_card_num', '' ).'
+              <input name="card_num" onkeyup="cc_card_pick(\'#cardimage\', \'#card_num\');"
                id="card_num" class="credit_card_number input_field noautocomplete"
                type="text" size="22" maxlength="22" />
-        		<div class="hide_after_success nocard cardimage"  id="cardimage" style="background: url(<?php echo $mp->plugin_url; ?>images/card_array.png) no-repeat;"></div></td>
+        		<div class="hide_after_success nocard cardimage"  id="cardimage" style="background: url('.$mp->plugin_url.'images/card_array.png) no-repeat;"></div></td>
           </tr>
           
           <tr>
-            <td align="right"><?php _e('Expiration Date:', 'mp'); ?>*</td>
+            <td align="right">'.__('Expiration Date:', 'mp').'*</td>
             <td>
-            <?php echo apply_filters( 'mp_checkout_error_exp', '' ); ?>
-            <label class="inputLabel" for="exp_month"><?php _e('Month', 'mp'); ?></label>
+            '.apply_filters( 'mp_checkout_error_exp', '' ).'
+            <label class="inputLabel" for="exp_month">'.__('Month', 'mp').'</label>
 		        <select name="exp_month" id="exp_month">
-		          <?php print $this->_print_month_dropdown(); ?>
+		          '.$this->_print_month_dropdown().'
 		        </select>
-		        <label class="inputLabel" for="exp_year"><?php _e('Year', 'mp'); ?></label>
+		        <label class="inputLabel" for="exp_year">'.__('Year', 'mp').'</label>
 		        <select name="exp_year" id="exp_year">
-		          <?php print $this->_print_year_dropdown('', true); ?>
+		          '.$this->_print_year_dropdown('', true).'
 		        </select>
 		        </td>
           </tr>
           
           <tr>
-            <td align="right"><?php _e('Security Code:', 'mp'); ?></td>
-            <td><?php echo apply_filters( 'mp_checkout_error_card_code', '' ); ?>
+            <td align="right">'.__('Security Code:', 'mp').'</td>
+            <td>'.apply_filters( 'mp_checkout_error_card_code', '' ).'
             <input id="card_code" name="card_code" class="input_field noautocomplete"
                style="width: 70px;" type="text" size="4" maxlength="4" /></td>
           </tr>
   
-        <?php do_action( 'mp_checkout_billing_field' ); ?>
-  
         </tbody>
-      </table>
-    <?php
+      </table>';
+      
+		return $content;
   }
   
   function _print_year_dropdown($sel='', $pfp = false) {
@@ -330,7 +329,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     
     //save to session
     global $current_user;
-    $meta = get_user_meta($current_user->ID, 'mp_billing_info');
+    $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
     $_SESSION['mp_billing_info']['email'] = ($_POST['email']) ? trim(stripslashes($_POST['email'])) : $current_user->user_email;
     $_SESSION['mp_billing_info']['name'] = ($_POST['name']) ? trim(stripslashes($_POST['name'])) : $current_user->user_firstname . ' ' . $current_user->user_lastname;
     $_SESSION['mp_billing_info']['address1'] = ($_POST['address1']) ? trim(stripslashes($_POST['address1'])) : $meta['address1'];
@@ -408,7 +407,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     global $mp;
     
     $settings = get_option('mp_settings');
-    $meta = get_user_meta($current_user->ID, 'mp_billing_info');
+    $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
     
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
     $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name'])?$meta['name']:$_SESSION['mp_shipping_info']['name']);
