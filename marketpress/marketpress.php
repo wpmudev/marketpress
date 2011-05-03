@@ -199,7 +199,7 @@ class MarketPress {
         'order_status' => __('<p>If you have any questions about your order please do not hesitate to <a href="http://mysite.com/contact/">contact us</a>.</p>', 'mp'),
         'cart' => '',
         'shipping' => __('<p>Please enter your shipping information in the form below to proceed with your order.</p>', 'mp'),
-        'checkout' => __('<p>Please choose your desired payment method.</p>', 'mp'),
+        'checkout' => '',
         'confirm_checkout' => __('<p>You are almost done! Please do a final review of your order to make sure everything is correct then click the "Confirm Payment" button.</p>', 'mp'),
         'success' => __('<p>Thank you for your order! We appreciate your business, and please come back often to check out our new products.</p>', 'mp')
       ),
@@ -486,7 +486,10 @@ Thanks again!", 'mp')
 
   //ajax cart handling for store frontend
   function store_script() {
-
+		//disable ajax cart if incompatible by domain mapping plugin settings
+		if (is_multisite() && class_exists('domain_map') && 'original' == get_site_option('map_admindomain'))
+		  return;
+		  
     //setup shopping cart javascript
     wp_enqueue_script( 'mp-store-js', $this->plugin_url . 'js/store.js', array('jquery'), $this->version );
 
@@ -2319,9 +2322,9 @@ Thanks again!", 'mp')
 		
       //save to session
       global $current_user;
-      $meta = get_user_meta($current_user->ID, 'mp_shipping_info');
-      $_SESSION['mp_shipping_info']['email'] = ($_POST['email']) ? trim(stripslashes($_POST['email'])) : $current_user->user_email;
-      $_SESSION['mp_shipping_info']['name'] = ($_POST['name']) ? trim(stripslashes($_POST['name'])) : $current_user->user_firstname . ' ' . $current_user->user_lastname;
+      $meta = get_user_meta($current_user->ID, 'mp_shipping_info', true);
+      $_SESSION['mp_shipping_info']['email'] = ($_POST['email']) ? trim(stripslashes($_POST['email'])) : (isset($meta['email']) ? $meta['email']: $current_user->user_email);
+      $_SESSION['mp_shipping_info']['name'] = ($_POST['name']) ? trim(stripslashes($_POST['name'])) : (isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname);
       $_SESSION['mp_shipping_info']['address1'] = ($_POST['address1']) ? trim(stripslashes($_POST['address1'])) : $meta['address1'];
       $_SESSION['mp_shipping_info']['address2'] = ($_POST['address2']) ? trim(stripslashes($_POST['address2'])) : $meta['address2'];
       $_SESSION['mp_shipping_info']['city'] = ($_POST['city']) ? trim(stripslashes($_POST['city'])) : $meta['city'];

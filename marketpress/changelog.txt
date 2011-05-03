@@ -8,6 +8,9 @@ Change Log:
 2.0.2 - 5/02/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix up bugs with Authorize.net gateway
+- Bugfixes with storing shipping info on checkout
+- Disable ajax cart if domain mapping is set to original backend
+- Fix add link popup in messages rich text editors
 
 2.0.1 - 4/29/2011 - Aaron Edwards
 ----------------------------------------------------------------------

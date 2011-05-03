@@ -455,11 +455,11 @@ function _mp_cart_login($echo = false) {
 function _mp_cart_shipping($editable = false, $echo = false) {
   global $mp, $current_user;
   $settings = get_option('mp_settings');
-  
+
   $meta = get_user_meta($current_user->ID, 'mp_shipping_info', true);
   //get address
-  $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : isset($meta['email']) ? $meta['email']: $current_user->user_email;
-  $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname;
+  $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : (isset($meta['email']) ? $meta['email']: $current_user->user_email);
+  $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : (isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname);
   $address1 = (!empty($_SESSION['mp_shipping_info']['address1'])) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
   $address2 = (!empty($_SESSION['mp_shipping_info']['address2'])) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
   $city = (!empty($_SESSION['mp_shipping_info']['city'])) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
@@ -469,7 +469,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
   if (!$country)
     $country = $settings['base_country'];
   $phone = (!empty($_SESSION['mp_shipping_info']['phone'])) ? $_SESSION['mp_shipping_info']['phone'] : $meta['phone'];
-  
+
   $content = '';
   //don't show if logged in
   if (!is_user_logged_in() && $editable) {

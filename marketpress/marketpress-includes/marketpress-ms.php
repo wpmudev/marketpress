@@ -189,7 +189,6 @@ class MarketPress_MS {
     if ($wp_query->query_vars['pagename'] == 'mp_global_products') {
 
       $templates[] = "mp_global_products.php";
-    	$templates[] = "mp_productlist.php";
 
       //if custom template exists load it
       if ($this->global_list_template = locate_template($templates)) {
@@ -402,7 +401,9 @@ class MarketPress_MS {
 
   //this is the default theme added to the global product list page
   function product_list_theme($content) {
-    global $wp_query;
+		//don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
 
     $args = array();
     $args['echo'] = false;
@@ -412,14 +413,16 @@ class MarketPress_MS {
       $args['page'] = intval(get_query_var('paged'));
 
     $content = mp_list_global_products( $args );
-    //$content .= get_posts_nav_link();
+    $content .= get_posts_nav_link();
 
     return $content;
   }
   
   //this is the default theme added to the global categories page
   function global_categories_theme($content) {
-    global $wp_query;
+    //don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
 
     if ( $slug = get_query_var('global_taxonomy') ) {
       $args = array();
@@ -442,7 +445,9 @@ class MarketPress_MS {
   
   //this is the default theme added to the global tags page
   function global_tags_theme($content) {
-    global $wp_query;
+    //don't filter outside of the loop
+  	if ( !in_the_loop() )
+		  return $content;
 
     if ( $slug = get_query_var('global_taxonomy') ) {
       $args = array();
