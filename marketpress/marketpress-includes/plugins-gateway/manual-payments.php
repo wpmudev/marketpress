@@ -188,7 +188,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		  
     //enqueue visual editor
     if (get_user_option('rich_editing') == 'true')
-    	wp_tiny_mce(true, array("editor_selector" => "mp_msgs_txt"));
+    	$mp->load_tiny_mce("mp_msgs_txt");
     ?>
     <div id="mp_manual_payments" class="postbox mp-pages-msgs">
     	<h3 class='handle'><span><?php _e('Manual Payments Settings', 'mp'); ?></span></h3>

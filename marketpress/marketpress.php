@@ -497,6 +497,16 @@ Thanks again!", 'mp')
     wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('Out of Stock', 'mp') ) );
   }
 
+  function load_tiny_mce($selector) {
+		// We need internal-linking.php for wp_link_dialog() function
+		require_once (ABSPATH . 'wp-admin/includes/internal-linking.php');
+		// We need wp_tiny_mce_preload_dialogs() and wp_link_dialog() to create (hidden) markup for Insert/Edit Link dialog.
+		add_action('admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30);
+		add_action('tiny_mce_preload_dialogs', 'wp_link_dialog', 30);
+
+    wp_tiny_mce(false, array("editor_selector" => $selector));
+	}
+
   //loads the jquery lightbox plugin
   function enqueue_lightbox() {
 
@@ -4978,7 +4988,7 @@ Notification Preferences: %s', 'mp');
 
         //enqueue visual editor
         if (get_user_option('rich_editing') == 'true')
-        	wp_tiny_mce(false, array("editor_selector" => "mp_msgs_txt"));
+        	$this->load_tiny_mce("mp_msgs_txt");
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/messages.png'; ?>" /></div>
         <h2><?php _e('Messages Settings', 'mp'); ?></h2>
