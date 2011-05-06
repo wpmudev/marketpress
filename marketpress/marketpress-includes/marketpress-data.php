@@ -312,7 +312,7 @@ $this->uk_counties = array("Aberdeenshire"=>"Aberdeenshire","Angus/Forfarshire"=
 "Denbighshire"=>"Denbighshire","Derbyshire"=>"Derbyshire","Devon"=>"Devon","Dorset"=>"Dorset",
 "Dumfriesshire"=>"Dumfriesshire","Dunbartonshire/Dumbartonshire"=>"Dunbartonshire/Dumbartonshire",
 "Durham"=>"Durham","East Lothian/Haddingtonshire"=>"East Lothian/Haddingtonshire","Essex"=>"Essex","Fife"=>"Fife",
-"Flintshire"=>"Flintshire","Gloucestershire"=>"Gloucestershire","Gwynedd"=>"Gwynedd","Hampshire"=>"Hampshire",
+"Flintshire"=>"Flintshire","Gloucestershire"=>"Gloucestershire","Greater Manchester"=>"Greater Manchester","Gwynedd"=>"Gwynedd","Hampshire"=>"Hampshire",
 "Herefordshire"=>"Herefordshire","Hertfordshire"=>"Hertfordshire","Huntingdonshire"=>"Huntingdonshire",
 "Inverness-shire"=>"Inverness-shire","Isle of Anglesey"=>"Isle of Anglesey","Kent"=>"Kent",
 "Kincardineshire"=>"Kincardineshire","Kinross-shire"=>"Kinross-shire","Kirkcudbrightshire"=>"Kirkcudbrightshire",

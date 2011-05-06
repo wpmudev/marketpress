@@ -168,7 +168,7 @@ if(!class_exists('MP_Gateway_API')) {
       $content .= $this->payment_form($cart, $shipping_info);
 
       $content .= '<p class="mp_cart_direct_checkout">';
-      $content .= '<input type="submit" name="mp_payment_submit" id="mp_payment_submit" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
+      $content .= '<input type="submit" name="mp_payment_submit" id="mp_payment_confirm" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
       $content .= '</p></div>';
       
       return $content;

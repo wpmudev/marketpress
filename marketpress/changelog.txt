@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.0.3 - 5/06/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Fix another bug with Authorize.net gateway when product names are too long
+- Update UK county list
+- Fix some style issues
+
 2.0.2 - 5/02/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix up bugs with Authorize.net gateway

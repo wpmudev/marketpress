@@ -812,11 +812,11 @@ Thanks again!", 'mp')
 				wp_redirect( mp_cart_link(false, true) );
 				exit;
 			}
-			
+
 			// Redirect to https if forced to use SSL by a payment gateway
 			if (get_query_var('checkoutstep')) {
 				foreach ((array)$mp_gateway_active_plugins as $plugin) {
-		      if ($plugin->force_ssl) {
+					if ($plugin->force_ssl) {
 					  if ( !is_ssl() ) {
 							wp_redirect('https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 							exit();

@@ -50,7 +50,6 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
     
     $this->version = "63.0"; //api version
-    $this->force_ssl = true;
     
     //set credit card vars
     if ( isset( $settings['gateways']['authorizenet-aim'] ) ) {
@@ -76,8 +75,10 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    */
   function payment_form($cart, $shipping_info) {
     global $mp;
+    $content = '';
+    
     if (isset($_GET['cancel'])) {
-      echo '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
+      $content .= '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
     }
     
     $settings = get_option('mp_settings');
@@ -95,7 +96,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       $country = $settings['base_country'];
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
 
-    $content = '<style type="text/css">
+    $content .= '<style type="text/css">
         .cardimage {
           height: 23px;
           width: 157px;
@@ -203,7 +204,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         <select id="mp_" name="country">';
 
           foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
-            $content .= '<option value="'.$code.'"'.selected($country, $code).'>'.esc_attr($mp->countries[$code]).'</option>';
+            $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
           }
 
       $content .= '</select>
@@ -258,7 +259,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $minYear = $localDate["year"];
     $maxYear = $minYear + 15;
 
-    $output =  "<option value=''>--</option>";
+    $output = "<option value=''>--</option>";
     for($i=$minYear; $i<$maxYear; $i++) {
             if ($pfp) {
                     $output .= "<option value='". substr($i, 0, 4) ."'".($sel==(substr($i, 0, 4))?' selected':'').
@@ -517,10 +518,10 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $totals = array();
     foreach ($cart as $product_id => $variations) {
       foreach ($variations as $variation => $data) {
-        $sku = empty($data['SKU']) ? "{$product_id}{$variation}" : $data['SKU'];
+        $sku = empty($data['SKU']) ? "{$product_id}_{$variation}" : $data['SKU'];
         $totals[] = $data['price'] * $data['quantity'];
-        $payment->addLineItem($sku, $data['name'],
-          $data['url'], $data['quantity'], $data['price'], 1);
+        $payment->addLineItem($sku, substr($data['name'], 0, 31),
+          substr($data['name'].' - '.$data['url'], 0, 254), $data['quantity'], $data['price'], 1);
         $i++;
       }
     }
@@ -547,7 +548,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $payment->setParameter("x_amount", $total);
     
     // Order Info
-    $payment->setParameter("x_description", "Order ID ".$_SESSION['mp_order']);
+    $payment->setParameter("x_description", "Order ID: ".$_SESSION['mp_order']);
     $payment->setParameter("x_invoice_num",  $_SESSION['mp_order']);
     if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
       $payment->setParameter("x_test_request", true);
@@ -621,8 +622,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $payment->setParameter("x_customer_ip", $_SERVER['REMOTE_ADDR']);
     
     $payment->process();
-    
+
     if ($payment->isApproved()) {
+
       $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
       $paid = true;
       
@@ -846,7 +848,7 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
       
       $this->_prepareParameters();
       $query_string = rtrim($this->fields, "&");
-      
+
       $count = 0;
       while ($count < $retries)
       {
