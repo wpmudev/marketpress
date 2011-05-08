@@ -1723,7 +1723,7 @@ function mp_items_count_in_cart() {
     foreach ($selected_cart as $cart) {
       if (is_array($cart) && count($cart)) {
         foreach ($cart as $variations) {
-          if (is_array($variations) && count($variations)) 
+          if (is_array($variations) && count($variations)) {
             foreach ($variations as $item) {
               $count += $item['quantity'];
             }
