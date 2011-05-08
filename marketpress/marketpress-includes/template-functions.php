@@ -1721,9 +1721,13 @@ function mp_items_count_in_cart() {
   if (is_array($selected_cart) && count($selected_cart)) {
     $count = 0;
     foreach ($selected_cart as $cart) {
-      foreach ($cart as $variations) {
-        foreach ($variations as $item) {
-          $count += $item['quantity'];
+      if (is_array($cart) && count($cart)) {
+        foreach ($cart as $variations) {
+          if (is_array($variations) && count($variations)) 
+            foreach ($variations as $item) {
+              $count += $item['quantity'];
+            }
+          }
         }
       }
     }
