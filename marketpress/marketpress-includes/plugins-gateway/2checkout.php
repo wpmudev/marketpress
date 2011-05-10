@@ -313,6 +313,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 							"NZD" => 'NZD - New Zealand Dollar',
 							"SEK" => 'SEK - Swedish Krona',
 							"USD" => 'USD - U.S. Dollar',
+    					"ZAR" => 'ZAR - South African Rand'
 	          );
 
 	          foreach ($currencies as $k => $v) {

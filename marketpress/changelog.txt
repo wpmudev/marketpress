@@ -5,7 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-<<<<<<< HEAD
+2.0.4 - 5/10/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Add Kuwaiti dinar
+- Additional error checks for FrameMarket theme
+- Add ZAR to 2Checkout gateway
+
 2.0.3 - 5/06/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix another bug with Authorize.net gateway when product names are too long
