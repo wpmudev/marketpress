@@ -920,6 +920,7 @@ function mp_order_status() {
         <li><?php _e('Order Total:', 'mp'); ?> <strong><?php echo $mp->format_currency('', $order->mp_order_total); ?></strong></li>
       </ul>
 
+      <?php if (!defined('MP_HIDE_ORDERSTATUS_SHIPPING')) { ?>
       <h3><?php _e('Shipping Information:', 'mp'); ?></h3>
       <table>
         <tr>
@@ -968,6 +969,8 @@ function mp_order_status() {
       	</tr>
         <?php } ?>
       </table>
+      <?php } ?>
+      
       <?php mp_orderstatus_link(true, false, __('&laquo; Back', 'mp')); ?>
       <?php
 
