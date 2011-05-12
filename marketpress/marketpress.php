@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.0.4
+Version: 2.0.5
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.0.4';
+  var $version = '2.0.5';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -101,6 +101,7 @@ class MarketPress {
 		//Templates and Rewrites
 		add_action( 'template_redirect', array(&$this, 'load_store_templates') );
 		add_action( 'template_redirect', array(&$this, 'load_store_theme') );
+	  add_action( 'pre_get_posts', array(&$this, 'remove_canonical') );
 		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
   	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
@@ -131,7 +132,6 @@ class MarketPress {
 		add_action('profile_update', array(&$this, 'user_profile_update'));
 		add_action('edit_user_profile', array(&$this, 'user_profile_fields'));
 		add_action('show_user_profile', array(&$this, 'user_profile_fields'));
-		
 	}
 
   function install() {
@@ -429,8 +429,22 @@ Thanks again!", 'mp')
 			do_action( 'mp_handle_payment_return_' . $wp_query->query_vars['paymentgateway'] );
 			// exit();
 		}
+		
+		//stop canonical problems with virtual pages
+  	$page = get_query_var('pagename');
+  	if ($page == 'cart' || $page == 'orderstatus' || $page == 'product_list') {
+			remove_action('template_redirect', 'redirect_canonical');
+		}
 	}
-
+	
+  function remove_canonical($wp_query) {
+		//stop canonical problems with virtual pages redirecting
+  	$page = get_query_var('pagename');
+  	if ($page == 'cart' || $page == 'orderstatus' || $page == 'product_list') {
+			remove_action('template_redirect', 'redirect_canonical');
+		}
+	}
+	
   function admin_nopermalink_warning() {
     //warns admins if permalinks are not enabled on the blog
     if ( current_user_can('manage_options') && !get_option('permalink_structure') )
@@ -800,7 +814,7 @@ Thanks again!", 'mp')
 
     //load proper theme for checkout page
     if ($wp_query->query_vars['pagename'] == 'cart') {
-			
+
       //init session for store pages
       $this->start_session();
 
