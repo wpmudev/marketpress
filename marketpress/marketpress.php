@@ -3357,6 +3357,8 @@ ORDERINFO
 Shipping Information:
 SHIPPINGINFO
 
+Email: %s
+
 Payment Information:
 PAYMENTINFO
 
@@ -3364,7 +3366,7 @@ You can manage this order here: %s", 'mp');
 
     $subject = $this->filter_email($order, $subject);
     $msg = $this->filter_email($order, $msg);
-		$msg = sprintf($msg, admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
+		$msg = sprintf($msg, $order->mp_shipping_info['email'], admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
 
     wp_mail(get_option('admin_email'), $subject, $msg);
   }
