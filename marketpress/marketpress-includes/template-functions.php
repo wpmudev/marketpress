@@ -265,14 +265,14 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
       $content .=  '</tr>';
       $total = $total + $tax_price;
     }
-      
-    $content .=  '<tfoot><tr>';
+
+    $content .=  '</tbody><tfoot><tr>';
     $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
     $content .=  '  <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
     $content .=  '  <td class="mp_cart_col_updatecart"><input type="submit" name="update_cart_submit" value="' . __('Update Cart &raquo;', 'mp') . '" /></td>';
     $content .=  '</tr></tfoot>';
     
-    $content .= '</tbody></table></form>';
+    $content .= '</table></form>';
     
   } else if ($type == 'checkout') {
   
