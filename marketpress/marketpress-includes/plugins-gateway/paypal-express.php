@@ -945,10 +945,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
-				  if ($data['download'])
-				  	$detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Digital";
-					else
-					  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
+				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
 				  $i++;
 				}
       }
