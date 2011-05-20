@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.0.5
+Version: 2.0.6
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.0.5';
+  var $version = '2.0.6';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -197,13 +197,14 @@ class MarketPress {
       ),
       'msg' => array (
         'product_list' => '',
-        'order_status' => __('<p>If you have any questions about your order please do not hesitate to <a href="http://mysite.com/contact/">contact us</a>.</p>', 'mp'),
+        'order_status' => __('<p>If you have any questions about your order please do not hesitate to contact us.</p>', 'mp'),
         'cart' => '',
         'shipping' => __('<p>Please enter your shipping information in the form below to proceed with your order.</p>', 'mp'),
         'checkout' => '',
         'confirm_checkout' => __('<p>You are almost done! Please do a final review of your order to make sure everything is correct then click the "Confirm Payment" button.</p>', 'mp'),
         'success' => __('<p>Thank you for your order! We appreciate your business, and please come back often to check out our new products.</p>', 'mp')
       ),
+      'store_email' => get_option("admin_email"),
       'email' => array (
         'new_order_subject' => __('Your Order Confirmation (ORDERID)', 'mp'),
         'new_order_txt' => __("Thank you for your order CUSTOMERNAME!
@@ -3259,7 +3260,7 @@ Thanks again!", 'mp')
 
 		//add our own filters
 		add_filter( 'wp_mail_from_name', create_function('', 'return get_bloginfo("name");') );
-		add_filter( 'wp_mail_from', create_function('', 'return get_option("admin_email");') );
+		add_filter( 'wp_mail_from', create_function('', '$settings = get_option("mp_settings");return isset($settings["store_email"]) ? $settings["store_email"] : get_option("admin_email");') );
 
 		return wp_mail($to, $subject, $msg);
 	}
@@ -3383,8 +3384,8 @@ You can manage this order here: %s", 'mp');
     $subject = $this->filter_email($order, $subject);
     $msg = $this->filter_email($order, $msg);
 		$msg = sprintf($msg, $order->mp_shipping_info['email'], admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
-
-    $this->mail(get_option('admin_email'), $subject, $msg);
+    $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email");
+    $this->mail($store_email, $subject, $msg);
   }
 
   //sends email for orders marked as shipped
@@ -3433,8 +3434,8 @@ Edit Product: %s
 Notification Preferences: %s', 'mp');
     $msg = sprintf($msg, $name, number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
     $msg = apply_filters( 'mp_low_stock_notification', $msg, $product_id );
-
-    $this->mail(get_option('admin_email'), $subject, $msg);
+    $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email");
+    $this->mail($store_email, $subject, $msg);
 
     //save so we don't send an email every time
     update_post_meta($product_id, 'mp_stock_email_sent', 1);
@@ -4365,6 +4366,7 @@ Notification Preferences: %s', 'mp');
                 <br /><span class="description"><?php _e('Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp') ?></span>
           			</td>
                 </tr>
+                <?php /* ?>
                 <tr>
         				<th scope="row"><?php _e('Show Prices Inclusive of Tax?', 'mp') ?></th>
                 <td>
@@ -4374,6 +4376,7 @@ Notification Preferences: %s', 'mp');
                 <br /><span class="description"><?php _e('Please see your local tax laws.', 'mp') ?></span>
           			</td>
                 </tr>
+                <?php */ ?>
               </table>
             </div>
           </div>
@@ -5042,6 +5045,14 @@ Notification Preferences: %s', 'mp');
             <h3 class='hndle'><span><?php _e('Email Notifications', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
+							<tr>
+        				<th scope="row"><?php _e('Store Admin Email', 'mp'); ?></th>
+        				<td>
+								<?php $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email"); ?>
+        				<span class="description"><?php _e('The email address that new order notifications are sent to and received from.', 'mp') ?></span><br />
+                <input name="mp[store_email]" value="<?php echo esc_attr($store_email); ?>" maxlength="150" size="50" />
+                </td>
+                </tr>
                 <tr>
         				<th scope="row"><?php _e('New Order', 'mp'); ?></th>
         				<td>

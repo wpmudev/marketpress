@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.0.6 - 5/20/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Add configurable store admin email address
+- Filter email from and name for store emails
+- Add buyer email to order admin notification
+- Remove digital flag in PayPal express gateway
+- Fix out of order </tbody> tag on cart page
+- Remove PHP5 depreciated class assignments
+
 2.0.5 - 5/12/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix slug conflicts with virtual pages and similar permalinks: http://premium.wpmudev.org/forums/topic/checkout-page-redirecting-slug-bug
