@@ -129,9 +129,9 @@ class MarketPress {
 		add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Tag_Cloud_Widget");') );
 		
 		// Edit profile
-		add_action('profile_update', array(&$this, 'user_profile_update'));
-		add_action('edit_user_profile', array(&$this, 'user_profile_fields'));
-		add_action('show_user_profile', array(&$this, 'user_profile_fields'));
+		add_action( 'profile_update', array(&$this, 'user_profile_update') );
+		add_action( 'edit_user_profile', array(&$this, 'user_profile_fields') );
+		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
 	}
 
   function install() {
@@ -144,7 +144,8 @@ class MarketPress {
       'base_country' => 'US',
       'tax' => array (
         'rate' => 0,
-        'tax_shipping' => 1
+        'tax_shipping' => 1,
+        'tax_inclusive' => 0
       ),
       'currency' => 'USD',
       'curr_symbol_position' => 1,
@@ -3248,6 +3249,21 @@ Thanks again!", 'mp')
     return $payment_info;
   }
 
+	//filters wp_mail headers
+	function mail($to, $subject, $msg) {
+    $settings = get_option('mp_settings');
+
+    //remove any other filters
+    remove_all_filters( 'wp_mail_from' );
+		remove_all_filters( 'wp_mail_from_name' );
+
+		//add our own filters
+		add_filter( 'wp_mail_from_name', create_function('', 'return get_bloginfo("name");') );
+		add_filter( 'wp_mail_from', create_function('', 'return get_option("admin_email");') );
+
+		return wp_mail($to, $subject, $msg);
+	}
+	
   //replaces shortcodes in email msgs with dynamic content
   function filter_email($order, $text) {
     $settings = get_option('mp_settings');
@@ -3345,7 +3361,7 @@ Thanks again!", 'mp')
     $msg = $this->filter_email($order, $settings['email']['new_order_txt']);
     $msg = apply_filters( 'mp_order_notification_' . $_SESSION['mp_payment_method'], $msg, $order );
 
-    wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+    $this->mail($order->mp_shipping_info['email'], $subject, $msg);
     
     //send message to admin
     $subject = __('New Order Notification: ORDERID', 'mp');
@@ -3368,7 +3384,7 @@ You can manage this order here: %s", 'mp');
     $msg = $this->filter_email($order, $msg);
 		$msg = sprintf($msg, $order->mp_shipping_info['email'], admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
 
-    wp_mail(get_option('admin_email'), $subject, $msg);
+    $this->mail(get_option('admin_email'), $subject, $msg);
   }
 
   //sends email for orders marked as shipped
@@ -3388,7 +3404,7 @@ You can manage this order here: %s", 'mp');
     $msg = $this->filter_email($order, $settings['email']['shipped_order_txt']);
     $msg = apply_filters( 'mp_shipped_order_notification', $msg, $order );
 
-    wp_mail($order->mp_shipping_info['email'], $subject, $msg);
+    $this->mail($order->mp_shipping_info['email'], $subject, $msg);
     
   }
 
@@ -3418,7 +3434,7 @@ Notification Preferences: %s', 'mp');
     $msg = sprintf($msg, $name, number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
     $msg = apply_filters( 'mp_low_stock_notification', $msg, $product_id );
 
-    wp_mail(get_option('admin_email'), $subject, $msg);
+    $this->mail(get_option('admin_email'), $subject, $msg);
 
     //save so we don't send an email every time
     update_post_meta($product_id, 'mp_stock_email_sent', 1);
@@ -4347,6 +4363,15 @@ Notification Preferences: %s', 'mp');
         				<label><input value="1" name="mp[tax][tax_shipping]" type="radio"<?php checked($settings['tax']['tax_shipping'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                 <label><input value="0" name="mp[tax][tax_shipping]" type="radio"<?php checked($settings['tax']['tax_shipping'], 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp') ?></span>
+          			</td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Show Prices Inclusive of Tax?', 'mp') ?></th>
+                <td>
+                <?php $tax_inclusive = isset($settings['tax']['tax_inclusive']) ? $settings['tax']['tax_inclusive'] : 0; ?>
+        				<label><input value="1" name="mp[tax][tax_inclusive]" type="radio"<?php checked($tax_inclusive, 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[tax][tax_inclusive]" type="radio"<?php checked($tax_inclusive, 0) ?> /> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e('Please see your local tax laws.', 'mp') ?></span>
           			</td>
                 </tr>
               </table>
