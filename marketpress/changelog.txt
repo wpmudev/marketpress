@@ -5,6 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.1 - 5/25/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- WP e-Commerce product importer added
+- New importer plugin class added for others to easily build importers
+- Fix rare bug with permalinks
+- Try to prevent other plugins that cache output from stopping downloads
+
 2.0.6 - 5/20/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add configurable store admin email address

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.0.6
+Version: 2.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.0.6';
+  var $version = '2.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -71,7 +71,10 @@ class MarketPress {
 
     //load APIs and plugins
 		add_action( 'plugins_loaded', array(&$this, 'load_plugins') );
-
+		
+    //load importers
+		add_action( 'plugins_loaded', array(&$this, 'load_importers') );
+		
 		//localize the plugin
 		add_action( 'plugins_loaded', array(&$this, 'localization') );
 
@@ -303,7 +306,11 @@ Thanks again!", 'mp')
   function load_bp_features() {
     include_once( $this->plugin_dir . 'marketpress-bp.php' );
   }
-
+  
+  function load_importers() {
+    include_once( $this->plugin_dir . 'marketpress-importers.php' );
+  }
+  
   function load_plugins() {
     $settings = get_option('mp_settings');
 
@@ -733,7 +740,7 @@ Thanks again!", 'mp')
     if ( ! post_type_exists( 'product' ) )
       return $value;
 
-		if ( !in_array('index.php?product=$matches[1]&paged=$matches[2]', $value) ) {
+		if ( is_array($value) && !in_array('index.php?product=$matches[1]&paged=$matches[2]', $value) ) {
 			$this->flush_rewrite();
     }
   }
@@ -2911,6 +2918,7 @@ Thanks again!", 'mp')
 		}
     
 	  if (file_exists($tmp)) {
+	    ob_end_clean(); //kills any buffers set by other plugins
 			header('Content-Description: File Transfer');
 	    header('Content-Type: application/octet-stream');
 	    header('Content-Disposition: attachment; filename="'.$filename.'"');
@@ -4163,7 +4171,7 @@ Notification Preferences: %s', 'mp');
     		'messages'      => __('Messages', 'mp'),
     		'shipping'      => __('Shipping', 'mp'),
     		'gateways'      => __('Payments', 'mp'),
-    		'shortcodes'          => __('Shortcodes', 'mp')
+    		'shortcodes'    => __('Shortcodes', 'mp')
     	);
     } else {
       $tabs = array( 'presentation'  => __('Presentation', 'mp') );
