@@ -117,18 +117,18 @@ class WP_eCommerceImporter extends MarketPress_Importer {
     		update_post_meta($new_id, 'mp_sku', $meta['_wpsc_sku']); //add sku
         update_post_meta($new_id, 'mp_price', $meta['_wpsc_price']); //add price
         
-				//add sale price
-				if (isset($meta['_wpsc_special_price'][0]) && $meta['_wpsc_special_price'][0]) {
+    		//add sale price only if set and different than reg price
+				if (isset($meta['_wpsc_special_price'][0]) && $meta['_wpsc_special_price'][0] && $meta['_wpsc_special_price'][0] != $meta['_wpsc_price'][0]) {
 				  update_post_meta($new_id, 'mp_is_sale', 1);
     			update_post_meta($new_id, 'mp_sale_price', $meta['_wpsc_special_price']);
 				}
-    		
+
     		//add stock count
     		if (isset($meta['_wpsc_stock'][0]) && $meta['_wpsc_stock'][0]) {
     		  update_post_meta($new_id, 'mp_track_inventory', 1);
     			update_post_meta($new_id, 'mp_inventory', $meta['_wpsc_stock']);
 				}
-    		
+
     		//add external link
     		if (!empty($meta_data['external_link']))
     			update_post_meta($new_id, 'mp_product_link', esc_url_raw($meta_data['external_link']));
@@ -136,10 +136,20 @@ class WP_eCommerceImporter extends MarketPress_Importer {
 				//add extra shipping
 				if (isset($meta_data['shipping']['local']) && $meta_data['shipping']['local'])
     			update_post_meta($new_id, 'mp_shipping', array( 'extra_cost' => $meta_data['shipping']['local'] ) );
-    			
+
     		//add thumbnail
-				if (isset($meta['_thumbnail_id'][0]))
+				if (isset($meta['_thumbnail_id'][0])) { //if featured image is set
     			update_post_meta($new_id, '_thumbnail_id', $meta['_thumbnail_id'][0]);
+				} else { //grab first attachment as there is no featured image
+          $images =& get_children( "post_type=attachment&post_mime_type=image&post_parent=$old_id" );
+          $thumbnail_id = false;
+					foreach ( (array) $images as $attachment_id => $attachment ) {
+						$thumbnail_id = $attachment_id;
+						break; //only grab the first attachment
+					}
+					if ($thumbnail_id)
+    				update_post_meta($new_id, '_thumbnail_id', $thumbnail_id);
+				}
     			
 				//get first downloadable product url
 				$args = array(
