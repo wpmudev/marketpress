@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.1
+Version: 2.1.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.1';
+  var $version = '2.1.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -2907,29 +2907,71 @@ Thanks again!", 'mp')
 		if (intval($download['downloaded']) >= $max_downloads)
 		  return false;
 		
-		require_once(ABSPATH . '/wp-admin/includes/file.php');
-  
-    $filename = basename($url);
-    $tmp = download_url($url); //we download the url so we can serve it via php, completely obfuscating original source
+		//if your getting out of memory errors with large downloads, you can use a redirect instead, it's not so secure though
+		if ( defined('MP_LARGE_DOWNLOADS') && MP_LARGE_DOWNLOADS ) {
+		  //attempt to record a download attempt
+			if (isset($download['downloaded'])) {
+	    	$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
+      	update_post_meta($order->ID, 'mp_cart_info', $order->mp_cart_info);
+			}
+			wp_redirect($url);
+			exit;
+		} else {
 
-		if ( is_wp_error($tmp) ) {
-			@unlink($tmp);
-			return false;
-		}
-    
-	  if (file_exists($tmp)) {
-	    ob_end_clean(); //kills any buffers set by other plugins
-			header('Content-Description: File Transfer');
-	    header('Content-Type: application/octet-stream');
-	    header('Content-Disposition: attachment; filename="'.$filename.'"');
-	    header('Content-Transfer-Encoding: binary');
-	    header('Expires: 0');
-	    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-	    header('Pragma: public');
-	    header('Content-Length: ' . filesize($tmp));
-	    readfile($tmp);
-	    @unlink($tmp);
+			//create unique filename
+			$ext = ltrim(strrchr(basename($url), '.'), '.');
+			$filename = sanitize_file_name( strtolower( get_the_title($product_id) ) . '.' . $ext );
 
+			// Determine if this file is in our server
+			$dirs = wp_upload_dir();
+			$location = str_replace($dirs['baseurl'], $dirs['basedir'], $url);
+			if ( file_exists($location) ) {
+			  $tmp = $location;
+			  $not_delete = true;
+			} else {
+				require_once(ABSPATH . '/wp-admin/includes/file.php');
+
+		    $tmp = download_url($url); //we download the url so we can serve it via php, completely obfuscating original source
+
+				if ( is_wp_error($tmp) ) {
+					@unlink($tmp);
+					return false;
+				}
+	    }
+
+		  if (file_exists($tmp)) {
+		    ob_end_clean(); //kills any buffers set by other plugins
+				header('Content-Description: File Transfer');
+		    header('Content-Type: application/octet-stream');
+		    header('Content-Disposition: attachment; filename="'.$filename.'"');
+		    header('Content-Transfer-Encoding: binary');
+		    header('Expires: 0');
+		    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		    header('Pragma: public');
+		    header('Content-Length: ' . filesize($tmp));
+		    //readfile($tmp); //seems readfile chokes on large files
+				$chunksize = 1 * (1024 * 1024); // how many bytes per chunk
+				$buffer = '';
+				$cnt = 0;
+				$handle = fopen( $tmp, 'rb' );
+				if ( $handle === false ) {
+					return false;
+				}
+				while ( !feof( $handle ) ) {
+					$buffer = fread( $handle, $chunksize );
+					echo $buffer;
+					ob_flush();
+					flush();
+					if ( $retbytes ) {
+						$cnt += strlen( $buffer );
+					}
+				}
+				fclose( $handle );
+
+				if (!$not_delete)
+		    	@unlink($tmp);
+			}
+			
 	    //attempt to record a download attempt
 			if (isset($download['downloaded'])) {
 	    	$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
@@ -3709,7 +3751,7 @@ Notification Preferences: %s', 'mp');
             <th class="mp_cart_col_thumb">&nbsp;</th>
             <th class="mp_cart_col_sku"><?php _e('SKU', 'mp'); ?></th>
             <th class="mp_cart_col_product"><?php _e('Item', 'mp'); ?></th>
-            <th class="mp_cart_col_quant"><?php _e('Qantity', 'mp'); ?></th>
+            <th class="mp_cart_col_quant"><?php _e('Quantity', 'mp'); ?></th>
             <th class="mp_cart_col_price"><?php _e('Price', 'mp'); ?></th>
             <th class="mp_cart_col_subtotal"><?php _e('Subtotal', 'mp'); ?></th>
             <th class="mp_cart_col_downloads"><?php _e('Downloads', 'mp'); ?></th>
