@@ -1580,6 +1580,8 @@ function mp_cart_link($echo = true, $url = false, $link_text = '') {
     $link = '<a href="' . $link . '" class="mp_cart_link">' . $text . '</a>';
   }
 
+  $link = apply_filters( 'mp_cart_link', $link, $echo, $url, $link_text );
+
   if ($echo)
     echo $link;
   else
@@ -1600,6 +1602,8 @@ function mp_store_link($echo = true, $url = false, $link_text = '') {
     $text = ($link_text) ? $link_text : __('Visit Store', 'mp');
     $link = '<a href="' . $link . '" class="mp_store_link">' . $text . '</a>';
   }
+
+  $link = apply_filters( 'mp_store_link', $link, $echo, $url, $link_text );
 
   if ($echo)
     echo $link;
@@ -1622,6 +1626,8 @@ function mp_products_link($echo = true, $url = false, $link_text = '') {
     $link = '<a href="' . $link . '" class="mp_products_link">' . $text . '</a>';
   }
 
+  $link = apply_filters( 'mp_products_link', $link, $echo, $url, $link_text );
+  
   if ($echo)
     echo $link;
   else
@@ -1642,6 +1648,8 @@ function mp_orderstatus_link($echo = true, $url = false, $link_text = '') {
     $text = ($link_text) ? $link_text : __('Check Order Status', 'mp');
     $link = '<a href="' . $link . '" class="mp_orderstatus_link">' . $text . '</a>';
   }
+
+  $link = apply_filters( 'mp_orderstatus_link', $link, $echo, $url, $link_text );
 
   if ($echo)
     echo $link;

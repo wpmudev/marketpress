@@ -1192,7 +1192,7 @@ Thanks again!", 'mp')
 		$store_url = mp_store_link(false, true);
 		$store_page = get_option('mp_store_page');
 		foreach($list as $menu_item) {
-			if ($menu_item->ID == $store_page || $menu_item->url == $store_url) {
+			if ($menu_item->object_id == $store_page || $menu_item->url == $store_url) {
 				$store_object = $menu_item;
 				break;
 			}
