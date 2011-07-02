@@ -735,8 +735,10 @@ Thanks again!", 'mp')
     if ( ! post_type_exists( 'product' ) )
       return $value;
 
-		if ( is_array($value) && !in_array('index.php?product=$matches[1]&paged=$matches[2]', $value) ) {
-			$this->flush_rewrite();
+	if ( is_array($value) && !in_array('index.php?product=$matches[1]&paged=$matches[2]', $value) ) {
+		$this->flush_rewrite();
+    } else {
+        return $value;
     }
   }
 
@@ -2160,7 +2162,7 @@ Thanks again!", 'mp')
     } else if (isset($_POST['product_id'])) { //add a product to cart
 
 			//if not valid product_id return
-      $product_id = intval($_POST['product_id']);
+      $product_id = apply_filters('mp_product_id_add_to_cart', intval($_POST['product_id']));
       $product = get_post($product_id);
       if (!$product)
         return false;
@@ -3452,7 +3454,9 @@ You can manage this order here: %s", 'mp');
 		if ($this->download_only_cart($order->mp_cart_info))
     	return false;
 
+    $settings['email']['shipped_order_subject'] = apply_filters('mp_shipped_order_notification_subject', $settings['email']['shipped_order_subject'], $order);
     $subject = $this->filter_email($order, $settings['email']['shipped_order_subject']);
+    $settings['email']['shipped_order_txt'] = apply_filters( 'mp_shipped_order_notification_body', $settings['email']['shipped_order_txt'], $order );
     $msg = $this->filter_email($order, $settings['email']['shipped_order_txt']);
     $msg = apply_filters( 'mp_shipped_order_notification', $msg, $order );
 

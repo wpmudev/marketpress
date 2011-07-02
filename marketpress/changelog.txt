@@ -14,6 +14,7 @@ Change Log:
 - Ability to add add_theme_support('mp_style') to disable frontend css
 - Fixed Kenyan Shilling symbol
 - Added hooks to the download handler to allow plugins to override
+- Fixed bug in drop down menus
 
 2.1.1 - 6/03/2011 - Aaron Edwards
 ----------------------------------------------------------------------
