@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.1.1
+Version: 2.1.2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.1.1';
+  var $version = '2.1.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -521,15 +521,10 @@ Thanks again!", 'mp')
   }
 
   function load_tiny_mce($selector) {
-		// We need internal-linking.php for wp_link_dialog() function
-		require_once (ABSPATH . 'wp-admin/includes/internal-linking.php');
-		// We need wp_tiny_mce_preload_dialogs() and wp_link_dialog() to create (hidden) markup for Insert/Edit Link dialog.
-		add_action('admin_print_footer_scripts', 'wp_tiny_mce_preload_dialogs', 30);
-		add_action('tiny_mce_preload_dialogs', 'wp_link_dialog', 30);
-
-    wp_tiny_mce(false, array("editor_selector" => $selector));
+    wp_tiny_mce(false, array("editor_selector" => $selector, 'plugins' => 'inlinepopups,spellchecker,tabfocus,paste,link'));
 	}
 
+	
   //loads the jquery lightbox plugin
   function enqueue_lightbox() {
 
@@ -1055,7 +1050,7 @@ Thanks again!", 'mp')
   function load_store_theme() {
     $settings = get_option('mp_settings');
 
-    if ($settings['store_theme'] == 'none')
+    if ( $settings['store_theme'] == 'none' || current_theme_supports('mp_style') )
       return;
     else
       wp_enqueue_style( 'mp-store-theme', $this->plugin_url . 'themes/' . $settings['store_theme'] . '.css', false, $this->version );
@@ -2907,6 +2902,12 @@ Thanks again!", 'mp')
 		if (intval($download['downloaded']) >= $max_downloads)
 		  return false;
 		
+		//for plugins to hook into the download script. Don't forget to increment the download count, then exit!
+		do_action('mp_serve_download', $url, $order, $download);
+		
+		//allows you to simply filter the url
+		$url = apply_filters('mp_download_url', $url, $order, $download);
+		
 		//if your getting out of memory errors with large downloads, you can use a redirect instead, it's not so secure though
 		if ( defined('MP_LARGE_DOWNLOADS') && MP_LARGE_DOWNLOADS ) {
 		  //attempt to record a download attempt
@@ -3886,8 +3887,12 @@ Notification Preferences: %s', 'mp');
           <p><?php echo htmlentities($order->mp_payment_info['note']); ?></p>
           <?php } ?>
 
+          <?php do_action('mp_single_order_display_shipping', $order); ?>
+
         </div>
       </div>
+
+      <?php do_action('mp_single_order_display_box', $order); ?>
 
     </div>
 
@@ -4202,7 +4207,7 @@ Notification Preferences: %s', 'mp');
     $settings = get_option('mp_settings');
     ?>
     <div class="wrap">
-    <ul id="sidemenu">
+    <h3 class="nav-tab-wrapper">
     <?php
     $tab = ( !empty($_GET['tab']) ) ? $_GET['tab'] : 'main';
 
@@ -4223,17 +4228,17 @@ Notification Preferences: %s', 'mp');
     // If someone wants to remove or add a tab
   	$tabs = apply_filters( 'marketpress_tabs', $tabs );
 
-  	$class = ( 'main' == $tab ) ? ' class="current"' : '';
-  	$tabhtml[] = '		<li><a href="' . admin_url( 'edit.php?post_type=product&amp;page=marketpress' ) . '"' . $class . '>' . __('General', 'mp') . '</a>';
+  	$class = ( 'main' == $tab ) ? ' nav-tab-active' : '';
+  	$tabhtml[] = '	<a href="' . admin_url( 'edit.php?post_type=product&amp;page=marketpress' ) . '" class="nav-tab'.$class.'">' . __('General', 'mp') . '</a>';
 
   	foreach ( $tabs as $stub => $title ) {
-  		$class = ( $stub == $tab ) ? ' class="current"' : '';
-  		$tabhtml[] = '		<li><a href="' . admin_url( 'edit.php?post_type=product&amp;page=marketpress&amp;tab=' . $stub ) . '"' . $class . ">$title</a>";
+  		$class = ( $stub == $tab ) ? ' nav-tab-active' : '';
+  		$tabhtml[] = '	<a href="' . admin_url( 'edit.php?post_type=product&amp;page=marketpress&amp;tab=' . $stub ) . '" class="nav-tab'.$class.'">'.$title.'</a>';
   	}
 
-  	echo implode( "</li>\n", $tabhtml ) . '</li>';
+  	echo implode( "\n", $tabhtml );
     ?>
-  	</ul>
+  	</h3>
   	<div class="clear"></div>
 
   	<?php

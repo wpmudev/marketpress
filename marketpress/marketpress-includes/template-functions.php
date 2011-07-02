@@ -406,7 +406,7 @@ function _mp_cart_login($echo = false) {
   
   $content = '';
   //don't show if logged in
-  if (is_user_logged_in()) {
+  if ( is_user_logged_in() || defined('MP_HIDE_LOGIN_OPTION') ) {
     $content .= '<p class="mp_cart_direct_checkout">';
     $content .= '<a class="mp_cart_direct_checkout_link" href="'.mp_checkout_step_url('shipping').'">'.__('Checkout Now &raquo;', 'mp').'</a>';
     $content .= '</p>';
@@ -472,9 +472,9 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 
   $content = '';
   //don't show if logged in
-  if (!is_user_logged_in() && $editable) {
+  if ( !is_user_logged_in() && !defined('MP_HIDE_LOGIN_OPTION') && $editable) {
     $content .= '<p class="mp_cart_login_msg">';
-    $content .= __('Made a purchase here before?', 'mp').' <a class="mp_cart_login_link" href="'.wp_login_url(mp_checkout_step_url('checkout')).'">'.__('Login now to retrieve your saved info &raquo;', 'mp').'</a>';
+    $content .= __('Made a purchase here before?', 'mp').' <a class="mp_cart_login_link" href="'.wp_login_url(mp_checkout_step_url('shipping')).'">'.__('Login now to retrieve your saved info &raquo;', 'mp').'</a>';
     $content .= '</p>';
   }
 

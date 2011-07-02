@@ -755,7 +755,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			if (!isset($_POST)) $_POST = $HTTP_POST_VARS;
 			foreach ($_POST as $k => $v) {
 				if (get_magic_quotes_gpc()) $v = stripslashes($v);
-				$req .= '&' . $k . '=' . $v;
+				$req .= '&' . $k . '=' . urlencode($v);
 			}
 
       $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/{$mp->version}";

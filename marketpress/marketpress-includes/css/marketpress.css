@@ -206,3 +206,6 @@ td.mp_var_remove {
 	margin-bottom: 5px;
 	float: right;
 }
+.wp_themeSkin iframe {
+    background: white;
+}
