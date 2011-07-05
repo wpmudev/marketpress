@@ -157,6 +157,7 @@ class MarketPress {
       'inventory_threshhold' => 3,
       'max_downloads' => 5,
       'force_login' => 0,
+      'ga_ecommerce' => 'none',
       'store_theme' => 'icons',
       'product_img_height' => 150,
       'product_img_width' => 150,
@@ -610,8 +611,8 @@ Thanks again!", 'mp')
     $settings = get_option('mp_settings');
 
     // Register custom taxonomy
-		register_taxonomy( 'product_category', 'product', array("hierarchical" => true, 'label' => __('Product Categories', 'mp'), 'singular_label' => __('Product Category', 'mp'), 'rewrite' => array('slug' => $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/' . $settings['slugs']['category'])) );
-		register_taxonomy( 'product_tag', 'product', array("hierarchical" => false, 'label' => __('Product Tags', 'mp'), 'singular_label' => __('Product Tag', 'mp'), 'rewrite' => array('slug' => $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/' . $settings['slugs']['tag'])) );
+		register_taxonomy( 'product_category', 'product', apply_filters( 'mp_register_product_category', array("hierarchical" => true, 'label' => __('Product Categories', 'mp'), 'singular_label' => __('Product Category', 'mp'), 'rewrite' => array('slug' => $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/' . $settings['slugs']['category'])) ) );
+		register_taxonomy( 'product_tag', 'product', apply_filters( 'mp_register_product_tag', array("hierarchical" => false, 'label' => __('Product Tags', 'mp'), 'singular_label' => __('Product Tag', 'mp'), 'rewrite' => array('slug' => $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/' . $settings['slugs']['tag'])) ) );
 
     // Register custom product post type
     $supports = array( 'title', 'editor', 'author', 'excerpt', 'revisions', 'thumbnail' );
@@ -2056,7 +2057,9 @@ Thanks again!", 'mp')
     }
 
     $global_cart = $this->get_cart_cookie(true);
-    
+    if (!is_array($global_cart))
+      return array();
+      
     $full_cart = array();
     foreach ($global_cart as $bid => $cart) {
 
@@ -3584,6 +3587,89 @@ Notification Preferences: %s', 'mp');
   	return $text;
   }
 
+  //returns the js needed to record ecommerce transactions. $project should be an array of id, title
+	function create_ga_ecommerce($order) {
+  	$settings = get_option('mp_settings');
+
+		if (!is_object($order))
+		  return false;
+		  
+    if ($settings['ga_ecommerce'] == 'old') {
+
+			$js = '<script type="text/javascript">
+			try{
+		  pageTracker._addTrans(
+		      "'.esc_attr($order->post_title).'",                  // order ID - required
+		      "'.esc_attr(get_bloginfo('blogname')).'",            // affiliation or store name
+		      "'.$order->mp_order_total.'",                        // total - required
+		      "'.$order->mp_tax_total.'",                          // tax
+		      "'.$order->mp_shipping_total.'",                     // shipping
+		      "'.esc_attr($order->mp_shipping_info['city']).'",    // city
+		      "'.esc_attr($order->mp_shipping_info['state']).'",   // state or province
+		      "'.esc_attr($order->mp_shipping_info['country']).'"  // country
+		    );';
+
+			if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+				foreach ($order->mp_cart_info as $product_id => $variations) {
+					foreach ($variations as $variation => $data) {
+						$sku = !empty($data['SKU']) ? esc_attr($data['SKU']) : $product_id;
+						$js .= 'pageTracker._addItem(
+						  "'.esc_attr($order->post_title).'", // order ID - necessary to associate item with transaction
+						  "'.$sku.'",                         // SKU/code - required
+						  "'.esc_attr($data['name']).'",      // product name
+						  "'.$data['price'].'",               // unit price - required
+						  "'.$data['quantity'].'"             // quantity - required
+						);';
+					}
+				}
+			}
+		  $js .= 'pageTracker._trackTrans(); //submits transaction to the Analytics servers
+			} catch(err) {}
+			</script>
+			';
+	
+	  } else if ($settings['ga_ecommerce'] == 'new') {
+
+      $js = '<script type="text/javascript">
+   			_gaq.push(["_addTrans",
+		      "'.esc_attr($order->post_title).'",                  // order ID - required
+		      "'.esc_attr(get_bloginfo('blogname')).'",            // affiliation or store name
+		      "'.$order->mp_order_total.'",                        // total - required
+		      "'.$order->mp_tax_total.'",                          // tax
+		      "'.$order->mp_shipping_total.'",                     // shipping
+		      "'.esc_attr($order->mp_shipping_info['city']).'",    // city
+		      "'.esc_attr($order->mp_shipping_info['state']).'",   // state or province
+		      "'.esc_attr($order->mp_shipping_info['country']).'"  // country
+		    ]);';
+
+			if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+				foreach ($order->mp_cart_info as $product_id => $variations) {
+					foreach ($variations as $variation => $data) {
+						$sku = !empty($data['SKU']) ? esc_attr($data['SKU']) : $product_id;
+						$js .= '_gaq.push(["_addItem",
+						  "'.esc_attr($order->post_title).'", // order ID - necessary to associate item with transaction
+						  "'.$sku.'",                         // SKU/code - required
+						  "'.esc_attr($data['name']).'",      // product name
+						  "",                                 // category
+						  "'.$data['price'].'",               // unit price - required
+						  "'.$data['quantity'].'"             // quantity - required
+						]);';
+					}
+				}
+			}
+		  $js .= '_gaq.push(["_trackTrans"]);
+			</script>
+			';
+
+		}
+
+		//add to footer
+		if ( !empty($js) ) {
+		  $function = "echo '$js';";
+      add_action( 'wp_footer', create_function('', $function), 99999 );
+		}
+	}
+
   //displays the detail page of an order
   function single_order_page() {
     $order = $this->get_order((int)$_GET['order_id']);
@@ -4518,6 +4604,17 @@ Notification Preferences: %s', 'mp');
         				<label><input value="1" name="mp[disable_cart]" type="radio"<?php checked($settings['disable_cart'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                 <label><input value="0" name="mp[disable_cart]" type="radio"<?php checked($settings['disable_cart'], 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the "Buy Now" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links.', 'mp') ?></span>
+          			</td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Google Analytics Ecommerce Tracking', 'mp') ?></th>
+                <td>
+                <select name="mp[ga_ecommerce]">
+									<option value="none"<?php selected($settings['ga_ecommerce'], 'none') ?>><?php _e('None', 'mp') ?></option>
+									<option value="new"<?php selected($settings['ga_ecommerce'], 'new') ?>><?php _e('Asynchronous Tracking Code', 'mp') ?></option>
+									<option value="old"<?php selected($settings['ga_ecommerce'], 'old') ?>><?php _e('Old Tracking Code', 'mp') ?></option>
+								</select>
+        				<br /><span class="description"><?php _e('If you already use Google Analytics for your website, you can track detailed ecommerce information by enabling this setting. Choose whether you are using the new asynchronous or old tracking code. Before Google Analytics can report ecommerce activity for your website, you must enable ecommerce tracking on the profile settings page for your website. Also keep in mind that some gateways do not reliably show the receipt page, so tracking may not be accurate in those cases. It is recommended to use the PayPal gateway for the most accurate data. <a href="http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-in-google.html" target="_blank">More information &raquo;</a>', 'mp') ?></span>
           			</td>
                 </tr>
               </table>

@@ -342,7 +342,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       //check response
       if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
-      
+
         //setup our payment details
   			$payment_info['gateway_public_name'] = $this->public_name;
         $payment_info['gateway_private_name'] = $this->admin_name;
@@ -458,7 +458,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     	
         //success. Do nothing, it will take us to the confirmation page
       } else { //whoops, error
-        for ($i = 0; $i <= 5; $i++) { //print the first 5 errors
+
+				for ($i = 0; $i <= 5; $i++) { //print the first 5 errors
           if (isset($result["L_ERRORCODE$i"]))
             $error .= "<li>{$result["L_ERRORCODE$i"]} - {$result["L_SHORTMESSAGE$i"]} - {$result["L_LONGMESSAGE$i"]}</li>";
         }

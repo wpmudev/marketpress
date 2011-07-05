@@ -8,6 +8,7 @@ Change Log:
 2.1.2 - 7/03/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - WP 3.2 compatibility
+- Google Analytics Ecommerce tracking support
 - Ability to add define('MP_HIDE_LOGIN_OPTION', true); to hide the login option on checkout
 - Fixed redirect bug for login link on checkout
 - Many new hooks for WPML full translation capability

@@ -688,6 +688,9 @@ function _mp_cart_payment($type, $echo = false) {
     $track_link = '<a href="' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '">' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '</a>';
     $content .= '<p>' . sprintf(__('You may track the latest status of your order(s) here:<br />%s', 'mp'), $track_link) . '</p>';
 
+    //add ecommerce JS
+    $mp->create_ga_ecommerce( $mp->get_order($_SESSION['mp_order']) );
+
     //clear cart session vars
     unset($_SESSION['mp_payment_method']);
     unset($_SESSION['mp_order']);
