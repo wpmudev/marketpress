@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.1.2
+Version: 2.1.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.1.2';
+  var $version = '2.1.3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -102,7 +102,7 @@ class MarketPress {
 		add_action( 'wp_insert_post', array(&$this, 'save_product_meta'), 10, 2 );
 
 		//Templates and Rewrites
-		add_action( 'template_redirect', array(&$this, 'load_store_templates') );
+		add_action( 'wp', array(&$this, 'load_store_templates') );
 		add_action( 'template_redirect', array(&$this, 'load_store_theme') );
 	  add_action( 'pre_get_posts', array(&$this, 'remove_canonical') );
 		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
@@ -3599,24 +3599,24 @@ Notification Preferences: %s', 'mp');
 			$js = '<script type="text/javascript">
 			try{
 		  pageTracker._addTrans(
-		      "'.esc_attr($order->post_title).'",                  // order ID - required
-		      "'.esc_attr(get_bloginfo('blogname')).'",            // affiliation or store name
+		      "'.esc_js($order->post_title).'",                  // order ID - required
+		      "'.esc_js(get_bloginfo('blogname')).'",            // affiliation or store name
 		      "'.$order->mp_order_total.'",                        // total - required
 		      "'.$order->mp_tax_total.'",                          // tax
 		      "'.$order->mp_shipping_total.'",                     // shipping
-		      "'.esc_attr($order->mp_shipping_info['city']).'",    // city
-		      "'.esc_attr($order->mp_shipping_info['state']).'",   // state or province
-		      "'.esc_attr($order->mp_shipping_info['country']).'"  // country
+		      "'.esc_js($order->mp_shipping_info['city']).'",    // city
+		      "'.esc_js($order->mp_shipping_info['state']).'",   // state or province
+		      "'.esc_js($order->mp_shipping_info['country']).'"  // country
 		    );';
 
 			if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
 				foreach ($order->mp_cart_info as $product_id => $variations) {
 					foreach ($variations as $variation => $data) {
-						$sku = !empty($data['SKU']) ? esc_attr($data['SKU']) : $product_id;
+						$sku = !empty($data['SKU']) ? esc_js($data['SKU']) : $product_id;
 						$js .= 'pageTracker._addItem(
-						  "'.esc_attr($order->post_title).'", // order ID - necessary to associate item with transaction
+						  "'.esc_js($order->post_title).'", // order ID - necessary to associate item with transaction
 						  "'.$sku.'",                         // SKU/code - required
-						  "'.esc_attr($data['name']).'",      // product name
+						  "'.esc_js($data['name']).'",      // product name
 						  "'.$data['price'].'",               // unit price - required
 						  "'.$data['quantity'].'"             // quantity - required
 						);';
@@ -5458,7 +5458,7 @@ Notification Preferences: %s', 'mp');
 
                 foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                   if ($plugin[3]) { //if demo
-                  	?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>" disabled="disabled" /> <?php echo esc_attr($plugin[1]); ?></label> <a href="http://premium.wpmudev.org/project/e-commerce" title="<?php _e('Upgrade', 'mp'); ?> &raquo;"><?php _e('Pro Only &raquo;', 'mp'); ?></a><br /><?php
+                  	?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>" disabled="disabled" /> <?php echo esc_attr($plugin[1]); ?></label> <a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce" title="<?php _e('Upgrade', 'mp'); ?> &raquo;"><?php _e('Pro Only &raquo;', 'mp'); ?></a><br /><?php
 									} else {
                     ?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, (array)$settings['gateways']['allowed'])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
 									}
