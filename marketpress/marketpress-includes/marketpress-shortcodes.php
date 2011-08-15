@@ -8,7 +8,7 @@ class MarketPress_Shortcodes {
 	function MarketPress_Shortcodes() {
 		$this->__construct();
 	}
-	
+
   function __construct() {
 
     //register our shortcodes
@@ -17,14 +17,14 @@ class MarketPress_Shortcodes {
     add_shortcode( 'mp_dropdown_categories', array(&$this, 'mp_dropdown_categories_sc') );
     add_shortcode( 'mp_popular_products', array(&$this, 'mp_popular_products_sc') );
     add_shortcode( 'mp_list_products', array(&$this, 'mp_list_products_sc') );
-    
+
     //store links
     add_shortcode( 'mp_cart_link', array(&$this, 'mp_cart_link_sc') );
     add_shortcode( 'mp_store_link', array(&$this, 'mp_store_link_sc') );
     add_shortcode( 'mp_products_link', array(&$this, 'mp_products_link_sc') );
     add_shortcode( 'mp_orderstatus_link', array(&$this, 'mp_orderstatus_link_sc') );
     add_shortcode( 'mp_store_navigation', array(&$this, 'mp_store_navigation_sc') );
-    
+
 	}
 
 
@@ -121,7 +121,7 @@ class MarketPress_Shortcodes {
   function mp_dropdown_categories_sc($atts) {
     return mp_dropdown_categories(false, $atts);
   }
-  
+
   /**
    * Displays a list of popular products ordered by sales.
    *
@@ -134,7 +134,7 @@ class MarketPress_Shortcodes {
 
     return mp_popular_products(false, $number);
   }
-  
+
   /*
    * Displays a list of products according to preference. Optional values default to the values in Presentation Settings -> Product List
    *
@@ -170,7 +170,7 @@ class MarketPress_Shortcodes {
   		'url' => false,
   		'link_text' => '',
   	), $atts));
-  	
+
     return mp_cart_link(false, $url, $link_text);
   }
 
@@ -215,7 +215,7 @@ class MarketPress_Shortcodes {
 
     return mp_orderstatus_link(false, $url, $link_text);
   }
-  
+
 /**
  * Returns the current store navigation links.
  *

@@ -8,16 +8,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'paypal-express';
-  
+
   //name of your gateway, for the admin side.
   var $admin_name = '';
-  
+
   //public name of your gateway, for lists and such.
   var $public_name = '';
 
   //url for an image for your checkout method. Displayed on checkout form if set
   var $method_img_url = '';
-  
+
   //url for an submit button image for your checkout method. Displayed on checkout form if set
   var $method_button_img_url = '';
 
@@ -29,16 +29,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
   //whether if this is the only enabled gateway it can skip the payment_form step
   var $skip_form = true;
-  
+
   //only required for global capable gateways. The maximum stores that can checkout at once
   var $max_stores = 10;
-  
+
   // Payment action
   var $payment_action = 'Sale';
 
   //paypal vars
   var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $paypalURL, $version, $currencyCode, $locale;
-    
+
   /****** Below are the public methods you may overwrite via a plugin ******/
 
   /**
@@ -47,20 +47,20 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   function on_creation() {
     global $mp;
     $settings = get_option('mp_settings');
-    
+
     //set names here to be able to translate
     $this->admin_name = __('PayPal Express Checkout', 'mp');
     $this->public_name = __('PayPal', 'mp');
-    
+
     //dynamic button img, see: https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECButtonIntegration
     $this->method_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&buttontype=ecmark&locale=' . get_locale();
     $this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
-		
+
     //set paypal vars
     /** @todo Set all array keys to resolve Undefined indexes notice */;
     if ( $mp->global_cart )
       $settings = get_site_option( 'mp_network_settings' );
-    
+
     $this->API_Username = $settings['gateways']['paypal-express']['api_user'];
     $this->API_Password = $settings['gateways']['paypal-express']['api_pass'];
     $this->API_Signature = $settings['gateways']['paypal-express']['api_sig'];
@@ -92,7 +92,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     if (isset($_GET['cancel']))
       echo '<div class="mp_checkout_error">' . __('Your PayPal transaction has been canceled.', 'mp') . '</div>';
   }
-  
+
   /**
    * Use this to authorize ordered transactions.
    *
@@ -191,7 +191,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       }
     }
   }
-  
+
   /**
    * Use this to capture authorized transactions.
    *
@@ -210,7 +210,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       }
     }
   }
-  
+
   /**
    * Use this to process any fields you added. Use the $_POST global,
    *  and be sure to save it to both the $_SESSION and usermeta if logged in.
@@ -223,7 +223,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function process_payment_form($global_cart, $shipping_info) {
     global $mp;
-    
+
     //create order id for paypal invoice
     $order_id = $mp->generate_order_id();
     /*
@@ -237,7 +237,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     */
     //set it up with PayPal
     $result = $this->SetExpressCheckout($global_cart, $shipping_info, $order_id);
-    
+
     //check response
     if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
       $token = urldecode($result["TOKEN"]);
@@ -252,7 +252,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $mp->cart_checkout_error( __('There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp') . $error );
     }
   }
-  
+
   /**
    * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
@@ -262,21 +262,21 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function confirm_payment_form($global_cart, $shipping_info) {
     global $mp;
-    
+
     $content = '';
-    
+
     if (isset($_GET['token']) && isset($_GET['PayerID'])) {
       $_SESSION['token'] = $_GET['token'];
       $_SESSION['PayerID'] = $_GET['PayerID'];
-      
+
       //get details from PayPal
       $result = $this->GetExpressCheckoutDetails($_SESSION['token']);
-      
+
       //check response
   		if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
 
         $account_name = ($result["BUSINESS"]) ? $result["BUSINESS"] : $result["EMAIL"];
-        
+
         //set final amount
         $_SESSION['final_amt'] = 0;
 				$_SESSION['final_amts'] = array();
@@ -296,7 +296,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				  //$_SESSION['seller_ids'][] = $result['PAYMENTREQUEST_'.$i.'_SELLERID'];
 				  $_SESSION['seller_paypal_accounts'][] = $result['PAYMENTREQUEST_'.$i.'_SELLERPAYPALACCOUNTID'];
 				}
-	
+
         //print payment details
         $content .= '<p>' . sprintf(__('Please confirm your final payment for this order totaling %s. It will be made via your "%s" PayPal account.', 'mp'), $mp->format_currency('', $_SESSION['final_amt']), $account_name) . '</p>';
 
@@ -312,7 +312,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     } else {
       $content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
     }
-    
+
     return $content;
   }
 
@@ -335,7 +335,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  	$selected_cart[$blog_id] = $global_cart;
 	  else
 	    $selected_cart = $global_cart;
-    
+
     if (isset($_SESSION['token']) && isset($_SESSION['PayerID']) && isset($_SESSION['final_amt'])) {
       //attempt the final payment
       $result = $this->DoExpressCheckoutPayment($_SESSION['token'], $_SESSION['PayerID'], $_SESSION['final_amts'], $_SESSION['seller_paypal_accounts'], $_SESSION['ipns'], $_SESSION['prs']);
@@ -439,7 +439,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				  $payment_info['status'][$timestamp] = $status;
 				  $payment_info['currency'] = $result["PAYMENTINFO_{$i}_CURRENCYCODE"];
 				  $payment_info['total'] = $result["PAYMENTINFO_{$i}_AMT"];
-				  
+
 				  $payment_info['note'] = $result["NOTE"]; //optional, only shown if gateway supports it
 
 					//figure out blog_id of this payment to put the order into it
@@ -455,7 +455,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
         if (is_multisite())
     			switch_to_blog($current_blog_id);
-    	
+
         //success. Do nothing, it will take us to the confirmation page
       } else { //whoops, error
 
@@ -470,14 +470,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $mp->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase with PayPal. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) );
     }
   }
-	
+
 	/**
    * Runs before page load incase you need to run any scripts before loading the success message page
    */
 	function order_confirmation($order) {
 
   }
-	
+
   /**
    * Filters the order confirmation email message body. You may want to append something to
    *  the message. Optional
@@ -487,7 +487,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	function order_confirmation_email($msg, $order) {
     return $msg;
   }
-  
+
   /**
    * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
@@ -496,7 +496,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function order_confirmation_msg($content, $order) {
     global $mp;
-    
+
     if ($mp->global_cart) {
 		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
 			/* TODO - create a list of sep store orders
@@ -518,7 +518,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		}
     return $content;
   }
-	
+
 	/**
    * Echo a settings meta box with whatever settings you need for you gateway.
    *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
@@ -725,7 +725,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     </div>
     <?php
   }
-  
+
   /**
    * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
    *  array. Don't forget to return!
@@ -734,18 +734,18 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
     return $settings;
   }
-  
+
 	/**
    * Use to handle any payment returns from your gateway to the ipn_url. Do not echo anything here. If you encounter errors
    *  return the proper headers to your ipn sender. Exits after.
    */
 	function process_ipn_return() {
     global $mp;
-    
+
     // PayPal IPN handling code
     if (isset($_POST['payment_status']) || isset($_POST['txn_type'])) {
       $settings = get_option('mp_settings');
-      
+
 			if ($settings['gateways']['paypal-express']['mode'] == 'sandbox') {
         $domain = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 			} else {
@@ -775,7 +775,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 			// process PayPal response
 			switch ($_POST['payment_status']) {
-			
+
 			  case 'Canceled-Reversal':
           $status = __('A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.', 'mp');
           $paid = true;
@@ -795,7 +795,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
           $status = __("The payment has failed. This happens only if the payment was made from your customer's bank account.", 'mp');
           $paid = false;
 					break;
-					
+
    			case 'Partially-Refunded':
           $status = __('The payment has been partially refunded.', 'mp');
           $paid = true;
@@ -864,7 +864,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					// case: various error cases
 			}
       $status = $_POST['payment_status'] . ': '. $status;
-      
+
       //record transaction
       $mp->update_order_payment_status($_POST['invoice'], $status, $paid);
 
@@ -875,9 +875,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			exit;
 		}
   }
-  
+
   /**** PayPal API methods *****/
-  
+
 
 	//Purpose: 	Prepares the parameters for the SetExpressCheckout API Call.
   function SetExpressCheckout($global_cart, $shipping_info, $order_id)	{
@@ -892,7 +892,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	    $selected_cart = $global_cart;
       $settings = get_site_option( 'mp_network_settings' );
     }
-    
+
     $nvpstr = "";
     $nvpstr .= "&ReturnUrl=" . $this->returnURL;
     $nvpstr .= "&CANCELURL=" . $this->cancelURL;
@@ -902,13 +902,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $nvpstr .= "&SOLUTIONTYPE=Sole";
     $nvpstr .= "&LOCALECODE=" . $this->locale;
     $nvpstr .= "&EMAIL=" . urlencode($shipping_info['email']);
-    
+
     //formatting
     $nvpstr .= "&HDRIMG=" . urlencode($settings['gateways']['paypal-express']['header_img']);
     $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($settings['gateways']['paypal-express']['header_border']);
     $nvpstr .= "&HDRBACKCOLOR=" . urlencode($settings['gateways']['paypal-express']['header_back']);
     $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($settings['gateways']['paypal-express']['page_back']);
-    
+
     //loop through cart items
     $j = 0;
     foreach ($selected_cart as $bid => $cart) {
@@ -919,9 +919,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog($bid);
       }
       $blog_settings = get_option('mp_settings');
-      
+
       $totals = array();
-      
+
       $nvpstr .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $blog_settings['gateways']['paypal-express']['merchant_email'];
       $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
@@ -935,7 +935,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRY=" . urlencode($shipping_info['country']);
       $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . urlencode($shipping_info['zip']);
       $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . urlencode($shipping_info['phone']);
-      
+
       $detailstr = "";
       $i = 0;
       foreach ($cart as $product_id => $variations) {
@@ -951,46 +951,46 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				}
       }
       $total = array_sum($totals);
-      
+
       //coupon line
       if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
 				$total = $coupon['new_total'];
       }
-      
+
       $detailstr .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
-      
+
       //shipping line
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
 				$total = $total + $shipping_price;
 				$detailstr .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
       }
-      
+
       //tax line
       if ( ($tax_price = $mp->tax_price(false)) !== false ) {
 				$total = $total + $tax_price;
 				$detailstr .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }
-      
+
       //only add cart details if no coupon, as that's unsupported (stupid PayPal)
       if (!$coupon) {
 				$nvpstr .= $detailstr;
       }
-      
+
       //order details
       $nvpstr .= "&PAYMENTREQUEST_{$j}_DESC=" . urlencode(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
       $nvpstr .= "&PAYMENTREQUEST_{$j}_AMT=" . $total; //cart total
       $nvpstr .= "&PAYMENTREQUEST_{$j}_INVNUM=" . $order_id;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTREQUESTID=" . $bid . ":" . $order_id;
-      
+
       if ($this->payment_action == 'Sale') {
 				$nvpstr .= "&PAYMENTREQUEST_{$j}_ALLOWEDPAYMENTMETHOD=InstantPaymentOnly";
       }
       $j++;
     }
-    
+
     if (is_multisite())
       switch_to_blog($current_blog_id);
-    
+
     //'---------------------------------------------------------------------------------------------------------------
     //' Make the API call to PayPal
     //' If the API call succeded, then redirect the buyer to PayPal to begin to authorize payment.
@@ -1004,7 +1004,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     }
     return $resArray;
   }
-  
+
 	//Purpose: 	Prepares the parameters for the GetExpressCheckoutDetails API Call.
 	function GetExpressCheckoutDetails( $token )	{
 		//'--------------------------------------------------------------
@@ -1035,8 +1035,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		}
 		return $resArray;
 	}
-	
-	
+
+
 	//Purpose: 	Prepares the parameters for the DoExpressCheckoutPayment API Call.
 	function DoExpressCheckoutPayment($token, $payer_id, $final_amts, $seller_paypal_accounts, $ipns, $prs) {
 	  $nvpstr  = '&TOKEN=' . urlencode($token);
@@ -1049,38 +1049,38 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_SELLERPAYPALACCOUNTID=" . $seller_paypal_accounts[$i];
 	    $nvpstr .= "&PAYMENTREQUEST_{$i}_PAYMENTREQUESTID=" . $prs[$i];
 	  }
-	  
+
 	  /* Make the call to PayPal to finalize payment
 	    */
 	  return $this->api_call("DoExpressCheckoutPayment", $nvpstr);
 	}
-	
+
 	//Purpose: 	Prepares the parameters for the DoAuthorization API Call.
 	function DoAuthorization($transaction_id, $final_amt) {
-	  
+
 	  $nvpstr .= '&TRANSACTIONID=' . urlencode($transaction_id);
 	  $nvpstr .= '&AMT=' . $final_amt;
 	  $nvpstr .= '&TRANSACTIONENTITY=Order';
 	  $nvpstr .= '&CURRENCYCODE=' . $this->currencyCode;
-	  
+
 	  /* Make the call to PayPal to finalize payment
 	   */
 	  return $this->api_call("DoAuthorization", $nvpstr);
 	}
-	
+
 	//Purpose: 	Prepares the parameters for the DoCapture API Call.
 	function DoCapture($transaction_id, $final_amt) {
-	  
+
 	  $nvpstr .= '&AUTHORIZATIONID=' . urlencode($transaction_id);
 	  $nvpstr .= '&AMT=' . $final_amt;
 	  $nvpstr .= '&CURRENCYCODE=' . $this->currencyCode;
 	  $nvpstr .= '&COMPLETETYPE=Complete';
-	  
+
 	  /* Make the call to PayPal to finalize payment
 	   */
 	  return $this->api_call("DoCapture", $nvpstr);
 	}
-	
+
 	/**
 	  '-------------------------------------------------------------------------------------------------------------------------------------------
 	  * $this->api_call: Function to perform the API call to PayPal using API signature
@@ -1091,14 +1091,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	*/
 	function api_call($methodName, $nvpStr) {
 	  global $mp;
-	  
+
 	  //NVPRequest for submitting to server
 	  $query_string = "METHOD=" . urlencode($methodName) . "&VERSION=" . urlencode($this->version) . "&PWD=" . urlencode($this->API_Password) . "&USER=" . urlencode($this->API_Username) . "&SIGNATURE=" . urlencode($this->API_Signature) . $nvpStr;
 	  //build args
 	  $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/{$mp->version}";
 	  $args['body'] = $query_string;
 	  $args['sslverify'] = false;
-	  
+
 	  //use built in WP http class to work with most server setups
 	  $response = wp_remote_post($this->API_Endpoint, $args);
 	  if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
