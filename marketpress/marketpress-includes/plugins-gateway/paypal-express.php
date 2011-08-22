@@ -1098,6 +1098,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/{$mp->version}";
 	  $args['body'] = $query_string;
 	  $args['sslverify'] = false;
+	  $args['timeout'] = 30;
 
 	  //use built in WP http class to work with most server setups
 	  $response = wp_remote_post($this->API_Endpoint, $args);
