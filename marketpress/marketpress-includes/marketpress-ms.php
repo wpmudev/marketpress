@@ -25,6 +25,8 @@ class MarketPress_MS {
 
     //index products
     add_action( 'save_post', array(&$this, 'index_product') );
+		add_action( 'untrash_post', array(&$this, 'index_product') );
+    add_action( 'trash_post', array(&$this, 'delete_product') );
     add_action( 'delete_post', array(&$this, 'delete_product') );
     add_action( 'mp_product_sale', array(&$this, 'record_sale'), 10, 4 );
     
@@ -472,9 +474,9 @@ class MarketPress_MS {
     global $mp, $wp_version;
     
     if ( version_compare($wp_version, '3.0.9', '>') ) {
-      $page = add_submenu_page('settings.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 10, 'marketpress-ms', array(&$this, 'super_admin_page'));
+      $page = add_submenu_page('settings.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 'manage_network_options', 'marketpress-ms', array(&$this, 'super_admin_page'));
     } else {
-      $page = add_submenu_page('ms-admin.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 10, 'marketpress-ms', array(&$this, 'super_admin_page'));
+      $page = add_submenu_page('ms-admin.php', __('MarketPress Network Options', 'mp'), __('MarketPress', 'mp'), 'manage_network_options', 'marketpress-ms', array(&$this, 'super_admin_page'));
     }
     //add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
     //add_action( 'admin_print_styles-' . $page, array(&$this, 'admin_css_settings') );
@@ -775,7 +777,7 @@ class MarketPress_MS {
       return;
 
     //remove old post if necessary
-    if ( $post->post_status != 'publish' || !empty($post->post_password) || empty($post->post_title) || empty($post->post_content) || $blog_archived || $blog_mature || $blog_spam || $blog_deleted ) {
+    if ( $post->post_status != 'publish' || !empty($post->post_password) || empty($post->post_title) || $blog_archived || $blog_mature || $blog_spam || $blog_deleted ) {
       $this->delete_product($post_id);
       return;
     }
@@ -795,7 +797,7 @@ class MarketPress_MS {
                       'post_modified_gmt' => $post->post_modified_gmt,
                       'price'             => $mp->product_price($post_id),
                       'sales_count'       => get_post_meta($post_id, "mp_sales_count", true) ),
-                      array( 'id' => $id ) );
+                      array( 'id' => $global_id ) );
       $existed = true;
     } else {
       $wpdb->insert( $wpdb->base_prefix . 'mp_products', array(

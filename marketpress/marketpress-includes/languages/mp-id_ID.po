@@ -1,0 +1,3660 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: MarketPress Lite v2.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2011-07-11 19:48+0000\n"
+"Last-Translator: admin <caksalman@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Language: Indonesian\n"
+"X-Poedit-Country: INDONESIA\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-Bookmarks: \n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Textdomain-Support: yes"
+
+#: marketpress-includes/marketpress-gateways.php:171
+#: marketpress-includes/template-functions.php:551
+#@ mp
+msgid "Continue Checkout &raquo;"
+msgstr "Periksa lagi &raquo;"
+
+#: marketpress-includes/marketpress-importers.php:33
+#, php-format
+#@ mp
+msgid "Import From %s"
+msgstr "Import dari %s"
+
+#: marketpress-includes/marketpress-importers.php:49
+#, php-format
+#@ mp
+msgid "%s Importer"
+msgstr "%s Importir"
+
+#: marketpress-includes/marketpress-importers.php:159
+#, php-format
+#@ mp
+msgid "Successfully imported %s products from WP e-Commerce. The old products were not deleted, so running the importer again will just create copies of the products in MarketPress."
+msgstr "Produk %s berhasil diimport dari WP e-Commerce. Produk lama tidak dihapus, jadi menjalankan lagi importir hanya membuat penggandaan produk di MarketPress."
+
+#: marketpress-includes/marketpress-importers.php:160
+#, php-format
+#@ mp
+msgid "You should <a href=\"%s\">deactivate the WP e-Commerce plugin now</a>. Have fun!"
+msgstr "Anda harus <a href=\"%s\">menonaktifkan plugin WP e-Commerce sekarang</a>. Selamat!"
+
+#: marketpress-includes/marketpress-importers.php:166
+#@ mp
+msgid "This will allow you to import your products and most of their attributes from the WP e-Commerce plugin."
+msgstr "Anda boleh mengimport produk-produk anda beserta atributnya dari plugin WP e-Commerce."
+
+#: marketpress-includes/marketpress-importers.php:168
+#, php-format
+#@ mp
+msgid "It appears that you have %s products from WP e-Commerce. Click below to begin your import!"
+msgstr "Sepertinya anda punya %s produk dari WP e-Commerce. Klik dibawah untuk memulai mengimport!"
+
+#: marketpress-includes/marketpress-importers.php:170
+#@ mp
+msgid "Import Now &raquo;"
+msgstr "Import Sekarang &raquo;"
+
+#: marketpress-includes/marketpress-importers.php:175
+#, php-format
+#@ mp
+msgid "It appears you have no products in WP e-Commerce to import. You should <a href=\"%s\">deactivate the WP e-Commerce plugin</a>, or check that the plugin is updated to the latest version (the importer only works with >3.8)."
+msgstr "Sepertinya anda tidak memiliki produk di WP e-Commerce untuk diimport. Anda harus <a href=\"%s\">menonaktifkan plugin WP e-Commerce</a>, or periksa apakah plugin telah diperbarui ke versi terbaru (importir hanya bekerja diatas>3.8)."
+
+#: marketpress-includes/marketpress-ms.php:39
+#: marketpress-includes/marketpress-ms.php:41
+#: marketpress-includes/marketpress-ms.php:60
+#@ mp
+msgid "MarketPress Network Options"
+msgstr "Pilihan Jaringan MarketPress"
+
+#: marketpress-includes/marketpress-ms.php:39
+#: marketpress-includes/marketpress-ms.php:41
+#@ mp
+msgid "MarketPress"
+msgstr "MarketPress"
+
+#: marketpress-includes/marketpress-ms.php:53
+#: marketpress.php:4049
+#@ mp
+msgid "Nice Try..."
+msgstr "Bagus..."
+
+#: marketpress-includes/marketpress-ms.php:61
+#: marketpress.php:1810
+#: marketpress.php:4336
+#: marketpress.php:4419
+#: marketpress.php:4712
+#: marketpress.php:5144
+#@ mp
+msgid "Upgrade Now"
+msgstr "Tingkatkan Sekarang"
+
+#: marketpress-includes/marketpress-ms.php:61
+#@ mp
+msgid "Upgrade to MarketPress Pro to enable Multisite features &raquo;"
+msgstr "Tingkatkan ke MarketPress Pro untuk mengaktifkan fitur Multisitus &raquo;"
+
+#: marketpress-includes/marketpress-ms.php:66
+#: marketpress.php:4115
+#: marketpress.php:4707
+#: marketpress.php:5075
+#: marketpress.php:5153
+#@ mp
+msgid "General Settings"
+msgstr "Pengaturan Umum"
+
+#: marketpress-includes/marketpress-ms.php:70
+#@ mp
+msgid "Limit Global Widgets/Shortcodes To Main Blog"
+msgstr "Batas Widget Global/Kodesingkat ke Blog Utama"
+
+#: marketpress-includes/marketpress-ms.php:72
+#: marketpress-includes/marketpress-ms.php:79
+#: marketpress.php:4253
+#: marketpress.php:4265
+#: marketpress.php:4319
+#: marketpress.php:4353
+#: marketpress.php:4361
+#: marketpress.php:4738
+#: marketpress.php:4756
+#: marketpress.php:4788
+#: marketpress.php:4806
+#@ mp
+msgid "Yes"
+msgstr "Ya"
+
+#: marketpress-includes/marketpress-ms.php:73
+#: marketpress-includes/marketpress-ms.php:80
+#: marketpress.php:4254
+#: marketpress.php:4266
+#: marketpress.php:4321
+#: marketpress.php:4354
+#: marketpress.php:4362
+#: marketpress.php:4739
+#: marketpress.php:4757
+#: marketpress.php:4789
+#: marketpress.php:4807
+#@ mp
+msgid "No"
+msgstr "Tidak"
+
+#: marketpress-includes/marketpress-ms.php:77
+#@ mp
+msgid "Enable Global shopping cart"
+msgstr "Mengaktifkan Keranjang Belanja Global"
+
+#: marketpress-includes/marketpress-ms.php:88
+#@ mp
+msgid "Gateway Permissions"
+msgstr "Izin Pintu Pembayaran"
+
+#: marketpress-includes/marketpress-ms.php:88
+#@ mp
+msgid "Set payment gateway access permissions for network stores. The main site will maintain access to all gateways."
+msgstr "Atur akses izin pintu pembayaran untuk jaringan toko. Situs utama akan mengatur akses ke seluruh pintu pembayaran."
+
+#: marketpress-includes/marketpress-ms.php:98
+#: marketpress-includes/marketpress-ms.php:152
+#@ mp
+msgid "All Can Use"
+msgstr "Bisa Pakai Semua"
+
+#: marketpress-includes/marketpress-ms.php:100
+#: marketpress-includes/marketpress-ms.php:154
+#@ mp
+msgid "Supporter Sites Only"
+msgstr "Hanya Situs Pendukung"
+
+#: marketpress-includes/marketpress-ms.php:102
+#: marketpress-includes/marketpress-ms.php:156
+#@ mp
+msgid "No Access"
+msgstr "Tidak ada akses"
+
+#: marketpress-includes/marketpress-ms.php:118
+#@ mp
+msgid "Theme Permissions"
+msgstr "Izin Tema"
+
+#: marketpress-includes/marketpress-ms.php:118
+#@ mp
+msgid "Set theme access permissions for network stores."
+msgstr "Atur izin akses tema bagi jaringan toko."
+
+#: marketpress-includes/marketpress-ms.php:120
+#@ mp
+msgid "For a custom css theme, save your css file with the \"MarketPress Theme: NAME\" header in the \"/marketpress/css/themes/\" folder and it will appear in this list so you may select it."
+msgstr "Untuk standar css tema, simpan kepala file css anda dengan \"MarketPress Tema: NAMA\" di folder \"/marketpress/css/tema/\" dan tema tersebut akan muncul dalam daftar sehingga anda bisa memilihnya. "
+
+#: marketpress-includes/marketpress-ms.php:167
+#@ mp
+msgid "Global Marketplace URL Slugs"
+msgstr "URL Slugs Pasar Global"
+
+#: marketpress-includes/marketpress-ms.php:169
+#@ mp
+msgid "Customizes the url structure of global category and tag listings."
+msgstr "Sesuaikan struktur url pada kategori global dan daftar label. "
+
+#: marketpress-includes/marketpress-ms.php:172
+#@ mp
+msgid "Marketplace Base"
+msgstr "Asal Pasar"
+
+#: marketpress-includes/marketpress-ms.php:176
+#: marketpress.php:618
+#: marketpress.php:1423
+#: marketpress.php:5581
+#: marketpress.php:5587
+#@ mp
+msgid "Product Categories"
+msgstr "Kategori-kategori Produk"
+
+#: marketpress-includes/marketpress-ms.php:180
+#: marketpress.php:619
+#: marketpress.php:1424
+#: marketpress.php:5697
+#@ mp
+msgid "Product Tags"
+msgstr "Label-label Produk"
+
+#: marketpress-includes/marketpress-ms.php:193
+#: marketpress.php:4067
+#: marketpress.php:5219
+#@ mp
+msgid "Shortcodes"
+msgstr "Kodesingkat"
+
+#: marketpress-includes/marketpress-ms.php:195
+#@ mp
+msgid "Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1=\"value\" attr2=\"value\"]</em>. Note that depending on your preference above, you may only be able to use these on the main blog."
+msgstr "Kodesingkat membolehkan anda menyertakan isi toko dinamis dalam tulisan dan halaman pada situs anda. Simpel saja ketik atau gandakan kodesingkat pada isi tulisan anda atau halaman dimana anda ingin menampilkannya. Atribut pilihan dapat ditambahkan dengan format seperti <em>[kodesingkat attr1=nilai\" attr2=\"nilai\"]</em>. Catatan: pilihan tergantung pada pilihan anda diatas, anda hanya diperbolehkan menggunakannya pada blog utama."
+
+#: marketpress-includes/marketpress-ms.php:198
+#@ mp
+msgid "Global Products List"
+msgstr "Daftar Produk Global"
+
+#: marketpress-includes/marketpress-ms.php:201
+#@ mp
+msgid "Displays a network-wide list of products according to preference."
+msgstr "Tampilkan daftar panjang jaringan sesuai pilihan"
+
+#: marketpress-includes/marketpress-ms.php:203
+#: marketpress-includes/marketpress-ms.php:228
+#: marketpress-includes/marketpress-ms.php:243
+#: marketpress.php:5253
+#: marketpress.php:5266
+#: marketpress.php:5291
+#@ mp
+msgid "Optional Attributes:"
+msgstr "Atribut Pilihan:"
+
+#: marketpress-includes/marketpress-ms.php:205
+#@ mp
+msgid "\"paginate\" - Whether to paginate the product list. This is useful to only show a subset. Default: 1"
+msgstr "\"paginasi\" - Apakah memberi halaman daftar produk. Ini berguna hanya untuk menampilkan sebagian. Standar: 1"
+
+#: marketpress-includes/marketpress-ms.php:206
+#@ mp
+msgid "\"page\" - How many products to display in the product list if \"paginate\" is set to true. Default: 20"
+msgstr "\"page\" - Berapa produk untuk ditampilkan dalam daftar produk jika \"paginasi\" pengaturan benar. Standar: 20"
+
+#: marketpress-includes/marketpress-ms.php:207
+#@ mp
+msgid "\"per_page\" - How many products to display in the product list if \"paginate\" is set to 1."
+msgstr "\"per_page\" - Berapa produk ditampilkan dalam daftar produk jika \"paginasi\" pengaturan 1."
+
+#: marketpress-includes/marketpress-ms.php:208
+#@ mp
+msgid "\"order_by\" - What field to order products by. Can be: date, title, price, sales, rand. Default: date"
+msgstr "\"order_by\" - Apakah kolom berdasarkan pesanan produk. Bisa: tanggal, judul, harga, penjualan, acak. Standar: tanggal"
+
+#: marketpress-includes/marketpress-ms.php:209
+#: marketpress-includes/marketpress-ms.php:247
+#@ mp
+msgid "\"order\" - Direction to order products by. Can be: DESC, ASC. Default: DESC"
+msgstr "\"order\" - Arahan berdasarkan pesanan produk. Bisa DESC, ASC. Standar: DESC"
+
+#: marketpress-includes/marketpress-ms.php:210
+#: marketpress.php:5273
+#@ mp
+msgid "\"category\" - Limits list to a specific product category. Use the category Slug"
+msgstr "\"kategori\" - Batas daftar berdasarkan kategori produk khusus. Gunakan Slug kategori"
+
+#: marketpress-includes/marketpress-ms.php:211
+#: marketpress.php:5274
+#@ mp
+msgid "\"tag\" - Limits list to a specific product tag. Use the tag Slug"
+msgstr "\"lebel\" - Batas daftar label produk khusus. Gunakan Slug label"
+
+#: marketpress-includes/marketpress-ms.php:212
+#@ mp
+msgid "\"show_thumbnail\" - Whether to show the product thumbnail. Default: 1"
+msgstr "\"show_thumbnail\" - Apakah menampilkan thumbnail produk. Standar: 1"
+
+#: marketpress-includes/marketpress-ms.php:213
+#@ mp
+msgid "\"thumbnail_size\" - Max thumbnail width/height. Default: 150"
+msgstr "\"thumbnail_size\" - Maks thumbnail lebar/tinggi. Standar: 150"
+
+#: marketpress-includes/marketpress-ms.php:214
+#@ mp
+msgid "\"show_price\" - Whether to show the product price. Default: 1"
+msgstr "\"show_price\" - Apakah menampilkan harga produk. Standar: 1"
+
+#: marketpress-includes/marketpress-ms.php:215
+#@ mp
+msgid "\"text\" - Choose \"excerpt\", \"content\", or \"none\". Default: excerpt"
+msgstr "\"text\" - Pilih \"excerpt\", atau \"none\". Standar: excerpt"
+
+#: marketpress-includes/marketpress-ms.php:216
+#@ mp
+msgid "\"as_list\" - Whether to show as an unordered list. Default: 0"
+msgstr "\"as_list\" - Apakah menampilkan sebagai daftar belum dipesan. Standar: 0 "
+
+#: marketpress-includes/marketpress-ms.php:217
+#: marketpress-includes/marketpress-ms.php:232
+#: marketpress-includes/marketpress-ms.php:250
+#: marketpress.php:5256
+#: marketpress.php:5275
+#: marketpress.php:5295
+#@ mp
+msgid "Example:"
+msgstr "Contoh:"
+
+#: marketpress-includes/marketpress-ms.php:219
+#@ mp
+msgid "You may also use the mp_list_global_products() template function in your theme with the same arguments."
+msgstr "Anda juga boleh menggunakan fungsi template mp_list_global_products() pada tema anda dengan argumentasi sama."
+
+#: marketpress-includes/marketpress-ms.php:223
+#@ mp
+msgid "Global Tag Cloud"
+msgstr "Label Awan Global"
+
+#: marketpress-includes/marketpress-ms.php:226
+#@ mp
+msgid "Displays global most used product tags in cloud format from network MarketPress stores."
+msgstr "Tampilkan label produk global paling banyak digunakan dalam format awan dari jaringan toko MarketPress."
+
+#: marketpress-includes/marketpress-ms.php:230
+#@ mp
+msgid "\"limit\" - Maximum amount of tags to display. Default: 45"
+msgstr "\"limit\" - Maksimal jumlah label ditampilkan. Standar: 45"
+
+#: marketpress-includes/marketpress-ms.php:231
+#@ mp
+msgid "\"seperator\" - String to seperate tags by, like a comma, etc."
+msgstr "\"separator\" - Memisahkan string berdasarkan label-label, seperti koma, dsb."
+
+#: marketpress-includes/marketpress-ms.php:234
+#@ mp
+msgid "You may also use the mp_global_tag_cloud() template function in your theme with the same arguments."
+msgstr "Anda boleh menggunakan fungsi template mp_global_tag_cloud() pada tema anda dengan argumentasi sama."
+
+#: marketpress-includes/marketpress-ms.php:238
+#@ mp
+msgid "Global Categories List"
+msgstr "Daftar Kategori Global"
+
+#: marketpress-includes/marketpress-ms.php:241
+#@ mp
+msgid "Displays a network-wide HTML list of product categories according to preference."
+msgstr "Tampilkan jaringan-luas HTML dari daftar kategori produk menurut pilihan."
+
+#: marketpress-includes/marketpress-ms.php:245
+#@ mp
+msgid "\"limit\" - Text to display for showing all categories. Default: 50"
+msgstr "\"limit\" - Teks ditampilkan untuk menunjukkan semua kategori. Standar: 50"
+
+#: marketpress-includes/marketpress-ms.php:246
+#@ mp
+msgid "\"order_by\" - What column to use for ordering the categories. \"count\" or \"name\". Default: count"
+msgstr "\"order_by\" - Apakah kolom menggunakan pesanan menurut kategori. \"count\" or \"name\". Standar: count"
+
+#: marketpress-includes/marketpress-ms.php:248
+#@ mp
+msgid "\"show_count\" - Whether to show how many posts are in the category. Default: 0"
+msgstr "\"shown_count\" - Apakah ingin menampilkanberapa jumlah tulisan pada kategori. Standar: 0"
+
+#: marketpress-includes/marketpress-ms.php:249
+#@ mp
+msgid "\"include\" - What to show, \"tags\", \"categories\", or \"both\"."
+msgstr "\"include\" - Apakah menampilkan, \"label\", \"kategori\", atau \"keduanya\"."
+
+#: marketpress-includes/marketpress-ms.php:252
+#@ mp
+msgid "You may also use the mp_global_categories_list() template function in your theme with the same arguments."
+msgstr "Anda juga boleh menggunakan fungsi template mp_global_categories_list() pada tema anda dengan argumentasi sama."
+
+#: marketpress-includes/marketpress-ms.php:260
+#: marketpress.php:4376
+#: marketpress.php:4868
+#: marketpress.php:5031
+#: marketpress.php:5118
+#: marketpress.php:5194
+#@ mp
+msgid "Save Changes"
+msgstr "Simpan Perubahan"
+
+#: marketpress-includes/plugins-gateway/2checkout.php:8
+#@ mp
+msgid "2Checkout"
+msgstr "2Checkout"
+
+#: marketpress-includes/plugins-gateway/authorizenet-aim.php:8
+#@ mp
+msgid "Authorize.net AIM Checkout"
+msgstr "Authorized.net AIM Checkout"
+
+#: marketpress-includes/plugins-gateway/google-checkout.php:8
+#@ mp
+msgid "Google Checkout"
+msgstr "Google Checkout"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:43
+#: marketpress-includes/plugins-gateway/manual-payments.php:270
+#@ mp
+msgid "Manual Payments"
+msgstr "Manual Pembayaran"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:44
+#: marketpress-includes/plugins-gateway/manual-payments.php:184
+#@ mp
+msgid "Manual Payment"
+msgstr "Manual Pembayaran"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:127
+#@ mp
+msgid "Invoiced"
+msgstr "Faktur"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:130
+#@ mp
+msgid "Manual/Invoice"
+msgstr "Manual/Faktur"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:194
+#@ mp
+msgid "Manual Payments Settings"
+msgstr "Pengaturan Manual Pembiayaan"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:196
+#@ mp
+msgid "Record payments manually, such as by Cash, Check, or EFT."
+msgstr "Rekam pembayaran secara manual, misal menurut Cash, Check, atau EFT."
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:199
+#@ mp
+msgid "Method Name"
+msgstr "Nama metode"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:201
+#@ mp
+msgid "Enter a public name for this payment method that is displayed to users - No HTML"
+msgstr "Masukkan nama sehari-hari untuk metode pembayaran guna ditampilkan di pengguna - Tidak HTML"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:208
+#@ mp
+msgid "User Instructions"
+msgstr "Instruksi Pengguna"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:210
+#@ mp
+msgid "These are the manual payment instructions to display on the payments screen - HTML allowed"
+msgstr "Berikut instruksi manual pembayaran agar tampil di layar pembayaran - HTML diperbolehkan"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:217
+#@ mp
+msgid "Confirmation User Instructions"
+msgstr "Instruksi Konfirmasi Pengguna"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:219
+#@ mp
+msgid "These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed"
+msgstr "Berikut instruksi manual pembayaran agar tampil di layar konfirmasi. Total akan diganti dengan total pesanan. - HTML diperbolehkan."
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:226
+#@ mp
+msgid "Order Confirmation Email"
+msgstr "Email Konfirmasi Pesanan"
+
+#: marketpress-includes/plugins-gateway/manual-payments.php:228
+#@ mp
+msgid "This is the email text to send to those who have made manual payment checkouts. You should include your manual payment instructions here. It overrides the default order checkout email. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed."
+msgstr "Email ini dikirim kepada mereka yang melakukan checkout pembayaran manual. Anda harus menyertakan instruksi pembayaran manual disini. Ini mengesampingkan email pesanan periksa belanja standar. Kode-kode berikut akan diganti dengan penjelasan pesanan: NAMAPELANGGAN, IDPESANAN, INFOPESANAN, INFOPENGIRIMAN, INFOPEMBAYARAN, TOTAL, LACAKGURL. Tidak diperkenankan HTML."
+
+#: marketpress-includes/plugins-gateway/moneybookers.php:8
+#@ mp
+msgid "Moneybookers"
+msgstr "Moneybookers"
+
+#: marketpress-includes/plugins-gateway/paypal-chained-payments.php:8
+#@ mp
+msgid "PayPal Chained Payments"
+msgstr "PayPal Chained Payments"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:52
+#: marketpress-includes/plugins-gateway/paypal-express.php:1136
+#@ mp
+msgid "PayPal Express Checkout"
+msgstr "PayPal Express Checkout"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:53
+#@ mp
+msgid "PayPal"
+msgstr "PayPal"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:93
+#@ mp
+msgid "Your PayPal transaction has been canceled."
+msgstr "Transaksi Paypal anda telah dibatalkan."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:111
+#: marketpress-includes/plugins-gateway/paypal-express.php:360
+#: marketpress-includes/plugins-gateway/paypal-express.php:779
+#@ mp
+msgid "A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you."
+msgstr "Pengembalian kerugian telah dibatalkan; misalnya, ketika anda memenangkan perselisihan dengan pelanggan dan dana pengembalian kerugian telah dikembalikan kepada anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:115
+#: marketpress-includes/plugins-gateway/paypal-express.php:364
+#: marketpress-includes/plugins-gateway/paypal-express.php:784
+#@ mp
+msgid "The authorization period for this payment has been reached."
+msgstr "Masa otorisasi untuk pembayaran telah tercapai"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:119
+#: marketpress-includes/plugins-gateway/paypal-express.php:368
+#: marketpress-includes/plugins-gateway/paypal-express.php:789
+#@ mp
+msgid "An authorization for this transaction has been voided."
+msgstr "Otorisasi untuk transaksi ini telah dikosongkan"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:123
+#: marketpress-includes/plugins-gateway/paypal-express.php:372
+#: marketpress-includes/plugins-gateway/paypal-express.php:794
+#@ mp
+msgid "The payment has failed. This happens only if the payment was made from your customer's bank account."
+msgstr "Pembayaran gagal. Ini terjadi hanya apabila pembayaran dilakukan melalui akun bank pelanggan anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:127
+#: marketpress-includes/plugins-gateway/paypal-express.php:376
+#: marketpress-includes/plugins-gateway/paypal-express.php:799
+#@ mp
+msgid "The payment has been partially refunded."
+msgstr "Pembayaran sebagian telah dikembalikan"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:131
+#: marketpress-includes/plugins-gateway/paypal-express.php:380
+#: marketpress-includes/plugins-gateway/paypal-express.php:804
+#@ mp
+msgid "The transaction has not terminated, e.g. an authorization may be awaiting completion."
+msgstr "Transaksi belum selesai, misal, menunggu otorisasi penyelesaian."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:135
+#: marketpress-includes/plugins-gateway/paypal-express.php:384
+#: marketpress-includes/plugins-gateway/paypal-express.php:809
+#@ mp
+msgid "The payment has been completed, and the funds have been added successfully to your account balance."
+msgstr "Pembayaran telah lengkap, dan dana telah ditambahkan dengan sukses ke neraca keuangan anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:139
+#: marketpress-includes/plugins-gateway/paypal-express.php:388
+#: marketpress-includes/plugins-gateway/paypal-express.php:814
+#@ mp
+msgid "A payment has been accepted."
+msgstr "Pembayaran telah diterima."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:143
+#: marketpress-includes/plugins-gateway/paypal-express.php:392
+#: marketpress-includes/plugins-gateway/paypal-express.php:819
+#@ mp
+msgid "A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer:"
+msgstr "Pembayaran telah ditolak karena sebab pengembalian ongkos atau jenis pembayaran tidak diterima. Dana telah dihapus dari akun neraca anda dan dikembalikan kepada pembeli."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:146
+#: marketpress-includes/plugins-gateway/paypal-express.php:395
+#: marketpress-includes/plugins-gateway/paypal-express.php:822
+#@ mp
+msgid "A reversal has occurred on this transaction due to a chargeback by your customer."
+msgstr "Penolakan transaksi terjadi karena sebab pengembalian ongkos kepada pelanggan anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:147
+#: marketpress-includes/plugins-gateway/paypal-express.php:396
+#: marketpress-includes/plugins-gateway/paypal-express.php:823
+#@ mp
+msgid "A reversal has occurred on this transaction due to your customer triggering a money-back guarantee."
+msgstr "Penolakan transaksi terjadi karena sebab pelanggan anda mencetuskan garansi uang kembali."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:148
+#: marketpress-includes/plugins-gateway/paypal-express.php:397
+#: marketpress-includes/plugins-gateway/paypal-express.php:824
+#@ mp
+msgid "A reversal has occurred on this transaction due to a complaint about the transaction from your customer."
+msgstr "Penolakan transaksi terjadi karena sebab tuntutan tentang transaksi dari pelanggan anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:149
+#: marketpress-includes/plugins-gateway/paypal-express.php:398
+#: marketpress-includes/plugins-gateway/paypal-express.php:825
+#@ mp
+msgid "A reversal has occurred on this transaction because you have given the customer a refund."
+msgstr "Penolakan transaksi terjadi karena anda telah mengembalikan dana pelanggan."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:150
+#: marketpress-includes/plugins-gateway/paypal-express.php:399
+#: marketpress-includes/plugins-gateway/paypal-express.php:826
+#@ mp
+msgid "A reversal has occurred on this transaction due to an unknown reason."
+msgstr "Penolakan transaksi terjadi karena sebab alasan tidak diketahui."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:156
+#: marketpress-includes/plugins-gateway/paypal-express.php:405
+#: marketpress-includes/plugins-gateway/paypal-express.php:833
+#@ mp
+msgid "You refunded the payment."
+msgstr "Anda mengembalikan uang pembayaran."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:160
+#: marketpress-includes/plugins-gateway/paypal-express.php:409
+#: marketpress-includes/plugins-gateway/paypal-express.php:838
+#@ mp
+msgid "You denied the payment when it was marked as pending."
+msgstr "Anda meniadakan pembayaran ketika ditandai sebagai menunggu."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:165
+#: marketpress-includes/plugins-gateway/paypal-express.php:414
+#: marketpress-includes/plugins-gateway/paypal-express.php:844
+#@ mp
+msgid "The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences  section of your Profile."
+msgstr "Pembayaran menunggu karena pelanggan anda belum menyertakan konfirmasi alamat pengiriman dan Pilihan Penerimaan Pembayaran diatur semacam ini sehingga anda menginginkan menerima secara manual atau meniadakan setiap model pembayaran tanpa konfirmasi alamat pengiriman. Untuk mengubah pilihan, pergi ke bagian Pilihan pada profile anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:166
+#: marketpress-includes/plugins-gateway/paypal-express.php:415
+#: marketpress-includes/plugins-gateway/paypal-express.php:845
+#@ mp
+msgid "The payment is pending because it has been authorized but not settled. You must capture the funds first."
+msgstr "Pembayaran sedang proses menunggu karena belum beres. Sebelum itu anda harus meng-capture dana."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:167
+#: marketpress-includes/plugins-gateway/paypal-express.php:416
+#: marketpress-includes/plugins-gateway/paypal-express.php:846
+#@ mp
+msgid "The payment is pending because it was made by an eCheck that has not yet cleared."
+msgstr "Pembayaran sedang menunggu karena pembayaran melalui eCheck belum lengkap."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:168
+#: marketpress-includes/plugins-gateway/paypal-express.php:417
+#: marketpress-includes/plugins-gateway/paypal-express.php:847
+#@ mp
+msgid "The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview."
+msgstr "Pembayaran sedang menunggu karena akun anda berada diluar U.S. dan tidak memiliki mekanisme penukaran. Anda harus menerima pembayaran secara manual atau menolaknya dari ikhtisar akun anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:169
+#: marketpress-includes/plugins-gateway/paypal-express.php:418
+#: marketpress-includes/plugins-gateway/paypal-express.php:848
+#@ mp
+msgid "You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment."
+msgstr "Anda tidak memiliki neraca dalam pengiriman mata uang, dan anda tidak memiliki pengaturan konversi otomatis Pilihan Penerimaan Pembayaran dan menerima pembayaran ini. Anda harus menerima pembayaran secara manual atau menolaknya."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:170
+#: marketpress-includes/plugins-gateway/paypal-express.php:419
+#: marketpress-includes/plugins-gateway/paypal-express.php:849
+#@ mp
+msgid "The payment is pending because it is part of an order that has been authorized but not settled."
+msgstr "Pembayaran sedang menunggu karena merupakan bagian dari pesanan yang telah diotorisasi namun belum disetujui."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:171
+#: marketpress-includes/plugins-gateway/paypal-express.php:420
+#: marketpress-includes/plugins-gateway/paypal-express.php:850
+#@ mp
+msgid "The payment is pending while it is being reviewed by PayPal for risk."
+msgstr "Pembayaran sedang menunggu mengingat dipandang oleh Paypal sebagai beresiko."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:172
+#: marketpress-includes/plugins-gateway/paypal-express.php:421
+#: marketpress-includes/plugins-gateway/paypal-express.php:851
+#@ mp
+msgid "The payment is pending because it was made to an email address that is not yet registered or confirmed."
+msgstr "Pembayaran masih menunggu karena dilakukan melalui alamat email yang belum terdaftar atau dikonfirmasi."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:173
+#: marketpress-includes/plugins-gateway/paypal-express.php:422
+#: marketpress-includes/plugins-gateway/paypal-express.php:852
+#@ mp
+msgid "The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account."
+msgstr "Pembayaran masih menunggu karena dibayar lewat kartu kredit dan anda harus upgrade akun anda ke status Business atau Premier agar bisa menerima dana. Ini juga bisa berarti bahwa transaksi melebihi batas transaksi bulanan pada akun anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:174
+#: marketpress-includes/plugins-gateway/paypal-express.php:423
+#: marketpress-includes/plugins-gateway/paypal-express.php:853
+#@ mp
+msgid "The payment is pending because you are not yet verified. You must verify your account before you can accept this payment."
+msgstr "Pembayaran masih menunggu karena anda belum diverifikasi. Anda harus memverifikasi akun anda sebelum anda bisa menerima pembayaran ini."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:175
+#: marketpress-includes/plugins-gateway/paypal-express.php:424
+#: marketpress-includes/plugins-gateway/paypal-express.php:854
+#@ mp
+msgid "The payment is pending for an unknown reason. For more information, contact PayPal customer service."
+msgstr "Pembayaran sedang menunggu karena alasan tak diketahui. Untuk informasi lebih lanjut, hubungi layanan pelanggan Paypal."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:178
+#: marketpress-includes/plugins-gateway/paypal-express.php:427
+#: marketpress-includes/plugins-gateway/paypal-express.php:857
+#@ mp
+msgid "The payment is pending."
+msgstr "Pembayaran sedang menunggu."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:252
+#@ mp
+msgid "There was a problem connecting to PayPal to setup your purchase. Please try again."
+msgstr "Ada masalah menghubungi Paypal untuk mengatur pembelian anda. Silahkan ulangi lagi."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:301
+#, php-format
+#@ mp
+msgid "Please confirm your final payment for this order totaling %s. It will be made via your \"%s\" PayPal account."
+msgstr "Silahkan konfirmasi pembayaran akhir anda untuk pesanan total %s. Pembayaran dilakukan lewat \"%s\" akun Paypal anda."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:309
+#, php-format
+#@ mp
+msgid "There was a problem with your PayPal transaction. Please <a href=\"%s\">go back and try again</a>."
+msgstr "Ada masalah dengan transaksi Paypal anda. Silahkan <a href=\"%s\"> kembali dan ulangi lagi</a>."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:313
+#: marketpress-includes/template-functions.php:665
+#: marketpress-includes/template-functions.php:681
+#, php-format
+#@ mp
+msgid "Whoops, looks like you skipped a step! Please <a href=\"%s\">go back and try again</a>."
+msgstr "Uups, sepertinya anda melewati langkah! Silahkan <a href=\"%s\">kembali dan ulangi lagi</a>."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:353
+#@ mp
+msgid "eCheck"
+msgstr "eCheck"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:353
+#@ mp
+msgid "PayPal balance, Credit Card, or Instant Transfer"
+msgstr "Neraca Paypal, Kartu Kredit, atau Transfer Langsung"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:466
+#: marketpress-includes/plugins-gateway/paypal-express.php:469
+#, php-format
+#@ mp
+msgid "There was a problem finalizing your purchase with PayPal. Please <a href=\"%s\">go back and try again</a>."
+msgstr "Ada masalah dalam penyelesaian pembelian anda lewat Paypal. Silahkan <a href=\"%s\">kembali dan ulangi lagi</a>. "
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:500
+#, php-format
+#@ mp
+msgid "Your order(s) for %s store(s) totaling %s were successful."
+msgstr "Pesanan anda untuk %s toko total %s telah berhasil."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:508
+#, php-format
+#@ mp
+msgid "Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:"
+msgstr "Pembayaran Paypal anda untuk pesanan total %s belum lengkap. Berikut status terakhir:"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:515
+#, php-format
+#@ mp
+msgid "Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>."
+msgstr "Pembayaran Paypal anda untuk total pesanan %s lengkap. Jumlah transaksi Paypal <strong>%s</strong>."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:579
+#@ mp
+msgid "PayPal Express Checkout Settings"
+msgstr "Pengaturan Paypal Express Checkout."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:581
+#@ mp
+msgid "Express Checkout is PayPal's premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted\">More Info &raquo;</a>"
+msgstr "Express Checkout adalah solusi Paypal premier chechkout yang mempersingkat proses bagi pembeli dan menjaga mereka tetap di situs anda setelah melakukan pembelian. Paypal Pro, sebaliknya, tidak ada biaya tambahan untuk menggunakan Express Checkout, tapi anda perlu upgrade gratis ke akun business. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted\">Info Lebih Lanjut  &raquo;</a>"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:584
+#: marketpress-includes/plugins-gateway/paypal-express.php:1213
+#@ mp
+msgid "PayPal Site"
+msgstr "Situs Paypal"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:618
+#: marketpress-includes/plugins-gateway/paypal-express.php:1247
+#@ mp
+msgid "Paypal Currency"
+msgstr "Mata Uang Paypal"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:657
+#: marketpress-includes/plugins-gateway/paypal-express.php:1286
+#@ mp
+msgid "PayPal Mode"
+msgstr "Mode Paypal"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:660
+#: marketpress-includes/plugins-gateway/paypal-express.php:1289
+#@ mp
+msgid "Sandbox"
+msgstr "Sandbox"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:661
+#: marketpress-includes/plugins-gateway/paypal-express.php:1290
+#@ mp
+msgid "Live"
+msgstr "Live"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:666
+#@ mp
+msgid "PayPal Merchant E-mail"
+msgstr "PayPal Merchant E-mail"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:672
+#: marketpress-includes/plugins-gateway/paypal-express.php:1295
+#@ mp
+msgid "PayPal API Credentials"
+msgstr "PayPal API Credentials"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:674
+#: marketpress-includes/plugins-gateway/paypal-express.php:1297
+#@ mp
+msgid "You must login to PayPal and create an API signature to get your credentials. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_NVPAPIBasics#id084DN0AK0HS\">Instructions &raquo;</a>"
+msgstr "Anda harus masuk ke Paypal dan buat sebuah API signature untuk memperoleh creditial anda. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_NVPAPIBasics#id084DN0AK0HS\">Instruksi &raquo;</a>"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:675
+#: marketpress-includes/plugins-gateway/paypal-express.php:1298
+#@ mp
+msgid "API Username"
+msgstr "API Pengguna"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:678
+#: marketpress-includes/plugins-gateway/paypal-express.php:1301
+#@ mp
+msgid "API Password"
+msgstr "API Sandi"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:681
+#: marketpress-includes/plugins-gateway/paypal-express.php:1304
+#@ mp
+msgid "Signature"
+msgstr "Signature"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:687
+#: marketpress-includes/plugins-gateway/paypal-express.php:1310
+#@ mp
+msgid "PayPal Header Image (optional)"
+msgstr "PayPal Header Image (pilihan)"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:689
+#: marketpress-includes/plugins-gateway/paypal-express.php:1312
+#@ mp
+msgid "URL for an image you want to appear at the top left of the payment page. The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal recommends that you provide an image that is stored on a secure (https) server. If you do not specify an image, the business name is displayed."
+msgstr "URL untuk gambar jika anda ingin muncul di kiri atas pada halaman pembayaran. Ukuran lembar maksimal gambar 750 pixel kali 90 pixel tinggi. Paypal merekomendasikan agar anda menyediakan gambar yang disimpan dengan aman di server (https). Jika anda tidak menyediakan gambar, nama bisnis yang dipakai. "
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:696
+#: marketpress-includes/plugins-gateway/paypal-express.php:1319
+#@ mp
+msgid "PayPal Header Border Color (optional)"
+msgstr "Warna Garis Kepala Paypal (pilihan)"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:698
+#: marketpress-includes/plugins-gateway/paypal-express.php:1321
+#@ mp
+msgid "Sets the border color around the header of the payment page. The border is a 2-pixel perimeter around the header space, which is 750 pixels wide by 90 pixels high. By default, the color is black."
+msgstr "Pengaturan warna garis sekitar kepala halaman pembayaran. Ukuran garis sekitar 2-pixel dengan lebar 750 pixel dan tinggi 90 pixel. Standar, warna hitam."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:705
+#: marketpress-includes/plugins-gateway/paypal-express.php:1328
+#@ mp
+msgid "PayPal Header Background Color (optional)"
+msgstr "Warna Latar Kepala Paypal (pilihan)"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:707
+#: marketpress-includes/plugins-gateway/paypal-express.php:1330
+#@ mp
+msgid "Sets the background color for the header of the payment page. By default, the color is white."
+msgstr "Pengaturan warna latar untuk kepala halaman pembayaran. Standar, warna putih."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:714
+#: marketpress-includes/plugins-gateway/paypal-express.php:1337
+#@ mp
+msgid "PayPal Page Background Color (optional)"
+msgstr "Warna Latar Halaman Paypal (pilihan)"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:716
+#: marketpress-includes/plugins-gateway/paypal-express.php:1339
+#@ mp
+msgid "Sets the background color for the payment page. By default, the color is white."
+msgstr "Pengaturan warna latar untuk halaman pembayaran. Standar, warna putih."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:771
+#@ mp
+msgid "There was a problem verifying the IPN string with PayPal. Please try again."
+msgstr "Ada masalah dalam verifikasi IPN Paypal. Silahkan ulangi lagi."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:979
+#, php-format
+#@ mp
+msgid "%s Store Purchase - Order ID: %s"
+msgstr "%s Pembelian Toko - ID Pesanan: %s"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:1104
+#@ mp
+msgid "There was a problem connecting to PayPal. Please try again."
+msgstr "Ada masalah koneksi dengan Paypal. Silahkan ulangi lagi."
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:1208
+#@ mp
+msgid "PayPal Express Checkout Global Cart Settings"
+msgstr "Pengaturan PayPal Express Checkout Global Cart"
+
+#: marketpress-includes/plugins-gateway/paypal-express.php:1210
+#@ mp
+msgid "Express Checkout is PayPal's premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. This gateway allows carts from up to 10 stores to checkout at once using parallel payments. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted\">More Info &raquo;</a>"
+msgstr "Express Checkout adalah solusi pembayaran Paypal premier, yang mempersingkat proses pembayaran bagi pembeli dan menjaga pengunjung berada di situs anda setelah membeli. Tidak seperti Paypal Pro, layanan Express Checkout tidak dipungut biaya tambahan, namun demikian anda perlu upgrade ke akun bisnis. Metode pembayaran ini bisa melakukan transaksi sampai 10 toko sekaligus menggunakan pembayaran paralel. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted\">Info Selanjutnya &raquo;</a>"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:23
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:294
+#@ mp
+msgid "Flat Rate"
+msgstr "Harga Umum"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:64
+#@ mp
+msgid "Flat Rate Settings"
+msgstr "Pengaturan Harga Umum"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:66
+#@ mp
+msgid "Be sure to enter a shipping price for every option or those customers may get free shipping."
+msgstr "Pastikan masukkan biaya pengiriman untuk setiap pilihan atau pelanggan bisa mendapatkan bebas biaya kirim."
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:73
+#@ mp
+msgid "Lower 48 States"
+msgstr "Dibawah 48 Negara"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:79
+#@ mp
+msgid "Hawaii and Alaska"
+msgstr "Hawaii dan Alaska"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:85
+#@ mp
+msgid "Canada"
+msgstr "Canada"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:91
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:114
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:139
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:154
+#@ mp
+msgid "International"
+msgstr "Internasional"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:102
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:127
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:148
+#@ mp
+msgid "In Country"
+msgstr "Dalam Negeri"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:108
+#@ mp
+msgid "United States"
+msgstr "Amerika Serikat"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:133
+#@ mp
+msgid "European Union"
+msgstr "Uni Eropa"
+
+#: marketpress-includes/plugins-shipping/mp-flat-rate.php:188
+#@ mp
+msgid "Extra Shipping Cost"
+msgstr "Biaya Pengiriman Tambahan"
+
+#: marketpress-includes/plugins-shipping/plugin-template.php:22
+#@ mp
+msgid "My Plugin"
+msgstr "Plugin Saya"
+
+#: marketpress-includes/template-functions.php:152
+#: marketpress-includes/template-functions.php:1196
+#: marketpress.php:5482
+#@ mp
+msgid "No Products"
+msgstr "Tidak Ada Produk"
+
+#: marketpress-includes/template-functions.php:183
+#: marketpress-includes/template-functions.php:280
+#: marketpress-includes/template-functions.php:359
+#@ mp
+msgid "Item:"
+msgstr "Barang:"
+
+#: marketpress-includes/template-functions.php:184
+#: marketpress-includes/template-functions.php:282
+#: marketpress-includes/template-functions.php:361
+#@ mp
+msgid "Price:"
+msgstr "Harga:"
+
+#: marketpress-includes/template-functions.php:185
+#: marketpress-includes/template-functions.php:1461
+#@ mp
+msgid "Quantity:"
+msgstr "Kuantitas:"
+
+#: marketpress-includes/template-functions.php:203
+#@ mp
+msgid "Remove"
+msgstr "Hapus"
+
+#: marketpress-includes/template-functions.php:224
+#: marketpress-includes/template-functions.php:321
+#: marketpress-includes/template-functions.php:388
+#@ mp
+msgid "Subtotal:"
+msgstr "Subtotal:"
+
+#: marketpress-includes/template-functions.php:229
+#: marketpress-includes/template-functions.php:325
+#@ mp
+msgid "Discount:"
+msgstr "Diskon:"
+
+#: marketpress-includes/template-functions.php:231
+#@ mp
+msgid "Remove Coupon &raquo;"
+msgstr "Hapus Kupon &raquo;"
+
+#: marketpress-includes/template-functions.php:237
+#@ mp
+msgid "Have a coupon code?"
+msgstr "Punya  kode kupon?"
+
+#: marketpress-includes/template-functions.php:239
+#@ mp
+msgid "Enter your code:"
+msgstr "Masukan kodepos anda"
+
+#: marketpress-includes/template-functions.php:241
+#@ mp
+msgid "Apply &raquo;"
+msgstr "Pakai &raquo;"
+
+#: marketpress-includes/template-functions.php:252
+#: marketpress-includes/template-functions.php:334
+#: marketpress-includes/template-functions.php:912
+#: marketpress.php:3193
+#: marketpress.php:3658
+#@ mp
+msgid "Shipping:"
+msgstr "Pengiriman:"
+
+#: marketpress-includes/template-functions.php:262
+#: marketpress-includes/template-functions.php:343
+#: marketpress-includes/template-functions.php:917
+#: marketpress.php:3197
+#: marketpress.php:3664
+#@ mp
+msgid "Taxes:"
+msgstr "Pajak:"
+
+#: marketpress-includes/template-functions.php:270
+#: marketpress-includes/template-functions.php:350
+#: marketpress.php:3668
+#@ mp
+msgid "Cart Total:"
+msgstr "Total Keranjang:"
+
+#: marketpress-includes/template-functions.php:272
+#@ mp
+msgid "Update Cart &raquo;"
+msgstr "Update Keranjang &raquo;"
+
+#: marketpress-includes/template-functions.php:281
+#: marketpress-includes/template-functions.php:360
+#@ mp
+msgid "Qty:"
+msgstr "Qty:"
+
+#: marketpress-includes/template-functions.php:411
+#: marketpress-includes/template-functions.php:442
+#@ mp
+msgid "Checkout Now &raquo;"
+msgstr "Periksa Sekarang &raquo;"
+
+#: marketpress-includes/template-functions.php:416
+#@ mp
+msgid "Have a User Account?"
+msgstr "Punya Akun Pengguna?"
+
+#: marketpress-includes/template-functions.php:419
+#@ mp
+msgid "Register To Checkout"
+msgstr "Daftar untuk Periksa Belanja"
+
+#: marketpress-includes/template-functions.php:421
+#@ mp
+msgid "Checkout Directly"
+msgstr "Langsung Periksa Belanja"
+
+#: marketpress-includes/template-functions.php:427
+#: marketpress-includes/template-functions.php:1043
+#@ mp
+msgid "Username"
+msgstr "Nama Pengguna"
+
+#: marketpress-includes/template-functions.php:430
+#: marketpress-includes/template-functions.php:1046
+#@ mp
+msgid "Password"
+msgstr "Sandi"
+
+#: marketpress-includes/template-functions.php:433
+#@ mp
+msgid "Login and Checkout &raquo;"
+msgstr "Masuk dan Periksa Belanja &raquo;"
+
+#: marketpress-includes/template-functions.php:437
+#: marketpress-includes/template-functions.php:1053
+#@ mp
+msgid "or"
+msgstr "atau"
+
+#: marketpress-includes/template-functions.php:440
+#@ mp
+msgid "Register Now To Checkout &raquo;"
+msgstr "Daftar Sekarang untuk Periksa Belanja &raquo;"
+
+#: marketpress-includes/template-functions.php:477
+#@ mp
+msgid "Made a purchase here before?"
+msgstr "Pernah belanja disini sebelumnya?"
+
+#: marketpress-includes/template-functions.php:477
+#@ mp
+msgid "Login now to retrieve your saved info &raquo;"
+msgstr "Masuk sekarang untuk mendapatkan kembali informasi yang anda simpan &raquo;"
+
+#: marketpress-includes/template-functions.php:488
+#@ mp
+msgid "Enter Your Shipping Information:"
+msgstr "Masukan Informasi Alamat Pengiriman anda:"
+
+#: marketpress-includes/template-functions.php:492
+#: marketpress-includes/template-functions.php:564
+#: marketpress.php:2974
+#: marketpress.php:3051
+#: marketpress.php:3685
+#@ mp
+msgid "Email:"
+msgstr "Email:"
+
+#: marketpress-includes/template-functions.php:497
+#: marketpress-includes/template-functions.php:568
+#: marketpress-includes/template-functions.php:927
+#: marketpress.php:2979
+#: marketpress.php:3056
+#: marketpress.php:3203
+#: marketpress.php:3680
+#@ mp
+msgid "Full Name:"
+msgstr "Nama Lengkap:"
+
+#: marketpress-includes/template-functions.php:502
+#: marketpress-includes/template-functions.php:572
+#: marketpress-includes/template-functions.php:932
+#: marketpress.php:2984
+#: marketpress.php:3061
+#: marketpress.php:3204
+#: marketpress.php:3677
+#: marketpress.php:3690
+#@ mp
+msgid "Address:"
+msgstr "Alamat:"
+
+#: marketpress-includes/template-functions.php:505
+#: marketpress.php:2987
+#: marketpress.php:3064
+#@ mp
+msgid "Street address, P.O. box, company name, c/o"
+msgstr "Alamat jalan, P.O. box, nama perusahaan, c/o"
+
+#: marketpress-includes/template-functions.php:509
+#: marketpress-includes/template-functions.php:578
+#: marketpress-includes/template-functions.php:938
+#: marketpress.php:2991
+#: marketpress.php:3068
+#: marketpress.php:3206
+#: marketpress.php:3696
+#@ mp
+msgid "Address 2:"
+msgstr "Alamat 2:"
+
+#: marketpress-includes/template-functions.php:511
+#: marketpress.php:2994
+#: marketpress.php:3071
+#@ mp
+msgid "Apartment, suite, unit, building, floor, etc."
+msgstr "Apartemen, suite, unit, gedung, lantai, ect."
+
+#: marketpress-includes/template-functions.php:515
+#: marketpress-includes/template-functions.php:584
+#: marketpress-includes/template-functions.php:944
+#: marketpress.php:2998
+#: marketpress.php:3075
+#: marketpress.php:3207
+#: marketpress.php:3702
+#@ mp
+msgid "City:"
+msgstr "Kota:"
+
+#: marketpress-includes/template-functions.php:520
+#: marketpress-includes/template-functions.php:590
+#: marketpress-includes/template-functions.php:950
+#: marketpress.php:3003
+#: marketpress.php:3080
+#: marketpress.php:3209
+#: marketpress.php:3708
+#@ mp
+msgid "State/Province/Region:"
+msgstr "Negarabagian/Propinsi/Daerah:"
+
+#: marketpress-includes/template-functions.php:525
+#: marketpress-includes/template-functions.php:596
+#: marketpress-includes/template-functions.php:956
+#: marketpress.php:3008
+#: marketpress.php:3085
+#: marketpress.php:3210
+#: marketpress.php:3714
+#@ mp
+msgid "Postal/Zip Code:"
+msgstr "Pos/Kode Pos:"
+
+#: marketpress-includes/template-functions.php:530
+#: marketpress-includes/template-functions.php:601
+#: marketpress-includes/template-functions.php:961
+#: marketpress.php:3013
+#: marketpress.php:3090
+#: marketpress.php:3211
+#: marketpress.php:3719
+#@ mp
+msgid "Country:"
+msgstr "Negeri"
+
+#: marketpress-includes/template-functions.php:540
+#: marketpress-includes/template-functions.php:607
+#: marketpress-includes/template-functions.php:967
+#: marketpress.php:3025
+#: marketpress.php:3102
+#: marketpress.php:3213
+#: marketpress.php:3725
+#@ mp
+msgid "Phone Number:"
+msgstr "Nomor Telpon:"
+
+#: marketpress-includes/template-functions.php:559
+#: marketpress-includes/template-functions.php:924
+#@ mp
+msgid "Shipping Information:"
+msgstr "Informasi Pengiriman:"
+
+#: marketpress-includes/template-functions.php:560
+#@ mp
+msgid "&laquo; Edit"
+msgstr "&laquo; Perbaiki"
+
+#: marketpress-includes/template-functions.php:638
+#@ mp
+msgid "Choose a Payment Method:"
+msgstr "Pilih Cara Pembayaran"
+
+#: marketpress-includes/template-functions.php:673
+#@ mp
+msgid "Confirm Payment &raquo;"
+msgstr "Konfirmasi Pembayaran &raquo;"
+
+#: marketpress-includes/template-functions.php:689
+#, php-format
+#@ mp
+msgid "You may track the latest status of your order(s) here:<br />%s"
+msgstr "Anda bisa menelusuri status terakhir pesanan anda disini: <br />%s"
+
+#: marketpress-includes/template-functions.php:724
+#: marketpress-includes/template-functions.php:767
+#@ mp
+msgid "Empty your shopping cart"
+msgstr "Kosongkan keranjang belanja anda"
+
+#: marketpress-includes/template-functions.php:724
+#: marketpress-includes/template-functions.php:767
+#@ mp
+msgid "Empty Cart"
+msgstr "Keranjang Kosong"
+
+#: marketpress-includes/template-functions.php:725
+#: marketpress-includes/template-functions.php:768
+#@ mp
+msgid "Go To Checkout Page"
+msgstr "Pergi ke Halaman Periksa"
+
+#: marketpress-includes/template-functions.php:725
+#: marketpress-includes/template-functions.php:768
+#@ mp
+msgid "Checkout &raquo;"
+msgstr "Periksa &raquo;"
+
+#: marketpress-includes/template-functions.php:772
+#: marketpress.php:2158
+#@ mp
+msgid "There are no items in your cart."
+msgstr "Tidak ada barang dalam keranjang anda."
+
+#: marketpress-includes/template-functions.php:773
+#: marketpress.php:2161
+#@ mp
+msgid "Browse Products &raquo;"
+msgstr "Cari Produk &raquo;"
+
+#: marketpress-includes/template-functions.php:799
+#, php-format
+#@ mp
+msgid "Order Details (%s):"
+msgstr "Pesanan selengkapnya (%s):"
+
+#: marketpress-includes/template-functions.php:801
+#: marketpress.php:3507
+#@ mp
+msgid "Current Status"
+msgstr "Status Sekarang"
+
+#: marketpress-includes/template-functions.php:812
+#: marketpress-includes/template-functions.php:815
+#: marketpress-includes/template-functions.php:819
+#: marketpress.php:3520
+#: marketpress.php:3523
+#: marketpress.php:3527
+#: marketpress.php:3532
+#@ mp
+msgid "Received:"
+msgstr "Diterima:"
+
+#: marketpress-includes/template-functions.php:814
+#: marketpress-includes/template-functions.php:818
+#: marketpress.php:3522
+#: marketpress.php:3526
+#: marketpress.php:3531
+#@ mp
+msgid "Paid:"
+msgstr "Telah Dibayar:"
+
+#: marketpress-includes/template-functions.php:817
+#: marketpress.php:3525
+#: marketpress.php:3530
+#@ mp
+msgid "Shipped:"
+msgstr "Terkirim:"
+
+#: marketpress-includes/template-functions.php:827
+#@ mp
+msgid "Payment Information:"
+msgstr "Informasi Pembayaran:"
+
+#: marketpress-includes/template-functions.php:830
+#: marketpress.php:3216
+#@ mp
+msgid "Payment Method:"
+msgstr "Cara Pembayaran:"
+
+#: marketpress-includes/template-functions.php:834
+#: marketpress.php:3219
+#: marketpress.php:3547
+#@ mp
+msgid "Payment Type:"
+msgstr "Jenis Pembayaran:"
+
+#: marketpress-includes/template-functions.php:838
+#: marketpress.php:3222
+#: marketpress.php:3553
+#@ mp
+msgid "Transaction ID:"
+msgstr "ID Transaksi:"
+
+#: marketpress-includes/template-functions.php:842
+#: marketpress.php:3224
+#: marketpress.php:3558
+#@ mp
+msgid "Payment Total:"
+msgstr "Total Pembayaran:"
+
+#: marketpress-includes/template-functions.php:848
+#@ mp
+msgid "Order Information:"
+msgstr "Informasi Pesanan:"
+
+#: marketpress-includes/template-functions.php:852
+#: marketpress.php:3604
+#@ mp
+msgid "Item"
+msgstr "Barang"
+
+#: marketpress-includes/template-functions.php:853
+#@ mp
+msgid "Quantity"
+msgstr "Kuantitas"
+
+#: marketpress-includes/template-functions.php:854
+#: marketpress.php:1418
+#: marketpress.php:1734
+#: marketpress.php:3606
+#@ mp
+msgid "Price"
+msgstr "Harga"
+
+#: marketpress-includes/template-functions.php:855
+#: marketpress.php:3607
+#@ mp
+msgid "Subtotal"
+msgstr "Subtotal"
+
+#: marketpress-includes/template-functions.php:856
+#@ mp
+msgid "Download"
+msgstr "Unduh"
+
+#: marketpress-includes/template-functions.php:885
+#@ mp
+msgid "Download&raquo;"
+msgstr "Unduh&raquo;"
+
+#: marketpress-includes/template-functions.php:887
+#@ mp
+msgid "Limit Reached"
+msgstr "Batas Terpenuhi"
+
+#: marketpress-includes/template-functions.php:889
+#@ mp
+msgid "Awaiting Payment"
+msgstr "Pembayaran Menunggu"
+
+#: marketpress-includes/template-functions.php:899
+#: marketpress.php:3644
+#@ mp
+msgid "No products could be found for this order"
+msgstr "Tidak ditemukan produk untuk pesanan ini"
+
+#: marketpress-includes/template-functions.php:907
+#: marketpress.php:3189
+#: marketpress.php:3652
+#@ mp
+msgid "Coupon Discount:"
+msgstr "Kupon Diskon:"
+
+#: marketpress-includes/template-functions.php:920
+#: marketpress.php:3200
+#@ mp
+msgid "Order Total:"
+msgstr "Total Pesanan:"
+
+#: marketpress-includes/template-functions.php:974
+#: marketpress.php:3498
+#@ mp
+msgid "&laquo; Back"
+msgstr "&laquo: Kembali"
+
+#: marketpress-includes/template-functions.php:978
+#@ mp
+msgid "Invalid Order ID. Please try again:"
+msgstr "ID Pesanan salah. Silahkan ulangi lagi:"
+
+#: marketpress-includes/template-functions.php:981
+#: marketpress-includes/template-functions.php:1056
+#: marketpress-includes/template-functions.php:1068
+#@ mp
+msgid "Enter your 12-digit Order ID number:"
+msgstr "Masukan 12-digit Nomor ID anda:"
+
+#: marketpress-includes/template-functions.php:983
+#: marketpress-includes/template-functions.php:1026
+#: marketpress-includes/template-functions.php:1058
+#: marketpress-includes/template-functions.php:1070
+#@ mp
+msgid "Look Up &raquo;"
+msgstr "Cari &raquo;"
+
+#: marketpress-includes/template-functions.php:1016
+#@ mp
+msgid "Your Recent Orders:"
+msgstr "Pesanan Terbaru Anda:"
+
+#: marketpress-includes/template-functions.php:1024
+#@ mp
+msgid "Or enter your 12-digit Order ID number:"
+msgstr "Atau masukkan 12-digit Nomor ID pesanan anda:"
+
+#: marketpress-includes/template-functions.php:1036
+#@ mp
+msgid "Have a User Account? Login To View Your Order History:"
+msgstr "Punya Akun Pengguna? Masuk untuk melihat ringkasan Pesanan Anda:"
+
+#: marketpress-includes/template-functions.php:1049
+#@ mp
+msgid "Login &raquo;"
+msgstr "Masuk &raquo;"
+
+#: marketpress-includes/template-functions.php:1221
+#@ mp
+msgid "Uncatagorized"
+msgstr "Tidak terkategori"
+
+#: marketpress-includes/template-functions.php:1238
+#@ mp
+msgid "No Tags"
+msgstr "Tidak ada Label"
+
+#: marketpress-includes/template-functions.php:1336
+#@ mp
+msgid "Price: "
+msgstr "Harga:"
+
+#: marketpress-includes/template-functions.php:1416
+#: marketpress-includes/template-functions.php:1453
+#: marketpress-includes/template-functions.php:1468
+#@ mp
+msgid "Buy Now &raquo;"
+msgstr "Beli Sekarang &raquo;"
+
+#: marketpress-includes/template-functions.php:1423
+#: marketpress.php:520
+#@ mp
+msgid "Out of Stock"
+msgstr "Stok Habis"
+
+#: marketpress-includes/template-functions.php:1448
+#@ mp
+msgid "Choose Option &raquo;"
+msgstr "Pilih Opsi &raquo;"
+
+#: marketpress-includes/template-functions.php:1451
+#: marketpress-includes/template-functions.php:1466
+#@ mp
+msgid "Add To Cart &raquo;"
+msgstr "Tambah ke dalam keranjang &raquo;"
+
+#: marketpress-includes/template-functions.php:1530
+#@ mp
+msgid "View Larger Image &raquo;"
+msgstr "Perbesar gambar &raquo;"
+
+#: marketpress-includes/template-functions.php:1579
+#: marketpress-includes/template-functions.php:1672
+#: marketpress.php:569
+#: marketpress.php:1169
+#: marketpress.php:1219
+#: marketpress.php:5337
+#: marketpress.php:5374
+#@ mp
+msgid "Shopping Cart"
+msgstr "Keranjang Belanja"
+
+#: marketpress-includes/template-functions.php:1600
+#@ mp
+msgid "Visit Store"
+msgstr "Kunjungi Toko"
+
+#: marketpress-includes/template-functions.php:1621
+#@ mp
+msgid "View Products"
+msgstr "Lihat Produk"
+
+#: marketpress-includes/template-functions.php:1642
+#@ mp
+msgid "Check Order Status"
+msgstr "Cek Status Pesanan"
+
+#: marketpress-includes/template-functions.php:1671
+#: marketpress-includes/template-functions.php:1677
+#: marketpress.php:624
+#: marketpress.php:625
+#: marketpress.php:1168
+#: marketpress.php:1176
+#: marketpress.php:1204
+#: marketpress.php:1290
+#@ mp
+msgid "Products"
+msgstr "Produk"
+
+#: marketpress-includes/template-functions.php:1673
+#: marketpress.php:1170
+#: marketpress.php:1230
+#@ mp
+msgid "Order Status"
+msgstr "Status Pesanan"
+
+#. Translators: change default slugs here
+#: marketpress.php:169
+#@ mp
+msgid "store"
+msgstr "toko"
+
+#: marketpress.php:170
+#@ mp
+msgid "products"
+msgstr "produk"
+
+#: marketpress.php:171
+#@ mp
+msgid "shopping-cart"
+msgstr "keranjang belanja"
+
+#: marketpress.php:172
+#@ mp
+msgid "order-status"
+msgstr "status-pesanan"
+
+#: marketpress.php:173
+#@ mp
+msgid "category"
+msgstr "kategori"
+
+#: marketpress.php:174
+#@ mp
+msgid "tag"
+msgstr "label"
+
+#: marketpress.php:203
+#@ mp
+msgid "<p>If you have any questions about your order please do not hesitate to contact us.</p>"
+msgstr "<p>Jika anda punya pertanyaan tentang pesanan anda silahkan jangan ragu menghubungi kami.</p>"
+
+#: marketpress.php:205
+#@ mp
+msgid "<p>Please enter your shipping information in the form below to proceed with your order.</p>"
+msgstr "<p>Silahkan masukan informasi alamat pengiriman anda pada formulir dibawah untuk diproses dengan pesanan anda.</p>"
+
+#: marketpress.php:207
+#@ mp
+msgid "<p>You are almost done! Please do a final review of your order to make sure everything is correct then click the \"Confirm Payment\" button.</p>"
+msgstr "<p>Hampir selesai! Silahkan cek akhir pesanan anda untuk memastkan semuanya benar lalu klik tombol \"Konfirmasi Pembayaran\".</p>"
+
+#: marketpress.php:208
+#@ mp
+msgid "<p>Thank you for your order! We appreciate your business, and please come back often to check out our new products.</p>"
+msgstr "<p>Terima kasih atas pesanan anda! Kami sangat bangsa berbisnis dengan anda, dan silahkan kembali untuk mengecek produk-produk terbaru kami.</p>"
+
+#: marketpress.php:212
+#@ mp
+msgid "Your Order Confirmation (ORDERID)"
+msgstr "Konfirmasi Pembayaran Anda (IDPESANAN)"
+
+#: marketpress.php:213
+#@ mp
+msgid ""
+"Thank you for your order CUSTOMERNAME!\n"
+"\n"
+"Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n"
+"Here is a confirmation of your order details:\n"
+"\n"
+"Order Information:\n"
+"ORDERINFO\n"
+"\n"
+"Shipping Information:\n"
+"SHIPPINGINFO\n"
+"\n"
+"Payment Information:\n"
+"PAYMENTINFO\n"
+"\n"
+"You can track the latest status of your order here: TRACKINGURL\n"
+"\n"
+"Thanks again!"
+msgstr ""
+"Terima kasih atas pesanan NAMAPELANGGAN!\n"
+"\n"
+"Pesanan anda telah diterima, dan barang akan dikirim secepat mungkin. Silahkan tunjukkan ID Pesanan anda (IDPESANAN) pada saat menghubungi anda.\n"
+"Berikut ini konfirmasi detil pesanan anda:\n"
+"\n"
+"Informasi Pesanan:\n"
+"INFOPESANAN\n"
+"\n"
+"Informasi Pengiriman:\n"
+"INFOPENGIRIMAN\n"
+"\n"
+"Informasi Pembayaran:\n"
+"INFOPEMBAYARAN\n"
+"\n"
+"Anda bisa melacak status terakhir pesanan anda disini: LACAKURL\n"
+"\n"
+"Terima Kasih kembali!"
+
+#: marketpress.php:230
+#@ mp
+msgid "Your Order Has Been Shipped! (ORDERID)"
+msgstr "Pesanan Anda Telah Dikirim! (IDPESANAN)"
+
+#: marketpress.php:231
+#@ mp
+msgid ""
+"Dear CUSTOMERNAME,\n"
+"\n"
+"Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n"
+"Here is a confirmation of your order details:\n"
+"\n"
+"Order Information:\n"
+"ORDERINFO\n"
+"\n"
+"Shipping Information:\n"
+"SHIPPINGINFO\n"
+"\n"
+"Payment Information:\n"
+"PAYMENTINFO\n"
+"\n"
+"You can track the latest status of your order here: TRACKINGURL\n"
+"\n"
+"Thanks again!"
+msgstr ""
+"Yang Terhormat NAMAPELANGGAN,\n"
+"\n"
+"Pesanan anda telah dikirim! Waktu pengiriman tergantung cara pembayaran dan lokasi anda tapi akan tiba secepatnya. Silahkan tunjukkan ID Pesanan anda (IDPESANAN) ketika menghun=bungi kami.\n"
+"Berikut ini konfirmasi detil pesanan anda:\n"
+"\n"
+"Informasi Pesanan:\n"
+"INFOPESANAN\n"
+"\n"
+"Informasi Pengiriman:\n"
+"INFOPENGIRIMAN\n"
+"\n"
+"Informasi Pembayaran:\n"
+"INFOPEMBAYARAN\n"
+"\n"
+"Anda bisa lacak status pesanan anda disini: LACAKURL\n"
+"\n"
+"Terima kasih kembali!"
+
+#: marketpress.php:297
+#@ mp
+msgid "There was an issue determining where MarketPress is installed. Please reinstall."
+msgstr "Ada berita terkait penginstalan MarketPress. Silahkan instal kembali."
+
+#: marketpress.php:460
+#@ mp
+msgid "You must <a href=\"options-permalink.php\">enable Pretty Permalinks</a> to use MarketPress!"
+msgstr "Anda harus <a href=\"options-permalink.php\">mengaktifkan Pretty Permalinks</a>untuk menggunakan MarketPress!"
+
+#: marketpress.php:474
+#: marketpress.php:3842
+#@ mp
+msgid "Manage Orders"
+msgstr "Kelola Pesanan"
+
+#: marketpress.php:477
+#@ mp
+msgid "Store Settings"
+msgstr "Pengaturan Toko"
+
+#: marketpress.php:520
+#@ mp
+msgid "Are you sure you want to remove all items from your cart?"
+msgstr "Anda yakin ingin menghapus semua barang dari keranjang belanja anda?"
+
+#: marketpress.php:520
+#@ mp
+msgid "Item(s) Added!"
+msgstr "Barang Ditambah!"
+
+#: marketpress.php:520
+#@ mp
+msgid "Adding to your cart..."
+msgstr "Menambah ke keranjang anda..."
+
+#: marketpress.php:549
+#@ mp
+msgid "Product"
+msgstr "Produk"
+
+#: marketpress.php:550
+#@ mp
+msgid "of"
+msgstr "dari"
+
+#: marketpress.php:598
+#@ mp
+msgid "Welcome to our online store! Feel free to browse around:"
+msgstr "Selamat datang di toko online kami! Silahkan melihat-lihat produk:"
+
+#: marketpress.php:600
+#@ mp
+msgid "Check out our most popular products:"
+msgstr "Lihat produk terpopuler kami:"
+
+#: marketpress.php:602
+#@ mp
+msgid "Browse by category:"
+msgstr "Cari menurut kategori:"
+
+#: marketpress.php:604
+#@ mp
+msgid "Browse by tag:"
+msgstr "Cari menurut label:"
+
+#: marketpress.php:607
+#@ mp
+msgid "Store"
+msgstr "Toko"
+
+#: marketpress.php:618
+#: marketpress.php:4854
+#@ mp
+msgid "Product Category"
+msgstr "Kategori Produk"
+
+#: marketpress.php:619
+#: marketpress.php:4858
+#@ mp
+msgid "Product Tag"
+msgstr "Label Produk"
+
+#: marketpress.php:626
+#@ mp
+msgid "Create New"
+msgstr "Buat Baru"
+
+#: marketpress.php:627
+#@ mp
+msgid "Create New Product"
+msgstr "Buat Produk Baru"
+
+#: marketpress.php:628
+#@ mp
+msgid "Edit Products"
+msgstr "Perbaiki Produk"
+
+#: marketpress.php:629
+#: marketpress.php:654
+#: marketpress.php:4463
+#: marketpress.php:4550
+#@ mp
+msgid "Edit"
+msgstr "Perbaiki"
+
+#: marketpress.php:630
+#@ mp
+msgid "New Product"
+msgstr "Produk Baru"
+
+#: marketpress.php:631
+#: marketpress.php:635
+#@ mp
+msgid "View Product"
+msgstr "Lihat Produk"
+
+#: marketpress.php:632
+#@ mp
+msgid "Search Products"
+msgstr "Cari Produk"
+
+#: marketpress.php:633
+#@ mp
+msgid "No Products Found"
+msgstr "Produk tidak ditemukan"
+
+#: marketpress.php:634
+#@ mp
+msgid "No Products found in Trash"
+msgstr "Produk di tong sampah tidak ditemukan"
+
+#: marketpress.php:637
+#@ mp
+msgid "Products for your MarketPress store."
+msgstr "Produk untuk toko MarketPress anda."
+
+#: marketpress.php:652
+#@ mp
+msgid "Orders"
+msgstr "Pesanan"
+
+#: marketpress.php:653
+#@ mp
+msgid "Order"
+msgstr "Pesanan"
+
+#: marketpress.php:655
+#@ mp
+msgid "View Order"
+msgstr "Lihat Pesanan"
+
+#: marketpress.php:656
+#: marketpress.php:3895
+#: marketpress.php:3897
+#@ mp
+msgid "Search Orders"
+msgstr "Cari Pesanan"
+
+#: marketpress.php:657
+#@ mp
+msgid "No Orders Found"
+msgstr "Pesanan tidak ditemukan"
+
+#: marketpress.php:659
+#@ mp
+msgid "Orders from your MarketPress store."
+msgstr "Pesanan dari toko MarketPress anda."
+
+#: marketpress.php:671
+#: marketpress.php:1558
+#: marketpress.php:1599
+#: marketpress.php:3461
+#: marketpress.php:3466
+#: marketpress.php:3471
+#: marketpress.php:3476
+#: marketpress.php:3924
+#: marketpress.php:4021
+#@ mp
+msgid "Received"
+msgstr "Diterima"
+
+#: marketpress.php:672
+#, php-format
+#@ mp
+msgid "Received <span class=\"count\">(%s)</span>"
+msgstr "Diterima <span class=\"count\">(%s)</span>"
+
+#: marketpress.php:677
+#: marketpress.php:1560
+#: marketpress.php:1590
+#: marketpress.php:1600
+#: marketpress.php:3462
+#: marketpress.php:3467
+#: marketpress.php:3472
+#: marketpress.php:3477
+#: marketpress.php:3925
+#: marketpress.php:4022
+#@ mp
+msgid "Paid"
+msgstr "Telah Dibayar"
+
+#: marketpress.php:678
+#, php-format
+#@ mp
+msgid "Paid <span class=\"count\">(%s)</span>"
+msgstr "Telah Dibayar <span class=\"count\">(%s)</span>"
+
+#: marketpress.php:683
+#: marketpress.php:1562
+#: marketpress.php:1591
+#: marketpress.php:1594
+#: marketpress.php:1601
+#: marketpress.php:3463
+#: marketpress.php:3468
+#: marketpress.php:3473
+#: marketpress.php:3478
+#: marketpress.php:3926
+#: marketpress.php:4023
+#@ mp
+msgid "Shipped"
+msgstr "Terkirim"
+
+#: marketpress.php:684
+#, php-format
+#@ mp
+msgid "Shipped <span class=\"count\">(%s)</span>"
+msgstr "Terkirim <span class=\"count\">(%s)</span>"
+
+#: marketpress.php:689
+#: marketpress.php:1564
+#: marketpress.php:1592
+#: marketpress.php:1595
+#: marketpress.php:1597
+#: marketpress.php:3464
+#: marketpress.php:3469
+#: marketpress.php:3474
+#: marketpress.php:3479
+#: marketpress.php:3927
+#: marketpress.php:4024
+#@ mp
+msgid "Closed"
+msgstr "Ditutup"
+
+#: marketpress.php:690
+#, php-format
+#@ mp
+msgid "Closed <span class=\"count\">(%s)</span>"
+msgstr "Ditutup <span class=\"count\">(%s)</span>"
+
+#: marketpress.php:1114
+#@ mp
+msgid "None - Custom theme template"
+msgstr "Kosong - Tema Template Biasa"
+
+#: marketpress.php:1264
+#, php-format
+#@ mp
+msgid "Product Category: %s"
+msgstr "Kategori Produk: %s"
+
+#: marketpress.php:1267
+#, php-format
+#@ mp
+msgid "Product Tag: %s"
+msgstr "Label Produk: %s"
+
+#: marketpress.php:1274
+#: marketpress.php:3675
+#@ mp
+msgid "Shipping Information"
+msgstr "Informasi Pengiriman"
+
+#: marketpress.php:1276
+#: marketpress.php:3539
+#@ mp
+msgid "Payment Information"
+msgstr "Informasi Pembayaran"
+
+#: marketpress.php:1278
+#@ mp
+msgid "Confirm Your Purchase"
+msgstr "Konfirmasi Pembelian Anda"
+
+#: marketpress.php:1280
+#@ mp
+msgid "Order Confirmation"
+msgstr "Konfirmasi Pesanan"
+
+#: marketpress.php:1282
+#@ mp
+msgid "Your Shopping Cart"
+msgstr "Keranjang Belanja Anda"
+
+#: marketpress.php:1286
+#@ mp
+msgid "Track Your Order"
+msgstr "Lacak Pesanan Anda"
+
+#: marketpress.php:1315
+#@ mp
+msgid "Categorized in "
+msgstr "Kategori di"
+
+#: marketpress.php:1387
+#@ default
+msgid "View all categories"
+msgstr ""
+
+#: marketpress.php:1414
+#@ mp
+msgid "Thumbnail"
+msgstr "Thumbnail"
+
+#: marketpress.php:1415
+#: marketpress.php:4815
+#: marketpress.php:5539
+#@ mp
+msgid "Product Name"
+msgstr "Nama Produk"
+
+#: marketpress.php:1416
+#@ mp
+msgid "Variations"
+msgstr "Variasi"
+
+#: marketpress.php:1417
+#: marketpress.php:1733
+#: marketpress.php:3603
+#@ mp
+msgid "SKU"
+msgstr "SKU"
+
+#: marketpress.php:1420
+#@ mp
+msgid "Stock"
+msgstr "Stok"
+
+#: marketpress.php:1421
+#@ mp
+msgid "Sales"
+msgstr "Penjualan"
+
+#: marketpress.php:1449
+#@ default
+msgid "Edit &raquo;"
+msgstr ""
+
+#: marketpress.php:1460
+#: marketpress.php:1470
+#: marketpress.php:1507
+#: marketpress.php:1635
+#: marketpress.php:2485
+#: marketpress.php:3624
+#: marketpress.php:3638
+#@ mp
+msgid "N/A"
+msgstr "N/A"
+
+#: marketpress.php:1532
+#@ mp
+msgid "Status"
+msgstr "Status"
+
+#: marketpress.php:1533
+#@ mp
+msgid "Order ID"
+msgstr "ID Pesanan"
+
+#: marketpress.php:1534
+#@ mp
+msgid "Order Date"
+msgstr "Tanggal Pesan"
+
+#: marketpress.php:1535
+#@ mp
+msgid "From"
+msgstr "Dari"
+
+#: marketpress.php:1536
+#@ mp
+msgid "Items"
+msgstr "Barang"
+
+#: marketpress.php:1537
+#: marketpress.php:1656
+#: marketpress.php:4065
+#@ mp
+msgid "Shipping"
+msgstr "Pengiriman"
+
+#: marketpress.php:1538
+#@ mp
+msgid "Tax"
+msgstr "Pajak"
+
+#: marketpress.php:1539
+#: marketpress.php:4458
+#: marketpress.php:4620
+#@ mp
+msgid "Discount"
+msgstr "Diskon"
+
+#: marketpress.php:1540
+#@ mp
+msgid "Total"
+msgstr "Total"
+
+#: marketpress.php:1566
+#@ mp
+msgid "View Order Details"
+msgstr "Lihat Detil Pesanan"
+
+#: marketpress.php:1570
+#@ default
+msgid "Y/m/d g:i:s A"
+msgstr ""
+
+#: marketpress.php:1577
+#, php-format
+#@ default
+msgid "%s ago"
+msgstr ""
+
+#: marketpress.php:1579
+#@ default
+msgid "Y/m/d"
+msgstr ""
+
+#: marketpress.php:1586
+#, php-format
+#@ mp
+msgid "View &#8220;%s&#8221;"
+msgstr "Lihat &#8220;%s&#8221;"
+
+#: marketpress.php:1590
+#: marketpress.php:1600
+#: marketpress.php:3462
+#: marketpress.php:3477
+#@ mp
+msgid "Mark as Paid"
+msgstr "Tandai Telah Dibayar"
+
+#: marketpress.php:1591
+#: marketpress.php:1594
+#: marketpress.php:1601
+#: marketpress.php:3463
+#: marketpress.php:3468
+#: marketpress.php:3478
+#@ mp
+msgid "Mark as Shipped"
+msgstr "Tandai Telah Dikirim"
+
+#: marketpress.php:1592
+#: marketpress.php:1595
+#: marketpress.php:1597
+#: marketpress.php:3464
+#: marketpress.php:3469
+#: marketpress.php:3474
+#@ mp
+msgid "Mark as Closed"
+msgstr "Tandai Telah Ditutup"
+
+#: marketpress.php:1599
+#: marketpress.php:3476
+#@ mp
+msgid "Mark as Received"
+msgstr "Tandai Telah Diterima"
+
+#: marketpress.php:1616
+#, php-format
+#@ mp
+msgid "Regarding Your Order (%s)"
+msgstr "Mengenai Pesanan Anda (%s)"
+
+#: marketpress.php:1649
+#@ mp
+msgid "Product Details"
+msgstr "Produk Detil"
+
+#: marketpress.php:1659
+#@ mp
+msgid "Product Download"
+msgstr "Produk Unduh"
+
+#: marketpress.php:1732
+#@ mp
+msgid "Variation Name"
+msgstr "Variasi Nama"
+
+#: marketpress.php:1733
+#@ mp
+msgid "Stock Keeping Unit - Your custom Product ID number"
+msgstr "Unit Stok Yang Ada - Nomor ID Produk Anda"
+
+#: marketpress.php:1735
+#@ mp
+msgid "When checked these override the normal price."
+msgstr "Jika dicek akan mengesampingkan harga normal."
+
+#: marketpress.php:1735
+#@ mp
+msgid "Sale Price"
+msgstr "Harga Jual"
+
+#: marketpress.php:1736
+#@ mp
+msgid "When checked inventory tracking will be enabled."
+msgstr "Ketika dicek penelusuran inventarisasi akan diaktifkan."
+
+#: marketpress.php:1736
+#@ mp
+msgid "Inventory"
+msgstr "Inventarisasi"
+
+#: marketpress.php:1756
+#: marketpress.php:1770
+#@ mp
+msgid "Remove Variation"
+msgstr "Hapus Variasi"
+
+#: marketpress.php:1778
+#@ mp
+msgid "Add Variation"
+msgstr "Tambah Variasi"
+
+#: marketpress.php:1780
+#@ mp
+msgid "Product variations are not allowed for Downloadable or Externally Linked products."
+msgstr "Variasi produk tidak diperkenankan diunduh atau produk tautan eksternal."
+
+#: marketpress.php:1784
+#@ mp
+msgid "Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link."
+msgstr "Beberapa contoh bertautan dengan lagu/album dalam iTunes, atau produk milik tautan situs lain dengan tautan afiliasi anda."
+
+#: marketpress.php:1784
+#@ mp
+msgid "External Link"
+msgstr "Tautan Eksternal"
+
+#: marketpress.php:1784
+#@ mp
+msgid "When set this overrides the purchase button with a link to this URL."
+msgstr "Ketika mengeset ini akan mengesampingkan tombol pembelian dengan tautan ke URL ini."
+
+#: marketpress.php:1810
+#@ mp
+msgid "Downloadable products are enabled in MarketPress Pro only, upgrade to enable &raquo;"
+msgstr "Produk dapat diunduh telah diaktifkan hanya MarketPress Pro, upgrade untuk mengaktifkan &raquo;"
+
+#: marketpress.php:1811
+#@ mp
+msgid "File URL"
+msgstr "URL File"
+
+#: marketpress.php:1812
+#@ mp
+msgid "Upload File"
+msgstr "Unggah File"
+
+#: marketpress.php:2035
+#: marketpress.php:2184
+#: marketpress.php:2187
+#, php-format
+#@ mp
+msgid "Sorry, currently it's not possible to checkout with items from more than %s stores."
+msgstr "Maaf, saat ini tidak bisa memeriksa barang lebih dari %s toko."
+
+#: marketpress.php:2096
+#, php-format
+#@ mp
+msgid "Sorry, there is a per order limit of %1$s for \"%2$s\". Your cart quantity has been changed to %3$s."
+msgstr "Maaf, batas tiap pesanan %1$s untuk \"%2$s\". Kuantitas keranjang anda telah diubah %3$s."
+
+#: marketpress.php:2202
+#: marketpress.php:2205
+#, php-format
+#@ mp
+msgid "Sorry, we don't have enough of this item in stock. (%s remaining)"
+msgstr "Maaf, stok barang kami tidak cukup. (%s sisa)"
+
+#: marketpress.php:2225
+#: marketpress.php:2228
+#: marketpress.php:2272
+#, php-format
+#@ mp
+msgid "Sorry, there is a per order limit of %1$s for \"%2$s\"."
+msgstr "Maaf, batas tiap pesanan %1$s untuk \"%2$s\"."
+
+#: marketpress.php:2264
+#, php-format
+#@ mp
+msgid "Sorry, there is not enough stock for \"%s\". (%s remaining)"
+msgstr "Maaf, stok tidak cukup untuk \"%s\". (%s sisa)"
+
+#: marketpress.php:2299
+#@ mp
+msgid "Item(s) Removed"
+msgstr "Barang Dihapus"
+
+#: marketpress.php:2312
+#@ mp
+msgid "Coupon Successfully Applied"
+msgstr "Kupon Berhasil Digunakan"
+
+#: marketpress.php:2314
+#@ mp
+msgid "Invalid Coupon Code"
+msgstr "Kode Kupon Salah"
+
+#: marketpress.php:2327
+#@ mp
+msgid "Coupon Removed"
+msgstr "Kupon Dihapus"
+
+#: marketpress.php:2333
+#@ mp
+msgid "Please enter a valid Email Address."
+msgstr "Silahkan masukan Alamat Email yang benar."
+
+#: marketpress.php:2336
+#@ mp
+msgid "Please enter your Full Name."
+msgstr "Silahkan masukan Nama Lengkap anda."
+
+#: marketpress.php:2339
+#@ mp
+msgid "Please enter your Street Address."
+msgstr "Silahkan masukan Alamat Jalan anda."
+
+#: marketpress.php:2342
+#@ mp
+msgid "Please enter your City."
+msgstr "Silahkan masukan Kota anda."
+
+#: marketpress.php:2345
+#@ mp
+msgid "Please enter your State/Province/Region."
+msgstr "Silahkan masukan Negarabagian/Propinsi/Wilayah anda."
+
+#: marketpress.php:2348
+#@ mp
+msgid "Please enter a valid two-letter State abbreviation."
+msgstr "Silahkan masukan dua-huruf singkatan Negerabagian."
+
+#: marketpress.php:2353
+#@ mp
+msgid "Please enter your Zip/Postal Code."
+msgstr "Silahkan masukan Pos/Kodepos anda."
+
+#: marketpress.php:2356
+#@ mp
+msgid "Please enter your Country."
+msgstr "Silahkan masukan Negeri anda."
+
+#: marketpress.php:2482
+#: marketpress.php:2483
+#@ mp
+msgid "Manual Checkout"
+msgstr "Periksa Manual"
+
+#: marketpress.php:2484
+#@ mp
+msgid "N/A - Free order"
+msgstr "N/A - Bebas pesan"
+
+#: marketpress.php:2486
+#@ mp
+msgid "Completed"
+msgstr "Selesai"
+
+#: marketpress.php:2970
+#@ mp
+msgid "Billing Info"
+msgstr "Info Penagihan"
+
+#: marketpress.php:3046
+#@ mp
+msgid "Shipping Info"
+msgstr "Info Pengiriman"
+
+#: marketpress.php:3048
+#@ mp
+msgid "Same as Billing"
+msgstr "Sama dengan Penagihan"
+
+#: marketpress.php:3175
+#@ mp
+msgid "Items:"
+msgstr "Barang:"
+
+#: marketpress.php:3182
+#@ mp
+msgid "Download: "
+msgstr "Unduh:"
+
+#: marketpress.php:3227
+#@ mp
+msgid "Your payment for this order is not yet complete. Here is the latest status:"
+msgstr "Pembayaran anda untuk pesanan ini belum selesai. Berikut status terakhir:"
+
+#: marketpress.php:3234
+#@ mp
+msgid "Your payment for this order is complete."
+msgstr "Pembayaran anda untuk pesanan ini telah selesai."
+
+#: marketpress.php:3269
+#@ mp
+msgid "New Order Notification: ORDERID"
+msgstr "Notifikasi Pesanan Baru: IDPESANAN"
+
+#: marketpress.php:3270
+#, php-format
+#@ mp
+msgid ""
+"A new order (ORDERID) was created in your store:\n"
+"\n"
+"Order Information:\n"
+"ORDERINFO\n"
+"\n"
+"Shipping Information:\n"
+"SHIPPINGINFO\n"
+"\n"
+"Email: %s\n"
+"\n"
+"Payment Information:\n"
+"PAYMENTINFO\n"
+"\n"
+"You can manage this order here: %s"
+msgstr ""
+"Satu pesanan baru (IDPESANAN) telah dibuat pada toko anda:\n"
+"\n"
+"Informasi Pesanan:\n"
+"INFOPESANAN\n"
+"\n"
+"Informasi Pengiriman:\n"
+"NFOPENGIRIMAN\n"
+"\n"
+"Email: %s\n"
+"\n"
+"Informasi Pembayaran:\n"
+"INFOPEMBAYARAN\n"
+"\n"
+"Anda bisa mengelola pesanan ini disini: %s"
+
+#: marketpress.php:3327
+#@ mp
+msgid "Low Product Inventory Notification"
+msgstr "Notifikasi Inventaris Produk Rendah"
+
+#: marketpress.php:3328
+#, php-format
+#@ mp
+msgid ""
+"This message is being sent to notify you of low stock of a product in your online store according to your preferences.\n"
+"\n"
+"Product: %s\n"
+"Current Inventory: %s\n"
+"Link: %s\n"
+"\n"
+"Edit Product: %s\n"
+"Notification Preferences: %s"
+msgstr ""
+"Pesan ini dikirim guna memberitahukan anda tentang stok barang rendah dalam toko online anda menurut pilihan anda.\n"
+"\n"
+"Produk: %s\n"
+"Inventarisasi Sekarang: %s\n"
+"Tautan: %s\n"
+"\n"
+"Perbaiki Produk: %s\n"
+"Pilihan Pemberitahuan: %s"
+
+#: marketpress.php:3412
+#@ mp
+msgid "More Info &raquo;"
+msgstr "Info Selanjutnya &raquo;"
+
+#: marketpress.php:3438
+#@ mp
+msgid "Invalid Order ID"
+msgstr "ID Pesanan Salah"
+
+#: marketpress.php:3445
+#, php-format
+#@ mp
+msgid "Order Details (%s)"
+msgstr "Detil Pesanan (%s)"
+
+#: marketpress.php:3454
+#@ mp
+msgid "Order Actions"
+msgstr "Tindakan Pesanan"
+
+#: marketpress.php:3457
+#@ mp
+msgid "Change Order Status:"
+msgstr "Ubah Status Pesanan:"
+
+#: marketpress.php:3529
+#@ mp
+msgid "Closed:"
+msgstr "Ditutup:"
+
+#: marketpress.php:3542
+#@ mp
+msgid "Payment Gateway:"
+msgstr "Pintu Pembayaran:"
+
+#: marketpress.php:3566
+#@ mp
+msgid "Payment Transaction History"
+msgstr "Kilas Transaksi Pembayaran"
+
+#: marketpress.php:3597
+#@ mp
+msgid "Order Information"
+msgstr "Informasi Pesanan"
+
+#: marketpress.php:3605
+#@ mp
+msgid "Qantity"
+msgstr "Kuantitas"
+
+#: marketpress.php:3608
+#@ mp
+msgid "Downloads"
+msgstr "Unduh"
+
+#: marketpress.php:3636
+#@ mp
+msgid " (Limit Reached)"
+msgstr " (Batas Terpenuhi)"
+
+#: marketpress.php:3731
+#@ mp
+msgid "Cost:"
+msgstr "Biaya:"
+
+#: marketpress.php:3736
+#@ mp
+msgid "Special Note:"
+msgstr "Catatan Khusus:"
+
+#: marketpress.php:3773
+#@ default
+msgid "Cheatin&#8217; uh?"
+msgstr ""
+
+#: marketpress.php:3802
+#, php-format
+#@ mp
+msgid "%s order marked as Received."
+msgid_plural "%s orders marked as Received."
+msgstr[0] "%s pesanan ditandai Diterima."
+msgstr[1] "%s beberapa pesanan ditandai Diterima."
+
+#: marketpress.php:3810
+#, php-format
+#@ mp
+msgid "%s order marked as Paid."
+msgid_plural "%s orders marked as Paid."
+msgstr[0] "%s pesanan ditandai Dibayar."
+msgstr[1] "%s beberapa pesanan ditandai Dibayar."
+
+#: marketpress.php:3818
+#, php-format
+#@ mp
+msgid "%s order marked as Shipped."
+msgid_plural "%s orders marked as Shipped."
+msgstr[0] "%s pesanan ditandai Dikirim."
+msgstr[1] "%s beberapa pesanan ditandai Dikirim."
+
+#: marketpress.php:3826
+#, php-format
+#@ mp
+msgid "%s order Closed."
+msgid_plural "%s orders Closed."
+msgstr[0] "%s pesanan Ditutup."
+msgstr[1] "%s pesanan Ditutup."
+
+#: marketpress.php:3844
+#, php-format
+#@ default
+msgid "Search results for &#8220;%s&#8221;"
+msgstr ""
+
+#: marketpress.php:3870
+#, php-format
+#@ default
+msgctxt "posts"
+msgid "All <span class=\"count\">(%s)</span>"
+msgid_plural "All <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: marketpress.php:3913
+#@ default
+msgid "&laquo;"
+msgstr ""
+
+#: marketpress.php:3914
+#@ default
+msgid "&raquo;"
+msgstr ""
+
+#: marketpress.php:3923
+#: marketpress.php:4020
+#@ mp
+msgid "Change Status"
+msgstr "Perubahan Status"
+
+#: marketpress.php:3929
+#: marketpress.php:4026
+#@ default
+msgid "Apply"
+msgstr ""
+
+#: marketpress.php:3944
+#@ default
+msgid "Show all dates"
+msgstr ""
+
+#: marketpress.php:3964
+#@ default
+msgid "Filter"
+msgstr ""
+
+#: marketpress.php:3971
+#, php-format
+#@ default
+msgid "Displaying %s&#8211;%s of %s"
+msgstr ""
+
+#: marketpress.php:4034
+#@ mp
+msgid "No Orders Yet"
+msgstr "Pesanan Belum Ada"
+
+#: marketpress.php:4062
+#: marketpress.php:4418
+#@ mp
+msgid "Coupons"
+msgstr "Kupon"
+
+#: marketpress.php:4063
+#: marketpress.php:4070
+#@ mp
+msgid "Presentation"
+msgstr "Penyajian"
+
+#: marketpress.php:4064
+#@ mp
+msgid "Messages"
+msgstr "Pesan"
+
+#: marketpress.php:4066
+#@ mp
+msgid "Payments"
+msgstr "Pembayaran"
+
+#: marketpress.php:4078
+#@ mp
+msgid "General"
+msgstr "Umum"
+
+#: marketpress.php:4104
+#: marketpress.php:4695
+#: marketpress.php:4895
+#: marketpress.php:5045
+#: marketpress.php:5132
+#@ mp
+msgid "Settings saved."
+msgstr "Pengaturan disimpan."
+
+#: marketpress.php:4122
+#@ mp
+msgid "Location Settings"
+msgstr "Pengaturan Lokasi"
+
+#: marketpress.php:4124
+#@ mp
+msgid "This is the base location that shipping and tax rates will be calculated from."
+msgstr "Lokasi ini dasar penghitungan untuk pengiriman dan pajak."
+
+#: marketpress.php:4127
+#@ mp
+msgid "Base Country"
+msgstr "Asal Negara"
+
+#: marketpress.php:4165
+#@ mp
+msgid "Base State/Province/Region"
+msgstr "Asal Negarabagian/Propinsi/Wilayah"
+
+#: marketpress.php:4182
+#@ mp
+msgid "Tax Settings"
+msgstr "Pengaturan Pajak"
+
+#: marketpress.php:4190
+#, php-format
+#@ mp
+msgid "%s Tax Rate"
+msgstr "%s Rata-rata Pajak"
+
+#: marketpress.php:4201
+#, php-format
+#@ mp
+msgid "%s Total Tax Rate (VAT,GST,PST,HST)"
+msgstr "%s Total Rata-rata Pajak (VAT,GST,PST,HST)"
+
+#: marketpress.php:4212
+#: marketpress.php:4236
+#@ mp
+msgid "VAT Tax Rate"
+msgstr "Rata-rata Pajak VAT"
+
+#: marketpress.php:4223
+#@ mp
+msgid "GST Tax Rate"
+msgstr "Rata-rata Pajak GST"
+
+#: marketpress.php:4245
+#@ mp
+msgid "Country Total Tax Rate (VAT, GST, Etc.)"
+msgstr "Total Rata-rata Pajak Negara (VAT, GST, dll)"
+
+#: marketpress.php:4251
+#@ mp
+msgid "Tax Orders Outside Your Base Country?"
+msgstr "Pajak Pesanan diluar asal Negara Anda?"
+
+#: marketpress.php:4263
+#@ mp
+msgid "Apply Tax To Shipping Fees?"
+msgstr "Pakai Pajak untuk Biaya Pengiriman?"
+
+#: marketpress.php:4267
+#@ mp
+msgid "Please see your local tax laws. Most areas charge tax on shipping fees."
+msgstr "Silahkan lihat tata aturan pajak daerah anda. Kebnyakan daerah membebani pajak pada biaya pengiriman."
+
+#: marketpress.php:4286
+#@ mp
+msgid "Currency Settings"
+msgstr "Pengaturan Mata Uang"
+
+#: marketpress.php:4288
+#@ mp
+msgid "These preferences affect display only. Your payment gateway of choice may not support every currency listed here."
+msgstr "Pilihan ini hanya sekedar display saja. Pilihan pintu pembayaran anda mungkin tidak mendukung untuk daftar mata uang berikut."
+
+#: marketpress.php:4291
+#@ mp
+msgid "Store Currency"
+msgstr "Mata Uang Toko"
+
+#: marketpress.php:4303
+#@ mp
+msgid "Currency Symbol Position"
+msgstr "Letak Simbol Mata Uang"
+
+#: marketpress.php:4316
+#@ mp
+msgid "Show Decimal in Prices"
+msgstr "Munculkan Desimal pada Harga"
+
+#: marketpress.php:4329
+#@ mp
+msgid "Miscellaneous Settings"
+msgstr "Jenis Pengaturan"
+
+#: marketpress.php:4334
+#@ mp
+msgid "Maximum Downloads"
+msgstr "Maksimal Unduh"
+
+#: marketpress.php:4336
+#@ mp
+msgid "MarketPress Pro only, upgrade to enable &raquo;"
+msgstr "Hanya MarketPress Pro, upgrade untuk mengaktifkan &raquo;"
+
+#: marketpress.php:4337
+#@ mp
+msgid "How many times may a customer download a file they have purchased? (It's best to set this higher than one in case they have any problems downloading)"
+msgstr "Berapa kali pelanggan mengunduh file yang mereka beli? (Sangat bagus apabila diatur lebih dari 1 kali untuk mengantisipasi gagal sewaktu mengunduh)"
+
+#: marketpress.php:4350
+#@ mp
+msgid "Force Login"
+msgstr "Paksa Masuk"
+
+#: marketpress.php:4355
+#@ mp
+msgid "Whether or not customers must be registered and logged in to checkout. (Not recommended: Enabling this can lower conversions)"
+msgstr "Apakah pelanggan harus mendaftar dan masuk untuk memeriksa pembelian atau tidak. (Tidak disarankan: mengaktifkan ini dapat menurunkan konversi)"
+
+#: marketpress.php:4359
+#@ mp
+msgid "Product Listings Only"
+msgstr "Hanya Daftar Produk"
+
+#: marketpress.php:4363
+#@ mp
+msgid "This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the \"Buy Now\" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links."
+msgstr "Pilihan ini mengembalikan MarketPress berubah menjadi plugin daftar produk lebih banyak, menonaktifkan keranjang belanja, periksa pembelian, dan pengaturan pesanan. Ini berguna jika anda ingin menampilkan daftar barang yang dapat beli muncul di halaman mana saja di toko, terlepas apakah pilihan tautan tombol \"Beli Sekarang\" milik situs luar. Beberapa contoh diantaranya dipakai pada dealer mobil, atau tautan pada lagu/album di itunes, atau tautan produk dari situ lain dengan tautan afiliasi anda sendiri."
+
+#: marketpress.php:4401
+#@ mp
+msgid "Coupon(s) succesfully deleted."
+msgstr "Kupon berhasil dihapus."
+
+#: marketpress.php:4419
+#@ mp
+msgid "Coupons are enabled in MarketPress Pro only, upgrade to enable &raquo;"
+msgstr "Kupon baru bisa diaktifkan hanya MarketPress Pro, upgrade untuk mengaktifkan &raquo;"
+
+#: marketpress.php:4420
+#@ mp
+msgid "You can create, delete, or update coupon codes for your store here."
+msgstr "Anda dapat buat, hapus, atau perbarui kode kupon untuk toko anda disini."
+
+#: marketpress.php:4447
+#@ mp
+msgid "Delete"
+msgstr "Hapus"
+
+#: marketpress.php:4457
+#: marketpress.php:4617
+#@ mp
+msgid "Coupon Code"
+msgstr "Kode Kupon"
+
+#: marketpress.php:4459
+#: marketpress.php:4621
+#@ mp
+msgid "Start Date"
+msgstr "Tanggal Mulai"
+
+#: marketpress.php:4460
+#: marketpress.php:4623
+#@ mp
+msgid "Expire Date"
+msgstr "Masa Kadaluarsa"
+
+#: marketpress.php:4461
+#@ mp
+msgid "Used"
+msgstr "Bekas"
+
+#: marketpress.php:4462
+#@ mp
+msgid "Remaining Uses"
+msgstr "Sisa Penggunaan"
+
+#: marketpress.php:4524
+#@ mp
+msgid "No End"
+msgstr "Tanpa Akhir"
+
+#: marketpress.php:4542
+#@ mp
+msgid "Unlimited"
+msgstr "Tak Terbatas"
+
+#: marketpress.php:4563
+#@ mp
+msgid "No coupons yet."
+msgstr "Belum ada kupon."
+
+#: marketpress.php:4592
+#@ mp
+msgid "Edit Coupon"
+msgstr "Perbaiki Kupon"
+
+#: marketpress.php:4594
+#@ mp
+msgid "Add Coupon"
+msgstr "Tambah Kupon"
+
+#: marketpress.php:4618
+#@ mp
+msgid "Letters and Numbers only"
+msgstr "Hanya Huruf dan Angka"
+
+#: marketpress.php:4624
+#@ mp
+msgid "No end if blank"
+msgstr "Tanpa Akhir jika kosong"
+
+#: marketpress.php:4627
+#@ mp
+msgid "Allowed Uses"
+msgstr "Sisa yang Diperbolehkan"
+
+#: marketpress.php:4628
+#@ mp
+msgid "Unlimited if blank"
+msgstr "Tak Terbatas jika kosong"
+
+#: marketpress.php:4658
+#@ mp
+msgid "Save Coupon"
+msgstr "Simpan Kupon"
+
+#: marketpress.php:4685
+#@ mp
+msgid "Store base URL conflicts with another page"
+msgstr "Asal URL Toko bentrok dengan halaman lainnya"
+
+#: marketpress.php:4700
+#@ mp
+msgid "Presentation Settings"
+msgstr "Pengaturan Penyajian"
+
+#: marketpress.php:4710
+#@ mp
+msgid "Store Theme"
+msgstr "Tema Toko"
+
+#: marketpress.php:4712
+#@ mp
+msgid "Upgrade to enable all themes &raquo;"
+msgstr "Upgrade untuk mengaktifkan semua tema &raquo;"
+
+#: marketpress.php:4714
+#@ mp
+msgid "This option changes the built-in css styles for store pages."
+msgstr "Pilihan ini mengubah gaya built-in css untuk halaman toko."
+
+#: marketpress.php:4725
+#@ mp
+msgid "Single Product Settings"
+msgstr "Pengaturan Produk Tunggal"
+
+#: marketpress.php:4729
+#: marketpress.php:4779
+#@ mp
+msgid "Checkout Button Type"
+msgstr "Jenis Tombol Periksa Belanja"
+
+#: marketpress.php:4731
+#: marketpress.php:4781
+#@ mp
+msgid "Add To Cart"
+msgstr "Tambah ke Keranjang"
+
+#: marketpress.php:4732
+#: marketpress.php:4782
+#@ mp
+msgid "Buy Now"
+msgstr "Beli Sekarang"
+
+#: marketpress.php:4736
+#@ mp
+msgid "Show Quantity Option"
+msgstr "Pilihan Tunjukkan Kuantitas"
+
+#: marketpress.php:4743
+#@ mp
+msgid "Product Image Size"
+msgstr "Ukuran Gambar Produk"
+
+#: marketpress.php:4745
+#: marketpress.php:4795
+#@ mp
+msgid "WP Thumbnail size"
+msgstr "Ukuran Thumbnail WP"
+
+#: marketpress.php:4746
+#: marketpress.php:4796
+#@ mp
+msgid "WP Medium size"
+msgstr "Ukuran Sedang WP"
+
+#: marketpress.php:4747
+#: marketpress.php:4797
+#@ mp
+msgid "WP Large size"
+msgstr "Ukuran Besar WP"
+
+#: marketpress.php:4748
+#: marketpress.php:4798
+#@ mp
+msgid "Custom"
+msgstr "Biasa"
+
+#: marketpress.php:4749
+#: marketpress.php:4799
+#@ mp
+msgid "Height"
+msgstr "Tinggi"
+
+#: marketpress.php:4750
+#: marketpress.php:4800
+#@ mp
+msgid "Width"
+msgstr "Lebar"
+
+#: marketpress.php:4754
+#@ mp
+msgid "Show Image Lightbox"
+msgstr "Munculkan Kotak Lampu Gambar"
+
+#: marketpress.php:4758
+#@ mp
+msgid "Makes clicking the single product image open an instant zoomed preview."
+msgstr "Klik tunggal gambar produk membuka tampilan zoom instan."
+
+#: marketpress.php:4766
+#@ mp
+msgid "Product List Settings"
+msgstr "Pengaturan Daftar Produk"
+
+#: marketpress.php:4786
+#@ mp
+msgid "Show Product Thumbnail"
+msgstr "Munculkan Thumbnail Produk"
+
+#: marketpress.php:4793
+#@ mp
+msgid "Product Thumbnail Size"
+msgstr "Ukuran Thumbnail Produk"
+
+#: marketpress.php:4804
+#@ mp
+msgid "Paginate Products"
+msgstr "Halaman Produk"
+
+#: marketpress.php:4808
+#@ mp
+msgid "Products per page"
+msgstr "Produk per halaman"
+
+#: marketpress.php:4812
+#@ mp
+msgid "Order Products By"
+msgstr "Pesanan Produk menurut"
+
+#: marketpress.php:4816
+#: marketpress.php:5540
+#@ mp
+msgid "Publish Date"
+msgstr "Tanggal Terbit"
+
+#: marketpress.php:4817
+#: marketpress.php:5541
+#@ mp
+msgid "Product ID"
+msgstr "ID Produk"
+
+#: marketpress.php:4818
+#: marketpress.php:5542
+#@ mp
+msgid "Product Author"
+msgstr "Pengarang Produk"
+
+#: marketpress.php:4819
+#: marketpress.php:5543
+#@ mp
+msgid "Number of Sales"
+msgstr "Jumlah Penjualan"
+
+#: marketpress.php:4820
+#: marketpress.php:5544
+#@ mp
+msgid "Product Price"
+msgstr "Harga Produk"
+
+#: marketpress.php:4821
+#: marketpress.php:5545
+#@ mp
+msgid "Random"
+msgstr "Acak"
+
+#: marketpress.php:4823
+#: marketpress.php:5547
+#@ mp
+msgid "Descending"
+msgstr "Menurun"
+
+#: marketpress.php:4824
+#: marketpress.php:5548
+#@ mp
+msgid "Ascending"
+msgstr "Naik"
+
+#: marketpress.php:4832
+#@ mp
+msgid "Store URL Slugs"
+msgstr "Slugs URL Toko"
+
+#: marketpress.php:4834
+#@ mp
+msgid "Customizes the url structure of your store"
+msgstr "Mengatur struktur url toko anda"
+
+#: marketpress.php:4837
+#@ mp
+msgid "Store Base"
+msgstr "Asal Toko"
+
+#: marketpress.php:4839
+#@ mp
+msgid "This page will be created so you can change it's content and the order in which it appears in navigation menus if your theme supports it."
+msgstr "Halaman ini akan dibuat jadi anda bisa mengubah isinya dan pesanan dimana halaman muncul pada menu navigasi jika tema anda mendukungnya."
+
+#: marketpress.php:4842
+#: marketpress.php:5261
+#@ mp
+msgid "Products List"
+msgstr "Daftar Produk"
+
+#: marketpress.php:4846
+#: marketpress.php:4987
+#@ mp
+msgid "Shopping Cart Page"
+msgstr "Halaman Keranjang Belanja"
+
+#: marketpress.php:4850
+#: marketpress.php:4972
+#@ mp
+msgid "Order Status Page"
+msgstr "Halaman Status Pesanan"
+
+#: marketpress.php:4906
+#@ mp
+msgid "Messages Settings"
+msgstr "Pengaturan Pesan"
+
+#: marketpress.php:4913
+#@ mp
+msgid "Email Notifications"
+msgstr "Notifikasi Email"
+
+#: marketpress.php:4917
+#@ mp
+msgid "Store Admin Email"
+msgstr "Email Admin Toko"
+
+#: marketpress.php:4920
+#@ mp
+msgid "The email address that new order notifications are sent to and received from."
+msgstr "Alamat email untuk mengirim dan menerima notifikasi pesanan baru."
+
+#: marketpress.php:4925
+#@ mp
+msgid "New Order"
+msgstr "Pesanan Baru"
+
+#: marketpress.php:4927
+#@ mp
+msgid "The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed."
+msgstr "Tulisan email telah dikirim ke pelanggan anda untuk konfirmasi sebuah pesanan baru. Kode-kode berikut akan diganti dengan penjelasan pesanan: NAMAPELANGGAN, IDPESANAN, INFOPESANAN, INFOPENGIRIMAN, INFOPEMBAYARAN, TOTAL, LACAKURL. Tidak diperkenankan HTML."
+
+#: marketpress.php:4928
+#: marketpress.php:4939
+#@ mp
+msgid "Subject:"
+msgstr ""
+
+#: marketpress.php:4930
+#: marketpress.php:4941
+#@ mp
+msgid "Text:"
+msgstr ""
+
+#: marketpress.php:4936
+#@ mp
+msgid "Order Shipped"
+msgstr ""
+
+#: marketpress.php:4938
+#@ mp
+msgid "The email text sent to your customer when you mark an order as \"Shipped\". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed."
+msgstr ""
+
+#: marketpress.php:4951
+#@ mp
+msgid "Store Pages"
+msgstr ""
+
+#: marketpress.php:4955
+#@ mp
+msgid "Store Page"
+msgstr ""
+
+#: marketpress.php:4957
+#@ mp
+msgid "The main store page is an actual page on your site. You can edit it here:"
+msgstr ""
+
+#: marketpress.php:4960
+#@ mp
+msgid "Edit Page &raquo;"
+msgstr ""
+
+#: marketpress.php:4965
+#@ mp
+msgid "Product Listing Pages"
+msgstr ""
+
+#: marketpress.php:4967
+#@ mp
+msgid "Displayed at the top of the product listing pages. Optional, HTML allowed."
+msgstr ""
+
+#: marketpress.php:4974
+#@ mp
+msgid "Displayed at the top of the Order Status page. Optional, HTML allowed."
+msgstr ""
+
+#: marketpress.php:4983
+#@ mp
+msgid "Shopping Cart Pages"
+msgstr ""
+
+#: marketpress.php:4989
+#@ mp
+msgid "Displayed at the top of the Shopping Cart page. Optional, HTML allowed."
+msgstr ""
+
+#: marketpress.php:4994
+#@ mp
+msgid "Shipping Form Page"
+msgstr ""
+
+#: marketpress.php:4996
+#@ mp
+msgid "Displayed at the top of the Shipping Form page. Optional, HTML allowed."
+msgstr ""
+
+#: marketpress.php:5001
+#@ mp
+msgid "Payment Form Page"
+msgstr ""
+
+#: marketpress.php:5003
+#@ mp
+msgid "Displayed at the top of the Payment Form page. Optional, HTML allowed."
+msgstr ""
+
+#: marketpress.php:5008
+#@ mp
+msgid "Order Confirmation Page"
+msgstr ""
+
+#: marketpress.php:5010
+#@ mp
+msgid "Displayed at the top of the final Order Confirmation page. HTML allowed."
+msgstr ""
+
+#: marketpress.php:5015
+#@ mp
+msgid "Order Complete Page"
+msgstr ""
+
+#: marketpress.php:5017
+#@ mp
+msgid "Displayed at the top of the page notifying customers of a successful order. HTML allowed."
+msgstr ""
+
+#: marketpress.php:5068
+#@ mp
+msgid "Shipping Settings"
+msgstr ""
+
+#: marketpress.php:5080
+#@ mp
+msgid "Choose Target Countries"
+msgstr ""
+
+#: marketpress.php:5082
+#@ mp
+msgid "Select:"
+msgstr ""
+
+#: marketpress.php:5082
+#@ mp
+msgid "All"
+msgstr ""
+
+#: marketpress.php:5082
+#@ mp
+msgid "EU"
+msgstr ""
+
+#: marketpress.php:5082
+#@ mp
+msgid "None"
+msgstr ""
+
+#: marketpress.php:5090
+#@ mp
+msgid "These are the countries you will sell and ship to."
+msgstr ""
+
+#: marketpress.php:5095
+#@ mp
+msgid "Select Shipping Method"
+msgstr ""
+
+#: marketpress.php:5098
+#@ mp
+msgid "No Shipping"
+msgstr ""
+
+#: marketpress.php:5143
+#@ mp
+msgid "Payment Settings"
+msgstr ""
+
+#: marketpress.php:5144
+#@ mp
+msgid "Upgrade to MarketPress Pro to enable all gateways &raquo;"
+msgstr ""
+
+#: marketpress.php:5157
+#@ mp
+msgid "Select Payment Gateway(s)"
+msgstr ""
+
+#: marketpress.php:5175
+#@ mp
+msgid "Upgrade"
+msgstr ""
+
+#: marketpress.php:5175
+#@ mp
+msgid "Pro Only &raquo;"
+msgstr ""
+
+#: marketpress.php:5206
+#@ mp
+msgid "MarketPress Shortcodes"
+msgstr ""
+
+#: marketpress.php:5211
+#@ mp
+msgid "General Information"
+msgstr ""
+
+#: marketpress.php:5221
+#@ mp
+msgid "Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1=\"value\" attr2=\"value\"]</em>."
+msgstr ""
+
+#: marketpress.php:5224
+#: marketpress.php:5671
+#@ mp
+msgid "Product Tag Cloud"
+msgstr ""
+
+#: marketpress.php:5227
+#@ mp
+msgid "Displays a cloud or list of your product tags."
+msgstr ""
+
+#: marketpress.php:5228
+#: marketpress.php:5236
+#: marketpress.php:5244
+#@ mp
+msgid "Optional Attributes &raquo;"
+msgstr ""
+
+#: marketpress.php:5232
+#@ mp
+msgid "Product Categories List"
+msgstr ""
+
+#: marketpress.php:5235
+#@ mp
+msgid "Displays an HTML list of your product categories."
+msgstr ""
+
+#: marketpress.php:5240
+#@ mp
+msgid "Product Categories Dropdown"
+msgstr ""
+
+#: marketpress.php:5243
+#@ mp
+msgid "Displays an HTML dropdown of your product categories."
+msgstr ""
+
+#: marketpress.php:5248
+#@ mp
+msgid "Popular Products List"
+msgstr ""
+
+#: marketpress.php:5251
+#@ mp
+msgid "Displays a list of popular products ordered by sales."
+msgstr ""
+
+#: marketpress.php:5255
+#@ mp
+msgid "\"number\" - max number of products to display. Defaults to 5."
+msgstr ""
+
+#: marketpress.php:5264
+#@ mp
+msgid "Displays a list of products according to preference. Optional attributes default to the values in Presentation Settings -> Product List."
+msgstr ""
+
+#: marketpress.php:5268
+#@ mp
+msgid "\"paginate\" - Whether to paginate the product list. This is useful to only show a subset."
+msgstr ""
+
+#: marketpress.php:5269
+#@ mp
+msgid "\"page\" - The page number to display in the product list if \"paginate\" is set to true."
+msgstr ""
+
+#: marketpress.php:5270
+#@ mp
+msgid "\"per_page\" - How many products to display in the product list if \"paginate\" is set to true."
+msgstr ""
+
+#: marketpress.php:5271
+#@ mp
+msgid "\"order_by\" - What field to order products by. Can be: title, date, ID, author, price, sales, rand (random)."
+msgstr ""
+
+#: marketpress.php:5272
+#@ mp
+msgid "\"order\" - Direction to order products by. Can be: DESC, ASC"
+msgstr ""
+
+#: marketpress.php:5280
+#@ mp
+msgid "Store Links"
+msgstr ""
+
+#: marketpress.php:5283
+#@ mp
+msgid "Displays a link or url to the current shopping cart page."
+msgstr ""
+
+#: marketpress.php:5285
+#@ mp
+msgid "Displays a link or url to the current store page."
+msgstr ""
+
+#: marketpress.php:5287
+#@ mp
+msgid "Displays a link or url to the current products list page."
+msgstr ""
+
+#: marketpress.php:5289
+#@ mp
+msgid "Displays a link or url to the order status page."
+msgstr ""
+
+#: marketpress.php:5293
+#@ mp
+msgid "\"url\" - Whether to return a clickable link or url. Can be: true, false. Defaults to showing link."
+msgstr ""
+
+#: marketpress.php:5294
+#@ mp
+msgid "\"link_text\" - The text to show in the link."
+msgstr ""
+
+#: marketpress.php:5300
+#@ mp
+msgid "Store Navigation List"
+msgstr ""
+
+#: marketpress.php:5303
+#@ mp
+msgid "Displays a list of links to your store pages."
+msgstr ""
+
+#: marketpress.php:5336
+#@ mp
+msgid "Shows dynamic shopping cart contents along with a checkout button for your MarketPress store."
+msgstr ""
+
+#: marketpress.php:5380
+#: marketpress.php:5527
+#: marketpress.php:5651
+#: marketpress.php:5699
+#@ mp
+#@ default
+msgid "Title:"
+msgstr ""
+
+#: marketpress.php:5381
+#: marketpress.php:5528
+#@ mp
+msgid "Custom Text:"
+msgstr ""
+
+#: marketpress.php:5397
+#@ mp
+msgid "Shows a customizable list of products from your MarketPress store."
+msgstr ""
+
+#: marketpress.php:5398
+#@ mp
+msgid "Product List"
+msgstr ""
+
+#: marketpress.php:5511
+#@ mp
+msgid "Our Products"
+msgstr ""
+
+#: marketpress.php:5532
+#@ mp
+msgid "List Settings"
+msgstr ""
+
+#: marketpress.php:5534
+#@ mp
+msgid "Number of Products:"
+msgstr ""
+
+#: marketpress.php:5537
+#@ mp
+msgid "Order Products By:"
+msgstr ""
+
+#: marketpress.php:5551
+#@ mp
+msgid "Taxonomy Filter:"
+msgstr ""
+
+#: marketpress.php:5553
+#@ mp
+msgid "No Filter"
+msgstr ""
+
+#: marketpress.php:5554
+#@ mp
+msgid "Category"
+msgstr ""
+
+#: marketpress.php:5555
+#@ mp
+msgid "Tag"
+msgstr ""
+
+#: marketpress.php:5557
+#@ mp
+msgid "Enter the Slug"
+msgstr ""
+
+#: marketpress.php:5560
+#@ mp
+msgid "Display Settings"
+msgstr ""
+
+#: marketpress.php:5562
+#@ mp
+msgid "Show Thumbnail"
+msgstr ""
+
+#: marketpress.php:5563
+#@ mp
+msgid "Thumbnail Size:"
+msgstr ""
+
+#: marketpress.php:5566
+#@ mp
+msgid "Show Excerpt"
+msgstr ""
+
+#: marketpress.php:5568
+#@ mp
+msgid "Show Price"
+msgstr ""
+
+#: marketpress.php:5570
+#@ mp
+msgid "Show Buy Button"
+msgstr ""
+
+#: marketpress.php:5580
+#@ mp
+msgid "A list or dropdown of product categories from your MarketPress store."
+msgstr ""
+
+#: marketpress.php:5599
+#@ default
+msgid "Select Category"
+msgstr ""
+
+#: marketpress.php:5655
+#@ default
+msgid "Show as dropdown"
+msgstr ""
+
+#: marketpress.php:5658
+#@ mp
+msgid "Show product counts"
+msgstr ""
+
+#: marketpress.php:5661
+#@ default
+msgid "Show hierarchy"
+msgstr ""
+
+#: marketpress.php:5670
+#@ default
+msgid "Your most used product tags in cloud format from your MarketPress store."
+msgstr ""
+

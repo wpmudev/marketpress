@@ -673,6 +673,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   	$args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Chained Payments Plugin/{$mp->version}";
     $args['body'] = $nvpStr . '&requestEnvelope.errorLanguage=en_US';
     $args['sslverify'] = false;
+		$args['timeout'] = 60;
     
     //use built in WP http class to work with most server setups
   	$response = wp_remote_post($this->API_Endpoint . $methodName, $args);
