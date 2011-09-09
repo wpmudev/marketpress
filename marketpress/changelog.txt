@@ -11,6 +11,8 @@ Change Log:
 - Fix rare bug with paypal-express gateway where orders were being duplicated across random blogs
 - Usability improvements to settings pages
 - Fix problem with network gateway control when listings only are enabled on main site
+- Fix Global products listing paging
+- Add global products previous/next navigation links
 
 2.1.5 - 9/01/2011 - Aaron Edwards
 ----------------------------------------------------------------------

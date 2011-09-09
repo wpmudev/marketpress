@@ -1279,10 +1279,16 @@ function mp_list_global_products( $args = '' ) {
   } else {
     $query .= " DESC";
   }
-
+	
+	//adjust for mysql (0 is lowest)
+	$page = $page - 1;
+	if ($page < 0)
+		$page = 0;
+	$start = $page * $per_page;
+	
   //get page details
   if ($paginate)
-    $query .= " LIMIT " . intval($page) . ", " . intval($per_page);
+    $query .= " LIMIT " . intval($start) . ", " . intval($per_page);
 
   //The Query
   $results = $wpdb->get_results( $query );
@@ -1435,7 +1441,7 @@ function mp_global_products_nav_link( $args = '' ) {
 		$paged = 1;
 	
 	//if only one page skip
-	if ($paged <= $max_pages)
+	if ($paged >= $max_pages)
 		return '';
 	
 	//only have sep if there's both prev and next results
