@@ -3,7 +3,7 @@
 Plugin Name: MarketPress
 Version: 2.1.5
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
-Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage!
+Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
 Author URI: http://uglyrobot.com
 WDP ID: 144
@@ -96,7 +96,9 @@ class MarketPress {
 		add_action( 'admin_print_styles', array(&$this, 'admin_css') );
 		add_action( 'admin_print_scripts', array(&$this, 'admin_script_post') );
     add_action( 'admin_notices', array(&$this, 'admin_nopermalink_warning') );
-
+		add_filter( 'plugin_action_links', array(&$this, 'plugin_action_link'), 10, 2);
+		add_action( 'wp_ajax_mp-hide-help', array(&$this, 'hide_help') );
+		
 		//Meta boxes
 		add_action( 'add_meta_boxes_product', array(&$this, 'meta_boxes') );
 		add_action( 'wp_insert_post', array(&$this, 'save_product_meta'), 10, 2 );
@@ -158,6 +160,7 @@ class MarketPress {
       'curr_symbol_position' => 1,
       'curr_decimal' => 1,
       'disable_cart' => 0,
+      'hide_popup' => 0,
       'inventory_threshhold' => 3,
       'max_downloads' => 5,
       'force_login' => 0,
@@ -358,7 +361,7 @@ Thanks again!", 'mp')
   function load_plugins() {
     $settings = get_option('mp_settings');
 
-    if (!$settings['disable_cart']) {
+    if (is_network_admin() || !$settings['disable_cart']) {
       //load shipping plugin API
       require_once( $this->plugin_dir . 'marketpress-shipping.php' );
       $this->load_shipping_plugins();
@@ -501,9 +504,27 @@ Thanks again!", 'mp')
   function admin_nopermalink_warning() {
     //warns admins if permalinks are not enabled on the blog
     if ( current_user_can('manage_options') && !get_option('permalink_structure') )
-      echo '<div class="error"><p>'.__('You must <a href="options-permalink.php">enable Pretty Permalinks</a> to use MarketPress!', 'mp').'</p></div>';
+      echo '<div class="error"><p>'.__('You must enable Pretty Permalinks</a> to use MarketPress - <a href="options-permalink.php">Enable now &raquo;</a>', 'mp').'</p></div>';
 	}
-
+		
+	function plugin_action_link($links, $file) {
+    static $this_plugin;
+ 
+    if (!$this_plugin) {
+      $this_plugin = plugin_basename(__FILE__);
+    }
+ 
+    // check to make sure we are on the correct plugin
+    if ($file == $this_plugin) {
+			// the anchor tag and href to the URL we want. For a "Settings" link, this needs to be the url of your settings page
+			$settings_link = '<a href="' . admin_url('edit.php?post_type=product&page=marketpress') . '">' . __('Settings', 'mp') . '</a>';
+			// add the link to the list
+			array_unshift($links, $settings_link);
+    }
+ 
+    return $links;
+	}
+	
   function add_menu_items() {
     $settings = get_option('mp_settings');
 
@@ -549,8 +570,22 @@ Thanks again!", 'mp')
     //only load languages for datepicker if not english (or it will show Chinese!)
     if ($this->language != 'en')
       wp_enqueue_script( 'jquery-datepicker-i18n', $this->plugin_url . 'datepicker/js/datepicker-i18n.min.js', array('jquery', 'jquery-ui-core', 'jquery-datepicker'), $this->version);
-  }
-
+		
+		$settings = get_option('mp_settings');
+		if (intval($settings['hide_popup']) < 3) {
+			wp_enqueue_script( 'mp-need-help', $this->plugin_url . 'js/need-help.js', array('jquery'), $this->version);
+			$settings['hide_popup'] = intval($settings['hide_popup']) + 1;
+			update_option('mp_settings', $settings);
+		}
+	}
+	
+	//ties into the ajax request to disable help popup if clicked
+	function hide_help() {
+		$settings = get_option('mp_settings');
+		$settings['hide_popup'] = 3;
+		update_option('mp_settings', $settings);
+	}
+	
   //ajax cart handling for store frontend
   function store_script() {
 		//disable ajax cart if incompatible by domain mapping plugin settings
@@ -1486,9 +1521,11 @@ Thanks again!", 'mp')
 
 		switch ($column) {
 			case "thumbnail":
-        echo '<a href="' . get_edit_post_link() . '" title="' . __('Edit &raquo;') . '">';
-				the_post_thumbnail(array(50,50), array('title' => ''));
-				echo '</a>';
+        if (has_post_thumbnail()) {
+					echo '<a href="' . get_edit_post_link() . '" title="' . __('Edit &raquo;') . '">';
+					the_post_thumbnail(array(50,50), array('title' => ''));
+					echo '</a>';
+				}
 				break;
 
 			case "variations":

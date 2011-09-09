@@ -209,3 +209,13 @@ td.mp_var_remove {
 .wp_themeSkin iframe {
     background: white;
 }
+#mp-need-help {
+	background: transparent url('../images/need-help.png') no-repeat scroll top left;
+	display: block;
+	width: 272px;
+	height: 119px;
+	position: absolute;
+	z-index: 10;
+	float: right;
+	right: 45px;
+}

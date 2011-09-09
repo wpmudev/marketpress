@@ -327,7 +327,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function process_payment($global_cart, $shipping_info) {
-    global $mp, $blog_id;
+    global $mp, $blog_id, $site_id, $switched_stack, $switched;
+		
 	  $blog_id = (is_multisite()) ? $blog_id : 1;
 	  $current_blog_id = $blog_id;
 
@@ -445,17 +446,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					//figure out blog_id of this payment to put the order into it
           $unique_id = ($result["PAYMENTINFO_{$i}_PAYMENTREQUESTID"]) ? $result["PAYMENTINFO_{$i}_PAYMENTREQUESTID"] : $result["PAYMENTREQUEST_{$i}_PAYMENTREQUESTID"]; //paypal docs messed up, not sure which is valid return
 					@list($bid, $order_id) = explode(':', $unique_id);
-
-          if (is_multisite())
-						switch_to_blog($bid);
+			
+          if (is_multisite())	
+						switch_to_blog($bid, true);
 
 					//succesful payment, create our order now
-	        $result = $mp->create_order($_SESSION['mp_order'], $selected_cart[$bid], $shipping_info, $payment_info, $paid);
-				}
-
+	        $mp->create_order($_SESSION['mp_order'], $selected_cart[$bid], $shipping_info, $payment_info, $paid);
+				}	
+		
         if (is_multisite())
-    			switch_to_blog($current_blog_id);
-
+    			switch_to_blog($current_blog_id, true);
+				
         //success. Do nothing, it will take us to the confirmation page
       } else { //whoops, error
 
@@ -498,13 +499,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     global $mp;
 
     if ($mp->global_cart) {
-		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
-			/* TODO - create a list of sep store orders
-	    foreach ($_SESSION['prs'] as $i => $pr) {
-		    $_SESSION['final_amts'][$i];
-		  }
-		  */
-		} else {
+		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), count($_SESSION['prs']), $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
+			/* TODO - create a list of sep store orders*/
+	  	} else {
 	    if ($order->post_status == 'order_received') {
 	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
 	      $statuses = $order->mp_payment_info['status'];

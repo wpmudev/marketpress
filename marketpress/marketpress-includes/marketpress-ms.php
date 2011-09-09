@@ -415,7 +415,7 @@ class MarketPress_MS {
       $args['page'] = intval(get_query_var('paged'));
 
     $content = mp_list_global_products( $args );
-    $content .= get_posts_nav_link();
+    $content .= mp_global_products_nav_link( $args );
 
     return $content;
   }
@@ -436,7 +436,7 @@ class MarketPress_MS {
         $args['page'] = intval(get_query_var('paged'));
 
       $content = mp_list_global_products( $args );
-      $content .= get_posts_nav_link();
+      $content .= mp_global_products_nav_link( $args );
       
     } else { //no category set, so show list
       $content .= mp_global_categories_list( array( 'echo' => false ) );
@@ -461,7 +461,7 @@ class MarketPress_MS {
         $args['page'] = intval(get_query_var('paged'));
 
       $content = mp_list_global_products( $args );
-      $content .= get_posts_nav_link();
+      $content .= mp_global_products_nav_link( $args );
 
     } else { //no category set, so show list
       $content = mp_global_tag_cloud( false );
@@ -1377,6 +1377,98 @@ function mp_list_global_products( $args = '' ) {
     return $content;
 }
 
+/*
+ * function mp_global_products_nav_link
+ * 
+ * The list of arguments is below:
+ *    bool echo Optional, whether to echo or return
+ *    int page Optional, The page number to display in the product list if $paginate is set to true. Default: 0
+ *    int per_page Optional, How many products to display in the product list if $paginate is set to true. Default: 20
+ *    string category Optional, limit to a product category, use slug
+ *    string tag Optional, limit to a product tag, use slug
+ *
+ * @param string|array $args Optional. Override default arguments.
+ */
+function mp_global_products_nav_link( $args = '' ) {
+  global $wpdb, $mp;
+	
+  $defaults = array(
+		'echo' => true,
+		'page' => false, 
+    'per_page' => 20,
+		'category' => '',
+    'tag' => '',
+		'sep' => ' &#8212; ',
+		'prelabel' => __('&laquo; Previous', 'mp'),
+		'nxtlabel' => __('Next &raquo;', 'mp')
+	);
+
+  $r = wp_parse_args( $args, $defaults );
+  extract( $r );
+
+  //setup taxonomy if applicable
+  if ($category) {
+    $category = $wpdb->escape( sanitize_title( $category ) );
+    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_category' AND t.slug = '$category'";
+  } else if ($tag) {
+    $tag = $wpdb->escape( sanitize_title( $tag ) );
+    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_tag' AND t.slug = '$tag'";
+  } else {
+    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
+  }
+
+  //The Query
+  $total = $wpdb->get_var( $query );
+	
+	//setup last page
+	$max_pages = intval($total / $per_page);
+	if ($max_pages < 1)
+		$max_pages = 1;
+	
+	//setup current page
+	if ($page !== false) {
+		$paged = $page; //pages start at 1 for our uses
+	} else {
+		$paged = intval(get_query_var('paged'));
+	}
+	if ($paged < 1)
+		$paged = 1;
+	
+	//if only one page skip
+	if ($paged <= $max_pages)
+		return '';
+	
+	//only have sep if there's both prev and next results
+	if ($paged < 2 || $paged >= $max_pages) {
+		$sep = '';
+	}
+
+	if ( $max_pages > 1 ) {
+		//previous
+		if ( $paged > 1 ) {
+			$attr = apply_filters( 'previous_posts_link_attributes', '' );
+			$prevpage = intval($paged) - 1;
+			if ( $prevpage < 1 )
+				$prevpage = 1;
+			$return .= '<a href="' . get_pagenum_link($prevpage) . "\" $attr>". preg_replace( '/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $prelabel ) .'</a>';
+		}
+		
+		$return .= preg_replace('/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $sep);
+		
+		$nextpage = intval($paged) + 1;
+		if ( $nextpage <= $max_pages ) {
+			$attr = apply_filters( 'next_posts_link_attributes', '' );
+			$nextpage = intval($paged) + 1;
+			$return .= '<a href="' . get_pagenum_link($nextpage) . "\" $attr>" . preg_replace('/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $nxtlabel ) . '</a>';
+		}
+		
+	}
+	
+	if ($echo)
+		echo $return;
+	else
+		return $return;
+}
 
 /*** Widgets ***/
 
