@@ -102,6 +102,7 @@ class MarketPress {
 		//Meta boxes
 		add_action( 'add_meta_boxes_product', array(&$this, 'meta_boxes') );
 		add_action( 'wp_insert_post', array(&$this, 'save_product_meta'), 10, 2 );
+		add_filter( 'enter_title_here', array(&$this, 'filter_title') );
 
 		//Templates and Rewrites
 		add_action( 'wp', array(&$this, 'load_store_templates') );
@@ -273,7 +274,7 @@ Thanks again!", 'mp')
 			add_option( 'mp_store_page', '', '', 'no' );
 
 			//create store page
-			add_action( 'init', array(&$this, 'create_store_page') );
+			add_action( 'admin_init', array(&$this, 'create_store_page') );
 
 			//add cart widget to first sidebar
 			add_action( 'widgets_init', array(&$this, 'add_default_widget'), 11 );
@@ -1718,9 +1719,20 @@ Thanks again!", 'mp')
 
 		}
 	}
-
+	
+	//filters label in new product title field
+	function filter_title($post) {
+		global $post_type;
+		
+		if ($post_type != 'product')
+			return $post;
+		
+		return __( 'Enter Product title here', 'mp' );
+	}
+	
   //adds our custom meta boxes the the product edit screen
   function meta_boxes() {
+		global $wp_meta_boxes;
     $settings = get_option('mp_settings');
 
     add_meta_box('mp-meta-details', __('Product Details', 'mp'), array(&$this, 'meta_details'), 'product', 'normal', 'high');
@@ -1735,6 +1747,19 @@ Thanks again!", 'mp')
 			//for product downloads
       add_meta_box('mp-meta-download', __('Product Download', 'mp'), array(&$this, 'meta_download'), 'product', 'normal', 'high');
     }
+		
+		//all this junk is to reorder the metabox array to move the featured image box to the top right below submit box. User order will override
+		if ( isset( $wp_meta_boxes['product']['side']['low']['postimagediv'] ) ) {
+			$imagediv = $wp_meta_boxes['product']['side']['low']['postimagediv'];
+			unset( $wp_meta_boxes['product']['side']['low'] );
+			$submitdiv = $wp_meta_boxes['product']['side']['core']['submitdiv'];
+			unset( $wp_meta_boxes['product']['side']['core']['submitdiv'] );
+			$new_core['submitdiv'] = $submitdiv;
+			$new_core['postimagediv'] = $imagediv;
+			$wp_meta_boxes['product']['side']['core'] = array_merge( $new_core, $wp_meta_boxes['product']['side']['core']) ;
+			//filter title
+			$wp_meta_boxes['product']['side']['core']['postimagediv']['title'] = __('Product Image', 'mp');
+		}
   }
 
   //Save our post meta when a product is created or updated
@@ -4395,7 +4420,8 @@ Notification Preferences: %s', 'mp');
     		'messages'      => __('Messages', 'mp'),
     		'shipping'      => __('Shipping', 'mp'),
     		'gateways'      => __('Payments', 'mp'),
-    		'shortcodes'    => __('Shortcodes', 'mp')
+    		'shortcodes'    => __('Shortcodes', 'mp'),
+    		'importers'     => __('Importers', 'mp')
     	);
     } else {
       $tabs = array( 'presentation'  => __('Presentation', 'mp') );
@@ -5086,11 +5112,16 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Store Theme', 'mp') ?></th>
         				<td>
                   <?php $this->store_themes_select(); ?>
-                  <br /><span class="description"><?php _e('This option changes the built-in css styles for store pages.', 'mp') ?>
+                  <br /><span class="description"><?php _e('This option changes the built-in css styles for store pages.', 'mp') ?></span>
                   <?php if ((is_multisite() && is_super_admin()) || !is_multisite()) { ?>
-                  <br /><?php _e('For a custom css theme, save your css file with the "MarketPress Theme: NAME" header in the "/marketpress/css/themes/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="' . $this->plugin_url . 'themes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp') ?>
-                  <?php } ?></span>
-                 </td>
+                  <br /><span class="description"><?php _e('For a custom css theme, save your css file with the "MarketPress Theme: NAME" header in the "/marketpress/css/themes/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="' . $this->plugin_url . 'themes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp') ?></span>
+                  <h4><?php _e('Full-featured MarketPress Themes:', 'mp') ?></h4>
+									<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/frame-market-theme"><img alt="FrameMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/219/listing-image-thumb.png" />
+										<?php _e('The ultimate MarkePress theme brings visual perfection to WordPress e-commerce. This professional front-end does all the work for you!', 'mp') ?></a></div>
+									<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/simplemarket"><img alt="SimpleMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/237/listing-image-thumb.png" />
+										<?php _e('The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!', 'mp') ?></a></div>
+									<?php } ?>
+									</td>
                 </tr>
               </table>
             </div>
@@ -5687,6 +5718,21 @@ Notification Preferences: %s', 'mp');
         </div>
         <?php
         break;
+			
+			//---------------------------------------------------//
+  		case "importers":
+        ?>
+        <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/import.png'; ?>" /></div>
+				<form id="mp-import-form" method="post" action="" enctype="multipart/form-data">
+				<h2><?php _e('Import Products', 'mp'); ?></h2>
+				<div id="poststuff" class="metabox-holder mp-importer">
+					<?php do_action('marketpress_add_importer'); ?>	
+				</div>
+				</form>
+			</div>
+        <?php
+        break;
+			
   	} //end switch
 
   	//hook to create a new admin screen.
