@@ -229,3 +229,16 @@ td.mp_var_remove {
 	margin-right: 10px;
 	margin-bottom: 1px;
 }
+div.mp-pro-update {
+	background-color: #FFEBE8;
+	border-color: #CC0000;
+	border-radius: 3px 3px 3px 3px;
+	border-style: solid;
+	border-width: 1px;
+	margin: 10px 0;
+	padding: 1em;
+}
+.mp-pro-update {
+	color: red;
+	font-weight: bold;
+}

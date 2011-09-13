@@ -5117,9 +5117,11 @@ Notification Preferences: %s', 'mp');
                   <br /><span class="description"><?php _e('For a custom css theme, save your css file with the "MarketPress Theme: NAME" header in the "/marketpress/css/themes/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="' . $this->plugin_url . 'themes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp') ?></span>
                   <h4><?php _e('Full-featured MarketPress Themes:', 'mp') ?></h4>
 									<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/frame-market-theme"><img alt="FrameMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/219/listing-image-thumb.png" />
-										<?php _e('The ultimate MarkePress theme brings visual perfection to WordPress e-commerce. This professional front-end does all the work for you!', 'mp') ?></a></div>
+										<strong><?php _e('FrameMarket/GridMarket', 'mp') ?></strong></a><br />
+										<?php _e('The ultimate MarkePress theme brings visual perfection to WordPress e-commerce. This professional front-end does all the work for you!', 'mp') ?></div>
 									<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/simplemarket"><img alt="SimpleMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/237/listing-image-thumb.png" />
-										<?php _e('The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!', 'mp') ?></a></div>
+										<strong><?php _e('SimpleMarket', 'mp') ?></strong></a><br />
+										<?php _e('The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!', 'mp') ?></div>
 									<?php } ?>
 									</td>
                 </tr>
