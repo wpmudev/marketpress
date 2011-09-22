@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.1.6
+Version: 2.2 Beta 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.1.6';
+  var $version = '2.2-Beta-1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -96,7 +96,7 @@ class MarketPress {
 		add_action( 'admin_print_styles', array(&$this, 'admin_css') );
 		add_action( 'admin_print_scripts', array(&$this, 'admin_script_post') );
     add_action( 'admin_notices', array(&$this, 'admin_nopermalink_warning') );
-		add_filter( 'plugin_action_links', array(&$this, 'plugin_action_link'), 10, 2);
+		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array(&$this, 'plugin_action_link'), 10, 2);
 		add_action( 'wp_ajax_mp-hide-help', array(&$this, 'hide_help') );
 		
 		//Meta boxes
@@ -166,6 +166,7 @@ class MarketPress {
       'max_downloads' => 5,
       'force_login' => 0,
       'ga_ecommerce' => 'none',
+			'special_instructions' => 0,
       'store_theme' => 'icons',
       'product_img_height' => 150,
       'product_img_width' => 150,
@@ -233,6 +234,8 @@ SHIPPINGINFO
 Payment Information:
 PAYMENTINFO
 
+ORDERNOTES
+
 You can track the latest status of your order here: TRACKINGURL
 
 Thanks again!", 'mp'),
@@ -250,6 +253,8 @@ SHIPPINGINFO
 
 Payment Information:
 PAYMENTINFO
+
+ORDERNOTES
 
 You can track the latest status of your order here: TRACKINGURL
 
@@ -509,20 +514,10 @@ Thanks again!", 'mp')
 	}
 		
 	function plugin_action_link($links, $file) {
-    static $this_plugin;
- 
-    if (!$this_plugin) {
-      $this_plugin = plugin_basename(__FILE__);
-    }
- 
-    // check to make sure we are on the correct plugin
-    if ($file == $this_plugin) {
-			// the anchor tag and href to the URL we want. For a "Settings" link, this needs to be the url of your settings page
-			$settings_link = '<a href="' . admin_url('edit.php?post_type=product&page=marketpress') . '">' . __('Settings', 'mp') . '</a>';
-			// add the link to the list
-			array_unshift($links, $settings_link);
-    }
- 
+		// the anchor tag and href to the URL we want. For a "Settings" link, this needs to be the url of your settings page
+		$settings_link = '<a href="' . admin_url('edit.php?post_type=product&page=marketpress') . '">' . __('Settings', 'mp') . '</a>';
+		// add the link to the list
+		array_unshift($links, $settings_link);
     return $links;
 	}
 	
@@ -697,7 +692,7 @@ Thanks again!", 'mp')
     $supports = array( 'title', 'editor', 'author', 'excerpt', 'revisions', 'thumbnail' );
     $args = array (
         'labels' => array('name' => __('Products', 'mp'),
-                      		'singular_name' => __('Products', 'mp'),
+                      		'singular_name' => __('Product', 'mp'),
                       		'add_new' => __('Create New', 'mp'),
                       		'add_new_item' => __('Create New Product', 'mp'),
                       		'edit_item' => __('Edit Products', 'mp'),
@@ -1043,7 +1038,7 @@ Thanks again!", 'mp')
     //load proper theme for product category or tag listings
     if ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') {
       $templates = array();
-
+			
       if ($wp_query->query_vars['taxonomy'] == 'product_category') {
 
         $cat_name = get_query_var('product_category');
@@ -1069,13 +1064,20 @@ Thanks again!", 'mp')
       //defaults
       $templates[] = "mp_taxonomy.php";
       $templates[] = "mp_productlist.php";
-
+			
+			//override if id is passed, mainly for product category dropdown widget
+			if ( is_numeric( get_query_var($wp_query->query_vars['taxonomy']) ) ) {
+				$term = get_term( get_query_var($wp_query->query_vars['taxonomy']), $wp_query->query_vars['taxonomy'] );
+				$wp_query->query_vars[$wp_query->query_vars['taxonomy']] = $term->slug;
+				$wp_query->query_vars['term'] = $term->slug;
+			}
+			
       //if custom template exists load it
       if ($this->product_taxonomy_template = locate_template($templates)) {
 
         //call a custom query posts for this listing
         $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
-
+				
         //setup pagination
         if ($settings['paginate']) {
           //figure out perpage
@@ -1971,7 +1973,7 @@ Thanks again!", 'mp')
     $totals = array();
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-			    $totals[] = $data['price'] * $data['quantity'];
+			    $totals[] = $this->before_tax_price($data['price']) * $data['quantity'];
 			}
     }
 
@@ -2006,6 +2008,20 @@ Thanks again!", 'mp')
     else
       return $price;
   }
+	
+	function shipping_tracking_link($tracking_number, $method = 'other') {
+		$tracking_number = esc_attr($tracking_number);
+		if ($method == 'UPS')
+			return '<a title="'.__('Track your UPS package &raquo;', 'mp').'" href="http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1='.$tracking_number.'&track.x=0&track.y=0" target="_blank">'.$tracking_number.'</a>';
+		else if ($method == 'FedEx')
+			return '<a title="'.__('Track your FedEx package &raquo;', 'mp').'" href="http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
+		else if ($method == 'USPS')
+			return '<a title="'.__('Track your USPS package &raquo;', 'mp').'" href="http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
+		else if ($method == 'DHL')
+			return '<a title="'.__('Track your DHL package &raquo;', 'mp').'" href="http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
+		else
+			return $tracking_number;
+	}
 
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $cart = false) {
@@ -2032,7 +2048,7 @@ Thanks again!", 'mp')
     $totals = array();
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-			  $totals[] = $data['price'] * $data['quantity'];
+			  $totals[] = $this->before_tax_price($data['price']) * $data['quantity'];
 			}
     }
 
@@ -2077,7 +2093,7 @@ Thanks again!", 'mp')
 			      $price = round($total * $settings['tax']['rate'], 2);
 			  } else {
 			    //all other countries use the tax outside preference
-			    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country = $settings['base_country']))
+			    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country == $settings['base_country']))
 			      $price = round($total * $settings['tax']['rate'], 2);
 			  }
 			  break;
@@ -2092,6 +2108,17 @@ Thanks again!", 'mp')
     else
       return $price;
   }
+	
+	//returns the before tax price for a given amount based on a bunch of foreign tax laws.
+  function before_tax_price($tax_price) {
+		$settings = get_option('mp_settings');
+		
+		//if tax inclusve pricing is turned off just return given price
+		if (!$settings['tax']['tax_inclusive'])
+			return $tax_price;
+			
+		return round($tax_price / ($settings['tax']['rate'] + 1), 2);
+	}
 
   //returns contents of shopping cart cookie
   function get_cart_cookie($global = false) {
@@ -2477,6 +2504,8 @@ Thanks again!", 'mp')
       $_SESSION['mp_shipping_info']['zip'] = ($_POST['zip']) ? trim(stripslashes($_POST['zip'])) : $meta['zip'];
       $_SESSION['mp_shipping_info']['country'] = ($_POST['country']) ? trim($_POST['country']) : $meta['country'];
       $_SESSION['mp_shipping_info']['phone'] = ($_POST['phone']) ? preg_replace('/[^0-9-\(\) ]/', '', trim($_POST['phone'])) : $meta['phone'];
+			if (isset($_POST['special_instructions']))
+				$_SESSION['mp_shipping_info']['special_instructions'] = trim(stripslashes($_POST['special_instructions']));
 
       //for checkout plugins
       do_action( 'mp_shipping_process' );
@@ -2763,8 +2792,17 @@ Thanks again!", 'mp')
     $post_id = wp_insert_post($order);
 
     /* add post meta */
+		
+		//filter tax included products in cart
+		$filtered_cart = $cart;
+    foreach ($cart as $product_id => $variations) {
+			foreach ($variations as $variation => $data) {
+	      $filtered_cart[$product_id][$variation]['price'] = $this->before_tax_price($data['price']);
+			}
+		}
+		
     //cart info
-    add_post_meta($post_id, 'mp_cart_info', $cart, true);
+    add_post_meta($post_id, 'mp_cart_info', $filtered_cart, true);
     //shipping info
     add_post_meta($post_id, 'mp_shipping_info', $shipping_info, true);
     //payment info
@@ -3403,7 +3441,7 @@ Thanks again!", 'mp')
         do_action( 'mp_order_paid', $order );
 
         //if paid and the cart is only digital products mark it shipped
-				if ($this->download_only_cart($cart))
+				if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info))
 				  $this->update_order_status($order->ID, 'shipped');
       } else {
         //update payment time if somehow it was skipped
@@ -3478,7 +3516,14 @@ Thanks again!", 'mp')
     $shipping_info .= "\n" . __('Country:', 'mp') . ' ' . $order->mp_shipping_info['country'];
     if ($order->mp_shipping_info['phone'])
       $shipping_info .= "\n" . __('Phone Number:', 'mp') . ' ' . $order->mp_shipping_info['phone'];
-
+		if (isset($order->mp_shipping_info['method']) && $order->mp_shipping_info['method'] != 'other')
+      $shipping_info .= "\n" . __('Shipping Method:', 'mp') . ' ' . $order->mp_shipping_info['method'];
+		if ($order->mp_shipping_info['tracking_num'])
+      $shipping_info .= "\n" . __('Tracking Number:', 'mp') . ' ' . $order->mp_shipping_info['tracking_num'];
+		
+		if ($order->mp_order_notes)
+      $order_notes = __('Order Notes:', 'mp') . "\n" . $order->mp_order_notes;
+		
     //// Payment Info
     $payment_info = __('Payment Method:', 'mp') . ' ' . $order->mp_payment_info['gateway_public_name'];
 
@@ -3508,8 +3553,8 @@ Thanks again!", 'mp')
     $tracking_url = mp_orderstatus_link(false, true) . $order->post_title . '/';
 
     //setup filters
-    $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL');
-    $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url);
+    $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
+    $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
 
     //replace
     $text = str_replace($search, $replace, $text);
@@ -3566,7 +3611,7 @@ You can manage this order here: %s", 'mp');
       return false;
 
     //if the cart is only digital products skip notification
-		if ($this->download_only_cart($order->mp_cart_info))
+		if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info))
     	return false;
 
     $settings['email']['shipped_order_subject'] = apply_filters('mp_shipped_order_notification_subject', $settings['email']['shipped_order_subject'], $order);
@@ -3791,12 +3836,34 @@ Notification Preferences: %s', 'mp');
 
     $settings = get_option('mp_settings');
 		$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+		
+		//save tracking number
+		if (isset($_POST['mp_tracking_number'])) {
+			$order->mp_shipping_info['tracking_num'] = stripslashes(trim($_POST['mp_tracking_number']));
+			$order->mp_shipping_info['method'] = stripslashes(trim($_POST['mp_shipping_method']));
+			update_post_meta($order->ID, 'mp_shipping_info', $order->mp_shipping_info);
+			?><div class="updated fade"><p><?php _e('Tracking number saved!', 'mp'); ?></p></div><?php
+			if (isset($_POST['add-tracking-shipped'])) {
+				$this->update_order_status($order->ID, 'shipped');
+				$order->post_status = 'order_shipped';
+				?><div class="updated fade"><p><?php _e('This order has been marked as Shipped.', 'mp'); ?></p></div><?php
+			}
+		}
+		
+		//save order notes
+		if (isset($_POST['mp_order_notes'])) {
+			if (!current_user_can('unfiltered_html'))
+				$_POST['mp_order_notes'] = wp_filter_post_kses(trim(stripslashes($_POST['mp_order_notes'])));
+				
+			$order->mp_order_notes = stripslashes($_POST['mp_order_notes']);
+			update_post_meta($order->ID, 'mp_order_notes', $_POST['mp_order_notes']);
+			?><div class="updated fade"><p><?php _e('Order Notes updated!', 'mp'); ?></p></div><?php
+		}
     ?>
     <div class="wrap">
     <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/shopping-cart.png'; ?>" /></div>
     <h2><?php echo sprintf(__('Order Details (%s)', 'mp'), esc_attr($order->post_title)); ?></h2>
 
-    <form id="mp-single-order-form" action="<?php echo admin_url('edit.php'); ?>" method="get">
     <div id="poststuff" class="metabox-holder mp-settings has-right-sidebar">
 
     <div id="side-info-column" class="inner-sidebar">
@@ -3843,12 +3910,13 @@ Notification Preferences: %s', 'mp');
         ?>
 
           <div id="major-publishing-actions">
-
+						<form id="mp-single-order-form" action="<?php echo admin_url('edit.php'); ?>" method="get">
             <div id="mp-single-order-buttons">
               <input type="hidden" name="post_type" class="post_status_page" value="product" />
               <input type="hidden" name="page" class="post_status_page" value="marketpress-orders" />
               <input name="save" class="button-primary" id="publish" tabindex="1" value="<?php _e('&laquo; Back', 'mp'); ?>" type="submit" />
             </div>
+						</form>
             <div class="clear"></div>
           </div>
         </div>
@@ -3930,7 +3998,7 @@ Notification Preferences: %s', 'mp');
           }
           ?>
             <strong><?php echo date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp); ?>:</strong>
-            <?php echo htmlentities($status); ?>
+            <?php echo esc_html($status); ?>
           </div>
         <?php } ?>
 
@@ -4019,10 +4087,17 @@ Notification Preferences: %s', 'mp');
 
         <h3><?php _e('Cart Total:', 'mp'); ?></h3>
         <p><?php echo $this->format_currency('', $order->mp_order_total); ?></p>
-
+				
+				<?php //special instructions line
+        if ( !empty($order->mp_shipping_info['special_instructions']) ) { ?>
+        <h3><?php _e('Special Instructions:', 'mp'); ?></h3>
+        <p><?php echo wpautop(esc_html($order->mp_shipping_info['special_instructions'])); ?></p>
+        <?php } ?>
+				
         </div>
       </div>
-
+			
+			<form id="mp-shipping-form" action="" method="post">
       <div id="mp-order-shipping-info" class="postbox">
         <h3 class='hndle'><span><?php _e('Shipping Information', 'mp'); ?></span></h3>
         <div class="inside">
@@ -4030,41 +4105,41 @@ Notification Preferences: %s', 'mp');
           <table>
             <tr>
           	<td align="right"><?php _e('Full Name:', 'mp'); ?></td><td>
-            <?php echo esc_attr($order->mp_shipping_info['name']); ?></td>
+            <?php esc_attr_e($order->mp_shipping_info['name']); ?></td>
           	</tr>
 
             <tr>
           	<td align="right"><?php _e('Email:', 'mp'); ?></td><td>
-            <?php echo esc_attr($order->mp_shipping_info['email']); ?></td>
+            <?php esc_attr_e($order->mp_shipping_info['email']); ?></td>
           	</tr>
 
           	<tr>
           	<td align="right"><?php _e('Address:', 'mp'); ?></td>
-            <td><?php echo esc_attr($order->mp_shipping_info['address1']); ?></td>
+            <td><?php esc_attr_e($order->mp_shipping_info['address1']); ?></td>
           	</tr>
 
             <?php if ($order->mp_shipping_info['address2']) { ?>
           	<tr>
           	<td align="right"><?php _e('Address 2:', 'mp'); ?></td>
-            <td><?php echo esc_attr($order->mp_shipping_info['address2']); ?></td>
+            <td><?php esc_attr_e($order->mp_shipping_info['address2']); ?></td>
           	</tr>
             <?php } ?>
 
           	<tr>
           	<td align="right"><?php _e('City:', 'mp'); ?></td>
-            <td><?php echo esc_attr($order->mp_shipping_info['city']); ?></td>
+            <td><?php esc_attr_e($order->mp_shipping_info['city']); ?></td>
           	</tr>
 
           	<?php if ($order->mp_shipping_info['state']) { ?>
           	<tr>
           	<td align="right"><?php _e('State/Province/Region:', 'mp'); ?></td>
-            <td><?php echo esc_attr($order->mp_shipping_info['state']); ?></td>
+            <td><?php esc_attr_e($order->mp_shipping_info['state']); ?></td>
           	</tr>
             <?php } ?>
 
           	<tr>
           	<td align="right"><?php _e('Postal/Zip Code:', 'mp'); ?></td>
-            <td><?php echo esc_attr($order->mp_shipping_info['zip']); ?></td>
+            <td><?php esc_attr_e($order->mp_shipping_info['zip']); ?></td>
           	</tr>
 
           	<tr>
@@ -4075,29 +4150,56 @@ Notification Preferences: %s', 'mp');
             <?php if ($order->mp_shipping_info['phone']) { ?>
           	<tr>
           	<td align="right"><?php _e('Phone Number:', 'mp'); ?></td>
-            <td><?php echo esc_attr($order->mp_shipping_info['phone']); ?></td>
+            <td><?php esc_attr_e($order->mp_shipping_info['phone']); ?></td>
           	</tr>
             <?php } ?>
           </table>
 
           <h3><?php _e('Cost:', 'mp'); ?></h3>
           <p><?php echo $this->format_currency('', $order->mp_shipping_total); ?></p>
-
+					
+          <h3><?php _e('Shipping Method & Tracking Number:', 'mp'); ?></h3>
+          <p>
+					<select name="mp_shipping_method">
+						<option value="other"><?php _e('Choose Method:', 'mp'); ?></option>
+						<option value="UPS"<?php selected($order->mp_shipping_info['method'], 'UPS'); ?>>UPS</option>
+						<option value="FedEx"<?php selected($order->mp_shipping_info['method'], 'FedEx'); ?>>FedEx</option>
+						<option value="USPS"<?php selected($order->mp_shipping_info['method'], 'USPS'); ?>>USPS</option>
+						<option value="DHL"<?php selected($order->mp_shipping_info['method'], 'DHL'); ?>>DHL</option>
+						<option value="other"<?php selected($order->mp_shipping_info['method'], 'other'); ?>><?php _e('Other', 'mp'); ?></option>
+					</select>
+					<input type="text" name="mp_tracking_number" value="<?php esc_attr_e($order->mp_shipping_info['tracking_num']); ?>" size="25" />
+					<input type="submit" name="add-tracking" value="<?php _e('Save', 'mp'); ?>" /><?php if ($order->post_status == 'order_received' ||$order->post_status == 'order_paid') { ?><input type="submit" name="add-tracking-shipped" value="<?php _e('Save & Mark as Shipped &raquo;', 'mp'); ?>" /><?php } ?>
+					</p>
+					
           <?php //note line if set by gateway
           if ( $order->mp_payment_info['note'] ) { ?>
           <h3><?php _e('Special Note:', 'mp'); ?></h3>
-          <p><?php echo htmlentities($order->mp_payment_info['note']); ?></p>
+          <p><?php esc_html_e($order->mp_payment_info['note']); ?></p>
           <?php } ?>
-
+					
           <?php do_action('mp_single_order_display_shipping', $order); ?>
 
         </div>
       </div>
-
+			</form>
+			
+			<form id="mp-notes-form" action="" method="post">
+      <div id="mp-order-notes" class="postbox">
+        <h3 class='hndle'><span><?php _e('Order Notes', 'mp'); ?></span> - <span class="description"><?php _e('These notes will be displayed on the order status page', 'mp'); ?></span></h3>
+        <div class="inside">
+					<p>
+					<textarea name="mp_order_notes" rows="5" style="width: 100%;"><?php echo esc_textarea($order->mp_order_notes); ?></textarea><br />
+					<input type="submit" name="save-note" value="<?php _e('Save Notes &raquo;', 'mp'); ?>" />
+					</p>
+				</div>
+      </div>
+			</form>
+			
       <?php do_action('mp_single_order_display_box', $order); ?>
 
     </div>
-
+		
     <div id='advanced-sortables' class='meta-box-sortables'>
     </div>
 
@@ -4105,7 +4207,7 @@ Notification Preferences: %s', 'mp');
     </div>
     <br class="clear" />
     </div><!-- /poststuff -->
-    </form>
+    
     </div><!-- /wrap -->
     <?php
   }
@@ -4624,17 +4726,14 @@ Notification Preferences: %s', 'mp');
                 <br /><span class="description"><?php _e('Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp') ?></span>
           			</td>
                 </tr>
-                <?php /* ?>
                 <tr>
-        				<th scope="row"><?php _e('Show Prices Inclusive of Tax?', 'mp') ?></th>
+        				<th scope="row"><?php _e('Enter Prices Inclusive of Tax?', 'mp') ?></th>
                 <td>
-                <?php $tax_inclusive = isset($settings['tax']['tax_inclusive']) ? $settings['tax']['tax_inclusive'] : 0; ?>
-        				<label><input value="1" name="mp[tax][tax_inclusive]" type="radio"<?php checked($tax_inclusive, 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                <label><input value="0" name="mp[tax][tax_inclusive]" type="radio"<?php checked($tax_inclusive, 0) ?> /> <?php _e('No', 'mp') ?></label>
-                <br /><span class="description"><?php _e('Please see your local tax laws.', 'mp') ?></span>
+        				<label><input value="1" name="mp[tax][tax_inclusive]" type="radio"<?php checked($settings['tax']['tax_inclusive'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[tax][tax_inclusive]" type="radio"<?php checked($settings['tax']['tax_inclusive'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e('Enabling this option allows you to enter and show all prices inclusive of tax, while still listing the tax total as a line item in shopping carts. Please see your local tax laws.', 'mp') ?></span>
           			</td>
                 </tr>
-                <?php */ ?>
               </table>
             </div>
           </div>
@@ -4728,6 +4827,14 @@ Notification Preferences: %s', 'mp');
 									<option value="old"<?php selected($settings['ga_ecommerce'], 'old') ?>><?php _e('Old Tracking Code', 'mp') ?></option>
 								</select>
         				<br /><span class="description"><?php _e('If you already use Google Analytics for your website, you can track detailed ecommerce information by enabling this setting. Choose whether you are using the new asynchronous or old tracking code. Before Google Analytics can report ecommerce activity for your website, you must enable ecommerce tracking on the profile settings page for your website. Also keep in mind that some gateways do not reliably show the receipt page, so tracking may not be accurate in those cases. It is recommended to use the PayPal gateway for the most accurate data. <a href="http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-in-google.html" target="_blank">More information &raquo;</a>', 'mp') ?></span>
+          			</td>
+                </tr>
+                <tr>
+                <th scope="row"><?php _e('Special Instructions Field', 'mp') ?></th>
+        				<td>
+        				<label><input value="1" name="mp[special_instructions]" type="radio"<?php checked($settings['special_instructions'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[special_instructions]" type="radio"<?php checked($settings['special_instructions'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php printf(__('Enabling this field will display a textbox on the shipping checkout page for users to enter special instructions for their order. Useful for product personalization, etc. Note you may want to <a href="%s">adjust the message on the shipping page.', 'mp'), admin_url('edit.php?post_type=product&page=marketpress&tab=messages#mp_msgs_shipping')); ?></span>
           			</td>
                 </tr>
               </table>
@@ -5332,7 +5439,7 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('New Order', 'mp'); ?></th>
         				<td>
-        				<span class="description"><?php _e('The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp') ?></span><br />
+        				<span class="description"><?php _e('The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
                 <input class="mp_emails_sub" name="mp[email][new_order_subject]" value="<?php echo esc_attr($settings['email']['new_order_subject']); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
@@ -5343,7 +5450,7 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('Order Shipped', 'mp'); ?></th>
         				<td>
-        				<span class="description"><?php _e('The email text sent to your customer when you mark an order as "Shipped". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp') ?></span><br />
+        				<span class="description"><?php _e('The email text sent to your customer when you mark an order as "Shipped". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
                 <input class="mp_emails_sub" name="mp[email][shipped_order_subject]" value="<?php echo esc_attr($settings['email']['shipped_order_subject']); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
@@ -5398,7 +5505,7 @@ Notification Preferences: %s', 'mp');
                 <textarea class="mp_msgs_txt" name="mp[msg][cart]"><?php echo $settings['msg']['cart']; ?></textarea>
         				</td>
                 </tr>
-                <tr>
+                <tr id="mp_msgs_shipping">
         				<th scope="row"><?php _e('Shipping Form Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Shipping Form page. Optional, HTML allowed.', 'mp') ?></span><br />

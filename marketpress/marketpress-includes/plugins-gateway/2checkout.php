@@ -135,7 +135,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     foreach ($cart as $product_id => $variations) {
       foreach ($variations as $variation => $data) {
-	      $totals[] = $data['price'] * $data['quantity'];
+	      $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
 
 	      $suffix = "_{$counter}";
 
@@ -143,12 +143,12 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	      $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
 	      $params["c_name{$suffix}"] = $data['name'];
 	      $params["c_description{$suffix}"] = $data['url'];
-	      $params["c_price{$suffix}"] = $data['price'];
+	      $params["c_price{$suffix}"] = $mp->before_tax_price($data['price']);
 	      if ($data['download'])
 	      	$params["c_tangible{$suffix}"] = 'N';
 				else
 				  $params["c_tangible{$suffix}"] = 'Y';
-	      $i++;
+	      $counter++;
       }
     }
     

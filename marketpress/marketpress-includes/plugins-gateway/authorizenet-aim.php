@@ -519,9 +519,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     foreach ($cart as $product_id => $variations) {
       foreach ($variations as $variation => $data) {
         $sku = empty($data['SKU']) ? "{$product_id}_{$variation}" : $data['SKU'];
-        $totals[] = $data['price'] * $data['quantity'];
+        $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
         $payment->addLineItem($sku, substr($data['name'], 0, 31),
-          substr($data['name'].' - '.$data['url'], 0, 254), $data['quantity'], $data['price'], 1);
+          substr($data['name'].' - '.$data['url'], 0, 254), $data['quantity'], $mp->before_tax_price($data['price']), 1);
         $i++;
       }
     }
@@ -592,33 +592,36 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $payment->setParameter("x_phone", $billing_info['phone']);
     $payment->setParameter("x_email", $billing_info['email']);
     
-    $_names = split(" ", $shipping_info['name']);
-    if (isset($_names[0])) {
-      $shipping_first_name = array_shift($_names);
-    } else {
-      $shipping_first_name = "";
-    }
-    
-    if (isset($_names[0])) {
-      $shipping_last_name = join(" ", $_names);
-    } else {
-      $shipping_last_name = "";
-    }
-    
-    $shipping_address = $shipping_info['address1'];
-    
-    if (!empty($billing_info['address2'])) {
-      $shipping_address .= "\n".$shipping_info['address2'];
-    }
-    
-    $payment->setParameter("x_ship_to_first_name", $shipping_first_name);
-    $payment->setParameter("x_ship_to_last_name", $shipping_last_name);
-    $payment->setParameter("x_ship_to_address", $shipping_address);
-    $payment->setParameter("x_ship_to_city", $shipping_info['city']);
-    $payment->setParameter("x_ship_to_state", $shipping_info['state']);
-    $payment->setParameter("x_ship_to_country", $shipping_info['country']);
-    $payment->setParameter("x_ship_to_zip", $shipping_info['zip']);
-    
+		//only add shipping info if set
+		if (isset($shipping_info['name'])) {
+			$_names = split(" ", $shipping_info['name']);
+			if (isset($_names[0])) {
+				$shipping_first_name = array_shift($_names);
+			} else {
+				$shipping_first_name = "";
+			}
+			
+			if (isset($_names[0])) {
+				$shipping_last_name = join(" ", $_names);
+			} else {
+				$shipping_last_name = "";
+			}
+			
+			$shipping_address = $shipping_info['address1'];
+			
+			if (!empty($billing_info['address2'])) {
+				$shipping_address .= "\n".$shipping_info['address2'];
+			}
+			
+			$payment->setParameter("x_ship_to_first_name", $shipping_first_name);
+			$payment->setParameter("x_ship_to_last_name", $shipping_last_name);
+			$payment->setParameter("x_ship_to_address", $shipping_address);
+			$payment->setParameter("x_ship_to_city", $shipping_info['city']);
+			$payment->setParameter("x_ship_to_state", $shipping_info['state']);
+			$payment->setParameter("x_ship_to_country", $shipping_info['country']);
+			$payment->setParameter("x_ship_to_zip", $shipping_info['zip']);
+		}
+		
     $payment->setParameter("x_customer_ip", $_SERVER['REMOTE_ADDR']);
     
     $payment->process();
@@ -855,6 +858,7 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
         $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | Authorize.net AIM Plugin/{$mp->version}";
         $args['body'] = $query_string;
         $args['sslverify'] = false;
+				$args['timeout'] = 30;
         
         //use built in WP http class to work with most server setups
         $response = wp_remote_post($this->url, $args);

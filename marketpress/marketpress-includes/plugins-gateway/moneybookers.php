@@ -130,22 +130,24 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 			
 		if (isset($settings['gateways']['moneybookers']['business-name']) && !empty($settings['gateways']['moneybookers']['business-name']))
 			$params['recipient_description'] = $settings['gateways']['moneybookers']['business-name'];
-			
-    $params['pay_from_email'] = $shipping_info['email'];
-		$names = explode(' ', $shipping_info['name']);
-    $params['firstname'] = $names[0];
-    $params['lastname'] = $names[count($names)-1]; //grab last name
-    $params['address'] = $shipping_info['address1'];
-    $params['phone_number'] = $shipping_info['phone'];
-    $params['postal_code'] = $shipping_info['zip'];
-    $params['city'] = $shipping_info['city'];
-    $params['state'] = $shipping_info['state'];
+		
+		if (isset($shipping_info['name'])) {	
+			$params['pay_from_email'] = $shipping_info['email'];
+			$names = explode(' ', $shipping_info['name']);
+			$params['firstname'] = $names[0];
+			$params['lastname'] = $names[count($names)-1]; //grab last name
+			$params['address'] = $shipping_info['address1'];
+			$params['phone_number'] = $shipping_info['phone'];
+			$params['postal_code'] = $shipping_info['zip'];
+			$params['city'] = $shipping_info['city'];
+			$params['state'] = $shipping_info['state'];
+		}
     
     $totals = array();
 		$product_count = 0;
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $data['price'] * $data['quantity'];
+				$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
 				$product_count++;
 			}
     }
@@ -245,7 +247,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 	    $cart = $mp->get_cart_contents();
 	    foreach ($cart as $product_id => $variations) {
 				foreach ($variations as $data) {
-					$totals[] = $data['price'] * $data['quantity'];
+					$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
 				}
 	    }
 	    $total = array_sum($totals);

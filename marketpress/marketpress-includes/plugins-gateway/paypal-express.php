@@ -759,6 +759,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/{$mp->version}";
       $args['body'] = $req;
       $args['sslverify'] = false;
+			$args['timeout'] = 30;
 
       //use built in WP http class to work with most server setups
     	$response = wp_remote_post($domain, $args);
@@ -924,22 +925,24 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . urlencode($shipping_info['name']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . urlencode($shipping_info['address1']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . urlencode($shipping_info['address2']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . urlencode($shipping_info['city']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . urlencode($shipping_info['state']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRY=" . urlencode($shipping_info['country']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . urlencode($shipping_info['zip']);
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . urlencode($shipping_info['phone']);
+			if (isset($shipping_info['name'])) {
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . urlencode($shipping_info['name']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . urlencode($shipping_info['address1']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . urlencode($shipping_info['address2']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . urlencode($shipping_info['city']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . urlencode($shipping_info['state']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRY=" . urlencode($shipping_info['country']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . urlencode($shipping_info['zip']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . urlencode($shipping_info['phone']);
+			}
 
       $detailstr = "";
       $i = 0;
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-				  $totals[] = $data['price'] * $data['quantity'];
+				  $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode($data['name']);
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($data['price']);
+				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price']));
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);

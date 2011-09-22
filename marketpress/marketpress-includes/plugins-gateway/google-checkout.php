@@ -142,7 +142,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		$items = 0;
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $data['price'] * $data['quantity'];
+				$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
 		    $item_params["shopping-cart.items.item-{$i}.item-name"] = $data['name'];
 				$item_params["shopping-cart.items.item-{$i}.item-description"] = $data['url'];
 				$item_params["shopping-cart.items.item-{$i}.unit-price"] = $data['price'];
@@ -205,10 +205,11 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		}
 	}
 	
-	function google_api_request($param_str, $url){
+	function google_api_request($param_str, $url) {
 		global $mp;
 		$args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | Google Checkout Payment Plugin/{$mp->version}";
 		$args['body'] = $param_str;
+		$args['timeout'] = 30;
 		$args['sslverify'] = false;
     $args['headers']['Authorization'] = 'Basic ' . base64_encode($this->API_Merchant_id.':'.$this->API_Merchant_key);
     $args['headers']['Content-Type'] = 'application/xml;charset=UTF-8';
@@ -374,8 +375,6 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 				header('HTTP/1.0 403 Forbidden');
 				exit('We were unable to authenticate the request');
       }
-
-
 
 		  $timestamp = time();
       $order_id = $response['google-order-number'];
