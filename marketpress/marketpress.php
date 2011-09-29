@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.2 Beta 1
+Version: 2.2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.2-Beta-1';
+  var $version = '2.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -2043,7 +2043,15 @@ Thanks again!", 'mp')
 
     $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
     $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
-
+		
+		//if we've skipped the shipping page and no address is set, use base for tax calculation
+		if ($this->download_only_cart($cart)) {
+			if (empty($country))
+				$country = $settings['base_country'];
+			else
+				$state = $settings['base_province'];
+		}
+		
     //get total after any coupons
     $totals = array();
     foreach ($cart as $product_id => $variations) {
@@ -2075,9 +2083,13 @@ Thanks again!", 'mp')
 			  break;
 
 			case 'CA':
-			  //Canada tax is for all orders in country. We're assuming the rate is a combination of GST/PST/etc.
-			  if ($country == 'CA')
-			    $price = round($total * $settings['tax']['rate'], 2);
+			  //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
+				if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
+					if (isset($settings['tax']['canada_rate'][$key]))
+						$price = round($total * $settings['tax']['canada_rate'][$key], 2);
+					else //backwards compat with pre 2.2 if per province rates are not set
+						$price = round($total * $settings['tax']['rate'], 2);
+				}
 			  break;
 
 			case 'AU':
@@ -2101,7 +2113,7 @@ Thanks again!", 'mp')
     if (empty($price))
 			$price = 0;
 
-    $price = apply_filters( 'mp_tax_price', $price, $total, $cart );
+    $price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
 
     if ($format)
       return $this->format_currency('', $price);
@@ -2116,8 +2128,11 @@ Thanks again!", 'mp')
 		//if tax inclusve pricing is turned off just return given price
 		if (!$settings['tax']['tax_inclusive'])
 			return $tax_price;
+		
+		//figure out rate in case its based on a canadian base province
+		$rate =  ('CA' == $settings['base_country']) ? $settings['tax']['canada_rate'][$settings['base_province']] : $settings['tax']['rate'];
 			
-		return round($tax_price / ($settings['tax']['rate'] + 1), 2);
+		return round($tax_price / ($rate + 1), 2);
 	}
 
   //returns contents of shopping cart cookie
@@ -4555,8 +4570,15 @@ Notification Preferences: %s', 'mp');
         if (isset($_POST['marketplace_settings'])) {
 
           //allow plugins to verify settings before saving
-          $tax_rate = $_POST['mp']['tax']['rate'] * .01;
-          $_POST['mp']['tax']['rate'] = ($tax_rate < 1 && $tax_rate >= 0) ? $tax_rate : 0;
+					if (isset($_POST['mp']['tax']['canada_rate'])) {
+						foreach	($_POST['mp']['tax']['canada_rate'] as $key => $rate) {
+							$tax_rate = $rate * .01;
+							$_POST['mp']['tax']['canada_rate'][$key] = ($tax_rate < 1 && $tax_rate >= 0) ? $tax_rate : 0;
+						}
+					} else {
+						$tax_rate = $_POST['mp']['tax']['rate'] * .01;
+						$_POST['mp']['tax']['rate'] = ($tax_rate < 1 && $tax_rate >= 0) ? $tax_rate : 0;
+					}
           $settings = array_merge($settings, apply_filters('mp_main_settings_filter', $_POST['mp']));
           update_option('mp_settings', $settings);
 
@@ -4657,10 +4679,18 @@ Notification Preferences: %s', 'mp');
                 case 'CA':
                   ?>
                   <tr>
-          				<th scope="row"><?php echo sprintf(__('%s Total Tax Rate (VAT,GST,PST,HST)', 'mp'), esc_attr($this->canadian_provinces[$settings['base_province']])); ?></th>
+          				<th scope="row"><a href="http://sbinfocanada.about.com/od/pst/a/PSTecommerce.htm" target="_blank"><?php _e('Total Tax Rates (VAT,GST,PST,HST)', 'mp'); ?></a></th>
           				<td>
-                  <input value="<?php echo $settings['tax']['rate'] * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
-            			</td>
+										<span class="description"><a href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada" target="_blank"><?php _e('Current Rates &raquo;', 'mp'); ?></a></span>
+										<table cellspacing="0" cellpadding="0">
+										<?php foreach ($this->canadian_provinces as $key => $label) { ?>
+										<tr>
+											<td style="padding: 0 5px;"><label for="mp_tax_<?php echo $key; ?>"><?php echo esc_attr($label); ?></label></td>
+											<td style="padding: 0 5px;"><input value="<?php echo $settings['tax']['canada_rate'][$key] * 100; ?>" size="3" id="mp_tax_<?php echo $key; ?>" name="mp[tax][canada_rate][<?php echo $key; ?>]" type="text" style="text-align:right;" />%</td>
+										</tr>
+										<?php	} ?>
+										</table>
+									</td>
                   </tr>
                   <?php
                   break;

@@ -8,14 +8,16 @@ Change Log:
 2.2 - 9/22/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Added Cubepoints gateway - Requires the CubePoints plugin: http://wordpress.org/extend/plugins/cubepoints/
+- Added eWay Shared Payments gateway
 - Add Tax inclusive pricing option
 - Add tracking number field to shipping section of Order management
-- Add notes field to Order management page
+- Add notes field to order management page
 - Add special instructions field option for orders that require personalization
 - Skip shipping checkout page for digital only orders
 - Fix dropdown product category widget
 - Fix bug in tax calculation for some countries
 - Fix bug in order payment status change to paid
+- Fix small bug in global products paging last page
 
 2.1.6 - 9/10/2011 - Aaron Edwards
 ----------------------------------------------------------------------

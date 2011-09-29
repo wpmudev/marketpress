@@ -1343,7 +1343,7 @@ function mp_list_global_products( $args = '' ) {
     		} else {
     			$excerpt = implode(' ', $words);
     		}
-        $content .= $excerpt;
+        $content .= '<p>'.$excerpt.'<p>';
       } else if ($text == 'content') {
         $content .= $product->post_content;
       }
@@ -1441,7 +1441,7 @@ function mp_global_products_nav_link( $args = '' ) {
 		$paged = 1;
 	
 	//if only one page skip
-	if ($paged >= $max_pages)
+	if ($paged > $max_pages)
 		return '';
 	
 	//only have sep if there's both prev and next results
