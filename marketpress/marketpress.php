@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.2
+Version: 2.2.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.2';
+  var $version = '2.2.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -122,6 +122,8 @@ class MarketPress {
     /* use both actions so logged in and not logged in users can send this AJAX request */
     add_action( 'wp_ajax_nopriv_mp-update-cart', array(&$this, 'update_cart') );
     add_action( 'wp_ajax_mp-update-cart', array(&$this, 'update_cart') );
+		add_action( 'wp_ajax_mp-province-field', 'mp_province_field' ); //province field callback for shipping form
+		add_action( 'wp_ajax_nopriv_mp-province-field', 'mp_province_field' );
 
 		//Relies on post thumbnails for products
 		add_action( 'after_setup_theme', array(&$this, 'post_thumbnails'), 9999 );
@@ -2008,20 +2010,6 @@ Thanks again!", 'mp')
     else
       return $price;
   }
-	
-	function shipping_tracking_link($tracking_number, $method = 'other') {
-		$tracking_number = esc_attr($tracking_number);
-		if ($method == 'UPS')
-			return '<a title="'.__('Track your UPS package &raquo;', 'mp').'" href="http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1='.$tracking_number.'&track.x=0&track.y=0" target="_blank">'.$tracking_number.'</a>';
-		else if ($method == 'FedEx')
-			return '<a title="'.__('Track your FedEx package &raquo;', 'mp').'" href="http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
-		else if ($method == 'USPS')
-			return '<a title="'.__('Track your USPS package &raquo;', 'mp').'" href="http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
-		else if ($method == 'DHL')
-			return '<a title="'.__('Track your DHL package &raquo;', 'mp').'" href="http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
-		else
-			return $tracking_number;
-	}
 
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $cart = false) {
@@ -2045,10 +2033,10 @@ Thanks again!", 'mp')
     $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
 		
 		//if we've skipped the shipping page and no address is set, use base for tax calculation
-		if ($this->download_only_cart($cart)) {
+		if ($this->download_only_cart($cart) || $settings['tax']['tax_inclusive']) {
 			if (empty($country))
 				$country = $settings['base_country'];
-			else
+			if (empty($state))
 				$state = $settings['base_province'];
 		}
 		
@@ -2085,8 +2073,8 @@ Thanks again!", 'mp')
 			case 'CA':
 			  //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 				if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
-					if (isset($settings['tax']['canada_rate'][$key]))
-						$price = round($total * $settings['tax']['canada_rate'][$key], 2);
+					if (isset($settings['tax']['canada_rate'][$state]))
+						$price = round($total * $settings['tax']['canada_rate'][$state], 2);
 					else //backwards compat with pre 2.2 if per province rates are not set
 						$price = round($total * $settings['tax']['rate'], 2);
 				}
@@ -2498,6 +2486,8 @@ Thanks again!", 'mp')
 
       if ($_POST['country'] == 'US' && !array_key_exists(strtoupper($_POST['state']), $this->usa_states))
         $this->cart_checkout_error( __('Please enter a valid two-letter State abbreviation.', 'mp'), 'state');
+			else if ($_POST['country'] == 'CA' && !array_key_exists(strtoupper($_POST['state']), $this->canadian_provinces))
+        $this->cart_checkout_error( __('Please enter a valid two-letter Canadian Province abbreviation.', 'mp'), 'state');
 			else
 			  $_POST['state'] = strtoupper($_POST['state']);
 
@@ -2682,7 +2672,7 @@ Thanks again!", 'mp')
 
   function cart_checkout_error($msg, $context = 'checkout') {
     $msg = str_replace('"', '\"', $msg); //prevent double quotes from causing errors.
-    $content = 'echo "<div class=\"mp_checkout_error\">' . $msg . '</div>";';
+    $content = 'return "<div class=\"mp_checkout_error\">' . $msg . '</div>";';
     add_action( 'mp_checkout_error_' . $context, create_function('', $content) );
     $this->checkout_error = true;
   }
@@ -3586,8 +3576,8 @@ Thanks again!", 'mp')
     if (!$order)
       return false;
 
-    $subject = $this->filter_email($order, $settings['email']['new_order_subject']);
-    $msg = $this->filter_email($order, $settings['email']['new_order_txt']);
+    $subject = $this->filter_email($order, stripslashes($settings['email']['new_order_subject']));
+    $msg = $this->filter_email($order, stripslashes($settings['email']['new_order_txt']));
     $msg = apply_filters( 'mp_order_notification_' . $_SESSION['mp_payment_method'], $msg, $order );
 
     $this->mail($order->mp_shipping_info['email'], $subject, $msg);
@@ -3629,10 +3619,10 @@ You can manage this order here: %s", 'mp');
 		if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info))
     	return false;
 
-    $settings['email']['shipped_order_subject'] = apply_filters('mp_shipped_order_notification_subject', $settings['email']['shipped_order_subject'], $order);
-    $subject = $this->filter_email($order, $settings['email']['shipped_order_subject']);
-    $settings['email']['shipped_order_txt'] = apply_filters( 'mp_shipped_order_notification_body', $settings['email']['shipped_order_txt'], $order );
-    $msg = $this->filter_email($order, $settings['email']['shipped_order_txt']);
+    $subject = apply_filters('mp_shipped_order_notification_subject', stripslashes($settings['email']['shipped_order_subject']), $order);
+    $subject = $this->filter_email($order, $subject);
+    $msg = apply_filters( 'mp_shipped_order_notification_body', stripslashes($settings['email']['shipped_order_txt']), $order );
+    $msg = $this->filter_email($order, $msg);
     $msg = apply_filters( 'mp_shipped_order_notification', $msg, $order );
 
     $this->mail($order->mp_shipping_info['email'], $subject, $msg);

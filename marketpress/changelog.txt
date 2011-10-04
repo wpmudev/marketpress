@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.2.1 - 10/03/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Fixed small bug in canada tax handling
+- Added ajax shipping province dropdown for USA, CAN, AUS
+- Fixed small checkout error display bug
+- Fixed slashes issue in emails
+- Fixed default tax display with tax inclusive pricing on
+
 2.2 - 9/22/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Added Cubepoints gateway - Requires the CubePoints plugin: http://wordpress.org/extend/plugins/cubepoints/

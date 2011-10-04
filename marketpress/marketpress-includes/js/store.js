@@ -69,4 +69,13 @@ jQuery(document).ready(function($) {
     $('div.mp_gateway_form').hide();
     $('div#' + gid).show();
   });
+
+  //province field choice
+  $('#mp_country').change(function() {
+    $("#mp_province_field").html('<img src="'+MP_Ajax.imgUrl+'" />');
+    var country = $(this).val();
+    $.post(MP_Ajax.ajaxUrl, {action: 'mp-province-field', country: country}, function(data) {
+      $("#mp_province_field").html(data);
+    });
+  });
 });

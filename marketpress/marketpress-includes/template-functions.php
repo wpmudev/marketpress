@@ -502,6 +502,16 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     $content .= '<input size="35" name="name" type="text" value="'.esc_attr($name).'" /> </td>';
     $content .= '</tr>';
     $content .= '<tr>';
+    $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
+    $content .= apply_filters( 'mp_checkout_error_country', '' );
+    $content .= '<select id="mp_country" name="country">';
+    foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
+      $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
+    }
+    $content .= '</select>';
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
     $content .= '<td align="right">'. __('Address:', 'mp').'*</td><td>';
     $content .= apply_filters( 'mp_checkout_error_address1', '' );
     $content .= '<input size="45" name="address1" type="text" value="'.esc_attr($address1).'" /><br />';
@@ -520,24 +530,14 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     $content .= '<input size="25" name="city" type="text" value="'.esc_attr($city).'" /></td>';
     $content .= '</tr>';
     $content .= '<tr>';
-    $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'*</td><td>';
+    $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'*</td><td id="mp_province_field">';
     $content .= apply_filters( 'mp_checkout_error_state', '' );
-    $content .= '<input size="15" name="state" type="text" value="'.esc_attr($state).'" /></td>';
+    $content .= mp_province_field($country, $state).'</td>';
     $content .= '</tr>';
     $content .= '<tr>';
     $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'*</td><td>';
     $content .= apply_filters( 'mp_checkout_error_zip', '' );
     $content .= '<input size="10" id="mp_zip" name="zip" type="text" value="'.esc_attr($zip).'" /></td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
-    $content .= apply_filters( 'mp_checkout_error_country', '' );
-    $content .= '<select id="mp_country" name="country">';
-    foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
-      $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
-    }
-    $content .= '</select>';
-    $content .= '</td>';
     $content .= '</tr>';
     $content .= '<tr>';
     $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td><td>';
@@ -985,7 +985,7 @@ function mp_order_status() {
         <?php if (isset($order->mp_shipping_info['tracking_num'])) { ?>
       	<tr>
       	<td align="right"><?php _e('Tracking Number:', 'mp'); ?></td>
-        <td><?php echo $mp->shipping_tracking_link($order->mp_shipping_info['tracking_num'], $order->mp_shipping_info['method']); ?></td>
+        <td><?php echo mp_tracking_link($order->mp_shipping_info['tracking_num'], $order->mp_shipping_info['method']); ?></td>
       	</tr>
         <?php } ?>
       </table>
@@ -1101,8 +1101,65 @@ function mp_order_status() {
   }
 }
 
+/*
+ * function mp_tracking_link
+ * @param string $tracking_number The tracking number string to turn into a link
+ * @param string $method Shipping method, can be UPS, FedEx, USPS, DHL, or other (default)
+ */
+function mp_tracking_link($tracking_number, $method = 'other') {
+  $tracking_number = esc_attr($tracking_number);
+  if ($method == 'UPS')
+    return '<a title="'.__('Track your UPS package &raquo;', 'mp').'" href="http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1='.$tracking_number.'&track.x=0&track.y=0" target="_blank">'.$tracking_number.'</a>';
+  else if ($method == 'FedEx')
+    return '<a title="'.__('Track your FedEx package &raquo;', 'mp').'" href="http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
+  else if ($method == 'USPS')
+    return '<a title="'.__('Track your USPS package &raquo;', 'mp').'" href="http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
+  else if ($method == 'DHL')
+    return '<a title="'.__('Track your DHL package &raquo;', 'mp').'" href="http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
+  else
+    return $tracking_number;
+}
 
 /*
+ * function mp_province_field
+ * @param string $country two-digit country code
+ * @param string $selected state code form value to be shown/selected
+ */
+function mp_province_field($country = 'US', $selected = null) {
+  global $mp;
+  
+  if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['country']))
+    $country = $_POST['country'];
+  
+  $list = false;
+  if ($country == 'US')
+    $list = $mp->usa_states;
+  else if ($country == 'CA')
+    $list = $mp->canadian_provinces;
+  else if ($country == 'AU')
+    $list = $mp->australian_states;
+  
+  $content = ''; 
+  if ($list) {
+    $content .= '<select id="mp_state" name="state">';
+    $content .= '<option value="">'.__('Select:', 'mp').'</option>';
+    foreach ($list as $abbr => $label)
+      $content .= '<option value="'.$abbr.'"'.selected($selected, $abbr, false).'>'.esc_attr($label).'</option>';
+    $content .= '</select>';
+  } else {
+    $content .= '<input size="15" id="mp_state" name="state" type="text" value="'.esc_attr($selected).'" />'; 
+  }
+
+  //if ajax 
+  if (defined('DOING_AJAX') && DOING_AJAX)
+    die($content);
+  else
+    return $content;
+}
+
+
+/*
+ * function mp_list_products
  * Displays a list of products according to preference. Optional values default to the values in Presentation Settings -> Product List
  *
  * @param bool $echo Optional, whether to echo or return
