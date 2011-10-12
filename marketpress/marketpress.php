@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.2.1
+Version: 2.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.2.1';
+  var $version = '2.3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -1351,7 +1351,7 @@ Thanks again!", 'mp')
     switch ($wp_query->query_vars['pagename']) {
       case 'cart':
         if ($wp_query->query_vars['checkoutstep'] == 'shipping')
-          return __('Shipping Information', 'mp');
+          return $this->download_only_cart($this->get_cart_contents()) ? __('Checkout Information', 'mp') : __('Shipping Information', 'mp');
         else if ($wp_query->query_vars['checkoutstep'] == 'checkout')
           return __('Payment Information', 'mp');
         else if ($wp_query->query_vars['checkoutstep'] == 'confirm-checkout')
@@ -2276,7 +2276,7 @@ Thanks again!", 'mp')
   }
 
   //receives a post and updates cookie variables for cart
-  function update_cart($no_ajax = true) {
+  function update_cart() {
 		global $blog_id, $mp_gateway_active_plugins;
 		$blog_id = (is_multisite()) ? $blog_id : 1;
 		$current_blog_id = $blog_id;
@@ -2292,7 +2292,7 @@ Thanks again!", 'mp')
 			else
 			  $this->set_cart_cookie(array());
 
-      if ($no_ajax !== true) {
+      if (defined('DOING_AJAX') && DOING_AJAX) {
         ?>
     	<div class="mp_cart_empty">
     	  <?php _e('There are no items in your cart.', 'mp') ?>
@@ -2320,7 +2320,7 @@ Thanks again!", 'mp')
 
       //check max stores
       if ($this->global_cart && count($global_cart = $this->get_cart_cookie(true)) >= $mp_gateway_active_plugins[0]->max_stores && !isset($global_cart[$blog_id])) {
-        if ($no_ajax !== true) {
+        if (defined('DOING_AJAX') && DOING_AJAX) {
 	  			echo 'error||' . sprintf(__("Sorry, currently it's not possible to checkout with items from more than %s stores.", 'mp'), $mp_gateway_active_plugins[0]->max_stores);
           exit;
         } else {
@@ -2338,7 +2338,7 @@ Thanks again!", 'mp')
         if (!is_array($stock))
 					$stock[0] = $stock;
         if ($stock[$variation] < $new_quantity) {
-          if ($no_ajax !== true) {
+          if (defined('DOING_AJAX') && DOING_AJAX) {
             echo 'error||' . sprintf(__("Sorry, we don't have enough of this item in stock. (%s remaining)", 'mp'), number_format_i18n($stock[$variation]-$cart[$product_id][$variation]));
             exit;
           } else {
@@ -2347,12 +2347,12 @@ Thanks again!", 'mp')
           }
         }
         //send ajax leftover stock
-        if ($no_ajax !== true) {
+        if (defined('DOING_AJAX') && DOING_AJAX) {
           $return = $stock[$variation]-$new_quantity . '||';
         }
       } else {
         //send ajax always stock if stock checking turned off
-        if ($no_ajax !== true) {
+        if (defined('DOING_AJAX') && DOING_AJAX) {
           $return = 1 . '||';
         }
       }
@@ -2361,7 +2361,7 @@ Thanks again!", 'mp')
     	if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
 				$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
 	      if ($limit[$variation] && $limit[$variation] < $new_quantity) {
-	        if ($no_ajax !== true) {
+	        if (defined('DOING_AJAX') && DOING_AJAX) {
 		  			echo 'error||' . sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), $product->post_title);
 	          exit;
 	        } else {
@@ -2377,7 +2377,7 @@ Thanks again!", 'mp')
       $this->set_cart_cookie($cart);
 
       //if running via ajax return updated cart and die
-      if ($no_ajax !== true) {
+      if (defined('DOING_AJAX') && DOING_AJAX) {
         $return .= mp_show_cart('widget', false, false);
         echo $return;
 				exit;
@@ -2471,31 +2471,35 @@ Thanks again!", 'mp')
       //check checkout info
       if (!is_email($_POST['email']))
     		$this->cart_checkout_error( __('Please enter a valid Email Address.', 'mp'), 'email');
-
-      if (empty($_POST['name']))
-    		$this->cart_checkout_error( __('Please enter your Full Name.', 'mp'), 'name');
-
-      if (empty($_POST['address1']))
-    		$this->cart_checkout_error( __('Please enter your Street Address.', 'mp'), 'address1');
-
-      if (empty($_POST['city']))
-    		$this->cart_checkout_error( __('Please enter your City.', 'mp'), 'city');
-
-      if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
-        $this->cart_checkout_error( __('Please enter your State/Province/Region.', 'mp'), 'state');
-
-      if ($_POST['country'] == 'US' && !array_key_exists(strtoupper($_POST['state']), $this->usa_states))
-        $this->cart_checkout_error( __('Please enter a valid two-letter State abbreviation.', 'mp'), 'state');
-			else if ($_POST['country'] == 'CA' && !array_key_exists(strtoupper($_POST['state']), $this->canadian_provinces))
-        $this->cart_checkout_error( __('Please enter a valid two-letter Canadian Province abbreviation.', 'mp'), 'state');
-			else
-			  $_POST['state'] = strtoupper($_POST['state']);
-
-      if (empty($_POST['zip']))
-    		$this->cart_checkout_error( __('Please enter your Zip/Postal Code.', 'mp'), 'zip');
-
-      if (empty($_POST['country']) || strlen($_POST['country']) != 2)
-    		$this->cart_checkout_error( __('Please enter your Country.', 'mp'), 'country');
+			
+			//only require these fields if not a download only cart
+			if (!$this->download_only_cart($this->get_cart_contents())) {
+				
+				if (empty($_POST['name']))
+					$this->cart_checkout_error( __('Please enter your Full Name.', 'mp'), 'name');
+	
+				if (empty($_POST['address1']))
+					$this->cart_checkout_error( __('Please enter your Street Address.', 'mp'), 'address1');
+	
+				if (empty($_POST['city']))
+					$this->cart_checkout_error( __('Please enter your City.', 'mp'), 'city');
+	
+				if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
+					$this->cart_checkout_error( __('Please enter your State/Province/Region.', 'mp'), 'state');
+	
+				if ($_POST['country'] == 'US' && !array_key_exists(strtoupper($_POST['state']), $this->usa_states))
+					$this->cart_checkout_error( __('Please enter a valid two-letter State abbreviation.', 'mp'), 'state');
+				else if ($_POST['country'] == 'CA' && !array_key_exists(strtoupper($_POST['state']), $this->canadian_provinces))
+					$this->cart_checkout_error( __('Please enter a valid two-letter Canadian Province abbreviation.', 'mp'), 'state');
+				else
+					$_POST['state'] = strtoupper($_POST['state']);
+	
+				if (empty($_POST['zip']))
+					$this->cart_checkout_error( __('Please enter your Zip/Postal Code.', 'mp'), 'zip');
+	
+				if (empty($_POST['country']) || strlen($_POST['country']) != 2)
+					$this->cart_checkout_error( __('Please enter your Country.', 'mp'), 'country');
+			}
 
       //save to session
       global $current_user;
@@ -2570,6 +2574,7 @@ Thanks again!", 'mp')
 		      $total = $total + $tax_price;
 
         if ($total > 0) {
+					$network_settings = get_site_option( 'mp_network_settings' );
           //can we skip the payment form page?
 					if ( $this->global_cart ) {
         		$skip = apply_filters('mp_payment_form_skip_' . $network_settings['global_gateway'], false);

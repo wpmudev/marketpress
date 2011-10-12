@@ -925,7 +925,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
-			if (isset($shipping_info['name'])) {
+			
+			if (!$mp->download_only_cart($cart)) {
 				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . urlencode($shipping_info['name']);
 				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . urlencode($shipping_info['address1']);
 				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . urlencode($shipping_info['address2']);
@@ -940,6 +941,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $i = 0;
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
+					//skip free products to avoid paypal error
+					if ($data['price'] <= 0)
+						continue;
+					
 				  $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode($data['name']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price']));

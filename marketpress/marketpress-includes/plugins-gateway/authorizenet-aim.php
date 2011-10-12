@@ -593,7 +593,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $payment->setParameter("x_email", $billing_info['email']);
     
 		//only add shipping info if set
-		if (isset($shipping_info['name'])) {
+		if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {
 			$_names = split(" ", $shipping_info['name']);
 			if (isset($_names[0])) {
 				$shipping_first_name = array_shift($_names);

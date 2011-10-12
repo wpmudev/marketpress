@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.3 - 10/11/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Add Table Rate shipping plugin
+- Fix tax inclusive display in cart widget
+- Fix blank gateway select page for download only carts combined with PayPal Express gateway
+- Add back email field for download only carts
+- Fix graceful degrading of AJAX cart handling
+- Adjust PayPal gateway to gracefully handle carts with free products in them
+
 2.2.1 - 10/03/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fixed small bug in canada tax handling

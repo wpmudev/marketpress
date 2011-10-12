@@ -368,7 +368,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-          $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+          $totals[] = $data['price'] * $data['quantity'];
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 25 ) . '</td>';
           $content .=  '  <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML
@@ -404,13 +404,11 @@ function _mp_cart_login($echo = false) {
   global $mp;
   $settings = get_option('mp_settings');
   
-  $next_step = $mp->download_only_cart($mp->get_cart_contents()) ? 'checkout' : 'shipping';
-  
   $content = '';
   //don't show if logged in
   if ( is_user_logged_in() || defined('MP_HIDE_LOGIN_OPTION') ) {
     $content .= '<p class="mp_cart_direct_checkout">';
-    $content .= '<a class="mp_cart_direct_checkout_link" href="'.mp_checkout_step_url($next_step).'">'.__('Checkout Now &raquo;', 'mp').'</a>';
+    $content .= '<a class="mp_cart_direct_checkout_link" href="'.mp_checkout_step_url('shipping').'">'.__('Checkout Now &raquo;', 'mp').'</a>';
     $content .= '</p>';
   } else {
     $content .= '<table class="mp_cart_login">';
@@ -433,7 +431,7 @@ function _mp_cart_login($echo = false) {
     $content .= '<input type="password" name="pwd" id="user_pass" class="input" value="" size="20" /></label>';
     $content .= '<br />';
     $content .= '<input type="submit" name="wp-submit" id="mp_login_submit" value="'.__('Login and Checkout &raquo;', 'mp').'" />';
-    $content .= '<input type="hidden" name="redirect_to" value="'.mp_checkout_step_url($next_step).'" />';
+    $content .= '<input type="hidden" name="redirect_to" value="'.mp_checkout_step_url('shipping').'" />';
     $content .= '</form>';
     $content .= '</td>';
     $content .= '<td class="mp_cart_or_label">'.__('or', 'mp').'</td>';
@@ -441,7 +439,7 @@ function _mp_cart_login($echo = false) {
     if ($settings['force_login'])
     	$content .= apply_filters('register', '<a class="mp_cart_direct_checkout_link" href="'.site_url('wp-login.php?action=register', 'login').'">'.__('Register Now To Checkout &raquo;', 'mp').'</a>');
 		else
-      $content .= '<a class="mp_cart_direct_checkout_link" href="' . mp_checkout_step_url($next_step) . '">' . __('Checkout Now &raquo;', 'mp') . '</a>';
+      $content .= '<a class="mp_cart_direct_checkout_link" href="' . mp_checkout_step_url('shipping') . '">' . __('Checkout Now &raquo;', 'mp') . '</a>';
 		$content .= '</td>';
     $content .= '</tr>';
     $content .= '</tbody>';
@@ -488,7 +486,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 
     $content .= '<table class="mp_cart_shipping">';
     $content .= '<thead><tr>';
-    $content .= '<th colspan="2">'.__('Enter Your Shipping Information:', 'mp').'</th>';
+    $content .= '<th colspan="2">'.($mp->download_only_cart($mp->get_cart_contents()) ? __('Enter Your Checkout Information:', 'mp') : __('Enter Your Shipping Information:', 'mp')).'</th>';
     $content .= '</tr></thead>';
     $content .= '<tbody>';
     $content .= '<tr>';
@@ -496,53 +494,56 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     $content .= apply_filters( 'mp_checkout_error_email', '' );
     $content .= '<input size="35" name="email" type="text" value="'.esc_attr($email).'" /></td>';
     $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'. __('Full Name:', 'mp').'*</td><td>';
-    $content .= apply_filters( 'mp_checkout_error_name', '' );
-    $content .= '<input size="35" name="name" type="text" value="'.esc_attr($name).'" /> </td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
-    $content .= apply_filters( 'mp_checkout_error_country', '' );
-    $content .= '<select id="mp_country" name="country">';
-    foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
-      $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
+    
+    if (!$mp->download_only_cart($mp->get_cart_contents())) {
+      $content .= '<tr>';
+      $content .= '<td align="right">'. __('Full Name:', 'mp').'*</td><td>';
+      $content .= apply_filters( 'mp_checkout_error_name', '' );
+      $content .= '<input size="35" name="name" type="text" value="'.esc_attr($name).'" /> </td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
+      $content .= apply_filters( 'mp_checkout_error_country', '' );
+      $content .= '<select id="mp_country" name="country">';
+      foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
+        $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
+      }
+      $content .= '</select>';
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'. __('Address:', 'mp').'*</td><td>';
+      $content .= apply_filters( 'mp_checkout_error_address1', '' );
+      $content .= '<input size="45" name="address1" type="text" value="'.esc_attr($address1).'" /><br />';
+      $content .= '<small><em>'. __('Street address, P.O. box, company name, c/o', 'mp').'</em></small>';
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'. __('Address 2:', 'mp').'&nbsp;</td><td>';
+      $content .= '<input size="45" name="address2" type="text" value="'.esc_attr($address2).'" /><br />';
+      $content .= '<small><em>'.__('Apartment, suite, unit, building, floor, etc.', 'mp').'</em></small>';
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('City:', 'mp').'*</td><td>';
+      $content .= apply_filters( 'mp_checkout_error_city', '' );
+      $content .= '<input size="25" name="city" type="text" value="'.esc_attr($city).'" /></td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'*</td><td id="mp_province_field">';
+      $content .= apply_filters( 'mp_checkout_error_state', '' );
+      $content .= mp_province_field($country, $state).'</td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'*</td><td>';
+      $content .= apply_filters( 'mp_checkout_error_zip', '' );
+      $content .= '<input size="10" id="mp_zip" name="zip" type="text" value="'.esc_attr($zip).'" /></td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td><td>';
+      $content .= '<input size="20" name="phone" type="text" value="'.esc_attr($phone).'" /></td>';
+      $content .= '</tr>';
     }
-    $content .= '</select>';
-    $content .= '</td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'. __('Address:', 'mp').'*</td><td>';
-    $content .= apply_filters( 'mp_checkout_error_address1', '' );
-    $content .= '<input size="45" name="address1" type="text" value="'.esc_attr($address1).'" /><br />';
-    $content .= '<small><em>'. __('Street address, P.O. box, company name, c/o', 'mp').'</em></small>';
-    $content .= '</td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'. __('Address 2:', 'mp').'&nbsp;</td><td>';
-    $content .= '<input size="45" name="address2" type="text" value="'.esc_attr($address2).'" /><br />';
-    $content .= '<small><em>'.__('Apartment, suite, unit, building, floor, etc.', 'mp').'</em></small>';
-    $content .= '</td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'.__('City:', 'mp').'*</td><td>';
-    $content .= apply_filters( 'mp_checkout_error_city', '' );
-    $content .= '<input size="25" name="city" type="text" value="'.esc_attr($city).'" /></td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'*</td><td id="mp_province_field">';
-    $content .= apply_filters( 'mp_checkout_error_state', '' );
-    $content .= mp_province_field($country, $state).'</td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'*</td><td>';
-    $content .= apply_filters( 'mp_checkout_error_zip', '' );
-    $content .= '<input size="10" id="mp_zip" name="zip" type="text" value="'.esc_attr($zip).'" /></td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td><td>';
-    $content .= '<input size="20" name="phone" type="text" value="'.esc_attr($phone).'" /></td>';
-    $content .= '</tr>';
     
     if ($settings['special_instructions']) {
       $content .= '<tr>';

@@ -148,9 +148,10 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 		if (!empty($settings['gateways']['eway']['PageBanner']))
 			$params['PageBanner'] = $settings['gateways']['eway']['PageBanner'];
 		
+		$params['CustomerEmail'] = $shipping_info['email'];
+		
 		//add shipping info if set
-		if (isset($shipping_info['name'])) {	
-			$params['CustomerEmail'] = $shipping_info['email'];
+		if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {	
 			$names = explode(' ', $shipping_info['name']);
 			$params['CustomerFirstName'] = $names[0];
 			$params['CustomerLastName'] = $names[count($names)-1]; //grab last name

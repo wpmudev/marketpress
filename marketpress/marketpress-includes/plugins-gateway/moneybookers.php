@@ -131,8 +131,9 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 		if (isset($settings['gateways']['moneybookers']['business-name']) && !empty($settings['gateways']['moneybookers']['business-name']))
 			$params['recipient_description'] = $settings['gateways']['moneybookers']['business-name'];
 		
-		if (isset($shipping_info['name'])) {	
-			$params['pay_from_email'] = $shipping_info['email'];
+		$params['pay_from_email'] = $shipping_info['email'];
+			
+		if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {	
 			$names = explode(' ', $shipping_info['name']);
 			$params['firstname'] = $names[0];
 			$params['lastname'] = $names[count($names)-1]; //grab last name
