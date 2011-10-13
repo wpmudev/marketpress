@@ -3515,22 +3515,27 @@ Thanks again!", 'mp')
     $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n($order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
 
     //// Shipping Info
-    $shipping_info = __('Full Name:', 'mp') . ' ' . $order->mp_shipping_info['name'];
-    $shipping_info .= "\n" . __('Address:', 'mp') . ' ' . $order->mp_shipping_info['address1'];
-    if ($order->mp_shipping_info['address2'])
-      $shipping_info .= "\n" . __('Address 2:', 'mp') . ' ' . $order->mp_shipping_info['address2'];
-    $shipping_info .= "\n" . __('City:', 'mp') . ' ' . $order->mp_shipping_info['city'];
-    if ($order->mp_shipping_info['state'])
-      $shipping_info .= "\n" . __('State/Province/Region:', 'mp') . ' ' . $order->mp_shipping_info['state'];
-    $shipping_info .= "\n" . __('Postal/Zip Code:', 'mp') . ' ' . $order->mp_shipping_info['zip'];
-    $shipping_info .= "\n" . __('Country:', 'mp') . ' ' . $order->mp_shipping_info['country'];
-    if ($order->mp_shipping_info['phone'])
-      $shipping_info .= "\n" . __('Phone Number:', 'mp') . ' ' . $order->mp_shipping_info['phone'];
-		if (isset($order->mp_shipping_info['method']) && $order->mp_shipping_info['method'] != 'other')
-      $shipping_info .= "\n" . __('Shipping Method:', 'mp') . ' ' . $order->mp_shipping_info['method'];
-		if ($order->mp_shipping_info['tracking_num'])
-      $shipping_info .= "\n" . __('Tracking Number:', 'mp') . ' ' . $order->mp_shipping_info['tracking_num'];
 		
+		if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info)) { //if the cart is only digital products
+			$shipping_info = __('No shipping required for this order.', 'mp');
+		} else {
+			$shipping_info = __('Full Name:', 'mp') . ' ' . $order->mp_shipping_info['name'];
+			$shipping_info .= "\n" . __('Address:', 'mp') . ' ' . $order->mp_shipping_info['address1'];
+			if ($order->mp_shipping_info['address2'])
+				$shipping_info .= "\n" . __('Address 2:', 'mp') . ' ' . $order->mp_shipping_info['address2'];
+			$shipping_info .= "\n" . __('City:', 'mp') . ' ' . $order->mp_shipping_info['city'];
+			if ($order->mp_shipping_info['state'])
+				$shipping_info .= "\n" . __('State/Province/Region:', 'mp') . ' ' . $order->mp_shipping_info['state'];
+			$shipping_info .= "\n" . __('Postal/Zip Code:', 'mp') . ' ' . $order->mp_shipping_info['zip'];
+			$shipping_info .= "\n" . __('Country:', 'mp') . ' ' . $order->mp_shipping_info['country'];
+			if ($order->mp_shipping_info['phone'])
+				$shipping_info .= "\n" . __('Phone Number:', 'mp') . ' ' . $order->mp_shipping_info['phone'];
+			if (isset($order->mp_shipping_info['method']) && $order->mp_shipping_info['method'] != 'other')
+				$shipping_info .= "\n" . __('Shipping Method:', 'mp') . ' ' . $order->mp_shipping_info['method'];
+			if ($order->mp_shipping_info['tracking_num'])
+				$shipping_info .= "\n" . __('Tracking Number:', 'mp') . ' ' . $order->mp_shipping_info['tracking_num'];
+		}
+	
 		if ($order->mp_order_notes)
       $order_notes = __('Order Notes:', 'mp') . "\n" . $order->mp_order_notes;
 		
@@ -3619,10 +3624,6 @@ You can manage this order here: %s", 'mp');
     $order = $this->get_order($order_id);
     if (!$order)
       return false;
-
-    //if the cart is only digital products skip notification
-		if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info))
-    	return false;
 
     $subject = apply_filters('mp_shipped_order_notification_subject', stripslashes($settings['email']['shipped_order_subject']), $order);
     $subject = $this->filter_email($order, $subject);

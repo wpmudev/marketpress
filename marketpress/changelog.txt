@@ -5,6 +5,10 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.3.1 - 10/11/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Still send shipped notification email for download only carts (for gateways with delayed paid confirmations)
+
 2.3 - 10/11/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add Table Rate shipping plugin
