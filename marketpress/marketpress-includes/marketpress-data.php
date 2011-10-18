@@ -393,7 +393,8 @@ $this->eu_countries = array(
   'SE'
 );
 
-//currency list
+//currency list - http://www.xe.com/symbols.php
+//last perameter is symbol which is unicode hex: http://www.mikezilla.com/exp0012.html
 $this->currencies = array(
   "ALL"=> array("Albania, Leke", "4c, 65, 6b"),
   "AFN"=> array("Afghanistan, Afghanis", "60b"),
@@ -514,7 +515,9 @@ $this->currencies = array(
   "XAF"=> array("BEAC, CFA Francs", "46, 43, 46, 41"),
   "XOF"=> array("BCEAO, CFA Francs", "46, 43, 46, 41"),
   "YER"=> array("Yemen, Rials", "fdfc"),
-  "ZWD"=> array("Zimbabwe, Zimbabwe Dollars", "5a, 24")
+  "ZWD"=> array("Zimbabwe, Zimbabwe Dollars", "5a, 24"),
+	"POINTS"=> array("Points (for point based stores)", "50, 6f, 69, 6e, 74, 73"),
+	"CREDITS"=> array("Credits (for credit based stores)", "43, 72, 65, 64, 69, 74, 73")
 );
 
 ?>

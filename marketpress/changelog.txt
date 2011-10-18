@@ -5,9 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.3.1 - 10/11/2011 - Aaron Edwards
+2.3.1 - 10/17/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Still send shipped notification email for download only carts (for gateways with delayed paid confirmations)
+- Fix cart widget title getting removed on AJAX add to cart for some themes
+- Combine forms on the edit order screen to avoid confusion when saving
+- Add back in Inventory Threshold option
+- Add action hook to mp_order_status() template function.
+- Add points and credits currency types
 
 2.3 - 10/11/2011 - Aaron Edwards
 ----------------------------------------------------------------------

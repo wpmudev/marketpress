@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
       if (answer) {
         $(this).html('<img src="'+MP_Ajax.imgUrl+'" />');
         $.post(MP_Ajax.ajaxUrl, {action: 'mp-update-cart', empty_cart: 1}, function(data) {
-          $("div.mp_cart_widget").html(data);
+          $("div.mp_cart_widget_content").html(data);
         });
       }
       return false;
@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
           mp_cart_listeners();
         } else {
           formElm.html('<span class="mp_adding_to_cart">'+MP_Ajax.successMsg+'</span>');
-          $("div.mp_cart_widget").html(result[1]);
+          $("div.mp_cart_widget_content").html(result[1]);
           if (result[0] > 0) {
             formElm.fadeOut(2000, function(){
               formElm.html(tempHtml).fadeIn('fast');

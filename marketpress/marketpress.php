@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.3
+Version: 2.3.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.3';
+  var $version = '2.3.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -3853,22 +3853,19 @@ Notification Preferences: %s', 'mp');
 			$order->mp_shipping_info['tracking_num'] = stripslashes(trim($_POST['mp_tracking_number']));
 			$order->mp_shipping_info['method'] = stripslashes(trim($_POST['mp_shipping_method']));
 			update_post_meta($order->ID, 'mp_shipping_info', $order->mp_shipping_info);
-			?><div class="updated fade"><p><?php _e('Tracking number saved!', 'mp'); ?></p></div><?php
+
 			if (isset($_POST['add-tracking-shipped'])) {
 				$this->update_order_status($order->ID, 'shipped');
 				$order->post_status = 'order_shipped';
 				?><div class="updated fade"><p><?php _e('This order has been marked as Shipped.', 'mp'); ?></p></div><?php
 			}
-		}
-		
-		//save order notes
-		if (isset($_POST['mp_order_notes'])) {
+
 			if (!current_user_can('unfiltered_html'))
 				$_POST['mp_order_notes'] = wp_filter_post_kses(trim(stripslashes($_POST['mp_order_notes'])));
 				
 			$order->mp_order_notes = stripslashes($_POST['mp_order_notes']);
 			update_post_meta($order->ID, 'mp_order_notes', $_POST['mp_order_notes']);
-			?><div class="updated fade"><p><?php _e('Order Notes updated!', 'mp'); ?></p></div><?php
+			?><div class="updated fade"><p><?php _e('Order details have been saved!', 'mp'); ?></p></div><?php
 		}
     ?>
     <div class="wrap">
@@ -4180,7 +4177,7 @@ Notification Preferences: %s', 'mp');
 						<option value="other"<?php selected($order->mp_shipping_info['method'], 'other'); ?>><?php _e('Other', 'mp'); ?></option>
 					</select>
 					<input type="text" name="mp_tracking_number" value="<?php esc_attr_e($order->mp_shipping_info['tracking_num']); ?>" size="25" />
-					<input type="submit" name="add-tracking" value="<?php _e('Save', 'mp'); ?>" /><?php if ($order->post_status == 'order_received' ||$order->post_status == 'order_paid') { ?><input type="submit" name="add-tracking-shipped" value="<?php _e('Save & Mark as Shipped &raquo;', 'mp'); ?>" /><?php } ?>
+					<input type="submit" name="add-tracking" value="<?php _e('Save &raquo;', 'mp'); ?>" /><?php if ($order->post_status == 'order_received' ||$order->post_status == 'order_paid') { ?><input type="submit" name="add-tracking-shipped" value="<?php _e('Save & Mark as Shipped &raquo;', 'mp'); ?>" /><?php } ?>
 					</p>
 					
           <?php //note line if set by gateway
@@ -4193,15 +4190,13 @@ Notification Preferences: %s', 'mp');
 
         </div>
       </div>
-			</form>
 			
-			<form id="mp-notes-form" action="" method="post">
       <div id="mp-order-notes" class="postbox">
         <h3 class='hndle'><span><?php _e('Order Notes', 'mp'); ?></span> - <span class="description"><?php _e('These notes will be displayed on the order status page', 'mp'); ?></span></h3>
         <div class="inside">
 					<p>
 					<textarea name="mp_order_notes" rows="5" style="width: 100%;"><?php echo esc_textarea($order->mp_order_notes); ?></textarea><br />
-					<input type="submit" name="save-note" value="<?php _e('Save Notes &raquo;', 'mp'); ?>" />
+					<input type="submit" name="save-note" value="<?php _e('Save &raquo;', 'mp'); ?>" />
 					</p>
 				</div>
       </div>
@@ -4811,7 +4806,21 @@ Notification Preferences: %s', 'mp');
             <h3 class='hndle'><span><?php _e('Miscellaneous Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
-
+								<tr id="mp-inventory-setting">
+                <th scope="row"><?php _e('Inventory Warning Threshold', 'mp') ?></th>
+        				<td>
+        				<span class="description"><?php _e('At what low stock count do you want to be warned for products you have enabled inventory tracking for?', 'mp') ?></span><br />
+								<select name="mp[inventory_threshhold]">
+								<?php
+								$inventory_threshhold = isset($settings['inventory_threshhold']) ? intval($settings['inventory_threshhold']) : 3;
+								for ($i=0; $i<=100; $i++) {
+                  $selected = ($inventory_threshhold == $i) ? ' selected="selected"' : '';
+			            echo '<option value="' . $i . '"' . $selected . '">' . $i . '</option>';
+			    			}
+								?>
+								</select>
+                </td>
+                </tr>
                 <tr id="mp-downloads-setting">
                 <th scope="row"><?php _e('Maximum Downloads', 'mp') ?></th>
         				<td>
@@ -5907,7 +5916,7 @@ class MarketPress_Shopping_Cart extends WP_Widget {
     if ( !empty($instance['custom_text']) )
       echo '<div class="custom_text">' . $instance['custom_text'] . '</div>';
 
-    echo '<div class="mp_cart_widget">';
+    echo '<div class="mp_cart_widget_content">';
     mp_show_cart('widget');
     echo '</div>';
 

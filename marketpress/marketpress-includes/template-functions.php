@@ -547,7 +547,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     
     if ($settings['special_instructions']) {
       $content .= '<tr>';
-      $content .= '<td align="right">'.__('Special Instructons:', 'mp').'</td><td>';
+      $content .= '<td align="right">'.__('Special Instructions:', 'mp').'</td><td>';
       $content .= '<textarea name="special_instructions" rows="2" style="width: 100%;">'.esc_textarea($special_instructions).'</textarea></td>';
       $content .= '</tr>';
     }
@@ -996,7 +996,9 @@ function mp_order_status() {
       <h3><?php _e('Order Notes:', 'mp'); ?></h3>
       <?php echo wpautop($order->mp_order_notes); ?>
       <?php } ?>
-
+      
+      <?php do_action('mp_order_status_output', $order); ?>
+      
       <?php mp_orderstatus_link(true, false, __('&laquo; Back', 'mp')); ?>
       <?php
 
