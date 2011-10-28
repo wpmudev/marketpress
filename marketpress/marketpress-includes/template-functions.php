@@ -125,7 +125,18 @@ function mp_dropdown_categories( $echo = true, $args = '' ) {
   $args['id'] = 'mp_category_dropdown';
 
   $dropdown = wp_dropdown_categories( $args );
-
+  $dropdown .= '<script type="text/javascript">
+/* <![CDATA[ */
+	var dropdown = document.getElementById("mp_category_dropdown");
+	function onCatChange() {
+		if ( dropdown.options[dropdown.selectedIndex].value > 0 ) {
+			location.href = "<?php echo home_url(); ?>/?product_category="+dropdown.options[dropdown.selectedIndex].value;
+		}
+	}
+	dropdown.onchange = onCatChange;
+/* ]]> */
+</script>';
+  
   if ($echo)
     echo $dropdown;
   else
@@ -1596,11 +1607,15 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
       return '';
 
     //size
-    if ($settings['list_img_size'] == 'custom')
-      $size = array($settings['list_img_width'], $settings['list_img_height']);
-    else
-      $size = $settings['list_img_size'];
-
+    if (intval($size)) {
+      $size = array(intval($size), intval($size));
+    } else {
+      if ($settings['list_img_size'] == 'custom')
+        $size = array($settings['list_img_width'], $settings['list_img_height']);
+      else
+        $size = $settings['list_img_size'];
+    }
+    
     //link
     $link = get_permalink($post_id);
 

@@ -261,18 +261,22 @@ background: #eeeeee;
 
 .mp_cart_contents th.mp_cart_col_product {
 background: url('modern-images/basket.png') no-repeat 5px 7px;
+padding: 6px 0px 5px 30px;
 }
 
 .mp_cart_contents th.mp_cart_col_price {
 background: url('modern-images/money.png') no-repeat 5px 7px;
+padding: 6px 0px 5px 30px;
 }
 
 .mp_cart_contents th.mp_cart_col_quant {
 background: url('modern-images/basket_add.png') no-repeat 5px 7px;
+padding: 6px 0px 5px 30px;
 }
 
 .mp_cart_shipping thead {
 background: #eeeeee url('modern-images/lorry.png') no-repeat 5px 9px;
+padding: 6px 0px 5px 30px;
 }
 
 .mp_product_categories {

@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.3.2 - 10/28/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Add JS to dropdown categories shortcode
+- Fix image size in global product listings to be correct
+- Fix missing title on product list pages
+- Fix title incompatibility with Genesis & Catalyst framework based themes
+- Style fixes to icons CSS theme
+- Fix double email for digital only orders
+
 2.3.1 - 10/17/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Still send shipped notification email for download only carts (for gateways with delayed paid confirmations)

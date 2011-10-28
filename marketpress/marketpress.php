@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.3.1
+Version: 2.3.2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.3.1';
+  var $version = '2.3.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -41,6 +41,7 @@ class MarketPress {
   var $cart_cache = false;
   var $is_shop_page = false;
   var $global_cart = false;
+	var $skip_shipping_notice = false;
 
   function MarketPress() {
     $this->__construct();
@@ -936,13 +937,13 @@ Thanks again!", 'mp')
         add_filter( 'template_include', array(&$this, 'custom_checkout_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
         add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
       }
 
@@ -965,13 +966,13 @@ Thanks again!", 'mp')
         add_filter( 'template_include', array(&$this, 'custom_orderstatus_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 99, 3 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
         add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
       }
 
@@ -1021,10 +1022,14 @@ Thanks again!", 'mp')
 
         add_filter( 'template_include', array(&$this, 'custom_product_list_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
         add_filter( 'the_content', array(&$this, 'product_list_theme'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
       }
@@ -1108,12 +1113,17 @@ Thanks again!", 'mp')
 
         add_filter( 'template_include', array(&$this, 'custom_product_taxonomy_template'));
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
       } else {
         //otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
         $wp_query->is_page = 1;
         //$wp_query->is_singular = 1;
         $wp_query->is_404 = null;
         $wp_query->post_count = 1;
+				add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99, 2 );
         add_filter( 'the_content', array(&$this, 'product_taxonomy_list_theme'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
@@ -2927,8 +2937,10 @@ Thanks again!", 'mp')
     do_action( 'mp_new_order', $this->get_order($order_id) );
 
 		//if paid and the cart is only digital products mark it shipped
-		if ($paid && $this->download_only_cart($cart))
+		if ($paid && $this->download_only_cart($cart)) {
+			$this->skip_shipping_notice = true;
 		  $this->update_order_status($order_id, 'shipped');
+		}
 
     return $order_id;
   }
@@ -2988,7 +3000,7 @@ Thanks again!", 'mp')
         update_post_meta($order->ID, 'mp_shipped_time', time());
 
         //send email
-        $this->order_shipped_notification($order->ID);
+				$this->order_shipped_notification($order->ID);
         break;
 
       case 'closed':
@@ -3624,7 +3636,11 @@ You can manage this order here: %s", 'mp');
     $order = $this->get_order($order_id);
     if (!$order)
       return false;
-
+		
+		//skip notice for paid download only carts
+		if ($this->skip_shipping_notice)
+			return false;
+		
     $subject = apply_filters('mp_shipped_order_notification_subject', stripslashes($settings['email']['shipped_order_subject']), $order);
     $subject = $this->filter_email($order, $subject);
     $msg = apply_filters( 'mp_shipped_order_notification_body', stripslashes($settings['email']['shipped_order_txt']), $order );
@@ -6163,21 +6179,6 @@ class MarketPress_Categories_Widget extends WP_Widget {
 			$cat_args['taxonomy'] = 'product_category';
       $cat_args['id'] = 'mp_category_dropdown';
 			wp_dropdown_categories( $cat_args );
-?>
-
-<script type='text/javascript'>
-/* <![CDATA[ */
-	var dropdown = document.getElementById("mp_category_dropdown");
-	function onCatChange() {
-		if ( dropdown.options[dropdown.selectedIndex].value > 0 ) {
-			location.href = "<?php echo home_url(); ?>/?product_category="+dropdown.options[dropdown.selectedIndex].value;
-		}
-	}
-	dropdown.onchange = onCatChange;
-/* ]]> */
-</script>
-
-<?php
 		} else {
 ?>
 <ul id="mp_category_list">
