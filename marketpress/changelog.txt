@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.4 - 11/28/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Update for Pro Sites Level compatibility
+- Add textdomain to plugin header to translate plugin description
+- Change link field to work with low resolution
+- Fix bug with icons css theme
+- Update the table rate shipping for international support
+- Update chained payments documentation
+
 2.3.2 - 10/28/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add JS to dropdown categories shortcode

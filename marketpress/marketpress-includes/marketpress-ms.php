@@ -589,8 +589,8 @@ class MarketPress_MS {
       				<th scope="row"><?php echo $plugin[1]; ?></th>
       				<td>
               <label><input value="full" id="gw_full_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
-              <?php if (function_exists('is_supporter')) { ?>
-              <label><input value="supporter" id="gw_supporter_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
+              <?php if (function_exists('is_pro_site')) { ?>
+              <label><input value="supporter" id="gw_supporter_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Pro Sites Only', 'mp') ?></label><br />
               <?php } ?>
               <label><input value="none" id="gw_none_<?php echo $code; ?>" name="mp[allowed_gateways][<?php echo $code; ?>]" type="radio"<?php checked($allowed, 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
               </td>
@@ -643,8 +643,8 @@ class MarketPress_MS {
         				<th scope="row"><?php echo $name; ?></th>
         				<td>
                 <label><input value="full" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'full') ?> /> <?php _e('All Can Use', 'mp') ?></label><br />
-                <?php if (function_exists('is_supporter')) { ?>
-                <label><input value="supporter" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Supporter Sites Only', 'mp') ?></label><br />
+                <?php if (function_exists('is_pro_site')) { ?>
+                <label><input value="supporter" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'supporter') ?> /> <?php _e('Pro Sites Only', 'mp') ?></label><br />
                 <?php } ?>
                 <label><input value="none" name="mp[allowed_themes][<?php echo $value; ?>]" type="radio"<?php checked($allowed, 'none') ?> /> <?php _e('No Access', 'mp') ?></label>
                 </td>

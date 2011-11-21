@@ -19,7 +19,10 @@ float: left;
 }
 
 .mp_product_price {
-line-height: 40px;
+	line-height: 40px;
+	background: url('modern-images/money.png') no-repeat 0 2px;
+	margin-right: 10px;
+	padding: 0px 0px 0px 20px;
 }
 
 .product {
@@ -240,9 +243,7 @@ padding: 0px 0px 0px 20px;
 }
 
 .mp_product_meta {
-background: url('modern-images/money.png') no-repeat 0 12px;
-margin-right: 10px;
-padding: 0px 0px 0px 20px;
+
 }
 
 ul.mp_store_navigation, ul#mp_popular_products, ul#mp_category_list, li.product_category ul, ul#mp_product_list {

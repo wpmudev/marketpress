@@ -6,6 +6,7 @@ Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
 Author URI: http://uglyrobot.com
+Text Domain: mp
 WDP ID: 144
 
 Copyright 2009-2011 Incsub (http://incsub.com)
@@ -1905,7 +1906,7 @@ Thanks again!", 'mp')
 
     <div id="mp_product_link_div">
       <label title="<?php _e('Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
-      <input type="text" size="100" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"]); ?>" /></label>
+      <input type="text" style="width: 100%;" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"]); ?>" /></label>
     </div>
 
     <?php do_action( 'mp_details_metabox' ); ?>
@@ -3113,6 +3114,7 @@ Thanks again!", 'mp')
 
 				if ( is_wp_error($tmp) ) {
 					@unlink($tmp);
+					trigger_error("MarketPress was unable to download the file $url for serving as download: ".$tmp->get_error_message(), E_USER_WARNING);
 					return false;
 				}
 	    }
@@ -3133,6 +3135,7 @@ Thanks again!", 'mp')
 				$cnt = 0;
 				$handle = fopen( $tmp, 'rb' );
 				if ( $handle === false ) {
+					trigger_error("MarketPress was unable to read the file $tmp for serving as download.", E_USER_WARNING);
 					return false;
 				}
 				while ( !feof( $handle ) ) {
