@@ -1427,7 +1427,7 @@ function mp_global_products_nav_link( $args = '' ) {
   $total = $wpdb->get_var( $query );
 	
 	//setup last page
-	$max_pages = intval($total / $per_page);
+	$max_pages = ceil($total / $per_page);
 	if ($max_pages < 1)
 		$max_pages = 1;
 	

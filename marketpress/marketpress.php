@@ -596,7 +596,7 @@ Thanks again!", 'mp')
     wp_enqueue_script( 'mp-store-js', $this->plugin_url . 'js/store.js', array('jquery'), $this->version );
 
     // declare the variables we need to access in js
-    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('Out of Stock', 'mp') ) );
+    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp') ) );
   }
 
   function load_tiny_mce($selector) {
@@ -2807,7 +2807,7 @@ Thanks again!", 'mp')
     $order = array();
     $order['post_title'] = $order_id;
     $order['post_name'] = $order_id;
-    $order['post_content'] = serialize($cart); //this is purely so you can search by cart contents
+    $order['post_content'] = serialize($cart).serialize($shipping_info); //this is purely so you can search by cart contents
     $order['post_status'] = ($paid) ? 'order_paid' : 'order_received';
     $order['post_type'] = 'mp_order';
     $post_id = wp_insert_post($order);

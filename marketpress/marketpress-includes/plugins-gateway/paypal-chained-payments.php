@@ -347,6 +347,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
               'SGD' => 'SGD - Singapore Dollar',
               'TWD' => 'TWD - Taiwan New Dollars',
               'THB' => 'THB - Thai Baht',
+							'TRY' => 'TRY - Turkish lira',
               'USD' => 'USD - U.S. Dollar'
           );
 

@@ -601,6 +601,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
               'ES'	=> 'Spain',
               'SE'	=> 'Sweden',
               'CH'	=> 'Switzerland',
+							'TR' 	=> 'Turkey',
               'GB'	=> 'United Kingdom',
               'US'	=> 'United States'
             );
@@ -641,6 +642,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	              'SGD' => 'SGD - Singapore Dollar',
 	              'TWD' => 'TWD - Taiwan New Dollars',
 	              'THB' => 'THB - Thai Baht',
+								'TRY' => 'TRY - Turkish lira',
 	              'USD' => 'USD - U.S. Dollar'
 	          );
 
