@@ -202,9 +202,6 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 		if (!isset($settings['gateways']['cubepoints']['email']))
 		  $settings['gateways']['cubepoints']['email'] = $settings['email']['new_order_txt'];
 
-    //enqueue visual editor
-    if (get_user_option('rich_editing') == 'true')
-    	$mp->load_tiny_mce("mp_msgs_txt");
     ?>
     <div id="mp_cubepoints_payments" class="postbox mp-pages-msgs">
     	<h3 class='handle'><span><?php _e('CubePoints Settings', 'mp'); ?></span></h3>

@@ -599,11 +599,6 @@ Thanks again!", 'mp')
     wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp') ) );
   }
 
-  function load_tiny_mce($selector) {
-    wp_tiny_mce(false, array("editor_selector" => $selector, 'plugins' => 'inlinepopups,spellchecker,tabfocus,paste,link'));
-	}
-
-
   //loads the jquery lightbox plugin
   function enqueue_lightbox() {
 
