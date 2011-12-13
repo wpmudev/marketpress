@@ -207,7 +207,7 @@ td.mp_var_remove {
 	float: right;
 }
 .wp_themeSkin iframe {
-    background: white;
+  background-color: #FFFFFF !important;
 }
 #mp-need-help {
 	background: transparent url('../images/need-help.png') no-repeat scroll top left;

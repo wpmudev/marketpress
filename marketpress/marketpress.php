@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.3.2
+Version: 2.4
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.3.2';
+  var $version = '2.4';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -1189,7 +1189,7 @@ Thanks again!", 'mp')
       foreach ($theme_list as $value => $name) {
         if ($network_settings['allowed_themes'][$value] == 'full')
           $allowed_list[$value] = $name;
-        else if (function_exists('is_supporter') && is_supporter() && $network_settings['allowed_themes'][$value] == 'supporter')
+        else if (function_exists('is_pro_site') && is_pro_site() && $network_settings['allowed_themes'][$value] == 'supporter')
           $allowed_list[$value] = $name;
         else if (is_super_admin()) //super admins can access all installed themes
           $allowed_list[$value] = $name;
@@ -5466,10 +5466,6 @@ Notification Preferences: %s', 'mp');
 
         //strip slashes
         $settings['email'] = array_map('stripslashes', $settings['email']);
-
-        //enqueue visual editor
-        if (get_user_option('rich_editing') == 'true')
-        	$this->load_tiny_mce("mp_msgs_txt");
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/messages.png'; ?>" /></div>
         <h2><?php _e('Messages Settings', 'mp'); ?></h2>
@@ -5534,14 +5530,14 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Product Listing Pages', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the product listing pages. Optional, HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][product_list]"><?php echo $settings['msg']['product_list']; ?></textarea>
-        				</td>
+        				<?php wp_editor( $settings['msg']['product_list'], 'product_list', array('textarea_name'=>'mp[msg][product_list]') ); ?>
+								</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Status Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Order Status page. Optional, HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][order_status]"><?php echo $settings['msg']['order_status']; ?></textarea>
+								<?php wp_editor( $settings['msg']['order_status'], 'order_status', array('textarea_name'=>'mp[msg][order_status]') ); ?>
         				</td>
                 </tr>
               </table>
@@ -5556,35 +5552,35 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Shopping Cart Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Shopping Cart page. Optional, HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][cart]"><?php echo $settings['msg']['cart']; ?></textarea>
+								<?php wp_editor( $settings['msg']['cart'], 'cart', array('textarea_name'=>'mp[msg][cart]') ); ?>
         				</td>
                 </tr>
                 <tr id="mp_msgs_shipping">
         				<th scope="row"><?php _e('Shipping Form Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Shipping Form page. Optional, HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][shipping]"><?php echo $settings['msg']['shipping']; ?></textarea>
+								<?php wp_editor( $settings['msg']['shipping'], 'shipping', array('textarea_name'=>'mp[msg][shipping]') ); ?>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Payment Form Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Payment Form page. Optional, HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][checkout]"><?php echo $settings['msg']['checkout']; ?></textarea>
+								<?php wp_editor( $settings['msg']['checkout'], 'checkout', array('textarea_name'=>'mp[msg][checkout]') ); ?>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Confirmation Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the final Order Confirmation page. HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][confirm_checkout]"><?php echo $settings['msg']['confirm_checkout']; ?></textarea>
+								<?php wp_editor( $settings['msg']['confirm_checkout'], 'confirm_checkout', array('textarea_name'=>'mp[msg][confirm_checkout]') ); ?>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Complete Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the page notifying customers of a successful order. HTML allowed.', 'mp') ?></span><br />
-                <textarea class="mp_msgs_txt" name="mp[msg][success]"><?php echo $settings['msg']['success']; ?></textarea>
+								<?php wp_editor( $settings['msg']['success'], 'success', array('textarea_name'=>'mp[msg][success]') ); ?>
         				</td>
                 </tr>
               </table>
@@ -5730,7 +5726,7 @@ Notification Preferences: %s', 'mp');
                   foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                     if ($network_settings['allowed_gateways'][$code] == 'full') {
                       $allowed_plugins[$code] = $plugin;
-                    } else if (function_exists('is_supporter') && is_supporter() && $network_settings['allowed_gateways'][$code] == 'supporter') {
+                    } else if (function_exists('is_pro_site') && is_pro_site() && $network_settings['allowed_gateways'][$code] == 'supporter') {
                       $allowed_plugins[$code] = $plugin;
                     }
                   }

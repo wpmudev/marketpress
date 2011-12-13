@@ -186,9 +186,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		if (!isset($settings['gateways']['manual-payments']['email']))
 		  $settings['gateways']['manual-payments']['email'] = $settings['email']['new_order_txt'];
 		  
-    //enqueue visual editor
-    if (get_user_option('rich_editing') == 'true')
-    	$mp->load_tiny_mce("mp_msgs_txt");
     ?>
     <div id="mp_manual_payments" class="postbox mp-pages-msgs">
     	<h3 class='handle'><span><?php _e('Manual Payments Settings', 'mp'); ?></span></h3>
@@ -209,17 +206,15 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		        <td>
 		        <span class="description"><?php _e('These are the manual payment instructions to display on the payments screen - HTML allowed', 'mp') ?></span>
 	          <p>
-	            <textarea id="manual-payments-instructions" name="mp[gateways][manual-payments][instructions]" class="mp_msgs_txt"><?php echo esc_textarea($settings['gateways']['manual-payments']['instructions']); ?></textarea>
-	          </p>
+							<?php wp_editor( $settings['gateways']['manual-payments']['instructions'], 'manualpaymentsinstructions', array('textarea_name'=>'mp[gateways][manual-payments][instructions]') ); ?>
+						</p>
 	        	</td>
 	        </tr>
 	        <tr>
 		        <th scope="row"><label for="manual-payments-confirmation"><?php _e('Confirmation User Instructions', 'mp') ?></label></th>
 		        <td>
 		        <span class="description"><?php _e('These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed', 'mp') ?></span>
-	          <p>
-	            <textarea id="manual-payments-confirmation" name="mp[gateways][manual-payments][confirmation]" class="mp_msgs_txt"><?php echo esc_textarea($settings['gateways']['manual-payments']['confirmation']); ?></textarea>
-	          </p>
+	          <?php wp_editor( $settings['gateways']['manual-payments']['confirmation'], 'manualpaymentsconfirmation', array('textarea_name'=>'mp[gateways][manual-payments][confirmation]') ); ?> 
 	        	</td>
 	        </tr>
 	        <tr>
@@ -243,6 +238,9 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    */
 	function process_gateway_settings($settings) {
 
+		//strip slashes
+    $settings['gateways']['manual-payments'] = array_map('stripslashes', $settings['gateways']['manual-payments']);
+		
 		//no html in public name
   	$settings['gateways']['manual-payments']['name'] = wp_filter_nohtml_kses($settings['gateways']['manual-payments']['name']);
   	
@@ -253,8 +251,8 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		}
 		
 		//no html in email
-  	$settings['gateways']['manual-payments']['email'] = wp_filter_nohtml_kses($settings['gateways']['manual-payments']['email']);
-  	
+  	$settings['gateways']['manual-payments']['email'] = wp_filter_nohtml_kses($settings['gateways']['manual-payments']['email']);	
+		
     return $settings;
   }
   
