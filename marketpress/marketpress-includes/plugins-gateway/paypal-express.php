@@ -919,7 +919,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog($bid);
       }
       $blog_settings = get_option('mp_settings');
-
+			
+			//if a seller hasn't configured paypal skip
+			if ( empty($blog_settings['gateways']['paypal-express']['merchant_email']) )
+				continue;
+			
       $totals = array();
 
       $nvpstr .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;

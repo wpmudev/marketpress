@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.4
+Version: 2.4.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.4';
+  var $version = '2.4.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -126,6 +126,7 @@ class MarketPress {
     add_action( 'wp_ajax_mp-update-cart', array(&$this, 'update_cart') );
 		add_action( 'wp_ajax_mp-province-field', 'mp_province_field' ); //province field callback for shipping form
 		add_action( 'wp_ajax_nopriv_mp-province-field', 'mp_province_field' );
+		add_action( 'wp_logout', array(&$this, 'logout_clear_session') ); //see http://premium.wpmudev.org/forums/topic/security-issue-with-marketpress
 
 		//Relies on post thumbnails for products
 		add_action( 'after_setup_theme', array(&$this, 'post_thumbnails'), 9999 );
@@ -341,11 +342,11 @@ Thanks again!", 'mp')
     if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/marketpress/' . basename(__FILE__))) {
       $this->location = 'subfolder-plugins';
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/marketpress-includes/';
-      $this->plugin_url = WP_PLUGIN_URL . '/marketpress/marketpress-includes/';
+			$this->plugin_url = plugins_url( '/marketpress-includes/', __FILE__ );
   	} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/' . basename(__FILE__))) {
       $this->location = 'plugins';
       $this->plugin_dir = WP_PLUGIN_DIR . '/marketpress-includes/';
-      $this->plugin_url = WP_PLUGIN_URL . '/marketpress-includes/';
+			$this->plugin_url = plugins_url( '/marketpress-includes/', __FILE__ );
   	} else if (is_multisite() && defined('WPMU_PLUGIN_URL') && defined('WPMU_PLUGIN_DIR') && file_exists(WPMU_PLUGIN_DIR . '/' . basename(__FILE__))) {
       $this->location = 'mu-plugins';
       $this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress-includes/';
@@ -835,7 +836,23 @@ Thanks again!", 'mp')
     if (session_id() == "")
       session_start();
   }
-
+	
+	function logout_clear_session() {
+		$this->start_session();
+		
+		//clear personal info
+		unset($_SESSION['mp_shipping_info']);
+		unset($_SESSION['mp_billing_info']);
+		
+		//remove coupon code
+		if (is_multisite()) {
+			global $blog_id;
+			unset($_SESSION['mp_cart_coupon_' . $blog_id]);
+		} else {
+			unset($_SESSION['mp_cart_coupon']);
+		}
+	}
+	
   //scans post type at template_redirect to apply custom themeing to products
   function load_store_templates() {
     global $wp_query, $mp_wpmu, $mp_gateway_active_plugins;
@@ -2319,10 +2336,10 @@ Thanks again!", 'mp')
         return false;
 
 			//get quantity
-      $quantity = (isset($_POST['quantity'])) ? intval($_POST['quantity']) : 1;
+      $quantity = (isset($_POST['quantity'])) ? intval(abs($_POST['quantity'])) : 1;
 
       //get variation
-      $variation = (isset($_POST['variation'])) ? intval($_POST['variation']) : 0;
+      $variation = (isset($_POST['variation'])) ? intval(abs($_POST['variation'])) : 0;
 
       //check max stores
       if ($this->global_cart && count($global_cart = $this->get_cart_cookie(true)) >= $mp_gateway_active_plugins[0]->max_stores && !isset($global_cart[$blog_id])) {
@@ -2354,7 +2371,7 @@ Thanks again!", 'mp')
         }
         //send ajax leftover stock
         if (defined('DOING_AJAX') && DOING_AJAX) {
-          $return = $stock[$variation]-$new_quantity . '||';
+          $return = array_sum($stock)-$new_quantity . '||';
         }
       } else {
         //send ajax always stock if stock checking turned off
@@ -2395,17 +2412,19 @@ Thanks again!", 'mp')
       if (is_array($_POST['quant'])) {
         foreach ($_POST['quant'] as $pbid => $quant) {
 				  list($bid, $product_id, $variation) = split(':', $pbid);
-
+					
 					if (is_multisite())
 				    switch_to_blog($bid);
-
-          if (intval($quant)) {
+					
+					$quant = intval(abs($quant));
+					
+          if ($quant) {
             //check stock
             if (get_post_meta($product_id, 'mp_track_inventory', true)) {
               $stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
               if (!is_array($stock))
 								$stock[0] = $stock;
-              if ($stock[$variation] < intval($quant)) {
+              if ($stock[$variation] < $quant) {
                 $left = (($stock[$variation]-intval($global_cart[$bid][$product_id][$variation])) < 0) ? 0 : ($stock[$variation]-intval($global_cart[$bid][$product_id][$variation]));
                 $this->cart_checkout_error( sprintf(__('Sorry, there is not enough stock for "%s". (%s remaining)', 'mp'), get_the_title($product_id), number_format_i18n($left)) );
                 continue;
@@ -2414,37 +2433,35 @@ Thanks again!", 'mp')
           	//check limit if tracking on or downloadable
     				if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
 							$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
-							if ($limit[$variation] && $limit[$variation] < intval($quant)) {
+							if ($limit[$variation] && $limit[$variation] < $quant) {
 					      $this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), get_the_title($product_id)) );
 	          		continue;
 					    }
 	          }
 
-            $global_cart[$blog_id][$product_id][$variation] = intval($quant);
+            $global_cart[$bid][$product_id][$variation] = $quant;
           } else {
-            unset($global_cart[$blog_id][$product_id][$variation]);
+            unset($global_cart[$bid][$product_id][$variation]);
           }
         }
 
 	    	if (is_multisite())
     			switch_to_blog($current_blog_id);
-
-        //save items to cookie
-        $this->set_global_cart_cookie($global_cart);
       }
 
       //remove items
       if (is_array($_POST['remove'])) {
         foreach ($_POST['remove'] as $pbid) {
 				  list($bid, $product_id, $variation) = split(':', $pbid);
-          unset($global_cart[$blog_id][$product_id][$variation]);
+          unset($global_cart[$bid][$product_id][$variation]);
         }
 
-        //save items to cookie
-        $this->set_global_cart_cookie($global_cart);
         $this->cart_update_message( __('Item(s) Removed', 'mp') );
       }
 
+			//save items to cookie
+			$this->set_global_cart_cookie($global_cart);
+				
       //add coupon code
       if (!empty($_POST['coupon_code'])) {
         if ($this->check_coupon($_POST['coupon_code'])) {
