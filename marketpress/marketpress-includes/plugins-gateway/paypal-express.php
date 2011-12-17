@@ -921,7 +921,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $blog_settings = get_option('mp_settings');
 			
 			//if a seller hasn't configured paypal skip
-			if ( empty($blog_settings['gateways']['paypal-express']['merchant_email']) )
+			if ( $mp->global_cart && empty($blog_settings['gateways']['paypal-express']['merchant_email']) )
 				continue;
 			
       $totals = array();
@@ -933,14 +933,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $nvpstr .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
 			
 			if (!$mp->download_only_cart($cart)) {
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . urlencode($shipping_info['name']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . urlencode($shipping_info['address1']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . urlencode($shipping_info['address2']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . urlencode($shipping_info['city']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . urlencode($shipping_info['state']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRY=" . urlencode($shipping_info['country']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . urlencode($shipping_info['zip']);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . urlencode($shipping_info['phone']);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . $this->trim_name($shipping_info['name'], 32);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . $this->trim_name($shipping_info['address1'], 100);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . $this->trim_name($shipping_info['address2'], 100);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . $this->trim_name($shipping_info['city'], 40);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . $this->trim_name($shipping_info['state'], 40);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRY=" . $this->trim_name($shipping_info['country'], 2);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . $this->trim_name($shipping_info['zip'], 20);
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . $this->trim_name($shipping_info['phone'], 20);
 			}
 
       $detailstr = "";
@@ -952,7 +952,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 						continue;
 					
 				  $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode($data['name']);
+				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price']));
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
@@ -988,7 +988,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       }
 
       //order details
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_DESC=" . urlencode(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
+      $nvpstr .= "&PAYMENTREQUEST_{$j}_DESC=" . $this->trim_name(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
       $nvpstr .= "&PAYMENTREQUEST_{$j}_AMT=" . $total; //cart total
       $nvpstr .= "&PAYMENTREQUEST_{$j}_INVNUM=" . $order_id;
       $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTREQUESTID=" . $bid . ":" . $order_id;
@@ -1142,7 +1142,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		parse_str($nvpstr, $nvpArray);
 		return $nvpArray;
 	}
-
+	
+	function trim_name($name, $length = 127) {
+		while (strlen(urlencode($name)) > $length)
+			$name = substr($name, 0, -1);
+		
+		return urlencode($name);	
+	}
+	
 }
 
 //register shipping plugin

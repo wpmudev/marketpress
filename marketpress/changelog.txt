@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.4.2 - 12/16/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Fix a fatal bug introduced to the PayPal express gateway in 2.4.1. Important update!
+- Add sanity checks for long product names into PayPal gateway to prevent errors
+
 2.4.1 - 12/14/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix negative quantities being able to be added to your cart: http://premium.wpmudev.org/forums/topic/marketpress-security-bug
