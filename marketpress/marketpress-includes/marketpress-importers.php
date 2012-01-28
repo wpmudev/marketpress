@@ -47,7 +47,7 @@ class MarketPress_Importer {
 		$label = !empty($label) ? $label : __('Import Now &raquo;', 'mp');
 		?>
 		<p class="submit">
-			<input type="submit" name="mp_import-<?php echo sanitize_title($this->importer_name); ?>" value="<?php echo $label; ?>" />
+			<input class="button-primary" type="submit" name="mp_import-<?php echo sanitize_title($this->importer_name); ?>" value="<?php echo $label; ?>" />
 		</p>
 		<?php
 	}
@@ -211,12 +211,234 @@ class CsvImporter extends MarketPress_Importer {
 	var $importer_name = 'CSV';
 
 	function display() {
-	  ?>
-		<span class="description"><?php _e('This will allow you to import products and most of their attributes from a CSV file.', 'mp'); ?></span>
+		global $mp;
+		
+		$file_path = $this->file_path();
+		
+		//delete file
+		if (isset($_GET['csv_del']) && file_exists($file_path)) {
+			@unlink($file_path);
+			echo '<div class="updated fade"><p>'.__('Import file successfully deleted.', 'mp').'</p></div>';
+		}
 
-		<p><?php _e('Coming soon...', 'mp'); ?></p>
-		<?php
+		//if uploaded file
+		if ( isset($_FILES['csv_file']['name']) && current_user_can('upload_files') ) {
+		
+			//make sure directory exists
+			wp_mkdir_p( $this->file_path(true) );
+			
+			//check extension
+			if ( preg_match( '!\.(csv)$!i', strtolower($_FILES['csv_file']['name']) ) ) {
+			
+				//attempt to move uploaded file
+				if (!move_uploaded_file($_FILES['csv_file']['tmp_name'], $file_path)) {
+					@unlink($_FILES['csv_file']['tmp_name']);
+					echo '<div class="error"><p>'.__('There was a problem uploading your file. Please check permissions or use FTP.', 'mp').'</p></div>';
+				} else {
+					//check for required fields
+					$headers = $this->get_csv_headers();
+					if ( !in_array('title', $headers) || !in_array('price', $headers) ) {
+						@unlink($file_path);
+						echo '<div class="error"><p>'.__('The CSV file must contain at a minimum the "title" and "price" columns. Please fix and upload again.', 'mp').'</p></div>';
+					}
+				}
+			} else {
+				@unlink($_FILES['csv_file']['tmp_name']);
+				echo '<div class="error"><p>'.__('Invalid file format. Please upload your import file ending in ".csv".', 'mp').'</p></div>';
+			}
+			
+		}
+		
+		if ($this->results) {
+			@unlink($file_path);
+			?>
+			<p><?php printf( __('Successfully imported %s products from your CSV file. Products were created in draft status, so you will need to review them then publish (bulk or one-by-one). Importing the CSV file again will just create copies of the products in MarketPress.', 'mp'), number_format_i18n($this->results) ); ?></p>
+			<p><a class="button" href="<?php echo admin_url('edit.php?post_status=draft&post_type=product'); ?>"><?php _e('Review Now &raquo;', 'mp'); ?></a></p>
+			<?php
+		} else {
+		
+			//if file has been uploaded
+			if ( file_exists($file_path) ) {
+				$total = count($this->get_csv_array());
+				?>
+				<h4><?php echo sprintf(__('A CSV import file was detected with %d products to process.', 'mp'), $total); ?> <a class="button" href="<?php echo admin_url('edit.php?post_type=product&page=marketpress&tab=importers&csv_del=1'); ?>" title="<?php _e("Delete the current CSV import file", 'mp'); ?>"><?php _e("Re-upload", 'mp'); ?></a></h4>
+	
+				<p><?php _e('Please be patient while products are being imported. Ready?', 'mp') ?></p>
+				
+				<?php
+				$this->import_button();
+				
+			} else { //file does not exist, show upload form
+			
+				?>
+				<span class="description"><?php _e('This will allow you to import products and most of their attributes from a CSV file.', 'mp'); ?></span>
+				<p><span class="description"><?php _e('Your CSV file must be comma (,) delimited and fields with commas or quotes in them must be surrounded by parenthesis (") as per the CSV standard. Columns in the CSV file can be in any order, provided that they have the correct headings from the example file. "title" and "price" are the only required columns, all others can be left blank. A spreadsheet program like Excel or Numbers can be used to easily manipulate your import file, and their save as CSV option will create a correctly formatted file.', 'mp'); ?></span></p>
+				
+				<p><?php _e('Please select and upload your CSV file below.', 'mp'); ?> 
+				<a href="<?php echo $mp->plugin_url; ?>sample-marketpress-import.csv" target="_blank"><?php _e('Use this example file &raquo;', 'mp'); ?></a>
+				</p>
+				
+				<p>
+					<input name="csv_file" id="csv_file" size="20" type="file" /> 
+					<input name="Submit" value="<?php _e('Upload &raquo;', 'mp') ?>" type="submit"><br />
+					<small><?php echo __('Maximum file size: ', 'mp') . ini_get('upload_max_filesize'); ?></small>
+				</p>
+				<?php
+				
+			} //end file exists
+		}
 	}
+	
+	function process() {
+	  global $wpdb;
+
+		set_time_limit(90); //this can take a while
+		$this->results = 0;
+		$products = $this->get_csv_array();
+		
+		foreach ($products as $row) {
+			
+			$product = array();
+			
+			if (empty($row['title']) || empty($row['price']))
+				continue;
+			
+			//import product
+			$product['post_title'] = $row['title'];
+			$product['post_content'] = $row['description'];
+			$product['post_status'] = 'draft';
+			$product['post_type'] = 'product';
+			$product['comment_status'] = 'closed';
+			$product['comment_count'] = 0;
+			
+			//add tags
+			if (!empty($row['tags']))
+				$product['tax_input']['product_tag'] = trim($row['tags']);
+
+			$new_id = wp_insert_post($product); //create the post
+			
+			//insert categories
+			if (!empty($row['categories'])) {
+				$product_cats = explode(',', trim($row['categories']));
+				$product_cats = array_map('trim', $product_cats);
+				wp_set_object_terms($new_id, $product_cats, 'product_category');
+			}
+			
+			//add product meta
+			update_post_meta($new_id, 'mp_sku', array( preg_replace("/[^a-zA-Z0-9_-]/", "", trim(@$row['sku'])) ) ); //add sku
+			update_post_meta($new_id, 'mp_price', array( round( (float)preg_replace('/[^0-9.]/', '', $row['price']), 2 ) ) ); //add price
+			update_post_meta($new_id, 'mp_var_name', array('') ); //add blank var name
+			
+			//add sale price only if set
+			if (!empty($row['sale_price'])) {
+				update_post_meta($new_id, 'mp_is_sale', 1);
+				update_post_meta($new_id, 'mp_sale_price', array( round( (float)preg_replace('/[^0-9.]/', '', $row['sale_price']), 2 ) ) );
+				update_post_meta($new_id, 'mp_price_sort', round( (float)preg_replace('/[^0-9.]/', '', $row['sale_price']), 2 ));
+			} else {
+				update_post_meta($new_id, 'mp_is_sale', 0);
+				update_post_meta($new_id, 'mp_price_sort', round( (float)preg_replace('/[^0-9.]/', '', $row['mp_price']), 2 ));
+			}
+
+			//add stock count if set
+			if (!empty($row['stock'])) {
+				update_post_meta($new_id, 'mp_track_inventory', 1);
+				update_post_meta($new_id, 'mp_inventory', array( intval($row['stock']) ));
+			} else {
+				update_post_meta($new_id, 'mp_track_inventory', 0);
+			}
+
+			//add external link
+			if (!empty($row['external_link']))
+				update_post_meta($new_id, 'mp_product_link', esc_url_raw($row['external_link']));
+
+			//add shipping info
+			$shipping = array();
+			if (!empty($row['extra_shipping']))
+				$shipping['extra_cost'] = round( (float)preg_replace('/[^0-9.]/', '', $row['extra_shipping']), 2 );
+			if (!empty($row['weight']))
+				$shipping['weight'] = round( (float)preg_replace('/[^0-9.]/', '', $row['weight']), 2 );
+			update_post_meta($new_id, 'mp_shipping', $shipping);
+
+			//add thumbnail
+			//update_post_meta($new_id, '_thumbnail_id', $meta['_thumbnail_id'][0]);
+				
+			//download
+			if (!empty($row['download_url']))
+				update_post_meta($new_id, 'mp_file', esc_url_raw($row['download_url']));
+			
+			//download
+			if (isset($row['sales_count']))
+				update_post_meta($new_id, 'mp_sales_count', intval($row['sales_count']));
+			
+			
+			//inc count
+			$this->results++;
+		}	
+	}
+	
+	function get_csv_headers() {
+		$file_path = $this->file_path();
+
+		@ini_set('auto_detect_line_endings', true); //so it doesn't choke on mac CR line endings
+		$fh = @fopen($file_path, 'r');
+		if ($fh) {
+			$temp_fields = fgetcsv($fh, 5120); // 5KB
+			
+			if (is_array($temp_fields))
+				$headers = array_map('strtolower', $temp_fields);
+	
+			fclose($fh);
+			
+			return $headers;
+		} else {
+			return false;
+		}
+	}
+	
+	function get_csv_array() {
+		$file_path = $this->file_path();
+		$i = 0;
+		@ini_set('auto_detect_line_endings', true); //so it doesn't choke on mac CR line endings
+		$fh = @fopen($file_path, 'r');
+		if ($fh) {
+			while (!feof($fh)) {
+				//parse csv line
+				$temp_fields = fgetcsv($fh, 5120); // 5KB
+				
+				if (is_array($temp_fields)) {
+					if (!isset($titles))
+						$titles = array_map('strtolower', $temp_fields);
+					
+					//switch keys out for titles
+					$new_fields = array();
+					foreach ($temp_fields as $key => $value) {
+						$new_fields[$titles[$key]] = $value;
+					}
+				}
+				
+				$fields[] = $new_fields;
+			}
+	
+	
+			fclose($fh);
+			
+			//remove header row
+			array_shift($fields);
+			
+			return $fields;
+		} else {
+			return false;
+		}
+	}
+	
+	function file_path($dir = false) {
+		$target_path = wp_upload_dir();
+		if ($dir)
+			return trailingslashit($target_path['basedir']);
+		else
+			return trailingslashit($target_path['basedir']) . 'marketpress-import.csv';
+	}
+	
 }
 //only load if the plugin is active and installed
 $mp_csv = new CsvImporter();

@@ -78,4 +78,20 @@ jQuery(document).ready(function($) {
       $("#mp_province_field").html(data);
     });
   });
+  
+  //shipping field choice
+  $('#mp-shipping-select').change(function() {mp_refresh_shipping();});
+  
+  //refresh on blur if necessary 3 fields are set
+  $('#mp_shipping_form .mp_shipping_field').blur(function() {
+    if ($('#mp_city').val() && $('#mp_state').val() && $('#mp_zip').val()) mp_refresh_shipping();
+  });
+  
+  function mp_refresh_shipping() {
+    $("#mp-shipping-select-holder").html('<img src="'+MP_Ajax.imgUrl+'" />');
+    var serializedForm = $('form#mp_shipping_form').serialize();
+    $.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
+      $("#mp-shipping-select-holder").html(data);
+    });
+  }
 });

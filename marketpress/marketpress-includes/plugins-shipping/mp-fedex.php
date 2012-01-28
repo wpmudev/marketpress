@@ -1,18 +1,21 @@
 <?php
 /*
-MarketPress Example Shipping Plugin Template
+MarketPress FedEx Calculated Shipping Plugin
+Author: Aaron Edwards (Incsub)
 */
-
-class My_Plugin_Name extends MP_Shipping_API {
+class MP_Shipping_FedEx extends MP_Shipping_API {
 
   //private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
-  var $plugin_name = 'my-plugin-name';
+  var $plugin_name = 'fedex';
   
   //public name of your method, for lists and such.
   var $public_name = '';
   
   //set to true if you need to use the shipping_metabox() method to add per-product shipping options
   var $use_metabox = false;
+	
+	//set to true if you want to add per-product extra shipping cost field
+	var $use_extra = false;
 	
 	//set to true if you want to add per-product weight shipping field
 	var $use_weight = true;
@@ -22,8 +25,8 @@ class My_Plugin_Name extends MP_Shipping_API {
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
   function on_creation() {
-    //declare here for translation
-    $this->public_name = __('My Plugin', 'mp');
+    //set name here to be able to translate
+    $this->public_name = __('FedEx', 'mp');
 	}
 
   /**
@@ -61,7 +64,18 @@ class My_Plugin_Name extends MP_Shipping_API {
    *  You can access saved settings via $settings array.
    */
 	function shipping_settings_box($settings) {
+    global $mp;
+    ?>
+    <div id="mp_flat_rate" class="postbox">
+      <h3 class='hndle'><span><?php _e('FedEx Settings', 'mp'); ?></span></h3>
+      <div class="inside">
+        <span class="description"><?php _e('Here is how to get your api credentials...', 'mp') ?></span>
+        <table class="form-table">
 
+        </table>
+      </div>
+    </div>
+    <?php
   }
   
   /**
@@ -90,7 +104,7 @@ class My_Plugin_Name extends MP_Shipping_API {
    * return array $shipping_meta
    */
 	function save_shipping_metabox($shipping_meta) {
-
+		
     return $shipping_meta;
   }
   
@@ -111,31 +125,45 @@ class My_Plugin_Name extends MP_Shipping_API {
 		* return float $price
 		*/
 	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
+    global $mp;
+    $settings = get_option('mp_settings');
+		
+    //merge
+		if ($selected_option == 'ground')
+			$price = 7.99;
+		else if ($selected_option == '2day')
+			$price = 8.99;
+		else if ($selected_option == 'overnight')
+			$price = 9.99;
+
     return $price;
   }
 	
 	/**
-		* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
-		*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
-		*
-		* @param string $address1
-		* @param string $address2
-		* @param string $city
-		* @param string $state, state/province/region
-		* @param string $zip, postal code
-		* @param string $country, ISO 3166-1 alpha-2 country code
-		*
-		* return array $shipping_options 
-		*/
+	* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
+	*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
+	*
+	* @param string $address1
+	* @param string $address2
+	* @param string $city
+	* @param string $state, state/province/region
+	* @param string $zip, postal code
+	* @param string $country, ISO 3166-1 alpha-2 country code
+	*
+	* return array $shipping_options 
+	*/
 	function shipping_options($address1, $address2, $city, $state, $zip, $country) {
+		global $mp;
 		
-		$shipping_options = array();
-		
-		return $shipping_options;
+		$shipping_options = array( 'ground' => sprintf(__('Ground (6 Days): %s', 'mp'), $mp->format_currency(false, 7.99)),
+															'2day' => sprintf(__('Two Day Express: %s', 'mp'), $mp->format_currency(false, 8.99)),
+															'overnight' => sprintf(__('Overnight Express: %s', 'mp'), $mp->format_currency(false, 9.99))
+															);
+
+	 return $shipping_options;
 	}
-	
 }
 
-//register plugin - uncomment to register
-//mp_register_shipping_plugin( 'My_Plugin_Name', 'my-plugin-name', __('My Plugin', 'mp'), false );
+//register plugin as calculated
+mp_register_shipping_plugin( 'MP_Shipping_FedEx', 'fedex', __('FedEx', 'mp'), true );
 ?>

@@ -3,7 +3,6 @@
 MarketPress Table-Rate Shipping Plugin
 Author: Nick Bunn (Salty Dog Interactive for Incsub)
 Version: 1.1
-10/27/11: Added Country Shipping
 */
 
 class MP_Shipping_Table_Rate extends MP_Shipping_API {
@@ -15,7 +14,10 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	var $public_name = '';
 	
 	//set to true if you need to use the shipping_metabox() method to add per-product shipping options
-	var $use_metabox = true;
+	var $use_metabox = false;
+	
+	//set to true if you want to add per-product weight shipping field
+	var $use_weight = false;
 	
 	/**
 	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
@@ -23,44 +25,44 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	function on_creation() {
 		//declare here for translation
 		$this->public_name = __('Table Rate', 'mp');
-		}
-	
-	/**
-	 * Echo anything you want to add to the top of the shipping screen
-	 */
-		function before_shipping_form() {
-	
 	}
 	
 	/**
-	 * Echo anything you want to add to the bottom of the shipping screen
-	 */
-		function after_shipping_form() {
-	
-	}
+   * Echo anything you want to add to the top of the shipping screen
+   */
+	function before_shipping_form($content) {
+		return $content;
+  }
+  
+  /**
+   * Echo anything you want to add to the bottom of the shipping screen
+   */
+	function after_shipping_form($content) {
+		return $content;
+  }
+  
+  /**
+   * Echo a table row with any extra shipping fields you need to add to the shipping checkout form
+   */
+	function extra_shipping_field($content) {
+		return $content;
+  }
+  
+  /**
+   * Use this to process any additional field you may add. Use the $_POST global,
+   *  and be sure to save it to both the cookie and usermeta if logged in.
+   */
+	function process_shipping_form() {
+
+  }
 	
 	/**
-	 * Echo a table row with any extra shipping fields you need to add to the form
-	 */
-		function extra_shipping_field() {
-	
-	}
-	
-	/**
-	 * Use this to process any additional field you may add. Use the $_POST global,
-	 *  and be sure to save it to both the cookie and usermeta if logged in.
-	 */
-		function process_shipping_form() {
-	
-	}
-	
-		/**
 	 * Echo a settings meta box with whatever settings you need for you shipping module.
 	 *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
 	 *  You can access saved settings via $settings array.
 	 */
-		function shipping_settings_box($settings) {
-			global $mp;
+	function shipping_settings_box($settings) {
+		global $mp;
 		?>
 		<script type="text/javascript">
 				jQuery(document).ready(function ($) {
@@ -211,7 +213,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	 * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
 	 *  array. Don't forget to return!
 	 */
-		function process_shipping_settings($settings) {
+	function process_shipping_settings($settings) {
 	
 		return $settings;
 	}
@@ -222,14 +224,8 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	 * @param array $shipping_meta, the contents of the post meta. Use to retrieve any previously saved product meta
 	 * @param array $settings, access saved settings via $settings array.
 	 */
-		function shipping_metabox($shipping_meta, $settings) {
-			global $mp;
-		?>
-		<label><?php _e('Extra Shipping Cost', 'mp'); ?>:<br />
-		<?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo ($shipping_meta['extra_cost']) ? $mp->display_currency($shipping_meta['extra_cost']) : '0.00'; ?>" />
-		</label>
-		<?php
-	
+	function shipping_metabox($shipping_meta, $settings) {
+
 	}
 	
 	/**
@@ -238,34 +234,30 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	 * @param array $shipping_meta, save anything from the $_POST global
 	 * return array $shipping_meta
 	 */
-		function save_shipping_metabox($shipping_meta) {
-			$shipping_meta['extra_cost'] = (!empty($_POST['mp_extra_shipping_cost'])) ? round($_POST['mp_extra_shipping_cost'], 2) : 0;
-	
+	function save_shipping_metabox($shipping_meta) {
+
 		return $shipping_meta;
 	}
 	
 	/**
-	 * Use this function to return your calculated price as an integer or float
-	 *
-	 * @param int $price, always 0. Modify this and return
-	 * @param float $total, cart total after any coupons and before tax
-	 * @param array $cart, the contents of the shopping cart for advanced calculations
-	 * @param string $address1
-	 * @param string $address2
-	 * @param string $city
-	 * @param string $state, state/province/region
-	 * @param string $zip, postal code
-	 * @param string $country, ISO 3166-1 alpha-2 country code
-	 *
-	 * return float $price
-	 */
-		function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
-			global $mp;
+		* Use this function to return your calculated price as an integer or float
+		*
+		* @param int $price, always 0. Modify this and return
+		* @param float $total, cart total after any coupons and before tax
+		* @param array $cart, the contents of the shopping cart for advanced calculations
+		* @param string $address1
+		* @param string $address2
+		* @param string $city
+		* @param string $state, state/province/region
+		* @param string $zip, postal code
+		* @param string $country, ISO 3166-1 alpha-2 country code
+		* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
+		*
+		* return float $price
+		*/
+	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
+		global $mp;
 		$settings = get_option('mp_settings');
-	
-		//don't charge shipping if only digital products
-		if ( $mp->download_only_cart($cart) )
-		return 0;
 		
 		switch ($settings['base_country']) 
 		{
@@ -329,20 +321,6 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 					}
 			}
 		}
-	
-		//calculate extra shipping
-		$extras = array();
-		foreach ($cart as $product_id => $variations) {
-			$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-			foreach ($variations as $variation => $data) {
-				if (!$data['download'])
-				$extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
-			}
-		}
-		$extra = array_sum($extras);
-	
-		//merge
-		$price = round($price + $extra, 2);
 	
 		return $price;
 	}

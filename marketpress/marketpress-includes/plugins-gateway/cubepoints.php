@@ -128,20 +128,22 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 	  $uid = cp_currentUser();
 	  //test for CubePoints amount
 	  if ( cp_getPoints ( cp_currentUser() ) >= $total ) {
-		//subtract $total from user's CubePoints
-		cp_points ( 'marketpress', $uid, -$total, '' );
-		//create MarketPress order
-		$order_id = $mp->generate_order_id();
-		$payment_info['gateway_public_name'] = $this->public_name;
-		$payment_info['gateway_private_name'] = $this->admin_name;
-		$payment_info['status'][$timestamp] = __("Paid", 'mp');
-		$payment_info['total'] = $total;
-		$payment_info['currency'] = $settings['currency'];
-		$payment_info['method'] = __('CubePoints', 'mp');
-		$payment_info['transaction_id'] = $order_id;
-		$paid = true;
-		//create our order now
-		$result = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid);
+						
+			//subtract $total from user's CubePoints
+			cp_points( 'custom', $uid, -$total, sprintf(__('%s Store Purchase', 'mp'), get_bloginfo('name')) );
+			
+			//create MarketPress order
+			$order_id = $mp->generate_order_id();
+			$payment_info['gateway_public_name'] = $this->public_name;
+			$payment_info['gateway_private_name'] = $this->admin_name;
+			$payment_info['status'][$timestamp] = __("Paid", 'mp');
+			$payment_info['total'] = $total;
+			$payment_info['currency'] = $settings['currency'];
+			$payment_info['method'] = __('CubePoints', 'mp');
+			$payment_info['transaction_id'] = $order_id;
+			$paid = true;
+			//create our order now
+			$result = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid);
 	  } else {
 		//insuffient CubePoints
 		$mp->cart_checkout_error( sprintf(__('Sorry, but you do not appear to have enough points to complete this purchase!', 'mp'), mp_checkout_step_url('checkout')) );

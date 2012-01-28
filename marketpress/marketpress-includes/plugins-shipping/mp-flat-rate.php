@@ -3,7 +3,6 @@
 MarketPress Flat-Rate Shipping Plugin
 Author: Aaron Edwards (Incsub)
 */
-
 class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 
   //private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
@@ -13,8 +12,11 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
   var $public_name = '';
   
   //set to true if you need to use the shipping_metabox() method to add per-product shipping options
-  var $use_metabox = true;
-
+  var $use_metabox = false;
+	
+	//set to true if you want to add per-product weight shipping field
+	var $use_weight = false;
+		
   /**
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
@@ -26,22 +28,22 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
   /**
    * Echo anything you want to add to the top of the shipping screen
    */
-	function before_shipping_form() {
-
+	function before_shipping_form($content) {
+		return $content;
   }
   
   /**
    * Echo anything you want to add to the bottom of the shipping screen
    */
-	function after_shipping_form() {
-
+	function after_shipping_form($content) {
+		return $content;
   }
   
   /**
    * Echo a table row with any extra shipping fields you need to add to the shipping checkout form
    */
-	function extra_shipping_field() {
-
+	function extra_shipping_field($content) {
+		return $content;
   }
   
   /**
@@ -183,12 +185,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
    * @param array $settings, access saved settings via $settings array.
    */
 	function shipping_metabox($shipping_meta, $settings) {
-    global $mp;
-    ?>
-    <label><?php _e('Extra Shipping Cost', 'mp'); ?>:<br />
-    <?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo ($shipping_meta['extra_cost']) ? $mp->display_currency($shipping_meta['extra_cost']) : '0.00'; ?>" />
-    </label>
-    <?php
+
   }
 
   /**
@@ -198,34 +195,29 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
    * return array $shipping_meta
    */
 	function save_shipping_metabox($shipping_meta) {
-    //process extra per item shipping
-    $shipping_meta['extra_cost'] = (!empty($_POST['mp_extra_shipping_cost'])) ? round($_POST['mp_extra_shipping_cost'], 2) : 0;
-
+		
     return $shipping_meta;
   }
   
   /**
-   * Use this function to return your calculated price as an integer or float
-   *
-   * @param int $price, always 0. Modify this and return
-   * @param float $total, cart total after any coupons and before tax
-   * @param array $cart, the contents of the shopping cart for advanced calculations
-   * @param string $address1
-   * @param string $address2
-   * @param string $city
-   * @param string $state, state/province/region
-   * @param string $zip, postal code
-   * @param string $country, ISO 3166-1 alpha-2 country code
-   *
-   * return float $price
-   */
-  function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
+		* Use this function to return your calculated price as an integer or float
+		*
+		* @param int $price, always 0. Modify this and return
+		* @param float $total, cart total after any coupons and before tax
+		* @param array $cart, the contents of the shopping cart for advanced calculations
+		* @param string $address1
+		* @param string $address2
+		* @param string $city
+		* @param string $state, state/province/region
+		* @param string $zip, postal code
+		* @param string $country, ISO 3166-1 alpha-2 country code
+		* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
+		*
+		* return float $price
+		*/
+	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
     global $mp;
     $settings = get_option('mp_settings');
-    
-    //don't charge shipping if only digital products
-    if ( $mp->download_only_cart($cart) )
-      return 0;
     
     switch ($settings['base_country']) {
       case 'US':
@@ -271,20 +263,6 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
         }
         break;
     }
-
-    //calculate extra shipping
-    $extras = array();
-    foreach ($cart as $product_id => $variations) {
-	    $shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-			foreach ($variations as $variation => $data) {
-			  if (!$data['download'])
-	      	$extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
-			}
-    }
-    $extra = array_sum($extras);
-
-    //merge
-    $price = round($price + $extra, 2);
     
     return $price;
   }

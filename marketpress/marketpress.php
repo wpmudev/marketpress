@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.4.2
+Version: 2.5 Beta 2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -9,7 +9,7 @@ Author URI: http://uglyrobot.com
 Text Domain: mp
 WDP ID: 144
 
-Copyright 2009-2011 Incsub (http://incsub.com)
+Copyright 2009-2012 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.4.2';
+  var $version = '2.5beta2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -71,15 +71,15 @@ class MarketPress {
 
     $settings = get_option('mp_settings');
 
+		//localize the plugin
+		add_action( 'plugins_loaded', array(&$this, 'localization'), 9 );
+		
     //load APIs and plugins
 		add_action( 'plugins_loaded', array(&$this, 'load_plugins') );
 
     //load importers
 		add_action( 'plugins_loaded', array(&$this, 'load_importers') );
-
-		//localize the plugin
-		add_action( 'plugins_loaded', array(&$this, 'localization') );
-
+		
 		//custom post type
     add_action( 'init', array(&$this, 'register_custom_posts'), 0 ); //super high priority
 		add_filter( 'request', array(&$this, 'handle_edit_screen_filter') );
@@ -200,7 +200,8 @@ class MarketPress {
       'order' => 'DESC',
       'shipping' => array (
         'allowed_countries' => array ('CA', 'US'),
-        'method' => 'flat-rate'
+        'method' => 'flat-rate',
+				'system' => 'english'
       ),
       'gateways' => array (
         'paypal-express' => array (
@@ -417,12 +418,23 @@ Thanks again!", 'mp')
 		do_action('mp_load_shipping_plugins');
 
     //load chosen plugin class
-    global $mp_shipping_plugins, $mp_shipping_active_plugin;
+    global $mp_shipping_plugins, $mp_shipping_active_plugins;
     $settings = get_option('mp_settings');
-
-    $class = $mp_shipping_plugins[$settings['shipping']['method']][0];
-    if (class_exists($class))
-      $mp_shipping_active_plugin = new $class;
+		
+		if ($settings['shipping']['method'] == 'calculated') {
+			//load just the calculated ones
+			foreach ((array)$mp_shipping_plugins as $code => $plugin) {
+				if ($plugin[2]) {
+					if ( isset($settings['shipping']['calc_methods'][$code]) && class_exists($plugin[0]) && !$plugin[3] )
+						$mp_shipping_active_plugins[$code] = new $plugin[0];
+				}
+			}
+		} else {
+			//load only and all calculated ones
+			$class = $mp_shipping_plugins[$settings['shipping']['method']][0];
+			if (class_exists($class))
+				$mp_shipping_active_plugins[$settings['shipping']['method']] = new $class;
+		}
   }
 
   function load_gateway_plugins() {
@@ -1989,7 +2001,9 @@ Thanks again!", 'mp')
 
   //returns the calculated price for shipping. Returns False if shipping address is not available
   function shipping_price($format = false, $cart = false) {
-
+		global $mp_shipping_active_plugins;
+		$settings = get_option('mp_settings');
+		
 		//grab cart for just this blog
 		if (!$cart)
 			$cart = $this->get_cart_contents();
@@ -2016,14 +2030,37 @@ Thanks again!", 'mp')
     $state = ($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
     $zip = ($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip'];
     $country = ($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
-
+		$selected_option = ($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
+		
     //check required fields
     if ( empty($address1) || empty($city) || empty($zip) || empty($country) || !(is_array($cart) && count($cart)) )
       return false;
+		
+		//don't charge shipping if only digital products
+    if ( $this->download_only_cart($cart) ) {
+      $price = 0;
+    } else if ( $settings['shipping']['method'] == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
+			//shipping plugins tie into this to calculate their shipping cost
+			$price = apply_filters( 'mp_calculate_shipping_'.$_SESSION['mp_shipping_info']['shipping_option'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+		} else {
+			//shipping plugins tie into this to calculate their shipping cost
+			$price = apply_filters( 'mp_calculate_shipping_'.$settings['shipping']['method'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+		}
+		
+		//calculate extra shipping
+    $extras = array();
+    foreach ($cart as $product_id => $variations) {
+	    $shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
+			foreach ($variations as $variation => $data) {
+			  if (!$data['download'])
+	      	$extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
+			}
+    }
+    $extra = array_sum($extras);
 
-    //shipping plugins tie into this to calculate their shipping cost
-    $price = apply_filters( 'mp_calculate_shipping', 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country );
-
+    //merge
+    $price = round($price + $extra, 2);
+		
     //boot if shipping plugin didn't return at least 0
     if (empty($price))
       return false;
@@ -3040,7 +3077,7 @@ Thanks again!", 'mp')
   }
 
 	//checks if a given cart is only downloadable products
-	function download_only_cart($cart) {
+	function download_only_cart($cart) {	
 		foreach ((array)$cart as $product_id => $variations) {
 			foreach ((array)$variations as $variation => $data) {
 				if (!is_array($data['download']))
@@ -3637,8 +3674,10 @@ PAYMENTINFO
 You can manage this order here: %s", 'mp');
 
     $subject = $this->filter_email($order, $subject);
+		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $order );
     $msg = $this->filter_email($order, $msg);
 		$msg = sprintf($msg, $order->mp_shipping_info['email'], admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
+		$msg = apply_filters( 'mp_order_notification_admin_msg', $msg, $order );
     $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email");
     $this->mail($store_email, $subject, $msg);
   }
@@ -4676,6 +4715,16 @@ Notification Preferences: %s', 'mp');
                   </select>
           				</td>
                 </tr>
+              <?php }
+							//only show if correct country
+              if (is_array($list)) {
+              ?>
+                <tr>
+        				<th scope="row"><?php _e('Base Zip/Postal Code', 'mp') ?></th>
+        				<td>
+                  <input value="<?php echo esc_attr($settings['base_zip']); ?>" size="10" name="mp[base_zip]" type="text" />
+          			</td>
+                </tr>
               <?php } ?>
               </table>
             </div>
@@ -4913,7 +4962,7 @@ Notification Preferences: %s', 'mp');
           ?>
 
           <p class="submit">
-            <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+            <input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
           </p>
         </form>
         </div>
@@ -5230,7 +5279,7 @@ Notification Preferences: %s', 'mp');
             </table>
 
             <p class="submit">
-              <input type="submit" name="submit_settings" value="<?php _e('Save Coupon', 'mp') ?>" />
+              <input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Coupon', 'mp') ?>" />
             </p>
           </div>
         </div>
@@ -5446,7 +5495,7 @@ Notification Preferences: %s', 'mp');
           <?php do_action('mp_presentation_settings'); ?>
 
           <p class="submit">
-            <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+            <input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
           </p>
         </form>
         </div>
@@ -5605,7 +5654,7 @@ Notification Preferences: %s', 'mp');
           ?>
 
           <p class="submit">
-            <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+            <input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
           </p>
         </form>
         </div>
@@ -5636,7 +5685,7 @@ Notification Preferences: %s', 'mp');
               $("#mp-target-countries input[type='checkbox']").attr('checked', false);
               return false;
             });
-            $("#mp-shipping-method").change(function() {
+            $(".mp-shipping-method").change(function() {
               $("#mp-shipping-form").submit();
         		});
       		});
@@ -5671,17 +5720,49 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('Select Shipping Method', 'mp') ?></th>
         				<td>
-                  <select name="mp[shipping][method]" id="mp-shipping-method">
+                  <select name="mp[shipping][method]" class="mp-shipping-method">
                     <option value="none"<?php selected($settings['shipping']['method'], 'none'); ?>><?php _e('No Shipping', 'mp'); ?></option>
                     <?php
+										$calculated_methods = 0;
                     foreach ((array)$mp_shipping_plugins as $code => $plugin) {
-                      ?><option value="<?php echo $code; ?>"<?php selected($settings['shipping']['method'], $code); ?>><?php echo $plugin[1]; ?></option><?php
+											if ($plugin[2]) {
+												$calculated_methods++;
+												continue;
+											}
+                      ?><option value="<?php echo $code; ?>"<?php selected($settings['shipping']['method'], $code); ?>><?php echo esc_attr($plugin[1]); ?></option><?php
                     }
+										if ($calculated_methods) {
+											?><option value="calculated"<?php selected($settings['shipping']['method'], 'calculated'); ?>><?php _e('Calculated Options', 'mp'); ?></option><?php
+										}
                     ?>
                   </select>
           				</td>
                 </tr>
-
+								<?php
+								if ($calculated_methods && $settings['shipping']['method'] == 'calculated') {
+								?>
+								<tr>
+								<th scope="row"><?php _e('Select Shipping Options', 'mp') ?></th>
+								<td>
+									<span class="description"><?php _e('Select which calculated shipping methods the customer will be able to choose from:', 'mp') ?></span><br />
+									<?php
+										foreach ((array)$mp_shipping_plugins as $code => $plugin) {
+											if (!$plugin[2]) continue; //skip non calculated
+											?><label><input type="checkbox" class="mp-shipping-method" name="mp[shipping][calc_methods][<?php echo $code; ?>]" value="<?php echo $code; ?>"<?php echo (isset($settings['shipping']['calc_methods'][$code])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
+										}
+									?>										
+								</td>
+								</tr>								
+								<?php
+								}
+								?>
+								<tr>
+        				<th scope="row"><?php _e('Measurement System', 'mp') ?></th>
+        				<td>
+                  <label><input value="english" name="mp[shipping][system]" type="radio"<?php checked($settings['shipping']['system'], 'english') ?> /> <?php _e('Engish (Pounds)', 'mp') ?></label>
+                  <label><input value="metric" name="mp[shipping][system]" type="radio"<?php checked($settings['shipping']['system'], 'metric') ?> /> <?php _e('Metric (Kilograms)', 'mp') ?></label>
+        				</td>
+                </tr>
               </table>
             </div>
           </div>
@@ -5692,7 +5773,7 @@ Notification Preferences: %s', 'mp');
           ?>
 
           <p class="submit">
-            <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+            <input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
           </p>
         </form>
         </div>
@@ -5766,7 +5847,7 @@ Notification Preferences: %s', 'mp');
           ?>
 
           <p class="submit">
-            <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+            <input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
           </p>
         </form>
         </div>
@@ -5933,7 +6014,10 @@ class MarketPress_Shopping_Cart extends WP_Widget {
 
     if ( get_query_var('pagename') == 'cart' )
       return;
-
+		
+		if ($instance['only_store_pages'] && !mp_is_shop_page())
+			return;
+		
 		extract( $args );
 
 		echo $before_widget;
@@ -5954,23 +6038,31 @@ class MarketPress_Shopping_Cart extends WP_Widget {
 		$instance = $old_instance;
 		$instance['title'] = wp_filter_nohtml_kses( $new_instance['title'] );
 		$instance['custom_text'] = wp_filter_kses( $new_instance['custom_text'] );
+		$instance['only_store_pages'] = !empty($new_instance['only_store_pages']) ? 1 : 0;
+		/*
 		$instance['show_thumbnail'] = !empty($new_instance['show_thumbnail']) ? 1 : 0;
     $instance['size'] = !empty($new_instance['size']) ? intval($new_instance['size']) : 25;
-
+		*/
+		
 		return $instance;
 	}
 
 	function form( $instance ) {
-    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Shopping Cart', 'mp'), 'custom_text' => '', 'show_thumbnail' => 1, 'size' => 25 ) );
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Shopping Cart', 'mp'), 'custom_text' => '', 'only_store_pages' => 0 ) );
 		$title = $instance['title'];
 		$custom_text = $instance['custom_text'];
+		$only_store_pages = isset( $instance['only_store_pages'] ) ? (bool) $instance['only_store_pages'] : false;
+		/*
 		$show_thumbnail = isset( $instance['show_thumbnail'] ) ? (bool) $instance['show_thumbnail'] : false;
 		$size = !empty($instance['size']) ? intval($instance['size']) : 25;
+		*/
   ?>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'mp') ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" /></label></p>
 		<p><label for="<?php echo $this->get_field_id('custom_text'); ?>"><?php _e('Custom Text:', 'mp') ?><br />
     <textarea class="widefat" id="<?php echo $this->get_field_id('custom_text'); ?>" name="<?php echo $this->get_field_name('custom_text'); ?>"><?php echo esc_attr($custom_text); ?></textarea></label>
     </p>
+		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('only_store_pages'); ?>" name="<?php echo $this->get_field_name('only_store_pages'); ?>"<?php checked( $only_store_pages ); ?> />
+		<label for="<?php echo $this->get_field_id('only_store_pages'); ?>"><?php _e( 'Only show on store pages', 'mp' ); ?></label></p>
   <?php
 		/* Disable untill we can mod the cart
 		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_thumbnail'); ?>" name="<?php echo $this->get_field_name('show_thumbnail'); ?>"<?php checked( $show_thumbnail ); ?> />
@@ -5991,7 +6083,10 @@ class MarketPress_Product_List extends WP_Widget {
 	function widget($args, $instance) {
     global $mp;
 		$settings = get_option('mp_settings');
-
+		
+		if ($instance['only_store_pages'] && !mp_is_shop_page())
+			return;
+		
 		extract( $args );
 
 		echo $before_widget;
@@ -6093,12 +6188,14 @@ class MarketPress_Product_List extends WP_Widget {
     $instance['show_excerpt'] = !empty($new_instance['show_excerpt']) ? 1 : 0;
     $instance['show_price'] = !empty($new_instance['show_price']) ? 1 : 0;
     $instance['show_button'] = !empty($new_instance['show_button']) ? 1 : 0;
-
+		
+		$instance['only_store_pages'] = !empty($new_instance['only_store_pages']) ? 1 : 0;
+		
 		return $instance;
 	}
 
 	function form( $instance ) {
-    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Our Products', 'mp'), 'custom_text' => '', 'num_products' => 10, 'order_by' => 'title', 'order' => 'DESC', 'show_thumbnail' => 1, 'size' => 50 ) );
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Our Products', 'mp'), 'custom_text' => '', 'num_products' => 10, 'order_by' => 'title', 'order' => 'DESC', 'show_thumbnail' => 1, 'size' => 50, 'only_store_pages' => 0 ) );
 		$title = $instance['title'];
 		$custom_text = $instance['custom_text'];
 
@@ -6113,6 +6210,8 @@ class MarketPress_Product_List extends WP_Widget {
 		$show_excerpt = isset( $instance['show_excerpt'] ) ? (bool) $instance['show_excerpt'] : false;
 		$show_price = isset( $instance['show_price'] ) ? (bool) $instance['show_price'] : false;
 		$show_button = isset( $instance['show_button'] ) ? (bool) $instance['show_button'] : false;
+		
+		$only_store_pages = isset( $instance['only_store_pages'] ) ? (bool) $instance['only_store_pages'] : false;
   ?>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'mp') ?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" /></label></p>
 		<p><label for="<?php echo $this->get_field_id('custom_text'); ?>"><?php _e('Custom Text:', 'mp') ?><br />
@@ -6158,7 +6257,9 @@ class MarketPress_Product_List extends WP_Widget {
 		<label for="<?php echo $this->get_field_id('show_price'); ?>"><?php _e( 'Show Price', 'mp' ); ?></label><br />
     <input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_button'); ?>" name="<?php echo $this->get_field_name('show_button'); ?>"<?php checked( $show_button ); ?> />
 		<label for="<?php echo $this->get_field_id('show_button'); ?>"><?php _e( 'Show Buy Button', 'mp' ); ?></label></p>
-
+		
+		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('only_store_pages'); ?>" name="<?php echo $this->get_field_name('only_store_pages'); ?>"<?php checked( $only_store_pages ); ?> />
+		<label for="<?php echo $this->get_field_id('only_store_pages'); ?>"><?php _e( 'Only show on store pages', 'mp' ); ?></label></p>
 	<?php
 	}
 }
@@ -6172,6 +6273,10 @@ class MarketPress_Categories_Widget extends WP_Widget {
 	}
 
 	function widget( $args, $instance ) {
+		
+		if ($instance['only_store_pages'] && !mp_is_shop_page())
+			return;
+		
 		extract( $args );
 
 		$title = apply_filters('widget_title', empty( $instance['title'] ) ? __('Product Categories', 'mp') : $instance['title'], $instance, $this->id_base);
@@ -6189,7 +6294,7 @@ class MarketPress_Categories_Widget extends WP_Widget {
 			$cat_args['show_option_none'] = __('Select Category');
 			$cat_args['taxonomy'] = 'product_category';
       $cat_args['id'] = 'mp_category_dropdown';
-			wp_dropdown_categories( $cat_args );
+			mp_dropdown_categories( true, $cat_args );
 		} else {
 ?>
 <ul id="mp_category_list">
@@ -6211,17 +6316,19 @@ class MarketPress_Categories_Widget extends WP_Widget {
 		$instance['count'] = !empty($new_instance['count']) ? 1 : 0;
 		$instance['hierarchical'] = !empty($new_instance['hierarchical']) ? 1 : 0;
 		$instance['dropdown'] = !empty($new_instance['dropdown']) ? 1 : 0;
-
+		$instance['only_store_pages'] = !empty($new_instance['only_store_pages']) ? 1 : 0;
+		
 		return $instance;
 	}
 
 	function form( $instance ) {
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '') );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'only_store_pages' => 0 ) );
 		$title = esc_attr( $instance['title'] );
 		$count = isset($instance['count']) ? (bool) $instance['count'] :false;
 		$hierarchical = isset( $instance['hierarchical'] ) ? (bool) $instance['hierarchical'] : false;
 		$dropdown = isset( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : false;
+		$only_store_pages = isset( $instance['only_store_pages'] ) ? (bool) $instance['only_store_pages'] : false;
 ?>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
@@ -6234,6 +6341,9 @@ class MarketPress_Categories_Widget extends WP_Widget {
 
 		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('hierarchical'); ?>" name="<?php echo $this->get_field_name('hierarchical'); ?>"<?php checked( $hierarchical ); ?> />
 		<label for="<?php echo $this->get_field_id('hierarchical'); ?>"><?php _e( 'Show hierarchy' ); ?></label></p>
+		
+		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('only_store_pages'); ?>" name="<?php echo $this->get_field_name('only_store_pages'); ?>"<?php checked( $only_store_pages ); ?> />
+		<label for="<?php echo $this->get_field_id('only_store_pages'); ?>"><?php _e( 'Only show on store pages', 'mp' ); ?></label></p>
 <?php
 	}
 }
@@ -6247,6 +6357,10 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 	}
 
 	function widget( $args, $instance ) {
+		
+		if ($instance['only_store_pages'] && !mp_is_shop_page())
+			return;
+		
 		extract($args);
 		$current_taxonomy = 'product_tag';
 		if ( !empty($instance['title']) ) {
@@ -6265,14 +6379,19 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 
 	function update( $new_instance, $old_instance ) {
 		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['only_store_pages'] = !empty($new_instance['only_store_pages']) ? 1 : 0;
 		return $instance;
 	}
 
 	function form( $instance ) {
-    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Product Tags', 'mp') ) );
+    $instance = wp_parse_args( (array) $instance, array( 'title' => __('Product Tags', 'mp'), 'only_store_pages' => 0 ) );
+		$only_store_pages = isset( $instance['only_store_pages'] ) ? (bool) $instance['only_store_pages'] : false;
 ?>
 	<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:') ?></label>
 	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $instance['title'])) {echo esc_attr( $instance['title'] );} ?>" /></p>
+	
+	<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('only_store_pages'); ?>" name="<?php echo $this->get_field_name('only_store_pages'); ?>"<?php checked( $only_store_pages ); ?> />
+		<label for="<?php echo $this->get_field_id('only_store_pages'); ?>"><?php _e( 'Only show on store pages', 'mp' ); ?></label></p>
 	<?php
 	}
 }

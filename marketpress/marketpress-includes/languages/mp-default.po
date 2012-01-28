@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: marketpress\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-12 23:07-0600\n"
-"PO-Revision-Date: 2011-12-12 23:07-0600\n"
+"POT-Creation-Date: 2011-12-23 13:57-0600\n"
+"PO-Revision-Date: 2011-12-23 13:57-0600\n"
 "Last-Translator: Aaron Edwards\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -13,51 +13,51 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress\n"
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:183
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:184
 msgid "store"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:184
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:185
 msgid "products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:185
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:186
 msgid "shopping-cart"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:186
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:187
 msgid "order-status"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:187
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:188
 msgid "category"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:188
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:189
 msgid "tag"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:217
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:218
 msgid "<p>If you have any questions about your order please do not hesitate to contact us.</p>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:219
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:220
 msgid "<p>Please enter your shipping information in the form below to proceed with your order.</p>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:221
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:222
 msgid "<p>You are almost done! Please do a final review of your order to make sure everything is correct then click the \"Confirm Payment\" button.</p>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:222
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:223
 msgid "<p>Thank you for your order! We appreciate your business, and please come back often to check out our new products.</p>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:226
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:227
 msgid "Your Order Confirmation (ORDERID)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:227
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:228
 msgid ""
 "Thank you for your order CUSTOMERNAME!\r\n"
 "\r\n"
@@ -80,11 +80,11 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:246
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:247
 msgid "Your Order Has Been Shipped! (ORDERID)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:247
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:248
 msgid ""
 "Dear CUSTOMERNAME,\r\n"
 "\r\n"
@@ -107,659 +107,659 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:354
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:355
 msgid "There was an issue determining where MarketPress is installed. Please reinstall."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:517
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:518
 msgid "You must enable Pretty Permalinks</a> to use MarketPress - <a href=\"options-permalink.php\">Enable now &raquo;</a>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:522
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:523
 msgid "Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:539
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4325
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:540
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4337
 msgid "Manage Orders"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:542
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:543
 msgid "Store Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:599
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:600
 msgid "Are you sure you want to remove all items from your cart?"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:599
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:600
 msgid "Item(s) Added!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:599
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:600
 msgid "Adding to your cart..."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:599
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:600
 msgid "In Your Cart"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:623
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:699
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:619
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:695
 msgid "Product"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:624
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:620
 msgid "of"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:643
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1260
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1310
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5915
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5952
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:639
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1272
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1322
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5927
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5964
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1684
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1785
 msgid "Shopping Cart"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:672
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:668
 msgid "Welcome to our online store! Feel free to browse around:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:674
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:670
 msgid "Check out our most popular products:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:676
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:672
 msgid "Browse by category:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:678
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:674
 msgid "Browse by tag:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:681
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:677
 msgid "Store"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:692
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1514
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6159
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6165
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:688
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1526
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6171
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6177
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:669
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1628
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1702
 msgid "Product Categories"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:692
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5423
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:688
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5435
 msgid "Product Category"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:693
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1515
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6260
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:689
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1527
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6272
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:673
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1627
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1701
 msgid "Product Tags"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:693
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5427
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:689
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5439
 msgid "Product Tag"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:698
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1259
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1267
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1295
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1381
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:694
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1271
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1279
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1307
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1393
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1184
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1784
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1790
 msgid "Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:700
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:696
 msgid "Create New"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:701
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:697
 msgid "Create New Product"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:702
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:698
 msgid "Edit Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:703
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:728
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5026
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5113
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:699
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:724
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5038
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5125
 msgid "Edit"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:704
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:700
 msgid "New Product"
 msgstr ""
 
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:701
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:705
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:709
 msgid "View Product"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:706
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:702
 msgid "Search Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:707
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:703
 msgid "No Products Found"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:708
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:704
 msgid "No Products found in Trash"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:711
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:707
 msgid "Products for your MarketPress store."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:726
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:722
 msgid "Orders"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:727
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:723
 msgid "Order"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:729
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:725
 msgid "View Order"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:730
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4378
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4380
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:726
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4390
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4392
 msgid "Search Orders"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:731
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:727
 msgid "No Orders Found"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:733
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:729
 msgid "Orders from your MarketPress store."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:745
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1651
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1692
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3907
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3912
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3917
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3922
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4407
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4504
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:741
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1663
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1704
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3919
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3924
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3929
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3934
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4419
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4516
 msgid "Received"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:746
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:742
 #, php-format
 msgid "Received <span class=\"count\">(%s)</span>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:751
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1653
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1683
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1693
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3908
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3913
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3918
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3923
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4408
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4505
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:747
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1665
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1695
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1705
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3920
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3925
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3930
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3935
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4420
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4517
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/2checkout.php:239
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:137
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:139
 msgid "Paid"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:752
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:748
 #, php-format
 msgid "Paid <span class=\"count\">(%s)</span>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:757
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1655
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1684
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1687
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1694
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3909
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3914
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3919
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3924
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4409
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4506
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:753
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1667
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1696
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1699
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1706
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3921
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3926
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3931
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3936
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4421
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4518
 msgid "Shipped"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:758
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:754
 #, php-format
 msgid "Shipped <span class=\"count\">(%s)</span>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:763
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1657
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1685
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1688
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1690
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3910
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3915
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3920
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3925
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4410
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4507
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:759
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1669
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1697
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1700
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1702
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3922
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3927
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3932
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3937
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4422
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4519
 msgid "Closed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:764
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:760
 #, php-format
 msgid "Closed <span class=\"count\">(%s)</span>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1205
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1217
 msgid "None - Custom theme template"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1261
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1321
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1273
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1333
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1786
 msgid "Order Status"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1355
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1367
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:318
 #, php-format
 msgid "Product Category: %s"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1358
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1370
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:325
 #, php-format
 msgid "Product Tag: %s"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1365
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1377
 msgid "Checkout Information"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1365
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4129
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1377
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4141
 msgid "Shipping Information"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1367
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3986
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1379
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3998
 msgid "Payment Information"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1369
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1381
 msgid "Confirm Your Purchase"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1371
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1383
 msgid "Order Confirmation"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1373
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1385
 msgid "Your Shopping Cart"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1377
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1389
 msgid "Track Your Order"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1406
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1418
 msgid "Categorized in "
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1478
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1490
 msgid "View all categories"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1505
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1517
 msgid "Thumbnail"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1506
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5384
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6117
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1518
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5396
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6129
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1546
 msgid "Product Name"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1507
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1519
 msgid "Variations"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1508
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1857
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4050
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1520
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1869
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4062
 msgid "SKU"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1509
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1858
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4053
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1521
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1870
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4065
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:879
 msgid "Price"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1511
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1523
 msgid "Stock"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1512
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1524
 msgid "Sales"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1541
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1553
 msgid "Edit &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1553
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1563
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1600
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1728
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2645
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4071
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4085
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1565
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1575
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1612
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1740
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2657
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4083
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4097
 msgid "N/A"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1625
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1637
 msgid "Status"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1626
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1638
 msgid "Order ID"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1627
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1639
 msgid "Order Date"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1628
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1640
 msgid "From"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1629
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1641
 msgid "Items"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1630
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1760
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4548
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1642
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1772
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4560
 msgid "Shipping"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1631
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1643
 msgid "Tax"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1632
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5021
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5183
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1644
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5033
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5195
 msgid "Discount"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1633
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1645
 msgid "Total"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1659
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1671
 msgid "View Order Details"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1663
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1675
 msgid "Y/m/d g:i:s A"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1670
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1682
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1672
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1684
 msgid "Y/m/d"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1679
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1691
 #, php-format
 msgid "View &#8220;%s&#8221;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1683
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1693
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3908
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3923
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1695
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1705
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3920
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3935
 msgid "Mark as Paid"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1684
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1687
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1694
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3909
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3914
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3924
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1696
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1699
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1706
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3921
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3926
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3936
 msgid "Mark as Shipped"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1685
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1688
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1690
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3910
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3915
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3920
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1697
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1700
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1702
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3922
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3927
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3932
 msgid "Mark as Closed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1692
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3922
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1704
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3934
 msgid "Mark as Received"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1709
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1721
 #, php-format
 msgid "Regarding Your Order (%s)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1745
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1757
 msgid "Enter Product title here"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1753
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1765
 msgid "Product Details"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1763
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1775
 msgid "Product Download"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1776
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1788
 msgid "Product Image"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1856
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1868
 msgid "Variation Name"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1857
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1869
 msgid "Stock Keeping Unit - Your custom Product ID number"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1859
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1871
 msgid "When checked these override the normal price."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1859
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1871
 msgid "Sale Price"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1860
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1872
 msgid "When checked inventory tracking will be enabled."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1860
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1872
 msgid "Inventory"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1880
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1894
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1892
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1906
 msgid "Remove Variation"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1902
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1914
 msgid "Add Variation"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1904
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1916
 msgid "Product variations are not allowed for Downloadable or Externally Linked products."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1908
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1920
 msgid "Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1908
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1920
 msgid "External Link"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1908
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1920
 msgid "When set this overrides the purchase button with a link to this URL."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1934
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1946
 msgid "File URL"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1935
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:1947
 msgid "Upload File"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2184
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2335
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2338
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2196
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2347
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2350
 #, php-format
 msgid "Sorry, currently it's not possible to checkout with items from more than %s stores."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2247
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2259
 #, php-format
 msgid "Sorry, there is a per order limit of %1$s for \"%2$s\". Your cart quantity has been changed to %3$s."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2309
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2321
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:797
 msgid "There are no items in your cart."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2312
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2324
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:798
 msgid "Browse Products &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2353
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2356
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2365
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2368
 #, php-format
 msgid "Sorry, we don't have enough of this item in stock. (%s remaining)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2376
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2379
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2423
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2388
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2391
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2437
 #, php-format
 msgid "Sorry, there is a per order limit of %1$s for \"%2$s\"."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2415
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2429
 #, php-format
 msgid "Sorry, there is not enough stock for \"%s\". (%s remaining)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2450
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2459
 msgid "Item(s) Removed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2463
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2475
 msgid "Coupon Successfully Applied"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2465
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2477
 msgid "Invalid Coupon Code"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2478
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2490
 msgid "Coupon Removed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2484
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2496
 msgid "Please enter a valid Email Address."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2490
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2502
 msgid "Please enter your Full Name."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2493
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2505
 msgid "Please enter your Street Address."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2496
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2508
 msgid "Please enter your City."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2499
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2511
 msgid "Please enter your State/Province/Region."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2502
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2514
 msgid "Please enter a valid two-letter State abbreviation."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2504
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2516
 msgid "Please enter a valid two-letter Canadian Province abbreviation."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2509
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2521
 msgid "Please enter your Zip/Postal Code."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2512
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2524
 msgid "Please enter your Country."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2642
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2643
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2654
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2655
 msgid "Manual Checkout"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2644
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2656
 msgid "N/A - Free order"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2646
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:2658
 msgid "Completed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3300
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3312
 msgid "Billing Info"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3304
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3381
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4139
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3316
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3393
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4151
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:504
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:586
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:157
@@ -767,10 +767,10 @@ msgstr ""
 msgid "Email:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3309
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3386
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3537
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4134
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3321
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3398
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3549
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4146
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:511
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:590
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:952
@@ -779,11 +779,11 @@ msgstr ""
 msgid "Full Name:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3314
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3391
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3538
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4131
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4144
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3326
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3403
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3550
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4143
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4156
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:526
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:594
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:957
@@ -792,17 +792,17 @@ msgstr ""
 msgid "Address:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3317
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3394
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3329
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3406
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:529
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:172
 msgid "Street address, P.O. box, company name, c/o"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3321
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3398
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3540
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4150
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3333
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3410
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3552
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4162
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:533
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:600
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:963
@@ -811,17 +811,17 @@ msgstr ""
 msgid "Address 2:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3324
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3401
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3336
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3413
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:535
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:179
 msgid "Apartment, suite, unit, building, floor, etc."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3328
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3405
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3541
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4156
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3340
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3417
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3553
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4168
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:539
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:606
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:969
@@ -830,10 +830,10 @@ msgstr ""
 msgid "City:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3333
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3410
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3543
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4162
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3345
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3422
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3555
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4174
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:544
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:612
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:975
@@ -842,10 +842,10 @@ msgstr ""
 msgid "State/Province/Region:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3338
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3415
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3544
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4168
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3350
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3427
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3556
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4180
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:549
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:618
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:981
@@ -854,10 +854,10 @@ msgstr ""
 msgid "Postal/Zip Code:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3343
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3420
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3545
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4173
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3355
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3432
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3557
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4185
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:516
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:623
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:986
@@ -866,10 +866,10 @@ msgstr ""
 msgid "Country:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3355
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3432
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3547
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4179
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3367
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3444
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3559
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4191
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:554
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:629
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:992
@@ -878,39 +878,39 @@ msgstr ""
 msgid "Phone Number:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3376
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3388
 msgid "Shipping Info"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3378
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3390
 msgid "Same as Billing"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3505
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3517
 msgid "Items:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3512
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3524
 msgid "Download: "
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3519
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4099
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3531
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4111
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:932
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/moneybookers.php:169
 msgid "Coupon Discount:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3523
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4105
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3535
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4117
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:263
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:345
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:937
 msgid "Shipping:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3527
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4111
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3539
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4123
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:273
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:354
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:942
@@ -918,65 +918,65 @@ msgstr ""
 msgid "Taxes:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3530
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3542
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:945
 msgid "Order Total:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3535
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3547
 msgid "No shipping required for this order."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3549
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3561
 msgid "Shipping Method:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3551
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3563
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:999
 msgid "Tracking Number:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3555
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3567
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1007
 msgid "Order Notes:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3558
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3570
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:855
 msgid "Payment Method:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3561
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3994
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3573
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4006
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:859
 msgid "Payment Type:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3564
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4000
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3576
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4012
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:863
 msgid "Transaction ID:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3566
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4005
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3578
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4017
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:867
 msgid "Payment Total:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3569
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3581
 msgid "Your payment for this order is not yet complete. Here is the latest status:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3576
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3588
 msgid "Your payment for this order is complete."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3611
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3623
 msgid "New Order Notification: ORDERID"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3612
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3624
 #, php-format
 msgid ""
 "A new order (ORDERID) was created in your store:\r\n"
@@ -995,11 +995,11 @@ msgid ""
 "You can manage this order here: %s"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3671
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3683
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3672
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3684
 #, php-format
 msgid ""
 "This message is being sent to notify you of low stock of a product in your online store according to your preferences.\r\n"
@@ -1012,331 +1012,331 @@ msgid ""
 "Notification Preferences: %s"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3756
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3768
 msgid "More Info &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3865
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3877
 msgid "Invalid Order ID"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3879
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3891
 msgid "This order has been marked as Shipped."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3887
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3899
 msgid "Order details have been saved!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3892
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3904
 #, php-format
 msgid "Order Details (%s)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3900
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3912
 msgid "Order Actions"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3903
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3915
 msgid "Change Order Status:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3944
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3956
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1013
 msgid "&laquo; Back"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3954
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3966
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:826
 msgid "Current Status"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3967
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3970
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3974
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3979
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3982
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3986
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3991
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:837
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:840
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:844
 msgid "Received:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3969
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3973
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3978
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3981
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3985
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3990
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:839
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:843
 msgid "Paid:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3972
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3977
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3984
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3989
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:842
 msgid "Shipped:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3976
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3988
 msgid "Closed:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:3989
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4001
 msgid "Payment Gateway:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4013
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4025
 msgid "Payment Transaction History"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4044
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4056
 msgid "Order Information"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4051
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4063
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:877
 msgid "Item"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4052
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4064
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:878
 msgid "Quantity"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4054
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4066
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:880
 msgid "Subtotal"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4055
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4067
 msgid "Downloads"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4083
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4095
 msgid " (Limit Reached)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4091
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4103
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:924
 msgid "No products could be found for this order"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4115
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4127
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:281
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:361
 msgid "Cart Total:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4120
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4132
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:561
 msgid "Special Instructions:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4185
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4197
 msgid "Cost:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4188
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4200
 msgid "Shipping Method & Tracking Number:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4191
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4203
 msgid "Choose Method:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4196
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4208
 msgid "Other"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4199
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4218
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4211
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4230
 msgid "Save &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4199
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4211
 msgid "Save & Mark as Shipped &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4204
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4216
 msgid "Special Note:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4214
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4226
 msgid "Order Notes"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4214
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4226
 msgid "These notes will be displayed on the order status page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4256
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4268
 msgid "Cheatin&#8217; uh?"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4285
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4297
 #, php-format
 msgid "%s order marked as Received."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4293
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4305
 #, php-format
 msgid "%s order marked as Paid."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4301
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4313
 #, php-format
 msgid "%s order marked as Shipped."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4309
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4321
 #, php-format
 msgid "%s order Closed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4327
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4339
 #, php-format
 msgid "Search results for &#8220;%s&#8221;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4396
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4408
 msgid "&laquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4397
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4409
 msgid "&raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4406
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4503
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4418
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4515
 msgid "Change Status"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4427
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4439
 msgid "Show all dates"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4454
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4466
 #, php-format
 msgid "Displaying %s&#8211;%s of %s"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4517
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4529
 msgid "No Orders Yet"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4532
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4544
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:502
 msgid "Nice Try..."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4545
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4982
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4557
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4994
 msgid "Coupons"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4546
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4554
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4558
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4566
 msgid "Presentation"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4547
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4559
 msgid "Messages"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4549
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4561
 msgid "Payments"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4550
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5782
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4562
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5794
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:686
 msgid "Shortcodes"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4551
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4563
 msgid "Importers"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4562
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4574
 msgid "General"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4595
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5258
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5464
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5610
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5697
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4607
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5270
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5476
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5622
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5709
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:517
 msgid "Settings saved."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4606
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5270
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5640
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5716
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4618
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5282
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5652
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5728
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:539
 msgid "General Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4613
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4625
 msgid "Location Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4615
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4627
 msgid "This is the base location that shipping and tax rates will be calculated from."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4618
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4630
 msgid "Base Country"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4656
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4668
 msgid "Base State/Province/Region"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4673
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4685
 msgid "Tax Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4681
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4693
 #, php-format
 msgid "%s Tax Rate"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4692
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4704
 msgid "Total Tax Rates (VAT,GST,PST,HST)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4694
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4706
 msgid "Current Rates &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4711
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4735
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4723
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4747
 msgid "VAT Tax Rate"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4722
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4734
 msgid "GST Tax Rate"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4744
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4756
 msgid "Country Total Tax Rate (VAT, GST, Etc.)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4750
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4762
 msgid "Tax Orders Outside Your Base Country?"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4752
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4764
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4772
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4815
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4862
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4870
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4889
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5307
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5325
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5357
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5375
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4776
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4784
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4827
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4874
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4882
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4901
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5319
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5337
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5369
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5387
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:545
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:552
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:745
@@ -1344,17 +1344,17 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4753
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4765
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4773
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4817
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4863
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4871
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4890
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5308
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5326
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5358
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5376
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4777
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4785
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4829
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4875
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4883
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4902
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5320
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5338
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5370
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5388
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:546
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:553
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/authorizenet-aim.php:746
@@ -1362,765 +1362,765 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4762
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4774
 msgid "Apply Tax To Shipping Fees?"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4766
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4778
 msgid "Please see your local tax laws. Most areas charge tax on shipping fees."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4770
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4782
 msgid "Enter Prices Inclusive of Tax?"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4774
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4786
 msgid "Enabling this option allows you to enter and show all prices inclusive of tax, while still listing the tax total as a line item in shopping carts. Please see your local tax laws."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4782
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4794
 msgid "Currency Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4784
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4796
 msgid "These preferences affect display only. Your payment gateway of choice may not support every currency listed here."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4787
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4799
 msgid "Store Currency"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4799
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4811
 msgid "Currency Symbol Position"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4812
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4824
 msgid "Show Decimal in Prices"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4825
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4837
 msgid "Miscellaneous Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4829
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4841
 msgid "Inventory Warning Threshold"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4831
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4843
 msgid "At what low stock count do you want to be warned for products you have enabled inventory tracking for?"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4844
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4856
 msgid "Maximum Downloads"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4846
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4858
 msgid "How many times may a customer download a file they have purchased? (It's best to set this higher than one in case they have any problems downloading)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4859
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4871
 msgid "Force Login"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4864
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4876
 msgid "Whether or not customers must be registered and logged in to checkout. (Not recommended: Enabling this can lower conversions)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4868
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4880
 msgid "Product Listings Only"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4872
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4884
 msgid "This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the \"Buy Now\" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4876
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4888
 msgid "Google Analytics Ecommerce Tracking"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4879
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5647
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4891
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5659
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1572
 msgid "None"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4880
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4892
 msgid "Asynchronous Tracking Code"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4881
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4893
 msgid "Old Tracking Code"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4883
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4895
 msgid "If you already use Google Analytics for your website, you can track detailed ecommerce information by enabling this setting. Choose whether you are using the new asynchronous or old tracking code. Before Google Analytics can report ecommerce activity for your website, you must enable ecommerce tracking on the profile settings page for your website. Also keep in mind that some gateways do not reliably show the receipt page, so tracking may not be accurate in those cases. It is recommended to use the PayPal gateway for the most accurate data. <a href=\"http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-in-google.html\" target=\"_blank\">More information &raquo;</a>"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4887
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4899
 msgid "Special Instructions Field"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4891
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4903
 #, php-format
 msgid "Enabling this field will display a textbox on the shipping checkout page for users to enter special instructions for their order. Useful for product personalization, etc. Note you may want to <a href=\"%s\">adjust the message on the shipping page."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4904
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5437
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5596
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5683
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5757
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4916
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5449
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5608
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5695
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5769
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:753
 msgid "Save Changes"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4929
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4941
 msgid "Coupon(s) succesfully deleted."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4942
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4954
 msgid "Please enter a valid Coupon Code"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4946
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4958
 msgid "Please enter a valid Discount Amount"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4950
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4962
 msgid "Please choose a valid Discount Type"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4954
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4966
 msgid "Please enter a valid Start Date"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4958
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4970
 msgid "Please enter a valid End Date not earlier than the Start Date"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4965
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4977
 msgid "Coupon succesfully saved."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4983
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:4995
 msgid "You can create, delete, or update coupon codes for your store here."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5010
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5022
 msgid "Delete"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5020
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5180
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5032
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5192
 msgid "Coupon Code"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5022
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5184
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5034
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5196
 msgid "Start Date"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5023
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5186
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5035
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5198
 msgid "Expire Date"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5024
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5036
 msgid "Used"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5025
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5037
 msgid "Remaining Uses"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5087
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5099
 msgid "No End"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5105
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5117
 msgid "Unlimited"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5126
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5138
 msgid "No coupons yet."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5155
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5167
 msgid "Edit Coupon"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5157
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5169
 msgid "Add Coupon"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5181
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5193
 msgid "Letters and Numbers only"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5187
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5199
 msgid "No end if blank"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5190
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5202
 msgid "Allowed Uses"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5191
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5203
 msgid "Unlimited if blank"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5221
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5233
 msgid "Save Coupon"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5248
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5260
 msgid "Store base URL conflicts with another page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5263
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5275
 msgid "Presentation Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5273
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5285
 msgid "Store Theme"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5276
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5288
 msgid "This option changes the built-in css styles for store pages."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5278
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5290
 msgid "For a custom css theme, save your css file with the \"MarketPress Theme: NAME\" header in the \"/marketpress/css/themes/\" folder and it will appear in this list so you may select it. You can also select \"None\" and create custom theme templates and css to make your own completely unique store design. More information on that <a href=\""
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5279
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5291
 msgid "Full-featured MarketPress Themes:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5280
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5283
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5292
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5295
 msgid "Download Now &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5281
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5293
 msgid "FrameMarket/GridMarket"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5282
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5294
 msgid "The ultimate MarkePress theme brings visual perfection to WordPress e-commerce. This professional front-end does all the work for you!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5284
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5296
 msgid "SimpleMarket"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5285
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5297
 msgid "The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5294
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5306
 msgid "Single Product Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5298
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5348
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5310
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5360
 msgid "Checkout Button Type"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5300
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5350
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5312
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5362
 msgid "Add To Cart"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5301
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5351
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5313
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5363
 msgid "Buy Now"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5305
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5317
 msgid "Show Quantity Option"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5312
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5324
 msgid "Product Image Size"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5314
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5364
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5326
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5376
 msgid "WP Thumbnail size"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5315
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5365
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5327
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5377
 msgid "WP Medium size"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5316
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5366
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5328
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5378
 msgid "WP Large size"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5317
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5367
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5329
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5379
 msgid "Custom"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5318
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5368
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5330
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5380
 msgid "Height"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5319
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5369
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5331
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5381
 msgid "Width"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5323
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5335
 msgid "Show Image Lightbox"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5327
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5339
 msgid "Makes clicking the single product image open an instant zoomed preview."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5335
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5347
 msgid "Product List Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5355
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5367
 msgid "Show Product Thumbnail"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5362
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5374
 msgid "Product Thumbnail Size"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5373
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5385
 msgid "Paginate Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5377
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5389
 msgid "Products per page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5381
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5393
 msgid "Order Products By"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5385
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6118
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5397
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6130
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1545
 msgid "Publish Date"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5386
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6119
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5398
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6131
 msgid "Product ID"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5387
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6120
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5399
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6132
 msgid "Product Author"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5388
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6121
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5400
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6133
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1547
 msgid "Number of Sales"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5389
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6122
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5401
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6134
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1548
 msgid "Product Price"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5390
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6123
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5402
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6135
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1549
 msgid "Random"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5392
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6125
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5404
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6137
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1551
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1685
 msgid "Descending"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5393
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6126
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5405
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6138
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1552
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1686
 msgid "Ascending"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5401
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5413
 msgid "Store URL Slugs"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5403
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5415
 msgid "Customizes the url structure of your store"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5406
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5418
 msgid "Store Base"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5408
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5420
 msgid "This page will be created so you can change it's content and the order in which it appears in navigation menus if your theme supports it."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5411
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5824
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5423
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5836
 msgid "Products List"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5415
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5552
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5427
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5564
 msgid "Shopping Cart Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5419
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5537
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5431
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5549
 msgid "Order Status Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5471
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5483
 msgid "Messages Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5478
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5490
 msgid "Email Notifications"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5482
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5494
 msgid "Store Admin Email"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5485
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5497
 msgid "The email address that new order notifications are sent to and received from."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5490
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5502
 msgid "New Order"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5492
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5504
 msgid "The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5493
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5504
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5505
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5516
 msgid "Subject:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5495
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5506
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5507
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5518
 msgid "Text:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5501
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5513
 msgid "Order Shipped"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5503
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5515
 msgid "The email text sent to your customer when you mark an order as \"Shipped\". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5516
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5528
 msgid "Store Pages"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5520
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5532
 msgid "Store Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5522
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5534
 msgid "The main store page is an actual page on your site. You can edit it here:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5525
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5537
 msgid "Edit Page &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5530
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5542
 msgid "Product Listing Pages"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5532
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5544
 msgid "Displayed at the top of the product listing pages. Optional, HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5539
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5551
 msgid "Displayed at the top of the Order Status page. Optional, HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5548
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5560
 msgid "Shopping Cart Pages"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5554
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5566
 msgid "Displayed at the top of the Shopping Cart page. Optional, HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5559
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5571
 msgid "Shipping Form Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5561
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5573
 msgid "Displayed at the top of the Shipping Form page. Optional, HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5566
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5578
 msgid "Payment Form Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5568
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5580
 msgid "Displayed at the top of the Payment Form page. Optional, HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5573
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5585
 msgid "Order Confirmation Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5575
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5587
 msgid "Displayed at the top of the final Order Confirmation page. HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5580
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5592
 msgid "Order Complete Page"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5582
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5594
 msgid "Displayed at the top of the page notifying customers of a successful order. HTML allowed."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5633
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5645
 msgid "Shipping Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5645
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5657
 msgid "Choose Target Countries"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5647
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5659
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:1159
 msgid "Select:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5647
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5659
 msgid "All"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5647
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5659
 msgid "EU"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5655
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5667
 msgid "These are the countries you will sell and ship to."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5660
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5672
 msgid "Select Shipping Method"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5663
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5675
 msgid "No Shipping"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5708
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5720
 msgid "Payment Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5720
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5732
 msgid "Select Payment Gateway(s)"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5738
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5750
 msgid "Upgrade"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5738
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5750
 msgid "Pro Only &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5769
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5781
 msgid "MarketPress Shortcodes"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5774
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5786
 msgid "General Information"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5784
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5796
 msgid "Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1=\"value\" attr2=\"value\"]</em>."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5787
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6234
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5799
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6246
 msgid "Product Tag Cloud"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5790
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5802
 msgid "Displays a cloud or list of your product tags."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5791
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5799
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5807
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5803
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5811
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5819
 msgid "Optional Attributes &raquo;"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5795
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5807
 msgid "Product Categories List"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5798
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5810
 msgid "Displays an HTML list of your product categories."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5803
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5815
 msgid "Product Categories Dropdown"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5806
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5818
 msgid "Displays an HTML dropdown of your product categories."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5811
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5823
 msgid "Popular Products List"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5814
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5826
 msgid "Displays a list of popular products ordered by sales."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5816
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5829
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5854
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5828
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5841
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5866
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:696
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:721
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:736
 msgid "Optional Attributes:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5818
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5830
 msgid "\"number\" - max number of products to display. Defaults to 5."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5819
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5838
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5858
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5831
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5850
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5870
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:710
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:725
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:743
 msgid "Example:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5827
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5839
 msgid "Displays a list of products according to preference. Optional attributes default to the values in Presentation Settings -> Product List."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5831
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5843
 msgid "\"paginate\" - Whether to paginate the product list. This is useful to only show a subset."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5832
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5844
 msgid "\"page\" - The page number to display in the product list if \"paginate\" is set to true."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5833
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5845
 msgid "\"per_page\" - How many products to display in the product list if \"paginate\" is set to true."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5834
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5846
 msgid "\"order_by\" - What field to order products by. Can be: title, date, ID, author, price, sales, rand (random)."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5835
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5847
 msgid "\"order\" - Direction to order products by. Can be: DESC, ASC"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5836
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5848
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:703
 msgid "\"category\" - Limits list to a specific product category. Use the category Slug"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5837
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5849
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:704
 msgid "\"tag\" - Limits list to a specific product tag. Use the tag Slug"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5843
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5855
 msgid "Store Links"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5846
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5858
 msgid "Displays a link or url to the current shopping cart page."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5848
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5860
 msgid "Displays a link or url to the current store page."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5850
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5862
 msgid "Displays a link or url to the current products list page."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5852
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5864
 msgid "Displays a link or url to the order status page."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5856
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5868
 msgid "\"url\" - Whether to return a clickable link or url. Can be: true, false. Defaults to showing link."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5857
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5869
 msgid "\"link_text\" - The text to show in the link."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5863
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5875
 msgid "Store Navigation List"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5866
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5878
 msgid "Displays a list of links to your store pages."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5886
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5898
 msgid "Import Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5914
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5926
 msgid "Shows dynamic shopping cart contents along with a checkout button for your MarketPress store."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5958
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6105
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6214
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6262
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5970
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6117
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6226
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6274
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1533
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1623
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1676
 msgid "Title:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5959
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6106
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5971
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6118
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1534
 msgid "Custom Text:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5975
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5987
 msgid "Shows a customizable list of products from your MarketPress store."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5976
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5988
 msgid "Product List"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6060
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6072
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1370
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1372
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/template-functions.php:163
@@ -2128,101 +2128,101 @@ msgstr ""
 msgid "No Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6089
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6101
 msgid "Our Products"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6110
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6122
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1538
 msgid "List Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6112
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6124
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1540
 msgid "Number of Products:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6115
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6127
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1543
 msgid "Order Products By:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6129
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6141
 msgid "Taxonomy Filter:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6131
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6143
 msgid "No Filter"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6132
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6144
 msgid "Category"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6133
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6145
 msgid "Tag"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6135
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6147
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1556
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1560
 msgid "Enter the Slug"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6138
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6150
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1563
 msgid "Display Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6140
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6152
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1565
 msgid "Show Thumbnail"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6141
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6153
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1566
 msgid "Thumbnail Size:"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6144
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6156
 msgid "Show Excerpt"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6146
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6158
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1580
 msgid "Show Price"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6148
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6160
 msgid "Show Buy Button"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6158
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6170
 msgid "A list or dropdown of product categories from your MarketPress store."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6177
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6189
 msgid "Select Category"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6218
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6230
 msgid "Show as dropdown"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6221
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6233
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/marketpress-ms.php:1696
 msgid "Show product counts"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6224
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6236
 msgid "Show hierarchy"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6233
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6245
 msgid "Your most used product tags in cloud format from your MarketPress store."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6275
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:6287
 msgid "Please install the latest version of <a href=\"http://premium.wpmudev.org/project/update-notifications/\" title=\"Download Now &raquo;\">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">More information &raquo;</a>"
 msgstr ""
 
@@ -3104,63 +3104,68 @@ msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:44
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:45
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:140
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:200
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:287
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:142
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:202
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:286
 msgid "CubePoints"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:87
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:187
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:189
 msgid "Your current points: "
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:147
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:133
+#, php-format
+msgid "%s Store Purchase"
+msgstr ""
+
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:149
 msgid "Sorry, but you do not appear to have enough points to complete this purchase!"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:210
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:209
 msgid "CubePoints Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:212
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:211
 msgid "Accept CubePoints as payment(requires the CubePoints plugin)."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:215
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:214
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/manual-payments.php:196
 msgid "Method Name"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:217
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:216
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/manual-payments.php:198
 msgid "Enter a public name for this payment method that is displayed to users - No HTML"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:224
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:223
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/manual-payments.php:205
 msgid "User Instructions"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:226
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:225
 msgid "These are the CubePoints instructions to display on the payments screen - HTML allowed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:233
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:232
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/manual-payments.php:214
 msgid "Confirmation User Instructions"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:235
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:234
 msgid "These are the CubePoints to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:242
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:241
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/manual-payments.php:221
 msgid "Order Confirmation Email"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:244
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/cubepoints.php:243
 msgid "This is the email text to send to those who have made CubePoints checkouts. You should include your CubePoints instructions here. It overrides the default order checkout email. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed."
 msgstr ""
 
@@ -3741,13 +3746,13 @@ msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:322
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:617
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1256
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1267
 msgid "Paypal Currency"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:362
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:657
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1295
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1306
 msgid "PayPal Mode"
 msgstr ""
 
@@ -3766,7 +3771,7 @@ msgid "There was a problem verifying the IPN string with PayPal. Please try agai
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:683
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1113
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1117
 msgid "There was a problem connecting to PayPal. Please try again."
 msgstr ""
 
@@ -3797,7 +3802,7 @@ msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:763
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:672
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1304
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1315
 msgid "PayPal API Credentials"
 msgstr ""
 
@@ -3808,21 +3813,21 @@ msgstr ""
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:766
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:787
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:675
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1307
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1318
 msgid "API Username"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:769
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:790
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:678
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1310
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1321
 msgid "API Password"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:772
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-chained-payments.php:793
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:681
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1313
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1324
 msgid "Signature"
 msgstr ""
 
@@ -3855,7 +3860,7 @@ msgid "This message is displayed at the top of the gateway settings page to stor
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:52
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1145
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1156
 msgid "PayPal Express Checkout"
 msgstr ""
 
@@ -3989,7 +3994,7 @@ msgid "Express Checkout is PayPal's premier checkout solution, which streamlines
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:582
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1222
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1233
 msgid "PayPal Site"
 msgstr ""
 
@@ -3998,55 +4003,55 @@ msgid "PayPal Merchant E-mail"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:674
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1306
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1317
 msgid "You must login to PayPal and create an API signature to get your credentials. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_ECAPICredentials\">Instructions &raquo;</a>"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:687
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1319
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1330
 msgid "PayPal Header Image (optional)"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:689
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1321
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1332
 msgid "URL for an image you want to appear at the top left of the payment page. The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal recommends that you provide an image that is stored on a secure (https) server. If you do not specify an image, the business name is displayed."
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:696
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1328
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1339
 msgid "PayPal Header Border Color (optional)"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:698
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1330
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1341
 msgid "Sets the border color around the header of the payment page. The border is a 2-pixel perimeter around the header space, which is 750 pixels wide by 90 pixels high. By default, the color is black."
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:705
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1337
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1348
 msgid "PayPal Header Background Color (optional)"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:707
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1339
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1350
 msgid "Sets the background color for the header of the payment page. By default, the color is white."
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:714
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1346
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1357
 msgid "PayPal Page Background Color (optional)"
 msgstr ""
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:716
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1348
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1359
 msgid "Sets the background color for the payment page. By default, the color is white."
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1217
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1228
 msgid "PayPal Express Checkout Global Cart Settings"
 msgstr ""
 
-#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1219
+#: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress-includes/plugins-gateway/paypal-express.php:1230
 msgid "Express Checkout is PayPal's premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. This gateway allows carts from up to 10 stores to checkout at once using parallel payments. <a target=\"_blank\" href=\"https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted\">More Info &raquo;</a>"
 msgstr ""
 

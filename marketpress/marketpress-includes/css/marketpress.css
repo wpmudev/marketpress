@@ -146,9 +146,6 @@ div#mp-target-countries {
 .mp_emails_sub {
   width: 99.5%;
 }
-.mp-pages-msgs .wp_themeSkin table.mceLayout {
-  border: 1px #ccc solid;
-}
 ul.mp-shortcode-options {
   list-style: disc outside none;
   margin-left: 25px;

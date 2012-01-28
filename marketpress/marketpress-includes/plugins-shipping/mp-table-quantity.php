@@ -15,7 +15,13 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
   var $public_name = '';
 
   //set to true if you need to use the shipping_metabox() method to add per-product shipping options
-  var $use_metabox = true;
+  var $use_metabox = false;
+	
+	//set to true if you want to add per-product extra shipping cost field
+	var $use_extra = true;
+	
+	//set to true if you want to add per-product weight shipping field
+	var $use_weight = false;
 
   /**
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
@@ -122,12 +128,6 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
    * @param array $settings, access saved settings via $settings array.
    */
 	function shipping_metabox($shipping_meta, $settings) {
-		global $mp;
-    ?>
-    <label><?php _e('Extra Shipping Cost', 'mp'); ?>:<br />
-    <?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo ($shipping_meta['extra_cost']) ? $mp->display_currency($shipping_meta['extra_cost']) : '0.00'; ?>" />
-    </label>
-    <?php
 
   }
 
@@ -138,7 +138,6 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
    * return array $shipping_meta
    */
 	function save_shipping_metabox($shipping_meta) {
-		$shipping_meta['extra_cost'] = (!empty($_POST['mp_extra_shipping_cost'])) ? round($_POST['mp_extra_shipping_cost'], 2) : 0;
 
     return $shipping_meta;
   }
@@ -161,10 +160,6 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
 	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
 		global $mp;
     $settings = get_option('mp_settings');
-
-    //don't charge shipping if only digital products
-    if ( $mp->download_only_cart($cart) )
-      return 0;
 		
     $total_order_quantity = 0;
     foreach ($cart as $product_id => $variations) {

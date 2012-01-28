@@ -177,7 +177,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		}
 		
 		//tax line
-		if ( ($tax_price = $mp->tax_price()) !== false ) {
+		if ( $tax_price = $mp->tax_price() ) {
 			$total = $total + $tax_price;
 			$params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.rate"] = $settings['tax']['rate'];
 		} else {
@@ -320,7 +320,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 				    <span>
 				    <span class="description"><?php _e('You must setup your API callback URL in Google Checkout to be able to process orders.', 'mp') ?></span>
           	<ul>
-							<li><?php _e('Login to the Integration page of your Merchant Center <a target="_blank" href="https://sandbox.google.com/checkout/sell/settings?section=Integration">sandbox</a> or <a target="_blank" href="https://checkout.google.com/sell/settings?section=Integration">production</a> account. (You must set it of each)', 'mp') ?></li>
+							<li><?php _e('Login to the Integration page of your Merchant Center <a target="_blank" href="https://sandbox.google.com/checkout/sell/settings?section=Integration">sandbox</a> or <a target="_blank" href="https://checkout.google.com/sell/settings?section=Integration">production</a> account. (You must set it in each)', 'mp') ?></li>
 							<li><?php printf( __('Enter the URL for the web service in the <b>API callback URL</b> field: <strong>%s</strong>', 'mp'), $this->ipn_url); ?></li>
 							<li><?php _e('Indicate the format as "<b>Notification as Serial Number</b>" and use <b>API Version 2.0</b>.', 'mp') ?></li>
 							<li><?php _e('Save your settings.', 'mp') ?></li>

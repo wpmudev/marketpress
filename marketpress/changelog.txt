@@ -5,6 +5,19 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+
+2.5 - 1/30/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Add a full CSV product importer!
+- Add weight based shipping module
+- Add support for calculated shipping modules
+- Fix bug with category dropdown widget
+- Add Log entry for cubpoints gateway checkouts
+- Fix translation issues for gateway and shipping plugin names
+- Add "only show on store pages" option to all widgets
+- Fix custom menu highlighting in WP 3.3
+- Fix tax bug with Google Checkout gateway
+
 2.4.2 - 12/16/2011 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix a fatal bug introduced to the PayPal express gateway in 2.4.1. Important update!

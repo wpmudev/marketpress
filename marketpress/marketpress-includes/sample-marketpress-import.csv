@@ -1,0 +1,6 @@
+title,description,sku,price,sale_price,tags,categories,stock,external_link,download_url,sales_count,extra_shipping,weight
+Product 1,Sample product description,32432432,112.04,69.99,"Tag 1, Tag 2","Cool Stuff, Red Stuff",,,,1,,
+Product 2,Sample product description,321321321,0.12,,Tag 2,"Cool Stuff, Red Stuff",2,,,,3,
+Product 3,Sample product description,23232,3.21,2.983,Another,Red Stuff,,,http://test.com/myfile.pdf,,,3
+Product 4,Sample product description,,1123.34,,test,"Cool Stuff, Red Stuff",4,,,,2.19,
+Product 5,Sample product description,657657657,15,,,Red Stuff,5,http://mytestsite.com,,3,,1.3
