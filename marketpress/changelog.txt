@@ -11,12 +11,15 @@ Change Log:
 - Add a full CSV product importer!
 - Add weight based shipping module
 - Add support for calculated shipping modules
-- Fix bug with category dropdown widget
 - Add Log entry for cubpoints gateway checkouts
-- Fix translation issues for gateway and shipping plugin names
 - Add "only show on store pages" option to all widgets
-- Fix custom menu highlighting in WP 3.3
-- Fix tax bug with Google Checkout gateway
+- Fix translation issues for gateway and shipping plugin names
+- Fix bug with category dropdown widget
+- Fix custom menu current item highlighting in WP 3.3
+- Fix tax calculation bug with Google Checkout gateway for orders with no tax
+- Make shipping fields behavior consistent with global cart enabled
+- Fix currency rounding problem for large prices with decimals off
+- Change add to cart button when in product listing mode and no custom link set
 
 2.4.2 - 12/16/2011 - Aaron Edwards
 ----------------------------------------------------------------------

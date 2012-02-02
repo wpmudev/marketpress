@@ -1816,7 +1816,7 @@ Thanks again!", 'mp')
 			}
 
       //price function
-      $func_curr = '$price = round($price, 2);return ($price) ? $price : 0;';
+      $func_curr = '$price = round(preg_replace("/[^0-9.]/", "", $price), 2);return ($price) ? $price : 0;';
 
       //sku function
       $func_sku = 'return preg_replace("/[^a-zA-Z0-9_-]/", "", $value);';
@@ -2024,13 +2024,13 @@ Thanks again!", 'mp')
 
     //get address
     $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info');
-    $address1 = ($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
-    $address2 = ($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
-    $city = ($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
-    $state = ($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
-    $zip = ($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip'];
-    $country = ($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
-		$selected_option = ($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
+    $address1 = isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
+    $address2 = isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
+    $city = isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
+    $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
+    $zip = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip'];
+    $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
+		$selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
 		
     //check required fields
     if ( empty($address1) || empty($city) || empty($zip) || empty($country) || !(is_array($cart) && count($cart)) )
@@ -3077,7 +3077,11 @@ Thanks again!", 'mp')
   }
 
 	//checks if a given cart is only downloadable products
-	function download_only_cart($cart) {	
+	function download_only_cart($cart) {
+		//always show shipping fields with global cart. TODO - make aware of global carts
+		if ($this->global_cart)
+			return false;
+		
 		foreach ((array)$cart as $product_id => $variations) {
 			foreach ((array)$variations as $variation => $data) {
 				if (!is_array($data['download']))
@@ -3742,7 +3746,7 @@ Notification Preferences: %s', 'mp');
     $settings = get_option('mp_settings');
 
     if ( $settings['curr_decimal'] === '0' )
-      return number_format( round( $amount ) );
+      return number_format( round( $amount ), 0, '.', '');
     else
       return number_format( round( $amount, 2 ), 2, '.', '');
   }

@@ -1519,6 +1519,10 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 
     $button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 
+  } else if ($settings['disable_cart']) {
+    
+    $button = '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
+    
   } else {
 
     $button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';

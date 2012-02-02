@@ -52,7 +52,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		$settings = get_option('mp_settings');
 		
 		//set names here to be able to translate
-		$this->admin_name = __('Google Checkout (beta)', 'mp');
+		$this->admin_name = __('Google Checkout', 'mp');
 		$this->public_name = __('Google Checkout', 'mp');
 		$this->method_img_url = $mp->plugin_url . 'images/google_checkout.gif';
     $locale = ($this->currencyCode == 'USD') ? 'en_US' : 'en_GB';
@@ -481,5 +481,5 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 }
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_GoogleCheckout', 'google-checkout', __('Google Checkout (beta)', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_GoogleCheckout', 'google-checkout', __('Google Checkout', 'mp') );
 ?>

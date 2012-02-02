@@ -132,7 +132,7 @@ if (!class_exists('MP_Shipping_API')) {
      *
      * return array $shipping_options 
      */
-		function shipping_options($address1, $address2, $city, $state, $zip, $country) {
+		function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
 			
 			$shipping_options = array();
 			
@@ -199,7 +199,7 @@ if (!class_exists('MP_Shipping_API')) {
 			
 			add_filter( "mp_calculate_shipping_{$this->plugin_name}", array(&$this, 'calculate_shipping'), 10, 10 );
 			
-			add_filter( "mp_shipping_options_{$this->plugin_name}", array(&$this, 'shipping_options'), 10, 6 );
+			add_filter( "mp_shipping_options_{$this->plugin_name}", array(&$this, 'shipping_options'), 10, 7 );
 			
 			//private
 			if ($this->use_weight && !$mp->weight_printed) {
@@ -318,7 +318,7 @@ class MP_Shipping_Handler {
 		$zip = isset($_POST['zip']) ? trim(stripslashes($_POST['zip'])) : (isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip']);
 		$country = isset($_POST['country']) ? trim($_POST['country']) : (isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country']);
 
-		$options = apply_filters("mp_shipping_options_$selected", $address1, $address2, $city, $state, $zip, $country);
+		$options = apply_filters("mp_shipping_options_$selected", $mp->get_cart_contents(), $address1, $address2, $city, $state, $zip, $country);
 
 		$content = '';
 		if ( count( $options ) ) {
