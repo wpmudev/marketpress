@@ -517,7 +517,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
       $content .= '<tr>';
       $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
       $content .= apply_filters( 'mp_checkout_error_country', '' );
-      $content .= '<select id="mp_country" name="country">';
+      $content .= '<select id="mp_country" name="country" class="mp_shipping_field">';
       foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
         $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
       }
@@ -1280,7 +1280,8 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
       $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
       $content .= '<div class="mp_product_content">';
       $product_content = mp_product_image( false, 'list', $post->ID );
-      $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+      if ($settings['show_excerpt'] == 1)
+        $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
       $content .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
       $content .= '</div>';
 
@@ -1521,7 +1522,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 
   } else if ($settings['disable_cart']) {
     
-    $button = '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
+    $button = '';
     
   } else {
 

@@ -120,18 +120,19 @@ if (!class_exists('MP_Shipping_API')) {
     }
     
 		/**
-     * For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
-     *  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
-     *
-     * @param string $address1
-     * @param string $address2
-     * @param string $city
-     * @param string $state, state/province/region
-     * @param string $zip, postal code
-     * @param string $country, ISO 3166-1 alpha-2 country code
-     *
-     * return array $shipping_options 
-     */
+			* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
+			*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
+			*
+			* @param array $cart, the contents of the shopping cart for advanced calculations
+			* @param string $address1
+			* @param string $address2
+			* @param string $city
+			* @param string $state, state/province/region
+			* @param string $zip, postal code
+			* @param string $country, ISO 3166-1 alpha-2 country code
+			*
+			* return array $shipping_options 
+			*/
 		function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
 			
 			$shipping_options = array();
@@ -171,7 +172,7 @@ if (!class_exists('MP_Shipping_API')) {
 			if ($settings['shipping']['system'] == 'metric') {
 				$shipping_meta['weight'] = (!empty($_POST['mp_shipping_weight'])) ? round($_POST['mp_shipping_weight'], 2) : 0;
 			} else {
-				$pounds = (!empty($_POST['mp_shipping_weight_pounds'])) ? round($_POST['mp_shipping_weight_pounds']) : 0;
+				$pounds = (!empty($_POST['mp_shipping_weight_pounds'])) ? floatval($_POST['mp_shipping_weight_pounds']) : 0;
 				$oz = (!empty($_POST['mp_shipping_weight_oz'])) ? round($_POST['mp_shipping_weight_oz']) : 0;
 				$oz = $oz / 16;
 				$shipping_meta['weight'] = round($pounds + $oz, 2);
@@ -284,7 +285,7 @@ class MP_Shipping_Handler {
 
 		if ( $settings['shipping']['method'] == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
 			$label = $mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
-			$options = apply_filters("mp_shipping_options_".$_SESSION['mp_shipping_info']['shipping_option'], null, null, null, null, null, null);
+			$options = apply_filters("mp_shipping_options_".$_SESSION['mp_shipping_info']['shipping_option'], null, null, null, null, null, null, null);
 			if (isset($options[$_SESSION['mp_shipping_info']['shipping_sub_option']]))
 				$label .= ' - ' . $options[$_SESSION['mp_shipping_info']['shipping_sub_option']];
 			$content .= '<tr>';
@@ -310,7 +311,7 @@ class MP_Shipping_Handler {
 		$selected = isset($_POST['shipping_option']) ? $_POST['shipping_option'] : (isset($_SESSION['mp_shipping_info']['shipping_option']) ? $_SESSION['mp_shipping_info']['shipping_option'] : $first->plugin_name);
 		
 		//get address
-    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info');
+    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
 		$address1 = isset($_POST['address1']) ? trim(stripslashes($_POST['address1'])) : (isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1']);
 		$address2 = isset($_POST['address2']) ? trim(stripslashes($_POST['address2'])) : (isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2']);
 		$city = isset($_POST['city']) ? trim(stripslashes($_POST['city'])) : (isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city']);

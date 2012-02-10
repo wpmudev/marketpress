@@ -118,6 +118,7 @@ class My_Plugin_Name extends MP_Shipping_API {
 		* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
 		*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
 		*
+		* @param array $cart, the contents of the shopping cart for advanced calculations
 		* @param string $address1
 		* @param string $address2
 		* @param string $city
@@ -127,7 +128,7 @@ class My_Plugin_Name extends MP_Shipping_API {
 		*
 		* return array $shipping_options 
 		*/
-	function shipping_options($address1, $address2, $city, $state, $zip, $country) {
+	function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
 		
 		$shipping_options = array();
 		

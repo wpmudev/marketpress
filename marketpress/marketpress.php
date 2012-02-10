@@ -177,6 +177,7 @@ class MarketPress {
       'product_img_width' => 150,
       'list_img_height' => 150,
       'list_img_width' => 150,
+			'show_excerpt' => 1,
       'per_page' => 20,
       'order_by' => 'title',
       /* Translators: change default slugs here */
@@ -1981,7 +1982,7 @@ Thanks again!", 'mp')
 		}
 
     if (is_array($meta["mp_price"])) {
-			if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$variation]) {
+			if ($meta["mp_is_sale"]) {
         $price = $meta["mp_sale_price"][$variation];
       } else {
         $price = $meta["mp_price"][$variation];
@@ -2023,7 +2024,7 @@ Thanks again!", 'mp')
       $total = $coupon['new_total'];
 
     //get address
-    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info');
+    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
     $address1 = isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
     $address2 = isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
     $city = isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
@@ -2080,7 +2081,7 @@ Thanks again!", 'mp')
 			$cart = $this->get_cart_contents();
 
     //get address
-    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info');
+    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
 
     if (!isset($meta['state'])) {
       $meta['state'] = '';
@@ -3222,7 +3223,7 @@ Thanks again!", 'mp')
     $user_id =  $_REQUEST['user_id'];
 
     // Billing Info
-    $meta = get_user_meta($user_id, 'mp_billing_info');
+    $meta = get_user_meta($user_id, 'mp_billing_info', true);
 
     if (!isset($_POST['mp_billing_info']['email'])) {
       $meta['email'] = '';
@@ -3275,7 +3276,7 @@ Thanks again!", 'mp')
     update_user_meta($user_id, 'mp_billing_info', $billing_meta);
 
     // Shipping Info
-    $meta = get_user_meta($user_id, 'mp_shipping_info');
+    $meta = get_user_meta($user_id, 'mp_shipping_info', true);
 
     if (!isset($_POST['mp_shipping_info']['email'])) {
       $meta['email'] = '';
@@ -5434,6 +5435,13 @@ Notification Preferences: %s', 'mp');
                   <label><?php _e('Width', 'mp') ?><input size="3" name="mp[list_img_width]" value="<?php echo esc_attr($settings['list_img_width']) ?>" type="text" /></label>
                 </td>
                 </tr>
+								<tr>
+									<th scope="row"><?php _e('Show Excerpts', 'mp') ?></th>
+									<td>
+									<label><input value="1" name="mp[show_excerpt]" type="radio"<?php checked($settings['show_excerpt'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+									<label><input value="0" name="mp[show_excerpt]" type="radio"<?php checked($settings['show_excerpt'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+									</td>
+								</tr>
                 <tr>
         				<th scope="row"><?php _e('Paginate Products', 'mp') ?></th>
         				<td>
