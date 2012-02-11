@@ -184,7 +184,7 @@ td.mp_inv_col input {
 }
 #mp_add_vars a {
   background: transparent url('../images/plus.gif') no-repeat scroll left center;
-  padding-left: 20px;
+  padding: 1px 0 1px 20px;
 }
 .mp_var_remove a {
 	text-indent: -9999px;

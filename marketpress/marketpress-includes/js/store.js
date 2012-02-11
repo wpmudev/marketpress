@@ -72,10 +72,14 @@ jQuery(document).ready(function($) {
 
   //province field choice
   $('#mp_country').change(function() {
-    $("#mp_province_field").html('<img src="'+MP_Ajax.imgUrl+'" />');
+    $("#mp_province_field").html('<img src="'+MP_Ajax.imgUrl+'" alt="Loading..." />');
     var country = $(this).val();
     $.post(MP_Ajax.ajaxUrl, {action: 'mp-province-field', country: country}, function(data) {
       $("#mp_province_field").html(data);
+      //remap listener
+      $('#mp_state').change(function() {
+        if ($('#mp_city').val() && $('#mp_state').val() && $('#mp_zip').val()) mp_refresh_shipping();
+      });
     });
   });
   
@@ -83,12 +87,12 @@ jQuery(document).ready(function($) {
   $('#mp-shipping-select').change(function() {mp_refresh_shipping();});
   
   //refresh on blur if necessary 3 fields are set
-  $('#mp_shipping_form .mp_shipping_field').blur(function() {
+  $('#mp_shipping_form .mp_shipping_field').change(function() {
     if ($('#mp_city').val() && $('#mp_state').val() && $('#mp_zip').val()) mp_refresh_shipping();
   });
   
   function mp_refresh_shipping() {
-    $("#mp-shipping-select-holder").html('<img src="'+MP_Ajax.imgUrl+'" />');
+    $("#mp-shipping-select-holder").html('<img src="'+MP_Ajax.imgUrl+'" alt="Loading..." />');
     var serializedForm = $('form#mp_shipping_form').serialize();
     $.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
       $("#mp-shipping-select-holder").html(data);

@@ -6,15 +6,19 @@ Change Log:
 ----------------------------------------------------------------------
 
 
-2.5 - 2/5/2012 - Aaron Edwards
+2.5 - 2/10/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add a full CSV product importer!
+- Add orders exporting as CSV
 - Add weight based shipping module
 - Add support for calculated shipping modules
 - USPS calculated shipping module!
 - Add Log entry for cubpoints gateway checkouts
 - Add "Only show on store pages" option to all widgets
 - Add setting to disable excerpts in product lists
+- Add custom API url support to Authorize.net gateway for compatibility with many 3rd party gateways
+- Add beta PayPal Payflow Pro gateway
+- Add beta iDEAL gateway (ING bank only)
 - Fix translation issues for gateway and shipping plugin names
 - Fix bug with category dropdown widget
 - Fix custom menu current item highlighting in WP 3.3

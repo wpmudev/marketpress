@@ -105,22 +105,25 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$this->intl_services = array(
 		'Express Mail International' => 
-		array( 'service' => 1, 'name' => 'Express Mail International'),
+		array( 'service' => 1, 'name' => __('Express Mail International', 'mp')),
 		
 		'Express Mail International Flat Rate Boxes' =>
-		array( 'service' => 26, 'name' => 'Express Mail International Flat Rate Boxes'),
+		array( 'service' => 26, 'name' => __('Express Mail International Flat Rate Boxes', 'mp')),
+		
+		'Priority Mail International' =>
+		array( 'service' => 2, 'name' => __('Priority Mail International', 'mp')),
 		
 		'Priority Mail International Large Flat Rate Boxes' =>
-		array( 'service' => 11, 'name' => 'Priority Mail International Large Flat Rate Boxes'),
-		
+		array( 'service' => 11, 'name' => __('Priority Mail International Large Flat Rate Boxes', 'mp')),
+
 		'Priority Mail International Medium Flat Rate Boxes' =>
-		array( 'service' => 9, 'name' => 'Priority Mail International Medium Flat Rate Boxes'),
+		array( 'service' => 9, 'name' => __('Priority Mail International Medium Flat Rate Boxes', 'mp')),
 
 		'Priority Mail International Small Flat Rate Boxes' =>
-		array( 'service' => 16, 'name' => 'Priority Mail International Small Flat Rate Boxes'),
+		array( 'service' => 16, 'name' => __('Priority Mail International Small Flat Rate Boxes', 'mp')),
 		
 		'First Class International Parcel' =>
-		array( 'service' => 15, 'name' => 'First Class International Parcel'),
+		array( 'service' => 15, 'name' => __('First Class International Parcel', 'mp')),
 
 		);
 
@@ -515,7 +518,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->machinable = ($this->pkg_weight > 35) ? 'false' : $this->machinable;
 
 
-		if ($this->country == 'US'){
+    if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			$shipping_options = $this->ratev4_request();
 		} else {
 			$shipping_options = $this->ratev2_request();
@@ -539,6 +542,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 
 		//Assume equal size packages. Find the best matching box size
+		$this->usps_settings['max_weight'] = ( empty($this->usps_settings['max_weight'])) ? 50 : $this->usps_settings['max_weight'];
 		$diff = floatval($this->usps_settings['max_weight']);
 		$found = -1;
 		foreach($this->usps_settings['boxes']['weight'] as $key => $weight) {
@@ -683,6 +687,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$shipping_options = $this->usps_settings['intl_services'];
 
 		//Assume equal size packages. Find the best matching box size
+		$this->usps_settings['max_weight'] = ( empty($this->usps_settings['max_weight'])) ? 50 : $this->usps_settings['max_weight'];
 		$diff = floatval($this->usps_settings['max_weight']);
 		$found = -1;
 		foreach($this->usps_settings['boxes']['weight'] as $key => $weight) {
@@ -924,7 +929,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 } //End MP_Shipping_USPS
 
-//register plugin as calculated
-mp_register_shipping_plugin( 'MP_Shipping_USPS', 'usps', __('USPS', 'mp'), true );
+//register plugin as calculated. Only in US and US Possesions
+
+$settings = get_option('mp_settings');
+
+if (in_array($settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+  mp_register_shipping_plugin( 'MP_Shipping_USPS', 'usps', __('USPS', 'mp'), true );
+}
 
 ?>

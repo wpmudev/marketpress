@@ -1450,7 +1450,7 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 	}
 
   if ((is_array($meta["mp_price"]) && count($meta["mp_price"]) == 1) || !empty($meta["mp_file"])) {
-    if ($meta["mp_is_sale"] && $meta["mp_sale_price"][0]) {
+    if ($meta["mp_is_sale"]) {
 	    $price = '<span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
 	    $price .= '<span class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
 	  } else {

@@ -1,13 +1,13 @@
 <?php
 /*
-MarketPress Authorize.net AIM Gateway Plugin
-Author: S H Mohanjith (Incsub)
+MarketPress Payflow Pro Gateway Plugin
+Author: Sue Cline (Cyclonic Consulting)
 */
 
-class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
+class MP_Gateway_Payflow extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-  var $plugin_name = 'authorizenet-aim';
+  var $plugin_name = 'payflow';
   
   //name of your gateway, for the admin side.
   var $admin_name = '';
@@ -43,7 +43,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $settings = get_option('mp_settings');
     
     //set names here to be able to translate
-    $this->admin_name = __('Authorize.net Checkout', 'mp');
+    $this->admin_name = __('PayPal Payflow Pro (beta)', 'mp');
     $this->public_name = __('Credit Card', 'mp');
     
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
@@ -52,19 +52,17 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $this->version = "63.0"; //api version
     
     //set credit card vars
-    if ( isset( $settings['gateways']['authorizenet-aim'] ) ) {
-      $this->API_Username = $settings['gateways']['authorizenet-aim']['api_user'];
-      $this->API_Password = $settings['gateways']['authorizenet-aim']['api_pass'];
-      $this->API_Signature = $settings['gateways']['authorizenet-aim']['api_sig'];
-      $this->currencyCode = $settings['gateways']['authorizenet-aim']['currency'];
-      $this->locale = $settings['gateways']['authorizenet-aim']['locale'];
+    if ( isset( $settings['gateways']['payflow'] ) ) {
+      $this->API_Username = $settings['gateways']['payflow']['api_user'];
+      $this->API_Password = $settings['gateways']['payflow']['api_pass'];
+      $this->API_Signature = $settings['gateways']['payflow']['api_sig'];
+      $this->currencyCode = $settings['gateways']['payflow']['currency'];
+      $this->locale = $settings['gateways']['payflow']['locale'];
       //set api urls
-			if (!empty($settings['gateways']['authorizenet-aim']['custom_api']))	{
-        $this->API_Endpoint = esc_url_raw($settings['gateways']['authorizenet-aim']['custom_api']);
-			} else if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
-        $this->API_Endpoint = "https://test.authorize.net/gateway/transact.dll";
+      if ($settings['gateways']['payflow']['mode'] == 'sandbox')	{
+        $this->API_Endpoint = "https://pilot-payflowpro.paypal.com";
       } else {
-        $this->API_Endpoint = "https://secure.authorize.net/gateway/transact.dll";
+        $this->API_Endpoint = "https://payflowpro.paypal.com";
       }
     }
   }
@@ -507,23 +505,28 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $settings = get_option('mp_settings');
     $billing_info = $_SESSION['mp_billing_info'];
     
-    $payment = new MP_Gateway_Worker_AuthorizeNet_AIM($this->API_Endpoint,
-      $settings['gateways']['authorizenet-aim']['delim_data'],
-      $settings['gateways']['authorizenet-aim']['delim_char'],
-      $settings['gateways']['authorizenet-aim']['encap_char'],
-      $settings['gateways']['authorizenet-aim']['api_user'],
-      $settings['gateways']['authorizenet-aim']['api_key'],
-      ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox'));
+    $payment = new MP_Gateway_Worker_Payflow($this->API_Endpoint,
+      $settings['gateways']['payflow']['delim_data'],
+      $settings['gateways']['payflow']['delim_char'],
+      $settings['gateways']['payflow']['encap_char'],
+      $settings['gateways']['payflow']['api_user'],
+      $settings['gateways']['payflow']['api_key'],
+      ($settings['gateways']['payflow']['mode'] == 'sandbox'));
     
+
     $payment->transaction($_SESSION['card_num']);
-    
+    $payment->setParameter("EXPDATE", $_SESSION['exp_month'] .$_SESSION['exp_year']);
+    $payment->setParameter("CVV2", $_SESSION['card_code'] );
+    $payment->setParameter("USER", $settings['gateways']['payflow']['api_user']);
+    $payment->setParameter("VENDOR", $settings['gateways']['payflow']['api_vendor']);
+    $payment->setParameter("PWD", $settings['gateways']['payflow']['api_pwd']);
+    $payment->setParameter("PARTNER", $settings['gateways']['payflow']['api_partner']);
+
     $totals = array();
     foreach ($cart as $product_id => $variations) {
       foreach ($variations as $variation => $data) {
-        $sku = empty($data['SKU']) ? "{$product_id}_{$variation}" : $data['SKU'];
+
         $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
-        $payment->addLineItem($sku, substr($data['name'], 0, 31),
-          substr($data['name'].' - '.$data['url'], 0, 254), $data['quantity'], $mp->before_tax_price($data['price']), 1);
         $i++;
       }
     }
@@ -545,25 +548,20 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     }
     
     // Billing Info
-    $payment->setParameter("x_card_code", $_SESSION['card_code']);
-    $payment->setParameter("x_exp_date ", $_SESSION['exp_month'] . $_SESSION['exp_year']);
-    $payment->setParameter("x_amount", $total);
+    $payment->setParameter("TENDER", 'C');
+    $payment->setParameter("TRXTYPE", 'S');
+    $payment->setParameter("AMT", number_format($total, 2, '.', ''));
+
+    $payment->setParameter("CURRENCY",$this->currencyCode);
     
     // Order Info
-    $payment->setParameter("x_description", "Order ID: ".$_SESSION['mp_order']);
-    $payment->setParameter("x_invoice_num",  $_SESSION['mp_order']);
-    if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
-      $payment->setParameter("x_test_request", true);
-    } else {
-      $payment->setParameter("x_test_request", false);
-    }
-    $payment->setParameter("x_duplicate_window", 30);
+    $payment->setParameter("COMMENT1", "Order ID: ".$_SESSION['mp_order']);
+    $payment->setParameter("INVNUM",  $_SESSION['mp_order']);
+
+
     
     // E-mail
-    $payment->setParameter("x_header_email_receipt", $settings['gateways']['authorizenet-aim']['header_email_receipt']);
-    $payment->setParameter("x_footer_email_receipt", $settings['gateways']['authorizenet-aim']['footer_email_receipt']);
-    $payment->setParameter("x_email_customer", strtoupper($settings['gateways']['authorizenet-aim']['email_customer']));
-    
+
     $_names = split(" ", $billing_info['name']);
     if (isset($_names[0])) {
       $first_name = array_shift($_names);
@@ -584,49 +582,22 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     }
     
     //Customer Info
-    $payment->setParameter("x_first_name", $first_name);
-    $payment->setParameter("x_last_name", $last_name);
-    $payment->setParameter("x_address", $address);
-    $payment->setParameter("x_city", $billing_info['city']);
-    $payment->setParameter("x_state", $billing_info['state']);
-    $payment->setParameter("x_country", $billing_info['country']);
-    $payment->setParameter("x_zip", $billing_info['zip']);
-    $payment->setParameter("x_phone", $billing_info['phone']);
-    $payment->setParameter("x_email", $billing_info['email']);
+    $payment->setParameter("FIRSTNAME", $first_name);
+    $payment->setParameter("LASTNAME", $last_name);
+    $payment->setParameter("STREET", $address);
+    $payment->setParameter("CITY", $billing_info['city']);
+
+    $payment->setParameter("COUNTRY", $billing_info['country']);
+    $payment->setParameter("ZIP", $billing_info['zip']);
+ 
+    $payment->setParameter("EMAIL", $billing_info['email']);
     
-		//only add shipping info if set
-		if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {
-			$_names = split(" ", $shipping_info['name']);
-			if (isset($_names[0])) {
-				$shipping_first_name = array_shift($_names);
-			} else {
-				$shipping_first_name = "";
-			}
-			
-			if (isset($_names[0])) {
-				$shipping_last_name = join(" ", $_names);
-			} else {
-				$shipping_last_name = "";
-			}
-			
-			$shipping_address = $shipping_info['address1'];
-			
-			if (!empty($billing_info['address2'])) {
-				$shipping_address .= "\n".$shipping_info['address2'];
-			}
-			
-			$payment->setParameter("x_ship_to_first_name", $shipping_first_name);
-			$payment->setParameter("x_ship_to_last_name", $shipping_last_name);
-			$payment->setParameter("x_ship_to_address", $shipping_address);
-			$payment->setParameter("x_ship_to_city", $shipping_info['city']);
-			$payment->setParameter("x_ship_to_state", $shipping_info['state']);
-			$payment->setParameter("x_ship_to_country", $shipping_info['country']);
-			$payment->setParameter("x_ship_to_zip", $shipping_info['zip']);
-		}
+ 
 		
-    $payment->setParameter("x_customer_ip", $_SERVER['REMOTE_ADDR']);
+    $payment->setParameter("CLIENTIP", $_SERVER['REMOTE_ADDR']);
     
     $payment->process();
+
 
     if ($payment->isApproved()) {
 
@@ -693,18 +664,19 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   function gateway_settings_box($settings) {
     global $mp;
     ?>
-    <div id="mp_authorizenet-aim_express" class="postbox">
-      <h3 class='hndle'><span><?php _e('Authorize.net AIM Settings', 'mp'); ?></span></h3>
+    <div id="mp_payflow_express" class="postbox">
+      <h3 class='hndle'><span><?php _e('PayPal Payflow Settings', 'mp'); ?></span></h3>
       <div class="inside">
-        <span class="description"><?php _e('Authorize.net AIM is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway. USD is the only currency supported by this gateway.', 'mp') ?></span>
+				<a href="https://merchant.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=merchant/payment_gateway" target="_blank"><img src="<?php echo $mp->plugin_url . 'images/paypal-payflow.png'; ?>" /></a>
+        <p class="description"><?php _e('Use Payflow payment gateway to accept online payments using your Internet merchant account and processing network. PayPal Payflow Pro is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway. USD is the only currency supported by this gateway.', 'mp') ?></p>
         <table class="form-table">
 				  <tr>
 				    <th scope="row"><?php _e('Mode', 'mp') ?></th>
 				    <td>
 			        <p>
-			          <select name="mp[gateways][authorizenet-aim][mode]">
-			            <option value="sandbox" <?php selected($settings['gateways']['authorizenet-aim']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-			            <option value="live" <?php selected($settings['gateways']['authorizenet-aim']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
+			          <select name="mp[gateways][payflow][mode]">
+			            <option value="sandbox" <?php selected($settings['gateways']['payflow']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
+			            <option value="live" <?php selected($settings['gateways']['payflow']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
 			          </select>
 			        </p>
 				    </td>
@@ -712,75 +684,57 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 				  <tr>
 				    <th scope="row"><?php _e('Gateway Credentials', 'mp') ?></th>
 				    <td>
-			              <span class="description"><?php print sprintf(__('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.authorize.net/support/merchant/Integration_Settings/Access_Settings.htm"); ?></span>
 				      <p>
-					<label><?php _e('Login ID', 'mp') ?><br />
-					  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_user']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_user]" type="text" />
+					<label><?php _e('USER', 'mp') ?><br />
+					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_user']); ?>" size="30" name="mp[gateways][payflow][api_user]" type="text" />
 					</label>
 				      </p>
 				      <p>
-					<label><?php _e('Transaction Key', 'mp') ?><br />
-					  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_key']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_key]" type="text" />
+					<label><?php _e('VENDOR', 'mp') ?><br />
+					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_vendor']); ?>" size="30" name="mp[gateways][payflow][api_vendor]" type="text" />
 					</label>
 				      </p>
+				      <p>
+					<label><?php _e('PARTNER', 'mp') ?><br />
+					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_partner']); ?>" size="30" name="mp[gateways][payflow][api_partner]" type="text" />
+					</label>
+				      </p>
+
+				      <p>
+					<label><?php _e('PWD', 'mp') ?><br />
+					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_pwd']); ?>" size="30" name="mp[gateways][payflow][api_pwd]" type="password" />
+					</label>
+				      </p>
+
 				    </td>
 				  </tr>
 			          <tr>
 				    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
 				    <td>
 				      <span class="description"><?php _e('Optional settings to control advanced options', 'mp') ?></span>
-			              <p>
-			                <label><a title="<?php _e('Authorize.net default is \',\'. Otherwise, get this from your credit card processor. If the transactions are not going through, this character is most likely wrong.', 'mp'); ?>"><?php _e('Delimiter Character', 'mp'); ?></a><br />
-			                  <input value="<?php echo (empty($settings['gateways']['authorizenet-aim']['delim_char']))?",":esc_attr($settings['gateways']['authorizenet-aim']['delim_char']); ?>" size="2" name="mp[gateways][authorizenet-aim][delim_char]" type="text" />
-			                </label>
-				      </p>
-
-			              <p>
-					<label><a title="<?php _e('Authorize.net default is blank. Otherwise, get this from your credit card processor. If the transactions are going through, but getting strange responses, this character is most likely wrong.', 'mp'); ?>"><?php _e('Encapsulation Character', 'mp'); ?></a><br />
-			                  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['encap_char']); ?>" size="2" name="mp[gateways][authorizenet-aim][encap_char]" type="text" />
-			                </label>
-			              </p>
+		
 
 			              <p>
 					<label><?php _e('Email Customer (on success):', 'mp'); ?><br />
-			                  <select name="mp[gateways][authorizenet-aim][email_customer]">
-			                    <option value="yes" <?php selected($settings['gateways']['authorizenet-aim']['email_customer'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
-			                    <option value="no" <?php selected($settings['gateways']['authorizenet-aim']['email_customer'], 'no') ?>><?php _e('No', 'mp') ?></option>
+			                  <select name="mp[gateways][payflow][email_customer]">
+			                    <option value="yes" <?php selected($settings['gateways']['payflow']['email_customer'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
+			                    <option value="no" <?php selected($settings['gateways']['payflow']['email_customer'], 'no') ?>><?php _e('No', 'mp') ?></option>
 			                  </select>
 			                </label>
 			              </p>
 
 			              <p>
 					<label><a title="<?php _e('This text will appear as the header of the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Header', 'mp'); ?></a><br/>
-			                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['header_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['authorizenet-aim']['header_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][header_email_receipt]" type="text" />
+			                  <input value="<?php echo empty($settings['gateways']['payflow']['header_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['payflow']['header_email_receipt']); ?>" size="40" name="mp[gateways][payflow][header_email_receipt]" type="text" />
 			                </label>
 				      </p>
 
 			              <p>
 					<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
-			                  <input value="<?php echo empty($settings['gateways']['authorizenet-aim']['footer_email_receipt']) ? '' : esc_attr($settings['gateways']['authorizenet-aim']['footer_email_receipt']); ?>" size="40" name="mp[gateways][authorizenet-aim][footer_email_receipt]" type="text" />
+			                  <input value="<?php echo empty($settings['gateways']['payflow']['footer_email_receipt']) ? '' : esc_attr($settings['gateways']['payflow']['footer_email_receipt']); ?>" size="40" name="mp[gateways][payflow][footer_email_receipt]" type="text" />
 			                </label>
 				      </p>
 
-			              <p>
-					<label><a title="<?php _e('The payment gateway generated MD5 hash value that can be used to authenticate the transaction response. Not needed because responses are returned using an SSL connection.', 'mp'); ?>"><?php _e('Security: MD5 Hash', 'mp'); ?></a><br/>
-			                  <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['md5_hash']); ?>" size="32" name="mp[gateways][authorizenet-aim][md5_hash]" type="text" />
-			                </label>
-			              </p>
-
-							<p>
-		<label><a title="<?php _e('Request a delimited response from the payment gateway.', 'mp'); ?>"><?php _e('Delim Data:', 'mp'); ?></a><br/>
-									<select name="mp[gateways][authorizenet-aim][delim_data]">
-										<option value="yes" <?php selected($settings['gateways']['authorizenet-aim']['delim_data'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
-										<option value="no" <?php selected($settings['gateways']['authorizenet-aim']['delim_data'], 'no') ?>><?php _e('No', 'mp') ?></option>
-									</select>
-								</label>
-							</p>
-							<p>
-							<label><a title="<?php _e('Many other gateways have Authorize.net API emulators. To use one of these gateways input their API post url here.', 'mp'); ?>"><?php _e('Custom API URL', 'mp') ?></a><br />
-								<input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['custom_api']); ?>" size="50" name="mp[gateways][authorizenet-aim][custom_api]" type="text" />
-							</label>
-							</p>
 
 				    </td>
 				  </tr>
@@ -799,8 +753,8 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
   }
 }
 
-if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
-  class MP_Gateway_Worker_AuthorizeNet_AIM
+if(!class_exists('MP_Gateway_Worker_Payflow')) {
+  class MP_Gateway_Worker_Payflow
   {
     var $login;
     var $transkey;
@@ -822,29 +776,18 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
     {
       if ($this->instances == 0)
       {
-	$this->url = $url;
 
-	$this->params['x_delim_data']     = $delim_data;
-	$this->params['x_delim_char']     = $delim_char;
-	$this->params['x_encap_char']     = $encap_char;
-	$this->params['x_relay_response'] = "FALSE";
-	$this->params['x_url']            = "FALSE";
-	$this->params['x_version']        = "3.1";
-	$this->params['x_method']         = "CC";
-	$this->params['x_type']           = "AUTH_CAPTURE";
-	$this->params['x_login']          = $gw_username;
-	$this->params['x_tran_key']       = $gw_tran_key;
-	$this->params['x_test_request']   = $gw_test_mode;
+	   $this->url = $url;
 
-	$this->instances++;
+	   $this->instances++;
       } else {
-	return false;
+	   return false;
       }
     }
 
     function transaction($cardnum)
     {
-      $this->params['x_card_num']  = trim($cardnum);
+      $this->params['ACCT']  = trim($cardnum);
     }
     
     function addLineItem($id, $name, $description, $quantity, $price, $taxable = 0)
@@ -854,53 +797,100 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 
     function process($retries = 1)
     {
-      global $mp;
-      
-      $this->_prepareParameters();
-      $query_string = rtrim($this->fields, "&");
+        global $mp;
+       
 
-      $count = 0;
-      while ($count < $retries)
-      {
-        $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | Authorize.net AIM Plugin/{$mp->version}";
-        $args['body'] = $query_string;
-        $args['sslverify'] = false;
-				$args['timeout'] = 30;
-        
-        //use built in WP http class to work with most server setups
-        $response = wp_remote_post($this->url, $args);
-        
-        if (is_array($response) && isset($response['body'])) {
-          $this->response = $response['body'];
-        } else {
-          $this->response = "";
-          $this->error = true;
-          return;
+        $post_string = '';
+
+        foreach ($this->params as $key => $value) {
+          $post_string .= $key . '[' . strlen(urlencode(utf8_encode(trim($value)))) . ']=' . urlencode(utf8_encode(trim($value))) . '&';
         }
+
+        $post_string = substr($post_string, 0, -1);
+
+        $count = 0;
+
+ 
+        //use built in WP http class to work with most server setups
+        //$response = wp_remote_post($this->url, $args);
         
-	$this->parseResults();
-        
-	if ($this->getResultResponseFull() == "Approved")
-	{
-          $this->approved = true;
-	  $this->declined = false;
-	  $this->error    = false;
-          $this->method   = $this->getMethod();
-	  break;
-	} else if ($this->getResultResponseFull() == "Declined")
-	{
-          $this->approved = false;
-	  $this->declined = true;
-	  $this->error    = false;
-	  break;
-	}
-	$count++;
+
+        $response = $this->sendTransactionToGateway($this->url,$post_string );
+        $response_array = array();
+        parse_str($response, $response_array);
+        $this->results = $response_array;
+        $this->results["METHOD"] = "Sale";
+        if($response_array["RESULT"] == 0)
+        {
+           $this->approved = true;
+           $this->declined = false;
+           $this->error    = false;
+           $this->method   = $this->getMethod();
+        }else
+        {
+           $this->approved = false;
+	     $this->declined = true;
+	     $this->error    = false;
+        }
+ 
+   }
+
+
+    function sendTransactionToGateway($url, $parameters, $headers = null) {
+      $header = array();
+
+      $server = parse_url($url);
+
+      if (!isset($server['port'])) {
+        $server['port'] = ($server['scheme'] == 'https') ? 443 : 80;
       }
+
+      if (!isset($server['path'])) {
+        $server['path'] = '/';
+      }
+
+      if (isset($server['user']) && isset($server['pass'])) {
+        $header[] = 'Authorization: Basic ' . base64_encode($server['user'] . ':' . $server['pass']);
+      }
+
+      if (!empty($headers) && is_array($headers)) {
+        $header = array_merge($header, $headers);
+      }
+
+      if (function_exists('curl_init')) {
+        $curl = curl_init($server['scheme'] . '://' . $server['host'] . $server['path'] . (isset($server['query']) ? '?' . $server['query'] : ''));
+        curl_setopt($curl, CURLOPT_PORT, $server['port']);
+        curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
+        curl_setopt($curl, CURLOPT_FRESH_CONNECT, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
+
+        if (!empty($header)) {
+          curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        }
+
+        $result = curl_exec($curl);
+
+        curl_close($curl);
+      } else {
+        exec(escapeshellarg(MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_CURL) . ' -d ' . escapeshellarg($parameters) . ' "' . $server['scheme'] . '://' . $server['host'] . $server['path'] . (isset($server['query']) ? '?' . $server['query'] : '') . '" -P ' . $server['port'] . ' -k' . (!empty($header) ? ' -H ' . escapeshellarg(implode("\r\n", $header)) : ''), $result);
+        $result = implode("\n", $result);
+      }
+
+      return $result;
     }
+
+
+
+
+
 
     function parseResults()
     {
-      $this->results = explode($this->params['x_delim_char'], $this->response);
+      $this->results = explode("&", $this->response);
     }
 
     function setParameter($param, $value)
@@ -910,16 +900,11 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
       $this->params[$param] = $value;
     }
 
-    function setTransactionType($type)
-    {
-      $this->params['x_type'] = strtoupper(trim($type));
-    }
-
     function _prepareParameters()
     {
       foreach($this->params as $key => $value)
       {
-	$this->fields .= "$key=" . urlencode($value) . "&";
+		$this->fields .= "$key=" . urlencode($value) . "&";
       }
       for($i=0; $i<count($this->line_items); $i++) {
         $this->fields .= "x_line_item={$this->line_items[$i]}&";
@@ -928,22 +913,21 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
     
     function getMethod()
     {
-      if (isset($this->results[51]))
+      if (isset($this->results["METHOD"]))
       {
-        return str_replace($this->params['x_encap_char'],'',$this->results[51]);
+        return $this->results["METHOD"];
       }
       return "";
     }
 
     function getGatewayResponse()
     {
-      return str_replace($this->params['x_encap_char'],'',$this->results[0]);
+      return $this->results["RESULT"];
     }
 
     function getResultResponseFull()
     {
-      $response = array("", "Approved", "Declined", "Error");
-      return $response[str_replace($this->params['x_encap_char'],'',$this->results[0])];
+      return $this->results["RESPMSG"];
     }
 
     function isApproved()
@@ -963,28 +947,28 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 
     function getResponseText()
     {
-      return $this->results[3];
-      $strip = array($this->params['x_delim_char'],$this->params['x_encap_char'],'|',',');
-      return str_replace($strip,'',$this->results[3]);
+      return $this->results["RESPMSG"];
+
     }
 
     function getAuthCode()
     {
-      return str_replace($this->params['x_encap_char'],'',$this->results[4]);
+      return $this->results["AUTHCODE"];
     }
 
     function getAVSResponse()
     {
-      return str_replace($this->params['x_encap_char'],'',$this->results[5]);
+      return true;
     }
 
     function getTransactionID()
     {
-      return str_replace($this->params['x_encap_char'],'',$this->results[6]);
+      return $this->results["PNREF"];
     }
   }
 }
 
+
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_AuthorizeNet_AIM', 'authorizenet-aim', __('Authorize.net AIM Checkout', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_Payflow', 'payflow', __('PayPal Payflow Pro (beta)', 'mp') );
 ?>

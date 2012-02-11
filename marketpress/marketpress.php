@@ -126,6 +126,7 @@ class MarketPress {
     add_action( 'wp_ajax_mp-update-cart', array(&$this, 'update_cart') );
 		add_action( 'wp_ajax_mp-province-field', 'mp_province_field' ); //province field callback for shipping form
 		add_action( 'wp_ajax_nopriv_mp-province-field', 'mp_province_field' );
+		add_action( 'wp_ajax_mp-orders-export', array(&$this, 'export_orders_csv') );
 		add_action( 'wp_logout', array(&$this, 'logout_clear_session') ); //see http://premium.wpmudev.org/forums/topic/security-issue-with-marketpress
 
 		//Relies on post thumbnails for products
@@ -1831,7 +1832,7 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_inventory', array_map('intval', (array)$_POST['mp_inventory']));
 
 			//save true first variation price for sorting
-			if ( isset($_POST['mp_is_sale']) && round($_POST['mp_sale_price'][0], 2) )
+			if ( isset($_POST['mp_is_sale']) )
 				$sort_price = round($_POST['mp_sale_price'][0], 2);
 			else
 				$sort_price = round($_POST['mp_price'][0], 2);
@@ -1898,8 +1899,8 @@ Thanks again!", 'mp')
 						<tr class="variation">
 							<td class="mp_var_col"><input type="text" name="mp_var_name[]" value="<?php echo esc_attr($meta["mp_var_name"][$key]); ?>" /></td>
 							<td class="mp_sku_col"><input type="text" name="mp_sku[]" value="<?php echo esc_attr($meta["mp_sku"][$key]); ?>" /></td>
-							<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="<?php echo ($meta["mp_price"][$key]) ? $this->display_currency($meta["mp_price"][$key]) : '0.00'; ?>" /></td>
-							<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="<?php echo ($meta["mp_sale_price"][$key]) ? $this->display_currency($meta["mp_sale_price"][$key]) : $this->display_currency($meta["mp_price"][$key]); ?>" disabled="disabled" /></td>
+							<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="<?php echo isset($meta["mp_price"][$key]) ? $this->display_currency($meta["mp_price"][$key]) : '0.00'; ?>" /></td>
+							<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="<?php echo isset($meta["mp_sale_price"][$key]) ? $this->display_currency($meta["mp_sale_price"][$key]) : $this->display_currency($meta["mp_price"][$key]); ?>" disabled="disabled" /></td>
               <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="<?php echo intval($meta["mp_inventory"][$key]); ?>" disabled="disabled" /></td>
 							<td class="mp_var_remove">
 							<?php if ($count == $last) { ?><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a><?php } ?>
@@ -3015,7 +3016,106 @@ Thanks again!", 'mp')
 
     return $order;
   }
+	
+	//serves the 'order_paid' : 'order_received'
+	function export_orders_csv() {
+		global $wpdb;
+		
+		//check permissions
+		$post_type_object = get_post_type_object('mp_order');
+    if ( !current_user_can($post_type_object->cap->edit_posts) )
+    	wp_die(__('Cheatin&#8217; uh?'));
+		
+		$query = "SELECT ID, post_title, post_date, post_status FROM {$wpdb->posts} WHERE post_type = 'mp_order'";
+		
+		if (isset($_POST['order_status']) && $_POST['order_status'] != 'all')
+			$query .= $wpdb->prepare(' AND post_status = %s', $_POST['order_status']);
+			
+		// If a month is specified in the querystring, load that month
+		if ( isset($_POST['m']) && $_POST['m'] > 0 ) {
+			$_POST['m'] = '' . preg_replace('|[^0-9]|', '', $_POST['m']);
+			$query .= " AND YEAR($wpdb->posts.post_date)=" . substr($_POST['m'], 0, 4);
+			if ( strlen($_POST['m']) > 5 )
+				$query .= " AND MONTH($wpdb->posts.post_date)=" . substr($_POST['m'], 4, 2);
+			if ( strlen($_POST['m']) > 7 )
+				$query .= " AND DAYOFMONTH($wpdb->posts.post_date)=" . substr($_POST['m'], 6, 2);
+			if ( strlen($_POST['m']) > 9 )
+				$query .= " AND HOUR($wpdb->posts.post_date)=" . substr($_POST['m'], 8, 2);
+			if ( strlen($_POST['m']) > 11 )
+				$query .= " AND MINUTE($wpdb->posts.post_date)=" . substr($_POST['m'], 10, 2);
+			if ( strlen($_POST['m']) > 13 )
+				$query .= " AND SECOND($wpdb->posts.post_date)=" . substr($_POST['m'], 12, 2);
+		}
+			
+		$query .= " ORDER BY post_date DESC";
 
+		$orders = $wpdb->get_results($query);
+
+		// Keep up to 12MB in memory, if becomes bigger write to temp file
+    $file = fopen('php://temp/maxmemory:'. (12*1024*1024), 'r+');
+		fputcsv( $file, array('order_id', 'status', 'received_date', 'paid_date', 'shipped_date', 'tax', 'shipping', 'total', 'coupon_discount', 'coupon_code', 'item_count', 'email', 'name', 'address1', 'address2', 'city', 'state', 'zipcode', 'country', 'phone', 'shipping_method', 'shipping_method_option', 'special_instructions', 'gateway', 'gateway_method', 'payment_currency', 'transaction_id' ) );
+		
+		//loop through orders and add rows
+		foreach ($orders as $order) {
+			$meta = get_post_custom($order->ID);
+
+			//unserialize a and add to object
+			foreach ($meta as $key => $val)
+				$order->$key = maybe_unserialize($meta[$key][0]);
+				
+			$fields = array();
+			$fields['order_id'] = $order->post_title;
+			$fields['status'] = $order->post_status;
+			$fields['received_date'] = $order->post_date;
+			$fields['paid_date'] = isset($order->mp_paid_time) ? date('Y-m-d H:i:s', $order->mp_paid_time) : null;
+			$fields['shipped_date'] = isset($order->mp_shipped_time) ? date('Y-m-d H:i:s', $order->mp_paid_time) : null;
+			$fields['tax'] = $order->mp_tax_total;
+			$fields['shipping'] = $order->mp_shipping_total;
+			$fields['total'] = $order->mp_order_total;
+			$fields['coupon_discount'] = @$order->mp_discount_info['discount'];
+			$fields['coupon_code'] = @$order->mp_discount_info['code'];
+			$fields['item_count'] = $order->mp_order_items;
+			$fields['email'] = @$order->mp_shipping_info['email'];
+			$fields['name'] = @$order->mp_shipping_info['name'];
+			$fields['address1'] = @$order->mp_shipping_info['address1'];
+			$fields['address2'] = @$order->mp_shipping_info['address2'];
+			$fields['city'] = @$order->mp_shipping_info['city'];
+			$fields['state'] = @$order->mp_shipping_info['state'];
+			$fields['zipcode'] = @$order->mp_shipping_info['zip'];
+			$fields['country'] = @$order->mp_shipping_info['country'];
+			$fields['phone'] = @$order->mp_shipping_info['phone'];
+			$fields['shipping_method'] = @$order->mp_shipping_info['shipping_option'];
+			$fields['shipping_method_option'] = @$order->mp_shipping_info['shipping_sub_option'];
+			$fields['special_instructions'] = @$order->mp_shipping_info['email'];
+			$fields['gateway'] = @$order->mp_payment_info['gateway_private_name'];
+			$fields['gateway_method'] = @$order->mp_payment_info['method'];
+			$fields['payment_currency'] = @$order->mp_payment_info['currency'];
+			$fields['transaction_id'] = @$order->mp_payment_info['transaction_id'];
+
+			fputcsv( $file, $fields );
+		}
+		
+		//create our filename
+		$filename = 'orders_export';
+		$filename .= isset($_POST['m']) ? '_' . $_POST['m'] : '';
+		$filename .= '_' . time() . '.csv';
+
+		//serve the file
+		rewind($file);
+		ob_end_clean(); //kills any buffers set by other plugins
+		header('Content-Description: File Transfer');
+		header('Content-Type: text/csv');
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
+		header('Content-Transfer-Encoding: binary');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: public');
+		$output = stream_get_contents($file);
+		header('Content-Length: ' . strlen($output));
+		fclose($file);
+		die($output);
+	}
+	
   //converts the pretty order id to an actual post ID
   function order_to_post_id($order_id) {
     global $wpdb;
@@ -4574,7 +4674,56 @@ Notification Preferences: %s', 'mp');
       <?php } ?>
 
       </form>
-
+			
+			<div class="icon32"><img src="<?php echo $this->plugin_url . 'images/download.png'; ?>" /></div>
+			<h2><?php _e('Export Orders', 'mp'); ?></h2>
+			<form action="<?php echo admin_url('admin-ajax.php?action=mp-orders-export'); ?>" method="post">
+				<?php
+				$months = $wpdb->get_results( $wpdb->prepare( "
+				SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month
+				FROM $wpdb->posts
+				WHERE post_type = %s
+				ORDER BY post_date DESC
+			", 'mp_order' ) );
+	
+			$month_count = count( $months );
+	
+			if ( !$month_count || ( 1 == $month_count && 0 == $months[0]->month ) )
+				return;
+	
+			$m = isset( $_GET['m'] ) ? (int) $_GET['m'] : 0;
+	?>
+			<select name='m'>
+				<option<?php selected( $m, 0 ); ?> value='0'><?php _e( 'Show all dates' ); ?></option>
+	<?php
+			foreach ( $months as $arc_row ) {
+				if ( 0 == $arc_row->year )
+					continue;
+	
+				$month = zeroise( $arc_row->month, 2 );
+				$year = $arc_row->year;
+	
+				printf( "<option %s value='%s'>%s</option>\n",
+					selected( $m, $year . $month, false ),
+					esc_attr( $arc_row->year . $month ),
+					$wp_locale->get_month( $month ) . " $year"
+				);
+			}
+			
+			$status = isset( $_GET['post_status'] ) ? $_GET['post_status'] : 'all';
+	?>
+			</select>
+			<select name="order_status">
+      <option<?php selected( $status, 'all' ); ?> value="all" selected="selected"><?php _e('All Statuses', 'mp'); ?></option>
+      <option<?php selected( $status, 'order_received' ); ?> value="order_received"><?php _e('Received', 'mp'); ?></option>
+      <option<?php selected( $status, 'order_paid' ); ?> value="order_paid"><?php _e('Paid', 'mp'); ?></option>
+      <option<?php selected( $status, 'order_shipped' ); ?> value="order_shipped"><?php _e('Shipped', 'mp'); ?></option>
+      <option<?php selected( $status, 'order_closed' ); ?> value="order_closed"><?php _e('Closed', 'mp'); ?></option>
+      </select>
+			<input type="submit" value="<?php _e('Download &raquo;', 'mp'); ?>" name="export_orders" class="button-secondary" />
+			</form>
+			
+			
       <br class="clear">
     </div>
     <?php
@@ -4721,8 +4870,8 @@ Notification Preferences: %s', 'mp');
           				</td>
                 </tr>
               <?php }
-							//only show if correct country
-              if (is_array($list)) {
+							//only show if correct country or US province
+              if ( is_array($list) || in_array( $settings['base_country'], array('UM','AS','FM','GU','MH','MP','PW','PR','PI') )	) {
               ?>
                 <tr>
         				<th scope="row"><?php _e('Base Zip/Postal Code', 'mp') ?></th>
