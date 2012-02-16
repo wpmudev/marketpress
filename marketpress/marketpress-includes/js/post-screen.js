@@ -105,4 +105,13 @@ jQuery(document).ready(function($) {
 		});
 	}
 	reg_remove_variation();
+	
+	//toggle extra tax field
+	$('#mp_is_special_tax').change(function() {
+    if(this.checked) {
+      $('#mp_special_tax').show();
+		} else {
+      $('#mp_special_tax').hide();
+    }
+	});
 });

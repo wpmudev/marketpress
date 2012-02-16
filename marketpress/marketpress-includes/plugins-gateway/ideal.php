@@ -102,7 +102,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 					'itemPrice'.$i =>  $data['price']*100 // Artikel price in cents
 				);
 				$i++;
-				$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 			}
 			//include shipping as separate product
 			if ( ($shipping_price = $mp->shipping_price()) !== false ) {
@@ -232,7 +232,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$totals = array();
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 			}
 		}
 		$total = array_sum($totals);

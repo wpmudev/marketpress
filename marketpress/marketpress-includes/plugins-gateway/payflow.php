@@ -526,7 +526,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     foreach ($cart as $product_id => $variations) {
       foreach ($variations as $variation => $data) {
 
-        $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+        $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
         $i++;
       }
     }

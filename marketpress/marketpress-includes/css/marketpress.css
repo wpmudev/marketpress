@@ -203,6 +203,19 @@ td.mp_var_remove {
 	margin-bottom: 5px;
 	float: right;
 }
+#mp_tax_rate_div {
+	margin-top: 5px;
+}
+div#mp-meta-details #mp_tax_rate_div label {
+	display: inline;
+}
+#mp_special_tax {
+	margin-left: 15px;
+}
+#mp_special_tax input {
+	text-align: right;
+}
+
 .wp_themeSkin iframe {
   background-color: #FFFFFF !important;
 }
@@ -238,4 +251,68 @@ div.mp-pro-update {
 .mp-pro-update {
 	color: red;
 	font-weight: bold;
+}
+#mp_stats_widget p.sub, #mp_stats_widget .table {
+    margin: -12px;
+}
+#mp_stats_widget .inside {
+    font-size: 12px;
+    padding-top: 20px;
+}
+#mp_stats_widget p.sub {
+    color: #8F8F8F;
+    font-size: 14px;
+    left: 15px;
+    padding: 5px 0 15px;
+    position: absolute;
+    top: -17px;
+}
+#mp_stats_widget .table {
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+#mp_stats_widget .table_content {
+    border-top: 1px solid #ECECEC;
+    float: left;
+    width: 45%;
+}
+#mp_stats_widget .table_discussion {
+    border-top: 1px solid #ECECEC;
+    float: right;
+    width: 45%;
+}
+#mp_stats_widget table td {
+    padding: 3px 0;
+    white-space: nowrap;
+}
+#mp_stats_widget table tr.first td {
+    border-top: medium none;
+}
+#mp_stats_widget td.b {
+    font-size: 14px;
+    padding-right: 6px;
+    text-align: right;
+    width: 1%;
+}
+#mp_stats_widget td.b a {
+    font-size: 18px;
+}
+#mp_stats_widget td.b a:hover {
+    color: #D54E21;
+}
+#mp_stats_widget .t {
+    color: #777777;
+    font-size: 12px;
+    padding-right: 12px;
+    padding-top: 6px;
+}
+#mp_stats_widget .t a {
+    white-space: nowrap;
+}
+#mp_stats_widget .red {
+  color: red;
+}
+#mp_stats_widget .green {
+  color: green;
 }

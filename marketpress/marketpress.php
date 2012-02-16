@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5 Beta 2
+Version: 2.5 Beta 3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.5beta2';
+  var $version = '2.5beta3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -60,7 +60,10 @@ class MarketPress {
 
     //load shortcodes
     include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
-
+		
+		//load stats
+    include_once( $this->plugin_dir . 'marketpress-stats.php' );
+		
     //load sitewide features if WPMU
     if (is_multisite()) {
       include_once( $this->plugin_dir . 'marketpress-ms.php' );
@@ -1843,6 +1846,10 @@ Thanks again!", 'mp')
         delete_post_meta($product_id, 'mp_stock_email_sent');
 
       update_post_meta( $post_id, 'mp_product_link', esc_url_raw($_POST['mp_product_link']) );
+			
+			update_post_meta($post_id, 'mp_is_special_tax', isset($_POST['mp_is_special_tax']) ? 1 : 0);
+			$tax_rate = round(preg_replace("/[^0-9.]/", "", $_POST['mp_special_tax']), 3) * .01;
+			update_post_meta($post_id, 'mp_special_tax', $tax_rate);
 
       //set sales count to zero if none set
       $sale_count = ($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0;
@@ -1871,7 +1878,7 @@ Thanks again!", 'mp')
   	//unserialize
     foreach ($meta as $key => $val) {
 		  $meta[$key] = maybe_unserialize($val[0]);
-		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file")
+		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_is_special_tax" && $key != "mp_special_tax")
 		    $meta[$key] = array($meta[$key]);
 		}
     ?>
@@ -1934,6 +1941,11 @@ Thanks again!", 'mp')
       <label title="<?php _e('Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link.', 'mp'); ?>"><?php _e('External Link', 'mp'); ?>:<br /><small><?php _e('When set this overrides the purchase button with a link to this URL.', 'mp'); ?></small><br />
       <input type="text" style="width: 100%;" id="mp_product_link" name="mp_product_link" value="<?php echo esc_url($meta["mp_product_link"]); ?>" /></label>
     </div>
+		
+		<div id="mp_tax_rate_div">
+		<label title="<?php esc_attr_e('Depending on local tax laws, some items are tax-free or a have different sales tax rate. You can set that here.', 'mp'); ?>"><input type="checkbox" id="mp_is_special_tax" name="mp_is_special_tax" value="1" <?php checked($meta["mp_is_special_tax"]); ?>/> <?php _e('Special Tax Rate?', 'mp'); ?></label>
+		<label id="mp_special_tax"<?php echo ($meta["mp_is_special_tax"]) ? '' : ' style="display:none;"'; ?>><?php _e('Rate:', 'mp'); ?> <input type="text" size="2" name="mp_special_tax" value="<?php echo isset($meta["mp_special_tax"]) ? round($meta["mp_special_tax"] * 100, 3) : 0; ?>" />%</label>
+		</div>
 
     <?php do_action( 'mp_details_metabox' ); ?>
     <div class="clear"></div>
@@ -2014,7 +2026,7 @@ Thanks again!", 'mp')
     $totals = array();
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-			    $totals[] = $this->before_tax_price($data['price']) * $data['quantity'];
+			  $totals[] = $this->before_tax_price($data['price'], $product_id) * $data['quantity'];
 			}
     }
 
@@ -2104,24 +2116,33 @@ Thanks again!", 'mp')
 		
     //get total after any coupons
     $totals = array();
+		$special_totals = array();
     foreach ($cart as $product_id => $variations) {
+			//check for special rate
+			$special = (bool)get_post_meta($product_id, 'mp_is_special_tax', true);
+			if ($special)
+				$special_rate = get_post_meta($product_id, 'mp_special_tax', true);
 			foreach ($variations as $variation => $data) {
-			  $totals[] = $this->before_tax_price($data['price']) * $data['quantity'];
+				if ($special)
+					$special_totals[] = ($this->before_tax_price($data['price'], $product_id) * $data['quantity']) * $special_rate;
+				else
+					$totals[] = $this->before_tax_price($data['price'], false) * $data['quantity'];
 			}
     }
 
     $total = array_sum($totals);
-
+		$special_total = array_sum($special_totals);
+		
     $coupon_code = $this->get_coupon_code();
     if ( $coupon = $this->coupon_value($coupon_code, $total) )
 			$total = $coupon['new_total'];
 
     //add in shipping?
     if ( $settings['tax']['tax_shipping'] && ($shipping_price = $this->shipping_price()) )
-			$total = $total + $shipping_price;
+			$total += $shipping_price;
 
     //check required fields
-    if ( empty($country) || !(is_array($cart) && count($cart)) || $total <= 0 ) {
+    if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
       return false;
     }
 
@@ -2129,34 +2150,34 @@ Thanks again!", 'mp')
 			case 'US':
 			  //USA taxes are only for orders delivered inside the state
 			  if ($country == 'US' && $state == $settings['base_province'])
-			    $price = round($total * $settings['tax']['rate'], 2);
+			    $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
 			  break;
 
 			case 'CA':
 			  //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 				if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
 					if (isset($settings['tax']['canada_rate'][$state]))
-						$price = round($total * $settings['tax']['canada_rate'][$state], 2);
+						$price = round(($total * $settings['tax']['canada_rate'][$state]) + $special_total, 2);
 					else //backwards compat with pre 2.2 if per province rates are not set
-						$price = round($total * $settings['tax']['rate'], 2);
+						$price = round(($total * $settings['tax']['rate']) + $special_total, 2);
 				}
 			  break;
 
 			case 'AU':
 			  //Australia taxes orders in country
 			  if ($country == 'AU')
-			    $price = round($total * $settings['tax']['rate'], 2);
+			    $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
 			  break;
 
 			default:
 			  //EU countries charge VAT within the EU
 			  if ( in_array($settings['base_country'], $this->eu_countries) ) {
 			    if (in_array($country, $this->eu_countries))
-			      $price = round($total * $settings['tax']['rate'], 2);
+			      $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
 			  } else {
 			    //all other countries use the tax outside preference
 			    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country == $settings['base_country']))
-			      $price = round($total * $settings['tax']['rate'], 2);
+			      $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
 			  }
 			  break;
     }
@@ -2172,16 +2193,20 @@ Thanks again!", 'mp')
   }
 	
 	//returns the before tax price for a given amount based on a bunch of foreign tax laws.
-  function before_tax_price($tax_price) {
+  function before_tax_price($tax_price, $product_id = false) {
 		$settings = get_option('mp_settings');
 		
 		//if tax inclusve pricing is turned off just return given price
 		if (!$settings['tax']['tax_inclusive'])
 			return $tax_price;
 		
-		//figure out rate in case its based on a canadian base province
-		$rate =  ('CA' == $settings['base_country']) ? $settings['tax']['canada_rate'][$settings['base_province']] : $settings['tax']['rate'];
-			
+		if ($product_id && get_post_meta($product_id, 'mp_is_special_tax', true)) {
+			$rate = get_post_meta($product_id, 'mp_special_tax', true);
+		} else {
+			//figure out rate in case its based on a canadian base province
+			$rate =  ('CA' == $settings['base_country']) ? $settings['tax']['canada_rate'][$settings['base_province']] : $settings['tax']['rate'];
+		}
+		
 		return round($tax_price / ($rate + 1), 2);
 	}
 
@@ -2869,7 +2894,7 @@ Thanks again!", 'mp')
 		$filtered_cart = $cart;
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-	      $filtered_cart[$product_id][$variation]['price'] = $this->before_tax_price($data['price']);
+	      $filtered_cart[$product_id][$variation]['price'] = $this->before_tax_price($data['price'], $product_id);
 			}
 		}
 		

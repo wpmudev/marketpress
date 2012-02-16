@@ -205,7 +205,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-          $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+          $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 50 ) . '</td>';
@@ -302,7 +302,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-          $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+          $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 75 ) . '</td>';

@@ -951,9 +951,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					if ($data['price'] <= 0)
 						continue;
 					
-				  $totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+				  $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price']));
+				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price'], $product_id));
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
 				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);

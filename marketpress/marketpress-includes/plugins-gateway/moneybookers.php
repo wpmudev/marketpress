@@ -148,7 +148,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 		$product_count = 0;
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 				$product_count++;
 			}
     }
@@ -248,7 +248,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 	    $cart = $mp->get_cart_contents();
 	    foreach ($cart as $product_id => $variations) {
 				foreach ($variations as $data) {
-					$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+					$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 				}
 	    }
 	    $total = array_sum($totals);

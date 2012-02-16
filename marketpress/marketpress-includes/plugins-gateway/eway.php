@@ -169,7 +169,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 		$product_count = 0;
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $mp->before_tax_price($data['price']) * $data['quantity'];
+				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 				$product_count++;
 			}
     }

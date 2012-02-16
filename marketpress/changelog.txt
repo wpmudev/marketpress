@@ -6,16 +6,19 @@ Change Log:
 ----------------------------------------------------------------------
 
 
-2.5 - 2/10/2012 - Aaron Edwards
+2.5 - 2/16/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add a full CSV product importer!
-- Add orders exporting as CSV
+- Add orders exporting as CSV by year and month
 - Add weight based shipping module
 - Add support for calculated shipping modules
-- USPS calculated shipping module!
+- Add USPS calculated shipping module!
+- Add order statistics dashboard widget
 - Add Log entry for cubpoints gateway checkouts
 - Add "Only show on store pages" option to all widgets
 - Add setting to disable excerpts in product lists
+- Add per product special tax rates
+- Add Stripe payment gateway! Accept credit cards directly on your site with full PCI compliance
 - Add custom API url support to Authorize.net gateway for compatibility with many 3rd party gateways
 - Add beta PayPal Payflow Pro gateway
 - Add beta iDEAL gateway (ING bank only)
