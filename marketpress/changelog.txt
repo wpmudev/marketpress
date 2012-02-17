@@ -14,10 +14,12 @@ Change Log:
 - Add support for calculated shipping modules
 - Add USPS calculated shipping module!
 - Add order statistics dashboard widget
+- Add store info to right now widget
 - Add Log entry for cubpoints gateway checkouts
 - Add "Only show on store pages" option to all widgets
 - Add setting to disable excerpts in product lists
 - Add per product special tax rates
+- Add Pro Sites level recognition for multisite: http://premium.wpmudev.org/forums/topic/feature-request-advanced-integration-of-marketpress-and-pro-sites
 - Add Stripe payment gateway! Accept credit cards directly on your site with full PCI compliance
 - Add custom API url support to Authorize.net gateway for compatibility with many 3rd party gateways
 - Add beta PayPal Payflow Pro gateway

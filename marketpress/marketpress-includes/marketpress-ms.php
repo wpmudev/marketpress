@@ -751,7 +751,7 @@ class MarketPress_MS {
         </div>
 
         <p class="submit">
-          <input type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+          <input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
         </p>
       </form>
     </div>
