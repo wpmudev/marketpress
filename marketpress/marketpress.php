@@ -1218,7 +1218,7 @@ Thanks again!", 'mp')
       foreach ($theme_list as $value => $name) {
         if ($network_settings['allowed_themes'][$value] == 'full')
           $allowed_list[$value] = $name;
-        else if (function_exists('is_pro_site') && is_pro_site() && $network_settings['allowed_themes'][$value] == 'supporter')
+        else if ($network_settings['allowed_themes'][$value] == 'supporter' && function_exists('is_pro_site') && is_pro_site(false, $network_settings['themes_pro_level'][$value]))
           $allowed_list[$value] = $name;
         else if (is_super_admin()) //super admins can access all installed themes
           $allowed_list[$value] = $name;
@@ -6005,7 +6005,8 @@ Notification Preferences: %s', 'mp');
                   foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                     if ($network_settings['allowed_gateways'][$code] == 'full') {
                       $allowed_plugins[$code] = $plugin;
-                    } else if (function_exists('is_pro_site') && is_pro_site() && $network_settings['allowed_gateways'][$code] == 'supporter') {
+                    } else if ($network_settings['allowed_gateways'][$code] == 'supporter' && function_exists('is_pro_site') && is_pro_site(false, $network_settings['gateways_pro_level'][$code]) ) {
+											
                       $allowed_plugins[$code] = $plugin;
                     }
                   }

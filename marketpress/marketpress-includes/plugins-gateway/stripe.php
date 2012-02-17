@@ -43,6 +43,10 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		//set names here to be able to translate
 		$this->admin_name = __('Stripe', 'mp');
 		$this->public_name = __('Credit Card', 'mp');
+		
+		$this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
+    $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
+		
 		if (isset($settings['gateways']['stripe']['publishable_key'] ) ) {
 			$this->publishable_key = $settings['gateways']['stripe']['publishable_key'];
 			$this->private_key = $settings['gateways']['stripe']['private_key'];
