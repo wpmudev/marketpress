@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5 Beta 3
+Version: 2.5
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
-Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your <a href="edit.php?post_type=product&page=marketpress">settings</a> then <a href="post-new.php?post_type=product">add some products</a> to your store.
+Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
 Author URI: http://uglyrobot.com
 Text Domain: mp
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.5beta3';
+  var $version = '2.5';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -177,6 +177,7 @@ class MarketPress {
       'ga_ecommerce' => 'none',
 			'special_instructions' => 0,
       'store_theme' => 'icons',
+			'show_img' => 1,
       'product_img_height' => 150,
       'product_img_width' => 150,
       'list_img_height' => 150,
@@ -1422,17 +1423,20 @@ Thanks again!", 'mp')
     //don't filter outside of the loop
   	if ( !in_the_loop() )
 		  return $content;
-
+		
+		$settings = get_option('mp_settings');
+		
     //add thumbnail
-    $content = mp_product_image( false, 'single' ) . $content;
-
-
+		if ($settings['show_img']) {
+			$content = mp_product_image( false, 'single' ) . $content;
+		} 
+		
     $content .= '<div class="mp_product_meta">';
     $content .= mp_product_price(false);
     $content .= mp_buy_button(false, 'single');
     $content .= '</div>';
 
-	$content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
+		$content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
 
     //$content .= mp_tag_list($post->ID, '<div class="mp_product_tags">', ', ', '</div>');
 
@@ -3695,7 +3699,7 @@ Thanks again!", 'mp')
     }
     //coupon line
     if ( $order->mp_discount_info ) {
-      $order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $order->mp_discount_info['discount'];
+      $order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . str_replace('%', __(' Percent', 'mp'), $order->mp_discount_info['discount']); //have to escape % sign so sprintf doesn't choke
     }
     //shipping line
     if ( $order->mp_shipping_total ) {
@@ -5546,6 +5550,13 @@ Notification Preferences: %s', 'mp');
         				<td>
                   <label><input value="1" name="mp[show_quantity]" type="radio"<?php checked($settings['show_quantity'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                   <label><input value="0" name="mp[show_quantity]" type="radio"<?php checked($settings['show_quantity'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        				</td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Show Product Image', 'mp') ?></th>
+        				<td>
+                  <label><input value="1" name="mp[show_img]" type="radio"<?php checked($settings['show_img'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[show_img]" type="radio"<?php checked($settings['show_img'], 0) ?> /> <?php _e('No', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
