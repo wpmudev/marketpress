@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.1 - 2/26/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Fix bugs with iDEAL gateway
+- Add support for multiple iDEAL banks
+- Rename Store Themes to Store Styles to avoid terminology confusion
 
 2.5 - 2/16/2012 - Aaron Edwards
 ----------------------------------------------------------------------

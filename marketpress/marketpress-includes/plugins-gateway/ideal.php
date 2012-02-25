@@ -1,4 +1,4 @@
-<? 
+<?php
 /*
 MarketPress iDeal Gateway Plugin
 Author: Remi Schouten
@@ -7,7 +7,7 @@ Author: Remi Schouten
 class MP_Gateway_IDeal extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-  var $plugin_name = 'ideal-payments';
+  var $plugin_name = 'ideal';
   
   //name of your gateway, for the admin side.
   var $admin_name = '';
@@ -41,12 +41,12 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 
 		//set names here to be able to translate
 		$this->admin_name = __('iDEAL (beta)', 'mp');
-		$this->public_name = (isset($settings['gateways']['ideal-payments']['name'])) ? $settings['gateways']['ideal-payments']['name'] : __('iDEAL', 'mp');
+		$this->public_name = __('iDEAL', 'mp');
 
     $this->method_img_url = $mp->plugin_url . 'images/ideal.png';
 		$this->method_button_img_url = $mp->plugin_url . 'images/ideal.png';
-		$this->merchant_id = $settings['gateways']['ideal-payments']['merchant_id'];
-		$this->ideal_hash = $settings['gateways']['ideal-payments']['ideal_hash'];
+		$this->merchant_id = $settings['gateways']['ideal']['merchant_id'];
+		$this->ideal_hash = $settings['gateways']['ideal']['ideal_hash'];
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');
   	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
 		$this->errorURL = mp_checkout_step_url('checkout') . "?err=1";
@@ -64,10 +64,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		if (isset($_GET['cancel']))
 			echo '<div class="mp_checkout_error">' . __('Your iDEAL transaction has been canceled.', 'mp') . '</div>';
 
-	
-    $settings = get_option('mp_settings');
-    echo $settings['gateways']['ideal-payments']['instructions'];
-	
   }
   
   /**
@@ -82,15 +78,14 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
 	function process_payment_form($cart, $shipping_info) {
 		global $mp;
+		$settings = get_option('mp_settings');
 		
 		$key = $this->ideal_hash; // Your hashkey or Secret key
 		$merchantID = $this->merchant_id; //Your merchant ID
 		$subID = '0'; //Almost always 0
-		$amount = $total*100; //Total amount in cents
 		$purchaseID = $mp->generate_order_id(); //Order ID
-		$_SESSION['order_id'] = $purchaseID;
 		$paymentType = 'ideal'; //Always ideal
-		$validUntil = date('Y-m-d\TH:i:s.000\Z', time()+900); //Validation timer, timer in seconds	
+		$validUntil = date('Y-m-d\TG:i:s\Z', strtotime('+1 hour'));
 		
 		$i = 1;
 		foreach ($cart as $product_id => $variations) {
@@ -99,40 +94,44 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 					'itemNumber'.$i => $data['SKU'], // Article number
 					'itemDescription'.$i => $data['name'], // Description
 					'itemQuantity'.$i => $data['quantity'], // Quantity
-					'itemPrice'.$i =>  $data['price']*100 // Artikel price in cents
+					'itemPrice'.$i =>  round($data['price']*100) // Artikel price in cents
 				);
 				$i++;
 				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
-			}
-			//include shipping as separate product
-			if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-				
 			}
 		}
 		$total = array_sum($totals);
 	
 		if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-		$total = $coupon['new_total'];
+			$total = $coupon['new_total'];
 		}
 		
 		//shipping line
 		if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-			$total = $total + $shipping_price;
+			$total += $shipping_price;
 			//Add shipping as separate product
 			$items[] = array(
-				'itemNumber'.$i => '99999999', // Product number
-				'itemDescription'.$i => 'Shipping', // Description
+				'itemNumber'.$i => '99999998', // Product number
+				'itemDescription'.$i => __('Shipping', 'mp'), // Description
 				'itemQuantity'.$i => 1, // Quantity
-				'itemPrice'.$i => $shipping_price*100  // Product price in cents
+				'itemPrice'.$i => round($shipping_price*100) // Product price in cents
 			);
+			$i++;
 		}
 		
 		//tax line
 		if ( ($tax_price = $mp->tax_price()) !== false ) {
-		$total = $total + $tax_price;
+			$total = $total + $tax_price;
+			//Add tax as separate product
+			$items[] = array(
+				'itemNumber'.$i => '99999999', // Product number
+				'itemDescription'.$i => __('Tax', 'mp'), // Description
+				'itemQuantity'.$i => 1, // Quantity
+				'itemPrice'.$i => round($tax_price*100)  // Product price in cents
+			);
 		}
 		
-		$total = /*--> EDIT */ $_SESSION['total_price']*100;
+		$total = round($total * 100);
 		$shastring = "$key$merchantID$subID$total$purchaseID$paymentType$validUntil";
 		
 		$i = 1;
@@ -141,43 +140,56 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 			$i++;
 		}
 		
-		echo '<p>'.$shastring.'</p>';
-		//Replace unwanted characters
-		$shastring = preg_replace(array("/[ \t\n]/", '/&amp;/i', '/&lt;/i', '/&gt;/i', '/&quot/i'), array( '', '&', '<', '>', '"'), $shastring);
-		
-		
-		$shasign = sha1($shastring);//Encrypt the string
-		
+		// Remove HTML Entities
+		$shastring = html_entity_decode($shastring);
+
+		// Remove space characters: "\t", "\n", "\r" and " "
+		$shastring = str_replace(array("\t", "\n", "\r", " "), '', $shastring);
+
+		// Generate hash
+		$shasign = sha1($shastring);
+
 		// Other variables not part of the hash
 		$language = 'nl'; # preferred '' for consistent texts, also quicker
 		$currency = 'EUR';
-		$description = 'Chibishoe';
+		$description = substr( sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id), 0, 32 );
 		$urlSuccess = $this->returnURL;
 		$urlCancel = $this->cancelURL;
 		$urlError = $this->errorURL;
 		
-		$redirectURL = 'https://ideal.secure-ing.com/ideal/mpiPayInitIng.do?';
+		//setup bank specific urls
+		$test = ($settings['gateways']['ideal']['mode'] == 'test');
+		if ($settings['gateways']['ideal']['mode'] == 'ing')
+			$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.secure-ing.com/ideal/mpiPayInitIng.do?';
+		else if ($settings['gateways']['ideal']['mode'] == 'rabo')
+			$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.rabobank.nl/ideal/mpiPayInitRabo.do?';
+		else if ($settings['gateways']['ideal']['mode'] == 'fries')
+			$redirectURL = 'https://' . ($test ? 'test' : '') . 'idealkassa.frieslandbank.nl/ideal/mpiPayInitFriesland.do?';
+		else if ($settings['gateways']['ideal']['mode'] == 'abn')
+			$redirectURL = 'https://abnamro' . ($test ? '-test' : '') . '.ideal-payment.de/ideal/mpiPayInitFortis.do?';
+		else
+			$redirectURL = 'https://www.ideal-simulator.nl/lite/?';
+			
 		$redirectURL .= 'merchantID='.$merchantID;
 		$redirectURL .='&subID='.$subID;
 		$redirectURL .='&amount='.$total;
 		$redirectURL .='&purchaseID='.$purchaseID;
 		$redirectURL .='&language='.$language;
 		$redirectURL .='&currency='.$currency;
-		$redirectURL .='&description='.$description;
+		$redirectURL .='&description='.urlencode($description);
 		$redirectURL .='&hash='.$shasign;
 		$redirectURL .='&paymentType='.$paymentType;
 		$redirectURL .='&validUntil='.$validUntil;
 		
 		$i = 1;
-		foreach ($items as $item){
+		foreach ($items as $item) {
 			$redirectURL .= '&itemNumber'.$i.'='.$item['itemNumber'.$i].'&itemDescription'.$i.'='.$item['itemDescription'.$i].'&itemQuantity'.$i.'='.$item['itemQuantity'.$i].'&itemPrice'.$i.'='.$item['itemPrice'.$i];	
 			$i++;
 		}
 	
-		$redirectURL .='&urlSuccess='.$urlSuccess;
-		$redirectURL .='&urlCancel='.$urlCancel;
-		$redirectURL .='&urlError='.$urlError;
-		$redirectURL .='&submit2=vestuur';
+		$redirectURL .='&urlSuccess='.urlencode($urlSuccess);
+		$redirectURL .='&urlCancel='.urlencode($urlCancel);
+		$redirectURL .='&urlError='.urlencode($urlError);
 		
 		//echo $redirectURL;
 		wp_redirect($redirectURL);
@@ -294,11 +306,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 	function order_confirmation_email($msg, $order) {
     global $mp;
 		$settings = get_option('mp_settings');
-	  
-	  if (isset($settings['gateways']['ideal-payments']['email']))
-		  $msg = $mp->filter_email($order, $settings['gateways']['ideal-payments']['email']);
-		else
-		  $msg = $settings['email']['new_order_txt'];
 		  
     return $msg;
   }
@@ -313,7 +320,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
     global $mp;
     $settings = get_option('mp_settings');
     
-    return $content . str_replace( 'TOTAL', $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $settings['gateways']['ideal-payments']['confirmation'] );
+    return $content;
   }
 	
 	/**
@@ -323,72 +330,46 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
 	function gateway_settings_box($settings) {
     global $mp;
-    $settings = get_option('mp_settings');
-		if (!isset($settings['gateways']['ideal-payments']['name']))
-		  $settings['gateways']['ideal-payments']['name'] = __('iDeal', 'mp');
-		  
-		if (!isset($settings['gateways']['ideal-payments']['email']))
-		  $settings['gateways']['ideal-payments']['email'] = $settings['email']['new_order_txt'];
-		  
     ?>
-    <div id="mp_manual_payments" class="postbox mp-pages-msgs">
+    <div class="postbox">
     	<h3 class='handle'><span><?php _e('iDEAL Settings', 'mp'); ?></span></h3>
       <div class="inside">
 				<a href="http://www.ideal.nl/?lang=eng-GB" target="_blank"><img src="<?php echo $mp->plugin_url . 'images/ideal.png'; ?>" /></a>
         
-	      <p class="description"><?php _e('To make it easier to pay for online products and services, the Dutch banking community has developed the iDEAL online payment method. iDEAL allows online payments to be made using online banking. Currently this Beta only supports ING banking.', 'mp') ?></p>
+	      <p class="description"><?php _e('To make it easier to pay for online products and services, the Dutch banking community has developed the iDEAL online payment method. iDEAL allows online payments to be made using online banking in EUR only.', 'mp') ?></p>
 	      <table class="form-table">
+					<tr>
+					<th scope="row"><?php _e('Bank', 'mp') ?></th>
+					<td>
+					<select name="mp[gateways][ideal][bank]">
+	          <option value="ing"<?php selected($settings['gateways']['ideal']['bank'], 'ing') ?>><?php _e('ING Bank', 'mp') ?></option>
+	          <option value="rabo"<?php selected($settings['gateways']['ideal']['bank'], 'rabo') ?>><?php _e('Rabobank', 'mp') ?></option>
+	          <option value="fries"<?php selected($settings['gateways']['ideal']['bank'], 'fries') ?>><?php _e('Friesland Bank', 'mp') ?></option>
+	          <option value="abn"<?php selected($settings['gateways']['ideal']['bank'], 'abn') ?>><?php _e('ABN Amro Bank', 'mp') ?></option>
+	          <option value="sim"<?php selected($settings['gateways']['ideal']['bank'], 'sim') ?>><?php _e('iDEAL Simulator (for testing)', 'mp') ?></option>
+	        </select>
+					</td>
+	        </tr>
 		     <tr>
 				  <th scope="row"><label for="ideal-key"><?php _e('Merchant ID', 'mp') ?></label></th>
-				  <td>
-		  		 
-		          <input value="<?php echo esc_attr($settings['gateways']['ideal-payments']['merchant_id']); ?>" style="width: 100%;" name="mp[gateways][ideal-payments][merchant_id]" id="merchant_id" type="text" />
-		          
+				  <td>	  		 
+		          <input value="<?php echo esc_attr($settings['gateways']['ideal']['merchant_id']); ?>" name="mp[gateways][ideal][merchant_id]" id="merchant_id" type="text" />   
 		        </td>
 	         </tr>
-			 <tr>
-				  <th scope="row"><label for="ideal-hash"><?php _e('iDeal Secret Key', 'mp') ?></label></th>
+					<tr>
+				  <th scope="row"><label for="ideal-hash"><?php _e('iDEAL Secret Key', 'mp') ?></label></th>
 				  <td>
-		  		  
-		          <input value="<?php echo esc_attr($settings['gateways']['ideal-payments']['ideal_hash']); ?>" style="width: 100%;" name="mp[gateways][ideal-payments][ideal_hash]" id="ideal_hash" type="text" />
-		          
-		        </td>
-	         </tr>
-			 <tr>
-						<th scope="row"><label for="ideal-payments-name"><?php _e('Method Name', 'mp') ?></label></th>
-						<td>
-		  				<span class="description"><?php _e('Enter a public name for this payment method that is displayed to users - No HTML', 'mp') ?></span>
-		          <p>
-		          <input value="<?php echo esc_attr($settings['gateways']['ideal-payments']['name']); ?>" style="width: 100%;" name="mp[gateways][ideal-payments][name]" id="ideal-payments-name" type="text" />
-		          </p>
-		        </td>
-	        </tr>
-		      <tr>
-		        <th scope="row"><label for="ideal-payments-instructions"><?php _e('User Instructions', 'mp') ?></label></th>
-		        <td>
-		        <span class="description"><?php _e('These are the iDeal instructions to display on the payments screen - HTML allowed', 'mp') ?></span>
-	          <p>
-	            <textarea id="ideal-payments-instructions" name="mp[gateways][ideal-payments][instructions]" class="mp_msgs_txt"><?php echo esc_textarea($settings['gateways']['ideal-payments']['instructions']); ?></textarea>
-	          </p>
-	        	</td>
-	        </tr>
-	        <tr>
-		        <th scope="row"><label for="ideal-payments-confirmation"><?php _e('Confirmation User Instructions', 'mp') ?></label></th>
-		        <td>
-		        <span class="description"><?php _e('These are the iDeal instructions to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed', 'mp') ?></span>
-	          <p>
-	            <textarea id="ideal-payments-confirmation" name="mp[gateways][ideal-payments][confirmation]" class="mp_msgs_txt"><?php echo esc_textarea($settings['gateways']['ideal-payments']['confirmation']); ?></textarea>
-	          </p>
-	        	</td>
-	        </tr>
-	        <tr>
-		        <th scope="row"><label for="ideal-payments-email"><?php _e('Order Confirmation Email', 'mp') ?></label></th>
-		        <td>
-		        <span class="description"><?php _e('This is the email text to send to those who have made iDeal checkouts. You should include your iDeal instructions here. It overrides the default order checkout email. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp') ?></span>
-	          <p>
-	            <textarea id="ideal-payments-email" name="mp[gateways][ideal-payments][email]" class="mp_emails_txt"><?php echo esc_textarea($settings['gateways']['ideal-payments']['email']); ?></textarea>
-	          </p>
-	        	</td>
+						<input value="<?php echo esc_attr($settings['gateways']['ideal']['ideal_hash']); ?>" name="mp[gateways][ideal][ideal_hash]" id="ideal_hash" type="text" />
+					</td>
+				 </tr>
+					<tr>
+					<th scope="row"><?php _e('Mode', 'mp') ?></th>
+					<td>
+					<select name="mp[gateways][ideal][mode]">
+	          <option value="test"<?php selected($settings['gateways']['ideal']['mode'], 'test') ?>><?php _e('Testing', 'mp') ?></option>
+	          <option value="live"<?php selected($settings['gateways']['ideal']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
+	        </select>
+					</td>
 	        </tr>
       	</table>
       </div>
@@ -401,7 +382,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    *  array. Don't forget to return!
    */
 	function process_gateway_settings($settings) {
-  	}
+		return $settings;
+	}
   
 	/**
    * Use to handle any payment returns to the ipn_url. Do not display anything here. If you encounter errors
@@ -412,5 +394,5 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
   }
 }
 
-mp_register_gateway_plugin( 'MP_Gateway_IDeal', 'ideal-payments', __('iDEAL (beta)', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_IDeal', 'ideal', __('iDEAL (beta)', 'mp') );
 ?>

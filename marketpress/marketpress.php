@@ -2118,6 +2118,8 @@ Thanks again!", 'mp')
 				$state = $settings['base_province'];
 		}
 		
+		//TODO calculate all taxes per product before rounding
+		
     //get total after any coupons
     $totals = array();
 		$special_totals = array();
@@ -5514,12 +5516,12 @@ Notification Preferences: %s', 'mp');
             <h3 class='hndle'><span><?php _e('General Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
-        				<th scope="row"><?php _e('Store Theme', 'mp') ?></th>
+        				<th scope="row"><?php _e('Store Style', 'mp') ?></th>
         				<td>
                   <?php $this->store_themes_select(); ?>
                   <br /><span class="description"><?php _e('This option changes the built-in css styles for store pages.', 'mp') ?></span>
                   <?php if ((is_multisite() && is_super_admin()) || !is_multisite()) { ?>
-                  <br /><span class="description"><?php _e('For a custom css theme, save your css file with the "MarketPress Theme: NAME" header in the "/marketpress/css/themes/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="' . $this->plugin_url . 'themes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp') ?></span>
+                  <br /><span class="description"><?php _e('For a custom css style, save your css file with the "MarketPress Style: NAME" header in the "/marketpress/marketpress-includes/themes/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="' . $this->plugin_url . 'themes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp') ?></span>
                   <h4><?php _e('Full-featured MarketPress Themes:', 'mp') ?></h4>
 									<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/frame-market-theme"><img alt="FrameMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/219/listing-image-thumb.png" />
 										<strong><?php _e('FrameMarket/GridMarket', 'mp') ?></strong></a><br />
