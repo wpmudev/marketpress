@@ -1449,7 +1449,9 @@ function mp_global_products_nav_link( $args = '' ) {
 	if ($paged < 2 || $paged >= $max_pages) {
 		$sep = '';
 	}
-
+	
+	$return = '';
+	
 	if ( $max_pages > 1 ) {
 		//previous
 		if ( $paged > 1 ) {
@@ -1470,6 +1472,8 @@ function mp_global_products_nav_link( $args = '' ) {
 		}
 		
 	}
+	
+	$return = '<div id="mp_global_products_nav_links">' . $return . '</div>';
 	
 	if ($echo)
 		echo $return;

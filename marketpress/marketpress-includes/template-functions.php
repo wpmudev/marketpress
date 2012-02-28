@@ -1643,7 +1643,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
     $link = $temp[0];
 
     $title = __('View Larger Image &raquo;', 'mp');
-    $class = ' class="mp_product_image_link mp_lightbox"';
+    $class = ' class="mp_product_image_link mp_lightbox" rel="lightbox"';
 
   } else if ($context == 'widget') {
     //size

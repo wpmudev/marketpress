@@ -625,19 +625,12 @@ Thanks again!", 'mp')
     if (!$settings['show_lightbox'])
       return;
 
-    wp_enqueue_style( 'jquery-lightbox', $this->plugin_url . 'lightbox/css/jquery.lightbox-0.5.css', false, $this->version );
-    wp_enqueue_script( 'jquery-lightbox', $this->plugin_url . 'lightbox/js/jquery.lightbox-0.5.pack.js', array('jquery'), $this->version );
+    wp_enqueue_style( 'jquery-lightbox', $this->plugin_url . 'lightbox/style/lumebox.css', false, $this->version );
+    wp_enqueue_script( 'jquery-lightbox', $this->plugin_url . 'lightbox/js/jquery.lumebox.min.js', array('jquery'), $this->version, true );
 
     // declare the variables we need to access in js
-    $js_vars = array( 'imageLoading' => $this->plugin_url . 'lightbox/images/lightbox-ico-loading.gif',
-                      'imageBtnClose' => $this->plugin_url . 'lightbox/images/lightbox-btn-close.gif',
-                      'imageBtnPrev' => $this->plugin_url . 'lightbox/images/lightbox-btn-prev.gif',
-                      'imageBtnNext' => $this->plugin_url . 'lightbox/images/lightbox-btn-next.gif',
-                      /* For lightbox Product # of # display */
-                      'txtImage' => __('Product', 'mp'),
-                      'txtOf' => __('of', 'mp')
-                    );
-    wp_localize_script( 'jquery-lightbox', 'MP_Lightbox', $js_vars );
+    $js_vars = array( 'graphicsDir' => $this->plugin_url . 'lightbox/style/' );
+    wp_localize_script( 'jquery-lightbox', 'lumeboxOptions', $js_vars );
   }
 
 	//if cart widget is not in a sidebar, add it to the top of the first sidebar. Only runs at initial install
@@ -3765,8 +3758,8 @@ Thanks again!", 'mp')
 		$order_total = number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
 
     //tracking URL
-    $tracking_url = mp_orderstatus_link(false, true) . $order->post_title . '/';
-
+		$tracking_url = apply_filters('wpml_marketpress_tracking_url', mp_orderstatus_link(false, true) . $order->post_title . '/');
+		
     //setup filters
     $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
     $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
@@ -3785,11 +3778,11 @@ Thanks again!", 'mp')
     $order = $this->get_order($order_id);
     if (!$order)
       return false;
-
-    $subject = $this->filter_email($order, stripslashes($settings['email']['new_order_subject']));
-    $msg = $this->filter_email($order, stripslashes($settings['email']['new_order_txt']));
-    $msg = apply_filters( 'mp_order_notification_' . $_SESSION['mp_payment_method'], $msg, $order );
-
+		
+		$subject = apply_filters('mp_order_notification_subject', $this->filter_email($order, stripslashes($settings['email']['new_order_subject'])), $order);
+		$msg = apply_filters('mp_order_notification_body', $this->filter_email($order, stripslashes($settings['email']['new_order_txt'])), $order);
+		$msg = apply_filters('mp_order_notification_' . $_SESSION['mp_payment_method'], $msg, $order );
+		
     $this->mail($order->mp_shipping_info['email'], $subject, $msg);
 
     //send message to admin
