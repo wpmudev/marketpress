@@ -5,12 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.5.1 - 2/26/2012 - Aaron Edwards
+2.5.1 - 2/29/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix bugs with iDEAL gateway
 - Add support for multiple iDEAL banks
 - Rename Store Themes to Store Styles to avoid terminology confusion
-- switch lightbox to GPL compatible lumebox
+- Switch lightbox to GPL compatible lumebox
+- WPML compatibility fixes
 
 2.5 - 2/16/2012 - Aaron Edwards
 ----------------------------------------------------------------------
