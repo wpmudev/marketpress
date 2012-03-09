@@ -259,8 +259,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		global $mp;
 		$settings = get_option('mp_settings');
 		
-		switch ($settings['base_country']) 
-		{
+		switch ($settings['base_country']) {
 			case 'US':
 			for ($i = $settings['shipping']['table-rate']['rowcount'] - 1; $i >= 0; $i--) 
 				{
@@ -282,19 +281,19 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 				}
 		break;
 		case 'CA':
-			for ($i = $settings['shipping']['table-rate']['rowcount'] - 1; $i >= 0; $i--) 
+			for ($i = $settings['shipping']['table-rate']['rowcount'] - 1; $i >= 0; $i--)
+			{
+				if ($total >= $settings['shipping']['table-rate'][$i]['mincost'])
 				{
-				if ($total >= $settings['shipping']['table-rate'][$i]['mincost']) 
-					{
-					if ($country == 'CA') 
+					if ($country == 'CA')
 						$price = $settings['shipping']['table-rate'][$i]['in_country'];
 					else if ($country == 'US')
 						$price = $settings['shipping']['table-rate'][$i]['usa'];
 					else
 						$price = $settings['shipping']['table-rate'][$i]['international'];
+					break;
 				}
-				break;
-				}
+			}
 		break;
 		default:
 			for ($i = $settings['shipping']['table-rate']['rowcount'] - 1; $i >= 0; $i--) 

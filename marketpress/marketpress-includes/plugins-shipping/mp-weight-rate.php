@@ -293,7 +293,7 @@ function calculate_shipping($price, $total, $cart, $address1, $address2, $city, 
 						$price = $settings['shipping']['weight-rate'][$i]['canada'];
 				  	else
 						$price = $settings['shipping']['weight-rate'][$i]['international'];
-					break;
+						break;
 			  	}
 		  	}
 		break;
@@ -308,9 +308,9 @@ function calculate_shipping($price, $total, $cart, $address1, $address2, $city, 
 						$price = $settings['shipping']['weight-rate'][$i]['usa'];
 					else
 						$price = $settings['shipping']['weight-rate'][$i]['international'];
-				}
-				break;
-		  	}
+					break;
+				}				
+		  }
 		break;
 		default:
 			for ($i = $settings['shipping']['weight-rate']['rowcount'] - 1; $i >= 0; $i--)

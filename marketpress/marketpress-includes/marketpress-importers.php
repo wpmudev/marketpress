@@ -96,7 +96,13 @@ class WP_eCommerceImporter extends MarketPress_Importer {
 	
 				<p><?php printf( __('It appears that you have %s products from WP e-Commerce. Click below to begin your import!', 'mp'), number_format_i18n($num_products) ); ?></p>
 				<?php
-				$this->import_button(); 
+				if ( class_exists('WP_eCommerce') ) {
+					$this->import_button();
+				} else {
+					?>
+					<p><?php _e('Please activate the WP e-Commerce plugin to import these products.', 'mp'); ?></p>
+					<?php
+				}
 	    } else { //no products
         ?>
 				<p><?php printf( __('It appears you have no products from WP e-Commerce to import. Check that the plugin is updated to the latest version (the importer only works with >3.8).', 'mp'), wp_nonce_url(admin_url('plugins.php?action=deactivate&plugin=wp-e-commerce%2Fwp-shopping-cart.php'), 'deactivate-plugin_wp-e-commerce/wp-shopping-cart.php') ); ?></p>
@@ -165,10 +171,14 @@ class WP_eCommerceImporter extends MarketPress_Importer {
 			if (!empty($meta_data['external_link']))
 				update_post_meta($new_id, 'mp_product_link', esc_url_raw($meta_data['external_link']));
 
-			//add extra shipping
-			if (isset($meta_data['shipping']['local']) && $meta_data['shipping']['local'])
-				update_post_meta($new_id, 'mp_shipping', array( 'extra_cost' => $meta_data['shipping']['local'] ) );
-
+			//add shipping info
+			$shipping = array();
+			if (!empty($meta_data['shipping']['local']))
+				$shipping['extra_cost'] = round( (float)preg_replace('/[^0-9.]/', '', $meta_data['shipping']['local']), 2 );
+			if (!empty($meta_data['weight']))
+				$shipping['weight'] = round( (float)preg_replace('/[^0-9.]/', '', $meta_data['weight']), 2 );
+			update_post_meta($new_id, 'mp_shipping', $shipping);
+			
 			//add thumbnail
 			if (isset($meta['_thumbnail_id'][0])) { //if featured image is set
 				update_post_meta($new_id, '_thumbnail_id', $meta['_thumbnail_id'][0]);
