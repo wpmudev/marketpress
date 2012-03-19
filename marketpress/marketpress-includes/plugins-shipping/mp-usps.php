@@ -46,7 +46,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 	private $settings = '';
 	private $usps_settings;
-	
+
 	private $pkg_count = 0;
 	private $pkg_weight = 0;
 
@@ -104,15 +104,15 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		);
 
 		$this->intl_services = array(
-		'Express Mail International' => 
+		'Express Mail International' =>
 		array( 'service' => 1, 'name' => __('Express Mail International', 'mp')),
-		
+
 		'Express Mail International Flat Rate Boxes' =>
 		array( 'service' => 26, 'name' => __('Express Mail International Flat Rate Boxes', 'mp')),
-		
+
 		'Priority Mail International' =>
 		array( 'service' => 2, 'name' => __('Priority Mail International', 'mp')),
-		
+
 		'Priority Mail International Large Flat Rate Boxes' =>
 		array( 'service' => 11, 'name' => __('Priority Mail International Large Flat Rate Boxes', 'mp')),
 
@@ -121,7 +121,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		'Priority Mail International Small Flat Rate Boxes' =>
 		array( 'service' => 16, 'name' => __('Priority Mail International Small Flat Rate Boxes', 'mp')),
-		
+
 		'First Class International Parcel' =>
 		array( 'service' => 15, 'name' => __('First Class International Parcel', 'mp')),
 
@@ -444,19 +444,19 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	}
 
 	/**
-		* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
-		*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
-		*
-		* @param array $cart, the contents of the shopping cart for advanced calculations
-		* @param string $address1
-		* @param string $address2
-		* @param string $city
-		* @param string $state, state/province/region
-		* @param string $zip, postal code
-		* @param string $country, ISO 3166-1 alpha-2 country code
-		*
-		* return array $shipping_options 
-		*/
+	* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
+	*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
+	*
+	* @param array $cart, the contents of the shopping cart for advanced calculations
+	* @param string $address1
+	* @param string $address2
+	* @param string $city
+	* @param string $state, state/province/region
+	* @param string $zip, postal code
+	* @param string $country, ISO 3166-1 alpha-2 country code
+	*
+	* return array $shipping_options
+	*/
 	function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
 		global $mp;
 
@@ -467,7 +467,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			// Format the returned array for display in the drop down
 			$shipping_options = array();
 			foreach ($_SESSION['mp_shipping_options'] as $service => $item) {
-			  $shipping_options[$service] = $this->format_shipping_option($service, $item['rate'], $item['delivery']);
+				$shipping_options[$service] = $this->format_shipping_option($service, $item['rate'], $item['delivery']);
 			}
 			//All done
 			return $shipping_options;
@@ -486,7 +486,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->machinable = 'true';
 		$this->size = 'REGULAR';
 
-		$this->country = $country;	
+		$this->country = $country;
 		$this->destination_zip = $zip;
 
 		foreach ($cart as $product_id => $variations) {
@@ -518,7 +518,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->machinable = ($this->pkg_weight > 35) ? 'false' : $this->machinable;
 
 
-    if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			$shipping_options = $this->ratev4_request();
 		} else {
 			$shipping_options = $this->ratev2_request();
@@ -628,7 +628,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			$dom->loadHTML($body);
 			libxml_clear_errors();
 		}
-
 
 		//Process the return XML
 
@@ -934,7 +933,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 $settings = get_option('mp_settings');
 
 if (in_array($settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
-  mp_register_shipping_plugin( 'MP_Shipping_USPS', 'usps', __('USPS', 'mp'), true );
+	mp_register_shipping_plugin( 'MP_Shipping_USPS', 'usps', __('USPS', 'mp'), true );
 }
 
 ?>
