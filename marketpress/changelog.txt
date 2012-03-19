@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.4 - 3/19/2012 - Arnold Bailey
+----------------------------------------------------------------------
+- Fixed improper switching to V2 rate schedule on foreign orders in USPS module
+
+
 2.5.3 - 3/09/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix table/weight rate shipping calculations for Canada - props shaunmacrae
