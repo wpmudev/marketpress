@@ -8,7 +8,7 @@ Basic Styles:
   Basic styles are comprised of a css file and an optional images folder that is loaded
   and applied on store pages. To create a basic style:
   
-  1. Create a css file in the /marketpress/themes/ directory with your custom styles. It
+  1. Create a css file in the /wp-content/marketpress-styles/ directory with your custom styles. It
       may be easiest to copy our default.css theme and modify it.
   2. Make sure to add the custom theme header with your theme's name at the top of the css file:
       /*
@@ -16,7 +16,7 @@ Basic Styles:
       */
       Including this header will cause your custom theme to show in the dropdown on the
       Store Settings -> Presentation page so it may be selected.
-  3. You can also optionally create a directory for your images in the /themes/ folder and
+  3. You can also optionally create a subdirectory for your css images in the /wp-content/marketpress-styles/ folder and
       link to images within it with relative urls like "image-folder/my-image.jpg".
       
 

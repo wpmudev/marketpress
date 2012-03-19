@@ -1266,7 +1266,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
 
   $content = '<div id="mp_product_list">';
 
-  if ($last = count($custom_query->posts)) {
+  if ($last = $custom_query->post_count) {
     $count = 1;
     foreach ($custom_query->posts as $post) {
 
@@ -1309,6 +1309,52 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     return $content;
 }
 
+
+/*
+ * function mp_product
+ * Displays a single product according to preference
+ * 
+ * @param bool $echo Optional, whether to echo or return
+ * @param int $product_id the ID of the product to display
+ * @param bool $title Whether to display the title
+ * @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'
+ * @param bool/string $image Whether and what context of image size to display. Options are false, 'single', or 'list'. Default 'single'
+ * @param bool $meta Whether to display the product meta
+ */
+function mp_product($echo = true, $product_id, $title = true, $content = 'full', $image = 'single', $meta = true) {
+  global $mp;
+  $post = get_post($product_id);
+
+  $content = '<div '.mp_product_class(false, 'mp_product', $post->ID).'>';
+  if ($title)
+    $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
+  
+  if ($content) {
+    $content .= '<div class="mp_product_content">';
+    if ($image)
+      $content .= mp_product_image( false, $image, $post->ID );
+    if ($content == 'excerpt')
+      $content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+    else
+      $content .= apply_filters('the_content', $post->post_content);
+    $content .= '</div>';
+  }
+  
+  if ($meta) {
+    $content .= '<div class="mp_product_meta">';
+    //price
+    $content .= mp_product_price(false, $post->ID);
+    //button
+    $content .= mp_buy_button(false, 'single', $post->ID);
+    $content .= '</div>';
+  }
+  $content .= '</div>';
+      
+  if ($echo)
+    echo $content;
+  else
+    return $content;
+}
 
 /**
  * Retrieve product's category list in either HTML list or custom format.

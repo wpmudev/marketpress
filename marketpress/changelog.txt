@@ -5,10 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.5.4 - 3/19/2012 - Arnold Bailey
+2.5.4 - 3/19/2012 - Aaron Edwards
 ----------------------------------------------------------------------
-- Fixed improper switching to V2 rate schedule on foreign orders in USPS module
-
+- Four new shortcodes! [mp_product] (display a single product anywhere!), [mp_product_image], [mp_buy_button], [mp_product_price]
+- Add support for custom css files in /wp-content/marketpress-styles/ folder to avoid overwriting on updates
+- Fixed improper switching to V2 rate schedule on foreign orders in USPS module - Arnold Bailey
+- Genesis compatibility improvements with it's featured images settings
+- Fix bug with message display when there are no products in the product list or shortcode
 
 2.5.3 - 3/09/2012 - Aaron Edwards
 ----------------------------------------------------------------------

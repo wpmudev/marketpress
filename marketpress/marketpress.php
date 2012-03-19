@@ -894,6 +894,11 @@ Thanks again!", 'mp')
         $wp_query->is_single = null;
         $wp_query->is_page = 1;
         add_filter( 'the_content', array(&$this, 'product_theme'), 99 );
+				
+				//genesis fixes
+				remove_action( 'genesis_post_content', 'genesis_do_post_image' );
+				remove_action( 'genesis_post_content', 'genesis_do_post_content' );
+				add_action('genesis_post_content', 'the_content');
       }
 
       $this->is_shop_page = true;
@@ -1056,6 +1061,11 @@ Thanks again!", 'mp')
 				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
         add_filter( 'the_content', array(&$this, 'product_list_theme'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
+				
+				//genesis fixes
+				remove_action( 'genesis_post_content', 'genesis_do_post_image' );
+				remove_action( 'genesis_post_content', 'genesis_do_post_content' );
+				add_action('genesis_post_content', 'the_content');
       }
 
       $wp_query->is_page = 1;
@@ -1151,6 +1161,11 @@ Thanks again!", 'mp')
         add_filter( 'the_title', array(&$this, 'page_title_output'), 99, 2 );
         add_filter( 'the_content', array(&$this, 'product_taxonomy_list_theme'), 99 );
         add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
+				
+				//genesis fixes
+				remove_action( 'genesis_post_content', 'genesis_do_post_image' );
+				remove_action( 'genesis_post_content', 'genesis_do_post_content' );
+				add_action('genesis_post_content', 'the_content');
       }
 
       $this->is_shop_page = true;
@@ -1170,10 +1185,13 @@ Thanks again!", 'mp')
   function load_store_theme() {
     $settings = get_option('mp_settings');
 
-    if ( $settings['store_theme'] == 'none' || current_theme_supports('mp_style') )
+    if ( $settings['store_theme'] == 'none' || current_theme_supports('mp_style') ) {
       return;
-    else
+		} else if (file_exists($this->plugin_dir . 'themes/' . $settings['store_theme'] . '.css')) {
       wp_enqueue_style( 'mp-store-theme', $this->plugin_url . 'themes/' . $settings['store_theme'] . '.css', false, $this->version );
+		} else if (file_exists(WP_CONTENT_DIR . '/marketpress-styles/' . $settings['store_theme'] . '.css')) {
+      wp_enqueue_style( 'mp-store-theme', WP_CONTENT_URL . '/marketpress-styles/' . $settings['store_theme'] . '.css', false, $this->version );
+		}
 
   }
 
@@ -1186,6 +1204,23 @@ Thanks again!", 'mp')
 
     //scan directory for theme css files
     $theme_list = array();
+    if ($handle = @opendir($theme_dir)) {
+      while (false !== ($file = readdir($handle))) {
+        if (($pos = strrpos($file, '.css')) !== false) {
+          $value = substr($file, 0, $pos);
+          if (is_readable("$theme_dir/$file")) {
+            $theme_data = get_file_data( "$theme_dir/$file", array('name' => 'MarketPress Style') );
+            if (is_array($theme_data))
+              $theme_list[$value] = $theme_data['name'];
+          }
+        }
+      }
+
+      @closedir($handle);
+    }
+		
+    //scan wp-content/marketpress-styles/ directory for theme css files
+    $theme_dir = WP_CONTENT_DIR . '/marketpress-styles/';
     if ($handle = @opendir($theme_dir)) {
       while (false !== ($file = readdir($handle))) {
         if (($pos = strrpos($file, '.css')) !== false) {
@@ -5514,7 +5549,7 @@ Notification Preferences: %s', 'mp');
                   <?php $this->store_themes_select(); ?>
                   <br /><span class="description"><?php _e('This option changes the built-in css styles for store pages.', 'mp') ?></span>
                   <?php if ((is_multisite() && is_super_admin()) || !is_multisite()) { ?>
-                  <br /><span class="description"><?php _e('For a custom css style, save your css file with the "MarketPress Style: NAME" header in the "/marketpress/marketpress-includes/themes/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="' . $this->plugin_url . 'themes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp') ?></span>
+                  <br /><span class="description"><?php printf(__('For a custom css style, save your css file with the "MarketPress Style: NAME" header in the "%s/marketpress-styles/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="%sthemes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp'), WP_CONTENT_DIR, $this->plugin_url); ?></span>
                   <h4><?php _e('Full-featured MarketPress Themes:', 'mp') ?></h4>
 									<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/frame-market-theme"><img alt="FrameMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/219/listing-image-thumb.png" />
 										<strong><?php _e('FrameMarket/GridMarket', 'mp') ?></strong></a><br />
@@ -6122,6 +6157,66 @@ Notification Preferences: %s', 'mp');
                     <li><?php _e('"category" - Limits list to a specific product category. Use the category Slug', 'mp') ?></li>
                     <li><?php _e('"tag" - Limits list to a specific product tag. Use the tag Slug', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_list_products paginate="true" page="1" per_page="10" order_by="price" order="DESC" category="downloads"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Single Product', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_product]</strong> -
+                  <span class="description"><?php _e('Displays a single product according to preference.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+										<li><?php _e('"product_id" - The ID of the product to display.', 'mp') ?></li>
+                    <li><?php _e('"title" - Whether to display the product title.', 'mp') ?></li>
+                    <li><?php _e('"content" - Whether and what type of content to display. Options are false/0, "full", or "excerpt". Default "full"', 'mp') ?></li>
+                    <li><?php _e('"image" - Whether and what context of image size to display. Options are false/0, "single", or "list". Default "single"', 'mp') ?></li>
+                    <li><?php _e('"meta" - Whether to display the product meta (price, buy button).', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_product product_id="1" title="1" content="excerpt" image="single" meta="1"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Product Image', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_product_image]</strong> -
+                  <span class="description"><?php _e('Displays the featured image of a given product.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+										<li><?php _e('"context" - What context for preset size options. Options are list, single, or widget, default single.', 'mp') ?></li>
+										<li><?php _e('"size" - Set a custom pixel width/height. If omitted defaults to the size set by "context".', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_product_image product_id="1" size="150"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Product Buy Button', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_buy_button]</strong> -
+                  <span class="description"><?php _e('Displays the buy or add to cart button.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+										<li><?php _e('"context" - What context for display. Options are list or single, default single which shows all variations.', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_buy_button product_id="1" context="single"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Product Price', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_product_price]</strong> -
+                  <span class="description"><?php _e('Displays the buy or add to cart button.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+										<li><?php _e('"label" - A label to prepend to the price. Defaults to "Price: ".', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_product_price product_id="1" label="Buy this thing now!"]</em></li>
                   </ul></p>
                 </td>
                 </tr>

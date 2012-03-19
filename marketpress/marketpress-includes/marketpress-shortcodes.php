@@ -17,6 +17,11 @@ class MarketPress_Shortcodes {
     add_shortcode( 'mp_dropdown_categories', array(&$this, 'mp_dropdown_categories_sc') );
     add_shortcode( 'mp_popular_products', array(&$this, 'mp_popular_products_sc') );
     add_shortcode( 'mp_list_products', array(&$this, 'mp_list_products_sc') );
+    add_shortcode( 'mp_product', array(&$this, 'mp_product_sc') );
+    add_shortcode( 'mp_product_image', array(&$this, 'mp_product_image_sc') );
+    add_shortcode( 'mp_buy_button', array(&$this, 'mp_buy_button_sc') );
+    add_shortcode( 'mp_product_price', array(&$this, 'mp_product_price_sc') );
+    add_shortcode( 'mp_product_meta', array(&$this, 'mp_product_meta_sc') );
 
     //store links
     add_shortcode( 'mp_cart_link', array(&$this, 'mp_cart_link_sc') );
@@ -159,7 +164,96 @@ class MarketPress_Shortcodes {
 
     return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag);
   }
+	
+	/*
+	* Displays a single product according to preference
+	* 
+	* @param int $product_id the ID of the product to display
+	* @param bool $title Whether to display the title
+	* @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'
+	* @param bool/string $image Whether and what context of image size to display. Options are false, 'single', or 'list'. Default 'single'
+	* @param bool $meta Whether to display the product meta
+  */
+  function mp_product_sc($atts) {
+    extract(shortcode_atts(array(
+  		'product_id' => false,
+  		'title' => true,
+  		'content' => 'full',
+  		'image' => 'single',
+  		'meta' => true
+  	), $atts));
 
+    return mp_product(false, $product_id, $title, $content, $image, $meta);
+  }
+	
+	/**
+		* Displays the product featured image
+		*
+		* @param string $context Options are list, single, or widget
+		* @param int $product_id The post_id for the product. Optional if in the loop
+		* @param int $size An optional width/height for the image if contect is widget
+   */
+  function mp_product_image_sc($atts) {
+    extract(shortcode_atts(array(
+  		$context = 'single',
+			$product_id = NULL,
+			$size = NULL
+  	), $atts));
+
+    return mp_product_image(false, $context, $product_id, $size);
+  }
+	
+	/*
+	 * Displays the buy or add to cart button
+	 *
+	 * @param string $context Options are list or single
+	 * @param int $post_id The post_id for the product. Optional if in the loop
+	 */
+  function mp_buy_button_sc($atts) {
+    extract(shortcode_atts(array(
+  		$context = 'single',
+			$product_id = NULL
+  	), $atts));
+
+    return mp_buy_button(false, $context, $product_id);
+  }
+
+	/*
+	 * Displays the product price (and sale price)
+	 *
+	 * @param int $product_id The post_id for the product. Optional if in the loop
+	 * @param sting $label A label to prepend to the price. Defaults to "Price: "
+	 */
+  function mp_product_price_sc($atts) {
+    extract(shortcode_atts(array(
+  		$label = true,
+			$product_id = NULL
+  	), $atts));
+
+    return mp_product_price(false, $product_id, $label);
+  }
+	
+	/*
+	 * Displays the product meta box
+	 *
+	 * @param string $context Options are list or single
+	 * @param int $product_id The post_id for the product. Optional if in the loop
+	 * @param sting $label A label to prepend to the price. Defaults to "Price: "
+	 */
+  function mp_product_meta_sc($atts) {
+    extract(shortcode_atts(array(
+			$context = 'single',
+  		$label = true,
+			$product_id = NULL
+  	), $atts));
+		
+		$content = '<div class="mp_product_meta">';
+		$content .= mp_product_price(false, $product_id, $label);
+		$content .= mp_buy_button(false, $context, $product_id);
+		$content .= '</div>';
+    return $content;
+  }
+	
   /**
    * Returns the current shopping cart link.
    * @param bool url Optional, whether to return a link or url. Defaults to show link.
