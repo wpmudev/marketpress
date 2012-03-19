@@ -6210,13 +6210,28 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Product Price', 'mp') ?></th>
         				<td>
                   <strong>[mp_product_price]</strong> -
-                  <span class="description"><?php _e('Displays the buy or add to cart button.', 'mp') ?></span>
+                  <span class="description"><?php _e('Displays the product price (and sale price).', 'mp') ?></span>
                   <p>
                   <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
                   <ul class="mp-shortcode-options">
                     <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"label" - A label to prepend to the price. Defaults to "Price: ".', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_product_price product_id="1" label="Buy this thing now!"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Product Meta', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_product_meta]</strong> -
+                  <span class="description"><?php _e('Displays the full product meta box with price and buy now/add to cart button.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+										<li><?php _e('"label" - A label to prepend to the price. Defaults to "Price: ".', 'mp') ?></li>
+                    <li><?php _e('"context" - What context for display. Options are list or single, default single which shows all variations.', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_product_meta product_id="1" label="Buy this thing now!"]</em></li>
                   </ul></p>
                 </td>
                 </tr>
