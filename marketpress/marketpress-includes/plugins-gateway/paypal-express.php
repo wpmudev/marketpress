@@ -501,7 +501,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     if ($mp->global_cart) {
 		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), count($_SESSION['prs']), $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
 			/* TODO - create a list of sep store orders*/
-	  	} else {
+	  } else {
 	    if ($order->post_status == 'order_received') {
 	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
 	      $statuses = $order->mp_payment_info['status'];

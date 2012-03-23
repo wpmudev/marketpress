@@ -824,7 +824,7 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
       {
 	$this->url = $url;
 
-	$this->params['x_delim_data']     = $delim_data;
+	$this->params['x_delim_data']     = ($delim_data == 'yes') ? 'TRUE' : 'FALSE';
 	$this->params['x_delim_char']     = $delim_char;
 	$this->params['x_encap_char']     = $encap_char;
 	$this->params['x_relay_response'] = "FALSE";

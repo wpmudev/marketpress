@@ -670,9 +670,8 @@ function _mp_cart_payment($type, $echo = false) {
         $content .= '<input type="radio" class="mp_choose_gateway" name="mp_choose_gateway" value="'.$plugin->plugin_name.'" '.checked($_SESSION['mp_payment_method'], $plugin->plugin_name, false).'/>';
         if ($plugin->method_img_url) {
           $content .= '<img src="' . $plugin->method_img_url . '" alt="' . $plugin->public_name . '" />';
-        } else {
-          $content .= $plugin->public_name;
         }
+        $content .= $plugin->public_name;
         $content .= '</label>';
       }
       $content .= '</td>';
@@ -710,11 +709,13 @@ function _mp_cart_payment($type, $echo = false) {
 
     //gateway plugin message hook
     $content .= apply_filters( 'mp_checkout_payment_confirmation_' . $_SESSION['mp_payment_method'], '', $mp->get_order($_SESSION['mp_order']) );
-
-    //tracking information
-    $track_link = '<a href="' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '">' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '</a>';
-    $content .= '<p>' . sprintf(__('You may track the latest status of your order(s) here:<br />%s', 'mp'), $track_link) . '</p>';
-
+    
+    if (!$mp->global_cart) {
+      //tracking information
+      $track_link = '<a href="' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '">' . mp_orderstatus_link(false, true) . $_SESSION['mp_order'] . '/' . '</a>';
+      $content .= '<p>' . sprintf(__('You may track the latest status of your order(s) here:<br />%s', 'mp'), $track_link) . '</p>';
+    }
+    
     //add ecommerce JS
     $mp->create_ga_ecommerce( $mp->get_order($_SESSION['mp_order']) );
 

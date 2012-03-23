@@ -5,6 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.5 - 3/23/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Fix shortcodes documentation
+- Fix stripslashes issue in cart widget custom text
+- Fix bug with x_delim_data in authorize.net gateway
+- Fix wrong orderstatus link on global checkout confirmation page
+
 2.5.4 - 3/19/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Four new shortcodes! [mp_product] (display a single product anywhere!), [mp_product_image], [mp_buy_button], [mp_product_price]
