@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.6 - 4/02/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Create MP_HIDE_MENUS define to hide store menus
+- Add basic error messages for downloads
+- Fix ocassional issues with chained payments gateway
+
 2.5.5 - 3/23/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix shortcodes documentation

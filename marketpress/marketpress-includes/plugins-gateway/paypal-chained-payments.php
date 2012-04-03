@@ -247,7 +247,9 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
         //succesful payment, create our order now
         if ($create_order) {
-          $order_id = $mp->create_order($result["trackingId"], $mp->get_cart_contents(), $_SESSION['mp_shipping_info'], $payment_info, $paid);
+					$cart = get_transient('mp_order_' . $order_id . '_cart');
+					$shipping_info = get_transient('mp_order_' . $order_id . '_shipping');
+          $order_id = $mp->create_order($result["trackingId"], $cart, $shipping_info, $payment_info, $paid);
           delete_transient('mp_order_' . $order_id . '_cart');
           delete_transient('mp_order_' . $order_id . '_shipping');
 			  	delete_transient('mp_order_' . $order_id . '_userid');

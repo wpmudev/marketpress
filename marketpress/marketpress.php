@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5.5
+Version: 2.5.6
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.5.5';
+  var $version = '2.5.6';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -115,9 +115,11 @@ class MarketPress {
 	  add_action( 'pre_get_posts', array(&$this, 'remove_canonical') );
 		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
   	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
-		add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
-		add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
 		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
+		if ( !defined('MP_HIDE_MENUS') ) { //allows you to hide MP menus
+			add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
+			add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
+		}
 
 		//Payment gateway returns
 	  add_action( 'pre_get_posts', array(&$this, 'handle_gateway_returns'), 1 );
@@ -3270,11 +3272,11 @@ Thanks again!", 'mp')
     //get the order
     $order = $this->get_order($_GET['orderid']);
 		if (!$order)
-      return false;
+      wp_die( __('Sorry, the link is invalid for this download.', 'mp') );
 
 		//check that order is paid
     if ($order->post_status == 'order_received')
-      return false;
+      wp_die( __('Sorry, your order has been marked as unpaid.', 'mp') );
 
 		$url = get_post_meta($product_id, 'mp_file', true);
 
@@ -3286,12 +3288,12 @@ Thanks again!", 'mp')
     if (!$url && isset($download['url']))
       $url = $download['url'];
 		else if (!$url)
-			return false;
+			wp_die( __('Whoops, we were unable to find the file for this download. Please contact us for help.', 'mp') );
 
 		//check for too many downloads
 		$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
 		if (intval($download['downloaded']) >= $max_downloads)
-		  return false;
+		  wp_die( sprintf( __("Sorry, our records show you've downloaded this file %d out of %d times allowed. Please contact us if you still need help.", 'mp'), intval($download['downloaded']), $max_downloads ) );
 
 		//for plugins to hook into the download script. Don't forget to increment the download count, then exit!
 		do_action('mp_serve_download', $url, $order, $download);
@@ -3328,7 +3330,7 @@ Thanks again!", 'mp')
 				if ( is_wp_error($tmp) ) {
 					@unlink($tmp);
 					trigger_error("MarketPress was unable to download the file $url for serving as download: ".$tmp->get_error_message(), E_USER_WARNING);
-					return false;
+					wp_die( __('Whoops, there was a problem loading up this file for your download. Please contact us for help.', 'mp') );
 				}
 	    }
 
