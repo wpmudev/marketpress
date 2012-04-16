@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.7 - 4/16/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Fix issues with PayPal chained payments gateway for sure
+- Fix bug in Payflow Pro gateway: http://premium.wpmudev.org/forums/topic/marketpress-payflow-pro-not-sending-info-to-paypal
+- Separate AJAX cart and checkout JS: http://premium.wpmudev.org/forums/topic/checkout-button-disappears
+
 2.5.6 - 4/02/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Create MP_HIDE_MENUS define to hide store menus

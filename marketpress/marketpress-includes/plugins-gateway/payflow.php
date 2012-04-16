@@ -514,8 +514,10 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       ($settings['gateways']['payflow']['mode'] == 'sandbox'));
     
 
+
+
     $payment->transaction($_SESSION['card_num']);
-    $payment->setParameter("EXPDATE", $_SESSION['exp_month'] .$_SESSION['exp_year']);
+    $payment->setParameter("EXPDATE", $_SESSION['exp_month'] .substr($_SESSION['exp_year'],2,2));
     $payment->setParameter("CVV2", $_SESSION['card_code'] );
     $payment->setParameter("USER", $settings['gateways']['payflow']['api_user']);
     $payment->setParameter("VENDOR", $settings['gateways']['payflow']['api_vendor']);
@@ -600,6 +602,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
 
     if ($payment->isApproved()) {
+
 
       $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
       $paid = true;

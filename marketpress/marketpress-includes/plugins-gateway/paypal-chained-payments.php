@@ -182,6 +182,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   		  $payment_info['transaction_id'] = $result["paymentInfoList_paymentInfo(0)_transactionId"];
 
   		  $timestamp = time();
+				$order_id = $result["trackingId"];
+				
         //setup status
         switch ($result["paymentInfoList_paymentInfo(0)_transactionStatus"]) {
 
@@ -244,7 +246,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
   		  $payment_info['status'][$timestamp] = $status;
   		  $payment_info['total'] = $result["paymentInfoList_paymentInfo(0)_receiver_amount"];
   		  $payment_info['currency'] = $result["currencyCode"];
-
+				
         //succesful payment, create our order now
         if ($create_order) {
 					$cart = get_transient('mp_order_' . $order_id . '_cart');

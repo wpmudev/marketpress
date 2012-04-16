@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5.6
+Version: 2.5.7
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.5.6';
+  var $version = '2.5.7';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -613,11 +613,11 @@ Thanks again!", 'mp')
 		if (is_multisite() && class_exists('domain_map') && 'original' == get_site_option('map_admindomain'))
 		  return;
 
-    //setup shopping cart javascript
-    wp_enqueue_script( 'mp-store-js', $this->plugin_url . 'js/store.js', array('jquery'), $this->version );
+    //setup ajax cart javascript
+    wp_enqueue_script( 'mp-ajax-js', $this->plugin_url . 'js/ajax-cart.js', array('jquery'), $this->version );
 
     // declare the variables we need to access in js
-    wp_localize_script( 'mp-store-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp') ) );
+    wp_localize_script( 'mp-ajax-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp') ) );
   }
 
   //loads the jquery lightbox plugin
@@ -959,7 +959,10 @@ Thanks again!", 'mp')
         wp_redirect( wp_login_url( mp_checkout_step_url( get_query_var('checkoutstep') ) ) );
 				exit();
 			}
-
+			
+			//setup shopping cart javascript
+			wp_enqueue_script( 'mp-store-js', $this->plugin_url . 'js/store.js', array('jquery'), $this->version );
+			
       //check for custom theme template
       $templates = array("mp_cart.php");
 
