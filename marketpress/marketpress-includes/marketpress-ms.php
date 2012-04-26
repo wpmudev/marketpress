@@ -723,6 +723,7 @@ class MarketPress_MS {
                 <ul class="mp-shortcode-options">
                   <li><?php _e('"limit" - Maximum amount of tags to display. Default: 45', 'mp') ?></li>
                   <li><?php _e('"seperator" - String to seperate tags by, like a comma, etc.', 'mp') ?></li>
+									<li><?php _e('"include" - What to show, "tags", "categories", or "both". Default: "both"', 'mp') ?></li>
                   <li><?php _e('Example:', 'mp') ?> <em>[mp_global_tag_cloud limit="55" seperator=", "]</em></li>
                 </ul></p>
                 <span class="description"><?php _e('You may also use the mp_global_tag_cloud() template function in your theme with the same arguments.', 'mp') ?></span>

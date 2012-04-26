@@ -833,11 +833,11 @@ function mp_order_status() {
       <ul>
       <?php
       //get times
-      $received = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
+      $received = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
       if ($order->mp_paid_time)
-        $paid = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
+        $paid = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
       if ($order->mp_shipped_time)
-        $shipped = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
+        $shipped = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
 
       if ($order->post_status == 'order_received') {
         echo '<li>' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></li>';
@@ -1061,7 +1061,7 @@ function mp_order_status() {
       echo '<h3>' . __('Your Recent Orders:', 'mp') . '</h3>';
       echo '<ul id="mp-order-list">';
       foreach ($orders as $timestamp => $order)
-        echo '  <li><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
+        echo '  <li><strong>' . date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
       echo '</ul>';
 
       ?>

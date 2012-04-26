@@ -279,22 +279,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
         //set final amount
         $_SESSION['final_amt'] = 0;
-				$_SESSION['final_amts'] = array();
 				$_SESSION['prs'] = array();
-				$_SESSION['ipns'] = array();
-				// $_SESSION['seller_ids'] = array();
-				$_SESSION['seller_paypal_accounts'] = array();
 
 				for ($i=0; $i<10; $i++) {
 				  if (!isset($result['PAYMENTREQUEST_'.$i.'_AMT'])) {
 				    continue;
 				  }
 				  $_SESSION['final_amt'] += $result['PAYMENTREQUEST_'.$i.'_AMT'];
-				  $_SESSION['final_amts'][] = $result['PAYMENTREQUEST_'.$i.'_AMT'];
-				  $_SESSION['prs'][] = $result['PAYMENTREQUEST_'.$i.'_PAYMENTREQUESTID'];
-				  $_SESSION['ipns'][] = $result['PAYMENTREQUEST_'.$i.'_NOTIFYURL'];
-				  //$_SESSION['seller_ids'][] = $result['PAYMENTREQUEST_'.$i.'_SELLERID'];
-				  $_SESSION['seller_paypal_accounts'][] = $result['PAYMENTREQUEST_'.$i.'_SELLERPAYPALACCOUNTID'];
 				}
 
         //print payment details
@@ -339,7 +330,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
     if (isset($_SESSION['token']) && isset($_SESSION['PayerID']) && isset($_SESSION['final_amt'])) {
       //attempt the final payment
-      $result = $this->DoExpressCheckoutPayment($_SESSION['token'], $_SESSION['PayerID'], $_SESSION['final_amts'], $_SESSION['seller_paypal_accounts'], $_SESSION['ipns'], $_SESSION['prs']);
+      $result = $this->DoExpressCheckoutPayment($_SESSION['token'], $_SESSION['PayerID']);
 
       //check response
       if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
@@ -462,7 +453,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 				for ($i = 0; $i <= 5; $i++) { //print the first 5 errors
           if (isset($result["L_ERRORCODE$i"]))
-            $error .= "<li>{$result["L_ERRORCODE$i"]} - {$result["L_SHORTMESSAGE$i"]} - {$result["L_LONGMESSAGE$i"]}</li>";
+            $error .= "<li>{$result["L_ERRORCODE$i"]} - {$result["L_SHORTMESSAGE$i"]} - ".stripslashes($result["L_LONGMESSAGE$i"])."</li>";
         }
         $error = '<br /><ul>' . $error . '</ul>';
         $mp->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase with PayPal. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . $error );
@@ -908,9 +899,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($settings['gateways']['paypal-express']['header_border']);
     $nvpstr .= "&HDRBACKCOLOR=" . urlencode($settings['gateways']['paypal-express']['header_back']);
     $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($settings['gateways']['paypal-express']['page_back']);
-
+		
     //loop through cart items
     $j = 0;
+		$request = '';
     foreach ($selected_cart as $bid => $cart) {
       if (!is_array($cart) || count($cart) == 0) {
 				continue;
@@ -925,22 +917,22 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				continue;
 			
       $totals = array();
-
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $blog_settings['gateways']['paypal-express']['merchant_email'];
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
+			
+      $request .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
+      $request .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $blog_settings['gateways']['paypal-express']['merchant_email'];
+      $request .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
+      $request .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
+      $request .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
 			
 			if (!$mp->download_only_cart($cart)) {
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . $this->trim_name($shipping_info['name'], 32);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . $this->trim_name($shipping_info['address1'], 100);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . $this->trim_name($shipping_info['address2'], 100);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . $this->trim_name($shipping_info['city'], 40);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . $this->trim_name($shipping_info['state'], 40);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRY=" . $this->trim_name($shipping_info['country'], 2);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . $this->trim_name($shipping_info['zip'], 20);
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . $this->trim_name($shipping_info['phone'], 20);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . $this->trim_name($shipping_info['name'], 32);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . $this->trim_name($shipping_info['address1'], 100);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . $this->trim_name($shipping_info['address2'], 100);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . $this->trim_name($shipping_info['city'], 40);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . $this->trim_name($shipping_info['state'], 40);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRYCODE=" . $this->trim_name($shipping_info['country'], 2);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . $this->trim_name($shipping_info['zip'], 20);
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . $this->trim_name($shipping_info['phone'], 20);
 			}
 
       $i = 0;
@@ -951,12 +943,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 						continue;
 					
 				  $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
-				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
-				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price'], $product_id));
-				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
-				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
-				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
-				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
+				  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
+				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price'], $product_id));
+				  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
+				  $request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
+				  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
+				  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
 				  $i++;
 				}
       }
@@ -964,49 +956,52 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       //coupon line
       if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $coupon['discount']));
-				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon['new_total']-$total);
-				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($mp->get_coupon_code());
-				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
+				$request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $coupon['discount']));
+				$request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon['new_total']-$total);
+				$request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($mp->get_coupon_code());
+				$request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
 				
 				$total = $coupon['new_total'];
       }
 
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
+      $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
 
       //shipping line
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
 				$total = $total + $shipping_price;
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
+				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
       }
 
       //tax line
       if ( ($tax_price = $mp->tax_price(false)) !== false ) {
 				$total = $total + $tax_price;
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
+				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }
 
       //order details
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_DESC=" . $this->trim_name(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_AMT=" . $total; //cart total
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_INVNUM=" . $order_id;
-      $nvpstr .= "&PAYMENTREQUEST_{$j}_PAYMENTREQUESTID=" . $bid . ":" . $order_id;
+      $request .= "&PAYMENTREQUEST_{$j}_DESC=" . $this->trim_name(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
+      $request .= "&PAYMENTREQUEST_{$j}_AMT=" . $total; //cart total
+      $request .= "&PAYMENTREQUEST_{$j}_INVNUM=" . $order_id;
+      $request .= "&PAYMENTREQUEST_{$j}_PAYMENTREQUESTID=" . $bid . ":" . $order_id;
 
       if ($this->payment_action == 'Sale') {
-				$nvpstr .= "&PAYMENTREQUEST_{$j}_ALLOWEDPAYMENTMETHOD=InstantPaymentOnly";
+				$request .= "&PAYMENTREQUEST_{$j}_ALLOWEDPAYMENTMETHOD=InstantPaymentOnly";
       }
       $j++;
     }
 
     if (is_multisite())
       switch_to_blog($current_blog_id);
-
+		
+		$nvpstr .= $request;
+		$_SESSION['nvpstr'] = $request;
+		
     //'---------------------------------------------------------------------------------------------------------------
     //' Make the API call to PayPal
     //' If the API call succeded, then redirect the buyer to PayPal to begin to authorize payment.
     //' If an error occured, show the resulting errors
     //'---------------------------------------------------------------------------------------------------------------
-    $resArray = $this->api_call("SetExpressCheckout", $nvpstr);var_dump($nvpstr);
+    $resArray = $this->api_call("SetExpressCheckout", $nvpstr);
     $ack = strtoupper($resArray["ACK"]);
     if($ack=="SUCCESS" || $ack=="SUCCESSWITHWARNING")	{
       $token = urldecode($resArray["TOKEN"]);
@@ -1049,17 +1044,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 	//Purpose: 	Prepares the parameters for the DoExpressCheckoutPayment API Call.
 	function DoExpressCheckoutPayment($token, $payer_id, $final_amts, $seller_paypal_accounts, $ipns, $prs) {
-	  $nvpstr  = '&TOKEN=' . urlencode($token);
+		
+		$nvpstr  = '&TOKEN=' . urlencode($token);
 	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
-	  foreach ($prs as $i => $pr) {
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_AMT=" . $final_amts[$i];
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_CURRENCYCODE=" . $this->currencyCode;
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_PAYMENTACTION=" . $this->payment_action;
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_NOTIFYURL=" . $ipns[$i];
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_SELLERPAYPALACCOUNTID=" . $seller_paypal_accounts[$i];
-	    $nvpstr .= "&PAYMENTREQUEST_{$i}_PAYMENTREQUESTID=" . $prs[$i];
-	  }
-
+		$nvpstr .= $_SESSION['nvpstr'];
+		var_dump($nvpstr);
 	  /* Make the call to PayPal to finalize payment
 	    */
 	  return $this->api_call("DoExpressCheckoutPayment", $nvpstr);

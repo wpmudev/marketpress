@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5.7
+Version: 2.5.8 Beta 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.5.7';
+  var $version = '2.5.8';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -151,7 +151,7 @@ class MarketPress {
 		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
 
 		//update install script if necessary
-		if ($settings['mp_version'] != $this->version) {
+		if (get_option('mp_version') != $this->version) {
 			$this->install();
 		}
 	}
@@ -2424,7 +2424,7 @@ Thanks again!", 'mp')
     	  <?php _e('There are no items in your cart.', 'mp') ?>
     	</div>
     	<div id="mp_cart_actions_widget">
-    	  <a class="mp_store_link" href="<?php mp_store_link(true, true); ?>"><?php _e('Browse Products &raquo;', 'mp') ?></a>
+    	  <a class="mp_store_link" href="<?php mp_products_link(true, true); ?>"><?php _e('Browse Products &raquo;', 'mp') ?></a>
     	</div>
         <?php
         exit;
@@ -2909,7 +2909,7 @@ Thanks again!", 'mp')
   }
 
   //called on checkout to create a new order
-  function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false) {
+  function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false, $shipping_total = false, $tax_total = false) {
     $settings = get_option('mp_settings');
 
     //order id can be null
@@ -2984,8 +2984,8 @@ Thanks again!", 'mp')
 
     //payment info
     add_post_meta($post_id, 'mp_order_total', $payment_info['total'], true);
-    add_post_meta($post_id, 'mp_shipping_total', $this->shipping_price(false, $cart), true);
-    add_post_meta($post_id, 'mp_tax_total', $this->tax_price(false, $cart), true);
+    add_post_meta($post_id, 'mp_shipping_total', ($shipping_total ? $shipping_total : $this->shipping_price(false, $cart)), true);
+    add_post_meta($post_id, 'mp_tax_total', ($tax_total ? $tax_total : $this->tax_price(false, $cart)), true);
     add_post_meta($post_id, 'mp_order_items', $item_count, true);
 
     $timestamp = time();
@@ -3175,6 +3175,7 @@ Thanks again!", 'mp')
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
 		$output = stream_get_contents($file);
+		$output = $output . "\xEF\xBB\xBF"; // UTF-8 BOM
 		header('Content-Length: ' . strlen($output));
 		fclose($file);
 		die($output);
@@ -3789,7 +3790,7 @@ Thanks again!", 'mp')
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
       $timestamp = key($statuses);
-      $payment_info .= date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ': ' . $status;
+      $payment_info .= date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ': ' . $status;
     } else {
       $payment_info .= __('Your payment for this order is complete.', 'mp');
     }
@@ -4175,13 +4176,13 @@ Notification Preferences: %s', 'mp');
         <div class="inside">
           <?php
           //get times
-          $received = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
+          $received = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
           if ($order->mp_paid_time)
-            $paid = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
+            $paid = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
           if ($order->mp_shipped_time)
-            $shipped = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
+            $shipped = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
           if ($order->mp_closed_time)
-            $closed = date(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_closed_time);
+            $closed = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_closed_time);
 
           if ($order->post_status == 'order_received') {
             echo '<div id="major-publishing-actions" class="misc-pub-section">' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></div>';
@@ -4244,7 +4245,7 @@ Notification Preferences: %s', 'mp');
             echo '<div id="mp_payment_gateway" class="misc-pub-section">';
           }
           ?>
-            <strong><?php echo date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp); ?>:</strong>
+            <strong><?php echo date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp); ?>:</strong>
             <?php echo esc_html($status); ?>
           </div>
         <?php } ?>

@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.8 - 4/26/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Improvements to coupon handling in PayPal Express gateway
+- Add cart details to PayPal Express gateway paypal history
+- Fix a bug in chained payments gateway not filling shipping/tax totals
+- Internationalize various date strings on the order status pages
+- Add UTF-8 BOM to csv exports http://premium.wpmudev.org/forums/topic/export-orders-csv-character-support
+
 2.5.7 - 4/16/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix issues with PayPal chained payments gateway for sure

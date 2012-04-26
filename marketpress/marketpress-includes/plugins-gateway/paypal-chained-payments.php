@@ -148,8 +148,10 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			//setup transients for ipn in case checkout doesn't redirect (ipn should come within 12 hrs!)
 			set_transient('mp_order_'. $order_id . '_cart', $cart, 60*60*12);
 			set_transient('mp_order_'. $order_id . '_shipping', $shipping_info, 60*60*12);
+			set_transient('mp_order_'. $order_id . '_shipping_total', $mp->shipping_price(), 60*60*12);
+			set_transient('mp_order_'. $order_id . '_tax_total', $mp->tax_price(), 60*60*12);
 			set_transient('mp_order_'. $order_id . '_userid', $current_user->ID, 60*60*12);
-			
+
 			//go to paypal for final payment confirmation
       $this->RedirectToPayPal($paykey);
 		} else { //whoops, error
@@ -254,6 +256,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
           $order_id = $mp->create_order($result["trackingId"], $cart, $shipping_info, $payment_info, $paid);
           delete_transient('mp_order_' . $order_id . '_cart');
           delete_transient('mp_order_' . $order_id . '_shipping');
+          delete_transient('mp_order_' . $order_id . '_shipping_total');
+          delete_transient('mp_order_' . $order_id . '_tax_total');
 			  	delete_transient('mp_order_' . $order_id . '_userid');
 				} else {
           $mp->cart_checkout_error( sprintf(__('Sorry, your order was not completed. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) );
@@ -534,13 +538,17 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
         //succesful payment, create our order now
         $cart = get_transient('mp_order_' . $order_id . '_cart');
 			  $shipping_info = get_transient('mp_order_' . $order_id . '_shipping');
+			  $shipping_total = get_transient('mp_order_' . $order_id . '_shipping_total');
+			  $tax_total = get_transient('mp_order_' . $order_id . '_tax_total');
 			  $user_id = get_transient('mp_order_' . $order_id . '_userid');
-        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id);
+        $success = $mp->create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id, $shipping_total, $tax_total);
         
         //if successful delete transients
         if ($success) {
           delete_transient('mp_order_' . $order_id . '_cart');
           delete_transient('mp_order_' . $order_id . '_shipping');
+          delete_transient('mp_order_' . $order_id . '_shipping_total');
+          delete_transient('mp_order_' . $order_id . '_tax_total');
 			  	delete_transient('mp_order_' . $order_id . '_userid');
         }
       }
