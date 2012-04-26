@@ -943,7 +943,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . $this->trim_name($shipping_info['phone'], 20);
 			}
 
-      $detailstr = "";
       $i = 0;
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
@@ -952,12 +951,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 						continue;
 					
 				  $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price'], $product_id));
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
-				  $detailstr .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
+				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
+				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price'], $product_id));
+				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
+				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
+				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
+				  $nvpstr .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
 				  $i++;
 				}
       }
@@ -965,26 +964,26 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       //coupon line
       if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
+				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $coupon['discount']));
+				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon['new_total']-$total);
+				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($mp->get_coupon_code());
+				$nvpstr .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
+				
 				$total = $coupon['new_total'];
       }
 
-      $detailstr .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
+      $nvpstr .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
 
       //shipping line
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
 				$total = $total + $shipping_price;
-				$detailstr .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
       }
 
       //tax line
       if ( ($tax_price = $mp->tax_price(false)) !== false ) {
 				$total = $total + $tax_price;
-				$detailstr .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
-      }
-
-      //only add cart details if no coupon, as that's unsupported (stupid PayPal)
-      if (!$coupon) {
-				$nvpstr .= $detailstr;
+				$nvpstr .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }
 
       //order details
@@ -1007,7 +1006,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     //' If the API call succeded, then redirect the buyer to PayPal to begin to authorize payment.
     //' If an error occured, show the resulting errors
     //'---------------------------------------------------------------------------------------------------------------
-    $resArray = $this->api_call("SetExpressCheckout", $nvpstr);
+    $resArray = $this->api_call("SetExpressCheckout", $nvpstr);var_dump($nvpstr);
     $ack = strtoupper($resArray["ACK"]);
     if($ack=="SUCCESS" || $ack=="SUCCESSWITHWARNING")	{
       $token = urldecode($resArray["TOKEN"]);
