@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5.8 Beta 1
+Version: 2.5.8
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -2909,7 +2909,7 @@ Thanks again!", 'mp')
   }
 
   //called on checkout to create a new order
-  function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false, $shipping_total = false, $tax_total = false) {
+  function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false, $shipping_total = false, $tax_total = false, $coupon_code = false) {
     $settings = get_option('mp_settings');
 
     //order id can be null
@@ -2974,7 +2974,7 @@ Thanks again!", 'mp')
 		$item_count = array_sum($items);
 
     //coupon info
-    $code = $this->get_coupon_code();
+    $code = $coupon_code ? $coupon_code : $this->get_coupon_code();
     if ( $coupon = $this->coupon_value($code, 9999999999) ) {
       add_post_meta($post_id, 'mp_discount_info', array('code' => $code, 'discount' => $coupon['discount']), true);
 
