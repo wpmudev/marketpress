@@ -261,6 +261,7 @@ class MP_Shipping_Handler {
 		global $mp_shipping_active_plugins;
 		$settings = get_option('mp_settings');
 
+
 		if ( count((array)$mp_shipping_active_plugins) && $settings['shipping']['method'] == 'calculated' ) {
 			$content .= '<thead><tr>';
 			$content .= '<th colspan="2">'. __('Choose a Shipping Method:', 'mp').'</th>';
@@ -273,7 +274,7 @@ class MP_Shipping_Handler {
 				$content .= '<option value="' . $plugin->plugin_name . '"'.selected(@$_SESSION['mp_shipping_info']['shipping_option'], $plugin->plugin_name, false).'>' . esc_attr($plugin->public_name) . '</option>';
 			}
 			$content .= '</select>';
-			$content .= ' <span id="mp-shipping-select-holder">'.$this->shipping_sub_options().'</span>';
+			$content .= ' <span id="mp-shipping-select-holder">' . $this->shipping_sub_options().'</span>';
 			$content .= '</td></tr>';
 		}
 		return $content;
@@ -328,7 +329,11 @@ class MP_Shipping_Handler {
 				$content .= '<option value="' . $key . '"'.selected(@$_SESSION['mp_shipping_info']['shipping_sub_option'], $key, false).'>' . esc_attr($name) . '</option>';
 			}
 			$content .= '</select>';
+		} else{
+			$content .= '<input type="hidden" id="mp_no_shipping_options" name="no_shipping_options" value="1" />'; 
+			$content .= apply_filters('mp_checkout_error_no_shipping_options', '');
 		}
+		
 		
 		if (defined('DOING_AJAX'))
 			die($content);
