@@ -2625,6 +2625,10 @@ Thanks again!", 'mp')
 	
 				if (empty($_POST['country']) || strlen($_POST['country']) != 2)
 					$this->cart_checkout_error( __('Please enter your Country.', 'mp'), 'country');
+
+				if ($_POST['no_shipping_options'] == '1'){
+					$this->cart_checkout_error( __('No valid shipping options found. Please check your address carefully.', 'mp' ), 'no_shipping_options');
+				}
 			}
 
       //save to session
