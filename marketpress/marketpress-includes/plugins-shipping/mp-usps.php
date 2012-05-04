@@ -640,6 +640,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$xpath = new DOMXPath($dom);
 
 		//Make SESSION copy with just prices and delivery
+		
+		if(! is_array($shipping_options)) $shipping_options = array();
 		$mp_shipping_options = $shipping_options;
 
 		foreach($shipping_options as $service => &$option){
@@ -791,6 +793,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$xpath = new DOMXPath($dom);
 
 		//Make SESSION copy with just prices
+		if(! is_array($shipping_options)) $shipping_options = array();
+
 		$mp_shipping_options = $shipping_options;
 
 		foreach($shipping_options as $service => &$option){
