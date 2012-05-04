@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.5.9 - 5/5/2012 - Aaron Edwards/Arnold
+----------------------------------------------------------------------
+- Fix problems with USPS shipping module
+- Fix stripslashes issue with widget custom content
+- Fix issues with single product shortcode attributes
+
 2.5.8 - 4/26/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Improvements to coupon handling in PayPal Express gateway

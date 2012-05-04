@@ -195,9 +195,9 @@ class MarketPress_Shortcodes {
    */
   function mp_product_image_sc($atts) {
     extract(shortcode_atts(array(
-  		$context = 'single',
-			$product_id = NULL,
-			$size = NULL
+  		'context' => 'single',
+			'product_id' => NULL,
+			'size' => NULL
   	), $atts));
 
     return mp_product_image(false, $context, $product_id, $size);
@@ -211,8 +211,8 @@ class MarketPress_Shortcodes {
 	 */
   function mp_buy_button_sc($atts) {
     extract(shortcode_atts(array(
-  		$context = 'single',
-			$product_id = NULL
+  		'context' => 'single',
+			'product_id' => NULL
   	), $atts));
 
     return mp_buy_button(false, $context, $product_id);
@@ -226,8 +226,8 @@ class MarketPress_Shortcodes {
 	 */
   function mp_product_price_sc($atts) {
     extract(shortcode_atts(array(
-  		$label = true,
-			$product_id = NULL
+  		'label' => true,
+			'product_id' => NULL
   	), $atts));
 
     return mp_product_price(false, $product_id, $label);
@@ -242,9 +242,9 @@ class MarketPress_Shortcodes {
 	 */
   function mp_product_meta_sc($atts) {
     extract(shortcode_atts(array(
-			$context = 'single',
-  		$label = true,
-			$product_id = NULL
+			'context' => 'single',
+  		'label' => true,
+			'product_id' => NULL
   	), $atts));
 		
 		$content = '<div class="mp_product_meta">';
