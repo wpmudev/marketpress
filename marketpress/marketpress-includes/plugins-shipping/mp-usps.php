@@ -503,10 +503,13 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		//USPS won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
+		
+		$max_weight = floatval($this->usps_settings[max_weight]);
+		$max_weight = ($max_weight > 0) ? $max_weight : 75;
 
 		//Properties should already be converted to weight in decimal pounds and Pounds and Ounces
 		//Figure out how many boxes
-		$this->pkg_count = ceil($this->weight / floatval($this->usps_settings[max_weight]));
+		$this->pkg_count = ceil($this->weight / $max_weight); // Avoid zero
 		// Equal size packages.
 		$this->pkg_weight = $this->weight / $this->pkg_count;
 
