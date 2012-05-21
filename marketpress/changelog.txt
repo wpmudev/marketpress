@@ -5,6 +5,8 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Bug fixes with $content argument in mp_product template function/shortcode
+
 2.5.9 - 5/5/2012 - Aaron Edwards/Arnold
 ----------------------------------------------------------------------
 - Fix problems with USPS shipping module

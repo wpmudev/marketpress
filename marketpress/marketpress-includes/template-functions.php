@@ -1326,35 +1326,35 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
   global $mp;
   $post = get_post($product_id);
 
-  $content = '<div '.mp_product_class(false, 'mp_product', $post->ID).'>';
+  $return = '<div '.mp_product_class(false, 'mp_product', $post->ID).'>';
   if ($title)
-    $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
+    $return .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
   
   if ($content) {
-    $content .= '<div class="mp_product_content">';
+    $return .= '<div class="mp_product_content">';
     if ($image)
-      $content .= mp_product_image( false, $image, $post->ID );
+      $return .= mp_product_image( false, $image, $post->ID );
     if ($content == 'excerpt')
-      $content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+      $return .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
     else
-      $content .= apply_filters('the_content', $post->post_content);
-    $content .= '</div>';
+      $return .= apply_filters('the_content', $post->post_content);
+    $return .= '</div>';
   }
   
   if ($meta) {
-    $content .= '<div class="mp_product_meta">';
+    $return .= '<div class="mp_product_meta">';
     //price
-    $content .= mp_product_price(false, $post->ID);
+    $return .= mp_product_price(false, $post->ID);
     //button
-    $content .= mp_buy_button(false, 'single', $post->ID);
-    $content .= '</div>';
+    $return .= mp_buy_button(false, 'single', $post->ID);
+    $return .= '</div>';
   }
-  $content .= '</div>';
+  $return .= '</div>';
       
   if ($echo)
-    echo $content;
+    echo $return;
   else
-    return $content;
+    return $return;
 }
 
 /**
