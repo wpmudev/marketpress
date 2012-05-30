@@ -1201,9 +1201,10 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   } else if ($tag) {
     $taxonomy_query = '&product_tag=' . sanitize_title($tag);
   } else if ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') {
-    $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
+    $term = get_queried_object(); //must do this for number tags
+    $taxonomy_query = '&' . $term->taxonomy . '=' . $term->slug;
   }
-
+  
   //setup pagination
   $paged = false;
   if ($paginate) {
