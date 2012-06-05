@@ -5,6 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Allow shortcodes to work in custom page messages
 - Fix an issue with number tags showing all products
 - Bug fixes with $content argument in mp_product template function/shortcode
 - Wrap prev/next nav links in wrapper for styling

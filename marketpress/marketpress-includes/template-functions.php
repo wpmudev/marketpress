@@ -764,29 +764,29 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
       switch($checkoutstep) {
 
         case 'shipping':
-          $content .= $settings['msg']['shipping'];
+          $content .= do_shortcode($settings['msg']['shipping']);
           $content .= _mp_cart_shipping(true);
           break;
 
         case 'checkout':
-          $content .=  $settings['msg']['checkout'];
+          $content .=  do_shortcode($settings['msg']['checkout']);
           $content .= _mp_cart_payment('form');
           break;
 
         case 'confirm-checkout':
-          $content .=  $settings['msg']['confirm_checkout'];
+          $content .=  do_shortcode($settings['msg']['confirm_checkout']);
           $content .= _mp_cart_table('checkout');
           $content .= _mp_cart_shipping(false);
           $content .= _mp_cart_payment('confirm');
           break;
 
         case 'confirmation':
-          $content .=  $settings['msg']['success'];
+          $content .=  do_shortcode($settings['msg']['success']);
           $content .= _mp_cart_payment('confirmation');
           break;
 
         default:
-          $content .= $settings['msg']['cart'];
+          $content .= do_shortcode($settings['msg']['cart']);
           $content .= _mp_cart_table('checkout-edit');
           $content .= _mp_cart_login(false);
           break;
@@ -818,7 +818,7 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
 function mp_order_status() {
   global $mp, $wp_query;
 	$settings = get_option('mp_settings');
-  echo $settings['msg']['order_status'];
+  echo do_shortcode($settings['msg']['order_status']);
 
   $order_id = ($wp_query->query_vars['order_id']) ? $wp_query->query_vars['order_id'] : $_GET['order_id'];
 

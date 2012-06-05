@@ -1515,7 +1515,7 @@ Thanks again!", 'mp')
 		  return $content;
 
 		$settings = get_option('mp_settings');
-    $content .= $settings['msg']['product_list'];
+    $content .= do_shortcode($settings['msg']['product_list']);
     $content .= mp_list_products(false);
     $content .= '<div id="mp_product_nav">' . get_posts_nav_link() . '</div>';
 
@@ -1529,7 +1529,7 @@ Thanks again!", 'mp')
 		  return $content;
 
 		$settings = get_option('mp_settings');
-    $content = $settings['msg']['product_list'];
+    $content = do_shortcode($settings['msg']['product_list']);
     $content .= mp_list_products(false);
     $content .= '<div id="mp_product_nav">' . get_posts_nav_link() . '</div>';
 
