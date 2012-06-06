@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.5.9.1 Beta 1
+Version: 2.6 Beta 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.5.9';
+  var $version = '2.6';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -54,7 +54,10 @@ class MarketPress {
 
     //install plugin
     register_activation_hook( __FILE__, array($this, 'install') );
-
+		
+		//load dashboard notice
+    include_once( $this->plugin_dir . 'dash-notice/wpmudev-dash-notification.php' );
+		
     //load template functions
     require_once( $this->plugin_dir . 'template-functions.php' );
 
@@ -6709,15 +6712,4 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////
-/* -------------------- Update Notifications Notice -------------------- */
-if ( !function_exists( 'wdp_un_check' ) ) {
-  add_action( 'admin_notices', 'wdp_un_check', 5 );
-  add_action( 'network_admin_notices', 'wdp_un_check', 5 );
-  function wdp_un_check() {
-    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'install_plugins' ) )
-      echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
-  }
-}
-/* --------------------------------------------------------------------- */
 ?>
