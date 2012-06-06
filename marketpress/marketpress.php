@@ -3179,7 +3179,7 @@ Thanks again!", 'mp')
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		header('Pragma: public');
 		$output = stream_get_contents($file);
-		$output = $output . "\xEF\xBB\xBF"; // UTF-8 BOM
+		$output = "\xEF\xBB\xBF" . $output; // UTF-8 BOM
 		header('Content-Length: ' . strlen($output));
 		fclose($file);
 		die($output);
