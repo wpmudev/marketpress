@@ -1945,6 +1945,7 @@ Thanks again!", 'mp')
 		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_is_special_tax" && $key != "mp_special_tax")
 		    $meta[$key] = array($meta[$key]);
 		}
+
     ?>
     <input type="hidden" name="mp_product_meta" value="1" />
     <table class="widefat" id="mp_product_variations_table">
@@ -2012,20 +2013,18 @@ Thanks again!", 'mp')
 						<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="0.00" /></td>
 						<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="0.00" disabled="disabled" /></td>
             			<td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
-						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="<?php echo $key ?>" <?php 
-							if (isset($meta['has_custom_field'][$key])) { echo ' checked="checked" '; } ?> /></td>
+						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="0" /></td>
 						<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
 					</tr>
-					<tr class="variation-custom-field <?php if (!isset($meta['mp_has_custom_field'][$key])) { echo ' variation-custom-field-hidden'; } ?>">
+					<tr class="variation-custom-field variation-custom-field-hidden">
 						<td class="mp_custom_label_col" colspan="5">
 
 							<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[]" value="input" />
 							<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[]" value="quantity" />
 
 							<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label> <input type="text" class="mp_custom_field_value" 
-								name="mp_custom_field_label[]" value="<?php if (isset($meta['mp_custom_field_label'][$key])) { 
-									echo $meta['mp_custom_field_label'][$key];} ?>"  />
-							<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" /> <label
+								name="mp_custom_field_label[]" value="" />
+							<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" value="0" /> <label
 								class="mp_custom_field_required_label"><?php _e('Required:', 'mp'); ?></label>						
 						</td>
 						<td>&nbsp;</td>
@@ -2700,15 +2699,15 @@ Thanks again!", 'mp')
 
 			// FPM: Process Custom Field(s)
 			if ((isset($_POST['mp_custom_fields'])) && (count($_POST['mp_custom_fields']))) {
-			
 				foreach($_POST['mp_custom_fields'] as $cf_key => $cf_items) {
 					
 					list($bid, $product_id, $variation) = split(':', $cf_key);
-					
-					if (!intval($product_id)) continue;
-					if (!intval($variation)) continue;
+
+					if (!isset($product_id)) continue;
+					if (!isset($variation)) continue;
 
 					$mp_has_custom_field 		= get_post_meta(intval($product_id), 'mp_has_custom_field', true);
+
 					if ((isset($mp_has_custom_field)) && (isset($mp_has_custom_field[intval(intval($variation))]))) {
 						$mp_custom_field_required 	= get_post_meta(intval($product_id), 'mp_custom_field_required', true);
 
@@ -2718,6 +2717,7 @@ Thanks again!", 'mp')
 
 							foreach($cf_items as $idx => $cf_item) {
 								if (empty($cf_item)) {
+
 									$this->cart_checkout_error( __('Required product extra information.', 'mp' ), 
 										'custom_fields_'. $product_id .'_'. $variation);
 									break;
