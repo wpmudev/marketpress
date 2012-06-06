@@ -5,6 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+----------------------------------------------------------------------
+- Added support for Product variation custom fields. http://premium.wpmudev.org/forums/topic/marketpress-certain-products-require-custom-data-from-shoppers
+- Fix issue with Stripe payment gateway JS conflict. http://premium.wpmudev.org/forums/topic/marketpress-problem-cant-finish-checking-out
+
+2.6.0 Beta 1 - 6/6/2012 - Paul Menard
+----------------------------------------------------------------------
+
 - Allow shortcodes to work in custom page messages
 - Fix an issue with number tags showing all products
 - Bug fixes with $content argument in mp_product template function/shortcode

@@ -166,7 +166,9 @@ td.mp_price_col {
 td.mp_sale_col {
 	width: 100px;
 }
-td.mp_price_col input, td.mp_sale_col input {
+
+/* FPM: (2.6.0) Updated to limit for text input */
+td.mp_price_col input[type="text"], td.mp_sale_col input[type="text"] {
 	width: 65px;
 }
 td.mp_inv_col {
@@ -176,6 +178,38 @@ td.mp_inv_col input {
 	width: 30px;
 	text-align: center;
 }
+
+/* FPM: CSS for admin product custom field styling */
+tr.variation td.mp_custom_field_col {
+	width: 50px;
+}
+
+div#mp-meta-details tr.variation-custom-field label.mp_custom_field_label {
+	margin-top: 0;
+	width: 70px;
+	float: left;
+}
+tr.variation-custom-field input.mp_custom_field_value {
+	width: 50%;
+	float: left;
+}
+
+tr.variation-custom-field input.mp_custom_field_required {
+	float: left;
+	margin-right: 5px;
+}
+
+div#mp-meta-details tr.variation-custom-field label.mp_custom_field_required_label {
+	margin-top: 0;
+	float: left;
+}
+
+tr.variation-custom-field-hidden {
+	display: none;
+}
+/* End Custom Field */
+
+
 
 #mp_add_vars {
 	text-align: right;

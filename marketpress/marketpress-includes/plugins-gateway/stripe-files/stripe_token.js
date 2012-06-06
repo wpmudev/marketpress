@@ -21,6 +21,19 @@ function stripeResponseHandler(status, response) {
 jQuery(document).ready(function($) {
 	$("#mp_payment_form").submit(function(event) {
 		
+		// FPM: Seems this JS is trapping on all types of payment. So we need to only process if the payment 
+		// type is stripe or stipe is the only option
+
+		// If we have the radio buttons allowing the user to select the payment method? ...
+		// IF the length is zero then stripe or some other payment gateway is the only one defined. 
+		if ( $('input.mp_choose_gateway').length ) {
+			
+			// If the payment option selected is not stripe then return and bypass input validations
+			if ( $('input.mp_choose_gateway:checked').val() != "stripe" ) {
+				return true;
+			}
+		}
+		
 		//clear errors
 		$("#stripe_checkout_errors").empty();
 		var is_error = false;

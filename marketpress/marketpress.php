@@ -1874,6 +1874,30 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_track_inventory', isset($_POST['mp_track_inventory']) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', array_map('intval', (array)$_POST['mp_inventory']));
 
+	// FPM: Process Custom Field from Admin Product form	
+	if (isset($_POST['mp_has_custom_field'])) {
+		$mp_has_custom_field = array();
+		foreach($_POST['mp_has_custom_field'] as $idx => $key) {
+			$mp_has_custom_field[$key] = "on";
+		}
+		update_post_meta($post_id, 'mp_has_custom_field', $mp_has_custom_field);
+	}
+		
+	if (isset($_POST['mp_custom_field_required'])) {
+		$mp_custom_field_required = array();
+		foreach($_POST['mp_custom_field_required'] as $idx => $key) {
+			$mp_custom_field_required[$key] = "on";
+		}
+		update_post_meta($post_id, 'mp_custom_field_required', $mp_custom_field_required);
+	}
+	if (isset($_POST['mp_custom_field_per'])) {
+		update_post_meta($post_id, 'mp_custom_field_per', array_map('esc_attr', (array)$_POST['mp_custom_field_per']));
+	}
+	if (isset($_POST['mp_custom_field_label'])) {
+		update_post_meta($post_id, 'mp_custom_field_label', array_map('esc_attr', (array)$_POST['mp_custom_field_label']));
+	}
+	// Custom Field end
+
 			//save true first variation price for sorting
 			if ( isset($_POST['mp_is_sale']) )
 				$sort_price = round($_POST['mp_sale_price'][0], 2);
@@ -1931,6 +1955,7 @@ Thanks again!", 'mp')
 					<th scope="col" class="mp_price_col"><?php _e('Price', 'mp') ?></th>
 					<th scope="col" class="mp_sale_col"><label title="<?php _e('When checked these override the normal price.', 'mp'); ?>"><input type="checkbox" id="mp_is_sale" name="mp_is_sale" value="1"<?php checked($meta["mp_is_sale"], '1'); ?> /> <?php _e('Sale Price', 'mp') ?></label></th>
 					<th scope="col" class="mp_inv_col"><label title="<?php _e('When checked inventory tracking will be enabled.', 'mp'); ?>"><input type="checkbox" id="mp_track_inventory" name="mp_track_inventory" value="1"<?php checked($meta["mp_track_inventory"], '1'); ?> /> <?php _e('Inventory', 'mp') ?></label></th>
+					<th scope="col" class="mp_custom_field_col"><?php _e('Custom', 'mp') ?></th>
 					<th scope="col" class="mp_var_remove"></th>
 				</tr>
 			</thead>
@@ -1949,9 +1974,32 @@ Thanks again!", 'mp')
 							<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="<?php echo isset($meta["mp_price"][$key]) ? $this->display_currency($meta["mp_price"][$key]) : '0.00'; ?>" /></td>
 							<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="<?php echo isset($meta["mp_sale_price"][$key]) ? $this->display_currency($meta["mp_sale_price"][$key]) : $this->display_currency($meta["mp_price"][$key]); ?>" disabled="disabled" /></td>
               <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="<?php echo intval($meta["mp_inventory"][$key]); ?>" disabled="disabled" /></td>
+
+							<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="<?php echo $key ?>" <?php 
+								if (isset($meta['mp_has_custom_field'][$key])) { echo ' checked="checked" '; } ?> /></td>
+			
 							<td class="mp_var_remove">
 							<?php if ($count == $last) { ?><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a><?php } ?>
 							</td>
+						</tr>
+						<tr class="variation-custom-field <?php if (!isset($meta['mp_has_custom_field'][$key])) { echo ' variation-custom-field-hidden'; } ?>">
+							<td class="mp_custom_label_col" colspan="1">
+								<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[]" value="input" />
+								<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[]" value="quantity" />
+
+								<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label> <input type="text" 
+									class="mp_custom_field_value" name="mp_custom_field_label[]" 
+									value="<?php if (isset($meta['mp_custom_field_label'][$key])) { 
+										echo $meta['mp_custom_field_label'][$key];} ?>"  />
+							
+								<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" value="<?php echo $key; ?>"
+								<?php 
+									if ($meta['mp_custom_field_required'][$key] == "on") {
+										echo ' checked="checked" ';
+									} ?> /> <label class="mp_custom_field_required_label"><?php _e('Required:', 'mp'); ?></label>
+
+							</td>
+							<td>&nbsp;</td>
 						</tr>
 						<?php
 						$count++;
@@ -1963,8 +2011,24 @@ Thanks again!", 'mp')
 						<td class="mp_sku_col"><input type="text" name="mp_sku[]" value="" /></td>
 						<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="0.00" /></td>
 						<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="0.00" disabled="disabled" /></td>
-            <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
+            			<td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
+						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="<?php echo $key ?>" <?php 
+							if (isset($meta['has_custom_field'][$key])) { echo ' checked="checked" '; } ?> /></td>
 						<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
+					</tr>
+					<tr class="variation-custom-field <?php if (!isset($meta['mp_has_custom_field'][$key])) { echo ' variation-custom-field-hidden'; } ?>">
+						<td class="mp_custom_label_col" colspan="5">
+
+							<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[]" value="input" />
+							<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[]" value="quantity" />
+
+							<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label> <input type="text" class="mp_custom_field_value" 
+								name="mp_custom_field_label[]" value="<?php if (isset($meta['mp_custom_field_label'][$key])) { 
+									echo $meta['mp_custom_field_label'][$key];} ?>"  />
+							<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" /> <label
+								class="mp_custom_field_required_label"><?php _e('Required:', 'mp'); ?></label>						
+						</td>
+						<td>&nbsp;</td>
 					</tr>
 					<?php
 	      }
@@ -2634,6 +2698,39 @@ Thanks again!", 'mp')
 				}
 			}
 
+			// FPM: Process Custom Field(s)
+			if ((isset($_POST['mp_custom_fields'])) && (count($_POST['mp_custom_fields']))) {
+			
+				foreach($_POST['mp_custom_fields'] as $cf_key => $cf_items) {
+					
+					list($bid, $product_id, $variation) = split(':', $cf_key);
+					
+					if (!intval($product_id)) continue;
+					if (!intval($variation)) continue;
+
+					$mp_has_custom_field 		= get_post_meta(intval($product_id), 'mp_has_custom_field', true);
+					if ((isset($mp_has_custom_field)) && (isset($mp_has_custom_field[intval(intval($variation))]))) {
+						$mp_custom_field_required 	= get_post_meta(intval($product_id), 'mp_custom_field_required', true);
+
+						if ((isset($mp_custom_field_required)) 
+					 	 && (isset($mp_custom_field_required[intval($variation)])) 
+					 	 && ($mp_custom_field_required[intval($variation)] == "on")) {
+
+							foreach($cf_items as $idx => $cf_item) {
+								if (empty($cf_item)) {
+									$this->cart_checkout_error( __('Required product extra information.', 'mp' ), 
+										'custom_fields_'. $product_id .'_'. $variation);
+									break;
+								} else {
+									$cf_items[$idx] = trim(strip_tags(stripslashes($cf_item)));
+								}
+							}
+							$_POST['mp_custom_fields'][$cf_key] = $cf_items;
+						}
+					}				
+				}
+			}
+
       //save to session
       global $current_user;
       $meta = get_user_meta($current_user->ID, 'mp_shipping_info', true);
@@ -2648,6 +2745,11 @@ Thanks again!", 'mp')
       $_SESSION['mp_shipping_info']['phone'] = ($_POST['phone']) ? preg_replace('/[^0-9-\(\) ]/', '', trim($_POST['phone'])) : $meta['phone'];
 			if (isset($_POST['special_instructions']))
 				$_SESSION['mp_shipping_info']['special_instructions'] = trim(stripslashes($_POST['special_instructions']));
+
+		// FPM: Handle and store Product Custom field data
+		if (isset($_POST['mp_custom_fields']))
+			$_SESSION['mp_shipping_info']['mp_custom_fields'] = $_POST['mp_custom_fields'];
+
 
       //for checkout plugins
       do_action( 'mp_shipping_process' );
@@ -3724,6 +3826,10 @@ Thanks again!", 'mp')
 
   //replaces shortcodes in email msgs with dynamic content
   function filter_email($order, $text) {
+	
+	global $blog_id; // FPM: Needed for Custom Field Processing
+	$bid = (is_multisite()) ? $blog_id : 1;  // FPM Needed for Custom Field Processing
+
     $settings = get_option('mp_settings');
 
     //// order info
@@ -3736,6 +3842,27 @@ Thanks again!", 'mp')
 					//show download link if set
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
 	        	$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
+
+				// FPM: Product Custom Fields
+				$cf_key = $bid .':'. $product_id .':'. $variation;
+				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+
+					$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+					if (isset($mp_custom_field_label[$variation]))
+						$label_text = $mp_custom_field_label[$variation];
+					else
+						$label_text = __('Product Extra Fields: ', 'mp');
+
+		        	$order_info .= "\t\t" . $label_text  ."\n";
+					foreach($cf_items as $idx => $cf_item) {
+						$item_cnt = intval($idx)+1;
+			        	$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
+					}
+				}
+				$order_info .= "\n";
+
+
 				}
 			}
       $order_info .= "\n";
@@ -4284,6 +4411,9 @@ Notification Preferences: %s', 'mp');
           </tr></thead>
           <tbody>
           <?php
+			global $blog_id;
+			$bid = (is_multisite()) ? $blog_id : 1; // FPM
+
           if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
             foreach ($order->mp_cart_info as $product_id => $variations) {
 							//for compatibility for old orders from MP 1.0
@@ -4303,7 +4433,27 @@ Notification Preferences: %s', 'mp');
 		              echo '<tr>';
 		              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
 		              echo '  <td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
-		              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
+		              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a>';
+
+						// FPM: Output product custom field information
+						$cf_key = $bid .':'. $product_id .':'. $variation;
+						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+							$cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+
+							$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+							if (isset($mp_custom_field_label[$variation]))
+								$label_text = $mp_custom_field_label[$variation];
+							else
+								$label_text = __('Product Extra Fields:', 'mp');
+
+							echo '<div class="mp_cart_custom_fields">'. $label_text .'<ol>';
+							foreach($cf_item as $item) {
+								echo '<li>'. $item .'</li>';
+							}
+							echo '</ol></div>';
+						}
+		
+					  echo '</td>';
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 		              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
 		              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';

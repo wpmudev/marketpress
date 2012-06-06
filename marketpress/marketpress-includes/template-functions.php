@@ -306,7 +306,27 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
           $content .=  '<tr>';
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 75 ) . '</td>';
-          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML
+          $content .=  '  <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
+
+			// FPM: Output product custom field information
+			$cf_key = $bid .':'. $product_id .':'. $variation;
+			if (isset($_SESSION['mp_shipping_info']['mp_custom_fields'][$cf_key])) {
+				$cf_item = $_SESSION['mp_shipping_info']['mp_custom_fields'][$cf_key];
+
+				$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+				if (isset($mp_custom_field_label[$variation]))
+					$label_text = $mp_custom_field_label[$variation];
+				else
+					$label_text = __('Product Extra Fields:', 'mp');
+				
+				$content .=  '<div class="mp_cart_custom_fields">'. $label_text .'<br /><ol>';
+				foreach($cf_item as $item) {
+					$content .=  '<li>'. $item .'</li>';
+				}
+				$content .=  '</ol></div>';
+			}
+          $content .=  '</td>'; // Added WPML
+
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
           $content .=  '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
           $content .=  '</tr>';
@@ -816,7 +836,11 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
  *
  */
 function mp_order_status() {
-  global $mp, $wp_query;
+  global $mp, $wp_query, $blog_id;
+
+
+	$bid = (is_multisite()) ? $blog_id : 1; // FPM: Used for Custom Field Processing
+	
 	$settings = get_option('mp_settings');
   echo do_shortcode($settings['msg']['order_status']);
 
@@ -905,7 +929,28 @@ function mp_order_status() {
 								foreach ($variations as $variation => $data) {
 		              echo '<tr>';
 		              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-		              echo '  <td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML (This differs than other code)
+		              echo '  <td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
+		
+		
+						// FPM: Output product custom field information
+						$cf_key = $bid .':'. $product_id .':'. $variation;
+						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+							$cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+
+							$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+							if (isset($mp_custom_field_label[$variation]))
+								$label_text = $mp_custom_field_label[$variation];
+							else
+								$label_text = __('Product Extra Fields:', 'mp');
+
+							echo '<div class="mp_cart_custom_fields">'. $label_text .'<br /><ol>';
+							foreach($cf_item as $item) {
+								echo '<li>'. $item .'</li>';
+							}
+							echo '</ol></div>';
+						}
+					
+		              echo '</td>'; // Added WPML (This differs than other code)
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
 		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
@@ -1920,3 +1965,179 @@ function mp_products_count() {
   $custom_query = new WP_Query('post_type=product&post_status=publish');
   return $custom_query->post_count;
 }
+
+/**
+* This function hook into the shipping filter to add any product custom fields. Checks the cart items
+ * If any cart items have associated custom fields then they will be displayed in a new section 'Product extra fields'
+ * shown below the shipping form inputs. The custom fields will be one for each quantity. Via the product admin each 
+ * custom field can be made required or optional. Standard error handling is provided per Market Press standard processing.
+ *
+ * @since 2.6.0
+ * @see 
+ *
+ * @param $content - output content passed from caller (_mp_cart_shipping)
+ * @return $content - Revised content with added information
+ */
+
+function mp_custom_fields_checkout_after_shipping($content='') {
+	
+	global $mp, $blog_id, $current_user;
+	
+	if (isset($_SESSION['mp_shipping_info']['mp_custom_fields'])) {
+		$mp_custom_fields = $_SESSION['mp_shipping_info']['mp_custom_fields'];
+	} else {
+		$mp_custom_fields = array();
+	}
+  
+	$blog_id = (is_multisite()) ? $blog_id : 1;
+	$settings = get_option('mp_settings');
+	
+	$current_blog_id = $blog_id;
+
+	$global_cart = $mp->get_cart_contents(true);
+	if (!$mp->global_cart)  //get subset if needed
+		$selected_cart[$blog_id] = $global_cart[$blog_id];
+	else
+    	$selected_cart = $global_cart;
+  
+	$content_product = '';
+	
+    foreach ($selected_cart as $bid => $cart) {
+
+		if (is_multisite())
+			switch_to_blog($bid);
+
+      	foreach ($cart as $product_id => $variations) {
+	
+			// Load the meta info for the custom fields for this product
+			$mp_has_custom_field 		= get_post_meta($product_id, 'mp_has_custom_field', true);
+			$mp_custom_field_required 	= get_post_meta($product_id, 'mp_custom_field_required', true);;
+			$mp_custom_field_per 		= get_post_meta($product_id, 'mp_custom_field_per', true);;
+			$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+	
+        	foreach ($variations as $variation => $data) {
+		
+				if (isset($mp_has_custom_field[$variation])) {
+
+					if (isset($mp_custom_field_label[$variation]))
+						$label_text = $mp_custom_field_label[$variation];
+					else
+						$label_text = "";
+					
+					if (isset($mp_custom_field_required[$variation]))
+						$required_text = 'required';
+					else
+						$required_text = "optional";									
+				    
+					$content_product .= '<tr class="mp_product_name"><td align="right" colspan="2">';
+					$content_product .= apply_filters( 'mp_checkout_error_custom_fields_'. $product_id .'_'. $variation, '' );
+					$content_product .= $data['name'];
+					$content_product .= '</td></tr>';
+					$content_product .= '<tr class="mp_product_custom_fields" style="border-width: 0px">';
+					$content_product .= '<td align="right" style="border-width: 0px">';
+				    $content_product .= $label_text .' ('. $required_text .')';
+					$content_product .=  '</td></tr>';
+					$content_product .= '<tr><td style="border-width: 0px">';
+					
+					// If the mp_custom_field_per is set to 'line' we only show one input field per item in the cart. 
+					// This input field will be a simply unordered list (<ul>). However, if the mp_custom_field_per
+					// Then we need to show an input field per the quantity items. In this case we use an ordered list
+					// to show the numbers to the user. 0-based.
+					if ($mp_custom_field_per[$variation] == "line") {
+						$content_product .= '<ul>';
+						$cf_limit = 1;
+						
+					} else if ($mp_custom_field_per[$variation] == "quantity") {
+						$content_product .= '<ol>';
+						$cf_limit = $data['quantity'];
+					}
+					
+					$output_cnt = 0;
+					while($output_cnt < $cf_limit) {
+
+						$cf_key = $bid .':'. $product_id .':'. $variation;
+						if (isset($mp_custom_fields[$cf_key][$output_cnt])) 
+							$output_value = $mp_custom_fields[$cf_key][$output_cnt];
+						else
+							$output_value = '';
+							
+						$content_product .= '<li><input type="text" style="width: 90%;" value="'. $output_value .'" 
+							name="mp_custom_fields[' . $bid . ':' . $product_id . ':' . $variation . ']['. $output_cnt .']" /></li>';
+						$output_cnt += 1;
+					}
+					
+					if ($mp_custom_field_per[$variation] == "line")
+						$content_product .= '<ul>';
+					else if ($mp_custom_field_per[$variation] == "quantity")
+						$content_product .= '<ol>';
+
+					$content_product .=  '</td>';
+					$content_product .=  '</tr>';
+				}
+			}
+		}
+
+	    //go back to original blog
+	    if (is_multisite())
+	      switch_to_blog($current_blog_id);
+	}
+	
+	if (strlen($content_product)) {
+		
+	    $content .= '<table class="mp_product_shipping_custom_fields">';
+	    $content .= '<thead><tr><th colspan="2">'. __('Product extra fields:', 'mp') .'</th></tr></thead>';
+	    $content .= '<tbody>';
+	    $content .= $content_product;
+	    $content .= '</tbody>';
+	    $content .= '</table>';		
+	}
+	return $content;
+}
+add_filter('mp_checkout_after_shipping', 'mp_custom_fields_checkout_after_shipping');
+
+/* Not used. This code will show the custom fields input at the view cart page instead of shipping */
+function mp_custom_fields_single_order_display_box($order) {
+	global $blog_id;
+	
+	// If this order doesn't have custom fields then return...
+	if (!isset($order->mp_shipping_info['mp_custom_fields']))
+		return;
+
+	// IF no order items. Not sure this can happend but just in case. 
+	if (!isset($order->mp_cart_info))
+		return;
+	
+	//echo "order<pre>"; print_r($order); echo "</pre>";
+
+	$content_product = '';
+	
+	$bid = (is_multisite()) ? $blog_id : 1;
+	foreach ($order->mp_cart_info as $product_id => $variations) {
+		foreach ($variations as $variation => $data) {
+			$content_product .= '<h3>'. $data['name'] .'</h3>';
+			$cf_key = $bid .':'. $product_id .':'. $variation;
+			if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+				$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+				$content_product .= '<ol>';
+				foreach($cf_items as $cf_item) {
+					$content_product .= '<li>'. $cf_item .'</li>';
+				}
+				$content_product .= '</ol>';
+			}
+		}
+	}
+	if (strlen($content_product)) {
+		?>
+		<div id="mp-order-custom-fields-info" class="postbox">
+			<h3 class='hndle'><span><?php _e('Product Extra Fields', 'mp'); ?></span></h3>
+			<div class="inside">
+			<?php echo $content_product; ?>
+	   		</div>
+		</div>
+		<script type="text/javascript">
+			jQuery('table#mp-order-product-table').after('<p><a href="#mp-order-custom-fields-info">View Product Extra Fields</a></p>');
+		</script>
+		<?php
+	}
+}
+//add_action('mp_single_order_display_box', 'mp_custom_fields_single_order_display_box');
