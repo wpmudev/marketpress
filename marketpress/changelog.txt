@@ -5,7 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.6.0 Beta 1 - 6/6/2012 - Aaron Edwards/Paul Menard
+2.6.0 - 6/6/2012 - Aaron Edwards/Paul Menard
 ----------------------------------------------------------------------
 - Added support for per Product and variation custom fields for personalization
 - Allow shortcodes to work in custom page messages
