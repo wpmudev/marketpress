@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6
+Version: 2.6.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.6';
+  var $version = '2.6.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -3898,8 +3898,13 @@ Thanks again!", 'mp')
 			$shipping_info .= "\n" . __('Country:', 'mp') . ' ' . $order->mp_shipping_info['country'];
 			if ($order->mp_shipping_info['phone'])
 				$shipping_info .= "\n" . __('Phone Number:', 'mp') . ' ' . $order->mp_shipping_info['phone'];
+			
+			// If actually shipped show method, else customer's shipping choice.
 			if (isset($order->mp_shipping_info['method']) && $order->mp_shipping_info['method'] != 'other')
 				$shipping_info .= "\n" . __('Shipping Method:', 'mp') . ' ' . $order->mp_shipping_info['method'];
+			elseif (! empty($order->mp_shipping_info['shipping_option']) )
+				$shipping_info .= "\n" . __('Shipping Method:', 'mp') . ' ' . strtoupper($order->mp_shipping_info['shipping_option']) . ' ' .$order->mp_shipping_info['shipping_sub_option'] ;
+	
 			if ($order->mp_shipping_info['tracking_num'])
 				$shipping_info .= "\n" . __('Tracking Number:', 'mp') . ' ' . $order->mp_shipping_info['tracking_num'];
 		}
@@ -4481,7 +4486,7 @@ Notification Preferences: %s', 'mp');
         <?php //shipping line
         if ( $order->mp_shipping_total ) { ?>
         <h3><?php _e('Shipping:', 'mp'); ?></h3>
-        <p><?php echo $this->format_currency('', $order->mp_shipping_total); ?></p>
+        <p><?php echo $this->format_currency('', $order->mp_shipping_total) . ' ( ' . strtoupper($order->mp_shipping_info['shipping_option']) . ' ' .  $order->mp_shipping_info['shipping_sub_option'] . ' )'; ?></p>
         <?php } ?>
 
         <?php //tax line
@@ -4561,7 +4566,7 @@ Notification Preferences: %s', 'mp');
           </table>
 
           <h3><?php _e('Cost:', 'mp'); ?></h3>
-          <p><?php echo $this->format_currency('', $order->mp_shipping_total); ?></p>
+          <p><?php echo $this->format_currency('', $order->mp_shipping_total) . ' ( ' . strtoupper($order->mp_shipping_info['shipping_option']) . ' ' .  $order->mp_shipping_info['shipping_sub_option'] . ' )'; ?></p>
 					
           <h3><?php _e('Shipping Method & Tracking Number:', 'mp'); ?></h3>
           <p>
