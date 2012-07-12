@@ -1416,7 +1416,7 @@ function mp_category_list( $product_id = false, $before = '', $sep = ', ', $afte
   if ( $terms )
     return $terms;
   else
-		return __( 'Uncatagorized', 'mp' );
+		return __( 'Uncategorized', 'mp' );
 }
 
 

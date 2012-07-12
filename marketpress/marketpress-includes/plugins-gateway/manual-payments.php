@@ -153,8 +153,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	  
 	  if (isset($settings['gateways']['manual-payments']['email']))
 		  $msg = $mp->filter_email($order, $settings['gateways']['manual-payments']['email']);
-		else
-		  $msg = $settings['email']['new_order_txt'];
 		  
     return $msg;
   }
