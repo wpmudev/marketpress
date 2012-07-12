@@ -1090,6 +1090,8 @@ function mp_global_categories_list( $args = '' ) {
 
 	if ( !$tags )
 		return;
+	
+	$tags = apply_filters('mp_global_categories_list_tags', $tags);
 
   //sort by name
   foreach ($tags as $tag) {
@@ -1137,7 +1139,9 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
 
 	if ( !$tags )
 		return;
-
+	
+	$tags = apply_filters('mp_global_tag_cloud_tags', $tags);
+	
   //sort by name
   foreach ($tags as $tag) {
     //skip empty tags
@@ -1301,6 +1305,9 @@ function mp_list_global_products( $args = '' ) {
     $content = '<div id="mp_product_list">';
 
   if ($results) {
+		
+		$results = apply_filters('mp_list_global_products_results', $results);
+		
     foreach ($results as $product) {
 
       if ($as_list)
