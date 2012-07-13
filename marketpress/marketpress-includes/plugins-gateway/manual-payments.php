@@ -235,12 +235,15 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    *  array. Don't forget to return!
    */
 	function process_gateway_settings($settings) {
-
+		
+		if ( !is_array( $settings['gateways']['manual-payments'] ) )
+			return $settings;
+		
 		//strip slashes
     $settings['gateways']['manual-payments'] = array_map('stripslashes', $settings['gateways']['manual-payments']);
 		
 		//no html in public name
-  	$settings['gateways']['manual-payments']['name'] = wp_filter_nohtml_kses($settings['gateways']['manual-payments']['name']);
+  	$settings['gateways']['manual-payments']['name'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['manual-payments']['name']));
   	
 		//filter html if needed
 		if (!current_user_can('unfiltered_html')) {
@@ -249,8 +252,8 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		}
 		
 		//no html in email
-  	$settings['gateways']['manual-payments']['email'] = wp_filter_nohtml_kses($settings['gateways']['manual-payments']['email']);	
-		
+  	$settings['gateways']['manual-payments']['email'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['manual-payments']['email']));	
+
     return $settings;
   }
   

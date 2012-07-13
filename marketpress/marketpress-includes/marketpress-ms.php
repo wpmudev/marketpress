@@ -615,27 +615,44 @@ class MarketPress_MS {
             <table class="form-table">
               <?php
               //get theme dir
-              $theme_dir = $mp->plugin_dir . 'themes/';
-
-              //scan directory for theme css files
-              $theme_list = array();
-              if ($handle = @opendir($theme_dir)) {
-                while (false !== ($file = readdir($handle))) {
-                  if (($pos = strrpos($file, '.css')) !== false) {
-                    $value = substr($file, 0, $pos);
-                    if (is_readable("$theme_dir/$file")) {
-                      $theme_data = get_file_data( "$theme_dir/$file", array('name' => 'MarketPress Theme') );
-                      if (is_array($theme_data))
-                        $theme_list[$value] = $theme_data['name'];
-                    }
-                  }
-                }
-
-                @closedir($handle);
-              }
-
-              //sort the themes
-              asort($theme_list);
+							$theme_dir = $mp->plugin_dir . 'themes/';
+					
+							//scan directory for theme css files
+							$theme_list = array();
+							if ($handle = @opendir($theme_dir)) {
+								while (false !== ($file = readdir($handle))) {
+									if (($pos = strrpos($file, '.css')) !== false) {
+										$value = substr($file, 0, $pos);
+										if (is_readable("$theme_dir/$file")) {
+											$theme_data = get_file_data( "$theme_dir/$file", array('name' => 'MarketPress Style') );
+											if (is_array($theme_data))
+												$theme_list[$value] = $theme_data['name'];
+										}
+									}
+								}
+					
+								@closedir($handle);
+							}
+							
+							//scan wp-content/marketpress-styles/ directory for theme css files
+							$theme_dir = WP_CONTENT_DIR . '/marketpress-styles/';
+							if ($handle = @opendir($theme_dir)) {
+								while (false !== ($file = readdir($handle))) {
+									if (($pos = strrpos($file, '.css')) !== false) {
+										$value = substr($file, 0, $pos);
+										if (is_readable("$theme_dir/$file")) {
+											$theme_data = get_file_data( "$theme_dir/$file", array('name' => 'MarketPress Style') );
+											if (is_array($theme_data))
+												$theme_list[$value] = $theme_data['name'];
+										}
+									}
+								}
+					
+								@closedir($handle);
+							}
+					
+							//sort the themes
+							asort($theme_list);
 
               foreach ($theme_list as $value => $name) {
                 $allowed = ($settings['allowed_themes'][$value]) ? $settings['allowed_themes'][$value] : 'full';

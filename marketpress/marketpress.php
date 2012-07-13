@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6.1 beta 1
+Version: 2.6.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -455,13 +455,8 @@ Thanks again!", 'mp')
       $settings = get_option('mp_settings');
 
       //see if there are checkboxes checked
-      if ( isset( $_POST['mp'] ) ) {
-
-        //clear allowed array as it will be refilled
-        unset( $settings['gateways']['allowed'] );
-
-        //allow plugins to verify settings before saving
-        $settings = array_merge($settings, apply_filters('mp_gateway_settings_filter', $_POST['mp']));
+      if ( isset( $_POST['mp']['gateways']['allowed'] ) ) {
+				$settings['gateways']['allowed'] = $_POST['mp']['gateways']['allowed'];
       } else {
         //blank array if no checkboxes
         $settings['gateways']['allowed'] = array();
@@ -2501,9 +2496,9 @@ Thanks again!", 'mp')
 			//if not valid product_id return
       $product_id = apply_filters('mp_product_id_add_to_cart', intval($_POST['product_id']));
       $product = get_post($product_id);
-      if (!$product)
+      if (!$product || $product->post_type != 'product' || $product->post_status != 'publish')
         return false;
-
+			
 			//get quantity
       $quantity = (isset($_POST['quantity'])) ? intval(abs($_POST['quantity'])) : 1;
 
@@ -4983,7 +4978,11 @@ Notification Preferences: %s', 'mp');
     		'importers'     => __('Importers', 'mp')
     	);
     } else {
-      $tabs = array( 'presentation'  => __('Presentation', 'mp') );
+      $tabs = array(
+				'presentation'  => __('Presentation', 'mp'),
+    		'shortcodes'    => __('Shortcodes', 'mp'),
+    		'importers'     => __('Importers', 'mp')
+			);
     }
   	$tabhtml = array();
 
@@ -6182,6 +6181,12 @@ Notification Preferences: %s', 'mp');
 
         //save settings
         if (isset($_POST['gateway_settings'])) {
+					if ( isset( $_POST['mp'] ) ) {
+						$filtered_settings = apply_filters('mp_gateway_settings_filter', $_POST['mp']);
+						//allow plugins to verify settings before saving
+						$settings = array_merge($settings, $filtered_settings);
+						update_option('mp_settings', $settings);
+					}
           echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
         }
         ?>

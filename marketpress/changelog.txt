@@ -5,13 +5,19 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.6.1 - 7/11/2012 - Aaron Edwards/Arnold Bailey
+2.6.1 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
 - Display Shipping Option and Shipping Sub Option next to shipping cost on Order Manage Page.
 - Added shipping method to the SHIPPINGINFO in email. If mp_shipping_info['method'] not yet set from actual shipping, displays the customer's choice.
+- Show Shortcodes and importers tabs in listing only mode
+- Major bugfix to gateway plugins settings filters
+- Fix stripslashes issue with manual payments gateway
 - Fix email filtering for manual payments gateway
 - Change order of 'mp_new_order' hook
 - Add some more filters for WPML compatibility
+- Verify product_ids before adding to cart
+- Fix Egypt Pounds currency symbol
+- Fix missing labels for custom styles in Network settings
 
 2.6.0 - 6/6/2012 - Aaron Edwards/Paul Menard
 ----------------------------------------------------------------------
