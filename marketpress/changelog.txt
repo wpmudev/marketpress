@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.6.2 - 7/13/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Fix some potential problems with new installs and the CubePoints gateway
+
+
 2.6.1 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
 - Display Shipping Option and Shipping Sub Option next to shipping cost on Order Manage Page.

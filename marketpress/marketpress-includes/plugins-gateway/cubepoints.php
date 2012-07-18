@@ -42,7 +42,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 
 		//set names here to be able to translate
 		$this->admin_name = __('CubePoints', 'mp');
-		$this->public_name = (isset($settings['gateways']['cubepoints']['name'])) ? $settings['gateways']['cubepoints']['name'] : __('CubePoints', 'mp');
+		$this->public_name = (!empty($settings['gateways']['cubepoints']['name'])) ? $settings['gateways']['cubepoints']['name'] : __('CubePoints', 'mp');
 
     $this->method_img_url = $mp->plugin_url . 'images/cubepoints.png';
 	}
@@ -198,7 +198,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 	function gateway_settings_box($settings) {
     global $mp;
     $settings = get_option('mp_settings');
-		if (!isset($settings['gateways']['cubepoints']['name']))
+		if (empty($settings['gateways']['cubepoints']['name']))
 		  $settings['gateways']['cubepoints']['name'] = __('CubePoints', 'mp');
 
 		if (!isset($settings['gateways']['cubepoints']['email']))
@@ -259,7 +259,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 	function process_gateway_settings($settings) {
 
 		//no html in public name
-  	$settings['gateways']['cubepoints']['name'] = wp_filter_nohtml_kses($settings['gateways']['cubepoints']['name']);
+  	$settings['gateways']['cubepoints']['name'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['cubepoints']['name']));
 
 		//filter html if needed
 		if (!current_user_can('unfiltered_html')) {
@@ -268,7 +268,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 		}
 
 		//no html in email
-  	$settings['gateways']['cubepoints']['email'] = wp_filter_nohtml_kses($settings['gateways']['cubepoints']['email']);
+  	$settings['gateways']['cubepoints']['email'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['cubepoints']['email']));
 
     return $settings;
   }
