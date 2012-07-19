@@ -576,15 +576,18 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
             <?php
             $sel_locale = ($settings['gateways']['paypal-express']['locale']) ? $settings['gateways']['paypal-express']['locale'] : $settings['base_country'];
             $locales = array(
+              'AR'	=> 'Argentina',
               'AU'	=> 'Australia',
               'AT'	=> 'Austria',
               'BE'	=> 'Belgium',
+              'BR'	=> 'Brazil',
               'CA'	=> 'Canada',
               'CN'	=> 'China',
               'FR'	=> 'France',
               'DE'	=> 'Germany',
               'HK'	=> 'Hong Kong',
               'IT'	=> 'Italy',
+              'JP'	=> 'Japan',
               'MX'	=> 'Mexico',
               'NL'	=> 'Netherlands',
               'PL'	=> 'Poland',
