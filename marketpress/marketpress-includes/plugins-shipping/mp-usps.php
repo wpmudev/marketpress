@@ -44,6 +44,9 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	public $origin_zip = '';
 	public $destination_zip = '';
 
+	public $domestic_handling = 0;
+	public $intl_handling = 0;
+
 	private $settings = '';
 	private $usps_settings;
 
@@ -316,6 +319,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 								</label>
 							</td>
 						</tr>
+
 						<tr>
 							<th scope="row"><?php _e('USPS Offered Domestic Services', 'mp') ?></th>
 							<td>
@@ -328,6 +332,13 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 						</tr>
 
 						<tr>
+							<th scope="row"><?php _e('Handling Charge per Domestic Shipment ', 'mp') ?></th>
+							<td>
+								<input type="text" name="mp[shipping][usps][domestic_handling]" value="<?php echo (empty($this->usps_settings['domestic_handling']) ) ? '0.00' : esc_attr($this->usps_settings['domestic_handling']); ?>" size="20" maxlength="20" />
+							</td>
+						</tr>
+
+						<tr>
 							<th scope="row"><?php _e('USPS Offered International Services', 'mp') ?></th>
 							<td>
 								<?php foreach($this->intl_services as $service => $detail): ?>
@@ -335,6 +346,13 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 									<input type="checkbox" name="mp[shipping][usps][intl_services][<?php echo $service; ?>]" value="1" <?php checked($this->usps_settings['intl_services'][$service]); ?> />&nbsp;<?php echo $detail['name']; ?>
 								</label><br />
 								<?php endforeach;	?>
+							</td>
+						</tr>
+
+						<tr>
+							<th scope="row"><?php _e('Handling Charge per Interntional Shipment', 'mp') ?></th>
+							<td>
+								<input type="text" name="mp[shipping][usps][intl_handling]" value="<?php echo (empty($this->usps_settings['intl_handling']) ) ? '0.00' : esc_attr($this->usps_settings['intl_handling']); ?>" size="20" maxlength="20" />
 							</td>
 						</tr>
 
@@ -467,7 +485,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			// Format the returned array for display in the drop down
 			$shipping_options = array();
 			foreach ($_SESSION['mp_shipping_options'] as $service => $item) {
-				$shipping_options[$service] = $this->format_shipping_option($service, $item['rate'], $item['delivery']);
+				$shipping_options[$service] = $this->format_shipping_option($service, $item['rate'], $item['delivery'], $item['handling']);
 			}
 			//All done
 			return $shipping_options;
@@ -497,7 +515,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 		}
 
-
 		// Got our totals  make sure we're in decimal pounds.
 		$this->weight = $this->as_pounds($this->weight);
 
@@ -523,7 +540,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		// Can't use zip+4
 		$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
 		$this->destination_zip = substr($this->destination_zip, 0, 5);
-
+		
 		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			$shipping_options = $this->ratev4_request();
 		} else {
@@ -656,14 +673,15 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 			else
 			{
+				$handling = floatval($this->usps_settings['domestic_handling']) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]['delivery'];
-				$option = $this->format_shipping_option($service, $rate, $delivery);
-				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery);
+				$option = $this->format_shipping_option($service, $rate, $delivery, $handling);
+				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
 				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
 					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
-						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate;
+						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate + $handling;
 					}
 				}
 			}
@@ -814,13 +832,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 			else
 			{
-				$option = $this->format_shipping_option($service, $rate, $delivery);
-				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery);
+				$handling = floatval($this->usps_settings['intl_handling']) * $this->pkg_count; // Add handling times number of packages.
+				$option = $this->format_shipping_option($service, $rate, $delivery, $handling);
+				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
 				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
 					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
-						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate;
+						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate + $handling;
 					}
 				}
 			}
@@ -884,7 +903,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* @return string, Formatted string with shipping method name delivery time and price
 	*
 	*/
-	private function format_shipping_option($shipping_option = '', $price = '', $delivery = ''){
+	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
 		global $mp;
 		if ( isset($this->services[$shipping_option])){
 			$option = $this->services[$shipping_option]['name'];
@@ -892,7 +911,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		elseif ( isset($this->intl_services[$shipping_option])){
 			$option = $this->intl_services[$shipping_option]['name'];
 		}
-		$option .=  ' ' . $delivery . ' - ' . $mp->format_currency('', $price);
+		$option .=  sprintf(__(' %1$s - %2$s + %3$s handling', 'mp'), $delivery, $mp->format_currency('', $price), $mp->format_currency('', $handling) );
 		return $option;
 	}
 
