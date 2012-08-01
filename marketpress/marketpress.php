@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6.3
+Version: 2.6.2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.6.3';
+  var $version = '2.6.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -1109,13 +1109,12 @@ Thanks again!", 'mp')
       $templates[] = "mp_taxonomy.php";
       $templates[] = "mp_productlist.php";
 			
-			//override if id is passed, mainly for product category dropdown widget
-			if ( is_numeric( get_query_var($wp_query->query_vars['taxonomy']) ) ) {
-				$term = get_term( get_query_var($wp_query->query_vars['taxonomy']), $wp_query->query_vars['taxonomy'] );
-				$wp_query->query_vars[$wp_query->query_vars['taxonomy']] = $term->slug;
-				$wp_query->query_vars['term'] = $term->slug;
+			if ( isset($_GET['product_category']) ) {
+				$link = get_term_link( (int)get_query_var($wp_query->query_vars['taxonomy']), $wp_query->query_vars['taxonomy'] );
+				wp_redirect($link);
+				exit;
 			}
-			
+
       //if custom template exists load it
       if ($this->product_taxonomy_template = locate_template($templates)) {
 
@@ -3821,9 +3820,9 @@ Thanks again!", 'mp')
 
   //replaces shortcodes in email msgs with dynamic content
   function filter_email($order, $text) {
-	
-	global $blog_id; // FPM: Needed for Custom Field Processing
-	$bid = (is_multisite()) ? $blog_id : 1;  // FPM Needed for Custom Field Processing
+		
+		global $blog_id; // FPM: Needed for Custom Field Processing
+		$bid = (is_multisite()) ? $blog_id : 1;  // FPM Needed for Custom Field Processing
 
     $settings = get_option('mp_settings');
 
@@ -3832,31 +3831,30 @@ Thanks again!", 'mp')
       $order_info = __('Items:', 'mp') . "\n";
       foreach ($order->mp_cart_info as $product_id => $variations) {
 				foreach ($variations as $variation => $data) {
-	        $order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+	        $order_info .= "\t" . $data['name'] . (empty($data['sku']) ? '' : ' - ' . $data['sku']) . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 					//show download link if set
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
 	        	$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
 
-				// FPM: Product Custom Fields
-				$cf_key = $bid .':'. $product_id .':'. $variation;
-				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-
-					$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
-					if (isset($mp_custom_field_label[$variation]))
-						$label_text = $mp_custom_field_label[$variation];
-					else
-						$label_text = __('Product Extra Fields: ', 'mp');
-
-		        	$order_info .= "\t\t" . $label_text  ."\n";
-					foreach($cf_items as $idx => $cf_item) {
-						$item_cnt = intval($idx)+1;
-			        	$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
+					// FPM: Product Custom Fields
+					$cf_key = $bid .':'. $product_id .':'. $variation;
+					if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+						$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+	
+						$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+						if (isset($mp_custom_field_label[$variation]))
+							$label_text = $mp_custom_field_label[$variation];
+						else
+							$label_text = __('Product Extra Fields: ', 'mp');
+	
+						$order_info .= "\t\t" . $label_text  ."\n";
+						foreach($cf_items as $idx => $cf_item) {
+							$item_cnt = intval($idx)+1;
+									$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
+						}
 					}
-				}
-				$order_info .= "\n";
-
+					$order_info .= "\n";
 
 				}
 			}
@@ -5354,7 +5352,7 @@ Notification Preferences: %s', 'mp');
   		case "coupons":
 
         $coupons = get_option('mp_coupons');
-
+				
         //delete checked coupons
       	if (isset($_POST['allcoupon_delete'])) {
           //check nonce
@@ -5379,7 +5377,7 @@ Notification Preferences: %s', 'mp');
           $error = false;
 
           $new_coupon_code = preg_replace('/[^A-Z0-9_-]/', '', strtoupper($_POST['coupon_code']));
-          if (!$new_coupon_code)
+          if (empty($new_coupon_code))
             $error[] = __('Please enter a valid Coupon Code', 'mp');
 
           $coupons[$new_coupon_code]['discount'] = round($_POST['discount'], 2);
@@ -5406,7 +5404,7 @@ Notification Preferences: %s', 'mp');
             echo '<div class="updated fade"><p>'.__('Coupon succesfully saved.', 'mp').'</p></div>';
           }
         }
-
+				
         //if editing a coupon
         if (isset($_GET['code'])) {
           $new_coupon_code = $_GET['code'];
@@ -5429,9 +5427,9 @@ Notification Preferences: %s', 'mp');
 
     		$coupon_list = get_option('mp_coupons');
     		$total = (is_array($coupon_list)) ? count($coupon_list) : 0;
-
+				
         if ($total)
-          $coupon_list = array_slice($coupon_list, intval(($apage-1) * $num), intval($num));
+          $coupon_list = array_slice($coupon_list, intval(($apage-1) * $num), intval($num), true);
 
     		$coupon_navigation = paginate_links( array(
     			'base' => add_query_arg( 'apage', '%#%' ).$url2,
@@ -5606,13 +5604,11 @@ Notification Preferences: %s', 'mp');
           	}
 
           	//setup defaults
-          	if ($new_coupon_code) {
-              $discount = ($coupons[$new_coupon_code]['discount'] && $coupons[$new_coupon_code]['discount_type'] == 'amt') ? round($coupons[$new_coupon_code]['discount'], 2) : $coupons[$new_coupon_code]['discount'];
-              $discount_type = $coupons[$new_coupon_code]['discount_type'];
-              $start = ($coupons[$new_coupon_code]['start']) ? date('Y-m-d', $coupons[$new_coupon_code]['start']) : date('Y-m-d');
-              $end = ($coupons[$new_coupon_code]['end']) ? date('Y-m-d', $coupons[$new_coupon_code]['end']) : '';
-              $uses = $coupons[$new_coupon_code]['uses'];
-            }
+              $discount = (isset($coupons[$new_coupon_code]['discount']) && $coupons[$new_coupon_code]['discount_type'] == 'amt') ? round($coupons[$new_coupon_code]['discount'], 2) : $coupons[$new_coupon_code]['discount'];
+              $discount_type = isset($coupons[$new_coupon_code]['discount_type']) ? $coupons[$new_coupon_code]['discount_type'] : '';
+              $start = isset($coupons[$new_coupon_code]['start']) ? date('Y-m-d', $coupons[$new_coupon_code]['start']) : date('Y-m-d');
+              $end = isset($coupons[$new_coupon_code]['end']) ? date('Y-m-d', $coupons[$new_coupon_code]['end']) : '';
+              $uses = isset($coupons[$new_coupon_code]['uses']) ? $coupons[$new_coupon_code]['uses'] : '';
           	?>
             <table id="add_coupon">
             <thead>

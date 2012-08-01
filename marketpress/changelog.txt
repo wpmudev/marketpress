@@ -8,8 +8,10 @@ Change Log:
 2.6.2 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
 - Added per shipment handling charge to USPS, one for domestic and one for international shipping.
-- Fix some potential problems with new installs and the CubePoints gateway
 - Add Argentina and Brazil to PayPal gateway countries
+- Add SKU's to new order emails
+- Fix issue with category dropdown widget displaying all products
+- Fix some potential problems with new installs and the CubePoints gateway
 
 2.6.1 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
