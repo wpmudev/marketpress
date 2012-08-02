@@ -5604,11 +5604,11 @@ Notification Preferences: %s', 'mp');
           	}
 
           	//setup defaults
-              $discount = (isset($coupons[$new_coupon_code]['discount']) && $coupons[$new_coupon_code]['discount_type'] == 'amt') ? round($coupons[$new_coupon_code]['discount'], 2) : $coupons[$new_coupon_code]['discount'];
-              $discount_type = isset($coupons[$new_coupon_code]['discount_type']) ? $coupons[$new_coupon_code]['discount_type'] : '';
-              $start = isset($coupons[$new_coupon_code]['start']) ? date('Y-m-d', $coupons[$new_coupon_code]['start']) : date('Y-m-d');
-              $end = isset($coupons[$new_coupon_code]['end']) ? date('Y-m-d', $coupons[$new_coupon_code]['end']) : '';
-              $uses = isset($coupons[$new_coupon_code]['uses']) ? $coupons[$new_coupon_code]['uses'] : '';
+						$discount = (isset($coupons[$new_coupon_code]['discount']) && $coupons[$new_coupon_code]['discount_type'] == 'amt') ? round($coupons[$new_coupon_code]['discount'], 2) : $coupons[$new_coupon_code]['discount'];
+						$discount_type = isset($coupons[$new_coupon_code]['discount_type']) ? $coupons[$new_coupon_code]['discount_type'] : '';
+						$start = !empty($coupons[$new_coupon_code]['start']) ? date('Y-m-d', $coupons[$new_coupon_code]['start']) : date('Y-m-d');
+						$end = !empty($coupons[$new_coupon_code]['end']) ? date('Y-m-d', $coupons[$new_coupon_code]['end']) : '';
+						$uses = isset($coupons[$new_coupon_code]['uses']) ? $coupons[$new_coupon_code]['uses'] : '';
           	?>
             <table id="add_coupon">
             <thead>
