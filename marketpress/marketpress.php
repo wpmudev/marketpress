@@ -1705,7 +1705,7 @@ Thanks again!", 'mp')
 		$meta = get_post_custom();
     //unserialize
     foreach ($meta as $key => $val)
-		  $meta[$key] = array_map('maybe_unserialize', $val);
+		  $meta[$key] = array_map('maybe_unserialize', (array)$val);
 
 		switch ($column) {
 
@@ -1861,10 +1861,10 @@ Thanks again!", 'mp')
       $func_sku = 'return preg_replace("/[^a-zA-Z0-9_-]/", "", $value);';
 
       update_post_meta($post_id, 'mp_var_name', $_POST['mp_var_name']);
-      update_post_meta($post_id, 'mp_sku', array_map(create_function('$value', $func_sku), $_POST['mp_sku']));
-      update_post_meta($post_id, 'mp_price', array_map(create_function('$price', $func_curr), $_POST['mp_price']));
+      update_post_meta($post_id, 'mp_sku', array_map(create_function('$value', $func_sku), (array)$_POST['mp_sku']));
+      update_post_meta($post_id, 'mp_price', array_map(create_function('$price', $func_curr), (array)$_POST['mp_price']));
       update_post_meta($post_id, 'mp_is_sale', isset($_POST['mp_is_sale']) ? 1 : 0);
-      update_post_meta($post_id, 'mp_sale_price', array_map(create_function('$price', $func_curr), $_POST['mp_sale_price']));
+      update_post_meta($post_id, 'mp_sale_price', array_map(create_function('$price', $func_curr), (array)$_POST['mp_sale_price']));
       update_post_meta($post_id, 'mp_track_inventory', isset($_POST['mp_track_inventory']) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', array_map('intval', (array)$_POST['mp_inventory']));
 
@@ -5675,7 +5675,7 @@ Notification Preferences: %s', 'mp');
 		  		$old_slug = $settings['slugs']['store'];
 
 	        //filter slugs
-	        $_POST['mp']['slugs'] = array_map('sanitize_title', $_POST['mp']['slugs']);
+	        $_POST['mp']['slugs'] = array_map('sanitize_title', (array)$_POST['mp']['slugs']);
 
 				  // Fixing http://premium.wpmudev.org/forums/topic/store-page-content-overwritten
 				  $new_slug = $_POST['mp']['slugs']['store'];
@@ -5899,14 +5899,14 @@ Notification Preferences: %s', 'mp');
         if (isset($_POST['messages_settings'])) {
 
           //strip slashes
-          $_POST['mp']['msg'] = array_map('stripslashes', $_POST['mp']['msg']);
+          $_POST['mp']['msg'] = array_map('stripslashes', (array)$_POST['mp']['msg']);
 
           //remove html from emails
-          $_POST['mp']['email'] = array_map('wp_filter_nohtml_kses', $_POST['mp']['email']);
+          $_POST['mp']['email'] = array_map('wp_filter_nohtml_kses', (array)$_POST['mp']['email']);
 
           //filter msg inputs if necessary
           if (!current_user_can('unfiltered_html')) {
-            $_POST['mp']['msg'] = array_map('wp_kses_post', $_POST['mp']['msg']);
+            $_POST['mp']['msg'] = array_map('wp_kses_post', (array)$_POST['mp']['msg']);
           }
 
           $settings = array_merge($settings, apply_filters('mp_messages_settings_filter', $_POST['mp']));
@@ -5916,7 +5916,7 @@ Notification Preferences: %s', 'mp');
         }
 
         //strip slashes
-        $settings['email'] = array_map('stripslashes', $settings['email']);
+        $settings['email'] = array_map('stripslashes', (array)$settings['email']);
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/messages.png'; ?>" /></div>
         <h2><?php _e('Messages Settings', 'mp'); ?></h2>
