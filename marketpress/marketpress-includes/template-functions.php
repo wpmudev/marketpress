@@ -1372,12 +1372,12 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
   global $mp;
   $post = get_post($product_id);
 
-  $return = '<div '.mp_product_class(false, 'mp_product', $post->ID).'>';
+  $return = '<div itemscope itemtype="http://schema.org/Product" '.mp_product_class(false, 'mp_product', $post->ID).'>';
   if ($title)
-    $return .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
+    $return .= '<h3 itemprop="name" class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
   
   if ($content) {
-    $return .= '<div class="mp_product_content">';
+    $return .= '<div itemprop="description" class="mp_product_content">';
     if ($image)
       $return .= mp_product_image( false, $image, $post->ID );
     if ($content == 'excerpt')
@@ -1388,7 +1388,7 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
   }
   
   if ($meta) {
-    $return .= '<div class="mp_product_meta">';
+    $return .= '<div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="mp_product_meta">';
     //price
     $return .= mp_product_price(false, $post->ID);
     //button
@@ -1545,9 +1545,9 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
   if ((is_array($meta["mp_price"]) && count($meta["mp_price"]) == 1) || !empty($meta["mp_file"])) {
     if ($meta["mp_is_sale"]) {
 	    $price = '<span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
-	    $price .= '<span class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
+	    $price .= '<span itemprop="price" class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
 	  } else {
-	    $price = '<span class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
+	    $price = '<span itemprop="price" class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
 	  }
 	} else {
 		return '';
@@ -1752,7 +1752,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 
   }
 
-  $image = get_the_post_thumbnail($post_id, $size, array('class' => 'alignleft mp_product_image_'.$context, 'title' => $title));
+  $image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => 'alignleft mp_product_image_'.$context, 'title' => $title));
 
   //add the link
   if ($link)

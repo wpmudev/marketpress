@@ -8,16 +8,16 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'payflow';
-  
+
   //name of your gateway, for the admin side.
   var $admin_name = '';
-  
+
   //public name of your gateway, for lists and such.
   var $public_name = '';
 
   //url for an image for your checkout method. Displayed on checkout form if set
   var $method_img_url = '';
-  
+
   //url for an submit button image for your checkout method. Displayed on checkout form if set
   var $method_button_img_url = '';
 
@@ -32,25 +32,25 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
   //credit card vars
   var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
-    
+
   /****** Below are the public methods you may overwrite via a plugin ******/
-  
+
   /**
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
   function on_creation() {
     global $mp;
     $settings = get_option('mp_settings');
-    
+
     //set names here to be able to translate
     $this->admin_name = __('PayPal Payflow Pro (beta)', 'mp');
     $this->public_name = __('Credit Card', 'mp');
-    
+
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
     $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
-    
+
     $this->version = "63.0"; //api version
-    
+
     //set credit card vars
     if ( isset( $settings['gateways']['payflow'] ) ) {
       $this->API_Username = $settings['gateways']['payflow']['api_user'];
@@ -76,14 +76,14 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
   function payment_form($cart, $shipping_info) {
     global $mp;
     $content = '';
-    
+
     if (isset($_GET['cancel'])) {
       $content .= '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
     }
-    
+
     $settings = get_option('mp_settings');
     $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
-    
+
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
     $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name'])?$meta['name']:$_SESSION['mp_shipping_info']['name']);
     $address1 = (!empty($_SESSION['mp_billing_info']['address1'])) ? $_SESSION['mp_billing_info']['address1'] : (!empty($meta['address1'])?$meta['address1']:$_SESSION['mp_shipping_info']['address1']);
@@ -102,23 +102,23 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
           width: 157px;
           display: inline-table;
         }
-        
+
         .nocard {
           background-position: 0px 0px !important;
         }
-        
+
         .visa_card {
           background-position: 0px -23px !important;
         }
-        
+
         .mastercard {
           background-position: 0px -46px !important;
         }
-        
+
         .discover_card {
           background-position: 0px -69px !important;
         }
-        
+
         .amex {
           background-position: 0px -92px !important;
         }
@@ -131,7 +131,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
           if (card_num == null) {
                   card_num = "#card_num";
           }
-  
+
           numLength = jQuery(card_num).val().length;
           number = jQuery(card_num).val();
           if (numLength > 10)
@@ -141,7 +141,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
                   else if(number.substring(0,4) == "6011" && (numLength==16)) 	{ jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage amex"); }
                   else if((number.charAt(0) == "3" && ((number.charAt(1) == "4") || (number.charAt(1) == "7"))) && (numLength==15)) { jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage discover_card"); }
                   else { jQuery(card_image).removeClass(); jQuery(card_image).addClass("cardimage nocard"); }
-  
+
           }
         }
         jQuery(document).ready( function() {
@@ -158,13 +158,13 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
         '.apply_filters( 'mp_checkout_error_email', '' ).'
         <input size="35" name="email" type="text" value="'.esc_attr($email).'" /></td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('Full Name:', 'mp').'*</td><td>
         '.apply_filters( 'mp_checkout_error_name', '' ).'
         <input size="35" name="name" type="text" value="'.esc_attr($name).'" /> </td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('Address:', 'mp').'*</td><td>
         '.apply_filters( 'mp_checkout_error_address1', '' ).'
@@ -172,32 +172,32 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
         <small><em>'.__('Street address, P.O. box, company name, c/o', 'mp').'</em></small>
         </td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('Address 2:', 'mp').'&nbsp;</td><td>
         <input size="45" name="address2" type="text" value="'.esc_attr($address2).'" /><br />
         <small><em>'.__('Apartment, suite, unit, building, floor, etc.', 'mp').'</em></small>
         </td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('City:', 'mp').'*</td><td>
         '.apply_filters( 'mp_checkout_error_city', '' ).'
         <input size="25" name="city" type="text" value="'.esc_attr($city).'" /></td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('State/Province/Region:', 'mp').'*</td><td>
         '.apply_filters( 'mp_checkout_error_state', '' ).'
         <input size="15" name="state" type="text" value="'.esc_attr($state).'" /></td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('Postal/Zip Code:', 'mp').'*</td><td>
         '.apply_filters( 'mp_checkout_error_zip', '' ).'
         <input size="10" id="mp_zip" name="zip" type="text" value="'.esc_attr($zip).'" /></td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('Country:', 'mp').'*</td><td>
           '.apply_filters( 'mp_checkout_error_country', '' ).'
@@ -210,12 +210,12 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $content .= '</select>
         </td>
           </tr>
-  
+
           <tr>
           <td align="right">'.__('Phone Number:', 'mp').'</td><td>
         	<input size="20" name="phone" type="text" value="'.esc_attr($phone).'" /></td>
           </tr>
-          
+
           <tr>
             <td align="right">'.__('Credit Card Number:', 'mp').'*</td>
             <td>
@@ -225,7 +225,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
                type="text" size="22" maxlength="22" />
         		<div class="hide_after_success nocard cardimage"  id="cardimage" style="background: url('.$mp->plugin_url.'images/card_array.png) no-repeat;"></div></td>
           </tr>
-          
+
           <tr>
             <td align="right">'.__('Expiration Date:', 'mp').'*</td>
             <td>
@@ -240,20 +240,20 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 		        </select>
 		        </td>
           </tr>
-          
+
           <tr>
             <td align="right">'.__('Security Code:', 'mp').'</td>
             <td>'.apply_filters( 'mp_checkout_error_card_code', '' ).'
             <input id="card_code" name="card_code" class="input_field noautocomplete"
                style="width: 70px;" type="text" size="4" maxlength="4" /></td>
           </tr>
-  
+
         </tbody>
       </table>';
-      
+
 		return $content;
   }
-  
+
   function _print_year_dropdown($sel='', $pfp = false) {
     $localDate=getdate();
     $minYear = $localDate["year"];
@@ -271,7 +271,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     }
     return($output);
   }
-  
+
   function _print_month_dropdown($sel='') {
     $output =  "<option value=''>--</option>";
     $output .=  "<option " . ($sel==1?' selected':'') . " value='01'>01 - Jan</option>";
@@ -289,7 +289,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
     return($output);
   }
-  
+
   /**
    * Use this to process any fields you added. Use the $_POST global,
    *  and be sure to save it to both the $_SESSION and usermeta if logged in.
@@ -303,31 +303,31 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
   function process_payment_form($cart, $shipping_info) {
     global $mp;
     $settings = get_option('mp_settings');
-    
+
     if (!is_email($_POST['email']))
       $mp->cart_checkout_error('Please enter a valid Email Address.', 'email');
-    
+
     if (empty($_POST['name']))
       $mp->cart_checkout_error('Please enter your Full Name.', 'name');
-    
+
     if (empty($_POST['address1']))
       $mp->cart_checkout_error('Please enter your Street Address.', 'address1');
-    
+
     if (empty($_POST['city']))
       $mp->cart_checkout_error('Please enter your City.', 'city');
-    
+
     if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
       $mp->cart_checkout_error('Please enter your State/Province/Region.', 'state');
-    
+
     if (empty($_POST['zip']))
       $mp->cart_checkout_error('Please enter your Zip/Postal Code.', 'zip');
-    
+
     if (empty($_POST['country']) || strlen($_POST['country']) != 2)
       $mp->cart_checkout_error('Please enter your Country.', 'country');
-    
+
     //for checkout plugins
     do_action( 'mp_billing_process' );
-    
+
     //save to session
     global $current_user;
     $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
@@ -344,15 +344,15 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     //save to user meta
     if ($current_user->ID)
       update_user_meta($current_user->ID, 'mp_billing_info', $_SESSION['mp_billing_info']);
-    
+
     if (!isset($_POST['exp_month']) || !isset($_POST['exp_year']) || empty($_POST['exp_month']) || empty($_POST['exp_year'])) {
       $mp->cart_checkout_error( __('Please select your credit card expiration date.', 'mp'), 'exp');
     }
-    
+
     if (!isset($_POST['card_code']) || empty($_POST['card_code'])) {
       $mp->cart_checkout_error( __('Please enter your credit card security code', 'mp'), 'card_code');
     }
-    
+
     if (!isset($_POST['card_num']) || empty($_POST['card_num'])) {
       $mp->cart_checkout_error( __('Please enter your credit card number', 'mp'), 'card_num');
     } else {
@@ -360,29 +360,29 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
         $mp->cart_checkout_error( __('Please enter a valid credit card number', 'mp'), 'card_num');
       }
     }
-    
+
     if (!$mp->checkout_error) {
       if (
-        ($this->_get_card_type($_POST['card_num']) == "American Express" && strlen($_POST['card_code']) != 4) || 
+        ($this->_get_card_type($_POST['card_num']) == "American Express" && strlen($_POST['card_code']) != 4) ||
         ($this->_get_card_type($_POST['card_num']) != "American Express" && strlen($_POST['card_code']) != 3)
         ) {
         $mp->cart_checkout_error(__('Please enter a valid credit card security code', 'mp'), 'card_code');
       }
     }
-    
+
     if (!$mp->checkout_error) {
       $_SESSION['card_num'] = $_POST['card_num'];
       $_SESSION['card_code'] = $_POST['card_code'];
       $_SESSION['exp_month'] = $_POST['exp_month'];
       $_SESSION['exp_year'] = $_POST['exp_year'];
-      
+
       $mp->generate_order_id();
     }
   }
-  
+
   function _get_card_type($number) {
     $num_length = strlen($number);
-    
+
     if ($num_length > 10 && preg_match('/[0-9]+/', $number) >= 1) {
       if((substr($number, 0, 1) == '4') && (($num_length == 13)||($num_length == 16))) {
         return "Visa";
@@ -396,7 +396,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     }
     return "";
   }
-  
+
   /**
    * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
@@ -406,10 +406,10 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    */
   function confirm_payment_form($cart, $shipping_info) {
     global $mp;
-    
+
     $settings = get_option('mp_settings');
     $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
-    
+
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
     $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name'])?$meta['name']:$_SESSION['mp_shipping_info']['name']);
     $address1 = (!empty($_SESSION['mp_billing_info']['address1'])) ? $_SESSION['mp_billing_info']['address1'] : (!empty($meta['address1'])?$meta['address1']:$_SESSION['mp_shipping_info']['address1']);
@@ -423,7 +423,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
 
     $content = '';
-    
+
     $content .= '<table class="mp_cart_billing">';
     $content .= '<thead><tr>';
     $content .= '<th>'.__('Billing Information:', 'mp').'</th>';
@@ -442,26 +442,26 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $content .= '<td align="right">'.__('Address:', 'mp').'</td>';
     $content .= '<td>'.esc_attr($address1).'</td>';
     $content .= '</tr>';
-    
+
     if ($address2) {
       $content .= '<tr>';
       $content .= '<td align="right">'.__('Address 2:', 'mp').'</td>';
       $content .= '<td>'.esc_attr($address2).'</td>';
       $content .= '</tr>';
     }
-  
+
     $content .= '<tr>';
     $content .= '<td align="right">'.__('City:', 'mp').'</td>';
     $content .= '<td>'.esc_attr($city).'</td>';
     $content .= '</tr>';
-    
+
     if ($state) {
       $content .= '<tr>';
       $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'</td>';
       $content .= '<td>'.esc_attr($state).'</td>';
       $content .= '</tr>';
     }
-    
+
     $content .= '<tr>';
     $content .= '<td align="right">'.__('Postal/Zip Code:', 'mp').'</td>';
     $content .= '<td>'.esc_attr($zip).'</td>';
@@ -470,21 +470,21 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $content .= '<td align="right">'.__('Country:', 'mp').'</td>';
     $content .= '<td>'.$mp->countries[$country].'</td>';
     $content .= '</tr>';
-    
+
     if ($phone) {
       $content .= '<tr>';
       $content .= '<td align="right">'.__('Phone Number:', 'mp').'</td>';
       $content .= '<td>'.esc_attr($phone).'</td>';
       $content .= '</tr>';
     }
-    
+
     $content .= '<tr>';
     $content .= '<td align="right">'.__('Payment method:', 'mp').'</td>';
     $content .= '<td>'.$this->_get_card_type($_SESSION['card_num']).' ending in '. substr($_SESSION['card_num'], strlen($_SESSION['card_num'])-4, 4).'</td>';
     $content .= '</tr>';
     $content .= '</tbody>';
     $content .= '</table>';
-    
+
     return $content;
   }
 
@@ -500,11 +500,11 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    */
   function process_payment($cart, $shipping_info) {
     global $mp;
-    
+
     $timestamp = time();
     $settings = get_option('mp_settings');
     $billing_info = $_SESSION['mp_billing_info'];
-    
+
     $payment = new MP_Gateway_Worker_Payflow($this->API_Endpoint,
       $settings['gateways']['payflow']['delim_data'],
       $settings['gateways']['payflow']['delim_char'],
@@ -512,7 +512,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $settings['gateways']['payflow']['api_user'],
       $settings['gateways']['payflow']['api_key'],
       ($settings['gateways']['payflow']['mode'] == 'sandbox'));
-    
+
 
 
 
@@ -543,25 +543,25 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
       $total = $total + $shipping_price;
     }
-    
+
     //tax line
     if ( ($tax_price = $mp->tax_price()) !== false ) {
       $total = $total + $tax_price;
     }
-    
+
     // Billing Info
     $payment->setParameter("TENDER", 'C');
     $payment->setParameter("TRXTYPE", 'S');
     $payment->setParameter("AMT", number_format($total, 2, '.', ''));
 
     $payment->setParameter("CURRENCY",$this->currencyCode);
-    
+
     // Order Info
     $payment->setParameter("COMMENT1", "Order ID: ".$_SESSION['mp_order']);
     $payment->setParameter("INVNUM",  $_SESSION['mp_order']);
 
 
-    
+
     // E-mail
 
     $_names = split(" ", $billing_info['name']);
@@ -570,19 +570,19 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     } else {
       $first_name = "";
     }
-    
+
     if (isset($_names[0])) {
       $last_name = join(" ", $_names);
     } else {
       $last_name = "";
     }
-    
+
     $address = $billing_info['address1'];
-    
+
     if (!empty($billing_info['address2'])) {
       $address .= "\n".$billing_info['address2'];
     }
-    
+
     //Customer Info
     $payment->setParameter("FIRSTNAME", $first_name);
     $payment->setParameter("LASTNAME", $last_name);
@@ -591,13 +591,13 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
     $payment->setParameter("COUNTRY", $billing_info['country']);
     $payment->setParameter("ZIP", $billing_info['zip']);
- 
+
     $payment->setParameter("EMAIL", $billing_info['email']);
-    
- 
-		
+
+
+
     $payment->setParameter("CLIENTIP", $_SERVER['REMOTE_ADDR']);
-    
+
     $payment->process();
 
 
@@ -606,7 +606,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
       $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
       $paid = true;
-      
+
       $payment_info['gateway_public_name'] = $this->public_name;
       $payment_info['gateway_private_name'] = $this->admin_name;
       $payment_info['method'] = $payment->getMethod();
@@ -614,7 +614,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $payment_info['total'] = $total;
       $payment_info['currency'] = "USD"; // Authorize.net only supports USD transactions
       $payment_info['transaction_id'] = $payment->getTransactionID();
-      
+
       //succesful payment, create our order now
       $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
     } else {
@@ -622,7 +622,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $mp->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp') , $error, mp_checkout_step_url('checkout')) );
     }
   }
-  
+
   /**
    * Filters the order confirmation email message body. You may want to append something to
    *  the message. Optional
@@ -632,7 +632,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
   function order_confirmation_email($msg) {
     return $msg;
   }
-  
+
   /**
    * Return any html you want to show on the confirmation screen after checkout. This
    *  should be a payment details box and message.
@@ -651,14 +651,14 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     }
     return $content;
   }
-  
+
   /**
    * Runs before page load incase you need to run any scripts before loading the success message page
    */
   function order_confirmation($order) {
-    
+
   }
-  
+
   /**
    * Echo a settings meta box with whatever settings you need for you gateway.
    *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
@@ -666,6 +666,22 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    */
   function gateway_settings_box($settings) {
     global $mp;
+
+    $defaults = array(
+    	'mode' => 'sandbox',
+    	'api_user' => '',
+    	'api_vendor' => '',
+    	'api_partner' => '',
+    	'api_pwd' => '',
+    	'email_customer' => 'yes',
+    	'header_email_receipt' => 'Thanks for your payment!',
+    	'footer_email_receipt' => ''
+    );
+    if ( !isset( $settings['gateways']['payflow'] ) )
+    	$settings['gateways']['payflow'] = array();
+
+    $settings['gateways']['payflow'] = $settings['gateways']['payflow'] + $defaults;
+
     ?>
     <div id="mp_payflow_express" class="postbox">
       <h3 class='hndle'><span><?php _e('PayPal Payflow Settings', 'mp'); ?></span></h3>
@@ -715,7 +731,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 				    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
 				    <td>
 				      <span class="description"><?php _e('Optional settings to control advanced options', 'mp') ?></span>
-		
+
 
 			              <p>
 					<label><?php _e('Email Customer (on success):', 'mp'); ?><br />
@@ -746,7 +762,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     </div>
     <?php
   }
-  
+
   /**
    * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
    *  array. Don't forget to return!
@@ -792,7 +808,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
     {
       $this->params['ACCT']  = trim($cardnum);
     }
-    
+
     function addLineItem($id, $name, $description, $quantity, $price, $taxable = 0)
     {
       $this->line_items[] = "{$id}<|>{$name}<|>{$description}<|>{$quantity}<|>{$price}<|>{$taxable}";
@@ -801,7 +817,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
     function process($retries = 1)
     {
         global $mp;
-       
+
 
         $post_string = '';
 
@@ -813,10 +829,10 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 
         $count = 0;
 
- 
+
         //use built in WP http class to work with most server setups
         //$response = wp_remote_post($this->url, $args);
-        
+
 
         $response = $this->sendTransactionToGateway($this->url,$post_string );
         $response_array = array();
@@ -835,7 +851,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 	     $this->declined = true;
 	     $this->error    = false;
         }
- 
+
    }
 
 
@@ -913,7 +929,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
         $this->fields .= "x_line_item={$this->line_items[$i]}&";
       }
     }
-    
+
     function getMethod()
     {
       if (isset($this->results["METHOD"]))

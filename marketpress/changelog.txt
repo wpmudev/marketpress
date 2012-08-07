@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.6.3 - 8/13/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Add Schema.org microdata to products for SEO, props @aristath!
+- Many php notice fixes
+
 2.6.2 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
 - Added per shipment handling charge to USPS, one for domestic and one for international shipping.

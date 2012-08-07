@@ -7,16 +7,16 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 
   //private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'flat-rate';
-  
+
   //public name of your method, for lists and such.
   var $public_name = '';
-  
+
   //set to true if you need to use the shipping_metabox() method to add per-product shipping options
   var $use_metabox = false;
-	
+
 	//set to true if you want to add per-product weight shipping field
 	var $use_weight = false;
-		
+
   /**
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
@@ -31,21 +31,21 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 	function before_shipping_form($content) {
 		return $content;
   }
-  
+
   /**
    * Echo anything you want to add to the bottom of the shipping screen
    */
 	function after_shipping_form($content) {
 		return $content;
   }
-  
+
   /**
    * Echo a table row with any extra shipping fields you need to add to the shipping checkout form
    */
 	function extra_shipping_field($content) {
 		return $content;
   }
-  
+
   /**
    * Use this to process any additional field you may add. Use the $_POST global,
    *  and be sure to save it to both the cookie and usermeta if logged in.
@@ -53,7 +53,23 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 	function process_shipping_form() {
 
   }
-	
+
+    function clean_settings( $settings ) {
+		$defaults = array(
+			'lower_48' => '',
+			'hi_ak' => '',
+			'canada' => '',
+			'international' => ''
+		);
+
+		if ( !isset( $settings['shipping']['flat-rate'] ) )
+			$settings['shipping']['flat-rate'] = array();
+
+		$settings['shipping']['flat-rate'] = $settings['shipping']['flat-rate'] + $defaults;
+
+		return $settings;
+    }
+
 	/**
    * Echo a settings meta box with whatever settings you need for you shipping module.
    *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
@@ -61,6 +77,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
    */
 	function shipping_settings_box($settings) {
     global $mp;
+    $settings = $this->clean_settings($settings);
     ?>
     <div id="mp_flat_rate" class="postbox">
       <h3 class='hndle'><span><?php _e('Flat Rate Settings', 'mp'); ?></span></h3>
@@ -168,7 +185,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
     </div>
     <?php
   }
-  
+
   /**
    * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
    *  array. Don't forget to return!
@@ -177,7 +194,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 
     return $settings;
   }
-  
+
   /**
    * Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
    *
@@ -195,10 +212,10 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
    * return array $shipping_meta
    */
 	function save_shipping_metabox($shipping_meta) {
-		
+
     return $shipping_meta;
   }
-  
+
   /**
 		* Use this function to return your calculated price as an integer or float
 		*
@@ -218,7 +235,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
     global $mp;
     $settings = get_option('mp_settings');
-    
+
     switch ($settings['base_country']) {
       case 'US':
         if ($country == 'US') {
@@ -233,7 +250,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
           $price = $settings['shipping']['flat-rate']['international'];
         }
         break;
-      
+
       case 'CA':
         if ($country == 'CA') {
           $price = $settings['shipping']['flat-rate']['in_country'];
@@ -263,7 +280,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
         }
         break;
     }
-    
+
     return $price;
   }
 }

@@ -8,17 +8,17 @@ if (!class_exists('MP_Shipping_API')) {
 
     //private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
     var $plugin_name = '';
-    
+
     //public name of your method, for lists and such.
     var $public_name = '';
-    
+
     //set to true if you need to use the shipping_metabox() method to add per-product shipping options
     var $use_metabox = false;
-		
+
 		//set to true if you want to add per-product weight shipping field
     var $use_weight = false;
-		
-		
+
+
     /****** Below are the public methods you may overwrite via a plugin ******/
 
     /**
@@ -34,21 +34,21 @@ if (!class_exists('MP_Shipping_API')) {
 		function before_shipping_form($content) {
 
     }
-    
+
     /**
      * Echo anything you want to add to the bottom of the shipping screen
      */
 		function after_shipping_form($content) {
 
     }
-    
+
     /**
      * Echo a table row with any extra shipping fields you need to add to the form
      */
 		function extra_shipping_field($content) {
 
     }
-    
+
     /**
      * Use this to process any additional field you may add. Use the $_POST global,
      *  and be sure to save it to both the cookie and usermeta if logged in.
@@ -56,7 +56,7 @@ if (!class_exists('MP_Shipping_API')) {
 		function process_shipping_form() {
 
     }
-		
+
 		/**
      * Echo a settings meta box with whatever settings you need for you shipping module.
      *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
@@ -65,7 +65,7 @@ if (!class_exists('MP_Shipping_API')) {
 		function shipping_settings_box($settings) {
 
     }
-    
+
     /**
      * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
      *  array. Don't forget to return!
@@ -74,7 +74,7 @@ if (!class_exists('MP_Shipping_API')) {
 
       return $settings;
     }
-    
+
     /**
      * Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
      *
@@ -86,7 +86,7 @@ if (!class_exists('MP_Shipping_API')) {
       if ($this->use_metabox)
         wp_die( __("You must override the shipping_metabox() method in your {$this->public_name} shipping plugin if \$use_metabox is set to true!", 'mp') );
     }
-    
+
     /**
      * Save any per-product shipping fields from the shipping metabox using update_post_meta
      *
@@ -94,10 +94,10 @@ if (!class_exists('MP_Shipping_API')) {
      * return array|string $shipping_meta
      */
 		function save_shipping_metabox($shipping_meta) {
-		
+
       return $shipping_meta;
     }
-    
+
     /**
      * Use this function to return your calculated price as an integer or float
      *
@@ -118,7 +118,7 @@ if (!class_exists('MP_Shipping_API')) {
       //it is required to override this method
       wp_die( __("You must override the calculate_shipping() method in your {$this->public_name} shipping plugin!", 'mp') );
     }
-    
+
 		/**
 			* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
 			*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
@@ -131,21 +131,21 @@ if (!class_exists('MP_Shipping_API')) {
 			* @param string $zip, postal code
 			* @param string $country, ISO 3166-1 alpha-2 country code
 			*
-			* return array $shipping_options 
+			* return array $shipping_options
 			*/
 		function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
-			
+
 			$shipping_options = array();
-			
+
       return $shipping_options;
     }
-		
+
 		/****** Do not override any of these private methods please! ******/
 		////////////////////////////////////////////////////////////////////
-		
+
 		function _weight_shipping_metabox($shipping_meta, $settings) {
       global $mp;
-			
+
 			echo '<p>';
 			if ($settings['shipping']['system'] == 'metric') {
 				?>
@@ -164,10 +164,10 @@ if (!class_exists('MP_Shipping_API')) {
 			}
 			echo '</p>';
     }
-    
+
 		function _weight_save_shipping_metabox($shipping_meta) {
 			$settings = get_option('mp_settings');
-			
+
 			//process extra per item shipping
 			if ($settings['shipping']['system'] == 'metric') {
 				$shipping_meta['weight'] = (!empty($_POST['mp_shipping_weight'])) ? round($_POST['mp_shipping_weight'], 2) : 0;
@@ -177,10 +177,10 @@ if (!class_exists('MP_Shipping_API')) {
 				$oz = $oz / 16;
 				$shipping_meta['weight'] = round($pounds + $oz, 2);
 			}
-			
+
 			return $shipping_meta;
     }
-		
+
     //DO NOT override the construct! instead use the on_creation() method.
   	function MP_Shipping_API() {
   		$this->__construct();
@@ -188,7 +188,7 @@ if (!class_exists('MP_Shipping_API')) {
 
     function __construct() {
       global $mp;
-			
+
 			$this->on_creation();
 
       add_filter( 'mp_checkout_before_shipping', array(&$this, 'before_shipping_form') );
@@ -197,18 +197,18 @@ if (!class_exists('MP_Shipping_API')) {
       add_action( 'mp_shipping_process', array(&$this, 'process_shipping_form') );
       add_action( 'mp_shipping_settings', array(&$this, 'shipping_settings_box') );
       add_filter( 'mp_shipping_settings_filter', array(&$this, 'process_shipping_settings') );
-			
+
 			add_filter( "mp_calculate_shipping_{$this->plugin_name}", array(&$this, 'calculate_shipping'), 10, 10 );
-			
+
 			add_filter( "mp_shipping_options_{$this->plugin_name}", array(&$this, 'shipping_options'), 10, 7 );
-			
+
 			//private
 			if ($this->use_weight && !$mp->weight_printed) {
 				add_action( 'mp_shipping_metabox', array(&$this, '_weight_shipping_metabox'), 10, 2 );
 				add_filter( 'mp_save_shipping_meta', array(&$this, '_weight_save_shipping_metabox') );
 				$mp->weight_printed = true;
 			}
-			
+
       if ($this->use_metabox) {
         add_action( 'mp_shipping_metabox', array(&$this, 'shipping_metabox'), 10, 2 );
         add_filter( 'mp_save_shipping_meta', array(&$this, 'save_shipping_metabox') );
@@ -216,7 +216,7 @@ if (!class_exists('MP_Shipping_API')) {
 
   	}
   }
-  
+
 }
 
 /**
@@ -229,11 +229,11 @@ if (!class_exists('MP_Shipping_API')) {
  */
 function mp_register_shipping_plugin($class_name, $plugin_name, $public_name, $calculated = false, $demo = false) {
   global $mp_shipping_plugins;
-  
+
   if(!is_array($mp_shipping_plugins)) {
 		$mp_shipping_plugins = array();
 	}
-	
+
 	if(class_exists($class_name)) {
 		$mp_shipping_plugins[$plugin_name] = array($class_name, $public_name, $calculated, $demo);
 	} else {
@@ -256,7 +256,7 @@ class MP_Shipping_Handler {
 		add_action( 'mp_shipping_metabox', array(&$this, 'extra_shipping_metabox'), 10, 2 );
     add_filter( 'mp_save_shipping_meta', array(&$this, 'extra_save_shipping_metabox') );
 	}
-	
+
 	function extra_shipping_box($content) {
 		global $mp_shipping_active_plugins;
 		$settings = get_option('mp_settings');
@@ -279,7 +279,7 @@ class MP_Shipping_Handler {
 		}
 		return $content;
 	}
-	
+
 	function extra_shipping_box_label($content) {
 		global $mp_shipping_active_plugins;
 		$settings = get_option('mp_settings');
@@ -296,21 +296,21 @@ class MP_Shipping_Handler {
 		}
 		return $content;
 	}
-	
+
 	function process_shipping_form() {
 		if (isset($_POST['shipping_option']))
 			$_SESSION['mp_shipping_info']['shipping_option'] = trim($_POST['shipping_option']);
 		if (isset($_POST['shipping_sub_option']))
 			$_SESSION['mp_shipping_info']['shipping_sub_option'] = trim($_POST['shipping_sub_option']);
 	}
-	
+
 	function shipping_sub_options() {
 		global $mp_shipping_active_plugins, $mp;
 		$settings = get_option('mp_settings');
-		
+
 		$first = reset($mp_shipping_active_plugins);
 		$selected = isset($_POST['shipping_option']) ? $_POST['shipping_option'] : (isset($_SESSION['mp_shipping_info']['shipping_option']) ? $_SESSION['mp_shipping_info']['shipping_option'] : $first->plugin_name);
-		
+
 		//get address
     $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
 		$address1 = isset($_POST['address1']) ? trim(stripslashes($_POST['address1'])) : (isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1']);
@@ -330,17 +330,17 @@ class MP_Shipping_Handler {
 			}
 			$content .= '</select>';
 		} else{
-			$content .= '<input type="hidden" id="mp_no_shipping_options" name="no_shipping_options" value="1" />'; 
+			$content .= '<input type="hidden" id="mp_no_shipping_options" name="no_shipping_options" value="1" />';
 			$content .= apply_filters('mp_checkout_error_no_shipping_options', '');
 		}
-		
-		
+
+
 		if (defined('DOING_AJAX'))
 			die($content);
 		else
 			return $content;
 	}
-	
+
 	function filter_method_lbl() {
 		global $mp_shipping_active_plugins;
 		$settings = get_option('mp_settings');
@@ -349,18 +349,18 @@ class MP_Shipping_Handler {
 			return $mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
 		}
 	}
-			
+
 	function extra_shipping_metabox($shipping_meta, $settings) {
 		global $mp;
 		?>
 		<p>
 		<label><?php _e('Extra Shipping Cost', 'mp'); ?>:<br />
-		<?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo ($shipping_meta['extra_cost']) ? $mp->display_currency($shipping_meta['extra_cost']) : '0.00'; ?>" />
+		<?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo !empty($shipping_meta['extra_cost']) ? $mp->display_currency($shipping_meta['extra_cost']) : '0.00'; ?>" />
 		</label>
 		</p>
 		<?php
 	}
-	
+
 	function extra_save_shipping_metabox($shipping_meta) {
 		//process extra per item shipping
 		$shipping_meta['extra_cost'] = (!empty($_POST['mp_extra_shipping_cost'])) ? round($_POST['mp_extra_shipping_cost'], 2) : 0;
