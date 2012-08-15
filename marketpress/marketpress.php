@@ -293,7 +293,7 @@ Thanks again!", 'mp')
     if ( empty($old_settings) ) {
 
 			//define settings that don't need to autoload for efficiency
-			add_option( 'mp_coupons', array(), '', 'no' );
+			add_option( 'mp_coupons', '', '', 'no' );
 			add_option( 'mp_store_page', '', '', 'no' );
 
 			//create store page
