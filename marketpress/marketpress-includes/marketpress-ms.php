@@ -513,7 +513,7 @@ class MarketPress_MS {
       update_site_option( 'mp_network_settings', apply_filters('mp_network_settings_save', $_POST['mp']) );
       
       //flush rewrite rules due to product slugs
-      $mp->flush_rewrite();
+      update_option('mp_flush_rewrite', 1);
       
       echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
     }

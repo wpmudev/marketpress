@@ -259,6 +259,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
     if ( $shipping_price = array_sum($shipping_prices) ) {
       if (!$mp->global_cart && apply_filters( 'mp_shipping_method_lbl', '' ))
         $shipping_method = apply_filters( 'mp_shipping_method_lbl', '' );
+      else
+        $shipping_method = '';
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
       $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
@@ -838,13 +840,12 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
 function mp_order_status() {
   global $mp, $wp_query, $blog_id;
 
-
 	$bid = (is_multisite()) ? $blog_id : 1; // FPM: Used for Custom Field Processing
 	
 	$settings = get_option('mp_settings');
   echo do_shortcode($settings['msg']['order_status']);
 
-  $order_id = ($wp_query->query_vars['order_id']) ? $wp_query->query_vars['order_id'] : $_GET['order_id'];
+  $order_id = isset($wp_query->query_vars['order_id']) ? $wp_query->query_vars['order_id'] : (isset($_GET['order_id']) ? $_GET['order_id'] : '');
 
   if (!empty($order_id)) {
     //get order
@@ -1245,9 +1246,11 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     $taxonomy_query = '&product_category=' . sanitize_title($category);
   } else if ($tag) {
     $taxonomy_query = '&product_tag=' . sanitize_title($tag);
-  } else if ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') {
+  } else if (isset($wp_query->query_vars['taxonomy']) && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag')) {
     $term = get_queried_object(); //must do this for number tags
     $taxonomy_query = '&' . $term->taxonomy . '=' . $term->slug;
+  } else {
+    $taxonomy_query = '';
   }
   
   //setup pagination
@@ -1495,7 +1498,7 @@ function mp_get_product_class( $class = '', $post_id = null ) {
 	// Categories
 	$categories = get_the_terms($post->ID, "product_category");
 	foreach ( (array) $categories as $cat ) {
-		if ( empty($cat->slug ) )
+		if ( empty($cat->slug) || !isset($cat->cat_ID) )
 			continue;
 		$classes[] = 'category-' . sanitize_html_class($cat->slug, $cat->cat_ID);
 	}
@@ -1548,6 +1551,13 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 	    $price .= '<span itemprop="price" class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
 	  } else {
 	    $price = '<span itemprop="price" class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
+	  }
+	} else if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1 && !is_singular('product')) { //only show from price in lists
+    if ($meta["mp_is_sale"]) {
+	    $price = __('from', 'mp').' <span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
+	    $price .= '<span itemprop="price" class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
+	  } else {
+	    $price = __('from', 'mp').' <span itemprop="price" class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
 	  }
 	} else {
 		return '';
@@ -1618,7 +1628,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
     $button = '';
     
   } else {
-
+    $variation_select = '';
     $button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
 
     if ($all_out) {
@@ -1703,7 +1713,8 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 
   $settings = get_option('mp_settings');
   $post_thumbnail_id = get_post_thumbnail_id( $post_id );
-
+  $class = '';
+  
   if ($context == 'list') {
     //quit if no thumbnails on listings
     if (!$settings['show_thumbnail'])

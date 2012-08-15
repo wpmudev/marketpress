@@ -270,8 +270,9 @@ class MP_Shipping_Handler {
 			$content .= '<td align="right">'.__('Shipping Method:', 'mp').'</td><td id="mp-shipping-select-td">';
 			$content .= '<input type="hidden" name="action" value="mp-shipping-options" />';
 			$content .= '<select name="shipping_option" id="mp-shipping-select">';
+			$shipping_option = isset($_SESSION['mp_shipping_info']['shipping_option']) ? $_SESSION['mp_shipping_info']['shipping_option'] : '';
 			foreach ($mp_shipping_active_plugins as $plugin) {
-				$content .= '<option value="' . $plugin->plugin_name . '"'.selected(@$_SESSION['mp_shipping_info']['shipping_option'], $plugin->plugin_name, false).'>' . esc_attr($plugin->public_name) . '</option>';
+				$content .= '<option value="' . $plugin->plugin_name . '"'.selected($shipping_option, $plugin->plugin_name, false).'>' . esc_attr($plugin->public_name) . '</option>';
 			}
 			$content .= '</select>';
 			$content .= ' <span id="mp-shipping-select-holder">' . $this->shipping_sub_options().'</span>';
@@ -325,8 +326,9 @@ class MP_Shipping_Handler {
 		$content = '';
 		if ( count( $options ) ) {
 			$content .= '<select name="shipping_sub_option">';
+			$suboption = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : '';
 			foreach ($options as $key => $name) {
-				$content .= '<option value="' . $key . '"'.selected(@$_SESSION['mp_shipping_info']['shipping_sub_option'], $key, false).'>' . esc_attr($name) . '</option>';
+				$content .= '<option value="' . $key . '"'.selected($suboption, $key, false).'>' . esc_attr($name) . '</option>';
 			}
 			$content .= '</select>';
 		} else{

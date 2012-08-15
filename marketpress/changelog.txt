@@ -8,7 +8,11 @@ Change Log:
 2.6.3 - 8/13/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add Schema.org microdata to products for SEO, props @aristath!
-- Many php notice fixes
+- Add "from" price label to listings of multiple variation products
+- Many many php notice fixes
+- Fix major issues with new sites and coupons
+- Fix coupons with a number as the code
+- Fix rewrite flushing when changing store slugs
 
 2.6.2 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
