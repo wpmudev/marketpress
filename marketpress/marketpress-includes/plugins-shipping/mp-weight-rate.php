@@ -100,33 +100,31 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
      		</th>
      	</tr>
         <?php
-		switch ($settings['base_country'])
-        {
+		switch ($settings['base_country']) {
             case 'US':
         ?>
-                <tr>
-                    <td scope="row"><?php _e('If weight is ', 'mp'); ?><input type="text" name="mp[shipping][weight-rate][0][minweight]" value="0.01" size="5" maxlength="10" disabled="disabled" /><?php _e(' and above.', 'mp'); ?>
-                                          <?php _e('Shipping Cost - Lower 48 States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][lower_48]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['lower_48']); ?>" size="5" maxlength="10" />
-                                          <?php _e('Hawaii and Alaska:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][hi_ak]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['hi_ak']); ?>" size="5" maxlength="10" />
-                                          <?php _e('Canada:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][canada]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['canada']); ?>" size="5" maxlength="10" />
-                                          <?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][international]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['international']); ?>" size="5" maxlength="10" />
-                    </td>
-                </tr>
-                    <?php
-                    for ( $i = 1; $i < $settings['shipping']['weight-rate']['rowcount']; $i++ )
-                    {
-                    ?>
-                        <tr>
-                            <td scope="row">
-								<?php _e('If weight is ', 'mp'); ?><input type="text" name="mp[shipping][weight-rate][<?php echo $i; ?>][minweight]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['minweight']); ?>" size="5" maxlength="10" /><?php _e(' and above.', 'mp'); ?>
-                                <?php _e('Shipping Cost - Lower 48 States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][lower_48]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['lower_48']); ?>" size="5" maxlength="10" />
-                                <?php _e('Hawaii and Alaska:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][hi_ak]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['hi_ak']); ?>" size="5" maxlength="10" />
-                                <?php _e('Canada:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][canada]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['canada']); ?>" size="5" maxlength="10" />
-                                <?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][international]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['international']); ?>" size="5" maxlength="10" />
-                            </td>
-                        </tr>
-                    <?php
-                    }
+				<tr>
+					<td scope="row"><?php _e('If weight is ', 'mp'); ?><input type="text" name="mp[shipping][weight-rate][0][minweight]" value="0.01" size="5" maxlength="10" disabled="disabled" /><?php _e(' and above.', 'mp'); ?>
+						<?php _e('Shipping Cost - Lower 48 States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][lower_48]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['lower_48']); ?>" size="5" maxlength="10" />
+						<?php _e('Hawaii and Alaska:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][hi_ak]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['hi_ak']); ?>" size="5" maxlength="10" />
+						<?php _e('Canada:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][canada]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['canada']); ?>" size="5" maxlength="10" />
+						<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][0][international]" value="<?php echo esc_attr($settings['shipping']['weight-rate']['0']['international']); ?>" size="5" maxlength="10" />
+					</td>
+				</tr>
+				<?php
+				for ( $i = 1; $i < $settings['shipping']['weight-rate']['rowcount']; $i++ ) {
+				?>
+				<tr>
+					<td scope="row">
+						<?php _e('If weight is ', 'mp'); ?><input type="text" name="mp[shipping][weight-rate][<?php echo $i; ?>][minweight]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['minweight']); ?>" size="5" maxlength="10" /><?php _e(' and above.', 'mp'); ?>
+						<?php _e('Shipping Cost - Lower 48 States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][lower_48]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['lower_48']); ?>" size="5" maxlength="10" />
+						<?php _e('Hawaii and Alaska:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][hi_ak]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['hi_ak']); ?>" size="5" maxlength="10" />
+						<?php _e('Canada:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][canada]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['canada']); ?>" size="5" maxlength="10" />
+						<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][weight-rate][<?php echo $i?>][international]" value="<?php echo esc_attr($settings['shipping']['weight-rate'][$i]['international']); ?>" size="5" maxlength="10" />
+					</td>
+				</tr>
+				<?php
+				}
 			break;
 			case 'CA':
 					?>

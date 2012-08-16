@@ -176,7 +176,6 @@ function mp_popular_products( $echo = true, $num = 5 ) {
 function _mp_cart_table($type = 'checkout', $echo = false) {
   global $mp, $blog_id;
   $blog_id = (is_multisite()) ? $blog_id : 1;
-  $settings = get_option('mp_settings');
   $current_blog_id = $blog_id;
 
 	$global_cart = $mp->get_cart_contents(true);
@@ -437,7 +436,6 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 //Prints cart login/register form, for internal use
 function _mp_cart_login($echo = false) {
   global $mp;
-  $settings = get_option('mp_settings');
   
   $content = '';
   //don't show if logged in
@@ -450,7 +448,7 @@ function _mp_cart_login($echo = false) {
     $content .= '<thead><tr>';
     $content .= '<th class="mp_cart_login">'.__('Have a User Account?', 'mp').'</th>';
     $content .= '<th>&nbsp;</th>';
-    if ($settings['force_login'])
+    if ($mp->get_setting('force_login'))
       $content .= '<th>'.__('Register To Checkout', 'mp').'</th>';
 		else
       $content .= '<th>'.__('Checkout Directly', 'mp').'</th>';
@@ -471,7 +469,7 @@ function _mp_cart_login($echo = false) {
     $content .= '</td>';
     $content .= '<td class="mp_cart_or_label">'.__('or', 'mp').'</td>';
     $content .= '<td class="mp_cart_checkout">';
-    if ($settings['force_login'])
+    if ($mp->get_setting('force_login'))
     	$content .= apply_filters('register', '<a class="mp_cart_direct_checkout_link" href="'.site_url('wp-login.php?action=register', 'login').'">'.__('Register Now To Checkout &raquo;', 'mp').'</a>');
 		else
       $content .= '<a class="mp_cart_direct_checkout_link" href="' . mp_checkout_step_url('shipping') . '">' . __('Checkout Now &raquo;', 'mp') . '</a>';
@@ -489,7 +487,6 @@ function _mp_cart_login($echo = false) {
 //Prints cart shipping form, for internal use
 function _mp_cart_shipping($editable = false, $echo = false) {
   global $mp, $current_user;
-  $settings = get_option('mp_settings');
 
   $meta = get_user_meta($current_user->ID, 'mp_shipping_info', true);
   //get address
@@ -502,7 +499,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
   $zip = (!empty($_SESSION['mp_shipping_info']['zip'])) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip'];
   $country = (!empty($_SESSION['mp_shipping_info']['country'])) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
   if (!$country)
-    $country = $settings['base_country'];
+    $country = $mp->get_setting('base_country', 'US');
   $phone = (!empty($_SESSION['mp_shipping_info']['phone'])) ? $_SESSION['mp_shipping_info']['phone'] : $meta['phone'];
   $special_instructions = (!empty($_SESSION['mp_shipping_info']['special_instructions'])) ? $_SESSION['mp_shipping_info']['special_instructions'] : '';
 
@@ -540,7 +537,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
       $content .= '<td align="right">'.__('Country:', 'mp').'*</td><td>';
       $content .= apply_filters( 'mp_checkout_error_country', '' );
       $content .= '<select id="mp_country" name="country" class="mp_shipping_field">';
-      foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
+      foreach ($mp->get_setting('shipping->allowed_countries', array()) as $code) {
         $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr($mp->countries[$code]).'</option>';
       }
       $content .= '</select>';
@@ -565,7 +562,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
       $content .= '<input size="25" id="mp_city" class="mp_shipping_field" name="city" type="text" value="'.esc_attr($city).'" /></td>';
       $content .= '</tr>';
       $content .= '<tr>';
-      $content .= '<td align="right">'.__('State/Province/Region:', 'mp').'*</td><td id="mp_province_field">';
+      $content .= '<td align="right">'.__('State/Province/Region:', 'mp') . (($country == 'US' || $country == 'CA') ? '*' : '') . '</td><td id="mp_province_field">';
       $content .= apply_filters( 'mp_checkout_error_state', '' );
       $content .= mp_province_field($country, $state).'</td>';
       $content .= '</tr>';
@@ -580,7 +577,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
       $content .= '</tr>';
     }
     
-    if ($settings['special_instructions']) {
+    if ($mp->get_setting('special_instructions')) {
       $content .= '<tr>';
       $content .= '<td align="right">'.__('Special Instructions:', 'mp').'</td><td>';
       $content .= '<textarea name="special_instructions" rows="2" style="width: 100%;">'.esc_textarea($special_instructions).'</textarea></td>';
@@ -762,8 +759,6 @@ function _mp_cart_payment($type, $echo = false) {
  */
 function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
   global $mp, $blog_id;
-  $settings = get_option('mp_settings');
-
   $content = '';
 
   if ( $checkoutstep == null )
@@ -786,29 +781,29 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
       switch($checkoutstep) {
 
         case 'shipping':
-          $content .= do_shortcode($settings['msg']['shipping']);
+          $content .= do_shortcode($mp->get_setting('msg->shipping'));
           $content .= _mp_cart_shipping(true);
           break;
 
         case 'checkout':
-          $content .=  do_shortcode($settings['msg']['checkout']);
+          $content .=  do_shortcode($mp->get_setting('msg->checkout'));
           $content .= _mp_cart_payment('form');
           break;
 
         case 'confirm-checkout':
-          $content .=  do_shortcode($settings['msg']['confirm_checkout']);
+          $content .=  do_shortcode($mp->get_setting('msg->confirm_checkout'));
           $content .= _mp_cart_table('checkout');
           $content .= _mp_cart_shipping(false);
           $content .= _mp_cart_payment('confirm');
           break;
 
         case 'confirmation':
-          $content .=  do_shortcode($settings['msg']['success']);
+          $content .=  do_shortcode($mp->get_setting('msg->success'));
           $content .= _mp_cart_payment('confirmation');
           break;
 
         default:
-          $content .= do_shortcode($settings['msg']['cart']);
+          $content .= do_shortcode($mp->get_setting('msg->cart'));
           $content .= _mp_cart_table('checkout-edit');
           $content .= _mp_cart_login(false);
           break;
@@ -822,6 +817,7 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
       $content .= '</div>';
     }
   } else {
+    $content .= do_shortcode($mp->get_setting('msg->cart'));
     $content .= '<div class="mp_cart_empty">'.__('There are no items in your cart.', 'mp').'</div>';
     $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="'.mp_products_link(false, true).'">'.__('Browse Products &raquo;', 'mp').'</a></div>';
   }
@@ -842,8 +838,7 @@ function mp_order_status() {
 
 	$bid = (is_multisite()) ? $blog_id : 1; // FPM: Used for Custom Field Processing
 	
-	$settings = get_option('mp_settings');
-  echo do_shortcode($settings['msg']['order_status']);
+  echo do_shortcode($mp->get_setting('msg->order_status'));
 
   $order_id = isset($wp_query->query_vars['order_id']) ? $wp_query->query_vars['order_id'] : (isset($_GET['order_id']) ? $_GET['order_id'] : '');
 
@@ -876,7 +871,7 @@ function mp_order_status() {
       }
 
       $order_paid = $order->post_status != 'order_received';
-      $max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+      $max_downloads = $mp->get_setting('max_downloads', 5);
       ?>
       </ul>
 
@@ -1239,7 +1234,6 @@ function mp_province_field($country = 'US', $selected = null) {
  */
 function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '' ) {
   global $wp_query, $mp;
-  $settings = get_option('mp_settings');
 
   //setup taxonomy if applicable
   if ($category) {
@@ -1258,7 +1252,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   if ($paginate) {
     $paged = true;
   } else if ($paginate === '') {
-    if ($settings['paginate'])
+    if ($mp->get_setting('paginate'))
       $paged = true;
     else
       $paginate_query = '&nopaging=true';
@@ -1272,7 +1266,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     if (intval($per_page)) {
       $paginate_query = '&posts_per_page='.intval($per_page);
     } else {
-      $paginate_query = '&posts_per_page='.$settings['per_page'];
+      $paginate_query = '&posts_per_page='.$mp->get_setting('per_page');
 		}
 
     //figure out page
@@ -1287,12 +1281,12 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
 
   //get order by
   if (!$order_by) {
-    if ($settings['order_by'] == 'price')
+    if ($mp->get_setting('order_by') == 'price')
       $order_by_query = '&meta_key=mp_price_sort&orderby=meta_value_num';
-    else if ($settings['order_by'] == 'sales')
+    else if ($mp->get_setting('order_by') == 'sales')
       $order_by_query = '&meta_key=mp_sales_count&orderby=meta_value_num';
     else
-      $order_by_query = '&orderby='.$settings['order_by'];
+      $order_by_query = '&orderby='.$mp->get_setting('order_by');
   } else {
   	if ('price' == $order_by)
   		$order_by_query = '&meta_key=mp_price_sort&orderby=meta_value_num';
@@ -1302,7 +1296,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
 
   //get order direction
   if (!$order) {
-    $order_query = '&order='.$settings['order'];
+    $order_query = '&order='.$mp->get_setting('order');
   } else {
     $order_query = '&order='.$order;
   }
@@ -1330,7 +1324,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
       $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
       $content .= '<div class="mp_product_content">';
       $product_content = mp_product_image( false, 'list', $post->ID );
-      if ($settings['show_excerpt'] == 1)
+      if ($mp->get_setting('show_excerpt'))
         $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
       $content .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
       $content .= '</div>';
@@ -1536,7 +1530,6 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 
   $label = ($label === true) ? __('Price: ', 'mp') : $label;
 
-  $settings = get_option('mp_settings');
 	$meta = get_post_custom($post_id);
   //unserialize
   foreach ($meta as $key => $val) {
@@ -1583,7 +1576,6 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   global $id, $mp;
   $post_id = ( NULL === $post_id ) ? $id : $post_id;
 
-  $settings = get_option('mp_settings');
   $meta = get_post_custom($post_id);
   //unserialize
   foreach ($meta as $key => $val) {
@@ -1623,7 +1615,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 
     $button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 
-  } else if ($settings['disable_cart']) {
+  } else if ($mp->get_setting('disable_cart')) {
     
     $button = '';
     
@@ -1658,10 +1650,10 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 	    if ($context == 'list') {
 	      if ($variation_select) {
         	$button .= '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Choose Option &raquo;', 'mp') . '</a>';
-	      } else if ($settings['list_button_type'] == 'addcart') {
+	      } else if ($mp->get_setting('list_button_type') == 'addcart') {
 	        $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
 	        $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-	      } else if ($settings['list_button_type'] == 'buynow') {
+	      } else if ($mp->get_setting('list_button_type') == 'buynow') {
 	        $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
 	      }
 	    } else {
@@ -1669,14 +1661,14 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
 	      $button .= $variation_select;
 
 	      //add quantity field if not downloadable
-	      if ($settings['show_quantity'] && empty($meta["mp_file"])) {
+	      if ($mp->get_setting('show_quantity') && empty($meta["mp_file"])) {
 	        $button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
 	      }
 
-	      if ($settings['product_button_type'] == 'addcart') {
+	      if ($mp->get_setting('product_button_type') == 'addcart') {
 	        $button .= '<input type="hidden" name="action" value="mp-update-cart" />';
 	        $button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-	      } else if ($settings['product_button_type'] == 'buynow') {
+	      } else if ($mp->get_setting('product_button_type') == 'buynow') {
 	        $button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
 	      }
 	    }
@@ -1704,30 +1696,29 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
  * @param int $size An optional width/height for the image if contect is widget
  */
 function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $size = NULL ) {
-  global $id;
+  global $id, $mp;
   $post_id = ( NULL === $post_id ) ? $id : $post_id;
   // Added WPML
   $post_id = apply_filters('mp_product_image_id', $post_id);
 
   $post = get_post($post_id);
 
-  $settings = get_option('mp_settings');
   $post_thumbnail_id = get_post_thumbnail_id( $post_id );
   $class = '';
   
   if ($context == 'list') {
     //quit if no thumbnails on listings
-    if (!$settings['show_thumbnail'])
+    if (!$mp->get_setting('show_thumbnail'))
       return '';
 
     //size
     if (intval($size)) {
       $size = array(intval($size), intval($size));
     } else {
-      if ($settings['list_img_size'] == 'custom')
-        $size = array($settings['list_img_width'], $settings['list_img_height']);
+      if ($mp->get_setting('list_img_size') == 'custom')
+        $size = array($mp->get_setting('list_img_width'), $mp->get_setting('list_img_height'));
       else
-        $size = $settings['list_img_size'];
+        $size = $mp->get_setting('list_img_size');
     }
     
     //link
@@ -1737,10 +1728,10 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 
   } else if ($context == 'single') {
     //size
-    if ($settings['product_img_size'] == 'custom')
-      $size = array($settings['product_img_width'], $settings['product_img_height']);
+    if ($mp->get_setting('product_img_size') == 'custom')
+      $size = array($mp->get_setting('product_img_width'), $mp->get_setting('product_img_height'));
     else
-      $size = $settings['product_img_size'];
+      $size = $mp->get_setting('product_img_size');
 
     //link
     $temp = wp_get_attachment_image_src( $post_thumbnail_id, 'large' );
@@ -1786,12 +1777,10 @@ function mp_cart_link($echo = true, $url = false, $link_text = '') {
 
 	if ( $mp->global_cart && is_object($mp_wpmu) && !$mp_wpmu->is_main_site() && function_exists('mp_main_site_id') ) {
 		switch_to_blog(mp_main_site_id());
-		$settings = get_option('mp_settings');
-		$link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
+		$link = home_url( $mp->get_setting('slugs->store') . '/' . $mp->get_setting('slugs->cart') . '/' );
 		restore_current_blog();
 	} else {
-    $settings = get_option('mp_settings');
-		$link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['cart'] . '/' );
+		$link = home_url( $mp->get_setting('slugs->store') . '/' . $mp->get_setting('slugs->cart') . '/' );
 	}
 
   if (!$url) {
@@ -1814,8 +1803,8 @@ function mp_cart_link($echo = true, $url = false, $link_text = '') {
  * @param string $link_text Optional, text to show in link.
  */
 function mp_store_link($echo = true, $url = false, $link_text = '') {
-	$settings = get_option('mp_settings');
-  $link = home_url(trailingslashit($settings['slugs']['store']));
+  global $mp;
+  $link = home_url( trailingslashit( $mp->get_setting('slugs->store') ) );
 
   if (!$url) {
     $text = ($link_text) ? $link_text : __('Visit Store', 'mp');
@@ -1837,8 +1826,8 @@ function mp_store_link($echo = true, $url = false, $link_text = '') {
  * @param string $link_text Optional, text to show in link.
  */
 function mp_products_link($echo = true, $url = false, $link_text = '') {
-	$settings = get_option('mp_settings');
-  $link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['products'] . '/' );
+  global $mp;
+  $link = home_url( $mp->get_setting('slugs->store') . '/' . $mp->get_setting('slugs->products') . '/' );
 
   if (!$url) {
     $text = ($link_text) ? $link_text : __('View Products', 'mp');
@@ -1860,8 +1849,8 @@ function mp_products_link($echo = true, $url = false, $link_text = '') {
  * @param string $link_text Optional, text to show in link.
  */
 function mp_orderstatus_link($echo = true, $url = false, $link_text = '') {
-	$settings = get_option('mp_settings');
-  $link = home_url( $settings['slugs']['store'] . '/' . $settings['slugs']['orderstatus'] . '/' );
+  global $mp;
+  $link = home_url( $mp->get_setting('slugs->store') . '/' . $mp->get_setting('slugs->orderstatus') . '/' );
 
   if (!$url) {
     $text = ($link_text) ? $link_text : __('Check Order Status', 'mp');
@@ -1891,10 +1880,9 @@ function mp_checkout_step_url($checkout_step) {
  * @param bool $echo Optional, whether to echo. Defaults to true
  */
 function mp_store_navigation( $echo = true ) {
-	$settings = get_option('mp_settings');
 
   //navigation
-  if (!$settings['disable_cart']) {
+  if (!$mp->get_setting('disable_cart')) {
     $nav = '<ul class="mp_store_navigation"><li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
 		$nav .= '<li class="page_item"><a href="' . mp_cart_link(false, true) . '" title="' . __('Shopping Cart', 'mp') . '">' . __('Shopping Cart', 'mp') . '</a></li>';
     $nav .= '<li class="page_item"><a href="' . mp_orderstatus_link(false, true) . '" title="' . __('Order Status', 'mp') . '">' . __('Order Status', 'mp') . '</a></li>
@@ -2001,7 +1989,6 @@ function mp_custom_fields_checkout_after_shipping($content='') {
 	}
   
 	$blog_id = (is_multisite()) ? $blog_id : 1;
-	$settings = get_option('mp_settings');
 	
 	$current_blog_id = $blog_id;
 
@@ -2009,84 +1996,84 @@ function mp_custom_fields_checkout_after_shipping($content='') {
 	if (!$mp->global_cart)  //get subset if needed
 		$selected_cart[$blog_id] = $global_cart[$blog_id];
 	else
-    	$selected_cart = $global_cart;
+    $selected_cart = $global_cart;
   
 	$content_product = '';
 	
-    foreach ($selected_cart as $bid => $cart) {
+  foreach ($selected_cart as $bid => $cart) {
 
 		if (is_multisite())
 			switch_to_blog($bid);
 
-      	foreach ($cart as $product_id => $variations) {
+      foreach ($cart as $product_id => $variations) {
 	
-			// Load the meta info for the custom fields for this product
-			$mp_has_custom_field 		= get_post_meta($product_id, 'mp_has_custom_field', true);
-			$mp_custom_field_required 	= get_post_meta($product_id, 'mp_custom_field_required', true);;
-			$mp_custom_field_per 		= get_post_meta($product_id, 'mp_custom_field_per', true);;
-			$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
-	
-        	foreach ($variations as $variation => $data) {
+        // Load the meta info for the custom fields for this product
+        $mp_has_custom_field 		= get_post_meta($product_id, 'mp_has_custom_field', true);
+        $mp_custom_field_required 	= get_post_meta($product_id, 'mp_custom_field_required', true);;
+        $mp_custom_field_per 		= get_post_meta($product_id, 'mp_custom_field_per', true);;
+        $mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+    
+        foreach ($variations as $variation => $data) {
 		
-				if (isset($mp_has_custom_field[$variation])) {
-
-					if (isset($mp_custom_field_label[$variation]))
-						$label_text = $mp_custom_field_label[$variation];
-					else
-						$label_text = "";
-					
-					if (isset($mp_custom_field_required[$variation]))
-						$required_text = 'required';
-					else
-						$required_text = "optional";									
-				    
-					$content_product .= '<tr class="mp_product_name"><td align="right" colspan="2">';
-					$content_product .= apply_filters( 'mp_checkout_error_custom_fields_'. $product_id .'_'. $variation, '' );
-					$content_product .= $data['name'];
-					$content_product .= '</td></tr>';
-					$content_product .= '<tr class="mp_product_custom_fields" style="border-width: 0px">';
-					$content_product .= '<td align="right" style="border-width: 0px">';
-				    $content_product .= $label_text .' ('. $required_text .')';
-					$content_product .=  '</td></tr>';
-					$content_product .= '<tr><td style="border-width: 0px">';
-					
-					// If the mp_custom_field_per is set to 'line' we only show one input field per item in the cart. 
-					// This input field will be a simply unordered list (<ul>). However, if the mp_custom_field_per
-					// Then we need to show an input field per the quantity items. In this case we use an ordered list
-					// to show the numbers to the user. 0-based.
-					if ($mp_custom_field_per[$variation] == "line") {
-						$content_product .= '<ul>';
-						$cf_limit = 1;
-						
-					} else if ($mp_custom_field_per[$variation] == "quantity") {
-						$content_product .= '<ol>';
-						$cf_limit = $data['quantity'];
-					}
-					
-					$output_cnt = 0;
-					while($output_cnt < $cf_limit) {
-
-						$cf_key = $bid .':'. $product_id .':'. $variation;
-						if (isset($mp_custom_fields[$cf_key][$output_cnt])) 
-							$output_value = $mp_custom_fields[$cf_key][$output_cnt];
-						else
-							$output_value = '';
-							
-						$content_product .= '<li><input type="text" style="width: 90%;" value="'. $output_value .'" 
-							name="mp_custom_fields[' . $bid . ':' . $product_id . ':' . $variation . ']['. $output_cnt .']" /></li>';
-						$output_cnt += 1;
-					}
-					
-					if ($mp_custom_field_per[$variation] == "line")
-						$content_product .= '<ul>';
-					else if ($mp_custom_field_per[$variation] == "quantity")
-						$content_product .= '<ol>';
-
-					$content_product .=  '</td>';
-					$content_product .=  '</tr>';
-				}
-			}
-		}
+          if (isset($mp_has_custom_field[$variation])) {
+  
+            if (isset($mp_custom_field_label[$variation]))
+              $label_text = $mp_custom_field_label[$variation];
+            else
+              $label_text = "";
+            
+            if (isset($mp_custom_field_required[$variation]))
+              $required_text = 'required';
+            else
+              $required_text = "optional";									
+              
+            $content_product .= '<tr class="mp_product_name"><td align="right" colspan="2">';
+            $content_product .= apply_filters( 'mp_checkout_error_custom_fields_'. $product_id .'_'. $variation, '' );
+            $content_product .= $data['name'];
+            $content_product .= '</td></tr>';
+            $content_product .= '<tr class="mp_product_custom_fields" style="border-width: 0px">';
+            $content_product .= '<td align="right" style="border-width: 0px">';
+            $content_product .= $label_text .' ('. $required_text .')';
+            $content_product .=  '</td></tr>';
+            $content_product .= '<tr><td style="border-width: 0px">';
+            
+            // If the mp_custom_field_per is set to 'line' we only show one input field per item in the cart. 
+            // This input field will be a simply unordered list (<ul>). However, if the mp_custom_field_per
+            // Then we need to show an input field per the quantity items. In this case we use an ordered list
+            // to show the numbers to the user. 0-based.
+            if ($mp_custom_field_per[$variation] == "line") {
+              $content_product .= '<ul>';
+              $cf_limit = 1;
+              
+            } else if ($mp_custom_field_per[$variation] == "quantity") {
+              $content_product .= '<ol>';
+              $cf_limit = $data['quantity'];
+            }
+            
+            $output_cnt = 0;
+            while($output_cnt < $cf_limit) {
+  
+              $cf_key = $bid .':'. $product_id .':'. $variation;
+              if (isset($mp_custom_fields[$cf_key][$output_cnt])) 
+                $output_value = $mp_custom_fields[$cf_key][$output_cnt];
+              else
+                $output_value = '';
+                
+              $content_product .= '<li><input type="text" style="width: 90%;" value="'. $output_value .'" 
+                name="mp_custom_fields[' . $bid . ':' . $product_id . ':' . $variation . ']['. $output_cnt .']" /></li>';
+              $output_cnt += 1;
+            }
+            
+            if ($mp_custom_field_per[$variation] == "line")
+              $content_product .= '<ul>';
+            else if ($mp_custom_field_per[$variation] == "quantity")
+              $content_product .= '<ol>';
+  
+            $content_product .=  '</td>';
+            $content_product .=  '</tr>';
+          }
+        }
+      }
 
 	    //go back to original blog
 	    if (is_multisite())

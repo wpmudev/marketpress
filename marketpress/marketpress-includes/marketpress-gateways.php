@@ -148,8 +148,8 @@ if(!class_exists('MP_Gateway_API')) {
 		
 		//populates ipn_url var
 		function _generate_ipn_url() {
-      $settings = get_option('mp_settings');
-      $this->ipn_url = home_url($settings['slugs']['store'] . '/payment-return/' . $this->plugin_name);
+			global $mp;
+      $this->ipn_url = home_url($mp->get_setting('slugs->store') . '/payment-return/' . $this->plugin_name);
     }
     
 		//populates ipn_url var

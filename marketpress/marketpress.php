@@ -431,7 +431,7 @@ Thanks again!", 'mp')
     global $mp_shipping_plugins, $mp_shipping_active_plugins;
 		$shipping = $this->get_setting('shipping');
 
-		if ($settings['shipping']['method'] == 'calculated') {
+		if ($this->get_setting('shipping->method') == 'calculated') {
 			//load just the calculated ones
 			foreach ((array)$mp_shipping_plugins as $code => $plugin) {
 				if ($plugin[2]) {
@@ -507,11 +507,27 @@ Thanks again!", 'mp')
     }
   }
 	
-	//an easy way to get to our settings array without undefined indexes
+	/*
+	 * function get_setting
+	 * @param string $key A setting key, or -> separated list of keys to go multiple levels into an array
+	 * @param mixed $default Returns when setting is not set
+	 *
+	 * an easy way to get to our settings array without undefined indexes
+	 */
 	function get_setting($key, $default = null) {
     $settings = get_option( 'mp_settings' );
-    $setting = isset($settings[$key]) ? $settings[$key] : $default;
-		return apply_filters( "mp_setting_$key", $setting, $default );
+		$keys = explode('->', $key);
+		array_map('trim', $keys);
+		if (count($keys) == 1)
+			$setting = isset($settings[$keys[0]]) ? $settings[$keys[0]] : $default;
+		else if (count($keys) == 2)
+			$setting = isset($settings[$keys[0]][$keys[1]]) ? $settings[$keys[0]][$keys[1]] : $default;
+		else if (count($keys) == 3)
+			$setting = isset($settings[$keys[0]][$keys[1]][$keys[2]]) ? $settings[$keys[0]][$keys[1]][$keys[2]] : $default;
+		else if (count($keys) == 4)
+			$setting = isset($settings[$keys[0]][$keys[1]][$keys[2]][$keys[3]]) ? $settings[$keys[0]][$keys[1]][$keys[2]][$keys[3]] : $default;
+	
+		return apply_filters( "mp_setting_".implode('', $keys), $setting, $default );
 	}
 
 	function update_setting($key, $value) {
@@ -674,19 +690,18 @@ Thanks again!", 'mp')
   //creates the store page on install and updates
   function create_store_page($old_slug = false) {
   	global $wpdb;
-		$slugs = $this->get_setting('slugs');
 
     //remove old page if updating
-    if ($old_slug && $old_slug != $slugs['store']) {
+    if ($old_slug && $old_slug != $this->get_setting('slugs->store')) {
       $old_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$old_slug' AND post_type = 'page'");
       $old_post = get_post($old_post_id);
 
-      $old_post->post_name = $slugs['store'];
+      $old_post->post_name = $this->get_setting('slugs->store');
       wp_update_post($old_post);
     }
 
     //insert new page if not existing
-		$page_count = $wpdb->get_var("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_name = '" . $slugs['store'] . "' AND post_type = 'page'");
+		$page_count = $wpdb->get_var("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_name = '" . $this->get_setting('slugs->store') . "' AND post_type = 'page'");
 		if ( !$page_count ) {
 
 		  //default page content
@@ -699,7 +714,7 @@ Thanks again!", 'mp')
       $content .= '<p>' . __('Browse by tag:', 'mp') . '</p>';
       $content .= '[mp_tag_cloud]';
 
-      $id = wp_insert_post( array('post_title' => __('Store', 'mp'), 'post_name' => $slugs['store'], 'post_status' => 'publish', 'post_type' => 'page', 'post_content' => $content ) );
+      $id = wp_insert_post( array('post_title' => __('Store', 'mp'), 'post_name' => $this->get_setting('slugs->store'), 'post_status' => 'publish', 'post_type' => 'page', 'post_content' => $content ) );
 			update_option('mp_store_page', $id);
     }
   }
@@ -707,11 +722,9 @@ Thanks again!", 'mp')
   function register_custom_posts() {
     ob_start();
 
-		$slugs = $this->get_setting('slugs');
-
     // Register custom taxonomy
-		register_taxonomy( 'product_category', 'product', apply_filters( 'mp_register_product_category', array("hierarchical" => true, 'label' => __('Product Categories', 'mp'), 'singular_label' => __('Product Category', 'mp'), 'rewrite' => array('slug' => $slugs['store'] . '/' . $slugs['products'] . '/' . $slugs['category'])) ) );
-		register_taxonomy( 'product_tag', 'product', apply_filters( 'mp_register_product_tag', array("hierarchical" => false, 'label' => __('Product Tags', 'mp'), 'singular_label' => __('Product Tag', 'mp'), 'rewrite' => array('slug' => $slugs['store'] . '/' . $slugs['products'] . '/' . $slugs['tag'])) ) );
+		register_taxonomy( 'product_category', 'product', apply_filters( 'mp_register_product_category', array("hierarchical" => true, 'label' => __('Product Categories', 'mp'), 'singular_label' => __('Product Category', 'mp'), 'rewrite' => array('slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->category'))) ) );
+		register_taxonomy( 'product_tag', 'product', apply_filters( 'mp_register_product_tag', array("hierarchical" => false, 'label' => __('Product Tags', 'mp'), 'singular_label' => __('Product Tag', 'mp'), 'rewrite' => array('slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->tag'))) ) );
 
     // Register custom product post type
     $supports = array( 'title', 'editor', 'author', 'excerpt', 'revisions', 'thumbnail' );
@@ -736,7 +749,7 @@ Thanks again!", 'mp')
         'publicly_queryable' => true,
         'capability_type' => 'page',
         'hierarchical' => false,
-        'rewrite' => array('slug' => $slugs['store'] . '/' . $slugs['products'], 'with_front' => false), // Permalinks format
+        'rewrite' => array('slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products'), 'with_front' => false), // Permalinks format
         'query_var' => true,
         'supports' => $supports
     );
@@ -806,25 +819,23 @@ Thanks again!", 'mp')
 		}
   }
 
-  function add_rewrite_rules($rules){
-    $slugs = $this->get_setting('slugs');
-
+  function add_rewrite_rules($rules) {
     $new_rules = array();
 
     //product list
-    $new_rules[$slugs['store'] . '/' . $slugs['products'] . '/?$'] = 'index.php?pagename=product_list';
-  	$new_rules[$slugs['store'] . '/' . $slugs['products'] . '/page/?([0-9]{1,})/?$'] = 'index.php?pagename=product_list&paged=$matches[1]';
+    $new_rules[$this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/?$'] = 'index.php?pagename=product_list';
+  	$new_rules[$this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/page/?([0-9]{1,})/?$'] = 'index.php?pagename=product_list&paged=$matches[1]';
 
     //checkout page
-    $new_rules[$slugs['store'] . '/' . $slugs['cart'] . '/?$'] = 'index.php?pagename=cart';
-    $new_rules[$slugs['store'] . '/' . $slugs['cart'] . '/([^/]+)/?$'] = 'index.php?pagename=cart&checkoutstep=$matches[1]';
+    $new_rules[$this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->cart') . '/?$'] = 'index.php?pagename=cart';
+    $new_rules[$this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->cart') . '/([^/]+)/?$'] = 'index.php?pagename=cart&checkoutstep=$matches[1]';
 
     //order status page
-    $new_rules[$slugs['store'] . '/' . $slugs['orderstatus'] . '/?$'] = 'index.php?pagename=orderstatus';
-    $new_rules[$slugs['store'] . '/' . $slugs['orderstatus'] . '/([^/]+)/?$'] = 'index.php?pagename=orderstatus&order_id=$matches[1]';
+    $new_rules[$this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->orderstatus') . '/?$'] = 'index.php?pagename=orderstatus';
+    $new_rules[$this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->orderstatus') . '/([^/]+)/?$'] = 'index.php?pagename=orderstatus&order_id=$matches[1]';
 
     //ipn handling for payment gateways
-    $new_rules[$slugs['store'] . '/payment-return/(.+)'] = 'index.php?paymentgateway=$matches[1]';
+    $new_rules[$this->get_setting('slugs->store') . '/payment-return/(.+)'] = 'index.php?paymentgateway=$matches[1]';
 
   	return array_merge($new_rules, $rules);
   }
@@ -882,7 +893,6 @@ Thanks again!", 'mp')
   //scans post type at template_redirect to apply custom themeing to products
   function load_store_templates() {
     global $wp_query, $mp_wpmu, $mp_gateway_active_plugins;
-    $settings = get_option('mp_settings');
 		
 		//only filter public side
 		if (is_admin()) return;
@@ -928,7 +938,7 @@ Thanks again!", 'mp')
 		
     //load proper theme for main store page
 		$slugs = $this->get_setting('slugs');
-    if ($wp_query->query_vars['pagename'] == $slugs['store']) {
+    if ($wp_query->query_vars['pagename'] == $this->get_setting('slugs->store')) {
 
       //check for custom theme template
       $templates = array("mp_store.php");
@@ -1721,7 +1731,6 @@ Thanks again!", 'mp')
   //adds our custom column content
 	function manage_orders_custom_columns($column) {
 		global $post;
-		$settings = get_option('mp_settings');
 		$meta = get_post_custom();
     //unserialize
     foreach ($meta as $key => $val)
@@ -1831,12 +1840,11 @@ Thanks again!", 'mp')
   //adds our custom meta boxes the the product edit screen
   function meta_boxes() {
 		global $wp_meta_boxes;
-    $settings = get_option('mp_settings');
 
     add_meta_box('mp-meta-details', __('Product Details', 'mp'), array(&$this, 'meta_details'), 'product', 'normal', 'high');
 
     //only add these boxes if orders are enabled
-    if (!$settings['disable_cart']) {
+    if (!$this->get_setting('disable_cart')) {
 
       //only display metabox if shipping plugin ties into it
       if ( has_action('mp_shipping_metabox') )
@@ -1968,7 +1976,6 @@ Thanks again!", 'mp')
   //The Product Details meta box
   function meta_details() {
     global $post;
-    $settings = get_option('mp_settings');
 		$meta = get_post_custom($post->ID);
   	//unserialize
     foreach ($meta as $key => $val) {
@@ -1977,8 +1984,7 @@ Thanks again!", 'mp')
 		    $meta[$key] = array($meta[$key]);
 		}
 
-	$meta = apply_filters( 'mp_meta_details', $meta, $post->ID );
-
+		$meta = apply_filters( 'mp_meta_details', $meta, $post->ID );
     ?>
     <input type="hidden" name="mp_product_meta" value="1" />
     <table class="widefat" id="mp_product_variations_table">
@@ -2104,7 +2110,6 @@ Thanks again!", 'mp')
   //The Product Download meta box
   function meta_download() {
     global $post;
-    $settings = get_option('mp_settings');
 		$meta = get_post_custom($post->ID);
 		$meta = apply_filters( 'mp_meta_details', $meta, $post->ID );
     ?>
@@ -2155,7 +2160,6 @@ Thanks again!", 'mp')
   //returns the calculated price for shipping. Returns False if shipping address is not available
   function shipping_price($format = false, $cart = false) {
 		global $mp_shipping_active_plugins;
-		$settings = get_option('mp_settings');
 
 		//grab cart for just this blog
 		if (!$cart)
@@ -2192,12 +2196,12 @@ Thanks again!", 'mp')
 		//don't charge shipping if only digital products
     if ( $this->download_only_cart($cart) ) {
       $price = 0;
-    } else if ( $settings['shipping']['method'] == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
+    } else if ( $this->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
 			//shipping plugins tie into this to calculate their shipping cost
 			$price = apply_filters( 'mp_calculate_shipping_'.$_SESSION['mp_shipping_info']['shipping_option'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 		} else {
 			//shipping plugins tie into this to calculate their shipping cost
-			$price = apply_filters( 'mp_calculate_shipping_'.$settings['shipping']['method'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+			$price = apply_filters( 'mp_calculate_shipping_'.$this->get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 		}
 
 		//calculate extra shipping
@@ -2226,7 +2230,6 @@ Thanks again!", 'mp')
 
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $cart = false) {
-		$settings = get_option('mp_settings');
 
     //grab cart for just this blog
     if (!$cart)
@@ -2246,11 +2249,11 @@ Thanks again!", 'mp')
     $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
 
 		//if we've skipped the shipping page and no address is set, use base for tax calculation
-		if ($this->download_only_cart($cart) || $settings['tax']['tax_inclusive']) {
+		if ($this->download_only_cart($cart) || $this->get_setting('tax->tax_inclusive')) {
 			if (empty($country))
-				$country = $settings['base_country'];
+				$country = $this->get_setting('base_country');
 			if (empty($state))
-				$state = $settings['base_province'];
+				$state = $this->get_setting('base_province');
 		}
 
 		//TODO calculate all taxes per product before rounding
@@ -2279,7 +2282,7 @@ Thanks again!", 'mp')
 			$total = $coupon['new_total'];
 
     //add in shipping?
-    if ( $settings['tax']['tax_shipping'] && ($shipping_price = $this->shipping_price()) )
+    if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) )
 			$total += $shipping_price;
 
     //check required fields
@@ -2287,38 +2290,38 @@ Thanks again!", 'mp')
       return false;
     }
 
-    switch ($settings['base_country']) {
+    switch ($this->get_setting('base_country')) {
 			case 'US':
 			  //USA taxes are only for orders delivered inside the state
-			  if ($country == 'US' && $state == $settings['base_province'])
-			    $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
+			  if ($country == 'US' && $state == $this->get_setting('base_province'))
+			    $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
 			  break;
 
 			case 'CA':
 			  //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 				if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
-					if (isset($settings['tax']['canada_rate'][$state]))
-						$price = round(($total * $settings['tax']['canada_rate'][$state]) + $special_total, 2);
+					if (!is_null($this->get_setting("tax->canada_rate->$state")))
+						$price = round(($total * $this->get_setting("tax->canada_rate->$state")) + $special_total, 2);
 					else //backwards compat with pre 2.2 if per province rates are not set
-						$price = round(($total * $settings['tax']['rate']) + $special_total, 2);
+						$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
 				}
 			  break;
 
 			case 'AU':
 			  //Australia taxes orders in country
 			  if ($country == 'AU')
-			    $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
+			    $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
 			  break;
 
 			default:
 			  //EU countries charge VAT within the EU
-			  if ( in_array($settings['base_country'], $this->eu_countries) ) {
+			  if ( in_array($this->get_setting('base_country'), $this->eu_countries) ) {
 			    if (in_array($country, $this->eu_countries))
-			      $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
+			      $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
 			  } else {
 			    //all other countries use the tax outside preference
-			    if ($settings['tax']['tax_outside'] || (!$settings['tax']['tax_outside'] && $country == $settings['base_country']))
-			      $price = round(($total * $settings['tax']['rate']) + $special_total, 2);
+			    if ($this->get_setting('tax->tax_outside') || (!$this->get_setting('tax->tax_outside') && $country == $this->get_setting('base_country')))
+			      $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
 			  }
 			  break;
     }
@@ -2335,17 +2338,16 @@ Thanks again!", 'mp')
 
 	//returns the before tax price for a given amount based on a bunch of foreign tax laws.
   function before_tax_price($tax_price, $product_id = false) {
-		$settings = get_option('mp_settings');
 
 		//if tax inclusve pricing is turned off just return given price
-		if (!$settings['tax']['tax_inclusive'])
+		if (!$this->get_setting('tax->tax_inclusive'))
 			return $tax_price;
 
 		if ($product_id && get_post_meta($product_id, 'mp_is_special_tax', true)) {
 			$rate = get_post_meta($product_id, 'mp_special_tax', true);
 		} else {
 			//figure out rate in case its based on a canadian base province
-			$rate =  ('CA' == $settings['base_country']) ? $settings['tax']['canada_rate'][$settings['base_province']] : $settings['tax']['rate'];
+			$rate =  ('CA' == $this->get_setting('tax->base_country')) ? $this->get_setting('tax->canada_rate'.$this->get_setting('base_province')) : $this->get_setting('tax->rate');
 		}
 
 		return round($tax_price / ($rate + 1), 2);
@@ -2508,7 +2510,6 @@ Thanks again!", 'mp')
 		global $blog_id, $mp_gateway_active_plugins;
 		$blog_id = (is_multisite()) ? $blog_id : 1;
 		$current_blog_id = $blog_id;
-		$settings = get_option('mp_settings');
 
     $cart = $this->get_cart_cookie();
 
@@ -2522,12 +2523,12 @@ Thanks again!", 'mp')
 
       if (defined('DOING_AJAX') && DOING_AJAX) {
         ?>
-    	<div class="mp_cart_empty">
-    	  <?php _e('There are no items in your cart.', 'mp') ?>
-    	</div>
-    	<div id="mp_cart_actions_widget">
-    	  <a class="mp_store_link" href="<?php mp_products_link(true, true); ?>"><?php _e('Browse Products &raquo;', 'mp') ?></a>
-    	</div>
+				<div class="mp_cart_empty">
+					<?php _e('There are no items in your cart.', 'mp') ?>
+				</div>
+				<div id="mp_cart_actions_widget">
+					<a class="mp_store_link" href="<?php mp_products_link(true, true); ?>"><?php _e('Browse Products &raquo;', 'mp') ?></a>
+				</div>
         <?php
         exit;
       }
@@ -2850,16 +2851,16 @@ Thanks again!", 'mp')
 					if ( $this->global_cart ) {
         		$skip = apply_filters('mp_payment_form_skip_' . $network_settings['global_gateway'], false);
 					} else {
-					  $skip = apply_filters('mp_payment_form_skip_' . $settings['gateways']['allowed'][0], false);
+					  $skip = apply_filters('mp_payment_form_skip_' . $this->get_setting('gateways->allowed->0'), false);
 					}
-			    if ( (!$this->global_cart && count((array)$settings['gateways']['allowed']) > 1) || !$skip ) {
+			    if ( (!$this->global_cart && count($this->get_setting('gateways->allowed', array())) > 1) || !$skip ) {
 			      wp_safe_redirect(mp_checkout_step_url('checkout'));
 			      exit;
 			    } else {
 			      if ( $this->global_cart )
 			      	$_SESSION['mp_payment_method'] = $network_settings['global_gateway'];
 						else
-			      	$_SESSION['mp_payment_method'] = $settings['gateways']['allowed'][0];
+			      	$_SESSION['mp_payment_method'] = $this->get_setting('gateways->allowed->0');
 			      do_action( 'mp_payment_submit_' . $_SESSION['mp_payment_method'], $this->get_cart_contents($this->global_cart), $_SESSION['mp_shipping_info'] );
 			      //if no errors send to next checkout step
 			      if ($this->checkout_error == false) {
@@ -2898,14 +2899,13 @@ Thanks again!", 'mp')
 
             //setup our payment details
 	          $timestamp = time();
-	          $settings = get_option('mp_settings');
 	    	  	$payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
 	          $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
 	      	  $payment_info['method'][] = __('N/A - Free order', 'mp');
 	      	  $payment_info['transaction_id'][] = __('N/A', 'mp');
 	      	  $payment_info['status'][$timestamp] = __('Completed', 'mp');
 	      	  $payment_info['total'] = $total;
-	      	  $payment_info['currency'] = $settings['currency'];
+	      	  $payment_info['currency'] = $this->get_setting('currency');
 		  			$this->create_order(false, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
 	        }
 
@@ -3002,7 +3002,6 @@ Thanks again!", 'mp')
       $coupons = get_option('mp_coupons');
       $coupon_code = preg_replace('/[^A-Z0-9_-]/', '', strtoupper($code));
       if ($coupons[$coupon_code]['discount_type'] == 'amt') {
-        $settings = get_option('mp_settings');
         $new_total = round($total - $coupons[$coupon_code]['discount'], 2);
         $new_total = ($new_total < 0) ? 0.00 : $new_total;
         $discount = '-' . $this->format_currency('', $coupons[$coupon_code]['discount']);
@@ -3055,7 +3054,6 @@ Thanks again!", 'mp')
 
   //called on checkout to create a new order
   function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false, $shipping_total = false, $tax_total = false, $coupon_code = false) {
-    $settings = get_option('mp_settings');
 
     //order id can be null
     if (empty($order_id))
@@ -3102,7 +3100,7 @@ Thanks again!", 'mp')
 					$stock[$variation] = $stock[$variation] - $data['quantity'];
 	        update_post_meta($product_id, 'mp_inventory', $stock);
 
-	        if ($stock[$variation] <= $settings['inventory_threshold']) {
+	        if ($stock[$variation] <= $this->get_setting('inventory_threshold')) {
 	          $this->low_stock_notification($product_id, $variation, $stock[$variation]);
 	        }
 	      }//check stock
@@ -3413,7 +3411,6 @@ Thanks again!", 'mp')
 
   //serves a downloadble product file
   function serve_download($product_id) {
-    $settings = get_option('mp_settings');
 
 		if (!isset($_GET['orderid']))
       return false;
@@ -3440,7 +3437,7 @@ Thanks again!", 'mp')
 			wp_die( __('Whoops, we were unable to find the file for this download. Please contact us for help.', 'mp') );
 
 		//check for too many downloads
-		$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+		$max_downloads = $this->get_setting('max_downloads', 5);
 		if (intval($download['downloaded']) >= $max_downloads)
 		  wp_die( sprintf( __("Sorry, our records show you've downloaded this file %d out of %d times allowed. Please contact us if you still need help.", 'mp'), intval($download['downloaded']), $max_downloads ) );
 
@@ -3645,8 +3642,6 @@ Thanks again!", 'mp')
       $user_id = $current_user->ID;
     }
 
-    $settings = get_option('mp_settings');
-
     $meta = get_user_meta($user_id, 'mp_billing_info', true);
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : $meta['email'];
     $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : $meta['name'];
@@ -3657,7 +3652,7 @@ Thanks again!", 'mp')
     $zip = (!empty($_SESSION['mp_billing_info']['zip'])) ? $_SESSION['mp_billing_info']['zip'] : $meta['zip'];
     $country = (!empty($_SESSION['mp_billing_info']['country'])) ? $_SESSION['mp_billing_info']['country'] : $meta['country'];
     if (!$country)
-      $country = $settings['base_country'];
+      $country = $this->get_setting('base_country');
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : $meta['phone'];
 
     ?>
@@ -3708,7 +3703,7 @@ Thanks again!", 'mp')
         <?php echo apply_filters( 'mp_billing_info_error_country', ''); ?>
         <select id="mp_billing_info_country" name="mp_billing_info[country]">
           <?php
-          foreach ($settings['shipping']['allowed_countries'] as $code) {
+          foreach ($this->get_setting('shipping->allowed_countries') as $code) {
             ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($this->countries[$code]); ?></option><?php
           }
           ?>
@@ -3733,7 +3728,7 @@ Thanks again!", 'mp')
     $zip = (!empty($_SESSION['mp_shipping_info']['zip'])) ? $_SESSION['mp_shipping_info']['zip'] : (!empty($meta['zip'])?$meta['zip']:$_SESSION['mp_shipping_info']['zip']);
     $country = (!empty($_SESSION['mp_shipping_info']['country'])) ? $_SESSION['mp_shipping_info']['country'] : (!empty($meta['country'])?$meta['country']:$_SESSION['mp_shipping_info']['country']);
     if (!$country)
-      $country = $settings['base_country'];
+      $country = $this->get_setting('base_country');
     $phone = (!empty($_SESSION['mp_shipping_info']['phone'])) ? $_SESSION['mp_shipping_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
 
     ?>
@@ -3785,7 +3780,7 @@ Thanks again!", 'mp')
         <?php echo apply_filters( 'mp_shipping_info_error_country', ''); ?>
         <select id="mp_shipping_info_country" name="mp_shipping_info[country]">
           <?php
-          foreach ($settings['shipping']['allowed_countries'] as $code) {
+          foreach ($this->get_setting('shipping->allowed_countries') as $code) {
             ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($this->countries[$code]); ?></option><?php
           }
           ?>
@@ -3847,7 +3842,6 @@ Thanks again!", 'mp')
 
 	//filters wp_mail headers
 	function mail($to, $subject, $msg) {
-    $settings = get_option('mp_settings');
 
     //remove any other filters
     remove_all_filters( 'wp_mail_from' );
@@ -3863,10 +3857,8 @@ Thanks again!", 'mp')
   //replaces shortcodes in email msgs with dynamic content
   function filter_email($order, $text) {
 
-	global $blog_id; // FPM: Needed for Custom Field Processing
-	$bid = (is_multisite()) ? $blog_id : 1;  // FPM Needed for Custom Field Processing
-
-    $settings = get_option('mp_settings');
+		global $blog_id; // FPM: Needed for Custom Field Processing
+		$bid = (is_multisite()) ? $blog_id : 1;  // FPM Needed for Custom Field Processing
 
     //// order info
     if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
@@ -3988,15 +3980,14 @@ Thanks again!", 'mp')
 
   //sends email for new orders
   function order_notification($order_id) {
-    $settings = get_option('mp_settings');
 
     //get the order
     $order = $this->get_order($order_id);
     if (!$order)
       return false;
 
-		$subject = apply_filters('mp_order_notification_subject', $this->filter_email($order, stripslashes($settings['email']['new_order_subject'])), $order);
-		$msg = apply_filters('mp_order_notification_body', $this->filter_email($order, stripslashes($settings['email']['new_order_txt'])), $order);
+		$subject = apply_filters('mp_order_notification_subject', $this->filter_email($order, stripslashes($this->get_setting('email->new_order_subject'))), $order);
+		$msg = apply_filters('mp_order_notification_body', $this->filter_email($order, stripslashes($this->get_setting('email->new_order_txt'))), $order);
 		$msg = apply_filters('mp_order_notification_' . $_SESSION['mp_payment_method'], $msg, $order );
 
     $this->mail($order->mp_shipping_info['email'], $subject, $msg);
@@ -4023,13 +4014,12 @@ You can manage this order here: %s", 'mp');
     $msg = $this->filter_email($order, $msg);
 		$msg = sprintf($msg, $order->mp_shipping_info['email'], admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
 		$msg = apply_filters( 'mp_order_notification_admin_msg', $msg, $order );
-    $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email");
+    $store_email = $this->get_setting('store_email') ? $this->get_setting('store_email') : get_option("admin_email");
     $this->mail($store_email, $subject, $msg);
   }
 
   //sends email for orders marked as shipped
   function order_shipped_notification($order_id) {
-    $settings = get_option('mp_settings');
 
     //get the order
     $order = $this->get_order($order_id);
@@ -4040,9 +4030,9 @@ You can manage this order here: %s", 'mp');
 		if ($this->skip_shipping_notice)
 			return false;
 
-    $subject = apply_filters('mp_shipped_order_notification_subject', stripslashes($settings['email']['shipped_order_subject']), $order);
+    $subject = apply_filters('mp_shipped_order_notification_subject', stripslashes($this->get_setting('email->shipped_order_subject')), $order);
     $subject = $this->filter_email($order, $subject);
-    $msg = apply_filters( 'mp_shipped_order_notification_body', stripslashes($settings['email']['shipped_order_txt']), $order );
+    $msg = apply_filters( 'mp_shipped_order_notification_body', stripslashes($this->get_setting('email->shipped_order_txt')), $order );
     $msg = $this->filter_email($order, $msg);
     $msg = apply_filters( 'mp_shipped_order_notification', $msg, $order );
 
@@ -4052,7 +4042,6 @@ You can manage this order here: %s", 'mp');
 
   //sends email to admin for low stock notification
   function low_stock_notification($product_id, $variation, $stock) {
-    $settings = get_option('mp_settings');
 
     //skip if sent already and not 0
     if ( get_post_meta($product_id, 'mp_stock_email_sent', true) && $stock > 0 )
@@ -4075,7 +4064,7 @@ Edit Product: %s
 Notification Preferences: %s', 'mp');
     $msg = sprintf($msg, $name, number_format_i18n($stock), get_permalink($product_id), get_edit_post_link($product_id), admin_url('edit.php?post_type=product&page=marketpress#mp-inventory-setting'));
     $msg = apply_filters( 'mp_low_stock_notification', $msg, $product_id );
-    $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email");
+    $store_email = $this->get_setting('store_email') ? $this->get_setting('store_email') : get_option("admin_email");
     $this->mail($store_email, $subject, $msg);
 
     //save so we don't send an email every time
@@ -4084,9 +4073,8 @@ Notification Preferences: %s', 'mp');
 
   //round and display currency with padded zeros
   function display_currency( $amount ) {
-    $settings = get_option('mp_settings');
 
-    if ( $settings['curr_decimal'] === '0' )
+    if ( $this->get_setting('curr_decimal') === '0' )
       return number_format( round( $amount ), 0, '.', '');
     else
       return number_format( round( $amount, 2 ), 2, '.', '');
@@ -4094,10 +4082,9 @@ Notification Preferences: %s', 'mp');
 
   //display currency symbol
   function format_currency($currency = '', $amount = false) {
-    $settings = get_option('mp_settings');
 
     if (!$currency)
-      $currency = $settings['currency'];
+      $currency = $this->get_setting('currency', 'USD');
 
     // get the currency symbol
     $symbol = $this->currencies[$currency][1];
@@ -4113,7 +4100,7 @@ Notification Preferences: %s', 'mp');
     }
 
 		//check decimal option
-    if ( $settings['curr_decimal'] === '0' ) {
+    if ( $this->get_setting('curr_decimal') === '0' ) {
       $decimal_place = 0;
       $zero = '0';
 		} else {
@@ -4124,25 +4111,25 @@ Notification Preferences: %s', 'mp');
     //format currency amount according to preference
     if ($amount) {
 
-      if ($settings['curr_symbol_position'] == 1 || !$settings['curr_symbol_position'])
+      if ($this->get_setting('curr_symbol_position') == 1 || !$this->get_setting('curr_symbol_position'))
         return $symbol . number_format_i18n($amount, $decimal_place);
-      else if ($settings['curr_symbol_position'] == 2)
+      else if ($this->get_setting('curr_symbol_position') == 2)
         return $symbol . ' ' . number_format_i18n($amount, $decimal_place);
-      else if ($settings['curr_symbol_position'] == 3)
+      else if ($this->get_setting('curr_symbol_position') == 3)
         return number_format_i18n($amount, $decimal_place) . $symbol;
-      else if ($settings['curr_symbol_position'] == 4)
+      else if ($this->get_setting('curr_symbol_position') == 4)
         return number_format_i18n($amount, $decimal_place) . ' ' . $symbol;
 
     } else if ($amount === false) {
       return $symbol;
     } else {
-      if ($settings['curr_symbol_position'] == 1 || !$settings['curr_symbol_position'])
+      if ($this->get_setting('curr_symbol_position') == 1 || !$this->get_setting('curr_symbol_position'))
         return $symbol . $zero;
-      else if ($settings['curr_symbol_position'] == 2)
+      else if ($this->get_setting('curr_symbol_position') == 2)
         return $symbol . ' ' . $zero;
-      else if ($settings['curr_symbol_position'] == 3)
+      else if ($this->get_setting('curr_symbol_position') == 3)
         return $zero . $symbol;
-      else if ($settings['curr_symbol_position'] == 4)
+      else if ($this->get_setting('curr_symbol_position') == 4)
         return $zero . ' ' . $symbol;
     }
   }
@@ -4172,12 +4159,11 @@ Notification Preferences: %s', 'mp');
 
   //returns the js needed to record ecommerce transactions. $project should be an array of id, title
 	function create_ga_ecommerce($order) {
-  	$settings = get_option('mp_settings');
 
 		if (!is_object($order))
 		  return false;
 
-    if ($settings['ga_ecommerce'] == 'old') {
+    if ($this->get_setting('ga_ecommerce') == 'old') {
 
 			$js = '<script type="text/javascript">
 			try{
@@ -4211,7 +4197,7 @@ Notification Preferences: %s', 'mp');
 			</script>
 			';
 
-	  } else if ($settings['ga_ecommerce'] == 'new') {
+	  } else if ($this->get_setting('ga_ecommerce') == 'new') {
 
       $js = '<script type="text/javascript">
    			_gaq.push(["_addTrans",
@@ -4260,8 +4246,7 @@ Notification Preferences: %s', 'mp');
     if ( !$order )
       wp_die(__('Invalid Order ID', 'mp'));
 
-    $settings = get_option('mp_settings');
-		$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+		$max_downloads = $this->get_setting('max_downloads', 5);
 
 		//save tracking number
 		if (isset($_POST['mp_tracking_number'])) {
@@ -5008,7 +4993,7 @@ Notification Preferences: %s', 'mp');
     <?php
     $tab = ( !empty($_GET['tab']) ) ? $_GET['tab'] : 'main';
 
-    if (!$settings['disable_cart']) {
+    if (!$this->get_setting('disable_cart')) {
     	$tabs = array(
         'coupons'       => __('Coupons', 'mp'),
     		'presentation'  => __('Presentation', 'mp'),
@@ -5092,7 +5077,7 @@ Notification Preferences: %s', 'mp');
                   <select id="mp-country-select" name="mp[base_country]">
                     <?php
                     foreach ($this->countries as $key => $value) {
-                      ?><option value="<?php echo $key; ?>"<?php selected($settings['base_country'], $key); ?>><?php echo esc_attr($value); ?></option><?php
+                      ?><option value="<?php echo $key; ?>"<?php selected($this->get_setting('base_country'), $key); ?>><?php echo esc_attr($value); ?></option><?php
                     }
                     ?>
                   </select>
@@ -5100,7 +5085,7 @@ Notification Preferences: %s', 'mp');
                 </tr>
 
               <?php
-              switch ($settings['base_country']) {
+              switch ($this->get_setting('base_country')) {
                 case 'US':
                   $list = $this->usa_states;
                   break;
@@ -5130,7 +5115,7 @@ Notification Preferences: %s', 'mp');
                   <select name="mp[base_province]">
                     <?php
                     foreach ($list as $key => $value) {
-                      ?><option value="<?php echo esc_attr($key); ?>"<?php selected($settings['base_province'], $key); ?>><?php echo esc_attr($value); ?></option><?php
+                      ?><option value="<?php echo esc_attr($key); ?>"<?php selected($this->get_setting('base_province'), $key); ?>><?php echo esc_attr($value); ?></option><?php
                     }
                     ?>
                   </select>
@@ -5138,12 +5123,12 @@ Notification Preferences: %s', 'mp');
                 </tr>
               <?php }
 							//only show if correct country or US province
-              if ( is_array($list) || in_array( $settings['base_country'], array('UM','AS','FM','GU','MH','MP','PW','PR','PI') )	) {
+              if ( is_array($list) || in_array( $this->get_setting('base_country'), array('UM','AS','FM','GU','MH','MP','PW','PR','PI') )	) {
               ?>
                 <tr>
         				<th scope="row"><?php _e('Base Zip/Postal Code', 'mp') ?></th>
         				<td>
-                  <input value="<?php echo esc_attr($settings['base_zip']); ?>" size="10" name="mp[base_zip]" type="text" />
+                  <input value="<?php echo esc_attr($this->get_setting('base_zip')); ?>" size="10" name="mp[base_zip]" type="text" />
           			</td>
                 </tr>
               <?php } ?>
@@ -5156,13 +5141,13 @@ Notification Preferences: %s', 'mp');
             <div class="inside">
               <table class="form-table">
               <?php
-              switch ($settings['base_country']) {
+              switch ($this->get_setting('base_country')) {
                 case 'US':
                   ?>
                   <tr>
-          				<th scope="row"><?php echo sprintf(__('%s Tax Rate', 'mp'), esc_attr($this->usa_states[$settings['base_province']])); ?></th>
+          				<th scope="row"><?php echo sprintf(__('%s Tax Rate', 'mp'), esc_attr($this->usa_states[$this->get_setting('base_province')])); ?></th>
           				<td>
-                  <input value="<?php echo $settings['tax']['rate'] * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
+                  <input value="<?php echo $this->get_setting('tax->rate') * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
             			</td>
                   </tr>
                   <?php
@@ -5178,7 +5163,7 @@ Notification Preferences: %s', 'mp');
 										<?php foreach ($this->canadian_provinces as $key => $label) { ?>
 										<tr>
 											<td style="padding: 0 5px;"><label for="mp_tax_<?php echo $key; ?>"><?php echo esc_attr($label); ?></label></td>
-											<td style="padding: 0 5px;"><input value="<?php echo $settings['tax']['canada_rate'][$key] * 100; ?>" size="3" id="mp_tax_<?php echo $key; ?>" name="mp[tax][canada_rate][<?php echo $key; ?>]" type="text" style="text-align:right;" />%</td>
+											<td style="padding: 0 5px;"><input value="<?php echo $this->get_setting("tax->canada_rate->$key") * 100; ?>" size="3" id="mp_tax_<?php echo $key; ?>" name="mp[tax][canada_rate][<?php echo $key; ?>]" type="text" style="text-align:right;" />%</td>
 										</tr>
 										<?php	} ?>
 										</table>
@@ -5192,7 +5177,7 @@ Notification Preferences: %s', 'mp');
                   <tr>
           				<th scope="row"><?php _e('VAT Tax Rate', 'mp') ?></th>
           				<td>
-                  <input value="<?php echo $settings['tax']['rate'] * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
+                  <input value="<?php echo $this->get_setting('tax->rate') * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
             			</td>
                   </tr>
                   <?php
@@ -5203,7 +5188,7 @@ Notification Preferences: %s', 'mp');
                   <tr>
           				<th scope="row"><?php _e('GST Tax Rate', 'mp') ?></th>
           				<td>
-                  <input value="<?php echo $settings['tax']['rate'] * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
+                  <input value="<?php echo $this->get_setting('tax->rate') * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
             			</td>
                   </tr>
                   <?php
@@ -5211,12 +5196,12 @@ Notification Preferences: %s', 'mp');
 
                 default:
                   //in european union
-                  if ( in_array($settings['base_country'], $this->eu_countries) ) {
+                  if ( in_array($this->get_setting('base_country'), $this->eu_countries) ) {
                     ?>
                     <tr>
             				<th scope="row"><?php _e('VAT Tax Rate', 'mp') ?></th>
             				<td>
-                    <input value="<?php echo $settings['tax']['rate'] * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
+                    <input value="<?php echo $this->get_setting('tax->rate') * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
                     </td>
                     </tr>
                     <?php
@@ -5225,14 +5210,14 @@ Notification Preferences: %s', 'mp');
                     <tr>
             				<th scope="row"><?php _e('Country Total Tax Rate (VAT, GST, Etc.)', 'mp') ?></th>
             				<td>
-                    <input value="<?php echo $settings['tax']['rate'] * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
+                    <input value="<?php echo $this->get_setting('tax->rate') * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
                     </td>
                     </tr>
                     <tr>
             				<th scope="row"><?php _e('Tax Orders Outside Your Base Country?', 'mp'); ?></th>
             				<td>
-            				<label><input value="1" name="mp[tax][tax_outside]" type="radio"<?php checked($settings['tax']['tax_outside'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                    <label><input value="0" name="mp[tax][tax_outside]" type="radio"<?php checked($settings['tax']['tax_outside'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+            				<label><input value="1" name="mp[tax][tax_outside]" type="radio"<?php checked($this->get_setting('tax->tax_outside'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                    <label><input value="0" name="mp[tax][tax_outside]" type="radio"<?php checked($this->get_setting('tax->tax_outside'), 0) ?> /> <?php _e('No', 'mp') ?></label>
               			</td>
                     </tr>
                     <?php
@@ -5243,16 +5228,16 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('Apply Tax To Shipping Fees?', 'mp') ?></th>
                 <td>
-        				<label><input value="1" name="mp[tax][tax_shipping]" type="radio"<?php checked($settings['tax']['tax_shipping'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                <label><input value="0" name="mp[tax][tax_shipping]" type="radio"<?php checked($settings['tax']['tax_shipping'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        				<label><input value="1" name="mp[tax][tax_shipping]" type="radio"<?php checked($this->get_setting('tax->tax_shipping'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[tax][tax_shipping]" type="radio"<?php checked($this->get_setting('tax->tax_shipping'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp') ?></span>
           			</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Enter Prices Inclusive of Tax?', 'mp') ?></th>
                 <td>
-        				<label><input value="1" name="mp[tax][tax_inclusive]" type="radio"<?php checked($settings['tax']['tax_inclusive'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                <label><input value="0" name="mp[tax][tax_inclusive]" type="radio"<?php checked($settings['tax']['tax_inclusive'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        				<label><input value="1" name="mp[tax][tax_inclusive]" type="radio"<?php checked($this->get_setting('tax->tax_inclusive'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[tax][tax_inclusive]" type="radio"<?php checked($this->get_setting('tax->tax_inclusive'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('Enabling this option allows you to enter and show all prices inclusive of tax, while still listing the tax total as a line item in shopping carts. Please see your local tax laws.', 'mp') ?></span>
           			</td>
                 </tr>
@@ -5271,7 +5256,7 @@ Notification Preferences: %s', 'mp');
                   <select id="mp-currency-select" name="mp[currency]">
                     <?php
                     foreach ($this->currencies as $key => $value) {
-                      ?><option value="<?php echo $key; ?>"<?php selected($settings['currency'], $key); ?>><?php echo esc_attr($value[0]) . ' - ' . $this->format_currency($key); ?></option><?php
+                      ?><option value="<?php echo $key; ?>"<?php selected($this->get_setting('currency'), $key); ?>><?php echo esc_attr($value[0]) . ' - ' . $this->format_currency($key); ?></option><?php
                     }
                     ?>
                   </select>
@@ -5280,22 +5265,22 @@ Notification Preferences: %s', 'mp');
                 <tr valign="top">
                 <th scope="row"><?php _e('Currency Symbol Position', 'mp') ?></th>
                 <td>
-                <label><input value="1" name="mp[curr_symbol_position]" type="radio"<?php checked($settings['curr_symbol_position'], 1); ?>>
-        				<?php echo $this->format_currency($settings['currency']); ?>100</label><br />
-        				<label><input value="2" name="mp[curr_symbol_position]" type="radio"<?php checked($settings['curr_symbol_position'], 2); ?>>
-        				<?php echo $this->format_currency($settings['currency']); ?> 100</label><br />
-        				<label><input value="3" name="mp[curr_symbol_position]" type="radio"<?php checked($settings['curr_symbol_position'], 3); ?>>
-        				100<?php echo $this->format_currency($settings['currency']); ?></label><br />
-        				<label><input value="4" name="mp[curr_symbol_position]" type="radio"<?php checked($settings['curr_symbol_position'], 4); ?>>
-        				100 <?php echo $this->format_currency($settings['currency']); ?></label>
+                <label><input value="1" name="mp[curr_symbol_position]" type="radio"<?php checked($this->get_setting('curr_symbol_position'), 1); ?>>
+        				<?php echo $this->format_currency($this->get_setting('currency')); ?>100</label><br />
+        				<label><input value="2" name="mp[curr_symbol_position]" type="radio"<?php checked($this->get_setting('curr_symbol_position'), 2); ?>>
+        				<?php echo $this->format_currency($this->get_setting('currency')); ?> 100</label><br />
+        				<label><input value="3" name="mp[curr_symbol_position]" type="radio"<?php checked($this->get_setting('curr_symbol_position'), 3); ?>>
+        				100<?php echo $this->format_currency($this->get_setting('currency')); ?></label><br />
+        				<label><input value="4" name="mp[curr_symbol_position]" type="radio"<?php checked($this->get_setting('curr_symbol_position'), 4); ?>>
+        				100 <?php echo $this->format_currency($this->get_setting('currency')); ?></label>
                 </td>
                 </tr>
                 <tr valign="top">
                 <th scope="row"><?php _e('Show Decimal in Prices', 'mp') ?></th>
                 <td>
-                <label><input value="1" name="mp[curr_decimal]" type="radio"<?php checked( ( ($settings['curr_decimal'] !== 0) ? 1 : 0 ), 1); ?>>
+                <label><input value="1" name="mp[curr_decimal]" type="radio"<?php checked( ( ($this->get_setting('curr_decimal') !== 0) ? 1 : 0 ), 1); ?>>
         				<?php _e('Yes', 'mp') ?></label>
-        				<label><input value="0" name="mp[curr_decimal]" type="radio"<?php checked($settings['curr_decimal'], 0); ?>>
+        				<label><input value="0" name="mp[curr_decimal]" type="radio"<?php checked($this->get_setting('curr_decimal'), 0); ?>>
         				<?php _e('No', 'mp') ?></label>
                 </td>
                 </tr>
@@ -5313,7 +5298,7 @@ Notification Preferences: %s', 'mp');
         				<span class="description"><?php _e('At what low stock count do you want to be warned for products you have enabled inventory tracking for?', 'mp') ?></span><br />
 								<select name="mp[inventory_threshhold]">
 								<?php
-								$inventory_threshhold = isset($settings['inventory_threshhold']) ? intval($settings['inventory_threshhold']) : 3;
+								$inventory_threshhold = $this->get_setting('inventory_threshhold', 3);
 								for ($i=0; $i<=100; $i++) {
                   $selected = ($inventory_threshhold == $i) ? ' selected="selected"' : '';
 			            echo '<option value="' . $i . '"' . $selected . '">' . $i . '</option>';
@@ -5328,7 +5313,7 @@ Notification Preferences: %s', 'mp');
         				<span class="description"><?php _e('How many times may a customer download a file they have purchased? (It\'s best to set this higher than one in case they have any problems downloading)', 'mp') ?></span><br />
                 <select name="mp[max_downloads]">
 								<?php
-								$max_downloads = intval($settings['max_downloads']) ? intval($settings['max_downloads']) : 5;
+								$max_downloads = $this->get_setting('max_downloads', 5);
 								for ($i=1; $i<=100; $i++) {
                   $selected = ($max_downloads == $i) ? ' selected="selected"' : '';
 			            echo '<option value="' . $i . '"' . $selected . '">' . $i . '</option>';
@@ -5340,7 +5325,7 @@ Notification Preferences: %s', 'mp');
                 <tr>
                 <th scope="row"><?php _e('Force Login', 'mp') ?></th>
         				<td>
-        				<?php $force_login = ($settings['force_login']) ? 1 : 0; ?>
+        				<?php $force_login = ($this->get_setting('force_login')) ? 1 : 0; ?>
         				<label><input value="1" name="mp[force_login]" type="radio"<?php checked($force_login, 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                 <label><input value="0" name="mp[force_login]" type="radio"<?php checked($force_login, 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('Whether or not customers must be registered and logged in to checkout. (Not recommended: Enabling this can lower conversions)', 'mp') ?></span>
@@ -5349,8 +5334,8 @@ Notification Preferences: %s', 'mp');
                 <tr>
                 <th scope="row"><?php _e('Product Listings Only', 'mp') ?></th>
         				<td>
-        				<label><input value="1" name="mp[disable_cart]" type="radio"<?php checked($settings['disable_cart'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                <label><input value="0" name="mp[disable_cart]" type="radio"<?php checked($settings['disable_cart'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        				<label><input value="1" name="mp[disable_cart]" type="radio"<?php checked($this->get_setting('disable_cart'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[disable_cart]" type="radio"<?php checked($this->get_setting('disable_cart'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the "Buy Now" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links.', 'mp') ?></span>
           			</td>
                 </tr>
@@ -5358,9 +5343,9 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Google Analytics Ecommerce Tracking', 'mp') ?></th>
                 <td>
                 <select name="mp[ga_ecommerce]">
-									<option value="none"<?php selected($settings['ga_ecommerce'], 'none') ?>><?php _e('None', 'mp') ?></option>
-									<option value="new"<?php selected($settings['ga_ecommerce'], 'new') ?>><?php _e('Asynchronous Tracking Code', 'mp') ?></option>
-									<option value="old"<?php selected($settings['ga_ecommerce'], 'old') ?>><?php _e('Old Tracking Code', 'mp') ?></option>
+									<option value="none"<?php selected($this->get_setting('ga_ecommerce'), 'none') ?>><?php _e('None', 'mp') ?></option>
+									<option value="new"<?php selected($this->get_setting('ga_ecommerce'), 'new') ?>><?php _e('Asynchronous Tracking Code', 'mp') ?></option>
+									<option value="old"<?php selected($this->get_setting('ga_ecommerce'), 'old') ?>><?php _e('Old Tracking Code', 'mp') ?></option>
 								</select>
         				<br /><span class="description"><?php _e('If you already use Google Analytics for your website, you can track detailed ecommerce information by enabling this setting. Choose whether you are using the new asynchronous or old tracking code. Before Google Analytics can report ecommerce activity for your website, you must enable ecommerce tracking on the profile settings page for your website. Also keep in mind that some gateways do not reliably show the receipt page, so tracking may not be accurate in those cases. It is recommended to use the PayPal gateway for the most accurate data. <a href="http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-in-google.html" target="_blank">More information &raquo;</a>', 'mp') ?></span>
           			</td>
@@ -5368,8 +5353,8 @@ Notification Preferences: %s', 'mp');
                 <tr>
                 <th scope="row"><?php _e('Special Instructions Field', 'mp') ?></th>
         				<td>
-        				<label><input value="1" name="mp[special_instructions]" type="radio"<?php checked($settings['special_instructions'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                <label><input value="0" name="mp[special_instructions]" type="radio"<?php checked($settings['special_instructions'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+        				<label><input value="1" name="mp[special_instructions]" type="radio"<?php checked($this->get_setting('special_instructions'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[special_instructions]" type="radio"<?php checked($this->get_setting('special_instructions'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php printf(__('Enabling this field will display a textbox on the shipping checkout page for users to enter special instructions for their order. Useful for product personalization, etc. Note you may want to <a href="%s">adjust the message on the shipping page.', 'mp'), admin_url('edit.php?post_type=product&page=marketpress&tab=messages#mp_msgs_shipping')); ?></span>
           			</td>
                 </tr>
@@ -5718,7 +5703,7 @@ Notification Preferences: %s', 'mp');
         //save settings
         if (isset($_POST['marketplace_settings'])) {
 	        //get old store slug
-		  		$old_slug = $settings['slugs']['store'];
+		  		$old_slug = $this->get_setting('slugs->store');
 
 	        //filter slugs
 	        $_POST['mp']['slugs'] = array_map('sanitize_title', (array)$_POST['mp']['slugs']);
@@ -5780,40 +5765,40 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('Checkout Button Type', 'mp') ?></th>
         				<td>
-                  <label><input value="addcart" name="mp[product_button_type]" type="radio"<?php checked($settings['product_button_type'], 'addcart') ?> /> <?php _e('Add To Cart', 'mp') ?></label><br />
-                  <label><input value="buynow" name="mp[product_button_type]" type="radio"<?php checked($settings['product_button_type'], 'buynow') ?> /> <?php _e('Buy Now', 'mp') ?></label>
+                  <label><input value="addcart" name="mp[product_button_type]" type="radio"<?php checked($this->get_setting('product_button_type'), 'addcart') ?> /> <?php _e('Add To Cart', 'mp') ?></label><br />
+                  <label><input value="buynow" name="mp[product_button_type]" type="radio"<?php checked($this->get_setting('product_button_type'), 'buynow') ?> /> <?php _e('Buy Now', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Show Quantity Option', 'mp') ?></th>
         				<td>
-                  <label><input value="1" name="mp[show_quantity]" type="radio"<?php checked($settings['show_quantity'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                  <label><input value="0" name="mp[show_quantity]" type="radio"<?php checked($settings['show_quantity'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+                  <label><input value="1" name="mp[show_quantity]" type="radio"<?php checked($this->get_setting('show_quantity'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[show_quantity]" type="radio"<?php checked($this->get_setting('show_quantity'), 0) ?> /> <?php _e('No', 'mp') ?></label>
         				</td>
                 </tr>
 								<tr>
         				<th scope="row"><?php _e('Show Product Image', 'mp') ?></th>
         				<td>
-                  <label><input value="1" name="mp[show_img]" type="radio"<?php checked($settings['show_img'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                  <label><input value="0" name="mp[show_img]" type="radio"<?php checked($settings['show_img'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+                  <label><input value="1" name="mp[show_img]" type="radio"<?php checked($this->get_setting('show_img'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[show_img]" type="radio"<?php checked($this->get_setting('show_img'), 0) ?> /> <?php _e('No', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Product Image Size', 'mp') ?></th>
         				<td>
-                  <label><input value="thumbnail" name="mp[product_img_size]" type="radio"<?php checked($settings['product_img_size'], 'thumbnail') ?> /> <a href="options-media.php"><?php _e('WP Thumbnail size', 'mp') ?></a></label><br />
-                  <label><input value="medium" name="mp[product_img_size]" type="radio"<?php checked($settings['product_img_size'], 'medium') ?> /> <a href="options-media.php"><?php _e('WP Medium size', 'mp') ?></a></label><br />
-                  <label><input value="large" name="mp[product_img_size]" type="radio"<?php checked($settings['product_img_size'], 'large') ?> /> <a href="options-media.php"><?php _e('WP Large size', 'mp') ?></a></label><br />
-                  <label><input value="custom" name="mp[product_img_size]" type="radio"<?php checked($settings['product_img_size'], 'custom') ?> /> <?php _e('Custom', 'mp') ?></label>:&nbsp;&nbsp;
-                  <label><?php _e('Height', 'mp') ?><input size="3" name="mp[product_img_height]" value="<?php echo esc_attr($settings['product_img_height']) ?>" type="text" /></label>&nbsp;
-                  <label><?php _e('Width', 'mp') ?><input size="3" name="mp[product_img_width]" value="<?php echo esc_attr($settings['product_img_width']) ?>" type="text" /></label>
+                  <label><input value="thumbnail" name="mp[product_img_size]" type="radio"<?php checked($this->get_setting('product_img_size'), 'thumbnail') ?> /> <a href="options-media.php"><?php _e('WP Thumbnail size', 'mp') ?></a></label><br />
+                  <label><input value="medium" name="mp[product_img_size]" type="radio"<?php checked($this->get_setting('product_img_size'), 'medium') ?> /> <a href="options-media.php"><?php _e('WP Medium size', 'mp') ?></a></label><br />
+                  <label><input value="large" name="mp[product_img_size]" type="radio"<?php checked($this->get_setting('product_img_size'), 'large') ?> /> <a href="options-media.php"><?php _e('WP Large size', 'mp') ?></a></label><br />
+                  <label><input value="custom" name="mp[product_img_size]" type="radio"<?php checked($this->get_setting('product_img_size'), 'custom') ?> /> <?php _e('Custom', 'mp') ?></label>:&nbsp;&nbsp;
+                  <label><?php _e('Height', 'mp') ?><input size="3" name="mp[product_img_height]" value="<?php echo esc_attr($this->get_setting('product_img_height')) ?>" type="text" /></label>&nbsp;
+                  <label><?php _e('Width', 'mp') ?><input size="3" name="mp[product_img_width]" value="<?php echo esc_attr($this->get_setting('product_img_width')) ?>" type="text" /></label>
                 </td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Show Image Lightbox', 'mp') ?></th>
         				<td>
-                  <label><input value="1" name="mp[show_lightbox]" type="radio"<?php checked($settings['show_lightbox'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                  <label><input value="0" name="mp[show_lightbox]" type="radio"<?php checked($settings['show_lightbox'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+                  <label><input value="1" name="mp[show_lightbox]" type="radio"<?php checked($this->get_setting('show_lightbox'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[show_lightbox]" type="radio"<?php checked($this->get_setting('show_lightbox'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                   <br /><span class="description"><?php _e('Makes clicking the single product image open an instant zoomed preview.', 'mp') ?></span>
                 </td>
                 </tr>
@@ -5829,65 +5814,65 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('Product List View', 'mp') ?></th>
         				<td>
-                  <label><input value="list" name="mp[list_view]" type="radio"<?php checked($settings['list_view'], 'list') ?> /> <?php _e('List View', 'mp') ?></label><br />
-                  <label><input value="grid" name="mp[list_view]" type="radio"<?php checked($settings['list_view'], 'grid') ?> /> <?php _e('Grid View', 'mp') ?></label>
+                  <label><input value="list" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view'), 'list') ?> /> <?php _e('List View', 'mp') ?></label><br />
+                  <label><input value="grid" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view'), 'grid') ?> /> <?php _e('Grid View', 'mp') ?></label>
         				</td>
                 </tr>
                 <?php */ ?>
                 <tr>
         				<th scope="row"><?php _e('Checkout Button Type', 'mp') ?></th>
         				<td>
-                  <label><input value="addcart" name="mp[list_button_type]" type="radio"<?php checked($settings['list_button_type'], 'addcart') ?> /> <?php _e('Add To Cart', 'mp') ?></label><br />
-                  <label><input value="buynow" name="mp[list_button_type]" type="radio"<?php checked($settings['list_button_type'], 'buynow') ?> /> <?php _e('Buy Now', 'mp') ?></label>
+                  <label><input value="addcart" name="mp[list_button_type]" type="radio"<?php checked($this->get_setting('list_button_type'), 'addcart') ?> /> <?php _e('Add To Cart', 'mp') ?></label><br />
+                  <label><input value="buynow" name="mp[list_button_type]" type="radio"<?php checked($this->get_setting('list_button_type'), 'buynow') ?> /> <?php _e('Buy Now', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Show Product Thumbnail', 'mp') ?></th>
         				<td>
-                  <label><input value="1" name="mp[show_thumbnail]" type="radio"<?php checked($settings['show_thumbnail'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                  <label><input value="0" name="mp[show_thumbnail]" type="radio"<?php checked($settings['show_thumbnail'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+                  <label><input value="1" name="mp[show_thumbnail]" type="radio"<?php checked($this->get_setting('show_thumbnail'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[show_thumbnail]" type="radio"<?php checked($this->get_setting('show_thumbnail'), 0) ?> /> <?php _e('No', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Product Thumbnail Size', 'mp') ?></th>
         				<td>
-                  <label><input value="thumbnail" name="mp[list_img_size]" type="radio"<?php checked($settings['list_img_size'], 'thumbnail') ?> /> <a href="options-media.php"><?php _e('WP Thumbnail size', 'mp') ?></a></label><br />
-                  <label><input value="medium" name="mp[list_img_size]" type="radio"<?php checked($settings['list_img_size'], 'medium') ?> /> <a href="options-media.php"><?php _e('WP Medium size', 'mp') ?></a></label><br />
-                  <label><input value="large" name="mp[list_img_size]" type="radio"<?php checked($settings['list_img_size'], 'large') ?> /> <a href="options-media.php"><?php _e('WP Large size', 'mp') ?></a></label><br />
-                  <label><input value="custom" name="mp[list_img_size]" type="radio"<?php checked($settings['list_img_size'], 'custom') ?> /> <?php _e('Custom', 'mp') ?></label>:&nbsp;&nbsp;
-                  <label><?php _e('Height', 'mp') ?><input size="3" name="mp[list_img_height]" value="<?php echo esc_attr($settings['list_img_height']) ?>" type="text" /></label>&nbsp;
-                  <label><?php _e('Width', 'mp') ?><input size="3" name="mp[list_img_width]" value="<?php echo esc_attr($settings['list_img_width']) ?>" type="text" /></label>
+                  <label><input value="thumbnail" name="mp[list_img_size]" type="radio"<?php checked($this->get_setting('list_img_size'), 'thumbnail') ?> /> <a href="options-media.php"><?php _e('WP Thumbnail size', 'mp') ?></a></label><br />
+                  <label><input value="medium" name="mp[list_img_size]" type="radio"<?php checked($this->get_setting('list_img_size'), 'medium') ?> /> <a href="options-media.php"><?php _e('WP Medium size', 'mp') ?></a></label><br />
+                  <label><input value="large" name="mp[list_img_size]" type="radio"<?php checked($this->get_setting('list_img_size'), 'large') ?> /> <a href="options-media.php"><?php _e('WP Large size', 'mp') ?></a></label><br />
+                  <label><input value="custom" name="mp[list_img_size]" type="radio"<?php checked($this->get_setting('list_img_size'), 'custom') ?> /> <?php _e('Custom', 'mp') ?></label>:&nbsp;&nbsp;
+                  <label><?php _e('Height', 'mp') ?><input size="3" name="mp[list_img_height]" value="<?php echo esc_attr($this->get_setting('list_img_height')) ?>" type="text" /></label>&nbsp;
+                  <label><?php _e('Width', 'mp') ?><input size="3" name="mp[list_img_width]" value="<?php echo esc_attr($this->get_setting('list_img_width')) ?>" type="text" /></label>
                 </td>
                 </tr>
 								<tr>
 									<th scope="row"><?php _e('Show Excerpts', 'mp') ?></th>
 									<td>
-									<label><input value="1" name="mp[show_excerpt]" type="radio"<?php checked($settings['show_excerpt'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-									<label><input value="0" name="mp[show_excerpt]" type="radio"<?php checked($settings['show_excerpt'], 0) ?> /> <?php _e('No', 'mp') ?></label>
+									<label><input value="1" name="mp[show_excerpt]" type="radio"<?php checked($this->get_setting('show_excerpt'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+									<label><input value="0" name="mp[show_excerpt]" type="radio"<?php checked($this->get_setting('show_excerpt'), 0) ?> /> <?php _e('No', 'mp') ?></label>
 									</td>
 								</tr>
                 <tr>
         				<th scope="row"><?php _e('Paginate Products', 'mp') ?></th>
         				<td>
-                  <label><input value="1" name="mp[paginate]" type="radio"<?php checked($settings['paginate'], 1) ?> /> <?php _e('Yes', 'mp') ?></label>
-                  <label><input value="0" name="mp[paginate]" type="radio"<?php checked($settings['paginate'], 0) ?> /> <?php _e('No', 'mp') ?></label>&nbsp;&nbsp;
-                  <label><input value="<?php echo esc_attr($settings['per_page']) ?>" name="mp[per_page]" type="text" size="2" /> <?php _e('Products per page', 'mp') ?></label>
+                  <label><input value="1" name="mp[paginate]" type="radio"<?php checked($this->get_setting('paginate'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[paginate]" type="radio"<?php checked($this->get_setting('paginate'), 0) ?> /> <?php _e('No', 'mp') ?></label>&nbsp;&nbsp;
+                  <label><input value="<?php echo esc_attr($this->get_setting('per_page', 20)) ?>" name="mp[per_page]" type="text" size="2" /> <?php _e('Products per page', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Products By', 'mp') ?></th>
         				<td>
                   <select name="mp[order_by]">
-                    <option value="title"<?php selected($settings['order_by'], 'title') ?>><?php _e('Product Name', 'mp') ?></option>
-                    <option value="date"<?php selected($settings['order_by'], 'date') ?>><?php _e('Publish Date', 'mp') ?></option>
-                    <option value="ID"<?php selected($settings['order_by'], 'ID') ?>><?php _e('Product ID', 'mp') ?></option>
-                    <option value="author"<?php selected($settings['order_by'], 'author') ?>><?php _e('Product Author', 'mp') ?></option>
-                    <option value="sales"<?php selected($settings['order_by'], 'sales') ?>><?php _e('Number of Sales', 'mp') ?></option>
-                    <option value="price"<?php selected($settings['order_by'], 'price') ?>><?php _e('Product Price', 'mp') ?></option>
-                    <option value="rand"<?php selected($settings['order_by'], 'rand') ?>><?php _e('Random', 'mp') ?></option>
+                    <option value="title"<?php selected($this->get_setting('order_by'), 'title') ?>><?php _e('Product Name', 'mp') ?></option>
+                    <option value="date"<?php selected($this->get_setting('order_by'), 'date') ?>><?php _e('Publish Date', 'mp') ?></option>
+                    <option value="ID"<?php selected($this->get_setting('order_by'), 'ID') ?>><?php _e('Product ID', 'mp') ?></option>
+                    <option value="author"<?php selected($this->get_setting('order_by'), 'author') ?>><?php _e('Product Author', 'mp') ?></option>
+                    <option value="sales"<?php selected($this->get_setting('order_by'), 'sales') ?>><?php _e('Number of Sales', 'mp') ?></option>
+                    <option value="price"<?php selected($this->get_setting('order_by'), 'price') ?>><?php _e('Product Price', 'mp') ?></option>
+                    <option value="rand"<?php selected($this->get_setting('order_by'), 'rand') ?>><?php _e('Random', 'mp') ?></option>
                   </select>
-                  <label><input value="DESC" name="mp[order]" type="radio"<?php checked($settings['order'], 'DESC') ?> /> <?php _e('Descending', 'mp') ?></label>
-                  <label><input value="ASC" name="mp[order]" type="radio"<?php checked($settings['order'], 'ASC') ?> /> <?php _e('Ascending', 'mp') ?></label>
+                  <label><input value="DESC" name="mp[order]" type="radio"<?php checked($this->get_setting('order'), 'DESC') ?> /> <?php _e('Descending', 'mp') ?></label>
+                  <label><input value="ASC" name="mp[order]" type="radio"<?php checked($this->get_setting('order'), 'ASC') ?> /> <?php _e('Ascending', 'mp') ?></label>
          	  </td>
                 </tr>
               </table>
@@ -5901,28 +5886,28 @@ Notification Preferences: %s', 'mp');
               <table class="form-table">
                 <tr valign="top">
                 <th scope="row"><?php _e('Store Base', 'mp') ?></th>
-                <td>/<input type="text" name="mp[slugs][store]" value="<?php echo esc_attr($settings['slugs']['store']); ?>" size="20" maxlength="50" />/<br />
+                <td>/<input type="text" name="mp[slugs][store]" value="<?php echo esc_attr($this->get_setting('slugs->store')); ?>" size="20" maxlength="50" />/<br />
                 <span class="description"><?php _e('This page will be created so you can change it\'s content and the order in which it appears in navigation menus if your theme supports it.', 'mp') ?></span></td>
                 </tr>
                 <tr valign="top">
                 <th scope="row"><?php _e('Products List', 'mp') ?></th>
-                <td>/<?php echo esc_attr($settings['slugs']['store']); ?>/<input type="text" name="mp[slugs][products]" value="<?php echo esc_attr($settings['slugs']['products']); ?>" size="20" maxlength="50" />/</td>
+                <td>/<?php echo esc_attr($this->get_setting('slugs->store')); ?>/<input type="text" name="mp[slugs][products]" value="<?php echo esc_attr($this->get_setting('slugs->products')); ?>" size="20" maxlength="50" />/</td>
                 </tr>
                 <tr valign="top">
                 <th scope="row"><?php _e('Shopping Cart Page', 'mp') ?></th>
-                <td>/<?php echo esc_attr($settings['slugs']['store']); ?>/<input type="text" name="mp[slugs][cart]" value="<?php echo esc_attr($settings['slugs']['cart']); ?>" size="20" maxlength="50" />/</td>
+                <td>/<?php echo esc_attr($this->get_setting('slugs->store')); ?>/<input type="text" name="mp[slugs][cart]" value="<?php echo esc_attr($this->get_setting('slugs->cart')); ?>" size="20" maxlength="50" />/</td>
                 </tr>
                 <tr valign="top">
                 <th scope="row"><?php _e('Order Status Page', 'mp') ?></th>
-                <td>/<?php echo esc_attr($settings['slugs']['store']); ?>/<input type="text" name="mp[slugs][orderstatus]" value="<?php echo esc_attr($settings['slugs']['orderstatus']); ?>" size="20" maxlength="50" />/</td>
+                <td>/<?php echo esc_attr($this->get_setting('slugs->store')); ?>/<input type="text" name="mp[slugs][orderstatus]" value="<?php echo esc_attr($this->get_setting('slugs->orderstatus')); ?>" size="20" maxlength="50" />/</td>
                 </tr>
                 <tr valign="top">
                 <th scope="row"><?php _e('Product Category', 'mp') ?></th>
-                <td>/<?php echo esc_attr($settings['slugs']['store']); ?>/<?php echo esc_attr($settings['slugs']['products']); ?>/<input type="text" name="mp[slugs][category]" value="<?php echo esc_attr($settings['slugs']['category']); ?>" size="20" maxlength="50" />/</td>
+                <td>/<?php echo esc_attr($this->get_setting('slugs->store')); ?>/<?php echo esc_attr($this->get_setting('slugs->products')); ?>/<input type="text" name="mp[slugs][category]" value="<?php echo esc_attr($this->get_setting('slugs->category')); ?>" size="20" maxlength="50" />/</td>
                 </tr>
                 <tr valign="top">
                 <th scope="row"><?php _e('Product Tag', 'mp') ?></th>
-                <td>/<?php echo esc_attr($settings['slugs']['store']); ?>/<?php echo esc_attr($settings['slugs']['products']); ?>/<input type="text" name="mp[slugs][tag]" value="<?php echo esc_attr($settings['slugs']['tag']); ?>" size="20" maxlength="50" />/</td>
+                <td>/<?php echo esc_attr($this->get_setting('slugs->store')); ?>/<?php echo esc_attr($this->get_setting('slugs->products')); ?>/<input type="text" name="mp[slugs][tag]" value="<?php echo esc_attr($this->get_setting('slugs->tag')); ?>" size="20" maxlength="50" />/</td>
                 </tr>
               </table>
             </div>
@@ -5944,9 +5929,6 @@ Notification Preferences: %s', 'mp');
         //save settings
         if (isset($_POST['messages_settings'])) {
 
-          //strip slashes
-          $_POST['mp']['msg'] = array_map('stripslashes', (array)$_POST['mp']['msg']);
-
           //remove html from emails
           $_POST['mp']['email'] = array_map('wp_filter_nohtml_kses', (array)$_POST['mp']['email']);
 
@@ -5954,7 +5936,11 @@ Notification Preferences: %s', 'mp');
           if (!current_user_can('unfiltered_html')) {
             $_POST['mp']['msg'] = array_map('wp_kses_post', (array)$_POST['mp']['msg']);
           }
-
+					
+					//strip slashes
+          $_POST['mp']['msg'] = array_map('stripslashes', (array)$_POST['mp']['msg']);
+          $_POST['mp']['email'] = array_map('stripslashes', (array)$_POST['mp']['email']);
+					
           $settings = array_merge($settings, apply_filters('mp_messages_settings_filter', $_POST['mp']));
           update_option('mp_settings', $settings);
 
@@ -5978,7 +5964,7 @@ Notification Preferences: %s', 'mp');
 							<tr>
         				<th scope="row"><?php _e('Store Admin Email', 'mp'); ?></th>
         				<td>
-								<?php $store_email = isset($settings['store_email']) ? $settings['store_email'] : get_option("admin_email"); ?>
+								<?php $store_email = $this->get_setting('store_email') ? $this->get_setting('store_email') : get_option("admin_email"); ?>
         				<span class="description"><?php _e('The email address that new order notifications are sent to and received from.', 'mp') ?></span><br />
                 <input name="mp[store_email]" value="<?php echo esc_attr($store_email); ?>" maxlength="150" size="50" />
                 </td>
@@ -5988,9 +5974,9 @@ Notification Preferences: %s', 'mp');
         				<td>
         				<span class="description"><?php _e('The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
-                <input class="mp_emails_sub" name="mp[email][new_order_subject]" value="<?php echo esc_attr($settings['email']['new_order_subject']); ?>" maxlength="150" /></label><br />
+                <input class="mp_emails_sub" name="mp[email][new_order_subject]" value="<?php echo esc_attr($this->get_setting('email->new_order_subject')); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
-                <textarea class="mp_emails_txt" name="mp[email][new_order_txt]"><?php echo esc_textarea($settings['email']['new_order_txt']); ?></textarea>
+                <textarea class="mp_emails_txt" name="mp[email][new_order_txt]"><?php echo esc_textarea($this->get_setting('email->new_order_txt')); ?></textarea>
                 </label>
                 </td>
                 </tr>
@@ -5999,9 +5985,9 @@ Notification Preferences: %s', 'mp');
         				<td>
         				<span class="description"><?php _e('The email text sent to your customer when you mark an order as "Shipped". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
-                <input class="mp_emails_sub" name="mp[email][shipped_order_subject]" value="<?php echo esc_attr($settings['email']['shipped_order_subject']); ?>" maxlength="150" /></label><br />
+                <input class="mp_emails_sub" name="mp[email][shipped_order_subject]" value="<?php echo esc_attr($this->get_setting('email->shipped_order_subject')); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
-                <textarea class="mp_emails_txt" name="mp[email][shipped_order_txt]"><?php echo esc_textarea($settings['email']['shipped_order_txt']); ?></textarea>
+                <textarea class="mp_emails_txt" name="mp[email][shipped_order_txt]"><?php echo esc_textarea($this->get_setting('email->shipped_order_txt')); ?></textarea>
                 </label>
                 </td>
                 </tr>
@@ -6027,14 +6013,14 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Product Listing Pages', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the product listing pages. Optional, HTML allowed.', 'mp') ?></span><br />
-        				<?php wp_editor( $settings['msg']['product_list'], 'product_list', array('textarea_name'=>'mp[msg][product_list]') ); ?>
+        				<?php wp_editor( $this->get_setting('msg->product_list'), 'product_list', array('textarea_name'=>'mp[msg][product_list]') ); ?>
 								</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Status Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Order Status page. Optional, HTML allowed.', 'mp') ?></span><br />
-								<?php wp_editor( $settings['msg']['order_status'], 'order_status', array('textarea_name'=>'mp[msg][order_status]') ); ?>
+								<?php wp_editor( $this->get_setting('msg->order_status'), 'order_status', array('textarea_name'=>'mp[msg][order_status]') ); ?>
         				</td>
                 </tr>
               </table>
@@ -6049,35 +6035,35 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Shopping Cart Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Shopping Cart page. Optional, HTML allowed.', 'mp') ?></span><br />
-								<?php wp_editor( $settings['msg']['cart'], 'cart', array('textarea_name'=>'mp[msg][cart]') ); ?>
+								<?php wp_editor( $this->get_setting('msg->cart'), 'cart', array('textarea_name'=>'mp[msg][cart]') ); ?>
         				</td>
                 </tr>
                 <tr id="mp_msgs_shipping">
         				<th scope="row"><?php _e('Shipping Form Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Shipping Form page. Optional, HTML allowed.', 'mp') ?></span><br />
-								<?php wp_editor( $settings['msg']['shipping'], 'shipping', array('textarea_name'=>'mp[msg][shipping]') ); ?>
+								<?php wp_editor( $this->get_setting('msg->shipping'), 'shipping', array('textarea_name'=>'mp[msg][shipping]') ); ?>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Payment Form Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the Payment Form page. Optional, HTML allowed.', 'mp') ?></span><br />
-								<?php wp_editor( $settings['msg']['checkout'], 'checkout', array('textarea_name'=>'mp[msg][checkout]') ); ?>
+								<?php wp_editor( $this->get_setting('msg->checkout'), 'checkout', array('textarea_name'=>'mp[msg][checkout]') ); ?>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Confirmation Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the final Order Confirmation page. HTML allowed.', 'mp') ?></span><br />
-								<?php wp_editor( $settings['msg']['confirm_checkout'], 'confirm_checkout', array('textarea_name'=>'mp[msg][confirm_checkout]') ); ?>
+								<?php wp_editor( $this->get_setting('msg->confirm_checkout'), 'confirm_checkout', array('textarea_name'=>'mp[msg][confirm_checkout]') ); ?>
         				</td>
                 </tr>
                 <tr>
         				<th scope="row"><?php _e('Order Complete Page', 'mp'); ?></th>
         				<td>
         				<span class="description"><?php _e('Displayed at the top of the page notifying customers of a successful order. HTML allowed.', 'mp') ?></span><br />
-								<?php wp_editor( $settings['msg']['success'], 'success', array('textarea_name'=>'mp[msg][success]') ); ?>
+								<?php wp_editor( $this->get_setting('msg->success'), 'success', array('textarea_name'=>'mp[msg][success]') ); ?>
         				</td>
                 </tr>
               </table>
@@ -6145,7 +6131,7 @@ Notification Preferences: %s', 'mp');
                   <div id="mp-target-countries">
                   <?php
                     foreach ($this->countries as $code => $name) {
-                      ?><label><input type="checkbox"<?php echo (in_array($code, $this->eu_countries)) ? ' class="eu"' : ''; ?> name="mp[shipping][allowed_countries][]" value="<?php echo $code; ?>"<?php echo (in_array($code, (array)$settings['shipping']['allowed_countries'])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($name); ?></label><br /><?php
+                      ?><label><input type="checkbox"<?php echo (in_array($code, $this->eu_countries)) ? ' class="eu"' : ''; ?> name="mp[shipping][allowed_countries][]" value="<?php echo $code; ?>"<?php echo (in_array($code, $this->get_setting('shipping->allowed_countries', array()))) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($name); ?></label><br /><?php
                     }
                   ?>
                   </div><br />
@@ -6157,7 +6143,7 @@ Notification Preferences: %s', 'mp');
         				<th scope="row"><?php _e('Select Shipping Method', 'mp') ?></th>
         				<td>
                   <select name="mp[shipping][method]" class="mp-shipping-method">
-                    <option value="none"<?php selected($settings['shipping']['method'], 'none'); ?>><?php _e('No Shipping', 'mp'); ?></option>
+                    <option value="none"<?php selected($this->get_setting('shipping->method'), 'none'); ?>><?php _e('No Shipping', 'mp'); ?></option>
                     <?php
 										$calculated_methods = 0;
                     foreach ((array)$mp_shipping_plugins as $code => $plugin) {
@@ -6165,17 +6151,17 @@ Notification Preferences: %s', 'mp');
 												$calculated_methods++;
 												continue;
 											}
-                      ?><option value="<?php echo $code; ?>"<?php selected($settings['shipping']['method'], $code); ?>><?php echo esc_attr($plugin[1]); ?></option><?php
+                      ?><option value="<?php echo $code; ?>"<?php selected($this->get_setting('shipping->method'), $code); ?>><?php echo esc_attr($plugin[1]); ?></option><?php
                     }
 										if ($calculated_methods) {
-											?><option value="calculated"<?php selected($settings['shipping']['method'], 'calculated'); ?>><?php _e('Calculated Options', 'mp'); ?></option><?php
+											?><option value="calculated"<?php selected($this->get_setting('shipping->method'), 'calculated'); ?>><?php _e('Calculated Options', 'mp'); ?></option><?php
 										}
                     ?>
                   </select>
           				</td>
                 </tr>
 								<?php
-								if ($calculated_methods && $settings['shipping']['method'] == 'calculated') {
+								if ($calculated_methods && $this->get_setting('shipping->method') == 'calculated') {
 								?>
 								<tr>
 								<th scope="row"><?php _e('Select Shipping Options', 'mp') ?></th>
@@ -6184,7 +6170,7 @@ Notification Preferences: %s', 'mp');
 									<?php
 										foreach ((array)$mp_shipping_plugins as $code => $plugin) {
 											if (!$plugin[2]) continue; //skip non calculated
-											?><label><input type="checkbox" class="mp-shipping-method" name="mp[shipping][calc_methods][<?php echo $code; ?>]" value="<?php echo $code; ?>"<?php echo (isset($settings['shipping']['calc_methods'][$code])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
+											?><label><input type="checkbox" class="mp-shipping-method" name="mp[shipping][calc_methods][<?php echo $code; ?>]" value="<?php echo $code; ?>"<?php echo $this->get_setting("shipping->calc_methods->$code") ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
 										}
 									?>
 								</td>
@@ -6195,8 +6181,8 @@ Notification Preferences: %s', 'mp');
 								<tr>
         				<th scope="row"><?php _e('Measurement System', 'mp') ?></th>
         				<td>
-                  <label><input value="english" name="mp[shipping][system]" type="radio"<?php checked($settings['shipping']['system'], 'english') ?> /> <?php _e('Engish (Pounds)', 'mp') ?></label>
-                  <label><input value="metric" name="mp[shipping][system]" type="radio"<?php checked($settings['shipping']['system'], 'metric') ?> /> <?php _e('Metric (Kilograms)', 'mp') ?></label>
+                  <label><input value="english" name="mp[shipping][system]" type="radio"<?php checked($this->get_setting('shipping->system'), 'english') ?> /> <?php _e('Engish (Pounds)', 'mp') ?></label>
+                  <label><input value="metric" name="mp[shipping][system]" type="radio"<?php checked($this->get_setting('shipping->system'), 'metric') ?> /> <?php _e('Metric (Kilograms)', 'mp') ?></label>
         				</td>
                 </tr>
               </table>
@@ -6269,14 +6255,11 @@ Notification Preferences: %s', 'mp');
                   $mp_gateway_plugins = $allowed_plugins;
                 }
 
-				if ( !isset( $settings['gateways']['allowed'] ) )
-					$settings['gateways']['allowed'] = array();
-
                 foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                   if ($plugin[3]) { //if demo
                   	?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>" disabled="disabled" /> <?php echo esc_attr($plugin[1]); ?></label> <a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce" title="<?php _e('Upgrade', 'mp'); ?> &raquo;"><?php _e('Pro Only &raquo;', 'mp'); ?></a><br /><?php
 									} else {
-                    ?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, (array)$settings['gateways']['allowed'])) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
+                    ?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, $this->get_setting('gateways->allowed', array()))) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
 									}
 								}
                 ?>
@@ -6531,7 +6514,6 @@ class MarketPress_Shopping_Cart extends WP_Widget {
 
 	function widget($args, $instance) {
 		global $mp;
-		$settings = get_option('mp_settings');
 
     if ( get_query_var('pagename') == 'cart' )
       return;
@@ -6603,7 +6585,6 @@ class MarketPress_Product_List extends WP_Widget {
 
 	function widget($args, $instance) {
     global $mp;
-		$settings = get_option('mp_settings');
 
 		if ($instance['only_store_pages'] && !mp_is_shop_page())
 			return;

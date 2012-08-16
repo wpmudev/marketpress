@@ -9,10 +9,12 @@ Change Log:
 ----------------------------------------------------------------------
 - Add Schema.org microdata to products for SEO, props @aristath!
 - Add "from" price label to listings of multiple variation products
+- Add cart message even when its empty
 - Many many php notice fixes
 - Fix major issues with new sites and coupons
 - Fix coupons with a number as the code
 - Fix rewrite flushing when changing store slugs
+- Fix a stripslashes issue with email settings
 
 2.6.2 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------
