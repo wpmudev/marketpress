@@ -364,6 +364,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
     if ( $shipping_price = array_sum($shipping_prices) ) {
       if (!$mp->global_cart && apply_filters( 'mp_shipping_method_lbl', '' ))
         $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
+      else
+        $shipping_method = '';
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
       $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
@@ -853,10 +855,10 @@ function mp_order_status() {
       <ul>
       <?php
       //get times
-      $received = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
-      if ($order->mp_paid_time)
+      $received = isset($order->mp_received_time) ? date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time) : '';
+      if (!empty($order->mp_paid_time))
         $paid = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
-      if ($order->mp_shipped_time)
+      if (!empty($order->mp_shipped_time))
         $shipped = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
 
       if ($order->post_status == 'order_received') {
@@ -1589,7 +1591,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   $all_out = false;
   if ($meta['mp_track_inventory']) {
     $cart = $mp->get_cart_contents();
-    if (is_array($cart[$post_id])) {
+    if (isset($cart[$post_id]) && is_array($cart[$post_id])) {
 	    foreach ($cart[$post_id] as $variation => $data) {
 	      if ($meta['mp_inventory'][$variation] <= $data['quantity'])
 	        $no_inventory[] = $variation;
@@ -1611,7 +1613,7 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
   }
 
   //display an external link or form button
-  if ($product_link = $meta['mp_product_link']) {
+  if (isset($meta['mp_product_link']) && $product_link = $meta['mp_product_link']) {
 
     $button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 
@@ -1880,7 +1882,8 @@ function mp_checkout_step_url($checkout_step) {
  * @param bool $echo Optional, whether to echo. Defaults to true
  */
 function mp_store_navigation( $echo = true ) {
-
+  global $mp;
+  
   //navigation
   if (!$mp->get_setting('disable_cart')) {
     $nav = '<ul class="mp_store_navigation"><li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>';
@@ -1979,7 +1982,6 @@ function mp_products_count() {
  */
 
 function mp_custom_fields_checkout_after_shipping($content='') {
-	
 	global $mp, $blog_id, $current_user;
 	
 	if (isset($_SESSION['mp_shipping_info']['mp_custom_fields'])) {
@@ -2008,21 +2010,21 @@ function mp_custom_fields_checkout_after_shipping($content='') {
       foreach ($cart as $product_id => $variations) {
 	
         // Load the meta info for the custom fields for this product
-        $mp_has_custom_field 		= get_post_meta($product_id, 'mp_has_custom_field', true);
-        $mp_custom_field_required 	= get_post_meta($product_id, 'mp_custom_field_required', true);;
-        $mp_custom_field_per 		= get_post_meta($product_id, 'mp_custom_field_per', true);;
-        $mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+        $mp_has_custom_field = get_post_meta($product_id, 'mp_has_custom_field', true);
+        $mp_custom_field_required = get_post_meta($product_id, 'mp_custom_field_required', true);
+        $mp_custom_field_per = get_post_meta($product_id, 'mp_custom_field_per', true);
+        $mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
     
         foreach ($variations as $variation => $data) {
 		
-          if (isset($mp_has_custom_field[$variation])) {
+          if (isset($mp_has_custom_field[$variation]) && $mp_has_custom_field[$variation]) {
   
-            if (isset($mp_custom_field_label[$variation]))
-              $label_text = $mp_custom_field_label[$variation];
+            if (!empty($mp_custom_field_label[$variation]))
+              $label_text = esc_attr($mp_custom_field_label[$variation]);
             else
               $label_text = "";
             
-            if (isset($mp_custom_field_required[$variation]))
+            if (isset($mp_custom_field_required[$variation]) && $mp_custom_field_required[$variation])
               $required_text = 'required';
             else
               $required_text = "optional";									

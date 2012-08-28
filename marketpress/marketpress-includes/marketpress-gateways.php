@@ -179,7 +179,7 @@ if(!class_exists('MP_Gateway_API')) {
       global $wp_query, $mp;
 
       if ($wp_query->query_vars['pagename'] == 'cart') {
-        if ($wp_query->query_vars['checkoutstep'] == 'confirmation')
+        if (isset($wp_query->query_vars['checkoutstep']) && $wp_query->query_vars['checkoutstep'] == 'confirmation')
           do_action( 'mp_checkout_payment_pre_confirmation_' . $_SESSION['mp_payment_method'], $mp->get_order($_SESSION['mp_order']) );
       }
     }

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6.3 Beta 1
+Version: 2.6.3 Beta 3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -93,7 +93,6 @@ class MarketPress {
 		add_filter( 'manage_product_posts_columns', array(&$this, 'edit_products_columns') );
 		add_action( 'manage_posts_custom_column', array(&$this, 'edit_products_custom_columns') );
 		add_action( 'restrict_manage_posts', array(&$this, 'edit_products_filter') );
-		add_filter( 'mp_meta_details', array(&$this, 'clean_meta_details') );
 
 		//manage orders page
 		add_filter( 'manage_product_page_marketpress-orders_columns', array(&$this, 'manage_orders_columns') );
@@ -1149,7 +1148,7 @@ Thanks again!", 'mp')
 
         //call a custom query posts for this listing
         $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
-
+				
         //setup pagination
         if ($this->get_setting('paginate')) {
           //figure out perpage
@@ -1638,7 +1637,7 @@ Thanks again!", 'mp')
 				break;
 
 			case "variations":
-			  if (is_array($meta["mp_var_name"]) && count($meta["mp_var_name"]) > 1) {
+			  if (isset($meta["mp_var_name"]) && is_array($meta["mp_var_name"]) && count($meta["mp_var_name"]) > 1) {
 					foreach ($meta["mp_var_name"] as $value) {
             echo esc_attr($value) . '<br />';
 					}
@@ -1648,7 +1647,7 @@ Thanks again!", 'mp')
 			  break;
 
       case "sku":
-			  if (is_array($meta["mp_var_name"])) {
+			  if (isset($meta["mp_var_name"]) && is_array($meta["mp_var_name"])) {
 					foreach ((array)$meta["mp_sku"] as $value) {
 	          echo esc_attr($value) . '<br />';
 					}
@@ -1658,7 +1657,7 @@ Thanks again!", 'mp')
 				break;
 
       case "pricing":
-        if (is_array($meta["mp_price"])) {
+        if (isset($meta["mp_price"]) && is_array($meta["mp_price"])) {
 	        foreach ($meta["mp_price"] as $key => $value) {
 						if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
 		          echo '<del>'.$this->format_currency('', $value).'</del> ';
@@ -1673,11 +1672,11 @@ Thanks again!", 'mp')
 				break;
 
       case "sales":
-				echo number_format_i18n(($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0);
+				echo number_format_i18n(isset($meta["mp_sales_count"][0]) ? $meta["mp_sales_count"][0] : 0);
 				break;
 
       case "stock":
-				if ($meta["mp_track_inventory"]) {
+				if (isset($meta["mp_track_inventory"]) && $meta["mp_track_inventory"]) {
 				  foreach ((array)$meta["mp_inventory"] as $value) {
 	          $inventory = ($value) ? $value : 0;
 	          if ($inventory == 0)
@@ -1896,29 +1895,23 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_track_inventory', isset($_POST['mp_track_inventory']) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', array_map('intval', (array)$_POST['mp_inventory']));
 
-	// FPM: Process Custom Field from Admin Product form
-	if (isset($_POST['mp_has_custom_field'])) {
-		$mp_has_custom_field = array();
-		foreach($_POST['mp_has_custom_field'] as $idx => $key) {
-			$mp_has_custom_field[$key] = "on";
-		}
-		update_post_meta($post_id, 'mp_has_custom_field', $mp_has_custom_field);
-	}
+			//personalization fields
+			$mp_has_custom_field = $mp_custom_field_required = array();
+			foreach ((array)$_POST['mp_price'] as $key => $null) {
+				$mp_has_custom_field[$key] = isset($_POST['mp_has_custom_field'][$key]) ? 1 : 0;
+				$mp_custom_field_required[$key] = isset($_POST['mp_custom_field_required'][$key]) ? 1 : 0;
+			}
+			update_post_meta($post_id, 'mp_has_custom_field', $mp_has_custom_field);
+			update_post_meta($post_id, 'mp_custom_field_required', $mp_custom_field_required);
+			
+			if (isset($_POST['mp_custom_field_per'])) {
+				update_post_meta($post_id, 'mp_custom_field_per', (array)$_POST['mp_custom_field_per']);
+			}
 
-	if (isset($_POST['mp_custom_field_required'])) {
-		$mp_custom_field_required = array();
-		foreach($_POST['mp_custom_field_required'] as $idx => $key) {
-			$mp_custom_field_required[$key] = "on";
-		}
-		update_post_meta($post_id, 'mp_custom_field_required', $mp_custom_field_required);
-	}
-	if (isset($_POST['mp_custom_field_per'])) {
-		update_post_meta($post_id, 'mp_custom_field_per', array_map('esc_attr', (array)$_POST['mp_custom_field_per']));
-	}
-	if (isset($_POST['mp_custom_field_label'])) {
-		update_post_meta($post_id, 'mp_custom_field_label', array_map('esc_attr', (array)$_POST['mp_custom_field_label']));
-	}
-	// Custom Field end
+			if (isset($_POST['mp_custom_field_label'])) {
+				update_post_meta($post_id, 'mp_custom_field_label', array_map('trim', (array)$_POST['mp_custom_field_label']));
+			}
+
 
 			//save true first variation price for sorting
 			if ( isset($_POST['mp_is_sale']) )
@@ -1957,34 +1950,33 @@ Thanks again!", 'mp')
 	}
 
   // Make sure that product meta keys are present, set to sensible defaults
-  function clean_meta_details( $meta ) {
-	$defaults = array(
-		'mp_is_sale' => '',
-		'mp_track_inventory' => '',
-		'mp_price' => 0,
-		'mp_product_link' => '',
-		'mp_is_special_tax' => '',
-		'mp_file' => array(''),
-		'mp_shipping' => array('')
-	);
-
-	//Set default value if key is not already set.
-	$meta = $meta + $defaults;
-	return $meta;
-  }
-
-  //The Product Details meta box
-  function meta_details() {
-    global $post;
-		$meta = get_post_custom($post->ID);
+  function get_meta_details( $post_id ) {
+		$meta = get_post_custom($post_id);
   	//unserialize
     foreach ($meta as $key => $val) {
 		  $meta[$key] = maybe_unserialize($val[0]);
 		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_is_special_tax" && $key != "mp_special_tax")
 		    $meta[$key] = array($meta[$key]);
 		}
+		
+		$defaults = array(
+			'mp_is_sale' => '',
+			'mp_track_inventory' => '',
+			'mp_price' => array(),
+			'mp_product_link' => '',
+			'mp_is_special_tax' => '',
+			'mp_file' => '',
+			'mp_shipping' => array('')
+		);
+	
+		//Set default value if key is not already set.
+		return wp_parse_args($meta, $defaults);
+  }
 
-		$meta = apply_filters( 'mp_meta_details', $meta, $post->ID );
+  //The Product Details meta box
+  function meta_details() {
+    global $post;
+		$meta = $this->get_meta_details( $post->ID );
     ?>
     <input type="hidden" name="mp_product_meta" value="1" />
     <table class="widefat" id="mp_product_variations_table">
@@ -2001,7 +1993,7 @@ Thanks again!", 'mp')
 			</thead>
 			<tbody>
 			<?php
-			  if ($meta["mp_price"]) {
+			  if (isset($meta["mp_price"]) && $meta["mp_price"]) {
 			    //if download enabled only show first variation
 			    $meta["mp_price"] = (empty($meta["mp_file"]) && empty($meta["mp_product_link"])) ? $meta["mp_price"] : array($meta["mp_price"][0]);
 			    $count = 1;
@@ -2015,30 +2007,20 @@ Thanks again!", 'mp')
 							<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="<?php echo isset($meta["mp_sale_price"][$key]) ? $this->display_currency($meta["mp_sale_price"][$key]) : $this->display_currency($meta["mp_price"][$key]); ?>" disabled="disabled" /></td>
               <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="<?php echo isset($meta["mp_inventory"][$key]) ? intval($meta["mp_inventory"][$key]) : 0; ?>" disabled="disabled" /></td>
 
-							<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="<?php echo $key ?>" <?php
-								if (isset($meta['mp_has_custom_field'][$key])) { echo ' checked="checked" '; } ?> /></td>
+							<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[<?php echo $key; ?>]" value="1" <?php checked(isset($meta['mp_has_custom_field'][$key]) && $meta['mp_has_custom_field'][$key]); ?> /></td>
 
 							<td class="mp_var_remove">
 							<?php if ($count == $last) { ?><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a><?php } ?>
 							</td>
 						</tr>
-						<tr class="variation-custom-field <?php if (!isset($meta['mp_has_custom_field'][$key])) { echo ' variation-custom-field-hidden'; } ?>">
+						<tr class="variation-custom-field <?php echo (!isset($meta['mp_has_custom_field'][$key]) || !$meta['mp_has_custom_field'][$key]) ? ' variation-custom-field-hidden' : ''; ?>">
 							<td class="mp_custom_label_col" colspan="1">
-								<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[]" value="input" />
-								<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[]" value="quantity" />
-
-								<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label> <input type="text"
-									class="mp_custom_field_value" name="mp_custom_field_label[]"
-									value="<?php if (isset($meta['mp_custom_field_label'][$key])) {
-										echo $meta['mp_custom_field_label'][$key];} ?>" />
-								
+								<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[<?php echo $key; ?>]" value="input" />
+								<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[<?php echo $key; ?>]" value="quantity" />
+								<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label>
+								<input type="text" class="mp_custom_field_value" name="mp_custom_field_label[<?php echo $key; ?>]" value="<?php echo isset($meta['mp_custom_field_label'][$key]) ? esc_attr($meta['mp_custom_field_label'][$key]) : ''; ?>" />							
 								<label class="mp_custom_field_required_label">
-								<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" value="<?php echo $key; ?>"
-								<?php
-									if ( isset($meta['mp_custom_field_required'][$key]) && $meta['mp_custom_field_required'][$key] == "on" ) {
-										echo ' checked="checked" ';
-									} ?> /> <?php _e('Required', 'mp'); ?></label>
-
+								<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[<?php echo $key; ?>]" value="1" <?php echo checked(isset($meta['mp_custom_field_required'][$key]) && $meta['mp_custom_field_required'][$key]); ?> /> <?php _e('Required', 'mp'); ?></label>
 							</td>
 							<td>&nbsp;</td>
 						</tr>
@@ -2052,20 +2034,16 @@ Thanks again!", 'mp')
 						<td class="mp_sku_col"><input type="text" name="mp_sku[]" value="" /></td>
 						<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="0.00" /></td>
 						<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="0.00" disabled="disabled" /></td>
-            			<td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
-						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="0" /></td>
+            <td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
+						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="1" /></td>
 						<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
 					</tr>
 					<tr class="variation-custom-field variation-custom-field-hidden">
 						<td class="mp_custom_label_col" colspan="5">
-
 							<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[]" value="input" />
-							<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[]" value="quantity" />
-
-							<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label> <input type="text" class="mp_custom_field_value"
-								name="mp_custom_field_label[]" value="" />
-							<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" value="0" /> <label
-								class="mp_custom_field_required_label"><?php _e('Required:', 'mp'); ?></label>
+								<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[]" value="quantity" />
+							<label class="mp_custom_field_label"><?php _e('Description:', 'mp'); ?></label> <input type="text" class="mp_custom_field_value" name="mp_custom_field_label[]" value="" />
+							<input type="checkbox" class="mp_custom_field_required" name="mp_custom_field_required[]" value="1" /> <label class="mp_custom_field_required_label"><?php _e('Required:', 'mp'); ?></label>
 						</td>
 						<td>&nbsp;</td>
 					</tr>
@@ -2099,9 +2077,8 @@ Thanks again!", 'mp')
   function meta_shipping() {
     global $post;
     $settings = get_option('mp_settings');
-		$meta = get_post_custom($post->ID);
-		$meta = apply_filters( 'mp_meta_details', $meta, $post->ID );
-		$mp_shipping = isset( $meta['mp_shipping'][0] ) ? maybe_unserialize($meta["mp_shipping"][0]) : array();
+		$mp_shipping = get_post_meta($post->ID, 'mp_file', true);
+		$mp_shipping = $mp_shipping ? maybe_unserialize($mp_shipping) : array();
 
 		//tie in for shipping plugins
     do_action( 'mp_shipping_metabox', $mp_shipping, $settings );
@@ -2110,10 +2087,9 @@ Thanks again!", 'mp')
   //The Product Download meta box
   function meta_download() {
     global $post;
-		$meta = get_post_custom($post->ID);
-		$meta = apply_filters( 'mp_meta_details', $meta, $post->ID );
+		$file = get_post_meta($post->ID, 'mp_file', true);
     ?>
-    <label><?php _e('File URL', 'mp'); ?>:<br /><input type="text" size="50" id="mp_file" class="mp_file" name="mp_file" value="<?php echo esc_attr($meta["mp_file"][0]); ?>" /></label>
+    <label><?php _e('File URL', 'mp'); ?>:<br /><input type="text" size="50" id="mp_file" class="mp_file" name="mp_file" value="<?php echo esc_attr($file); ?>" /></label>
     <input id="mp_upload_button" type="button" value="<?php _e('Upload File', 'mp'); ?>" /><br />
     <?php
     //display allowed filetypes if WPMU
@@ -2734,8 +2710,8 @@ Thanks again!", 'mp')
 				}
 			}
 
-			// FPM: Process Custom Field(s)
-			if ((isset($_POST['mp_custom_fields'])) && (count($_POST['mp_custom_fields']))) {
+			// Process Personalization
+			if (isset($_POST['mp_custom_fields']) && count($_POST['mp_custom_fields'])) {
 				foreach($_POST['mp_custom_fields'] as $cf_key => $cf_items) {
 
 					list($bid, $product_id, $variation) = split(':', $cf_key);
@@ -2743,20 +2719,16 @@ Thanks again!", 'mp')
 					if (!isset($product_id)) continue;
 					if (!isset($variation)) continue;
 
-					$mp_has_custom_field 		= get_post_meta(intval($product_id), 'mp_has_custom_field', true);
+					$mp_has_custom_field = get_post_meta(intval($product_id), 'mp_has_custom_field', true);
 
-					if ((isset($mp_has_custom_field)) && (isset($mp_has_custom_field[intval(intval($variation))]))) {
-						$mp_custom_field_required 	= get_post_meta(intval($product_id), 'mp_custom_field_required', true);
+					if (isset($mp_has_custom_field) && isset($mp_has_custom_field[intval($variation)]) && $mp_has_custom_field[intval($variation)]) {
+						$mp_custom_field_required = get_post_meta(intval($product_id), 'mp_custom_field_required', true);
 
-						if ((isset($mp_custom_field_required))
-					 	 && (isset($mp_custom_field_required[intval($variation)]))
-					 	 && ($mp_custom_field_required[intval($variation)] == "on")) {
+						if (isset($mp_custom_field_required) && isset($mp_custom_field_required[intval($variation)]) && $mp_custom_field_required[intval($variation)]) {
 
 							foreach($cf_items as $idx => $cf_item) {
 								if (empty($cf_item)) {
-
-									$this->cart_checkout_error( __('Required product extra information.', 'mp' ),
-										'custom_fields_'. $product_id .'_'. $variation);
+									$this->cart_checkout_error( __('Required product extra information.', 'mp' ), 'custom_fields_'. $product_id .'_'. $variation);
 									break;
 								} else {
 									$cf_items[$idx] = trim(strip_tags(stripslashes($cf_item)));
@@ -3876,9 +3848,9 @@ Thanks again!", 'mp')
 				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
 					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
 
-					$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+					$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
 					if (isset($mp_custom_field_label[$variation]))
-						$label_text = $mp_custom_field_label[$variation];
+						$label_text = esc_attr($mp_custom_field_label[$variation]);
 					else
 						$label_text = __('Product Extra Fields: ', 'mp');
 
@@ -4466,9 +4438,9 @@ Notification Preferences: %s', 'mp');
 						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
 							$cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
 
-							$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+							$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
 							if (isset($mp_custom_field_label[$variation]))
-								$label_text = $mp_custom_field_label[$variation];
+								$label_text = esc_attr($mp_custom_field_label[$variation]);
 							else
 								$label_text = __('Product Extra Fields:', 'mp');
 
