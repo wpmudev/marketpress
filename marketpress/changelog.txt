@@ -5,7 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.6.3 - 8/13/2012 - Aaron Edwards
+2.6.3 - 8/29/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add Schema.org microdata to products for SEO, props @aristath!
 - Add "from" price label to listings of multiple variation products
@@ -15,7 +15,8 @@ Change Log:
 - Fix coupons with a number as the code
 - Fix rewrite flushing when changing store slugs
 - Fix a stripslashes issue with email settings
-- Fix unchecking of personalization checkboxes
+- Fix unchecking of personalization checkboxes bug
+- Fix outdated product urls in orderstatus after slug changes
 
 2.6.2 - 7/13/2012 - Aaron Edwards/Arnold Bailey
 ----------------------------------------------------------------------

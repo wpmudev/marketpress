@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6.3 Beta 3
+Version: 2.6.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -2755,10 +2755,9 @@ Thanks again!", 'mp')
 			if (isset($_POST['special_instructions']))
 				$_SESSION['mp_shipping_info']['special_instructions'] = trim(stripslashes($_POST['special_instructions']));
 
-		// FPM: Handle and store Product Custom field data
-		if (isset($_POST['mp_custom_fields']))
-			$_SESSION['mp_shipping_info']['mp_custom_fields'] = $_POST['mp_custom_fields'];
-
+			//Handle and store Product Custom field data
+			if (isset($_POST['mp_custom_fields']))
+				$_SESSION['mp_shipping_info']['mp_custom_fields'] = $_POST['mp_custom_fields'];
 
       //for checkout plugins
       do_action( 'mp_shipping_process' );
@@ -3828,9 +3827,8 @@ Thanks again!", 'mp')
 
   //replaces shortcodes in email msgs with dynamic content
   function filter_email($order, $text) {
-
-		global $blog_id; // FPM: Needed for Custom Field Processing
-		$bid = (is_multisite()) ? $blog_id : 1;  // FPM Needed for Custom Field Processing
+		global $blog_id; 
+		$bid = (is_multisite()) ? $blog_id : 1;
 
     //// order info
     if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
@@ -3843,26 +3841,24 @@ Thanks again!", 'mp')
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
 	        	$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
 
-				// FPM: Product Custom Fields
-				$cf_key = $bid .':'. $product_id .':'. $variation;
-				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-
-					$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
-					if (isset($mp_custom_field_label[$variation]))
-						$label_text = esc_attr($mp_custom_field_label[$variation]);
-					else
-						$label_text = __('Product Extra Fields: ', 'mp');
-
-		        	$order_info .= "\t\t" . $label_text  ."\n";
-					foreach($cf_items as $idx => $cf_item) {
-						$item_cnt = intval($idx)+1;
-			        	$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
+					// FPM: Product Custom Fields
+					$cf_key = $bid .':'. $product_id .':'. $variation;
+					if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+						$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+	
+						$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
+						if (isset($mp_custom_field_label[$variation]))
+							$label_text = esc_attr($mp_custom_field_label[$variation]);
+						else
+							$label_text = __('Product Personalization: ', 'mp');
+	
+						$order_info .= "\t\t" . $label_text  ."\n";
+						foreach($cf_items as $idx => $cf_item) {
+							$item_cnt = intval($idx)+1;
+							$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
+						}
 					}
-				}
-				$order_info .= "\n";
-
-
+					$order_info .= "\n";
 				}
 			}
       $order_info .= "\n";
@@ -4433,25 +4429,25 @@ Notification Preferences: %s', 'mp');
 		              echo '  <td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
 		              echo '  <td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a>';
 
-						// FPM: Output product custom field information
-						$cf_key = $bid .':'. $product_id .':'. $variation;
-						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-							$cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-
-							$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
-							if (isset($mp_custom_field_label[$variation]))
-								$label_text = esc_attr($mp_custom_field_label[$variation]);
-							else
-								$label_text = __('Product Extra Fields:', 'mp');
-
-							echo '<div class="mp_cart_custom_fields">'. $label_text .'<ol>';
-							foreach($cf_item as $item) {
-								echo '<li>'. $item .'</li>';
-							}
-							echo '</ol></div>';
-						}
-
-					  echo '</td>';
+									//Output product custom field information
+									$cf_key = $bid .':'. $product_id .':'. $variation;
+									if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+										$cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+			
+										$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
+										if (isset($mp_custom_field_label[$variation]))
+											$label_text = esc_attr($mp_custom_field_label[$variation]);
+										else
+											$label_text = __('Product Personalization:', 'mp');
+			
+										echo '<div class="mp_cart_custom_fields">'. $label_text .'<ol>';
+										foreach ($cf_item as $item) {
+											echo '<li>'. $item .'</li>';
+										}
+										echo '</ol></div>';
+									}
+			
+									echo '</td>';
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 		              echo '  <td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
 		              echo '  <td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
@@ -4471,7 +4467,7 @@ Notification Preferences: %s', 'mp');
         </table><br />
 
         <?php //coupon line
-        if ( $order->mp_discount_info ) { ?>
+        if ( isset($order->mp_discount_info) ) { ?>
         <h3><?php _e('Coupon Discount:', 'mp'); ?></h3>
         <p><?php echo $order->mp_discount_info['discount']; ?> (<?php echo $order->mp_discount_info['code']; ?>)</p>
         <?php } ?>

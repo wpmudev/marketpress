@@ -917,7 +917,7 @@ function mp_order_status() {
               	$data = $variations;
                 echo '<tr>';
 	              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-	              echo '  <td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML (This differs than other code)
+	              echo '  <td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', get_permalink($product_id), $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML (This differs than other code)
 	              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 	              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
 	              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
@@ -927,26 +927,25 @@ function mp_order_status() {
 								foreach ($variations as $variation => $data) {
 		              echo '<tr>';
 		              echo '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
-		              echo '  <td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
+		              echo '  <td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', get_permalink($product_id), $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
 		
-		
-						// FPM: Output product custom field information
-						$cf_key = $bid .':'. $product_id .':'. $variation;
-						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-							$cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-
-							$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
-							if (isset($mp_custom_field_label[$variation]))
-								$label_text = $mp_custom_field_label[$variation];
-							else
-								$label_text = __('Product Extra Fields:', 'mp');
-
-							echo '<div class="mp_cart_custom_fields">'. $label_text .'<br /><ol>';
-							foreach($cf_item as $item) {
-								echo '<li>'. $item .'</li>';
-							}
-							echo '</ol></div>';
-						}
+                  // Output product custom field information
+                  $cf_key = $bid .':'. $product_id .':'. $variation;
+                  if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+                    $cf_item = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+      
+                    $mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+                    if (isset($mp_custom_field_label[$variation]))
+                      $label_text = $mp_custom_field_label[$variation];
+                    else
+                      $label_text = __('Product Personalization:', 'mp');
+      
+                    echo '<div class="mp_cart_custom_fields">'. $label_text .'<br />';
+                    foreach($cf_item as $item) {
+                      echo $item;
+                    }
+                    echo '</div>';
+                  }
 					
 		              echo '</td>'; // Added WPML (This differs than other code)
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
@@ -2025,30 +2024,30 @@ function mp_custom_fields_checkout_after_shipping($content='') {
               $label_text = "";
             
             if (isset($mp_custom_field_required[$variation]) && $mp_custom_field_required[$variation])
-              $required_text = 'required';
+              $required_text = __('required', 'mp');
             else
-              $required_text = "optional";									
+              $required_text = __('optional', 'mp');									
               
             $content_product .= '<tr class="mp_product_name"><td align="right" colspan="2">';
             $content_product .= apply_filters( 'mp_checkout_error_custom_fields_'. $product_id .'_'. $variation, '' );
             $content_product .= $data['name'];
             $content_product .= '</td></tr>';
             $content_product .= '<tr class="mp_product_custom_fields" style="border-width: 0px">';
-            $content_product .= '<td align="right" style="border-width: 0px">';
-            $content_product .= $label_text .' ('. $required_text .')';
-            $content_product .=  '</td></tr>';
-            $content_product .= '<tr><td style="border-width: 0px">';
+            $content_product .= '<td style="border-width: 0px">';
+            $content_product .= $label_text .' ('. $required_text .')<br />';
+            //$content_product .=  '</td></tr>';
+            //$content_product .= '<tr><td style="border-width: 0px">';
             
             // If the mp_custom_field_per is set to 'line' we only show one input field per item in the cart. 
             // This input field will be a simply unordered list (<ul>). However, if the mp_custom_field_per
             // Then we need to show an input field per the quantity items. In this case we use an ordered list
             // to show the numbers to the user. 0-based.
             if ($mp_custom_field_per[$variation] == "line") {
-              $content_product .= '<ul>';
+              //$content_product .= '<ul>';
               $cf_limit = 1;
               
             } else if ($mp_custom_field_per[$variation] == "quantity") {
-              $content_product .= '<ol>';
+              //$content_product .= '<ol>';
               $cf_limit = $data['quantity'];
             }
             
@@ -2061,16 +2060,15 @@ function mp_custom_fields_checkout_after_shipping($content='') {
               else
                 $output_value = '';
                 
-              $content_product .= '<li><input type="text" style="width: 90%;" value="'. $output_value .'" 
-                name="mp_custom_fields[' . $bid . ':' . $product_id . ':' . $variation . ']['. $output_cnt .']" /></li>';
+              $content_product .= '<input type="text" style="width: 90%;" value="'. $output_value .'" name="mp_custom_fields[' . $bid . ':' . $product_id . ':' . $variation . ']['. $output_cnt .']" />';
               $output_cnt += 1;
             }
-            
+            /*
             if ($mp_custom_field_per[$variation] == "line")
               $content_product .= '<ul>';
             else if ($mp_custom_field_per[$variation] == "quantity")
               $content_product .= '<ol>';
-  
+            */
             $content_product .=  '</td>';
             $content_product .=  '</tr>';
           }
@@ -2085,7 +2083,7 @@ function mp_custom_fields_checkout_after_shipping($content='') {
 	if (strlen($content_product)) {
 		
 	    $content .= '<table class="mp_product_shipping_custom_fields">';
-	    $content .= '<thead><tr><th colspan="2">'. __('Product extra fields:', 'mp') .'</th></tr></thead>';
+	    $content .= '<thead><tr><th colspan="2">'. __('Product Personalization:', 'mp') .'</th></tr></thead>';
 	    $content .= '<tbody>';
 	    $content .= $content_product;
 	    $content .= '</tbody>';
