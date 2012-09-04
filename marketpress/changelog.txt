@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.6.4 - 9/04/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Important bugfix with saving Extra Shipping costs and Weights
+- Fix bugs in iDeal gateway: http://premium.wpmudev.org/forums/topic/ideal-making-it-work
+
 2.6.3 - 8/29/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Add Schema.org microdata to products for SEO, props @aristath!

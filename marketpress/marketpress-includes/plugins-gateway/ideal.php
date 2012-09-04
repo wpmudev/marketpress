@@ -37,7 +37,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
   function on_creation() {
 		global $mp;
-		$settings = get_option('mp_settings');
 
 		//set names here to be able to translate
 		$this->admin_name = __('iDEAL (beta)', 'mp');
@@ -45,8 +44,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 
     $this->method_img_url = $mp->plugin_url . 'images/ideal.png';
 		$this->method_button_img_url = $mp->plugin_url . 'images/ideal.png';
-		$this->merchant_id = $settings['gateways']['ideal']['merchant_id'];
-		$this->ideal_hash = $settings['gateways']['ideal']['ideal_hash'];
+		$this->merchant_id = $mp->get_setting('gateways->ideal->merchant_id');
+		$this->ideal_hash = $mp->get_setting('gateways->ideal->ideal_hash');
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');
   	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
 		$this->errorURL = mp_checkout_step_url('checkout') . "?err=1";
@@ -78,7 +77,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
 	function process_payment_form($cart, $shipping_info) {
 		global $mp;
-		$settings = get_option('mp_settings');
 		
 		$key = $this->ideal_hash; // Your hashkey or Secret key
 		$merchantID = $this->merchant_id; //Your merchant ID
@@ -158,14 +156,14 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$urlError = $this->errorURL;
 		
 		//setup bank specific urls
-		$test = ($settings['gateways']['ideal']['mode'] == 'test');
-		if ($settings['gateways']['ideal']['mode'] == 'ing')
+		$test = ($mp->get_setting('gateways->ideal->mode', 'test') == 'test');
+		if ($mp->get_setting('gateways->ideal->bank') == 'ing')
 			$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.secure-ing.com/ideal/mpiPayInitIng.do?';
-		else if ($settings['gateways']['ideal']['mode'] == 'rabo')
+		else if ($mp->get_setting('gateways->ideal->bank') == 'rabo')
 			$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.rabobank.nl/ideal/mpiPayInitRabo.do?';
-		else if ($settings['gateways']['ideal']['mode'] == 'fries')
+		else if ($mp->get_setting('gateways->ideal->bank') == 'fries')
 			$redirectURL = 'https://' . ($test ? 'test' : '') . 'idealkassa.frieslandbank.nl/ideal/mpiPayInitFriesland.do?';
-		else if ($settings['gateways']['ideal']['mode'] == 'abn')
+		else if ($mp->get_setting('gateways->ideal->bank') == 'abn')
 			$redirectURL = 'https://abnamro' . ($test ? '-test' : '') . '.ideal-payment.de/ideal/mpiPayInitFortis.do?';
 		else
 			$redirectURL = 'https://www.ideal-simulator.nl/lite/?';
@@ -238,7 +236,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
 	function confirm_payment_form($cart, $shipping_info) {
 		global $mp;
-		$settings = get_option('mp_settings');
 		$timestamp = time();
 	  
 		$totals = array();
@@ -267,7 +264,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$payment_info['gateway_private_name'] = $this->admin_name;
 		$payment_info['status'][$timestamp] = __('Invoiced', 'mp');
 		$payment_info['total'] = $total;
-		$payment_info['currency'] = $settings['currency'];
+		$payment_info['currency'] = $mp->get_setting('currency');
 		$payment_info['method'] = __('iDEAL', 'mp');
 		$payment_info['transaction_id'] = $order_id;
 	
@@ -305,7 +302,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
 	function order_confirmation_email($msg, $order) {
     global $mp;
-		$settings = get_option('mp_settings');
 		  
     return $msg;
   }
@@ -318,7 +314,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    */
 	function order_confirmation_msg($content, $order) {
     global $mp;
-    $settings = get_option('mp_settings');
     
     return $content;
   }
@@ -342,32 +337,32 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 					<th scope="row"><?php _e('Bank', 'mp') ?></th>
 					<td>
 					<select name="mp[gateways][ideal][bank]">
-	          <option value="ing"<?php selected($settings['gateways']['ideal']['bank'], 'ing') ?>><?php _e('ING Bank', 'mp') ?></option>
-	          <option value="rabo"<?php selected($settings['gateways']['ideal']['bank'], 'rabo') ?>><?php _e('Rabobank', 'mp') ?></option>
-	          <option value="fries"<?php selected($settings['gateways']['ideal']['bank'], 'fries') ?>><?php _e('Friesland Bank', 'mp') ?></option>
-	          <option value="abn"<?php selected($settings['gateways']['ideal']['bank'], 'abn') ?>><?php _e('ABN Amro Bank', 'mp') ?></option>
-	          <option value="sim"<?php selected($settings['gateways']['ideal']['bank'], 'sim') ?>><?php _e('iDEAL Simulator (for testing)', 'mp') ?></option>
+	          <option value="ing"<?php selected($mp->get_setting('gateways->ideal->bank'), 'ing') ?>><?php _e('ING Bank', 'mp') ?></option>
+	          <option value="rabo"<?php selected($mp->get_setting('gateways->ideal->bank'), 'rabo') ?>><?php _e('Rabobank', 'mp') ?></option>
+	          <option value="fries"<?php selected($mp->get_setting('gateways->ideal->bank'), 'fries') ?>><?php _e('Friesland Bank', 'mp') ?></option>
+	          <option value="abn"<?php selected($mp->get_setting('gateways->ideal->bank'), 'abn') ?>><?php _e('ABN Amro Bank', 'mp') ?></option>
+	          <option value="sim"<?php selected($mp->get_setting('gateways->ideal->bank'), 'sim') ?>><?php _e('iDEAL Simulator (for testing)', 'mp') ?></option>
 	        </select>
 					</td>
 	        </tr>
 		     <tr>
 				  <th scope="row"><label for="ideal-key"><?php _e('Merchant ID', 'mp') ?></label></th>
 				  <td>	  		 
-		          <input value="<?php echo esc_attr($settings['gateways']['ideal']['merchant_id']); ?>" name="mp[gateways][ideal][merchant_id]" id="merchant_id" type="text" />   
+		          <input value="<?php echo esc_attr($mp->get_setting('gateways->ideal->merchant_id')); ?>" name="mp[gateways][ideal][merchant_id]" id="merchant_id" type="text" />   
 		        </td>
 	         </tr>
 					<tr>
 				  <th scope="row"><label for="ideal-hash"><?php _e('iDEAL Secret Key', 'mp') ?></label></th>
 				  <td>
-						<input value="<?php echo esc_attr($settings['gateways']['ideal']['ideal_hash']); ?>" name="mp[gateways][ideal][ideal_hash]" id="ideal_hash" type="text" />
+						<input value="<?php echo esc_attr($mp->get_setting('gateways->ideal->ideal_hash')); ?>" name="mp[gateways][ideal][ideal_hash]" id="ideal_hash" type="text" />
 					</td>
 				 </tr>
 					<tr>
 					<th scope="row"><?php _e('Mode', 'mp') ?></th>
 					<td>
 					<select name="mp[gateways][ideal][mode]">
-	          <option value="test"<?php selected($settings['gateways']['ideal']['mode'], 'test') ?>><?php _e('Testing', 'mp') ?></option>
-	          <option value="live"<?php selected($settings['gateways']['ideal']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
+	          <option value="test"<?php selected($mp->get_setting('gateways->ideal->mode', 'test'), 'test') ?>><?php _e('Testing', 'mp') ?></option>
+	          <option value="live"<?php selected($mp->get_setting('gateways->ideal->mode'), 'live') ?>><?php _e('Live', 'mp') ?></option>
 	        </select>
 					</td>
 	        </tr>

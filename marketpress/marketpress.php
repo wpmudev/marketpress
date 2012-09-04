@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6.3
+Version: 2.6.4
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.6.3';
+  var $version = '2.6.4';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -949,7 +949,7 @@ Thanks again!", 'mp')
         //otherwise load the page template and use our own theme
         add_filter( 'the_content', array(&$this, 'store_theme'), 99 );
       }
-
+      
       $this->is_shop_page = true;
     }
 
@@ -1025,8 +1025,8 @@ Thanks again!", 'mp')
       if ($this->orderstatus_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_orderstatus_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+	add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+	add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
@@ -1425,7 +1425,7 @@ Thanks again!", 'mp')
   //filters the titles for our custom pages
   function page_title_output($title, $id = false) {
     global $wp_query;
-
+    
     //filter out nav titles
     if (!empty($title) && $id === false)
       return $title;
@@ -1440,7 +1440,7 @@ Thanks again!", 'mp')
         return sprintf( __('Product Tag: %s', 'mp'), $term->name );
       }
     }
-
+    
     switch ($wp_query->query_vars['pagename']) {
       case 'cart':
 				if ( isset($wp_query->query_vars['checkoutstep']) ) {
@@ -2077,7 +2077,7 @@ Thanks again!", 'mp')
   function meta_shipping() {
     global $post;
     $settings = get_option('mp_settings');
-		$mp_shipping = get_post_meta($post->ID, 'mp_file', true);
+		$mp_shipping = get_post_meta($post->ID, 'mp_shipping', true);
 		$mp_shipping = $mp_shipping ? maybe_unserialize($mp_shipping) : array();
 
 		//tie in for shipping plugins
