@@ -63,6 +63,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         $this->API_Endpoint = esc_url_raw($settings['gateways']['authorizenet-aim']['custom_api']);
 			} else if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox')	{
         $this->API_Endpoint = "https://test.authorize.net/gateway/transact.dll";
+				$this->force_ssl = false;
       } else {
         $this->API_Endpoint = "https://secure.authorize.net/gateway/transact.dll";
       }

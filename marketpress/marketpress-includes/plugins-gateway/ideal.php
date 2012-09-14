@@ -89,8 +89,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
 				$items[] = array(
-					'itemNumber'.$i => $data['SKU'], // Article number
-					'itemDescription'.$i => $data['name'], // Description
+					'itemNumber'.$i => empty($data['SKU']) ? $product_id : substr($data['SKU'], 0, 12), // Article number
+					'itemDescription'.$i => substr($data['name'], 0, 32), // Description
 					'itemQuantity'.$i => $data['quantity'], // Quantity
 					'itemPrice'.$i =>  round($data['price']*100) // Artikel price in cents
 				);
@@ -119,7 +119,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		
 		//tax line
 		if ( ($tax_price = $mp->tax_price()) !== false ) {
-			$total = $total + $tax_price;
+			$total += $tax_price;
 			//Add tax as separate product
 			$items[] = array(
 				'itemNumber'.$i => '99999999', // Product number
@@ -131,13 +131,13 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		
 		$total = round($total * 100);
 		$shastring = "$key$merchantID$subID$total$purchaseID$paymentType$validUntil";
-		
+		/*
 		$i = 1;
 		foreach ($items as $item){
 			$shastring .= $item['itemNumber'.$i].$item['itemDescription'.$i].$item['itemQuantity'.$i].$item['itemPrice'.$i];	
 			$i++;
 		}
-		
+		*/
 		// Remove HTML Entities
 		$shastring = html_entity_decode($shastring);
 
@@ -178,13 +178,13 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$redirectURL .='&hash='.$shasign;
 		$redirectURL .='&paymentType='.$paymentType;
 		$redirectURL .='&validUntil='.$validUntil;
-		
+		/*
 		$i = 1;
 		foreach ($items as $item) {
 			$redirectURL .= '&itemNumber'.$i.'='.$item['itemNumber'.$i].'&itemDescription'.$i.'='.$item['itemDescription'.$i].'&itemQuantity'.$i.'='.$item['itemQuantity'.$i].'&itemPrice'.$i.'='.$item['itemPrice'.$i];	
 			$i++;
 		}
-	
+		*/
 		$redirectURL .='&urlSuccess='.urlencode($urlSuccess);
 		$redirectURL .='&urlCancel='.urlencode($urlCancel);
 		$redirectURL .='&urlError='.urlencode($urlError);

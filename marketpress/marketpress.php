@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.6.4
+Version: 2.7
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.6.4';
+  var $version = '2.7';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -3231,7 +3231,7 @@ Thanks again!", 'mp')
 
 		// Keep up to 12MB in memory, if becomes bigger write to temp file
     $file = fopen('php://temp/maxmemory:'. (12*1024*1024), 'r+');
-		fputcsv( $file, array('order_id', 'status', 'received_date', 'paid_date', 'shipped_date', 'tax', 'shipping', 'total', 'coupon_discount', 'coupon_code', 'item_count', 'email', 'name', 'address1', 'address2', 'city', 'state', 'zipcode', 'country', 'phone', 'shipping_method', 'shipping_method_option', 'special_instructions', 'gateway', 'gateway_method', 'payment_currency', 'transaction_id' ) );
+		fputcsv( $file, array('order_id', 'status', 'received_date', 'paid_date', 'shipped_date', 'tax', 'shipping', 'total', 'coupon_discount', 'coupon_code', 'item_count', 'items', 'email', 'name', 'address1', 'address2', 'city', 'state', 'zipcode', 'country', 'phone', 'shipping_method', 'shipping_method_option', 'special_instructions', 'gateway', 'gateway_method', 'payment_currency', 'transaction_id' ) );
 
 		//loop through orders and add rows
 		foreach ($orders as $order) {
@@ -3253,6 +3253,39 @@ Thanks again!", 'mp')
 			$fields['coupon_discount'] = @$order->mp_discount_info['discount'];
 			$fields['coupon_code'] = @$order->mp_discount_info['code'];
 			$fields['item_count'] = $order->mp_order_items;
+			//items
+			if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+				foreach ($order->mp_cart_info as $product_id => $variations) {
+					foreach ($variations as $variation => $data) {
+						if (!empty($fields['items']))
+							$fields['items'] .= "\r\n";
+						if (!empty($data['SKU']))
+							$fields['items'] .= '[' . $data['SKU'] . '] ';
+						$fields['items'] .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' ' . $order->mp_payment_info['currency'];
+						/*
+						$cf_key = $bid .':'. $product_id .':'. $variation;
+						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+							$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+		
+							$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
+							if (isset($mp_custom_field_label[$variation]))
+								$label_text = esc_attr($mp_custom_field_label[$variation]);
+							else
+								$label_text = __('Product Personalization', 'mp');
+		
+							$fields['items'] .= "\r\n\t" . $label_text  .": ";
+							foreach($cf_items as $idx => $cf_item) {
+								$item_cnt = intval($idx)+1;
+								$fields['items'] .= $cf_item;
+							}
+						}
+						*/
+					}
+				}
+			} else {
+				$fields['items'] = 'N/A';
+			}
+
 			$fields['email'] = @$order->mp_shipping_info['email'];
 			$fields['name'] = @$order->mp_shipping_info['name'];
 			$fields['address1'] = @$order->mp_shipping_info['address1'];
@@ -3888,11 +3921,11 @@ Thanks again!", 'mp')
 			if ($order->mp_shipping_info['address2'])
 				$shipping_info .= "\n" . __('Address 2:', 'mp') . ' ' . $order->mp_shipping_info['address2'];
 			$shipping_info .= "\n" . __('City:', 'mp') . ' ' . $order->mp_shipping_info['city'];
-			if ($order->mp_shipping_info['state'])
+			if (!empty($order->mp_shipping_info['state']))
 				$shipping_info .= "\n" . __('State/Province/Region:', 'mp') . ' ' . $order->mp_shipping_info['state'];
 			$shipping_info .= "\n" . __('Postal/Zip Code:', 'mp') . ' ' . $order->mp_shipping_info['zip'];
 			$shipping_info .= "\n" . __('Country:', 'mp') . ' ' . $order->mp_shipping_info['country'];
-			if ($order->mp_shipping_info['phone'])
+			if (!empty($order->mp_shipping_info['phone']))
 				$shipping_info .= "\n" . __('Phone Number:', 'mp') . ' ' . $order->mp_shipping_info['phone'];
 
 			// If actually shipped show method, else customer's shipping choice.
@@ -3901,11 +3934,14 @@ Thanks again!", 'mp')
 			elseif (! empty($order->mp_shipping_info['shipping_option']) )
 				$shipping_info .= "\n" . __('Shipping Method:', 'mp') . ' ' . strtoupper($order->mp_shipping_info['shipping_option']) . ' ' .$order->mp_shipping_info['shipping_sub_option'] ;
 
-			if ($order->mp_shipping_info['tracking_num'])
+			if (!empty($order->mp_shipping_info['tracking_num']))
 				$shipping_info .= "\n" . __('Tracking Number:', 'mp') . ' ' . $order->mp_shipping_info['tracking_num'];
 		}
-
-		if ($order->mp_order_notes)
+		
+		if (!empty($order->mp_shipping_info['special_instructions']))
+			$shipping_info .= "\n" . __('Special Instructions:', 'mp') . ' ' . $order->mp_shipping_info['special_instructions'];
+		
+		if (!empty($order->mp_order_notes))
       $order_notes = __('Order Notes:', 'mp') . "\n" . $order->mp_order_notes;
 
     //// Payment Info
@@ -5914,9 +5950,6 @@ Notification Preferences: %s', 'mp');
 
           echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
         }
-
-        //strip slashes
-        $settings['email'] = array_map('stripslashes', (array)$settings['email']);
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/messages.png'; ?>" /></div>
         <h2><?php _e('Messages Settings', 'mp'); ?></h2>
@@ -5934,7 +5967,7 @@ Notification Preferences: %s', 'mp');
         				<td>
 								<?php $store_email = $this->get_setting('store_email') ? $this->get_setting('store_email') : get_option("admin_email"); ?>
         				<span class="description"><?php _e('The email address that new order notifications are sent to and received from.', 'mp') ?></span><br />
-                <input name="mp[store_email]" value="<?php echo esc_attr($store_email); ?>" maxlength="150" size="50" />
+                <input type="text" name="mp[store_email]" value="<?php echo esc_attr($store_email); ?>" maxlength="150" size="50" />
                 </td>
                 </tr>
                 <tr>
@@ -5942,7 +5975,7 @@ Notification Preferences: %s', 'mp');
         				<td>
         				<span class="description"><?php _e('The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
-                <input class="mp_emails_sub" name="mp[email][new_order_subject]" value="<?php echo esc_attr($this->get_setting('email->new_order_subject')); ?>" maxlength="150" /></label><br />
+                <input type="text" class="mp_emails_sub" name="mp[email][new_order_subject]" value="<?php echo esc_attr($this->get_setting('email->new_order_subject')); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
                 <textarea class="mp_emails_txt" name="mp[email][new_order_txt]"><?php echo esc_textarea($this->get_setting('email->new_order_txt')); ?></textarea>
                 </label>
@@ -5953,7 +5986,7 @@ Notification Preferences: %s', 'mp');
         				<td>
         				<span class="description"><?php _e('The email text sent to your customer when you mark an order as "Shipped". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed.', 'mp') ?></span><br />
                 <label><?php _e('Subject:', 'mp'); ?><br />
-                <input class="mp_emails_sub" name="mp[email][shipped_order_subject]" value="<?php echo esc_attr($this->get_setting('email->shipped_order_subject')); ?>" maxlength="150" /></label><br />
+                <input type="text" class="mp_emails_sub" name="mp[email][shipped_order_subject]" value="<?php echo esc_attr($this->get_setting('email->shipped_order_subject')); ?>" maxlength="150" /></label><br />
                 <label><?php _e('Text:', 'mp'); ?><br />
                 <textarea class="mp_emails_txt" name="mp[email][shipped_order_txt]"><?php echo esc_textarea($this->get_setting('email->shipped_order_txt')); ?></textarea>
                 </label>

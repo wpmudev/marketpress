@@ -2,6 +2,8 @@
 /*
 MarketPress Payflow Pro Gateway Plugin
 Author: Sue Cline (Cyclonic Consulting)
+Modifications: Robert M. Hall - www.impossibilities.com
+Revision-History:  09/04/2012 - Added support for passing along SHIPTO information in the main transaction
 */
 
 class MP_Gateway_Payflow extends MP_Gateway_API {
@@ -43,7 +45,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $settings = get_option('mp_settings');
 
     //set names here to be able to translate
-    $this->admin_name = __('PayPal Payflow Pro (beta)', 'mp');
+    $this->admin_name = __('PayPal Payflow Pro (beta RHALL)', 'mp');
     $this->public_name = __('Credit Card', 'mp');
 
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
@@ -588,19 +590,44 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $payment->setParameter("LASTNAME", $last_name);
     $payment->setParameter("STREET", $address);
     $payment->setParameter("CITY", $billing_info['city']);
-
+		$payment->setParameter("STATE", $billing_info['state']);
     $payment->setParameter("COUNTRY", $billing_info['country']);
     $payment->setParameter("ZIP", $billing_info['zip']);
 
     $payment->setParameter("EMAIL", $billing_info['email']);
-
-
-
+    
+ 	$_ship_names = split(" ", $shipping_info['name']);
+    
+	if (isset($_ship_names[0])) {
+		$first_name_shipping = array_shift($_ship_names);
+	} else {
+		$first_name_shipping = "";
+	}
+	
+	if (isset($_ship_names[0])) {
+		$last_name_shipping = join(" ", $_ship_names);
+	} else {
+		$last_name_shipping = "";
+	}
+	
+	$ship_address = $shipping_info['address1'];
+	
+	if (!empty($shipping_info['address2'])) {
+		$ship_address .= "\n".$shipping_info['address2'];
+	}
+	$payment->setParameter("SHIPTOFIRSTNAME", $first_name_shipping);
+	$payment->setParameter("SHIPTOLASTNAME", $last_name_shipping);
+	$payment->setParameter("SHIPTOCITY", $shipping_info["city"]);
+	$payment->setParameter("SHIPTOSTATE", $shipping_info["state"]);
+	$payment->setParameter("SHIPTOCOUNTRY", $shipping_info["country"]);
+	$payment->setParameter("SHIPTOZIP", $shipping_info["zip"]);
+	$payment->setParameter("SHIPTOSTREET", $ship_address);    
+ 
     $payment->setParameter("CLIENTIP", $_SERVER['REMOTE_ADDR']);
 
     $payment->process();
 
-
+	//file_put_contents("pp.txt",serialize($payment));
     if ($payment->isApproved()) {
 
 
@@ -989,5 +1016,5 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_Payflow', 'payflow', __('PayPal Payflow Pro (beta)', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_Payflow', 'payflow', __('PayPal Payflow Pro (beta RHALL)', 'mp') );
 ?>

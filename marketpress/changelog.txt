@@ -5,6 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.7 - 9/20/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Include shopping cart item details in orders csv exports
+- Add special instructions to admin new order notification
+- Urlencode paypal url fields to support utf8 store slugs
+- iDeal gateway bugfixes
+
 2.6.4 - 9/04/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Important bugfix with saving Extra Shipping costs and Weights

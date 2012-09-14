@@ -66,8 +66,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $this->API_Signature = isset($settings['gateways']['paypal-express']['api_sig']) ? $settings['gateways']['paypal-express']['api_sig'] : '';
     $this->currencyCode = isset($settings['gateways']['paypal-express']['currency']) ? $settings['gateways']['paypal-express']['currency'] : '';
     $this->locale = isset($settings['gateways']['paypal-express']['locale']) ? $settings['gateways']['paypal-express']['locale'] : '';
-    $this->returnURL = mp_checkout_step_url('confirm-checkout');
-  	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
+    $this->returnURL = urlencode(mp_checkout_step_url('confirm-checkout'));
+  	$this->cancelURL = urlencode(mp_checkout_step_url('checkout')) . "?cancel=1";
     $this->version = "69.0"; //api version
 
     //set api urls
