@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.7
+Version: 2.7 Beta 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.7';
+  var $version = '2.7 Beta 1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -3297,7 +3297,7 @@ Thanks again!", 'mp')
 			$fields['phone'] = @$order->mp_shipping_info['phone'];
 			$fields['shipping_method'] = @$order->mp_shipping_info['shipping_option'];
 			$fields['shipping_method_option'] = @$order->mp_shipping_info['shipping_sub_option'];
-			$fields['special_instructions'] = @$order->mp_shipping_info['email'];
+			$fields['special_instructions'] = @$order->mp_shipping_info['special_instructions'];
 			$fields['gateway'] = @$order->mp_payment_info['gateway_private_name'];
 			$fields['gateway_method'] = @$order->mp_payment_info['method'];
 			$fields['payment_currency'] = @$order->mp_payment_info['currency'];
@@ -3351,16 +3351,22 @@ Thanks again!", 'mp')
 
       case 'paid':
         //update paid time, can't be adjusted as we don't want to loose gateway info
-        if (!get_post_meta($order->ID, 'mp_paid_time', true))
+        if (!get_post_meta($order->ID, 'mp_paid_time', true)) {
           update_post_meta($order->ID, 'mp_paid_time', time());
+          do_action( 'mp_order_paid', $order );
+        }
         break;
 
       case 'shipped':
         //update paid time if paid step was skipped
-        if (!get_post_meta($order->ID, 'mp_paid_time', true))
+        if (!get_post_meta($order->ID, 'mp_paid_time', true)) {
           update_post_meta($order->ID, 'mp_paid_time', time());
+          do_action( 'mp_order_paid', $order );
+        }
+
         //update shipped time, can be adjusted
         update_post_meta($order->ID, 'mp_shipped_time', time());
+        do_action( 'mp_order_shipped', $order );
 
         //send email
 				$this->order_shipped_notification($order->ID);
@@ -3368,13 +3374,20 @@ Thanks again!", 'mp')
 
       case 'closed':
         //update paid time if paid step was skipped
-        if (!get_post_meta($order->ID, 'mp_paid_time', true))
+        if (!get_post_meta($order->ID, 'mp_paid_time', true)) {
           update_post_meta($order->ID, 'mp_paid_time', time());
+          do_action( 'mp_order_paid', $order );
+        }
+
         //update shipped time if shipped step was skipped
-        if (!get_post_meta($order->ID, 'mp_shipped_time', true))
+        if (!get_post_meta($order->ID, 'mp_shipped_time', true)) {
           update_post_meta($order->ID, 'mp_shipped_time', time());
+          do_action( 'mp_order_shipped', $order );
+        }
+
         //update closed
         update_post_meta($order->ID, 'mp_closed_time', time());
+        do_action( 'mp_order_closed', $order );
         break;
 
     }
@@ -4142,7 +4155,7 @@ Notification Preferences: %s', 'mp');
   function product_excerpt($excerpt, $content, $product_id) {
     $excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink($product_id) . '">' .  __('More Info &raquo;', 'mp') . '</a>';
     if ($excerpt) {
-      return $excerpt . $excerpt_more;
+      return apply_filters('get_the_excerpt', $excerpt) . $excerpt_more;
     } else {
   		$text = strip_shortcodes( $content );
   		//$text = apply_filters('the_content', $text);
@@ -4233,6 +4246,41 @@ Notification Preferences: %s', 'mp');
 		  $js .= '_gaq.push(["_trackTrans"]);
 			</script>
 			';
+			
+			//add info for subblog if our GA plugin is installed
+			if (class_exists('Google_Analytics_Async')) {
+				
+				$js = '<script type="text/javascript">
+					_gaq.push(["b._addTrans",
+						"'.esc_attr($order->post_title).'",                  // order ID - required
+						"'.esc_attr(get_bloginfo('blogname')).'",            // affiliation or store name
+						"'.$order->mp_order_total.'",                        // total - required
+						"'.$order->mp_tax_total.'",                          // tax
+						"'.$order->mp_shipping_total.'",                     // shipping
+						"'.esc_attr($order->mp_shipping_info['city']).'",    // city
+						"'.esc_attr($order->mp_shipping_info['state']).'",   // state or province
+						"'.esc_attr($order->mp_shipping_info['country']).'"  // country
+					]);';
+
+				if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+					foreach ($order->mp_cart_info as $product_id => $variations) {
+						foreach ($variations as $variation => $data) {
+							$sku = !empty($data['SKU']) ? esc_attr($data['SKU']) : $product_id;
+							$js .= '_gaq.push(["b._addItem",
+								"'.esc_attr($order->post_title).'", // order ID - necessary to associate item with transaction
+								"'.$sku.'",                         // SKU/code - required
+								"'.esc_attr($data['name']).'",      // product name
+								"",                                 // category
+								"'.$data['price'].'",               // unit price - required
+								"'.$data['quantity'].'"             // quantity - required
+							]);';
+						}
+					}
+				}
+				$js .= '_gaq.push(["b._trackTrans"]);
+				</script>
+				';
+			}
 
 		}
 

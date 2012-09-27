@@ -819,7 +819,9 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
       $content .= '</div>';
     }
   } else {
-    $content .= do_shortcode($mp->get_setting('msg->cart'));
+    if ($context != 'widget')
+      $content .= do_shortcode($mp->get_setting('msg->cart'));
+      
     $content .= '<div class="mp_cart_empty">'.__('There are no items in your cart.', 'mp').'</div>';
     $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="'.mp_products_link(false, true).'">'.__('Browse Products &raquo;', 'mp').'</a></div>';
   }

@@ -1045,12 +1045,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 
 	//Purpose: 	Prepares the parameters for the DoExpressCheckoutPayment API Call.
-	function DoExpressCheckoutPayment($token, $payer_id, $final_amts, $seller_paypal_accounts, $ipns, $prs) {
+	function DoExpressCheckoutPayment($token, $payer_id) {
 		
 		$nvpstr  = '&TOKEN=' . urlencode($token);
 	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
 		$nvpstr .= $_SESSION['nvpstr'];
-		var_dump($nvpstr);
+
 	  /* Make the call to PayPal to finalize payment
 	    */
 	  return $this->api_call("DoExpressCheckoutPayment", $nvpstr);
