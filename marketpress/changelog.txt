@@ -11,6 +11,7 @@ Change Log:
 - fix special instructions in CSV order exports
 - Add special instructions to admin new order notification
 - Support ecommerce tracking with our Google Analytics plugin on multisite
+- Don't require shipping fields when Shipping Modules are turned off
 - Urlencode paypal url fields to support utf8 store slugs
 - Fix an error and debug code in PayPal Express gateway
 - Fix custom message showing in cart widget when empty: http://premium.wpmudev.org/forums/topic/shopping-cart-page-message-repeating-in-shopping-cart-widget

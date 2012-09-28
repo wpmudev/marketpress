@@ -2678,7 +2678,7 @@ Thanks again!", 'mp')
     		$this->cart_checkout_error( __('Please enter a valid Email Address.', 'mp'), 'email');
 
 			//only require these fields if not a download only cart
-			if (!$this->download_only_cart($this->get_cart_contents())) {
+			if (!$this->download_only_cart($this->get_cart_contents()) && $this->get_setting('shipping->method') != 'none') {
 
 				if (empty($_POST['name']))
 					$this->cart_checkout_error( __('Please enter your Full Name.', 'mp'), 'name');
@@ -3926,7 +3926,7 @@ Thanks again!", 'mp')
 
     //// Shipping Info
 
-		if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info)) { //if the cart is only digital products
+		if ((is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info)) || $this->get_setting('shipping->method') == 'none') { //if the cart is only digital products
 			$shipping_info = __('No shipping required for this order.', 'mp');
 		} else {
 			$shipping_info = __('Full Name:', 'mp') . ' ' . $order->mp_shipping_info['name'];

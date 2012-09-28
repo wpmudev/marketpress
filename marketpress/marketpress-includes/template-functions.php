@@ -529,7 +529,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     $content .= '<input size="35" name="email" type="text" value="'.esc_attr($email).'" /></td>';
     $content .= '</tr>';
     
-    if (!$mp->download_only_cart($mp->get_cart_contents())) {
+    if (!$mp->download_only_cart($mp->get_cart_contents()) && $mp->get_setting('shipping->method') != 'none') {
       $content .= '<tr>';
       $content .= '<td align="right">'. __('Full Name:', 'mp').'*</td><td>';
       $content .= apply_filters( 'mp_checkout_error_name', '' );
