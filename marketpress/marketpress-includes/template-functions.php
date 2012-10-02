@@ -295,6 +295,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
     $totals = array();
     $shipping_prices = array();
+    $shipping_tax_prices = array();
     $tax_prices = array();
     foreach ($selected_cart as $bid => $cart) {
 
@@ -309,23 +310,23 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
           $content .=  '  <td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id, 75 ) . '</td>';
           $content .=  '  <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
 
-			// FPM: Output product custom field information
-			$cf_key = $bid .':'. $product_id .':'. $variation;
-			if (isset($_SESSION['mp_shipping_info']['mp_custom_fields'][$cf_key])) {
-				$cf_item = $_SESSION['mp_shipping_info']['mp_custom_fields'][$cf_key];
-
-				$mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
-				if (isset($mp_custom_field_label[$variation]))
-					$label_text = $mp_custom_field_label[$variation];
-				else
-					$label_text = __('Product Extra Fields:', 'mp');
-				
-				$content .=  '<div class="mp_cart_custom_fields">'. $label_text .'<br /><ol>';
-				foreach($cf_item as $item) {
-					$content .=  '<li>'. $item .'</li>';
-				}
-				$content .=  '</ol></div>';
-			}
+          // FPM: Output product custom field information
+          $cf_key = $bid .':'. $product_id .':'. $variation;
+          if (isset($_SESSION['mp_shipping_info']['mp_custom_fields'][$cf_key])) {
+            $cf_item = $_SESSION['mp_shipping_info']['mp_custom_fields'][$cf_key];
+    
+            $mp_custom_field_label 		= get_post_meta($product_id, 'mp_custom_field_label', true);
+            if (isset($mp_custom_field_label[$variation]))
+              $label_text = $mp_custom_field_label[$variation];
+            else
+              $label_text = __('Product Extra Fields:', 'mp');
+            
+            $content .=  '<div class="mp_cart_custom_fields">'. $label_text .'<br /><ol>';
+            foreach($cf_item as $item) {
+              $content .=  '<li>'. $item .'</li>';
+            }
+            $content .=  '</ol></div>';
+          }
           $content .=  '</td>'; // Added WPML
 
           $content .=  '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
@@ -336,6 +337,9 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
       if ( ($shipping_price = $mp->shipping_price()) !== false )
         $shipping_prices[] = $shipping_price;
+      
+      if ( ($shipping_tax_price = $mp->shipping_tax_price($shipping_price)) !== false )
+        $shipping_tax_prices[] = $shipping_tax_price; 
 
       if ( ($tax_price = $mp->tax_price()) !== false )
         $tax_prices[] = $tax_price;
@@ -362,13 +366,14 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
     //shipping line
     if ( $shipping_price = array_sum($shipping_prices) ) {
+      $shipping_tax_price = array_sum($shipping_tax_prices);
       if (!$mp->global_cart && apply_filters( 'mp_shipping_method_lbl', '' ))
         $shipping_method = ' (' . apply_filters( 'mp_shipping_method_lbl', '' ) . ')';
       else
         $shipping_method = '';
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
-      $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
+      $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_tax_price) . '</td>';
       $content .=  '</tr>';
       $total = $total + $shipping_price;
     }

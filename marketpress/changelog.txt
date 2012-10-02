@@ -12,11 +12,13 @@ Change Log:
 - Add special instructions to admin new order notification
 - Support ecommerce tracking with our Google Analytics plugin on multisite
 - Don't require shipping fields when Shipping Modules are turned off
+- Display shipping inclusive of tax if tax inclusive pricing is on
 - Urlencode paypal url fields to support utf8 store slugs
 - Fix an error and debug code in PayPal Express gateway
 - Fix custom message showing in cart widget when empty: http://premium.wpmudev.org/forums/topic/shopping-cart-page-message-repeating-in-shopping-cart-widget
 - Fix hooks for Affiliate plugin integration with Manual Payments gateway. Props @Rystraum!
 - iDeal gateway bugfixes
+- Fix rounding problems with tax prices when tax inclusive pricing is on
 
 2.6.4 - 9/04/2012 - Aaron Edwards
 ----------------------------------------------------------------------

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.7 Beta 1
+Version: 2.7 Beta 2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.7 Beta 1';
+  var $version = '2.7 Beta 2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -2203,7 +2203,82 @@ Thanks again!", 'mp')
     else
       return $price;
   }
+	
+	//returns the calculated price for shipping after tax. For display only.
+  function shipping_tax_price($shipping_price) {
+		
+		if ( !$this->get_setting('tax->tax_shipping') || !$this->get_setting('tax->tax_inclusive')  )
+			return $shipping_price;
+		
+    //get address
+    $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
 
+    if (!isset($meta['state'])) {
+      $meta['state'] = '';
+    }
+    if (!isset($meta['country'])) {
+      $meta['country'] = '';
+    }
+
+    $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
+    $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
+
+		//if we've skipped the shipping page and no address is set, use base for tax calculation
+		if ($this->download_only_cart($cart) || $this->get_setting('tax->tax_inclusive') || $this->get_setting('shipping->method') == 'none') {
+			if (empty($country))
+				$country = $this->get_setting('base_country');
+			if (empty($state))
+				$state = $this->get_setting('base_province');
+		}
+
+    //check required fields
+    if ( empty($country) || $shipping_price <= 0 ) {
+      return false;
+    }
+
+    switch ($this->get_setting('base_country')) {
+			case 'US':
+			  //USA taxes are only for orders delivered inside the state
+			  if ($country == 'US' && $state == $this->get_setting('base_province'))
+			    $price = round(($shipping_price * $this->get_setting('tax->rate')), 2);
+			  break;
+
+			case 'CA':
+			  //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
+				if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
+					if (!is_null($this->get_setting("tax->canada_rate->$state")))
+						$price = round(($shipping_price * $this->get_setting("tax->canada_rate->$state")), 2);
+					else //backwards compat with pre 2.2 if per province rates are not set
+						$price = round(($shipping_price * $this->get_setting('tax->rate')), 2);
+				}
+			  break;
+
+			case 'AU':
+			  //Australia taxes orders in country
+			  if ($country == 'AU')
+			    $price = round(($shipping_price * $this->get_setting('tax->rate')), 2);
+			  break;
+
+			default:
+			  //EU countries charge VAT within the EU
+			  if ( in_array($this->get_setting('base_country'), $this->eu_countries) ) {
+			    if (in_array($country, $this->eu_countries))
+			      $price = round(($shipping_price * $this->get_setting('tax->rate')), 2);
+			  } else {
+			    //all other countries use the tax outside preference
+			    if ($this->get_setting('tax->tax_outside') || (!$this->get_setting('tax->tax_outside') && $country == $this->get_setting('base_country')))
+			      $price = round(($shipping_price * $this->get_setting('tax->rate')), 2);
+			  }
+			  break;
+    }
+    if (empty($price))
+			$price = 0;
+
+    $price = apply_filters( 'mp_shipping_tax_price', $price, $shipping_price, $country, $state );
+
+    return $price;
+  }
+	
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $cart = false) {
 
@@ -2225,7 +2300,7 @@ Thanks again!", 'mp')
     $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
 
 		//if we've skipped the shipping page and no address is set, use base for tax calculation
-		if ($this->download_only_cart($cart) || $this->get_setting('tax->tax_inclusive')) {
+		if ($this->download_only_cart($cart) || $this->get_setting('tax->tax_inclusive') || $this->get_setting('shipping->method') == 'none') {
 			if (empty($country))
 				$country = $this->get_setting('base_country');
 			if (empty($state))
@@ -2326,7 +2401,7 @@ Thanks again!", 'mp')
 			$rate =  ('CA' == $this->get_setting('tax->base_country')) ? $this->get_setting('tax->canada_rate'.$this->get_setting('base_province')) : $this->get_setting('tax->rate');
 		}
 
-		return round($tax_price / ($rate + 1), 2);
+		return $tax_price / ($rate + 1);
 	}
 
   //returns contents of shopping cart cookie
