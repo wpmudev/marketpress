@@ -161,8 +161,7 @@ if(!class_exists('MP_Gateway_API')) {
 		function _payment_form_wrapper($content, $cart, $shipping_info) {
       global $mp, $mp_gateway_active_plugins;
       
-      if (count((array)$mp_gateway_active_plugins) > 1 && $_SESSION['mp_payment_method'] != $this->plugin_name)
-        $hidden = ' style="display:none;"';
+      $hidden = (count((array)$mp_gateway_active_plugins) > 1 && $_SESSION['mp_payment_method'] != $this->plugin_name) ? ' style="display:none;"' : '';
         
       $content .= '<div class="mp_gateway_form" id="' . $this->plugin_name . '"' . $hidden . '>';
       $content .= $this->payment_form($cart, $shipping_info);

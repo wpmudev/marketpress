@@ -243,23 +243,23 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
   }
 
   /**
-* Use this function to return your calculated price as an integer or float
-*
-* @param int $price, always 0. Modify this and return
-* @param float $total, cart total after any coupons and before tax
-* @param array $cart, the contents of the shopping cart for advanced calculations
-* @param string $address1
-* @param string $address2
-* @param string $city
-* @param string $state, state/province/region
-* @param string $zip, postal code
-* @param string $country, ISO 3166-1 alpha-2 country code
-* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
-*
-* return float $price
-*/
-function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-			global $mp;
+	* Use this function to return your calculated price as an integer or float
+	*
+	* @param int $price, always 0. Modify this and return
+	* @param float $total, cart total after any coupons and before tax
+	* @param array $cart, the contents of the shopping cart for advanced calculations
+	* @param string $address1
+	* @param string $address2
+	* @param string $city
+	* @param string $state, state/province/region
+	* @param string $zip, postal code
+	* @param string $country, ISO 3166-1 alpha-2 country code
+	* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
+	*
+	* return float $price
+	*/
+	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
+		global $mp;
     $settings = get_option('mp_settings');
 
     //calculate extra shipping

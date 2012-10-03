@@ -912,16 +912,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       if (is_multisite()) {
 				switch_to_blog($bid);
       }
-      $blog_settings = get_option('mp_settings');
-			
+
+			$merchant_email = $mp->get_setting('gateways->paypal-express->merchant_email');
 			//if a seller hasn't configured paypal skip
-			if ( $mp->global_cart && empty($blog_settings['gateways']['paypal-express']['merchant_email']) )
+			if ( $mp->global_cart && empty($merchant_email) )
 				continue;
 			
       $totals = array();
 			
       $request .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
-      $request .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $blog_settings['gateways']['paypal-express']['merchant_email'];
+      $request .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $merchant_email;
       $request .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
       $request .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
       $request .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
@@ -1152,7 +1152,6 @@ if ( is_multisite() ) {
 
 function pe_network_gateway_settings_box($settings) {
   global $mp;
-  $blog_settings = get_option('mp_settings');
   ?>
   <script type="text/javascript">
 	  jQuery(document).ready(function($) {
@@ -1224,7 +1223,7 @@ function pe_network_gateway_settings_box($settings) {
 				<td>
           <select name="mp[gateways][paypal-express][locale]">
           <?php
-          $sel_locale = ($settings['gateways']['paypal-express']['locale']) ? $settings['gateways']['paypal-express']['locale'] : $blog_settings['base_country'];
+          $sel_locale = ($settings['gateways']['paypal-express']['locale']) ? $settings['gateways']['paypal-express']['locale'] : $mp->get_setting('base_country', 'US');
           $locales = array(
             'AU'	=> 'Australia',
             'AT'	=> 'Austria',
@@ -1258,7 +1257,7 @@ function pe_network_gateway_settings_box($settings) {
         <td>
           <select name="mp[gateways][paypal-express][currency]">
           <?php
-          $sel_currency = ($settings['gateways']['paypal-express']['currency']) ? $settings['gateways']['paypal-express']['currency'] : $blog_settings['currency'];
+          $sel_currency = ($settings['gateways']['paypal-express']['currency']) ? $settings['gateways']['paypal-express']['currency'] : $mp->get_setting('currency');
 	        $currencies = array(
               'AUD' => 'AUD - Australian Dollar',
               'BRL' => 'BRL - Brazilian Real',
@@ -1306,13 +1305,13 @@ function pe_network_gateway_settings_box($settings) {
 				<td>
   				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_ECAPICredentials">Instructions &raquo;</a>', 'mp') ?></span>
           <p><label><?php _e('API Username', 'mp') ?><br />
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_user']) ? $settings['gateways']['paypal-express']['api_user'] : $blog_settings['gateways']['paypal-express']['api_user']); ?>" size="30" name="mp[gateways][paypal-express][api_user]" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_user']) ? $settings['gateways']['paypal-express']['api_user'] : $mp->get_setting('gateways->paypal-express->api_user')); ?>" size="30" name="mp[gateways][paypal-express][api_user]" type="text" />
           </label></p>
           <p><label><?php _e('API Password', 'mp') ?><br />
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_pass']) ? $settings['gateways']['paypal-express']['api_pass'] : $blog_settings['gateways']['paypal-express']['api_pass']); ?>" size="20" name="mp[gateways][paypal-express][api_pass]" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_pass']) ? $settings['gateways']['paypal-express']['api_pass'] : $mp->get_setting('gateways->paypal-express->api_pass')); ?>" size="20" name="mp[gateways][paypal-express][api_pass]" type="text" />
           </label></p>
           <p><label><?php _e('Signature', 'mp') ?><br />
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_sig']) ? $settings['gateways']['paypal-express']['api_sig'] : $blog_settings['gateways']['paypal-express']['api_sig']); ?>" size="70" name="mp[gateways][paypal-express][api_sig]" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_sig']) ? $settings['gateways']['paypal-express']['api_sig'] : $mp->get_setting('gateways->paypal-express->api_sig')); ?>" size="70" name="mp[gateways][paypal-express][api_sig]" type="text" />
           </label></p>
         </td>
         </tr>
@@ -1321,7 +1320,7 @@ function pe_network_gateway_settings_box($settings) {
 				<td>
   				<span class="description"><?php _e('URL for an image you want to appear at the top left of the payment page. The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal recommends that you provide an image that is stored on a secure (https) server. If you do not specify an image, the business name is displayed.', 'mp') ?></span>
           <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_img']) ? $settings['gateways']['paypal-express']['header_img'] : $blog_settings['gateways']['paypal-express']['header_img']); ?>" size="80" name="mp[gateways][paypal-express][header_img]" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_img']) ? $settings['gateways']['paypal-express']['header_img'] : $mp->get_setting('gateways->paypal-express->header_img')); ?>" size="80" name="mp[gateways][paypal-express][header_img]" type="text" />
           </p>
         </td>
         </tr>
@@ -1330,7 +1329,7 @@ function pe_network_gateway_settings_box($settings) {
 				<td>
   				<span class="description"><?php _e('Sets the border color around the header of the payment page. The border is a 2-pixel perimeter around the header space, which is 750 pixels wide by 90 pixels high. By default, the color is black.', 'mp') ?></span>
           <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_border']) ? $settings['gateways']['paypal-express']['header_border'] : $blog_settings['gateways']['paypal-express']['header_border']); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][header_border]" id="mp-hdr-bdr" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_border']) ? $settings['gateways']['paypal-express']['header_border'] : $mp->get_setting('gateways->paypal-express->header_border')); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][header_border]" id="mp-hdr-bdr" type="text" />
           </p>
         </td>
         </tr>
@@ -1339,7 +1338,7 @@ function pe_network_gateway_settings_box($settings) {
 				<td>
   				<span class="description"><?php _e('Sets the background color for the header of the payment page. By default, the color is white.', 'mp') ?></span>
           <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_back']) ? $settings['gateways']['paypal-express']['header_back'] : $blog_settings['gateways']['paypal-express']['header_back']); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][header_back]" id="mp-hdr-bck" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_back']) ? $settings['gateways']['paypal-express']['header_back'] : $mp->get_setting('gateways->paypal-express->header_back')); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][header_back]" id="mp-hdr-bck" type="text" />
           </p>
         </td>
         </tr>
@@ -1348,7 +1347,7 @@ function pe_network_gateway_settings_box($settings) {
 				<td>
   				<span class="description"><?php _e('Sets the background color for the payment page. By default, the color is white.', 'mp') ?></span>
           <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['page_back']) ? $settings['gateways']['paypal-express']['page_back'] : $blog_settings['gateways']['paypal-express']['page_back']); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][page_back]" id="mp-pg-bck" type="text" />
+          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['page_back']) ? $settings['gateways']['paypal-express']['page_back'] : $mp->get_setting('gateways->paypal-express->page_back')); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][page_back]" id="mp-pg-bck" type="text" />
           </p>
         </td>
         </tr>

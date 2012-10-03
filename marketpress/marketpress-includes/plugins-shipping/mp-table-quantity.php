@@ -169,9 +169,9 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
 			}
     }
 
-		for ($i = $settings['shipping']['table-quantity']['rowcount'] - 1; $i >= 0; $i--) {
-			if ($total_order_quantity >= $settings['shipping']['table-quantity'][$i]['minqty']) {
-				$price = $settings['shipping']['table-quantity'][$i]['shipping'];
+		for ($i = $mp->get_setting('shipping->table-quantity->rowcount') - 1; $i >= 0; $i--) {
+			if ($total_order_quantity >= $mp->get_setting("shipping->table-quantity->$i->minqty")) {
+				$price = $mp->get_setting("shipping->table-quantity->$i->shipping");
 				break;
 			}
 		}

@@ -196,6 +196,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
     $totals = array();
     $shipping_prices = array();
+    $shipping_tax_prices = array();
     $tax_prices = array();
     foreach ($selected_cart as $bid => $cart) {
 
@@ -218,6 +219,9 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
       if ( ($shipping_price = $mp->shipping_price()) !== false )
         $shipping_prices[] = $shipping_price;
 
+      if ( ($shipping_tax_price = $mp->shipping_tax_price($shipping_price)) !== false )
+        $shipping_tax_prices[] = $shipping_tax_price;
+        
       if ( ($tax_price = $mp->tax_price()) !== false )
         $tax_prices[] = $tax_price;
     }
@@ -256,13 +260,14 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
     //shipping line
     if ( $shipping_price = array_sum($shipping_prices) ) {
+      $shipping_tax_price = array_sum($shipping_tax_prices);
       if (!$mp->global_cart && apply_filters( 'mp_shipping_method_lbl', '' ))
         $shipping_method = apply_filters( 'mp_shipping_method_lbl', '' );
       else
         $shipping_method = '';
       $content .=  '<tr>';
       $content .=  '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
-      $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_price) . '</td>';
+      $content .=  '  <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_tax_price) . '</td>';
       $content .=  '  <td>' . $shipping_method . '</td>';
       $content .=  '</tr>';
       $total = $total + $shipping_price;
@@ -525,7 +530,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 
     $content .= '<table class="mp_cart_shipping">';
     $content .= '<thead><tr>';
-    $content .= '<th colspan="2">'.($mp->download_only_cart($mp->get_cart_contents()) ? __('Enter Your Checkout Information:', 'mp') : __('Enter Your Shipping Information:', 'mp')).'</th>';
+    $content .= '<th colspan="2">'.($mp->download_only_cart($mp->get_cart_contents() && !$mp->global_cart) ? __('Enter Your Checkout Information:', 'mp') : __('Enter Your Shipping Information:', 'mp')).'</th>';
     $content .= '</tr></thead>';
     $content .= '<tbody>';
     $content .= '<tr>';
@@ -534,7 +539,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     $content .= '<input size="35" name="email" type="text" value="'.esc_attr($email).'" /></td>';
     $content .= '</tr>';
     
-    if (!$mp->download_only_cart($mp->get_cart_contents()) && $mp->get_setting('shipping->method') != 'none') {
+    if ((!$mp->download_only_cart($mp->get_cart_contents()) || $mp->global_cart) && $mp->get_setting('shipping->method') != 'none') {
       $content .= '<tr>';
       $content .= '<td align="right">'. __('Full Name:', 'mp').'*</td><td>';
       $content .= apply_filters( 'mp_checkout_error_name', '' );

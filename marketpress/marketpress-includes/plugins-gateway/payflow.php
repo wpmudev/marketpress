@@ -45,7 +45,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $settings = get_option('mp_settings');
 
     //set names here to be able to translate
-    $this->admin_name = __('PayPal Payflow Pro (beta RHALL)', 'mp');
+    $this->admin_name = __('PayPal Payflow Pro', 'mp');
     $this->public_name = __('Credit Card', 'mp');
 
     $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
@@ -849,7 +849,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
         $post_string = '';
 
         foreach ($this->params as $key => $value) {
-          $post_string .= $key . '[' . strlen(urlencode(utf8_encode(trim($value)))) . ']=' . urlencode(utf8_encode(trim($value))) . '&';
+          $post_string .= $key . '[' . strlen(utf8_encode(trim($value))) . ']=' . utf8_encode(trim($value)) . '&';
         }
 
         $post_string = substr($post_string, 0, -1);
@@ -1016,5 +1016,5 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_Payflow', 'payflow', __('PayPal Payflow Pro (beta RHALL)', 'mp') );
+mp_register_gateway_plugin( 'MP_Gateway_Payflow', 'payflow', __('PayPal Payflow Pro', 'mp') );
 ?>

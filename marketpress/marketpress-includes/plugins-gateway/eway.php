@@ -476,4 +476,4 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 
 //register gateway only if SimpleXML module installed
 if (class_exists("SimpleXMLElement"))
-	mp_register_gateway_plugin( 'MP_Gateway_eWay_Shared', 'eway', __('eWay Shared Payments', 'mp'), true );
+	mp_register_gateway_plugin( 'MP_Gateway_eWay_Shared', 'eway', __('eWay Shared Payments', 'mp') );

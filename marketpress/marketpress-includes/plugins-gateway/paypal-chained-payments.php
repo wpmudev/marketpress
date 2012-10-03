@@ -40,7 +40,6 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
    */
   function on_creation() {
     global $mp;
-    $settings = get_option('mp_settings');
     $network_settings = get_site_option( 'mp_network_settings' );
     
     //set names here to be able to translate
@@ -56,13 +55,13 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
     $this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
     
     //set paypal vars
-  	$this->currencyCode = $settings['gateways']['paypal-chained']['currency'];
-  	$this->locale = $settings['gateways']['paypal-chained']['locale'];
+  	$this->currencyCode = $mp->get_setting('gateways->paypal-chained->currency');
+  	$this->locale = $mp->get_setting('gateways->paypal-chained->locale');
     $this->returnURL = mp_checkout_step_url('confirmation');
 	  $this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
 
     //set api urls
-  	if ($settings['gateways']['paypal-chained']['mode'] == 'sandbox')	{
+  	if ($mp->get_setting('gateways->paypal-chained->mode') == 'sandbox')	{
   		$this->API_Endpoint = "https://svcs.sandbox.paypal.com/AdaptivePayments/";
   		$this->paypalURL = "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey=";
   		$this->API_Username = $network_settings['gateways']['paypal-chained']['api_user_sandbox'];
@@ -750,7 +749,8 @@ if ( is_multisite() ) {
   	</script>
 		<?php
 		//skip if not enabled
-    if ($settings['allowed_gateways']['paypal-chained'] != 'full' && $settings['allowed_gateways']['paypal-chained'] != 'supporter' && $settings['global_gateway'] != 'paypal-chained')
+		$hide = false;
+    if (($settings['allowed_gateways']['paypal-chained'] != 'full' && $settings['allowed_gateways']['paypal-chained'] != 'supporter' && $settings['global_gateway'] != 'paypal-chained') || $mp->global_cart)
       $hide = true;
 
     if (!isset($settings['gateways']['paypal-chained']['msg']))

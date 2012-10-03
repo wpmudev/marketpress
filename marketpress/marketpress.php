@@ -1659,7 +1659,7 @@ Thanks again!", 'mp')
       case "pricing":
         if (isset($meta["mp_price"]) && is_array($meta["mp_price"])) {
 	        foreach ($meta["mp_price"] as $key => $value) {
-						if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
+						if (isset($meta["mp_is_sale"]) && $meta["mp_is_sale"] && isset($meta["mp_sale_price"][$key])) {
 		          echo '<del>'.$this->format_currency('', $value).'</del> ';
 		          echo $this->format_currency('', $meta["mp_sale_price"][$key]) . '<br />';
 		        } else {
@@ -2206,8 +2206,8 @@ Thanks again!", 'mp')
 	
 	//returns the calculated price for shipping after tax. For display only.
   function shipping_tax_price($shipping_price) {
-		
-		if ( !$this->get_setting('tax->tax_shipping') || !$this->get_setting('tax->tax_inclusive')  )
+
+		if ( !$this->get_setting('tax->tax_shipping') || !$this->get_setting('tax->tax_inclusive') )
 			return $shipping_price;
 		
     //get address
@@ -2224,7 +2224,7 @@ Thanks again!", 'mp')
     $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
 
 		//if we've skipped the shipping page and no address is set, use base for tax calculation
-		if ($this->download_only_cart($cart) || $this->get_setting('tax->tax_inclusive') || $this->get_setting('shipping->method') == 'none') {
+		if ($this->get_setting('tax->tax_inclusive') || $this->get_setting('shipping->method') == 'none') {
 			if (empty($country))
 				$country = $this->get_setting('base_country');
 			if (empty($state))
@@ -2273,9 +2273,11 @@ Thanks again!", 'mp')
     }
     if (empty($price))
 			$price = 0;
-
+		
     $price = apply_filters( 'mp_shipping_tax_price', $price, $shipping_price, $country, $state );
-
+		
+		$price += $shipping_price;
+		
     return $price;
   }
 	
@@ -2401,7 +2403,7 @@ Thanks again!", 'mp')
 			$rate =  ('CA' == $this->get_setting('tax->base_country')) ? $this->get_setting('tax->canada_rate'.$this->get_setting('base_province')) : $this->get_setting('tax->rate');
 		}
 
-		return $tax_price / ($rate + 1);
+		return round($tax_price / ($rate + 1), 2);
 	}
 
   //returns contents of shopping cart cookie
@@ -3479,10 +3481,6 @@ Thanks again!", 'mp')
 
 	//checks if a given cart is only downloadable products
 	function download_only_cart($cart) {
-		//always show shipping fields with global cart. TODO - make aware of global carts
-		if ($this->global_cart)
-			return false;
-
 		foreach ((array)$cart as $product_id => $variations) {
 			foreach ((array)$variations as $variation => $data) {
 				if (!is_array($data['download']))

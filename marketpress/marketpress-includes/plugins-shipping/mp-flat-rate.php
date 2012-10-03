@@ -245,8 +245,8 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 
       default:
         //in european union
-        if ( in_array($settings['base_country'], $mp->eu_countries) ) {
-          if ($country == $settings['base_country']) {
+        if ( in_array($mp->get_setting('base_country'), $mp->eu_countries) ) {
+          if ($country == $mp->get_setting('base_country')) {
             $price = $mp->get_setting('shipping->flat-rate->in_country');
           } else if (in_array($country, $mp->eu_countries)) {
             $price = $mp->get_setting('shipping->flat-rate->eu');
@@ -254,7 +254,7 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
             $price = $mp->get_setting('shipping->flat-rate->international');
           }
         } else { //all other countries
-          if ($country == $settings['base_country']) {
+          if ($country == $mp->get_setting('base_country')) {
             $price = $mp->get_setting('shipping->flat-rate->in_country');
           } else {
             $price = $mp->get_setting('shipping->flat-rate->international');
