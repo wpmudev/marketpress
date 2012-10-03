@@ -42,12 +42,12 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$this->admin_name = __('iDEAL (beta)', 'mp');
 		$this->public_name = __('iDEAL', 'mp');
 
-    $this->method_img_url = $mp->plugin_url . 'images/ideal.png';
+    	$this->method_img_url = $mp->plugin_url . 'images/ideal.png';
 		$this->method_button_img_url = $mp->plugin_url . 'images/ideal.png';
 		$this->merchant_id = $mp->get_setting('gateways->ideal->merchant_id');
 		$this->ideal_hash = $mp->get_setting('gateways->ideal->ideal_hash');
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');
-  	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
+  		$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
 		$this->errorURL = mp_checkout_step_url('checkout') . "?err=1";
 	}
 
@@ -101,7 +101,21 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$total = array_sum($totals);
 	
 		if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-			$total = $coupon['new_total'];
+
+			//	bereken de korting
+			$discount = ($total-$coupon['new_total']) * 100;
+						
+			//Add shipping as separate product
+			$items[] = array(
+				'itemNumber'.$i => '99999997', // Product number
+				'itemDescription'.$i => __('Coupon', 'mp'), // Description
+				'itemQuantity'.$i => 1, // Quantity
+				'itemPrice'.$i => -$discount // Product price in cents
+			);
+			$i++;
+			
+			//	update het totaal
+			$total = $coupon['new_total'];			
 		}
 		
 		//shipping line
@@ -127,17 +141,17 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 				'itemQuantity'.$i => 1, // Quantity
 				'itemPrice'.$i => round($tax_price*100)  // Product price in cents
 			);
-		}
+					}
 		
 		$total = round($total * 100);
 		$shastring = "$key$merchantID$subID$total$purchaseID$paymentType$validUntil";
-		/*
+		
 		$i = 1;
 		foreach ($items as $item){
 			$shastring .= $item['itemNumber'.$i].$item['itemDescription'.$i].$item['itemQuantity'.$i].$item['itemPrice'.$i];	
 			$i++;
 		}
-		*/
+		
 		// Remove HTML Entities
 		$shastring = html_entity_decode($shastring);
 
@@ -178,13 +192,13 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$redirectURL .='&hash='.$shasign;
 		$redirectURL .='&paymentType='.$paymentType;
 		$redirectURL .='&validUntil='.$validUntil;
-		/*
+		
 		$i = 1;
 		foreach ($items as $item) {
 			$redirectURL .= '&itemNumber'.$i.'='.$item['itemNumber'.$i].'&itemDescription'.$i.'='.$item['itemDescription'.$i].'&itemQuantity'.$i.'='.$item['itemQuantity'.$i].'&itemPrice'.$i.'='.$item['itemPrice'.$i];	
 			$i++;
 		}
-		*/
+	
 		$redirectURL .='&urlSuccess='.urlencode($urlSuccess);
 		$redirectURL .='&urlCancel='.urlencode($urlCancel);
 		$redirectURL .='&urlError='.urlencode($urlError);
