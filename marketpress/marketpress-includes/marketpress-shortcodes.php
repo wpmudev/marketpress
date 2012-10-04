@@ -159,10 +159,11 @@ class MarketPress_Shortcodes {
   		'order_by' => '',
   		'order' => '',
   		'category' => '',
-  		'tag' => ''
+  		'tag' => '',
+      'list_view'=> false
   	), $atts));
 
-    return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag);
+    return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
   }
 	
 	/*

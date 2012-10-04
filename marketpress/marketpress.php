@@ -1213,6 +1213,7 @@ Thanks again!", 'mp')
 
   //loads the selected theme css files
   function load_store_theme() {
+    wp_enqueue_style( 'mp-public-core', $this->plugin_url . 'css/public-core.css', false, $this->version);
     if ( $this->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') ) {
       return;
 		} else if (file_exists($this->plugin_dir . 'themes/' . $this->get_setting('store_theme') . '.css')) {
@@ -5935,7 +5936,6 @@ Notification Preferences: %s', 'mp');
             <h3 class='hndle'><span><?php _e('Product List Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
-                <?php /* ?>
                 <tr>
         				<th scope="row"><?php _e('Product List View', 'mp') ?></th>
         				<td>
@@ -5943,7 +5943,6 @@ Notification Preferences: %s', 'mp');
                   <label><input value="grid" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view'), 'grid') ?> /> <?php _e('Grid View', 'mp') ?></label>
         				</td>
                 </tr>
-                <?php */ ?>
                 <tr>
         				<th scope="row"><?php _e('Checkout Button Type', 'mp') ?></th>
         				<td>

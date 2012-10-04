@@ -1245,7 +1245,7 @@ function mp_province_field($country = 'US', $selected = null) {
  * @param string $category Optional, limit to a product category
  * @param string $tag Optional, limit to a product tag
  */
-function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '' ) {
+function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '', $list_view = false ) {
   global $wp_query, $mp;
 
   //setup taxonomy if applicable
@@ -1321,40 +1321,19 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   if ($wp_query->max_num_pages == 0 || $taxonomy_query)
     $wp_query->max_num_pages = $custom_query->max_num_pages;
 
-  $content = '<div id="mp_product_list">';
+  // get layout type for products
+  $setting = $mp->get_setting('list_view');
+  $layout_type = get_product_layout_type(array($list_view, $setting));
 
-  if ($last = $custom_query->post_count) {
-    $count = 1;
-    foreach ($custom_query->posts as $post) {
+  $content = '<div id="mp_product_list" class="mp_'.$layout_type.'">';
 
-			//add last css class for styling grids
-			if ($count == $last)
-			  $class = array('mp_product', 'last-product');
-			else
-			  $class = 'mp_product';
+  if ($last = $custom_query->post_count){
 
-      $content .= '<div '.mp_product_class(false, $class, $post->ID).'>';
-      $content .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
-      $content .= '<div class="mp_product_content">';
-      $product_content = mp_product_image( false, 'list', $post->ID );
-      if ($mp->get_setting('show_excerpt'))
-        $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
-      $content .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
-      $content .= '</div>';
-
-      $content .= '<div class="mp_product_meta">';
-      //price
-      $meta = mp_product_price(false, $post->ID);
-      //button
-      $meta .= mp_buy_button(false, 'list', $post->ID);
-      $content .= apply_filters( 'mp_product_list_meta', $meta, $post->ID );
-      $content .= '</div>';
-
-      $content .= '</div>';
-
-      $count++;
-    }
-  } else {
+		$content .= $layout_type == 'grid' ?
+									get_products_html_grid($custom_query->posts) :
+									get_products_html_list($custom_query->posts);
+  	
+  }else{
     $content .= '<div id="mp_no_products">' . apply_filters( 'mp_product_list_none', __('No Products', 'mp') ) . '</div>';
   }
 
@@ -1366,6 +1345,96 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     return $content;
 }
 
+/**
+ * returns current product list layout based on setting/shortcode attribute
+ */
+function get_product_layout_type($ar=array()){
+	foreach($ar as $layout){
+		if(in_array($layout, array('list','grid'))){
+			return $layout;
+		}
+	}
+	return 'list';
+}
+
+function get_products_html_list($post_array=array()){
+    global $mp;
+    $html='';
+    $total = count($post_array);
+    $count = 0;
+    foreach($post_array as $post){
+        $count++;
+
+        //add last css class for styling grids
+        if ($count == $total)
+            $class = array('mp_product', 'last-product');
+        else
+            $class = 'mp_product';
+
+        $html .= '<div '.mp_product_class(false, $class, $post->ID).'>';
+        $html .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
+        $html .= '<div class="mp_product_content">';
+        $product_content = mp_product_image( false, 'list', $post->ID );
+        if ($mp->get_setting('show_excerpt'))
+            $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+        $html .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
+        $html .= '</div>';
+
+        $html .= '<div class="mp_product_meta">';
+        //price
+        $meta = mp_product_price(false, $post->ID);
+        //button
+        $meta .= mp_buy_button(false, 'list', $post->ID);
+        $html .= apply_filters( 'mp_product_list_meta', $meta, $post->ID );
+        $html .= '</div>';
+
+        $html .= '</div>';
+    }
+
+    return $html;
+}
+
+function get_products_html_grid($post_array=array()){
+    global $mp;
+    $html='';
+    foreach($post_array as $post){
+        $mp_product_list_content = apply_filters( 'mp_product_list_content', $product_content, $post->ID );
+
+				$img = mp_product_image(false, 'list', $post->ID);
+				$excerpt = $mp->get_setting('show_excerpt') ?
+													'<p class="mp_excerpt">'.$mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID).'</p>' :
+													'';
+
+				$class=array();
+				$class[] = strlen($img)>0?'mp_thumbnail':'';
+				$class[] = strlen($excerpt)>0?'mp_excerpt':'';
+
+				$html .= '<div class="mp_one_tile '.implode($class, ' ').'">
+										<div class="mp_one_product">
+											'.$img.'
+											
+											<h3 class="mp_product_name">
+												<a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
+											</h3>
+											
+											'.$excerpt.'
+
+											'.$mp_product_list_content.'
+
+											<div class="mp_price_buy">
+												'.mp_product_price(false, $post->ID).'
+												'.mp_buy_button(false, 'list', $post->ID).'
+												'.apply_filters( 'mp_product_list_meta', $meta, $post->ID ).'
+											</div>
+
+										</div>
+									</div>';
+    }
+
+    $html .= (count($post_array)>0?'<div class="clear"></div>':'');
+
+    return $html;
+}
 
 /*
  * function mp_product
@@ -1771,7 +1840,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 
   //add the link
   if ($link)
-    $image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
+    $image = '<a class="mp_img_link" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
 
   if ($echo)
     echo $image;
