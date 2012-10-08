@@ -232,7 +232,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     
     if ($_REQUEST['key'] == $hash) {
       $status = __('The order has been received', 'mp');
-      $paid = true;
+      $paid = apply_filters('mp_twocheckout_post_order_paid_status',true);
       
       $payment_info['gateway_public_name'] = $this->public_name;
       $payment_info['gateway_private_name'] = $this->admin_name;
