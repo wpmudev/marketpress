@@ -1715,7 +1715,8 @@ Thanks again!", 'mp')
     global $post_status;
 
 		$columns['cb'] = '<input type="checkbox" />';
-		$columns['mp_orders_status'] = __('Status', 'mp');
+		
+		$columns['mp_orders_status'] = __('Status', 'mp');			
 		$columns['mp_orders_id'] = __('Order ID', 'mp');
 		$columns['mp_orders_date'] = __('Order Date', 'mp');
 		$columns['mp_orders_name'] = __('From', 'mp');
@@ -1747,6 +1748,8 @@ Thanks again!", 'mp')
           $text = __('Shipped', 'mp');
         else if ($post->post_status == 'order_closed')
           $text = __('Closed', 'mp');
+        else if ($post->post_status == 'trash')
+          $text = __('Trash', 'mp');
 
         ?><a class="mp_order_status" href="edit.php?post_type=product&page=marketpress-orders&order_id=<?php echo $post->ID; ?>" title="<?php echo __('View Order Details', 'mp'); ?>"><?php echo $text ?></a><?php
 				break;
@@ -1786,6 +1789,12 @@ Thanks again!", 'mp')
           $actions['shipped'] = "<a title='" . esc_attr(__('Mark as Shipped', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=shipped&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Shipped', 'mp') . "</a>";
         }
 
+		if ((isset($_GET['post_status'])) && ($_GET['post_status'] == "trash")) {
+        	$actions['delete'] = "<a title='" . esc_attr(__('Delete', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=delete&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Delete Permanently', 'mp') . "</a>";
+		} else  {
+        	$actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
+		}
+		
         $action_count = count($actions);
   			$i = 0;
   			echo '<div class="row-actions">';
@@ -3416,7 +3425,7 @@ Thanks again!", 'mp')
   function update_order_status($order_id, $new_status) {
     global $wpdb;
 
-    $statuses = array('received' => 'order_received', 'paid' => 'order_paid', 'shipped' => 'order_shipped', 'closed' => 'order_closed');
+    $statuses = array('received' => 'order_received', 'paid' => 'order_paid', 'shipped' => 'order_shipped', 'closed' => 'order_closed', 'trash' => 'trash', 'delete' => 'delete');
     if (!array_key_exists($new_status, $statuses))
       return false;
 
@@ -3425,6 +3434,31 @@ Thanks again!", 'mp')
     if (!$order)
       return false;
 
+	// If we are transitioning the status from 'trash' to some other vlaue we want to decrement the product variation quantities. 
+	if (($order->post_status == "trash") && ($new_status != "delete") && ($new_status != 'trash')) {
+		if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+			foreach ($order->mp_cart_info as $product_id => $variations) {
+			
+				if (!get_post_meta($product_id, 'mp_track_inventory', true))
+				 	continue;
+
+				$mp_inventory = get_post_meta($product_id, 'mp_inventory', true);
+				if (!$mp_inventory)
+					continue;
+			
+				$_PRODUCT_INVENTORY_CHANGED = false;
+				foreach ($variations as $variation => $data) {
+					if (array_key_exists($variation, $mp_inventory)) {
+						$mp_inventory[$variation] -= $data['quantity'];
+						$_PRODUCT_INVENTORY_CHANGED = true;
+					}
+				}
+				if ($_PRODUCT_INVENTORY_CHANGED) {
+					update_post_meta($product_id, 'mp_inventory', $mp_inventory);					
+				}
+			}
+		}
+	}
     switch ($new_status) {
 
       case 'paid':
@@ -3467,6 +3501,37 @@ Thanks again!", 'mp')
         update_post_meta($order->ID, 'mp_closed_time', time());
         do_action( 'mp_order_closed', $order );
         break;
+
+	 case 'trash':
+		if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+			foreach ($order->mp_cart_info as $product_id => $variations) {
+				
+				if (!get_post_meta($product_id, 'mp_track_inventory', true))
+				 	continue;
+
+				$mp_inventory = get_post_meta($product_id, 'mp_inventory', true);
+				if (!$mp_inventory)
+					continue;
+				
+				$_PRODUCT_INVENTORY_CHANGED = false;
+				foreach ($variations as $variation => $data) {
+					if (array_key_exists($variation, $mp_inventory)) {
+						$mp_inventory[$variation] += $data['quantity'];
+						$_PRODUCT_INVENTORY_CHANGED = true;
+					}
+				}
+				
+				if ($_PRODUCT_INVENTORY_CHANGED) {
+					update_post_meta($product_id, 'mp_inventory', $mp_inventory);					
+				}
+				
+			}
+		}
+		break;
+		
+	 case 'delete':
+		wp_delete_post( $order_id );
+		break;
 
     }
 
@@ -4415,22 +4480,33 @@ Notification Preferences: %s', 'mp');
           $actions['paid'] = "<a title='" . esc_attr(__('Mark as Paid', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=paid&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Paid', 'mp') . "</a>";
           $actions['shipped'] = "<a title='" . esc_attr(__('Mark as Shipped', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=shipped&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Shipped', 'mp') . "</a>";
           $actions['closed'] = "<a title='" . esc_attr(__('Mark as Closed', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=closed&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Closed', 'mp') . "</a>";
+          $actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
         } else if ($order->post_status == 'order_paid') {
           $actions['received'] = __('Received', 'mp');
           $actions['paid current'] = __('Paid', 'mp');
           $actions['shipped'] = "<a title='" . esc_attr(__('Mark as Shipped', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=shipped&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Shipped', 'mp') . "</a>";
           $actions['closed'] = "<a title='" . esc_attr(__('Mark as Closed', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=closed&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Closed', 'mp') . "</a>";
+          $actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
         } else if ($order->post_status == 'order_shipped') {
           $actions['received'] = __('Received', 'mp');
           $actions['paid'] = __('Paid', 'mp');
           $actions['shipped current'] = __('Shipped', 'mp');
           $actions['closed'] = "<a title='" . esc_attr(__('Mark as Closed', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=closed&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Closed', 'mp') . "</a>";
+          $actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
         } else if ($order->post_status == 'order_closed') {
           $actions['received'] = "<a title='" . esc_attr(__('Mark as Received', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=received&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Received', 'mp') . "</a>";
           $actions['paid'] = "<a title='" . esc_attr(__('Mark as Paid', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=paid&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Paid', 'mp') . "</a>";
           $actions['shipped'] = "<a title='" . esc_attr(__('Mark as Shipped', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=shipped&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Shipped', 'mp') . "</a>";
           $actions['closed current'] = __('Closed', 'mp');
-        }
+          $actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
+        } else if ($order->post_status == "trash") {
+          $actions['received'] = "<a title='" . esc_attr(__('Mark as Received', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=received&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Received', 'mp') . "</a>";
+          $actions['paid'] = "<a title='" . esc_attr(__('Mark as Paid', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=paid&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Paid', 'mp') . "</a>";
+          $actions['shipped'] = "<a title='" . esc_attr(__('Mark as Shipped', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=shipped&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Shipped', 'mp') . "</a>";
+          $actions['closed'] = "<a title='" . esc_attr(__('Mark as Closed', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=closed&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Closed', 'mp') . "</a>";
+          $actions['delete'] = "<a title='" . esc_attr(__('Delete', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=delete&amp;post=' . $order->ID), 'update-order-status' ) . "'>" . __('Delete', 'mp') . "</a>";
+		
+		}
 
         $action_count = count($actions);
         $i = 0;
@@ -4484,7 +4560,10 @@ Notification Preferences: %s', 'mp');
             echo '<div class="misc-pub-section">' . __('Shipped:', 'mp') . ' <strong>' . $shipped . '</strong></div>';
             echo '<div class="misc-pub-section">' . __('Paid:', 'mp') . ' <strong>' . $paid . '</strong></div>';
             echo '<div class="misc-pub-section">' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></div>';
-          }
+      	  } else if ($order->post_status == 'trash') {
+            echo '<div id="major-publishing-actions" class="misc-pub-section">' . __('Trash:', 'mp') . ' <strong>' . $received . '</strong></div>';
+		  }
+
           ?>
         </div>
       </div>
@@ -4796,15 +4875,17 @@ Notification Preferences: %s', 'mp');
     $per_page = apply_filters( 'edit_posts_per_page', $per_page );
 
     // Handle bulk actions
-    if ( isset($_GET['doaction']) || isset($_GET['doaction2']) || isset($_GET['bulk_edit']) || isset($_GET['action']) ) {
+    if ( isset($_GET['doaction']) || isset($_GET['doaction2']) || isset($_GET['bulk_edit']) || isset($_GET['action']) 
+		|| (isset($_GET['delete_all'])) || (isset($_GET['delete_all2'])) ) {
     	check_admin_referer('update-order-status');
-    	$sendback = remove_query_arg( array('received', 'paid', 'shipped', 'closed', 'ids'), wp_get_referer() );
+    	$sendback = remove_query_arg( array('received', 'paid', 'shipped', 'closed', 'trash', 'delete', 'ids', 'delete_all', 'delete_all2'), wp_get_referer() );
 
     	if ( ( $_GET['action'] != -1 || $_GET['action2'] != -1 ) && ( isset($_GET['post']) || isset($_GET['ids']) ) ) {
     		$post_ids = isset($_GET['post']) ? array_map( 'intval', (array) $_GET['post'] ) : explode(',', $_GET['ids']);
     		$doaction = ($_GET['action'] != -1) ? $_GET['action'] : $_GET['action2'];
-    	}
-
+    	} else if ( isset( $_GET['delete_all'] ) || isset( $_GET['delete_all2'] ) )
+			$doaction = 'delete_all';
+		
     	switch ( $doaction ) {
     		case 'received':
     			$received = 0;
@@ -4839,6 +4920,35 @@ Notification Preferences: %s', 'mp');
     			$msg = sprintf( _n( '%s order Closed.', '%s orders Closed.', $closed, 'mp' ), number_format_i18n( $closed ) );
     			break;
 
+        case 'trash':
+    			$trashed = 0;
+    			foreach( (array) $post_ids as $post_id ) {
+    				$this->update_order_status($post_id, 'trash');
+    				$trashed++;
+    			}
+    			$msg = sprintf( _n( '%s order moved to Trash.', '%s orders moved to Trash.', $trashed, 'mp' ), number_format_i18n( $trashed ) );
+    			break;
+
+        case 'delete':
+    			$deleted = 0;
+    			foreach( (array) $post_ids as $post_id ) {
+    				$this->update_order_status($post_id, 'delete');
+    				$deleted++;
+    			}
+    			$msg = sprintf( _n( '%s order Deleted.', '%s orders Deleted.', $deleted, 'mp' ), number_format_i18n( $deleted ) );
+    			break;
+
+		case 'delete_all':
+				$mp_orders = get_posts('post_type=mp_order&post_status=trash&numberposts=-1');
+				if ($mp_orders) {
+	    			$deleted = 0;
+					foreach($mp_orders as $mp_order) {
+	    				$this->update_order_status($mp_order->ID, 'delete');						
+	    				$deleted++;
+					}
+	    			$msg = sprintf( _n( '%s order Deleted.', '%s orders Deleted.', $deleted, 'mp' ), number_format_i18n( $deleted ) );
+				}
+				break;
     	}
 
     }
@@ -4938,6 +5048,11 @@ Notification Preferences: %s', 'mp');
       <option value="paid"><?php _e('Paid', 'mp'); ?></option>
       <option value="shipped"><?php _e('Shipped', 'mp'); ?></option>
       <option value="closed"><?php _e('Closed', 'mp'); ?></option>
+		<?php if ((isset($_GET['post_status'])) && ($_GET['post_status'] == 'trash')) { ?>
+			<option value="delete"><?php _e('Delete', 'mp'); ?></option>
+		<?php } else { ?>
+			<option value="trash"><?php _e('Trash', 'mp'); ?></option>			
+		<?php } ?>
       </select>
       <input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction" id="doaction" class="button-secondary action" />
       <?php wp_nonce_field('update-order-status'); ?>
@@ -4976,6 +5091,12 @@ Notification Preferences: %s', 'mp');
 
       <input type="submit" id="post-query-submit" value="<?php esc_attr_e('Filter'); ?>" class="button-secondary" />
       <?php } ?>
+
+	  <?php 
+		if ((isset($_GET['post_status'])) && ($_GET['post_status'] == 'trash')) {
+			submit_button( __( 'Empty Trash' ), 'button-secondary apply', 'delete_all', false );
+		} 
+	  ?>
       </div>
 
       <?php if ( $page_links ) { ?>
@@ -5035,8 +5156,19 @@ Notification Preferences: %s', 'mp');
       <option value="paid"><?php _e('Paid', 'mp'); ?></option>
       <option value="shipped"><?php _e('Shipped', 'mp'); ?></option>
       <option value="closed"><?php _e('Closed', 'mp'); ?></option>
+		<?php if ((isset($_GET['post_status'])) && ($_GET['post_status'] == 'trash')) { ?>
+			<option value="delete"><?php _e('Delete', 'mp'); ?></option>
+		<?php } else { ?>
+			<option value="trash"><?php _e('Trash', 'mp'); ?></option>			
+		<?php } ?>
       </select>
       <input type="submit" value="<?php esc_attr_e('Apply'); ?>" name="doaction2" id="doaction2" class="button-secondary action" />
+	  <?php 
+		if ((isset($_GET['post_status'])) && ($_GET['post_status'] == 'trash')) {
+			submit_button( __( 'Empty Trash' ), 'button-secondary apply', 'delete_all2', false );
+		} 
+	  ?>
+
       <br class="clear" />
       </div>
       <br class="clear" />
@@ -5049,6 +5181,7 @@ Notification Preferences: %s', 'mp');
 
       </form>
 
+		<?php if ((isset($_GET['post_status'])) && ($_GET['post_status'] != 'trash')) { ?>
 			<div class="icon32"><img src="<?php echo $this->plugin_url . 'images/download.png'; ?>" /></div>
 			<h2><?php _e('Export Orders', 'mp'); ?></h2>
 			<form action="<?php echo admin_url('admin-ajax.php?action=mp-orders-export'); ?>" method="post">
@@ -5099,6 +5232,7 @@ Notification Preferences: %s', 'mp');
 
 
       <br class="clear">
+	<?php } ?>
     </div>
     <?php
   }
