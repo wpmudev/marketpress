@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.8 - 10/15/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Added built in grid views!
+- Added ability to trash/delete test orders, adjusting stock counts
+- Fix bug with product list widget when ordering by price or sales
+
 2.7 - 10/03/2012 - Aaron Edwards
 ----------------------------------------------------------------------
 - Include shopping cart item details in orders CSV exports

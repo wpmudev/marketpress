@@ -260,7 +260,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     <div id="mp_2checkout" class="postbox">
       <h3 class='handle'><span><?php _e('2Checkout Settings', 'mp'); ?></span></h3>
       <div class="inside">
-        <span class="description"><?php _e('Resell your inventory via 2Checkout.com.', 'mp') ?></span>
+        <span class="description"><?php _e('Resell your inventory via 2Checkout.com. This gateway requires that the setting in 2Checkout for "Return Method" inside Account -> Site Management be set to "Header Redirect".', 'mp') ?></span>
         <table class="form-table">
 				  <tr>
 				    <th scope="row"><?php _e('Mode', 'mp') ?></th>
