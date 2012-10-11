@@ -5001,7 +5001,7 @@ Notification Preferences: %s', 'mp');
       $class = empty($class) && empty($_GET['post_status']) ? ' class="current"' : '';
       $status_links[] = "<li><a href='edit.php?page=marketpress-orders&post_type=product{$allposts}'$class>" . sprintf( _nx( 'All <span class="count">(%s)</span>', 'All <span class="count">(%s)</span>', $total_posts, 'posts' ), number_format_i18n( $total_posts ) ) . '</a>';
 
-      foreach ( get_post_stati(array(), 'objects') as $status ) {
+      foreach ( get_post_stati(array(), 'objects') as $status_key => $status ) {
       	$class = '';
 
       	$status_name = $status->name;
@@ -5015,8 +5015,16 @@ Notification Preferences: %s', 'mp');
       	if ( isset($_GET['post_status']) && $status_name == $_GET['post_status'] )
       		$class = ' class="current"';
 
-      	$status_links[] = "<li><a href='edit.php?page=marketpress-orders&amp;post_status=$status_name&amp;post_type=product'$class>" . sprintf( _n( $status->label_count[0], $status->label_count[1], $num_posts->$status_name ), number_format_i18n( $num_posts->$status_name ) ) . '</a>';
+      	$status_links[$status_key] = "<li><a href='edit.php?page=marketpress-orders&amp;post_status=$status_name&amp;post_type=product'$class>" . sprintf( _n( $status->label_count[0], $status->label_count[1], $num_posts->$status_name ), number_format_i18n( $num_posts->$status_name ) ) . '</a>';
       }
+
+		// Kludge. There has to be a better way to order stati. If present we want to 'trash' key always at the end. 
+		// Maybe if we were properly inheriting WP_List_Table.
+		if (isset($status_links['trash'])) {
+			$trash_item = $status_links['trash'];
+			unset($status_links['trash']);
+			$status_links['trash'] = $trash_item;
+		}
       echo implode( " |</li>\n", $status_links ) . '</li>';
       unset( $status_links );
     endif;
