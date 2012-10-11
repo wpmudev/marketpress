@@ -798,6 +798,13 @@ Thanks again!", 'mp')
   		'post_type'   => 'mp_order',
   		'public'      => false
   	) );
+		register_post_status( 'trash', array(
+			'label'       => _x( 'Trash', 'post' ),
+			'label_count' => _n_noop( 'Trash <span class="count">(%s)</span>', 'Trash <span class="count">(%s)</span>' ),
+			'show_in_admin_status_list' => true,
+			'post_type'   => 'mp_order',
+  		'public'      => false
+		) );
   }
 
   //necessary to mod array directly rather than with add_theme_support() to play nice with other themes. See http://www.wptavern.com/forum/plugins-hacks/1751-need-help-enabling-post-thumbnails-custom-post-type.html
@@ -1630,11 +1637,13 @@ Thanks again!", 'mp')
 
 		switch ($column) {
 			case "thumbnail":
+				echo '<a href="' . get_edit_post_link() . '" title="' . __('Edit &raquo;') . '">';
         if (has_post_thumbnail()) {
-					echo '<a href="' . get_edit_post_link() . '" title="' . __('Edit &raquo;') . '">';
 					the_post_thumbnail(array(50,50), array('title' => ''));
-					echo '</a>';
+				} else {
+					echo '<img width="50" height="50" src="'.apply_filters('mp_default_product_img', $this->plugin_url.'images/default-product.png').'">';
 				}
+				echo '</a>';
 				break;
 
 			case "variations":
@@ -1749,7 +1758,7 @@ Thanks again!", 'mp')
         else if ($post->post_status == 'order_closed')
           $text = __('Closed', 'mp');
         else if ($post->post_status == 'trash')
-          $text = __('Trash', 'mp');
+          $text = __('Trashed', 'mp');
 
         ?><a class="mp_order_status" href="edit.php?post_type=product&page=marketpress-orders&order_id=<?php echo $post->ID; ?>" title="<?php echo __('View Order Details', 'mp'); ?>"><?php echo $text ?></a><?php
 				break;
@@ -1788,12 +1797,12 @@ Thanks again!", 'mp')
           $actions['paid'] = "<a title='" . esc_attr(__('Mark as Paid', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=paid&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Paid', 'mp') . "</a>";
           $actions['shipped'] = "<a title='" . esc_attr(__('Mark as Shipped', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=shipped&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Shipped', 'mp') . "</a>";
         }
-
-		if ((isset($_GET['post_status'])) && ($_GET['post_status'] == "trash")) {
-        	$actions['delete'] = "<a title='" . esc_attr(__('Delete', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=delete&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Delete Permanently', 'mp') . "</a>";
-		} else  {
-        	$actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
-		}
+		
+				if ((isset($_GET['post_status'])) && ($_GET['post_status'] == "trash")) {
+							$actions['delete'] = "<a title='" . esc_attr(__('Delete', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=delete&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Delete Permanently', 'mp') . "</a>";
+				} else  {
+							$actions['trash'] = "<a title='" . esc_attr(__('Trash', 'mp')) . "' href='" . wp_nonce_url( admin_url( 'edit.php?post_type=product&amp;page=marketpress-orders&amp;action=trash&amp;post=' . $post->ID), 'update-order-status' ) . "'>" . __('Trash', 'mp') . "</a>";
+				}
 		
         $action_count = count($actions);
   			$i = 0;
@@ -2167,12 +2176,12 @@ Thanks again!", 'mp')
 
     //get address
     $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
-    $address1 = isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1'];
-    $address2 = isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : $meta['address2'];
-    $city = isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city'];
-    $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state'];
-    $zip = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip'];
-    $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country'];
+    $address1 = isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : (isset($meta['address1']) ? $meta['address1'] : '');
+    $address2 = isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : (isset($meta['address2']) ? $meta['address2'] : '');
+    $city = isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : (isset($meta['city']) ? $meta['city'] : '');
+    $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : (isset($meta['state']) ? $meta['state'] : '');
+    $zip = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : (isset($meta['zip']) ? $meta['zip'] : '');
+    $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : (isset($meta['country']) ? $meta['country'] : '');
 		$selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
 
     //check required fields
@@ -4561,7 +4570,7 @@ Notification Preferences: %s', 'mp');
             echo '<div class="misc-pub-section">' . __('Paid:', 'mp') . ' <strong>' . $paid . '</strong></div>';
             echo '<div class="misc-pub-section">' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></div>';
       	  } else if ($order->post_status == 'trash') {
-            echo '<div id="major-publishing-actions" class="misc-pub-section">' . __('Trash:', 'mp') . ' <strong>' . $received . '</strong></div>';
+            echo '<div id="major-publishing-actions" class="misc-pub-section">' . __('Trashed', 'mp') . '</div>';
 		  }
 
           ?>
@@ -6138,9 +6147,8 @@ Notification Preferences: %s', 'mp');
           </div>
 
           <div class="postbox">
-            <h3 class='hndle'><span><?php _e('Store URL Slugs', 'mp') ?></span></h3>
+            <h3 class='hndle'><span><?php _e('Store URL Slugs', 'mp') ?></span> - <span class="description"><?php _e('Customizes the url structure of your store', 'mp') ?></span></h3>
             <div class="inside">
-              <span class="description"><?php _e('Customizes the url structure of your store', 'mp') ?></span>
               <table class="form-table">
                 <tr valign="top">
                 <th scope="row"><?php _e('Store Base', 'mp') ?></th>
@@ -6860,7 +6868,9 @@ class MarketPress_Product_List extends WP_Widget {
       $taxonomy_query = '&product_category=' . $instance['taxonomy'];
     } else if ($instance['taxonomy_type'] == 'tag') {
       $taxonomy_query = '&product_tag=' . $instance['taxonomy'];
-    }
+    } else {
+			$taxonomy_query = '';
+		}
 
     //figure out perpage
     if (isset($instance['num_products']) && intval($instance['num_products']) > 0) {
@@ -6915,7 +6925,7 @@ class MarketPress_Product_List extends WP_Widget {
 
           echo '</div>';
         }
-        $content .= '</li>';
+        echo '</li>';
       }
       echo '</ul>';
     } else {

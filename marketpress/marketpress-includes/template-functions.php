@@ -1358,82 +1358,81 @@ function get_product_layout_type($ar=array()){
 }
 
 function get_products_html_list($post_array=array()){
-    global $mp;
-    $html='';
-    $total = count($post_array);
-    $count = 0;
-    foreach($post_array as $post){
-        $count++;
+  global $mp;
+  $html='';
+  $total = count($post_array);
+  $count = 0;
+  foreach($post_array as $post){
+      $count++;
 
-        //add last css class for styling grids
-        if ($count == $total)
-            $class = array('mp_product', 'last-product');
-        else
-            $class = 'mp_product';
+      //add last css class for styling grids
+      if ($count == $total)
+          $class = array('mp_product', 'last-product');
+      else
+          $class = 'mp_product';
 
-        $html .= '<div '.mp_product_class(false, $class, $post->ID).'>';
-        $html .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
-        $html .= '<div class="mp_product_content">';
-        $product_content = mp_product_image( false, 'list', $post->ID );
-        if ($mp->get_setting('show_excerpt'))
-            $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
-        $html .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
-        $html .= '</div>';
+      $html .= '<div '.mp_product_class(false, $class, $post->ID).'>';
+      $html .= '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a></h3>';
+      $html .= '<div class="mp_product_content">';
+      $product_content = mp_product_image( false, 'list', $post->ID );
+      if ($mp->get_setting('show_excerpt'))
+          $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+      $html .= apply_filters( 'mp_product_list_content', $product_content, $post->ID );
+      $html .= '</div>';
 
-        $html .= '<div class="mp_product_meta">';
-        //price
-        $meta = mp_product_price(false, $post->ID);
-        //button
-        $meta .= mp_buy_button(false, 'list', $post->ID);
-        $html .= apply_filters( 'mp_product_list_meta', $meta, $post->ID );
-        $html .= '</div>';
+      $html .= '<div class="mp_product_meta">';
+      //price
+      $meta = mp_product_price(false, $post->ID);
+      //button
+      $meta .= mp_buy_button(false, 'list', $post->ID);
+      $html .= apply_filters( 'mp_product_list_meta', $meta, $post->ID );
+      $html .= '</div>';
 
-        $html .= '</div>';
-    }
+      $html .= '</div>';
+  }
 
-    return $html;
+  return $html;
 }
 
 function get_products_html_grid($post_array=array()){
-    global $mp;
-    $html='';
-    foreach($post_array as $post){
-        $mp_product_list_content = apply_filters( 'mp_product_list_content', $product_content, $post->ID );
+  global $mp;
+  $html='';
+  foreach ($post_array as $post){
+    
 
-				$img = mp_product_image(false, 'list', $post->ID);
-				$excerpt = $mp->get_setting('show_excerpt') ?
-													'<p class="mp_excerpt">'.$mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID).'</p>' :
-													'';
+    $img = mp_product_image(false, 'list', $post->ID);
+    $excerpt = $mp->get_setting('show_excerpt') ?
+                      '<p class="mp_excerpt">'.$mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID).'</p>' :
+                      '';
+    $mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $post->ID );
+    
+    $class=array();
+    $class[] = strlen($img)>0?'mp_thumbnail':'';
+    $class[] = strlen($excerpt)>0?'mp_excerpt':'';
 
-				$class=array();
-				$class[] = strlen($img)>0?'mp_thumbnail':'';
-				$class[] = strlen($excerpt)>0?'mp_excerpt':'';
+    $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
+                <div class="mp_one_product">
+                  '.$img.'
+                  
+                  <h3 class="mp_product_name">
+                    <a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
+                  </h3>
+                  
+                  '.$mp_product_list_content.'
 
-				$html .= '<div class="mp_one_tile '.implode($class, ' ').'">
-										<div class="mp_one_product">
-											'.$img.'
-											
-											<h3 class="mp_product_name">
-												<a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
-											</h3>
-											
-											'.$excerpt.'
+                  <div class="mp_price_buy">
+                    '.mp_product_price(false, $post->ID).'
+                    '.mp_buy_button(false, 'list', $post->ID).'
+                    '.apply_filters( 'mp_product_list_meta', '', $post->ID ).'
+                  </div>
 
-											'.$mp_product_list_content.'
+                </div>
+              </div>';
+  }
 
-											<div class="mp_price_buy">
-												'.mp_product_price(false, $post->ID).'
-												'.mp_buy_button(false, 'list', $post->ID).'
-												'.apply_filters( 'mp_product_list_meta', $meta, $post->ID ).'
-											</div>
+  $html .= (count($post_array)>0?'<div class="clear"></div>':'');
 
-										</div>
-									</div>';
-    }
-
-    $html .= (count($post_array)>0?'<div class="clear"></div>':'');
-
-    return $html;
+  return $html;
 }
 
 /*
@@ -1786,7 +1785,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
   $post = get_post($post_id);
 
   $post_thumbnail_id = get_post_thumbnail_id( $post_id );
-  $class = '';
+  $class = $title = $link = '';
   
   if ($context == 'list') {
     //quit if no thumbnails on listings
@@ -1837,7 +1836,14 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
   }
 
   $image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => 'alignleft mp_product_image_'.$context, 'title' => $title));
-
+  
+  if ( empty($image) && $context != 'single') {
+    if ( !is_array($size) ) {
+      $size = array( get_option($size."_size_w"), get_option($size."_size_h") );
+    }
+    $image = '<img width="'.$size[0].'" height="'.$size[1].'" itemprop="image" title="'.esc_attr($title).'" class="alignleft mp_product_image_'.$context.' wp-post-image" src="'.apply_filters('mp_default_product_img', $mp->plugin_url.'images/default-product.png').'">';
+  }
+  
   //add the link
   if ($link)
     $image = '<a class="mp_img_link" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
