@@ -12,6 +12,7 @@ Change Log:
 - Fix bug with product list widget when ordering by price or sales
 - Add default product images
 - Other minor bug/notice fixes
+- Forced shipping option recalculation when Country changes.
 
 2.7 - 10/03/2012 - Aaron Edwards
 ----------------------------------------------------------------------

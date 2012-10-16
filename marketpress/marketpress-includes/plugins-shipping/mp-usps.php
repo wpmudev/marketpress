@@ -452,7 +452,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		global $mp;
 
 
-		if(! $this->crc_ok()) {
+		if(! $this->crc_ok()) 
+		{
 			//Price added to this object
 			$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
 		}
@@ -480,7 +481,9 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		//Check the shipping options to see if we already have a valid shipping price
 		//
-		if($this->crc_ok()){
+		/*
+		if($this->crc_ok())
+		{
 			// Shipping prices still valid just use them
 			// Format the returned array for display in the drop down
 			$shipping_options = array();
@@ -490,7 +493,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			//All done
 			return $shipping_options;
 		}
-
+		*/
+		
 		// Not ok then calculate them
 		$settings = get_option('mp_settings');
 
