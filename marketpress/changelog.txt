@@ -13,6 +13,7 @@ Change Log:
 - Add default product images
 - Other minor bug/notice fixes
 - Forced shipping option recalculation when Country changes.
+- Fix missing closing tag in global widget breaking drag and drop
 
 2.7 - 10/03/2012 - Aaron Edwards
 ----------------------------------------------------------------------

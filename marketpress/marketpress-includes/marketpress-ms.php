@@ -1707,7 +1707,7 @@ class MarketPress_Global_Category_List_Widget extends WP_Widget {
 	<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php if (isset ( $title )) {echo esc_attr( $title );} ?>" /></p>
 
   <p>
-  <label for="<?php echo $this->get_field_id('order_by'); ?>"><?php _e('Order Categories By:', 'mp') ?><br />
+  <label for="<?php echo $this->get_field_id('order_by'); ?>"><?php _e('Order Categories By:', 'mp') ?></label><br />
   <select id="<?php echo $this->get_field_id('order_by'); ?>" name="<?php echo $this->get_field_name('order_by'); ?>">
     <option value="name"<?php selected($order_by, 'name') ?>><?php _e('Name', 'mp') ?></option>
     <option value="count"<?php selected($order_by, 'count') ?>><?php _e('Product Count', 'mp') ?></option>
