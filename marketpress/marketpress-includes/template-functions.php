@@ -1191,7 +1191,7 @@ function mp_tracking_link($tracking_number, $method = 'other') {
   else if ($method == 'DHL')
     return '<a title="'.__('Track your DHL package &raquo;', 'mp').'" href="http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB='.$tracking_number.'" target="_blank">'.$tracking_number.'</a>';
   else
-    return $tracking_number;
+    return apply_filters('mp_shipping_tracking_link', $tracking_number, $method);
 }
 
 /*

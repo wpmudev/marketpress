@@ -11,6 +11,7 @@ Change Log:
 - Added ability to trash/delete orders and adjusts stock counts accordingly
 - Fix bug with product list widget when ordering by price or sales
 - Add default product images
+- Add a hooks for custom shipping methods and tracking links
 - Other minor bug/notice fixes
 - Forced shipping option recalculation when Country changes.
 - Fix missing closing tag in global widget breaking drag and drop

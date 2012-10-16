@@ -4812,6 +4812,7 @@ Notification Preferences: %s', 'mp');
 						<option value="USPS"<?php selected(@$order->mp_shipping_info['method'], 'USPS'); ?>>USPS</option>
 						<option value="DHL"<?php selected(@$order->mp_shipping_info['method'], 'DHL'); ?>>DHL</option>
 						<option value="other"<?php selected(@$order->mp_shipping_info['method'], 'other'); ?>><?php _e('Other', 'mp'); ?></option>
+						<?php do_action('mp_shipping_tracking_select', @$order->mp_shipping_info['method']); ?>
 					</select>
 					<input type="text" name="mp_tracking_number" value="<?php esc_attr_e(isset($order->mp_shipping_info['tracking_num']) ? $order->mp_shipping_info['tracking_num'] : ''); ?>" size="25" />
 					<input type="submit" name="add-tracking" value="<?php _e('Save &raquo;', 'mp'); ?>" /><?php if ($order->post_status == 'order_received' ||$order->post_status == 'order_paid') { ?><input type="submit" name="add-tracking-shipped" value="<?php _e('Save & Mark as Shipped &raquo;', 'mp'); ?>" /><?php } ?>
