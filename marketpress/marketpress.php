@@ -1730,13 +1730,16 @@ Thanks again!", 'mp')
 	function edit_products_custom_row_actions($actions, $post) {
 		$action = 'copy-product';
 
-		if ( ($post->post_type == "product") && (!isset($actions[$action])) && current_user_can('edit_posts') ) {
+		if ( ($post->post_type == "product") && (!isset($actions[$action])) ) {
+			
 			$post_type_object = get_post_type_object( $post->post_type );
 			if ( $post_type_object ) {
-				$copy_link = add_query_arg( 'action', $action );
-				$copy_link = add_query_arg( 'post', $post->ID, $copy_link );
-				$copy_link = wp_nonce_url( $copy_link, "{$action}-{$post->post_type}_{$post->ID}" );
-				$actions[$action] = '<a href="'. $copy_link .'">'. __('Copy', 'mp') .'</a>';
+				if ( current_user_can('edit_pages') ) {
+					$copy_link = add_query_arg( 'action', $action );
+					$copy_link = add_query_arg( 'post', $post->ID, $copy_link );
+					$copy_link = wp_nonce_url( $copy_link, "{$action}-{$post->post_type}_{$post->ID}" );
+					$actions[$action] = '<a href="'. $copy_link .'">'. __('Copy', 'mp') .'</a>';
+				}
 			}
 		}
 		return $actions;
@@ -1764,11 +1767,7 @@ Thanks again!", 'mp')
 							
 			$product = (array)get_post_to_edit( $product_id );
 			$product['ID'] = 0;	// Zero out the Product ID to force insert of new item
-
-			// If the cloning user has 'edit_posts' capability they will get to this point. But if they are copying a product that is not their own 
-			// We check if that also have 'edit_others_posts' capability. If not we set the post_status to Draft to force the whole Publish/Submit for review
-			if ( (intval($product['post_author']) != get_current_user_id()) && (current_user_can('edit_others_posts')) )
-				$product['post_status'] = 'draft';
+			$product['post_status'] = 'draft';
 				
 			$new_product_id = wp_insert_post($product);
 			if (($new_product_id) && (!is_wp_error($$new_product_id))) {
