@@ -94,6 +94,9 @@ class MarketPress {
 		add_action( 'manage_posts_custom_column', array(&$this, 'edit_products_custom_columns') );
 		add_action( 'restrict_manage_posts', array(&$this, 'edit_products_filter') );
 
+		add_filter( 'post_row_actions', array(&$this, 'edit_products_custom_row_actions'), 10, 2);
+		add_filter( 'admin_action_copy-product', array(&$this, 'edit_products_copy_action') );
+
 		//manage orders page
 		add_filter( 'manage_product_page_marketpress-orders_columns', array(&$this, 'manage_orders_columns') );
 		add_action( 'manage_posts_custom_column', array(&$this, 'manage_orders_custom_columns') );
@@ -1627,6 +1630,10 @@ Thanks again!", 'mp')
 	function edit_products_custom_columns($column) {
 		global $post;
 		
+		//$screen = get_current_screen();
+		//echo "screen->id=[". $screen->id ."]<br />";
+		//apply_filters( 'bulk_actions-' . $screen->id, $this->_actions );
+		
 		$meta = get_post_custom();
     //unserialize
     foreach ($meta as $key => $val) {
@@ -1717,6 +1724,79 @@ Thanks again!", 'mp')
               </div>';
         break;
 		}
+	}
+
+	// Adds a custom row action for Copying/Cloning a Product
+	function edit_products_custom_row_actions($actions, $post) {
+		$action = 'copy-product';
+
+		if ( ($post->post_type == "product") && (!isset($actions[$action])) && current_user_can('edit_posts') ) {
+			$post_type_object = get_post_type_object( $post->post_type );
+			if ( $post_type_object ) {
+				$copy_link = add_query_arg( 'action', $action );
+				$copy_link = add_query_arg( 'post', $post->ID, $copy_link );
+				$copy_link = wp_nonce_url( $copy_link, "{$action}-{$post->post_type}_{$post->ID}" );
+				$actions[$action] = '<a href="'. $copy_link .'">'. __('Copy', 'mp') .'</a>';
+			}
+		}
+		return $actions;
+	}
+
+	function edit_products_copy_action() {
+		
+		$action = 'copy-product';
+		if ((isset($_GET['action'])) && ($_GET['action'] == "copy-product")) {
+
+			$sendback_href = remove_query_arg( array('_wpnonce', 'mp-action', 'post', 'trashed', 'untrashed', 'deleted', 'ids'), wp_get_referer() );
+
+			if (isset($_GET['post']))
+				$product_id = intval($_GET['post']);
+			else
+				wp_redirect($sendback_href);
+
+			if (isset($_GET['post_type']))
+				$post_type = esc_attr($_GET['post_type']);
+			else
+				wp_redirect($sendback_href);
+				
+			if ( (!isset($_GET['_wpnonce'])) || !wp_verify_nonce($_GET['_wpnonce'], "{$action}-{$post_type}_{$product_id}") ) 
+				wp_redirect($sendback_href);
+							
+			$product = (array)get_post_to_edit( $product_id );
+			$product['ID'] = 0;	// Zero out the Product ID to force insert of new item
+			$new_product_id = wp_insert_post($product);
+			if (($new_product_id) && (!is_wp_error($$new_product_id))) {
+
+				//If we have the a valid new product ID we copy the product meta...
+				$product_meta_keys = get_post_custom_keys($product_id);
+				if (!empty($product_meta_keys)) {
+					foreach ($product_meta_keys as $meta_key) {
+						$meta_values = get_post_custom_values($meta_key, $product_id);
+
+						foreach ($meta_values as $meta_value) {
+							$meta_value = maybe_unserialize($meta_value);
+							add_post_meta($new_product_id, $meta_key, $meta_value);
+						}
+					}
+				}
+				
+				// ... thne we copy the product taxonomy terms
+				$product_taxonomies = get_object_taxonomies($post_type);
+				if (!empty($product_taxonomies)) {
+					foreach ($product_taxonomies as $product_taxonomy) {
+						$product_terms = wp_get_object_terms($product_id, $product_taxonomy, array( 'orderby' => 'term_order' ));
+						if (($product_terms) && (count($product_terms))) {
+							$terms = array();
+							foreach($product_terms as $product_term)
+								$terms[] = $product_term->slug;
+						}
+						wp_set_object_terms($new_product_id, $terms, $product_taxonomy);
+					}
+				}
+			}
+		}
+		wp_redirect($sendback_href);
+		die();		
 	}
 
 	//adds our custom column headers
