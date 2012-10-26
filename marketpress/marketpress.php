@@ -1768,6 +1768,7 @@ Thanks again!", 'mp')
 			$product = (array)get_post_to_edit( $product_id );
 			$product['ID'] = 0;	// Zero out the Product ID to force insert of new item
 			$product['post_status'] = 'draft';
+			$product['post_author'] = get_current_user_id();
 				
 			$new_product_id = wp_insert_post($product);
 			if (($new_product_id) && (!is_wp_error($$new_product_id))) {
