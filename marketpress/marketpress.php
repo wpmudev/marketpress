@@ -140,6 +140,9 @@ class MarketPress {
 		add_action( 'wp_ajax_mp-orders-export', array(&$this, 'export_orders_csv') );
 		add_action( 'wp_logout', array(&$this, 'logout_clear_session') ); //see http://premium.wpmudev.org/forums/topic/security-issue-with-marketpress
 
+		add_action( 'wp_ajax_nopriv_get_products_list', array(&$this, 'get_products_list') );
+		add_action( 'wp_ajax_get_products_list', array(&$this, 'get_products_list') );
+
 		//Relies on post thumbnails for products
 		add_action( 'after_setup_theme', array(&$this, 'post_thumbnails'), 9999 );
 
@@ -211,6 +214,7 @@ class MarketPress {
       'show_thumbnail' => 1,
       'list_img_size' => 'thumbnail',
       'paginate' => 1,
+      'show_filters' => 0,
       'order' => 'DESC',
       'shipping' => array (
         'allowed_countries' => array ('CA', 'US'),
@@ -649,7 +653,7 @@ Thanks again!", 'mp')
     wp_enqueue_script( 'mp-ajax-js', $this->plugin_url . 'js/ajax-cart.js', array('jquery'), $this->version );
 
     // declare the variables we need to access in js
-    wp_localize_script( 'mp-ajax-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp') ) );
+    wp_localize_script( 'mp-ajax-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp'), 'show_filters' => $this->get_setting('show_filters') ) );
   }
 
   //loads the jquery lightbox plugin
@@ -1548,6 +1552,7 @@ Thanks again!", 'mp')
 
 		$msgs = $this->get_setting('msg');
     $content .= do_shortcode($msgs['product_list']);
+    $content .=  $this->get_setting('show_filters')==1 ? $this->get_filter_order_html() : '';
     $content .= mp_list_products(false);
     $content .= '<div id="mp_product_nav">' . get_posts_nav_link() . '</div>';
 
@@ -1562,11 +1567,105 @@ Thanks again!", 'mp')
 
 		$msgs = $this->get_setting('msg');
     $content = do_shortcode($msgs['product_list']);
+    $content .=  $this->get_setting('show_filters')==1 ? $this->get_filter_order_html() : '';
     $content .= mp_list_products(false);
     $content .= '<div id="mp_product_nav">' . get_posts_nav_link() . '</div>';
 
     return $content;
   }
+
+  /**
+   * @return string   html for filter/order products select elements.
+   */
+  function get_filter_order_html(){
+
+      $terms = wp_dropdown_categories(array(
+        'name' => 'filter-term',
+        'taxonomy' => 'product_category',
+        'show_option_none' => 'Show All',
+        'show_count' => 1,
+        'orderby' => 'name',
+        'selected' => '',
+        'echo' => 0,
+        'hierarchical' => true
+      )); 
+
+      return 
+      ' <div class="mp_list_filter">
+            <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
+                <div class="one_filter">
+                  <span>Category</span>
+                  '.$terms.'
+                </div>
+
+                <div class="one_filter">
+                  <span>Price</span>
+                  <select name="order-price">
+                    <option value="0">Select Order</option>
+                    <option value="asc">Low to High</option>
+                    <option value="desc">High to Low</option>
+                  </select>
+                </div>
+            </form>
+        </div>';
+  }
+
+	/**
+	* ajax handler
+	* @return string html of products list, and optionally pagination
+	*/
+	function get_products_list(){
+    global $wp_query;
+
+		$ret = array('products'=>false, 'pagination'=>false);
+
+		extract(array(
+			'paginate' => '',
+			'page' => 1,
+			'per_page' => '',
+			'order_by' => '',
+			'order' => '',
+			'category' => '',
+			'tag' => '',
+			'list_view'=> false));
+
+		if( isset($_POST['order-price']) && in_array($_POST['order-price'], array('asc','desc')) ){
+				$order_by = 'price';
+				$order = strtoupper($_POST['order-price']);
+		}
+
+		if( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1){
+				$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
+				$category = $term->slug;
+		}
+
+		if( isset($_POST['page']) && is_numeric($_POST['page']) ){
+				$page = $_POST['page'];
+		}
+
+		$ret['products'] = mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
+
+		if($this->get_setting('paginate')){
+
+			// get_posts_nav_link() does not work with ajax
+			$max = $wp_query->max_num_pages;
+			$prev=$next='';
+
+			if($max > 1){
+				if( $page != $max ){
+					$next='<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
+				}
+				if($page != 1){
+					$prev='<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
+				}
+				$ret['pagination'] = '<div id="mp_product_nav">' . $prev . (strlen($prev)>0 && strlen($next)>0?' &#8212; ':'') . $next . '</div>';
+			}
+		}
+
+		header('Content-type: application/json');
+		echo json_encode($ret);
+		exit;
+	}
 
   //adds the "filter by product category" to the edit products screen
   function edit_products_filter() {
@@ -6236,6 +6335,15 @@ Notification Preferences: %s', 'mp');
                   <label><input value="DESC" name="mp[order]" type="radio"<?php checked($this->get_setting('order'), 'DESC') ?> /> <?php _e('Descending', 'mp') ?></label>
                   <label><input value="ASC" name="mp[order]" type="radio"<?php checked($this->get_setting('order'), 'ASC') ?> /> <?php _e('Ascending', 'mp') ?></label>
          	  </td>
+                </tr>
+                <tr>
+                  <td scope="row"><?php _e('Show dropdown boxes', 'mp') ?></td>
+                  <td> 
+                    <label><input value="1" name="mp[show_filters]" type="radio"<?php checked($this->get_setting('show_filters'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                    <label><input value="0" name="mp[show_filters]" type="radio"<?php checked($this->get_setting('show_filters'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                    <br />
+                    <span class="description">Show select product category, order by price dropdown boxes. Uses Ajax to update the page without reloading.</span>
+                  </td>
                 </tr>
               </table>
             </div>
