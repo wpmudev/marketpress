@@ -189,3 +189,32 @@ border-radius: 3px;
 .mp_list .mp_ajax_loading{
 background:rgba(201,201,201,.2) url('../images/ajax-loader.gif') no-repeat 99% 5px;
 }
+
+
+/* cart breadcrumbs */
+.mp_cart_breadcrumbs{
+margin-bottom:20px;
+}
+
+.mp_cart_breadcrumbs span,
+.mp_cart_breadcrumbs a{
+margin-right:20px;
+}
+
+.mp_cart_breadcrumbs a{
+opacity: .6;
+}
+.mp_cart_breadcrumbs a:hover{
+opacity: 1;
+}
+.mp_cart_breadcrumbs .current{
+font-weight: bold;
+}
+
+.mp_cart_breadcrumbs .sep,
+.mp_cart_breadcrumbs .incomplete:not(.current){
+color:#cccccc;
+}
+.mp_cart_breadcrumbs .current + .sep{
+color:black;
+}

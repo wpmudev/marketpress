@@ -789,6 +789,8 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
       //generic error message context for plugins to hook into
       $content .= apply_filters( 'mp_checkout_error_checkout', '' );
 
+      $content .= mp_cart_breadcrumbs($checkoutstep);
+
       //handle checkout steps
       switch($checkoutstep) {
 
@@ -1960,6 +1962,39 @@ function mp_orderstatus_link($echo = true, $url = false, $link_text = '') {
  */
 function mp_checkout_step_url($checkout_step) {
   return apply_filters('mp_checkout_step_url', mp_cart_link(false, true) . trailingslashit($checkout_step));
+}
+
+/**
+ * @return string HTML that shows the user their current position in the purchase process.
+ */
+function mp_cart_breadcrumbs($current_step){	
+	$steps = array(
+		'checkout-edit'=>'Review Cart',
+		'shipping'=>'Shipping',
+		'checkout'=>'Checkout',
+		'confirm-checkout'=>'Confirm',
+		'confirmation'=>'Thankyou'
+	);
+
+	$order = array_keys($steps);
+	$current = array_search($current_step, $order);
+	$all = array();
+
+	foreach($steps as $str => $human){
+		$i = array_search($str, $order);
+
+		if($i >= $current){
+			// incomplete
+			$all[] = '<span class="incomplete '.($i==$current?'current':'').'">'.$human.'</span>';
+		}else{
+			// done
+			$all[] = '<a class="done" href="'.mp_checkout_step_url($str).'">'.$human.'</a>';
+		}
+	}
+	
+	return '<div class="mp_cart_breadcrumbs">
+				'.implode('<span class="sep">&raquo;</span>', $all).'
+			</div>';
 }
 
 /**
