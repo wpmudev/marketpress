@@ -402,11 +402,11 @@ Thanks again!", 'mp')
 
   function load_shipping_plugins() {
 
-    //save settings from screen. Put here to be before plugin is loaded
+    //save shipping method. Put here to be before plugin is loaded
     if (isset($_POST['shipping_settings'])) {
       $settings = get_option('mp_settings');
-      //allow plugins to verify settings before saving
-      $settings = array_merge($settings, apply_filters('mp_shipping_settings_filter', $_POST['mp']));
+			$settings['shipping']['method'] = $_POST['mp']['shipping']['method'];
+			$settings['shipping']['calc_methods'] = isset($_POST['mp']['shipping']['calc_methods']) ? $_POST['mp']['shipping']['calc_methods'] : array();
       update_option('mp_settings', $settings);
     }
 
@@ -2921,6 +2921,18 @@ Thanks again!", 'mp')
 
         $this->cart_update_message( __('Item(s) Removed', 'mp') );
       }
+			
+			//check for empty blogid carts and unset them to avoid errors on global cart
+			foreach ($global_cart as $bid => $data) {
+				
+				foreach ($data as $product_id => $product) {
+					if (!count($product))
+						unset($global_cart[$bid][$product_id]);
+				}
+				
+				if (!count($global_cart[$bid]))
+					unset($global_cart[$bid]);
+			}
 
 			//save items to cookie
 			$this->set_global_cart_cookie($global_cart);
@@ -6554,10 +6566,14 @@ Notification Preferences: %s', 'mp');
   		case "shipping":
   		  global $mp_shipping_plugins;
 
-        //save settings
-        if (isset($_POST['shipping_settings'])) {
+				//save settings from screen. Put here to be before plugin is loaded
+				if (isset($_POST['shipping_settings'])) {
+					$settings = get_option('mp_settings');
+					//allow plugins to verify settings before saving
+					$settings = array_merge($settings, apply_filters('mp_shipping_settings_filter', $_POST['mp']));
+					update_option('mp_settings', $settings);
           echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
-        }
+				}
         ?>
         <script type="text/javascript">
       	  jQuery(document).ready(function ($) {

@@ -329,7 +329,7 @@ $this->uk_counties = array("Aberdeenshire"=>"Aberdeenshire","Angus/Forfarshire"=
 "Somerset"=>"Somerset","Staffordshire"=>"Staffordshire","Stirlingshire"=>"Stirlingshire","Suffolk"=>"Suffolk",
 "Surrey"=>"Surrey","Sussex"=>"Sussex","Sutherland"=>"Sutherland","Swansea"=>"Swansea","Torfaen"=>"Torfaen",
 "Vale of Glamorgan"=>"Vale of Glamorgan","Warwickshire"=>"Warwickshire",
-"West Lothian/Linlithgowshire"=>"West Lothian/Linlithgowshire","Westmorland"=>"Westmorland",
+"West Lothian/Linlithgowshire"=>"West Lothian/Linlithgowshire","West Midlands"=>"West Midlands","Westmorland"=>"Westmorland",
 "Wigtownshire"=>"Wigtownshire","Wiltshire"=>"Wiltshire",
 "Worcestershire"=>"Worcestershire","Wrexham"=>"Wrexham","Yorkshire"=>"Yorkshire");
 

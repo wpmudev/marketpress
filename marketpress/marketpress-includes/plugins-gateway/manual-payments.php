@@ -228,7 +228,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 			return $settings;
 		
 		//strip slashes
-    $settings['gateways']['manual-payments'] = array_map('stripslashes', $settings['gateways']['manual-payments']);
+    $settings['gateways']['manual-payments'] = array_map('stripslashes', (array)$settings['gateways']['manual-payments']);
 		
 		//no html in public name
   	$settings['gateways']['manual-payments']['name'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['manual-payments']['name']));
