@@ -1552,7 +1552,7 @@ Thanks again!", 'mp')
 
 		$msgs = $this->get_setting('msg');
     $content .= do_shortcode($msgs['product_list']);
-    $content .=  $this->get_setting('show_filters')==1 ? $this->get_filter_order_html() : '';
+    $content .= $this->get_setting('show_filters')==1 ? mp_products_filter() : '';
     $content .= mp_list_products(false);
     $content .= '<div id="mp_product_nav">' . get_posts_nav_link() . '</div>';
 
@@ -1567,54 +1567,18 @@ Thanks again!", 'mp')
 
 		$msgs = $this->get_setting('msg');
     $content = do_shortcode($msgs['product_list']);
-    $content .=  $this->get_setting('show_filters')==1 ? $this->get_filter_order_html() : '';
+    $content .= $this->get_setting('show_filters')==1 ? mp_products_filter() : '';
     $content .= mp_list_products(false);
     $content .= '<div id="mp_product_nav">' . get_posts_nav_link() . '</div>';
 
     return $content;
   }
 
-  /**
-   * @return string   html for filter/order products select elements.
-   */
-  function get_filter_order_html(){
-
-      $terms = wp_dropdown_categories(array(
-        'name' => 'filter-term',
-        'taxonomy' => 'product_category',
-        'show_option_none' => 'Show All',
-        'show_count' => 1,
-        'orderby' => 'name',
-        'selected' => '',
-        'echo' => 0,
-        'hierarchical' => true
-      )); 
-
-      return 
-      ' <div class="mp_list_filter">
-            <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
-                <div class="one_filter">
-                  <span>Category</span>
-                  '.$terms.'
-                </div>
-
-                <div class="one_filter">
-                  <span>Price</span>
-                  <select name="order-price">
-                    <option value="0">Select Order</option>
-                    <option value="asc">Low to High</option>
-                    <option value="desc">High to Low</option>
-                  </select>
-                </div>
-            </form>
-        </div>';
-  }
-
 	/**
 	* ajax handler
 	* @return string html of products list, and optionally pagination
 	*/
-	function get_products_list(){
+	function get_products_list() {
     global $wp_query;
 
 		$ret = array('products'=>false, 'pagination'=>false);
@@ -1629,34 +1593,34 @@ Thanks again!", 'mp')
 			'tag' => '',
 			'list_view'=> false));
 
-		if( isset($_POST['order-price']) && in_array($_POST['order-price'], array('asc','desc')) ){
-				$order_by = 'price';
-				$order = strtoupper($_POST['order-price']);
+		if ( isset($_POST['order-price']) && in_array($_POST['order-price'], array('asc','desc')) ) {
+			$order_by = 'price';
+			$order = strtoupper($_POST['order-price']);
 		}
 
-		if( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1){
-				$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
-				$category = $term->slug;
+		if ( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1) {
+			$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
+			$category = $term->slug;
 		}
 
-		if( isset($_POST['page']) && is_numeric($_POST['page']) ){
-				$page = $_POST['page'];
+		if ( isset($_POST['page']) && is_numeric($_POST['page']) ){
+			$page = $_POST['page'];
 		}
 
 		$ret['products'] = mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
 
-		if($this->get_setting('paginate')){
+		if ( $this->get_setting('paginate') ) {
 
 			// get_posts_nav_link() does not work with ajax
 			$max = $wp_query->max_num_pages;
-			$prev=$next='';
+			$prev = $next = '';
 
-			if($max > 1){
-				if( $page != $max ){
-					$next='<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
+			if ($max > 1) {
+				if ( $page != $max ) {
+					$next = '<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
 				}
-				if($page != 1){
-					$prev='<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
+				if ( $page != 1 ) {
+					$prev = '<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
 				}
 				$ret['pagination'] = '<div id="mp_product_nav">' . $prev . (strlen($prev)>0 && strlen($next)>0?' &#8212; ':'') . $next . '</div>';
 			}
@@ -1681,22 +1645,22 @@ Thanks again!", 'mp')
 
   //adjusts the query vars on the products/order management screens.
   function handle_edit_screen_filter($request) {
-	if ( is_admin() ) {
-		global $current_screen;
-
-		if ( $current_screen->id == 'edit-product' ) {
-			//Switches the product_category ids to slugs as you can't query custom taxonomys with ids
-			if ( !empty( $request['product_category'] ) ) {
-				$cat = get_term_by('id', $request['product_category'], 'product_category');
-				$request['product_category'] = $cat->slug;
+		if ( is_admin() ) {
+			global $current_screen;
+	
+			if ( $current_screen->id == 'edit-product' ) {
+				//Switches the product_category ids to slugs as you can't query custom taxonomys with ids
+				if ( !empty( $request['product_category'] ) ) {
+					$cat = get_term_by('id', $request['product_category'], 'product_category');
+					$request['product_category'] = $cat->slug;
+				}
+			} else if ( $current_screen->id == 'product_page_marketpress-orders' && !isset($_GET['post_status']) ) {
+				//set the post status when on "All" to everything but closed
+				$request['post_status'] = 'order_received,order_paid,order_shipped';
 			}
-		} else if ( $current_screen->id == 'product_page_marketpress-orders' && !isset($_GET['post_status']) ) {
-			//set the post status when on "All" to everything but closed
-			$request['post_status'] = 'order_received,order_paid,order_shipped';
 		}
-	}
-
-	return $request;
+	
+		return $request;
   }
 
   //adds our custom column headers to edit products screen

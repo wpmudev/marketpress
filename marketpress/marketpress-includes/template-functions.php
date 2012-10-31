@@ -1857,6 +1857,43 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
 }
 
 /**
+ * Displays the product list filter dropdowns
+ * 
+ * @return string   html for filter/order products select elements.
+ */
+function mp_products_filter() {
+  $terms = wp_dropdown_categories(array(
+    'name' => 'filter-term',
+    'taxonomy' => 'product_category',
+    'show_option_none' => __('Show All', 'mp'),
+    'show_count' => 1,
+    'orderby' => 'name',
+    'selected' => '',
+    'echo' => 0,
+    'hierarchical' => true
+  )); 
+
+  return 
+  ' <div class="mp_list_filter">
+        <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
+            <div class="one_filter">
+              <span>'.__('Category', 'mp').'</span>
+              '.$terms.'
+            </div>
+
+            <div class="one_filter">
+              <span>'.__('Price', 'mp').'</span>
+              <select name="order-price">
+                <option value="0">'.__('Select Order', 'mp').'</option>
+                <option value="asc">'.__('Low to High', 'mp').'</option>
+                <option value="desc">'.__('High to Low', 'mp').'</option>
+              </select>
+            </div>
+        </form>
+    </div>';
+}
+  
+/**
  * Echos the current shopping cart link. If global cart is on reflects global location
  * @param bool $echo Optional, whether to echo. Defaults to true
  * @param bool $url Optional, whether to return a link or url. Defaults to show link.

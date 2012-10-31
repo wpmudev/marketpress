@@ -5,7 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8 - 10/15/2012 - Aaron Edwards
+2.8 - 10/31/2012 - Aaron, Cole, Enzo
 ----------------------------------------------------------------------
 - Added built in grid views!
 - Added ability to trash/delete orders and adjusts stock counts accordingly
