@@ -1578,8 +1578,8 @@ Thanks again!", 'mp')
 	* ajax handler
 	* @return string html of products list, and optionally pagination
 	*/
-	function get_products_list() {
-    global $wp_query;
+	function get_products_list(){
+		global $wp_query;
 
 		$ret = array('products'=>false, 'pagination'=>false);
 
@@ -1593,34 +1593,43 @@ Thanks again!", 'mp')
 			'tag' => '',
 			'list_view'=> false));
 
-		if ( isset($_POST['order-price']) && in_array($_POST['order-price'], array('asc','desc')) ) {
-			$order_by = 'price';
-			$order = strtoupper($_POST['order-price']);
+		if( isset($_POST['order']) ){
+				$o = explode('-',$_POST['order']);
+
+				// column
+				if(isset($o[0]) && in_array($o[0], array('date','title','price','sales'))){
+					$order_by = $o[0];
+				}
+
+				// direction
+				if(isset($o[1]) &&  in_array($o[1], array('asc','desc'))){
+					$order = strtoupper($o[1]);
+				}
 		}
 
-		if ( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1) {
-			$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
-			$category = $term->slug;
+		if( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1){
+				$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
+				$category = $term->slug;
 		}
 
-		if ( isset($_POST['page']) && is_numeric($_POST['page']) ){
-			$page = $_POST['page'];
+		if( isset($_POST['page']) && is_numeric($_POST['page']) ){
+				$page = $_POST['page'];
 		}
 
 		$ret['products'] = mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
 
-		if ( $this->get_setting('paginate') ) {
+		if($this->get_setting('paginate')){
 
 			// get_posts_nav_link() does not work with ajax
 			$max = $wp_query->max_num_pages;
-			$prev = $next = '';
+			$prev=$next='';
 
-			if ($max > 1) {
-				if ( $page != $max ) {
-					$next = '<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
+			if($max > 1){
+				if( $page != $max ){
+					$next='<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
 				}
-				if ( $page != 1 ) {
-					$prev = '<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
+				if($page != 1){
+					$prev='<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
 				}
 				$ret['pagination'] = '<div id="mp_product_nav">' . $prev . (strlen($prev)>0 && strlen($next)>0?' &#8212; ':'') . $next . '</div>';
 			}

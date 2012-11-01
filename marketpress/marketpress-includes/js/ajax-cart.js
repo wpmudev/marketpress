@@ -61,7 +61,7 @@ jQuery(document).ready(function($) {
 		// hash tags are used to store the current state in these situations:
 		//	a) when the user views a product and then clicks back
 		//	b) viewing the URL from a bookmark
-		if( /filter-term|order-price|paged/.test(location.hash) ){
+		if( /filter-term|order|paged/.test(location.hash) ){
 				var query_string = location.hash.replace('#', '');
 				get_and_insert_products(query_string);
 				update_dropdown_state(query_string);

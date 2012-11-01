@@ -1285,7 +1285,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
 		}
 
     //figure out page
-    if ($wp_query->query_vars['paged'])
+    if (isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'])
       $paginate_query .= '&paged='.intval($wp_query->query_vars['paged']);
 
     if (intval($page))
@@ -1305,6 +1305,8 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   } else {
   	if ('price' == $order_by)
   		$order_by_query = '&meta_key=mp_price_sort&orderby=meta_value_num';
+    else if('sales' == $order_by)
+      $order_by_query = '&meta_key=mp_sales_count&orderby=meta_value_num';
     else
     	$order_by_query = '&orderby='.$order_by;
   }
@@ -1861,36 +1863,41 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
  * 
  * @return string   html for filter/order products select elements.
  */
-function mp_products_filter() {
-  $terms = wp_dropdown_categories(array(
-    'name' => 'filter-term',
-    'taxonomy' => 'product_category',
-    'show_option_none' => __('Show All', 'mp'),
-    'show_count' => 1,
-    'orderby' => 'name',
-    'selected' => '',
-    'echo' => 0,
-    'hierarchical' => true
-  )); 
+function mp_products_filter(){
+      $terms = wp_dropdown_categories(array(
+        'name' => 'filter-term',
+        'taxonomy' => 'product_category',
+        'show_option_none' => __('Show All', 'mp'),
+        'show_count' => 1,
+        'orderby' => 'name',
+        'selected' => '',
+        'echo' => 0,
+        'hierarchical' => true
+      )); 
 
-  return 
-  ' <div class="mp_list_filter">
-        <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
-            <div class="one_filter">
-              <span>'.__('Category', 'mp').'</span>
-              '.$terms.'
-            </div>
+      return 
+      ' <div class="mp_list_filter">
+            <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
+                <div class="one_filter">
+                  <span>'.__('Category', 'mp').'</span>
+                  '.$terms.'
+                </div>
 
-            <div class="one_filter">
-              <span>'.__('Price', 'mp').'</span>
-              <select name="order-price">
-                <option value="0">'.__('Select Order', 'mp').'</option>
-                <option value="asc">'.__('Low to High', 'mp').'</option>
-                <option value="desc">'.__('High to Low', 'mp').'</option>
-              </select>
-            </div>
-        </form>
-    </div>';
+                <div class="one_filter">
+                  <span>'.__('Order By', 'mp').'</span>
+                  <select name="order">
+
+                    <option value="0">Default</option>
+                    <option value="date-desc">Release date</option>
+                    <option value="title-asc">Name</option>
+                    <option value="price-asc">Price (Low to High)</option>
+                    <option value="price-desc">Price (High to Low)</option>
+                    <option value="sales-desc">Popularity</option>
+
+                  </select>
+                </div>
+            </form>
+        </div>';
 }
   
 /**
