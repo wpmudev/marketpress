@@ -1631,10 +1631,18 @@ function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
 	    $price = '<span itemprop="price" class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
 	  }
 	} else if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1 && !is_singular('product')) { //only show from price in lists
+    
     if ($meta["mp_is_sale"]) {
-	    $price = __('from', 'mp').' <span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</del>';
-	    $price .= '<span itemprop="price" class="mp_current_price">'.$mp->format_currency('', $meta["mp_sale_price"][0]).'</span></span>';
+      //do some crazy stuff here to get the lowest price pair ordered by sale prices
+      asort($meta["mp_sale_price"], SORT_NUMERIC);
+      $lowest = array_slice($meta["mp_sale_price"], 0, 1, true);
+      $keys = array_keys($lowest);
+      $mp_price = $meta["mp_price"][$keys[0]];
+      $mp_sale_price = array_pop($lowest);
+	    $price = __('from', 'mp').' <span class="mp_special_price"><del class="mp_old_price">'.$mp->format_currency('', $mp_price).'</del>';
+	    $price .= '<span itemprop="price" class="mp_current_price">'.$mp->format_currency('', $mp_sale_price).'</span></span>';
 	  } else {
+      sort($meta["mp_price"], SORT_NUMERIC);
 	    $price = __('from', 'mp').' <span itemprop="price" class="mp_normal_price"><span class="mp_current_price">'.$mp->format_currency('', $meta["mp_price"][0]).'</span></span>';
 	  }
 	} else {

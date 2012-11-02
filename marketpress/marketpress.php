@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8 Beta 2
+Version: 2.8 Beta 3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -209,12 +209,12 @@ class MarketPress {
       'show_quantity' => 1,
       'product_img_size' => 'medium',
       'show_lightbox' => 1,
-      'list_view' => 'list',
+      'list_view' => 'grid',
       'list_button_type' => 'addcart',
       'show_thumbnail' => 1,
       'list_img_size' => 'thumbnail',
       'paginate' => 1,
-      'show_filters' => 0,
+      'show_filters' => 1,
       'order' => 'DESC',
       'shipping' => array (
         'allowed_countries' => array ('CA', 'US'),
@@ -6261,8 +6261,8 @@ Notification Preferences: %s', 'mp');
                 <tr>
         				<th scope="row"><?php _e('Product List View', 'mp') ?></th>
         				<td>
-                  <label><input value="list" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view'), 'list') ?> /> <?php _e('List View', 'mp') ?></label><br />
-                  <label><input value="grid" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view'), 'grid') ?> /> <?php _e('Grid View', 'mp') ?></label>
+                  <label><input value="list" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view', 'grid'), 'list') ?> /> <?php _e('List View', 'mp') ?></label><br />
+                  <label><input value="grid" name="mp[list_view]" type="radio"<?php checked($this->get_setting('list_view', 'grid'), 'grid') ?> /> <?php _e('Grid View', 'mp') ?></label>
         				</td>
                 </tr>
                 <tr>
@@ -6322,12 +6322,12 @@ Notification Preferences: %s', 'mp');
          	  </td>
                 </tr>
                 <tr>
-                  <td scope="row"><?php _e('Show dropdown boxes', 'mp') ?></td>
+                  <td scope="row"><?php _e('Show Product Filters', 'mp') ?></td>
                   <td> 
                     <label><input value="1" name="mp[show_filters]" type="radio"<?php checked($this->get_setting('show_filters'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                     <label><input value="0" name="mp[show_filters]" type="radio"<?php checked($this->get_setting('show_filters'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                     <br />
-                    <span class="description">Show select product category, order by price dropdown boxes. Uses Ajax to update the page without reloading.</span>
+                    <span class="description"><?php _e('Show "Product Category" and "Order By" filters at the top of listings pages. Uses AJAX for instant updates based on user selection.', 'mp') ?></span>
                   </td>
                 </tr>
               </table>
