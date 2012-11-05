@@ -216,7 +216,7 @@ class MarketPress {
       'paginate' => 1,
       'show_filters' => 1,
       'order' => 'DESC',
-      'show_purchase_breadcrumbs' => 0,
+      'show_purchase_breadcrumbs' => 1,
       'shipping' => array (
         'allowed_countries' => array ('CA', 'US'),
         'method' => 'flat-rate',

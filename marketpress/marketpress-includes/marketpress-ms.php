@@ -1130,8 +1130,8 @@ function mp_global_categories_list( $args = '' ) {
 
 	if ( $echo )
 		echo '<ul id="mp_category_list">' . $list . '</ul>';
-
-	return '<ul id="mp_category_list">' . $list . '</ul>';
+	else
+		return '<ul id="mp_category_list">' . $list . '</ul>';
 }
 
 /**
@@ -1270,7 +1270,9 @@ function mp_list_global_products( $args = '' ) {
   } else {
     $query = "SELECT blog_id, p.post_id, post_permalink, post_title, post_content FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
   }
-
+	
+	$query = apply_filters('mp_list_global_products_sql_where', $query);
+	
   //get order by
   switch ($order_by) {
 

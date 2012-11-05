@@ -1895,7 +1895,7 @@ function mp_products_filter(){
 
       $options=array(
         array('0', '', __('Default', 'mp')),
-        array('date', 'desc', __('Release date', 'mp')),
+        array('date', 'desc', __('Release Date', 'mp')),
         array('title', 'asc', __('Name', 'mp')),
         array('price', 'asc', __('Price (Low to High)', 'mp')),
         array('price', 'desc', __('Price (High to Low)', 'mp')),
