@@ -8,18 +8,20 @@ Change Log:
 2.8 - 10/31/2012 - Aaron, Cole, Enzo
 ----------------------------------------------------------------------
 - Added built in grid views!
-- Added ability to trash/delete orders and adjusts stock counts accordingly
-- Fix bug with product list widget when ordering by price or sales
+- Add in AJAX dropdown category and order filters to listings pages
+- Add breadcrumbs to checkout process steps
 - Add default product images
+- Added ability to trash/delete orders and adjusts stock counts accordingly
 - Add a hooks for custom shipping methods and tracking links
-- Other minor bug/notice fixes
 - Forced shipping option recalculation when Country changes.
+- Fix bug with product list widget when ordering by price or sales
 - Fix missing closing tag in global widget breaking drag and drop
 - Fix shipping settings save filter for method plugins
 - Error check in Manual Payments gateway: http://premium.wpmudev.org/forums/topic/bug-with-manual-payment
 - Fixed 10525 Paypal errors in global cart checkouts
 - Change the "from" price shown on variation listings to the lowest
 - Change PayPal generated timestamps for server timezone support
+- Other minor bug/notice fixes
 
 2.7 - 10/03/2012 - Aaron Edwards
 ----------------------------------------------------------------------
