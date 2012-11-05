@@ -789,7 +789,9 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
       //generic error message context for plugins to hook into
       $content .= apply_filters( 'mp_checkout_error_checkout', '' );
 
-      $content .= mp_cart_breadcrumbs($checkoutstep);
+      if( $mp->get_setting('show_purchase_breadcrumbs')==1 ){
+        $content .= mp_cart_breadcrumbs($checkoutstep);
+      }
 
       //handle checkout steps
       switch($checkoutstep) {
@@ -1403,7 +1405,6 @@ function get_products_html_grid($post_array=array()){
   $html='';
   foreach ($post_array as $post){
     
-
     $img = mp_product_image(false, 'list', $post->ID);
     $excerpt = $mp->get_setting('show_excerpt') ?
                       '<p class="mp_excerpt">'.$mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID).'</p>' :
@@ -1413,6 +1414,7 @@ function get_products_html_grid($post_array=array()){
     $class=array();
     $class[] = strlen($img)>0?'mp_thumbnail':'';
     $class[] = strlen($excerpt)>0?'mp_excerpt':'';
+    $class[] = has_price_variations($post->ID) ? 'mp_price_variations':'';
 
     $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
                 <div class="mp_one_product">
@@ -1438,6 +1440,12 @@ function get_products_html_grid($post_array=array()){
 
   return $html;
 }
+
+function has_price_variations($post_id){
+  $mp_price = maybe_unserialize(get_post_meta($post_id, 'mp_price', true));
+  return (is_array($mp_price) && count($mp_price) > 1);
+}
+
 
 /*
  * function mp_product
@@ -1872,6 +1880,8 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
  * @return string   html for filter/order products select elements.
  */
 function mp_products_filter(){
+      global $mp;
+
       $terms = wp_dropdown_categories(array(
         'name' => 'filter-term',
         'taxonomy' => 'product_category',
@@ -1881,7 +1891,16 @@ function mp_products_filter(){
         'selected' => '',
         'echo' => 0,
         'hierarchical' => true
-      )); 
+      ));
+
+      $options=array(
+        array('0', '', __('Default', 'mp')),
+        array('date', 'desc', __('Release date', 'mp')),
+        array('title', 'asc', __('Name', 'mp')),
+        array('price', 'asc', __('Price (Low to High)', 'mp')),
+        array('price', 'desc', __('Price (High to Low)', 'mp')),
+        array('sales', 'desc', __('Popularity', 'mp'))
+      );
 
       return 
       ' <div class="mp_list_filter">
@@ -1894,19 +1913,33 @@ function mp_products_filter(){
                 <div class="one_filter">
                   <span>'.__('Order By', 'mp').'</span>
                   <select name="order">
-
-                    <option value="0">Default</option>
-                    <option value="date-desc">Release date</option>
-                    <option value="title-asc">Name</option>
-                    <option value="price-asc">Price (Low to High)</option>
-                    <option value="price-desc">Price (High to Low)</option>
-                    <option value="sales-desc">Popularity</option>
-
+                    '.get_filter_order_options($options).'
                   </select>
                 </div>
             </form>
         </div>';
 }
+
+/**
+ * @param  array $options 2d array, each child array contains: 0: column, 1: order (asc|desc), 2: human readable value
+ * @return string html of select element options
+ */
+function get_filter_order_options($options){
+  global $mp;
+  $html='';
+  $current_order = strtolower($mp->get_setting('order_by').'-'.$mp->get_setting('order'));
+
+  foreach($options as $k => $t){
+    $value = $t[0].'-'.$t[1];
+    $selected = $current_order == $value ? 'selected' : '';
+
+    $html.='<option value="'.$value.'" '.$selected.'>
+              '.$t[2].'
+            </option>';
+  }
+  return $html;
+}
+
   
 /**
  * Echos the current shopping cart link. If global cart is on reflects global location
@@ -2021,11 +2054,11 @@ function mp_checkout_step_url($checkout_step) {
  */
 function mp_cart_breadcrumbs($current_step){	
 	$steps = array(
-		'checkout-edit'=>'Review Cart',
-		'shipping'=>'Shipping',
-		'checkout'=>'Checkout',
-		'confirm-checkout'=>'Confirm',
-		'confirmation'=>'Thankyou'
+		'checkout-edit'=>__('Review Cart','mp'),
+		'shipping'=>__('Shipping','mp'),
+		'checkout'=>__('Checkout','mp'),
+		'confirm-checkout'=>__('Confirm','mp'),
+		'confirmation'=>__('Thankyou','mp')
 	);
 
 	$order = array_keys($steps);
@@ -2045,7 +2078,9 @@ function mp_cart_breadcrumbs($current_step){
 	}
 	
 	return '<div class="mp_cart_breadcrumbs">
-				'.implode('<span class="sep">&raquo;</span>', $all).'
+				'.implode(
+            '<span class="sep">'.apply_filters('mp_cart_breadcrumbs_seperator', '&raquo;').'</span>', 
+            $all).'
 			</div>';
 }
 

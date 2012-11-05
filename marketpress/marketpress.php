@@ -216,6 +216,7 @@ class MarketPress {
       'paginate' => 1,
       'show_filters' => 1,
       'order' => 'DESC',
+      'show_purchase_breadcrumbs' => 0,
       'shipping' => array (
         'allowed_countries' => array ('CA', 'US'),
         'method' => 'flat-rate',
@@ -6186,7 +6187,8 @@ Notification Preferences: %s', 'mp');
             <h3 class='hndle'><span><?php _e('General Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
-        				<th scope="row"><?php _e('Store Style', 'mp') ?></th>
+        				<tr>
+                <th scope="row"><?php _e('Store Style', 'mp') ?></th>
         				<td>
                   <?php $this->store_themes_select(); ?>
                   <br /><span class="description"><?php _e('This option changes the built-in css styles for store pages.', 'mp') ?></span>
@@ -6201,6 +6203,14 @@ Notification Preferences: %s', 'mp');
 										<?php _e('The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!', 'mp') ?></div>
 									<?php } ?>
 									</td>
+                </tr>
+                <tr>
+                  <th scope="row"><?php _e('Show breadcrumbs for purchase process?', 'mp') ?></th>
+                  <td>
+                    <label><input value="1" name="mp[show_purchase_breadcrumbs]" type="radio"<?php checked($this->get_setting('show_purchase_breadcrumbs'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                    <label><input value="0" name="mp[show_purchase_breadcrumbs]" type="radio"<?php checked($this->get_setting('show_purchase_breadcrumbs'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                    <br /><span class="description"><?php _e('Show previous, current and next steps when a customer is purchasing their cart, shown below the title.', 'mp') ?></span>
+                  </td>
                 </tr>
               </table>
             </div>
