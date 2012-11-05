@@ -19,6 +19,7 @@ Change Log:
 - Error check in Manual Payments gateway: http://premium.wpmudev.org/forums/topic/bug-with-manual-payment
 - Fixed 10525 Paypal errors in global cart checkouts
 - Change the "from" price shown on variation listings to the lowest
+- Change PayPal generated timestamps for server timezone support
 
 2.7 - 10/03/2012 - Aaron Edwards
 ----------------------------------------------------------------------

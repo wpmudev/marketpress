@@ -4822,8 +4822,8 @@ Notification Preferences: %s', 'mp');
           </tr></thead>
           <tbody>
           <?php
-			global $blog_id;
-			$bid = (is_multisite()) ? $blog_id : 1; // FPM
+					global $blog_id;
+					$bid = (is_multisite()) ? $blog_id : 1; // FPM
 
           if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
             foreach ($order->mp_cart_info as $product_id => $variations) {

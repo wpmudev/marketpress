@@ -345,7 +345,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				  $payment_info['method'] = ($result["PAYMENTINFO_{$i}_PAYMENTTYPE"] == 'echeck') ? __('eCheck', 'mp') : __('PayPal balance, Credit Card, or Instant Transfer', 'mp');
 				  $payment_info['transaction_id'] = $result["PAYMENTINFO_{$i}_TRANSACTIONID"];
 
-				  $timestamp = strtotime($result["PAYMENTINFO_{$i}_ORDERTIME"]);
+				  $timestamp = time();//strtotime($result["PAYMENTINFO_{$i}_ORDERTIME"]);
 				  //setup status
 				  switch ($result["PAYMENTINFO_{$i}_PAYMENTSTATUS"]) {
 				    case 'Canceled-Reversal':

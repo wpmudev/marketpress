@@ -515,9 +515,6 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $settings['gateways']['payflow']['api_key'],
       ($settings['gateways']['payflow']['mode'] == 'sandbox'));
 
-
-
-
     $payment->transaction($_SESSION['card_num']);
     $payment->setParameter("EXPDATE", $_SESSION['exp_month'] .substr($_SESSION['exp_year'],2,2));
     $payment->setParameter("CVV2", $_SESSION['card_code'] );
@@ -596,32 +593,32 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
     $payment->setParameter("EMAIL", $billing_info['email']);
     
- 	$_ship_names = split(" ", $shipping_info['name']);
-    
-	if (isset($_ship_names[0])) {
-		$first_name_shipping = array_shift($_ship_names);
-	} else {
-		$first_name_shipping = "";
-	}
-	
-	if (isset($_ship_names[0])) {
-		$last_name_shipping = join(" ", $_ship_names);
-	} else {
-		$last_name_shipping = "";
-	}
-	
-	$ship_address = $shipping_info['address1'];
-	
-	if (!empty($shipping_info['address2'])) {
-		$ship_address .= "\n".$shipping_info['address2'];
-	}
-	$payment->setParameter("SHIPTOFIRSTNAME", $first_name_shipping);
-	$payment->setParameter("SHIPTOLASTNAME", $last_name_shipping);
-	$payment->setParameter("SHIPTOCITY", $shipping_info["city"]);
-	$payment->setParameter("SHIPTOSTATE", $shipping_info["state"]);
-	$payment->setParameter("SHIPTOCOUNTRY", $shipping_info["country"]);
-	$payment->setParameter("SHIPTOZIP", $shipping_info["zip"]);
-	$payment->setParameter("SHIPTOSTREET", $ship_address);    
+		$_ship_names = split(" ", $shipping_info['name']);
+			
+		if (isset($_ship_names[0])) {
+			$first_name_shipping = array_shift($_ship_names);
+		} else {
+			$first_name_shipping = "";
+		}
+		
+		if (isset($_ship_names[0])) {
+			$last_name_shipping = join(" ", $_ship_names);
+		} else {
+			$last_name_shipping = "";
+		}
+		
+		$ship_address = $shipping_info['address1'];
+		
+		if (!empty($shipping_info['address2'])) {
+			$ship_address .= "\n".$shipping_info['address2'];
+		}
+		$payment->setParameter("SHIPTOFIRSTNAME", $first_name_shipping);
+		$payment->setParameter("SHIPTOLASTNAME", $last_name_shipping);
+		$payment->setParameter("SHIPTOCITY", $shipping_info["city"]);
+		$payment->setParameter("SHIPTOSTATE", $shipping_info["state"]);
+		$payment->setParameter("SHIPTOCOUNTRY", $shipping_info["country"]);
+		$payment->setParameter("SHIPTOZIP", $shipping_info["zip"]);
+		$payment->setParameter("SHIPTOSTREET", $ship_address);    
  
     $payment->setParameter("CLIENTIP", $_SERVER['REMOTE_ADDR']);
 
