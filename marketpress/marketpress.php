@@ -3314,7 +3314,13 @@ Thanks again!", 'mp')
 		$filtered_cart = $cart;
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-	      $filtered_cart[$product_id][$variation]['price'] = $this->before_tax_price($data['price'], $product_id);
+        
+        // store orignal price 
+        // if tax_inclusive==true, before_tax_price() rounds to two decimal places
+        // the original price cannot be accurately calculated on the order tracking page with just the before_tax_price value
+        $filtered_cart[$product_id][$variation]['price_db'] = $data['price'];
+	      
+        $filtered_cart[$product_id][$variation]['price'] = $this->before_tax_price($data['price'], $product_id);
 			}
 		}
 
@@ -3365,10 +3371,17 @@ Thanks again!", 'mp')
 
     //payment info
     add_post_meta($post_id, 'mp_order_total', $payment_info['total'], true);
-    add_post_meta($post_id, 'mp_shipping_total', ($shipping_total ? $shipping_total : $this->shipping_price(false, $cart)), true);
+
+    $mp_shipping_total = ($shipping_total ? $shipping_total : $this->shipping_price(false, $cart));
+    add_post_meta($post_id, 'mp_shipping_total', $mp_shipping_total, true);
+    add_post_meta($post_id, 'mp_shipping_with_tax', $this->shipping_tax_price($mp_shipping_total), true);
+
     add_post_meta($post_id, 'mp_tax_total', ($tax_total ? $tax_total : $this->tax_price(false, $cart)), true);
     add_post_meta($post_id, 'mp_order_items', $item_count, true);
 
+    add_post_meta($post_id, 'mp_tax_inclusive', $this->get_setting('tax->tax_inclusive'), true);
+    add_post_meta($post_id, 'mp_tax_shipping', $this->get_setting('tax->tax_shipping'), true);
+    
     $timestamp = time();
     add_post_meta($post_id, 'mp_received_time', $timestamp, true);
 
@@ -3449,6 +3462,8 @@ Thanks again!", 'mp')
     if (empty($id))
       return false;
 
+
+
 		$order = get_post($id);
     if (!$order)
       return false;
@@ -3458,7 +3473,7 @@ Thanks again!", 'mp')
 		//unserialize a and add to object
 		foreach ($meta as $key => $val)
       $order->$key = maybe_unserialize($meta[$key][0]);
-
+    
     return $order;
   }
 
@@ -4200,7 +4215,8 @@ Thanks again!", 'mp')
       $order_info = __('Items:', 'mp') . "\n";
       foreach ($order->mp_cart_info as $product_id => $variations) {
 				foreach ($variations as $variation => $data) {
-	        $order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+					$price = get_display_price($order, $data);
+					$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($price, 2) . ' = '. number_format_i18n($price * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 					//show download link if set
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
@@ -4234,7 +4250,7 @@ Thanks again!", 'mp')
     }
     //shipping line
     if ( $order->mp_shipping_total ) {
-      $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($order->mp_shipping_total, 2) . ' ' . $order->mp_payment_info['currency'];
+      $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n(get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //tax line
     if ( $order->mp_tax_total ) {

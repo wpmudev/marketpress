@@ -221,7 +221,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
       if ( ($shipping_tax_price = $mp->shipping_tax_price($shipping_price)) !== false )
         $shipping_tax_prices[] = $shipping_tax_price;
-        
+      
       if ( ($tax_price = $mp->tax_price()) !== false )
         $tax_prices[] = $tax_price;
     }
@@ -964,9 +964,12 @@ function mp_order_status() {
                   }
 					
 		              echo '</td>'; // Added WPML (This differs than other code)
+
+                  $price = get_display_price($order, $data);
+
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
-		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $price) . '</td>';
+		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $price * $data['quantity']) . '</td>';
 									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->post_title)) {
                     if ($order_paid) {
                       //check for too many downloads
@@ -997,8 +1000,8 @@ function mp_order_status() {
         <?php } ?>
 
         <?php //shipping line
-        if ( $order->mp_shipping_total ) { ?>
-        <li><?php _e('Shipping:', 'mp'); ?> <strong><?php echo $mp->format_currency('', $order->mp_shipping_total); ?></strong></li>
+        if ( $order->mp_shipping_total ){ ?>
+          <li><?php _e('Shipping:', 'mp'); ?> <strong><?php echo $mp->format_currency('', get_display_shipping($order)); ?></strong></li>
         <?php } ?>
 
         <?php //tax line
@@ -1177,6 +1180,22 @@ function mp_order_status() {
 
     }
   }
+}
+
+/**
+ * if tax_inclusive prices enabled, show product line prices with tax to match the review/confirm cart pages
+ * @param  object $order post-order object
+ * @param  array $data  data for one product line
+ * @return float price to display on order tracking and emails for admin/customers
+ */
+function get_display_price($order, $data){
+	return isset($order->mp_tax_inclusive) && $order->mp_tax_inclusive==1 && isset($data['price_db']) ?
+	            $data['price_db'] :
+	            $data['price'];
+}
+
+function get_display_shipping($order){
+	return isset($order->mp_shipping_with_tax) ? $order->mp_shipping_with_tax : $order->mp_tax_shipping;
 }
 
 /*
