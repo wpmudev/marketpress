@@ -63,7 +63,48 @@ class MarketPress_Importer {
 	function process() {
 		
 	}
-	
+
+	/**
+	 * sets a featured image on a post
+	 * @param integer $post_id   parent post to set featured image on
+	 * @param string $file_path absolute file path to image
+	 */
+	function set_featured_image($post_id, $file_path){
+
+		// validate arguments
+		if( !is_numeric($post_id) || !file_exists($file_path) ){
+			return false;
+		}
+
+		// replace windows dir seperator '\' with unix. (windows can use either, wp_basename does not work with windows paths)
+		$file_path = str_replace('\\', '/', $file_path);
+
+		$wp_filetype = wp_check_filetype(basename($file_path), null);
+		$attachment = array(
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title' => preg_replace('/\.[^.]+$/', '', basename($file_path)),
+			'post_content' => '',
+			'post_status' => 'inherit'
+		);
+
+		$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
+		
+		require_once(ABSPATH . 'wp-admin/includes/image.php'); // wp_generate_attachment_metadata()
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
+		wp_update_attachment_metadata( $attach_id, $attach_data );
+
+		// add featured image to post
+		add_post_meta($post_id, '_thumbnail_id', $attach_id);
+	}
+
+	/**
+	 * returns absolute file paths. input file paths are relative to the uploads directory
+	 * converts windows dir seperators to unix, wp_basename() does not work with windows seperators (\)
+	 */
+	function rel_to_absolute($file_path){
+		$dir = wp_upload_dir();
+		return trailingslashit($dir['basedir']).ltrim(str_replace('\\', '/', $file_path), '/');
+	}
 }
 
 /* ------------------------------------------------------------------ */
@@ -259,7 +300,18 @@ class CsvImporter extends MarketPress_Importer {
 			
 		}
 		
-		if ($this->results) {
+		if( count($this->img_errors) > 0 ){
+			?>
+			<p>
+				<?php 
+					_e('Cannot find these images on your webserver filesystem. ', 'mp');
+					echo '<br /><span class="description">'.__('Files should be placed in the wordpress uploads directory. The webserver needs write permission to the directory containing the files. File paths in the CSV should be relative to the base of the wordpress uploads directory.', 'mp').'</span>';
+					echo '<ul><li>'.implode('</li><li>', $this->img_errors).'</li>';
+				?>
+			</p>
+			<p><?php _e('Please amend your CSV file and try again.', 'mp'); ?></p>
+			<?php
+		}else if ($this->results) {
 			@unlink($file_path);
 			?>
 			<p><?php printf( __('Successfully imported %s products from your CSV file. Products were created in draft status, so you will need to review them then publish (bulk or one-by-one). Importing the CSV file again will just create copies of the products in MarketPress.', 'mp'), number_format_i18n($this->results) ); ?></p>
@@ -282,7 +334,7 @@ class CsvImporter extends MarketPress_Importer {
 			
 				?>
 				<span class="description"><?php _e('This will allow you to import products and most of their attributes from a CSV file.', 'mp'); ?></span>
-				<p><span class="description"><?php _e('Your CSV file must be comma (,) delimited and fields with commas or quotes in them must be surrounded by parenthesis (") as per the CSV standard. Columns in the CSV file can be in any order, provided that they have the correct headings from the example file. "title" and "price" are the only required columns, all others can be left blank. A spreadsheet program like Excel or Numbers can be used to easily manipulate your import file, and their save as CSV option will create a correctly formatted file.', 'mp'); ?></span></p>
+				<p><span class="description"><?php _e('Your CSV file must be comma (,) delimited and fields with commas or quotes in them must be surrounded by parenthesis (") as per the CSV standard. Columns in the CSV file can be in any order, provided that they have the correct headings from the example file. "title" and "price" are the only required columns, all others can be left blank. Images should be uploaded to your wordpress uploads folder. Image paths are relative to the uploads folder. A spreadsheet program like Excel or Numbers can be used to easily manipulate your import file, and their save as CSV option will create a correctly formatted file.', 'mp'); ?></span></p>
 				
 				<p><?php _e('Please select and upload your CSV file below.', 'mp'); ?> 
 				<a href="<?php echo $mp->plugin_url; ?>sample-marketpress-import.csv" target="_blank"><?php _e('Use this example file &raquo;', 'mp'); ?></a>
@@ -302,12 +354,24 @@ class CsvImporter extends MarketPress_Importer {
 	function process() {
 	  global $wpdb;
 
-		set_time_limit(90); //this can take a while
+		set_time_limit(120); //this can take a while
 		$this->results = 0;
 		$products = $this->get_csv_array();
-		
+
+		// check all images exist in file system
+		$this->img_errors = array();
+		foreach($products as $key => $row){
+			if(isset($row['image']) && !empty($row['image'])){
+				if(is_writable($this->rel_to_absolute($row['image'])) === false){
+					$this->img_errors[] = sprintf(__('Row %d, %s','mp'), ($key+1), $row['image']);
+				}
+			}
+		}
+		if( count($this->img_errors) > 0 ){
+			return false;
+		}
+
 		foreach ($products as $row) {
-			
 			$product = array();
 			
 			if (empty($row['title']) || empty($row['price']))
@@ -368,9 +432,6 @@ class CsvImporter extends MarketPress_Importer {
 			if (!empty($row['weight']))
 				$shipping['weight'] = round( (float)preg_replace('/[^0-9.]/', '', $row['weight']), 2 );
 			update_post_meta($new_id, 'mp_shipping', $shipping);
-
-			//add thumbnail
-			//update_post_meta($new_id, '_thumbnail_id', $meta['_thumbnail_id'][0]);
 				
 			//download
 			if (!empty($row['download_url']))
@@ -380,7 +441,11 @@ class CsvImporter extends MarketPress_Importer {
 			if (isset($row['sales_count']))
 				update_post_meta($new_id, 'mp_sales_count', intval($row['sales_count']));
 			
-			
+			$img = $this->rel_to_absolute($row['image']);
+			if(is_writable($img)){
+				$this->set_featured_image($new_id, $img);
+			}
+
 			//inc count
 			$this->results++;
 		}	
@@ -424,9 +489,8 @@ class CsvImporter extends MarketPress_Importer {
 					foreach ($temp_fields as $key => $value) {
 						$new_fields[$titles[$key]] = $value;
 					}
+					$fields[] = $new_fields;
 				}
-				
-				$fields[] = $new_fields;
 			}
 	
 	
