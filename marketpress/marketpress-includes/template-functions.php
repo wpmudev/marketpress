@@ -1,6 +1,24 @@
 <?php
 /*
 MarketPress Template Functions
+
+Relevant functions for custom template files:
+
+mp_product.php
+  mp_product_image
+  mp_product_price
+  mp_buy_button
+  mp_category_list
+
+mp_cart.php
+  mp_show_cart
+
+mp_orderstatus.php
+  mp_order_status
+
+mp_productlist.php
+  mp_products_filter
+  mp_list_products
 */
 
 /**

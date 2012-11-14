@@ -25,8 +25,16 @@ Advanced Themes:
   MarketPress uses custom post types to display it's products. This means that you can use
   the same WP theme templating system you are familiar with. We simply provide a customized
   subset of template functions so you don't have to worry about dealing with post meta. Template
-  functions are fully documented and can be found in the /marketpress/marketpress-includes/template-functions.php file.
+  functions are fully documented and can be found in the /marketpress/marketpress-includes/template-functions.php file. 
+
   
+  E.g. to create a custom product page:
+
+  1. Make a copy of the page.php template file in your theme directory and rename it mp_product.php
+
+  2. mp_product.php must use the mp_* functions instead of the_content(), see template-functions.php for a list of functions relevant to products.
+
+
   MarketPress searches your current theme folder for template files specific to store pages. If
   a template file does not exist it loads the theme's page template instead. Just like WP, the
   plugin will search for templates in order of priority from top to bottom. Here are possible
