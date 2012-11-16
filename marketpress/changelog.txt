@@ -9,10 +9,12 @@ Change Log:
 ----------------------------------------------------------------------
 - Added built in grid views!
 - Add in AJAX dropdown category and order filters to listings pages
-- Add breadcrumbs to checkout process steps
+- Add optional breadcrumbs to checkout process steps
 - Add default product images
 - Added ability to trash/delete orders and adjusts stock counts accordingly
-- Add a hooks for custom shipping methods and tracking links
+- Add featured image import support to the CSV importer
+- Add a "clone product" functionality
+- Add hooks for custom shipping methods and tracking links
 - Forced shipping option recalculation when Country changes.
 - Fix bug with product list widget when ordering by price or sales
 - Fix missing closing tag in global widget breaking drag and drop
