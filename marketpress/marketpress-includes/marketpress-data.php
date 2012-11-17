@@ -298,7 +298,10 @@ $this->usa_states = array(
 	'WA'=>"Washington",
 	'WV'=>"West Virginia",
 	'WI'=>"Wisconsin",
-	'WY'=>"Wyoming"
+	'WY'=>"Wyoming",
+	'AA'=>'AA - Armed Forces Americas',
+	"AE"=>'AE - Armed Forces Africa, Canada, Europe, Middle East',
+	"AP"=>'AP - Armed Forces Pacific',
 );
 
 //UK counties/provinces

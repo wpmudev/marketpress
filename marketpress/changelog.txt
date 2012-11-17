@@ -4,6 +4,10 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+2.8.1 - 11/16/2012 - Aaron, Arnold
+----------------------------------------------------------------------
+- Added APO state codes to the marketpress-data.php so addresses can make it past PayPal's address checker, 
+  Use "APO", "FPO" or "DPO" for the City and 10 digit Zip code.
 
 2.8 - 10/31/2012 - Aaron, Cole, Enzo
 ----------------------------------------------------------------------
