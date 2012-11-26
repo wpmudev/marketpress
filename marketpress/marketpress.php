@@ -3139,8 +3139,8 @@ Thanks again!", 'mp')
 	          $timestamp = time();
 	    	  	$payment_info['gateway_public_name'] = __('Manual Checkout', 'mp');
 	          $payment_info['gateway_private_name'] = __('Manual Checkout', 'mp');
-	      	  $payment_info['method'][] = __('N/A - Free order', 'mp');
-	      	  $payment_info['transaction_id'][] = __('N/A', 'mp');
+	      	  $payment_info['method'] = __('N/A - Free order', 'mp');
+	      	  $payment_info['transaction_id'] = __('N/A', 'mp');
 	      	  $payment_info['status'][$timestamp] = __('Completed', 'mp');
 	      	  $payment_info['total'] = $total;
 	      	  $payment_info['currency'] = $this->get_setting('currency');
@@ -4173,7 +4173,6 @@ Thanks again!", 'mp')
     if ($paid) {
       if ($order->post_status == 'order_received') {
         $this->update_order_status($order->ID, 'paid');
-        do_action( 'mp_order_paid', $order );
 
         //if paid and the cart is only digital products mark it shipped
 				if (is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info))

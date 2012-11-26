@@ -27,6 +27,7 @@ Change Log:
 - Fixed 10525 Paypal errors in global cart checkouts
 - Change the "from" price shown on variation listings to the lowest
 - Change PayPal generated timestamps for server timezone support
+- Fix double trigger of 'mp_order_paid' hook
 - Other minor bug/notice fixes
 
 2.7 - 10/03/2012 - Aaron Edwards
