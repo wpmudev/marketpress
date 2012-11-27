@@ -668,18 +668,16 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		if(! is_array($shipping_options)) $shipping_options = array();
 		$mp_shipping_options = $shipping_options;
 
-		foreach($shipping_options as $service => &$option){
+		foreach($shipping_options as $service => $option){
 			$nodes = $xpath->query('//postage[@classid="' . $this->services[$service]['classid'] . '"]/rate');
 			$rate = floatval($nodes->item(0)->textContent) * $this->pkg_count;
 			if($rate == 0){  //Not available for this combination
-				unset($shipping_options[$service]);
 				unset($mp_shipping_options[$service]);
 			}
 			else
 			{
 				$handling = floatval($this->usps_settings['domestic_handling']) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]['delivery'];
-				$option = $this->format_shipping_option($service, $rate, $delivery, $handling);
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
@@ -691,6 +689,19 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 		}
 
+		//For uasort below
+		function cmp($a, $b){
+			if($a['rate'] == $b['rate']) return 0;
+			return ($a['rate'] < $b['rate']) ? -1 : 1;
+		}
+
+		uasort($mp_shipping_options, 'cmp');
+		
+		$shipping_options = array();
+		foreach($mp_shipping_options as $service => $options){
+			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
+		}
+
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
@@ -698,6 +709,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		unset($xpath);
 		unset($dom);
+
 		return $shipping_options;
 	}
 
@@ -822,7 +834,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$mp_shipping_options = $shipping_options;
 
-		foreach($shipping_options as $service => &$option){
+		foreach($shipping_options as $service => $option){
 			$nodes = $xpath->query('//service[@id="' . $this->intl_services[$service]['service'] . '"]/postage');
 			$rate = floatval($nodes->item(0)->textContent) * $this->pkg_count;
 
@@ -831,13 +843,11 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			$delivery = '(' . str_replace('businessdays',') days', $delivery);
 
 			if($rate == 0){  //Not available for this combination
-				unset($shipping_options[$service]);
 				unset($mp_shipping_options[$service]);
 			}
 			else
 			{
 				$handling = floatval($this->usps_settings['intl_handling']) * $this->pkg_count; // Add handling times number of packages.
-				$option = $this->format_shipping_option($service, $rate, $delivery, $handling);
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
@@ -848,7 +858,20 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				}
 			}
 		}
+		
+		//For uasort below
+		function cmp($a, $b){
+			if($a['rate'] == $b['rate']) return 0;
+			return ($a['rate'] < $b['rate']) ? -1 : 1;
+		}
 
+		uasort($mp_shipping_options, 'cmp');
+		
+		$shipping_options = array();
+		foreach($mp_shipping_options as $service => $options){
+			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
+		}
+		
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
@@ -856,6 +879,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		unset($xpath);
 		unset($dom);
+		
 		return $shipping_options;
 	}
 
