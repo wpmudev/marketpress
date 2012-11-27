@@ -325,7 +325,7 @@ class MP_Shipping_Handler {
 
 		$content = '';
 		if ( count( $options ) ) {
-			$content .= '<select name="shipping_sub_option">';
+			$content .= '<select name="shipping_sub_option" size="' . count($options) . '">';
 			$suboption = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : '';
 			foreach ($options as $key => $name) {
 				$content .= '<option value="' . $key . '"'.selected($suboption, $key, false).'>' . esc_attr($name) . '</option>';
