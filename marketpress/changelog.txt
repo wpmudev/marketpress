@@ -4,14 +4,8 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
-2.8 beta 4 - 11/27/2012 - Aaron, Arnold
-----------------------------------------------------------------------
-- Added APO state codes to the marketpress-data.php so addresses can make it past PayPal's address checker, 
-- Use "APO", "FPO" or "DPO" for the City and 10 digit Zip code.
-- Sorted USPS shipping choices in Ascending order so that the lowest price will be the default. 
-- Changed the Shipping sub options <select> to a select box instead of a dropdown.
 
-2.8 - 10/31/2012 - Aaron, Cole, Enzo
+2.8 - 11/28/2012 - Aaron, Arnold, Cole, Enzo
 ----------------------------------------------------------------------
 - Added built in grid views!
 - Add in AJAX dropdown category and order filters to listings pages
@@ -30,6 +24,10 @@ Change Log:
 - Change the "from" price shown on variation listings to the lowest
 - Change PayPal generated timestamps for server timezone support
 - Fix double trigger of 'mp_order_paid' hook
+- Added APO state codes to the marketpress-data.php so addresses can make it past PayPal's address checker, 
+- Use "APO", "FPO" or "DPO" for the City and 10 digit Zip code.
+- Sorted USPS shipping choices in Ascending order so that the lowest price will be the default. 
+- Changed the Shipping sub options <select> to a select box instead of a dropdown.
 - Other minor bug/notice fixes
 
 2.7 - 10/03/2012 - Aaron Edwards
