@@ -28,6 +28,7 @@ Change Log:
 - Use "APO", "FPO" or "DPO" for the City and 10 digit Zip code.
 - Sorted USPS shipping choices in Ascending order so that the lowest price will be the default. 
 - Changed the Shipping sub options <select> to a select box instead of a dropdown.
+- Removed Handling charge display from USPS shipping options.
 - Other minor bug/notice fixes
 
 2.7 - 10/03/2012 - Aaron Edwards

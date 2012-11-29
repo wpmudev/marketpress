@@ -939,7 +939,11 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		elseif ( isset($this->intl_services[$shipping_option])){
 			$option = $this->intl_services[$shipping_option]['name'];
 		}
-		$option .=  sprintf(__(' %1$s - %2$s + %3$s handling', 'mp'), $delivery, $mp->format_currency('', $price), $mp->format_currency('', $handling) );
+		
+		$price = is_numeric($price) ? $price : 0;
+		$handling = is_numeric($handling) ? $handling : 0;
+		
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $price + $handling) );
 		return $option;
 	}
 
