@@ -29,6 +29,7 @@ Change Log:
 - Sorted USPS shipping choices in Ascending order so that the lowest price will be the default. 
 - Changed the Shipping sub options <select> to a select box instead of a dropdown.
 - Removed Handling charge display from USPS shipping options.
+- Add hooks to coupon functions
 - Other minor bug/notice fixes
 
 2.7 - 10/03/2012 - Aaron Edwards
