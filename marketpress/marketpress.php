@@ -3213,7 +3213,12 @@ Thanks again!", 'mp')
       return false;
 
     $coupons = get_option('mp_coupons');
-
+		
+		//allow short circuit of coupon codes
+		$return = apply_filters('mp_coupon_check', null, $coupon_code, $coupons);
+		if ( !is_null($return) )
+			return $return;
+		
     //no record for code
     if (!isset($coupons[$coupon_code]) || !is_array($coupons[$coupon_code]))
       return false;
@@ -3243,14 +3248,14 @@ Thanks again!", 'mp')
         $new_total = round($total - $coupons[$coupon_code]['discount'], 2);
         $new_total = ($new_total < 0) ? 0.00 : $new_total;
         $discount = '-' . $this->format_currency('', $coupons[$coupon_code]['discount']);
-        return array('discount' => $discount, 'new_total' => $new_total);
+        $return = array('discount' => $discount, 'new_total' => $new_total);
       } else {
         $new_total = round($total - ($total * ($coupons[$coupon_code]['discount'] * 0.01)), 2);
         $new_total = ($new_total < 0) ? 0.00 : $new_total;
         $discount = '-' . $coupons[$coupon_code]['discount'] . '%';
-        return array('discount' => $discount, 'new_total' => $new_total);
+        $return = array('discount' => $discount, 'new_total' => $new_total);
       }
-
+			return apply_filters('mp_coupon_value', $return, $code, $total);
     } else {
       return false;
     }
@@ -3263,9 +3268,12 @@ Thanks again!", 'mp')
       $coupon_code = preg_replace('/[^A-Z0-9_-]/', '', strtoupper($code));
 
       //increment count
-      $coupons[$coupon_code]['used']++;
-      update_option('mp_coupons', $coupons);
-
+			if ( isset($coupons[$coupon_code]) ) {
+				$coupons[$coupon_code]['used']++;
+				update_option('mp_coupons', $coupons);
+			}
+			do_action('mp_coupon_use', $coupon_code);
+			
       return true;
     } else {
       return false;

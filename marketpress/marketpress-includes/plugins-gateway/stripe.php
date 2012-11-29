@@ -150,7 +150,9 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		}
 		
 		//setup the Stripe API
-		require_once($mp->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php"); 			
+		if (!class_exists('Stripe')) {
+			require_once($mp->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php"); 			
+		}
 		Stripe::setApiKey($this->private_key);
 		try {
 			$token = Stripe_Token::retrieve($_SESSION['stripeToken']);
@@ -339,7 +341,9 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		}
 		
 		//setup the Stripe API
-		require_once($mp->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php"); 			
+		if (!class_exists('Stripe')) {
+			require_once($mp->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php"); 			
+		}		
 		Stripe::setApiKey($this->private_key);
 		
 		$totals = array();
