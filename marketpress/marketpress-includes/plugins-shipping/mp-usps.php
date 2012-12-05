@@ -553,6 +553,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		return $shipping_options;
 	}
 
+
+		//For uasort below
+		function compare_rates($a, $b){
+			if($a['rate'] == $b['rate']) return 0;
+			return ($a['rate'] < $b['rate']) ? -1 : 1;
+		}
+
+
 	/**
 	* For USPS RateV4 Request Takes the set of allowed Shipping options and mp_settings and makes the API call to USPS
 	* Return the set of valid shipping options for this order with prices added.
@@ -689,13 +697,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 		}
 
-		//For uasort below
-		function cmp($a, $b){
-			if($a['rate'] == $b['rate']) return 0;
-			return ($a['rate'] < $b['rate']) ? -1 : 1;
-		}
-
-		uasort($mp_shipping_options, 'cmp');
+		uasort($mp_shipping_options, array($this,'compare_rates') );
 		
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){
@@ -859,13 +861,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 		}
 		
-		//For uasort below
-		function cmp($a, $b){
-			if($a['rate'] == $b['rate']) return 0;
-			return ($a['rate'] < $b['rate']) ? -1 : 1;
-		}
-
-		uasort($mp_shipping_options, 'cmp');
+		uasort($mp_shipping_options, array($this, 'compare_rates') );
 		
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){
