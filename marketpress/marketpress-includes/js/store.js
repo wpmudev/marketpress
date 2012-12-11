@@ -27,6 +27,7 @@ jQuery(document).ready(function($) {
         if ($('#mp_city').val() && $('#mp_state').val() && $('#mp_zip').val()) mp_refresh_shipping();
       });
     });
+    mp_refresh_shipping();
   });
   
   //shipping field choice

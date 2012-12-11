@@ -156,7 +156,7 @@ if (!class_exists('MP_Shipping_API')) {
 			} else {
 				if ( isset($shipping_meta['weight']) ) {
 					$pounds = intval($shipping_meta['weight']);
-					$oz = round( ($shipping_meta['weight'] - $pounds) * 16 );
+					$oz = floatval( ($shipping_meta['weight'] - $pounds) * 16);
 				} else {
 					$pounds = $oz = '';
 				}
@@ -177,9 +177,9 @@ if (!class_exists('MP_Shipping_API')) {
 				$shipping_meta['weight'] = (!empty($_POST['mp_shipping_weight'])) ? round($_POST['mp_shipping_weight'], 2) : 0;
 			} else {
 				$pounds = (!empty($_POST['mp_shipping_weight_pounds'])) ? floatval($_POST['mp_shipping_weight_pounds']) : 0;
-				$oz = (!empty($_POST['mp_shipping_weight_oz'])) ? round($_POST['mp_shipping_weight_oz']) : 0;
+				$oz = (!empty($_POST['mp_shipping_weight_oz'])) ? floatval($_POST['mp_shipping_weight_oz']) : 0;
 				$oz = $oz / 16;
-				$shipping_meta['weight'] = round($pounds + $oz, 2);
+				$shipping_meta['weight'] = floatval($pounds + $oz);
 			}
 
 			return $shipping_meta;
@@ -325,10 +325,13 @@ class MP_Shipping_Handler {
 
 		$content = '';
 		if ( count( $options ) ) {
-			$content .= '<select name="shipping_sub_option" size="' . count($options) . '">';
+			$content .= '<select name="shipping_sub_option" size="' . max(count($options), 4) . '">'; //4 min because of safari
 			$suboption = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : '';
+			$ndx = 0;
 			foreach ($options as $key => $name) {
-				$content .= '<option value="' . $key . '"'.selected($suboption, $key, false).'>' . esc_attr($name) . '</option>';
+				$selected = ($ndx == 0 && $suboption == '') ? true :  ($suboption == $key); //Nothing selected pick the first one.
+				$content .= '<option value="' . $key . '"'. selected($selected, true, false) . '>' . esc_attr($name) . '</option>';
+				$ndx++;
 			}
 			$content .= '</select>';
 		} else{

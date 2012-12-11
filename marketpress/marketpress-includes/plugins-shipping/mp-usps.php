@@ -452,7 +452,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		global $mp;
 
 
-		if(! $this->crc_ok()) 
+		if(! $this->crc_ok())
 		{
 			//Price added to this object
 			$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
@@ -484,17 +484,17 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		/*
 		if($this->crc_ok())
 		{
-			// Shipping prices still valid just use them
-			// Format the returned array for display in the drop down
-			$shipping_options = array();
-			foreach ($_SESSION['mp_shipping_options'] as $service => $item) {
-				$shipping_options[$service] = $this->format_shipping_option($service, $item['rate'], $item['delivery'], $item['handling']);
-			}
-			//All done
-			return $shipping_options;
+		// Shipping prices still valid just use them
+		// Format the returned array for display in the drop down
+		$shipping_options = array();
+		foreach ($_SESSION['mp_shipping_options'] as $service => $item) {
+		$shipping_options[$service] = $this->format_shipping_option($service, $item['rate'], $item['delivery'], $item['handling']);
+		}
+		//All done
+		return $shipping_options;
 		}
 		*/
-		
+
 		// Not ok then calculate them
 		$settings = get_option('mp_settings');
 
@@ -511,6 +511,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->country = $country;
 		$this->destination_zip = $zip;
 
+		if( is_array($cart) ) {
 		foreach ($cart as $product_id => $variations) {
 			$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
 			foreach($variations as $variation => $product) {
@@ -518,13 +519,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				$this->weight += floatval($shipping_meta['weight']) * $qty;
 			}
 		}
+	}
 
 		// Got our totals  make sure we're in decimal pounds.
 		$this->weight = $this->as_pounds($this->weight);
 
 		//USPS won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
-		
+
 		$max_weight = floatval($this->usps_settings[max_weight]);
 		$max_weight = ($max_weight > 0) ? $max_weight : 75;
 
@@ -544,7 +546,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		// Can't use zip+4
 		$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
 		$this->destination_zip = substr($this->destination_zip, 0, 5);
-		
+
 		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			$shipping_options = $this->ratev4_request();
 		} else {
@@ -554,11 +556,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	}
 
 
-		//For uasort below
-		function compare_rates($a, $b){
-			if($a['rate'] == $b['rate']) return 0;
-			return ($a['rate'] < $b['rate']) ? -1 : 1;
-		}
+	/**For uasort below
+	*/
+	function compare_rates($a, $b){
+		if($a['rate'] == $b['rate']) return 0;
+		return ($a['rate'] < $b['rate']) ? -1 : 1;
+	}
 
 
 	/**
@@ -624,8 +627,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$package->appendChild($dom->createElement('Size', $this->size));
 
-		$package->appendChild($dom->createElement('Machinable', $this->machinable));
-
 		if($this->size == 'LARGE')
 		{
 			$package->appendChild($dom->createElement('Width', $dims[1]));
@@ -635,6 +636,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 			$package->appendChild($dom->createElement('Value', $total));  //For insurance?
 		}
+
+		$package->appendChild($dom->createElement('Machinable', $this->machinable));
 
 		//We have the XML make the call
 		$url = $this->production_uri . '?API=RateV4&XML=' . urlencode($dom->saveXML());
@@ -672,7 +675,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$xpath = new DOMXPath($dom);
 
 		//Make SESSION copy with just prices and delivery
-		
+
 		if(! is_array($shipping_options)) $shipping_options = array();
 		$mp_shipping_options = $shipping_options;
 
@@ -698,7 +701,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		}
 
 		uasort($mp_shipping_options, array($this,'compare_rates') );
-		
+
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){
 			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
@@ -860,14 +863,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				}
 			}
 		}
-		
+
 		uasort($mp_shipping_options, array($this, 'compare_rates') );
-		
+
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){
 			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
 		}
-		
+
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
@@ -875,7 +878,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		unset($xpath);
 		unset($dom);
-		
+
 		return $shipping_options;
 	}
 
@@ -935,10 +938,10 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		elseif ( isset($this->intl_services[$shipping_option])){
 			$option = $this->intl_services[$shipping_option]['name'];
 		}
-		
+
 		$price = is_numeric($price) ? $price : 0;
 		$handling = is_numeric($handling) ? $handling : 0;
-		
+
 		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $price + $handling) );
 		return $option;
 	}

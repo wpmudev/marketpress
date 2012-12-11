@@ -28,7 +28,10 @@ Change Log:
 - Use "APO", "FPO" or "DPO" for the City and 10 digit Zip code.
 - Sorted USPS shipping choices in Ascending order so that the lowest price will be the default. 
 - Changed the Shipping sub options <select> to a select box instead of a dropdown.
+- Added code to insure the first item in the Shipping sub options is selected if suboption is blank. Makes sure an item shows in iPad.
+- Set minimum "size" on shipping_sub_options select box to 4 for Safari and Chrome quirk. 
 - Removed Handling charge display from USPS shipping options.
+- Let ounces go decimal for shipping weight
 - Add hooks to coupon functions
 - Other minor bug/notice fixes
 
