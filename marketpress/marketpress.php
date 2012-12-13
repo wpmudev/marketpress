@@ -646,10 +646,6 @@ Thanks again!", 'mp')
 
   //ajax cart handling for store frontend
   function store_script() {
-		//disable ajax cart if incompatible by domain mapping plugin settings
-		if (is_multisite() && class_exists('domain_map') && 'original' == get_site_option('map_admindomain'))
-		  return;
-
     //setup ajax cart javascript
     wp_enqueue_script( 'mp-ajax-js', $this->plugin_url . 'js/ajax-cart.js', array('jquery'), $this->version );
 
@@ -1228,7 +1224,6 @@ Thanks again!", 'mp')
 
   //loads the selected theme css files
   function load_store_theme() {
-    wp_enqueue_style( 'mp-public-core', $this->plugin_url . 'css/public-core.css', false, $this->version);
     if ( $this->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') ) {
       return;
 		} else if (file_exists($this->plugin_dir . 'themes/' . $this->get_setting('store_theme') . '.css')) {
