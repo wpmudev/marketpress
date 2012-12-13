@@ -324,7 +324,7 @@ class MP_Shipping_Handler {
 		$options = apply_filters("mp_shipping_options_$selected", $mp->get_cart_contents(), $address1, $address2, $city, $state, $zip, $country);
 
 		$content = '';
-		if ( count( $options ) ) {
+		if ( count( $options ) && ! array_key_exists('error', $options) ) {  //If one of the keys is 'error' then it contains an error message from calculated rates.
 			$content .= '<select name="shipping_sub_option" size="' . max(count($options), 4) . '">'; //4 min because of safari
 			$suboption = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : '';
 			$ndx = 0;
@@ -335,6 +335,7 @@ class MP_Shipping_Handler {
 			}
 			$content .= '</select>';
 		} else{
+			$content .= $options['error'];
 			$content .= '<input type="hidden" id="mp_no_shipping_options" name="no_shipping_options" value="1" />';
 			$content .= apply_filters('mp_checkout_error_no_shipping_options', '');
 		}

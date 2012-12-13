@@ -134,6 +134,9 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->settings = get_option('mp_settings');
 		$this->usps_settings = $this->settings['shipping']['usps'];
 
+	}
+	
+	function default_boxes() {
 		// Initialize the default boxes if nothing there
 		if(count($this->usps_settings['boxes']['name']) <= 1)
 		{
@@ -235,13 +238,13 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			<?php if ( is_numeric($key) ): ?>
 
 			<td class="mp_box_remove">
-				<a onclick="deleteBox(this);" href="#mp_shipping_boxes_table" title="<?php _e('Remove Box', 'mp'); ?>" >x</a>
+				<a onclick="uspsDeleteBox(this);" href="#mp_shipping_boxes_table" title="<?php _e('Remove Box', 'mp'); ?>" > </a>
 			</td>
 
 			<?php else: ?>
 
 			<td class="mp_box_add">
-				<a onclick="addBox(this);" href="#mp_shipping_boxes_table" title="<?php _e('Add Box', 'mp'); ?>" >x</a>
+				<a onclick="uspsAddBox(this);" href="#mp_shipping_boxes_table" title="<?php _e('Add Box', 'mp'); ?>" > </a>
 			</td>
 
 			<?php endif; ?>
@@ -256,20 +259,22 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	*/
 	function shipping_settings_box($settings) {
 		global $mp;
-
-		$system= $this->settings['shipping']['system']; //Current Unit settings english | metric
+		
+		$this->settings = $settings;
+		$this->usps_settings = $this->settings['shipping']['usps'];
+		$system = $this->settings['shipping']['system']; //Current Unit settings english | metric
 
 		?>
 
 		<script type="text/javascript">
 			//Remove a row in the Boxes table
-			function deleteBox(row)
+			function uspsDeleteBox(row)
 			{
 				var i = row.parentNode.parentNode.rowIndex;
 				document.getElementById('mp_shipping_boxes_table').deleteRow(i);
 			}
 
-			function addBox(row)
+			function uspsAddBox(row)
 			{
 				//Adds an Empty Row
 				var clone = row.parentNode.parentNode.cloneNode(true);
@@ -382,6 +387,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 									</thead>
 									<tbody>
 										<?php
+										$this->default_boxes();
 										if ($this->usps_settings['boxes']) {
 											foreach ( $this->usps_settings['boxes']['name'] as $key => $value){
 												$this->box_row_html($key);
@@ -512,14 +518,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->destination_zip = $zip;
 
 		if( is_array($cart) ) {
-		foreach ($cart as $product_id => $variations) {
-			$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-			foreach($variations as $variation => $product) {
-				$qty = $product['quantity'];
-				$this->weight += floatval($shipping_meta['weight']) * $qty;
+			foreach ($cart as $product_id => $variations) {
+				$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
+				foreach($variations as $variation => $product) {
+					$qty = $product['quantity'];
+					$this->weight += floatval($shipping_meta['weight']) * $qty;
+				}
 			}
 		}
-	}
 
 		// Got our totals  make sure we're in decimal pounds.
 		$this->weight = $this->as_pounds($this->weight);
@@ -644,17 +650,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$response = wp_remote_request($url, array('headers' => array('Content-Type: text/xml')) );
 		if (is_wp_error($response)){
-			//@todo ? How to do error reports
-			echo "<p>" . $response->get_error_message() . "</p>\n";
+			return array('error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>');
 		}
 		else
 		{
 			$loaded = ($response['response']['code'] == '200');
 			$body = $response['body'];
 			if(! $loaded){
-
-				//@todo ? How to do error reports
-				echo "<p>" . $response['response']['code'] . "&mdash;" . $response['response']['message'] . "</p>\n" ;
+				return array('error' => '<div class="mp_checkout_error">' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
 			}
 		}
 
@@ -804,17 +807,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$response = wp_remote_request($url, array('headers' => array('Content-Type: text/xml')) );
 		if (is_wp_error($response)){
-			//@todo ? How to do error reports
-			echo "<p>" . $response->get_error_message() . "</p>\n";
+			return array('error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>');
 		}
 		else
 		{
 			$loaded = ($response['response']['code'] == '200');
 			$body = $response['body'];
 			if(! $loaded){
-
-				//@todo ? How to do error reports
-				echo "<p>" . $response['response']['code'] . "&mdash;" . $response['response']['message'] . "</p>\n" ;
+				return array('error' => '<div class="mp_checkout_error">' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
 			}
 		}
 
