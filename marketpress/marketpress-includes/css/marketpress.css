@@ -350,3 +350,13 @@ div.mp-pro-update {
 #mp_stats_widget .green {
   color: green;
 }
+
+.mp_box_add a{
+  background: transparent url('../images/plus.gif') no-repeat scroll left center;
+  padding: 1px 0 1px 20px;
+}
+
+.mp_box_remove a{
+  background: transparent url('../images/remove.png') no-repeat scroll left center;
+  padding: 1px 0 1px 20px;
+}
