@@ -650,7 +650,7 @@ Thanks again!", 'mp')
     wp_enqueue_script( 'mp-ajax-js', $this->plugin_url . 'js/ajax-cart.js', array('jquery'), $this->version );
 
     // declare the variables we need to access in js
-    wp_localize_script( 'mp-ajax-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php' ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp'), 'show_filters' => $this->get_setting('show_filters') ) );
+    wp_localize_script( 'mp-ajax-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php', (is_ssl() ? 'https': 'http') ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp'), 'show_filters' => $this->get_setting('show_filters') ) );
   }
 
   //loads the jquery lightbox plugin
@@ -1036,8 +1036,8 @@ Thanks again!", 'mp')
       if ($this->orderstatus_template = locate_template($templates)) {
         add_filter( 'template_include', array(&$this, 'custom_orderstatus_template') );
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-	add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-	add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
       } else {
         //otherwise load the page template and use our own theme
         add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
