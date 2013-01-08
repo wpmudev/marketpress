@@ -6850,7 +6850,7 @@ Notification Preferences: %s', 'mp');
                   <p>
                   <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
                   <ul class="mp-shortcode-options">
-										<li><?php _e('"product_id" - The ID of the product to display.', 'mp') ?></li>
+										<li><?php _e('"product_id" - The ID of the product to display. This is the Post ID, you can find it in the url of a product edit page.', 'mp') ?></li>
                     <li><?php _e('"title" - Whether to display the product title.', 'mp') ?></li>
                     <li><?php _e('"content" - Whether and what type of content to display. Options are false/0, "full", or "excerpt". Default "full"', 'mp') ?></li>
                     <li><?php _e('"image" - Whether and what context of image size to display. Options are false/0, "single", or "list". Default "single"', 'mp') ?></li>
@@ -6867,7 +6867,7 @@ Notification Preferences: %s', 'mp');
                   <p>
                   <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
                   <ul class="mp-shortcode-options">
-                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+                    <li><?php _e('"product_id" - The ID for the product.  This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"context" - What context for preset size options. Options are list, single, or widget, default single.', 'mp') ?></li>
 										<li><?php _e('"size" - Set a custom pixel width/height. If omitted defaults to the size set by "context".', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_product_image product_id="1" size="150"]</em></li>
@@ -6882,7 +6882,7 @@ Notification Preferences: %s', 'mp');
                   <p>
                   <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
                   <ul class="mp-shortcode-options">
-                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+                    <li><?php _e('"product_id" - The ID for the product.  This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"context" - What context for display. Options are list or single, default single which shows all variations.', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_buy_button product_id="1" context="single"]</em></li>
                   </ul></p>
@@ -6896,7 +6896,7 @@ Notification Preferences: %s', 'mp');
                   <p>
                   <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
                   <ul class="mp-shortcode-options">
-                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+                    <li><?php _e('"product_id" - The ID for the product.  This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"label" - A label to prepend to the price. Defaults to "Price: ".', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_product_price product_id="1" label="Buy this thing now!"]</em></li>
                   </ul></p>
@@ -6910,7 +6910,7 @@ Notification Preferences: %s', 'mp');
                   <p>
                   <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
                   <ul class="mp-shortcode-options">
-                    <li><?php _e('"product_id" - The ID for the product. Optional if shortcode is in the loop.', 'mp') ?></li>
+                    <li><?php _e('"product_id" - The ID for the product.  This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"label" - A label to prepend to the price. Defaults to "Price: ".', 'mp') ?></li>
                     <li><?php _e('"context" - What context for display. Options are list or single, default single which shows all variations.', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_product_meta product_id="1" label="Buy this thing now!"]</em></li>
