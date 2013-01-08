@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8 beta 6
+Version: 2.8 RC 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -544,20 +544,18 @@ Thanks again!", 'mp')
 	}
 	
   function handle_gateway_returns($wp_query) {
+		if ( is_admin() ) return;
+		
     //listen for gateway IPN returns and tie them in to proper gateway plugin
 		if(!empty($wp_query->query_vars['paymentgateway'])) {
 			do_action( 'mp_handle_payment_return_' . $wp_query->query_vars['paymentgateway'] );
 			// exit();
 		}
-
-		//stop canonical problems with virtual pages
-  	$page = get_query_var('pagename');
-  	if ($page == 'cart' || $page == 'orderstatus' || $page == 'product_list') {
-			remove_action('template_redirect', 'redirect_canonical');
-		}
 	}
 
   function remove_canonical($wp_query) {
+		if ( is_admin() ) return;
+		
 		//stop canonical problems with virtual pages redirecting
   	$page = get_query_var('pagename');
   	if ($page == 'cart' || $page == 'orderstatus' || $page == 'product_list') {
@@ -3632,31 +3630,31 @@ Thanks again!", 'mp')
     if (!$order)
       return false;
 
-	// If we are transitioning the status from 'trash' to some other vlaue we want to decrement the product variation quantities. 
-	if (($order->post_status == "trash") && ($new_status != "delete") && ($new_status != 'trash')) {
-		if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
-			foreach ($order->mp_cart_info as $product_id => $variations) {
-			
-				if (!get_post_meta($product_id, 'mp_track_inventory', true))
-				 	continue;
-
-				$mp_inventory = get_post_meta($product_id, 'mp_inventory', true);
-				if (!$mp_inventory)
-					continue;
-			
-				$_PRODUCT_INVENTORY_CHANGED = false;
-				foreach ($variations as $variation => $data) {
-					if (array_key_exists($variation, $mp_inventory)) {
-						$mp_inventory[$variation] -= $data['quantity'];
-						$_PRODUCT_INVENTORY_CHANGED = true;
+		// If we are transitioning the status from 'trash' to some other vlaue we want to decrement the product variation quantities. 
+		if (($order->post_status == "trash") && ($new_status != "delete") && ($new_status != 'trash')) {
+			if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+				foreach ($order->mp_cart_info as $product_id => $variations) {
+				
+					if (!get_post_meta($product_id, 'mp_track_inventory', true))
+						continue;
+	
+					$mp_inventory = get_post_meta($product_id, 'mp_inventory', true);
+					if (!$mp_inventory)
+						continue;
+				
+					$_PRODUCT_INVENTORY_CHANGED = false;
+					foreach ($variations as $variation => $data) {
+						if (array_key_exists($variation, $mp_inventory)) {
+							$mp_inventory[$variation] -= $data['quantity'];
+							$_PRODUCT_INVENTORY_CHANGED = true;
+						}
 					}
-				}
-				if ($_PRODUCT_INVENTORY_CHANGED) {
-					update_post_meta($product_id, 'mp_inventory', $mp_inventory);					
+					if ($_PRODUCT_INVENTORY_CHANGED) {
+						update_post_meta($product_id, 'mp_inventory', $mp_inventory);					
+					}
 				}
 			}
 		}
-	}
     switch ($new_status) {
 
       case 'paid':

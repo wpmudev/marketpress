@@ -36,6 +36,7 @@ Change Log:
 - Add hooks to coupon functions
 - Added another error passing method for calculated rates. If a suboption key contains 'error' the value is an error message.
 - Fix ajax when force admin ssl is on
+- Fix conflict with PODS plugin
 - Other minor bug/notice fixes
 
 2.7 - 10/03/2012 - Aaron Edwards
