@@ -236,7 +236,7 @@ color:black;
 
 .mp_one_tile .mp_excerpt,
 .mp_one_tile .mp_price_buy{
-display:none;
+/*display:none;*/
 }
 
 .mp_one_tile:hover .mp_excerpt,
@@ -245,5 +245,5 @@ display:block;
 }
 
 .mp_price_variations span.mp_product_price{
-display:none;
+/*display:none;*/
 }

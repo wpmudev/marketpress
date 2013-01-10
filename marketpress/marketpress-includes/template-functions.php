@@ -1452,7 +1452,7 @@ function get_products_html_grid($post_array=array()){
     $class[] = strlen($img)>0?'mp_thumbnail':'';
     $class[] = strlen($excerpt)>0?'mp_excerpt':'';
     $class[] = has_price_variations($post->ID) ? 'mp_price_variations':'';
-
+    /*
     $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
                 <div class="mp_one_product">
                   '.$img.'
@@ -1471,6 +1471,26 @@ function get_products_html_grid($post_array=array()){
 
                 </div>
               </div>';
+    */
+    $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
+                <div class="mp_one_product">
+                  '.$img.'
+                  
+                  <h3 class="mp_product_name">
+                    <a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
+                  </h3>
+                  
+                  '.$mp_product_list_content.'
+
+                  <div class="mp_price_buy">
+                    '.mp_product_price(false, $post->ID).'
+                    '.mp_buy_button(false, 'list', $post->ID).'
+                    '.apply_filters( 'mp_product_list_meta', '', $post->ID ).'
+                  </div>
+
+                </div>
+              </div>';
+
   }
 
   $html .= (count($post_array)>0?'<div class="clear"></div>':'');
