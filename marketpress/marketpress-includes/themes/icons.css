@@ -44,15 +44,33 @@ border: none;
 padding: 0px;
 }
 
+/* generic buttons rules */
+
+#mp_product_list input[type="submit"] {
+	-moz-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
+	font-weight: bold;
+	border: 1px solid #e1e1e1;
+	text-decoration: none;
+	padding: 5px 15px;
+	font-size: 0.85em;
+	font-weight: normal;
+}
+
+#mp_product_list input[type="submit"]:hover {
+	-moz-border-radius: 2px;
+	-khtml-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+}
+
+#mp_product_list .mp_button_addcart { color: #74CC09; }
+
+/*
 .mp_button_addcart, .mp_button_buynow, .mp_cart_col_updatecart input[type=submit], #mp_shipping_submit, #mp_payment_confirm, #mp_payment_submit {
-font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
-font-weight: bold;
-padding: 5px;
--moz-border-radius: 10px;
--khtml-border-radius: 10px;
--webkit-border-radius: 10px;
-border-radius: 10px;
-text-decoration: none;
 background: #e2e2e2;
 background: -moz-linear-gradient(center bottom , rgb(199, 199, 199) 39%, rgb(230, 230, 230) 67%) repeat scroll 0% 0% transparent;
 border: 1px solid #e1e1e1;
@@ -68,7 +86,6 @@ padding: 5px;
 border-radius: 10px;
 text-decoration: none;
 background: #e2e2e2;
-border: 1px solid #e1e1e1;
 }
 
 a.mp_link_addcart, a.mp_link_buynow {
@@ -99,6 +116,7 @@ text-decoration: none;
 background: #e2e2e2;
 border: 1px solid #e1e1e1;
 }
+*/
 
 del.mp_old_price {
 margin-right: 5px;
