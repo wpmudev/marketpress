@@ -490,9 +490,13 @@ font-size:1px;
 
 /* New Grid stylesheet */
 
-.mp_img_link, 
-.mp_product_name, 
-.mp_one_tile { display: inline-block; clear: both;  }
+.mp_grid .mp_one_tile { display: inline-block; vertical-align: top; clear: both; padding: 10px; *display: inline; *zoom: 1; }
+/* Below approach works great on IE9+, Chrome, Firefox and Opera, IE8 and IE7 not so much :( */
+.mp_grid .mp_one_product { display: table; width: 1px; min-width: 200px; }
+.mp_grid .mp_product_name,
+.mp_grid .mp_excerpt {  word-wrap: break-word; }
+.mp_grid .mp_img_link { display: block; }
+.mp_grid .mp_img_link img { margin: 0 auto; float: none; display: block; max-width: none; }
 
 /* End GRID view */
 
