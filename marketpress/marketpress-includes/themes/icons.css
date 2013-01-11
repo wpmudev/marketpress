@@ -67,7 +67,7 @@ padding: 0px;
 	border-radius: 2px;
 }
 
-#mp_product_list .mp_button_addcart { color: #74CC09; }
+#mp_product_list .mp_button_addcart { color: #549306; }
 
 /*
 .mp_button_addcart, .mp_button_buynow, .mp_cart_col_updatecart input[type=submit], #mp_shipping_submit, #mp_payment_confirm, #mp_payment_submit {
@@ -490,7 +490,7 @@ font-size:1px;
 
 /* New Grid stylesheet */
 
-.mp_grid .mp_one_tile { display: inline-block; vertical-align: top; clear: both; margin:30px 30px 0 0; *display: inline; *zoom: 1; }
+.mp_grid .mp_one_tile { display: inline-block; vertical-align: top; clear: both; margin:30px 40px 0 0; *display: inline; *zoom: 1; }
 /* Below approach works great on IE9+, Chrome, Firefox and Opera, IE8 and IE7 not so much :( */
 .mp_grid .mp_one_product { display: table; width: 1px; min-width: 140px; }
 .mp_grid .mp_product_name,
