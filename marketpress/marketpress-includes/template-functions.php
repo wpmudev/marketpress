@@ -1474,13 +1474,16 @@ function get_products_html_grid($post_array=array()){
     */
     $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
                 <div class="mp_one_product">
-                  '.$img.'
+                
+                  <div class="mp_product_detail">
+                    '.$img.'
                   
-                  <h3 class="mp_product_name">
-                    <a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
-                  </h3>
+                    <h3 class="mp_product_name">
+                      <a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
+                    </h3>
                   
-                  '.$mp_product_list_content.'
+                    '.$mp_product_list_content.'
+                  </div>
 
                   <div class="mp_price_buy">
                     '.mp_product_price(false, $post->ID).'
