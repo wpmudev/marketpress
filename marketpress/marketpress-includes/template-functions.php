@@ -1440,6 +1440,15 @@ function get_products_html_list($post_array=array()){
 function get_products_html_grid($post_array=array()){
   global $mp;
   $html='';
+  
+  //get image width
+  if ($mp->get_setting('list_img_size') == 'custom'){
+    $width = $mp->get_setting('list_img_width');
+  }
+  else {
+    $size = $mp->get_setting('list_img_size');
+    $width = get_option($size."_size_w");
+  }
   foreach ($post_array as $post){
     
     $img = mp_product_image(false, 'list', $post->ID);
@@ -1472,7 +1481,7 @@ function get_products_html_grid($post_array=array()){
                 </div>
               </div>';
     */
-    $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
+    $html .= '<div class="mp_one_tile '.implode($class, ' ').'" style="width: '.$width.'px;">
                 <div class="mp_one_product">
                 
                   <div class="mp_product_detail">
