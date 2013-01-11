@@ -1481,10 +1481,10 @@ function get_products_html_grid($post_array=array()){
                 </div>
               </div>';
     */
-    $html .= '<div class="mp_one_tile '.implode($class, ' ').'" style="width: '.$width.'px;">
-                <div class="mp_one_product">
+    $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
+                <div class="mp_one_product" style="width: '.$width.'px;">
                 
-                  <div class="mp_product_detail">
+                  <div class="mp_product_detail" style="width: '.$width.'px;">
                     '.$img.'
                   
                     <h3 class="mp_product_name">
@@ -1494,7 +1494,7 @@ function get_products_html_grid($post_array=array()){
                     '.$mp_product_list_content.'
                   </div>
 
-                  <div class="mp_price_buy">
+                  <div class="mp_price_buy" style="width: '.$width.'px; margin-left:-'.$width.'px;">
                     '.mp_product_price(false, $post->ID).'
                     '.mp_buy_button(false, 'list', $post->ID).'
                     '.apply_filters( 'mp_product_list_meta', '', $post->ID ).'
