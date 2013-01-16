@@ -64,47 +64,6 @@ class MarketPress_Importer {
 		
 	}
 
-	/**
-	 * sets a featured image on a post
-	 * @param integer $post_id   parent post to set featured image on
-	 * @param string $file_path absolute file path to image
-	 */
-	function set_featured_image($post_id, $file_path){
-
-		// validate arguments
-		if( !is_numeric($post_id) || !file_exists($file_path) ){
-			return false;
-		}
-
-		// replace windows dir seperator '\' with unix. (windows can use either, wp_basename does not work with windows paths)
-		$file_path = str_replace('\\', '/', $file_path);
-
-		$wp_filetype = wp_check_filetype(basename($file_path), null);
-		$attachment = array(
-			'post_mime_type' => $wp_filetype['type'],
-			'post_title' => preg_replace('/\.[^.]+$/', '', basename($file_path)),
-			'post_content' => '',
-			'post_status' => 'inherit'
-		);
-
-		$attach_id = wp_insert_attachment( $attachment, $file_path, $post_id );
-		
-		require_once(ABSPATH . 'wp-admin/includes/image.php'); // wp_generate_attachment_metadata()
-		$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
-		wp_update_attachment_metadata( $attach_id, $attach_data );
-
-		// add featured image to post
-		add_post_meta($post_id, '_thumbnail_id', $attach_id);
-	}
-
-	/**
-	 * returns absolute file paths. input file paths are relative to the uploads directory
-	 * converts windows dir seperators to unix, wp_basename() does not work with windows seperators (\)
-	 */
-	function rel_to_absolute($file_path){
-		$dir = wp_upload_dir();
-		return trailingslashit($dir['basedir']).ltrim(str_replace('\\', '/', $file_path), '/');
-	}
 }
 
 /* ------------------------------------------------------------------ */
@@ -300,18 +259,7 @@ class CsvImporter extends MarketPress_Importer {
 			
 		}
 		
-		if( count($this->img_errors) > 0 ){
-			?>
-			<p>
-				<?php 
-					_e('Cannot find these images on your webserver filesystem. ', 'mp');
-					echo '<br /><span class="description">'.__('Files should be placed in the wordpress uploads directory. The webserver needs write permission to the directory containing the files. File paths in the CSV should be relative to the base of the wordpress uploads directory.', 'mp').'</span>';
-					echo '<ul><li>'.implode('</li><li>', $this->img_errors).'</li>';
-				?>
-			</p>
-			<p><?php _e('Please amend your CSV file and try again.', 'mp'); ?></p>
-			<?php
-		}else if ($this->results) {
+		if ($this->results) {
 			@unlink($file_path);
 			?>
 			<p><?php printf( __('Successfully imported %s products from your CSV file. Products were created in draft status, so you will need to review them then publish (bulk or one-by-one). Importing the CSV file again will just create copies of the products in MarketPress.', 'mp'), number_format_i18n($this->results) ); ?></p>
@@ -331,10 +279,11 @@ class CsvImporter extends MarketPress_Importer {
 				$this->import_button();
 				
 			} else { //file does not exist, show upload form
-			
+				$dirs = wp_upload_dir();
 				?>
 				<span class="description"><?php _e('This will allow you to import products and most of their attributes from a CSV file.', 'mp'); ?></span>
-				<p><span class="description"><?php _e('Your CSV file must be comma (,) delimited and fields with commas or quotes in them must be surrounded by parenthesis (") as per the CSV standard. Columns in the CSV file can be in any order, provided that they have the correct headings from the example file. "title" and "price" are the only required columns, all others can be left blank. Images should be uploaded to your wordpress uploads folder. Image paths are relative to the uploads folder. A spreadsheet program like Excel or Numbers can be used to easily manipulate your import file, and their save as CSV option will create a correctly formatted file.', 'mp'); ?></span></p>
+				<p><span class="description"><?php _e('Your CSV file must be comma (,) delimited and fields with commas or quotes in them must be surrounded by parenthesis (") as per the CSV standard. Columns in the CSV file can be in any order, provided that they have the correct headings from the example file. "title" and "price" are the only required columns, all others can be left blank.', 'mp'); ?></span></p>
+				<p><span class="description"><?php printf(__('To import featured images, it is preferable to upload them via FTP to a directory in your WP uploads folder: %s. Image paths should be relative to the uploads folder, like "/myimport/myimage.png". You may also include full external image urls and the importer will download them. This is not a preferable though because it can be too slow for a large import, and you may need to split your CSV file into multple imports to avoid timeouts. A spreadsheet program like Excel or Numbers can be used to easily manipulate your import file, and their save as CSV option will create a correctly formatted file.', 'mp'), $dirs['basedir']); ?></span></p>
 				
 				<p><?php _e('Please select and upload your CSV file below.', 'mp'); ?> 
 				<a href="<?php echo $mp->plugin_url; ?>sample-marketpress-import.csv" target="_blank"><?php _e('Use this example file &raquo;', 'mp'); ?></a>
@@ -342,7 +291,7 @@ class CsvImporter extends MarketPress_Importer {
 				
 				<p>
 					<input name="csv_file" id="csv_file" size="20" type="file" /> 
-					<input name="Submit" value="<?php _e('Upload &raquo;', 'mp') ?>" type="submit"><br />
+					<input class="button-secondary" name="Submit" value="<?php _e('Upload &raquo;', 'mp') ?>" type="submit"><br />
 					<small><?php echo __('Maximum file size: ', 'mp') . ini_get('upload_max_filesize'); ?></small>
 				</p>
 				<?php
@@ -357,20 +306,8 @@ class CsvImporter extends MarketPress_Importer {
 		set_time_limit(120); //this can take a while
 		$this->results = 0;
 		$products = $this->get_csv_array();
-
-		// check all images exist in file system
-		$this->img_errors = array();
-		foreach($products as $key => $row){
-			if(isset($row['image']) && !empty($row['image'])){
-				if(is_writable($this->rel_to_absolute($row['image'])) === false){
-					$this->img_errors[] = sprintf(__('Row %d, %s','mp'), ($key+1), $row['image']);
-				}
-			}
-		}
-		if( count($this->img_errors) > 0 ){
-			return false;
-		}
-
+		$dirs = wp_upload_dir();
+		
 		foreach ($products as $row) {
 			$product = array();
 			
@@ -410,7 +347,7 @@ class CsvImporter extends MarketPress_Importer {
 				update_post_meta($new_id, 'mp_price_sort', round( (float)preg_replace('/[^0-9.]/', '', $row['sale_price']), 2 ));
 			} else {
 				update_post_meta($new_id, 'mp_is_sale', 0);
-				update_post_meta($new_id, 'mp_price_sort', round( (float)preg_replace('/[^0-9.]/', '', $row['mp_price']), 2 ));
+				update_post_meta($new_id, 'mp_price_sort', round( (float)preg_replace('/[^0-9.]/', '', $row['price']), 2 ));
 			}
 
 			//add stock count if set
@@ -441,10 +378,54 @@ class CsvImporter extends MarketPress_Importer {
 			if (isset($row['sales_count']))
 				update_post_meta($new_id, 'mp_sales_count', intval($row['sales_count']));
 			
-			$img = $this->rel_to_absolute($row['image']);
-			if(is_writable($img)){
-				$this->set_featured_image($new_id, $img);
-			}
+			//add featured images
+			if (isset($row['image']) && !empty($row['image'])) {
+				
+				// Determine if this file is in our server
+				$local = false;
+				$img_location = str_replace($dirs['baseurl'], $dirs['basedir'], $row['image']);
+				if ( file_exists($img_location) ) {
+					$local = true;
+				} else if ( file_exists($dirs['basedir'] . '/' . ltrim($row['image'], '/')) ) {
+					$local = true;
+					$img_location = $dirs['basedir'] . '/' . ltrim($row['image'], '/');
+				}
+				if ( $local ) { //just resize without downloading as it's on our server
+					preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_location, $matches );
+					$file_array = array();
+					$file_array['name'] = basename($matches[0]);
+					$file_array['tmp_name'] = $img_location;
+					
+					// do the validation and storage stuff
+					$id = media_handle_sideload( $file_array, $new_id, $row['title'] );
+					// If error storing permanently, unlink
+					if ( !is_wp_error($id) ) {
+						// add featured image to post
+						add_post_meta($new_id, '_thumbnail_id', $id);
+					}
+				} else { //download the image and attach
+					require_once(ABSPATH . '/wp-admin/includes/file.php');
+					$img_html = media_sideload_image( $row['image'], $new_id, $row['title'] );
+					if ( !is_wp_error($img_html) ) {
+						//figure out the id
+						$args = array(
+							'numberposts' => 1,
+							'order'=> 'DESC',
+							'post_mime_type' => 'image',
+							'post_parent' => $new_id,
+							'post_type' => 'attachment'
+							);
+						
+						$get_children_array = get_children($args, ARRAY_A);  //returns Array ( [$image_ID]... 
+						$rekeyed_array = array_values($get_children_array);
+						$child_image = $rekeyed_array[0];  
+						
+						// add featured image to post
+						add_post_meta($new_id, '_thumbnail_id', $child_image['ID']);
+					}
+				}
+				
+	    }
 
 			//inc count
 			$this->results++;

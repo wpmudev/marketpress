@@ -16,6 +16,7 @@ Change Log:
 - Add featured image import support to the CSV importer
 - Add a "clone product" functionality
 - Add hooks for custom shipping methods and tracking links
+- Major refresh of css styles
 - Forced shipping option recalculation when Country changes.
 - Fix bug with product list widget when ordering by price or sales
 - Fix missing closing tag in global widget breaking drag and drop
