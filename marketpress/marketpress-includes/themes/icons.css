@@ -51,7 +51,8 @@ padding: 0px;
 .mp_cart_col_updatecart input[type="submit"],
 .mp_cart_direct_checkout_link,
 #mp_shipping_submit,
-#order-id-submit {
+#order-id-submit,
+#mp_payment_confirm {
 	border: 1px solid #bfbfbf;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -81,7 +82,8 @@ padding: 0px;
 .mp_cart_col_updatecart input[type="submit"]:hover,
 .mp_cart_direct_checkout_link:hover,
 #mp_shipping_submit:hover,
-#order-id-submit:hover {
+#order-id-submit:hover,
+#mp_payment_confirm:hover {
 	background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxsaW5lYXJHcmFkaWVudCBpZD0iaGF0MCIgZ3JhZGllbnRVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHgxPSI1MCUiIHkxPSIxMDAlIiB4Mj0iNTAlIiB5Mj0iLTEuNDIxMDg1NDcxNTIwMmUtMTQlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2YyZjJmMiIgc3RvcC1vcGFjaXR5PSIxIi8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2YyZjJmMiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgIDwvbGluZWFyR3JhZGllbnQ+Cgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNoYXQwKSIgLz4KPC9zdmc+);
 	background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #f2f2f2 100%);
 	background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #f2f2f2 100%);
@@ -94,7 +96,8 @@ padding: 0px;
 .mp_cart_col_updatecart input[type="submit"]:active,
 .mp_cart_direct_checkout_link:active,
 #mp_shipping_submit:active,
-#order-id-submit:active {
+#order-id-submit:active,
+#mp_payment_confirm:active {
 	background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPjxsaW5lYXJHcmFkaWVudCBpZD0iaGF0MCIgZ3JhZGllbnRVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHgxPSI1MCUiIHkxPSIxMDAlIiB4Mj0iNTAlIiB5Mj0iLTEuNDIxMDg1NDcxNTIwMmUtMTQlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2YyZjJmMiIgc3RvcC1vcGFjaXR5PSIxIi8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2U1ZTVlNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgIDwvbGluZWFyR3JhZGllbnQ+Cgo8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0idXJsKCNoYXQwKSIgLz4KPC9zdmc+);
 	background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #e5e5e5 100%);
 	background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #e5e5e5 100%);
