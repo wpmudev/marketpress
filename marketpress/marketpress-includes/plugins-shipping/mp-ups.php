@@ -40,7 +40,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*/
 	function on_creation() {
 		//set name here to be able to translate
-		$this->public_name = __('UPS', 'mp');
+		$this->public_name = __('UPS (beta)', 'mp');
 
 		//US Domestic services
 		$this->services = array(
@@ -836,7 +836,7 @@ $settings = get_option('mp_settings');
 
 //if(in_array($settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI')))
 {
-	mp_register_shipping_plugin('MP_Shipping_UPS', 'ups', __('UPS', 'mp'), true);
+	mp_register_shipping_plugin('MP_Shipping_UPS', 'ups', __('UPS (beta)', 'mp'), true);
 }
 
 ?>
