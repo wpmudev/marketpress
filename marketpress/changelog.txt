@@ -5,7 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8 - 12/14/2012 - Aaron, Arnold, Cole, Enzo
+2.8 - 1/15/2012 - Aaron, Arnold, Cole, Enzo
 ----------------------------------------------------------------------
 - Added UPS Shipping plugin!
 - Added built in grid views!
@@ -18,9 +18,10 @@ Change Log:
 - Add hooks for custom shipping methods and tracking links
 - Major refresh of css styles
 - Forced shipping option recalculation when Country changes.
+- Fix php warning on category list page old menus
 - Fix bug with product list widget when ordering by price or sales
 - Fix missing closing tag in global widget breaking drag and drop
-- Fix shipping settings save filter for method plugins
+- Fix shipping settings save filter for method plugins: http://wp.mu/d7
 - Error check in Manual Payments gateway: http://premium.wpmudev.org/forums/topic/bug-with-manual-payment
 - Fixed 10525 Paypal errors in global cart checkouts
 - Change the "from" price shown on variation listings to the lowest
