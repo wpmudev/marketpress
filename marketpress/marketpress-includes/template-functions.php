@@ -1453,7 +1453,7 @@ function get_products_html_grid($post_array=array()){
     
     $img = mp_product_image(false, 'list', $post->ID);
     $excerpt = $mp->get_setting('show_excerpt') ?
-                      '<p class="mp_excerpt">'.$mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID).'</p>' :
+                      '<p class="mp_excerpt">'.$mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '').'</p>' :
                       '';
     $mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $post->ID );
     

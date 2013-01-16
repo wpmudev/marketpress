@@ -80,6 +80,7 @@ jQuery(document).ready(function($) {
 				// scroll to top of list
 				var pos = $('.mp_list_filter').offset();
 				$('body').animate({ scrollTop: pos.top-10 });
+				mp_cart_listeners();
 				return false;
 		});
 
@@ -97,6 +98,7 @@ jQuery(document).ready(function($) {
 							$('#mp_product_list').after(data.pagination);
 						}
 						location.hash = query_string;
+						mp_cart_listeners();
 					}
 				);
 		}

@@ -53,8 +53,7 @@ padding: 0px;
 #mp_shipping_submit,
 #order-id-submit,
 #mp_payment_confirm,
-.mp_no_stock,
-.mp_adding_to_cart {
+.mp_no_stock {
 	border: 1px solid #bfbfbf;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -77,7 +76,12 @@ padding: 0px;
 	padding: 8px 20px;
 	font-size: 0.9em;
 }
-
+.mp_adding_to_cart {
+	font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
+	padding: 8px 20px;
+	font-size: 0.9em;
+	color: #190;
+}
 .mp_no_stock { opacity: 0.5; display: inline-block; }
 
 #order-id-submit { padding:5px 20px; }
@@ -182,17 +186,7 @@ padding: 0px;
 del.mp_old_price {
 margin-right: 5px;
 }
-form.mp_buy_form .mp_adding_to_cart {
-color: #ffffff;
-font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
-font-weight: normal;
-text-decoration: none;
-background: #82b33d;
-border: 1px solid #82b33d;
-display: inline-block;
-border-radius:  0 0 0 0;
-box-shadow: none;
-}
+
 /*
 form.mp_buy_form .mp_no_stock {
 color: #ffffff;

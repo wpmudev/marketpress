@@ -39,8 +39,7 @@ padding: 0px;
 #mp_shipping_submit,
 #order-id-submit,
 #mp_payment_confirm,
-.mp_no_stock,
-.mp_adding_to_cart {
+.mp_no_stock {
 	border: none;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -63,7 +62,11 @@ padding: 0px;
 	color: #fff; /* text color */
 	text-shadow: 0 -1px 1px rgba(140,140,140,.6); /* drop shadow */
 }
-
+.mp_adding_to_cart {
+	padding: 8px 20px;
+	font-size: 1.1em;
+	color: #190;
+}
 .mp_no_stock { opacity: 0.5; display: inline-block; }
 
 #order-id-submit { padding:5px 20px; }
