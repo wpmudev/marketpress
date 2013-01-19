@@ -1019,7 +1019,7 @@ function mp_order_status() {
 
         <?php //shipping line
         if ( $order->mp_shipping_total ){ ?>
-          <li><?php _e('Shipping:', 'mp'); ?> <strong><?php echo $mp->format_currency('', get_display_shipping($order)); ?></strong></li>
+          <li><?php _e('Shipping:', 'mp'); ?> <strong><?php echo $mp->format_currency('', $mp->get_display_shipping($order)); ?></strong></li>
         <?php } ?>
 
         <?php //tax line
@@ -1206,15 +1206,12 @@ function mp_order_status() {
  * @param  array $data  data for one product line
  * @return float price to display on order tracking and emails for admin/customers
  */
-function get_display_price($order, $data){
+function get_display_price($order, $data) {
 	return isset($order->mp_tax_inclusive) && $order->mp_tax_inclusive==1 && isset($data['price_db']) ?
 	            $data['price_db'] :
 	            $data['price'];
 }
 
-function get_display_shipping($order){
-	return isset($order->mp_shipping_with_tax) ? $order->mp_shipping_with_tax : $order->mp_tax_shipping;
-}
 
 /*
  * function mp_tracking_link

@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8
-Plugin URI: http://premium.wpmudev.org/project/e-commerce
+Version: 2.8.1
+Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
 Author URI: http://uglyrobot.com
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8';
+  var $version = '2.8.1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -2454,6 +2454,10 @@ Thanks again!", 'mp')
     return $price;
   }
 	
+	function get_display_shipping($order) {
+		return (float)(isset($order->mp_shipping_with_tax) ? $order->mp_shipping_with_tax : $order->mp_tax_shipping);
+	}
+
   //returns the calculated price for taxes based on a bunch of foreign tax laws.
   function tax_price($format = false, $cart = false) {
 
@@ -4252,14 +4256,14 @@ Thanks again!", 'mp')
     }
     //shipping line
     if ( $order->mp_shipping_total ) {
-      $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n(get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
+      $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($this->get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //tax line
     if ( $order->mp_tax_total ) {
-      $order_info .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n($order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
+      $order_info .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //total line
-    $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n($order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
+    $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
 
     //// Shipping Info
 
@@ -4291,6 +4295,7 @@ Thanks again!", 'mp')
 		if (!empty($order->mp_shipping_info['special_instructions']))
 			$shipping_info .= "\n" . __('Special Instructions:', 'mp') . ' ' . $order->mp_shipping_info['special_instructions'];
 		
+		$order_notes = '';
 		if (!empty($order->mp_order_notes))
       $order_notes = __('Order Notes:', 'mp') . "\n" . $order->mp_order_notes;
 
@@ -4303,7 +4308,7 @@ Thanks again!", 'mp')
 		if ($order->mp_payment_info['transaction_id'])
 			$payment_info .= "\n" . __('Transaction ID:', 'mp') . ' ' . $order->mp_payment_info['transaction_id'];
 
-		$payment_info .= "\n" . __('Payment Total:', 'mp') . ' ' . number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
+		$payment_info .= "\n" . __('Payment Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
     $payment_info .= "\n\n";
     if ($order->post_status == 'order_received') {
       $payment_info .= __('Your payment for this order is not yet complete. Here is the latest status:', 'mp') . "\n";
@@ -4317,7 +4322,7 @@ Thanks again!", 'mp')
     }
 
 		//total
-		$order_total = number_format_i18n($order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
+		$order_total = number_format_i18n((float)$order->mp_payment_info['total'], 2) . ' ' . $order->mp_payment_info['currency'];
 
     //tracking URL
 		$tracking_url = apply_filters('wpml_marketpress_tracking_url', mp_orderstatus_link(false, true) . $order->post_title . '/');
@@ -5005,7 +5010,7 @@ Notification Preferences: %s', 'mp');
 						<?php do_action('mp_shipping_tracking_select', @$order->mp_shipping_info['method']); ?>
 					</select>
 					<input type="text" name="mp_tracking_number" value="<?php esc_attr_e(isset($order->mp_shipping_info['tracking_num']) ? $order->mp_shipping_info['tracking_num'] : ''); ?>" size="25" />
-					<input type="submit" name="add-tracking" value="<?php _e('Save &raquo;', 'mp'); ?>" /><?php if ($order->post_status == 'order_received' ||$order->post_status == 'order_paid') { ?><input type="submit" name="add-tracking-shipped" value="<?php _e('Save & Mark as Shipped &raquo;', 'mp'); ?>" /><?php } ?>
+					<input type="submit" class="button-secondary" name="add-tracking" value="<?php _e('Save &raquo;', 'mp'); ?>" /><?php if ($order->post_status == 'order_received' ||$order->post_status == 'order_paid') { ?> <input type="submit" class="button-secondary" name="add-tracking-shipped" value="<?php _e('Save & Mark as Shipped &raquo;', 'mp'); ?>" /><?php } ?>
 					</p>
 
           <?php //note line if set by gateway
@@ -5024,7 +5029,7 @@ Notification Preferences: %s', 'mp');
         <div class="inside">
 					<p>
 					<textarea name="mp_order_notes" rows="5" style="width: 100%;"><?php echo esc_textarea(isset($order->mp_order_notes) ? $order->mp_order_notes : ''); ?></textarea><br />
-					<input type="submit" name="save-note" value="<?php _e('Save &raquo;', 'mp'); ?>" />
+					<input type="submit" class="button-secondary" name="save-note" value="<?php _e('Save &raquo;', 'mp'); ?>" />
 					</p>
 				</div>
       </div>
