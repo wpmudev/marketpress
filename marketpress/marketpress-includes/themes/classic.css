@@ -314,7 +314,8 @@ clear:both;
 #mp_shipping_submit,
 #order-id-submit,
 #mp_payment_confirm,
-.mp_no_stock {
+.mp_no_stock,
+.mp_link_buynow {
 	border: none;
 	border-radius: 0; /* border radius */
 	-moz-background-clip: padding;
@@ -343,6 +344,7 @@ clear:both;
 .mp_no_stock { opacity: 0.5; display: inline-block; }
 
 #order-id-submit { padding:5px 20px; }
+.mp_link_buynow { float: right; }
 
 #mp_product_list input[type="submit"]:hover,
 .type-product input[type="submit"]:hover,
@@ -350,7 +352,8 @@ clear:both;
 .mp_cart_direct_checkout_link:hover,
 #mp_shipping_submit:hover,
 #order-id-submit:hover,
-#mp_payment_confirm:hover {
+#mp_payment_confirm:hover,
+.mp_link_buynow:hover {
 	-moz-box-shadow: inset 0 1px 0 #ccc; /* inner shadow */
 	-webkit-box-shadow: inset 0 1px 0 #ccc; /* inner shadow */
 	box-shadow: inset 0 1px 0 #ccc; /* inner shadow */
@@ -359,6 +362,7 @@ clear:both;
 	background-image: -o-linear-gradient(bottom, #bfbfbf 0%, #ccc 100%); /* gradient overlay */
 	background-image: -webkit-linear-gradient(bottom, #bfbfbf 0%, #ccc 100%); /* gradient overlay */
 	background-image: linear-gradient(bottom, #bfbfbf 0%, #ccc 100%); /* gradient overlay */
+	text-decoration: none;
 }
 
 #mp_product_list input[type="submit"]:active,
@@ -367,7 +371,8 @@ clear:both;
 .mp_cart_direct_checkout_link:active,
 #mp_shipping_submit:active,
 #order-id-submit:active,
-#mp_payment_confirm:active {
+#mp_payment_confirm:active,
+.mp_link_buynow:active {
 	-moz-box-shadow: inset 0 1px 0 #bfbfbf; /* inner shadow */
 	-webkit-box-shadow: inset 0 1px 0 #bfbfbf; /* inner shadow */
 	box-shadow: inset 0 1px 0 #bfbfbf; /* inner shadow */
@@ -376,6 +381,7 @@ clear:both;
 	background-image: -o-linear-gradient(bottom, #b2b2b2 0%, #a5a5a5 100%); /* gradient overlay */
 	background-image: -webkit-linear-gradient(bottom, #b2b2b2 0%, #a5a5a5 100%); /* gradient overlay */
 	background-image: linear-gradient(bottom, #b2b2b2 0%, #a5a5a5 100%); /* gradient overlay */
+	text-decoration: none;
 }
 
 /* green font on buy-action buttons */
@@ -384,7 +390,8 @@ clear:both;
 input.mp_cart_direct_checkout_link,
 #mp_shipping_submit,
 form.mp_buy_form .mp_adding_to_cart,
-.mp_cart_direct_checkout_link { 
+.mp_cart_direct_checkout_link,
+.mp_link_buynow { 
 	background-color: #349936; /* layer fill content */
 	-moz-box-shadow: inset 0 1px 0 #2b7f2e; /* inner shadow */
 	-webkit-box-shadow: inset 0 1px 0 #2b7f2e; /* inner shadow */
@@ -401,7 +408,8 @@ form.mp_buy_form .mp_adding_to_cart,
 .type-product input.mp_button_addcart:hover,
 input.mp_cart_direct_checkout_link:hover,
 #mp_shipping_submit:hover,
-.mp_cart_direct_checkout_link:hover {
+.mp_cart_direct_checkout_link:hover,
+.mp_link_buynow:hover {
 	background-color: #349936; /* layer fill content */
 	-moz-box-shadow: inset 0 1px 0 #2b7f2e; /* inner shadow */
 	-webkit-box-shadow: inset 0 1px 0 #2b7f2e; /* inner shadow */
@@ -418,7 +426,8 @@ input.mp_cart_direct_checkout_link:hover,
 .type-product input.mp_button_addcart:active,
 input.mp_cart_direct_checkout_link:active,
 #mp_shipping_submit:active,
-.mp_cart_direct_checkout_link:active {
+.mp_cart_direct_checkout_link:active,
+.mp_link_buynow:active {
 	background-color: #349936; /* layer fill content */
 	-moz-box-shadow: inset 0 1px 0 #226624; /* inner shadow */
 	-webkit-box-shadow: inset 0 1px 0 #226624; /* inner shadow */

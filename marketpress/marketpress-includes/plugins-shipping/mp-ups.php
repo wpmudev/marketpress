@@ -40,7 +40,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*/
 	function on_creation() {
 		//set name here to be able to translate
-		$this->public_name = __('UPS (beta)', 'mp');
+		$this->public_name = __('UPS', 'mp');
 
 		//US Domestic services
 		$this->services = array(

@@ -5394,7 +5394,7 @@ Notification Preferences: %s', 'mp');
 
       </form>
 
-		<?php if ((isset($_GET['post_status'])) && ($_GET['post_status'] != 'trash')) { ?>
+		<?php if (!isset($_GET['post_status']) || $_GET['post_status'] != 'trash') { ?>
 			<div class="icon32"><img src="<?php echo $this->plugin_url . 'images/download.png'; ?>" /></div>
 			<h2><?php _e('Export Orders', 'mp'); ?></h2>
 			<form action="<?php echo admin_url('admin-ajax.php?action=mp-orders-export'); ?>" method="post">

@@ -5,9 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8.1 - 1/15/2012 - Aaron
+2.8.1 - 1/21/2012 - Aaron
 ----------------------------------------------------------------------
+- Add very beta Fedex shipping module
 - Fix php warning when marking as shipped
+- Fix missing orders export box on All orders page: http://wp.mu/ee
+- Small fixes to css styles for external links
 
 2.8 - 1/15/2012 - Aaron, Arnold, Cole, Enzo
 ----------------------------------------------------------------------

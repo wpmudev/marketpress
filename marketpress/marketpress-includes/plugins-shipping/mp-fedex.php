@@ -28,7 +28,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function on_creation() {
 		//declare here for translation
-		$this->public_name = __('FedEx (beta)', 'mp');
+		$this->public_name = __('FedEx', 'mp');
 		//US Domestic services
 		$this->services = array(
 		'FIRST_OVERNIGHT'                   => new FedEx_Service('FIRST_OVERNIGHT',        __('First Overnight', 'mp'),        __('(1 Day am)', 'mp') ),
@@ -901,5 +901,5 @@ $settings = get_option('mp_settings');
 
 //if(in_array($settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI')))
 {
-	mp_register_shipping_plugin('MP_Shipping_FedEx', 'fedex', __('FedEx', 'mp'), true);
+	mp_register_shipping_plugin('MP_Shipping_FedEx', 'fedex', __('FedEx (beta)', 'mp'), true);
 }
