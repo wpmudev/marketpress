@@ -501,7 +501,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	}
 
 	/**
-	* rate_request - Makes th actual call to UPS
+	* rate_request - Makes the actual call to UPS
 	*/
 	function rate_request() {
 		global $mp;
@@ -609,14 +609,14 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		);
 
 		if (is_wp_error($response)){
-			return array('error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>');
+			return array('error' => '<div class="mp_checkout_error">UPS: ' . $response->get_error_message() . '</div>');
 		}
 		else
 		{
 			$loaded = ($response['response']['code'] == '200');
 			$body = $response['body'];
 			if(! $loaded){
-				return array('error' => '<div class="mp_checkout_error">' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
+				return array('error' => '<div class="mp_checkout_error">UPS: ' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
 			}
 		}
 

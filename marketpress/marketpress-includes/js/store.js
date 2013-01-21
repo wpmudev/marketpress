@@ -33,6 +33,9 @@ jQuery(document).ready(function($) {
   //shipping field choice
   $('#mp-shipping-select').change(function() {mp_refresh_shipping();});
   
+  //For fedex residential delivery
+  $('#mp_residential').change(function() {mp_refresh_shipping();});
+  
   //refresh on blur if necessary 3 fields are set
   $('#mp_shipping_form .mp_shipping_field').change(function() {
     if ($('#mp_city').val() && $('#mp_state').val() && $('#mp_zip').val()) mp_refresh_shipping();
