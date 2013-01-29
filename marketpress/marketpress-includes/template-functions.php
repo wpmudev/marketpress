@@ -1853,6 +1853,29 @@ function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
     return $button;
 }
 
+/*
+ * function mp_product_sku
+ * 
+ * @param bool $echo default true
+ * @param int $post_id The post_id of the product. Optional if in the loop
+ * @param string $seperator The seperator to put between skus, default ', '
+ * 
+ * Returns or echos html of variation SKUs
+ */
+function mp_product_sku( $echo = true, $post_id = NULL, $seperator = ', ' ) {
+  global $id, $mp;
+  $post_id = ( NULL === $post_id ) ? $id : $post_id;
+  
+  $list = get_post_meta($post_id, "mp_sku", true);
+  $html = '<span class="mp_product_skus">' . implode($seperator, $list) . '</span>';
+  
+  $html = apply_filters( 'mp_product_skus', $html, $post_id, $list, $seperator );
+
+  if ($echo)
+    echo $html;
+  else
+    return $html;
+}
 
 /*
  * Displays the product featured image
@@ -1892,6 +1915,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
     $link = get_permalink($post_id);
 
     $title = esc_attr($post->post_title);
+    $class = ' class="mp_img_link"';
 
   } else if ($context == 'single') {
     //size
@@ -1918,7 +1942,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
     $link = get_permalink($post_id);
 
     $title = esc_attr($post->post_title);
-
+    $class = ' class="mp_img_link"';
   }
 
   $image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => 'alignleft mp_product_image_'.$context, 'title' => $title));
@@ -1932,7 +1956,7 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
   
   //add the link
   if ($link)
-    $image = '<a class="mp_img_link" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
+    $image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
 
   if ($echo)
     echo $image;
