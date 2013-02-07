@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.1
+Version: 2.8.2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.1';
+  var $version = '2.8.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -448,7 +448,7 @@ Thanks again!", 'mp')
 			}
 		} else {
 			//load only and all calculated ones
-			$class = $mp_shipping_plugins[$shipping['method']][0];
+			$class = isset($mp_shipping_plugins[$shipping['method']][0]) ? $mp_shipping_plugins[$shipping['method']][0] : '';
 			if (class_exists($class))
 				$mp_shipping_active_plugins[$shipping['method']] = new $class;
 		}
@@ -3009,15 +3009,15 @@ Thanks again!", 'mp')
       //save to session
       global $current_user;
       $meta = get_user_meta($current_user->ID, 'mp_shipping_info', true);
-      $_SESSION['mp_shipping_info']['email'] = ($_POST['email']) ? trim(stripslashes($_POST['email'])) : (isset($meta['email']) ? $meta['email']: $current_user->user_email);
-      $_SESSION['mp_shipping_info']['name'] = ($_POST['name']) ? trim(stripslashes($_POST['name'])) : (isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname);
-      $_SESSION['mp_shipping_info']['address1'] = ($_POST['address1']) ? trim(stripslashes($_POST['address1'])) : $meta['address1'];
-      $_SESSION['mp_shipping_info']['address2'] = ($_POST['address2']) ? trim(stripslashes($_POST['address2'])) : $meta['address2'];
-      $_SESSION['mp_shipping_info']['city'] = ($_POST['city']) ? trim(stripslashes($_POST['city'])) : $meta['city'];
-      $_SESSION['mp_shipping_info']['state'] = ($_POST['state']) ? trim(stripslashes($_POST['state'])) : $meta['state'];
-      $_SESSION['mp_shipping_info']['zip'] = ($_POST['zip']) ? trim(stripslashes($_POST['zip'])) : $meta['zip'];
-      $_SESSION['mp_shipping_info']['country'] = ($_POST['country']) ? trim($_POST['country']) : $meta['country'];
-      $_SESSION['mp_shipping_info']['phone'] = ($_POST['phone']) ? preg_replace('/[^0-9-\(\) ]/', '', trim($_POST['phone'])) : $meta['phone'];
+      $_SESSION['mp_shipping_info']['email'] = isset($_POST['email']) ? trim(stripslashes($_POST['email'])) : (isset($meta['email']) ? $meta['email']: $current_user->user_email);
+      $_SESSION['mp_shipping_info']['name'] = isset($_POST['name']) ? trim(stripslashes($_POST['name'])) : (isset($meta['name']) ? $meta['name'] : $current_user->user_firstname . ' ' . $current_user->user_lastname);
+      $_SESSION['mp_shipping_info']['address1'] = isset($_POST['address1']) ? trim(stripslashes($_POST['address1'])) : $meta['address1'];
+      $_SESSION['mp_shipping_info']['address2'] = isset($_POST['address2']) ? trim(stripslashes($_POST['address2'])) : $meta['address2'];
+      $_SESSION['mp_shipping_info']['city'] = isset($_POST['city']) ? trim(stripslashes($_POST['city'])) : $meta['city'];
+      $_SESSION['mp_shipping_info']['state'] = isset($_POST['state']) ? trim(stripslashes($_POST['state'])) : $meta['state'];
+      $_SESSION['mp_shipping_info']['zip'] = isset($_POST['zip']) ? trim(stripslashes($_POST['zip'])) : $meta['zip'];
+      $_SESSION['mp_shipping_info']['country'] = isset($_POST['country']) ? trim($_POST['country']) : $meta['country'];
+      $_SESSION['mp_shipping_info']['phone'] = isset($_POST['phone']) ? preg_replace('/[^0-9-\(\) ]/', '', trim($_POST['phone'])) : $meta['phone'];
 			if (isset($_POST['special_instructions']))
 				$_SESSION['mp_shipping_info']['special_instructions'] = trim(stripslashes($_POST['special_instructions']));
 
@@ -6731,7 +6731,7 @@ Notification Preferences: %s', 'mp');
         				<td>
                 <?php
                 //check network permissions
-                if (is_multisite() && !is_main_site()) {
+                if (is_multisite() && !is_main_site() && !is_super_admin()) {
                   $network_settings = get_site_option( 'mp_network_settings' );
                   foreach ((array)$mp_gateway_plugins as $code => $plugin) {
                     if ($network_settings['allowed_gateways'][$code] == 'full') {

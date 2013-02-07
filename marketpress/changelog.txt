@@ -5,17 +5,22 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.8.2 - 2/7/2013 - Aaron
+----------------------------------------------------------------------
 - Add mp_product_sku() template function
 - Fix css class on product images
+- Fix being unable to overwrite shipping information fields with a blank value 
+- Fix grid bug when no styles are loaded http://wp.mu/h7
+- Show all gateways to super admins in multisite (avoid confusion)
 
-2.8.1 - 1/21/2012 - Aaron
+2.8.1 - 1/21/2013 - Aaron
 ----------------------------------------------------------------------
 - Add very beta Fedex shipping module
 - Fix php warning when marking as shipped
 - Fix missing orders export box on All orders page: http://wp.mu/ee
 - Small fixes to css styles for external links
 
-2.8 - 1/15/2012 - Aaron, Arnold, Cole, Enzo
+2.8 - 1/15/2013 - Aaron, Arnold, Cole, Enzo
 ----------------------------------------------------------------------
 - Added UPS Shipping plugin!
 - Added built in grid views!

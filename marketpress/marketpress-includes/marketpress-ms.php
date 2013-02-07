@@ -114,13 +114,17 @@ class MarketPress_MS {
         'paypal-express' => 'full',
         'paypal-chained' => 'none',
         'paypal-pro' => 'none',
+				'payflow' => 'none',
         'stripe' => 'none',
         'authorizenet-aim' => 'none',
         'authorizenet-sim' => 'full',
         'google-checkout' => 'full',
         '2checkout' => 'full',
         'manual-payment' => 'full',
-        'moneybookers' => 'full'
+        'moneybookers' => 'full',
+        'cubepoints' => 'none',
+        'eway' => 'full',
+        'ideal' => 'full'
       ),
 			'global_gateway' => 'paypal-express',
       'allowed_themes' => array(

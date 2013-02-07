@@ -1441,11 +1441,13 @@ function get_products_html_grid($post_array=array()){
   //get image width
   if ($mp->get_setting('list_img_size') == 'custom'){
     $width = $mp->get_setting('list_img_width');
-  }
-  else {
+  } else {
     $size = $mp->get_setting('list_img_size');
     $width = get_option($size."_size_w");
   }
+  
+  $inline_style = !( $mp->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
+  
   foreach ($post_array as $post){
     
     $img = mp_product_image(false, 'list', $post->ID);
@@ -1458,30 +1460,11 @@ function get_products_html_grid($post_array=array()){
     $class[] = strlen($img)>0?'mp_thumbnail':'';
     $class[] = strlen($excerpt)>0?'mp_excerpt':'';
     $class[] = has_price_variations($post->ID) ? 'mp_price_variations':'';
-    /*
+    
     $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
-                <div class="mp_one_product">
-                  '.$img.'
-                  
-                  <h3 class="mp_product_name">
-                    <a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>
-                  </h3>
-                  
-                  '.$mp_product_list_content.'
-
-                  <div class="mp_price_buy">
-                    '.mp_product_price(false, $post->ID).'
-                    '.mp_buy_button(false, 'list', $post->ID).'
-                    '.apply_filters( 'mp_product_list_meta', '', $post->ID ).'
-                  </div>
-
-                </div>
-              </div>';
-    */
-    $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
-                <div class="mp_one_product" style="width: '.$width.'px;">
+                <div class="mp_one_product"' . ($inline_style ? ' style="width: '.$width.'px;"' : '') . '>
                 
-                  <div class="mp_product_detail" style="width: '.$width.'px;">
+                  <div class="mp_product_detail"' . ($inline_style ? ' style="width: '.$width.'px;"' : '') . '>
                     '.$img.'
                   
                     <h3 class="mp_product_name">
@@ -1491,7 +1474,7 @@ function get_products_html_grid($post_array=array()){
                     '.$mp_product_list_content.'
                   </div>
 
-                  <div class="mp_price_buy" style="width: '.$width.'px; margin-left:-'.$width.'px;">
+                  <div class="mp_price_buy"' . ($inline_style ? ' style="width: '.$width.'px; margin-left:-'.$width.'px;"' : '') . '>
                     '.mp_product_price(false, $post->ID).'
                     '.mp_buy_button(false, 'list', $post->ID).'
                     '.apply_filters( 'mp_product_list_meta', '', $post->ID ).'
