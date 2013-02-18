@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.2
+Version: 2.8.2 beta 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.2';
+  var $version = '2.8.2 beta 1';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -175,7 +175,8 @@ class MarketPress {
       'tax' => array (
         'rate' => 0,
         'tax_shipping' => 1,
-        'tax_inclusive' => 0
+        'tax_inclusive' => 0,
+				'tax_digital' => 1
       ),
       'currency' => 'USD',
       'curr_symbol_position' => 1,
@@ -183,6 +184,7 @@ class MarketPress {
       'disable_cart' => 0,
       'hide_popup' => 0,
       'inventory_threshhold' => 3,
+      'inventory_remove' => 0,
       'max_downloads' => 5,
       'force_login' => 0,
       'ga_ecommerce' => 'none',
@@ -2029,7 +2031,7 @@ Thanks again!", 'mp')
 		//all this junk is to reorder the metabox array to move the featured image box to the top right below submit box. User order will override
 		if ( isset( $wp_meta_boxes['product']['side']['low']['postimagediv'] ) ) {
 			$imagediv = $wp_meta_boxes['product']['side']['low']['postimagediv'];
-			unset( $wp_meta_boxes['product']['side']['low'] );
+			unset( $wp_meta_boxes['product']['side']['low']['postimagediv'] );
 			$submitdiv = $wp_meta_boxes['product']['side']['core']['submitdiv'];
 			unset( $wp_meta_boxes['product']['side']['core']['submitdiv'] );
 			$new_core['submitdiv'] = $submitdiv;
@@ -2263,7 +2265,7 @@ Thanks again!", 'mp')
 		$file = get_post_meta($post->ID, 'mp_file', true);
     ?>
     <label><?php _e('File URL', 'mp'); ?>:<br /><input type="text" size="50" id="mp_file" class="mp_file" name="mp_file" value="<?php echo esc_attr($file); ?>" /></label>
-    <input id="mp_upload_button" type="button" value="<?php _e('Upload File', 'mp'); ?>" /><br />
+    <input id="mp_upload_button" class="button-secondary" type="button" value="<?php _e('Upload File', 'mp'); ?>" /><br />
     <?php
     //display allowed filetypes if WPMU
     if (is_multisite()) {
@@ -2497,6 +2499,10 @@ Thanks again!", 'mp')
 			if ($special)
 				$special_rate = get_post_meta($product_id, 'mp_special_tax', true);
 			foreach ($variations as $variation => $data) {
+				//if not taxing digital goods, skip them completely
+				if ( !$this->get_setting('tax->tax_digital') && isset($data['download']) && is_array($data['download']) )
+					continue;
+				
 				if ($special)
 					$special_totals[] = ($this->before_tax_price($data['price'], $product_id) * $data['quantity']) * $special_rate;
 				else
@@ -3299,7 +3305,8 @@ Thanks again!", 'mp')
 
   //called on checkout to create a new order
   function create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id = false, $shipping_total = false, $tax_total = false, $coupon_code = false) {
-
+		global $wpdb;
+		
     //order id can be null
     if (empty($order_id))
       $order_id = $this->generate_order_id();
@@ -3350,7 +3357,8 @@ Thanks again!", 'mp')
 					  $stock[0] = $stock;
 					$stock[$variation] = $stock[$variation] - $data['quantity'];
 	        update_post_meta($product_id, 'mp_inventory', $stock);
-
+					
+					//send low stock notification if needed
 	        if ($stock[$variation] <= $this->get_setting('inventory_threshold')) {
 	          $this->low_stock_notification($product_id, $variation, $stock[$variation]);
 	        }
@@ -3363,6 +3371,26 @@ Thanks again!", 'mp')
 
 	      //for plugins into product sales
 	      do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
+			}
+			
+			//set product to draft if completly out of stock
+			if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
+				if (!is_array($stock))
+					$stock[0] = $stock;
+					
+				if ($this->get_setting('inventory_remove') && !array_sum($stock)) {		
+					$post = get_post( $product_id );
+					$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
+					clean_post_cache( $post->ID );
+					$old_status = $post->post_status;
+					$post->post_status = 'draft';
+					wp_transition_post_status( 'draft', $old_status, $post );
+	
+					do_action( 'edit_post', $post->ID, $post );
+					do_action( 'save_post', $post->ID, $post );
+					do_action( 'wp_insert_post', $post->ID, $post );
+				}	
 			}
     }
 		$item_count = array_sum($items);
@@ -5714,6 +5742,14 @@ Notification Preferences: %s', 'mp');
                 <br /><span class="description"><?php _e('Enabling this option allows you to enter and show all prices inclusive of tax, while still listing the tax total as a line item in shopping carts. Please see your local tax laws.', 'mp') ?></span>
           			</td>
                 </tr>
+                <tr>
+        				<th scope="row"><?php _e("Apply Tax to Downloadable Products?", 'mp') ?></th>
+                <td>
+        				<label><input value="1" name="mp[tax][tax_digital]" type="radio"<?php checked($this->get_setting('tax->tax_digital'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[tax][tax_digital]" type="radio"<?php checked($this->get_setting('tax->tax_digital'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e('Please see your local tax laws. Note if this is enabled and a downloadable only cart, rates will be the default for your base location.', 'mp') ?></span>
+          			</td>
+                </tr>
               </table>
             </div>
           </div>
@@ -5778,6 +5814,14 @@ Notification Preferences: %s', 'mp');
 			    			}
 								?>
 								</select>
+                </td>
+                </tr>
+								<tr valign="top">
+                <th scope="row"><?php _e('Hide Out of Stock Products', 'mp') ?></th>
+                <td>
+                <label><input value="1" name="mp[inventory_remove]" type="radio"<?php checked($this->get_setting('inventory_remove'), 1); ?>> <?php _e('Yes', 'mp') ?></label>
+        				<label><input value="0" name="mp[inventory_remove]" type="radio"<?php checked($this->get_setting('inventory_remove'), 0); ?>> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e('This will set the product to draft if inventory of all variations is gone.', 'mp') ?></span>
                 </td>
                 </tr>
                 <tr id="mp-downloads-setting">
@@ -6428,6 +6472,9 @@ Notification Preferences: %s', 'mp');
 					//strip slashes
           $_POST['mp']['msg'] = array_map('stripslashes', (array)$_POST['mp']['msg']);
           $_POST['mp']['email'] = array_map('stripslashes', (array)$_POST['mp']['email']);
+					
+					//wpautop
+					$_POST['mp']['msg'] = array_map('wpautop', (array)$_POST['mp']['msg']);
 					
           $settings = array_merge($settings, apply_filters('mp_messages_settings_filter', $_POST['mp']));
           update_option('mp_settings', $settings);
