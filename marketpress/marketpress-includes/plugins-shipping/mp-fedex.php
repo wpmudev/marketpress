@@ -34,15 +34,15 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		'FIRST_OVERNIGHT'                   => new FedEx_Service('FIRST_OVERNIGHT',        __('First Overnight', 'mp'),        __('(1 Day am)', 'mp') ),
 		'PRIORITY_OVERNIGHT'                => new FedEx_Service('PRIORITY_OVERNIGHT',     __('Priority Overnight', 'mp'),     __('(1 Day am )', 'mp') ),
 		'STANDARD_OVERNIGHT'                => new FedEx_Service('STANDARD_OVERNIGHT',     __('Standard Overnight', 'mp'),     __('(1 Day)', 'mp') ),
-//		'FEDEX_1_DAY_FREIGHT'               => new FedEx_Service('FEDEX_1_DAY_FREIGHT',    __('Fedex 1 Day Freight', 'mp'),    __('(1 Day)', 'mp')),
+		//		'FEDEX_1_DAY_FREIGHT'               => new FedEx_Service('FEDEX_1_DAY_FREIGHT',    __('Fedex 1 Day Freight', 'mp'),    __('(1 Day)', 'mp')),
 		'FEDEX_2_DAY_AM'                    => new FedEx_Service('FEDEX_2_DAY_AM',         __('Fedex 2 Day AM', 'mp'),         __('(2 Days am)', 'mp')),
 		'FEDEX_2_DAY'                       => new FedEx_Service('FEDEX_2_DAY',            __('Fedex 2 Day', 'mp'),            __('(2 Days)', 'mp')),
-//		'FEDEX_2_DAY_FREIGHT'               => new FedEx_Service('FEDEX_2_DAY_FREIGHT',    __('Fedex 2 Day Freight', 'mp'),    __('(2 Days)', 'mp')),
-//		'FEDEX_3_DAY_FREIGHT'               => new FedEx_Service('FEDEX_3_DAY_FREIGHT',    __('Fedex 3 Day Freight', 'mp'),    __('(3 Days)', 'mp')),
+		//		'FEDEX_2_DAY_FREIGHT'               => new FedEx_Service('FEDEX_2_DAY_FREIGHT',    __('Fedex 2 Day Freight', 'mp'),    __('(2 Days)', 'mp')),
+		//		'FEDEX_3_DAY_FREIGHT'               => new FedEx_Service('FEDEX_3_DAY_FREIGHT',    __('Fedex 3 Day Freight', 'mp'),    __('(3 Days)', 'mp')),
 		'FEDEX_EXPRESS_SAVER'               => new FedEx_Service('FEDEX_EXPRESS_SAVER',    __('Fedex Express Saver', 'mp'),    __('(3 Days)', 'mp')),
-//		'FEDEX_FIRST_FREIGHT'               => new FedEx_Service('FEDEX_FIRST_FREIGHT',    __('Fedex First Freight', 'mp'),    __('(1-3 Days)', 'mp')),
-//		'FEDEX_FREIGHT_ECONOMY'             => new FedEx_Service('FEDEX_FREIGHT_ECONOMY',  __('Fedex Freight Economy', 'mp'),  __('(2-5 Days)', 'mp') ),
-//		'FEDEX_FREIGHT_PRIORITY'            => new FedEx_Service('FEDEX_FREIGHT_PRIORITY', __('Fedex Freight Priority', 'mp'), __('(Scheduled)', 'mp') ),
+		//		'FEDEX_FIRST_FREIGHT'               => new FedEx_Service('FEDEX_FIRST_FREIGHT',    __('Fedex First Freight', 'mp'),    __('(1-3 Days)', 'mp')),
+		//		'FEDEX_FREIGHT_ECONOMY'             => new FedEx_Service('FEDEX_FREIGHT_ECONOMY',  __('Fedex Freight Economy', 'mp'),  __('(2-5 Days)', 'mp') ),
+		//		'FEDEX_FREIGHT_PRIORITY'            => new FedEx_Service('FEDEX_FREIGHT_PRIORITY', __('Fedex Freight Priority', 'mp'), __('(Scheduled)', 'mp') ),
 		'FEDEX_GROUND'                      => new FedEx_Service('FEDEX_GROUND',           __('Fedex Ground', 'mp'),           __('(1-7 Days)', 'mp') ),
 		'GROUND_HOME_DELIVERY'              => new FedEx_Service('GROUND_HOME_DELIVERY',   __('Ground Home Delivery', 'mp'),   __('(1-5 Days)', 'mp') ),
 		'SMART_POST'                        => new FedEx_Service('SMART_POST',             __('Smart Post', 'mp'),             __('(2-7 Days)', 'mp') ),
@@ -51,10 +51,10 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		//International Services
 		$this->intl_services = array(
 		'INTERNATIONAL_ECONOMY'             => new FedEx_Service('INTERNATIONAL_ECONOMY',  __('International Economy', 'mp'),  __('(5 Days)', 'mp') ),
-//		'INTERNATIONAL_ECONOMY_FREIGHT'     => new FedEx_Service('INTERNATIONAL_ECONOMY_FREIGHT', __('International Economy Freight', 'mp'),                  __('(1-5 Days)', 'mp') ),
+		//		'INTERNATIONAL_ECONOMY_FREIGHT'     => new FedEx_Service('INTERNATIONAL_ECONOMY_FREIGHT', __('International Economy Freight', 'mp'),                  __('(1-5 Days)', 'mp') ),
 		'INTERNATIONAL_FIRST'               => new FedEx_Service('INTERNATIONAL_FIRST',    __('International First', 'mp'),     __('(1-3 Days)', 'mp') ),
 		'INTERNATIONAL_PRIORITY'            => new FedEx_Service('INTERNATIONAL_PRIORITY', __('International Priority', 'mp'),  __('(1-3 Days)', 'mp') ),
-//		'INTERNATIONAL_PRIORITY_FREIGHT'    => new FedEx_Service('INTERNATIONAL_PRIORITY_FREIGHT', __('International Priority Freight', 'mp'),                  __('(1-5 Days)', 'mp') ),
+		//		'INTERNATIONAL_PRIORITY_FREIGHT'    => new FedEx_Service('INTERNATIONAL_PRIORITY_FREIGHT', __('International Priority Freight', 'mp'),                  __('(1-5 Days)', 'mp') ),
 		'EUROPE_FIRST_INTERNATIONAL_PRIORITY' => new FedEx_Service('EUROPE_FIRST_INTERNATIONAL_PRIORITY', __('Europe First International Priority', 'mp'),     __('(Next Day)', 'mp')),
 		);
 
@@ -298,21 +298,21 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 								<?php echo $this->get_units_weight(); ?>
 							</td>
 						</tr>
-<!--
+						<!--
 						<tr>
-							<th scope="row"><?php _e('FedEx Request Mode', 'mp') ?></th>
-							<td>
-								<label>
-									<input type="radio" name="mp[shipping][fedex][online]" value="online" <?php checked($this->fedex_settings['online'], 'online'); ?> />
-									<?php _e('Online rates','mp'); ?>
-								</label>&nbsp;&nbsp;&nbsp;
-								<label>
-									<input type="radio" name="mp[shipping][fedex][online]" value="retail" <?php checked($this->fedex_settings['online'], 'retail'); ?> />
-									<?php _e('Retail rates','mp'); ?>
-								</label>
-							</td>
+						<th scope="row"><?php _e('FedEx Request Mode', 'mp') ?></th>
+						<td>
+						<label>
+						<input type="radio" name="mp[shipping][fedex][online]" value="online" <?php checked($this->fedex_settings['online'], 'online'); ?> />
+						<?php _e('Online rates','mp'); ?>
+						</label>&nbsp;&nbsp;&nbsp;
+						<label>
+						<input type="radio" name="mp[shipping][fedex][online]" value="retail" <?php checked($this->fedex_settings['online'], 'retail'); ?> />
+						<?php _e('Retail rates','mp'); ?>
+						</label>
+						</td>
 						</tr>
--->
+						-->
 						<tr>
 							<th scope="row"><?php _e('FedEx Offered Domestic Services', 'mp') ?></th>
 							<td>
@@ -515,13 +515,14 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$this->pounds = intval($this->pkg_weight);
 		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
-		// Can't use zip+4
-		$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
-		$this->destination_zip = substr($this->destination_zip, 0, 5);
-
-		$shipping_options = $this->rate_request();
+		if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+			// Can't use zip+4
+			$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
+		}
 
 		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+			// Can't use zip+4
+			$this->destination_zip = substr($this->destination_zip, 0, 5);
 			$shipping_options = $this->rate_request();
 		} else {
 			$shipping_options = $this->rate_request(true);
@@ -545,19 +546,19 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 			$packages .=
 			'<v13:RequestedPackageLineItems>
-				<v13:SequenceNumber>1</v13:SequenceNumber>
-				<v13:GroupNumber>1</v13:GroupNumber>
-				<v13:GroupPackageCount>' . $count . '</v13:GroupPackageCount>
-				<v13:Weight>
-					<v13:Units>LB</v13:Units>
-					<v13:Value>' . $weight . '</v13:Value>
-				</v13:Weight>
-				<v13:Dimensions>
-					<v13:Length>' . intval($length) . '</v13:Length>
-					<v13:Width>' . intval($width) . '</v13:Width>
-					<v13:Height>' . intval($height) . '</v13:Height>
-					<v13:Units>IN</v13:Units>
-				</v13:Dimensions>
+			<v13:SequenceNumber>1</v13:SequenceNumber>
+			<v13:GroupNumber>1</v13:GroupNumber>
+			<v13:GroupPackageCount>' . $count . '</v13:GroupPackageCount>
+			<v13:Weight>
+			<v13:Units>LB</v13:Units>
+			<v13:Value>' . $weight . '</v13:Value>
+			</v13:Weight>
+			<v13:Dimensions>
+			<v13:Length>' . intval($length) . '</v13:Length>
+			<v13:Width>' . intval($width) . '</v13:Width>
+			<v13:Height>' . intval($height) . '</v13:Height>
+			<v13:Units>IN</v13:Units>
+			</v13:Dimensions>
 			</v13:RequestedPackageLineItems>';
 		}
 		return $packages;
@@ -596,72 +597,72 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 		$xml_req = '<?xml version="1.0" encoding="UTF-8"?>
 		<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v13="http://fedex.com/ws/rate/v13">
-			<SOAP-ENV:Body>
-				<v13:RateRequest>
-					<v13:WebAuthenticationDetail>
-						<v13:UserCredential>
-							<v13:Key>' . $this->fedex_settings['api_key'] . '</v13:Key>
-							<v13:Password>' . $this->fedex_settings['api_password'] . '</v13:Password>
-						</v13:UserCredential>
-					</v13:WebAuthenticationDetail>
-					<v13:ClientDetail>
-						<v13:AccountNumber>' . $this->fedex_settings['account'] . '</v13:AccountNumber>
-						<v13:MeterNumber>' . $this->fedex_settings['meter'] . '</v13:MeterNumber>
-					</v13:ClientDetail>
-					<v13:TransactionDetail>
-						<v13:CustomerTransactionId>Marketpress Rates Request</v13:CustomerTransactionId>
-					</v13:TransactionDetail>
-					<v13:Version>
-						<v13:ServiceId>crs</v13:ServiceId>
-						<v13:Major>13</v13:Major>
-						<v13:Intermediate>0</v13:Intermediate>
-						<v13:Minor>0</v13:Minor>
-					</v13:Version>
-					<v13:RequestedShipment>
-						<v13:DropoffType>' . $this->fedex_settings['dropoff'] . '</v13:DropoffType>
-						<v13:PackagingType>' . $this->fedex_settings['packaging'] . '</v13:PackagingType>
-						<v13:PreferredCurrency>' . $mp->get_setting('currency') . '</v13:PreferredCurrency>
-						<v13:Shipper>
-							<v13:Address>
-								<v13:StateOrProvinceCode>' . $this->settings['base_province'] . '</v13:StateOrProvinceCode>
-								<v13:PostalCode>' . $this->settings['base_zip'] . '</v13:PostalCode>
-								<v13:CountryCode>' . $this->settings['base_country'] . '</v13:CountryCode>
-							</v13:Address>
-						</v13:Shipper>
-						<v13:Recipient>
-							<v13:Address>
-								<v13:StreetLines>' . $this->address1 . '</v13:StreetLines>
-								<v13:StreetLines>' . $this->address2 . '</v13:StreetLines>
-								<v13:City>' . $this->city . '</v13:City>
-								<v13:StateOrProvinceCode>' . $this->state . '</v13:StateOrProvinceCode>
-								<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
-								<v13:CountryCode>' . $this->country . '</v13:CountryCode>';
-		
-								if (!empty($this->residential)) {
-								$xml_req .= '
-								<v13:Residential>true</v13:Residential>';
-								}
-		
-								$xml_req .= '
-							</v13:Address>
-						</v13:Recipient>
-						<v13:ShippingChargesPayment>
-							<v13:PaymentType>SENDER</v13:PaymentType>
-							<v13:Payor>
-								<v13:ResponsibleParty>
-									<v13:AccountNumber>' . $this->fedex_settings['account'] . '</v13:AccountNumber>
-								</v13:ResponsibleParty>
-							</v13:Payor>
-						</v13:ShippingChargesPayment>
-						<v13:RateRequestTypes>LIST</v13:RateRequestTypes>
-						';
-						$xml_req .= $packages . '
-		
-					</v13:RequestedShipment>
-				</v13:RateRequest>
-			</SOAP-ENV:Body>
+		<SOAP-ENV:Body>
+		<v13:RateRequest>
+		<v13:WebAuthenticationDetail>
+		<v13:UserCredential>
+		<v13:Key>' . $this->fedex_settings['api_key'] . '</v13:Key>
+		<v13:Password>' . $this->fedex_settings['api_password'] . '</v13:Password>
+		</v13:UserCredential>
+		</v13:WebAuthenticationDetail>
+		<v13:ClientDetail>
+		<v13:AccountNumber>' . $this->fedex_settings['account'] . '</v13:AccountNumber>
+		<v13:MeterNumber>' . $this->fedex_settings['meter'] . '</v13:MeterNumber>
+		</v13:ClientDetail>
+		<v13:TransactionDetail>
+		<v13:CustomerTransactionId>Marketpress Rates Request</v13:CustomerTransactionId>
+		</v13:TransactionDetail>
+		<v13:Version>
+		<v13:ServiceId>crs</v13:ServiceId>
+		<v13:Major>13</v13:Major>
+		<v13:Intermediate>0</v13:Intermediate>
+		<v13:Minor>0</v13:Minor>
+		</v13:Version>
+		<v13:RequestedShipment>
+		<v13:DropoffType>' . $this->fedex_settings['dropoff'] . '</v13:DropoffType>
+		<v13:PackagingType>' . $this->fedex_settings['packaging'] . '</v13:PackagingType>
+		<v13:PreferredCurrency>' . $mp->get_setting('currency') . '</v13:PreferredCurrency>
+		<v13:Shipper>
+		<v13:Address>
+		<v13:StateOrProvinceCode>' . $this->settings['base_province'] . '</v13:StateOrProvinceCode>
+		<v13:PostalCode>' . $this->settings['base_zip'] . '</v13:PostalCode>
+		<v13:CountryCode>' . $this->settings['base_country'] . '</v13:CountryCode>
+		</v13:Address>
+		</v13:Shipper>
+		<v13:Recipient>
+		<v13:Address>
+		<v13:StreetLines>' . $this->address1 . '</v13:StreetLines>
+		<v13:StreetLines>' . $this->address2 . '</v13:StreetLines>
+		<v13:City>' . $this->city . '</v13:City>
+		<v13:StateOrProvinceCode>' . $this->state . '</v13:StateOrProvinceCode>
+		<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
+		<v13:CountryCode>' . $this->country . '</v13:CountryCode>';
+
+		if (!empty($this->residential)) {
+			$xml_req .= '
+			<v13:Residential>true</v13:Residential>';
+		}
+
+		$xml_req .= '
+		</v13:Address>
+		</v13:Recipient>
+		<v13:ShippingChargesPayment>
+		<v13:PaymentType>SENDER</v13:PaymentType>
+		<v13:Payor>
+		<v13:ResponsibleParty>
+		<v13:AccountNumber>' . $this->fedex_settings['account'] . '</v13:AccountNumber>
+		</v13:ResponsibleParty>
+		</v13:Payor>
+		</v13:ShippingChargesPayment>
+		<v13:RateRequestTypes>LIST</v13:RateRequestTypes>
+		';
+		$xml_req .= $packages . '
+
+		</v13:RequestedShipment>
+		</v13:RateRequest>
+		</SOAP-ENV:Body>
 		</SOAP-ENV:Envelope>';
-		
+
 		//print_r($xml_req);
 		//We have the XML make the call
 		$url = ($this->fedex_settings['mode'] == 'sandbox') ? $this->sandbox_uri : $this->production_uri;
@@ -713,7 +714,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		}
 
 		//Good to go
-		
+
 		$service_set = ($international) ? $this->intl_services : $this->services;
 		//Make SESSION copy with just prices and delivery
 

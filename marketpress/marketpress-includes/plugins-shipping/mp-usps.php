@@ -549,11 +549,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//If > 35 ponds it's a not machinable
 		$this->machinable = ($this->pkg_weight > 35) ? 'false' : $this->machinable;
 
-		// Can't use zip+4
-		$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
-		$this->destination_zip = substr($this->destination_zip, 0, 5);
+		if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+			// Can't use zip+4
+			$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
+		}
 
 		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+			// Can't use zip+4
+			$this->destination_zip = substr($this->destination_zip, 0, 5);
 			$shipping_options = $this->ratev4_request();
 		} else {
 			$shipping_options = $this->ratev2_request();

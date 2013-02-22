@@ -483,9 +483,15 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$this->pounds = intval($this->pkg_weight);
 		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
-		// Can't use zip+4
-		$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
-		$this->destination_zip = substr($this->destination_zip, 0, 5);
+		if($this->settings['base_country'] == 'US') {
+			// Can't use zip+4
+			$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
+		}
+
+		if($this->country == 'US') {
+			// Can't use zip+4
+			$this->destination_zip = substr($this->destination_zip, 0, 5);
+		}
 
 		$shipping_options = $this->rate_request();
 
