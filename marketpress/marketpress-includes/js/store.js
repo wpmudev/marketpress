@@ -48,6 +48,6 @@ jQuery(document).ready(function($) {
     $.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
       $("#mp-shipping-select-holder").html(data);
     });
-    $("#mp_shipping_submit").attr('disabled', 'disabled');
+    $("#mp_shipping_submit").removeAttr('disabled');
   }
 });
