@@ -1,7 +1,7 @@
 Plugin Name: MarketPress
 Author: Aaron Edwards (incsub)
 
-Change Log:
+Change Log: 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
@@ -15,6 +15,8 @@ Change Log:
 - Fix grid bug when no styles are loaded http://wp.mu/h7
 - Show all gateways to super admins in multisite (avoid confusion)
 - Pass messages through wpautop()
+- Added check for US coutry before trimming zip code to 5 characters
+- Disabled continue button on shipping form while shipping rates are being updated
 
 2.8.1 - 1/21/2013 - Aaron
 ----------------------------------------------------------------------
