@@ -293,7 +293,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				<img src="<?php echo $mp->plugin_url; ?>images/usps.png" />
 				<p class="description">
 					<?php _e('Using this USPS Shipping calculator requires requesting an Ecommerce API Username and Password. Get your free set of credentials <a target="_blank" href="https://secure.shippingapis.com/registration/">here &raquo;</a>', 'mp') ?><br />
-					<?php _e('You must test and then Activate your credentials with USPS before going live.', 'mp') ?>
+					<?php _e('The password is no longer used for the API, just the username which you should enter below.', 'mp'); ?>
+					<?php _e('The USPS test site has not yet been updated and currently doesn\'t work. You should just request activating your credentials with USPS and go live.', 'mp') ?>
 				</p>
 
 				<input type="hidden" name="mp_shipping_usps_meta" value="1" />
