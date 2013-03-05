@@ -133,7 +133,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 		
 		$params['pay_from_email'] = $shipping_info['email'];
 			
-		if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {	
+		if (!$mp->download_only_cart($cart) && $mp->get_setting('shipping->method') != 'none' && isset($shipping_info['name'])) {	
 			$names = explode(' ', $shipping_info['name']);
 			$params['firstname'] = $names[0];
 			$params['lastname'] = $names[count($names)-1]; //grab last name
@@ -148,7 +148,8 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 		$product_count = 0;
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+				//we're sending tax included prices here if tax included is on
+				$totals[] = $data['price'] * $data['quantity'];
 				$product_count++;
 			}
     }
@@ -177,11 +178,15 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 			$i++;
     }
     
-    //tax line
-    if ( ($tax_price = $mp->tax_price()) !== false ) {
+    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
+    if ( !$mp->get_setting('tax->tax_inclusive') && ($tax_price = $mp->tax_price()) !== false ) {
       $total = $total + $tax_price;
 			$params["amount{$i}"] = $tax_price;
 			$params["amount{$i}_description"] = __('Taxes:', 'mp');
+			$i++;
+    } else if ( ($tax_price = $mp->tax_price()) !== false ) { //tax is already in items total, so just add it as a description line item
+			$params["detail3_text"] = $tax_price;
+			$params["detail3_description"] = __('Taxes:', 'mp');
 			$i++;
     }
     

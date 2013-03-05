@@ -151,7 +151,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 		$params['CustomerEmail'] = $shipping_info['email'];
 		
 		//add shipping info if set
-		if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {	
+		if (!$mp->download_only_cart($cart) && $mp->get_setting('shipping->method') != 'none' && isset($shipping_info['name'])) {	
 			$names = explode(' ', $shipping_info['name']);
 			$params['CustomerFirstName'] = $names[0];
 			$params['CustomerLastName'] = $names[count($names)-1]; //grab last name

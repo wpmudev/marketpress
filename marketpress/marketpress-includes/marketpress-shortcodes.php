@@ -150,6 +150,7 @@ class MarketPress_Shortcodes {
    * @param string order Optional, Direction to order products by. Can be: DESC, ASC
    * @param string category Optional, limit to a product category
    * @param string tag Optional, limit to a product tag
+   * @param bool list_view Optional, show as list. Grid default
    */
   function mp_list_products_sc($atts) {
     extract(shortcode_atts(array(

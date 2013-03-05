@@ -927,7 +927,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $request .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
       $request .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
 			
-			if (!$mp->download_only_cart($cart)) {
+			if (!$mp->download_only_cart($cart) && $mp->get_setting('shipping->method') != 'none') {
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . $this->trim_name($shipping_info['name'], 32);
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . $this->trim_name($shipping_info['address1'], 100);
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . $this->trim_name($shipping_info['address2'], 100);
@@ -945,9 +945,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					if ($data['price'] <= 0)
 						continue;
 					
-				  $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+					//we're sending tax included prices here is tax included is on, as paypal messes up rounding
+				  $totals[] = $data['price'] * $data['quantity'];
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($mp->before_tax_price($data['price'], $product_id));
+				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($data['price']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
@@ -975,8 +976,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
       }
 
-      //tax line
-      if ( ($tax_price = $mp->tax_price(false)) !== false ) {
+      //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
+      if ( !$mp->get_setting('tax->tax_inclusive') && ($tax_price = $mp->tax_price(false)) !== false ) {
 				$total = $total + $tax_price;
 				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }

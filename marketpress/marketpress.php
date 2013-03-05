@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.2 beta 1
+Version: 2.8.2 beta 3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.2 beta 1';
+  var $version = '2.8.2 beta 3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -2488,8 +2488,6 @@ Thanks again!", 'mp')
 				$state = $this->get_setting('base_province');
 		}
 
-		//TODO calculate all taxes per product before rounding
-
     //get total after any coupons
     $totals = array();
 		$special_totals = array();
@@ -2586,7 +2584,8 @@ Thanks again!", 'mp')
 			$rate =  ('CA' == $this->get_setting('tax->base_country')) ? $this->get_setting('tax->canada_rate'.$this->get_setting('base_province')) : $this->get_setting('tax->rate');
 		}
 
-		return round($tax_price / ($rate + 1), 2);
+		//return round($tax_price / ($rate + 1), 2);
+		return $tax_price / ($rate + 1);
 	}
 
   //returns contents of shopping cart cookie
@@ -3327,14 +3326,11 @@ Thanks again!", 'mp')
 		//filter tax included products in cart
 		$filtered_cart = $cart;
     foreach ($cart as $product_id => $variations) {
-			foreach ($variations as $variation => $data) {
-        
-        // store orignal price 
+			foreach ($variations as $variation => $data) { 
+        // store before tax price 
         // if tax_inclusive==true, before_tax_price() rounds to two decimal places
         // the original price cannot be accurately calculated on the order tracking page with just the before_tax_price value
-        $filtered_cart[$product_id][$variation]['price_db'] = $data['price'];
-	      
-        $filtered_cart[$product_id][$variation]['price'] = $this->before_tax_price($data['price'], $product_id);
+        $filtered_cart[$product_id][$variation]['before_tax_price'] = $this->before_tax_price($data['price'], $product_id);
 			}
 		}
 
@@ -3362,7 +3358,7 @@ Thanks again!", 'mp')
 	        if ($stock[$variation] <= $this->get_setting('inventory_threshold')) {
 	          $this->low_stock_notification($product_id, $variation, $stock[$variation]);
 	        }
-	      }//check stock
+	      } //check stock
 
 	      //update sales count
 	      $count = get_post_meta($product_id, 'mp_sales_count', true);
@@ -3914,213 +3910,55 @@ Thanks again!", 'mp')
   // Update profile fields
   function user_profile_update() {
     $user_id =  $_REQUEST['user_id'];
-
+		$fields = array( 'email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone' );
+		
+		//shipping fields
+		$meta = array();
+		foreach ( $fields as $field ) {
+			if ( isset($_POST['mp_shipping_info'][$field]) )
+				$meta[$field] = $_POST['mp_shipping_info'][$field];
+			else
+				$meta[$field] = '';
+		}
+		update_user_meta($user_id, 'mp_shipping_info', $meta);
+		
     // Billing Info
-    $meta = get_user_meta($user_id, 'mp_billing_info', true);
-
-    if (!isset($_POST['mp_billing_info']['email'])) {
-      $meta['email'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['name'])) {
-      $meta['name'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['address1'])) {
-      $meta['address1'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['address2'])) {
-      $meta['address2'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['city'])) {
-      $meta['city'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['state'])) {
-      $meta['state'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['zip'])) {
-      $meta['zip'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['country'])) {
-      $meta['country'] = '';
-    }
-    if (!isset($_POST['mp_billing_info']['phone'])) {
-      $meta['phone'] = '';
-    }
-
-    $email = isset($_POST['mp_billing_info']['email']) ? $_POST['mp_billing_info']['email'] : $meta['email'];
-    $name = isset($_POST['mp_billing_info']['name']) ? $_POST['mp_billing_info']['name'] : $meta['name'];
-    $address1 = isset($_POST['mp_billing_info']['address1']) ? $_POST['mp_billing_info']['address1'] : $meta['address1'];
-    $address2 = isset($_POST['mp_billing_info']['address2']) ? $_POST['mp_billing_info']['address2'] : $meta['address2'];
-    $city = isset($_POST['mp_billing_info']['city']) ? $_POST['mp_billing_info']['city'] : $meta['city'];
-    $state = isset($_POST['mp_billing_info']['state']) ? $_POST['mp_billing_info']['state'] : $meta['state'];
-    $zip = isset($_POST['mp_billing_info']['zip']) ? $_POST['mp_billing_info']['zip'] : $meta['zip'];
-    $country = isset($_POST['mp_billing_info']['country']) ? $_POST['mp_billing_info']['country'] : $meta['country'];
-    $phone = isset($_POST['mp_billing_info']['phone']) ? $_POST['mp_billing_info']['phone'] : $meta['phone'];
-
-    $billing_meta = array('email' => $email,
-			  'name' => $name,
-			  'address1' => $address1,
-			  'address2' => $address2,
-			  'city' => $city,
-			  'state' => $state,
-			  'zip' => $zip,
-		    'country' => $country,
-			  'phone' => $phone);
-
-    update_user_meta($user_id, 'mp_billing_info', $billing_meta);
-
-    // Shipping Info
-    $meta = get_user_meta($user_id, 'mp_shipping_info', true);
-
-    if (!isset($_POST['mp_shipping_info']['email'])) {
-      $meta['email'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['name'])) {
-      $meta['name'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['address1'])) {
-      $meta['address1'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['address2'])) {
-      $meta['address2'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['city'])) {
-      $meta['city'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['state'])) {
-      $meta['state'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['zip'])) {
-      $meta['zip'] = '';
-    }
-    if (!isset($_POST['mp_shipping_info']['country'])) {
-      $meta['country'] = '';
-    }
-
-    $email = isset($_POST['mp_shipping_info']['email']) ? $_POST['mp_shipping_info']['email'] : $meta['email'];
-    $name = isset($_POST['mp_shipping_info']['name']) ? $_POST['mp_shipping_info']['name'] : $meta['name'];
-    $address1 = isset($_POST['mp_shipping_info']['address1']) ? $_POST['mp_shipping_info']['address1'] : $meta['address1'];
-    $address2 = isset($_POST['mp_shipping_info']['address2']) ? $_POST['mp_shipping_info']['address2'] : $meta['address2'];
-    $city = isset($_POST['mp_shipping_info']['city']) ? $_POST['mp_shipping_info']['city'] : $meta['city'];
-    $state = isset($_POST['mp_shipping_info']['state']) ? $_POST['mp_shipping_info']['state'] : $meta['state'];
-    $zip = isset($_POST['mp_shipping_info']['zip']) ? $_POST['mp_shipping_info']['zip'] : $meta['zip'];
-    $country = isset($_POST['mp_shipping_info']['country']) ? $_POST['mp_shipping_info']['country'] : $meta['country'];
-    $phone = isset($_POST['mp_shipping_info']['phone']) ? $_POST['mp_shipping_info']['phone'] : $meta['phone'];
-
-    $shipping_meta = array('email' => $email,
-			   'name' => $name,
-			   'address1' => $address1,
-			   'address2' => $address2,
-			   'city' => $city,
-			   'state' => $state,
-			   'zip' => $zip,
-			   'country' => $country,
-			   'phone' => $phone);
-
-    update_user_meta($user_id, 'mp_shipping_info', $shipping_meta);
+		$meta = array();
+    foreach ( $fields as $field ) {
+			if ( isset($_POST['mp_billing_info'][$field]) )
+				$meta[$field] = $_POST['mp_billing_info'][$field];
+			else
+				$meta[$field] = '';
+		}
+		update_user_meta($user_id, 'mp_billing_info', $meta);
   }
 
   function user_profile_fields() {
     global $current_user;
-
+		$this->start_session();
+		$fields = array( 'email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone' );
+		
     if (isset($_REQUEST['user_id'])) {
       $user_id = $_REQUEST['user_id'];
     } else {
       $user_id = $current_user->ID;
     }
-
-    $meta = get_user_meta($user_id, 'mp_billing_info', true);
-    $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : $meta['email'];
-    $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : $meta['name'];
-    $address1 = (!empty($_SESSION['mp_billing_info']['address1'])) ? $_SESSION['mp_billing_info']['address1'] : $meta['address1'];
-    $address2 = (!empty($_SESSION['mp_billing_info']['address2'])) ? $_SESSION['mp_billing_info']['address2'] : $meta['address2'];
-    $city = (!empty($_SESSION['mp_billing_info']['city'])) ? $_SESSION['mp_billing_info']['city'] : $meta['city'];
-    $state = (!empty($_SESSION['mp_billing_info']['state'])) ? $_SESSION['mp_billing_info']['state'] : $meta['state'];
-    $zip = (!empty($_SESSION['mp_billing_info']['zip'])) ? $_SESSION['mp_billing_info']['zip'] : $meta['zip'];
-    $country = (!empty($_SESSION['mp_billing_info']['country'])) ? $_SESSION['mp_billing_info']['country'] : $meta['country'];
-    if (!$country)
-      $country = $this->get_setting('base_country');
-    $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : $meta['phone'];
-
-    ?>
-    <h3><?php _e('Billing Info', 'mp'); ?></h3>
-    <a name="mp_billing_info"></a>
-    <table class="form-table">
-      <tr>
-        <th align="right"><label for="mp_billing_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_email', ''); ?>
-        <input size="35" id="mp_billing_info_email" name="mp_billing_info[email]" type="text" value="<?php echo esc_attr($email); ?>" /></td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_name"><?php _e('Full Name:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_name', ''); ?>
-        <input size="35" id="mp_billing_info_name" name="mp_billing_info[name]" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_address1"><?php _e('Address:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_address1', ''); ?>
-        <input size="45" id="mp_billing_info_address1" name="mp_billing_info[address1]" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
-        <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
-        </td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_address2"><?php _e('Address 2:', 'mp'); ?>&nbsp;</label></th><td>
-  			<?php echo apply_filters( 'mp_billing_info_error_address2', ''); ?>
-        <input size="45" id="mp_billing_info_address2" name="mp_billing_info[address2]" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
-        <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
-        </td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_city"><?php _e('City:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_city', ''); ?>
-        <input size="25" id="mp_billing_info_city" name="mp_billing_info[city]" type="text" value="<?php echo esc_attr($city); ?>" /></td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_state"><?php _e('State/Province/Region:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_state', ''); ?>
-        <input size="15" id="mp_billing_info_state" name="mp_billing_info[state]" type="text" value="<?php echo esc_attr($state); ?>" /></td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_zip"><?php _e('Postal/Zip Code:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_zip', ''); ?>
-        <input size="10" id="mp_billing_info_zip" name="mp_billing_info[zip]" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_country"><?php _e('Country:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_country', ''); ?>
-        <select id="mp_billing_info_country" name="mp_billing_info[country]">
-          <?php
-          foreach ($this->get_setting('shipping->allowed_countries') as $code) {
-            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($this->countries[$code]); ?></option><?php
-          }
-          ?>
-        </select>
-        </td>
-      </tr>
-      <tr>
-        <th align="right"><label for="mp_billing_info_phone"><?php _e('Phone Number:', 'mp'); ?>&nbsp;</label></th><td>
-        <?php echo apply_filters( 'mp_billing_info_error_phone', ''); ?>
-  			<input size="20" id="mp_billing_info_phone" name="mp_billing_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
-      </tr>
-    </table>
-    <?php
+		
+		//initialize variables
     $meta = get_user_meta($user_id, 'mp_shipping_info', true);
-
-    $email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
-    $name = (!empty($_SESSION['mp_shipping_info']['name'])) ? $_SESSION['mp_shipping_info']['name'] : (!empty($meta['name'])?$meta['name']:$_SESSION['mp_shipping_info']['name']);
-    $address1 = (!empty($_SESSION['mp_shipping_info']['address1'])) ? $_SESSION['mp_shipping_info']['address1'] : (!empty($meta['address1'])?$meta['address1']:$_SESSION['mp_shipping_info']['address1']);
-    $address2 = (!empty($_SESSION['mp_shipping_info']['address2'])) ? $_SESSION['mp_shipping_info']['address2'] : (!empty($meta['address2'])?$meta['address2']:$_SESSION['mp_shipping_info']['address2']);
-    $city = (!empty($_SESSION['mp_shipping_info']['city'])) ? $_SESSION['mp_shipping_info']['city'] : (!empty($meta['city'])?$meta['city']:$_SESSION['mp_shipping_info']['city']);
-    $state = (!empty($_SESSION['mp_shipping_info']['state'])) ? $_SESSION['mp_shipping_info']['state'] : (!empty($meta['state'])?$meta['state']:$_SESSION['mp_shipping_info']['state']);
-    $zip = (!empty($_SESSION['mp_shipping_info']['zip'])) ? $_SESSION['mp_shipping_info']['zip'] : (!empty($meta['zip'])?$meta['zip']:$_SESSION['mp_shipping_info']['zip']);
-    $country = (!empty($_SESSION['mp_shipping_info']['country'])) ? $_SESSION['mp_shipping_info']['country'] : (!empty($meta['country'])?$meta['country']:$_SESSION['mp_shipping_info']['country']);
-    if (!$country)
+		foreach ( $fields as $field ) {
+			if ( !empty($_SESSION['mp_shipping_info'][$field]) )
+				$$field = $_SESSION['mp_shipping_info'][$field];
+			else if ( !empty($meta[$field]) )
+				$$field = $meta[$field];
+			else
+				$$field = '';
+		}
+		if ( empty($country) )
       $country = $this->get_setting('base_country');
-    $phone = (!empty($_SESSION['mp_shipping_info']['phone'])) ? $_SESSION['mp_shipping_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
-
+    
     ?>
     <h3><?php _e('Shipping Info', 'mp'); ?></h3>
-    <a name="mp_shipping_info"></a>
-    <span class="mp_action" ><a href="javascript:mp_copy_billing('mp_shipping_info');"><?php _e('Same as Billing', 'mp'); ?></a></span>
     <table class="form-table">
 			<tr>
         <th align="right"><label for="mp_shipping_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
@@ -4179,12 +4017,86 @@ Thanks again!", 'mp')
   			<input size="20" id="mp_shipping_info_phone" name="mp_shipping_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
       </tr>
     </table>
+		<?php
+
+    //initialize variables
+    $meta = get_user_meta($user_id, 'mp_billing_info', true);
+		foreach ( $fields as $field ) {
+			if ( !empty($_SESSION['mp_billing_info'][$field]) )
+				$$field = $_SESSION['mp_billing_info'][$field];
+			else if ( !empty($meta[$field]) )
+				$$field = $meta[$field];
+			else
+				$$field = '';
+		}
+		if ( empty($country) )
+      $country = $this->get_setting('base_country');
+    ?>
+    <h3><?php _e('Billing Info', 'mp'); ?> <a class="add-new-h2" href="javascript:mp_copy_billing('mp_billing_info');"><?php _e('Same as Shipping', 'mp'); ?></a></h3>
+    <table class="form-table">
+      <tr>
+        <th align="right"><label for="mp_billing_info_email"><?php _e('Email:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_email', ''); ?>
+        <input size="35" id="mp_billing_info_email" name="mp_billing_info[email]" type="text" value="<?php echo esc_attr($email); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_name"><?php _e('Full Name:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_name', ''); ?>
+        <input size="35" id="mp_billing_info_name" name="mp_billing_info[name]" type="text" value="<?php echo esc_attr($name); ?>" /> </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_address1"><?php _e('Address:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_address1', ''); ?>
+        <input size="45" id="mp_billing_info_address1" name="mp_billing_info[address1]" type="text" value="<?php echo esc_attr($address1); ?>" /><br />
+        <small><em><?php _e('Street address, P.O. box, company name, c/o', 'mp'); ?></em></small>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_address2"><?php _e('Address 2:', 'mp'); ?>&nbsp;</label></th><td>
+  			<?php echo apply_filters( 'mp_billing_info_error_address2', ''); ?>
+        <input size="45" id="mp_billing_info_address2" name="mp_billing_info[address2]" type="text" value="<?php echo esc_attr($address2); ?>" /><br />
+        <small><em><?php _e('Apartment, suite, unit, building, floor, etc.', 'mp'); ?></em></small>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_city"><?php _e('City:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_city', ''); ?>
+        <input size="25" id="mp_billing_info_city" name="mp_billing_info[city]" type="text" value="<?php echo esc_attr($city); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_state"><?php _e('State/Province/Region:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_state', ''); ?>
+        <input size="15" id="mp_billing_info_state" name="mp_billing_info[state]" type="text" value="<?php echo esc_attr($state); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_zip"><?php _e('Postal/Zip Code:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_zip', ''); ?>
+        <input size="10" id="mp_billing_info_zip" name="mp_billing_info[zip]" type="text" value="<?php echo esc_attr($zip); ?>" /></td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_country"><?php _e('Country:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_country', ''); ?>
+        <select id="mp_billing_info_country" name="mp_billing_info[country]">
+          <?php
+          foreach ($this->get_setting('shipping->allowed_countries') as $code) {
+            ?><option value="<?php echo $code; ?>"<?php selected($country, $code); ?>><?php echo esc_attr($this->countries[$code]); ?></option><?php
+          }
+          ?>
+        </select>
+        </td>
+      </tr>
+      <tr>
+        <th align="right"><label for="mp_billing_info_phone"><?php _e('Phone Number:', 'mp'); ?>&nbsp;</label></th><td>
+        <?php echo apply_filters( 'mp_billing_info_error_phone', ''); ?>
+  			<input size="20" id="mp_billing_info_phone" name="mp_billing_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
+      </tr>
+    </table>
     <script type="text/javascript">
     function mp_copy_billing(prefix) {
-      _mp_profile_billing_fields = ['emal', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone'];
+      _mp_profile_billing_fields = ['email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone'];
 
       for (_i=0; _i<_mp_profile_billing_fields.length; _i++) {
-        jQuery('form #'+prefix+'_'+_mp_profile_billing_fields[_i]).val(jQuery('form #mp_billing_info_'+_mp_profile_billing_fields[_i]).val());
+        jQuery('form #'+prefix+'_'+_mp_profile_billing_fields[_i]).val(jQuery('form #mp_shipping_info_'+_mp_profile_billing_fields[_i]).val());
       }
     }
     </script>
@@ -6893,6 +6805,7 @@ Notification Preferences: %s', 'mp');
                     <li><?php _e('"order" - Direction to order products by. Can be: DESC, ASC', 'mp') ?></li>
                     <li><?php _e('"category" - Limits list to a specific product category. Use the category Slug', 'mp') ?></li>
                     <li><?php _e('"tag" - Limits list to a specific product tag. Use the tag Slug', 'mp') ?></li>
+                    <li><?php _e('"list_view" - 1 for list view, 0 (default) for grid view', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_list_products paginate="true" page="1" per_page="10" order_by="price" order="DESC" category="downloads"]</em></li>
                   </ul></p>
                 </td>

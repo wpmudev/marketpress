@@ -88,6 +88,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$i = 1;
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
+				//we're sending tax included prices here isf tax included is on, to avoid rounding errors
+				$totals[] = $data['price'] * $data['quantity'];
 				$items[] = array(
 					'itemNumber'.$i => empty($data['SKU']) ? $product_id : substr($data['SKU'], 0, 12), // Article number
 					'itemDescription'.$i => substr($data['name'], 0, 32), // Description
@@ -95,7 +97,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 					'itemPrice'.$i =>  round($data['price']*100) // Artikel price in cents
 				);
 				$i++;
-				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
 			}
 		}
 		$total = array_sum($totals);
@@ -131,8 +132,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 			$i++;
 		}
 		
-		//tax line
-		if ( ($tax_price = $mp->tax_price()) !== false ) {
+		//tax line if tax inclusive pricing is off. If it's on it would screw up the totals
+    if ( !$mp->get_setting('tax->tax_inclusive') && ($tax_price = $mp->tax_price()) !== false ) {
 			$total += $tax_price;
 			//Add tax as separate product
 			$items[] = array(
@@ -141,7 +142,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 				'itemQuantity'.$i => 1, // Quantity
 				'itemPrice'.$i => round($tax_price*100)  // Product price in cents
 			);
-					}
+		}
 		
 		$total = round($total * 100);
 		$shastring = "$key$merchantID$subID$total$purchaseID$paymentType$validUntil";

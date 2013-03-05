@@ -143,7 +143,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	      $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
 	      $params["c_name{$suffix}"] = $data['name'];
 	      $params["c_description{$suffix}"] = $data['url'];
-	      $params["c_price{$suffix}"] = $mp->before_tax_price($data['price'], $product_id);
+	      $params["c_price{$suffix}"] = $data['price'];
 	      if ($data['download'])
 	      	$params["c_tangible{$suffix}"] = 'N';
 				else

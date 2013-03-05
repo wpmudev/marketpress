@@ -981,13 +981,11 @@ function mp_order_status() {
                     echo '</div>';
                   }
 					
-		              echo '</td>'; // Added WPML (This differs than other code)
-
-                  $price = get_display_price($order, $data);
+		              echo '</td>';
 
 		              echo '  <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $price) . '</td>';
-		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $price * $data['quantity']) . '</td>';
+		              echo '  <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
+		              echo '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
 									if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->post_title)) {
                     if ($order_paid) {
                       //check for too many downloads
@@ -1200,19 +1198,6 @@ function mp_order_status() {
   }
 }
 
-/**
- * if tax_inclusive prices enabled, show product line prices with tax to match the review/confirm cart pages
- * @param  object $order post-order object
- * @param  array $data  data for one product line
- * @return float price to display on order tracking and emails for admin/customers
- */
-function get_display_price($order, $data) {
-	return isset($order->mp_tax_inclusive) && $order->mp_tax_inclusive==1 && isset($data['price_db']) ?
-	            $data['price_db'] :
-	            $data['price'];
-}
-
-
 /*
  * function mp_tracking_link
  * @param string $tracking_number The tracking number string to turn into a link
@@ -1282,6 +1267,7 @@ function mp_province_field($country = 'US', $selected = null) {
  * @param string $order Optional, Direction to order products by. Can be: DESC, ASC
  * @param string $category Optional, limit to a product category
  * @param string $tag Optional, limit to a product tag
+ * @param bool $list_view Optional, show as list. Grid default
  */
 function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '', $list_view = false ) {
   global $wp_query, $mp;
@@ -1292,8 +1278,8 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   } else if ($tag) {
     $taxonomy_query = '&product_tag=' . sanitize_title($tag);
   } else if (isset($wp_query->query_vars['taxonomy']) && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag')) {
-    $term = get_queried_object(); //must do this for number tags
-    $taxonomy_query = '&' . $term->taxonomy . '=' . $term->slug;
+    //TODO might need to fix for tags that are a number
+    $taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . $wp_query->query_vars['term'];
   } else {
     $taxonomy_query = '';
   }
@@ -1448,7 +1434,7 @@ function get_products_html_grid($post_array=array()){
   
   $inline_style = !( $mp->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
   
-  foreach ($post_array as $post){
+  foreach ($post_array as $post) {
     
     $img = mp_product_image(false, 'list', $post->ID);
     $excerpt = $mp->get_setting('show_excerpt') ?
@@ -1459,7 +1445,7 @@ function get_products_html_grid($post_array=array()){
     $class=array();
     $class[] = strlen($img)>0?'mp_thumbnail':'';
     $class[] = strlen($excerpt)>0?'mp_excerpt':'';
-    $class[] = has_price_variations($post->ID) ? 'mp_price_variations':'';
+    $class[] = mp_has_variations($post->ID) ? 'mp_price_variations':'';
     
     $html .= '<div class="mp_one_tile '.implode($class, ' ').'">
                 <div class="mp_one_product"' . ($inline_style ? ' style="width: '.$width.'px;"' : '') . '>
@@ -1490,7 +1476,15 @@ function get_products_html_grid($post_array=array()){
   return $html;
 }
 
-function has_price_variations($post_id){
+
+/*
+ * function mp_has_variations
+ * Checks if a given product has price variations
+ * 
+ * @param $post_id int The product or post id
+ * @return bool Whether or not it has variations
+ */
+function mp_has_variations($post_id) {
   $mp_price = maybe_unserialize(get_post_meta($post_id, 'mp_price', true));
   return (is_array($mp_price) && count($mp_price) > 1);
 }
@@ -1952,68 +1946,64 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
  * 
  * @return string   html for filter/order products select elements.
  */
-function mp_products_filter(){
-      global $mp;
+function mp_products_filter() {
+  global $wp_query, $mp;
 
-      $terms = wp_dropdown_categories(array(
-        'name' => 'filter-term',
-        'taxonomy' => 'product_category',
-        'show_option_none' => __('Show All', 'mp'),
-        'show_count' => 1,
-        'orderby' => 'name',
-        'selected' => '',
-        'echo' => 0,
-        'hierarchical' => true
-      ));
+  if (isset($wp_query->query_vars['taxonomy']) && $wp_query->query_vars['taxonomy'] == 'product_category') {
+    $term = get_queried_object(); //must do this for number tags
+    $default = $term->term_id;
+  } else {
+    $default = '';
+  }
+  
+  $terms = wp_dropdown_categories(array(
+    'name' => 'filter-term',
+    'taxonomy' => 'product_category',
+    'show_option_none' => __('Show All', 'mp'),
+    'show_count' => 1,
+    'orderby' => 'name',
+    'selected' => $default,
+    'echo' => 0,
+    'hierarchical' => true
+  ));
 
-      $options=array(
-        array('0', '', __('Default', 'mp')),
-        array('date', 'desc', __('Release Date', 'mp')),
-        array('title', 'asc', __('Name', 'mp')),
-        array('price', 'asc', __('Price (Low to High)', 'mp')),
-        array('price', 'desc', __('Price (High to Low)', 'mp')),
-        array('sales', 'desc', __('Popularity', 'mp'))
-      );
-
-      return 
-      ' <div class="mp_list_filter">
-            <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
-                <div class="one_filter">
-                  <span>'.__('Category', 'mp').'</span>
-                  '.$terms.'
-                </div>
-
-                <div class="one_filter">
-                  <span>'.__('Order By', 'mp').'</span>
-                  <select name="order">
-                    '.get_filter_order_options($options).'
-                  </select>
-                </div>
-            </form>
-        </div>';
-}
-
-/**
- * @param  array $options 2d array, each child array contains: 0: column, 1: order (asc|desc), 2: human readable value
- * @return string html of select element options
- */
-function get_filter_order_options($options){
-  global $mp;
-  $html='';
   $current_order = strtolower($mp->get_setting('order_by').'-'.$mp->get_setting('order'));
-
-  foreach($options as $k => $t){
+  $options = array(
+    array('0', '', __('Default', 'mp')),
+    array('date', 'desc', __('Release Date', 'mp')),
+    array('title', 'asc', __('Name', 'mp')),
+    array('price', 'asc', __('Price (Low to High)', 'mp')),
+    array('price', 'desc', __('Price (High to Low)', 'mp')),
+    array('sales', 'desc', __('Popularity', 'mp'))
+  );
+  $options_html = '';
+  foreach ($options as $k => $t) {
     $value = $t[0].'-'.$t[1];
     $selected = $current_order == $value ? 'selected' : '';
 
-    $html.='<option value="'.$value.'" '.$selected.'>
+    $options_html.='<option value="'.$value.'" '.$selected.'>
               '.$t[2].'
             </option>';
   }
-  return $html;
+  
+  return 
+  ' <div class="mp_list_filter">
+        <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
+            <div class="one_filter">
+              <span>'.__('Category', 'mp').'</span>
+              '.$terms.'
+            </div>
+
+            <div class="one_filter">
+              <span>'.__('Order By', 'mp').'</span>
+              <select name="order">
+                '.$options_html.'
+              </select>
+            </div>
+        </form>
+    </div>';
 }
 
-  
 /**
  * Echos the current shopping cart link. If global cart is on reflects global location
  * @param bool $echo Optional, whether to echo. Defaults to true
