@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.2 beta 3
+Version: 2.8.2
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.2 beta 3';
+  var $version = '2.8.2';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -2585,7 +2585,7 @@ Thanks again!", 'mp')
 		}
 
 		//return round($tax_price / ($rate + 1), 2);
-		return $tax_price / ($rate + 1);
+		return $tax_price / ($rate + 1); //do not round this to avoid rounding errors in tax calculation
 	}
 
   //returns contents of shopping cart cookie
@@ -6867,6 +6867,20 @@ Notification Preferences: %s', 'mp');
                     <li><?php _e('"product_id" - The ID for the product.  This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"label" - A label to prepend to the price. Defaults to "Price: ".', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_product_price product_id="1" label="Buy this thing now!"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+								<tr>
+        				<th scope="row"><?php _e('Product SKU', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_product_sku]</strong> -
+                  <span class="description"><?php _e('Displays the product SKU number(s).', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                    <li><?php _e('"product_id" - The ID for the product.  This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
+										<li><?php _e('"seperator" - If there are variation, what to seperate the list of SKUs with. Defaults to a comma ", ".', 'mp') ?></li>
+                    <li><?php _e('Example:', 'mp') ?> <em>[mp_product_sku product_id="1" seperator=", "]</em></li>
                   </ul></p>
                 </td>
                 </tr>

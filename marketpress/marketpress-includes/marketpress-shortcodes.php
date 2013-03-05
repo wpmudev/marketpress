@@ -22,6 +22,7 @@ class MarketPress_Shortcodes {
     add_shortcode( 'mp_buy_button', array(&$this, 'mp_buy_button_sc') );
     add_shortcode( 'mp_product_price', array(&$this, 'mp_product_price_sc') );
     add_shortcode( 'mp_product_meta', array(&$this, 'mp_product_meta_sc') );
+    add_shortcode( 'mp_product_sku', array(&$this, 'mp_product_sku_sc') );
 
     //store links
     add_shortcode( 'mp_cart_link', array(&$this, 'mp_cart_link_sc') );
@@ -254,6 +255,21 @@ class MarketPress_Shortcodes {
 		$content .= mp_buy_button(false, $context, $product_id);
 		$content .= '</div>';
     return $content;
+  }
+	
+	/*
+	 * Displays the product SKU
+	 *
+	 * @param int $product_id The post_id for the product. Optional if in the loop
+	 * @param string $seperator The seperator to put between skus, default ', '
+	 */
+  function mp_product_sku_sc($atts) {
+    extract(shortcode_atts(array(
+  		'seperator' => false,
+			'product_id' => NULL
+  	), $atts));
+		
+		return mp_product_sku( false, $product_id, $seperator );
   }
 	
   /**

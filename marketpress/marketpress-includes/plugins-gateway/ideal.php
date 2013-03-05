@@ -121,6 +121,10 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		
 		//shipping line
 		if ( ($shipping_price = $mp->shipping_price()) !== false ) {
+			//adjust price if tax inclusive is on
+			if ( $mp->get_setting('tax->tax_inclusive') )
+				$shipping_price = $mp->shipping_tax_price($shipping_price);
+				
 			$total += $shipping_price;
 			//Add shipping as separate product
 			$items[] = array(

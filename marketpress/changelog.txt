@@ -5,13 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8.2 - 3/4/2013 - Aaron, Arnold
+2.8.2 - 3/5/2013 - Aaron, Arnold
 ----------------------------------------------------------------------
-- Add mp_product_sku() template function
-- Add settings to disable sales tax on digital products if desired
+- Add mp_product_sku() template function and shortcode
+- Add setting to disable sales tax on digital products if desired
 - Add option to set products to draft when out of stock
 - Show all gateways to super admins in multisite (avoid confusion)
-- Fix rounding errors with tax inclusive pricing
+- Fix rounding errors with tax inclusive pricing (big one!)
 - Fix problems with ajax paging with grid on taxonomy archive pages
 - Fix css class on product images
 - Fix being unable to overwrite shipping information fields with a blank value 
@@ -19,9 +19,9 @@ Change Log:
 - Pass messages settings through wpautop()
 - Added check for US country before trimming zip code to 5 characters in calculated shipping modules
 - Disabled continue button on shipping form while shipping rates are being updated
-- Fix up some notices and warnings of profile page: http://wp.mu/kl
+- Fix up some notices and warnings on profile page: http://wp.mu/kl
 - Reformat various template functions and their documentation
-- Fix bug in PayPal/Moneybookers/eway gateways with shipping method set to none
+- Fix bug in PayPal/Moneybookers/eWay gateways with shipping method set to none
 - Fix iDeal gateway tax inclusive pricing bug by dropping extra tax line item
 
 2.8.1 - 1/21/2013 - Aaron

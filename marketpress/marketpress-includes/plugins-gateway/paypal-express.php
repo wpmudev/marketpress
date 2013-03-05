@@ -972,6 +972,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       //shipping line
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
+				
+				//adjust price if tax inclusive is on
+				if ( $mp->get_setting('tax->tax_inclusive') )
+					$shipping_price = $mp->shipping_tax_price($shipping_price);
+					
 				$total = $total + $shipping_price;
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
       }
