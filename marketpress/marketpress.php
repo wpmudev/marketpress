@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.2
+Version: 2.8.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.2';
+  var $version = '2.8.3';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -4161,8 +4161,7 @@ Thanks again!", 'mp')
       $order_info = __('Items:', 'mp') . "\n";
       foreach ($order->mp_cart_info as $product_id => $variations) {
 				foreach ($variations as $variation => $data) {
-					$price = get_display_price($order, $data);
-					$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($price, 2) . ' = '. number_format_i18n($price * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+					$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 					//show download link if set
 					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
