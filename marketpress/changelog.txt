@@ -5,9 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8.3 - 3/6/2013 - Aaron
+2.8.3 - 3/6/2013 - Aaron, Arnold
 ----------------------------------------------------------------------
 - Fix a fatal error that slipped through when sending emails. Important!
+- Fixed FedEx no results problem. Shipment in non US countries were treated as International even though the destination was the same country.
+- Disable the Continue checkout button while shipping options are updating.
 
 2.8.2 - 3/5/2013 - Aaron, Arnold
 ----------------------------------------------------------------------

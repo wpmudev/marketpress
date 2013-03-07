@@ -523,6 +523,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			// Can't use zip+4
 			$this->destination_zip = substr($this->destination_zip, 0, 5);
+		}
+		if ($this->country == $this->settings['base_country']) {
 			$shipping_options = $this->rate_request();
 		} else {
 			$shipping_options = $this->rate_request(true);
@@ -569,9 +571,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function rate_request( $international = false) {
 		global $mp;
-
+	
 		$shipping_options = $this->fedex_settings['services'];
-
+	
 		//Assume equal size packages. Find the best matching box size
 		$this->fedex_settings['max_weight'] = ( empty($this->fedex_settings['max_weight'])) ? 50 : $this->fedex_settings['max_weight'];
 		$diff = floatval($this->fedex_settings['max_weight']);
@@ -584,17 +586,17 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				}
 			}
 		}
-
+	
 		//found our box
 		$dims = explode('x', strtolower($this->fedex_settings['boxes']['size'][$found]));
 		foreach($dims as &$dim) $dim = $this->as_inches($dim);
-
+	
 		sort($dims); //Sort so two lowest values are used for Girth
-
+	
 		$packages = $this->packages($dims, $this->pkg_weight);
-
+	
 		//var_dump($this->fedex_settings['services']);
-
+	
 		$xml_req = '<?xml version="1.0" encoding="UTF-8"?>
 		<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v13="http://fedex.com/ws/rate/v13">
 		<SOAP-ENV:Body>
@@ -637,12 +639,12 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		<v13:StateOrProvinceCode>' . $this->state . '</v13:StateOrProvinceCode>
 		<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
 		<v13:CountryCode>' . $this->country . '</v13:CountryCode>';
-
+	
 		if (!empty($this->residential)) {
 			$xml_req .= '
 			<v13:Residential>true</v13:Residential>';
 		}
-
+	
 		$xml_req .= '
 		</v13:Address>
 		</v13:Recipient>
@@ -657,16 +659,17 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		<v13:RateRequestTypes>LIST</v13:RateRequestTypes>
 		';
 		$xml_req .= $packages . '
-
+	
 		</v13:RequestedShipment>
 		</v13:RateRequest>
 		</SOAP-ENV:Body>
 		</SOAP-ENV:Envelope>';
-
+	
 		//print_r($xml_req);
 		//We have the XML make the call
 		$url = ($this->fedex_settings['mode'] == 'sandbox') ? $this->sandbox_uri : $this->production_uri;
-
+	
+		//var_dump($xml_req);
 		$response = wp_remote_request($url, array(
 		'headers' => array('Content-Type: text/xml'),
 		'method' => 'POST',
@@ -674,7 +677,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		'sslverify' => false,
 		)
 		);
-
+	
 		if (is_wp_error($response)){
 			return array('error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>');
 		}
@@ -686,9 +689,10 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				return array('error' => '<div class="mp_checkout_error">FedEx: ' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
 			}
 		}
-
+		//var_dump($response);
+	
 		if ($loaded){
-
+	
 			libxml_use_internal_errors(true);
 			$dom = new DOMDocument();
 			$dom->encoding = 'utf-8';
@@ -696,15 +700,15 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$dom->loadHTML($body);
 			libxml_clear_errors();
 		}
-
+	
 		//Process the return XML
-
+	
 		//print_r($dom->saveXML());
 		//Clear any old price
 		unset($_SESSION['mp_shipping_info']['shipping_cost']);
-
+	
 		$xpath = new DOMXPath($dom);
-
+	
 		//Check for errors
 		$nodes = $xpath->query('//highestseverity');
 		if( in_array( $nodes->item(0)->textContent, array('ERROR', 'FAILURE', 'WARNING' ) ) ) {
@@ -712,18 +716,18 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$this->rate_error = $nodes->item(0)->textContent;
 			return array('error' => '<div class="mp_checkout_error">FedEx: ' . $this->rate_error . '</div>');
 		}
-
+	
 		//Good to go
-
+	
 		$service_set = ($international) ? $this->intl_services : $this->services;
 		//Make SESSION copy with just prices and delivery
-
+		//var_dump($service_set);
 		if(! is_array($shipping_options)) $shipping_options = array();
 		$mp_shipping_options = $shipping_options;
 		foreach($shipping_options as $service => $option){
 			$nodes = $xpath->query('//ratereplydetails[servicetype="' . $service_set[$service]->code . '"]//totalnetcharge/amount');
 			$rate = floatval($nodes->item(0)->textContent) * $this->pkg_count;
-
+	
 			if($rate == 0){  //Not available for this combination
 				unset($mp_shipping_options[$service]);
 			}
@@ -733,7 +737,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				$handling = floatval($handling) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $service_set[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
-
+	
 				//match it up if there is already a selection
 				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
 					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
@@ -742,22 +746,22 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				}
 			}
 		}
-
+	
 		uasort($mp_shipping_options, array($this,'compare_rates') );
-
+	
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){
 			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
 		}
-
+	
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
-
+	
 		unset($xpath);
 		unset($dom);
-
+	
 		return $shipping_options;
 	}
 
