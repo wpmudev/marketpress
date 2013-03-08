@@ -189,7 +189,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
       $total = $total + $tax_price;
     }
     
-    $params['Amount'] = $mp->display_currency($total);
+    $params['Amount'] = number_format( round( $total, 2 ), 2, '.', '');
     
     $result = $this->api_call('https://au.ewaygateway.com/Request', $params);
 		
