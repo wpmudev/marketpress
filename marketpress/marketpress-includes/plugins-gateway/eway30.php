@@ -507,7 +507,7 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 		<div id="mp_paypal_express" class="postbox">
 			<h3 class='hndle'><span><?php _e('eWay Rapid 3.0 Payments Settings', 'mp'); ?></span></h3>
 			<div class="inside">
-				<span class="description"><?php _e('eWay Rapid 3.0 Payments lets merchants recieve credit card payments through eWay without need for users to leave the shop. Note eWay only handles AUD, NZD, and GBP currencies', 'mp') ?></span>
+				<span class="description"><?php _e('eWay Rapid 3.0 Payments lets merchants recieve credit card payments through eWay without need for users to leave the shop. Note this gateway requires a valid SSL certificate configured for this site.', 'mp') ?></span>
 				<table class="form-table">
 					<tr>
 					<th scope="row"><?php _e('eWay Currency', 'mp') ?></th>
