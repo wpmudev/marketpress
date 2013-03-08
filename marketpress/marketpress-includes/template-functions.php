@@ -1904,9 +1904,17 @@ function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $si
     //link
     $temp = wp_get_attachment_image_src( $post_thumbnail_id, 'large' );
     $link = $temp[0];
+    
+    if($mp->get_setting('disable_large_image') ) {
+    	$link = '';
+	    $title = esc_attr($post->post_title);
+    } else {
+  	  $title = __('View Larger Image &raquo;', 'mp');
+  	}
 
-    $title = __('View Larger Image &raquo;', 'mp');
-    $class = ' class="mp_product_image_link mp_lightbox" rel="lightbox"';
+    $class = ' class="mp_product_image_link mp_lightbox"';
+    //in case another plugin is loadin glightbox
+    if($mp->get_setting('show_lightbox') ) $class .= ' rel="lightbox"';
 
   } else if ($context == 'widget') {
     //size

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.3
+Version: 2.8.4 beta 1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.3';
+  var $version = '2.8.4';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -6237,6 +6237,14 @@ Notification Preferences: %s', 'mp');
                   <label><input value="1" name="mp[show_lightbox]" type="radio"<?php checked($this->get_setting('show_lightbox'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                   <label><input value="0" name="mp[show_lightbox]" type="radio"<?php checked($this->get_setting('show_lightbox'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                   <br /><span class="description"><?php _e('Makes clicking the single product image open an instant zoomed preview.', 'mp') ?></span>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Disable Large Image display', 'mp') ?></th>
+        				<td>
+                  <label><input value="1" name="mp[disable_large_image]" type="radio"<?php checked($this->get_setting('disable_large_image'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  <label><input value="0" name="mp[disable_large_image]" type="radio"<?php checked($this->get_setting('disable_large_image'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                  <br /><span class="description"><?php _e('Disables "Display Larger Image" function. Clicking a product image will not display a larger image.', 'mp') ?></span>
                 </td>
                 </tr>
               </table>
