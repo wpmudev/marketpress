@@ -7,6 +7,7 @@ Change Log:
 
 2.8.4 - 3/8/2013 - Aaron, Arnold
 ----------------------------------------------------------------------
+- Added eWay Rapid Payments 3.0 gateway
 - Fixed FedEx no results problem. Shipment in non US countries were treated as International even though the destination was the same country.
 - Added "Disable Large Image Display" to Presentatio, which prevents clicking on a product image from displaying a large image. Requested to prevent poaching large gallery images.
 - Changed class if Lightbox is disabled so that if another plugin loads lightbox the product images won't use it.

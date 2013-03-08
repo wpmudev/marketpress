@@ -124,6 +124,7 @@ class MarketPress_MS {
         'moneybookers' => 'full',
         'cubepoints' => 'none',
         'eway' => 'full',
+        'eway30' => 'none',
         'ideal' => 'full'
       ),
 			'global_gateway' => 'paypal-express',
