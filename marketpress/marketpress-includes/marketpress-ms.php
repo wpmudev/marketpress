@@ -1335,9 +1335,9 @@ function mp_list_global_products( $args = '' ) {
     foreach ($results as $product) {
 
       if ($as_list)
-        $content .= '<li class="product type-product mp_product">';
+        $content .= '<li class="product type-product mp_product mp_blog-'.$product->blog_id.'">';
       else
-        $content .= '<div class="product type-product mp_product">';
+        $content .= '<div class="product type-product mp_product mp_blog-'.$product->blog_id.'">';
 
       global $current_blog;
       switch_to_blog($product->blog_id);

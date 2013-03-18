@@ -7089,7 +7089,7 @@ class MarketPress_Product_List extends WP_Widget {
     //get order by
     if ($instance['order_by']) {
       if ($instance['order_by'] == 'price')
-        $order_by_query = '&meta_key=mp_price&orderby=meta_value_num';
+        $order_by_query = '&meta_key=mp_price_sort&orderby=meta_value_num';
       else if ($instance['order_by'] == 'sales')
         $order_by_query = '&meta_key=mp_sales_count&orderby=meta_value_num';
       else
@@ -7176,8 +7176,8 @@ class MarketPress_Product_List extends WP_Widget {
 		$num_products = intval($instance['num_products']);
 		$order_by = $instance['order_by'];
 		$order = $instance['order'];
-    $taxonomy_type = $instance['taxonomy_type'];
-    $taxonomy = $instance['taxonomy'];
+    $taxonomy_type = isset($instance['taxonomy_type']) ? $instance['taxonomy_type'] : '';
+    $taxonomy = isset($instance['taxonomy']) ? $instance['taxonomy'] : '';
 
 		$show_thumbnail = isset( $instance['show_thumbnail'] ) ? (bool) $instance['show_thumbnail'] : false;
 		$size = !empty($instance['size']) ? intval($instance['size']) : 50;
