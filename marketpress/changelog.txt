@@ -7,8 +7,9 @@ Change Log:
 
 2.8.5 - 3/8/2013 - Aaron
 ----------------------------------------------------------------------
-- Allow styling of global products by site (blogid classname)
+- Allow styling of global products by site (blogid in classname)
 - Fix sort by price in product list widget http://wp.mu/1r5
+- Change Shipping form label when shipping is turned off
 
 2.8.4 - 3/8/2013 - Aaron, Arnold
 ----------------------------------------------------------------------

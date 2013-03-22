@@ -548,7 +548,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 
     $content .= '<table class="mp_cart_shipping">';
     $content .= '<thead><tr>';
-    $content .= '<th colspan="2">'.($mp->download_only_cart($mp->get_cart_contents() && !$mp->global_cart) ? __('Enter Your Checkout Information:', 'mp') : __('Enter Your Shipping Information:', 'mp')).'</th>';
+    $content .= '<th colspan="2">'.(($mp->download_only_cart($mp->get_cart_contents() && !$mp->global_cart) ||  $mp->get_setting('shipping->method') != 'none') ? __('Enter Your Checkout Information:', 'mp') : __('Enter Your Shipping Information:', 'mp')).'</th>';
     $content .= '</tr></thead>';
     $content .= '<tbody>';
     $content .= '<tr>';
