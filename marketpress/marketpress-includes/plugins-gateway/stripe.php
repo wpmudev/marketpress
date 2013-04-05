@@ -31,7 +31,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	var $skip_form = false;
 	
 	//api vars
-	var $publishable_key, $private_key;
+	var $publishable_key, $private_key, $currency;
 	
 	/**
 	* Runs when your class is instantiated. Use to setup your plugin instead of __construct()
@@ -52,6 +52,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			$this->private_key = $settings['gateways']['stripe']['private_key'];
 		}
 		$this->force_ssl = (bool)( isset($settings['gateways']['stripe']['is_ssl']) && $settings['gateways']['stripe']['is_ssl'] );
+		$this->currency = isset($settings['gateways']['stripe']['currency']) ? $settings['gateways']['stripe']['currency'] : 'USD';
 		
 		add_action( 'wp_enqueue_scripts', array(&$this, 'enqueue_scripts') );
 	}
@@ -307,6 +308,25 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 						</label></p>
 					</td>
 					</tr>
+					<tr valign="top">
+						<th scope="row"><?php _e('Currency', 'mp') ?></th>
+						<td>
+							<span class="description"><?php _e('Selecting a currency other than that used for your store may cause problems at checkout.', 'mp'); ?></span><br />
+							<select name="mp[gateways][stripe][currency]">
+							<?php
+							$sel_currency = isset($settings['gateways']['stripe']['currency']) ? $settings['gateways']['stripe']['currency'] : $settings['currency'];
+							$currencies = array(
+								"CAD" => 'CAD - Canadian Dollar',
+								"USD" => 'USD - U.S. Dollar'
+							);
+	
+							foreach ($currencies as $k => $v) {
+									echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+							}
+							?>
+							</select>
+						</td>
+	        </tr>
 				</table>    
 			</div>
 		</div>      
@@ -375,7 +395,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			// create the charge on Stripe's servers - this will charge the user's card
 			$charge = Stripe_Charge::create(array(
 				"amount" => $total * 100, // amount in cents, again
-				"currency" => "usd",
+				"currency" => strtolower($this->currency),
 				"card" => $_SESSION['stripeToken'],
 				"description" => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']) )
 			);
@@ -391,7 +411,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 				$timestamp = time();
 				$payment_info['status'][$timestamp] = __('Paid', 'mp');
 				$payment_info['total'] = $total;
-				$payment_info['currency'] = 'USD';
+				$payment_info['currency'] = $this->currency;
 	
 				$order = $mp->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
 				unset($_SESSION['stripeToken']);
