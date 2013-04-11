@@ -5,12 +5,16 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8.5 - 4/7/2013 - Aaron
+2.8.5 - 4/11/2013 - Aaron
 ----------------------------------------------------------------------
 - Allow styling of global products by site (blogid in classname)
 - Fix sort by price in product list widget http://wp.mu/1r5
+- Fix popular products shortcode ordering
 - Change Shipping form label when shipping is turned off
 - Add CAD to stripe gateway
+- Add Israel locale to PayPal gateway
+- Fix function name conflict with WP-Client plugin
+- Fix mp_product_list shortcode list_view argument
 
 2.8.4 - 3/8/2013 - Aaron, Arnold
 ----------------------------------------------------------------------

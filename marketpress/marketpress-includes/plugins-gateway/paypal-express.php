@@ -587,6 +587,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
               'FR'	=> 'France',
               'DE'	=> 'Germany',
               'HK'	=> 'Hong Kong',
+              'IL'	=> 'Israel',
               'IT'	=> 'Italy',
               'JP'	=> 'Japan',
               'MX'	=> 'Mexico',
@@ -1154,10 +1155,10 @@ mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal-express', __('P
 
 if ( is_multisite() ) {
 	//tie into network settings form
-	add_action( 'mp_network_gateway_settings', 'pe_network_gateway_settings_box' );
+	add_action( 'mp_network_gateway_settings', 'psts_pe_network_gateway_settings_box' );
 }
 
-function pe_network_gateway_settings_box($settings) {
+function psts_pe_network_gateway_settings_box($settings) {
   global $mp;
   ?>
   <script type="text/javascript">
@@ -1241,6 +1242,7 @@ function pe_network_gateway_settings_box($settings) {
             'FR'	=> 'France',
             'DE'	=> 'Germany',
             'HK'	=> 'Hong Kong',
+            'IL'	=> 'Israel',
             'IT'	=> 'Italy',
             'MX'	=> 'Mexico',
             'NL'	=> 'Netherlands',

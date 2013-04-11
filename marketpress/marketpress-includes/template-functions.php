@@ -169,7 +169,7 @@ function mp_dropdown_categories( $echo = true, $args = '' ) {
  */
 function mp_popular_products( $echo = true, $num = 5 ) {
   //The Query
-  $custom_query = new WP_Query('post_type=product&post_status=publish&posts_per_page='.intval($num).'&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value&order=DESC');
+  $custom_query = new WP_Query('post_type=product&post_status=publish&posts_per_page='.intval($num).'&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value_num&order=DESC');
 
   $content = '<ul id="mp_popular_products">';
 
@@ -1267,9 +1267,9 @@ function mp_province_field($country = 'US', $selected = null) {
  * @param string $order Optional, Direction to order products by. Can be: DESC, ASC
  * @param string $category Optional, limit to a product category
  * @param string $tag Optional, limit to a product tag
- * @param bool $list_view Optional, show as list. Grid default
+ * @param bool $list_view Optional, show as list. Default to presentation settings
  */
-function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '', $list_view = false ) {
+function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '', $list_view = NULL ) {
   global $wp_query, $mp;
 
   //setup taxonomy if applicable
@@ -1348,18 +1348,21 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     $wp_query->max_num_pages = $custom_query->max_num_pages;
 
   // get layout type for products
-  $setting = $mp->get_setting('list_view');
-  $layout_type = get_product_layout_type(array($list_view, $setting));
+  if ( is_null($list_view) ) {
+    $layout_type = $mp->get_setting('list_view');
+  } else {
+    $layout_type = $list_view ? 'list' : 'grid';
+  }
 
   $content = '<div id="mp_product_list" class="mp_'.$layout_type.'">';
 
-  if ($last = $custom_query->post_count){
+  if ($last = $custom_query->post_count) {
 
 		$content .= $layout_type == 'grid' ?
 									get_products_html_grid($custom_query->posts) :
 									get_products_html_list($custom_query->posts);
   	
-  }else{
+  } else {
     $content .= '<div id="mp_no_products">' . apply_filters( 'mp_product_list_none', __('No Products', 'mp') ) . '</div>';
   }
 
@@ -1369,18 +1372,6 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     echo $content;
   else
     return $content;
-}
-
-/**
- * returns current product list layout based on setting/shortcode attribute
- */
-function get_product_layout_type($ar=array()){
-	foreach($ar as $layout){
-		if(in_array($layout, array('list','grid'))){
-			return $layout;
-		}
-	}
-	return 'list';
 }
 
 function get_products_html_list($post_array=array()){

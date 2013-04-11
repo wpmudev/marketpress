@@ -162,7 +162,7 @@ class MarketPress_Shortcodes {
   		'order' => '',
   		'category' => '',
   		'tag' => '',
-      'list_view'=> false
+      'list_view'=> NULL
   	), $atts));
 
     return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
