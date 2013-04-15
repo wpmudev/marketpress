@@ -4153,7 +4153,7 @@ Thanks again!", 'mp')
 	}
 
   //replaces shortcodes in email msgs with dynamic content
-  function filter_email($order, $text) {
+  function filter_email($order, $text, $escape = false) {
 		global $blog_id; 
 		$bid = (is_multisite()) ? $blog_id : 1;
 
@@ -4270,7 +4270,12 @@ Thanks again!", 'mp')
     //setup filters
     $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
     $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
-
+		
+		//escape for sprintf() if required
+		if ($escape) {
+			$replace = array_map( create_function('$a', 'return str_replace("%","%%",$a);'), $replace );
+		}
+		
     //replace
     $text = str_replace($search, $replace, $text);
 
@@ -4310,7 +4315,7 @@ You can manage this order here: %s", 'mp');
 
     $subject = $this->filter_email($order, $subject);
 		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $order );
-    $msg = $this->filter_email($order, $msg);
+    $msg = $this->filter_email($order, $msg, true);
 		$msg = sprintf($msg, $order->mp_shipping_info['email'], admin_url('edit.php?post_type=product&page=marketpress-orders&order_id=') . $order->ID);
 		$msg = apply_filters( 'mp_order_notification_admin_msg', $msg, $order );
     $store_email = $this->get_setting('store_email') ? $this->get_setting('store_email') : get_option("admin_email");
