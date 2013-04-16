@@ -2950,7 +2950,7 @@ Thanks again!", 'mp')
     		$this->cart_checkout_error( __('Please enter a valid Email Address.', 'mp'), 'email');
 
 			//only require these fields if not a download only cart
-			if (!$this->download_only_cart($this->get_cart_contents()) && $this->get_setting('shipping->method') != 'none') {
+			if ((!$this->download_only_cart($this->get_cart_contents()) || $this->global_cart || $this->get_setting('tax->downloadable_address')) && $this->get_setting('shipping->method') != 'none') {
 
 				if (empty($_POST['name']))
 					$this->cart_checkout_error( __('Please enter your Full Name.', 'mp'), 'name');
@@ -5665,6 +5665,14 @@ Notification Preferences: %s', 'mp');
         				<label><input value="1" name="mp[tax][tax_digital]" type="radio"<?php checked($this->get_setting('tax->tax_digital'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
                 <label><input value="0" name="mp[tax][tax_digital]" type="radio"<?php checked($this->get_setting('tax->tax_digital'), 0) ?> /> <?php _e('No', 'mp') ?></label>
                 <br /><span class="description"><?php _e('Please see your local tax laws. Note if this is enabled and a downloadable only cart, rates will be the default for your base location.', 'mp') ?></span>
+          			</td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e("Collect Address on Downloadable Only Cart?", 'mp') ?></th>
+                <td>
+        				<label><input value="1" name="mp[tax][downloadable_address]" type="radio"<?php checked($this->get_setting('tax->downloadable_address'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                <label><input value="0" name="mp[tax][downloadable_address]" type="radio"<?php checked($this->get_setting('tax->downloadable_address', 0), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e("If you need to tax downloadable products and don't want to default to the rates to your base location, enable this to always collect the shipping address.", 'mp') ?></span>
           			</td>
                 </tr>
               </table>

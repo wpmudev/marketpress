@@ -6,6 +6,8 @@ Change Log:
 ----------------------------------------------------------------------
 
 - Fix broken new order emails if % is included in product title
+- Fix paypal express documentation links
+- Add setting for "Collect Address on Downloadable Only Cart"
 
 2.8.5 - 4/11/2013 - Aaron
 ----------------------------------------------------------------------

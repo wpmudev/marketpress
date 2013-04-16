@@ -667,7 +667,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	        <tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : ''; ?>>
 					<th scope="row"><?php _e('PayPal API Credentials', 'mp') ?></th>
 					<td>
-	  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_ECAPICredentials">Instructions &raquo;</a>', 'mp') ?></span>
+	  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://www.x.com/developers/paypal/documentation-tools/express-checkout/integration-guide/ECAPICredentials">Instructions &raquo;</a>', 'mp') ?></span>
 	          <p><label><?php _e('API Username', 'mp') ?><br />
 	          <input value="<?php echo esc_attr($mp->get_setting('gateways->paypal-express->api_user')); ?>" size="30" name="mp[gateways][paypal-express][api_user]" type="text" />
 	          </label></p>
@@ -1313,7 +1313,7 @@ function psts_pe_network_gateway_settings_box($settings) {
         <tr>
 				<th scope="row"><?php _e('PayPal API Credentials', 'mp') ?></th>
 				<td>
-  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_ECAPICredentials">Instructions &raquo;</a>', 'mp') ?></span>
+  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://www.x.com/developers/paypal/documentation-tools/express-checkout/integration-guide/ECAPICredentials">Instructions &raquo;</a>', 'mp') ?></span>
           <p><label><?php _e('API Username', 'mp') ?><br />
           <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_user']) ? $settings['gateways']['paypal-express']['api_user'] : $mp->get_setting('gateways->paypal-express->api_user')); ?>" size="30" name="mp[gateways][paypal-express][api_user]" type="text" />
           </label></p>
