@@ -697,7 +697,7 @@ Thanks again!", 'mp')
 
     //remove old page if updating
     if ($old_slug && $old_slug != $this->get_setting('slugs->store')) {
-      $old_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$old_slug' AND post_type = 'page'");
+      $old_post_id = $wpdb->get_var( $wpdb->prepare("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = %s AND post_type = 'page'", $old_slug) );
       $old_post = get_post($old_post_id);
 
       $old_post->post_name = $this->get_setting('slugs->store');
@@ -705,7 +705,7 @@ Thanks again!", 'mp')
     }
 
     //insert new page if not existing
-		$page_count = $wpdb->get_var("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_name = '" . $this->get_setting('slugs->store') . "' AND post_type = 'page'");
+		$page_count = $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_name = %s AND post_type = 'page'", $this->get_setting('slugs->store')) );
 		if ( !$page_count ) {
 
 		  //default page content
@@ -3292,7 +3292,7 @@ Thanks again!", 'mp')
     $count = true;
     while ($count) { //make sure it's unique
       $order_id = substr(sha1(uniqid('')), rand(1, 24), 12);
-      $count = $wpdb->get_var("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_title = '" . $order_id . "' AND post_type = 'mp_order'");
+      $count = $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM " . $wpdb->posts . " WHERE post_title = %s AND post_type = 'mp_order'", $order_id) );
     }
 
     $order_id = apply_filters( 'mp_order_id', $order_id ); //Very important to make sure order numbers are unique and not sequential if filtering
@@ -5217,37 +5217,37 @@ Notification Preferences: %s', 'mp');
 
       <?php // view filters
       if ( !is_singular() ) {
-      $arc_query = $wpdb->prepare("SELECT DISTINCT YEAR(post_date) AS yyear, MONTH(post_date) AS mmonth FROM $wpdb->posts WHERE post_type = %s ORDER BY post_date DESC", $post_type);
-
-      $arc_result = $wpdb->get_results( $arc_query );
-
-      $month_count = count($arc_result);
-
-      if ( $month_count && !( 1 == $month_count && 0 == $arc_result[0]->mmonth ) ) {
-      $m = isset($_GET['m']) ? (int)$_GET['m'] : 0;
-      ?>
-      <select name='m'>
-      <option<?php selected( $m, 0 ); ?> value='0'><?php _e('Show all dates'); ?></option>
-      <?php
-      foreach ($arc_result as $arc_row) {
-      	if ( $arc_row->yyear == 0 )
-      		continue;
-      	$arc_row->mmonth = zeroise( $arc_row->mmonth, 2 );
-
-      	if ( $arc_row->yyear . $arc_row->mmonth == $m )
-      		$default = ' selected="selected"';
-      	else
-      		$default = '';
-
-      	echo "<option$default value='" . esc_attr("$arc_row->yyear$arc_row->mmonth") . "'>";
-      	echo $wp_locale->get_month($arc_row->mmonth) . " $arc_row->yyear";
-      	echo "</option>\n";
-      }
-      ?>
-      </select>
-      <?php } ?>
-
-      <input type="submit" id="post-query-submit" value="<?php esc_attr_e('Filter'); ?>" class="button-secondary" />
+				$arc_query = $wpdb->prepare("SELECT DISTINCT YEAR(post_date) AS yyear, MONTH(post_date) AS mmonth FROM $wpdb->posts WHERE post_type = %s ORDER BY post_date DESC", $post_type);
+	
+				$arc_result = $wpdb->get_results( $arc_query );
+	
+				$month_count = count($arc_result);
+	
+				if ( $month_count && !( 1 == $month_count && 0 == $arc_result[0]->mmonth ) ) {
+				$m = isset($_GET['m']) ? (int)$_GET['m'] : 0;
+				?>
+				<select name='m'>
+				<option<?php selected( $m, 0 ); ?> value='0'><?php _e('Show all dates'); ?></option>
+				<?php
+				foreach ($arc_result as $arc_row) {
+					if ( $arc_row->yyear == 0 )
+						continue;
+					$arc_row->mmonth = zeroise( $arc_row->mmonth, 2 );
+	
+					if ( $arc_row->yyear . $arc_row->mmonth == $m )
+						$default = ' selected="selected"';
+					else
+						$default = '';
+	
+					echo "<option$default value='" . esc_attr("$arc_row->yyear$arc_row->mmonth") . "'>";
+					echo $wp_locale->get_month($arc_row->mmonth) . " $arc_row->yyear";
+					echo "</option>\n";
+				}
+				?>
+				</select>
+				<?php } ?>
+	
+				<input type="submit" id="post-query-submit" value="<?php esc_attr_e('Filter'); ?>" class="button-secondary" />
       <?php } ?>
 
 	  <?php 
@@ -6152,7 +6152,7 @@ Notification Preferences: %s', 'mp');
 
 				  // Fixing http://premium.wpmudev.org/forums/topic/store-page-content-overwritten
 				  $new_slug = $_POST['mp']['slugs']['store'];
-				  $new_post_id = $wpdb->get_var("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = '$new_slug' AND post_type = 'page'");
+				  $new_post_id = $wpdb->get_var( $wpdb->prepare("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = %s AND post_type = 'page'", $new_slug) );
 
 				  if ($new_slug != $old_slug && $new_post_id != 0) {
 				    echo '<div class="error fade"><p>'.__('Store base URL conflicts with another page', 'mp').'</p></div>';

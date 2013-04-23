@@ -310,8 +310,7 @@ class MarketPress_MS {
       return $title;
 
     if ( $slug = get_query_var('global_taxonomy') ) {
-      $slug = $wpdb->escape( $slug );
-      $name = $wpdb->get_var( "SELECT name FROM {$wpdb->base_prefix}mp_terms WHERE slug = '$slug'" );
+      $name = $wpdb->get_var( $wpdb->prepare("SELECT name FROM {$wpdb->base_prefix}mp_terms WHERE slug = %s", $slug) );
     }
 
     switch ($wp_query->query_vars['pagename']) {
@@ -807,7 +806,7 @@ class MarketPress_MS {
     }
 
 		//update or insert the product
-		$global_id = $wpdb->get_var("SELECT id FROM {$wpdb->base_prefix}mp_products WHERE site_id = {$wpdb->siteid} AND blog_id = {$wpdb->blogid} AND post_id = $post_id");
+		$global_id = $wpdb->get_var( $wpdb->prepare("SELECT id FROM {$wpdb->base_prefix}mp_products WHERE site_id = {$wpdb->siteid} AND blog_id = {$wpdb->blogid} AND post_id = %s", $post_id) );
     if ($global_id) {
       $wpdb->update( $wpdb->base_prefix . 'mp_products', array(
                       'blog_public'       => $blog_public,
@@ -850,7 +849,7 @@ class MarketPress_MS {
 		
       //get existing terms
       foreach ($new_terms as $term)
-        $new_slugs[] = $term->slug;
+        $new_slugs[] = $wpdb->escape($term->slug);
   		$slug_list = implode( "','", $new_slugs );
       $existing_terms = $wpdb->get_results( "SELECT * FROM {$wpdb->base_prefix}mp_terms WHERE slug IN ('$slug_list')" );
       $existing_slugs = array();
@@ -942,14 +941,14 @@ class MarketPress_MS {
     global $wpdb, $current_site, $mp;
 
     //delete all
-    $wpdb->query( "DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = {$wpdb->blogid} AND p.post_id = $post_id" );
+    $wpdb->query( $wpdb->prepare("DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = {$wpdb->blogid} AND p.post_id = %d", $post_id) );
   }
   
   function remove_blog($blog_id) {
     global $wpdb, $current_site, $mp;
 
     //delete all - note that reinstating the blog will not restore indexed products
-    $wpdb->query( "DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = $blog_id" );
+    $wpdb->query( $wpdb->prepare("DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = %d", $blog_id) );
   }
   
   function public_update( $old_value, $value ) {
@@ -961,7 +960,7 @@ class MarketPress_MS {
   function record_sale( $product_id, $variation, $data, $paid ) {
     global $wpdb;
     
-    $wpdb->query( "UPDATE {$wpdb->base_prefix}mp_products SET sales_count = (sales_count + {$data['quantity']}) WHERE site_id = {$wpdb->siteid} AND blog_id = {$wpdb->blogid} AND post_id = $product_id" );
+    $wpdb->query( $wpdb->prepare("UPDATE {$wpdb->base_prefix}mp_products SET sales_count = (sales_count + {$data['quantity']}) WHERE site_id = {$wpdb->siteid} AND blog_id = {$wpdb->blogid} AND post_id = %d", $product_id) );
   }
   
   
@@ -1157,6 +1156,8 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
   else if ($include == 'categories')
     $where = " WHERE t.type = 'product_category'";
   
+	$limit = intval($limit);
+	
   $tags = $wpdb->get_results( "SELECT name, slug, type, count(post_id) as count FROM {$wpdb->base_prefix}mp_terms t LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON t.term_id = r.term_id$where GROUP BY t.term_id ORDER BY count DESC LIMIT $limit", ARRAY_A );
 
 	if ( !$tags )
