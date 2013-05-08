@@ -5,9 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.8.6 - 5/8/2013 - Aaron
+----------------------------------------------------------------------
 - Fix broken new order emails if % is included in product title
 - Fix paypal express documentation links
 - Add setting for "Collect Address on Downloadable Only Cart"
+- SQL injection hardening
 
 2.8.5 - 4/11/2013 - Aaron
 ----------------------------------------------------------------------
