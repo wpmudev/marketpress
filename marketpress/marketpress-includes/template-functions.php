@@ -2120,7 +2120,7 @@ function mp_cart_breadcrumbs($current_step){
 		'shipping'=>__('Shipping','mp'),
 		'checkout'=>__('Checkout','mp'),
 		'confirm-checkout'=>__('Confirm','mp'),
-		'confirmation'=>__('Thankyou','mp')
+		'confirmation'=>__('Order Complete','mp')
 	);
 
 	$order = array_keys($steps);

@@ -5,6 +5,8 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Change text of last checkout breadcrumb to "Order Complete"
+
 2.8.6 - 5/8/2013 - Aaron
 ----------------------------------------------------------------------
 - Fix broken new order emails if % is included in product title
