@@ -6,6 +6,7 @@ Change Log:
 ----------------------------------------------------------------------
 
 - Change text of last checkout breadcrumb to "Order Complete"
+- Add Paymill gateway
 
 2.8.6 - 5/8/2013 - Aaron
 ----------------------------------------------------------------------
