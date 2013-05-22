@@ -221,7 +221,9 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
 		function sanitize_rates(&$value, $key) {
 			global $mp;
 			if (!is_array($value)) {
-				if ($key == 'minweight')
+				if ($key == 'rowcount')
+					$value = intval($value);
+				else if ($key == 'minweight')
 					$value = round(preg_replace('/[^0-9.]/', '', $value), 2);
 				else
 					$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));

@@ -208,7 +208,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		//sanitize the price fields
 		function sanitize_rates(&$value, $key) {
 			global $mp;
-			if (!is_array($value))
+			if (!is_array($value) && $key != 'rowcount')
 				$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));
 		}
 		array_walk_recursive($settings['shipping']['table-rate'], 'sanitize_rates');
