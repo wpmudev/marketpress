@@ -7,6 +7,7 @@ Change Log:
 
 - Change text of last checkout breadcrumb to "Order Complete"
 - Add Paymill gateway
+- Sanitize fields in various shipping modules
 
 2.8.6 - 5/8/2013 - Aaron
 ----------------------------------------------------------------------

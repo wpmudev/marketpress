@@ -217,8 +217,18 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
    *  array. Don't forget to return!
    */
 	function process_shipping_settings($settings) {
-
-    return $settings;
+		//sanitize the price fields
+		function sanitize_rates(&$value, $key) {
+			global $mp;
+			if (!is_array($value)) {
+				if ($key == 'minweight')
+					$value = round(preg_replace('/[^0-9.]/', '', $value), 2);
+				else
+					$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));
+			}
+		}
+		array_walk_recursive($settings['shipping']['weight-rate'], 'sanitize_rates');
+		return $settings;
   }
 
   /**
