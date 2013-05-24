@@ -235,8 +235,8 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
   	
 		//filter html if needed
 		if (!current_user_can('unfiltered_html')) {
-			$settings['gateways']['manual-payments']['instructions'] = filter_post_kses($settings['gateways']['manual-payments']['instructions']);
-			$settings['gateways']['manual-payments']['confirmation'] = filter_post_kses($settings['gateways']['manual-payments']['confirmation']);
+			$settings['gateways']['manual-payments']['instructions'] = wp_filter_post_kses($settings['gateways']['manual-payments']['instructions']);
+			$settings['gateways']['manual-payments']['confirmation'] = wp_filter_post_kses($settings['gateways']['manual-payments']['confirmation']);
 		}
 		
 		//no html in email

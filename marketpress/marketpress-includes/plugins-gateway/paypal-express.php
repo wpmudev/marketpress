@@ -175,8 +175,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				      'other' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp'),
 				      '*' => ''
 				    );
-				    $status = __('The payment is pending.', 'mp');
-				    $status .= '<br />' . $pending_str[$result["PENDINGREASON"]];
+				    $status = __('The payment is pending', 'mp');
+						if (isset($pending_str[$result["PENDINGREASON"]]))
+							$status .= ': ' . $pending_str[$result["PENDINGREASON"]];
 				    $authorized = false;
 				    break;
 				  default:
@@ -592,7 +593,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
               'JP'	=> 'Japan',
               'MX'	=> 'Mexico',
               'NL'	=> 'Netherlands',
-              'PL'	=> 'Poland',
+              'NZ'	=> 'New Zealand',
               'SG'	=> 'Singapore',
               'ES'	=> 'Spain',
               'SE'	=> 'Sweden',
@@ -1246,6 +1247,7 @@ function psts_pe_network_gateway_settings_box($settings) {
             'IT'	=> 'Italy',
             'MX'	=> 'Mexico',
             'NL'	=> 'Netherlands',
+            'NZ'	=> 'New Zealand',
             'PL'	=> 'Poland',
             'SG'	=> 'Singapore',
             'ES'	=> 'Spain',

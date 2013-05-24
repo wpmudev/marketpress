@@ -263,8 +263,8 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 
 		//filter html if needed
 		if (!current_user_can('unfiltered_html')) {
-			$settings['gateways']['cubepoints']['instructions'] = filter_post_kses($settings['gateways']['cubepoints']['instructions']);
-			$settings['gateways']['cubepoints']['confirmation'] = filter_post_kses($settings['gateways']['cubepoints']['confirmation']);
+			$settings['gateways']['cubepoints']['instructions'] = wp_filter_post_kses($settings['gateways']['cubepoints']['instructions']);
+			$settings['gateways']['cubepoints']['confirmation'] = wp_filter_post_kses($settings['gateways']['cubepoints']['confirmation']);
 		}
 
 		//no html in email
