@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.8.6
+Version: 2.8.7
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class MarketPress {
 
-  var $version = '2.8.6';
+  var $version = '2.8.7';
   var $location;
   var $plugin_dir = '';
   var $plugin_url = '';
@@ -1198,8 +1198,7 @@ Thanks again!", 'mp')
         //$wp_query->is_singular = 1;
         $wp_query->is_404 = null;
         $wp_query->post_count = 1;
-				//var_dump($wp_query);
-				$wp_query->queried_object_id = get_option('mp_store_page');
+				//$wp_query->queried_object_id = get_option('mp_store_page');
 				add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
@@ -1591,44 +1590,44 @@ Thanks again!", 'mp')
 			'order' => '',
 			'category' => '',
 			'tag' => '',
-			'list_view'=> false));
+			'list_view'=> NULL));
 
-		if( isset($_POST['order']) ){
-				$o = explode('-',$_POST['order']);
+		if ( isset($_POST['order']) ) {
+			$o = explode('-',$_POST['order']);
 
-				// column
-				if(isset($o[0]) && in_array($o[0], array('date','title','price','sales'))){
-					$order_by = $o[0];
-				}
+			// column
+			if(isset($o[0]) && in_array($o[0], array('date','title','price','sales'))) {
+				$order_by = $o[0];
+			}
 
-				// direction
-				if(isset($o[1]) &&  in_array($o[1], array('asc','desc'))){
-					$order = strtoupper($o[1]);
-				}
+			// direction
+			if(isset($o[1]) &&  in_array($o[1], array('asc','desc'))) {
+				$order = strtoupper($o[1]);
+			}
 		}
 
-		if( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1){
-				$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
-				$category = $term->slug;
+		if ( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1) {
+			$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
+			$category = $term->slug;
 		}
 
-		if( isset($_POST['page']) && is_numeric($_POST['page']) ){
-				$page = $_POST['page'];
+		if ( isset($_POST['page']) && is_numeric($_POST['page']) ) {
+			$page = $_POST['page'];
 		}
 
 		$ret['products'] = mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
 
-		if($this->get_setting('paginate')){
+		if ($this->get_setting('paginate')) {
 
 			// get_posts_nav_link() does not work with ajax
 			$max = $wp_query->max_num_pages;
 			$prev=$next='';
 
-			if($max > 1){
-				if( $page != $max ){
+			if ($max > 1) {
+				if ( $page != $max ) {
 					$next='<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
 				}
-				if($page != 1){
+				if ($page != 1) {
 					$prev='<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
 				}
 				$ret['pagination'] = '<div id="mp_product_nav">' . $prev . (strlen($prev)>0 && strlen($next)>0?' &#8212; ':'') . $next . '</div>';
@@ -4193,7 +4192,11 @@ Thanks again!", 'mp')
     }
     //coupon line
     if ( $order->mp_discount_info ) {
-      $order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . str_replace('%', __(' Percent', 'mp'), $order->mp_discount_info['discount']); //have to escape % sign so sprintf doesn't choke
+			if (false !== strpos($order->mp_discount_info['discount'], '%'))
+				$discount = str_replace('%', '%%', $order->mp_discount_info['discount']); //have to escape % sign so sprintf doesn't choke
+			else
+				$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $order->mp_discount_info['discount']) . ' ' . $order->mp_payment_info['currency'];
+      $order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
     }
     //shipping line
     if ( $order->mp_shipping_total ) {
@@ -4257,7 +4260,7 @@ Thanks again!", 'mp')
       krsort($statuses); //sort with latest status at the top
       $status = reset($statuses);
       $timestamp = key($statuses);
-      $payment_info .= date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ': ' . $status;
+      $payment_info .= $this->format_date($timestamp) . ': ' . $status;
     } else {
       $payment_info .= __('Your payment for this order is complete.', 'mp');
     }
@@ -4438,7 +4441,12 @@ Notification Preferences: %s', 'mp');
         return $zero . ' ' . $symbol;
     }
   }
-
+	
+	//translates a gmt timestamp into local timezone for display
+	function format_date($gmt_timestamp) {
+		return date_i18n( get_option('date_format') . ' - ' . get_option('time_format'), $gmt_timestamp + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
+	}
+	
   //replaces wp_trim_excerpt in our custom loops
   function product_excerpt($excerpt, $content, $product_id, $excerpt_more = null) {
     if (is_null($excerpt_more))
@@ -4688,13 +4696,13 @@ Notification Preferences: %s', 'mp');
         <div class="inside">
           <?php
           //get times
-          $received = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time);
+          $received = $this->format_date($order->mp_received_time);
           if (isset($order->mp_paid_time) && $order->mp_paid_time)
-            $paid = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
+            $paid = $this->format_date($order->mp_paid_time);
           if (isset($order->mp_shipped_time) && $order->mp_shipped_time)
-            $shipped = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
+            $shipped = $this->format_date($order->mp_shipped_time);
           if (isset($order->mp_closed_time) && $order->mp_closed_time)
-            $closed = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_closed_time);
+            $closed = $this->format_date($order->mp_closed_time);
 
           if ($order->post_status == 'order_received') {
             echo '<div id="major-publishing-actions" class="misc-pub-section">' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></div>';
@@ -4760,7 +4768,7 @@ Notification Preferences: %s', 'mp');
             echo '<div id="mp_payment_gateway" class="misc-pub-section">';
           }
           ?>
-            <strong><?php echo date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp); ?>:</strong>
+            <strong><?php echo $this->format_date($timestamp); ?>:</strong>
             <?php echo esc_html($status); ?>
           </div>
         <?php } ?>
@@ -5021,9 +5029,9 @@ Notification Preferences: %s', 'mp');
     $per_page = 'edit_' . $post_type . '_per_page';
     $per_page = (int) get_user_option( $per_page );
     if ( empty( $per_page ) || $per_page < 1 )
-    	$per_page = 15;
+    	$per_page = 20;
     // @todo filter based on type
-    $per_page = apply_filters( 'edit_posts_per_page', $per_page );
+    $per_page = apply_filters( 'edit_' . $post_type . '_per_page', $per_page );
 
     // Handle bulk actions
     if ( isset($_GET['doaction']) || isset($_GET['doaction2']) || isset($_GET['bulk_edit']) || isset($_GET['action']) 

@@ -883,17 +883,17 @@ function mp_order_status() {
     $order = $mp->get_order($order_id);
 
     if ($order) { //valid order
-      echo '<h2><em>' . sprintf( __('Order Details (%s):', 'mp'), htmlentities($order_id)) . '</em></h2>';
+      echo '<h2><em>' . sprintf( __('Order Details (%s):', 'mp'), esc_html($order_id)) . '</em></h2>';
       ?>
       <h3><?php _e('Current Status', 'mp'); ?></h3>
       <ul>
       <?php
       //get times
-      $received = isset($order->mp_received_time) ? date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_received_time) : '';
+      $received = isset($order->mp_received_time) ? $mp->format_date($order->mp_received_time) : '';
       if (!empty($order->mp_paid_time))
-        $paid = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_paid_time);
+        $paid = $mp->format_date($order->mp_paid_time);
       if (!empty($order->mp_shipped_time))
-        $shipped = date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $order->mp_shipped_time);
+        $shipped = $mp->format_date($order->mp_shipped_time);
 
       if ($order->post_status == 'order_received') {
         echo '<li>' . __('Received:', 'mp') . ' <strong>' . $received . '</strong></li>';
@@ -1138,7 +1138,7 @@ function mp_order_status() {
       echo '<h3>' . __('Your Recent Orders:', 'mp') . '</h3>';
       echo '<ul id="mp-order-list">';
       foreach ($orders as $timestamp => $order)
-        echo '  <li><strong>' . date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
+        echo '  <li><strong>' . $mp->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
       echo '</ul>';
 
       ?>
@@ -1359,8 +1359,8 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
   if ($last = $custom_query->post_count) {
 
 		$content .= $layout_type == 'grid' ?
-									get_products_html_grid($custom_query->posts) :
-									get_products_html_list($custom_query->posts);
+									_mp_products_html_grid($custom_query->posts) :
+									_mp_products_html_list($custom_query->posts);
   	
   } else {
     $content .= '<div id="mp_no_products">' . apply_filters( 'mp_product_list_none', __('No Products', 'mp') ) . '</div>';
@@ -1374,7 +1374,7 @@ function mp_list_products( $echo = true, $paginate = '', $page = '', $per_page =
     return $content;
 }
 
-function get_products_html_list($post_array=array()){
+function _mp_products_html_list($post_array=array()){
   global $mp;
   $html='';
   $total = count($post_array);
@@ -1411,7 +1411,7 @@ function get_products_html_list($post_array=array()){
   return $html;
 }
 
-function get_products_html_grid($post_array=array()){
+function _mp_products_html_grid($post_array=array()){
   global $mp;
   $html='';
   

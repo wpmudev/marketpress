@@ -115,6 +115,7 @@ class MarketPress_MS {
         'paypal-chained' => 'none',
         'paypal-pro' => 'none',
 				'payflow' => 'none',
+				'paymill' => 'none',
         'stripe' => 'none',
         'authorizenet-aim' => 'none',
         'authorizenet-sim' => 'full',

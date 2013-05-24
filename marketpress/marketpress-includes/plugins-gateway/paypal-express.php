@@ -500,7 +500,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	      krsort($statuses); //sort with latest status at the top
 	      $status = reset($statuses);
 	      $timestamp = key($statuses);
-	      $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong> ' . esc_html($status) . '</p>';
+	      $content .= '<p><strong>' . $mp->format_date($timestamp) . ':</strong> ' . esc_html($status) . '</p>';
 	    } else {
 	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
 	    }
@@ -962,7 +962,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       //coupon line
       if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-				$request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $coupon['discount']));
+				if (false === strpos($coupon['discount'], '%'))
+					$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $coupon['discount']) . ' ' . $this->currencyCode;
+					
+				$request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $discount));
 				$request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon['new_total']-$total);
 				$request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($mp->get_coupon_code());
 				$request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";

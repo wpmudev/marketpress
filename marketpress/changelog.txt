@@ -5,11 +5,18 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.8.7 - 5/24/2013 - Aaron
+----------------------------------------------------------------------
+- Make order and payment history times adjust dynamically for the site timezone
+- Add Paymill gateway (beta)
+- Fix encoded discount display in confirmation emails and PayPal
+- Fix products display reverting to grid in list mode when ajax filters are used
 - Fix undefined filter_post_kses error for subsite admins in multisite in Manual Payments and Cubepoints gateways
+- Fix a Manage Orders page pagination display bug/conflict
+- Fix fatal conflict with SEO features of Genesis/Catalyst themes on category pages
 - Change text of last checkout breadcrumb to "Order Complete"
-- Add Paymill gateway
-- Sanitize fields in various shipping modules
-- Add New Zealand locale to paypal gateway
+- Sanitize price fields in various shipping modules
+- Add New Zealand locale to paypal gateways
 
 2.8.6 - 5/8/2013 - Aaron
 ----------------------------------------------------------------------
