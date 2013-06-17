@@ -317,7 +317,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 							$sel_currency = isset($settings['gateways']['stripe']['currency']) ? $settings['gateways']['stripe']['currency'] : $settings['currency'];
 							$currencies = array(
 								"CAD" => 'CAD - Canadian Dollar',
-								"USD" => 'USD - U.S. Dollar'
+								"USD" => 'USD - U.S. Dollar',
+								"GBP" => 'GBP - Pounds Sterling'
 							);
 	
 							foreach ($currencies as $k => $v) {
