@@ -103,7 +103,7 @@ class MarketPress {
 
 		//Plug admin pages
 		add_action( 'admin_menu', array(&$this, 'add_menu_items') );
-		add_action( 'admin_print_styles', array(&$this, 'admin_css') );
+		add_action( 'admin_print_crestyles', array(&$this, 'admin_css') );
 		add_action( 'admin_print_scripts', array(&$this, 'admin_script_post') );
     add_action( 'admin_notices', array(&$this, 'admin_nopermalink_warning') );
 		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array(&$this, 'plugin_action_link'), 10, 2);
@@ -2971,7 +2971,7 @@ Thanks again!", 'mp')
 				else
 					$_POST['state'] = strtoupper($_POST['state']);
 
-				if (empty($_POST['zip']))
+				if (empty($_POST['zip']) && $_POST['country'] != 'IE') //no postal code in Ireland
 					$this->cart_checkout_error( __('Please enter your Zip/Postal Code.', 'mp'), 'zip');
 
 				if (empty($_POST['country']) || strlen($_POST['country']) != 2)

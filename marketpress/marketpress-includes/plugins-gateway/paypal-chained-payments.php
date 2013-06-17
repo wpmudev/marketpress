@@ -650,7 +650,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
     $fee = round( ($network_settings['gateways']['paypal-chained']['percentage'] * 0.01) * $total, 2);
     
     $nvpstr .= "&receiverList.receiver(0).email=" . urlencode($settings['gateways']['paypal-chained']['email']);
-		$nvpstr .= "&receiverList.receiver(0).amount=" . $total;
+		$nvpstr .= "&receiverList.receiver(0).amount=" . round($total, 2);
 		$nvpstr .= "&receiverList.receiver(0).invoiceId=" . $order_id;
 		$nvpstr .= "&receiverList.receiver(0).paymentType=GOODS";
 		$nvpstr .= "&receiverList.receiver(0).primary=true";

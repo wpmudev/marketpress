@@ -56,7 +56,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       $this->API_Username = $settings['gateways']['authorizenet-aim']['api_user'];
       $this->API_Password = $settings['gateways']['authorizenet-aim']['api_pass'];
       $this->API_Signature = $settings['gateways']['authorizenet-aim']['api_sig'];
-      $this->currencyCode = $settings['gateways']['authorizenet-aim']['currency'];
+      $this->currencyCode = isset($settings['gateways']['authorizenet-aim']['currency']) ? $settings['gateways']['authorizenet-aim']['currency'] : 'USD';
       $this->locale = $settings['gateways']['authorizenet-aim']['locale'];
       //set api urls
 			if (!empty($settings['gateways']['authorizenet-aim']['custom_api']))	{
@@ -550,6 +550,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     $payment->setParameter("x_card_code", $_SESSION['card_code']);
     $payment->setParameter("x_exp_date ", $_SESSION['exp_month'] . $_SESSION['exp_year']);
     $payment->setParameter("x_amount", $total);
+		$payment->setParameter("x_currency_code", $this->currencyCode);
     
     // Order Info
     $payment->setParameter("x_description", "Order ID: ".$_SESSION['mp_order']);
@@ -640,7 +641,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
       $payment_info['method'] = $payment->getMethod();
       $payment_info['status'][$timestamp] = "paid";
       $payment_info['total'] = $total;
-      $payment_info['currency'] = "USD"; // Authorize.net only supports USD transactions
+      $payment_info['currency'] = $this->currencyCode;
       $payment_info['transaction_id'] = $payment->getTransactionID();
       
       //succesful payment, create our order now
@@ -727,6 +728,25 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 				      </p>
 				    </td>
 				  </tr>
+					<th scope="row"><?php _e('Currency', 'mp') ?></th>
+        <td>
+          <select name="mp[gateways][authorizenet-aim][currency]">
+          <?php
+          $sel_currency = ($settings['gateways']['authorizenet-aim']['currency']) ? $settings['gateways']['authorizenet-aim']['currency'] : $mp->get_setting('currency');
+	        $currencies = array(
+              'CAD' => 'CAD - Canadian Dollar',
+              'EUR' => 'EUR - Euro',
+              'GBP' => 'GBP - Pound Sterling',
+              'USD' => 'USD - U.S. Dollar'
+          );
+
+          foreach ($currencies as $k => $v) {
+              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+          }
+          ?>
+          </select>
+        </td>
+        </tr>
 			          <tr>
 				    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
 				    <td>
