@@ -280,13 +280,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
         //set final amount
         $_SESSION['final_amt'] = 0;
-				$_SESSION['prs'] = array();
+				$_SESSION['store_count'] = 0;
 
 				for ($i=0; $i<10; $i++) {
 				  if (!isset($result['PAYMENTREQUEST_'.$i.'_AMT'])) {
 				    continue;
 				  }
 				  $_SESSION['final_amt'] += $result['PAYMENTREQUEST_'.$i.'_AMT'];
+					$_SESSION['store_count']++;
 				}
 
         //print payment details
@@ -491,7 +492,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     global $mp;
 
     if ($mp->global_cart) {
-		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), count($_SESSION['prs']), $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
+		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), $_SESSION['store_count'], $mp->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
 			/* TODO - create a list of sep store orders*/
 	  } else {
 	    if ($order->post_status == 'order_received') {
