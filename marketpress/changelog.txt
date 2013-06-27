@@ -10,6 +10,7 @@ Change Log:
 - Add support for CAD, EUR and GBP to Authorize.net AIM gateway
 - Add support for GBP to Stripe gateway
 - Fix store count on global checkout confirmaion screen
+- Fix coupons datepicker
 
 2.8.7 - 5/24/2013 - Aaron
 ----------------------------------------------------------------------

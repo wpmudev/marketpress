@@ -621,18 +621,18 @@ Thanks again!", 'mp')
 
   //enqeue css on product settings screen
   function admin_css_settings() {
-    wp_enqueue_style( 'jquery-datepicker-css', $this->plugin_url . 'datepicker/css/ui-lightness/datepicker.css', false, $this->version);
+    wp_enqueue_style( 'jquery-datepicker-css', $this->plugin_url . 'datepicker/css/smoothness/jquery-ui-1.10.3.custom.min.css', false, $this->version);
     wp_enqueue_style( 'jquery-colorpicker-css', $this->plugin_url . 'colorpicker/css/colorpicker.css', false, $this->version);
   }
 
   //enqeue js on product settings screen
   function admin_script_settings() {
     wp_enqueue_script( 'jquery-colorpicker', $this->plugin_url . 'colorpicker/js/colorpicker.js', array('jquery'), $this->version);
-    wp_enqueue_script( 'jquery-datepicker', $this->plugin_url . 'datepicker/js/datepicker.min.js', array('jquery', 'jquery-ui-core'), $this->version);
+    wp_enqueue_script( 'jquery-ui-datepicker');//use built in version
 
     //only load languages for datepicker if not english (or it will show Chinese!)
     if ($this->language != 'en')
-      wp_enqueue_script( 'jquery-datepicker-i18n', $this->plugin_url . 'datepicker/js/datepicker-i18n.min.js', array('jquery', 'jquery-ui-core', 'jquery-datepicker'), $this->version);
+      wp_enqueue_script( 'jquery-datepicker-i18n', $this->plugin_url . 'datepicker/js/jquery-ui-i18n.min.js', array('jquery', 'jquery-ui-core', 'jquery-datepicker'), $this->version);
 
 		if (intval($this->get_setting('hide_popup')) < 3) {
 			wp_enqueue_script( 'mp-need-help', $this->plugin_url . 'js/need-help.js', array('jquery'), $this->version);
