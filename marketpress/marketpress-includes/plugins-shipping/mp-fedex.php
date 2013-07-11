@@ -127,6 +127,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		</tr>
 		<?php
 		$content .= ob_get_clean();
+
 		return $content;
 	}
 
@@ -135,9 +136,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*  and be sure to save it to both the cookie and usermeta if logged in.
 	*/
 	function process_shipping_form() {
-
 		$_SESSION['mp_shipping_info']['residential'] = $_POST['residential'];
-
+		$this->residential = $_SESSION['mp_shipping_info']['residential'];
 	}
 
 	/**
@@ -747,7 +747,17 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			}
 		}
 	
+		//Sort low to high rate
 		uasort($mp_shipping_options, array($this,'compare_rates') );
+		
+		//If no cost matched yet set to the first one which is now the cheapest.
+		if( empty($_SESSION['mp_shipping_info']['shipping_cost']) ){
+			//Get the first one
+			reset($mp_shipping_options);
+			$service = key($mp_shipping_options);
+			$_SESSION['mp_shipping_info']['shipping_sub_option'] = $service;
+			$_SESSION['mp_shipping_info']['shipping_cost'] =  $mp_shipping_options[$service]['rate'] + $mp_shipping_options[$service]['handling'];
+		}
 	
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){

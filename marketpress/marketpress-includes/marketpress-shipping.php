@@ -321,6 +321,9 @@ class MP_Shipping_Handler {
 		$zip = isset($_POST['zip']) ? trim(stripslashes($_POST['zip'])) : (isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip']);
 		$country = isset($_POST['country']) ? trim($_POST['country']) : (isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country']);
 
+		//Pick up any service specific fields
+		do_action( 'mp_shipping_process' );
+
 		$options = apply_filters("mp_shipping_options_$selected", $mp->get_cart_contents(), $address1, $address2, $city, $state, $zip, $country);
 
 		$content = '';

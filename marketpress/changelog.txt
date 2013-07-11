@@ -12,6 +12,7 @@ Change Log:
 - Add support for GBP to Stripe gateway
 - Fix store count on global checkout confirmaion screen
 - Fix coupons datepicker
+- Added process_shipping_form call to shipping_sub_options() so that custom fields that can affect shipping will be read. (ie Resedential in FedEx)
 - Make custom column code more efficient - props @michael_cannon
 - Add a note to table rate shipping that it uses the pre-tax order total
 - Add Serbia and Montenegro country codes
