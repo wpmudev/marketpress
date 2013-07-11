@@ -91,7 +91,7 @@ class MarketPress {
 
 		//edit products page
 		add_filter( 'manage_product_posts_columns', array(&$this, 'edit_products_columns') );
-		add_action( 'manage_posts_custom_column', array(&$this, 'edit_products_custom_columns') );
+		add_action( 'manage_product_posts_custom_column', array(&$this, 'edit_products_custom_columns') );
 		add_action( 'restrict_manage_posts', array(&$this, 'edit_products_filter') );
 
 		add_filter( 'post_row_actions', array(&$this, 'edit_products_custom_row_actions'), 10, 2);
@@ -99,7 +99,7 @@ class MarketPress {
 
 		//manage orders page
 		add_filter( 'manage_product_page_marketpress-orders_columns', array(&$this, 'manage_orders_columns') );
-		add_action( 'manage_posts_custom_column', array(&$this, 'manage_orders_custom_columns') );
+		add_action( 'manage_mp_order_posts_custom_column', array(&$this, 'manage_orders_custom_columns') );
 
 		//Plug admin pages
 		add_action( 'admin_menu', array(&$this, 'add_menu_items') );
@@ -4159,14 +4159,17 @@ Thanks again!", 'mp')
 
     //// order info
     if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
-      $order_info = __('Items:', 'mp') . "\n";
+      $order_info = $order_info_sku = __('Items:', 'mp') . "\n";
       foreach ($order->mp_cart_info as $product_id => $variations) {
 				foreach ($variations as $variation => $data) {
 					$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+					$order_info_sku .= "\t" . $data['name'] . ' - ' . $data['sku'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 					//show download link if set
-					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title))
+					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title)) {
 	        	$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
+						$order_info_sku .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
+					}
 
 					// FPM: Product Custom Fields
 					$cf_key = $bid .':'. $product_id .':'. $variation;
@@ -4180,15 +4183,19 @@ Thanks again!", 'mp')
 							$label_text = __('Product Personalization: ', 'mp');
 	
 						$order_info .= "\t\t" . $label_text  ."\n";
+						$order_info_sku .= "\t\t" . $label_text  ."\n";
 						foreach($cf_items as $idx => $cf_item) {
 							$item_cnt = intval($idx)+1;
 							$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
+							$order_info_sku .= "\t\t\t" . $item_cnt .". ". $cf_item  ."\n";
 						}
 					}
 					$order_info .= "\n";
+					$order_info_sku .= "\n";
 				}
 			}
       $order_info .= "\n";
+      $order_info_sku .= "\n";
     }
     //coupon line
     if ( $order->mp_discount_info ) {
@@ -4197,17 +4204,21 @@ Thanks again!", 'mp')
 			else
 				$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $order->mp_discount_info['discount']) . ' ' . $order->mp_payment_info['currency'];
       $order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
+			$order_info_sku .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
     }
     //shipping line
     if ( $order->mp_shipping_total ) {
       $order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($this->get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
-    }
+			$order_info_sku .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($this->get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
+		}
     //tax line
     if ( $order->mp_tax_total ) {
       $order_info .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
+			$order_info_sku .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //total line
     $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
+		$order_info_sku .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
 
     //// Shipping Info
 
@@ -4272,8 +4283,8 @@ Thanks again!", 'mp')
 		$tracking_url = apply_filters('wpml_marketpress_tracking_url', mp_orderstatus_link(false, true) . $order->post_title . '/');
 
     //setup filters
-    $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
-    $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
+    $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'ORDERINFOSKU', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
+    $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $order_info_sku, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
 		
 		//escape for sprintf() if required
 		if ($escape) {
@@ -4305,7 +4316,7 @@ Thanks again!", 'mp')
     $msg = __("A new order (ORDERID) was created in your store:
 
 Order Information:
-ORDERINFO
+ORDERINFOSKU
 
 Shipping Information:
 SHIPPINGINFO

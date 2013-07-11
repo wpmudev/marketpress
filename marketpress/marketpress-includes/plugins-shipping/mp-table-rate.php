@@ -74,7 +74,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		<div id="mp_table_rate" class="postbox">
 		<h3 class='hndle'><span><?php _e('Table Rate Settings', 'mp'); ?></span></h3>
 		<div class="inside">
-			<span class="description"><?php _e('Be sure to enter a shipping price for every option or those customers may get free shipping. Each layer must be a higher price than the previous.', 'mp') ?></span>
+			<span class="description"><?php _e('Be sure to enter a shipping price for every option unless you want a certain tier to get get free shipping. Each layer should generally be a higher price than the previous. Note that order total that it is compared to is pre-tax.', 'mp') ?></span>
 		<table class="form-table">
 		<tr>
 			<td scope="row"><?php _e('Number of Layers:', 'mp');?>

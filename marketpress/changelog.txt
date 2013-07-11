@@ -5,12 +5,16 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Add SKU's to admin new order notification email
 - Fixed a rounding error with Paypal chained and Tax Inclusive pricing
 - Add support for Ireland locale in paypal and not require postal code
 - Add support for CAD, EUR and GBP to Authorize.net AIM gateway
 - Add support for GBP to Stripe gateway
 - Fix store count on global checkout confirmaion screen
 - Fix coupons datepicker
+- Make custom column code more efficient - props @michael_cannon
+- Add a note to table rate shipping that it uses the pre-tax order total
+- Add Serbia and Montenegro country codes
 
 2.8.7 - 5/24/2013 - Aaron
 ----------------------------------------------------------------------
@@ -155,7 +159,6 @@ Change Log:
 ----------------------------------------------------------------------
 - Added per shipment handling charge to USPS, one for domestic and one for international shipping.
 - Add Argentina and Brazil to PayPal gateway countries
-- Add SKU's to new order emails
 - Fix issue with category dropdown widget displaying all products
 - Fix some potential problems with new installs and the CubePoints gateway
 
