@@ -5,6 +5,8 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.8.8 - 7/15/2013 - Aaron Edwards, Marko Miljus
+----------------------------------------------------------------------
 - Add SKU's to admin new order notification email
 - Fixed a rounding error with Paypal chained and Tax Inclusive pricing
 - Add support for Ireland locale in paypal and not require postal code
@@ -16,8 +18,11 @@ Change Log:
 - Make custom column code more efficient - props @michael_cannon
 - Add a note to table rate shipping that it uses the pre-tax order total
 - Add Serbia and Montenegro country codes
+- Add mp_product_title() template function
+- Add mp_product_description template function
+- Add mp_product_meta template function
 
-2.8.7 - 5/24/2013 - Aaron
+2.8.7 - 5/24/2013 - Aaron Edwards
 ----------------------------------------------------------------------
 - Make order and payment history times adjust dynamically for the site timezone
 - Add Paymill gateway (beta)
@@ -30,14 +35,14 @@ Change Log:
 - Sanitize price fields in various shipping modules
 - Add New Zealand locale to paypal gateways
 
-2.8.6 - 5/8/2013 - Aaron
+2.8.6 - 5/8/2013 - Aaron Edwards
 ----------------------------------------------------------------------
 - Fix broken new order emails if % is included in product title
 - Fix paypal express documentation links
 - Add setting for "Collect Address on Downloadable Only Cart"
 - SQL injection hardening
 
-2.8.5 - 4/11/2013 - Aaron
+2.8.5 - 4/11/2013 - Aaron Edwards
 ----------------------------------------------------------------------
 - Allow styling of global products by site (blogid in classname)
 - Fix sort by price in product list widget http://wp.mu/1r5
