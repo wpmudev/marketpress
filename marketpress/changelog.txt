@@ -5,14 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.8.8 - 7/15/2013 - Aaron Edwards, Marko Miljus
+2.8.8 - 7/15/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
 - Add SKU's to admin new order notification email
 - Fixed a rounding error with Paypal chained and Tax Inclusive pricing
 - Add support for Ireland locale in paypal and not require postal code
 - Add support for CAD, EUR and GBP to Authorize.net AIM gateway
 - Add support for GBP to Stripe gateway
-- Fix store count on global checkout confirmaion screen
+- Fix store count on global checkout confirmation screen
 - Fix coupons datepicker
 - Added process_shipping_form call to shipping_sub_options() so that custom fields that can affect shipping will be read. (ie Resedential in FedEx)
 - Make custom column code more efficient - props @michael_cannon
