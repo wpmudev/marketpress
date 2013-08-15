@@ -636,7 +636,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $payment_info['method'] = $payment->getMethod();
       $payment_info['status'][$timestamp] = "paid";
       $payment_info['total'] = $total;
-      $payment_info['currency'] = "USD"; // Authorize.net only supports USD transactions
+      $payment_info['currency'] = $this->currencyCode;
       $payment_info['transaction_id'] = $payment->getTransactionID();
 
       //succesful payment, create our order now
@@ -751,6 +751,28 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
 				    </td>
 				  </tr>
+					<tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : ''; ?>>
+	        <th scope="row"><?php _e('Paypal Currency', 'mp') ?></th>
+	        <td>
+	          <select name="mp[gateways][payflow][currency]">
+	          <?php
+	          $sel_currency = $mp->get_setting('gateways->payflow->currency', $mp->get_setting('currency'));
+	          $currencies = array(
+	              'AUD' => 'AUD - Australian Dollar',
+	              'CAD' => 'CAD - Canadian Dollar',
+	              'EUR' => 'EUR - Euro',
+	              'GBP' => 'GBP - Pound Sterling',
+	              'JPY' => 'JPY - Japanese Yen',
+	              'USD' => 'USD - U.S. Dollar'
+	          );
+
+	          foreach ($currencies as $k => $v) {
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	          }
+	          ?>
+	          </select>
+	        </td>
+	        </tr>
 			          <tr>
 				    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
 				    <td>

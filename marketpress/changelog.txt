@@ -5,6 +5,8 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Add multiple currency support to Payflow Pro gateway
+
 2.8.8 - 7/15/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
 - Add SKU's to admin new order notification email
