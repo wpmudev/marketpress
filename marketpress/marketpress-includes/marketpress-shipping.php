@@ -325,10 +325,14 @@ class MP_Shipping_Handler {
 		$content = '';
 		if ( count( $options ) && ! array_key_exists('error', $options) ) {  //If one of the keys is 'error' then it contains an error message from calculated rates.
 			$content .= '<select name="shipping_sub_option" size="' . max(count($options), 4) . '">'; //4 min because of safari
+			
+			//Make sure the $_SESSION suboption is still in the available rates
 			$suboption = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : '';
+			$suboption = array_key_exists($suboption, $options) ? $suboption : '';
+			
 			$ndx = 0;
 			foreach ($options as $key => $name) {
-				$selected = ($ndx == 0 && $suboption == '') ? true :  ($suboption == $key); //Nothing selected pick the first one.
+				$selected = ($ndx == 0 && empty($suboption) ) ? true :  ($suboption == $key); //Nothing selected pick the first one.
 				$content .= '<option value="' . $key . '"'. selected($selected, true, false) . '>' . esc_attr($name) . '</option>';
 				$ndx++;
 			}
