@@ -115,6 +115,10 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* Echo a table row with any extra shipping fields you need to add to the shipping checkout form
 	*/
 	function extra_shipping_field($content) {
+		
+		if( empty($this->fedex_settings['commercial']) ) { //force residential
+			$content += '<input type="hidden" name="residential" value="1" />';
+		} else {
 		ob_start();
 		?>
 		<tr>
@@ -127,7 +131,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		</tr>
 		<?php
 		$content .= ob_get_clean();
-
+		}
 		return $content;
 	}
 
@@ -298,6 +302,18 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 								<?php echo $this->get_units_weight(); ?>
 							</td>
 						</tr>
+						<tr>
+							<th scope="row">
+								<?php _e('FedEx Allow Commercial Delivery', 'mp') ?>
+								<span class="description"><?php _e('<br />When checked the customer can chose Residential or Commercial delivery. Otherwise it\'s always Residential.', 'mp'); ?></span>
+							</th>
+							<td>
+								<label>
+									<input type="checkbox" name="mp[shipping][fedex][commercial]" value="1" <?php checked($this->fedex_settings['commercial']); ?> />&nbsp;<?php echo $detail->name . ' ' .$detail->delivery; ?>&nbsp;<?php _e('Allow Commercial Delivery.', 'mp'); ?>
+								</label><br />
+							</td>
+						</tr>
+
 						<!--
 						<tr>
 						<th scope="row"><?php _e('FedEx Request Mode', 'mp') ?></th>
@@ -640,7 +656,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
 		<v13:CountryCode>' . $this->country . '</v13:CountryCode>';
 	
-		if (!empty($this->residential)) {
+		if (!empty($this->residential) 
+		|| empty($this->fedex_settings['commercial']) ) {
 			$xml_req .= '
 			<v13:Residential>true</v13:Residential>';
 		}
