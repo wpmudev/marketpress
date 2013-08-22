@@ -246,7 +246,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
      *
      * Don't forget to return!
      */
-    function order_confirmation_email($msg) {
+    function order_confirmation_email($msg, $order = null) {
         return $msg;
     }
 

@@ -45,10 +45,6 @@ class MarketPress {
 	var $skip_shipping_notice = false;
 	var $weight_printed = false;
 
-  function MarketPress() {
-    $this->__construct();
-  }
-
   function __construct() {
     //setup our variables
     $this->init_vars();

@@ -54,10 +54,10 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
     //set credit card vars
     if ( isset( $settings['gateways']['authorizenet-aim'] ) ) {
       $this->API_Username = $settings['gateways']['authorizenet-aim']['api_user'];
-      $this->API_Password = $settings['gateways']['authorizenet-aim']['api_pass'];
-      $this->API_Signature = $settings['gateways']['authorizenet-aim']['api_sig'];
+      $this->API_Password = isset($settings['gateways']['authorizenet-aim']['api_pass']) ? $settings['gateways']['authorizenet-aim']['api_pass'] : '';
+      $this->API_Signature = isset($settings['gateways']['authorizenet-aim']['api_sig']) ? $settings['gateways']['authorizenet-aim']['api_sig'] : '';
       $this->currencyCode = isset($settings['gateways']['authorizenet-aim']['currency']) ? $settings['gateways']['authorizenet-aim']['currency'] : 'USD';
-      $this->locale = $settings['gateways']['authorizenet-aim']['locale'];
+      $this->locale = isset($settings['gateways']['authorizenet-aim']['locale']) ? $settings['gateways']['authorizenet-aim']['locale'] : '';
       //set api urls
 			if (!empty($settings['gateways']['authorizenet-aim']['custom_api']))	{
         $this->API_Endpoint = esc_url_raw($settings['gateways']['authorizenet-aim']['custom_api']);
@@ -658,7 +658,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    *
    * Don't forget to return!
    */
-  function order_confirmation_email($msg) {
+  function order_confirmation_email($msg, $order = null) {
     return $msg;
   }
   

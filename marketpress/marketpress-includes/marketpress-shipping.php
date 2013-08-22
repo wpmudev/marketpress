@@ -186,10 +186,6 @@ if (!class_exists('MP_Shipping_API')) {
     }
 
     //DO NOT override the construct! instead use the on_creation() method.
-  	function MP_Shipping_API() {
-  		$this->__construct();
-  	}
-
     function __construct() {
       global $mp;
 

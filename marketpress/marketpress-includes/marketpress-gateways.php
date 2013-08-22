@@ -184,10 +184,6 @@ if(!class_exists('MP_Gateway_API')) {
     }
     
     //DO NOT override the construct! instead use the on_creation() method.
-  	function MP_Gateway_API() {
-  		$this->__construct();
-  	}
-
     function __construct() {
     
       $this->_generate_ipn_url();

@@ -5,10 +5,6 @@ MarketPress Shortcode Support
 
 class MarketPress_Shortcodes {
 
-	function MarketPress_Shortcodes() {
-		$this->__construct();
-	}
-
   function __construct() {
 
     //register our shortcodes

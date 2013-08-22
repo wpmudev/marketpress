@@ -9,10 +9,6 @@ class MarketPress_MS {
   var $tag_template;
   var $category_template;
   
-	function MarketPress_MS() {
-		$this->__construct();
-	}
-	
   function __construct() {
     global $mp;
     

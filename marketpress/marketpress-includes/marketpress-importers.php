@@ -10,10 +10,6 @@ class MarketPress_Importer {
   var $importer_name = '';
 	var $results;
   
-	function MarketPress_Importer() {
-		$this->__construct();
-	}
-	
   function __construct() {
     global $mp;
 		
