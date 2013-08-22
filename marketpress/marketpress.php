@@ -592,14 +592,16 @@ Thanks again!", 'mp')
     $page = add_submenu_page('edit.php?post_type=product', __('Store Settings', 'mp'), __('Store Settings', 'mp'), 'manage_options', 'marketpress', array(&$this, 'admin_page'));
     add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
     add_action( 'admin_print_styles-' . $page, array(&$this, 'admin_css_settings') );
-
-		add_action( "load-{$page}", array( &$this, 'add_help_tab' ) );
+		
+		if ( !defined('WPMUDEV_REMOVE_BRANDING') ) {
+			add_action( "load-{$page}", array( &$this, 'add_help_tab' ) );
+		}
   }
 
   function add_help_tab() {
 		get_current_screen()->add_help_tab( array(
 			'id' => 'marketpress-help',
-			'title' => 'MarketPress Instructions',
+			'title' => __('MarketPress Instructions', 'mp'),
 			'content' => '<iframe src="http://premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="600px"></iframe>'
 		) );
   }
@@ -630,7 +632,7 @@ Thanks again!", 'mp')
     if ($this->language != 'en')
       wp_enqueue_script( 'jquery-datepicker-i18n', $this->plugin_url . 'datepicker/js/jquery-ui-i18n.min.js', array('jquery', 'jquery-ui-core', 'jquery-datepicker'), $this->version);
 
-		if (intval($this->get_setting('hide_popup')) < 3) {
+		if (!defined('WPMUDEV_REMOVE_BRANDING') && intval($this->get_setting('hide_popup')) < 3) {
 			wp_enqueue_script( 'mp-need-help', $this->plugin_url . 'js/need-help.js', array('jquery'), $this->version);
 			$new_count = intval($this->get_setting('hide_popup')) + 1;
 			$this->update_setting('hide_popup', $new_count);

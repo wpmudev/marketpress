@@ -7,6 +7,7 @@ Change Log:
 
 - Removed all the old style PHP 4 constructors (Class name functions)
 - Add multiple currency support to Payflow Pro gateway
+- Remove help screen when WPMUDEV_REMOVE_BRANDING defined
 - Fixed order_confirmation_email() declaration to match it's parent.(Warnings)
 - In USPS shipping added maximum box weights to flat rate boxes to improve calculating the number of boxes needed.
 
