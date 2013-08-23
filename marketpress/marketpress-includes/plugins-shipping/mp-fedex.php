@@ -120,12 +120,16 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$content += '<input type="hidden" name="residential" value="1" />';
 		} else {
 		ob_start();
+		
+		if(isset($_SESSION['mp_shipping_info']['residential']) $checked = $_SESSION['mp_shipping_info']['residential'];
+		else $checked = true; //default to checked
+		
 		?>
 		<tr>
 			<td><?php esc_html_e('Residential Delivery', 'mp'); ?></td>
 			<td>
 				<input type="hidden" name="residential" value="0" />
-				<input id="mp_residential" type="checkbox" name="residential" value="1" <?php checked($_SESSION['mp_shipping_info']['residential']); ?> />
+				<input id="mp_residential" type="checkbox" name="residential" value="1" <?php checked($checked); ?> />
 				<small><em><?php esc_html_e('Check if delivery is to a residence.', 'mp'); ?></em></small>
 			</td>
 		</tr>
@@ -305,7 +309,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 						<tr>
 							<th scope="row">
 								<?php _e('FedEx Allow Commercial Delivery', 'mp') ?>
-								<span class="description"><?php _e('<br />When checked the customer can chose Residential or Commercial delivery. Otherwise it\'s always Residential.', 'mp'); ?></span>
+								<span class="description"><?php _e('<br />When checked the customer can chose Residential or Commercial delivery with Residential the default. Unchecked it\'s only Residential rates.', 'mp'); ?></span>
 							</th>
 							<td>
 								<label>
