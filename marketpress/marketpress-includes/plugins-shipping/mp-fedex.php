@@ -116,25 +116,23 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function extra_shipping_field($content) {
 		
-		if( empty($this->fedex_settings['commercial']) ) { //force residential
-			$content += '<input type="hidden" name="residential" value="1" />';
+		if ( empty($this->fedex_settings['commercial']) ) { //force residential
+			$content .= '<input type="hidden" name="residential" value="1" />';
 		} else {
-		ob_start();
-		
-		if(isset($_SESSION['mp_shipping_info']['residential']) $checked = $_SESSION['mp_shipping_info']['residential'];
-		else $checked = true; //default to checked
-		
-		?>
-		<tr>
-			<td><?php esc_html_e('Residential Delivery', 'mp'); ?></td>
-			<td>
-				<input type="hidden" name="residential" value="0" />
-				<input id="mp_residential" type="checkbox" name="residential" value="1" <?php checked($checked); ?> />
-				<small><em><?php esc_html_e('Check if delivery is to a residence.', 'mp'); ?></em></small>
-			</td>
-		</tr>
-		<?php
-		$content .= ob_get_clean();
+			
+			if ( isset($_SESSION['mp_shipping_info']['residential']) )
+				$checked = $_SESSION['mp_shipping_info']['residential'];
+			else
+				$checked = true; //default to checked
+			
+			$content .= '<tr>
+				<td>' . __('Residential Delivery', 'mp') . '</td>
+				<td>
+					<input type="hidden" name="residential" value="0" />
+					<input id="mp_residential" type="checkbox" name="residential" value="1" ' . checked($checked, true, false) .' />
+					<small><em>' . __('Check if delivery is to a residence.', 'mp') . '</em></small>
+				</td>
+			</tr>';
 		}
 		return $content;
 	}
