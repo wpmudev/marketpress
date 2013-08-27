@@ -94,6 +94,9 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		'Priority Mail Small Flat Rate Box' =>
 		array('classid' => 28, 'name' => __('Priority Mail Small Flat Rate Box', 'mp'), 'delivery' => __('(2-4 days)','mp'), 'max_weight' => 3),
 
+		'Padded Flat Rate Envelope' =>
+		array('classid' => 29, 'name' => __('Priority Mail Padded Flat Rate Envelope', 'mp'), 'delivery' => __('(2-4 days)','mp'), 'max_weight' => 2),
+
 		'First-Class Mail Parcel' =>
 		array('classid' => 0, 'name' => __('First-Class Mail Parcel', 'mp'), 'delivery' => __('(2-4 days)','mp')),
 
