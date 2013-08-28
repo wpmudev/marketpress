@@ -1,28 +1,28 @@
 <?php
 /*
   MarketPress PIN Gateway (www.pin.net.au) Plugin
-  Author: Marko Miljus (Incsub)
+  Author: Marko Miljus
  */
 
 class MP_Gateway_PIN extends MP_Gateway_API {
 
-    //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
+//private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
     var $plugin_name = 'PIN';
-    //name of your gateway, for the admin side.
+//name of your gateway, for the admin side.
     var $admin_name = '';
-    //public name of your gateway, for lists and such.
+//public name of your gateway, for lists and such.
     var $public_name = '';
-    //url for an image for your checkout method. Displayed on checkout form if set
+//url for an image for your checkout method. Displayed on checkout form if set
     var $method_img_url = '';
-    //url for an submit button image for your checkout method. Displayed on checkout form if set
+//url for an submit button image for your checkout method. Displayed on checkout form if set
     var $method_button_img_url = '';
-    //whether or not ssl is needed for checkout page
+//whether or not ssl is needed for checkout page
     var $force_ssl;
-    //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
+//always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
     var $ipn_url;
-    //whether if this is the only enabled gateway it can skip the payment_form step
+//whether if this is the only enabled gateway it can skip the payment_form step
     var $skip_form = false;
-    //api vars
+//api vars
     var $publishable_key, $private_key, $currency;
 
     /**
@@ -38,10 +38,15 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 
         $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
         $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
-        $this->public_key = $mp->get_setting('gateways->pin->public_key');
-        $this->private_key = $mp->get_setting('gateways->pin->private_key');
-        $this->force_ssl = $mp->get_setting('gateways->pin->is_ssl');
-        $this->currency = $mp->get_setting('gateways->pin->currency', 'AUD');
+
+        if (isset($settings['gateways']['pin']['public_key'])) {
+            $this->public_key = $settings['gateways']['pin']['public_key'];
+            $this->private_key = $settings['gateways']['pin']['private_key'];
+        }
+
+        $this->force_ssl = (bool) ( isset($settings['gateways']['pin']['is_ssl']) && $settings['gateways']['pin']['is_ssl'] );
+        $this->currency = isset($settings['gateways']['pin']['currency']) ? $settings['gateways']['paymill']['currency'] : 'AUD';
+
         add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
     }
 
@@ -50,7 +55,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 
         if (!is_admin() && get_query_var('pagename') == 'cart' && get_query_var('checkoutstep') == 'checkout') {
 
-            if ($mp->get_setting('gateways->pin->is_ssl')) {
+            if (isset($settings['gateways']['pin']['is_ssl']) && $settings['gateways']['pin']['is_ssl']) {
                 wp_enqueue_script('js-pin', 'https://api.pin.net.au/pin.js', array('jquery'));
             } else {
                 wp_enqueue_script('js-pin', 'https://test-api.pin.net.au/pin.js', array('jquery'));
@@ -310,8 +315,8 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                         <td>
                             <span class="description"><?php _e('When in live mode PIN recommends you have an SSL certificate setup for the site where the checkout form will be displayed.', 'mp'); ?> </span><br/>
                             <select name="mp[gateways][pin][is_ssl]">
-                                <option value="1"<?php selected($mp->get_setting('gateways->pin->is_ssl'), 1); ?>><?php _e('Force SSL (Live Site)', 'mp') ?></option>
-                                <option value="0"<?php selected($mp->get_setting('gateways->pin->is_ssl', 0), 0); ?>><?php _e('No SSL (Testing)', 'mp') ?></option>
+                                <option value="1"<?php selected($settings['gateways']['pin']['is_ssl'], 1); ?>><?php _e('Force SSL (Live Site)', 'mp') ?></option>
+                                <option value="0"<?php selected($settings['gateways']['pin']['is_ssl'], 0); ?>><?php _e('No SSL (Testing)', 'mp') ?></option>
                             </select>
                         </td>
                     </tr>
@@ -320,10 +325,10 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                         <td>
                             <span class="description"><?php _e('You must login to PIN to <a target="_blank" href="https://dashboard.pin.net.au/account">get your API credentials</a>. You can enter your test keys, then live ones when ready.', 'mp') ?></span>
                             <p><label><?php _e('Secret API Key', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr($mp->get_setting('gateways->pin->private_key')); ?>" size="70" name="mp[gateways][pin][private_key]" type="text" />
+                                    <input value="<?php echo esc_attr($settings['gateways']['pin']['private_key']); ?>" size="70" name="mp[gateways][pin][private_key]" type="text" />
                                 </label></p>
                             <p><label><?php _e('Publishable API Key', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr($mp->get_setting('gateways->pin->public_key')); ?>" size="70" name="mp[gateways][pin][public_key]" type="text" />
+                                    <input value="<?php echo esc_attr($settings['gateways']['pin']['public_key']); ?>" size="70" name="mp[gateways][pin][public_key]" type="text" />
                                 </label></p>
                         </td>
                     </tr>
@@ -333,7 +338,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                             <span class="description"><?php _e('Selecting a currency other than currency supported by PIN may cause problems at checkout.', 'mp'); ?></span><br />
                             <select name="mp[gateways][pin][currency]">
                                 <?php
-                                $sel_currency = $mp->get_setting('gateways->pin->currency', $settings['currency']);
+                                $sel_currency = isset($settings['gateways']['pin']['currency']) ? $settings['gateways']['pin']['currency'] : $settings['currency'];
                                 $currencies = array(
                                     "AUD" => 'AUD',
                                     "USD" => 'USD'
@@ -380,13 +385,14 @@ class MP_Gateway_PIN extends MP_Gateway_API {
             return false;
         }
 
-        if ($this->force_ssl) {
+        if (isset($settings['gateways']['pin']['is_ssl']) && $settings['gateways']['pin']['is_ssl']) {
+
             define('PIN_API_CHARGE_URL', 'https://api.pin.net.au/1/charges');
         } else {
             define('PIN_API_CHARGE_URL', 'https://test-api.pin.net.au/1/charges');
         }
 
-        define('PIN_API_KEY', $this->private_key);
+        define('PIN_API_KEY', $settings['gateways']['pin']['private_key']);
 
         $token = $_SESSION['card_token'];
 
@@ -428,7 +434,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                     'compress' => true,
                     'headers' => array('Authorization' => 'Basic ' . base64_encode(PIN_API_KEY . ':' . '')),
                     'body' => array(
-                        'amount' => $total * 100,
+                        'amount' => (int)($total * 100),
                         'currency' => strtolower($this->currency),
                         'description' => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']),
                         'email' => $_SESSION['mp_shipping_info']['email'],
