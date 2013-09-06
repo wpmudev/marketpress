@@ -42,12 +42,12 @@ jQuery(document).ready(function($) {
   });
   
   function mp_refresh_shipping() {
-    $("#mp_shipping_submit").attr('disabled', 'disabled');
+   	$("#mp_shipping_submit").hide();
     $("#mp-shipping-select-holder").html('<img src="'+MP_Ajax.imgUrl+'" alt="Loading..." />');
     var serializedForm = $('form#mp_shipping_form').serialize();
     $.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
       $("#mp-shipping-select-holder").html(data);
+    	$("#mp_shipping_submit").show();
     });
-    $("#mp_shipping_submit").removeAttr('disabled');
   }
 });
