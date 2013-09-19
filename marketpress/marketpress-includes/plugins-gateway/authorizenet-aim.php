@@ -77,7 +77,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function payment_form($cart, $shipping_info) {
-    global $mp;
+    global $mp, $current_user;
     $content = '';
     
     if (isset($_GET['cancel'])) {

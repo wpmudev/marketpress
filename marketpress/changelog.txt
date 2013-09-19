@@ -4,7 +4,8 @@ Author: Aaron Edwards (incsub)
 Change Log: 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
-- Changed Continue Checkout buttonform disabled to hide during the shipping rate update.
+
+
 
 2.8.9 - 8/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
@@ -15,8 +16,11 @@ Change Log:
 - Remove help screen when WPMUDEV_REMOVE_BRANDING defined
 - Fixed order_confirmation_email() declaration to match it's parent.(Warnings)
 - In USPS shipping added maximum box weights to flat rate boxes to improve calculating the number of boxes needed.
-- Fixed problem where shipping option could be unselected if the suboption disappeared due to changin the address.
+- Fixed problem where shipping option could be unselected if the suboption disappeared due to changing the address.
 - In FedEx, default to residential delivery. Only allow the customer to change residential to commercial if Allow Commercial checked in settings.
+- Changed Continue Checkout buttonform disabled to hide during the shipping rate update.
+- Add Euro support to Stripe gateway (Ireland)
+- Fix admin styles that stopped being included due to a typo
 
 2.8.8 - 7/15/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
