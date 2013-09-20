@@ -966,13 +966,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
 				if (false === strpos($coupon['discount'], '%'))
 					$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $coupon['discount']) . ' ' . $this->currencyCode;
-					
+				
+				$coupon_total = ($coupon['new_total'] <= 0) ? '0.01' : $coupon['new_total'];//if coupon makes it 0 then change to 1 cent to avoid errors
+				
 				$request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $discount));
-				$request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon['new_total']-$total);
+				$request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon_total-$total);
 				$request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($mp->get_coupon_code());
 				$request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
 				
-				$total = $coupon['new_total'];
+				$total = $coupon_total;
       }
 
       $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
@@ -1114,7 +1116,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $args['body'] = $query_string;
 	  $args['sslverify'] = false;
 	  $args['timeout'] = 60;
-
+		
+		//allow easy debugging
+		if ( defined('MP_DEBUG_API') ) {
+			var_dump( $this->deformatNVP($query_string) );
+			die;
+		}
+		
 	  //use built in WP http class to work with most server setups
 	  $response = wp_remote_post($this->API_Endpoint, $args);
 	  if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
