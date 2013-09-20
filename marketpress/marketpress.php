@@ -170,6 +170,7 @@ class MarketPress {
       'base_country' => 'US',
       'tax' => array (
         'rate' => 0,
+				'label' => __('Taxes', 'mp'),
         'tax_shipping' => 1,
         'tax_inclusive' => 0,
 				'tax_digital' => 1,
@@ -4211,8 +4212,8 @@ Thanks again!", 'mp')
 		}
     //tax line
     if ( $order->mp_tax_total ) {
-      $order_info .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
-			$order_info_sku .= "\n" . __('Taxes:', 'mp') . ' ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
+      $order_info .= "\n" . esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))) . ': ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
+			$order_info_sku .= "\n" . esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))) . ': ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
     }
     //total line
     $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
@@ -4884,7 +4885,7 @@ Notification Preferences: %s', 'mp');
 
         <?php //tax line
         if ( $order->mp_tax_total ) { ?>
-        <h3><?php _e('Taxes:', 'mp'); ?></h3>
+        <h3><?php echo esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))); ?>:</h3>
         <p><?php echo $this->format_currency('', $order->mp_tax_total); ?></p>
         <?php } ?>
 
@@ -5661,6 +5662,13 @@ Notification Preferences: %s', 'mp');
                   break;
               }
               ?>
+								<tr>
+								<th scope="row"><?php _e('Tax Label', 'mp') ?></th>
+								<td>
+								<input value="<?php echo esc_attr($this->get_setting('tax->label', __('Taxes', 'mp'))); ?>" size="10" name="mp[tax][label]" type="text" />
+								<br /><span class="description"><?php _e('The label shown for the tax line item in the cart. Taxes, VAT, GST, etc.', 'mp') ?></span>
+								</td>
+								</tr>
                 <tr>
         				<th scope="row"><?php _e('Apply Tax To Shipping Fees?', 'mp') ?></th>
                 <td>

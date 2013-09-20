@@ -252,11 +252,14 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         //coupon line TODO - figure out how to apply them on global checkout
         $coupon_code = $mp->get_coupon_code();
         if ($coupon = $mp->coupon_value($coupon_code, $total)) {
-            $content .= '<tr>';
-            $content .= '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
-            $content .= '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
-            $content .= '  <td>&nbsp;</td>';
-            $content .= '</tr>';
+            //dont' show confusing subtotal with tax inclusive pricing on
+            if (!$mp->get_setting('tax->tax_inclusive')) {
+                $content .= '<tr>';
+                $content .= '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
+                $content .= '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
+                $content .= '  <td>&nbsp;</td>';
+                $content .= '</tr>';
+            }
             $content .= '<tr>';
             $content .= '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Discount:', 'mp') . '</td>';
             $content .= '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
@@ -294,7 +297,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         //tax line
         if ($tax_price = array_sum($tax_prices)) {
             $content .= '<tr>';
-            $content .= '  <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Taxes:', 'mp') . '</td>';
+            $content .= '  <td class="mp_cart_subtotal_lbl" colspan="2">' . esc_html($mp->get_setting('tax->label', __('Taxes', 'mp'))) . ':</td>';
             $content .= '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
             $content .= '  <td>&nbsp;</td>';
             $content .= '</tr>';
@@ -375,10 +378,14 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         //coupon line TODO - figure out how to apply them on global checkout
         $coupon_code = $mp->get_coupon_code();
         if ($coupon = $mp->coupon_value($coupon_code, $total)) {
-            $content .= '<tr>';
-            $content .= '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-            $content .= '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
-            $content .= '</tr>';
+            
+            //dont' show confusing subtotal with tax inclusive pricing on
+            if (!$mp->get_setting('tax->tax_inclusive')) {
+                $content .= '<tr>';
+                $content .= '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
+                $content .= '  <td class="mp_cart_col_subtotal">' . $mp->format_currency('', $total) . '</td>';
+                $content .= '</tr>';
+            }
             $content .= '<tr>';
             $content .= '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Discount:', 'mp') . '</td>';
             $content .= '  <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
@@ -403,7 +410,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         //tax line
         if ($tax_price = array_sum($tax_prices)) {
             $content .= '<tr>';
-            $content .= '  <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Taxes:', 'mp') . '</td>';
+            $content .= '  <td class="mp_cart_subtotal_lbl" colspan="3">' . esc_html($mp->get_setting('tax->label', __('Taxes', 'mp'))) . ':</td>';
             $content .= '  <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
             $content .= '</tr>';
             $total = $total + $tax_price;
@@ -1021,7 +1028,7 @@ function mp_order_status() {
                 //tax line
                 if ($order->mp_tax_total) {
                     ?>
-                    <li><?php _e('Taxes:', 'mp'); ?> <strong><?php echo $mp->format_currency('', $order->mp_tax_total); ?></strong></li>
+                    <li><?php echo esc_html($mp->get_setting('tax->label', __('Taxes', 'mp'))); ?>: <strong><?php echo $mp->format_currency('', $order->mp_tax_total); ?></strong></li>
                 <?php } ?>
 
                 <li><?php _e('Order Total:', 'mp'); ?> <strong><?php echo $mp->format_currency('', $order->mp_order_total); ?></strong></li>
