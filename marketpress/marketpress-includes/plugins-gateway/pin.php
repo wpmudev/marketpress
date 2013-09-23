@@ -336,6 +336,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                                 $sel_currency = $mp->get_setting('gateways->pin->currency', $settings['currency']);
                                 $currencies = array(
                                     "AUD" => 'AUD',
+                                    "NZD" => 'NZD',
                                     "USD" => 'USD'
                                 );
 
