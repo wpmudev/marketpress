@@ -596,6 +596,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
               'MX'	=> 'Mexico',
               'NL'	=> 'Netherlands',
               'NZ'	=> 'New Zealand',
+							'PL'	=> 'Poland',
+							'RU'	=> 'Russia',
               'SG'	=> 'Singapore',
               'ES'	=> 'Spain',
               'SE'	=> 'Sweden',
@@ -637,6 +639,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	              'NZD' => 'NZD - New Zealand Dollar',
 	              'PHP' => 'PHP - Philippine Pesos',
 	              'PLN' => 'PLN - Polish Zloty',
+								'RUB' => 'RUB - Russian Rubles',
 	              'SEK' => 'SEK - Swedish Krona',
 	              'SGD' => 'SGD - Singapore Dollar',
 	              'TWD' => 'TWD - Taiwan New Dollars',
@@ -1247,30 +1250,34 @@ function psts_pe_network_gateway_settings_box($settings) {
           <?php
           $sel_locale = ($settings['gateways']['paypal-express']['locale']) ? $settings['gateways']['paypal-express']['locale'] : $mp->get_setting('base_country', 'US');
           $locales = array(
-            'AU'	=> 'Australia',
-            'AT'	=> 'Austria',
-            'BE'	=> 'Belgium',
-            'CA'	=> 'Canada',
-            'CN'	=> 'China',
-            'FI'	=> 'Finland',
-            'FR'	=> 'France',
-            'DE'	=> 'Germany',
-            'HK'	=> 'Hong Kong',
-            'IE'	=> 'Ireland',
-            'IL'	=> 'Israel',
-            'IT'	=> 'Italy',
-            'MX'	=> 'Mexico',
-            'NL'	=> 'Netherlands',
-            'NZ'	=> 'New Zealand',
-            'PL'	=> 'Poland',
-            'SG'	=> 'Singapore',
-            'ES'	=> 'Spain',
-            'SE'	=> 'Sweden',
-            'CH'	=> 'Switzerland',
-            'GB'	=> 'United Kingdom',
-            'US'	=> 'United States'
-          );
-
+						'AR'	=> 'Argentina',
+						'AU'	=> 'Australia',
+						'AT'	=> 'Austria',
+						'BE'	=> 'Belgium',
+						'BR'	=> 'Brazil',
+						'CA'	=> 'Canada',
+						'CN'	=> 'China',
+						'FI'	=> 'Finland',
+						'FR'	=> 'France',
+						'DE'	=> 'Germany',
+						'HK'	=> 'Hong Kong',
+						'IL'	=> 'Israel',
+						'IT'	=> 'Italy',
+						'JP'	=> 'Japan',
+						'MX'	=> 'Mexico',
+						'NL'	=> 'Netherlands',
+						'NZ'	=> 'New Zealand',
+						'PL'	=> 'Poland',
+						'RU'	=> 'Russia',
+						'SG'	=> 'Singapore',
+						'ES'	=> 'Spain',
+						'SE'	=> 'Sweden',
+						'CH'	=> 'Switzerland',
+						'TR' 	=> 'Turkey',
+						'GB'	=> 'United Kingdom',
+						'US'	=> 'United States'
+					);
+					
           foreach ($locales as $k => $v) {
               echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
           }
@@ -1285,30 +1292,32 @@ function psts_pe_network_gateway_settings_box($settings) {
           <?php
           $sel_currency = ($settings['gateways']['paypal-express']['currency']) ? $settings['gateways']['paypal-express']['currency'] : $mp->get_setting('currency');
 	        $currencies = array(
-              'AUD' => 'AUD - Australian Dollar',
-              'BRL' => 'BRL - Brazilian Real',
-              'CAD' => 'CAD - Canadian Dollar',
-              'CHF' => 'CHF - Swiss Franc',
-              'CZK' => 'CZK - Czech Koruna',
-              'DKK' => 'DKK - Danish Krone',
-              'EUR' => 'EUR - Euro',
-              'GBP' => 'GBP - Pound Sterling',
-              'ILS' => 'ILS - Israeli Shekel',
-              'HKD' => 'HKD - Hong Kong Dollar',
-              'HUF' => 'HUF - Hungarian Forint',
-              'JPY' => 'JPY - Japanese Yen',
-              'MYR' => 'MYR - Malaysian Ringgits',
-              'MXN' => 'MXN - Mexican Peso',
-              'NOK' => 'NOK - Norwegian Krone',
-              'NZD' => 'NZD - New Zealand Dollar',
-              'PHP' => 'PHP - Philippine Pesos',
-              'PLN' => 'PLN - Polish Zloty',
-              'SEK' => 'SEK - Swedish Krona',
-              'SGD' => 'SGD - Singapore Dollar',
-              'TWD' => 'TWD - Taiwan New Dollars',
-              'THB' => 'THB - Thai Baht',
-              'USD' => 'USD - U.S. Dollar'
-          );
+	              'AUD' => 'AUD - Australian Dollar',
+	              'BRL' => 'BRL - Brazilian Real',
+	              'CAD' => 'CAD - Canadian Dollar',
+	              'CHF' => 'CHF - Swiss Franc',
+	              'CZK' => 'CZK - Czech Koruna',
+	              'DKK' => 'DKK - Danish Krone',
+	              'EUR' => 'EUR - Euro',
+	              'GBP' => 'GBP - Pound Sterling',
+	              'ILS' => 'ILS - Israeli Shekel',
+	              'HKD' => 'HKD - Hong Kong Dollar',
+	              'HUF' => 'HUF - Hungarian Forint',
+	              'JPY' => 'JPY - Japanese Yen',
+	              'MYR' => 'MYR - Malaysian Ringgits',
+	              'MXN' => 'MXN - Mexican Peso',
+	              'NOK' => 'NOK - Norwegian Krone',
+	              'NZD' => 'NZD - New Zealand Dollar',
+	              'PHP' => 'PHP - Philippine Pesos',
+	              'PLN' => 'PLN - Polish Zloty',
+								'RUB' => 'RUB - Russian Rubles',
+	              'SEK' => 'SEK - Swedish Krona',
+	              'SGD' => 'SGD - Singapore Dollar',
+	              'TWD' => 'TWD - Taiwan New Dollars',
+	              'THB' => 'THB - Thai Baht',
+								'TRY' => 'TRY - Turkish lira',
+	              'USD' => 'USD - U.S. Dollar'
+	          );
 
           foreach ($currencies as $k => $v) {
               echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";

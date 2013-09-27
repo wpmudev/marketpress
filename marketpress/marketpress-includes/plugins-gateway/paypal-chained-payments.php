@@ -334,31 +334,32 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
           <?php
           $sel_currency = ($settings['gateways']['paypal-chained']['currency']) ? $settings['gateways']['paypal-chained']['currency'] : $settings['currency'];
           $currencies = array(
-              'AUD' => 'AUD - Australian Dollar',
-              'BRL' => 'BRL - Brazilian Real',
-              'CAD' => 'CAD - Canadian Dollar',
-              'CHF' => 'CHF - Swiss Franc',
-              'CZK' => 'CZK - Czech Koruna',
-              'DKK' => 'DKK - Danish Krone',
-              'EUR' => 'EUR - Euro',
-              'GBP' => 'GBP - Pound Sterling',
-              'ILS' => 'ILS - Israeli Shekel',
-              'HKD' => 'HKD - Hong Kong Dollar',
-              'HUF' => 'HUF - Hungarian Forint',
-              'JPY' => 'JPY - Japanese Yen',
-              'MYR' => 'MYR - Malaysian Ringgits',
-              'MXN' => 'MXN - Mexican Peso',
-              'NOK' => 'NOK - Norwegian Krone',
-              'NZD' => 'NZD - New Zealand Dollar',
-              'PHP' => 'PHP - Philippine Pesos',
-              'PLN' => 'PLN - Polish Zloty',
-              'SEK' => 'SEK - Swedish Krona',
-              'SGD' => 'SGD - Singapore Dollar',
-              'TWD' => 'TWD - Taiwan New Dollars',
-              'THB' => 'THB - Thai Baht',
-							'TRY' => 'TRY - Turkish lira',
-              'USD' => 'USD - U.S. Dollar'
-          );
+	              'AUD' => 'AUD - Australian Dollar',
+	              'BRL' => 'BRL - Brazilian Real',
+	              'CAD' => 'CAD - Canadian Dollar',
+	              'CHF' => 'CHF - Swiss Franc',
+	              'CZK' => 'CZK - Czech Koruna',
+	              'DKK' => 'DKK - Danish Krone',
+	              'EUR' => 'EUR - Euro',
+	              'GBP' => 'GBP - Pound Sterling',
+	              'ILS' => 'ILS - Israeli Shekel',
+	              'HKD' => 'HKD - Hong Kong Dollar',
+	              'HUF' => 'HUF - Hungarian Forint',
+	              'JPY' => 'JPY - Japanese Yen',
+	              'MYR' => 'MYR - Malaysian Ringgits',
+	              'MXN' => 'MXN - Mexican Peso',
+	              'NOK' => 'NOK - Norwegian Krone',
+	              'NZD' => 'NZD - New Zealand Dollar',
+	              'PHP' => 'PHP - Philippine Pesos',
+	              'PLN' => 'PLN - Polish Zloty',
+								'RUB' => 'RUB - Russian Rubles',
+	              'SEK' => 'SEK - Swedish Krona',
+	              'SGD' => 'SGD - Singapore Dollar',
+	              'TWD' => 'TWD - Taiwan New Dollars',
+	              'THB' => 'THB - Thai Baht',
+								'TRY' => 'TRY - Turkish lira',
+	              'USD' => 'USD - U.S. Dollar'
+	          );
 
           foreach ($currencies as $k => $v) {
               echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
