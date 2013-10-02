@@ -376,7 +376,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 	          );
 
 	          foreach ($currencies as $k => $v) {
-	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
 	          }
 	          ?>
 	          </select>
@@ -408,7 +408,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 	          );
 
 	          foreach ($languages as $k => $v) {
-	              echo '		<option value="' . $k . '"' . ($k == $sel_language ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	              echo '		<option value="' . $k . '"' . ($k == $sel_language ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
 	          }
 	          ?>
 	          </select>

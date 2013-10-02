@@ -362,7 +362,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	          );
 
           foreach ($currencies as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
           }
           ?>
           </select>
@@ -751,7 +751,7 @@ if ( is_multisite() ) {
 		<?php
 		//skip if not enabled
 		$hide = false;
-    if (($settings['allowed_gateways']['paypal-chained'] != 'full' && $settings['allowed_gateways']['paypal-chained'] != 'supporter' && $settings['global_gateway'] != 'paypal-chained') || $mp->global_cart)
+    if (($settings['allowed_gateways']['paypal-chained'] != 'full' && $settings['allowed_gateways']['paypal-chained'] != 'supporter' && $settings['global_gateway'] != 'paypal-chained') || $settings['global_cart'])
       $hide = true;
 
     if (!isset($settings['gateways']['paypal-chained']['msg']))

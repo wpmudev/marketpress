@@ -7,6 +7,7 @@ Change Log:
 
 - Added Russian Rubles to paypal currencies and locale
 - Fix php warnings when switching between non-calculated shipping modules
+- Fix bug with which gateway is shown when switching global cart in network settings
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------

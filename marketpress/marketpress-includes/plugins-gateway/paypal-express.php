@@ -608,7 +608,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
             );
 
             foreach ($locales as $k => $v) {
-                echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
+                echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
             }
             ?>
             </select>
@@ -649,7 +649,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	          );
 
 	          foreach ($currencies as $k => $v) {
-	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
 	          }
 	          ?>
 	          </select>
@@ -1186,10 +1186,11 @@ function psts_pe_network_gateway_settings_box($settings) {
     });
 	</script>
 	<?php
-  if (!$mp->global_cart || $settings['global_gateway'] != 'paypal-express')
-    return;
+	$hide = false;
+  if (!$settings['global_cart'] || $settings['global_gateway'] != 'paypal-express')
+    $hide = true;
   ?>
-  <div id="mp_paypal_express" class="postbox">
+  <div id="mp_paypal_express" class="postbox"<?php echo ($hide) ? ' style="display:none;"' : ''; ?>>
     <script type="text/javascript">
   	  jQuery(document).ready(function ($) {
     		$('#mp-hdr-bdr').ColorPicker({
@@ -1279,7 +1280,7 @@ function psts_pe_network_gateway_settings_box($settings) {
 					);
 					
           foreach ($locales as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
+              echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
           }
           ?>
           </select>
@@ -1320,7 +1321,7 @@ function psts_pe_network_gateway_settings_box($settings) {
 	          );
 
           foreach ($currencies as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
+              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
           }
           ?>
           </select>

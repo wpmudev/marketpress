@@ -322,7 +322,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 	              'USD' => 'USD - U.S. Dollar'
 	          );
 	          foreach ($currencies as $k => $v) {
-	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
 	          }
 	          ?>
 	          </select>

@@ -291,7 +291,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 									"live" => 'Live'
 								);
 								foreach ($server_types as $k => $v) {
-								  echo '<option value="' . $k . '"' . ($k == $settings['gateways']['google-checkout']['server_type'] ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+								  echo '<option value="' . $k . '"' . ($k == $settings['gateways']['google-checkout']['server_type'] ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
 								}
 								?>
 			          </select>
@@ -338,7 +338,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 	          );
 
 	          foreach ($currencies as $k => $v) {
-	              echo '<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	              echo '<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
 	          }
 	          ?>
 	          </select>
