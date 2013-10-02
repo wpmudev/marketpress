@@ -180,7 +180,10 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 			if (!is_array($value))
 				$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));
 		}
-		array_walk_recursive($settings['shipping']['flat-rate'], 'sanitize_rates');
+		
+		if (is_array($settings['shipping']['flat-rate']))
+			array_walk_recursive($settings['shipping']['flat-rate'], 'sanitize_rates');
+			
 		return $settings;
   }
 

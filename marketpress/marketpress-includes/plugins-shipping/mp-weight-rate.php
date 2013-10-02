@@ -229,7 +229,10 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
 					$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));
 			}
 		}
-		array_walk_recursive($settings['shipping']['weight-rate'], 'sanitize_rates');
+		
+		if (is_array($settings['shipping']['weight-rate']))
+			array_walk_recursive($settings['shipping']['weight-rate'], 'sanitize_rates');
+			
 		return $settings;
   }
 

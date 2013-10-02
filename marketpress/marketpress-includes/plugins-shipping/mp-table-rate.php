@@ -211,7 +211,10 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			if (!is_array($value) && $key != 'rowcount')
 				$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));
 		}
-		array_walk_recursive($settings['shipping']['table-rate'], 'sanitize_rates');
+		
+		if (is_array($settings['shipping']['table-rate']))
+			array_walk_recursive($settings['shipping']['table-rate'], 'sanitize_rates');
+			
 		return $settings;
 	}
 	
