@@ -608,7 +608,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
             );
 
             foreach ($locales as $k => $v) {
-                echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+                echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
             }
             ?>
             </select>
@@ -649,7 +649,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	          );
 
 	          foreach ($currencies as $k => $v) {
-	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
 	          }
 	          ?>
 	          </select>
@@ -1279,7 +1279,7 @@ function psts_pe_network_gateway_settings_box($settings) {
 					);
 					
           foreach ($locales as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+              echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
           }
           ?>
           </select>
@@ -1320,7 +1320,7 @@ function psts_pe_network_gateway_settings_box($settings) {
 	          );
 
           foreach ($currencies as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . wp_specialchars($v, true) . '</option>' . "\n";
+              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v, true) . '</option>' . "\n";
           }
           ?>
           </select>

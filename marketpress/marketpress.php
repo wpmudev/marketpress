@@ -5582,7 +5582,7 @@ Notification Preferences: %s', 'mp');
                 case 'US':
                   ?>
                   <tr>
-          				<th scope="row"><?php echo sprintf(__('%s Tax Rate', 'mp'), esc_attr($this->usa_states[$this->get_setting('base_province')])); ?></th>
+          				<th scope="row"><?php echo sprintf(__('%s Tax Rate', 'mp'), esc_attr($this->usa_states[$this->get_setting('base_province', 'CA')])); ?></th>
           				<td>
                   <input value="<?php echo $this->get_setting('tax->rate') * 100; ?>" size="3" name="mp[tax][rate]" type="text" style="text-align:right;" />%
             			</td>
