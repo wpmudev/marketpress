@@ -558,6 +558,13 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 		}
 
+		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
+		if($this->weight == 0){ //Nothing to ship
+			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
+			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
+			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
+		}
+
 		// Got our totals  make sure we're in decimal pounds.
 		$this->weight = $this->as_pounds($this->weight);
 		$this->pkg_max = $this->as_pounds($this->pkg_max);
@@ -595,43 +602,36 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//Assume equal size packages. Find the best matching box size
 		$diff = floatval($this->usps_settings['max_weight']);
 		$found = -1;
+		$largest = -1.0;
+
 		//See if it fits in one box
 		foreach($this->usps_settings['boxes']['weight'] as $key => $weight) {
-			if ($this->weight <= $weight) {
-				if(($weight - $this->weight) < $diff){
-					$diff = $weight - $this->weight;
-					$found = $key;
-				}
+			//			//Find largest
+			if( $weight > $largest) {
+				$largest = $weight;
+				$found = $key;
+			}
+			//If weight less
+			if( floatval($this->weight) <= floatval($weight) ) {
+				$found = $key;
+				break;
 			}
 		}
 		
-		if($found == -1){
-			foreach($this->usps_settings['boxes']['weight'] as $key => $weight) {
-				if($weight > 0){
-					$count = ceil($this->weight / $weight);
-					if($count < $this->pkg_count) {
-						$this->pkg_count = $count;
-						$found = $key;
-					}
-				}
-			}	
+		$allowed_weight = min($this->usps_settings['boxes']['weight'][$found], $this->usps_settings['max_weight']);
+
+		if($allowed_weight >= $this->weight){
+			$this->pkg_count = 1;
+			$this->pkg_weight = $this->weight;
+		} else {
+			$this->pkg_count = ceil($this->weight / $allowed_weight); // Avoid zero
+			$this->pkg_weight = $this->weight / $this->pkg_count;
 		}
 
-		if($found == -1){
-			$this->pkg_dims = array(12,12,12); //not enough info so quess
-			$this->pkg_count = 1;
-		} else {
-			//found our box
-			$this->pkg_dims = explode('x', strtolower($this->usps_settings['boxes']['size'][$found]));
-			
-			foreach($this->pkg_dims as &$dim) $dim = $this->as_inches($dim);
-			
-			sort($this->pkg_dims); //Sort so two lowest values are used for Girth
-			
-			$this->pkg_count = ceil($this->weight / $this->usps_settings['boxes']['weight'][$found]);
-		}
-		
-		$this->pkg_weight = $this->weight / $this->pkg_count;
+		//found our box
+		$this->pkg_dims = explode('x', strtolower($this->usps_settings['boxes']['size'][$found]));
+		foreach($this->pkg_dims as &$dim) $dim = $this->as_inches($dim);
+		sort($this->pkg_dims); //Sort so two lowest values are used for Girth
 
 		// Fixup pounds by converting multiples of 16 ounces to pounds
 		$this->pounds = intval($this->pkg_weight);
@@ -739,7 +739,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		foreach($shipping_options as $service => $option){
 
 			$box_count = $this->pkg_count;
-			
+
 			//Check for flat rate boxes
 			if( isset($this->services[$service]['max_weight']) ){ //Is it flat rate
 				$max_weight = $this->as_pounds($this->usps_settings['flat_weights'][$service]);
@@ -888,7 +888,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		foreach($shipping_options as $service => $option){
 
 			$box_count = $this->pkg_count;
-			
+
 			//Check for flat rate boxes
 			if( isset($this->intl_services[$service]['max_weight']) ){ //Is it flat rate
 				$max_weight = $this->as_pounds($this->usps_settings['flat_weights'][$service]);

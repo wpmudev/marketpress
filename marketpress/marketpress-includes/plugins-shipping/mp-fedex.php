@@ -6,16 +6,16 @@ MarketPress Example Shipping Plugin Template
 class MP_Shipping_FedEx extends MP_Shipping_API {
 
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
-	var $plugin_name = 'fedex';
+	public $plugin_name = 'fedex';
 
 	//public name of your method, for lists and such.
-	var $public_name = '';
+	public $public_name = '';
 
 	//set to true if you need to use the shipping_metabox() method to add per-product shipping options
-	var $use_metabox = true;
+	public $use_metabox = true;
 
 	//set to true if you want to add per-product weight shipping field
-	var $use_weight = true;
+	public $use_weight = true;
 
 	//set to true if you want to add per-product extra shipping cost field
 	public $use_extra = true;
@@ -23,6 +23,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	public $sandbox_uri = 'https://wsbeta.fedex.com:443/web-services/rate';
 
 	public $production_uri = 'https://ws.fedex.com:443/web-services/rate';
+
 	/**
 	* Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 	*/
@@ -115,25 +116,32 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* Echo a table row with any extra shipping fields you need to add to the shipping checkout form
 	*/
 	function extra_shipping_field($content) {
-		
+
+		$this->residential = true;
 		if ( empty($this->fedex_settings['commercial']) ) { //force residential
 			$content .= '<input type="hidden" name="residential" value="1" />';
+			$_SESSION['mp_shipping_info']['residential'] = true;
 		} else {
-			
-			if ( isset($_SESSION['mp_shipping_info']['residential']) )
+
+			if ( isset($_SESSION['mp_shipping_info']['residential']) ) {
 				$checked = $_SESSION['mp_shipping_info']['residential'];
-			else
+			} else {
 				$checked = true; //default to checked
+				$_SESSION['mp_shipping_info']['residential'] = true;
+			}
+			
+			$this->residential = $checked;
 			
 			$content .= '<tr>
-				<td>' . __('Residential Delivery', 'mp') . '</td>
-				<td>
-					<input type="hidden" name="residential" value="0" />
-					<input id="mp_residential" type="checkbox" name="residential" value="1" ' . checked($checked, true, false) .' />
-					<small><em>' . __('Check if delivery is to a residence.', 'mp') . '</em></small>
-				</td>
+			<td>' . __('Residential Delivery', 'mp') . '</td>
+			<td>
+			<input type="hidden" name="residential" value="0" />
+			<input id="mp_residential" type="checkbox" name="residential" value="1" ' . checked($checked, true, false) .' />
+			<small><em>' . __('Check if delivery is to a residence.', 'mp') . '</em></small>
+			</td>
 			</tr>';
 		}
+
 		return $content;
 	}
 
@@ -142,8 +150,10 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*  and be sure to save it to both the cookie and usermeta if logged in.
 	*/
 	function process_shipping_form() {
-		$_SESSION['mp_shipping_info']['residential'] = $_POST['residential'];
-		$this->residential = $_SESSION['mp_shipping_info']['residential'];
+		if(isset($_POST['residential']) ) {
+			$_SESSION['mp_shipping_info']['residential'] = $_POST['residential'];
+			$this->residential = $_SESSION['mp_shipping_info']['residential'];
+		}
 	}
 
 	/**
@@ -514,6 +524,13 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			}
 		}
 
+		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
+		if($this->weight == 0){ //Nothing to ship
+			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
+			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
+			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
+		}
+
 		// Got our totals  make sure we're in decimal pounds.
 		$this->weight = $this->as_pounds($this->weight);
 
@@ -522,16 +539,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 		$max_weight = floatval($this->ups[max_weight]);
 		$max_weight = ($max_weight > 0) ? $max_weight : 75;
-
-		//Properties should already be converted to weight in decimal pounds and Pounds and Ounces
-		//Figure out how many boxes
-		$this->pkg_count = ceil($this->weight / $max_weight); // Avoid zero
-		// Equal size packages.
-		$this->pkg_weight = $this->weight / $this->pkg_count;
-
-		// Fixup pounds by converting multiples of 16 ounces to pounds
-		$this->pounds = intval($this->pkg_weight);
-		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
 		if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			// Can't use zip+4
@@ -552,7 +559,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	}
 
 	function packages($dimensions, $weight){
-
 		$height = (empty($dimensions[0]) ) ? 0 : $dimensions[0];
 		$width = (empty($dimensions[1]) ) ? 0 : $dimensions[1];
 		$length = (empty($dimensions[2]) ) ? 0 : $dimensions[2];
@@ -566,9 +572,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 			$packages .=
 			'<v13:RequestedPackageLineItems>
-			<v13:SequenceNumber>1</v13:SequenceNumber>
+			<v13:SequenceNumber>' . $count . '</v13:SequenceNumber>
 			<v13:GroupNumber>1</v13:GroupNumber>
-			<v13:GroupPackageCount>' . $count . '</v13:GroupPackageCount>
+			<v13:GroupPackageCount>1</v13:GroupPackageCount>
 			<v13:Weight>
 			<v13:Units>LB</v13:Units>
 			<v13:Value>' . $weight . '</v13:Value>
@@ -589,32 +595,52 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function rate_request( $international = false) {
 		global $mp;
-	
+
 		$shipping_options = $this->fedex_settings['services'];
-	
+
 		//Assume equal size packages. Find the best matching box size
 		$this->fedex_settings['max_weight'] = ( empty($this->fedex_settings['max_weight'])) ? 50 : $this->fedex_settings['max_weight'];
 		$diff = floatval($this->fedex_settings['max_weight']);
 		$found = -1;
-		foreach($this->fedex_settings['boxes']['weight'] as $key => $weight) {
-			if ($this->pkg_weight < $weight) {
-				if(($weight - $this->pkg_weight) < $diff){
-					$diff = $weight - $this->pkg_weight;
-					$found = $key;
-				}
+		$largest = -1.0;
+
+		foreach( $this->fedex_settings['boxes']['weight'] as $key => $weight ) {
+			//			//Find largest
+			if( $weight > $largest) {
+				$largest = $weight;
+				$found = $key;
+			}
+			//If weight less
+			if( floatval($this->weight) <= floatval($weight) ) {
+				$found = $key;
+				break;
 			}
 		}
-	
+		
+		$allowed_weight = min($this->fedex_settings['boxes']['weight'][$found], $this->fedex_settings['max_weight']);
+		
+		if($allowed_weight >= $this->weight){
+			$this->pkg_count = 1;
+			$this->pkg_weight = $this->weight;
+		} else {
+			$this->pkg_count = ceil($this->weight / $allowed_weight); // Avoid zero
+			$this->pkg_weight = $this->weight / $this->pkg_count;
+		}
+
+		// Fixup pounds by converting multiples of 16 ounces to pounds
+		$this->pounds = intval($this->pkg_weight);
+		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
+
 		//found our box
 		$dims = explode('x', strtolower($this->fedex_settings['boxes']['size'][$found]));
 		foreach($dims as &$dim) $dim = $this->as_inches($dim);
-	
+
 		sort($dims); //Sort so two lowest values are used for Girth
-	
+
 		$packages = $this->packages($dims, $this->pkg_weight);
-	
+
 		//var_dump($this->fedex_settings['services']);
-	
+
 		$xml_req = '<?xml version="1.0" encoding="UTF-8"?>
 		<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v13="http://fedex.com/ws/rate/v13">
 		<SOAP-ENV:Body>
@@ -657,13 +683,16 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		<v13:StateOrProvinceCode>' . $this->state . '</v13:StateOrProvinceCode>
 		<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
 		<v13:CountryCode>' . $this->country . '</v13:CountryCode>';
-	
-		if (!empty($this->residential) 
+
+		if (!empty($this->residential)
 		|| empty($this->fedex_settings['commercial']) ) {
 			$xml_req .= '
 			<v13:Residential>true</v13:Residential>';
+		} else {
+			$xml_req .= '
+			<v13:Residential>false</v13:Residential>';
 		}
-	
+
 		$xml_req .= '
 		</v13:Address>
 		</v13:Recipient>
@@ -678,16 +707,16 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		<v13:RateRequestTypes>LIST</v13:RateRequestTypes>
 		';
 		$xml_req .= $packages . '
-	
+
 		</v13:RequestedShipment>
 		</v13:RateRequest>
 		</SOAP-ENV:Body>
 		</SOAP-ENV:Envelope>';
-	
+
 		//print_r($xml_req);
 		//We have the XML make the call
 		$url = ($this->fedex_settings['mode'] == 'sandbox') ? $this->sandbox_uri : $this->production_uri;
-	
+
 		//var_dump($xml_req);
 		$response = wp_remote_request($url, array(
 		'headers' => array('Content-Type: text/xml'),
@@ -696,7 +725,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		'sslverify' => false,
 		)
 		);
-	
+
 		if (is_wp_error($response)){
 			return array('error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>');
 		}
@@ -709,9 +738,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			}
 		}
 		//var_dump($response);
-	
+
 		if ($loaded){
-	
+
 			libxml_use_internal_errors(true);
 			$dom = new DOMDocument();
 			$dom->encoding = 'utf-8';
@@ -719,15 +748,15 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$dom->loadHTML($body);
 			libxml_clear_errors();
 		}
-	
+
 		//Process the return XML
-	
+
 		//print_r($dom->saveXML());
 		//Clear any old price
 		unset($_SESSION['mp_shipping_info']['shipping_cost']);
-	
+
 		$xpath = new DOMXPath($dom);
-	
+
 		//Check for errors
 		$nodes = $xpath->query('//highestseverity');
 		if( in_array( $nodes->item(0)->textContent, array('ERROR', 'FAILURE', 'WARNING' ) ) ) {
@@ -735,9 +764,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$this->rate_error = $nodes->item(0)->textContent;
 			return array('error' => '<div class="mp_checkout_error">FedEx: ' . $this->rate_error . '</div>');
 		}
-	
+
 		//Good to go
-	
+
 		$service_set = ($international) ? $this->intl_services : $this->services;
 		//Make SESSION copy with just prices and delivery
 		//var_dump($service_set);
@@ -745,8 +774,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$mp_shipping_options = $shipping_options;
 		foreach($shipping_options as $service => $option){
 			$nodes = $xpath->query('//ratereplydetails[servicetype="' . $service_set[$service]->code . '"]//totalnetcharge/amount');
-			$rate = floatval($nodes->item(0)->textContent) * $this->pkg_count;
-	
+			$rate = floatval($nodes->item(0)->textContent);// * $this->pkg_count;
+
 			if($rate == 0){  //Not available for this combination
 				unset($mp_shipping_options[$service]);
 			}
@@ -756,7 +785,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				$handling = floatval($handling) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $service_set[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
-	
+
 				//match it up if there is already a selection
 				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
 					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
@@ -765,10 +794,10 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				}
 			}
 		}
-	
+
 		//Sort low to high rate
 		uasort($mp_shipping_options, array($this,'compare_rates') );
-		
+
 		//If no cost matched yet set to the first one which is now the cheapest.
 		if( empty($_SESSION['mp_shipping_info']['shipping_cost']) ){
 			//Get the first one
@@ -777,20 +806,20 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$_SESSION['mp_shipping_info']['shipping_sub_option'] = $service;
 			$_SESSION['mp_shipping_info']['shipping_cost'] =  $mp_shipping_options[$service]['rate'] + $mp_shipping_options[$service]['handling'];
 		}
-	
+
 		$shipping_options = array();
 		foreach($mp_shipping_options as $service => $options){
 			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
 		}
-	
+
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
-	
+
 		unset($xpath);
 		unset($dom);
-	
+
 		return $shipping_options;
 	}
 

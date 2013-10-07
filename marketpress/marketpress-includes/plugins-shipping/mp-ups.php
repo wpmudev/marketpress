@@ -303,7 +303,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 								<input type="text" name="mp[shipping][ups][domestic_handling]" value="<?php echo (empty($this->ups_settings['domestic_handling']) ) ? '0.00' : esc_attr($this->ups_settings['domestic_handling']); ?>" size="20" maxlength="20" />
 							</td>
 						</tr>
-
+<!--
 						<tr>
 							<th scope="row">
 								<?php _e('Default Weight (for products whose weights are not specified)', 'mp') ?>
@@ -312,7 +312,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 								<input type="text" name="mp[shipping][ups][default_weight]" value="<?php echo esc_attr($this->ups_settings['default_weight']); ?>" size="20" maxlength="20" />
 							</td>
 						</tr>
-
+-->
 						<tr>
 							<td colspan="2">
 								<?php _e('Standard Boxes and Weight Limits', 'mp') ?>
@@ -464,6 +464,13 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 			}
 		}
 
+		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
+		if($this->weight == 0){ //Nothing to ship
+			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
+			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
+			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
+		}
+
 		// Got our totals  make sure we're in decimal pounds.
 		$this->weight = $this->as_pounds($this->weight);
 
@@ -518,14 +525,32 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$this->ups_settings['max_weight'] = ( empty($this->ups_settings['max_weight'])) ? 50 : $this->ups_settings['max_weight'];
 		$diff = floatval($this->ups_settings['max_weight']);
 		$found = -1;
+		$largest = -1.0;
+		
 		foreach($this->ups_settings['boxes']['weight'] as $key => $weight) {
-			if ($this->pkg_weight < $weight) {
-				if(($weight - $this->pkg_weight) < $diff){
-					$diff = $weight - $this->pkg_weight;
-					$found = $key;
-				}
+			//			//Find largest
+			if( $weight > $largest) {
+				$largest = $weight;
+				$found = $key;
+			}
+			//If weight less
+			if( floatval($this->weight) <= floatval($weight) ) {
+				$found = $key;
+				break;
 			}
 		}
+
+		if($this->ups_settings['boxes']['weight'][$found] >= $this->weight){
+			$this->pkg_count = 1;
+			$this->pkg_weight = $this->weight;
+		} else {
+			$this->pkg_count = ceil($this->weight / $this->ups_settings['boxes']['weight'][$found]); // Avoid zero
+			$this->pkg_weight = $this->weight / $this->pkg_count;
+		}
+
+		// Fixup pounds by converting multiples of 16 ounces to pounds
+		$this->pounds = intval($this->pkg_weight);
+		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
 		//found our box
 		$dims = explode('x', strtolower($this->ups_settings['boxes']['size'][$found]));
@@ -637,7 +662,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		}
 
 		//Process the return XML
-
 		//Clear any old price
 		unset($_SESSION['mp_shipping_info']['shipping_cost']);
 
