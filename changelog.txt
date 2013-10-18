@@ -11,6 +11,7 @@ Change Log:
 - Fix possible rounding error in Stripe gateway
 - In Calculated Shipping plugins changed so if all weights in an order are zero then show Free Shipping
 - In FedEx fixed problem with calculating the correct number of packages.
+- Added https support for custom styles in the wp-content/marketpress-styles/ directory.
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------

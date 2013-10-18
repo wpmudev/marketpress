@@ -1231,7 +1231,7 @@ Thanks again!", 'mp')
 		} else if (file_exists($this->plugin_dir . 'themes/' . $this->get_setting('store_theme') . '.css')) {
       wp_enqueue_style( 'mp-store-theme', $this->plugin_url . 'themes/' . $this->get_setting('store_theme') . '.css', false, $this->version );
 		} else if (file_exists(WP_CONTENT_DIR . '/marketpress-styles/' . $this->get_setting('store_theme') . '.css')) {
-      wp_enqueue_style( 'mp-store-theme', WP_CONTENT_URL . '/marketpress-styles/' . $this->get_setting('store_theme') . '.css', false, $this->version );
+      wp_enqueue_style( 'mp-store-theme', content_url( '/marketpress-styles/' . $this->get_setting('store_theme') . '.css' ), false, $this->version );
 		}
   }
 
