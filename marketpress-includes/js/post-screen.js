@@ -180,4 +180,13 @@ jQuery(document).ready(function($) {
       $('#mp_special_tax').hide();
     }
 	});
+	
+	//toggle the limit cart field
+	$('#mp_track_limit').change(function(){
+		if(this.checked) {
+			$('#mp_limit').show();
+		}else{
+			$('#mp_limit').hide();
+		}
+	})
 });

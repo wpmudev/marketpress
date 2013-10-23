@@ -60,6 +60,9 @@ class MarketPress {
 
     //load shortcodes
     include_once( $this->plugin_dir . 'marketpress-shortcodes.php' );
+	
+	//load oembed
+	include_once( $this->plugin_dir . 'marketpress-oembed.php');
 
 		//load stats
     include_once( $this->plugin_dir . 'marketpress-stats.php' );
@@ -285,7 +288,20 @@ ORDERNOTES
 You can track the latest status of your order here: TRACKINGURL
 
 Thanks again!", 'mp')
-      )
+      ),
+	  'social' => array(
+	  	 'pinterest' => array(
+			'show_pinit_button' => 'off',
+			'show_pin_count' => 'none'
+		 ),
+	  ),
+	  'related_products' => array(
+	  	 'show' => 1,
+		 'in_same_category' => 1,
+		 'simple_list' => 0,
+		 'show_limit' => 3
+	  )
+	 
     );
 
     //filter default settings
@@ -1504,8 +1520,12 @@ Thanks again!", 'mp')
     $content .= '</div>';
 
 		$content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
+		$content .= mp_pinit_button($post->ID);
 
-    //$content .= mp_tag_list($post->ID, '<div class="mp_product_tags">', ', ', '</div>');
+    	//$content .= mp_tag_list($post->ID, '<div class="mp_product_tags">', ', ', '</div>');
+	
+		$content .= mp_related_products( $post->ID );
+		
 
     return $content;
   }
@@ -2069,6 +2089,15 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_sale_price', array_map(create_function('$price', $func_curr), (array)$_POST['mp_sale_price']));
       update_post_meta($post_id, 'mp_track_inventory', isset($_POST['mp_track_inventory']) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', array_map('intval', (array)$_POST['mp_inventory']));
+	  //track limit
+	  update_post_meta($post_id, 'mp_track_limit', isset($_POST['mp_track_limit']) ? 1 : 0);
+	  if( isset($_POST['mp_track_limit']) ){
+		  //fill the array with the value of mp_limit
+		  update_post_meta($post_id, 'mp_limit', array_fill(0, count((array)$_POST['mp_price']) , isset( $_POST['mp_limit'] ) ? $_POST['mp_limit'] : 1  ) );
+	  }else{
+		  //empty the array
+		  update_post_meta($post_id, 'mp_limit',array());
+	  }
 
 			//personalization fields
 			$mp_has_custom_field = $mp_custom_field_required = array();
@@ -2130,7 +2159,7 @@ Thanks again!", 'mp')
   	//unserialize
     foreach ($meta as $key => $val) {
 		  $meta[$key] = maybe_unserialize($val[0]);
-		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_is_special_tax" && $key != "mp_special_tax")
+		  if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_is_special_tax" && $key != "mp_special_tax" && $key != 'mp_track_limit')
 		    $meta[$key] = array($meta[$key]);
 		}
 		
@@ -2141,7 +2170,9 @@ Thanks again!", 'mp')
 			'mp_product_link' => '',
 			'mp_is_special_tax' => '',
 			'mp_file' => '',
-			'mp_shipping' => array('')
+			'mp_shipping' => array(''),
+			'mp_track_limit' => '',
+			'mp_limit' => array(),
 		);
 	
 		//Set default value if key is not already set.
@@ -2241,6 +2272,16 @@ Thanks again!", 'mp')
 		<div id="mp_tax_rate_div">
 		<label title="<?php esc_attr_e('Depending on local tax laws, some items are tax-free or a have different sales tax rate. You can set that here.', 'mp'); ?>"><input type="checkbox" id="mp_is_special_tax" name="mp_is_special_tax" value="1" <?php checked($meta["mp_is_special_tax"]); ?>/> <?php _e('Special Tax Rate?', 'mp'); ?></label>
 		<label id="mp_special_tax"<?php echo ($meta["mp_is_special_tax"]) ? '' : ' style="display:none;"'; ?>><?php _e('Rate:', 'mp'); ?> <input type="text" size="2" name="mp_special_tax" value="<?php echo isset($meta["mp_special_tax"]) ? round($meta["mp_special_tax"] * 100, 3) : 0; ?>" />%</label>
+		</div>
+        
+		<div id="mp_cart_limit_div">
+			<label title="<?php esc_attr_e('Limit the order to a certain amount of this product.', 'mp'); ?>">
+			<input type="checkbox" id="mp_track_limit" name="mp_track_limit" value="1" <?php checked($meta['mp_track_limit']); ?> /> <?php _e('Limit Per Order?','mp');?>
+			</label>
+			
+			<label id="mp_limit"<?php echo ($meta['mp_track_limit']) ? '' :' style="display:none;"';?> ><?php _e('Limit:', 'mp');?>
+			<input type="text" size="2" name="mp_limit" value="<?php echo isset( $meta['mp_limit'][0]) ? intval($meta['mp_limit'][0]) : '1' ;?>" /></label>
+			
 		</div>
 
     <?php do_action( 'mp_details_metabox' ); ?>
@@ -2917,16 +2958,29 @@ Thanks again!", 'mp')
 
       //add coupon code
       if (!empty($_POST['coupon_code'])) {
-        if ($this->check_coupon($_POST['coupon_code'])) {
-          //get coupon code
-          if (is_multisite()) {
-            global $blog_id;
-            $_SESSION['mp_cart_coupon_' . $blog_id] = $_POST['coupon_code'];
-          } else {
-            $_SESSION['mp_cart_coupon'] = $_POST['coupon_code'];
-          }
-          $this->cart_update_message( __('Coupon Successfully Applied', 'mp') );
-        } else {
+		  
+		 
+		  if ($this->check_coupon($_POST['coupon_code'])) {
+			  
+			 
+			  //get coupon code
+			  //set a flag so all other coupons will be processed
+			  $can_apply  = $this->coupon_applicable( $_POST['coupon_code'], $product_id );
+			  //check the flag before applying the coupon
+			  if( $can_apply ) {
+				  
+				  if (is_multisite()) {
+					  global $blog_id;
+					  $_SESSION['mp_cart_coupon_' . $blog_id] = $_POST['coupon_code'];
+					} else {
+					$_SESSION['mp_cart_coupon'] = $_POST['coupon_code'];
+			  		}
+					
+			  	$this->cart_update_message( __('Coupon Successfully Applied', 'mp') );
+		  		}else{
+				$this->cart_checkout_error( __('Coupon Was Not Applied', 'mp') );
+				}
+			} else {
           $this->cart_checkout_error( __('Invalid Coupon Code', 'mp') );
         }
       }
@@ -3242,6 +3296,50 @@ Thanks again!", 'mp')
     //everything passed so it's valid
     return true;
   }
+  
+  
+  /**
+   * Checks a coupon to see if it can be applied to a product.
+   *
+   * @param string The coupon code
+   * @param int The product ID we are checking
+   */
+  function coupon_applicable( $code, $product_id ) {
+	  //
+	  $can_apply = true;
+	  $coupons    = get_option('mp_coupons');
+	  
+	  //check for the applies to setting
+	  $applies_to = !empty( $coupons[ $code ]['applies_to'] ) ? $coupons[ $code ]['applies_to'] : false;
+	  if( $applies_to ) {
+		  
+		  $what = $applies_to['type']; // the type will be 'product', 'category'
+		  $item_id   = $applies_to['id']; // the is is either id post ID or the term ID depending on the above
+		  
+		  switch( $what ) {
+			  case 'product':
+			  	$can_apply = ( $product_id == $item_id ) ? true : false;
+		      break;
+			  
+			  case 'category':
+			  	$terms = get_the_terms( $product_id, 'product_category' );
+				if(!empty( $terms) && !is_wp_error( $terms ) ) {
+					$can_apply = false;
+						foreach( $terms as $term) {
+							if( $term->term_id == $item_id ) {
+								$can_apply = true;
+							}
+						}
+					}
+			   break;
+			   
+			   default:
+			}
+		}
+		
+		return $can_apply;
+  }
+  
 
   //get coupon value. Returns array(discount, new_total) or false for invalid code
   function coupon_value($code, $total) {
@@ -4589,6 +4687,36 @@ Notification Preferences: %s', 'mp');
 				';
 			}
 
+		} else if( $this->get_setting('ga_ecommerce') == 'universal' ) {
+			// add the UA code
+			
+			$js = '<script type="text/javascript">
+					ga("require", "ecommerce", "ecommerce.js");
+					ga("ecommerce:addTransaction", {
+						  "id": "'.esc_attr($order->post_title).'",                 // Transaction ID. Required.
+						  "affiliation": "'.esc_attr(get_bloginfo('blogname')).'",  // Affiliation or store name.
+						  "revenue": "'.$order->mp_order_total.'",               	// Grand Total.
+						  "shipping": "'.$order->mp_shipping_total.'",              // Shipping.
+						  "tax": "'.$order->mp_tax_total.'"                    		// Tax.
+						});';
+					//loop the items
+					if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
+						foreach ($order->mp_cart_info as $product_id => $variations) {
+							foreach ($variations as $variation => $data) {
+								$sku = !empty($data['SKU']) ? esc_attr($data['SKU']) : $product_id;
+								$js .= 'ga("ecommerce:addItem", {
+											  "id": "'.esc_attr($order->post_title).'", // Transaction ID. Required.
+											  "name": "'.esc_attr($data['name']).'",    // Product name. Required.
+											  "sku": "'.$sku.'",                 		// SKU/code.
+											  "category": "",         					// Category or variation.
+											  "price": "'.$data['price'].'",            // Unit price.
+											  "quantity": "'.$data['quantity'].'"       // Quantity.
+											});';
+							}
+						}
+					}
+			
+			$js .='ga("ecommerce:send");<script>';
 		}
 
 		//add to footer
@@ -5814,6 +5942,7 @@ Notification Preferences: %s', 'mp');
 									<option value="none"<?php selected($this->get_setting('ga_ecommerce'), 'none') ?>><?php _e('None', 'mp') ?></option>
 									<option value="new"<?php selected($this->get_setting('ga_ecommerce'), 'new') ?>><?php _e('Asynchronous Tracking Code', 'mp') ?></option>
 									<option value="old"<?php selected($this->get_setting('ga_ecommerce'), 'old') ?>><?php _e('Old Tracking Code', 'mp') ?></option>
+                                    <option value="universal"<?php selected($this->get_setting('ga_ecommerce'), 'universal') ?>><?php _e('Universal Analytics', 'mp') ?></option>
 								</select>
         				<br /><span class="description"><?php _e('If you already use Google Analytics for your website, you can track detailed ecommerce information by enabling this setting. Choose whether you are using the new asynchronous or old tracking code. Before Google Analytics can report ecommerce activity for your website, you must enable ecommerce tracking on the profile settings page for your website. Also keep in mind that some gateways do not reliably show the receipt page, so tracking may not be accurate in those cases. It is recommended to use the PayPal gateway for the most accurate data. <a href="http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-in-google.html" target="_blank">More information &raquo;</a>', 'mp') ?></span>
           			</td>
@@ -5894,7 +6023,34 @@ Notification Preferences: %s', 'mp');
             $error[] = __('Please enter a valid End Date not earlier than the Start Date', 'mp');
 
           $coupons[$new_coupon_code]['uses'] = (is_numeric($_POST['uses'])) ? (int)$_POST['uses'] : '';
-
+		  
+		  // applies to
+		  $applies_to = $_POST['applies_to'];
+		  switch( $applies_to ) {
+			  case 'all':
+			  	
+				$coupons[$new_coupon_code]['applies_to'] = '';
+			  break;
+			  
+			  case 'category';
+			  	$coupons[$new_coupon_code]['applies_to']['type'] = $_POST['applies_to'];
+				$coupons[$new_coupon_code]['applies_to']['id'] = $_POST['coupon_category'];
+				if( empty( $_POST['coupon_category'] ) ) {
+					$error[] = __('Please choose a Product Category to apply the coupon to', 'mp');
+				}
+			  break;
+			  
+			  case 'product':
+			  	$coupons[$new_coupon_code]['applies_to']['type'] = $_POST['applies_to'];
+				$coupons[$new_coupon_code]['applies_to']['id'] = $_POST['coupon_product'];
+				if( empty( $_POST['coupon_product'] ) ) {
+					$error[] = __('Please choose an Individual Product to apply the coupon to', 'mp');
+				}
+			  break;
+		  
+		  }
+		  
+		  
           if (!$error) {
             update_option('mp_coupons', $coupons);
             $new_coupon_code = '';
@@ -5955,8 +6111,9 @@ Notification Preferences: %s', 'mp');
     			'discount'     => __('Discount', 'mp'),
     			'start'        => __('Start Date', 'mp'),
     			'end'          => __('Expire Date', 'mp'),
-          'used'         => __('Used', 'mp'),
-          'remaining'    => __('Remaining Uses', 'mp'),
+         		'used'         => __('Used', 'mp'),
+          		'remaining'    => __('Remaining Uses', 'mp'),
+				'applies_to'	=> __('Applies to', 'mp'),
     			'edit'         => __('Edit', 'mp')
     		);
     		?>
@@ -6041,6 +6198,34 @@ Notification Preferences: %s', 'mp');
     								</th>
     							<?php
     							break;
+								
+								
+								// RW - 
+								case 'applies_to':
+									?>
+                                    <th scope="row">
+                                   	<?php
+										if( !empty( $coupon['applies_to'] ) ) {
+											$type = $coupon['applies_to']['type'];
+											$id   = $coupon['applies_to']['id'];
+											//check to make sure the category or product still exists
+											$details = ( $type == 'category') ? get_term($id , 'product_category'): get_post( $id );
+											if(is_null( $details ) ) {
+												$item = ( $type == 'category') ? 'Category' : 'Product';
+												printf( __( 'Associated %s Deleted', $item , 'mp' ), $item );
+											}else{
+												$name = ( $type == 'category') ? $details->name : $details->post_title;
+												$display = ( $type == 'category') ? 'All %s' : '%s';
+												printf( __( $display, $name, 'mp' ), $name );
+											}
+										}else{
+											_e('All Products','mp');
+										}
+									?>
+                                    </th>
+                                    <?php
+								break;
+								// /RW
 
                   case 'edit': ?>
     								<th scope="row">
@@ -6108,6 +6293,9 @@ Notification Preferences: %s', 'mp');
 						$start = !empty($coupons[$new_coupon_code]['start']) ? date('Y-m-d', $coupons[$new_coupon_code]['start']) : date('Y-m-d');
 						$end = !empty($coupons[$new_coupon_code]['end']) ? date('Y-m-d', $coupons[$new_coupon_code]['end']) : '';
 						$uses = isset($coupons[$new_coupon_code]['uses']) ? $coupons[$new_coupon_code]['uses'] : '';
+						//
+						$applies_to = ( isset($coupons[$new_coupon_code]['applies_to']['type'] ) ) ? $coupons[$new_coupon_code]['applies_to']['type'] : 'all';
+						$applies_to_id  = ( isset( $coupons[$new_coupon_code]['applies_to']['id'] ) ) ? $coupons[$new_coupon_code]['applies_to']['id'] : '';
           	?>
             <table id="add_coupon">
             <thead>
@@ -6126,7 +6314,12 @@ Notification Preferences: %s', 'mp');
                 <?php _e('Allowed Uses', 'mp') ?><br />
                 <small style="font-weight: normal;"><?php _e('Unlimited if blank', 'mp') ?></small>
               </th>
-            </tr>
+             <!-- category/listing -->
+              <th>
+              	<?php _e('Applies To', 'mp');?>
+              </th>
+              <!-- /category/listing -->
+              </tr>
             </thead>
             <tbody>
             <tr>
@@ -6148,6 +6341,72 @@ Notification Preferences: %s', 'mp');
               </td>
               <td>
                 <input value="<?php echo $uses; ?>" size="4" name="uses" type="text" />
+              </td>
+               <td>
+              <select id="applies_to" name="applies_to">
+              	<option value="all" <?php selected($applies_to, 'all');?>><?php _e('All Products','mp');?></option>
+                <option value="category" <?php selected($applies_to, 'category');?>><?php _e('Product Category','mp');?></option>
+                <option value="product" <?php selected($applies_to, 'product');?>><?php _e('Product','mp');?></option>
+              </select>
+              <script type="text/javascript">
+      	  		jQuery(document).ready(function ($) {
+			  		$('#applies_to').change(function(){
+						var type = 'coupon_' + $(this).val();
+						switch(type) {
+							case 'coupon_all':
+								$('#coupon_category').hide();
+								$('#coupon_product').hide();
+							break;
+							case 'coupon_category':
+								$('#coupon_category').show();
+								$('#coupon_product').hide();
+							break;
+							case 'coupon_product':
+								$('#coupon_category').hide();
+								$('#coupon_product').show();
+							break;
+							default:
+						}
+					});
+			    })
+			  </script>
+              <?php
+			  	//get all the product categories
+			  	$product_cats = get_terms( array( 'product_category'), array( 'hide_empty' => false ) );
+				if( !is_wp_error( $product_cats ) && count( $product_cats ) > 0 ) {
+					$cat_style = ( $applies_to == 'category' ) ? '' : 'style="display:none;"';
+					
+					$cat_select = '<select name="coupon_category" id="coupon_category" '. $cat_style .' >%s</select>';
+					$cat_options = '';
+					foreach($product_cats as $cat) {
+							$cat_options .= '<option value="'.$cat->term_id.'" '. selected( $applies_to_id, $cat->term_id, false ). '  >'.$cat->name.'</option>';
+					}
+					printf( $cat_select, $cat_options );
+				}else{
+					_e('No Product Categories','mp');
+				}
+				
+			  	//get all the products
+				
+				$products = new WP_Query( array( 'post_type' => 'product', 'posts_per_page' => -1 ) );
+				if( !is_wp_error( $products ) ) {
+					if( $products->post_count > 500) {
+					?>
+					<label id="coupon_product" <?php echo ( $applies_to == 'product' ) ? '' : 'style="display:none;"';?>><?php _e('Post ID','mp');?>
+					<input type="text" value="<?php echo ( $applies_to == 'product' ) ? $applies_to_id : ''; ?>" name="coupon_product" />
+					</label>
+					<?php
+					}else{
+						$style = ( $applies_to == 'category' ) ? '' : 'style="display:none;"';
+						$product_select = '<select name="coupon_product" id="coupon_product" '. $style .' >%s</select>';
+						$product_options = '';
+						foreach($products->posts as $product) {
+							$product_options  .= '<option value="'.$product->ID.'" '. selected( $applies_to_id, $product->ID, false ). '  >'.$product->post_title.'</option>';
+						}
+						printf( $product_select, $product_options );
+					}
+				}
+				?>
               </td>
             </tr>
             </tbody>
@@ -6287,6 +6546,35 @@ Notification Preferences: %s', 'mp');
                   <br /><span class="description"><?php _e('Disables "Display Larger Image" function. Clicking a product image will not display a larger image.', 'mp') ?></span>
                 </td>
                 </tr>
+                <tr>
+                	<th scope="row"><?php _e('Show Related Products', 'mp') ?></th>
+        			<td>
+                  	<label><input value="1" name="mp[related_products][show]" type="radio"<?php checked($this->get_setting('related_products->show'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  	<label><input value="0" name="mp[related_products][show]" type="radio"<?php checked($this->get_setting('related_products->show'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                </td>
+                </tr>
+                 <tr>
+                	<th scope="row"><?php _e('Related Product Limit', 'mp') ?></th>
+        			<td>
+                  	<label><input name="mp[related_products][show_limit]" type="input" size="2" value="<?php echo intval($this->get_setting('related_products->show_limit') ); ?>" /></label>
+                </td>
+                </tr>
+                <tr>
+                	<th scope="row"><?php _e('Show Related Products In Same Category', 'mp') ?></th>
+        			<td>
+                  	<label><input value="1" name="mp[related_products][in_same_category]" type="radio"<?php checked($this->get_setting('related_products->in_same_category'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  	<label><input value="0" name="mp[related_products][in_same_category]" type="radio"<?php checked($this->get_setting('related_products->in_same_category'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                     <br /><span class="description"><?php _e('Setting to "No" will include products with the same tags regardless of category', 'mp') ?></span>
+                </td>
+                </tr>
+                <tr>
+                	<th scope="row"><?php _e('Show Related Products As Simple List', 'mp') ?></th>
+        			<td>
+                  	<label><input value="1" name="mp[related_products][simple_list]" type="radio"<?php checked($this->get_setting('related_products->simple_list'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
+                  	<label><input value="0" name="mp[related_products][simple_list]" type="radio"<?php checked($this->get_setting('related_products->simple_list'), 0) ?> /> <?php _e('No', 'mp') ?></label>
+                     <br /><span class="description"><?php _e('Setting to "No" will use the List/Grid View setting.', 'mp') ?></span>
+                </td>
+                </tr>
               </table>
             </div>
           </div>
@@ -6403,7 +6691,32 @@ Notification Preferences: %s', 'mp');
               </table>
             </div>
           </div>
-
+          
+          <!-- pinterest Rich Pins/oEmbed -->
+          <div class="postbox">
+          	<h3 class="hndle"><span><?php _e('Social','mp');?></span></h3>
+            <div class="inside">
+            <img src="<?php echo $this->plugin_url; ?>images/134x35_pinterest_logo.png" width="134" height="35" alt="Pinterest">
+<table class="form-table">
+           	  <tr>
+           	<th scope="row"><?php _e('Show "Pin It" button','mp');?></th>
+                	<td>
+                    	<label><input value="off" name="mp[social][pinterest][show_pinit_button]" type="radio"<?php checked($this->get_setting('social->pinterest->show_pinit_button'), 'off') ?> /> <?php _e('Off', 'mp') ?></label><br/>
+                  		<label><input value="single_view" name="mp[social][pinterest][show_pinit_button]" type="radio"<?php checked($this->get_setting('social->pinterest->show_pinit_button'), 'single_view') ?> /> <?php _e('Single View', 'mp') ?></label><br/>
+                        <label><input value="all_view" name="mp[social][pinterest][show_pinit_button]" type="radio"<?php checked($this->get_setting('social->pinterest->show_pinit_button'), 'all_view') ?> /> <?php _e('All View', 'mp') ?></label>
+                    </td>
+                </tr>
+                <tr>
+                	<th scope="row"><?php _e('Pin Count','mp');?></th>
+                    <td>
+                    	<label><input value="none" name="mp[social][pinterest][show_pin_count]" type="radio"<?php checked($this->get_setting('social->pinterest->show_pin_count'), 'none') ?> /> <?php _e('None', 'mp') ?></label><br/>
+                    	<label><input value="above" name="mp[social][pinterest][show_pin_count]" type="radio"<?php checked($this->get_setting('social->pinterest->show_pin_count'), 'above') ?> /> <?php _e('Above', 'mp') ?></label><br/>
+                        <label><input value="beside" name="mp[social][pinterest][show_pin_count]" type="radio"<?php checked($this->get_setting('social->pinterest->show_pin_count'), 'beside') ?> /> <?php _e('Beside', 'mp') ?></label>
+                    </td>
+                </tr>
+            </table>
+            </div>
+          </div><!-- /pinterest Rich Pins/oEmbed -->
           <?php do_action('mp_presentation_settings'); ?>
 
           <p class="submit">
@@ -6834,6 +7147,23 @@ Notification Preferences: %s', 'mp');
                   <ul class="mp-shortcode-options">
                     <li><?php _e('"number" - max number of products to display. Defaults to 5.', 'mp') ?></li>
                     <li><?php _e('Example:', 'mp') ?> <em>[mp_popular_products number="5"]</em></li>
+                  </ul></p>
+                </td>
+                </tr>
+                <tr>
+        				<th scope="row"><?php _e('Related Products', 'mp') ?></th>
+        				<td>
+                  <strong>[mp_mp_related_products]</strong> -
+                  <span class="description"><?php _e('Displays a products related to the one being viewed.', 'mp') ?></span>
+                  <p>
+                  <strong><?php _e('Optional Attributes:', 'mp') ?></strong>
+                  <ul class="mp-shortcode-options">
+                  <li><?php _e('"product_id" - The product to show related items for.', 'mp') ?></li>
+                  <li><?php _e('"in_same_category" - Whether to limit the related items to ones in the same category. Defaults to 1 (true)', 'mp') ?></li>
+                  <li><?php _e('"limit" - How many related items to show. Defaults to 3', 'mp') ?></li>
+                  <li><?php _e('"simple_list" - Whether to display the items as a simple list or based on the list/grid view setting. Defaults to 0 (false)', 'mp') ?></li>
+                  <li><?php _e('"number" - max number of products to display. Defaults to 5.', 'mp') ?></li>
+                  <li><?php _e('Example:', 'mp') ?> <em>[mp_related_products product_id="12345" in_same_category="1" limit="3" simple_list="0"]</em></li>
                   </ul></p>
                 </td>
                 </tr>

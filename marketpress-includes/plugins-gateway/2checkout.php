@@ -155,18 +155,18 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $total = array_sum($totals);
     
     if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-      $total = $coupon['new_total'];
+      $total = round($coupon['new_total'], 2 );
     }
 
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-      $total = $total + $shipping_price;
+      $total = round( ( $total + $shipping_price), 2 );
 			$params['sh_cost'] = $shipping_price;
     }
     
     //tax line
     if ( ($tax_price = $mp->tax_price()) !== false ) {
-      $total = $total + $tax_price;
+      $total = ruond( ($total + $tax_price), 2);
     }
     
     $params['total'] = $total;
@@ -222,7 +222,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     global $mp;
     
     $timestamp = time();
-    $total = $_REQUEST['total'];
+    $total = round( $_REQUEST['total'], 2 );
     
     if ($this->SandboxFlag == 'sandbox') {
       $hash = strtoupper(md5($this->API_Password . $this->API_Username . 1 . $total));

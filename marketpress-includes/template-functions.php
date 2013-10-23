@@ -190,6 +190,170 @@ function mp_popular_products($echo = true, $num = 5) {
         return $content;
 }
 
+
+
+/**
+ * Displays related products for the passed product id
+ *
+ * @param int $product_id. 
+ * @param bool $in_same_category Optional, whether to limit related to the same category.
+ * @param bool $echo. Optional, whether to echo or return the results
+ * @param int $limit. Optional The number of products we want to retrieve.
+ * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
+ */
+function mp_related_products( $product_id = NULL, $in_same_category = NULL, $echo = false, $limit = NULL, $simple_list = NULL) {
+	global $mp, $post;
+	
+	$output = '';
+	$categories = array();
+	
+	if( $mp->get_setting('related_products->show') == 0) {
+		return;
+	}
+	
+	$simple_list = ( is_null( $simple_list ) ) ? $mp->get_setting('related_products->simple_list') : ( $simple_list == 'true') ? true : false;
+	$same_category = ( is_null( $in_same_category ) ) ? $mp->get_setting('related_products->in_same_category') : ( $in_same_category == 'true') ? true : false;
+	
+	
+	$limit = (!$limit) ? $mp->get_setting('related_products->show_limit') : $limit;
+	
+	if( !$product_id ) {
+		$product_id = ( isset($post) && $post->post_type == 'product') ? $post->ID : false;
+		$product_details = get_post($product_id);
+	}else{
+		$product_details = get_post($product_id);
+		$product_id = ( $product_details->post_type == 'product') ? $post->ID : false;
+	}
+	
+	if(!$product_details) {
+		return '';
+	}
+	
+	
+	//setup the default args
+	$query_args = array(
+		'post_type' 	 => 'product',
+		'posts_per_page' => intval($limit),
+		'post__not_in' 	 => array($product_id),
+		'tax_query' 	 => array(), //we'll add these later
+	);
+	
+	//get the tags for this product
+	$tags = get_the_terms( $product_id, 'product_tag');
+	$tag_list = array();
+	
+	if($tags) {
+		$tag_list = array();
+		foreach($tags as $tag) {
+			$tag_list[] = $tag->term_id;
+		}
+		//add the tag taxonomy query
+		$query_args['tax_query'][] = array(
+				'taxonomy' => 'product_tag',
+				'field' => 'id',
+				'terms' => $tag_list,
+				'operator' => 'IN'
+		);
+	}
+	
+	//are we limiting to only the assigned categories
+	if( $same_category) {
+		$product_cats = get_the_terms(  $product_id, 'product_category' );
+		if($product_cats) {
+			foreach($product_cats as $cat) {
+				$categories[] = $cat->term_id;
+			}
+			
+			$query_args['tax_query'][] = array(
+					'taxonomy' => 'product_category',
+					'field' => 'id',
+					'terms' => $categories,
+					'operator' => 'IN'
+			);
+		}
+	}
+	
+	//we only want to run the query if we have categories or tags to look for.
+	if(count($tag_list) > 0 || count($categories) > 0 ) {
+		//make the query
+		$related_query = new WP_Query( $query_args );
+		
+		//how are we formatting the output
+		if( $simple_list) {
+			
+			$output = '<div id="mp_related_products">';
+			$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4><div>';
+			if( $related_query->post_count ) {
+				//echo '<pre>' . print_r($related_query, 1) . '</pre>';
+				$list = '<u class="mp_related_products_list">%s</ul>';
+				$items = '';
+				foreach($related_query->posts as $product) {
+					$items .= '<li class="mp_related_products_list_item"><a href="'.get_permalink($product->ID).'">'.$product->post_title.'</a></li>';
+				}
+				$output .= sprintf($list, $items );
+			}else{
+				$output .= '<div class="mp_related_products_title"><h4>'. apply_filters( 'mp_related_products_title_none', __('No Related Products','mp') ) . '</h4></div>';
+			}
+			
+			$output .'</div>';
+			
+		}else{
+			//we'll use the $mp settings and functions
+			$layout_type = $mp->get_setting('list_view');
+			$output = '<div id="mp_related_products" class="mp_' . $layout_type . '">';
+			//do we have posts?
+			if( $related_query->post_count ) {
+				$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4><div>';
+				$output .= $layout_type == 'grid' ? _mp_products_html_grid($related_query->posts) : _mp_products_html_list($related_query->posts);
+			}else{
+				$output .= '<div class="mp_related_products_title"><h4>'. apply_filters( 'mp_related_products_title_none', __('No Related Products','mp') ) . '</h4></div>';
+			}
+	
+			$output .'</div>';
+		}
+	}
+	//how are we sending back the data
+	if($echo) {
+		echo $output;
+	}else{
+		return $output;
+	}
+}
+
+
+
+/**
+ * Pinterest PinIt button
+ */
+function mp_pinit_button( $product_id = NULL, $context = 'single_view', $echo = false ) {
+	global $mp, $id;
+	
+	$post_id = ($product_id === NULL) ? $id : $product_id;
+	$setting = $mp->get_setting('social->pinterest->show_pinit_button');
+	
+	if( $setting == 'off' || $setting != $context ) {
+		return '';
+	}
+
+	$url = urlencode( get_permalink( $post_id ) );
+	$desc = urlencode( get_the_title( $post_id ) );
+		
+	$image_info =  $large_image_url = wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'large');
+	$media = ( $image_info ) ?  '&media='.urlencode( $image_info[0] ) : '';
+		
+	$count_pos = ( $pos = $mp->get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
+		
+	$snippet = apply_filters('mp_pinit_button_link', '
+		<a href="//www.pinterest.com/pin/create/button/?url='.$url . $media .'&description='.$desc.'" data-pin-do="buttonPin" data-pin-config="'. $count_pos.'"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>');
+		
+	if($echo) {
+		echo $snippet;
+	}else{
+		return $snippet;
+	}
+}
+
+
 //Prints cart table, for internal use
 function _mp_cart_table($type = 'checkout', $echo = false) {
     global $mp, $blog_id;
@@ -1141,9 +1305,26 @@ function mp_order_status() {
             //list orders
             echo '<h3>' . __('Your Recent Orders:', 'mp') . '</h3>';
             echo '<ul id="mp-order-list">';
+			
+			//need to check for removed orders
+			$resave_meta = false;
             foreach ($orders as $timestamp => $order)
-                echo '  <li><strong>' . $mp->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
+			
+				if( $mp->get_order( $order['id'] ) ) {
+                	echo '  <li><strong>' . $mp->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
+					
+				}else{
+					unset( $orders[$timestamp] );
+					$resave_meta = true;
+				}
             echo '</ul>';
+			//if we need to resave we'll do it here
+			if($resave_meta) {
+				
+				$_COOKIE[$cookie_id] = serialize($orders);
+				update_user_meta($user_id, $meta_id, $orders );
+				
+			}
             ?>
             <form action="<?php mp_orderstatus_link(true, true); ?>" method="get">
                 <label><?php _e('Or enter your 12-digit Order ID number:', 'mp'); ?><br />
@@ -1397,6 +1578,7 @@ function _mp_products_html_list($post_array = array()) {
         if ($mp->get_setting('show_excerpt'))
             $product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
         $html .= apply_filters('mp_product_list_content', $product_content, $post->ID);
+		$html .= mp_pinit_button($post->ID,'all_view');
         $html .= '</div>';
 
         $html .= '<div class="mp_product_meta">';
@@ -1434,6 +1616,8 @@ function _mp_products_html_grid($post_array = array()) {
                 '<p class="mp_excerpt">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
                 '';
         $mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
+		
+		$pinit = mp_pinit_button($post->ID, 'all_view');
 
         $class = array();
         $class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
@@ -1445,7 +1629,7 @@ function _mp_products_html_grid($post_array = array()) {
                 
                   <div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
                     ' . $img . '
-                  
+                    ' . $pinit .'
                     <h3 class="mp_product_name">
                       <a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
                     </h3>

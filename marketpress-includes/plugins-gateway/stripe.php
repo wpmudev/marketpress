@@ -73,6 +73,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		}
 	}
 	
+	
+
 	/**
 	* Return fields you need to add to the top of the payment screen, like your credit card info fields
 	*
@@ -82,6 +84,57 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	function payment_form($cart, $shipping_info) {
 		global $mp;
 		$settings = get_option('mp_settings');
+		
+		//check to see if we're using the embedded form
+		$embedded_form = isset($settings['gateways']['stripe']['embedded_form_type']) ?  $settings['gateways']['stripe']['embedded_form_type'] :false;
+		
+		//if we are create the form button
+		if( $settings['gateways']['stripe']['embedded_form_type'] ) {
+			
+			$totals = array();
+			$description = '';
+			foreach ($cart as $product_id => $variations) {
+		  		foreach ($variations as $variation => $data) {
+					$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+		  		}
+			}
+			
+			$total = array_sum( $totals ) * 100; //get the total as cents
+			$content = '<script>
+							jQuery(document).ready(function($){
+								var gateway = $(".mp_choose_gateway").val();
+								if( gateway  === "stripe" ) {
+									$("#stripe .mp_cart_direct_checkout").hide();
+									$("#mp_payment_confirm").click(function(e){
+										e.preventDefault();
+										$("#mp_payment_form").submit();
+									});
+								}
+								$(".mp_choose_gateway").change(function(){
+									if($(this).val() === "stripe") {
+										$("#stripe .mp_cart_direct_checkout").hide();
+										$("#mp_payment_confirm").click(function(e){
+											e.preventDefault();
+											$("#mp_payment_form").submit();
+										});
+									}
+								});
+							});
+						</script>
+			<div align="right">
+            <form action="" method="POST">
+            <script
+                src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
+                data-key="' . $this->publishable_key . '"
+                data-amount="'. $total .'"
+                data-name="' . get_bloginfo('title') . '"
+                data-description="' . __('Your Order','mp') . '"
+                data-image="">
+              </script>
+            </form></div>';
+			
+			return $content;
+		}
 		
 		$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
 		
@@ -329,6 +382,15 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 							</select>
 						</td>
 	        </tr>
+            <tr>
+            	<th scope="row"><?php _e('Form Options','mp');?></th>
+            	<td>
+                <label for="stripe_form_type">
+					<?php _e('Use Default Embedded Form','mp');?>
+                    <?php $form_type = isset( $settings['gateways']['stripe']['embedded_form_type'] )? $settings['gateways']['stripe']['embedded_form_type'] : ''; ?>
+                    <input type="checkbox" id="stripe_form_type" name="mp[gateways][stripe][embedded_form_type]" value="default" <?php checked( $form_type, 'default');?> /></label>
+                </td>
+            </tr>
 				</table>    
 			</div>
 		</div>      

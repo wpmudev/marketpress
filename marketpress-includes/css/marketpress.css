@@ -250,6 +250,9 @@ div#mp-meta-details #mp_tax_rate_div label {
 	text-align: right;
 }
 
+div#mp-meta-details #mp_cart_limit_div label { display:inline; }
+#mp_limit { margin-left:15px;}
+
 .wp_themeSkin iframe {
   background-color: #FFFFFF !important;
 }
