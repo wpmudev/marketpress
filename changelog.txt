@@ -5,6 +5,18 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+-- Added Coupons for individual categories/products
+-- Deleted orders are now removed from usermeta
+-- Added compatibility with Google Universal Analytics
+-- Added Stripe embedded form button
+-- Added oembed endpoint for Pinterest "Rich Pins"
+-- Added show related products option
+-- Added Pickup in-store shipping option
+-- Fixed bug with 2checkout where amount was returning more than 2 decimal places
+
+2.9 beta 1 - 10/24/2013 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher
+----------------------------------------------------------------------
+
 - Added Russian Rubles to paypal currencies and locale
 - Fix php warnings when switching between non-calculated shipping modules
 - Fix bug with which gateway is shown when switching global cart in network settings
