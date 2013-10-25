@@ -5631,7 +5631,7 @@ Notification Preferences: %s', 'mp');
         <form id="mp-main-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=main">
           <input type="hidden" name="marketplace_settings" value="1" />
 
-          <div class="postbox">
+          <div class="postbox location-settings">
             <h3 class='hndle'><span><?php _e('Location Settings', 'mp') ?></span></h3>
             <div class="inside">
               <span class="description"><?php _e('This is the base location that shipping and tax rates will be calculated from.', 'mp') ?></span>
@@ -5701,7 +5701,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox">
+          <div class="postbox tax-settings">
             <h3 class='hndle'><span><?php _e('Tax Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -5833,7 +5833,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox">
+          <div class="postbox currency-settings">
             <h3 class='hndle'><span><?php _e('Currency Settings', 'mp') ?></span></h3>
             <div class="inside">
               <span class="description"><?php _e('These preferences affect display only. Your payment gateway of choice may not support every currency listed here.', 'mp') ?></span>
@@ -5876,7 +5876,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox">
+          <div class="postbox miscelaneous-settings">
             <h3 class='hndle'><span><?php _e('Miscellaneous Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6461,7 +6461,7 @@ Notification Preferences: %s', 'mp');
         <form method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=presentation">
           <input type="hidden" name="marketplace_settings" value="1" />
 
-          <div class="postbox">
+          <div class="postbox presentation-general-settings">
             <h3 class='hndle'><span><?php _e('General Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6494,7 +6494,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox">
+          <div class="postbox presentation-single-product-settings">
             <h3 class='hndle'><span><?php _e('Single Product Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6579,7 +6579,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox">
+          <div class="postbox presentation-product-list-settings">
             <h3 class='hndle'><span><?php _e('Product List Settings', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6659,7 +6659,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox">
+          <div class="postbox store-url-slugs">
             <h3 class='hndle'><span><?php _e('Store URL Slugs', 'mp') ?></span> - <span class="description"><?php _e('Customizes the url structure of your store', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6693,7 +6693,7 @@ Notification Preferences: %s', 'mp');
           </div>
           
           <!-- pinterest Rich Pins/oEmbed -->
-          <div class="postbox">
+          <div class="postbox presentation-social">
           	<h3 class="hndle"><span><?php _e('Social','mp');?></span></h3>
             <div class="inside">
             <img src="<?php echo $this->plugin_url; ?>images/134x35_pinterest_logo.png" width="134" height="35" alt="Pinterest">
@@ -6761,7 +6761,7 @@ Notification Preferences: %s', 'mp');
         <form id="mp-messages-form" method="post" action="edit.php?post_type=product&amp;page=marketpress&amp;tab=messages">
           <input type="hidden" name="messages_settings" value="1" />
 
-          <div class="postbox">
+          <div class="postbox email-notifications">
             <h3 class='hndle'><span><?php _e('Email Notifications', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6799,7 +6799,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox mp-pages-msgs">
+          <div class="postbox mp-pages-msgs store-pages">
             <h3 class='hndle'><span><?php _e('Store Pages', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
@@ -6831,7 +6831,7 @@ Notification Preferences: %s', 'mp');
             </div>
           </div>
 
-          <div class="postbox mp-pages-msgs">
+          <div class="postbox mp-pages-msgs stopping-cart-pages">
             <h3 class='hndle'><span><?php _e('Shopping Cart Pages', 'mp') ?></span></h3>
             <div class="inside">
               <table class="form-table">
