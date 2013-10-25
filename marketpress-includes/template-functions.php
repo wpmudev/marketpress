@@ -57,6 +57,8 @@ function mp_tag_cloud($echo = true, $args = array()) {
 
     $cloud = '<div id="mp_tag_cloud">' . wp_tag_cloud($args) . '</div>';
 
+    $cloud = apply_filters('mp_tag_cloud', $cloud);
+
     if ($echo)
         echo $cloud;
     else
@@ -98,6 +100,8 @@ function mp_list_categories($echo = true, $args = '') {
     $args['echo'] = false;
 
     $list = '<ul id="mp_category_list">' . wp_list_categories($args) . '</ul>';
+
+    $list = apply_filters('mp_list_categories', $list);
 
     if ($echo)
         echo $list;
@@ -156,6 +160,8 @@ function mp_dropdown_categories($echo = true, $args = '') {
 /* ]]> */
 </script>';
 
+	$dropdown = apply_filters('mp_dropdown_categories', $dropdown );
+
     if ($echo)
         echo $dropdown;
     else
@@ -183,6 +189,8 @@ function mp_popular_products($echo = true, $num = 5) {
     }
 
     $content .= '</ul>';
+
+    $content = apply_filters('mp_popular_products', $content);
 
     if ($echo)
         echo $content;
@@ -312,6 +320,9 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 			$output .'</div>';
 		}
 	}
+
+	$output = apply_filters('mp_related_products', $output);
+
 	//how are we sending back the data
 	if($echo) {
 		echo $output;
@@ -625,6 +636,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         $content .= '</tbody></table>';
     }
 
+    $content = apply_filters('_mp_cart_table', $content);
+
     if ($echo) {
         echo $content;
     } else {
@@ -677,6 +690,8 @@ function _mp_cart_login($echo = false) {
         $content .= '</tbody>';
         $content .= '</table>';
     }
+
+    $content = apply_filters('_mp_cart_login', $content);
     if ($echo)
         echo $content;
     else
@@ -856,6 +871,8 @@ function _mp_cart_shipping($editable = false, $echo = false) {
         $content .= '</table>';
     }
 
+    $content = apply_filters('_mp_cart_shipping', $content);
+
     if ($echo) {
         echo $content;
     } else {
@@ -937,6 +954,8 @@ function _mp_cart_payment($type, $echo = false) {
         unset($_SESSION['mp_payment_method']);
         unset($_SESSION['mp_order']);
     }
+
+    $content = apply_filters('_mp_cart_payment', $content);
 
     if ($echo) {
         echo $content;
@@ -1022,6 +1041,8 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
         $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="' . mp_products_link(false, true) . '">' . __('Browse Products &raquo;', 'mp') . '</a></div>';
     }
 
+    $content = apply_filters('mp_show_cart', $content);
+
     if ($echo) {
         echo $content;
     } else {
@@ -1033,6 +1054,7 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
  * Echos the order status page. Use in the mp_orderstatus.php template.
  *
  */
+if (!function_exists('mp_order_status')) :
 function mp_order_status() {
     global $mp, $wp_query, $blog_id;
 
@@ -1379,6 +1401,7 @@ function mp_order_status() {
         }
     }
 }
+endif;
 
 /*
  * function mp_tracking_link
@@ -1430,6 +1453,8 @@ function mp_province_field($country = 'US', $selected = null) {
     } else {
         $content .= '<input size="15" id="mp_state" name="state" type="text" value="' . esc_attr($selected) . '" />';
     }
+
+    $content = apply_filters('mp_province_field', $content);
 
     //if ajax 
     if (defined('DOING_AJAX') && DOING_AJAX)
@@ -1551,6 +1576,8 @@ function mp_list_products($echo = true, $paginate = '', $page = '', $per_page = 
 
     $content .= '</div>';
 
+    $content = apply_filters('mp_list_products', $content);
+
     if ($echo)
         echo $content;
     else
@@ -1592,7 +1619,7 @@ function _mp_products_html_list($post_array = array()) {
         $html .= '</div>';
     }
 
-    return $html;
+    return apply_filters('_mp_products_html_list', $html);
 }
 
 function _mp_products_html_grid($post_array = array()) {
@@ -1649,7 +1676,7 @@ function _mp_products_html_grid($post_array = array()) {
 
     $html .= (count($post_array) > 0 ? '<div class="clear"></div>' : '');
 
-    return $html;
+    return apply_filters('_mp_products_html_grid', $html);
 }
 
 /*
@@ -1697,7 +1724,7 @@ function mp_product_title($product_id, $echo = true, $link = false, $formated = 
         $after_title = '';
     }
 
-    $return = $before_title . $title . $after_title;
+    $return = apply_filters('mp_product_title', $before_title . $title . $after_title);
 
     if ($echo)
         echo $return;
@@ -1737,7 +1764,7 @@ function mp_product_description($product_id, $echo = true, $content = 'full', $h
         $after_description = '';
     }
 
-    $return = $before_description . $description . $after_description;
+    $return = apply_filters('mp_product_description', $before_description . $description . $after_description);
 
     if ($echo)
         echo $return;
@@ -1767,6 +1794,8 @@ function mp_product_meta($echo = true, $context = 'context', $label = true, $pro
     if ($html_tag) {
         $content .= '</div>';
     }
+
+    $content = apply_filters('mp_product_meta', $content);
 
     if ($echo)
         echo $content;
@@ -1815,6 +1844,8 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
     }
     $return .= '</div>';
 
+    $return = apply_filters('mp_product', $return);
+
     if ($echo)
         echo $return;
     else
@@ -1832,9 +1863,11 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
 function mp_category_list($product_id = false, $before = '', $sep = ', ', $after = '') {
     $terms = get_the_term_list($product_id, 'product_category', $before, $sep, $after);
     if ($terms)
-        return $terms;
+        $return = $terms;
     else
-        return __('Uncategorized', 'mp');
+        $return = __('Uncategorized', 'mp');
+
+    return apply_filters('mp_category_list', $return);
 }
 
 /**
@@ -1848,9 +1881,11 @@ function mp_category_list($product_id = false, $before = '', $sep = ', ', $after
 function mp_tag_list($product_id = false, $before = '', $sep = ', ', $after = '') {
     $terms = get_the_term_list($product_id, 'product_tag', $before, $sep, $after);
     if ($terms)
-        return $terms;
+        $return = $terms;
     else
-        return __('No Tags', 'mp');
+        $return = __('No Tags', 'mp');
+
+    return apply_filters('mp_tag_list', $return);
 }
 
 /**
@@ -1863,6 +1898,8 @@ function mp_tag_list($product_id = false, $before = '', $sep = ', ', $after = ''
 function mp_product_class($echo = true, $class = '', $post_id = null) {
     // Separates classes with a single space, collates classes for post DIV
     $content = 'class="' . join(' ', mp_get_product_class($class, $post_id)) . '"';
+
+    $content = apply_filters('mp_product_class', $content);
 
     if ($echo)
         echo $content;
@@ -1932,7 +1969,7 @@ function mp_get_product_class($class = '', $post_id = null) {
 
     $classes = array_map('esc_attr', $classes);
 
-    return $classes;
+    return apply_filters('mp_get_product_class', $classes);
 }
 
 /*
@@ -2223,6 +2260,8 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
     if ($link)
         $image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
 
+    $image = apply_filters('mp_product_image', $image);
+
     if ($echo)
         echo $image;
     else
@@ -2274,7 +2313,7 @@ function mp_products_filter() {
             </option>';
     }
 
-    return
+    $return =
             ' <div class="mp_list_filter">
         <form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
             <div class="one_filter">
@@ -2290,6 +2329,8 @@ function mp_products_filter() {
             </div>
         </form>
     </div>';
+
+    return apply_filters('mp_products_filter', $return);
 }
 
 /**
@@ -2428,10 +2469,12 @@ function mp_cart_breadcrumbs($current_step) {
         }
     }
 
-    return '<div class="mp_cart_breadcrumbs">
+    $return = '<div class="mp_cart_breadcrumbs">
 				' . implode(
                     '<span class="sep">' . apply_filters('mp_cart_breadcrumbs_seperator', '&raquo;') . '</span>', $all) . '
 			</div>';
+
+	return apply_filters('mp_cart_breadcrumbs'. $return);
 }
 
 /**
@@ -2453,6 +2496,8 @@ function mp_store_navigation($echo = true) {
 <li class="page_item"><a href="' . mp_products_link(false, true) . '" title="' . __('Products', 'mp') . '">' . __('Products', 'mp') . '</a></li>
 </ul>';
     }
+
+    $nav = apply_filters('mp_store_navigation', $nav);
 
     if ($echo)
         echo $nav;
@@ -2645,6 +2690,9 @@ function mp_custom_fields_checkout_after_shipping($content = '') {
         $content .= '</tbody>';
         $content .= '</table>';
     }
+
+    $content = apply_filters('mp_custom_fields_checkout_after_shipping', $content);
+
     return $content;
 }
 
