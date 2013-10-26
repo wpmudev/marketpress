@@ -5,6 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+-- Added filters to many template functions
 -- Added Coupons for individual categories/products
 -- Deleted orders are now removed from usermeta
 -- Added compatibility with Google Universal Analytics
