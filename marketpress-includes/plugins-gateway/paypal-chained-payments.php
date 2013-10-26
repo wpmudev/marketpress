@@ -825,4 +825,3 @@ if ( is_multisite() ) {
     <?php
   }
 }
-?>

@@ -139,4 +139,3 @@ class My_Plugin_Name extends MP_Shipping_API {
 
 //register plugin - uncomment to register
 //mp_register_shipping_plugin( 'My_Plugin_Name', 'my-plugin-name', __('My Plugin', 'mp'), false );
-?>

@@ -7739,5 +7739,3 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 	<?php
 	}
 }
-
-?>

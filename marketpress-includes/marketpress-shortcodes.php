@@ -354,5 +354,3 @@ class MarketPress_Shortcodes {
 
 }
 $mp_shortcodes = new MarketPress_Shortcodes();
-
-?>

@@ -1052,5 +1052,3 @@ $settings = get_option('mp_settings');
 if (in_array($settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 	mp_register_shipping_plugin( 'MP_Shipping_USPS', 'usps', __('USPS', 'mp'), true );
 }
-
-?>

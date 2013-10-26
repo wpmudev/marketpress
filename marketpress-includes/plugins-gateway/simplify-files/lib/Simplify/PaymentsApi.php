@@ -270,4 +270,3 @@ class Simplify_PaymentsApi
     }
 
 }
-

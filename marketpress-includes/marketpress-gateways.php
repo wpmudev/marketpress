@@ -233,4 +233,3 @@ function mp_register_gateway_plugin($class_name, $plugin_name, $admin_name, $glo
 		return false;
 	}
 }
-?>

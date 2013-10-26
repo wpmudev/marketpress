@@ -376,4 +376,3 @@ class MP_Shipping_Handler {
 	}
 }
 $mpsh = new MP_Shipping_Handler();
-?>

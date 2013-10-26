@@ -493,4 +493,3 @@ class CsvImporter extends MarketPress_Importer {
 }
 //only load if the plugin is active and installed
 $mp_csv = new CsvImporter();
-?>
