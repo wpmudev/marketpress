@@ -2474,7 +2474,7 @@ function mp_cart_breadcrumbs($current_step) {
                     '<span class="sep">' . apply_filters('mp_cart_breadcrumbs_seperator', '&raquo;') . '</span>', $all) . '
 			</div>';
 
-	return apply_filters('mp_cart_breadcrumbs'. $return);
+	return apply_filters('mp_cart_breadcrumbs', $return);
 }
 
 /**
