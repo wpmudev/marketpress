@@ -80,11 +80,10 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 		$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
 		$content .= '<div class="row-fluid">';
 			$content .= '<div class="span6 offset3">';
-				$content .= '<input class="input-block-level" id="cc-number" type="text" maxlength="20" autocomplete="off" value="" placeholder="Card Number" autofocus />';
+				$content .= '<label for="cc-number">Credit Card Number: </label><input class="input-block-level" id="cc-number" type="text" maxlength="20" autocomplete="off" value="" placeholder="Card Number" autofocus />';
 				$content .= '<div class="row-fluid">';
-					$content .= '<div class="span4"><input class="input-block-level" id="cc-cvc" type="text" maxlength="3" autocomplete="off" value="" placeholder="CVC" /></div>';
-					$content .= '<div class="span4"><select class="input-block-level" id="cc-exp-month">' . $this->_print_month_dropdown() . '</select></div>';
-					$content .= '<div class="span4"><select class="input-block-level" id="cc-exp-year">' . $this->_print_year_dropdown() . '</select></div>';
+					$content .= '<div class="span4"><label for="cc-cvc">CVC: </label><input class="input-block-level" id="cc-cvc" type="text" maxlength="3" autocomplete="off" value="" placeholder="CVC" /></div>';
+					$content .= '<div class="span4"><label>Expiry Date: </label><select class="input-block-level" id="cc-exp-month">' . $this->_print_month_dropdown() . '</select> - <select class="input-block-level" id="cc-exp-year">' . $this->_print_year_dropdown() . '</select></div>';
 				$content .= '</div>';
 			$content .= '</div>';
 		$content .= '</div>';
@@ -246,7 +245,7 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 		<div class="postbox">
 			<h3 class='hndle' style="background: #222; box-shadow: inset 0px 15px 15px #333; text-shadow: 0px 1px 0px #000; color: #ccc;">
 				<img style="width: 100px; float: left; padding: 5px; padding-right: 25px;" src="<?php echo $mp->plugin_url . 'images/simplify.png'; ?>" />
-				<span style="color: #fff;"><?php _e('Simplify Commerce', 'mp') ?> <em><?php _e('by MasterCard', 'mp') ?></em></span> - <span style="color: #ccc;" class="description"><?php _e('Simplify helps merchants to accept online payments from Visa, MasterCard, American Express, Discover, JCB, and Diners Club cards. It\'s that simple. We offer a merchant account and payment gateway in a single, secure package so you can concentrate on what really matters to your business. Only supports USD currently.', 'mp'); ?> <a style="color: #fff;" href="https://www.simplify.com/commerce/login/signup" target="_blank"><?php _e('Signup for Simplify Commerce &raquo;', 'mp') ?></a></span>
+				<span style="color: #fff;"><?php _e('Simplify Commerce', 'mp') ?> <em><?php _e('by MasterCard', 'mp') ?></em></span> - <span style="color: #ccc;" class="description"><?php _e('Simplify helps merchants to accept online payments from Mastercard, Visa, American Express, Discover, JCB, and Diners Club cards. It\'s that simple. We offer a merchant account and payment gateway in a single, secure package so you can concentrate on what really matters to your business. Only supports USD currently.', 'mp'); ?> <a style="color: #fff;" href="https://www.simplify.com/commerce/login/signup" target="_blank"><?php _e('Signup for Simplify Commerce &raquo;', 'mp') ?></a></span>
 				<br style="clear: both;" />
 			</h3>
 			<div class="inside">
