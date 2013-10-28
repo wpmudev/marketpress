@@ -24,6 +24,8 @@
   mp_list_products
  */
 
+
+if (!function_exists('mp_tag_cloud')) :
 /**
  * Display product tag cloud.
  *
@@ -57,14 +59,17 @@ function mp_tag_cloud($echo = true, $args = array()) {
 
     $cloud = '<div id="mp_tag_cloud">' . wp_tag_cloud($args) . '</div>';
 
-    $cloud = apply_filters('mp_tag_cloud', $cloud);
+    $cloud = apply_filters('mp_tag_cloud', $cloud, $args);
 
     if ($echo)
         echo $cloud;
     else
         return $cloud;
 }
+endif;
 
+
+if (!function_exists('mp_list_categories')) :
 /**
  * Display or retrieve the HTML list of product categories.
  *
@@ -101,14 +106,17 @@ function mp_list_categories($echo = true, $args = '') {
 
     $list = '<ul id="mp_category_list">' . wp_list_categories($args) . '</ul>';
 
-    $list = apply_filters('mp_list_categories', $list);
+    $list = apply_filters('mp_list_categories', $list, $args);
 
     if ($echo)
         echo $list;
     else
         return $list;
 }
+endif;
 
+
+if (!function_exists('mp_dropdown_categories')) :
 /**
  * Display or retrieve the HTML dropdown list of product categories.
  *
@@ -160,14 +168,17 @@ function mp_dropdown_categories($echo = true, $args = '') {
 /* ]]> */
 </script>';
 
-	$dropdown = apply_filters('mp_dropdown_categories', $dropdown );
+	$dropdown = apply_filters('mp_dropdown_categories', $dropdown, $args );
 
     if ($echo)
         echo $dropdown;
     else
         return $dropdown;
 }
+endif;
 
+
+if (!function_exists('mp_popular_products')) :
 /**
  * Displays a list of popular products ordered by sales.
  *
@@ -190,16 +201,17 @@ function mp_popular_products($echo = true, $num = 5) {
 
     $content .= '</ul>';
 
-    $content = apply_filters('mp_popular_products', $content);
+    $content = apply_filters('mp_popular_products', $content, $num);
 
     if ($echo)
         echo $content;
     else
         return $content;
 }
+endif;
 
 
-
+if (!function_exists('mp_related_products')) :
 /**
  * Displays related products for the passed product id
  *
@@ -321,7 +333,7 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 		}
 	}
 
-	$output = apply_filters('mp_related_products', $output);
+	$output = apply_filters('mp_related_products', $output, $product_id, $in_same_category, $limit, $simple_list);
 
 	//how are we sending back the data
 	if($echo) {
@@ -330,9 +342,10 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 		return $output;
 	}
 }
+endif;
 
 
-
+if (!function_exists('mp_pinit_button')) :
 /**
  * Pinterest PinIt button
  */
@@ -355,7 +368,7 @@ function mp_pinit_button( $product_id = NULL, $context = 'single_view', $echo = 
 	$count_pos = ( $pos = $mp->get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
 		
 	$snippet = apply_filters('mp_pinit_button_link', '
-		<a href="//www.pinterest.com/pin/create/button/?url='.$url . $media .'&description='.$desc.'" data-pin-do="buttonPin" data-pin-config="'. $count_pos.'"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>');
+		<a href="//www.pinterest.com/pin/create/button/?url='.$url . $media .'&description='.$desc.'" data-pin-do="buttonPin" data-pin-config="'. $count_pos.'"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $product_id, $context);
 		
 	if($echo) {
 		echo $snippet;
@@ -363,8 +376,10 @@ function mp_pinit_button( $product_id = NULL, $context = 'single_view', $echo = 
 		return $snippet;
 	}
 }
+endif;
 
 
+if (!function_exists('_mp_cart_table')) :
 //Prints cart table, for internal use
 function _mp_cart_table($type = 'checkout', $echo = false) {
     global $mp, $blog_id;
@@ -636,7 +651,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         $content .= '</tbody></table>';
     }
 
-    $content = apply_filters('_mp_cart_table', $content);
+    $content = apply_filters('_mp_cart_table', $content, $type);
 
     if ($echo) {
         echo $content;
@@ -644,7 +659,10 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         return $content;
     }
 }
+endif;
 
+
+if (!function_exists('_mp_cart_login')) :
 //Prints cart login/register form, for internal use
 function _mp_cart_login($echo = false) {
     global $mp;
@@ -697,7 +715,10 @@ function _mp_cart_login($echo = false) {
     else
         return $content;
 }
+endif;
 
+
+if (!function_exists('_mp_cart_shipping')) :
 //Prints cart shipping form, for internal use
 function _mp_cart_shipping($editable = false, $echo = false) {
     global $mp, $current_user;
@@ -871,7 +892,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
         $content .= '</table>';
     }
 
-    $content = apply_filters('_mp_cart_shipping', $content);
+    $content = apply_filters('_mp_cart_shipping', $content, $editable);
 
     if ($echo) {
         echo $content;
@@ -879,7 +900,10 @@ function _mp_cart_shipping($editable = false, $echo = false) {
         return $content;
     }
 }
+endif;
 
+
+if (!function_exists('_mp_cart_payment')) :
 //Prints cart payment gateway form, for internal use
 function _mp_cart_payment($type, $echo = false) {
     global $mp, $blog_id, $mp_gateway_active_plugins;
@@ -955,7 +979,7 @@ function _mp_cart_payment($type, $echo = false) {
         unset($_SESSION['mp_order']);
     }
 
-    $content = apply_filters('_mp_cart_payment', $content);
+    $content = apply_filters('_mp_cart_payment', $content, $type);
 
     if ($echo) {
         echo $content;
@@ -963,7 +987,10 @@ function _mp_cart_payment($type, $echo = false) {
         return $content;
     }
 }
+endif;
 
+
+if (!function_exists('mp_show_cart')) :
 /**
  * Echos the current shopping cart contents. Use in the cart template.
  *
@@ -1041,7 +1068,7 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
         $content .= '<div id="mp_cart_actions_widget"><a class="mp_store_link" href="' . mp_products_link(false, true) . '">' . __('Browse Products &raquo;', 'mp') . '</a></div>';
     }
 
-    $content = apply_filters('mp_show_cart', $content);
+    $content = apply_filters('mp_show_cart', $content, $context, $checkoutstep);
 
     if ($echo) {
         echo $content;
@@ -1049,12 +1076,14 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
         return $content;
     }
 }
+endif;
 
+
+if (!function_exists('mp_order_status')) :
 /**
  * Echos the order status page. Use in the mp_orderstatus.php template.
  *
  */
-if (!function_exists('mp_order_status')) :
 function mp_order_status() {
     global $mp, $wp_query, $blog_id;
 
@@ -1403,12 +1432,13 @@ function mp_order_status() {
 }
 endif;
 
+
+if (!function_exists('mp_tracking_link')) :
 /*
  * function mp_tracking_link
  * @param string $tracking_number The tracking number string to turn into a link
  * @param string $method Shipping method, can be UPS, FedEx, USPS, DHL, or other (default)
  */
-
 function mp_tracking_link($tracking_number, $method = 'other') {
     $tracking_number = esc_attr($tracking_number);
     if ($method == 'UPS')
@@ -1422,13 +1452,15 @@ function mp_tracking_link($tracking_number, $method = 'other') {
     else
         return apply_filters('mp_shipping_tracking_link', $tracking_number, $method);
 }
+endif;
 
+
+if (!function_exists('mp_province_field')) :
 /*
  * function mp_province_field
  * @param string $country two-digit country code
  * @param string $selected state code form value to be shown/selected
  */
-
 function mp_province_field($country = 'US', $selected = null) {
     global $mp;
 
@@ -1454,7 +1486,7 @@ function mp_province_field($country = 'US', $selected = null) {
         $content .= '<input size="15" id="mp_state" name="state" type="text" value="' . esc_attr($selected) . '" />';
     }
 
-    $content = apply_filters('mp_province_field', $content);
+    $content = apply_filters('mp_province_field', $content, $country, $selected);
 
     //if ajax 
     if (defined('DOING_AJAX') && DOING_AJAX)
@@ -1462,7 +1494,10 @@ function mp_province_field($country = 'US', $selected = null) {
     else
         return $content;
 }
+endif;
 
+
+if (!function_exists('mp_list_products')) :
 /*
  * function mp_list_products
  * Displays a list of products according to preference. Optional values default to the values in Presentation Settings -> Product List
@@ -1477,7 +1512,6 @@ function mp_province_field($country = 'US', $selected = null) {
  * @param string $tag Optional, limit to a product tag
  * @param bool $list_view Optional, show as list. Default to presentation settings
  */
-
 function mp_list_products($echo = true, $paginate = '', $page = '', $per_page = '', $order_by = '', $order = '', $category = '', $tag = '', $list_view = NULL) {
     global $wp_query, $mp;
 
@@ -1576,14 +1610,17 @@ function mp_list_products($echo = true, $paginate = '', $page = '', $per_page = 
 
     $content .= '</div>';
 
-    $content = apply_filters('mp_list_products', $content);
+    $content = apply_filters('mp_list_products', $content, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
 
     if ($echo)
         echo $content;
     else
         return $content;
 }
+endif;
 
+
+if (!function_exists('_mp_products_html_list')) :
 function _mp_products_html_list($post_array = array()) {
     global $mp;
     $html = '';
@@ -1619,9 +1656,12 @@ function _mp_products_html_list($post_array = array()) {
         $html .= '</div>';
     }
 
-    return apply_filters('_mp_products_html_list', $html);
+    return apply_filters('_mp_products_html_list', $html, $post_array);
 }
+endif;
 
+
+if (!function_exists('_mp_products_html_grid')) :
 function _mp_products_html_grid($post_array = array()) {
     global $mp;
     $html = '';
@@ -1676,9 +1716,12 @@ function _mp_products_html_grid($post_array = array()) {
 
     $html .= (count($post_array) > 0 ? '<div class="clear"></div>' : '');
 
-    return apply_filters('_mp_products_html_grid', $html);
+    return apply_filters('_mp_products_html_grid', $html, $post_array);
 }
+endif;
 
+
+if (!function_exists('mp_has_variations')) :
 /*
  * function mp_has_variations
  * Checks if a given product has price variations
@@ -1686,12 +1729,14 @@ function _mp_products_html_grid($post_array = array()) {
  * @param $post_id int The product or post id
  * @return bool Whether or not it has variations
  */
-
 function mp_has_variations($post_id) {
     $mp_price = maybe_unserialize(get_post_meta($post_id, 'mp_price', true));
     return (is_array($mp_price) && count($mp_price) > 1);
 }
+endif;
 
+
+if (!function_exists('mp_product_title')) :
 /*
  * function mp_product_title
  * Displays a title of a single product according to preference
@@ -1704,7 +1749,6 @@ function mp_has_variations($post_id) {
  * @param string $css_class add custom css class to the title
  * @param string $microdata add additional information to HTML content which is more descriptive and suitable for search engines (learn more here http://schema.org/docs/gs.html)
  */
-
 function mp_product_title($product_id, $echo = true, $link = false, $formated = true, $html_tag = 'h3', $css_class = 'mp_product_name', $microdata = 'itemprop="name"') {
     global $mp;
 
@@ -1724,14 +1768,17 @@ function mp_product_title($product_id, $echo = true, $link = false, $formated = 
         $after_title = '';
     }
 
-    $return = apply_filters('mp_product_title', $before_title . $title . $after_title);
+    $return = apply_filters('mp_product_title', $before_title . $title . $after_title, $product_id, $link, $formated, $html_tag, $css_class, $microdata);
 
     if ($echo)
         echo $return;
     else
         return $return;
 }
+endif;
 
+
+if (!function_exists('mp_product_description')) :
 /*
  * function mp_product_description
  * Displays a title of a single product according to preference
@@ -1743,7 +1790,6 @@ function mp_product_title($product_id, $echo = true, $link = false, $formated = 
  * @param string $css_class add custom css class to the description
  * @param string $microdata add additional information to HTML content which is more descriptive and suitable for search engines (learn more here http://schema.org/docs/gs.html)
  */
-
 function mp_product_description($product_id, $echo = true, $content = 'full', $html_tag = true, $css_class = 'mp_product_content', $microdata = 'itemprop="description"') {
     global $mp;
 
@@ -1764,14 +1810,17 @@ function mp_product_description($product_id, $echo = true, $content = 'full', $h
         $after_description = '';
     }
 
-    $return = apply_filters('mp_product_description', $before_description . $description . $after_description);
+    $return = apply_filters('mp_product_description', $before_description . $description . $after_description, $product_id, $content, $html_tag, $css_class, $microdata);
 
     if ($echo)
         echo $return;
     else
         return $return;
 }
+endif;
 
+
+if (!function_exists('mp_product_meta')) :
 /*
  * function mp_product_meta
  * Displays the product meta box
@@ -1783,7 +1832,6 @@ function mp_product_description($product_id, $echo = true, $content = 'full', $h
  * @param string $html_tag title surrounding HTML tag (i.e. <div>title</div>)
  * @param string $css_class add custom css class to the description
  */
-
 function mp_product_meta($echo = true, $context = 'context', $label = true, $product_id = null, $html_tag = true, $css_class = 'mp_product_meta') {
 
     if ($html_tag) {
@@ -1795,14 +1843,17 @@ function mp_product_meta($echo = true, $context = 'context', $label = true, $pro
         $content .= '</div>';
     }
 
-    $content = apply_filters('mp_product_meta', $content);
+    $content = apply_filters('mp_product_meta', $content, $context, $label, $product_id, $html_tag, $css_class);
 
     if ($echo)
         echo $content;
     else
         return $content;
 }
+endif;
 
+
+if (!function_exists('mp_product')) :
 /*
  * function mp_product
  * Displays a single product according to preference
@@ -1814,7 +1865,6 @@ function mp_product_meta($echo = true, $context = 'context', $label = true, $pro
  * @param bool/string $image Whether and what context of image size to display. Options are false, 'single', or 'list'. Default 'single'
  * @param bool $meta Whether to display the product meta
  */
-
 function mp_product($echo = true, $product_id, $title = true, $content = 'full', $image = 'single', $meta = true) {
     global $mp;
     $post = get_post($product_id);
@@ -1844,14 +1894,17 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
     }
     $return .= '</div>';
 
-    $return = apply_filters('mp_product', $return);
+    $return = apply_filters('mp_product', $return, $product_id, $title, $content, $image, $meta);
 
     if ($echo)
         echo $return;
     else
         return $return;
 }
+endif;
 
+
+if (!function_exists('mp_category_list')) :
 /**
  * Retrieve product's category list in either HTML list or custom format.
  *
@@ -1867,9 +1920,12 @@ function mp_category_list($product_id = false, $before = '', $sep = ', ', $after
     else
         $return = __('Uncategorized', 'mp');
 
-    return apply_filters('mp_category_list', $return);
+    return apply_filters('mp_category_list', $return, $product_id, $before, $sep, $after);
 }
+endif;
 
+
+if (!function_exists('mp_tag_list')) :
 /**
  * Retrieve product's tag list in either HTML list or custom format.
  *
@@ -1885,9 +1941,12 @@ function mp_tag_list($product_id = false, $before = '', $sep = ', ', $after = ''
     else
         $return = __('No Tags', 'mp');
 
-    return apply_filters('mp_tag_list', $return);
+    return apply_filters('mp_tag_list', $return, $product_id, $before, $sep, $after);
 }
+endif;
 
+
+if (!function_exists('mp_product_class')) :
 /**
  * Display the classes for the product div.
  *
@@ -1899,14 +1958,17 @@ function mp_product_class($echo = true, $class = '', $post_id = null) {
     // Separates classes with a single space, collates classes for post DIV
     $content = 'class="' . join(' ', mp_get_product_class($class, $post_id)) . '"';
 
-    $content = apply_filters('mp_product_class', $content);
+    $content = apply_filters('mp_product_class', $content, $class, $post_id);
 
     if ($echo)
         echo $content;
     else
         return $content;
 }
+endif;
 
+
+if (!function_exists('mp_get_product_class')) :
 /**
  * Retrieve the list of classes for the product as an array.
  *
@@ -1969,9 +2031,12 @@ function mp_get_product_class($class = '', $post_id = null) {
 
     $classes = array_map('esc_attr', $classes);
 
-    return apply_filters('mp_get_product_class', $classes);
+    return apply_filters('mp_get_product_class', $classes, $class, $post_id);
 }
+endif;
 
+
+if (!function_exists('mp_product_price')) :
 /*
  * Displays the product price (and sale price)
  *
@@ -2026,7 +2091,10 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
     else
         return $price;
 }
+endif;
 
+
+if (!function_exists('mp_buy_button')) :
 /*
  * Displays the buy or add to cart button
  *
@@ -2034,7 +2102,6 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
  * @param string $context Options are list or single
  * @param int $post_id The post_id for the product. Optional if in the loop
  */
-
 function mp_buy_button($echo = true, $context = 'list', $post_id = NULL) {
     global $id, $mp;
     $post_id = ( NULL === $post_id ) ? $id : $post_id;
@@ -2145,7 +2212,10 @@ function mp_buy_button($echo = true, $context = 'list', $post_id = NULL) {
     else
         return $button;
 }
+endif;
 
+
+if (!function_exists('mp_product_sku')) :
 /*
  * function mp_product_sku
  * 
@@ -2155,7 +2225,6 @@ function mp_buy_button($echo = true, $context = 'list', $post_id = NULL) {
  * 
  * Returns or echos html of variation SKUs
  */
-
 function mp_product_sku($echo = true, $post_id = NULL, $seperator = ', ') {
     global $id, $mp;
     $post_id = ( NULL === $post_id ) ? $id : $post_id;
@@ -2170,7 +2239,10 @@ function mp_product_sku($echo = true, $post_id = NULL, $seperator = ', ') {
     else
         return $html;
 }
+endif;
 
+
+if (!function_exists('mp_product_image')) :
 /*
  * Displays the product featured image
  *
@@ -2260,14 +2332,17 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
     if ($link)
         $image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
 
-    $image = apply_filters('mp_product_image', $image);
+    $image = apply_filters('mp_product_image', $image, $context, $post_id, $size);
 
     if ($echo)
         echo $image;
     else
         return $image;
 }
+endif;
 
+
+if (!function_exists('mp_products_filter')) :
 /**
  * Displays the product list filter dropdowns
  * 
@@ -2332,7 +2407,10 @@ function mp_products_filter() {
 
     return apply_filters('mp_products_filter', $return);
 }
+endif;
 
+
+if (!function_exists('mp_cart_link')) :
 /**
  * Echos the current shopping cart link. If global cart is on reflects global location
  * @param bool $echo Optional, whether to echo. Defaults to true
@@ -2362,7 +2440,10 @@ function mp_cart_link($echo = true, $url = false, $link_text = '') {
     else
         return $link;
 }
+endif;
 
+
+if (!function_exists('mp_store_link')) :
 /**
  * Echos the current store link.
  * @param bool $echo Optional, whether to echo. Defaults to true
@@ -2385,7 +2466,10 @@ function mp_store_link($echo = true, $url = false, $link_text = '') {
     else
         return $link;
 }
+endif;
 
+
+if (!function_exists('mp_product_link')) :
 /**
  * Echos the current product list link.
  * @param bool $echo Optional, whether to echo. Defaults to true
@@ -2408,7 +2492,10 @@ function mp_products_link($echo = true, $url = false, $link_text = '') {
     else
         return $link;
 }
+endif;
 
+
+if (!function_exists('mp_orderstatus_link')) :
 /**
  * Echos the current order status link.
  * @param bool $echo Optional, whether to echo. Defaults to true
@@ -2431,16 +2518,22 @@ function mp_orderstatus_link($echo = true, $url = false, $link_text = '') {
     else
         return $link;
 }
+endif;
 
+
+if (!function_exists('mp_checkout_step_url')) :
 /**
  * Returns the current shopping cart link with checkout step.
  *
  * @param string $checkoutstep. Possible values: checkout-edit, shipping, checkout, confirm-checkout, confirmation
  */
 function mp_checkout_step_url($checkout_step) {
-    return apply_filters('mp_checkout_step_url', mp_cart_link(false, true) . trailingslashit($checkout_step));
+    return apply_filters('mp_checkout_step_url', mp_cart_link(false, true) . trailingslashit($checkout_step), $checkout_step);
 }
+endif;
 
+
+if (!function_exists('mp_cart_breadcrumbs')) :
 /**
  * @return string HTML that shows the user their current position in the purchase process.
  */
@@ -2474,9 +2567,12 @@ function mp_cart_breadcrumbs($current_step) {
                     '<span class="sep">' . apply_filters('mp_cart_breadcrumbs_seperator', '&raquo;') . '</span>', $all) . '
 			</div>';
 
-	return apply_filters('mp_cart_breadcrumbs', $return);
+	return apply_filters('mp_cart_breadcrumbs', $return, $current_step);
 }
+endif;
 
+
+if (!function_exists('mp_store_navigation')) :
 /**
  * Echos the current store navigation links.
  *
@@ -2504,7 +2600,10 @@ function mp_store_navigation($echo = true) {
     else
         return $nav;
 }
+endif;
 
+
+if (!function_exists('mp_is_shop_page')) :
 /**
  * Determine if on a MarketPress shop page
  *
@@ -2514,7 +2613,10 @@ function mp_is_shop_page() {
     global $mp;
     return $mp->is_shop_page;
 }
+endif;
 
+
+if (!function_exists('mp_items_in_cart')) :
 /**
  * Determine if there are any items in the cart
  *
@@ -2526,7 +2628,10 @@ function mp_items_in_cart() {
     else
         return false;
 }
+endif;
 
+
+if (!function_exists('mp_items_count_in_cart')) :
 /**
  * Determine count of any items in the cart
  *
@@ -2560,7 +2665,10 @@ function mp_items_count_in_cart() {
         return 0;
     }
 }
+endif;
 
+
+if (!function_exists('mp_products_count')) :
 /**
  * Determine the number of published products
  *
@@ -2570,7 +2678,10 @@ function mp_products_count() {
     $custom_query = new WP_Query('post_type=product&post_status=publish');
     return $custom_query->post_count;
 }
+endif;
 
+
+if (!function_exists('mp_custom_fields_checkout_after_shipping')) :
 /**
  * This function hook into the shipping filter to add any product custom fields. Checks the cart items
  * If any cart items have associated custom fields then they will be displayed in a new section 'Product extra fields'
@@ -2695,9 +2806,11 @@ function mp_custom_fields_checkout_after_shipping($content = '') {
 
     return $content;
 }
-
+endif;
 add_filter('mp_checkout_after_shipping', 'mp_custom_fields_checkout_after_shipping');
 
+
+if (!function_exists('mp_custom_fields_single_order_display_box')) :
 /* Not used. This code will show the custom fields input at the view cart page instead of shipping */
 
 function mp_custom_fields_single_order_display_box($order) {
@@ -2744,5 +2857,5 @@ function mp_custom_fields_single_order_display_box($order) {
         <?php
     }
 }
-
+endif;
 //add_action('mp_single_order_display_box', 'mp_custom_fields_single_order_display_box');
