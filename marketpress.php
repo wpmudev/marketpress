@@ -3212,7 +3212,7 @@ Thanks again!", 'mp')
       	  $_SESSION['mp_payment_method'] = 'manual'; //so we don't get an error message on confirmation page
 
           //redirect to final page
-	  			wp_safe_redirect(mp_checkout_step_url('confirmation'));
+	  		wp_safe_redirect(mp_checkout_step_url('confirmation'));
           exit;
         }
       }
@@ -3227,13 +3227,30 @@ Thanks again!", 'mp')
         exit;
       }
     } else if (isset($_POST['mp_payment_confirm'])) { //create order and process payment
-      do_action( 'mp_payment_confirm_' . $_SESSION['mp_payment_method'], $this->get_cart_contents($this->global_cart), $_SESSION['mp_shipping_info'] );
-
-      //if no errors send to next checkout step
-      if ($this->checkout_error == false) {
-        wp_safe_redirect(mp_checkout_step_url('confirmation'));
-        exit;
-      }
+	
+	//check to be sure each product is still available
+	$final_cart = $this->get_cart_contents( $this->global_cart );
+	if( is_array( $final_cart ) ) {
+		foreach($final_cart as $prod_id => $details) {
+			if (get_post_meta( $prod_id, 'mp_track_inventory', true ) ) {
+	        	$stock = maybe_unserialize(get_post_meta($prod_id, 'mp_inventory', true));
+				if( isset( $stock[0] ) && $stock[0] === 0 ) {
+					$this->cart_checkout_error( __("Sorry, one or more products are no longer available. Please review your cart.", 'mp') );
+				}
+			}
+		}
+	}
+	
+	//wrap the action as it may trigger errors as well
+	if($this->checkout_error == false) {
+		do_action( 'mp_payment_confirm_' . $_SESSION['mp_payment_method'], $this->get_cart_contents($this->global_cart), $_SESSION['mp_shipping_info'] );
+	}
+	
+	//if no errors send to next checkout step
+    if ($this->checkout_error == false) {
+    	wp_safe_redirect(mp_checkout_step_url('confirmation'));
+    	exit;
+		}
     }
   }
 
