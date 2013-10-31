@@ -2272,7 +2272,7 @@ msgid "SimpleMarket"
 msgstr "SimpleMarket"
 
 #: marketpress.php:6222
-msgid "The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
+msgid "The SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
 msgstr "El tema de SimpleMarket GRATUITO utiliza un diseño de HTML 5 de respuesta rapida para que su sitio de comercio electrónico se vea bien en todos los tamaños de pantalla y dispositivos, como teléfonos inteligentes o tabletas!"
 
 #: marketpress.php:6227

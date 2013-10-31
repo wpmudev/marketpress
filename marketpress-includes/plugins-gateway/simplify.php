@@ -80,10 +80,10 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 		$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
 		$content .= '<div class="row-fluid">';
 			$content .= '<div class="span6 offset3">';
-				$content .= '<label for="cc-number">Credit Card Number: </label><input class="input-block-level" id="cc-number" type="text" maxlength="20" autocomplete="off" value="" placeholder="Card Number" autofocus />';
+				$content .= '<label for="cc-number"><?php __('Credit Card Number', 'mp'); ?>: </label><input class="input-block-level" id="cc-number" type="text" maxlength="20" autocomplete="off" value="" placeholder="<?php __('Card Number', 'mp'); ?>" autofocus />';
 				$content .= '<div class="row-fluid">';
-					$content .= '<div class="span4"><label for="cc-cvc">CVC: </label><input class="input-block-level" id="cc-cvc" type="text" maxlength="3" autocomplete="off" value="" placeholder="CVC" /></div>';
-					$content .= '<div class="span4"><label>Expiry Date: </label><select class="input-block-level" id="cc-exp-month">' . $this->_print_month_dropdown() . '</select> - <select class="input-block-level" id="cc-exp-year">' . $this->_print_year_dropdown() . '</select></div>';
+					$content .= '<div class="span4"><label for="cc-cvc"><?php __('CVC', 'mp'); ?>: </label><input class="input-block-level" id="cc-cvc" type="text" maxlength="3" autocomplete="off" value="" placeholder="<?php __('CVC', 'mp'); ?>" /></div>';
+					$content .= '<div class="span4"><label><?php __('Expiry Date', 'mp'); ?>: </label><select class="input-block-level" id="cc-exp-month">' . $this->_print_month_dropdown() . '</select> - <select class="input-block-level" id="cc-exp-year">' . $this->_print_year_dropdown() . '</select></div>';
 				$content .= '</div>';
 			$content .= '</div>';
 		$content .= '</div>';
