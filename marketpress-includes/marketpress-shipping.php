@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
 MarketPress Shipping Plugin Base Class
 */
@@ -171,7 +171,7 @@ if (!class_exists('MP_Shipping_API')) {
 
 		function _weight_save_shipping_metabox($shipping_meta) {
 			global $mp;
-			
+
 			//process extra per item shipping
 			if ($mp->get_setting('shipping->system') == 'metric') {
 				$shipping_meta['weight'] = (!empty($_POST['mp_shipping_weight'])) ? round($_POST['mp_shipping_weight'], 2) : 0;
@@ -284,9 +284,10 @@ class MP_Shipping_Handler {
 
 		if ( $mp->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
 			$label = $mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
-			$options = apply_filters("mp_shipping_options_".$_SESSION['mp_shipping_info']['shipping_option'], null, null, null, null, null, null, null);
-			if (isset($options[$_SESSION['mp_shipping_info']['shipping_sub_option']]))
-				$label .= ' - ' . $options[$_SESSION['mp_shipping_info']['shipping_sub_option']];
+//    Because no address is passed doesn't make sense to recalculate options here. They've already been selected
+//		$options = apply_filters("mp_shipping_options_".$_SESSION['mp_shipping_info']['shipping_option'], null, null, null, null, null, null, null);
+			if (isset($_SESSION['mp_shipping_info']['shipping_sub_option']))
+				$label .= ' - ' . $_SESSION['mp_shipping_info']['shipping_sub_option'];
 			$content .= '<tr>';
       $content .= '<td align="right">'.__('Shipping Method:', 'mp').'</td>';
       $content .= '<td>'.esc_attr($label).'</td>';
@@ -324,12 +325,17 @@ class MP_Shipping_Handler {
 
 		$content = '';
 		if ( count( $options ) && ! array_key_exists('error', $options) ) {  //If one of the keys is 'error' then it contains an error message from calculated rates.
+
+			if (defined('DOING_AJAX')) {
+				header('Content-Type: text/html');
+			}
+
 			$content .= '<select name="shipping_sub_option" size="' . max(count($options), 4) . '">'; //4 min because of safari
-			
+
 			//Make sure the $_SESSION suboption is still in the available rates
 			$suboption = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : '';
 			$suboption = array_key_exists($suboption, $options) ? $suboption : '';
-			
+
 			$ndx = 0;
 			foreach ($options as $key => $name) {
 				$selected = ($ndx == 0 && empty($suboption) ) ? true :  ($suboption == $key); //Nothing selected pick the first one.
@@ -338,8 +344,13 @@ class MP_Shipping_Handler {
 			}
 			$content .= '</select>';
 		} else{
+			if (defined('DOING_AJAX')) {
+				header('Content-Type: application/json');
+				$content = json_encode(array('error' => $options['error']) );
+			} else {
 			$content .= $options['error'];
-			$content .= '<input type="hidden" id="mp_no_shipping_options" name="no_shipping_options" value="1" />';
+			$content .= '<input type="hidden" name="no_shipping_options" value="1" />';
+			}
 			$content .= apply_filters('mp_checkout_error_no_shipping_options', '');
 		}
 

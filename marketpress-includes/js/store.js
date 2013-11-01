@@ -1,4 +1,4 @@
-/**** MarketPress Checkout JS *********/
+﻿/**** MarketPress Checkout JS *********/
 jQuery(document).ready(function($) {
   
   //coupon codes
@@ -45,9 +45,24 @@ jQuery(document).ready(function($) {
    	$("#mp_shipping_submit").hide();
     $("#mp-shipping-select-holder").html('<img src="'+MP_Ajax.imgUrl+'" alt="Loading..." />');
     var serializedForm = $('form#mp_shipping_form').serialize();
-    $.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
+
+		$('#mp_no_shipping_options').val(1); // Set the error flag
+
+		$.ajax({
+			type: 'POST',
+			url: MP_Ajax.ajaxUrl,
+			data: serializedForm,
+
+			success: function(data) {
+				if(typeof data == 'object'){
+					$("#mp-shipping-select-holder").html(data.error);
+				} else {
+					$('#mp_no_shipping_options').val(0); // Clear the error flag
       $("#mp-shipping-select-holder").html(data);
+				}
     	$("#mp_shipping_submit").show();
+			}
+
     });
   }
 });

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /*
   MarketPress Template Functions
 
@@ -215,7 +215,7 @@ if (!function_exists('mp_related_products')) :
 /**
  * Displays related products for the passed product id
  *
- * @param int $product_id. 
+ * @param int $product_id.
  * @param bool $in_same_category Optional, whether to limit related to the same category.
  * @param bool $echo. Optional, whether to echo or return the results
  * @param int $limit. Optional The number of products we want to retrieve.
@@ -223,20 +223,20 @@ if (!function_exists('mp_related_products')) :
  */
 function mp_related_products( $product_id = NULL, $in_same_category = NULL, $echo = false, $limit = NULL, $simple_list = NULL) {
 	global $mp, $post;
-	
+
 	$output = '';
 	$categories = array();
-	
+
 	if( $mp->get_setting('related_products->show') == 0) {
 		return;
 	}
-	
+
 	$simple_list = ( is_null( $simple_list ) ) ? $mp->get_setting('related_products->simple_list') : ( $simple_list == 'true') ? true : false;
 	$same_category = ( is_null( $in_same_category ) ) ? $mp->get_setting('related_products->in_same_category') : ( $in_same_category == 'true') ? true : false;
-	
-	
+
+
 	$limit = (!$limit) ? $mp->get_setting('related_products->show_limit') : $limit;
-	
+
 	if( !$product_id ) {
 		$product_id = ( isset($post) && $post->post_type == 'product') ? $post->ID : false;
 		$product_details = get_post($product_id);
@@ -244,12 +244,12 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 		$product_details = get_post($product_id);
 		$product_id = ( $product_details->post_type == 'product') ? $post->ID : false;
 	}
-	
+
 	if(!$product_details) {
 		return '';
 	}
-	
-	
+
+
 	//setup the default args
 	$query_args = array(
 		'post_type' 	 => 'product',
@@ -257,11 +257,11 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 		'post__not_in' 	 => array($product_id),
 		'tax_query' 	 => array(), //we'll add these later
 	);
-	
+
 	//get the tags for this product
 	$tags = get_the_terms( $product_id, 'product_tag');
 	$tag_list = array();
-	
+
 	if($tags) {
 		$tag_list = array();
 		foreach($tags as $tag) {
@@ -275,7 +275,7 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 				'operator' => 'IN'
 		);
 	}
-	
+
 	//are we limiting to only the assigned categories
 	if( $same_category) {
 		$product_cats = get_the_terms(  $product_id, 'product_category' );
@@ -283,7 +283,7 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 			foreach($product_cats as $cat) {
 				$categories[] = $cat->term_id;
 			}
-			
+
 			$query_args['tax_query'][] = array(
 					'taxonomy' => 'product_category',
 					'field' => 'id',
@@ -292,15 +292,15 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 			);
 		}
 	}
-	
+
 	//we only want to run the query if we have categories or tags to look for.
 	if(count($tag_list) > 0 || count($categories) > 0 ) {
 		//make the query
 		$related_query = new WP_Query( $query_args );
-		
+
 		//how are we formatting the output
 		if( $simple_list) {
-			
+
 			$output = '<div id="mp_related_products">';
 			$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4><div>';
 			if( $related_query->post_count ) {
@@ -314,9 +314,9 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 			}else{
 				$output .= '<div class="mp_related_products_title"><h4>'. apply_filters( 'mp_related_products_title_none', __('No Related Products','mp') ) . '</h4></div>';
 			}
-			
+
 			$output .'</div>';
-			
+
 		}else{
 			//we'll use the $mp settings and functions
 			$layout_type = $mp->get_setting('list_view');
@@ -328,7 +328,7 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 			}else{
 				$output .= '<div class="mp_related_products_title"><h4>'. apply_filters( 'mp_related_products_title_none', __('No Related Products','mp') ) . '</h4></div>';
 			}
-	
+
 			$output .'</div>';
 		}
 	}
@@ -351,25 +351,25 @@ if (!function_exists('mp_pinit_button')) :
  */
 function mp_pinit_button( $product_id = NULL, $context = 'single_view', $echo = false ) {
 	global $mp, $id;
-	
+
 	$post_id = ($product_id === NULL) ? $id : $product_id;
 	$setting = $mp->get_setting('social->pinterest->show_pinit_button');
-	
+
 	if( $setting == 'off' || $setting != $context ) {
 		return '';
 	}
 
 	$url = urlencode( get_permalink( $post_id ) );
 	$desc = urlencode( get_the_title( $post_id ) );
-		
+
 	$image_info =  $large_image_url = wp_get_attachment_image_src( get_post_thumbnail_id($post_id), 'large');
 	$media = ( $image_info ) ?  '&media='.urlencode( $image_info[0] ) : '';
-		
+
 	$count_pos = ( $pos = $mp->get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
-		
+
 	$snippet = apply_filters('mp_pinit_button_link', '
 		<a href="//www.pinterest.com/pin/create/button/?url='.$url . $media .'&description='.$desc.'" data-pin-do="buttonPin" data-pin-config="'. $count_pos.'"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $product_id, $context);
-		
+
 	if($echo) {
 		echo $snippet;
 	}else{
@@ -568,7 +568,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
         //coupon line TODO - figure out how to apply them on global checkout
         $coupon_code = $mp->get_coupon_code();
         if ($coupon = $mp->coupon_value($coupon_code, $total)) {
-            
+
             //dont' show confusing subtotal with tax inclusive pricing on
             if (!$mp->get_setting('tax->tax_inclusive')) {
                 $content .= '<tr>';
@@ -749,7 +749,12 @@ function _mp_cart_shipping($editable = false, $echo = false) {
     if ($editable) {
         $content .= '<form id="mp_shipping_form" method="post" action="">';
 
-        $content .= apply_filters('mp_checkout_before_shipping', '');
+        //Flag used by ajax to alert a submit of any errors that may have occured on the fornt end.
+        //Set to "1" when the ajax starts so that if the ajax fails the failure will autonmatically be flagged.
+        //Left as "1" is ajax returns an error
+        $content .= '<input type="hidden" id="mp_no_shipping_options" name="no_shipping_options" value="0" />';
+
+       $content .= apply_filters('mp_checkout_before_shipping', '');
 
         $content .= '<table class="mp_cart_shipping">';
         $content .= '<thead><tr>';
@@ -1356,14 +1361,14 @@ function mp_order_status() {
             //list orders
             echo '<h3>' . __('Your Recent Orders:', 'mp') . '</h3>';
             echo '<ul id="mp-order-list">';
-			
+
 			//need to check for removed orders
 			$resave_meta = false;
             foreach ($orders as $timestamp => $order)
-			
+
 				if( $mp->get_order( $order['id'] ) ) {
                 	echo '  <li><strong>' . $mp->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
-					
+
 				}else{
 					unset( $orders[$timestamp] );
 					$resave_meta = true;
@@ -1371,10 +1376,10 @@ function mp_order_status() {
             echo '</ul>';
 			//if we need to resave we'll do it here
 			if($resave_meta) {
-				
+
 				$_COOKIE[$cookie_id] = serialize($orders);
 				update_user_meta($user_id, $meta_id, $orders );
-				
+
 			}
             ?>
             <form action="<?php mp_orderstatus_link(true, true); ?>" method="get">
@@ -1488,7 +1493,7 @@ function mp_province_field($country = 'US', $selected = null) {
 
     $content = apply_filters('mp_province_field', $content, $country, $selected);
 
-    //if ajax 
+    //if ajax
     if (defined('DOING_AJAX') && DOING_AJAX)
         die($content);
     else
@@ -1683,7 +1688,7 @@ function _mp_products_html_grid($post_array = array()) {
                 '<p class="mp_excerpt">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
                 '';
         $mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
-		
+
 		$pinit = mp_pinit_button($post->ID, 'all_view');
 
         $class = array();
@@ -1693,14 +1698,14 @@ function _mp_products_html_grid($post_array = array()) {
 
         $html .= '<div class="mp_one_tile ' . implode($class, ' ') . '">
                 <div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-                
+
                   <div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
                     ' . $img . '
                     ' . $pinit .'
                     <h3 class="mp_product_name">
                       <a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
                     </h3>
-                  
+
                     ' . $mp_product_list_content . '
                   </div>
 
@@ -1725,7 +1730,7 @@ if (!function_exists('mp_has_variations')) :
 /*
  * function mp_has_variations
  * Checks if a given product has price variations
- * 
+ *
  * @param $post_id int The product or post id
  * @return bool Whether or not it has variations
  */
@@ -1740,7 +1745,7 @@ if (!function_exists('mp_product_title')) :
 /*
  * function mp_product_title
  * Displays a title of a single product according to preference
- * 
+ *
  * @param bool $echo Optional, whether to echo or return
  * @param int $product_id the ID of the product to display
  * @param bool $link Whether to display title with or without a link
@@ -1782,7 +1787,7 @@ if (!function_exists('mp_product_description')) :
 /*
  * function mp_product_description
  * Displays a title of a single product according to preference
- * 
+ *
  * @param bool $echo Optional, whether to echo or return
  * @param int $product_id the ID of the product to display
  * @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'
@@ -1836,7 +1841,7 @@ function mp_product_meta($echo = true, $context = 'context', $label = true, $pro
 
     if ($html_tag) {
         $content = '<div class="'.$css_class.'">';
-    }    
+    }
     $content .= mp_product_price(false, $product_id, $label);
     $content .= mp_buy_button(false, $context, $product_id);
     if ($html_tag) {
@@ -1857,7 +1862,7 @@ if (!function_exists('mp_product')) :
 /*
  * function mp_product
  * Displays a single product according to preference
- * 
+ *
  * @param bool $echo Optional, whether to echo or return
  * @param int $product_id the ID of the product to display
  * @param bool $title Whether to display the title
@@ -2218,11 +2223,11 @@ endif;
 if (!function_exists('mp_product_sku')) :
 /*
  * function mp_product_sku
- * 
+ *
  * @param bool $echo default true
  * @param int $post_id The post_id of the product. Optional if in the loop
  * @param string $seperator The seperator to put between skus, default ', '
- * 
+ *
  * Returns or echos html of variation SKUs
  */
 function mp_product_sku($echo = true, $post_id = NULL, $seperator = ', ') {
@@ -2345,7 +2350,7 @@ endif;
 if (!function_exists('mp_products_filter')) :
 /**
  * Displays the product list filter dropdowns
- * 
+ *
  * @return string   html for filter/order products select elements.
  */
 function mp_products_filter() {
@@ -2685,11 +2690,11 @@ if (!function_exists('mp_custom_fields_checkout_after_shipping')) :
 /**
  * This function hook into the shipping filter to add any product custom fields. Checks the cart items
  * If any cart items have associated custom fields then they will be displayed in a new section 'Product extra fields'
- * shown below the shipping form inputs. The custom fields will be one for each quantity. Via the product admin each 
+ * shown below the shipping form inputs. The custom fields will be one for each quantity. Via the product admin each
  * custom field can be made required or optional. Standard error handling is provided per Market Press standard processing.
  *
  * @since 2.6.0
- * @see 
+ * @see
  *
  * @param $content - output content passed from caller (_mp_cart_shipping)
  * @return $content - Revised content with added information
@@ -2751,7 +2756,7 @@ function mp_custom_fields_checkout_after_shipping($content = '') {
                     $content_product .= $label_text . ' (' . $required_text . ')<br />';
                     //$content_product .=  '</td></tr>';
                     //$content_product .= '<tr><td style="border-width: 0px">';
-                    // If the mp_custom_field_per is set to 'line' we only show one input field per item in the cart. 
+                    // If the mp_custom_field_per is set to 'line' we only show one input field per item in the cart.
                     // This input field will be a simply unordered list (<ul>). However, if the mp_custom_field_per
                     // Then we need to show an input field per the quantity items. In this case we use an ordered list
                     // to show the numbers to the user. 0-based.
@@ -2820,7 +2825,7 @@ function mp_custom_fields_single_order_display_box($order) {
     if (!isset($order->mp_shipping_info['mp_custom_fields']))
         return;
 
-    // IF no order items. Not sure this can happend but just in case. 
+    // IF no order items. Not sure this can happend but just in case.
     if (!isset($order->mp_cart_info))
         return;
 
