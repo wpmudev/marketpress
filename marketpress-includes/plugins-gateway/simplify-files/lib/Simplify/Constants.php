@@ -47,5 +47,3 @@ class Simplify_Constants
      */
     const API_BASE_SANDBOX_URL = 'https://sandbox.simplify.com/v1/api';
 }
-
-?>

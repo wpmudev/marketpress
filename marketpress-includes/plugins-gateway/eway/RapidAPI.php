@@ -643,5 +643,3 @@ class EwayParser {
     }
 
 }
-
-?>

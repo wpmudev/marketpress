@@ -1674,8 +1674,8 @@ msgid "SimpleMarket"
 msgstr "SimpleMarket"
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5297
-msgid "The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
-msgstr "The FREE SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
+msgid "The SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
+msgstr "The SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
 
 #: /Users/aaron2/Documents/WP-Test/wp-content/plugins/marketpress/marketpress.php:5306
 msgid "Single Product Settings"

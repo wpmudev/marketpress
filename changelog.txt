@@ -1,17 +1,30 @@
 Plugin Name: MarketPress
 Author: Aaron Edwards (incsub)
 
-Change Log:
+Change Log: 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+
+2.9 beta 1 - 10/24/2013 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher
+----------------------------------------------------------------------
+- Added Coupons for individual categories/products
+- Added compatibility with Google Universal Analytics
+- Added Stripe embedded form button
+- Added oembed endpoint for Pinterest "Rich Pins"
+- Added show related products option
+- Added Pickup in-store shipping option
+- Added filters to many template functions
+- Minor bugfixes on Simplify gateway
+- Deleted orders are now removed from usermeta
+- Fixed bug with 2checkout where amount was returning more than 2 decimal places
 - Added Russian Rubles to paypal currencies and locale
 - Fix php warnings when switching between non-calculated shipping modules
 - Fix bug with which gateway is shown when switching global cart in network settings
 - Fix possible rounding error in Stripe gateway
 - In Calculated Shipping plugins changed so if all weights in an order are zero then show Free Shipping
 - In FedEx fixed problem with calculating the correct number of packages.
-- Added ajax checkout error flag which is set when ajax starts and reset when ajax is finished. Prevents form submits from aborting shipping lookups.
+- Added https support for custom styles in the wp-content/marketpress-styles/ directory.
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
@@ -99,7 +112,7 @@ Change Log:
 - Fix rounding errors with tax inclusive pricing (big one!)
 - Fix problems with ajax paging with grid on taxonomy archive pages
 - Fix css class on product images
-- Fix being unable to overwrite shipping information fields with a blank value
+- Fix being unable to overwrite shipping information fields with a blank value 
 - Fix grid bug when no styles are loaded http://wp.mu/h7
 - Pass messages settings through wpautop()
 - Added check for US country before trimming zip code to 5 characters in calculated shipping modules
@@ -138,12 +151,12 @@ Change Log:
 - Change the "from" price shown on variation listings to the lowest
 - Change PayPal generated timestamps for server timezone support
 - Fix double trigger of 'mp_order_paid' hook
-- Added APO state codes to the marketpress-data.php so addresses can make it past PayPal's address checker,
+- Added APO state codes to the marketpress-data.php so addresses can make it past PayPal's address checker, 
 - Use "APO", "FPO" or "DPO" for the City and 10 digit Zip code.
-- Sorted USPS shipping choices in Ascending order so that the lowest price will be the default.
+- Sorted USPS shipping choices in Ascending order so that the lowest price will be the default. 
 - Changed the Shipping sub options <select> to a select box instead of a dropdown.
 - Added code to insure the first item in the Shipping sub options is selected if suboption is blank. Makes sure an item shows in iPad.
-- Set minimum "size" on shipping_sub_options select box to 4 for Safari and Chrome quirk.
+- Set minimum "size" on shipping_sub_options select box to 4 for Safari and Chrome quirk. 
 - Removed Handling charge display from USPS shipping options.
 - Let ounces go decimal for shipping weight
 - Add hooks to coupon functions
