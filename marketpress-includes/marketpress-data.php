@@ -5164,3 +5164,5 @@ $this->currencies = array(
 	"POINTS"=> array("Points (for point based stores)", "50, 6f, 69, 6e, 74, 73"),
 	"CREDITS"=> array("Credits (for credit based stores)", "43, 72, 65, 64, 69, 74, 73")
 );
+
+?>

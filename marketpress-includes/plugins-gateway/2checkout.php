@@ -155,18 +155,18 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     $total = array_sum($totals);
     
     if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-      $total = round($coupon['new_total'], 2 );
+      $total = $coupon['new_total'];
     }
 
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
-      $total = round( ( $total + $shipping_price), 2 );
+      $total = $total + $shipping_price;
 			$params['sh_cost'] = $shipping_price;
     }
     
     //tax line
     if ( ($tax_price = $mp->tax_price()) !== false ) {
-      $total = ruond( ($total + $tax_price), 2);
+      $total = $total + $tax_price;
     }
     
     $params['total'] = $total;
@@ -222,7 +222,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     global $mp;
     
     $timestamp = time();
-    $total = round( $_REQUEST['total'], 2 );
+    $total = $_REQUEST['total'];
     
     if ($this->SandboxFlag == 'sandbox') {
       $hash = strtoupper(md5($this->API_Password . $this->API_Username . 1 . $total));
@@ -401,3 +401,4 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 
 //register payment gateway plugin
 mp_register_gateway_plugin( 'MP_Gateway_2Checkout', '2checkout', __('2Checkout', 'mp') );
+?>

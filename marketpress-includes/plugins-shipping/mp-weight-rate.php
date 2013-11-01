@@ -358,3 +358,4 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
 
 //register plugin - uncomment to register
 mp_register_shipping_plugin( 'MP_Shipping_Weight_Rate', 'weight-rate', __('Weight Rate', 'mp') );
+?>

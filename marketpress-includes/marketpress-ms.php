@@ -330,7 +330,7 @@ class MarketPress_MS {
         break;
 
       default:
-        return apply_filters('mp_ms_page_title_output', $title);
+        return $title;
     }
   }
   
@@ -1130,9 +1130,9 @@ function mp_global_categories_list( $args = '' ) {
 
 
 	if ( $echo )
-		echo apply_filters('mp_global_categories_list', '<ul id="mp_category_list">' . $list . '</ul>');
+		echo '<ul id="mp_category_list">' . $list . '</ul>';
 	else
-		return apply_filters('mp_global_categories_list', '<ul id="mp_category_list">' . $list . '</ul>');
+		return '<ul id="mp_category_list">' . $list . '</ul>';
 }
 
 /**
@@ -1215,9 +1215,9 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
 	$return = join( $seperator, $a );
 
 	if ( $echo )
-		echo apply_filters('mp_global_tag_cloud', '<div id="mp_tag_cloud">' . $return . '</div>');
+		echo '<div id="mp_tag_cloud">' . $return . '</div>';
 
-	return apply_filters('mp_global_tag_cloud', '<div id="mp_tag_cloud">' . $return . '</div>');
+	return '<div id="mp_tag_cloud">' . $return . '</div>';
 }
 
 /*
@@ -1408,8 +1408,6 @@ function mp_list_global_products( $args = '' ) {
   else
     $content .= '</div>';
 
-  $content = apply_filters('mp_list_global_products', $content);
-
   if ($echo)
     echo $content;
   else
@@ -1505,7 +1503,7 @@ function mp_global_products_nav_link( $args = '' ) {
 		
 	}
 	
-	$return = apply_filters('mp_global_products_nav_link', '<div id="mp_global_products_nav_links">' . $return . '</div>');
+	$return = '<div id="mp_global_products_nav_links">' . $return . '</div>';
 	
 	if ($echo)
 		echo $return;
@@ -1742,3 +1740,4 @@ class MarketPress_Global_Category_List_Widget extends WP_Widget {
   <?php
 	}
 }
+?>

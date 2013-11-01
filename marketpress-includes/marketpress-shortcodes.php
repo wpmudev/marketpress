@@ -12,7 +12,6 @@ class MarketPress_Shortcodes {
     add_shortcode( 'mp_list_categories', array(&$this, 'mp_list_categories_sc') );
     add_shortcode( 'mp_dropdown_categories', array(&$this, 'mp_dropdown_categories_sc') );
     add_shortcode( 'mp_popular_products', array(&$this, 'mp_popular_products_sc') );
-		add_shortcode( 'mp_related_products', array(&$this, 'mp_related_products_sc') );
     add_shortcode( 'mp_list_products', array(&$this, 'mp_list_products_sc') );
     add_shortcode( 'mp_product', array(&$this, 'mp_product_sc') );
     add_shortcode( 'mp_product_image', array(&$this, 'mp_product_image_sc') );
@@ -136,25 +135,6 @@ class MarketPress_Shortcodes {
   	), $atts));
 
     return mp_popular_products(false, $number);
-  }
-  
-  /**
-   * Displays related products for the passed product id
-   *
-   * @param int $product_id. 
-   * @param bool $in_same_category Optional, whether to limit related to the same category.
-   * @param bool $echo. Optional, whether to echo or return the results
-   * @param int $limit. Optional The number of products we want to retrieve.
-   * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
-   */
-  function mp_related_products_sc($atts) {
-	  extract( shortcode_atts( array(
-	  			'product_id' => false,
-				'in_same_category' => true,
-				'limit' => 3,
-				'simple_list' => false
- 	   ), $atts) );
-	return mp_related_products($product_id, $in_same_category, false, $limit, $simple_list);
   }
 
   /*
@@ -354,3 +334,5 @@ class MarketPress_Shortcodes {
 
 }
 $mp_shortcodes = new MarketPress_Shortcodes();
+
+?>

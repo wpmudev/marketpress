@@ -868,3 +868,5 @@ $settings = get_option('mp_settings');
 {
 	mp_register_shipping_plugin('MP_Shipping_UPS', 'ups', __('UPS (beta)', 'mp'), true);
 }
+
+?>

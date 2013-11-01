@@ -1036,3 +1036,4 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 
 //register payment gateway plugin
 mp_register_gateway_plugin( 'MP_Gateway_Payflow', 'payflow', __('PayPal Payflow Pro', 'mp') );
+?>

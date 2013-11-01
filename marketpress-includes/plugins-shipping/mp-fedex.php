@@ -129,9 +129,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				$checked = true; //default to checked
 				$_SESSION['mp_shipping_info']['residential'] = true;
 			}
-			
+
 			$this->residential = $checked;
-			
+
 			$content .= '<tr>
 			<td>' . __('Residential Delivery', 'mp') . '</td>
 			<td>
@@ -616,9 +616,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				break;
 			}
 		}
-		
+
 		$allowed_weight = min($this->fedex_settings['boxes']['weight'][$found], $this->fedex_settings['max_weight']);
-		
+
 		if($allowed_weight >= $this->weight){
 			$this->pkg_count = 1;
 			$this->pkg_weight = $this->weight;

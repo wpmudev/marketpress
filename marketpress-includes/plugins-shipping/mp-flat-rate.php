@@ -278,3 +278,4 @@ class MP_Shipping_Flat_Rate extends MP_Shipping_API {
 
 //register plugin
 mp_register_shipping_plugin( 'MP_Shipping_Flat_Rate', 'flat-rate', __('Flat Rate', 'mp') );
+?>

@@ -16,3 +16,5 @@ class MarketPress_BP {
 
 }
 $mp_bp = &new MarketPress_BP();
+
+?>

@@ -1009,3 +1009,4 @@ if(!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 
 //register payment gateway plugin
 mp_register_gateway_plugin( 'MP_Gateway_AuthorizeNet_AIM', 'authorizenet-aim', __('Authorize.net AIM Checkout', 'mp') );
+?>

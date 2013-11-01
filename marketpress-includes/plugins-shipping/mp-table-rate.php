@@ -327,3 +327,4 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 
 //register plugin - uncomment to register
 mp_register_shipping_plugin( 'MP_Shipping_Table_Rate', 'table-rate', __('Table Rate', 'mp') );
+?>

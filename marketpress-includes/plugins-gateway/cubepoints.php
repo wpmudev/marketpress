@@ -285,3 +285,4 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 if (function_exists( 'cp_ready' ) ) {
 	mp_register_gateway_plugin( 'MP_Gateway_CubePoints', 'cubepoints', __('CubePoints', 'mp') );
 }
+?>

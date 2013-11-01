@@ -442,3 +442,4 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 
 //register payment gateway plugin
 mp_register_gateway_plugin('MP_Gateway_Paymill', 'paymill', __('Paymill (beta)', 'mp'));
+?>

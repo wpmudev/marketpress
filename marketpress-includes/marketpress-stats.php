@@ -183,3 +183,4 @@ class MarketPress_Stats {
 	}
 }
 $mp_stats = new MarketPress_Stats();
+?>
