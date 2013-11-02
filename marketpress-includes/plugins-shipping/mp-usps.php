@@ -65,76 +65,76 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//Key is the enumeration for the USPS Services XML field
 		$this->services = array(
 		'Express Mail' =>
-		array('classid' => 3, 'name' => __('Express Mail', 'mp'), 'delivery' => __('(1-2 days)','mp')),
+		new USPS_Service( 3, __('Express Mail', 'mp'),                                          __('(1-2 days)','mp') ),
 
 		'Express Mail Hold For Pickup' =>
-		array('classid' => 2, 'name' => __('Express Mail Hold For Pickup', 'mp'), 'delivery' => __('(1-2 days)','mp')),
+		new USPS_Service( 2, __('Express Mail Hold For Pickup', 'mp'),                          __('(1-2 days)','mp') ),
 
 		'Express Mail Sunday/Holiday Delivery' =>
-		array('classid' => 3, 'name' => __('Express Mail Sunday/Holiday Delivery', 'mp'), 'delivery' => __('(1-2 days)','mp')),
+		new USPS_Service( 3, __('Express Mail Sunday/Holiday Delivery', 'mp'),                  __('(1-2 days)','mp') ),
 
 		'Express Mail Flat Rate Boxes' =>
-		array('classid' => 55, 'name' => __('Express Mail Flat Rate Boxes', 'mp'), 'delivery' => __('(1-2 days)','mp'), 'max_weight' => 50),
+		new USPS_Service( 55, __('Express Mail Flat Rate Boxes', 'mp'),                         __('(1-2 days)','mp'), 50 ),
 
 		'Express Mail Flat Rate Boxes Hold For Pickup' =>
-		array('classid' => 56, 'name' => __('Express Mail Flat Rate Boxes Hold For Pickup', 'mp'), 'delivery' => __('(1-2 days)','mp'), 'max_weight' => 50),
+		new USPS_Service( 56, __('Express Mail Flat Rate Boxes Hold For Pickup', 'mp'),         __('(1-2 days)','mp'), 50 ),
 
 		'Express Mail Sunday/Holiday Delivery Flat Rate Boxes' =>
-		array('classid' => 57, 'name' => __('Express Mail Sunday/Holiday Delivery Flat Rate Boxes', 'mp'), 'delivery' => __('(1-2 days)','mp')),
+		new USPS_Service( 57, __('Express Mail Sunday/Holiday Delivery Flat Rate Boxes', 'mp'), __('(1-2 days)','mp') ),
 
 		'Priority Mail' =>
-		array('classid' => 1, 'name' => __('Priority Mail', 'mp'), 'delivery' => __('(2-4) days','mp')),
+		new USPS_Service( 1, __('Priority Mail', 'mp'),                                         __('(2-4) days','mp') ),
 
 		'Priority Mail Large Flat Rate Box' =>
-		array('classid' => 22, 'name' => __('Priority Mail Large Flat Rate Box', 'mp'), 'delivery' => __('(2-4 days)','mp'), 'max_weight' => 30),
+		new USPS_Service( 22, __('Priority Mail Large Flat Rate Box', 'mp'),                    __('(2-4 days)','mp'), 30 ),
 
 		'Priority Mail Medium Flat Rate Box' =>
-		array('classid' => 17, 'name' => __('Priority Mail Medium Flat Rate Box', 'mp'), 'delivery' => __('(2-4 days)','mp'), 'max_weight' => 20),
+		new USPS_Service( 17, __('Priority Mail Medium Flat Rate Box', 'mp'),                   __('(2-4 days)','mp'), 20 ),
 
 		'Priority Mail Small Flat Rate Box' =>
-		array('classid' => 28, 'name' => __('Priority Mail Small Flat Rate Box', 'mp'), 'delivery' => __('(2-4 days)','mp'), 'max_weight' => 3),
+		new USPS_Service( 28, __('Priority Mail Small Flat Rate Box', 'mp'),                    __('(2-4 days)','mp'),  3 ),
 
 		'Padded Flat Rate Envelope' =>
-		array('classid' => 29, 'name' => __('Priority Mail Padded Flat Rate Envelope', 'mp'), 'delivery' => __('(2-4 days)','mp'), 'max_weight' => 2),
+		new USPS_Service( 29, __('Priority Mail Padded Flat Rate Envelope', 'mp'),              __('(2-4 days)','mp'),  2 ),
 
 		'First-Class Mail Parcel' =>
-		array('classid' => 0, 'name' => __('First-Class Mail Parcel', 'mp'), 'delivery' => __('(2-4 days)','mp')),
+		new USPS_Service( 0, __('First-Class Mail Parcel', 'mp'),                               __('(2-4 days)','mp') ),
 
 		'Parcel Post' =>
-		array('classid' => 4, 'name' => __('Parcel Post', 'mp'), 'delivery' => __('(4-7 days)','mp')),
+		new USPS_Service( 4, __('Parcel Post', 'mp'),                                           __('(4-7 days)','mp') ),
 
 		'Media Mail' =>
-		array('classid' => 6, 'name' => __('Media Mail', 'mp'), 'delivery' => ''),
+		new USPS_Service( 6, __('Media Mail', 'mp'),                                            ''),
 
 		'Library Mail' =>
-		array('classid' => 7, 'name' => __('Library Mail', 'mp'), 'delivery' => ''),
+		new USPS_Service( 7, __('Library Mail', 'mp'),                                          ''),
 
 		);
 
 		$this->intl_services = array(
 		'Express Mail International' =>
-		array( 'service' => 1, 'name' => __('Express Mail International', 'mp')),
+		new USPS_Service( 1,  __('Express Mail International', 'mp') ),
 
 		'Express Mail International Flat Rate Boxes' =>
-		array( 'service' => 26, 'name' => __('Express Mail International Flat Rate Boxes', 'mp'), 'max_weight' => 50),
+		new USPS_Service( 26, __('Express Mail International Flat Rate Boxes', 'mp'),                     '',                   50 ),
 
 		'Priority Mail International' =>
-		array( 'service' => 2, 'name' => __('Priority Mail International', 'mp')),
+		new USPS_Service( 2,  __('Priority Mail International', 'mp') ),
 
 		'Priority Mail International Large Flat Rate Boxes' =>
-		array( 'service' => 11, 'name' => __('Priority Mail International Large Flat Rate Boxes', 'mp'), 'max_weight' => 30),
+		new USPS_Service( 11, __('Priority Mail International Large Flat Rate Boxes', 'mp'),              '',                   30 ),
 
 		'Priority Mail International Medium Flat Rate Boxes' =>
-		array( 'service' => 9, 'name' => __('Priority Mail International Medium Flat Rate Boxes', 'mp'), 'max_weight' => 20),
+		new USPS_Service( 9,  __('Priority Mail International Medium Flat Rate Boxes', 'mp'),             '',                   20 ),
 
 		'Priority Mail International Small Flat Rate Boxes' =>
-		array( 'service' => 16, 'name' => __('Priority Mail International Small Flat Rate Boxes', 'mp'), 'max_weight' => 3),
+		new USPS_Service( 16, __('Priority Mail International Small Flat Rate Boxes', 'mp'),              '',                    3 ),
 
 		'Priority Mail Express International Padded Flat Rate Envelope' =>
-		array('classid' => 27, 'name' => __('Priority Mail Express International Padded Flat Rate Envelope', 'mp'), 'delivery' => __('(3-5 days)','mp'), 'max_weight' => 2),
+		new USPS_Service( 27, __('Priority Mail Express International Padded Flat Rate Envelope', 'mp'),  __('(3-5 days)','mp'), 2 ),
 
 		'First Class International Parcel' =>
-		array( 'service' => 15, 'name' => __('First Class International Parcel', 'mp')),
+		new USPS_Service( 15, __('First Class International Parcel', 'mp') ),
 
 		);
 
@@ -339,12 +339,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 							<td>
 								<?php foreach($this->services as $service => $detail): ?>
 								<label>
-									<input type="checkbox" name="mp[shipping][usps][services][<?php echo $service; ?>]" value="1" <?php checked($this->usps_settings['services'][$service]); ?> />&nbsp;<?php echo $detail['name'] . $detail['delivery']; ?>
+									<input type="checkbox" name="mp[shipping][usps][services][<?php echo $service; ?>]" value="1" <?php checked( $this->usps_settings['services'][$service] ); ?> />&nbsp;<?php echo $detail->name . $detail->delivery; ?>
 								</label>
 
 								<?php
-								if(isset($detail['max_weight']) ):
-								$max_weight = empty($this->usps_settings['flat_weights'][$service]) ? $detail['max_weight'] : $this->usps_settings['flat_weights'][$service];
+								if(isset($detail->max_weight) ):
+								$max_weight = empty($this->usps_settings['flat_weights'][$service]) ? $detail->max_weight : $this->usps_settings['flat_weights'][$service];
 								?>
 								<?php _e('@ Max', 'mp'); ?> <input type="text" size="1" name="mp[shipping][usps][flat_weights][<?php echo $service; ?>]" value="<?php esc_attr_e( $max_weight); ?>" />
 								<?php echo $this->get_units_weight(); ?>
@@ -367,12 +367,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 							<td>
 								<?php foreach($this->intl_services as $service => $detail): ?>
 								<label>
-									<input type="checkbox" name="mp[shipping][usps][intl_services][<?php echo $service; ?>]" value="1" <?php checked($this->usps_settings['intl_services'][$service]); ?> />&nbsp;<?php echo $detail['name']; ?>
+									<input type="checkbox" name="mp[shipping][usps][intl_services][<?php echo $service; ?>]" value="1" <?php checked($this->usps_settings['intl_services'][$service]); ?> />&nbsp;<?php echo $detail->name; ?>
 								</label>
 
 								<?php
-								if(isset($detail['max_weight']) ):
-								$max_weight = empty($this->usps_settings['flat_weights'][$service]) ? $detail['max_weight'] : $this->usps_settings['flat_weights'][$service];
+								if(isset($detail->max_weight) ):
+								$max_weight = empty($this->usps_settings['flat_weights'][$service]) ? $detail->max_weight : $this->usps_settings['flat_weights'][$service];
 								?>
 								<?php _e('@ Max', 'mp'); ?> <input type="text" size="1" name="mp[shipping][usps][flat_weights][<?php echo $service; ?>]" value="<?php esc_attr_e($max_weight); ?>" />
 								<?php echo $this->get_units_weight(); ?>
@@ -617,7 +617,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				break;
 			}
 		}
-		
+
 		$allowed_weight = min($this->usps_settings['boxes']['weight'][$found], $this->usps_settings['max_weight']);
 
 		if($allowed_weight >= $this->weight){
@@ -741,14 +741,14 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			$box_count = $this->pkg_count;
 
 			//Check for flat rate boxes
-			if( isset($this->services[$service]['max_weight']) ){ //Is it flat rate
+			if( isset( $this->services[$service]->max_weight ) ){ //Is it flat rate
 				$max_weight = $this->as_pounds($this->usps_settings['flat_weights'][$service]);
 				if( $this->pkg_max <= $max_weight ){
 					$box_count = ceil($this->weight / $max_weight);
 				}
 			}
 
-			$nodes = $xpath->query('//postage[@classid="' . $this->services[$service]['classid'] . '"]/rate');
+			$nodes = $xpath->query('//postage[@classid="' . $this->services[$service]->code . '"]/rate');
 			$rate = floatval($nodes->item(0)->textContent) * $box_count;
 			if($rate == 0){  //Not available for this combination
 				unset($mp_shipping_options[$service]);
@@ -756,7 +756,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			else
 			{
 				$handling = floatval($this->usps_settings['domestic_handling']) * $box_count; // Add handling times number of packages.
-				$delivery = $this->services[$service]['delivery'];
+				$delivery = $this->services[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
@@ -890,17 +890,17 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			$box_count = $this->pkg_count;
 
 			//Check for flat rate boxes
-			if( isset($this->intl_services[$service]['max_weight']) ){ //Is it flat rate
+			if( isset( $this->intl_services[$service]->max_weight ) ){ //Is it flat rate
 				$max_weight = $this->as_pounds($this->usps_settings['flat_weights'][$service]);
 				if( $this->pkg_max <= $max_weight ){
 					$box_count = ceil($this->weight / $max_weight);
 				}
 			}
 
-			$nodes = $xpath->query('//service[@id="' . $this->intl_services[$service]['service'] . '"]/postage');
+			$nodes = $xpath->query('//service[@id="' . $this->intl_services[$service]->code . '"]/postage');
 			$rate = floatval($nodes->item(0)->textContent) * $box_count;
 
-			$nodes = $xpath->query('//service[@id="' . $this->intl_services[$service]['service'] . '"]/svccommitments');
+			$nodes = $xpath->query('//service[@id="' . $this->intl_services[$service]->code . '"]/svccommitments');
 			$delivery = str_replace(' ', '', $nodes->item(0)->textContent);
 			$delivery = '(' . str_replace('businessdays',') days', $delivery);
 
@@ -990,10 +990,10 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
 		global $mp;
 		if ( isset($this->services[$shipping_option])){
-			$option = $this->services[$shipping_option]['name'];
+			$option = $this->services[$shipping_option]->name;
 		}
 		elseif ( isset($this->intl_services[$shipping_option])){
-			$option = $this->intl_services[$shipping_option]['name'];
+			$option = $this->intl_services[$shipping_option]->name;
 		}
 
 		$price = is_numeric($price) ? $price : 0;
@@ -1044,6 +1044,26 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	}
 
 } //End MP_Shipping_USPS
+
+if(! class_exists('USPS_Service') ):
+class USPS_Service
+{
+	public $code;
+	public $name;
+	public $delivery;
+	public $max_weight;
+
+	function __construct($code, $name, $delivery = '', $max_weight = null)
+	{
+		$this->code = $code;
+		$this->name = $name;
+		$this->delivery = $delivery;
+		$this->max_weight = $max_weight;
+
+	}
+}
+endif;
+
 
 //register plugin as calculated. Only in US and US Possesions
 

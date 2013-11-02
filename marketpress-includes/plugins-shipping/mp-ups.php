@@ -303,16 +303,16 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 								<input type="text" name="mp[shipping][ups][domestic_handling]" value="<?php echo (empty($this->ups_settings['domestic_handling']) ) ? '0.00' : esc_attr($this->ups_settings['domestic_handling']); ?>" size="20" maxlength="20" />
 							</td>
 						</tr>
-<!--
+						<!--
 						<tr>
-							<th scope="row">
-								<?php _e('Default Weight (for products whose weights are not specified)', 'mp') ?>
-							</th>
-							<td>
-								<input type="text" name="mp[shipping][ups][default_weight]" value="<?php echo esc_attr($this->ups_settings['default_weight']); ?>" size="20" maxlength="20" />
-							</td>
+						<th scope="row">
+						<?php _e('Default Weight (for products whose weights are not specified)', 'mp') ?>
+						</th>
+						<td>
+						<input type="text" name="mp[shipping][ups][default_weight]" value="<?php echo esc_attr($this->ups_settings['default_weight']); ?>" size="20" maxlength="20" />
+						</td>
 						</tr>
--->
+						-->
 						<tr>
 							<td colspan="2">
 								<?php _e('Standard Boxes and Weight Limits', 'mp') ?>
@@ -526,7 +526,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$diff = floatval($this->ups_settings['max_weight']);
 		$found = -1;
 		$largest = -1.0;
-		
+
 		foreach($this->ups_settings['boxes']['weight'] as $key => $weight) {
 			//			//Find largest
 			if( $weight > $largest) {
@@ -858,7 +858,6 @@ class Box_Size
 	}
 }
 endif;
-
 
 //register plugin only in US and US Possesions
 

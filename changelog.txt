@@ -27,6 +27,7 @@ Change Log:
 - Added https support for custom styles in the wp-content/marketpress-styles/ directory.
 - Added ajax checkout error flag which is set when ajax starts and reset when ajax is finished. Prevents form submits from aborting shipping lookups.
 - Removed apply_filters("mp_shipping_options_... call in extra_shipping_box_label() It passes nulls instead of an address so it can't properly recalculate the options anyway.
+- Changes to USPS to standardize across the calculated shipping plugins.
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------

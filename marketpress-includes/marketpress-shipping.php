@@ -284,15 +284,16 @@ class MP_Shipping_Handler {
 
 		if ( $mp->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
 			$label = $mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
-//    Because no address is passed doesn't make sense to recalculate options here. They've already been selected
-//		$options = apply_filters("mp_shipping_options_".$_SESSION['mp_shipping_info']['shipping_option'], null, null, null, null, null, null, null);
+
 			if (isset($_SESSION['mp_shipping_info']['shipping_sub_option']))
 				$label .= ' - ' . $_SESSION['mp_shipping_info']['shipping_sub_option'];
+
 			$content .= '<tr>';
       $content .= '<td align="right">'.__('Shipping Method:', 'mp').'</td>';
       $content .= '<td>'.esc_attr($label).'</td>';
       $content .= '</tr>';
 		}
+		var_dump($_SESSION);
 		return $content;
 	}
 
