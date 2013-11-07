@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
 MarketPress Shipping Plugin Base Class
 */

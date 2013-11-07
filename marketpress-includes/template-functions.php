@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
   MarketPress Template Functions
 
@@ -188,9 +188,9 @@ if (!function_exists('mp_popular_products')) :
 function mp_popular_products($echo = true, $num = 5) {
     //The Query
     $custom_query = new WP_Query('post_type=product&post_status=publish&posts_per_page=' . intval($num) . '&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value_num&order=DESC');
-
+    
     $content = '<ul id="mp_popular_products">';
-
+    
     if (count($custom_query->posts)) {
         foreach ($custom_query->posts as $post) {
             $content .= '<li><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></li>';
@@ -198,11 +198,11 @@ function mp_popular_products($echo = true, $num = 5) {
     } else {
         $content .= '<li>' . __('No Products', 'mp') . '</li>';
     }
-
+    
     $content .= '</ul>';
-
+    
     $content = apply_filters('mp_popular_products', $content, $num);
-
+    
     if ($echo)
         echo $content;
     else
@@ -1362,25 +1362,24 @@ function mp_order_status() {
             echo '<h3>' . __('Your Recent Orders:', 'mp') . '</h3>';
             echo '<ul id="mp-order-list">';
 
-			//need to check for removed orders
-			$resave_meta = false;
+            //need to check for removed orders
+            $resave_meta = false;
             foreach ($orders as $timestamp => $order)
 
-				if( $mp->get_order( $order['id'] ) ) {
-                	echo '  <li><strong>' . $mp->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
-
-				}else{
+				if ( $mp->get_order( $order['id'] ) ) {
+            echo '  <li><strong>' . $mp->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . $mp->format_currency('', $order['total']) . '</li>';
+				} else {
 					unset( $orders[$timestamp] );
 					$resave_meta = true;
 				}
-            echo '</ul>';
-			//if we need to resave we'll do it here
-			if($resave_meta) {
-
-				$_COOKIE[$cookie_id] = serialize($orders);
-				update_user_meta($user_id, $meta_id, $orders );
-
-			}
+        echo '</ul>';
+        //if we need to resave we'll do it here
+        if($resave_meta) {
+  
+          $_COOKIE[$cookie_id] = serialize($orders);
+          update_user_meta($user_id, $meta_id, $orders );
+  
+        }
             ?>
             <form action="<?php mp_orderstatus_link(true, true); ?>" method="get">
                 <label><?php _e('Or enter your 12-digit Order ID number:', 'mp'); ?><br />
@@ -2686,7 +2685,6 @@ function mp_products_count() {
 endif;
 
 
-if (!function_exists('mp_custom_fields_checkout_after_shipping')) :
 /**
  * This function hook into the shipping filter to add any product custom fields. Checks the cart items
  * If any cart items have associated custom fields then they will be displayed in a new section 'Product extra fields'
@@ -2811,11 +2809,9 @@ function mp_custom_fields_checkout_after_shipping($content = '') {
 
     return $content;
 }
-endif;
 add_filter('mp_checkout_after_shipping', 'mp_custom_fields_checkout_after_shipping');
 
 
-if (!function_exists('mp_custom_fields_single_order_display_box')) :
 /* Not used. This code will show the custom fields input at the view cart page instead of shipping */
 
 function mp_custom_fields_single_order_display_box($order) {
@@ -2862,5 +2858,4 @@ function mp_custom_fields_single_order_display_box($order) {
         <?php
     }
 }
-endif;
 //add_action('mp_single_order_display_box', 'mp_custom_fields_single_order_display_box');
