@@ -33,6 +33,7 @@ Change Log:
 - Added 4 new currencies to PayMill payment gateway (BGN, HRK, GIP, RON)
 - Added 3 new currencies to PIN payment gateway (SGD, EUR and GBP)
 - Added Australian Dollars (AUD) currency to Stripe payment gateway
+- Added Norwegian Krone (NOK) currency to Skrill / MoneyBookers payment gateway
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
