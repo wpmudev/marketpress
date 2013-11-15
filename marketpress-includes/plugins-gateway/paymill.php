@@ -307,8 +307,11 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
                                 $sel_currency = isset($settings['gateways']['paymill']['currency']) ? $settings['gateways']['paymill']['currency'] : $settings['currency'];
                                 $currencies = array(
                                     "EUR" => 'EUR',
+                                    "BGN" => 'BGN',
                                     "CZK" => 'CZK',
+                                    "HRK" => 'HRK',
                                     "DKK" => 'DKK',
+                                    "GIP" => 'GIP',
                                     "HUF" => 'HUF',
                                     "ISK" => 'ISK',
                                     "ILS" => 'ILS',
@@ -317,6 +320,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
                                     "LTL" => 'LTL',
                                     "NOK" => 'NOK',
                                     "PLN" => 'PLN',
+                                    "RON" => 'RON',
                                     "SEK" => 'SEK',
                                     "TRY" => 'TRY',
                                     "GBP" => 'GBP'

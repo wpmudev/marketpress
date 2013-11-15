@@ -30,6 +30,7 @@ Change Log:
 - Changes to USPS to standardize across the calculated shipping plugins.
 - Make messages visual editor css more specific to avoid conflicts
 - Add US Virgin Islands to USPS allowed base country list
+- Added 4 new currencies to PayMill payment gateway (BGN, HRK, GIP, RON)
 - Added 3 new currencies to PIN payment gateway (SGD, EUR and GBP)
 - Added Australian Dollars (AUD) currency to Stripe payment gateway
 
