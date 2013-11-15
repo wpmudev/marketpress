@@ -35,6 +35,7 @@ Change Log:
 - Added Australian Dollars (AUD) currency to Stripe payment gateway
 - Added Norwegian Krone (NOK) currency to Skrill / MoneyBookers payment gateway
 - Added 8 new currencies to 2CheckOut payment gateway (AED, ILS, LTL, PHP, RON, RUB, SGD, TRY)
+- Added 2 new currencies to Authorize.net AIM payment gateway (AUD and NZD)
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
