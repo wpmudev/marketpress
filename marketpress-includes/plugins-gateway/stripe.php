@@ -372,7 +372,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 								"CAD" => 'CAD - Canadian Dollar',
 								"EUR" => 'EUR - Euro',
 								"USD" => 'USD - U.S. Dollar',
-								"GBP" => 'GBP - Pounds Sterling'
+								"GBP" => 'GBP - Pounds Sterling',
+                                                                "AUD" => 'AUD - Australian Dollars'
 							);
 	
 							foreach ($currencies as $k => $v) {
