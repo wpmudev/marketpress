@@ -337,7 +337,10 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                                 $currencies = array(
                                     "AUD" => 'AUD',
                                     "NZD" => 'NZD',
-                                    "USD" => 'USD'
+                                    "USD" => 'USD',
+                                    'SGD' => 'SGD',
+                                    'GBP' => 'GBP',
+                                    'EUR' => 'EUR'
                                 );
 
                                 foreach ($currencies as $k => $v) {
