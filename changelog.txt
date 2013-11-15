@@ -31,6 +31,7 @@ Change Log:
 - Make messages visual editor css more specific to avoid conflicts
 - Add US Virgin Islands to USPS allowed base country list
 - Added 3 new currencies to PIN payment gateway (SGD, EUR and GBP)
+- Added Australian Dollars (AUD) currency to Stripe payment gateway
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
