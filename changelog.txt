@@ -34,6 +34,7 @@ Change Log:
 - Added 3 new currencies to PIN payment gateway (SGD, EUR and GBP)
 - Added Australian Dollars (AUD) currency to Stripe payment gateway
 - Added Norwegian Krone (NOK) currency to Skrill / MoneyBookers payment gateway
+- Added 8 new currencies to 2CheckOut payment gateway (AED, ILS, LTL, PHP, RON, RUB, SGD, TRY)
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
