@@ -4601,7 +4601,10 @@ Notification Preferences: %s', 'mp');
 
 		if (!is_object($order))
 		  return false;
-
+		
+		//so that certain products can be excluded from tracking
+		$order = apply_filters( 'mp_ga_ecommerce', $order );
+		
     if ($this->get_setting('ga_ecommerce') == 'old') {
 
 			$js = '<script type="text/javascript">

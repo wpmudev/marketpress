@@ -332,18 +332,18 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
 			  	{
 					if ( in_array($settings['base_country'], $mp->eu_countries) )  //in european union
 				  	{
-						if ($country == $settings['base_country'])
-							$price = $settings['shipping']['weight-rate'][$i]['in_country'];
+							if ($country == $settings['base_country'])
+								$price = $settings['shipping']['weight-rate'][$i]['in_country'];
 					  	else if (in_array($country, $mp->eu_countries))
 						  	$price = $settings['shipping']['weight-rate'][$i]['eu'];
 					  	else
-							$price = $settings['shipping']['weight-rate'][$i]['international'];
+								$price = $settings['shipping']['weight-rate'][$i]['international'];
 				  	}
 				  	else  //all other countries
 				  	{
 						if ($country == $settings['base_country'])
 							$price = $settings['shipping']['weight-rate'][$i]['in_country'];
-					  	else
+					  else
 							$price = $settings['shipping']['weight-rate'][$i]['international'];
 					}
 				 	break;

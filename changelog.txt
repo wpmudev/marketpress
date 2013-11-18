@@ -36,6 +36,7 @@ Change Log:
 - Added Norwegian Krone (NOK) currency to Skrill / MoneyBookers payment gateway
 - Added 8 new currencies to 2CheckOut payment gateway (AED, ILS, LTL, PHP, RON, RUB, SGD, TRY)
 - Added 2 new currencies to Authorize.net AIM payment gateway (AUD and NZD)
+- Add filter so certain products can be excluded from GA tracking
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
