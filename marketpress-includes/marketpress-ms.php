@@ -43,7 +43,7 @@ class MarketPress_MS {
 
     //check for main blog limits
     $settings = get_site_option( 'mp_network_settings' );
-    if ( ( $settings['main_blog'] && $this->is_main_site() ) || !$settings['main_blog'] ) {
+    if ( ( isset($settings['main_blog']) && $this->is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
       //shortcodes
       add_shortcode( 'mp_list_global_products', array(&$this, 'mp_list_global_products_sc') );
       add_shortcode( 'mp_global_categories_list', array(&$this, 'mp_global_categories_list_sc') );
