@@ -53,6 +53,8 @@ class MarketPress {
     register_activation_hook( __FILE__, array($this, 'install') );
 
 		//load dashboard notice
+		global $wpmudev_notices;
+		$wpmudev_notices[] = array( 'id'=> 144,'name'=> 'MarketPress', 'screens' => array( 'edit-product', 'product', 'edit-product_category', 'edit-product_tag', 'product_page_marketpress-orders', 'product_page_marketpress', 'settings_page_marketpress-ms-network' ) );
     include_once( $this->plugin_dir . 'dash-notice/wpmudev-dash-notification.php' );
 
     //load template functions
