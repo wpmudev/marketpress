@@ -189,6 +189,7 @@ class MarketPress {
       'inventory_threshhold' => 3,
       'inventory_remove' => 0,
       'max_downloads' => 5,
+			'download_order_limit' = 1,
       'force_login' => 0,
       'ga_ecommerce' => 'none',
 			'special_instructions' => 0,
@@ -2091,15 +2092,15 @@ Thanks again!", 'mp')
       update_post_meta($post_id, 'mp_sale_price', array_map(create_function('$price', $func_curr), (array)$_POST['mp_sale_price']));
       update_post_meta($post_id, 'mp_track_inventory', isset($_POST['mp_track_inventory']) ? 1 : 0);
       update_post_meta($post_id, 'mp_inventory', array_map('intval', (array)$_POST['mp_inventory']));
-	  //track limit
-	  update_post_meta($post_id, 'mp_track_limit', isset($_POST['mp_track_limit']) ? 1 : 0);
-	  if( isset($_POST['mp_track_limit']) ){
-		  //fill the array with the value of mp_limit
-		  update_post_meta($post_id, 'mp_limit', array_fill(0, count((array)$_POST['mp_price']) , isset( $_POST['mp_limit'] ) ? $_POST['mp_limit'] : 1  ) );
-	  }else{
-		  //empty the array
-		  update_post_meta($post_id, 'mp_limit',array());
-	  }
+			//track limit
+			update_post_meta($post_id, 'mp_track_limit', isset($_POST['mp_track_limit']) ? 1 : 0);
+			if ( isset($_POST['mp_track_limit']) ) {
+				//fill the array with the value of mp_limit
+				update_post_meta($post_id, 'mp_limit', array_fill(0, count((array)$_POST['mp_price']) , isset( $_POST['mp_limit'] ) ? $_POST['mp_limit'] : 1  ) );
+			} else {
+				//empty the array
+				update_post_meta($post_id, 'mp_limit',array());
+			}
 
 			//personalization fields
 			$mp_has_custom_field = $mp_custom_field_required = array();
@@ -2738,8 +2739,15 @@ Thanks again!", 'mp')
 					}
 
         	//check limit if tracking on or downloadable
-    			if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
-						$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
+    			if (get_post_meta($product_id, 'mp_track_limit', true) || ( $this->get_setting('download_order_limit', 1) && $file = get_post_meta($product_id, 'mp_file', true) ) ) {
+						
+						//if tracking is on and (no file or file with limit override off)
+						if (get_post_meta($product_id, 'mp_track_limit', true) && ( empty($file) || !$this->get_setting('download_order_limit', 1) ) ) {
+							$limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+						} else {
+							$limit = array($variation => 1);
+						}
+						
 			      if ($limit[$variation] && $limit[$variation] < $quantity) {
            		$this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s". Your cart quantity has been changed to %3$s.', 'mp'), number_format_i18n($limit[$variation]), $product->post_title, number_format_i18n($limit[$variation])) );
               $quantity = $limit[$variation];
@@ -5939,6 +5947,14 @@ Notification Preferences: %s', 'mp');
 								?>
 								</select>
 								</td>
+                </tr>
+								<tr valign="top">
+                <th scope="row"><?php _e('Limit Digital Products Per-order', 'mp') ?></th>
+                <td>
+                <label><input value="1" name="mp[download_order_limit]" type="radio"<?php checked($this->get_setting('download_order_limit', 1), 1); ?>> <?php _e('Yes', 'mp') ?></label>
+        				<label><input value="0" name="mp[download_order_limit]" type="radio"<?php checked($this->get_setting('download_order_limit'), 0); ?>> <?php _e('No', 'mp') ?></label>
+                <br /><span class="description"><?php _e('This will prevent multiples of the same downloadable product form being added to the cart. Per-product custom limits will override this.', 'mp') ?></span>
+                </td>
                 </tr>
                 <tr>
                 <th scope="row"><?php _e('Force Login', 'mp') ?></th>
