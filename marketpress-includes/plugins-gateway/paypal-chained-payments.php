@@ -516,8 +516,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 						'VERIFY' => __('The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp'),
 						'OTHER' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp')
 						);
-          $status = __('The payment is pending.', 'mp');
-          $status .= '<br />' . $pending_str[$result["transaction"][0]["pending_reason"]];
+          $status = __('The payment is pending', 'mp');
+          $status .= ': ' . $pending_str[$result["transaction"][0]["pending_reason"]];
           $create_order = true;
           $paid = false;
 					break;

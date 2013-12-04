@@ -140,7 +140,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				    $authorized = true;
 				    break;
 				  case 'Reversed':
-				    $status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer:', 'mp');
+				    $status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer', 'mp');
 				    $reverse_reasons = array(
 				      'none' => '',
 				      'chargeback' => __('A reversal has occurred on this transaction due to a chargeback by your customer.', 'mp'),
@@ -149,7 +149,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				      'refund' => __('A reversal has occurred on this transaction because you have given the customer a refund.', 'mp'),
 				      'other' => __('A reversal has occurred on this transaction due to an unknown reason.', 'mp')
 				      );
-				    $status .= '<br />' . $reverse_reasons[$result["REASONCODE"]];
+				    $status .= ': ' . $reverse_reasons[$result["REASONCODE"]];
 				    $authorized = false;
 				    break;
 				  case 'Refunded':
