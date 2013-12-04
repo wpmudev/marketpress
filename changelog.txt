@@ -14,6 +14,8 @@ Change Log:
 - Added oembed endpoint for Pinterest "Rich Pins"
 - Added show related products option
 - Added Pickup in-store shipping option
+- Added ability to assign a custom per-order limit to a product
+- Add setting to turn of downloadable product default 1 per order limit
 - Added filters to many template functions
 - Minor bugfixes on Simplify gateway
 - Deleted orders are now removed from usermeta
@@ -37,7 +39,7 @@ Change Log:
 - Added 8 new currencies to 2CheckOut payment gateway (AED, ILS, LTL, PHP, RON, RUB, SGD, TRY)
 - Added 2 new currencies to Authorize.net AIM payment gateway (AUD and NZD)
 - Add filter so certain products can be excluded from GA tracking
-- Add setting to turn of downloadable product default 1 per order limit
+- Pass manual gateway instuctions through wpautop() and allow shortcodes in it
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
