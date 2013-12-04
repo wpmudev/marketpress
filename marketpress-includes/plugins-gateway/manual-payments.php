@@ -53,7 +53,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    */
   function payment_form($cart, $shipping_info) {
     global $mp;
-    return $mp->get_setting('gateways->manual-payments->instructions');
+    return do_shortcode($mp->get_setting('gateways->manual-payments->instructions'));
   }
   
   /**
@@ -238,6 +238,9 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 			$settings['gateways']['manual-payments']['instructions'] = wp_filter_post_kses($settings['gateways']['manual-payments']['instructions']);
 			$settings['gateways']['manual-payments']['confirmation'] = wp_filter_post_kses($settings['gateways']['manual-payments']['confirmation']);
 		}
+		
+		$settings['gateways']['manual-payments']['instructions'] = wpautop($settings['gateways']['manual-payments']['instructions']);
+		$settings['gateways']['manual-payments']['confirmation'] = wpautop($settings['gateways']['manual-payments']['confirmation']);
 		
 		//no html in email
   	$settings['gateways']['manual-payments']['email'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['manual-payments']['email']));	
