@@ -189,7 +189,7 @@ class MarketPress {
       'inventory_threshhold' => 3,
       'inventory_remove' => 0,
       'max_downloads' => 5,
-			'download_order_limit' = 1,
+			'download_order_limit' => 1,
       'force_login' => 0,
       'ga_ecommerce' => 'none',
 			'special_instructions' => 0,
