@@ -41,6 +41,7 @@ Change Log:
 - Add filter so certain products can be excluded from GA tracking
 - Pass manual gateway instuctions through wpautop() and allow shortcodes in it
 - Remove encoded html from PayPal IPN strings http://wp.mu/7s9
+- Delay upgrade rewrite flush to end of init hook http://wp.mu/7vt
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------

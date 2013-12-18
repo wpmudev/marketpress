@@ -122,7 +122,7 @@ class MarketPress {
 		add_filter( 'rewrite_rules_array', array(&$this, 'add_rewrite_rules') );
   	add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
-		add_action( 'init', array(&$this, 'flush_rewrite_check') );
+		add_action( 'init', array(&$this, 'flush_rewrite_check'), 99 );
 		if ( !defined('MP_HIDE_MENUS') ) { //allows you to hide MP menus
 			add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
 			add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
@@ -878,9 +878,9 @@ Thanks again!", 'mp')
       return $value;
 
 		if ( is_array($value) && !in_array('index.php?product=$matches[1]&paged=$matches[2]', $value) ) {
-			flush_rewrite_rules();
+			update_option('mp_flush_rewrite', 1);
     } else {
-      return $value;
+			return $value;
     }
   }
 
