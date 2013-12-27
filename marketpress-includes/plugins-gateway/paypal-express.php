@@ -1121,7 +1121,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $args['timeout'] = 60;
 		
 		//allow easy debugging
-		if ( defined('MP_DEBUG_API') ) {
+		if ( defined("MP_DEBUG_API_$methodName") ) {
 			var_dump( $this->deformatNVP($query_string) );
 			die;
 		}
