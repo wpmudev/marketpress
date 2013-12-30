@@ -369,11 +369,11 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 							<?php
 							$sel_currency = isset($settings['gateways']['stripe']['currency']) ? $settings['gateways']['stripe']['currency'] : $settings['currency'];
 							$currencies = array(
+								"AUD" => 'AUD - Australian Dollar',
 								"CAD" => 'CAD - Canadian Dollar',
 								"EUR" => 'EUR - Euro',
-								"USD" => 'USD - U.S. Dollar',
 								"GBP" => 'GBP - Pounds Sterling',
-                                                                "AUD" => 'AUD - Australian Dollars'
+								"USD" => 'USD - U.S. Dollar',
 							);
 	
 							foreach ($currencies as $k => $v) {
