@@ -6,7 +6,7 @@ Change Log:
 ----------------------------------------------------------------------
 
 
-2.9 beta 1 - 10/24/2013 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher
+2.9 beta 2 - 1/03/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher
 ----------------------------------------------------------------------
 - Added Coupons for individual categories/products
 - Added compatibility with Google Universal Analytics
@@ -42,6 +42,7 @@ Change Log:
 - Pass manual gateway instuctions through wpautop() and allow shortcodes in it
 - Remove encoded html from PayPal IPN strings http://wp.mu/7s9
 - Delay upgrade rewrite flush to end of init hook http://wp.mu/7vt
+- Remove retired Google checkout plugin
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
