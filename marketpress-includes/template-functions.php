@@ -188,9 +188,9 @@ if (!function_exists('mp_popular_products')) :
 function mp_popular_products($echo = true, $num = 5) {
     //The Query
     $custom_query = new WP_Query('post_type=product&post_status=publish&posts_per_page=' . intval($num) . '&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value_num&order=DESC');
-
+    
     $content = '<ul id="mp_popular_products">';
-
+    
     if (count($custom_query->posts)) {
         foreach ($custom_query->posts as $post) {
             $content .= '<li><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></li>';
@@ -198,7 +198,7 @@ function mp_popular_products($echo = true, $num = 5) {
     } else {
         $content .= '<li>' . __('No Products', 'mp') . '</li>';
     }
-
+    
     $content .= '</ul>';
     
     $content = apply_filters('mp_popular_products', $content, $num);
@@ -208,9 +208,10 @@ function mp_popular_products($echo = true, $num = 5) {
     else
         return $content;
 }
+endif;
 
 
-
+if (!function_exists('mp_related_products')) :
 /**
  * Displays related products for the passed product id
  *
