@@ -168,20 +168,12 @@ class MarketPress_Shortcodes {
    * @param string category Optional, limit to a product category
    * @param string tag Optional, limit to a product tag
    * @param bool list_view Optional, show as list. Grid default
+   * @param bool filters Optional, show filters
    */
   function mp_list_products_sc($atts) {
-    extract(shortcode_atts(array(
-  		'paginate' => '',
-  		'page' => '',
-  		'per_page' => '',
-  		'order_by' => '',
-  		'order' => '',
-  		'category' => '',
-  		'tag' => '',
-      'list_view'=> NULL
-  	), $atts));
-
-    return mp_list_products(false, $paginate, $page, $per_page, $order_by, $order, $category, $tag, $list_view);
+  	global $mp;
+    $args = shortcode_atts($mp->defaults['list_products'], $atts);
+    return mp_list_products($args);
   }
 	
 	/*
