@@ -43,6 +43,12 @@ Change Log:
 - Remove encoded html from PayPal IPN strings http://wp.mu/7s9
 - Delay upgrade rewrite flush to end of init hook http://wp.mu/7vt
 - Remove retired Google checkout plugin
+- Fixed bug with PayPal Express gateway and coupons where totals would be incorrect after being transferred to PayPal
+- Updated mp_list_products() function to use WP-style arguments - users can still use existing argument style if they wish
+- Added mp_list_products() can now display filters - no need to call mp_products_filter() in your theme template
+- Added mp_list_products() can now display pagination
+- Added mp_products_nav() to display products pagination
+- Fixed some warnings related to shipping fields when checking out
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
