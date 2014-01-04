@@ -92,11 +92,8 @@ jQuery(document).ready(function($) {
 					'action=get_products_list&'+query_string,
 					function(data) {
 						ajax_loading(false);
-						$('#mp_product_list').first().replaceWith(data.products);
 						$('#mp_product_nav').remove();
-						if(data.pagination!==false){
-							$('#mp_product_list').after(data.pagination);
-						}
+						$('#mp_product_list').first().replaceWith(data.products);
 						location.hash = query_string;
 						mp_cart_listeners();
 					}
