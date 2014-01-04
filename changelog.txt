@@ -6,16 +6,16 @@ Change Log:
 ----------------------------------------------------------------------
 
 
-2.9 beta 2 - 1/03/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher
+2.9 beta 2 - 1/03/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowhler
 ----------------------------------------------------------------------
 - Added Coupons for individual categories/products
 - Added compatibility with Google Universal Analytics
 - Added Stripe embedded form button
-- Added oembed endpoint for Pinterest "Rich Pins"
+- Added Pinterest "Rich Pins" w/advanced oembed endpoint 
 - Added show related products option
 - Added Pickup in-store shipping option
 - Added ability to assign a custom per-order limit to a product
-- Add setting to turn of downloadable product default 1 per order limit
+- Add setting to turn off downloadable product default 1 per order limit
 - Added filters to many template functions
 - Minor bugfixes on Simplify gateway
 - Deleted orders are now removed from usermeta
@@ -42,7 +42,7 @@ Change Log:
 - Pass manual gateway instuctions through wpautop() and allow shortcodes in it
 - Remove encoded html from PayPal IPN strings http://wp.mu/7s9
 - Delay upgrade rewrite flush to end of init hook http://wp.mu/7vt
-- Remove retired Google checkout plugin
+- Remove retired Google checkout gateway
 - Fixed bug with PayPal Express gateway and coupons where totals would be incorrect after being transferred to PayPal
 - Updated mp_list_products() function to use WP-style arguments - users can still use existing argument style if they wish
 - Added mp_list_products() can now display filters - no need to call mp_products_filter() in your theme template
