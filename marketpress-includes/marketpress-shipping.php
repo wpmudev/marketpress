@@ -293,7 +293,7 @@ class MP_Shipping_Handler {
       $content .= '<td>'.esc_attr($label).'</td>';
       $content .= '</tr>';
 		}
-		var_dump($_SESSION);
+
 		return $content;
 	}
 
