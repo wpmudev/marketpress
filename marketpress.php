@@ -7356,7 +7356,7 @@ Notification Preferences: %s', 'mp');
   		case "importers":
         ?>
         <div class="icon32"><img src="<?php echo $this->plugin_url . 'images/import.png'; ?>" /></div>
-				<form id="mp-import-form" method="post" action="" enctype="multipart/form-data">
+				<form id="mp-import-form" method="post" action="<?php echo admin_url('edit.php?post_type=product&page=marketpress&tab=importers'); ?>" enctype="multipart/form-data">
 				<h2><?php _e('Import Products', 'mp'); ?></h2>
 				<div id="poststuff" class="metabox-holder mp-importer">
 					<?php do_action('marketpress_add_importer'); ?>

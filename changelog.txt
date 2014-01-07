@@ -49,6 +49,7 @@ Change Log:
 - Added mp_list_products() can now display pagination
 - Added mp_products_nav() to display products pagination
 - Fixed some warnings related to shipping fields when checking out
+- Fix premature deletion of csv import file after previously deleting
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
