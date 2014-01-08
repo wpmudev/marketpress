@@ -142,19 +142,15 @@ class MarketPress_Shortcodes {
    * Displays related products for the passed product id
    *
    * @param int $product_id. 
-   * @param bool $in_same_category Optional, whether to limit related to the same category.
+   * @param string $relate_by Optional, whether to limit related to the same category, tags or both.
    * @param bool $echo. Optional, whether to echo or return the results
    * @param int $limit. Optional The number of products we want to retrieve.
    * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
    */
   function mp_related_products_sc($atts) {
-	  extract( shortcode_atts( array(
-	  			'product_id' => false,
-				'in_same_category' => true,
-				'limit' => 3,
-				'simple_list' => false
- 	   ), $atts) );
-	return mp_related_products($product_id, $in_same_category, false, $limit, $simple_list);
+  	global $mp;
+  	$args = shortcode_atts($mp->defaults->related_products, $atts);
+		return mp_related_products($args);
   }
 
   /*
