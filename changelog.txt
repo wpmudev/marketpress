@@ -48,14 +48,9 @@ Change Log:
 - Added mp_list_products() can now display pagination
 - Added mp_products_nav() to display products pagination
 - Fixed some warnings related to shipping fields when checking out
-<<<<<<< .mine
 - Fix premature deletion of csv import file after previously deleting
 - Fix old text in Payflow gateway
 - Related products can now be set to use either categories/tags separately or both at the same time
-=======
-- Fix premature deletion of csv import file after previously deleting
-- Fix old text in Payflow gateway
->>>>>>> .r12406
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
