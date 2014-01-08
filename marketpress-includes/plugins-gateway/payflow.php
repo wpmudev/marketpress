@@ -711,7 +711,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       <h3 class='hndle'><span><?php _e('PayPal Payflow Settings', 'mp'); ?></span></h3>
       <div class="inside">
 				<a href="https://merchant.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=merchant/payment_gateway" target="_blank"><img src="<?php echo $mp->plugin_url . 'images/paypal-payflow.png'; ?>" /></a>
-        <p class="description"><?php _e('Use Payflow payment gateway to accept online payments using your Internet merchant account and processing network. PayPal Payflow Pro is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway. USD is the only currency supported by this gateway.', 'mp') ?></p>
+        <p class="description"><?php _e('Use Payflow payment gateway to accept online payments using your Internet merchant account and processing network. PayPal Payflow Pro is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway.', 'mp') ?></p>
         <table class="form-table">
 				  <tr>
 				    <th scope="row"><?php _e('Mode', 'mp') ?></th>
@@ -751,7 +751,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 
 				    </td>
 				  </tr>
-					<tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : ''; ?>>
+					<tr>
 	        <th scope="row"><?php _e('Paypal Currency', 'mp') ?></th>
 	        <td>
 	          <select name="mp[gateways][payflow][currency]">
