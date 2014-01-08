@@ -293,7 +293,6 @@ class MP_Shipping_Handler {
       $content .= '<td>'.esc_attr($label).'</td>';
       $content .= '</tr>';
 		}
-
 		return $content;
 	}
 
