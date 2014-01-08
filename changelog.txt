@@ -1,12 +1,11 @@
-﻿Plugin Name: MarketPress
+Plugin Name: MarketPress
 Author: Aaron Edwards (incsub)
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-
-2.9 beta 2 - 1/03/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowhler
+2.9 beta 2 - 1/03/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowher
 ----------------------------------------------------------------------
 - Added Coupons for individual categories/products
 - Added compatibility with Google Universal Analytics
@@ -49,8 +48,14 @@ Change Log:
 - Added mp_list_products() can now display pagination
 - Added mp_products_nav() to display products pagination
 - Fixed some warnings related to shipping fields when checking out
+<<<<<<< .mine
 - Fix premature deletion of csv import file after previously deleting
 - Fix old text in Payflow gateway
+- Related products can now be set to use either categories/tags separately or both at the same time
+=======
+- Fix premature deletion of csv import file after previously deleting
+- Fix old text in Payflow gateway
+>>>>>>> .r12406
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
