@@ -220,66 +220,68 @@ if (!function_exists('mp_related_products')) :
  * @param bool $echo. Optional, whether to echo or return the results
  * @param int $limit. Optional The number of products we want to retrieve.
  * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
+ * @param bool $in_same_tags Optional, whether to limit related to same tags
  */
-function mp_related_products( $product_id = NULL, $in_same_category = NULL, $echo = false, $limit = NULL, $simple_list = NULL) {
+function mp_related_products() {
 	global $mp, $post;
 	
 	$output = '';
-	$categories = array();
+	$categories = $tag_list = array();
 	
-	if( $mp->get_setting('related_products->show') == 0) {
-		return;
-	}
-	
-	$simple_list = ( is_null( $simple_list ) ) ? $mp->get_setting('related_products->simple_list') : ( $simple_list == 'true') ? true : false;
-	$same_category = ( is_null( $in_same_category ) ) ? $mp->get_setting('related_products->in_same_category') : ( $in_same_category == 'true') ? true : false;
-	
-	
-	$limit = (!$limit) ? $mp->get_setting('related_products->show_limit') : $limit;
-	
-	if( !$product_id ) {
-		$product_id = ( isset($post) && $post->post_type == 'product') ? $post->ID : false;
-		$product_details = get_post($product_id);
-	}else{
-		$product_details = get_post($product_id);
-		$product_id = ( $product_details->post_type == 'product') ? $post->ID : false;
-	}
-	
-	if(!$product_details) {
+	if( $mp->get_setting('related_products->show') == 0)
 		return '';
+		
+	$defaults = array_merge($mp->defaults['related_products'], array(
+		'simple_list' => $mp->get_setting('related_products->simple_list'),
+		'relate_by' => $mp->get_setting('related_products->relate_by'),
+		'limit' => $mp->get_setting('related_products->show_limit'),
+	));
+	
+	$args = $mp->parse_args(func_get_args(), $defaults);
+	
+	if( !is_null($args['product_id']) ) {
+		$args['product_id'] = ( isset($post) && $post->post_type == 'product' ) ? $post->ID : false;
+		$product_details = get_post($args['product_id']);
+	}else{
+		$product_details = get_post($args['product_id']);
+		$args['product_id'] = ( $product_details->post_type == 'product' ) ? $post->ID : false;
 	}
 	
+	if( is_null($product_details) )
+		return '';
 	
 	//setup the default args
 	$query_args = array(
 		'post_type' 	 => 'product',
-		'posts_per_page' => intval($limit),
-		'post__not_in' 	 => array($product_id),
+		'posts_per_page' => intval($args['limit']),
+		'post__not_in' 	 => array($args['product_id']),
 		'tax_query' 	 => array(), //we'll add these later
 	);
 	
 	//get the tags for this product
-	$tags = get_the_terms( $product_id, 'product_tag');
-	$tag_list = array();
-	
-	if($tags) {
-		$tag_list = array();
-		foreach($tags as $tag) {
-			$tag_list[] = $tag->term_id;
+	if ( 'both' == $args['relate_by'] || 'tags' == $args['relate_by'] ) {
+		$tags = get_the_terms( $args['product_id'], 'product_tag');
+		
+		if ( is_array($tags) ) {
+			foreach($tags as $tag) {
+				$tag_list[] = $tag->term_id;
+			}
+			
+			//add the tag taxonomy query
+			$query_args['tax_query'][] = array(
+					'taxonomy' => 'product_tag',
+					'field' => 'id',
+					'terms' => $tag_list,
+					'operator' => 'IN'
+			);
 		}
-		//add the tag taxonomy query
-		$query_args['tax_query'][] = array(
-				'taxonomy' => 'product_tag',
-				'field' => 'id',
-				'terms' => $tag_list,
-				'operator' => 'IN'
-		);
 	}
 	
 	//are we limiting to only the assigned categories
-	if( $same_category) {
-		$product_cats = get_the_terms(  $product_id, 'product_category' );
-		if($product_cats) {
+	if( 'both' == $args['relate_by'] || 'category' == $args['relate_by'] ) {
+		$product_cats = get_the_terms( $args['product_id'], 'product_category' );
+		
+		if( is_array($product_cats) ) {
 			foreach($product_cats as $cat) {
 				$categories[] = $cat->term_id;
 			}
@@ -294,56 +296,54 @@ function mp_related_products( $product_id = NULL, $in_same_category = NULL, $ech
 	}
 	
 	//we only want to run the query if we have categories or tags to look for.
-	if(count($tag_list) > 0 || count($categories) > 0 ) {
+	if ( count($tag_list) > 0 || count($categories) > 0 ) {
 		//make the query
 		$related_query = new WP_Query( $query_args );
 		
 		//how are we formatting the output
-		if( $simple_list) {
+		if( $args['simple_list'] ) {
 			
 			$output = '<div id="mp_related_products">';
-			$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4><div>';
+			$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4></div>';
 			if( $related_query->post_count ) {
-				//echo '<pre>' . print_r($related_query, 1) . '</pre>';
-				$list = '<u class="mp_related_products_list">%s</ul>';
+				$list = '<ul class="mp_related_products_list">%s</ul>';
 				$items = '';
 				foreach($related_query->posts as $product) {
 					$items .= '<li class="mp_related_products_list_item"><a href="'.get_permalink($product->ID).'">'.$product->post_title.'</a></li>';
 				}
-				$output .= sprintf($list, $items );
+				$output .= sprintf($list, $items);
 			}else{
 				$output .= '<div class="mp_related_products_title"><h4>'. apply_filters( 'mp_related_products_title_none', __('No Related Products','mp') ) . '</h4></div>';
 			}
 			
-			$output .'</div>';
+			$output .= '</div>';
 			
-		}else{
+		} else {
 			//we'll use the $mp settings and functions
 			$layout_type = $mp->get_setting('list_view');
 			$output = '<div id="mp_related_products" class="mp_' . $layout_type . '">';
 			//do we have posts?
 			if( $related_query->post_count ) {
-				$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4><div>';
+				$output .= '<div class="mp_related_products_title"><h4>' . apply_filters( 'mp_related_products_title', __('Related Products','mp') ) . '</h4></div>';
 				$output .= $layout_type == 'grid' ? _mp_products_html_grid($related_query) : _mp_products_html_list($related_query);
 			}else{
 				$output .= '<div class="mp_related_products_title"><h4>'. apply_filters( 'mp_related_products_title_none', __('No Related Products','mp') ) . '</h4></div>';
 			}
 	
-			$output .'</div>';
+			$output .= '</div>';
 		}
 	}
 
-	$output = apply_filters('mp_related_products', $output, $product_id, $in_same_category, $limit, $simple_list);
+	$output = apply_filters('mp_related_products', $output, $args);
 
 	//how are we sending back the data
-	if($echo) {
+	if($args['echo']) {
 		echo $output;
 	}else{
 		return $output;
 	}
 }
 endif;
-
 
 if (!function_exists('mp_pinit_button')) :
 /**
