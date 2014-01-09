@@ -149,7 +149,7 @@ class MarketPress_Shortcodes {
    */
   function mp_related_products_sc($atts) {
   	global $mp;
-  	$args = shortcode_atts($mp->defaults->related_products, $atts);
+  	$args = shortcode_atts($mp->defaults['related_products'], $atts);
 		return mp_related_products($args);
   }
 
