@@ -3645,8 +3645,8 @@ Thanks again!", 'mp')
 
 		//check permissions
 		$post_type_object = get_post_type_object('mp_order');
-	 if ( !current_user_can($post_type_object->cap->edit_posts) )
-	 	wp_die(__('Cheatin&#8217; uh?'));
+		if ( !current_user_can($post_type_object->cap->edit_posts) )
+			wp_die(__('Cheatin&#8217; uh?'));
 
 		$query = "SELECT ID, post_title, post_date, post_status FROM {$wpdb->posts} WHERE post_type = 'mp_order'";
 
@@ -3674,7 +3674,7 @@ Thanks again!", 'mp')
 		$orders = $wpdb->get_results($query);
 
 		// Keep up to 12MB in memory, if becomes bigger write to temp file
-	 $file = fopen('php://temp/maxmemory:'. (12*1024*1024), 'r+');
+		$file = fopen('php://temp/maxmemory:'. (12*1024*1024), 'r+');
 		fputcsv( $file, array('order_id', 'status', 'received_date', 'paid_date', 'shipped_date', 'tax', 'shipping', 'total', 'coupon_discount', 'coupon_code', 'item_count', 'items', 'email', 'name', 'address1', 'address2', 'city', 'state', 'zipcode', 'country', 'phone', 'shipping_method', 'shipping_method_option', 'special_instructions', 'gateway', 'gateway_method', 'payment_currency', 'transaction_id' ) );
 
 		//loop through orders and add rows

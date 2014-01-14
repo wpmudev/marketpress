@@ -779,7 +779,7 @@ if ( is_multisite() ) {
         <tr>
 				<th scope="row"><?php _e('PayPal API Credentials', 'mp') ?></th>
 				<td>
-  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_NVPAPIBasics#id084DN0AK0HS">Instructions &raquo;</a>', 'mp') ?></span>
+  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">Instructions &raquo;</a>', 'mp') ?></span>
           <p><label><?php _e('API Username', 'mp') ?><br />
           <input value="<?php echo esc_attr($settings['gateways']['paypal-chained']['api_user']); ?>" size="30" name="mp[gateways][paypal-chained][api_user]" type="text" />
           </label></p>
@@ -789,7 +789,7 @@ if ( is_multisite() ) {
           <p><label><?php _e('Signature', 'mp') ?><br />
           <input value="<?php echo esc_attr($settings['gateways']['paypal-chained']['api_sig']); ?>" size="70" name="mp[gateways][paypal-chained][api_sig]" type="text" />
           </label></p>
-          <span class="description"><?php _e('You must register this application with PayPal using your business account login to get an Application ID that will work with your API credentials. A bit of a hassle, but worth it! In the near future we will be looking for ways to simplify this process. <a target="_blank" href="https://appreview.x.com/create-appvetting-app!input.jspa">Register then submit your application</a> while logged in to the developer portal.</a> Note that you do not need an Application ID for testing in sandbox mode. <a target="_blank" href="https://www.x.com/community/ppx/apps101/go-live">More Information &raquo;</a>', 'mp') ?><br />
+          <span class="description"><?php _e('You must register this application with PayPal using your business account login to get an Application ID that will work with your API credentials. A bit of a hassle, but worth it! In the near future we will be looking for ways to simplify this process. <a target="_blank" href="https://apps.paypal.com/user/my-account/applications">Register then submit your application</a> while logged in to the developer portal.</a> Note that you do not need an Application ID for testing in sandbox mode. <a target="_blank" href="https://developer.paypal.com/docs/classic/lifecycle/goingLive/#register">More Information &raquo;</a>', 'mp') ?><br />
           <a href="<?php echo $mp->plugin_url . 'plugins-gateway/paypal-chained-payments-docs/readme.html'; ?>"><?php _e('View an example form &raquo;', 'mp'); ?></a>
           </span>
           <p><label><?php _e('Application ID', 'mp') ?><br />
