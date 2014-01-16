@@ -1533,27 +1533,16 @@ if (!function_exists('mp_list_products')) :
 function mp_list_products() {
 		global $wp_query, $mp;
 		
-		$args = func_get_args();
-		$newargs = array();
-		
-		if ( (isset($args[0]) && is_array($args[0])) || (isset($args[0]) && !is_numeric($args[0]) && !is_bool($args[0])) ) {
-			 $newargs = wp_parse_args($args[0], $mp->defaults['list_products']);
-		} else {
-			 foreach ( $mp->defaults['list_products'] as $key => $arg ) {
-				$newargs[$key] = count($args) ? array_shift($args) : $arg;
-			 }
-		}
-		
-		$args = $newargs;
+		$args = $mp->parse_args(func_get_args(), $mp->defaults['list_products']);
 		
 		//setup taxonomy if applicable
-		if ($category) {
-				$taxonomy_query = '&product_category=' . sanitize_title($category);
-		} else if ($tag) {
+		if ($args['category']) {
+				$taxonomy_query = '&product_category=' . sanitize_title($args['category']);
+		} else if ($args['tag']) {
 				$taxonomy_query = '&product_tag=' . sanitize_title($tag);
-		} else if (isset($wp_query->query_vars['taxonomy']) && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag')) {
+		} else if ($wp_query->get('taxonomy') == 'product_category' || $wp_query->get('taxonomy') == 'product_tag') {
 				//TODO might need to fix for tags that are a number
-				$taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . $wp_query->query_vars['term'];
+				$taxonomy_query = '&' . $wp_query->get('taxonomy') . '=' . $wp_query->get('term');
 		} else {
 				$taxonomy_query = '';
 		}
@@ -1581,13 +1570,13 @@ function mp_list_products() {
 				}
 
 				//figure out page
-				if (isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'])
-						$paginate_query .= '&paged=' . intval($wp_query->query_vars['paged']);
+				if ($wp_query->get('paged') != '')
+						$paginate_query .= '&paged=' . intval($wp_query->get('paged'));
 
 				if (intval($args['page']))
 						$paginate_query .= '&paged=' . intval($args['page']);
-				else if ($wp_query->query_vars['paged'])
-						$paginate_query .= '&paged=' . intval($wp_query->query_vars['paged']);
+				else if ($wp_query->get('paged') != '')
+						$paginate_query .= '&paged=' . intval($wp_query->get('paged'));
 		}
 
 		//get order by
@@ -1641,10 +1630,10 @@ function mp_list_products() {
 		
 		$content = apply_filters('mp_list_products', $content, $args);
 	
-		if ($echo)
-				echo $content;
+		if ($args['echo'])
+			echo $content;
 		else
-				return $content;
+			return $content;
 }
 endif;
 

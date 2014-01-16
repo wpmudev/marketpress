@@ -51,6 +51,7 @@ Change Log:
 - Fix premature deletion of csv import file after previously deleting
 - Fix old text in Payflow gateway
 - Related products can now be set to use either categories/tags separately or both at the same time
+- Fixed bug when using category filter the page title, menu item, etc would not update accordingly http://wp.mu/8l9
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------

@@ -67,8 +67,12 @@ jQuery(document).ready(function($) {
 				update_dropdown_state(query_string);
 		}
 
-		$(".mp_list_filter select").change(function(){
+		$(".mp_list_filter select").not('#filter-term').change(function(){
 				get_and_insert_products( $('.mp_product_list_refine').serialize() );
+		});
+		
+		$('#filter-term').change(function(){
+			window.location.href = MP_Product_Cats.links[$(this).val()] + window.location.hash;
 		});
 
 		// on next/prev link click, get page number and update products

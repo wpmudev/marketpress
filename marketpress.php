@@ -692,8 +692,26 @@ Thanks again!", 'mp')
 	 //setup ajax cart javascript
 	 wp_enqueue_script( 'mp-ajax-js', $this->plugin_url . 'js/ajax-cart.js', array('jquery'), $this->version );
 
+	 //get all product category links for access in js
+	 $vars = array();
+	 $terms = get_terms('product_category');
+	 if ( !is_wp_error($terms) ) {
+	 	foreach ( $terms as $term ) {
+		 	$vars['links'][$term->term_id] = get_term_link($term);
+	 	}
+	 }
+	 wp_localize_script('mp-ajax-js', 'MP_Product_Cats', $vars);
+	 
 	 // declare the variables we need to access in js
-	 wp_localize_script( 'mp-ajax-js', 'MP_Ajax', array( 'ajaxUrl' => admin_url( 'admin-ajax.php', (is_ssl() ? 'https': 'http') ), 'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'), 'successMsg' => __('Item(s) Added!', 'mp'), 'imgUrl' => $this->plugin_url.'images/loading.gif', 'addingMsg' => __('Adding to your cart...', 'mp'), 'outMsg' => __('In Your Cart', 'mp'), 'show_filters' => $this->get_setting('show_filters') ) );
+	 wp_localize_script('mp-ajax-js', 'MP_Ajax', array(
+	 	'ajaxUrl' => admin_url('admin-ajax.php', (is_ssl() ? 'https': 'http')),
+	 	'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'),
+	 	'successMsg' => __('Item(s) Added!', 'mp'),
+	 	'imgUrl' => $this->plugin_url.'images/loading.gif',
+	 	'addingMsg' => __('Adding to your cart...', 'mp'),
+	 	'outMsg' => __('In Your Cart', 'mp'),
+	 	'show_filters' => $this->get_setting('show_filters'),
+	 ));
 	}
 
 	//loads the jquery lightbox plugin
@@ -1652,7 +1670,7 @@ Thanks again!", 'mp')
 
 		if ( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1) {
 			$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
-			$category = $term->slug;
+			$args['category'] = $term->slug;
 		}
 
 		if ( isset($_POST['page']) && is_numeric($_POST['page']) ) {
@@ -7412,7 +7430,7 @@ Notification Preferences: %s', 'mp');
 	 */
 	function parse_args( $args, $defaults ) {
 		if ( (isset($args[0]) && is_array($args[0])) || (isset($args[0]) && !is_numeric($args[0]) && !is_bool($args[0])) )
-			return wp_parse_args($args, $defaults);
+			return wp_parse_args($args[0], $defaults);
 		
 		$tmp_args = array();
 		
