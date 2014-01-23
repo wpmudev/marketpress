@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9
+Version: 2.9.0.1
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9';
+	var $version = '2.9.0.1';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -778,12 +778,6 @@ Thanks again!", 'mp')
 			'hierarchical' => true,
 			'label' => __('Product Categories', 'mp'),
 			'singular_label' => __('Product Category', 'mp'),
-			'capabilities' => array(
-				'manage_terms' => 'manage_product_categories',
-				'edit_terms' => 'manage_product_categories',
-				'delete_terms' => 'manage_product_categories',
-				'assign_terms' => 'edit_products'
-			),
 			'rewrite' => array(
 				'with_front' => false,
 				'slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->category')
@@ -795,12 +789,6 @@ Thanks again!", 'mp')
 			'hierarchical' => false,
 			'label' => __('Product Tags', 'mp'),
 			'singular_label' => __('Product Tag', 'mp'),
-			'capabilities' => array(
-				'manage_terms' => 'manage_product_tags',
-				'edit_terms' => 'manage_product_tags',
-				'delete_terms' => 'manage_product_tags',
-				'assign_terms' => 'edit_products'
-			),
 			'rewrite' => array(
 				'with_front' => false,
 				'slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->tag')
@@ -829,7 +817,7 @@ Thanks again!", 'mp')
 				'public' => true,
 				'show_ui' => true,
 				'publicly_queryable' => true,
-				'capability_type' => 'product',
+				'capability_type' => 'page',
 				'hierarchical' => false,
 				'menu_icon' => $this->plugin_url . 'images/marketpress-icon.png',
 				'rewrite' => array(
@@ -863,7 +851,7 @@ Thanks again!", 'mp')
 			'description' => __('Orders from your e-commerce store.', 'mp'),
 			'public' => false,
 			'show_ui' => false,
-			'capability_type' => apply_filters('mp_orders_capability', 'order'),
+			'capability_type' => apply_filters('mp_orders_capability', 'page'),
 			'hierarchical' => false,
 			'rewrite' => false,
 			'query_var' => false,
