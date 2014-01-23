@@ -1579,25 +1579,21 @@ function mp_list_products() {
 			'relation' => 'AND',
 		);
 	}
-
+	
 	//setup pagination
 	if ( (!is_null($args['paginate']) && !$args['paginate']) || (is_null($args['paginate']) && !$mp->get_setting('paginate')) ) {
 		$query['nopaging'] = true;
 	} else {
-		//get page details
+		//figure out perpage
+		if ( !is_null($args['per_page']) ) {
+			$query['posts_per_page'] = intval($args['per_page']);
+		} else {
+			$query['posts_per_page'] = intval($mp->get_setting('per_page'));
+		}
+		
+		//figure out page
 		if ( !is_null($args['paged']) ) {
-			//figure out perpage
-			$args['posts_per_page'] = $mp->get_setting('per_page');
-			if ( $per_page = intval($args['per_page']) ) {
-				$args['posts_per_page'] = $per_page;
-			}
-
-			//figure out page
-			if ( $page = intval($args['page']) ) {
-				$args['paged'] = $page;
-			} elseif ( $wp_query->get('paged') != '' ) {
-				$args['paged'] = intval($wp_query->get('paged'));
-			}
+			$query['paged'] = intval($args['page']);
 		} elseif ( $wp_query->get('paged') != '' ) {
 			$query['paged'] = intval($wp_query->get('paged'));
 		}
@@ -1632,7 +1628,7 @@ function mp_list_products() {
 	} else {
 		$query['order'] = $args['order'];
 	}
-
+	
 	//The Query
 	$custom_query = new WP_Query($query);
 
