@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9 beta 2
+Version: 2.9
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,10 +27,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9 beta 2';
+	var $version = '2.9';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
+	var $plugin_file = '';
 	var $product_template;
 	var $product_taxonomy_template;
 	var $product_list_template;
@@ -51,12 +52,12 @@ class MarketPress {
 		'list_products' => array(
 			'echo' => true,
 			'paginate' => NULL,
-			'page' => '',
-			'per_page' => '',
-			'order_by' => '',
-			'order' => '',
-			'category' => '',
-			'tag' => '',
+			'page' => NULL,
+			'per_page' => NULL,
+			'order_by' => NULL,
+			'order' => NULL,
+			'category' => NULL,
+			'tag' => NULL,
 			'list_view'=> NULL,
 			'filters' => NULL,
 		),
@@ -388,12 +389,13 @@ Thanks again!", 'mp')
 	function localization() {
 		// Load up the localization file if we're using WordPress in a different language
 		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
-		if ($this->location == 'mu-plugins')
-			load_muplugin_textdomain( 'mp', '/marketpress-includes/languages/' );
-		else if ($this->location == 'subfolder-plugins')
-			load_plugin_textdomain( 'mp', false, '/marketpress/marketpress-includes/languages/' );
-		else if ($this->location == 'plugins')
-			load_plugin_textdomain( 'mp', false, '/marketpress-includes/languages/' );
+		$mu_plugins = wp_get_mu_plugins();
+		$lang_dir = dirname(plugin_basename($this->plugin_file)) . '/marketpress-includes/languages/';
+		
+		if ( in_array($this->plugin_file, $mu_plugins) )
+			load_muplugin_textdomain('mp', $lang_dir);
+		else
+			load_plugin_textdomain('mp', false, $lang_dir);
 
 		//setup language code for jquery datepicker translation
 		$temp_locales = explode('_', get_locale());
@@ -402,25 +404,12 @@ Thanks again!", 'mp')
 
 	function init_vars() {
 		//setup proper directories
-		if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/marketpress/' . basename(__FILE__))) {
-			$this->location = 'subfolder-plugins';
-			$this->plugin_dir = WP_PLUGIN_DIR . '/marketpress/marketpress-includes/';
-			$this->plugin_url = plugins_url( '/marketpress-includes/', __FILE__ );
-		} else if (defined('WP_PLUGIN_URL') && defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/' . basename(__FILE__))) {
-			$this->location = 'plugins';
-			$this->plugin_dir = WP_PLUGIN_DIR . '/marketpress-includes/';
-			$this->plugin_url = plugins_url( '/marketpress-includes/', __FILE__ );
-		} else if (is_multisite() && defined('WPMU_PLUGIN_URL') && defined('WPMU_PLUGIN_DIR') && file_exists(WPMU_PLUGIN_DIR . '/' . basename(__FILE__))) {
-			$this->location = 'mu-plugins';
-			$this->plugin_dir = WPMU_PLUGIN_DIR . '/marketpress-includes/';
-			$this->plugin_url = WPMU_PLUGIN_URL . '/marketpress-includes/';
-		} else {
-			wp_die(__('There was an issue determining where MarketPress is installed. Please reinstall.', 'mp'));
-		}
+		$this->plugin_file = __FILE__;
+		$this->plugin_dir = plugin_dir_path(__FILE__) . 'marketpress-includes/';
+		$this->plugin_url = plugin_dir_url(__FILE__) . 'marketpress-includes/';
 
 		//load data structures
 		require_once( $this->plugin_dir . 'marketpress-data.php' );
-
 	}
 
 	/* Only load code that needs BuddyPress to run once BP is loaded and initialized. */
@@ -784,91 +773,134 @@ Thanks again!", 'mp')
 	}
 
 	function register_custom_posts() {
-	 ob_start();
-
-	 // Register custom taxonomy
-		register_taxonomy( 'product_category', 'product', apply_filters( 'mp_register_product_category', array("hierarchical" => true, 'label' => __('Product Categories', 'mp'), 'singular_label' => __('Product Category', 'mp'), 'rewrite' => array('slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->category'))) ) );
-		register_taxonomy( 'product_tag', 'product', apply_filters( 'mp_register_product_tag', array("hierarchical" => false, 'label' => __('Product Tags', 'mp'), 'singular_label' => __('Product Tag', 'mp'), 'rewrite' => array('slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->tag'))) ) );
-
-	 // Register custom product post type
-	 $supports = array( 'title', 'editor', 'author', 'excerpt', 'revisions', 'thumbnail' );
-	 $args = array (
-			'labels' => array('name' => __('Products', 'mp'),
-							 		'singular_name' => __('Product', 'mp'),
-							 		'add_new' => __('Create New', 'mp'),
-							 		'add_new_item' => __('Create New Product', 'mp'),
-							 		'edit_item' => __('Edit Products', 'mp'),
-							 		'edit' => __('Edit', 'mp'),
-							 		'new_item' => __('New Product', 'mp'),
-							 		'view_item' => __('View Product', 'mp'),
-							 		'search_items' => __('Search Products', 'mp'),
-							 		'not_found' => __('No Products Found', 'mp'),
-							 		'not_found_in_trash' => __('No Products found in Trash', 'mp'),
-							 		'view' => __('View Product', 'mp')
-							 	),
-			'description' => __('Products for your MarketPress store.', 'mp'),
-			'menu_icon' => $this->plugin_url . 'images/marketpress-icon.png',
-			'public' => true,
-			'show_ui' => true,
-			'publicly_queryable' => true,
-			'capability_type' => 'page',
+		// Register product categories
+		register_taxonomy('product_category', 'product', apply_filters('mp_register_product_category', array(
+			'hierarchical' => true,
+			'label' => __('Product Categories', 'mp'),
+			'singular_label' => __('Product Category', 'mp'),
+			'capabilities' => array(
+				'manage_terms' => 'manage_product_categories',
+				'edit_terms' => 'manage_product_categories',
+				'delete_terms' => 'manage_product_categories',
+				'assign_terms' => 'edit_products'
+			),
+			'rewrite' => array(
+				'with_front' => false,
+				'slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->category')
+			),
+		)));
+		
+		// Register product tags
+		register_taxonomy('product_tag', 'product', apply_filters('mp_register_product_tag', array(
 			'hierarchical' => false,
-			'rewrite' => array('slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products'), 'with_front' => false), // Permalinks format
-			'query_var' => true,
-			'supports' => $supports
-	 );
-	 register_post_type( 'product' , apply_filters( 'mp_register_post_type', $args ) );
+			'label' => __('Product Tags', 'mp'),
+			'singular_label' => __('Product Tag', 'mp'),
+			'capabilities' => array(
+				'manage_terms' => 'manage_product_tags',
+				'edit_terms' => 'manage_product_tags',
+				'delete_terms' => 'manage_product_tags',
+				'assign_terms' => 'edit_products'
+			),
+			'rewrite' => array(
+				'with_front' => false,
+				'slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products') . '/' . $this->get_setting('slugs->tag')
+			),
+		)));
 
-	 //register the orders post type
-	 register_post_type( 'mp_order', array(
-		'labels' => array('name' => __('Orders', 'mp'),
-							 		'singular_name' => __('Order', 'mp'),
-							 		'edit' => __('Edit', 'mp'),
-							 		'view_item' => __('View Order', 'mp'),
-							 		'search_items' => __('Search Orders', 'mp'),
-							 		'not_found' => __('No Orders Found', 'mp')
-							 	),
-		'description' => __('Orders from your MarketPress store.', 'mp'),
+		// Register custom product post type
+		register_post_type('product' , apply_filters('mp_register_post_type', array(
+				'labels' => array(
+					'name' => __('Products', 'mp'),
+					'singular_name' => __('Product', 'mp'),
+					'menu_name' => __('Products', 'mp'),
+					'all_items' => __('Products', 'mp'),
+					'add_new' => __('Create New', 'mp'),
+					'add_new_item' => __('Create New Product', 'mp'),
+					'edit_item' => __('Edit Product', 'mp'),
+					'edit' => __('Edit', 'mp'),
+					'new_item' => __('New Product', 'mp'),
+					'view_item' => __('View Product', 'mp'),
+					'search_items' => __('Search Products', 'mp'),
+					'not_found' => __('No Products Found', 'mp'),
+					'not_found_in_trash' => __('No Products found in Trash', 'mp'),
+					'view' => __('View Product', 'mp')
+				),
+				'description' => __('Products for your e-commerce store.', 'mp'),
+				'public' => true,
+				'show_ui' => true,
+				'publicly_queryable' => true,
+				'capability_type' => 'product',
+				'hierarchical' => false,
+				'menu_icon' => $this->plugin_url . 'images/marketpress-icon.png',
+				'rewrite' => array(
+					'slug' => $this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products'),
+					'with_front' => false
+				),
+				'query_var' => true,
+				'supports' => array(
+					'title',
+					'editor',
+					'author',
+					'excerpt',
+					'revisions',
+					'thumbnail',
+				),
+				'taxonomies' => array(
+					'product_category',
+					'product_tag',
+				),
+		)));
+
+		//register the orders post type
+		register_post_type('mp_order', apply_filters('mp_register_post_type_mp_order', array(
+			'labels' => array('name' => __('Orders', 'mp'),
+				'singular_name' => __('Order', 'mp'),
+				'edit' => __('Edit', 'mp'),
+				'view_item' => __('View Order', 'mp'),
+				'search_items' => __('Search Orders', 'mp'),
+				'not_found' => __('No Orders Found', 'mp')
+			),
+			'description' => __('Orders from your e-commerce store.', 'mp'),
 			'public' => false,
 			'show_ui' => false,
-			'capability_type' => apply_filters( 'mp_orders_capability', 'page' ),
+			'capability_type' => apply_filters('mp_orders_capability', 'order'),
 			'hierarchical' => false,
 			'rewrite' => false,
 			'query_var' => false,
-		'supports' => array()
-		) );
+			'supports' => array(),
+		)));
 
-	 //register custom post statuses for our orders
-	 register_post_status( 'order_received', array(
-			'label'			=> __('Received', 'mp'),
+		//register custom post statuses for our orders
+		register_post_status( 'order_received', array(
+			'label'				=> __('Received', 'mp'),
 			'label_count' => array( __('Received <span class="count">(%s)</span>', 'mp'), __('Received <span class="count">(%s)</span>', 'mp') ),
-			'post_type'	=> 'mp_order',
-			'public'		=> false
+			'post_type'		=> 'mp_order',
+			'public'			=> false
 		) );
 		register_post_status( 'order_paid', array(
-			'label'			=> __('Paid', 'mp'),
+			'label'				=> __('Paid', 'mp'),
 			'label_count' => array( __('Paid <span class="count">(%s)</span>', 'mp'), __('Paid <span class="count">(%s)</span>', 'mp') ),
-			'post_type'	=> 'mp_order',
-			'public'		=> false
+			'post_type'		=> 'mp_order',
+			'public'			=> false
 		) );
 		register_post_status( 'order_shipped', array(
-			'label'			=> __('Shipped', 'mp'),
+			'label'				=> __('Shipped', 'mp'),
 			'label_count' => array( __('Shipped <span class="count">(%s)</span>', 'mp'), __('Shipped <span class="count">(%s)</span>', 'mp') ),
-			'post_type'	=> 'mp_order',
-			'public'		=> false
+			'post_type'		=> 'mp_order',
+			'public'			=> false
 		) );
 		register_post_status( 'order_closed', array(
-			'label'			=> __('Closed', 'mp'),
+			'label'				=> __('Closed', 'mp'),
 			'label_count' => array( __('Closed <span class="count">(%s)</span>', 'mp'), __('Closed <span class="count">(%s)</span>', 'mp') ),
-			'post_type'	=> 'mp_order',
-			'public'		=> false
+			'post_type'		=> 'mp_order',
+			'public'			=> false
 		) );
 		register_post_status( 'trash', array(
-			'label'			=> _x( 'Trash', 'post' ),
+			'label'			 => _x( 'Trash', 'post' ),
 			'label_count' => _n_noop( 'Trash <span class="count">(%s)</span>', 'Trash <span class="count">(%s)</span>' ),
 			'show_in_admin_status_list' => true,
-			'post_type'		 => 'mp_order',
-			'public'		=> false
+			'post_type'	 => 'mp_order',
+			'public'			=> false
 		) );
 	}
 
@@ -2067,7 +2099,7 @@ Thanks again!", 'mp')
 	 if (!$this->get_setting('disable_cart')) {
 
 		//only display metabox if shipping plugin ties into it
-		if ( has_action('mp_shipping_metabox') )
+		if ( has_action('mp_shipping_metabox') && 'none' != $this->get_setting('shipping->method') )
 			add_meta_box('mp-meta-shipping', __('Shipping', 'mp'), array(&$this, 'meta_shipping'), 'product', 'normal', 'high');
 
 			//for product downloads

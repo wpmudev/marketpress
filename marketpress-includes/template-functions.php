@@ -833,8 +833,10 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 						$content .= '</tr>';
 				}
 
-				$content .= apply_filters('mp_checkout_shipping_field', '');
-
+				if ( !$mp->download_only_cart($mp->get_cart_contents()) ) {
+					$content .= apply_filters('mp_checkout_shipping_field', '');
+				}
+				
 				$content .= '</tbody>';
 				$content .= '</table>';
 
@@ -900,7 +902,9 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 						$content .= '</tr>';
 				}
 
-				$content .= apply_filters('mp_checkout_shipping_field_readonly', '');
+				if ( !$mp->download_only_cart($mp->get_cart_contents()) ) {
+					$content .= apply_filters('mp_checkout_shipping_field_readonly', '');
+				}
 
 				$content .= '</tbody>';
 				$content .= '</table>';
@@ -1531,109 +1535,133 @@ if (!function_exists('mp_list_products')) :
  */
 
 function mp_list_products() {
-		global $wp_query, $mp;
-		
-		$args = $mp->parse_args(func_get_args(), $mp->defaults['list_products']);
-		
-		//setup taxonomy if applicable
-		if ($args['category']) {
-				$taxonomy_query = '&product_category=' . sanitize_title($args['category']);
-		} else if ($args['tag']) {
-				$taxonomy_query = '&product_tag=' . sanitize_title($tag);
-		} else if ($wp_query->get('taxonomy') == 'product_category' || $wp_query->get('taxonomy') == 'product_tag') {
-				//TODO might need to fix for tags that are a number
-				$taxonomy_query = '&' . $wp_query->get('taxonomy') . '=' . $wp_query->get('term');
-		} else {
-				$taxonomy_query = '';
+	global $wp_query, $mp;
+	
+	$args = $mp->parse_args(func_get_args(), $mp->defaults['list_products']);
+	$query = array(
+		'post_type' => 'product',
+		'post_status' => 'publish',
+	);
+	
+	//setup taxonomies if possible
+	if ( !is_null($args['category']) || !is_null($args['tag']) ) {
+		if ( !is_null($args['category']) ) {
+			$query['tax_query'][] = array(
+				'taxonomy' => 'product_category',
+				'field' => 'slug',
+				'terms' => sanitize_title($args['category']),
+			);
 		}
+		
+		if ( !is_null($args['tag']) ) {
+			$query['tax_query'][] = array(
+				'taxonomy' => 'product_tag',
+				'field' => 'slug',
+				'terms' => sanitize_title($args['tag']),
+			);
+		}			
+	} elseif ( $wp_query->get('taxonomy') == 'product_category' ) {
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_category',
+			'field' => 'slug',
+			'terms' => $wp_query->get('term'),
+		);
+	} elseif ( $wp_query->get('taxonomy') == 'product_tag' ) {
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_tag',
+			'field' => 'slug',
+			'terms' => $wp_query->get('term'),
+		);
+	}
+	
+	if ( isset($query['tax_query']) && count($query['tax_query']) > 1 ) {
+		$query['tax_query'][] = array(
+			'relation' => 'AND',
+		);
+	}
 
-		//setup pagination
-		$args['paged'] = false;
-		if ($args['paginate']) {
-				$args['paged'] = true;
-		} else if (is_null($args['paginate'])) {
-				if ($mp->get_setting('paginate'))
-						$args['paged'] = true;
-				else
-						$paginate_query = '&nopaging=true';
-		} else {
-				$paginate_query = '&nopaging=true';
-		}
-		
+	//setup pagination
+	if ( (!is_null($args['paginate']) && !$args['paginate']) || (is_null($args['paginate']) && !$mp->get_setting('paginate')) ) {
+		$query['nopaging'] = true;
+	} else {
 		//get page details
-		if ($args['paged']) {
-				//figure out perpage
-				if (intval($args['per_page'])) {
-						$paginate_query = '&posts_per_page=' . intval($args['per_page']);
-				} else {
-						$paginate_query = '&posts_per_page=' . $mp->get_setting('per_page');
-				}
+		if ( !is_null($args['paged']) ) {
+			//figure out perpage
+			$args['posts_per_page'] = $mp->get_setting('per_page');
+			if ( $per_page = intval($args['per_page']) ) {
+				$args['posts_per_page'] = $per_page;
+			}
 
-				//figure out page
-				if ($wp_query->get('paged') != '')
-						$paginate_query .= '&paged=' . intval($wp_query->get('paged'));
-
-				if (intval($args['page']))
-						$paginate_query .= '&paged=' . intval($args['page']);
-				else if ($wp_query->get('paged') != '')
-						$paginate_query .= '&paged=' . intval($wp_query->get('paged'));
+			//figure out page
+			if ( $page = intval($args['page']) ) {
+				$args['paged'] = $page;
+			} elseif ( $wp_query->get('paged') != '' ) {
+				$args['paged'] = intval($wp_query->get('paged'));
+			}
+		} elseif ( $wp_query->get('paged') != '' ) {
+			$query['paged'] = intval($wp_query->get('paged'));
 		}
 
 		//get order by
-		if (!$args['order_by']) {
-				if ($mp->get_setting('order_by') == 'price')
-						$order_by_query = '&meta_key=mp_price_sort&orderby=meta_value_num';
-				else if ($mp->get_setting('order_by') == 'sales')
-						$order_by_query = '&meta_key=mp_sales_count&orderby=meta_value_num';
-				else
-						$order_by_query = '&orderby=' . $mp->get_setting('order_by');
+		if ( is_null($args['order_by']) ) {
+			if ( 'price' == $mp->get_setting('order_by') ) {
+				$query['meta_key'] = 'mp_price_sort';
+				$query['orderby'] = 'meta_value_num';
+			} elseif ( 'sales' == $mp->get_setting('order_by') ) {
+				$query['meta_key'] = 'mp_sales_count';
+				$query['orderby'] = 'meta_value_num';
+			} else {
+				$query['orderby'] = $mp->get_setting('order_by');
+			}
 		} else {
-				if ('price' == $args['order_by'])
-						$order_by_query = '&meta_key=mp_price_sort&orderby=meta_value_num';
-				else if ('sales' == $args['order_by'])
-						$order_by_query = '&meta_key=mp_sales_count&orderby=meta_value_num';
-				else
-						$order_by_query = '&orderby=' . $args['order_by'];
+			if ( 'price' == $args['order_by'] ) {
+				$query['meta_key'] = 'mp_price_sort';
+				$query['orderby'] = 'meta_value_num';
+			} else if ( 'sales' == $args['order_by'] ) {
+				$query['meta_key'] = 'mp_sales_count';
+				$query['orderby'] = 'meta_value_num';
+			} else {
+				$query['orderby'] = $args['order_by'];
+			}
 		}
+	}
 
-		//get order direction
-		if (!$args['order']) {
-				$order_query = '&order=' . $mp->get_setting('order');
-		} else {
-				$order_query = '&order=' . $args['order'];
-		}
+	//get order direction
+	if ( is_null($args['order']) ) {
+		$query['order'] = $mp->get_setting('order');
+	} else {
+		$query['order'] = $args['order'];
+	}
 
-		//The Query
-		$custom_query = new WP_Query('post_type=product&post_status=publish' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
+	//The Query
+	$custom_query = new WP_Query($query);
 
-		// get layout type for products
-		if (is_null($args['list_view'])) {
-				$layout_type = $mp->get_setting('list_view');
-		} else {
-				$layout_type = $args['list_view'] ? 'list' : 'grid';
-		}
-		
-		$content = ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter() : '';
-		$content .= '<div id="mp_product_list" class="mp_' . $layout_type . '">';
-
-		if ($last = $custom_query->post_count) {
-
-				$content .= $layout_type == 'grid' ?
-								_mp_products_html_grid($custom_query) :
-								_mp_products_html_list($custom_query);
-		} else {
-				$content .= '<div id="mp_no_products">' . apply_filters('mp_product_list_none', __('No Products', 'mp')) . '</div>';
-		}
-
-		$content .= '</div>';
-		$content .= ($args['paged']) ? mp_products_nav(false, $custom_query) : '';
-		
-		$content = apply_filters('mp_list_products', $content, $args);
+	// get layout type for products
+	if ( is_null($args['list_view']) ) {
+		$layout_type = $mp->get_setting('list_view');
+	} else {
+		$layout_type = $args['list_view'] ? 'list' : 'grid';
+	}
 	
-		if ($args['echo'])
-			echo $content;
-		else
-			return $content;
+	$content = ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter() : '';
+	$content .= '<div id="mp_product_list" class="mp_' . $layout_type . '">';
+
+	if ( $last = $custom_query->post_count ) {
+		$content .= $layout_type == 'grid' ? _mp_products_html_grid($custom_query) : _mp_products_html_list($custom_query);
+	} else {
+		$content .= '<div id="mp_no_products">' . apply_filters('mp_product_list_none', __('No Products', 'mp')) . '</div>';
+	}
+
+	$content .= '</div>';
+	$content .= ($args['paged']) ? mp_products_nav(false, $custom_query) : '';
+	
+	$content = apply_filters('mp_list_products', $content, $args);
+
+	if ( $args['echo'] ) {
+		echo $content;
+	} else {
+		return $content;
+	}
 }
 endif;
 

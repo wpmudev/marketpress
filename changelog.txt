@@ -5,7 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.9 beta 2 - 1/03/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowher
+2.9 - 1/22/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowher
 ----------------------------------------------------------------------
 - Added Coupons for individual categories/products
 - Added compatibility with Google Universal Analytics
@@ -48,10 +48,11 @@ Change Log:
 - Added mp_list_products() can now display pagination
 - Added mp_products_nav() to display products pagination
 - Fixed some warnings related to shipping fields when checking out
-- Fix premature deletion of csv import file after previously deleting
-- Fix old text in Payflow gateway
+- Fixed premature deletion of csv import file after previously deleting
+- Fixed old text in Payflow gateway
 - Related products can now be set to use either categories/tags separately or both at the same time
 - Fixed bug when using category filter the page title, menu item, etc would not update accordingly http://wp.mu/8l9
+- Fixed bug when checking out digital downloads and shipping was enabled the user would still be asked to choose a shipping method http://wp.mu/8mz
 
 2.8.9 - 9/22/2013 - Aaron Edwards, Arnold, Marko Miljus
 ----------------------------------------------------------------------
