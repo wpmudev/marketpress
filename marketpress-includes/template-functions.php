@@ -1538,13 +1538,26 @@ function mp_list_products() {
 	global $wp_query, $mp;
 	
 	$args = $mp->parse_args(func_get_args(), $mp->defaults['list_products']);
+	
 	$query = array(
 		'post_type' => 'product',
 		'post_status' => 'publish',
 	);
 	
 	//setup taxonomies if possible
-	if ( !is_null($args['category']) || !is_null($args['tag']) ) {
+	if ( $wp_query->get('taxonomy') == 'product_category' ) {
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_category',
+			'field' => 'slug',
+			'terms' => $wp_query->get('term'),
+		);
+	} elseif ( $wp_query->get('taxonomy') == 'product_tag' ) {
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_tag',
+			'field' => 'slug',
+			'terms' => $wp_query->get('term'),
+		);
+	} elseif ( !is_null($args['category']) || !is_null($args['tag']) ) {
 		if ( !is_null($args['category']) ) {
 			$query['tax_query'][] = array(
 				'taxonomy' => 'product_category',
@@ -1560,18 +1573,6 @@ function mp_list_products() {
 				'terms' => sanitize_title($args['tag']),
 			);
 		}			
-	} elseif ( $wp_query->get('taxonomy') == 'product_category' ) {
-		$query['tax_query'][] = array(
-			'taxonomy' => 'product_category',
-			'field' => 'slug',
-			'terms' => $wp_query->get('term'),
-		);
-	} elseif ( $wp_query->get('taxonomy') == 'product_tag' ) {
-		$query['tax_query'][] = array(
-			'taxonomy' => 'product_tag',
-			'field' => 'slug',
-			'terms' => $wp_query->get('term'),
-		);
 	}
 	
 	if ( isset($query['tax_query']) && count($query['tax_query']) > 1 ) {
@@ -2402,15 +2403,16 @@ if (!function_exists('mp_products_filter')) :
 function mp_products_filter() {
 		global $wp_query, $mp;
 
-		if (isset($wp_query->query_vars['taxonomy']) && $wp_query->query_vars['taxonomy'] == 'product_category') {
+		if ( 'product_category' == get_query_var('taxonomy') ) {
 				$term = get_queried_object(); //must do this for number tags
 				$default = $term->term_id;
 		} else {
-				$default = '';
+				$default = '-1';
 		}
 
 		$terms = wp_dropdown_categories(array(
-				'name' => 'filter-term',
+				'name' => 'product_category',
+				'id' => 'product-category',
 				'taxonomy' => 'product_category',
 				'show_option_none' => __('Show All', 'mp'),
 				'show_count' => 1,
@@ -2439,8 +2441,8 @@ function mp_products_filter() {
 						</option>';
 		}
 
-		$return =
-						' <div class="mp_list_filter">
+		$return = '
+			<div class="mp_list_filter">
 				<form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
 						<div class="one_filter">
 							<span>' . __('Category', 'mp') . '</span>
@@ -2454,7 +2456,7 @@ function mp_products_filter() {
 							</select>
 						</div>
 				</form>
-		</div>';
+			</div>';
 
 		return apply_filters('mp_products_filter', $return);
 }

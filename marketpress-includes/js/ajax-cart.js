@@ -63,16 +63,20 @@ jQuery(document).ready(function($) {
 		//	b) viewing the URL from a bookmark
 		if( /filter-term|order|paged/.test(location.hash) ){
 				var query_string = location.hash.replace('#', '');
+				
+				if ( MP_Ajax.productCategory != '' )
+					query_string += '&product_category=' + MP_Ajax.productCategory;
+				
 				get_and_insert_products(query_string);
 				update_dropdown_state(query_string);
 		}
 
-		$(".mp_list_filter select").not('#filter-term').change(function(){
+		$(".mp_list_filter select").not('#product-category').change(function(){
 				get_and_insert_products( $('.mp_product_list_refine').serialize() );
 		});
 		
-		$('#filter-term').change(function(){
-			window.location.href = MP_Product_Cats.links[$(this).val()] + window.location.hash;
+		$('#product-category').change(function(){
+			window.location.href = MP_Ajax.links[$(this).val()] + location.hash;
 		});
 
 		// on next/prev link click, get page number and update products
@@ -98,7 +102,7 @@ jQuery(document).ready(function($) {
 						ajax_loading(false);
 						$('#mp_product_nav').remove();
 						$('#mp_product_list').first().replaceWith(data.products);
-						location.hash = query_string;
+						location.hash = 'order=' + $('select[name="order"]').val();
 						mp_cart_listeners();
 					}
 				);
@@ -125,7 +129,7 @@ jQuery(document).ready(function($) {
 	mp_empty_cart();
 	mp_cart_listeners();
 
-	if(MP_Ajax.show_filters == 1){
+	if( MP_Ajax.showFilters == 1 ){
 		mp_ajax_products_list();
 	}
 

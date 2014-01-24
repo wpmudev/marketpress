@@ -592,12 +592,7 @@ font-size:1px;
 
 
 /* Ajax for products view*/
-.mp_product_list_refine{
-display: none;
-}
-.mp_list_filter{
-
-}
+.mp_list_filter{}
 .mp_list_filter .one_filter{
 display:inline-block;
 margin-right:20px;

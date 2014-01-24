@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.0.2
+Version: 2.9.0.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: Aaron Edwards (Incsub)
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.0.2';
+	var $version = '2.9.0.3';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -682,25 +682,34 @@ Thanks again!", 'mp')
 	 wp_enqueue_script( 'mp-ajax-js', $this->plugin_url . 'js/ajax-cart.js', array('jquery'), $this->version );
 
 	 //get all product category links for access in js
-	 $vars = array();
-	 $terms = get_terms('product_category');
-	 if ( !is_wp_error($terms) ) {
-	 	foreach ( $terms as $term ) {
-		 	$vars['links'][$term->term_id] = get_term_link($term);
-	 	}
-	 }
-	 wp_localize_script('mp-ajax-js', 'MP_Product_Cats', $vars);
-	 
-	 // declare the variables we need to access in js
-	 wp_localize_script('mp-ajax-js', 'MP_Ajax', array(
+	 $vars = array(
 	 	'ajaxUrl' => admin_url('admin-ajax.php', (is_ssl() ? 'https': 'http')),
 	 	'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'),
 	 	'successMsg' => __('Item(s) Added!', 'mp'),
 	 	'imgUrl' => $this->plugin_url.'images/loading.gif',
 	 	'addingMsg' => __('Adding to your cart...', 'mp'),
 	 	'outMsg' => __('In Your Cart', 'mp'),
-	 	'show_filters' => $this->get_setting('show_filters'),
-	 ));
+	 	'showFilters' => $this->get_setting('show_filters'),
+	 	'links' => array('-1' => home_url($this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products'))),
+	 );
+	 
+	 if ( 'product_category' == get_query_var('taxonomy') && '' != get_query_var('term') ) {
+		 $cat = get_term_by('slug', get_query_var('term'), 'product_category');
+		 $vars['productCategory'] = $cat->term_id;
+	 } else {
+		 $vars['productCategory'] = '-1';
+	 }
+	 
+	 $terms = get_terms('product_category');
+	 
+	 if ( is_array($terms) ) {
+	 	foreach ( $terms as $term ) {
+		 	$vars['links'][$term->term_id] = get_term_link($term);
+	 	}
+	 }
+	 
+	 // declare the variables we need to access in js
+	 wp_localize_script('mp-ajax-js', 'MP_Ajax', $vars);
 	}
 
 	//loads the jquery lightbox plugin
@@ -1634,7 +1643,7 @@ Thanks again!", 'mp')
 
 	$msgs = $this->get_setting('msg');
 	 $content .= do_shortcode($msgs['product_list']);
-	 $content .= mp_list_products(false);
+	 $content .= mp_list_products(array('echo' => false, 'filters' => true));
 
 	 return $content;
 	}
@@ -1647,7 +1656,7 @@ Thanks again!", 'mp')
 
 		$msgs = $this->get_setting('msg');
 	 $content = do_shortcode($msgs['product_list']);
-	 $content .= mp_list_products(false);
+	 $content .= mp_list_products(array('echo' => false, 'filters' => true));
 
 	 return $content;
 	}
@@ -1660,19 +1669,10 @@ Thanks again!", 'mp')
 		global $wp_query;
 
 		$ret = array('products'=>false, 'pagination'=>false);
-
-		$args = array(
+		$args = wp_parse_args(array(
 			'echo' => false,
-			'paginate' => NULL,
-			'page' => 1,
-			'per_page' => '',
-			'order_by' => '',
-			'order' => '',
-			'category' => '',
-			'tag' => '',
-			'list_view' => NULL,
 			'filters' => false,
-		);
+		), $this->defaults['list_products']);
 
 		if ( isset($_POST['order']) ) {
 			$o = explode('-',$_POST['order']);
@@ -1688,15 +1688,15 @@ Thanks again!", 'mp')
 			}
 		}
 
-		if ( isset($_POST['filter-term']) && is_numeric($_POST['filter-term']) && $_POST['filter-term']!=-1) {
-			$term = get_term_by( 'id', $_POST['filter-term'], 'product_category' );
+		if ( isset($_POST['product_category']) && is_numeric($_POST['product_category']) ) {
+			$term = get_term_by( 'id', $_POST['product_category'], 'product_category' );
 			$args['category'] = $term->slug;
 		}
 
 		if ( isset($_POST['page']) && is_numeric($_POST['page']) ) {
 			$args['page'] = $_POST['page'];
 		}
-
+		
 		$ret['products'] = mp_list_products($args);
 
 		header('Content-type: application/json');
@@ -7449,6 +7449,9 @@ Notification Preferences: %s', 'mp');
 	 * @return array
 	 */
 	function parse_args( $args, $defaults ) {
+		if ( !isset($args[0]) )
+			return $defaults;
+		
 		if ( (isset($args[0]) && is_array($args[0])) || (isset($args[0]) && !is_numeric($args[0]) && !is_bool($args[0])) )
 			return wp_parse_args($args[0], $defaults);
 		

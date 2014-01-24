@@ -443,9 +443,6 @@ input.mp_cart_direct_checkout_link:active,
 /* end generic buttons rules */
 
 /* Ajax for products view*/
-.mp_product_list_refine{
-display: none;
-}
 .mp_list_filter{
 
 }
