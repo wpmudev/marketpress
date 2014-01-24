@@ -4,12 +4,14 @@ Plugin Name: MarketPress
 Version: 2.9.0.3
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
-Author: Aaron Edwards (Incsub)
-Author URI: http://uglyrobot.com
+Author: WPMU DEV
+Author URI: http://premium.wpmudev.org/
 Text Domain: mp
 WDP ID: 144
 
 Copyright 2009-2014 Incsub (http://incsub.com)
+Author - Aaron Edwards
+Contributors - Arnold Bailey, Jonathan Cowher, Ryan Welcher, Marko Miljus, Aristeides Stathopoulos, Jeffri H, Coleman Stevenson, Enzo Maddalena
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -105,14 +107,14 @@ class MarketPress {
 		//localize the plugin
 		add_action( 'plugins_loaded', array(&$this, 'localization'), 9 );
 
-	 //load APIs and plugins
+		//load APIs and plugins
 		add_action( 'plugins_loaded', array(&$this, 'load_plugins') );
 
-	 //load importers
+		//load importers
 		add_action( 'plugins_loaded', array(&$this, 'load_importers') );
 
 		//custom post type
-	 add_action( 'init', array(&$this, 'register_custom_posts'), 0 ); //super high priority
+		add_action( 'init', array(&$this, 'register_custom_posts'), 0 ); //super high priority
 		add_filter( 'request', array(&$this, 'handle_edit_screen_filter') );
 
 		//edit products page
@@ -131,7 +133,7 @@ class MarketPress {
 		add_action( 'admin_menu', array(&$this, 'add_menu_items') );
 		add_action( 'admin_print_styles', array(&$this, 'admin_css') );
 		add_action( 'admin_print_scripts', array(&$this, 'admin_script_post') );
-	 add_action( 'admin_notices', array(&$this, 'admin_nopermalink_warning') );
+		add_action( 'admin_notices', array(&$this, 'admin_nopermalink_warning') );
 		add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), array(&$this, 'plugin_action_link'), 10, 2);
 		add_action( 'wp_ajax_mp-hide-help', array(&$this, 'hide_help') );
 
