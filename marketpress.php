@@ -1025,10 +1025,11 @@ Thanks again!", 'mp')
 			$wp_query->is_page = 1;
 			add_filter( 'the_content', array(&$this, 'product_theme'), 99 );
 
-				//genesis fixes
-				remove_action( 'genesis_post_content', 'genesis_do_post_image' );
-				remove_action( 'genesis_post_content', 'genesis_do_post_content' );
-				add_action('genesis_post_content', 'the_content');
+			//genesis fixes
+			remove_action( 'genesis_entry_content', 'genesis_do_post_image' );
+			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
+			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
+			add_action('genesis_entry_content', 'the_content');
 		}
 
 		$this->is_shop_page = true;
@@ -1128,14 +1129,14 @@ Thanks again!", 'mp')
 		if ($this->orderstatus_template = locate_template($templates)) {
 			add_filter( 'template_include', array(&$this, 'custom_orderstatus_template') );
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 		} else {
 			//otherwise load the page template and use our own theme
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
 		}
 
@@ -1185,21 +1186,22 @@ Thanks again!", 'mp')
 
 			add_filter( 'template_include', array(&$this, 'custom_product_list_template') );
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 		} else {
 			//otherwise load the page template and use our own theme
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'the_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_content', array(&$this, 'product_list_theme'), 99 );
 			add_filter( 'the_excerpt', array(&$this, 'product_list_theme'), 99 );
 
-				//genesis fixes
-				remove_action( 'genesis_post_content', 'genesis_do_post_image' );
-				remove_action( 'genesis_post_content', 'genesis_do_post_content' );
-				add_action('genesis_post_content', 'the_content');
+			//genesis fixes
+			remove_action( 'genesis_entry_content', 'genesis_do_post_image' );
+			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
+			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
+			add_action('genesis_entry_content', 'the_content');
 		}
 
 		$wp_query->is_page = 1;
@@ -1280,26 +1282,27 @@ Thanks again!", 'mp')
 
 			add_filter( 'template_include', array(&$this, 'custom_product_taxonomy_template'));
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 		} else {
 			//otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
 			$wp_query->is_page = 1;
 			//$wp_query->is_singular = 1;
 			$wp_query->is_404 = null;
 			$wp_query->post_count = 1;
-				//$wp_query->queried_object_id = get_option('mp_store_page');
-				add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
-				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
+			//$wp_query->queried_object_id = get_option('mp_store_page');
+			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
+			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_title', array(&$this, 'page_title_output'), 99, 2 );
 			add_filter( 'the_content', array(&$this, 'product_taxonomy_list_theme'), 99 );
 			add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
 
-				//genesis fixes
-				remove_action( 'genesis_post_content', 'genesis_do_post_image' );
-				remove_action( 'genesis_post_content', 'genesis_do_post_content' );
-				add_action('genesis_post_content', 'the_content');
+			//genesis fixes
+			remove_action( 'genesis_entry_content', 'genesis_do_post_image' );
+			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
+			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
+			add_action('genesis_entry_content', 'the_content');
 		}
 
 		$this->is_shop_page = true;
