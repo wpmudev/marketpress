@@ -31,7 +31,6 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
      */
     function on_creation() {
         global $mp;
-        $settings = get_option('mp_settings');
 
         //set names here to be able to translate
         $this->admin_name = __('WePay', 'mp');
@@ -40,15 +39,15 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
         $this->method_img_url = $mp->plugin_url . 'images/credit_card.png';
         $this->method_button_img_url = $mp->plugin_url . 'images/cc-button.png';
 
-        $this->client_id = isset($settings['gateways']['wepay']['client_id']) ? $settings['gateways']['wepay']['client_id'] : '';
-        $this->client_secret = isset($settings['gateways']['wepay']['client_secret']) ? $settings['gateways']['wepay']['client_secret'] : '';
-        $this->access_token = isset($settings['gateways']['wepay']['access_token']) ? $settings['gateways']['wepay']['access_token'] : '';
-        $this->account_id = isset($settings['gateways']['wepay']['account_id']) ? $settings['gateways']['wepay']['account_id'] : '';
-        $this->mode = (isset($settings['gateways']['wepay']['mode']) ? $settings['gateways']['wepay']['mode'] : '');
-        $this->checkout_type = (isset($settings['gateways']['wepay']['checkout_type']) ? $settings['gateways']['wepay']['checkout_type'] : 'GOODS');
+        $this->client_id =  $mp->get_setting('gateways->wepay->client_id');
+        $this->client_secret = $mp->get_setting('gateways->wepay->client_secret');
+        $this->access_token = $mp->get_setting('gateways->wepay->access_token');
+        $this->account_id = $mp->get_setting('gateways->wepay->account_id');
+        $this->mode = $mp->get_setting('gateways->wepay->mode');
+        $this->checkout_type = $mp->get_setting('gateways->wepay->checkout_type');
 
-        $this->force_ssl = (bool) ( isset($settings['gateways']['wepay']['is_ssl']) && $settings['gateways']['wepay']['is_ssl'] );
-        $this->currency = isset($settings['gateways']['wepay']['currency']) ? $settings['gateways']['wepay']['currency'] : 'USD';
+        $this->force_ssl = (bool) ( $mp->get_setting('gateways->wepay->is_ssl') );
+        $this->currency = 'USD';//just USD for now
 
         add_action('wp_footer', array(&$this, 'enqueue_scripts'));
     }
@@ -313,8 +312,8 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
                         <td>
                             <span class="description"><?php _e('Choose STAGING if you have registered the app on stage.wepay.com, or PRODUCTION if you registered on www.wepay.com', 'mp'); ?> </span><br/>
                             <select name="mp[gateways][wepay][mode]">
-                                <option value="staging"<?php selected((isset($settings['gateways']['wepay']['mode']) ? $settings['gateways']['wepay']['mode'] : 'staging'), 'staging'); ?>><?php _e('Staging', 'mp') ?></option>
-                                <option value="production"<?php selected((isset($settings['gateways']['wepay']['mode']) ? $settings['gateways']['wepay']['mode'] : 'production'), 'production'); ?>><?php _e('Production', 'mp') ?></option>
+                                <option value="staging"<?php selected($mp->get_setting('gateways->wepay->mode'), 'staging'); ?>><?php _e('Staging', 'mp') ?></option>
+                                <option value="production"<?php selected($mp->get_setting('gateways->wepay->mode'), 'production'); ?>><?php _e('Production', 'mp') ?></option>
                             </select>
                         </td>
                     </tr>
@@ -324,11 +323,11 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
                         <td>
                             <span class="description"><?php _e('Choose type of payments', 'mp'); ?> </span><br/>
                             <select name="mp[gateways][wepay][checkout_type]">
-                                <option value="GOODS"<?php selected((isset($settings['gateways']['wepay']['checkout_type']) ? $settings['gateways']['wepay']['checkout_type'] : 'GOODS'), 'GOODS'); ?>><?php _e('Goods', 'mp') ?></option>
-                                <option value="SERVICE"<?php selected((isset($settings['gateways']['wepay']['checkout_type']) ? $settings['gateways']['wepay']['checkout_type'] : ''), 'SERVICE'); ?>><?php _e('Service', 'mp') ?></option>
-                                <option value="PERSONAL"<?php selected((isset($settings['gateways']['wepay']['checkout_type']) ? $settings['gateways']['wepay']['checkout_type'] : ''), 'PERSONAL'); ?>><?php _e('Personal', 'mp') ?></option>
-                                <option value="EVENT"<?php selected((isset($settings['gateways']['wepay']['checkout_type']) ? $settings['gateways']['wepay']['checkout_type'] : ''), 'EVENT'); ?>><?php _e('Event', 'mp') ?></option>
-                                <option value="DONATION"<?php selected((isset($settings['gateways']['wepay']['checkout_type']) ? $settings['gateways']['wepay']['checkout_type'] : ''), 'DONATION'); ?>><?php _e('Donation', 'mp') ?></option>
+                                <option value="GOODS"<?php selected($mp->get_setting('gateways->wepay->checkout_type'),'GOODS'); ?>><?php _e('Goods', 'mp') ?></option>
+                                <option value="SERVICE"<?php selected($mp->get_setting('gateways->wepay->checkout_type'), 'SERVICE'); ?>><?php _e('Service', 'mp') ?></option>
+                                <option value="PERSONAL"<?php selected($mp->get_setting('gateways->wepay->checkout_type'),'PERSONAL'); ?>><?php _e('Personal', 'mp') ?></option>
+                                <option value="EVENT"<?php selected($mp->get_setting('gateways->wepay->checkout_type'), 'EVENT'); ?>><?php _e('Event', 'mp') ?></option>
+                                <option value="DONATION"<?php selected($mp->get_setting('gateways->wepay->checkout_type'),'DONATION'); ?>><?php _e('Donation', 'mp') ?></option>
                             </select>
                         </td>
                     </tr>
@@ -338,8 +337,8 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
                         <td>
                             <span class="description"><?php _e('When in live mode it is recommended to use SSL certificate setup for the site where the checkout form will be displayed.', 'mp'); ?> </span><br/>
                             <select name="mp[gateways][wepay][is_ssl]">
-                                <option value="1"<?php selected((isset($settings['gateways']['wepay']['is_ssl']) ? $settings['gateways']['wepay']['is_ssl'] : 0), 1); ?>><?php _e('Force SSL', 'mp') ?></option>
-                                <option value="0"<?php selected((isset($settings['gateways']['wepay']['is_ssl']) ? $settings['gateways']['wepay']['is_ssl'] : 0), 0); ?>><?php _e('No SSL', 'mp') ?></option>
+                                <option value="1"<?php selected($mp->get_setting('gateways->wepay->is_ssl'), 1); ?>><?php _e('Force SSL', 'mp') ?></option>
+                                <option value="0"<?php selected($mp->get_setting('gateways->wepay->is_ssl'), 0); ?>><?php _e('No SSL', 'mp') ?></option>
                             </select>
                         </td>
                     </tr>
@@ -349,25 +348,25 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
                             <span class="description"><?php _e('You must login to WePay to <a target="_blank" href="https://www.wepay.com/">get your API credentials</a>. Make sure to check "Tokenize credit cards" option under "API Keys" section of your WePay app.', 'mp') ?></span>
                             <p>
                                 <label><?php _e('Client ID', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr((isset($settings['gateways']['wepay']['client_id']) ? $settings['gateways']['wepay']['client_id'] : '')); ?>" size="70" name="mp[gateways][wepay][client_id]" type="text" />
+                                    <input value="<?php echo esc_attr($mp->get_setting('gateways->wepay->client_id')); ?>" size="70" name="mp[gateways][wepay][client_id]" type="text" />
                                 </label>
                             </p>
 
                             <p>
                                 <label><?php _e('Client Secret', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr((isset($settings['gateways']['wepay']['client_secret']) ? $settings['gateways']['wepay']['client_secret'] : '')); ?>" size="70" name="mp[gateways][wepay][client_secret]" type="text" />
+                                    <input value="<?php echo esc_attr($mp->get_setting('gateways->wepay->client_secret')); ?>" size="70" name="mp[gateways][wepay][client_secret]" type="text" />
                                 </label>
                             </p>
 
                             <p>
                                 <label><?php _e('Access Token', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr((isset($settings['gateways']['wepay']['access_token']) ? $settings['gateways']['wepay']['access_token'] : '')); ?>" size="70" name="mp[gateways][wepay][access_token]" type="text" />
+                                    <input value="<?php echo esc_attr($mp->get_setting('gateways->wepay->access_token')); ?>" size="70" name="mp[gateways][wepay][access_token]" type="text" />
                                 </label>
                             </p>
 
                             <p>
                                 <label><?php _e('Account ID', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr((isset($settings['gateways']['wepay']['account_id']) ? $settings['gateways']['wepay']['account_id'] : '')); ?>" size="70" name="mp[gateways][wepay][account_id]" type="text" />
+                                    <input value="<?php echo esc_attr($mp->get_setting('gateways->wepay->account_id')); ?>" size="70" name="mp[gateways][wepay][account_id]" type="text" />
                                 </label>
                             </p>
 
