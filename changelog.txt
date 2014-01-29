@@ -6,6 +6,7 @@ Change Log:
 ----------------------------------------------------------------------
 
 - Fix: Genesis theme compatibility update for >2.0
+- Use WP3.8 dashicon for admin menu
 
 2.9.0.3 - 1/23/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
