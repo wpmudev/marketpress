@@ -5,11 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-- Fix: Genesis theme compatibility update for >2.0
-- Use WP3.8 dashicon for admin menu
-
-1/29/2014 - Marko Miljus
+2.9.0.4 - 1/29/2014 - Jonathan Cowher, Marko Miljus, Aaron Edwards
 ----------------------------------------------------------------------
+- Fixed a bug where product filters would show even if turned off in presentation settings
+- Fixed a Genesis theme compatibility update for >2.0
+- Fixed a bug where no lightbox would show when using the [mp_product_image context="single"] shortcode with lightbox enabled in presentation settings http://wp.mu/8ov
+- Use WP3.8 dashicon for admin menu
 - Added new payment gateway - WePay (beta)
 
 2.9.0.3 - 1/23/2014 - Jonathan Cowher

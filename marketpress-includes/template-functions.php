@@ -2354,9 +2354,12 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				}
 
 				$class = ' class="mp_product_image_link mp_lightbox"';
+				
 				//in case another plugin is loadin glightbox
-				if ($mp->get_setting('show_lightbox'))
-						$class .= ' rel="lightbox"';
+				if ($mp->get_setting('show_lightbox')) {
+					$class .= ' rel="lightbox"';
+					wp_enqueue_script('mp-lightbox');
+				}
 		} else if ($context == 'widget') {
 				//size
 				if (intval($size))

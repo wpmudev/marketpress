@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.0.3
+Version: 2.9.0.4
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.0.3';
+	var $version = '2.9.0.4';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -156,6 +156,10 @@ class MarketPress {
 			add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
 			add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
 		}
+		
+		/* enqueue lightbox - this will just register the styles/scripts
+			 the won't actually be output unless they're needed */
+		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_lightbox'));
 
 		//Payment gateway returns
 		add_action( 'pre_get_posts', array(&$this, 'handle_gateway_returns'), 1 );
@@ -721,14 +725,14 @@ Thanks again!", 'mp')
 	 if ( !$this->get_setting('show_lightbox') )
 		return;
 
-	 wp_enqueue_style( 'jquery-lightbox', $this->plugin_url . 'lightbox/style/lumebox.css', false, $this->version );
-	 wp_enqueue_script( 'jquery-lightbox', $this->plugin_url . 'lightbox/js/jquery.lumebox.min.js', array('jquery'), $this->version, true );
+	 wp_enqueue_style('mp-lightbox', $this->plugin_url . 'lightbox/style/lumebox.css', false, $this->version);	//we enqueue styles on every page just in case of shortcodes http://wp.mu/8ou
+	 wp_register_script('mp-lightbox', $this->plugin_url . 'lightbox/js/jquery.lumebox.min.js', array('jquery'), $this->version, true);	//we just register the script here - we can output selectively later
 
 	 // declare the variables we need to access in js
 	 $js_vars = array( 'graphicsDir' => $this->plugin_url . 'lightbox/style/' );
-	 wp_localize_script( 'jquery-lightbox', 'lumeboxOptions', $js_vars );
+	 wp_localize_script('mp-lightbox', 'lumeboxOptions', $js_vars);
 	}
-
+	
 	//if cart widget is not in a sidebar, add it to the top of the first sidebar. Only runs at initial install
 	function add_default_widget() {
 	 if (!is_active_widget(false, false, 'mp_cart_widget')) {
@@ -1040,10 +1044,7 @@ Thanks again!", 'mp')
 		}
 
 		$this->is_shop_page = true;
-
-		//enqueue lightbox on single product page
-		$this->enqueue_lightbox();
-
+		wp_enqueue_script('mp-lightbox');
 	 }
 
 	 //load proper theme for main store page
@@ -1656,7 +1657,7 @@ Thanks again!", 'mp')
 
 	$msgs = $this->get_setting('msg');
 	 $content .= do_shortcode($msgs['product_list']);
-	 $content .= mp_list_products(array('echo' => false, 'filters' => true));
+	 $content .= mp_list_products(array('echo' => false));
 
 	 return $content;
 	}
@@ -1669,7 +1670,7 @@ Thanks again!", 'mp')
 
 		$msgs = $this->get_setting('msg');
 	 $content = do_shortcode($msgs['product_list']);
-	 $content .= mp_list_products(array('echo' => false, 'filters' => true));
+	 $content .= mp_list_products(array('echo' => false));
 
 	 return $content;
 	}
@@ -7485,7 +7486,7 @@ Notification Preferences: %s', 'mp');
 		
 		foreach ( $defaults as $key => $value ) {
 			$val = array_shift($args);
-			$tmp_args[$key] = is_null($val) ? $val : $value;
+			$tmp_args[$key] = !is_null($val) ? $val : $value;
 		}
 		
 		return $tmp_args;
