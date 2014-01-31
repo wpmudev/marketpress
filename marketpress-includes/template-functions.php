@@ -2302,9 +2302,10 @@ if (!function_exists('mp_product_image')) :
  * @param string $context Options are list, single, or widget
  * @param int $post_id The post_id for the product. Optional if in the loop
  * @param int $size An optional width/height for the image if contect is widget
+ * @param string $align The alignment of the image. Defaults to settings.
  */
 
-function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $size = NULL) {
+function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $size = NULL, $align = NULL) {
 		global $id, $mp;
 		$post_id = ( NULL === $post_id ) ? $id : $post_id;
 		// Added WPML
@@ -2314,6 +2315,10 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 
 		$post_thumbnail_id = get_post_thumbnail_id($post_id);
 		$class = $title = $link = '';
+		$img_classes = array('mp_product_image_' . $context);
+		
+		if ( !is_null($align) )
+			$align = 'align' . $align;
 
 		if ($context == 'list') {
 				//quit if no thumbnails on listings
@@ -2335,6 +2340,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 
 				$title = esc_attr($post->post_title);
 				$class = ' class="mp_img_link"';
+				$img_classes[] = is_null($align) ? $mp->get_setting('image_alignment_list') : $align;
 		} else if ($context == 'single') {
 				//size
 				if ($mp->get_setting('product_img_size') == 'custom')
@@ -2354,6 +2360,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				}
 
 				$class = ' class="mp_product_image_link mp_lightbox"';
+				$img_classes[] = is_null($align) ? $mp->get_setting('image_alignment_single') : $align;
 				
 				//in case another plugin is loadin glightbox
 				if ($mp->get_setting('show_lightbox')) {
@@ -2374,13 +2381,14 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				$class = ' class="mp_img_link"';
 		}
 
-		$image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => 'alignleft mp_product_image_' . $context, 'title' => $title));
+		$image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => implode(' ', $img_classes), 'title' => $title));
 
 		if (empty($image) && $context != 'single') {
 				if (!is_array($size)) {
 						$size = array(get_option($size . "_size_w"), get_option($size . "_size_h"));
 				}
-				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="alignleft mp_product_image_' . $context . ' wp-post-image" src="' . apply_filters('mp_default_product_img', $mp->plugin_url . 'images/default-product.png') . '">';
+				$img_classes[] = 'wp-post-image';
+				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', $mp->plugin_url . 'images/default-product.png') . '">';
 		}
 
 		//add the link

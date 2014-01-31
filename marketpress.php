@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.0.4
+Version: 2.9.0.5
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.0.4';
+	var $version = '2.9.0.5';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -337,6 +337,8 @@ Thanks again!", 'mp')
 		 'simple_list' => 0,
 		 'show_limit' => 3
 		),
+		'image_alignment_single' => 'alignleft',
+		'image_alignment_list' => 'alignleft',
 	 );
 
 	 //filter default settings
@@ -6651,6 +6653,22 @@ Notification Preferences: %s', 'mp');
 					 </td>
 					 </tr>
 					 <tr>
+					 		<th scope="row"><?php _e('Product Image Alignment', 'mp'); ?></th>
+					 		<td>
+					 			<?php
+					 			$alignments = array(
+					 				'alignnone' => __('None', 'mp'),
+					 				'aligncenter' => __('Center', 'mp'),
+					 				'alignleft' => __('Left', 'mp'),
+					 				'alignright' => __('Right', 'mp'),
+					 			);
+					 			foreach ( $alignments as $value => $label ) :
+					 				$input_id = 'mp-image-align-single' . $value; ?>
+					 			<label for="<?php echo $input_id; ?>"><input value="<?php echo $value; ?>" type="radio" name="mp[image_alignment_single]" id="<?php echo $input_id; ?>" <?php checked($this->get_setting('image_alignment_single'), $value); ?> /> <?php echo $label; ?></label><?php
+					 			endforeach; ?>
+					 		</td>
+					 </tr>
+					 <tr>
 							<th scope="row"><?php _e('Show Image Lightbox', 'mp') ?></th>
 							<td>
 						<label><input value="1" name="mp[show_lightbox]" type="radio"<?php checked($this->get_setting('show_lightbox'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
@@ -6743,6 +6761,22 @@ Notification Preferences: %s', 'mp');
 						<label><?php _e('Height', 'mp') ?><input size="3" name="mp[list_img_height]" value="<?php echo esc_attr($this->get_setting('list_img_height')) ?>" type="text" /></label>&nbsp;
 						<label><?php _e('Width', 'mp') ?><input size="3" name="mp[list_img_width]" value="<?php echo esc_attr($this->get_setting('list_img_width')) ?>" type="text" /></label>
 					 </td>
+					 <tr>
+					 		<th scope="row"><?php _e('Product Thumbnail Alignment', 'mp'); ?></th>
+					 		<td>
+					 			<?php
+					 			$alignments = array(
+					 				'alignnone' => __('None', 'mp'),
+					 				'aligncenter' => __('Center', 'mp'),
+					 				'alignleft' => __('Left', 'mp'),
+					 				'alignright' => __('Right', 'mp'),
+					 			);
+					 			foreach ( $alignments as $value => $label ) :
+					 				$input_id = 'mp-image-align-list' . $value; ?>
+					 			<label for="<?php echo $input_id; ?>"><input value="<?php echo $value; ?>" type="radio" name="mp[image_alignment_list]" id="<?php echo $input_id; ?>" <?php checked($this->get_setting('image_alignment_list'), $value); ?> /> <?php echo $label; ?></label><?php
+					 			endforeach; ?>
+					 		</td>
+					 </tr>					 
 					 </tr>
 								<tr>
 									<th scope="row"><?php _e('Show Excerpts', 'mp') ?></th>
@@ -7315,6 +7349,7 @@ Notification Preferences: %s', 'mp');
 							<li><?php _e('"tag" - Limits list to a specific product tag. Use the tag Slug', 'mp') ?></li>
 							<li><?php _e('"list_view" - 1 for list view, 0 (default) for grid view', 'mp') ?></li>
 							<li><?php _e('Example:', 'mp') ?> <em>[mp_list_products paginate="true" page="1" per_page="10" order_by="price" order="DESC" category="downloads"]</em></li>
+							<li><?php _e('"filters" - 1 to show product filters, 0 to not show filters', 'mp') ?></li>							
 						</ul></p>
 					 </td>
 					 </tr>
@@ -7346,7 +7381,8 @@ Notification Preferences: %s', 'mp');
 							<li><?php _e('"product_id" - The ID for the product.	This is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop.', 'mp') ?></li>
 										<li><?php _e('"context" - What context for preset size options. Options are list, single, or widget, default single.', 'mp') ?></li>
 										<li><?php _e('"size" - Set a custom pixel width/height. If omitted defaults to the size set by "context".', 'mp') ?></li>
-							<li><?php _e('Example:', 'mp') ?> <em>[mp_product_image product_id="1" size="150"]</em></li>
+										<li><?php _e('"align" - Set the alignment of the image. If omitted defaults to the alignment set in presentation settings.', 'mp') ?></li>
+							<li><?php _e('Example:', 'mp') ?> <em>[mp_product_image product_id="1" size="150" align="left"]</em></li>
 						</ul></p>
 					 </td>
 					 </tr>
