@@ -401,11 +401,15 @@ Thanks again!", 'mp')
 		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
 		$mu_plugins = wp_get_mu_plugins();
 		$lang_dir = dirname(plugin_basename($this->plugin_file)) . '/marketpress-includes/languages/';
+		$custom_path = WP_LANG_DIR . '/marketpress/mp-' . get_locale() . '.mo';
 		
-		if ( in_array($this->plugin_file, $mu_plugins) )
+		if ( file_exists($custom_path) ) {
+			load_textdomain('mp', $custom_path);
+		} elseif ( in_array($this->plugin_file, $mu_plugins) ) {
 			load_muplugin_textdomain('mp', $lang_dir);
-		else
+		} else {
 			load_plugin_textdomain('mp', false, $lang_dir);
+		}
 
 		//setup language code for jquery datepicker translation
 		$temp_locales = explode('_', get_locale());

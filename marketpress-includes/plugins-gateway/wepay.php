@@ -98,7 +98,7 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
     function payment_form($cart, $shipping_info) {
         global $mp;
 
-        require '/wepay-files/wepay-sdk.php';
+        require $mp->plugin_dir . 'plugins-gateway/wepay-files/wepay-sdk.php';
 
         if ($this->mode == 'staging') {
             WePay::useStaging($mp->client_id, $mp->client_secret);
