@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.0.6
+Version: 2.9.0.7
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.0.6';
+	var $version = '2.9.0.7';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -6810,7 +6810,7 @@ Notification Preferences: %s', 'mp');
 					</td>
 					 </tr>
 					 <tr>
-						<td scope="row"><?php _e('Show Product Filters', 'mp') ?></td>
+						<th scope="row"><?php _e('Show Product Filters', 'mp') ?></th>
 						<td> 
 							<label><input value="1" name="mp[show_filters]" type="radio"<?php checked($this->get_setting('show_filters'), 1) ?> /> <?php _e('Yes', 'mp') ?></label>
 							<label><input value="0" name="mp[show_filters]" type="radio"<?php checked($this->get_setting('show_filters'), 0) ?> /> <?php _e('No', 'mp') ?></label>

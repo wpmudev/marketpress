@@ -1538,6 +1538,7 @@ function mp_list_products() {
 	global $wp_query, $mp;
 	
 	$args = $mp->parse_args(func_get_args(), $mp->defaults['list_products']);
+	$args['nopaging'] = false;
 	
 	$query = array(
 		'post_type' => 'product',
@@ -1583,7 +1584,7 @@ function mp_list_products() {
 	
 	//setup pagination
 	if ( (!is_null($args['paginate']) && !$args['paginate']) || (is_null($args['paginate']) && !$mp->get_setting('paginate')) ) {
-		$query['nopaging'] = true;
+		$query['nopaging'] = $args['nopaging'] = true;
 	} else {
 		//figure out perpage
 		if ( !is_null($args['per_page']) ) {
@@ -1593,10 +1594,10 @@ function mp_list_products() {
 		}
 		
 		//figure out page
-		if ( !is_null($args['paged']) ) {
+		if ( !is_null($args['page']) ) {
 			$query['paged'] = intval($args['page']);
 		} elseif ( $wp_query->get('paged') != '' ) {
-			$query['paged'] = intval($wp_query->get('paged'));
+			$query['paged'] = $args['page'] = intval($wp_query->get('paged'));
 		}
 
 		//get order by
@@ -1640,7 +1641,14 @@ function mp_list_products() {
 		$layout_type = $args['list_view'] ? 'list' : 'grid';
 	}
 	
-	$content = ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter() : '';
+	$content = '';
+	
+	if ( defined('DOING_AJAX') && DOING_AJAX ) {
+		//do nothing
+	} else {
+		$content .= ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter() : mp_products_filter(true);
+	}
+	
 	$content .= '<div id="mp_product_list" class="mp_' . $layout_type . '">';
 
 	if ( $last = $custom_query->post_count ) {
@@ -1650,7 +1658,7 @@ function mp_list_products() {
 	}
 
 	$content .= '</div>';
-	$content .= ($args['paged']) ? mp_products_nav(false, $custom_query) : '';
+	$content .= ( ! $args['nopaging'] ) ? mp_products_nav(false, $custom_query) : '';
 	
 	$content = apply_filters('mp_list_products', $content, $args);
 
@@ -2411,7 +2419,7 @@ if (!function_exists('mp_products_filter')) :
  * 
  * @return string		html for filter/order products select elements.
  */
-function mp_products_filter() {
+function mp_products_filter( $hidden = false ) {
 		global $wp_query, $mp;
 
 		if ( 'product_category' == get_query_var('taxonomy') ) {
@@ -2453,7 +2461,7 @@ function mp_products_filter() {
 		}
 
 		$return = '
-			<div class="mp_list_filter">
+			<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
 				<form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
 						<div class="one_filter">
 							<span>' . __('Category', 'mp') . '</span>

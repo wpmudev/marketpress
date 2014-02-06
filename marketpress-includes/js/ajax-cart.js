@@ -17,9 +17,12 @@ jQuery(document).ready(function($) {
 			return false;
 		});
 	}
+	
 	//add item to cart
 	function mp_cart_listeners() {
-		$("input.mp_button_addcart").click(function() {
+		$("input.mp_button_addcart").click(function(e) {
+			e.preventDefault();
+			
 			var input = $(this);
 			var formElm = $(input).parents('form.mp_buy_form');
 			var tempHtml = formElm.html();
@@ -48,13 +51,67 @@ jQuery(document).ready(function($) {
 					mp_empty_cart(); //re-init empty script as the widget was reloaded
 				}
 			});
-			return false;
 		});
+	}
+	
+	//general store listeners (e.g. pagination, etc)
+	function mp_store_listeners(){
+		// on next/prev link click, get page number and update products
+		$(document).on('click', '#mp_product_nav a', function(e){
+			e.preventDefault();
+			
+			var m = $(this).attr('href').match(/(paged=|page\/)(\d+)/);
+			var nw_page = m != null ? m[2] : 1;
+			get_and_insert_products( $('.mp_product_list_refine').serialize() + '&page=' + nw_page );
+
+			// scroll to top of list
+			var pos = $('.mp_list_filter').offset();
+			$('body').animate({ scrollTop: pos.top-10 });
+			mp_cart_listeners();
+		});
+	}
+
+	// get products via ajax, insert into DOM with new pagination links
+	function get_and_insert_products(query_string){
+			ajax_loading(true);
+			$.post(
+				MP_Ajax.ajaxUrl, 
+				'action=get_products_list&'+query_string,
+				function(data) {
+					var hash = 'order=' + $('select[name="order"]').val();
+					var m = query_string.match(/page=(\d)+/i);
+					
+					if ( m != null) {
+						hash += '&page=' + m[1];	
+					}
+					
+					ajax_loading(false);
+					$('#mp_product_nav').remove();
+					$('#mp_product_list').first().replaceWith(data.products);
+					location.hash = hash;
+					mp_cart_listeners();
+				}
+			);
+	}
+
+	// if the page has been loaded from a bookmark set the current state for select elements
+	function update_dropdown_state(query_string){
+		var query = JSON.parse('{"' + decodeURI(query_string.replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
+		for(name in query){
+			$('select[name="'+name+'"]').val(query[name]);
+		}
+	}
+
+	// show loading ui when waiting for ajax response
+	function ajax_loading(loading){
+		$('#mp_product_list .mp_ajax_loading').remove();
+		if(loading){
+			$('#mp_product_list').prepend('<div class="mp_ajax_loading"></div>');
+		}
 	}
 
 	// Ajax for products view.
 	function mp_ajax_products_list(){
-		
 		$('.mp_product_list_refine').show(); // hide for non JS users
 
 		// if hash tag contains a state, update view
@@ -78,56 +135,12 @@ jQuery(document).ready(function($) {
 		$('#product-category').change(function(){
 			window.location.href = MP_Ajax.links[$(this).val()] + location.hash;
 		});
-
-		// on next/prev link click, get page number and update products
-		$(document).on('click', '#mp_product_nav a', function(){
-				var m = $(this).attr('href').match(/(paged=|page\/)(\d+)/);
-				var nw_page = m != null ? m[2] : 1;
-				get_and_insert_products( $('.mp_product_list_refine').serialize() + '&page=' + nw_page );
-
-				// scroll to top of list
-				var pos = $('.mp_list_filter').offset();
-				$('body').animate({ scrollTop: pos.top-10 });
-				mp_cart_listeners();
-				return false;
-		});
-
-		// get products via ajax, insert into DOM with new pagination links
-		function get_and_insert_products(query_string){
-				ajax_loading(true);
-				$.post(
-					MP_Ajax.ajaxUrl, 
-					'action=get_products_list&'+query_string,
-					function(data) {
-						ajax_loading(false);
-						$('#mp_product_nav').remove();
-						$('#mp_product_list').first().replaceWith(data.products);
-						location.hash = 'order=' + $('select[name="order"]').val();
-						mp_cart_listeners();
-					}
-				);
-		}
-
-		// if the page has been loaded from a bookmark set the current state for select elements
-		function update_dropdown_state(query_string){
-			var query = JSON.parse('{"' + decodeURI(query_string.replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
-			for(name in query){
-				$('select[name="'+name+'"]').val(query[name]);
-			}
-		}
-
-		// show loading ui when waiting for ajax response
-		function ajax_loading(loading){
-			$('#mp_product_list .mp_ajax_loading').remove();
-			if(loading){
-				$('#mp_product_list').prepend('<div class="mp_ajax_loading"></div>');
-			}
-		}
 	}
 
 	//add listeners
 	mp_empty_cart();
 	mp_cart_listeners();
+	mp_store_listeners();
 
 	if( MP_Ajax.showFilters == 1 ){
 		mp_ajax_products_list();
