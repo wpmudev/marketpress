@@ -168,7 +168,10 @@ class MarketPress_Shortcodes {
    */
   function mp_list_products_sc($atts) {
   	global $mp;
+  	
     $args = shortcode_atts($mp->defaults['list_products'], $atts);
+    $args['echo'] = false;
+    
     return mp_list_products($args);
   }
 	

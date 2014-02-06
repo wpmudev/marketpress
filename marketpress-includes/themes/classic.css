@@ -85,6 +85,10 @@ background: #eeeeee;
 border: 1px solid #eeeeee;
 }
 
+.mp_cart_contents_widget img.mp_product_image_widget {
+	margin: 0;
+}
+
 .mp_cart_actions_widget {
 padding-top: 10px;
 }

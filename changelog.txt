@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.0.6
+----------------------------------------------------------------------
+- Fixed a bug in [mp_list_products] where products would always show above all other content
+- Updated some default styles for cart widget
+- Update .pot file
+
 2.9.0.5 - 1/30/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Added presentation settings for choosing alignment of product image instead of always "alignleft"
