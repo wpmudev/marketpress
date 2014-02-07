@@ -158,7 +158,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 
         //tax line
         if (($tax_price = $mp->tax_price()) !== false) {
-            $total = ruond(($total + $tax_price), 2);
+            $total = round(($total + $tax_price), 2);
         }
 
         $params['total'] = $total;
