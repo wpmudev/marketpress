@@ -387,9 +387,10 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
      * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
      *  array. Don't forget to return!
      */
-    function process_gateway_settings($settings) {
-        return $settings;
-    }
+		function process_gateway_settings($settings) {
+			$settings['gateways']['wepay'] = array_map('trim', $settings['gateways']['wepay']);
+			return $settings;
+		}
 
     /**
      * Use this to do the final payment. Create the order then process the payment. If
@@ -415,7 +416,7 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
         $order_id = $mp->generate_order_id();
 
         //Get the WePay SDK
-        require '/wepay-files/wepay-sdk.php';
+        require $mp->plugin_dir .'plugins-gateway/wepay-files/wepay-sdk.php';
 
 
         $totals = array();
@@ -453,11 +454,11 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
 
             // Credit card id to charge
             $credit_card_id = $_SESSION['payment_method_id'];
-
+						
             if ($this->mode == 'staging') {
-                WePay::useStaging($mp->client_id, $mp->client_secret);
+                WePay::useStaging($this->client_id, $this->client_secret);
             } else {
-                WePay::useProduction($mp->client_id, $mp->client_secret);
+                WePay::useProduction($this->client_id, $this->client_secret);
             }
 
             $wepay = new WePay($access_token);
@@ -465,7 +466,7 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
             // charge the credit card
             $response = $wepay->request('checkout/create', array(
                 'account_id' => $account_id,
-                'amount' => $total,
+                'amount' => number_format($total, 2, '.', ''),
                 'currency' => 'USD',
                 'short_description' => $order_id,
                 'type' => $this->checkout_type,

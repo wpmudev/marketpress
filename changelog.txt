@@ -5,14 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.9.0.9 - 2/7/2014 - Marko Miljus
+2.9.0.8 - 2/7/2014 - Jonathan Cowher, Marko Miljus
 ----------------------------------------------------------------------
-- Fixed issue (fatal error) when calculating total price with taxes in 2checkout payment gateway
-
-2.9.0.8
-----------------------------------------------------------------------
-- Fixed a PHP fatal error in Wepay gateway
+- Fixed some bugs in WePay gateway
 - Localization files (.mo) can now be loaded from wp-content/language/marketpress/mp-{your locale}.mo
+- Fixed issue (fatal error) when calculating total price with taxes in 2checkout payment gateway
 
 2.9.0.7 - 2/6/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
