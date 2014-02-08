@@ -140,7 +140,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		// Get settings for convenience sake
 		$this->settings = get_option('mp_settings');
-		$this->usps_settings = $this->settings['shipping']['usps'];
+		$this->usps_settings = isset($this->settings['shipping']['usps']) ? $this->settings['shipping']['usps'] : array();
 	}
 
 	function default_boxes() {

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.0.8
+Version: 2.9.0.9
 Plugin URI: http://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.0.8';
+	var $version = '2.9.0.9';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -75,6 +75,9 @@ class MarketPress {
 	function __construct() {
 	 //setup our variables
 	 $this->init_vars();
+	 
+	 //initialize session
+	 $this->start_session();
 
 	 //install plugin
 	 register_activation_hook( __FILE__, array($this, 'install') );
@@ -987,15 +990,54 @@ Thanks again!", 'mp')
 		return $vars;
 	}
 
+	/**
+	 * Securely starts our session for handling cart info, etc
+	 */
 	function start_session() {
-	 //start the sessions for cart handling
-	 if (session_id() == "")
+		$sess_id = session_id();
+		
+		if ( !empty($sess_id) ) {
+			session_destroy();	//destroy the possibly unsafe session (maybe from another plugin)
+		}
+		
+		$httponly = true;	//session cookies not available to javascript? (true = safest)
+		$session_hashes = array('sha512', 'sha384', 'sha256', 'sha224', 'sha1');
+		$secure = false;	//force https?
+		$session_name = 'mp_session';
+		$hash_algos = hash_algos();
+		
+		//attempt to set the hashing algorithm starting strongest to least strong
+		foreach ( $session_hashes as $session_hash ) {
+			if ( in_array($session_hash, $hash_algos) ) {
+				ini_set('session.hash_function', $session_hash);
+				break;
+			}
+		}
+		
+		// How many bits per character of the hash.
+	  // The possible values are '4' (0-9, a-f), '5' (0-9, a-v), and '6' (0-9, a-z, A-Z, "-", ",").
+	  ini_set('session.hash_bits_per_character', 5);
+		
+		// Force the session to only use cookies, not URL variables.
+		ini_set('session.use_only_cookies', 1);
+		
+		// Get session cookie parameters 
+		$cookie_params = session_get_cookie_params();
+		
+		// Set the cookie parameters
+		session_set_cookie_params($cookie_params['lifetime'], $cookie_params['path'], $cookie_params['domain'], $secure, $httponly);
+		
+		// Change the session name 
+		session_name($session_name);
+   
+		// Start the session
 		session_start();
+		
+		// Regenerate the session and delete the old one. 
+		session_regenerate_id(true); 
 	}
 
 	function logout_clear_session() {
-		$this->start_session();
-
 		//clear personal info
 		unset($_SESSION['mp_shipping_info']);
 		unset($_SESSION['mp_billing_info']);
@@ -1073,10 +1115,6 @@ Thanks again!", 'mp')
 
 	 //load proper theme for checkout page
 	 if ($wp_query->query_vars['pagename'] == 'cart') {
-
-		//init session for store pages
-		$this->start_session();
-
 		//process cart updates
 		$this->update_cart();
 
@@ -4125,7 +4163,6 @@ Thanks again!", 'mp')
 
 	function user_profile_fields() {
 	 global $current_user;
-		$this->start_session();
 		$fields = array( 'email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone' );
 		
 	 if (isset($_REQUEST['user_id'])) {
