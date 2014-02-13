@@ -619,7 +619,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$allowed_weight = min($this->usps_settings['boxes']['weight'][$found], $this->usps_settings['max_weight']);
 
-		if($allowed_weight >= $this->weight){
+		if($allowed_weight >= $this->weight || $allowed_weight <= 0){
 			$this->pkg_count = 1;
 			$this->pkg_weight = $this->weight;
 		} else {
