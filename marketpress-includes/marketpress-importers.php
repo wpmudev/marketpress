@@ -347,7 +347,7 @@ class CsvImporter extends MarketPress_Importer {
 			}
 
 			//add stock count if set
-			if (!empty($row['stock'])) {
+			if ( is_numeric($row['stock']) ) {
 				update_post_meta($new_id, 'mp_track_inventory', 1);
 				update_post_meta($new_id, 'mp_inventory', array( intval($row['stock']) ));
 			} else {

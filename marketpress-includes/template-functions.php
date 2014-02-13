@@ -1112,7 +1112,7 @@ function mp_order_status( $echo = true ) {
 		if (!empty($order_id)) {
 				//get order
 				$order = $mp->get_order($order_id);
-
+				
 				if ($order) { //valid order
 						$content .= '
 							<h2><em>' . sprintf(__('Order Details (%s):', 'mp'), esc_html($order_id)) . '</em></h2>
@@ -2398,17 +2398,23 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				$img_classes[] = 'wp-post-image';
 				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', $mp->plugin_url . 'images/default-product.png') . '">';
 		}
+		
+		//force ssl on images (if applicable) http://wp.mu/8s7
+		if ( is_ssl() ) {
+			$image = str_replace('http://', 'https://', $image);
+		}
 
 		//add the link
-		if ($link)
-				$image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
+		if ($link) {
+			$image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
+		}
 
 		$image = apply_filters('mp_product_image', $image, $context, $post_id, $size);
 
 		if ($echo)
-				echo $image;
+			echo $image;
 		else
-				return $image;
+			return $image;
 }
 endif;
 
