@@ -5,6 +5,8 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Fix: Make help iframe embed https compatible
+
 2.9.1 - 2/13/2014 - Jonathan Cowher, Marko Miljus
 ----------------------------------------------------------------------
 - Fixed mixed-content issues on checkout pages when using SSL

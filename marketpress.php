@@ -2,7 +2,7 @@
 /*
 Plugin Name: MarketPress
 Version: 2.9.1
-Plugin URI: http://premium.wpmudev.org/project/e-commerce/
+Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
 Author URI: http://premium.wpmudev.org/
@@ -651,7 +651,7 @@ Thanks again!", 'mp')
 		get_current_screen()->add_help_tab( array(
 			'id' => 'marketpress-help',
 			'title' => __('MarketPress Instructions', 'mp'),
-			'content' => '<iframe src="http://premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="600px"></iframe>'
+			'content' => '<iframe src="//premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="600px"></iframe>'
 		) );
 	}
 
@@ -5622,7 +5622,7 @@ Notification Preferences: %s', 'mp');
 			<div class="icon32"><img src="<?php echo $this->plugin_url . 'images/download.png'; ?>" /></div>
 			<h2><?php _e('Export Orders', 'mp'); ?></h2>
 			<?php if ( defined( 'MP_LITE' ) ) { ?>
-			<a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable CSV order exports &raquo;', 'mp'); ?></a><br />
+			<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable CSV order exports &raquo;', 'mp'); ?></a><br />
 			<?php } ?>
 			<form action="<?php echo admin_url('admin-ajax.php?action=mp-orders-export'); ?>" method="post">
 				<?php
@@ -6082,7 +6082,7 @@ Notification Preferences: %s', 'mp');
 							<th scope="row"><?php _e('Google Analytics Ecommerce Tracking', 'mp') ?></th>
 					 <td>
 						<?php if ( defined( 'MP_LITE' ) ) { ?>
-						<a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable Google Analytics Ecommerce Tracking &raquo;', 'mp'); ?></a><br />
+						<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable Google Analytics Ecommerce Tracking &raquo;', 'mp'); ?></a><br />
 						<?php } ?>
 						<select name="mp[ga_ecommerce]"<?php echo defined( 'MP_LITE' ) ? ' disabled="disabled"' : ''; ?>>
 								<option value="none"<?php selected($this->get_setting('ga_ecommerce'), 'none') ?>><?php _e('None', 'mp') ?></option>
@@ -6629,17 +6629,17 @@ Notification Preferences: %s', 'mp');
 					 <th scope="row"><?php _e('Store Style', 'mp') ?></th>
 						<td>
 						<?php if ( defined( 'MP_LITE' ) ) { ?>
-						<a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable all styles &raquo;', 'mp'); ?></a><br />
+						<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable all styles &raquo;', 'mp'); ?></a><br />
 						<?php } ?>
 						<?php $this->store_themes_select(); ?>
 						<br /><span class="description"><?php _e('This option changes the built-in css styles for store pages.', 'mp') ?></span>
 						<?php if ((is_multisite() && is_super_admin()) || !is_multisite()) { ?>
 						<br /><span class="description"><?php printf(__('For a custom css style, save your css file with the "MarketPress Style: NAME" header in the "%s/marketpress-styles/" folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a href="%sthemes/Themeing_MarketPress.txt">here &raquo;</a>', 'mp'), WP_CONTENT_DIR, $this->plugin_url); ?></span>
 						<h4><?php _e('Full-featured MarketPress Themes:', 'mp') ?></h4>
-						<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/frame-market-theme/"><img alt="FrameMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/219/listing-image-thumb.png" />
+						<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="https://premium.wpmudev.org/project/frame-market-theme/"><img alt="FrameMarket Theme" src="//premium.wpmudev.org/wp-content/projects/219/listing-image-thumb.png" />
 							<strong><?php _e('FrameMarket/GridMarket', 'mp') ?></strong></a><br />
 							<?php _e('The ultimate MarkePress theme brings visual perfection to WordPress e-commerce. This professional front-end does all the work for you!', 'mp') ?></div>
-						<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="http://premium.wpmudev.org/project/simplemarket/"><img alt="SimpleMarket Theme" src="http://premium.wpmudev.org/wp-content/projects/237/listing-image-thumb.png" />
+						<div class="mp-theme-preview"><a title="<?php _e('Download Now &raquo;', 'mp') ?>" href="https://premium.wpmudev.org/project/simplemarket/"><img alt="SimpleMarket Theme" src="//premium.wpmudev.org/wp-content/projects/237/listing-image-thumb.png" />
 							<strong><?php _e('SimpleMarket', 'mp') ?></strong></a><br />
 							<?php _e('The SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!', 'mp') ?></div>
 						<?php } ?>
@@ -7179,7 +7179,7 @@ Notification Preferences: %s', 'mp');
 								<th scope="row"><?php _e('Select Shipping Options', 'mp') ?></th>
 								<td>
 									<?php if ( defined( 'MP_LITE' ) ) { ?>
-									<a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable Calculated Shipping options &raquo;', 'mp'); ?></a><br />
+									<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable Calculated Shipping options &raquo;', 'mp'); ?></a><br />
 									<?php } ?>
 									<span class="description"><?php _e('Select which calculated shipping methods the customer will be able to choose from:', 'mp') ?></span><br />
 									<?php
@@ -7272,7 +7272,7 @@ Notification Preferences: %s', 'mp');
 
 					 foreach ((array)$mp_gateway_plugins as $code => $plugin) {
 						if ($plugin[3]) { //if demo
-							?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>" disabled="disabled" /> <?php echo esc_attr($plugin[1]); ?></label> <a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce" title="<?php _e('Upgrade', 'mp'); ?> &raquo;"><?php _e('Pro Only &raquo;', 'mp'); ?></a><br /><?php
+							?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>" disabled="disabled" /> <?php echo esc_attr($plugin[1]); ?></label> <a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce" title="<?php _e('Upgrade', 'mp'); ?> &raquo;"><?php _e('Pro Only &raquo;', 'mp'); ?></a><br /><?php
 									} else {
 							?><label><input type="checkbox" class="mp_allowed_gateways" name="mp[gateways][allowed][]" value="<?php echo $code; ?>"<?php echo (in_array($code, $this->get_setting('gateways->allowed', array()))) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
 									}
@@ -7310,7 +7310,7 @@ Notification Preferences: %s', 'mp');
 			 <div class="postbox">
 				<h3 class='hndle'><span><?php _e('General Information', 'mp') ?></span></h3>
 				<div class="inside">
-					<iframe src="http://premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="400px"></iframe>
+					<iframe src="//premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="400px"></iframe>
 				</div>
 			 </div>
 			 -->
