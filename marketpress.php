@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.1
+Version: 2.9.2
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.1';
+	var $version = '2.9.2';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -996,45 +996,9 @@ Thanks again!", 'mp')
 	function start_session() {
 		$sess_id = session_id();
 		
-		if ( !empty($sess_id) ) {
-			session_destroy();	//destroy the possibly unsafe session (maybe from another plugin)
+		if ( empty($sess_id) ) {
+			session_start();
 		}
-		
-		$httponly = true;	//session cookies not available to javascript? (true = safest)
-		$session_hashes = array('sha512', 'sha384', 'sha256', 'sha224', 'sha1');
-		$secure = false;	//force https?
-		$session_name = 'mp_session';
-		$hash_algos = hash_algos();
-		
-		//attempt to set the hashing algorithm starting strongest to least strong
-		foreach ( $session_hashes as $session_hash ) {
-			if ( in_array($session_hash, $hash_algos) ) {
-				ini_set('session.hash_function', $session_hash);
-				break;
-			}
-		}
-		
-		// How many bits per character of the hash.
-	  // The possible values are '4' (0-9, a-f), '5' (0-9, a-v), and '6' (0-9, a-z, A-Z, "-", ",").
-	  ini_set('session.hash_bits_per_character', 5);
-		
-		// Force the session to only use cookies, not URL variables.
-		ini_set('session.use_only_cookies', 1);
-		
-		// Get session cookie parameters 
-		$cookie_params = session_get_cookie_params();
-		
-		// Set the cookie parameters
-		session_set_cookie_params($cookie_params['lifetime'], $cookie_params['path'], $cookie_params['domain'], $secure, $httponly);
-		
-		// Change the session name 
-		session_name($session_name);
-   
-		// Start the session
-		session_start();
-		
-		// Regenerate the session and delete the old one. 
-		session_regenerate_id(true); 
 	}
 
 	function logout_clear_session() {
@@ -4848,7 +4812,7 @@ Notification Preferences: %s', 'mp');
 						}
 					}
 			
-			$js .='ga("ecommerce:send");<script>';
+			$js .='ga("ecommerce:send");</script>';
 		}
 
 		//add to footer

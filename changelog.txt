@@ -5,14 +5,21 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-- Fix: Make help iframe embed https compatible
+2.9.2 - 2/13/2014 - Jonathan Cowher, Marko Miljus, Arnold
+----------------------------------------------------------------------
+- Fixed: Divide by zero warning in USPS gateway
+- Fixed: Mixed-content warnings in wp-admin
+- Fixed: Session handling code that caused issues with PayPal Express checkout 
+- Fixed: Conflict with WordPress Social Invitations plugin http://wp.mu/8ul
+- Fixed: When using WPML and [mp_product] shortcode the non-translated version of the product would be returned
+- Fixed: GA E-Commerce bug http://wp.mu/8ve
 
 2.9.1 - 2/13/2014 - Jonathan Cowher, Marko Miljus
 ----------------------------------------------------------------------
 - Fixed mixed-content issues on checkout pages when using SSL
 - Fixed when importing products from csv, products with stock set to 0 wouldn't be tracked http://wp.mu/8sp
 - Removed outdated translation files
-- Added upport for all Stripe payment gateway currencies http://wp.mu/8sw
+- Added support for all Stripe payment gateway currencies http://wp.mu/8sw
 
 2.9.0.9 - 2/8/2014 - Jonathan Cowher
 ----------------------------------------------------------------------

@@ -1925,6 +1925,11 @@ if (!function_exists('mp_product')) :
 
 function mp_product($echo = true, $product_id, $title = true, $content = 'full', $image = 'single', $meta = true) {
 		global $mp;
+		
+		if ( function_exists('icl_object_id') ) {
+			$product_id = icl_object_id($product_id, 'product', false);	
+		}
+		
 		$post = get_post($product_id);
 
 		$return = '<div itemscope itemtype="http://schema.org/Product" ' . mp_product_class(false, 'mp_product', $post->ID) . '>';
