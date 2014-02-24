@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.2
+Version: 2.9.2.1
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2';
+	var $version = '2.9.2.1';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -628,20 +628,22 @@ Thanks again!", 'mp')
 
 	function add_menu_items() {
 	 //only process the manage orders page for editors and above and if orders hasn't been disabled
-	 if (current_user_can('edit_others_posts') && !$this->get_setting('disable_cart')) {
+	 $order_cap = apply_filters('mp_orders_cap', 'edit_others_posts');
+	 
+	 if (current_user_can($order_cap) && !$this->get_setting('disable_cart')) {
 		$num_posts = wp_count_posts('mp_order'); //get pending order count
 		$count = $num_posts->order_received + $num_posts->order_paid;
 		if ( $count > 0 )
 				$count_output = '&nbsp;<span class="update-plugins"><span class="updates-count count-' . $count . '">' . $count . '</span></span>';
 			else
 				$count_output = '';
-		$orders_page = add_submenu_page('edit.php?post_type=product', __('Manage Orders', 'mp'), __('Manage Orders', 'mp') . $count_output, 'edit_others_posts', 'marketpress-orders', array(&$this, 'orders_page'));
+		$orders_page = add_submenu_page('edit.php?post_type=product', __('Manage Orders', 'mp'), __('Manage Orders', 'mp') . $count_output, $order_cap, 'marketpress-orders', array(&$this, 'orders_page'));
 	 }
-
+	
 	 $page = add_submenu_page('edit.php?post_type=product', __('Store Settings', 'mp'), __('Store Settings', 'mp'), 'manage_options', 'marketpress', array(&$this, 'admin_page'));
 	 add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
 	 add_action( 'admin_print_styles-' . $page, array(&$this, 'admin_css_settings') );
-
+	
 		if ( !defined('WPMUDEV_REMOVE_BRANDING') ) {
 			add_action( "load-{$page}", array( &$this, 'add_help_tab' ) );
 		}

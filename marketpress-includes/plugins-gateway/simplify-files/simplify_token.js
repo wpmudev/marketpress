@@ -24,46 +24,54 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
  * SUCH DAMAGE.
  */
+(function($){
 
-function simplifyResponseHandler(data) {
-    jQuery(".error").remove();
-    if(data.error) {
-        if(data.error.code == "validation") {
-            var fieldErrors = data.error.fieldErrors,
-                fieldErrorsLength = fieldErrors.length;
-            jQuery('#cc-cvc, #cc-number, #cc-exp-month, #cc-exp-year').css('box-shadow', 'none');
-            for (var i = 0; i < fieldErrorsLength; i++) {
-                if(fieldErrors[i].field == 'card.cvc') {
-                    jQuery('#cc-cvc').css('box-shadow', '0px 0px 5px red');
-                } else if(fieldErrors[i].field == 'card.number') {
-                    jQuery('#cc-number').css('box-shadow', '0px 0px 5px red');
-                } else if(fieldErrors[i].field == 'card.expMonth') {
-                    jQuery('#cc-exp-month').css('box-shadow', '0px 0px 5px red');
-                } else if(fieldErrors[i].field == 'card.expYear') {
-                    jQuery('#cc-exp-year').css('box-shadow', '0px 0px 5px red');
-                }
-            }
-        }
-        jQuery("#mp_payment_confirm").removeAttr("disabled");
-    } else {
-        var token = data["id"];
-        jQuery("#mp_payment_form").append("<input type='hidden' name='simplifyToken' value='" + token + "' />");
-        jQuery("#mp_payment_form").get(0).submit();
-    }
-}
-
-jQuery(document).ready(function() {
-    jQuery("#mp_payment_form").on("submit", function() {
-        jQuery("#mp_payment_confirm").attr("disabled", "disabled");
-        SimplifyCommerce.generateToken({
-            key: simplify.publicKey,
-            card: {
-                number: jQuery("#cc-number").val(),
-                cvc: jQuery("#cc-cvc").val(),
-                expMonth: jQuery("#cc-exp-month").val(),
-                expYear: jQuery("#cc-exp-year").val()
-            }
-        }, simplifyResponseHandler);
-        return false;
-    });
-});
+	function simplifyResponseHandler(data) {
+		$(".error").remove();
+		if(data.error) {
+			if(data.error.code == "validation") {
+				var fieldErrors = data.error.fieldErrors,
+						fieldErrorsLength = fieldErrors.length;
+				$('#cc-cvc, #cc-number, #cc-exp-month, #cc-exp-year').css('box-shadow', 'none');
+				for (var i = 0; i < fieldErrorsLength; i++) {
+					if(fieldErrors[i].field == 'card.cvc') {
+						$('#cc-cvc').css('box-shadow', '0px 0px 5px red');
+					} else if(fieldErrors[i].field == 'card.number') {
+						$('#cc-number').css('box-shadow', '0px 0px 5px red');
+					} else if(fieldErrors[i].field == 'card.expMonth') {
+						$('#cc-exp-month').css('box-shadow', '0px 0px 5px red');
+					} else if(fieldErrors[i].field == 'card.expYear') {
+						$('#cc-exp-year').css('box-shadow', '0px 0px 5px red');
+					}
+				}
+			}
+			$("#mp_payment_confirm").removeAttr("disabled");
+		} else {
+			var token = data["id"];
+			$("#mp_payment_form").append("<input type='hidden' name='simplifyToken' value='" + token + "' />");
+			$("#mp_payment_form").get(0).submit();
+		}
+	}
+	
+	$(document).ready(function() {
+		$("#mp_payment_form").on("submit", function(event) {
+			if ( $(this).find('.mp_choose_gateway').filter(':checked').val() != 'simplify' )
+				//simplify gateway is not checked so let's bail to prevent conflicts with other gateways
+				return;
+			
+			event.preventDefault();
+			
+			$("#mp_payment_confirm").attr("disabled", "disabled");
+			SimplifyCommerce.generateToken({
+				"key" : simplify.publicKey,
+				"card" : {
+					"number" : $("#cc-number").val(),
+					"cvc" : $("#cc-cvc").val(),
+					"expMonth" : $("#cc-exp-month").val(),
+					"expYear" : $("#cc-exp-year").val()
+				}
+			}, simplifyResponseHandler);
+		});
+	});
+	
+}(jQuery));
