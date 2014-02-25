@@ -313,8 +313,8 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
             $mp->cart_checkout_error('Please enter your State/Province/Region.', 'state');
 
-        if (empty($_POST['zip']))
-            $mp->cart_checkout_error('Please enter your Zip/Postal Code.', 'zip');
+        if (!$mp->is_valid_zip($_POST['zip'], $_POST['country']))
+            $mp->cart_checkout_error('Please enter a valid Zip/Postal Code.', 'zip');
 
         if (empty($_POST['country']) || strlen($_POST['country']) != 2)
             $mp->cart_checkout_error('Please enter your Country.', 'country');

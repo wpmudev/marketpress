@@ -5,10 +5,18 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-2.9.2.1 - 2/13/2014 - Jonathan Cowher
+2.9.2.2 - 2/25/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Fixed: Bug where store page wasn't being created on activation http://wp.mu/8wl
+- Fixed: Bug when adding coupons to specific products on sites with many (~10k+) products http://wp.mu/8wj
+- Fixed: Hide postal/zip code field when checking out for ship-to countries that don't use postal/zip codes
+- Fixed: Shipping would be set to zero for countries that don't require a postal/zip code http://wp.mu/8wi
+- Fixed: Low-stock notifications now send at appropriate threshold http://wp.mu/8w6
+
+2.9.2.1 - 2/24/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Fixed: Simplify gateway would cause errors when enabled with other gateways http://wp.mu/8w1
-- Added: "mp_orders_cap" filter which allows developers to easily change the capability type required to view the orders menu
+- Added: "mp_orders_cap" filter which allows developers to easily change the capability type required to view the orders menu http://wp.mu/8w2
 
 2.9.2 - 2/13/2014 - Jonathan Cowher, Marko Miljus, Arnold
 ----------------------------------------------------------------------

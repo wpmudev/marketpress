@@ -815,7 +815,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 						$content .= apply_filters('mp_checkout_error_state', '');
 						$content .= mp_province_field($country, $state) . '</td>';
 						$content .= '</tr>';
-						$content .= '<tr>';
+						$content .= '<tr' . (( array_key_exists($country, $mp->countries_no_postcode) ) ? ' style="display:none"' : '') . '>';
 						$content .= '<td align="right">' . __('Postal/Zip Code:', 'mp') . '*</td><td>';
 						$content .= apply_filters('mp_checkout_error_zip', '');
 						$content .= '<input size="10" class="mp_shipping_field" id="mp_zip" name="zip" type="text" value="' . esc_attr($zip) . '" /></td>';

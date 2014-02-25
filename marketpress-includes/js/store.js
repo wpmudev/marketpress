@@ -20,6 +20,9 @@ jQuery(document).ready(function($) {
   $('#mp_country').change(function() {
     $("#mp_province_field").html('<img src="'+MP_Ajax.imgUrl+'" alt="Loading..." />');
     var country = $(this).val();
+    
+    toggle_zip_code(country);
+    
     $.post(MP_Ajax.ajaxUrl, {action: 'mp-province-field', country: country}, function(data) {
       $("#mp_province_field").html(data);
       //remap listener
@@ -40,6 +43,23 @@ jQuery(document).ready(function($) {
   $('#mp_shipping_form .mp_shipping_field').change(function() {
     if ($('#mp_city').val() && $('#mp_state').val() && $('#mp_zip').val()) mp_refresh_shipping();
   });
+  
+  function toggle_zip_code(country) {
+    var hideZipRow = false;
+    
+    for ( i in MP_Ajax.countriesNoPostCode ) {
+	  	if ( country == i ) {
+		  	hideZipRow = true;
+		  	break;
+	  	}  
+    }
+    
+    if ( hideZipRow ) {
+	    $('#mp_zip').closest('tr').fadeOut(250);
+    } else {
+	    $('#mp_zip').closest('tr').fadeIn(250);
+    }
+  }
   
   function mp_refresh_shipping() {
    	$("#mp_shipping_submit").hide();

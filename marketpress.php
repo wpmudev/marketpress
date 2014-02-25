@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.2.1
+Version: 2.9.2.2
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2.1';
+	var $version = '2.9.2.2';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -78,10 +78,11 @@ class MarketPress {
 	 
 	 //initialize session
 	 $this->start_session();
+	 
+	 //maybe install
+	 $this->install();
+	 add_action('wpmu_new_blog', array(&$this, 'setup_new_blog'), 10, 6);	 
 
-	 //install plugin
-	 register_activation_hook( __FILE__, array($this, 'install') );
-	
 	if ( ! defined( 'MP_LITE' ) ) {
 		//load dashboard notice
 		global $wpmudev_notices;
@@ -195,15 +196,21 @@ class MarketPress {
 		add_action( 'profile_update', array(&$this, 'user_profile_update') );
 		add_action( 'edit_user_profile', array(&$this, 'user_profile_fields') );
 		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
-
-		//update install script if necessary
-		if (get_option('mp_version') != $this->version) {
-			$this->install();
-		}
+	}
+	
+	function setup_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
+		//flag to run on next visit to blog
+		update_blog_option($blog_id, 'mp_do_install', 1);
 	}
 
 	function install() {
-	 $old_settings = get_option('mp_settings');
+		if ( !get_option('mp_do_install') ) {
+			if ( get_option('mp_version') == $this->version ) {
+				return;
+			}
+		}
+			
+		$old_settings = get_option('mp_settings');
 		$old_version = get_option('mp_version');
 
 	 //our default settings
@@ -352,7 +359,7 @@ Thanks again!", 'mp')
 		//2.1.4 update
 		if ( version_compare($old_version, '2.1.4', '<') )
 			$this->update_214();
-
+			
 	 //only run these on first install
 	 if ( empty($old_settings) ) {
 
@@ -361,16 +368,17 @@ Thanks again!", 'mp')
 			add_option( 'mp_store_page', '', '', 'no' );
 
 			//create store page
-			add_action( 'admin_init', array(&$this, 'create_store_page') );
+			add_action('admin_init', array(&$this, 'create_store_page'));
 
 			//add cart widget to first sidebar
 			add_action( 'widgets_init', array(&$this, 'add_default_widget'), 11 );
 		}
 
-	 //add action to flush rewrite rules after we've added them for the first time
+		//add action to flush rewrite rules after we've added them for the first time
 		update_option('mp_flush_rewrite', 1);
-
-	 update_option( 'mp_version', $this->version );
+		
+		update_option('mp_version', $this->version);
+		delete_option('mp_do_install');
 	}
 
 	//run on 2.1.4 update to fix price sorts
@@ -710,6 +718,7 @@ Thanks again!", 'mp')
 	 	'outMsg' => __('In Your Cart', 'mp'),
 	 	'showFilters' => $this->get_setting('show_filters'),
 	 	'links' => array('-1' => home_url($this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products'))),
+	 	'countriesNoPostCode' => $this->countries_no_postcode,
 	 );
 	 
 	 if ( 'product_category' == get_query_var('taxonomy') && '' != get_query_var('term') ) {
@@ -771,7 +780,7 @@ Thanks again!", 'mp')
 	//creates the store page on install and updates
 	function create_store_page($old_slug = false) {
 		global $wpdb;
-
+		
 	 //remove old page if updating
 	 if ($old_slug && $old_slug != $this->get_setting('slugs->store')) {
 		$old_post_id = $wpdb->get_var( $wpdb->prepare("SELECT ID FROM " . $wpdb->posts . " WHERE post_name = %s AND post_type = 'page'", $old_slug) );
@@ -2420,6 +2429,22 @@ Thanks again!", 'mp')
 		return $price;
 	}
 
+	function is_valid_zip( $zip, $country ) {
+		if ( array_key_exists($country, $this->countries_no_postcode) )
+			//given country doesn't use post codes so zip is always valid
+			return true;
+		
+		if ( empty($zip) )
+			//no post code provided
+			return false;
+			
+		if ( strlen($zip) < 3 )
+			//post code is too short - see http://wp.mu/8wg
+			return false;
+			
+		return true;
+	}
+
 	//returns the calculated price for shipping. Returns False if shipping address is not available
 	function shipping_price($format = false, $cart = false) {
 		global $mp_shipping_active_plugins;
@@ -2453,7 +2478,7 @@ Thanks again!", 'mp')
 		$selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
 
 	 //check required fields
-	 if ( empty($address1) || empty($city) || empty($zip) || empty($country) || !(is_array($cart) && count($cart)) )
+	 if ( empty($address1) || empty($city) || !$this->is_valid_zip($zip, $country) || empty($country) || !(is_array($cart) && count($cart)) )
 		return false;
 
 		//don't charge shipping if only digital products
@@ -3103,8 +3128,8 @@ Thanks again!", 'mp')
 				else
 					$_POST['state'] = strtoupper($_POST['state']);
 
-				if (empty($_POST['zip']) && $_POST['country'] != 'IE') //no postal code in Ireland
-					$this->cart_checkout_error( __('Please enter your Zip/Postal Code.', 'mp'), 'zip');
+				if (!$this->is_valid_zip($_POST['zip'], $_POST['country'])) //no postal code for country
+					$this->cart_checkout_error( __('Please enter a valid Zip/Postal Code.', 'mp'), 'zip');
 
 				if (empty($_POST['country']) || strlen($_POST['country']) != 2)
 					$this->cart_checkout_error( __('Please enter your Country.', 'mp'), 'country');
@@ -4554,9 +4579,11 @@ You can manage this order here: %s", 'mp');
 	//sends email to admin for low stock notification
 	function low_stock_notification($product_id, $variation, $stock) {
 
-	 //skip if sent already and not 0
-	 if ( get_post_meta($product_id, 'mp_stock_email_sent', true) && $stock > 0 )
-		return;
+	 //skip if sent already
+	 if ( get_post_meta($product_id, 'mp_stock_email_sent', true) != '' ) return;
+		
+	 //don't send an email every time - we set this before doing anything else to avoid race conditions
+	 update_post_meta($product_id, 'mp_stock_email_sent', 1);
 
 	 $var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
 		if (is_array($var_names) && count($var_names) > 1)
@@ -4577,9 +4604,6 @@ Notification Preferences: %s', 'mp');
 	 $msg = apply_filters( 'mp_low_stock_notification', $msg, $product_id );
 	 $store_email = $this->get_setting('store_email') ? $this->get_setting('store_email') : get_option("admin_email");
 	 $this->mail($store_email, $subject, $msg);
-
-	 //save so we don't send an email every time
-	 update_post_meta($product_id, 'mp_stock_email_sent', 1);
 	}
 
 	//round and display currency with padded zeros
@@ -6501,9 +6525,9 @@ Notification Preferences: %s', 'mp');
 				
 				 	//get all the products
 				
-				$products = new WP_Query( array( 'post_type' => 'product', 'posts_per_page' => -1 ) );
+				$products = new WP_Query( array( 'post_type' => 'product', 'posts_per_page' => 500, 'update_post_term_cache' => false, 'update_post_meta_cache' => false ) );
 				if( !is_wp_error( $products ) ) {
-					if( $products->post_count > 500) {
+					if( $products->found_posts > 500) {
 					?>
 					<label id="coupon_product" <?php echo ( $applies_to == 'product' ) ? '' : 'style="display:none;"';?>><?php _e('Post ID','mp');?>
 					<input type="text" value="<?php echo ( $applies_to == 'product' ) ? $applies_to_id : ''; ?>" name="coupon_product" />
