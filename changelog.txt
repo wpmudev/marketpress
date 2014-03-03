@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.2.3 - 3/3/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Fixed: Low-stock notifications wouldn't send at expected threshold
+- Fixed: Fixed a bug with not being able to use "services" as a page slug http://wp.mu/8xw
+- Fixed: Javascript for Pinterest pin-it button would not be generated correctly
+- Fixed: When switching shipping methods, table-rate data would be wiped out http://wp.mu/8xy
+- New: Updated the Pinterest Rich Pins oEmbed endpoint to use http://www.yourdomain.com/wp-admin/admin-ajax.php?action=mp_oembed&type=pinterest&url=* instead of http://www.yourdomain.com/services/oembed
+
 2.9.2.2 - 2/25/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Fixed: Bug where store page wasn't being created on activation http://wp.mu/8wl

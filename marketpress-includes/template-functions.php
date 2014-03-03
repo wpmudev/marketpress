@@ -24,7 +24,6 @@
 	mp_list_products
  */
 
-
 if (!function_exists('mp_tag_cloud')) :
 /**
  * Display product tag cloud.

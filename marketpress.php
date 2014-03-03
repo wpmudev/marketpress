@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2.2';
+	var $version = '2.9.2.3';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -360,6 +360,10 @@ Thanks again!", 'mp')
 		if ( version_compare($old_version, '2.1.4', '<') )
 			$this->update_214();
 			
+		//2.9.2.3 update
+		if ( version_compare($old_version, '2.9.2.3', '<') )
+			$this->update_2923();
+			
 	 //only run these on first install
 	 if ( empty($old_settings) ) {
 
@@ -379,6 +383,12 @@ Thanks again!", 'mp')
 		
 		update_option('mp_version', $this->version);
 		delete_option('mp_do_install');
+	}
+	
+	//run on 2.9.2.3 update to fix low inventory emails not being sent
+	function update_2923() {
+		global $wpdb;
+		$wpdb->delete($wpdb->postmeta, array('meta_key' => 'mp_stock_email_sent'), array('%s'));
 	}
 
 	//run on 2.1.4 update to fix price sorts
@@ -570,7 +580,23 @@ Thanks again!", 'mp')
 			}
 	 }
 	}
-
+	
+	function parse_args_r( &$a, $b ) {
+		$a = (array) $a;
+		$b = (array) $b;
+		$r = $b;
+		 
+		foreach ( $a as $k => &$v ) {
+			if ( is_array($v) && isset($r[$k]) ) {
+				$r[$k] = $this->parse_args_r($v, $r[$k]);
+			} else {
+				$r[$k] = $v;
+			}
+		}
+		 
+		return $r;
+	}
+	
 	/*
 	 * function get_setting
 	 * @param string $key A setting key, or -> separated list of keys to go multiple levels into an array
@@ -2205,7 +2231,7 @@ Thanks again!", 'mp')
 
 			//if changing delete flag so emails will be sent again
 		if ( $_POST['mp_inventory'] != $meta['mp_inventory'] )
-			delete_post_meta($product_id, 'mp_stock_email_sent');
+			delete_post_meta($post_id, 'mp_stock_email_sent');
 
 		update_post_meta( $post_id, 'mp_product_link', esc_url_raw($_POST['mp_product_link']) );
 
@@ -3566,13 +3592,16 @@ Thanks again!", 'mp')
 			 $items[] = $data['quantity'];
 
 			 //adjust product stock quantities
-			 if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+			 if ( get_post_meta($product_id, 'mp_track_inventory', true) != '' ) {
 				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
-					if (!is_array($stock))
-						 $stock[0] = $stock;
-					$stock[$variation] = $stock[$variation] - $data['quantity'];
-				update_post_meta($product_id, 'mp_inventory', $stock);
+				
+				if (!is_array($stock))
+					 $stock[0] = $stock;
+					 
+				$stock[$variation] = $stock[$variation] - $data['quantity'];
 					
+				update_post_meta($product_id, 'mp_inventory', $stock);
+				
 					//send low stock notification if needed
 				if ($stock[$variation] <= $this->get_setting('inventory_threshold')) {
 					$this->low_stock_notification($product_id, $variation, $stock[$variation]);
@@ -4580,7 +4609,7 @@ You can manage this order here: %s", 'mp');
 	function low_stock_notification($product_id, $variation, $stock) {
 
 	 //skip if sent already
-	 if ( get_post_meta($product_id, 'mp_stock_email_sent', true) != '' ) return;
+	 if ( get_post_meta($product_id, 'mp_stock_email_sent', true) != '' && $stock > 0 ) return;
 		
 	 //don't send an email every time - we set this before doing anything else to avoid race conditions
 	 update_post_meta($product_id, 'mp_stock_email_sent', 1);
@@ -6020,7 +6049,7 @@ Notification Preferences: %s', 'mp');
 								</select>
 					 </td>
 					 </tr>
-								<tr valign="top">
+					 <tr valign="top">
 					 <th scope="row"><?php _e('Hide Out of Stock Products', 'mp') ?></th>
 					 <td>
 					 <label><input value="1" name="mp[inventory_remove]" type="radio"<?php checked($this->get_setting('inventory_remove'), 1); ?>> <?php _e('Yes', 'mp') ?></label>
@@ -7090,7 +7119,7 @@ Notification Preferences: %s', 'mp');
 				if (isset($_POST['shipping_settings'])) {
 					$settings = get_option('mp_settings');
 					//allow plugins to verify settings before saving
-					$settings = array_merge($settings, apply_filters('mp_shipping_settings_filter', $_POST['mp']));
+					$settings = $this->parse_args_r(apply_filters('mp_shipping_settings_filter', $_POST['mp']), $settings);
 					update_option('mp_settings', $settings);
 			 echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
 				}

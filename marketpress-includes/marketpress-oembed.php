@@ -18,11 +18,8 @@ class MP_Oembed {
 	 * Construct
 	 */
 	function __construct() {
-		//
-		add_filter( 'rewrite_rules_array', array(&$this, 'add_oembed_rewrite_filter') );
-		add_filter( 'query_vars', array(&$this, 'add_oembed_queryvars_filter') );
-		
-		add_action('wp', array(&$this, 'process_oembed_request_action'));
+		add_action('wp_ajax_mp_oembed', array(&$this, 'process_oembed_request_action'));
+		add_action('wp_ajax_no_priv_mp_oembed', array(&$this, 'process_oembed_request_action'));
 		
 		// we'll need to invalidate the cache on post save for products
 		add_action('save_post', array(&$this, 'check_for_invalid_cache_action' ));
@@ -34,49 +31,23 @@ class MP_Oembed {
 	
 	
 	/**
-	 * filter the rules to create the endpoint
-	 */
-	function add_oembed_rewrite_filter($rules) {
-    	$oembed_rules = array();
-		
-		$oembed_rules['services/([^/]+)/?$'] = 'index.php?service=$matches[1]';
-		return array_merge($oembed_rules, $rules);
-	}
-	
-	
-	/**
-	 * filter the query vars to add services
-	 */
-	function add_oembed_queryvars_filter($vars) {
-		
-	 if(!in_array('service', $vars)) {
-	 	$vars[] = 'service';
-	 }
-	 return $vars;
-	}
-	
-	
-	/**
 	 * parses the request to look for the service type and act accordingly
-	 * @todo take the concept below and allow for other kinds of services
 	 */
 	function process_oembed_request_action() {
-		global $wp_query;
-		if( array_key_exists('service', $wp_query->query_vars ) ) {
+		$type = isset($_GET['type']) ? $_GET['type'] : '';
+		
+		switch ( $type ) {
+			case 'pinterest' :
+				$results = $this->process();
+				echo $results->package;
+			break;
 			
-			switch( $wp_query->query_vars['service'] ){
-				case 'oembed':
-					$results = $this->process();
-					echo $results->package;
-					exit;
-				break;
-				
-				default:
-					echo __('Service Unavailable','mp');
-					exit;
-			}
-			
+			default :
+				_e('Service Unavailable', 'mp');
+			break;
 		}
+		
+		exit;
 	}
 	
 	
@@ -84,13 +55,13 @@ class MP_Oembed {
 	 * Checks on post save for invalid caches
 	 */
 	function check_for_invalid_cache_action( $post_id ) {
-		global $post_type;
 		//we only want this running on product pages
-		if(  $post_type != 'product' ) {
+		if ( get_post_type() != 'product' ) {
 			return $post_id;
 		}
+		
 		$this->_cache_identifier = $post_id;
-		if( $cache = $this->checkForCache() ) {
+		if ( $cache = $this->checkForCache() ) {
 			$this->removeCache();
 		}
 	}
@@ -100,11 +71,11 @@ class MP_Oembed {
 	 * Injects the pinterest js into the footer if enabled
 	 */
 	function inject_pinterest_js_action() {
-		global $post_type, $mp;
+		global $mp;
 		
-		$show_pinit_button = ($show = $mp->get_setting('show_pinit_button') ) ? $show : 'off';
+		$show_pinit_button = ($show = $mp->get_setting('social->pinterest->show_pinit_button') ) ? $show : 'off';
 		
-		if($post_type == 'product' && $show_pinit_button != 'off' ){
+		if ( get_post_type() == 'product' && $show_pinit_button != 'off' ){
 		?>
         <script type="text/javascript">
 		(function(d){
