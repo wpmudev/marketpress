@@ -995,7 +995,8 @@ class MarketPress_MS {
   		'thumbnail_size' => 50,
   		'show_price' => true,
       'text' => 'excerpt',
-  		'as_list' => false
+  		'as_list' => false,
+  		'paginav' => false,
   	), $atts);
 
     $args['echo'] = false;
@@ -1257,7 +1258,8 @@ function mp_list_global_products( $args = '' ) {
 		'context' => 'list',
 		'show_price' => true,
 		'text' => 'excerpt',
-		'as_list' => false
+		'as_list' => false,
+		'paginav' => false,
 	);
 
   $r = wp_parse_args( $args, $defaults );
@@ -1274,7 +1276,7 @@ function mp_list_global_products( $args = '' ) {
     $query = "SELECT blog_id, p.post_id, post_permalink, post_title, post_content FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
   }
 	
-	$query = apply_filters('mp_list_global_products_sql_where', $query);
+	$query = $no_limit_query = apply_filters('mp_list_global_products_sql_where', $query);
 	
   //get order by
   switch ($order_by) {
@@ -1321,10 +1323,12 @@ function mp_list_global_products( $args = '' ) {
   //The Query
   $results = $wpdb->get_results( $query );
 
+	$content = '';
+	
   if ($as_list)
-    $content = '<ul id="mp_product_list">';
+    $content .= '<ul id="mp_product_list">';
   else
-    $content = '<div id="mp_product_list">';
+    $content .= '<div id="mp_product_list">';
 
   if ($results) {
 		
@@ -1407,6 +1411,10 @@ function mp_list_global_products( $args = '' ) {
     $content .= '</ul>';
   else
     $content .= '</div>';
+    
+  //show navigation?
+  if ( $paginav )
+  	$content .= mp_global_products_nav_link($args, $no_limit_query);
 
   $content = apply_filters('mp_list_global_products', $content);
 
@@ -1428,7 +1436,7 @@ function mp_list_global_products( $args = '' ) {
  *
  * @param string|array $args Optional. Override default arguments.
  */
-function mp_global_products_nav_link( $args = '' ) {
+function mp_global_products_nav_link( $args = '', $query = null ) {
   global $wpdb, $mp;
 	
   $defaults = array(
@@ -1446,19 +1454,22 @@ function mp_global_products_nav_link( $args = '' ) {
   extract( $r );
 
   //setup taxonomy if applicable
-  if ($category) {
-    $category = $wpdb->escape( sanitize_title( $category ) );
-    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_category' AND t.slug = '$category'";
-  } else if ($tag) {
-    $tag = $wpdb->escape( sanitize_title( $tag ) );
-    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_tag' AND t.slug = '$tag'";
-  } else {
-    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
-  }
-
-  //The Query
-  $total = $wpdb->get_var( $query );
-	
+  if ( is_null($query) ) {
+	  if ($category) {
+	    $category = $wpdb->escape( sanitize_title( $category ) );
+	    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_category' AND t.slug = '$category'";
+	  } else if ($tag) {
+	    $tag = $wpdb->escape( sanitize_title( $tag ) );
+	    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_tag' AND t.slug = '$tag'";
+	  } else {
+	    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
+	  }
+	  
+	  $total = $wpdb->get_var( $query );
+	} else {
+		$total = $wpdb->num_rows;
+	}
+  
 	//setup last page
 	$max_pages = ceil($total / $per_page);
 	if ($max_pages < 1)

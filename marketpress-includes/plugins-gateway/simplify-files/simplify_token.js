@@ -55,13 +55,17 @@
 	
 	$(document).ready(function() {
 		$("#mp_payment_form").on("submit", function(event) {
-			if ( $(this).find('.mp_choose_gateway').filter(':checked').val() != 'simplify' )
+			var $this = $(this),
+					$gateway = $this.find('.mp_choose_gateway');
+			
+			if ( $gateway.length && $gateway.filter(':checked').val() != 'simplify' )
 				//simplify gateway is not checked so let's bail to prevent conflicts with other gateways
 				return;
 			
 			event.preventDefault();
 			
 			$("#mp_payment_confirm").attr("disabled", "disabled");
+			
 			SimplifyCommerce.generateToken({
 				"key" : simplify.publicKey,
 				"card" : {

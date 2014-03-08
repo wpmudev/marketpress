@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.2.3
+Version: 2.9.2.4
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2.3';
+	var $version = '2.9.2.4';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -109,6 +109,9 @@ class MarketPress {
 			if ( $network_settings['global_cart'] )
 				$this->global_cart = true;
 	 }
+	 
+	 	//make sure admin_url() returns proper scheme - set to super low priority to make sure this is run last
+	 	add_filter('admin_url', array(&$this, 'filter_admin_url'), 999);
 
 		//localize the plugin
 		add_action( 'plugins_loaded', array(&$this, 'localization'), 9 );
@@ -728,7 +731,24 @@ Thanks again!", 'mp')
 	function hide_help() {
 		$this->update_setting('hide_popup', 3);
 	}
-
+	
+	/**
+	 * Ensures that admin_url() uses the correct URL scheme when WordPress HTTPS
+	 * plugin is enabled
+	 *
+	 * @since 2.9.2.4
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	
+	function filter_admin_url( $url ) {
+		if ( class_exists('WordPressHTTPS') )
+			return is_ssl() ? str_replace('http://', 'https://', $url) : str_replace('https://', 'http://', $url);
+		
+		return $url;
+	}
+	
 	//ajax cart handling for store frontend
 	function store_script() {
 	 //setup ajax cart javascript
@@ -736,7 +756,7 @@ Thanks again!", 'mp')
 
 	 //get all product category links for access in js
 	 $vars = array(
-	 	'ajaxUrl' => admin_url('admin-ajax.php', (is_ssl() ? 'https': 'http')),
+	 	'ajaxUrl' => admin_url('admin-ajax.php'),
 	 	'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'),
 	 	'successMsg' => __('Item(s) Added!', 'mp'),
 	 	'imgUrl' => $this->plugin_url.'images/loading.gif',
@@ -3088,11 +3108,7 @@ Thanks again!", 'mp')
 
 		//add coupon code
 		if (!empty($_POST['coupon_code'])) {
-			 
-		 
 			 if ($this->check_coupon($_POST['coupon_code'])) {
-				 
-			 
 				 //get coupon code
 				 //set a flag so all other coupons will be processed
 				 $can_apply	 = $this->coupon_applicable( $_POST['coupon_code'], $product_id );
@@ -3452,35 +3468,34 @@ Thanks again!", 'mp')
 	* @param int The product ID we are checking
 	*/
 	function coupon_applicable( $code, $product_id ) {
-		//
 		$can_apply = true;
-		$coupons		= get_option('mp_coupons');
+		$coupons = get_option('mp_coupons');
+		$code = strtoupper($code);
+		$applies_to = is_array($coupons[$code]['applies_to']) ? $coupons[$code]['applies_to'] : false;
 		
-		//check for the applies to setting
-		$applies_to = !empty( $coupons[ $code ]['applies_to'] ) ? $coupons[ $code ]['applies_to'] : false;
-		if( $applies_to ) {
+		if ( $applies_to !== false ) {
+			$what = $applies_to['type']; // the type will be 'product', 'category'
+			$item_id	= $applies_to['id']; // the is is either id post ID or the term ID depending on the above
 			 
-			 $what = $applies_to['type']; // the type will be 'product', 'category'
-			 $item_id	= $applies_to['id']; // the is is either id post ID or the term ID depending on the above
-			 
-			 switch( $what ) {
-				 case 'product':
+			switch( $what ) {
+				case 'product':
 				 	$can_apply = ( $product_id == $item_id ) ? true : false;
 					break;
 				 
-				 case 'category':
-				 	$terms = get_the_terms( $product_id, 'product_category' );
-				if(!empty( $terms) && !is_wp_error( $terms ) ) {
-					$can_apply = false;
-						foreach( $terms as $term) {
-							if( $term->term_id == $item_id ) {
+				case 'category':
+				 	$terms = get_the_terms($product_id, 'product_category');
+				 	
+				 	if ( is_array($terms) ) {
+						$can_apply = false;
+						
+						foreach ( $terms as $term) {
+							if ( $term->term_id == $item_id ) {
 								$can_apply = true;
+								break;
 							}
 						}
 					}
 				break;
-				
-				default:
 			}
 		}
 		
@@ -3602,8 +3617,8 @@ Thanks again!", 'mp')
 					
 				update_post_meta($product_id, 'mp_inventory', $stock);
 				
-					//send low stock notification if needed
-				if ($stock[$variation] <= $this->get_setting('inventory_threshold')) {
+				//send low stock notification if needed
+				if ($stock[$variation] <= $this->get_setting('inventory_threshhold')) {
 					$this->low_stock_notification($product_id, $variation, $stock[$variation]);
 				}
 			 } //check stock
