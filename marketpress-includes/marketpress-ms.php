@@ -1280,7 +1280,6 @@ function mp_list_global_products( $args = '' ) {
 	
   //get order by
   switch ($order_by) {
-
     case 'title':
       $query .= " ORDER BY p.post_title";
       break;
@@ -1309,7 +1308,11 @@ function mp_list_global_products( $args = '' ) {
   } else {
     $query .= " DESC";
   }
-	
+  
+  // get page
+  if ( get_query_var('paged') )
+  	$page = get_query_var('paged');
+  
 	//adjust for mysql (0 is lowest)
 	$page = $page - 1;
 	if ($page < 0)
@@ -1441,7 +1444,7 @@ function mp_global_products_nav_link( $args = '', $query = null ) {
 	
   $defaults = array(
 		'echo' => true,
-		'page' => false, 
+		'page' => 0, 
     'per_page' => 20,
 		'category' => '',
     'tag' => '',
@@ -1467,20 +1470,22 @@ function mp_global_products_nav_link( $args = '', $query = null ) {
 	  
 	  $total = $wpdb->get_var( $query );
 	} else {
+		$result = $wpdb->query($query);
 		$total = $wpdb->num_rows;
 	}
-  
+	
 	//setup last page
 	$max_pages = ceil($total / $per_page);
 	if ($max_pages < 1)
 		$max_pages = 1;
 	
 	//setup current page
-	if ($page !== false) {
-		$paged = $page; //pages start at 1 for our uses
-	} else {
+	if ( get_query_var('paged') ) {
 		$paged = intval(get_query_var('paged'));
+	} else {
+		$paged = $page; //pages start at 1 for our uses
 	}
+	
 	if ($paged < 1)
 		$paged = 1;
 	
