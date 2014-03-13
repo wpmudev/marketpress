@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.2.5
+Version: 2.9.2.6
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2.5';
+	var $version = '2.9.2.6';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -460,7 +460,7 @@ Thanks again!", 'mp')
 	}
 
 	function load_plugins() {
-	 if (is_network_admin() || !$this->get_setting('disable_cart')) {
+	 if ( is_network_admin() || !$this->get_setting('disable_cart') ) {
 		//load shipping plugin API
 		require_once( $this->plugin_dir . 'marketpress-shipping.php' );
 		$this->load_shipping_plugins();
@@ -577,7 +577,7 @@ Thanks again!", 'mp')
 			 $mp_gateway_active_plugins[] = new $class;
 			 break;
 				}
-		} else {
+		} elseif ( !is_network_admin() ) {
 			 if ( isset( $gateways['allowed'] ) && in_array($code, (array)$gateways['allowed']) && class_exists($class) && !$plugin[3] )
 				$mp_gateway_active_plugins[] = new $class;
 			}
@@ -756,7 +756,7 @@ Thanks again!", 'mp')
 
 	 //get all product category links for access in js
 	 $vars = array(
-	 	'ajaxUrl' => admin_url('admin-ajax.php'),
+	 	'ajaxUrl' => admin_url('admin-ajax.php', (( is_ssl() ) ? 'https' : 'http')),
 	 	'emptyCartMsg' => __('Are you sure you want to remove all items from your cart?', 'mp'),
 	 	'successMsg' => __('Item(s) Added!', 'mp'),
 	 	'imgUrl' => $this->plugin_url.'images/loading.gif',
@@ -3606,8 +3606,11 @@ Thanks again!", 'mp')
 			foreach ($variations as $variation => $data) {
 			 $items[] = $data['quantity'];
 
-			 //adjust product stock quantities
-			 if ( get_post_meta($product_id, 'mp_track_inventory', true) != '' ) {
+			 /*** adjust product stock quantities ***/
+			 
+			 //check if inventory tracking is enabled
+			 //returned value could be 0, 1 or an empty string so casting as boolean
+			 if ( ((bool) get_post_meta($product_id, 'mp_track_inventory', true)) === true ) {
 				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
 				
 				if (!is_array($stock))

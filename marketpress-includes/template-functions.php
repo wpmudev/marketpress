@@ -1032,12 +1032,13 @@ function mp_show_cart($context = '', $checkoutstep = null, $echo = true) {
 						$content .= '</div>';
 				} else if ($context == 'checkout') {
 
-						//generic error message context for plugins to hook into
-						$content .= apply_filters('mp_checkout_error_checkout', '');
+					if ($mp->get_setting('show_purchase_breadcrumbs') == 1) {
+							$content .= mp_cart_breadcrumbs($checkoutstep);
+					}
+					
+					//generic error message context for plugins to hook into
+					$content .= apply_filters('mp_checkout_error_checkout', '');
 
-						if ($mp->get_setting('show_purchase_breadcrumbs') == 1) {
-								$content .= mp_cart_breadcrumbs($checkoutstep);
-						}
 
 						//handle checkout steps
 						switch ($checkoutstep) {

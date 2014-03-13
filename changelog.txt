@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.2.6 - 3/13/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Fixed: "Uncaught TypeError: Object [object Object] has no method 'ColorPicker'" on network settings screen http://wp.mu/900
+- Fixed: Undefined variables notices on network settings screen
+- Fixed: Low stock notifications were being sent for products that didn't have inventory tracking enabled http://wp.mu/905
+- Fixed: On checkout screen errors would show above breadcrumb whereas update messages would show below http://wp.mu/904
+- Code cleanup for PayPal Express gateway
+
 2.9.2.5 - 3/8/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Fixed: When using [mp_list_global_products] pagination would not work http://wp.mu/8z9

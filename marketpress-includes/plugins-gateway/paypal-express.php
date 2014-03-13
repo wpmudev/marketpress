@@ -78,8 +78,50 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   		$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
   		$this->paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
     }
+    
+    if ( is_network_admin() ) {
+			//tie into network settings form
+			add_action('admin_enqueue_scripts', array(&$this, 'network_gateway_scripts'));
+			add_action('mp_network_gateway_settings', array($this, 'network_gateway_settings_box'));
+		}
   }
+  
+  /**
+   * Displays the network gateway settings box
+   *
+   * @since 2.9.2.6
+   */
+  
+  function network_gateway_settings_box() {
+  	global $mp;
+  	$global_cart = $mp->global_cart;	//so we can set back later
+  	$mp->global_cart = false;	//otherwise the full settings won't show up
+	  $settings = get_option('mp_settings');
+	  $this->gateway_settings_box($settings);	//display the regular settings box
+	  $mp->global_cart = $global_cart;	//set this back to what it was
+  }
+  
+  /**
+   * Enqueue any necessary scripts
+   *
+   * @since 2.9.2.6
+   *
+   * @param string $page The current page being viewed
+   *
+   */
+  
+  function network_gateway_scripts( $page ) {
+		global $mp;
+		
+		if ( $page != 'settings_page_marketpress-ms' )
+			return;
+		
+		wp_enqueue_style('mp-colorpicker', $mp->plugin_url . 'colorpicker/css/colorpicker.css', array(), $mp->version);
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('mp-colorpicker', $mp->plugin_url . 'colorpicker/js/colorpicker.js', array('jquery'), $mp->version);
+	}
 
+  
 	/**
    * Echo fields you need to add to the payment screen, like your credit card info fields.
    *  If you don't need to add form fields set $skip_form to true so this page can be skipped
@@ -1169,226 +1211,3 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 //register shipping plugin
 mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal-express', __('PayPal Express Checkout', 'mp'), true );
-
-if ( is_multisite() ) {
-	//tie into network settings form
-	add_action( 'mp_network_gateway_settings', 'psts_pe_network_gateway_settings_box' );
-}
-
-function psts_pe_network_gateway_settings_box($settings) {
-  global $mp;
-  ?>
-  <script type="text/javascript">
-	  jQuery(document).ready(function($) {
-      $("#gbl_gw_paypal-express").change(function() {
-        $("#mp-main-form").submit();
-  		});
-    });
-	</script>
-	<?php
-	$hide = false;
-  if (!$settings['global_cart'] || $settings['global_gateway'] != 'paypal-express')
-    $hide = true;
-  ?>
-  <div id="mp_paypal_express" class="postbox"<?php echo ($hide) ? ' style="display:none;"' : ''; ?>>
-    <script type="text/javascript">
-  	  jQuery(document).ready(function ($) {
-    		$('#mp-hdr-bdr').ColorPicker({
-        	onSubmit: function(hsb, hex, rgb, el) {
-        		$(el).val(hex);
-        		$(el).ColorPickerHide();
-        	},
-        	onBeforeShow: function () {
-        		$(this).ColorPickerSetColor(this.value);
-        	},
-          onChange: function (hsb, hex, rgb) {
-        		$('#mp-hdr-bdr').val(hex);
-        	}
-        })
-        .bind('keyup', function(){
-        	$(this).ColorPickerSetColor(this.value);
-        });
-        $('#mp-hdr-bck').ColorPicker({
-        	onSubmit: function(hsb, hex, rgb, el) {
-        		$(el).val(hex);
-        		$(el).ColorPickerHide();
-        	},
-        	onBeforeShow: function () {
-        		$(this).ColorPickerSetColor(this.value);
-        	},
-          onChange: function (hsb, hex, rgb) {
-        		$('#mp-hdr-bck').val(hex);
-        	}
-        })
-        .bind('keyup', function(){
-        	$(this).ColorPickerSetColor(this.value);
-        });
-        $('#mp-pg-bck').ColorPicker({
-        	onSubmit: function(hsb, hex, rgb, el) {
-        		$(el).val(hex);
-        		$(el).ColorPickerHide();
-        	},
-        	onBeforeShow: function () {
-        		$(this).ColorPickerSetColor(this.value);
-        	},
-          onChange: function (hsb, hex, rgb) {
-        		$('#mp-pg-bck').val(hex);
-        	}
-        })
-        .bind('keyup', function(){
-        	$(this).ColorPickerSetColor(this.value);
-        });
-  		});
-  	</script>
-    <h3 class='hndle'><span><?php _e('PayPal Express Checkout Global Cart Settings', 'mp'); ?></span></h3>
-    <div class="inside">
-      <span class="description"><?php _e('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. This gateway allows carts from up to 10 stores to checkout at once using parallel payments. <a target="_blank" href="https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECGettingStarted">More Info &raquo;</a>', 'mp') ?></span>
-      <table class="form-table">
-        <tr>
-				<th scope="row"><?php _e('PayPal Site', 'mp') ?></th>
-				<td>
-          <select name="mp[gateways][paypal-express][locale]">
-          <?php
-          $sel_locale = ($settings['gateways']['paypal-express']['locale']) ? $settings['gateways']['paypal-express']['locale'] : $mp->get_setting('base_country', 'US');
-          $locales = array(
-						'AR'	=> 'Argentina',
-						'AU'	=> 'Australia',
-						'AT'	=> 'Austria',
-						'BE'	=> 'Belgium',
-						'BR'	=> 'Brazil',
-						'CA'	=> 'Canada',
-						'CN'	=> 'China',
-						'FI'	=> 'Finland',
-						'FR'	=> 'France',
-						'DE'	=> 'Germany',
-						'HK'	=> 'Hong Kong',
-						'IL'	=> 'Israel',
-						'IT'	=> 'Italy',
-						'JP'	=> 'Japan',
-						'MX'	=> 'Mexico',
-						'NL'	=> 'Netherlands',
-						'NZ'	=> 'New Zealand',
-						'PL'	=> 'Poland',
-						'RU'	=> 'Russia',
-						'SG'	=> 'Singapore',
-						'ES'	=> 'Spain',
-						'SE'	=> 'Sweden',
-						'CH'	=> 'Switzerland',
-						'TR' 	=> 'Turkey',
-						'GB'	=> 'United Kingdom',
-						'US'	=> 'United States'
-					);
-					
-          foreach ($locales as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_locale ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
-          }
-          ?>
-          </select>
-				</td>
-        </tr>
-        <tr>
-        <th scope="row"><?php _e('Paypal Currency', 'mp') ?></th>
-        <td>
-          <select name="mp[gateways][paypal-express][currency]">
-          <?php
-          $sel_currency = ($settings['gateways']['paypal-express']['currency']) ? $settings['gateways']['paypal-express']['currency'] : $mp->get_setting('currency');
-	        $currencies = array(
-	              'AUD' => 'AUD - Australian Dollar',
-	              'BRL' => 'BRL - Brazilian Real',
-	              'CAD' => 'CAD - Canadian Dollar',
-	              'CHF' => 'CHF - Swiss Franc',
-	              'CZK' => 'CZK - Czech Koruna',
-	              'DKK' => 'DKK - Danish Krone',
-	              'EUR' => 'EUR - Euro',
-	              'GBP' => 'GBP - Pound Sterling',
-	              'ILS' => 'ILS - Israeli Shekel',
-	              'HKD' => 'HKD - Hong Kong Dollar',
-	              'HUF' => 'HUF - Hungarian Forint',
-	              'JPY' => 'JPY - Japanese Yen',
-	              'MYR' => 'MYR - Malaysian Ringgits',
-	              'MXN' => 'MXN - Mexican Peso',
-	              'NOK' => 'NOK - Norwegian Krone',
-	              'NZD' => 'NZD - New Zealand Dollar',
-	              'PHP' => 'PHP - Philippine Pesos',
-	              'PLN' => 'PLN - Polish Zloty',
-								'RUB' => 'RUB - Russian Rubles',
-	              'SEK' => 'SEK - Swedish Krona',
-	              'SGD' => 'SGD - Singapore Dollar',
-	              'TWD' => 'TWD - Taiwan New Dollars',
-	              'THB' => 'THB - Thai Baht',
-								'TRY' => 'TRY - Turkish lira',
-	              'USD' => 'USD - U.S. Dollar'
-	          );
-
-          foreach ($currencies as $k => $v) {
-              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
-          }
-          ?>
-          </select>
-        </td>
-        </tr>
-        <tr>
-				<th scope="row"><?php _e('PayPal Mode', 'mp') ?></th>
-				<td>
-				<select name="mp[gateways][paypal-express][mode]">
-          <option value="sandbox"<?php selected($settings['gateways']['paypal-express']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-          <option value="live"<?php selected($settings['gateways']['paypal-express']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
-        </select>
-				</td>
-        </tr>
-        <tr>
-				<th scope="row"><?php _e('PayPal API Credentials', 'mp') ?></th>
-				<td>
-  				<span class="description"><?php _e('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://www.x.com/developers/paypal/documentation-tools/express-checkout/integration-guide/ECAPICredentials">Instructions &raquo;</a>', 'mp') ?></span>
-          <p><label><?php _e('API Username', 'mp') ?><br />
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_user']) ? $settings['gateways']['paypal-express']['api_user'] : $mp->get_setting('gateways->paypal-express->api_user')); ?>" size="30" name="mp[gateways][paypal-express][api_user]" type="text" />
-          </label></p>
-          <p><label><?php _e('API Password', 'mp') ?><br />
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_pass']) ? $settings['gateways']['paypal-express']['api_pass'] : $mp->get_setting('gateways->paypal-express->api_pass')); ?>" size="20" name="mp[gateways][paypal-express][api_pass]" type="text" />
-          </label></p>
-          <p><label><?php _e('Signature', 'mp') ?><br />
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['api_sig']) ? $settings['gateways']['paypal-express']['api_sig'] : $mp->get_setting('gateways->paypal-express->api_sig')); ?>" size="70" name="mp[gateways][paypal-express][api_sig]" type="text" />
-          </label></p>
-        </td>
-        </tr>
-        <tr>
-				<th scope="row"><?php _e('PayPal Header Image (optional)', 'mp') ?></th>
-				<td>
-  				<span class="description"><?php _e('URL for an image you want to appear at the top left of the payment page. The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal recommends that you provide an image that is stored on a secure (https) server. If you do not specify an image, the business name is displayed.', 'mp') ?></span>
-          <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_img']) ? $settings['gateways']['paypal-express']['header_img'] : $mp->get_setting('gateways->paypal-express->header_img')); ?>" size="80" name="mp[gateways][paypal-express][header_img]" type="text" />
-          </p>
-        </td>
-        </tr>
-        <tr>
-				<th scope="row"><?php _e('PayPal Header Border Color (optional)', 'mp') ?></th>
-				<td>
-  				<span class="description"><?php _e('Sets the border color around the header of the payment page. The border is a 2-pixel perimeter around the header space, which is 750 pixels wide by 90 pixels high. By default, the color is black.', 'mp') ?></span>
-          <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_border']) ? $settings['gateways']['paypal-express']['header_border'] : $mp->get_setting('gateways->paypal-express->header_border')); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][header_border]" id="mp-hdr-bdr" type="text" />
-          </p>
-        </td>
-        </tr>
-        <tr>
-				<th scope="row"><?php _e('PayPal Header Background Color (optional)', 'mp') ?></th>
-				<td>
-  				<span class="description"><?php _e('Sets the background color for the header of the payment page. By default, the color is white.', 'mp') ?></span>
-          <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['header_back']) ? $settings['gateways']['paypal-express']['header_back'] : $mp->get_setting('gateways->paypal-express->header_back')); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][header_back]" id="mp-hdr-bck" type="text" />
-          </p>
-        </td>
-        </tr>
-        <tr>
-				<th scope="row"><?php _e('PayPal Page Background Color (optional)', 'mp') ?></th>
-				<td>
-  				<span class="description"><?php _e('Sets the background color for the payment page. By default, the color is white.', 'mp') ?></span>
-          <p>
-          <input value="<?php echo esc_attr(($settings['gateways']['paypal-express']['page_back']) ? $settings['gateways']['paypal-express']['page_back'] : $mp->get_setting('gateways->paypal-express->page_back')); ?>" size="6" maxlength="6" name="mp[gateways][paypal-express][page_back]" id="mp-pg-bck" type="text" />
-          </p>
-        </td>
-        </tr>
-      </table>
-    </div>
-  </div>
-  <?php
-}

@@ -726,6 +726,7 @@ class MarketPress_MS {
                   <li><?php _e('"show_price" - Whether to show the product price. Default: 1', 'mp') ?></li>
                   <li><?php _e('"text" - Choose "excerpt", "content", or "none". Default: excerpt', 'mp') ?></li>
                   <li><?php _e('"as_list" - Whether to show as an unordered list. Default: 0', 'mp') ?></li>
+                  <li><?php _e('"paginav" - Whether to show the prev/next pagination. Default: 1', 'mp') ?></li>
                   <li><?php _e('Example:', 'mp') ?> <em>[mp_list_global_products paginate="1" page="0" per_page="10" order_by="price" order="DESC" category="downloads"]</em></li>
                 </ul></p>
                 <span class="description"><?php _e('You may also use the mp_list_global_products() template function in your theme with the same arguments.', 'mp') ?></span>
@@ -979,6 +980,7 @@ class MarketPress_MS {
    *    bool show_price Optional, whether to show the product price. Default: true
    *    string text Optional, choose 'excerpt', 'content', or 'none'. Default: excerpt
    *    bool as_list Optional, true to show as unordered list. Default: false
+   *		bool paginav Optional, true to show the prev/next pagination links. Default: true
    *
    * @param string|array $attr Optional. Override default arguments.
    */
@@ -996,7 +998,7 @@ class MarketPress_MS {
   		'show_price' => true,
       'text' => 'excerpt',
   		'as_list' => false,
-  		'paginav' => false,
+  		'paginav' => true,
   	), $atts);
 
     $args['echo'] = false;
@@ -1111,6 +1113,7 @@ function mp_global_categories_list( $args = '' ) {
 		return;
 	
 	$tags = apply_filters('mp_global_categories_list_tags', $tags);
+	$list = '';
 
   //sort by name
   foreach ($tags as $tag) {
@@ -1238,6 +1241,7 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
  *    bool show_price Optional, whether to show the product price. Default: true
  *    string text Optional, choose 'excerpt', 'content', or 'none'. Default: excerpt
  *    bool as_list Optional, true to show as unordered list. Default: false
+ *		bool paginav Optional, true to show the prev/next pagination links. Default: false
  *
  * @param string|array $args Optional. Override default arguments.
  */
