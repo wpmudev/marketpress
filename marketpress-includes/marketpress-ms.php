@@ -147,7 +147,7 @@ class MarketPress_MS {
   //wrapper function for checking if global marketpress blog. Define MP_ROOT_BLOG with a blog_id to override
   function is_main_site() {
     global $wpdb;
-    if ( defined( 'MP_ROOT_BLOG' ) ) {
+    if ( MP_ROOT_BLOG !== false ) {
       return $wpdb->blogid == MP_ROOT_BLOG;
     } else {
       return is_main_site();
@@ -1056,7 +1056,7 @@ $mp_wpmu = new MarketPress_MS();
 
 function mp_main_site_id() {
   global $current_site;
-  if ( defined( 'MP_ROOT_BLOG' ) ) {
+  if ( MP_ROOT_BLOG !== false ) {
     return MP_ROOT_BLOG;
   } else {
     return $current_site->blog_id;

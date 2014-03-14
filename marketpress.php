@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.2.8
+Version: 2.9.2.9
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2.8';
+	var $version = '2.9.2.9';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -80,7 +80,7 @@ class MarketPress {
 	 $this->install();
 	 add_action('wpmu_new_blog', array(&$this, 'setup_new_blog'), 10, 6);	 
 
-	if ( ! defined( 'MP_LITE' ) ) {
+	if ( MP_LITE === false ) {
 		//load dashboard notice
 		global $wpmudev_notices;
 		$wpmudev_notices[] = array( 'id'=> 144,'name'=> 'MarketPress', 'screens' => array( 'edit-product', 'product', 'edit-product_category', 'edit-product_tag', 'product_page_marketpress-orders', 'product_page_marketpress', 'settings_page_marketpress-ms-network' ) );
@@ -159,7 +159,7 @@ class MarketPress {
 		add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
 		add_action( 'init', array(&$this, 'flush_rewrite_check'), 99 );
-		if ( !defined('MP_HIDE_MENUS') ) { //allows you to hide MP menus
+		if ( MP_HIDE_MENUS === false ) { //allows you to hide MP menus
 			add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
 			add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
 		}
@@ -453,6 +453,9 @@ Thanks again!", 'mp')
 		$this->plugin_dir = plugin_dir_path(__FILE__) . 'marketpress-includes/';
 		$this->plugin_url = plugin_dir_url(__FILE__) . 'marketpress-includes/';
 
+		//load constants
+		require_once( $this->plugin_dir . 'constants.php' );
+		
 		//load data structures
 		require_once( $this->plugin_dir . 'marketpress-data.php' );
 	}
@@ -688,7 +691,7 @@ Thanks again!", 'mp')
 	 add_action( 'admin_print_scripts-' . $page, array(&$this, 'admin_script_settings') );
 	 add_action( 'admin_print_styles-' . $page, array(&$this, 'admin_css_settings') );
 	
-		if ( !defined('WPMUDEV_REMOVE_BRANDING') ) {
+		if ( WPMUDEV_REMOVE_BRANDING === false ) {
 			add_action( "load-{$page}", array( &$this, 'add_help_tab' ) );
 		}
 	}
@@ -727,7 +730,7 @@ Thanks again!", 'mp')
 	 if ($this->language != 'en')
 		wp_enqueue_script( 'jquery-datepicker-i18n', $this->plugin_url . 'datepicker/js/jquery-ui-i18n.min.js', array('jquery', 'jquery-ui-core', 'jquery-datepicker'), $this->version);
 
-		if (!defined('WPMUDEV_REMOVE_BRANDING') && intval($this->get_setting('hide_popup')) < 3) {
+		if ( WPMUDEV_REMOVE_BRANDING === false && intval($this->get_setting('hide_popup')) < 3) {
 			wp_enqueue_script( 'mp-need-help', $this->plugin_url . 'js/need-help.js', array('jquery'), $this->version);
 			$new_count = intval($this->get_setting('hide_popup')) + 1;
 			$this->update_setting('hide_popup', $new_count);
@@ -1473,7 +1476,7 @@ Thanks again!", 'mp')
 
 	 echo '<select name="mp[store_theme]">';
 	 foreach ($theme_list as $value => $name) {
-		$disabled = (defined('MP_LITE') && $value != 'icons') ? ' disabled="disabled"' : '';
+		$disabled = (MP_LITE === true && $value != 'icons') ? ' disabled="disabled"' : '';
 		?><option value="<?php echo $value ?>"<?php selected($this->get_setting('store_theme'), $value); echo $disabled; ?>><?php echo $name ?></option><?php
 	}
 	 ?>
@@ -2320,7 +2323,7 @@ Thanks again!", 'mp')
 	 global $post;
 		$meta = $this->get_meta_details( $post->ID );
 	 ?>
-	 <?php if ( defined( 'MP_LITE' ) ) { ?>
+	 <?php if ( MP_LITE === true ) { ?>
 	 <a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable item personalization &raquo;', 'mp'); ?></a><br />
 	 <?php } ?>
 	 <input type="hidden" name="mp_product_meta" value="1" />
@@ -2351,12 +2354,12 @@ Thanks again!", 'mp')
 							<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="<?php echo isset($meta["mp_price"][$key]) ? $this->display_currency($meta["mp_price"][$key]) : '0.00'; ?>" /></td>
 							<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="<?php echo isset($meta["mp_sale_price"][$key]) ? $this->display_currency($meta["mp_sale_price"][$key]) : $this->display_currency($meta["mp_price"][$key]); ?>" disabled="disabled" /></td>
 							<td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="<?php echo isset($meta["mp_inventory"][$key]) ? intval($meta["mp_inventory"][$key]) : 0; ?>" disabled="disabled" /></td>
-							<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[<?php echo $key; ?>]" value="1" <?php checked(!defined('MP_LITE') && isset($meta['mp_has_custom_field'][$key]) && $meta['mp_has_custom_field'][$key]); echo defined('MP_LITE') ? ' disabled="disabled"' : ''; ?> /></td>
+							<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[<?php echo $key; ?>]" value="1" <?php checked(MP_LITE === false && isset($meta['mp_has_custom_field'][$key]) && $meta['mp_has_custom_field'][$key]); echo MP_LITE === true ? ' disabled="disabled"' : ''; ?> /></td>
 							<td class="mp_var_remove">
 							<?php if ($count == $last) { ?><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a><?php } ?>
 							</td>
 						</tr>
-						<tr class="variation-custom-field <?php echo (defined('MP_LITE') || !isset($meta['mp_has_custom_field'][$key]) || !$meta['mp_has_custom_field'][$key]) ? ' variation-custom-field-hidden' : ''; ?>">
+						<tr class="variation-custom-field <?php echo (MP_LITE === true || !isset($meta['mp_has_custom_field'][$key]) || !$meta['mp_has_custom_field'][$key]) ? ' variation-custom-field-hidden' : ''; ?>">
 							<td class="mp_custom_label_col" colspan="1">
 								<input type="hidden" class="mp_custom_field_type" name="mp_custom_field_type[<?php echo $key; ?>]" value="input" />
 								<input type="hidden" class="mp_custom_field_per" name="mp_custom_field_per[<?php echo $key; ?>]" value="quantity" />
@@ -2378,7 +2381,7 @@ Thanks again!", 'mp')
 						<td class="mp_price_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_price[]" value="0.00" /></td>
 						<td class="mp_sale_col"><?php echo $this->format_currency(); ?><input type="text" name="mp_sale_price[]" value="0.00" disabled="disabled" /></td>
 				<td class="mp_inv_col"><input type="text" name="mp_inventory[]" value="0" disabled="disabled" /></td>
-						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="1"<?php echo defined('MP_LITE') ? ' disabled="disabled"' : ''; ?> /></td>
+						<td class="mp_custom_field_col"><input type="checkbox" class="mp_has_custom_field" name="mp_has_custom_field[]" value="1"<?php echo MP_LITE === true ? ' disabled="disabled"' : ''; ?> /></td>
 						<td class="mp_var_remove"><a href="#mp_product_variations_table" title="<?php _e('Remove Variation', 'mp'); ?>">x</a></td>
 					</tr>
 					<tr class="variation-custom-field variation-custom-field-hidden">
@@ -4114,7 +4117,7 @@ Thanks again!", 'mp')
 		$url = apply_filters('mp_download_url', $url, $order, $download);
 
 		//if your getting out of memory errors with large downloads, you can use a redirect instead, it's not so secure though
-		if ( defined('MP_LARGE_DOWNLOADS') && MP_LARGE_DOWNLOADS ) {
+		if ( MP_LARGE_DOWNLOADS === true ) {
 			 //attempt to record a download attempt
 			if (isset($download['downloaded'])) {
 				$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
@@ -5711,7 +5714,7 @@ Notification Preferences: %s', 'mp');
 		<?php if (!isset($_GET['post_status']) || $_GET['post_status'] != 'trash') { ?>
 			<div class="icon32"><img src="<?php echo $this->plugin_url . 'images/download.png'; ?>" /></div>
 			<h2><?php _e('Export Orders', 'mp'); ?></h2>
-			<?php if ( defined( 'MP_LITE' ) ) { ?>
+			<?php if ( MP_LITE === true ) { ?>
 			<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable CSV order exports &raquo;', 'mp'); ?></a><br />
 			<?php } ?>
 			<form action="<?php echo admin_url('admin-ajax.php?action=mp-orders-export'); ?>" method="post">
@@ -5757,7 +5760,7 @@ Notification Preferences: %s', 'mp');
 				<option<?php selected( $status, 'order_shipped' ); ?> value="order_shipped"><?php _e('Shipped', 'mp'); ?></option>
 				<option<?php selected( $status, 'order_closed' ); ?> value="order_closed"><?php _e('Closed', 'mp'); ?></option>
 			</select>
-			<input type="submit" value="<?php _e('Download &raquo;', 'mp'); ?>" name="export_orders" class="button-secondary"<?php echo defined( 'MP_LITE' ) ? ' disabled="disabled"' : ''; ?> />
+			<input type="submit" value="<?php _e('Download &raquo;', 'mp'); ?>" name="export_orders" class="button-secondary"<?php echo MP_LITE === true ? ' disabled="disabled"' : ''; ?> />
 			</form>
 
 
@@ -6171,10 +6174,10 @@ Notification Preferences: %s', 'mp');
 					 <tr>
 							<th scope="row"><?php _e('Google Analytics Ecommerce Tracking', 'mp') ?></th>
 					 <td>
-						<?php if ( defined( 'MP_LITE' ) ) { ?>
+						<?php if ( MP_LITE === true) { ?>
 						<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable Google Analytics Ecommerce Tracking &raquo;', 'mp'); ?></a><br />
 						<?php } ?>
-						<select name="mp[ga_ecommerce]"<?php echo defined( 'MP_LITE' ) ? ' disabled="disabled"' : ''; ?>>
+						<select name="mp[ga_ecommerce]"<?php echo MP_LITE === true ? ' disabled="disabled"' : ''; ?>>
 								<option value="none"<?php selected($this->get_setting('ga_ecommerce'), 'none') ?>><?php _e('None', 'mp') ?></option>
 								<option value="new"<?php selected($this->get_setting('ga_ecommerce'), 'new') ?>><?php _e('Asynchronous Tracking Code', 'mp') ?></option>
 								<option value="old"<?php selected($this->get_setting('ga_ecommerce'), 'old') ?>><?php _e('Old Tracking Code', 'mp') ?></option>
@@ -6718,7 +6721,7 @@ Notification Preferences: %s', 'mp');
 							<tr>
 					 <th scope="row"><?php _e('Store Style', 'mp') ?></th>
 						<td>
-						<?php if ( defined( 'MP_LITE' ) ) { ?>
+						<?php if ( MP_LITE === true ) { ?>
 						<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable all styles &raquo;', 'mp'); ?></a><br />
 						<?php } ?>
 						<?php $this->store_themes_select(); ?>
@@ -7268,14 +7271,14 @@ Notification Preferences: %s', 'mp');
 								<tr>
 								<th scope="row"><?php _e('Select Shipping Options', 'mp') ?></th>
 								<td>
-									<?php if ( defined( 'MP_LITE' ) ) { ?>
+									<?php if ( MP_LITE === true ) { ?>
 									<a class="mp-pro-update" href="https://premium.wpmudev.org/project/e-commerce/" title="<?php _e('Upgrade Now', 'mp'); ?> &raquo;"><?php _e('Upgrade to enable Calculated Shipping options &raquo;', 'mp'); ?></a><br />
 									<?php } ?>
 									<span class="description"><?php _e('Select which calculated shipping methods the customer will be able to choose from:', 'mp') ?></span><br />
 									<?php
 										foreach ((array)$mp_shipping_plugins as $code => $plugin) {
 											if (!$plugin[2]) continue; //skip non calculated
-											?><label><input type="checkbox" class="mp-shipping-method" name="mp[shipping][calc_methods][<?php echo $code; ?>]" value="<?php echo $code; ?>"<?php echo $this->get_setting("shipping->calc_methods->$code") ? ' checked="checked"' : ''; echo defined( 'MP_LITE' ) ? ' disabled="disabled"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
+											?><label><input type="checkbox" class="mp-shipping-method" name="mp[shipping][calc_methods][<?php echo $code; ?>]" value="<?php echo $code; ?>"<?php echo $this->get_setting("shipping->calc_methods->$code") ? ' checked="checked"' : ''; echo MP_LITE === true ? ' disabled="disabled"' : ''; ?> /> <?php echo esc_attr($plugin[1]); ?></label><br /><?php
 										}
 									?>
 								</td>

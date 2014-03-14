@@ -307,9 +307,9 @@ class CsvImporter extends MarketPress_Importer {
 		foreach ($products as $row) {
 			$product = array();
 			
-			if (empty($row['title']) || empty($row['price']))
+			if (empty($row['title']) || (empty($row['price']) && MP_IMPORT_ALLOW_NO_PRICE === false) )
 				continue;
-			
+				
 			//import product
 			$product['post_title'] = $row['title'];
 			$product['post_content'] = $row['description'];

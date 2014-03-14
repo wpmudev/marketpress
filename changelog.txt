@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.2.9 - 3/14/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Added MP_IMPORT_ALLOW_NO_PRICE constant to allow importing of products with no price
+
+2.9.2.8 - 3/14/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Updated order status screens to reflect new coupon changes from 2.9.2.7
+- Added coupon code to discount column in admin orders screen
+
 2.9.2.7 - 3/13/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Fixed: In USPS shipping settings, services could not be unchecked

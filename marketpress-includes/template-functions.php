@@ -694,7 +694,7 @@ function _mp_cart_login($echo = false) {
 
 		$content = '';
 		//don't show if logged in
-		if (is_user_logged_in() || defined('MP_HIDE_LOGIN_OPTION')) {
+		if (is_user_logged_in() || MP_HIDE_LOGIN_OPTION === true) {
 				$content .= '<p class="mp_cart_direct_checkout">';
 				$content .= '<a class="mp_cart_direct_checkout_link" href="' . mp_checkout_step_url('shipping') . '">' . __('Checkout Now &raquo;', 'mp') . '</a>';
 				$content .= '</p>';
@@ -774,7 +774,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 
 		$content = '';
 		//don't show if logged in
-		if (!is_user_logged_in() && !defined('MP_HIDE_LOGIN_OPTION') && $editable) {
+		if (!is_user_logged_in() && MP_HIDE_LOGIN_OPTION !== true && $editable) {
 				$content .= '<p class="mp_cart_login_msg">';
 				$content .= __('Made a purchase here before?', 'mp') . ' <a class="mp_cart_login_link" href="' . wp_login_url(mp_checkout_step_url('shipping')) . '">' . __('Login now to retrieve your saved info &raquo;', 'mp') . '</a>';
 				$content .= '</p>';
@@ -1321,7 +1321,7 @@ function mp_order_status( $echo = true ) {
 								$content .= '<li>' . apply_filters('mp_order_status_label_order_total', __('Order Total', 'mp'), $order) . ': <strong>' . $mp->format_currency('', $order->mp_order_total) . '</strong></li>
 						</ul>';
 						
-						if (!defined('MP_HIDE_ORDERSTATUS_SHIPPING')) {
+						if ( MP_HIDE_ORDERSTATUS_SHIPPING !== true ) {
 							$content .= '
 								<h3>' . apply_filters('mp_order_status_section_title_shipping_info', __('Shipping Information', 'mp'), $order) . '</h3>
 								<table class="mp_cart_shipping">
