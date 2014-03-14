@@ -280,7 +280,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     */
     //set it up with PayPal
     $result = $this->SetExpressCheckout($global_cart, $shipping_info, $order_id);
-
+    
     //check response
     if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
       $token = urldecode($result["TOKEN"]);
@@ -927,7 +927,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     global $mp, $blog_id;
 	  $blog_id = (is_multisite()) ? $blog_id : 1;
 	  $current_blog_id = $blog_id;
-
+	  
 	  if (!$mp->global_cart) {
 	  	$selected_cart[$blog_id] = $global_cart;
 	  	$settings = get_option('mp_settings');
@@ -959,7 +959,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       if (!is_array($cart) || count($cart) == 0) {
 				continue;
       }
-      if (is_multisite()) {
+      if (is_multisite() && $bid != $blog_id) {
 				switch_to_blog($bid);
       }
 
@@ -988,16 +988,20 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			}
 
       $i = 0;
+      $coupon_code = $mp->get_coupon_code();
+      
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
+					$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+					$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+        	
 					//skip free products to avoid paypal error
-					if ($data['price'] <= 0)
+					if ($price <= 0)
 						continue;
 					
-					//we're sending tax included prices here is tax included is on, as paypal messes up rounding
-				  $totals[] = $data['price'] * $data['quantity'];
+				  $totals[] = $price;
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($data['price']);
+				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($price);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
@@ -1006,21 +1010,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				}
       }
       $total = array_sum($totals);
-
-      //coupon line
-      if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-				if (false === strpos($coupon['discount'], '%'))
-					$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $coupon['discount']) . ' ' . $this->currencyCode;
-				
-				$coupon_total = ($coupon['new_total'] <= 0) ? '0.01' : $coupon['new_total'];//if coupon makes it 0 then change to 1 cent to avoid errors
-				
-				$request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . urlencode(sprintf(__('%s Coupon discount'), $discount));
-				$request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($coupon_total-$total);
-				$request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($mp->get_coupon_code());
-				$request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
-				
-				$total = $coupon_total;
-      }
 
       $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
 
@@ -1161,10 +1150,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $args['body'] = $query_string;
 	  $args['sslverify'] = false;
 	  $args['timeout'] = 60;
+	  $args['httpversion'] = '1.1';	//api call will fail without this!
 		
 		//allow easy debugging
 		if ( defined("MP_DEBUG_API_$methodName") ) {
-			var_dump( $this->deformatNVP($query_string) );
+			print_r( $this->deformatNVP($query_string) );
 			die;
 		}
 		

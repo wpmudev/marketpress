@@ -405,6 +405,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				$shipping_prices = array();
 				$shipping_tax_prices = array();
 				$tax_prices = array();
+				$coupon_code = $mp->get_coupon_code();
+				
 				foreach ($selected_cart as $bid => $cart) {
 
 						if (is_multisite())
@@ -412,12 +414,24 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 						foreach ($cart as $product_id => $variations) {
 								foreach ($variations as $variation => $data) {
-										$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
-
+										$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+										$price = $price_before_tax * $data['quantity'];
+										$discount_price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+										$totals[] = $discount_price;
+										
 										$content .= '<tr>';
 										$content .= '	 <td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id, 50) . '</td>';
 										$content .= '	 <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML
-										$content .= '	 <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+										$content .= '	 <td class="mp_cart_col_price">';
+										
+										if ( $discount_price == $price ) {
+											$content .= $mp->format_currency('', $price);
+										} else {
+											$content .= '<del>' . $mp->format_currency('', $price) . '</del><br />';
+											$content .= $mp->format_currency('', $discount_price);
+										}
+											
+										$content .= '  </td>';
 										$content .= '	 <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $bid . ':' . $product_id . ':' . $variation . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $bid . ':' . $product_id . ':' . $variation . '" /> ' . __('Remove', 'mp') . '</label></td>';
 										$content .= '</tr>';
 								}
@@ -439,8 +453,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				$total = array_sum($totals);
 
 				//coupon line TODO - figure out how to apply them on global checkout
-				$coupon_code = $mp->get_coupon_code();
-				if ($coupon = $mp->coupon_value($coupon_code, $total)) {
+				if ( !empty($coupon_code) ) {
 						//dont' show confusing subtotal with tax inclusive pricing on
 						if (!$mp->get_setting('tax->tax_inclusive')) {
 								$content .= '<tr>';
@@ -449,12 +462,12 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 								$content .= '	 <td>&nbsp;</td>';
 								$content .= '</tr>';
 						}
+						
 						$content .= '<tr>';
-						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Discount:', 'mp') . '</td>';
-						$content .= '	 <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
+						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Coupon:', 'mp') . '</td>';
+						$content .= '	 <td class="mp_cart_col_discount">' . $coupon_code . '</td>';
 						$content .= '	 <td class="mp_cart_remove_coupon"><a href="?remove_coupon=1">' . __('Remove Coupon &raquo;', 'mp') . '</a></td>';
 						$content .= '</tr>';
-						$total = $coupon['new_total'];
 				} else {
 						$content .= '<tr>';
 						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="4">
@@ -511,6 +524,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				$shipping_prices = array();
 				$shipping_tax_prices = array();
 				$tax_prices = array();
+				$coupon_code = $mp->get_coupon_code();
+				
 				foreach ($selected_cart as $bid => $cart) {
 
 						if (is_multisite())
@@ -518,8 +533,6 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 						foreach ($cart as $product_id => $variations) {
 								foreach ($variations as $variation => $data) {
-										$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
-
 										$content .= '<tr>';
 										$content .= '	 <td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id, 75) . '</td>';
 										$content .= '	 <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
@@ -544,7 +557,22 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 										$content .= '</td>'; // Added WPML
 
 										$content .= '	 <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-										$content .= '	 <td class="mp_cart_col_price">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+										
+										$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+										$price = $price_before_tax * $data['quantity'];
+										$discount_price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+										$totals[] = $discount_price;
+										
+										$content .= '	 <td class="mp_cart_col_price">';
+										
+										if ( $discount_price == $price ) {
+											$content .= $mp->format_currency('', $discount_price);
+										} else {
+											$content .= '<del>' . $mp->format_currency('', $price) . '</del><br />';
+											$content .= $mp->format_currency('', $discount_price);
+										}
+										
+										$content .= '  </td>';
 										$content .= '</tr>';
 								}
 						}
@@ -565,8 +593,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				$total = array_sum($totals);
 
 				//coupon line TODO - figure out how to apply them on global checkout
-				$coupon_code = $mp->get_coupon_code();
-				if ($coupon = $mp->coupon_value($coupon_code, $total)) {
+				if ( !empty($coupon_code) ) {
 						
 						//dont' show confusing subtotal with tax inclusive pricing on
 						if (!$mp->get_setting('tax->tax_inclusive')) {
@@ -576,10 +603,9 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 								$content .= '</tr>';
 						}
 						$content .= '<tr>';
-						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Discount:', 'mp') . '</td>';
-						$content .= '	 <td class="mp_cart_col_discount">' . $coupon['discount'] . '</td>';
+						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Coupon:', 'mp') . '</td>';
+						$content .= '	 <td class="mp_cart_col_discount">' . $coupon_code . '</td>';
 						$content .= '</tr>';
-						$total = $coupon['new_total'];
 				}
 
 				//shipping line

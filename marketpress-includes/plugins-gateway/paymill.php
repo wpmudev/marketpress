@@ -377,17 +377,16 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
             $transactionsObject = new Services_Paymill_Transactions(PAYMILL_API_KEY, PAYMILL_API_HOST);
 
             $totals = array();
+            $coupon_code = $mp->get_coupon_code();
+             
             foreach ($cart as $product_id => $variations) {
                 foreach ($variations as $variation => $data) {
-                    $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+										$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+										$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);                
+                    $totals[] = $price;
                 }
             }
             $total = array_sum($totals);
-
-            //coupon line
-            if ($coupon = $mp->coupon_value($mp->get_coupon_code(), $total)) {
-                $total = $coupon['new_total'];
-            }
 
             //shipping line
             if ($shipping_price = $mp->shipping_price()) {

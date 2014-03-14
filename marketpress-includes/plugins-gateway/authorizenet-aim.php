@@ -504,22 +504,21 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         $payment->transaction($_SESSION['card_num']);
 
         $totals = array();
+        $coupon_code = $mp->get_coupon_code();
+        
         foreach ($cart as $product_id => $variations) {
             foreach ($variations as $variation => $data) {
                 $sku = empty($data['SKU']) ? "{$product_id}_{$variation}" : $data['SKU'];
                 //total on tax excluded
-                $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+								$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+								$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+                $totals[] = $price;
                 //display as tax inclusive
                 $payment->addLineItem($sku, substr($data['name'], 0, 31), substr($data['name'] . ' - ' . $data['url'], 0, 254), $data['quantity'], $data['price'], 1);
                 $i++;
             }
         }
         $total = array_sum($totals);
-
-        //coupon line
-        if ($coupon = $mp->coupon_value($mp->get_coupon_code(), $total)) {
-            $total = $coupon['new_total'];
-        }
 
         //shipping line
         if (($shipping_price = $mp->shipping_price()) !== false) {

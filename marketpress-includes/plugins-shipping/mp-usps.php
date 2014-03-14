@@ -441,6 +441,17 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	*  array. Don't forget to return!
 	*/
 	function process_shipping_settings($settings) {
+		//handle domestic services checkboxes
+		foreach ( $this->services as $service => $detail ) {
+			if ( !isset($_POST['mp']['shipping']['usps']['services'][$service]) )
+				$settings['shipping']['usps']['services'][$service] = 0;	
+		}
+		
+		//handle international services checkboxes
+		foreach ( $this->intl_services as $service => $detail ) {
+			if ( !isset($_POST['mp']['shipping']['usps']['intl_services'][$service]) )
+				$settings['shipping']['usps']['intl_services'][$service] = 0;	
+		}
 
 		return $settings;
 	}

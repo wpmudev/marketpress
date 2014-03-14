@@ -84,41 +84,26 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$purchaseID = $mp->generate_order_id(); //Order ID
 		$paymentType = 'ideal'; //Always ideal
 		$validUntil = date('Y-m-d\TG:i:s\Z', strtotime('+1 hour'));
+		$coupon_code = $mp->get_coupon_code();
 		
 		$i = 1;
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
 				//we're sending tax included prices here isf tax included is on, to avoid rounding errors
-				$totals[] = $data['price'] * $data['quantity'];
+				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+				$totals[] = $price;
 				$items[] = array(
 					'itemNumber'.$i => empty($data['SKU']) ? $product_id : substr($data['SKU'], 0, 12), // Article number
 					'itemDescription'.$i => substr($data['name'], 0, 32), // Description
 					'itemQuantity'.$i => $data['quantity'], // Quantity
-					'itemPrice'.$i =>  round($data['price']*100) // Artikel price in cents
+					'itemPrice'.$i =>  round($price*100) // Artikel price in cents
 				);
 				$i++;
 			}
 		}
 		$total = array_sum($totals);
 	
-		if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-
-			//	bereken de korting
-			$discount = ($total-$coupon['new_total']) * 100;
-						
-			//Add shipping as separate product
-			$items[] = array(
-				'itemNumber'.$i => '99999997', // Product number
-				'itemDescription'.$i => __('Coupon', 'mp'), // Description
-				'itemQuantity'.$i => 1, // Quantity
-				'itemPrice'.$i => -$discount // Product price in cents
-			);
-			$i++;
-			
-			//	update het totaal
-			$total = $coupon['new_total'];			
-		}
-		
 		//shipping line
 		if ( ($shipping_price = $mp->shipping_price()) !== false ) {
 			//adjust price if tax inclusive is on

@@ -615,6 +615,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
     global $mp;
     $settings = get_option('mp_settings');
     $network_settings = get_site_option('mp_network_settings');
+    $coupon_code = $mp->get_coupon_code();
     
 		$nvpstr = "actionType=PAY";
 		$nvpstr .= "&returnUrl=" . $this->returnURL;
@@ -626,16 +627,15 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$nvpstr .= "&memo=" . urlencode(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
     
 	  //loop through cart items
+	  
     foreach ($cart as $product_id => $variations) {
       foreach ($variations as $variation => $data) {
-      	$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);      
+      	$totals[] = $price;
       }
     }
 		$total = array_sum($totals);
-
-    //coupon line
-    if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) )
-      $total = $coupon['new_total'];
 
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {

@@ -140,12 +140,16 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		$item_params = array();
 		$i = 1;
 		$items = 0;
+		$coupon_code = $mp->get_coupon_code();
+		
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);			
+				$totals[] = $price;
 		    $item_params["shopping-cart.items.item-{$i}.item-name"] = $data['name'];
 				$item_params["shopping-cart.items.item-{$i}.item-description"] = $data['url'];
-				$item_params["shopping-cart.items.item-{$i}.unit-price"] = $data['price'];
+				$item_params["shopping-cart.items.item-{$i}.unit-price"] = $price;
 				$item_params["shopping-cart.items.item-{$i}.unit-price.currency"] = $this->currencyCode;
 				$item_params["shopping-cart.items.item-{$i}.quantity"] = $data['quantity'];
 				$item_params["shopping-cart.items.item-{$i}.merchant-item-id"] = $data['SKU'];
@@ -155,18 +159,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		}
 		
 		$total = array_sum($totals);
-		
-		if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-		  $total = $coupon['new_total'];
-		  $params["shopping-cart.items.item-1.item-name"] = __('Order ID: ', 'mp') . $order_id;
-			$params["shopping-cart.items.item-1.item-description"] = sprintf( __('Cart Subtotal for %d Items', 'mp'), $items);
-			$params["shopping-cart.items.item-1.unit-price"] = $total;
-			$params["shopping-cart.items.item-1.unit-price.currency"] = $this->currencyCode;
-			$params["shopping-cart.items.item-1.quantity"] = 1;
-			$params["shopping-cart.items.item-1.merchant-item-id"] = $order_id;
-		} else {
-      $params = array_merge($params, $item_params);
-		}
+    $params = array_merge($params, $item_params);
 
 		//shipping line
 		if ( ($shipping_price = $mp->shipping_price()) !== false ) {

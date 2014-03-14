@@ -139,10 +139,15 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 
         $totals = array();
         $product_count = 0;
+        $coupon_code = $mp->get_coupon_code();
+        
         foreach ($cart as $product_id => $variations) {
             foreach ($variations as $data) {
+								$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+								$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+            
                 //we're sending tax included prices here if tax included is on
-                $totals[] = $data['price'] * $data['quantity'];
+                $totals[] = $price;
                 $product_count++;
             }
         }
@@ -156,12 +161,6 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
         $params["amount{$i}"] = $mp->display_currency($total);
         $params["amount{$i}_description"] = sprintf(__('Cart Subtotal for %d Items:', 'mp'), $product_count);
         $i++;
-
-        if ($coupon = $mp->coupon_value($mp->get_coupon_code(), $total)) {
-            $total = $coupon['new_total'];
-            $params["detail2_text"] = $coupon['discount'];
-            $params["detail2_description"] = __('Coupon Discount:', 'mp');
-        }
 
         //shipping line
         if (($shipping_price = $mp->shipping_price()) !== false) {

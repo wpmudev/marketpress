@@ -5,6 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.2.7 - 3/13/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Fixed: In USPS shipping settings, services could not be unchecked
+- Sessions are now only initialized when needed instead of on globally
+- Coupon discounts are now applied to each applicable product instead of the cart as a whole (fixes "applies to" rules not working correctly)
+
 2.9.2.6 - 3/13/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Fixed: "Uncaught TypeError: Object [object Object] has no method 'ColorPicker'" on network settings screen http://wp.mu/900

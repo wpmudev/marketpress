@@ -89,27 +89,27 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$parameters['surcharge_rates'] = 'VI/MC=0.0,AX=1.5,DC=1.5';
 		
 		$i = 1;
+		$coupon_code = $mp->get_coupon_code();
+		
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
+				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);			
 				$items[] = array(
 					'itemNumber'.$i => $data['SKU'], // Article number
 					'itemDescription'.$i => $data['name'], // Description
 					'itemQuantity'.$i => $data['quantity'], // Quantity
-					'itemPrice'.$i =>  round($data['price']*100) // Artikel price in cents
+					'itemPrice'.$i =>  round($price*100) // Artikel price in cents
 				);
 				if ( $data['quantity'] != 0 && $data['quantity'] != null )
 				{
-					$parameters[$data['name']] = $data['quantity'] . ',' . $mp->before_tax_price($data['price'], $product_id);
+					$parameters[$data['name']] = $data['quantity'] . ',' . $price / $data['quantity'];
 				}
 				$i++;
-				$totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+				$totals[] = $price;
 			}
 		}
 		$total = array_sum($totals);
-		if ( $coupon = $mp->coupon_value($mp->get_coupon_code(), $total) ) {
-			$parameters["Discount"] = '1,'.($coupon['new_total']-$total);
-			$total = $coupon['new_total'];
-		}
 		
 		//shipping line
 		if ( ($shipping_price = $mp->shipping_price()) !== false ) {

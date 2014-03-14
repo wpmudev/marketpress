@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.2.6
+Version: 2.9.2.7
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.2.6';
+	var $version = '2.9.2.7';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -76,9 +76,6 @@ class MarketPress {
 	 //setup our variables
 	 $this->init_vars();
 	 
-	 //initialize session
-	 $this->start_session();
-	 
 	 //maybe install
 	 $this->install();
 	 add_action('wpmu_new_blog', array(&$this, 'setup_new_blog'), 10, 6);	 
@@ -109,6 +106,9 @@ class MarketPress {
 			if ( $network_settings['global_cart'] )
 				$this->global_cart = true;
 	 }
+	 	
+	 	//initialize the session for admin screens that need it
+	 	add_action('current_screen', array(&$this, 'admin_start_session'));
 	 
 	 	//make sure admin_url() returns proper scheme - set to super low priority to make sure this is run last
 	 	add_filter('admin_url', array(&$this, 'filter_admin_url'), 999);
@@ -199,6 +199,13 @@ class MarketPress {
 		add_action( 'profile_update', array(&$this, 'user_profile_update') );
 		add_action( 'edit_user_profile', array(&$this, 'user_profile_fields') );
 		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
+	}
+	
+	function admin_start_session() {
+		$screen = get_current_screen();
+		if ( $screen->id == 'profile' || $screen->id == 'user-edit' || $screen->id == 'user-new' ) {
+			$this->start_session();
+		}
 	}
 	
 	function setup_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
@@ -1136,6 +1143,9 @@ Thanks again!", 'mp')
 
 	 //load proper theme for checkout page
 	 if ($wp_query->query_vars['pagename'] == 'cart') {
+	 	//start the session
+	 	$this->start_session();
+	 	
 		//process cart updates
 		$this->update_cart();
 
@@ -2673,7 +2683,8 @@ Thanks again!", 'mp')
 
 	 //get total after any coupons
 	 $totals = array();
-		$special_totals = array();
+	 $special_totals = array();
+	 $coupon_code = $this->get_coupon_code();
 	 foreach ($cart as $product_id => $variations) {
 			//check for special rate
 			$special = (bool)get_post_meta($product_id, 'mp_is_special_tax', true);
@@ -2683,25 +2694,24 @@ Thanks again!", 'mp')
 				//if not taxing digital goods, skip them completely
 				if ( !$this->get_setting('tax->tax_digital') && isset($data['download']) && is_array($data['download']) )
 					continue;
+
+				$price_before_tax = $this->before_tax_price($data['price'], $product_id);
+				$price = $this->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
 				
 				if ($special)
-					$special_totals[] = ($this->before_tax_price($data['price'], $product_id) * $data['quantity']) * $special_rate;
+					$special_totals[] = $price * $special_rate;
 				else
-					$totals[] = $this->before_tax_price($data['price'], false) * $data['quantity'];
+					$totals[] = $price;
 			}
 	 }
-
+	 
 	 $total = array_sum($totals);
 		$special_total = array_sum($special_totals);
-
-	 $coupon_code = $this->get_coupon_code();
-	 if ( $coupon = $this->coupon_value($coupon_code, $total) )
-			$total = $coupon['new_total'];
 
 	 //add in shipping?
 	 if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) )
 			$total += $shipping_price;
-
+			
 	 //check required fields
 	 if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
 		return false;
@@ -3109,9 +3119,18 @@ Thanks again!", 'mp')
 		//add coupon code
 		if (!empty($_POST['coupon_code'])) {
 			 if ($this->check_coupon($_POST['coupon_code'])) {
-				 //get coupon code
 				 //set a flag so all other coupons will be processed
-				 $can_apply	 = $this->coupon_applicable( $_POST['coupon_code'], $product_id );
+				 $cart = $this->get_cart_contents($this->global_cart);
+				 $can_apply = false;
+				 
+				 foreach ( $cart as $product_id => $product ) {
+				 	//loop through the cart and check each product - just need one "true" response
+					 if ( $this->coupon_applicable($_POST['coupon_code'], $product_id) ) {
+						 $can_apply = true;
+						 break;
+					 }
+				 }
+				 
 				 //check the flag before applying the coupon
 				 if( $can_apply ) {
 					
@@ -3465,7 +3484,8 @@ Thanks again!", 'mp')
 	* Checks a coupon to see if it can be applied to a product.
 	*
 	* @param string The coupon code
-	* @param int The product ID we are checking
+	* @param int The product we are checking
+	* @return bool
 	*/
 	function coupon_applicable( $code, $product_id ) {
 		$can_apply = true;
@@ -3523,6 +3543,16 @@ Thanks again!", 'mp')
 	 } else {
 		return false;
 	 }
+	}
+	
+	//get the price for a product with coupon applied (if applicable)
+	function coupon_value_product($code, $price, $product_id) {
+		if ( $this->coupon_applicable($code, $product_id) ) {
+			$discount = $this->coupon_value($code, $price);
+			return ( $discount === false ) ? $price : $discount['new_total'];
+		}
+		
+		return $price;
 	}
 
 	//record coupon use. Returns boolean successful
@@ -4425,61 +4455,62 @@ Thanks again!", 'mp')
 	 if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
 		$order_info = $order_info_sku = __('Items:', 'mp') . "\n";
 		foreach ($order->mp_cart_info as $product_id => $variations) {
-				foreach ($variations as $variation => $data) {
-					$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
-					$order_info_sku .= "\t" . $data['name'] . ' - ' . $data['sku'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+			foreach ($variations as $variation => $data) {
+				$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+				$order_info_sku .= "\t" . $data['name'] . ' - ' . $data['sku'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
-					//show download link if set
-					if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title)) {
-					$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
-						$order_info_sku .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
-					}
-
-					// FPM: Product Custom Fields
-					$cf_key = $bid .':'. $product_id .':'. $variation;
-					if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-						$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-	
-						$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
-						if (isset($mp_custom_field_label[$variation]))
-							$label_text = esc_attr($mp_custom_field_label[$variation]);
-						else
-							$label_text = __('Product Personalization: ', 'mp');
-	
-						$order_info .= "\t\t" . $label_text	 ."\n";
-						$order_info_sku .= "\t\t" . $label_text	 ."\n";
-						foreach($cf_items as $idx => $cf_item) {
-							$item_cnt = intval($idx)+1;
-							$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item	."\n";
-							$order_info_sku .= "\t\t\t" . $item_cnt .". ". $cf_item	 ."\n";
-						}
-					}
-					$order_info .= "\n";
-					$order_info_sku .= "\n";
+				//show download link if set
+				if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title)) {
+				$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
+					$order_info_sku .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
 				}
+
+				// FPM: Product Custom Fields
+				$cf_key = $bid .':'. $product_id .':'. $variation;
+				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+
+					$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
+					if (isset($mp_custom_field_label[$variation]))
+						$label_text = esc_attr($mp_custom_field_label[$variation]);
+					else
+						$label_text = __('Product Personalization: ', 'mp');
+
+					$order_info .= "\t\t" . $label_text	 ."\n";
+					$order_info_sku .= "\t\t" . $label_text	 ."\n";
+					foreach($cf_items as $idx => $cf_item) {
+						$item_cnt = intval($idx)+1;
+						$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item	."\n";
+						$order_info_sku .= "\t\t\t" . $item_cnt .". ". $cf_item	 ."\n";
+					}
+				}
+				$order_info .= "\n";
+				$order_info_sku .= "\n";
 			}
+		}
+		
 		$order_info .= "\n";
 		$order_info_sku .= "\n";
-	 }
-	 //coupon line
-	 if ( $order->mp_discount_info ) {
-			if (false !== strpos($order->mp_discount_info['discount'], '%'))
-				$discount = str_replace('%', '%%', $order->mp_discount_info['discount']); //have to escape % sign so sprintf doesn't choke
-			else
-				$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $order->mp_discount_info['discount']) . ' ' . $order->mp_payment_info['currency'];
+	}
+	//coupon line
+	if ( $order->mp_discount_info ) {
+		$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $order->mp_discount_info['discount']) . ' ' . $order->mp_payment_info['currency'];
 		$order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
-			$order_info_sku .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
-	 }
-	 //shipping line
-	 if ( $order->mp_shipping_total ) {
+		$order_info_sku .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
+	}
+	
+	//shipping line
+	if ( $order->mp_shipping_total ) {
 		$order_info .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($this->get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
-			$order_info_sku .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($this->get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
-		}
-	 //tax line
-	 if ( $order->mp_tax_total ) {
+		$order_info_sku .= "\n" . __('Shipping:', 'mp') . ' ' . number_format_i18n($this->get_display_shipping($order), 2) . ' ' . $order->mp_payment_info['currency'];
+	}
+	
+	//tax line
+	if ( $order->mp_tax_total ) {
 		$order_info .= "\n" . esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))) . ': ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
-			$order_info_sku .= "\n" . esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))) . ': ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
-	 }
+		$order_info_sku .= "\n" . esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))) . ': ' . number_format_i18n((float)$order->mp_tax_total, 2) . ' ' . $order->mp_payment_info['currency'];
+	}
+	
 	 //total line
 	 $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
 		$order_info_sku .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];

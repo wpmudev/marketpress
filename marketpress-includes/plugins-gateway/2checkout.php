@@ -124,10 +124,13 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
         $counter = 1;
 
         $params["id_type"] = 1;
+        $coupon_code = $mp->get_coupon_code();
 
         foreach ($cart as $product_id => $variations) {
             foreach ($variations as $variation => $data) {
-                $totals[] = $mp->before_tax_price($data['price'], $product_id) * $data['quantity'];
+            		$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
+								$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+                $totals[] = $price;
 
                 $suffix = "_{$counter}";
 
@@ -145,10 +148,6 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
         }
 
         $total = array_sum($totals);
-
-        if ($coupon = $mp->coupon_value($mp->get_coupon_code(), $total)) {
-            $total = round($coupon['new_total'], 2);
-        }
 
         //shipping line
         if (($shipping_price = $mp->shipping_price()) !== false) {
