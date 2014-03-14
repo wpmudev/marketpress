@@ -2143,10 +2143,11 @@ Thanks again!", 'mp')
 				break;
 
 		case "mp_orders_discount":
-			if (isset($meta["mp_discount_info"][0]) && $meta["mp_discount_info"][0])
-					echo $meta["mp_discount_info"][0]['discount'];
-			else
-			 _e('N/A', 'mp');
+			if (isset($meta["mp_discount_info"][0]) && $meta["mp_discount_info"][0]) {
+				echo $meta["mp_discount_info"][0]['discount'] . ' (' . strtoupper($meta["mp_discount_info"][0]['code']) . ')';
+			} else {
+				_e('N/A', 'mp');
+			}
 				break;
 
 		case "mp_orders_total":
@@ -3868,27 +3869,14 @@ Thanks again!", 'mp')
 					foreach ($variations as $variation => $data) {
 						if (!empty($fields['items']))
 							$fields['items'] .= "\r\n";
+							
 						if (!empty($data['SKU']))
 							$fields['items'] .= '[' . $data['SKU'] . '] ';
-						$fields['items'] .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' ' . $order->mp_payment_info['currency'];
-						/*
-						$cf_key = $bid .':'. $product_id .':'. $variation;
-						if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-							$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-		
-							$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
-							if (isset($mp_custom_field_label[$variation]))
-								$label_text = esc_attr($mp_custom_field_label[$variation]);
-							else
-								$label_text = __('Product Personalization', 'mp');
-		
-							$fields['items'] .= "\r\n\t" . $label_text	.": ";
-							foreach($cf_items as $idx => $cf_item) {
-								$item_cnt = intval($idx)+1;
-								$fields['items'] .= $cf_item;
-							}
-						}
-						*/
+						
+						$price_before_tax = $this->before_tax_price($data['price'], $product_id);
+						$price = $this->coupon_value_product($fields['coupon_code'], $price_before_tax * $data['quantity'], $product_id);
+						
+						$fields['items'] .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($price / $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'];
 					}
 				}
 			} else {
@@ -5140,23 +5128,57 @@ Notification Preferences: %s', 'mp');
 			 <?php
 					global $blog_id;
 					$bid = (is_multisite()) ? $blog_id : 1; // FPM
+					$coupon_code = is_array($order->mp_discount_info) ? $order->mp_discount_info['code'] : '';
+										
 
 			 if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
 				foreach ($order->mp_cart_info as $product_id => $variations) {
 							//for compatibility for old orders from MP 1.0
 							if (isset($variations['name'])) {
-						$data = $variations;
+								$data = $variations;
+								$price = $this->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+								$price_text = '';
+								
+								//price text
+								if ( $price != $data['before_tax_price'] ) {
+									$price_text = '<del>' . $this->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+								}
+								
+								$price_text .= $this->format_currency('', $price / $data['quantity']);
+	
+								//subtotal text
+								if ( $price != $data['before_tax_price'] ) {
+									$subtotal_text = '<del>' . $this->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+								}
+								$subtotal_text .= $this->format_currency('', $price);
+						
 					 echo '<tr>';
 						echo '	<td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
 						echo '	<td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
 						echo '	<td class="mp_cart_col_product"><a href="' . get_permalink($product_id) . '">' . esc_attr($data['name']) . '</a></td>';
 						echo '	<td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-						echo '	<td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
-						echo '	<td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+						echo '	<td class="mp_cart_col_price">' . $price_text . '</td>';
+						echo '	<td class="mp_cart_col_subtotal">' . $subtotal_text . '</td>';
 						echo '	<td class="mp_cart_col_downloads">' . __('N/A', 'mp') . '</td>';
 						echo '</tr>';
 							} else {
 								foreach ($variations as $variation => $data) {
+									$price = $this->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+									$price_text = '';
+									
+									//price text
+									if ( $price != $data['before_tax_price'] ) {
+										$price_text = '<del>' . $this->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+									}
+									
+									$price_text .= $this->format_currency('', $price / $data['quantity']);
+		
+									//subtotal text
+									if ( $price != $data['before_tax_price'] ) {
+										$subtotal_text = '<del>' . $this->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+									}
+									$subtotal_text .= $this->format_currency('', $price);
+								
 							 echo '<tr>';
 							 echo '	<td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
 							 echo '	<td class="mp_cart_col_sku">' . esc_attr($data['SKU']) . '</td>';
@@ -5182,8 +5204,8 @@ Notification Preferences: %s', 'mp');
 			
 									echo '</td>';
 							 echo '	<td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-							 echo '	<td class="mp_cart_col_price">' . $this->format_currency('', $data['price']) . '</td>';
-							 echo '	<td class="mp_cart_col_subtotal">' . $this->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+							 echo '	<td class="mp_cart_col_price">' . $price_text . '</td>';
+							 echo '	<td class="mp_cart_col_subtotal">' . $subtotal_text . '</td>';
 									if (is_array($data['download']))
 										 echo '	 <td class="mp_cart_col_downloads">' . number_format_i18n($data['download']['downloaded']) . (($data['download']['downloaded'] >= $max_downloads) ? __(' (Limit Reached)', 'mp') : '')	 . '</td>';
 									else

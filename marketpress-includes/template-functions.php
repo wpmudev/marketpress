@@ -1201,21 +1201,56 @@ function mp_order_status( $echo = true ) {
 										</tr></thead>
 								<tbody>';
 								
+										$coupon_code = is_array($order->mp_discount_info) ? $order->mp_discount_info['code'] : '';
+										
 										if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
 												foreach ($order->mp_cart_info as $product_id => $variations) {
 														//for compatibility for old orders from MP 1.x
 														if (isset($variations['name'])) {
 																$data = $variations;
+																$price = $mp->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+																$price_text = '';
+																
+																//price text
+																if ( $price != $data['before_tax_price'] ) {
+																	$price_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+																}
+																
+																$price_text .= $mp->format_currency('', $price / $data['quantity']);
+									
+																//subtotal text
+																if ( $price != $data['before_tax_price'] ) {
+																	$subtotal_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+																}
+																$subtotal_text .= $mp->format_currency('', $price);
+																															
 																$content .= '<tr>';
 																$content .= '	<td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id) . '</td>';
 																$content .= '	<td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', get_permalink($product_id), $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML (This differs than other code)
 																$content .= '	<td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-																$content .= '	<td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
-																$content .= '	<td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+																$content .= '	<td class="mp_cart_col_price">' . $price_text . '</td>';
+																$content .= '	<td class="mp_cart_col_subtotal">' . $subtotal_text . '</td>';
 																$content .= '	<td class="mp_cart_col_downloads"></td>';
 																$content .= '</tr>';
 														} else {
 																foreach ($variations as $variation => $data) {
+																		$price = $mp->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+																		$price_text = '';
+																		
+																		//price text
+																		if ( $price != $data['before_tax_price'] ) {
+																			$price_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+																		}
+																		
+																		$price_text .= $mp->format_currency('', $price / $data['quantity']);
+											
+																		//subtotal text
+																		if ( $price != $data['before_tax_price'] ) {
+																			$subtotal_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+																		}
+																		$subtotal_text .= $mp->format_currency('', $price);
+
+																		
 																		$content .= '<tr>';
 																		$content .= '	<td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id) . '</td>';
 																		$content .= '	<td class="mp_cart_col_product"><a href="' . apply_filters('mp_product_url_display_in_cart', get_permalink($product_id), $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>';
@@ -1239,10 +1274,9 @@ function mp_order_status( $echo = true ) {
 																		}
 
 																		$content .= '</td>';
-
 																		$content .= '	<td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-																		$content .= '	<td class="mp_cart_col_price">' . $mp->format_currency('', $data['price']) . '</td>';
-																		$content .= '	<td class="mp_cart_col_subtotal">' . $mp->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+																		$content .= '	<td class="mp_cart_col_price">' . $price_text . '</td>';
+																		$content .= '	<td class="mp_cart_col_subtotal">' . $subtotal_text . '</td>';
 																		if (is_array($data['download']) && $download_url = $mp->get_download_url($product_id, $order->post_title)) {
 																				if ($order_paid) {
 																						//check for too many downloads
@@ -1271,12 +1305,12 @@ function mp_order_status( $echo = true ) {
 						
 								//coupon line
 								if ($order->mp_discount_info) {
-									$content .= '<li>' . apply_filters('mp_order_status_label_coupon_discount', __('Coupon Discount', 'mp'), $order) . ' <strong>' . $order->mp_discount_info['discount'] . '</strong></li>';
+									$content .= '<li>' . apply_filters('mp_order_status_label_coupon_discount', __('Coupon', 'mp'), $order) . ': <strong>' . strtoupper($order->mp_discount_info['code']) . '</strong></li>';
 								}
 
 								//shipping line
 								if ($order->mp_shipping_total) {
-									$content .= '<li>' . apply_filters('mp_order_status_label_shipping', __('Shipping', 'mp'), $order) . ' <strong>' . $mp->format_currency('', $mp->get_display_shipping($order)) . '</strong></li>';
+									$content .= '<li>' . apply_filters('mp_order_status_label_shipping', __('Shipping', 'mp'), $order) . ': <strong>' . $mp->format_currency('', $mp->get_display_shipping($order)) . '</strong></li>';
 								}
 
 								//tax line
