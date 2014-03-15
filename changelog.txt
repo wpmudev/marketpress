@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.3.1 - 3/15/2014 - Jonathan Cowher
+----------------------------------------------------------------------
+- Fixed: when using USPS shipping all shipping options would be available instead of only the ones selected in settings
+- Fixed: Taxes were being added to cart when they shouldn't have been
+
 2.9.3 - 3/14/2014 - Jonathan Cowher
 ----------------------------------------------------------------------
 - Fixed fatal error on checkout page that some users were reporting (specific to PHP version 5.3.1) 

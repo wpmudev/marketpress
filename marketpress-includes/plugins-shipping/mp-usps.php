@@ -664,9 +664,23 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	*/
 	function ratev4_request(){
 		global $mp;
-
-		$shipping_options = $this->usps_settings['services'];
-
+		
+		$settings = get_option('mp_settings');
+		$shipping_options = isset($settings['shipping']['usps']['services']) ? (array) $settings['shipping']['usps']['services'] : array();
+		$temp = array();
+		
+		//determine which options are enabled
+		foreach ( $shipping_options as $service => $enabled ) {
+			if ( $enabled )
+				$temp[$service] = $enabled;
+		}
+		
+		$shipping_options = $temp;
+		
+		if ( count($shipping_options) == 0 )
+			//no services enabled - bail
+			return array();
+			
 		$this->calculate_packages();
 
 		//Build XML. **Despite being XML the order of elements is important in a RateV4 request**
@@ -808,7 +822,21 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	function ratev2_request(){
 		global $mp;
 
-		$shipping_options = $this->usps_settings['intl_services'];
+		$settings = get_option('mp_settings');
+		$shipping_options = isset($settings['shipping']['usps']['intl_services']) ? (array) $settings['shipping']['usps']['intl_services'] : array();
+		$temp = array();
+		
+		//determine which options are enabled
+		foreach ( $shipping_options as $service => $enabled ) {
+			if ( $enabled )
+				$temp[$service] = $enabled;
+		}
+		
+		$shipping_options = $temp;
+		
+		if ( count($shipping_options) == 0 )
+			//no services enabled - bail
+			return array();
 
 		$this->calculate_packages();
 
