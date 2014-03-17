@@ -90,8 +90,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
 				//we're sending tax included prices here isf tax included is on, to avoid rounding errors
-				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+				$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
 				$totals[] = $price;
 				$items[] = array(
 					'itemNumber'.$i => empty($data['SKU']) ? $product_id : substr($data['SKU'], 0, 12), // Article number

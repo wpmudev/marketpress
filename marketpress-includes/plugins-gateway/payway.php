@@ -93,8 +93,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);			
+				$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);			
 				$items[] = array(
 					'itemNumber'.$i => $data['SKU'], // Article number
 					'itemDescription'.$i => $data['name'], // Description

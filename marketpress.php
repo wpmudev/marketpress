@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.1
+Version: 2.9.3.2
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.1';
+	var $version = '2.9.3.2';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -2689,73 +2689,78 @@ Thanks again!", 'mp')
 	 $totals = array();
 	 $special_totals = array();
 	 $coupon_code = $this->get_coupon_code();
-	 foreach ($cart as $product_id => $variations) {
+	 
+	 if ( !$this->get_setting('tax->tax_inclusive') ) {
+		 foreach ($cart as $product_id => $variations) {
 			//check for special rate
 			$special = (bool)get_post_meta($product_id, 'mp_is_special_tax', true);
 			if ($special)
 				$special_rate = get_post_meta($product_id, 'mp_special_tax', true);
+				
 			foreach ($variations as $variation => $data) {
 				//if not taxing digital goods, skip them completely
 				if ( !$this->get_setting('tax->tax_digital') && isset($data['download']) && is_array($data['download']) )
 					continue;
 
-				$price_before_tax = $this->before_tax_price($data['price'], $product_id);
-				$product_price = $this->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+				$product_price = $this->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
 				
 				if ($special)
 					$special_totals[] = $product_price * $special_rate;
 				else
 					$totals[] = $product_price;
 			}
-	 }
+		}
+	}	
+		
 	 
-	 $total = array_sum($totals);
-		$special_total = array_sum($special_totals);
+	$total = array_sum($totals);
+	$special_total = array_sum($special_totals);
 
-	 //add in shipping?
-	 if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) )
-			$total += $shipping_price;
+	//add in shipping?
+	if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) )
+		$total += $shipping_price;
 			
-	 //check required fields
-	 if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
+	//check required fields
+	if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
 		return false;
-	 }
+	}
 
-	 switch ($this->get_setting('base_country')) {
-			case 'US':
-				 //USA taxes are only for orders delivered inside the state
-				 if ($country == 'US' && $state == $this->get_setting('base_province'))
-				 $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
-				 break;
+	switch ($this->get_setting('base_country')) {
+		case 'US':
+		 //USA taxes are only for orders delivered inside the state
+		 if ($country == 'US' && $state == $this->get_setting('base_province'))
+		 $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+		 break;
 
-			case 'CA':
-				 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
-				if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
-					if (!is_null($this->get_setting("tax->canada_rate->$state")))
-						$price = round(($total * $this->get_setting("tax->canada_rate->$state")) + $special_total, 2);
-					else //backwards compat with pre 2.2 if per province rates are not set
-						$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
-				}
-				 break;
-
-			case 'AU':
-				 //Australia taxes orders in country
-				 if ($country == 'AU')
-				 $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
-				 break;
-
-			default:
-				 //EU countries charge VAT within the EU
-				 if ( in_array($this->get_setting('base_country'), $this->eu_countries) ) {
-				 if (in_array($country, $this->eu_countries))
+		case 'CA':
+			 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
+			if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
+				if (!is_null($this->get_setting("tax->canada_rate->$state")))
+					$price = round(($total * $this->get_setting("tax->canada_rate->$state")) + $special_total, 2);
+				else //backwards compat with pre 2.2 if per province rates are not set
 					$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
-				 } else {
-				 //all other countries use the tax outside preference
-				 if ($this->get_setting('tax->tax_outside') || (!$this->get_setting('tax->tax_outside') && $country == $this->get_setting('base_country')))
-					$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
-				 }
-				 break;
-	 }
+			}
+			 break;
+
+		case 'AU':
+			 //Australia taxes orders in country
+			 if ($country == 'AU')
+			 $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+			 break;
+
+		default:
+			 //EU countries charge VAT within the EU
+			 if ( in_array($this->get_setting('base_country'), $this->eu_countries) ) {
+			 if (in_array($country, $this->eu_countries))
+				$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+			 } else {
+			 //all other countries use the tax outside preference
+			 if ($this->get_setting('tax->tax_outside') || (!$this->get_setting('tax->tax_outside') && $country == $this->get_setting('base_country')))
+				$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+			 }
+			 break;
+	}
+	
 	 if (empty($price))
 			$price = 0;
 
@@ -2866,80 +2871,82 @@ Thanks again!", 'mp')
 
 	 $full_cart = array();
 	 foreach ($global_cart as $bid => $cart) {
-
-			if (is_multisite())
+			if ( is_multisite() && $bid != get_current_blog_id() )
 				switch_to_blog($bid);
 
-		$full_cart[$bid] = array();
-		foreach ($cart as $product_id => $variations) {
+			$full_cart[$bid] = array();
+			
+			foreach ($cart as $product_id => $variations) {
 				$product = get_post($product_id);
 
-				if ( empty($product) ) {
+				if ( empty($product) )
 					continue;
-				}
 
-			$full_cart[$bid][$product_id] = array();
-				foreach ($variations as $variation => $quantity) {
+				$full_cart[$bid][$product_id] = array();
+				
+				foreach ( $variations as $variation => $quantity ) {
 					//check stock
-			 if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+					if (get_post_meta($product_id, 'mp_track_inventory', true)) {
 						$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
-						if (!is_array($stock))
+						
+						if ( !is_array($stock) )
 						 	$stock[0] = $stock;
-					if ($stock[$variation] < $quantity) {
-						$this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of %1$s in stock. Your cart quantity has been changed to %2$s.", 'mp'), $product->post_title, number_format_i18n($stock[$variation])) );
-					$quantity = $stock[$variation];
+						 	
+					 	if ($stock[$variation] < $quantity) {
+							$this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of %1$s in stock. Your cart quantity has been changed to %2$s.", 'mp'), $product->post_title, number_format_i18n($stock[$variation])) );
+							$quantity = $stock[$variation];
 						}
 					}
 
-				//check limit if tracking on or downloadable
-	 			if (get_post_meta($product_id, 'mp_track_limit', true) || ( $this->get_setting('download_order_limit', 1) && $file = get_post_meta($product_id, 'mp_file', true) ) ) {
-
-						//if tracking is on and (no file or file with limit override off)
-						if (get_post_meta($product_id, 'mp_track_limit', true) && ( empty($file) || !$this->get_setting('download_order_limit', 1) ) ) {
+					//check limit if tracking on or is downloadable
+					if ( get_post_meta($product_id, 'mp_track_limit', true) || ($this->get_setting('download_order_limit', 1) && $file = get_post_meta($product_id, 'mp_file', true)) ) {
+						if ( get_post_meta($product_id, 'mp_track_limit', true) )
+							//limit tracking is on
 							$limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
-						} else {
+						elseif ( $this->get_setting('download_order_limit', 1) )
+							//limit digital products per order is on
 							$limit = array($variation => 1);
-						}
+					
+						if ( isset($limit) && $limit[$variation] && $limit[$variation] < $quantity) {
+				 			$this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s". Your cart quantity has been changed to %3$s.', 'mp'), number_format_i18n($limit[$variation]), $product->post_title, number_format_i18n($limit[$variation])) );
+				 			$quantity = $limit[$variation];
+				 		}
+				 	}
 
-					if ($limit[$variation] && $limit[$variation] < $quantity) {
-				 		$this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s". Your cart quantity has been changed to %3$s.', 'mp'), number_format_i18n($limit[$variation]), $product->post_title, number_format_i18n($limit[$variation])) );
-					$quantity = $limit[$variation];
-					}
-					}
-
-					$skus = maybe_unserialize(get_post_meta($product_id, 'mp_sku', true));
-					if (!is_array($skus))
+				 	$skus = maybe_unserialize(get_post_meta($product_id, 'mp_sku', true));
+				 	if ( !is_array($skus) )
 						$skus[0] = $skus;
+						
 					$var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
-					if (is_array($var_names) && count($var_names) > 1)
-						 $name = $product->post_title . ': ' . $var_names[$variation];
+					if ( is_array($var_names) && count($var_names) > 1 )
+						$name = $product->post_title . ': ' . $var_names[$variation];
 					else
-						 $name = $product->post_title;
+						$name = $product->post_title;
 
 					//get if downloadable
-			 if ( $download_url = get_post_meta($product_id, 'mp_file', true) )
-				$download = array('url' => $download_url, 'downloaded' => 0);
+					if ( $download_url = get_post_meta($product_id, 'mp_file', true) )
+						$download = array('url' => $download_url, 'downloaded' => 0);
 					else
-						 $download = false;
+						$download = false;
 
 					$full_cart[$bid][$product_id][$variation] = array('SKU' => $skus[$variation], 'name' => $name, 'url' => get_permalink($product_id), 'price' => $this->product_price($product_id, $variation), 'quantity' => $quantity, 'download' => $download);
 				}
+			}
 		}
-	 }
 
-	 if (is_multisite())
-	 	switch_to_blog($current_blog_id);
-
-	 //save to cache
-	 $this->cart_cache = $full_cart;
-
-	 if ($global) {
-		return $full_cart;
-	 } else {
+		if (is_multisite())
+			switch_to_blog($current_blog_id);
+	
+		//save to cache
+		$this->cart_cache = $full_cart;
+	
+		if ( $global ) {
+			return $full_cart;
+		} else {
 			if (isset($full_cart[$blog_id])) {
-			 return $full_cart[$blog_id];
+				return $full_cart[$blog_id];
 			} else {
-			 return array();
+				return array();
 			}
 		}
 	}
@@ -3024,19 +3031,25 @@ Thanks again!", 'mp')
 			 $return = 1 . '||';
 			}
 		}
-
+		
 		//check limit if tracking on or downloadable
-	 	if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
-				$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
-			 if ($limit[$variation] && $limit[$variation] < $new_quantity) {
+	 	if ( get_post_meta($product_id, 'mp_track_limit', true) || ($this->get_setting('download_order_limit', 1) && $file = get_post_meta($product_id, 'mp_file', true)) ) {
+			if ( get_post_meta($product_id, 'mp_track_limit', true) )
+				//limit tracking is on
+				$limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+			elseif ( $this->get_setting('download_order_limit', 1) )
+				//limit digital products per order is on
+				$limit = array($variation => 1);
+				
+			if ( isset($limit) && $limit[$variation] && $limit[$variation] < $new_quantity ) {
 				if (defined('DOING_AJAX') && DOING_AJAX) {
-			 			echo 'error||' . sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), $product->post_title);
+			 		echo 'error||' . sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), $product->post_title);
 					exit;
 				} else {
 					$this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), $product->post_title) );
 					return false;
 				}
-			 }
+			}
 		}
 
 		$cart[$product_id][$variation] = $new_quantity;
@@ -3076,23 +3089,30 @@ Thanks again!", 'mp')
 					 continue;
 					}
 				}
+				
 			 	//check limit if tracking on or downloadable
-	 				if (get_post_meta($product_id, 'mp_track_limit', true) || $file = get_post_meta($product_id, 'mp_file', true)) {
-							$limit = empty($file) ? maybe_unserialize(get_post_meta($product_id, 'mp_limit', true)) : array($variation => 1);
-							if ($limit[$variation] && $limit[$variation] < $quant) {
-								 $this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), get_the_title($product_id)) );
-							continue;
-							}
+ 				if ( get_post_meta($product_id, 'mp_track_limit', true) || ($this->get_setting('download_order_limit', 1) && $file = get_post_meta($product_id, 'mp_file', true)) ) {
+					if ( get_post_meta($product_id, 'mp_track_limit', true) )
+						//limit tracking is on
+						$limit = maybe_unserialize(get_post_meta($product_id, 'mp_limit', true));
+					elseif ( $this->get_setting('download_order_limit', 1) )
+						//limit digital products per order is on
+						$limit = array($variation => 1);
+						
+					if ( isset($limit) && $limit[$variation] && $limit[$variation] < $quant ) {
+						$this->cart_checkout_error( sprintf(__('Sorry, there is a per order limit of %1$s for "%2$s".', 'mp'), number_format_i18n($limit[$variation]), get_the_title($product_id)) );
+						continue;
 					}
+				}
 
 				$global_cart[$bid][$product_id][$variation] = $quant;
-			 } else {
+			} else {
 				unset($global_cart[$bid][$product_id][$variation]);
-			 }
 			}
+		}
 
-				if (is_multisite())
-	 			switch_to_blog($current_blog_id);
+		if ( is_multisite() )
+	 		switch_to_blog($current_blog_id);
 		}
 
 		//remove items
@@ -3553,6 +3573,7 @@ Thanks again!", 'mp')
 	function coupon_value_product($code, $price, $product_id) {
 		if ( $this->coupon_applicable($code, $product_id) ) {
 			$discount = $this->coupon_value($code, $price);
+			
 			return ( $discount === false ) ? $price : $discount['new_total'];
 		}
 		
@@ -3876,8 +3897,7 @@ Thanks again!", 'mp')
 						if (!empty($data['SKU']))
 							$fields['items'] .= '[' . $data['SKU'] . '] ';
 						
-						$price_before_tax = $this->before_tax_price($data['price'], $product_id);
-						$price = $this->coupon_value_product($fields['coupon_code'], $price_before_tax * $data['quantity'], $product_id);
+						$price = $this->coupon_value_product($fields['coupon_code'], $data['price'] * $data['quantity'], $product_id);
 						
 						$fields['items'] .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($price / $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'];
 					}
@@ -4442,13 +4462,17 @@ Thanks again!", 'mp')
 		global $blog_id; 
 		$bid = (is_multisite()) ? $blog_id : 1;
 
-	 //// order info
+	 // order info
 	 if (is_array($order->mp_cart_info) && count($order->mp_cart_info)) {
 		$order_info = $order_info_sku = __('Items:', 'mp') . "\n";
 		foreach ($order->mp_cart_info as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-				$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
-				$order_info_sku .= "\t" . $data['name'] . ' - ' . $data['sku'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($data['price'], 2) . ' = '. number_format_i18n($data['price'] * $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+				$price = $data['price'] * $data['quantity'];
+				if ( $order->mp_discount_info )
+					$price = $this->coupon_value_product($order->mp_discount_info['code'], $price, $product_id);
+					
+				$order_info .= "\t" . $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($price / $data['quantity'], 2) . ' = '. number_format_i18n($price, 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
+				$order_info_sku .= "\t" . $data['name'] . ' - ' . $data['sku'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . number_format_i18n($price / $data['quantity'] , 2) . ' = '. number_format_i18n($price, 2) . ' ' . $order->mp_payment_info['currency'] . "\n";
 
 				//show download link if set
 				if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title)) {
@@ -4485,9 +4509,9 @@ Thanks again!", 'mp')
 	}
 	//coupon line
 	if ( $order->mp_discount_info ) {
-		$discount = preg_replace("/&([A-Za-z]+|#x[\dA-Fa-f]+|#\d+);/", "", $order->mp_discount_info['discount']) . ' ' . $order->mp_payment_info['currency'];
-		$order_info .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
-		$order_info_sku .= "\n" . __('Coupon Discount:', 'mp') . ' ' . $discount;
+		$discount = $order->mp_discount_info['code'];
+		$order_info .= "\n" . __('Coupon Code:', 'mp') . ' ' . $discount;
+		$order_info_sku .= "\n" . __('Coupon Code:', 'mp') . ' ' . $discount;
 	}
 	
 	//shipping line
@@ -5139,21 +5163,21 @@ Notification Preferences: %s', 'mp');
 							//for compatibility for old orders from MP 1.0
 							if (isset($variations['name'])) {
 								$data = $variations;
-								$price = $this->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+								$price = $data['price'] * $data['quantity'];
+								$discount_price = $this->coupon_value_product($coupon_code, $price, $product_id);
 								$price_text = '';
 								
 								//price text
-								if ( $price != $data['before_tax_price'] ) {
-									$price_text = '<del>' . $this->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+								if ( $price != $discount_price ) {
+									$price_text = '<del>' . $this->format_currency('', $price / $data['quantity']) . '</del><br />';
 								}
-								
-								$price_text .= $this->format_currency('', $price / $data['quantity']);
+								$price_text .= $this->format_currency('', $discount_price / $data['quantity']);
 	
 								//subtotal text
-								if ( $price != $data['before_tax_price'] ) {
-									$subtotal_text = '<del>' . $this->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+								if ( $price != $discount_price ) {
+									$subtotal_text = '<del>' . $this->format_currency('', $price) . '</del><br />';
 								}
-								$subtotal_text .= $this->format_currency('', $price);
+								$subtotal_text .= $this->format_currency('', $discount_price);
 						
 					 echo '<tr>';
 						echo '	<td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';
@@ -5166,21 +5190,21 @@ Notification Preferences: %s', 'mp');
 						echo '</tr>';
 							} else {
 								foreach ($variations as $variation => $data) {
-									$price = $this->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+									$price = $data['price'] * $data['quantity'];
+									$discount_price = $this->coupon_value_product($coupon_code, $price, $product_id);
 									$price_text = '';
 									
 									//price text
-									if ( $price != $data['before_tax_price'] ) {
-										$price_text = '<del>' . $this->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+									if ( $price != $discount_price ) {
+										$price_text = '<del>' . $this->format_currency('', $price / $data['quantity']) . '</del><br />';
 									}
-									
-									$price_text .= $this->format_currency('', $price / $data['quantity']);
+									$price_text .= $this->format_currency('', $discount_price / $data['quantity']);
 		
 									//subtotal text
-									if ( $price != $data['before_tax_price'] ) {
-										$subtotal_text = '<del>' . $this->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+									if ( $price != $discount_price ) {
+										$subtotal_text = '<del>' . $this->format_currency('', $price) . '</del><br />';
 									}
-									$subtotal_text .= $this->format_currency('', $price);
+									$subtotal_text .= $this->format_currency('', $discount_price);
 								
 							 echo '<tr>';
 							 echo '	<td class="mp_cart_col_thumb">' . mp_product_image( false, 'widget', $product_id ) . '</td>';

@@ -414,9 +414,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 						foreach ($cart as $product_id => $variations) {
 								foreach ($variations as $variation => $data) {
-										$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-										$price = $price_before_tax * $data['quantity'];
-										$discount_price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+										$price = $data['price'] * $data['quantity'];
+										$discount_price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
 										$totals[] = $discount_price;
 										
 										$content .= '<tr>';
@@ -558,9 +557,8 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 										$content .= '	 <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 										
-										$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-										$price = $price_before_tax * $data['quantity'];
-										$discount_price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+										$price = $data['price'] * $data['quantity'];
+										$discount_price = $mp->coupon_value_product($coupon_code, $price * $data['quantity'], $product_id);
 										$totals[] = $discount_price;
 										
 										$content .= '	 <td class="mp_cart_col_price">';
@@ -1208,21 +1206,22 @@ function mp_order_status( $echo = true ) {
 														//for compatibility for old orders from MP 1.x
 														if (isset($variations['name'])) {
 																$data = $variations;
-																$price = $mp->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+																$price = $data['price'] * $data['quantity'];
+																$discount_price = $mp->coupon_value_product($coupon_code, $price, $product_id);
 																$price_text = '';
 																
 																//price text
-																if ( $price != $data['before_tax_price'] ) {
-																	$price_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+																if ( $price != $discount_price ) {
+																	$price_text = '<del>' . $mp->format_currency('', $price / $data['quantity']) . '</del><br />';
 																}
 																
-																$price_text .= $mp->format_currency('', $price / $data['quantity']);
+																$price_text .= $mp->format_currency('', $discount_price / $data['quantity']);
 									
 																//subtotal text
-																if ( $price != $data['before_tax_price'] ) {
-																	$subtotal_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+																if ( $price != $discount_price ) {
+																	$subtotal_text = '<del>' . $mp->format_currency('', $price) . '</del><br />';
 																}
-																$subtotal_text .= $mp->format_currency('', $price);
+																$subtotal_text .= $mp->format_currency('', $discount_price);
 																															
 																$content .= '<tr>';
 																$content .= '	<td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id) . '</td>';
@@ -1234,22 +1233,22 @@ function mp_order_status( $echo = true ) {
 																$content .= '</tr>';
 														} else {
 																foreach ($variations as $variation => $data) {
-																		$price = $mp->coupon_value_product($coupon_code, $data['before_tax_price'] * $data['quantity'], $product_id);
+																		$price = $data['price'] * $data['quantity'];
+																		$discount_price = $mp->coupon_value_product($coupon_code, $price, $product_id);
 																		$price_text = '';
 																		
 																		//price text
-																		if ( $price != $data['before_tax_price'] ) {
-																			$price_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] / $data['quantity']) . '</del><br />';
+																		if ( $price != $discount_price ) {
+																			$price_text = '<del>' . $mp->format_currency('', $price / $data['quantity']) . '</del><br />';
 																		}
 																		
-																		$price_text .= $mp->format_currency('', $price / $data['quantity']);
+																		$price_text .= $mp->format_currency('', $discount_price / $data['quantity']);
 											
 																		//subtotal text
-																		if ( $price != $data['before_tax_price'] ) {
-																			$subtotal_text = '<del>' . $mp->format_currency('', $data['before_tax_price'] * $data['quantity']) . '</del><br />';
+																		if ( $price != $discount_price ) {
+																			$subtotal_text = '<del>' . $mp->format_currency('', $price) . '</del><br />';
 																		}
-																		$subtotal_text .= $mp->format_currency('', $price);
-
+																		$subtotal_text .= $mp->format_currency('', $discount_price);
 																		
 																		$content .= '<tr>';
 																		$content .= '	<td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id) . '</td>';

@@ -144,8 +144,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-				$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);			
+				$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);			
 				$totals[] = $price;
 		    $item_params["shopping-cart.items.item-{$i}.item-name"] = $data['name'];
 				$item_params["shopping-cart.items.item-{$i}.item-description"] = $data['url'];

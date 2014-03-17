@@ -992,8 +992,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-					$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-					$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+					$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
         	
 					//skip free products to avoid paypal error
 					if ($price <= 0)

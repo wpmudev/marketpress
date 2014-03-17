@@ -510,8 +510,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
             foreach ($variations as $variation => $data) {
                 $sku = empty($data['SKU']) ? "{$product_id}_{$variation}" : $data['SKU'];
                 //total on tax excluded
-								$price_before_tax = $mp->before_tax_price($data['price'], $product_id);
-								$price = $mp->coupon_value_product($coupon_code, $price_before_tax * $data['quantity'], $product_id);
+								$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
                 $totals[] = $price;
                 //display as tax inclusive
                 $payment->addLineItem($sku, substr($data['name'], 0, 31), substr($data['name'] . ' - ' . $data['url'], 0, 254), $data['quantity'], $data['price'], 1);
