@@ -558,7 +558,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 										$content .= '	 <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
 										
 										$price = $data['price'] * $data['quantity'];
-										$discount_price = $mp->coupon_value_product($coupon_code, $price * $data['quantity'], $product_id);
+										$discount_price = $mp->coupon_value_product($coupon_code, $price, $product_id);
 										$totals[] = $discount_price;
 										
 										$content .= '	 <td class="mp_cart_col_price">';
