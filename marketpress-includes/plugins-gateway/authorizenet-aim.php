@@ -609,7 +609,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
             $payment->setParameter("x_ship_to_country", $shipping_info['country']);
             $payment->setParameter("x_ship_to_zip", $shipping_info['zip']);
         }
-
+        
         $payment->setParameter("x_customer_ip", $_SERVER['REMOTE_ADDR']);
 
         $payment->process();

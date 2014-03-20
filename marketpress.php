@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.2
+Version: 2.9.3.3
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.2';
+	var $version = '2.9.3.3';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -2142,7 +2142,7 @@ Thanks again!", 'mp')
 				break;
 
 		case "mp_orders_tax":
-				echo $this->format_currency('', $meta["mp_tax_total"][0]);
+				echo $this->get_setting('tax->inclusive', false) ? $this->format_currency('', $meta["mp_tax_total"][0]) : $this->format_currency('', $meta["mp_order_total"][0] * $this->get_setting('tax->rate'));
 				break;
 
 		case "mp_orders_discount":
@@ -5261,9 +5261,9 @@ Notification Preferences: %s', 'mp');
 			<?php } ?>
 
 			<?php //tax line
-			if ( $order->mp_tax_total ) { ?>
+			if ( $order->mp_tax_total || $this->get_setting('tax->tax_inclusive') ) { ?>
 			<h3><?php echo esc_html($this->get_setting('tax->label', __('Taxes', 'mp'))); ?>:</h3>
-			<p><?php echo $this->format_currency('', $order->mp_tax_total); ?></p>
+			<p><?php echo !$this->get_setting('tax->tax_inclusive') ? $this->format_currency('', $order->mp_tax_total) : $this->format_currency('', $order->mp_order_total * $this->get_setting('tax->rate')) . ' ' . __('(inclusive)', 'mp'); ?></p>
 			<?php } ?>
 
 			<h3><?php _e('Cart Total:', 'mp'); ?></h3>
@@ -7218,6 +7218,17 @@ Notification Preferences: %s', 'mp');
 					$settings = get_option('mp_settings');
 					//allow plugins to verify settings before saving
 					$settings = $this->parse_args_r(apply_filters('mp_shipping_settings_filter', $_POST['mp']), $settings);
+					//loop through allowed countries checkboxes and remove unchecked options
+					if ( !isset($_POST['mp']['shipping']['allowed_countries']) ) {
+						$settings['shipping']['allowed_countries'] = array();
+					} else {
+						foreach ( $settings['shipping']['allowed_countries'] as $key => $code ) {
+							if ( !in_array($code, (array) $_POST['mp']['shipping']['allowed_countries']) ) {
+								unset($settings['shipping']['allowed_countries'][$key]);
+							}
+						}
+					}
+					
 					update_option('mp_settings', $settings);
 			 echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
 				}
@@ -7225,15 +7236,15 @@ Notification Preferences: %s', 'mp');
 			<script type="text/javascript">
 				jQuery(document).ready(function ($) {
 				$("#mp-select-all").click(function() {
-					$("#mp-target-countries input[type='checkbox']").attr('checked', true);
+					$("#mp-target-countries input[type='checkbox']").prop('checked', true);
 					return false;
 				});
 				$("#mp-select-eu").click(function() {
-					$("#mp-target-countries input[type='checkbox'].eu").attr('checked', true);
+					$("#mp-target-countries input[type='checkbox']").prop('checked', false).filter('.eu').prop('checked', true);
 					return false;
 				});
 				$("#mp-select-none").click(function() {
-					$("#mp-target-countries input[type='checkbox']").attr('checked', false);
+					$("#mp-target-countries input[type='checkbox']").prop('checked', false);
 					return false;
 				});
 				$(".mp-shipping-method").change(function() {
@@ -7344,7 +7355,7 @@ Notification Preferences: %s', 'mp');
 					if ( isset( $_POST['mp'] ) ) {
 						$filtered_settings = apply_filters('mp_gateway_settings_filter', $_POST['mp']);
 						//allow plugins to verify settings before saving
-						$settings = array_merge($settings, $filtered_settings);
+						$settings = $this->parse_args_r($settings, $filtered_settings);
 						update_option('mp_settings', $settings);
 					}
 			 echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';

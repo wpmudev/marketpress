@@ -992,13 +992,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-					$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
+					$price = $mp->coupon_value_product($coupon_code, $data['price'], $product_id);
         	
 					//skip free products to avoid paypal error
 					if ($price <= 0)
 						continue;
 					
-				  $totals[] = $price;
+				  $totals[] = $price * $data['quantity'];
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($price);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);

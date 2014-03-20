@@ -93,19 +93,19 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);			
+				$price = $mp->coupon_value_product($coupon_code, $data['price'], $product_id);			
 				$items[] = array(
 					'itemNumber'.$i => $data['SKU'], // Article number
 					'itemDescription'.$i => $data['name'], // Description
 					'itemQuantity'.$i => $data['quantity'], // Quantity
-					'itemPrice'.$i =>  round($price*100) // Artikel price in cents
+					'itemPrice'.$i =>  round($price*100) // Article price in cents
 				);
 				if ( $data['quantity'] != 0 && $data['quantity'] != null )
 				{
 					$parameters[$data['name']] = $data['quantity'] . ',' . $price / $data['quantity'];
 				}
 				$i++;
-				$totals[] = $price;
+				$totals[] = $price * $data['quantity'];
 			}
 		}
 		$total = array_sum($totals);
