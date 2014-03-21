@@ -7236,7 +7236,7 @@ Notification Preferences: %s', 'mp');
 				if (isset($_POST['shipping_settings'])) {
 					$settings = get_option('mp_settings');
 					//allow plugins to verify settings before saving
-					$settings = $this->parse_args_r(apply_filters('mp_shipping_settings_filter', $_POST['mp']), $settings);
+					$settings = $this->parse_args_r($settings, apply_filters('mp_shipping_settings_filter', $_POST['mp']));
 					//loop through allowed countries checkboxes and remove unchecked options
 					if ( !isset($_POST['mp']['shipping']['allowed_countries']) ) {
 						$settings['shipping']['allowed_countries'] = array();
