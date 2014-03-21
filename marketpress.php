@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.4
+Version: 2.9.3.5
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.4';
+	var $version = '2.9.3.5';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -594,21 +594,40 @@ Thanks again!", 'mp')
 	 }
 	}
 	
-	function parse_args_r( &$a, $b ) {
-		$a = (array) $a;
-		$b = (array) $b;
-		$r = $b;
-		 
-		foreach ( $a as $k => &$v ) {
-			if ( is_array($v) && isset($r[$k]) ) {
-				$r[$k] = $this->parse_args_r($v, $r[$k]);
-			} else {
-				$r[$k] = $v;
-			}
-		}
-		 
-		return $r;
-	}
+	function parse_args_r( $array, $array1 ) {
+    function recurse($array, $array1) {
+      foreach ( $array1 as $key => $value ) {
+        // create new key in $array, if it is empty or not an array
+        if ( ! isset($array[$key]) || (isset($array[$key]) && ! is_array($array[$key])) )
+        {
+          $array[$key] = array();
+        }
+ 
+        // overwrite the value in the base array
+        if ( is_array($value) ) {
+          $value = recurse($array[$key], $value);
+        }
+        
+        $array[$key] = $value;
+      }
+      return $array;
+    }
+ 
+    // handle the arguments, merge one by one
+    $args = func_get_args();
+    $array = $args[0];
+    if ( ! is_array($array) ) {
+      return $array;
+    }
+    
+    for ( $i = 1; $i < count($args); $i++ ) {
+      if ( is_array($args[$i]) ) {
+        $array = recurse($array, $args[$i]);
+      }
+    }
+    
+    return $array;
+  }
 	
 	/*
 	 * function get_setting
