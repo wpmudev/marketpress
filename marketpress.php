@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.5
+Version: 2.9.3.6
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.5';
+	var $version = '2.9.3.6';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -1310,10 +1310,8 @@ Thanks again!", 'mp')
 		}
 
 		$wp_query->is_page = 1;
-		//$wp_query->is_singular = 1;
 		$wp_query->is_404 = null;
 		$wp_query->post_count = 1;
-
 		$this->is_shop_page = true;
 	 }
 
@@ -1794,9 +1792,13 @@ Thanks again!", 'mp')
 			}
 
 			// direction
-			if(isset($o[1]) &&	 in_array($o[1], array('asc','desc'))) {
+			if(isset($o[1]) && in_array($o[1], array('asc','desc'))) {
 				$args['order'] = strtoupper($o[1]);
 			}
+		}
+		
+		if ( isset($_POST['per_page']) ) {
+			$args['per_page'] = intval($_POST['per_page']);
 		}
 
 		if ( isset($_POST['product_category']) && is_numeric($_POST['product_category']) ) {
@@ -1809,10 +1811,8 @@ Thanks again!", 'mp')
 		}
 		
 		$ret['products'] = mp_list_products($args);
-
-		header('Content-type: application/json');
-		echo json_encode($ret);
-		exit;
+		
+		wp_send_json($ret);
 	}
 
 	//adds the "filter by product category" to the edit products screen
@@ -7290,7 +7290,7 @@ Notification Preferences: %s', 'mp');
 						<div id="mp-target-countries">
 						<?php
 							foreach ($this->countries as $code => $name) {
-							 ?><label><input type="checkbox"<?php echo (in_array($code, $this->eu_countries)) ? ' class="eu"' : ''; ?> name="mp[shipping][allowed_countries][]" value="<?php echo $code; ?>"<?php echo (in_array($code, $this->get_setting('shipping->allowed_countries', array()))) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($name); ?></label><br /><?php
+							 ?><label for="mp-target-country-<?php echo $code; ?>"><input id="mp-target-country-<?php echo $code; ?>" type="checkbox"<?php echo (in_array($code, $this->eu_countries)) ? ' class="eu"' : ''; ?> name="mp[shipping][allowed_countries][]" value="<?php echo $code; ?>"<?php echo (in_array($code, $this->get_setting('shipping->allowed_countries', array()))) ? ' checked="checked"' : ''; ?> /> <?php echo esc_attr($name); ?></label><br /><?php
 							}
 						?>
 						</div><br />

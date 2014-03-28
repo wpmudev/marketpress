@@ -60,13 +60,10 @@ jQuery(document).ready(function($) {
 		$(document).on('click', '#mp_product_nav a', function(e){
 			e.preventDefault();
 			
-			var m = $(this).attr('href').match(/(paged=|page\/)(\d+)/);
-			var nw_page = m != null ? m[2] : 1;
-			get_and_insert_products( $('.mp_product_list_refine').serialize() + '&page=' + nw_page );
+			var hrefParts = $(this).attr('href').split('#'),
+					qs = parse_query(hrefParts[1]);
+			get_and_insert_products($('.mp_product_list_refine').serialize() + '&page=' + qs['page']);
 
-			// scroll to top of list
-			var pos = $('.mp_list_filter').offset();
-			$('body').animate({ scrollTop: pos.top-10 });
 			mp_cart_listeners();
 		});
 	}
@@ -78,20 +75,34 @@ jQuery(document).ready(function($) {
 				MP_Ajax.ajaxUrl, 
 				'action=get_products_list&'+query_string,
 				function(data) {
-					var hash = 'order=' + $('select[name="order"]').val();
-					var m = query_string.match(/page=(\d)+/i);
-					
-					if ( m != null) {
-						hash += '&page=' + m[1];	
-					}
+					var qs = parse_query(query_string),
+							hash = 'order=' + $('select[name="order"]').val() + '&page=' + qs['page'];
 					
 					ajax_loading(false);
 					$('#mp_product_nav').remove();
 					$('#mp_product_list').first().replaceWith(data.products);
 					location.hash = hash;
+
+					// scroll to top of list
+					var pos = $('a[name="mp-product-list-top"]').offset();
+					$('body,html').animate({ scrollTop: pos.top - 20 });
+					
 					mp_cart_listeners();
 				}
 			);
+	}
+	
+	// parse querystring into variables
+	function parse_query(query_string){
+		var vars = [],
+				pairs = query_string.split('&');
+		
+		for ( i = 0; i < pairs.length; i++ ) {
+			var tmp = pairs[i].split('=');
+			vars[tmp[0]] = tmp[1];
+		}
+		
+		return vars;
 	}
 
 	// if the page has been loaded from a bookmark set the current state for select elements
@@ -118,11 +129,15 @@ jQuery(document).ready(function($) {
 		// hash tags are used to store the current state in these situations:
 		//	a) when the user views a product and then clicks back
 		//	b) viewing the URL from a bookmark
-		if( /filter-term|order|paged/.test(location.hash) ){
+		if( /filter-term|order|page/.test(location.hash) ){
 				var query_string = location.hash.replace('#', '');
 				
 				if ( MP_Ajax.productCategory != '' )
 					query_string += '&product_category=' + MP_Ajax.productCategory;
+				
+				var $perPage = $('.mp_list_filter').find('[name="per_page"]');
+				if ( $perPage.length )
+					query_string += '&per_page=' + $perPage.val();
 				
 				get_and_insert_products(query_string);
 				update_dropdown_state(query_string);

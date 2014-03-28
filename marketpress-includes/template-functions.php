@@ -1705,7 +1705,8 @@ function mp_list_products() {
 	if ( defined('DOING_AJAX') && DOING_AJAX ) {
 		//do nothing
 	} else {
-		$content .= ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter() : mp_products_filter(true);
+		$per_page = ( is_null($args['per_page']) ) ? null : $args['per_page'];
+		$content .= ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter(false, $per_page) : mp_products_filter(true, $per_page);
 	}
 	
 	$content .= '<div id="mp_product_list" class="mp_' . $layout_type . '">';
@@ -2489,7 +2490,7 @@ if (!function_exists('mp_products_filter')) :
  * 
  * @return string		html for filter/order products select elements.
  */
-function mp_products_filter( $hidden = false ) {
+function mp_products_filter( $hidden = false, $per_page = null ) {
 		global $wp_query, $mp;
 
 		if ( 'product_category' == get_query_var('taxonomy') ) {
@@ -2531,6 +2532,7 @@ function mp_products_filter( $hidden = false ) {
 		}
 
 		$return = '
+			<a name="mp-product-list-top"></a>
 			<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
 				<form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
 						<div class="one_filter">
@@ -2543,7 +2545,9 @@ function mp_products_filter( $hidden = false ) {
 							<select name="order">
 								' . $options_html . '
 							</select>
-						</div>
+						</div>' .
+						
+						(( is_null($per_page) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />') . '
 				</form>
 			</div>';
 
@@ -2649,10 +2653,10 @@ function mp_products_nav($echo = true, $custom_query) {
 
 	if ($max > 1) {
 		if ( $page != $max ) {
-			$next='<a href="#paged='.($page+1).'">'.__('Next Page &raquo;').'</a>';
+			$next='<a href="#page='.($page+1).'">'.__('Next Page &raquo;').'</a>';
 		}
 		if ($page != 1) {
-			$prev='<a href="#paged='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
+			$prev='<a href="#page='.($page-1).'">'.__('&laquo; Previous Page').'</a>';
 		}
 		$html = '<div id="mp_product_nav">' . $prev . (strlen($prev)>0 && strlen($next)>0?' &#8212; ':'') . $next . '</div>';
 	}
