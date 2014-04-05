@@ -2227,17 +2227,17 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 				return '';
 		}
 		
-		$price = mp_apply_deprecated_filters('mp_product_price_tag', array('<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label), '2.9.3.7', 'mp_product_price_html');
-		$price = apply_filters('mp_product_price_html', '<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label, $price);
+		$price_html = _mp_apply_deprecated_filters('mp_product_price_tag', array('<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label), '2.9.3.7', 'mp_product_price_html');
+		$price_html = apply_filters('mp_product_price_html', $price_html, $post_id, $label, $price);
 
-		if ($echo)
-				echo $price;
+		if ( $echo )
+			echo $price_html;
 		else
-				return $price;
+			return $price_html;
 }
 endif;
 
-if ( ! function_exists('mp_apply_deprecated_filters') ) :
+if ( ! function_exists('_mp_apply_deprecated_filters') ) :
 /** 
  * Fire a deprecated filter. Wraps apply_filters(). 
  * 
@@ -2249,16 +2249,16 @@ if ( ! function_exists('mp_apply_deprecated_filters') ) :
  * @param string $replacement Optional. The hook that should have been used 
  * @param string $message Optional. A message regarding the change 
  */ 
-function mp_apply_deprecated_filters( $tag, $args, $version, $replacement = false, $message = null ) { 
+function _mp_apply_deprecated_filters( $tag, $args, $version, $replacement = false, $message = null ) { 
 	if ( ! has_filter( $tag ) ) 
-		return; 
+		return array_shift($args); 
 	_mp_deprecated_hook( $tag, $version, $replacement, $message ); 
-	array_unshift( $args, $tag ); 
+	array_unshift( $args, $tag );
 	return call_user_func_array( 'apply_filters', $args ); 
 } 
 endif;
 
-if ( ! function_exists('mp_do_deprecated_action') ) :
+if ( ! function_exists('_mp_do_deprecated_action') ) :
 /**
  * Fire a deprecated action. Wraps do_action(). 
  * 
@@ -2270,9 +2270,9 @@ if ( ! function_exists('mp_do_deprecated_action') ) :
  * @param string $replacement Optional. The hook that should have been used 
  * @param string $message Optional. A message regarding the change 
  */ 
-function mp_do_deprecated_action( $tag, $args, $version, $replacement = false, $message = null ) { 
+function _mp_do_deprecated_action( $tag, $args, $version, $replacement = false, $message = null ) { 
 	if ( ! has_action( $tag ) ) 
-					return; 
+		return; 
 	_mp_deprecated_hook( $tag, $version, $replacement, $message ); 
 	array_unshift( $args, $tag ); 
 	call_user_func_array( 'do_action', $args ); 
