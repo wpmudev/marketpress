@@ -5,6 +5,16 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.3.7 - 4/5/2014 - Jonathan Cowher 
+----------------------------------------------------------------------
+- Fixed: deprecated use of the $wpdb->escape() function
+- Fixed: wrong link in PayPal Express settings
+- Fixed: subtotal text appending for each item
+- Fixed: coupons incorrectly apply to uncategorized items when using category-based coupons
+- Fixed: coupon stays applied to cart after removing applicable products from cart
+- Added: support for Google rich snippets NOTE: PLEASE CHECK YOUR PRODUCT PAGES AFTER UPDATING AS SOME ADDITIONAL TAGS HAVE BEEN ADDED
+- Deprecated: mp_product_price_tag filter - use mp_product_price_html instead
+
 2.9.3.6 - 3/27/2014 - Jonathan Cowher 
 ----------------------------------------------------------------------
 - Fixed: product list shortcode not using correct "per_page" setting

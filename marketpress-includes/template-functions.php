@@ -430,7 +430,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 											$content .= $mp->format_currency('', $discount_price);
 										}
 											
-										$content .= '  </td>';
+										$content .= '	 </td>';
 										$content .= '	 <td class="mp_cart_col_quant"><input type="text" size="2" name="quant[' . $bid . ':' . $product_id . ':' . $variation . ']" value="' . $data['quantity'] . '" />&nbsp;<label><input type="checkbox" name="remove[]" value="' . $bid . ':' . $product_id . ':' . $variation . '" /> ' . __('Remove', 'mp') . '</label></td>';
 										$content .= '</tr>';
 								}
@@ -570,7 +570,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 											$content .= $mp->format_currency('', $discount_price);
 										}
 										
-										$content .= '  </td>';
+										$content .= '	 </td>';
 										$content .= '</tr>';
 								}
 						}
@@ -689,7 +689,7 @@ if (!function_exists('_mp_cart_login')) :
 //Prints cart login/register form, for internal use
 function _mp_cart_login($echo = false) {
 		global $mp;
-
+		
 		$content = '';
 		//don't show if logged in
 		if (is_user_logged_in() || MP_HIDE_LOGIN_OPTION === true) {
@@ -1209,6 +1209,7 @@ function mp_order_status( $echo = true ) {
 																$price = $data['price'] * $data['quantity'];
 																$discount_price = $mp->coupon_value_product($coupon_code, $price, $product_id);
 																$price_text = '';
+																$subtotal_text = '';
 																
 																//price text
 																if ( $price != $discount_price ) {
@@ -1219,7 +1220,7 @@ function mp_order_status( $echo = true ) {
 									
 																//subtotal text
 																if ( $price != $discount_price ) {
-																	$subtotal_text = '<del>' . $mp->format_currency('', $price) . '</del><br />';
+																	$subtotal_text .= '<del>' . $mp->format_currency('', $price) . '</del><br />';
 																}
 																$subtotal_text .= $mp->format_currency('', $discount_price);
 																															
@@ -1236,6 +1237,7 @@ function mp_order_status( $echo = true ) {
 																		$price = $data['price'] * $data['quantity'];
 																		$discount_price = $mp->coupon_value_product($coupon_code, $price, $product_id);
 																		$price_text = '';
+																		$subtotal_text = '';
 																		
 																		//price text
 																		if ( $price != $discount_price ) {
@@ -1246,7 +1248,7 @@ function mp_order_status( $echo = true ) {
 											
 																		//subtotal text
 																		if ( $price != $discount_price ) {
-																			$subtotal_text = '<del>' . $mp->format_currency('', $price) . '</del><br />';
+																			$subtotal_text .= '<del>' . $mp->format_currency('', $price) . '</del><br />';
 																		}
 																		$subtotal_text .= $mp->format_currency('', $discount_price);
 																		
@@ -1709,7 +1711,7 @@ function mp_list_products() {
 		$content .= ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter(false, $per_page) : mp_products_filter(true, $per_page);
 	}
 	
-	$content .= '<div id="mp_product_list" class="mp_' . $layout_type . '">';
+	$content .= '<div id="mp_product_list" class="hfeed mp_' . $layout_type . '">';
 
 	if ( $last = $custom_query->post_count ) {
 		$content .= $layout_type == 'grid' ? _mp_products_html_grid($custom_query) : _mp_products_html_list($custom_query);
@@ -1742,29 +1744,40 @@ function _mp_products_html_list($custom_query) {
 
 				//add last css class for styling grids
 				if ($count == $total)
-						$class = array('mp_product', 'last-product');
+						$class = array('mp_product', 'last-product', 'hentry');
 				else
-						$class = 'mp_product';
+						$class = array('mp_product', 'hentry');
 
-				$html .= '<div ' . mp_product_class(false, $class, $post->ID) . '>';
-				$html .= '<h3 class="mp_product_name"><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></h3>';
-				$html .= '<div class="mp_product_content">';
+				$html .= '
+					<div itemscope itemtype="http://schema.org/Product" ' . mp_product_class(false, $class, $post->ID) . '>
+						<h3 class="mp_product_name entry-title"><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></h3>
+						<div class="entry-content">
+							<div class="mp_product_content">';
+				
 				$product_content = mp_product_image(false, 'list', $post->ID);
-				if ($mp->get_setting('show_excerpt'))
-						$product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+				if ( $mp->get_setting('show_excerpt') ) {
+					$product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+				}
+				
 				$html .= apply_filters('mp_product_list_content', $product_content, $post->ID);
-		$html .= mp_pinit_button($post->ID,'all_view');
-				$html .= '</div>';
-
-				$html .= '<div class="mp_product_meta">';
+				$html .= mp_pinit_button($post->ID,'all_view');
+				$html .= '
+							</div>
+							<div class="mp_product_meta">';
+						
 				//price
 				$meta = mp_product_price(false, $post->ID);
 				//button
 				$meta .= mp_buy_button(false, 'list', $post->ID);
 				$html .= apply_filters('mp_product_list_meta', $meta, $post->ID);
-				$html .= '</div>';
-
-				$html .= '</div>';
+				$html .= '
+							</div>
+						</div>
+						<div style="display:none">
+							<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
+							<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
+						</div>
+					</div>';
 		endwhile;
 		
 		$post = NULL; //wp_reset_postdata() doesn't work here
@@ -1795,34 +1808,39 @@ function _mp_products_html_grid($custom_query) {
 								'';
 				$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
 		
-		$pinit = mp_pinit_button($post->ID, 'all_view');
+				$pinit = mp_pinit_button($post->ID, 'all_view');
 
 				$class = array();
 				$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
 				$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
 				$class[] = mp_has_variations($post->ID) ? 'mp_price_variations' : '';
 
-				$html .= '<div class="mp_one_tile ' . implode($class, ' ') . '">
-								<div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-								
-									<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-										' . $img . '
-										' . $pinit .'
-										<h3 class="mp_product_name">
-											<a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
-										</h3>
-									
-										' . $mp_product_list_content . '
-									</div>
+				$html .= '
+					<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '">
+						<div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+							<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+								' . $img . '
+								' . $pinit .'
+								<h3 class="mp_product_name entry-title">
+									<a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
+								</h3>
+							
+								<div>' . $mp_product_list_content . '</div>
+							</div>
 
-									<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px; margin-left:-' . $width . 'px;"' : '') . '>
-										' . mp_product_price(false, $post->ID) . '
-										' . mp_buy_button(false, 'list', $post->ID) . '
-										' . apply_filters('mp_product_list_meta', '', $post->ID) . '
-									</div>
-
-								</div>
-							</div>';
+							<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px; margin-left:-' . $width . 'px;"' : '') . '>
+								' . mp_product_price(false, $post->ID) . '
+								' . mp_buy_button(false, 'list', $post->ID) . '
+								' . apply_filters('mp_product_list_meta', '', $post->ID) . '
+							</div>
+							
+							<div style="display:none" >
+								<span class="entry-title">' . get_the_title() . '</span> was last modified:
+								<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
+								<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
+							</div>
+						</div>
+					</div>';
 		endwhile;
 
 		$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
@@ -1876,11 +1894,11 @@ function mp_product_title($product_id, $echo = true, $link = false, $formated = 
 		}
 
 		if ($formated) {
-				$before_title = '<' . $html_tag . ' ' . $microdata . ' class="' . $css_class . '">';
+				$before_title = '<' . $html_tag . ' ' . $microdata . ' class="entry-title ' . $css_class . '">';
 				$after_title = '</' . $html_tag . '>';
 		} else {
-				$before_title = '';
-				$after_title = '';
+				$before_title = '<span class="entry-title">';
+				$after_title = '</span>';
 		}
 
 		$return = apply_filters('mp_product_title', $before_title . $title . $after_title, $product_id, $link, $formated, $html_tag, $css_class, $microdata);
@@ -1993,8 +2011,10 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
 		$post = get_post($product_id);
 
 		$return = '<div itemscope itemtype="http://schema.org/Product" ' . mp_product_class(false, 'mp_product', $post->ID) . '>';
+		$return .= '<span style="display:none" class="date updated">' . get_the_time($product_id) . '</span>';
+		
 		if ($title)
-				$return .= '<h3 itemprop="name" class="mp_product_name"><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></h3>';
+				$return .= '<h3 itemprop="name" class="mp_product_name entry-title"><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></h3>';
 
 		if ($content) {
 				$return .= '<div itemprop="description" class="mp_product_content">';
@@ -2206,8 +2226,9 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 		} else {
 				return '';
 		}
-
-		$price = apply_filters('mp_product_price_tag', '<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label);
+		
+		$price = mp_apply_deprecated_filters('mp_product_price_tag', array('<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label), '2.9.3.7', 'mp_product_price_html');
+		$price = apply_filters('mp_product_price_html', '<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label, $price);
 
 		if ($echo)
 				echo $price;
@@ -2216,6 +2237,85 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 }
 endif;
 
+if ( ! function_exists('mp_apply_deprecated_filters') ) :
+/** 
+ * Fire a deprecated filter. Wraps apply_filters(). 
+ * 
+ * @since 2.9.3.7 
+ * 
+ * @param string $tag The name of the filter hook. 
+ * @param array $args Array of additional function arguments to be passed to apply_filters(). 
+ * @param string $version The version of WordPress that deprecated the hook 
+ * @param string $replacement Optional. The hook that should have been used 
+ * @param string $message Optional. A message regarding the change 
+ */ 
+function mp_apply_deprecated_filters( $tag, $args, $version, $replacement = false, $message = null ) { 
+	if ( ! has_filter( $tag ) ) 
+		return; 
+	_mp_deprecated_hook( $tag, $version, $replacement, $message ); 
+	array_unshift( $args, $tag ); 
+	return call_user_func_array( 'apply_filters', $args ); 
+} 
+endif;
+
+if ( ! function_exists('mp_do_deprecated_action') ) :
+/**
+ * Fire a deprecated action. Wraps do_action(). 
+ * 
+ * @since 2.9.3.7
+ * 
+ * @param string $tag The name of the filter hook. 
+ * @param array $args Array of additional function arguments to be passed to do_action(). 
+ * @param string $version The version of WordPress that deprecated the hook 
+ * @param string $replacement Optional. The hook that should have been used 
+ * @param string $message Optional. A message regarding the change 
+ */ 
+function mp_do_deprecated_action( $tag, $args, $version, $replacement = false, $message = null ) { 
+	if ( ! has_action( $tag ) ) 
+					return; 
+	_mp_deprecated_hook( $tag, $version, $replacement, $message ); 
+	array_unshift( $args, $tag ); 
+	call_user_func_array( 'do_action', $args ); 
+}
+endif;
+
+if ( ! function_exists('_mp_deprecated_hook') ) :
+/**
+ * Marks a hook as deprecated and informs when it has been used. 
+ * 
+ * There is a hook deprecated_hook_used that will be called that can be used 
+ * to get the backtrace up to what file and function was used for the callback. 
+ * 
+ * The current behavior is to trigger a user error if WP_DEBUG is true. 
+ * 
+ * This function is to be used for every hook that is deprecated, when any callback is 
+ * attacked to the hook, as determined by has_action() or has_filter(), and shall be 
+ * called before the hook is fired. 
+ * 
+ * @since 2.9.3.6
+ * 
+ * @uses do_action() Calls 'deprecated_hook_used' and passes the hook name, what to use instead, 
+ *	 the version in which the file was deprecated, and any message regarding the change. 
+ * @uses apply_filters() Calls 'deprecated_hook_trigger_error' and expects boolean value of true to do 
+ *	 trigger or false to not trigger error. 
+ * 
+ * @param string $hook The hook that was used 
+ * @param string $version The version of WordPress that deprecated the hook 
+ * @param string $replacement Optional. The hook that should have been used 
+ * @param string $message Optional. A message regarding the change 
+ */ 
+function _mp_deprecated_hook( $hook, $version, $replacement = null, $message = null ) { 
+	// Allow plugin to filter the output error trigger 
+	if ( WP_DEBUG && apply_filters( 'deprecated_hook_trigger_error', true ) ) { 
+		$message = empty( $message ) ? '' : ' ' . $message; 
+		if ( ! is_null( $replacement ) ) 
+			trigger_error( sprintf( __('%1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.'), $hook, $version, $replacement ) . $message ); 
+		else 
+			trigger_error( sprintf( __('%1$s is <strong>deprecated</strong> since version %2$s with no alternative available.'), $hook, $version ) . $message ); 
+	}
+} 
+ 	 
+endif;
 
 if (!function_exists('mp_buy_button')) :
 /*
@@ -2388,7 +2488,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 
 		$post_thumbnail_id = get_post_thumbnail_id($post_id);
 		$class = $title = $link = '';
-		$img_classes = array('mp_product_image_' . $context);
+		$img_classes = array('mp_product_image_' . $context, 'photo');
 		
 		if ( !is_null($align) )
 			$align = 'align' . $align;
@@ -2461,7 +2561,11 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 						$size = array(get_option($size . "_size_w"), get_option($size . "_size_h"));
 				}
 				$img_classes[] = 'wp-post-image';
-				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', $mp->plugin_url . 'images/default-product.png') . '">';
+				$image = '
+					<div itemscope class="hmedia">
+						<span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span>
+						<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', $mp->plugin_url . 'images/default-product.png') . '" />
+					</div>';
 		}
 		
 		//force ssl on images (if applicable) http://wp.mu/8s7
@@ -2471,7 +2575,11 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 
 		//add the link
 		if ($link) {
-			$image = '<a id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>';
+			$image = '
+				<div itemscope class="hmedia">
+					<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
+					<a rel="enclosure" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>
+				</div>';
 		}
 
 		$image = apply_filters('mp_product_image', $image, $context, $post_id, $size);

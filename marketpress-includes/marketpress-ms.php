@@ -847,9 +847,14 @@ class MarketPress_MS {
 		
       //get existing terms
       foreach ($new_terms as $term)
-        $new_slugs[] = $wpdb->escape($term->slug);
-  		$slug_list = implode( "','", $new_slugs );
-      $existing_terms = $wpdb->get_results( "SELECT * FROM {$wpdb->base_prefix}mp_terms WHERE slug IN ('$slug_list')" );
+        $new_slugs[] = $term->slug;
+			
+			$slug_list = implode( "','", $new_slugs );
+      $existing_terms = $wpdb->get_results($wpdb->prepare("
+      	SELECT *
+      	FROM {$wpdb->base_prefix}mp_terms
+      	WHERE slug IN (%s)", $new_slugs
+      ));
       $existing_slugs = array();
       if ( is_array($existing_terms) && count($existing_terms) ) {
         foreach ($existing_terms as $term) {
@@ -1271,13 +1276,30 @@ function mp_list_global_products( $args = '' ) {
 
   //setup taxonomy if applicable
   if ($category) {
-    $category = $wpdb->escape( sanitize_title( $category ) );
-    $query = "SELECT blog_id, p.post_id, post_permalink, post_title, post_content FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_category' AND t.slug = '$category'";
+    $query = $wpdb->prepare("
+    	SELECT blog_id, p.post_id, post_permalink, post_title, post_content
+    	FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r
+    		ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t
+    		ON r.term_id = t.term_id
+    	WHERE p.blog_public = 1
+    		AND t.type = 'product_category'
+    		AND t.slug = %s", sanitize_title($category)
+    );
   } else if ($tag) {
-    $tag = $wpdb->escape( sanitize_title( $tag ) );
-    $query = "SELECT blog_id, p.post_id, post_permalink, post_title, post_content FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_tag' AND t.slug = '$tag'";
+    $query = $wpdb->prepare("
+    	SELECT blog_id, p.post_id, post_permalink, post_title, post_content
+    	FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r
+    		ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t
+    		ON r.term_id = t.term_id
+    	WHERE p.blog_public = 1
+    		AND t.type = 'product_tag'
+    		AND t.slug = %s", sanitize_title($tag)
+    );
   } else {
-    $query = "SELECT blog_id, p.post_id, post_permalink, post_title, post_content FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
+    $query = "
+    	SELECT blog_id, p.post_id, post_permalink, post_title, post_content
+			FROM {$wpdb->base_prefix}mp_products p
+			WHERE p.blog_public = 1";
   }
 	
 	$query = $no_limit_query = apply_filters('mp_list_global_products_sql_where', $query);
@@ -1463,13 +1485,30 @@ function mp_global_products_nav_link( $args = '', $query = null ) {
   //setup taxonomy if applicable
   if ( is_null($query) ) {
 	  if ($category) {
-	    $category = $wpdb->escape( sanitize_title( $category ) );
-	    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_category' AND t.slug = '$category'";
+	    $query = $wpdb->prepare("
+	    	SELECT COUNT(*)
+	    	FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r
+	    		ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t
+	    		ON r.term_id = t.term_id
+	    	WHERE p.blog_public = 1
+	    		AND t.type = 'product_category'
+	    		AND t.slug = %s", sanitize_title($category)
+	    );
 	  } else if ($tag) {
-	    $tag = $wpdb->escape( sanitize_title( $tag ) );
-	    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t ON r.term_id = t.term_id WHERE p.blog_public = 1 AND t.type = 'product_tag' AND t.slug = '$tag'";
+	    $query = $wpdb->prepare("
+	    	SELECT COUNT(*)
+	    	FROM {$wpdb->base_prefix}mp_products p INNER JOIN {$wpdb->base_prefix}mp_term_relationships r
+	    		ON p.id = r.post_id INNER JOIN {$wpdb->base_prefix}mp_terms t
+	    		ON r.term_id = t.term_id
+	    	WHERE p.blog_public = 1
+	    		AND t.type = 'product_tag'
+	    		AND t.slug = %s", sanitize_title($tag)
+	    );
 	  } else {
-	    $query = "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_products p WHERE p.blog_public = 1";
+	    $query = "
+	    	SELECT COUNT(*)
+	    	FROM {$wpdb->base_prefix}mp_products p
+	    	WHERE p.blog_public = 1";
 	  }
 	  
 	  $total = $wpdb->get_var( $query );

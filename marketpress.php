@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.6
+Version: 2.9.3.7
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.6';
+	var $version = '2.9.3.7';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -1170,6 +1170,24 @@ Thanks again!", 'mp')
 	 	
 		//process cart updates
 		$this->update_cart();
+		
+		//check cart cookie to make applicable items haven't been removed
+		$valid = false;
+		$coupon_code = $this->get_coupon_code();
+		
+		if ( ! empty($coupon_code) ) {
+			foreach ( $this->get_cart_contents() as $product_id => $product ) {
+			 	if ( $this->coupon_applicable($coupon_code, $product_id) ) {
+				 	$valid = true;
+				 	break;
+				}
+			}
+			
+			if ( ! $valid ) {
+				$this->remove_coupon();
+				$this->cart_checkout_error(__('The coupon previously applied to your cart has been removed because it is no longer applicable', 'mp'));
+			}
+		}
 
 			//if global cart is on forward to main site checkout
 			if ( $this->global_cart && is_object($mp_wpmu) && !$mp_wpmu->is_main_site() ) {
@@ -1699,12 +1717,12 @@ Thanks again!", 'mp')
 	 $content .= '<div class="mp_product_meta">';
 	 $content .= mp_product_price(false);
 	 $content .= mp_buy_button(false, 'single');
+	 $content .= '<span style="display:none" class="date updated">' .  get_the_time('Y-m-d\TG:i') . '</span>';
+	 $content .= '<span style="display:none" class="vcard author"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>';	 
 	 $content .= '</div>';
 
 		$content .= mp_category_list($post->ID, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>');
 		$content .= mp_pinit_button($post->ID);
-
-	 	//$content .= mp_tag_list($post->ID, '<div class="mp_product_tags">', ', ', '</div>');
 
 		$content .= mp_related_products( $post->ID );
 
@@ -2161,7 +2179,7 @@ Thanks again!", 'mp')
 				break;
 
 		case "mp_orders_tax":
-				echo $this->get_setting('tax->inclusive', false) ? $this->format_currency('', $meta["mp_tax_total"][0]) : $this->format_currency('', $meta["mp_order_total"][0] * $this->get_setting('tax->rate'));
+				echo $this->format_currency('', $meta["mp_tax_total"][0]);
 				break;
 
 		case "mp_orders_discount":
@@ -3089,7 +3107,7 @@ Thanks again!", 'mp')
 		//process quantity updates
 		if (is_array($_POST['quant'])) {
 			foreach ($_POST['quant'] as $pbid => $quant) {
-					list($bid, $product_id, $variation) = split(':', $pbid);
+					list($bid, $product_id, $variation) = explode(':', $pbid);
 
 					if (is_multisite())
 						 switch_to_blog($bid);
@@ -3137,7 +3155,7 @@ Thanks again!", 'mp')
 		//remove items
 		if (isset($_POST['remove']) && is_array($_POST['remove'])) {
 			foreach ($_POST['remove'] as $pbid) {
-					list($bid, $product_id, $variation) = split(':', $pbid);
+					list($bid, $product_id, $variation) = explode(':', $pbid);
 			 unset($global_cart[$bid][$product_id][$variation]);
 			}
 
@@ -3194,14 +3212,7 @@ Thanks again!", 'mp')
 		}
 
 	 } else if (isset($_GET['remove_coupon'])) {
-
-		//remove coupon code
-		if (is_multisite()) {
-			global $blog_id;
-			unset($_SESSION['mp_cart_coupon_' . $blog_id]);
-		} else {
-			unset($_SESSION['mp_cart_coupon']);
-		}
+		$this->remove_coupon();
 		$this->cart_update_message( __('Coupon Removed', 'mp') );
 
 	 } else if (isset($_POST['mp_shipping_submit'])) { //save shipping info
@@ -3477,14 +3488,28 @@ Thanks again!", 'mp')
 	//returns any coupon code saved in $_SESSION. Will only reliably work on checkout pages
 	function get_coupon_code() {
 	 //get coupon code
-	 if (is_multisite()) {
+	 if ( is_multisite() ) {
 		global $blog_id;
 		$coupon_code = isset($_SESSION['mp_cart_coupon_' . $blog_id]) ? $_SESSION['mp_cart_coupon_' . $blog_id] : false;
 	 } else {
 		$coupon_code = isset($_SESSION['mp_cart_coupon']) ? $_SESSION['mp_cart_coupon'] : false;
 	 }
-
+	 
+	 if ( empty($coupon_code) ) {
+		 return false;
+	 }
+	 
 	 return $coupon_code;
+	}
+	
+	//removes a coupon (e.g. a product was removed after coupon was applied)
+	function remove_coupon() {
+		if ( is_multisite() ) {
+			global $blog_id;
+			unset($_SESSION['mp_cart_coupon_' . $blog_id]);
+		} else {
+			unset($_SESSION['mp_cart_coupon']);
+		}		
 	}
 
 	//checks a coupon code for validity. Return boolean
@@ -3536,7 +3561,7 @@ Thanks again!", 'mp')
 		$code = strtoupper($code);
 		$applies_to = isset($coupons[$code]['applies_to']) ? $coupons[$code]['applies_to'] : false;
 		
-		if ( $applies_to !== false ) {
+		if ( isset($applies_to['type']) && isset($applies_to['id']) ) {
 			$what = $applies_to['type']; // the type will be 'product', 'category'
 			$item_id	= $applies_to['id']; // the is is either id post ID or the term ID depending on the above
 			 
@@ -3547,10 +3572,9 @@ Thanks again!", 'mp')
 				 
 				case 'category':
 				 	$terms = get_the_terms($product_id, 'product_category');
+				 	$can_apply = false;
 				 	
 				 	if ( is_array($terms) ) {
-						$can_apply = false;
-						
 						foreach ( $terms as $term) {
 							if ( $term->term_id == $item_id ) {
 								$can_apply = true;
@@ -4160,77 +4184,107 @@ Thanks again!", 'mp')
 			 //attempt to record a download attempt
 			if (isset($download['downloaded'])) {
 				$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
-			update_post_meta($order->ID, 'mp_cart_info', $order->mp_cart_info);
+				update_post_meta($order->ID, 'mp_cart_info', $order->mp_cart_info);
 			}
+			
 			wp_redirect($url);
 			exit;
+		}
+		
+		set_time_limit(0); //try to prevent script from timing out
+
+		//create unique filename
+		$ext = ltrim(strrchr(basename($url), '.'), '.');
+		$filename = sanitize_file_name( strtolower( get_the_title($product_id) ) . '.' . $ext );
+
+		$dirs = wp_upload_dir();
+		$location = str_replace($dirs['baseurl'], $dirs['basedir'], $url);
+		if ( file_exists($location) ) {
+			// File is in our server
+			$tmp = $location;
+			$not_delete = true;
 		} else {
+			// File is remote so we need to download it first
+			require_once(ABSPATH . '/wp-admin/includes/file.php');
 
-			//create unique filename
-			$ext = ltrim(strrchr(basename($url), '.'), '.');
-			$filename = sanitize_file_name( strtolower( get_the_title($product_id) ) . '.' . $ext );
+			$tmp = download_url($url); //we download the url so we can serve it via php, completely obfuscating original source
 
-			// Determine if this file is in our server
-			$dirs = wp_upload_dir();
-			$location = str_replace($dirs['baseurl'], $dirs['basedir'], $url);
-			if ( file_exists($location) ) {
-				 $tmp = $location;
-				 $not_delete = true;
-			} else {
-				require_once(ABSPATH . '/wp-admin/includes/file.php');
-
-				$tmp = download_url($url); //we download the url so we can serve it via php, completely obfuscating original source
-
-				if ( is_wp_error($tmp) ) {
-					@unlink($tmp);
-					trigger_error("MarketPress was unable to download the file $url for serving as download: ".$tmp->get_error_message(), E_USER_WARNING);
-					wp_die( __('Whoops, there was a problem loading up this file for your download. Please contact us for help.', 'mp') );
-				}
+			if ( is_wp_error($tmp) ) {
+				@unlink($tmp);
+				trigger_error("MarketPress was unable to download the file $url for serving as download: " . $tmp->get_error_message(), E_USER_WARNING);
+				wp_die(__('Whoops, there was a problem loading up this file for your download. Please contact us for help.', 'mp'));
 			}
+		}
 
-			 if (file_exists($tmp)) {
-				ob_end_clean(); //kills any buffers set by other plugins
-				header('Content-Description: File Transfer');
-				header('Content-Type: application/octet-stream');
-				header('Content-Disposition: attachment; filename="'.$filename.'"');
-				header('Content-Transfer-Encoding: binary');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-				header('Pragma: public');
-				header('Content-Length: ' . filesize($tmp));
-				//readfile($tmp); //seems readfile chokes on large files
-				$chunksize = 1 * (1024 * 1024); // how many bytes per chunk
-				$buffer = '';
-				$cnt = 0;
-				$handle = fopen( $tmp, 'rb' );
+		if ( file_exists($tmp) ) {
+		 	$chunksize = (8 * 1024); //number of bytes per chunk
+			$buffer = '';
+			$filesize = filesize($tmp);
+			$length = $filesize;
+			list($fileext, $filetype) = wp_check_filetype($tmp);
+			
+			if ( empty($filetype) ) {
+				$filetype = 'application/octet-stream';
+			}
+			
+			ob_end_clean(); //kills any buffers set by other plugins
+			
+      if( isset($_SERVER['HTTP_RANGE']) ) {
+      	//partial download headers
+        preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
+        $offset = intval($matches[1]);
+        $length = intval($matches[2]) - $offset;
+        $fhandle = fopen($filePath, 'r');
+        fseek($fhandle, $offset); // seek to the requested offset, this is 0 if it's not a partial content request
+        $data = fread($fhandle, $length);
+        fclose($fhandle);
+        header('HTTP/1.1 206 Partial Content');
+        header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $filesize);
+      }
+			
+			header('Accept-Ranges: bytes');
+			header('Content-Description: File Transfer');
+			header('Content-Type: ' . $filetype);
+			header('Content-Disposition: attachment;filename="' . $filename . '"');
+			header('Expires: -1');
+			header('Cache-Control: public, must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+			header('Content-Length: ' . $filesize);
+			
+			if ( $filesize > $chunksize ) {
+				$handle = fopen($tmp, 'rb');
+				
 				if ( $handle === false ) {
 					trigger_error("MarketPress was unable to read the file $tmp for serving as download.", E_USER_WARNING);
 					return false;
 				}
-				while ( !feof( $handle ) ) {
+				
+				while ( ! feof($handle) && ( connection_status() === CONNECTION_NORMAL ) ) {
 					$buffer = fread( $handle, $chunksize );
 					echo $buffer;
 					ob_flush();
 					flush();
-					if ( $retbytes ) {
-						$cnt += strlen( $buffer );
-					}
 				}
-				fclose( $handle );
-
-				if (!$not_delete)
-					@unlink($tmp);
+				
+				fclose($handle);
+			} else {
+				ob_clean();
+				flush();
+				readfile($tmp);
 			}
 
-			//attempt to record a download attempt
-			if (isset($download['downloaded'])) {
-				$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
-			update_post_meta($order->ID, 'mp_cart_info', $order->mp_cart_info);
+			if ( ! $not_delete ) {
+				@unlink($tmp);
 			}
-			exit;
 		}
 
-		return false;
+		//attempt to record a download attempt
+		if ( isset($download['downloaded']) ) {
+			$order->mp_cart_info[$product_id][0]['download']['downloaded'] = $download['downloaded'] + 1;
+			update_post_meta($order->ID, 'mp_cart_info', $order->mp_cart_info);
+		}
+		
+		exit;
 	}
 
 	// Update profile fields
@@ -5185,6 +5239,7 @@ Notification Preferences: %s', 'mp');
 								$price = $data['price'] * $data['quantity'];
 								$discount_price = $this->coupon_value_product($coupon_code, $price, $product_id);
 								$price_text = '';
+								$subtotal_text = '';
 								
 								//price text
 								if ( $price != $discount_price ) {
@@ -5194,7 +5249,7 @@ Notification Preferences: %s', 'mp');
 	
 								//subtotal text
 								if ( $price != $discount_price ) {
-									$subtotal_text = '<del>' . $this->format_currency('', $price) . '</del><br />';
+									$subtotal_text .= '<del>' . $this->format_currency('', $price) . '</del><br />';
 								}
 								$subtotal_text .= $this->format_currency('', $discount_price);
 						
@@ -5212,6 +5267,7 @@ Notification Preferences: %s', 'mp');
 									$price = $data['price'] * $data['quantity'];
 									$discount_price = $this->coupon_value_product($coupon_code, $price, $product_id);
 									$price_text = '';
+									$subtotal_text = '';
 									
 									//price text
 									if ( $price != $discount_price ) {
@@ -5221,7 +5277,7 @@ Notification Preferences: %s', 'mp');
 		
 									//subtotal text
 									if ( $price != $discount_price ) {
-										$subtotal_text = '<del>' . $this->format_currency('', $price) . '</del><br />';
+										$subtotal_text .= '<del>' . $this->format_currency('', $price) . '</del><br />';
 									}
 									$subtotal_text .= $this->format_currency('', $discount_price);
 								
