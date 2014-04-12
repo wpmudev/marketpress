@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.8
+Version: 2.9.3.9
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.8';
+	var $version = '2.9.3.9';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -791,6 +791,7 @@ Thanks again!", 'mp')
 	 	'imgUrl' => $this->plugin_url.'images/loading.gif',
 	 	'addingMsg' => __('Adding to your cart...', 'mp'),
 	 	'outMsg' => __('In Your Cart', 'mp'),
+	 	'addToCartErrorMsg' => __('Oops... it looks like something went wrong and we couldn\'t add an item to your cart. Please check your cart for any missing items and try again.', 'mp'),
 	 	'showFilters' => $this->get_setting('show_filters'),
 	 	'links' => array('-1' => home_url($this->get_setting('slugs->store') . '/' . $this->get_setting('slugs->products'))),
 	 	'countriesNoPostCode' => $this->countries_no_postcode,
@@ -2921,16 +2922,24 @@ Thanks again!", 'mp')
 
 				$full_cart[$bid][$product_id] = array();
 				
+				$var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
+				
 				foreach ( $variations as $variation => $quantity ) {
+					if ( is_array($var_names) && count($var_names) > 1 ) {
+						$name = get_the_title($product_id) . ': ' . $var_names[$variation];
+					} else {
+						$name = get_the_title($product_id);
+					}
+
 					//check stock
-					if (get_post_meta($product_id, 'mp_track_inventory', true)) {
+					if ( get_post_meta($product_id, 'mp_track_inventory', true) ) {
 						$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
 						
-						if ( !is_array($stock) )
+						if ( ! is_array($stock) )
 						 	$stock[0] = $stock;
 						 	
-					 	if ($stock[$variation] < $quantity) {
-							$this->cart_checkout_error( sprintf(__("Sorry, we don't have enough of %1$s in stock. Your cart quantity has been changed to %2$s.", 'mp'), $product->post_title, number_format_i18n($stock[$variation])) );
+					 	if ( $stock[$variation] < $quantity ) {
+							$this->cart_checkout_error( sprintf(__('Sorry, we don\'t have enough of <strong>%1$s</strong> in stock. Your cart quantity has been changed to <strong>%2$s</strong>.', 'mp'), $name, number_format_i18n($stock[$variation])) );
 							$quantity = $stock[$variation];
 						}
 					}
@@ -2954,12 +2963,6 @@ Thanks again!", 'mp')
 				 	if ( !is_array($skus) )
 						$skus[0] = $skus;
 						
-					$var_names = maybe_unserialize(get_post_meta($product_id, 'mp_var_name', true));
-					if ( is_array($var_names) && count($var_names) > 1 )
-						$name = $product->post_title . ': ' . $var_names[$variation];
-					else
-						$name = $product->post_title;
-
 					//get if downloadable
 					if ( $download_url = get_post_meta($product_id, 'mp_file', true) )
 						$download = array('url' => $download_url, 'downloaded' => 0);
@@ -3449,12 +3452,19 @@ Thanks again!", 'mp')
 
 	//check to be sure each product is still available
 	$final_cart = $this->get_cart_contents( $this->global_cart );
-	if( is_array( $final_cart ) ) {
-		foreach($final_cart as $prod_id => $details) {
-			if (get_post_meta( $prod_id, 'mp_track_inventory', true ) ) {
-					$stock = maybe_unserialize(get_post_meta($prod_id, 'mp_inventory', true));
-				if( isset( $stock[0] ) && $stock[0] === 0 ) {
-					$this->cart_checkout_error( __("Sorry, one or more products are no longer available. Please review your cart.", 'mp') );
+	if ( is_array( $final_cart ) ) {
+		foreach ( $final_cart as $prod_id => $details ) {
+			if ( get_post_meta( $prod_id, 'mp_track_inventory', true ) ) {
+				$stock = get_post_meta($prod_id, 'mp_inventory', true);
+				
+				if ( ! is_array($stock) ) {
+					$stock = array($stock);
+				}
+				
+				foreach ( $details as $variation => $data ) {
+					if ( $data['quantity'] > $stock[$variation] ) {
+						$this->cart_checkout_error( __("Sorry, one or more products are no longer available. Please review your cart.", 'mp') );
+					}
 				}
 			}
 		}

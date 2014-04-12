@@ -253,7 +253,7 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 					<tr>
 						<th scope="row"><?php _e('Simplify API Credentials', 'mp') ?></th>
 						<td>
-							<span class="description"><?php _e('Login to Simplify to <a target="_blank" href="https://manage.simplify.com/#account/apikeys">get your API credentials</a>. Enter your test credentials, then live ones when ready.', 'mp') ?></span>
+							<span class="description"><?php _e('Login to Simplify to <a target="_blank" href="https://www.simplify.com/commerce/app#/account/apiKeys">get your API credentials</a>. Enter your test credentials, then live ones when ready.', 'mp') ?></span>
 							<p><label><?php _e('Private Key', 'mp') ?><br /><input value="<?php echo esc_attr($mp->get_setting('gateways->simplify->private_key')); ?>" size="70" name="mp[gateways][simplify][private_key]" type="text" /></label></p>
 							<p><label><?php _e('Public Key', 'mp') ?><br /><input value="<?php echo esc_attr($mp->get_setting('gateways->simplify->publishable_key')); ?>" size="70" name="mp[gateways][simplify][publishable_key]" type="text" /></label></p>
 						</td>

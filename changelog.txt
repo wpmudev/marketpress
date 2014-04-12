@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.3.9 - 4/12/2014
+----------------------------------------------------------------------
+- Fixed: incorrect URL in Simplify gateway settings
+- Fixed: incorrect URL in Authorize.net gateway settings
+- Fixed: when logged in, order status links are incorrect
+- Fixed: when using Authorize.net in sandbox mode API calls are being made in test mode
+- Fixed: when completing checkout, in-stock items some times show as out of stock (when using variations)
+- Fixed: when quickly adding multiple items to cart not all of the items get added http://wp.mu/96f
+
 2.9.3.8 - 4/5/2014 - Jonathan Cowher 
 ----------------------------------------------------------------------
 - Fixed: prices not showing up after 2.9.3.7 release

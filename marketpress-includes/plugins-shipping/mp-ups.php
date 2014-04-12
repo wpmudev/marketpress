@@ -244,8 +244,8 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 								<?php _e('UPS Sandbox Mode', 'mp') ?>
 							</th>
 							<td>
-								<label><input type="radio" name="mp[shipping][ups][sandbox]" value="1" <?php checked(! empty($this->ups_settings['sandbox'])); ?>" /> Sandbox</label><br />
-								<label><input type="radio" name="mp[shipping][ups][sandbox]" value="0" <?php checked(empty($this->ups_settings['sandbox'])); ?>" /> Production</label>
+								<label><input type="radio" name="mp[shipping][ups][sandbox]" value="1" <?php checked(! empty($this->ups_settings['sandbox'])); ?> /> <?php _e('Sandbox', 'mp'); ?></label><br />
+								<label><input type="radio" name="mp[shipping][ups][sandbox]" value="0" <?php checked(empty($this->ups_settings['sandbox'])); ?> /> <?php _e('Production', 'mp'); ?></label>
 							</td>
 						</tr>
 
@@ -501,7 +501,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		}
 
 		$shipping_options = $this->rate_request();
-
+		
 		return $shipping_options;
 
 	}
@@ -713,7 +713,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
-
+		
 		unset($xpath);
 		unset($dom);
 

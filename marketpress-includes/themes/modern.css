@@ -346,12 +346,15 @@ box-shadow: none;
 border: none;
 }
 
-#mp_product_list.mp_grid .mp_img_link img{
+#mp_product_list.mp_grid .mp_img_link img,
+#mp_product_list.mp_grid .mp_img_link img.alignleft,
+#mp_product_list.mp_grid .mp_img_link img.alignright{
 padding: 1px;
 border: 1px solid #CCC;
 -webkit-border-radius: 2px;
 -moz-border-radius: 2px;
 border-radius: 2px;
+margin: 0;
 }
 
 

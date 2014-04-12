@@ -1,12 +1,16 @@
+// AjaxQ jQuery Plugin
+// Copyright (c) 2012 Foliotek Inc.
+// MIT License
+// https://github.com/Foliotek/ajaxq
+(function($){var queues={};$.ajaxq=function(qname,opts){if(typeof opts==="undefined"){throw ("AjaxQ: queue name is not provided")}var deferred=$.Deferred(),promise=deferred.promise();promise.success=promise.done;promise.error=promise.fail;promise.complete=promise.always;var clonedOptions=$.extend(true,{},opts);enqueue(function(){var jqXHR=$.ajax.apply(window,[clonedOptions]).always(dequeue);jqXHR.done(function(){deferred.resolve.apply(this,arguments)});jqXHR.fail(function(){deferred.reject.apply(this,arguments)})});return promise;function enqueue(cb){if(!queues[qname]){queues[qname]=[];cb()}else{queues[qname].push(cb)}}function dequeue(){if(!queues[qname]){return}var nextCallback=queues[qname].shift();if(nextCallback){nextCallback()}else{delete queues[qname]}}};$.each(["getq","postq"],function(i,method){$[method]=function(qname,url,data,callback,type){if($.isFunction(data)){type=type||callback;callback=data;data=undefined}return $.ajaxq(qname,{type:method==="postq"?"post":"get",url:url,data:data,success:callback,dataType:type})}});var isQueueRunning=function(qname){return queues.hasOwnProperty(qname)};var isAnyQueueRunning=function(){for(var i in queues){if(isQueueRunning(i)){return true}}return false};$.ajaxq.isRunning=function(qname){if(qname){return isQueueRunning(qname)}else{return isAnyQueueRunning()}};$.ajaxq.clear=function(qname){if(!qname){for(var i in queues){if(queues.hasOwnProperty(i)){delete queues[i]}}}else{if(queues[qname]){delete queues[qname]}}}})(jQuery);
+
 /**** MarketPress Ajax JS *********/
 jQuery(document).ready(function($) {
 	//empty cart
 	function mp_empty_cart() {
-		if ($("a.mp_empty_cart").attr("onClick") != undefined) {
-			return;
-		}
-
-		$("a.mp_empty_cart").click(function() {
+		$(document).on('click', 'a.mp_empty_cart', function(e) {
+			e.preventDefault();
+			
 			var answer = confirm(MP_Ajax.emptyCartMsg);
 			if (answer) {
 				$(this).html('<img src="'+MP_Ajax.imgUrl+'" />');
@@ -20,36 +24,47 @@ jQuery(document).ready(function($) {
 	
 	//add item to cart
 	function mp_cart_listeners() {
-		$("input.mp_button_addcart").click(function(e) {
+		$(document).on('submit', '.mp_buy_form', function(e) {
 			e.preventDefault();
 			
-			var input = $(this);
-			var formElm = $(input).parents('form.mp_buy_form');
-			var tempHtml = formElm.html();
-			var serializedForm = formElm.serialize();
-			formElm.html('<img src="'+MP_Ajax.imgUrl+'" alt="'+MP_Ajax.addingMsg+'" />');
-			$.post(MP_Ajax.ajaxUrl, serializedForm, function(data) {
+			var $formElm = $(this),
+					tempHtml = $formElm.html(),
+					serializedForm = $formElm.serialize();
+			
+			$formElm.html('<img src="' + MP_Ajax.imgUrl + '" alt="' + MP_Ajax.addingMsg + '" />');
+			
+			// we use the AjaxQ plugin here because we need to queue multiple add-to-cart requests http://wp.mu/96f
+			$.ajaxq('addtocart', {
+				"data" : serializedForm,
+				"dataType" : "html",
+				"type" : "POST",
+				"url" : MP_Ajax.ajaxUrl,
+			})
+			
+			//callback when item is successfully added to cart
+			.success(function(data){
 				var result = data.split('||', 2);
 				if (result[0] == 'error') {
 					alert(result[1]);
-					formElm.html(tempHtml);
-					mp_cart_listeners();
+					$formElm.html(tempHtml);
 				} else {
-					formElm.html('<span class="mp_adding_to_cart">'+MP_Ajax.successMsg+'</span>');
+					$formElm.html('<span class="mp_adding_to_cart">' + MP_Ajax.successMsg + '</span>');
 					$("div.mp_cart_widget_content").html(result[1]);
 					if (result[0] > 0) {
-						formElm.fadeOut(2000, function(){
-							formElm.html(tempHtml).fadeIn('fast');
-							mp_cart_listeners();
+						$formElm.fadeOut(2000, function(){
+							$formElm.html(tempHtml).fadeIn('fast');
 						});
 					} else {
-						formElm.fadeOut(2000, function(){
-							formElm.html('<span class="mp_no_stock">'+MP_Ajax.outMsg+'</span>').fadeIn('fast');
-							mp_cart_listeners();
+						$formElm.fadeOut(2000, function(){
+							$formElm.html('<span class="mp_no_stock">' + MP_Ajax.outMsg + '</span>').fadeIn('fast');
 						});
 					}
-					mp_empty_cart(); //re-init empty script as the widget was reloaded
 				}
+			})
+			
+			//callback when an error occurs while adding an item to the cart
+			.error(function(){
+				alert(MP_Ajax.addToCartErrorMsg);
 			});
 		});
 	}
@@ -63,33 +78,25 @@ jQuery(document).ready(function($) {
 			var hrefParts = $(this).attr('href').split('#'),
 					qs = parse_query(hrefParts[1]);
 			get_and_insert_products($('.mp_product_list_refine').serialize() + '&page=' + qs['page']);
-
-			mp_cart_listeners();
 		});
 	}
 
 	// get products via ajax, insert into DOM with new pagination links
 	function get_and_insert_products(query_string){
-			ajax_loading(true);
-			$.post(
-				MP_Ajax.ajaxUrl, 
-				'action=get_products_list&'+query_string,
-				function(data) {
-					var qs = parse_query(query_string),
-							hash = 'order=' + $('select[name="order"]').val() + '&page=' + qs['page'];
-					
-					ajax_loading(false);
-					$('#mp_product_nav').remove();
-					$('#mp_product_list').first().replaceWith(data.products);
-					location.hash = hash;
+		ajax_loading(true);
+		$.post(MP_Ajax.ajaxUrl, 'action=get_products_list&' + query_string, function(data) {
+			var qs = parse_query(query_string),
+					hash = 'order=' + $('select[name="order"]').val() + '&page=' + qs['page'];
+			
+			ajax_loading(false);
+			$('#mp_product_nav').remove();
+			$('#mp_product_list').first().replaceWith(data.products);
+			location.hash = hash;
 
-					// scroll to top of list
-					var pos = $('a[name="mp-product-list-top"]').offset();
-					$('body,html').animate({ scrollTop: pos.top - 20 });
-					
-					mp_cart_listeners();
-				}
-			);
+			// scroll to top of list
+			var pos = $('a[name="mp-product-list-top"]').offset();
+			$('body,html').animate({ scrollTop: pos.top - 20 });
+	  });
 	}
 	
 	// parse querystring into variables

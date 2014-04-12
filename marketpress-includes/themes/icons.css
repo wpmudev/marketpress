@@ -71,7 +71,9 @@ padding: 0px;
 	background-image: -o-linear-gradient(bottom, #e5e5e5 0%, #f2f2f2 100%);
 	background-image: -webkit-linear-gradient(bottom, #e5e5e5 0%, #f2f2f2 100%);
 	background-image: linear-gradient(bottom, #e5e5e5 0%, #f2f2f2 100%);
+	display: inline-block;
 	font-family: "Helvetica Neue",Arial,Helvetica,"Nimbus Sans L",sans-serif;
+	line-height: 18px;
 	text-shadow: 0 1px 0 #fff;
 	text-decoration: none;
 	padding: 8px 20px;
@@ -86,7 +88,6 @@ padding: 0px;
 .mp_no_stock { opacity: 0.5; display: inline-block; }
 
 #order-id-submit { padding:5px 20px; }
-.mp_link_buynow { float: right; }
 
 #mp_product_list input[type="submit"]:hover,
 .type-product input[type="submit"]:hover,
@@ -343,7 +344,7 @@ list-style: none;
 margin: 10px 0px;
 }
 
-.mp_product_image_single { margin-top:0!important; }
+.mp_product_image_single { margin-top:0 !important; margin-left:0 !important; }
 
 .mp_store_navigation li, #mp_popular_products li, #mp_category_list li, .product_category li {
 background: url('modern-images/arrow_right.png') no-repeat 0px 3px;
@@ -561,8 +562,10 @@ font-size:1px;
 .mp_grid .mp_one_tile { vertical-align: top; clear: both; margin:30px 30px 0 0; *display: inline; *zoom: 1; }
 .mp_grid .mp_product_name,
 .mp_grid .mp_excerpt {  word-wrap: break-word; }
-.mp_grid .mp_img_link { display: block; }
-.mp_grid .mp_img_link img { margin: 0 auto; float: none; display: block; }
+.mp_grid .mp_img_link { display: block; margin-bottom: 20px; }
+.mp_grid .mp_img_link img,
+.mp_grid .mp_img_link img.alignleft,
+.mp_grid .mp_img_link img.alignright { margin: 0 auto; float: none; display: block; }
 
 .mp_grid #mp_product_list, 
 .mp_grid .mp_product_detail, 
@@ -574,7 +577,7 @@ font-size:1px;
 .mp_grid .mp_product_detail { vertical-align: top; margin-bottom: 60px; margin-top: 30px; }
 .mp_grid .mp_price_buy { vertical-align: bottom; }
 
-.mp_grid .mp_buy_form { float:none; text-align: center; }
+.mp_grid .mp_buy_form { float:none; }
 .mp_grid .mp_product_price { display: inline-block; background: none; padding: 0; margin: 0 0 0 16px; }
 .mp_grid .mp_product_price:before { 
 	content: ' ';

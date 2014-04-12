@@ -988,7 +988,7 @@ function _mp_cart_payment($type, $echo = false) {
 						$content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
 						return $content;
 				}
-				$content .= '<form id="mp_payment_form" method="post" action="' . mp_checkout_step_url('confirm-checkout') . '">';
+				$content .= '<form id="mp_payment_form" method="post" action="' . add_query_arg(array()) . '">';
 
 				$content .= apply_filters('mp_checkout_confirm_payment_' . $_SESSION['mp_payment_method'], $cart, $_SESSION['mp_shipping_info']);
 
@@ -997,12 +997,6 @@ function _mp_cart_payment($type, $echo = false) {
 				$content .= '</p>';
 				$content .= '</form>';
 		} else if ($type == 'confirmation') {
-
-				//if skipping a step
-				if (empty($_SESSION['mp_payment_method'])) {
-						//$content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
-				}
-
 				//gateway plugin message hook
 				$content .= apply_filters('mp_checkout_payment_confirmation_' . $_SESSION['mp_payment_method'], '', $mp->get_order($_SESSION['mp_order']));
 
@@ -1455,7 +1449,7 @@ function mp_order_status( $echo = true ) {
 					}
 					
 					$content .= '
-						<form action="<?php mp_orderstatus_link(true, true); ?>" method="get">
+						<form action="' . mp_orderstatus_link(false, true) . '" method="get">
 								<label>' . apply_filters('mp_order_status_label_or_enter_order_number', __('Or enter your 12-digit Order ID number:', 'mp'), $order) . '<br />
 										<input type="text" name="order_id" id="order_id" class="input" value="" size="20" /></label>
 								<input type="submit" id="order-id-submit" value="' . apply_filters('mp_order_status_label_look_up_button', __('Look Up &raquo;', 'mp'), $order) . '" />

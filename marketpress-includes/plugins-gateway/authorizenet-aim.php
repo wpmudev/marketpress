@@ -538,11 +538,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         // Order Info
         $payment->setParameter("x_description", "Order ID: " . $_SESSION['mp_order']);
         $payment->setParameter("x_invoice_num", $_SESSION['mp_order']);
-        if ($settings['gateways']['authorizenet-aim']['mode'] == 'sandbox') {
-            $payment->setParameter("x_test_request", true);
-        } else {
-            $payment->setParameter("x_test_request", false);
-        }
+				$payment->setParameter("x_test_request", false);	// this should NEVER be true, even in sandbox mode
         $payment->setParameter("x_duplicate_window", 30);
 
         // E-mail
@@ -550,7 +546,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         $payment->setParameter("x_footer_email_receipt", $settings['gateways']['authorizenet-aim']['footer_email_receipt']);
         $payment->setParameter("x_email_customer", strtoupper($settings['gateways']['authorizenet-aim']['email_customer']));
 
-        $_names = split(" ", $billing_info['name']);
+        $_names = explode(" ", $billing_info['name']);
         if (isset($_names[0])) {
             $first_name = array_shift($_names);
         } else {
@@ -582,7 +578,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 
         //only add shipping info if set
         if (!$mp->download_only_cart($cart) && isset($shipping_info['name'])) {
-            $_names = split(" ", $shipping_info['name']);
+            $_names = explode(" ", $shipping_info['name']);
             if (isset($_names[0])) {
                 $shipping_first_name = array_shift($_names);
             } else {
@@ -698,7 +694,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
                     <tr>
                         <th scope="row"><?php _e('Gateway Credentials', 'mp') ?></th>
                         <td>
-                            <span class="description"><?php print sprintf(__('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.authorize.net/support/merchant/Integration_Settings/Access_Settings.htm"); ?></span>
+                            <span class="description"><?php print sprintf(__('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.authorize.net/support/merchant/wwhelp/wwhimpl/js/html/wwhelp.htm "); ?></span>
                             <p>
                                 <label><?php _e('Login ID', 'mp') ?><br />
                                     <input value="<?php echo esc_attr($settings['gateways']['authorizenet-aim']['api_user']); ?>" size="30" name="mp[gateways][authorizenet-aim][api_user]" type="text" />
