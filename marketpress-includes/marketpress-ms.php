@@ -1436,6 +1436,7 @@ function _mp_global_products_html_list( $results ) {
 		$count = 0;
 		
 		foreach ( $results as $index => $result ) :
+			switch_to_blog($result->blog_id);
 			$post = get_post($result->post_id);
 			setup_postdata($post);
 			
@@ -1481,6 +1482,7 @@ function _mp_global_products_html_list( $results ) {
 		
 		$post = NULL; //wp_reset_postdata() doesn't work here
 		
+		restore_current_blog();
 		return apply_filters('_mp_global_products_html_list', $html, $results);
 }
 endif;
