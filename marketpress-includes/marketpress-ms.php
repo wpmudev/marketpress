@@ -64,16 +64,16 @@ class MarketPress_MS {
 		$build = (int) get_site_option('mp_network_build', '1');
 		
 		//check if installed
-		if ( get_site_option('mp_network_settings') && $this->build === $build ) {
+		if ( $this->build === $build ) {
 			return;
 		}
 		
-		if ( $build == 1 ) {
+		if ( $build === 1 && ! get_site_option('mp_network_settings') ) {
 			$this->initial_install();
-		}
-		
-		if ( $build <= 2 ) {
-			add_action('init', array(&$this, 'fix_bad_term_relationships'));
+		} else {
+			if ( $build <= 2 ) {
+				add_action('init', array(&$this, 'fix_bad_term_relationships'));
+			}
 		}
 		
 		update_site_option('mp_network_build', $this->build);
@@ -89,7 +89,7 @@ class MarketPress_MS {
 	 * @access public
 	 */
 	public function initial_install() {
-		global $wpdb;
+		global $wpdb, $current_site, $mp;
 		
 		//create tables
 		$table_1 = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}mp_products` (
@@ -130,6 +130,7 @@ class MarketPress_MS {
 		$wpdb->query($table_2);
 		$wpdb->query($table_3);
 		
+		$settings = get_site_option('mp_network_settings', array());
 		$default_settings = array(
 			'main_blog' => $current_site->blog_id,
 			'global_cart' => 0,
