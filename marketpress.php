@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.3.9
+Version: 2.9.4
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.3.9';
+	var $version = '2.9.4';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -1105,7 +1105,7 @@ Thanks again!", 'mp')
 	//scans post type at template_redirect to apply custom themeing to products
 	function load_store_templates() {
 	 global $wp_query, $mp_wpmu, $mp_gateway_active_plugins;
-
+	 
 		//only filter public side
 		if (is_admin()) return;
 
