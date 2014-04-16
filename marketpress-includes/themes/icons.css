@@ -63,6 +63,7 @@ padding: 0px;
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	background-color: #dfdfdf;
+	color: #333;
 	-moz-box-shadow: inset 0 1px 0 #fff;
 	-webkit-box-shadow: inset 0 1px 0 #fff;
 	box-shadow: inset 0 1px 0 #fff;
@@ -563,9 +564,9 @@ font-size:1px;
 .mp_grid .mp_product_name,
 .mp_grid .mp_excerpt {  word-wrap: break-word; }
 .mp_grid .mp_img_link { display: block; margin-bottom: 20px; }
-.mp_grid .mp_img_link img,
-.mp_grid .mp_img_link img.alignleft,
-.mp_grid .mp_img_link img.alignright { margin: 0 auto; float: none; display: block; }
+.mp_grid .mp_product_detail img,
+.mp_grid .mp_product_detail img.alignleft,
+.mp_grid .mp_product_detail img.alignright { margin: 0 auto; float: none; display: block; }
 
 .mp_grid #mp_product_list, 
 .mp_grid .mp_product_detail, 

@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
 	
 	//add item to cart
 	function mp_cart_listeners() {
-		$(document).on('submit', '.mp_buy_form', function(e) {
+		$(document).on('submit', '.mp_buy_form:has(input[name="action"])', function(e) {
 			e.preventDefault();
 			
 			var $formElm = $(this),

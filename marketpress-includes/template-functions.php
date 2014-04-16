@@ -2188,7 +2188,7 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 
 		$label = ($label === true) ? __('Price: ', 'mp') : $label;
 
-		$meta = get_post_custom($post_id);
+		$meta = (array) get_post_custom($post_id);
 		//unserialize
 		foreach ($meta as $key => $val) {
 				$meta[$key] = maybe_unserialize($val[0]);
@@ -2324,7 +2324,7 @@ function mp_buy_button($echo = true, $context = 'list', $post_id = NULL) {
 		global $id, $mp;
 		$post_id = ( NULL === $post_id ) ? $id : $post_id;
 
-		$meta = get_post_custom($post_id);
+		$meta = (array) get_post_custom($post_id);
 		//unserialize
 		foreach ($meta as $key => $val) {
 				$meta[$key] = maybe_unserialize($val[0]);

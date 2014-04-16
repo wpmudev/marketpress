@@ -5,7 +5,12 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-- New: Bitpay Bitcoin gateway (alpha)
+2.9.4 - 4/16/2014
+----------------------------------------------------------------------
+- Fixed: grid view doesn't work when displaying global product list
+- Fixed: products on are not added to cart when using buy now button on single product page
+- Fixed: product categories not properly assigning when using global marketplace http://wp.mu/970
+- Added: Bitpay Bitcoin gateway (alpha)
 
 2.9.3.9 - 4/12/2014
 ----------------------------------------------------------------------
