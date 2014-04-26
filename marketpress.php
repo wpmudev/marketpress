@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4
+Version: 2.9.4.1
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4';
+	var $version = '2.9.4.1';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -125,6 +125,7 @@ class MarketPress {
 		//custom post type
 		add_action( 'init', array(&$this, 'register_custom_posts'), 0 ); //super high priority
 		add_filter( 'request', array(&$this, 'handle_edit_screen_filter') );
+		add_filter( 'post_updated_messages', array(&$this, 'post_updated_messages') );
 
 		//edit products page
 		add_filter( 'manage_product_posts_columns', array(&$this, 'edit_products_columns') );
@@ -199,6 +200,33 @@ class MarketPress {
 		add_action( 'profile_update', array(&$this, 'user_profile_update') );
 		add_action( 'edit_user_profile', array(&$this, 'user_profile_fields') );
 		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
+	}
+	
+	function post_updated_messages( $messages ) {
+		global $post, $post_ID;
+		
+		$post_type = get_post_type($post_ID);
+		
+		if ( $post_type != 'mp_order' && $post_type != 'product' ) { return $messages; }
+		
+		$obj = get_post_type_object($post_type);
+		$singular = $obj->labels->singular_name;
+		
+		$messages[$post_type] = array(
+			0 => '', // Unused. Messages start at index 1.
+			1 => sprintf(__($singular.' updated. <a href="%s">View ' . strtolower($singular) . '</a>'), esc_url(get_permalink($post_ID))),
+			2 => __('Custom field updated.'),
+			3 => __('Custom field deleted.'),
+			4 => __($singular.' updated.'),
+			5 => isset($_GET['revision']) ? sprintf(__($singular . ' restored to revision from %s'), wp_post_revision_title((int) $_GET['revision'], false)) : false,
+			6 => sprintf(__($singular.' published. <a href="%s">View ' . strtolower($singular).'</a>'), esc_url(get_permalink($post_ID))),
+			7 => __('Page saved.'),
+			8 => sprintf(__($singular . ' submitted. <a target="_blank" href="%s">Preview ' . strtolower($singular).'</a>'), esc_url(add_query_arg('preview', 'true', get_permalink($post_ID)))),
+			9 => sprintf(__($singular . ' scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview ' . strtolower($singular).'</a>'), date_i18n(__('M j, Y @ G:i'), strtotime($post->post_date)), esc_url(get_permalink($post_ID))),
+			10 => sprintf(__($singular . ' draft updated. <a target="_blank" href="%s">Preview ' . strtolower($singular).'</a>'), esc_url(add_query_arg( 'preview', 'true', get_permalink($post_ID)))),
+		);
+		
+		return $messages;
 	}
 	
 	function admin_start_session() {
@@ -821,6 +849,7 @@ Thanks again!", 'mp')
 	 if ( !$this->get_setting('show_lightbox') )
 		return;
 
+	 wp_enqueue_script('jquery');
 	 wp_enqueue_style('mp-lightbox', $this->plugin_url . 'lightbox/style/lumebox.css', false, $this->version);	//we enqueue styles on every page just in case of shortcodes http://wp.mu/8ou
 	 wp_register_script('mp-lightbox', $this->plugin_url . 'lightbox/js/jquery.lumebox.min.js', array('jquery'), $this->version, true);	//we just register the script here - we can output selectively later
 
@@ -6951,9 +6980,9 @@ Notification Preferences: %s', 'mp');
 							<th scope="row"><?php _e('Relate Products By', 'mp') ?></th>
 							<td>
 								<select name="mp[related_products][relate_by]">
-									<option value="both" <?php checked($this->get_setting('related_products->relate_by'), 'both'); ?>><?php _e('Category &amp; Tags', 'mp'); ?></option>
-									<option value="category" <?php checked($this->get_setting('related_products->relate_by'), 'category'); ?>><?php _e('Category Only', 'mp'); ?></option>
-									<option value="tags" <?php checked($this->get_setting('related_products->relate_by'), 'tags'); ?>><?php _e('Tags Only', 'mp'); ?></option>
+									<option value="both" <?php selected($this->get_setting('related_products->relate_by'), 'both'); ?>><?php _e('Category &amp; Tags', 'mp'); ?></option>
+									<option value="category" <?php selected($this->get_setting('related_products->relate_by'), 'category'); ?>><?php _e('Category Only', 'mp'); ?></option>
+									<option value="tags" <?php selected($this->get_setting('related_products->relate_by'), 'tags'); ?>><?php _e('Tags Only', 'mp'); ?></option>
 								</select>
 							</td>
 						</tr>
@@ -7409,7 +7438,7 @@ Notification Preferences: %s', 'mp');
 								<tr>
 							<th scope="row"><?php _e('Measurement System', 'mp') ?></th>
 							<td>
-						<label><input value="english" name="mp[shipping][system]" type="radio"<?php checked($this->get_setting('shipping->system'), 'english') ?> /> <?php _e('Engish (Pounds)', 'mp') ?></label>
+						<label><input value="english" name="mp[shipping][system]" type="radio"<?php checked($this->get_setting('shipping->system'), 'english') ?> /> <?php _e('English (Pounds)', 'mp') ?></label>
 						<label><input value="metric" name="mp[shipping][system]" type="radio"<?php checked($this->get_setting('shipping->system'), 'metric') ?> /> <?php _e('Metric (Kilograms)', 'mp') ?></label>
 							</td>
 					 </tr>
@@ -7867,7 +7896,7 @@ class MarketPress_Product_List extends WP_Widget {
 	}
 
 	function widget($args, $instance) {
-	 global $mp;
+	 global $mp, $post;
 
 		if ($instance['only_store_pages'] && !mp_is_shop_page())
 			return;
@@ -7922,14 +7951,16 @@ class MarketPress_Product_List extends WP_Widget {
 	 $custom_query = new WP_Query('post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query);
 
 	 //do we have products?
-	 if (count($custom_query->posts)) {
-		echo '<ul id="mp_product_list">';
-		foreach ($custom_query->posts as $post) {
+	 if ( $custom_query->have_posts() ) {
+		echo '<ul id="mp_product_list" class="hfeed">';
+		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 
-			echo '<li '.mp_product_class(false, 'mp_product', $post->ID).'>';
-			echo '<h3 class="mp_product_name"><a href="' . get_permalink( $post->ID ) . '">' . esc_attr($post->post_title) . '</a></h3>';
+			echo '<li itemscope itemtype="http://schema.org/Product" ' . mp_product_class(false, array('mp_product', 'hentry'), $post->ID) . '>';
+			echo '<h3 class="mp_product_name entry-title" itemprop="name"><a href="' . get_permalink( $post->ID ) . '">' . esc_attr($post->post_title) . '</a></h3>';
 			if ($instance['show_thumbnail'])
 			 mp_product_image( true, 'widget', $post->ID, $instance['size'] );
+			
+			echo '<div class="entry-content" style="margin:0;padding:0;width:auto;">';
 
 			if ($instance['show_excerpt'])
 			 echo '<div class="mp_product_content">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID) . '</div>';
@@ -7943,10 +7974,17 @@ class MarketPress_Product_List extends WP_Widget {
 			 if ($instance['show_button'])
 				echo mp_buy_button(false, 'list', $post->ID);
 
-			 echo '</div>';
+			echo '</div>';
 			}
+			
+			echo '</div>';
+			echo '<div style="display:none">
+							<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
+							<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
+						</div>';
 			echo '</li>';
-		}
+		endwhile;
+		wp_reset_postdata();
 		echo '</ul>';
 	 } else {
 		?>

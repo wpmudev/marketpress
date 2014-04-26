@@ -1599,23 +1599,24 @@ function mp_list_products() {
 		'post_type' => 'product',
 		'post_status' => 'publish',
 	);
+	$tax_query = array();
 	
 	//setup taxonomies if possible
 	if ( $wp_query->get('taxonomy') == 'product_category' ) {
-		$query['tax_query'][] = array(
+		$tax_query[] = array(
 			'taxonomy' => 'product_category',
 			'field' => 'slug',
 			'terms' => $wp_query->get('term'),
 		);
 	} elseif ( $wp_query->get('taxonomy') == 'product_tag' ) {
-		$query['tax_query'][] = array(
+		$tax_query[] = array(
 			'taxonomy' => 'product_tag',
 			'field' => 'slug',
 			'terms' => $wp_query->get('term'),
 		);
 	} elseif ( !is_null($args['category']) || !is_null($args['tag']) ) {
 		if ( !is_null($args['category']) ) {
-			$query['tax_query'][] = array(
+			$tax_query[] = array(
 				'taxonomy' => 'product_category',
 				'field' => 'slug',
 				'terms' => sanitize_title($args['category']),
@@ -1623,7 +1624,7 @@ function mp_list_products() {
 		}
 		
 		if ( !is_null($args['tag']) ) {
-			$query['tax_query'][] = array(
+			$tax_query[] = array(
 				'taxonomy' => 'product_tag',
 				'field' => 'slug',
 				'terms' => sanitize_title($args['tag']),
@@ -1631,10 +1632,10 @@ function mp_list_products() {
 		}			
 	}
 	
-	if ( isset($query['tax_query']) && count($query['tax_query']) > 1 ) {
-		$query['tax_query'][] = array(
-			'relation' => 'AND',
-		);
+	if ( count($tax_query) > 1 ) {
+		$query['tax_query'] = array_merge(array('relation' => 'AND'), $tax_query);
+	} elseif ( count($tax_query) == 1 ) {
+		$query['tax_query'] = $tax_query;
 	}
 	
 	//setup pagination
@@ -1815,14 +1816,14 @@ function _mp_products_html_grid($custom_query) {
 							<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
 								' . $img . '
 								' . $pinit .'
-								<h3 class="mp_product_name entry-title">
+								<h3 class="mp_product_name entry-title" itemprop="name">
 									<a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
 								</h3>
 							
 								<div>' . $mp_product_list_content . '</div>
 							</div>
 
-							<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px; margin-left:-' . $width . 'px;"' : '') . '>
+							<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
 								' . mp_product_price(false, $post->ID) . '
 								' . mp_buy_button(false, 'list', $post->ID) . '
 								' . apply_filters('mp_product_list_meta', '', $post->ID) . '
@@ -2022,12 +2023,10 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
 		}
 
 		if ($meta) {
-				$return .= '<div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="mp_product_meta">';
-				//price
-				$return .= mp_product_price(false, $post->ID);
-				//button
-				$return .= mp_buy_button(false, 'single', $post->ID);
-				$return .= '</div>';
+			//price
+			$return .= mp_product_price(false, $post->ID);
+			//button
+			$return .= mp_buy_button(false, 'single', $post->ID);
 		}
 		$return .= '</div>';
 
@@ -2203,7 +2202,7 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 				} else {
 						$price = '<span itemprop="price" class="mp_normal_price"><span class="mp_current_price">' . $mp->format_currency('', $meta["mp_price"][0]) . '</span></span>';
 				}
-		} else if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1 && !is_singular('product')) { //only show from price in lists
+		} else if (is_array($meta["mp_price"]) && count($meta["mp_price"])) { //only show from price in lists
 				if ($meta["mp_is_sale"]) {
 						//do some crazy stuff here to get the lowest price pair ordered by sale prices
 						asort($meta["mp_sale_price"], SORT_NUMERIC);
@@ -2221,7 +2220,7 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 				return '';
 		}
 		
-		$price_html = _mp_apply_deprecated_filters('mp_product_price_tag', array('<span class="mp_product_price">' . $label . $price . '</span>', $post_id, $label), '2.9.3.7', 'mp_product_price_html');
+		$price_html = _mp_apply_deprecated_filters('mp_product_price_tag', array('<span itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="mp_product_price">' . $label . $price . '</span>', $post_id, $label), '2.9.3.7', 'mp_product_price_html');
 		$price_html = apply_filters('mp_product_price_html', $price_html, $post_id, $label, $price);
 
 		if ( $echo )
@@ -2572,7 +2571,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 			$image = '
 				<div itemscope class="hmedia">
 					<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
-					<a rel="enclosure" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>
+					<a rel="lightbox enclosure" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>
 				</div>';
 		}
 

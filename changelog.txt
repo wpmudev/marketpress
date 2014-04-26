@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+- Fixed: product list widget doesn't show price for products with variations http://wp.mu/9ai
+- Fixed: spelling error in shipping settings http://wp.mu/9aj
+- Fixed: lightbox no longer works on product images
+- Fixed: not able to use both categories and tags in [mp_list_products] http://wp.mu/9ao
+- Fixed: grid view broken in 2014 theme
+- Fixed: related products "Relate Products By" dropdown doesn't accurately show selected value
+- Added: custom update messages for products and orders
+- Added: additional schema.org markup for Google Rich Snippets
+
 2.9.4 - 4/16/2014
 ----------------------------------------------------------------------
 - Fixed: grid view doesn't work when displaying global product list

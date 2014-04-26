@@ -572,10 +572,9 @@ font-size:1px;
 .mp_grid .mp_product_detail, 
 .mp_grid .mp_price_buy { display: inline-block; }
 
-.mp_grid .mp_one_tile, 
-.mp_grid .mp_one_product { display: inline; }
+.mp_grid .mp_one_tile { display: inline-block; }
 
-.mp_grid .mp_product_detail { vertical-align: top; margin-bottom: 60px; margin-top: 30px; }
+.mp_grid .mp_product_detail { vertical-align: top; margin-top: 30px; }
 .mp_grid .mp_price_buy { vertical-align: bottom; }
 
 .mp_grid .mp_buy_form { float:none; }

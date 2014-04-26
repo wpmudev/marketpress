@@ -959,7 +959,7 @@ class MarketPress_MS {
 			} else { //new post
 
 				//process
-				foreach ($new_terms as $term) {
+				foreach ( $new_terms as $term ) {
 
 					//check if in terms, but not attached
 					if ( in_array($term->slug, $existing_slugs) ) {
@@ -1415,11 +1415,13 @@ function mp_list_global_products( $args = '' ) {
 	} else {
 		$content .= '<div id="mp_no_products">' . apply_filters('mp_product_list_none', __('No Products', 'mp')) . '</div>';
 	}
+
+	$content .= '</div>';
 	 
 	//show navigation?
 	if ( $paginav )
 		$content .= mp_global_products_nav_link($args, $no_limit_query);
-
+	
 	$content = apply_filters('mp_list_global_products', $content);
 
 	if ( $echo ) {
