@@ -119,9 +119,9 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 	  }
 
 	  //tax line
-	  if ( ($tax_price = $mp->tax_price()) !== false ) {
-	    $total = $total + $tax_price;
-	  }
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$total += $mp->tax_price();
+    }
 
 	  //get CubePoints user
 	  $uid = cp_currentUser();

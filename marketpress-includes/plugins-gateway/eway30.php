@@ -304,9 +304,10 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 		}
 		
 		//tax line
-		if ( ($tax_price = $mp->tax_price()) !== false ) {
-			$total = $total + $tax_price;
-		}
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$total += $mp->tax_price();
+    }
+    
 		$amount = number_format( round( $total, 2 ), 2, '.', '');
 			
 		require_once($mp->plugin_dir . "plugins-gateway/eway/RapidAPI.php");

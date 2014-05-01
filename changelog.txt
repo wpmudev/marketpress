@@ -5,6 +5,16 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.2
+----------------------------------------------------------------------
+- Fixed: dashboard stats widget includes orders that are trashed
+- Fixed: can't edit user shipping/billing info on user edit screen
+- Fixed: tax breakdown doesn't display when using tax-inclusive pricing http://wp.mu/9bu
+- Fixed: special characters show as html entities in emails
+- Fixed: errors when checking out using Authorize.net gateway http://wp.mu/9bv
+
+2.9.4.1
+----------------------------------------------------------------------
 - Fixed: product list widget doesn't show price for products with variations http://wp.mu/9ai
 - Fixed: spelling error in shipping settings http://wp.mu/9aj
 - Fixed: lightbox no longer works on product images

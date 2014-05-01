@@ -115,11 +115,11 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
             $total += $shipping_price;
         }
 
-        //tax line
-        if ($tax_price = $mp->tax_price()) {
-            $total += $tax_price;
+				//tax line
+        if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+        	$total += $mp->tax_price();
         }
-
+        
         $content .= '<tr>';
         $content .= '<td>';
         $content .= __('Card Number', 'mp');

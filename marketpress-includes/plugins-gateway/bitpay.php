@@ -109,9 +109,9 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		}
 
 		//tax line
-		if ( $tax_price = $mp->tax_price() ) {
-			$total += $tax_price;
-		}
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$total += $mp->tax_price();
+    }
 
 		$order_id          = $mp->generate_order_id();
 		$notificationURL   = $this->ipn_url;

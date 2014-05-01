@@ -540,11 +540,11 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
       $total = $total + $shipping_price;
     }
 
-    //tax line
-    if ( ($tax_price = $mp->tax_price()) !== false ) {
-      $total = $total + $tax_price;
+		//tax line
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$total += $mp->tax_price();
     }
-
+    
     // Billing Info
     $payment->setParameter("TENDER", 'C');
     $payment->setParameter("TRXTYPE", 'S');

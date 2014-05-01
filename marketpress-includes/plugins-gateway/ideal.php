@@ -121,7 +121,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		}
 		
 		//tax line if tax inclusive pricing is off. If it's on it would screw up the totals
-    if ( !$mp->get_setting('tax->tax_inclusive') && ($tax_price = $mp->tax_price()) !== false ) {
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$tax_price = $mp->tax_price();
 			$total += $tax_price;
 			//Add tax as separate product
 			$items[] = array(

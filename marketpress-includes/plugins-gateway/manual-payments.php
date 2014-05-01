@@ -111,11 +111,11 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	    $total = $total + $shipping_price;
 	  }
 
-	  //tax line
-	  if ( ($tax_price = $mp->tax_price()) !== false ) {
-	    $total = $total + $tax_price;
-	  }
-
+		//tax line
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$total += $mp->tax_price();
+    }
+    
 		$order_id = $mp->generate_order_id();
 
     $payment_info['gateway_public_name'] = $this->public_name;

@@ -324,10 +324,11 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 			$total += $shipping_price;
 		}
 
-		if($tax_price = $mp->tax_price()) {
-			$total += $tax_price;
-		}
-
+		//tax line
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$total += $mp->tax_price();
+    }
+    
 		$order_id = $mp->generate_order_id();
 
 		try {

@@ -442,9 +442,9 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						if (($shipping_tax_price = $mp->shipping_tax_price($shipping_price)) !== false)
 								$shipping_tax_prices[] = $shipping_tax_price;
 
-						if (($tax_price = $mp->tax_price()) !== false)
-								$tax_prices[] = $tax_price;
+						$tax_prices[] =  $mp->tax_price();
 				}
+				
 				//go back to original blog
 				if (is_multisite())
 						switch_to_blog($current_blog_id);
@@ -482,28 +482,32 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 				//shipping line
 				if ($shipping_price = array_sum($shipping_prices)) {
-						$shipping_tax_price = array_sum($shipping_tax_prices);
-						if (!$mp->global_cart && apply_filters('mp_shipping_method_lbl', ''))
-								$shipping_method = apply_filters('mp_shipping_method_lbl', '');
-						else
-								$shipping_method = '';
-						$content .= '<tr>';
-						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
-						$content .= '	 <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_tax_price) . '</td>';
-						$content .= '	 <td>' . $shipping_method . '</td>';
-						$content .= '</tr>';
-						$total = $total + $shipping_price;
+					$shipping_tax_price = array_sum($shipping_tax_prices);
+					if (!$mp->global_cart && apply_filters('mp_shipping_method_lbl', ''))
+							$shipping_method = apply_filters('mp_shipping_method_lbl', '');
+					else
+							$shipping_method = '';
+					$content .= '<tr>';
+					$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
+					$content .= '	 <td class="mp_cart_col_shipping">' . $mp->format_currency('', $shipping_tax_price) . '</td>';
+					$content .= '	 <td>' . $shipping_method . '</td>';
+					$content .= '</tr>';
+					$total = $total + $shipping_price;
 				}
 
 				//tax line
 				if ($tax_price = array_sum($tax_prices)) {
-						$content .= '<tr>';
-						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . esc_html($mp->get_setting('tax->label', __('Taxes', 'mp'))) . ':</td>';
-						$content .= '	 <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
-						$content .= '	 <td>&nbsp;</td>';
-						$content .= '</tr>';
+					$content .= '<tr>';
+					$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . esc_html($mp->get_setting('tax->label', __('Taxes', 'mp'))) . ':</td>';
+					$content .= '	 <td class="mp_cart_col_tax">' . $mp->format_currency('', $tax_price) . '</td>';
+					$content .= '	 <td>&nbsp;</td>';
+					$content .= '</tr>';
+					
+					if ( ! $mp->get_setting('tax->tax_inclusive') ) {
 						$total = $total + $tax_price;
+					}
 				}
+				
 
 				$content .= '</tbody><tfoot><tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
@@ -581,14 +585,17 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						if (($shipping_tax_price = $mp->shipping_tax_price($shipping_price)) !== false)
 								$shipping_tax_prices[] = $shipping_tax_price;
 
-						if (($tax_price = $mp->tax_price()) !== false)
-								$tax_prices[] = $tax_price;
+						$tax_prices[] = $mp->tax_price();
 				}
 				//go back to original blog
 				if (is_multisite())
 						switch_to_blog($current_blog_id);
 
 				$total = array_sum($totals);
+				
+				if ( $mp->get_setting('tax->tax_inclusive') ) {
+					$total -= array_sum($tax_prices);
+				}
 
 				//coupon line TODO - figure out how to apply them on global checkout
 				if ( !empty($coupon_code) ) {
@@ -665,7 +672,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						switch_to_blog($current_blog_id);
 
 				$total = array_sum($totals);
-
+				
 				$content .= '<tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
 				$content .= '	 <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';

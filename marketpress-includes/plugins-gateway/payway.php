@@ -126,8 +126,10 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		}
 		
 		//tax line
-		if ( ($tax_price = $mp->tax_price()) !== false ) {
+		if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+			$tax_price = $mp->tax_price();
 			$total = $total + $tax_price;
+
 			if(!empty($tax_price))
 				$parameters["Tax"] = '1,'.$tax_price;
 			//Add tax as separate product

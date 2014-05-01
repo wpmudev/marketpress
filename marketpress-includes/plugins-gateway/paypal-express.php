@@ -1024,7 +1024,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       }
 
       //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-      if ( !$mp->get_setting('tax->tax_inclusive') && ($tax_price = $mp->tax_price(false)) !== false ) {
+      if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+      	$tax_price = $mp->tax_price(false);
 				$total = $total + $tax_price;
 				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4.1
+Version: 2.9.4.2
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4.1';
+	var $version = '2.9.4.2';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -197,7 +197,8 @@ class MarketPress {
 		add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Tag_Cloud_Widget");') );
 
 		// Edit profile
-		add_action( 'profile_update', array(&$this, 'user_profile_update') );
+		add_action( 'edit_user_profile_update', array(&$this, 'user_profile_update') );
+		add_action( 'personal_options_update', array(&$this, 'user_profile_update') );
 		add_action( 'edit_user_profile', array(&$this, 'user_profile_fields') );
 		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
 	}
@@ -2724,8 +2725,15 @@ Thanks again!", 'mp')
 		return (float)(isset($order->mp_shipping_with_tax) ? $order->mp_shipping_with_tax : $order->mp_tax_shipping);
 	}
 
-	//returns the calculated price for taxes based on a bunch of foreign tax laws.
-	function tax_price($format = false, $cart = false) {
+	/**
+	 * Gets the calculated price for taxes based on a bunch of foreign tax laws.
+	 *
+	 * @access public
+	 * @param bool $format (optional) Format number as currency when returned
+	 * @param array $cart (optional) The cart array to use for calculations
+	 * @return string/float 
+	 */
+	function tax_price( $format = false, $cart = false ) {
 
 	 //grab cart for just this blog
 	 if (!$cart)
@@ -2757,25 +2765,23 @@ Thanks again!", 'mp')
 	 $special_totals = array();
 	 $coupon_code = $this->get_coupon_code();
 	 
-	 if ( !$this->get_setting('tax->tax_inclusive') ) {
-		 foreach ($cart as $product_id => $variations) {
-			//check for special rate
-			$special = (bool)get_post_meta($product_id, 'mp_is_special_tax', true);
-			if ($special)
-				$special_rate = get_post_meta($product_id, 'mp_special_tax', true);
-				
-			foreach ($variations as $variation => $data) {
-				//if not taxing digital goods, skip them completely
-				if ( !$this->get_setting('tax->tax_digital') && isset($data['download']) && is_array($data['download']) )
-					continue;
+	 foreach ($cart as $product_id => $variations) {
+		//check for special rate
+		$special = (bool)get_post_meta($product_id, 'mp_is_special_tax', true);
+		if ($special)
+			$special_rate = get_post_meta($product_id, 'mp_special_tax', true);
+			
+		foreach ($variations as $variation => $data) {
+			//if not taxing digital goods, skip them completely
+			if ( !$this->get_setting('tax->tax_digital') && isset($data['download']) && is_array($data['download']) )
+				continue;
 
-				$product_price = $this->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-				
-				if ($special)
-					$special_totals[] = $product_price * $special_rate;
-				else
-					$totals[] = $product_price;
-			}
+			$product_price = $this->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
+			
+			if ($special)
+				$special_totals[] = $product_price * $special_rate;
+			else
+				$totals[] = $product_price;
 		}
 	}	
 		
@@ -4326,55 +4332,66 @@ Thanks again!", 'mp')
 		exit;
 	}
 
-	// Update profile fields
-	function user_profile_update() {
-	 $user_id =	 $_REQUEST['user_id'];
+	/**
+	 * Update user fields
+	 *
+	 * @access public
+	 * @param int $user_id
+	 */
+	function user_profile_update( $user_id ) {
 		$fields = array( 'email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone' );
 		
 		//shipping fields
 		$meta = array();
 		foreach ( $fields as $field ) {
-			if ( isset($_POST['mp_shipping_info'][$field]) )
-				$meta[$field] = $_POST['mp_shipping_info'][$field];
-			else
-				$meta[$field] = '';
+			if ( isset($_POST['mp_shipping_info'][$field]) ) {
+				$value = $_POST['mp_shipping_info'][$field];
+			} else {
+				$value = '';
+			}
+			
+			$meta[$field] = $_SESSION['mp_shipping_info'][$field] = $value;
 		}
 		update_user_meta($user_id, 'mp_shipping_info', $meta);
 		
-	 // Billing Info
+		// Billing Info
 		$meta = array();
-	 foreach ( $fields as $field ) {
-			if ( isset($_POST['mp_billing_info'][$field]) )
-				$meta[$field] = $_POST['mp_billing_info'][$field];
-			else
-				$meta[$field] = '';
+		foreach ( $fields as $field ) {
+			if ( isset($_POST['mp_billing_info'][$field]) ) {
+				$value = $_POST['mp_billing_info'][$field];
+			} else {
+				$value = '';
+			}
+			
+			$meta[$field] = $_SESSION['mp_billing_info'][$field] = $value;
 		}
 		update_user_meta($user_id, 'mp_billing_info', $meta);
 	}
 
 	function user_profile_fields() {
-	 global $current_user;
+		global $current_user;
 		$fields = array( 'email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone' );
 		
-	 if (isset($_REQUEST['user_id'])) {
-		$user_id = $_REQUEST['user_id'];
-	 } else {
-		$user_id = $current_user->ID;
-	 }
+		if (isset($_REQUEST['user_id'])) {
+			$user_id = $_REQUEST['user_id'];
+		} else {
+			$user_id = $current_user->ID;
+		}
 		
 		//initialize variables
-	 $meta = get_user_meta($user_id, 'mp_shipping_info', true);
+		$meta = get_user_meta($user_id, 'mp_shipping_info', true);
 		foreach ( $fields as $field ) {
-			if ( !empty($_SESSION['mp_shipping_info'][$field]) )
+			if ( ! empty($_SESSION['mp_shipping_info'][$field]) ) {
 				$$field = $_SESSION['mp_shipping_info'][$field];
-			else if ( !empty($meta[$field]) )
+			} elseif ( !empty($meta[$field]) ) {
 				$$field = $meta[$field];
-			else
+			} else {
 				$$field = '';
+			}
 		}
+		
 		if ( empty($country) )
-		$country = $this->get_setting('base_country');
-	 
+			$country = $this->get_setting('base_country');
 	 ?>
 	 <h3><?php _e('Shipping Info', 'mp'); ?></h3>
 	 <table class="form-table">
@@ -4435,20 +4452,22 @@ Thanks again!", 'mp')
 				<input size="20" id="mp_shipping_info_phone" name="mp_shipping_info[phone]" type="text" value="<?php echo esc_attr($phone); ?>" /></td>
 		</tr>
 	 </table>
-		<?php
+	 <?php
 
-	 //initialize variables
-	 $meta = get_user_meta($user_id, 'mp_billing_info', true);
+		//initialize variables
+	 	$meta = get_user_meta($user_id, 'mp_billing_info', true);
 		foreach ( $fields as $field ) {
-			if ( !empty($_SESSION['mp_billing_info'][$field]) )
+			if ( !empty($_SESSION['mp_billing_info'][$field]) ) {
 				$$field = $_SESSION['mp_billing_info'][$field];
-			else if ( !empty($meta[$field]) )
+			} elseif ( !empty($meta[$field]) ) {
 				$$field = $meta[$field];
-			else
+			} else {
 				$$field = '';
+			}
 		}
+		
 		if ( empty($country) )
-		$country = $this->get_setting('base_country');
+			$country = $this->get_setting('base_country');
 	 ?>
 	 <h3><?php _e('Billing Info', 'mp'); ?> <a class="add-new-h2" href="javascript:mp_copy_billing('mp_billing_info');"><?php _e('Same as Shipping', 'mp'); ?></a></h3>
 	 <table class="form-table">
@@ -4566,7 +4585,7 @@ Thanks again!", 'mp')
 		add_filter( 'wp_mail_from_name', create_function('', 'return get_bloginfo("name");') );
 		add_filter( 'wp_mail_from', create_function('', '$settings = get_option("mp_settings");return isset($settings["store_email"]) ? $settings["store_email"] : get_option("admin_email");') );
 
-		return wp_mail($to, $subject, $msg);
+		return wp_mail($to, $subject, html_entity_decode($msg));
 	}
 
 	//replaces shortcodes in email msgs with dynamic content

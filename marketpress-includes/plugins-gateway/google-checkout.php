@@ -169,10 +169,11 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 		}
 		
 		//tax line
-		if ( $tax_price = $mp->tax_price() ) {
-			$total = $total + $tax_price;
-			$params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.rate"] = $settings['tax']['rate'];
-		} else {
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+    	$tax_price = $mp->tax_price();
+     	$total += $tax_price;
+     	$params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.rate"] = $tax_price;
+    } else {
       $params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.rate"] = '0.00';
 		}
 
