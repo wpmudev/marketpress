@@ -561,19 +561,18 @@ class MarketPress_MS {
 		}
 
 		//save settings
-		if (isset($_POST['marketplace_network_settings'])) {
-
+		if ( isset($_POST['marketplace_network_settings']) ) {
 			//filter slugs
 			$_POST['mp']['slugs'] = array_map('sanitize_title', $_POST['mp']['slugs']);
-
-			update_site_option( 'mp_network_settings', apply_filters('mp_network_settings_save', $_POST['mp']) );
+			
+			update_site_option('mp_network_settings', apply_filters('mp_network_settings_save', $_POST['mp']));
 			
 			//flush rewrite rules due to product slugs
 			update_option('mp_flush_rewrite', 1);
 			
 			echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
 		}
-		$settings = get_site_option( 'mp_network_settings' );
+		$settings = get_site_option('mp_network_settings');
 		
 		if (!isset($settings['global_cart']))
 			$settings['global_cart'] = 0;
@@ -1437,6 +1436,7 @@ function _mp_global_products_html_list( $results ) {
 		$html = '';
 		$total = count($results);
 		$count = 0;
+		$current_blog_id = get_current_blog_id();
 		
 		foreach ( $results as $index => $result ) :
 			switch_to_blog($result->blog_id);
@@ -1485,7 +1485,7 @@ function _mp_global_products_html_list( $results ) {
 		
 		$post = NULL; //wp_reset_postdata() doesn't work here
 		
-		restore_current_blog();
+		switch_to_blog($current_blog_id);
 		return apply_filters('_mp_global_products_html_list', $html, $results);
 }
 endif;
@@ -1504,6 +1504,7 @@ function _mp_global_products_html_grid( $results ) {
 	}
 
 	$inline_style = !( $mp->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
+	$current_blog_id = get_current_blog_id();
 
 	foreach ( $results as $index => $result ) :
 		switch_to_blog($result->blog_id);
@@ -1555,7 +1556,7 @@ function _mp_global_products_html_grid( $results ) {
 	
 	$post = NULL; //wp_reset_postdata() doesn't work here
 	
-	restore_current_blog();
+	switch_to_blog($current_blog_id);
 	return apply_filters('_mp_global_products_html_grid', $html, $results);
 }
 endif;

@@ -113,7 +113,11 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		//shipping line
 		if ( ($shipping_price = $mp->shipping_price()) !== false ) {
 			$total += $shipping_price;
-			$shipping_tax_price = $mp->shipping_tax_price($shipping_price);
+			
+			if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+				$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+			}
+			
 			$parameters["Shipping"] = '1,'.$shipping_price;
 			//Add shipping as separate product
 			$items[] = array(

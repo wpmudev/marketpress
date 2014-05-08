@@ -181,13 +181,17 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
       $total = $total + $shipping_price;
+      
+			if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+				$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+			}
     }
     
 		//tax line
     if ( ! $mp->get_setting('tax->tax_inclusive') ) {
     	$total += $mp->tax_price();
     }   
-     
+				
     $params['Amount'] = number_format( round( $total, 2 ), 2, '.', '');
     
     $result = $this->api_call('https://au.ewaygateway.com/Request', $params);

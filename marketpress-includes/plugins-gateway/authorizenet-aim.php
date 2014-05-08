@@ -522,13 +522,17 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         //shipping line
         if (($shipping_price = $mp->shipping_price()) !== false) {
         	$total = $total + $shipping_price;
+
+					if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+						$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+					}        	
         }
 
         //tax line
         if ( ! $mp->get_setting('tax->tax_inclusive') ) {
         	$total += $mp->tax_price();
         }
-
+				
         // Billing Info
         $payment->setParameter("x_card_code", $_SESSION['card_code']);
         $payment->setParameter("x_exp_date ", $_SESSION['exp_month'] . $_SESSION['exp_year']);

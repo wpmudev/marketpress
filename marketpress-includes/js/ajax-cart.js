@@ -145,7 +145,7 @@ jQuery(document).ready(function($) {
 				var $perPage = $('.mp_list_filter').find('[name="per_page"]');
 				if ( $perPage.length )
 					query_string += '&per_page=' + $perPage.val();
-				
+					
 				get_and_insert_products(query_string);
 				update_dropdown_state(query_string);
 		}
@@ -155,7 +155,8 @@ jQuery(document).ready(function($) {
 		});
 		
 		$('#product-category').change(function(){
-			window.location.href = MP_Ajax.links[$(this).val()] + location.hash;
+			var hash = location.hash.replace(/page=(\d)*/, 'page=1'); //when changing categories set page=1
+			window.location.href = MP_Ajax.links[$(this).val()] + hash;
 		});
 	}
 

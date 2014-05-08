@@ -639,6 +639,10 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
     //shipping line
     if ( ($shipping_price = $mp->shipping_price()) !== false ) {
       $total = $total + $shipping_price;
+      
+			if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+				$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+			}      
     }
     
 		//tax line
@@ -824,3 +828,6 @@ if ( is_multisite() ) {
     <?php
   }
 }
+
+//register shipping plugin
+//mp_register_gateway_plugin('MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', __('PayPal Chained Payments', 'mp'), true);

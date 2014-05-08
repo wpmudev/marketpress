@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4.2
+Version: 2.9.4.3
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4.2';
+	var $version = '2.9.4.3';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -666,7 +666,7 @@ Thanks again!", 'mp')
 	 * an easy way to get to our settings array without undefined indexes
 	 */
 	function get_setting($key, $default = null) {
-	 $settings = get_option( 'mp_settings' );
+	 	$settings = get_option('mp_settings');
 		$keys = explode('->', $key);
 		array_map('trim', $keys);
 		if (count($keys) == 1)
@@ -1438,11 +1438,8 @@ Thanks again!", 'mp')
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 		} else {
 			//otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
-			$wp_query->is_page = 1;
-			//$wp_query->is_singular = 1;
 			$wp_query->is_404 = null;
 			$wp_query->post_count = 1;
-			//$wp_query->queried_object_id = get_option('mp_store_page');
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
@@ -1799,11 +1796,11 @@ Thanks again!", 'mp')
 		if ( !in_the_loop() )
 			 return $content;
 
-	$msgs = $this->get_setting('msg');
-	 $content .= do_shortcode($msgs['product_list']);
-	 $content .= mp_list_products(array('echo' => false));
+		$msgs = $this->get_setting('msg');
+		$content .= do_shortcode($msgs['product_list']);
+		$content .= mp_list_products(array('echo' => false));
 
-	 return $content;
+		return $content;
 	}
 
 	//this is the default theme added to product taxonomies
@@ -1813,10 +1810,10 @@ Thanks again!", 'mp')
 			 return $content;
 
 		$msgs = $this->get_setting('msg');
-	 $content = do_shortcode($msgs['product_list']);
-	 $content .= mp_list_products(array('echo' => false));
+		$content = do_shortcode($msgs['product_list']);
+		$content .= mp_list_products(array('echo' => false));
 
-	 return $content;
+		return $content;
 	}
 
 	/**
@@ -2582,18 +2579,15 @@ Thanks again!", 'mp')
 			$cart = $this->get_cart_contents();
 
 	 //get total after any coupons
+	 $coupon_code = $this->get_coupon_code();
 	 $totals = array();
 	 foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $variation => $data) {
-				 $totals[] = $this->before_tax_price($data['price'], $product_id) * $data['quantity'];
+				 $totals[] = $this->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
 			}
 	 }
 
 	 $total = array_sum($totals);
-
-	 $coupon_code = $this->get_coupon_code();
-	 if ( $coupon = $this->coupon_value($coupon_code, $total) )
-		$total = $coupon['new_total'];
 
 	 //get address
 	 $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
@@ -2603,7 +2597,7 @@ Thanks again!", 'mp')
 	 $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : (isset($meta['state']) ? $meta['state'] : '');
 	 $zip = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : (isset($meta['zip']) ? $meta['zip'] : '');
 	 $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : (isset($meta['country']) ? $meta['country'] : '');
-		$selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
+	$selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
 
 	 //check required fields
 	 if ( empty($address1) || empty($city) || !$this->is_valid_zip($zip, $country) || empty($country) || !(is_array($cart) && count($cart)) )
@@ -2615,11 +2609,14 @@ Thanks again!", 'mp')
 	 } else if ( $this->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
 			//shipping plugins tie into this to calculate their shipping cost
 			$price = apply_filters( 'mp_calculate_shipping_'.$_SESSION['mp_shipping_info']['shipping_option'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+			if ( $this->get_setting('tax->tax_inclusive') && $this->get_setting('tax->tax_shipping') ) {
+				$price = $price * (1 + (float) $this->get_setting('tax->rate'));
+			}
 		} else {
 			//shipping plugins tie into this to calculate their shipping cost
 			$price = apply_filters( 'mp_calculate_shipping_'.$this->get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 		}
-
+		
 		//calculate extra shipping
 	 $extras = array();
 	 foreach ($cart as $product_id => $variations) {
@@ -2633,15 +2630,19 @@ Thanks again!", 'mp')
 
 	 //merge
 	 $price = round($price + $extra, 2);
+	 
+		if ( $this->get_setting('tax->tax_inclusive') && $this->get_setting('tax->tax_shipping') ) {
+			$price = $price / (1 + (float) $this->get_setting('tax->rate'));
+		}
 
-	 //boot if shipping plugin didn't return at least 0
-	 if (empty($price))
-		return false;
-
-	 if ($format)
-		return $this->format_currency('', $price);
-	 else
-		return $price;
+		//boot if shipping plugin didn't return at least 0
+		if (empty($price))
+			return false;
+		
+		if ($format)
+			return $this->format_currency('', $price);
+		else
+			return $price;
 	}
 	
 	//returns the calculated price for shipping after tax. For display only.
@@ -2711,9 +2712,10 @@ Thanks again!", 'mp')
 				 }
 				 break;
 	 }
+	 
 	 if (empty($price))
 			$price = 0;
-		
+			
 	 $price = apply_filters( 'mp_shipping_tax_price', $price, $shipping_price, $country, $state );
 		
 		$price += $shipping_price;
@@ -2724,7 +2726,7 @@ Thanks again!", 'mp')
 	function get_display_shipping($order) {
 		return (float)(isset($order->mp_shipping_with_tax) ? $order->mp_shipping_with_tax : $order->mp_tax_shipping);
 	}
-
+	
 	/**
 	 * Gets the calculated price for taxes based on a bunch of foreign tax laws.
 	 *
@@ -2778,6 +2780,10 @@ Thanks again!", 'mp')
 
 			$product_price = $this->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
 			
+			if ( $this->get_setting('tax->tax_inclusive') ) {
+				$product_price = $product_price / (1 + (float) $this->get_setting('tax->rate'));
+			}
+			
 			if ($special)
 				$special_totals[] = $product_price * $special_rate;
 			else
@@ -2785,14 +2791,14 @@ Thanks again!", 'mp')
 		}
 	}	
 		
-	 
 	$total = array_sum($totals);
 	$special_total = array_sum($special_totals);
-
+	
 	//add in shipping?
-	if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) )
+	if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) ) {
 		$total += $shipping_price;
-			
+	}
+	
 	//check required fields
 	if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
 		return false;
@@ -2838,7 +2844,7 @@ Thanks again!", 'mp')
 			$price = 0;
 
 	 $price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
-
+	 
 	 if ($format)
 		return $this->format_currency('', $price);
 	 else

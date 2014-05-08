@@ -569,7 +569,11 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 
 				//shipping line
 				if ($shipping_price = $mp->shipping_price()) {
-						$total += $shipping_price;
+					$total += $shipping_price;
+					
+					if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+						$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+					}
 				}
 
 				//tax line

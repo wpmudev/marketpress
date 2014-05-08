@@ -116,13 +116,17 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 	  //shipping line
 	  if ( ($shipping_price = $mp->shipping_price()) !== false ) {
 	    $total = $total + $shipping_price;
+
+			if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+				$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+			}
 	  }
 
 	  //tax line
     if ( ! $mp->get_setting('tax->tax_inclusive') ) {
     	$total += $mp->tax_price();
     }
-
+				
 	  //get CubePoints user
 	  $uid = cp_currentUser();
 	  //test for CubePoints amount

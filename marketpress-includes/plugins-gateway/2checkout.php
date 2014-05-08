@@ -150,15 +150,19 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 
         //shipping line
         if (($shipping_price = $mp->shipping_price()) !== false) {
-            $total = round(( $total + $shipping_price), 2);
-            $params['sh_cost'] = $shipping_price;
+          $total = round(( $total + $shipping_price), 2);
+          $params['sh_cost'] = $shipping_price;
+            
+					if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+						$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+					}       
         }
 
         //tax line
         if ( ! $mp->get_setting('tax->tax_inclusive') ) {
         	$total += round(($total + $mp->tax_price()), 2);
         }
-
+				
         $params['total'] = $total;
 
         $param_list = array();

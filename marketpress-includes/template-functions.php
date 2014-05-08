@@ -297,7 +297,7 @@ function mp_related_products() {
 	//we only want to run the query if we have categories or tags to look for.
 	if ( count($tag_list) > 0 || count($categories) > 0 ) {
 		//make the query
-		$related_query = new WP_Query( $query_args );
+		$related_query = new WP_Query($query_args);
 		
 		//how are we formatting the output
 		if( $args['simple_list'] ) {
@@ -316,7 +316,6 @@ function mp_related_products() {
 			}
 			
 			$output .= '</div>';
-			
 		} else {
 			//we'll use the $mp settings and functions
 			$layout_type = $mp->get_setting('list_view');
@@ -415,7 +414,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						foreach ($cart as $product_id => $variations) {
 								foreach ($variations as $variation => $data) {
 										$price = $data['price'] * $data['quantity'];
-										$discount_price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
+										$discount_price = $mp->coupon_value_product($coupon_code, $price, $product_id);
 										$totals[] = $discount_price;
 										
 										$content .= '<tr>';
@@ -450,6 +449,10 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						switch_to_blog($current_blog_id);
 
 				$total = array_sum($totals);
+				
+				if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+					$total += array_sum($shipping_tax_prices) - array_sum($shipping_prices);
+				}
 
 				//coupon line TODO - figure out how to apply them on global checkout
 				if ( !empty($coupon_code) ) {
@@ -506,8 +509,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 					if ( ! $mp->get_setting('tax->tax_inclusive') ) {
 						$total = $total + $tax_price;
 					}
-				}
-				
+				}				
 
 				$content .= '</tbody><tfoot><tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
@@ -597,6 +599,10 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 					$total -= array_sum($tax_prices);
 				}
 
+				if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+					$total += array_sum($shipping_tax_prices) - array_sum($shipping_prices);
+				}
+
 				//coupon line TODO - figure out how to apply them on global checkout
 				if ( !empty($coupon_code) ) {
 						
@@ -672,6 +678,10 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						switch_to_blog($current_blog_id);
 
 				$total = array_sum($totals);
+
+				if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+					$total += array_sum($shipping_tax_prices) - array_sum($shipping_prices);
+				}
 				
 				$content .= '<tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
@@ -1740,6 +1750,7 @@ function _mp_products_html_list($custom_query) {
 		$html = '';
 		$total = $custom_query->post_count;
 		$count = 0;
+		$current_post = $post;
 		
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 				$count = $custom_query->current_post + 1;
@@ -1782,7 +1793,7 @@ function _mp_products_html_list($custom_query) {
 					</div>';
 		endwhile;
 		
-		$post = NULL; //wp_reset_postdata() doesn't work here
+		$post = null; //wp_reset_postdata() doesn't work here for some reason
 		
 		return apply_filters('_mp_products_html_list', $html, $custom_query);
 }
@@ -1792,6 +1803,7 @@ if (!function_exists('_mp_products_html_grid')) :
 function _mp_products_html_grid($custom_query) {
 		global $mp,$post;
 		$html = '';
+		$current_post = $post;
 		
 		//get image width
 		if ($mp->get_setting('list_img_size') == 'custom') {
@@ -1847,7 +1859,7 @@ function _mp_products_html_grid($custom_query) {
 
 		$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
 		
-		$post = NULL; //wp_reset_postdata() doesn't work here
+		$post = null; //wp_reset_postdata() doesn't work here for some reason
 		
 		return apply_filters('_mp_products_html_grid', $html, $custom_query);
 }

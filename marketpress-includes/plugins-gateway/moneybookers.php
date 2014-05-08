@@ -168,6 +168,11 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
                 $shipping_price = $mp->shipping_tax_price($shipping_price);
 
             $total = $total + $shipping_price;
+            
+						if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+							$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+						}
+            
             $params["amount{$i}"] = $mp->display_currency($shipping_price);
             $params["amount{$i}_description"] = __('Shipping & Handling:', 'mp');
             $i++;

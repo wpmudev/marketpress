@@ -5,6 +5,18 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.3
+----------------------------------------------------------------------
+- Fixed: admin bar shows wrong site than what is currently being viewed in multisite setup
+- Fixed: receiving errors when checking out using Fedex http://wp.mu/9c2
+- Fixed: when using UPS shipping, cart is showing one shipping rate while a different rate is being applied to the orders http://wp.mu/9c3
+- Fixed: [mp_related_products] some times causes product categories/tags to not display http://wp.mu/9ce
+- Fixed: PHP warning on product category/tag page
+- Fixed: when changing categories some times no products will display even though there are products in the selected category
+- Fixed: PayPal network settings don't save
+- Fixed: item price in cart is wrong http://wp.mu/9cj
+- Fixed: when using prices inclusive of tax and also taxing shipping fees the total tax is calculated incorrectly http://wp.mu/9cs
+
 2.9.4.2
 ----------------------------------------------------------------------
 - Fixed: dashboard stats widget includes orders that are trashed

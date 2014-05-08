@@ -1036,8 +1036,13 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		$price = is_numeric($price) ? $price : 0;
 		$handling = is_numeric($handling) ? $handling : 0;
+		$total = $price + $handling;
+		
+		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+			$total = $total * (1 + (float) $mp->get_setting('tax->rate'));
+		}
 
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $price + $handling) );
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total));
 		return $option;
 	}
 

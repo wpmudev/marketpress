@@ -587,6 +587,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		//Shipper
 		$shipment = $root->appendChild($dom->createElement('Shipment'));
+		$shipment->appendChild($dom->createElement('NegotiatedRatesIndicator'));
 		$shipper = $shipment->appendChild($dom->createElement('Shipper'));
 		$shipper->appendChild($dom->createElement('ShipperNumber',$this->ups_settings['shipper_number']));
 		$address = $shipper->appendChild($dom->createElement('Address'));
@@ -776,8 +777,13 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		$price = is_numeric($price) ? $price : 0;
 		$handling = is_numeric($handling) ? $handling : 0;
+		$total = $price + $handling;
+		
+		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+			$total = $total * (1 + (float) $mp->get_setting('tax->rate'));
+		}
 
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $price + $handling) );
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total));
 		return $option;
 	}
 

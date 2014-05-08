@@ -20,9 +20,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	//set to true if you want to add per-product extra shipping cost field
 	public $use_extra = true;
 
-	public $sandbox_uri = 'https://wsbeta.fedex.com:443/web-services/rate';
+	public $sandbox_uri = 'https://wsbeta.fedex.com:443/web-services';
 
-	public $production_uri = 'https://ws.fedex.com:443/web-services/rate';
+	public $production_uri = 'https://ws.fedex.com:443/web-services';
 
 	/**
 	* Runs when your class is instantiated. Use to setup your plugin instead of __construct()
@@ -595,7 +595,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function rate_request( $international = false) {
 		global $mp;
-
+		
 		$shipping_options = $this->fedex_settings['services'];
 
 		//Assume equal size packages. Find the best matching box size
@@ -891,8 +891,13 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 		$price = is_numeric($price) ? $price : 0;
 		$handling = is_numeric($handling) ? $handling : 0;
+		$total = $price + $handling;
+		
+		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+			$total = $total * (1 + (float) $mp->get_setting('tax->rate'));
+		}
 
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $price + $handling) );
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total) );
 		return $option;
 	}
 

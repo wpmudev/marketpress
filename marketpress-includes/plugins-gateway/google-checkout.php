@@ -166,7 +166,11 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
 			$params["checkout-flow-support.merchant-checkout-flow-support.shipping-methods.flat-rate-shipping-1.price"] = $shipping_price;
 			$params["checkout-flow-support.merchant-checkout-flow-support.shipping-methods.flat-rate-shipping-1.price.currency"] = $this->currencyCode;
 			$params["checkout-flow-support.merchant-checkout-flow-support.shipping-methods.flat-rate-shipping-1.name"] = __('Standard Shipping', 'mp');
-		}
+			
+			if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
+				$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
+			}
+		}				
 		
 		//tax line
     if ( ! $mp->get_setting('tax->tax_inclusive') ) {
