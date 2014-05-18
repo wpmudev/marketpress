@@ -71,7 +71,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		// Get settings for convenience sake
 		$this->settings = get_option('mp_settings');
 		$this->ups_settings = $this->settings['shipping']['ups'];
-
 	}
 
 	function default_boxes(){
@@ -291,7 +290,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 							<td>
 								<?php foreach($this->services as $name => $service) : ?>
 								<label>
-									<input type="checkbox" name="mp[shipping][ups][services][<?php echo $name; ?>]" value="1" <?php checked($this->ups_settings['services'][$name]); ?> />&nbsp;<?php echo $service->name; ?>
+									<input type="checkbox" name="mp[shipping][ups][services][<?php echo $name; ?>]" value="1" <?php checked($this->ups_settings['services'][$name], 1); ?> />&nbsp;<?php echo $service->name; ?>
 								</label><br />
 								<?php endforeach; ?>
 							</td>
@@ -372,7 +371,14 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*  array. Don't forget to return!
 	*/
 	function process_shipping_settings($settings) {
-
+		foreach ( $this->services as $service => $class ) {
+			if ( isset($_POST['mp']['shipping']['ups']['services'][$service]) ) {
+				$settings['shipping']['ups']['services'][$service] = 1;
+			} else {
+				$settings['shipping']['ups']['services'][$service] = 0;
+			}
+		}
+		
 		return $settings;
 	}
 

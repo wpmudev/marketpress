@@ -679,10 +679,6 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 				$total = array_sum($totals);
 
-				if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-					$total += array_sum($shipping_tax_prices) - array_sum($shipping_prices);
-				}
-				
 				$content .= '<tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
 				$content .= '	 <td class="mp_cart_col_total">' . $mp->format_currency('', $total) . '</td>';
@@ -1706,7 +1702,7 @@ function mp_list_products() {
 	
 	//The Query
 	$custom_query = new WP_Query($query);
-
+	
 	// get layout type for products
 	if ( is_null($args['list_view']) ) {
 		$layout_type = $mp->get_setting('list_view');
@@ -1730,12 +1726,12 @@ function mp_list_products() {
 	} else {
 		$content .= '<div id="mp_no_products">' . apply_filters('mp_product_list_none', __('No Products', 'mp')) . '</div>';
 	}
-
+	
 	$content .= '</div>';
 	$content .= ( ! $args['nopaging'] ) ? mp_products_nav(false, $custom_query) : '';
 	
 	$content = apply_filters('mp_list_products', $content, $args);
-
+	
 	if ( $args['echo'] ) {
 		echo $content;
 	} else {
@@ -1745,7 +1741,7 @@ function mp_list_products() {
 endif;
 
 if (!function_exists('_mp_products_html_list')) :
-function _mp_products_html_list($custom_query) {
+function _mp_products_html_list( $custom_query ) {
 		global $mp,$post;
 		$html = '';
 		$total = $custom_query->post_count;
@@ -1793,18 +1789,18 @@ function _mp_products_html_list($custom_query) {
 					</div>';
 		endwhile;
 		
-		$post = null; //wp_reset_postdata() doesn't work here for some reason
+		$post = $current_post; //wp_reset_postdata() doesn't work here for some reason
 		
 		return apply_filters('_mp_products_html_list', $html, $custom_query);
 }
 endif;
 
 if (!function_exists('_mp_products_html_grid')) :
-function _mp_products_html_grid($custom_query) {
+function _mp_products_html_grid( $custom_query ) {
 		global $mp,$post;
 		$html = '';
 		$current_post = $post;
-		
+
 		//get image width
 		if ($mp->get_setting('list_img_size') == 'custom') {
 				$width = $mp->get_setting('list_img_width');
@@ -1816,50 +1812,50 @@ function _mp_products_html_grid($custom_query) {
 		$inline_style = !( $mp->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
 
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
-				$img = mp_product_image(false, 'list', $post->ID);
-				$excerpt = $mp->get_setting('show_excerpt') ?
-								'<p class="mp_excerpt">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
-								'';
-				$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
-		
-				$pinit = mp_pinit_button($post->ID, 'all_view');
+			$img = mp_product_image(false, 'list', $post->ID);
+			$excerpt = $mp->get_setting('show_excerpt') ?
+							'<p class="mp_excerpt">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
+							'';
+			$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
+	
+			$pinit = mp_pinit_button($post->ID, 'all_view');
 
-				$class = array();
-				$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
-				$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
-				$class[] = mp_has_variations($post->ID) ? 'mp_price_variations' : '';
+			$class = array();
+			$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
+			$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
+			$class[] = mp_has_variations($post->ID) ? 'mp_price_variations' : '';
 
-				$html .= '
-					<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '">
-						<div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-							<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-								' . $img . '
-								' . $pinit .'
-								<h3 class="mp_product_name entry-title" itemprop="name">
-									<a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
-								</h3>
-							
-								<div>' . $mp_product_list_content . '</div>
-							</div>
-
-							<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-								' . mp_product_price(false, $post->ID) . '
-								' . mp_buy_button(false, 'list', $post->ID) . '
-								' . apply_filters('mp_product_list_meta', '', $post->ID) . '
-							</div>
-							
-							<div style="display:none" >
-								<span class="entry-title">' . get_the_title() . '</span> was last modified:
-								<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
-								<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
-							</div>
+			$html .= '
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '">
+					<div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+						<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+							' . $img . '
+							' . $pinit .'
+							<h3 class="mp_product_name entry-title" itemprop="name">
+								<a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>
+							</h3>
+						
+							<div>' . $mp_product_list_content . '</div>
 						</div>
-					</div>';
-		endwhile;
 
+						<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+							' . mp_product_price(false, $post->ID) . '
+							' . mp_buy_button(false, 'list', $post->ID) . '
+							' . apply_filters('mp_product_list_meta', '', $post->ID) . '
+						</div>
+						
+						<div style="display:none" >
+							<span class="entry-title">' . get_the_title() . '</span> was last modified:
+							<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
+							<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
+						</div>
+					</div>
+				</div>';
+		endwhile;
+		
 		$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
 		
-		$post = null; //wp_reset_postdata() doesn't work here for some reason
+		$post = $current_post; //wp_reset_postdata() doesn't work here for some reason
 		
 		return apply_filters('_mp_products_html_grid', $html, $custom_query);
 }

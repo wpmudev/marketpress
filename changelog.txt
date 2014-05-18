@@ -5,6 +5,17 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.4
+----------------------------------------------------------------------
+- Fixed: [mp_related_products] some times causes product categories/tags to not display http://wp.mu/9ce
+- Fixed: errors when checking out when using global cart 
+- Fixed: shopping cart shows PHP warning
+- Fixed: some arguments in [mp_list_global_products] don't work http://wp.mu/9dm
+- Fixed: during checkout the shipping name field isn't being validated that a full name was entered http://wp.mu/9e8
+- Fixed: can't unselect shipping options when using UPS gateway
+- Removed Parcel Post shipping option from USPS shipping gateway as this only available through retail outlets
+- New: emails are now sent as HTML - fixes issues with html entities displaying improperly in emails
+
 2.9.4.3
 ----------------------------------------------------------------------
 - Fixed: admin bar shows wrong site than what is currently being viewed in multisite setup

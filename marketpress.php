@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4.3
+Version: 2.9.4.4
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4.3';
+	var $version = '2.9.4.4';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -1141,7 +1141,6 @@ Thanks again!", 'mp')
 
 	 //load proper theme for single product page display
 	 if ($wp_query->is_single && $wp_query->query_vars['post_type'] == 'product') {
-
 		//check for custom theme templates
 		$product_name = get_query_var('product');
 		$product_id = (int) $wp_query->get_queried_object_id();
@@ -1304,7 +1303,6 @@ Thanks again!", 'mp')
 
 	 //load proper theme for product listings
 	 if ($wp_query->query_vars['pagename'] == 'product_list') {
-
 		//check for custom theme template
 		$templates = array("mp_productlist.php");
 
@@ -1363,7 +1361,7 @@ Thanks again!", 'mp')
 		$wp_query->post_count = 1;
 		$this->is_shop_page = true;
 	 }
-
+	 
 	 //load proper theme for product category or tag listings
 	 if ( isset( $wp_query->query_vars['taxonomy'] ) && ( $wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag' ) ) {
 		$templates = array();
@@ -1377,9 +1375,7 @@ Thanks again!", 'mp')
 			if ( $cat_id )
 				$templates[] = "mp_category-$cat_id.php";
 			$templates[] = "mp_category.php";
-
 		} else if ($wp_query->query_vars['taxonomy'] == 'product_tag') {
-
 			$tag_name = get_query_var('product_tag');
 			$tag_id = absint( $wp_query->get_queried_object_id() );
 			if ( $tag_name )
@@ -1387,22 +1383,20 @@ Thanks again!", 'mp')
 			if ( $tag_id )
 				$templates[] = "mp_tag-$tag_id.php";
 			$templates[] = "mp_tag.php";
-
 		}
 
 		//defaults
 		$templates[] = "mp_taxonomy.php";
 		$templates[] = "mp_productlist.php";
 
-			if ( !is_admin() && isset($_GET['product_category']) && is_numeric($_GET['product_category']) ) {
-				$link = get_term_link( (int)get_query_var($wp_query->query_vars['taxonomy']), $wp_query->query_vars['taxonomy'] );
-				wp_redirect($link);
-				exit;
-			}
+		if ( !is_admin() && isset($_GET['product_category']) && is_numeric($_GET['product_category']) ) {
+			$link = get_term_link( (int)get_query_var($wp_query->query_vars['taxonomy']), $wp_query->query_vars['taxonomy'] );
+			wp_redirect($link);
+			exit;
+		}
 
 		//if custom template exists load it
 		if ($this->product_taxonomy_template = locate_template($templates)) {
-
 			//call a custom query posts for this listing
 			$taxonomy_query = '&' . $wp_query->query_vars['taxonomy'] . '=' . get_query_var($wp_query->query_vars['taxonomy']);
 
@@ -1437,13 +1431,14 @@ Thanks again!", 'mp')
 			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 		} else {
-			//otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
-			$wp_query->is_404 = null;
 			$wp_query->post_count = 1;
+			
+			//otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_title', array(&$this, 'page_title_output'), 99, 2 );
+			
 			add_filter( 'the_content', array(&$this, 'product_taxonomy_list_theme'), 99 );
 			add_filter( 'the_excerpt', array(&$this, 'product_taxonomy_list_theme'), 99 );
 
@@ -1691,42 +1686,46 @@ Thanks again!", 'mp')
 	 if (isset($wp_query->query_vars['taxonomy']) && ($wp_query->query_vars['taxonomy'] == 'product_category' || $wp_query->query_vars['taxonomy'] == 'product_tag') && $wp_query->post->ID == $id) {
 		if ($wp_query->query_vars['taxonomy'] == 'product_category') {
 			$term = get_term_by('slug', get_query_var('product_category'), 'product_category');
-			return sprintf( __('Product Category: %s', 'mp'), $term->name );
+			$title = sprintf( __('Product Category: %s', 'mp'), $term->name );
 		} else if ($wp_query->query_vars['taxonomy'] == 'product_tag') {
 			$term = get_term_by('slug', get_query_var('product_tag'), 'product_tag');
-			return sprintf( __('Product Tag: %s', 'mp'), $term->name );
+			$title = sprintf( __('Product Tag: %s', 'mp'), $term->name );
 		}
+		
+		return ( $id !== true ) ? '<span class="mp-page-title">' . $title . '</span>' : $title;
 	 }
 
 	 switch ($wp_query->query_vars['pagename']) {
 		case 'cart':
 				if ( isset($wp_query->query_vars['checkoutstep']) ) {
 					if ($wp_query->query_vars['checkoutstep'] == 'shipping')
-						return $this->download_only_cart($this->get_cart_contents()) ? __('Checkout Information', 'mp') : __('Shipping Information', 'mp');
+						$title = $this->download_only_cart($this->get_cart_contents()) ? __('Checkout Information', 'mp') : __('Shipping Information', 'mp');
 					else if ($wp_query->query_vars['checkoutstep'] == 'checkout')
-						return __('Payment Information', 'mp');
+						$title = __('Payment Information', 'mp');
 					else if ($wp_query->query_vars['checkoutstep'] == 'confirm-checkout')
-						return __('Confirm Your Purchase', 'mp');
+						$title = __('Confirm Your Purchase', 'mp');
 					else if ($wp_query->query_vars['checkoutstep'] == 'confirmation')
-						return __('Order Confirmation', 'mp');
+						$title = __('Order Confirmation', 'mp');
 					else
-						return __('Your Shopping Cart', 'mp');
+						$title = __('Your Shopping Cart', 'mp');
 				} else {
-					return __('Your Shopping Cart', 'mp');
+					$title = __('Your Shopping Cart', 'mp');
 				}
 			break;
 
 		case 'orderstatus':
-			return __('Track Your Order', 'mp');
+			$title = __('Track Your Order', 'mp');
 			break;
 
 		case 'product_list':
-			return __('Products', 'mp');
+			$title = __('Products', 'mp');
 			break;
 
 		default:
-			return $title;
+			$title = $title;
 	 }
+	 
+	 return ( $id !== true ) ? '<span class="mp-page-title">' . $title . '</span>' : $title; 
 	}
 
 	//this is the default theme added to single product listings
@@ -1734,7 +1733,7 @@ Thanks again!", 'mp')
 	 global $post;
 
 	 //don't filter outside of the loop
-		if ( !in_the_loop() )
+		if ( ! in_the_loop() )
 			 return $content;
 
 	 //add thumbnail
@@ -1761,7 +1760,7 @@ Thanks again!", 'mp')
 	//this is the default theme added to the checkout page
 	function store_theme($content) {
 	 //don't filter outside of the loop
-		if ( !in_the_loop() )
+		if ( ! in_the_loop() )
 			 return $content;
 
 	 return $content;
@@ -1772,7 +1771,7 @@ Thanks again!", 'mp')
 	 global $wp_query;
 
 		//don't filter outside of the loop
-		if ( !in_the_loop() )
+		if ( ! in_the_loop() )
 			 return $content;
 
 	 $content = mp_show_cart('checkout', null, false);
@@ -1783,7 +1782,7 @@ Thanks again!", 'mp')
 	//this is the default theme added to the order status page
 	function orderstatus_theme($content) {
 	 //don't filter outside of the loop
-		if ( !in_the_loop() )
+		if ( ! in_the_loop() )
 			 return $content;
 
 	 mp_order_status();
@@ -1793,7 +1792,7 @@ Thanks again!", 'mp')
 	//this is the default theme added to product listings
 	function product_list_theme($content) {
 		//don't filter outside of the loop
-		if ( !in_the_loop() )
+		if ( ! in_the_loop() )
 			 return $content;
 
 		$msgs = $this->get_setting('msg');
@@ -1804,16 +1803,17 @@ Thanks again!", 'mp')
 	}
 
 	//this is the default theme added to product taxonomies
-	function product_taxonomy_list_theme($content) {
+	function product_taxonomy_list_theme( $content ) {
+		if ( ! is_main_query() || ! in_the_loop() ) {
+			return $content;
+		}
+		
 		//don't filter outside of the loop
-		if ( !in_the_loop() )
-			 return $content;
-
 		$msgs = $this->get_setting('msg');
 		$content = do_shortcode($msgs['product_list']);
 		$content .= mp_list_products(array('echo' => false));
-
-		return $content;
+		
+		echo $content;
 	}
 
 	/**
@@ -3267,9 +3267,11 @@ Thanks again!", 'mp')
 
 			//only require these fields if not a download only cart
 			if ((!$this->download_only_cart($this->get_cart_contents()) || $this->global_cart || $this->get_setting('tax->downloadable_address')) && $this->get_setting('shipping->method') != 'none') {
-
-				if (empty($_POST['name']))
+				$name = trim($_POST['name']);
+				$name_parts = explode(' ', $name);
+				if (empty($name) || count($name_parts) == 1) {
 					$this->cart_checkout_error( __('Please enter your Full Name.', 'mp'), 'name');
+				}
 
 				if (empty($_POST['address1']))
 					$this->cart_checkout_error( __('Please enter your Street Address.', 'mp'), 'address1');
@@ -4583,15 +4585,18 @@ Thanks again!", 'mp')
 	//filters wp_mail headers
 	function mail($to, $subject, $msg) {
 
-	 //remove any other filters
-	 remove_all_filters( 'wp_mail_from' );
+		//remove any other filters
+		remove_all_filters( 'wp_mail_from' );
 		remove_all_filters( 'wp_mail_from_name' );
 
 		//add our own filters
 		add_filter( 'wp_mail_from_name', create_function('', 'return get_bloginfo("name");') );
 		add_filter( 'wp_mail_from', create_function('', '$settings = get_option("mp_settings");return isset($settings["store_email"]) ? $settings["store_email"] : get_option("admin_email");') );
 
-		return wp_mail($to, $subject, html_entity_decode($msg));
+		//convert all newlines and tabs to their approriate html markup
+		$msg = str_replace(array("\r\n", "\n", "\t"), array('<br />', '<br />', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'), $msg);
+		
+		return wp_mail($to, $subject, $msg, "Content-Type: text/html; charset=UTF-8");
 	}
 
 	//replaces shortcodes in email msgs with dynamic content
@@ -7495,6 +7500,7 @@ Notification Preferences: %s', 'mp');
 						$filtered_settings = apply_filters('mp_gateway_settings_filter', $_POST['mp']);
 						//allow plugins to verify settings before saving
 						$settings = $this->parse_args_r($settings, $filtered_settings);
+						
 						update_option('mp_settings', $settings);
 					}
 			 echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';

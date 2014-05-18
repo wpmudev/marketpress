@@ -100,9 +100,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		'First-Class Mail Parcel' =>
 		new USPS_Service( 0, __('First-Class Mail Parcel', 'mp'),                               __('(2-4 days)','mp') ),
 
-		'Parcel Post' =>
-		new USPS_Service( 4, __('Parcel Post', 'mp'),                                           __('(4-7 days)','mp') ),
-
 		'Media Mail' =>
 		new USPS_Service( 6, __('Media Mail', 'mp'),                                            ''),
 

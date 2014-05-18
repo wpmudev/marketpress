@@ -72,7 +72,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   		$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
   		$this->paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
     }
-    
+
     if ( is_network_admin() ) {
 			//tie into network settings form
 			add_action('admin_enqueue_scripts', array(&$this, 'network_gateway_scripts'));
@@ -88,8 +88,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function get_setting( $setting, $default = false ) {
   	global $mp;
-  	
-	  if ( is_network_admin() ) {
+
+	  if ( is_network_admin() || $mp->global_cart ) {
 		 	$settings = get_site_option('mp_network_settings');
 			$keys = explode('->', $setting);
 			array_map('trim', $keys);
@@ -101,13 +101,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$setting = isset($settings[$keys[0]][$keys[1]][$keys[2]]) ? $settings[$keys[0]][$keys[1]][$keys[2]] : $default;
 			else if (count($keys) == 4)
 				$setting = isset($settings[$keys[0]][$keys[1]][$keys[2]][$keys[3]]) ? $settings[$keys[0]][$keys[1]][$keys[2]][$keys[3]] : $default;
-	
-			return apply_filters("mp_network_setting_".implode('', $keys), $setting, $default );		  
+
+			return apply_filters("mp_network_setting_".implode('', $keys), $setting, $default );
 	  } else {
 	  	return $mp->get_setting($setting, $default);
 	  }
   }
-  
+
   /**
    * Displays the network gateway settings box
    *
@@ -120,7 +120,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $this->gateway_settings_box();	//display the regular settings box
 	  $mp->global_cart = $global_cart;	//set this back to what it was
   }
-  
+
   /**
    * Enqueue any necessary scripts
    *
@@ -129,19 +129,19 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    * @param string $page The current page being viewed
    *
    */
-  
+
   function network_gateway_scripts( $page ) {
 		global $mp;
-		
+
 		if ( $page != 'settings_page_marketpress-ms' )
 			return;
-		
+
 		wp_enqueue_style('mp-colorpicker', $mp->plugin_url . 'colorpicker/css/colorpicker.css', array(), $mp->version);
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('mp-colorpicker', $mp->plugin_url . 'colorpicker/js/colorpicker.js', array('jquery'), $mp->version);
 	}
 
-  
+
 	/**
    * Echo fields you need to add to the payment screen, like your credit card info fields.
    *  If you don't need to add form fields set $skip_form to true so this page can be skipped
@@ -286,7 +286,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function process_payment_form($global_cart, $shipping_info) {
     global $mp;
-
+    
     //create order id for paypal invoice
     $order_id = $mp->generate_order_id();
     /*
@@ -383,7 +383,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function process_payment($global_cart, $shipping_info) {
     global $mp, $blog_id, $site_id, $switched_stack, $switched;
-		
+
 	  $blog_id = (is_multisite()) ? $blog_id : 1;
 	  $current_blog_id = $blog_id;
 
@@ -501,17 +501,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					//figure out blog_id of this payment to put the order into it
           $unique_id = ($result["PAYMENTINFO_{$i}_PAYMENTREQUESTID"]) ? $result["PAYMENTINFO_{$i}_PAYMENTREQUESTID"] : $result["PAYMENTREQUEST_{$i}_PAYMENTREQUESTID"]; //paypal docs messed up, not sure which is valid return
 					@list($bid, $order_id) = explode(':', $unique_id);
-			
-          if (is_multisite())	
+
+          if (is_multisite())
 						switch_to_blog($bid, true);
 
 					//succesful payment, create our order now
 	        $mp->create_order($_SESSION['mp_order'], $selected_cart[$bid], $shipping_info, $payment_info, $paid);
-				}	
-		
+				}
+
         if (is_multisite())
     			switch_to_blog($current_blog_id, true);
-				
+
         //success. Do nothing, it will take us to the confirmation page
       } else { //whoops, error
 
@@ -565,12 +565,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	      $timestamp = key($statuses);
 	      $content .= '<p><strong>' . $mp->format_date($timestamp) . ':</strong> ' . esc_html($status) . '</p>';
 	    } else {
-	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
+	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';	  		    	 	 	 		  
 	    }
 		}
     return $content;
   }
-  
+
 	/**
    * Echo a settings meta box with whatever settings you need for you gateway.
    *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
@@ -947,14 +947,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $blog_id = (is_multisite()) ? $blog_id : 1;
 	  $current_blog_id = $blog_id;
 	  
-	  if (!$mp->global_cart) {
+	  if ( ! $mp->global_cart ) {
 	  	$selected_cart[$blog_id] = $global_cart;
-	  	$settings = get_option('mp_settings');
 	  } else {
 	    $selected_cart = $global_cart;
-      $settings = get_site_option( 'mp_network_settings' );
     }
-
+    
     $nvpstr = "";
     $nvpstr .= "&ReturnUrl=" . $this->returnURL;
     $nvpstr .= "&CANCELURL=" . $this->cancelURL;
@@ -966,11 +964,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $nvpstr .= "&EMAIL=" . urlencode($shipping_info['email']);
 
     //formatting
-    $nvpstr .= "&HDRIMG=" . urlencode($settings['gateways']['paypal-express']['header_img']);
-    $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($settings['gateways']['paypal-express']['header_border']);
-    $nvpstr .= "&HDRBACKCOLOR=" . urlencode($settings['gateways']['paypal-express']['header_back']);
-    $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($settings['gateways']['paypal-express']['page_back']);
-		
+    $nvpstr .= "&HDRIMG=" . urlencode($this->get_setting('gateways->paypal-express->header_img', ''));
+    $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($this->get_setting('gateways->paypal-express->header_border', ''));
+    $nvpstr .= "&HDRBACKCOLOR=" . urlencode($this->get_setting('gateways->paypal-express->header_back', ''));
+    $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($this->get_setting('gateways->paypal-express->page_back', ''));
+
     //loop through cart items
     $j = 0;
 		$request = '';
@@ -986,15 +984,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			//if a seller hasn't configured paypal skip
 			if ( $mp->global_cart && empty($merchant_email) )
 				continue;
-			
+
       $totals = array();
-			
+
       $request .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
       $request .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $merchant_email;
       $request .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
       $request .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
       $request .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
-			
+
 			if (!$mp->download_only_cart($cart) && $this->get_setting('shipping->method') != 'none') {
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . $this->trim_name($shipping_info['name'], 32);
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . $this->trim_name($shipping_info['address1'], 100);
@@ -1008,15 +1006,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       $i = 0;
       $coupon_code = $mp->get_coupon_code();
-      
+
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
 					$price = $mp->coupon_value_product($coupon_code, $data['price'], $product_id);
-        	
+
 					//skip free products to avoid paypal error
 					if ($price <= 0)
 						continue;
-					
+
 				  $totals[] = $price * $data['quantity'];
 				  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
 				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($price);
@@ -1033,17 +1031,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       //shipping line
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
-				
+
 				//adjust price if tax inclusive is on
 				if ( $this->get_setting('tax->tax_inclusive') )
 					$shipping_price = $mp->shipping_tax_price($shipping_price);
-					
+
 				$total = $total + $shipping_price;
-				
+
 				if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
 					$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
 				}
-				
+
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
       }
 
@@ -1068,10 +1066,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
     if (is_multisite())
       switch_to_blog($current_blog_id);
-		
+
 		$nvpstr .= $request;
 		$_SESSION['nvpstr'] = $request;
-		
+
     //'---------------------------------------------------------------------------------------------------------------
     //' Make the API call to PayPal
     //' If the API call succeded, then redirect the buyer to PayPal to begin to authorize payment.
@@ -1120,7 +1118,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 	//Purpose: 	Prepares the parameters for the DoExpressCheckoutPayment API Call.
 	function DoExpressCheckoutPayment($token, $payer_id) {
-		
+
 		$nvpstr  = '&TOKEN=' . urlencode($token);
 	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
 		$nvpstr .= $_SESSION['nvpstr'];
@@ -1175,13 +1173,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $args['sslverify'] = false;
 	  $args['timeout'] = 60;
 	  $args['httpversion'] = '1.1';	//api call will fail without this!
-		
+	  
 		//allow easy debugging
 		if ( defined("MP_DEBUG_API_$methodName") ) {
 			print_r( $this->deformatNVP($query_string) );
 			die;
 		}
-		
+
 	  //use built in WP http class to work with most server setups
 	  $response = wp_remote_post($this->API_Endpoint, $args);
 	  if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
@@ -1213,14 +1211,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		parse_str($nvpstr, $nvpArray);
 		return $nvpArray;
 	}
-	
+
 	function trim_name($name, $length = 127) {
 		while (strlen(urlencode($name)) > $length)
 			$name = substr($name, 0, -1);
-		
-		return urlencode($name);	
+
+		return urlencode($name);
 	}
-	
+
 }
 
 //register shipping plugin

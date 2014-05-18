@@ -3,6 +3,8 @@
 MarketPress Multisite Features
 */
 
+$GLOBALS['mp_wpmu'] = new MarketPress_MS();
+
 class MarketPress_MS {
 
 	var $build = 2;
@@ -458,21 +460,53 @@ class MarketPress_MS {
 	}
 */
 
-	//this is the default theme added to the global product list page
-	function product_list_theme($content) {
-		//don't filter outside of the loop
-		if ( !in_the_loop() )
-			return $content;
-
-		$args = array();
-		$args['echo'] = false;
+	function product_list_default_args( $echo = false ) {
+		global $mp;
+		
+		$args = apply_filters('mp_global_product_list_theme_default_args', array(
+			'echo' => $echo,
+			'paginate' => $mp->get_setting('paginate'),
+			'page' => 1,
+			'per_page' => $mp->get_setting('per_page'),
+			'order_by' => $mp->get_setting('order_by'),
+			'order' => $mp->get_setting('order'),
+			'category' => '',
+			'tag' => '',
+			'show_thumbnail' => $mp->get_setting('show_thumbnail'),
+			'thumbnail_size' => 150,
+			'thumbnail_align' => $mp->get_setting('image_alignment_list'),
+			'show_price' => true,
+			'text' => ( $mp->get_setting('show_excerpt') ) ? 'excerpt' : 'none',
+			'as_list' => ( $mp->get_setting('list_view') == 'list' ),
+			'paginav' => true,
+		));
+		
+		//thumbnail size
+		$size = $mp->get_setting('list_img_size');
+		if ( $size == 'custom' ) {
+			$args['thumbnail_size'] = (float) $mp->get_setting('list_img_width');
+		} else {
+			$args['thumbnail_size'] = (float) get_option($size . '_size_w');
+		}
 
 		//check for paging
-		if (get_query_var('paged'))
-			$args['page'] = intval(get_query_var('paged'));
+		if ( get_query_var('paged') ) {
+			$args['page'] = (float) get_query_var('paged');
+		}
+		
+		return $args;		
+	}
+	
+	//this is the default theme added to the global product list page
+	function product_list_theme( $content ) {
+		if ( ! in_the_loop() ) {
+			//don't filter outside of the loop
+			return $content;
+		}
 
-		$content = mp_list_global_products( $args );
-		$content .= mp_global_products_nav_link( $args );
+		$args = $this->product_list_default_args();
+		$content = mp_list_global_products($args);
+		$content .= mp_global_products_nav_link($args);
 
 		return $content;
 	}
@@ -1040,24 +1074,7 @@ class MarketPress_MS {
 	 * @param string|array $attr Optional. Override default arguments.
 	 */
 	function mp_list_global_products_sc($atts) {
-		$args = shortcode_atts(array(
-			'paginate' => true,
-			'page' => 0,
-			'per_page' => 20,
-			'order_by' => 'date',
-			'order' => 'DESC',
-			'category' => '',
-			'tag' => '',
-			'show_thumbnail' => true,
-			'thumbnail_size' => 50,
-			'show_price' => true,
-			'text' => 'excerpt',
-			'as_list' => false,
-			'paginav' => true,
-		), $atts);
-
-		$args['echo'] = false;
-
+		$args = shortcode_atts($this->product_list_default_args(), $atts);
 		return mp_list_global_products( $args );
 	}
 	
@@ -1107,7 +1124,6 @@ class MarketPress_MS {
 	}
 	
 }
-$mp_wpmu = new MarketPress_MS();
 
 function mp_main_site_id() {
 	global $current_site;
@@ -1300,29 +1316,11 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
  *
  * @param string|array $args Optional. Override default arguments.
  */
-function mp_list_global_products( $args = '' ) {
-	global $wpdb, $mp;
-
-	$defaults = array(
-		'echo' => true,
-		'paginate' => true,
-		'page' => 0,
-		'per_page' => 20,
-		'order_by' => 'date',
-		'order' => 'DESC',
-		'category' => '',
-		'tag' => '',
-		'show_thumbnail' => true,
-		'thumbnail_size' => 150,
-		'context' => 'list',
-		'show_price' => true,
-		'text' => 'excerpt',
-		'as_list' => false,
-		'paginav' => false,
-	);
-
-	$r = wp_parse_args( $args, $defaults );
-	extract( $r );
+function mp_list_global_products( $args ) {
+	global $wpdb, $mp, $mp_wpmu;
+	
+	$r = wp_parse_args($args, $mp_wpmu->product_list_default_args(true));
+	extract($r);
 
 	//setup taxonomy if applicable
 	if ($category) {
@@ -1410,7 +1408,7 @@ function mp_list_global_products( $args = '' ) {
 	$content = '<div id="mp_product_list" class="hfeed mp_' . $layout_type . '">';
 
 	if ( count($results) > 0 ) {
-		$content .= $layout_type == 'grid' ? _mp_global_products_html_grid($results) : _mp_global_products_html_list($results);
+		$content .= $layout_type == 'grid' ? _mp_global_products_html_grid($results, $r) : _mp_global_products_html_list($results, $r);
 	} else {
 		$content .= '<div id="mp_no_products">' . apply_filters('mp_product_list_none', __('No Products', 'mp')) . '</div>';
 	}
@@ -1431,12 +1429,13 @@ function mp_list_global_products( $args = '' ) {
 }
 
 if (!function_exists('_mp_global_products_html_list')) :
-function _mp_global_products_html_list( $results ) {
+function _mp_global_products_html_list( $results, $args ) {
 		global $mp,$post;
 		$html = '';
 		$total = count($results);
 		$count = 0;
 		$current_blog_id = get_current_blog_id();
+		$current_post = $post;
 		
 		foreach ( $results as $index => $result ) :
 			switch_to_blog($result->blog_id);
@@ -1456,8 +1455,13 @@ function _mp_global_products_html_list( $results ) {
 					<h3 class="mp_product_name entry-title"><a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a></h3>
 					<div class="entry-content">
 						<div class="mp_product_content">';
+						
+			$product_content = '';
 			
-			$product_content = mp_product_image(false, 'list', $post->ID);
+			if ( $args['show_thumbnail'] ) {
+				$product_content = mp_product_image(false, 'list', $post->ID, $args['thumbnail_size']);
+			}
+			
 			if ( $mp->get_setting('show_excerpt') ) {
 				$product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
 			}
@@ -1468,8 +1472,13 @@ function _mp_global_products_html_list( $results ) {
 						</div>
 						<div class="mp_product_meta">';
 					
+			$meta = '';
+			
 			//price
-			$meta = mp_product_price(false, $post->ID);
+			if ( $args['show_price'] ) {
+				$meta .= mp_product_price(false, $post->ID);
+			}
+			
 			//button
 			$meta .= mp_buy_button(false, 'list', $post->ID);
 			$html .= apply_filters('mp_product_list_meta', $meta, $post->ID);
@@ -1483,7 +1492,7 @@ function _mp_global_products_html_list( $results ) {
 				</div>';
 		endforeach;
 		
-		$post = NULL; //wp_reset_postdata() doesn't work here
+		$post = $current_post; //wp_reset_postdata() doesn't work here
 		
 		switch_to_blog($current_blog_id);
 		return apply_filters('_mp_global_products_html_list', $html, $results);
@@ -1491,30 +1500,31 @@ function _mp_global_products_html_list( $results ) {
 endif;
 
 if (!function_exists('_mp_global_products_html_grid')) :
-function _mp_global_products_html_grid( $results ) {
+function _mp_global_products_html_grid( $results, $args ) {
 	global $mp,$post;
 	$html = '';
 	
-	//get image width
-	if ($mp->get_setting('list_img_size') == 'custom') {
-		$width = $mp->get_setting('list_img_width');
-	} else {
-		$size = $mp->get_setting('list_img_size');
-		$width = get_option($size . "_size_w");
-	}
-
 	$inline_style = !( $mp->get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
 	$current_blog_id = get_current_blog_id();
+	$current_post = $post;
+	
+	//thumbnail width
+	$width = (float) $args['thumbnail_size'];
 
 	foreach ( $results as $index => $result ) :
 		switch_to_blog($result->blog_id);
 		$post = get_post($result->post_id);
 		setup_postdata($post);
 
-		$img = mp_product_image(false, 'list', $post->ID);
-		$excerpt = $mp->get_setting('show_excerpt') ?
-						'<p class="mp_excerpt">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
-						'';
+		$img = mp_product_image(false, 'list', $post->ID, $args['thumbnail_size']);
+		
+		$excerpt = '';
+		if ( $args['text'] == 'excerpt' ) {
+			$excerpt = '<p class="mp_excerpt">' . $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>';
+		} elseif ( $args['text'] == 'content' ) {
+			$excerpt = get_the_content();	
+		}
+		
 		$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
 
 		$pinit = mp_pinit_button($post->ID, 'all_view');
@@ -1537,8 +1547,8 @@ function _mp_global_products_html_grid( $results ) {
 						<div>' . $mp_product_list_content . '</div>
 					</div>
 
-					<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px; margin-left:-' . $width . 'px;"' : '') . '>
-						' . mp_product_price(false, $post->ID) . '
+					<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+						' . (( $args['show_price'] ) ? mp_product_price(false, $post->ID) : '') . '
 						' . mp_buy_button(false, 'list', $post->ID) . '
 						' . apply_filters('mp_product_list_meta', '', $post->ID) . '
 					</div>
@@ -1554,7 +1564,7 @@ function _mp_global_products_html_grid( $results ) {
 
 	$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
 	
-	$post = NULL; //wp_reset_postdata() doesn't work here
+	$post = $current_post; //wp_reset_postdata() doesn't work here
 	
 	switch_to_blog($current_blog_id);
 	return apply_filters('_mp_global_products_html_grid', $html, $results);

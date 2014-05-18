@@ -132,8 +132,15 @@ if(!class_exists('MP_Gateway_API')) {
      *  array. Don't forget to return!
      */
 		function process_gateway_settings($settings) {
-
       return $settings;
+    }
+
+    /**
+     * Filters posted data from your network settings form. Do anything you need to the $settings['gateways']['plugin_name']
+     *  array. Don't forget to return!
+     */
+    function proces_network_gateway_settings( $settings ) {
+	    return $settings;
     }
     
 		/**
@@ -205,8 +212,13 @@ if(!class_exists('MP_Gateway_API')) {
       add_action( 'mp_checkout_payment_pre_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation') );
       add_filter( 'mp_checkout_payment_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation_msg'), 10, 2 );
       add_action( 'mp_gateway_settings', array(&$this, 'gateway_settings_box') );
-      add_filter( 'mp_gateway_settings_filter', array(&$this, 'process_gateway_settings') );
       add_action( 'mp_handle_payment_return_' . $this->plugin_name, array(&$this, 'process_ipn_return') );
+      
+      if ( is_network_admin() ) {
+	      add_filter('mp_network_settings_save', array(&$this, 'network_settings_save'));
+      } else {
+	      add_filter('mp_gateway_settings_filter', array(&$this, 'process_gateway_settings'));
+      }
   	}
   }
   
