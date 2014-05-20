@@ -165,6 +165,7 @@ class Marketpress {
 				'delete_terms' => 'manage_product_categories',
 				'assign_terms' => 'edit_products'
 			),
+			'show_ui' => false,
 			'rewrite' => array(
 				'with_front' => false,
 				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products') . '/' . mp_get_setting('slugs->category')
@@ -182,6 +183,7 @@ class Marketpress {
 				'delete_terms' => 'manage_product_tags',
 				'assign_terms' => 'edit_products'
 			),
+			'show_ui' => false,
 			'rewrite' => array(
 				'with_front' => false,
 				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products') . '/' . mp_get_setting('slugs->tag')
@@ -228,9 +230,9 @@ class Marketpress {
 			'labels' => array(
 				'name' => __('Products', 'mp'),
 				'singular_name' => __('Product', 'mp'),
-				'menu_name' => __('Store', 'mp'),
+				'menu_name' => __('Products', 'mp'),
 				'all_items' => __('Products', 'mp'),
-				'add_new' => __('Create New', 'mp'),
+				'add_new' => __('Create New Product', 'mp'),
 				'add_new_item' => __('Create New Product', 'mp'),
 				'edit_item' => __('Edit Product', 'mp'),
 				'edit' => __('Edit', 'mp'),
@@ -254,9 +256,9 @@ class Marketpress {
         'read_private_posts' => 'read_private_products',
         'delete_post' => 'delete_product'
       ),
+      'menu_icon' => ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-cart' : mp_plugin_url('ui/images/marketpress-icon.png'),
 			'map_meta_cap' => true,
 			'hierarchical' => false,
-			'menu_icon' => ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-cart' : mp_plugin_url('ui/images/marketpress-icon.png'),
 			'rewrite' => array(
 				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products'),
 				'with_front' => false

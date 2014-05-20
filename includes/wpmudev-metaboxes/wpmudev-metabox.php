@@ -80,7 +80,21 @@ class WPMUDEV_Metabox {
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'));
-		add_action('save_post', array(&$this, 'save_fields'));		
+		add_action('save_post', array(&$this, 'save_fields'));
+		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
+	}
+	
+	/**
+	 * Adds classes to the metabox for easier styling
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter postbox_classes_{$post_type}_{$id}
+	 * @param array $classes
+	 * @return array
+	 */
+	public function add_meta_box_classes( $classes ) {
+		return array_merge($classes, array('wpmudev-postbox'));
 	}
 
 	/**
