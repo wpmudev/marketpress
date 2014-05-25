@@ -32,10 +32,9 @@ class MP_Admin {
 	 */
 	private function __construct() {
 		require_once mp_plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-orders-screen.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-product-coupons-screen.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-products-screen.php');
-
+		
+		add_action('init', array(&$this, 'includes'));
+		
 		//add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'));
 		//admin scripts/styles
@@ -46,6 +45,15 @@ class MP_Admin {
 		add_action('plugins_loaded', array(&$this, 'load_settings_metaboxes'));
 		//set custom post-updated messages
 		add_filter('post_updated_messages', array(&$this, 'post_updated_messages'));
+		//display the current page id
+		add_action('current_screen', function() { get_current_screen()->id; });
+	}
+	
+	public function includes() {
+		require_once mp_plugin_dir('includes/admin/class-mp-orders-screen.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-product-coupons-screen.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-products-screen.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-store-settings-screen.php');		
 	}
 	
 	/**
@@ -151,14 +159,16 @@ class MP_Admin {
 		//store settings
 		$cap = apply_filters('mp_store_settings_cap', 'manage_options');
 		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
-		add_submenu_page('store-settings', __('General', 'mp'), __('General', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'));		
-		add_submenu_page('store-settings', __('Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Messaging', 'mp'), __('Messaging', 'mp'), $cap, 'store-settings-messaging', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Short Codes', 'mp'), __('Short Codes', 'mp'), $cap, 'store-settings-shortcodes', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Product Settings', 'mp'), __('Product Settings', 'mp'), $cap, 'store-settings-productsettings', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'));		
+		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Messaging', 'mp'), __('Messaging', 'mp'), $cap, 'store-settings-messaging', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Short Codes', 'mp'), __('Short Codes', 'mp'), $cap, 'store-settings-shortcodes', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=product'); 
+		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=product');		
+		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', array(&$this, 'admin_page'));
 
 		if ( ! defined('WPMUDEV_REMOVE_BRANDING') ) {
 	 		define('WPMUDEV_REMOVE_BRANDING', false);
@@ -171,7 +181,7 @@ class MP_Admin {
 			add_action('store-settings_page_store-settings-shipping', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-payments', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-short-codes', array(&$this, 'add_help_tab'));
-			add_action('store-settings_page_store-settings-product-settings', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
 		}
 	}
@@ -197,15 +207,6 @@ class MP_Admin {
 	 * @access public
 	 */
 	public function admin_page() {
-		$slug = mp_get_get_value('page', $_GET, 'store-settings');
-		$page = sanitize_file_name($slug . '.php');
-		$path = mp_plugin_dir('includes/admin/views/' . $page);
-		
-		if ( ! file_exists($path) ) {
-			return false;
-		}
-		
-		include_once $path;
 	}
 	
 	/**
@@ -242,8 +243,8 @@ class MP_Admin {
 			wp_enqueue_style('dashicons', mp_plugin_url('ui/css/dashicons.css'), false, MP_VERSION);
 		}
 
-		wp_enqueue_style('mp3-admin-css', mp_plugin_url('ui/css/marketpress3.css'), false, MP_VERSION);		
-		wp_enqueue_style('jquery-colorpicker-css', mp_plugin_url('ui/colorpicker/css/colorpicker.css'), false, MP_VERSION);
+		wp_enqueue_style('mp3-admin', mp_plugin_url('ui/css/marketpress3.css'), false, MP_VERSION);		
+		wp_enqueue_style('jquery-colorpicker', mp_plugin_url('ui/colorpicker/css/colorpicker.css'), false, MP_VERSION);
 	}
 
 	/**

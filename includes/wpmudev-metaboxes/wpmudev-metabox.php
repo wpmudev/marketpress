@@ -57,6 +57,33 @@ class WPMUDEV_Metabox {
 	var $nonce_name = '';
 	
 	/**
+	 * Refers to the metabox's current status (e.g. active or not)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var bool
+	 */
+	var $is_active = null;
+	
+	/**
+	 * If the current metabox is a settings page metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var bool
+	 */
+	var $is_settings_metabox = null;
+	
+	/**
+	 * Refers to any custom field validation messages
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var array
+	 */
+	var $validation_messages = array();
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 1.0
@@ -64,13 +91,13 @@ class WPMUDEV_Metabox {
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = wp_parse_args($args, array(
-			'id' => '',
-			'title' => '',
-			'post_type' => '',
-			'context' => 'advanced',
-			'priority' => 'default',
-			'scripts' => array(),
-			'stylesheets' => array(),
+			'id' => '',								//the id of the metabox (required)
+			'title' => '',						//the title of the metabox (required)
+			'post_type' => '',				//the post type to display the metabox on
+			'screen_ids' => array(),	//the screen ID to display the metabox on
+			'context' => 'advanced',	//the context of the metabox (advanced, normal, side)
+			'priority' => 'default',	//the priority of the metabox (default, high, normal)
+			'option_name' => '',			//if not a post metabox, enter the option name that will be used to retrieve the field's value (e.g. mp_settings)
 		));
 		
 		$this->load_fields();
@@ -80,8 +107,23 @@ class WPMUDEV_Metabox {
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'));
+		add_action('wpmudev_metaboxes_settings', array(&$this, 'maybe_render'));
 		add_action('save_post', array(&$this, 'save_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
+	}
+	
+	/**
+	 * Determines if a metabox should be rendered
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function maybe_render() {
+		if ( ! $this->is_active() ) {
+			return false;
+		}
+  		
+		$this->render($this->args['option_name']);
 	}
 	
 	/**
@@ -104,18 +146,19 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */	
 	public function admin_enqueue_scripts() {
-		if ( get_current_screen()->post_type != $this->args['post_type'] ) {
-			return;
+		if ( ! $this->is_active() ) {
+			return false;
 		}
 		
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('jquery-validate', $this->class_url('ui/js/jquery.validate.min.js', array('jquery'), '1.12'));
-		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate'), $this->version);
+		wp_enqueue_script('jquery-validate', $this->class_url('ui/js/jquery.validate.min.js'), array('jquery'), '1.12');
+		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate'), $this->version, true);
 		
-		wp_localize_script('wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes', array(
+		$default_messages = array(
 			'alphanumeric_error_msg' => __('Please enter only letters and numbers', 'wpmudev_metaboxes'),
-			'discount_error_msg' => __('An invalid discount amount was entered', 'wpmudev_metaboxes'),
-		));
+		);
+		
+		wp_localize_script('wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes_Validation_Messages', array_merge($default_messages, $this->validation_messages));
 	}
 	
 	/**
@@ -125,8 +168,8 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */	
 	public function admin_enqueue_styles() {
-		if ( get_current_screen()->post_type != $this->args['post_type'] ) {
-			return;
+		if ( ! $this->is_active() ) {
+			return false;
 		}
 		
 		wp_enqueue_style('wpmudev-metaboxes-admin', $this->class_url('ui/css/admin.css'), array(), $this->version);
@@ -226,22 +269,41 @@ class WPMUDEV_Metabox {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param object post
+	 * @param object/string post
 	 */
-	public function render( $post ) {
+	public function render( $post = null ) {
 		wp_nonce_field($this->nonce_action, $this->nonce_name);
 		
-		echo '<div class="wpmudev-fields clearfix">';
-		
-		foreach ( $this->fields as $field ) {
-			echo '<div class="wpmudev-field">';
-				echo '<div class="wpmudev-field-label">' . $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : '') . '</div>';
-				echo '<div class="wpmudev-field-desc">' . $field->args['desc'] . '</div>';
-				$field->display($post->ID);
-			echo '</div>';
+		if ( $post instanceof WP_Post ) {
+			$post = $post->ID;
 		}
 		
-		echo '</div>';
+		if ( $this->is_settings_metabox() ) {
+			echo '<div id="poststuff">';
+				echo '<div class="meta-box-sortables">';
+					echo '<div class="postbox wpmudev-postbox">';
+						echo '<div class="inside">';
+							echo '<h3 class="hndle"><span>' . $this->args['title'] . '</span></h3>';
+		}
+		
+							echo '<div class="wpmudev-fields clearfix">';
+				
+							foreach ( $this->fields as $field ) {
+								echo '<div class="wpmudev-field">';
+									echo '<div class="wpmudev-field-label">' . $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : '') . '</div>';
+									echo '<div class="wpmudev-field-desc">' . $field->args['desc'] . '</div>';
+									$field->display($post);
+								echo '</div>';
+							}
+				
+							echo '</div>';
+		
+		if ( $this->is_settings_metabox() ) {
+						echo '</div>';
+					echo '</div>';
+				echo '</div>';
+			echo '</div>';
+		}
 	}
 	
 	/**
@@ -263,6 +325,74 @@ class WPMUDEV_Metabox {
 	}
 	
 	/**
+	 * Checks if the metabox is a settings metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function is_settings_metabox() {
+		if ( ! is_null($this->is_settings_metabox) ) {
+			return $this->is_settings_metabox;
+		}
+
+		$current_screen = $this->get_current_screen();
+		
+		$this->is_settings_metabox = false;
+		if ( in_array($current_screen->id, $this->args['screen_ids']) ) {
+			$this->is_settings_metabox = true;
+		}
+		
+		return $this->is_settings_metabox;
+	}
+	
+	/**
+	 * Safely gets the $current_screen object
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $current_screen
+	 * @return object
+	 */
+	
+	public function get_current_screen() {
+		global $current_screen;
+		
+		if ( is_null($current_screen) ) {
+			//set current screen (not normally available here)
+			require_once ABSPATH . 'wp-admin/includes/screen.php';
+			set_current_screen();
+		}
+		
+		return get_current_screen();
+	}
+	
+	/**
+	 * Checks if the current metabox is active for the current page
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function is_active() {
+		if ( ! is_null($this->is_active) ) {
+			return $this->is_active;
+		}
+		
+		//only load metaboxes on appropriate post page and for assigned post type or screen_id
+		$this->is_active = true;
+		if ( $this->args['post_type'] != $this->get_current_screen()->post_type && ! in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
+			$this->is_active = false;
+		}
+		
+		if ( in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
+			$this->is_settings_metabox = true;
+		}
+		
+		return $this->is_active;	
+	}
+	
+	/**
 	 * Adds a form field to the meta box
 	 *
 	 * @since 1.0
@@ -270,24 +400,21 @@ class WPMUDEV_Metabox {
 	 * @param string $type
 	 * @param array $args
 	 */
-	public function add_field( $type, $args = array() ) {
+	public function add_field( $type, $args = array() ) {		
 		$class = apply_filters('wpmudev_metabox_add_field', 'WPMUDEV_Field_' . ucfirst($type), $type, $args);
-		
-		//only load metaboxes on appropriate post page and for assigned post type (Note: get_current_screen() doesn't work here)
-		$uri = $_SERVER['REQUEST_URI'];
-		if ( strpos($uri, 'post.php') === false && strpos($uri, 'post-new.php') === false ) {
-			return false;
-		} elseif ( isset($_GET['post']) && get_post_type($_GET['post']) != $this->args['post_type'] ) {
-			return false;
-		} elseif ( isset($_GET['post_type']) && $_GET['post_type'] != $this->args['post_type'] ) {
-			return false;
-		}
-		
+				
 		if ( ! class_exists($class) ) {
 			return false;	
 		}
 		
+		if ( ! empty($args['custom_validation_message']) ) {
+			$this->validation_messages = array_merge($this->validation_messages, array($args['name'] => $args['custom_validation_message']));
+		}
+		
 		$args['echo'] = false;
-		$this->fields[] = new $class($args);
+		$field = new $class($args);
+		$this->fields[] = $field;
+		
+		return $field;
 	}
 }

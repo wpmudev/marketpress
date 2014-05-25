@@ -1,11 +1,7 @@
 jQuery.validator.addMethod('alphanumeric', function(value, element){
 	return this.optional(element) || new RegExp('[a-z0-9]{' + value.length + '}', 'ig').test(value);
-}, WPMUDEV_Metaboxes.alphanumeric_error_msg);
+}, WPMUDEV_Metaboxes_Validation_Messages.alphanumeric_error_msg);
 jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
-
-jQuery.validator.addMethod('custom', function(value, element, params){
-	return this.optional(element) || new RegExp(params + '{' + value.length + '}', 'ig').test(value);
-}, WPMUDEV_Metaboxes.discount_error_msg);
 
 (function($){
 	jQuery(document).ready(function($){
@@ -80,23 +76,32 @@ jQuery.validator.addMethod('custom', function(value, element, params){
 	};
 	
 	var initValidation = function(){
-		$('[data-custom-validation]').each(function(){
-			var $this = $(this);
-			$this.rules('add', {
-				"custom" : $this.attr('data-custom-validation')
-			});
-		});
-		
 		var $form = $("form#post");
+
+		//initialize the form validation		
+		$form.validate();
+		
 		$form.find('#publish').click(function(e){
 			e.preventDefault();
-			
-			$form.validate();
 			
 			if ( $form.valid() ) {
 				$form.submit();
 			}
 		});
+	
+		$('[data-custom-validation]').each(function(){
+			var $this = $(this),
+					ruleName = $this.attr('name'),
+					rules = {};
+										
+			rules[ruleName] = $this.attr('data-custom-validation');
+			
+			$.validator.addMethod(ruleName, function(value, element, params){
+				return this.optional(element) || new RegExp(params + '{' + value.length + '}', 'ig').test(value);
+			}, WPMUDEV_Metaboxes_Validation_Messages[ruleName]);
+
+			$this.rules('add', rules);
+		});		
 	}
 
 }(jQuery));

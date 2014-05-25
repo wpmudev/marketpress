@@ -2419,12 +2419,6 @@ body .ui-tooltip {
   padding: 8px 15px;
   text-decoration: none;
 }
-.mp-wrap .mp-settings {
-  background: #fff;
-  border: 1px solid #ccc;
-  overflow: hidden;
-  padding: 20px;
-}
 .mp-wrap .mp-postbox {
   border-top: 2px dotted #ccc;
   margin-top: 20px;

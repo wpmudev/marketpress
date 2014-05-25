@@ -39,6 +39,7 @@ class WPMUDEV_Field {
 			'default_value' => '',		//the default value of the field before any user interaction,
 			'value_only' => false,		//only get the field's value - don't initialize scripts, styles, etc
 			'validation' => array(		//the rules to apply for validation
+			'custom_validation_message' => '',	//any custom validation message the field uses (only used for custom validation)
 			/*'required' => false,
 				'minlength' => 0,
 				'maxlength' => 0,
@@ -83,7 +84,10 @@ class WPMUDEV_Field {
 		
 		if ( ! empty($this->args['validation']) ) {
 			foreach ( $this->args['validation'] as $key => $val ) {
-				if ( is_bool($val) === true ) {
+				if ( $key == 'custom' ) {
+					$this->args['custom']['data-custom-validation'] = $val;
+				}
+				elseif ( is_bool($val) === true ) {
 					$this->args['class'] .= " $key";
 				} else {
 					$this->args['custom'][$key] = $val;
@@ -183,6 +187,8 @@ class WPMUDEV_Field {
 		}
 		
 		$printed_field_scripts[] = $class;
+		
+		return false;
 	}
 	
 	/**
@@ -258,16 +264,5 @@ class WPMUDEV_Field {
 		}
 		
 		return apply_filters('wpmudev_field_get_id', $this->args['id'], $this);
-	}
-	
-	/**
-	 * This is required when setting echo = false - otherwise a fatal error will be triggered
-	 *
-	 * @since 1.0
-	 * @access public
-	 * @return string
-	 */
-	public function __toString() {
-		return $this->html;
 	}
 }

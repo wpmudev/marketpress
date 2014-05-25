@@ -230,7 +230,7 @@ class Marketpress {
 			'labels' => array(
 				'name' => __('Products', 'mp'),
 				'singular_name' => __('Product', 'mp'),
-				'menu_name' => __('Products', 'mp'),
+				'menu_name' => __('Store', 'mp'),
 				'all_items' => __('Products', 'mp'),
 				'add_new' => __('Create New Product', 'mp'),
 				'add_new_item' => __('Create New Product', 'mp'),

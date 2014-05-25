@@ -46,7 +46,7 @@ class MP_Product_Coupons_Screen {
 		//on coupon save update post title to equal coupon code field
 		add_filter('wp_insert_post_data', array(&$this, 'save_coupon_data'), 99, 2);
 		//init metaboxes
-		$this->init_metaboxes();
+		add_action('admin_init', array(&$this, 'init_metaboxes'));
 	}
 	
 	/**
@@ -94,6 +94,7 @@ class MP_Product_Coupons_Screen {
 			'name' => 'discount',
 			'desc' => __('If you would like to give a percentage-based discount make sure to include the percent (%) symbol. Otherwise, the discount will be applied as a fixed amount off.', 'mp'),
 			'validation' => array('required' => true, 'custom' => '[0-9%.]'),
+			'custom_validation_message' => __('Value must either be a decimal number or a percentage', 'mp'),
 			'label' => array('text' => __('Discount Amount', 'mp')),
 		));
 		$metabox->add_field('text', array(

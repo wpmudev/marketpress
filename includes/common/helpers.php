@@ -13,6 +13,27 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_current_screen') ) :
+	/**
+	 * Safely gets the $current_screen object even if the $current_object is not available when called
+	 *
+	 * @since 3.0
+	 * @uses $current_screen
+	 * @return object
+	 */
+	function mp_get_current_screen() {
+		global $current_screen;
+		
+		if ( is_null($current_screen) ) {
+			//set current screen
+			require_once ABSPATH . 'wp-admin/includes/screen.php';
+			set_current_screen();
+		}
+		
+		return get_current_screen();
+	}
+endif;
+
 if ( ! function_exists('mp_get_field') ) :
 	/**
 	 * Gets a fields value

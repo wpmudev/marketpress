@@ -28,6 +28,9 @@ label.error:before {
 .postbox.wpmudev-postbox .inside textarea {
   width: 100%;
 }
+.postbox.wpmudev-postbox .inside .hndle {
+  cursor: default;
+}
 .postbox.wpmudev-postbox .inside .wpmudev-field {
   border-top: 1px solid #f5f5f5;
   padding: 12px;
