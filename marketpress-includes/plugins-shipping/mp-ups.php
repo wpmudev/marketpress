@@ -525,7 +525,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	function rate_request() {
 		global $mp;
 
-		$shipping_options = $this->ups_settings['services'];
+		$shipping_options = array_filter($this->ups_settings['services'], create_function('$val', 'return ($val == 1);'));
 
 		//Assume equal size packages. Find the best matching box size
 		$this->ups_settings['max_weight'] = ( empty($this->ups_settings['max_weight'])) ? 50 : $this->ups_settings['max_weight'];
@@ -777,7 +777,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*/
 	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
 		global $mp;
-		if ( isset($this->services[$shipping_option])){
+		if ( isset($this->services[$shipping_option]) ) {
 			$option = $this->services[$shipping_option]->name;
 		}
 

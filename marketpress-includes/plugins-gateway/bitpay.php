@@ -387,7 +387,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 							<br/>
 
 							<p><label><?php _e( 'Message', 'mp' ) ?><br/>
-								<textarea rows="5" cols="50" name="mp[gateways][bitpay][redirectMessage]"><?php echo esc_textarea($redirectMessage); ?></textarea><br/>
+								<textarea rows="5" cols="50" name="mp[gateways][bitpay][redirectMessage]"><?php echo stripslashes(esc_textarea($redirectMessage)); ?></textarea><br/>
 									<small><?php _e( 'Displayed on payment page.', 'mp' ); ?></small>
 								</label>
 							</p>

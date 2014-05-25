@@ -5,6 +5,14 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.5
+----------------------------------------------------------------------
+- Fixed: display issue on product category templates http://wp.mu/9ek
+- Fixed: when checking out every UPS shipping service shows as available instead of only the ones that are selected
+- Fixed: order status links generate page-not-found errors http://wp.mu/9em
+- Fixed: PHP notices when logging out
+- Fixed: random slashes being added to Bitpay message field http://wp.mu/9f6
+
 2.9.4.4
 ----------------------------------------------------------------------
 - Fixed: [mp_related_products] some times causes product categories/tags to not display http://wp.mu/9ce

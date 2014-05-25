@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4.4
+Version: 2.9.4.5
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4.4';
+	var $version = '2.9.4.5';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -1120,15 +1120,25 @@ Thanks again!", 'mp')
 
 	function logout_clear_session() {
 		//clear personal info
-		unset($_SESSION['mp_shipping_info']);
-		unset($_SESSION['mp_billing_info']);
+		if ( isset($_SESSION['mp_shipping_info']) ) {
+			unset($_SESSION['mp_shipping_info']);
+		}
+		
+		if ( isset($_SESSION['mp_billing_info']) ) {
+			unset($_SESSION['mp_billing_info']);			
+		}
 
 		//remove coupon code
-		if (is_multisite()) {
+		if ( is_multisite() ) {
 			global $blog_id;
-			unset($_SESSION['mp_cart_coupon_' . $blog_id]);
+			
+			if ( isset($_SESSION['mp_cart_coupon_' . $blog_id]) ) {
+				unset($_SESSION['mp_cart_coupon_' . $blog_id]);
+			}
 		} else {
-			unset($_SESSION['mp_cart_coupon']);
+			if ( isset($_SESSION['mp_cart_coupon']) ) {
+				unset($_SESSION['mp_cart_coupon']);
+			}
 		}
 	}
 
@@ -1433,6 +1443,10 @@ Thanks again!", 'mp')
 		} else {
 			$wp_query->post_count = 1;
 			
+			//load theme's page.php template
+			$this->product_taxonomy_template = locate_template(array('page.php', 'index.php'));
+			add_filter( 'template_include', array(&$this, 'custom_product_taxonomy_template'));
+			
 			//otherwise load the page template and use our own list theme. We don't use theme's taxonomy as not enough control
 			add_filter( 'single_post_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
@@ -1725,7 +1739,7 @@ Thanks again!", 'mp')
 			$title = $title;
 	 }
 	 
-	 return ( $id !== true ) ? '<span class="mp-page-title">' . $title . '</span>' : $title; 
+	 return $title; 
 	}
 
 	//this is the default theme added to single product listings
