@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4.5
+Version: 2.9.4.6
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4.5';
+	var $version = '2.9.4.6';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -3220,20 +3220,20 @@ Thanks again!", 'mp')
 			$this->cart_update_message( __('Item(s) Removed', 'mp') );
 		}
 			
-			//check for empty blogid carts and unset them to avoid errors on global cart
-			foreach ($global_cart as $bid => $data) {
-				
-				foreach ($data as $product_id => $product) {
-					if (!count($product))
-						unset($global_cart[$bid][$product_id]);
-				}
-				
-				if (!count($global_cart[$bid]))
-					unset($global_cart[$bid]);
+		//check for empty blogid carts and unset them to avoid errors on global cart
+		foreach ($global_cart as $bid => $data) {
+			
+			foreach ($data as $product_id => $product) {
+				if (!count($product))
+					unset($global_cart[$bid][$product_id]);
 			}
+			
+			if (!count($global_cart[$bid]))
+				unset($global_cart[$bid]);
+		}
 
-			//save items to cookie
-			$this->set_global_cart_cookie($global_cart);
+		//save items to cookie
+		$this->set_global_cart_cookie($global_cart);
 
 		//add coupon code
 		if (!empty($_POST['coupon_code'])) {
@@ -3257,16 +3257,16 @@ Thanks again!", 'mp')
 						 global $blog_id;
 						 $_SESSION['mp_cart_coupon_' . $blog_id] = $_POST['coupon_code'];
 					} else {
-					$_SESSION['mp_cart_coupon'] = $_POST['coupon_code'];
-				 		}
+						$_SESSION['mp_cart_coupon'] = $_POST['coupon_code'];
+				 	}
 					
 				 	$this->cart_update_message( __('Coupon Successfully Applied', 'mp') );
-			 		}else{
-				$this->cart_checkout_error( __('Coupon Was Not Applied', 'mp') );
+			 	}else{
+					$this->cart_checkout_error( __('Coupon Was Not Applied', 'mp') );
 				}
 			} else {
-			 $this->cart_checkout_error( __('Invalid Coupon Code', 'mp') );
-				}
+				$this->cart_checkout_error( __('Invalid Coupon Code', 'mp') );
+			}
 		}
 
 	 } else if (isset($_GET['remove_coupon'])) {
@@ -3625,8 +3625,8 @@ Thanks again!", 'mp')
 	function coupon_applicable( $code, $product_id ) {
 		$can_apply = true;
 		$coupons = get_option('mp_coupons');
-		$code = strtoupper($code);
-		$applies_to = isset($coupons[$code]['applies_to']) ? $coupons[$code]['applies_to'] : false;
+		$coupon_code = preg_replace('/[^A-Z0-9_-]/', '', strtoupper($code));
+		$applies_to = isset($coupons[$coupon_code]['applies_to']) ? $coupons[$coupon_code]['applies_to'] : false;
 		
 		if ( isset($applies_to['type']) && isset($applies_to['id']) ) {
 			$what = $applies_to['type']; // the type will be 'product', 'category'

@@ -211,8 +211,13 @@ class MarketPress_MS {
 		}
 	}
 
-	function add_rewrite_rules($rules){
-		$settings = get_site_option('mp_network_settings');
+	function add_rewrite_rules($rules) {
+		$settings = get_site_option('mp_network_settings'); 
+		
+		//if something happens to our settings bail to prevent an error
+		if ( empty( $settings['slugs']['marketplace'] ) ) {
+			return $rules;
+		}
 
 		$new_rules = array();
 

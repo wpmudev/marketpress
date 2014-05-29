@@ -5,6 +5,11 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.6
+----------------------------------------------------------------------
+- Fixed: Product and category specific coupons could be used for any product with a mal-formed coupon code http://wp.mu/9qe
+- Fixed: Fatal "Cannot use string offset as an array" error in network admin when enabling global cart http://wp.mu/9qf
+
 2.9.4.5
 ----------------------------------------------------------------------
 - Fixed: display issue on product category templates http://wp.mu/9ek
