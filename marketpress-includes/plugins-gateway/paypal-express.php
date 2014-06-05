@@ -120,7 +120,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  $this->gateway_settings_box();	//display the regular settings box
 	  $mp->global_cart = $global_cart;	//set this back to what it was
   }
-
+  
   /**
    * Enqueue any necessary scripts
    *
@@ -729,7 +729,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					<tr<?php echo ($mp->global_cart) ? '' : ' style="display:none;"'; ?>>
 					<th scope="row"><?php _e('PayPal Merchant E-mail', 'mp') ?></th>
 					<td>
-					<input value="<?php echo esc_attr($this->get_setting('gateways->paypal-express->merchant_email')); ?>" size="30" name="mp[gateways][paypal-express][merchant_email]" type="text" />
+					<input value="<?php echo esc_attr($mp->get_setting('gateways->paypal-express->merchant_email')); ?>" size="30" name="mp[gateways][paypal-express][merchant_email]" type="text" />
 					</td>
 	        </tr>
 	        <tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : ''; ?>>
@@ -976,15 +976,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       if (!is_array($cart) || count($cart) == 0) {
 				continue;
       }
+      
       if (is_multisite() && $bid != $blog_id) {
 				switch_to_blog($bid);
       }
 
-			$merchant_email = $this->get_setting('gateways->paypal-express->merchant_email');
+			$merchant_email = $mp->get_setting('gateways->paypal-express->merchant_email');
 			//if a seller hasn't configured paypal skip
 			if ( $mp->global_cart && empty($merchant_email) )
 				continue;
-
+			
       $totals = array();
 
       $request .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
@@ -1030,25 +1031,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
 
       //shipping line
+      $shipping_tax = 0;
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
-
-				//adjust price if tax inclusive is on
-				if ( $this->get_setting('tax->tax_inclusive') )
-					$shipping_price = $mp->shipping_tax_price($shipping_price);
-
-				$total = $total + $shipping_price;
-
-				if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-					$total += $mp->shipping_tax_price($shipping_price) - $shipping_price;
-				}
-
+				$total += $shipping_price;
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
+				$shipping_tax = ($mp->shipping_tax_price($shipping_price) - $shipping_price);
       }
 
       //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
       if ( ! $this->get_setting('tax->tax_inclusive') ) {
-      	$tax_price = $mp->tax_price(false);
-				$total = $total + $tax_price;
+      	$tax_price = ($mp->tax_price(false) + $shipping_tax);
+				$total += $tax_price;
 				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }
 
@@ -1063,7 +1056,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       }
       $j++;
     }
-
+    
+    //echo '<pre>'; print_r($this->deformatNVP($request)); echo '</pre>';die;
+    
     if (is_multisite())
       switch_to_blog($current_blog_id);
 

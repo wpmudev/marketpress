@@ -894,7 +894,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$total = $price + $handling;
 		
 		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-			$total = $total * (1 + (float) $mp->get_setting('tax->rate'));
+			$total = $mp->shipping_tax_price($total);
 		}
 
 		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total) );

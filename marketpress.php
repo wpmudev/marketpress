@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.4.6
+Version: 2.9.4.7
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 
 class MarketPress {
 
-	var $version = '2.9.4.6';
+	var $version = '2.9.4.7';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -160,6 +160,7 @@ class MarketPress {
 		add_filter( 'query_vars', array(&$this, 'add_queryvars') );
 		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
 		add_action( 'init', array(&$this, 'flush_rewrite_check'), 99 );
+		
 		if ( MP_HIDE_MENUS === false ) { //allows you to hide MP menus
 			add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
 			add_filter( 'wp_nav_menu_objects', array(&$this, 'filter_nav_menu'), 10, 2 );
@@ -2623,9 +2624,6 @@ Thanks again!", 'mp')
 	 } else if ( $this->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
 			//shipping plugins tie into this to calculate their shipping cost
 			$price = apply_filters( 'mp_calculate_shipping_'.$_SESSION['mp_shipping_info']['shipping_option'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
-			if ( $this->get_setting('tax->tax_inclusive') && $this->get_setting('tax->tax_shipping') ) {
-				$price = $price * (1 + (float) $this->get_setting('tax->rate'));
-			}
 		} else {
 			//shipping plugins tie into this to calculate their shipping cost
 			$price = apply_filters( 'mp_calculate_shipping_'.$this->get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
@@ -2645,10 +2643,6 @@ Thanks again!", 'mp')
 	 //merge
 	 $price = round($price + $extra, 2);
 	 
-		if ( $this->get_setting('tax->tax_inclusive') && $this->get_setting('tax->tax_shipping') ) {
-			$price = $price / (1 + (float) $this->get_setting('tax->rate'));
-		}
-
 		//boot if shipping plugin didn't return at least 0
 		if (empty($price))
 			return false;
@@ -2656,7 +2650,7 @@ Thanks again!", 'mp')
 		if ($format)
 			return $this->format_currency('', $price);
 		else
-			return $price;
+			return round($price, 2);
 	}
 	
 	//returns the calculated price for shipping after tax. For display only.
@@ -2731,10 +2725,9 @@ Thanks again!", 'mp')
 			$price = 0;
 			
 	 $price = apply_filters( 'mp_shipping_tax_price', $price, $shipping_price, $country, $state );
+	 $price += $shipping_price;
 		
-		$price += $shipping_price;
-		
-	 return $price;
+	 return round($price, 2);
 	}
 	
 	function get_display_shipping($order) {

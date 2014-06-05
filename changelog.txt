@@ -5,6 +5,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.7
+----------------------------------------------------------------------
+- Fixed: errors when checking out using PayPal and global cart is enabled
+- Fixed: incorrect shipping calculations when using tax inclusive pricing and calculated shipping options
+- Fixed: when toggling global cart on/off PayPal settings get wiped out
+- Fixed: PHP warning when checking out using UPS shipping gateway
+
 2.9.4.6
 ----------------------------------------------------------------------
 - Fixed: Product and category specific coupons could be used for any product with a mal-formed coupon code http://wp.mu/9qe

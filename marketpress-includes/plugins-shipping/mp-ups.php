@@ -595,7 +595,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$shipment = $root->appendChild($dom->createElement('Shipment'));
 		$shipment->appendChild($dom->createElement('NegotiatedRatesIndicator'));
 		$shipper = $shipment->appendChild($dom->createElement('Shipper'));
-		$shipper->appendChild($dom->createElement('ShipperNumber',$this->ups_settings['shipper_number']));
+		$shipper->appendChild($dom->createElement('ShipperNumber', htmlentities($this->ups_settings['shipper_number'])));
 		$address = $shipper->appendChild($dom->createElement('Address'));
 		$address->appendChild($dom->createElement('StateProvinceCode', $this->settings['base_province']));
 		$address->appendChild($dom->createElement('PostalCode', $this->settings['base_zip']));
@@ -786,7 +786,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$total = $price + $handling;
 		
 		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-			$total = $total * (1 + (float) $mp->get_setting('tax->rate'));
+			$total = $mp->shipping_tax_price($total);
 		}
 
 		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total));

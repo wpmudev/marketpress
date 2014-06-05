@@ -35,6 +35,10 @@ if(!class_exists('MP_Gateway_API')) {
     
     /****** Below are the public methods you may overwrite via a plugin ******/
 
+		function network_settings_save( $settings ) {
+			return $settings;
+		}
+		
     /**
      * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
      */

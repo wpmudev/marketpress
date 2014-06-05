@@ -598,22 +598,27 @@ class MarketPress_MS {
 			echo "<p>" . __('Nice Try...', 'mp') . "</p>";	//If accessed properly, this message doesn't appear.
 			return;
 		}
+		
+		//get settings
+		$settings = (array) get_site_option('mp_network_settings');
 
 		//save settings
 		if ( isset($_POST['marketplace_network_settings']) ) {
 			//filter slugs
 			$_POST['mp']['slugs'] = array_map('sanitize_title', $_POST['mp']['slugs']);
 			
-			update_site_option('mp_network_settings', apply_filters('mp_network_settings_save', $_POST['mp']));
+			//merge settings
+			$settings = apply_filters('mp_network_settings_save', $mp->parse_args_r($settings, $_POST['mp']));
+			
+			update_site_option('mp_network_settings', $settings);
 			
 			//flush rewrite rules due to product slugs
 			update_option('mp_flush_rewrite', 1);
 			
 			echo '<div class="updated fade"><p>'.__('Settings saved.', 'mp').'</p></div>';
 		}
-		$settings = get_site_option('mp_network_settings');
 		
-		if (!isset($settings['global_cart']))
+		if ( ! isset($settings['global_cart']) )
 			$settings['global_cart'] = 0;
 		?>
 		<div class="wrap">
@@ -1183,7 +1188,14 @@ function mp_global_categories_list( $args = '' ) {
 	else if ($include == 'categories')
 		$where = " WHERE t.type = 'product_category'";
 
-	$tags = $wpdb->get_results( "SELECT name, slug, type, count(post_id) as count FROM {$wpdb->base_prefix}mp_terms t LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON t.term_id = r.term_id$where GROUP BY t.term_id ORDER BY $order_by $order LIMIT $limit", ARRAY_A );
+	$tags = $wpdb->get_results("
+		SELECT name, slug, type, count(post_id) as count
+		FROM {$wpdb->base_prefix}mp_terms t
+		LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON t.term_id = r.term_id
+		$where
+		GROUP BY t.term_id
+		ORDER BY $order_by $order
+		LIMIT $limit", ARRAY_A);
 
 	if ( !$tags )
 		return;
