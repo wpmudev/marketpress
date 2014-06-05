@@ -171,7 +171,7 @@ class MP_Gateway_GoogleCheckout extends MP_Gateway_API {
     }
 
     //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-    if ( ! $this->get_setting('tax->tax_inclusive') ) {
+    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
     	$tax_price = ($mp->tax_price(false) + $shipping_tax);
 			$total += $tax_price;
      	$params["checkout-flow-support.merchant-checkout-flow-support.tax-tables.default-tax-table.tax-rules.default-tax-rule-1.rate"] = $tax_price;			

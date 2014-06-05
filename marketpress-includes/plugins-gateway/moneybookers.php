@@ -174,7 +174,7 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 		
 		    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
 		    $tax_price = ($mp->tax_price(false) + $shipping_tax);
-		    if ( ! $this->get_setting('tax->tax_inclusive') ) {
+		    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
 					$total += $tax_price;
           $params["amount{$i}"] = $mp->display_currency($tax_price);
           $params["amount{$i}_description"] = __('Taxes:', 'mp');
