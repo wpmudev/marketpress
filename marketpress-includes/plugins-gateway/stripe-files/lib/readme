@@ -1,0 +1,55 @@
+You will be developing this in multisite context.
+                                    
+We want to use the Stripe marketplace api to be able to,
+(when in multisite) access network settings to configure
+instead of main blog. 
+like chained, this can be turned on and off 
+(still be able to use individually if marketplace setting not turned on).
+Then individual substites can do the oath login
+ to grant checkout permissions to the main site.
+And the main site can configure
+what percentage of sales to deduct automatically.
+
+So most all of this is done,
+it was just pretty bad UI and buggy as well.
+
+Things to check and fix if needed:
+
+Multisite                                   Single
+
+Network Settings                            Blog settings
+
+On/off (behave like single sites)
+
+                                            oAuth login to stripe
+                                                checkout permissions for main blog
+
+%age commission (can be 0)
+
+sandbox and live
+API credentials
+
+In multisite it functions identical until
+you go to network settings, and configure there for marketplace
+
+Network settings make it simple
+to enable marketplace,
+enter live and sandbox creds,
+configure commissions (or none optionally if 
+we just want to use oauth
+to simplify setup for substores)
+
+Subsites settings behave nicely if
+ there are problems with network settings
+
+Subsites can easily grant permission/signup via oath,
+ and super admin can use sandbox mode.
+
+And finally of course that 
+everything works fine checkout wise and commission receipt wise.
+
+I'm attaching the latest files from previous trialist,
+
+as well as latest MP plugin version,
+
+and a patch that was recently added and needs applying to this new version.

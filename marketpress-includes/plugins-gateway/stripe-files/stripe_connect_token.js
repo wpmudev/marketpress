@@ -1,7 +1,7 @@
 // this identifies your website in the createToken call below
-Stripe.setPublishableKey(stripe.publisher_key);
+Stripe.setPublishableKey(stripe_connect.publisher_key);
 
-function stripeResponseHandler(status, response) {
+function stripetokenResponseHandler(status, response) {
 	if (response.error) {
 		// re-enable the submit button
 		jQuery('#mp_payment_confirm').removeAttr("disabled").show();
@@ -12,7 +12,7 @@ function stripeResponseHandler(status, response) {
 		// token contains id, last4, and card type
 		var token = response['id'];
 		// insert the token into the form so it gets submitted to the server
-		jQuery("#mp_payment_form").append("<input type='hidden' name='stripeToken' value='" + token + "' />");
+		jQuery("#mp_payment_form").append("<input type='hidden' name='stripeconnectToken' value='" + token + "' />");
 		// and submit
 		jQuery("#mp_payment_form").get(0).submit();
 	}
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
 		if ( $('input.mp_choose_gateway').length ) {
 			
 			// If the payment option selected is not stripe then return and bypass input validations
-			if ( $('input.mp_choose_gateway:checked').val() != "stripe" ) {
+			if ( $('input.mp_choose_gateway:checked').val() != "stripe-connect" ) {
 				return true;
 			}
 		}
@@ -41,19 +41,19 @@ jQuery(document).ready(function($) {
 		
 		//check form fields
 		if ( $('#cc_name').val().length < 4 ) {
-			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe.name + '</div>');
+			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe_connect.name + '</div>');
 			is_error = true;
 		}
 		if ( !Stripe.validateCardNumber( $('#cc_number').val() )) {
-			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe.number + '</div>');
+			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe_connect.number + '</div>');
 			is_error = true;
 		}
 		if ( !Stripe.validateExpiry( $('#cc_month').val(), $('#cc_year').val() ) ) {
-			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe.expiration + '</div>');
+			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe_connect.expiration + '</div>');
 			is_error = true;
 		}
 		if ( !Stripe.validateCVC($('#cc_cvv2').val())) {
-			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe.cvv2 + '</div>');
+			$("#stripe_checkout_errors").append('<div class="mp_checkout_error">' + stripe_connect.cvv2 + '</div>');
 			is_error = true;
 		}
 		if (is_error) return false;
@@ -69,7 +69,7 @@ jQuery(document).ready(function($) {
 			cvc: $('#cc_cvv2').val(),
 			exp_month: $('#cc_month').val(),
 			exp_year: $('#cc_year').val()
-			}, stripeResponseHandler);
+			}, stripetokenResponseHandler);
 			return false; // submit from callback
 	});
 });
