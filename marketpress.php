@@ -49,7 +49,7 @@ class MarketPress {
 	var $weight_printed = false;
 	var $defaults = array(
 		/*	IMPORTANT! DO NOT CHANGE THE ORDER OF THESE ARGUMENTS!
-				REQUIRED FOR BACKWARDS COMPATABILITY. IF YOU NEED TO
+				REQUIRED FOR BACKWARDS COMPATIBILITY. IF YOU NEED TO
 				ADD AN ADDITIONAL DEFAULT ADD IT TO THE END OF EACH ARRAY */
 		'list_products' => array(
 			'echo' => true,
@@ -174,10 +174,10 @@ class MarketPress {
 		add_action( 'pre_get_posts', array(&$this, 'handle_gateway_returns'), 1 );
 
 		//Store cart handling
-	 add_action( 'template_redirect', array(&$this, 'store_script') ); //only on front pages
-	 /* use both actions so logged in and not logged in users can send this AJAX request */
-	 add_action( 'wp_ajax_nopriv_mp-update-cart', array(&$this, 'update_cart') );
-	 add_action( 'wp_ajax_mp-update-cart', array(&$this, 'update_cart') );
+		add_action( 'template_redirect', array(&$this, 'store_script') ); //only on front pages
+		/* use both actions so logged in and not logged in users can send this AJAX request */
+		add_action( 'wp_ajax_nopriv_mp-update-cart', array(&$this, 'update_cart') );
+		add_action( 'wp_ajax_mp-update-cart', array(&$this, 'update_cart') );
 		add_action( 'wp_ajax_mp-province-field', 'mp_province_field' ); //province field callback for shipping form
 		add_action( 'wp_ajax_nopriv_mp-province-field', 'mp_province_field' );
 		add_action( 'wp_ajax_mp-orders-export', array(&$this, 'export_orders_csv') );
@@ -191,7 +191,7 @@ class MarketPress {
 
 		//Add widgets
 		if (!$this->get_setting('disable_cart', 0))
-			 add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Shopping_Cart");') );
+			add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Shopping_Cart");') );
 
 		add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Product_List");') );
 		add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Categories_Widget");') );
