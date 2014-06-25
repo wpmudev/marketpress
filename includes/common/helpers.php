@@ -13,20 +13,121 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_dir_files') ) :
+	/**
+	 * Get all files from a given directory
+	 *
+	 * @since 3.0
+	 *
+	 * @param string $dir The full path of the directory
+	 * @param string $ext Get only files with a given extension. Set to NULL to get all files.
+	 * @return array or false if no files exist
+	 */
+	function mp_get_dir_files( $dir, $ext = 'php' ) {
+		$myfiles = array();
+		
+		if ( ! is_null($ext) )
+			$ext = '.' . $ext;
+		
+		if ( false === file_exists($dir) )
+			return false;
+		
+		$dir = trailingslashit($dir);
+		$files = glob($dir . '*' . $ext);
+		
+		return ( empty($files) ) ? false : $files;
+	}
+endif;
+
+if ( ! function_exists('mp_include_dir') ) :
+	/**
+	 * Includes all files in a given directory
+	 *
+	 * @since 3.0
+	 *
+	 * @param string $dir The directory to work with
+	 * @param string $ext Only include files with this extension
+	 */
+	function mp_include_dir( $dir, $ext = 'php' ) {
+		if ( false === ($files = mp_get_dir_files($dir, $ext)) )
+			return false;
+		
+		foreach ( $files as $file ) {
+			include_once $file;
+		}
+	}
+endif;
+
 if ( ! function_exists('mp_get_current_screen') ) :
 	/**
-	 * Safely gets the $current_screen object even if the $current_object is not available when called
+	 * Safely gets the $current_screen object even before the current_screen hook is fired
 	 *
 	 * @since 3.0
 	 * @uses $current_screen
+	 * @uses $pagenow
+	 * @uses $hook_suffix
 	 * @return object
 	 */
 	function mp_get_current_screen() {
-		global $current_screen;
+		global $current_screen, $hook_suffix, $pagenow;
 		
 		if ( is_null($current_screen) ) {
-			//set current screen
+			//set current screen (not normally available here) - this code is derived from wp-admin/admin.php
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			
+			if ( isset($_GET['page']) ) {
+				$plugin_page = wp_unslash($_GET['page']);
+				$plugin_page = plugin_basename($plugin_page);
+			}
+
+			if ( isset($_REQUEST['post_type']) && post_type_exists($_REQUEST['post_type']) ) {
+				$typenow = $_REQUEST['post_type'];
+			} else {
+				$typenow = '';
+			}
+			
+			if ( isset($_REQUEST['taxonomy']) && taxonomy_exists($_REQUEST['taxonomy']) ) {
+				$taxnow = $_REQUEST['taxonomy'];
+			} else {
+				$taxnow = '';
+			}
+
+			if ( isset($plugin_page) ) {
+				if ( !empty($typenow) ) {
+					$the_parent = $pagenow . '?post_type=' . $typenow;
+				} else {
+					$the_parent = $pagenow;
+				}
+					
+				if ( ! $page_hook = get_plugin_page_hook($plugin_page, $the_parent) ) {
+					$page_hook = get_plugin_page_hook($plugin_page, $plugin_page);
+					// backwards compatibility for plugins using add_management_page
+					if ( empty( $page_hook ) && 'edit.php' == $pagenow && '' != get_plugin_page_hook($plugin_page, 'tools.php') ) {
+						// There could be plugin specific params on the URL, so we need the whole query string
+						if ( ! empty($_SERVER[ 'QUERY_STRING' ]) ) {
+							$query_string = $_SERVER[ 'QUERY_STRING' ];
+						} else {
+							$query_string = 'page=' . $plugin_page;
+						}
+							
+						wp_redirect( admin_url('tools.php?' . $query_string) );
+						exit;
+					}
+				}
+				
+				unset($the_parent);
+			}
+			
+			$hook_suffix = '';
+			if ( isset($page_hook) ) {
+				$hook_suffix = $page_hook;
+			} else if ( isset($plugin_page) ) {
+				$hook_suffix = $plugin_page;
+			} else if ( isset($pagenow) ) {
+				$hook_suffix = $pagenow;
+			}
+
 			set_current_screen();
 		}
 		

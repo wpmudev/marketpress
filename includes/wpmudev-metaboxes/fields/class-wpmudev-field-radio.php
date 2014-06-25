@@ -2,6 +2,19 @@
 
 class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	/**
+	 * Runs on construct of parent
+	 *
+	 * @param array $args {
+	 *		An array of arguments.
+	 *
+	 *		@see WPMUDEV_Field::__construct() for core list of available arguments.
+	 *		@type array $fields A value => label list of fields.
+	 * }
+	 */
+	public function on_creation( $args ) {
+	}
+	
+	/**
 	 * Sanitizes the field value before saving to database
 	 *
 	 * @since 1.0
@@ -10,7 +23,7 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	 */	
 	public function sanitize_for_db( $value ) {
 		$value = ( empty($value) ) ? 0 : $value;
-		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
+		parent::sanitize_for_db($value);
 	}
 
 	/**

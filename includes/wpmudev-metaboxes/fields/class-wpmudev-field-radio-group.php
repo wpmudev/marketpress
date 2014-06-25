@@ -6,12 +6,18 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param array $args {
+	 *		An array of arguments
+	 *
+	 *		@type string $orientation The orientation of each radio field (horizontal or vertical). Defaults to horizontal.
+	 * }
 	 */
-	public function on_creation() {
+	public function on_creation( $args ) {
 		$this->args = wp_parse_args($this->args, array(
 			'orientation' => 'horizontal',
 		));
 	}
+	
 	/**
 	 * Displays the field
 	 *

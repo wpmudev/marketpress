@@ -2,7 +2,7 @@
 
 class WPMUDEV_Field {
 	/**
-	 * Refers to the field arguments
+	 * Refers to the field arguments.
 	 *
 	 * @since 1.0
 	 * @access public
@@ -11,7 +11,7 @@ class WPMUDEV_Field {
 	var $args = array();
 	
 	/**
-	 * Refers to the default field attributes
+	 * Refers to the default field attributes.
 	 *
 	 * @since 1.0
 	 * @access public
@@ -20,48 +20,68 @@ class WPMUDEV_Field {
 	var $default_atts = array('name', 'id', 'class', 'style', 'disabled', 'readonly', 'value');
 		
 	/**
-	 * Constructor function
+	 * Constructor function.
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param array $args (optional)
+	 * @param array $args {
+	 *		An array of arguments. Optional.
+	 *
+	 *		@type string $name The field's name attribute.
+	 *		@type string $id The field's id attribute.
+	 *		@type string $class The field's class attribute.
+	 *		@type string $style The field's style attribute.
+	 *		@type bool $disabled Should the field be disabled.
+	 *		@type bool $readonly Should the field be read-only.
+	 *		@type string $desc The field's description.
+	 *		@type array $custom Any custom/non-standard attributes.
+	 *		@type bool $value_only Only get the field's value - don't initialize scripts, styles, etc.
+	 *		@type string $default_value The value of the field before any user interaction.
+	 *		@type string $custom_validation_message Any custom validation message the field uses (only used for custom validation).
+	 *		@type array $validation {
+	 *			The rules to apply for validation.
+	 *
+	 *			@type bool $required Makes the element required.
+	 *			@type int $minlength Makes the element require a given minimum length.
+	 *			@type int $maxlength Makes the element require a given maxmimum length.
+	 *			@type array $rangelength Makes the element require a given value range.
+	 *			@type int $min Makes the element require a given minimum value.
+	 *			@type int $max Makes the element require a given maximum value.
+	 *			@type array $range Makes the element require a value between the given range.
+	 *			@type bool $email Makes the element require a valid email.
+	 *			@type bool $url Makes the element require a valid url.
+	 *			@type bool $date Makes the element require a date.
+	 *			@type bool $number Makes the element require a decimal number.
+	 *			@type bool $digits Makes the element require digits only.
+	 *			@type bool $creditcard Makes the element require a credit card number.
+	 *			@type bool $alphanumeric Makes the element require only letters and numbers.
+	 *			@type string $custom A regular expression to test for (e.g. [0-9A-Z]).
+	 *			@type string $equalTo The id of a field that this field's value should match.
+	 *	}
+	 *	@type array $conditional {
+	 *		Conditionally hide/show this field if another field value is a certain value.
+	 *
+	 *		@type string $name The name of the field to do the comparison on.
+	 *		@type string $value The value to check against.
+	 *		@type string $action The action to perform (show/hide).
+	 *	}
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = wp_parse_args($args, array(
-			'name' => '',							//the field's name attribute
-			'id' => '',								//the field's id attribute
-			'class' => '',						//the field's class attribute
-			'style' => '',						//the field's style attribute
-			'disabled' => '',					//whether the field should be disabled or not
-			'readonly' => '',					//whether the field should be read-only or not
-			'desc' => '',							//the field's description
-			'custom' => array(),			//any custom/non-standard attributes,
-			'default_value' => '',		//the default value of the field before any user interaction,
-			'value_only' => false,		//only get the field's value - don't initialize scripts, styles, etc
-			'validation' => array(		//the rules to apply for validation
-			'custom_validation_message' => '',	//any custom validation message the field uses (only used for custom validation)
-			/*'required' => false,
-				'minlength' => 0,
-				'maxlength' => 0,
-				'rangelength' => array(),
-				'min' => 0,
-				'max' => 0,
-				'range' => 0,
-				'email' => true,
-				'url' => true,
-				'date' => true,
-				'number' => true,
-				'digits' => true,
-				'creditcard' => true,
-				'alphanumeric' => true,
-				'custom' => '', //a regular expression to test for (e.g. [0-9A-Z])
-				'equalTo' => '#field-id',*/
-			),	
-			'conditional' => array(		//conditionally hide/show this field if another field value is a certain value
-				/*'name' =>	'',
-				'value' => '',
-				'action' => 'show',*/
-			),
+			'name' => '',
+			'id' => '',
+			'class' => '',
+			'style' => '',
+			'disabled' => '',
+			'readonly' => '',
+			'desc' => '',
+			'custom' => array(),
+			'default_value' => '',
+			'value_only' => false,
+			'custom_validation_message' => '',
+			'custom_save_handler' => null,			
+			'validation' => array(),	
+			'conditional' => array(),
 		));
 		
 		if ( $this->args['value_only'] ) {
@@ -70,7 +90,12 @@ class WPMUDEV_Field {
 		
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_scripts'));
-		add_action('wpmudev_metaboxes_save_fields', array(&$this, 'save_value'));
+		
+		if ( is_null($this->args['custom_save_handler']) ) {
+			add_action('wpmudev_metaboxes_save_fields', array(&$this, 'save_value'));
+		} else {
+			add_action('wpmudev_metaboxes_save_fields', $this->args['custom_save_handler']);
+		}
 		
 		if ( ! $this->scripts_printed() ) {
 			add_action('in_admin_footer', array(&$this, 'print_scripts'));
@@ -99,12 +124,12 @@ class WPMUDEV_Field {
 	}
 	
 	/**
-	 * Saves the field to the database
+	 * Saves the field to the database.
 	 *
 	 * @since 1.0
 	 * @access public
 	 * @action save_post
-	 * @param int $post
+	 * @param int $post_id
 	 * @param $value (optional)
 	 */
 	public function save_value( $post_id, $value = null ) {
@@ -112,21 +137,34 @@ class WPMUDEV_Field {
 			$value = isset($_POST[$this->args['name']]) ? $_POST[$this->args['name']] : '';
 		}
 		
+		/**
+		 * Modify the value before it's saved to the database. Return null to bypass internal saving mechanisms.
+		 *
+		 * @since 1.0
+		 * @param mixed $value The field's value
+		 * @param mixed $post_id The current post id or option name
+		 * @param object $this Refers to the current field object
+		 */
 		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $this->sanitize_for_db($value), $post_id, $this);
 		
+		if ( is_null($value) ) {
+			return;
+		}
+				
 		update_post_meta($post_id, $this->args['name'], $value);
-		update_post_meta($post_id, '_' . $this->args['name'], get_class($this));
+		update_post_meta($post_id, '_' . $this->args['name'], get_class($this));		
 	}
 	
 	/**
-	 * Gets the field value from the database
+	 * Gets the field value from the database.
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param int $post_id
+	 * @param mixed $post_id
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 	 */
-	public function get_value( $post_id, $raw = false ) {		
+	public function get_value( $post_id, $raw = false ) {
 		$value = get_post_meta($post_id, $this->args['name'], true);
 		
 		if ( $value === '' ) {
@@ -135,28 +173,56 @@ class WPMUDEV_Field {
 		
 		$value = ( $raw ) ? $value : $this->format_value($value, $args);
 		
-		return apply_filters('wpmudev_field_get_value', $value, $this, $post_id, $raw);
+		/**
+		 * Modify the returned value.
+		 *
+		 * @since 1.0
+		 * @param mixed $value The return value
+		 * @param mixed $post_id The current post id or option name
+		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
+		 * @param object $this Refers to the current field object
+		 */
+		$value = apply_filters('wpmudev_field_get_value', $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field_get_value_' . $this->args['name'], $value, $post_id, $raw, $this);
+		
+		return $value;
 	}
 
 	/**
-	 * Formats the field value for display
+	 * Formats the field value for display.
 	 *
 	 * @since 1.0
 	 * @access public
 	 * @param $value
 	 */
 	public function format_value( $value ) {
+		/**
+		 * Modify the formatted value.
+		 *
+		 * @since 1.0
+		 * @param mixed $value The return value
+		 * @param mixed $post_id The current post id or option name
+		 * @param object $this Refers to the current field object
+		 */	
 		return apply_filters('wpmudev_field_format_value', $value, $post_id, $this);
 	}
 	
 	/**
-	 * Sanitizes the field value before saving to database
+	 * Sanitizes the field value before saving to database.
 	 *
 	 * @since 1.0
 	 * @access public
 	 * @param $value
 	 */	
 	public function sanitize_for_db( $value ) {
+		/**
+		 * Modify the value right before it's saved to the database.
+		 *
+		 * @since 1.0
+		 * @param mixed $value The current value
+		 * @param mixed $post_id The current post id or option name
+		 * @param object $this Refers to the current field object
+		 */	
 		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
 	}
 	
@@ -167,26 +233,32 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function print_scripts() {
-		
+		/**
+		 * Triggered when the field's scripts are printed.
+		 *
+		 * @since 1.0
+		 * @param object $this The current field object.
+		 */
+		do_action('wpmudev_field_print_scripts', $this);
 	}
 	
 	/**
 	 * Determines if a field's scripts have already been printed
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @uses $printed_field_scripts
 	 */
 	public function scripts_printed() {
-		global $printed_field_scripts;
+		global $wpmudev_metaboxes_printed_field_scripts;
 		
 		$class = get_class($this);
 		
-		if ( in_array($class, $printed_field_scripts) ) {
+		if ( in_array($class, $wpmudev_metaboxes_printed_field_scripts) ) {
 			return true;
 		}
 		
-		$printed_field_scripts[] = $class;
+		$wpmudev_metaboxes_printed_field_scripts[] = $class;
 		
 		return false;
 	}
@@ -198,7 +270,7 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function display() {
-		wp_die(__('You must the MP_Field::display() method in your form field class', 'mp'), E_USER_ERROR);
+		wp_die(__('You must the WPMUDEV_Field::display() method in your form field class', 'wpmudev_metaboxes'), E_USER_ERROR);
 	}
 	
 	/**
@@ -249,6 +321,13 @@ class WPMUDEV_Field {
 		
 		$atts = trim($atts);
 		
+		/**
+		 * Modify the field's attributes before display
+		 *
+		 * @since 1.0
+		 * @param string $atts The field's attributes
+		 * @param object $this Refers to the current field object
+		 */
 		return apply_filters('wpmudev_field_parse_atts', $atts, $this);
 	}
 	
@@ -262,7 +341,14 @@ class WPMUDEV_Field {
 		if ( empty($this->args['id']) ) {
 			$this->args['id'] = 'mp-field-' . uniqid(true);
 		}
-		
+
+		/**
+		 * Modify the field's id before return
+		 *
+		 * @since 1.0
+		 * @param string $id
+		 * @param object $this Refers to the current field object
+		 */		
 		return apply_filters('wpmudev_field_get_id', $this->args['id'], $this);
 	}
 }

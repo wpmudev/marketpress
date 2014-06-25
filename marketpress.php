@@ -342,7 +342,7 @@ class Marketpress {
 		) );
 	}
 	
-		/**
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0

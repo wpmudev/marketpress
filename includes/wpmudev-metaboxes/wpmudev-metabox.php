@@ -8,7 +8,7 @@ require_once WPMUDEV_Metabox::class_dir('api.php');
  * @global array
  * @name $printed_field_scripts
  */
-$GLOBALS['printed_field_scripts'] = array();
+$GLOBALS['wpmudev_metaboxes_printed_field_scripts'] = array();
 
 class WPMUDEV_Metabox {
 	/**
@@ -59,7 +59,7 @@ class WPMUDEV_Metabox {
 	/**
 	 * Refers to the metabox's current status (e.g. active or not)
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @var bool
 	 */
@@ -68,7 +68,7 @@ class WPMUDEV_Metabox {
 	/**
 	 * If the current metabox is a settings page metabox
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @var bool
 	 */
@@ -77,7 +77,7 @@ class WPMUDEV_Metabox {
 	/**
 	 * Refers to any custom field validation messages
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @var array
 	 */
@@ -88,16 +88,27 @@ class WPMUDEV_Metabox {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param array $args {
+	 *		An array of arguments. Optional.
+	 *
+	 *		@type string $id The id of the metabox (required)
+	 *		@type string $title The title of the metabox (required)
+	 *		@type string $post_type The post type to display the metabox on
+	 *		@type array $screen_ids The screen ID(s) to display the metabox on
+	 *		@type string $context The context of the metabox (advanced, normal, side)
+	 *		@type string $priority The priority of the metabox (default, high, normal)
+	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. mp_settings)
+	 * }
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = wp_parse_args($args, array(
-			'id' => '',								//the id of the metabox (required)
-			'title' => '',						//the title of the metabox (required)
-			'post_type' => '',				//the post type to display the metabox on
-			'screen_ids' => array(),	//the screen ID to display the metabox on
-			'context' => 'advanced',	//the context of the metabox (advanced, normal, side)
-			'priority' => 'default',	//the priority of the metabox (default, high, normal)
-			'option_name' => '',			//if not a post metabox, enter the option name that will be used to retrieve the field's value (e.g. mp_settings)
+			'id' => '',
+			'title' => '',
+			'post_type' => '',
+			'screen_ids' => array(),
+			'context' => 'advanced',
+			'priority' => 'default',
+			'option_name' => '',
 		));
 		
 		$this->load_fields();
@@ -109,13 +120,28 @@ class WPMUDEV_Metabox {
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'));
 		add_action('wpmudev_metaboxes_settings', array(&$this, 'maybe_render'));
 		add_action('save_post', array(&$this, 'save_fields'));
+		add_action('current_screen', array(&$this, 'maybe_save_settings_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
+	}
+	
+	/**
+	 * Determine if settings fields should be saved
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function maybe_save_settings_fields() {
+		if ( ! $this->is_active() || ! $this->is_settings_metabox() ) {
+			return;
+		}
+		
+		$this->save_fields($this->args['option_name']);
 	}
 	
 	/**
 	 * Determines if a metabox should be rendered
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 */
 	public function maybe_render() {
@@ -129,7 +155,7 @@ class WPMUDEV_Metabox {
 	/**
 	 * Adds classes to the metabox for easier styling
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @filter postbox_classes_{$post_type}_{$id}
 	 * @param array $classes
@@ -289,7 +315,7 @@ class WPMUDEV_Metabox {
 							echo '<div class="wpmudev-fields clearfix">';
 				
 							foreach ( $this->fields as $field ) {
-								echo '<div class="wpmudev-field">';
+								echo '<div class="wpmudev-field ' . str_replace('_', '-', strtolower(get_class($field))) . '">';
 									echo '<div class="wpmudev-field-label">' . $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : '') . '</div>';
 									echo '<div class="wpmudev-field-desc">' . $field->args['desc'] . '</div>';
 									$field->display($post);
@@ -327,7 +353,7 @@ class WPMUDEV_Metabox {
 	/**
 	 * Checks if the metabox is a settings metabox
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @return bool
 	 */
@@ -347,20 +373,75 @@ class WPMUDEV_Metabox {
 	}
 	
 	/**
-	 * Safely gets the $current_screen object
+	 * Safely gets the $current_screen object even before the current_screen hook is fired
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @uses $current_screen
+	 * @uses $pagenow
+	 * @uses $hook_suffix
 	 * @return object
 	 */
-	
 	public function get_current_screen() {
-		global $current_screen;
+		global $current_screen, $hook_suffix, $pagenow;
 		
 		if ( is_null($current_screen) ) {
-			//set current screen (not normally available here)
+			//set current screen (not normally available here) - this code is derived from wp-admin/admin.php
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			
+			if ( isset($_GET['page']) ) {
+				$plugin_page = wp_unslash($_GET['page']);
+				$plugin_page = plugin_basename($plugin_page);
+			}
+
+			if ( isset($_REQUEST['post_type']) && post_type_exists($_REQUEST['post_type']) ) {
+				$typenow = $_REQUEST['post_type'];
+			} else {
+				$typenow = '';
+			}
+			
+			if ( isset($_REQUEST['taxonomy']) && taxonomy_exists($_REQUEST['taxonomy']) ) {
+				$taxnow = $_REQUEST['taxonomy'];
+			} else {
+				$taxnow = '';
+			}
+
+			if ( isset($plugin_page) ) {
+				if ( ! empty($typenow) ) {
+					$the_parent = $pagenow . '?post_type=' . $typenow;
+				} else {
+					$the_parent = $pagenow;
+				}
+					
+				if ( ! $page_hook = get_plugin_page_hook($plugin_page, $the_parent) ) {
+					$page_hook = get_plugin_page_hook($plugin_page, $plugin_page);
+					// backwards compatibility for plugins using add_management_page
+					if ( empty( $page_hook ) && 'edit.php' == $pagenow && '' != get_plugin_page_hook($plugin_page, 'tools.php') ) {
+						// There could be plugin specific params on the URL, so we need the whole query string
+						if ( ! empty($_SERVER[ 'QUERY_STRING' ]) ) {
+							$query_string = $_SERVER[ 'QUERY_STRING' ];
+						} else {
+							$query_string = 'page=' . $plugin_page;
+						}
+							
+						wp_redirect( admin_url('tools.php?' . $query_string) );
+						exit;
+					}
+				}
+				
+				unset($the_parent);
+			}
+			
+			$hook_suffix = '';
+			if ( isset($page_hook) ) {
+				$hook_suffix = $page_hook;
+			} else if ( isset($plugin_page) ) {
+				$hook_suffix = $plugin_page;
+			} else if ( isset($pagenow) ) {
+				$hook_suffix = $pagenow;
+			}
+
 			set_current_screen();
 		}
 		
@@ -370,7 +451,7 @@ class WPMUDEV_Metabox {
 	/**
 	 * Checks if the current metabox is active for the current page
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @return bool
 	 */
@@ -398,12 +479,12 @@ class WPMUDEV_Metabox {
 	 * @since 1.0
 	 * @access public
 	 * @param string $type
-	 * @param array $args
+	 * @param array $args==
 	 */
 	public function add_field( $type, $args = array() ) {		
 		$class = apply_filters('wpmudev_metabox_add_field', 'WPMUDEV_Field_' . ucfirst($type), $type, $args);
 				
-		if ( ! class_exists($class) ) {
+		if ( ! class_exists($class) || ! $this->is_active() ) {
 			return false;	
 		}
 		

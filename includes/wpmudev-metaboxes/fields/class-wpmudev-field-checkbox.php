@@ -6,11 +6,17 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param array $args {
+	 *		An array of arguments.
+	 *
+	 *		@type mixed $value The value of the checkbox when checked.
+	 *		@type string $message The message that should be displayed next to the checkbox (e.g. Yes, No, etc). Optional.
+	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = wp_parse_args($args, array(
-			'value' => 1,			//the value that gets saved to the database
-			'message' => '',	//the message that should be displayed next to the checkbox (e.g. Yes, No, etc)
+			'value' => 1,
+			'message' => '',
 		));
 	}
 	
@@ -23,7 +29,7 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 */	
 	public function sanitize_for_db( $value ) {
 		$value = ( empty($value) ) ? 0 : $value;
-		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
+		parent::sanitize_for_db($value);
 	}
 
 	/**

@@ -18,6 +18,7 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function print_scripts() {
+		parent::print_scripts();
 	?>
 <script type="text/javascript">
 jQuery(document).ready(function($){

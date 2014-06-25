@@ -44,7 +44,7 @@ class MP_Installer {
 		$old_version = get_option('mp_version');
 		
 		if ( ! get_option('mp_do_install') ) {
-			if ( $old_version  == MP_VERSION ) {
+			if ( $old_version == MP_VERSION ) {
 				return;
 			}
 		}
@@ -92,6 +92,29 @@ class MP_Installer {
 		update_option('mp_version', MP_VERSION);
 		delete_option('mp_do_install');		
 	}
+	
+	/**
+	 * Creates the product attributes table
+	 *
+	 * @since 3.0
+	 * @access private
+	 * @uses $wpdb, $charset_collate
+	 */
+	private function _create_product_attributes_table() {
+		global $wpdb, $charset_collate;
+		
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		
+		$table_name = $wpdb->prefix . 'mp_product_attributes';
+		dbDelta("CREATE TABLE $table_name (
+			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
+			attribute_name varchar(45) DEFAULT '',
+			attribute_slug varchar(32) DEFAULT '',
+			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
+			attribute_terms_sort_order enum('ASC','DESC') DEFAULT NULL,
+			PRIMARY KEY  (attribute_id)
+		) $charset_collate");
+	}
 
 	/**
 	 * Runs on 3.0 update
@@ -101,6 +124,7 @@ class MP_Installer {
 	 */
 	private function _update_3000( $settings ) {
 		$this->_update_coupon_schema();
+		$this->_create_product_attributes_table();
 		
 		//currency changes
 		if ( 'TRL' == mp_get_setting('currency') ) {
@@ -165,6 +189,10 @@ class MP_Installer {
 			//no coupons to update
 			return false;
 		}
+		
+		//include WPMUDEV Metaboxes/Fields
+		include_once mp_plugin_dir('includes/wpmudev-metaboxes/class-wpmudev-field.php');
+		mp_include_dir(mp_plugin_dir('includes/wpmudev-metaboxes/fields'));
 		
 		foreach ( $coupons as $code => $coupon ) {
 			$type = isset($coupon['applies_to']['type']) ? $coupon['applies_to']['type'] : 'all';

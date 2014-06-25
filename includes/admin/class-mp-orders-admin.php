@@ -1,6 +1,6 @@
 <?php
 
-class MP_Orders_Screen {
+class MP_Orders_Admin {
 	/**
 	 * Refers to a single instance of the class
 	 *
@@ -19,7 +19,7 @@ class MP_Orders_Screen {
 	 */
 	public static function get_instance() {
 		if ( is_null(self::$_instance) ) {
-			self::$_instance = new MP_Orders_Screen();
+			self::$_instance = new MP_Orders_Admin();
 		}
 		return self::$_instance;
 	}
@@ -404,7 +404,7 @@ class MP_Orders_Screen {
 				$count_output = '';
 			}
 				
-			$orders_page = add_submenu_page('edit.php?post_type=product', __('Manage Orders', 'mp'), __('Manage Orders', 'mp') . $count_output, $order_cap, 'edit.php?post_type=mp_order');
+			$orders_page = add_submenu_page('edit.php?post_type=product', __('Orders', 'mp'), __('Orders', 'mp') . $count_output, $order_cap, 'edit.php?post_type=mp_order');
 		}
 	}
 	
@@ -552,4 +552,4 @@ class MP_Orders_Screen {
 	}
 }
 
-MP_Orders_Screen::get_instance();
+MP_Orders_Admin::get_instance();

@@ -45,15 +45,19 @@ class MP_Admin {
 		add_action('plugins_loaded', array(&$this, 'load_settings_metaboxes'));
 		//set custom post-updated messages
 		add_filter('post_updated_messages', array(&$this, 'post_updated_messages'));
-		//display the current page id
-		add_action('current_screen', function() { get_current_screen()->id; });
 	}
 	
+	/**
+	 * Includes any necessary files
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function includes() {
-		require_once mp_plugin_dir('includes/admin/class-mp-orders-screen.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-product-coupons-screen.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-products-screen.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-store-settings-screen.php');		
+		require_once mp_plugin_dir('includes/admin/class-mp-orders-admin.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-product-coupons-admin.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-products-admin.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-store-settings-admin.php');
 	}
 	
 	/**
@@ -91,50 +95,7 @@ class MP_Admin {
 		
 		return $messages;
 	}
-	
-	/**
-	 * Get all files from a given directory
-	 *
-	 * @since 3.0
-	 * @access public
-	 *
-	 * @param string $dir The full path of the directory
-	 * @param string $ext Get only files with a given extension. Set to NULL to get all files.
-	 * @return array or false if no files exist
-	 */
-	public function get_dir_files( $dir, $ext = 'php' ) {
-		$myfiles = array();
-		
-		if ( ! is_null($ext) )
-			$ext = '.' . $ext;
-		
-		if ( false === file_exists($dir) )
-			return false;
-		
-		$dir = trailingslashit($dir);
-		$files = glob($dir . '*' . $ext);
-		
-		return ( empty($files) ) ? false : $files;
-	}
-
-	/**
-	 * Includes all files in a given directory
-	 *
-	 * @since 3.0
-	 * @access public
-	 *
-	 * @param string $dir The directory to work with
-	 * @param string $ext Only include files with this extension
-	 */
-	public function include_dir( $dir, $ext = 'php' ) {
-		if ( false === ($files = $this->get_dir_files($dir, $ext)) )
-			return false;
-		
-		foreach ( $files as $file ) {
-			include_once $file;
-		}
-	}
-				
+					
 	/**
 	 * Load settings metaboxes
 	 *
@@ -143,7 +104,7 @@ class MP_Admin {
 	 */
 	public function load_settings_metaboxes() {
 		require_once mp_plugin_dir('includes/admin/class-mp-settings-metabox.php');
-		$this->include_dir(mp_plugin_dir('includes/admin/metaboxes-settings'));
+		mp_include_dir(mp_plugin_dir('includes/admin/metaboxes-settings'));
 	}
 
 	/**

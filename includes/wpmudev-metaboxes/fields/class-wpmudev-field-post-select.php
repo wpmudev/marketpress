@@ -8,10 +8,17 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param array $args {
+	 * 		An array of arguments.
+	 *
+	 *		@type array $query @see WP_Query
+	 *		@type bool $multiple True, if selection of multiple posts is allowed.
+	 *		@type string $placeholder The text that shows up in the field before any posts are selected
+	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = wp_parse_args($args, array(
-			'query' => array(),		// see WP_Query
+			'query' => array(),
 			'multiple' => false,
 			'placeholder' => __('Select Posts', 'mp')
 		));
@@ -93,6 +100,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 	 * @access public
 	 */	
 	public function print_scripts() {
+		parent::print_scripts();
 	?>
 <script type="text/javascript">
 jQuery(document).ready(function($){

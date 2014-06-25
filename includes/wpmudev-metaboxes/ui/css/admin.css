@@ -21,6 +21,14 @@ label.error:before {
 }
 .postbox.wpmudev-postbox .inside {
   padding: 0;
+  /**
+	 * Radio Group
+	 */
+
+  /**
+	 * Repeater Field
+	 */
+
 }
 .postbox.wpmudev-postbox .inside input[type="text"],
 .postbox.wpmudev-postbox .inside input[type="password"],
@@ -32,7 +40,7 @@ label.error:before {
   cursor: default;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field {
-  border-top: 1px solid #f5f5f5;
+  border-top: 1px solid #e1e1e1;
   padding: 12px;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field:first-child {
@@ -45,6 +53,11 @@ label.error:before {
   font-size: 0.85em;
   padding-bottom: 5px;
 }
+.postbox.wpmudev-postbox .inside span.required {
+  color: #f00;
+  display: inline-block;
+  padding-left: 1px;
+}
 .postbox.wpmudev-postbox .inside .wpmudev-radio-group.vertical label:before {
   content: "";
   display: block;
@@ -56,8 +69,121 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-radio-group label {
   margin-right: 30px;
 }
-.postbox.wpmudev-postbox .inside span.required {
-  color: #f00;
+.postbox.wpmudev-postbox .inside .wpmudev-field-repeater {
+  padding-left: 0;
+  padding-right: 0;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-field-repeater .wpmudev-field-label,
+.postbox.wpmudev-postbox .inside .wpmudev-field-repeater .wpmudev-field-desc,
+.postbox.wpmudev-postbox .inside .wpmudev-field-repeater .wpmudev-repeater-field-actions {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfields {
+  position: relative;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid #777;
+  width: 100%;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-wrap {
+  background: #999;
+  -webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+  padding: 10px;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group {
+  position: relative;
+  background: #fff;
+  border-bottom: 1px solid #e1e1e1;
+  border-top: 1px solid #fff;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group td {
+  border-bottom: 1px solid #e1e1e1;
+  border-top: 1px solid #fff;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group:first-child {
+  border-top: 0;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group:first-child td {
+  border-top: 0;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group:nth-child(even),
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group:nth-child(even) td {
+  background: #f9f9f9;
+}
+.postbox.wpmudev-postbox .inside div.wpmudev-subfield-group {
+  display: table;
+  width: 100%;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-index span {
+  color: #ddd;
+  cursor: move;
   display: inline-block;
-  padding-left: 1px;
+  font-size: 18px;
+}
+.postbox.wpmudev-postbox .inside div.wpmudev-subfield-group-index {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  width: 30px;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields {
+  display: table-cell;
+  vertical-align: top;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields .wpmudev-subfield-label {
+  float: left;
+  width: 10%;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields input[type="text"],
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields input[type="password"],
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields select,
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields textarea {
+  float: right;
+  width: 85%;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-delete-group-link-wrap {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  width: 30px;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-delete-group-link-wrap .wpmudev-subfield-delete-group-link {
+  position: static;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-delete-group-link {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: inline-block;
+  font-size: 18px;
+  margin-top: -9px;
+  text-decoration: none;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-delete-group-link:after {
+  color: #ddd;
+  content: "\f158";
+  font-family: dashicons;
+  -webkit-transition: color 250ms;
+  transition: color 250ms;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-delete-group-link:hover:after {
+  color: #999;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-label {
+  font-weight: 700;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-desc {
+  color: #666;
+  display: block;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield {
+  padding: 10px 5px;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield input,
+.postbox.wpmudev-postbox .inside .wpmudev-subfield select,
+.postbox.wpmudev-postbox .inside .wpmudev-subfield textarea {
+  margin: 0;
 }
