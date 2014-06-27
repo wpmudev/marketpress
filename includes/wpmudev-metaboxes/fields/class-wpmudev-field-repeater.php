@@ -38,68 +38,82 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @param bool $echo
 	 */
 	public function display( $post_id, $echo = true ) {
+		$data = $this->get_value($post_id);
+		
+		if ( empty($data) ) {
+			$data[] = array(); // So we always show at least one row
+		}
+		
 		$html = '<div class="wpmudev-subfield-group-wrap">';
 		
 		if ( $this->args['layout'] == 'table' ) {
 			$html .= '<table class="wpmudev-subfields widefat">';
-				$html .= '<thead>';
-					$html .= '<th style="width:15px">&nbsp;</th>';
+			$html .= '<thead>';
+			$html .= '<th style="width:15px">&nbsp;</th>';
 				
-					foreach ( $this->subfields as $index => $subfield ) {
-						$html .= '<th>' . $subfield->args['label']['text'] . '<small class="wpmudev-subfield-desc">' . $subfield->args['desc'] . '</small></th>';
-					}				
+			foreach ( $this->subfields as $index => $subfield ) {
+				$html .= '<th>' . $subfield->args['label']['text'] . '<small class="wpmudev-subfield-desc">' . $subfield->args['desc'] . '</small></th>';
+			}				
 			
-					$html .= '<th style="width:15px">&nbsp;</th>';
-				$html .= '</thead>';
-				$html .= '<tr class="wpmudev-subfield-group">';
-				
+			$html .= '<th style="width:15px">&nbsp;</th>';
+			$html .= '</thead>';
 		} else {
 			$html .= '<div class="wpmudev-subfields">';
-				$html .= '<div class="wpmudev-subfield-group">';
 		}
 		
-		foreach ( $this->subfields as $index => $subfield ) {
-			switch ( $this->args['layout'] ) {
-				case 'rows' :
-					if ( $index == 0 ) {
-						$html .= '<div class="wpmudev-subfield-group-index"><span>' . ($index + 1) . '</span></div>';
+		foreach ( $data as $outer_index => $row ) {
+			foreach ( $this->subfields as $index => $subfield ) {
+				if ( isset($data[$outer_index][$subfield->args['original_name']]) ) {
+					$subfield->set_value($data[$outer_index][$subfield->args['original_name']]);
+				}
+				
+				switch ( $this->args['layout'] ) {
+					case 'rows' :
+						if ( $index == 0 ) {
+							$html .= '<div class="wpmudev-subfield-group">';
+							$html .= '<div class="wpmudev-subfield-group-index"><span>' . ($outer_index + 1) . '</span></div>';
 							$html .= '<div class="wpmudev-subfield-group-fields">';
-					}
-					
-					$html .= '<div class="wpmudev-subfield">';
+						}
+						
+						$html .= '<div class="wpmudev-subfield">';
 						$html .= '<div class="wpmudev-subfield-inner">';
-							$html .= $subfield->display($post_id, false);
-							$html .= '<label for="' . $subfield->get_id() . '" class="wpmudev-subfield-label ' . $subfield->args['label']['class'] . '">' . $subfield->args['label']['text'] . '</label>';
+						$html .= $subfield->display($post_id, false);
+						$html .= '<label for="' . $subfield->get_id() . '" class="wpmudev-subfield-label ' . $subfield->args['label']['class'] . '">' . $subfield->args['label']['text'] . '</label>';
 						$html .= '</div>';
-					$html .= '</div>';
-					
-					if ( $index == (count($this->subfields) - 1) ) {
+						$html .= '</div>';
+						
+						if ( $index == (count($this->subfields) - 1) ) {
 							$html .= '</div>';
 							$html .= '<div class="wpmudev-subfield-delete-group-link-wrap"><a class="wpmudev-subfield-delete-group-link" href="javascript:;"></a></div>';
-					}
-				break;
-			
-				default :
-					$html .= ( $index == 0 ) ? '<td class="wpmudev-subfield-group-index"><span>' . ($index + 1) . '</span></td>' : '';
-					$html .= '<td class="wpmudev-subfield">';
+						}
+					break;
+				
+					default :
+						$html .= ( $index == 0 ) ? '<tr class="wpmudev-subfield-group"><td class="wpmudev-subfield-group-index"><span>' . ($outer_index + 1) . '</span></td>' : '';
+						$html .= '<td class="wpmudev-subfield">';
 						$html .= '<div class="wpmudev-subfield-inner">';
-							$html .= $subfield->display($post_id, false);
+						$html .= $subfield->display($post_id, false);
 						$html .= '</div>';
-					$html .= '</td>';
-					$html .= ( $index == (count($this->subfields) - 1) ) ? '<td class="wpmudev-subfield-delete-group"><a class="wpmudev-subfield-delete-group-link" href="javascript:;"></a></td>' : '';
-				break;				
+						$html .= '</td>';
+						$html .= ( $index == (count($this->subfields) - 1) ) ? '<td class="wpmudev-subfield-delete-group"><a class="wpmudev-subfield-delete-group-link" href="javascript:;"></a></td>' : '';
+					break;				
+				}
+			}
+		
+			if ( $this->args['layout'] == 'table' ) {
+				$html .= '</tr>';
+			} else {
+				$html .= '</div>';
 			}
 		}
-		
+
 		if ( $this->args['layout'] == 'table' ) {
-				$html .= '</tr>';
 			$html .= '</table>';
 		} else {
-				$html .= '</div>';
 			$html .= '</div>';
 		}
 		
-			$html .= '</div>';
+		$html .= '</div>';
 		$html .= '<div class="wpmudev-repeater-field-actions clearfix"><input class="button wpmudev-repeater-field-add alignright" type="button" value="' . $this->args['add_row_label'] . '" /></div>';
 
 		/**
@@ -220,6 +234,7 @@ jQuery(document).ready(function($){
 		}
 		
 		$args['echo'] = false;
+		$args['original_name'] = $args['name'];
 		$args['name'] = '[' . $this->args['name'] . '][' . $args['name'] . '][]'; //repeater fields should be an array
 		$this->subfields[] = new $class($args);
 	}

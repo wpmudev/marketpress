@@ -37,12 +37,6 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	public function display( $post_id, $echo = true ) {
 		$value = $this->get_value($post_id, false);
 		
-		if ( $value === false ) {
-			$checked = checked($this->args['value'], $this->args['default_value'], false);
-		} else {
-			$checked = checked($this->args['value'], $value, false);
-		}
-		
 		$html  = '<label class="' . $this->args['label']['class'] . '" for="' . $this->get_id() . '">';
 		$html .= '<input type="radio" ' . $this->parse_atts() . ' ' . $checked . ' /> <span>' . $this->args['label']['text'] . '</span></label>';
 		

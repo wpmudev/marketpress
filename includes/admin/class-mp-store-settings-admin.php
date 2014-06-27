@@ -54,7 +54,8 @@ class MP_Store_Settings_Admin {
 	 */
 	public function get_message_by_key( $key ) {
 		$messages = array(
-			'mp_product_attribute_added' => __('Product attribute added successfully', 'mp'),
+			'mp_product_attribute_added' => __('Product attribute added successfully.', 'mp'),
+			'mp_product_attribute_updated' => __('Product attribute updated successfully.', 'mp'),
 		);
 		
 		return ( isset($messages[$key]) ) ? $messages[$key] : sprintf(__('An appropriate message for key "%s" could not be found.', 'mp'), $key);
@@ -150,8 +151,15 @@ class MP_Store_Settings_Admin {
 				$value = $attribute->$key;
 			break;
 			
-			case '[product_attribute_terms][name][]' :
-			case '[product_attribute_terms][slug][]' :
+			case 'product_attribute_terms' :
+				$table_name = $wpdb->prefix . 'mp_product_attributes';
+				$attribute_slug = $wpdb->get_var($wpdb->prepare("SELECT attribute_slug FROM $table_name WHERE attribute_id = %d", mp_get_get_value('attribute_id')), 0);
+				$terms = get_terms($attribute_slug, array('hide_empty' => false));
+				$value = array();
+				
+				foreach ( $terms as $term ) {
+					$value[] = array('name' => $term->name, 'slug' => $term->slug);
+				}
 			break;
 		}
 		
@@ -173,29 +181,50 @@ class MP_Store_Settings_Admin {
 			return $value;
 		}
 		
-		$table_name = $wpdb->prefix . 'mp_product_attributes';
+		$table_name = MP_Product_Attributes::get_instance()->get_table_name();
 		$attribute_slug = substr(sanitize_key($_POST['attribute_name']), 0, 32);
-		$attribute_id = $wpdb->insert($table_name, array(
-			'attribute_name' => $_POST['attribute_name'],
-			'attribute_slug' => $attribute_slug,
-			'attribute_terms_sort_by' => $_POST['sort_by'],
-			'attribute_terms_sort_order' => $_POST['sort_order'],
-		));
 		
-		//temporarily register the taxonomy - otherwise we won't be able to insert terms below
-		register_taxonomy($attribute_slug, 'product', array(
-			'show_ui' => false,
-			'show_in_nav_menus' => false,
-			'hierarchical' => true,
-		));
+		if ( mp_get_get_value('action') == 'mp_add_product_attribute' ) {
+			$attribute_id = $wpdb->insert($table_name, array(
+				'attribute_name' => $_POST['attribute_name'],
+				'attribute_slug' => $attribute_slug,
+				'attribute_terms_sort_by' => $_POST['sort_by'],
+				'attribute_terms_sort_order' => $_POST['sort_order'],
+			));
 		
-		//insert terms
-		foreach ( $_POST['attribute_term_name'] as $key => $term_name ) {
-			wp_insert_term($term_name, $attribute_slug);
+			//temporarily register the taxonomy - otherwise we won't be able to insert terms below
+			register_taxonomy($attribute_slug, 'product', array(
+				'show_ui' => false,
+				'show_in_nav_menus' => false,
+				'hierarchical' => true,
+			));
+		
+			//insert terms
+			foreach ( $_POST['attribute_term_name'] as $key => $term_name ) {
+				wp_insert_term($term_name, $attribute_slug);
+			}
+			
+			//redirect
+			wp_redirect(add_query_arg(array('attribute_id' => $attribute_id, 'action' => 'mp_edit_product_attribute', 'mp_message' => 'mp_product_attribute_added')));			
+		} else {
+			$attribute_id = mp_get_get_value('attribute_id');
+			$wpdb->update($table_name, array(
+				'attribute_name' => $_POST['attribute_name'],
+				'attribute_slug' => $attribute_slug,
+				'attribute_terms_sort_by' => $_POST['sort_by'],
+				'attribute_terms_sort_order' => $_POST['sort_order'],
+			), array('attribute_id' => $attribute_id));
+			
+			//update terms
+			//TODO: figure out how to update existing terms
+			/*foreach ( $_POST['attribute_term_name'] as $key => $term_name ) {
+				wp_update_term($term_name, $attribute_slug);
+			}*/
+			
+			//redirect
+			wp_redirect(add_query_arg(array('attribute_id' => $attribute_id, 'action' => 'mp_edit_product_attribute', 'mp_message' => 'mp_product_attribute_updated')));			
 		}
 		
-		//redirect
-		wp_redirect(add_query_arg(array('attribute_id' => $attribute_id, 'action' => 'mp_edit_product_attribute', 'mp_message' => 'mp_product_attribute_added')));
 		exit;
 	}
 		

@@ -10,7 +10,7 @@ class WPMUDEV_Field_Text extends WPMUDEV_Field {
 	 * @param bool $echo
 	 */
 	public function display( $post_id, $echo = true ) {
-		$html = '<input type="text" ' . $this->parse_atts() . ' value="' . $this->get_value($post_id) . '" />';
+		$html = '<input type="text" ' . $this->parse_atts() . ' value="' . $this->get_value($post_id, false) . '" />';
 		
 		if ( $echo ) {
 			echo $html;

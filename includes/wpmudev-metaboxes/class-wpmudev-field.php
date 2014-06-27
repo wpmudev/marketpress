@@ -2,6 +2,15 @@
 
 class WPMUDEV_Field {
 	/**
+	 * Refers to the field's value
+	 *
+	 * @since 1.0
+	 * @access private
+	 * @var mixed
+	 */
+	private $_value = null;
+	
+	/**
 	 * Refers to the field arguments.
 	 *
 	 * @since 1.0
@@ -146,7 +155,7 @@ class WPMUDEV_Field {
 		 * @param object $this Refers to the current field object
 		 */
 		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
-		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $value, $post_id, $this);
 		
 		if ( is_null($value) ) {
 			return;
@@ -157,21 +166,39 @@ class WPMUDEV_Field {
 	}
 	
 	/**
+	 * Sets the value essentially overriding the internal get_value() function
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param mixed $value
+	 */
+	public function set_value( $value ) {
+		$this->_value = $value;
+	}
+	
+	/**
 	 * Gets the field value from the database.
 	 *
 	 * @since 1.0
 	 * @access public
 	 * @param mixed $post_id
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
+	 * @return mixed
 	 */
 	public function get_value( $post_id, $raw = false ) {
-		$value = get_post_meta($post_id, $this->args['name'], true);
-		
-		if ( $value === '' ) {
-			return false;
+		if ( ! is_null($this->_value) ) {
+			return $this->_value;
 		}
 		
-		$value = ( $raw ) ? $value : $this->format_value($value, $args);
+		if ( ! empty($post_id) ) {
+			$value = get_post_meta($post_id, $this->args['name'], true);
+			
+			if ( $value === '' ) {
+				return false;
+			}
+			
+			$value = ( $raw ) ? $value : $this->format_value($value, $args);
+		}
 		
 		/**
 		 * Modify the returned value.
@@ -180,10 +207,17 @@ class WPMUDEV_Field {
 		 * @param mixed $value The return value
 		 * @param mixed $post_id The current post id or option name
 		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
-		 * @param object $this Refers to the current field object
+		 * @param object $this Refers to the current field object		 
 		 */
 		$value = apply_filters('wpmudev_field_get_value', $value, $post_id, $raw, $this);
 		$value = apply_filters('wpmudev_field_get_value_' . $this->args['name'], $value, $post_id, $raw, $this);
+		
+		if ( is_null($value) ) {
+			$value = $this->args['default_value'];
+		}
+		
+		// Set the field's value for future
+		$this->_value = $value;
 		
 		return $value;
 	}

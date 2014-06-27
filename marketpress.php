@@ -340,6 +340,9 @@ class Marketpress {
 			'post_type'	 	=> 'mp_order',
 			'public'			=> false
 		) );
+		
+		// register product attributes
+		MP_Product_Attributes::get_instance()->register();
 	}
 	
 	/**
@@ -352,7 +355,7 @@ class Marketpress {
 		$this->_init_vars();
 		
 		//setup custom types
-		add_action('init', array(&$this, 'register_custom_types'), 0);		
+		add_action('init', array(&$this, 'register_custom_types'), 0);
 	}
 	
 	/**
@@ -378,6 +381,8 @@ $mp = Marketpress::get_instance();
 require_once $mp->plugin_dir('includes/common/helpers.php');
 // include installer class
 require_once $mp->plugin_dir('includes/common/class-mp-installer.php');
+// include product attributes class
+require_once $mp->plugin_dir('includes/common/class-mp-product-attributes.php');
 
 if ( is_admin() ) {
 	require_once $mp->plugin_dir('includes/admin/class-mp-admin.php');
