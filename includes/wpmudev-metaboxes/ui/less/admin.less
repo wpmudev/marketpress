@@ -21,6 +21,19 @@ label.error {
 	}
 }
 
+.clearfix {
+	&:after {
+		clear: both;
+		content: "";
+		display: block;
+		font-size: 0;
+		height: 0;
+		line-height: 0;
+		visibility: hidden;
+		width: 100%;
+	}
+}
+
 .postbox.wpmudev-postbox .inside {
 	padding: 0;
 	
@@ -28,6 +41,7 @@ label.error {
 	input[type="password"],
 	input[type="hidden"],
 	textarea {
+		line-height: 1.1;
 		width: 100%;
 	}
 	

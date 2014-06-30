@@ -29,13 +29,52 @@ class MP_Product_Attributes {
 	 *
 	 * @since 3.0
 	 * @uses $wpdb
-	 * @param string $where The where clause for the SQL statement
+	 * @param string $where The where clause for the SQL statement. IMPORTANT: You must make sure your SQL is escaped/safe!
 	 * @return array
 	 */
 	public function get( $where = '' ) {
 		global $wpdb;
-		$table = $this->get_table_name();
-		return $wpdb->get_results("SELECT * FROM $table $where");
+		
+		if ( ! empty($where) ) {
+			$where = " WHERE $where";
+		}
+		
+		return $wpdb->get_results('SELECT * FROM ' . $this->get_table_name() . $where);
+	}
+	
+	/**
+	 * Generates a product attribute's slug from it's ID.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $id The attribute's ID.
+	 * @return string
+	 */
+	public function generate_slug( $id ) {
+		return 'product_attr_' . $id;
+	}
+	
+	/**
+	 * Deletes a product attribute(s)
+	 *
+	 * @since 3.0
+	 * @uses $wpdb
+	 * @access public
+	 * @param array/int $id The ID of the attribute to delete.
+	 */
+	public function delete( $id = false ) {
+		global $wpdb;
+		
+		if ( empty($id) ) {
+			// Require at least one ID to prevent accidental deleting of all attributes 
+			return false;
+		}
+		
+		if ( is_array($id) ) {
+			$wpdb->query('DELETE FROM . ' . $this->get_table_name() . ' WHERE attribute_id IN (' . implode(',', $id) . ')');
+		} else {
+			$wpdb->delete($this->get_table_name(), array('attribute_id' => $ids));
+		}
 	}
 	
 	/**
@@ -59,8 +98,10 @@ class MP_Product_Attributes {
 	 */
 	public function register() {
 		$atts = $this->get();
+		$product_atts = MP_Product_Attributes::get_instance();
+		
 		foreach ( $atts as $att ) {
-			register_taxonomy($att->attribute_slug, 'product', array(
+			register_taxonomy($product_atts->generate_slug($att->attribute_id), 'product', array(
 				'show_ui' => false,
 				'show_in_nav_menus' => false,
 				'hierarchical' => true,

@@ -11,6 +11,24 @@ class WPMUDEV_Field {
 	private $_value = null;
 	
 	/**
+	 * Refers to the field's subfield id (for use in repeater field)
+	 *
+	 * @since 1.0
+	 * @access private
+	 * @var int
+	 */
+	private $_subfield_id = null;
+	
+	/**
+	 * Refers to the field's parent metabox
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var object
+	 */
+	 var $metabox = null;
+	
+	/**
 	 * Refers to the field arguments.
 	 *
 	 * @since 1.0
@@ -37,6 +55,7 @@ class WPMUDEV_Field {
 	 *		An array of arguments. Optional.
 	 *
 	 *		@type string $name The field's name attribute.
+	 *		@type string $original_name The field's original name (subfield name attributes get changed)
 	 *		@type string $id The field's id attribute.
 	 *		@type string $class The field's class attribute.
 	 *		@type string $style The field's style attribute.
@@ -86,15 +105,19 @@ class WPMUDEV_Field {
 			'desc' => '',
 			'custom' => array(),
 			'default_value' => '',
+			'original_name' => '',
 			'value_only' => false,
 			'custom_validation_message' => '',
-			'custom_save_handler' => null,			
 			'validation' => array(),	
 			'conditional' => array(),
 		));
 		
 		if ( $this->args['value_only'] ) {
 			return false;
+		}
+		
+		if ( empty($this->args['original_name']) ) {
+			$this->args['original_name'] = $this->args['name'];
 		}
 		
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
@@ -177,6 +200,17 @@ class WPMUDEV_Field {
 	}
 	
 	/**
+	 * Sets the subfield's id (for repeater fields)
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param mixed $id
+	 */
+	public function set_subfield_id( $id ) {
+		$this->_subfield_id = $id;
+	}
+	
+	/**
 	 * Gets the field value from the database.
 	 *
 	 * @since 1.0
@@ -212,7 +246,7 @@ class WPMUDEV_Field {
 		$value = apply_filters('wpmudev_field_get_value', $value, $post_id, $raw, $this);
 		$value = apply_filters('wpmudev_field_get_value_' . $this->args['name'], $value, $post_id, $raw, $this);
 		
-		if ( is_null($value) ) {
+		if ( is_null($value) || $value === false ) {
 			$value = $this->args['default_value'];
 		}
 		
@@ -343,16 +377,25 @@ class WPMUDEV_Field {
 	 */
 	public function parse_atts() {
 		$atts = '';
+		$args = $this->args; //make a copy of field args so as to not overwrite
+		
+		if ( ! is_null($this->_subfield_id) && ! empty($args['name']) ) {
+			// repeater field - add the subfield id
+			$args['name'] = str_replace('[new][]', '[existing][' . $this->_subfield_id . ']', $args['name']);
+		}
 		
 		foreach ( $this->default_atts as $key ) {
-			if ( empty($this->args[$key]) ) { continue; }
-			$atts .= $key . '="' . esc_attr($this->args[$key]) . '" ';
+			if ( empty($args[$key]) ) {
+				continue;
+			}
+			
+			$atts .= $key . '="' . esc_attr($args[$key]) . '" ';
 		}
 		
-		foreach ( $this->args['custom'] as $key => $val ) {
+		foreach ( $args['custom'] as $key => $val ) {
 			$atts .= $key . '="' . esc_attr($val) . '" ';
 		}
-		
+				
 		$atts = trim($atts);
 		
 		/**
@@ -366,10 +409,11 @@ class WPMUDEV_Field {
 	}
 	
 	/**
-	 * Gets the field's ID - if not yet an ID will be generated
+	 * Gets the field's ID - if not set an ID will be generated
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @return string
 	 */
 	public function get_id() {
 		if ( empty($this->args['id']) ) {

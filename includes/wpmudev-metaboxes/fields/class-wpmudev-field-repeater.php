@@ -19,7 +19,8 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @param array $args {
 	 *		An array of arguments. Optional.
 	 *
-	 *		@type string $layout (table/rows)
+	 *		@type string $layout How to display the repeater subfields - either "table" or "rows".
+	 *		@type string $add_row_label The label for the add row button.
 	 * }
 	 */
 	public function on_creation( $args ) {
@@ -65,6 +66,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 			foreach ( $this->subfields as $index => $subfield ) {
 				if ( isset($data[$outer_index][$subfield->args['original_name']]) ) {
 					$subfield->set_value($data[$outer_index][$subfield->args['original_name']]);
+					$subfield->set_subfield_id($data[$outer_index]['ID']);
 				}
 				
 				switch ( $this->args['layout'] ) {
@@ -149,6 +151,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function print_scripts() {
+		parent::print_scripts();
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
@@ -210,6 +213,19 @@ jQuery(document).ready(function($){
 		$clonedRow.find('.wpmudev-subfield-inner').css('display', 'none');
 		$clonedRow.appendTo($subfields);
 		$clonedRow.find('.wpmudev-subfield-group-index').find('span').html($clonedRow.index() + 1);
+		$clonedRow.find('[name]').each(function(){
+			var $this = $(this),
+					name = $this.attr('name').replace('existing', 'new'),
+					nameParts = name.split('['),
+					newName = nameParts[0];
+			
+			for ( i = 1; i < (nameParts.length - 1); i++ ) {
+				var namePart = nameParts[i].replace(']', '');
+				newName += '[' + namePart + ']';
+			}
+			
+			$this.attr('name', newName + '[]');
+		});
 		$clonedRow.find('.wpmudev-subfield-inner').css('display', 'none').fadeIn(250, function(){
 			$('.wpmudev-subfield-delete-group-link').show();
 			$('.wpmudev-subfields').sortable('refresh'); //so the new row is recognized by the sortable plugin
@@ -233,9 +249,13 @@ jQuery(document).ready(function($){
 			return false;	
 		}
 		
+		//subfields don't support validation or conditional logic (yet) so make sure these arguments are set accordingly
+		$args['validation'] = $args['conditional'] = array();
+		$args['custom_validation_message'] = '';
+		
 		$args['echo'] = false;
 		$args['original_name'] = $args['name'];
-		$args['name'] = '[' . $this->args['name'] . '][' . $args['name'] . '][]'; //repeater fields should be an array
+		$args['name'] = $this->args['name'] . '[' . $args['name'] . '][new][]'; //repeater fields should be an array
 		$this->subfields[] = new $class($args);
 	}
 }

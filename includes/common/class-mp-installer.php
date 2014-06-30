@@ -109,7 +109,6 @@ class MP_Installer {
 		dbDelta("CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
-			attribute_slug varchar(32) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
 			attribute_terms_sort_order enum('ASC','DESC') DEFAULT NULL,
 			PRIMARY KEY  (attribute_id)

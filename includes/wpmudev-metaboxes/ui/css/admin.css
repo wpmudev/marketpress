@@ -19,6 +19,16 @@ label.error:before {
   font-size: 20px;
   margin: -9px 0 0;
 }
+.clearfix:after {
+  clear: both;
+  content: "";
+  display: block;
+  font-size: 0;
+  height: 0;
+  line-height: 0;
+  visibility: hidden;
+  width: 100%;
+}
 .postbox.wpmudev-postbox .inside {
   padding: 0;
   /**
@@ -34,6 +44,7 @@ label.error:before {
 .postbox.wpmudev-postbox .inside input[type="password"],
 .postbox.wpmudev-postbox .inside input[type="hidden"],
 .postbox.wpmudev-postbox .inside textarea {
+  line-height: 1.1;
   width: 100%;
 }
 .postbox.wpmudev-postbox .inside .hndle {

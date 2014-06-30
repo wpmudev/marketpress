@@ -494,6 +494,7 @@ class WPMUDEV_Metabox {
 		
 		$args['echo'] = false;
 		$field = new $class($args);
+		$field->metabox = $this;
 		$this->fields[] = $field;
 		
 		return $field;

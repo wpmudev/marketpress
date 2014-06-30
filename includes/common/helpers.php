@@ -265,7 +265,7 @@ if ( ! function_exists('mp_arr_get_value') ) :
 	
 	function mp_arr_get_value( $key, $array, $default = false ) {
 		$keys = explode('->', $key);
-		array_map('trim', $keys);
+		$keys = array_map('trim', $keys);
 		
 		if ( count($keys) > 0 ) {
 			$value = mp_arr_search($array, $key);
@@ -329,7 +329,7 @@ if ( ! function_exists('mp_get_setting') ) :
 		$settings = get_option('mp_settings');
 		
 		$keys = explode('->', $key);
-		array_map('trim', $keys);
+		$keys = array_map('trim', $keys);
 		
 		if ( count($keys) > 0 ) {
 			$setting = mp_arr_search($settings, $key);
@@ -355,17 +355,18 @@ if ( ! function_exists('mp_arr_search') ) :
 	 * @return mixed
 	 */
 	 
-	function mp_arr_search( $array, $path ) {
-		$keys = explode('->', $path);
-		array_map('trim', $keys);
+function mp_arr_search( $array, $path ) {
+	$keys = explode('->', $path);
+	$keys = array_map('trim', $keys);
 	
-		for ( $i = $array; $key = array_shift($keys); $i = $i[$key] ) {
-	    if ( ! isset($i[$key]) )
-	    	return null;
-	  }
-	  
-	  return $i;
-	}
+	for ( $i = $array; ($key = array_shift($keys)) !== null; $i = $i[$key] ) {
+    if ( ! isset($i[$key]) ) {
+    	return null;
+    }
+  }
+  
+  return $i;
+}
 endif;
 
 if ( ! function_exists('mp_toggle_plugin') ) :

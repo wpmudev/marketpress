@@ -76,7 +76,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	};
 	
 	var initValidation = function(){
-		var $form = $("form#post");
+		var $form = $("form#post, form#mp-main-form");
 
 		//initialize the form validation		
 		$form.validate();
@@ -88,12 +88,13 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 				$form.submit();
 			}
 		});
-	
+		
 		$('[data-custom-validation]').each(function(){
 			var $this = $(this),
-					ruleName = $this.attr('name'),
+					nameParts = $this.attr('name').split('['), //take into account array fields
+					ruleName = nameParts[0],
 					rules = {};
-										
+			
 			rules[ruleName] = $this.attr('data-custom-validation');
 			
 			$.validator.addMethod(ruleName, function(value, element, params){
