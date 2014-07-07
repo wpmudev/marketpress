@@ -1,5 +1,13 @@
 <?php
 
+if ( ! defined('WPMUDEV_METABOX_DIR') ) {
+	define('WPMUDEV_METABOX_DIR', plugin_dir_path(__FILE__));
+}
+
+if ( ! defined('WPMUDEV_METABOX_URL') ) {
+	define('WPMUDEV_METABOX_URL', plugin_dir_url(__FILE__));
+}
+
 require_once WPMUDEV_Metabox::class_dir('api.php');
 
 /**
@@ -82,6 +90,9 @@ class WPMUDEV_Metabox {
 	 * @var array
 	 */
 	var $validation_messages = array();
+	
+	static $dir = '';
+	static $url = '';
 	
 	/**
 	 * Constructor function
@@ -210,7 +221,7 @@ class WPMUDEV_Metabox {
 	 * @return string
 	 */
 	public static function class_dir( $path = '' ) {
-		return plugin_dir_path(__FILE__) . ltrim($path, '/');
+		return WPMUDEV_METABOX_DIR . ltrim($path, '/');
 	}
 
 	/**
@@ -222,7 +233,7 @@ class WPMUDEV_Metabox {
 	 * @return string
 	 */
 	public static function class_url( $path = '' ) {
-		return plugin_dir_url(__FILE__) . ltrim($path, '/');
+		return WPMUDEV_METABOX_URL . ltrim($path, '/');
 	}
 
 	/**
@@ -377,15 +388,13 @@ class WPMUDEV_Metabox {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @uses $current_screen
-	 * @uses $pagenow
-	 * @uses $hook_suffix
+	 * @uses $current_screen, $hook_suffix, $pagenow, $taxnow, $typenow
 	 * @return object
 	 */
 	public function get_current_screen() {
-		global $current_screen, $hook_suffix, $pagenow;
+		global $current_screen, $hook_suffix, $pagenow, $taxnow, $typenow;
 		
-		if ( is_null($current_screen) ) {
+		if ( empty($current_screen) ) {
 			//set current screen (not normally available here) - this code is derived from wp-admin/admin.php
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -394,7 +403,7 @@ class WPMUDEV_Metabox {
 				$plugin_page = wp_unslash($_GET['page']);
 				$plugin_page = plugin_basename($plugin_page);
 			}
-
+			
 			if ( isset($_REQUEST['post_type']) && post_type_exists($_REQUEST['post_type']) ) {
 				$typenow = $_REQUEST['post_type'];
 			} else {
@@ -441,7 +450,7 @@ class WPMUDEV_Metabox {
 			} else if ( isset($pagenow) ) {
 				$hook_suffix = $pagenow;
 			}
-
+			
 			set_current_screen();
 		}
 		
@@ -462,7 +471,7 @@ class WPMUDEV_Metabox {
 		
 		//only load metaboxes on appropriate post page and for assigned post type or screen_id
 		$this->is_active = true;
-		if ( $this->args['post_type'] != $this->get_current_screen()->post_type && ! in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
+		if ( $this->args['post_type'] != $this->get_current_screen()->id && ! in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
 			$this->is_active = false;
 		}
 		
@@ -479,7 +488,8 @@ class WPMUDEV_Metabox {
 	 * @since 1.0
 	 * @access public
 	 * @param string $type
-	 * @param array $args==
+	 * @param array $args
+	 * @return WPMUDEV_Field
 	 */
 	public function add_field( $type, $args = array() ) {		
 		$class = apply_filters('wpmudev_metabox_add_field', 'WPMUDEV_Field_' . ucfirst($type), $type, $args);

@@ -43,11 +43,11 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	public function display( $post_id, $echo = true ) {
 		$value = $this->get_value($post_id);
 
-		if ( $value === false ) {
+		/*if ( $value === false ) {
 			$checked = checked($this->args['value'], $this->args['default_value'], false);
 		} else {
 			$checked = checked($this->args['value'], $value, false);
-		}
+		}*/
 
 		$html  = '<label class="' . $this->args['label']['class'] . '" for="' . $this->get_id(). '">';
 		$html .= '<input type="checkbox" ' . $this->parse_atts() . ' ' . $checked . ' /> <span>' . $this->args['message'] . '</span></label>';

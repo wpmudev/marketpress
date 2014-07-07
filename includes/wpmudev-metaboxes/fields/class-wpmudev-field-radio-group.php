@@ -10,11 +10,13 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 *		An array of arguments
 	 *
 	 *		@type string $orientation The orientation of each radio field (horizontal or vertical). Defaults to horizontal.
+	 *		@type array $options The radio group options in $value => $label format.
 	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = wp_parse_args($this->args, array(
 			'orientation' => 'horizontal',
+			'options' => array(),
 		));
 	}
 	
@@ -27,14 +29,9 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 * @param bool $echo
 	 */
 	public function display( $post_id = null, $echo = true ) {
-		if ( is_null($post_id) ) {
-			//if post_id is not set get the global post ID
-			$post_id = get_the_ID();
-		}
-		
 		$html = '<div class="wpmudev-radio-group ' . $this->args['orientation'] . '">';
 		
-		foreach ( $this->args['fields'] as $value => $label ) {
+		foreach ( $this->args['options'] as $value => $label ) {
 			$field = new WPMUDEV_Field_Radio(array_merge($this->args, array(
 				'name' => $this->args['name'],
 				'value' => $value,

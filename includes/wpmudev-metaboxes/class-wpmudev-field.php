@@ -11,13 +11,22 @@ class WPMUDEV_Field {
 	private $_value = null;
 	
 	/**
-	 * Refers to the field's subfield id (for use in repeater field)
+	 * Refers to the field's subfield id (repeater field will set this)
 	 *
 	 * @since 1.0
 	 * @access private
 	 * @var int
 	 */
 	private $_subfield_id = null;
+	
+	/**
+	 * If the field is a subfield (repeater field will set this)
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var bool
+	 */
+	var $is_subfield = false;
 	
 	/**
 	 * Refers to the field's parent metabox
@@ -122,12 +131,7 @@ class WPMUDEV_Field {
 		
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_scripts'));
-		
-		if ( is_null($this->args['custom_save_handler']) ) {
-			add_action('wpmudev_metaboxes_save_fields', array(&$this, 'save_value'));
-		} else {
-			add_action('wpmudev_metaboxes_save_fields', $this->args['custom_save_handler']);
-		}
+		add_action('wpmudev_metaboxes_save_fields', array(&$this, 'save_value'));
 		
 		if ( ! $this->scripts_printed() ) {
 			add_action('in_admin_footer', array(&$this, 'print_scripts'));
@@ -220,18 +224,20 @@ class WPMUDEV_Field {
 	 * @return mixed
 	 */
 	public function get_value( $post_id, $raw = false ) {
+		$value = null;
+		
 		if ( ! is_null($this->_value) ) {
 			return $this->_value;
 		}
 		
 		if ( ! empty($post_id) ) {
-			$value = get_post_meta($post_id, $this->args['name'], true);
-			
-			if ( $value === '' ) {
-				return false;
+			if ( metadata_exists(get_post_type($post_id), $post_id, $this->args['name']) ) {
+				$value = get_post_meta($post_id, $this->args['name'], true);
+				
+				if ( $value === '' ) {
+					$value = $this->args['default_value'];
+				}
 			}
-			
-			$value = ( $raw ) ? $value : $this->format_value($value, $args);
 		}
 		
 		/**
@@ -249,6 +255,8 @@ class WPMUDEV_Field {
 		if ( is_null($value) || $value === false ) {
 			$value = $this->args['default_value'];
 		}
+		
+		$value = ( $raw ) ? $value : $this->format_value($value);
 		
 		// Set the field's value for future
 		$this->_value = $value;
@@ -269,10 +277,9 @@ class WPMUDEV_Field {
 		 *
 		 * @since 1.0
 		 * @param mixed $value The return value
-		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */	
-		return apply_filters('wpmudev_field_format_value', $value, $post_id, $this);
+		return apply_filters('wpmudev_field_format_value', $value, $this);
 	}
 	
 	/**

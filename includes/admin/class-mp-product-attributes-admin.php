@@ -66,7 +66,7 @@ th.column-ID {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-store-settings-product-attributes-add',
 			'title' => __('Add Product Attribute', 'mp'),
-			'screen_ids' => array('store-settings_page_store-settings-productattributes'),
+			'screen_ids' => array('store-settings-productattributes'),
 		));
 		$metabox->add_field('text', array(
 			'name' => 'product_attribute_name',
@@ -100,25 +100,28 @@ th.column-ID {
 			'label' => array('text' => __('Attribute Options', 'mp')),
 			'desc' => __('Use the numbers on the left to sort. To delete - click the "X" to the right of each row.', 'mp'),
 		));
-		$repeater->add_sub_field('text', array(
-			'name' => 'name',
-			'label' => array('text' => __('Name', 'mp')),
-			'desc' => __('Max 45 characters.', 'mp'),
-			'custom' => array('maxlength' => 45),
-			'validation' => array(
-				'required' => true,
-			),
-		));		
-		$repeater->add_sub_field('text', array(
-			'name' => 'slug',
-			'label' => array('text' => __('Slug', 'mp')),
-			'desc' => __('If a slug is not entered, it will be generated automatically. Max 32 characters.', 'mp'),
-			'custom' => array('maxlength' => 32),
-			'validation' => array(
-				'custom' => '[a-z\-]',
-			),
-			'custom_validation_message' => __('Only lowercase letters and dashes (-) are allowed.', 'mp'),
-		));
+		
+		if ( $repeater instanceof WPMUDEV_Field ) {
+			$repeater->add_sub_field('text', array(
+				'name' => 'name',
+				'label' => array('text' => __('Name', 'mp')),
+				'desc' => __('Max 45 characters.', 'mp'),
+				'custom' => array('maxlength' => 45),
+				'validation' => array(
+					'required' => true,
+				),
+			));		
+			$repeater->add_sub_field('text', array(
+				'name' => 'slug',
+				'label' => array('text' => __('Slug', 'mp')),
+				'desc' => __('If a slug is not entered, it will be generated automatically. Max 32 characters.', 'mp'),
+				'custom' => array('maxlength' => 32),
+				'validation' => array(
+					'custom' => '[a-z\-]',
+				),
+				'custom_validation_message' => __('Only lowercase letters and dashes (-) are allowed.', 'mp'),
+			));
+		}
 	}
 	
 	/**
@@ -250,6 +253,13 @@ th.column-ID {
 		exit;
 	}
 	
+	/**
+	 * Print custom scripts for the product attribute repeater field
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param WPMUDEV_Field $field
+	 */
 	function product_attribute_scripts( $field ) {
 		if ( $field->args['name'] != 'product_attribute_terms' ) {
 			return;

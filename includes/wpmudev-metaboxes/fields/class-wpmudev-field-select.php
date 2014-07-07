@@ -32,12 +32,7 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 		$html = '<select ' . $this->parse_atts() . '>';
 		
 		foreach ( $this->args['options'] as $val => $label ) {
-			if ( $value === false ) {
-				$selected = selected($val, $this->args['default_value'], false);
-			} else {
-				$selected = checked($val, $value, false);
-			}
-
+			$selected = selected($val, $value, false);
 			$html .= '<option value="' . esc_attr($val) . '" ' . $selected . '>' . esc_attr($label) . '</option>';	
 		}
 		

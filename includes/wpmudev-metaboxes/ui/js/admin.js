@@ -7,16 +7,20 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	jQuery(document).ready(function($){
 		initConditionals();
 		initValidation();
+		
+		$(document).on('wpmudev_repeater_field_after_add_field_group', function(e){
+			initConditionals();
+		});
 	});
 	
 	var initConditionals = function(){
-		$('input[data-conditional-name][data-conditional-value][data-conditional-action]').each(function(){
+		$('[data-conditional-name][data-conditional-value][data-conditional-action]').each(function(){
 			var $this = $(this),
 					conditionalAction = $this.attr('data-conditional-action'),
 					conditionalValue = $this.attr('data-conditional-value'),
 					conditionalName = $this.attr('data-conditional-name'),
-					$container = $this.closest('.wpmudev-field'),
-					$conditionalInput = $('input[name="' + conditionalName + '"]');
+					$container = ( $this.closest('.wpmudev-subfield').length ) ? $this.closest('.wpmudev-subfield') : $this.closest('.wpmudev-field'),
+					$conditionalInput = $('[name="' + conditionalName + '"]');
 					
 			if ( ! $conditionalInput.is(':radio') && ! $conditionalInput.is(':checkbox') && ! $conditionalInput.is('select') ) {
 				//conditional logic only works for radios, checkboxes and select dropdowns

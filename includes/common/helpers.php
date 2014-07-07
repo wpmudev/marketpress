@@ -63,15 +63,13 @@ if ( ! function_exists('mp_get_current_screen') ) :
 	 * Safely gets the $current_screen object even before the current_screen hook is fired
 	 *
 	 * @since 3.0
-	 * @uses $current_screen
-	 * @uses $pagenow
-	 * @uses $hook_suffix
+	 * @uses $current_screen, $hook_suffix, $pagenow, $taxnow, $typenow
 	 * @return object
 	 */
 	function mp_get_current_screen() {
-		global $current_screen, $hook_suffix, $pagenow;
+		global $current_screen, $hook_suffix, $pagenow, $taxnow, $typenow;
 		
-		if ( is_null($current_screen) ) {
+		if ( empty($current_screen) ) {
 			//set current screen (not normally available here) - this code is derived from wp-admin/admin.php
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';

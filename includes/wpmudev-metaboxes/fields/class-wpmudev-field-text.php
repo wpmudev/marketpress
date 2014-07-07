@@ -4,7 +4,7 @@ class WPMUDEV_Field_Text extends WPMUDEV_Field {
 	/**
 	 * Displays the field
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
 	 * @param bool $echo
