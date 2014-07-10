@@ -260,6 +260,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		
 		switch ($mp->get_setting('base_country')) {
 			case 'US':
+			
 			for ($i = $mp->get_setting('shipping->table-rate->rowcount') - 1; $i >= 0; $i--) 
 				{
 					if ($total >= $mp->get_setting("shipping->table-rate->{$i}->mincost")) 

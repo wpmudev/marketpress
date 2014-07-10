@@ -100,10 +100,10 @@ class MarketPress {
 	 include_once( $this->plugin_dir . 'marketpress-stats.php' );
 
 	 //load sitewide features if WPMU
-	 if (is_multisite()) {
+	 if ( is_multisite() ) {
 		include_once( $this->plugin_dir . 'marketpress-ms.php' );
 		$network_settings = get_site_option( 'mp_network_settings' );
-			if ( $network_settings['global_cart'] )
+			if ( isset($network_settings['global_cart']) && $network_settings['global_cart'] )
 				$this->global_cart = true;
 	 }
 	 	
@@ -190,7 +190,7 @@ class MarketPress {
 		add_action( 'after_setup_theme', array(&$this, 'post_thumbnails'), 9999 );
 
 		//Add widgets
-		if (!$this->get_setting('disable_cart', 0))
+		if ( ! $this->get_setting('disable_cart', 0) )
 			add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Shopping_Cart");') );
 
 		add_action( 'widgets_init', create_function('', 'return register_widget("MarketPress_Product_List");') );
@@ -512,55 +512,88 @@ Thanks again!", 'mp')
 	}
 
 	function load_shipping_plugins() {
-
-	 //save shipping method. Put here to be before plugin is loaded
-	 if (isset($_POST['shipping_settings'])) {
-		$settings = get_option('mp_settings');
+		//save shipping method. Put here to be before plugin is loaded
+		if (isset($_POST['shipping_settings'])) {
+		 	$settings = get_option('mp_settings');
 			$settings['shipping']['method'] = $_POST['mp']['shipping']['method'];
 			$settings['shipping']['calc_methods'] = isset($_POST['mp']['shipping']['calc_methods']) ? $_POST['mp']['shipping']['calc_methods'] : array();
-		update_option('mp_settings', $settings);
-	 }
-
-	 //get shipping plugins dir
-	 $dir = $this->plugin_dir . 'plugins-shipping/';
-
-	 //search the dir for files
-	 $shipping_plugins = array();
-		if ( !is_dir( $dir ) )
-			return;
-		if ( ! $dh = opendir( $dir ) )
-			return;
-		while ( ( $plugin = readdir( $dh ) ) !== false ) {
-			if ( substr( $plugin, -4 ) == '.php' )
-				$shipping_plugins[] = $dir . $plugin;
+			update_option('mp_settings', $settings);
 		}
-		closedir( $dh );
-		sort( $shipping_plugins );
+
+		//get shipping plugins dir
+		$dir = $this->plugin_dir . 'plugins-shipping/';
+
+		//search the dir for files
+		$shipping_plugins = array();
+		if ( ! is_dir($dir) ) {
+			return;
+		}
+		
+		if ( ! $dh = opendir($dir) ) {
+			return;
+		}
+		
+		while ( ($plugin = readdir($dh)) !== false ) {
+			if ( substr( $plugin, -4 ) == '.php' ) {
+				$shipping_plugins[] = $dir . $plugin;
+			}
+		}
+		
+		closedir($dh);
+		sort($shipping_plugins);
 
 		//include them suppressing errors
-		foreach ($shipping_plugins as $file)
-		@include_once( $file );
+		foreach ( $shipping_plugins as $file ) {
+			@include_once($file);
+		}
 
 		//allow plugins from an external location to register themselves
 		do_action('mp_load_shipping_plugins');
 
-	 //load chosen plugin class
-	 global $mp_shipping_plugins, $mp_shipping_active_plugins;
-		$shipping = $this->get_setting('shipping');
+		//load chosen plugin class
+		global $mp_shipping_plugins, $mp_shipping_active_plugins;
+		
 
-		if ($this->get_setting('shipping->method') == 'calculated') {
-			//load just the calculated ones
-			foreach ((array)$mp_shipping_plugins as $code => $plugin) {
-				if ($plugin[2]) {
-					if ( isset($shipping['calc_methods'][$code]) && class_exists($plugin[0]) && !$plugin[3] )
-						$mp_shipping_active_plugins[$code] = new $plugin[0];
+		if ( $this->global_cart ) {
+			/* global cart is being used so we need to go through the cart contents and
+			get the active shipping method for each blog in the cart */
+			
+			$cart = $this->get_cart_contents(true);
+			$blogs = array_keys($cart);
+			$current_blog_id = get_current_blog_id();
+			$methods = array();
+			
+			foreach ( $blogs as $blog_id ) {
+				switch_to_blog($blog_id);
+				
+				$shipping = $this->get_setting('shipping');
+				
+				//load only selected shipping method
+				$class = isset($mp_shipping_plugins[$shipping['method']][0]) ? $mp_shipping_plugins[$shipping['method']][0] : '';
+				if ( class_exists($class) ) {
+					$mp_shipping_active_plugins[$shipping['method']] = new $class;
 				}
 			}
+			
+			switch_to_blog($current_blog_id);
 		} else {
-			//load only and all calculated ones
-			$class = isset($mp_shipping_plugins[$shipping['method']][0]) ? $mp_shipping_plugins[$shipping['method']][0] : '';
-			if (class_exists($class))
-				$mp_shipping_active_plugins[$shipping['method']] = new $class;
+			$shipping = $this->get_setting('shipping');
+			if ( $this->get_setting('shipping->method') == 'calculated' ) {
+				//load just the calculated ones
+				foreach ( (array) $mp_shipping_plugins as $code => $plugin ) {
+					if ( $plugin[2] ) {
+						if ( isset($shipping['calc_methods'][$code]) && class_exists($plugin[0]) && !$plugin[3] ) {
+							$mp_shipping_active_plugins[$code] = new $plugin[0];
+						}
+					}
+				}
+			} else {			
+				//load only selected shipping method
+				$class = isset($mp_shipping_plugins[$shipping['method']][0]) ? $mp_shipping_plugins[$shipping['method']][0] : '';
+				if ( class_exists($class) ) {
+					$mp_shipping_active_plugins[$shipping['method']] = new $class;
+				}
+			}
 		}
 	}
 
@@ -1180,6 +1213,8 @@ Thanks again!", 'mp')
 			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
 			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
 			add_action('genesis_entry_content', 'the_content');
+			// ultimatum fixes Run this action before loop starts to print
+			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);
 		}
 
 		$this->is_shop_page = true;
@@ -1273,6 +1308,8 @@ Thanks again!", 'mp')
 				add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
 				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
+			// ultimatum fixes Run this action before loop starts to print
+			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
 		}
 
 		$wp_query->is_page = 1;
@@ -1302,6 +1339,8 @@ Thanks again!", 'mp')
 			add_filter( 'bp_page_title', array(&$this, 'page_title_output'), 99 );
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
+			// ultimatum fixes Run this action before loop starts to print
+			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
 		}
 
 		$wp_query->is_page = 1;
@@ -1365,12 +1404,16 @@ Thanks again!", 'mp')
 			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
 			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
 			add_action('genesis_entry_content', 'the_content');
+			// ultimatum fixes Run this action before loop starts to print
+			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
 		}
 
 		$wp_query->is_page = 1;
 		$wp_query->is_404 = null;
 		$wp_query->post_count = 1;
 		$this->is_shop_page = true;
+		// ultimatum fixes Ultimatum loop checks status with if is_singular() which was missed here
+		$wp_query->is_singular = 1;		
 	 }
 	 
 	 //load proper theme for product category or tag listings
@@ -1443,6 +1486,8 @@ Thanks again!", 'mp')
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 		} else {
 			$wp_query->post_count = 1;
+			// Ultimatum fix for making page singular so that loop decides it as singular and acts so.
+			$wp_query->is_singular = true;
 			
 			//load theme's page.php template
 			$this->product_taxonomy_template = locate_template(array('page.php', 'index.php'));
@@ -1462,6 +1507,8 @@ Thanks again!", 'mp')
 			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
 			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
 			add_action('genesis_entry_content', 'the_content');
+			// ultimatum fixes Run this action before loop starts to print
+			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
 		}
 
 		$this->is_shop_page = true;
@@ -2590,9 +2637,10 @@ Thanks again!", 'mp')
 		global $mp_shipping_active_plugins;
 
 		//grab cart for just this blog
-		if (!$cart)
+		if ( ! $cart ) {
 			$cart = $this->get_cart_contents();
-
+		}
+		
 	 //get total after any coupons
 	 $coupon_code = $this->get_coupon_code();
 	 $totals = array();
@@ -2612,8 +2660,13 @@ Thanks again!", 'mp')
 	 $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : (isset($meta['state']) ? $meta['state'] : '');
 	 $zip = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : (isset($meta['zip']) ? $meta['zip'] : '');
 	 $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : (isset($meta['country']) ? $meta['country'] : '');
-	$selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
+	 $selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
 
+	 // validate selected option
+	 if ( isset($_SESSION['mp_shipping_info']['shipping_option']) && $_SESSION['mp_shipping_info']['shipping_option'] != $this->get_setting('shipping->method') ) {
+		 unset($_SESSION['mp_shipping_info']['shipping_option'], $_SESSION['mp_shipping_info']['shipping_sub_option'], $_SESSION['mp_shipping_info']['shipping_cost']);
+	 }
+	 
 	 //check required fields
 	 if ( empty($address1) || empty($city) || !$this->is_valid_zip($zip, $country) || empty($country) || !(is_array($cart) && count($cart)) )
 		return false;
@@ -2937,18 +2990,18 @@ Thanks again!", 'mp')
 	 global $blog_id;
 	 $blog_id = (is_multisite()) ? $blog_id : 1;
 	 $current_blog_id = $blog_id;
-
+	 
 	 //check cache
 	 if ($this->cart_cache) {
-		if ($global) {
+		if ( $global ) {
 			 return $this->cart_cache;
+		} else {
+			if (isset($this->cart_cache[$blog_id])) {
+				return $this->cart_cache[$blog_id];
 			} else {
-				if (isset($this->cart_cache[$blog_id])) {
-					return $this->cart_cache[$blog_id];
-				} else {
-					return array();
-				}
+				return array();
 			}
+		}
 	 }
 
 	 $global_cart = $this->get_cart_cookie(true);
@@ -3027,7 +3080,7 @@ Thanks again!", 'mp')
 	
 		//save to cache
 		$this->cart_cache = $full_cart;
-	
+		
 		if ( $global ) {
 			return $full_cart;
 		} else {
@@ -4287,7 +4340,7 @@ Thanks again!", 'mp')
 				$filetype = 'application/octet-stream';
 			}
 			
-			ob_end_clean(); //kills any buffers set by other plugins
+			ob_clean(); //kills any buffers set by other plugins
 			
       if( isset($_SERVER['HTTP_RANGE']) ) {
       	//partial download headers
@@ -4322,10 +4375,9 @@ Thanks again!", 'mp')
 				while ( ! feof($handle) && ( connection_status() === CONNECTION_NORMAL ) ) {
 					$buffer = fread( $handle, $chunksize );
 					echo $buffer;
-					ob_flush();
-					flush();
 				}
 				
+				ob_end_flush();
 				fclose($handle);
 			} else {
 				ob_clean();
@@ -7824,6 +7876,21 @@ Notification Preferences: %s', 'mp');
 
 		echo '</div>';
 
+	}
+
+	/*
+	 * By Onur Demir aka @xenous from Ultimatum Theme
+	 * Function to fix all issues with Ultimatum Loop 
+	 * ultimatum fixes
+	 */
+	function ultimatum_fixes_forMP(){
+		remove_action( 'ultimatum_post_content', 'ultimatum_do_post_content');
+		remove_action('ultimatum_after_post_title','ultimatum_content_item_image');
+		remove_action('ultimatum_before_post_title','ultimatum_content_item_image');
+		remove_action( 'ultimatum_after_post_title', 'ultimatum_post_meta');
+		remove_action( 'ultimatum_after_post_content', 'ultimatum_post_tax');
+		remove_action( 'ultimatum_after_post_content', 'ultimatum_post_meta');
+		add_action('ultimatum_post_content', 'the_content');
 	}
 
 	/**

@@ -1479,10 +1479,12 @@ function _mp_global_products_html_list( $results, $args ) {
 				$product_content = mp_product_image(false, 'list', $post->ID, $args['thumbnail_size']);
 			}
 			
-			if ( $mp->get_setting('show_excerpt') ) {
+			if ( $args['text'] == 'excerpt' ) {
 				$product_content .= $mp->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+			} elseif ( $args['text'] == 'content' ) {
+				$product_content .= get_the_content();
 			}
-			
+					
 			$html .= apply_filters('mp_product_list_content', $product_content, $post->ID);
 			$html .= mp_pinit_button($post->ID,'all_view');
 			$html .= '
