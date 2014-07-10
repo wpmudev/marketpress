@@ -4439,7 +4439,7 @@ Thanks again!", 'mp')
 		global $current_user;
 		$fields = array( 'email', 'name', 'address1', 'address2', 'city', 'state', 'zip', 'country', 'phone' );
 		
-		if (isset($_REQUEST['user_id'])) {
+		if ( isset($_REQUEST['user_id'])) {
 			$user_id = $_REQUEST['user_id'];
 		} else {
 			$user_id = $current_user->ID;
@@ -4448,9 +4448,7 @@ Thanks again!", 'mp')
 		//initialize variables
 		$meta = get_user_meta($user_id, 'mp_shipping_info', true);
 		foreach ( $fields as $field ) {
-			if ( ! empty($_SESSION['mp_shipping_info'][$field]) ) {
-				$$field = $_SESSION['mp_shipping_info'][$field];
-			} elseif ( !empty($meta[$field]) ) {
+			if ( ! empty($meta[$field]) ) {
 				$$field = $meta[$field];
 			} else {
 				$$field = '';
