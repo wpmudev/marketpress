@@ -9,7 +9,8 @@ Change Log:
 - Fixed: Conflicts with Ultimatum theme http://wp.mu/9tt
 - Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8 
 - Fixed: Shipping not being calculated correctly when using global cart and multiple shipping methods http://wp.mu/a0a
-- Fixed: Issue with shipping/billing fields displaying incorrect values http://wp.mu/a0b
+- Fixed: Issue with shipping/billing fields displaying incorrect values in admin http://wp.mu/a0b
+- Fixed: Double escaping in global product list widget title http://wp.mu/a0e
 
 2.9.4.8
 ----------------------------------------------------------------------

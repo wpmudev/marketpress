@@ -1742,8 +1742,8 @@ class MarketPress_Global_Product_List extends WP_Widget {
 
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-		$instance['title'] = wp_filter_nohtml_kses( $new_instance['title'] );
-		$instance['custom_text'] = wp_filter_kses( $new_instance['custom_text'] );
+		$instance['title'] = strip_tags(stripslashes($new_instance['title']));
+		$instance['custom_text'] = stripslashes(wp_filter_kses($new_instance['custom_text']));
 
 		$instance['per_page'] = intval($new_instance['per_page']);
 		$instance['order_by'] = $new_instance['order_by'];
