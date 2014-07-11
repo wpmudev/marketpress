@@ -5,6 +5,8 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.4.9
+----------------------------------------------------------------------
 - Fixed: File download issue that some users were reporting
 - Fixed: Conflicts with Ultimatum theme http://wp.mu/9tt
 - Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8 
