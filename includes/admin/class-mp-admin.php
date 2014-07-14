@@ -127,7 +127,6 @@ class MP_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Messaging', 'mp'), __('Messaging', 'mp'), $cap, 'store-settings-messaging', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Short Codes', 'mp'), __('Short Codes', 'mp'), $cap, 'store-settings-shortcodes', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=product'); 
 		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=product');		
@@ -143,7 +142,6 @@ class MP_Admin {
 			add_action('store-settings_page_store-settings-messaging', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-shipping', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-payments', array(&$this, 'add_help_tab'));
-			add_action('store-settings_page_store-settings-short-codes', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
 		}

@@ -8,19 +8,13 @@ Change Log:
 3.0 beta 1
 ----------------------------------------------------------------------
 - TONS of code cleanup/optimizations
-- Added: mp_register_admin_page() function for registering admin pages
-- Added: marketpress_save_settings_{$current_tab} filter
-- Added: marketpress_settings_tab filter - replaces existing marketpress_tabs filter
-- Added: marketpress_admin_page_{$current_tab} filter
-- Added: marketpress_registered_admin_pages filter
-- Added: marketpress_settings_tabs_sort filter
-- Added: nonce checks to all admin pages for enhanced security
-- Added: Bahrain Dinars to the list of available currencies
-- Added: mp_currencies filter for adding non-default currencies
-- Added: links to settings/network settings on plugins page
-- Added: settings metaboxes now use ajax instead of page refresh where applicable
-- Added: screen options tab on orders screen - users can now specify how many orders per page they want
-- Added: on demand data validation on most settings screens
+- New: Bahrain Dinars to the list of available currencies
+- New: mp_currencies filter for adding non-default currencies
+- New: links to settings/network settings on plugins page
+- New: settings metaboxes now use ajax instead of page refresh where applicable
+- New: screen options tab on orders screen - users can now specify how many orders per page they want
+- New: on demand data validation on most settings screens
+- New: short codes can now be inserted via a popup wizard that is available from within the TinyMCE editor
 - Fixed: some Strict Standards notices in PIN and Simplify gateways
 
 2.9 - 1/22/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowher
