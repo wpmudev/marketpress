@@ -31,7 +31,7 @@
 			var shortcode = '[' + $form.find('[name="shortcode"]').val();
 			var atts = '';
 			
-			$form.find('input, select, textarea').not('[name="shortcode"], [type="submit"], [type="button"]').filter('[name]').each(function(){
+			$form.find('.form-table').filter(':visible').find('input, select, textarea').filter('[name]').each(function(){
 				var $this = $(this);
 				
 				if ( $.trim($this.val()).length == 0 || ($this.attr('data-default') !== undefined && $this.attr('data-default') == $.trim($this.val())) ) {
