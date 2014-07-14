@@ -59,6 +59,7 @@ class MP_Admin {
 		require_once mp_plugin_dir('includes/admin/class-mp-products-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-product-attributes-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-store-settings-admin.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-shortcode-builder.php');
 	}
 	
 	/**
@@ -180,10 +181,7 @@ class MP_Admin {
 	public function admin_styles_scripts() {
 		global $current_screen;
 		
-		$screens = array('product');
-		if ( in_array($current_screen->id, $screens) ) {
-			wp_enqueue_script('mp-post', mp_plugin_url('ui/js/post-screen.js'), array('jquery'), MP_VERSION);
-		}
+		wp_enqueue_style('mp-admin', mp_plugin_url('includes/admin/ui/css/admin.css'), false, MP_VERSION);
 		
 		if ( strpos($current_screen->id, 'store-settings') !== false ) {
 			$this->admin_script_settings();
@@ -205,8 +203,7 @@ class MP_Admin {
 			wp_enqueue_style('dashicons', mp_plugin_url('ui/css/dashicons.css'), false, MP_VERSION);
 		}
 
-		wp_enqueue_style('mp3-admin', mp_plugin_url('ui/css/marketpress3.css'), false, MP_VERSION);		
-		wp_enqueue_style('jquery-colorpicker', mp_plugin_url('ui/colorpicker/css/colorpicker.css'), false, MP_VERSION);
+		wp_enqueue_style('mp-admin', mp_plugin_url('includes/admin/ui/css/admin.css'), false, MP_VERSION);
 	}
 
 	/**

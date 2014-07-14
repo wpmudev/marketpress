@@ -139,7 +139,7 @@ class WPMUDEV_Field {
 		
 		if ( ! empty($this->args['conditional']) ) {
 			$this->args['custom']['data-conditional-name'] = $this->args['conditional']['name'];
-			$this->args['custom']['data-conditional-value'] = $this->args['conditional']['value'];
+			$this->args['custom']['data-conditional-value'] = ( is_array($this->args['conditional']['value']) && count($this->args['conditional']['value']) > 1 ) ? implode('||', $this->args['conditional']['value']) : $this->args['conditional']['value'];
 			$this->args['custom']['data-conditional-action'] = $this->args['conditional']['action'];
 		}
 		

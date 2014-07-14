@@ -33,53 +33,11 @@ class MP_Products_Screen {
 	private function __construct() {
 		//remove add-new submenu item from store admin menu
 		add_action('admin_menu', array(&$this, 'remove_menu_items'), 999);
-		//print scripts for setting the active admin menu item when on the product tag page
-		add_action('admin_footer', array(&$this, 'print_product_tag_scripts'));
-		//print scripts for setting the active admin menu item when on the product category page
-		add_action('admin_footer', array(&$this, 'print_product_category_scripts'));		
 		//init metaboxes
 		$this->init_variations_metabox();
 		$this->init_attributes_metabox();	
 	}
-	
-	/**
-	 * Print scripts for setting the active admin menu item when on the product tag page
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function print_product_tag_scripts() {
-		if ( mp_get_current_screen()->id != 'edit-product_tag' ) { return false; }
-		?>
-<script type="text/javascript">
-jQuery(document).ready(function($){
-	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
-	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=product"]').addClass('current').parent().addClass('current');
-});
-</script>
-		<?php
-	}
-
-	/**
-	 * Print scripts for setting the active admin menu item when on the product category page
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function print_product_category_scripts() {
-		if ( mp_get_current_screen()->id != 'edit-product_category' ) { return false; }
-		?>
-<script type="text/javascript">
-jQuery(document).ready(function($){
-	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
-	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_category&post_type=product"]').addClass('current').parent().addClass('current');
-});
-</script>
-		<?php
-	}
-	
+		
 	/**
 	 * Remove add-new submenu item from store admin menu
 	 *
@@ -113,8 +71,8 @@ jQuery(document).ready(function($){
 			'default_value' => 'physical',
 			'options' => array(
 				'physical' => __('Physical/Tangible Product', 'mp'),
+				'digital' => __('Digital Download', 'mp'),				
 				'external' => __('External/Affiliate Link', 'mp'),
-				'digital_download' => __('Digital Download', 'mp'),
 			),
 			'conditional' => array(
 				'name' => 'has_variations',
@@ -155,10 +113,20 @@ jQuery(document).ready(function($){
 			$repeater->add_sub_field('text', array(
 				'name' => 'regular_price',
 				'label' => array('text' => __('Regular Price', 'mp')),
+				'conditional' => array(
+					'name' => 'variation_type',
+					'value' => array('physical', 'digital'),
+					'action' => 'show',
+				),
 			));
 			$sale_price = $repeater->add_sub_field('complex', array(
 				'name' => 'sale_price',
 				'label' => array('text' => __('Sale Price', 'mp')),
+				'conditional' => array(
+					'name' => 'variation_type',
+					'value' => array('physical', 'digital'),
+					'action' => 'show',
+				),												
 			));
 			$sale_price->add_field('text', array(
 				'name' => 'price',
@@ -195,16 +163,26 @@ jQuery(document).ready(function($){
 				'default_value' => '0.00',
 				'conditional' => array(
 					'name' => 'variation_type',
-					'value' => 'physical',
+					'value' => array('physical', 'digital'),
 					'action' => 'show',
 				),	
 			));
+			$repeater->add_sub_field('text', array(
+				'name' => 'special_tax_rate',
+				'label' => array('text' => __('Special Tax Rate', 'mp')),
+				'default_value' => '0.00',
+				'conditional' => array(
+					'name' => 'variation_type',
+					'value' => array('physical', 'digital'),
+					'action' => 'show',
+				),	
+			));			
 			$repeater->add_sub_field('file', array(
 				'name' => 'file_url',
 				'label' => array('text' => __('File URL', 'mp')),
 				'conditional' => array(
 					'name' => 'variation_type',
-					'value' => 'digital_download',
+					'value' => 'digital',
 					'action' => 'show',
 				),	
 			));

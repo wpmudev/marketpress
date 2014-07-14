@@ -73,11 +73,7 @@ class WPMUDEV_Field_WYSIWYG extends WPMUDEV_Field {
 	public function print_scripts() {
 		?>
 <script type="text/javascript">
-jQuery(document).ready(function($){
-	$('.wpmudev-field-wysiwyg-wrap').find('textarea').each(function(){
-		tinymce.execCommand('mceAddEditor', false, $(this).attr('id'));
-	});
-	
+jQuery(document).ready(function($){	
 	$(document).on('wpmudev_repeater_field_start_sort', function(e, $group){
 		$group.find('.wp-editor-area').each(function(){
 			tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));

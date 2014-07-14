@@ -1,0 +1,111 @@
+(function($){
+	$(document).ready(function($){
+		initShortCodeBuilder();
+		initColorbox();
+		initSelect2();
+		initProductSearchField();
+	});
+
+ 	var initShortCodeBuilder = function() {
+		var $form = $('#mp-shortcode-builder-form');
+		
+		$form.find('[name="shortcode"]').change(function(){
+			var $table = $('#' + $(this).val().replace(/_/g, '-') + '-shortcode');
+			
+			if ( $table.length == 0 ) {
+				$form.find('.form-table').hide();
+				$.colorbox.resize();
+				return; // bail
+			}
+			
+			$table.show().siblings('.form-table').hide();
+			$.colorbox.resize({
+				"height" : "80%"
+			});
+			refreshChosenFields();
+		});
+		
+		$form.submit(function(e){
+			e.preventDefault();
+			
+			var shortcode = '[' + $form.find('[name="shortcode"]').val();
+			var atts = '';
+			
+			$form.find('input, select, textarea').not('[name="shortcode"], [type="submit"], [type="button"]').filter('[name]').each(function(){
+				var $this = $(this);
+				
+				if ( $.trim($this.val()).length == 0 || ($this.attr('data-default') !== undefined && $this.attr('data-default') == $.trim($this.val())) ) {
+					return; // Don't include empty fields or fields that are default values
+				}
+				
+				if ( $this.is(':radio') || $this.is(':checkbox') ) {
+					if ( $this.is(':checked') ) {
+						atts += ' ' + $this.attr('name') + '="' + $this.val() + '"';
+					}
+				} else {
+					atts += ' ' + $this.attr('name') + '="' + $this.val() + '"';
+				}
+			});
+			
+			shortcode += atts + ']';
+			
+			window.send_to_editor(shortcode);
+			$.colorbox.close();
+		});
+	};
+	
+	var refreshChosenFields = function() {
+		$('.chosen-select').trigger('chosen:updated');
+	};
+	
+	var initColorbox = function() {
+		$('body').on('click', '.mp-shortcode-builder-button', function(){
+			var $this = $(this);
+			
+			$.colorbox({
+				"width" : 800,
+				"maxWidth" : "80%",
+				"height" : "80%",
+				"inline" : true,
+				"href" : "#mp-shortcode-builder-form",
+				"opacity" : 0.7
+			});
+		});
+	};
+	
+	var initSelect2 = function() {
+		$('.chosen-select').select2({
+			"width" : "100%"
+		});
+	};
+	
+	var initProductSearchField = function() {
+		$('input.mp-select-product').each(function(){
+			var $this = $(this);
+			
+			$this.select2({
+				"multiple" : false,
+				"placeholder" : MP_ShortCode_Builder.select_product,
+				"width" : "100%",
+				"ajax" : {
+					"url" : ajaxurl,
+					"dataType" : "json",
+					"data" : function(term, page){
+						return {
+							"search_term" : term,
+							"page" : page,
+							"action" : "mp_shortcode_builder_search_products"
+						}
+					},
+					"results" : function(data, page){
+						var more = (page * data.post_per_page) < data.total;
+						return {
+							"results" : data.posts,
+							"more" : more
+						}
+					}
+				}
+			}) 
+		});
+	}
+}(jQuery));

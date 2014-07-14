@@ -4,20 +4,25 @@ jQuery.validator.addMethod('alphanumeric', function(value, element){
 jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 
 (function($){
-	jQuery(document).ready(function($){
+	window.onload = function() {
+		/* initializing conditional logic here instead of document.ready() to prevent
+		issues with wysiwyg editor not getting proper height */
 		initConditionals();
+	}
+	
+	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e){
+		initConditionals();
+	});
+	
+	jQuery(document).ready(function($){
 		initValidation();
-		
-		$(document).on('wpmudev_repeater_field_after_add_field_group', function(e){
-			initConditionals();
-		});
 	});
 	
 	var initConditionals = function(){
 		$('[data-conditional-name][data-conditional-value][data-conditional-action]').each(function(){
 			var $this = $(this),
 					conditionalAction = $this.attr('data-conditional-action'),
-					conditionalValue = $this.attr('data-conditional-value'),
+					conditionalValue = $this.attr('data-conditional-value').split('||'),
 					conditionalName = $this.attr('data-conditional-name'),
 					$container = ( $this.closest('.wpmudev-subfield').length ) ? $this.closest('.wpmudev-subfield') : $this.closest('.wpmudev-field'),
 					$conditionalInput = $('[name="' + conditionalName + '"]');
@@ -34,7 +39,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			}
 			
 			if ( conditionalAction == 'show' ) {
-				if ( selected != conditionalValue ) {
+				if ( $.inArray(selected, conditionalValue) < 0 ) {
 					$container.hide();
 				}
 				
@@ -47,7 +52,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 						var selected = $this.filter(':checked').val();
 					}
 				
-					if ( selected == conditionalValue ) {
+					if ( $.inArray(selected, conditionalValue) >= 0 ) {
 						$container.slideDown(500);
 					} else {
 						$container.slideUp(500);
@@ -56,7 +61,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			}
 
 			if ( conditionalAction == 'hide' ) {
-				if ( selected != conditionalValue ) {
+				if ( $.inArray(selected, conditionalValue) < 0 ) {
 					$container.show();
 				}		
 				
@@ -69,7 +74,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 						var selected = $this.filter(':checked').val();
 					}
 					
-					if ( selected == conditionalValue ) {
+					if ( $.inArray(selected, conditionalValue) >= 0 ) {
 						$container.slideUp(500);
 					} else {
 						$container.slideDown(500);

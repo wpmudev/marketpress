@@ -31,6 +31,11 @@ class MP_Store_Settings_Admin {
 	 * @access private
 	 */
 	private function __construct() {
+		//print scripts for setting the active admin menu item when on the product tag page
+		add_action('admin_footer', array(&$this, 'print_product_tag_scripts'));
+		//print scripts for setting the active admin menu item when on the product category page
+		add_action('admin_footer', array(&$this, 'print_product_category_scripts'));		
+
 		if ( mp_get_get_value('action') == 'mp_add_product_attribute' || mp_get_get_value('action') == 'mp_edit_product_attribute' ) {
 			MP_Product_Attributes_Admin::add_product_attribute_metaboxes();
 			add_filter('wpmudev_field_save_value', array('MP_Product_Attributes_Admin', 'save_product_attribute'), 10, 3);
@@ -44,6 +49,44 @@ class MP_Store_Settings_Admin {
 		}
 		
 		add_action('store-settings_page_store-settings-productattributes', array('MP_Product_Attributes_Admin', 'display_product_attributes'));
+	}
+
+	/**
+	 * Print scripts for setting the active admin menu item when on the product tag page
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function print_product_tag_scripts() {
+		if ( mp_get_current_screen()->id != 'edit-product_tag' ) { return false; }
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
+	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
+	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=product"]').addClass('current').parent().addClass('current');
+});
+</script>
+		<?php
+	}
+
+	/**
+	 * Print scripts for setting the active admin menu item when on the product category page
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function print_product_category_scripts() {
+		if ( mp_get_current_screen()->id != 'edit-product_category' ) { return false; }
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
+	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
+	$('a[href="edit-tags.php?taxonomy=product_category&post_type=product"]').addClass('current').parent().addClass('current');
+});
+</script>
+		<?php
 	}
 	
 	/**
