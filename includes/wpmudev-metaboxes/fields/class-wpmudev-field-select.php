@@ -24,24 +24,16 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 	 * @since 3.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
-		$value = $this->get_value($post_id, false);
-	
-		$html = '<select ' . $this->parse_atts() . '>';
-		
-		foreach ( $this->args['options'] as $val => $label ) {
-			$selected = selected($val, $value, false);
-			$html .= '<option value="' . esc_attr($val) . '" ' . $selected . '>' . esc_attr($label) . '</option>';	
-		}
-		
-		$html .= '</select>';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+	public function display( $post_id ) {
+		$value = $this->get_value($post_id); ?>
+		<select <?php echo $this->parse_atts(); ?>>
+		<?php
+		foreach ( $this->args['options'] as $val => $label ) : ?>
+			<option value="<?php echo esc_attr($val); ?>" <?php selected($val, $value); ?>><?php esc_attr($label); ?></option>
+		<?php
+		endforeach; ?>
+		</select>
+		<?php
 	}
 }

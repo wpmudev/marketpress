@@ -80,6 +80,7 @@ jQuery(document).ready(function($){
 });
 </script>
 		<?php
+		parent::print_scripts();
 	}
 	
 	/**
@@ -88,25 +89,10 @@ jQuery(document).ready(function($){
 	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
-		$value = $this->get_value($post_id);
-		$html = '<input type="text" ' . $this->parse_atts() . ' value="' . $value . '" /> <a class="button wpmudev-field-file-select" href="#">' . __('Select File', 'wpmudev_metaboxes') . '</a>';
-
-		/**
-		 * Modify the display HTML before return/output.
-		 *
-		 * @since 1.0
-		 * @param string $html The current display HTML.
-		 * @param object $this The current field object.
-		 */		
-		$html = apply_filters('wpmudev_field_file_display', $html, $this);
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+	public function display( $post_id ) {
+		$value = $this->get_value($post_id); ?>
+		<input type="text" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" /> <a class="button wpmudev-field-file-select" href="#"><?php _e('Select File', 'wpmudev_metaboxes'); ?></a>
+		<?php
 	}
 }

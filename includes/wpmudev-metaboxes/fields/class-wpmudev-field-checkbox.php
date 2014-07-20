@@ -29,7 +29,7 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 */	
 	public function sanitize_for_db( $value ) {
 		$value = ( empty($value) ) ? 0 : $value;
-		parent::sanitize_for_db($value);
+		return parent::sanitize_for_db($value);
 	}
 
 	/**
@@ -38,24 +38,11 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 * @since 3.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
-		$value = $this->get_value($post_id);
-
-		/*if ( $value === false ) {
-			$checked = checked($this->args['value'], $this->args['default_value'], false);
-		} else {
-			$checked = checked($this->args['value'], $value, false);
-		}*/
-
-		$html  = '<label class="' . $this->args['label']['class'] . '" for="' . $this->get_id(). '">';
-		$html .= '<input type="checkbox" ' . $this->parse_atts() . ' ' . $checked . ' /> <span>' . $this->args['message'] . '</span></label>';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+	public function display( $post_id ) {
+		$value = $this->get_value($post_id); ?>
+		<label class="<?php echo $this->args['label']['class']; ?>" for="<?php echo $this->get_id(); ?>">
+		<input type="checkbox" <?php echo $this->parse_atts(); ?> <?php checked($value, $this->args['value']); ?> /> <span><?php echo $this->args['message']; ?></span></label>
+		<?php
 	}
 }

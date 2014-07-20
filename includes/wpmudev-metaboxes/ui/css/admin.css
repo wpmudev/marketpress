@@ -36,6 +36,10 @@ label.error:before {
 	 */
 
   /**
+	 * Section Field
+	 */
+
+  /**
 	 * WYSIWYG Field
 	 */
 
@@ -119,13 +123,20 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-metabox-tooltip:hover > span {
   display: block;
 }
+.postbox.wpmudev-postbox .inside .wpmudev-section-title {
+  margin-bottom: 0 !important;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-section-title + p {
+  margin-top: 0;
+}
 .postbox.wpmudev-postbox .inside .wp-switch-editor {
   text-decoration: none;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field-complex-label {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  display: inline-block;
+  display: block;
+  float: left;
   padding-left: 10px;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field-complex-label span {
@@ -256,7 +267,7 @@ label.error:before {
   float: left;
   width: 20%;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields .wpmudev-subfield-input {
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-fields .wpmudev-subfield-label + .wpmudev-subfield-input {
   float: right;
   width: 75%;
 }

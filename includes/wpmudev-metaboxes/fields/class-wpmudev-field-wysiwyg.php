@@ -139,6 +139,18 @@ jQuery(document).ready(function($){
 	}
 
 	/**
+	 * Sanitizes the field value before saving to database.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param $value
+	 */		
+	public function sanitize_for_db( $value ) {
+		$value = wp_kses_post($value);
+		return parent::sanitize_for_db($value);
+	}
+
+	/**
 	 * Displays the field
 	 *
 	 * @since 1.0
@@ -151,6 +163,7 @@ jQuery(document).ready(function($){
 		$args = array(
 			'wpautop' => $this->args['wpautop'],
 			'media_buttons' => $this->args['media_buttons'],
+			'textarea_name' => $this->get_name(),
 		);
 		
 		if ( $this->is_subfield ) {

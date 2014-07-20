@@ -31,6 +31,103 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	}
 	
 	/**
+	 * Saves the field to the database.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @action save_post
+	 * @param int $post_id
+	 * @param string $meta_key
+	 * @param $value (optional)
+	 */
+	public function save_value( $post_id, $meta_key = null, $value = null ) {
+		/**
+		 * Modify the value before it's saved to the database. Return null to bypass internal saving mechanisms.
+		 *
+		 * @since 1.0
+		 * @param mixed $value The field's value
+		 * @param mixed $post_id The current post id or option name
+		 * @param object $this Refers to the current field object
+		 */
+		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $value, $post_id, $this);
+	}
+
+	/**
+	 * Gets an appropriate meta key for a given subfield
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param WPMUDEV_Field $field
+	 * @return string
+	 */
+	public function get_subfield_meta_key( $field ) {
+		$meta_key_parts = explode('[', $field->args['name']);
+		return rtrim($meta_key_parts[1], ']');
+	}
+	
+	/**
+	 * Sorts the repeater field's subfields for easier input
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param array $unsorted The unsorted subfield $_POST data
+	 * @return array
+	 */
+	public function sort_subfields( $unsorted ) {
+		$new = $existing = array();
+		
+		foreach ( $unsorted as $input_name => $array ) {
+			foreach ( $array as $type => $array2 ) {
+				switch ( $type ) {
+					case 'new' :
+						$fields = array();
+						foreach ( $array2 as $index => $value ) {
+							$subfield = $this->subfields[$index];
+							$new[$index][$input_name] = $value;
+						}
+					break;
+				
+					case 'existing' :
+						$index = 0;
+						foreach ( $array2 as $variation_id => $value ) {
+							$subfield = $this->subfields[$index];
+							$existing[$variation_id][$input_name] = $value;
+							$index ++;
+						}
+					break;
+					
+					// Complex fields will have $input_name as $type key
+					default :
+						$input_name2 = $type;
+						foreach ( $array2 as $type2 => $array3 ) {
+							switch ( $type2 ) {
+								case 'new' :
+									foreach ( $array3 as $index => $value ) {
+										$subfield = $this->subfields[$index];
+										$new[$index][$input_name][$input_name2] = $value;
+									}
+								break;
+							
+								case 'existing' :
+									$index = 0;
+									foreach ( $array3 as $variation_id => $value ) {
+										$subfield = $this->subfields[$index];
+										$existing[$variation_id][$input_name][$input_name2] = $value;
+										$index ++;
+									}
+								break;
+							}
+						}
+					break;
+				}
+			}
+		}
+		
+		return array('new' => $new, 'existing' => $existing);
+	}
+	
+	/**
 	 * Displays the field
 	 *
 	 * @since 1.0
@@ -76,6 +173,8 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 				if ( isset($data[$outer_index][$subfield->args['original_name']]) ) {
 					$subfield->set_value($data[$outer_index][$subfield->args['original_name']]);
 					$subfield->set_subfield_id($data[$outer_index]['ID']);
+				} else {
+					$subfield->set_value('');
 				}
 				
 				switch ( $this->args['layout'] ) :
@@ -88,10 +187,14 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 						endif; ?>
 							<div class="wpmudev-subfield">
 								<div class="wpmudev-subfield-inner clearfix">
-									<div class="wpmudev-subfield-input"><?php echo $subfield->display($post_id, false); ?></div>
-										<label for="<?php echo $subfield->get_id(); ?>" class="wpmudev-subfield-label '<?php echo $subfield->args['label']['class']; ?>"><?php echo $subfield->args['label']['text'] . (( ! empty($subfield->args['desc']) ) ? '<span class="wpmudev-metabox-tooltip dashicons dashicons-editor-help"><span>' . $subfield->args['desc'] . '</span></span>' : ''); ?></label>
-									</div>
+										<?php
+						if ( ! empty($subfield->args['label']['text']) ) : ?>
+										<label class="wpmudev-subfield-label <?php echo $subfield->args['label']['class']; ?>"><?php echo $subfield->args['label']['text'] . (( ! empty($subfield->args['desc']) ) ? '<span class="wpmudev-metabox-tooltip dashicons dashicons-editor-help"><span>' . $subfield->args['desc'] . '</span></span>' : ''); ?></label>
+										<?php
+						endif; ?>
+									<div class="wpmudev-subfield-input"><?php $subfield->display($post_id); ?></div>
 								</div>
+							</div>
 						<?php
 						if ( $index == (count($this->subfields) - 1) ) : ?>
 							</div>
@@ -135,6 +238,13 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		endif; ?>
 		</div>
 		<div class="wpmudev-repeater-field-actions clearfix"><input class="button wpmudev-repeater-field-add alignright" type="button" value="<?php echo $this->args['add_row_label']; ?>" /></div>
+		<script type="text/javascript">
+		// Clone the subfields BEFORE any events/plugins are able to modify the markup, bind events, etc
+		jQuery('.wpmudev-subfields').not('[data-ready-for-cloning]').each(function(){
+			var $this = jQuery(this);
+			$this.data('toClone', $this.find('.wpmudev-subfield-group:first')).attr('data-ready-for-cloning', 1);
+		});
+		</script>
 		<?php
 	}
 	
@@ -146,6 +256,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script('jquery-ui-sortable');
+		wp_enqueue_script('jquery-ui-core');
 	}
 	
 	/**
@@ -241,11 +352,18 @@ jQuery(document).ready(function($){
 	});
 	
 	$('.wpmudev-repeater-field-add').click(function(){
+		/**
+		 * Triggered right before a row is added.
+		 *
+		 * @since 1.0
+		 */
+		$(document).trigger('wpmudev_repeater_field_before_add_field_group');
+
 		var $btn = $(this),
 				$subfields = $btn.closest('.wpmudev-field').find('.wpmudev-subfields'),
-				$clonedRow = $subfields.find('.wpmudev-subfield-group:last').clone(),
+				$clonedRow = $subfields.data('toClone').clone(),
 				didOne = false;
-				
+								
 		$clonedRow.find('[name]').val('');
 		$clonedRow.find('.wpmudev-subfield-inner').css('display', 'none');
 		$clonedRow.appendTo($subfields);
@@ -270,6 +388,15 @@ jQuery(document).ready(function($){
 			}
 			
 			didOne = true;
+			
+			// Change the id of each field
+			$clonedRow.find('[id]').each(function(){
+				var $this = $(this),
+						oldId = $this.attr('id');
+						
+				$this.attr('id', '').uniqueId();
+				$clonedRow.find('label[for="' + oldId + '"]').attr('for', $this.attr('id'));
+			});
 			
 			/**
 			 * Triggered when a row is added.

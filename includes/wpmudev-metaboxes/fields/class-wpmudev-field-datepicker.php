@@ -18,16 +18,71 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function print_scripts() {
-		parent::print_scripts();
-	?>
+		?>
 <script type="text/javascript">
-jQuery(document).ready(function($){
-	$('.wpmudev-datepicker-field').datepicker({
-		"dateFormat" : "yy-mm-dd"
+(function($){	
+	$(document).on('wpmudev_repeater_field_before_add_field_group', function(e){
+		$('.wpmudev-datepicker-field').datepicker('destroy');
 	});
-});
+	
+	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e, $group){
+		$('.wpmudev-datepicker-field').each(function(){
+			var $this = $(this);
+			
+			$this.datepicker({
+				"dateFormat" : "<?php echo $this->format_date_for_jquery(get_option('date_format')); ?>",
+				"altField" : $this.prev('input[type="hidden"]'),
+				"altFormat" : "yy-mm-dd"
+			});
+		});
+	});
+	
+	$(document).ready(function(){
+		$('.wpmudev-datepicker-field').each(function(){
+			var $this = $(this);
+			
+			$this.datepicker({
+				"dateFormat" : "<?php echo $this->format_date_for_jquery(get_option('date_format')); ?>",
+				"altField" : $this.prev('input[type="hidden"]'),
+				"altFormat" : "yy-mm-dd"
+			});
+		});
+	});
+}(jQuery));
 </script>
-	<?php
+		<?php
+		parent::print_scripts();
+	}
+	
+	/**
+	 * Takes a PHP date format and converts it to jquery-ui dateFormat
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param string $format
+	 * @return string
+	 */
+	public function format_date_for_jquery( $format ) {
+		$pattern = array('d', 'j', 'l', 'z', 'F', 'M', 'n', 'm', 'Y', 'y');
+		$replace = array('dd', 'd', 'DD', 'o', 'MM', 'M', 'm', 'mm', 'yy', 'y');
+		
+		foreach ( $pattern as &$p ) {
+			$p = '/' . $p . '/';
+		}
+		
+		return preg_replace($pattern, $replace, $format);
+	}
+	
+	/**
+	 * Checks if provided string is a valid timestamp
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param string $value
+	 * @return bool
+	 */
+	public function is_timestamp( $value ) {
+		return ( is_numeric($value) && (int) $value == $value );
 	}
 
 	/**
@@ -37,7 +92,7 @@ jQuery(document).ready(function($){
 	 * @access public
 	 */
 	public function format_value( $value ) {
-		$value = is_int($value) ? date('Y-m-d', $value) : $value;
+		$value = $this->is_timestamp($value) ? date('Y-m-d', $value) : $value;
 		return apply_filters('wpmudev_field_format_value', $value, $post_id, $this);
 	}
 
@@ -49,7 +104,8 @@ jQuery(document).ready(function($){
 	 * @param $value
 	 */	
 	public function sanitize_for_db( $value ) {
-		return apply_filters('wpmudev_field_sanitize_for_db', strtotime($value), $post_id, $this);
+		$value = empty($value) ? $value : strtotime($value);
+		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
 	}
 		
 	/**
@@ -78,17 +134,11 @@ jQuery(document).ready(function($){
 	 * @since 3.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
-		$value = $this->get_value($post_id);
-		
-		$html = '<input type="text" ' . $this->parse_atts() . ' value="' . $value . '" />';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+	public function display( $post_id ) {
+		$value = $this->get_value($post_id); ?>
+		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" />
+		<input type="text" class="wpmudev-datepicker-field" value="<?php echo ( empty($value) ) ? '' : date_i18n(get_option('date_format'), strtotime($value)); ?>" />
+		<?php
 	}
 }

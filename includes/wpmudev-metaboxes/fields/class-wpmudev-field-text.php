@@ -7,15 +7,10 @@ class WPMUDEV_Field_Text extends WPMUDEV_Field {
 	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
-		$html = '<input type="text" ' . $this->parse_atts() . ' value="' . $this->get_value($post_id, false) . '" />';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+	public function display( $post_id ) {
+		?>
+		<input type="text" <?php echo $this->parse_atts(); ?> value="<?php echo $this->get_value($post_id); ?>" />
+		<?php
 	}
 }

@@ -26,11 +26,11 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 * @since 3.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id = null, $echo = true ) {
-		$html = '<div class="wpmudev-radio-group ' . $this->args['orientation'] . '">';
-		
+	public function display( $post_id = null ) {
+		?>
+		<div class="wpmudev-radio-group <?php echo $this->args['orientation']; ?>">
+		<?php
 		foreach ( $this->args['options'] as $value => $label ) {
 			$field = new WPMUDEV_Field_Radio(array_merge($this->args, array(
 				'name' => $this->args['name'],
@@ -38,15 +38,9 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 				'default_value' => $this->args['default_value'],
 				'label' => array('text' => $label)
 			)));
-			$html .= $field->display($post_id, false);
-		}
-		
-		$html .= '</div>';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+			$field->display($post_id);
+		} ?>
+		</div>
+		<?php
 	}
 }

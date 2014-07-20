@@ -353,11 +353,30 @@ class WPMUDEV_Metabox {
 	 */
 	public function save_fields( $post_id ) {
 		if ( ! isset($_POST[$this->nonce_name]) || (isset($_POST[$this->nonce_name]) && ! wp_verify_nonce($_POST[$this->nonce_name], $this->nonce_action)) ) {
-			//bail - nonce is not set or could not be verified
+			// Bail - nonce is not set or could not be verified
+			return;
+		}
+
+		// Make sure we only run once
+		if ( wp_cache_get('save_fields', 'wpmudev_metaboxes') ) {
+			return;
+		}
+		wp_cache_set('save_fields', true, 'wpmudev_metaboxes');
+		
+		// Avoid infinite loops later (e.g. when calling wp_insert_post, etc)
+		remove_action('save_post', array(&$this, 'save_fields'));
+		
+		// Make sure $post_id isn't a revision
+		if ( wp_is_post_revision($post_id) ) {
 			return;
 		}
 		
-		//for plugins to tie into
+		/**
+		 * Fires after the appropriate nonce's have been verified for fields to tie into.
+		 *
+		 * @since 3.0
+		 * @param int $post_id Post ID.
+		 */
 		do_action('wpmudev_metaboxes_save_fields', $post_id);
 	}
 	

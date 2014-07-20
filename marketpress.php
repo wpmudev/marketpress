@@ -307,6 +307,17 @@ class Marketpress {
 			'query_var' => false,
 			'supports' => array(),
 		)));
+		
+		//! Register product_variation post type
+		register_post_type('product_variation', array(
+			'public' => false,
+			'show_ui' => false,
+			'publicly_queryable' => true,
+			'hierarchical' => true,
+			'rewrite' => false,
+			'query_var' => false,
+			'supports' => array(),
+		));
 
 		//! Register custom post statuses for our orders
 		register_post_status('order_received', array(

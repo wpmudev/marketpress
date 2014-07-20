@@ -78,7 +78,7 @@ th.column-ID {
 			'label' => array('text' => __('Sort By', 'mp')),
 			'default_value' => 'ID',
 			'desc' => __('Select how the options will be sorted.', 'mp'),
-			'fields' => array(
+			'options' => array(
 				'ID' => __('ID', 'mp'),
 				'ALPHA' => __('Alphabetical', 'mp'),
 				'CUSTOM' => __('Custom', 'mp'),
@@ -88,7 +88,7 @@ th.column-ID {
 			'name' => 'product_attribute_terms_sort_order',
 			'label' => array('text' => __('Sort Order', 'mp')),
 			'default_value' => 'ASC',
-			'fields' => array(
+			'options' => array(
 				'ASC' => __('Ascending', 'mp'),
 				'DESC' => __('Descending', 'mp'),
 			),

@@ -8,10 +8,13 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	 *		An array of arguments.
 	 *
 	 *		@see WPMUDEV_Field::__construct() for core list of available arguments.
-	 *		@type array $fields A value => label list of fields.
+	 *		@type mixed $value The value of the field.
 	 * }
 	 */
 	public function on_creation( $args ) {
+		$this->args = wp_parse_args($args, array(
+			'value' => 1
+		));
 	}
 	
 	/**
@@ -23,27 +26,20 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	 */	
 	public function sanitize_for_db( $value ) {
 		$value = ( empty($value) ) ? 0 : $value;
-		parent::sanitize_for_db($value);
+		return parent::sanitize_for_db($value);
 	}
 
 	/**
 	 * Displays the field
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo (optional)
 	 */
-	public function display( $post_id, $echo = true ) {
-		$value = $this->get_value($post_id, false);
-		
-		$html  = '<label class="' . $this->args['label']['class'] . '" for="' . $this->get_id() . '">';
-		$html .= '<input type="radio" ' . $this->parse_atts() . ' ' . checked($value, $this->args['value'], false) . ' /> <span>' . $this->args['label']['text'] . '</span></label>';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+	public function display( $post_id ) {
+		$value = $this->get_value($post_id); ?>
+		<label class="<?php echo $this->args['label']['class']; ?>" for="<?php echo $this->get_id(); ?>">
+		<input type="radio" <?php echo $this->parse_atts(); ?> <?php checked($value, $this->args['value']); ?> /> <span><?php echo $this->args['label']['text']; ?></span></label>
+		<?php
 	}
 }

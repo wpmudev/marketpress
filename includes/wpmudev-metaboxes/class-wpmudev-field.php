@@ -11,16 +11,16 @@ class WPMUDEV_Field {
 	private $_value = null;
 	
 	/**
-	 * Refers to the field's subfield id (repeater field will set this)
+	 * Refers to the field's subfield id (repeater/complex field will set this)
 	 *
 	 * @since 1.0
-	 * @access private
+	 * @access public
 	 * @var int
 	 */
-	private $_subfield_id = null;
+	var $subfield_id = null;
 	
 	/**
-	 * If the field is a subfield (repeater field will set this)
+	 * If the field is a subfield (repeater/complex field will set this)
 	 *
 	 * @since 1.0
 	 * @access public
@@ -160,17 +160,92 @@ class WPMUDEV_Field {
 	}
 	
 	/**
+	 * Gets the field name attribute
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @return string
+	 */
+	public function get_name() {
+		$name = $this->args['name'];
+		
+		if ( ! is_null($this->subfield_id) && ! empty($name) ) {
+			// Repeater field - add the subfield id
+			$name = str_replace('[new][]', '[existing][' . $this->subfield_id . ']', $name);
+		}
+		
+		return $name;
+	}
+	
+	/**
+	 * Safely retreives a value from the $_POST array
+	 *
+	 * @since 3.0.0
+	 * @uses mp_arr_get_value()
+	 *	 
+	 * @param string $key (e.g. key1->key2->key3)
+	 * @param mixed $default The default value to return if $key is not found within $array
+	 * @return mixed
+	 */	 
+	public function get_post_value( $key, $default = false ) {
+		$keys = explode('->', $key);
+		$keys = array_map('trim', $keys);
+		
+		if ( count($keys) > 0 ) {
+			$value = $this->array_search($_POST, $key);
+		} else {
+			$value = isset($_POST[$keys[0]]) ? $_POST[$keys[0]] : null;
+		}
+		
+		return ( is_null($value) ) ? $default : $value;
+	}
+
+	
+	/**
+	 * Searches an array multidimensional array for a specific path (if it exists)
+	 *
+	 * @since 3.0.0
+	 *
+	 * @param array $array The array we want to search
+	 * @param string $path The path we want to check for (e.g. key1->key2->key3 = $array[key1][key2][key3])
+	 * @return mixed
+	 */
+	public function array_search( $array, $path ) {
+		$keys = explode('->', $path);
+		$keys = array_map('trim', $keys);
+		
+		for ( $i = $array; ($key = array_shift($keys)) !== null; $i = $i[$key] ) {
+	    if ( ! isset($i[$key]) ) {
+	    	return null;
+	    }
+	  }
+	  
+	  return $i;
+	}
+
+	/**
 	 * Saves the field to the database.
 	 *
 	 * @since 1.0
 	 * @access public
 	 * @action save_post
 	 * @param int $post_id
-	 * @param $value (optional)
+	 * @param string $meta_key The meta key to use when storing the field value. Defaults to null.
+	 * @param mixed $value The value of the field. Defaults to null.
+	 * @param bool $force Whether to bypass the is_subfield check. Subfields normally don't run their own save routine. Defaults to false.
 	 */
-	public function save_value( $post_id, $value = null ) {
+	public function save_value( $post_id, $meta_key = null, $value = null, $force = false ) {
+		if ( $this->is_subfield && ! $force ) {
+			return;	
+		}
+		
 		if ( is_null($value) ) {
-			$value = isset($_POST[$this->args['name']]) ? $_POST[$this->args['name']] : '';
+			$post_key = $this->get_post_key();
+			$value = $this->get_post_value($post_key, null);
+		}
+		
+		if ( is_null($meta_key) ) {
+			$meta_key = $this->get_meta_key();
 		}
 		
 		/**
@@ -183,15 +258,62 @@ class WPMUDEV_Field {
 		 */
 		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
 		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $value, $post_id, $this);
-		
+
 		if ( is_null($value) ) {
 			return;
 		}
-				
-		update_post_meta($post_id, $this->args['name'], $value);
-		update_post_meta($post_id, '_' . $this->args['name'], get_class($this));		
+		
+		update_post_meta($post_id, $meta_key, $value);
+		update_post_meta($post_id, '_' . $meta_key, get_class($this));
 	}
-	
+
+	/**
+	 * Gets the correct meta key from a field's name
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @return string
+	 */
+	public function get_meta_key() {
+		if ( strpos($this->args['original_name'], '[') === false ) {
+			return $this->args['original_name'];
+		}
+		
+		$name_parts = explode('[', $this->args['name']);
+		
+		foreach ( $name_parts as &$part ) {
+			$part = rtrim($part, ']');
+		}
+		
+		$name_parts = array_filter($name_parts, create_function('$x', 'return ! empty($x);'));
+		
+		return array_shift($name_parts);	
+	}
+
+	/**
+	 * Gets the correct post key from a field's name
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @return string
+	 */
+	public function get_post_key() {
+		if ( strpos($this->args['name'], '[') === false ) {
+			// Name isn't an array so just return the name
+			return $this->args['name'];
+		}
+		
+		$name_parts = explode('[', $this->args['name']);
+		
+		foreach ( $name_parts as &$part ) {
+			$part = rtrim($part, ']');
+		}
+		
+		$name_parts = array_filter($name_parts, create_function('$x', 'return ! empty($x);'));
+		
+		return implode('->', $name_parts);
+	}
+
 	/**
 	 * Sets the value essentially overriding the internal get_value() function
 	 *
@@ -204,6 +326,18 @@ class WPMUDEV_Field {
 	}
 	
 	/**
+	 * Set the internal meta key for retrieving/saving the field's value
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param string @meta_key
+	 */
+	
+	public function set_meta_key( $meta_key ) {
+		$this->_meta_key = $meta_key;
+	}
+	
+	/**
 	 * Sets the subfield's id (for repeater fields)
 	 *
 	 * @since 1.0
@@ -211,7 +345,7 @@ class WPMUDEV_Field {
 	 * @param mixed $id
 	 */
 	public function set_subfield_id( $id ) {
-		$this->_subfield_id = $id;
+		$this->subfield_id = $id;
 	}
 	
 	/**
@@ -220,19 +354,24 @@ class WPMUDEV_Field {
 	 * @since 1.0
 	 * @access public
 	 * @param mixed $post_id
+	 * @param string $meta_key
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 	 * @return mixed
 	 */
-	public function get_value( $post_id, $raw = false ) {
+	public function get_value( $post_id, $meta_key = null, $raw = false ) {
 		$value = null;
 		
 		if ( ! is_null($this->_value) ) {
-			return $this->_value;
+			return $this->format_value($this->_value);
+		}
+		
+		if ( is_null($meta_key) ) {
+			$meta_key = $this->get_meta_key();
 		}
 		
 		if ( ! empty($post_id) ) {
-			if ( metadata_exists(get_post_type($post_id), $post_id, $this->args['name']) ) {
-				$value = get_post_meta($post_id, $this->args['name'], true);
+			if ( metadata_exists('post', $post_id, $meta_key) ) {
+				$value = get_post_meta($post_id, $meta_key, true);
 				
 				if ( $value === '' ) {
 					$value = $this->args['default_value'];
@@ -263,6 +402,17 @@ class WPMUDEV_Field {
 		
 		return $value;
 	}
+	
+	/**
+	 * Gets the API field value (e.g. called from frontend)
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @return mixed
+	 */
+	public function get_api_value() {
+		//! TODO
+	}
 
 	/**
 	 * Formats the field value for display.
@@ -283,6 +433,33 @@ class WPMUDEV_Field {
 	}
 	
 	/**
+	 * Recursively call a function over an array
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param array $array
+	 * @param string $callback
+	 * @return array
+	 */
+	public function array_map_deep( $array, $callback ) {
+    $new = array();
+    
+    if ( is_array($array) ) {
+    	foreach ( $array as $key => $val ) {
+        if ( is_array($val) ) {
+        	$new[$key] = $this->array_map_deep($val, $callback);
+        } else {
+        	$new[$key] = call_user_func($callback, $val);
+        }
+      }
+    } else {
+    	$new = call_user_func($callback, $array);
+    }
+    
+    return $new;
+}   
+	
+	/**
 	 * Sanitizes the field value before saving to database.
 	 *
 	 * @since 1.0
@@ -290,6 +467,8 @@ class WPMUDEV_Field {
 	 * @param $value
 	 */	
 	public function sanitize_for_db( $value ) {
+		$value = is_array($value) ? $this->array_map_deep($value, 'trim') : trim($value);
+		
 		/**
 		 * Modify the value right before it's saved to the database.
 		 *
@@ -385,11 +564,7 @@ class WPMUDEV_Field {
 	public function parse_atts() {
 		$atts = '';
 		$args = $this->args; //make a copy of field args so as to not overwrite
-		
-		if ( ! is_null($this->_subfield_id) && ! empty($args['name']) ) {
-			// repeater field - add the subfield id
-			$args['name'] = str_replace('[new][]', '[existing][' . $this->_subfield_id . ']', $args['name']);
-		}
+		$args['name'] = $this->get_name();
 		
 		foreach ( $this->default_atts as $key ) {
 			if ( empty($args[$key]) ) {

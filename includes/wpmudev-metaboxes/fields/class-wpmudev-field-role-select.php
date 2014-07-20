@@ -62,9 +62,8 @@ jQuery(document).ready(function($){
 	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
+	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
 		$data = array();
 		$roles = explode(',', $value);
@@ -73,15 +72,9 @@ jQuery(document).ready(function($){
 			$data[] = $role . '->' . $role;
 		}
 		
-		$this->args['custom']['data-select2-value'] = implode('||', $data);
-	
-		echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . esc_attr($value) . '" />';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+		$this->args['custom']['data-select2-value'] = implode('||', $data); ?>
+		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" />
+		<?php
 	}
 	
 	/**

@@ -10,12 +10,8 @@ class WPMUDEV_Field_Textarea extends WPMUDEV_Field {
 	 * @param bool $echo
 	 */
 	public function display( $post_id, $echo = true ) {
-		$html = '<textarea ' . $this->parse_atts() . '>' . $this->get_value($post_id) . '</textarea>';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+		?>
+		<textarea <?php echo $this->parse_atts(); ?>><?php echo esc_textarea($this->get_value($post_id)); ?></textarea>
+		<?php
 	}
 }

@@ -128,34 +128,20 @@ jQuery(document).ready(function($){
 	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
+	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
-		$html = '';
 		
-		if ( $value ) {
-			$img_url = wp_get_attachment_image_src($value, $this->args['preview_size']);
-			$html .= '<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit wpmudev-image-field-select dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="' + $img_url + '" alt="" /></div>';
-		} else {
-			$html .= '<a class="button wpmudev-image-field-select" href="javascript:;">' . __('Select Image', 'wpmudev_metaboxes') . '</a>';
-		}
+		if ( $value ) :
+			$img_url = wp_get_attachment_image_src($value, $this->args['preview_size']); ?>
+		<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit wpmudev-image-field-select dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="<?php echo $img_url; ?>" alt="" /></div>
+		<?php
+		else : ?>
+		<a class="button wpmudev-image-field-select" href="javascript:;"><?php _e('Select Image', 'wpmudev_metaboxes'); ?></a>
+		<?php
+		endif; ?>
 		
-		$html .= '<input type="hidden" ' . $this->parse_atts() . ' value="' . $value . '" />';
-
-		/**
-		 * Modify the display HTML before return/output.
-		 *
-		 * @since 1.0
-		 * @param string $html The current display HTML.
-		 * @param object $this The current field object.
-		 */		
-		$html = apply_filters('wpmudev_field_image_display', $html, $this);
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" />
+		<?php
 	}
 }

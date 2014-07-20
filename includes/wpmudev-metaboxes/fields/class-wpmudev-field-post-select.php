@@ -100,8 +100,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 	 * @access public
 	 */	
 	public function print_scripts() {
-		parent::print_scripts();
-	?>
+		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
 	$('input.wpmudev-post-select').each(function(){
@@ -144,7 +143,8 @@ jQuery(document).ready(function($){
 	});
 });
 </script>
-	<?php		
+		<?php
+		parent::print_scripts();
 	}
 
 	/**
@@ -153,9 +153,8 @@ jQuery(document).ready(function($){
 	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
-	 * @param bool $echo
 	 */
-	public function display( $post_id, $echo = true ) {
+	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
 		$data = array();
 		$ids = explode(',', $value);
@@ -164,15 +163,9 @@ jQuery(document).ready(function($){
 			$data[] = $id . '->' . get_the_title($id);
 		}
 		
-		$this->args['custom']['data-select2-value'] = implode('||', $data);
-	
-		echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . esc_attr($value) . '" />';
-		
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+		$this->args['custom']['data-select2-value'] = implode('||', $data); ?>
+		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php $value; ?>" />
+		<?php
 	}
 	
 	/**
