@@ -36,11 +36,17 @@ class MP_Products_Screen {
 		// Product variations save/get value
 		add_filter('wpmudev_field_save_value_variations', array(&$this, 'save_product_variations'), 10, 3);
 		add_filter('wpmudev_field_get_value_variations', array(&$this, 'get_product_variations'), 10, 4);
-				
+		// Product attributes save/get value
+		$mp_product_atts = MP_Product_Attributes::get_instance();
+		$atts = $mp_product_atts->get();
+		foreach ( $atts as $att ) {
+			add_filter('wpmudev_field_save_value_' . $mp_product_atts->generate_slug($att->attribute_id), array(&$this, 'save_product_attribute'), 10, 3);
+		}
+		
 		// Init metaboxes
 		$this->init_product_details_metabox();
+		$this->init_attributes_metabox();
 		$this->init_variations_metabox();
-		$this->init_attributes_metabox();	
 	}
 		
 	/**
@@ -51,6 +57,19 @@ class MP_Products_Screen {
 	 */
 	public function remove_menu_items() {
 		remove_submenu_page('edit.php?post_type=product', 'post-new.php?post_type=product');
+	}
+
+	/**
+	 * Saves the product attributes to the database
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wpmudev_field_save_value_product_attr_*
+	 */	
+	public function save_product_attribute( $value, $post_id, $field ) {
+		$slug = $field->args['name'];
+		wp_set_post_terms($post_id, $value, $slug);
+		return $value;
 	}
 	
 	/**
@@ -101,7 +120,7 @@ class MP_Products_Screen {
 		$sorted = $field->sort_subfields($variations);
 		$outer_index = 0;
 		$ids = array();
-		$where = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id";
+		$delete_where = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id";
 		
 		if ( mp_get_post_value('has_variations', false) ) {
 			foreach ( $sorted as $type => $array ) {
@@ -148,15 +167,15 @@ class MP_Products_Screen {
 				}
 			}
 			
-			$where .= " AND {$wpdb->posts}.ID NOT IN (" . implode(',', $ids) . ")";
+			$delete_where .= " AND {$wpdb->posts}.ID NOT IN (" . implode(',', $ids) . ")";
 		}
 		
-		// Delete variations that no longer exists
+		// Delete variations that no longer exist
 		$wpdb->query("
 			DELETE FROM $wpdb->posts
 			USING $wpdb->posts
 			INNER JOIN $wpdb->postmeta
-			WHERE $where"
+			WHERE $delete_where"
 		);
 		
 		return null; // Returning null will bypass internal save mechanism
@@ -442,7 +461,7 @@ class MP_Products_Screen {
 			));
 			$repeater->add_sub_field('section', array(
 				'title' => __('Variation Attributes', 'mp'),
-				'desc' => __('Choose the attribute(s) that this variation should be associated with.', 'mp'),
+				'desc' => __('Choose the attribute(s) that make this variation unique.', 'mp'),
 			));
 			
 			$mp_product_atts = MP_Product_Attributes::get_instance();
@@ -482,7 +501,30 @@ class MP_Products_Screen {
 			'title' => __('Attributes', 'mp'),
 			'post_type' => 'product',
 			'context' => 'normal',
-		));		
+		));
+		
+		$mp_product_atts = MP_Product_Attributes::get_instance();
+		$atts = $mp_product_atts->get();
+		foreach ( $atts as $att ) {
+			$slug = $mp_product_atts->generate_slug($att->attribute_id);
+			$terms = get_terms($slug, 'hide_empty=0');
+			$options = array();
+			
+			foreach ( $terms as $term ) {
+				$options[$term->term_id] = $term->name;
+			}
+			
+			$metabox->add_field('advanced_select', array(
+				'name' => $slug,
+				'label' => array('text' => $att->attribute_name),
+				'options' => $options,
+				'conditional' => array(
+					'name' => 'product_type',
+					'value' => array('physical', 'digital'),
+					'action' => 'show',
+				),	
+			));
+		}	
 	}
 }
 

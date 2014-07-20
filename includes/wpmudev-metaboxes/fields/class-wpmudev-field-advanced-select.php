@@ -17,7 +17,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	public function on_creation( $args ) {
 		$this->args = wp_parse_args($args, array(
 			'multiple' => true,
-			'placeholder' => __('Select One', 'mp'),
+			'placeholder' => __('Select Some Options', 'mp'),
 			'options' => array(),
 		));
 		
@@ -74,18 +74,6 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	
 	$(document).ready(function(){
 		initSelect2();
-		
-		$('.wpmudev-field').on('click', '.wpmudev-advanced-select-all-link', function(){
-			var $this = $(this),
-					options = [];
-			
-			$($this.siblings('.wpmudev-advanced-select').attr('data-options').split('||')).each(function(){
-				var val = this.split('=');
-				options.push(val[0]);
-			});
-			
-			console.log(options);
-		});
 	});
 }(jQuery));
 </script>

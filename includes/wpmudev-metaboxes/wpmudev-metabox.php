@@ -108,7 +108,7 @@ class WPMUDEV_Metabox {
 	 *		@type array $screen_ids The screen ID(s) to display the metabox on
 	 *		@type string $context The context of the metabox (advanced, normal, side)
 	 *		@type string $priority The priority of the metabox (default, high, normal)
-	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. mp_settings)
+	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings)
 	 * }
 	 */
 	public function __construct( $args = array() ) {
