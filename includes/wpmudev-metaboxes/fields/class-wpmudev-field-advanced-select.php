@@ -45,6 +45,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			});
 			
 			$this.select2({
+				"allowSelectAllNone" : true,
 				"multiple" : <?php echo $this->args['multiple']; ?>,
 				"placeholder" : "<?php echo $this->args['placeholder']; ?>",
 				"initSelection" : function(element, callback){
@@ -73,6 +74,18 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	
 	$(document).ready(function(){
 		initSelect2();
+		
+		$('.wpmudev-field').on('click', '.wpmudev-advanced-select-all-link', function(){
+			var $this = $(this),
+					options = [];
+			
+			$($this.siblings('.wpmudev-advanced-select').attr('data-options').split('||')).each(function(){
+				var val = this.split('=');
+				options.push(val[0]);
+			});
+			
+			console.log(options);
+		});
 	});
 }(jQuery));
 </script>
@@ -102,7 +115,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 		$value = $this->get_value($post_id);
 		$vals = explode(',', $value);
 		$values = array();
-		$options = array('-1' => __('All', 'wpmudev_metaboxes'));
+		$options = array();
 		
 		foreach ( $vals as $val ) {
 			$values[] = $val . '=' . $this->args['options'][$val];
