@@ -1499,7 +1499,7 @@ function _mp_global_products_html_list( $results, $args ) {
 			}
 			
 			//button
-			$meta .= mp_buy_button(false, 'list', $post->ID);
+			$meta .= '<a class="mp_link_buynow" href="' . get_permalink($post->ID) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 			$html .= apply_filters('mp_product_list_meta', $meta, $post->ID);
 			$html .= '
 						</div>
@@ -1568,7 +1568,7 @@ function _mp_global_products_html_grid( $results, $args ) {
 
 					<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
 						' . (( $args['show_price'] ) ? mp_product_price(false, $post->ID) : '') . '
-						' . mp_buy_button(false, 'list', $post->ID) . '
+						<a class="mp_link_buynow" href="' . get_permalink($post->ID) . '">' . __('Buy Now &raquo;', 'mp') . '</a>
 						' . apply_filters('mp_product_list_meta', '', $post->ID) . '
 					</div>
 					

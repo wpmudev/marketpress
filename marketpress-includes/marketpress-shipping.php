@@ -299,8 +299,9 @@ class MP_Shipping_Handler {
 	function process_shipping_form() {
 		if (isset($_POST['shipping_option']))
 			$_SESSION['mp_shipping_info']['shipping_option'] = trim($_POST['shipping_option']);
-		if (isset($_POST['shipping_sub_option']))
+		if (isset($_POST['shipping_sub_option'])) {
 			$_SESSION['mp_shipping_info']['shipping_sub_option'] = trim($_POST['shipping_sub_option']);
+		}
 	}
 
 	function shipping_sub_options() {

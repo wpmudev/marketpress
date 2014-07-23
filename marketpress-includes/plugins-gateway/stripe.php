@@ -528,6 +528,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		 *	array. Don't forget to return!
 		 */
 		function process_gateway_settings($settings) {
+			$settings['gateways']['stripe']['embedded_form_type'] = ( ! isset($_POST['mp']['gateways']['stripe']['embedded_form_type']) ) ? '' : $_POST['mp']['gateways']['stripe']['embedded_form_type'];
 			return $settings;
 		}
 

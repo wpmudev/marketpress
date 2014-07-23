@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.5
+Version: 2.9.5.1
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 */
 
 class MarketPress {
-	var $version = '2.9.5';
+	var $version = '2.9.5.1';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -2660,11 +2660,6 @@ Thanks again!", 'mp')
 	 $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : (isset($meta['country']) ? $meta['country'] : '');
 	 $selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
 
-	 // validate selected option
-	 if ( isset($_SESSION['mp_shipping_info']['shipping_option']) && $_SESSION['mp_shipping_info']['shipping_option'] != $this->get_setting('shipping->method') ) {
-		 unset($_SESSION['mp_shipping_info']['shipping_option'], $_SESSION['mp_shipping_info']['shipping_sub_option'], $_SESSION['mp_shipping_info']['shipping_cost']);
-	 }
-	 
 	 //check required fields
 	 if ( empty($address1) || empty($city) || !$this->is_valid_zip($zip, $country) || empty($country) || !(is_array($cart) && count($cart)) )
 		return false;
@@ -4645,7 +4640,7 @@ Thanks again!", 'mp')
 		remove_all_filters( 'wp_mail_from_name' );
 
 		//add our own filters
-		add_filter( 'wp_mail_from_name', create_function('', 'return get_bloginfo("name");') );
+		add_filter( 'wp_mail_from_name', create_function('', 'return wp_specialchars_decode(get_bloginfo("name"), ENT_QUOTES);') );
 		add_filter( 'wp_mail_from', create_function('', '$settings = get_option("mp_settings");return isset($settings["store_email"]) ? $settings["store_email"] : get_option("admin_email");') );
 
 		//convert all newlines and tabs to their approriate html markup
@@ -4790,8 +4785,8 @@ Thanks again!", 'mp')
 		$tracking_url = apply_filters('wpml_marketpress_tracking_url', mp_orderstatus_link(false, true) . $order->post_title . '/');
 
 	 //setup filters
-	 $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFO', 'ORDERINFOSKU', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
-	 $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info, $order_info_sku, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
+	 $search = array('CUSTOMERNAME', 'ORDERID', 'ORDERINFOSKU', 'ORDERINFO', 'SHIPPINGINFO', 'PAYMENTINFO', 'TOTAL', 'TRACKINGURL', 'ORDERNOTES');
+	 $replace = array($order->mp_shipping_info['name'], $order->post_title, $order_info_sku, $order_info, $shipping_info, $payment_info, $order_total, $tracking_url, $order_notes);
 		
 		//escape for sprintf() if required
 		if ($escape) {

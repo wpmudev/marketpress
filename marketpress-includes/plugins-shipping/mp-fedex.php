@@ -429,8 +429,14 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
 	*  array. Don't forget to return!
 	*/
-	function process_shipping_settings($settings) {
-
+	function process_shipping_settings( $settings ) {
+		$services = array_merge($this->services, $this->intl_services);
+		foreach ( $services as $service => $detail ) {
+			$settings['shipping']['fedex']['services'][$service] = (int) isset($_POST['mp']['shipping']['fedex']['services'][$service]);
+		}
+		
+		$settings['shipping']['fedex']['commercial'] = (int) isset($_POST['mp']['shipping']['fedex']['commercial']);
+				
 		return $settings;
 	}
 

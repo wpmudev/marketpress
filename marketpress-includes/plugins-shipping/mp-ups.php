@@ -39,6 +39,8 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 	*/
 	function on_creation() {
+		global $mp;
+		
 		//set name here to be able to translate
 		$this->public_name = __('UPS', 'mp');
 
@@ -58,7 +60,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		'Worldwide Express Plus' => new UPS_Service('54', __('Worldwide Express Plus', 'mp'), __('(1-3 Days)', 'mp') ),
 		'Saver'                  => new UPS_Service('65', __('Saver', 'mp'),                  __('(1-5 Days)', 'mp') ),
 		);
-
+		
 		//		//International Services
 		//		$this->intl_services = array(
 		//		'Worldwide Express' 		 => new UPS_Service('07', __('Worldwide Express', 'mp') ),
@@ -70,7 +72,13 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		// Get settings for convenience sake
 		$this->settings = get_option('mp_settings');
-		$this->ups_settings = $this->settings['shipping']['ups'];
+		$this->ups_settings =& $this->settings['shipping']['ups'];
+		
+		// Added in 2.9.5.1 - make sure we set the old default which was daily pickup
+		if ( ! isset($this->ups_settings['pickup_type']) ) {
+			$this->ups_settings['pickup_type'] = '01';
+			update_option('mp_settings', $this->settings);
+		}
 	}
 
 	function default_boxes(){
@@ -291,6 +299,20 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 								<?php foreach($this->services as $name => $service) : ?>
 								<label>
 									<input type="checkbox" name="mp[shipping][ups][services][<?php echo $name; ?>]" value="1" <?php checked($this->ups_settings['services'][$name], 1); ?> />&nbsp;<?php echo $service->name; ?>
+								</label><br />
+								<?php endforeach; ?>
+							</td>
+						</tr>
+						
+						<tr>
+							<th scope="row">
+								<?php _e('Pickup type', 'mp') ?>
+								<br /><span class="description"><?php _e('For the most accurate rates, please select the appropriate pick up type for your business.','mp'); ?></span>
+							</th>
+							<td>
+								<?php foreach ( array('01' => __('Daily Pickup', 'mp'), '03' => __('Customer Counter', 'mp'), '06' => __('One Time Pickup', 'mp')) as $code => $label ) : ?>
+								<label>
+									<input type="radio" name="mp[shipping][ups][pickup_type]" value="01" <?php checked($code, $this->ups_settings['pickup_type']); ?> /> <?php echo $label; ?>
 								</label><br />
 								<?php endforeach; ?>
 							</td>
@@ -566,7 +588,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		//Build Authorization XML
 		$auth_dom = new DOMDocument('1.0', 'utf-8');
-		$auth_dom->formatOutout = true;
+		$auth_dom->formatOutput = true;
 		$root = $auth_dom->appendChild($auth_dom->createElement('AccessRequest'));
 		$root->setAttribute('xml:lang', 'en-US');
 		$root->appendChild($auth_dom->createElement('AccessLicenseNumber',$this->ups_settings['api_key']));
@@ -589,7 +611,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$request->appendChild($dom->createElement('RequestOption', 'Shop'));
 
 		$pickup = $root->appendChild($dom->createElement('PickupType'));
-		$pickup->appendChild($dom->createElement('Code', '01'));
+		$pickup->appendChild($dom->createElement('Code', $this->ups_settings['pickup_type']));
 
 		//Shipper
 		$shipment = $root->appendChild($dom->createElement('Shipment'));
@@ -619,7 +641,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$package = $shipment->appendChild($dom->createElement('Package'));
 
 		$packaging_type = $package->appendChild($dom->createElement('PackagingType') );
-		$packaging_type->appendChild($dom->createElement('Code', '02'));
+		$packaging_type->appendChild($dom->createElement('Code', '00'));
 
 		//Dimensions
 		$dimensions = $package->appendChild($dom->createElement('Dimensions') );

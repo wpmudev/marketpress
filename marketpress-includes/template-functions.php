@@ -439,7 +439,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 					if ( ($shipping_price = $mp->shipping_price()) !== false ) {
 						$shipping_prices[] = $shipping_price;
 					}
-
+					
 					if ( ($shipping_tax_price = $mp->shipping_tax_price($shipping_price)) !== false ) {
 						$shipping_tax_prices[] = $shipping_tax_price;
 					}
@@ -535,10 +535,11 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				$tax_prices = array();
 				$coupon_code = $mp->get_coupon_code();
 
-				foreach ($selected_cart as $bid => $cart) {
+				foreach ( $selected_cart as $bid => $cart ) {
 
-						if (is_multisite())
-								switch_to_blog($bid);
+						if ( is_multisite() ) {
+							switch_to_blog($bid);
+						}
 								
 						foreach ($cart as $product_id => $variations) {
 								foreach ($variations as $variation => $data) {
