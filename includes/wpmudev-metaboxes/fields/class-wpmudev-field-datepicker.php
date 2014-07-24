@@ -92,7 +92,11 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function format_value( $value ) {
-		$value = $this->is_timestamp($value) ? date('Y-m-d', $value) : $value;
+		if ( ! empty($value) ) {
+			$value = $this->is_timestamp($value) ? $value : strtotime($value);
+			$value = date_i18n(get_option('date_format'), $value);
+		}
+		
 		return apply_filters('wpmudev_field_format_value', $value, $post_id, $this);
 	}
 
@@ -104,7 +108,7 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @param $value
 	 */	
 	public function sanitize_for_db( $value ) {
-		$value = empty($value) ? $value : strtotime($value);
+		$value = $this->is_timestamp($value) ? date('Y-m-d', $value) : $value;
 		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
 	}
 		
@@ -136,9 +140,9 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-		$value = $this->get_value($post_id); ?>
-		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" />
-		<input type="text" class="wpmudev-datepicker-field" value="<?php echo ( empty($value) ) ? '' : date_i18n(get_option('date_format'), strtotime($value)); ?>" />
+		?>
+		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $this->get_value($post_id, null, true); ?>" />
+		<input type="text" class="wpmudev-datepicker-field" value="<?php echo $this->get_value($post_id); ?>" />
 		<?php
 	}
 }

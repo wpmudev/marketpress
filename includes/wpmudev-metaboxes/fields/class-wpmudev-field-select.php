@@ -13,9 +13,9 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'options' => array(),
-		));
+		), $args);
 	}
 	
 	/**
@@ -30,7 +30,7 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 		<select <?php echo $this->parse_atts(); ?>>
 		<?php
 		foreach ( $this->args['options'] as $val => $label ) : ?>
-			<option value="<?php echo esc_attr($val); ?>" <?php selected($val, $value); ?>><?php esc_attr($label); ?></option>
+			<option value="<?php echo esc_attr($val); ?>" <?php selected($val, $value); ?>><?php echo esc_attr($label); ?></option>
 		<?php
 		endforeach; ?>
 		</select>

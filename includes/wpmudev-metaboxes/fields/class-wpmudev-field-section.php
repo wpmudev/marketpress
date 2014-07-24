@@ -13,9 +13,9 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 	 * }	 
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'title' => __('Section Title', 'wpmudev_metaboxes'),
-		));
+		), $args);
 	}
 
 	/**
@@ -26,12 +26,26 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-		?>
-		<h2 class="wpmudev-section-title"><?php echo $this->args['title']; ?></h2>
+		$class = 'wpmudev-field-section-wrap';
+		$atts = '';
+		
+		foreach ( $this->args['custom'] as $key => $att ) {
+			if ( strpos($key, 'data-conditional') !== false ) {
+				$atts .= ' ' . $key . '="' . esc_attr($att) . '"';
+			}
+		}
+		
+		if ( strlen($atts) > 0 ) {
+			$class .= ' wpmudev-field-has-conditional';
+		} ?>
+		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
+			<h2 class="wpmudev-section-title"><?php echo $this->args['title']; ?></h2>
+			<?php
+			if ( ! empty($this->args['desc']) ) : ?>
+			<p><?php echo $this->args['desc']; ?></p>
+			<?php
+			endif; ?>
+		</div>
 		<?php
-		if ( ! empty($this->args['desc']) ) : ?>
-		<p><?php echo $this->args['desc']; ?></p>
-		<?php
-		endif;
 	}
 }

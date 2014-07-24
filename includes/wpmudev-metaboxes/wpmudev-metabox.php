@@ -102,25 +102,27 @@ class WPMUDEV_Metabox {
 	 * @param array $args {
 	 *		An array of arguments. Optional.
 	 *
-	 *		@type string $id The id of the metabox (required)
-	 *		@type string $title The title of the metabox (required)
-	 *		@type string $post_type The post type to display the metabox on
-	 *		@type array $screen_ids The screen ID(s) to display the metabox on
-	 *		@type string $context The context of the metabox (advanced, normal, side)
-	 *		@type string $priority The priority of the metabox (default, high, normal)
-	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings)
+	 *		@type string $id The id of the metabox (required).
+	 *		@type string $title The title of the metabox (required).
+	 *		@type string $desc The description of the metabox.
+	 *		@type string $post_type The post type to display the metabox on.
+	 *		@type array $screen_ids The screen ID(s) to display the metabox on.
+	 *		@type string $context The context of the metabox (advanced, normal, side).
+	 *		@type string $priority The priority of the metabox (default, high, normal).
+	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
 	 * }
 	 */
 	public function __construct( $args = array() ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'id' => '',
 			'title' => '',
+			'desc' => null,
 			'post_type' => '',
 			'screen_ids' => array(),
 			'context' => 'advanced',
 			'priority' => 'default',
 			'option_name' => '',
-		));
+		), $args);
 		
 		$this->load_fields();
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
@@ -315,32 +317,66 @@ class WPMUDEV_Metabox {
 			$post = $post->ID;
 		}
 		
-		if ( $this->is_settings_metabox() ) {
-			echo '<div id="poststuff">';
-				echo '<div class="meta-box-sortables">';
-					echo '<div class="postbox wpmudev-postbox">';
-						echo '<div class="inside">';
-							echo '<h3 class="hndle"><span>' . $this->args['title'] . '</span></h3>';
-		}
+		if ( $this->is_settings_metabox() ) : ?>
+			<div id="poststuff">
+				<div class="meta-box-sortables">
+					<div class="postbox wpmudev-postbox">
+						<div class="inside">
+							<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
+		<?php
+		endif;
 		
-							echo '<div class="wpmudev-fields clearfix">';
-				
-							foreach ( $this->fields as $field ) {
-								echo '<div class="wpmudev-field ' . str_replace('_', '-', strtolower(get_class($field))) . '">';
-									echo '<div class="wpmudev-field-label">' . $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : '') . '</div>';
-									echo '<div class="wpmudev-field-desc">' . $field->args['desc'] . '</div>';
-									$field->display($post);
-								echo '</div>';
-							}
-				
-							echo '</div>';
-		
-		if ( $this->is_settings_metabox() ) {
-						echo '</div>';
-					echo '</div>';
-				echo '</div>';
-			echo '</div>';
-		}
+		if ( ! is_null($this->args['desc']) ) : ?>
+							<div class="wpmudev-metabox-desc"><?php echo $this->args['desc']; ?></div>
+		<?php
+		endif; ?>
+							<div class="wpmudev-fields clearfix">
+		<?php
+		foreach ( $this->fields as $field ) : ?>
+								<div class="wpmudev-field <?php echo str_replace('_', '-', strtolower(get_class($field))); ?>">
+									<div class="wpmudev-field-label"><?php echo $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : ''); ?></div>
+									<div class="wpmudev-field-desc"><?php echo $field->args['desc']; ?></div>
+									<?php $field->display($post); ?>
+								</div>
+		<?php
+		endforeach; ?>
+							</div>
+		<?php
+		if ( $this->is_settings_metabox() ) : ?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php
+		endif;
+	}
+	
+	/**
+	 * Pushes a value with a given array with given key
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param array $array The array to work with.
+	 * @param string $key_string
+	 * @param mixed $value
+	 */
+	public function push_to_array( $array, $key_string, $value ) {
+    $keys = explode('->', $key_string);
+    $branch = &$array;
+    
+    while ( count($keys) ) {
+    	$key = array_shift($keys);
+    	
+	    if ( ! is_array($branch) ) {
+		  	$branch = array();
+	    }	
+	        
+	    $branch = &$branch[$key];
+    }
+    
+    $branch = $value;
+    
+    return $array;
 	}
 	
 	/**
@@ -356,28 +392,41 @@ class WPMUDEV_Metabox {
 			// Bail - nonce is not set or could not be verified
 			return;
 		}
-
-		// Make sure we only run once
-		if ( wp_cache_get('save_fields', 'wpmudev_metaboxes') ) {
-			return;
-		}
-		wp_cache_set('save_fields', true, 'wpmudev_metaboxes');
 		
 		// Avoid infinite loops later (e.g. when calling wp_insert_post, etc)
 		remove_action('save_post', array(&$this, 'save_fields'));
 		
-		// Make sure $post_id isn't a revision
-		if ( wp_is_post_revision($post_id) ) {
-			return;
-		}
+		// For settings metaboxes we don't want to call the internal save methods for each field
+		if ( ! is_numeric($post_id) ) {
+			$settings = get_option($post_id, array());
+			
+			foreach ( $this->fields as $field ) {
+				$post_key = $field->get_post_key($field->args['name']);
+				$value = $field->sanitize_for_db($field->get_post_value($post_key));
+				$settings = $this->push_to_array($settings, $post_key, $value);
+			}
+			
+			update_option($post_id, $settings);
+		} else {	
+			// Make sure $post_id isn't a revision
+			if ( wp_is_post_revision($post_id) ) {
+				return;
+			}
+
+			// Make sure we only run once
+			if ( wp_cache_get('save_fields', 'wpmudev_metaboxes') ) {
+				return;
+			}
+			wp_cache_set('save_fields', true, 'wpmudev_metaboxes');
 		
-		/**
-		 * Fires after the appropriate nonce's have been verified for fields to tie into.
-		 *
-		 * @since 3.0
-		 * @param int $post_id Post ID.
-		 */
-		do_action('wpmudev_metaboxes_save_fields', $post_id);
+			/**
+			 * Fires after the appropriate nonce's have been verified for fields to tie into.
+			 *
+			 * @since 3.0
+			 * @param int $post_id Post ID.
+			 */
+			do_action('wpmudev_metaboxes_save_fields', $post_id);
+		}
 	}
 	
 	/**

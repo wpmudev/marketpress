@@ -31,6 +31,8 @@ class MP_Store_Settings_Admin {
 	 * @access private
 	 */
 	private function __construct() {
+		mp_include_dir(mp_plugin_dir('includes/admin/store-settings/'));
+		
 		//print scripts for setting the active admin menu item when on the product tag page
 		add_action('admin_footer', array(&$this, 'print_product_tag_scripts'));
 		//print scripts for setting the active admin menu item when on the product category page
@@ -46,9 +48,22 @@ class MP_Store_Settings_Admin {
 			}
 			
 			return;
+		} else {
+			$screen_ids = array(
+				'toplevel_page_store-settings',
+				'store-settings_page_store-settings-presentation',
+				'store-settings_page_store-settings-messaging',
+				'store-settings_page_store-settings-shipping',
+				'store-settings_page_store-settings-payments',
+				'store-settings_page_store-settings-importers'
+			);
+			
+			foreach ( $screen_ids as $screen_id ) {
+				add_action($screen_id, array(&$this, 'display_settings_form'));
+			}			
 		}
 		
-		add_action('store-settings_page_store-settings-productattributes', array('MP_Product_Attributes_Admin', 'display_product_attributes'));
+		//add_action('current_screen', function() { echo get_current_screen()->id; });		
 	}
 
 	/**

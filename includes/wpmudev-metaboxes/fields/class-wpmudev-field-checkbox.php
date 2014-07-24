@@ -14,10 +14,10 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'value' => 1,
 			'message' => '',
-		));
+		), $args);
 	}
 	
 	/**

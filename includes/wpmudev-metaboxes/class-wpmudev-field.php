@@ -98,13 +98,17 @@ class WPMUDEV_Field {
 	 *	@type array $conditional {
 	 *		Conditionally hide/show this field if another field value is a certain value.
 	 *
+	 *		Example 1: array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show');
+	 *		Example 2: array('operator' => 'AND', array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'), array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'));
+	 *		Example 3: array('operator' => 'OR', array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'), array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'));
+	 *
 	 *		@type string $name The name of the field to do the comparison on.
-	 *		@type string $value The value to check against.
+	 *		@type string $value The value to check against. Use "-1" to check for a checkbox being unchecked.
 	 *		@type string $action The action to perform (show/hide).
 	 *	}
 	 */
 	public function __construct( $args = array() ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'name' => '',
 			'id' => '',
 			'class' => '',
@@ -119,14 +123,14 @@ class WPMUDEV_Field {
 			'custom_validation_message' => '',
 			'validation' => array(),	
 			'conditional' => array(),
-		));
-		
-		if ( $this->args['value_only'] ) {
-			return false;
-		}
+		), $args);
 		
 		if ( empty($this->args['original_name']) ) {
 			$this->args['original_name'] = $this->args['name'];
+		}
+		
+		if ( $this->args['value_only'] ) {
+			return false;
 		}
 		
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
@@ -137,28 +141,73 @@ class WPMUDEV_Field {
 			add_action('in_admin_footer', array(&$this, 'print_scripts'));
 		}
 		
-		if ( ! empty($this->args['conditional']) ) {
-			$this->args['custom']['data-conditional-name'] = $this->args['conditional']['name'];
-			$this->args['custom']['data-conditional-value'] = ( is_array($this->args['conditional']['value']) && count($this->args['conditional']['value']) > 1 ) ? implode('||', $this->args['conditional']['value']) : $this->args['conditional']['value'];
-			$this->args['custom']['data-conditional-action'] = $this->args['conditional']['action'];
-		}
-		
-		if ( ! empty($this->args['validation']) ) {
-			foreach ( $this->args['validation'] as $key => $val ) {
-				if ( $key == 'custom' ) {
-					$this->args['custom']['data-custom-validation'] = $val;
-				}
-				elseif ( is_bool($val) === true ) {
-					$this->args['class'] .= " $key";
-				} else {
-					$this->args['custom'][$key] = $val;
-				}
-			}
-		}
-		
+		$this->init_conditional_logic();
+		$this->init_validation();
 		$this->on_creation($this->args);
 	}
 	
+	/**
+	 * Initializes validation attributes
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function init_validation() {
+		if ( empty($this->args['validation']) ) {
+			return;
+		}
+		
+		foreach ( $this->args['validation'] as $key => $val ) {
+			if ( $key == 'custom' ) {
+				$this->args['custom']['data-custom-validation'] = $val;
+			}
+			elseif ( $val === 1 ) {
+				$this->args['class'] .= " $key";
+			} else {
+				$this->args['custom'][$key] = $val;
+			}
+		}
+	}
+	
+	/**
+	 * Initializes conditional logic attributes
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function init_conditional_logic() {
+		if ( empty($this->args['conditional']) ) {
+			return;
+		}
+		
+		$this->args['custom']['data-conditional-operator'] = 'OR';
+		
+		if ( isset($this->args['conditional']['operator']) ) {
+			$this->args['custom']['data-conditional-operator'] = $this->args['conditional']['operator'];
+			unset($this->args['conditional']['operator']);
+		}
+		
+		if ( isset($this->args['conditional']['action']) ) {
+			$this->args['custom']['data-conditional-action'] = $this->args['conditional']['action'];
+			unset($this->args['conditional']['action']);
+		}
+		
+		if ( array_key_exists('name', $this->args['conditional']) || array_key_exists('value', $this->args['conditional']) ) {
+			$conditional = array(
+				'name' => $this->args['conditional']['name'],
+				'value' => $this->args['conditional']['value'],
+			);
+			$this->args['conditional'] = array($conditional);
+		}
+		
+		foreach ( $this->args['conditional'] as $index => $value ) {
+			$this->args['custom']['data-conditional-name-' . $index] = $value['name'];
+			$this->args['custom']['data-conditional-value-' . $index] = ( is_array($value['value']) && count($value['value']) > 1 ) ? implode('||', $value['value']) : $value['value'];
+		}
+		
+		$this->args['class'] .= ' wpmudev-field-has-conditional';
+	}
+		
 	/**
 	 * Gets the field name attribute
 	 *
@@ -362,21 +411,29 @@ class WPMUDEV_Field {
 		$value = null;
 		
 		if ( ! is_null($this->_value) ) {
-			return $this->format_value($this->_value);
+			return ($raw) ? $this->_value : $this->format_value($this->_value);
 		}
 		
-		if ( is_null($meta_key) ) {
-			$meta_key = $this->get_meta_key();
-		}
-		
-		if ( ! empty($post_id) ) {
-			if ( metadata_exists('post', $post_id, $meta_key) ) {
-				$value = get_post_meta($post_id, $meta_key, true);
-				
-				if ( $value === '' ) {
-					$value = $this->args['default_value'];
+		if ( is_numeric($post_id) ) {
+			// This is a post
+			if ( is_null($meta_key) ) {
+				$meta_key = $this->get_meta_key();
+			}
+			
+			if ( ! empty($post_id) ) {
+				if ( metadata_exists('post', $post_id, $meta_key) ) {
+					$value = get_post_meta($post_id, $meta_key, true);
+					
+					if ( $value === '' ) {
+						$value = $this->args['default_value'];
+					}
 				}
 			}
+		} else {
+			// This is a settings key
+			$settings = get_option($post_id, array());
+			$key = $this->get_post_key();
+			$value = $this->array_search($settings, $key);
 		}
 		
 		/**
@@ -395,10 +452,10 @@ class WPMUDEV_Field {
 			$value = $this->args['default_value'];
 		}
 		
-		$value = ( $raw ) ? $value : $this->format_value($value);
-		
 		// Set the field's value for future
 		$this->_value = $value;
+		
+		$value = ( $raw ) ? $value : $this->format_value($value);
 		
 		return $value;
 	}
@@ -494,6 +551,7 @@ class WPMUDEV_Field {
 		 * @param object $this The current field object.
 		 */
 		do_action('wpmudev_field_print_scripts', $this);
+		do_action('wpmudev_field_print_scripts_' . $this->args['name'], $this);
 	}
 	
 	/**

@@ -17,11 +17,11 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'query' => array(),
 			'multiple' => false,
 			'placeholder' => __('Select Posts', 'mp')
-		));
+		), $args);
 		
 		$this->args['class'] .= ' wpmudev-post-select';		
 	}

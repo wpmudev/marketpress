@@ -24,10 +24,10 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'layout' => 'table',
 			'add_row_label' => __('Add Row', 'wpmudev_metaboxes'),
-		));
+		), $args);
 	}
 	
 	/**
@@ -136,6 +136,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 */
 	public function display( $post_id ) {
 		$data = $this->get_value($post_id);
+		$class = 'wpmudev-subfield-group-wrap';
 		$atts = '';
 		
 		if ( empty($data) ) {
@@ -144,11 +145,15 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		
 		foreach ( $this->args['custom'] as $key => $att ) {
 			if ( strpos($key, 'data-conditional') !== false ) {
-				$atts .= $key . '="' . esc_attr($att) . '" ';
+				$atts .= ' ' . $key . '="' . esc_attr($att) . '"';
 			}
+		}
+		
+		if ( strlen($atts) > 0 ) {
+			$class .= ' wpmudev-field-has-conditional';
 		} ?>
 		
-		<div class="wpmudev-subfield-group-wrap" <?php echo trim($atts); ?>>
+		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 		<?php		
 		if ( $this->args['layout'] == 'table' ) : ?>
 			<table class="wpmudev-subfields widefat">

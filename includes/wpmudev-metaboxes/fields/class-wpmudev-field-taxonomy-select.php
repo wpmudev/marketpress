@@ -8,11 +8,11 @@ class WPMUDEV_Field_Taxonomy_Select extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'multiple' => false,
 			'placeholder' => __('Select Posts', 'mp'),
 			'taxonomy' => '',
-		));
+		), $args);
 		
 		$this->args['class'] .= ' wpmudev-taxonomy-select';			
 	}

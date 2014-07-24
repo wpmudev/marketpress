@@ -14,10 +14,10 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($this->args, array(
+		$this->args = array_replace_recursive(array(
 			'orientation' => 'horizontal',
 			'options' => array(),
-		));
+		), $args);
 	}
 	
 	/**

@@ -8,10 +8,10 @@ class WPMUDEV_Field_User_Role_Select extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'multiple' => true,
 			'placeholder' => __('Select User Role', 'mp'),
-		));
+		), $args);
 		
 		$this->args['class'] .= ' wpmudev-user-role-select';			
 	}

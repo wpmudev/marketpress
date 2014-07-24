@@ -108,14 +108,19 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		$numfields = count($this->subfields);
 		$label_width = floor(100 / $numfields) . '%';
 		$value = $this->get_value($post_id);
+		$class = 'wpmudev-field-complex-wrap clearfix';
+		$atts = '';
 		
 		foreach ( $this->args['custom'] as $key => $att ) {
 			if ( strpos($key, 'data-conditional') !== false ) {
 				$atts .= ' ' . $key . '="' . esc_attr($att) . '"';
 			}
-		} ?>
+		}
 		
-		<div class="wpmudev-field-complex-wrap clearfix"<?php echo $atts; ?>>
+		if ( strlen($atts) > 0 ) {
+			$class .= ' wpmudev-field-has-conditional';
+		} ?>
+		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 			<?php
 			foreach ( $this->subfields as $field ) :
 				if ( ! is_null($this->subfield_id) ) {

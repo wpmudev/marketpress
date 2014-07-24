@@ -162,7 +162,6 @@ class MP_Settings_Metabox_General_Location_Settings extends MP_Settings_Metabox 
 					)) . '
 				</td>
 			</tr>';
-
 		endif;
 		
 		//only show if correct country or US province

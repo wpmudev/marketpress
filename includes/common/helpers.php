@@ -13,12 +13,46 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_states') ) :
+	/**
+	 * Gets the states/regions/provinces for a given country
+	 *
+	 * @since 3.0
+	 * @param string $country The country code.
+	 * @return array
+	 */
+	function mp_get_states( $country ) {
+		if ( ! in_array($country, array('US','CA','GB','AU')) ) {
+			return array();
+		}
+		
+		switch ( $country ) {
+			case 'US' :
+				$list = mp()->usa_states;
+			break;
+			
+			case 'CA' :
+				$list = mp()->canadian_provinces;
+			break;
+			
+			case 'GB' :
+				$list = mp()->uk_counties;
+			break;
+			
+			case 'AU' :
+				$list = mp()->australian_states;
+			break;
+		}
+		
+		return $list;
+	}
+endif;
+
 if ( ! function_exists('mp_get_dir_files') ) :
 	/**
 	 * Get all files from a given directory
 	 *
 	 * @since 3.0
-	 *
 	 * @param string $dir The full path of the directory
 	 * @param string $ext Get only files with a given extension. Set to NULL to get all files.
 	 * @return array or false if no files exist
@@ -210,7 +244,6 @@ if ( ! function_exists('array_replace_recursive') ) :
 	 * @param array $array1 The values from this array will overwrite the values from $array
 	 * @return array
 	 */
-	
 	function array_replace_recursive() {
 		function recurse( $array, $array1 ) {
 	    foreach ( $array1 as $key => $value ) {

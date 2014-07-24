@@ -49,11 +49,11 @@ class MP_Installer {
 			}
 		}
 
-		$old_settings = get_option('mp_settings');
+		$old_settings = get_option('mp_settings', array());
 
 		//filter default settings
-		$default_settings = apply_filters('mp_default_settings', $this->default_settings);
-		$settings = wp_parse_args((array) $old_settings, $default_settings);
+		$default_settings = apply_filters('mp_default_settings', mp()->default_settings);
+		$settings = array_replace_recursive($default_settings, $old_settings);
 		
 		//2.1.4 update
 		if ( version_compare($old_version, '2.1.4', '<') ) {
@@ -70,19 +70,14 @@ class MP_Installer {
 			$settings = $this->_update_3000($settings);
 		}
 
-		//update settings
+		// Update settings
 		update_option('mp_settings', $settings);
 
-		//only run these on first install
+		// Only run these on first install
 		if ( empty($old_settings) ) {
-			//define settings that don't need to autoload for efficiency
+			// Define settings that don't need to autoload for efficiency
 			add_option('mp_coupons', '', '', 'no');
-			add_option('mp_store_page', '', '', 'no');
 
-			//create store page
-			add_action('admin_init', array(&$this, 'create_store_page'));
-
-			//add cart widget to first sidebar
 			add_action('widgets_init', array(&$this, 'add_default_widget'), 11);
 	 	}
 
@@ -114,7 +109,30 @@ class MP_Installer {
 			PRIMARY KEY  (attribute_id)
 		) $charset_collate");
 	}
-
+	
+	/**
+	 * Adds the cart widget to the default/first sidebar
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action widgets_init
+	 */
+	public function add_default_widget() {
+		//! TODO: copy from 2.9
+	}
+	
+	/**
+	 * Creates stores pages
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_init
+	 */
+	public function create_store_pages() {
+		$store_page = get_option('mp_store_page');
+		//! TODO
+	}
+	
 	/**
 	 * Runs on 3.0 update
 	 *
@@ -124,6 +142,9 @@ class MP_Installer {
 	private function _update_3000( $settings ) {
 		$this->_update_coupon_schema();
 		$this->_create_product_attributes_table();
+		
+		// Create store pages
+		add_action('admin_init', array(&$this, 'create_store_pages'));
 		
 		//currency changes
 		if ( 'TRL' == mp_get_setting('currency') ) {
@@ -220,15 +241,15 @@ class MP_Installer {
 				),
 				'start_date' => array(
 					'type' => 'WPMUDEV_Field_Datepicker',
-					'value' => date('Ymd', $coupon['start']),
+					'value' => date('Y-m-d', $coupon['start']),
 				),
 				'indefinite' => array(
 					'type' => 'WPMUDEV_Field_Checkbox',
-					'value' => ( empty($coupon['end']) ) ? '1' : '0', 
+					'value' => ( empty($coupon['end']) ) ? '0' : '1', 
 				),
 				'end_date' => array(
 					'type' => 'WPMUDEV_Field_Datepicker',
-					'value' =>  ( empty($coupon['end']) ) ? '' : date('Ymd', $coupon['end']),
+					'value' =>  ( empty($coupon['end']) ) ? '' : date('Y-m-d', $coupon['end']),
 				),
 			);
 			
@@ -242,7 +263,7 @@ class MP_Installer {
 			foreach ( $metadata as $name => $data ) {
 				$type = $data['type'];
 				$field = new $type(array('name' => $name, 'value_only' => true));
-				$field->save_value($post_id, $data['value']);
+				$field->save_value($post_id, $name, $data['value'], true);
 			}
 		}
 	}

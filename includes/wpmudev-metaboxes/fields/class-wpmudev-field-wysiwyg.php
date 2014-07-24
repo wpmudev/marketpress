@@ -16,11 +16,12 @@ class WPMUDEV_Field_WYSIWYG extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = wp_parse_args($args, array(
+		$this->args = array_replace_recursive(array(
 			'media_buttons' => true,
 			'wpautop' => true,
 			'rows' => 15,
-		));
+		), $args);
+		
 		$this->args['custom']['rows'] = $this->args['rows'];
 		$this->args['class'] .= ' wp-editor-area wpmudev-field-wysiwyg-textarea';
 		

@@ -31,22 +31,33 @@ class MP_Product_Coupons_Screen {
 	 * @access private
 	 */
 	private function __construct() {
-		//add menu items
+		// Add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
-		//change the "enter title here" text
-		add_filter('enter_title_here', array(&$this, 'enter_title_here'));
-		//modify coupon list table columns/data
+		// Modify coupon list table columns/data
 		add_filter('manage_product_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
 		add_action('manage_product_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
 		add_filter('manage_edit-product_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
 		add_action('pre_get_posts', array(&$this, 'sort_product_coupons'));
-		//custom css/javascript
+		// Custom css/javascript
 		add_action('admin_print_styles', array(&$this, 'print_css'));
 		add_action('admin_print_footer_scripts', array(&$this, 'print_js'));
-		//on coupon save update post title to equal coupon code field
+		// On coupon save update post title to equal coupon code field
 		add_filter('wp_insert_post_data', array(&$this, 'save_coupon_data'), 99, 2);
-		//init metaboxes
+		// Init metaboxes
 		add_action('admin_init', array(&$this, 'init_metaboxes'));
+		// Get coupon code value
+		add_filter('wpmudev_field_get_value_coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
+	}
+	
+	/**
+	 * Get coupon code value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field_get_value_coupon_code
+	 */
+	public function get_coupon_code_value( $value, $post_id, $raw, $field ) {
+		return get_the_title($post_id);
 	}
 	
 	/**
@@ -108,7 +119,7 @@ class MP_Product_Coupons_Screen {
 			'label' => array('text' => __('Applies To', 'mp')),
 			'orientation' => 'horizontal',
 			'default_value' => 'all',
-			'fields' => array(
+			'options' => array(
 				'all' => __('All Products', 'mp'),
 				'category' => __('Category', 'mp'),
 				'product' => __('Product', 'mp'),
@@ -273,23 +284,6 @@ class MP_Product_Coupons_Screen {
 	}
 	
 	/**
-	 * Changes the "enter title here" text when editing/adding coupons
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action enter_title_here
-	 * @param string $title The default title
-	 * @return string
-	 */
-	public function enter_title_here( $title ) {
-		if ( get_current_screen()->post_type != 'product_coupon' ) {
-			return $title;
-		}
-		
-		return __('Enter coupon code here', 'mp');
-	}
-	
-	/**
 	 * Adds menu items to the admin menu
 	 *
 	 * @since 3.0
@@ -350,11 +344,11 @@ class MP_Product_Coupons_Screen {
 			
 			//! Valid Dates
 			case 'valid_dates' :
-				$end = get_field_value('end_date', $post_id, true);
-				echo date_i18n(get_option('date_format'), get_field_value('start_date', $post_id, true)) . ' &mdash;<br />';
+				$end = get_field_value('end_date', $post_id);
+				echo get_field_value('start_date', $post_id) . ' &mdash;<br />';
 				
 				if ( $end ) {
-					echo date_i18n(get_option('date_format'), $end);
+					echo $end;
 				} else {
 					_e('No end', 'mp');
 				}
