@@ -129,9 +129,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				$checked = true; //default to checked
 				$_SESSION['mp_shipping_info']['residential'] = true;
 			}
-			
+
 			$this->residential = $checked;
-			
+
 			$content .= '<tr>
 			<td>' . __('Residential Delivery', 'mp') . '</td>
 			<td>
@@ -429,14 +429,20 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
 	*  array. Don't forget to return!
 	*/
-	function process_shipping_settings( $settings ) {
-		$services = array_merge($this->services, $this->intl_services);
-		foreach ( $services as $service => $detail ) {
-			$settings['shipping']['fedex']['services'][$service] = (int) isset($_POST['mp']['shipping']['fedex']['services'][$service]);
-		}
-		
-		$settings['shipping']['fedex']['commercial'] = (int) isset($_POST['mp']['shipping']['fedex']['commercial']);
-				
+	function process_shipping_settings($settings) {
+        //Force not defined values to 0.
+        if ( isset($_POST['mp']['shipping']['fedex']['commercial']) ) {
+            $settings['shipping']['fedex']['commercial'] = 1;
+        } else {
+            $settings['shipping']['fedex']['commercial'] = 0;
+        }
+        foreach ( $this->services as $service => $class ) {
+            if ( isset($_POST['mp']['shipping']['fedex']['services'][$service]) ) {
+                $settings['shipping']['fedex']['services'][$service] = 1;
+            } else {
+                $settings['shipping']['fedex']['services'][$service] = 0;
+            }
+        }
 		return $settings;
 	}
 
@@ -601,7 +607,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function rate_request( $international = false) {
 		global $mp;
-		
+
 		$shipping_options = $this->fedex_settings['services'];
 
 		//Assume equal size packages. Find the best matching box size
@@ -622,9 +628,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				break;
 			}
 		}
-		
+
 		$allowed_weight = min($this->fedex_settings['boxes']['weight'][$found], $this->fedex_settings['max_weight']);
-		
+
 		if($allowed_weight >= $this->weight){
 			$this->pkg_count = 1;
 			$this->pkg_weight = $this->weight;
@@ -898,9 +904,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$price = is_numeric($price) ? $price : 0;
 		$handling = is_numeric($handling) ? $handling : 0;
 		$total = $price + $handling;
-		
+
 		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-			$total = $mp->shipping_tax_price($total);
+			$total = $total * (1 + (float) $mp->get_setting('tax->rate'));
 		}
 
 		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total) );
