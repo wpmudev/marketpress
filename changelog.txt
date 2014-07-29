@@ -3,17 +3,8 @@ Author: Aaron Edwards (incsub)
 
 Change Log:
 ----------------------------------------------------------------------
+- Fixed: Nav Menu items calsses not being applied correctly
 ----------------------------------------------------------------------
-
-2.9.5.1
-----------------------------------------------------------------------
-- Added: UPS shipping gateway now allows admin to choose the appropriate pickup type allowing for more accurate rate requests
-- Fixed: When using global product list the "buy now" button adds the item to a cart that doesn't exist http://wp.mu/a2i
-- Fixed: Shipping costs are being calculated but are not applying when order is processed http://wp.mu/a2h
-- Fixed: Unable to deselect shipping options in Fedex shipping gateway settings http://wp.mu/a0s
-- Fixed: Unable to deselect "use default embedded form" in Stripe gateway settings http://wp.mu/a0t
-- Fixed: Unable to deselect checkboxes in Bitpay gateway settings
-- Fixed: Extra characters at end of admin order notification email http://wp.mu/a0u
 
 2.9.5
 ----------------------------------------------------------------------
@@ -922,3 +913,6 @@ Change Log:
 1.0 - 9/11/2010
 ----------------------------------------------------------------------
 - Initial Release
+
+
+307693-1405537921
