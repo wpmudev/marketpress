@@ -9,12 +9,14 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 	 * @param array $args {
 	 *		An array of arguments. Optional.
 	 *
-	 *		@type bool $title The title of the section.
+	 *		@type string $title The title of the section.
+	 *		@type string $subtitle The subtitle of the section.
 	 * }	 
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
 			'title' => __('Section Title', 'wpmudev_metaboxes'),
+			'subtitle' => '',
 		), $args);
 	}
 
@@ -41,8 +43,8 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 			<h2 class="wpmudev-section-title"><?php echo $this->args['title']; ?></h2>
 			<?php
-			if ( ! empty($this->args['desc']) ) : ?>
-			<p><?php echo $this->args['desc']; ?></p>
+			if ( ! empty($this->args['subtitle']) ) : ?>
+			<p><?php echo $this->args['subtitle']; ?></p>
 			<?php
 			endif; ?>
 		</div>

@@ -175,8 +175,7 @@ jQuery(document).ready(function($){
 	 * @access public
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script('jquery');
-		wp_enqueue_script('wpmudev-field-select2', WPMUDEV_Metabox::class_url('ui/select2/select2.min.js'), array('jquery'), '3.4.8');
+		wp_enqueue_script('wpmudev-field-select2', WPMUDEV_Metabox::class_url('ui/select2/select2.min.js'), array('jquery'), WPMUDEV_METABOX_VERSION);
 	}
 	
 	/**
@@ -186,6 +185,6 @@ jQuery(document).ready(function($){
 	 * @access public
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style('wpmudev-field-select2',  WPMUDEV_Metabox::class_url('ui/select2/select2.css'), array(), '3.4.8');
+		wp_enqueue_style('wpmudev-field-select2',  WPMUDEV_Metabox::class_url('ui/select2/select2.css'), array(), WPMUDEV_METABOX_VERSION);
 	}
 }

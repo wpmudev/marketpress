@@ -8,6 +8,11 @@ if ( ! defined('WPMUDEV_METABOX_URL') ) {
 	define('WPMUDEV_METABOX_URL', plugin_dir_url(__FILE__));
 }
 
+if ( ! defined('WPMUDEV_METABOX_VERSION') ) {
+	define('WPMUDEV_METABOX_VERSION', '1.0');
+}
+
+
 require_once WPMUDEV_Metabox::class_dir('api.php');
 
 /**
@@ -18,15 +23,15 @@ require_once WPMUDEV_Metabox::class_dir('api.php');
  */
 $GLOBALS['wpmudev_metaboxes_printed_field_scripts'] = array();
 
-class WPMUDEV_Metabox {
+class WPMUDEV_Metabox {	
 	/**
-	 * Refers to the current version of the class
+	 * Refers to if the metabox fields are saved
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @var string
+	 * @var bool
 	 */
-	var $version = '1.0';
+	var $fields_saved = false;
 	
 	/**
 	 * Refers to the meta box's constructor arguments
@@ -91,8 +96,32 @@ class WPMUDEV_Metabox {
 	 */
 	var $validation_messages = array();
 	
-	static $dir = '';
-	static $url = '';
+	/**
+	 * Refers to the base directory
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var string
+	 */
+	public static $dir = '';
+	
+	/**
+	 * Refers to the base url
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var string
+	 */
+	public static $url = '';
+	
+	/**
+	 * Refers to the metaboxes that are registered
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var array
+	 */
+	public static $metaboxes = array();
 	
 	/**
 	 * Constructor function
@@ -110,6 +139,7 @@ class WPMUDEV_Metabox {
 	 *		@type string $context The context of the metabox (advanced, normal, side).
 	 *		@type string $priority The priority of the metabox (default, high, normal).
 	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
+	 *		@type int $order Display order for settings metaboxes. If this is not entered metaboxes will be rendered in the order they logically show up in the code. Defaults to 10.
 	 * }
 	 */
 	public function __construct( $args = array() ) {
@@ -122,19 +152,34 @@ class WPMUDEV_Metabox {
 			'context' => 'advanced',
 			'priority' => 'default',
 			'option_name' => '',
+			'order' => 10,
 		), $args);
 		
 		$this->load_fields();
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
 		$this->nonce_name = $this->nonce_action . '_nonce';
-
+		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'));
-		add_action('wpmudev_metaboxes_settings', array(&$this, 'maybe_render'));
+		add_action('wpmudev_metaboxes_settings', array(&$this, 'maybe_render'), $this->args['order']);
 		add_action('save_post', array(&$this, 'save_fields'));
-		add_action('current_screen', array(&$this, 'maybe_save_settings_fields'));
+		add_action('admin_init', array(&$this, 'maybe_save_settings_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
+		add_action('admin_notices', array(&$this, 'admin_notices'));
+	}
+	
+	/**
+	 * Displays the "settings updated" notice
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function admin_notices() {
+		if ( isset($_GET['wpmudev_metabox_settings_saved']) && ! wp_cache_get('settings_saved', 'wpmudev_metaboxes') ) {
+			echo '<div class="updated"><p>' . __('Settings Saved', 'wpmudev_metaboxes') . '</p></div>';
+			wp_cache_set('settings_saved', true, 'wpmudev_metaboxes'); // Only show the message once per screen
+		}
 	}
 	
 	/**
@@ -189,9 +234,8 @@ class WPMUDEV_Metabox {
 			return false;
 		}
 		
-		wp_enqueue_script('jquery');
 		wp_enqueue_script('jquery-validate', $this->class_url('ui/js/jquery.validate.min.js'), array('jquery'), '1.12');
-		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate'), $this->version, true);
+		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate', 'jquery-effects-highlight'), $this->version, true);
 		
 		$default_messages = array(
 			'alphanumeric_error_msg' => __('Please enter only letters and numbers', 'wpmudev_metaboxes'),
@@ -320,7 +364,7 @@ class WPMUDEV_Metabox {
 		if ( $this->is_settings_metabox() ) : ?>
 			<div id="poststuff">
 				<div class="meta-box-sortables">
-					<div class="postbox wpmudev-postbox">
+					<div id="<?php echo $this->args['id']; ?>" class="postbox wpmudev-postbox">
 						<div class="inside">
 							<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
 		<?php
@@ -407,6 +451,20 @@ class WPMUDEV_Metabox {
 			}
 			
 			update_option($post_id, $settings);
+			
+			/**
+			 * Fires after the settings metabox has been saved.
+			 *
+			 * @since 3.0
+			 * @param WPMUDEV_Metabox $this The metabox that was saved.
+			 */
+			do_action('wpmudev_metaboxes_settings_metabox_saved', $this);
+			
+			if ( did_action('wpmudev_metaboxes_settings_metabox_saved') == count(self::$metaboxes) ) {
+				// Redirect to avoid accidental saves on page refresh
+				wp_redirect(add_query_arg('wpmudev_metabox_settings_saved', 1), 301);
+				exit;
+			}
 		} else {	
 			// Make sure $post_id isn't a revision
 			if ( wp_is_post_revision($post_id) ) {
@@ -545,6 +603,11 @@ class WPMUDEV_Metabox {
 		
 		if ( in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
 			$this->is_settings_metabox = true;
+		}
+		
+		if ( $this->is_active ) {
+			// Set this as an active metabox
+			self::$metaboxes[$this->args['id']] = '';
 		}
 		
 		return $this->is_active;	

@@ -35,8 +35,17 @@ class MP_Store_Settings_Presentation {
 		$this->init_product_page_settings();
 		$this->init_related_product_settings();
 		$this->init_product_list_settings();
+		$this->init_social_settings();
 	}
 	
+	/**
+	 * Gets the appropriate image size label for a given size.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $size The image size.
+	 * @return string
+	 */
 	public function get_image_size_label( $size ) {
 		$width = get_option("{$size}_size_w");
 		$height = get_option("{$size}_size_h");
@@ -51,11 +60,47 @@ class MP_Store_Settings_Presentation {
 	 * @since 3.0
 	 * @access public
 	 */
+	public function init_social_settings() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-settings-presentation-social',
+			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'title' => __('Social Settings', 'mp'),
+			'option_name' => 'mp_settings',			
+		));	
+		$metabox->add_field('section', array(
+			'title' => __('Pinterest', 'mp'),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => 'social[pinterest][show_pinit_button]',
+			'label' => array('text' => __('Show "Pin It" Button', 'mp')),
+			'options' => array(
+				'off' => __('Off', 'mp'),
+				'single_view' => __('Single View', 'mp'),
+				'all_view' => __('All View', 'mp'),
+			),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => 'social[pinterest][show_pin_count]',
+			'label' => array('text' => __('Pin Count', 'mp')),
+			'options' => array(
+				'none' => __('None', 'mp'),
+				'above' => __('Above', 'mp'),
+				'beside' => __('Beside', 'mp'),
+			),
+		));
+	}
+	
+	/**
+	 * Init the product list settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function init_product_list_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-product-list',
 			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
-			'title' => __('Product Page Settings', 'mp'),
+			'title' => __('Product List/Grid Settings', 'mp'),
 			'desc' => __('Settings related to the display of product lists/grids.', 'mp'),
 			'option_name' => 'mp_settings',			
 		));
@@ -88,7 +133,6 @@ class MP_Store_Settings_Presentation {
 				'action' => 'show',
 			),
 		));
-		//! TODO: Installer should update old settings names to new. Also need to update all places in code that used old names.
 		$custom_size = $metabox->add_field('complex', array(
 			'name' => 'list_img_size_custom',
 			'label' => array('text' => __('Custom Image Size', 'mp')),
@@ -261,7 +305,6 @@ class MP_Store_Settings_Presentation {
 				'action' => 'show',
 			),
 		));
-		//! TODO: Installer should update old settings names to new. Also need to update all places in code that used old names.
 		$custom_size = $metabox->add_field('complex', array(
 			'name' => 'product_img_size_custom',
 			'label' => array('text' => __('Custom Image Size', 'mp')),

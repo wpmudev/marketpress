@@ -41,8 +41,6 @@ class MP_Admin {
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_styles_scripts'));
 		//save orders screen options
 		add_filter('set-screen-option', array(&$this, 'save_orders_screen_options'), 10, 3);
-		//load settings metaboxes
-		add_action('plugins_loaded', array(&$this, 'load_settings_metaboxes'));
 		//set custom post-updated messages
 		add_filter('post_updated_messages', array(&$this, 'post_updated_messages'));
 	}
@@ -99,17 +97,6 @@ class MP_Admin {
 	}
 					
 	/**
-	 * Load settings metaboxes
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function load_settings_metaboxes() {
-		require_once mp_plugin_dir('includes/admin/class-mp-settings-metabox.php');
-		mp_include_dir(mp_plugin_dir('includes/admin/metaboxes-settings'));
-	}
-
-	/**
 	 * Add items to the admin menu
 	 *
 	 * @since 3.0
@@ -124,7 +111,7 @@ class MP_Admin {
 		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
 		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'));		
 		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Messaging', 'mp'), __('Messaging', 'mp'), $cap, 'store-settings-messaging', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Notifications', 'mp'), __('Notifications', 'mp'), $cap, 'store-settings-notifications', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', array(&$this, 'admin_page'));
@@ -139,7 +126,7 @@ class MP_Admin {
 	 	if ( ! WPMUDEV_REMOVE_BRANDING ) {
 			add_action('load-toplevel_page_store-settings', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-presentation', array(&$this, 'add_help_tab'));
-			add_action('store-settings_page_store-settings-messaging', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-notifications', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-shipping', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-payments', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));

@@ -13,6 +13,34 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_push_to_array') ) :
+	/**
+	 * Pushes a value with a given array with given key
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param array $array The array to work with.
+	 * @param string $key_string
+	 * @param mixed $value
+	 */
+	function mp_push_to_array( &$array, $key_string, $value ) {
+    $keys = explode('->', $key_string);
+    $branch = &$array;
+    
+    while ( count($keys) ) {
+    	$key = array_shift($keys);
+    	
+	    if ( ! is_array($branch) ) {
+		  	$branch = array();
+	    }	
+	        
+	    $branch = &$branch[$key];
+    }
+    
+    $branch = $value;
+	}
+endif;
+
 if ( ! function_exists('mp_get_states') ) :
 	/**
 	 * Gets the states/regions/provinces for a given country
@@ -239,7 +267,7 @@ if ( ! function_exists('array_replace_recursive') ) :
 	/**
 	 * Recursively replace one array with another. Provides compatibility for PHP version < 5.3
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 * @param array $array
 	 * @param array $array1 The values from this array will overwrite the values from $array
 	 * @return array
@@ -285,7 +313,7 @@ if ( ! function_exists('mp_arr_get_value') ) :
 	/**
 	 * Safely retrieve a value from an array
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 * @uses mp_arr_search()
 	 *
 	 * @param string $key (e.g. key1->key2->key3)
@@ -297,12 +325,7 @@ if ( ! function_exists('mp_arr_get_value') ) :
 	function mp_arr_get_value( $key, $array, $default = false ) {
 		$keys = explode('->', $key);
 		$keys = array_map('trim', $keys);
-		
-		if ( count($keys) > 0 ) {
-			$value = mp_arr_search($array, $key);
-		} else {
-			$value = isset($array[$keys[0]]) ? $array[$keys[0]] : null;
-		}
+		$value = mp_arr_search($array, $key);
 		
 		return ( is_null($value) ) ? $default : $value;
 	}
@@ -312,7 +335,7 @@ if ( ! function_exists('mp_get_get_value') ) :
 	/**
 	 * Safely retreives a value from the $_GET array
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 * @uses mp_arr_get_value()
 	 *	 
 	 * @param string $key (e.g. key1->key2->key3)
@@ -329,7 +352,7 @@ if ( ! function_exists('mp_get_post_value') ) :
 	/**
 	 * Safely retreives a value from the $_POST array
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 * @uses mp_arr_get_value()
 	 *	 
 	 * @param string $key (e.g. key1->key2->key3)
@@ -342,13 +365,30 @@ if ( ! function_exists('mp_get_post_value') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_session_value') ) :
+	/**
+	 * Safely retreives a value from the $_SESSION array
+	 *
+	 * @since 3.0
+	 * @uses mp_arr_get_value()
+	 *	 
+	 * @param string $key (e.g. key1->key2->key3)
+	 * @param mixed $default The default value to return if $key is not found within $array
+	 * @return mixed
+	 */	 
+	
+	function mp_get_session_value( $key, $default = false ) {
+		return mp_arr_get_value($key, $_POST, $default);
+	}
+endif;
+
 if ( ! function_exists('mp_get_setting') ) :
 	/*
 	 * Safely retrieves a setting
 	 *
 	 * An easy way to get to our settings array without undefined indexes
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 * @uses mp_arr_search()
 	 *
 	 * @param string $key A setting key, or -> separated list of keys to go multiple levels into an array
@@ -361,15 +401,7 @@ if ( ! function_exists('mp_get_setting') ) :
 		
 		$keys = explode('->', $key);
 		$keys = array_map('trim', $keys);
-		
-		if ( count($keys) > 0 ) {
-			$setting = mp_arr_search($settings, $key);
-		} else {
-			$setting = isset($settings[$keys[0]]) ? $settings[$keys[0]] : null;
-		}
-		
-		if ( is_null($setting) )
-			$setting = $default;
+		$setting = mp_arr_get_value($key, $settings, $default);
 		
 		return apply_filters('mp_setting_' . implode('', $keys), $setting, $default);
 	}
@@ -379,7 +411,7 @@ if ( ! function_exists('mp_arr_search') ) :
 	/**
 	 * Searches an array multidimensional array for a specific path (if it exists)
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param array $array The array we want to search
 	 * @param string $path The path we want to check for (e.g. key1->key2->key3 = $array[key1][key2][key3])
@@ -400,64 +432,37 @@ function mp_arr_search( $array, $path ) {
 }
 endif;
 
-if ( ! function_exists('mp_toggle_plugin') ) :
-	/**
-	 * Activates/deactivates a given gateway/shipping plugin
-	 *
-	 * @since 3.0.0
-	 *
-	 * @param string $code The gateway code/ID
-	 * @param string $type The type of the plugin
-	 * @param string $subtype The subtype of the plugin
-	 * @param bool $activate Activate the plugin? False will deactivate.
-	 */
-	
-	function mp_toggle_plugin( $code, $type, $subtype, $activate ) {
-		global $mp_gateway_plugins, $mp_gateway_active_plugins, $mp_shipping_plugins, $mp_shipping_active_plugins;
-		
-		if ( $activate ) {
-			switch ( $type ) {
-				case 'gateway' :
-					if ( mp_arr_get_value("$code->0", $mp_gateway_plugins, false) && class_exists($mp_gateway_plugins[$code][0]) ) {
-						$mp_gateway_active_plugins[$code] = new $mp_gateway_plugins[$code][0];
-					}
-				break;
-			
-				case 'shipping' :
-					if ( mp_arr_get_value("$code->0", $mp_shipping_plugins, false) && class_exists($mp_shipping_plugins[$code][0]) ) {
-						$mp_shipping_active_plugins[$subtype][$code] = new $mp_shipping_plugins[$code][0];
-					}
-				break;
-			}
-		} else {
-			switch ( $type ) {
-				case 'gateway' :
-					unset($mp_gateway_active_plugins[$code]);
-				break;
-				
-				case 'shipping' :
-					unset($mp_shipping_active_plugins[$subtype][$code]);
-				break;
-			}
-		}
-	}
-endif;
-
 if ( ! function_exists('mp_update_setting') ) :
 	/**
 	 * Update a specific setting
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param string $key The key to update
 	 * @param mixed $value The value to use
 	 * @return bool
 	 */
-
 	function mp_update_setting( $key, $value ) {
 		$settings = get_option('mp_settings');
-		$settings[$key] = $value;
+		mp_push_to_array($settings, $key, $value);
 		return update_option('mp_settings', $settings);
+	}
+endif;
+
+if ( ! function_exists('mp_update_network_setting') ) :
+	/**
+	 * Update a specific network setting
+	 *
+	 * @since 3.0
+	 *
+	 * @param string $key The key to update
+	 * @param mixed $value The value to use
+	 * @return bool
+	 */
+	function mp_update_network_setting( $key, $value ) {
+		$settings = get_site_option('mp_network_settings');
+		mp_push_to_array($settings, $key, $value);
+		return update_site_option('mp_network_settings', $settings);
 	}
 endif;
 
@@ -465,7 +470,7 @@ if ( ! function_exists('mp_format_currency') ) :
 	/**
 	 * Formats currency
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param string $currency The currency code to use for formatting (defaults to value set in currency settings)
 	 * @param float $amount The amount to format
@@ -539,7 +544,7 @@ if ( ! function_exists('mp_display_currency') ) :
 	/**
 	 * Round and display currency with padded zeros
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param float $amount
 	 * @return string
@@ -557,7 +562,7 @@ if ( ! function_exists('mp_format_date') ) :
 	/**
 	 * Translates a gmt timestamp into local timezone for display
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param int $gmt_timestamp
 	 * @return string
@@ -572,7 +577,7 @@ if ( ! function_exists('mp_before_tax_price') ) :
 	/**
 	 * Returns the before tax price for a given amount based on a bunch of foreign tax laws.
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param float $tax_price The price including taxes
 	 * @param int $product_id
@@ -599,7 +604,7 @@ if ( ! function_exists('mp_is_valid_zip') ) :
 	/**
 	 * Checks if a given zip is valid for a given country
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param string $zip The zip code to check
 	 * @param string $country The country to check
@@ -629,7 +634,7 @@ if ( ! function_exists('mp_plugin_url') ) :
 	/**
 	 * Returns a url with given path relative to the plugin's root
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param string $path
 	 * @return string
@@ -644,7 +649,7 @@ if ( ! function_exists('mp_plugin_dir') ) :
 	/**
 	 * Returns a path with given path relative to the plugin's root
 	 *
-	 * @since 3.0.0
+	 * @since 3.0
 	 *
 	 * @param string $path
 	 * @return string

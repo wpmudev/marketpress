@@ -40,7 +40,7 @@ if ( ! function_exists('array_replace_recursive') ) :
 	/**
 	 * Recursively replace one array with another. Provides compatibility for PHP version < 5.3
 	 *
-	 * @since 3.0.0
+	 * @since 1.0
 	 * @param array $array
 	 * @param array $array1 The values from this array will overwrite the values from $array
 	 * @return array

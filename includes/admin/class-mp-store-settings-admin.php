@@ -46,13 +46,11 @@ class MP_Store_Settings_Admin {
 			if ( mp_get_get_value('action') == 'mp_edit_product_attribute' ) {
 				add_filter('wpmudev_field_get_value', array('MP_Product_Attributes_Admin', 'get_product_attribute_value'), 10, 4);	
 			}
-			
-			return;
 		} else {
 			$screen_ids = array(
 				'toplevel_page_store-settings',
 				'store-settings_page_store-settings-presentation',
-				'store-settings_page_store-settings-messaging',
+				'store-settings_page_store-settings-notifications',
 				'store-settings_page_store-settings-shipping',
 				'store-settings_page_store-settings-payments',
 				'store-settings_page_store-settings-importers'
@@ -60,10 +58,11 @@ class MP_Store_Settings_Admin {
 			
 			foreach ( $screen_ids as $screen_id ) {
 				add_action($screen_id, array(&$this, 'display_settings_form'));
-			}			
+			}
+			
+			// Product attributes list
+			add_action('store-settings_page_store-settings-productattributes', array('MP_Product_Attributes_Admin', 'display_product_attributes'));		
 		}
-		
-		//add_action('current_screen', function() { echo get_current_screen()->id; });		
 	}
 
 	/**
@@ -134,8 +133,8 @@ jQuery(document).ready(function($){
 				$title .= __('Presentation', 'mp');
 			break;
 			
-			case 'store-settings_page_store-settings-messaging' :
-				$title .= __('Messaging', 'mp');
+			case 'store-settings_page_store-settings-notifications' :
+				$title .= __('Notifications', 'mp');
 			break;
 			
 			case 'store-settings_page_store-settings-shipping' :
@@ -143,7 +142,7 @@ jQuery(document).ready(function($){
 			break;
 			
 			case 'store-settings_page_store-settings-payments' :
-				$title .= __('Payment', 'mp');
+				$title .= __('Payments', 'mp');
 			break;
 			
 			case 'store-settings_page_store-settings-shortcodes' :

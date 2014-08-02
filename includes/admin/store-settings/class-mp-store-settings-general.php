@@ -245,7 +245,7 @@ jQuery(document).ready(function($){
 			'after_field' => '%',
 			'style' => 'width:75px',
 			'validation' => array(
-				'digits' => true,
+				'number' => true,
 			),
 		));
 		$metabox->add_field('text', array(

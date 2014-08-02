@@ -16,9 +16,29 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	
 	jQuery(document).ready(function($){
 		initValidation();
+		initRowShading();
 	});
 	
-	var testConditionals = function(conditionals, action){
+	var initRowShading = function(){
+		$('.wpmudev-postbox').each(function(){
+			var $rows = $(this).find('.wpmudev-field:visible');
+			$rows.filter(':odd').addClass('shaded');
+			$rows.filter(':even').removeClass('shaded');
+		});
+		
+		$('.wpmudev-field-section').each(function(){
+			var $this = $(this),
+					shaded = $this.hasClass('shaded') ? true : false;
+			
+			if ( shaded ) {
+				$this.nextUntil('.wpmudev-field-section').addClass('shaded');
+			} else {
+				$this.nextUntil('.wpmudev-field-section').removeClass('shaded');
+			}
+		})
+	}
+	
+	var testConditionals = function(conditionals){
 		var numValids = 0;
 		
 		$.each(conditionals, function(i, conditional){
@@ -29,17 +49,9 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 				return;
 			}
 			
-			if ( $input.is('select') ) {
-				var selected = $input.val();
-			} else {
-				var selected = ( $input.filter(':checked').length == 0 ) ? '-1' : $input.filter(':checked').val();
-			}
+			var val = getInputValue($input);
 			
-			if ( action == 'show' && $.inArray(selected, conditional.value) >= 0 ) {
-				numValids ++;
-			}
-			
-			if ( action == 'hide' && $.inArray(selected, conditional.value) < 0 ) {
+			if ( $.inArray(val, conditional.value) >= 0 ) {
 				numValids ++;
 			}
 		});
@@ -74,6 +86,22 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		return conditionals;
 	};
 	
+	var getInputValue = function($input) {
+		if ( $input.is('select') ) {
+			var val = $input.val();
+		}
+		
+		if ( $input.is(':checkbox') ) {
+			var val = ( $input.prop('checked') ) ? $input.val() : "-1";
+		}
+		
+		if ( $input.is(':radio') ) {
+			var val = $input.filter(':checked').val();
+		}
+		
+		return val;			
+	}
+	
 	var initConditionals = function(){
 		$('.wpmudev-field-has-conditional').each(function(){
 			var $this = $(this),
@@ -85,54 +113,54 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			
 			if ( action == 'show' ) {
 				if ( operator == 'AND' ) {
-					if ( testConditionals(conditionals, 'show') != conditionals.length ) {
+					if ( testConditionals(conditionals) != conditionals.length ) {
 						$container.hide();
 					}
 				} else {
-					if ( testConditionals(conditionals, 'show') == 0 ) {
+					if ( testConditionals(conditionals) == 0 ) {
 						$container.hide();
 					}
 				}
+				
+				initRowShading();
 				
 				$.each(conditionals, function(i, conditional){
 					var $input = $('[name="' + conditional.name + '"]');
 					
 					$input.change(function(){
 						var $this = $(this);
-						
-						if ( $this.is('select') ) {
-							var selected = $this.val();	
-						} else {
-							var selected = $this.filter(':checked').val();
-						}
-					
+															
 						if ( operator == 'AND' ) {
-							if ( testConditionals(conditionals, 'show') != conditionals.length ) {
-								$container.slideUp(500);
+							if ( testConditionals(conditionals) != conditionals.length ) {
+								$container.hide();
 							} else {
-								$container.slideDown(500);
+								$container.show();
 							}
 						} else {
-							if ( testConditionals(conditionals, 'show') == 0 ) {
-								$container.slideUp(500);
+							if ( testConditionals(conditionals) == 0 ) {
+								$container.hide();
 							} else {
-								$container.slideDown(500);
+								$container.show();
 							}
 						}
+						
+						initRowShading();
 					});
 				});
 			}	
 				
 			if ( action == 'hide' ) {
 				if ( operator == 'AND' ) {
-					if ( testConditionals(conditionals, 'hide') != conditionals.length ) {
-						$container.show();
+					if ( testConditionals(conditionals) == conditionals.length ) {
+						$container.hide();
 					}
 				} else {
-					if ( testConditionals(conditionals, 'hide') == 0 ) {
-						$container.show();
+					if ( testConditionals(conditionals) > 0 ) {
+						$container.hide();
 					}
 				}
+				
+				initRowShading();
 
 				$.each(conditionals, function(i, conditional){
 					var $input = $('[name="' + conditional.name + '"]');
@@ -140,25 +168,21 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 					$input.change(function(){
 						var $this = $(this);
 						
-						if ( $this.is('select') ) {
-							var selected = $this.val();	
-						} else {
-							var selected = $this.filter(':checked').val();
-						}
-					
 						if ( operator == 'AND' ) {
-							if ( testConditionals(conditionals, 'hide') != conditionals.length ) {
-								$container.slideDown(500);
+							if ( testConditionals(conditionals) == conditionals.length ) {
+								$container.hide();
 							} else {
-								$container.slideUp(500);
+								$container.show();
 							}
 						} else {
-							if ( testConditionals(conditionals, 'hide') == 0 ) {
-								$container.slideDown(500);
+							if ( testConditionals(conditionals) > 0 ) {
+								$container.hide();
 							} else {
-								$container.slideUp(500);
+								$container.show();
 							}
 						}
+						
+						initRowShading();
 					});
 				});
 			}	

@@ -357,15 +357,41 @@ class Marketpress {
 	}
 	
 	/**
+	 * Load payment and shipping gateways
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function load_plugins() {
+		if ( is_network_admin() || ! mp_get_setting('disable_cart') ) {
+			require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
+			mp_include_dir($this->plugin_dir('includes/common/payment-gateways'));
+			
+			/**
+			 * Fires after internal gateway plugins are loaded
+			 *
+			 * @since 3.0
+			 */
+			do_action('mp_load_gateway_plugins');
+			
+			MP_Gateway_API::load_active_gateways();
+		}		
+	}
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
 	 * @access private
 	 */
 	private function __construct() {
+		// Init variables
 		$this->_init_vars();
 		
-		//setup custom types
+		// Load plugins
+		add_action('init', array(&$this, 'load_plugins'));
+		
+		// Setup custom types
 		add_action('init', array(&$this, 'register_custom_types'), 0);
 	}
 	
@@ -388,12 +414,17 @@ class Marketpress {
 
 $mp = Marketpress::get_instance();
 
-// include helper functions
+// Include helper functions
 require_once $mp->plugin_dir('includes/common/helpers.php');
-// include installer class
+// Include installer class
 require_once $mp->plugin_dir('includes/common/class-mp-installer.php');
-// include product attributes class
+// Include product attributes class
 require_once $mp->plugin_dir('includes/common/class-mp-product-attributes.php');
+// Include MP_Cart class
+require_once $mp->plugin_dir('includes/common/class-mp-cart.php');
+// Include template functions
+require_once $mp->plugin_dir('includes/common/template-functions.php');
+
 
 if ( is_admin() ) {
 	require_once $mp->plugin_dir('includes/admin/class-mp-admin.php');

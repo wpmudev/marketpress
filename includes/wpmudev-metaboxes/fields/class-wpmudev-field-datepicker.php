@@ -4,7 +4,7 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	/**
 	 * Runs on construct of parent class
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 */
 	public function on_creation( $args ) {
@@ -14,7 +14,7 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	/**
 	 * Prints scripts
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 */
 	public function print_scripts() {
@@ -115,7 +115,7 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	/**
 	 * Enqueue scripts
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 */
 	public function enqueue_scripts() {
@@ -125,17 +125,17 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	/**
 	 * Enqueue styles
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style('jquery-ui-smoothness-theme', WPMUDEV_Metabox::class_url('ui/smoothness/jquery-ui.min.css'), false, '1.11');
+		wp_enqueue_style('jquery-ui-smoothness-theme', WPMUDEV_Metabox::class_url('ui/smoothness/jquery-ui.min.css'), false, WPMUDEV_METABOX_VERSION);
 	}
 	
 	/**
 	 * Displays the field
 	 *
-	 * @since 3.0
+	 * @since 1.0
 	 * @access public
 	 * @param int $post_id
 	 */

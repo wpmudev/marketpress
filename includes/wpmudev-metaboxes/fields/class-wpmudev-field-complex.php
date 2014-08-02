@@ -11,6 +11,23 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 	var $subfields = array();
 	
 	/**
+	 * Runs on construct of parent
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param array $args {
+	 *		An array of arguments.
+	 *
+	 *		@type string $layout The layout of the subfields - either "rows" or "columns"
+	 * }
+	 */
+	public function on_creation( $args ) {
+		$this->args = array_replace_recursive(array(
+			'layout' => 'columns',
+		), $args);
+	}
+	
+	/**
 	 * Gets the field value from the database.
 	 *
 	 * @since 1.0
@@ -108,7 +125,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		$numfields = count($this->subfields);
 		$label_width = floor(100 / $numfields) . '%';
 		$value = $this->get_value($post_id);
-		$class = 'wpmudev-field-complex-wrap clearfix';
+		$class = 'wpmudev-field-complex-wrap clearfix ' . $this->args['layout'];
 		$atts = '';
 		
 		foreach ( $this->args['custom'] as $key => $att ) {
@@ -121,7 +138,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 			$class .= ' wpmudev-field-has-conditional';
 		} ?>
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
-			<?php
+		<?php
 			foreach ( $this->subfields as $field ) :
 				if ( ! is_null($this->subfield_id) ) {
 					$field->set_subfield_id($this->subfield_id);
@@ -129,9 +146,15 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 				
 				if ( is_array($value) && ($value = array_shift($value)) ) {
 					$field->set_value($value);
-				} ?>
+				}
+				
+				if ( $this->args['layout'] == 'columns' ) :  ?>
 			<label class="wpmudev-field-complex-label" style="width:<?php echo $label_width ; ?>"><?php $field->display($post_id); ?><span><?php echo $field->args['label']['text']; ?></span></label>
-			<?php
+		<?php
+				else : ?>
+			<label class="wpmudev-field-complex-label"><?php $field->display($post_id); ?><span><?php echo $field->args['label']['text']; ?></span></label>			
+		<?php
+				endif;
 			endforeach; ?>
 		</div>
 		<?php

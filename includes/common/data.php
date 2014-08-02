@@ -17,6 +17,8 @@ $this->default_settings = array(
 	'curr_decimal' => 1,
 	'disable_cart' => 0,
 	'hide_popup' => 0,
+	'image_alignment_single' => 'alignleft',
+	'image_alignment_list' => 'alignleft',
 	'inventory_threshhold' => 3,
 	'inventory_remove' => 0,
 	'max_downloads' => 5,
@@ -82,8 +84,9 @@ $this->default_settings = array(
 	),
 	'store_email' => get_option("admin_email"),
 	'email' => array (
-		'new_order_subject' => __('Your Order Confirmation (ORDERID)', 'mp'),
-		'new_order_txt' => __("Thank you for your order CUSTOMERNAME!
+		'new_order' => array(
+			'subject' => __('Your Order Confirmation (ORDERID)', 'mp'),
+			'text' => __("Thank you for your order CUSTOMERNAME!
 
 Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.
 Here is a confirmation of your order details:
@@ -101,9 +104,12 @@ ORDERNOTES
 
 You can track the latest status of your order here: TRACKINGURL
 
-Thanks again!", 'mp'),
-				'shipped_order_subject' => __('Your Order Has Been Shipped! (ORDERID)', 'mp'),
-				'shipped_order_txt' => __("Dear CUSTOMERNAME,
+Thanks again!", 'mp'
+			),
+		),
+		'order_shipped' => array(
+			'subject' => __('Your Order Has Been Shipped! (ORDERID)', 'mp'),
+			'text' => __("Dear CUSTOMERNAME,
 
 Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.
 Here is a confirmation of your order details:
@@ -121,8 +127,9 @@ ORDERNOTES
 
 You can track the latest status of your order here: TRACKINGURL
 
-Thanks again!", 'mp')
-	),
+Thanks again!", 'mp'
+		),
+	)),
 	'social' => array(
 		'pinterest' => array(
 			'show_pinit_button' => 'off',

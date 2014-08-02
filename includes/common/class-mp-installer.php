@@ -51,23 +51,26 @@ class MP_Installer {
 
 		$old_settings = get_option('mp_settings', array());
 
-		//filter default settings
+		// Filter default settings
 		$default_settings = apply_filters('mp_default_settings', mp()->default_settings);
 		$settings = array_replace_recursive($default_settings, $old_settings);
 		
-		//2.1.4 update
-		if ( version_compare($old_version, '2.1.4', '<') ) {
-			$this->_update_214();
-		}
-		
-		//2.9.2.3 update
-		if ( version_compare($old_version, '2.9.2.3', '<') ) {
-			$this->_update_2923();
-		}
-		
-		//3.0 update
-		if ( version_compare($old_version, '3.1', '<') ) {
-			$settings = $this->_update_3000($settings);
+		// Only run the follow scripts if this not a fresh install
+		if ( ! empty($old_version) ) {
+			//2.1.4 update
+			if ( version_compare($old_version, '2.1.4', '<') ) {
+				$this->_update_214();
+			}
+			
+			//2.9.2.3 update
+			if ( version_compare($old_version, '2.9.2.3', '<') ) {
+				$this->_update_2923();
+			}
+			
+			//3.0 update
+			if ( version_compare($old_version, '3.0', '<') ) {
+				$settings = $this->_update_3000($settings);
+			}
 		}
 
 		// Update settings
@@ -130,7 +133,69 @@ class MP_Installer {
 	 */
 	public function create_store_pages() {
 		$store_page = get_option('mp_store_page');
-		//! TODO
+		//! TODO: create store pages
+	}
+
+	/**
+	 * Updates presentation settings
+	 *
+	 * @since 3.0
+	 * @access private
+	 * @param array $settings
+	 */
+	private function _update_presentation_settings( $settings ) {
+		if ( $height = mp_get_setting('list_img_height') ) {
+			mp_push_to_array($settings, 'list_img_size_custom->height', $height);
+			unset($settings['list_img_height']);
+		}
+		
+		if ( $width = mp_get_setting('list_img_width') ) {
+			mp_push_to_array($settings, 'list_img_size_custom->width', $width);
+			unset($settings['list_img_width']);
+		}
+		
+		if ( $height = mp_get_setting('product_img_height') ) {
+			mp_push_to_array($settings, 'product_img_size_custom->height', $height);
+			unset($settings['product_img_height']);
+		}
+		
+		if ( $width = mp_get_setting('product_img_width') ) {
+			mp_push_to_array($settings, 'product_img_size_custom->width', $width);
+			unset($settings['product_img_width']);
+		}
+		
+		return $settings;
+	}
+	
+	/**
+	 * Updates notification settings
+	 *
+	 * @since 3.0
+	 * @access private
+	 * @param array $settings
+	 */
+	private function _update_notification_settings( $settings ) {		
+		if ( $subject = mp_get_setting('email->new_order_subject') ) {
+			mp_push_to_array($settings, 'email->new_order->subject', $subject);
+			unset($settings['new_order_subject']);
+		}
+		
+		if ( $text = mp_get_setting('email->new_order_txt') ) {
+			mp_push_to_array($settings, 'email->new_order->text', $text);
+			unset($settings['email']['new_order_txt']);
+		}
+
+		if ( $subject = mp_get_setting('email->shipped_order_subject') ) {
+			mp_push_to_array($settings, 'email->order_shipped->subject', $subject);
+			unset($settings['email']['shipped_order_subject']);
+		}
+		
+		if ( $text = mp_get_setting('email->shipped_order_txt') ) {
+			mp_push_to_array($settings, 'email->order_shipped->text', $text);
+			unset($settings['email']['shipped_order_txt']);
+		}
+	
+		return $settings;
 	}
 	
 	/**
@@ -138,10 +203,13 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access private
+	 * @param array $settings
 	 */
 	private function _update_3000( $settings ) {
 		$this->_update_coupon_schema();
 		$this->_create_product_attributes_table();
+		$settings = $this->_update_notification_settings($settings);
+		$settings = $this->_update_presentation_settings($settings);
 		
 		// Create store pages
 		add_action('admin_init', array(&$this, 'create_store_pages'));
@@ -203,9 +271,9 @@ class MP_Installer {
 	 * @access private
 	 */
 	private function _update_coupon_schema() {
-		$coupons = get_option('mp_coupons', false);
+		$coupons = get_option('mp_coupons');
 		
-		if ( $coupons === false ) {
+		if ( empty($coupons) ) {
 			//no coupons to update
 			return false;
 		}
@@ -266,6 +334,8 @@ class MP_Installer {
 				$field->save_value($post_id, $name, $data['value'], true);
 			}
 		}
+		
+		delete_option('mp_coupons');
 	}
 }
 

@@ -45,10 +45,12 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			options = [];
 			
 			if ( ! $this.is('select') ) {
-				$($this.attr('data-options').split('||')).each(function(){
-					var val = this.split('=');
-					options.push({ "id" : val[0], "text" : val[1] });
-				});
+				if ( $this.attr('data-options').length > 0 ) {
+					$($this.attr('data-options').split('||')).each(function(){
+						var val = this.split('=');
+						options.push({ "id" : val[0], "text" : val[1] });
+					});
+				}
 			
 				$this.select2({
 					"allowSelectAllNone" : true,
@@ -57,10 +59,12 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 					"initSelection" : function(element, callback){
 						var data = [];
 						
-						$(element.attr('data-value').split('||')).each(function(){
-							var val = this.split('=');
-							data.push({ "id" : val[0], "text" : val[1] });
-						});
+						if ( element.attr('data-value').length > 0 ) {
+							$(element.attr('data-value').split('||')).each(function(){
+								var val = this.split('=');
+								data.push({ "id" : val[0], "text" : val[1] });
+							});
+						}
 						
 						callback(data);
 					},			
@@ -115,7 +119,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	 */
 	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
-		$vals = explode(',', $value);
+		$vals = is_string($value) ? explode(',', $value) : $value;
 		$values = array();
 		$options = array();
 		
@@ -149,7 +153,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('wpmudev-field-select2', WPMUDEV_Metabox::class_url('ui/select2/select2.min.js'), array('jquery'), '3.4.8');
+		wp_enqueue_script('wpmudev-field-select2', WPMUDEV_Metabox::class_url('ui/select2/select2.min.js'), array('jquery'), WPMUDEV_METABOX_VERSION);
 	}
 	
 	/**
@@ -159,6 +163,6 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	 * @access public
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style('wpmudev-field-select2',  WPMUDEV_Metabox::class_url('ui/select2/select2.css'), array(), '3.4.8');
+		wp_enqueue_style('wpmudev-field-select2',  WPMUDEV_Metabox::class_url('ui/select2/select2.css'), array(), WPMUDEV_METABOX_VERSION);
 	}
 }
