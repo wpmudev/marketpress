@@ -6,8 +6,21 @@ class WPMUDEV_Field_File extends WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param array $args {
+	 *		Any array of arguments. Optional.
+	 *
+	 *		@type string $title The text that shows up in the header of the media lightbox. Optional.
+	 *		@type string $button_label The label of the send-to-editor button. Optional.
+	 * }
 	 */
 	public function on_creation( $args ) {
+		$this->args = array_replace_recursive(array(
+			'title' => __('Select the file that you would like to use.', 'wpmudev_metaboxes'),
+			'button_label' => __('Select File', 'wpmudev_metaboxes'),
+		), $args);
+		
+		$this->args['custom']['data-media-title'] = $this->args['title'];
+		$this->args['custom']['data-media-button-label'] = $this->args['button_label'];
 		$this->args['style'] .= ' width:60%;';
 	}
 
@@ -45,9 +58,9 @@ jQuery(document).ready(function($){
 		var $this = $(this),
 				$input = $this.siblings('input'),
 				frame = wp.media({
-					"title" : "<?php _e('Select the file that you would like to use.', 'wpmudev_metaboxes'); ?>",
+					"title" : $input.attr('data-media-title'),
 					"multiple" : false,
-					"button" : { "text" : "<?php _e('Select File', 'wpmudev_metaboxes'); ?>" }
+					"button" : { "text" : $input.attr('data-media-button-label') }
 				});
 		
 		/*

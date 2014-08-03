@@ -124,6 +124,15 @@ class WPMUDEV_Metabox {
 	public static $metaboxes = array();
 	
 	/**
+	 * The number of metaboxes that have been displayed
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var int
+	 */
+	public static $did_metabox_count = 0;
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 1.0
@@ -361,8 +370,11 @@ class WPMUDEV_Metabox {
 			$post = $post->ID;
 		}
 		
-		if ( $this->is_settings_metabox() ) : ?>
+		if ( $this->is_settings_metabox() ) :
+			if ( self::$did_metabox_count == 0 ) : ?>
 			<div id="poststuff">
+		<?php
+			endif; ?>
 				<div class="meta-box-sortables">
 					<div id="<?php echo $this->args['id']; ?>" class="postbox wpmudev-postbox">
 						<div class="inside">
@@ -390,9 +402,14 @@ class WPMUDEV_Metabox {
 					</div>
 				</div>
 			</div>
+		<?php
+			if ( self::$did_metabox_count == (count(self::$metaboxes) - 1) ) : ?>
 		</div>
 		<?php
+			endif;
 		endif;
+		
+		self::$did_metabox_count += 1;
 	}
 	
 	/**

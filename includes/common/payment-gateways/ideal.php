@@ -36,18 +36,16 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
   function on_creation() {
-		;
-
 		//set names here to be able to translate
 		$this->admin_name = __('iDEAL (beta)', 'mp');
 		$this->public_name = __('iDEAL', 'mp');
 
-    	$this->method_img_url = mp()->plugin_url . 'images/ideal.png';
+    $this->method_img_url = mp()->plugin_url . 'images/ideal.png';
 		$this->method_button_img_url = mp()->plugin_url . 'images/ideal.png';
-		$this->merchant_id = mp_get_setting('gateways->ideal->merchant_id');
-		$this->ideal_hash = mp_get_setting('gateways->ideal->ideal_hash');
+		$this->merchant_id = $this->get_setting('merchant_id');
+		$this->ideal_hash = $this->get_setting('ideal_hash');
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');
-  		$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
+  	$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
 		$this->errorURL = mp_checkout_step_url('checkout') . "?err=1";
 	}
 
@@ -57,12 +55,10 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form($cart, $shipping_info) {
-    ;
-	
-		if (isset($_GET['cancel']))
+  function payment_form( $cart, $shipping_info ) {
+		if ( mp_get_get_value('cancel') ) {
 			echo '<div class="mp_checkout_error">' . __('Your iDEAL transaction has been canceled.', 'mp') . '</div>';
-
+		}
   }
   
   /**
@@ -76,8 +72,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment_form($cart, $shipping_info) {
-		;
-		
 		$key = $this->ideal_hash; // Your hashkey or Secret key
 		$merchantID = $this->merchant_id; //Your merchant ID
 		$subID = '0'; //Almost always 0
@@ -160,17 +154,26 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$urlError = $this->errorURL;
 		
 		//setup bank specific urls
-		$test = (mp_get_setting('gateways->ideal->mode', 'test') == 'test');
-		if (mp_get_setting('gateways->ideal->bank') == 'ing')
-			$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.secure-ing.com/ideal/mpiPayInitIng.do?';
-		else if (mp_get_setting('gateways->ideal->bank') == 'rabo')
-			$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.rabobank.nl/ideal/mpiPayInitRabo.do?';
-		else if (mp_get_setting('gateways->ideal->bank') == 'fries')
-			$redirectURL = 'https://' . ($test ? 'test' : '') . 'idealkassa.frieslandbank.nl/ideal/mpiPayInitFriesland.do?';
-		else if (mp_get_setting('gateways->ideal->bank') == 'abn')
-			$redirectURL = 'https://abnamro' . ($test ? '-test' : '') . '.ideal-payment.de/ideal/mpiPayInitFortis.do?';
-		else
-			$redirectURL = 'https://www.ideal-simulator.nl/lite/?';
+		$test = ( $this->get_setting('mode', 'test') == 'test');
+		$redirectURL = 'https://www.ideal-simulator.nl/lite/?';
+		
+		switch ( $this->get_setting('bank') ) {
+			case 'ing' :
+				$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.secure-ing.com/ideal/mpiPayInitIng.do?';
+				break;
+			
+			case 'rabo' :
+				$redirectURL = 'https://ideal' . ($test ? 'test' : '') . '.rabobank.nl/ideal/mpiPayInitRabo.do?';
+				break;
+			
+			case 'fries' :
+				$redirectURL = 'https://' . ($test ? 'test' : '') . 'idealkassa.frieslandbank.nl/ideal/mpiPayInitFriesland.do?';
+				break;
+				
+			case 'abn' :
+				$redirectURL = 'https://abnamro' . ($test ? '-test' : '') . '.ideal-payment.de/ideal/mpiPayInitFortis.do?';
+				break;
+		}
 			
 		$redirectURL .= 'merchantID='.$merchantID;
 		$redirectURL .='&subID='.$subID;
@@ -305,8 +308,6 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    * Don't forget to return!
    */
 	function order_confirmation_email($msg, $order) {
-    ;
-		  
     return $msg;
   }
   
@@ -317,72 +318,55 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
    * Don't forget to return!
    */
 	function order_confirmation_msg($content, $order) {
-    ;
-    
     return $content;
   }
-	
-	/**
-   * Echo a settings meta box with whatever settings you need for you gateway.
-   *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-   *  You can access saved settings via $settings array.
-   */
-	function gateway_settings_box($settings) {
-    ;
-    ?>
-    <div class="postbox">
-    	<h3 class='handle'><span><?php _e('iDEAL Settings', 'mp'); ?></span></h3>
-      <div class="inside">
-				<a href="http://www.ideal.nl/?lang=eng-GB" target="_blank"><img src="<?php echo mp()->plugin_url . 'images/ideal.png'; ?>" /></a>
-        
-	      <p class="description"><?php _e('To make it easier to pay for online products and services, the Dutch banking community has developed the iDEAL online payment method. iDEAL allows online payments to be made using online banking in EUR only.', 'mp') ?></p>
-	      <table class="form-table">
-					<tr>
-					<th scope="row"><?php _e('Bank', 'mp') ?></th>
-					<td>
-					<select name="mp[gateways][ideal][bank]">
-	          <option value="ing"<?php selected(mp_get_setting('gateways->ideal->bank'), 'ing') ?>><?php _e('ING Bank', 'mp') ?></option>
-	          <option value="rabo"<?php selected(mp_get_setting('gateways->ideal->bank'), 'rabo') ?>><?php _e('Rabobank', 'mp') ?></option>
-	          <option value="fries"<?php selected(mp_get_setting('gateways->ideal->bank'), 'fries') ?>><?php _e('Friesland Bank', 'mp') ?></option>
-	          <option value="abn"<?php selected(mp_get_setting('gateways->ideal->bank'), 'abn') ?>><?php _e('ABN Amro Bank', 'mp') ?></option>
-	          <option value="sim"<?php selected(mp_get_setting('gateways->ideal->bank'), 'sim') ?>><?php _e('iDEAL Simulator (for testing)', 'mp') ?></option>
-	        </select>
-					</td>
-	        </tr>
-		     <tr>
-				  <th scope="row"><label for="ideal-key"><?php _e('Merchant ID', 'mp') ?></label></th>
-				  <td>	  		 
-		          <input value="<?php echo esc_attr(mp_get_setting('gateways->ideal->merchant_id')); ?>" name="mp[gateways][ideal][merchant_id]" id="merchant_id" type="text" />   
-		        </td>
-	         </tr>
-					<tr>
-				  <th scope="row"><label for="ideal-hash"><?php _e('iDEAL Secret Key', 'mp') ?></label></th>
-				  <td>
-						<input value="<?php echo esc_attr(mp_get_setting('gateways->ideal->ideal_hash')); ?>" name="mp[gateways][ideal][ideal_hash]" id="ideal_hash" type="text" />
-					</td>
-				 </tr>
-					<tr>
-					<th scope="row"><?php _e('Mode', 'mp') ?></th>
-					<td>
-					<select name="mp[gateways][ideal][mode]">
-	          <option value="test"<?php selected(mp_get_setting('gateways->ideal->mode', 'test'), 'test') ?>><?php _e('Testing', 'mp') ?></option>
-	          <option value="live"<?php selected(mp_get_setting('gateways->ideal->mode'), 'live') ?>><?php _e('Live', 'mp') ?></option>
-	        </select>
-					</td>
-	        </tr>
-      	</table>
-      </div>
-    </div>
-    <?php
-  }
-  
+
   /**
-   * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-   *  array. Don't forget to return!
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
    */
-	function process_gateway_settings($settings) {
-		return $settings;
-	}
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('To make it easier to pay for online products and services, the Dutch banking community has developed the iDEAL online payment method. iDEAL allows online payments to be made using online banking in EUR only.', 'mp'),
+		));
+		$metabox->add_field('advanced_select', array(
+			'name' => $this->get_field_name('bank'),
+			'label' => array('text' => __('Bank', 'mp')),
+			'width' => 'element',
+			'multiple' => false,
+			'options' => array(
+				'' => __('Select Your Bank', 'mp'),
+				'ing' => __('ING Bank', 'mp'),
+				'rabo' => __('Rabobank', 'mp'),
+				'fries' => __('Friesland Bank', 'mp'),
+				'abn' => __('ABN Amro Bank', 'mp'),
+				'sim' => __('iDEAL Simulator (for testing)', 'mp'),
+			),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('merchant_id'),
+			'label' => array('text' => __('Merchant ID', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('ideal_hash'),
+			'label' => array('text' => __('Secret Key', 'mp')),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => $this->get_field_name('mode'),
+			'label' => array('text' => __('Mode', 'mp')),
+			'default_value' => 'test',
+			'options' => array(
+				'test' => __('Test', 'mp'),
+				'live' => __('Live', 'mp'),
+			),
+		));
+  }
   
 	/**
    * Use to handle any payment returns to the ipn_url. Do not display anything here. If you encounter errors

@@ -36,12 +36,9 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
   function on_creation() {
-		;
-
 		//set names here to be able to translate
 		$this->admin_name = __('Manual Payments', 'mp');
-		$this->public_name = mp_get_setting('gateways->manual-payments->name') ? mp_get_setting('gateways->manual-payments->name', __('Manual Payment', 'mp')) : __('Manual Payment', 'mp');
-
+		$this->public_name = $this->get_setting('name', __('Manual Payment', 'mp'));
     $this->method_img_url = mp()->plugin_url . 'images/manual-payment.png';
 	}
 
@@ -52,8 +49,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function payment_form($cart, $shipping_info) {
-    ;
-    return do_shortcode(mp_get_setting('gateways->manual-payments->instructions'));
+    return do_shortcode($this->get_setting('instructions'));
   }
   
   /**
@@ -67,7 +63,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment_form($cart, $shipping_info) {
-		;
   }
   
   /**
@@ -92,7 +87,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment($cart, $shipping_info) {
-	  ;
 	  $timestamp = time();
 	  
     $totals = array();
@@ -127,7 +121,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
     $payment_info['total'] = $total;
     $payment_info['currency'] = mp_get_setting('currency');
 	  $payment_info['method'] = __('Manual/Invoice', 'mp');
-	  //$payment_info['transaction_id'] = $order_id;
 	  
     //create our order now
     $result = mp()->create_order($order_id, $cart, $shipping_info, $payment_info, false);
@@ -147,10 +140,9 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * Don't forget to return!
    */
 	function order_confirmation_email($msg, $order) {
-    ;
-	  
-	  if (mp_get_setting('gateways->manual-payments->email'))
-		  $msg = mp()->filter_email($order, mp_get_setting('gateways->manual-payments->email'));
+	  if ( $email_text = $this->get_setting('email') ) {
+			$msg = mp()->filter_email($order, $email_text);
+		}
 		  
     return $msg;
   }
@@ -162,94 +154,46 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
    * Don't forget to return!
    */
 	function order_confirmation_msg($content, $order) {
-    ;
-    
-    return $content . str_replace( 'TOTAL', mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), mp_get_setting('gateways->manual-payments->confirmation') );
+    return $content . str_replace('TOTAL', mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $this->get_setting('confirmation'));
   }
-	
-	/**
-   * Echo a settings meta box with whatever settings you need for you gateway.
-   *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-   *  You can access saved settings via $settings array.
-   */
-	function gateway_settings_box($settings) {
-    ;
-    ?>
-    <div id="mp_manual_payments" class="postbox mp-pages-msgs">
-    	<h3 class='handle'><span><?php _e('Manual Payments Settings', 'mp'); ?></span></h3>
-      <div class="inside">
-	      <span class="description"><?php _e('Record payments manually, such as by Cash, Check, or EFT.', 'mp') ?></span>
-	      <table class="form-table">
-		      <tr>
-						<th scope="row"><label for="manual-payments-name"><?php _e('Method Name', 'mp') ?></label></th>
-						<td>
-		  				<span class="description"><?php _e('Enter a public name for this payment method that is displayed to users - No HTML', 'mp') ?></span>
-		          <p>
-		          <input value="<?php echo esc_attr(mp_get_setting('gateways->manual-payments->name') ? mp_get_setting('gateways->manual-payments->name', __('Manual Payment', 'mp')) : __('Manual Payment', 'mp')); ?>" style="width: 100%;" name="mp[gateways][manual-payments][name]" id="manual-payments-name" type="text" />
-		          </p>
-		        </td>
-	        </tr>
-		      <tr>
-		        <th scope="row"><label for="manual-payments-instructions"><?php _e('User Instructions', 'mp') ?></label></th>
-		        <td>
-		        <span class="description"><?php _e('These are the manual payment instructions to display on the payments screen - HTML allowed', 'mp') ?></span>
-	          <p>
-							<?php wp_editor( mp_get_setting('gateways->manual-payments->instructions'), 'manualpaymentsinstructions', array('textarea_name'=>'mp[gateways][manual-payments][instructions]') ); ?>
-						</p>
-	        	</td>
-	        </tr>
-	        <tr>
-		        <th scope="row"><label for="manual-payments-confirmation"><?php _e('Confirmation User Instructions', 'mp') ?></label></th>
-		        <td>
-		        <span class="description"><?php _e('These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed', 'mp') ?></span>
-	          <?php wp_editor( mp_get_setting('gateways->manual-payments->confirmation'), 'manualpaymentsconfirmation', array('textarea_name'=>'mp[gateways][manual-payments][confirmation]') ); ?> 
-	        	</td>
-	        </tr>
-	        <tr>
-		        <th scope="row"><label for="manual-payments-email"><?php _e('Order Confirmation Email', 'mp') ?></label></th>
-		        <td>
-		        <span class="description"><?php _e('This is the email text to send to those who have made manual payment checkouts. You should include your manual payment instructions here. It overrides the default order checkout email. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp') ?></span>
-	          <p>
-	            <textarea id="manual-payments-email" name="mp[gateways][manual-payments][email]" class="mp_emails_txt"><?php echo esc_textarea(mp_get_setting('gateways->manual-payments->email', mp_get_setting('email->new_order_txt'))); ?></textarea>
-	          </p>
-	        	</td>
-	        </tr>
-      	</table>
-      </div>
-    </div>
-    <?php
-  }
-  
-  /**
-   * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-   *  array. Don't forget to return!
-   */
-	function process_gateway_settings($settings) {
-		
-		if ( isset( $settings['gateways']['manual-payments'] ) && !is_array( $settings['gateways']['manual-payments'] ) )
-			return $settings;
-		
-		//strip slashes
-    $settings['gateways']['manual-payments'] = array_map('stripslashes', (array)$settings['gateways']['manual-payments']);
-		
-		//no html in public name
-  	$settings['gateways']['manual-payments']['name'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['manual-payments']['name']));
-  	
-		//filter html if needed
-		if (!current_user_can('unfiltered_html')) {
-			$settings['gateways']['manual-payments']['instructions'] = wp_filter_post_kses($settings['gateways']['manual-payments']['instructions']);
-			$settings['gateways']['manual-payments']['confirmation'] = wp_filter_post_kses($settings['gateways']['manual-payments']['confirmation']);
-		}
-		
-		$settings['gateways']['manual-payments']['instructions'] = wpautop($settings['gateways']['manual-payments']['instructions']);
-		$settings['gateways']['manual-payments']['confirmation'] = wpautop($settings['gateways']['manual-payments']['confirmation']);
-		
-		//no html in email
-  	$settings['gateways']['manual-payments']['email'] = stripslashes(wp_filter_nohtml_kses($settings['gateways']['manual-payments']['email']));	
 
-    return $settings;
-  }
-  
+  /**
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('Record payments manually, such as by Cash, Check, or EFT.', 'mp'),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('name', $this->public_name),
+			'label' => array('text' => __('Method Name', 'mp')),
+			'desc' => __('Enter a public name for this payment method that is displayed to users - No HTML', 'mp'),
+		));
+		$metabox->add_field('wysiwyg', array(
+			'name' => $this->get_field_name('instruction'),
+			'label' => array('text' => __('User Instructions', 'mp')),
+			'desc' => __('These are the manual payment instructions to display on the payments screen - HTML allowed', 'mp'),
+		));
+		$metabox->add_field('wysiwyg', array(
+			'name' => $this->get_field_name('confirmation'),
+			'label' => array('text' => __('Confirmation User Instructions', 'mp')),
+			'desc' => __('These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed', 'mp'),
+		));
+		$metabox->add_field('textarea', array(
+			'name' => $this->get_field_name('email'),
+			'label' => array('text' => __('Order Confirmation Email', 'mp')),
+			'desc' => __('This is the email text to send to those who have made manual payment checkouts. You should include your manual payment instructions here. It overrides the default order checkout email. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp'),
+			'custom' => array('rows' => 10),
+		));
+	}
+	  
 	/**
    * Use to handle any payment returns to the ipn_url. Do not display anything here. If you encounter errors
    *  return the proper headers. Exits after.

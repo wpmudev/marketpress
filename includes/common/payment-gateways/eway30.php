@@ -5,40 +5,116 @@ Author: Mariusz Maniu (Incsub)
 */
 
 class MP_Gateway_eWay30 extends MP_Gateway_API {
+	/**
+	 * Build of the gateway plugin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var int
+	 */
+	var $build = 2;
 
-	//private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
+	/**
+	 * Private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $plugin_name = 'eway30';
 
-	//name of your gateway, for the admin side.
+	/**
+	 * Name of your gateway, for the admin side.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $admin_name = '';
 
-	//public name of your gateway, for lists and such.
+	/**
+	 * Public name of your gateway, for lists and such.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $public_name = '';
 
-	//url for an image for your checkout method. Displayed on checkout form if set
+	/**
+	 * Url for an image for your checkout method. Displayed on checkout form if set.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $method_img_url = '';
 
-	//url for an submit button image for your checkout method. Displayed on checkout form if set
+	/**
+	 * Url for an submit button image for your checkout method. Displayed on checkout form if set.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $method_button_img_url = '';
 
-	//whether or not ssl is needed for checkout page
+	/**
+	 * Whether or not ssl is needed for checkout page
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var bool
+	 */
 	var $force_ssl = true;
 
-	//always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
+	/**
+	 * Always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $ipn_url;
 
-	//whether if this is the only enabled gateway it can skip the payment_form step
+	/**
+	 * whether if this is the only enabled gateway it can skip the payment_form step
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
 	var $skip_form = false;
+	
+	/**
+	 * The gateway's currencies
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var array
+	 */
+	var $currencies = array(
+		'NZD' => 'NZD - New Zealand Dollar',
+		'AUD' => 'AUD - Australian Dollar',
+		'CAD' => 'CAD - Canadian Dollar',
+		'EUR' => 'EUR - Euro',
+		'GBP' => 'GBP - Pound Sterling',
+		'HKD' => 'HKD - Hong Kong Dollar',
+		'JPY' => 'JPY - Japanese Yen',
+		'SGD' => 'SGD - Singapore Dollar',
+		'USD' => 'USD - U.S. Dollar'
+	);
 
 
 	/****** Below are the public methods you may overwrite via a plugin ******/
 
 	/**
 	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
+	 *
+	 * @since 3.0
+	 * @access public
 	 */
 	function on_creation() {
-		;
-		
 		//set names here to be able to translate
 		$this->admin_name = __('eWay Rapid 3.0 Payments (beta)', 'mp');
 		$this->public_name = __('Credit Card', 'mp');
@@ -49,13 +125,13 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 		$this->returnURL = mp_checkout_step_url('confirmation');
 		
 		//sets eway api settings
-		if (mp_get_setting('gateways->eway30->mode') == 'rapid30live') {
-			$this->UserAPIKey = mp_get_setting('gateways->eway30->UserAPIKeyLive');
-			$this->UserPassword = mp_get_setting('gateways->eway30->UserPasswordLive');
+		if ( $this->get_setting('mode') == 'rapid30live' ) {
+			$this->UserAPIKey =  $this->get_setting('api_credentials->live->api_key');
+			$this->UserPassword =  $this->get_setting('api_credentials->live->api_pass');
 			$this->LiveMode = true;
-		} else if (mp_get_setting('gateways->eway30->mode') == 'rapid30sandbox') {
-			$this->UserAPIKey = mp_get_setting('gateways->eway30->UserAPIKeySandbox');
-			$this->UserPassword = mp_get_setting('gateways->eway30->UserPasswordSandbox');
+		} else if ( $this->get_setting('mode') == 'rapid30sandbox' ) {
+			$this->UserAPIKey = $this->get_setting('api_credentials->sandbox->api_key');
+			$this->UserPassword = $this->get_setting('api_credentials->sandbox->api_pass');
 			$this->LiveMode = false;
 		} else {
 			$this->UserAPIKey = '';
@@ -65,15 +141,15 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	}
 
 	/**
-	* Return fields you need to add to the payment screen, like your credit card info fields
-	*
-	* @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	* @param array $shipping_info. Contains shipping info and email in case you need it
-	*/
-	function payment_form($cart, $shipping_info) {
-		;
-		
-		$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
+	 * Return fields you need to add to the payment screen, like your credit card info fields
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 */
+	function payment_form( $cart, $shipping_info ) {
+		$name = mp_get_session_value('mp_shipping_info->name');
 		
 		$content = '';
 				
@@ -125,18 +201,20 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	}
 	
 	/**
-	 * Use this to process any fields you added. Use the $_POST global,
-	 *	and be sure to save it to both the $_SESSION and usermeta if logged in.
-	 *	DO NOT save credit card details to usermeta as it's not PCI compliant.
-	 *	Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-	 *	it will redirect to the next step.
+	 * Use this to process any fields you added.
 	 *
+	 * Use the $_POST global,
+	 * and be sure to save it to both the $_SESSION and usermeta if logged in.
+	 * DO NOT save credit card details to usermeta as it's not PCI compliant.
+	 * Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
+	 * it will redirect to the next step.
+	 *
+	 * @since 3.0
+	 * @access public
 	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 * @param array $shipping_info. Contains shipping info and email in case you need it	 
 	 */
-	function process_payment_form($cart, $shipping_info) {
-		;
-			
+	function process_payment_form( $cart, $shipping_info ) {
 		if (!isset($_POST['exp_month']) || !isset($_POST['exp_year']) || empty($_POST['exp_month']) || empty($_POST['exp_year'])) {
 			mp()->cart_checkout_error( __('Please select your credit card expiration date.', 'mp'), 'exp');
 		}
@@ -179,8 +257,6 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function confirm_payment_form($cart, $shipping_info) {
-		;
-		
 		//print payment details
 		$content = '';
 		
@@ -319,23 +395,26 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	
 		// Create AccessCode Request Object
 		$request = new CreateAccessCodeRequest();
-	
-		$request->Customer->Reference = 'MarketPress';
-		if (!mp()->download_only_cart($cart) && mp_get_setting('shipping->method') != 'none' && isset($shipping_info['name'])) {	
-			list($first_name, $last_name) = split(' ', $shipping_info['name'], 2);
+		$request->Customer->Reference = 'MarketPress';
+		if ( ! mp()->download_only_cart($cart) && mp_get_setting('shipping->method') != 'none' && ($name = mp_arr_get_value('name', $shipping_info)) ) {	
+			$name_parts = explode(' ', $name);
 				
-			$request->Customer->FirstName = $first_name;
-			$request->Customer->LastName = $last_name;
-			$request->Customer->Street1 = $shipping_info['address1'];
-			if (!empty($shipping_info['address2']))
-				$request->Customer->Street2 = $shipping_info['address1'] . " " . $shipping_info['address2'];
-			$request->Customer->Phone = $shipping_info['phone'];	
-			$request->Customer->City = $shipping_info['city'];
-			$request->Customer->State = $shipping_info['state'];
-			$request->Customer->PostalCode = $shipping_info['zip'];
-			$request->Customer->Country = $shipping_info['country'];		
+			$request->Customer->FirstName = array_shift($name_parts);
+			$request->Customer->LastName = ( ! empty($name_parts) ) ? array_shift($name_parts) : '';
+			$request->Customer->Street1 = mp_arr_get_value('address1', $shipping_info);
+			
+			if ( $address2 = mp_arr_get_value('address2', $shipping_info) ) {
+				$request->Customer->Street2 = mp_arr_get_value('address1', $shipping_info) . ' ' . mp_arr_get_value('address2', $shipping_info);
+			}
+			
+			$request->Customer->Phone = mp_arr_get_value('phone', $shipping_info);	
+			$request->Customer->City = mp_arr_get_value('city', $shipping_info);
+			$request->Customer->State = mp_arr_get_value('state', $shipping_info);
+			$request->Customer->PostalCode = mp_arr_get_value('zip', $shipping_info);
+			$request->Customer->Country = mp_arr_get_value('country', $shipping_info);		
 		}
-		$request->Customer->Email = $shipping_info['email'];
+		
+		$request->Customer->Email = mp_arr_get_value('email', $shipping_info);
 		$request->Customer->Mobile = '';
 	
 		// require field
@@ -357,7 +436,7 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 		$request->Payment->InvoiceDescription = '';
 		$request->Payment->InvoiceReference = '';
 	
-		$request->Payment->CurrencyCode = mp_get_setting('gateways->eway30->Currency');
+		$request->Payment->CurrencyCode = $this->get_setting('Currency');
 	
 		$request->RedirectUrl = $this->returnURL;
 		$request->Method = 'ProcessPayment';
@@ -450,7 +529,7 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 			$payment_info['method'] = "eWay payment";
 			$payment_info['status'][$timestamp] = "paid";
 			$payment_info['total'] = $amount;
-			$payment_info['currency'] = mp_get_setting('gateways->eway30->Currency');
+			$payment_info['currency'] = $this->get_setting('Currency');
 			$payment_info['transaction_id'] = $result->TransactionID;
 	  
 			$result = mp()->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);		
@@ -474,7 +553,6 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	 * Don't forget to return!
 	 */
 	function order_confirmation_msg($content, $order) {
-		;
 		$content = '';
 		
 		if (!$order)
@@ -497,90 +575,112 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	 * Runs before page load incase you need to run any scripts before loading the success message page
 	 */
 	function order_confirmation($order) {
-		;
 	}
 
-	/**
-	 * Echo a settings meta box with whatever settings you need for you gateway.
-	 *	Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-	 *	You can access saved settings via $settings array.
-	 */
-	function gateway_settings_box($settings) {
-		;				
-		?>
-		<div id="mp_paypal_express" class="postbox">
-			<h3 class='hndle'><span><?php _e('eWay Rapid 3.0 Payments Settings', 'mp'); ?></span></h3>
-			<div class="inside">
-				<span class="description"><?php _e('eWay Rapid 3.0 Payments lets merchants recieve credit card payments through eWay without need for users to leave the shop. Note this gateway requires a valid SSL certificate configured for this site.', 'mp') ?></span>
-				<table class="form-table">
-					<tr>
-					<th scope="row"><?php _e('eWay Currency', 'mp') ?></th>
-					<td>
-						<select name="mp[gateways][eway30][Currency]">
-						<?php
-						$sel_currency = mp_get_setting('gateways->eway30->Currency', $settings['currency']);
-						$currencies = array(
-								'NZD' => 'NZD - New Zealand Dollar',
-								'AUD' => 'AUD - Australian Dollar',
-								'CAD' => 'CAD - Canadian Dollar',
-								'EUR' => 'EUR - Euro',
-								'GBP' => 'GBP - Pound Sterling',
-								'HKD' => 'HKD - Hong Kong Dollar',
-								'JPY' => 'JPY - Japanese Yen',
-								'SGD' => 'SGD - Singapore Dollar',
-								'USD' => 'USD - U.S. Dollar'
-						);
-						foreach ($currencies as $k => $v) {
-								echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
-						}
-						?>
-						</select>
-					</td>
-					</tr>
-					<tr>
-					<th scope="row"><?php _e('Gateway Mode', 'mp') ?></th>
-					<td>
-					<span class="description"><?php _e('Rapid 3.0 method keeps User on your page through whole payment process. ', 'mp') ?><a href="http://www.eway.com.au/developers/api/rapid-3-0" target="_blank"><?php _e('More about Rapid 3.0 API. ', 'mp') ?></a></span><br />
-					<select name="mp[gateways][eway30][mode]">
-						<option value="rapid30sandbox"<?php selected(mp_get_setting('gateways->eway30->mode', 'rapid30sandbox'), 'rapid30sandbox') ?>><?php _e('Sandbox Rapid 3.0', 'mp') ?></option>
-						<option value="rapid30live"<?php selected(mp_get_setting('gateways->eway30->mode'), 'rapid30live') ?>><?php _e('Live Rapid 3.0', 'mp') ?></option>
-					</select>
-					</td>
-					</tr>
-					<tr>
-					<th scope="row"><?php _e('Live Rapid 3.0 API Credentials', 'mp') ?></th>
-					<td>
-						<p><label><?php _e('eWay User API Key', 'mp') ?><br />
-						<input value="<?php echo esc_attr(mp_get_setting('gateways->eway30->UserAPIKeyLive')); ?>" size="30" name="mp[gateways][eway30][UserAPIKeyLive]" type="text" />
-						</label></p>
-						<p><label><?php _e('eWay User Password', 'mp') ?><br />
-						<input value="<?php echo esc_attr(mp_get_setting('gateways->eway30->UserPasswordLive')); ?>" size="20" name="mp[gateways][eway30][UserPasswordLive]" type="text" />
-						</label></p>
-					</td>
-					</tr>
-					<tr>
-					<th scope="row"><?php _e('Sandbox Rapid 3.0 API Credentials', 'mp') ?></th>
-					<td>
-						<p><label><?php _e('eWay User API Key', 'mp') ?><br />
-						<input value="<?php echo esc_attr(mp_get_setting('gateways->eway30->UserAPIKeySandbox')); ?>" size="30" name="mp[gateways][eway30][UserAPIKeySandbox]" type="text" />
-						</label></p>
-						<p><label><?php _e('eWay User Password', 'mp') ?><br />
-						<input value="<?php echo esc_attr(mp_get_setting('gateways->eway30->UserPasswordSandbox')); ?>" size="20" name="mp[gateways][eway30][UserPasswordSandbox]" type="text" />
-						</label></p>
-					</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-		<?php
-	}
+  /**
+   * Updates the gateway settings
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function update() {
+  	$settings = get_option('mp_settings');
+  	
+  	if ( $api_key = $this->get_setting('UserAPIKeyLive') ) {
+	  	mp_push_to_array($settings, 'api_credentials->live->api_key', $api_key);
+	  	unset($settings['gateways']['eway30']['UserAPIKeyLive']);
+  	}
+  	
+  	if ( $api_pass = $this->get_setting('UserPasswordLive') ) {
+	  	mp_push_to_array($settings, 'api_credentials->live->api_pass', $api_key);
+	  	unset($settings['gateways']['eway30']['UserPasswordLive']);
+  	}
+  	
+  	if ( $api_key = $this->get_setting('UserAPIKeySandbox') ) {
+	  	mp_push_to_array($settings, 'api_credentials->sandbox->api_key', $api_key);
+	  	unset($settings['gateways']['eway30']['UserAPIKeySandbox']);
+  	}
+  	
+  	if ( $api_pass = $this->get_setting('UserPasswordSandbox') ) {
+	  	mp_push_to_array($settings, 'api_credentials->sandbox->api_pass', $api_key);
+	  	unset($settings['gateways']['eway30']['UserPasswordSandbox']);
+  	}
+  	
+  	update_option('mp_settings', $settings);
+  }
 
-	/**
-	 * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-	 *	array. Don't forget to return!
-	 */
-	function process_gateway_settings($settings) {
-		return $settings;
+  /**
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('eWay Rapid 3.0 Payments lets merchants recieve credit card payments through eWay without need for users to leave the shop. Note this gateway requires a valid SSL certificate configured for this site.', 'mp'),
+		));
+		$metabox->add_field('advanced_select', array(
+			'name' => $this->get_field_name('Currency'),
+			'label' => array('text' => __('Currency', 'mp')),
+			'default_value' => mp_get_setting('currency'),
+			'multiple' => false,
+			'width' => 'element',
+			'options' => $this->currencies,
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => $this->get_field_name('mode'),
+			'label' => array('text' => __('Gateway Mode', 'mp')),
+			'default_value' => 'rapid30sandbox',
+			'options' => array(
+				'rapid30sandbox' => 'Sandbox',
+				'rapid30live' => 'Live',
+			),
+		));
+		$api_creds = $metabox->add_field('complex', array(
+			'name' => $this->get_field_name('api_credentials->live'),
+			'label' => array('text' => __('Live API Credentials', 'mp')),
+			'conditional' => array(
+				'name' => $this->get_field_name('mode'),
+				'value' => 'rapid30live',
+				'action' => 'show',
+			),
+		));
+		
+		if ( $api_creds instanceof WPMUDEV_Field ) {
+			$api_creds->add_field('text', array(
+				'name' => $this->get_field_name('api_key'),
+				'label' => array('text' => __('API Key', 'mp')),
+			));
+			$api_creds->add_field('text', array(
+				'name' => $this->get_field_name('api_password'),
+				'label' => array('text' => __('API Password', 'mp')),
+			));
+		}
+		
+		$api_creds = $metabox->add_field('complex', array(
+			'name' => $this->get_field_name('api_credentials->sandbox'),
+			'label' => array('text' => __('Sandbox API Credentials', 'mp')),
+			'conditional' => array(
+				'name' => $this->get_field_name('mode'),
+				'value' => 'rapid30sandbox',
+				'action' => 'show',
+			),
+		));
+		
+		if ( $api_creds instanceof WPMUDEV_Field ) {
+			$api_creds->add_field('text', array(
+				'name' => $this->get_field_name('api_key'),
+				'label' => array('text' => __('API Key', 'mp')),
+			));
+			$api_creds->add_field('text', array(
+				'name' => $this->get_field_name('api_pass'),
+				'label' => array('text' => __('API Password', 'mp')),
+			));
+		}
 	}
 
 	/**

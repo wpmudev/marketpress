@@ -58,9 +58,12 @@ class MP_Store_Settings_Payments {
 				$metaboxes.not(selectors.join(',')).hide();
 			};
 			
+			$(window).load(function(){
+				// Hide the inactive gateways. We do this window.onload instead of document.ready to avoid display issues (e.g. WYSIWYG not getting proper height)
+				hideInactiveGateways();				
+			});
+			
 			$(document).ready(function(){
-				hideInactiveGateways();
-				
 				$('[name="gateways[allowed]"]').on('change', function(e){
 					if ( e.added !== undefined ) {
 						$('#mp-settings-gateway-' + e.added.id).slideDown(500);

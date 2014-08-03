@@ -1,12 +1,16 @@
 <?php
-/*
-MarketPress CubePoints Plugin
-Requires the CubePoints plugin: http://wordpress.org/extend/plugins/cubepoints/
-Author: David Mallonee (Incsub)
-*/
+
+/**
+ * MarketPress CubePoints Plugin
+ *
+ * Requires the CubePoints plugin: http://wordpress.org/extend/plugins/cubepoints/
+ *
+ * @since 3.0
+ *
+ * @package MarketPress
+ */
 
 class MP_Gateway_CubePoints extends MP_Gateway_API {
-
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'cubepoints';
 
@@ -61,7 +65,6 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment_form($cart, $shipping_info) {
-		;
   }
 
   /**
@@ -72,8 +75,6 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function confirm_payment_form($cart, $shipping_info) {
-	  ;
-			
 		$uid = cp_currentUser();
 		return '<div id="mp_cp_points">' . __('Your current points: ', 'mp') . cp_getPoints ( cp_currentUser() ) . '</div>';
   }
