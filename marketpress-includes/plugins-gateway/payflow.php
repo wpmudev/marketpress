@@ -551,6 +551,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     // Billing Info
     $payment->setParameter("TENDER", 'C');
     $payment->setParameter("TRXTYPE", 'S');
+	  $payment->setParameter("BUTTONSOURCE", 'incsub_SP');
     $payment->setParameter("AMT", number_format($total, 2, '.', ''));
 
     $payment->setParameter("CURRENCY",$this->currencyCode);

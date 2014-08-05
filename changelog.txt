@@ -5,6 +5,10 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+2.9.5.2
+----------------------------------------------------------------------
+- Added: BN codes to PayPal gateways
+
 2.9.5.1
 ----------------------------------------------------------------------
 - Added: UPS shipping gateway now allows admin to choose the appropriate pickup type allowing for more accurate rate requests

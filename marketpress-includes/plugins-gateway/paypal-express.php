@@ -1116,6 +1116,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 		$nvpstr  = '&TOKEN=' . urlencode($token);
 	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
+		$nvpstr .= '&BUTTONSOURCE=incsub_SP';
 		$nvpstr .= $_SESSION['nvpstr'];
 
 	  /* Make the call to PayPal to finalize payment
