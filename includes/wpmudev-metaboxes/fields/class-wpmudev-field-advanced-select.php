@@ -123,6 +123,11 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 		$values = array();
 		$options = array();
 		
+		if ( ! is_array($vals) ) {
+			// Make sure this is an array - just in case :)
+			$vals = array();
+		}
+		
 		foreach ( $vals as $val ) {
 			$values[] = $val . '=' . $this->args['options'][$val];
 		}

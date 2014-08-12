@@ -76,23 +76,22 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			}
 		}
 
-    /**
-     * Updates the gateway settings
-     *
-     * @since 3.0
-     * @access public
-     */
-    public function update() {
-    	$settings = get_option('mp_settings');
-    	mp_push_to_array($settings, 'build', $this->build);
-    	
+	  /**
+	   * Updates the gateway settings
+	   *
+	   * @since 3.0
+	   * @access public
+	   * @param array $settings
+	   * @return array $settings
+	   */
+    public function update( $settings ) {
     	if ( ($api_user = $this->get_setting('api_user')) && ($api_key = $this->get_setting('api_key')) ) {
 	    	mp_push_to_array($settings, 'gateways->authorizenet-aim->api_credentials->api_user', $api_user);
 	    	mp_push_to_array($settings, 'gateways->authorizenet-aim->api_credentials->api_key', $api_key);
 	    	unset($settings['gateways']['authorizenet-aim']['api_user'], $settings['gateways']['authorizenet-aim']['api_key']);
     	}
     	
-    	update_option('mp_settings', $settings);
+    	return $settings;
 		}
 		
 		/**

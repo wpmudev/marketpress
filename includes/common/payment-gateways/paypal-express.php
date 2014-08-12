@@ -5,7 +5,9 @@ Author: Aaron Edwards (Incsub)
 */
 
 class MP_Gateway_Paypal_Express extends MP_Gateway_API {
-
+	//build
+	var $build = 2;
+	
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'paypal-express';
 
@@ -121,24 +123,21 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $this->admin_name = __('PayPal Express Checkout', 'mp');
     $this->public_name = __('PayPal', 'mp');
 
-		//3.0 update
-		$this->update_3000();
-		
     //dynamic button img, see: https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECButtonIntegration
     $this->method_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&buttontype=ecmark&locale=' . get_locale();
     $this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
 
-    $this->API_Username = $this->get_setting('gateways->paypal-express->api_credentials->username');
-    $this->API_Password = $this->get_setting('gateways->paypal-express->api_credentials->password');
-    $this->API_Signature = $this->get_setting('gateways->paypal-express->api_credentials->signature');
-    $this->currencyCode = $this->get_setting('gateways->paypal-express->currency');
-    $this->locale = $this->get_setting('gateways->paypal-express->locale');
+    $this->API_Username = $this->get_setting('api_credentials->username');
+    $this->API_Password = $this->get_setting('api_credentials->password');
+    $this->API_Signature = $this->get_setting('api_credentials->signature');
+    $this->currencyCode = $this->get_setting('currency', mp_get_setting('currency'));
+    $this->locale = $this->get_setting('locale');
     $this->returnURL = urlencode(mp_checkout_step_url('confirm-checkout'));
   	$this->cancelURL = urlencode(mp_checkout_step_url('checkout')) . "?cancel=1";
     $this->version = "69.0"; //api version
 
     // Set api urls
-  	if ( $this->get_setting('gateways->paypal-express->mode') == 'sandbox' )	{
+  	if ( $this->get_setting('mode') == 'sandbox' )	{
   		$this->API_Endpoint = "https://api-3t.sandbox.paypal.com/nvp";
   		$this->paypalURL = "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=";
   	} else {
@@ -148,20 +147,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   }
   
   /**
-   * 3.0 Update
+   * Updates the gateway settings
    *
    * @since 3.0
    * @access public
+   * @param array $settings
+   * @return array
    */
-  function update_3000() {
-		if ( ($api_user = $this->get_setting('gateways->paypal-express->api_user')) && ($api_pass = $this->get_setting('gateways->paypal-express->api_pass')) && ($api_sig = $this->get_setting('gateways->paypal-express->api_sig')) ) {
-			// Get appropriate settings
-	    if ( is_network_admin() || mp()->global_cart ) {
-	    	$settings = get_site_option('mp_network_settings');
-	    } else {
-		    $settings = get_option('mp_settings');
-	    }
-	    
+  function update( $settings ) {
+		if ( ($api_user = $this->get_setting('api_user')) && ($api_pass = $this->get_setting('api_pass')) && ($api_sig = $this->get_setting('api_sig')) ) {
 	    // Update api user
 	    $settings = mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->username', $api_user);
 	    
@@ -173,14 +167,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	    
 	    // Unset old keys
 	    unset($settings['gateways']['paypal-express']['api_user'], $settings['gateways']['paypal-express']['api_pass'], $settings['gateways']['paypal-express']['api_sig']);
-	    
-	    // Update database
-	    if ( is_network_admin() || mp()->global_cart ) {
-	    	update_site_option('mp_network_settings', $settings);
-	    } else {
-	    	update_option('mp_settings', $settings);
-	    }
-    }	  
+	  }
+	  
+	  return $settings;
   }
   
   /**
@@ -191,6 +180,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    */
   function init_settings_metabox() {
   	if ( mp()->global_cart ) {
+  		//! TODO: code for network settings/global cart
 	  	return;
   	}
   	
@@ -267,34 +257,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		));
   }
   
-  /**
-   * Gets a setting
-   *
-   * @since 2.9.4.3
-   * @access public
-   */
-  function get_setting( $setting, $default = false ) {
-	  if ( is_network_admin() || mp()->global_cart ) {
-		 	$settings = get_site_option('mp_network_settings');
-		 	return mp_arr_get_value($setting, $settings, $default);
-	  } else {
-	  	return mp_get_setting($setting, $default);
-	  }
-  }
-
-  /**
-   * Enqueue any necessary scripts
-   *
-   * @since 2.9.2.6
-   *
-   * @param string $page The current page being viewed
-   *
-   */
-
-  function network_gateway_scripts( $page ) {
-	}
-
-
 	/**
    * Echo fields you need to add to the payment screen, like your credit card info fields.
    *  If you don't need to add form fields set $skip_form to true so this page can be skipped
@@ -730,7 +692,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     // PayPal IPN handling code
     if ( mp_get_post_value('payment_status') && mp_get_post_value('txn_type') ) {
 
-			if ( $this->get_setting('gateways->paypal-express->mode') == 'sandbox' ) {
+			if ( $this->get_setting('mode') == 'sandbox' ) {
         $domain = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 			} else {
 				$domain = 'https://www.paypal.com/cgi-bin/webscr';
@@ -890,10 +852,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $nvpstr .= "&EMAIL=" . urlencode($shipping_info['email']);
 
     //formatting
-    $nvpstr .= "&HDRIMG=" . urlencode($this->get_setting('gateways->paypal-express->header_img', ''));
-    $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($this->get_setting('gateways->paypal-express->header_border', ''));
-    $nvpstr .= "&HDRBACKCOLOR=" . urlencode($this->get_setting('gateways->paypal-express->header_back', ''));
-    $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($this->get_setting('gateways->paypal-express->page_back', ''));
+    $nvpstr .= "&HDRIMG=" . urlencode($this->get_setting('header_img', ''));
+    $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($this->get_setting('header_border', ''));
+    $nvpstr .= "&HDRBACKCOLOR=" . urlencode($this->get_setting('header_back', ''));
+    $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($this->get_setting('page_back', ''));
 
     //loop through cart items
     $j = 0;
@@ -907,7 +869,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog($bid);
       }
 
-			$merchant_email = mp_get_setting('gateways->paypal-express->merchant_email');
+			$merchant_email = $this->get_setting('merchant_email');
 			//if a seller hasn't configured paypal skip
 			if ( mp()->global_cart && empty($merchant_email) )
 				continue;
@@ -965,7 +927,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       }
 
       //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-      if ( ! $this->get_setting('tax->tax_inclusive') ) {
+      if ( ! mp_get_setting('tax->tax_inclusive') ) {
       	$tax_price = (mp()->tax_price(false) + $shipping_tax);
 				$total += $tax_price;
 				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total

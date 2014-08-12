@@ -80,23 +80,21 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
   }
   
   /**
-   * Update build
+   * Updates the gateway settings
    *
    * @since 3.0
    * @access public
    * @param array $settings
+   * @return array
    */
-  function update() {
-  	$settings = get_option('mp_settings');
-  	mp_push_to_array($settings, 'build', $this->build);
-  	
+  function update( $settings) {
 	  if ( ($seller_id = $this->get_setting('sid')) && ($secret_word = $this->get_setting('secret_word')) ) {
 		  mp_push_to_array($settings, 'gateways->2checkout->api_credentials->sid', $seller_id);
 		  mp_push_to_array($settings, 'gateways->2checkout->api_credentials->secret_word', $secret_word);
 		  unset($settings['gateways']['2checkout']['sid'], $settings['gateways']['2checkout']['secret_word']);
 	  }
 	  
-	  update_option('mp_settings', $settings);
+	  return $settings;
   }
 
   /**

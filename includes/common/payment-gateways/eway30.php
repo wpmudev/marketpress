@@ -395,7 +395,8 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	
 		// Create AccessCode Request Object
 		$request = new CreateAccessCodeRequest();
-		$request->Customer->Reference = 'MarketPress';
+		$request->Customer->Reference = 'MarketPress';
+
 		if ( ! mp()->download_only_cart($cart) && mp_get_setting('shipping->method') != 'none' && ($name = mp_arr_get_value('name', $shipping_info)) ) {	
 			$name_parts = explode(' ', $name);
 				
@@ -582,8 +583,10 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
    *
    * @since 3.0
    * @access public
+   * @param array $settings
+   * @return array
    */
-  public function update() {
+  public function update( $settings ) {
   	$settings = get_option('mp_settings');
   	
   	if ( $api_key = $this->get_setting('UserAPIKeyLive') ) {
@@ -606,7 +609,7 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 	  	unset($settings['gateways']['eway30']['UserPasswordSandbox']);
   	}
   	
-  	update_option('mp_settings', $settings);
+  	return $settings;
   }
 
   /**

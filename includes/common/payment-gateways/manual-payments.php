@@ -172,25 +172,28 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 			'desc' => __('Record payments manually, such as by Cash, Check, or EFT.', 'mp'),
 		));
 		$metabox->add_field('text', array(
-			'name' => $this->get_field_name('name', $this->public_name),
+			'name' => $this->get_field_name('name'),
+			'default_value' => $this->public_name,
 			'label' => array('text' => __('Method Name', 'mp')),
 			'desc' => __('Enter a public name for this payment method that is displayed to users - No HTML', 'mp'),
+			'save_callback' => array('strip_tags'),
 		));
 		$metabox->add_field('wysiwyg', array(
 			'name' => $this->get_field_name('instruction'),
 			'label' => array('text' => __('User Instructions', 'mp')),
-			'desc' => __('These are the manual payment instructions to display on the payments screen - HTML allowed', 'mp'),
+			'desc' => __('These are the manual payment instructions to display on the payments screen.', 'mp'),
 		));
 		$metabox->add_field('wysiwyg', array(
 			'name' => $this->get_field_name('confirmation'),
 			'label' => array('text' => __('Confirmation User Instructions', 'mp')),
-			'desc' => __('These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total. - HTML allowed', 'mp'),
+			'desc' => __('These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total.', 'mp'),
 		));
 		$metabox->add_field('textarea', array(
 			'name' => $this->get_field_name('email'),
 			'label' => array('text' => __('Order Confirmation Email', 'mp')),
 			'desc' => __('This is the email text to send to those who have made manual payment checkouts. You should include your manual payment instructions here. It overrides the default order checkout email. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp'),
 			'custom' => array('rows' => 10),
+			'save_callback' => array('strip_tags'),
 		));
 	}
 	  

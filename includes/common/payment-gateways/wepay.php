@@ -1,517 +1,506 @@
 <?php
 /*
-  MarketPress WePay Gateway Plugin
-  Author: Marko Miljus (Incsub)
- */
+MarketPress WePay Gateway Plugin
+Author: Marko Miljus (Incsub)
+*/
 
 class MP_Gateway_Wepay extends MP_Gateway_API {
+	//build
+	var $build = 2;
+	
+  var $version = '1.0b';
+  //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
+  var $plugin_name = 'wepay';
+  //name of your gateway, for the admin side.
+  var $admin_name = '';
+  //public name of your gateway, for lists and such.
+  var $public_name = '';
+  //url for an image for your checkout method. Displayed on checkout form if set
+  var $method_img_url = '';
+  //url for an submit button image for your checkout method. Displayed on checkout form if set
+  var $method_button_img_url = '';
+  //whether or not ssl is needed for checkout page
+  var $force_ssl;
+  //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
+  var $ipn_url;
+  //whether if this is the only enabled gateway it can skip the payment_form step
+  var $skip_form = false;
+  //api vars
+  var $publishable_key, $private_key, $currency, $mode, $checkout_type;
 
-    var $version = '1.0b';
-    //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-    var $plugin_name = 'wepay';
-    //name of your gateway, for the admin side.
-    var $admin_name = '';
-    //public name of your gateway, for lists and such.
-    var $public_name = '';
-    //url for an image for your checkout method. Displayed on checkout form if set
-    var $method_img_url = '';
-    //url for an submit button image for your checkout method. Displayed on checkout form if set
-    var $method_button_img_url = '';
-    //whether or not ssl is needed for checkout page
-    var $force_ssl;
-    //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
-    var $ipn_url;
-    //whether if this is the only enabled gateway it can skip the payment_form step
-    var $skip_form = false;
-    //api vars
-    var $publishable_key, $private_key, $currency, $mode, $checkout_type;
+  /**
+   * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
+   */
+  function on_creation() {
+    //set names here to be able to translate
+    $this->admin_name = __('WePay', 'mp');
+    $this->public_name = __('Credit Card', 'mp');
 
-    /**
-     * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
-     */
-    function on_creation() {
-        ;
+    $this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
+    $this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
 
-        //set names here to be able to translate
-        $this->admin_name = __('WePay', 'mp');
-        $this->public_name = __('Credit Card', 'mp');
+    $this->client_id =  $this->get_setting('client_id');
+    $this->client_secret =$this->get_setting('client_secret');
+    $this->access_token = $this->get_setting('access_token');
+    $this->account_id = $this->get_setting('account_id');
+    $this->mode = $this->get_setting('mode');
+    $this->checkout_type =$this->get_setting('checkout_type');
 
-        $this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-        $this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+    $this->force_ssl = (bool) $this->get_setting('is_ssl');
+    $this->currency = 'USD';//just USD for now
 
-        $this->client_id =  mp_get_setting('gateways->wepay->client_id');
-        $this->client_secret = mp_get_setting('gateways->wepay->client_secret');
-        $this->access_token = mp_get_setting('gateways->wepay->access_token');
-        $this->account_id = mp_get_setting('gateways->wepay->account_id');
-        $this->mode = mp_get_setting('gateways->wepay->mode');
-        $this->checkout_type = mp_get_setting('gateways->wepay->checkout_type');
+    add_action('wp_footer', array(&$this, 'enqueue_scripts'));
+  }
 
-        $this->force_ssl = (bool) ( mp_get_setting('gateways->wepay->is_ssl') );
-        $this->currency = 'USD';//just USD for now
+  function enqueue_scripts() {
+      if (!is_admin() && get_query_var('pagename') == 'cart' && get_query_var('checkoutstep') == 'checkout') {
 
-        add_action('wp_footer', array(&$this, 'enqueue_scripts'));
-    }
+          wp_enqueue_script('wepay-tokenization', 'https://static.wepay.com/min/js/tokenization.v2.js', array('jquery'), $this->version, true);
+          wp_enqueue_script('wepay-script', mp()->plugin_url . 'plugins-gateway/wepay-files/wepay.js', array('wepay-tokenization'));
 
-    function enqueue_scripts() {
-        ;
+          $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
 
-        if (!is_admin() && get_query_var('pagename') == 'cart' && get_query_var('checkoutstep') == 'checkout') {
+          $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email']) ? $meta['email'] : $_SESSION['mp_shipping_info']['email']);
+          $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name']) ? $meta['name'] : $_SESSION['mp_shipping_info']['name']);
 
-            wp_enqueue_script('wepay-tokenization', 'https://static.wepay.com/min/js/tokenization.v2.js', array('jquery'), $this->version, true);
-            wp_enqueue_script('wepay-script', mp()->plugin_url . 'plugins-gateway/wepay-files/wepay.js', array('wepay-tokenization'));
+          $address1 = (isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1']);
+          $city = (isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city']);
+          $state = (isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state']);
+          $zip = (isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip']);
+          $country = (isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country']);
 
-            $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
+          wp_localize_script('wepay-script', 'wepay_script', array(
+              'mode' => $this->mode,
+              'client_id' => $this->client_id,
+              'user_name' => $name,
+              'email' => $email,
+              'address' => $address1,
+              'city' => $city,
+              'state' => $state,
+              'zip' => $zip,
+              'country' => $country
+                  )
+          );
+      }
+      ?>
 
-            $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email']) ? $meta['email'] : $_SESSION['mp_shipping_info']['email']);
-            $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name']) ? $meta['name'] : $_SESSION['mp_shipping_info']['name']);
+      <?php
+  }
 
-            $address1 = (isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1']);
-            $city = (isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city']);
-            $state = (isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state']);
-            $zip = (isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip']);
-            $country = (isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country']);
+  /**
+   * Return fields you need to add to the top of the payment screen, like your credit card info fields
+   *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+   * @param array $shipping_info. Contains shipping info and email in case you need it
+   */
+  function payment_form($cart, $shipping_info) {
+      require mp()->plugin_dir . 'plugins-gateway/wepay-files/wepay-sdk.php';
 
-            wp_localize_script('wepay-script', 'wepay_script', array(
-                'mode' => $this->mode,
-                'client_id' => $this->client_id,
-                'user_name' => $name,
-                'email' => $email,
-                'address' => $address1,
-                'city' => $city,
-                'state' => $state,
-                'zip' => $zip,
-                'country' => $country
-                    )
-            );
-        }
-        ?>
+      if ($this->mode == 'staging') {
+          WePay::useStaging(mp()->client_id, mp()->client_secret);
+      } else {
+          WePay::useProduction(mp()->client_id, mp()->client_secret);
+      }
 
-        <?php
-    }
+      $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
 
-    /**
-     * Return fields you need to add to the top of the payment screen, like your credit card info fields
-     *
-     * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-     * @param array $shipping_info. Contains shipping info and email in case you need it
-     */
-    function payment_form($cart, $shipping_info) {
-        ;
+      $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email']) ? $meta['email'] : $_SESSION['mp_shipping_info']['email']);
+      $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name']) ? $meta['name'] : $_SESSION['mp_shipping_info']['name']);
 
-        require mp()->plugin_dir . 'plugins-gateway/wepay-files/wepay-sdk.php';
+      $address1 = (isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1']);
+      $city = (isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city']);
+      $state = (isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state']);
+      $zip = (isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip']);
+      $country = (isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country']);
 
-        if ($this->mode == 'staging') {
-            WePay::useStaging(mp()->client_id, mp()->client_secret);
-        } else {
-            WePay::useProduction(mp()->client_id, mp()->client_secret);
-        }
+      $content = '';
 
-        $settings = get_option('mp_settings');
+      $content .= '<div id="wepay_checkout_errors"></div>';
 
-        $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
+      $content .= '<table class="mp_cart_billing">
+      <thead><tr>
+        <th colspan="2">' . __('Enter Your Credit Card Information:', 'mp') . '</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+        <td align="right">' . __('Cardholder Name:', 'mp') . '</td>
+        <td><input size="35" class="card-holdername" type="text" value="' . esc_attr($name) . '" /> </td>
+        </tr>';
 
-        $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email']) ? $meta['email'] : $_SESSION['mp_shipping_info']['email']);
-        $name = (!empty($_SESSION['mp_billing_info']['name'])) ? $_SESSION['mp_billing_info']['name'] : (!empty($meta['name']) ? $meta['name'] : $_SESSION['mp_shipping_info']['name']);
+      $totals = array();
 
-        $address1 = (isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : $meta['address1']);
-        $city = (isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : $meta['city']);
-        $state = (isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : $meta['state']);
-        $zip = (isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : $meta['zip']);
-        $country = (isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : $meta['country']);
+      foreach ($cart as $product_id => $variations) {
+          foreach ($variations as $variation => $data) {
+              $totals[] = mp()->before_tax_price($data['price'], $product_id) * $data['quantity'];
+          }
+      }
 
-        $content = '';
+      $total = array_sum($totals);
 
-        $content .= '<div id="wepay_checkout_errors"></div>';
+      //coupon line
+      if ($coupon = mp()->coupon_value(mp()->get_coupon_code(), $total)) {
+          $total = $coupon['new_total'];
+      }
 
-        $content .= '<table class="mp_cart_billing">
-        <thead><tr>
-          <th colspan="2">' . __('Enter Your Credit Card Information:', 'mp') . '</th>
-        </tr></thead>
-        <tbody>
-          <tr>
-          <td align="right">' . __('Cardholder Name:', 'mp') . '</td>
-          <td><input size="35" class="card-holdername" type="text" value="' . esc_attr($name) . '" /> </td>
-          </tr>';
+			//shipping line
+	    $shipping_tax = 0;
+	    if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
+				$total += $shipping_price;
+				$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
+	    }
+	
+	    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
+	    if ( ! mp_get_setting('tax->tax_inclusive') ) {
+	    	$tax_price = (mp()->tax_price(false) + $shipping_tax);
+				$total += $tax_price;
+	    }     
+	       
+      $content .= '<tr>';
+      $content .= '<td>';
+      $content .= __('Card Number', 'mp');
+      $content .= '</td>';
+      $content .= '<td>';
+      $content .= '<input type="text" size="30" autocomplete="off" class="card-number"/>';
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td>';
+      $content .= __('Expiration:', 'mp');
+      $content .= '</td>';
+      $content .= '<td>';
+      $content .= '<select class="card-expiry-month">';
+      $content .= $this->_print_month_dropdown();
+      $content .= '</select>';
+      $content .= '<span> / </span>';
+      $content .= '<select class="card-expiry-year">';
+      $content .= $this->_print_year_dropdown('', true);
+      $content .= '</select>';
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '<tr>';
+      $content .= '<td>';
+      $content .= __('CVC:', 'mp');
+      $content .= '</td>';
+      $content .= '<td>';
+      $content .= '<input type="text" size="4" autocomplete="off" class="card-cvc" />';
+      $content .= '<input type="hidden" class="currency" value="' . $this->currency . '" />';
+      $content .= '<input type="hidden" class="amount" value="' . $total * 100 . '" />';
+      $content .= '</td>';
+      $content .= '</tr>';
+      $content .= '</table>';
+      $content .= '<span id="wepay_processing" style="display: none;float: right;"><img src="' . mp()->plugin_url . 'images/loading.gif" /> ' . __('Processing...', 'mp') . '</span>';
+      return $content;
+  }
 
-        $totals = array();
+  /**
+   * Return the chosen payment details here for final confirmation. You probably don't need
+   *  to post anything in the form as it should be in your $_SESSION var already.
+   *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+   * @param array $shipping_info. Contains shipping info and email in case you need it
+   */
+  function confirm_payment_form($cart, $shipping_info) {
+      if (isset($_POST['payment_method_id'])) {
+          $_SESSION['payment_method_id'] = $_POST['payment_method_id'];
+      }
+  }
 
-        foreach ($cart as $product_id => $variations) {
-            foreach ($variations as $variation => $data) {
-                $totals[] = mp()->before_tax_price($data['price'], $product_id) * $data['quantity'];
-            }
-        }
+  /**
+   * Runs before page load incase you need to run any scripts before loading the success message page
+   */
+  function order_confirmation($order) {
+      
+  }
 
-        $total = array_sum($totals);
+  /**
+   * Print the years
+   */
+  function _print_year_dropdown($sel = '', $pfp = false) {
+      $localDate = getdate();
+      $minYear = $localDate["year"];
+      $maxYear = $minYear + 15;
 
-        //coupon line
-        if ($coupon = mp()->coupon_value(mp()->get_coupon_code(), $total)) {
-            $total = $coupon['new_total'];
-        }
+      $output = "<option value=''>--</option>";
+      for ($i = $minYear; $i < $maxYear; $i++) {
+          if ($pfp) {
+              $output .= "<option value='" . substr($i, 0, 4) . "'" . ($sel == (substr($i, 0, 4)) ? ' selected' : '') .
+                      ">" . $i . "</option>";
+          } else {
+              $output .= "<option value='" . substr($i, 2, 2) . "'" . ($sel == (substr($i, 2, 2)) ? ' selected' : '') .
+                      ">" . $i . "</option>";
+          }
+      }
+      return($output);
+  }
 
-				//shipping line
-		    $shipping_tax = 0;
-		    if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
-					$total += $shipping_price;
-					$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-		    }
+  /**
+   * Print the months
+   */
+  function _print_month_dropdown($sel = '') {
+      $output = "<option value=''>--</option>";
+      $output .= "<option " . ($sel == 1 ? ' selected' : '') . " value='01'>01 - Jan</option>";
+      $output .= "<option " . ($sel == 2 ? ' selected' : '') . "  value='02'>02 - Feb</option>";
+      $output .= "<option " . ($sel == 3 ? ' selected' : '') . "  value='03'>03 - Mar</option>";
+      $output .= "<option " . ($sel == 4 ? ' selected' : '') . "  value='04'>04 - Apr</option>";
+      $output .= "<option " . ($sel == 5 ? ' selected' : '') . "  value='05'>05 - May</option>";
+      $output .= "<option " . ($sel == 6 ? ' selected' : '') . "  value='06'>06 - Jun</option>";
+      $output .= "<option " . ($sel == 7 ? ' selected' : '') . "  value='07'>07 - Jul</option>";
+      $output .= "<option " . ($sel == 8 ? ' selected' : '') . "  value='08'>08 - Aug</option>";
+      $output .= "<option " . ($sel == 9 ? ' selected' : '') . "  value='09'>09 - Sep</option>";
+      $output .= "<option " . ($sel == 10 ? ' selected' : '') . "  value='10'>10 - Oct</option>";
+      $output .= "<option " . ($sel == 11 ? ' selected' : '') . "  value='11'>11 - Nov</option>";
+      $output .= "<option " . ($sel == 12 ? ' selected' : '') . "  value='12'>12 - Dec</option>";
+
+      return($output);
+  }
+
+  /**
+   * Use this to process any fields you added. Use the $_POST global,
+   * and be sure to save it to both the $_SESSION and usermeta if logged in.
+   * DO NOT save credit card details to usermeta as it's not PCI compliant.
+   * Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
+   * it will redirect to the next step.
+   *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+   * @param array $shipping_info. Contains shipping info and email in case you need it
+   */
+  function process_payment_form($cart, $shipping_info) {
+      $_SESSION['payment_method_id'] = $_POST['payment_method_id'];
+  }
+
+  /**
+   * Filters the order confirmation email message body. You may want to append something to
+   *  the message. Optional
+   *
+   * Don't forget to return!
+   */
+  function order_confirmation_email($msg, $order = null) {
+      return $msg;
+  }
+
+  /**
+   * Return any html you want to show on the confirmation screen after checkout. This
+   *  should be a payment details box and message.
+   *
+   * Don't forget to return!
+   */
+  function order_confirmation_msg($content, $order) {
+      if ($order->post_status == 'order_paid')
+          $content .= '<p>' . sprintf(__('Your payment for this order totaling %s is complete.', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
+      return $content;
+  }
+
+	/**
+   * Updates the gateway settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
+  public function update( $settings ) {
+  	if ( $val = $this->get_setting('client_id') ) {
+	  	mp_push_to_array($settings, 'gateways->wepay->api_credentials->client_id', $val);
+	  	unset($settings['gateways']['wepay']['client_id']);	
+  	}
+  	
+  	if ( $val = $this->get_setting('client_secret') ) {
+	  	mp_push_to_array($settings, 'gateways->wepay->api_credentials->client_secret', $val);
+	  	unset($settings['gateways']['wepay']['client_secret']);	
+  	}
+  	
+  	if ( $val = $this->get_setting('access_token') ) {
+	  	mp_push_to_array($settings, 'gateways->wepay->api_credentials->access_token', $val);
+	  	unset($settings['gateways']['wepay']['access_token']);	
+  	}
+  	
+  	if ( $val = $this->get_setting('account_id') ) {
+	  	mp_push_to_array($settings, 'gateways->wepay->api_credentials->account_id', $val);
+	  	unset($settings['gateways']['wepay']['account_id']);	
+  	}
+  	
+    return $settings;
+  }
+
+  /**
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('Wepay makes it easy to start accepting credit cards directly on your site with full PCI compliance. Accept cards directly on your site. You don\'t need a merchant account or gateway. WePay handles everything including storing cards. Credit cards go directly to WePay\'s secure environment, and never hit your servers so you can avoid most PCI requirements.', 'mp'),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => $this->get_field_name('mode'),
+			'label' => array('text' => __('Mode', 'mp')),
+			'desc' => __('Choose STAGING if you have registered the app on stage.wepay.com, or PRODUCTION if you registered on www.wepay.com', 'mp'),
+			'default_value' => 'staging',
+			'options' => array(
+				'staging' => __('Staging', 'mp'),
+				'production' => __('Production', 'mp'),
+			),
+		));
+		$metabox->add_field('advanced_select', array(
+			'name' => $this->get_field_name('checkout_type'),
+			'label' => array('text' => __('Checkout Type', 'mp')),
+			'desc' => __('Choose type of payments', 'mp'),
+			'options' => array(
+				'' => __('Select One', 'mp'),
+				'GOODS' => __('Goods', 'mp'),
+				'SERVICE' => __('Service', 'mp'),
+				'PERSONAL' => __('Personal', 'mp'),
+				'EVENT' => __('Event', 'mp'),
+				'DONATION' => __('Donation', 'mp'),
+			),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => $this->get_field_name('is_ssl'),
+			'label' => array('text' => __('Force SSL?', 'mp')),
+			'desc' => __('When in live mode it is recommended to use SSL certificate setup for the site where the checkout form will be displayed.', 'mp'),
+		));
+		$creds = $metabox->add_field('complex', array(
+			'name' => $this->get_field_name('api_credentials'),
+			'label' => array('text' => __('API Credentials', 'mp')),
+			'desc' => __('You must login to WePay to <a target="_blank" href="https://www.wepay.com/">get your API credentials</a>. Make sure to check "Tokenize credit cards" option under "API Keys" section of your WePay app.', 'mp'),
+		));
 		
-		    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-		    if ( ! mp_get_setting('tax->tax_inclusive') ) {
-		    	$tax_price = (mp()->tax_price(false) + $shipping_tax);
-					$total += $tax_price;
-		    }     
-		       
-        $content .= '<tr>';
-        $content .= '<td>';
-        $content .= __('Card Number', 'mp');
-        $content .= '</td>';
-        $content .= '<td>';
-        $content .= '<input type="text" size="30" autocomplete="off" class="card-number"/>';
-        $content .= '</td>';
-        $content .= '</tr>';
-        $content .= '<tr>';
-        $content .= '<td>';
-        $content .= __('Expiration:', 'mp');
-        $content .= '</td>';
-        $content .= '<td>';
-        $content .= '<select class="card-expiry-month">';
-        $content .= $this->_print_month_dropdown();
-        $content .= '</select>';
-        $content .= '<span> / </span>';
-        $content .= '<select class="card-expiry-year">';
-        $content .= $this->_print_year_dropdown('', true);
-        $content .= '</select>';
-        $content .= '</td>';
-        $content .= '</tr>';
-        $content .= '<tr>';
-        $content .= '<td>';
-        $content .= __('CVC:', 'mp');
-        $content .= '</td>';
-        $content .= '<td>';
-        $content .= '<input type="text" size="4" autocomplete="off" class="card-cvc" />';
-        $content .= '<input type="hidden" class="currency" value="' . $this->currency . '" />';
-        $content .= '<input type="hidden" class="amount" value="' . $total * 100 . '" />';
-        $content .= '</td>';
-        $content .= '</tr>';
-        $content .= '</table>';
-        $content .= '<span id="wepay_processing" style="display: none;float: right;"><img src="' . mp()->plugin_url . 'images/loading.gif" /> ' . __('Processing...', 'mp') . '</span>';
-        return $content;
-    }
-
-    /**
-     * Return the chosen payment details here for final confirmation. You probably don't need
-     *  to post anything in the form as it should be in your $_SESSION var already.
-     *
-     * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-     * @param array $shipping_info. Contains shipping info and email in case you need it
-     */
-    function confirm_payment_form($cart, $shipping_info) {
-        if (isset($_POST['payment_method_id'])) {
-            $_SESSION['payment_method_id'] = $_POST['payment_method_id'];
-        }
-    }
-
-    /**
-     * Runs before page load incase you need to run any scripts before loading the success message page
-     */
-    function order_confirmation($order) {
-        
-    }
-
-    /**
-     * Print the years
-     */
-    function _print_year_dropdown($sel = '', $pfp = false) {
-        $localDate = getdate();
-        $minYear = $localDate["year"];
-        $maxYear = $minYear + 15;
-
-        $output = "<option value=''>--</option>";
-        for ($i = $minYear; $i < $maxYear; $i++) {
-            if ($pfp) {
-                $output .= "<option value='" . substr($i, 0, 4) . "'" . ($sel == (substr($i, 0, 4)) ? ' selected' : '') .
-                        ">" . $i . "</option>";
-            } else {
-                $output .= "<option value='" . substr($i, 2, 2) . "'" . ($sel == (substr($i, 2, 2)) ? ' selected' : '') .
-                        ">" . $i . "</option>";
-            }
-        }
-        return($output);
-    }
-
-    /**
-     * Print the months
-     */
-    function _print_month_dropdown($sel = '') {
-        $output = "<option value=''>--</option>";
-        $output .= "<option " . ($sel == 1 ? ' selected' : '') . " value='01'>01 - Jan</option>";
-        $output .= "<option " . ($sel == 2 ? ' selected' : '') . "  value='02'>02 - Feb</option>";
-        $output .= "<option " . ($sel == 3 ? ' selected' : '') . "  value='03'>03 - Mar</option>";
-        $output .= "<option " . ($sel == 4 ? ' selected' : '') . "  value='04'>04 - Apr</option>";
-        $output .= "<option " . ($sel == 5 ? ' selected' : '') . "  value='05'>05 - May</option>";
-        $output .= "<option " . ($sel == 6 ? ' selected' : '') . "  value='06'>06 - Jun</option>";
-        $output .= "<option " . ($sel == 7 ? ' selected' : '') . "  value='07'>07 - Jul</option>";
-        $output .= "<option " . ($sel == 8 ? ' selected' : '') . "  value='08'>08 - Aug</option>";
-        $output .= "<option " . ($sel == 9 ? ' selected' : '') . "  value='09'>09 - Sep</option>";
-        $output .= "<option " . ($sel == 10 ? ' selected' : '') . "  value='10'>10 - Oct</option>";
-        $output .= "<option " . ($sel == 11 ? ' selected' : '') . "  value='11'>11 - Nov</option>";
-        $output .= "<option " . ($sel == 12 ? ' selected' : '') . "  value='12'>12 - Dec</option>";
-
-        return($output);
-    }
-
-    /**
-     * Use this to process any fields you added. Use the $_POST global,
-     * and be sure to save it to both the $_SESSION and usermeta if logged in.
-     * DO NOT save credit card details to usermeta as it's not PCI compliant.
-     * Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-     * it will redirect to the next step.
-     *
-     * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-     * @param array $shipping_info. Contains shipping info and email in case you need it
-     */
-    function process_payment_form($cart, $shipping_info) {
-        $_SESSION['payment_method_id'] = $_POST['payment_method_id'];
-    }
-
-    /**
-     * Filters the order confirmation email message body. You may want to append something to
-     *  the message. Optional
-     *
-     * Don't forget to return!
-     */
-    function order_confirmation_email($msg, $order = null) {
-        return $msg;
-    }
-
-    /**
-     * Return any html you want to show on the confirmation screen after checkout. This
-     *  should be a payment details box and message.
-     *
-     * Don't forget to return!
-     */
-    function order_confirmation_msg($content, $order) {
-        ;
-        if ($order->post_status == 'order_paid')
-            $content .= '<p>' . sprintf(__('Your payment for this order totaling %s is complete.', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
-        return $content;
-    }
-
-    /**
-     * Echo a settings meta box with whatever settings you need for you gateway.
-     *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-     *  You can access saved settings via $settings array.
-     */
-    function gateway_settings_box($settings) {
-        ;
-        ?>
-        <div class="postbox">
-            <h3 class='hndle'><span><?php _e('WePay', 'mp') ?></span> - <span class="description"><?php _e('Wepay makes it easy to start accepting credit cards directly on your site with full PCI compliance', 'mp'); ?></span></h3>
-            <div class="inside">
-                <p class="description"><?php _e("Accept cards directly on your site. You don't need a merchant account or gateway. WePay handles everything including storing cards. Credit cards go directly to WePay's secure environment, and never hit your servers so you can avoid most PCI requirements.", 'mp'); ?> <a href="https://wepay.com/" target="_blank"><?php _e('More Info &raquo;', 'mp') ?></a></p>
-                <table class="form-table">
-                    <tr valign="top">
-                        <th scope="row"><?php _e('WePay Mode', 'mp') ?></th>
-                        <td>
-                            <span class="description"><?php _e('Choose STAGING if you have registered the app on stage.wepay.com, or PRODUCTION if you registered on www.wepay.com', 'mp'); ?> </span><br/>
-                            <select name="mp[gateways][wepay][mode]">
-                                <option value="staging"<?php selected(mp_get_setting('gateways->wepay->mode'), 'staging'); ?>><?php _e('Staging', 'mp') ?></option>
-                                <option value="production"<?php selected(mp_get_setting('gateways->wepay->mode'), 'production'); ?>><?php _e('Production', 'mp') ?></option>
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr valign="top">
-                        <th scope="row"><?php _e('Checkout Type', 'mp') ?></th>
-                        <td>
-                            <span class="description"><?php _e('Choose type of payments', 'mp'); ?> </span><br/>
-                            <select name="mp[gateways][wepay][checkout_type]">
-                                <option value="GOODS"<?php selected(mp_get_setting('gateways->wepay->checkout_type'),'GOODS'); ?>><?php _e('Goods', 'mp') ?></option>
-                                <option value="SERVICE"<?php selected(mp_get_setting('gateways->wepay->checkout_type'), 'SERVICE'); ?>><?php _e('Service', 'mp') ?></option>
-                                <option value="PERSONAL"<?php selected(mp_get_setting('gateways->wepay->checkout_type'),'PERSONAL'); ?>><?php _e('Personal', 'mp') ?></option>
-                                <option value="EVENT"<?php selected(mp_get_setting('gateways->wepay->checkout_type'), 'EVENT'); ?>><?php _e('Event', 'mp') ?></option>
-                                <option value="DONATION"<?php selected(mp_get_setting('gateways->wepay->checkout_type'),'DONATION'); ?>><?php _e('Donation', 'mp') ?></option>
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr valign="top">
-                        <th scope="row"><?php _e('WePay SSL', 'mp') ?></th>
-                        <td>
-                            <span class="description"><?php _e('When in live mode it is recommended to use SSL certificate setup for the site where the checkout form will be displayed.', 'mp'); ?> </span><br/>
-                            <select name="mp[gateways][wepay][is_ssl]">
-                                <option value="1"<?php selected(mp_get_setting('gateways->wepay->is_ssl'), 1); ?>><?php _e('Force SSL', 'mp') ?></option>
-                                <option value="0"<?php selected(mp_get_setting('gateways->wepay->is_ssl'), 0); ?>><?php _e('No SSL', 'mp') ?></option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><?php _e('WePay API Credentials', 'mp') ?></th>
-                        <td>
-                            <span class="description"><?php _e('You must login to WePay to <a target="_blank" href="https://www.wepay.com/">get your API credentials</a>. Make sure to check "Tokenize credit cards" option under "API Keys" section of your WePay app.', 'mp') ?></span>
-                            <p>
-                                <label><?php _e('Client ID', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr(mp_get_setting('gateways->wepay->client_id')); ?>" size="70" name="mp[gateways][wepay][client_id]" type="text" />
-                                </label>
-                            </p>
-
-                            <p>
-                                <label><?php _e('Client Secret', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr(mp_get_setting('gateways->wepay->client_secret')); ?>" size="70" name="mp[gateways][wepay][client_secret]" type="text" />
-                                </label>
-                            </p>
-
-                            <p>
-                                <label><?php _e('Access Token', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr(mp_get_setting('gateways->wepay->access_token')); ?>" size="70" name="mp[gateways][wepay][access_token]" type="text" />
-                                </label>
-                            </p>
-
-                            <p>
-                                <label><?php _e('Account ID', 'mp') ?><br />
-                                    <input value="<?php echo esc_attr(mp_get_setting('gateways->wepay->account_id')); ?>" size="70" name="mp[gateways][wepay][account_id]" type="text" />
-                                </label>
-                            </p>
-
-
-                        </td>
-                    </tr>
-
-
-                </table>
-
-                <input type="hidden" name="mp[gateways][wepay][currency]" value="USD">
-            </div>
-        </div>      
-        <?php
-    }
-
-    /**
-     * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-     *  array. Don't forget to return!
-     */
-		function process_gateway_settings($settings) {
-			$settings['gateways']['wepay'] = array_map('trim', $settings['gateways']['wepay']);
-			return $settings;
+		if ( $creds instanceof WPMUDEV_Field ) {
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('client_id'),
+				'label' => array('text' => __('Client ID', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('client_secret'),
+				'label' => array('text' => __('Client Secret', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('access_token'),
+				'label' => array('text' => __('Access Token', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('account_id'),
+				'label' => array('text' => __('Account ID', 'mp')),
+			));
 		}
+	}
+	
+  /**
+   * Use this to do the final payment. Create the order then process the payment. If
+   *  you know the payment is successful right away go ahead and change the order status
+   *  as well.
+   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
+   *  it will redirect to the next step.
+   *
+   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+   * @param array $shipping_info. Contains shipping info and email in case you need it
+   */
+  function process_payment($cart, $shipping_info) {
+      //make sure token is set at this point
+      if (!isset($_SESSION['payment_method_id'])) {
+          mp()->cart_checkout_error(__('The WePay Card Token was not generated correctly. Please go back and try again.', 'mp'));
+          return false;
+      }
 
-    /**
-     * Use this to do the final payment. Create the order then process the payment. If
-     *  you know the payment is successful right away go ahead and change the order status
-     *  as well.
-     *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-     *  it will redirect to the next step.
-     *
-     * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-     * @param array $shipping_info. Contains shipping info and email in case you need it
-     */
-    function process_payment($cart, $shipping_info) {
-        ;
+      $order_id = mp()->generate_order_id();
 
-        $settings = get_option('mp_settings');
-
-        //make sure token is set at this point
-        if (!isset($_SESSION['payment_method_id'])) {
-            mp()->cart_checkout_error(__('The WePay Card Token was not generated correctly. Please go back and try again.', 'mp'));
-            return false;
-        }
-
-        $order_id = mp()->generate_order_id();
-
-        //Get the WePay SDK
-        require mp()->plugin_dir .'plugins-gateway/wepay-files/wepay-sdk.php';
+      //Get the WePay SDK
+      require mp()->plugin_dir .'plugins-gateway/wepay-files/wepay-sdk.php';
 
 
-        $totals = array();
-        $coupon_code = mp()->get_coupon_code();
-        
-        foreach ($cart as $product_id => $variations) {
-            foreach ($variations as $variation => $data) {
-								$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-                $totals[] = $price;
-            }
-        }
+      $totals = array();
+      $coupon_code = mp()->get_coupon_code();
+      
+      foreach ($cart as $product_id => $variations) {
+          foreach ($variations as $variation => $data) {
+							$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
+              $totals[] = $price;
+          }
+      }
 
-        $total = array_sum($totals);
+      $total = array_sum($totals);
 
-        //shipping line
-        if ($shipping_price = mp()->shipping_price()) {
-            $total += $shipping_price;
-        }
+      //shipping line
+      if ($shipping_price = mp()->shipping_price()) {
+          $total += $shipping_price;
+      }
 
-        //tax line
-        if ($tax_price = mp()->tax_price()) {
-            $total += $tax_price;
-        }
+      //tax line
+      if ($tax_price = mp()->tax_price()) {
+          $total += $tax_price;
+      }
 
 
-        try {
+      try {
 
-            // Application settings
-            $account_id = $this->account_id;
-            $client_id = $this->client_id;
-            $client_secret = $this->client_secret;
-            $access_token = $this->access_token;
+          // Application settings
+          $account_id = $this->account_id;
+          $client_id = $this->client_id;
+          $client_secret = $this->client_secret;
+          $access_token = $this->access_token;
 
-            // Credit card id to charge
-            $credit_card_id = $_SESSION['payment_method_id'];
-						
-            if ($this->mode == 'staging') {
-                WePay::useStaging($this->client_id, $this->client_secret);
-            } else {
-                WePay::useProduction($this->client_id, $this->client_secret);
-            }
+          // Credit card id to charge
+          $credit_card_id = $_SESSION['payment_method_id'];
+					
+          if ($this->mode == 'staging') {
+              WePay::useStaging($this->client_id, $this->client_secret);
+          } else {
+              WePay::useProduction($this->client_id, $this->client_secret);
+          }
 
-            $wepay = new WePay($access_token);
+          $wepay = new WePay($access_token);
 
-            // charge the credit card
-            $response = $wepay->request('checkout/create', array(
-                'account_id' => $account_id,
-                'amount' => number_format($total, 2, '.', ''),
-                'currency' => 'USD',
-                'short_description' => $order_id,
-                'type' => $this->checkout_type,
-                'payment_method_id' => $credit_card_id, // user's credit_card_id
-                'payment_method_type' => 'credit_card'
-            ));
+          // charge the credit card
+          $response = $wepay->request('checkout/create', array(
+              'account_id' => $account_id,
+              'amount' => number_format($total, 2, '.', ''),
+              'currency' => 'USD',
+              'short_description' => $order_id,
+              'type' => $this->checkout_type,
+              'payment_method_id' => $credit_card_id, // user's credit_card_id
+              'payment_method_type' => 'credit_card'
+          ));
 
-            if (isset($response->state) && $response->state == 'authorized') {
+          if (isset($response->state) && $response->state == 'authorized') {
 
-                $credit_card_response = $wepay->request('/credit_card', array(
-                    'client_id' => $this->client_id,
-                    'client_secret' => $this->client_secret,
-                    'credit_card_id' => $_SESSION['payment_method_id'],
-                ));
+              $credit_card_response = $wepay->request('/credit_card', array(
+                  'client_id' => $this->client_id,
+                  'client_secret' => $this->client_secret,
+                  'credit_card_id' => $_SESSION['payment_method_id'],
+              ));
 
-                //setup our payment details
-                $payment_info = array();
-                $payment_info['gateway_public_name'] = $this->public_name;
-                $payment_info['gateway_private_name'] = $this->admin_name;
-                $payment_info['method'] = sprintf(__('%1$s', 'mp'), $credit_card_response->credit_card_name);
-                $payment_info['transaction_id'] = $order_id;
-                $timestamp = time();
-                $payment_info['status'][$timestamp] = __('Paid', 'mp');
-                $payment_info['total'] = $total;
-                $payment_info['currency'] = $this->currency;
+              //setup our payment details
+              $payment_info = array();
+              $payment_info['gateway_public_name'] = $this->public_name;
+              $payment_info['gateway_private_name'] = $this->admin_name;
+              $payment_info['method'] = sprintf(__('%1$s', 'mp'), $credit_card_response->credit_card_name);
+              $payment_info['transaction_id'] = $order_id;
+              $timestamp = time();
+              $payment_info['status'][$timestamp] = __('Paid', 'mp');
+              $payment_info['total'] = $total;
+              $payment_info['currency'] = $this->currency;
 
-                $order = mp()->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
-                unset($_SESSION['payment_method_id']);
-                mp()->set_cart_cookie(Array());
-            }
-        } catch (Exception $e) {
-            unset($_SESSION['payment_method_id']);
-            mp()->cart_checkout_error(sprintf(__('There was an error processing your card: "%s". Please <a href="%s">go back and try again</a>.', 'mp'), $e->getMessage(), mp_checkout_step_url('checkout')));
-            return false;
-        }
-    }
+              $order = mp()->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
+              unset($_SESSION['payment_method_id']);
+              mp()->set_cart_cookie(Array());
+          }
+      } catch (Exception $e) {
+          unset($_SESSION['payment_method_id']);
+          mp()->cart_checkout_error(sprintf(__('There was an error processing your card: "%s". Please <a href="%s">go back and try again</a>.', 'mp'), $e->getMessage(), mp_checkout_step_url('checkout')));
+          return false;
+      }
+  }
 
-    /**
-     * INS and payment return
-     */
-    function process_ipn_return() {
-        ;
-        $settings = get_option('mp_settings');
-    }
+  /**
+   * INS and payment return
+   */
+  function process_ipn_return() {
+  }
 
 }
 

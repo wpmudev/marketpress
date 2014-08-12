@@ -16,7 +16,7 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
 			'value' => 1,
-			'message' => '',
+			'message' => __('Yes', 'wpmudev_metaboxes'),
 		), $args);
 	}
 	

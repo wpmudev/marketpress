@@ -115,7 +115,7 @@ class WPMUDEV_Metabox {
 	public static $url = '';
 	
 	/**
-	 * Refers to the metaboxes that are registered
+	 * Refers to the metaboxes that are registered to the current screen
 	 *
 	 * @since 1.0
 	 * @access public
@@ -364,8 +364,6 @@ class WPMUDEV_Metabox {
 	 * @param object/string post
 	 */
 	public function render( $post = null ) {
-		wp_nonce_field($this->nonce_action, $this->nonce_name);
-		
 		if ( $post instanceof WP_Post ) {
 			$post = $post->ID;
 		}
@@ -373,10 +371,11 @@ class WPMUDEV_Metabox {
 		if ( $this->is_settings_metabox() ) :
 			if ( self::$did_metabox_count == 0 ) : ?>
 			<div id="poststuff">
+				<div class="meta-box-sortables">
 		<?php
 			endif; ?>
-				<div class="meta-box-sortables">
 					<div id="<?php echo $this->args['id']; ?>" class="postbox wpmudev-postbox">
+						<?php wp_nonce_field($this->nonce_action, $this->nonce_name); ?>
 						<div class="inside">
 							<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
 		<?php
@@ -401,9 +400,9 @@ class WPMUDEV_Metabox {
 		if ( $this->is_settings_metabox() ) : ?>
 					</div>
 				</div>
-			</div>
 		<?php
 			if ( self::$did_metabox_count == (count(self::$metaboxes) - 1) ) : ?>
+			</div>
 		</div>
 		<?php
 			endif;

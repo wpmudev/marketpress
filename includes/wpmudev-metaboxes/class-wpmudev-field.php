@@ -106,6 +106,7 @@ class WPMUDEV_Field {
 	 *		@type string $value The value to check against. Use "-1" to check for a checkbox being unchecked.
 	 *		@type string $action The action to perform (show/hide).
 	 *	}
+	 *	@type array $save_callback Functions to call before saving to the database (e.g. strip_tags, etc)
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = array_replace_recursive(array(
@@ -123,6 +124,7 @@ class WPMUDEV_Field {
 			'custom_validation_message' => '',
 			'validation' => array(),	
 			'conditional' => array(),
+			'save_callback' => array(),
 		), $args);
 		
 		if ( empty($this->args['original_name']) ) {
@@ -161,7 +163,7 @@ class WPMUDEV_Field {
 			if ( $key == 'custom' ) {
 				$this->args['custom']['data-custom-validation'] = $val;
 			}
-			elseif ( $val === 1 ) {
+			elseif ( $val === true ) {
 				$this->args['class'] .= " $key";
 			} else {
 				$this->args['custom'][$key] = $val;
@@ -526,6 +528,12 @@ class WPMUDEV_Field {
 	 */	
 	public function sanitize_for_db( $value ) {
 		$value = is_array($value) ? $this->array_map_deep($value, 'trim') : trim($value);
+		
+		if ( ! empty($this->args['save_callback']) ) {
+			foreach ( (array) $this->args['save_callback'] as $func ) {
+				$value = $func($value);
+			}
+		}
 		
 		/**
 		 * Modify the value right before it's saved to the database.

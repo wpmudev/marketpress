@@ -145,7 +145,7 @@ if( ! class_exists('MP_Gateway_API') ) {
      * @access private
      */
     public final function generate_metabox_id() {
-	    return 'mp-settings-gateway-' . $this->plugin_name;
+	    return 'mp-settings-gateway-' . strtolower($this->plugin_name);
     }
     
     /****** Below are the public methods you may overwrite via a plugin ******/
@@ -319,7 +319,20 @@ if( ! class_exists('MP_Gateway_API') ) {
      * @return mixed
      */
     public function get_setting( $setting, $default = false ) {
-	    return mp_get_setting("gateways->{$this->plugin_name}->{$setting}", $default);
+	    return mp_get_setting("gateways->" . $this->plugin_name . "->{$setting}", $default);
+    }
+    
+    /**
+     * Gets a network setting specific to the gateway
+     *
+     * @since 3.0
+     * @access public
+     * @param string $setting
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get_network_setting( $setting, $default = false ) {
+	    return mp_get_network_setting("gateways->" . $this->plugin_name . "->{$setting}", $default);
     }
     
     /**
@@ -330,7 +343,9 @@ if( ! class_exists('MP_Gateway_API') ) {
      */
     public final function maybe_update() {
 	    if ( ! is_null($this->build) && $this->build != $this->get_setting('build') ) {
-		    $this->update();
+		    $settings = $this->update(get_option('mp_settings'));
+		    mp_push_to_array($settings, 'gateways->' . $this->plugin_name . '->build', $this->build);
+		    update_option('mp_settings', $settings);
 	    }
     }
     
@@ -339,9 +354,11 @@ if( ! class_exists('MP_Gateway_API') ) {
      *
      * @since 3.0
      * @access public
+     * @param array $settings
+     * @return array
      */
-    public function update() {
-	    // Child gateway should call this
+    public function update( $settings ) {
+	    return $settings;
     }
     
     //DO NOT override the construct! instead use the on_creation() method.
@@ -354,7 +371,7 @@ if( ! class_exists('MP_Gateway_API') ) {
       $this->on_creation();
       
       //check required vars
-      if (empty($this->plugin_name) || empty($this->admin_name) || empty($this->public_name))
+      if ( empty($this->plugin_name) || empty($this->admin_name) || empty($this->public_name) )
         wp_die( __("You must override all required vars in your {$this->admin_name} payment gateway plugin!", 'mp') );
 
       add_filter('mp_checkout_payment_form', array(&$this, '_payment_form_wrapper'), 10, 3);
@@ -368,7 +385,9 @@ if( ! class_exists('MP_Gateway_API') ) {
       add_filter('mp_checkout_payment_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation_msg'), 10, 2);
       add_action('mp_handle_payment_return_' . $this->plugin_name, array(&$this, 'process_ipn_return') );
 
-      $this->init_settings_metabox();
+			if ( is_admin() ) {
+      	$this->init_settings_metabox();
+      }
   	}
   }
   

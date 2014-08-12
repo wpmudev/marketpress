@@ -36,18 +36,16 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
   function on_creation() {
-		;
-		$settings = get_option('mp_settings');
 		//set names here to be able to translate
 		$this->admin_name = __('PayWay', 'mp');
 		$this->public_name = __('PayWay', 'mp');
-		$this->method_img_url 			= 	mp()->plugin_url . 'images/ideal.png';
-		$this->method_button_img_url 	=	mp()->plugin_url . 'images/ideal.png';
-		$this->merchant_id 				= $settings['gateways']['payway']['merchant_id'];
-		$this->ideal_hash 				= $settings['gateways']['payway']['ideal_hash'];
+		$this->method_img_url = mp()->plugin_url . 'images/ideal.png';
+		$this->method_button_img_url =	mp()->plugin_url . 'images/ideal.png';
+		$this->merchant_id = $this->get_setting('merchant_id');
+		$this->ideal_hash = $this->get_setting('ideal_hash');
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');
 		$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
-		$this->errorURL	 = mp_checkout_step_url('checkout') . "?err=1";
+		$this->errorURL	= mp_checkout_step_url('checkout') . "?err=1";
 		
 	}
 	
@@ -58,7 +56,6 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function payment_form($cart, $shipping_info) {
-    ;
 		if (isset($_GET['cancel']))
 			echo '<div class="mp_checkout_error">' . __('Your PayWay transaction has been canceled.', 'mp') . '</div>';
   }
@@ -74,16 +71,12 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function process_payment_form($cart, $shipping_info) {
-		;
-		$settings = get_option('mp_settings');
-
 		$order_id = mp()->generate_order_id();
 		$parameters = array();
-		$parameters['username'] = $settings["gateways"]["payway"]["_USERNAME_"];
-		$parameters['password'] = $settings["gateways"]["payway"]["_PASSWORD_"];
-		$parameters['biller_code'] = $settings["gateways"]["payway"]["_BILLER_CODE_"];
-		$parameters['merchant_id'] = $settings["gateways"]["payway"]["merchantId"];
-		$parameters['paypal_email'] = $paypalEmail;
+		$parameters['username'] = $this->get_setting('_USERNAME_');
+		$parameters['password'] = $this->get_setting('_PASSWORD_');
+		$parameters['biller_code'] = $this->get_setting('_BILLER_CODE_');
+		$parameters['merchant_id'] = $this->get_setting('merchantId');
 		$parameters['payment_reference'] = $order_id;
 		$parameters['payment_reference_change'] = 'false';
 		$parameters['surcharge_rates'] = 'VI/MC=0.0,AX=1.5,DC=1.5';
@@ -182,8 +175,6 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
 	function confirm_payment_form($cart, $shipping_info) {
-		;
-		$settings 	= get_option('mp_settings');
 		$timestamp 	= time();
 		$totals 	= array();
 		foreach ($cart as $product_id => $variations) {
@@ -207,7 +198,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$payment_info['gateway_private_name'] = $this->admin_name;
 		$payment_info['status'][$timestamp] = __('Invoiced', 'mp');
 		$payment_info['total'] = $total;
-		$payment_info['currency'] = $settings['currency'];
+		$payment_info['currency'] = mp_get_setting('currency');
 		$payment_info['method'] = __('iDEAL', 'mp');
 		$payment_info['transaction_id'] = $order_id;
 		//create our order now
@@ -240,8 +231,6 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
    * Don't forget to return!
    */
 	function order_confirmation_email($msg, $order) {
-    ;
-	$settings = get_option('mp_settings');
     return $msg;
   }
   
@@ -252,90 +241,61 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
    * Don't forget to return!
    */
 	function order_confirmation_msg($content, $order) {
-    ;
-    $settings = get_option('mp_settings');
     return $content;
-  }
-	
-	/**
-   * Echo a settings meta box with whatever settings you need for you gateway.
-   *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-   *  You can access saved settings via $settings array.
-   */
-	function gateway_settings_box($settings) {
-    ;
-    ?>
-    <div class="postbox">
-    	<h3 class='handle'><span><?php _e('Payway Settings', 'mp'); ?></span></h3>
-      <div class="inside">
-	      <table class="form-table">
-		     <tr>
-				  <th scope="row"><label for="encryptionKey"><?php _e('Encryption Key', 'mp') ?></label></th>
-				  <td>	  		 
-		          <input value="<?php echo esc_attr($settings['gateways']['payway']['encryptionKey']); ?>" name="mp[gateways][payway][encryptionKey]" id="encryptionKey" type="text" />   
-				</td>
-	         </tr>
-			  <tr>
-				  <th scope="row"><label for="_LOG_DIR_"><?php _e('Log Directory', 'mp') ?></label></th>
-				  <td>	  		 
-					  <input value="<?php echo esc_attr($settings['gateways']['payway']['_LOG_DIR_']); ?>" name="mp[gateways][payway][_LOG_DIR_]" id="_LOG_DIR_" type="text" />   
-				  </td>
-			  </tr>
-			  <tr>
-				  <th scope="row"><label for="_BILLER_CODE_"><?php _e('Biller Code', 'mp') ?></label></th>
-				  <td>	  		 
-					  <input value="<?php echo esc_attr($settings['gateways']['payway']['_BILLER_CODE_']); ?>" name="mp[gateways][payway][_BILLER_CODE_]" id="_BILLER_CODE_" type="text" />   
-				  </td>
-			  </tr>			  
-			  <tr>
-				  <th scope="row"><label for="_USERNAME_"><?php _e('User Name', 'mp') ?></label></th>
-				  <td>	  		 
-					  <input value="<?php echo esc_attr($settings['gateways']['payway']['_USERNAME_']); ?>" name="mp[gateways][payway][_USERNAME_]" id="_USERNAME_" type="text" />   
-				  </td>
-			  </tr>			  
-			  <tr>
-				  <th scope="row"><label for="_PASSWORD_"><?php _e('Password', 'mp') ?></label></th>
-				  <td>	  		 
-					  <input value="<?php echo esc_attr($settings['gateways']['payway']['_PASSWORD_']); ?>" name="mp[gateways][payway][_PASSWORD_]" id="_PASSWORD_" type="text" />   
-				  </td>
-			  </tr>			  
-			  <tr>
-				  <th scope="row"><label for="_CA_FILE_"><?php _e('Full path of the cacerts.crt file', 'mp') ?></label></th>
-				  <td>	  		 
-					  <input value="<?php echo esc_attr($settings['gateways']['payway']['_CA_FILE_']); ?>" name="mp[gateways][payway][_CA_FILE_]" id="_CA_FILE_" type="text" />   
-				  </td>
-			  </tr>			  
-			  <tr>
-				  <th scope="row"><label for="merchantId"><?php _e('Merchant ID', 'mp') ?></label></th>
-				  <td>	  		 
-					  <input value="<?php echo esc_attr($settings['gateways']['payway']['merchantId']); ?>" name="mp[gateways][payway][merchantId]" id="merchantId" type="text" />   
-				  </td>
-			  </tr>			  
-      	</table>
-      </div>
-    </div>
-    <?php
   }
   
   /**
-   * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-   *  array. Don't forget to return!
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
    */
-	function process_gateway_settings($settings) {
-		return $settings;
-	}
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('Record payments manually, such as by Cash, Check, or EFT.', 'mp'),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('encryptionKey'),
+			'label' => array('text' => __('Encryption Key', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('_LOG_DIR_'),
+			'label' => array('text' => __('Log Directory', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('_BILLER_CODE_'),
+			'label' => array('text' => __('Biller Code', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('_USERNAME_'),
+			'label' => array('text' => __('User Name', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('_PASSWORD_'),
+			'label' => array('text' => __('Password', 'mp')),
+		));
+		$metabox->add_field('file', array(
+			'name' => $this->get_field_name('_CA_FILE_'),
+			'label' => array('text' => __('Full path of the cacerts.crt file', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('merchantId'),
+			'label' => array('text' => __('Merchant ID', 'mp')),
+		));
+  }
   
 	/**
    * Use to handle any payment returns to the ipn_url. Do not display anything here. If you encounter errors
    *  return the proper headers. Exits after.
    */
 	function process_ipn_return() {
-		;
-		$settings 				= get_option('mp_settings');
-		$encryptedParametersText = $_GET['EncryptedParameters'];
+		$encryptedParametersText = mp_get_get_value('EncryptedParameters');
 		$signatureText 	=	$_GET['Signature'];
-		$settings 		= 	get_option('mp_settings');
-		$encryptionKey	=	esc_attr($settings['gateways']['payway']['encryptionKey']);
+		$encryptionKey	=	esc_attr($this->get_setting('encryptionKey'));
 		$parameters 	= 	decrypt_parameters( $encryptionKey, $encryptedParametersText, $signatureText );
 		$data			=	$encryptionKey .' : '. $encryptedParametersText.' : '. $signatureText;
 		foreach($parameters as $key=>$value)

@@ -32,7 +32,9 @@ Author: MasterCard International Incorporated
  */
 
 class MP_Gateway_Simplify extends MP_Gateway_API {
-
+	//build
+	var $build = 2;
+	
 	var $plugin_name = 'simplify';
 	var $admin_name = '';
 	var $public_name = '';
@@ -46,21 +48,18 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 		$currency;
 
 	function on_creation() {
-		;
-		$settings = get_option('mp_settings');
 		$this->admin_name = __('Simplify', 'mp');
 		$this->public_name = __('Credit Card', 'mp');
 		$this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
 		$this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
-		$this->publishable_key = mp_get_setting('gateways->simplify->publishable_key');
-		$this->private_key = mp_get_setting('gateways->simplify->private_key');
-		$this->force_ssl = mp_get_setting('gateways->simplify->is_ssl');
-		$this->currency = mp_get_setting('gateways->simplify->currency', 'USD');
+		$this->publishable_key = $this->get_setting('publishable_key');
+		$this->private_key = $this->get_setting('private_key');
+		$this->force_ssl = $this->get_setting('is_ssl');
+		$this->currency = $this->get_setting('currency', 'USD');
 		add_action( 'wp_enqueue_scripts', array(&$this, 'enqueue_scripts') );
 	}
 
 	function enqueue_scripts() {
-		;
 		if(!is_admin() && get_query_var('pagename') == 'cart' && get_query_var('checkoutstep') == 'checkout') {
 			wp_enqueue_script('js-simplify', 'https://www.simplify.com/commerce/v1/simplify.js', array('jquery'));
 			wp_enqueue_script('simplify-token', mp()->plugin_url . 'plugins-gateway/simplify-files/simplify_token.js', array('js-simplify', 'jquery'));
@@ -75,8 +74,6 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 	* @param array $shipping_info. Contains shipping info and email in case you need it
 	*/
 	function payment_form($cart, $shipping_info) {
-		;
-		$settings = get_option('mp_settings');
 		$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
 		$content .= '<div class="row-fluid">';
 			$content .= '<div class="span6 offset3">';
@@ -200,9 +197,6 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 	* @param array $shipping_info. Contains shipping info and email in case you need it
 	*/
 	function process_payment_form($cart, $shipping_info) {
-		;
-		$settings = get_option('mp_settings');
-
 		if(!isset($_POST['simplifyToken'])) {
 			mp()->cart_checkout_error(__('The Simplify Token was not generated correctly. Please try again.', 'mp'));
 		} elseif(!mp()->checkout_error) {
@@ -227,60 +221,71 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 	* Don't forget to return!
 	*/
 	function order_confirmation_msg($content, $order) {
-		;
 		if($order->post_status == 'order_paid') {
 			$content .= '<p>' . sprintf(__('Your payment for this order totaling %s is complete.', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
 		}
 		return $content;
 	}
-
-	/**
-	* Echo a settings meta box with whatever settings you need for you gateway.
-	* Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-	* You can access saved settings via $settings array.
-	*/
-	function gateway_settings_box($settings) {
-		;
-		?>
-		<div class="postbox">
-			<h3 class='hndle' style="background: #222; box-shadow: inset 0px 15px 15px #333; text-shadow: 0px 1px 0px #000; color: #ccc;">
-				<img style="width: 100px; float: left; padding: 5px; padding-right: 25px;" src="<?php echo mp()->plugin_url . 'images/simplify.png'; ?>" />
-				<span style="color: #fff;"><?php _e('Simplify Commerce', 'mp') ?> <em><?php _e('by MasterCard', 'mp') ?></em></span> - <span style="color: #ccc;" class="description"><?php _e('Simplify helps merchants to accept online payments from Mastercard, Visa, American Express, Discover, JCB, and Diners Club cards. It\'s that simple. We offer a merchant account and payment gateway in a single, secure package so you can concentrate on what really matters to your business. Only supports USD currently.', 'mp'); ?> <a style="color: #fff;" href="https://www.simplify.com/commerce/login/signup" target="_blank"><?php _e('Signup for Simplify Commerce &raquo;', 'mp') ?></a></span>
-				<br style="clear: both;" />
-			</h3>
-			<div class="inside">
-				<table class="form-table">
-					<tr>
-						<th scope="row"><?php _e('Simplify API Credentials', 'mp') ?></th>
-						<td>
-							<span class="description"><?php _e('Login to Simplify to <a target="_blank" href="https://www.simplify.com/commerce/app#/account/apiKeys">get your API credentials</a>. Enter your test credentials, then live ones when ready.', 'mp') ?></span>
-							<p><label><?php _e('Private Key', 'mp') ?><br /><input value="<?php echo esc_attr(mp_get_setting('gateways->simplify->private_key')); ?>" size="70" name="mp[gateways][simplify][private_key]" type="text" /></label></p>
-							<p><label><?php _e('Public Key', 'mp') ?><br /><input value="<?php echo esc_attr(mp_get_setting('gateways->simplify->publishable_key')); ?>" size="70" name="mp[gateways][simplify][publishable_key]" type="text" /></label></p>
-						</td>
-					</tr>
-					<tr valign="top">
-						<th scope="row"><?php _e('Simplify SSL Mode', 'mp') ?></th>
-						<td>
-							<span class="description"><?php _e('When in live mode, although it is not required, Simplify recommends you have an SSL certificate.', 'mp'); ?></span><br/>
-							<select name="mp[gateways][simplify][is_ssl]">
-								<option value="1"<?php selected(mp_get_setting('gateways->simplify->is_ssl'), 1); ?>><?php _e('Force SSL', 'mp') ?></option>
-								<option value="0"<?php selected(mp_get_setting('gateways->simplify->is_ssl', 0), 0); ?>><?php _e('No SSL', 'mp') ?></option>
-							</select>
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-	<?php
+	
+  /**
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('Simplify helps merchants to accept online payments from Mastercard, Visa, American Express, Discover, JCB, and Diners Club cards. It\'s that simple. We offer a merchant account and payment gateway in a single, secure package so you can concentrate on what really matters to your business. Only supports USD currently.', 'mp'),
+		));
+		$creds = $metabox->add_field('complex', array(
+			'name' => $this->get_field_name('api_credentials'),
+			'label' => array('text' => __('API Credentials', 'mp')),
+			'desc' => __('Login to Simplify to <a target="_blank" href="https://www.simplify.com/commerce/app#/account/apiKeys">get your API credentials</a>. Enter your test credentials, then live ones when ready.', 'mp'),
+		));
+		
+		if ( $creds instanceof WPMUDEV_Field ) {
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('private_key'),
+				'label' => array('text' => __('Private Key', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('public_key'),
+				'label' => array('text' => __('Public Key', 'mp')),
+			));
+		}
+		
+		$metabox->add_field('checkbox', array(
+			'name' => $this->get_field_name('is_ssl'),
+			'label' => array('text' => __('Force SSL?', 'mp')),
+			'desc' => __('When in live mode, although it is not required, Simplify recommends you have an SSL certificate.', 'mp'),
+		));
 	}
-
+	
 	/**
-	* Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-	* array. Don't forget to return!
-	*/
-	function process_gateway_settings($settings) {
-		return $settings;
-	}
+   * Updates the gateway settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
+  public function update( $settings ) {
+  	if ( $val = $this->get_setting('private_key') ) {
+	  	mp_push_to_array($settings, 'gateways->simplify->api_credentials->private_key', $val);
+	  	unset($settings['gateways']['simplify']['private_key']);	
+  	}
+  	
+  	if ( $val = $this->get_setting('public_key') ) {
+	  	mp_push_to_array($settings, 'gateways->simplify->api_credentials->public_key', $val);
+	  	unset($settings['gateways']['simplify']['public_key']);	
+  	}
+  	
+    return $settings;
+  }
 
 	/**
 	* Use this to do the final payment. Create the order then process the payment. If
@@ -293,9 +298,6 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 	* @param array $shipping_info. Contains shipping info and email in case you need it
 	*/
 	function process_payment($cart, $shipping_info) {
-		;
-		$settings = get_option('mp_settings');
-
 		// Token MUST be set at this point
 		if(!isset($_SESSION['simplifyToken'])) {
 			mp()->cart_checkout_error(__('The Simplify Token was not generated correctly. Please go back and try again.', 'mp'));
@@ -375,8 +377,6 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 	* INS and payment return
 	*/
 	function process_ipn_return() {
-		;
-		$settings = get_option('mp_settings');
 	}
 
 }

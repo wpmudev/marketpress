@@ -195,35 +195,6 @@ if ( ! function_exists('mp_get_current_screen') ) :
 	}
 endif;
 
-if ( ! function_exists('mp_get_field') ) :
-	/**
-	 * Gets a fields value
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @param string $name The name of the field
-	 * @param string $type The type of field
-	 * @param int $post_id (optional) The post ID to retrieve the value from - defaults to current post id
-	 * @return mixed
-	 */
-	function mp_get_field( $name, $type, $post_id = null ) {
-		if ( ! class_exists($type) || empty($name) ) {
-			return false;
-		}
-		
-		if ( is_null($post_id) ) {
-			$post_id = get_the_ID();	
-		}
-		
-		if ( empty($post_id) ) {
-			return false;
-		}
-		
-		$field = new $type(array('name' => $name));
-		$value = $field->get_value($post_id);
-	}
-endif;
-
 if ( ! function_exists('mp_admin') ) :
 	/**
 	 * Returns the MP_Admin instance
@@ -407,6 +378,31 @@ if ( ! function_exists('mp_get_setting') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_network_setting') ) :
+	/*
+	 * Safely retrieves a network setting
+	 *
+	 * An easy way to get to our settings array without undefined indexes
+	 *
+	 * @since 3.0
+	 * @uses mp_arr_search()
+	 *
+	 * @param string $key A setting key, or -> separated list of keys to go multiple levels into an array
+	 * @param mixed $default Returns when setting is not set
+	 * @return mixed
+	 */
+	function mp_get_network_setting( $key, $default = null ) {
+		$settings = get_option('mp_network_settings');
+		
+		$keys = explode('->', $key);
+		$keys = array_map('trim', $keys);
+		$setting = mp_arr_get_value($key, $settings, $default);
+		
+		return apply_filters('mp_network_setting_' . implode('', $keys), $setting, $default);
+	}
+endif;
+
+
 if ( ! function_exists('mp_arr_search') ) :
 	/**
 	 * Searches an array multidimensional array for a specific path (if it exists)
@@ -417,7 +413,6 @@ if ( ! function_exists('mp_arr_search') ) :
 	 * @param string $path The path we want to check for (e.g. key1->key2->key3 = $array[key1][key2][key3])
 	 * @return mixed
 	 */
-	 
 function mp_arr_search( $array, $path ) {
 	$keys = explode('->', $path);
 	$keys = array_map('trim', $keys);

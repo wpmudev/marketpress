@@ -1,13 +1,17 @@
 <?php
-/*
-MarketPress Payflow Pro Gateway Plugin
-Author: Sue Cline (Cyclonic Consulting)
-Modifications: Robert M. Hall - www.impossibilities.com
-Revision-History:  09/04/2012 - Added support for passing along SHIPTO information in the main transaction
-*/
+
+/**
+ * MarketPress Payflow Pro Gateway Plugin
+ *
+ * @since 3.0
+ *
+ * @package MarketPress
+ */
 
 class MP_Gateway_Payflow extends MP_Gateway_API {
-
+	//build of the gateway plugin
+	var $build = 2;
+	
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'payflow';
 
@@ -33,7 +37,23 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
   var $skip_form = false;
 
   //credit card vars
-  var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
+  var $API_Username, $API_Vendor, $API_Partner, $API_Password, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
+  
+  /**
+   * Gateway currencies
+   *
+   * @since 3.0
+   * @access public
+   * @var array
+   */
+  var $currencies = array(
+    'AUD' => 'AUD - Australian Dollar',
+    'CAD' => 'CAD - Canadian Dollar',
+    'EUR' => 'EUR - Euro',
+    'GBP' => 'GBP - Pound Sterling',
+    'JPY' => 'JPY - Japanese Yen',
+    'USD' => 'USD - U.S. Dollar'
+  );
 
   /****** Below are the public methods you may overwrite via a plugin ******/
 
@@ -41,9 +61,6 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
    */
   function on_creation() {
-    ;
-    $settings = get_option('mp_settings');
-
     //set names here to be able to translate
     $this->admin_name = __('PayPal Payflow Pro', 'mp');
     $this->public_name = __('Credit Card', 'mp');
@@ -54,19 +71,51 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $this->version = "63.0"; //api version
 
     //set credit card vars
-    if ( isset( $settings['gateways']['payflow'] ) ) {
-      $this->API_Username = $settings['gateways']['payflow']['api_user'];
-      $this->API_Password = $settings['gateways']['payflow']['api_pass'];
-      $this->API_Signature = $settings['gateways']['payflow']['api_sig'];
-      $this->currencyCode = $settings['gateways']['payflow']['currency'];
-      $this->locale = $settings['gateways']['payflow']['locale'];
-      //set api urls
-      if ($settings['gateways']['payflow']['mode'] == 'sandbox')	{
-        $this->API_Endpoint = "https://pilot-payflowpro.paypal.com";
-      } else {
-        $this->API_Endpoint = "https://payflowpro.paypal.com";
-      }
+    $this->API_Username = $this->get_setting('api_credentials->user');
+    $this->API_Vendor = $this->get_setting('api_credentials->vendor');
+    $this->API_Partner = $this->get_setting('api_credentials->partner');
+    $this->API_Password = $this->get_setting('api_credentials->password');
+    $this->currencyCode = $this->get_setting('currency');
+    $this->locale = $this->get_setting('locale');
+    
+    //set api urls
+    if ( $this->get_setting('mode') == 'sandbox')	{
+      $this->API_Endpoint = "https://pilot-payflowpro.paypal.com";
+    } else {
+      $this->API_Endpoint = "https://payflowpro.paypal.com";
     }
+  }
+  
+  /**
+   * Updates the gateway settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
+  public function update( $settings ) {
+  	if ( $val = $this->get_setting('api_user') ) {
+	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->user', $val);
+	  	unset($settings['gateways']['payflow']['api_user']);
+  	}
+  	
+  	if ( $val = $this->get_setting('api_vendor') ) {
+	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->vendor', $val);
+	  	unset($settings['gateways']['payflow']['api_vendor']);
+  	}
+  	
+  	if ( $val = $this->get_setting('api_partner') ) {
+	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->partner', $val);
+	  	unset($settings['gateways']['payflow']['api_partner']);
+  	}
+  	
+  	if ( $val = $this->get_setting('api_pwd') ) {
+	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->password', $val);
+	  	unset($settings['gateways']['payflow']['api_pwd']);
+  	}
+  	
+  	return $settings;
   }
 
   /**
@@ -76,14 +125,12 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function payment_form($cart, $shipping_info) {
-    ;
     $content = '';
 
-    if (isset($_GET['cancel'])) {
+    if ( mp_get_get_value('cancel') ) {
       $content .= '<div class="mp_checkout_error">' . __('Your credit card transaction has been canceled.', 'mp') . '</div>';
     }
 
-    $settings = get_option('mp_settings');
     $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
 
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
@@ -95,7 +142,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $zip = (!empty($_SESSION['mp_billing_info']['zip'])) ? $_SESSION['mp_billing_info']['zip'] : (!empty($meta['zip'])?$meta['zip']:$_SESSION['mp_shipping_info']['zip']);
     $country = (!empty($_SESSION['mp_billing_info']['country'])) ? $_SESSION['mp_billing_info']['country'] : (!empty($meta['country'])?$meta['country']:$_SESSION['mp_shipping_info']['country']);
     if (!$country)
-      $country = $settings['base_country'];
+      $country = mp_get_setting('base_country');
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
 
     $content .= '<style type="text/css">
@@ -205,7 +252,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
           '.apply_filters( 'mp_checkout_error_country', '' ).'
         <select id="mp_" name="country">';
 
-          foreach ((array)$settings['shipping']['allowed_countries'] as $code) {
+          foreach ( mp_get_setting('allowed_countries', array()) as $code ) {
             $content .= '<option value="'.$code.'"'.selected($country, $code, false).'>'.esc_attr(mp()->countries[$code]).'</option>';
           }
 
@@ -303,32 +350,29 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function process_payment_form($cart, $shipping_info) {
-    ;
-    $settings = get_option('mp_settings');
-
-    if (!is_email($_POST['email']))
+    if ( ! is_email(mp_get_post_value('email', '')) )
       mp()->cart_checkout_error('Please enter a valid Email Address.', 'email');
 
-    if (empty($_POST['name']))
+    if ( ! mp_get_post_value('name') )
       mp()->cart_checkout_error('Please enter your Full Name.', 'name');
 
-    if (empty($_POST['address1']))
+    if ( mp_get_post_value('address1') )
       mp()->cart_checkout_error('Please enter your Street Address.', 'address1');
 
-    if (empty($_POST['city']))
+    if ( ! mp_get_post_value('city') )
       mp()->cart_checkout_error('Please enter your City.', 'city');
 
-    if (($_POST['country'] == 'US' || $_POST['country'] == 'CA') && empty($_POST['state']))
+    if ((mp_get_post_value('country') == 'US' || mp_get_post_value('country') == 'CA') && empty($_POST['state']))
       mp()->cart_checkout_error('Please enter your State/Province/Region.', 'state');
 
-    if (!mp()->is_valid_zip($_POST['zip'], $_POST['country']))
+    if ( ! mp()->is_valid_zip(mp_get_post_value('zip'), mp_get_post_value('country')) )
       mp()->cart_checkout_error('Please enter a valid Zip/Postal Code.', 'zip');
 
-    if (empty($_POST['country']) || strlen($_POST['country']) != 2)
+    if ( empty($_POST['country']) || strlen(mp_get_post_value('country', '')) != 2 )
       mp()->cart_checkout_error('Please enter your Country.', 'country');
 
     //for checkout plugins
-    do_action( 'mp_billing_process' );
+    do_action('mp_billing_process');
 
     //save to session
     global $current_user;
@@ -407,9 +451,8 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function confirm_payment_form($cart, $shipping_info) {
-    ;
+    global $mp;
 
-    $settings = get_option('mp_settings');
     $meta = get_user_meta($current_user->ID, 'mp_billing_info', true);
 
     $email = (!empty($_SESSION['mp_billing_info']['email'])) ? $_SESSION['mp_billing_info']['email'] : (!empty($meta['email'])?$meta['email']:$_SESSION['mp_shipping_info']['email']);
@@ -421,7 +464,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $zip = (!empty($_SESSION['mp_billing_info']['zip'])) ? $_SESSION['mp_billing_info']['zip'] : (!empty($meta['zip'])?$meta['zip']:$_SESSION['mp_shipping_info']['zip']);
     $country = (!empty($_SESSION['mp_billing_info']['country'])) ? $_SESSION['mp_billing_info']['country'] : (!empty($meta['country'])?$meta['country']:$_SESSION['mp_shipping_info']['country']);
     if (!$country)
-      $country = $settings['base_country'];
+      $country = mp_get_setting('base_country');
     $phone = (!empty($_SESSION['mp_billing_info']['phone'])) ? $_SESSION['mp_billing_info']['phone'] : (!empty($meta['phone'])?$meta['phone']:$_SESSION['mp_shipping_info']['phone']);
 
     $content = '';
@@ -501,27 +544,18 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
   function process_payment($cart, $shipping_info) {
-    ;
-
     $timestamp = time();
-    $settings = get_option('mp_settings');
     $billing_info = $_SESSION['mp_billing_info'];
 
-    $payment = new MP_Gateway_Worker_Payflow($this->API_Endpoint,
-      $settings['gateways']['payflow']['delim_data'],
-      $settings['gateways']['payflow']['delim_char'],
-      $settings['gateways']['payflow']['encap_char'],
-      $settings['gateways']['payflow']['api_user'],
-      $settings['gateways']['payflow']['api_key'],
-      ($settings['gateways']['payflow']['mode'] == 'sandbox'));
+    $payment = new MP_Gateway_Worker_Payflow($this->API_Endpoint);
 
-    $payment->transaction($_SESSION['card_num']);
-    $payment->setParameter("EXPDATE", $_SESSION['exp_month'] .substr($_SESSION['exp_year'],2,2));
-    $payment->setParameter("CVV2", $_SESSION['card_code'] );
-    $payment->setParameter("USER", $settings['gateways']['payflow']['api_user']);
-    $payment->setParameter("VENDOR", $settings['gateways']['payflow']['api_vendor']);
-    $payment->setParameter("PWD", $settings['gateways']['payflow']['api_pwd']);
-    $payment->setParameter("PARTNER", $settings['gateways']['payflow']['api_partner']);
+    $payment->transaction(mp_get_session_value('card_num'));
+    $payment->setParameter("EXPDATE", mp_get_session_value('exp_month', '') . substr(mp_get_session_value('exp_year', ''), 2, 2));
+    $payment->setParameter("CVV2", mp_get_session_value('card_code'));
+    $payment->setParameter("USER", $this->API_Username);
+    $payment->setParameter("VENDOR", $this->API_Vendor);
+    $payment->setParameter("PWD", $this->API_Password);
+    $payment->setParameter("PARTNER", $this->API_Partner);
 
     $totals = array();
     $coupon_code = mp()->get_coupon_code();
@@ -663,7 +697,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    *  should be a payment details box and message.
    */
   function order_confirmation_msg($content, $order) {
-    ;
+    global $mp;
     if ($order->post_status == 'order_received') {
       $content .= '<p>' . sprintf(__('Your credit card payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
       $statuses = $order->mp_payment_info['status'];
@@ -681,141 +715,88 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
    * Runs before page load incase you need to run any scripts before loading the success message page
    */
   function order_confirmation($order) {
-
   }
 
   /**
-   * Echo a settings meta box with whatever settings you need for you gateway.
-   *  Form field names should be prefixed with mp[gateways][plugin_name], like "mp[gateways][plugin_name][mysetting]".
-   *  You can access saved settings via $settings array.
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
    */
-  function gateway_settings_box($settings) {
-    ;
-
-    $defaults = array(
-    	'mode' => 'sandbox',
-    	'api_user' => '',
-    	'api_vendor' => '',
-    	'api_partner' => '',
-    	'api_pwd' => '',
-    	'email_customer' => 'yes',
-    	'header_email_receipt' => 'Thanks for your payment!',
-    	'footer_email_receipt' => ''
-    );
-    if ( !isset( $settings['gateways']['payflow'] ) )
-    	$settings['gateways']['payflow'] = array();
-
-    $settings['gateways']['payflow'] = $settings['gateways']['payflow'] + $defaults;
-
-    ?>
-    <div id="mp_payflow_express" class="postbox">
-      <h3 class='hndle'><span><?php _e('PayPal Payflow Settings', 'mp'); ?></span></h3>
-      <div class="inside">
-				<a href="https://merchant.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=merchant/payment_gateway" target="_blank"><img src="<?php echo mp()->plugin_url . 'images/paypal-payflow.png'; ?>" /></a>
-        <p class="description"><?php _e('Use Payflow payment gateway to accept online payments using your Internet merchant account and processing network. PayPal Payflow Pro is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway.', 'mp') ?></p>
-        <table class="form-table">
-				  <tr>
-				    <th scope="row"><?php _e('Mode', 'mp') ?></th>
-				    <td>
-			        <p>
-			          <select name="mp[gateways][payflow][mode]">
-			            <option value="sandbox" <?php selected($settings['gateways']['payflow']['mode'], 'sandbox') ?>><?php _e('Sandbox', 'mp') ?></option>
-			            <option value="live" <?php selected($settings['gateways']['payflow']['mode'], 'live') ?>><?php _e('Live', 'mp') ?></option>
-			          </select>
-			        </p>
-				    </td>
-				  </tr>
-				  <tr>
-				    <th scope="row"><?php _e('Gateway Credentials', 'mp') ?></th>
-				    <td>
-				      <p>
-					<label><?php _e('USER', 'mp') ?><br />
-					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_user']); ?>" size="30" name="mp[gateways][payflow][api_user]" type="text" />
-					</label>
-				      </p>
-				      <p>
-					<label><?php _e('VENDOR', 'mp') ?><br />
-					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_vendor']); ?>" size="30" name="mp[gateways][payflow][api_vendor]" type="text" />
-					</label>
-				      </p>
-				      <p>
-					<label><?php _e('PARTNER', 'mp') ?><br />
-					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_partner']); ?>" size="30" name="mp[gateways][payflow][api_partner]" type="text" />
-					</label>
-				      </p>
-
-				      <p>
-					<label><?php _e('PWD', 'mp') ?><br />
-					  <input value="<?php echo esc_attr($settings['gateways']['payflow']['api_pwd']); ?>" size="30" name="mp[gateways][payflow][api_pwd]" type="password" />
-					</label>
-				      </p>
-
-				    </td>
-				  </tr>
-					<tr>
-	        <th scope="row"><?php _e('Paypal Currency', 'mp') ?></th>
-	        <td>
-	          <select name="mp[gateways][payflow][currency]">
-	          <?php
-	          $sel_currency = mp_get_setting('gateways->payflow->currency', mp_get_setting('currency'));
-	          $currencies = array(
-	              'AUD' => 'AUD - Australian Dollar',
-	              'CAD' => 'CAD - Canadian Dollar',
-	              'EUR' => 'EUR - Euro',
-	              'GBP' => 'GBP - Pound Sterling',
-	              'JPY' => 'JPY - Japanese Yen',
-	              'USD' => 'USD - U.S. Dollar'
-	          );
-
-	          foreach ($currencies as $k => $v) {
-	              echo '		<option value="' . $k . '"' . ($k == $sel_currency ? ' selected' : '') . '>' . esc_html($v) . '</option>' . "\n";
-	          }
-	          ?>
-	          </select>
-	        </td>
-	        </tr>
-			          <tr>
-				    <th scope="row"><?php _e('Advanced Settings', 'mp') ?></th>
-				    <td>
-				      <span class="description"><?php _e('Optional settings to control advanced options', 'mp') ?></span>
-
-
-			              <p>
-					<label><?php _e('Email Customer (on success):', 'mp'); ?><br />
-			                  <select name="mp[gateways][payflow][email_customer]">
-			                    <option value="yes" <?php selected($settings['gateways']['payflow']['email_customer'], 'yes') ?>><?php _e('Yes', 'mp') ?></option>
-			                    <option value="no" <?php selected($settings['gateways']['payflow']['email_customer'], 'no') ?>><?php _e('No', 'mp') ?></option>
-			                  </select>
-			                </label>
-			              </p>
-
-			              <p>
-					<label><a title="<?php _e('This text will appear as the header of the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Header', 'mp'); ?></a><br/>
-			                  <input value="<?php echo empty($settings['gateways']['payflow']['header_email_receipt'])?__('Thanks for your payment!', 'mp'):esc_attr($settings['gateways']['payflow']['header_email_receipt']); ?>" size="40" name="mp[gateways][payflow][header_email_receipt]" type="text" />
-			                </label>
-				      </p>
-
-			              <p>
-					<label><a title="<?php _e('This text will appear as the footer on the email receipt sent to the customer.', 'mp'); ?>"><?php _e('Customer Receipt Email Footer', 'mp'); ?></a><br/>
-			                  <input value="<?php echo empty($settings['gateways']['payflow']['footer_email_receipt']) ? '' : esc_attr($settings['gateways']['payflow']['footer_email_receipt']); ?>" size="40" name="mp[gateways][payflow][footer_email_receipt]" type="text" />
-			                </label>
-				      </p>
-
-
-				    </td>
-				  </tr>
-        </table>
-      </div>
-    </div>
-    <?php
-  }
-
-  /**
-   * Filters posted data from your settings form. Do anything you need to the $settings['gateways']['plugin_name']
-   *  array. Don't forget to return!
-   */
-  function process_gateway_settings($settings) {
-    return $settings;
+  public function init_settings_metabox() {
+    $metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
+			'option_name' => 'mp_settings',
+			'desc' => __('Use Payflow payment gateway to accept online payments using your Internet merchant account and processing network. PayPal Payflow Pro is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway.', 'mp'),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => $this->get_field_name('mode'),
+			'label' => array('text' => __('Mode', 'mp')),
+			'default_value' => 'sandbox',
+			'options' => array(
+				'sandbox' => __('Sandbox', 'mp'),
+				'live' => __('Live', 'mp'),
+			),
+		));
+		$creds = $metabox->add_field('complex', array(
+			'name' => $this->get_field_name('api_credentials'),
+			'label' => array('text' => __('Gateway Credentials', 'mp')),
+		));
+		
+		if ( $creds instanceof WPMUDEV_Field ) {
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('user'),
+				'label' => array('text' => __('User', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('vendor'),
+				'label' => array('text' => __('Vendor', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('partner'),
+				'label' => array('text' => __('Partner', 'mp')),
+			));
+			$creds->add_field('text', array(
+				'name' => $this->get_field_name('password'),
+				'label' => array('text' => __('Password', 'mp')),
+			));
+		}
+		
+		$metabox->add_field('advanced_select', array(
+			'name' => $this->get_field_name('currency'),
+			'label' => array('text' => __('Currency', 'mp')),
+			'width' => 'element',
+			'multiple' => false,
+			'default_value' => mp_get_setting('currency'),
+			'options' => $this->currencies,
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => $this->get_field_name('email_customer'),
+			'label' => array('text' => __('Email Customer (on success)', 'mp')),
+			'message' => __('Yes', 'mp'),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('header_email_receipt'),
+			'label' => array('text' => __('Email Header', 'mp')),
+			'desc' => __('This text will appear as the header of the email receipt sent to the customer.', 'mp'),
+			'conditional' => array(
+				'name' => $this->get_field_name('email_customer'),
+				'value' => 1,
+				'action' => 'show',
+			),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('footer_email_receipt'),
+			'label' => array('text' => __('Email Footer', 'mp')),
+			'desc' => __('This text will appear as the footer of the email receipt sent to the customer.', 'mp'),
+			'conditional' => array(
+				'name' => $this->get_field_name('email_customer'),
+				'value' => 1,
+				'action' => 'show',
+			),
+		));
   }
 }
 
@@ -838,16 +819,13 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 
     var $instances = 0;
 
-    function __construct($url, $delim_data, $delim_char, $encap_char, $gw_username, $gw_tran_key, $gw_test_mode)
+    function __construct($url)
     {
-      if ($this->instances == 0)
-      {
-
-	   $this->url = $url;
-
-	   $this->instances++;
+      if ( $this->instances == 0 ) {
+		  	$this->url = $url;
+				$this->instances++;
       } else {
-	   return false;
+				return false;
       }
     }
 
@@ -863,7 +841,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
 
     function process($retries = 1)
     {
-        ;
+        global $mp;
 
 
         $post_string = '';
@@ -877,11 +855,7 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
         $count = 0;
 
 
-        //use built in WP http class to work with most server setups
-        //$response = wp_remote_post($this->url, $args);
-
-
-        $response = $this->sendTransactionToGateway($this->url,$post_string );
+        $response = $this->sendTransactionToGateway($this->url, $post_string);
         $response_array = array();
         parse_str($response, $response_array);
         $this->results = $response_array;
@@ -922,37 +896,14 @@ if(!class_exists('MP_Gateway_Worker_Payflow')) {
       if (!empty($headers) && is_array($headers)) {
         $header = array_merge($header, $headers);
       }
-
-      if (function_exists('curl_init')) {
-        $curl = curl_init($server['scheme'] . '://' . $server['host'] . $server['path'] . (isset($server['query']) ? '?' . $server['query'] : ''));
-        curl_setopt($curl, CURLOPT_PORT, $server['port']);
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
-        curl_setopt($curl, CURLOPT_FRESH_CONNECT, 1);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
-
-        if (!empty($header)) {
-          curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-        }
-
-        $result = curl_exec($curl);
-
-        curl_close($curl);
-      } else {
-        exec(escapeshellarg(MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_CURL) . ' -d ' . escapeshellarg($parameters) . ' "' . $server['scheme'] . '://' . $server['host'] . $server['path'] . (isset($server['query']) ? '?' . $server['query'] : '') . '" -P ' . $server['port'] . ' -k' . (!empty($header) ? ' -H ' . escapeshellarg(implode("\r\n", $header)) : ''), $result);
-        $result = implode("\n", $result);
-      }
-
-      return $result;
+      
+      $url = $server['scheme'] . '://' . $server['host'] . $server['path'] . (isset($server['query']) ? '?' . $server['query'] : '');
+      $result = wp_remote_post($url, array(
+      	'body' => $parameters,
+      ));
+      
+      return wp_remote_retrieve_body($result);
     }
-
-
-
-
-
 
     function parseResults()
     {

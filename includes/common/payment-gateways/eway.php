@@ -393,10 +393,10 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
    *
    * @since 3.0
    * @access public
+   * @param array $settings
+   * @return array
    */
-  public function update() {
-  	$settings = get_option('mp_settings');
-  	
+  public function update( $settings ) {
   	if ( $username = $this->get_setting('UserName') ) {
 	  	mp_push_to_array($settings, 'gateways->eway->api_credentials->UserName', $username);
 	  	unset($settings['gateways']['eway']['UserName']);
@@ -407,7 +407,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 	  	unset($settings['gateways']['eway']['CustomerID']);
   	}
   	
-  	update_option('mp_settings', $settings);
+  	return $settings;
   }
 
   /**

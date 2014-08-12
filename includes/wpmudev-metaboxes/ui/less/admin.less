@@ -67,8 +67,9 @@ label.error {
 	}
 	
 	.wpmudev-field-desc {
-		font-size: 0.85em;
-		padding-bottom: 5px;
+		color: #666;
+		font-size: 0.9em;
+		padding-bottom: 10px;
 	}
 
 	span.required {
@@ -131,7 +132,14 @@ label.error {
 	.wpmudev-field-advanced-select {
 		.select2-container-multi .select2-choices .select2-search-choice {
 			margin-top: 5px;
-		}	
+		}
+		
+		.select2-container.error {
+			border-left: 0;
+				-webkit-box-shadow: none;
+			box-shadow: none;
+			padding: 0;
+		}
 	}
 	
 	/**

@@ -47,16 +47,15 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		add_action('wp_ajax_bitpay_update_invoice', array($this, 'update_invoice'));
 	}
 	
-	/**
-	 * Update build
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
+  /**
+   * Updates the gateway settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
 	public function update() {
-		$settings = get_option('mp_settings');
-		mp_push_to_array($settings, 'build', $this->build);
-		
 		if ( ! $this->get_setting('transactionSpeed') ) {
 			mp_push_to_array($settings, 'gateways->bitpay->transactionSpeed', 'high');
 		}
@@ -65,7 +64,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			mp_push_to_array($settings, 'gateways->bitpay->redirectMessage', __('You will be redirected to <a href="http://bitpay.com" title="">bitpay.com</a>, for bitcoin payment. It is completely safe.', 'mp'));
 		}
 		
-		update_option('mp_settings', $settings);
+		return $settings;
 	}
 
   /**
