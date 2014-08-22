@@ -1,6 +1,6 @@
 <?php
 
-class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
+class WPMUDEV_Field_Checkbox_Group extends WPMUDEV_Field {
 	/**
 	 * Runs on construct of parent class
 	 *
@@ -11,12 +11,14 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 *
 	 *		@type string $orientation The orientation of each radio field (horizontal or vertical). Defaults to horizontal.
 	 *		@type array $options The radio group options in $value => $label format.
+	 *		@type bool $use_options_values Whether or not to use 0/1 for values or use the value in the $options array. 
 	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
 			'orientation' => 'horizontal',
 			'options' => array(),
+			'use_options_values' => false,
 		), $args);
 	}
 	
@@ -34,14 +36,14 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 		}
 		
 		$this->before_field(); ?>
-		<div class="wpmudev-radio-group <?php echo $this->args['orientation']; ?>">
+		<div class="wpmudev-checkbox-group <?php echo $this->args['orientation']; ?>">
 		<?php
 		foreach ( $this->args['options'] as $value => $label ) {
-			$field = new WPMUDEV_Field_Radio(array_replace_recursive($this->args, array(
-				'name' => $this->args['name'],
-				'value' => $value,
+			$field = new WPMUDEV_Field_Checkbox(array_replace_recursive($this->args, array(
+				'name' => $this->args['name'] . '[' . $value . ']',
 				'default_value' => $this->args['default_value'],
-				'label' => array('text' => $label),
+				'value' => ( $this->args['use_options_values'] ) ? $value : 1,
+				'message' => $label,
 				'width' => $width,
 			)));
 			$field->display($post_id);

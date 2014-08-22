@@ -9,11 +9,13 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	 *
 	 *		@see WPMUDEV_Field::__construct() for core list of available arguments.
 	 *		@type mixed $value The value of the field.
+	 *		@type string $width The width of the radio label (for horizontal radio groups)
 	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
-			'value' => 1
+			'value' => 1,
+			'width' => '100%',
 		), $args);
 	}
 	
@@ -37,9 +39,11 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-		$value = $this->get_value($post_id); ?>
-		<label class="<?php echo $this->args['label']['class']; ?>" for="<?php echo $this->get_id(); ?>">
+		$value = $this->get_value($post_id);
+		$this->before_field(); ?>
+		<label style="<?php echo $this->args['width']; ?>" class="<?php echo $this->args['label']['class']; ?>" for="<?php echo $this->get_id(); ?>">
 		<input type="radio" <?php echo $this->parse_atts(); ?> <?php checked($value, $this->args['value']); ?> /> <span><?php echo $this->args['label']['text']; ?></span></label>
 		<?php
+		$this->after_field();
 	}
 }

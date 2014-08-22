@@ -107,6 +107,8 @@ class WPMUDEV_Field {
 	 *		@type string $action The action to perform (show/hide).
 	 *	}
 	 *	@type array $save_callback Functions to call before saving to the database (e.g. strip_tags, etc)
+	 * 	@type string $before_field Text/html to display before the field
+	 *	@type string $after_field Text/html to display after the field
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = array_replace_recursive(array(
@@ -125,6 +127,8 @@ class WPMUDEV_Field {
 			'validation' => array(),	
 			'conditional' => array(),
 			'save_callback' => array(),
+			'before_field' => '',
+			'after_field' => '',
 		), $args);
 		
 		if ( empty($this->args['original_name']) ) {
@@ -677,5 +681,45 @@ class WPMUDEV_Field {
 		 * @param object $this Refers to the current field object
 		 */		
 		return apply_filters('wpmudev_field_get_id', $this->args['id'], $this);
+	}
+	
+	/**
+	 * Displays content before the field output
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function before_field() {
+		/**
+		 * Allows modification of the content that displays before a given field.
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param WPMUDEV_Field The current field object.
+		 */
+		$text = apply_filters('wpmudev_field_before_field', $this->args['before_field'], $this);
+		$text = apply_filters('wpmudev_field_before_field_' . $this->args['name'], $text, $this);
+		
+		echo $text;
+	}
+	
+	/**
+	 * Displays content after the field output
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function after_field() {
+		/**
+		 * Allows modification of the content that displays after a given field.
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param WPMUDEV_Field The current field object.
+		 */
+		$text = apply_filters('wpmudev_field_after_field', $this->args['after_field'], $this);
+		$text = apply_filters('wpmudev_field_after_field_' . $this->args['name'], $text, $this);
+		
+		echo $text;
 	}
 }

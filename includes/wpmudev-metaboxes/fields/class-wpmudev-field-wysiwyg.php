@@ -171,6 +171,8 @@ jQuery(document).ready(function($){
 			$args['quicktags'] = false;	// repeatable fields don't support quicktags
 		}
 		
+		$this->before_field();
 		wp_editor($value, $id, $args);
+		$this->after_field();
 	}
 }

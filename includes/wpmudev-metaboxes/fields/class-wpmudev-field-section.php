@@ -39,7 +39,9 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 		
 		if ( strlen($atts) > 0 ) {
 			$class .= ' wpmudev-field-has-conditional';
-		} ?>
+		}
+		
+		$this->before_field(); ?>
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 			<h2 class="wpmudev-section-title"><?php echo $this->args['title']; ?></h2>
 			<?php
@@ -49,5 +51,6 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 			endif; ?>
 		</div>
 		<?php
+		$this->after_field();
 	}
 }

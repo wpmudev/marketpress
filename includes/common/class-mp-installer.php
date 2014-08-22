@@ -2,7 +2,7 @@
 
 class MP_Installer {
 	/**
-	 * Refers to the single instance of the class
+	 * Refers to the single instance of the class.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -11,7 +11,7 @@ class MP_Installer {
 	private static $_instance = null;
 
 	/**
-	 * Gets the single instance of the class
+	 * Gets the single instance of the class.
 	 *
 	 * @since 3.0
 	 * @access public
@@ -25,7 +25,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -35,7 +35,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Runs the installer code
+	 * Runs the installer code.
 	 *
 	 * @since 3.0
 	 * @access public
@@ -72,7 +72,7 @@ class MP_Installer {
 				$settings = $this->_update_3000($settings);
 			}
 		}
-
+		
 		// Update settings
 		update_option('mp_settings', $settings);
 
@@ -92,7 +92,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Creates the product attributes table
+	 * Creates the product attributes table.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -114,7 +114,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Adds the cart widget to the default/first sidebar
+	 * Adds the cart widget to the default/first sidebar.
 	 *
 	 * @since 3.0
 	 * @access public
@@ -125,7 +125,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Creates stores pages
+	 * Creates stores pages.
 	 *
 	 * @since 3.0
 	 * @access public
@@ -137,7 +137,7 @@ class MP_Installer {
 	}
 
 	/**
-	 * Updates presentation settings
+	 * Updates presentation settings.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -168,7 +168,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Updates notification settings
+	 * Updates notification settings.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -199,13 +199,33 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Runs on 3.0 update
+	 * Creates a backup of the mp_settings and mp_coupons options.
+	 *
+	 * In the event that a user needs to rollback to a plugin version < 3.0 this data can be used to restore legacy settings.
+	 *
+	 * @since 3.0
+	 * @access private
+	 * @param array $settings
+	 */
+	private function _backup_legacy_settings( $settings ) {
+		if ( ! get_option('mp_settings_legacy') ) {
+			add_option('mp_settings_legacy', $settings, '', false);
+		}
+		
+		if ( ! get_option('mp_coupons_legacy') ) {
+			add_option('mp_coupons_legacy', get_option('mp_coupons'), '', false);
+		}
+	}
+	
+	/**
+	 * Runs on 3.0 update.
 	 *
 	 * @since 3.0
 	 * @access private
 	 * @param array $settings
 	 */
 	private function _update_3000( $settings ) {
+		$this->_backup_legacy_settings($settings);
 		$this->_update_coupon_schema();
 		$this->_create_product_attributes_table();
 		$settings = $this->_update_notification_settings($settings);
@@ -223,7 +243,7 @@ class MP_Installer {
 	}	
 	
 	/**
-	 * Runs on 2.9.2.3 update to fix low inventory emails not being sent
+	 * Runs on 2.9.2.3 update to fix low inventory emails not being sent.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -234,7 +254,7 @@ class MP_Installer {
 	}
 
 	/**
-	 * Runs on 2.1.4 update to fix price sorts
+	 * Runs on 2.1.4 update to fix price sorts.
 	 *
 	 * @since 3.0
 	 * @access private
@@ -265,7 +285,7 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Updates the coupon schema
+	 * Updates the coupon schema.
 	 *
 	 * @since 3.0
 	 * @access private

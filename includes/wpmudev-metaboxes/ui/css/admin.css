@@ -60,7 +60,7 @@ label.error:before {
 	 */
 
   /**
-	 * Radio Group
+	 * Radio/Checkbox Group
 	 */
 
   /**
@@ -186,16 +186,49 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-field-complex .columns .wpmudev-field-complex-label:first-child {
   padding-left: 0;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-radio-group.vertical label:before {
+.postbox.wpmudev-postbox .inside .wpmudev-radio-group:after,
+.postbox.wpmudev-postbox .inside .wpmudev-checkbox-group:after {
+  clear: both;
+  content: "";
+  display: block;
+  font-size: 0;
+  height: 0;
+  line-height: 0;
+  visibility: hidden;
+  width: 100%;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-radio-group label,
+.postbox.wpmudev-postbox .inside .wpmudev-checkbox-group label {
+  display: block;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-radio-group.vertical label:before,
+.postbox.wpmudev-postbox .inside .wpmudev-checkbox-group.vertical label:before {
   content: "";
   display: block;
   height: 10px;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-radio-group.vertical label:first-child:before {
+.postbox.wpmudev-postbox .inside .wpmudev-radio-group.vertical label:first-child:before,
+.postbox.wpmudev-postbox .inside .wpmudev-checkbox-group.vertical label:first-child:before {
   display: none;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-radio-group label {
+.postbox.wpmudev-postbox .inside .wpmudev-radio-group.horizontal label,
+.postbox.wpmudev-postbox .inside .wpmudev-checkbox-group.horizontal label {
+  float: left;
   margin-right: 30px;
+}
+@media (max-width: 900px) {
+  .postbox.wpmudev-postbox .inside .wpmudev-radio-group.horizontal label {
+    float: none;
+    margin-right: 0;
+  }
+  .postbox.wpmudev-postbox .inside .wpmudev-radio-group.horizontal label:before {
+    content: "";
+    display: block;
+    height: 10px;
+  }
+  .postbox.wpmudev-postbox .inside .wpmudev-radio-group.horizontal label:first-child:before {
+    display: none;
+  }
 }
 .postbox.wpmudev-postbox .inside .wpmudev-image-field-preview {
   position: relative;
@@ -286,6 +319,9 @@ label.error:before {
 .postbox.wpmudev-postbox .inside div.wpmudev-subfield-group {
   display: table;
   width: 100%;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-subfield-group-index {
+  vertical-align: middle;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-subfield-group-index span {
   color: #ddd;

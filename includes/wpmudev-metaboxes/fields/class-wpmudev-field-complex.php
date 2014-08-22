@@ -136,7 +136,9 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		
 		if ( strlen($atts) > 0 ) {
 			$class .= ' wpmudev-field-has-conditional';
-		} ?>
+		}
+		
+		$this->before_field(); ?>
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 		<?php
 			foreach ( $this->subfields as $field ) :
@@ -158,6 +160,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 			endforeach; ?>
 		</div>
 		<?php
+		$this->after_field();
 	}
 	
 	/**

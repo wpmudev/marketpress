@@ -104,8 +104,10 @@ jQuery(document).ready(function($){
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-		$value = $this->get_value($post_id); ?>
+		$value = $this->get_value($post_id);
+		$this->before_field(); ?>
 		<input type="text" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" /> <a class="button wpmudev-field-file-select" href="#"><?php _e('Select File', 'wpmudev_metaboxes'); ?></a>
 		<?php
+		$this->after_field();
 	}
 }

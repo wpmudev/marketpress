@@ -175,9 +175,6 @@ jQuery(document).ready(function($){
 	 	<form id="mp-main-form" method="post" action="<?php echo add_query_arg(array()); ?>">
 			<?php
 			do_action('wpmudev_metaboxes_settings'); ?>
-			<p class="submit">
-				<input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
-			</p>
 		</form>
 	</div>
 </div>

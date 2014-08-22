@@ -28,10 +28,10 @@ class WPMUDEV_Field_Password extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-		echo $this->args['before_field'];
+		$this->before_field();
 		?>
 		<input type="password" <?php echo $this->parse_atts(); ?> value="<?php echo $this->get_value($post_id); ?>" />
 		<?php
-		echo $this->args['after_field'];
+		$this->after_field();
 	}
 }

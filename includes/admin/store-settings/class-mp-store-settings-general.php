@@ -198,7 +198,7 @@ jQuery(document).ready(function($){
 		));
 		
 		$currencies = apply_filters('mp_currencies', mp()->currencies);
-		$options = array();
+		$options = array('' => __('Select a Currency', 'mp'));
 		
 		foreach ( $currencies as $key => $value ) {
 			$options[$key] = esc_attr($value[0]) . ' - ' . mp_format_currency($key);
@@ -298,7 +298,7 @@ jQuery(document).ready(function($){
 			'placeholder' => __('Select a Country', 'mp'),
 			'multiple' => false,
 			'label' => array('text' => __('Base Country', 'mp')),
-			'options' => mp()->countries,
+			'options' => array('' => __('Select A Country')) + mp()->countries,
 			'width' => 'element',
 		));
 		

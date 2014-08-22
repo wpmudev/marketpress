@@ -41,6 +41,46 @@ if ( ! function_exists('mp_push_to_array') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_country_list') ) :
+	/**
+	 * Gets the country list without the popular countries
+	 *
+	 * @since 3.0
+	 * @return array
+	 */
+	function mp_country_list() {
+		$sorted = array();
+		$countries = mp()->countries;
+		 
+		foreach ( $countries as $code => $country ) {
+			if ( ! in_array($code, mp()->popular_countries) ) {
+			 	$sorted[$code] = $country;
+			}
+		}
+		
+		return $sorted;
+	}
+endif;
+
+if ( ! function_exists('mp_popular_country_list') ) :
+	/**
+	 * Gets the popular country list
+	 *
+	 * @since 3.0
+	 * @return array
+	 */
+	function mp_popular_country_list() {
+		$sorted = array();
+		$countries = mp()->popular_countries;
+		 
+		foreach ( $countries as $code => $country ) {
+			$sorted[$code] = $country;
+		}
+		
+		return $sorted;
+	}
+endif;
+
 if ( ! function_exists('mp_get_states') ) :
 	/**
 	 * Gets the states/regions/provinces for a given country

@@ -157,13 +157,13 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   function update( $settings ) {
 		if ( ($api_user = $this->get_setting('api_user')) && ($api_pass = $this->get_setting('api_pass')) && ($api_sig = $this->get_setting('api_sig')) ) {
 	    // Update api user
-	    $settings = mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->username', $api_user);
+	    mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->username', $api_user);
 	    
 	    // Update api pass
-	    $settings = mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->password', $api_pass);
+	    mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->password', $api_pass);
 	    
 	    // Update api signature
-	    $settings = mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->signature', $api_sig);
+	    mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->signature', $api_sig);
 	    
 	    // Unset old keys
 	    unset($settings['gateways']['paypal-express']['api_user'], $settings['gateways']['paypal-express']['api_pass'], $settings['gateways']['paypal-express']['api_sig']);

@@ -140,6 +140,7 @@ class WPMUDEV_Metabox {
 	 * @param array $args {
 	 *		An array of arguments. Optional.
 	 *
+	 *		@type string $class The class of the metabox.
 	 *		@type string $id The id of the metabox (required).
 	 *		@type string $title The title of the metabox (required).
 	 *		@type string $desc The description of the metabox.
@@ -149,10 +150,22 @@ class WPMUDEV_Metabox {
 	 *		@type string $priority The priority of the metabox (default, high, normal).
 	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
 	 *		@type int $order Display order for settings metaboxes. If this is not entered metaboxes will be rendered in the order they logically show up in the code. Defaults to 10.
+	 *		@type array $conditional {
+	 *			Conditionally hide/show this field if another field value is a certain value.
+	 *
+	 *			Example 1: array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show');
+	 *			Example 2: array('operator' => 'AND', array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'), array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'));
+	 *			Example 3: array('operator' => 'OR', array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'), array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'));
+	 *
+	 *			@type string $name The name of the field to do the comparison on.
+	 *			@type string $value The value to check against. Use "-1" to check for a checkbox being unchecked.
+	 *			@type string $action The action to perform (show/hide).
+	 *		}
 	 * }
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = array_replace_recursive(array(
+			'class' => 'postbox wpmudev-postbox',
 			'id' => '',
 			'title' => '',
 			'desc' => null,
@@ -162,9 +175,11 @@ class WPMUDEV_Metabox {
 			'priority' => 'default',
 			'option_name' => '',
 			'order' => 10,
+			'conditional' => array(),
 		), $args);
 		
 		$this->load_fields();
+		$this->init_conditional_logic();
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
 		$this->nonce_name = $this->nonce_action . '_nonce';
 		
@@ -176,6 +191,45 @@ class WPMUDEV_Metabox {
 		add_action('admin_init', array(&$this, 'maybe_save_settings_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
 		add_action('admin_notices', array(&$this, 'admin_notices'));
+	}
+
+	/**
+	 * Initializes conditional logic attributes
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function init_conditional_logic() {
+		if ( empty($this->args['conditional']) ) {
+			return;
+		}
+		
+		$this->args['custom']['data-conditional-operator'] = 'OR';
+		
+		if ( isset($this->args['conditional']['operator']) ) {
+			$this->args['custom']['data-conditional-operator'] = $this->args['conditional']['operator'];
+			unset($this->args['conditional']['operator']);
+		}
+		
+		if ( isset($this->args['conditional']['action']) ) {
+			$this->args['custom']['data-conditional-action'] = $this->args['conditional']['action'];
+			unset($this->args['conditional']['action']);
+		}
+		
+		if ( array_key_exists('name', $this->args['conditional']) || array_key_exists('value', $this->args['conditional']) ) {
+			$conditional = array(
+				'name' => $this->args['conditional']['name'],
+				'value' => $this->args['conditional']['value'],
+			);
+			$this->args['conditional'] = array($conditional);
+		}
+		
+		foreach ( $this->args['conditional'] as $index => $value ) {
+			$this->args['custom']['data-conditional-name-' . $index] = $value['name'];
+			$this->args['custom']['data-conditional-value-' . $index] = ( is_array($value['value']) && count($value['value']) > 1 ) ? implode('||', $value['value']) : $value['value'];
+		}
+		
+		$this->args['class'] .= ' wpmudev-metabox-has-conditional';
 	}
 	
 	/**
@@ -369,12 +423,17 @@ class WPMUDEV_Metabox {
 		}
 		
 		if ( $this->is_settings_metabox() ) :
+			$atts = '';
+			foreach ( (array) $this->args['custom'] as $name => $val ) {
+				$atts .= ' ' . $name . '="' . esc_attr($val) . '"';	
+			}
+			
 			if ( self::$did_metabox_count == 0 ) : ?>
 			<div id="poststuff">
 				<div class="meta-box-sortables">
 		<?php
 			endif; ?>
-					<div id="<?php echo $this->args['id']; ?>" class="postbox wpmudev-postbox">
+					<div id="<?php echo $this->args['id']; ?>" class="<?php echo $this->args['class']; ?>"<?php echo $atts; ?>>
 						<?php wp_nonce_field($this->nonce_action, $this->nonce_name); ?>
 						<div class="inside">
 							<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
@@ -400,6 +459,9 @@ class WPMUDEV_Metabox {
 		if ( $this->is_settings_metabox() ) : ?>
 					</div>
 				</div>
+				<p class="submit">
+					<input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+				</p>
 		<?php
 			if ( self::$did_metabox_count == (count(self::$metaboxes) - 1) ) : ?>
 			</div>
@@ -462,7 +524,28 @@ class WPMUDEV_Metabox {
 			
 			foreach ( $this->fields as $field ) {
 				$post_key = $field->get_post_key($field->args['name']);
-				$value = $field->sanitize_for_db($field->get_post_value($post_key));
+				
+				if ( $field instanceof WPMUDEV_Field_Repeater ) {
+					$value = $field->get_post_value($post_key);
+					$values = $field->sort_subfields($value);
+					
+					if ( count($values) == 2 ) {
+						$values = array_merge($values['existing'], $values['new']);
+					}
+					
+					foreach ( $values as $idx => $array ) {
+						$index = 0;                                                                                                                                                                                                                     
+						foreach ( $array as $idx2 => $val ) {
+							$values[$idx][$index] = $field->subfields[$index]->sanitize_for_db($val);
+							$index ++;
+						}
+					}
+					
+					$value = $values;
+				} else {
+					$value = $field->sanitize_for_db($field->get_post_value($post_key));
+				}
+				
 				$settings = $this->push_to_array($settings, $post_key, $value);
 			}
 			

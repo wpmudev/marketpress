@@ -207,9 +207,16 @@ label.error {
 	}
 	
 	/**
-	 * Radio Group
+	 * Radio/Checkbox Group
 	 */
-	.wpmudev-radio-group {
+	.wpmudev-radio-group,
+	.wpmudev-checkbox-group {
+		.clearfix;
+		
+		label {
+			display: block;
+		}
+		
 		&.vertical {
 			label {
 				&:before {
@@ -226,8 +233,34 @@ label.error {
 			}	
 		}
 		
-		label {
-			margin-right: 30px;
+		&.horizontal {
+			label {
+				float: left;
+				margin-right: 30px;
+			}
+		}
+	}
+	
+	@media (max-width: 900px) {
+		.wpmudev-radio-group {
+			&.horizontal {
+				label {
+					float: none;
+					margin-right: 0;
+					
+					&:before {
+						content: "";
+						display: block;
+						height: 10px;
+					}
+					
+					&:first-child {
+						&:before {
+							display: none;
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -347,11 +380,15 @@ label.error {
 		width: 100%;
 	}
 	
-	.wpmudev-subfield-group-index span {
-		color: #ddd;
-		cursor: move;
-		display: inline-block;
-		font-size: 18px;
+	.wpmudev-subfield-group-index {
+		vertical-align: middle;
+	
+		span {
+			color: #ddd;
+			cursor: move;
+			display: inline-block;
+			font-size: 18px;
+		}
 	}
 	
 	div.wpmudev-subfield-group-index {

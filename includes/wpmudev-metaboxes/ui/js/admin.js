@@ -8,6 +8,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		/* initializing conditional logic here instead of document.ready() to prevent
 		issues with wysiwyg editor not getting proper height */
 		initConditionals();
+		$(':checkbox, :radio, select').change(initConditionals);
 	}
 	
 	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e){
@@ -103,92 +104,55 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	}
 	
 	var initConditionals = function(){
-		$('.wpmudev-field-has-conditional').each(function(){
+		$('.wpmudev-field-has-conditional, .wpmudev-metabox-has-conditional').each(function(){
 			var $this = $(this),
-					$container = ( $this.closest('.wpmudev-subfield').length ) ? $this.closest('.wpmudev-subfield') : $this.closest('.wpmudev-field'),
 					operator = $this.attr('data-conditional-operator').toUpperCase(),
 					action = $this.attr('data-conditional-action').toLowerCase(),
 					numValids = 0,
 					conditionals = parseConditionals(this);
 			
+			if ( $this.hasClass('wpmudev-metabox-has-conditional') ) {
+				$container = $this;
+			} else {
+				$container = ( $this.closest('.wpmudev-subfield').length ) ? $this.closest('.wpmudev-subfield') : $this.closest('.wpmudev-field')
+			}
+			
 			if ( action == 'show' ) {
 				if ( operator == 'AND' ) {
 					if ( testConditionals(conditionals) != conditionals.length ) {
 						$container.hide();
+					} else {
+						$container.show();
 					}
 				} else {
 					if ( testConditionals(conditionals) == 0 ) {
 						$container.hide();
+					} else {
+						$container.show();
 					}
 				}
-				
-				initRowShading();
-				
-				$.each(conditionals, function(i, conditional){
-					var $input = $('[name="' + conditional.name + '"]');
-					
-					$input.change(function(){
-						var $this = $(this);
-															
-						if ( operator == 'AND' ) {
-							if ( testConditionals(conditionals) != conditionals.length ) {
-								$container.hide();
-							} else {
-								$container.show();
-							}
-						} else {
-							if ( testConditionals(conditionals) == 0 ) {
-								$container.hide();
-							} else {
-								$container.show();
-							}
-						}
-						
-						initRowShading();
-					});
-				});
-			}	
-				
+			}
+			
 			if ( action == 'hide' ) {
 				if ( operator == 'AND' ) {
 					if ( testConditionals(conditionals) == conditionals.length ) {
 						$container.hide();
+					} else {
+						$container.show();
 					}
 				} else {
 					if ( testConditionals(conditionals) > 0 ) {
 						$container.hide();
+					} else {
+						$container.show();
 					}
 				}
+			}
 				
-				initRowShading();
-
-				$.each(conditionals, function(i, conditional){
-					var $input = $('[name="' + conditional.name + '"]');
-				
-					$input.change(function(){
-						var $this = $(this);
-						
-						if ( operator == 'AND' ) {
-							if ( testConditionals(conditionals) == conditionals.length ) {
-								$container.hide();
-							} else {
-								$container.show();
-							}
-						} else {
-							if ( testConditionals(conditionals) > 0 ) {
-								$container.hide();
-							} else {
-								$container.show();
-							}
-						}
-						
-						initRowShading();
-					});
-				});
-			}	
+			initRowShading();
 		});
 	};
-	
+
 	var initValidation = function(){
 		var $form = $("form#post, form#mp-main-form");
 

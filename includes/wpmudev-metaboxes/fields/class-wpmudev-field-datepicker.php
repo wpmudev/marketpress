@@ -140,9 +140,11 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
+		$this->before_field();
 		?>
 		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $this->get_value($post_id, null, true); ?>" />
 		<input type="text" class="wpmudev-datepicker-field" value="<?php echo $this->get_value($post_id); ?>" />
 		<?php
+		$this->after_field();
 	}
 }

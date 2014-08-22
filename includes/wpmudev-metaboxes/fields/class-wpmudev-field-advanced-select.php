@@ -12,7 +12,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	 *		@type bool $multiple Whether to allow multi-select or only one option.
 	 *		@type string $placeholder The text that shows up when the field is empty.
 	 *		@type array $options An array of $key => $value pairs of the available options.
-	 *		@type string $width @see http://ivaynberg.github.io/select2/#documentation
+	 *		@type string $format_dropdown_header The text to show in the dropdown header (e.g. select all, select none)
 	 * }	 
 	 */
 	public function on_creation( $args ) {
@@ -20,13 +20,13 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			'multiple' => true,
 			'placeholder' => __('Select Some Options', 'mp'),
 			'options' => array(),
-			'width' => '100%',
+			'format_dropdown_header' => '',
 		), $args);
 		
 		$this->args['class'] .= ' wpmudev-advanced-select';
 		$this->args['custom']['data-placeholder'] = $this->args['placeholder'];
 		$this->args['custom']['data-multiple'] = (int) $this->args['multiple'];
-		$this->args['custom']['data-width'] = $this->args['width'];
+		$this->args['custom']['data-format-dropdown-header'] = $this->args['format_dropdown_header'];
 	}
 
 	/**
@@ -39,6 +39,36 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	?>
 <script type="text/javascript">
 (function($){
+	var parseOptions = function(opts){
+		var options = opts.split('||'),
+				theArray = [];
+				
+		$(options).each(function(){
+			var val = this.split('='),
+					obj = { "id" : val[0], "text" : val[1] };
+					
+			if ( obj.id.indexOf('|disabled') >= 0 ) {
+				obj.disabled = true;
+			}
+			
+			theArray.push(obj);
+		});
+		
+		return theArray;
+	}
+	
+	var getOptionText = function(opts, val) {
+		var returnVal = '';
+		
+		$(opts).each(function(){
+			if ( this.id == val ) {
+				returnVal = this.text;
+			}
+		});
+		
+		return returnVal;
+	}
+	
 	var initSelect2 = function(){
 		$('.wpmudev-advanced-select').each(function(){
 			var $this = $(this),
@@ -46,36 +76,43 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			
 			if ( ! $this.is('select') ) {
 				if ( $this.attr('data-options').length > 0 ) {
-					$($this.attr('data-options').split('||')).each(function(){
-						var val = this.split('=');
-						options.push({ "id" : val[0], "text" : val[1] });
-					});
+					options = parseOptions($this.attr('data-options'));
 				}
-			
-				$this.select2({
+				
+				var args = {
 					"allowSelectAllNone" : true,
 					"multiple" : $this.attr('data-multiple'),
 					"placeholder" : $this.attr('data-placeholder'),
 					"initSelection" : function(element, callback){
 						var data = [];
 						
-						if ( element.attr('data-value').length > 0 ) {
-							$(element.attr('data-value').split('||')).each(function(){
-								var val = this.split('=');
-								data.push({ "id" : val[0], "text" : val[1] });
-							});
-						}
+						console.log(element.val());
+						$(element.val().split(',')).each(function(){
+							data.push({ "id" : this, "text" : getOptionText(options, this) });
+						});
 						
 						callback(data);
 					},			
 					"data" : options,
-					"width" : $this.attr('data-width')
-				});
+					"width" : "100%"					
+				}
+				
+				if ( $this.attr('data-format-dropdown-header') !== undefined ) {
+					args.formatDropdownHeader = function() { return $this.attr('data-format-dropdown-header'); };
+				}
+			
+				$this.select2(args);
 			} else {
-				$this.select2({
-					"placeholder" : $this.attr('data-placeholder'),
-					"width" : $this.attr('data-width')
-				});
+				var args = {
+					"dropdownAutoWidth" : true,
+					"placeholder" : $this.attr('data-placeholder'),					
+				};
+				
+				if ( $this.attr('data-format-dropdown-header') !== undefined ) {
+					args.formatDropdownHeader = function() { return $this.attr('data-format-dropdown-header'); };
+				}
+				
+				$this.select2(args);
 			}
 		});		
 	}
@@ -128,18 +165,15 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			$vals = array();
 		}
 		
-		foreach ( $vals as $val ) {
-			$values[] = $val . '=' . $this->args['options'][$val];
-		}
-		
 		foreach ( $this->args['options'] as $val => $label ) {
 			$options[] = $val . '=' . $label;
 		}
 		
+		$this->before_field();
+		
 		if ( $this->args['multiple'] ) :
 			$this->args['custom']['data-options'] = implode('||', $options);
-			$this->args['custom']['data-value'] = implode('||', $values);
-			echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . $value . '" />';
+			echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . implode(',', $vals) . '" />';
 		else : ?>
 			<select <?php echo $this->parse_atts(); ?>>
 				<?php foreach ( $this->args['options'] as $val => $label ) : ?>
@@ -148,6 +182,8 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			</select>
 		<?php
 		endif;
+		
+		$this->after_field();
 	}
 	
 	/**

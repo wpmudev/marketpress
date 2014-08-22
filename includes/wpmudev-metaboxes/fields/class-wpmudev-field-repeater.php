@@ -41,6 +41,16 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @param $value (optional)
 	 */
 	public function save_value( $post_id, $meta_key = null, $value = null ) {
+		if ( is_null($value) ) {
+			$post_key = $this->get_post_key();
+			$value = $this->get_post_value($post_key, null);
+		}
+		
+		
+		if ( is_null($meta_key) ) {
+			$meta_key = $this->get_meta_key();
+		}
+		
 		/**
 		 * Modify the value before it's saved to the database. Return null to bypass internal saving mechanisms.
 		 *
@@ -51,6 +61,12 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		 */
 		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
 		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $value, $post_id, $this);
+		
+		if ( is_null($value) ) {
+			return;
+		}
+		
+		//! TODO: This is a post - save to database
 	}
 
 	/**
@@ -65,9 +81,56 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		$meta_key_parts = explode('[', $field->args['name']);
 		return rtrim($meta_key_parts[1], ']');
 	}
+
+	/**
+	 * Gets the field value from the database.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param mixed $post_id
+	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
+	 * @return mixed
+	 */
+	public function get_value( $post_id, $raw = false ) {
+		if ( ! is_null($this->_value) ) {
+			return $this->_value;
+		}
+		
+		$value = array();
+		
+		if ( is_numeric($post_id) ) {
+			foreach ( $this->subfields as $subfield ) {
+				$meta_key = $this->args['original_name'] . '_' . $subfield->args['original_name'];
+				$value[$subfield->args['original_name']] = $subfield->get_value($post_id, $meta_key, $raw);
+			}
+		} else {
+			$options = get_option($post_id);
+			$key = $this->get_post_key();
+			$value = $this->array_search($options, $key);
+		}
+		
+		/**
+		 * Modify the returned value.
+		 *
+		 * @since 1.0
+		 * @param mixed $value The return value
+		 * @param mixed $post_id The current post id or option name
+		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
+		 * @param object $this Refers to the current field object		 
+		 */
+		$value = apply_filters('wpmudev_field_get_value', $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field_get_value_' . $this->args['name'], $value, $post_id, $raw, $this);
+		
+		if ( is_null($value) ) {
+			$this->_value = $value = $this->args['default_value'];
+		}
+		
+		return $value;
+	}
+	
 	
 	/**
-	 * Sorts the repeater field's subfields for easier input
+	 * Sorts/groups the repeater field's subfields for easier workability
 	 *
 	 * @since 1.0
 	 * @access public
@@ -97,7 +160,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 						}
 					break;
 					
-					// Complex fields will have $input_name as $type key
+					// Repeater fields will have $input_name as $type key
 					default :
 						$input_name2 = $type;
 						foreach ( $array2 as $type2 => $array3 ) {
@@ -151,21 +214,24 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		
 		if ( strlen($atts) > 0 ) {
 			$class .= ' wpmudev-field-has-conditional';
-		} ?>
+		}
 		
+		$this->before_field(); ?>
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 		<?php		
 		if ( $this->args['layout'] == 'table' ) : ?>
 			<table class="wpmudev-subfields widefat">
 				<thead>
-					<th style="width:15px">&nbsp;</th>
+					<tr>
+						<th style="width:15px">&nbsp;</th>
 			<?php
 			foreach ( $this->subfields as $index => $subfield ) : ?>
-					<th><?php echo $subfield->args['label']['text']; ?><small class="wpmudev-subfield-desc"><?php echo $subfield->args['desc']; ?></small></th>
+						<th><?php echo $subfield->args['label']['text']; ?><small class="wpmudev-subfield-desc"><?php echo $subfield->args['desc']; ?></small></th>
 			<?php
 			endforeach; ?>		
 			
-					<th style="width:15px">&nbsp;</th>
+						<th style="width:15px">&nbsp;</th>
+					</tr>
 				</thead>
 		<?php
 		else : ?>
@@ -176,8 +242,9 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		foreach ( $data as $outer_index => $row ) :
 			foreach ( $this->subfields as $index => $subfield ) :
 				if ( isset($data[$outer_index][$subfield->args['original_name']]) ) {
+					$id = ( isset($data[$outer_index]['ID']) ) ? $data[$outer_index]['ID'] : $outer_index;
 					$subfield->set_value($data[$outer_index][$subfield->args['original_name']]);
-					$subfield->set_subfield_id($data[$outer_index]['ID']);
+					$subfield->set_subfield_id($id);
 				} else {
 					$subfield->set_value('');
 				}
@@ -242,7 +309,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		<?php
 		endif; ?>
 		</div>
-		<div class="wpmudev-repeater-field-actions clearfix"><input class="button wpmudev-repeater-field-add alignright" type="button" value="<?php echo $this->args['add_row_label']; ?>" /></div>
+		<div class="wpmudev-repeater-field-actions clearfix"><input class="button-primary wpmudev-repeater-field-add alignright" type="button" value="<?php echo $this->args['add_row_label']; ?>" /></div>
 		<script type="text/javascript">
 		// Clone the subfields BEFORE any events/plugins are able to modify the markup, bind events, etc
 		jQuery('.wpmudev-subfields').not('[data-ready-for-cloning]').each(function(){
@@ -251,6 +318,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		});
 		</script>
 		<?php
+		$this->after_field();
 	}
 	
 	/**
@@ -319,7 +387,7 @@ jQuery(document).ready(function($){
 	}
 	
 	$('.wpmudev-subfields').on('click', '.wpmudev-subfield-delete-group-link', function(event){
-		if ( confirm('<?php _e('Are you sure you want to delete this field group?', 'wpmudev_metaboxes'); ?>') ) {
+		if ( confirm('<?php _e('Are you sure you want to delete this?', 'wpmudev_metaboxes'); ?>') ) {
 			var $this = $(this),
 					$subfieldGroup = $this.closest('.wpmudev-subfield-group'),
 					$links = $('.wpmudev-subfield-delete-group-link'),
@@ -327,31 +395,31 @@ jQuery(document).ready(function($){
 					subfieldGroupCount = $subfieldGroup.closest('.wpmudev-subfields').find('.wpmudev-subfield-group').length,
 					didOne = false;
 			
-			$subfieldGroup.find('.wpmudev-subfield-inner').fadeOut(250, function(){
-				if ( didOne ) {
-					return;
-				}
-				
-				didOne = true;
-				
-				if ( subfieldGroupCount == 2 ) {
-					$links.hide();
-				} else {
-					$links.show();
-				}
-				
-				/**
-				 * Triggered when a row is deleted
-				 *
-				 * @since 1.0
-				 * @param object
-				 */
-				$(document).trigger('wpmudev_repeater_field_after_delete_field_group', [ $subfieldGroup ]);
+			$subfieldGroup.find('.wpmudev-subfield-inner').hide();
+			
+			if ( didOne ) {
+				return;
+			}
+			
+			didOne = true;
+			
+			if ( subfieldGroupCount == 2 ) {
+				$links.hide();
+			} else {
+				$links.show();
+			}
+			
+			/**
+			 * Triggered when a row is deleted
+			 *
+			 * @since 1.0
+			 * @param object
+			 */
+			$(document).trigger('wpmudev_repeater_field_after_delete_field_group', [ $subfieldGroup ]);
 
-				$subfieldGroup.remove();
-				$siblings.each(function(i){
-					$(this).find('.wpmudev-subfield-group-index').find('span').html(i + 1);
-				});
+			$subfieldGroup.remove();
+			$siblings.each(function(i){
+				$(this).find('.wpmudev-subfield-group-index').find('span').html(i + 1);
 			});
 		}
 	});
@@ -387,33 +455,33 @@ jQuery(document).ready(function($){
 			$this.attr('name', newName + '[]');
 		});
 		
-		$clonedRow.find('.wpmudev-subfield-inner').css('display', 'none').fadeIn(250, function(){
-			if ( didOne ) {
-				return;
-			}
-			
-			didOne = true;
-			
-			// Change the id of each field
-			$clonedRow.find('[id]').each(function(){
-				var $this = $(this),
-						oldId = $this.attr('id');
-						
-				$this.attr('id', '').uniqueId();
-				$clonedRow.find('label[for="' + oldId + '"]').attr('for', $this.attr('id'));
-			});
-			
-			/**
-			 * Triggered when a row is added.
-			 *
-			 * @since 1.0
-			 * @param object group
-			 */
-			$(document).trigger('wpmudev_repeater_field_after_add_field_group', [ $clonedRow ]);
-			
-			$('.wpmudev-subfields').sortable('refresh'); //so the new row is recognized by the sortable plugin
-			$('.wpmudev-subfield-delete-group-link').show();
+		$clonedRow.find('.wpmudev-subfield-inner').show();
+		
+		if ( didOne ) {
+			return;
+		}
+		
+		didOne = true;
+		
+		// Change the id of each field
+		$clonedRow.find('[id]').each(function(){
+			var $this = $(this),
+					oldId = $this.attr('id');
+					
+			$this.attr('id', '').uniqueId();
+			$clonedRow.find('label[for="' + oldId + '"]').attr('for', $this.attr('id'));
 		});
+		
+		/**
+		 * Triggered when a row is added.
+		 *
+		 * @since 1.0
+		 * @param object group
+		 */
+		$(document).trigger('wpmudev_repeater_field_after_add_field_group', [ $clonedRow ]);
+		
+		$('.wpmudev-subfields').sortable('refresh'); //so the new row is recognized by the sortable plugin
+		$('.wpmudev-subfield-delete-group-link').show();
 	});
 });
 </script>

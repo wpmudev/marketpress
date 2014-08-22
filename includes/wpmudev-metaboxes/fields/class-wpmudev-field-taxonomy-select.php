@@ -80,9 +80,11 @@ jQuery(document).ready(function($){
 			$data[] =$id . '->' . $term->name;
 		}
 		
-		$this->args['custom']['data-select2-value'] = implode('||', $data); ?>
+		$this->args['custom']['data-select2-value'] = implode('||', $data);
+		$this->before_field(); ?>
 		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo esc_attr($value); ?>" />
 		<?php
+		$this->after_field();
 	}
 	
 	/**

@@ -163,9 +163,11 @@ jQuery(document).ready(function($){
 			$data[] = $id . '->' . get_the_title($id);
 		}
 		
-		$this->args['custom']['data-select2-value'] = implode('||', $data); ?>
+		$this->args['custom']['data-select2-value'] = implode('||', $data);
+		$this->before_field(); ?>
 		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php $value; ?>" />
 		<?php
+		$this->after_field();
 	}
 	
 	/**

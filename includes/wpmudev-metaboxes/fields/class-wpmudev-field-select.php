@@ -26,7 +26,8 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-		$value = $this->get_value($post_id); ?>
+		$value = $this->get_value($post_id);
+		$this->before_field(); ?>
 		<select <?php echo $this->parse_atts(); ?>>
 		<?php
 		foreach ( $this->args['options'] as $val => $label ) : ?>
@@ -35,5 +36,6 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 		endforeach; ?>
 		</select>
 		<?php
+		$this->after_field();
 	}
 }

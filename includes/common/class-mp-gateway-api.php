@@ -128,17 +128,6 @@ if( ! class_exists('MP_Gateway_API') ) {
     }
     
     /**
-     * Gets the active gateways for the admin
-     *
-     * @since 3.0
-     * @access public
-     * @return array
-     */
-    public static function get_active_gateways_admin() {
-	    return self::$_active_gateways;
-    }
-    
-    /**
      * Generats the appropriate metabox ID for the gateway
      *
      * @since 3.0
@@ -343,8 +332,9 @@ if( ! class_exists('MP_Gateway_API') ) {
      */
     public final function maybe_update() {
 	    if ( ! is_null($this->build) && $this->build != $this->get_setting('build') ) {
-		    $settings = $this->update(get_option('mp_settings'));
-		    mp_push_to_array($settings, 'gateways->' . $this->plugin_name . '->build', $this->build);
+	    	$old_settings = get_option('mp_settings');
+		    $settings = $this->update($old_settings);
+		    $settings['gateways'][$this->plugin_name]['build'] = $this->build;
 		    update_option('mp_settings', $settings);
 	    }
     }

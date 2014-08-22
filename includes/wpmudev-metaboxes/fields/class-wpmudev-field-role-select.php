@@ -72,9 +72,11 @@ jQuery(document).ready(function($){
 			$data[] = $role . '->' . $role;
 		}
 		
-		$this->args['custom']['data-select2-value'] = implode('||', $data); ?>
+		$this->args['custom']['data-select2-value'] = implode('||', $data);
+		$this->before_field(); ?>
 		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" />
 		<?php
+		$this->after_field();
 	}
 	
 	/**

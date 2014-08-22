@@ -132,6 +132,8 @@ jQuery(document).ready(function($){
 	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
 		
+		$this->before_field();
+		
 		if ( $value ) :
 			$img_url = wp_get_attachment_image_src($value, $this->args['preview_size']); ?>
 		<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit wpmudev-image-field-select dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="<?php echo $img_url; ?>" alt="" /></div>
@@ -143,5 +145,6 @@ jQuery(document).ready(function($){
 		
 		<input type="hidden" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" />
 		<?php
+		$this->after_field();
 	}
 }

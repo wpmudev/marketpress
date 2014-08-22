@@ -144,6 +144,17 @@ Thanks again!", 'mp'
 	),
 );
 
+//popular country list
+$this->popular_countries = array(
+	'US' => 'United States',
+	'GB' => 'United Kingdom',
+	'AU' => 'Australia',
+	'CA' => 'Canada',
+	'ES' => 'Spain',
+	'NL' => 'Netherlands',
+	'ZA' => 'South Africa',
+);
+
 //country list
 $this->countries = array(
   'AF' => 'Afghanistan',

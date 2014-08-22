@@ -55,7 +55,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
    * @param array $settings
    * @return array
    */
-	public function update() {
+	public function update( $settings ) {
 		if ( ! $this->get_setting('transactionSpeed') ) {
 			mp_push_to_array($settings, 'gateways->bitpay->transactionSpeed', 'high');
 		}
