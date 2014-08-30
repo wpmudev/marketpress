@@ -1726,7 +1726,7 @@ Thanks again!", 'mp')
 		return $list;
 	}
 
-	function wp_title_output($title, $sep, $seplocation) {
+	function wp_title_output($title = '', $sep = '', $seplocation = 'left') {
 	 // Determines position of the separator and direction of the breadcrumb
 		if ( 'right' == $seplocation )
 			return $this->page_title_output($title, true) . " $sep ";
