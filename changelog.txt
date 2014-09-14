@@ -3,6 +3,7 @@ Author: Aaron Edwards (incsub)
 
 Change Log:
 ----------------------------------------------------------------------
+- Fixed: Nav Menu items calsses not being applied correctly
 ----------------------------------------------------------------------
 
 2.9.5.2
