@@ -278,6 +278,11 @@ width:auto;
 min-width: 150px;
 margin:10px;
 }
+.mp_grid .mp_one_tile:first-child,
+.mp_grid .mp_one_tile:first-child + .mp_one_tile,
+.mp_grid .mp_one_tile:first-child + .mp_one_tile + .mp_one_tile {
+margin-top: 0;
+}
 .mp_one_tile{
 height:94px;
 }

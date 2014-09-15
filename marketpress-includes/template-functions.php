@@ -1722,7 +1722,7 @@ function mp_list_products() {
 		//do nothing
 	} else {
 		$per_page = ( is_null($args['per_page']) ) ? null : $args['per_page'];
-		$content .= ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter(false, $per_page) : mp_products_filter(true, $per_page);
+		$content .= ( (is_null($args['filters']) && 1 == $mp->get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter(false, $per_page, $args['category'], $args['order_by'], $args['order']) : mp_products_filter(true, $per_page, $args['category'], $args['order_by'], $args['order']);
 	}
 
 	$content .= '<div id="mp_product_list" class="hfeed mp_' . $layout_type . '">';
@@ -2549,7 +2549,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				$class = ' class="mp_product_image_link mp_lightbox"';
 				$img_classes[] = is_null($align) ? $mp->get_setting('image_alignment_single') : $align;
 
-				//in case another plugin is loadin glightbox
+				//in case another plugin is loading lightbox
 				if ($mp->get_setting('show_lightbox')) {
 					$class .= ' rel="lightbox"';
 					wp_enqueue_script('mp-lightbox');
@@ -2612,10 +2612,17 @@ if (!function_exists('mp_products_filter')) :
  *
  * @return string		html for filter/order products select elements.
  */
-function mp_products_filter( $hidden = false, $per_page = null ) {
+function mp_products_filter( $hidden = false, $per_page = null, $category = null, $order_by = null, $order = null ) {
 		global $wp_query, $mp;
 
-		if ( 'product_category' == get_query_var('taxonomy') ) {
+		if ( ! is_null($category) ) {
+			if ( is_numeric($category) ) {
+				$default = $category;
+			} else {
+				$term = get_term_by('slug', $category, 'product_category');
+				$default = $term->term_id;
+			}
+		} elseif ( 'product_category' == get_query_var('taxonomy') ) {
 				$term = get_queried_object(); //must do this for number tags
 				$default = $term->term_id;
 		} else {
@@ -2633,8 +2640,16 @@ function mp_products_filter( $hidden = false, $per_page = null ) {
 				'echo' => 0,
 				'hierarchical' => true
 		));
-
-		$current_order = strtolower($mp->get_setting('order_by') . '-' . $mp->get_setting('order'));
+		
+		if ( is_null($order_by) ) {
+			$order_by = $mp->get_setting('order_by');
+		}
+		
+		if ( is_null($order) ) {
+			$order = $mp->get_setting('order'); 
+		}
+		
+		$current_order = strtolower($order_by . '-' . $order);
 		$options = array(
 				array('0', '', __('Default', 'mp')),
 				array('date', 'desc', __('Release Date', 'mp')),

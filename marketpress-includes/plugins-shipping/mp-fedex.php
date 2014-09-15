@@ -430,19 +430,13 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*  array. Don't forget to return!
 	*/
 	function process_shipping_settings($settings) {
-        //Force not defined values to 0.
-        if ( isset($_POST['mp']['shipping']['fedex']['commercial']) ) {
-            $settings['shipping']['fedex']['commercial'] = 1;
-        } else {
-            $settings['shipping']['fedex']['commercial'] = 0;
-        }
-        foreach ( $this->services as $service => $class ) {
-            if ( isset($_POST['mp']['shipping']['fedex']['services'][$service]) ) {
-                $settings['shipping']['fedex']['services'][$service] = 1;
-            } else {
-                $settings['shipping']['fedex']['services'][$service] = 0;
-            }
-        }
+		$services = array_merge($this->services, $this->intl_services);
+		foreach ( $services as $service => $detail ) {
+			$settings['shipping']['fedex']['services'][$service] = (int) isset($_POST['mp']['shipping']['fedex']['services'][$service]);
+		}
+		
+		$settings['shipping']['fedex']['commercial'] = (int) isset($_POST['mp']['shipping']['fedex']['commercial']);
+				
 		return $settings;
 	}
 

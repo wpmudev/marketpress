@@ -77,6 +77,8 @@ jQuery(document).ready(function($) {
 			
 			var hrefParts = $(this).attr('href').split('#'),
 					qs = parse_query(hrefParts[1]);
+			
+			console.log($('.mp_product_list_refine').serialize());
 			get_and_insert_products($('.mp_product_list_refine').serialize() + '&page=' + qs['page']);
 		});
 	}
@@ -86,7 +88,7 @@ jQuery(document).ready(function($) {
 		ajax_loading(true);
 		$.post(MP_Ajax.ajaxUrl, 'action=get_products_list&' + query_string, function(data) {
 			var qs = parse_query(query_string),
-					hash = 'order=' + $('select[name="order"]').val() + '&page=' + qs['page'];
+					hash = 'product_category=' + qs['product_category'] + '&order=' + $('select[name="order"]').val() + '&page=' + qs['page'];
 			
 			ajax_loading(false);
 			$('#mp_product_nav').remove();
@@ -114,7 +116,7 @@ jQuery(document).ready(function($) {
 
 	// if the page has been loaded from a bookmark set the current state for select elements
 	function update_dropdown_state(query_string){
-		var query = JSON.parse('{"' + decodeURI(query_string.replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
+		var query = parse_query(query_string);
 		for(name in query){
 			$('select[name="'+name+'"]').val(query[name]);
 		}
@@ -136,7 +138,7 @@ jQuery(document).ready(function($) {
 		// hash tags are used to store the current state in these situations:
 		//	a) when the user views a product and then clicks back
 		//	b) viewing the URL from a bookmark
-		if( /filter-term|order|page/.test(location.hash) ){
+		if( /product_category|order|page/.test(location.hash) ){
 				var query_string = location.hash.replace('#', '');
 				
 				if ( MP_Ajax.productCategory != '' )
@@ -154,9 +156,12 @@ jQuery(document).ready(function($) {
 				get_and_insert_products( $('.mp_product_list_refine').serialize() );
 		});
 		
-		$('#product-category').change(function(){
-			var hash = location.hash.replace(/page=(\d)*/, 'page=1'); //when changing categories set page=1
-			window.location.href = MP_Ajax.links[$(this).val()] + hash;
+		$('.mp_list_filter').on('change', '#product-category', function(){
+			var thehash = location.hash,
+			
+			thehash = thehash.replace(/page=(\d)*/, 'page=1'); //when changing categories set page=1
+			
+			window.location.href = MP_Ajax.links[$(this).val()] + thehash;
 		});
 	}
 

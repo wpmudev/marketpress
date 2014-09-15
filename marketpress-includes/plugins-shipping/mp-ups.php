@@ -646,14 +646,15 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		//Dimensions
 		$dimensions = $package->appendChild($dom->createElement('Dimensions') );
 		$uom = $dimensions->appendChild($dom->createElement('UnitOfMeasurement') );
-		$uom->appendChild($dom->createElement('Code', 'IN'));
+		$uom->appendChild($dom->createElement('Code', ( $mp->get_setting('shipping->system', 'english') == 'english' ) ? 'IN' : 'CM'));
 		$dimensions->appendChild($dom->createElement('Length', $dims[1]) );
 		$dimensions->appendChild($dom->createElement('Width', $dims[2]) );
 		$dimensions->appendChild($dom->createElement('Height', $dims[0]) );
+		
 		//Weight
 		$package_weight = $package->appendChild($dom->createElement('PackageWeight') );
 		$uom = $package_weight->appendChild($dom->createElement('UnitOfMeasurement') );
-		$uom->appendChild($dom->createElement('Code', 'LBS'));
+		$uom->appendChild($dom->createElement('Code', ( $mp->get_setting('shipping->system', 'english') == 'english' ) ? 'LBS' : 'KGS'));
 		$package_weight->appendChild($dom->createElement('Weight', $this->pkg_weight) );
 
 
@@ -661,13 +662,12 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$url = ($this->ups_settings['sandbox']) ? $this->sandbox_uri : $this->production_uri;
 
 		$response = wp_remote_request($url, array(
-		'headers' => array('Content-Type: text/xml'),
-		'method' => 'POST',
-		'body' => $auth_dom->saveXML() . $dom->saveXML(),
-		'sslverify' => false,
-		)
-		);
-
+			'headers' => array('Content-Type: text/xml'),
+			'method' => 'POST',
+			'body' => $auth_dom->saveXML() . $dom->saveXML(),
+			'sslverify' => false,
+		));
+		
 		if (is_wp_error($response)){
 			return array('error' => '<div class="mp_checkout_error">UPS: ' . $response->get_error_message() . '</div>');
 		}
