@@ -311,10 +311,8 @@ if (!class_exists('MP_Shipping_API')) {
     }
 
 		function _weight_save_shipping_metabox($shipping_meta) {
-			global $mp;
-
 			//process extra per item shipping
-			if ($mp->get_setting('shipping->system') == 'metric') {
+			if ( mp_get_setting('shipping->system') == 'metric' ) {
 				$shipping_meta['weight'] = (!empty($_POST['mp_shipping_weight'])) ? round($_POST['mp_shipping_weight'], 2) : 0;
 			} else {
 				$pounds = (!empty($_POST['mp_shipping_weight_pounds'])) ? floatval($_POST['mp_shipping_weight_pounds']) : 0;
@@ -409,8 +407,6 @@ if (!class_exists('MP_Shipping_API')) {
 
     //DO NOT override the construct! instead use the on_creation() method.
     function __construct() {
-      global $mp;
-
 			$this->maybe_update();
 			$this->on_creation();
 
@@ -426,10 +422,10 @@ if (!class_exists('MP_Shipping_API')) {
 			add_filter( "mp_shipping_options_{$this->plugin_name}", array(&$this, 'shipping_options'), 10, 7 );
 
 			//private
-			if ($this->use_weight && !$mp->weight_printed) {
+			if ( $this->use_weight && ! mp()->weight_printed ) {
 				add_action( 'mp_shipping_metabox', array(&$this, '_weight_shipping_metabox'), 10, 2 );
 				add_filter( 'mp_save_shipping_meta', array(&$this, '_weight_save_shipping_metabox') );
-				$mp->weight_printed = true;
+				mp()->weight_printed = true;
 			}
 
 			if ( is_admin() ) {
@@ -457,9 +453,7 @@ class MP_Shipping_Handler {
 	}
 
 	function extra_shipping_box($content) {
-		global $mp_shipping_active_plugins, $mp;
-
-		if ( count((array)$mp_shipping_active_plugins) && $mp->get_setting('shipping->method') == 'calculated' ) {
+		if ( self::$active_plugins && mp_get_setting('shipping->method') == 'calculated' ) {
 			$content .= '<thead><tr>';
 			$content .= '<th colspan="2">'. __('Choose a Shipping Method:', 'mp').'</th>';
 			$content .= '</tr></thead>';
@@ -468,7 +462,7 @@ class MP_Shipping_Handler {
 			$content .= '<input type="hidden" name="action" value="mp-shipping-options" />';
 			$content .= '<select name="shipping_option" id="mp-shipping-select">';
 			$shipping_option = isset($_SESSION['mp_shipping_info']['shipping_option']) ? $_SESSION['mp_shipping_info']['shipping_option'] : '';
-			foreach ($mp_shipping_active_plugins as $plugin) {
+			foreach ( self::$active_plugins as $plugin) {
 				$content .= '<option value="' . $plugin->plugin_name . '"'.selected($shipping_option, $plugin->plugin_name, false).'>' . esc_attr($plugin->public_name) . '</option>';
 			}
 			$content .= '</select>';
@@ -479,10 +473,8 @@ class MP_Shipping_Handler {
 	}
 
 	function extra_shipping_box_label($content) {
-		global $mp_shipping_active_plugins, $mp;
-
-		if ( $mp->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
-			$label = $mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
+		if ( $mp->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset(self::$active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
+			$label = self::$active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
 
 			if (isset($_SESSION['mp_shipping_info']['shipping_sub_option']))
 				$label .= ' - ' . $_SESSION['mp_shipping_info']['shipping_sub_option'];
@@ -504,9 +496,7 @@ class MP_Shipping_Handler {
 	}
 
 	function shipping_sub_options() {
-		global $mp_shipping_active_plugins, $mp;
-
-		$first = reset($mp_shipping_active_plugins);
+		$first = reset(self::$active_plugins);
 		$selected = isset($_POST['shipping_option']) ? $_POST['shipping_option'] : (isset($_SESSION['mp_shipping_info']['shipping_option']) ? $_SESSION['mp_shipping_info']['shipping_option'] : $first->plugin_name);
 
 		//get address
@@ -562,10 +552,8 @@ class MP_Shipping_Handler {
 	}
 
 	function filter_method_lbl() {
-		global $mp_shipping_active_plugins;
-
-		if ( isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
-			return $mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
+		if ( isset($_SESSION['mp_shipping_info']['shipping_option']) && isset(self::$active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
+			return self::$active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]->public_name;
 		}
 	}
 

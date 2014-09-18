@@ -50,11 +50,37 @@ class MP_Store_Settings_General {
 	 */
 	private function __construct() {
 		add_action('wpmudev_field_print_scripts_base_country', array(&$this, 'update_states_dropdown'));
+		add_filter('wpmudev_field_get_value_tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
+		add_filter('wpmudev_field_sanitize_for_db_tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
 		
 		$this->init_location_settings();
 		$this->init_tax_settings();
 		$this->init_currency_settings();
 		$this->init_misc_settings();
+	}
+	
+	/**
+	 * Formats the tax rate value from decimal to percentage
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wpmudev_field_get_value_tax[rate]
+	 * @return string
+	 */
+	public function get_tax_rate_value( $value, $post_id, $raw, $field ) {
+		return ($value * 100);
+	}
+	
+	/**
+	 * Formats the tax rate value from percentage to decimal prior to saving to db
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wpmudev_field_sanitize_for_db_tax[rate]
+	 * @return string
+	 */
+	public function save_tax_rate_value( $value, $post_id, $field ) {
+		return ( $value > 0 ) ? ($value / 100) : 0;
 	}
 	
 	/**

@@ -41,7 +41,7 @@ class WPMUDEV_Field_Radio extends WPMUDEV_Field {
 	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
 		$this->before_field(); ?>
-		<label style="<?php echo $this->args['width']; ?>" class="<?php echo $this->args['label']['class']; ?>" for="<?php echo $this->get_id(); ?>">
+		<label style="<?php echo ( $this->args['orientation'] == 'horizontal' ) ? 'width:' . $this->args['width'] : ''; ?>" class="<?php echo $this->args['label']['class']; ?>" for="<?php echo $this->get_id(); ?>">
 		<input type="radio" <?php echo $this->parse_atts(); ?> <?php checked($value, $this->args['value']); ?> /> <span><?php echo $this->args['label']['text']; ?></span></label>
 		<?php
 		$this->after_field();

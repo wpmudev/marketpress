@@ -4,6 +4,8 @@ MarketPress USPS Calculated Shipping Plugin
 Author: Arnold Bailey (Incsub)
 */
 class MP_Shipping_USPS extends MP_Shipping_API {
+	//build of the plugin
+	public $build = 2;
 
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
 	public $plugin_name = 'usps';
@@ -134,42 +136,69 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		new USPS_Service( 15, __('First Class International Parcel', 'mp') ),
 
 		);
-
-		// Get settings for convenience sake
-		$this->settings = get_option('mp_settings');
-		$this->usps_settings = isset($this->settings['shipping']['usps']) ? $this->settings['shipping']['usps'] : array();
 	}
 
 	function default_boxes() {
 		// Initialize the default boxes if nothing there
-		if(count($this->usps_settings['boxes']['name']) <= 1)
-		{
-			$this->usps_settings['boxes'] =
-			array (
-			'name' =>
-			array (
-			0 => __('Flat Rate Small', 'mp'),
-			1 => __('Flat Rate Medium 1', 'mp'),
-			2 => __('Flat Rate Medium 2', 'mp'),
-			3 => __('Flat Rate Large', 'mp'),
-			),
-			'size' =>
-			array (
-			0 => '8x6x1.6',
-			1 => '11x8.5x5.5',
-			2 => '13.6x11.9.5x3.4',
-			3 => '12x12x5.5',
-			),
-			'weight' =>
-			array (
-			0 => '3',
-			1 => '20',
-			2 => '20',
-			3 => '30',
-			),
+		$boxes = $this->get_setting('boxes', array());
+		if ( count($boxes) <= 1 ) {
+			return array(
+				array(
+					'name' => __('Flat Rate Small', 'mp'),
+					'size' => '8x6x1.6',
+					'weight' => '3',
+				),
+				array(
+					'name' => __('Flat Rate Medium 1', 'mp'),
+					'size' => '11x8.5x5.5',
+					'weight' => '20',
+				),
+				array(
+					'name' => __('Flat Rate Medium 2', 'mp'),
+					'size' => '13.6x11.9.5x3.4',
+					'weight' => '20',
+				),
+				array(
+					'name' => __('Flat Rate Large', 'mp'),
+					'size' => '12x12x5.5',
+					'weight' => '30',
+				),
 			);
 		}
 	}
+
+	/**
+   * Updates the plugin settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
+  public function update( $settings ) {
+  	// Update boxes
+  	if ( $this->get_setting('boxes->name') ) {
+	  	$boxes = array();
+	  	$old_boxes = $this->get_setting('boxes');
+	  	
+			foreach ( $old_boxes['name'] as $idx => $val ) {
+				if ( empty($val) ) {
+					continue;
+				}
+				
+				$boxes[] = array(
+					'ID' => $idx,
+					'name' => $val,
+					'size' => $old_boxes['size'][$idx],
+					'weight' => $old_boxes['weight'][$idx],
+				);
+			}
+			
+			mp_push_to_array($settings, 'shipping->usps->boxes', $boxes);
+  	}
+  	
+    return $settings;
+  }
 
 	/**
 	* Echo anything you want to add to the top of the shipping screen
@@ -203,133 +232,72 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 	}
 
-	/*
-	* Echos one row for boxes data. If $key is non-numeric then emit a blank row for new entry
-	*
-	* @ $key
-	*
-	* @ returns HTML for one row
-	*/
-	private function box_row_html($key=''){
-
-		$name = '';
-		$size = '';
-		$weight = '';
-
-		if ( is_numeric($key) ){
-			$name = $this->usps_settings['boxes']['name'][$key];
-			$size = $this->usps_settings['boxes']['size'][$key];
-			$weight = $this->usps_settings['boxes']['weight'][$key];
-			if (empty($name) && empty($size) &empty($weight)) return''; //rows blank, don't need it
+	/**
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function init_settings_metabox() {
+  	$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->public_name),
+			'desc' => __('Using this USPS Shipping calculator requires requesting an Ecommerce API Username and Password. Get your free set of credentials <a target="_blank" href="https://secure.shippingapis.com/registration/">here &raquo;</a>. The password is no longer used for the API, just the username which you should enter below. The USPS test site has not yet been updated and currently doesn\'t work - you should just request activating your credentials with USPS and go live.', 'mp'), 
+			'option_name' => 'mp_settings',
+			'conditional' => array(
+				'operator' => 'AND',
+				'action' => 'show',
+				array(
+					'name' => 'shipping[method]',
+					'value' => 'calculated',
+				),
+				array(
+					'name' => 'shipping[calc_methods][usps]',
+					'value' => 'usps',
+				),
+			),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('api_username'),
+			'label' => array('text' => __('Username', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('max_weight'),
+			'label' => array('text' => __('Maximum Weight Per Package', 'mp')),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => $this->get_field_name('online'),
+			'label' => array('text' => __('Rates Request Type', 'mp')),
+			'options' => array(
+				'online' => __('Online Rates', 'mp'),
+				'retail' => __('Retail Rates', 'mp'),
+			),
+		));
+		
+		$services = array();
+		foreach ( $this->services as $service => $detail ) {
+			$services[$service] = $detail->name . ' ' . $detail->delivery;
 		}
-		?>
-		<tr class="variation">
-			<td class="mp_box_name">
-				<input type="text" name="mp[shipping][usps][boxes][name][]" value="<?php echo esc_attr($name); ?>" size="18" maxlength="20" />
-			</td>
-			<td class="mp_box_dimensions">
-				<label>
-					<input type="text" name="mp[shipping][usps][boxes][size][]" value="<?php echo esc_attr($size); ?>" size="10" maxlength="20" />
-					<?php echo $this->get_units_length(); ?>
-				</label>
-			</td>
-			<td class="mp_box_weight">
-				<label>
-					<input type="text" name="mp[shipping][usps][boxes][weight][]" value="<?php echo esc_attr($weight); ?>" size="6" maxlength="10" />
-					<?php echo $this->get_units_weight(); ?>
-				</label>
-			</td>
-			<?php if ( is_numeric($key) ): ?>
-
-			<td class="mp_box_remove">
-				<a onclick="uspsDeleteBox(this);" href="#mp_shipping_boxes_table" title="<?php _e('Remove Box', 'mp'); ?>" > </a>
-			</td>
-
-			<?php else: ?>
-
-			<td class="mp_box_add">
-				<a onclick="uspsAddBox(this);" href="#mp_shipping_boxes_table" title="<?php _e('Add Box', 'mp'); ?>" > </a>
-			</td>
-
-			<?php endif; ?>
-		</tr>
-		<?php
+		$metabox->add_field('checkbox_group', array(
+			'name' => $this->get_field_name('services'),
+			'label' => array('text' => __('Offered Domestic Services', 'mp')),
+			'options' => $services,
+		));
 	}
-
+	
 	/**
 	* Echo a settings meta box with whatever settings you need for you shipping module.
 	*  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
 	*  You can access saved settings via $settings array.
 	*/
 	function shipping_settings_box($settings) {
-		global $mp;
-
-		$this->settings = $settings;
-		$this->usps_settings = $this->settings['shipping']['usps'];
-		$system = $this->settings['shipping']['system']; //Current Unit settings english | metric
-
 		?>
-
-		<script type="text/javascript">
-			//Remove a row in the Boxes table
-			function uspsDeleteBox(row)
-			{
-				var i = row.parentNode.parentNode.rowIndex;
-				document.getElementById('mp_shipping_boxes_table').deleteRow(i);
-			}
-
-			function uspsAddBox(row)
-			{
-				//Adds an Empty Row
-				var clone = row.parentNode.parentNode.cloneNode(true);
-				document.getElementById('mp_shipping_boxes_table').appendChild(clone);
-				var fields = clone.getElementsByTagName('input');
-				for(i = 0; i < fields.length; i++)
-				{
-					fields[i].value = '';
-				}
-			}
-		</script>
-
 		<div id="mp_usps_rate" class="postbox">
 			<h3 class='hndle'><span><?php _e('USPS Settings', 'mp'); ?></span></h3>
 			<div class="inside">
-				<img src="<?php echo $mp->plugin_url; ?>images/usps.png" />
-				<p class="description">
-					<?php _e('Using this USPS Shipping calculator requires requesting an Ecommerce API Username and Password. Get your free set of credentials <a target="_blank" href="https://secure.shippingapis.com/registration/">here &raquo;</a>', 'mp') ?><br />
-					<?php _e('The password is no longer used for the API, just the username which you should enter below.', 'mp'); ?>
-					<?php _e('The USPS test site has not yet been updated and currently doesn\'t work. You should just request activating your credentials with USPS and go live.', 'mp') ?>
-				</p>
-
-				<input type="hidden" name="mp_shipping_usps_meta" value="1" />
 				<table class="form-table">
 					<tbody>
-						<tr>
-							<th scope="row"><?php _e('USPS Username', 'mp') ?></th>
-							<td><input type="text" name="mp[shipping][usps][api_username]" value="<?php echo esc_attr($this->usps_settings['api_username']); ?>" size="20" maxlength="20" /></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php _e('USPS Maximum Weight per Package', 'mp') ?></th>
-
-							<td>
-								<input type="text" name="mp[shipping][usps][max_weight]" value="<?php echo esc_attr($this->usps_settings['max_weight']); ?>" size="20" maxlength="20" />
-								<?php echo $this->get_units_weight(); ?>
-							</td>
-						</tr>
-						<tr>
-							<th scope="row"><?php _e('USPS Request Mode', 'mp') ?></th>
-							<td>
-								<label>
-									<input type="radio" name="mp[shipping][usps][online]" value="online" <?php checked($this->usps_settings['online'], 'online'); ?> />
-									<?php _e('Online rates','mp'); ?>
-								</label>&nbsp;&nbsp;&nbsp;
-								<label>
-									<input type="radio" name="mp[shipping][usps][online]" value="retail" <?php checked($this->usps_settings['online'], 'retail'); ?> />
-									<?php _e('Retail rates','mp'); ?>
-								</label>
-							</td>
-						</tr>
-
 						<tr>
 							<th scope="row"><?php _e('USPS Offered Domestic Services', 'mp') ?></th>
 							<td>
@@ -771,6 +739,22 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 			$nodes = $xpath->query('//postage[@classid="' . $this->services[$service]->code . '"]/rate');
 			$rate = floatval($nodes->item(0)->textContent) * $box_count;
+			
+			if ( $this->services[$service]->code == '0' ) {
+				/* First class mail returns 4 sub types (Stamped Letter, Parcel,
+				Large Envelope, Postcards). We need to get the PARCEL sub type or too low of
+				a rate will get returned */
+				$nodes_type = $xpath->query('//postage[@classid="' . $this->services[$service]->code . '"]/mailservice');
+				
+				for ( $i = 0; $i < $nodes_type->length; $i++ ) {
+					$type = $nodes_type->item($i)->textContent;
+					if ( strpos($type, 'Parcel') !== false ) {
+						$rate = floatval($nodes->item($i)->textContent) * $box_count;
+						break;
+					}
+				}
+			}
+
 			if($rate == 0){  //Not available for this combination
 				unset($mp_shipping_options[$service]);
 			}

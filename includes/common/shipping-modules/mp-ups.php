@@ -4,6 +4,8 @@ MarketPress UPS Calculated Shipping Plugin
 Author: Arnold Bailey (Incsub)
 */
 class MP_Shipping_UPS extends MP_Shipping_API {
+	//build of the plugin
+	public $build = 2;
 
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
 	public $plugin_name = 'ups';
@@ -29,9 +31,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	// Defines the available shipping Services and their display names
 	public $services = array();
 
-	private $settings = '';
-	private $ups_settings;
-
 	//Set to display any errors in the Rate calculations.
 	private $rate_error = '';
 
@@ -39,26 +38,23 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 	*/
 	function on_creation() {
-		global $mp;
-		
 		//set name here to be able to translate
 		$this->public_name = __('UPS', 'mp');
 
 		//US Domestic services
 		$this->services = array(
-
-		'Next Day Air'           => new UPS_Service('01', __('Next Day Air', 'mp'),           __('(Next Day)', 'mp')),
-		'2nd Day Air'            => new UPS_Service('02', __('2nd Day Air', 'mp'),            __('(2 Days)', 'mp')),
-		'Ground'                 => new UPS_Service('03', __('Ground', 'mp'),                 __('(1-5 Days)', 'mp')),
-		'3 Day Select'           => new UPS_Service('12', __('3 Day Select', 'mp'),           __('(3 Days)', 'mp')),
-		'Next Day Air Saver'     => new UPS_Service('13', __('Next Day Air Saver', 'mp'),     __('(1 Day)', 'mp')),
-		'Next Day Air Early AM'  => new UPS_Service('14', __('Next Day Air Early AM', 'mp'),  __('(1 Days)', 'mp')),
-		'2nd Day Air AM'         => new UPS_Service('59', __('2nd Day Air AM', 'mp'),         __('(2 Days)', 'mp')),
-		'Worldwide Express' 		 => new UPS_Service('07', __('Worldwide Express', 'mp'),      __('(1-3 Days)', 'mp')),
-		'Worldwide Expedited'    => new UPS_Service('08', __('Worldwide Expedited', 'mp'),    __('(2-5 Days)', 'mp') ),
-		'Standard'               => new UPS_Service('11', __('Standard', 'mp'),               __('(Scheduled)', 'mp') ),
-		'Worldwide Express Plus' => new UPS_Service('54', __('Worldwide Express Plus', 'mp'), __('(1-3 Days)', 'mp') ),
-		'Saver'                  => new UPS_Service('65', __('Saver', 'mp'),                  __('(1-5 Days)', 'mp') ),
+			'Next Day Air'           => new UPS_Service('01', __('Next Day Air', 'mp'),           __('(Next Day)', 'mp')),
+			'2nd Day Air'            => new UPS_Service('02', __('2nd Day Air', 'mp'),            __('(2 Days)', 'mp')),
+			'Ground'                 => new UPS_Service('03', __('Ground', 'mp'),                 __('(1-5 Days)', 'mp')),
+			'3 Day Select'           => new UPS_Service('12', __('3 Day Select', 'mp'),           __('(3 Days)', 'mp')),
+			'Next Day Air Saver'     => new UPS_Service('13', __('Next Day Air Saver', 'mp'),     __('(1 Day)', 'mp')),
+			'Next Day Air Early AM'  => new UPS_Service('14', __('Next Day Air Early AM', 'mp'),  __('(1 Days)', 'mp')),
+			'2nd Day Air AM'         => new UPS_Service('59', __('2nd Day Air AM', 'mp'),         __('(2 Days)', 'mp')),
+			'Worldwide Express' 		 => new UPS_Service('07', __('Worldwide Express', 'mp'),      __('(1-3 Days)', 'mp')),
+			'Worldwide Expedited'    => new UPS_Service('08', __('Worldwide Expedited', 'mp'),    __('(2-5 Days)', 'mp') ),
+			'Standard'               => new UPS_Service('11', __('Standard', 'mp'),               __('(Scheduled)', 'mp') ),
+			'Worldwide Express Plus' => new UPS_Service('54', __('Worldwide Express Plus', 'mp'), __('(1-3 Days)', 'mp') ),
+			'Saver'                  => new UPS_Service('65', __('Saver', 'mp'),                  __('(1-5 Days)', 'mp') ),
 		);
 		
 		//		//International Services
@@ -69,50 +65,82 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		//		'Worldwide Express Plus' => new UPS_Service('54', __('Worldwide Express Plus', 'mp') ),
 		//		'Saver'                  => new UPS_Service('65', __('Saver', 'mp') ),
 		//		);
-
-		// Get settings for convenience sake
-		$this->settings = get_option('mp_settings');
-		$this->ups_settings =& $this->settings['shipping']['ups'];
-		
-		// Added in 2.9.5.1 - make sure we set the old default which was daily pickup
-		if ( ! isset($this->ups_settings['pickup_type']) ) {
-			$this->ups_settings['pickup_type'] = '01';
-			update_option('mp_settings', $this->settings);
-		}
 	}
 
 	function default_boxes(){
 		// Initialize the default boxes if nothing there
-		if(count($this->ups_settings['boxes']['name']) < 2)
-		{
-			$this->ups_settings['boxes'] = array (
-			'name' =>
-			array (
-			0 => 'Small Express',
-			1 => 'Medium Express',
-			2 => 'Large Express',
-			3 => 'UPS 10KG',
-			4 => 'UPS 25KG',
-			),
-			'size' =>
-			array (
-			0 => '13x11x2',
-			1 => '15x11x3',
-			2 => '18x13x3',
-			3 => '17x13x11',
-			4 => '19x17x14',
-			),
-			'weight' =>
-			array (
-			0 => '10',
-			1 => '20',
-			2 => '30',
-			3 => '22',
-			4 => '55',
-			),
+		$boxes = $this->get_setting('boxes->name', array());
+		
+		if ( count($boxes) < 2 ) {
+			return array(
+				array(
+					'name' => 'Small Express',
+					'size' => '13x11x2',
+					'weight' => '10',
+				),
+				array(
+					'name' => 'Medium Express',
+					'size' => '15x11x3',
+					'weight' => '20',
+				),
+				array(
+					'name' => 'Large Express',
+					'size' => '18x13x3',
+					'weight' => '30',
+				),
+				array(
+					'name' => 'UPS 10KG',
+					'size' => '17x13x11',
+					'weight' => '22',
+				),
+				array(
+					'name' => 'UPS 25KG',
+					'size' => '19x17x14',
+					'weight' => '55',
+				),
 			);
 		}
+		
+		return array();
 	}
+
+	/**
+   * Updates the plugin settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
+  public function update( $settings ) {
+		// Added in 2.9.5.1 - make sure we set the old default which was daily pickup
+		if ( ! $this->get_setting('pickup_type') ) {
+			mp_push_to_array($settings, 'shipping->ups->pickup_type', '01');
+		}
+  
+  	// Update boxes
+  	if ( $this->get_setting('boxes->name') ) {
+	  	$boxes = array();
+	  	$old_boxes = $this->get_setting('boxes');
+	  	
+			foreach ( $old_boxes['name'] as $idx => $val ) {
+				if ( empty($val) ) {
+					continue;
+				}
+				
+				$boxes[] = array(
+					'ID' => $idx,
+					'name' => $val,
+					'size' => $old_boxes['size'][$idx],
+					'weight' => $old_boxes['weight'][$idx],
+				);
+			}
+			
+			mp_push_to_array($settings, 'shipping->ups->boxes', $boxes);
+  	}
+  	
+    return $settings;
+  }
 
 	/**
 	* Echo anything you want to add to the top of the shipping screen
@@ -143,266 +171,99 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 	}
 
-	/*
-	* Echos one row for boxes data. If $key is non-numeric then emit a blank row for new entry
-	*
-	* @ $key
-	*
-	* @ returns HTML for one row
-	*/
-	private function box_row_html($key=''){
-
-		$name = '';
-		$size = '';
-		$weight = '';
-
-		if ( is_numeric($key) ){
-			$name = $this->ups_settings['boxes']['name'][$key];
-			$size = $this->ups_settings['boxes']['size'][$key];
-			$weight = $this->ups_settings['boxes']['weight'][$key];
-			if (empty($name) && empty($size) &empty($weight)) return''; //rows blank, don't need it
-		}
-		?>
-		<tr class="variation">
-			<td class="mp_box_name">
-				<input type="text" name="mp[shipping][ups][boxes][name][]" value="<?php echo esc_attr($name); ?>" size="18" maxlength="20" />
-			</td>
-			<td class="mp_box_dimensions">
-				<label>
-					<input type="text" name="mp[shipping][ups][boxes][size][]" value="<?php echo esc_attr($size); ?>" size="10" maxlength="20" />
-					<?php echo $this->get_units_length(); ?>
-				</label>
-			</td>
-			<td class="mp_box_weight">
-				<label>
-					<input type="text" name="mp[shipping][ups][boxes][weight][]" value="<?php echo esc_attr($weight); ?>" size="6" maxlength="10" />
-					<?php echo $this->get_units_weight(); ?>
-				</label>
-			</td>
-			<?php if ( is_numeric($key) ): ?>
-
-			<td class="mp_box_remove">
-				<a onclick="upsDeleteBox(this);" href="#mp_ups_boxes_table" title="<?php _e('Remove Box', 'mp'); ?>" ></a>
-			</td>
-
-			<?php else: ?>
-
-			<td class="mp_box_add">
-				<a onclick="upsAddBox(this);" href="#mp_ups_boxes_table" title="<?php _e('Add Box', 'mp'); ?>" ></a>
-			</td>
-
-			<?php endif; ?>
-		</tr>
-		<?php
-	}
-
-	/**
-	* Echo a settings meta box with whatever settings you need for you shipping module.
-	*  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
-	*  You can access saved settings via $settings array.
-	*/
-	function shipping_settings_box($settings)
-	{
-		global $mp;
-
-		$this->settings = $settings;
-		$this->ups_settings = $this->settings['shipping']['ups'];
-		$system = $this->settings['shipping']['system']; //Current Unit settings english | metric
-		?>
-
-		<script type="text/javascript">
-			//Remove a row in the Boxes table
-			function upsDeleteBox(row)
-			{
-				var i = row.parentNode.parentNode.rowIndex;
-				document.getElementById('mp_ups_boxes_table').deleteRow(i);
-			}
-
-			function upsAddBox(row)
-			{
-				//Adds an Empty Row
-				var clone = row.parentNode.parentNode.cloneNode(true);
-				document.getElementById('mp_ups_boxes_table').appendChild(clone);
-				var fields = clone.getElementsByTagName('input');
-				for(i = 0; i < fields.length; i++)
-				{
-					fields[i].value = '';
-				}
-			}
-		</script>
-
-		<div id="mp_ups_rate" class="postbox">
-			<h3 class='hndle'><span><?php _e('UPS Settings', 'mp'); ?></span></h3>
-			<div class="inside">
-				<img src="<?php echo $mp->plugin_url; ?>images/ups.jpg" />
-				<input type="hidden" name="mp_shipping_ups_meta" value="1" />
-				<table class="form-table">
-					<tbody>
-						<tr>
-							<th colspan="2">
-								<?php _e('In order to use UPS, you will need a UPS Developer Kit access key ', 'mp') ?>
-								<?php _e('and the UPS user ID and password associated with the access key.  Set these up for free <a href="https://www.ups.com/upsdeveloperkit" target="_blank">here</a>.  ', 'mp') ?>
-								<?php _e('If this information is missing or incorrect, an error will appear during the checkout process and the buyer will not be able to complete the transaction.', 'mp') ?>
-							</th>
-						</tr>
-
-						<tr>
-							<th scope="row">
-								<?php _e('UPS Sandbox Mode', 'mp') ?>
-							</th>
-							<td>
-								<label><input type="radio" name="mp[shipping][ups][sandbox]" value="1" <?php checked(! empty($this->ups_settings['sandbox'])); ?> /> <?php _e('Sandbox', 'mp'); ?></label><br />
-								<label><input type="radio" name="mp[shipping][ups][sandbox]" value="0" <?php checked(empty($this->ups_settings['sandbox'])); ?> /> <?php _e('Production', 'mp'); ?></label>
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row">
-								<?php _e('UPS Developer Kit Access Key', 'mp') ?>
-							</th>
-							<td>
-								<input type="text" name="mp[shipping][ups][api_key]" value="<?php echo esc_attr($this->ups_settings['api_key']); ?>" size="20" maxlength="20" />
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row">
-								<?php _e('UPS User ID', 'mp') ?>
-							</th>
-							<td>
-								<input type="text" name="mp[shipping][ups][user_id]" value="<?php echo esc_attr($this->ups_settings['user_id']); ?>" size="20" maxlength="20" />
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row">
-								<?php _e('UPS Password', 'mp') ?>
-							</th>
-							<td>
-								<input type="password" name="mp[shipping][ups][password]" value="<?php echo esc_attr($this->ups_settings['password']); ?>" size="20" maxlength="20" />
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row">
-								<?php _e('UPS Shipper Number', 'mp') ?>
-								<br /><span class="description"><?php _e('Required if using negotiated rates','mp'); ?></span>
-							</th>
-							<td>
-								<input type="text" name="mp[shipping][ups][shipper_number]" value="<?php echo esc_attr($this->ups_settings['shipper_number']); ?>" size="20" maxlength="20" />
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row"><?php _e('UPS Offered Domestic Services', 'mp') ?></th>
-							<td>
-								<?php foreach($this->services as $name => $service) : ?>
-								<label>
-									<input type="checkbox" name="mp[shipping][ups][services][<?php echo $name; ?>]" value="1" <?php checked($this->ups_settings['services'][$name], 1); ?> />&nbsp;<?php echo $service->name; ?>
-								</label><br />
-								<?php endforeach; ?>
-							</td>
-						</tr>
-						
-						<tr>
-							<th scope="row">
-								<?php _e('Pickup type', 'mp') ?>
-								<br /><span class="description"><?php _e('For the most accurate rates, please select the appropriate pick up type for your business.','mp'); ?></span>
-							</th>
-							<td>
-								<?php foreach ( array('01' => __('Daily Pickup', 'mp'), '03' => __('Customer Counter', 'mp'), '06' => __('One Time Pickup', 'mp')) as $code => $label ) : ?>
-								<label>
-									<input type="radio" name="mp[shipping][ups][pickup_type]" value="01" <?php checked($code, $this->ups_settings['pickup_type']); ?> /> <?php echo $label; ?>
-								</label><br />
-								<?php endforeach; ?>
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row"><?php _e('Handling Charge per Box Shipped', 'mp') ?></th>
-							<td>
-								<input type="text" name="mp[shipping][ups][domestic_handling]" value="<?php echo (empty($this->ups_settings['domestic_handling']) ) ? '0.00' : esc_attr($this->ups_settings['domestic_handling']); ?>" size="20" maxlength="20" />
-							</td>
-						</tr>
-						<!--
-						<tr>
-						<th scope="row">
-						<?php _e('Default Weight (for products whose weights are not specified)', 'mp') ?>
-						</th>
-						<td>
-						<input type="text" name="mp[shipping][ups][default_weight]" value="<?php echo esc_attr($this->ups_settings['default_weight']); ?>" size="20" maxlength="20" />
-						</td>
-						</tr>
-						-->
-						<tr>
-							<td colspan="2">
-								<?php _e('Standard Boxes and Weight Limits', 'mp') ?>
-								<p>
-									<span class="description">
-										<?php _e('Enter your standard box sizes as LengthxWidthxHeight', 'mp') ?> (<b>e.g. 12x8x6</b>)
-										<?php _e('For each box defined enter the maximum weight it can contain.', 'mp') ?>
-									</span>
-								</p>
-								<table class="widefat" id="mp_ups_boxes_table">
-									<thead>
-										<tr>
-											<th scope="col" class="mp_box_name"><?php _e('Box Name', 'mp'); ?></th>
-											<th scope="col" class="mp_box_dimensions"><?php _e('Box Dimensions', 'mp'); ?></th>
-											<th scope="col" class="mp_box_weight"><?php _e('Max Weight per Box', 'mp'); ?></th>
-											<th scope="col" class="mp_box_remove"></th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php
-										$this->default_boxes();
-										if($this->ups_settings['boxes'])
-										{
-											foreach($this->ups_settings['boxes']['name'] as $key => $value)
-											{
-												$this->box_row_html($key);
-											}
-										}
-
-										//Add blank line for new entries. The non numeric $key says it's not in the array.
-										$this->box_row_html('');
-										?>
-									</tbody>
-								</table>
-							</td>
-						</tr>
-
-						<tr>
-							<th scope="row" colspan="2">
-								<p>
-									<span class="description">
-										<?php _e('Note: the shipping prices this plugin calculates are estimates.  If they are consistently too low or too high, please check that the list of boxes above and the product weights are accurate and complete.', 'mp') ?>
-									</span>
-								</p>
-							</th>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<?php
-	}
-
-
-	/**
-	* Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
-	*  array. Don't forget to return!
-	*/
-	function process_shipping_settings($settings) {
-		foreach ( $this->services as $service => $class ) {
-			if ( isset($_POST['mp']['shipping']['ups']['services'][$service]) ) {
-				$settings['shipping']['ups']['services'][$service] = 1;
-			} else {
-				$settings['shipping']['ups']['services'][$service] = 0;
-			}
+  /**
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function init_settings_metabox() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'title' => sprintf(__('%s Settings', 'mp'), $this->public_name),
+			'desc' => __('In order to use UPS, you will need a UPS Developer Kit access key and the UPS user ID and password associated with the access key.  Set these up for free <a href="https://www.ups.com/upsdeveloperkit" target="_blank">here</a>. If this information is missing or incorrect, an error will appear during the checkout process and the buyer will not be able to complete the transaction.', 'mp'),
+			'option_name' => 'mp_settings',
+			'conditional' => array(
+				'operator' => 'AND',
+				'action' => 'show',
+				array(
+					'name' => 'shipping[method]',
+					'value' => 'calculated',
+				),
+				array(
+					'name' => 'shipping[calc_methods][ups]',
+					'value' => 'ups',
+				),
+			),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => $this->get_field_name('sandbox'),
+			'label' => array('text' => __('Use Sandbox Mode?', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('api_key'),
+			'label' => array('text' => __('Developer Kit Access Key', 'mp')),
+		)); 
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('user_id'),
+			'label' => array('text' => __('User ID', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('password'),
+			'label' => array('text' => __('Password', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('shipper_number'),
+			'label' => array('text' => __('Shipper Number', 'mp')),
+			'desc' => __('Required if using negotiated rates', 'mp'),
+		));
+		
+		$services = array();
+		foreach ( $this->services as $name => $service ) {
+			$services[$name] = $service->name;	
 		}
 		
-		return $settings;
-	}
+		$metabox->add_field('checkbox_group', array(
+			'name' => $this->get_field_name('services'),
+			'label' => array('text' => __('Offered Services', 'mp')),
+			'options' => $services,
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => $this->get_field_name('pickup_type'),
+			'label' => array('text' => __('Offered Services', 'mp')),
+			'desc' => __('For the most accurate rates, please select the appropriate pick up type for your business.', 'mp'),
+			'options' => array('01' => __('Daily Pickup', 'mp'), '03' => __('Customer Counter', 'mp'), '06' => __('One Time Pickup', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('domestic_handling'),
+			'label' => array('text' => __('Handling Charge Per Box Shipped', 'mp')),
+			'default_value' => '0.00',
+		));
+		
+		$boxes = $metabox->add_field('repeater', array(
+			'name' => $this->get_field_name('boxes'),
+			'label' => array('text' => __('Standard Boxes and Weight Limits', 'mp')),
+			'default_value' => $this->default_boxes(),
+			'desc' => __('Enter your standard box sizes as LengthxWidthxHeight (e.g. 12x8x6) For each box defined enter the maximum weight it can contain. <strong>Note: the shipping prices this plugin calculates are estimates. If they are consistently too low or too high, please check that the list of boxes above and the product weights are accurate and complete.</strong>', 'mp'),
+			'add_row_label' => __('Add Box', 'mp'),
+		));
+		
+		if ( $boxes instanceof WPMUDEV_Field ) {
+			$boxes->add_sub_field('text', array(
+				'name' => 'name',
+				'label' => array('text' => __('Name', 'mp')),
+			));
+			$boxes->add_sub_field('text', array(
+				'name' => 'size',
+				'label' => array('text' => __('Size', 'mp')),
+			));
+			$boxes->add_sub_field('text', array(
+				'name' => 'weight',
+				'label' => array('text' => __('Max Weight', 'mp')),
+			));
+		}
+  }
 
 	/**
 	* Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
@@ -424,7 +285,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		return $shipping_meta;
 	}
-
+	
 	/**
 	* Use this function to return your calculated price as an integer or float
 	*
@@ -442,11 +303,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* return float $price
 	*/
 	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-		global $mp;
-
-
-		if(! $this->crc_ok())
-		{
+		if( ! $this->crc_ok() ) {
 			//Price added to this object
 			$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
 		}
@@ -469,7 +326,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*
 	* return array $shipping_options
 	*/
-	function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
+	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
 
 		$shipping_options = array();
 
@@ -480,20 +337,21 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$this->destination_zip = $zip;
 		$this->country = $country;
 
-		if( is_array($cart) ) {
-			$shipping_meta['weight'] = (is_numeric($shipping_meta['weight']) ) ? $shipping_meta['weight'] : 0;
+		if ( is_array($cart) ) {
 			foreach ($cart as $product_id => $variations) {
 				$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-				foreach($variations as $variation => $product) {
+				$shipping_meta['weight'] = (is_numeric($shipping_meta['weight']) ) ? $shipping_meta['weight'] : 0;
+				
+				foreach ( $variations as $variation => $product ) {
 					$qty = $product['quantity'];
-					$weight = (empty($shipping_meta['weight']) ) ? $this->ups_settings['default_weight'] : $shipping_meta['weight'];
+					$weight = (empty($shipping_meta['weight']) ) ? $this->get_setting('default_weight') : $shipping_meta['weight'];
 					$this->weight += floatval($weight) * $qty;
 				}
 			}
 		}
 
 		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
-		if($this->weight == 0){ //Nothing to ship
+		if( $this->weight == 0 ) { //Nothing to ship
 			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
 			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
 			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
@@ -505,7 +363,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		//ups won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
 
-		$max_weight = floatval($this->ups[max_weight]);
+		$max_weight = floatval($this->get_setting('max_weight'), 75);
 		$max_weight = ($max_weight > 0) ? $max_weight : 75;
 
 		//Properties should already be converted to weight in decimal pounds and Pounds and Ounces
@@ -545,43 +403,42 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* rate_request - Makes the actual call to UPS
 	*/
 	function rate_request() {
-		global $mp;
-
-		$shipping_options = array_filter($this->ups_settings['services'], create_function('$val', 'return ($val == 1);'));
+		$shipping_options = array_filter($this->get_setting('services', array()), create_function('$val', 'return ($val == 1);'));
 
 		//Assume equal size packages. Find the best matching box size
-		$this->ups_settings['max_weight'] = ( empty($this->ups_settings['max_weight'])) ? 50 : $this->ups_settings['max_weight'];
-		$diff = floatval($this->ups_settings['max_weight']);
-		$found = -1;
-		$largest = -1.0;
+		$boxes = $this->get_setting('boxes');
+		$box = $largest_box = false;
+		$index = 1;
+		$box_count = count($boxes);
 
-		foreach($this->ups_settings['boxes']['weight'] as $key => $weight) {
-			//			//Find largest
-			if( $weight > $largest) {
-				$largest = $weight;
-				$found = $key;
+		foreach ( $boxes as $thebox ) {
+			// Find largest box
+			if ( $thebox['weight'] > $this->weight || ($index == $box_count && $box === false) ) {
+				$largest_box = $thebox;
 			}
-			//If weight less
-			if( floatval($this->weight) <= floatval($weight) ) {
-				$found = $key;
+			
+			if ( floatval($this->weight) <= floatval($thebox['weight']) || ($index == $box_count && $box === false) ) {
+				$box = $thebox;
 				break;
 			}
+			
+			$index ++;
 		}
-
-		if($this->ups_settings['boxes']['weight'][$found] >= $this->weight){
+		
+		if ( $box['weight'] >= $this->weight ) {
 			$this->pkg_count = 1;
 			$this->pkg_weight = $this->weight;
 		} else {
-			$this->pkg_count = ceil($this->weight / $this->ups_settings['boxes']['weight'][$found]); // Avoid zero
+			$this->pkg_count = ceil($this->weight / $box['weight']); // Avoid zero
 			$this->pkg_weight = $this->weight / $this->pkg_count;
 		}
 
-		// Fixup pounds by converting multiples of 16 ounces to pounds
+		// Fix up pounds by converting multiples of 16 ounces to pounds
 		$this->pounds = intval($this->pkg_weight);
 		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
 		//found our box
-		$dims = explode('x', strtolower($this->ups_settings['boxes']['size'][$found]));
+		$dims = explode('x', strtolower($box['size']));
 		foreach($dims as &$dim) $dim = $this->as_inches($dim);
 
 		sort($dims); //Sort so two lowest values are used for Girth
@@ -658,30 +515,26 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 
 		//We have the XML make the call
-		$url = ($this->ups_settings['sandbox']) ? $this->sandbox_uri : $this->production_uri;
+		$url = ( $this->get_setting('sandbox') ) ? $this->sandbox_uri : $this->production_uri;
 
 		$response = wp_remote_request($url, array(
-		'headers' => array('Content-Type: text/xml'),
-		'method' => 'POST',
-		'body' => $auth_dom->saveXML() . $dom->saveXML(),
-		'sslverify' => false,
-		)
-		);
+			'headers' => array('Content-Type: text/xml'),
+			'method' => 'POST',
+			'body' => $auth_dom->saveXML() . $dom->saveXML(),
+			'sslverify' => false,
+		));
 
-		if (is_wp_error($response)){
+		if ( is_wp_error($response) ) {
 			return array('error' => '<div class="mp_checkout_error">UPS: ' . $response->get_error_message() . '</div>');
-		}
-		else
-		{
-			$loaded = ($response['response']['code'] == '200');
+		} else {
+			$loaded = ( $response['response']['code'] == '200' );
 			$body = $response['body'];
-			if(! $loaded){
+			if ( ! $loaded ) {
 				return array('error' => '<div class="mp_checkout_error">UPS: ' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
 			}
 		}
 
-		if ($loaded){
-
+		if ( $loaded ) {
 			libxml_use_internal_errors(true);
 			$dom = new DOMDocument();
 			$dom->encoding = 'utf-8';
@@ -698,7 +551,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		//Check for errors
 		$nodes = $xpath->query('//responsestatuscode');
-		if($nodes->item(0)->textContent == '0'){
+		if( $nodes->item(0)->textContent == '0' ) {
 			$nodes = $xpath->query('//errordescription');
 			$this->rate_error = $nodes->item(0)->textContent;
 			return array('error' => '<div class="mp_checkout_error">' . $this->rate_error . '</div>');
@@ -707,24 +560,23 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		//Good to go
 		//Make SESSION copy with just prices and delivery
 
-		if(! is_array($shipping_options)) $shipping_options = array();
+		if (! is_array($shipping_options) ) $shipping_options = array();
 		$mp_shipping_options = $shipping_options;
-		foreach($shipping_options as $service => $option){
+		
+		foreach ( $shipping_options as $service => $option ) {
 			$nodes = $xpath->query('//ratedshipment[service/code="' . $this->services[$service]->code . '"]/totalcharges/monetaryvalue');
 			$rate = floatval($nodes->item(0)->textContent) * $this->pkg_count;
 
-			if($rate == 0){  //Not available for this combination
+			if ( $rate == 0) {  //Not available for this combination
 				unset($mp_shipping_options[$service]);
-			}
-			else
-			{
-				$handling = floatval($this->ups_settings['domestic_handling']) * $this->pkg_count; // Add handling times number of packages.
+			} else {
+				$handling = floatval($this->get_setting('domestic_handling')) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
-				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
-					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
+				if ( ! empty($_SESSION['mp_shipping_info']['shipping_sub_option']) ) {
+					if ( $_SESSION['mp_shipping_info']['shipping_sub_option'] == $service ) {
 						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate + $handling;
 					}
 				}
@@ -734,13 +586,13 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		uasort($mp_shipping_options, array($this,'compare_rates') );
 
 		$shipping_options = array();
-		foreach($mp_shipping_options as $service => $options){
+		foreach ( $mp_shipping_options as $service => $options ) {
 			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
 		}
 
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
+		$_SESSION['mp_cart_crc'] = $this->crc(mp()->get_cart_cookie());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
 		
 		unset($xpath);
@@ -765,8 +617,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* @return boolean true | false
 	*/
 	private function crc_ok(){
-		global $mp;
-
 		//Assume it changed
 		$result = false;
 
@@ -776,7 +626,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 			//Did the cart change since last calculation
 			if ( is_numeric($_SESSION['mp_shipping_info']['shipping_cost'])){
 
-				if($_SESSION['mp_cart_crc'] == $this->crc($mp->get_cart_cookie())){
+				if($_SESSION['mp_cart_crc'] == $this->crc(mp()->get_cart_cookie())){
 					//Did the shipping info change
 					if($_SESSION['mp_shipping_crc'] == $this->crc($_SESSION['mp_shipping_info'])){
 						$result = true;
@@ -798,7 +648,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*
 	*/
 	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
-		global $mp;
 		if ( isset($this->services[$shipping_option]) ) {
 			$option = $this->services[$shipping_option]->name;
 		}
@@ -807,11 +656,11 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$handling = is_numeric($handling) ? $handling : 0;
 		$total = $price + $handling;
 		
-		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-			$total = $mp->shipping_tax_price($total);
+		if ( mp_get_setting('tax->tax_inclusive') && mp_get_setting('tax->tax_shipping') ) {
+			$total = mp()->shipping_tax_price($total);
 		}
 
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total));
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, mp_format_currency('', $total));
 		return $option;
 	}
 

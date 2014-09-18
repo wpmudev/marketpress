@@ -417,7 +417,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 					}
 			
 					//tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-					if ( ! mp()->get_setting('tax->tax_inclusive') ) {
+					if ( ! mp_get_setting('tax->tax_inclusive') ) {
 						$tax_price = (mp()->tax_price(false) + $shipping_tax);
 						$total += $tax_price;
 					}

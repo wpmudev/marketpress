@@ -31,8 +31,8 @@ class WPMUDEV_Field_Checkbox_Group extends WPMUDEV_Field {
 	 */
 	public function display( $post_id = null ) {
 		$width = '100%';
-		if (  count($this->args['options']) > 0 ) {
-			$width = floor(100 / count($this->args['options'])) . '%';
+		if ( count($this->args['options']) > 0 ) {
+			$width = max(floor(100 / count($this->args['options'])), 20) . '%';
 		}
 		
 		$this->before_field(); ?>

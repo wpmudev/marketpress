@@ -29,47 +29,51 @@ label.error:before {
   visibility: hidden;
   width: 100%;
 }
+.postbox.wpmudev-postbox {
+  /* Hide submit buttons for hidden metaboxes */
+
+}
 .postbox.wpmudev-postbox .inside {
   padding: 0;
   /**
-	 * Metabox Desc
-	 */
+		 * Metabox Desc
+		 */
 
   /**
-	 * Tooltips
-	 */
+		 * Tooltips
+		 */
 
   /**
-	 * Advanced Select Field
-	 */
+		 * Advanced Select Field
+		 */
 
   /**
-	 * File Field
-	 */
+		 * File Field
+		 */
 
   /**
-	 * Section Field
-	 */
+		 * Section Field
+		 */
 
   /**
-	 * WYSIWYG Field
-	 */
+		 * WYSIWYG Field
+		 */
 
   /**
-	 * Complex Field
-	 */
+		 * Complex Field
+		 */
 
   /**
-	 * Radio/Checkbox Group
-	 */
+		 * Radio/Checkbox Group
+		 */
 
   /**
-	 * Image Field
-	 */
+		 * Image Field
+		 */
 
   /**
-	 * Repeater Field
-	 */
+		 * Repeater Field
+		 */
 
 }
 .postbox.wpmudev-postbox .inside input[type="text"],
@@ -213,8 +217,12 @@ label.error:before {
 }
 .postbox.wpmudev-postbox .inside .wpmudev-radio-group.horizontal label,
 .postbox.wpmudev-postbox .inside .wpmudev-checkbox-group.horizontal label {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
   float: left;
-  margin-right: 30px;
+  margin-bottom: 10px;
+  padding-right: 30px;
 }
 @media (max-width: 900px) {
   .postbox.wpmudev-postbox .inside .wpmudev-radio-group.horizontal label {
@@ -389,4 +397,7 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-subfield select,
 .postbox.wpmudev-postbox .inside .wpmudev-subfield textarea {
   margin: 0;
+}
+.postbox.wpmudev-postbox[style*="display: none"] + p.submit {
+  display: none;
 }

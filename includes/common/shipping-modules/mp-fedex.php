@@ -96,6 +96,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				),
 			);
 		}
+		
+		return array();
 	}
 
 	/**
@@ -346,11 +348,11 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'size',
-				'label' => array('text' => __('Box Dimensions (inches)', 'mp')),
+				'label' => array('text' => __('Box Dimensions', 'mp')),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'weight',
-				'label' => array('text' => __('Max Weight Per Box (pounds)', 'mp')),
+				'label' => array('text' => __('Max Weight Per Box', 'mp')),
 			));
 		}
   }
@@ -393,11 +395,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* return float $price
 	*/
 	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-		global $mp;
-
-
-		if(! $this->crc_ok())
-		{
+		if( ! $this->crc_ok() ) {
 			//Price added to this object
 			$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
 		}
@@ -515,46 +513,42 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* rate_request - Makes the actual call to fedex
 	*/
 	function rate_request( $international = false ) {
-		global $mp;
-		
 		$shipping_options = $this->get_setting('services', array());
 
 		//Assume equal size packages. Find the best matching box size
-		$diff = floatval($this->get_setting('max_weight', 50));
-		$found = -1;
-		$largest = -1.0;
+		$boxes = $this->get_setting('boxes');
+		$box = $largest_box = false;
+		$index = 1;
+		$box_count = count($boxes);
 
-		foreach ( $this->get_setting('boxes', array()) as $key => $box ) {
-			//Find largest
-			$weight = $box['weight'];
-			if ( $weight > $largest) {
-				$largest = $weight;
-				$found = $key;
+		foreach ( $boxes as $thebox ) {
+			// Find largest box
+			if ( $thebox['weight'] > $this->weight || ($index == $box_count && $box === false) ) {
+				$largest_box = $thebox;
 			}
 			
-			//If weight less
-			if ( floatval($this->weight) <= floatval($weight) ) {
-				$found = $key;
+			if ( floatval($this->weight) <= floatval($thebox['weight']) || ($index == $box_count && $box === false) ) {
+				$box = $thebox;
 				break;
 			}
+			
+			$index ++;
 		}
 		
-		$allowed_weight = min($this->get_setting("boxes->{$found}->weight", 0), $this->get_setting('max_weight', 50));
-		
-		if ( $allowed_weight >= $this->weight ) {
+		if ( $box['weight'] >= $this->weight ) {
 			$this->pkg_count = 1;
 			$this->pkg_weight = $this->weight;
 		} else {
-			$this->pkg_count = ceil($this->weight / $allowed_weight); // Avoid zero
+			$this->pkg_count = ceil($this->weight / $box['weight']); // Avoid zero
 			$this->pkg_weight = $this->weight / $this->pkg_count;
 		}
-
+		
 		// Fixup pounds by converting multiples of 16 ounces to pounds
 		$this->pounds = intval($this->pkg_weight);
 		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
 		//found our box
-		$dims = explode('x', strtolower($this->get_setting("boxes->{$found}->size", '')));
+		$dims = explode('x', strtolower($box['size']));
 		foreach($dims as &$dim) $dim = $this->as_inches($dim);
 
 		sort($dims); //Sort so two lowest values are used for Girth
@@ -725,7 +719,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
+		$_SESSION['mp_cart_crc'] = $this->crc(mp()->get_cart_cookie());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
 
 		unset($xpath);
@@ -749,8 +743,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* @return boolean true | false
 	*/
 	private function crc_ok(){
-		global $mp;
-
 		//Assume it changed
 		$result = false;
 
@@ -760,7 +752,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			//Did the cart change since last calculation
 			if ( is_numeric($_SESSION['mp_shipping_info']['shipping_cost'])){
 
-				if($_SESSION['mp_cart_crc'] == $this->crc($mp->get_cart_cookie())){
+				if($_SESSION['mp_cart_crc'] == $this->crc(mp()->get_cart_cookie())){
 					//Did the shipping info change
 					if($_SESSION['mp_shipping_crc'] == $this->crc($_SESSION['mp_shipping_info'])){
 						$result = true;
@@ -792,11 +784,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*
 	*/
 	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
-		global $mp;
 		if ( in_array($shipping_option, $this->services) ) {
 			$option = $this->services[$shipping_option]->name;
-		}
-		elseif (  in_array($shipping_option, $this->intl_services) ) {
+		} elseif (  in_array($shipping_option, $this->intl_services) ) {
 			$option = $this->intl_services[$shipping_option]->name;
 		}
 
@@ -804,11 +794,11 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$handling = is_numeric($handling) ? $handling : 0;
 		$total = $price + $handling;
 		
-		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-			$total = $mp->shipping_tax_price($total);
+		if ( mp_get_setting('tax->tax_inclusive') && mp_get_setting('tax->tax_shipping') ) {
+			$total = mp()->shipping_tax_price($total);
 		}
 
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total) );
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, mp_format_currency('', $total) );
 		return $option;
 	}
 

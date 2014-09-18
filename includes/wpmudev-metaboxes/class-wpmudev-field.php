@@ -299,7 +299,6 @@ class WPMUDEV_Field {
 			$value = $this->get_post_value($post_key, null);
 		}
 		
-		
 		if ( is_null($meta_key) ) {
 			$meta_key = $this->get_meta_key();
 		}
@@ -492,8 +491,9 @@ class WPMUDEV_Field {
 		 * @since 1.0
 		 * @param mixed $value The return value
 		 * @param object $this Refers to the current field object
-		 */	
-		return apply_filters('wpmudev_field_format_value', $value, $this);
+		 */
+		$value = apply_filters('wpmudev_field_format_value', $value, $this);
+		return apply_filters('wpmudev_field_format_value_' . $this->args['name'], $value, $this);
 	}
 	
 	/**
@@ -546,8 +546,9 @@ class WPMUDEV_Field {
 		 * @param mixed $value The current value
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
-		 */	
-		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
+		 */
+		$value = apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
+		return apply_filters('wpmudev_field_sanitize_for_db_' . $this->args['name'], $value, $post_id, $this);
 	}
 	
 	/**
@@ -670,7 +671,7 @@ class WPMUDEV_Field {
 	 */
 	public function get_id() {
 		if ( empty($this->args['id']) ) {
-			$this->args['id'] = 'mp-field-' . uniqid(true);
+			$this->args['id'] = 'wpmudev-field-' . uniqid(true);
 		}
 
 		/**
@@ -695,6 +696,7 @@ class WPMUDEV_Field {
 		 *
 		 * @since 3.0
 		 * @access public
+		 * @param string $text The current text.
 		 * @param WPMUDEV_Field The current field object.
 		 */
 		$text = apply_filters('wpmudev_field_before_field', $this->args['before_field'], $this);
@@ -715,6 +717,7 @@ class WPMUDEV_Field {
 		 *
 		 * @since 3.0
 		 * @access public
+		 * @param string $text The current text.
 		 * @param WPMUDEV_Field The current field object.
 		 */
 		$text = apply_filters('wpmudev_field_after_field', $this->args['after_field'], $this);
