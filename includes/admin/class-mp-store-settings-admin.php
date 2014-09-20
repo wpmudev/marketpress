@@ -78,7 +78,7 @@ class MP_Store_Settings_Admin {
 jQuery(document).ready(function($){
 	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
 	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=product"]').addClass('current').parent().addClass('current');
+	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=mp_product"]').addClass('current').parent().addClass('current');
 });
 </script>
 		<?php

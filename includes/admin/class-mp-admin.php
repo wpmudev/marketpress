@@ -74,7 +74,7 @@ class MP_Admin {
 		
 		$post_type = get_post_type($post_ID);
 		
-		if ( $post_type != 'mp_order' && $post_type != 'product' && $post_type != 'mp_coupon' ) { return $messages; }
+		if ( $post_type != 'mp_order' && $post_type != 'mp_product' && $post_type != 'mp_coupon' ) { return $messages; }
 		
 		$obj = get_post_type_object($post_type);
 		$singular = $obj->labels->singular_name;
@@ -115,8 +115,8 @@ class MP_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', array(&$this, 'admin_page'));
 		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=product'); 
-		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=product');		
+		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=mp_product'); 
+		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=mp_product');		
 		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', array(&$this, 'admin_page'));
 
 		if ( ! defined('WPMUDEV_REMOVE_BRANDING') ) {

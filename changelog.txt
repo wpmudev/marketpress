@@ -8,15 +8,17 @@ Change Log:
 3.0 beta 1
 ----------------------------------------------------------------------
 - TONS of code cleanup/optimizations.
-- New: Bahrain Dinars to the list of available currencies.
-- New: mp_currencies filter for adding non-default currencies.
-- New: links to settings/network settings on plugins page.
-- New: settings metaboxes now use ajax instead of page refresh where applicable.
-- New: screen options tab on orders screen - users can now specify how many orders per page they want.
-- New: on demand data validation on most settings screens.
-- New: short codes can now be inserted via a popup wizard that is available from within the TinyMCE editor.
-- Removed: Google Checkout payment gateway. This will eventually be replaced by Google Wallet.
-- Fixed: some Strict Standards notices in PIN and Simplify gateways.
+- New: Short codes can now be inserted via a popup wizard that is available from within the TinyMCE editor.
+- New: Product variations have been rebuilt from the ground up!
+_ Added ability to assign attributes to products.
+- Added Bahrain Dinars to the list of available currencies.
+- Added mp_currencies filter for adding non-default currencies.
+- Added links to settings/network settings on plugins page.
+- Settings metaboxes now use ajax instead of page refresh where applicable.
+- Added screen options tab on orders screen - users can now specify how many orders per page they want.
+- Added on-demand (jQuery) data validation on most settings screens.
+- Removed Google Checkout payment gateway. This will eventually be replaced by Google Wallet.
+- Fixed some Strict Standards notices in PIN and Simplify gateways.
 
 2.9 - 1/22/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowher
 ----------------------------------------------------------------------

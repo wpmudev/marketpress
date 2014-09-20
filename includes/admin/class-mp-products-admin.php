@@ -56,7 +56,7 @@ class MP_Products_Screen {
 	 * @access public
 	 */
 	public function remove_menu_items() {
-		remove_submenu_page('edit.php?post_type=product', 'post-new.php?post_type=product');
+		remove_submenu_page('edit.php?post_type=mp_product', 'post-new.php?post_type=mp_product');
 	}
 
 	/**
@@ -81,7 +81,7 @@ class MP_Products_Screen {
 	 */
 	public function get_product_variations( $value, $post_id, $raw, $field ) {
 		$variations = new WP_Query(array(
-			'post_type' => 'product_variation',
+			'post_type' => 'mp_product_variation',
 			'posts_per_page' => -1,
 			'orderby' => 'menu_order',
 			'order' => 'ASC',
@@ -131,7 +131,7 @@ class MP_Products_Screen {
 								'post_content' => mp_arr_get_value('description', $fields, ''),
 								'post_title' => 'Product Variation of ' . $post_id,
 								'post_status' => 'publish',
-								'post_type' => 'product_variation',
+								'post_type' => 'mp_product_variation',
 								'post_parent' => $post_id,
 								'menu_order' => $outer_index,
 							));
@@ -191,7 +191,7 @@ class MP_Products_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-product-details-metabox',
 			'title' => __('Product Details', 'mp'),
-			'post_type' => 'product',
+			'post_type' => 'mp_product',
 			'context' => 'normal',
 		));
 		$metabox->add_field('radio_group', array(
@@ -323,7 +323,7 @@ class MP_Products_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-product-variations-metabox',
 			'title' => __('Variations', 'mp'),
-			'post_type' => 'product',
+			'post_type' => 'mp_product',
 			'context' => 'normal',
 		));
 		$metabox->add_field('checkbox', array(
@@ -499,7 +499,7 @@ class MP_Products_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-product-attributes-metabox',
 			'title' => __('Attributes', 'mp'),
-			'post_type' => 'product',
+			'post_type' => 'mp_product',
 			'context' => 'normal',
 		));
 		

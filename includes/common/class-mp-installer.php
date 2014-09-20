@@ -218,6 +218,20 @@ class MP_Installer {
 	}
 	
 	/**
+	 * Updates the product post type
+	 *
+	 * Updates the product post type to avoid conflicts with WooCommerce
+	 *
+	 * @since 3.0
+	 * @access private
+	 * @uses $wpdb
+	 */
+	private function _update_product_post_type() {
+		global $wpdb;
+		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type' => 'product'));
+	}
+	
+	/**
 	 * Runs on 3.0 update.
 	 *
 	 * @since 3.0
@@ -228,6 +242,7 @@ class MP_Installer {
 		$this->_backup_legacy_settings($settings);
 		$this->_update_coupon_schema();
 		$this->_create_product_attributes_table();
+		$this->_update_product_post_type();
 		$settings = $this->_update_notification_settings($settings);
 		$settings = $this->_update_presentation_settings($settings);
 		
