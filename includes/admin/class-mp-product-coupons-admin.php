@@ -131,7 +131,7 @@ class MP_Product_Coupons_Screen {
 			'validation' => array('required' => true),
 			'multiple' => true,
 			'placeholder' => __('Select Products', 'mp'),
-			'query' => array('post_type' => 'product', 'posts_per_page' => 20),
+			'query' => array('post_type' => 'mp_product', 'posts_per_page' => 20),
 			'label' => array('text' => __('Product', 'mp')),
 			'conditional' => array(
 				'name' => 'applies_to',
