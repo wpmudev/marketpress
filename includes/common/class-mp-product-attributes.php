@@ -101,7 +101,7 @@ class MP_Product_Attributes {
 		$product_atts = MP_Product_Attributes::get_instance();
 		
 		foreach ( $atts as $att ) {
-			register_taxonomy($product_atts->generate_slug($att->attribute_id), 'product', array(
+			register_taxonomy($product_atts->generate_slug($att->attribute_id), 'mp_product', array(
 				'show_ui' => false,
 				'show_in_nav_menus' => false,
 				'hierarchical' => true,

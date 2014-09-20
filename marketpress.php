@@ -155,7 +155,7 @@ class Marketpress {
 		global $wp_version;
 		
 		//! Register product_category taxonomy
-		register_taxonomy('product_category', 'product', apply_filters('mp_register_product_category', array(
+		register_taxonomy('product_category', 'mp_product', apply_filters('mp_register_product_category', array(
 			'hierarchical' => true,
 			'label' => __('Product Categories', 'mp'),
 			'singular_label' => __('Product Category', 'mp'),
@@ -173,7 +173,7 @@ class Marketpress {
 		)));
 		
 		//! Register product_tag taxonomy
-		register_taxonomy('product_tag', 'product', apply_filters('mp_register_product_tag', array(
+		register_taxonomy('product_tag', 'mp_product', apply_filters('mp_register_product_tag', array(
 			'hierarchical' => false,
 			'label' => __('Product Tags', 'mp'),
 			'singular_label' => __('Product Tag', 'mp'),

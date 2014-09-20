@@ -292,7 +292,7 @@ class MP_Product_Coupons_Screen {
 	 */
 	public function add_menu_items() {
 		//manage coupons
-		add_submenu_page('edit.php?post_type=product', __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=product_coupon');
+		add_submenu_page('edit.php?post_type=mp_product', __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=product_coupon');
 	}
 	
 	/**
