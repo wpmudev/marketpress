@@ -120,15 +120,15 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			if ( action == 'show' ) {
 				if ( operator == 'AND' ) {
 					if ( testConditionals(conditionals) != conditionals.length ) {
-						$container.hide();
+						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show();
+						$container.show().next('p.submit').show();
 					}
 				} else {
 					if ( testConditionals(conditionals) == 0 ) {
-						$container.hide();
+						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show();
+						$container.show().next('p.submit').show();
 					}
 				}
 			}
@@ -136,15 +136,15 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			if ( action == 'hide' ) {
 				if ( operator == 'AND' ) {
 					if ( testConditionals(conditionals) == conditionals.length ) {
-						$container.hide();
+						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show();
+						$container.show().next('p.submit').show();
 					}
 				} else {
 					if ( testConditionals(conditionals) > 0 ) {
-						$container.hide();
+						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show();
+						$container.show().next('p.submit').show();
 					}
 				}
 			}

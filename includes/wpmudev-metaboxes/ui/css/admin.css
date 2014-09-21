@@ -29,10 +29,6 @@ label.error:before {
   visibility: hidden;
   width: 100%;
 }
-.postbox.wpmudev-postbox {
-  /* Hide submit buttons for hidden metaboxes */
-
-}
 .postbox.wpmudev-postbox .inside {
   padding: 0;
   /**
@@ -397,7 +393,4 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-subfield select,
 .postbox.wpmudev-postbox .inside .wpmudev-subfield textarea {
   margin: 0;
-}
-.postbox.wpmudev-postbox[style*="display: none"] + p.submit {
-  display: none;
 }
