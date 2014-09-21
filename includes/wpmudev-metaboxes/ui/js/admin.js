@@ -39,7 +39,27 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	jQuery(document).ready(function($){
 		initValidation();
 		initRowShading();
+		initToolTips();
 	});
+	
+	var initToolTips = function(){
+		$('.wpmudev-field').on('click', '.wpmudev-metabox-tooltip', function(){
+			var $this = $(this),
+					$button = $this.find('.wpmudev-metabox-tooltip-button');
+			
+			if ( $button.length == 0 ) {
+				$this.children('span').append('<a class="wpmudev-metabox-tooltip-button" href="#">x</a>');
+			}
+			
+			$this.children('span').fadeIn(250);
+		});
+		
+		$('.wpmudev-field').on('click', '.wpmudev-metabox-tooltip-button', function(e){
+			e.preventDefault();
+			e.stopPropagation();
+			$(this).parent().fadeOut(250);
+		});
+	}
 	
 	var initRowShading = function(){
 		$('.wpmudev-postbox').each(function(){
