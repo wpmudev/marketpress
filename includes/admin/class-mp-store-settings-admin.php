@@ -40,11 +40,11 @@ class MP_Store_Settings_Admin {
 
 		if ( mp_get_get_value('action') == 'mp_add_product_attribute' || mp_get_get_value('action') == 'mp_edit_product_attribute' ) {
 			MP_Product_Attributes_Admin::add_product_attribute_metaboxes();
-			add_filter('wpmudev_field_save_value', array('MP_Product_Attributes_Admin', 'save_product_attribute'), 10, 3);
+			add_action('wpmudev_metabox/before_save_fields/mp-store-settings-product-attributes-add', array('MP_Product_Attributes_Admin', 'save_product_attribute'));
 			add_action('store-settings_page_store-settings-productattributes', array(&$this, 'display_settings_form'));
 			
 			if ( mp_get_get_value('action') == 'mp_edit_product_attribute' ) {
-				add_filter('wpmudev_field_get_value', array('MP_Product_Attributes_Admin', 'get_product_attribute_value'), 10, 4);	
+				add_filter('wpmudev_field/get_value', array('MP_Product_Attributes_Admin', 'get_product_attribute_value'), 10, 4);	
 			}
 		} else {
 			$screen_ids = array(
@@ -76,7 +76,7 @@ class MP_Store_Settings_Admin {
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
+	$('#menu-posts-mp_product, #menu-posts-mp_product > a').removeClass('wp-menu-open wp-has-current-submenu');
 	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
 	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=mp_product"]').addClass('current').parent().addClass('current');
 });
@@ -95,9 +95,9 @@ jQuery(document).ready(function($){
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('#menu-posts-product, #menu-posts-product > a').removeClass('wp-menu-open wp-has-current-submenu');
+	$('#menu-posts-mp_product, #menu-posts-mp_product > a').removeClass('wp-menu-open wp-has-current-submenu');
 	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_category&post_type=product"]').addClass('current').parent().addClass('current');
+	$('a[href="edit-tags.php?taxonomy=product_category&post_type=mp_product"]').addClass('current').parent().addClass('current');
 });
 </script>
 		<?php
@@ -174,7 +174,12 @@ jQuery(document).ready(function($){
 	<div class="mp-settings">
 	 	<form id="mp-main-form" method="post" action="<?php echo add_query_arg(array()); ?>">
 			<?php
-			do_action('wpmudev_metaboxes_settings'); ?>
+			/**
+			 * Render WPMUDEV Metabox settings
+			 *
+			 * @since 3.0
+			 */
+			do_action('wpmudev_metabox/render_settings_metaboxes'); ?>
 		</form>
 	</div>
 </div>

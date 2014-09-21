@@ -163,16 +163,11 @@ th.column-ID {
 	 * Saves the product attribute
 	 *
 	 * @since 3.0
-	 * @access private
-	 * @filter wpmudev_field_save_value
+	 * @action wpmudev_metabox_before_save_fields
 	 * @uses $wpdb
 	 */
-	public function save_product_attribute($value, $post_id, $field) {
+	public function save_product_attribute( $metabox ) {
 		global $wpdb;
-		
-		if ( $field->args['name'] != 'product_attribute_terms' ) {
-			return $value;
-		}
 		
 		$product_atts = MP_Product_Attributes::get_instance();
 		$table_name = MP_Product_Attributes::get_instance()->get_table_name();
@@ -197,7 +192,7 @@ th.column-ID {
 			//insert terms
 			foreach ( mp_get_post_value('product_attribute_terms->name->new', array()) as $key => $term_name ) {
 				if ( $term_slug = mp_get_post_value('product_attribute_terms->slug->new->' . $key) ) {
-					wp_insert_term($term_name, $attribute_slug, array('slug' => substr(sanitize_key($term_name), 0, 32)));
+					wp_insert_term($term_name, $attribute_slug, array('slug' => substr(sanitize_key($term_slug), 0, 32)));
 				} else {
 					wp_insert_term($term_name, $attribute_slug);
 				}
@@ -275,7 +270,7 @@ jQuery(document).ready(function($){
 			return;
 		}
 		
-		var slug = $this.val().toLowerCase().replace(' ', '-').replace('[^a-z0-9]', '');
+		var slug = $this.val().toLowerCase().replace(/ /ig, '-').replace(/[^a-z0-9-]/ig, '');
 		
 		$slugField.val(slug);
 	});
@@ -291,7 +286,7 @@ jQuery(document).ready(function($){
 	 * @access private
 	 */	
 	private function __construct() {
-		add_action('wpmudev_field_print_scripts', array(&$this, 'product_attribute_scripts'));
+		add_action('wpmudev_field/print_scripts', array(&$this, 'product_attribute_scripts'));
 	}
 }
 

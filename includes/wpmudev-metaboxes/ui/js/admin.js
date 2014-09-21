@@ -11,7 +11,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		$(':checkbox, :radio, select').change(initConditionals);
 	}
 	
-	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e){
+	$(document).on('wpmudev_repeater_field/after_add_field_group', function(e){
 		initConditionals();
 	});
 	

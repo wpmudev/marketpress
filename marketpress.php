@@ -221,7 +221,7 @@ class Marketpress {
 			'public' => false,
 			'publicly_queryable' => true,
 			'show_ui' => true,
-			'show_in_menu' => false,	// we're going to use admin_menu hook so we can require manage_options cap to edit
+			'show_in_menu' => false,
 			'supports' => array(''),
 		));
 

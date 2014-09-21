@@ -141,7 +141,7 @@ class WPMUDEV_Field {
 		
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_scripts'));
-		add_action('wpmudev_metaboxes_save_fields', array(&$this, 'save_value'));
+		add_action('wpmudev_metabox/save_fields', array(&$this, 'save_value'));
 		
 		if ( ! $this->scripts_printed() ) {
 			add_action('in_admin_footer', array(&$this, 'print_scripts'));
@@ -311,8 +311,8 @@ class WPMUDEV_Field {
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */
-		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
-		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $value, $post_id, $this);
+		$value = apply_filters('wpmudev_field/save_value', $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field/save_value/' . $this->args['name'], $value, $post_id, $this);
 
 		if ( is_null($value) ) {
 			return;
@@ -451,8 +451,8 @@ class WPMUDEV_Field {
 		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 		 * @param object $this Refers to the current field object		 
 		 */
-		$value = apply_filters('wpmudev_field_get_value', $value, $post_id, $raw, $this);
-		$value = apply_filters('wpmudev_field_get_value_' . $this->args['name'], $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field/get_value', $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field/get_value/' . $this->args['name'], $value, $post_id, $raw, $this);
 		
 		if ( is_null($value) || $value === false ) {
 			$value = $this->args['default_value'];
@@ -492,8 +492,8 @@ class WPMUDEV_Field {
 		 * @param mixed $value The return value
 		 * @param object $this Refers to the current field object
 		 */
-		$value = apply_filters('wpmudev_field_format_value', $value, $this);
-		return apply_filters('wpmudev_field_format_value_' . $this->args['name'], $value, $this);
+		$value = apply_filters('wpmudev_field/format_value', $value, $this);
+		return apply_filters('wpmudev_field/format_value/' . $this->args['name'], $value, $this);
 	}
 	
 	/**
@@ -547,8 +547,8 @@ class WPMUDEV_Field {
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */
-		$value = apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
-		return apply_filters('wpmudev_field_sanitize_for_db_' . $this->args['name'], $value, $post_id, $this);
+		$value = apply_filters('wpmudev_field/sanitize_for_db', $value, $post_id, $this);
+		return apply_filters('wpmudev_field/sanitize_for_db/' . $this->args['name'], $value, $post_id, $this);
 	}
 	
 	/**
@@ -559,13 +559,13 @@ class WPMUDEV_Field {
 	 */
 	public function print_scripts() {
 		/**
-		 * Triggered when the field's scripts are printed.
+		 * Runs when the field's scripts are printed.
 		 *
 		 * @since 1.0
 		 * @param object $this The current field object.
 		 */
-		do_action('wpmudev_field_print_scripts', $this);
-		do_action('wpmudev_field_print_scripts_' . $this->args['name'], $this);
+		do_action('wpmudev_field/print_scripts', $this);
+		do_action('wpmudev_field/print_scripts/' . $this->args['name'], $this);
 	}
 	
 	/**
@@ -659,7 +659,7 @@ class WPMUDEV_Field {
 		 * @param string $atts The field's attributes
 		 * @param object $this Refers to the current field object
 		 */
-		return apply_filters('wpmudev_field_parse_atts', $atts, $this);
+		return apply_filters('wpmudev_field/parse_atts', $atts, $this);
 	}
 	
 	/**
@@ -681,7 +681,7 @@ class WPMUDEV_Field {
 		 * @param string $id
 		 * @param object $this Refers to the current field object
 		 */		
-		return apply_filters('wpmudev_field_get_id', $this->args['id'], $this);
+		return apply_filters('wpmudev_field/get_id', $this->args['id'], $this);
 	}
 	
 	/**
@@ -699,8 +699,8 @@ class WPMUDEV_Field {
 		 * @param string $text The current text.
 		 * @param WPMUDEV_Field The current field object.
 		 */
-		$text = apply_filters('wpmudev_field_before_field', $this->args['before_field'], $this);
-		$text = apply_filters('wpmudev_field_before_field_' . $this->args['name'], $text, $this);
+		$text = apply_filters('wpmudev_field/before_field', $this->args['before_field'], $this);
+		$text = apply_filters('wpmudev_field/before_field/' . $this->args['name'], $text, $this);
 		
 		echo $text;
 	}
@@ -720,8 +720,8 @@ class WPMUDEV_Field {
 		 * @param string $text The current text.
 		 * @param WPMUDEV_Field The current field object.
 		 */
-		$text = apply_filters('wpmudev_field_after_field', $this->args['after_field'], $this);
-		$text = apply_filters('wpmudev_field_after_field_' . $this->args['name'], $text, $this);
+		$text = apply_filters('wpmudev_field/after_field', $this->args['after_field'], $this);
+		$text = apply_filters('wpmudev_field/after_field/' . $this->args['name'], $text, $this);
 		
 		echo $text;
 	}

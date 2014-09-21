@@ -21,11 +21,11 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 		?>
 <script type="text/javascript">
 (function($){	
-	$(document).on('wpmudev_repeater_field_before_add_field_group', function(e){
+	$(document).on('wpmudev_repeater_field/before_add_field_group', function(e){
 		$('.wpmudev-datepicker-field').datepicker('destroy');
 	});
 	
-	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e, $group){
+	$(document).on('wpmudev_repeater_field/after_add_field_group', function(e, $group){
 		$('.wpmudev-datepicker-field').each(function(){
 			var $this = $(this);
 			
@@ -97,7 +97,9 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 			$value = date_i18n(get_option('date_format'), $value);
 		}
 		
-		return apply_filters('wpmudev_field_format_value', $value, $post_id, $this);
+		// These filters are defined in class-wpmudev-field.php
+		$value = apply_filters('wpmudev_field/format_value', $value, $post_id, $this);
+		return apply_filters('wpmudev_field/format_value/' . $this->args['name'], $value, $post_id, $this);
 	}
 
 	/**
@@ -109,7 +111,9 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 */	
 	public function sanitize_for_db( $value ) {
 		$value = $this->is_timestamp($value) ? date('Y-m-d', $value) : $value;
-		return apply_filters('wpmudev_field_sanitize_for_db', $value, $post_id, $this);
+		// These filters are defined in class-wpmudev-field.php
+		$value = apply_filters('wpmudev_field/sanitize_for_db', $value, $post_id, $this);
+		return apply_filters('wpmudev_field/sanitize_for_db/' . $this->args['name'], $value, $post_id, $this);
 	}
 		
 	/**

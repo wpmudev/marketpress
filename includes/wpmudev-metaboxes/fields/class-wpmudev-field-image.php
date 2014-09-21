@@ -49,7 +49,7 @@ jQuery(document).ready(function($){
 	/*
 	 * When adding a new group to the repeater field reset the image preview back to a button
 	 */
-	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e, $group){
+	$(document).on('wpmudev_repeater_field/after_add_field_group', function(e, $group){
 		$group.find('.wpmudev-image-field-preview').replaceWith(buttonHtml)
 	});
 

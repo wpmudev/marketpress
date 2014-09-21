@@ -34,13 +34,13 @@ class MP_Products_Screen {
 		// Remove add-new submenu item from store admin menu
 		add_action('admin_menu', array(&$this, 'remove_menu_items'), 999);
 		// Product variations save/get value
-		add_filter('wpmudev_field_save_value_variations', array(&$this, 'save_product_variations'), 10, 3);
-		add_filter('wpmudev_field_get_value_variations', array(&$this, 'get_product_variations'), 10, 4);
+		add_filter('wpmudev_field/save_value/variations', array(&$this, 'save_product_variations'), 10, 3);
+		add_filter('wpmudev_field/get_value/variations', array(&$this, 'get_product_variations'), 10, 4);
 		// Product attributes save/get value
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
-			add_filter('wpmudev_field_save_value_' . $mp_product_atts->generate_slug($att->attribute_id), array(&$this, 'save_product_attribute'), 10, 3);
+			add_filter('wpmudev_field/save_value/' . $mp_product_atts->generate_slug($att->attribute_id), array(&$this, 'save_product_attribute'), 10, 3);
 		}
 		
 		// Init metaboxes

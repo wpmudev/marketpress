@@ -49,9 +49,9 @@ class MP_Store_Settings_General {
 	 * @access private
 	 */
 	private function __construct() {
-		add_action('wpmudev_field_print_scripts_base_country', array(&$this, 'update_states_dropdown'));
-		add_filter('wpmudev_field_get_value_tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
-		add_filter('wpmudev_field_sanitize_for_db_tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
+		add_action('wpmudev_field/print_scripts/base_country', array(&$this, 'update_states_dropdown'));
+		add_filter('wpmudev_field/get_value/tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
+		add_filter('wpmudev_field/sanitize_for_db/tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
 		
 		$this->init_location_settings();
 		$this->init_tax_settings();

@@ -185,8 +185,8 @@ class WPMUDEV_Metabox {
 		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
-		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'));
-		add_action('wpmudev_metaboxes_settings', array(&$this, 'maybe_render'), $this->args['order']);
+		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'), $this->args['order']);
+		add_action('wpmudev_metabox/render_settings_metaboxes', array(&$this, 'maybe_render'), $this->args['order']);
 		add_action('save_post', array(&$this, 'save_fields'));
 		add_action('admin_init', array(&$this, 'maybe_save_settings_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
@@ -514,19 +514,28 @@ class WPMUDEV_Metabox {
 			// Bail - nonce is not set or could not be verified
 			return;
 		}
-		
+
 		// Avoid infinite loops later (e.g. when calling wp_insert_post, etc)
 		remove_action('save_post', array(&$this, 'save_fields'));
-		
+
+		/**
+		 * Runs right before save_fields is run, but after nonces have been verified.
+		 *
+		 * @since 3.0
+		 * @param WPMUDEV_Metabox $this The current metabox
+		 */
+		do_action('wpmudev_metabox/before_save_fields', $this);
+		do_action('wpmudev_metabox/before_save_fields/' . $this->args['id'], $this);
+				
 		// For settings metaboxes we don't want to call the internal save methods for each field
 		if ( ! is_numeric($post_id) ) {
 			$settings = get_option($post_id, array());
-			
+
 			foreach ( $this->fields as $field ) {
 				$post_key = $field->get_post_key($field->args['name']);
-				
+				$value = $field->get_post_value($post_key);
+
 				if ( $field instanceof WPMUDEV_Field_Repeater ) {
-					$value = $field->get_post_value($post_key);
 					$values = $field->sort_subfields($value);
 					
 					if ( count($values) == 2 ) {
@@ -543,7 +552,7 @@ class WPMUDEV_Metabox {
 					
 					$value = $values;
 				} else {
-					$value = $field->sanitize_for_db($field->get_post_value($post_key));
+					$value = $field->sanitize_for_db($value);
 				}
 				
 				$settings = $this->push_to_array($settings, $post_key, $value);
@@ -557,9 +566,9 @@ class WPMUDEV_Metabox {
 			 * @since 3.0
 			 * @param WPMUDEV_Metabox $this The metabox that was saved.
 			 */
-			do_action('wpmudev_metaboxes_settings_metabox_saved', $this);
+			do_action('wpmudev_metabox/settings_metabox_saved', $this);
 			
-			if ( did_action('wpmudev_metaboxes_settings_metabox_saved') == count(self::$metaboxes) ) {
+			if ( did_action('wpmudev_metabox/settings_metabox_saved') == count(self::$metaboxes) ) {
 				// Redirect to avoid accidental saves on page refresh
 				wp_redirect(add_query_arg('wpmudev_metabox_settings_saved', 1), 301);
 				exit;
@@ -582,7 +591,7 @@ class WPMUDEV_Metabox {
 			 * @since 3.0
 			 * @param int $post_id Post ID.
 			 */
-			do_action('wpmudev_metaboxes_save_fields', $post_id);
+			do_action('wpmudev_metabox/save_fields', $post_id);
 		}
 	}
 	
@@ -722,7 +731,7 @@ class WPMUDEV_Metabox {
 	 * @return WPMUDEV_Field
 	 */
 	public function add_field( $type, $args = array() ) {		
-		$class = apply_filters('wpmudev_metabox_add_field', 'WPMUDEV_Field_' . ucfirst($type), $type, $args);
+		$class = 'WPMUDEV_Field_' . ucfirst($type);
 				
 		if ( ! class_exists($class) || ! $this->is_active() ) {
 			return false;	

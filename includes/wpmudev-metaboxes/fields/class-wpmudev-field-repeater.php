@@ -59,8 +59,8 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */
-		$value = apply_filters('wpmudev_field_save_value', $this->sanitize_for_db($value), $post_id, $this);
-		$value = apply_filters('wpmudev_field_save_value_' . $this->args['name'], $value, $post_id, $this);
+		$value = apply_filters('wpmudev_field/save_value', $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field/save_value_' . $this->args['name'], $value, $post_id, $this);
 		
 		if ( is_null($value) ) {
 			return;
@@ -118,8 +118,8 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 		 * @param object $this Refers to the current field object		 
 		 */
-		$value = apply_filters('wpmudev_field_get_value', $value, $post_id, $raw, $this);
-		$value = apply_filters('wpmudev_field_get_value_' . $this->args['name'], $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field/get_value', $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field/get_value/' . $this->args['name'], $value, $post_id, $raw, $this);
 		
 		if ( is_null($value) ) {
 			$this->_value = $value = $this->args['default_value'];
@@ -357,7 +357,7 @@ jQuery(document).ready(function($){
 			 * @since 1.0
 			 * @param object
 			 */
-			$(document).trigger('wpmudev_repeater_field_start_sort', [ ui.item ]);
+			$(document).trigger('wpmudev_repeater_field/start_sort', [ ui.item ]);
 		},
 		"stop" : function(e, ui) {
 			ui.item.siblings().andSelf().each(function(i){
@@ -370,7 +370,7 @@ jQuery(document).ready(function($){
 			 * @since 1.0
 			 * @param object
 			 */			
-			$(document).trigger('wpmudev_repeater_field_stop_sort', [ ui.item ]);
+			$(document).trigger('wpmudev_repeater_field/stop_sort', [ ui.item ]);
 		},
 		"helper" : function(e, ui){
 			ui.children().each(function() {
@@ -415,7 +415,7 @@ jQuery(document).ready(function($){
 			 * @since 1.0
 			 * @param object
 			 */
-			$(document).trigger('wpmudev_repeater_field_after_delete_field_group', [ $subfieldGroup ]);
+			$(document).trigger('wpmudev_repeater_field/after_delete_field_group', [ $subfieldGroup ]);
 
 			$subfieldGroup.remove();
 			$siblings.each(function(i){
@@ -430,7 +430,7 @@ jQuery(document).ready(function($){
 		 *
 		 * @since 1.0
 		 */
-		$(document).trigger('wpmudev_repeater_field_before_add_field_group');
+		$(document).trigger('wpmudev_repeater_field/before_add_field_group');
 
 		var $btn = $(this),
 				$subfields = $btn.closest('.wpmudev-field').find('.wpmudev-subfields'),
@@ -478,7 +478,7 @@ jQuery(document).ready(function($){
 		 * @since 1.0
 		 * @param object group
 		 */
-		$(document).trigger('wpmudev_repeater_field_after_add_field_group', [ $clonedRow ]);
+		$(document).trigger('wpmudev_repeater_field/after_add_field_group', [ $clonedRow ]);
 		
 		$('.wpmudev-subfields').sortable('refresh'); //so the new row is recognized by the sortable plugin
 		$('.wpmudev-subfield-delete-group-link').show();
@@ -496,7 +496,7 @@ jQuery(document).ready(function($){
 	 * @return WPMUDEV_Field
 	 */
 	public function add_sub_field( $type, $args ) {
-		$class = apply_filters('wpmudev_field_repeater_add_sub_field', 'WPMUDEV_Field_' . ucfirst($type), $type, $args);
+		$class = 'WPMUDEV_Field_' . ucfirst($type);
 		
 		if ( ! class_exists($class) ) {
 			return false;	

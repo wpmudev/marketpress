@@ -136,7 +136,8 @@ jQuery(document).ready(function($){
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */	
-		return apply_filters('wpmudev_field_format_value', $value, $post_id, $this);		
+		$value = apply_filters('wpmudev_field/format_value', $value, $post_id, $this);		
+		return apply_filters('wpmudev_field/format_value/' . $this->args['name'], $value, $post_id, $this);
 	}
 
 	/**
