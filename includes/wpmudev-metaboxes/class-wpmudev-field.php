@@ -142,10 +142,7 @@ class WPMUDEV_Field {
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_scripts'));
 		add_action('wpmudev_metabox/save_fields', array(&$this, 'save_value'));
-		
-		if ( ! $this->scripts_printed() ) {
-			add_action('in_admin_footer', array(&$this, 'print_scripts'));
-		}
+		add_action('in_admin_footer', array(&$this, 'maybe_print_scripts'));
 		
 		$this->init_conditional_logic();
 		$this->init_validation();
@@ -558,6 +555,15 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function print_scripts() {
+	}
+	
+	/**
+	 * Determines if the field's print_scripts function should be called
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function maybe_print_scripts() {
 		/**
 		 * Runs when the field's scripts are printed.
 		 *
@@ -565,7 +571,11 @@ class WPMUDEV_Field {
 		 * @param object $this The current field object.
 		 */
 		do_action('wpmudev_field/print_scripts', $this);
-		do_action('wpmudev_field/print_scripts/' . $this->args['name'], $this);
+		do_action('wpmudev_field/print_scripts/' . $this->args['name'], $this);		
+	
+		if ( ! $this->scripts_printed() ) {
+			$this->print_scripts();
+		}
 	}
 	
 	/**
