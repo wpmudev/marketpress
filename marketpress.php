@@ -2718,9 +2718,7 @@ Thanks again!", 'mp')
 	}
 	
 	//returns the calculated price for shipping after tax. For display only.
-	function shipping_tax_price($shipping_price) {
-
-		if ( !$this->get_setting('tax->tax_shipping') || !$this->get_setting('tax->tax_inclusive') )
+	function shipping_tax_price( $shipping_price ) {
 			return $shipping_price;
 		
 	 //get address
@@ -2866,8 +2864,13 @@ Thanks again!", 'mp')
 	$special_total = array_sum($special_totals);
 	
 	//add in shipping?
+	$shipping_tax = 0;
 	if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) ) {
-		$total += $shipping_price;
+		if ( $this->get_setting('tax->tax_inclusive') ) {
+			$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
+		} else {
+			$shipping_tax = $shipping_price * (float) $this->get_setting('tax->rate');
+		}
 	}
 	
 	//check required fields
@@ -2911,15 +2914,18 @@ Thanks again!", 'mp')
 			 break;
 	}
 	
-	 if (empty($price))
+		if ( empty($price) ) {
 			$price = 0;
-
-	 $price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
-	 
-	 if ($format)
-		return $this->format_currency('', $price);
-	 else
-		return $price;
+		}
+	
+		$price += $shipping_tax;
+		$price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
+		 
+		if ( $format ) {
+			return $this->format_currency('', $price);
+		} else {
+			return $price;
+		}
 	}
 
 	//returns the before tax price for a given amount based on a bunch of foreign tax laws.
@@ -3823,16 +3829,16 @@ Thanks again!", 'mp')
 	 //payment info
 	 add_post_meta($post_id, 'mp_payment_info', $payment_info, true);
 
-	 //loop through cart items
-	 foreach ($cart as $product_id => $variations) {
-			foreach ($variations as $variation => $data) {
-			 $items[] = $data['quantity'];
-
-			 /*** adjust product stock quantities ***/
-			 
-			 //check if inventory tracking is enabled
-			 //returned value could be 0, 1 or an empty string so casting as boolean
-			 if ( ((bool) get_post_meta($product_id, 'mp_track_inventory', true)) === true ) {
+	//loop through cart items
+	foreach ($cart as $product_id => $variations) {
+		foreach ($variations as $variation => $data) {
+			$items[] = $data['quantity'];
+	
+			/*** adjust product stock quantities ***/
+			
+			//check if inventory tracking is enabled
+			//returned value could be 0, 1 or an empty string so casting as boolean
+			if ( ((bool) get_post_meta($product_id, 'mp_track_inventory', true)) === true ) {
 				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
 				
 				if (!is_array($stock))
@@ -3846,37 +3852,30 @@ Thanks again!", 'mp')
 				if ($stock[$variation] <= $this->get_setting('inventory_threshhold')) {
 					$this->low_stock_notification($product_id, $variation, $stock[$variation]);
 				}
-			 } //check stock
-
-			 //update sales count
-			 $count = get_post_meta($product_id, 'mp_sales_count', true);
-			 $count = $count + $data['quantity'];
-			 update_post_meta($product_id, 'mp_sales_count', $count);
-
-			 //for plugins into product sales
-			 do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
 			}
 			
-			//set product to draft if completly out of stock
-			if (get_post_meta($product_id, 'mp_track_inventory', true)) {
-				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
-				if (!is_array($stock))
-					$stock[0] = $stock;
-					
-				if ($this->get_setting('inventory_remove') && !array_sum($stock)) {		
-					$post = get_post( $product_id );
-					$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
-					clean_post_cache( $post->ID );
-					$old_status = $post->post_status;
-					$post->post_status = 'draft';
-					wp_transition_post_status( 'draft', $old_status, $post );
-	
-					do_action( 'edit_post', $post->ID, $post );
-					do_action( 'save_post', $post->ID, $post );
-					do_action( 'wp_insert_post', $post->ID, $post );
-				}	
+			//update sales count
+			$count = get_post_meta($product_id, 'mp_sales_count', true);
+			$count = $count + $data['quantity'];
+			update_post_meta($product_id, 'mp_sales_count', $count);
+			
+			//for plugins into product sales
+			do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
+			
+			if ( $this->get_setting('inventory_remove') && $stock[$variation] <= 0 ) {		
+				$post = get_post( $product_id );
+				$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
+				clean_post_cache( $post->ID );
+				$old_status = $post->post_status;
+				$post->post_status = 'draft';
+				wp_transition_post_status( 'draft', $old_status, $post );
+				
+				do_action( 'edit_post', $post->ID, $post );
+				do_action( 'save_post', $post->ID, $post );
+				do_action( 'wp_insert_post', $post->ID, $post );
 			}
-	 }
+		}
+	}
 		$item_count = array_sum($items);
 
 	 //coupon info
