@@ -1,6 +1,7 @@
 <?php
 
-add_action('wp_ajax_mp_update_states_dropdown', array('MP_Store_Settings_General', 'mp_update_states_dropdown'));
+add_action('wp_ajax_mp_update_states_dropdown', array('MP_Store_Settings_General', 'ajax_mp_update_states_dropdown'));
+add_action('wp_ajax_mp_update_currency', array('MP_Store_Settings_General', 'ajax_mp_update_currency'));
 
 class MP_Store_Settings_General {
 	/**
@@ -33,10 +34,26 @@ class MP_Store_Settings_General {
 	 * @access public
 	 * @action wp_ajax_mp_update_states_dropdown
 	 */
-	public static function mp_update_states_dropdown() {
+	public static function ajax_mp_update_states_dropdown() {
 		if ( check_ajax_referer('mp_update_states_dropdown', 'nonce', false ) ) {
 			$states = mp_get_states(mp_get_get_value('base_country'));
 			wp_send_json_success($states);
+		}
+		
+		wp_send_json_error();
+	}
+
+	/**
+	 * Gets an updated currency symbol based upon a given currency code
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_update_currency
+	 */
+	public static function ajax_mp_update_currency() {
+		if ( check_ajax_referer('mp_update_currency', 'nonce', false ) ) {
+			$currency = mp_format_currency(mp_get_get_value('currency'));
+			wp_send_json_success($currency);
 		}
 		
 		wp_send_json_error();
@@ -50,6 +67,7 @@ class MP_Store_Settings_General {
 	 */
 	private function __construct() {
 		add_action('wpmudev_field/print_scripts/base_country', array(&$this, 'update_states_dropdown'));
+		add_action('wpmudev_field/print_scripts/currency', array(&$this, 'update_currency_symbol'));
 		add_filter('wpmudev_field/get_value/tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
 		add_filter('wpmudev_field/sanitize_for_db/tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
 		
@@ -64,7 +82,7 @@ class MP_Store_Settings_General {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field_get_value_tax[rate]
+	 * @filter wpmudev_field/get_value/tax[rate]
 	 * @return string
 	 */
 	public function get_tax_rate_value( $value, $post_id, $raw, $field ) {
@@ -76,19 +94,61 @@ class MP_Store_Settings_General {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field_sanitize_for_db_tax[rate]
+	 * @filter wpmudev_field/sanitize_for_db/tax[rate]
 	 * @return string
 	 */
 	public function save_tax_rate_value( $value, $post_id, $field ) {
 		return ( $value > 0 ) ? ($value / 100) : 0;
 	}
+
+	/**
+	 * Prints javascript for updating the currency symbol when user updates the currency value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/print_scripts/currency
+	 */
+	public function update_currency_symbol( $field ) {
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	var $currency = $('select[name="currency"]');
 	
+	$currency.on('change', function(e){
+		var data = [
+			{
+				"name" : "currency",
+				"value" : e.val
+			},{
+				"name" : "action",
+				"value" : "mp_update_currency"
+			},{
+				"name" : "nonce",
+				"value" : "<?php echo wp_create_nonce('mp_update_currency'); ?>"
+			}
+		];
+		
+		$currency.select2('enable', false).isWorking(true);
+
+		$.get(ajaxurl, $.param(data)).done(function(resp){
+			$currency.select2('enable', true).isWorking(false);
+			
+			if ( resp.success ) {
+				$('.mp-currency-symbol').html(resp.data);
+			}
+		});
+	});
+});
+</script>
+		<?php
+	}
+		
 	/**
 	 * Prints javascript for updating the base_province dropdown when user updates the base_country value
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @action wpmudev_field_print_scripts_base_country
+	 * @action wpmudev_field/print_scripts/base_country
 	 */
 	public function update_states_dropdown( $field ) {
 		?>
@@ -111,10 +171,12 @@ jQuery(document).ready(function($){
 			}
 		];
 		
-		$state.select2('enable', false).closest('.wpmudev-field').animate({ "opacity" : .5 }, 500);
+		$country.select2('enable', false).isWorking(true);
+		$state.select2('enable', false);
 		
 		$.get(ajaxurl, $.param(data)).done(function(resp){
-			$state.select2('enable', true).closest('.wpmudev-field').animate({ "opacity" : 1 }, 500);
+			$country.select2('enable', true).isWorking(false);
+			$state.select2('enable', true);
 			
 			if ( resp.success ) {
 				$state.empty();
@@ -244,10 +306,10 @@ jQuery(document).ready(function($){
 			'default_value' => '1',
 			'orientation' => 'horizontal',
 			'options' => array(
-				'1' => '$100',
-				'2' => '$ 100', 
-				'3' => '100$',
-				'4' => '100 $',
+				'1' => '<span class="mp-currency-symbol">' . mp_format_currency(mp_get_setting('currency', 'USD')) . '</span>100',
+				'2' => '<span class="mp-currency-symbol">' . mp_format_currency(mp_get_setting('currency', 'USD')) . '</span> 100', 
+				'3' => '100<span class="mp-currency-symbol">' . mp_format_currency(mp_get_setting('currency', 'USD')) . '</span>',
+				'4' => '100 <span class="mp-currency-symbol">' . mp_format_currency(mp_get_setting('currency', 'USD')) . '</span>',
 			),
 		));
 	}
@@ -277,7 +339,7 @@ jQuery(document).ready(function($){
 		$metabox->add_field('text', array(
 			'name' => 'tax[label]',
 			'label' => array('text' => __('Tax Label', 'mp')),
-			'style' => 'width:150px',
+			'style' => 'width:300px',
 			'desc' => __('The label shown for the tax line item in the cart. Taxes, VAT, GST, etc.', 'mp'),
 		));
 		$metabox->add_field('checkbox', array(

@@ -31,6 +31,10 @@ label.error:before {
 }
 .postbox.wpmudev-postbox .inside {
   padding: 0;
+  /** 
+		 * Working Indicator
+		 */
+
   /**
 		 * Metabox Desc
 		 */
@@ -104,6 +108,11 @@ label.error:before {
   color: #f00;
   display: inline-block;
   padding-left: 1px;
+}
+.postbox.wpmudev-postbox .inside .wpmudev-metabox-working-indicator {
+  display: inline-block;
+  margin: 0 0 0 10px;
+  vertical-align: middle;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-metabox-desc {
   font-style: italic;

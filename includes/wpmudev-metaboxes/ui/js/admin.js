@@ -4,6 +4,27 @@ jQuery.validator.addMethod('alphanumeric', function(value, element){
 jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 
 (function($){
+	$(document).ready(function(){
+		// Preload working indicator
+		$('body').append('<img class="wpmudev-metabox-working-indicator" style="display:none" src="' + WPMUDEV_Metaboxes.spinner_url + '" alt="" />');
+	});
+
+	$.fn.isWorking = function( isLoading ){
+		var $spinner = $('.wpmudev-metabox-working-indicator');
+		
+		if ( isLoading ) {
+			return this.each(function(){
+				var $this = $(this);
+				$spinner.insertAfter($this);
+				$spinner.show();
+			});
+		} else {
+			$spinner.hide();
+		}
+	};
+}(jQuery));
+
+(function($){
 	window.onload = function() {
 		/* initializing conditional logic here instead of document.ready() to prevent
 		issues with wysiwyg editor not getting proper height */

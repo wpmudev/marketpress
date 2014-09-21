@@ -305,6 +305,9 @@ class WPMUDEV_Metabox {
 		);
 		
 		wp_localize_script('wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes_Validation_Messages', array_merge($default_messages, $this->validation_messages));
+		wp_localize_script('wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes', array(
+			'spinner_url' => admin_url('images/spinner.gif'),
+		));
 	}
 	
 	/**
