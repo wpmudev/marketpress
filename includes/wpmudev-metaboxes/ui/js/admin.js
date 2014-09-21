@@ -106,10 +106,19 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	var initConditionals = function(){
 		$('.wpmudev-field-has-conditional, .wpmudev-metabox-has-conditional').each(function(){
 			var $this = $(this),
-					operator = $this.attr('data-conditional-operator').toUpperCase(),
-					action = $this.attr('data-conditional-action').toLowerCase(),
-					numValids = 0,
-					conditionals = parseConditionals(this);
+					operator = $this.attr('data-conditional-operator'),
+					action = $this.attr('data-conditional-action'),
+					numValids = 0;
+			
+			if ( operator === undefined || action === undefined ) {
+				// Skip elements that don't have conditional attributes defined
+				return;
+			}
+			
+			operator = operator.toUpperCase();
+			action = action.toLowerCase();
+			
+			var conditionals = parseConditionals(this);
 			
 			if ( $this.hasClass('wpmudev-metabox-has-conditional') ) {
 				$container = $this;
