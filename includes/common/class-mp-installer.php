@@ -5,10 +5,10 @@ class MP_Installer {
 	 * Refers to the single instance of the class.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @var object
 	 */
-	private static $_instance = null;
+	public static $_instance = null;
 
 	/**
 	 * Gets the single instance of the class.
@@ -28,10 +28,11 @@ class MP_Installer {
 	 * Constructor.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 */
-	private function __construct() {
+	public function _construct() {
 		add_action('plugins_loaded', array(&$this, 'run'));
+		add_action('after_switch_theme', array(&$this, 'update_admin_caps'));
 	}
 	
 	/**
@@ -59,17 +60,17 @@ class MP_Installer {
 		if ( ! empty($old_version) ) {
 			//2.1.4 update
 			if ( version_compare($old_version, '2.1.4', '<') ) {
-				$this->_update_214();
+				$this->update_214();
 			}
 			
 			//2.9.2.3 update
 			if ( version_compare($old_version, '2.9.2.3', '<') ) {
-				$this->_update_2923();
+				$this->update_2923();
 			}
 			
 			//3.0 update
 			if ( version_compare($old_version, '3.0', '<') ) {
-				$settings = $this->_update_3000($settings);
+				$settings = $this->update_3000($settings);
 			}
 		}
 		
@@ -95,10 +96,10 @@ class MP_Installer {
 	 * Creates the product attributes table.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @uses $wpdb, $charset_collate
 	 */
-	private function _create_product_attributes_table() {
+	public function create_product_attributes_table() {
 		global $wpdb, $charset_collate;
 		
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -140,10 +141,10 @@ class MP_Installer {
 	 * Updates presentation settings.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @param array $settings
 	 */
-	private function _update_presentation_settings( $settings ) {
+	public function update_presentation_settings( $settings ) {
 		if ( $height = mp_get_setting('list_img_height') ) {
 			mp_push_to_array($settings, 'list_img_size_custom->height', $height);
 			unset($settings['list_img_height']);
@@ -171,10 +172,10 @@ class MP_Installer {
 	 * Updates notification settings.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @param array $settings
 	 */
-	private function _update_notification_settings( $settings ) {		
+	public function update_notification_settings( $settings ) {		
 		if ( $subject = mp_get_setting('email->new_order_subject') ) {
 			mp_push_to_array($settings, 'email->new_order->subject', $subject);
 			unset($settings['new_order_subject']);
@@ -204,10 +205,10 @@ class MP_Installer {
 	 * In the event that a user needs to rollback to a plugin version < 3.0 this data can be used to restore legacy settings.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @param array $settings
 	 */
-	private function _backup_legacy_settings( $settings ) {
+	public function backup_legacy_settings( $settings ) {
 		if ( ! get_option('mp_settings_legacy') ) {
 			add_option('mp_settings_legacy', $settings, '', false);
 		}
@@ -223,28 +224,57 @@ class MP_Installer {
 	 * Updates the product post type to avoid conflicts with WooCommerce
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @uses $wpdb
 	 */
-	private function _update_product_post_type() {
+	public function update_product_post_type() {
 		global $wpdb;
 		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type' => 'product'));
+	}
+	
+	/**
+	 * Updates the admin capabilities
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action after_switch_theme
+	 */
+	
+	public function update_admin_caps() {
+		$role = get_role('administrator');
+		$taxonomies = array('product_category', 'product_tag');
+		$pts = array('mp_product', 'product_coupon', 'mp_order');
+		
+		foreach ( $taxonomies as $tax_slug ) {
+			$tax = get_taxonomy($tax_slug);
+			foreach ( $tax->cap as $cap ) {
+				$role->add_cap($cap);
+			}
+		}
+		
+		foreach ( $pts as $pt_slug ) {
+			$pt = get_post_type_object($pt_slug);
+			foreach ( $pt->cap as $cap ) {
+				$role->add_cap($cap);
+			}
+		}
 	}
 	
 	/**
 	 * Runs on 3.0 update.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 * @param array $settings
 	 */
-	private function _update_3000( $settings ) {
-		$this->_backup_legacy_settings($settings);
-		$this->_update_coupon_schema();
-		$this->_create_product_attributes_table();
-		$this->_update_product_post_type();
-		$settings = $this->_update_notification_settings($settings);
-		$settings = $this->_update_presentation_settings($settings);
+	public function update_3000( $settings ) {
+		$this->backup_legacy_settings($settings);
+		$this->update_coupon_schema();
+		$this->create_product_attributes_table();
+		$this->update_product_post_type();
+		$this->update_admin_caps();
+		$settings = $this->update_notification_settings($settings);
+		$settings = $this->update_presentation_settings($settings);
 		
 		// Create store pages
 		add_action('admin_init', array(&$this, 'create_store_pages'));
@@ -261,9 +291,9 @@ class MP_Installer {
 	 * Runs on 2.9.2.3 update to fix low inventory emails not being sent.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 */
-	private function _update_2923() {
+	public function update_2923() {
 		global $wpdb;
 		$wpdb->delete($wpdb->postmeta, array('meta_key' => 'mp_stock_email_sent'), array('%s'));
 	}
@@ -272,9 +302,9 @@ class MP_Installer {
 	 * Runs on 2.1.4 update to fix price sorts.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 */
-	private function _update_214() {
+	public function update_214() {
 		global $wpdb;
 
 		$posts = $wpdb->get_col("SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product'");
@@ -303,9 +333,9 @@ class MP_Installer {
 	 * Updates the coupon schema.
 	 *
 	 * @since 3.0
-	 * @access private
+	 * @access public
 	 */
-	private function _update_coupon_schema() {
+	public function update_coupon_schema() {
 		$coupons = get_option('mp_coupons');
 		
 		if ( empty($coupons) ) {
