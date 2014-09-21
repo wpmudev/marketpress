@@ -191,6 +191,24 @@ class WPMUDEV_Metabox {
 		add_action('admin_init', array(&$this, 'maybe_save_settings_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
 		add_action('admin_notices', array(&$this, 'admin_notices'));
+		add_action('init', array(&$this, 'localize'));
+	}
+
+	/**
+	 * Localize the library
+	 *
+	 * The function will try to load the translation file from the WP_LANG_DIR
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function localize() {
+		$domain = 'wpmudev_metaboxes';
+		// The plugin_locale filter is defined in /wp-includes/l10n.php
+		$locale = apply_filters('plugin_locale', get_locale(), $domain);
+		$lang_file = WP_LANG_DIR . '/' . $domain . '-' . $locale . '.mo';
+		
+		load_textdomain($domain, $lang_file);
 	}
 
 	/**
