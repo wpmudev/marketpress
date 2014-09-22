@@ -6,10 +6,17 @@ if ( ! function_exists('get_field_value') ) :
 	 *
 	 * @since 1.0
 	 * @param string $name The field's name
-	 * @param int $post_id
+	 * @param int $post_id (optional) Defaults to current post id
 	 * @param bool $raw (optional) Whether or not to get the raw/unformatted value as saved in the db
+	 * @uses $post
 	 */
-	function get_field_value( $name, $post_id, $raw = false ) {
+	function get_field_value( $name, $post_id = null, $raw = false ) {
+		global $post;
+		
+		if ( is_null($post_id) ) {
+			$post_id = $post->ID;
+		}
+		
 		$class = get_post_meta($post_id, '_' . $name, true);
 
 		if ( ! class_exists($class) ) {
@@ -28,10 +35,11 @@ if ( ! function_exists('field_value') ) :
 	 *
 	 * @since 1.0
 	 * @param string $name The field's name
-	 * @param int $post_id
+	 * @param int $post_id (optional) Defaults to current post id
 	 * @param bool $raw (optional) Whether or not to get the raw/unformatted value as saved in the db
+	 * @uses $post
 	 */
-	function field_value( $name, $post_id, $raw = false ) {
+	function field_value( $name, $post_id = null, $raw = false ) {
 		echo get_field_value($name, $post_id, $raw);
 	}
 endif;

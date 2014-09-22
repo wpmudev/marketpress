@@ -4,7 +4,27 @@
 		initColorbox();
 		initSelect2();
 		initProductSearchField();
+		initToolTips();
 	});
+	
+	var initToolTips = function(){
+		$('.mp-tooltip').click(function(){
+			var $this = $(this),
+					$button = $this.find('.mp-tooltip-button');
+			
+			if ( $button.length == 0 ) {
+				$this.children('span').append('<a class="mp-tooltip-button" href="#">x</a>');
+			}
+			
+			$this.children('span').fadeIn(250);
+		});
+		
+		$('.mp-tooltip').on('click', '.mp-tooltip-button', function(e){
+			e.preventDefault();
+			e.stopPropagation();
+			$(this).parent().fadeOut(250);
+		});
+	}
 
  	var initShortCodeBuilder = function() {
 		var $form = $('#mp-shortcode-builder-form');

@@ -222,7 +222,7 @@ class MP_Products_Screen {
 			'name' => 'regular_price',
 			'label' => array('text' => __('Regular Price', 'mp')),
 			'conditional' => array(
-				'name' => 'variation_type',
+				'name' => 'product_type',
 				'value' => array('physical', 'digital'),
 				'action' => 'show',
 			),

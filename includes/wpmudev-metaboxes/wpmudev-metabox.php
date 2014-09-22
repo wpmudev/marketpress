@@ -177,21 +177,22 @@ class WPMUDEV_Metabox {
 			'order' => 10,
 			'conditional' => array(),
 		), $args);
-		
-		$this->load_fields();
-		$this->init_conditional_logic();
+
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
 		$this->nonce_name = $this->nonce_action . '_nonce';
-		
+	
+		$this->localize();
+		$this->load_fields();
+		$this->init_conditional_logic();
+				
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'), $this->args['order']);
 		add_action('wpmudev_metabox/render_settings_metaboxes', array(&$this, 'maybe_render'), $this->args['order']);
 		add_action('save_post', array(&$this, 'save_fields'));
-		add_action('admin_init', array(&$this, 'maybe_save_settings_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
 		add_action('admin_notices', array(&$this, 'admin_notices'));
-		add_action('init', array(&$this, 'localize'));
+		add_action('init', array(&$this, 'maybe_save_settings_fields'));
 	}
 
 	/**
@@ -535,7 +536,7 @@ class WPMUDEV_Metabox {
 			// Bail - nonce is not set or could not be verified
 			return;
 		}
-
+		
 		// Avoid infinite loops later (e.g. when calling wp_insert_post, etc)
 		remove_action('save_post', array(&$this, 'save_fields'));
 
@@ -551,7 +552,7 @@ class WPMUDEV_Metabox {
 		// For settings metaboxes we don't want to call the internal save methods for each field
 		if ( ! is_numeric($post_id) ) {
 			$settings = get_option($post_id, array());
-
+			
 			foreach ( $this->fields as $field ) {
 				$post_key = $field->get_post_key($field->args['name']);
 				$value = $field->get_post_value($post_key);

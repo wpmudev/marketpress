@@ -50,33 +50,42 @@
   position: absolute;
   bottom: 25px;
   left: 50%;
-  background: #222;
-  border-radius: 4px;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  color: #fff;
+  background: #fafafa;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  -moz-box-shadow: -3px 0 10px 1px rgba(0, 0, 0, 0.12);
+  -webkit-box-shadow: -3px 0 10px 1px rgba(0, 0, 0, 0.12);
+  box-shadow: -3px 0 10px 1px rgba(0, 0, 0, 0.12);
+  color: #555;
   display: none;
-  font: 11px/1.3 Verdana, Geneva, sans-serif;
-  margin-left: -125px;
-  padding: 15px;
+  font: 12px/1.3 Verdana, Geneva, sans-serif;
+  margin-left: -147.5px;
+  padding: 20px;
   text-align: left;
-  width: 250px;
+  width: 255px;
 }
-.mp-tooltip > span:after {
+.mp-tooltip > span:before {
   position: absolute;
-  bottom: -6px;
+  bottom: -10px;
   left: 50%;
-  border-top: 6px solid #222;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
+  border-top: 10px solid #fafafa;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
   content: "";
   font-size: 0;
   line-height: 0;
-  margin-left: -6px;
+  margin-left: -12px;
   width: 0;
 }
-.mp-tooltip:hover > span {
+.mp-tooltip-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: inherit;
   display: block;
+  line-height: 1;
+  padding: 5px;
+  text-decoration: none;
 }
 /**
  * Short Code Builder Form

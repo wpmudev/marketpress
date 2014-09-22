@@ -33,12 +33,10 @@ class MP_Admin {
 	private function __construct() {
 		require_once mp_plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		
-		add_action('init', array(&$this, 'includes'));
+		$this->includes();
 		
 		//add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'));
-		//admin scripts/styles
-		add_action('admin_enqueue_scripts', array(&$this, 'admin_styles_scripts'));
 		//save orders screen options
 		add_filter('set-screen-option', array(&$this, 'save_orders_screen_options'), 10, 3);
 		//set custom post-updated messages
@@ -108,16 +106,16 @@ class MP_Admin {
 		
 		//store settings
 		$cap = apply_filters('mp_store_settings_cap', 'manage_options');
-		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
-		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', array(&$this, 'admin_page'));		
-		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Notifications', 'mp'), __('Notifications', 'mp'), $cap, 'store-settings-notifications', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', array(&$this, 'admin_page'));
-		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', array(&$this, 'admin_page'));
+		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', create_function('', ''), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
+		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', false);		
+		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', false);
+		add_submenu_page('store-settings', __('Store Settings: Notifications', 'mp'), __('Notifications', 'mp'), $cap, 'store-settings-notifications', false);
+		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', false);
+		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', false);
+		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', false);
 		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=mp_product'); 
 		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=mp_product');		
-		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', array(&$this, 'admin_page'));
+		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 
 		if ( ! defined('WPMUDEV_REMOVE_BRANDING') ) {
 	 		define('WPMUDEV_REMOVE_BRANDING', false);
@@ -145,83 +143,6 @@ class MP_Admin {
 			'id' => 'marketpress-help',
 			'title' => __('MarketPress Instructions', 'mp'),
 			'content' => '<iframe src="//premium.wpmudev.org/wdp-un.php?action=help&id=144" width="100%" height="600px"></iframe>'
-		));
-	}
-	
-	/**
-	 * Displays an admin page
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function admin_page() {
-	}
-	
-	/**
-	 * Determine which scripts/styles to load
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function admin_styles_scripts() {
-		global $current_screen;
-		
-		wp_enqueue_style('mp-admin', mp_plugin_url('includes/admin/ui/css/admin.css'), false, MP_VERSION);
-		
-		if ( strpos($current_screen->id, 'store-settings') !== false ) {
-			$this->admin_script_settings();
-			$this->admin_css_settings();
-		}
-	}
-	
-	/**
-	 * Enqueue styles for store settings screen
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function admin_css_settings() {
-		global $wp_version;
-
-		// load local dashicons if wp version is < 3.8
-		if ( version_compare($wp_version, '3.8', '<') ) {
-			wp_enqueue_style('dashicons', mp_plugin_url('ui/css/dashicons.css'), false, MP_VERSION);
-		}
-
-		wp_enqueue_style('mp-admin', mp_plugin_url('includes/admin/ui/css/admin.css'), false, MP_VERSION);
-	}
-
-	/**
-	 * Enqueue scripts for store settings screen
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function admin_script_settings() {
-		global $blog_id,  $current_user;
-		
-		wp_enqueue_script('jquery-ui-spinner');
-		wp_enqueue_script('jquery-colorpicker', mp_plugin_url('ui/colorpicker/js/colorpicker.js'), array('jquery'), MP_VERSION);
-		wp_enqueue_script('jquery-ui-datepicker');
-		wp_enqueue_script('mp-plugins', mp_plugin_url('ui/js/plugins.js'), array('jquery'), MP_VERSION);
-		wp_enqueue_script('mp-settings', mp_plugin_url('ui/js/settings.js'), array('jquery', 'mp-plugins', 'jquery-colorpicker', 'jquery-ui-datepicker', 'jquery-ui-spinner'), MP_VERSION);
-
-		//only load languages for datepicker if not english (or it will show Chinese!)
-		if ( mp()->language != 'en' )
-			wp_enqueue_script( 'jquery-118n', mp_plugin_url('ui/js/i18n/jquery-ui-i18n.min.js'), array('jquery', 'jquery-ui-datepicker'), MP_VERSION);
-
-		if (!defined('WPMUDEV_REMOVE_BRANDING') && intval(mp_get_setting('hide_popup')) < 3) {
-			wp_enqueue_script( 'mp-need-help', mp_plugin_url('ui/js/need-help.js'), array('jquery'), MP_VERSION);
-			$new_count = intval(mp_get_setting('hide_popup')) + 1;
-			mp_update_setting('hide_popup', $new_count);
-		}
-		
-		//localize settings
-		wp_localize_script('mp-settings', 'MarketPress', array(
-			'updateUserPreferenceNonce' => wp_create_nonce('mp-update-user-preference'),
-			'accordionText' => __('Did you know these section are collapsible? Go ahead... click here and try it out for your self.', 'mp'),
-			'userPrefs' => get_user_meta(get_current_user_id(), 'mp_user_preferences', true),
-			'ajaxLoader' => '<img class="mp-ajax-loader" src="' . mp_plugin_url('ui/images/ajax-loader.gif') . '" alt="" />',
 		));
 	}
 	

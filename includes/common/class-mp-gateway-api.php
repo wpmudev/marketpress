@@ -279,6 +279,16 @@ if( ! class_exists('MP_Gateway_API') ) {
     public function init_settings_metabox() {
 	    // Override in child gateway
     }
+
+    /**
+     * Initialize the network settings metabox
+     *
+     * @since 3.0
+     * @access public
+     */
+    public function init_network_settings_metabox() {
+	    // Override in child gateway
+    }
     
     /**
      * Generates an appropriate field name
@@ -377,6 +387,10 @@ if( ! class_exists('MP_Gateway_API') ) {
 
 			if ( is_admin() ) {
       	$this->init_settings_metabox();
+      }
+      
+      if ( is_network_admin() ) {
+	      $this->init_network_settings_metabox();
       }
   	}
   }

@@ -143,7 +143,7 @@ class Marketpress {
 		$prefs = get_user_meta($user_id, 'mp_user_preferences', true);
 		return mp_arr_get_value($key, $prefs, $default);
 	}
-
+	
 	/**
 	 * Register custom post types, taxonomies and stati
 	 *
@@ -402,11 +402,40 @@ class Marketpress {
 		// Init variables
 		$this->_init_vars();
 		
-		// Load plugins
-		add_action('init', array(&$this, 'load_plugins'));
+		add_action('plugins_loaded', array(&$this, 'includes'));
 		
 		// Setup custom types
 		add_action('init', array(&$this, 'register_custom_types'), 0);
+	}
+	
+	public function includes() {
+		// Include helper functions
+		require_once $this->plugin_dir('includes/common/helpers.php');
+		// Include installer class
+		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
+		// Include shipping and gateway api classes
+		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
+		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
+		// Include product attributes class
+		require_once $this->plugin_dir('includes/common/class-mp-product-attributes.php');
+		// Include MP_Cart class
+		require_once $this->plugin_dir('includes/common/class-mp-cart.php');
+		// Include template functions
+		require_once $this->plugin_dir('includes/common/template-functions.php');
+		
+		if ( is_admin() ) {
+			require_once $this->plugin_dir('includes/admin/class-mp-admin.php');
+			
+			if ( is_multisite() ) {
+				require_once $this->plugin_dir('includes/admin/class-mp-admin-multisite.php');
+			}
+			
+			if ( mp_doing_ajax() ) {
+				require_once $this->plugin_dir('includes/admin/class-mp-ajax.php');
+			}
+		} else {
+			require_once $this->plugin_dir('includes/public/class-mp-public.php');
+		}
 	}
 	
 	/**
@@ -427,25 +456,3 @@ class Marketpress {
 }
 
 $mp = Marketpress::get_instance();
-
-// Include helper functions
-require_once $mp->plugin_dir('includes/common/helpers.php');
-// Include installer class
-require_once $mp->plugin_dir('includes/common/class-mp-installer.php');
-// Include product attributes class
-require_once $mp->plugin_dir('includes/common/class-mp-product-attributes.php');
-// Include MP_Cart class
-require_once $mp->plugin_dir('includes/common/class-mp-cart.php');
-// Include template functions
-require_once $mp->plugin_dir('includes/common/template-functions.php');
-
-
-if ( is_admin() ) {
-	require_once $mp->plugin_dir('includes/admin/class-mp-admin.php');
-	
-	if ( mp_doing_ajax() ) {
-		require_once $mp->plugin_dir('includes/admin/class-mp-ajax.php');
-	}
-} else {
-	require_once $mp->plugin_dir('includes/public/class-mp-public.php');
-}
