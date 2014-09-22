@@ -30,8 +30,20 @@ class WPMUDEV_Field_Select extends WPMUDEV_Field {
 		$this->before_field(); ?>
 		<select <?php echo $this->parse_atts(); ?>>
 		<?php
-		foreach ( $this->args['options'] as $val => $label ) : ?>
+		foreach ( $this->args['options'] as $val => $label ) :
+			if ( is_array($label) ) : ?>
+				<optgroup label="<?php echo esc_attr($label['group_name']); ?>">
+				<?php
+				foreach ( $label['options'] as $subval => $sublabel ) : ?>
+					<option value="<?php echo esc_attr($subval); ?>" <?php selected($subval, $value); ?>><?php echo esc_attr($sublabel); ?></option>
+				<?php
+				endforeach; ?>
+				</optgroup>
+			<?php
+			else : ?>
 			<option value="<?php echo esc_attr($val); ?>" <?php selected($val, $value); ?>><?php echo esc_attr($label); ?></option>
+			<?php
+			endif; ?>
 		<?php
 		endforeach; ?>
 		</select>
