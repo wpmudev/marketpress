@@ -44,7 +44,7 @@ class MP_Product_Coupons_Screen {
 		// On coupon save update post title to equal coupon code field
 		add_filter('wp_insert_post_data', array(&$this, 'save_coupon_data'), 99, 2);
 		// Init metaboxes
-		add_action('admin_init', array(&$this, 'init_metaboxes'));
+		add_action('init', array(&$this, 'init_metaboxes'));
 		// Get coupon code value
 		add_filter('wpmudev_field/get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
 	}

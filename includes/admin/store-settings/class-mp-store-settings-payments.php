@@ -94,7 +94,7 @@ class MP_Store_Settings_Payments {
 			'order' => 1,
 		));
 		
-		$gateways = MP_Gateway_API::get_gateways();
+		$gateways = MP_Gateway_API::get_gateways(true);
 		$options = array();
 		
 		foreach ( $gateways as $slug => $gateway ) {

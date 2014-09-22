@@ -74,9 +74,21 @@ if( ! class_exists('MP_Gateway_API') ) {
      *
      * @since 3.0
      * @access public
+     * @param bool $network_enabled If multisite installation, only get gateways that are enabled in the store network settings.
      * @return array
      */
-    public static function get_gateways() {
+    public static function get_gateways( $network_enabled = false ) {
+    	if ( is_multisite() && ! is_main_site() && $network_enabled ) {
+	    	$gateways = array();
+	    	foreach ( self::$_gateways as $code => $gateway ) {
+	    		$level = str_replace('psts_level_', '', mp_get_network_setting('allowed_gateways->' . $code, ''));
+		    	if ( $level == 'full' || (function_exists('is_pro_site') && is_pro_site(false, $level)) ) {
+			    	$gateways[$code] = $gateway;
+		    	}
+	    	}
+	    	return $gateways;
+    	}
+    	
 	    return self::$_gateways;
     }
     
@@ -95,8 +107,9 @@ if( ! class_exists('MP_Gateway_API') ) {
     	
 			$gateways = mp_get_setting('gateways');
 			$network_settings = get_site_option('mp_network_settings');
+			$network_enabled = ( is_multisite() && ! is_main_site() && ! is_super_admin() ) ? true : false;
 
-			foreach ( self::get_gateways() as $code => $plugin ) {
+			foreach ( self::get_gateways($network_enabled) as $code => $plugin ) {
 				$class = $plugin[0];
 				
 				// If global cart is enabled force it

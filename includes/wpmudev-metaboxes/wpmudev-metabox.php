@@ -294,7 +294,8 @@ class WPMUDEV_Metabox {
 			return;
 		}
 		
-		$this->save_fields($this->args['option_name']);
+		$opt_name = ( ! empty($this->args['site_option_name']) ) ? $this->args['site_option_name'] : $this->args['option_name'];
+		$this->save_fields($opt_name);
 	}
 	
 	/**
@@ -307,8 +308,9 @@ class WPMUDEV_Metabox {
 		if ( ! $this->is_active() ) {
 			return false;
 		}
-  		
-		$this->render($this->args['option_name']);
+  	
+  	$opt_name = ( ! empty($this->args['site_option_name']) ) ? $this->args['site_option_name'] : $this->args['option_name'];
+		$this->render($opt_name);
 	}
 	
 	/**

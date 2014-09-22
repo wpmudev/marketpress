@@ -432,7 +432,7 @@ if ( ! function_exists('mp_get_network_setting') ) :
 	 * @return mixed
 	 */
 	function mp_get_network_setting( $key, $default = null ) {
-		$settings = get_option('mp_network_settings');
+		$settings = get_site_option('mp_network_settings', $default, false);
 		
 		$keys = explode('->', $key);
 		$keys = array_map('trim', $keys);

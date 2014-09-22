@@ -11,6 +11,15 @@ class MP_Admin_Multisite {
 	private static $_instance = null;
 	
 	/**
+	 * Refers to the current build of the class
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var int
+	 */
+	var $build = 1;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -32,22 +41,72 @@ class MP_Admin_Multisite {
 	 * @access private
 	 */
 	private function __construct() {
+		$this->maybe_update();
+		
 		add_action('init', array(&$this, 'init_metaboxes'));
 		add_action('network_admin_menu', array(&$this, 'add_menu_items'));
 	}
 	
+	/**
+	 * Determines if the update script should be run
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function maybe_update() {
+		if ( ! is_null($this->build) && $this->build != mp_get_network_setting('build') ) {
+    	$old_settings = get_site_option('mp_network_settings', array());
+	    $settings = $this->update($old_settings);
+	    $settings['build'] = $this->build;
+	    update_site_option('mp_network_settings', $settings);
+    }
+	}
+	
+	/**
+	 * Updates any necessary settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $settings
+	 * @return array
+	 */
+	public function update( $settings ) {
+		if ( $pro_levels = mp_get_network_setting('gateways_pro_level') ) {
+			foreach ( $pro_levels as $gateway => $level ) {
+				$settings['allowed_gateways'][$gateway] = 'psts_level_' . $level;
+			}
+			
+			unset($settings['gateways_pro_level']);
+		}
+		
+		return $settings;
+	}
+	
+	/**
+	 * Initialize metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function init_metaboxes() {
 		$this->init_general_settings_metaboxes();
 		$this->init_global_gateway_settings_metaboxes();
 		$this->init_gateway_permissions_metaboxes();
 	}
+
+	/**
+	 * Initialize general settings metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	
 	public function init_general_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-general',
 			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network '),
 			'title' => __('General Settings', 'mp'),
-			'option_name' => 'mp_network_settings',
+			'site_option_name' => 'mp_network_settings',
 		));
 		$metabox->add_field('checkbox', array(
 			'name' => 'main_blog',
@@ -58,13 +117,20 @@ class MP_Admin_Multisite {
 			'label' => array('text' => __('Enable Global Shopping Cart?', 'mp')),
 		));
 	}
+
+	/**
+	 * Initialize global gateway metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	
 	public function init_global_gateway_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-global-gateway',
 			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network '),
 			'title' => __('Global Gateway', 'mp'),
-			'option_name' => 'mp_network_settings',
+			'site_option_name' => 'mp_network_settings',
 			'conditional' => array(
 				'name' => 'global_cart',
 				'value' => '1',
@@ -91,12 +157,18 @@ class MP_Admin_Multisite {
 		));
 	}
 
+	/**
+	 * Initialize gateway permissions metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function init_gateway_permissions_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-gateway-permissions',
 			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network '),
 			'title' => __('Gateway Permissions', 'mp'),
-			'option_name' => 'mp_network_settings',
+			'site_option_name' => 'mp_network_settings',
 			'conditional' => array(
 				'name' => 'global_cart',
 				'value' => '1',
@@ -104,13 +176,25 @@ class MP_Admin_Multisite {
 			),
 		));
 		
-		$options = array(
+		$options_permissions = array(
 			'full' => __('All Can Use', 'mp'),
 			'none' => __('No Access', 'mp'),
 		);
 		
 		if ( function_exists('psts_levels_select') ) {
-			$options['supporter'] = __('Pro Site Level', 'mp');
+			$levels = get_site_option('psts_levels');
+			$options_levels = array();
+			
+			if ( is_array($levels) ) {
+				foreach ( $levels as $level => $value ) {
+					$options_levels['psts_level_' . $level] = $level . ':' . $value['name'];
+				}
+			}
+		
+			$options_permissions['supporter'] = array(
+				'group_name' => __('Pro Site Level', 'mp'),
+				'options' => $options_levels,
+			);
 		}
 		
 		$gateways = MP_Gateway_API::get_gateways();
@@ -118,7 +202,7 @@ class MP_Admin_Multisite {
 			$metabox->add_field('select', array(
 				'name' => 'allowed_gateways[' . $code . ']',
 				'label' => array('text' => $gateway[1]),
-				'options' => $options,
+				'options' => $options_permissions,
 			));
 		}
 	}
@@ -130,7 +214,7 @@ class MP_Admin_Multisite {
 	 * @access public
 	 */
 	public function add_menu_items() {
-		add_submenu_page('settings.php', __('Network Store Settings', 'mp'), __('Store Settings', 'mp'), 'manage_network_options', 'network-store-settings', array(&$this, 'network_store_settings'));
+		add_submenu_page('settings.php', __('Store Network Settings', 'mp'), __('Store Network', 'mp'), 'manage_network_options', 'network-store-settings', array(&$this, 'network_store_settings'));
 	}
 
 	/**
@@ -156,7 +240,7 @@ class MP_Admin_Multisite {
 		?>
 <div class="wrap mp-wrap">
 	<div class="icon32"><img src="<?php echo mp_plugin_url('ui/images/settings.png'); ?>" /></div>
-	<h2 class="mp-settings-title"><?php _e('Network Store Settings', 'mp'); ?></h2>
+	<h2 class="mp-settings-title"><?php _e('Store Network Settings', 'mp'); ?></h2>
 	<div class="clear"></div>
 	<?php
  	if ( $message_key = mp_get_get_value('mp_message') ) : ?>
