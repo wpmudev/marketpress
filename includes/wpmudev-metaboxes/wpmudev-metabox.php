@@ -189,7 +189,7 @@ class WPMUDEV_Metabox {
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'), $this->args['order']);
 		add_action('wpmudev_metabox/render_settings_metaboxes', array(&$this, 'maybe_render'), $this->args['order']);
-		add_action('save_post', array(&$this, 'save_fields'));
+		add_action('save_post', array(&$this, 'maybe_save_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
 		add_action('admin_notices', array(&$this, 'admin_notices'));
 		add_action('network_admin_notices', array(&$this, 'admin_notices'));
@@ -264,12 +264,28 @@ class WPMUDEV_Metabox {
 			wp_cache_set('settings_saved', true, 'wpmudev_metaboxes'); // Only show the message once per screen
 		}
 	}
+
+	/**
+	 * Determine if fields should be saved
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @action save_post
+	 */	
+	public function maybe_save_fields( $post_id ) {
+		if ( ! $this->is_active() ) {
+			return;
+		}
+		
+		$this->save_fields($post_id);
+	}
 	
 	/**
 	 * Determine if settings fields should be saved
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @action init
 	 */
 	public function maybe_save_settings_fields() {
 		if ( ! $this->is_active() || ! $this->is_settings_metabox() ) {
@@ -457,11 +473,12 @@ class WPMUDEV_Metabox {
 		<?php
 			endif; ?>
 					<div id="<?php echo $this->args['id']; ?>" class="<?php echo $this->args['class']; ?>"<?php echo $atts; ?>>
-						<?php wp_nonce_field($this->nonce_action, $this->nonce_name); ?>
 						<div class="inside">
 							<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
 		<?php
 		endif;
+		
+		wp_nonce_field($this->nonce_action, $this->nonce_name);
 		
 		if ( ! is_null($this->args['desc']) ) : ?>
 							<div class="wpmudev-metabox-desc"><?php echo $this->args['desc']; ?></div>
@@ -529,7 +546,6 @@ class WPMUDEV_Metabox {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @action save_post
 	 * @param int $post_id The current post ID
 	 */
 	public function save_fields( $post_id ) {

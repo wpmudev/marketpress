@@ -36,17 +36,26 @@ class MP_Products_Screen {
 		// Product variations save/get value
 		add_filter('wpmudev_field/save_value/variations', array(&$this, 'save_product_variations'), 10, 3);
 		add_filter('wpmudev_field/get_value/variations', array(&$this, 'get_product_variations'), 10, 4);
+		// Add metaboxes
+		add_action('init', array(&$this, 'init_metaboxes'));
 		// Product attributes save/get value
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
 			add_filter('wpmudev_field/save_value/' . $mp_product_atts->generate_slug($att->attribute_id), array(&$this, 'save_product_attribute'), 10, 3);
 		}
-		
-		// Init metaboxes
+	}
+	
+	/**
+	 * Initialize metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_metaboxes() {
 		$this->init_product_details_metabox();
 		$this->init_attributes_metabox();
-		$this->init_variations_metabox();
+		$this->init_variations_metabox();		
 	}
 		
 	/**
