@@ -434,7 +434,7 @@ class WPMUDEV_Field {
 			}
 		} else {
 			// This is a settings key
-			$settings = get_option($post_id, array());
+			$settings = ( ! empty($this->metabox->args['site_option_name']) ) ? get_site_option($post_id, array()) : get_option($post_id, array());
 			$key = $this->get_post_key();
 			$value = $this->array_search($settings, $key);
 		}

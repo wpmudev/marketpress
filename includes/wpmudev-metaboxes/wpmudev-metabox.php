@@ -149,6 +149,7 @@ class WPMUDEV_Metabox {
 	 *		@type string $context The context of the metabox (advanced, normal, side).
 	 *		@type string $priority The priority of the metabox (default, high, normal).
 	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
+	 *		@type string $site_option_name If not a post metabox, enter the site option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
 	 *		@type int $order Display order for settings metaboxes. If this is not entered metaboxes will be rendered in the order they logically show up in the code. Defaults to 10.
 	 *		@type array $conditional {
 	 *			Conditionally hide/show this field if another field value is a certain value.
@@ -174,6 +175,7 @@ class WPMUDEV_Metabox {
 			'context' => 'advanced',
 			'priority' => 'default',
 			'option_name' => '',
+			'site_option_name' => '',
 			'order' => 10,
 			'conditional' => array(),
 		), $args);
@@ -568,7 +570,7 @@ class WPMUDEV_Metabox {
 				
 		// For settings metaboxes we don't want to call the internal save methods for each field
 		if ( ! is_numeric($post_id) ) {
-			$settings = get_option($post_id, array());
+			$settings = ( ! empty($this->args['site_option_name']) ) ? get_site_option($post_id, array()) : get_option($post_id, array());
 			
 			foreach ( $this->fields as $field ) {
 				$post_key = $field->get_post_key($field->args['name']);
@@ -597,7 +599,11 @@ class WPMUDEV_Metabox {
 				$settings = $this->push_to_array($settings, $post_key, $value);
 			}
 			
-			update_option($post_id, $settings);
+			if ( ! empty($this->args['site_option_name']) ) {
+				update_site_option($post_id, $settings);
+			} else {
+				update_option($post_id, $settings);
+			}
 			
 			/**
 			 * Fires after the settings metabox has been saved.
