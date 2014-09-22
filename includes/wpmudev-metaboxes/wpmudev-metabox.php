@@ -177,7 +177,7 @@ class WPMUDEV_Metabox {
 			'order' => 10,
 			'conditional' => array(),
 		), $args);
-
+		
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
 		$this->nonce_name = $this->nonce_action . '_nonce';
 	
@@ -192,7 +192,8 @@ class WPMUDEV_Metabox {
 		add_action('save_post', array(&$this, 'save_fields'));
 		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
 		add_action('admin_notices', array(&$this, 'admin_notices'));
-		add_action('init', array(&$this, 'maybe_save_settings_fields'));
+		add_action('network_admin_notices', array(&$this, 'admin_notices'));
+		add_action('init', array(&$this, 'maybe_save_settings_fields'), 99);
 	}
 
 	/**

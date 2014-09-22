@@ -72,7 +72,7 @@ if ( ! function_exists('mp_popular_country_list') ) :
 	function mp_popular_country_list() {
 		$sorted = array();
 		$countries = mp()->popular_countries;
-		 
+		
 		foreach ( $countries as $code => $country ) {
 			$sorted[$code] = $country;
 		}

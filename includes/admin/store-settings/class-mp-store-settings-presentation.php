@@ -31,11 +31,21 @@ class MP_Store_Settings_Presentation {
 	 * @access private
 	 */
 	private function __construct() {
+		add_action('init', array(&$this, 'init_metaboxes'));
+	}
+	
+	/**
+	 * Initialize metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_metaboxes() {
 		$this->init_general_settings();
 		$this->init_product_page_settings();
 		$this->init_related_product_settings();
 		$this->init_product_list_settings();
-		$this->init_social_settings();
+		$this->init_social_settings();		
 	}
 	
 	/**

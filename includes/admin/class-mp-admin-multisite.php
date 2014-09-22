@@ -32,11 +32,14 @@ class MP_Admin_Multisite {
 	 * @access private
 	 */
 	private function __construct() {
+		add_action('init', array(&$this, 'init_metaboxes'));
+		add_action('network_admin_menu', array(&$this, 'add_menu_items'));
+	}
+	
+	public function init_metaboxes() {
 		$this->init_general_settings_metaboxes();
 		$this->init_global_gateway_settings_metaboxes();
 		$this->init_gateway_permissions_metaboxes();
-		
-		add_action('network_admin_menu', array(&$this, 'add_menu_items'));
 	}
 	
 	public function init_general_settings_metaboxes() {

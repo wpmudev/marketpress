@@ -31,7 +31,7 @@ class MP_Store_Settings_Notifications {
 	 * @access private
 	 */
 	private function __construct() {
-		$this->init_metaboxes();
+		add_action('init', array(&$this, 'init_metaboxes'));
 	}
 	
 	/**

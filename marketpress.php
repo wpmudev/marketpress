@@ -402,8 +402,10 @@ class Marketpress {
 		// Init variables
 		$this->_init_vars();
 		
+		// Includes
 		add_action('plugins_loaded', array(&$this, 'includes'));
-		
+		// Load gateway/shipping plugins
+		add_action('plugins_loaded', array(&$this, 'load_plugins'));
 		// Setup custom types
 		add_action('init', array(&$this, 'register_custom_types'), 0);
 	}

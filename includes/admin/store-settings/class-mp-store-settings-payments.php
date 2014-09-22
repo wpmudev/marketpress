@@ -31,7 +31,7 @@ class MP_Store_Settings_Payments {
 	 * @access private
 	 */
 	private function __construct() {
-		$this->add_metaboxes();
+		add_action('init', array(&$this, 'add_metaboxes'));
 		add_action('admin_footer', array(&$this, 'print_scripts'));
 	}
 	

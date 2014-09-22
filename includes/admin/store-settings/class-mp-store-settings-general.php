@@ -70,7 +70,16 @@ class MP_Store_Settings_General {
 		add_action('wpmudev_field/print_scripts/currency', array(&$this, 'update_currency_symbol'));
 		add_filter('wpmudev_field/get_value/tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
 		add_filter('wpmudev_field/sanitize_for_db/tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
-		
+		add_action('init', array(&$this, 'init_metaboxes'));
+	}
+	
+	/**
+	 * Initialize metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_metaboxes() {
 		$this->init_location_settings();
 		$this->init_tax_settings();
 		$this->init_currency_settings();
