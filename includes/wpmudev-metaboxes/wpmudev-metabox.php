@@ -664,7 +664,7 @@ class WPMUDEV_Metabox {
 					$value = $field->sanitize_for_db($value);
 				}
 				
-				$settings = $this->push_to_array($settings, $post_key, $value);
+				$this->push_to_array($settings, $post_key, $value);
 			}
 			
 			if ( ! empty($this->args['site_option_name']) ) {
