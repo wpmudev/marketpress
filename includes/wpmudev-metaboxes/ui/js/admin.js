@@ -103,7 +103,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		$.each(conditionals, function(i, conditional){
 			var $input = $('[name="' + conditional.name + '"]');
 			
-			if ( ! $input.is(':radio') && ! $input.is(':checkbox') && ! $input.is('select') ) {
+			if ( ! $input.is(':radio:visible') && ! $input.is(':checkbox:visible') && ! $input.is('select:visible') ) {
 				// Conditional logic only works for radios, checkboxes and select dropdowns
 				return;
 			}
