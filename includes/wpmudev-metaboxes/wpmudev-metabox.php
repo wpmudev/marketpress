@@ -23,6 +23,7 @@ require_once WPMUDEV_Metabox::class_dir('api.php');
  */
 $GLOBALS['wpmudev_metaboxes_printed_field_scripts'] = array();
 
+// Save the state of a given metabox
 add_action('wp_ajax_wpmudev_metabox_save_state', array('WPMUDEV_Metabox', 'ajax_save_state'));
 
 class WPMUDEV_Metabox {

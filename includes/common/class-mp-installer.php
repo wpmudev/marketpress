@@ -216,20 +216,6 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Updates the product post type
-	 *
-	 * Updates the product post type to avoid conflicts with WooCommerce
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @uses $wpdb
-	 */
-	public function update_product_post_type() {
-		global $wpdb;
-		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type' => 'product'));
-	}
-	
-	/**
 	 * Updates the admin capabilities
 	 *
 	 * @since 3.0
@@ -240,7 +226,7 @@ class MP_Installer {
 	public function update_admin_caps() {
 		$role = get_role('administrator');
 		$taxonomies = array('product_category', 'product_tag');
-		$pts = array('mp_product', 'product_coupon', 'mp_order');
+		$pts = array('product', 'product_coupon', 'mp_order');
 		
 		foreach ( $taxonomies as $tax_slug ) {
 			$tax = get_taxonomy($tax_slug);
@@ -268,7 +254,6 @@ class MP_Installer {
 		$this->backup_legacy_settings($settings);
 		$this->update_coupon_schema();
 		$this->create_product_attributes_table();
-		$this->update_product_post_type();
 		$this->update_admin_caps();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);

@@ -186,7 +186,7 @@ if (!function_exists('mp_popular_products')) :
  */
 function mp_popular_products($echo = true, $num = 5) {
 		//The Query
-		$custom_query = new WP_Query('post_type=mp_product&post_status=publish&posts_per_page=' . intval($num) . '&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value_num&order=DESC');
+		$custom_query = new WP_Query('post_type=' . MP_Product::get_post_type() . '&post_status=publish&posts_per_page=' . intval($num) . '&meta_key=mp_sales_count&meta_compare=>&meta_value=0&orderby=meta_value_num&order=DESC');
 		
 		$content = '<ul id="mp_popular_products">';
 		
@@ -239,11 +239,11 @@ function mp_related_products() {
 	$args = mp()->parse_args(func_get_args(), $defaults);
 	
 	if( !is_null($args['product_id']) ) {
-		$args['product_id'] = ( isset($post) && $post->post_type == 'mp_product' ) ? $post->ID : false;
+		$args['product_id'] = ( isset($post) && $post->post_type == MP_Product::get_post_type() ) ? $post->ID : false;
 		$product_details = get_post($args['product_id']);
 	}else{
 		$product_details = get_post($args['product_id']);
-		$args['product_id'] = ( $product_details->post_type == 'mp_product' ) ? $post->ID : false;
+		$args['product_id'] = ( $product_details->post_type == MP_Product::get_post_type() ) ? $post->ID : false;
 	}
 	
 	if( is_null($product_details) )
@@ -251,7 +251,7 @@ function mp_related_products() {
 	
 	//setup the default args
 	$query_args = array(
-		'post_type' 	 => 'mp_product',
+		'post_type' 	 => MP_Product::get_post_type(),
 		'posts_per_page' => intval($args['limit']),
 		'post__not_in' 	 => array($args['product_id']),
 		'tax_query' 	 => array(), //we'll add these later
@@ -1597,7 +1597,7 @@ function mp_list_products() {
 	$args['nopaging'] = false;
 	
 	$query = array(
-		'post_type' => 'mp_product',
+		'post_type' => MP_Product::get_post_type(),
 		'post_status' => 'publish',
 	);
 	$tax_query = array();
@@ -2952,7 +2952,7 @@ if (!function_exists('mp_products_count')) :
  * @retuns int number of published products.
  */
 function mp_products_count() {
-		$custom_query = new WP_Query('post_type=mp_product&post_status=publish');
+		$custom_query = new WP_Query('post_type=' . MP_Product::get_post_type() . '&post_status=publish');
 		return $custom_query->post_count;
 }
 endif;

@@ -131,7 +131,7 @@ class MP_Product_Coupons_Screen {
 			'validation' => array('required' => true),
 			'multiple' => true,
 			'placeholder' => __('Select Products', 'mp'),
-			'query' => array('post_type' => 'mp_product', 'posts_per_page' => 20),
+			'query' => array('post_type' => MP_Product::get_post_type(), 'posts_per_page' => 20),
 			'label' => array('text' => __('Product', 'mp')),
 			'conditional' => array(
 				'name' => 'applies_to',
@@ -292,7 +292,7 @@ class MP_Product_Coupons_Screen {
 	 */
 	public function add_menu_items() {
 		//manage coupons
-		add_submenu_page('edit.php?post_type=mp_product', __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=product_coupon');
+		add_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=product_coupon');
 	}
 	
 	/**

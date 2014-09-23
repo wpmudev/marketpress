@@ -68,6 +68,8 @@ class MP_Store_Settings_General {
 	private function __construct() {
 		add_action('wpmudev_field/print_scripts/base_country', array(&$this, 'update_states_dropdown'));
 		add_action('wpmudev_field/print_scripts/currency', array(&$this, 'update_currency_symbol'));
+		add_action('wpmudev_field/print_scripts/product_post_type', array(&$this, 'product_post_type_alert'));
+		//add_action('wpmudev_metabox/settings_metabox_saved', array(&$this, 'maybe_flush_rewrites'));
 		add_filter('wpmudev_field/get_value/tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
 		add_filter('wpmudev_field/sanitize_for_db/tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
 		add_action('init', array(&$this, 'init_metaboxes'));
@@ -84,6 +86,51 @@ class MP_Store_Settings_General {
 		$this->init_tax_settings();
 		$this->init_currency_settings();
 		$this->init_misc_settings();
+		$this->init_advanced_settings();
+	}
+	
+	/**
+	 * 
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_metabox/settings_metabox_saved
+	 */
+	public function maybe_flush_rewrites( $metabox ) {
+		if ( $metabox->args['id'] != 'mp-settings-general-advanced-settings' ) {
+			return;
+		}
+		
+		if ( mp_get_post_value('product_post_type') ) {
+			update_option('mp_flush_rewrite', 1);
+		}
+	}
+	
+	/**
+	 * Print javascript for displaying an alert when checking the "change product post type" field
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/print_scripts/product_post_type
+	 */
+	public function product_post_type_alert() {
+?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	$('input[name="product_post_type"]').change(function(){
+		var $this = $(this);
+		
+		if ( $this.is(':checked') ) {
+			var response = confirm("<?php _e('IMPORTANT! Enabling this setting is permanent!\n\nAre you sure you want to continue?', 'mp'); ?>");
+			
+			if ( ! response ) {
+				$this.prop('checked', false);
+			}
+		}
+	});
+});
+</script>
+<?php
 	}
 	
 	/**
@@ -202,6 +249,32 @@ jQuery(document).ready(function($){
 });
 </script>
 		<?php
+	}
+
+	/**
+	 * Init advanced settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_advanced_settings() {
+		if ( mp_get_setting('product_post_type', 'product') == 'mp_product' ) {
+			return;
+		}
+		
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-settings-general-advanced-settings',
+			'screen_ids' => array('store-settings', 'toplevel_page_store-settings'),
+			'title' => __('Advanced Settings', 'mp'),
+			'option_name' => 'mp_settings',
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => 'product_post_type',
+			'label' => array('text' => __('Change product post type', 'mp')),
+			'desc' => __('If you are experiencing conflicts with other e-commerce plugins enable this setting. This will change the internal post type of all your products from "product" to "mp_product". <strong>Please note that enabling this option may break 3rd party themes or plugins.</strong>', 'mp'),
+			'message' => __('Yes', 'mp'),
+			'value' => 'mp_product',
+		));
 	}
 
 	/**

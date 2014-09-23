@@ -51,7 +51,7 @@ class MP_Shortcode_Builder {
 			'update_post_term_cache' => false,
 			'orderby' => 'title',
 			'order' => 'ASC',
-			'post_type' => 'mp_product',
+			'post_type' => MP_Product::get_post_type(),
 		));
 		$data = array('posts' => array(), 'posts_per_page' => $args['posts_per_page'], 'total' => $query->found_posts);
 		

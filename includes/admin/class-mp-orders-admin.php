@@ -404,7 +404,7 @@ class MP_Orders_Admin {
 				$count_output = '';
 			}
 				
-			$orders_page = add_submenu_page('edit.php?post_type=mp_product', __('Orders', 'mp'), __('Orders', 'mp') . $count_output, $order_cap, 'edit.php?post_type=mp_order');
+			$orders_page = add_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), __('Orders', 'mp'), __('Orders', 'mp') . $count_output, $order_cap, 'edit.php?post_type=mp_order');
 		}
 	}
 	

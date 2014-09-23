@@ -65,7 +65,7 @@ class MP_Products_Screen {
 	 * @access public
 	 */
 	public function remove_menu_items() {
-		remove_submenu_page('edit.php?post_type=mp_product', 'post-new.php?post_type=mp_product');
+		remove_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), 'post-new.php?post_type=' . MP_Product::get_post_type());
 	}
 
 	/**
@@ -200,7 +200,7 @@ class MP_Products_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-product-details-metabox',
 			'title' => __('Product Details', 'mp'),
-			'post_type' => 'mp_product',
+			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
 		));
 		$metabox->add_field('radio_group', array(
@@ -332,7 +332,7 @@ class MP_Products_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-product-variations-metabox',
 			'title' => __('Variations', 'mp'),
-			'post_type' => 'mp_product',
+			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
 		));
 		$metabox->add_field('checkbox', array(
@@ -508,7 +508,7 @@ class MP_Products_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-product-attributes-metabox',
 			'title' => __('Attributes', 'mp'),
-			'post_type' => 'mp_product',
+			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
 		));
 		

@@ -103,48 +103,6 @@ class Marketpress {
 	}
 
 	/**
-	 * Update a user's preference
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 *
-	 * @param int $user_id The user ID (optional) defaults to current user ID
-	 * @param string $key The preference to get
-	 * @param mixed $value The value to set
-	 */
-	public function update_user_preference( $user_id = null, $key, $value ) {
-		if ( is_null($user_id) ) {
-			$user_id = get_current_user_id();
-		}
-		
-		$prefs = (array) get_user_meta($user_id, 'mp_user_preferences', true);
-		$prefs[$_POST['key']] = $_POST['value'];
-		update_user_meta($user_id, 'mp_user_preferences', $prefs);
-		
-		exit;
-	}
-	
-	/**
-	 * Get a users preference
-	 *
-	 * @since 3.0.0
-	 * @access public
-	 *
-	 * @param int $user_id The user ID (optional) defaults to current user ID
-	 * @param string $key The preference to get
-	 * @param mixed $default The default value to return if a preference isn't set
-	 * @return mixed
-	 */
-	public function get_user_preference( $user_id = null, $key, $default = false ) {
-		if ( is_null($user_id) ) {
-			$user_id = get_current_user_id();
-		}
-		
-		$prefs = get_user_meta($user_id, 'mp_user_preferences', true);
-		return mp_arr_get_value($key, $prefs, $default);
-	}
-	
-	/**
 	 * Register custom post types, taxonomies and stati
 	 *
 	 * @since 3.0
@@ -155,7 +113,7 @@ class Marketpress {
 		global $wp_version;
 		
 		//! Register product_category taxonomy
-		register_taxonomy('product_category', 'mp_product', apply_filters('mp_register_product_category', array(
+		register_taxonomy('product_category', MP_Product::get_post_type(), apply_filters('mp_register_product_category', array(
 			'hierarchical' => true,
 			'label' => __('Product Categories', 'mp'),
 			'singular_label' => __('Product Category', 'mp'),
@@ -173,7 +131,7 @@ class Marketpress {
 		)));
 		
 		//! Register product_tag taxonomy
-		register_taxonomy('product_tag', 'mp_product', apply_filters('mp_register_product_tag', array(
+		register_taxonomy('product_tag', MP_Product::get_post_type(), apply_filters('mp_register_product_tag', array(
 			'hierarchical' => false,
 			'label' => __('Product Tags', 'mp'),
 			'singular_label' => __('Product Tag', 'mp'),
@@ -226,7 +184,7 @@ class Marketpress {
 		));
 
 		//! Register product post type
-		register_post_type('mp_product' , apply_filters('mp_register_post_type', array(
+		register_post_type(MP_Product::get_post_type(), apply_filters('mp_register_post_type', array(
 			'labels' => array(
 				'name' => __('Products', 'mp'),
 				'singular_name' => __('Product', 'mp'),
@@ -408,11 +366,35 @@ class Marketpress {
 		add_action('plugins_loaded', array(&$this, 'load_plugins'));
 		// Setup custom types
 		add_action('init', array(&$this, 'register_custom_types'), 0);
+		// Maybe flush rewrites
+		add_action('init', array(&$this, 'maybe_flush_rewrites'), 99);
 	}
 	
+	/**
+	 * Maybe flush rewrite rules
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action init
+	 */
+	public function maybe_flush_rewrites() {
+		if ( get_option('mp_flush_rewrite') ) {
+			flush_rewrite_rules();
+			delete_option('mp_flush_rewrite');
+		}
+	}
+	
+	/**
+	 * Include necessary files
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function includes() {
 		// Include helper functions
 		require_once $this->plugin_dir('includes/common/helpers.php');
+		// Include product class
+		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		// Include installer class
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		// Include shipping and gateway api classes
