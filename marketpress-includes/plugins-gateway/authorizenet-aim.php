@@ -613,24 +613,22 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 
         $payment->process();
 
-        if ($payment->isApproved()) {
+        if ( $payment->isApproved() ) {
+          $paid = ( $payment->isHeldForReview() ) ? false : true;
 
-            $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
-            $paid = true;
+          $payment_info['gateway_public_name'] = $this->public_name;
+          $payment_info['gateway_private_name'] = $this->admin_name;
+          $payment_info['method'] = $payment->getMethod();
+          $payment_info['status'][$timestamp] = ( $payment->isHeldForReview() ) ? __('held for review', 'mp') : __('paid', 'mp');
+          $payment_info['total'] = $total;
+          $payment_info['currency'] = $this->currencyCode;
+          $payment_info['transaction_id'] = $payment->getTransactionID();
 
-            $payment_info['gateway_public_name'] = $this->public_name;
-            $payment_info['gateway_private_name'] = $this->admin_name;
-            $payment_info['method'] = $payment->getMethod();
-            $payment_info['status'][$timestamp] = "paid";
-            $payment_info['total'] = $total;
-            $payment_info['currency'] = $this->currencyCode;
-            $payment_info['transaction_id'] = $payment->getTransactionID();
-
-            //succesful payment, create our order now
-            $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
+          //succesful payment, create our order now
+          $result = $mp->create_order($_SESSION['mp_order'], $cart, $shipping_info, $payment_info, $paid);
         } else {
-            $error = $payment->getResponseText();
-            $mp->cart_checkout_error(sprintf(__('There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp'), $error, mp_checkout_step_url('checkout')));
+          $error = $payment->getResponseText();
+          $mp->cart_checkout_error(sprintf(__('There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp'), $error, mp_checkout_step_url('checkout')));
         }
     }
 
@@ -817,6 +815,7 @@ if (!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
         var $line_items = array();
         var $approved = false;
         var $declined = false;
+        var $held_for_review = false;
         var $error = true;
         var $method = "";
         var $fields;
@@ -896,20 +895,32 @@ if (!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
                 }
 
                 $this->parseResults();
-
-                if ($this->getResultResponseFull() == "Approved") {
-                    $this->approved = true;
+                
+                switch ( $this->getResultResponseFull() ) {
+	                case 'Approved' :
+	                	$this->approved = true;
                     $this->declined = false;
                     $this->error = false;
                     $this->method = $this->getMethod();
-                    break;
-                } else if ($this->getResultResponseFull() == "Declined") {
-                    $this->approved = false;
+										break;
+									
+									case 'Declined' :
+										$this->approved = false;
                     $this->declined = true;
                     $this->error = false;
                     break;
+                  
+                  case 'HeldForReview' :
+                  	$this->approved = true;
+                    $this->declined = false;
+                    $this->error = false;
+                    $this->held_for_review = true;
+                    break;
+                    
+                  case 'Error' :
+                  	$count ++;
+                  	break;
                 }
-                $count++;
             }
         }
 
@@ -948,7 +959,7 @@ if (!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
         }
 
         function getResultResponseFull() {
-            $response = array("", "Approved", "Declined", "Error");
+            $response = array("", "Approved", "Declined", "Error", "HeldForReview");
             return $response[str_replace($this->params['x_encap_char'], '', $this->results[0])];
         }
 
@@ -962,6 +973,10 @@ if (!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 
         function isError() {
             return $this->error;
+        }
+        
+        function isHeldForReview() {
+	        	return $this->held_for_review;
         }
 
         function getResponseText() {
