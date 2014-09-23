@@ -69,7 +69,7 @@ class MP_Store_Settings_General {
 		add_action('wpmudev_field/print_scripts/base_country', array(&$this, 'update_states_dropdown'));
 		add_action('wpmudev_field/print_scripts/currency', array(&$this, 'update_currency_symbol'));
 		add_action('wpmudev_field/print_scripts/product_post_type', array(&$this, 'product_post_type_alert'));
-		//add_action('wpmudev_metabox/settings_metabox_saved', array(&$this, 'maybe_flush_rewrites'));
+		add_action('wpmudev_metabox/after_settings_metabox_saved', array(&$this, 'update_product_post_type'));
 		add_filter('wpmudev_field/get_value/tax[rate]', array(&$this, 'get_tax_rate_value'), 10, 4);
 		add_filter('wpmudev_field/sanitize_for_db/tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
 		add_action('init', array(&$this, 'init_metaboxes'));
@@ -90,20 +90,22 @@ class MP_Store_Settings_General {
 	}
 	
 	/**
-	 * 
+	 * Update the product post type
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @action wpmudev_metabox/settings_metabox_saved
+	 * @uses $wpdb
 	 */
-	public function maybe_flush_rewrites( $metabox ) {
-		if ( $metabox->args['id'] != 'mp-settings-general-advanced-settings' ) {
+	public function update_product_post_type( $metabox ) {
+		global $wpdb;
+		
+		if ( $metabox->args['id'] != 'mp-settings-general-advanced-settings' || mp_get_post_value('product_post_type') != 'mp_product' ) {
 			return;
 		}
 		
-		if ( mp_get_post_value('product_post_type') ) {
-			update_option('mp_flush_rewrite', 1);
-		}
+		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type', 'product'));
+		update_option('mp_flush_rewrite', 1);
 	}
 	
 	/**
