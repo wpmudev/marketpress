@@ -40,7 +40,24 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		initValidation();
 		initRowShading();
 		initToolTips();
+		initPostboxAccordions();
 	});
+	
+	var initPostboxAccordions = function(){
+		$('.wpmudev-postbox').find('.hndle, .handlediv').click(function(){
+			var $this = $(this),
+					$postbox = $this.closest('.wpmudev-postbox');
+			
+			$postbox.toggleClass('closed');
+			$(document).trigger('postbox-toggled', $postbox);
+			
+			$.post(ajaxurl, {
+				"action" : "wpmudev_metabox_save_state",
+				"closed" : $postbox.hasClass('closed'),
+				"id" : $postbox.attr('id')
+			});
+		});
+	}
 	
 	var initToolTips = function(){
 		$('.wpmudev-field').on('click', '.wpmudev-metabox-tooltip', function(){

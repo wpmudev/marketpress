@@ -23,7 +23,9 @@ require_once WPMUDEV_Metabox::class_dir('api.php');
  */
 $GLOBALS['wpmudev_metaboxes_printed_field_scripts'] = array();
 
-class WPMUDEV_Metabox {	
+add_action('wp_ajax_wpmudev_metabox_save_state', array('WPMUDEV_Metabox', 'ajax_save_state'));
+
+class WPMUDEV_Metabox {
 	/**
 	 * Refers to if the metabox fields are saved
 	 *
@@ -133,6 +135,41 @@ class WPMUDEV_Metabox {
 	public static $did_metabox_count = 0;
 	
 	/**
+	 * Save the state of the metabox (open or closed)
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @action wp_ajax_wpmudev_metabox_save_state
+	 */
+	public static function ajax_save_state() {
+		$option = 'wpmudev_metabox_states';
+		$data = get_option($option, array());
+		$id = isset($_POST['id']) ? $_POST['id'] : null;
+		$is_closed = isset($_POST['closed']) ? $_POST['closed'] : null;
+		
+		if ( is_null($id) || is_null($is_closed) ) {
+			return;
+		}
+		
+		if ( $is_closed == 'true' ) {
+			$is_closed = true;
+		} else {
+			$is_closed = false;
+		}
+		
+		self::push_to_array($data, $id, $is_closed);
+		
+		// is_network_admin() doesn't work for ajax calls - see https://core.trac.wordpress.org/ticket/22589
+		if ( is_multisite() && preg_match('#^' . network_admin_url() . '#i', $_SERVER['HTTP_REFERER']) ) {
+			update_site_option($option, $data);
+		} else {
+			update_option($option, $data);
+		}
+		
+		die;
+	}
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 1.0
@@ -186,6 +223,7 @@ class WPMUDEV_Metabox {
 		$this->localize();
 		$this->load_fields();
 		$this->init_conditional_logic();
+		$this->add_html_classes();
 				
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
 		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
@@ -196,6 +234,29 @@ class WPMUDEV_Metabox {
 		add_action('admin_notices', array(&$this, 'admin_notices'));
 		add_action('network_admin_notices', array(&$this, 'admin_notices'));
 		add_action('init', array(&$this, 'maybe_save_settings_fields'), 99);
+	}
+	
+	/**
+	 * Add HTML classes to metabox
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function add_html_classes() {
+		if ( $this->is_closed() && $this->is_active() ) {
+			$this->args['class'] .= ' closed';
+		}
+	}
+	
+	/**
+	 * Determine if metabox is closed
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function is_closed() {
+		$settings = ( is_network_admin() ) ? get_site_option('wpmudev_metabox_states', array()) : get_option('wpmudev_metabox_states', array());
+		return (( isset($settings[$this->args['id']]) ) ? (bool) $settings[$this->args['id']] : false);
 	}
 
 	/**
@@ -482,8 +543,9 @@ class WPMUDEV_Metabox {
 		<?php
 			endif; ?>
 					<div id="<?php echo $this->args['id']; ?>" class="<?php echo $this->args['class']; ?>"<?php echo $atts; ?>>
+						<div class="handlediv" title="Click to toggle"><br /><br /></div>
+						<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
 						<div class="inside">
-							<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
 		<?php
 		endif;
 		
@@ -531,7 +593,7 @@ class WPMUDEV_Metabox {
 	 * @param string $key_string
 	 * @param mixed $value
 	 */
-	public function push_to_array( $array, $key_string, $value ) {
+	public function push_to_array( &$array, $key_string, $value ) {
     $keys = explode('->', $key_string);
     $branch = &$array;
     
@@ -546,8 +608,6 @@ class WPMUDEV_Metabox {
     }
     
     $branch = $value;
-    
-    return $array;
 	}
 	
 	/**

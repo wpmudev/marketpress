@@ -29,6 +29,9 @@ label.error:before {
   visibility: hidden;
   width: 100%;
 }
+.postbox.wpmudev-postbox .hndle {
+  cursor: pointer;
+}
 .postbox.wpmudev-postbox .inside {
   padding: 0;
   /** 
@@ -83,9 +86,6 @@ label.error:before {
   line-height: 1.2;
   padding: 7px;
   width: 100%;
-}
-.postbox.wpmudev-postbox .inside .hndle {
-  cursor: default;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field {
   padding: 12px;
