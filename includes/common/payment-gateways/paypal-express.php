@@ -190,6 +190,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			'title' => __('Paypal Express Checkout Settings', 'mp'),
 			'option_name' => 'mp_settings',
 			'desc' => __('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">More Info &raquo;</a>', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('advanced_select', array(
 			'name' => 'gateways[' . $this->plugin_name . '][locale]',

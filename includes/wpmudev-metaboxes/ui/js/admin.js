@@ -172,13 +172,13 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 					if ( testConditionals(conditionals) != conditionals.length ) {
 						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show().next('p.submit').show();
+						$container.fadeIn(500).next('p.submit').fadeIn(500)
 					}
 				} else {
 					if ( testConditionals(conditionals) == 0 ) {
 						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show().next('p.submit').show();
+						$container.fadeIn(500).next('p.submit').fadeIn(500)
 					}
 				}
 			}
@@ -188,13 +188,13 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 					if ( testConditionals(conditionals) == conditionals.length ) {
 						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show().next('p.submit').show();
+						$container.fadeIn(500).next('p.submit').fadeIn(500)
 					}
 				} else {
 					if ( testConditionals(conditionals) > 0 ) {
 						$container.hide().next('p.submit').hide();
 					} else {
-						$container.show().next('p.submit').show();
+						$container.fadeIn(500).next('p.submit').fadeIn(500)
 					}
 				}
 			}

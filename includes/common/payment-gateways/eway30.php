@@ -625,6 +625,11 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('eWay Rapid 3.0 Payments lets merchants recieve credit card payments through eWay without need for users to leave the shop. Note this gateway requires a valid SSL certificate configured for this site.', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('advanced_select', array(
 			'name' => $this->get_field_name('Currency'),

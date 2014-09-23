@@ -708,6 +708,11 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('Authorize.net AIM is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway. USD is the only currency supported by this gateway.', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'gateways[' . $this->plugin_name . '][mode]',

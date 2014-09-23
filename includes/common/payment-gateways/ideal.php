@@ -334,6 +334,11 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('To make it easier to pay for online products and services, the Dutch banking community has developed the iDEAL online payment method. iDEAL allows online payments to be made using online banking in EUR only.', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('advanced_select', array(
 			'name' => $this->get_field_name('bank'),

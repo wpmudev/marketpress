@@ -296,6 +296,11 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 				'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 				'option_name' => 'mp_settings',
 				'desc' => __('Accept Visa, MasterCard, Maestro UK, Discover and Solo cards directly on your site. You don\'t need a merchant account or gateway. Credit cards go directly to Paymill\'s secure environment, and never hit your servers so you can avoid most PCI requirements.', 'mp'),
+				'conditional' => array(
+					'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+					'value' => 1,
+					'action' => 'show',
+				),
 			));
 			$metabox->add_field('checkbox', array(
 				'name' => $this->get_field_name('is_ssl'),

@@ -358,6 +358,11 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('Record payments manually, such as by Cash, Check, or EFT.', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('advanced_select', array(
 			'name' => $this->get_field_name('currency'),

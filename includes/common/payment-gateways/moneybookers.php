@@ -371,6 +371,11 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 				'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 				'option_name' => 'mp_settings',
 				'desc' => __('Resell your inventory via Moneybookers.com.', 'mp'),
+				'conditional' => array(
+					'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+					'value' => 1,
+					'action' => 'show',
+				),
 			));
 			$metabox->add_field('text', array(
 				'name' => $this->get_field_name('email'),

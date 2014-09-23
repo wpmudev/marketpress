@@ -423,6 +423,11 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('The Hosted Page is a webpage hosted on eWAY\'s side eliminating the need for merchants to capture, transmit or store credit card numbers. At the checkout time the merchant automatically redirects the customer to the Hosted Page where they would enter their details and have the transaction processed. Upon completion of the transaction the customer is redirected back to the MarketPress checkout confirmation page.', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('advanced_select', array(
 			'name' => $this->get_field_name('Currency'),

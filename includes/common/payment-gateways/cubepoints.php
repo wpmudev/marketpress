@@ -186,6 +186,11 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('Accept CubePoints as payment(requires the CubePoints plugin).', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('name'),

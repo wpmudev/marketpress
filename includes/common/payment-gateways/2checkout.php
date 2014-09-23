@@ -297,6 +297,11 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('Resell your inventory via 2Checkout.com. This gateway requires that the setting in 2Checkout for "Return Method" inside Account -> Site Management be set to "Header Redirect".', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'gateways[' . $this->plugin_name . '][mode]',

@@ -106,7 +106,6 @@ if( ! class_exists('MP_Gateway_API') ) {
     	}
     	
 			$gateways = mp_get_setting('gateways');
-			$network_settings = get_site_option('mp_network_settings');
 			$network_enabled = ( is_multisite() && ! is_main_site() && ! is_super_admin() ) ? true : false;
 
 			foreach ( self::get_gateways($network_enabled) as $code => $plugin ) {
@@ -114,7 +113,7 @@ if( ! class_exists('MP_Gateway_API') ) {
 				
 				// If global cart is enabled force it
 				if ( mp()->global_cart ) {
-					if ( $code == $network_settings['global_gateway'] && class_exists($class) ) {
+					if ( $code == mp_get_network_setting('global_gateway') && class_exists($class) ) {
 						self::$_active_gateways[$code] = new $class;
 						break;
 					}

@@ -30,8 +30,8 @@ class MP_Installer {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function _construct() {
-		add_action('plugins_loaded', array(&$this, 'run'));
+	private function __construct() {
+		add_action('init', array(&$this, 'run'));
 		add_action('after_switch_theme', array(&$this, 'update_admin_caps'));
 	}
 	
@@ -44,10 +44,8 @@ class MP_Installer {
 	public function run() {
 		$old_version = get_option('mp_version');
 		
-		if ( ! get_option('mp_do_install') ) {
-			if ( $old_version == MP_VERSION ) {
-				return;
-			}
+		if ( $old_version == MP_VERSION ) {
+			return;
 		}
 
 		$old_settings = get_option('mp_settings', array());
@@ -89,7 +87,6 @@ class MP_Installer {
 		update_option('mp_flush_rewrite', 1);
 
 		update_option('mp_version', MP_VERSION);
-		delete_option('mp_do_install');		
 	}
 	
 	/**

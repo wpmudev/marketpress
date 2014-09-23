@@ -265,6 +265,11 @@ class WPMUDEV_Metabox {
 			echo '<div class="updated"><p>' . __('Settings Saved', 'wpmudev_metaboxes') . '</p></div>';
 			wp_cache_set('settings_saved', true, 'wpmudev_metaboxes'); // Only show the message once per screen
 		}
+		
+		if ( isset($_GET['wpmudev_metabox_settings_failed']) && ! wp_cache_get('settings_failed', 'wpmudev_metaboxes') ) {
+			echo '<div class="error"><p>' . __('Due to prolonged inactivity on this page, one or more settings were not saved. Please try again.', 'wpmudev_metaboxes') . '</p></div>';
+			wp_cache_set('settings_failed', true, 'wpmudev_metaboxes'); // Only show the message once per screen
+		}
 	}
 
 	/**

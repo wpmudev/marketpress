@@ -32,51 +32,6 @@ class MP_Store_Settings_Payments {
 	 */
 	private function __construct() {
 		add_action('init', array(&$this, 'add_metaboxes'));
-		add_action('admin_footer', array(&$this, 'print_scripts'));
-	}
-	
-	/**
-	 * Prints the necessary javascript
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function print_scripts() {
-		if ( get_current_screen()->id != 'store-settings_page_store-settings-payments' ) { return; }
-		?>
-		<script type="text/javascript">
-		(function($){
-			var hideInactiveGateways = function(){
-				var allowedGateways = $('[name="gateways[allowed]"]').val().split(',');
-				var $metaboxes = $('.wpmudev-postbox');
-				var selectors = new Array('#mp-settings-payments');
-				
-				$.each(allowedGateways, function(index, value){
-					selectors.push('#mp-settings-gateway-' + value);
-				});
-				
-				$metaboxes.not(selectors.join(',')).hide();
-			};
-			
-			$(window).load(function(){
-				// Hide the inactive gateways. We do this window.onload instead of document.ready to avoid display issues (e.g. WYSIWYG not getting proper height)
-				hideInactiveGateways();				
-			});
-			
-			$(document).ready(function(){
-				$('[name="gateways[allowed]"]').on('change', function(e){
-					if ( e.added !== undefined ) {
-						$('#mp-settings-gateway-' + e.added.id).slideDown(500);
-					}
-					
-					if ( e.removed !== undefined ) {
-						$('#mp-settings-gateway-' + e.removed.id).slideUp(500);
-					}
-				});
-			});
-		}(jQuery));
-		</script>
-		<?php
 	}
 	
 	/**
@@ -101,11 +56,12 @@ class MP_Store_Settings_Payments {
 			$options[$slug] = $gateway[1];
 		}
 		
-		$metabox->add_field('advanced_select', array(
+		$metabox->add_field('checkbox_group', array(
 			'name' => 'gateways[allowed]',
 			'label' => array('text' => __('Enabled Gateways', 'mp')),
 			'desc' => __('Choose the gateway(s) that you would like to be available for checkout.', 'mp'),
 			'options' => $options,
+			'width' => '50%',
 		));
 	}
 }

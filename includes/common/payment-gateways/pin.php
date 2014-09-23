@@ -333,6 +333,11 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('PIN makes it easy to start accepting credit card payments with Australia’s first all-in-one online payment system. Accept all major credit cards directly on your site. Your sales proceeds are deposited to any Australian bank account, no merchant account required.', 'mp'),
+			'conditional' => array(
+				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value' => 1,
+				'action' => 'show',
+			),
 		));
 		$metabox->add_field('checkbox', array(
 			'name' => $this->get_field_name('is_ssl'),
