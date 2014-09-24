@@ -82,7 +82,7 @@ if( ! class_exists('MP_Gateway_API') ) {
 	    	$gateways = array();
 	    	foreach ( self::$_gateways as $code => $gateway ) {
 	    		$level = str_replace('psts_level_', '', mp_get_network_setting('allowed_gateways->' . $code, ''));
-		    	if ( $level == 'full' || (function_exists('is_pro_site') && is_pro_site(false, $level)) ) {
+		    	if ( $level == 'full' || mp_is_pro_site(false, $level) ) {
 			    	$gateways[$code] = $gateway;
 		    	}
 	    	}
