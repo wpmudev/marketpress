@@ -43,10 +43,11 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		
 		$value = array();		
 		foreach ( $this->subfields as $subfield ) {
+			$subfield->metabox = $this->metabox;
 			$meta_key = $this->args['original_name'] . '_' . $subfield->args['original_name'];
 			$value[$subfield->args['original_name']] = $subfield->get_value($post_id, $meta_key, $raw);
 		}
-
+		
 		/**
 		 * Modify the returned value.
 		 *
