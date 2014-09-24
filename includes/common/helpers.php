@@ -116,6 +116,75 @@ if ( ! function_exists('mp_get_states') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_theme_list') ) :
+	/**
+	 * 
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	 function mp_get_theme_list() {
+		$theme_list = array();
+		$theme_dirs = array(mp_plugin_dir('ui/themes'), WP_CONTENT_DIR . '/marketpress-styles/');
+		
+		foreach ( $theme_dirs as $theme_dir ) {
+			$themes = mp_get_dir_files($theme_dir, 'css');
+			
+			if ( ! $themes ) {
+				continue;
+			}
+			
+			$allowed_themes = $themes;
+			if ( is_multisite() && ! is_network_admin() ) {
+				$allowed_themes = mp_get_network_setting('allowed_themes');
+			}
+			
+			foreach ( $themes as $theme ) {
+				$theme_data = get_file_data($theme, array('name' => 'MarketPress Style'));
+				$key = basename($theme, '.css');
+				
+				if ( $name = mp_arr_get_value('name', $theme_data) ) {
+					if ( is_multisite() && ! is_network_admin() ) {
+						if ( $permissions = mp_arr_get_value($key, $allowed_themes) ) {
+							$level = str_replace('psts_level_', '', $permissions);
+							
+							if ( $permissions != 'full' || ! mp_is_pro_site(false, $level) ) {
+								continue;
+							}
+						}
+					}
+					
+					if ( is_multisite() && is_network_admin() ) {
+						$theme_list[basename($theme, '.css')] = array('path' => $theme, 'name' => $name);
+					} else {
+						$theme_list[basename($theme, '.css')] = $name;
+					}
+				}
+			}
+		}
+		
+		asort($theme_list);
+		
+		return $theme_list;		 
+	 }
+endif;
+
+if ( ! function_exists('mp_is_pro_site') ) :
+	/**
+	 * Checks if the is_pro_site() function exists and if so calls it
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function mp_is_pro_site( $blog_id = false, $level = false ) {
+		if ( ! function_exists('is_pro_site') ) {
+			return true;
+		}
+		
+		return is_pro_site($blog_id, $level);
+	}
+endif;
+
 if ( ! function_exists('mp_get_dir_files') ) :
 	/**
 	 * Get all files from a given directory
@@ -136,6 +205,7 @@ if ( ! function_exists('mp_get_dir_files') ) :
 		
 		$dir = trailingslashit($dir);
 		$files = glob($dir . '*' . $ext);
+		$files = array_filter($files, create_function('$filepath', 'return is_readable($filepath);'));
 		
 		return ( empty($files) ) ? false : $files;
 	}
@@ -501,169 +571,6 @@ if ( ! function_exists('mp_update_network_setting') ) :
 	}
 endif;
 
-if ( ! function_exists('mp_format_currency') ) :
-	/**
-	 * Formats currency
-	 *
-	 * @since 3.0
-	 *
-	 * @param string $currency The currency code to use for formatting (defaults to value set in currency settings)
-	 * @param float $amount The amount to format
-	 * @return string
-	 */
-	 
-	function mp_format_currency( $currency = '', $amount = false ) {
-		
-		
-		$currencies = apply_filters('mp_currencies', mp()->currencies);
-		
-		if ( ! $currency )
-			$currency = mp_get_setting('currency', 'USD');
-
-		// get the currency symbol
-		$symbol = $currencies[$currency][1];
-		// if many symbols are found, rebuild the full symbol
-		$symbols = array_map('trim', explode(', ', $symbol));
-		if (is_array($symbols)) {
-			$symbol = "";
-			foreach ($symbols as $temp) {
-				$symbol .= '&#x'.$temp.';';
-			}
-		} else {
-			$symbol = '&#x'.$symbol.';';
-		}
-
-		//check decimal option
-		if ( mp_get_setting('curr_decimal') === '0' ) {
-			$decimal_place = 0;
-			$zero = '0';
-		} else {
-			$decimal_place = 2;
-			$zero = '0.00';
-		}
-
-		//format currency amount according to preference
-		if ( $amount ) {
-			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
-				return $symbol . number_format_i18n($amount, $decimal_place);
-			
-			if ( mp_get_setting('curr_symbol_position') == 2 )
-				return $symbol . ' ' . number_format_i18n($amount, $decimal_place);
-			
-			if ( mp_get_setting('curr_symbol_position') == 3 )
-				return number_format_i18n($amount, $decimal_place) . $symbol;
-				
-			if ( mp_get_setting('curr_symbol_position') == 4 )
-				return number_format_i18n($amount, $decimal_place) . ' ' . $symbol;
-		} else if ( $amount === false ) {
-			return $symbol;
-		} else {
-			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
-				return $symbol . $zero;
-			
-			if ( mp_get_setting('curr_symbol_position') == 2 )
-				return $symbol . ' ' . $zero;
-			
-			if ( mp_get_setting('curr_symbol_position') == 3 )
-				return $zero . $symbol;
-			
-			if ( mp_get_setting('curr_symbol_position') == 4 )
-				return $zero . ' ' . $symbol;
-		}
-		
-		return $symbol;
-	}
-endif;
-
-if ( ! function_exists('mp_display_currency') ) :
-	/**
-	 * Round and display currency with padded zeros
-	 *
-	 * @since 3.0
-	 *
-	 * @param float $amount
-	 * @return string
-	 */
-	 
-	function mp_display_currency( $amount ) {
-		if ( mp_get_setting('curr_decimal') === '0' )
-			return number_format( round( $amount ), 0, '.', '');
-		else
-			return number_format( round( $amount, 2 ), 2, '.', '');
-	}
-endif;
-
-if ( ! function_exists('mp_format_date') ) :
-	/**
-	 * Translates a gmt timestamp into local timezone for display
-	 *
-	 * @since 3.0
-	 *
-	 * @param int $gmt_timestamp
-	 * @return string
-	 */
-	 
-	function mp_format_date( $gmt_timestamp ) {
-		return date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $gmt_timestamp + (get_option('gmt_offset') * HOUR_IN_SECONDS));
-	}
-endif;
-
-if ( ! function_exists('mp_before_tax_price') ) :
-	/**
-	 * Returns the before tax price for a given amount based on a bunch of foreign tax laws.
-	 *
-	 * @since 3.0
-	 *
-	 * @param float $tax_price The price including taxes
-	 * @param int $product_id
-	 * @return float
-	 */
-	 
-	function mp_before_tax_price( $tax_price, $product_id = false ) {
-		//if tax inclusve pricing is turned off just return given price
-		if ( ! mp_get_setting('tax->tax_inclusive') )
-			return $tax_price;
-
-		if ( $product_id && get_post_meta($product_id, 'mp_is_special_tax', true) ) {
-			$rate = get_post_meta($product_id, 'mp_special_tax', true);
-		} else {
-			//figure out rate in case its based on a canadian base province
-			$rate =	('CA' == mp_get_setting('tax->base_country')) ? mp_get_setting('tax->canada_rate'.mp_get_setting('base_province')) : mp_get_setting('tax->rate');
-		}
-
-		return $tax_price / ($rate + 1); //do not round this to avoid rounding errors in tax calculation
-	}
-endif;
-
-if ( ! function_exists('mp_is_valid_zip') ) :
-	/**
-	 * Checks if a given zip is valid for a given country
-	 *
-	 * @since 3.0
-	 *
-	 * @param string $zip The zip code to check
-	 * @param string $country The country to check
-	 * @return bool
-	 */
-	 
-	function mp_is_valid_zip( $zip, $country ) {
-		
-		
-		if ( array_key_exists($country, mp()->countries_no_postcode) )
-			//given country doesn't use post codes so zip is always valid
-			return true;
-		
-		if ( empty($zip) )
-			//no post code provided
-			return false;
-			
-		if ( strlen($zip) < 3 )
-			//post code is too short - see http://wp.mu/8wg
-			return false;
-			
-		return true;
-	}
-endif;
 
 if ( ! function_exists('mp_plugin_url') ) :
 	/**
