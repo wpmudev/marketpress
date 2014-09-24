@@ -1,29 +1,4 @@
 <?php
-/*
-	MarketPress Template Functions
-
-	Relevant functions for custom template files:
-
-	mp_product.php
-	mp_product_title
-	mp_product_description
-	mp_product_meta
-	mp_product_image
-	mp_product_price
-	mp_buy_button
-	mp_category_list
-
-	mp_cart.php
-	mp_show_cart
-
-	mp_orderstatus.php
-	mp_order_status
-
-	mp_productlist.php
-	mp_products_filter
-	mp_list_products
- */
-
 if (!function_exists('mp_tag_cloud')) :
 /**
  * Display product tag cloud.
@@ -236,7 +211,7 @@ function mp_related_products() {
 		'limit' => mp_get_setting('related_products->show_limit'),
 	));
 	
-	$args = mp()->parse_args(func_get_args(), $defaults);
+	$args = array_replace_recursive($defaults, func_get_args());
 	
 	if( !is_null($args['product_id']) ) {
 		$args['product_id'] = ( isset($post) && $post->post_type == MP_Product::get_post_type() ) ? $post->ID : false;
@@ -424,10 +399,10 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 										$content .= '	 <td class="mp_cart_col_price">';
 										
 										if ( $discount_price == $price ) {
-											$content .= mp()->format_currency('', $price);
+											$content .= mp_format_currency('', $price);
 										} else {
-											$content .= '<del>' . mp()->format_currency('', $price) . '</del><br />';
-											$content .= mp()->format_currency('', $discount_price);
+											$content .= '<del>' . mp_format_currency('', $price) . '</del><br />';
+											$content .= mp_format_currency('', $discount_price);
 										}
 											
 										$content .= '	 </td>';
@@ -457,7 +432,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						if (!mp_get_setting('tax->tax_inclusive')) {
 								$content .= '<tr>';
 								$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Subtotal:', 'mp') . '</td>';
-								$content .= '	 <td class="mp_cart_col_subtotal">' . mp()->format_currency('', $total) . '</td>';
+								$content .= '	 <td class="mp_cart_col_subtotal">' . mp_format_currency('', $total) . '</td>';
 								$content .= '	 <td>&nbsp;</td>';
 								$content .= '</tr>';
 						}
@@ -489,7 +464,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 								$shipping_method = '';
 						$content .= '<tr>';
 						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Shipping:', 'mp') . '</td>';
-						$content .= '	 <td class="mp_cart_col_shipping">' . mp()->format_currency('', $shipping_tax_price) . '</td>';
+						$content .= '	 <td class="mp_cart_col_shipping">' . mp_format_currency('', $shipping_tax_price) . '</td>';
 						$content .= '	 <td>' . $shipping_method . '</td>';
 						$content .= '</tr>';
 						$total = $total + $shipping_price;
@@ -499,7 +474,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				if ($tax_price = array_sum($tax_prices)) {
 						$content .= '<tr>';
 						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . esc_html(mp_get_setting('tax->label', __('Taxes', 'mp'))) . ':</td>';
-						$content .= '	 <td class="mp_cart_col_tax">' . mp()->format_currency('', $tax_price) . '</td>';
+						$content .= '	 <td class="mp_cart_col_tax">' . mp_format_currency('', $tax_price) . '</td>';
 						$content .= '	 <td>&nbsp;</td>';
 						$content .= '</tr>';
 						$total = $total + $tax_price;
@@ -507,7 +482,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 				$content .= '</tbody><tfoot><tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="2">' . __('Cart Total:', 'mp') . '</td>';
-				$content .= '	 <td class="mp_cart_col_total">' . mp()->format_currency('', $total) . '</td>';
+				$content .= '	 <td class="mp_cart_col_total">' . mp_format_currency('', $total) . '</td>';
 				$content .= '	 <td class="mp_cart_col_updatecart"><input type="submit" name="update_cart_submit" value="' . __('Update Cart &raquo;', 'mp') . '" /></td>';
 				$content .= '</tr></tfoot>';
 
@@ -564,10 +539,10 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 										$content .= '	 <td class="mp_cart_col_price">';
 										
 										if ( $discount_price == $price ) {
-											$content .= mp()->format_currency('', $discount_price);
+											$content .= mp_format_currency('', $discount_price);
 										} else {
-											$content .= '<del>' . mp()->format_currency('', $price) . '</del><br />';
-											$content .= mp()->format_currency('', $discount_price);
+											$content .= '<del>' . mp_format_currency('', $price) . '</del><br />';
+											$content .= mp_format_currency('', $discount_price);
 										}
 										
 										$content .= '	 </td>';
@@ -597,7 +572,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 						if (!mp_get_setting('tax->tax_inclusive')) {
 								$content .= '<tr>';
 								$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-								$content .= '	 <td class="mp_cart_col_subtotal">' . mp()->format_currency('', $total) . '</td>';
+								$content .= '	 <td class="mp_cart_col_subtotal">' . mp_format_currency('', $total) . '</td>';
 								$content .= '</tr>';
 						}
 						$content .= '<tr>';
@@ -615,7 +590,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 								$shipping_method = '';
 						$content .= '<tr>';
 						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Shipping:', 'mp') . $shipping_method . '</td>';
-						$content .= '	 <td class="mp_cart_col_shipping">' . mp()->format_currency('', $shipping_tax_price) . '</td>';
+						$content .= '	 <td class="mp_cart_col_shipping">' . mp_format_currency('', $shipping_tax_price) . '</td>';
 						$content .= '</tr>';
 						$total = $total + $shipping_price;
 				}
@@ -624,14 +599,14 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 				if ($tax_price = array_sum($tax_prices)) {
 						$content .= '<tr>';
 						$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . esc_html(mp_get_setting('tax->label', __('Taxes', 'mp'))) . ':</td>';
-						$content .= '	 <td class="mp_cart_col_tax">' . mp()->format_currency('', $tax_price) . '</td>';
+						$content .= '	 <td class="mp_cart_col_tax">' . mp_format_currency('', $tax_price) . '</td>';
 						$content .= '</tr>';
 						$total = $total + $tax_price;
 				}
 
 				$content .= '<tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Cart Total:', 'mp') . '</td>';
-				$content .= '	 <td class="mp_cart_col_total">' . mp()->format_currency('', $total) . '</td>';
+				$content .= '	 <td class="mp_cart_col_total">' . mp_format_currency('', $total) . '</td>';
 				$content .= '</tr>';
 
 				$content .= '</tbody></table>';
@@ -655,7 +630,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 										$content .= '	 <td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id, 25) . '</td>';
 										$content .= '	 <td class="mp_cart_col_product_table"><a href="' . apply_filters('mp_product_url_display_in_cart', $data['url'], $product_id) . '">' . apply_filters('mp_product_name_display_in_cart', $data['name'], $product_id) . '</a>' . '</td>'; // Added WPML
 										$content .= '	 <td class="mp_cart_col_quant">' . number_format_i18n($data['quantity']) . '</td>';
-										$content .= '	 <td class="mp_cart_col_price">' . mp()->format_currency('', $data['price'] * $data['quantity']) . '</td>';
+										$content .= '	 <td class="mp_cart_col_price">' . mp_format_currency('', $data['price'] * $data['quantity']) . '</td>';
 										$content .= '</tr>';
 								}
 						}
@@ -668,7 +643,7 @@ function _mp_cart_table($type = 'checkout', $echo = false) {
 
 				$content .= '<tr>';
 				$content .= '	 <td class="mp_cart_subtotal_lbl" colspan="3">' . __('Subtotal:', 'mp') . '</td>';
-				$content .= '	 <td class="mp_cart_col_total">' . mp()->format_currency('', $total) . '</td>';
+				$content .= '	 <td class="mp_cart_col_total">' . mp_format_currency('', $total) . '</td>';
 				$content .= '</tr>';
 
 				$content .= '</tbody></table>';
@@ -746,7 +721,7 @@ if (!function_exists('_mp_cart_shipping')) :
 function _mp_cart_shipping($editable = false, $echo = false) {
 		global $current_user;
 
-		$meta = wp_parse_args(get_user_meta($current_user->ID, 'mp_shipping_info', true), array(
+		$meta = array_replace_recursive(array(
 			'address1' => '',
 			'address2' => '',
 			'city' => '',
@@ -754,7 +729,7 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 			'zip' => '',
 			'country' => '',
 			'phone' => '',
-		));
+		), get_user_meta($current_user->ID, 'mp_shipping_info', true));
 		
 		//get address
 		$email = (!empty($_SESSION['mp_shipping_info']['email'])) ? $_SESSION['mp_shipping_info']['email'] : (isset($meta['email']) ? $meta['email'] : $current_user->user_email);
@@ -1178,7 +1153,7 @@ function mp_order_status( $echo = true ) {
 								</li>
 								<li>' .
 										apply_filters('mp_order_status_label_payment_total', __('Payment Total', 'mp'), $order) . '
-										<strong>' . mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']) . ' ' . $order->mp_payment_info['currency'] . '</strong>
+										<strong>' . mp_format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']) . ' ' . $order->mp_payment_info['currency'] . '</strong>
 								</li>
 						</ul>
 
@@ -1208,16 +1183,16 @@ function mp_order_status( $echo = true ) {
 																
 																//price text
 																if ( $price != $discount_price ) {
-																	$price_text = '<del>' . mp()->format_currency('', $price / $data['quantity']) . '</del><br />';
+																	$price_text = '<del>' . mp_format_currency('', $price / $data['quantity']) . '</del><br />';
 																}
 																
-																$price_text .= mp()->format_currency('', $discount_price / $data['quantity']);
+																$price_text .= mp_format_currency('', $discount_price / $data['quantity']);
 									
 																//subtotal text
 																if ( $price != $discount_price ) {
-																	$subtotal_text .= '<del>' . mp()->format_currency('', $price) . '</del><br />';
+																	$subtotal_text .= '<del>' . mp_format_currency('', $price) . '</del><br />';
 																}
-																$subtotal_text .= mp()->format_currency('', $discount_price);
+																$subtotal_text .= mp_format_currency('', $discount_price);
 																															
 																$content .= '<tr>';
 																$content .= '	<td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id) . '</td>';
@@ -1236,16 +1211,16 @@ function mp_order_status( $echo = true ) {
 																		
 																		//price text
 																		if ( $price != $discount_price ) {
-																			$price_text = '<del>' . mp()->format_currency('', $price / $data['quantity']) . '</del><br />';
+																			$price_text = '<del>' . mp_format_currency('', $price / $data['quantity']) . '</del><br />';
 																		}
 																		
-																		$price_text .= mp()->format_currency('', $discount_price / $data['quantity']);
+																		$price_text .= mp_format_currency('', $discount_price / $data['quantity']);
 											
 																		//subtotal text
 																		if ( $price != $discount_price ) {
-																			$subtotal_text .= '<del>' . mp()->format_currency('', $price) . '</del><br />';
+																			$subtotal_text .= '<del>' . mp_format_currency('', $price) . '</del><br />';
 																		}
-																		$subtotal_text .= mp()->format_currency('', $discount_price);
+																		$subtotal_text .= mp_format_currency('', $discount_price);
 																		
 																		$content .= '<tr>';
 																		$content .= '	<td class="mp_cart_col_thumb">' . mp_product_image(false, 'widget', $product_id) . '</td>';
@@ -1306,15 +1281,15 @@ function mp_order_status( $echo = true ) {
 
 								//shipping line
 								if ($order->mp_shipping_total) {
-									$content .= '<li>' . apply_filters('mp_order_status_label_shipping', __('Shipping', 'mp'), $order) . ': <strong>' . mp()->format_currency('', mp()->get_display_shipping($order)) . '</strong></li>';
+									$content .= '<li>' . apply_filters('mp_order_status_label_shipping', __('Shipping', 'mp'), $order) . ': <strong>' . mp_format_currency('', mp()->get_display_shipping($order)) . '</strong></li>';
 								}
 
 								//tax line
 								if ($order->mp_tax_total) {
-									$content .= '<li>' . esc_html(mp_get_setting('tax->label', __('Taxes', 'mp'))) . ': <strong>' . mp()->format_currency('', $order->mp_tax_total) . '</strong></li>';
+									$content .= '<li>' . esc_html(mp_get_setting('tax->label', __('Taxes', 'mp'))) . ': <strong>' . mp_format_currency('', $order->mp_tax_total) . '</strong></li>';
 								}
 
-								$content .= '<li>' . apply_filters('mp_order_status_label_order_total', __('Order Total', 'mp'), $order) . ': <strong>' . mp()->format_currency('', $order->mp_order_total) . '</strong></li>
+								$content .= '<li>' . apply_filters('mp_order_status_label_order_total', __('Order Total', 'mp'), $order) . ': <strong>' . mp_format_currency('', $order->mp_order_total) . '</strong></li>
 						</ul>';
 						
 						if ( MP_HIDE_ORDERSTATUS_SHIPPING !== true ) {
@@ -1434,7 +1409,7 @@ function mp_order_status( $echo = true ) {
 					$resave_meta = false;
 					foreach ($orders as $timestamp => $order) {
 						if( mp()->get_order( $order['id'] ) ) {
-									$content .= '	 <li><strong>' . mp()->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . mp()->format_currency('', $order['total']) . '</li>';
+									$content .= '	 <li><strong>' . mp()->format_date($timestamp) . ':</strong> <a href="./' . trailingslashit($order['id']) . '">' . $order['id'] . '</a> - ' . mp_format_currency('', $order['total']) . '</li>';
 						}else{
 							unset( $orders[$timestamp] );
 							$resave_meta = true;
@@ -1593,7 +1568,7 @@ if (!function_exists('mp_list_products')) :
 function mp_list_products() {
 	global $wp_query, $mp;
 	
-	$args = mp()->parse_args(func_get_args(), mp()->defaults['list_products']);
+	$args = array_replace_recursive(mp()->defaults['list_products'], func_get_args());
 	$args['nopaging'] = false;
 	
 	$query = array(
@@ -1700,9 +1675,7 @@ function mp_list_products() {
 	
 	$content = '';
 	
-	if ( defined('DOING_AJAX') && DOING_AJAX ) {
-		//do nothing
-	} else {
+	if ( ! mp_doing_ajax() ) {
 		$per_page = ( is_null($args['per_page']) ) ? null : $args['per_page'];
 		$content .= ( (is_null($args['filters']) && 1 == mp_get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter(false, $per_page) : mp_products_filter(true, $per_page);
 	}
@@ -1752,7 +1725,7 @@ function _mp_products_html_list($custom_query) {
 				
 				$product_content = mp_product_image(false, 'list', $post->ID);
 				if ( mp_get_setting('show_excerpt') ) {
-					$product_content .= mp()->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+					$product_content .= mp_product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
 				}
 				
 				$html .= apply_filters('mp_product_list_content', $product_content, $post->ID);
@@ -1800,7 +1773,7 @@ function _mp_products_html_grid($custom_query) {
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 				$img = mp_product_image(false, 'list', $post->ID);
 				$excerpt = mp_get_setting('show_excerpt') ?
-								'<p class="mp_excerpt">' . mp()->product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
+								'<p class="mp_excerpt">' . mp_product_excerpt($post->post_excerpt, $post->post_content, $post->ID, '') . '</p>' :
 								'';
 				$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $post->ID);
 		
@@ -1921,13 +1894,11 @@ if (!function_exists('mp_product_description')) :
  */
 
 function mp_product_description($product_id, $echo = true, $content = 'full', $html_tag = true, $css_class = 'mp_product_content', $microdata = 'itemprop="description"') {
-		;
-
 		$post = get_post($product_id);
 		$description = '';
 
 		if ($content == 'excerpt') {
-				$description .= mp()->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+				$description .= mp_product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
 		} else {
 				$description .= apply_filters('the_content', $post->post_content);
 		}
@@ -1949,6 +1920,36 @@ function mp_product_description($product_id, $echo = true, $content = 'full', $h
 }
 endif;
 
+if ( ! function_exists('mp_product_excerpt') ) :
+	/**
+	 * Replaces wp_trim_excerpt in MP custom loops
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function mp_product_excerpt( $excerpt, $content, $product_id, $excerpt_more = null ) {
+	 if (is_null($excerpt_more))
+			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink($product_id) . '">' .	 __('More Info &raquo;', 'mp') . '</a>';
+	 if ($excerpt) {
+		return apply_filters('get_the_excerpt', $excerpt) . $excerpt_more;
+	 } else {
+			$text = strip_shortcodes( $content );
+			//$text = apply_filters('the_content', $text);
+			$text = str_replace(']]>', ']]&gt;', $text);
+			$text = strip_tags($text);
+			$excerpt_length = apply_filters('excerpt_length', 55);
+			$words = preg_split("/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY);
+			if ( count($words) > $excerpt_length ) {
+				array_pop($words);
+				$text = implode(' ', $words);
+				$text = $text . $excerpt_more;
+			} else {
+				$text = implode(' ', $words);
+			}
+		}
+		return $text;
+	}
+endif;
 
 if (!function_exists('mp_product_meta')) :
 /*
@@ -2017,7 +2018,7 @@ function mp_product($echo = true, $product_id, $title = true, $content = 'full',
 				if ($image)
 						$return .= mp_product_image(false, $image, $post->ID);
 				if ($content == 'excerpt')
-						$return .= mp()->product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
+						$return .= mp_product_excerpt($post->post_excerpt, $post->post_content, $post->ID);
 				else
 						$return .= apply_filters('the_content', $post->post_content);
 				$return .= '</div>';
@@ -2198,10 +2199,10 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 
 		if ((is_array($meta["mp_price"]) && count($meta["mp_price"]) == 1) || !empty($meta["mp_file"])) {
 				if ($meta["mp_is_sale"]) {
-						$price = '<span class="mp_special_price"><del class="mp_old_price">' . mp()->format_currency('', $meta["mp_price"][0]) . '</del>';
-						$price .= '<span itemprop="price" class="mp_current_price">' . mp()->format_currency('', $meta["mp_sale_price"][0]) . '</span></span>';
+						$price = '<span class="mp_special_price"><del class="mp_old_price">' . mp_format_currency('', $meta["mp_price"][0]) . '</del>';
+						$price .= '<span itemprop="price" class="mp_current_price">' . mp_format_currency('', $meta["mp_sale_price"][0]) . '</span></span>';
 				} else {
-						$price = '<span itemprop="price" class="mp_normal_price"><span class="mp_current_price">' . mp()->format_currency('', $meta["mp_price"][0]) . '</span></span>';
+						$price = '<span itemprop="price" class="mp_normal_price"><span class="mp_current_price">' . mp_format_currency('', $meta["mp_price"][0]) . '</span></span>';
 				}
 		} else if (is_array($meta["mp_price"]) && count($meta["mp_price"])) { //only show from price in lists
 				if ($meta["mp_is_sale"]) {
@@ -2211,11 +2212,11 @@ function mp_product_price($echo = true, $post_id = NULL, $label = true) {
 						$keys = array_keys($lowest);
 						$mp_price = $meta["mp_price"][$keys[0]];
 						$mp_sale_price = array_pop($lowest);
-						$price = __('from', 'mp') . ' <span class="mp_special_price"><del class="mp_old_price">' . mp()->format_currency('', $mp_price) . '</del>';
-						$price .= '<span itemprop="price" class="mp_current_price">' . mp()->format_currency('', $mp_sale_price) . '</span></span>';
+						$price = __('from', 'mp') . ' <span class="mp_special_price"><del class="mp_old_price">' . mp_format_currency('', $mp_price) . '</del>';
+						$price .= '<span itemprop="price" class="mp_current_price">' . mp_format_currency('', $mp_sale_price) . '</span></span>';
 				} else {
 						sort($meta["mp_price"], SORT_NUMERIC);
-						$price = __('from', 'mp') . ' <span itemprop="price" class="mp_normal_price"><span class="mp_current_price">' . mp()->format_currency('', $meta["mp_price"][0]) . '</span></span>';
+						$price = __('from', 'mp') . ' <span itemprop="price" class="mp_normal_price"><span class="mp_current_price">' . mp_format_currency('', $meta["mp_price"][0]) . '</span></span>';
 				}
 		} else {
 				return '';
@@ -2311,6 +2312,162 @@ function _mp_deprecated_hook( $hook, $version, $replacement = null, $message = n
  	 
 endif;
 
+if ( ! function_exists('mp_format_currency') ) :
+	/**
+	 * Formats currency
+	 *
+	 * @since 3.0
+	 *
+	 * @param string $currency The currency code to use for formatting (defaults to value set in currency settings)
+	 * @param float $amount The amount to format
+	 * @return string
+	 */
+	function mp_format_currency( $currency = '', $amount = false ) {
+		$currencies = apply_filters('mp_currencies', mp()->currencies);
+		
+		if ( ! $currency )
+			$currency = mp_get_setting('currency', 'USD');
+
+		// get the currency symbol
+		$symbol = $currencies[$currency][1];
+		// if many symbols are found, rebuild the full symbol
+		$symbols = array_map('trim', explode(', ', $symbol));
+		if (is_array($symbols)) {
+			$symbol = "";
+			foreach ($symbols as $temp) {
+				$symbol .= '&#x'.$temp.';';
+			}
+		} else {
+			$symbol = '&#x'.$symbol.';';
+		}
+
+		//check decimal option
+		if ( mp_get_setting('curr_decimal') === '0' ) {
+			$decimal_place = 0;
+			$zero = '0';
+		} else {
+			$decimal_place = 2;
+			$zero = '0.00';
+		}
+
+		//format currency amount according to preference
+		if ( $amount ) {
+			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
+				return $symbol . number_format_i18n($amount, $decimal_place);
+			
+			if ( mp_get_setting('curr_symbol_position') == 2 )
+				return $symbol . ' ' . number_format_i18n($amount, $decimal_place);
+			
+			if ( mp_get_setting('curr_symbol_position') == 3 )
+				return number_format_i18n($amount, $decimal_place) . $symbol;
+				
+			if ( mp_get_setting('curr_symbol_position') == 4 )
+				return number_format_i18n($amount, $decimal_place) . ' ' . $symbol;
+		} else if ( $amount === false ) {
+			return $symbol;
+		} else {
+			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
+				return $symbol . $zero;
+			
+			if ( mp_get_setting('curr_symbol_position') == 2 )
+				return $symbol . ' ' . $zero;
+			
+			if ( mp_get_setting('curr_symbol_position') == 3 )
+				return $zero . $symbol;
+			
+			if ( mp_get_setting('curr_symbol_position') == 4 )
+				return $zero . ' ' . $symbol;
+		}
+		
+		return $symbol;
+	}
+endif;
+
+if ( ! function_exists('mp_display_currency') ) :
+	/**
+	 * Round and display currency with padded zeros
+	 *
+	 * @since 3.0
+	 *
+	 * @param float $amount
+	 * @return string
+	 */
+	 
+	function mp_display_currency( $amount ) {
+		if ( mp_get_setting('curr_decimal') === '0' )
+			return number_format( round( $amount ), 0, '.', '');
+		else
+			return number_format( round( $amount, 2 ), 2, '.', '');
+	}
+endif;
+
+if ( ! function_exists('mp_format_date') ) :
+	/**
+	 * Translates a gmt timestamp into local timezone for display
+	 *
+	 * @since 3.0
+	 *
+	 * @param int $gmt_timestamp
+	 * @return string
+	 */
+	function mp_format_date( $gmt_timestamp ) {
+		return date_i18n(get_option('date_format') . ' - ' . get_option('time_format'), $gmt_timestamp + (get_option('gmt_offset') * HOUR_IN_SECONDS));
+	}
+endif;
+
+if ( ! function_exists('mp_before_tax_price') ) :
+	/**
+	 * Returns the before tax price for a given amount based on a bunch of foreign tax laws.
+	 *
+	 * @since 3.0
+	 *
+	 * @param float $tax_price The price including taxes
+	 * @param int $product_id
+	 * @return float
+	 */
+	function mp_before_tax_price( $tax_price, $product_id = false ) {
+		//if tax inclusve pricing is turned off just return given price
+		if ( ! mp_get_setting('tax->tax_inclusive') )
+			return $tax_price;
+
+		if ( $product_id && get_post_meta($product_id, 'mp_is_special_tax', true) ) {
+			$rate = get_post_meta($product_id, 'mp_special_tax', true);
+		} else {
+			//figure out rate in case its based on a canadian base province
+			$rate =	('CA' == mp_get_setting('tax->base_country')) ? mp_get_setting('tax->canada_rate'.mp_get_setting('base_province')) : mp_get_setting('tax->rate');
+		}
+
+		return $tax_price / ($rate + 1); //do not round this to avoid rounding errors in tax calculation
+	}
+endif;
+
+if ( ! function_exists('mp_is_valid_zip') ) :
+	/**
+	 * Checks if a given zip is valid for a given country
+	 *
+	 * @since 3.0
+	 *
+	 * @param string $zip The zip code to check
+	 * @param string $country The country to check
+	 * @return bool
+	 */
+	function mp_is_valid_zip( $zip, $country ) {
+		if ( array_key_exists($country, mp()->countries_no_postcode) )
+			//given country doesn't use post codes so zip is always valid
+			return true;
+		
+		if ( empty($zip) )
+			//no post code provided
+			return false;
+			
+		if ( strlen($zip) < 3 )
+			//post code is too short - see http://wp.mu/8wg
+			return false;
+			
+		return true;
+	}
+endif;
+
 if (!function_exists('mp_buy_button')) :
 /*
  * Displays the buy or add to cart button
@@ -2382,9 +2539,9 @@ function mp_buy_button($echo = true, $context = 'list', $post_id = NULL) {
 										$disabled = (in_array($key, $no_inventory)) ? ' disabled="disabled"' : '';
 										$variation_select .= '<option value="' . $key . '"' . $disabled . '>' . esc_html($meta["mp_var_name"][$key]) . ' - ';
 										if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
-												$variation_select .= mp()->format_currency('', $meta["mp_sale_price"][$key]);
+												$variation_select .= mp_format_currency('', $meta["mp_sale_price"][$key]);
 										} else {
-												$variation_select .= mp()->format_currency('', $value);
+												$variation_select .= mp_format_currency('', $value);
 										}
 										$variation_select .= "</option>\n";
 								}
@@ -2558,7 +2715,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				$image = '
 					<div itemscope class="hmedia">
 						<span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span>
-						<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp()->plugin_url . 'images/default-product.png') . '" />
+						<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />
 					</div>';
 		}
 		
