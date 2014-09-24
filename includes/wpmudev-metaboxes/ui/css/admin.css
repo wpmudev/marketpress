@@ -33,6 +33,7 @@ label.error:before {
   cursor: pointer;
 }
 .postbox.wpmudev-postbox .inside {
+  font-size: 14px;
   padding: 0;
   /** 
 		 * Working Indicator
