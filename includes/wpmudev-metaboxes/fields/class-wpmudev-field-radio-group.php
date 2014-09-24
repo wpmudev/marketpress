@@ -11,12 +11,14 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 *
 	 *		@type string $orientation The orientation of each radio field (horizontal or vertical). Defaults to horizontal.
 	 *		@type array $options The radio group options in $value => $label format.
+	 *		@type string $width The width of each checkbox with it's label. Optional.
 	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
 			'orientation' => 'horizontal',
 			'options' => array(),
+			'width' => null,
 		), $args);
 	}
 	
@@ -28,9 +30,13 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id = null ) {
-		$width = '100%';
-		if (  count($this->args['options']) > 0 ) {
-			$width = floor(100 / count($this->args['options'])) . '%';
+		if ( is_null($this->args['width']) ) {
+			$width = '100%';
+			if ( count($this->args['options']) > 0 ) {
+				$width = max(floor(100 / count($this->args['options'])), 20) . '%';
+			}
+		} else {
+			$width = $this->args['width'];
 		}
 		
 		$this->before_field(); ?>
