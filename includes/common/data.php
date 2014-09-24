@@ -1,4 +1,33 @@
 <?php
+
+/*
+Default settings
+*/
+$this->defaults = array(
+	/*	IMPORTANT! DO NOT CHANGE THE ORDER OF THESE ARGUMENTS!
+			REQUIRED FOR BACKWARDS COMPATIBILITY. IF YOU NEED TO
+			ADD AN ADDITIONAL DEFAULT ADD IT TO THE END OF EACH ARRAY */
+	'list_products' => array(
+		'echo' => true,
+		'paginate' => NULL,
+		'page' => NULL,
+		'per_page' => NULL,
+		'order_by' => NULL,
+		'order' => NULL,
+		'category' => NULL,
+		'tag' => NULL,
+		'list_view'=> NULL,
+		'filters' => NULL,
+	),
+	'related_products' => array(
+		'product_id' => NULL,
+		'relate_by' => 'both',
+		'echo' => false,
+		'limit' => NULL,
+		'simple_list' => NULL,
+	),
+);
+
 /*
 MarketPress Data Structures
 */
