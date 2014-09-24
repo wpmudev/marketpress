@@ -171,7 +171,36 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	  
 	  return $settings;
   }
-  
+
+  /**
+   * Init network settings metaboxes
+   *
+   * @since 3.0
+   * @access public
+   */
+  function init_network_settings_metabox() {
+	  $metabox = new WPMUDEV_Metabox(array(
+			'id' => $this->generate_metabox_id(),
+			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'title' => __('Paypal Express Network Settings', 'mp'),
+			'site_option_name' => 'mp_network_settings',
+			'desc' => __('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">More Info &raquo;</a>', 'mp'),
+			'conditional' => array(
+				'operator' => 'AND',
+				'action' => 'show',
+				array(
+					'name' => 'global_cart',
+					'value' => 1,
+				),
+				array(
+					'name' => 'global_gateway',
+					'value' => $this->plugin_name,
+				),
+			),
+		));
+		$this->common_metabox_fields($metabox);
+	}
+	  
   /**
    * Init settings metaboxes
    *
@@ -179,11 +208,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    * @access public
    */
   function init_settings_metabox() {
-  	if ( mp()->global_cart ) {
-  		//! TODO: code for network settings/global cart
-	  	return;
-  	}
-  	
 	  $metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
 			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
@@ -196,6 +220,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				'action' => 'show',
 			),
 		));
+		$this->common_metabox_fields($metabox);
+  }
+  
+  /**
+   * Both network settings and blog setting use these same fields
+   *
+   * @since 3.0
+   * @access public
+   * @param WPMUDEV_Metabox $metabox
+   */
+  function common_metabox_fields( $metabox ) {
 		$metabox->add_field('advanced_select', array(
 			'name' => 'gateways[' . $this->plugin_name . '][locale]',
 			'label' => array('text' => __('Locale', 'mp')),
@@ -259,7 +294,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			'name' => 'gateways[' . $this->plugin_name . '][page_back]',
 			'label' => array('text' => __('Page Background Color', 'mp')),
 			'desc' => __('Sets the background color for the payment page. By default, the color is white.', 'mp'),
-		));
+		));	  
   }
   
 	/**

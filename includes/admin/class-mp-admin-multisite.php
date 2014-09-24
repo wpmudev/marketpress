@@ -104,9 +104,10 @@ class MP_Admin_Multisite {
 	public function init_general_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-general',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network '),
+			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
 			'title' => __('General Settings', 'mp'),
 			'site_option_name' => 'mp_network_settings',
+			'order' => 0,
 		));
 		$metabox->add_field('checkbox', array(
 			'name' => 'main_blog',
@@ -128,9 +129,10 @@ class MP_Admin_Multisite {
 	public function init_global_gateway_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-global-gateway',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network '),
+			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
 			'title' => __('Global Gateway', 'mp'),
 			'site_option_name' => 'mp_network_settings',
+			'order' => 0,
 			'conditional' => array(
 				'name' => 'global_cart',
 				'value' => '1',
@@ -139,7 +141,7 @@ class MP_Admin_Multisite {
 		));
 		
 		$all_gateways = MP_Gateway_API::get_gateways();
-		$gateways = array();
+		$gateways = array('' => __('Chose a Gateway', 'mp'));
 		
 		foreach ( $all_gateways as $code => $gateway ) {
 			if ( ! $gateway[2] ) {
@@ -166,9 +168,10 @@ class MP_Admin_Multisite {
 	public function init_gateway_permissions_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-gateway-permissions',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network '),
+			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
 			'title' => __('Gateway Permissions', 'mp'),
 			'site_option_name' => 'mp_network_settings',
+			'order' => 0,
 			'conditional' => array(
 				'name' => 'global_cart',
 				'value' => '1',
