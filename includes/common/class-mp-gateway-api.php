@@ -107,7 +107,7 @@ if( ! class_exists('MP_Gateway_API') ) {
     	
 			$gateways = mp_get_setting('gateways');
 			$network_enabled = ( is_multisite() && ! is_main_site() && ! is_super_admin() ) ? true : false;
-
+			
 			foreach ( self::get_gateways($network_enabled) as $code => $plugin ) {
 				$class = $plugin[0];
 				
@@ -124,6 +124,12 @@ if( ! class_exists('MP_Gateway_API') ) {
 					} elseif ( mp_arr_get_value("allowed->{$code}", $gateways) && class_exists($class) && ! $plugin[3] ) {
 						self::$_active_gateways[$code] = new $class;
 					}
+				} elseif ( is_network_admin() ) {
+					if ( ! $plugin[2] ) {
+						continue;
+					}
+					
+					self::$_active_gateways[$code] = new $class;
 				}
 			}
     }
@@ -146,7 +152,11 @@ if( ! class_exists('MP_Gateway_API') ) {
      * @access private
      */
     public final function generate_metabox_id() {
-	    return 'mp-settings-gateway-' . strtolower($this->plugin_name);
+    	if ( is_network_admin() ) {
+	    	return 'mp-network-settings-gateway-' . strtolower($this->plugin_name);
+    	} else {
+	    	return 'mp-settings-gateway-' . strtolower($this->plugin_name);
+    	}
     }
     
     /****** Below are the public methods you may overwrite via a plugin ******/
