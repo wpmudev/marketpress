@@ -77,7 +77,7 @@ class Marketpress {
 		}
 		return self::$_instance;
 	}
-	
+		
 	/**
 	 * Gets an absolute path to the plugin's base directory
 	 *
@@ -359,6 +359,8 @@ class Marketpress {
 	private function __construct() {
 		// Init variables
 		$this->_init_vars();
+		// Include constants
+		require_once $this->plugin_dir('includes/common/constants.php');
 		
 		// Includes
 		add_action('plugins_loaded', array(&$this, 'includes'));
@@ -417,6 +419,42 @@ class Marketpress {
 	}
 	
 	/**
+	 * Catch deprecated functions
+	 */
+	public function __call( $method, $args ) {
+		switch ( $method ) {
+			case 'get_setting' :
+				_deprecated_function($method, '3.0', 'mp_get_setting');
+				return call_user_func_array('mp_get_setting', $args);
+			break;
+			
+			case 'format_currency' :
+				_deprecated_function($method, '3.0', 'mp_format_currency');
+				return call_user_func_array('mp_format_currency', $args);
+			break;
+			
+			case 'format_date' :
+				_deprecated_function($method, '3.0', 'mp_format_date');
+				return call_user_func_array('mp_format_date', $args);
+			break;
+			
+			case 'product_excerpt' :
+				_deprecated_function($method, '3.0', 'mp_product_excerpt');
+				return call_user_func_array('mp_product_excerpt', $args);
+			break;
+			
+			case 'product_price' :
+				_deprecated_function($method, '3.0', 'mp_product_price');
+				return call_user_func_array('mp_product_price', $args);
+			break;
+			
+			default :
+				trigger_error('Error! MarketPress doesn\'t have a ' . $method . ' method.', E_USER_ERROR);
+			break;
+		}
+	}
+
+	/**
 	 * Initializes the class variables
 	 *
 	 * @since 3.0
@@ -433,4 +471,4 @@ class Marketpress {
 	}
 }
 
-$mp = Marketpress::get_instance();
+$GLOBALS['mp'] = Marketpress::get_instance();
