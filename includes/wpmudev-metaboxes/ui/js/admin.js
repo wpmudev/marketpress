@@ -12,15 +12,24 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	$.fn.isWorking = function( isLoading ){
 		var $spinner = $('.wpmudev-metabox-working-indicator');
 		
-		if ( isLoading ) {
-			return this.each(function(){
-				var $this = $(this);
+		return this.each(function(){
+			var $this = $(this);
+			
+			if ( isLoading ) {
+				if ( $this.is('input, select, textarea') ) {
+					$this.prop('disabled', true);
+				}
+				
 				$spinner.insertAfter($this);
 				$spinner.show();
-			});
-		} else {
-			$spinner.hide();
-		}
+			} else {
+				if ( $this.is('input, select, textarea') ) {
+					$this.prop('disabled', false);
+				}
+				
+				$spinner.hide();
+			}
+		});
 	};
 }(jQuery));
 
