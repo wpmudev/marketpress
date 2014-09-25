@@ -50,8 +50,8 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 	function on_creation() {
 		$this->admin_name = __('Simplify', 'mp');
 		$this->public_name = __('Credit Card', 'mp');
-		$this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-		$this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+		$this->method_img_url = mp_plugin_url('images/credit_card.png');
+		$this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 		$this->publishable_key = $this->get_setting('publishable_key');
 		$this->private_key = $this->get_setting('private_key');
 		$this->force_ssl = $this->get_setting('is_ssl');

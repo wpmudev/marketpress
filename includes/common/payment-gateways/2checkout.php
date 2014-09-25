@@ -71,8 +71,8 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
     //set names here to be able to translate
     $this->admin_name = __('2Checkout', 'mp');
     $this->public_name = __('2Checkout', 'mp');
-    $this->method_img_url = mp()->plugin_url . 'images/2co_logo.png';
-    $this->method_button_img_url = mp()->plugin_url . 'images/2co.png';
+    $this->method_img_url = mp_plugin_url('images/2co_logo.png');
+    $this->method_button_img_url = mp_plugin_url('images/2co.png');
     $this->currencyCode = $this->get_setting('currency');
     $this->API_Username = $this->get_setting('sid');
     $this->API_Password = $this->get_setting('secret_word');

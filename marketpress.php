@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: MarketPress
-Version: 3.0a.4
+Version: 3.0a.5
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -26,9 +26,27 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 */
 
-define('MP_VERSION', '3.0a.4');
+define('MP_VERSION', '3.0a.5');
 
 class Marketpress {
+	/**
+	 * Refers to whether or not we're using global cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var bool
+	 */
+	var $global_cart = false;
+	
+	/**
+	 * 
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var bool
+	 */
+	var $weight_printed = false;
+	
 	/**
 	 * Refers to the single instance of the class
 	 *
@@ -166,16 +184,8 @@ class Marketpress {
 				'not_found_in_trash' => __('No Coupons found in Trash', 'mp'),
 				'view' => __('View Coupon', 'mp')
 			),
-			'capabilities' => array(
-				'edit_post' => 'edit_product_coupon',
-        'edit_posts' => 'edit_product_coupons',
-        'edit_others_posts' => 'edit_other_product_coupons',
-        'publish_posts' => 'publish_product_coupons',
-        'read_post' => 'read_product_coupon',
-        'read_private_posts' => 'read_private_product_coupons',
-        'delete_post' => 'delete_product_coupon'
-      ),
-			'map_meta_cap' => true,
+			'capability_type' => array('product_coupon', 'product_coupons'),
+			//'map_meta_cap' => true,
 			'public' => false,
 			'publicly_queryable' => true,
 			'show_ui' => true,
@@ -205,17 +215,9 @@ class Marketpress {
 			'public' => true,
 			'show_ui' => true,
 			'publicly_queryable' => true,
-			'capabilities' => array(
-				'edit_post' => 'edit_product',
-        'edit_posts' => 'edit_products',
-        'edit_others_posts' => 'edit_other_products',
-        'publish_posts' => 'publish_products',
-        'read_post' => 'read_product',
-        'read_private_posts' => 'read_private_products',
-        'delete_post' => 'delete_product'
-      ),
+			'capability_type' => array('product', 'products'),
       'menu_icon' => ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-cart' : mp_plugin_url('ui/images/marketpress-icon.png'),
-			'map_meta_cap' => true,
+			//'map_meta_cap' => true,
 			'hierarchical' => false,
 			'rewrite' => array(
 				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products'),
@@ -250,16 +252,8 @@ class Marketpress {
 			'public' => false,
 			'show_ui' => true,
 			'show_in_menu' => false,
-			'capabilities' => array(
-				'edit_post' => 'edit_order',
-        'edit_posts' => 'edit_orders',
-        'edit_others_posts' => 'edit_other_orders',
-        'publish_posts' => 'publish_orders',
-        'read_post' => 'read_order',
-        'read_private_posts' => 'read_private_orders',
-        'delete_post' => 'delete_order'
-      ),
-			'map_meta_cap' => true,
+			'capability_type' => array('store_order', 'store_orders'),
+			//'map_meta_cap' => true,
 			'hierarchical' => false,
 			'rewrite' => false,
 			'query_var' => false,

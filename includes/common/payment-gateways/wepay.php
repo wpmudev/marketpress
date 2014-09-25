@@ -36,8 +36,8 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
     $this->admin_name = __('WePay', 'mp');
     $this->public_name = __('Credit Card', 'mp');
 
-    $this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-    $this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+    $this->method_img_url = mp_plugin_url('images/credit_card.png');
+    $this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 
     $this->client_id =  $this->get_setting('client_id');
     $this->client_secret =$this->get_setting('client_secret');

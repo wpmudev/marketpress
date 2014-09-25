@@ -40,8 +40,8 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$this->admin_name = __('iDEAL (beta)', 'mp');
 		$this->public_name = __('iDEAL', 'mp');
 
-    $this->method_img_url = mp()->plugin_url . 'images/ideal.png';
-		$this->method_button_img_url = mp()->plugin_url . 'images/ideal.png';
+    $this->method_img_url = mp_plugin_url('images/ideal.png');
+		$this->method_button_img_url = mp_plugin_url('images/ideal.png');
 		$this->merchant_id = $this->get_setting('merchant_id');
 		$this->ideal_hash = $this->get_setting('ideal_hash');
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');

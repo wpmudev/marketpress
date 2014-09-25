@@ -31,6 +31,8 @@ class MP_Store_Settings_Presentation {
 	 * @access private
 	 */
 	private function __construct() {
+		add_filter('wpmudev_field/before_field', array(&$this, 'display_store_base_url'), 10, 2);
+		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
 		add_action('init', array(&$this, 'init_metaboxes'));
 	}
 	
@@ -42,6 +44,7 @@ class MP_Store_Settings_Presentation {
 	 */
 	public function init_metaboxes() {
 		$this->init_general_settings();
+		$this->init_store_pages_slugs_settings();
 		$this->init_product_page_settings();
 		$this->init_related_product_settings();
 		$this->init_product_list_settings();
@@ -62,6 +65,94 @@ class MP_Store_Settings_Presentation {
 		$crop = get_option("{$size}_crop");
 		
 		return "{$width} x {$height} (" . (( $crop ) ? __('cropped', 'mp') : __('uncropped', 'mp')) . ')';
+	}
+
+	/**
+	 * Display store base url before a given field
+	 *
+	 * @since 3.0
+	 * @access public
+	 * filter wpmudev_field/after_field
+	 */
+	public function display_store_base_url( $html, $field ) {
+		switch ( $field->args['original_name'] ) {
+			case 'pages[store]' :
+			case 'pages[products]' :
+			case 'pages[cart]' :
+			case 'pages[checkout]' :
+			case 'pages[order_status]' :
+				return '<span class="mp-store-page-slug">' . trailingslashit(get_page_uri(mp_get_setting('pages->store', '/'))) . '</span>';
+			break;
+		}
+		
+		return $html;
+	}
+		
+	/**
+	 * Display "create page" button next to a given field
+	 *
+	 * @since 3.0
+	 * @access public
+	 * filter wpmudev_field/after_field
+	 */
+	public function display_create_page_button( $html, $field ) {
+		switch ( $field->args['original_name'] ) {
+			case 'pages[store]' :
+			case 'pages[products]' :
+			case 'pages[cart]' :
+			case 'pages[checkout]' :
+			case 'pages[order_status]' :
+				return '<a class="button mp-create-page-button" href="' . get_admin_url(null, 'post-new.php?post_type=page') . '">' . __('Create Page') . '</a>';
+			break;
+		}
+		
+		return $html;
+	}
+
+	/**
+	 * Init the store page/slugs settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */	
+	public function init_store_pages_slugs_settings() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-settings-presentation-pages-slugs',
+			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'title' => __('Store Pages &amp; Slugs', 'mp'),
+			'option_name' => 'mp_settings',			
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'pages[store]',
+			'label' => array('text' => __('Store Base', 'mp')),
+			'desc' => __('This page will be used as the root for your store.', 'mp'),
+			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
+			'placeholder' => __('Choose a Page', 'mp'),
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'pages[products]',
+			'label' => array('text' => __('Products List', 'mp')),
+			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
+			'placeholder' => __('Choose a Page', 'mp'),
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'pages[cart]',
+			'label' => array('text' => __('Shopping Cart', 'mp')),
+			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
+			'placeholder' => __('Choose a Page', 'mp'),
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'pages[checkout]',
+			'label' => array('text' => __('Checkout', 'mp')),
+			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
+			'placeholder' => __('Choose a Page', 'mp'),
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'pages[order_status]',
+			'label' => array('text' => __('Order Status', 'mp')),
+			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
+			'placeholder' => __('Choose a Page', 'mp'),
+		));
 	}
 
 	/**

@@ -70,6 +70,12 @@ class WPMUDEV_Field {
 	 *		@type string $style The field's style attribute.
 	 *		@type bool $disabled Should the field be disabled.
 	 *		@type bool $readonly Should the field be read-only.
+	 *		@type array $label {
+	 *			The field's label.
+	 *
+	 *			@type string $text The text of the label.
+	 *			@type string $class Any HTML classes to apply to the label.
+	 *		}
 	 *		@type string $desc The field's description.
 	 *		@type array $custom Any custom/non-standard attributes.
 	 *		@type bool $value_only Only get the field's value - don't initialize scripts, styles, etc.
@@ -129,6 +135,10 @@ class WPMUDEV_Field {
 			'save_callback' => array(),
 			'before_field' => '',
 			'after_field' => '',
+			'label' => array(
+				'text' => '',
+				'class' => '',
+			),
 		), $args);
 		
 		if ( empty($this->args['original_name']) ) {

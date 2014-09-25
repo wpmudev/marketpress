@@ -119,8 +119,8 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 		$this->admin_name = __('eWay Rapid 3.0 Payments (beta)', 'mp');
 		$this->public_name = __('Credit Card', 'mp');
 		
-		$this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-		$this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+		$this->method_img_url = mp_plugin_url('images/credit_card.png');
+		$this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 		
 		$this->returnURL = mp_checkout_step_url('confirmation');
 		

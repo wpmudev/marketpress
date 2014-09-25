@@ -10,6 +10,10 @@
 .button.mp-create-page-button {
   margin-left: 15px;
 }
+.mp-store-page-slug {
+  display: inline-block;
+  margin-right: 5px;
+}
 #mp-coupon-form td,
 #mp-coupon-form th {
   vertical-align: top;

@@ -49,8 +49,8 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 		//set names here to be able to translate
 		$this->admin_name = __('PIN (beta)', 'mp');
 		$this->public_name = __('Credit Card', 'mp');
-		$this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-		$this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+		$this->method_img_url = mp_plugin_url('images/credit_card.png');
+		$this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 		$this->public_key = $this->get_setting('api_credentials->public_key');
 		$this->private_key = $this->get_setting('api_credentials->private_key');
 		$this->force_ssl = $this->get_setting('is_ssl');

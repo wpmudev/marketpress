@@ -32,7 +32,6 @@ class MP_Installer {
 	 */
 	private function __construct() {
 		add_action('init', array(&$this, 'run'));
-		add_action('after_switch_theme', array(&$this, 'update_admin_caps'));
 	}
 	
 	/**
@@ -216,34 +215,6 @@ class MP_Installer {
 	}
 	
 	/**
-	 * Updates the admin capabilities
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action after_switch_theme
-	 */
-	
-	public function update_admin_caps() {
-		$role = get_role('administrator');
-		$taxonomies = array('product_category', 'product_tag');
-		$pts = array('product', 'product_coupon', 'mp_order');
-		
-		foreach ( $taxonomies as $tax_slug ) {
-			$tax = get_taxonomy($tax_slug);
-			foreach ( $tax->cap as $cap ) {
-				$role->add_cap($cap);
-			}
-		}
-		
-		foreach ( $pts as $pt_slug ) {
-			$pt = get_post_type_object($pt_slug);
-			foreach ( $pt->cap as $cap ) {
-				$role->add_cap($cap);
-			}
-		}
-	}
-	
-	/**
 	 * Runs on 3.0 update.
 	 *
 	 * @since 3.0
@@ -254,7 +225,6 @@ class MP_Installer {
 		$this->backup_legacy_settings($settings);
 		$this->update_coupon_schema();
 		$this->create_product_attributes_table();
-		$this->update_admin_caps();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);
 		

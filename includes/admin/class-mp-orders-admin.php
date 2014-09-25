@@ -396,7 +396,7 @@ class MP_Orders_Admin {
 	 
 		if ( current_user_can($order_cap) && ! mp_get_setting('disable_cart') ) {
 			$num_posts = wp_count_posts('mp_order'); //get order count
-			$count = $num_posts->order_received + $num_posts->order_paid;
+			$count = ( isset($num_posts->order_received) && isset($num_posts->order_paid) )? ($num_posts->order_received + $num_posts->order_paid) : 0;
 			
 			if ( $count > 0 ) {
 				$count_output = '&nbsp;<span class="update-plugins"><span class="updates-count count-' . $count . '">' . $count . '</span></span>';

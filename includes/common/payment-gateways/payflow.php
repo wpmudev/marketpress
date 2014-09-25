@@ -65,8 +65,8 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
     $this->admin_name = __('PayPal Payflow Pro', 'mp');
     $this->public_name = __('Credit Card', 'mp');
 
-    $this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-    $this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+    $this->method_img_url = mp_plugin_url('images/credit_card.png');
+    $this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 
     $this->version = "63.0"; //api version
 

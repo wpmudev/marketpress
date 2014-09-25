@@ -38,7 +38,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 	 */
 	function on_creation() {
-		$this->method_img_url    = mp()->plugin_url . 'images/bitcoin.png';
+		$this->method_img_url    = mp_plugin_url('images/bitcoin.png');
 		$this->private_key       = $this->get_setting('private_key');
 		$this->transactionSpeed  = $this->get_setting('transactionSpeed');
 		$this->fullNotifications = $this->get_setting('fullNotifications');

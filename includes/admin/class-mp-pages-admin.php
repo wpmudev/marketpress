@@ -53,8 +53,8 @@ class MP_Pages_Admin {
 			'store' => __('Store Base', 'mp'),
 			'products' => __('Products List', 'mp'),
 			'cart' => __('Shopping Cart', 'mp'),
-			'order_status' => __('Order Status', 'mp'),
 			'checkout' => __('Checkout Page', 'mp'),
+			'order_status' => __('Order Status', 'mp'),
 		);
 		
 		if ( is_multisite() && mp_is_main_site() && is_super_admin() ) {
@@ -81,9 +81,9 @@ class MP_Pages_Admin {
 		global $wpdb;
 		
 		// Delete existing meta keys from db
-		$wpdb->delete($wpdb->postmeta, array('meta_key' => 'mp_store_page'));
+		$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page'));
 		
-		add_post_meta($post_id, 'mp_store_page', $value);
+		add_post_meta($post_id, '_mp_store_page', $value);
 		
 		if ( $value == 'network_store_page' ) {
 			mp_update_network_setting('network_store_page', $post_id);	
@@ -102,7 +102,7 @@ class MP_Pages_Admin {
 	 * @action wpmudev_field/get_value/store_page
 	 */
 	public function get_store_page_value( $value, $post_id, $raw, $field ) {
-		$meta_value = get_post_meta($post_id, 'mp_store_page', true);
+		$meta_value = get_post_meta($post_id, '_mp_store_page', true);
 		
 		if ( $meta_value !== '' ) {
 			return $meta_value;

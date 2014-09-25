@@ -56,8 +56,8 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			$this->admin_name = __('Authorize.net Checkout', 'mp');
 			$this->public_name = __('Credit Card', 'mp');
 
-			$this->method_img_url = mp()->plugin_url . 'images/credit_card.png';
-			$this->method_button_img_url = mp()->plugin_url . 'images/cc-button.png';
+			$this->method_img_url = mp_plugin_url('images/credit_card.png');
+			$this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 
 			$this->version = "63.0"; //api version
 			

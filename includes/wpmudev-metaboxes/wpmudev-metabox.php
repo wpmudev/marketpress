@@ -405,7 +405,7 @@ class WPMUDEV_Metabox {
 		}
 		
 		wp_enqueue_script('jquery-validate', $this->class_url('ui/js/jquery.validate.min.js'), array('jquery'), '1.12');
-		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate', 'jquery-effects-highlight'), $this->version, true);
+		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate', 'jquery-effects-highlight'), WPMUDEV_METABOX_VERSION, true);
 		
 		$default_messages = array(
 			'alphanumeric_error_msg' => __('Please enter only letters and numbers', 'wpmudev_metaboxes'),
@@ -428,7 +428,7 @@ class WPMUDEV_Metabox {
 			return false;
 		}
 		
-		wp_enqueue_style('wpmudev-metaboxes-admin', $this->class_url('ui/css/admin.css'), array(), $this->version);
+		wp_enqueue_style('wpmudev-metaboxes-admin', $this->class_url('ui/css/admin.css'), array(), WPMUDEV_METABOX_VERSION);
 	}
 	
 	/**

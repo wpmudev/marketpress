@@ -108,8 +108,8 @@ class MP_Gateway_Moneybookers extends MP_Gateway_API {
 			$this->admin_name = __('Moneybookers', 'mp');
 			$this->public_name = __('Moneybookers', 'mp');
 
-			$this->method_img_url = mp()->plugin_url . 'images/moneybookers.gif';
-			$this->method_button_img_url = mp()->plugin_url . 'images/moneybookers-button.gif';
+			$this->method_img_url = mp_plugin_url('images/moneybookers.gif');
+			$this->method_button_img_url = mp_plugin_url('images/moneybookers-button.gif');
 
 			$this->currencyCode = $this->get_setting('currency');
 			$this->API_Email = $this->get_setting('email');

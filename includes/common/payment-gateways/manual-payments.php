@@ -39,7 +39,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		//set names here to be able to translate
 		$this->admin_name = __('Manual Payments', 'mp');
 		$this->public_name = $this->get_setting('name', __('Manual Payment', 'mp'));
-    $this->method_img_url = mp()->plugin_url . 'images/manual-payment.png';
+    $this->method_img_url = mp_plugin_url('images/manual-payment.png');
 	}
 
   /**
