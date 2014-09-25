@@ -7,7 +7,6 @@ if ( ! function_exists('mp') ) :
 	 * @since 3.0
 	 * @return object
 	 */
-	 
 	function mp() {
 		return Marketpress::get_instance();
 	}
@@ -616,5 +615,41 @@ if ( !  function_exists('mp_array_map_recursive') ) :
     }
     
     return $array;
+	}
+endif;
+
+if ( ! function_exists('mp_is_main_site') ) :
+	/**
+	 * Checks if the current blog is the main site
+	 *
+	 * @since 3.0
+	 * @uses $wpdb
+	 */
+	function mp_is_main_site() {
+		global $wpdb;
+		
+		if ( MP_ROOT_BLOG !== false ) {
+			return $wpdb->blogid == MP_ROOT_BLOG;
+		} else {
+			return is_main_site();
+		}
+	}
+endif;
+
+if ( ! function_exists('mp_main_site_id') ) :
+	/**
+	 * Get the main site id
+	 *
+	 * @since 3.0
+	 * @uses $current_site
+	 */
+	function mp_main_site_id() {
+		global $current_site;
+		
+		if ( MP_ROOT_BLOG !== false ) {
+			return MP_ROOT_BLOG;
+		} else {
+			return $current_site->blog_id;
+		}
 	}
 endif;
