@@ -2823,10 +2823,8 @@ if (!function_exists('mp_cart_link')) :
  * @param string $link_text Optional, text to show in link.
  */
 function mp_cart_link($echo = true, $url = false, $link_text = '') {
-		global $mp_wpmu;
-
-		if (mp()->global_cart && is_object($mp_wpmu) && !$mp_wpmu->is_main_site() && function_exists('mp_main_site_id')) {
-				switch_to_blog(mp_main_site_id());
+		if (mp()->global_cart && mp_is_main_site() ) {
+				switch_to_blog(MP_ROOT_BLOG);
 				$link = home_url(mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->cart') . '/');
 				restore_current_blog();
 		} else {

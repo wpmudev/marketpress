@@ -57,7 +57,7 @@ class MP_Pages_Admin {
 			'checkout' => __('Checkout Page', 'mp'),
 		);
 		
-		if ( is_multisite() && is_main_site() && is_super_admin() ) {
+		if ( is_multisite() && mp_is_main_site() && is_super_admin() ) {
 			$options['network_store_page'] = __('Network Store Base', 'mp');
 		}
 		

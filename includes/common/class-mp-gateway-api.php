@@ -78,7 +78,7 @@ if( ! class_exists('MP_Gateway_API') ) {
      * @return array
      */
     public static function get_gateways( $network_enabled = false ) {
-    	if ( is_multisite() && ! is_main_site() && $network_enabled ) {
+    	if ( is_multisite() && ! mp_is_main_site() && $network_enabled ) {
 	    	$gateways = array();
 	    	foreach ( self::$_gateways as $code => $gateway ) {
 	    		$level = str_replace('psts_level_', '', mp_get_network_setting('allowed_gateways->' . $code, ''));
@@ -106,7 +106,7 @@ if( ! class_exists('MP_Gateway_API') ) {
     	}
     	
 			$gateways = mp_get_setting('gateways');
-			$network_enabled = ( is_multisite() && ! is_main_site() && ! is_super_admin() ) ? true : false;
+			$network_enabled = ( is_multisite() && ! mp_is_main_site() && ! is_super_admin() ) ? true : false;
 			
 			foreach ( self::get_gateways($network_enabled) as $code => $plugin ) {
 				$class = $plugin[0];
