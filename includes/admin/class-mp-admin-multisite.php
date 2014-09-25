@@ -45,6 +45,76 @@ class MP_Admin_Multisite {
 		
 		add_action('init', array(&$this, 'init_metaboxes'));
 		add_action('network_admin_menu', array(&$this, 'add_menu_items'));
+		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
+		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
+		add_action('wpmudev_field/print_scripts/network_store_page', array(&$this, 'print_network_store_page_scripts'));
+	}
+	
+	/**
+	 * Print network_store_page scripts
+	 *
+	 * When changing the network_store_page value update the product_category and
+	 * product_tag slug that is shown before those fields.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/print_scripts/network_store_page
+	 */
+	public function print_network_store_page_scripts( $field ) {
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	$('input[name="network_store_page"]').on('change', function(e){
+		var $this = $(this);
+		
+		$this.select2('enable', false).isWorking(true);
+		
+		$.post(ajaxurl, {
+			"page_id" : e.val,
+			"nonce" : "<?php echo wp_create_nonce('mp_get_page_slug'); ?>",
+			"action" : "mp_get_page_slug"
+		}).done(function(resp){
+			$this.select2('enable', false).isWorking(false);
+			
+			if ( resp.success ) {
+				$('.mp-network-store-page-slug').html(resp.data);
+			}
+		})
+	});
+});
+</script>
+		<?php
+	}
+	
+	/**
+	 * Enqueue admin styles and scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_enqueue_scripts
+	 */
+	public function enqueue_styles_scripts() {
+		// Styles
+		wp_enqueue_style('mp-admin', mp_plugin_url('includes/admin/ui/css/admin.css'), array(), MP_VERSION);
+		// Scripts
+		wp_enqueue_script('jquery');
+	}
+	
+	/**
+	 * Display "create page" button next to a given field
+	 *
+	 * @since 3.0
+	 * @access public
+	 * filter wpmudev_field/after_field
+	 */
+	public function display_create_page_button( $html, $field ) {
+		switch ( $field->args['original_name'] ) {
+			case 'network_store_page' :
+				return '<a class="button mp-create-page-button" href="' . admin_url('post-new.php?post_type=page') . '">' . __('Create Page') . '</a>';
+				break;
+		}
+		
+		return $html;
 	}
 	
 	/**
@@ -92,6 +162,8 @@ class MP_Admin_Multisite {
 		$this->init_general_settings_metaboxes();
 		$this->init_global_gateway_settings_metaboxes();
 		$this->init_gateway_permissions_metaboxes();
+		$this->init_theme_permissions_metaboxes();
+		$this->init_marketplace_slugs_metaboxes();
 	}
 
 	/**
@@ -209,6 +281,97 @@ class MP_Admin_Multisite {
 			));
 		}
 	}
+
+	/**
+	 * Initialize theme permissions metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */	
+	public function init_theme_permissions_metaboxes() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-network-settings-theme-permissions',
+			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'title' => __('Theme Permissions', 'mp'),
+			'site_option_name' => 'mp_network_settings',
+			'desc' => __('Set theme access permissions for network stores. For a custom css theme, save your css file with the <strong>MarketPress Theme: NAME</strong> header in the <strong>/marketpress/ui/themes/</strong> folder and it will appear in this list so you may select it.', 'mp'),
+			'order' => 15,
+		));
+		
+		$theme_list = mp_get_theme_list();
+
+		$options_permissions = array(
+			'full' => __('All Can Use', 'mp'),
+			'none' => __('No Access', 'mp'),
+		);
+		
+		if ( function_exists('psts_levels_select') ) {
+			$levels = get_site_option('psts_levels');
+			$options_levels = array();
+			
+			if ( is_array($levels) ) {
+				foreach ( $levels as $level => $value ) {
+					$options_levels['psts_level_' . $level] = $level . ':' . $value['name'];
+				}
+			}
+		
+			$options_permissions['supporter'] = array(
+				'group_name' => __('Pro Site Level', 'mp'),
+				'options' => $options_levels,
+			);
+		}
+		
+		foreach ( $theme_list as $value => $theme ) {
+			$metabox->add_field('select', array(
+				'name' => 'allowed_themes[' . $value . ']',
+				'label' => array('text' => $theme['name']),
+				'desc' => $theme['path'],
+				'options' => $options_permissions,
+			));
+		}		
+	}
+
+	/**
+	 * Initialize marketplace pages metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */	
+	public function init_marketplace_slugs_metaboxes() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-network-settings-slugs',
+			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'title' => __('Global MarketPlace Pages', 'mp'),
+			'site_option_name' => 'mp_network_settings',
+			'order' => 15,
+		));
+				
+		$metabox->add_field('post_select', array(
+			'name' => 'network_store_page',
+			'label' => array('text' => __('Network Store Page', 'mp')),
+			'desc' => __('This page will be used as the root for your global market place', 'mp'),
+			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
+			'placeholder' => __('Choose a Page', 'mp'),
+		));
+		
+		$network_page_slug = home_url();
+		if ( $network_page = mp_get_network_setting('network_store_page') ) {
+			$network_page_slug = get_permalink($network_page);
+		}
+		
+		$metabox->add_field('text', array(
+			'name' => 'slugs[categories]',
+			'label' => array('text' => __('Product Categories', 'mp')),
+			'custom' => array('style' => 'width:150px'),
+			'before_field' => '<span class="mp-network-store-page-slug">' . $network_page_slug . '</span>',
+		));
+		$metabox->add_field('text', array(
+			'name' => 'slugs[tags]',
+			'label' => array('text' => __('Product Tags', 'mp')),
+			'custom' => array('style' => 'width:150px'),
+			'before_field' => '<span class="mp-network-store-page-slug">' . $network_page_slug . '</span>',
+		));
+	}
 	
 	/**
 	 * Add menu items to the network admin menu
@@ -221,19 +384,6 @@ class MP_Admin_Multisite {
 	}
 
 	/**
-	 * Gets an appropriate message by it's key
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function get_message_by_key( $key ) {
-		$messages = array(
-		);
-		
-		return ( isset($messages[$key]) ) ? $messages[$key] : sprintf(__('An appropriate message for key "%s" could not be found.', 'mp'), $key);
-	}
-					
-	/**
 	 * Displays the network settings form/metaboxes
 	 *
 	 * @since 3.0
@@ -245,11 +395,6 @@ class MP_Admin_Multisite {
 	<div class="icon32"><img src="<?php echo mp_plugin_url('ui/images/settings.png'); ?>" /></div>
 	<h2 class="mp-settings-title"><?php _e('Store Network Settings', 'mp'); ?></h2>
 	<div class="clear"></div>
-	<?php
- 	if ( $message_key = mp_get_get_value('mp_message') ) : ?>
- 	<div class="updated"><p><?php echo $this->get_message_by_key($message_key); ?></p></div>
- 	<?php
- 	endif; ?> 	
 	<div class="mp-settings">
 	 	<form id="mp-main-form" method="post" action="<?php echo add_query_arg(array()); ?>">
 			<?php
