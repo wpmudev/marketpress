@@ -68,7 +68,10 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 				$this.children('span').append('<a class="wpmudev-metabox-tooltip-button" href="#">x</a>');
 			}
 			
-			$this.children('span').fadeIn(250);
+			$this.children('span').css({
+				"display" : "block",
+				"margin-top" : -($this.children('span').outerHeight() / 2)
+			});
 		});
 		
 		$('.wpmudev-field').on('click', '.wpmudev-metabox-tooltip-button', function(e){

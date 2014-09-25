@@ -16,7 +16,10 @@
 				$this.children('span').append('<a class="mp-tooltip-button" href="#">x</a>');
 			}
 			
-			$this.children('span').fadeIn(250);
+			$this.children('span').css({
+				"display" : "block",
+				"margin-top" : -($this.children('span').outerHeight() / 2)
+			});
 		});
 		
 		$('.mp-tooltip').on('click', '.mp-tooltip-button', function(e){
