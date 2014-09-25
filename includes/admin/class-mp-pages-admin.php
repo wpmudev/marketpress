@@ -50,21 +50,65 @@ class MP_Pages_Admin {
 		
 		$options = array(
 			'none' => __('None', 'mp'),
-			'store' => __('Root Store Page', 'mp'),
+			'store' => __('Store Base', 'mp'),
+			'products' => __('Products List', 'mp'),
+			'cart' => __('Shopping Cart', 'mp'),
+			'order_status' => __('Order Status', 'mp'),
 			'checkout' => __('Checkout Page', 'mp'),
 		);
 		
 		if ( is_multisite() && is_main_site() && is_super_admin() ) {
-			$options['network_store_page'] = __('Network Store Page', 'mp');
+			$options['network_store_page'] = __('Network Store Base', 'mp');
 		}
 		
-		$metabox->add_field('radio_group', array(
+		$metabox->add_field('select', array(
 			'name' => 'store_page',
-			'desc' => __('You can choose to make this page one of the following core store pages', 'mp'),
-			'orientation' => 'vertical',
+			'desc' => __('You can choose to make this page one of the following core store pages.', 'mp'),
 			'default_value' => 'none',
 			'options' => $options,
 		));
+	}
+	
+	/**
+	 * Save the store_page field value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/save_value/store_page
+	 * @uses $wpdb
+	 */
+	public function save_store_page_value( $value, $post_id, $field ) {
+		global $wpdb;
+		
+		// Delete existing meta keys from db
+		$wpdb->delete($wpdb->postmeta, array('meta_key' => 'mp_store_page'));
+		
+		add_post_meta($post_id, 'mp_store_page', $value);
+		
+		if ( $value == 'network_store_page' ) {
+			mp_update_network_setting('network_store_page', $post_id);	
+		} else {
+			mp_update_setting("pages->$value", $post_id);
+		}
+		
+		return null; 
+	}
+	
+	/**
+	 * Get the store_page field value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/get_value/store_page
+	 */
+	public function get_store_page_value( $value, $post_id, $raw, $field ) {
+		$meta_value = get_post_meta($post_id, 'mp_store_page', true);
+		
+		if ( $meta_value !== '' ) {
+			return $meta_value;
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -75,6 +119,8 @@ class MP_Pages_Admin {
 	 */
 	private function __construct() {
 		add_action('init', array(&$this, 'init_metaboxes'));
+		add_filter('wpmudev_field/save_value/store_page', array(&$this, 'save_store_page_value'), 10, 3);
+		add_filter('wpmudev_field/get_value/store_page', array(&$this, 'get_store_page_value'), 10, 4);
 	}
 }
 
