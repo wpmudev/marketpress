@@ -7,7 +7,7 @@
   line-height: 0;
   visibility: hidden;
 }
-.mp-create-page-button {
+.button.mp-create-page-button {
   margin-left: 15px;
 }
 #mp-coupon-form td,
