@@ -43,9 +43,9 @@ class MP_Admin_Multisite {
 	private function __construct() {
 		$this->maybe_update();
 		
+		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
 		add_action('init', array(&$this, 'init_metaboxes'));
 		add_action('network_admin_menu', array(&$this, 'add_menu_items'));
-		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
 		add_action('wpmudev_field/print_scripts/network_store_page', array(&$this, 'print_network_store_page_scripts'));
 	}
@@ -110,8 +110,8 @@ jQuery(document).ready(function($){
 	public function display_create_page_button( $html, $field ) {
 		switch ( $field->args['original_name'] ) {
 			case 'network_store_page' :
-				return '<a class="button mp-create-page-button" href="' . admin_url('post-new.php?post_type=page') . '">' . __('Create Page') . '</a>';
-				break;
+				return '<a class="button mp-create-page-button" href="' . get_admin_url(mp_main_site_id(), 'post-new.php?post_type=page') . '">' . __('Create Page') . '</a>';
+			break;
 		}
 		
 		return $html;
@@ -409,6 +409,22 @@ jQuery(document).ready(function($){
 </div>
 		<?php
 	}
+	
+	/**
+	 * Catch deprecated functions
+	 */
+	public function __call( $method, $args ) {
+		switch ( $method ) {
+			case 'is_main_site' :
+				_deprecated_function($method, '3.0', 'mp_is_main_site');
+				return call_user_func_array('mp_is_main_site', $args);
+			break;
+			
+			default :
+				trigger_error('Error! MP_Admin_Multisite doesn\'t have a ' . $method . ' method.', E_USER_ERROR);
+			break;
+		}
+	}
 }
 
-MP_Admin_Multisite::get_instance();
+$GLOBALS['mp_wpmu'] = MP_Admin_Multisite::get_instance();
