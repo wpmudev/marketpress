@@ -156,14 +156,9 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	 */
 	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
-		$vals = is_string($value) ? explode(',', $value) : $value;
+		$vals = is_array($value) ? $value : explode(',', $value);
 		$values = array();
 		$options = array();
-		
-		if ( ! is_array($vals) ) {
-			// Make sure this is an array - just in case :)
-			$vals = array();
-		}
 		
 		foreach ( $this->args['options'] as $val => $label ) {
 			$options[] = $val . '=' . $label;

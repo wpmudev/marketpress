@@ -177,13 +177,8 @@ jQuery(document).ready(function($){
 	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
 		$data = array();
-		$ids = is_string($value) ? explode(',', $value) : $value;
+		$ids = is_array($value) ? $value : explode(',', $value);
 		
-		if ( ! is_array($ids) ) {
-			// Make sure this is an array - just in case :)
-			$ids = array();
-		}
-	
 		foreach ( $ids as $id ) {
 			$data[] = $id . '->' . get_the_title($id);
 		}
