@@ -25,32 +25,20 @@ class MP_Ajax {
 	}
 	
 	/**
-	 * Updates a user's preference
+	 * Gets a page slug from a given page id
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @action wp_ajax_mp_get_page_slug
 	 */
-	public function update_user_preference() {
-		check_ajax_referer('mp-update-user-preference', 'mp_update_user_preference_nonce');
-		mp()->update_user_preference(get_current_user_id(), $_POST['key'], $_POST['value']);
+	public function get_page_slug() {
+		if ( wp_verify_nonce(mp_get_post_value('nonce'), 'mp_get_page_slug') && ($page_id = mp_get_post_value('page_id')) ) {
+			wp_send_json_success(get_permalink($page_id));
+		}
+		
+		wp_send_json_error();
 	}
-
-	/**
-	 * Maybe override the value returned by get_option('mp_settings')
-	 *
-	 * Used when running ajax requests and you need to change some settings
-	 * temporarily while you run some other functions that use
-	 * get_option('mp_settings), but you don't want to actually save the settings
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @param string $value
-	 * @return mixed
-	 */	
-	public function maybe_override_settings( $value ) {
-		return wp_cache_get('mp_settings', 'mp');
-	}
-			
+	
 	/**
 	 * Constructor function
 	 *
@@ -58,10 +46,7 @@ class MP_Ajax {
 	 * @access private
 	 */
 	private function __construct() {
-		//update a user's preference
-		add_action('wp_ajax_mp-update-user-preference', array(&$this, 'update_user_preference'));
-		//allow overriding of value returned by get_option('mp_settings'))
-		add_filter('pre_option_mp_settings', array(&$this, 'maybe_override_settings'));
+		add_action('wp_ajax_mp_get_page_slug', array(&$this, 'get_page_slug'));
 	}
 }
 
