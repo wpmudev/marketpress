@@ -53,7 +53,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	});
 	
 	var initPostboxAccordions = function(){
-		$('.wpmudev-postbox').find('.hndle, .handlediv').click(function(){
+		$('#mp-main-form').find('.wpmudev-postbox').find('.hndle, .handlediv').click(function(){
 			var $this = $(this),
 					$postbox = $this.closest('.wpmudev-postbox');
 			
