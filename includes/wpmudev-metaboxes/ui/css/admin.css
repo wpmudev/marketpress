@@ -191,21 +191,21 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wp-switch-editor {
   text-decoration: none;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-field-complex .wpmudev-field-complex-label {
+.postbox.wpmudev-postbox .inside .wpmudev-field-complex-wrap .wpmudev-field-complex-label {
   display: block;
   padding-bottom: 15px;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-field-complex .wpmudev-field-complex-label span {
+.postbox.wpmudev-postbox .inside .wpmudev-field-complex-wrap .wpmudev-field-complex-label span {
   color: #999;
   font-size: 90%;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-field-complex .columns .wpmudev-field-complex-label {
+.postbox.wpmudev-postbox .inside .wpmudev-field-complex-wrap.columns .wpmudev-field-complex-label {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   float: left;
   padding-left: 10px;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-field-complex .columns .wpmudev-field-complex-label:first-child {
+.postbox.wpmudev-postbox .inside .wpmudev-field-complex-wrap.columns .wpmudev-field-complex-label:first-child {
   padding-left: 0;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-radio-group:after,
