@@ -45,14 +45,15 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 			'posts_per_page' => get_option('posts_per_page'),
 		), $args);
 		
-		$query = new WP_Query(array_merge(array(
-			'paged' => isset($_GET['page']) ? $_GET['page'] : false,
+		$query = new WP_Query(array_replace_recursive(array(
+			'paged' => mp_arr_get_value('page', $_GET),
 			'posts_per_page' => $args['posts_per_page'],
-			's' => isset($_GET['search_term']) ? $_GET['search_term'] : false,
+			's' => mp_arr_get_value('search_term', $_GET),
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 			'orderby' => 'title',
 			'order' => 'ASC',
+			'post_status' => array('publish'),
 		), $args));
 		$data = array('posts' => array(), 'posts_per_page' => $args['posts_per_page'], 'total' => $query->found_posts);
 		
