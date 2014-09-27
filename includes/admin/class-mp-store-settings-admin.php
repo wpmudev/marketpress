@@ -76,9 +76,9 @@ class MP_Store_Settings_Admin {
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('#menu-posts-<?php echo MP_Product::get_post_type(); ?>, #menu-posts-<?php echo MP_Product::get_post_type(); ?> > a').removeClass('wp-menu-open wp-has-current-submenu');
+	$('#menu-posts-<?php echo mp_get_product_post_type(); ?>, #menu-posts-<?php echo mp_get_product_post_type(); ?> > a').removeClass('wp-menu-open wp-has-current-submenu');
 	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=<?php echo MP_Product::get_post_type(); ?>"]').addClass('current').parent().addClass('current');
+	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=<?php echo mp_get_product_post_type(); ?>"]').addClass('current').parent().addClass('current');
 });
 </script>
 		<?php
@@ -95,9 +95,9 @@ jQuery(document).ready(function($){
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('#menu-posts-<?php echo MP_Product::get_post_type(); ?>, #menu-posts-<?php echo MP_Product::get_post_type(); ?> > a').removeClass('wp-menu-open wp-has-current-submenu');
+	$('#menu-posts-<?php echo mp_get_product_post_type(); ?>, #menu-posts-<?php echo mp_get_product_post_type(); ?> > a').removeClass('wp-menu-open wp-has-current-submenu');
 	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_category&post_type=<?php echo MP_Product::get_post_type(); ?>"]').addClass('current').parent().addClass('current');
+	$('a[href="edit-tags.php?taxonomy=product_category&post_type=<?php echo mp_get_product_post_type(); ?>"]').addClass('current').parent().addClass('current');
 });
 </script>
 		<?php
