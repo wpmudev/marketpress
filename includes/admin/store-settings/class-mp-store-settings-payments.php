@@ -43,7 +43,7 @@ class MP_Store_Settings_Payments {
 	public function add_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-payments',
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => __('Payment Gateways', 'mp'),
 			'option_name' => 'mp_settings',
 			'order' => 1,

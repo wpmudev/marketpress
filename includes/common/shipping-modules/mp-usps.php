@@ -241,7 +241,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'page_slugs' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->public_name),
 			'desc' => __('Using this USPS Shipping calculator requires requesting an Ecommerce API Username and Password. Get your free set of credentials <a target="_blank" href="https://secure.shippingapis.com/registration/">here &raquo;</a>. The password is no longer used for the API, just the username which you should enter below. The USPS test site has not yet been updated and currently doesn\'t work - you should just request activating your credentials with USPS and go live.', 'mp'), 
 			'option_name' => 'mp_settings',

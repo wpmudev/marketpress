@@ -169,7 +169,50 @@ class WPMUDEV_Metabox {
 		
 		die;
 	}
-	
+
+	/**
+	 * Get all files from a given directory
+	 *
+	 * @since 1.0
+	 * @access public
+	 *
+	 * @param string $dir The full path of the directory
+	 * @param string $ext Get only files with a given extension. Set to NULL to get all files.
+	 * @return array or false if no files exist
+	 */
+	public static function get_dir_files( $dir, $ext = 'php' ) {
+		$myfiles = array();
+		
+		if ( ! is_null($ext) )
+			$ext = '.' . $ext;
+		
+		if ( false === file_exists($dir) )
+			return false;
+		
+		$dir = trailingslashit($dir);
+		$files = glob($dir . '*' . $ext);
+		
+		return ( empty($files) ) ? false : $files;
+	}
+
+	/**
+	 * Includes all files in a given directory
+	 *
+	 * @since 1.0
+	 * @access public
+	 *
+	 * @param string $dir The directory to work with
+	 * @param string $ext Only include files with this extension
+	 */
+	public static function include_dir( $dir, $ext = 'php' ) {
+		if ( false === ($files = self::get_dir_files($dir, $ext)) )
+			return false;
+		
+		foreach ( $files as $file ) {
+			include_once $file;
+		}
+	}
+			
 	/**
 	 * Constructor function
 	 *
@@ -183,7 +226,7 @@ class WPMUDEV_Metabox {
 	 *		@type string $title The title of the metabox (required).
 	 *		@type string $desc The description of the metabox.
 	 *		@type string $post_type The post type to display the metabox on.
-	 *		@type array $screen_ids The screen ID(s) to display the metabox on.
+	 *		@type array $page_slugs The page slugs to display the metabox on - for screens other than post-edit.php and post-new.php.
 	 *		@type string $context The context of the metabox (advanced, normal, side).
 	 *		@type string $priority The priority of the metabox (default, high, normal).
 	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
@@ -209,13 +252,14 @@ class WPMUDEV_Metabox {
 			'title' => '',
 			'desc' => null,
 			'post_type' => '',
-			'screen_ids' => array(),
+			'page_slugs' => array(),
 			'context' => 'advanced',
 			'priority' => 'default',
 			'option_name' => '',
 			'site_option_name' => '',
 			'order' => 10,
 			'conditional' => array(),
+			'custom' => array(),
 		), $args);
 		
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
@@ -225,9 +269,8 @@ class WPMUDEV_Metabox {
 		$this->load_fields();
 		$this->init_conditional_logic();
 		$this->add_html_classes();
-				
-		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_styles'));		
-		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'));
+		
+		add_action('admin_enqueue_scripts', array(&$this, 'maybe_enqueue_styles_scripts'));		
 		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'), $this->args['order']);
 		add_action('wpmudev_metabox/render_settings_metaboxes', array(&$this, 'maybe_render'), $this->args['order']);
 		add_action('save_post', array(&$this, 'maybe_save_fields'));
@@ -244,7 +287,7 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */
 	public function add_html_classes() {
-		if ( $this->is_closed() && $this->is_active() ) {
+		if ( $this->is_closed() ) {
 			$this->args['class'] .= ' closed';
 		}
 	}
@@ -366,18 +409,37 @@ class WPMUDEV_Metabox {
 	}
 	
 	/**
+	 * Maybe enqueue styles scripts
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @action admin_enqueue_scripts
+	 */
+	public function maybe_enqueue_styles_scripts() {
+		if ( $this->is_active() ) {
+			$this->admin_enqueue_styles();
+			$this->admin_enqueue_scripts();
+		}	
+	}
+	
+	/**
 	 * Determines if a metabox should be rendered
 	 *
 	 * @since 1.0
 	 * @access public
 	 */
-	public function maybe_render() {
+	public function maybe_render( $post = null ) {
 		if ( ! $this->is_active() ) {
 			return false;
 		}
-  	
-  	$opt_name = ( ! empty($this->args['site_option_name']) ) ? $this->args['site_option_name'] : $this->args['option_name'];
-		$this->render($opt_name);
+		
+		if ( $this->is_settings_metabox() ) {
+			$post_id = ( ! empty($this->args['site_option_name']) ) ? $this->args['site_option_name'] : $this->args['option_name'];
+		} else {
+			$post_id = $post->ID;
+		}
+		
+		$this->render($post_id);
 	}
 	
 	/**
@@ -400,10 +462,6 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */	
 	public function admin_enqueue_scripts() {
-		if ( ! $this->is_active() ) {
-			return false;
-		}
-		
 		wp_enqueue_script('jquery-validate', $this->class_url('ui/js/jquery.validate.min.js'), array('jquery'), '1.12');
 		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate', 'jquery-effects-highlight'), WPMUDEV_METABOX_VERSION, true);
 		
@@ -424,10 +482,6 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */	
 	public function admin_enqueue_styles() {
-		if ( ! $this->is_active() ) {
-			return false;
-		}
-		
 		wp_enqueue_style('wpmudev-metaboxes-admin', $this->class_url('ui/css/admin.css'), array(), WPMUDEV_METABOX_VERSION);
 	}
 	
@@ -456,49 +510,6 @@ class WPMUDEV_Metabox {
 	}
 
 	/**
-	 * Get all files from a given directory
-	 *
-	 * @since 1.0
-	 * @access public
-	 *
-	 * @param string $dir The full path of the directory
-	 * @param string $ext Get only files with a given extension. Set to NULL to get all files.
-	 * @return array or false if no files exist
-	 */
-	public static function get_dir_files( $dir, $ext = 'php' ) {
-		$myfiles = array();
-		
-		if ( ! is_null($ext) )
-			$ext = '.' . $ext;
-		
-		if ( false === file_exists($dir) )
-			return false;
-		
-		$dir = trailingslashit($dir);
-		$files = glob($dir . '*' . $ext);
-		
-		return ( empty($files) ) ? false : $files;
-	}
-
-	/**
-	 * Includes all files in a given directory
-	 *
-	 * @since 1.0
-	 * @access public
-	 *
-	 * @param string $dir The directory to work with
-	 * @param string $ext Only include files with this extension
-	 */
-	public static function include_dir( $dir, $ext = 'php' ) {
-		if ( false === ($files = self::get_dir_files($dir, $ext)) )
-			return false;
-		
-		foreach ( $files as $file ) {
-			include_once $file;
-		}
-	}
-		
-	/**
 	 * Load fields
 	 *
 	 * @since 1.0
@@ -517,7 +528,7 @@ class WPMUDEV_Metabox {
 	 * @param object $post
 	 */
 	public function add_meta_boxes( $post ) {
-		add_meta_box($this->args['id'], $this->args['title'], array(&$this, 'render'), $this->args['post_type'], $this->args['context'], $this->args['priority']);
+		add_meta_box($this->args['id'], $this->args['title'], array(&$this, 'maybe_render'), $this->args['post_type'], $this->args['context'], $this->args['priority']);
 	}
 	
 	/**
@@ -619,11 +630,16 @@ class WPMUDEV_Metabox {
 	 * @param int $post_id The current post ID
 	 */
 	public function save_fields( $post_id ) {
-		if ( ! isset($_POST[$this->nonce_name]) || (isset($_POST[$this->nonce_name]) && ! wp_verify_nonce($_POST[$this->nonce_name], $this->nonce_action)) ) {
-			// Bail - nonce is not set or could not be verified
+		if ( ! isset($_POST[$this->nonce_name]) || ! $this->is_active() || (isset($_POST[$this->nonce_name]) && ! wp_verify_nonce($_POST[$this->nonce_name], $this->nonce_action)) ) {
+			// Bail - nonce is not set or could not be verified or metabox is not active for current page
 			return;
 		}
 		
+		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) {
+			// Bail - this is an autosave, our form has not been submitted
+			return;
+		}
+
 		// Avoid infinite loops later (e.g. when calling wp_insert_post, etc)
 		remove_action('save_post', array(&$this, 'save_fields'));
 
@@ -635,7 +651,7 @@ class WPMUDEV_Metabox {
 		 */
 		do_action('wpmudev_metabox/before_save_fields', $this);
 		do_action('wpmudev_metabox/before_save_fields/' . $this->args['id'], $this);
-				
+		
 		// For settings metaboxes we don't want to call the internal save methods for each field
 		if ( ! is_numeric($post_id) ) {
 			$settings = ( ! empty($this->args['site_option_name']) ) ? get_site_option($post_id, array()) : get_option($post_id, array());
@@ -654,14 +670,14 @@ class WPMUDEV_Metabox {
 					foreach ( $values as $idx => $array ) {
 						$index = 0;                                                                                                                                                                                                                     
 						foreach ( $array as $idx2 => $val ) {
-							$values[$idx][$index] = $field->subfields[$index]->sanitize_for_db($val);
+							$values[$idx][$index] = $field->subfields[$index]->sanitize_for_db($val, $post_id);
 							$index ++;
 						}
 					}
 					
 					$value = $values;
 				} else {
-					$value = $field->sanitize_for_db($value);
+					$value = $field->sanitize_for_db($value, $post_id);
 				}
 				
 				$this->push_to_array($settings, $post_key, $value);
@@ -686,7 +702,7 @@ class WPMUDEV_Metabox {
 				wp_redirect(add_query_arg('wpmudev_metabox_settings_saved', 1), 301);
 				exit;
 			}
-		} else {	
+		} else {
 			// Make sure $post_id isn't a revision
 			if ( wp_is_post_revision($post_id) ) {
 				return;
@@ -719,89 +735,18 @@ class WPMUDEV_Metabox {
 		if ( ! is_null($this->is_settings_metabox) ) {
 			return $this->is_settings_metabox;
 		}
-
-		$current_screen = $this->get_current_screen();
 		
 		$this->is_settings_metabox = false;
-		if ( in_array($current_screen->id, $this->args['screen_ids']) ) {
-			$this->is_settings_metabox = true;
+		
+		if ( ! empty($_REQUEST['page']) && ! empty($this->args['page_slugs']) ) {
+			$page = $_REQUEST['page'];
+			
+			if ( in_array($page, $this->args['page_slugs']) ) {
+				$this->is_settings_metabox = true;
+			}
 		}
-		
-		return $this->is_settings_metabox;
-	}
-	
-	/**
-	 * Safely gets the $current_screen object even before the current_screen hook is fired
-	 *
-	 * @since 1.0
-	 * @access public
-	 * @uses $current_screen, $hook_suffix, $pagenow, $taxnow, $typenow
-	 * @return object
-	 */
-	public function get_current_screen() {
-		global $current_screen, $hook_suffix, $pagenow, $taxnow, $typenow;
-		
-		if ( empty($current_screen) ) {
-			//set current screen (not normally available here) - this code is derived from wp-admin/admin.php
-			require_once ABSPATH . 'wp-admin/includes/screen.php';
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			
-			if ( isset($_GET['page']) ) {
-				$plugin_page = wp_unslash($_GET['page']);
-				$plugin_page = plugin_basename($plugin_page);
-			}
-			
-			if ( isset($_REQUEST['post_type']) && post_type_exists($_REQUEST['post_type']) ) {
-				$typenow = $_REQUEST['post_type'];
-			} else {
-				$typenow = '';
-			}
-			
-			if ( isset($_REQUEST['taxonomy']) && taxonomy_exists($_REQUEST['taxonomy']) ) {
-				$taxnow = $_REQUEST['taxonomy'];
-			} else {
-				$taxnow = '';
-			}
 
-			if ( isset($plugin_page) ) {
-				if ( ! empty($typenow) ) {
-					$the_parent = $pagenow . '?post_type=' . $typenow;
-				} else {
-					$the_parent = $pagenow;
-				}
-					
-				if ( ! $page_hook = get_plugin_page_hook($plugin_page, $the_parent) ) {
-					$page_hook = get_plugin_page_hook($plugin_page, $plugin_page);
-					// backwards compatibility for plugins using add_management_page
-					if ( empty( $page_hook ) && 'edit.php' == $pagenow && '' != get_plugin_page_hook($plugin_page, 'tools.php') ) {
-						// There could be plugin specific params on the URL, so we need the whole query string
-						if ( ! empty($_SERVER[ 'QUERY_STRING' ]) ) {
-							$query_string = $_SERVER[ 'QUERY_STRING' ];
-						} else {
-							$query_string = 'page=' . $plugin_page;
-						}
-							
-						wp_redirect( admin_url('tools.php?' . $query_string) );
-						exit;
-					}
-				}
-				
-				unset($the_parent);
-			}
-			
-			$hook_suffix = '';
-			if ( isset($page_hook) ) {
-				$hook_suffix = $page_hook;
-			} else if ( isset($plugin_page) ) {
-				$hook_suffix = $plugin_page;
-			} else if ( isset($pagenow) ) {
-				$hook_suffix = $pagenow;
-			}
-			
-			set_current_screen();
-		}
-		
-		return get_current_screen();
+		return $this->is_settings_metabox;
 	}
 	
 	/**
@@ -809,26 +754,51 @@ class WPMUDEV_Metabox {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @uses $pagenow
 	 * @return bool
 	 */
-	public function is_active() {
-		if ( ! is_null($this->is_active) ) {
-			return $this->is_active;
+	public function is_active( $log = false ) {
+		global $pagenow;
+		
+		$this->is_active = false;
+		
+		if ( empty($pagenow) ) {
+			$pagenow = basename($_SERVER['PHP_SELF']);
 		}
 		
-		//only load metaboxes on appropriate post page and for assigned post type or screen_id
-		$this->is_active = true;
-		if ( $this->args['post_type'] != $this->get_current_screen()->id && ! in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
-			$this->is_active = false;
+		$post_type = false;
+		if ( ! empty($_REQUEST['post_type']) ) {
+			$post_type = $_REQUEST['post_type'];
 		}
 		
-		if ( in_array($this->get_current_screen()->id, $this->args['screen_ids']) ) {
+		$post_id = false;
+		if ( ! empty($_REQUEST['post']) ) {
+			$post_id = $_REQUEST['post'];
+		}
+		
+		if ( $post_type && $this->args['post_type'] == $post_type && ($pagenow == 'post-new.php' || $pagenow == 'post.php') ) {
+			$this->is_active = true;
+		} elseif ( $post_id && $pagenow == 'post.php' && get_post_type($post_id) == $this->args['post_type'] ) {
+			$this->is_active = true;
+		} elseif ( $this->is_settings_metabox() ) {
+			$this->is_active = true;
 			$this->is_settings_metabox = true;
 		}
 		
 		if ( $this->is_active ) {
 			// Set this as an active metabox
 			self::$metaboxes[$this->args['id']] = '';
+		}
+		
+		if ( $log ) {
+			print_r(array(
+				'id' => $this->args['id'],
+				'wp_post_type' => $post_type,
+				'mb_post_type' => $this->args['post_type'],
+				'post_id' => $post_id,
+				'is_active' => (int) $this->is_active,
+				'pagenow' => $pagenow,
+			));
 		}
 		
 		return $this->is_active;	
@@ -845,7 +815,7 @@ class WPMUDEV_Metabox {
 	 */
 	public function add_field( $type, $args = array() ) {		
 		$class = 'WPMUDEV_Field_' . ucfirst($type);
-				
+		
 		if ( ! class_exists($class) || ! $this->is_active() ) {
 			return false;	
 		}
@@ -856,7 +826,7 @@ class WPMUDEV_Metabox {
 		
 		$args['echo'] = false;
 		$field = new $class($args);
-		$field->metabox = $this;
+		$field->metabox = &$this;
 		$this->fields[] = $field;
 		
 		return $field;

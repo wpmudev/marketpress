@@ -621,7 +621,7 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('eWay Rapid 3.0 Payments lets merchants recieve credit card payments through eWay without need for users to leave the shop. Note this gateway requires a valid SSL certificate configured for this site.', 'mp'),

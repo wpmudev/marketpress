@@ -70,7 +70,7 @@ class MP_Store_Settings_Shipping {
 	public function add_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-shipping-plugins',
-			'screen_ids' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'page_slugs' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
 			'title' => __('General Shipping Settings', 'mp'),
 			'option_name' => 'mp_settings',
 			'order' => 1,

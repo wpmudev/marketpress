@@ -243,11 +243,9 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			"wrapper" : "div"
 		});
 		
-		$form.find('#publish').click(function(e){
-			e.preventDefault();
-			
-			if ( $form.valid() ) {
-				$form.submit();
+		$form.find('#publish, [type="submit"]').click(function(e){
+			if ( ! $form.valid() ) {
+				e.preventDefault();
 			}
 		});
 		

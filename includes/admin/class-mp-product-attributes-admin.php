@@ -66,7 +66,7 @@ th.column-ID {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-store-settings-product-attributes-add',
 			'title' => __('Add Product Attribute', 'mp'),
-			'screen_ids' => array('store-settings-productattributes'),
+			'page_slugs' => array('store-settings-productattributes'),
 		));
 		$metabox->add_field('text', array(
 			'name' => 'product_attribute_name',

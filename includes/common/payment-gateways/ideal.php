@@ -330,7 +330,7 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('To make it easier to pay for online products and services, the Dutch banking community has developed the iDEAL online payment method. iDEAL allows online payments to be made using online banking in EUR only.', 'mp'),

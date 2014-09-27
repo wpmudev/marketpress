@@ -266,7 +266,7 @@ jQuery(document).ready(function($){
 		
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-general-advanced-settings',
-			'screen_ids' => array('store-settings', 'toplevel_page_store-settings'),
+			'page_slugs' => array('store-settings', 'toplevel_page_store-settings'),
 			'title' => __('Advanced Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));
@@ -288,7 +288,7 @@ jQuery(document).ready(function($){
 	public function init_misc_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-general-misc',
-			'screen_ids' => array('store-settings', 'toplevel_page_store-settings'),
+			'page_slugs' => array('store-settings', 'toplevel_page_store-settings'),
 			'title' => __('Miscellaneous Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));
@@ -364,7 +364,7 @@ jQuery(document).ready(function($){
 	public function init_currency_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-general-currency',
-			'screen_ids' => array('store-settings', 'toplevel_page_store-settings'),
+			'page_slugs' => array('store-settings', 'toplevel_page_store-settings'),
 			'title' => __('Currency Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));
@@ -407,7 +407,7 @@ jQuery(document).ready(function($){
 	public function init_tax_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-general-tax',
-			'screen_ids' => array('store-settings', 'toplevel_page_store-settings'),
+			'page_slugs' => array('store-settings', 'toplevel_page_store-settings'),
 			'title' => __('Tax Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));
@@ -461,7 +461,7 @@ jQuery(document).ready(function($){
 	public function init_location_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-general-location',
-			'screen_ids' => array('store-settings', 'toplevel_page_store-settings'),
+			'page_slugs' => array('store-settings', 'toplevel_page_store-settings'),
 			'title' => __('Location Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));

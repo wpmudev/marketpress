@@ -726,7 +726,7 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
   public function init_settings_metabox() {
     $metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('Use Payflow payment gateway to accept online payments using your Internet merchant account and processing network. PayPal Payflow Pro is a customizable payment processing solution that gives the merchant control over all the steps in processing a transaction. An SSL certificate is required to use this gateway.', 'mp'),

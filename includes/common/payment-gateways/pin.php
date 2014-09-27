@@ -329,7 +329,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('PIN makes it easy to start accepting credit card payments with Australia’s first all-in-one online payment system. Accept all major credit cards directly on your site. Your sales proceeds are deposited to any Australian bank account, no merchant account required.', 'mp'),

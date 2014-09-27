@@ -419,7 +419,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('The Hosted Page is a webpage hosted on eWAY\'s side eliminating the need for merchants to capture, transmit or store credit card numbers. At the checkout time the merchant automatically redirects the customer to the Hosted Page where they would enter their details and have the transaction processed. Upon completion of the transaction the customer is redirected back to the MarketPress checkout confirmation page.', 'mp'),

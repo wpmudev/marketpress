@@ -62,7 +62,7 @@ class MP_Pages_Admin {
 		}
 		
 		$metabox->add_field('select', array(
-			'name' => 'store_page',
+			'name' => 'mp_store_page',
 			'desc' => __('You can choose to make this page one of the following core store pages.', 'mp'),
 			'default_value' => 'none',
 			'options' => $options,
@@ -119,8 +119,8 @@ class MP_Pages_Admin {
 	 */
 	private function __construct() {
 		add_action('init', array(&$this, 'init_metaboxes'));
-		add_filter('wpmudev_field/save_value/store_page', array(&$this, 'save_store_page_value'), 10, 3);
-		add_filter('wpmudev_field/get_value/store_page', array(&$this, 'get_store_page_value'), 10, 4);
+		add_filter('wpmudev_field/save_value/mp_store_page', array(&$this, 'save_store_page_value'), 10, 3);
+		add_filter('wpmudev_field/get_value/mp_store_page', array(&$this, 'get_store_page_value'), 10, 4);
 	}
 }
 

@@ -43,7 +43,7 @@ class MP_Store_Settings_Notifications {
 	public function init_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-notifications',
-			'screen_ids' => array('store-settings-notifications', 'store-settings_page_store-settings-notifications'),
+			'page_slugs' => array('store-settings-notifications', 'store-settings_page_store-settings-notifications'),
 			'title' => __('Notification Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));

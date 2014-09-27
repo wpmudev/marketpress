@@ -176,7 +176,7 @@ jQuery(document).ready(function($){
 	public function init_general_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-general',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'page_slugs' => array('network-store-settings'),
 			'title' => __('General Settings', 'mp'),
 			'site_option_name' => 'mp_network_settings',
 			'order' => 0,
@@ -201,7 +201,7 @@ jQuery(document).ready(function($){
 	public function init_global_gateway_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-global-gateway',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'page_slugs' => array('network-store-settings'),
 			'title' => __('Global Gateway', 'mp'),
 			'site_option_name' => 'mp_network_settings',
 			'order' => 0,
@@ -240,7 +240,7 @@ jQuery(document).ready(function($){
 	public function init_gateway_permissions_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-gateway-permissions',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'page_slugs' => array('network-store-settings'),
 			'title' => __('Gateway Permissions', 'mp'),
 			'site_option_name' => 'mp_network_settings',
 			'order' => 0,
@@ -291,7 +291,7 @@ jQuery(document).ready(function($){
 	public function init_theme_permissions_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-theme-permissions',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'page_slugs' => array('network-store-settings'),
 			'title' => __('Theme Permissions', 'mp'),
 			'site_option_name' => 'mp_network_settings',
 			'desc' => __('Set theme access permissions for network stores. For a custom css theme, save your css file with the <strong>MarketPress Theme: NAME</strong> header in the <strong>/marketpress/ui/themes/</strong> folder and it will appear in this list so you may select it.', 'mp'),
@@ -340,7 +340,7 @@ jQuery(document).ready(function($){
 	public function init_marketplace_slugs_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-network-settings-slugs',
-			'screen_ids' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'page_slugs' => array('network-store-settings'),
 			'title' => __('Global MarketPlace Pages', 'mp'),
 			'site_option_name' => 'mp_network_settings',
 			'order' => 15,

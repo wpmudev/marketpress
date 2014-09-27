@@ -236,7 +236,7 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
 			'desc' => __('Simplify helps merchants to accept online payments from Mastercard, Visa, American Express, Discover, JCB, and Diners Club cards. It\'s that simple. We offer a merchant account and payment gateway in a single, secure package so you can concentrate on what really matters to your business. Only supports USD currently.', 'mp'),

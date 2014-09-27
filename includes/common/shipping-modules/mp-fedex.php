@@ -212,7 +212,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'screen_ids' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'page_slugs' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->public_name),
 			'option_name' => 'mp_settings',
 			'conditional' => array(

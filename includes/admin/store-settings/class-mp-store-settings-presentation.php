@@ -118,7 +118,7 @@ class MP_Store_Settings_Presentation {
 	public function init_store_pages_slugs_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-pages-slugs',
-			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
 			'title' => __('Store Pages &amp; Slugs', 'mp'),
 			'option_name' => 'mp_settings',			
 		));
@@ -164,7 +164,7 @@ class MP_Store_Settings_Presentation {
 	public function init_social_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-social',
-			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
 			'title' => __('Social Settings', 'mp'),
 			'option_name' => 'mp_settings',			
 		));	
@@ -200,7 +200,7 @@ class MP_Store_Settings_Presentation {
 	public function init_product_list_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-product-list',
-			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
 			'title' => __('Product List/Grid Settings', 'mp'),
 			'desc' => __('Settings related to the display of product lists/grids.', 'mp'),
 			'option_name' => 'mp_settings',			
@@ -318,7 +318,7 @@ class MP_Store_Settings_Presentation {
 	public function init_related_product_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-product-related',
-			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
 			'title' => __('Related Product Settings', 'mp'),
 			'option_name' => 'mp_settings',			
 		));	
@@ -374,7 +374,7 @@ class MP_Store_Settings_Presentation {
 	public function init_product_page_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-product-page',
-			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
 			'title' => __('Product Page Settings', 'mp'),
 			'desc' => __('Settings related to the display of individual product pages.', 'mp'),
 			'option_name' => 'mp_settings',			
@@ -496,7 +496,7 @@ class MP_Store_Settings_Presentation {
 	public function init_general_settings() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-general',
-			'screen_ids' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
+			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
 			'title' => __('General Settings', 'mp'),
 			'option_name' => 'mp_settings',			
 		));
