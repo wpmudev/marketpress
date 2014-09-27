@@ -459,15 +459,6 @@ class MP_Products_Screen {
 					'action' => 'show',
 				),	
 			));
-			$repeater->add_sub_field('text', array(
-				'name' => 'external_url',
-				'label' => array('text' => __('External URL', 'mp')),
-				'conditional' => array(
-					'name' => 'product_type',
-					'value' => 'external',
-					'action' => 'show',
-				),	
-			));
 			$repeater->add_sub_field('section', array(
 				'title' => __('Variation Attributes', 'mp'),
 				'desc' => __('Choose the attribute(s) that make this variation unique.', 'mp'),
