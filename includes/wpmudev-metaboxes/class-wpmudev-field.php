@@ -5,10 +5,10 @@ class WPMUDEV_Field {
 	 * Refers to the field's value
 	 *
 	 * @since 1.0
-	 * @access private
+	 * @access protected
 	 * @var mixed
 	 */
-	private $_value = null;
+	protected $_value = null;
 	
 	/**
 	 * Refers to the field's subfield id (repeater/complex field will set this)
@@ -54,7 +54,7 @@ class WPMUDEV_Field {
 	 * @var array
 	 */
 	var $default_atts = array('name', 'id', 'class', 'style', 'disabled', 'readonly', 'value');
-		
+	
 	/**
 	 * Constructor function.
 	 *
@@ -149,8 +149,7 @@ class WPMUDEV_Field {
 			return false;
 		}
 		
-		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles'));
-		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_scripts'));
+		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
 		add_action('wpmudev_metabox/save_fields', array(&$this, 'save_value'));
 		add_action('in_admin_footer', array(&$this, 'maybe_print_scripts'));
 		
@@ -158,7 +157,7 @@ class WPMUDEV_Field {
 		$this->init_validation();
 		$this->on_creation($this->args);
 	}
-	
+
 	/**
 	 * Initializes validation attributes
 	 *
@@ -220,7 +219,7 @@ class WPMUDEV_Field {
 		
 		$this->args['class'] .= ' wpmudev-field-has-conditional';
 	}
-		
+
 	/**
 	 * Gets the field name attribute
 	 *
@@ -318,7 +317,7 @@ class WPMUDEV_Field {
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */
-		$value = apply_filters('wpmudev_field/save_value', $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field/save_value', $this->sanitize_for_db($value, $post_id), $post_id, $this);
 		$value = apply_filters('wpmudev_field/save_value/' . $this->args['name'], $value, $post_id, $this);
 
 		if ( is_null($value) ) {
@@ -424,7 +423,7 @@ class WPMUDEV_Field {
 		$value = null;
 		
 		if ( ! is_null($this->_value) ) {
-			return ($raw) ? $this->_value : $this->format_value($this->_value);
+			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 		
 		if ( is_numeric($post_id) ) {
@@ -468,7 +467,7 @@ class WPMUDEV_Field {
 		// Set the field's value for future
 		$this->_value = $value;
 		
-		$value = ( $raw ) ? $value : $this->format_value($value);
+		$value = ( $raw ) ? $value : $this->format_value($value, $post_id);
 		
 		return $value;
 	}
@@ -489,9 +488,10 @@ class WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param $value
+	 * @param mixed $value
+	 * @param mixed $post_id
 	 */
-	public function format_value( $value ) {
+	public function format_value( $value, $post_id ) {
 		/**
 		 * Modify the formatted value.
 		 *
@@ -535,9 +535,10 @@ class WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param $value
+	 * @param mixed $value
+	 * @param mixed $post_id
 	 */	
-	public function sanitize_for_db( $value ) {
+	public function sanitize_for_db( $value, $post_id ) {
 		$value = is_array($value) ? $this->array_map_deep($value, 'trim') : trim($value);
 		
 		if ( ! empty($this->args['save_callback']) ) {
@@ -644,6 +645,17 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function enqueue_styles() {
+	}
+	
+	/**
+	 * Enqueue styles and scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function enqueue_styles_scripts() {
+		$this->enqueue_styles();
+		$this->enqueue_scripts();
 	}
 
 	/**

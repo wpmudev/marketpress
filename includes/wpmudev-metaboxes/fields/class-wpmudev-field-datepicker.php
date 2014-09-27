@@ -51,7 +51,6 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 }(jQuery));
 </script>
 		<?php
-		parent::print_scripts();
 	}
 	
 	/**
@@ -90,8 +89,10 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param mixed $value
+	 * @param mixed $post_id
 	 */
-	public function format_value( $value ) {
+	public function format_value( $value, $post_id ) {
 		if ( ! empty($value) ) {
 			$value = $this->is_timestamp($value) ? $value : strtotime($value);
 			$value = date_i18n(get_option('date_format'), $value);
@@ -107,9 +108,10 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param $value
+	 * @param mixed $value
+	 * @param mixed $post_id
 	 */	
-	public function sanitize_for_db( $value ) {
+	public function sanitize_for_db( $value, $post_id ) {
 		$value = $this->is_timestamp($value) ? date('Y-m-d', $value) : $value;
 		// These filters are defined in class-wpmudev-field.php
 		$value = apply_filters('wpmudev_field/sanitize_for_db', $value, $post_id, $this);

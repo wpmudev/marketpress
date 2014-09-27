@@ -27,10 +27,11 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 * @since 1.0
 	 * @access public
 	 * @param $value
+	 * @param $post_id
 	 */	
-	public function sanitize_for_db( $value ) {
+	public function sanitize_for_db( $value, $post_id ) {
 		$value = ( empty($value) ) ? 0 : $value;
-		return parent::sanitize_for_db($value);
+		return parent::sanitize_for_db($value, $post_id);
 	}
 
 	/**

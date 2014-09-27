@@ -123,9 +123,10 @@ jQuery(document).ready(function($){
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param $value
+	 * @param mixed $value
+	 * @param mixed $post_id
 	 */
-	public function format_value( $value ) {
+	public function format_value( $value, $post_id ) {
 		$value = str_replace(']]>', ']]&gt;', $value);
 		
 		/**
@@ -145,11 +146,12 @@ jQuery(document).ready(function($){
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @param $value
+	 * @param mixed $value
+	 * @param mixed $post_id
 	 */		
-	public function sanitize_for_db( $value ) {
+	public function sanitize_for_db( $value, $post_id ) {
 		$value = wp_kses_post($value);
-		return parent::sanitize_for_db($value);
+		return parent::sanitize_for_db($value, $post_id);
 	}
 
 	/**

@@ -506,9 +506,13 @@ jQuery(document).ready(function($){
 		$args['validation'] = array();
 		$args['custom_validation_message'] = '';
 		
+		if ( isset($args['name']) ) {
+			// Some fields (e.g. section) don't use the name argument
+			$args['original_name'] = $args['name'];
+			$args['name'] = $this->args['name'] . '[' . $args['name'] . '][new][]'; //repeater fields should be an array
+		}
+		
 		$args['echo'] = false;
-		$args['original_name'] = $args['name'];
-		$args['name'] = $this->args['name'] . '[' . $args['name'] . '][new][]'; //repeater fields should be an array
 		$field = new $class($args);
 		$field->is_subfield = true;
 		$this->subfields[] = $field;

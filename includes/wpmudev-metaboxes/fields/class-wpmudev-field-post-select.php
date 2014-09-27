@@ -40,9 +40,14 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 		add_filter('posts_search', array(__CLASS__, 'search_by_title_only'), 500, 2);
 		
 		parse_str($_GET['query'], $args);
+		
+		$args = array_replace_recursive(array(
+			'posts_per_page' => get_option('posts_per_page'),
+		), $args);
+		
 		$query = new WP_Query(array_merge(array(
 			'paged' => isset($_GET['page']) ? $_GET['page'] : false,
-			'posts_per_page' => 10,
+			'posts_per_page' => $args['posts_per_page'],
 			's' => isset($_GET['search_term']) ? $_GET['search_term'] : false,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
