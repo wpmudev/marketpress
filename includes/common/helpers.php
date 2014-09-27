@@ -601,7 +601,7 @@ if ( ! function_exists('mp_plugin_dir') ) :
 	}
 endif;
 
-if ( !  function_exists('mp_array_map_recursive') ) :
+if ( ! function_exists('mp_array_map_recursive') ) :
 	/**
 	 * Execute a give function on each element in a given array
 	 * @param string $func The function name to execute
