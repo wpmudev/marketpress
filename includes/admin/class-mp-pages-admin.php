@@ -41,6 +41,11 @@ class MP_Pages_Admin {
 	 * @access public
 	 */
 	public function init_page_settings_metabox() {
+		if ( ! current_user_can('manage_store_settings') ) {
+			// Only admins can set store pages
+			return;
+		}
+		
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-store-pages-metabox',
 			'post_type' => 'page',
