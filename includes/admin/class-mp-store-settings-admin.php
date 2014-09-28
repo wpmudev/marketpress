@@ -53,7 +53,8 @@ class MP_Store_Settings_Admin {
 				'store-settings_page_store-settings-notifications',
 				'store-settings_page_store-settings-shipping',
 				'store-settings_page_store-settings-payments',
-				'store-settings_page_store-settings-importers'
+				'store-settings_page_store-settings-importers',
+				'store-settings_page_store-settings-capabilities',
 			);
 			
 			foreach ( $screen_ids as $screen_id ) {
@@ -155,6 +156,10 @@ jQuery(document).ready(function($){
 			
 			case 'store-settings_page_store-settings-productattributes' :
 				$title = ( mp_get_get_value('action') == 'mp_add_product_attribute' ) ? __('Add Product Attribute', 'mp') : __('Edit Product Attribute', 'mp');
+			break;
+			
+			case 'store-settings_page_store-settings-capabilities' :
+				$title .= __('Capabilities', 'mp');
 			break;
 			
 			default :

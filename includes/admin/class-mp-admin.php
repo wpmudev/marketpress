@@ -104,7 +104,7 @@ class MP_Admin {
 		global $wp_version;
 		
 		//store settings
-		$cap = apply_filters('mp_store_settings_cap', 'manage_options');
+		$cap = apply_filters('mp_store_settings_cap', 'manage_store_settings');
 		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', create_function('', ''), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
 		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', false);		
 		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', false);
@@ -114,6 +114,7 @@ class MP_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', false);
 		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=' . MP_Product::get_post_type()); 
 		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type());		
+		add_submenu_page('store-settings', __('Store Settings: Capabilities', 'mp'), __('User Capabilities', 'mp'), $cap, 'store-settings-capabilities', false);
 		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 
 		if ( ! defined('WPMUDEV_REMOVE_BRANDING') ) {
@@ -127,6 +128,7 @@ class MP_Admin {
 			add_action('store-settings_page_store-settings-shipping', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-payments', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-capabilities', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
 		}
 	}
