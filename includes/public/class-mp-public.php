@@ -32,7 +32,9 @@ class MP_Public {
 	 * @access private
 	 */
 	private function __construct() {
-		add_filter('taxonomy_template', array(&$this, 'load_taxonomy_templates'));
+		add_filter('taxonomy_template', array(&$this, 'load_taxonomy_template'));
+		add_filter('single_template', array(&$this, 'load_single_product_template'));
+		add_filter('page_template', array(&$this, 'load_page_template'));
 		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles'));
 	}
 	
@@ -45,7 +47,55 @@ class MP_Public {
 	public function frontend_styles() {
 		wp_enqueue_style('mp-frontend', mp_plugin_url('ui/css/frontend.css'), array(), MP_VERSION);
 	}
+
+	/**
+	 * Load template for a store page
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter page_template
+	 * @uses $post
+	 */
+	public function load_page_template( $template ) {
+		global $post;
+		
+		if ( mp_get_setting('pages->store') == $post->ID ) {
+			$template = locate_template(array('mp_store.php'));		
+		} elseif ( mp_get_setting('pages->product') == $post->ID ) {
+			$template = locate_template(array('mp_productlist.php'));
+		} elseif ( mp_get_setting('pages->cart') == $post->ID ) {
+			$template = locate_template(array('mp_cart.php'));
+		} elseif ( mp_get_setting('pages->checkout') == $post->ID ) {
+			$template = locate_template(array('mp_checkout.php', 'mp_cart.php'));
+		} elseif ( mp_get_setting('pages->order_status') == $post->ID ) {
+			$template = locate_template(array('mp_orderstatus.php'));
+		}
+		
+		return $template;
+	}
 	
+	/**
+	 * Load template for a single product
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter single_template
+	 * @uses $post
+	 */
+	public function load_single_product_template( $template ) {
+		global $post;
+		
+		if ( get_post_type() == MP_Product::get_post_type() ) {
+			$template = locate_template(array(
+				"mp_product-{$post->post_name}.php",
+				"mp_product-{$post->ID}.php",
+				"mp_product.php",
+			));
+		}
+		
+		return $template;
+	}
+		
 	/**
 	 * Load page template for product_category and product_tag
 	 *
@@ -57,24 +107,50 @@ class MP_Public {
 	 * @filter taxonomy_template
 	 * @uses $wp_query
 	 */
-	public function load_taxonomy_templates( $template ) {
+	public function load_taxonomy_template( $template ) {
 		global $wp_query;
-		
-		if ( ! empty($template) ) {
-			// Don't continue as there is a taxonomy template in the theme
-			return $template;
-		}
 		
 		switch ( get_query_var('taxonomy') ) {
 			case 'product_category' :
 			case 'product_tag' :
-				add_filter('edit_post_link', create_function('', 'return "";'));
-				add_filter('the_title', array(&$this, 'taxonomy_title'));
-				add_filter('the_content', array(&$this, 'taxonomy_content'));
-				
-				$wp_query->post_count = 1; // Only show the first post
-				$template = locate_template(array('page.php', 'index.php'));
-				break;
+				$term = get_term_by('slug', get_query_var('term'), get_query_var('taxonomy'));
+			
+			case 'product_category' :
+				$template = locate_template(array(
+					'mp_category-' . get_query_var('taxonomy') . '.php',
+					'mp_category-' . $term->term_id . '.php',
+					'mp_category.php',
+					'mp_taxonomy.php',
+					'taxonomy-product_category-' . get_query_var('term') . '.php',
+					'taxonomy-product_category.php',
+					'mp_productlist.php',
+					'page.php',
+				));
+			break;
+			
+			case 'product_tag' :
+				$template = locate_template(array(
+					'mp_tag-' . get_query_var('taxonomy') . '.php',
+					'mp_tag-' . $term->term_id . '.php',
+					'mp_tag.php',
+					'mp_taxonomy.php',
+					'taxonomy-product_tag-' . get_query_var('term') . '.php',
+					'taxonomy-product_tag.php',
+					'mp_productlist.php',
+					'page.php',
+				));
+			break;
+		}
+		
+		if ( strpos($template, 'page.php') !== false ) {
+			// Hide edit-post links
+			add_filter('edit_post_link', create_function('', 'return "";'));
+			// Filter output of the_title()
+			add_filter('the_title', array(&$this, 'taxonomy_title'));
+			// Filter output of the_content()
+			add_filter('the_content', array(&$this, 'taxonomy_content'));
+			// Only show the first post	
+			$wp_query->post_count = 1;
 		}
 		
 		return $template;
