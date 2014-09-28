@@ -260,7 +260,7 @@ jQuery(document).ready(function($){
 	 * @access public
 	 */
 	public function init_advanced_settings() {
-		if ( mp_get_setting('product_post_type', 'product') == 'mp_product' ) {
+		if ( MP_Product::get_post_type() == 'mp_product' ) {
 			return;
 		}
 		
