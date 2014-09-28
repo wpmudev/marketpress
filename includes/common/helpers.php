@@ -653,3 +653,47 @@ if ( ! function_exists('mp_main_site_id') ) :
 		}
 	}
 endif;
+
+if ( ! function_exists('mp_get_store_caps') ) :
+	/**
+	 * Get store capabilities
+	 *
+	 * @since 3.0
+	 * @return array
+	 */
+	function mp_get_store_caps() {
+		if ( $store_caps = wp_cache_get('store_caps', 'marketpress') ) {
+			return $store_caps;
+		}
+		
+		$store_caps = array('manage_store_caps');
+		$taxonomies = array('product_category', 'product_tag');
+		$pts = array('product', 'mp_product', 'product_coupon', 'mp_order');
+		
+		foreach ( $taxonomies as $tax_slug ) {
+			if ( ! taxonomy_exists($tax_slug) ) {
+				continue;
+			}
+			
+			$tax = get_taxonomy($tax_slug);
+			foreach ( $tax->cap as $cap ) {
+				$store_caps[$cap] = $cap;
+			}
+		}
+		
+		foreach ( $pts as $pt_slug ) {
+			if ( ! post_type_exists($pt_slug) ) {
+				continue;
+			}
+			
+			$pt = get_post_type_object($pt_slug);
+			foreach ( $pt->cap as $cap ) {
+				$store_caps[$cap] = $cap;
+			}
+		}
+		
+		wp_cache_set('store_caps', $store_caps, 'marketpress');
+		
+		return $store_caps;		
+	}
+endif;
