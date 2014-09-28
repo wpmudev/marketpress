@@ -76,7 +76,6 @@ class MP_Store_Settings_Presentation {
 	 */
 	public function display_store_base_url( $html, $field ) {
 		switch ( $field->args['original_name'] ) {
-			case 'pages[store]' :
 			case 'pages[products]' :
 			case 'pages[cart]' :
 			case 'pages[checkout]' :
