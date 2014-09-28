@@ -696,8 +696,17 @@ class WPMUDEV_Metabox {
 			 * @param WPMUDEV_Metabox $this The metabox that was saved.
 			 */
 			do_action('wpmudev_metabox/after_settings_metabox_saved', $this);
+			do_action('wpmudev_metabox/after_settings_metabox_saved/' . $this->args['id'], $this);
 			
 			if ( did_action('wpmudev_metabox/after_settings_metabox_saved') == count(self::$metaboxes) ) {
+				/**
+				 * Fires after all of the settings metaboxes have been saved
+				 *
+				 * @since 3.0
+				 */
+				do_action('wpmudev_metabox/after_all_settings_metaboxes_saved');
+				do_action('wpmudev_metabox/after_all_settings_metaboxes_saved/' . $_REQUEST['page']);
+				
 				// Redirect to avoid accidental saves on page refresh
 				wp_redirect(add_query_arg('wpmudev_metabox_settings_saved', 1), 301);
 				exit;
