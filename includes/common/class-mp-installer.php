@@ -32,6 +32,7 @@ class MP_Installer {
 	 */
 	private function __construct() {
 		add_action('init', array(&$this, 'run'));
+		add_action('after_switch_theme', array(&$this, 'add_admin_store_caps'));
 	}
 	
 	/**
@@ -215,6 +216,22 @@ class MP_Installer {
 	}
 	
 	/**
+	 * Add store custom capabilities to admin users
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action after_switch_theme
+	 */
+	public function add_admin_store_caps() {
+		$role = get_role('administrator');
+		$store_caps = mp_get_store_caps();
+		
+		foreach ( $store_caps as $cap ) {
+			$role->add_cap($cap);
+		}
+	}
+	
+	/**
 	 * Runs on 3.0 update.
 	 *
 	 * @since 3.0
@@ -225,6 +242,7 @@ class MP_Installer {
 		$this->backup_legacy_settings($settings);
 		$this->update_coupon_schema();
 		$this->create_product_attributes_table();
+		$this->add_store_caps();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);
 		
