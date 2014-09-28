@@ -35,41 +35,61 @@ Advanced Themes:
   2. mp_product.php must use the mp_* functions instead of the_content(), see template-functions.php for a list of functions relevant to products.
 
 
-  MarketPress searches your current theme folder for template files specific to store pages. If
-  a template file does not exist it loads the theme's page template instead. Just like WP, the
-  plugin will search for templates in order of priority from top to bottom. Here are possible
+  MarketPress searches your current theme folder for template files specific to store pages. Here are possible
   file names for store templates in order:
   
   Single Product Page
     mp_product-PRODUCTNAME.php
     mp_product-PRODUCTID.php
     mp_product.php
+    single-PRODUCT_POST_TYPE.php (post type may be "product" or "mp_product" depending on your site's settings)
+    single.php
+    index.php
     
   Store Page
     mp_store.php
+    page.php
+    index.php
     
   Cart/Checkout Page
+    mp_checkout.php
     mp_cart.php
+    page.php
+    index.php
     
   Order Status Page
     mp_orderstatus.php
+    page.php
+    index.php
     
   Product List Page
     mp_productlist.php
+    page.php
+    index.php
     
   Product Category List Page
     mp_category-CATEGORYSLUG.php
     mp_category-CATEGORYID.php
     mp_category.php
     mp_taxonomy.php
+    taxonomy-product_category-CATEGORYSLUG.php
+    taxonomy-product_category.php    
     mp_productlist.php
+    taxonomy.php
+    page.php
+    index.php
     
   Product Tag List Page
     mp_tag-TAGSLUG.php
     mp_tag-TAGID.php
     mp_tag.php
     mp_taxonomy.php
+    taxonomy-product_tag-TAGSLUG.php
+    taxonomy-product_tag.php    
     mp_productlist.php
+    taxonomy.php
+    page.php
+    index.php
 
   --------------------------------------------------
   Global Listings - Will only work on main site/blog
@@ -77,13 +97,27 @@ Advanced Themes:
   Product List Page
     mp_global_products.php
     mp_productlist.php
+    page.php
+    index.php
     
   Product Category List Page
     mp_global_category-CATEGORYSLUG.php
     mp_global_category.php
     mp_global_category_list.php
+    taxonomy-product_category-CATEGORYSLUG.php
+    taxonomy-product_category.php    
+    mp_productlist.php
+    taxonomy.php
+    page.php
+    index.php
     
   Product Tag List Page
     mp_global_tag-TAGSLUG.php
     mp_global_tag.php
     mp_global_tag_list.php
+    taxonomy-product_tag-TAGSLUG.php
+    taxonomy-product_tag.php    
+    mp_productlist.php
+    taxonomy.php
+    page.php
+    index.php
