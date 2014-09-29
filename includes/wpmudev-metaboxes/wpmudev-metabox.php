@@ -232,6 +232,8 @@ class WPMUDEV_Metabox {
 	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
 	 *		@type string $site_option_name If not a post metabox, enter the site option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
 	 *		@type int $order Display order for settings metaboxes. If this is not entered metaboxes will be rendered in the order they logically show up in the code. Defaults to 10.
+	 *		@type bool $show_submit_button Display a submit button below the metabox or not.
+	 *		@type string submit_button_text The text for the submit button.
 	 *		@type array $conditional {
 	 *			Conditionally hide/show this field if another field value is a certain value.
 	 *
@@ -260,6 +262,8 @@ class WPMUDEV_Metabox {
 			'order' => 10,
 			'conditional' => array(),
 			'custom' => array(),
+			'show_submit_button' => true,
+			'submit_button_text' => __('Save Changes', 'wpmudev_metaboxes'),
 		), $args);
 		
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
@@ -532,6 +536,40 @@ class WPMUDEV_Metabox {
 	}
 	
 	/**
+	 * Displays before-metabox content
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function before_settings_metabox() {
+		/**
+		 * Runs right before the metabox is displayed
+		 *
+		 * @since 3.0
+		 * @param WPMUDEV_Metabox The current metabox
+		 */
+		do_action('wpmudev_metabox/before_settings_metabox', $this);
+		do_action('wpmudev_metabox/before_settings_metabox/' . $this->args['id'], $this);
+	}
+
+	/**
+	 * Displays after-metabox content
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function after_settings_metabox() {
+		/**
+		 * Runs right after the metabox is displayed and before the submit button
+		 *
+		 * @since 3.0
+		 * @param WPMUDEV_Metabox The current metabox
+		 */
+		do_action('wpmudev_metabox/after_settings_metabox', $this);
+		do_action('wpmudev_metabox/after_settings_metabox/' . $this->args['id'], $this);
+	}
+	
+	/**
 	 * Renders the meta box
 	 *
 	 * @since 1.0
@@ -554,6 +592,7 @@ class WPMUDEV_Metabox {
 				<div class="meta-box-sortables">
 		<?php
 			endif; ?>
+					<?php $this->before_settings_metabox(); ?>
 					<div id="<?php echo $this->args['id']; ?>" class="<?php echo $this->args['class']; ?>"<?php echo $atts; ?>>
 						<div class="handlediv" title="Click to toggle"><br /><br /></div>
 						<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
@@ -582,9 +621,14 @@ class WPMUDEV_Metabox {
 		if ( $this->is_settings_metabox() ) : ?>
 					</div>
 				</div>
+				<?php
+				$this->after_settings_metabox();
+				if ( $this->args['show_submit_button'] ) : ?>
 				<p class="submit">
-					<input class="button-primary" type="submit" name="submit_settings" value="<?php _e('Save Changes', 'mp') ?>" />
+					<input class="button-primary" type="submit" name="submit_settings" value="<?php echo $this->args['submit_button_text']; ?>" />
 				</p>
+				<?php
+				endif; ?>
 		<?php
 			if ( self::$did_metabox_count == (count(self::$metaboxes) - 1) ) : ?>
 			</div>
