@@ -7,8 +7,13 @@
   line-height: 0;
   visibility: hidden;
 }
-.button.mp-create-page-button {
+.button.mp-create-page-button,
+.button.mp-edit-page-button {
   margin-left: 15px;
+}
+.button.mp-create-page-button.working,
+.button.mp-edit-page-button.working {
+  display: none;
 }
 .mp-store-page-slug {
   display: inline-block;

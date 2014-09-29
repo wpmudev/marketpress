@@ -64,22 +64,24 @@ class MP_Admin_Multisite {
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('input[name="network_store_page"]').on('change', function(e){
-		var $this = $(this);
+	$('.mp-create-page-button').click(function(e){
+		e.preventDefault();
 		
-		$this.select2('enable', false).isWorking(true);
+		var $this = $(this),
+				$select = $this.siblings('[name="network_store_page"]');
 		
-		$.post(ajaxurl, {
-			"page_id" : e.val,
-			"nonce" : "<?php echo wp_create_nonce('mp_get_page_slug'); ?>",
-			"action" : "mp_get_page_slug"
-		}).done(function(resp){
-			$this.select2('enable', false).isWorking(false);
-			
+		$this.isWorking(true);
+		
+		$.getJSON($this.attr('href'), function(resp){
 			if ( resp.success ) {
-				$('.mp-network-store-page-slug').html(resp.data);
+				$select.attr('data-select2-value', resp.data.select2_value).select2('val', resp.data.post_id).trigger('change');
+				$this.isWorking(false).replaceWith(resp.data.button_html);
+				$('.mp-network-store-page-slug').html(resp.data.parent_slug);
+			} else {
+				alert('<?php _e('An error occurred while creating the store page. Please try again.', 'mp'); ?>');
+				$this.isWorking(false);
 			}
-		})
+		});
 	});
 });
 </script>
@@ -105,12 +107,30 @@ jQuery(document).ready(function($){
 	 *
 	 * @since 3.0
 	 * @access public
-	 * filter wpmudev_field/after_field
+	 * @filter wpmudev_field/after_field
+	 * @uses $switched
 	 */
 	public function display_create_page_button( $html, $field ) {
 		switch ( $field->args['original_name'] ) {
 			case 'network_store_page' :
-				return '<a class="button mp-create-page-button" href="' . get_admin_url(mp_main_site_id(), 'post-new.php?post_type=page') . '">' . __('Create Page') . '</a>';
+				global $switched;
+				
+				if ( get_current_blog_id() != mp_main_site_id() ) {
+					switch_to_blog(mp_main_site_id());
+				}
+				
+				if ( ($post_id = mp_get_network_setting("network_store_page")) && get_post_status($post_id) !== false ) {
+					$return = '<a target="_blank" class="button mp-edit-page-button" href="' . add_query_arg(array(
+						'post' => $post_id,
+						'action' => 'edit',
+					), get_admin_url(null, 'post.php')) . '">' . __('Edit Page') . '</a>';
+				} else {
+					$return = '<a class="button mp-create-page-button" href="' . wp_nonce_url(get_admin_url(null, 'admin-ajax.php?action=mp_create_store_page&type=network_store_page'), 'mp_create_store_page') . '">' . __('Create Page') . '</a>';
+				}
+				
+				restore_current_blog();
+				
+				return $return;
 			break;
 		}
 		
@@ -356,7 +376,7 @@ jQuery(document).ready(function($){
 		
 		$network_page_slug = home_url();
 		if ( $network_page = mp_get_network_setting('network_store_page') ) {
-			$network_page_slug = get_permalink($network_page);
+			$network_page_slug = '/' . trailingslashit(get_page_uri($network_page));
 		}
 		
 		$metabox->add_field('text', array(

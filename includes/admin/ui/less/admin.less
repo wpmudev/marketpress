@@ -4,6 +4,12 @@
 	box-shadow: @s;	
 }
 
+.transition( @s ) {
+		-moz-transition: @s;
+		-webkit-transition: @s;
+	transition: @s;
+}
+
 .clearfix:after {
 	clear: both;
 	content: " ";
@@ -14,8 +20,13 @@
 	visibility: hidden;
 }
 
-.button.mp-create-page-button {
+.button.mp-create-page-button,
+.button.mp-edit-page-button {
 	margin-left: 15px;
+	
+	&.working {
+		display: none;
+	}
 }
 
 .mp-store-page-slug {

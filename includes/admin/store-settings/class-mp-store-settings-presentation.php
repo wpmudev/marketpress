@@ -31,9 +31,46 @@ class MP_Store_Settings_Presentation {
 	 * @access private
 	 */
 	private function __construct() {
-		add_filter('wpmudev_field/before_field', array(&$this, 'display_store_base_url'), 10, 2);
 		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
+		add_action('wpmudev_field/print_scripts', array(&$this, 'create_store_page_js'));
 		add_action('init', array(&$this, 'init_metaboxes'));
+	}
+	
+	/**
+	 * Print scripts for creating 
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/print_scripts
+	 */
+	public function create_store_page_js( $field ) {
+		if ( $field->args['original_name'] !== 'pages[store]' ) {
+			return;
+		}
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	$('.mp-create-page-button').click(function(e){
+		e.preventDefault();
+		
+		var $this = $(this),
+				$select = $this.siblings('[name^="pages"]');
+		
+		$this.isWorking(true);
+		
+		$.getJSON($this.attr('href'), function(resp){
+			if ( resp.success ) {
+				$select.attr('data-select2-value', resp.data.select2_value).select2('val', resp.data.post_id).trigger('change');
+				$this.isWorking(false).replaceWith(resp.data.button_html);
+			} else {
+				alert('<?php _e('An error occurred while creating the store page. Please try again.', 'mp'); ?>');
+				$this.isWorking(false);
+			}
+		});
+	});
+});
+</script>
+		<?php
 	}
 	
 	/**
@@ -68,26 +105,6 @@ class MP_Store_Settings_Presentation {
 	}
 
 	/**
-	 * Display store base url before a given field
-	 *
-	 * @since 3.0
-	 * @access public
-	 * filter wpmudev_field/after_field
-	 */
-	public function display_store_base_url( $html, $field ) {
-		switch ( $field->args['original_name'] ) {
-			case 'pages[products]' :
-			case 'pages[cart]' :
-			case 'pages[checkout]' :
-			case 'pages[order_status]' :
-				return '<span class="mp-store-page-slug">' . trailingslashit(get_page_uri(mp_get_setting('pages->store', '/'))) . '</span>';
-			break;
-		}
-		
-		return $html;
-	}
-		
-	/**
 	 * Display "create page" button next to a given field
 	 *
 	 * @since 3.0
@@ -97,12 +114,35 @@ class MP_Store_Settings_Presentation {
 	public function display_create_page_button( $html, $field ) {
 		switch ( $field->args['original_name'] ) {
 			case 'pages[store]' :
-			case 'pages[products]' :
-			case 'pages[cart]' :
-			case 'pages[checkout]' :
-			case 'pages[order_status]' :
-				return '<a class="button mp-create-page-button" href="' . get_admin_url(null, 'post-new.php?post_type=page') . '">' . __('Create Page') . '</a>';
+				$type = 'store';
 			break;
+			
+			case 'pages[products]' :
+				$type = 'products';
+			break;
+			
+			case 'pages[cart]' :
+				$type = 'cart';
+			break;
+			
+			case 'pages[checkout]' :
+				$type = 'checkout';
+			break;
+			
+			case 'pages[order_status]' :
+				$type = 'order_status';
+			break;
+		}
+		
+		if ( isset($type) ) {
+			if ( ($post_id = mp_get_setting("pages->$type")) && get_post_status($post_id) !== false ) {
+				return '<a target="_blank" class="button mp-edit-page-button" href="' . add_query_arg(array(
+					'post' => $post_id,
+					'action' => 'edit',
+				), get_admin_url(null, 'post.php')) . '">' . __('Edit Page') . '</a>';
+			} else {
+				return '<a class="button mp-create-page-button" href="' . wp_nonce_url(get_admin_url(null, 'admin-ajax.php?action=mp_create_store_page&type=' . $type), 'mp_create_store_page') . '">' . __('Create Page') . '</a>';
+			}
 		}
 		
 		return $html;
