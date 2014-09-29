@@ -54,6 +54,7 @@ class MP_Admin {
 		require_once mp_plugin_dir('includes/admin/class-mp-products-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-product-attributes-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-store-settings-admin.php');
+		require_once mp_plugin_dir('includes/admin/class-mp-setup-wizard.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-shortcode-builder.php');
 	}
 	
@@ -116,6 +117,7 @@ class MP_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type());		
 		add_submenu_page('store-settings', __('Store Settings: Capabilities', 'mp'), __('User Capabilities', 'mp'), $cap, 'store-settings-capabilities', false);
 		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
+		add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
 
 		if ( ! defined('WPMUDEV_REMOVE_BRANDING') ) {
 	 		define('WPMUDEV_REMOVE_BRANDING', false);
@@ -130,6 +132,7 @@ class MP_Admin {
 			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-capabilities', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-setup-wizard', array(&$this, 'add_help_tab'));
 		}
 	}
 		

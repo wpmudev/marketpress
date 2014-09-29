@@ -55,6 +55,7 @@ class MP_Store_Settings_Admin {
 				'store-settings_page_store-settings-payments',
 				'store-settings_page_store-settings-importers',
 				'store-settings_page_store-settings-capabilities',
+				'store-settings_page_store-setup-wizard',
 			);
 			
 			foreach ( $screen_ids as $screen_id ) {
@@ -160,6 +161,10 @@ jQuery(document).ready(function($){
 			
 			case 'store-settings_page_store-settings-capabilities' :
 				$title .= __('Capabilities', 'mp');
+			break;
+			
+			case 'store-settings_page_store-setup-wizard' :
+				$title = __('Store Setup Wizard', 'mp');
 			break;
 			
 			default :
