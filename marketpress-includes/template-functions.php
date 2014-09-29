@@ -2577,7 +2577,7 @@ function mp_product_image($echo = true, $context = 'list', $post_id = NULL, $siz
 				$img_classes[] = 'wp-post-image';
 				$image = '
 					<div itemscope class="hmedia">
-						<span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span>
+						<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
 						<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', $mp->plugin_url . 'images/default-product.png') . '" />
 					</div>';
 		}

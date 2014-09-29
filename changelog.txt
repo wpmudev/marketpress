@@ -6,6 +6,7 @@ Change Log:
 
 - Fixed: Shipping tax not being calculated correctly when using tax-inclusive pricing
 - Fixed: Out of stock products are still showing when "Hide out of stock items" is enabled
+- Fixed: Extra title showing above the default product image in grid view
 
 2.9.5.3
 ----------------------------------------------------------------------
