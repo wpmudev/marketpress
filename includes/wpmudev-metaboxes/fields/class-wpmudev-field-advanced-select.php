@@ -141,10 +141,11 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 	 * @since 1.0
 	 * @access public
 	 * @param $value
+	 * @param $post_id
 	 */	
-	public function sanitize_for_db( $value ) {
+	public function sanitize_for_db( $value, $post_id ) {
 		$value = trim($value, ',');
-		return parent::sanitize_for_db($value);
+		return parent::sanitize_for_db($value, $post_id);
 	}
 
 	/**
