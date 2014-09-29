@@ -100,11 +100,11 @@ class MP_Store_Settings_General {
 	public function update_product_post_type( $metabox ) {
 		global $wpdb;
 		
-		if ( $metabox->args['id'] != 'mp-settings-general-advanced-settings' || mp_get_post_value('product_post_type') != 'mp_product' ) {
+		if ( $metabox->args['id'] != 'mp-settings-general-advanced-settings' || mp_get_setting('product_post_type') != 'mp_product' ) {
 			return;
 		}
 		
-		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type', 'product'));
+		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type' => 'product'));
 		update_option('mp_flush_rewrite', 1);
 	}
 	
