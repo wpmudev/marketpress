@@ -16,10 +16,15 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			var $this = $(this);
 			
 			if ( isLoading ) {
+				if ( $this.hasClass('working') ) {
+					return;
+				}
+				
 				if ( $this.is('input, select, textarea') ) {
 					$this.prop('disabled', true);
 				}
 				
+				$this.addClass('working');
 				$spinner.insertAfter($this);
 				$spinner.show();
 			} else {
@@ -27,6 +32,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 					$this.prop('disabled', false);
 				}
 				
+				$this.removeClass('working');
 				$spinner.hide();
 			}
 		});
