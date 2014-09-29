@@ -242,7 +242,7 @@ class MP_Installer {
 		$this->backup_legacy_settings($settings);
 		$this->update_coupon_schema();
 		$this->create_product_attributes_table();
-		$this->add_store_caps();
+		$this->add_admin_store_caps();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);
 		
