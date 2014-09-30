@@ -336,8 +336,8 @@ class WPMUDEV_Field {
 	 * @return string
 	 */
 	public function get_meta_key() {
-		if ( strpos($this->args['original_name'], '[') === false ) {
-			return $this->args['original_name'];
+		if ( strpos($this->args['name'], '[') === false ) {
+			return $this->args['name'];
 		}
 		
 		$name_parts = explode('[', $this->args['name']);
@@ -422,7 +422,7 @@ class WPMUDEV_Field {
 	public function get_value( $post_id, $meta_key = null, $raw = false ) {
 		$value = null;
 		
-		if ( ! is_null($this->_value) ) {
+		if ( ! is_null($this->_value) && current_filter() == '' ) {
 			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 		
@@ -431,6 +431,7 @@ class WPMUDEV_Field {
 			if ( is_null($meta_key) ) {
 				$meta_key = $this->get_meta_key();
 			}
+			
 			
 			if ( ! empty($post_id) ) {
 				if ( metadata_exists('post', $post_id, $meta_key) ) {

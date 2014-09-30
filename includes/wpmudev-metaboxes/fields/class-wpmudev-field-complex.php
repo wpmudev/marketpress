@@ -36,8 +36,8 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 	 * @return mixed
 	 */
-	public function get_value( $post_id, $raw = false ) {
-		if ( ! is_null($this->_value) ) {
+	public function get_value( $post_id, $meta_key = null, $raw = false ) {
+		if ( ! is_null($this->_value) && current_filter() == '' ) {
 			return $this->_value;
 		}
 		
@@ -59,6 +59,8 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		 */
 		$value = apply_filters('wpmudev_field/get_value', $value, $post_id, $raw, $this);
 		$value = apply_filters('wpmudev_field/get_value/' . $this->args['name'], $value, $post_id, $raw, $this);
+		
+		$this->_value = $value;
 		
 		return $value;
 	}
@@ -96,7 +98,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		 * @param mixed $post_id The current post id or option name
 		 * @param object $this Refers to the current field object
 		 */
-		$value = apply_filters('wpmudev_field/save_value', $this->sanitize_for_db($value), $post_id, $this);
+		$value = apply_filters('wpmudev_field/save_value', $this->sanitize_for_db($value, $post_id), $post_id, $this);
 		$value = apply_filters('wpmudev_field/save_value/' . $this->args['name'], $value, $post_id, $this);
 		
 		if ( is_null($value) ) {

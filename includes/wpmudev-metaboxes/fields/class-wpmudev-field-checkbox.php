@@ -12,12 +12,14 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 	 *		@type mixed $value The value of the checkbox when checked. Optional. Defaults to 1.
 	 *		@type string $message The message that should be displayed next to the checkbox (e.g. Yes, No, etc). Optional. Defaults to "Yes".
 	 *		@type bool $is_toggl_switch If the checkbox is a toggle switch instead of a normal checkbox. Optional. Defaults to true.
+	 *		@type string $orientation
 	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
 			'value' => 1,
 			'message' => __('Yes', 'wpmudev_metaboxes'),
+			'orientation' => '',
 		), $args);
 	}
 	
