@@ -33,7 +33,11 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 				"dateFormat" : "<?php echo $this->format_date_for_jquery(get_option('date_format')); ?>",
 				"altField" : $this.prev('input[type="hidden"]'),
 				"altFormat" : "yy-mm-dd"
-			});
+			}).keyup(function(e){
+				if ( e.keyCode == 8 || e.keyCode == 46 ) {
+					$.datepicker._clearDate(this);
+				}
+			});;
 		});
 	});
 	
@@ -45,6 +49,10 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 				"dateFormat" : "<?php echo $this->format_date_for_jquery(get_option('date_format')); ?>",
 				"altField" : $this.prev('input[type="hidden"]'),
 				"altFormat" : "yy-mm-dd"
+			}).keyup(function(e){
+				if ( e.keyCode == 8 || e.keyCode == 46 ) {
+					$.datepicker._clearDate(this);
+				}
 			});
 		});
 	});
