@@ -25,7 +25,7 @@ if ( ! function_exists('get_field_value') ) :
 		
 		$field = new $class(array('name' => $name, 'value_only' => true));
 		
-		return $field->get_value($post_id, null, $raw);
+		return $field->get_api_value($post_id, null, $raw);
 	}
 endif;
 
