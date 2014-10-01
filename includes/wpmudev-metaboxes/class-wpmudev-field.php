@@ -474,14 +474,17 @@ class WPMUDEV_Field {
 	}
 	
 	/**
-	 * Gets the API field value (e.g. called from frontend)
+	 * Get the field value for API
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param mixed $post_id A post ID or option name.
+	 * @param string $meta_key A meta or settings key to override the default. Optional.
+	 * @param bool $raw True to return the unformatted value. Optional.
 	 * @return mixed
 	 */
-	public function get_api_value() {
-		//! TODO: get_api_value()
+	public function get_api_value( $post_id, $meta_key = null, $raw = false ) {
+		return $this->get_value($post_id, $meta_key, $raw);
 	}
 
 	/**
