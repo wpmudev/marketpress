@@ -93,7 +93,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 */
 	public function get_value( $post_id, $raw = false ) {
 		if ( ! is_null($this->_value) && current_filter() == '' ) {
-			return $this->_value;
+			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 		
 		$value = array();

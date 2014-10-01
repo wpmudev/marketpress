@@ -38,14 +38,14 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 	 */
 	public function get_value( $post_id, $meta_key = null, $raw = false ) {
 		if ( ! is_null($this->_value) && current_filter() == '' ) {
-			return $this->_value;
+			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 		
 		$value = array();		
 		foreach ( $this->subfields as $subfield ) {
 			$subfield->metabox = $this->metabox;
 			$meta_key = $this->args['original_name'] . '_' . $subfield->args['original_name'];
-			$value[$subfield->args['original_name']] = $subfield->get_value($post_id, $meta_key, $raw);
+			$value[$subfield->args['original_name']] = $subfield->get_value($post_id, $meta_key, true);
 		}
 		
 		/**
@@ -149,8 +149,8 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 					$field->set_subfield_id($this->subfield_id);
 				}
 				
-				if ( is_array($value) && ($value = array_shift($value)) ) {
-					$field->set_value($value);
+				if ( is_array($value) && ($val = array_shift($value)) ) {
+					$field->set_value($val);
 				}
 				
 				if ( $this->args['layout'] == 'columns' ) :  ?>
