@@ -36,13 +36,227 @@ class MP_Products_Screen {
 		// Product variations save/get value
 		add_filter('wpmudev_field/save_value/variations', array(&$this, 'save_product_variations'), 10, 3);
 		add_filter('wpmudev_field/get_value/variations', array(&$this, 'get_product_variations'), 10, 4);
+		// Custom product columns
+		add_filter('manage_product_posts_columns', array(&$this, 'product_columns_head'));
+		add_filter('manage_mp_product_posts_columns', array(&$this, 'product_columns_head'));
+		add_action('manage_product_posts_custom_column', array(&$this, 'product_columns_content'), 10, 2);
+		add_action('manage_mp_product_posts_custom_column', array(&$this, 'product_columns_content'), 10, 2);
 		// Add metaboxes
 		add_action('init', array(&$this, 'init_metaboxes'));
+		// Add quick/bulk edit capability for product fields
+		add_action('quick_edit_custom_box', array(&$this, 'quick_edit_custom_box'), 10, 2);
+		add_action('bulk_edit_custom_box', array(&$this, 'bulk_edit_custom_box'), 10, 2);
+		add_action('admin_print_scripts-edit.php', array(&$this, 'enqueue_bulk_quick_edit_js'));
+		add_action('save_post', array(&$this, 'save_quick_edit'), 10, 2);
 		// Product attributes save/get value
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
 			add_filter('wpmudev_field/save_value/' . $mp_product_atts->generate_slug($att->attribute_id), array(&$this, 'save_product_attribute'), 10, 3);
+		}
+	}
+	
+	/**
+	 * Save the custom quick edit form fields
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action save_post
+	 */
+	public function save_quick_edit( $post_id, $post ) {
+		if ( empty($_POST) ) {
+			return $post_id;
+		}
+		
+		if ( ($nonce = mp_get_post_value('quick_edit_product_nonce')) && ! wp_verify_nonce($nonce, 'quick_edit_product') ) {
+			return $post_id;
+		}
+		
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+		
+		if ( wp_is_post_revision($post) ) {
+			return $post_id;
+		}
+		
+		if ( $post->post_type != MP_Product::get_post_type() ) {
+			return $post_id;
+		}
+		
+		if ( $price = mp_get_post_value('product_price') ) {
+			update_post_meta($post_id, 'regular_price', $price);
+		}
+		
+		if ( $sale_price = mp_get_post_value('product_sale_price') ) {
+			update_post_meta($post_id, 'sale_price_amount', $sale_price);
+		}
+	}
+	
+	/**
+	 * Enqueue quick/bulk edit script
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_print_scripts-edit.php
+	 */
+	public function enqueue_bulk_quick_edit_js() {
+		if ( get_current_screen()->post_type != MP_Product::get_post_type() ) {
+			return;
+		}
+		
+		wp_enqueue_script('mp-bulk-quick-edit-product', mp_plugin_url('includes/admin/ui/js/bulk-quick-edit-product.js'), array('jquery', 'inline-edit-post'), MP_VERSION, true);
+	}
+	
+	/**
+	 * Display the custom quick edit box
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action quick_edit_custom_box
+	 */
+	public function quick_edit_custom_box( $column_name, $post_type ) {
+		if ( $post_type != MP_Product::get_post_type() || $column_name != 'product_price' ) {
+			return;
+		}
+		?>
+<fieldset id="quick-edit-col-product-price" class="inline-edit-col-left" style="clear:left">
+	<div class="inline-edit-col"><!-- content inserted via js here --></div>
+</fieldset>
+		<?php
+	}
+	
+	/**
+	 * Display the custom bulk edit box
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action bulk_edit_custom_box
+	 */
+	public function bulk_edit_custom_box( $column_name, $post_type ) {
+		if ( $post_type != MP_Product::get_post_type() || $column_name != 'product_price' ) {
+			return;
+		}
+		?>
+<fieldset id="bulk-edit-col-product-price" class="inline-edit-col-left" style="clear:left">
+	<div class="inline-edit-col clearfix">
+		<label class="alignleft"><span class="title"><?php _e('Price', 'mp'); ?></span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" /></span></label>
+		<label class="alignleft" style="margin-left:15px"><span class="title"><?php _e('Sale Price', 'mp'); ?></span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" /></span></label>
+		<input type="hidden" name="bulk_edit_products_nonce" value="<?php echo wp_create_nonce('bulk_edit_products'); ?>" />		
+	</div>
+</fieldset>
+		<?php
+	}
+	
+	/**
+	 * Filter the product admin columns
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter manage_product_posts_columns, manage_mp_product_posts_columns
+	 * @return array
+	 */
+	public function product_columns_head( $columns ) {
+		return array(
+			'cb' => '<input type="checkbox" />',
+			'title' => __('Product Name', 'mp'),
+			'product_variations' => __('Variations', 'mp'),
+			'product_sku' => __('SKU', 'mp'),			
+			'product_price' => __('Price', 'mp'),
+			'product_stock' => __('Stock', 'mp'),
+			'product_sales' => __('Sales', 'mp'),
+			'taxonomy-product_category' => __('Categories', 'mp'),
+			'taxonomy-product_tag' => __('Tags', 'mp'),
+		);
+	}
+	
+	/**
+	 * Display data for each product admin column
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action manage_product_posts_custom_column, manage_mp_product_posts_custom_column
+	 */
+	public function product_columns_content( $column, $post_id ) {
+		$product = new MP_Product($post_id);
+		$variations = $product->get_variations();
+		
+		switch ( $column ) {
+			case 'product_variations' :
+				$names = array('&mdash;');
+				if ( ! $product->has_variations() ) {
+					foreach ( $variations as $variation ) {
+						$names[] = $variation->get_meta('name');
+					}
+				}
+				echo implode('<br />', $names);
+			break;
+			
+			case 'product_sku' :
+				$skus = array($product->get_meta('sku'));
+				
+				if ( $product->has_variations() ) {
+					foreach ( $variations as $variation ) {
+						$skus[] = $variation->get_meta('sku');
+					}
+					echo implode('<br />', $skus);
+				}
+			break;
+			
+			case 'product_price' :
+				$price = $product->get_price();
+				if ( $product->on_sale() ) {
+					$prices = array('<strike>' . mp_format_currency('', $price['regular']) . '</strike> ' . mp_format_currency($price['sale']['amount']));
+				} else {
+					$prices = array(mp_format_currency('', $price['regular']));
+				}
+				
+				if ( $product->has_variations() ) {
+					foreach ( $variations as $variation ) {
+						$price = $variation->get_price();
+						if ( $variation->on_sale() ) {
+							$prices[] = '<strike>' . mp_format_currency('', $price['regular']) . '</strike> ' . mp_format_currency('', $price['sale']['amount']);
+						} else {
+							$prices[] = mp_format_currency('', $price['regular']);
+						}
+					}
+				}
+				
+				echo implode('<br />', $prices);
+				echo '
+					<div style="display:none">
+						<div id="quick-edit-product-content-' . $post_id . '">
+							<label class="alignleft"><span class="title">' . __('Price', 'mp') . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>
+							<label class="alignleft" style="margin-left:15px"><span class="title">' . __('Sale Price', 'mp') . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
+							<input type="hidden" name="quick_edit_product_nonce" value="' . wp_create_nonce('quick_edit_product') . '" />
+						</div>
+					</div>';
+			break;
+			
+			case 'product_stock' :
+				$stock = array($product->get_meta('inventory', '&mdash;'));
+				
+				if ( $product->has_variations() ) {
+					foreach ( $variations as $variation ) {
+						$stock[] = $variation->get_meta('inventory', '&mdash;');
+					}
+				}
+				
+				echo implode('<br />', $stock);
+			break;
+			
+			case 'product_sales' :
+				$sales = array($product->get_meta('sales_count', 0));
+				
+				if ( $product->has_variations() ) {
+					foreach ( $variations as $variation ) {
+						$sales[] = $variation->get_meta('sales_count', 0);
+					}
+				}
+				
+				echo implode('<br />', $sales);
+				
+			break;
 		}
 	}
 	
@@ -89,27 +303,19 @@ class MP_Products_Screen {
 	 * @filter wpmudev_field_get_value_variations
 	 */
 	public function get_product_variations( $value, $post_id, $raw, $field ) {
-		$variations = new WP_Query(array(
-			'post_type' => 'mp_product_variation',
-			'posts_per_page' => -1,
-			'orderby' => 'menu_order',
-			'order' => 'ASC',
-			'post_parent' => $post_id
-		));
+		$product = new MP_Product($post_id);
+		$variations = $product->get_variations();
 		$data = array();
 		
-		while ( $variations->have_posts() ) : $variations->the_post();
+		foreach ( $variations as $variation ) {
 			$meta = array();
-			$variation_id = get_the_ID();
 			
 			foreach ( $field->subfields as $subfield ) {
-				$meta[$subfield->args['original_name']] = $subfield->get_value($variation_id, $subfield->args['original_name']);
+				$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
 			}
 			
-			$data[] = array_merge(array('ID' => $variation_id), $meta);
-		endwhile;
-		
-		wp_reset_postdata();
+			$data[] = array_merge(array('ID' => $variation->ID), $meta);
+		}
 		
 		return $data;
 	}
@@ -166,7 +372,7 @@ class MP_Products_Screen {
 						$subfield->save_value($variation_id, $name, $value, true);
 						
 						if ( strpos($name, 'product_attr_') !== false ) {
-							wp_set_post_terms($variation_id, $subfield->sanitize_for_db($value), $name);	
+							wp_set_post_terms($variation_id, $subfield->sanitize_for_db($value, $variation_id), $name);	
 						}
 						
 						$index ++;
@@ -248,12 +454,12 @@ class MP_Products_Screen {
 		
 		if ( $sale_price instanceof WPMUDEV_Field ) {
 			$sale_price->add_field('text', array(
-				'name' => 'price',
+				'name' => 'amount',
 				'label' => array('text' => __('Price', 'mp')),
 			));
 			$sale_price->add_field('datepicker', array(
 				'name' => 'start_date',
-				'label' => array('text' => __('Start Date', 'mp')),
+				'label' => array('text' => __('Start Date (if applicable)', 'mp')),
 			));
 			$sale_price->add_field('datepicker', array(
 				'name' => 'end_date',
@@ -334,6 +540,7 @@ class MP_Products_Screen {
 			'title' => __('Variations', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
+			'desc' => __('Variations inherit all values from the main product with the exception of the "Name" and "SKU" fields which are necessary to differentiate the variation from the main product. You only need to enter values for fields that are different than the main product.', 'mp'),
 		));
 		$metabox->add_field('checkbox', array(
 			'name' => 'has_variations',
@@ -351,13 +558,17 @@ class MP_Products_Screen {
 		));
 		
 		if ( $repeater instanceof WPMUDEV_Field ) {
-			$repeater->add_sub_field('image', array(
-				'name' => 'image',
-				'label' => array('text' => __('Image', 'mp')),
+			$repeater->add_sub_field('text', array(
+				'name' => 'name',
+				'label' => array('text' => __('Name', 'mp')),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'sku',
 				'label' => array('text' => __('SKU', 'mp')),
+			));
+			$repeater->add_sub_field('image', array(
+				'name' => 'image',
+				'label' => array('text' => __('Image', 'mp')),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'inventory',
@@ -373,14 +584,14 @@ class MP_Products_Screen {
 				'name' => 'regular_price',
 				'label' => array('text' => __('Regular Price', 'mp')),
 				'conditional' => array(
-					'name' => 'variation_type',
+					'name' => 'product_type',
 					'value' => array('physical', 'digital'),
 					'action' => 'show',
 				),
 			));
 			$sale_price = $repeater->add_sub_field('complex', array(
 				'name' => 'sale_price',
-				'label' => array('text' => __('Sale Price', 'mp')),
+				'label' => array('text' => __('Sale Price (if applicable)', 'mp')),
 				'conditional' => array(
 					'name' => 'product_type',
 					'value' => array('physical', 'digital'),
@@ -388,7 +599,7 @@ class MP_Products_Screen {
 				),												
 			));
 			$sale_price->add_field('text', array(
-				'name' => 'price',
+				'name' => 'amount',
 				'label' => array('text' => __('Price', 'mp')),
 			));
 			$sale_price->add_field('datepicker', array(

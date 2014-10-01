@@ -101,6 +101,34 @@ class MP_Ajax {
 	}
 	
 	/**
+	 * Bulk edit products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_bulk_edit_product
+	 */
+	public function bulk_edit_products() {
+		if ( ! wp_verify_nonce(mp_get_post_value('nonce'), 'bulk_edit_products') ) {
+			die;
+		}
+		
+		$post_ids = mp_get_post_value('post_ids');
+		$price = mp_get_post_value('price', '');
+		$sale_price = mp_get_post_value('sale_price', '');
+		
+		if ( ! is_array($post_ids) ) {
+			die;
+		}
+		
+		foreach ( $post_ids as $post_id ) {
+			update_post_meta($post_id, 'regular_price', $price);
+			update_post_meta($post_id, 'sale_price_amount', $sale_price);
+		}
+		
+		die;
+	}
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
@@ -108,6 +136,7 @@ class MP_Ajax {
 	 */
 	private function __construct() {
 		add_action('wp_ajax_mp_create_store_page', array(&$this, 'create_store_page'));
+		add_action('wp_ajax_mp_bulk_edit_products', array(&$this, 'bulk_edit_products'));
 	}
 }
 

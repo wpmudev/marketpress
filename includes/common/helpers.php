@@ -343,6 +343,20 @@ if ( ! function_exists('mp_doing_ajax') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_doing_autosave') ) :
+	/**
+	 * Checks if an autosave action is currently being executed
+	 *
+	 * @since 3.0
+	 * @uses DOING_AUTOSAVE
+	 * @return bool
+	 */
+	function mp_doing_autosave() {
+		return ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE );
+	}
+endif;
+
+
 if ( ! function_exists('array_replace_recursive') ) :
 	/**
 	 * Recursively replace one array with another. Provides compatibility for PHP version < 5.3
