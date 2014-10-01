@@ -184,7 +184,7 @@ class MP_Products_Screen {
 		switch ( $column ) {
 			case 'product_variations' :
 				$names = array('&mdash;');
-				if ( ! $product->has_variations() ) {
+				if ( $product->has_variations() ) {
 					foreach ( $variations as $variation ) {
 						$names[] = $variation->get_meta('name');
 					}
