@@ -154,7 +154,7 @@ label.error:before {
   margin-top: -12px;
   width: 0;
 }
-.postbox.wpmudev-postbox .inside .wpmudev-metabox-button {
+.postbox.wpmudev-postbox .inside .wpmudev-metabox-tooltip-button {
   position: absolute;
   top: 5px;
   right: 5px;
