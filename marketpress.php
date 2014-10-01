@@ -141,7 +141,8 @@ class Marketpress {
 				'delete_terms' => 'manage_product_categories',
 				'assign_terms' => 'edit_products'
 			),
-			'show_ui' => false,
+			'show_ui' => true,
+			'show_admin_column' => true,
 			'rewrite' => array(
 				'with_front' => false,
 				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products') . '/' . mp_get_setting('slugs->category')
@@ -159,7 +160,8 @@ class Marketpress {
 				'delete_terms' => 'manage_product_tags',
 				'assign_terms' => 'edit_products'
 			),
-			'show_ui' => false,
+			'show_admin_column' => true,
+			'show_ui' => true,
 			'rewrite' => array(
 				'with_front' => false,
 				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products') . '/' . mp_get_setting('slugs->tag')
