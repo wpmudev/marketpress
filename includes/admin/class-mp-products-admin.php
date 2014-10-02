@@ -84,13 +84,11 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 		
-		if ( $price = mp_get_post_value('product_price') ) {
-			update_post_meta($post_id, 'regular_price', $price);
-		}
+		$price = mp_get_post_value('product_price', '');
+		$sale_price = mp_get_post_value('product_sale_price', '');
 		
-		if ( $sale_price = mp_get_post_value('product_sale_price') ) {
-			update_post_meta($post_id, 'sale_price_amount', $sale_price);
-		}
+		update_post_meta($post_id, 'regular_price', $price);
+		update_post_meta($post_id, 'sale_price_amount', $sale_price);
 	}
 	
 	/**
@@ -206,7 +204,7 @@ class MP_Products_Screen {
 			case 'product_price' :
 				$price = $product->get_price();
 				if ( $product->on_sale() ) {
-					$prices = array('<strike>' . mp_format_currency('', $price['regular']) . '</strike> ' . mp_format_currency($price['sale']['amount']));
+					$prices = array('<strike>' . mp_format_currency('', $price['regular']) . '</strike> ' . mp_format_currency('', $price['sale']['amount']));
 				} else {
 					$prices = array(mp_format_currency('', $price['regular']));
 				}
