@@ -85,10 +85,10 @@ class MP_Pages_Admin {
 	public function save_store_page_value( $value, $post_id, $field ) {
 		global $wpdb;
 		
-		// Delete existing meta keys from db
-		$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page'));
+		// Delete existing meta keys from db that have the same value
+		$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page', 'meta_value' => $value));
 		
-		add_post_meta($post_id, '_mp_store_page', $value);
+		update_post_meta($post_id, '_mp_store_page', $value);
 		
 		if ( $value == 'network_store_page' ) {
 			mp_update_network_setting('network_store_page', $post_id);	
