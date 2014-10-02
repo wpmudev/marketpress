@@ -9,7 +9,7 @@ class MP_Installer {
 	 * @var object
 	 */
 	public static $_instance = null;
-
+	
 	/**
 	 * Gets the single instance of the class.
 	 *
@@ -33,6 +33,142 @@ class MP_Installer {
 	private function __construct() {
 		add_action('init', array(&$this, 'run'));
 		add_action('after_switch_theme', array(&$this, 'add_admin_store_caps'));
+		add_action('admin_notices', array(&$this, 'db_update_notice'));
+		add_action('admin_menu', array(&$this, 'add_menu_items'), 99);
+		add_action('wp_ajax_mp_update_product_postmeta', array(&$this, 'update_product_postmeta'));
+		add_action('admin_print_scripts-store-settings_page_mp-db-update', array(&$this, 'enqueue_db_update_scripts'));
+	}
+	
+	/**
+	 * Enqueue db update scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function enqueue_db_update_scripts() {
+		wp_enqueue_style('jquery-smoothness', mp_plugin_url('includes/admin/ui/smoothness/jquery-ui-1.10.4.custom.css'), '', MP_VERSION);
+		wp_enqueue_script('mp-db-update', mp_plugin_url('includes/admin/ui/js/db-update.js'), array('jquery-ui-progressbar'), MP_VERSION);
+		wp_localize_script('mp-db-update', 'mp_db_update', array(
+			'error_text' => __('An error occurred while updating. Please refresh this page and try again.', 'mp'),
+			'progressbar' => array(
+				'label_text' => __('Loading...', 'mp'),
+				'complete_text' => __('Complete!', 'mp'),
+			),
+		));
+	}
+	
+	/**
+	 * Update product postmeta
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_update_product_postmeta
+	 */
+	public function update_product_postmeta() {
+		if ( ! wp_verify_nonce(mp_get_post_value('_wpnonce'), 'mp_update_product_postmeta') ) {
+			wp_send_json_error();
+		}
+		
+		$per_page = 100;
+		$query = new WP_Query(array(
+			'cache_results' => false,
+			'update_post_term_cache' => false,
+			'post_type' => 'product',
+			'posts_per_page' => 100,
+			'paged' => max(1, mp_get_post_value('page')),
+		));
+		$page = mp_get_post_value('page', 1);
+		$updated = ($page * $per_page);
+		
+		while ( $query->have_posts() ) : $query->the_post();
+			//! TODO: Update product metadata
+		endwhile;
+		
+		$response = array(
+			'updated' => $updated,
+			'is_done' => false,
+		);
+		
+		if ( $updated >= $query->found_posts ) {
+			$response['is_done'] = true;
+		}
+		
+		wp_send_json_success($response);
+	}
+	
+	/**
+	 * Add admin menu items and enqueue scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_menu
+	 */
+	public function add_menu_items() {
+		add_submenu_page('store-settings', __('Update Data', 'mp'), __('Update Data', 'mp'), 'activate_plugins', 'mp-db-update', array(&$this, 'db_update_page'));
+	}
+	
+	/**
+	 * Display the db update page
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 */
+	public function db_update_page() {
+		global $wpdb;
+		?>
+<div class="wrap">
+	<h2><?php _e('Update MarketPress Data', 'mp'); ?></h2>
+	<h4><?php _e('MarketPress requires a database update to continue working correctly.<br />Below you will find a list of items that require your attention.', 'mp'); ?></h4>
+	
+	<br />
+	
+	<?php
+	if ( $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'mp_var_name'") ) :
+		$postcount = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='product'");
+	?>
+	<style type="text/css">
+	.ui-progressbar {
+		position: relative;
+		width: 400px;
+	}
+	.progress-label {
+		position: absolute;
+			left: 0;
+			top: 4px;
+		font-weight: bold;
+		text-align: center;
+		text-shadow: 1px 1px 0 #fff;
+		width: 100%;
+	}
+	</style>
+	<h2><?php _e('Product Metadata', 'mp'); ?></h2>
+	<form id="mp-update-product-postmeta-form" action="<?php echo admin_url('admin-ajax.php'); ?>">
+		<?php wp_nonce_field('mp_update_product_postmeta'); ?>
+		<input type="hidden" name="action" value="mp_update_product_postmeta" />
+		<input type="hidden" name="page" value="1" />
+		<p class="submit"><input class="button-primary" type="submit" value="<?php _e('Perform Update', 'mp'); ?>"></p>
+	</form>
+	<?php
+	endif;
+	?>
+</div>
+		<?php
+	}
+	
+	/**
+	 * Display data update notice
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_notices
+	 */
+	public function db_update_notice() {
+		if ( ! get_option('mp_db_update_required') || ! current_user_can('activate_plugins') || mp_get_get_value('page') == 'mp-db-update' ) {
+			return;
+		}
+		
+		echo '<div class="error"><p>' . sprintf(__('MarketPress requires a database update to continue working correctly. <a class="button-primary" href="%s">Go to update page</a>', 'mp'), admin_url('admin.php?page=mp-db-update')) . '</p></div>';
 	}
 	
 	/**
@@ -239,6 +375,7 @@ class MP_Installer {
 	 * @param array $settings
 	 */
 	public function update_3000( $settings ) {
+		$this->_db_update_required();
 		$this->backup_legacy_settings($settings);
 		$this->update_coupon_schema();
 		$this->create_product_attributes_table();
@@ -371,6 +508,16 @@ class MP_Installer {
 		}
 		
 		delete_option('mp_coupons');
+	}
+	
+	/**
+	 * Set flag that db update is required
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	protected function _db_update_required() {
+		add_option('mp_db_update_required', 1);
 	}
 }
 
