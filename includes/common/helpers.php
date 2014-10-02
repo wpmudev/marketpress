@@ -680,7 +680,7 @@ if ( ! function_exists('mp_get_store_caps') ) :
 			return $store_caps;
 		}
 		
-		$store_caps = array('manage_store_caps');
+		$store_caps = array('manage_store_settings' => 'manage_store_settings');
 		$taxonomies = array('product_category', 'product_tag');
 		$pts = array('product', 'mp_product', 'product_coupon', 'mp_order');
 		
