@@ -71,11 +71,24 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param int $product_id
+	 * @uses $post
+	 * @param int/WP_Post $product Optional if in the loop
 	 */
-	public function __construct( $product_id ) {
-		$this->ID = $product_id;
-		$this->_get_post();
+	public function __construct( $product = null ) {
+		if ( is_null($product) && in_the_loop() ) {
+			global $post;
+			$product = $post;
+		}
+		
+		if ( $product instanceof WP_Post ) {
+			$this->ID = $product->ID;
+			$this->_post = $product;
+			$this->_exists = true;
+			$this->_post_queried = true;
+		} elseif ( is_numeric($product) ) {
+			$this->ID = $product;
+			$this->_get_post();
+		}
 	}
 	
 	/**
@@ -106,6 +119,168 @@ class MP_Product {
 		wp_reset_postdata();
 		
 		return $this->variations;
+	}
+
+	/*
+	 * Displays the buy or add to cart button
+	 *
+	 * @param bool $echo Optional, whether to echo
+	 * @param string $context Options are list or single
+	 * @param int $post_id The post_id for the product. Optional if in the loop
+	 */
+ 	function buy_button( $echo = true, $context = 'list' ) {
+ 		$post_id = $this->ID;
+
+		$meta = (array) get_post_custom($post_id);
+		//unserialize
+		foreach ($meta as $key => $val) {
+				$meta[$key] = maybe_unserialize($val[0]);
+				if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file")
+						$meta[$key] = array($meta[$key]);
+		}
+
+		//check stock
+		$no_inventory = array();
+		$all_out = false;
+		if ($meta['mp_track_inventory']) {
+				$cart = mp()->get_cart_contents();
+				if (isset($cart[$post_id]) && is_array($cart[$post_id])) {
+						foreach ($cart[$post_id] as $variation => $data) {
+								if ($meta['mp_inventory'][$variation] <= $data['quantity'])
+										$no_inventory[] = $variation;
+						}
+						foreach ($meta['mp_inventory'] as $key => $stock) {
+								if (!in_array($key, $no_inventory) && $stock <= 0)
+										$no_inventory[] = $key;
+						}
+				}
+
+				//find out of stock items that aren't in the cart
+				foreach ($meta['mp_inventory'] as $key => $stock) {
+						if (!in_array($key, $no_inventory) && $stock <= 0)
+								$no_inventory[] = $key;
+				}
+
+				if (count($no_inventory) >= count($meta["mp_price"]))
+						$all_out = true;
+		}
+
+		//display an external link or form button
+		if (isset($meta['mp_product_link']) && $product_link = $meta['mp_product_link']) {
+
+				$button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
+		} else if (mp_get_setting('disable_cart')) {
+
+				$button = '';
+		} else {
+				$variation_select = '';
+				$button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
+
+				if ($all_out) {
+						$button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
+				} else {
+
+						$button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
+
+						//create select list if more than one variation
+						if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1 && empty($meta["mp_file"])) {
+								$variation_select = '<select class="mp_product_variations" name="variation">';
+								foreach ($meta["mp_price"] as $key => $value) {
+										$disabled = (in_array($key, $no_inventory)) ? ' disabled="disabled"' : '';
+										$variation_select .= '<option value="' . $key . '"' . $disabled . '>' . esc_html($meta["mp_var_name"][$key]) . ' - ';
+										if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
+												$variation_select .= mp_format_currency('', $meta["mp_sale_price"][$key]);
+										} else {
+												$variation_select .= mp_format_currency('', $value);
+										}
+										$variation_select .= "</option>\n";
+								}
+								$variation_select .= "</select>&nbsp;\n";
+						} else {
+								$button .= '<input type="hidden" name="variation" value="0" />';
+						}
+
+						if ($context == 'list') {
+								if ($variation_select) {
+										$button .= '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Choose Option &raquo;', 'mp') . '</a>';
+								} else if (mp_get_setting('list_button_type') == 'addcart') {
+										$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+										$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+								} else if (mp_get_setting('list_button_type') == 'buynow') {
+										$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+								}
+						} else {
+
+								$button .= $variation_select;
+
+								//add quantity field if not downloadable
+								if (mp_get_setting('show_quantity') && empty($meta["mp_file"])) {
+										$button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
+								}
+
+								if (mp_get_setting('product_button_type') == 'addcart') {
+										$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+										$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+								} else if (mp_get_setting('product_button_type') == 'buynow') {
+										$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+								}
+						}
+				}
+
+				$button .= '</form>';
+		}
+
+		$button = apply_filters('mp_buy_button_tag', $button, $post_id, $context);
+
+		if ($echo)
+				echo $button;
+		else
+				return $button;
+	}
+
+	/**
+	 * Get the product's excerpt
+	 *
+	 * @since 3.0
+	 * @param string $excerpt
+	 * @param string $content
+	 * @param string $excerpt_more Optional
+	 * @return string
+	 */	
+	public function excerpt( $excerpt, $content, $excerpt_more = null ) {
+		if ( is_null($excerpt_more) ) {
+			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink($this->ID) . '">' .	 __('More Info &raquo;', 'mp') . '</a>';
+		}
+		
+		if ( $excerpt ) {
+			return apply_filters('get_the_excerpt', $excerpt) . $excerpt_more;
+		} else {
+			$text = strip_shortcodes($content);
+			$text = str_replace(']]>', ']]&gt;', $text);
+			$text = strip_tags($text);
+			$excerpt_length = apply_filters('excerpt_length', 55);
+			$words = preg_split("/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY);
+			
+			if ( count($words) > $excerpt_length ) {
+				array_pop($words);
+				$text = implode(' ', $words);
+				$text = $text . $excerpt_more;
+			} else {
+				$text = implode(' ', $words);
+			}
+		}
+		
+		/**
+		 * Filter the product excerpt
+		 *
+		 * @since 3.0
+		 * @param string $text
+		 * @param string $excerpt
+		 * @param string $content
+		 * @param int $product_id
+		 * @param string $excerpt_more Optional
+		 */
+		return apply_filters('mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more);
 	}
 	
 	/**
@@ -181,7 +356,138 @@ class MP_Product {
 		
 		return $price;
 	}
+
+	/*
+	 * Get the product image
+	 *
+	 * @since 3.0
+	 * @param bool $echo Optional, whether to echo
+	 * @param string $context Options are list, single, or widget
+	 * @param int $size An optional width/height for the image if contect is widget
+	 * @param string $align The alignment of the image. Defaults to settings.
+	 */
+	public function image( $echo = true, $context = 'list', $size = null, $align = null ) {
+		/**
+		 * Filter the post_id used for the product image
+		 *
+		 * @since 3.0
+		 * @param int $post_id
+		 */
+		$post_id = apply_filters('mp_product_image_id', $this->ID);
+		$post = $this->_post;
+
+		$post_thumbnail_id = get_post_thumbnail_id($post_id);
+		$class = $title = $link = '';
+		$img_classes = array('mp_product_image_' . $context, 'photo');
+		
+		if ( ! is_null($align) ) {
+			$align = 'align' . $align;
+		}
+
+		switch ( $context ) {
+			case 'list' :
+				if ( ! mp_get_setting('show_thumbnail') ) {
+					return '';
+				}
 	
+				//size
+				if ( intval($size) ) {
+					$size = array(intval($size), intval($size));
+				} else {
+					if ( mp_get_setting('list_img_size') == 'custom' ) {
+						$size = array(mp_get_setting('list_img_size_custom->width'), mp_get_setting('list_img_size_custom->height'));
+					} else {
+						$size = mp_get_setting('list_img_size');
+					}
+				}
+	
+				$link = get_permalink($post_id);
+				$title = esc_attr($post->post_title);
+				$class = ' class="mp_img_link"';
+				$img_classes[] = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
+			break;
+			
+			case 'single' :
+				//size
+				if ( mp_get_setting('product_img_size') == 'custom' ) {
+					$size = array(mp_get_setting('product_img_size_custom->width'), mp_get_setting('product_img_size_custom->height'));
+				} else {
+					$size = mp_get_setting('product_img_size');
+				}
+
+				//link
+				$temp = wp_get_attachment_image_src($post_thumbnail_id, 'large');
+				$link = $temp[0];
+
+				if ( mp_get_setting('disable_large_image') ) {
+					$link = '';
+					$title = esc_attr($post->post_title);
+				} else {
+					$title = __('View Larger Image &raquo;', 'mp');
+				}
+
+				$class = ' class="mp_product_image_link mp_lightbox"';
+				$img_classes[] = is_null($align) ? mp_get_setting('image_alignment_single') : $align;
+				
+				//in case another plugin is loadin glightbox
+				if ( mp_get_setting('show_lightbox') ) {
+					$class .= ' rel="lightbox"';
+					wp_enqueue_script('mp-lightbox');
+				}
+			break;
+			
+			case 'widget' :
+				//size
+				if (intval($size))
+						$size = array(intval($size), intval($size));
+				else
+						$size = array(50, 50);
+
+				//link
+				$link = get_permalink($post_id);
+
+				$title = esc_attr($post->post_title);
+				$class = ' class="mp_img_link"';
+			break;
+		}
+
+		$image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => implode(' ', $img_classes), 'title' => $title));
+
+		if ( empty($image) && $context != 'single' ) {
+			if ( ! is_array($size) ) {
+					$size = array(get_option($size . '_size_w'), get_option($size . '_size_h'));
+			}
+			
+			$img_classes[] = 'wp-post-image';
+			$image = '
+				<div itemscope class="hmedia">
+					<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
+					<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />
+				</div>';
+		}
+		
+		//force ssl on images (if applicable) http://wp.mu/8s7
+		if ( is_ssl() ) {
+			$image = str_replace('http://', 'https://', $image);
+		}
+
+		//add the link
+		if ( $link ) {
+			$image = '
+				<div itemscope class="hmedia">
+					<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
+					<a rel="lightbox enclosure" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>
+				</div>';
+		}
+
+		$image = apply_filters('mp_product_image', $image, $context, $post_id, $size);
+
+		if ( $echo ) {
+			echo $image;
+		} else {
+			return $image;	
+		}	
+	}	
 	/**
 	 * Get product meta value
 	 *
@@ -197,12 +503,14 @@ class MP_Product {
 			return $default;
 		}
 		
+		$value = null;
+		
 		if ( function_exists('get_field_value') ) {
 			// Try to get WPMUDEV_Field value
 			$value = get_field_value($name, $this->ID, $raw);
 		}
 		
-		if ( $value ) {
+		if ( ! is_null($value) ) {
 			return $value;
 		}
 		
@@ -214,7 +522,7 @@ class MP_Product {
 			}
 		}
 		
-		if ( $value ) {
+		if ( ! is_null($value) ) {
 			return $value;
 		}
 		
@@ -247,6 +555,34 @@ class MP_Product {
 	 */
 	public function meta( $name, $default = false, $raw = false ) {
 		echo $this->get_meta($name, $default, $raw);
+	}
+
+	/**
+	 * Get Pinterest PinIt button
+	 *
+	 * @since 3.0
+	 * @param string $context
+	 * @param bool $echo
+	 */
+	public function pinit_button( $context = 'single_view', $echo = false ) {
+		$setting = mp_get_setting('social->pinterest->show_pinit_button');
+		
+		if ( $setting == 'off' || $setting != $context ) {
+			return '';
+		}
+	
+		$url = urlencode(get_permalink($this->ID));
+		$desc = urlencode(get_the_title($this->ID));
+		$image_info =	$large_image_url = wp_get_attachment_image_src(get_post_thumbnail_id($this->ID), 'large');
+		$media = ($image_info) ?	 '&media=' . urlencode($image_info[0]) : '';
+		$count_pos = ( $pos = mp_get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
+		$snippet = apply_filters('mp_pinit_button_link', '<a href="//www.pinterest.com/pin/create/button/?url=' . $url . $media . '&description=' . $desc.  '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context);
+	
+		if ( $echo ) {
+			echo $snippet;
+		} else {
+			return $snippet;
+		}
 	}
 	
 	/**
