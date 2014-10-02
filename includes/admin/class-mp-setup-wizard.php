@@ -32,7 +32,7 @@ class MP_Setup_Wizard {
 	 * @action admin_notices
 	 */
 	public function nag_message() {
-		if ( get_option('mp_setup_complete') || mp_get_get_value('page') == 'store-setup-wizard' ) {
+		if ( get_option('mp_setup_complete') || mp_get_get_value('page') == 'store-setup-wizard' || mp_get_get_value('page') == 'mp-db-update' || ! current_user_can(apply_filters('mp_store_settings_cap', 'manage_store_settings')) ) {
 			return;
 		}
 		?>
