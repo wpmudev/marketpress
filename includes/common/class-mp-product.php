@@ -139,13 +139,12 @@ class MP_Product {
 			$start_date = $this->get_meta('sale_price_start_date', false, true);
 			$end_date = $this->get_meta('sale_price_end_date', false, true);
 			$time = current_time('Y-m-d');
+			$on_sale = true;
 			
-			if ( $start_date && $end_date && $time >= $start_date && $time <= $end_date ) {
-				$on_sale = true;
-			} elseif ( $start_date && $time >= $start_date ) {
-				$on_sale = true;
-			} elseif ( $end_date && $time <= $end_date ) {
-				$on_sale = true;
+			if ( $start_date && $time < $start_date ) {
+				$on_sale = false;
+			} elseif ( $end_date && $time > $end_date ) {
+				$on_sale = false;
 			}
 		}
 		
