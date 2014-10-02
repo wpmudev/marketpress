@@ -1,5 +1,97 @@
 <?php
 
+if ( ! function_exists('_mp_products_html_grid')) :
+	/**
+	 * Display product list in grid layout
+	 *
+	 * @since 3.0
+	 * @param WP_Query $custom_query
+	 * @return string
+	 */
+	function _mp_products_html_grid( $custom_query ) {
+		$html = '';
+		
+		//get image width
+		if ( mp_get_setting('list_img_size') == 'custom' ) {
+			$width = mp_get_setting('list_img_width');
+		} else {
+			$size = mp_get_setting('list_img_size');
+			$width = get_option($size . "_size_w");
+		}
+
+		$inline_style = ! ( mp_get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
+
+		while ( $custom_query->have_posts() ) : $custom_query->the_post();
+			$product = new MP_Product();
+			$img = $product->image(false, 'list');
+			$excerpt = mp_get_setting('show_excerpt') ? '<p class="mp_excerpt">' . $product->excerpt($product->post_excerpt, $product->post_content, '') . '</p>' : '';
+			$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $product->ID);
+	
+			$pinit = $product->pinit_button('all_view');
+
+			$class = array();
+			$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
+			$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
+			$class[] = ( $product->has_variations() ) ? 'mp_price_variations' : '';
+
+			$html .= '
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '">
+					<div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+						<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+							' . $img . '
+							' . $pinit .'
+							<h3 class="mp_product_name entry-title" itemprop="name">
+								<a href="' . get_permalink($product->ID) . '">' . $product->post_title . '</a>
+							</h3>
+						
+							<div>' . $mp_product_list_content . '</div>
+						</div>
+
+						<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+							' . $product->get_price() . '
+							' . $product->buy_button(false, 'list') . '
+							' . apply_filters('mp_product_list_meta', '', $product->ID) . '
+						</div>
+						
+						<div style="display:none" >
+							<span class="entry-title">' . get_the_title() . '</span> was last modified:
+							<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
+							<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
+						</div>
+					</div>
+				</div>';
+		endwhile;
+
+		$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
+		
+		wp_reset_postdata();
+		
+		return apply_filters('_mp_products_html_grid', $html, $custom_query);
+	}
+endif;
+
+if ( ! function_exists('mp_buy_button') ) :
+	/**
+	 * Display the buy or add to cart button
+	 *
+	 * @param bool $echo Optional, whether to echo
+	 * @param string $context Options are list or single
+	 * @param int $post_id The post_id for the product. Optional if in the loop.
+	 */
+	function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
+		_deprecated_function('mp_buy_button', '3.0', 'MP_Product::buy_button');
+		
+		$product = new MP_Product($post_id);
+		$button = $product->buy_button(false, $context);
+		
+		if ( $echo ) {
+			echo $button;
+		} else {
+			return $button;
+		}
+	}
+endif;
+
 if ( ! function_exists('mp_cart_link') ) :
 	/**
 	 * Display the current shopping cart link. If global cart is on reflects global location
@@ -265,7 +357,7 @@ if ( ! function_exists('mp_list_products') ) :
 		$content .= '<div id="mp_product_list" class="hfeed mp_' . $layout_type . '">';
 	
 		if ( $last = $custom_query->post_count ) {
-			//$content .= $layout_type == 'grid' ? _mp_products_html_grid($custom_query) : _mp_products_html_list($custom_query);
+			$content .= $layout_type == 'grid' ? _mp_products_html_grid($custom_query) : _mp_products_html_list($custom_query);
 		} else {
 			$content .= '<div id="mp_no_products">' . apply_filters('mp_product_list_none', __('No Products', 'mp')) . '</div>';
 		}
@@ -279,6 +371,69 @@ if ( ! function_exists('mp_list_products') ) :
 			echo $content;
 		} else {
 			return $content;
+		}
+	}
+endif;
+
+if ( ! function_exists('mp_pinit_button') ) :
+	/**
+	 * Pinterest PinIt button
+	 *
+	 * @param int $product_id
+	 * @param string $context
+	 * @param bool $echo
+	 */
+	function mp_pinit_button( $product_id = NULL, $context = 'single_view', $echo = false ) {
+		_deprecated_function('mp_pinit_button', '3.0', 'MP_Product::pinit_button()');
+		
+		$product = new MP_Product($product_id);
+		$snippet = $product->pinit_button($context, false);
+		
+		if ( $echo ) {
+			echo $snippet;
+		} else {
+			return $snippet;
+		}
+	}
+endif;
+
+if ( ! function_exists('mp_product_excerpt') ) :
+	/**
+	 * Replaces wp_trim_excerpt in MP custom loops
+	 *
+	 * @param string $excerpt
+	 * @param string $content
+	 * @param int $product_id
+	 * @param string $excerpt_more
+	 * @return string
+	 */
+	function mp_product_excerpt( $excerpt, $content, $product_id, $excerpt_more = null ) {
+		_deprecated_function('mp_product_excerpt', '3.0', 'MP_Product::excerpt()');
+		$product = new MP_Product($product_id);
+		return $product->excerpt($excerpt, $content, $excerpt_more);	
+	}
+endif;
+
+if ( ! function_exists('mp_product_image') ) :
+	/*
+	 * Get the product image
+	 *
+	 * @param bool $echo Optional, whether to echo
+	 * @param string $context Options are list, single, or widget
+	 * @param int $post_id The post_id for the product. Optional if in the loop
+	 * @param int $size An optional width/height for the image if contect is widget
+	 * @param string $align The alignment of the image. Defaults to settings.
+	 */
+	function mp_product_image( $echo = true, $context = 'list', $post_id = NULL, $size = NULL, $align = NULL ) {
+		_deprecated_function('mp_product_image', '3.0', 'MP_Product::image()');
+		
+		$product = new MP_Product($post_id);
+		$image = MP_Product::image(false, $context, $size, $align);
+		
+		if ( $echo ) {
+			echo $image;
+		} else {
+			return $image;
 		}
 	}
 endif;
