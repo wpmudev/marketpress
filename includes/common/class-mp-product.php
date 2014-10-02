@@ -60,9 +60,10 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @return string
 	 */
 	public static function get_post_type() {
-		return mp_get_setting('product_post_type', 'product');
+		return mp_get_setting('product_post_type') == 'mp_product' ? 'mp_product' : 'product';
 	}
 	
 	/**
