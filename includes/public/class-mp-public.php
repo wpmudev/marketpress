@@ -32,10 +32,21 @@ class MP_Public {
 	 * @access private
 	 */
 	private function __construct() {
+		$this->includes();
 		add_filter('taxonomy_template', array(&$this, 'load_taxonomy_template'));
 		add_filter('single_template', array(&$this, 'load_single_product_template'));
 		add_filter('page_template', array(&$this, 'load_page_template'));
 		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles'));
+	}
+	
+	/**
+	 * Include files
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function includes() {
+		require_once mp_plugin_dir('includes/public/class-mp-short-codes.php');
 	}
 	
 	/**
