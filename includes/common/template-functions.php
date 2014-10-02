@@ -60,7 +60,7 @@ if ( ! function_exists('mp_format_currency') ) :
 		if ( empty($currency) ) {
 			$currency = mp_get_setting('currency', 'USD');
 		}
-
+		
 		// get the currency symbol
 		if ( $symbol = mp_arr_get_value("$currency->1", $currencies) ) {
 			// if many symbols are found, rebuild the full symbol
@@ -73,9 +73,6 @@ if ( ! function_exists('mp_format_currency') ) :
 			} else {
 				$symbol = '&#x'.$symbol.';';
 			}
-		} else {
-			trigger_error(sprintf(__('No currency found for currency %s.', 'mp'), $currency), E_USER_ERROR);
-			return false;
 		}
 
 		/**
