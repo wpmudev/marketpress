@@ -85,7 +85,7 @@ class MP_Installer {
 		endwhile;
 		
 		$response = array(
-			'updated' => $updated,
+			'updated' => ceil($updated / $query->found_posts) * 100,
 			'is_done' => false,
 		);
 		
