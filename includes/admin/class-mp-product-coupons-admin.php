@@ -46,7 +46,7 @@ class MP_Product_Coupons_Screen {
 		// Init metaboxes
 		add_action('init', array(&$this, 'init_metaboxes'));
 		// Get coupon code value
-		add_filter('wpmudev_field/get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
+		add_filter('wpmudev_field/before_get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
 	}
 	
 	/**

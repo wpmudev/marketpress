@@ -44,7 +44,7 @@ class MP_Store_Settings_Admin {
 			add_action('store-settings_page_store-settings-productattributes', array(&$this, 'display_settings_form'));
 			
 			if ( mp_get_get_value('action') == 'mp_edit_product_attribute' ) {
-				add_filter('wpmudev_field/get_value', array('MP_Product_Attributes_Admin', 'get_product_attribute_value'), 10, 4);	
+				add_filter('wpmudev_field/before_get_value', array('MP_Product_Attributes_Admin', 'get_product_attribute_value'), 10, 4);	
 			}
 		} else {
 			$screen_ids = array(

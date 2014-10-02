@@ -420,12 +420,29 @@ class WPMUDEV_Field {
 	 * @return mixed
 	 */
 	public function get_value( $post_id, $meta_key = null, $raw = false ) {
-		$value = null;
-		
-		if ( ! is_null($this->_value) && current_filter() == '' ) {
+		if ( ! is_null($this->_value) ) {
 			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
+
+		$value = null;
 		
+		/**
+		 * Filter the returned value before any internal code is run
+		 *
+		 * @since 1.0
+		 * @param mixed $value The return value
+		 * @param mixed $post_id The current post id or option name
+		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
+		 * @param object $this Refers to the current field object		 
+		 */
+		$value = apply_filters('wpmudev_field/before_get_value', $value, $post_id, $raw, $this);
+		$value = apply_filters('wpmudev_field/before_get_value/' . $this->args['name'], $value, $post_id, $raw, $this);
+
+		if ( ! is_null($value) ) {
+			$this->_value = $value;
+			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
+		}
+				
 		if ( is_numeric($post_id) ) {
 			// This is a post
 			if ( is_null($meta_key) ) {
@@ -450,7 +467,7 @@ class WPMUDEV_Field {
 		}
 		
 		/**
-		 * Modify the returned value.
+		 * Filter the returned value
 		 *
 		 * @since 1.0
 		 * @param mixed $value The return value

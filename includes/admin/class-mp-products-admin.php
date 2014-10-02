@@ -35,7 +35,7 @@ class MP_Products_Screen {
 		add_action('admin_menu', array(&$this, 'remove_menu_items'), 999);
 		// Product variations save/get value
 		add_filter('wpmudev_field/save_value/variations', array(&$this, 'save_product_variations'), 10, 3);
-		add_filter('wpmudev_field/get_value/variations', array(&$this, 'get_product_variations'), 10, 4);
+		add_filter('wpmudev_field/before_get_value/variations', array(&$this, 'get_product_variations'), 10, 4);
 		// Custom product columns
 		add_filter('manage_product_posts_columns', array(&$this, 'product_columns_head'));
 		add_filter('manage_mp_product_posts_columns', array(&$this, 'product_columns_head'));
