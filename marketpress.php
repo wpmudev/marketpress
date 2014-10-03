@@ -359,11 +359,11 @@ class Marketpress {
 		require_once $this->plugin_dir('includes/common/constants.php');
 		
 		// Includes
-		add_action('plugins_loaded', array(&$this, 'includes'));
+		add_action('init', array(&$this, 'includes'), 0);
 		// Load gateway/shipping plugins
-		add_action('plugins_loaded', array(&$this, 'load_plugins'));
+		add_action('init', array(&$this, 'load_plugins'), 0);
 		// Setup custom types
-		add_action('init', array(&$this, 'register_custom_types'), 0);
+		add_action('init', array(&$this, 'register_custom_types'), 1);
 		// Maybe flush rewrites
 		add_action('init', array(&$this, 'maybe_flush_rewrites'), 99);
 	}
