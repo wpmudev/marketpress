@@ -35,6 +35,37 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 		$value = ( empty($value) ) ? 0 : $value;
 		return parent::sanitize_for_db($value, $post_id);
 	}
+	
+	/**
+	 * Prints inline javascript
+	 *
+	 * @since 1.0
+	 * @access public
+	 */
+	public function print_scripts() {
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	/* When unchecking a checkbox ensure that a value is sent with the post request,
+	otherwise things can get really screwy */
+	var onChange = function(){
+		var $this = $(this);
+		if ( ! $this.prop('checked') ) {
+			$this.after('<input type="hidden" name="' + $this.attr('name') + '" value="0" />');
+		} else {
+			$this.next(':hidden').remove();
+		}		
+	};
+	
+	$('.wpmudev-fields').on('change', ':checkbox', onChange)
+	$('.wpmudev-fields').find(':checkbox').each(onChange);
+	$(document).on('wpmudev_repeater_field/after_add_field_group', function(e, $group){
+		$group.find(':checkbox').each(onChange);
+	});
+});
+</script>
+		<?php
+	}
 
 	/**
 	 * Displays the field
