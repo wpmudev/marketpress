@@ -91,11 +91,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 	 * @return mixed
 	 */
-	public function get_value( $post_id, $raw = false ) {
-		if ( ! is_null($this->_value) ) {
-			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
-		}
-
+	public function get_value( $post_id, $raw = false ) {	
 		$value = null;
 		
 		/**
@@ -112,15 +108,17 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 
 		if ( ! is_null($value) ) {
 			$this->_value = $value;
-			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 		
+		if ( ! is_null($this->_value) ) {
+			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
+		}
+
 		$value = array();
 		
 		if ( is_numeric($post_id) ) {
 			foreach ( $this->subfields as $subfield ) {
 				$meta_key = $this->args['original_name'] . '_' . $subfield->args['original_name'];
-				$value[$subfield->args['original_name']] = $subfield->get_value($post_id, $meta_key, $raw);
 			}
 		} else {
 			$options = get_option($post_id);
@@ -141,7 +139,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		$value = apply_filters('wpmudev_field/get_value/' . $this->args['name'], $value, $post_id, $raw, $this);
 		
 		if ( is_null($value) ) {
-			$this->_value = $value = $this->args['default_value'];
+			$value = $this->args['default_value'];
 		}
 		
 		return $value;

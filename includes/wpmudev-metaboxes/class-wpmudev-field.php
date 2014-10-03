@@ -420,10 +420,6 @@ class WPMUDEV_Field {
 	 * @return mixed
 	 */
 	public function get_value( $post_id, $meta_key = null, $raw = false ) {
-		if ( ! is_null($this->_value) ) {
-			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
-		}
-
 		$value = null;
 		
 		/**
@@ -440,6 +436,9 @@ class WPMUDEV_Field {
 
 		if ( ! is_null($value) ) {
 			$this->_value = $value;
+		}
+		
+		if ( ! is_null($this->_value) ) {
 			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 				
@@ -481,9 +480,6 @@ class WPMUDEV_Field {
 		if ( is_null($value) || $value === false ) {
 			$value = $this->args['default_value'];
 		}
-		
-		// Set the field's value for future
-		$this->_value = $value;
 		
 		$value = ( $raw ) ? $value : $this->format_value($value, $post_id);
 		

@@ -37,10 +37,6 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 	 * @return mixed
 	 */
 	public function get_value( $post_id, $meta_key = null, $raw = false ) {
-		if ( ! is_null($this->_value) ) {
-			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
-		}
-
 		$value = null;
 		
 		/**
@@ -57,6 +53,9 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 
 		if ( ! is_null($value) ) {
 			$this->_value = $value;
+		}
+		
+		if ( ! is_null($this->_value) ) {
 			return ($raw) ? $this->_value : $this->format_value($this->_value, $post_id);
 		}
 		
@@ -78,8 +77,6 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		 */
 		$value = apply_filters('wpmudev_field/get_value', $value, $post_id, $raw, $this);
 		$value = apply_filters('wpmudev_field/get_value/' . $this->args['name'], $value, $post_id, $raw, $this);
-		
-		$this->_value = $value;
 		
 		return $value;
 	}
@@ -168,7 +165,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 					$field->set_subfield_id($this->subfield_id);
 				}
 				
-				if ( is_array($value) && ($val = array_shift($value)) ) {
+				if ( is_array($value) && ($val = array_shift($value)) !== null ) {
 					$field->set_value($val);
 				}
 				
