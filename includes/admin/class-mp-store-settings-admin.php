@@ -33,10 +33,14 @@ class MP_Store_Settings_Admin {
 	private function __construct() {
 		mp_include_dir(mp_plugin_dir('includes/admin/store-settings/'));
 		
-		//print scripts for setting the active admin menu item when on the product tag page
+		// Add menu items
+		add_action('admin_menu', array(&$this, 'add_menu_items'));
+		// Print scripts for setting the active admin menu item when on the product tag page
 		add_action('admin_footer', array(&$this, 'print_product_tag_scripts'));
-		//print scripts for setting the active admin menu item when on the product category page
-		add_action('admin_footer', array(&$this, 'print_product_category_scripts'));		
+		// Print scripts for setting the active admin menu item when on the product category page
+		add_action('admin_footer', array(&$this, 'print_product_category_scripts'));
+		// Move product categories and tags to store settings menu
+		add_action('parent_file', array(&$this, 'set_menu_item_parent'));
 
 		if ( mp_get_get_value('action') == 'mp_add_product_attribute' || mp_get_get_value('action') == 'mp_edit_product_attribute' ) {
 			MP_Product_Attributes_Admin::add_product_attribute_metaboxes();
@@ -66,6 +70,62 @@ class MP_Store_Settings_Admin {
 			add_action('store-settings_page_store-settings-productattributes', array('MP_Product_Attributes_Admin', 'display_product_attributes'));		
 		}
 	}
+	
+	/**
+	 * Set menu item parent file
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action parent_file
+	 */
+	public function set_menu_item_parent( $parent_file ) {
+		switch ( get_current_screen()->taxonomy ) {
+			case 'product_category' :
+			case 'product_tag' :
+				$parent_file = 'store-settings';
+			break;
+		}
+		
+		return $parent_file;
+	}
+	
+	/**
+	 * Add items to the admin menu
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wp_version
+	 */
+	public function add_menu_items() {
+		global $wp_version;
+		
+		//store settings
+		$cap = apply_filters('mp_store_settings_cap', 'manage_store_settings');
+		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', create_function('', ''), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
+		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', false);		
+		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', false);
+		add_submenu_page('store-settings', __('Store Settings: Notifications', 'mp'), __('Notifications', 'mp'), $cap, 'store-settings-notifications', false);
+		add_submenu_page('store-settings', __('Store Settings: Shipping', 'mp'), __('Shipping', 'mp'), $cap, 'store-settings-shipping', false);
+		add_submenu_page('store-settings', __('Store Settings: Payments', 'mp'), __('Payments', 'mp'), $cap, 'store-settings-payments', false);
+		add_submenu_page('store-settings', __('Store Settings: Product Attributes', 'mp'), __('Product Attributes', 'mp'), $cap, 'store-settings-productattributes', false);
+		add_submenu_page('store-settings', __('Store Settings: Product Categories', 'mp'), __('Product Categories', 'mp'), apply_filters('mp_manage_product_categories_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_category&post_type=' . MP_Product::get_post_type()); 
+		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type());		
+		add_submenu_page('store-settings', __('Store Settings: Capabilities', 'mp'), __('User Capabilities', 'mp'), $cap, 'store-settings-capabilities', false);
+		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
+		add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
+
+	 	if ( ! WPMUDEV_REMOVE_BRANDING ) {
+			add_action('load-toplevel_page_store-settings', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-presentation', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-notifications', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-shipping', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-payments', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-capabilities', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-setup-wizard', array(&$this, 'add_help_tab'));
+		}
+	}
 
 	/**
 	 * Print scripts for setting the active admin menu item when on the product tag page
@@ -78,9 +138,7 @@ class MP_Store_Settings_Admin {
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('#menu-posts-<?php echo mp_get_product_post_type(); ?>, #menu-posts-<?php echo mp_get_product_post_type(); ?> > a').removeClass('wp-menu-open wp-has-current-submenu');
-	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=<?php echo mp_get_product_post_type(); ?>"]').addClass('current').parent().addClass('current');
+	$('a[href="edit-tags.php?taxonomy=product_tag&post_type=<?php echo MP_Product::get_post_type(); ?>"]').addClass('current').parent().addClass('current');
 });
 </script>
 		<?php
@@ -97,9 +155,7 @@ jQuery(document).ready(function($){
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('#menu-posts-<?php echo mp_get_product_post_type(); ?>, #menu-posts-<?php echo mp_get_product_post_type(); ?> > a').removeClass('wp-menu-open wp-has-current-submenu');
-	$('#toplevel_page_store-settings, #toplevel_page_store-settings > a').addClass('wp-menu-open wp-has-current-submenu');
-	$('a[href="edit-tags.php?taxonomy=product_category&post_type=<?php echo mp_get_product_post_type(); ?>"]').addClass('current').parent().addClass('current');
+	$('a[href="edit-tags.php?taxonomy=product_category&post_type=<?php echo MP_Product::get_post_type(); ?>"]').addClass('current').parent().addClass('current');
 });
 </script>
 		<?php

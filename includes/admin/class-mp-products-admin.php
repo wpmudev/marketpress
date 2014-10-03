@@ -278,6 +278,8 @@ class MP_Products_Screen {
 	 */
 	public function remove_menu_items() {
 		remove_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), 'post-new.php?post_type=' . MP_Product::get_post_type());
+		remove_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), 'edit-tags.php?taxonomy=product_category&amp;post_type=' . MP_Product::get_post_type());
+		remove_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), 'edit-tags.php?taxonomy=product_tag&amp;post_type=' . MP_Product::get_post_type());
 	}
 
 	/**
