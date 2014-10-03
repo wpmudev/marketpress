@@ -101,12 +101,12 @@ if ( ! function_exists('mp_cart_link') ) :
 	 * @param string $link_text Optional, text to show in link.
 	 */
 	function mp_cart_link( $echo = true, $url = false, $link_text = '' ) {
-		if ( mp()->global_cart && mp_is_main_site() ) {
+		if ( mp()->global_cart && ! mp_is_main_site() ) {
 			switch_to_blog(MP_ROOT_BLOG);
-			$link = home_url(mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->cart') . '/');
+			$link = get_permalink(mp_get_setting('pages->checkout'));
 			restore_current_blog();
 		} else {
-			$link = home_url(mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->cart') . '/');
+			$link = get_permalink(mp_get_setting('pages->checkout'));
 		}
 
 		if ( ! $url ) {
