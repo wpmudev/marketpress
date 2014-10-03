@@ -423,14 +423,30 @@ class MP_Products_Screen {
 				'name' => 'sku',
 				'label' => array('text' => __('SKU', 'mp')),
 			));
+		$metabox->add_field('checkbox', array(
+				'name' => 'track_inventory',
+				'label' => array('text' => __('Track Inventory?', 'mp')),
+				'conditional' => array(
+					'name' => 'product_type',
+					'value' => 'physical',
+					'action' => 'show',
+				),				
+			));
 		$metabox->add_field('text', array(
 			'name' => 'inventory',
 			'label' => array('text' => __('Inventory Count', 'mp')),
 			'desc' => __('Enter the quantity that you have available to sell. Leave blank if you do not want to track inventory.', 'mp'),
 			'conditional' => array(
-				'name' => 'product_type',
-				'value' => 'physical',
 				'action' => 'show',
+				'operator' => 'AND',
+				array(
+					'name' => 'product_type',
+					'value' => 'physical',
+				),
+				array(
+					'name' => 'track_inventory',
+					'value' => 1,
+				),
 			),
 		));
 		$metabox->add_field('text', array(
@@ -570,14 +586,30 @@ class MP_Products_Screen {
 				'name' => 'image',
 				'label' => array('text' => __('Image', 'mp')),
 			));
+			$repeater->add_sub_field('checkbox', array(
+				'name' => 'track_inventory',
+				'label' => array('text' => __('Track Inventory?', 'mp')),
+				'conditional' => array(
+					'name' => 'product_type',
+					'value' => 'physical',
+					'action' => 'show',
+				),				
+			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'inventory',
 				'label' => array('text' => __('Inventory Count', 'mp')),
 				'desc' => __('Enter the quantity that you have available to sell. Leave blank if you do not want to track inventory.', 'mp'),
 				'conditional' => array(
-					'name' => 'product_type',
-					'value' => 'physical',
 					'action' => 'show',
+					'operator' => 'AND',
+					array(
+						'name' => 'product_type',
+						'value' => 'physical',
+					),
+					array(
+						'name' => 'variations[track_inventory]',
+						'value' => 1,
+					),
 				),
 			));
 			$repeater->add_sub_field('text', array(
