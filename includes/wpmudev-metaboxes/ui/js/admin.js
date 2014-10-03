@@ -115,12 +115,16 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		})
 	}
 	
-	var testConditionals = function(conditionals){
+	var testConditionals = function(conditionals, $obj){
 		var numValids = 0;
 		
 		$.each(conditionals, function(i, conditional){
-			var $input = $('[name="' + conditional.name + '"]');
-			
+			if ( conditional.name.indexOf('[') >= 0 && $obj.closest('.wpmudev-subfield-group').length ) {
+				var $input = $obj.closest('.wpmudev-subfield-group').find('[name^="' + conditional.name + '"]');
+			} else {
+				var $input = $('[name="' + conditional.name + '"]');
+			}
+
 			if ( ! $input.is(':radio:visible') && ! $input.is(':checkbox:visible') && ! $input.is('select:visible') ) {
 				// Conditional logic only works for radios, checkboxes and select dropdowns
 				return;
@@ -204,13 +208,13 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			
 			if ( action == 'show' ) {
 				if ( operator == 'AND' ) {
-					if ( testConditionals(conditionals) != conditionals.length ) {
+					if ( testConditionals(conditionals, $this) != conditionals.length ) {
 						$container.hide().next('p.submit').hide();
 					} else {
 						$container.fadeIn(500).next('p.submit').fadeIn(500)
 					}
 				} else {
-					if ( testConditionals(conditionals) == 0 ) {
+					if ( testConditionals(conditionals, $this) == 0 ) {
 						$container.hide().next('p.submit').hide();
 					} else {
 						$container.fadeIn(500).next('p.submit').fadeIn(500)
@@ -220,13 +224,13 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			
 			if ( action == 'hide' ) {
 				if ( operator == 'AND' ) {
-					if ( testConditionals(conditionals) == conditionals.length ) {
+					if ( testConditionals(conditionals, $this) == conditionals.length ) {
 						$container.hide().next('p.submit').hide();
 					} else {
 						$container.fadeIn(500).next('p.submit').fadeIn(500)
 					}
 				} else {
-					if ( testConditionals(conditionals) > 0 ) {
+					if ( testConditionals(conditionals, $this) > 0 ) {
 						$container.hide().next('p.submit').hide();
 					} else {
 						$container.fadeIn(500).next('p.submit').fadeIn(500)
