@@ -435,7 +435,7 @@ class MP_Products_Screen {
 		$metabox->add_field('text', array(
 			'name' => 'inventory',
 			'label' => array('text' => __('Inventory Count', 'mp')),
-			'desc' => __('Enter the quantity that you have available to sell. Leave blank if you do not want to track inventory.', 'mp'),
+			'desc' => __('Enter the quantity that you have available to sell.', 'mp'),
 			'conditional' => array(
 				'action' => 'show',
 				'operator' => 'AND',
@@ -598,7 +598,7 @@ class MP_Products_Screen {
 			$repeater->add_sub_field('text', array(
 				'name' => 'inventory',
 				'label' => array('text' => __('Inventory Count', 'mp')),
-				'desc' => __('Enter the quantity that you have available to sell. Leave blank if you do not want to track inventory.', 'mp'),
+				'desc' => __('Enter the quantity that you have available to sell.', 'mp'),
 				'conditional' => array(
 					'action' => 'show',
 					'operator' => 'AND',
