@@ -37,7 +37,7 @@ class MP_Store_Settings_Presentation {
 	}
 	
 	/**
-	 * Print scripts for creating 
+	 * Print scripts for creating store page
 	 *
 	 * @since 3.0
 	 * @access public
