@@ -126,116 +126,80 @@ class MP_Product {
 	 *
 	 * @param bool $echo Optional, whether to echo
 	 * @param string $context Options are list or single
-	 * @param int $post_id The post_id for the product. Optional if in the loop
 	 */
  	function buy_button( $echo = true, $context = 'list' ) {
- 		$post_id = $this->ID;
+ 		$product_link = get_permalink($this->ID);
+ 		
+		// Display an external link
+		$button = '';
+		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
+			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
+		} elseif ( ! mp_get_setting('disable_cart') ) {
+			$variation_select = '';
+			$button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
 
-		$meta = (array) get_post_custom($post_id);
-		//unserialize
-		foreach ($meta as $key => $val) {
-				$meta[$key] = maybe_unserialize($val[0]);
-				if (!is_array($meta[$key]) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file")
-						$meta[$key] = array($meta[$key]);
-		}
-
-		//check stock
-		$no_inventory = array();
-		$all_out = false;
-		if ($meta['mp_track_inventory']) {
-				$cart = mp()->get_cart_contents();
-				if (isset($cart[$post_id]) && is_array($cart[$post_id])) {
-						foreach ($cart[$post_id] as $variation => $data) {
-								if ($meta['mp_inventory'][$variation] <= $data['quantity'])
-										$no_inventory[] = $variation;
+			if ( ! $this->in_stock() ) {
+				$button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
+			} else {
+				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
+				
+				if ( $this->has_variations() ) {
+					$variation_select = '<select class="mp_product_variations" name="variation">';
+					$variations = $this->get_variations();
+					
+					foreach ( $variations as $variation ) {
+						$price_obj = $variation->get_price();
+						
+						if ( $variation->on_sale ) {
+							$price = mp_format_currency('', $price_obj['sale']['amount']);
+						} else {
+							$price = mp_format_currency('', $price_obj['regular']);
 						}
-						foreach ($meta['mp_inventory'] as $key => $stock) {
-								if (!in_array($key, $no_inventory) && $stock <= 0)
-										$no_inventory[] = $key;
-						}
+						
+						$variation_select .= '<option value="' . $variation->ID . '"' . (( $variation->in_stock() ) ? '' : ' disabled="disabled"') . '">' . esc_attr($variation->get_meta('name')) . ' - ' . $price . '</option>';
+					}
+					
+					$variation_select .= '</select>';
 				}
+				
+				//! TODO: Finish converting below code
 
-				//find out of stock items that aren't in the cart
-				foreach ($meta['mp_inventory'] as $key => $stock) {
-						if (!in_array($key, $no_inventory) && $stock <= 0)
-								$no_inventory[] = $key;
-				}
-
-				if (count($no_inventory) >= count($meta["mp_price"]))
-						$all_out = true;
-		}
-
-		//display an external link or form button
-		if (isset($meta['mp_product_link']) && $product_link = $meta['mp_product_link']) {
-
-				$button = '<a class="mp_link_buynow" href="' . esc_url($product_link) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
-		} else if (mp_get_setting('disable_cart')) {
-
-				$button = '';
-		} else {
-				$variation_select = '';
-				$button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
-
-				if ($all_out) {
-						$button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
+				if ( $context == 'list' ) {
+					if ($variation_select) {
+							$button .= '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Choose Option &raquo;', 'mp') . '</a>';
+					} else if (mp_get_setting('list_button_type') == 'addcart') {
+							$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+					} else if (mp_get_setting('list_button_type') == 'buynow') {
+							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+					}
 				} else {
+					$button .= $variation_select;
 
-						$button .= '<input type="hidden" name="product_id" value="' . $post_id . '" />';
+					//add quantity field if not downloadable
+					if (mp_get_setting('show_quantity') && empty($meta["mp_file"])) {
+							$button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
+					}
 
-						//create select list if more than one variation
-						if (is_array($meta["mp_price"]) && count($meta["mp_price"]) > 1 && empty($meta["mp_file"])) {
-								$variation_select = '<select class="mp_product_variations" name="variation">';
-								foreach ($meta["mp_price"] as $key => $value) {
-										$disabled = (in_array($key, $no_inventory)) ? ' disabled="disabled"' : '';
-										$variation_select .= '<option value="' . $key . '"' . $disabled . '>' . esc_html($meta["mp_var_name"][$key]) . ' - ';
-										if ($meta["mp_is_sale"] && $meta["mp_sale_price"][$key]) {
-												$variation_select .= mp_format_currency('', $meta["mp_sale_price"][$key]);
-										} else {
-												$variation_select .= mp_format_currency('', $value);
-										}
-										$variation_select .= "</option>\n";
-								}
-								$variation_select .= "</select>&nbsp;\n";
-						} else {
-								$button .= '<input type="hidden" name="variation" value="0" />';
-						}
-
-						if ($context == 'list') {
-								if ($variation_select) {
-										$button .= '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Choose Option &raquo;', 'mp') . '</a>';
-								} else if (mp_get_setting('list_button_type') == 'addcart') {
-										$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-										$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-								} else if (mp_get_setting('list_button_type') == 'buynow') {
-										$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
-								}
-						} else {
-
-								$button .= $variation_select;
-
-								//add quantity field if not downloadable
-								if (mp_get_setting('show_quantity') && empty($meta["mp_file"])) {
-										$button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
-								}
-
-								if (mp_get_setting('product_button_type') == 'addcart') {
-										$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-										$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
-								} else if (mp_get_setting('product_button_type') == 'buynow') {
-										$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
-								}
-						}
+					if (mp_get_setting('product_button_type') == 'addcart') {
+							$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
+							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+					} else if (mp_get_setting('product_button_type') == 'buynow') {
+							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+					}
 				}
+			}
 
-				$button .= '</form>';
+			$button .= '</form>';
 		}
 
-		$button = apply_filters('mp_buy_button_tag', $button, $post_id, $context);
+		$button = apply_filters('mp_buy_button_tag', $button, $this->ID, $context);
 
-		if ($echo)
-				echo $button;
-		else
-				return $button;
+		if ( $echo ) {
+			echo $button;
+		} else {
+			return $button;
+		}
 	}
 
 	/**
@@ -338,7 +302,7 @@ class MP_Product {
 	 */
 	public function get_price() {
 		$price = array(
-			'regular' => $this->get_meta('regular_price', 0),
+			'regular' => $this->get_meta('regular_price'),
 			'sale' => array(
 				'amount' => '',
 				'start_date' => '',
@@ -488,13 +452,42 @@ class MP_Product {
 			return $image;	
 		}	
 	}	
+	
+	/**
+	 * Check if product is in stock
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function in_stock() {
+		$track_inventory = $this->get_meta('track_inventory');
+		if ( ($track_inventory && $this->get_meta('inventory')) || ! $track_inventory ) {
+			return true;
+		}
+		
+		$has_stock = false;
+		if ( $this->has_variations() ) {
+			$variations = $this->get_variations();		
+			foreach ( $variations as $variation ) {
+				if ( $variation->get_meta('track_inventory') && ! $variation->get_meta('inventory') ) {
+					$has_stock = false;	
+				} else {
+					$has_stock = true;
+					break;
+				}
+			}
+		}
+		
+		return $has_stock;
+	}
+	
 	/**
 	 * Get product meta value
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @param string $name The name of the meta to get.
-	 * @param mixed $default The default value to return if meta doesn't exist. Optional.
+	 * @param mixed $default The default value to return if meta doesn't exist or is an empty string. Optional.
 	 * @param bool $raw Whether to return the raw meta or the formatted value. Optional.
 	 * @return mixed
 	 */
@@ -503,26 +496,26 @@ class MP_Product {
 			return $default;
 		}
 		
-		$value = null;
+		$value = false;
 		
 		if ( function_exists('get_field_value') ) {
 			// Try to get WPMUDEV_Field value
 			$value = get_field_value($name, $this->ID, $raw);
 		}
-		
-		if ( ! is_null($value) ) {
+
+		if ( $value !== false && $value !== '' ) {
 			return $value;
 		}
-		
+				
 		$parent_id = $this->_post->post_parent;
-		if ( ! empty($parent_id) ) {	
+		if ( ! empty($parent_id) ) {
 			// This is a variation, try to use WPMUDEV_Field value from parent product	
 			if ( function_exists('get_field_value') ) {
 				$value = get_field_value($name, $parent_id, $raw);
 			}
 		}
 		
-		if ( ! is_null($value) ) {
+		if ( $value !== false && $value !== '' ) {
 			return $value;
 		}
 		
@@ -549,7 +542,7 @@ class MP_Product {
 	 * @since 3.0
 	 * @access public
 	 * @param string $name The name of the meta to get.
-	 * @param mixed $default The default value to return if meta doesn't exist. Optional.
+	 * @param mixed $default The default value to return if meta doesn't exist or is an empty string. Optional.
 	 * @param bool $raw Whether to return the raw meta or the formatted value. Optional.
 	 * @return mixed
 	 */
@@ -571,12 +564,19 @@ class MP_Product {
 			return '';
 		}
 	
-		$url = urlencode(get_permalink($this->ID));
-		$desc = urlencode(get_the_title($this->ID));
-		$image_info =	$large_image_url = wp_get_attachment_image_src(get_post_thumbnail_id($this->ID), 'large');
-		$media = ($image_info) ?	 '&media=' . urlencode($image_info[0]) : '';
+		$image_info =	wp_get_attachment_image_src(get_post_thumbnail_id($this->ID), 'large');
+		$media = ($image_info) ?	 '&media=' . $image_info[0] : '';
 		$count_pos = ( $pos = mp_get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
-		$snippet = apply_filters('mp_pinit_button_link', '<a href="//www.pinterest.com/pin/create/button/?url=' . $url . $media . '&description=' . $desc.  '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context);
+		$url = add_query_arg(array(
+			'url' => get_permalink($this->ID),
+			'description' => get_the_title($this->ID),
+		), '//www.pinterest.com/pin/create/button/');
+		
+		if ( $media = mp_arr_get_value('0', $image_info) ) {
+			$url = add_query_arg('media',  $media, $url);	
+		}
+		
+		$snippet = apply_filters('mp_pinit_button_link', '<a href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context);
 	
 		if ( $echo ) {
 			echo $snippet;
