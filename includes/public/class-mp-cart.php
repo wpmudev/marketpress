@@ -29,6 +29,14 @@ class MP_Cart {
 	protected $_id = null;
 	
 	/**
+	 * Refers to the cart cookie id
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected $_cookie_id = null;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -51,9 +59,80 @@ class MP_Cart {
 	 * @param int $qty The quantity of the item
 	 */
 	public function add_item( $item_id, $qty = 1 ) {
+		if ( $in_cart = $this->has_item($item_id) ) {
+			$qty += $in_cart;
+		}
+		
 		mp_push_to_array($this->_items, $this->_id . '->' . $item_id, $qty);
+		$this->_update_cart_cookie();
 	}
 	
+	/**
+	 * Add an item to the cart (ajax)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_add_to_cart, wp_ajax_nopriv_mp_add_to_cart
+	 */
+	public function ajax_add_item() {
+		$item_id = mp_get_post_value('product_id', null);
+		$qty = mp_get_post_value('qty', 1);
+		
+		if ( is_null($item_id) ) {
+			wp_send_json_error();
+		}
+		
+		$this->add_item($item_id, $qty);
+		
+		wp_send_json_success();
+	}
+	
+	/**
+	 * Get cart cookie
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _get_cart_cookie( $global = false ) {
+		$this->_cookie_id = 'mp_globalcart_' . COOKIEHASH;
+		$global_cart = array($this->_id => array());
+	 
+		if ( $cart_cookie = mp_get_cookie_val($this->cookie_id) ) {
+			$global_cart = unserialize($cart);
+		}
+	 
+		$this->_items = $global_cart;
+	 
+		if ( $global ) {
+			return $this->_items;
+		} else {
+	 		$this->set_id($blog_id);
+	 		return $this->get_items();
+		}
+	}
+
+	/**
+	 * Get all cart items across all blogs
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_all_items() {
+		return $this->_items;
+	}
+	
+	/**
+	 * Get a single item from the cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param 
+	 */
+	public function get_item( $item_id ) {
+		
+	}
+
 	/**
 	 * Get cart items
 	 *
@@ -81,6 +160,7 @@ class MP_Cart {
 		do_action('mp_cart/empty', $this->_id, $this->get_items());
 		
 		$this->_items[$this->_id] = array();
+		$this->_update_cart_cookie();
 	}
 	
 	/**
@@ -118,6 +198,16 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Update the cart cookie
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _update_cart_cookie() {
+		setcookie($this->_cookie_id, serialize($this->_items), strtotime('+1 month'), COOKIEPATH, COOKIE_DOMAIN);
+	}
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
@@ -125,6 +215,11 @@ class MP_Cart {
 	 */
 	private function __construct() {
 		$this->set_id(get_current_blog_id());
+		$this->_get_cart_cookie();
+		
+		// Ajax hooks
+		add_action('wp_ajax_mp_add_to_cart', array(&$this, 'add_item'));
+		add_action('wp_ajax_nopriv_mp_add_to_cart', array(&$this, 'add_item'));
 	}
 }
 
