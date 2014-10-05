@@ -81,11 +81,11 @@ jQuery(document).ready(function($){
 	 */
 	public function init_metaboxes() {
 		$this->init_general_settings();
-		$this->init_store_pages_slugs_settings();
 		$this->init_product_page_settings();
 		$this->init_related_product_settings();
 		$this->init_product_list_settings();
-		$this->init_social_settings();		
+		$this->init_social_settings();
+		$this->init_store_pages_slugs_settings();
 	}
 	
 	/**
