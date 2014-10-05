@@ -170,10 +170,9 @@ endif;
 
 if ( ! function_exists('mp_is_pro_site') ) :
 	/**
-	 * Checks if the is_pro_site() function exists and if so calls it
+	 * Check if the is_pro_site() function exists and if so calls it
 	 *
 	 * @since 3.0
-	 * @access public
 	 */
 	function mp_is_pro_site( $blog_id = false, $level = false ) {
 		if ( ! function_exists('is_pro_site') ) {
@@ -422,6 +421,24 @@ if ( ! function_exists('mp_arr_get_value') ) :
 		$value = mp_arr_search($array, $key);
 		
 		return ( is_null($value) ) ? $default : $value;
+	}
+endif;
+
+
+if ( ! function_exists('mp_get_cookie_value') ) :
+	/**
+	 * Safely retreives a value from the $_COOKIE array
+	 *
+	 * @since 3.0
+	 * @uses mp_arr_get_value()
+	 *	 
+	 * @param string $key (e.g. key1->key2->key3)
+	 * @param mixed $default The default value to return if $key is not found within $array
+	 * @return mixed
+	 */	 
+	
+	function mp_get_cookie_value( $key, $default = false ) {
+		return mp_arr_get_value($key, $_COOKIE, $default);
 	}
 endif;
 
