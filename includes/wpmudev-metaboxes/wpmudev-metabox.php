@@ -12,7 +12,7 @@ if ( ! defined('WPMUDEV_METABOX_VERSION') ) {
 	define('WPMUDEV_METABOX_VERSION', '1.0');
 }
 
-
+WPMUDEV_Metabox::load_fields();
 require_once WPMUDEV_Metabox::class_dir('api.php');
 
 /**
@@ -270,7 +270,6 @@ class WPMUDEV_Metabox {
 		$this->nonce_name = $this->nonce_action . '_nonce';
 	
 		$this->localize();
-		$this->load_fields();
 		$this->init_conditional_logic();
 		$this->add_html_classes();
 		
@@ -519,7 +518,7 @@ class WPMUDEV_Metabox {
 	 * @since 1.0
 	 * @access public
 	 */
-	public function load_fields() {
+	public static function load_fields() {
 		require_once self::class_dir('class-wpmudev-field.php');
 		self::include_dir(self::class_dir('fields'));	
 	}	

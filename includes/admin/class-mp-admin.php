@@ -46,7 +46,6 @@ class MP_Admin {
 	 * @access public
 	 */
 	public function includes() {
-		require_once mp_plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-orders-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-product-coupons-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-products-admin.php');
