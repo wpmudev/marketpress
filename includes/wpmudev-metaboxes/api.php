@@ -53,25 +53,7 @@ if ( ! function_exists('array_replace_recursive') ) :
 	 * @param array $array1 The values from this array will overwrite the values from $array
 	 * @return array
 	 */
-	function array_replace_recursive() {
-		function recurse( $array, $array1 ) {
-	    foreach ( $array1 as $key => $value ) {
-	      // create new key in $array, if it is empty or not an array
-	      if ( ! isset($array[$key]) || (isset($array[$key]) && ! is_array($array[$key])) ) {
-	        $array[$key] = array();
-	      }
-	
-	      // overwrite the value in the base array
-	      if ( is_array($value) ) {
-	        $value = recurse($array[$key], $value);
-	      }
-	      
-	      $array[$key] = $value;
-	    }
-	    
-	    return $array;
-	  }
-	  
+	function array_replace_recursive() {	  
 	  // handle the arguments, merge one by one
 	  $args = func_get_args();
 	  $array = $args[0];
@@ -88,4 +70,22 @@ if ( ! function_exists('array_replace_recursive') ) :
 	  
 	  return $array;
 	}
+
+	function recurse( $array, $array1 ) {
+    foreach ( $array1 as $key => $value ) {
+      // create new key in $array, if it is empty or not an array
+      if ( ! isset($array[$key]) || (isset($array[$key]) && ! is_array($array[$key])) ) {
+        $array[$key] = array();
+      }
+
+      // overwrite the value in the base array
+      if ( is_array($value) ) {
+        $value = recurse($array[$key], $value);
+      }
+      
+      $array[$key] = $value;
+    }
+    
+    return $array;
+  }
 endif;
