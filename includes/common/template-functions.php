@@ -10,17 +10,18 @@ if ( ! function_exists('_mp_products_html_grid')) :
 	 */
 	function _mp_products_html_grid( $custom_query ) {
 		$html = '';
+		$per_row = (int) mp_get_setting('per_row');
+		$width = round(100 / $per_row, 1) . '%';
+		$column = 1;
 		
 		//get image width
 		if ( mp_get_setting('list_img_size') == 'custom' ) {
-			$width = mp_get_setting('list_img_width');
+			$img_width = mp_get_setting('list_img_width') . 'px';
 		} else {
 			$size = mp_get_setting('list_img_size');
-			$width = get_option($size . "_size_w");
+			$img_width = get_option($size . "_size_w") . 'px';
 		}
-
-		$inline_style = ! ( mp_get_setting('store_theme') == 'none' || current_theme_supports('mp_style') );
-
+		
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 			$product = new MP_Product();
 			$img = $product->image(false, 'list');
@@ -33,34 +34,50 @@ if ( ! function_exists('_mp_products_html_grid')) :
 			$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
 			$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
 			$class[] = ( $product->has_variations() ) ? 'mp_price_variations' : '';
+			
+			if ( $column == 1 ) {
+				$class[] = 'first';
+				$html .= '<div class="mp_grid_row">';
+				$column ++;
+			} elseif ( $column == $per_row ) {
+				$class[] = 'last';
+				$column = 1;
+			}
 
 			$html .= '
-				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '">
-					<div class="mp_one_product"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-						<div class="mp_product_detail"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '" style="width: ' . $width . '">
+					<div class="mp_one_product" style="width:' . $img_width . '">
+						<div class="mp_product_detail">
 							' . $img . '
 							' . $pinit .'
 							<h3 class="mp_product_name entry-title" itemprop="name">
 								<a href="' . get_permalink($product->ID) . '">' . $product->post_title . '</a>
 							</h3>
-						
 							<div>' . $mp_product_list_content . '</div>
 						</div>
 
-						<div class="mp_price_buy"' . ($inline_style ? ' style="width: ' . $width . 'px;"' : '') . '>
-							' . $product->get_price() . '
+						<div class="mp_price_buy">
+							' . $product->display_price() . '
 							' . $product->buy_button(false, 'list') . '
 							' . apply_filters('mp_product_list_meta', '', $product->ID) . '
 						</div>
 						
-						<div style="display:none" >
+						<div style="display:none">
 							<span class="entry-title">' . get_the_title() . '</span> was last modified:
 							<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
 							<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
 						</div>
 					</div>
 				</div>';
+			
+			if ( $column == 1 ) {
+				$html .= '</div><!-- END .mp_grid_row -->';				
+			}
 		endwhile;
+		
+		if ( $column != 1 ) {
+			$html .= '</div><!-- END .mp_grid_row -->';
+		}
 
 		$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
 		
@@ -354,7 +371,7 @@ if ( ! function_exists('mp_list_products') ) :
 			$content .= ( (is_null($args['filters']) && 1 == mp_get_setting('show_filters')) || $args['filters'] ) ? mp_products_filter(false, $per_page, $custom_query) : mp_products_filter(true, $per_page, $custom_query);
 		}
 		
-		$content .= '<div id="mp_product_list" class="hfeed mp_' . $layout_type . '">';
+		$content .= '<div id="mp_product_list" class="clearfix hfeed mp_' . $layout_type . '">';
 	
 		if ( $last = $custom_query->post_count ) {
 			$content .= $layout_type == 'grid' ? _mp_products_html_grid($custom_query) : _mp_products_html_list($custom_query);
@@ -459,7 +476,7 @@ if ( ! function_exists('mp_products_filter') ) :
 	
 		$terms = wp_dropdown_categories(array(
 			'name' => 'product_category',
-			'id' => 'product-category',
+			'id' => 'mp-product-category',
 			'taxonomy' => 'product_category',
 			'show_option_none' => __('Show All', 'mp'),
 			'show_count' => 1,
@@ -487,15 +504,15 @@ if ( ! function_exists('mp_products_filter') ) :
 		$return = '
 			<a name="mp-product-list-top"></a>
 			<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-				<form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
-						<div class="one_filter">
-							<span>' . __('Category', 'mp') . '</span>
+				<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp_product_list_refine clearfix" method="get">
+						<div class="one_filter" data-placeholder="' . __('Product Category', 'mp') . '">
+							<label for="mp-product-category">' . __('Category', 'mp') . '</label><br />
 							' . $terms . '
 						</div>
 	
 						<div class="one_filter">
-							<span>' . __('Order By', 'mp') . '</span>
-							<select name="order">
+							<label for="mp-sort-order">' . __('Order By', 'mp') . '</label><br />
+							<select id="mp-sort-order" name="order" data-placeholder="' . __('Product Category', 'mp') . '">
 								' . $options_html . '
 							</select>
 						</div>' .
