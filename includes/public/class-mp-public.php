@@ -36,7 +36,18 @@ class MP_Public {
 		add_filter('taxonomy_template', array(&$this, 'load_taxonomy_template'));
 		add_filter('single_template', array(&$this, 'load_single_product_template'));
 		add_filter('page_template', array(&$this, 'load_page_template'));
-		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles'));
+		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles_scripts'));
+	}
+
+	/**
+	 * Check if the current page is a store page
+	 *
+	 * @since 3.0
+	 * @uses $post
+	 */
+	function is_store_page() {
+		global $post;
+		return ( get_post_meta($post->ID, '_mp_store_page', true) !== '' );
 	}
 	
 	/**
@@ -50,13 +61,23 @@ class MP_Public {
 	}
 	
 	/**
-	 * Enqueue public stylesheets
+	 * Enqueue frontend styles and scripts
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function frontend_styles() {
-		wp_enqueue_style('mp-frontend', mp_plugin_url('ui/css/frontend.css'), array(), MP_VERSION);
+	public function frontend_styles_scripts() {
+		if ( ! $this->is_store_page() ) {
+			return;
+		}
+		
+		// CSS
+		wp_enqueue_style('mp-theme', mp_plugin_url('ui/themes/' . mp_get_setting('store_theme') . '.css'), false, MP_VERSION);
+		wp_enqueue_style('mp-select2', mp_plugin_url('ui/select2/select2.css'), false, MP_VERSION);
+		
+		// JS
+		wp_enqueue_script('mp-frontend', mp_plugin_url('ui/js/frontend.js'), array('jquery'), MP_VERSION, true);
+		wp_enqueue_script('mp-select2', mp_plugin_url('ui/select2/select2.min.js'), array('mp-frontend'), MP_VERSION, true);
 	}
 
 	/**
