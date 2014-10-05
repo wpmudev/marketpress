@@ -135,7 +135,7 @@ class MP_Product {
 		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
 			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 		} elseif ( ! mp_get_setting('disable_cart') ) {
-			$variation_select = '';
+			$variation_select = false;
 			$button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
 
 			if ( ! $this->in_stock() ) {
@@ -165,13 +165,13 @@ class MP_Product {
 				//! TODO: Finish converting below code
 
 				if ( $context == 'list' ) {
-					if ($variation_select) {
-							$button .= '<a class="mp_link_buynow" href="' . get_permalink($post_id) . '">' . __('Choose Option &raquo;', 'mp') . '</a>';
+					if ( $variation_select ) {
+							$button .= '<a class="mp_link_buynow" href="' . get_permalink($this->ID) . '">' . __('Choose Option', 'mp') . '</a>';
 					} else if (mp_get_setting('list_button_type') == 'addcart') {
 							$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
 					} else if (mp_get_setting('list_button_type') == 'buynow') {
-							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
 					}
 				} else {
 					$button .= $variation_select;
@@ -200,6 +200,39 @@ class MP_Product {
 		} else {
 			return $button;
 		}
+	}
+	
+	/**
+	 * Get the display product price
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function display_price() {
+		$price = $this->get_price();
+		$snippet = '
+			<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
+		
+		if ( $this->on_sale() ) {
+			$snippet .= '
+			<strike>' . mp_format_currency('', $price['regular']) . '</strike> <strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['sale']['amount']) . '</strong>';
+		} else {
+			$snippet .= '
+			<strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['regular']) . '</strong>';
+		}
+		
+		$snippet .= '
+			</div>';
+		
+		/**
+		 * Filter the display price of the product
+		 *
+		 * @since 3.0
+		 * @param string The current display price text
+		 * @param int The product ID
+		 */
+		return apply_filters('mp_product/display_price', $snippet, $this->ID);
 	}
 
 	/**
