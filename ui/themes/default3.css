@@ -1,0 +1,89 @@
+/* MarketPress Style: Default */
+.clearfix:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+#mp_product_list_refine .one_filter {
+  float: left;
+  width: 50%;
+}
+#mp_product_list {
+  margin-top: 30px;
+}
+#mp_product_list * {
+  line-height: 1.3;
+  margin: 0;
+  padding: 0;
+}
+#mp_product_list a {
+  text-decoration: none;
+}
+#mp_product_list .mp_link_buynow,
+#mp_product_list .mp_button_buynow {
+  background: #448cf8;
+  border: 0;
+  border-radius: 5px;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  color: #fff;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+  padding: 7px 12px;
+  text-transform: uppercase;
+  -moz-transition: background-color 300ms;
+  -webkit-transition: background-color 300ms;
+  transition: background-color 300ms;
+}
+#mp_product_list .mp_link_buynow:hover,
+#mp_product_list .mp_button_buynow:hover {
+  background-color: #000;
+}
+#mp_product_list .mp_price_buy.sticky {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+}
+#mp_product_list .mp_excerpt {
+  margin-bottom: 10px;
+}
+#mp_product_list .mp_one_product {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 10px;
+  -moz-transition: all 300ms;
+  -webkit-transition: all 300ms;
+  transition: all 300ms;
+}
+#mp_product_list .mp_one_tile {
+  margin-bottom: 15px;
+}
+#mp_product_list .mp_one_tile:hover .mp_one_product {
+  background: #fafafa;
+  border-color: #ddd;
+}
+#mp_product_list .mp_product_name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+#mp_product_list .mp_product_name a {
+  text-decoration: none;
+}
+#mp_product_list .photo {
+  margin-bottom: 20px;
+}
+#mp_product_list.mp_grid {
+  display: table;
+  width: 100%;
+}
+#mp_product_list.mp_grid .mp_grid_row {
+  display: table-row;
+}
+#mp_product_list.mp_grid .mp_one_tile {
+  display: table-cell;
+}
