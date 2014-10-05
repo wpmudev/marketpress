@@ -253,6 +253,23 @@ jQuery(document).ready(function($){
 			),
 		));
 		$metabox->add_field('radio_group', array(
+			'name' => 'per_row',
+			'label' => array('text' => __('How many products per row?', 'mp')),
+			'desc' => __('Set the number of products that show up in a grid row to best fit your theme', 'mp'),
+			'default_value' => 3,
+			'options' => array(
+				1 => __('One', 'mp'),
+				2 => __('Two', 'mp'),
+				3 => __('Three', 'mp'),
+				4 => __('Four', 'mp'),
+			),
+			'conditional' => array(
+				'name' => 'list_view',
+				'value' => 'grid',
+				'action' => 'show',
+			),
+		));
+		$metabox->add_field('radio_group', array(
 			'name' => 'list_button_type',
 			'label' => array('text' => __('Add To Cart Action', 'mp')),
 			'desc' => __('MarketPress supports two "flows" for adding products to the shopping cart. After adding a product to their cart, two things can happen:', 'mp'),
