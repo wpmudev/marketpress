@@ -55,7 +55,7 @@ $this->default_settings = array(
 	'force_login' => 0,
 	'ga_ecommerce' => 'none',
 	'special_instructions' => 0,
-	'store_theme' => 'icons',
+	'store_theme' => 'default3',
 	'show_img' => 1,
 	'product_img_height' => 150,
 	'product_img_width' => 150,
@@ -64,6 +64,7 @@ $this->default_settings = array(
 	'show_excerpt' => 1,
 	'per_page' => 20,
 	'order_by' => 'title',
+	'per_row' => 3,
 	/* Translators: change default slugs here */
 	'slugs' => array (
 		'store' => __('store', 'mp'),
