@@ -335,7 +335,7 @@ class MP_Products_Screen {
 		$sorted = $field->sort_subfields($variations);
 		$outer_index = 0;
 		$ids = array();
-		$delete_where = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id";
+		$delete_where = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = 'product_variation'";
 		
 		if ( mp_get_post_value('has_variations', false) ) {
 			foreach ( $sorted as $type => $array ) {
