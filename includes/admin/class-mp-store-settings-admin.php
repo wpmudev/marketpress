@@ -126,6 +126,16 @@ class MP_Store_Settings_Admin {
 			add_action('store-settings_page_store-setup-wizard', array(&$this, 'add_help_tab'));
 		}
 	}
+	
+	/**
+	 * Add help tab to current screen
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function add_help_tab() {
+		MP_Admin::get_instance()->add_help_tab();
+	}
 
 	/**
 	 * Print scripts for setting the active admin menu item when on the product tag page
