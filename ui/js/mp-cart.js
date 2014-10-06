@@ -33,7 +33,7 @@ var mp_cart = {};
 		}
 		
 		$form.addClass('invisible');
-		$('body').children('.mp-ajax-loader').insertAfter($form).show();
+		$('body').children('.mp-ajax-loader').clone().insertAfter($form).show();
 		
 		// we use the AjaxQ plugin here because we need to queue multiple add-to-cart requests http://wp.mu/96f
 		$.ajaxq('addtocart', {
@@ -53,6 +53,9 @@ var mp_cart = {};
 				
 				setTimeout(function(){
 					$('#mp-floating-cart').trigger('click');
+					setTimeout(function(){
+						$('#mp-floating-cart').removeClass('visible in-transition');
+					}, 3000);
 				}, 100);
 			}
 		});
