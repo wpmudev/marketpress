@@ -68,23 +68,28 @@ class MP_Cart {
 	}
 	
 	/**
-	 * Add an item to the cart (ajax)
+	 * Update the cart (ajax)
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @action wp_ajax_mp_add_to_cart, wp_ajax_nopriv_mp_add_to_cart
+	 * @action wp_ajax_mp_update_cart, wp_ajax_nopriv_mp_update_cart
 	 */
-	public function ajax_add_item() {
+	public function ajax_update_cart() {
 		$item_id = mp_get_post_value('product_id', null);
 		$qty = mp_get_post_value('qty', 1);
-		
+
 		if ( is_null($item_id) ) {
 			wp_send_json_error();
 		}
 		
-		$this->add_item($item_id, $qty);
+		switch ( mp_get_post_value('cart_action') ) {
+			case 'add_item' :
+				$this->add_item($item_id, $qty);
+				wp_send_json_success($this->floating_cart_html());
+			break;
+		}
 		
-		wp_send_json_success();
+		wp_send_json_error();
 	}
 	
 	/**
@@ -97,16 +102,15 @@ class MP_Cart {
 		$this->_cookie_id = 'mp_globalcart_' . COOKIEHASH;
 		$global_cart = array($this->_id => array());
 	 
-		if ( $cart_cookie = mp_get_cookie_val($this->cookie_id) ) {
-			$global_cart = unserialize($cart);
+		if ( $cart_cookie = mp_get_cookie_value($this->_cookie_id) ) {
+			$global_cart = unserialize($cart_cookie);
 		}
-	 
+		
 		$this->_items = $global_cart;
 	 
 		if ( $global ) {
-			return $this->_items;
+			return $this->get_all_items();
 		} else {
-	 		$this->set_id($blog_id);
 	 		return $this->get_items();
 		}
 	}
@@ -144,6 +148,31 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Get the cart total
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	public function get_total() {
+		$items = $this->get_items();
+		$total = 0;
+		
+		foreach ( $items as $item => $qty ) {
+			$product = new MP_Product($item);
+			$price_obj = $product->get_price();
+
+			if ( $product->on_sale() ) {
+				$total += ($price_obj['sale']['amount'] * $qty);
+			} else {
+				$total += ($price_obj['regular'] * $qty);
+			}
+		}
+		
+		return $total;
+	}
+	
+	/**
 	 * Empty cart
 	 *
 	 * @since 3.0
@@ -161,6 +190,89 @@ class MP_Cart {
 		
 		$this->_items[$this->_id] = array();
 		$this->_update_cart_cookie();
+	}
+	
+	/**
+	 * Enqueue styles and scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_enqueue_scripts
+	 * @uses $post
+	 */
+	public function enqueue_styles_scripts() {
+		global $post;
+		
+		if ( ! mp_is_shop_page() || mp_get_setting('pages->cart') == $post->ID ) {
+			return;
+		}
+		
+		wp_enqueue_style('mp-cart', mp_plugin_url('ui/css/mp-cart.css'), false, MP_VERSION);
+		wp_enqueue_script('ajaxq', mp_plugin_url('ui/js/ajaxq.min.js'), array('jquery'), MP_VERSION, true);
+		wp_enqueue_script('mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array('ajaxq'), MP_VERSION, true);
+	}
+	
+	/**
+	 * Display the floating cart html
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_footer
+	 */
+	public function floating_cart_html() {
+		$echo = true;
+		if ( mp_doing_ajax() ) {
+			$echo = false;
+		}
+		
+		if ( (! mp_is_shop_page() || mp_get_setting('pages->cart') == get_the_ID()) && ! mp_doing_ajax() ) {
+			return;
+		}
+		
+		$items = $this->get_items();
+		$html = '
+		<div id="mp-floating-cart"' . (( $this->has_items() ) ? ' class="has-items"' : '') . '>
+			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . mp_format_currency('', $this->get_total()) . '</span> ' . $this->item_count(false) . '</div>
+			<div id="mp-floating-cart-contents">';
+	
+		if ( $this->has_items() ) {
+			$html .= '
+				<ul id="mp-floating-cart-items-list">';
+		
+			foreach ( $items as $item => $qty ) {
+				$product = new MP_Product($item);
+			
+				$html .= '
+					<li class="mp-floating-cart-item">
+						<a class="mp-floating-cart-item-link" href="' . get_permalink($product->ID) . '">' . $product->image(false, 'floating-cart', 50) . '
+							<div class="mp-floating-cart-item-content">
+								<h3 class="mp-floating-cart-item-title">' . $product->post_title . '</h3>
+								<span class="mp-float-cart-item-qty">' . sprintf(__('Quantity: %d', 'mp'), $qty) . '</span>
+							</div>
+						</a>
+					</li>';
+			}
+			
+			$html .= '
+				</ul>
+				<a id="mp-floating-cart-button" href="' . get_permalink(mp_get_setting('pages->cart')) . '">' . __('View Cart', 'mp') . '</a>';
+		} else {
+			$html .= '
+				<div id="mp-floating-cart-no-items">
+					<p><strong>' . __('Your shopping cart is empty.', 'mp') . '</strong></p>
+					<p>' . __('As you add browse items and add them to your add cart they will show up here.', 'mp') . '</p>
+				</div>';
+		}
+	
+		$html .= '
+			</div>
+		</div>';
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
 	}
 	
 	/**
@@ -187,6 +299,30 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Display the item count
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 */
+	public function item_count( $echo = true ) {
+		$items = $this->get_items();
+		$numitems = count($items);
+		
+		if ( $numitems == 0 ) {
+			$snippet = __('0 items', 'mp');
+		} else {
+			$snippet = sprintf(_n('1 item', '%s items', $numitems, 'mp'), $numitems);
+		}
+		
+		if ( $echo ) {
+			echo $snippet;
+		} else {
+			return $snippet;
+		}
+	}
+	
+	/**
 	 * Set the cart id
 	 *
 	 * @since 3.0
@@ -204,7 +340,16 @@ class MP_Cart {
 	 * @access protected
 	 */
 	protected function _update_cart_cookie() {
-		setcookie($this->_cookie_id, serialize($this->_items), strtotime('+1 month'), COOKIEPATH, COOKIE_DOMAIN);
+		$expire = strtotime('+1 month');
+		if ( empty($this->_items) ) {
+			if ( $cart_cookie = mp_get_cookie_value($this->_cookie_id) ) {
+				$expire = strotime('-1 month');
+			} else {
+				return;
+			}
+		}
+		
+		setcookie($this->_cookie_id, serialize($this->_items), $expire, COOKIEPATH, COOKIE_DOMAIN);
 	}
 	
 	/**
@@ -217,9 +362,15 @@ class MP_Cart {
 		$this->set_id(get_current_blog_id());
 		$this->_get_cart_cookie();
 		
+		// Enqueue styles/scripts
+		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
+		
+		// Display the floating cart html
+		add_action('wp_footer', array(&$this, 'floating_cart_html'));
+		
 		// Ajax hooks
-		add_action('wp_ajax_mp_add_to_cart', array(&$this, 'add_item'));
-		add_action('wp_ajax_nopriv_mp_add_to_cart', array(&$this, 'add_item'));
+		add_action('wp_ajax_mp_update_cart', array(&$this, 'ajax_update_cart'));
+		add_action('wp_ajax_nopriv_mp_update_cart', array(&$this, 'ajax_update_cart'));
 	}
 }
 
