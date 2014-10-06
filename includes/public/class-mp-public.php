@@ -43,11 +43,9 @@ class MP_Public {
 	 * Check if the current page is a store page
 	 *
 	 * @since 3.0
-	 * @uses $post
 	 */
 	function is_store_page() {
-		global $post;
-		return ( get_post_meta($post->ID, '_mp_store_page', true) !== '' );
+		return ( get_post_meta(get_the_ID(), '_mp_store_page', true) !== '' );
 	}
 	
 	/**
@@ -57,6 +55,7 @@ class MP_Public {
 	 * @access public
 	 */
 	public function includes() {
+		require_once mp_plugin_dir('includes/public/class-mp-cart.php');
 		require_once mp_plugin_dir('includes/public/class-mp-short-codes.php');
 	}
 	
