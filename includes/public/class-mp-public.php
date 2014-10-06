@@ -45,7 +45,7 @@ class MP_Public {
 	 * @since 3.0
 	 */
 	function is_store_page() {
-		return ( get_post_meta(get_the_ID(), '_mp_store_page', true) !== '' );
+		return ( get_post_meta(get_the_ID(), '_mp_store_page', true) !== '' || is_singular(MP_Product::get_post_type()) || is_tax(array('product_category', 'product_tag')) );
 	}
 	
 	/**
@@ -219,7 +219,10 @@ class MP_Public {
 	public function single_product_content( $content ) {
 		if ( is_main_query() && in_the_loop() ) {
 			remove_filter('get_post_metadata', array(&$this, 'remove_product_post_thumbnail'), 999, 4);
-			return mp_product(false);
+			remove_filter('the_content', array(&$this, 'single_product_content'));
+			
+			$show_img = ( mp_get_setting('show_img') ) ? 'single' : false;
+			return mp_product(false, null, false, 'full', $show_img);
 		}
 		
 		return $content;
