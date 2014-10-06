@@ -34,6 +34,7 @@ if ( ! function_exists('_mp_products_html_grid')) :
 			$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
 			$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
 			$class[] = ( $product->has_variations() ) ? 'mp_price_variations' : '';
+			$class[] = ( $product->on_sale() ) ? 'mp_on_sale' : '';
 			
 			if ( $column == 1 ) {
 				$class[] = 'first';
@@ -43,6 +44,8 @@ if ( ! function_exists('_mp_products_html_grid')) :
 				$class[] = 'last';
 				$column = 1;
 			}
+			
+			$class = array_filter($class, create_function('$s', 'return ( ! empty($s) );'));
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '" style="width: ' . $width . '">
@@ -57,7 +60,7 @@ if ( ! function_exists('_mp_products_html_grid')) :
 						</div>
 
 						<div class="mp_price_buy">
-							' . $product->display_price() . '
+							' . $product->display_price(false) . '
 							' . $product->buy_button(false, 'list') . '
 							' . apply_filters('mp_product_list_meta', '', $product->ID) . '
 						</div>
@@ -243,6 +246,17 @@ if ( ! function_exists('mp_format_currency') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_is_shop_page') ) :
+	/**
+	 * Check if current page is a shop page
+	 *
+	 * @since 3.0
+	 */
+	function mp_is_shop_page() {
+		return MP_Public::get_instance()->is_store_page();
+	}
+endif;
+
 if ( ! function_exists('mp_list_products') ) :
 	/**
 	 * Display a list of products according to preference
@@ -261,7 +275,8 @@ if ( ! function_exists('mp_list_products') ) :
 	 */
 	function mp_list_products() {
 		// Init args
-		$args = array_replace_recursive(mp()->defaults['list_products'], func_get_args());
+		$func_args = func_get_args();
+		$args = array_replace_recursive(mp()->defaults['list_products'], $func_args);
 		$args['nopaging'] = false;
 		
 		// Init query params
