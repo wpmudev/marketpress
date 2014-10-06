@@ -23,12 +23,16 @@ var marketpress = {};
 	
 	marketpress.initSelect2 = function(){
 		$('.mp_list_filter').find('select').select2({
-			"dropdownAutoWidth" : true
+			"dropdownAutoWidth" : true,
+			"minimumResultsForSearch" : -1	// hide the search box
 		});
 	}
 }(jQuery));
 
 jQuery(document).ready(function(){
-	marketpress.equalizeProductGrid();
 	marketpress.initSelect2();
 });
+
+window.onload = function(){
+	marketpress.equalizeProductGrid();
+}
