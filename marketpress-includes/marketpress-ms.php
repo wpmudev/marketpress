@@ -3,8 +3,6 @@
 MarketPress Multisite Features
 */
 
-$GLOBALS['mp_wpmu'] = new MarketPress_MS();
-
 class MarketPress_MS {
 
 	var $build = 2;
@@ -1132,8 +1130,9 @@ class MarketPress_MS {
 
 		return mp_global_tag_cloud( false, $limit, $seperator, $include );
 	}
-	
 }
+
+$GLOBALS['mp_wpmu'] = new MarketPress_MS();
 
 function mp_main_site_id() {
 	global $current_site;

@@ -419,7 +419,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 				    }
 				
 				    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-				    if ( ! $this->get_setting('tax->tax_inclusive') ) {
+				    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
 				    	$tax_price = ($mp->tax_price(false) + $shipping_tax);
 							$total += $tax_price;
 				    }
@@ -436,7 +436,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
                     'compress' => true,
                     'headers' => array('Authorization' => 'Basic ' . base64_encode(PIN_API_KEY . ':' . '')),
                     'body' => array(
-                        'amount' => int($total * 100),
+                        'amount' => (int) $total * 100,
                         'currency' => strtolower($this->currency),
                         'description' => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']),
                         'email' => $_SESSION['mp_shipping_info']['email'],

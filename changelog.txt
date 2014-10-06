@@ -3,8 +3,23 @@ Author: Aaron Edwards (incsub)
 
 Change Log:
 ----------------------------------------------------------------------
-- Fixed: Nav Menu items calsses not being applied correctly
+
+- Fixed: Shipping tax not being calculated correctly when using tax-inclusive pricing
+- Fixed: Out of stock products are still showing when "Hide out of stock items" is enabled
+- Fixed: Extra title showing above the default product image in grid view
+
+2.9.5.3
 ----------------------------------------------------------------------
+- Fixed: Invalid measurement errors when using UPS shipping and a base country that uses the metric system http://wp.mu/a5s
+- Fixed: Incorrect First-class Mail Parcel rates being returned when using USPS shipping
+- Fixed: PHP warnings with wp_title_output()
+- Fixed: PHP errors in PIN gateway
+- Fixed: Nav Menu items classes not being applied correctly
+- Fixed: Bug with pagination when displaying products from a given category using [mp_list_products] short code
+
+2.9.5.2
+----------------------------------------------------------------------
+- Added: BN codes to PayPal gateways
 
 2.9.5.1
 ----------------------------------------------------------------------

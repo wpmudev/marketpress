@@ -282,6 +282,9 @@ clear:both;
 /* New Grid stylesheet */
 
 .mp_grid .mp_one_tile { vertical-align: top; clear: both; margin:30px 30px 0 0; *display: inline; *zoom: 1; }
+.mp_grid .mp_one_tile:first-child,
+.mp_grid .mp_one_tile:first-child + .mp_one_tile,
+.mp_grid .mp_one_tile:first-child + .mp_one_tile + .mp_one_tile { margin-top: 0; }
 .mp_grid .mp_product_name,
 .mp_grid .mp_excerpt {  word-wrap: break-word; }
 .mp_grid .mp_img_link { display: block; margin-bottom: 20px; }

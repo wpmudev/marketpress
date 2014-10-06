@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.5.1
+Version: 2.9.5.3
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 */
 
 class MarketPress {
-	var $version = '2.9.5.1';
+	var $version = '2.9.5.3';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -77,8 +77,8 @@ class MarketPress {
 	 
 	 //maybe install
 	 $this->install();
-	 add_action('wpmu_new_blog', array(&$this, 'setup_new_blog'), 10, 6);	 
-
+	 add_action('wpmu_new_blog', array(&$this, 'setup_new_blog'), 10, 6);
+	 
 	if ( MP_LITE === false ) {
 		//load dashboard notice
 		global $wpmudev_notices;
@@ -656,39 +656,39 @@ Thanks again!", 'mp')
 	}
 	
 	function parse_args_r( $array, $array1 ) {
-    function recurse($array, $array1) {
-      foreach ( $array1 as $key => $value ) {
-        // create new key in $array, if it is empty or not an array
-        if ( ! isset($array[$key]) || (isset($array[$key]) && ! is_array($array[$key])) )
-        {
-          $array[$key] = array();
-        }
+		function recurse($array, $array1) {
+			foreach ( $array1 as $key => $value ) {
+				// create new key in $array, if it is empty or not an array
+				if ( ! isset($array[$key]) || (isset($array[$key]) && ! is_array($array[$key])) )
+				{
+					$array[$key] = array();
+				}
  
-        // overwrite the value in the base array
-        if ( is_array($value) ) {
-          $value = recurse($array[$key], $value);
-        }
-        
-        $array[$key] = $value;
-      }
-      return $array;
-    }
+				// overwrite the value in the base array
+				if ( is_array($value) ) {
+					$value = recurse($array[$key], $value);
+				}
+				
+				$array[$key] = $value;
+			}
+			return $array;
+		}
  
-    // handle the arguments, merge one by one
-    $args = func_get_args();
-    $array = $args[0];
-    if ( ! is_array($array) ) {
-      return $array;
-    }
-    
-    for ( $i = 1; $i < count($args); $i++ ) {
-      if ( is_array($args[$i]) ) {
-        $array = recurse($array, $args[$i]);
-      }
-    }
-    
-    return $array;
-  }
+		// handle the arguments, merge one by one
+		$args = func_get_args();
+		$array = $args[0];
+		if ( ! is_array($array) ) {
+			return $array;
+		}
+		
+		for ( $i = 1; $i < count($args); $i++ ) {
+			if ( is_array($args[$i]) ) {
+				$array = recurse($array, $args[$i]);
+			}
+		}
+		
+		return $array;
+	}
 	
 	/*
 	 * function get_setting
@@ -1668,85 +1668,88 @@ Thanks again!", 'mp')
 	}
 
 	//adds our links to custom theme nav menus using wp_nav_menu()
-	function filter_nav_menu($list, $menu, $args = array()) {
+	function filter_nav_menu( $list, $menu, $args = array() ) {
 		$store_object = false;
 
-         if ($args->depth == 1)
-            return $list;
+		if ( $args->depth == 1 ) {
+			return $list;
+		}
 
-            //find store page
-            $store_url = mp_store_link(false, true);
-            $store_page = get_option('mp_store_page');
-            foreach($list as $menu_item) {
-                if ((isset($menu_item->object_id) and $menu_item->object_id == $store_page) || $menu_item->url == $store_url) {
-                    $store_object = $menu_item;
-                    break;
-                }
-            }
+		//find store page
+		$store_url = mp_store_link(false, true);
+		$store_page = get_option('mp_store_page');
+		
+		foreach( $list as $menu_item ) {
+			if ( (isset($menu_item->object_id) && $menu_item->object_id == $store_page) || $menu_item->url == $store_url ) {
+				$store_object = $menu_item;
+				break;
+			}
+		}
 
-            if ($store_object) {
-                $obj_products = clone $store_object;
-                $obj_products->title = __('Products', 'mp');
-                $obj_products->post_title = __('Products', 'mp');
-                $obj_products->menu_item_parent = $store_object->ID;
-                $obj_products->ID = 'products-subm';
-                $obj_products->db_id = 'products-subm';
-                $obj_products->post_name = 'products-subm';
-                $obj_products->url = mp_products_link(false, true);
-                $obj_products->current = (get_query_var('pagename') == 'product_list') ? true : false;
-                $obj_products->current_item_ancestor = (get_query_var('pagename') == 'product_list') ? true : false;
-                $obj_products->menu_order = 997;
-                $obj_products->object_id = '99999999997';
-                $obj_products->object = 'custom';
-                $obj_products->type = 'custom';
-                $list[] = $obj_products;
+		if ( $store_object ) {
+			$obj_products = clone $store_object;
+			$obj_products->title = __('Products', 'mp');
+			$obj_products->post_title = __('Products', 'mp');
+			$obj_products->menu_item_parent = $store_object->ID;
+			$obj_products->ID = 'products-subm';
+			$obj_products->db_id = 'products-subm';
+			$obj_products->post_name = 'products-subm';
+			$obj_products->url = mp_products_link(false, true);
+			$obj_products->current = (get_query_var('pagename') == 'product_list') ? true : false;
+			$obj_products->current_item_ancestor = (get_query_var('pagename') == 'product_list') ? true : false;
+			$obj_products->menu_order = 997;
+			$obj_products->object_id = '99999999997';
+			$obj_products->object = 'custom';
+			$obj_products->type = 'custom';
+			$list[] = $obj_products;
 
-                 //if cart disabled return only the products menu item
-                if ($this->get_setting('disable_cart'))
-                     return $list;
+			 //if cart disabled return only the products menu item
+			if ( $this->get_setting('disable_cart') ) {
+			 return $list;
+			}
 
-                $obj_cart = clone $store_object;
-                $obj_cart->title = __('Shopping Cart', 'mp');
-                $obj_cart->post_title = __('Shopping Cart', 'mp');
-                $obj_cart->menu_item_parent = $store_object->ID;
-                $obj_cart->ID = 'shopping-cart-subm';
-                $obj_cart->db_id = 'shopping-cart-subm';
-                $obj_cart->post_name = 'shopping-cart-subm';
-                $obj_cart->url = mp_cart_link(false, true);
-                $obj_cart->current = (get_query_var('pagename') == 'cart') ? true : false;
-                $obj_cart->current_item_ancestor = (get_query_var('pagename') == 'cart') ? true : false;
-                $obj_cart->menu_order = 998;
-                $obj_cart->object_id = '99999999998';
-                $obj_cart->object = 'custom';
-                $obj_cart->type = 'custom';
-                $list[] = $obj_cart;
+			$obj_cart = clone $store_object;
+			$obj_cart->title = __('Shopping Cart', 'mp');
+			$obj_cart->post_title = __('Shopping Cart', 'mp');
+			$obj_cart->menu_item_parent = $store_object->ID;
+			$obj_cart->ID = 'shopping-cart-subm';
+			$obj_cart->db_id = 'shopping-cart-subm';
+			$obj_cart->post_name = 'shopping-cart-subm';
+			$obj_cart->url = mp_cart_link(false, true);
+			$obj_cart->current = (get_query_var('pagename') == 'cart') ? true : false;
+			$obj_cart->current_item_ancestor = (get_query_var('pagename') == 'cart') ? true : false;
+			$obj_cart->menu_order = 998;
+			$obj_cart->object_id = '99999999998';
+			$obj_cart->object = 'custom';
+			$obj_cart->type = 'custom';
+			$list[] = $obj_cart;
 
-                $obj_order = clone $store_object;
-                $obj_order->title = __('Order Status', 'mp');
-                $obj_order->post_title = __('Order Status', 'mp');
-                $obj_order->menu_item_parent = $store_object->ID;
-                $obj_order->ID = 'order-status-subm';
-                $obj_order->db_id = 'order-status-subm';
-                $obj_order->post_name = 'order-status-subm';
-                $obj_order->url = mp_orderstatus_link(false, true);
-                $obj_order->current = (get_query_var('pagename') == 'orderstatus') ? true : false;
-                $obj_order->current_item_ancestor = (get_query_var('pagename') == 'orderstatus') ? true : false;
-                $obj_order->menu_order = 999;
-                $obj_order->object_id = '99999999999';
-                $obj_order->object = 'custom';
-                $obj_order->type = 'custom';
-                $list[] = $obj_order;
-            }
+			$obj_order = clone $store_object;
+			$obj_order->title = __('Order Status', 'mp');
+			$obj_order->post_title = __('Order Status', 'mp');
+			$obj_order->menu_item_parent = $store_object->ID;
+			$obj_order->ID = 'order-status-subm';
+			$obj_order->db_id = 'order-status-subm';
+			$obj_order->post_name = 'order-status-subm';
+			$obj_order->url = mp_orderstatus_link(false, true);
+			$obj_order->current = (get_query_var('pagename') == 'orderstatus') ? true : false;
+			$obj_order->current_item_ancestor = (get_query_var('pagename') == 'orderstatus') ? true : false;
+			$obj_order->menu_order = 999;
+			$obj_order->object_id = '99999999999';
+			$obj_order->object = 'custom';
+			$obj_order->type = 'custom';
+			$list[] = $obj_order;
+		}
 
-            return $list;
+		return $list;
 	}
 
-	function wp_title_output($title, $sep, $seplocation) {
+	function wp_title_output( $title = '', $sep = '', $seplocation = 'left' ) {
 	 // Determines position of the separator and direction of the breadcrumb
 		if ( 'right' == $seplocation )
 			return $this->page_title_output($title, true) . " $sep ";
 		else
-			 return " $sep " . $this->page_title_output($title, true);
+			return " $sep " . $this->page_title_output($title, true);
 	}
 
 	//filters the titles for our custom pages
@@ -1819,7 +1822,7 @@ Thanks again!", 'mp')
 	 $content .= '<div class="mp_product_meta">';
 	 $content .= mp_product_price(false);
 	 $content .= mp_buy_button(false, 'single');
-	 $content .= '<span style="display:none" class="date updated">' .  get_the_time('Y-m-d\TG:i') . '</span>';
+	 $content .= '<span style="display:none" class="date updated">' .	get_the_time('Y-m-d\TG:i') . '</span>';
 	 $content .= '<span style="display:none" class="vcard author"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>';	 
 	 $content .= '</div>';
 
@@ -2715,9 +2718,7 @@ Thanks again!", 'mp')
 	}
 	
 	//returns the calculated price for shipping after tax. For display only.
-	function shipping_tax_price($shipping_price) {
-
-		if ( !$this->get_setting('tax->tax_shipping') || !$this->get_setting('tax->tax_inclusive') )
+	function shipping_tax_price( $shipping_price ) {
 			return $shipping_price;
 		
 	 //get address
@@ -2863,8 +2864,13 @@ Thanks again!", 'mp')
 	$special_total = array_sum($special_totals);
 	
 	//add in shipping?
+	$shipping_tax = 0;
 	if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) ) {
-		$total += $shipping_price;
+		if ( $this->get_setting('tax->tax_inclusive') ) {
+			$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
+		} else {
+			$shipping_tax = $shipping_price * (float) $this->get_setting('tax->rate');
+		}
 	}
 	
 	//check required fields
@@ -2908,15 +2914,18 @@ Thanks again!", 'mp')
 			 break;
 	}
 	
-	 if (empty($price))
+		if ( empty($price) ) {
 			$price = 0;
-
-	 $price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
-	 
-	 if ($format)
-		return $this->format_currency('', $price);
-	 else
-		return $price;
+		}
+	
+		$price += $shipping_tax;
+		$price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
+		 
+		if ( $format ) {
+			return $this->format_currency('', $price);
+		} else {
+			return $price;
+		}
 	}
 
 	//returns the before tax price for a given amount based on a bunch of foreign tax laws.
@@ -3820,16 +3829,16 @@ Thanks again!", 'mp')
 	 //payment info
 	 add_post_meta($post_id, 'mp_payment_info', $payment_info, true);
 
-	 //loop through cart items
-	 foreach ($cart as $product_id => $variations) {
-			foreach ($variations as $variation => $data) {
-			 $items[] = $data['quantity'];
-
-			 /*** adjust product stock quantities ***/
-			 
-			 //check if inventory tracking is enabled
-			 //returned value could be 0, 1 or an empty string so casting as boolean
-			 if ( ((bool) get_post_meta($product_id, 'mp_track_inventory', true)) === true ) {
+	//loop through cart items
+	foreach ($cart as $product_id => $variations) {
+		foreach ($variations as $variation => $data) {
+			$items[] = $data['quantity'];
+	
+			/*** adjust product stock quantities ***/
+			
+			//check if inventory tracking is enabled
+			//returned value could be 0, 1 or an empty string so casting as boolean
+			if ( ((bool) get_post_meta($product_id, 'mp_track_inventory', true)) === true ) {
 				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
 				
 				if (!is_array($stock))
@@ -3843,37 +3852,30 @@ Thanks again!", 'mp')
 				if ($stock[$variation] <= $this->get_setting('inventory_threshhold')) {
 					$this->low_stock_notification($product_id, $variation, $stock[$variation]);
 				}
-			 } //check stock
-
-			 //update sales count
-			 $count = get_post_meta($product_id, 'mp_sales_count', true);
-			 $count = $count + $data['quantity'];
-			 update_post_meta($product_id, 'mp_sales_count', $count);
-
-			 //for plugins into product sales
-			 do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
 			}
 			
-			//set product to draft if completly out of stock
-			if (get_post_meta($product_id, 'mp_track_inventory', true)) {
-				$stock = maybe_unserialize(get_post_meta($product_id, 'mp_inventory', true));
-				if (!is_array($stock))
-					$stock[0] = $stock;
-					
-				if ($this->get_setting('inventory_remove') && !array_sum($stock)) {		
-					$post = get_post( $product_id );
-					$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
-					clean_post_cache( $post->ID );
-					$old_status = $post->post_status;
-					$post->post_status = 'draft';
-					wp_transition_post_status( 'draft', $old_status, $post );
-	
-					do_action( 'edit_post', $post->ID, $post );
-					do_action( 'save_post', $post->ID, $post );
-					do_action( 'wp_insert_post', $post->ID, $post );
-				}	
+			//update sales count
+			$count = get_post_meta($product_id, 'mp_sales_count', true);
+			$count = $count + $data['quantity'];
+			update_post_meta($product_id, 'mp_sales_count', $count);
+			
+			//for plugins into product sales
+			do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
+			
+			if ( $this->get_setting('inventory_remove') && $stock[$variation] <= 0 ) {		
+				$post = get_post( $product_id );
+				$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
+				clean_post_cache( $post->ID );
+				$old_status = $post->post_status;
+				$post->post_status = 'draft';
+				wp_transition_post_status( 'draft', $old_status, $post );
+				
+				do_action( 'edit_post', $post->ID, $post );
+				do_action( 'save_post', $post->ID, $post );
+				do_action( 'wp_insert_post', $post->ID, $post );
 			}
-	 }
+		}
+	}
 		$item_count = array_sum($items);
 
 	 //coupon info
@@ -4350,18 +4352,18 @@ Thanks again!", 'mp')
 			
 			ob_clean(); //kills any buffers set by other plugins
 			
-      if( isset($_SERVER['HTTP_RANGE']) ) {
-      	//partial download headers
-        preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
-        $offset = intval($matches[1]);
-        $length = intval($matches[2]) - $offset;
-        $fhandle = fopen($filePath, 'r');
-        fseek($fhandle, $offset); // seek to the requested offset, this is 0 if it's not a partial content request
-        $data = fread($fhandle, $length);
-        fclose($fhandle);
-        header('HTTP/1.1 206 Partial Content');
-        header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $filesize);
-      }
+			if( isset($_SERVER['HTTP_RANGE']) ) {
+				//partial download headers
+				preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
+				$offset = intval($matches[1]);
+				$length = intval($matches[2]) - $offset;
+				$fhandle = fopen($filePath, 'r');
+				fseek($fhandle, $offset); // seek to the requested offset, this is 0 if it's not a partial content request
+				$data = fread($fhandle, $length);
+				fclose($fhandle);
+				header('HTTP/1.1 206 Partial Content');
+				header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $filesize);
+			}
 			
 			header('Accept-Ranges: bytes');
 			header('Content-Description: File Transfer');

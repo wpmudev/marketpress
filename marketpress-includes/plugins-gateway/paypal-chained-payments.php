@@ -827,6 +827,3 @@ if ( is_multisite() ) {
     <?php
   }
 }
-
-//register shipping plugin
-//mp_register_gateway_plugin('MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', __('PayPal Chained Payments', 'mp'), true);

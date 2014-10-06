@@ -613,7 +613,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		//See if it fits in one box
 		foreach($this->usps_settings['boxes']['weight'] as $key => $weight) {
-			//			//Find largest
+			//Find largest
 			if( $weight > $largest) {
 				$largest = $weight;
 				$found = $key;
@@ -737,7 +737,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		}
 
 		if ($loaded){
-
 			libxml_use_internal_errors(true);
 			$dom = new DOMDocument();
 			$dom->encoding = 'utf-8';
@@ -751,7 +750,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		unset($_SESSION['mp_shipping_info']['shipping_cost']);
 
 		$xpath = new DOMXPath($dom);
-
+		
 		//Make SESSION copy with just prices and delivery
 
 		if(! is_array($shipping_options)) $shipping_options = array();
@@ -771,11 +770,25 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 			$nodes = $xpath->query('//postage[@classid="' . $this->services[$service]->code . '"]/rate');
 			$rate = floatval($nodes->item(0)->textContent) * $box_count;
-			if($rate == 0){  //Not available for this combination
-				unset($mp_shipping_options[$service]);
+			
+			if ( $this->services[$service]->code == '0' ) {
+				/* First class mail returns 4 sub types (Stamped Letter, Parcel,
+				Large Envelope, Postcards). We need to get the PARCEL sub type or too low of
+				a rate will get returned */
+				$nodes_type = $xpath->query('//postage[@classid="' . $this->services[$service]->code . '"]/mailservice');
+				
+				for ( $i = 0; $i < $nodes_type->length; $i++ ) {
+					$type = $nodes_type->item($i)->textContent;
+					if ( strpos($type, 'Parcel') !== false ) {
+						$rate = floatval($nodes->item($i)->textContent) * $box_count;
+						break;
+					}
+				}
 			}
-			else
-			{
+			
+			if ( $rate == 0 ) {  //Not available for this combination
+				unset($mp_shipping_options[$service]);
+			} else {
 				$handling = floatval($this->usps_settings['domestic_handling']) * $box_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
@@ -788,7 +801,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				}
 			}
 		}
-
+		
 		uasort($mp_shipping_options, array($this,'compare_rates') );
 
 		$shipping_options = array();
