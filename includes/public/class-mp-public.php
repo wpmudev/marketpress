@@ -23,7 +23,6 @@ class MP_Public {
 		}
 		return self::$_instance;
 	}
-
 	
 	/**
 	 * Constructor
@@ -36,9 +35,10 @@ class MP_Public {
 		add_filter('taxonomy_template', array(&$this, 'load_taxonomy_template'));
 		add_filter('single_template', array(&$this, 'load_single_product_template'));
 		add_filter('page_template', array(&$this, 'load_page_template'));
+		add_filter('get_post_metadata', array(&$this, 'remove_product_post_thumbnail'), 999, 4);
 		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles_scripts'));
 	}
-
+	
 	/**
 	 * Check if the current page is a store page
 	 *
@@ -124,6 +124,10 @@ class MP_Public {
 				"mp_product-{$post->ID}.php",
 				"mp_product.php",
 			));
+			
+			if ( $template === '' ) {
+				add_filter('the_content', array(&$this, 'single_product_content'));
+			}
 		}
 		
 		return $template;
@@ -187,6 +191,38 @@ class MP_Public {
 		}
 		
 		return $template;
+	}
+	
+	/**
+	 * Hide the post thumbnail on single product template
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter get_post_metadata
+	 */
+	public function remove_product_post_thumbnail( $content, $post_id, $meta_key, $single ) {
+		if ( is_singular(MP_Product::get_post_type()) && is_main_query() && $meta_key == '_thumbnail_id' ) {
+			return false;
+		}
+		
+		return $content;
+	}
+	
+	/**
+	 * Filter the content for a single product
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter the_content
+	 * @return string
+	 */
+	public function single_product_content( $content ) {
+		if ( is_main_query() && in_the_loop() ) {
+			remove_filter('get_post_metadata', array(&$this, 'remove_product_post_thumbnail'), 999, 4);
+			return mp_product(false);
+		}
+		
+		return $content;
 	}
 	
 	/**
