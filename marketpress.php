@@ -355,6 +355,7 @@ class Marketpress {
 	private function __construct() {
 		// Init variables
 		$this->_init_vars();
+		
 		// Include constants
 		require_once $this->plugin_dir('includes/common/constants.php');
 		
@@ -389,13 +390,13 @@ class Marketpress {
 	 * @access public
 	 */
 	public function includes() {
+		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
 		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product-attributes.php');
-		require_once $this->plugin_dir('includes/common/class-mp-cart.php');
 		require_once $this->plugin_dir('includes/common/template-functions.php');
 		
 		if ( is_admin() ) {
@@ -408,6 +409,7 @@ class Marketpress {
 			
 			if ( mp_doing_ajax() ) {
 				require_once $this->plugin_dir('includes/admin/class-mp-ajax.php');
+				require_once $this->plugin_dir('includes/public/class-mp-public.php');
 			}
 		} else {
 			require_once $this->plugin_dir('includes/public/class-mp-public.php');
