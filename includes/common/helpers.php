@@ -436,9 +436,8 @@ if ( ! function_exists('mp_get_cookie_value') ) :
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
 	 */	 
-	
 	function mp_get_cookie_value( $key, $default = false ) {
-		return mp_arr_get_value($key, $_COOKIE, $default);
+		return stripslashes(mp_arr_get_value($key, $_COOKIE, $default));
 	}
 endif;
 
