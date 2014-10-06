@@ -136,7 +136,7 @@ jQuery(document).ready(function($){
 		
 		if ( $value ) :
 			$img_url = wp_get_attachment_image_src($value, $this->args['preview_size']); ?>
-		<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit wpmudev-image-field-select dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="<?php echo $img_url; ?>" alt="" /></div>
+		<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit wpmudev-image-field-select dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="<?php echo $img_url[0]; ?>" alt="" /></div>
 		<?php
 		else : ?>
 		<a class="button wpmudev-image-field-select" href="javascript:;"><?php _e('Select Image', 'wpmudev_metaboxes'); ?></a>
