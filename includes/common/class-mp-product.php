@@ -136,7 +136,7 @@ class MP_Product {
 			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 		} elseif ( ! mp_get_setting('disable_cart') ) {
 			$variation_select = false;
-			$button = '<form class="mp_buy_form" method="post" action="' . mp_cart_link(false, true) . '">';
+			$button = '<form class="mp_buy_form" method="post" data-ajax-url="' . admin_url('admin-ajax.php?action=mp_update_cart') . '" action="' . mp_cart_link(false, true) . '">';
 
 			if ( ! $this->in_stock() ) {
 				$button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
@@ -168,7 +168,6 @@ class MP_Product {
 					if ( $variation_select ) {
 							$button .= '<a class="mp_link_buynow" href="' . get_permalink($this->ID) . '">' . __('Choose Option', 'mp') . '</a>';
 					} else if (mp_get_setting('list_button_type') == 'addcart') {
-							$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
 							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
 					} else if (mp_get_setting('list_button_type') == 'buynow') {
 							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
@@ -177,15 +176,14 @@ class MP_Product {
 					$button .= $variation_select;
 
 					//add quantity field if not downloadable
-					if (mp_get_setting('show_quantity') && empty($meta["mp_file"])) {
-							$button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
+					if ( mp_get_setting('show_quantity') && ! $this->is_download() ) {
+						$button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
 					}
 
-					if (mp_get_setting('product_button_type') == 'addcart') {
-							$button .= '<input type="hidden" name="action" value="mp-update-cart" />';
-							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+					if ( mp_get_setting('product_button_type') == 'addcart') {
+						$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
 					} else if (mp_get_setting('product_button_type') == 'buynow') {
-							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+						$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
 					}
 				}
 			}
@@ -207,32 +205,45 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @return string
+	 * @param bool $echo
 	 */
-	public function display_price() {
+	public function display_price( $echo = true ) {
 		$price = $this->get_price();
-		$snippet = '
-			<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
+		$snippet = '<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 		
 		if ( $this->on_sale() ) {
-			$snippet .= '
-			<strike>' . mp_format_currency('', $price['regular']) . '</strike> <strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['sale']['amount']) . '</strong>';
+			$percent_off = round((($price['regular'] - $price['sale']['amount']) * 100) / $price['regular']) . '%';
+			$snippet .= '<strike class="mp_normal_price">' . mp_format_currency('', $price['regular']) . '</strike>';
+			
+			if ( ($end_date = $price['sale']['end_date']) && ($days_left = $price['sale']['days_left']) ) {
+				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s - only %s days left!', 'mp'), $percent_off, $days_left) . '</span>';
+			} else {
+				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s', 'mp'), $percent_off) . '</span>';
+			}
+			
+			$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency('', $price['sale']['amount']) . '</strong>';
 		} else {
 			$snippet .= '
 			<strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['regular']) . '</strong>';
 		}
 		
-		$snippet .= '
-			</div>';
+		$snippet .= '</div>';
 		
 		/**
 		 * Filter the display price of the product
 		 *
 		 * @since 3.0
 		 * @param string The current display price text
+		 * @param array The current price object
 		 * @param int The product ID
 		 */
-		return apply_filters('mp_product/display_price', $snippet, $this->ID);
+		$snippet = apply_filters('mp_product/display_price', $snippet, $price, $this->ID);
+		
+		if ( $echo ) {
+			echo $snippet;
+		} else {
+			return $snippet;
+		}
 	}
 
 	/**
@@ -335,19 +346,43 @@ class MP_Product {
 	 */
 	public function get_price() {
 		$price = array(
-			'regular' => $this->get_meta('regular_price'),
+			'regular' => (float) $this->get_meta('regular_price'),
 			'sale' => array(
-				'amount' => '',
-				'start_date' => '',
-				'end_date' => '',
+				'amount' => false,
+				'start_date' => false,
+				'end_date' => false,
+				'days_left' => false,
 			),
 		);
 		
 		if ( $this->on_sale() && ($sale_price = $this->get_meta('sale_price_amount')) ) {
+			$start_date_obj = new DateTime($this->get_meta('sale_price_start_date', date('Y-m-d'), true));
+			$days_left = false;
+			
+			if ( method_exists($start_date_obj, 'diff') ) {
+				// The diff method is only available PHP version >= 5.3
+				$end_date_obj = new DateTime($this->get_meta('sale_price_end_date', date('Y-m-d'), true));
+				$diff = $start_date_obj->diff($end_date_obj);
+				$days_left = $diff->d;
+				
+				/**
+				 * Filter the maximum number of days before the "only x days left" nag shows
+				 *
+				 * @since 3.0
+				 * @param int The default number of days
+				 */
+				$days_limit = apply_filters('mp_product/get_price/days_left_limit', 7);
+				
+				if ( $days_left > $days_limit ) {
+					$days_left = false;
+				}
+			}
+			
 			$price['sale'] = array(
-				'amount' => $sale_price,
-				'start_date' => $this->get_meta('start_date', false, true),
-				'end_date' => $this->get_meta('end_date', false, true),
+				'amount' => (float) $sale_price,
+				'start_date' => $this->get_meta('sale_price_start_date', false),
+				'end_date' => $this->get_meta('sale_price_end_date', false),
+				'days_left' => $days_left,
 			);
 		}
 		
@@ -404,6 +439,16 @@ class MP_Product {
 				$img_classes[] = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
 			break;
 			
+			case 'floating-cart' :
+				$img_classes = array('mp-floating-cart-item-image');
+				
+				if ( $size = intval($size) ) {
+					$size = array($size, $size);
+				} else {
+					$size = array(50, 50);
+				}
+			break;
+			
 			case 'single' :
 				//size
 				if ( mp_get_setting('product_img_size') == 'custom' ) {
@@ -450,17 +495,21 @@ class MP_Product {
 
 		$image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => implode(' ', $img_classes), 'title' => $title));
 
-		if ( empty($image) && $context != 'single' ) {
-			if ( ! is_array($size) ) {
+		if ( empty($image) ) {
+			if ( $context == 'floating-cart' ) {
+				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />';
+			} elseif ( $context != 'single' ) {
+				if ( ! is_array($size) ) {
 					$size = array(get_option($size . '_size_w'), get_option($size . '_size_h'));
+				}
+				
+				$img_classes[] = 'wp-post-image';
+				$image = '
+					<div itemscope class="hmedia">
+						<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
+						<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />
+					</div>';
 			}
-			
-			$img_classes[] = 'wp-post-image';
-			$image = '
-				<div itemscope class="hmedia">
-					<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
-					<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />
-				</div>';
 		}
 		
 		//force ssl on images (if applicable) http://wp.mu/8s7
@@ -512,6 +561,17 @@ class MP_Product {
 		}
 		
 		return $has_stock;
+	}
+	
+	/**
+	 * Check if the product is a digital download
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function is_download() {
+		return ( $this->get_meta('product_type') == 'digital' && $this->get_meta('file_url') );
 	}
 	
 	/**
@@ -598,7 +658,6 @@ class MP_Product {
 		}
 	
 		$image_info =	wp_get_attachment_image_src(get_post_thumbnail_id($this->ID), 'large');
-		$media = ($image_info) ?	 '&media=' . $image_info[0] : '';
 		$count_pos = ( $pos = mp_get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
 		$url = add_query_arg(array(
 			'url' => get_permalink($this->ID),
@@ -609,7 +668,7 @@ class MP_Product {
 			$url = add_query_arg('media',  $media, $url);	
 		}
 		
-		$snippet = apply_filters('mp_pinit_button_link', '<a href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context);
+		$snippet = apply_filters('mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context);
 	
 		if ( $echo ) {
 			echo $snippet;
