@@ -244,10 +244,10 @@ class MP_Cart {
 			
 				$html .= '
 					<li class="mp-floating-cart-item">
-						<a class="mp-floating-cart-item-link" href="' . get_permalink($product->ID) . '">' . $product->image(false, 'floating-cart', 50) . '
+						<a class="mp-floating-cart-item-link" href="' . $product->url(false) . '">' . $product->image(false, 'floating-cart', 50) . '
 							<div class="mp-floating-cart-item-content">
-								<h3 class="mp-floating-cart-item-title">' . $product->post_title . '</h3>
-								<span class="mp-float-cart-item-qty">' . sprintf(__('Quantity: %d', 'mp'), $qty) . '</span>
+								<h3 class="mp-floating-cart-item-title">' . $product->title(false) . '</h3>
+								<span class="mp-floating-cart-item-qty">' . sprintf(__('Quantity: %d', 'mp'), $qty) . '</span>
 							</div>
 						</a>
 					</li>';
@@ -267,6 +267,9 @@ class MP_Cart {
 		$html .= '
 			</div>
 		</div>';
+		
+		$html .= '
+		<span class="mp-ajax-loader" style="display:none"><img src="' . mp_plugin_url('ui/images/ajax-loader.gif') . '" alt="" /> ' . __('Adding...' , 'mp') . '</span>';
 		
 		if ( $echo ) {
 			echo $html;
@@ -332,7 +335,7 @@ class MP_Cart {
 	public function set_id( $id ) {
 		$this->_id = $id;
 	}
-	
+		
 	/**
 	 * Update the cart cookie
 	 *

@@ -14,6 +14,13 @@ var mp_cart = {};
 			var $this = $(this);
 			mp_cart.addItem($this, $this.find('[name="product_id"]').val());
 		});
+		
+		$('#mp_product_list').on('click', '.mp_variations_flyout a', function(e){
+			e.preventDefault();
+			
+			var $this = $(this), $form = $this.closest('.mp_buy_form');
+			mp_cart.addItem($form, $this.attr('data-product-id'));
+		});
 	};
 	
 	mp_cart.addItem = function( $form, item, qty ){
@@ -24,6 +31,9 @@ var mp_cart = {};
 		if ( qty === undefined ) {
 			qty = 1;
 		}
+		
+		$form.addClass('invisible');
+		$('body').children('.mp-ajax-loader').insertAfter($form).show();
 		
 		// we use the AjaxQ plugin here because we need to queue multiple add-to-cart requests http://wp.mu/96f
 		$.ajaxq('addtocart', {
@@ -36,8 +46,14 @@ var mp_cart = {};
 			"url" : $form.attr('data-ajax-url'),
 		})
 		.success(function(resp){
+			$form.removeClass('invisible').next('.mp-ajax-loader').remove();
+			
 			if ( resp.success ) {
 				mp_cart.update(resp.data);
+				
+				setTimeout(function(){
+					$('#mp-floating-cart').trigger('click');
+				}, 100);
 			}
 		});
 	};
@@ -57,6 +73,11 @@ var mp_cart = {};
 			}, 300);
 		},function(){
 			$cart.removeClass('visible in-transition');
+		}).click(function(){
+			$cart.addClass('in-transition');
+			setTimeout(function(){
+				$cart.addClass('visible');
+			}, 300);
 		});
 	};
 }(jQuery));

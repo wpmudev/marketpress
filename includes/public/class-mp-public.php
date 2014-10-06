@@ -71,11 +71,13 @@ class MP_Public {
 		}
 		
 		// CSS
-		wp_enqueue_style('mp-theme', mp_plugin_url('ui/themes/' . mp_get_setting('store_theme') . '.css'), false, MP_VERSION);
+		wp_enqueue_style('mp-frontend', mp_plugin_url('ui/css/frontend.css'), false, MP_VERSION);
+		wp_enqueue_style('mp-theme', mp_plugin_url('ui/themes/' . mp_get_setting('store_theme') . '.css'), array('mp-frontend'), MP_VERSION);
 		wp_enqueue_style('mp-select2', mp_plugin_url('ui/select2/select2.css'), false, MP_VERSION);
 		
 		// JS
-		wp_enqueue_script('mp-frontend', mp_plugin_url('ui/js/frontend.js'), array('jquery'), MP_VERSION, true);
+		wp_enqueue_script('hover-intent', mp_plugin_url('ui/js/hoverintent.min.js'), array('jquery'), MP_VERSION, true);
+		wp_enqueue_script('mp-frontend', mp_plugin_url('ui/js/frontend.js'), array('hover-intent'), MP_VERSION, true);
 		wp_enqueue_script('mp-select2', mp_plugin_url('ui/select2/select2.min.js'), array('mp-frontend'), MP_VERSION, true);
 	}
 

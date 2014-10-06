@@ -128,14 +128,12 @@ class MP_Product {
 	 * @param string $context Options are list or single
 	 */
  	function buy_button( $echo = true, $context = 'list' ) {
- 		$product_link = get_permalink($this->ID);
- 		
 		// Display an external link
 		$button = '';
 		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
 			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 		} elseif ( ! mp_get_setting('disable_cart') ) {
-			$variation_select = false;
+			$variation_select = $variation_opts = false;
 			$button = '<form class="mp_buy_form" method="post" data-ajax-url="' . admin_url('admin-ajax.php?action=mp_update_cart') . '" action="' . mp_cart_link(false, true) . '">';
 
 			if ( ! $this->in_stock() ) {
@@ -146,31 +144,46 @@ class MP_Product {
 				if ( $this->has_variations() ) {
 					$variation_select = '<select class="mp_product_variations" name="variation">';
 					$variations = $this->get_variations();
+					$variation_opts = array();
 					
 					foreach ( $variations as $variation ) {
 						$price_obj = $variation->get_price();
 						
-						if ( $variation->on_sale ) {
+						if ( $variation->on_sale() ) {
 							$price = mp_format_currency('', $price_obj['sale']['amount']);
 						} else {
 							$price = mp_format_currency('', $price_obj['regular']);
 						}
 						
+						$variation_opts[$variation->ID] = (object) array(
+							'post' => $variation,
+							'price' => $price,
+						);
 						$variation_select .= '<option value="' . $variation->ID . '"' . (( $variation->in_stock() ) ? '' : ' disabled="disabled"') . '">' . esc_attr($variation->get_meta('name')) . ' - ' . $price . '</option>';
 					}
 					
 					$variation_select .= '</select>';
 				}
 				
-				//! TODO: Finish converting below code
-
 				if ( $context == 'list' ) {
 					if ( $variation_select ) {
-							$button .= '<a class="mp_link_buynow" href="' . get_permalink($this->ID) . '">' . __('Choose Option', 'mp') . '</a>';
-					} else if (mp_get_setting('list_button_type') == 'addcart') {
-							$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
-					} else if (mp_get_setting('list_button_type') == 'buynow') {
-							$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
+						if ( mp_get_setting('store_theme') == 'default3' ) {
+							$button .= '<div class="mp_link_buynow has_variations">' . __('Choose Option', 'mp');
+							$button .= '<ul class="mp_variations_flyout">';
+							
+							foreach ( $variation_opts as $id => $variation ) {
+								$button .= '<li class="mp_variation_flyout_item"><a class="clearfix" data-product-id="' . $id . '" href="' . $variation->post->url(false) . '"><strong class="mp_variation_flyout_name">' . $variation->post->get_meta('name') . '</strong><span class="mp_variation_flyout_price">' . $variation->price . '</span></a></li>';
+							}
+							
+							$button .= '</ul>';
+							$button .= '</div>';
+						} else {
+							$button .= '<a class="mp_link_buynow" href="' . $this->url(false) . '">' . __('Choose Option', 'mp') . '</a>';
+						}
+					} else if ( mp_get_setting('list_button_type') == 'addcart' ) {
+						$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
+					} else if ( mp_get_setting('list_button_type') == 'buynow' ) {
+						$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
 					}
 				} else {
 					$button .= $variation_select;
@@ -573,7 +586,17 @@ class MP_Product {
 	public function is_download() {
 		return ( $this->get_meta('product_type') == 'digital' && $this->get_meta('file_url') );
 	}
-	
+
+	/**
+	 * Check if the product is a variation of another product
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function is_variation() {
+		return ( ! empty($this->_post->post_parent) );
+	}
+		
 	/**
 	 * Get product meta value
 	 *
@@ -642,6 +665,27 @@ class MP_Product {
 	public function meta( $name, $default = false, $raw = false ) {
 		echo $this->get_meta($name, $default, $raw);
 	}
+	
+	/**
+	 * Get the product's url
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 */
+	public function url( $echo = true ) {
+		if ( $this->is_variation() ) {
+			$url = get_permalink($this->_post->post_parent) . '#!variation=' . $this->ID;
+		} else {
+			$url = get_permalink($this->ID);
+		}
+		
+		if ( $echo ) {
+			echo $url;
+		} else {
+			return $url;
+		}
+	}
 
 	/**
 	 * Get Pinterest PinIt button
@@ -674,6 +718,27 @@ class MP_Product {
 			echo $snippet;
 		} else {
 			return $snippet;
+		}
+	}
+
+	/**
+	 * Get the product title
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 */
+	public function title( $echo = true ) {
+		if ( $this->is_variation() ) {
+			$title = get_the_title($this->_post->post_parent) . ' - ' . $this->get_meta('name');
+		} else {
+			$title = $this->_post->post_title;
+		}
+		
+		if ( $echo ) {
+			echo $title;
+		} else {
+			return $title;
 		}
 	}
 	

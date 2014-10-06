@@ -2,13 +2,16 @@
   content: "";
   display: table;
 }
+.invisible {
+  opacity: 0;
+}
 #mp-floating-cart {
   position: fixed;
   top: 50px;
   right: 0;
   z-index: 500;
 }
-#mp-floating-cart:hover #mp-floating-cart-tab {
+#mp-floating-cart.in-transition #mp-floating-cart-tab {
   border-bottom-left-radius: 0;
   width: 225px;
 }
@@ -127,21 +130,21 @@
   transition: opacity 300ms;
 }
 #mp-floating-cart-items-list,
-#mp-floating-cart-items-list {
+#mp-floating-cart-item {
   background: none;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 #mp-floating-cart-items-list .mp-floating-cart-item-image,
-#mp-floating-cart-items-list .mp-floating-cart-item-image {
+#mp-floating-cart-item .mp-floating-cart-item-image {
   float: left;
   height: 40px;
   width: 40px;
   margin-right: 10px;
 }
 #mp-floating-cart-items-list .mp-floating-cart-item-link,
-#mp-floating-cart-items-list .mp-floating-cart-item-link {
+#mp-floating-cart-item .mp-floating-cart-item-link {
   display: block;
   overflow: hidden;
   margin: 5px 0;
@@ -152,16 +155,16 @@
   transition: background-color 300ms;
 }
 #mp-floating-cart-items-list .mp-floating-cart-item-link:hover,
-#mp-floating-cart-items-list .mp-floating-cart-item-link:hover {
+#mp-floating-cart-item .mp-floating-cart-item-link:hover {
   background-color: #eee;
 }
 #mp-floating-cart-items-list .mp-floating-cart-item-content,
-#mp-floating-cart-items-list .mp-floating-cart-item-content {
+#mp-floating-cart-item .mp-floating-cart-item-content {
   font-size: 12px;
   overflow: hidden;
 }
 #mp-floating-cart-items-list .mp-floating-cart-item-title,
-#mp-floating-cart-items-list .mp-floating-cart-item-title {
+#mp-floating-cart-item .mp-floating-cart-item-title {
   font-size: 12px;
   margin: 5px 0 0;
   padding: 0;
@@ -169,7 +172,7 @@
   -webkit-transition: color 300ms;
   transition: color 300ms;
 }
-#mp-floating-cart-items-list .mp-float-cart-item-qty,
-#mp-floating-cart-items-list .mp-float-cart-item-qty {
+#mp-floating-cart-items-list .mp-floating-cart-item-qty,
+#mp-floating-cart-item .mp-floating-cart-item-qty {
   color: #666;
 }
