@@ -1668,81 +1668,101 @@ Thanks again!", 'mp')
 	}
 
 	//adds our links to custom theme nav menus using wp_nav_menu()
-	function filter_nav_menu( $list, $menu, $args = array() ) {
-		$store_object = false;
+    function filter_nav_menu( $list, $menu, $args = array() ) {
 
-		if ( $args->depth == 1 ) {
-			return $list;
-		}
+        $store_object = false;
 
-		//find store page
-		$store_url = mp_store_link(false, true);
-		$store_page = get_option('mp_store_page');
-		
-		foreach( $list as $menu_item ) {
-			if ( (isset($menu_item->object_id) && $menu_item->object_id == $store_page) || $menu_item->url == $store_url ) {
-				$store_object = $menu_item;
-				break;
-			}
-		}
+        if ( $args->depth == 1 ) {
+            return $list;
+        }
 
-		if ( $store_object ) {
-			$obj_products = clone $store_object;
-			$obj_products->title = __('Products', 'mp');
-			$obj_products->post_title = __('Products', 'mp');
-			$obj_products->menu_item_parent = $store_object->ID;
-			$obj_products->ID = 'products-subm';
-			$obj_products->db_id = 'products-subm';
-			$obj_products->post_name = 'products-subm';
-			$obj_products->url = mp_products_link(false, true);
-			$obj_products->current = (get_query_var('pagename') == 'product_list') ? true : false;
-			$obj_products->current_item_ancestor = (get_query_var('pagename') == 'product_list') ? true : false;
-			$obj_products->menu_order = 997;
-			$obj_products->object_id = '99999999997';
-			$obj_products->object = 'custom';
-			$obj_products->type = 'custom';
-			$list[] = $obj_products;
+        //find store page
+        $store_url = mp_store_link(false, true);
+        $store_page = get_option('mp_store_page');
 
-			 //if cart disabled return only the products menu item
-			if ( $this->get_setting('disable_cart') ) {
-			 return $list;
-			}
 
-			$obj_cart = clone $store_object;
-			$obj_cart->title = __('Shopping Cart', 'mp');
-			$obj_cart->post_title = __('Shopping Cart', 'mp');
-			$obj_cart->menu_item_parent = $store_object->ID;
-			$obj_cart->ID = 'shopping-cart-subm';
-			$obj_cart->db_id = 'shopping-cart-subm';
-			$obj_cart->post_name = 'shopping-cart-subm';
-			$obj_cart->url = mp_cart_link(false, true);
-			$obj_cart->current = (get_query_var('pagename') == 'cart') ? true : false;
-			$obj_cart->current_item_ancestor = (get_query_var('pagename') == 'cart') ? true : false;
-			$obj_cart->menu_order = 998;
-			$obj_cart->object_id = '99999999998';
-			$obj_cart->object = 'custom';
-			$obj_cart->type = 'custom';
-			$list[] = $obj_cart;
+        $products_url = mp_products_link(false, true);
+        $products_item_exists = false;
+        $cart_url = mp_cart_link(false, true);
+        $cart_item_exists = false;
+        $order_url = mp_orderstatus_link(false, true);
+        $order_item_exists = false;
 
-			$obj_order = clone $store_object;
-			$obj_order->title = __('Order Status', 'mp');
-			$obj_order->post_title = __('Order Status', 'mp');
-			$obj_order->menu_item_parent = $store_object->ID;
-			$obj_order->ID = 'order-status-subm';
-			$obj_order->db_id = 'order-status-subm';
-			$obj_order->post_name = 'order-status-subm';
-			$obj_order->url = mp_orderstatus_link(false, true);
-			$obj_order->current = (get_query_var('pagename') == 'orderstatus') ? true : false;
-			$obj_order->current_item_ancestor = (get_query_var('pagename') == 'orderstatus') ? true : false;
-			$obj_order->menu_order = 999;
-			$obj_order->object_id = '99999999999';
-			$obj_order->object = 'custom';
-			$obj_order->type = 'custom';
-			$list[] = $obj_order;
-		}
+        foreach( $list as $menu_item ) {
+            if ( (isset($menu_item->object_id) && $menu_item->object_id == $store_page) || $menu_item->url == $store_url ) {
+                $store_object = $menu_item;
+            } elseif ( $menu_item->url == $products_url ) {
+                $products_item_exists = true;
+            } elseif ( $menu_item->url == $cart_url ) {
+                $cart_item_exists = true;
+            } elseif ( $menu_item->url == $order_url ) {
+                $order_item_exists = true;
+            }
+        }
 
-		return $list;
-	}
+        if ( $store_object ) {
+            if(!$products_item_exists){
+                $obj_products = clone $store_object;
+                $obj_products->title = __('Products', 'mp');
+                $obj_products->post_title = __('Products', 'mp');
+                $obj_products->menu_item_parent = $store_object->ID;
+                $obj_products->ID = 'products-subm';
+                $obj_products->db_id = 'products-subm';
+                $obj_products->post_name = 'products-subm';
+                $obj_products->url = mp_products_link(false, true);
+                $obj_products->current = (get_query_var('pagename') == 'product_list') ? true : false;
+                $obj_products->current_item_ancestor = (get_query_var('pagename') == 'product_list') ? true : false;
+                $obj_products->menu_order = 997;
+                $obj_products->object_id = '99999999997';
+                $obj_products->object = 'custom';
+                $obj_products->type = 'custom';
+                $list[] = $obj_products;
+
+                //if cart disabled return only the products menu item
+                if ( $this->get_setting('disable_cart') ) {
+                    return $list;
+                }
+            }
+
+            if(!$cart_item_exists){
+                $obj_cart = clone $store_object;
+                $obj_cart->title = __('Shopping Cart', 'mp');
+                $obj_cart->post_title = __('Shopping Cart', 'mp');
+                $obj_cart->menu_item_parent = $store_object->ID;
+                $obj_cart->ID = 'shopping-cart-subm';
+                $obj_cart->db_id = 'shopping-cart-subm';
+                $obj_cart->post_name = 'shopping-cart-subm';
+                $obj_cart->url = mp_cart_link(false, true);
+                $obj_cart->current = (get_query_var('pagename') == 'cart') ? true : false;
+                $obj_cart->current_item_ancestor = (get_query_var('pagename') == 'cart') ? true : false;
+                $obj_cart->menu_order = 998;
+                $obj_cart->object_id = '99999999998';
+                $obj_cart->object = 'custom';
+                $obj_cart->type = 'custom';
+                $list[] = $obj_cart;
+            }
+
+            if(!$order_item_exists){
+                $obj_order = clone $store_object;
+                $obj_order->title = __('Order Status', 'mp');
+                $obj_order->post_title = __('Order Status', 'mp');
+                $obj_order->menu_item_parent = $store_object->ID;
+                $obj_order->ID = 'order-status-subm';
+                $obj_order->db_id = 'order-status-subm';
+                $obj_order->post_name = 'order-status-subm';
+                $obj_order->url = mp_orderstatus_link(false, true);
+                $obj_order->current = (get_query_var('pagename') == 'orderstatus') ? true : false;
+                $obj_order->current_item_ancestor = (get_query_var('pagename') == 'orderstatus') ? true : false;
+                $obj_order->menu_order = 999;
+                $obj_order->object_id = '99999999999';
+                $obj_order->object = 'custom';
+                $obj_order->type = 'custom';
+                $list[] = $obj_order;
+            }
+        }
+
+        return $list;
+    }
 
 	function wp_title_output( $title = '', $sep = '', $seplocation = 'left' ) {
 	 // Determines position of the separator and direction of the breadcrumb
