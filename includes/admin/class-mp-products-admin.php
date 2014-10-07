@@ -457,7 +457,7 @@ class MP_Products_Screen {
 			'id' => 'mp-product-type-metabox',
 			'title' => __('Product Type', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
-			'context' => 'normal',
+			'context' => 'below_title',
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'product_type',
