@@ -429,6 +429,82 @@ if ( ! function_exists('mp_pinit_button') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_product') ) {
+	/*
+	 * Displays a single product according to preference
+	 * 
+	 * @param bool $echo Optional, whether to echo or return
+	 * @param int $product_id the ID of the product to display. Optional if in the loop.
+	 * @param bool $title Whether to display the title
+	 * @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'
+	 * @param bool/string $image Whether and what context of image size to display. Options are false, 'single', or 'list'. Default 'single'
+	 * @param bool $meta Whether to display the product meta
+	 */
+	function mp_product( $echo = true, $product_id = null, $title = true, $content = 'full', $image = 'single', $meta = true ) {
+		if ( function_exists('icl_object_id') ) {
+			$product_id = icl_object_id($product_id, 'product', false);	
+		}
+		
+		$product = new MP_Product($product_id);
+
+		$return = '
+			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
+				<span style="display:none" class="date updated">' . get_the_time($product_id) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
+		
+		if ( $title) {
+			$return .= '
+				<h3 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url(false) . '">' . $product->title(false) . '</a></h3>';
+		}
+
+		if ( ! empty($meta) ) {
+			$return .= '
+				<div class="mp_product_meta">';
+				
+			//price
+			$return .= $product->display_price(false);
+			//button
+			$return .= $product->buy_button(false, 'single');
+			
+			$return .= '
+				</div>';
+		}
+		
+		if ( ! empty($content) ) {
+			$return .= '
+				<div class="mp_product_content clearfix">';
+				
+			if ( $image ) {
+				$return .= $product->image(false, $image);
+			}
+			
+			
+			$return .= '
+					<div itemprop="description" class="mp_product_content_text">';
+								
+			if ( $content == 'excerpt' ) {
+				$return .= $product->excerpt($product->post_excerpt, $product->post_content);
+			} else {
+				$return .= apply_filters('the_content', $product->post_content);
+			}
+			
+			$return .= '
+					</div>
+				</div>';
+		}
+		
+		$return .= '
+			</div>';
+
+		$return = apply_filters('mp_product', $return, $product_id, $title, $content, $image, $meta);
+
+		if ( $echo ) {
+			echo $return;
+		} else {
+			return $return;
+		}
+	}
+}
+
 if ( ! function_exists('mp_product_excerpt') ) :
 	/**
 	 * Replaces wp_trim_excerpt in MP custom loops
@@ -491,6 +567,7 @@ if ( ! function_exists('mp_products_filter') ) :
 	
 		$terms = wp_dropdown_categories(array(
 			'name' => 'product_category',
+			'class' => 'mp_select2',
 			'id' => 'mp-product-category',
 			'taxonomy' => 'product_category',
 			'show_option_none' => __('Show All', 'mp'),
@@ -527,7 +604,7 @@ if ( ! function_exists('mp_products_filter') ) :
 	
 						<div class="one_filter">
 							<label for="mp-sort-order">' . __('Order By', 'mp') . '</label><br />
-							<select id="mp-sort-order" name="order" data-placeholder="' . __('Product Category', 'mp') . '">
+							<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __('Product Category', 'mp') . '">
 								' . $options_html . '
 							</select>
 						</div>' .
