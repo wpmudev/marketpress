@@ -407,6 +407,7 @@ class WPMUDEV_Field {
 	 */
 	public function set_subfield_id( $id ) {
 		$this->subfield_id = $id;
+		$this->args['id'] = 'wpmudev-field-' . uniqid(true);
 	}
 	
 	/**
