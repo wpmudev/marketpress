@@ -409,10 +409,15 @@ class MP_Products_Screen {
 					}
 					
 					// Unset the fields that shouldn't be saved as post meta
-					unset($fields['description'], $fields['image']);
+					$fields['description'] = $fields['image'] = null;
 							
 					$index = 0;
 					foreach ( $fields as $name => $value ) {
+						if ( is_null($value) ) {
+							$index ++;
+							continue;
+						}
+						
 						$subfield = $field->subfields[$index];
 						$subfield->save_value($variation_id, $name, $value, true);
 						
