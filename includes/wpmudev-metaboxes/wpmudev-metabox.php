@@ -597,6 +597,25 @@ class WPMUDEV_Metabox {
 						<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
 						<div class="inside">
 		<?php
+		else :
+			/* For metaboxes on the post creation/edit screen, we need to inject any
+			custom attributes and classes via jQuery */
+			if ( ! empty($this->args['custom']) ) :
+				$jquery_string = 'jQuery("#' . $this->args['id'] . '")';
+				
+				foreach ( (array) $this->args['custom'] as $name => $val ) {
+					$jquery_string .= '.attr("' . $name . '", "' . esc_attr($val) . '")';
+				}
+				
+				if ( ! empty($this->args['class']) ) {
+					$jquery_string .= '.addClass("' . $this->args['class'] . '")';
+				}
+				
+				$jquery_string .= ';';
+		?>
+							<script type="text/javascript"><?php echo $jquery_string; ?></script>
+		<?php
+			endif;
 		endif;
 		
 		wp_nonce_field($this->nonce_action, $this->nonce_name);
