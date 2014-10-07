@@ -227,7 +227,7 @@ class WPMUDEV_Metabox {
 	 *		@type string $desc The description of the metabox.
 	 *		@type string $post_type The post type to display the metabox on.
 	 *		@type array $page_slugs The page slugs to display the metabox on - for screens other than post-edit.php and post-new.php.
-	 *		@type string $context The context of the metabox (advanced, normal, side).
+	 *		@type string $context The context of the metabox (advanced, normal, side or below_title).
 	 *		@type string $priority The priority of the metabox (default, high, normal).
 	 *		@type string $option_name If not a post metabox, enter the option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
 	 *		@type string $site_option_name If not a post metabox, enter the site option name that will be used to retrieve/save the field's value (e.g. plugin_settings).
@@ -281,6 +281,21 @@ class WPMUDEV_Metabox {
 		add_action('admin_notices', array(&$this, 'admin_notices'));
 		add_action('network_admin_notices', array(&$this, 'admin_notices'));
 		add_action('init', array(&$this, 'maybe_save_settings_fields'), 99);
+		add_action('edit_form_after_title', array(&$this, 'add_metaboxes_below_title'));
+	}
+	
+	/**
+	 * Allow metaboxes to be rendered directly underneath the title field
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action edit_form_after_title
+	 * @uses $post, $wp_meta_boxes;
+	 */
+	public function add_metaboxes_below_title() {
+		global $post, $wp_meta_boxes;
+		do_meta_boxes(get_current_screen(), 'below_title', $post);
+		unset($wp_meta_boxes[get_post_type($post)]['below_title']);
 	}
 	
 	/**
