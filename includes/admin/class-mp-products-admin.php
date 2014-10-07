@@ -312,10 +312,18 @@ class MP_Products_Screen {
 			$meta = array();
 			
 			foreach ( $field->subfields as $subfield ) {
-				if ( $subfield->args['original_name'] == 'description' ) {
-					$meta[$subfield->args['original_name']] = $subfield->format_value($variation->post_content, $variation->ID);
-				} else {
-					$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
+				switch ( $subfield->args['original_name'] ) {
+					case 'description' :
+						$meta[$subfield->args['original_name']] = $subfield->format_value($variation->post_content, $variation->ID);
+					break;
+					
+					case 'image' :
+						$meta[$subfield->args['original_name']] = get_post_thumbnail_id($variation->ID);
+					break;
+					
+					default :
+						$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
+					break;
 				}
 			}
 			
@@ -368,8 +376,15 @@ class MP_Products_Screen {
 						break;
 					}
 					
+					// Update post thumbnail
+					if ( empty($fields['image']) ) {
+						delete_post_thumbnail($variation_id);
+					} else {
+						set_post_thumbnail($variation_id, $fields['image']);
+					}
+					
 					// Unset the fields that shouldn't be saved as post meta
-					unset($fields['description']);
+					unset($fields['description'], $fields['image']);
 							
 					$index = 0;
 					foreach ( $fields as $name => $value ) {
