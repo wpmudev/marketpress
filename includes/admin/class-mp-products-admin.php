@@ -492,10 +492,6 @@ class MP_Products_Screen {
 				'action' => 'hide',
 			),
 		));
-		$metabox->add_field('checkbox', array(
-			'name' => '',
-			'label' => array('text' => __('Track Inventory?', 'mp')),
-		));
 		$metabox->add_field('text', array(
 			'name' => 'sku',
 			'label' => array('text' => __('SKU', 'mp')),
@@ -632,17 +628,17 @@ class MP_Products_Screen {
 			'id' => 'mp-product-variations-metabox',
 			'title' => __('Variations', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
-			'context' => 'normal',
-		));
-		$repeater = $metabox->add_field('repeater', array(
-			'name' => 'variations',
-			'layout' => 'rows',
-			'add_row_label' => __('Add Variation', 'mp'),
+			'context' => 'below_title',
 			'conditional' => array(
 				'name' => 'has_variations',
 				'value' => 1,
 				'action' => 'show',
 			),
+		));
+		$repeater = $metabox->add_field('repeater', array(
+			'name' => 'variations',
+			'layout' => 'rows',
+			'add_row_label' => __('Add Variation', 'mp'),
 		));
 		
 		if ( $repeater instanceof WPMUDEV_Field ) {
