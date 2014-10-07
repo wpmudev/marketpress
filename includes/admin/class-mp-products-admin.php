@@ -416,7 +416,6 @@ class MP_Products_Screen {
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'product_type',
-			'label' => array('text' => __('Product Type', 'mp')),
 			'default_value' => 'physical',
 			'options' => array(
 				'physical' => __('Physical/Tangible Product', 'mp'),
