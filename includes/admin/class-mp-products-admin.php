@@ -265,6 +265,7 @@ class MP_Products_Screen {
 	 * @access public
 	 */
 	public function init_metaboxes() {
+		$this->init_product_type_metabox();
 		$this->init_product_details_metabox();
 		$this->init_attributes_metabox();
 		$this->init_variations_metabox();		
@@ -401,15 +402,15 @@ class MP_Products_Screen {
 	}
 
 	/**
-	 * Initializes the product details metabox
+	 * Initializes the product type metabox
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_product_details_metabox() {
+	public function init_product_type_metabox() {
 		$metabox = new WPMUDEV_Metabox(array(
-			'id' => 'mp-product-details-metabox',
-			'title' => __('Product Details', 'mp'),
+			'id' => 'mp-product-type-metabox',
+			'title' => __('Product Type', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
 		));
@@ -423,19 +424,47 @@ class MP_Products_Screen {
 				'external' => __('External/Affiliate Link', 'mp'),
 			),
 		));
-		$metabox->add_field('text', array(
-				'name' => 'sku',
-				'label' => array('text' => __('SKU', 'mp')),
-			));
 		$metabox->add_field('checkbox', array(
-				'name' => 'track_inventory',
-				'label' => array('text' => __('Track Inventory?', 'mp')),
-				'conditional' => array(
-					'name' => 'product_type',
-					'value' => 'physical',
-					'action' => 'show',
-				),				
-			));
+			'name' => 'has_variations',
+			'message' => __('Does this product have variations such as color, size, etc?', 'mp'),
+		));
+	}
+	
+	/**
+	 * Initializes the product details metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_product_details_metabox() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-product-details-metabox',
+			'title' => __('Product Details', 'mp'),
+			'post_type' => MP_Product::get_post_type(),
+			'context' => 'normal',
+			'conditional' => array(
+				'name' => 'has_variations',
+				'value' => 1,
+				'action' => 'hide',
+			),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => '',
+			'label' => array('text' => __('Track Inventory?', 'mp')),
+		));
+		$metabox->add_field('text', array(
+			'name' => 'sku',
+			'label' => array('text' => __('SKU', 'mp')),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => 'track_inventory',
+			'label' => array('text' => __('Track Inventory?', 'mp')),
+			'conditional' => array(
+				'name' => 'product_type',
+				'value' => 'physical',
+				'action' => 'show',
+			),				
+		));
 		$metabox->add_field('text', array(
 			'name' => 'inventory',
 			'label' => array('text' => __('Inventory Count', 'mp')),
@@ -560,11 +589,6 @@ class MP_Products_Screen {
 			'title' => __('Variations', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
-			'desc' => __('Variations inherit all values from the main product with the exception of the "Name" and "SKU" fields which are necessary to differentiate the variation from the main product. You only need to enter values for fields that are different than the main product.', 'mp'),
-		));
-		$metabox->add_field('checkbox', array(
-			'name' => 'has_variations',
-			'message' => __('Does this product have variations such as color, size, etc?', 'mp'),
 		));
 		$repeater = $metabox->add_field('repeater', array(
 			'name' => 'variations',
@@ -748,6 +772,11 @@ class MP_Products_Screen {
 			'title' => __('Attributes', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
+			'conditional' => array(
+				'name' => 'has_variations',
+				'value' => 1,
+				'action' => 'hide',
+			),
 		));
 		
 		$mp_product_atts = MP_Product_Attributes::get_instance();
