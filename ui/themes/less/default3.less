@@ -18,10 +18,12 @@
 	transition: @s;
 }
 
-.clearfix:after {
-  clear: both;
-  content: "";
-  display: table;
+.clearfix {
+	&:after {
+	  clear: both;
+	  content: "";
+	  display: table;
+	}
 }
 
 #mp_product_list_refine {
@@ -39,7 +41,10 @@
 		margin: 0;
 		padding: 0;
 	}
-	
+}
+
+#mp_single_product,
+#mp_product_list {
 	a {
 		text-decoration: none;
 	}
@@ -145,5 +150,46 @@
 		.mp_one_tile {
 			display: table-cell;
 		}
+	}
+}
+
+#mp_single_product {
+	.mp_normal_price,
+	.mp_sale_price,
+	.mp_savings_amt,
+	.mp_buy_form {
+		margin: 0;
+		padding: 0;
+		text-align: left;
+	}
+	
+	.mp_product_content {
+		border-top: 2px solid #eaeaea;
+		margin-top: 30px;
+		padding-top: 30px;
+	}
+	
+	.mp_product_meta {
+		position: relative;
+	}
+	
+	.mp_buy_form {
+		position: absolute;
+			right: 0;
+			bottom: 0;
+		text-align: right;
+		
+		input {
+			margin-top: 0;
+		}
+	}
+	
+	.mp_savings_amt {
+		font-size: 1em;
+	}
+	
+	.mp_normal_price,
+	.mp_sale_price {
+		font-size: 1.4em;
 	}
 }

@@ -22,6 +22,41 @@
 	display: table;
 }
 
+#mp_single_product {
+	.alignleft {
+		margin: 0 30px 0 0;
+	}
+	
+	.mp_product_variant_images {
+		clear: both;
+	}
+	
+	.mp_variant_image_link {
+		border: 1px solid #eaeaea;
+		display: block;
+		float: left;
+		overflow: hidden;
+		margin-left: 10px;
+		padding: 2px;
+		
+		&:first-child {
+			margin-left: 0;
+		}
+		
+		&:hover,
+		&.selected {
+			border-color: #aaa;
+		}
+	}
+	
+	.mp_variant_alt_image,
+	.mp_variant_alt_content {
+		position: absolute;
+			top: 0;
+			left: 9999px;
+	}
+}
+
 #mp_product_list {
 	.mp_one_product {
 		position: relative;
