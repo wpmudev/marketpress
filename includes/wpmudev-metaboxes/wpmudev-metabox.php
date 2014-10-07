@@ -25,6 +25,8 @@ $GLOBALS['wpmudev_metaboxes_printed_field_scripts'] = array();
 
 // Save the state of a given metabox
 add_action('wp_ajax_wpmudev_metabox_save_state', array('WPMUDEV_Metabox', 'ajax_save_state'));
+// Add metaboxes below title
+add_action('edit_form_after_title', array('WPMUDEV_Metabox', 'add_metaboxes_below_title'));
 
 class WPMUDEV_Metabox {
 	/**
@@ -281,7 +283,6 @@ class WPMUDEV_Metabox {
 		add_action('admin_notices', array(&$this, 'admin_notices'));
 		add_action('network_admin_notices', array(&$this, 'admin_notices'));
 		add_action('init', array(&$this, 'maybe_save_settings_fields'), 99);
-		add_action('edit_form_after_title', array(&$this, 'add_metaboxes_below_title'));
 	}
 	
 	/**
@@ -292,7 +293,7 @@ class WPMUDEV_Metabox {
 	 * @action edit_form_after_title
 	 * @uses $post, $wp_meta_boxes;
 	 */
-	public function add_metaboxes_below_title() {
+	public static function add_metaboxes_below_title() {
 		global $post, $wp_meta_boxes;
 		do_meta_boxes(get_current_screen(), 'below_title', $post);
 		unset($wp_meta_boxes[get_post_type($post)]['below_title']);
