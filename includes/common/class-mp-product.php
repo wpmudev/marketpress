@@ -142,7 +142,7 @@ class MP_Product {
 				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
 				
 				if ( $this->has_variations() ) {
-					$variation_select = '<select class="mp_product_variations" name="variation">';
+					$variation_select = '<select class="mp_product_variations mp_select2" name="variation">';
 					$variations = $this->get_variations();
 					$variation_opts = array();
 					
@@ -159,10 +159,10 @@ class MP_Product {
 							'post' => $variation,
 							'price' => $price,
 						);
-						$variation_select .= '<option value="' . $variation->ID . '"' . (( $variation->in_stock() ) ? '' : ' disabled="disabled"') . '">' . esc_attr($variation->get_meta('name')) . ' - ' . $price . '</option>';
+						$variation_select .= '<option value="' . $variation->ID . '"' . (( $variation->in_stock() ) ? '' : ' disabled="disabled"') . '>' . esc_attr($variation->get_meta('name')) . ' - ' . $price . '</option>';
 					}
 					
-					$variation_select .= '</select>';
+					$variation_select .= '</select><br /><br />';
 				}
 				
 				if ( $context == 'list' ) {
@@ -194,9 +194,9 @@ class MP_Product {
 					}
 
 					if ( mp_get_setting('product_button_type') == 'addcart') {
-						$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart &raquo;', 'mp') . '" />';
+						$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
 					} else if (mp_get_setting('product_button_type') == 'buynow') {
-						$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now &raquo;', 'mp') . '" />';
+						$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
 					}
 				}
 			}
@@ -422,7 +422,7 @@ class MP_Product {
 		$post = $this->_post;
 
 		$post_thumbnail_id = get_post_thumbnail_id($post_id);
-		$class = $title = $link = '';
+		$class = $title = $link = $img_align = '';
 		$img_classes = array('mp_product_image_' . $context, 'photo');
 		
 		if ( ! is_null($align) ) {
@@ -448,8 +448,8 @@ class MP_Product {
 	
 				$link = get_permalink($post_id);
 				$title = esc_attr($post->post_title);
-				$class = ' class="mp_img_link"';
-				$img_classes[] = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
+				$link_class = ' class="mp_img_link"';
+				$img_align = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
 			break;
 			
 			case 'floating-cart' :
@@ -463,46 +463,66 @@ class MP_Product {
 			break;
 			
 			case 'single' :
-				//size
+				// size
 				if ( mp_get_setting('product_img_size') == 'custom' ) {
 					$size = array(mp_get_setting('product_img_size_custom->width'), mp_get_setting('product_img_size_custom->height'));
 				} else {
 					$size = mp_get_setting('product_img_size');
 				}
 
-				//link
-				$temp = wp_get_attachment_image_src($post_thumbnail_id, 'large');
-				$link = $temp[0];
-
 				if ( mp_get_setting('disable_large_image') ) {
 					$link = '';
 					$title = esc_attr($post->post_title);
 				} else {
+					$temp = wp_get_attachment_image_src($post_thumbnail_id, 'large');
+					$link = $temp[0];
 					$title = __('View Larger Image &raquo;', 'mp');
 				}
 
-				$class = ' class="mp_product_image_link mp_lightbox"';
-				$img_classes[] = is_null($align) ? mp_get_setting('image_alignment_single') : $align;
+				$link_class = ' class="mp_product_image_link mp_lightbox"';
+				$img_align = is_null($align) ? mp_get_setting('image_alignment_single') : $align;
 				
-				//in case another plugin is loadin glightbox
+				// Get variant images
+				if ( $this->has_variations() ) {
+					$variant_images = array();
+					$variations = $this->get_variations();
+					$variant_images[] = '
+						<a class="mp_variant_image_link selected" href="' . $this->image_url(false) . '">
+							<img width="40" height="40" src="' . $this->image_url(false, 40) . '" alt="" />
+							<span class="mp_variant_alt_image"><img src="' . $this->image_url(false, $size) . '" alt="" /></span>
+							<div class="mp_variant_alt_content">' . apply_filters('the_content', $this->post_content) . '</div>
+						</a>';
+					
+					foreach ( $variations as $variation ) {
+						$variant_images[] = '
+							<a class="mp_variant_image_link" href="' . $variation->image_url(false) . '">
+								<img width="40" height="40" src="' . $variation->image_url(false, 40) . '" alt="" />
+								<span class="mp_variant_alt_image"><img src="' . $variation->image_url(false, $size) . '" alt="" /></span>
+								<div class="mp_variant_alt_content">' . (( strlen($variation->post_content) > 0 ) ? apply_filters('the_content', $variation->post_content) : apply_filters('the_content', $this->post_content)) . '</div>
+							</a>';
+					}
+				}
+				
+				// in case another plugin is loadin glightbox
 				if ( mp_get_setting('show_lightbox') ) {
-					$class .= ' rel="lightbox"';
+					$link_class .= ' rel="lightbox"';
 					wp_enqueue_script('mp-lightbox');
 				}
 			break;
 			
 			case 'widget' :
 				//size
-				if (intval($size))
-						$size = array(intval($size), intval($size));
-				else
-						$size = array(50, 50);
+				if ( $size = intval($size) ) {
+				 $size = array($size, $size);
+				} else {
+					$size = array(50, 50);
+				}
 
 				//link
 				$link = get_permalink($post_id);
-
+				$link_class = ' class="mp_img_link"';
+				
 				$title = esc_attr($post->post_title);
-				$class = ' class="mp_img_link"';
 			break;
 		}
 
@@ -511,17 +531,13 @@ class MP_Product {
 		if ( empty($image) ) {
 			if ( $context == 'floating-cart' ) {
 				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />';
-			} elseif ( $context != 'single' ) {
+			} else {
 				if ( ! is_array($size) ) {
 					$size = array(get_option($size . '_size_w'), get_option($size . '_size_h'));
 				}
 				
 				$img_classes[] = 'wp-post-image';
-				$image = '
-					<div itemscope class="hmedia">
-						<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
-						<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />
-					</div>';
+				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />';
 			}
 		}
 		
@@ -530,23 +546,58 @@ class MP_Product {
 			$image = str_replace('http://', 'https://', $image);
 		}
 
-		//add the link
+		$snippet = '
+			<div itemscope class="hmedia' . ( empty($img_align) ? '' : " $img_align") . '">
+				<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>';
+				
 		if ( $link ) {
-			$image = '
-				<div itemscope class="hmedia">
-					<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>
-					<a rel="lightbox enclosure" id="product_image-' . $post_id . '"' . $class . ' href="' . $link . '">' . $image . '</a>
-				</div>';
+			$snippet .= '<a rel="lightbox enclosure" id="product_image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
+		} else {
+			$snippet .= $image;
+		}
+		
+		if ( ! empty($variant_images) ) {
+			$snippet .= apply_filters('mp_product_variant_images', '<div class="mp_product_variant_images clearfix">' . implode('', $variant_images) . '</div>', $variations, $post_id);
 		}
 
-		$image = apply_filters('mp_product_image', $image, $context, $post_id, $size);
+		$snippet .= '
+			</div>';
+		
+		$snippet = apply_filters('mp_product_image', $snippet, $context, $post_id, $size);
 
 		if ( $echo ) {
-			echo $image;
+			echo $snippet;
 		} else {
-			return $image;	
+			return $snippet;	
 		}	
-	}	
+	}
+	
+	/**
+	 * Get the product image url
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function image_url( $echo = true, $size = 'large' ) {
+		if ( $thesize = intval($size) ) {
+			$size = array($thesize, $thesize);
+		}
+		
+		if ( $this->is_variation() && ($img_id = $this->get_meta('image')) ) {
+				$img_src = array_shift(wp_get_attachment_image_src($img_id, $size));
+		} else {
+			if ( has_post_thumbnail($this->ID) ) {
+				$img_id = get_post_thumbnail_id($this->ID);
+				$img_src = array_shift(wp_get_attachment_image_src($img_id, $size));
+			}
+		}
+		
+		if ( empty($img_src) ) {
+			$img_src = mp_plugin_url('ui/images/default-product.png');
+		}
+		
+		return $img_src;
+	}
 	
 	/**
 	 * Check if product is in stock
