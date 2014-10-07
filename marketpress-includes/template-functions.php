@@ -366,7 +366,7 @@ function mp_pinit_button( $product_id = NULL, $context = 'single_view', $echo = 
 	$count_pos = ( $pos = $mp->get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
 
 	$snippet = apply_filters('mp_pinit_button_link', '
-		<a href="//www.pinterest.com/pin/create/button/?url='.$url . $media .'&description='.$desc.'" data-pin-do="buttonPin" data-pin-config="'. $count_pos.'"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $product_id, $context);
+		<a href="//www.pinterest.com/pin/create/button/?url='.$url . $media .'&description='.$desc.'" data-pin-do="buttonPin" data-pin-config="'. $count_pos.'" target="_blank"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $product_id, $context);
 
 	if($echo) {
 		echo $snippet;
