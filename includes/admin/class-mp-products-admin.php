@@ -311,7 +311,11 @@ class MP_Products_Screen {
 			$meta = array();
 			
 			foreach ( $field->subfields as $subfield ) {
-				$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
+				if ( $subfield->args['original_name'] == 'description' ) {
+					$meta[$subfield->args['original_name']] = $subfield->format_value($variation->post_content, $variation->ID);
+				} else {
+					$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
+				}
 			}
 			
 			$data[] = array_merge(array('ID' => $variation->ID), $meta);
