@@ -34,7 +34,7 @@ class MP_Products_Screen {
 		// Remove add-new submenu item from store admin menu
 		add_action('admin_menu', array(&$this, 'remove_menu_items'), 999);
 		// Hide featured image for variable products
-		add_action('wpmudev_field/print_scripts/has_variations', array(&$this, 'maybe_hide_featured_image_metabox'));
+		add_action('wpmudev_field/print_scripts/has_variations', array(&$this, 'maybe_hide_core_metaboxes'));
 		// Product variations save/get value
 		add_filter('wpmudev_field/save_value/variations', array(&$this, 'save_product_variations'), 10, 3);
 		add_filter('wpmudev_field/before_get_value/variations', array(&$this, 'get_product_variations'), 10, 4);
@@ -59,21 +59,21 @@ class MP_Products_Screen {
 	}
 	
 	/**
-	 * Maybe hide the featured image metabox
+	 * Maybe hide some core metaboxes
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @action wpmudev_field/print_scripts/has_variations
 	 */
-	public function maybe_hide_featured_image_metabox( $field ) {
+	public function maybe_hide_core_metaboxes( $field ) {
 		?>
 		<script type="text/javascript">
 		jQuery(document).ready(function($){
 			$('[name="has_variations"]').change(function(){
 				if ( $(this).prop('checked') ) {
-					$('#postimagediv').fadeOut(300);
+					$('#postimagediv, #postdivrich, #postexcerpt').fadeOut(300);
 				} else {
-					$('#postimagediv').fadeIn(300);
+					$('#postimagediv, #postdivrich, #postexcerpt').fadeIn(300);
 				}
 			}).trigger('change');
 		});
