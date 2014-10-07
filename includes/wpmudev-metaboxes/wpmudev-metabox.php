@@ -628,8 +628,16 @@ class WPMUDEV_Metabox {
 		<?php
 		foreach ( $this->fields as $field ) : ?>
 								<div class="wpmudev-field <?php echo str_replace('_', '-', strtolower(get_class($field))); ?>">
+		<?php
+			if ( ! empty($field->args['label']['text']) ) : ?>
 									<div class="wpmudev-field-label"><?php echo $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : ''); ?></div>
+		<?php
+			endif;
+			
+			if ( ! empty($field->args['desc']) ) : ?>
 									<div class="wpmudev-field-desc"><?php echo $field->args['desc']; ?></div>
+		<?php
+			endif; ?>									
 									<?php $field->display($post); ?>
 								</div>
 		<?php
