@@ -292,7 +292,6 @@ class MP_Products_Screen {
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
 		$this->init_product_details_metabox();
-		$this->init_attributes_metabox();
 		$this->init_variations_metabox();		
 	}
 		
@@ -492,6 +491,35 @@ class MP_Products_Screen {
 				'action' => 'hide',
 			),
 		));
+		
+		$metabox->add_field('tab_labels', array(
+			'tabs' => array(
+				array(
+					'label' => __('General', 'mp'),
+					'slug' => 'general',
+					'active' => true,
+				),
+				array(
+					'label' => __('Price', 'mp'),
+					'slug' => 'price',
+				),
+				array(
+					'label' => __('Taxes', 'mp'),
+					'slug' => 'taxes',
+				),
+				array(
+					'label' => __('Shipping', 'mp'),
+					'slug' => 'shipping',
+				),
+				array(
+					'label' => __('Attributes', 'mp'),
+					'slug' => 'attributes',
+				),
+			),
+		));
+		
+		// General Tab
+		$metabox->add_field('tab', array('slug' => 'general'));
 		$metabox->add_field('text', array(
 			'name' => 'sku',
 			'label' => array('text' => __('SKU', 'mp')),
@@ -522,6 +550,27 @@ class MP_Products_Screen {
 				),
 			),
 		));
+		$metabox->add_field('file', array(
+			'name' => 'file_url',
+			'label' => array('text' => __('File URL', 'mp')),
+			'conditional' => array(
+				'name' => 'product_type',
+				'value' => 'digital',
+				'action' => 'show',
+			),	
+		));
+		$metabox->add_field('text', array(
+			'name' => 'external_url',
+			'label' => array('text' => __('External URL', 'mp')),
+			'conditional' => array(
+				'name' => 'product_type',
+				'value' => 'external',
+				'action' => 'show',
+			),	
+		));
+		
+		// Price Tab
+		$metabox->add_field('tab', array('slug' => 'price'));
 		$metabox->add_field('text', array(
 			'name' => 'regular_price',
 			'label' => array('text' => __('Regular Price', 'mp')),
@@ -556,6 +605,22 @@ class MP_Products_Screen {
 			));
 		}
 		
+		
+		// Tax Tab
+		$metabox->add_field('tab', array('slug' => 'taxes'));
+		$metabox->add_field('text', array(
+			'name' => 'special_tax_rate',
+			'label' => array('text' => __('Special Tax Rate', 'mp')),
+			'default_value' => '0.00',
+			'conditional' => array(
+				'name' => 'product_type',
+				'value' => array('physical', 'digital'),
+				'action' => 'show',
+			),	
+		));			
+		
+		// Shipping Tab
+		$metabox->add_field('tab', array('slug' => 'shipping'));
 		$weight = $metabox->add_field('complex', array(
 			'name' => 'weight',
 			'label' => array('text' => __('Weight', 'mp')),
@@ -587,34 +652,31 @@ class MP_Products_Screen {
 				'action' => 'show',
 			),	
 		));
-		$metabox->add_field('text', array(
-			'name' => 'special_tax_rate',
-			'label' => array('text' => __('Special Tax Rate', 'mp')),
-			'default_value' => '0.00',
-			'conditional' => array(
-				'name' => 'product_type',
-				'value' => array('physical', 'digital'),
-				'action' => 'show',
-			),	
-		));			
-		$metabox->add_field('file', array(
-			'name' => 'file_url',
-			'label' => array('text' => __('File URL', 'mp')),
-			'conditional' => array(
-				'name' => 'product_type',
-				'value' => 'digital',
-				'action' => 'show',
-			),	
-		));
-		$metabox->add_field('text', array(
-			'name' => 'external_url',
-			'label' => array('text' => __('External URL', 'mp')),
-			'conditional' => array(
-				'name' => 'product_type',
-				'value' => 'external',
-				'action' => 'show',
-			),	
-		));
+		
+		// Attributes Tab
+		$metabox->add_field('tab', array('slug' => 'attributes'));
+		$mp_product_atts = MP_Product_Attributes::get_instance();
+		$atts = $mp_product_atts->get();
+		foreach ( $atts as $att ) {
+			$slug = $mp_product_atts->generate_slug($att->attribute_id);
+			$terms = get_terms($slug, 'hide_empty=0');
+			$options = array();
+			
+			foreach ( $terms as $term ) {
+				$options[$term->term_id] = $term->name;
+			}
+			
+			$metabox->add_field('advanced_select', array(
+				'name' => $slug,
+				'label' => array('text' => $att->attribute_name),
+				'options' => $options,
+				'conditional' => array(
+					'name' => 'product_type',
+					'value' => array('physical', 'digital'),
+					'action' => 'show',
+				),	
+			));
+		}			
 	}
 		
 	/**
@@ -642,6 +704,34 @@ class MP_Products_Screen {
 		));
 		
 		if ( $repeater instanceof WPMUDEV_Field ) {
+			$repeater->add_sub_field('tab_labels', array(
+				'tabs' => array(
+					array(
+						'label' => __('General', 'mp'),
+						'slug' => 'general',
+						'active' => true,
+					),
+					array(
+						'label' => __('Price', 'mp'),
+						'slug' => 'price',
+					),
+					array(
+						'label' => __('Taxes', 'mp'),
+						'slug' => 'taxes',
+					),
+					array(
+						'label' => __('Shipping', 'mp'),
+						'slug' => 'shipping',
+					),
+					array(
+						'label' => __('Attributes', 'mp'),
+						'slug' => 'attributes',
+					),
+				),
+			));
+			
+			// General Tab
+			$repeater->add_sub_field('tab', array('slug' => 'general'));
 			$repeater->add_sub_field('text', array(
 				'name' => 'name',
 				'label' => array('text' => __('Name', 'mp')),
@@ -680,6 +770,32 @@ class MP_Products_Screen {
 					),
 				),
 			));
+			$repeater->add_sub_field('file', array(
+				'name' => 'file_url',
+				'label' => array('text' => __('File URL', 'mp')),
+				'conditional' => array(
+					'name' => 'product_type',
+					'value' => 'digital',
+					'action' => 'show',
+				),	
+			));
+			$repeater->add_sub_field('wysiwyg', array(
+				'name' => 'description',
+				'label' => array('text' => __('Description', 'mp')),
+				'desc' => __('If you would like the description to be different than the main product enter it here.', 'mp'),
+			));
+			$repeater->add_sub_field('text', array(
+				'name' => 'external_url',
+				'label' => array('text' => __('External URL', 'mp')),
+				'conditional' => array(
+					'name' => 'product_type',
+					'value' => 'external',
+					'action' => 'show',
+				),	
+			));
+			
+			// Price Tab
+			$repeater->add_sub_field('tab', array('slug' => 'price'));
 			$repeater->add_sub_field('text', array(
 				'name' => 'regular_price',
 				'label' => array('text' => __('Regular Price', 'mp')),
@@ -710,6 +826,9 @@ class MP_Products_Screen {
 				'name' => 'end_date',
 				'label' => array('text' => __('End Date (if applicable)', 'mp')),
 			));
+			
+			// Shipping Tab
+			$repeater->add_sub_field('tab', array('slug' => 'shipping'));
 			$weight = $repeater->add_sub_field('complex', array(
 				'name' => 'weight',
 				'label' => array('text' => __('Weight', 'mp')),
@@ -737,6 +856,9 @@ class MP_Products_Screen {
 					'action' => 'show',
 				),	
 			));
+			
+			// Taxes Tab
+			$repeater->add_sub_field('tab', array('slug' => 'taxes'));
 			$repeater->add_sub_field('text', array(
 				'name' => 'special_tax_rate',
 				'label' => array('text' => __('Special Tax Rate', 'mp')),
@@ -746,35 +868,10 @@ class MP_Products_Screen {
 					'value' => array('physical', 'digital'),
 					'action' => 'show',
 				),	
-			));			
-			$repeater->add_sub_field('file', array(
-				'name' => 'file_url',
-				'label' => array('text' => __('File URL', 'mp')),
-				'conditional' => array(
-					'name' => 'product_type',
-					'value' => 'digital',
-					'action' => 'show',
-				),	
-			));
-			$repeater->add_sub_field('wysiwyg', array(
-				'name' => 'description',
-				'label' => array('text' => __('Description', 'mp')),
-				'desc' => __('If you would like the description to be different than the main product enter it here.', 'mp'),
-			));
-			$repeater->add_sub_field('text', array(
-				'name' => 'external_url',
-				'label' => array('text' => __('External URL', 'mp')),
-				'conditional' => array(
-					'name' => 'product_type',
-					'value' => 'external',
-					'action' => 'show',
-				),	
-			));
-			$repeater->add_sub_field('section', array(
-				'title' => __('Variation Attributes', 'mp'),
-				'desc' => __('Choose the attribute(s) that make this variation unique.', 'mp'),
 			));
 			
+			// Attributes Tab
+			$repeater->add_sub_field('tab', array('slug' => 'attributes'));
 			$mp_product_atts = MP_Product_Attributes::get_instance();
 			$atts = $mp_product_atts->get();
 			foreach ( $atts as $att ) {
@@ -798,50 +895,7 @@ class MP_Products_Screen {
 				));
 			}
 		}
-	}
-	
-	/**
-	 * Initializes the product attributes metabox
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function init_attributes_metabox() {
-		$metabox = new WPMUDEV_Metabox(array(
-			'id' => 'mp-product-attributes-metabox',
-			'title' => __('Attributes', 'mp'),
-			'post_type' => MP_Product::get_post_type(),
-			'context' => 'normal',
-			'conditional' => array(
-				'name' => 'has_variations',
-				'value' => 1,
-				'action' => 'hide',
-			),
-		));
-		
-		$mp_product_atts = MP_Product_Attributes::get_instance();
-		$atts = $mp_product_atts->get();
-		foreach ( $atts as $att ) {
-			$slug = $mp_product_atts->generate_slug($att->attribute_id);
-			$terms = get_terms($slug, 'hide_empty=0');
-			$options = array();
-			
-			foreach ( $terms as $term ) {
-				$options[$term->term_id] = $term->name;
-			}
-			
-			$metabox->add_field('advanced_select', array(
-				'name' => $slug,
-				'label' => array('text' => $att->attribute_name),
-				'options' => $options,
-				'conditional' => array(
-					'name' => 'product_type',
-					'value' => array('physical', 'digital'),
-					'action' => 'show',
-				),	
-			));
-		}	
-	}
+	}	
 }
 
 MP_Products_Screen::get_instance();
