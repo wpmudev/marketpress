@@ -628,7 +628,7 @@ class MP_Products_Screen {
 			'id' => 'mp-product-variations-metabox',
 			'title' => __('Variations', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
-			'context' => 'below_title',
+			'context' => 'normal',
 			'conditional' => array(
 				'name' => 'has_variations',
 				'value' => 1,
