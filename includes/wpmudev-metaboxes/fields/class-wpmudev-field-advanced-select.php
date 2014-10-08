@@ -86,7 +86,6 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 					"initSelection" : function(element, callback){
 						var data = [];
 						
-						console.log(element.val());
 						$(element.val().split(',')).each(function(){
 							data.push({ "id" : this, "text" : getOptionText(options, this) });
 						});
