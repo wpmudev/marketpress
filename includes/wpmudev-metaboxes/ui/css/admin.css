@@ -418,3 +418,6 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-subfield textarea {
   margin: 0;
 }
+#below_title-sortables {
+  margin-top: 20px;
+}
