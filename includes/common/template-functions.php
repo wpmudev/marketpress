@@ -24,7 +24,13 @@ if ( ! function_exists('_mp_products_html_grid')) :
 		
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 			$product = new MP_Product();
+			
+			if ( $product->has_variations() ) {
+				$product = $product->get_variation();
+			}
+			
 			$img = $product->image(false, 'list');
+			
 			$excerpt = mp_get_setting('show_excerpt') ? '<p class="mp_excerpt">' . $product->excerpt($product->post_excerpt, $product->post_content, '') . '</p>' : '';
 			$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $product->ID);
 	
@@ -152,7 +158,7 @@ if ( ! function_exists('mp_checkout_step_url') ) :
 	 * @param string $checkoutstep. Possible values: checkout-edit, shipping, checkout, confirm-checkout, confirmation
 	 */
 	function mp_checkout_step_url( $checkout_step ) {
-		return apply_filters('mp_checkout_step_url', mp_cart_link(false, true) . trailingslashit($checkout_step), $checkout_step);
+		return ( is_admin() ) ? '' : apply_filters('mp_checkout_step_url', mp_cart_link(false, true) . trailingslashit($checkout_step), $checkout_step);
 	}
 endif;
 

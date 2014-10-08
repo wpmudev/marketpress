@@ -827,12 +827,27 @@ class WPMUDEV_Metabox {
 	 * @return bool
 	 */
 	public function is_settings_metabox() {
-		if ( ! is_null($this->is_settings_metabox) ) {
-			return $this->is_settings_metabox;
+		$is_settings_metabox = false;
+		if ( ! empty($this->args['page_slugs']) ) {
+			$is_settings_metabox = true;
+		}
+
+		return $is_settings_metabox;
+	}
+	
+	/**
+	 * Check if the metabox is an active settings metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function is_active_settings_metabox() {
+		if ( ! $this->is_settings_metabox() ) {
+			return false;
 		}
 		
-		$this->is_settings_metabox = false;
-		
+		$is_active = false;
 		if ( ! empty($_REQUEST['page']) && ! empty($this->args['page_slugs']) ) {
 			$page = $_REQUEST['page'];
 			
@@ -841,7 +856,7 @@ class WPMUDEV_Metabox {
 			}
 		}
 
-		return $this->is_settings_metabox;
+		return $is_active;		
 	}
 	
 	/**
@@ -849,35 +864,48 @@ class WPMUDEV_Metabox {
 	 *
 	 * @since 1.0
 	 * @access public
-	 * @uses $pagenow
+	 * @uses $pagenow, $post
 	 * @return bool
 	 */
 	public function is_active( $log = false ) {
-		global $pagenow;
+		global $pagenow, $post;
+		
+		if ( ! is_null($this->is_active) ) {
+			return $this->is_active;
+		}
 		
 		$this->is_active = false;
+		if ( $this->is_settings_metabox() ) {
+			if ( $this->is_active_settings_metabox() ) {
+				$this->is_active = true;
+				$this->is_settings_metabox = true;
+			}
+		} else {
+			$post_id = $post_type = false;
+			if ( is_null($post) && ! empty($_REQUEST['post']) ) {
+				$post_id = $_REQUEST['post'];
+				$post = get_post($post_id);
+				setup_postdata($post);
+			}
+			
+			if ( $post instanceof WP_Post ) {
+				$post_id = $post->ID;
+				$post_type = $post->post_type;
+			}
+			
+			if ( empty($pagenow) ) {
+				$pagenow = basename($_SERVER['PHP_SELF']);
+			}
+
+			if ( empty($post_type) && ! empty($_REQUEST['post_type']) ) {
+				$post_type = $_REQUEST['post_type'];
+			}
 		
-		if ( empty($pagenow) ) {
-			$pagenow = basename($_SERVER['PHP_SELF']);
-		}
-		
-		$post_type = false;
-		if ( ! empty($_REQUEST['post_type']) ) {
-			$post_type = $_REQUEST['post_type'];
-		}
-		
-		$post_id = false;
-		if ( ! empty($_REQUEST['post']) ) {
-			$post_id = $_REQUEST['post'];
-		}
-		
-		if ( $post_type && $this->args['post_type'] == $post_type && ($pagenow == 'post-new.php' || $pagenow == 'post.php') ) {
-			$this->is_active = true;
-		} elseif ( $post_id && $pagenow == 'post.php' && get_post_type($post_id) == $this->args['post_type'] ) {
-			$this->is_active = true;
-		} elseif ( $this->is_settings_metabox() ) {
-			$this->is_active = true;
-			$this->is_settings_metabox = true;
+			if ( $post_type && $this->args['post_type'] == $post_type && ($pagenow == 'post-new.php' || $pagenow == 'post.php') ) {
+				$this->is_active = true;
+			} elseif ( $post_id && $pagenow == 'post.php' && $post_type == $this->args['post_type'] ) {
+				$this->is_active = true;
+			}
 		}
 		
 		if ( $this->is_active ) {

@@ -33,7 +33,10 @@ class MP_Store_Settings_Presentation {
 	private function __construct() {
 		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
 		add_action('wpmudev_field/print_scripts', array(&$this, 'create_store_page_js'));
-		add_action('init', array(&$this, 'init_metaboxes'));
+		
+		if ( mp_get_get_value('page') == 'store-settings-presentation' ) {
+			add_action('init', array(&$this, 'init_metaboxes'));
+		}
 	}
 	
 	/**

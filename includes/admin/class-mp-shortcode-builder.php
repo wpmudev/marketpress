@@ -20,6 +20,24 @@ class MP_Shortcode_Builder {
 	private static $_instance = null;
 	
 	/**
+	 * Refers to the product categories
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var array
+	 */
+	protected $_product_cats = array();
+
+	/**
+	 * Refers to the product tags
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var array
+	 */
+	protected $_product_tags = array();
+	
+	/**
 	 * Gets the single instance of the class.
 	 *
 	 * @since 3.0
@@ -107,6 +125,9 @@ class MP_Shortcode_Builder {
 	 * @access private
 	 */
 	private function __construct() {
+		$this->_product_cats = get_terms('product_category', 'hide_empty=0');
+		$this->_product_tags = get_terms('product_tag', 'hide_empty=0');
+		
 		add_action('media_buttons', array(&$this, 'media_buttons'));
 		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
 		add_action('in_admin_footer', array(&$this, 'display_short_code_form'));
@@ -132,6 +153,11 @@ class MP_Shortcode_Builder {
 	 * @access public
 	 */
 	public function display_short_code_form() {
+		if ( did_action('media_buttons') == 0 ) {
+			// Only continue if a tinymce editor exists on the current page
+			return;
+		}
+		
 		$shortcodes = array(
 			'mp_tag_cloud' 							=> __('Display a cloud or list of your product tags.', 'mp'),
 			'mp_list_categories' 				=> __('Display an HTML list of your product categories.', 'mp'),
@@ -287,12 +313,7 @@ class MP_Shortcode_Builder {
 				<td>
 					<select name="exclude" class="chosen-select" data-placeholder="<?php _e('Select Categories', 'mp'); ?>" multiple>
 						<?php
-						$cats = get_categories(array(
-							'hide_empty' => 0,
-							'taxonomy' => 'product_category'
-						));
-						
-						foreach ( $cats as $cat ) : ?>
+						foreach ( $this->_product_cats as $cat ) : ?>
 						<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
 						<?php
 						endforeach; ?>
@@ -304,12 +325,7 @@ class MP_Shortcode_Builder {
 				<td>
 					<select name="include" class="chosen-select" data-placeholder="<?php _e('Select Categories', 'mp'); ?>" multiple>
 						<?php
-						$cats = get_categories(array(
-							'hide_empty' => 0,
-							'taxonomy' => 'product_category'
-						));
-						
-						foreach ( $cats as $cat ) : ?>
+						foreach ( $this->_product_cats as $cat ) : ?>
 						<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
 						<?php
 						endforeach; ?>
@@ -321,12 +337,7 @@ class MP_Shortcode_Builder {
 				<td>
 					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e('Select Categories', 'mp'); ?>" multiple>
 						<?php
-						$cats = get_categories(array(
-							'hide_empty' => 0,
-							'taxonomy' => 'product_category'
-						));
-						
-						foreach ( $cats as $cat ) : ?>
+						foreach ( $this->_product_cats as $cat ) : ?>
 						<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
 						<?php
 						endforeach; ?>
@@ -747,8 +758,7 @@ class MP_Shortcode_Builder {
 					<select name="category" data-default="" class="chosen-select">
 						<option value=""><?php _e('None', 'mp'); ?></option>
 						<?php
-						$terms = get_terms('product_category', 'hide_empty=0');
-						foreach ( $terms as $term ) : ?>
+						foreach ( $this->_product_cats as $term ) : ?>
 						<option value="<?php echo $term->slug; ?>"><?php echo $term->name; ?></option>
 						<?php
 						endforeach; ?>
@@ -761,8 +771,7 @@ class MP_Shortcode_Builder {
 					<select name="tag" data-default="" class="chosen-select">
 						<option value=""><?php _e('None', 'mp'); ?></option>
 						<?php
-						$terms = get_terms('product_tag', 'hide_empty=0');
-						foreach ( $terms as $term ) : ?>
+						foreach ( $this->_product_tags as $term ) : ?>
 						<option value="<?php echo $term->slug; ?>"><?php echo $term->name; ?></option>
 						<?php
 						endforeach; ?>

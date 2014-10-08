@@ -43,11 +43,13 @@ class MP_Admin_Multisite {
 	private function __construct() {
 		$this->maybe_update();
 		
-		add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
-		add_action('init', array(&$this, 'init_metaboxes'));
-		add_action('network_admin_menu', array(&$this, 'add_menu_items'));
-		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
-		add_action('wpmudev_field/print_scripts/network_store_page', array(&$this, 'print_network_store_page_scripts'));
+		if ( is_network_admin() ) {
+			add_filter('wpmudev_field/after_field', array(&$this, 'display_create_page_button'), 10, 2);
+			add_action('init', array(&$this, 'init_metaboxes'));
+			add_action('network_admin_menu', array(&$this, 'add_menu_items'));
+			add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
+			add_action('wpmudev_field/print_scripts/network_store_page', array(&$this, 'print_network_store_page_scripts'));
+		}
 	}
 	
 	/**

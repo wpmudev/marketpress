@@ -11,6 +11,15 @@ class MP_Product_Attributes {
 	private static $_instance = null;
 	
 	/**
+	 * Refers to the current product attributes
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_atts = null;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -35,11 +44,16 @@ class MP_Product_Attributes {
 	public function get( $where = '' ) {
 		global $wpdb;
 		
+		if ( ! is_null($this->_atts) ) {
+			return $this->_atts;
+		}
+		
 		if ( ! empty($where) ) {
 			$where = " WHERE $where";
 		}
 		
-		return $wpdb->get_results('SELECT * FROM ' . $this->get_table_name() . $where);
+		$this->_atts = $wpdb->get_results('SELECT * FROM ' . $this->get_table_name() . $where);
+		return $this->_atts;
 	}
 	
 	/**

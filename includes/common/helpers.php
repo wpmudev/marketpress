@@ -402,6 +402,23 @@ if ( ! function_exists('array_replace_recursive') ) :
   }
 endif;
 
+if ( ! function_exists('debug_to_console') ) :
+	/**
+	 * Send a log to the browser console
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function debug_to_console( $data ) {
+		if ( is_array($data) || is_object($data) )
+		{
+			echo "<script>if ( typeof(window.console) !== 'undefined' ) console.log('PHP: " . json_encode($data) . "');</script>";
+		} else {
+			echo "<script>if ( typeof(window.console) !== 'undefined' ) console.log('PHP: " . $data . "');</script>";
+		}
+	}
+endif;
+
 if ( ! function_exists('mp_arr_get_value') ) :
 	/**
 	 * Safely retrieve a value from an array
@@ -531,7 +548,11 @@ if ( ! function_exists('mp_get_network_setting') ) :
 	 * @return mixed
 	 */
 	function mp_get_network_setting( $key, $default = null ) {
-		$settings = get_site_option('mp_network_settings', $default, false);
+		$settings = wp_cache_get('network_settings', 'marketpress');
+		if ( ! $settings ) {
+			$settings = get_site_option('mp_network_settings', $default, false);
+			wp_cache_set('network_settings', $settings, 'marketpress');
+		}
 		
 		$keys = explode('->', $key);
 		$keys = array_map('trim', $keys);
