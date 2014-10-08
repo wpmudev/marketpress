@@ -297,6 +297,44 @@ label.error {
 		}
 		
 		/**
+		 * Tab Labels Field
+		 */
+		.wpmudev-field-tab-labels {}
+		
+		.wpmudev-field-tab-labels-holder {
+			background: #eaeaea;
+			border-radius: 5px 5px 0 0;
+			display: table;
+			margin: 0;
+			padding-top: 3px;
+			width: 100%;
+		}
+		
+		.wpmudev-field-tab-label {
+			display: table-cell;
+			margin: 0;
+			padding: 0 3px;
+			text-align: center;
+			
+			&.active {
+				.wpmudev-field-tab-label-link {
+					background: #fff;
+					border-radius: 4px 4px 0 0;
+					color: #000;
+				}
+			}
+		}
+		
+		.wpmudev-field-tab-label-link {
+			display: block;
+			font-size: 12px;
+			font-weight: 700;
+			padding: 7px 12px;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+		
+		/**
 		 * Image Field
 		 */
 		.wpmudev-image-field-preview {
