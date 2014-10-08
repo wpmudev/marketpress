@@ -274,7 +274,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 						<div class="wpmudev-subfield-group-fields">
 						<?php
 						endif; ?>
-							<div class="wpmudev-subfield">
+							<div class="wpmudev-subfield <?php echo str_replace('_', '-', strtolower(get_class($subfield))); ?>">
 								<div class="wpmudev-subfield-inner clearfix">
 										<?php
 						if ( ! empty($subfield->args['label']['text']) ) : ?>
