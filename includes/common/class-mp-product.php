@@ -92,6 +92,18 @@ class MP_Product {
 	}
 	
 	/**
+	 * Get a specific variation by it's index
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $index Optional.
+	 */
+	public function get_variation( $index = 0 ) {
+		$variations = $this->get_variations();
+		return mp_arr_get_value($index, $variations);
+	}
+	
+	/**
 	 * Get product variations
 	 *
 	 * @since 3.0
@@ -102,8 +114,12 @@ class MP_Product {
 		if ( ! is_null($this->variations) ) {
 			return $this->variations;
 		}
-
+		
 		$this->variations = array();
+		if ( ! $this->get_meta('has_variations') ) {
+			return $this->variations;
+		}
+
 		$query = new WP_Query(array(
 			'post_type' => 'mp_product_variation',
 			'posts_per_page' => -1,
@@ -133,7 +149,7 @@ class MP_Product {
 		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
 			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 		} elseif ( ! mp_get_setting('disable_cart') ) {
-			$variation_select = $variation_opts = false;
+			$cb_content = false;
 			$button = '<form class="mp_buy_form" method="post" data-ajax-url="' . admin_url('admin-ajax.php?action=mp_update_cart') . '" action="' . mp_cart_link(false, true) . '">';
 
 			if ( ! $this->in_stock() ) {
@@ -142,48 +158,22 @@ class MP_Product {
 				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
 				
 				if ( $this->has_variations() ) {
-					$variation_select = '<select class="mp_product_variations mp_select2" name="variation">';
-					$variations = $this->get_variations();
-					$variation_opts = array();
+					$cb_id = 'product_options_' . $this->ID;
+					$cb_content = '<div id="' . $cb_id . '" class="mp_product_options_cb">';
 					
-					foreach ( $variations as $variation ) {
-						$price_obj = $variation->get_price();
-						
-						if ( $variation->on_sale() ) {
-							$price = mp_format_currency('', $price_obj['sale']['amount']);
-						} else {
-							$price = mp_format_currency('', $price_obj['regular']);
-						}
-						
-						$variation_opts[$variation->ID] = (object) array(
-							'post' => $variation,
-							'price' => $price,
-						);
-						$variation_select .= '<option value="' . $variation->ID . '"' . (( $variation->in_stock() ) ? '' : ' disabled="disabled"') . '>' . esc_attr($variation->get_meta('name')) . ' - ' . $price . '</option>';
-					}
+					//! TODO
 					
-					$variation_select .= '</select><br /><br />';
+					$cb_content .= '</div>';
 				}
 				
 				if ( $context == 'list' ) {
-					if ( $variation_select ) {
-						if ( mp_get_setting('store_theme') == 'default3' ) {
-							$button .= '<div class="mp_link_buynow has_variations">' . __('Choose Option', 'mp');
-							$button .= '<ul class="mp_variations_flyout">';
-							
-							foreach ( $variation_opts as $id => $variation ) {
-								$button .= '<li class="mp_variation_flyout_item"><a class="clearfix" data-product-id="' . $id . '" href="' . $variation->post->url(false) . '"><strong class="mp_variation_flyout_name">' . $variation->post->get_meta('name') . '</strong><span class="mp_variation_flyout_price">' . $variation->price . '</span></a></li>';
-							}
-							
-							$button .= '</ul>';
-							$button .= '</div>';
-						} else {
-							$button .= '<a class="mp_link_buynow" href="' . $this->url(false) . '">' . __('Choose Option', 'mp') . '</a>';
-						}
+					if ( $cb_content ) {
+						$button .= '<a class="mp_link_buynow has_variations" href="#' . $cb_id . '">' . __('Choose Options', 'mp') . '</a>';
+						$button .= '<div style="display:none">' . $cb_content . '</div>';
 					} else if ( mp_get_setting('list_button_type') == 'addcart' ) {
-						$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
+						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
 					} else if ( mp_get_setting('list_button_type') == 'buynow' ) {
-						$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
+						$button .= '<button class="mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
 					}
 				} else {
 					$button .= $variation_select;
@@ -194,9 +184,9 @@ class MP_Product {
 					}
 
 					if ( mp_get_setting('product_button_type') == 'addcart') {
-						$button .= '<input class="mp_button_addcart" type="submit" name="addcart" value="' . __('Add To Cart', 'mp') . '" />';
+						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
 					} else if (mp_get_setting('product_button_type') == 'buynow') {
-						$button .= '<input class="mp_button_buynow" type="submit" name="buynow" value="' . __('Buy Now', 'mp') . '" />';
+						$button .= '<button class="mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
 					}
 				}
 			}
@@ -224,7 +214,10 @@ class MP_Product {
 		$price = $this->get_price();
 		$snippet = '<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 		
-		if ( $this->on_sale() ) {
+		if ( $this->has_variations() ) {
+			// Get price range
+			$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest']) . ' - ' .  mp_format_currency('', $price['highest']) . '</strong>';
+		} elseif ( $this->on_sale() ) {
 			$percent_off = round((($price['regular'] - $price['sale']['amount']) * 100) / $price['regular']) . '%';
 			$snippet .= '<strike class="mp_normal_price">' . mp_format_currency('', $price['regular']) . '</strike>';
 			
@@ -263,14 +256,22 @@ class MP_Product {
 	 * Get the product's excerpt
 	 *
 	 * @since 3.0
-	 * @param string $excerpt
-	 * @param string $content
 	 * @param string $excerpt_more Optional
+	 * @param string $excerpt Optional
+	 * @param string $content Optional
 	 * @return string
 	 */	
-	public function excerpt( $excerpt, $content, $excerpt_more = null ) {
+	public function excerpt( $excerpt = null, $content = null, $excerpt_more = null ) {
 		if ( is_null($excerpt_more) ) {
 			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink($this->ID) . '">' .	 __('More Info &raquo;', 'mp') . '</a>';
+		}
+		
+		if ( is_null($excerpt) ) {
+			$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
+		}
+		
+		if ( is_null($content) ) {
+			$content = $this->has_variations() ? $this->get_variation()->post_content : $this->_post->post_content;
 		}
 		
 		if ( $excerpt ) {
@@ -360,6 +361,8 @@ class MP_Product {
 	public function get_price() {
 		$price = array(
 			'regular' => (float) $this->get_meta('regular_price'),
+			'lowest' => '',
+			'highest' => '',
 			'sale' => array(
 				'amount' => false,
 				'start_date' => false,
@@ -368,7 +371,23 @@ class MP_Product {
 			),
 		);
 		
-		if ( $this->on_sale() && ($sale_price = $this->get_meta('sale_price_amount')) ) {
+		if ( $this->has_variations() ) {
+			$variations = $this->get_variations();
+			$prices = array();
+			
+			foreach ( $variations as $variation ) {
+				$price = $variation->get_price();
+				
+				if ( $variation->on_sale() ) {
+					$prices[] = $price['sale']['amount'];
+				} else {
+					$prices[] = $price['regular'];
+				}
+			}
+			
+			$price['lowest'] = min($prices);
+			$price['highest'] = max($prices);
+		} elseif ( $this->on_sale() && ($sale_price = $this->get_meta('sale_price_amount')) ) {
 			$start_date_obj = new DateTime($this->get_meta('sale_price_start_date', date('Y-m-d'), true));
 			$days_left = false;
 			
@@ -419,8 +438,14 @@ class MP_Product {
 		 * @param int $post_id
 		 */
 		$post_id = apply_filters('mp_product_image_id', $this->ID);
+		
 		$post = $this->_post;
-
+		if ( $post_id != $this->ID ) {
+			$this->ID = $post_id;
+			$this->_post = $post = get_post($post_id);
+		}
+		
+		$image_post_id = $post_id;
 		$post_thumbnail_id = get_post_thumbnail_id($post_id);
 		$class = $title = $link = $img_align = '';
 		$img_classes = array('mp_product_image_' . $context, 'photo');
@@ -450,6 +475,10 @@ class MP_Product {
 				$title = esc_attr($post->post_title);
 				$link_class = ' class="mp_img_link"';
 				$img_align = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
+				
+				if ( $this->has_variations() ) {
+					$image_post_id = $this->get_variation()->ID;
+				}
 			break;
 			
 			case 'floating-cart' :
@@ -525,8 +554,8 @@ class MP_Product {
 				$title = esc_attr($post->post_title);
 			break;
 		}
-
-		$image = get_the_post_thumbnail($post_id, $size, array('itemprop' => 'image', 'class' => implode(' ', $img_classes), 'title' => $title));
+		
+		$image = get_the_post_thumbnail($image_post_id, $size, array('itemprop' => 'image', 'class' => implode(' ', $img_classes), 'title' => $title));
 
 		if ( empty($image) ) {
 			if ( $context == 'floating-cart' ) {
