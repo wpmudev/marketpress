@@ -75,22 +75,23 @@ class WPMUDEV_Field_WYSIWYG extends WPMUDEV_Field {
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){	
-	$(document).on('wpmudev_repeater_field_start_sort', function(e, $group){
+	$(document).on('wpmudev_repeater_field/start_sort', function(e, $group){
 		$group.find('.wp-editor-area').each(function(){
 			tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
 		});
 	});
 
-	$(document).on('wpmudev_repeater_field_stop_sort', function(e, $group){
+	$(document).on('wpmudev_repeater_field/stop_sort', function(e, $group){
 		$group.find('.wp-editor-area').each(function(){
 			$group.find('.mce-tinymce').remove();	// remove the tinymce editor
 			tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
 		});
 	});
 	
-	$(document).on('wpmudev_repeater_field_after_add_field_group', function(e, $group){
-		var $textarea = $group.find('textarea'),
-				$wrap = $group.find('.wp-editor-wrap'),
+	$(document).on('wpmudev_repeater_field/after_add_field_group', function(e, $group){
+		var $field = $group.find('.wpmudev-field-wysiwyg'),
+				$textarea = $field.find('textarea'),
+				$wrap = $field.find('.wp-editor-wrap'),
 				oldId = $textarea.attr('id'),
 				newId = '';
 				
