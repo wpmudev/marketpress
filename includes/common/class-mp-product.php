@@ -216,7 +216,11 @@ class MP_Product {
 		
 		if ( $this->has_variations() ) {
 			// Get price range
-			$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest']) . ' - ' .  mp_format_currency('', $price['highest']) . '</strong>';
+			if ( $price['lowest'] != $price['highest'] ) {
+				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest']) . ' - ' .  mp_format_currency('', $price['highest']) . '</strong>';
+			} else {
+				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest'])  . '</strong>';
+			}
 		} elseif ( $this->on_sale() ) {
 			$percent_off = round((($price['regular'] - $price['sale']['amount']) * 100) / $price['regular']) . '%';
 			$snippet .= '<strike class="mp_normal_price">' . mp_format_currency('', $price['regular']) . '</strike>';
