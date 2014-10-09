@@ -222,7 +222,7 @@ class MP_Product {
 			$snippet .= '<strike class="mp_normal_price">' . mp_format_currency('', $price['regular']) . '</strike>';
 			
 			if ( ($end_date = $price['sale']['end_date']) && ($days_left = $price['sale']['days_left']) ) {
-				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s - only %s days left!', 'mp'), $percent_off, $days_left) . '</span>';
+				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s', 'mp'), $percent_off) . sprintf(_n(' - only 1 day left!', ' - only %s days left!', $days_left, 'mp'), $days_left) . '</span>';
 			} else {
 				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s', 'mp'), $percent_off) . '</span>';
 			}
