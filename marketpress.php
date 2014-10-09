@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: MarketPress
-Version: 3.0a.10
+Version: 3.0a.11
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -26,7 +26,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 */
 
-define('MP_VERSION', '3.0a.10');
+define('MP_VERSION', '3.0a.11');
 
 class Marketpress {
 	/**
@@ -367,6 +367,29 @@ class Marketpress {
 		add_action('init', array(&$this, 'register_custom_types'), 1);
 		// Maybe flush rewrites
 		add_action('init', array(&$this, 'maybe_flush_rewrites'), 99);
+		// Fix insecure images
+		add_filter('wp_get_attachment_url', array(&$this, 'fix_insecure_images'), 10, 2);
+	}
+	
+	/**
+	 * Make sure images use https protocol when displaying content over ssl
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wp_get_attachment_url
+	 * @return string
+	 */
+	public function fix_insecure_images( $url, $post_id ) {
+		//Skip file attachments
+    if ( ! wp_attachment_is_image($post_id) ) {
+    	return $url;
+    }
+    
+    if ( is_ssl() ) {
+	    $url = str_replace('http://', 'https://', $url);
+    }
+    
+    return $url;
 	}
 	
 	/**
