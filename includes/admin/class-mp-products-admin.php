@@ -493,6 +493,7 @@ class MP_Products_Screen {
 		));
 		
 		$metabox->add_field('tab_labels', array(
+			'name' => 'product_tabs',
 			'tabs' => array(
 				array(
 					'label' => __('General', 'mp'),
@@ -519,7 +520,10 @@ class MP_Products_Screen {
 		));
 		
 		// General Tab
-		$metabox->add_field('tab', array('slug' => 'general'));
+		$metabox->add_field('tab', array(
+			'name' => 'product_tab_general',
+			'slug' => 'general'
+		));
 		$metabox->add_field('text', array(
 			'name' => 'sku',
 			'label' => array('text' => __('SKU', 'mp')),
@@ -570,7 +574,10 @@ class MP_Products_Screen {
 		));
 		
 		// Price Tab
-		$metabox->add_field('tab', array('slug' => 'price'));
+		$metabox->add_field('tab', array(
+			'name' => 'product_tab_price',
+			'slug' => 'price'
+		));
 		$metabox->add_field('text', array(
 			'name' => 'regular_price',
 			'label' => array('text' => __('Regular Price', 'mp')),
@@ -607,7 +614,10 @@ class MP_Products_Screen {
 		
 		
 		// Tax Tab
-		$metabox->add_field('tab', array('slug' => 'taxes'));
+		$metabox->add_field('tab', array(
+			'name' => 'product_tab_taxes',
+			'slug' => 'taxes'
+		));
 		$metabox->add_field('text', array(
 			'name' => 'special_tax_rate',
 			'label' => array('text' => __('Special Tax Rate', 'mp')),
@@ -620,7 +630,10 @@ class MP_Products_Screen {
 		));			
 		
 		// Shipping Tab
-		$metabox->add_field('tab', array('slug' => 'shipping'));
+		$metabox->add_field('tab', array(
+			'name' => 'product_tab_shipping',
+			'slug' => 'shipping'
+		));
 		$weight = $metabox->add_field('complex', array(
 			'name' => 'weight',
 			'label' => array('text' => __('Weight', 'mp')),
@@ -654,7 +667,10 @@ class MP_Products_Screen {
 		));
 		
 		// Attributes Tab
-		$metabox->add_field('tab', array('slug' => 'attributes'));
+		$metabox->add_field('tab', array(
+			'name' => 'product_tab_attributes',
+			'slug' => 'attributes'
+		));
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
@@ -705,6 +721,7 @@ class MP_Products_Screen {
 		
 		if ( $repeater instanceof WPMUDEV_Field ) {
 			$repeater->add_sub_field('tab_labels', array(
+				'name' => 'tabs',
 				'tabs' => array(
 					array(
 						'label' => __('General', 'mp'),
@@ -731,7 +748,10 @@ class MP_Products_Screen {
 			));
 			
 			// General Tab
-			$repeater->add_sub_field('tab', array('slug' => 'general'));
+			$repeater->add_sub_field('tab', array(
+				'name' => 'tab_general',
+				'slug' => 'general'
+			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'name',
 				'label' => array('text' => __('Name', 'mp')),
@@ -795,7 +815,10 @@ class MP_Products_Screen {
 			));
 			
 			// Price Tab
-			$repeater->add_sub_field('tab', array('slug' => 'price'));
+			$repeater->add_sub_field('tab', array(
+				'name' => 'tab_price',
+				'slug' => 'price'
+			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'regular_price',
 				'label' => array('text' => __('Regular Price', 'mp')),
@@ -828,7 +851,10 @@ class MP_Products_Screen {
 			));
 			
 			// Shipping Tab
-			$repeater->add_sub_field('tab', array('slug' => 'shipping'));
+			$repeater->add_sub_field('tab', array(
+				'name' => 'tab_shipping',
+				'slug' => 'shipping'
+			));
 			$weight = $repeater->add_sub_field('complex', array(
 				'name' => 'weight',
 				'label' => array('text' => __('Weight', 'mp')),
@@ -858,7 +884,10 @@ class MP_Products_Screen {
 			));
 			
 			// Taxes Tab
-			$repeater->add_sub_field('tab', array('slug' => 'taxes'));
+			$repeater->add_sub_field('tab', array(
+				'name' => 'tab_taxes',
+				'slug' => 'taxes'
+			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'special_tax_rate',
 				'label' => array('text' => __('Special Tax Rate', 'mp')),
@@ -871,7 +900,10 @@ class MP_Products_Screen {
 			));
 			
 			// Attributes Tab
-			$repeater->add_sub_field('tab', array('slug' => 'attributes'));
+			$repeater->add_sub_field('tab', array(
+				'name' => 'tab_attributes',
+				'slug' => 'attributes'
+			));
 			$mp_product_atts = MP_Product_Attributes::get_instance();
 			$atts = $mp_product_atts->get();
 			foreach ( $atts as $att ) {
