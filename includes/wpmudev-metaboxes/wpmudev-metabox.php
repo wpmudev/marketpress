@@ -852,7 +852,7 @@ class WPMUDEV_Metabox {
 			$page = $_REQUEST['page'];
 			
 			if ( in_array($page, $this->args['page_slugs']) ) {
-				$this->is_settings_metabox = true;
+				$is_active = true;
 			}
 		}
 
