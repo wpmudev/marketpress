@@ -28,22 +28,6 @@ var marketpress = {};
 		});
 	}
 	
-	marketpress.initProductOptionsMenu = function(){
-		$('.mp_link_buynow').filter('.has_variations').hoverIntent(function(){
-			var $this = $(this);
-			$this.addClass('transitioning');
-			setTimeout(function(){
-				$this.addClass('visible');
-			}, 100);
-		},function(){
-			var $this = $(this);
-			$this.removeClass('visible');
-			setTimeout(function(){
-				$this.removeClass('transitioning');
-			}, 300);
-		});
-	}
-	
 	marketpress.initToggleVariations = function(){
 		$('.mp_variant_image_link').mouseover(function(e){
 			e.preventDefault();
@@ -61,7 +45,6 @@ var marketpress = {};
 
 jQuery(document).ready(function(){
 	marketpress.initSelect2();
-	marketpress.initProductOptionsMenu();
 	marketpress.initToggleVariations();
 });
 

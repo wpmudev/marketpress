@@ -5,6 +5,7 @@ var mp_cart = {};
 	mp_cart.init = function(){
 		this.initCartAnimation();
 		this.initCartListeners();
+		this.initProductOptionsLightbox();
 	}
 	
 	mp_cart.initCartListeners = function(){
@@ -22,6 +23,14 @@ var mp_cart = {};
 			mp_cart.addItem($form, $this.attr('data-product-id'));
 		});
 	};
+	
+	mp_cart.initProductOptionsLightbox = function(){
+		$('.mp_link_buynow').filter('.has_variations').colorbox({
+			"close" : "",
+			"inline" : true,
+			"overlayClose" : false
+		});
+	}
 	
 	mp_cart.addItem = function( $form, item, qty ){
 		if ( item === undefined || typeof($form) !== 'object' ) {

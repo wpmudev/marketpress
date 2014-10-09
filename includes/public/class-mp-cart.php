@@ -207,9 +207,14 @@ class MP_Cart {
 			return;
 		}
 		
+		// Styles
 		wp_enqueue_style('mp-cart', mp_plugin_url('ui/css/mp-cart.css'), false, MP_VERSION);
+		wp_enqueue_style('colorbox', mp_plugin_url('ui/css/colorbox.css'), false, MP_VERSION);
+		
+		// Scripts
 		wp_enqueue_script('ajaxq', mp_plugin_url('ui/js/ajaxq.min.js'), array('jquery'), MP_VERSION, true);
-		wp_enqueue_script('mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array('ajaxq'), MP_VERSION, true);
+		wp_enqueue_script('colorbox', mp_plugin_url('ui/js/jquery.colorbox-min.js'), array('jquery'), MP_VERSION, true);
+		wp_enqueue_script('mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array('ajaxq', 'colorbox'), MP_VERSION, true);
 	}
 	
 	/**
