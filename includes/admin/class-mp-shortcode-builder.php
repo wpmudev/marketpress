@@ -1095,7 +1095,7 @@ class MP_Shortcode_Builder {
 	 */
 	public function enqueue_styles_scripts() {
 		wp_enqueue_style('colorbox', mp_plugin_url('includes/admin/ui/colorbox/colorbox.css'), false, '1.5.10');
-		wp_enqueue_script('colorbox', mp_plugin_url('includes/admin/ui/colorbox/jquery.colorbox-min.js'), false, '1.5.10');
+		wp_enqueue_script('colorbox', mp_plugin_url('ui/colorbox/jquery.colorbox-min.js'), false, '1.5.10');
 		
 		wp_enqueue_style('select2', mp_plugin_url('ui/select2/select2.css'), false, '3.5.0');
 		wp_enqueue_script('select2', mp_plugin_url('ui/select2/select2.min.js'), false, '3.5.0');
