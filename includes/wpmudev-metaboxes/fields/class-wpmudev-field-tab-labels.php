@@ -25,6 +25,21 @@ class WPMUDEV_Field_Tab_Labels extends WPMUDEV_Field {
 	}
 
 	/**
+	 * Saves the field to the database.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @action save_post
+	 * @param int $post_id
+	 * @param string $meta_key The meta key to use when storing the field value. Defaults to null.
+	 * @param mixed $value The value of the field. Defaults to null.
+	 * @param bool $force Whether to bypass the is_subfield check. Subfields normally don't run their own save routine. Defaults to false.
+	 */
+	public function save_value( $post_id, $meta_key = null, $value = null, $force = false ) {
+		// Don't save to db
+	}
+
+	/**
 	 * Print necessary field scripts
 	 *
 	 * @since 1.0
@@ -81,6 +96,7 @@ class WPMUDEV_Field_Tab_Labels extends WPMUDEV_Field {
 	 */
 	public function display( $post_id ) {
 		?>
+<input type="hidden" <?php echo $this->parse_atts(); ?> value="" />
 <ul class="wpmudev-field-tab-labels-holder clearfix">
 		<?php
 		foreach ( $this->args['tabs'] as $tab ) :

@@ -21,6 +21,21 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 	}
 
 	/**
+	 * Saves the field to the database.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @action save_post
+	 * @param int $post_id
+	 * @param string $meta_key The meta key to use when storing the field value. Defaults to null.
+	 * @param mixed $value The value of the field. Defaults to null.
+	 * @param bool $force Whether to bypass the is_subfield check. Subfields normally don't run their own save routine. Defaults to false.
+	 */
+	public function save_value( $post_id, $meta_key = null, $value = null, $force = false ) {
+		// Don't save to db
+	}
+	
+	/**
 	 * Displays the field
 	 *
 	 * @since 1.0
@@ -42,6 +57,7 @@ class WPMUDEV_Field_Section extends WPMUDEV_Field {
 		}
 		
 		$this->before_field(); ?>
+		<input type="hidden" <?php echo $this->parse_atts(); ?> value="" />
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 			<h2 class="wpmudev-section-title"><?php echo $this->args['title']; ?></h2>
 			<?php

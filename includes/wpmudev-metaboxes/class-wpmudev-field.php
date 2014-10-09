@@ -141,6 +141,11 @@ class WPMUDEV_Field {
 			),
 		), $args);
 		
+		if ( empty($this->args['name']) ) {
+			$backtrace = debug_backtrace();
+			trigger_error('Failed to specify the "name" argument on line <strong>'. $backtrace[1]['line'] . '</strong> of <strong>' . $backtrace[1]['file'] . '</strong>', E_USER_ERROR);
+		}
+		
 		if ( empty($this->args['original_name']) ) {
 			$this->args['original_name'] = $this->args['name'];
 		}
