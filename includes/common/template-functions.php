@@ -25,13 +25,9 @@ if ( ! function_exists('_mp_products_html_grid')) :
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 			$product = new MP_Product();
 			
-			if ( $product->has_variations() ) {
-				$product = $product->get_variation();
-			}
-			
 			$img = $product->image(false, 'list');
 			
-			$excerpt = mp_get_setting('show_excerpt') ? '<p class="mp_excerpt">' . $product->excerpt($product->post_excerpt, $product->post_content, '') . '</p>' : '';
+			$excerpt = mp_get_setting('show_excerpt') ? '<p class="mp_excerpt">' . $product->excerpt() . '</p>' : '';
 			$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $product->ID);
 	
 			$pinit = $product->pinit_button('all_view');
@@ -524,7 +520,7 @@ if ( ! function_exists('mp_product_excerpt') ) :
 	function mp_product_excerpt( $excerpt, $content, $product_id, $excerpt_more = null ) {
 		_deprecated_function('mp_product_excerpt', '3.0', 'MP_Product::excerpt()');
 		$product = new MP_Product($product_id);
-		return $product->excerpt($excerpt, $content, $excerpt_more);	
+		return $product->excerpt($excerpt_more, $excerpt, $content);	
 	}
 endif;
 
