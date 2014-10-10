@@ -11,14 +11,32 @@ class MP_Product {
 	var $ID = null;
 	
 	/**
-	 * Referrs to the product's variations
+	 * Refers to the product's variations
 	 *
 	 * @since 3.0
-	 * @access public
+	 * @access protected
 	 * @type array
 	 */
-	var $variations = null;
+	protected $_variations = null;
+
+	/**
+	 * Refers to the product's variation IDs
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @type array
+	 */
+	protected $_variation_ids = null;
 	
+	/**
+	 * Refers to the product's attributes
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @type array
+	 */
+	protected $_attributes = null;
+		
 	/**
 	 * Refers to if the product is on sale
 	 *
@@ -104,6 +122,22 @@ class MP_Product {
 	}
 	
 	/**
+	 * Get product variation ids
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_variation_ids() {
+		if ( ! is_null($this->_variation_ids) ) {
+			return $this->_variation_ids;
+		}
+		
+		$this->get_variations();
+		return $this->_variation_ids;
+	}
+	
+	/**
 	 * Get product variations
 	 *
 	 * @since 3.0
@@ -111,13 +145,13 @@ class MP_Product {
 	 * @return array An array of MP_Product objects.
 	 */
 	public function get_variations() {
-		if ( ! is_null($this->variations) ) {
-			return $this->variations;
+		if ( ! is_null($this->_variations) ) {
+			return $this->_variations;
 		}
 		
-		$this->variations = array();
+		$this->_variations = array();
 		if ( ! $this->get_meta('has_variations') ) {
-			return $this->variations;
+			return $this->_variations;
 		}
 
 		$query = new WP_Query(array(
@@ -128,13 +162,15 @@ class MP_Product {
 			'post_parent' => $this->ID,
 		));		
 		
+		$this->_variation_ids = array();
 		while ( $query->have_posts() ) : $query->the_post();
-			$this->variations[] = new MP_Product(get_the_ID());
+			$this->_variations[] = $variation = new MP_Product(get_the_ID());
+			$this->_variation_ids[] = $variation->ID;
 		endwhile;
 		
 		wp_reset_postdata();
 		
-		return $this->variations;
+		return $this->_variations;
 	}
 
 	/*
@@ -158,12 +194,22 @@ class MP_Product {
 				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
 				
 				if ( $this->has_variations() ) {
+					$atts = $this->get_attributes();
 					$cb_id = 'product_options_' . $this->ID;
-					$cb_content = '<div id="' . $cb_id . '" class="mp_product_options_cb">';
+					$cb_content = '
+						<div id="' . $cb_id . '" class="mp_product_options_cb">
+							<img class="mp_product_options_thumb" src="' . $this->image_url(false, 'thumbnail') . '">
+							<div class="mp_product_options_content">
+								<h3 class="mp_product_name">' . $this->post_title . '</h3>
+								<div class="mp_product_options_excerpt">' . $this->excerpt(false) . '</div>
+								<div class="mp_product_options_atts">';
 					
-					//! TODO
+					//! TODO: display attribute fields
 					
-					$cb_content .= '</div>';
+					$cb_content .= '
+								</div>
+							</div>
+						</div>';
 				}
 				
 				if ( $context == 'list' ) {
@@ -616,13 +662,14 @@ class MP_Product {
 			$size = array($thesize, $thesize);
 		}
 		
-		if ( $this->is_variation() && ($img_id = $this->get_meta('image')) ) {
-				$img_src = array_shift(wp_get_attachment_image_src($img_id, $size));
-		} else {
-			if ( has_post_thumbnail($this->ID) ) {
-				$img_id = get_post_thumbnail_id($this->ID);
-				$img_src = array_shift(wp_get_attachment_image_src($img_id, $size));
-			}
+		$post_id = $this->ID;
+		if ( $this->has_variations() ) {
+			$post_id = $this->get_variation()->ID;
+		}
+		
+		if ( has_post_thumbnail($post_id) ) {
+			$img_id = get_post_thumbnail_id($post_id);
+			$img_src = array_shift(wp_get_attachment_image_src($img_id, $size));
 		}
 		
 		if ( empty($img_src) ) {
@@ -680,7 +727,49 @@ class MP_Product {
 	public function is_variation() {
 		return ( ! empty($this->_post->post_parent) );
 	}
+	
+	/**
+	 * Get the product attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_attributes() {
+		if ( ! is_null($this->_attributes) ) {
+			return $this->_attributes;
+		}
 		
+		$mp_product_atts = MP_Product_Attributes::get_instance();
+		$all_atts = $mp_product_atts->get();
+		$this->_attributes = array();
+		
+		$ids = array($this->ID);
+		if ( $this->has_variations() ) {
+			$ids = $this->get_variation_ids();
+		}
+		
+		$taxonomies = array();
+		foreach ( $all_atts as $att ) {
+			$taxonomies[] = $mp_product_atts->generate_slug($att->attribute_id);
+		}
+		
+		$terms = wp_get_object_terms($ids, $taxonomies);
+		$names = array();
+		foreach ( $terms as $term ) {
+			$tax_id = $mp_product_atts->get_id_from_slug($term->taxonomy);
+			if ( $att = $mp_product_atts->get_one($tax_id) ) {
+				if ( ! array_key_exists($term->taxonomy, $names) ) {
+					mp_push_to_array($this->_attributes, "{$term->taxonomy}->name", $att->attribute_name);
+				}
+				
+				mp_push_to_array($this->_attributes, "{$term->taxonomy}->terms->{$term->term_id}", $term->name);
+			}
+		}
+		
+		return $this->_attributes;
+	}
+	
 	/**
 	 * Get product meta value
 	 *
@@ -697,7 +786,6 @@ class MP_Product {
 		}
 		
 		$value = false;
-		
 		if ( function_exists('get_field_value') ) {
 			// Try to get WPMUDEV_Field value
 			$value = get_field_value($name, $this->ID, $raw);
@@ -707,30 +795,10 @@ class MP_Product {
 			return $value;
 		}
 				
-		$parent_id = $this->_post->post_parent;
-		if ( ! empty($parent_id) ) {
-			// This is a variation, try to use WPMUDEV_Field value from parent product	
-			if ( function_exists('get_field_value') ) {
-				$value = get_field_value($name, $parent_id, $raw);
-			}
-		}
-		
-		if ( $value !== false && $value !== '' ) {
-			return $value;
-		}
-		
 		// Try to use regular post meta
 		$meta_val = get_post_meta($this->ID, $name, true);
 		if ( $meta_val !== '' ) {
 			return $meta_val;
-		}
-		
-		// This is a variation - try to use regular post meta from parent product
-		if ( ! empty($parent_id) ) {
-			$meta_val = get_post_meta($parent_id, $name, true);
-			if ( $meta_val !== '' ) {
-				return $meta_val;
-			}
 		}
 		
 		return $default;
