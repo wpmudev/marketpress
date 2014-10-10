@@ -98,11 +98,23 @@
 
 #colorbox {
 	outline: none;
+	
+	* {
+		background: none;
+		border: 0;
+		.boxShadow(none);
+		margin: 0;
+		padding: 0;
+	}
 }
 
 #cboxContent {
 	background: #fff;
 	border: 2px solid #ddd;
+}
+
+#cboxLoadedContent {
+	padding: 15px;
 }
 
 #cboxClose {
