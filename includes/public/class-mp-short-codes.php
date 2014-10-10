@@ -364,7 +364,8 @@ class MP_Short_Codes {
 	 *
 	 */
   function mp_store_navigation_sc($atts) {
-    return mp_store_navigation(false);
+  	//! TODO: add mp_store_navigation function
+    //return mp_store_navigation(false);
   }
 }
 
