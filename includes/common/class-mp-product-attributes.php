@@ -57,6 +57,37 @@ class MP_Product_Attributes {
 	}
 	
 	/**
+	 * Get an attribute ID from it's slug
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $slug
+	 * @return int
+	 */
+	public function get_id_from_slug( $slug ) {
+		return (int) str_replace('product_attr_', '', $slug);
+	}
+	
+	/**
+	 * Get a single product attribute
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $id The ID of product attribute to fetch.
+	 * @return object The product attribute or FALSE if a product attribute is not found for the given ID.
+	 */
+	public function get_one( $id ) {
+		$atts = $this->get();
+		foreach ( $atts as $att ) {
+			if ( $att->attribute_id == $id ) {
+				return $att;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * Generates a product attribute's slug from it's ID.
 	 *
 	 * @since 3.0
