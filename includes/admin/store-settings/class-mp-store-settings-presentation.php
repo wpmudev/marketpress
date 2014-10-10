@@ -211,6 +211,7 @@ jQuery(document).ready(function($){
 			'option_name' => 'mp_settings',			
 		));	
 		$metabox->add_field('section', array(
+			'name' => 'section_pinterest',
 			'title' => __('Pinterest', 'mp'),
 		));
 		$metabox->add_field('radio_group', array(
