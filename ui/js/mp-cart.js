@@ -24,10 +24,29 @@ var mp_cart = {};
 		});
 	};
 	
+	mp_cart.initCboxListeners = function(){
+		$('.mp_product_options_cb').validate({
+			"errorClass" : "mp_input_error",
+			"errorElement" : "span",
+			"errorPlacement" : function(error, element){
+				error.appendTo(element.closest('.mp_product_options_att').find('.mp_product_options_att_label'));
+			},
+			"ignore" : "",
+			"submitHandler" : function(form){
+			}
+		});
+		
+		$('.mp_product_options_att_input_label').find(':radio').change(function(){
+			var $this = $(this), $form = $this.closest('form');
+			//! TODO: update product attributes based upon selected attributes (e.g. blue might not be not available in large size)
+	}
+	
 	mp_cart.initProductOptionsLightbox = function(){
 		$('.mp_link_buynow').filter('.has_variations').colorbox({
-			"close" : "",
-			"inline" : true,
+			"close" : "x",
+			"href" : function(){
+				return $(this).attr('data-href');
+			},
 			"overlayClose" : false
 		});
 	}
@@ -93,6 +112,11 @@ var mp_cart = {};
 		});
 	};
 }(jQuery));
+
+jQuery(document).on('cbox_complete', function(){
+	jQuery.colorbox.resize();
+	mp_cart.initCboxListeners();
+});
 
 jQuery(document).ready(function($){
 	mp_cart.init();

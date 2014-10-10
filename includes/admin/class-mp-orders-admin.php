@@ -31,12 +31,6 @@ class MP_Orders_Admin {
 	 * @access private
 	 */
 	private function __construct() {
-		if ( mp_doing_ajax() ) {
-			//change order status
-			add_action('wp_ajax_mp_change_order_status', array(&$this, 'change_order_status'));
-			return;
-		}
-		
 		//add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
 		//change the "enter title here" text
@@ -127,7 +121,7 @@ class MP_Orders_Admin {
 	 * @access public
 	 * @action admin_ajax_mp_change_order_status
 	 */
-	public function change_order_status() {
+	public static function ajax_change_order_status() {
 		$post_id = mp_get_get_value('post_id');
 		$order_id = mp_get_get_value('order_id');
 		$order_status = mp_get_get_value('order_status');

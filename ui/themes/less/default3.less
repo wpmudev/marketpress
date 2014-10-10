@@ -43,6 +43,15 @@
 	}
 }
 
+#colorbox {
+	.mp_product_options_att_input_label {
+		input[type="radio"]:checked + span {
+			background: #448cf8;
+			color: #fff;
+		}
+	}
+}
+
 #colorbox,
 #mp_single_product,
 #mp_product_list {
@@ -80,7 +89,13 @@
 			height: 16px;
 			margin-top: -8px;
 			width: 16px; 
-		}		
+		}	
+		
+		&[disabled],
+		&[disabled]:hover {
+			background-color: #ddd;
+			cursor: default;
+		}	
 	}
 	
 	.mp_link_buynow:before {

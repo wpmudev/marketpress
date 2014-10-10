@@ -137,6 +137,10 @@ class MP_Ajax {
 	private function __construct() {
 		add_action('wp_ajax_mp_create_store_page', array(&$this, 'create_store_page'));
 		add_action('wp_ajax_mp_bulk_edit_products', array(&$this, 'bulk_edit_products'));
+		add_action('wp_ajax_mp_change_order_status', array('MP_Orders_Admin', 'ajax_change_order_status'));
+		// Get product variation colorbox
+		add_action('wp_ajax_mp_product_get_variations_lightbox', array('MP_Product', 'ajax_display_variations_lightbox'));
+		add_action('wp_ajax_nopriv_mp_product_get_variations_lightbox', array('MP_Product', 'ajax_display_variations_lightbox'));
 	}
 }
 

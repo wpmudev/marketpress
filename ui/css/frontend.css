@@ -2,18 +2,113 @@
   content: "";
   display: table;
 }
+#colorbox .mp_input_error,
+#mp_single_product .mp_input_error {
+  position: relative;
+  background: #b90303;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  display: inline-block;
+  font-weight: 400;
+  line-height: 24px;
+  margin-left: 10px;
+  padding: 0 10px;
+  vertical-align: top;
+}
+#colorbox .mp_input_error:before,
+#mp_single_product .mp_input_error:before {
+  position: absolute;
+  top: 50%;
+  left: -3px;
+  content: "";
+  font-size: 0;
+  line-height: 0;
+  border-top: 3px solid transparent;
+  border-right: 3px solid #b90303;
+  border-bottom: 3px solid transparent;
+  margin-top: -3px;
+  width: 0;
+}
 /*
  * Product variations lightbox styles
  */
 .mp_product_options_cb {
   width: 600px;
 }
-#colorbox .mp_product_options_thumb {
+#colorbox .mp_product_options_cb {
+  font-size: 14px;
+}
+#colorbox .mp_product_options_cb h4 {
+  font-size: 1em;
+  margin-bottom: 15px;
+}
+#colorbox .mp_product_name {
+  padding-right: 30px;
+}
+#colorbox .mp_product_options_att {
+  margin-bottom: 10px;
+}
+#colorbox .mp_product_options_att_label {
+  display: block;
+  line-height: 24px;
+  margin-bottom: 5px;
+}
+#colorbox .mp_product_options_att_input_label {
+  position: relative;
+  cursor: pointer;
+  display: block;
   float: left;
-  margin-right: 20px;
+  margin-right: 5px;
+  overflow: hidden;
+}
+#colorbox .mp_product_options_att_input_label input[type="radio"] {
+  display: none;
+}
+#colorbox .mp_product_options_att_input_label input[type="radio"]:checked + span {
+  background: #bababa;
+  font-weight: 700;
+}
+#colorbox .mp_product_options_att_input_label span {
+  background: #eaeaea;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 3px 6px;
+  -moz-transition: all 300ms;
+  -webkit-transition: all 300ms;
+  transition: all 300ms;
+}
+#colorbox .mp_product_options_att_input_label span:hover {
+  background-color: #333;
+  color: #fff;
+}
+#colorbox .mp_product_options_thumbs {
+  padding-top: 3px;
+}
+#colorbox .mp_product_options_thumb_small_link {
+  border: 1px solid #eaeaea;
+  display: block;
+  float: left;
+  padding: 2px;
+}
+#colorbox .mp_product_options_image {
+  float: left;
+  margin-right: 40px;
 }
 #colorbox .mp_product_options_content {
   overflow: hidden;
+}
+#colorbox .mp_product_options_excerpt p {
+  margin-bottom: 10px;
+}
+#mp_product_options_att_quantity {
+  border: 2px solid #ddd;
+  padding: 3px 6px;
+  width: 50px;
+}
+#mp_product_options_att_quantity:active,
+#mp_product_options_att_quantity:focus {
+  border-color: #aaa;
 }
 #mp_single_product .alignleft {
   margin: 0 30px 0 0;

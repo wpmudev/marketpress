@@ -85,6 +85,43 @@ class MP_Product {
 	}
 	
 	/**
+	 * Display the lightbox for product variations
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function ajax_display_variations_lightbox() {
+		$product_id = mp_get_get_value('product_id');
+		$product = new MP_Product($product_id);
+		
+		if ( ! $product->exists() ) {
+			die(__('The product specified could not be found', 'mp'));
+		}
+		?>
+<form class="mp_product_options_cb" method="post" action="<?php echo get_permalink(mp_get_setting('pages->cart')); ?>">
+	<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
+	<div class="mp_product_options_image">
+		<img class="mp_product_options_thumb" src="<?php $product->image_url(true, 'medium'); ?>" />
+	</div>
+	<div class="mp_product_options_content">
+		<h3 class="mp_product_name"><?php echo $product->post_title; ?></h3>
+		<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div>
+		<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div>
+		<?php
+			if ( mp_get_setting('product_button_type') == 'addcart') : ?>
+		<button class="mp_button_addcart" type="submit" name="addcart"><?php _e('Add To Cart', 'mp'); ?></button>
+		<?php
+			elseif ( mp_get_setting('product_button_type') == 'buynow' ) : ?>
+		<button class="mp_button_buynow" type="submit" name="buynow"><?php _e('Buy Now', 'mp'); ?></button>
+		<?php
+			endif; ?>
+	</div>
+</form>
+		<?php
+		die;
+	}
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
@@ -106,6 +143,71 @@ class MP_Product {
 		} elseif ( is_numeric($product) ) {
 			$this->ID = $product;
 			$this->_get_post();
+		}
+	}
+	
+	/**
+	 * Display the attribute fields
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 */
+	public function attribute_fields( $echo = true ) {
+		$atts = $this->get_attributes();
+		$html = '<h4>' . __('Choose Options:', 'mp') . '</h4>';
+		$html = '';
+		
+		foreach ( $atts as $slug => $att ) {
+			$html .= '
+				<div class="mp_product_options_att">
+					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
+					<div class="clearfix">';
+			
+			$index = 0;
+			foreach ( $att['terms'] as $term_id => $term_name ) {
+				$input_id = 'mp_product_options_att_' . $term_id;
+				$class = ( $index == 0 ) ? ' class="required"' : '';
+				$checked = ( $index == 0 ) ? ' checked' : '';
+				$html .= '
+						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
+							<input id="' . $input_id . '"' . $class . ' type="radio" name="product_attr[' . $slug . ']" value="' . $term_id . '"' . $checked . ' />
+							<span>' . $term_name . '</span>
+						</label>';
+				$index ++;
+			}
+			
+			$html .= '
+					</div>
+				</div>';
+		}
+		
+		$input_id = 'mp_product_options_att_quantity';
+		$html .= '
+				<div class="mp_product_options_att">
+					<strong class="mp_product_options_att_label">' . __('Quantity', 'mp') . '</strong>
+					<div class="clearfix">
+						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
+							<input id="' . $input_id . '" class="required digits" type="text" name="product_quantity" value="1" />
+						</label>
+					</div>
+				</div>';					
+
+		
+		/**
+		 * Filter the attribute fields
+		 *
+		 * @since 3.0
+		 * @param string The current html.
+		 * @param MP_Product The current MP_Product object.
+		 */
+		$html = apply_filters('mp_product/attribute_fields', $html, $this);
+		$html = apply_filters('mp_product/attribute_fields/' . $this->ID, $html, $this);
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
 		}
 	}
 	
@@ -185,7 +287,6 @@ class MP_Product {
 		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
 			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
 		} elseif ( ! mp_get_setting('disable_cart') ) {
-			$cb_content = false;
 			$button = '<form class="mp_buy_form" method="post" data-ajax-url="' . admin_url('admin-ajax.php?action=mp_update_cart') . '" action="' . mp_cart_link(false, true) . '">';
 
 			if ( ! $this->in_stock() ) {
@@ -193,29 +294,9 @@ class MP_Product {
 			} else {
 				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
 				
-				if ( $this->has_variations() ) {
-					$atts = $this->get_attributes();
-					$cb_id = 'product_options_' . $this->ID;
-					$cb_content = '
-						<div id="' . $cb_id . '" class="mp_product_options_cb">
-							<img class="mp_product_options_thumb" src="' . $this->image_url(false, 'thumbnail') . '">
-							<div class="mp_product_options_content">
-								<h3 class="mp_product_name">' . $this->post_title . '</h3>
-								<div class="mp_product_options_excerpt">' . $this->excerpt(false) . '</div>
-								<div class="mp_product_options_atts">';
-					
-					//! TODO: display attribute fields
-					
-					$cb_content .= '
-								</div>
-							</div>
-						</div>';
-				}
-				
 				if ( $context == 'list' ) {
-					if ( $cb_content ) {
-						$button .= '<a class="mp_link_buynow has_variations" href="#' . $cb_id . '">' . __('Choose Options', 'mp') . '</a>';
-						$button .= '<div style="display:none">' . $cb_content . '</div>';
+					if ( $this->has_variations() ) {
+						$button .= '<a class="mp_link_buynow has_variations" data-href="' . admin_url('admin-ajax.php?action=mp_product_get_variations_lightbox&amp;product_id=' . $this->ID) . '" href="' . $this->url(false) . '">' . __('Choose Options', 'mp') . '</a>';
 					} else if ( mp_get_setting('list_button_type') == 'addcart' ) {
 						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
 					} else if ( mp_get_setting('list_button_type') == 'buynow' ) {
@@ -340,6 +421,8 @@ class MP_Product {
 			} else {
 				$text = implode(' ', $words);
 			}
+			
+			$text = wpautop($text);
 		}
 		
 		/**
@@ -656,6 +739,8 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param bool $echo
+	 * @param string/int $size
 	 */
 	public function image_url( $echo = true, $size = 'large' ) {
 		if ( $thesize = intval($size) ) {
@@ -676,7 +761,11 @@ class MP_Product {
 			$img_src = mp_plugin_url('ui/images/default-product.png');
 		}
 		
-		return $img_src;
+		if ( $echo ) {
+			echo $img_src;
+		} else {
+			return $img_src;
+		}
 	}
 	
 	/**

@@ -16,6 +16,10 @@
   margin: 0;
   padding: 0;
 }
+#colorbox .mp_product_options_att_input_label input[type="radio"]:checked + span {
+  background: #448cf8;
+  color: #fff;
+}
 #colorbox a,
 #mp_single_product a,
 #mp_product_list a {
@@ -76,6 +80,27 @@
   height: 16px;
   margin-top: -8px;
   width: 16px;
+}
+#colorbox .mp_link_buynow[disabled],
+#mp_single_product .mp_link_buynow[disabled],
+#mp_product_list .mp_link_buynow[disabled],
+#colorbox .mp_button_addcart[disabled],
+#mp_single_product .mp_button_addcart[disabled],
+#mp_product_list .mp_button_addcart[disabled],
+#colorbox .mp_button_buynow[disabled],
+#mp_single_product .mp_button_buynow[disabled],
+#mp_product_list .mp_button_buynow[disabled],
+#colorbox .mp_link_buynow[disabled]:hover,
+#mp_single_product .mp_link_buynow[disabled]:hover,
+#mp_product_list .mp_link_buynow[disabled]:hover,
+#colorbox .mp_button_addcart[disabled]:hover,
+#mp_single_product .mp_button_addcart[disabled]:hover,
+#mp_product_list .mp_button_addcart[disabled]:hover,
+#colorbox .mp_button_buynow[disabled]:hover,
+#mp_single_product .mp_button_buynow[disabled]:hover,
+#mp_product_list .mp_button_buynow[disabled]:hover {
+  background-color: #ddd;
+  cursor: default;
 }
 #colorbox .mp_link_buynow:before,
 #mp_single_product .mp_link_buynow:before,
