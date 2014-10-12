@@ -11,6 +11,24 @@ class WPMUDEV_Field {
 	protected $_value = null;
 	
 	/**
+	 * Refers to the name of the field
+	 *
+	 * @since 1.0
+	 * @access protected
+	 * @var string
+	 */
+	protected $_name = null;
+	
+	/**
+	 * Refers to the order of the field (repeater field will set this)
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @var int
+	 */
+	var $_order = null;
+	
+	/**
 	 * Refers to the field's subfield id (repeater/complex field will set this)
 	 *
 	 * @since 1.0
@@ -140,6 +158,8 @@ class WPMUDEV_Field {
 				'class' => '',
 			),
 		), $args);
+		
+		$this->_name = $this->args['name'];
 		
 		if ( empty($this->args['name']) ) {
 			$backtrace = debug_backtrace();
@@ -398,9 +418,20 @@ class WPMUDEV_Field {
 	 * @access public
 	 * @param string @meta_key
 	 */
-	
 	public function set_meta_key( $meta_key ) {
 		$this->_meta_key = $meta_key;
+	}
+	
+	/**
+	 * Set the order of the field
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param int $order
+	 */
+	public function set_order( $order ) {
+		$this->args['name'] = preg_replace('#\[#', "[$order][", $this->_name, 1);
+		$this->_order = $order;
 	}
 	
 	/**
@@ -692,6 +723,10 @@ class WPMUDEV_Field {
 		$atts = '';
 		$args = $this->args; //make a copy of field args so as to not overwrite
 		$args['name'] = $this->get_name();
+
+		if ( ! empty($args['default_value']) ) {
+			$args['custom']['data-default-value'] = $args['default_value'];
+		}
 		
 		foreach ( $this->default_atts as $key ) {
 			if ( empty($args[$key]) ) {

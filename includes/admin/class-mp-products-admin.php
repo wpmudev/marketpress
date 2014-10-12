@@ -312,7 +312,7 @@ class MP_Products_Screen {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field_save_value_product_attr_*
+	 * @filter wpmudev_field/save_value/product_attr_*
 	 */	
 	public function save_product_attribute( $value, $post_id, $field ) {
 		$slug = $field->args['name'];
@@ -325,7 +325,7 @@ class MP_Products_Screen {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field_get_value_variations
+	 * @filter wpmudev_field/get_value/variations
 	 */
 	public function get_product_variations( $value, $post_id, $raw, $field ) {
 		$product = new MP_Product($post_id);
@@ -362,7 +362,7 @@ class MP_Products_Screen {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field_save_value_variations
+	 * @filter wpmudev_field/save_value/variations
 	 * @uses $wpdb
 	 */
 	public function save_product_variations( $value, $post_id, $field ) {
@@ -370,65 +370,59 @@ class MP_Products_Screen {
 		
 		$variations = mp_get_post_value('variations', array());
 		$sorted = $field->sort_subfields($variations);
-		$outer_index = 0;
+		$menu_order = 1;
 		$ids = array();
 		$delete_where = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = 'mp_product_variation'";
 		
 		if ( mp_get_post_value('has_variations', false) ) {
-			foreach ( $sorted as $type => $array ) {
-				foreach ( $array as $variation_id => $fields ) {
-					switch ( $type ) {
-						case 'new' :
-							$variation_id = $ids[] = wp_insert_post(array(
-								'post_content' => mp_arr_get_value('description', $fields, ''),
-								'post_title' => 'Product Variation of ' . $post_id,
-								'post_status' => 'publish',
-								'post_type' => 'mp_product_variation',
-								'post_parent' => $post_id,
-								'menu_order' => $outer_index,
-							));
-						break;
-						
-						case 'existing' :
-							$ids[] = $variation_id;
-							wp_update_post(array(
-								'ID' => $variation_id,
-								'post_content' => mp_arr_get_value('description', $fields, ''),
-								'post_status' => 'publish',
-								'menu_order' => $outer_index,
-							));
-						break;
-					}
-					
-					// Update post thumbnail
-					if ( empty($fields['image']) ) {
-						delete_post_thumbnail($variation_id);
-					} else {
-						set_post_thumbnail($variation_id, $fields['image']);
-					}
-					
-					// Unset the fields that shouldn't be saved as post meta
-					$fields['description'] = $fields['image'] = null;
-							
-					$index = 0;
-					foreach ( $fields as $name => $value ) {
-						if ( is_null($value) ) {
-							$index ++;
-							continue;
-						}
-						
-						$subfield = $field->subfields[$index];
-						$subfield->save_value($variation_id, $name, $value, true);
-						
-						if ( strpos($name, 'product_attr_') !== false ) {
-							wp_set_post_terms($variation_id, $subfield->sanitize_for_db($value, $variation_id), $name);	
-						}
-						
-						$index ++;
-					}
-					
-					$outer_index ++;
+			foreach ( $sorted as $variation_id => $fields ) {
+				if ( strpos($variation_id, '_') === false ) {
+						$variation_id = $ids[] = wp_insert_post(array(
+							'post_content' => mp_arr_get_value('description', $fields, ''),
+							'post_title' => 'Product Variation of ' . $post_id,
+							'post_status' => 'publish',
+							'post_type' => 'mp_product_variation',
+							'post_parent' => $post_id,
+							'menu_order' => $menu_order,
+						));
+				} else {					
+					$ids[] = $variation_id = substr($variation_id, 1);
+					wp_update_post(array(
+						'ID' => $variation_id,
+						'post_content' => mp_arr_get_value('description', $fields, ''),
+						'post_status' => 'publish',
+						'menu_order' => $menu_order,
+					));
 				}
+				
+				// Update post thumbnail
+				if ( empty($fields['image']) ) {
+					delete_post_thumbnail($variation_id);
+				} else {
+					set_post_thumbnail($variation_id, $fields['image']);
+				}
+				
+				// Unset the fields that shouldn't be saved as post meta
+				$fields['description'] = $fields['image'] = null;
+						
+				$index = 0;
+				foreach ( $fields as $name => $value ) {
+					if ( is_null($value) ) {
+						$index ++;
+						continue;
+					}
+					
+					$subfield = $field->subfields[$index];
+					$subfield->save_value($variation_id, $name, $value, true);
+					
+					if ( strpos($name, 'product_attr_') !== false ) {
+						wp_set_post_terms($variation_id, $subfield->sanitize_for_db($value, $variation_id), $name);	
+					}
+					
+					$index ++;
+				}
+				
+				$menu_order ++;
 			}
 			
 			$delete_where .= " AND {$wpdb->posts}.ID NOT IN (" . implode(',', $ids) . ")";
@@ -676,6 +670,7 @@ class MP_Products_Screen {
 		foreach ( $atts as $att ) {
 			$slug = $mp_product_atts->generate_slug($att->attribute_id);
 			$terms = get_terms($slug, 'hide_empty=0');
+			$terms = $mp_product_atts->sort($terms, false);
 			$options = array();
 			
 			foreach ( $terms as $term ) {
@@ -909,6 +904,7 @@ class MP_Products_Screen {
 			foreach ( $atts as $att ) {
 				$slug = $mp_product_atts->generate_slug($att->attribute_id);
 				$terms = get_terms($slug, 'hide_empty=0');
+				$terms = $mp_product_atts->sort($terms, false);
 				$options = array();
 				
 				foreach ( $terms as $term ) {

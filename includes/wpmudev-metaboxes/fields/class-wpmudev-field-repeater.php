@@ -155,56 +155,33 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @return array
 	 */
 	public function sort_subfields( $unsorted ) {
-		$new = $existing = array();
-		
-		foreach ( $unsorted as $input_name => $array ) {
-			foreach ( $array as $type => $array2 ) {
-				switch ( $type ) {
-					case 'new' :
-						$fields = array();
-						foreach ( $array2 as $index => $value ) {
-							$subfield = $this->subfields[$index];
-							$new[$index][$input_name] = $value;
+		$sorted = array();
+		foreach ( $unsorted as $idx => $array ) {
+			foreach ( $array as $input_name => $array2 ) {
+				if ( mp_arr_get_value('existing', $array2) ) {
+					$post_id = key(mp_arr_get_value('existing', $array2));
+					$value = mp_arr_get_value("existing->$post_id", $array2);
+					$sorted['_' . $post_id][$input_name] = $value; 
+				} elseif ( mp_arr_get_value('new', $array2)) {
+					$value = mp_arr_get_value('new->0', $array2);
+					$sorted[$idx][$input_name] = $value;
+				} else {
+					// Complex fields need one additional loop
+					foreach ( $array2 as $input_name2 => $array3 ) {
+						if ( mp_arr_get_value('existing', $array3) ) {
+							$post_id = key(mp_arr_get_value('existing', $array3));
+							$value = mp_arr_get_value("existing->$post_id", $array3);
+							$sorted['_' . $post_id][$input_name][$input_name2] = $value; 
+						} elseif ( mp_arr_get_value('new', $array3)) {
+							$value = mp_arr_get_value('new->0', $array3);
+							$sorted[$idx][$input_name][$input_name2] = $value;
 						}
-					break;
-				
-					case 'existing' :
-						$index = 0;
-						foreach ( $array2 as $variation_id => $value ) {
-							$subfield = $this->subfields[$index];
-							$existing[$variation_id][$input_name] = $value;
-							$index ++;
-						}
-					break;
-					
-					// Repeater fields will have $input_name as $type key
-					default :
-						$input_name2 = $type;
-						foreach ( $array2 as $type2 => $array3 ) {
-							switch ( $type2 ) {
-								case 'new' :
-									foreach ( $array3 as $index => $value ) {
-										$subfield = $this->subfields[$index];
-										$new[$index][$input_name][$input_name2] = $value;
-									}
-								break;
-							
-								case 'existing' :
-									$index = 0;
-									foreach ( $array3 as $variation_id => $value ) {
-										$subfield = $this->subfields[$index];
-										$existing[$variation_id][$input_name][$input_name2] = $value;
-										$index ++;
-									}
-								break;
-							}
-						}
-					break;
+					}
 				}
 			}
 		}
 		
-		return array('new' => $new, 'existing' => $existing);
+		return $sorted;
 	}
 	
 	/**
@@ -258,6 +235,8 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		
 		foreach ( $data as $outer_index => $row ) :
 			foreach ( $this->subfields as $index => $subfield ) :
+				$subfield->set_order($outer_index);
+
 				if ( isset($data[$outer_index][$subfield->args['original_name']]) ) {
 					$id = ( isset($data[$outer_index]['ID']) ) ? $data[$outer_index]['ID'] : $outer_index;
 					$subfield->set_value($data[$outer_index][$subfield->args['original_name']]);
@@ -360,6 +339,20 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
+	var updateOrdering = function( $elms ){
+		$elms.each(function(i){
+			var $this = $(this);
+			$this.find('.wpmudev-subfield-group-index').find('span').html(i + 1);
+			$this.find('input,textarea,select').filter('[name]').each(function(){
+				var $this = $(this),
+						name = $this.attr('name'),
+						newName = name.replace(/\[[\d*]\]/, '[' + i + ']');
+						
+				$this.attr('name', newName);
+			});
+		});
+	};
+	
 	$('.wpmudev-subfields').sortable({
 		"axis" : "y",
 		"forceHelperSize" : true,
@@ -377,9 +370,7 @@ jQuery(document).ready(function($){
 			$(document).trigger('wpmudev_repeater_field/start_sort', [ ui.item ]);
 		},
 		"stop" : function(e, ui) {
-			ui.item.siblings().andSelf().each(function(i){
-				$(this).find('.wpmudev-subfield-group-index').find('span').html(i + 1);
-			});
+			updateOrdering(ui.item.siblings().andSelf());
 			
 			/**
 			 * Triggered when sorting stops
@@ -391,7 +382,8 @@ jQuery(document).ready(function($){
 		},
 		"helper" : function(e, ui){
 			ui.children().each(function() {
-		  	$(this).width($(this).width());
+				var $this = $(this);
+		  	$this.width($this.width());
 		  });
 		  
 		  return ui;
@@ -435,9 +427,7 @@ jQuery(document).ready(function($){
 			$(document).trigger('wpmudev_repeater_field/after_delete_field_group', [ $subfieldGroup ]);
 
 			$subfieldGroup.remove();
-			$siblings.each(function(i){
-				$(this).find('.wpmudev-subfield-group-index').find('span').html(i + 1);
-			});
+			updateOrdering($siblings);
 		}
 	});
 	
@@ -454,10 +444,8 @@ jQuery(document).ready(function($){
 				$clonedRow = $subfields.data('toClone').clone(),
 				didOne = false;
 								
-		$clonedRow.find('[name]').val('');
 		$clonedRow.find('.wpmudev-subfield-inner').css('display', 'none');
 		$clonedRow.appendTo($subfields);
-		$clonedRow.find('.wpmudev-subfield-group-index').find('span').html($clonedRow.index() + 1);
 		$clonedRow.find('[name]').each(function(){
 			var $this = $(this),
 					name = $this.attr('name').replace('existing', 'new'),
@@ -467,6 +455,13 @@ jQuery(document).ready(function($){
 			for ( i = 1; i < (nameParts.length - 1); i++ ) {
 				var namePart = nameParts[i].replace(']', '');
 				newName += '[' + namePart + ']';
+			}
+			
+			// Reset input value
+			if ( $this.attr('data-default-value') !== undefined ) {
+				$this.val($this.attr('data-default-value'));
+			} else {
+				$this.val('');
 			}
 			
 			$this.attr('name', newName + '[]');
@@ -488,6 +483,8 @@ jQuery(document).ready(function($){
 			$this.attr('id', '').uniqueId();
 			$clonedRow.find('label[for="' + oldId + '"]').attr('for', $this.attr('id'));
 		});
+		
+		updateOrdering($clonedRow.siblings().andSelf());
 		
 		/**
 		 * Triggered when a row is added.

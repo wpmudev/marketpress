@@ -169,6 +169,10 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 					$field->set_value($val);
 				}
 				
+				if ( $this->is_subfield ) {
+					$field->set_order($this->_order);
+				}
+				
 				if ( $this->args['layout'] == 'columns' ) :  ?>
 			<label class="wpmudev-field-complex-label" style="width:<?php echo $label_width ; ?>"><?php $field->display($post_id); ?><span><?php echo $field->args['label']['text']; ?></span></label>
 		<?php
