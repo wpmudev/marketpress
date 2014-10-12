@@ -263,24 +263,29 @@ label.error:before {
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field-tab-labels-holder {
   background: #eaeaea;
-  border-radius: 5px 5px 0 0;
+  border-radius: 5px;
   display: table;
   margin: 0;
-  padding-top: 3px;
+  padding: 5px 0;
   width: 100%;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field-tab-label {
   display: table-cell;
   margin: 0;
-  padding: 0 3px;
+  padding: 0 5px;
   text-align: center;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field-tab-label.active .wpmudev-field-tab-label-link {
   background: #fff;
-  border-radius: 4px 4px 0 0;
+  border-color: #dadada;
+  border-radius: 4px;
+  -moz-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
   color: #000;
 }
 .postbox.wpmudev-postbox .inside .wpmudev-field-tab-label-link {
+  border: 1px solid transparent;
   display: block;
   font-size: 12px;
   font-weight: 700;

@@ -2,8 +2,8 @@
   content: "";
   display: table;
 }
-#colorbox .mp_input_error,
-#mp_single_product .mp_input_error {
+#colorbox span.mp_input_error,
+#mp_single_product span.mp_input_error {
   position: relative;
   background: #b90303;
   border-radius: 4px;
@@ -16,8 +16,8 @@
   padding: 0 10px;
   vertical-align: top;
 }
-#colorbox .mp_input_error:before,
-#mp_single_product .mp_input_error:before {
+#colorbox span.mp_input_error:before,
+#mp_single_product span.mp_input_error:before {
   position: absolute;
   top: 50%;
   left: -3px;

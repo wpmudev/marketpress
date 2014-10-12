@@ -39,6 +39,7 @@ var mp_cart = {};
 		$('.mp_product_options_att_input_label').find(':radio').change(function(){
 			var $this = $(this), $form = $this.closest('form');
 			//! TODO: update product attributes based upon selected attributes (e.g. blue might not be not available in large size)
+		});
 	}
 	
 	mp_cart.initProductOptionsLightbox = function(){
