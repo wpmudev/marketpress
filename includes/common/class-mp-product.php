@@ -844,15 +844,19 @@ class MP_Product {
 		}
 		
 		$terms = wp_get_object_terms($ids, $taxonomies);
+		$terms_sorted = $mp_product_atts->sort($terms);
 		$names = array();
-		foreach ( $terms as $term ) {
-			$tax_id = $mp_product_atts->get_id_from_slug($term->taxonomy);
-			if ( $att = $mp_product_atts->get_one($tax_id) ) {
-				if ( ! array_key_exists($term->taxonomy, $names) ) {
-					mp_push_to_array($this->_attributes, "{$term->taxonomy}->name", $att->attribute_name);
+		foreach ( $terms_sorted as $tax_slug => $terms ) {
+			$tax_id = $mp_product_atts->get_id_from_slug($tax_slug);
+			
+			foreach ( $terms as $term ) {
+				if ( $att = $mp_product_atts->get_one($tax_id) ) {
+					if ( ! array_key_exists($term->taxonomy, $names) ) {
+						mp_push_to_array($this->_attributes, "{$term->taxonomy}->name", $att->attribute_name);
+					}
+					
+					mp_push_to_array($this->_attributes, "{$term->taxonomy}->terms->{$term->term_id}", $term->name);
 				}
-				
-				mp_push_to_array($this->_attributes, "{$term->taxonomy}->terms->{$term->term_id}", $term->name);
 			}
 		}
 		

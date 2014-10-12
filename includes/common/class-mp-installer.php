@@ -108,6 +108,23 @@ class MP_Installer {
 	}
 	
 	/**
+	 * Add term_order column to $wpdb->terms table
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 */
+	public function add_term_order_column() {
+		global $wpdb;
+		
+		$result = $wpdb->query("SHOW COLUMNS FROM $wpdb->terms LIKE 'term_order'");
+		
+		if ( $result == 0 ) {
+			$result = $wpdb->query("ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`");
+		}
+	}
+	
+	/**
 	 * Display the db update page
 	 *
 	 * @since 3.0
@@ -210,6 +227,13 @@ class MP_Installer {
 		
 		// Update settings
 		update_option('mp_settings', $settings);
+		
+		// Create product attributes table if it doesn't exist
+		$this->create_product_attributes_table();
+		// Give admin role all store capabilities
+		$this->add_admin_store_caps();
+		// Add "term_order" to $wpdb->terms table
+		$this->add_term_order_column();
 
 		// Only run these on first install
 		if ( empty($old_settings) ) {
@@ -258,18 +282,6 @@ class MP_Installer {
 		//! TODO: copy from 2.9
 	}
 	
-	/**
-	 * Creates stores pages.
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action admin_init
-	 */
-	public function create_store_pages() {
-		$store_page = get_option('mp_store_page');
-		//! TODO: create store pages
-	}
-
 	/**
 	 * Updates presentation settings.
 	 *
@@ -378,13 +390,8 @@ class MP_Installer {
 		$this->_db_update_required();
 		$this->backup_legacy_settings($settings);
 		$this->update_coupon_schema();
-		$this->create_product_attributes_table();
-		$this->add_admin_store_caps();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);
-		
-		// Create store pages
-		add_action('admin_init', array(&$this, 'create_store_pages'));
 		
 		//currency changes
 		if ( 'TRL' == mp_get_setting('currency') ) {

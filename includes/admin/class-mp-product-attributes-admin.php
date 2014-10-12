@@ -92,6 +92,11 @@ th.column-ID {
 				'ASC' => __('Ascending', 'mp'),
 				'DESC' => __('Descending', 'mp'),
 			),
+			'conditional' => array(
+				'name' => 'product_attribute_terms_sort_by',
+				'value' => 'CUSTOM',
+				'action' => 'hide',
+			),
 		));
 		$repeater = $metabox->add_field('repeater', array(
 			'name' => 'product_attribute_terms',
@@ -146,13 +151,19 @@ th.column-ID {
 			break;
 			
 			case 'product_attribute_terms' :
-				$attribute_slug = MP_Product_Attributes::get_instance()->generate_slug(mp_get_get_value('attribute_id'));
+				$product_atts = MP_Product_Attributes::get_instance();
+				$attribute_slug = $product_atts->generate_slug(mp_get_get_value('attribute_id'));
 				$terms = get_terms($attribute_slug, array('hide_empty' => false));
 				$value = array();
+				
+				// Sort terms by term order
+				$product_atts->sort_terms_by_custom_order($terms);
 				
 				foreach ( $terms as $term ) {
 					$value[] = array('ID' => $term->term_id, 'name' => $term->name, 'slug' => $term->slug);
 				}
+				
+				
 			break;
 		}
 		
@@ -211,28 +222,40 @@ th.column-ID {
 			), array('attribute_id' => $attribute_id));
 
 			//insert terms
-			foreach ( mp_get_post_value('product_attribute_terms->name->new', array()) as $key => $term_name ) {
-				if ( $term_slug = mp_get_post_value('product_attribute_terms->slug->new->' . $key) ) {
-					$term = wp_insert_term($term_name, $attribute_slug, array('slug' => substr(sanitize_key($term_slug), 0, 32)));
+			$order = 0;
+			foreach ( mp_get_post_value('product_attribute_terms', array()) as $order => $array ) {
+				$term_args = array();
+					
+				if ( mp_arr_get_value('slug->new', $array) ) {
+					$term_slug = mp_arr_get_value('slug->new->0', $array);
+					$term_name = mp_arr_get_value('name->new->0', $array);
+					
+					if ( ! empty($term_slug) ) {
+						$term_args['slug'] = substr(sanitize_key($term_slug), 0, 32);
+					}
+					
+					$term = wp_insert_term($term_name, $attribute_slug, $term_args);
+					
+					if ( ! is_wp_error($term) ) {
+						$term_ids[] = $term_id = $term['term_id'];
+					} else {
+						// term slug already exists, get existing term slug
+						$term_ids[] = $term_id = $term->error_data['term_exists'];
+					}
 				} else {
-					$term = wp_insert_term($term_name, $attribute_slug);
+					$term_id = $term_ids[] = key(mp_arr_get_value('slug->existing', $array));
+					$term_args['slug'] = mp_arr_get_value("slug->existing->$term_id", $array);
+					$term_args['name'] = mp_arr_get_value("name->existing->$term_id", $array);
+					
+					if ( ! empty($term_args['slug']) ) {
+						$term_args['slug'] = substr(sanitize_key($term_args['slug']), 0, 32);
+					}
+					
+					wp_update_term($term_id, $attribute_slug, $term_args);					
 				}
 				
-				if ( ! is_wp_error($term) ) {
-					$term_ids[] = $term['term_id'];
-				} else {
-					// term slug already exists, get existing term slug
-					$term_ids[] = $term->error_data['term_exists'];
-				}
-			}
-			
-			//update existing terms
-			foreach ( mp_get_post_value('product_attribute_terms->name->existing', array()) as $term_id => $term_name ) {
-				$term_ids[] = $term_id;
-				wp_update_term($term_id, $attribute_slug, array(
-					'name' => $term_name,
-					'slug' => ( $term_slug = mp_get_post_value('product_attribute_terms->slug->existing->' . $term_id) ) ? substr($term_slug, 0, 32) : substr(sanitize_key(mp_get_post_value('product_attribute_slug->existing->' . $term_id, '')), 0, 32),
-				));
+				// Update term order
+				$wpdb->update($wpdb->terms, array('term_order' => ($order + 1)), array('term_id' => $term_id));
 			}
 			
 			//remove deleted terms
@@ -261,7 +284,7 @@ th.column-ID {
 		} ?>
 <script type="text/javascript">
 jQuery(document).ready(function($){
-	$('.wpmudev-subfields').on('blur', 'input[name^="product_attribute_terms[name]"]', function(){
+	$('.wpmudev-subfields').on('blur', 'input[name^="product_attribute_terms"][name*="[name]"]', function(){
 		var $this = $(this),
 				$slugField = $this.closest('.wpmudev-subfield').next('.wpmudev-subfield').find('input');
 				

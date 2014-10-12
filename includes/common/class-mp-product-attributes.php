@@ -153,7 +153,65 @@ class MP_Product_Attributes {
 			));
 		}
 	}
-
+	
+	/**
+	 * Sort attributes per settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $attributes
+	 * @return array
+	 */
+	public function sort( $attributes, $grouping = true ) {
+		$groups = array();
+		
+		// Put attributes into groups by taxonomy
+		foreach ( $attributes as $attribute ) {
+			$groups[$attribute->taxonomy][] = $attribute;
+		}
+		
+		// Sort terms
+		foreach ( $groups as $tax_slug => &$group ) {
+			$tax_id = $this->get_id_from_slug($tax_slug);
+			$tax = $this->get_one($tax_id);
+			
+			switch ( $tax->attribute_terms_sort_by ) {
+				case 'ID' :
+					if ( $tax->attribute_terms_sort_order == 'ASC' ) {
+						usort($group, create_function('$a, $b', 'return ( $a->term_id == $b->term_id ) ? 0 : ( $a->term_id < $b->term_id ) ? -1 : 1;'));
+					} else {
+						usort($group, create_function('$a, $b', 'return ( $a->term_id == $b->term_id ) ? 0 : ( $a->term_id < $b->term_id ) ? 1 : -1;'));
+					}
+				break;
+				
+				case 'ALPHA' :
+					if ( $tax->attribute_terms_sort_order == 'ASC' ) {
+						usort($group, create_function('$a, $b', 'return ( $a->name == $b->name ) ? 0 : ( $a->name < $b->name ) ? -1 : 1;'));
+					} else {
+						usort($group, create_function('$a, $b', 'return ( $a->name == $b->name ) ? 0 : ( $a->name < $b->name ) ? 1 : -1;'));
+					}
+				break;
+				
+				case 'CUSTOM' :
+					$this->sort_terms_by_custom_order($group);
+				break;
+			}
+		}
+		
+		return ( $grouping ) ? $groups : array_shift($groups);
+	}
+	
+	/**
+	 * Sort terms by custom order
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $terms
+	 */
+	public function sort_terms_by_custom_order( &$terms ) {
+		usort($terms, create_function('$a, $b', 'return ( $a->term_order == $b->term_order ) ? 0 : ( $a->term_order < $b->term_order ) ? -1 : 1;'));
+	}
+	
 	/**
 	 * Constructor function
 	 *
