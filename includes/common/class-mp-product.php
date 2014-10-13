@@ -2,52 +2,52 @@
 
 class MP_Product {
 	/**
-	 * Refers to the product's ID
+	 * Refers to the product's ID.
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @type int
+	 * @var int
 	 */
 	var $ID = null;
 	
 	/**
-	 * Refers to the product's variations
+	 * Refers to the product's variations.
 	 *
 	 * @since 3.0
 	 * @access protected
-	 * @type array
+	 * @var array
 	 */
 	protected $_variations = null;
-
+	
 	/**
 	 * Refers to the product's variation IDs
 	 *
 	 * @since 3.0
 	 * @access protected
-	 * @type array
+	 * @var array
 	 */
 	protected $_variation_ids = null;
 	
 	/**
-	 * Refers to the product's attributes
+	 * Refers to the product's attributes.
 	 *
 	 * @since 3.0
 	 * @access protected
-	 * @type array
+	 * @var array
 	 */
 	protected $_attributes = null;
 		
 	/**
-	 * Refers to if the product is on sale
+	 * Refers to if the product is on sale.
 	 *
 	 * @since 3.0
 	 * @access protected
-	 * @type bool
+	 * @var bool
 	 */
 	protected $_on_sale = null;
 	
 	/**
-	 * Refers to the product's internal WP_Post object
+	 * Refers to the product's internal WP_Post object.
 	 *
 	 * @since 3.0
 	 * @access protected
@@ -56,7 +56,7 @@ class MP_Product {
 	protected $_post = null;
 	
 	/**
-	 * Refers to the whether the product exists or not
+	 * Refers to the whether the product exists or not.
 	 *
 	 * @since 3.0
 	 * @access protected
@@ -65,7 +65,7 @@ class MP_Product {
 	protected $_exists = null;
 	
 	/**
-	 * Refers to whether or not the class has attempted to fetch the internal WP_Post object or not
+	 * Refers to whether or not the class has attempted to fetch the internal WP_Post object or not.
 	 *
 	 * @since 3.0
 	 * @access protected
@@ -74,7 +74,7 @@ class MP_Product {
 	protected $_post_queried = false;
 	
 	/**
-	 * Get the internal post type for products
+	 * Get the internal post type for products.
 	 *
 	 * @since 3.0
 	 * @access public
@@ -147,6 +147,45 @@ class MP_Product {
 	}
 	
 	/**
+	 * Filter a given set of attribute terms given a set of selected attributes
+	 *
+	 * Some times certain attribute permutations aren't available - for example
+	 * a t-shirt in the color blue might not be available in a certain size.
+	 *
+	 * @since 3.0
+	 * @param array $terms The unfiltered terms.
+	 * @param string $slug The taxonomy of the unfiltered terms.
+	 * @param array $selected The other selected attributes.
+	 * @return array
+	 */
+	public function filter_terms( $terms, $slug, $selected ) {
+		//! TODO: this works OK for one selected attribute - need to figure out how to do this for more than one selected attribute
+		
+		$variations = $this->get_variations();
+		$filtered_posts = $filtered_terms = array();
+		
+		// Get all variations that have the first selected attribute
+		foreach ( $variations as $variation ) {
+			$tax_slug = key($selected);
+			$term_id = current($selected);
+			
+			if ( has_term($term_id, $tax_slug, $variation) ) {
+				$filtered_posts[] = $variation;
+			}
+		}
+		
+		$post = current($filtered_posts);
+
+		$the_terms = get_the_terms($post->ID, $slug);
+		$the_terms = MP_Product_Attributes::get_instance()->sort($the_terms, false);
+		foreach ( $the_terms as $term ) {
+			$filtered_terms[$term->term_id] = $term->name;
+		}
+		
+		return $filtered_terms;
+	}
+	
+	/**
 	 * Display the attribute fields
 	 *
 	 * @since 3.0
@@ -154,9 +193,9 @@ class MP_Product {
 	 * @param bool $echo
 	 */
 	public function attribute_fields( $echo = true ) {
-		$atts = $this->get_attributes();
-		$html = '<h4>' . __('Choose Options:', 'mp') . '</h4>';
 		$html = '';
+		$atts = $this->get_attributes();
+		$selected_att = null;
 		
 		foreach ( $atts as $slug => $att ) {
 			$html .= '
@@ -164,11 +203,18 @@ class MP_Product {
 					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
 					<div class="clearfix">';
 			
+			if ( is_null($selected_att) ) {
+				$selected_att[$slug] = key($att['terms']);
+			} else {
+				$att['terms'] = $this->filter_terms($att['terms'], $slug, $selected_att); 
+			}
+			
 			$index = 0;
 			foreach ( $att['terms'] as $term_id => $term_name ) {
 				$input_id = 'mp_product_options_att_' . $term_id;
 				$class = ( $index == 0 ) ? ' class="required"' : '';
 				$checked = ( $index == 0 ) ? ' checked' : '';
+				
 				$html .= '
 						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
 							<input id="' . $input_id . '"' . $class . ' type="radio" name="product_attr[' . $slug . ']" value="' . $term_id . '"' . $checked . ' />
