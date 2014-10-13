@@ -36,13 +36,14 @@ class MP_Product_Attributes_List_Table extends WP_List_Table {
 	
 	function get_data() {
 		$data = array();
-		$atts = MP_Product_Attributes::get_instance()->get();
+		$mp_product_atts = MP_Product_Attributes::get_instance();
+		$atts = $mp_product_atts->get();
 		
 		foreach ( $atts as $att ) {
 			$data[] = array(
 				'ID' => $att->attribute_id,
 				'name' => $att->attribute_name,
-				'slug' => 'product_attribute_' . $att->attribute_id,
+				'slug' => $mp_product_atts::SLUGBASE . $att->attribute_id,
 			);
 		}
 		

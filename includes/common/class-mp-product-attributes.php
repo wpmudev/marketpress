@@ -20,6 +20,15 @@ class MP_Product_Attributes {
 	protected $_atts = null;
 	
 	/**
+	 * Refers to the base slug for all product attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var string
+	 */
+	const SLUGBASE = 'product_attr_';
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -65,7 +74,7 @@ class MP_Product_Attributes {
 	 * @return int
 	 */
 	public function get_id_from_slug( $slug ) {
-		return (int) str_replace('product_attr_', '', $slug);
+		return (int) str_replace(self::SLUGBASE, '', $slug);
 	}
 	
 	/**
@@ -96,7 +105,7 @@ class MP_Product_Attributes {
 	 * @return string
 	 */
 	public function generate_slug( $id ) {
-		return 'product_attr_' . $id;
+		return self::SLUGBASE . $id;
 	}
 	
 	/**
