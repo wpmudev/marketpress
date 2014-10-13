@@ -506,10 +506,6 @@ class MP_Products_Screen {
 					'label' => __('Shipping', 'mp'),
 					'slug' => 'shipping',
 				),
-				array(
-					'label' => __('Attributes', 'mp'),
-					'slug' => 'attributes',
-				),
 			),
 		));
 		
@@ -659,35 +655,6 @@ class MP_Products_Screen {
 				'action' => 'show',
 			),	
 		));
-		
-		// Attributes Tab
-		$metabox->add_field('tab', array(
-			'name' => 'product_tab_attributes',
-			'slug' => 'attributes'
-		));
-		$mp_product_atts = MP_Product_Attributes::get_instance();
-		$atts = $mp_product_atts->get();
-		foreach ( $atts as $att ) {
-			$slug = $mp_product_atts->generate_slug($att->attribute_id);
-			$terms = get_terms($slug, 'hide_empty=0');
-			$terms = $mp_product_atts->sort($terms, false);
-			$options = array();
-			
-			foreach ( $terms as $term ) {
-				$options[$term->term_id] = $term->name;
-			}
-			
-			$metabox->add_field('advanced_select', array(
-				'name' => $slug,
-				'label' => array('text' => $att->attribute_name),
-				'options' => $options,
-				'conditional' => array(
-					'name' => 'product_type',
-					'value' => array('physical', 'digital'),
-					'action' => 'show',
-				),	
-			));
-		}			
 	}
 		
 	/**
