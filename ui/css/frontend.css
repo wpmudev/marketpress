@@ -104,6 +104,9 @@
 #mp_product_options_att_quantity {
   border: 2px solid #ddd;
   padding: 3px 6px;
+  -moz-transition: border-color 300ms;
+  -webkit-transition: border-color 300ms;
+  transition: border-color 300ms;
   width: 50px;
 }
 #mp_product_options_att_quantity:active,
