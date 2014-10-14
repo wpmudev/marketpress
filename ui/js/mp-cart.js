@@ -36,9 +36,24 @@ var mp_cart = {};
 			}
 		});
 		
-		$('.mp_product_options_att_input_label').find(':radio').change(function(){
-			var $this = $(this), $form = $this.closest('form');
-			//! TODO: update product attributes based upon selected attributes (e.g. blue might not be not available in large size)
+		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label :radio', function(){
+			var $this = $(this),
+					$form = $this.closest('form'),
+					$loadingGraphic = $('#cboxLoadingOverlay'),
+					url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
+			
+			$loadingGraphic.show();
+			$this.closest('.mp_product_options_att').nextAll('.mp_product_options_att').find(':radio').prop('checked', false);
+			
+			$.post(url, $form.serialize(), function(resp){
+				$loadingGraphic.hide();
+				
+				if ( resp.success ) {
+					$.each(resp.data, function(index, value){
+						$('#mp_' + index).html(value);
+					});
+				}
+			})
 		});
 	}
 	

@@ -89,6 +89,7 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @action wp_ajax_mp_product_get_variations_lightbox, wp_ajax_nopriv_mp_product_get_variations_lightbox
 	 */
 	public function ajax_display_variations_lightbox() {
 		$product_id = mp_get_get_value('product_id');
@@ -122,6 +123,77 @@ class MP_Product {
 	}
 	
 	/**
+	 * Update the product attributes based upon selection
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_product_update_attributes, wp_ajax_nopriv_mp_product_update_attributes
+	 */
+	public function ajax_update_attributes() {
+		$product_atts = MP_Product_Attributes::get_instance();
+		$all_atts = $product_atts->get();
+		$tax_query = $filtered_atts = $taxonomies = $filtered_terms = $json = array();
+		$product_id = mp_get_post_value('product_id');
+		
+		if ( empty($product_id) ) {
+			wp_send_json_error();
+		}
+		
+		foreach ( $_POST as $key => $val ) {
+			if ( false !== strpos($key, $product_atts::SLUGBASE) ) {
+				$taxonomies[] = $key;
+				$tax_query[] = array(
+					'taxonomy' => $key,
+					'terms' => $val,
+				);
+			}
+		}
+		
+		// Get variations that have all selected attributes
+		$posts = get_posts(array(
+			'post_type' => 'mp_product_variation',
+			'posts_per_page' => -1,
+			'post_parent' => mp_get_post_value('product_id'),
+			'tax_query' => array('relation' => 'AND') + $tax_query,
+		));
+		
+		// Filter out taxonomies that already have values and are still valid
+		foreach ( $all_atts as $att ) {
+			$slug = $product_atts->generate_slug($att->attribute_id);
+			if ( ! in_array($slug, $taxonomies) ) {
+				$filtered_atts[] = $slug;
+			}
+		}
+		
+		//! TODO: take into account out-of-stock variations
+		
+		// Make sure all attribute terms are unique
+		foreach ( $posts as $post ) {
+			foreach ( $filtered_atts as $tax_slug ) {
+				$terms = get_the_terms($post->ID, $tax_slug);
+				foreach ( $terms as $term ) {
+					$filtered_terms[$tax_slug][$term->term_id] = $term;
+				}
+			}
+		}
+		
+		// Format attribute terms for display
+		foreach ( $filtered_terms as $tax_slug => $terms ) {
+			$json[$tax_slug] = '';
+			$index = 0;
+			$terms = $product_atts->sort($terms, false);
+			foreach ( $terms as $term ) {
+				$checked = ( mp_get_post_value($tax_slug) == $term->term_id ) ? true : false;
+				$required = ( $index == 0 ) ? true : false;
+				$json[$tax_slug] .= self::attribute_field($term->term_id, $term->name, $tax_slug, $required, $checked);
+				$index ++;
+			}
+		}
+		
+		wp_send_json_success($json);
+	}
+	
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
@@ -147,42 +219,34 @@ class MP_Product {
 	}
 	
 	/**
-	 * Filter a given set of attribute terms given a set of selected attributes
-	 *
-	 * Some times certain attribute permutations aren't available - for example
-	 * a t-shirt in the color blue might not be available in a certain size.
+	 * Display a single attribute field
 	 *
 	 * @since 3.0
-	 * @param array $terms The unfiltered terms.
-	 * @param string $slug The taxonomy of the unfiltered terms.
-	 * @param array $selected The other selected attributes.
-	 * @return array
+	 * @access public
 	 */
-	public function filter_terms( $terms, $slug, $selected ) {
-		//! TODO: this works OK for one selected attribute - need to figure out how to do this for more than one selected attribute
+	public function attribute_field( $term_id, $term_name, $tax_slug, $required = false, $checked = false ) {
+		$input_id = 'mp_product_options_att_' . $term_id;
+		$class = ( $required ) ? ' class="required"' : '';
 		
-		$variations = $this->get_variations();
-		$filtered_posts = $filtered_terms = array();
+		$html = '
+				<label class="mp_product_options_att_input_label" for="' . $input_id . '">
+					<input id="' . $input_id . '"' . $class . ' type="radio" name="' . $tax_slug . '" value="' . $term_id . '"' . (( $checked ) ? ' checked' : '') . ' />
+					<span>' . $term_name . '</span>
+				</label>';
 		
-		// Get all variations that have the first selected attribute
-		foreach ( $variations as $variation ) {
-			$tax_slug = key($selected);
-			$term_id = current($selected);
-			
-			if ( has_term($term_id, $tax_slug, $variation) ) {
-				$filtered_posts[] = $variation;
-			}
-		}
+		/**
+		 * Filter the attribute field
+		 *
+		 * @since 3.0
+		 * @param string $html
+		 * @param int $term_id
+		 * @param string $term_name
+		 * @param string $tax_slug
+		 * @param bool $required		 
+		 */
+		$html = apply_filters('mp_product/attribute_field', $html, $term_id, $term_name, $tax_slug, $required);
 		
-		$post = current($filtered_posts);
-
-		$the_terms = get_the_terms($post->ID, $slug);
-		$the_terms = MP_Product_Attributes::get_instance()->sort($the_terms, false);
-		foreach ( $the_terms as $term ) {
-			$filtered_terms[$term->term_id] = $term->name;
-		}
-		
-		return $filtered_terms;
+		return $html;	
 	}
 	
 	/**
@@ -201,25 +265,11 @@ class MP_Product {
 			$html .= '
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
-					<div class="clearfix">';
-			
-			if ( is_null($selected_att) ) {
-				$selected_att[$slug] = key($att['terms']);
-			} else {
-				$att['terms'] = $this->filter_terms($att['terms'], $slug, $selected_att); 
-			}
+					<div class="clearfix" id="mp_' . $slug . '">';
 			
 			$index = 0;
 			foreach ( $att['terms'] as $term_id => $term_name ) {
-				$input_id = 'mp_product_options_att_' . $term_id;
-				$class = ( $index == 0 ) ? ' class="required"' : '';
-				$checked = ( $index == 0 ) ? ' checked' : '';
-				
-				$html .= '
-						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
-							<input id="' . $input_id . '"' . $class . ' type="radio" name="product_attr[' . $slug . ']" value="' . $term_id . '"' . $checked . ' />
-							<span>' . $term_name . '</span>
-						</label>';
+				$html .= $this->attribute_field($term_id, $term_name, $slug, ( $index == 0 ) ? true : false);
 				$index ++;
 			}
 			

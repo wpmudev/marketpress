@@ -141,6 +141,9 @@ class MP_Ajax {
 		// Get product variation colorbox
 		add_action('wp_ajax_mp_product_get_variations_lightbox', array('MP_Product', 'ajax_display_variations_lightbox'));
 		add_action('wp_ajax_nopriv_mp_product_get_variations_lightbox', array('MP_Product', 'ajax_display_variations_lightbox'));
+		// Update product attributes
+		add_action('wp_ajax_mp_product_update_attributes', array('MP_Product', 'ajax_update_attributes'));
+		add_action('wp_ajax_nopriv_mp_product_update_attributes', array('MP_Product', 'ajax_update_attributes'));		
 	}
 }
 
