@@ -104,7 +104,8 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			} else {
 				var args = {
 					"dropdownAutoWidth" : true,
-					"placeholder" : $this.attr('data-placeholder'),					
+					"placeholder" : $this.attr('data-placeholder'),
+					"allowClear" : true
 				};
 				
 				if ( $this.attr('data-format-dropdown-header') !== undefined ) {
@@ -171,9 +172,13 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 			echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . implode(',', $vals) . '" />';
 		else : ?>
 			<select <?php echo $this->parse_atts(); ?>>
-				<?php foreach ( $this->args['options'] as $val => $label ) : ?>
-				<option value="<?php echo $val; ?>"<?php echo in_array($val, $vals) ? ' selected' : ''; ?>><?php echo $label; ?></option>
-				<?php endforeach; ?>
+				<?php
+				foreach ( $this->args['options'] as $val => $label ) :
+					$value = empty($val) ? '' : ' value="' . $val . '"';
+				?>
+				<option<?php echo $value; echo in_array($val, $vals) ? ' selected' : ''; ?>><?php echo $label; ?></option>
+				<?php
+				endforeach; ?>
 			</select>
 		<?php
 		endif;
