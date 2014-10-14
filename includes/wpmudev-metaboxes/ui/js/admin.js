@@ -120,12 +120,13 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		
 		$.each(conditionals, function(i, conditional){
 			if ( conditional.name.indexOf('[') >= 0 && $obj.closest('.wpmudev-subfield-group').length ) {
-				var $input = $obj.closest('.wpmudev-subfield-group').find('[name^="' + conditional.name + '"]');
+				var nameParts = conditional.name.split('[');
+				var $input = $obj.closest('.wpmudev-subfield-group').find('[name^="' + nameParts[0] + '"][name*="[' + nameParts[1].replace(']', '') + ']"]');
 			} else {
 				var $input = $('[name="' + conditional.name + '"]');
 			}
 
-			if ( ! $input.is(':radio:visible') && ! $input.is(':checkbox:visible') && ! $input.is('select:visible') ) {
+			if ( ! $input.is(':radio') && ! $input.is(':checkbox') && ! $input.is('select') ) {
 				// Conditional logic only works for radios, checkboxes and select dropdowns
 				return;
 			}
