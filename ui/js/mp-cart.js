@@ -36,22 +36,38 @@ var mp_cart = {};
 			}
 		});
 		
-		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label :radio', function(){
+		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label input', function(){
 			var $this = $(this),
 					$form = $this.closest('form'),
 					$loadingGraphic = $('#cboxLoadingOverlay'),
+					$qtyChanged = $form.find('input[name="product_qty_changed"]');
 					url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 			
 			$loadingGraphic.show();
 			$this.closest('.mp_product_options_att').nextAll('.mp_product_options_att').find(':radio').prop('checked', false);
+			
+			if ( ! $this.is(':radio') ) {
+				$qtyChanged.val('1');
+			} else {
+				$qtyChanged.val('0');
+			}
 			
 			$.post(url, $form.serialize(), function(resp){
 				$loadingGraphic.hide();
 				
 				if ( resp.success ) {
 					$.each(resp.data, function(index, value){
+						if ( index == 'qty_in_stock' || index == 'out_of_stock' ) {
+							return;
+						}
+						
 						$('#mp_' + index).html(value);
 					});
+					
+					if ( resp.data.out_of_stock ) {
+						alert(resp.data.out_of_stock);
+						$form.find('input[name="product_quantity"]').val(resp.data.qty_in_stock);
+					}
 				}
 			})
 		});

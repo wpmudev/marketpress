@@ -101,6 +101,7 @@ class MP_Product {
 		?>
 <form class="mp_product_options_cb" method="post" action="<?php echo get_permalink(mp_get_setting('pages->cart')); ?>">
 	<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
+	<input type="hidden" name="product_qty_changed" value="0" />
 	<div class="mp_product_options_image">
 		<img class="mp_product_options_thumb" src="<?php $product->image_url(true, 'medium'); ?>" />
 	</div>
@@ -132,8 +133,11 @@ class MP_Product {
 	public function ajax_update_attributes() {
 		$product_atts = MP_Product_Attributes::get_instance();
 		$all_atts = $product_atts->get();
-		$tax_query = $filtered_atts = $taxonomies = $filtered_terms = $json = array();
+		$tax_query = $filtered_atts = $taxonomies = $filtered_terms = array();
+		$json = array('out_of_stock' => false, 'qty_in_stock' => 0);
 		$product_id = mp_get_post_value('product_id');
+		$qty = mp_get_post_value('product_quantity', 1);
+		$qty_changed = (bool) mp_get_post_value('product_qty_changed');
 		
 		if ( empty($product_id) ) {
 			wp_send_json_error();
@@ -160,19 +164,33 @@ class MP_Product {
 		// Filter out taxonomies that already have values and are still valid
 		foreach ( $all_atts as $att ) {
 			$slug = $product_atts->generate_slug($att->attribute_id);
-			if ( ! in_array($slug, $taxonomies) ) {
+			if ( ! in_array($slug, $taxonomies) || $qty_changed ) {
 				$filtered_atts[] = $slug;
 			}
 		}
 		
-		//! TODO: take into account out-of-stock variations
-		
-		// Make sure all attribute terms are unique
+		// Make sure all attribute terms are unique and in stock
 		foreach ( $posts as $post ) {
+			$product = new MP_Product($post);
+			
 			foreach ( $filtered_atts as $tax_slug ) {
 				$terms = get_the_terms($post->ID, $tax_slug);
+				
 				foreach ( $terms as $term ) {
-					$filtered_terms[$tax_slug][$term->term_id] = $term;
+					if ( $product->in_stock($qty) ) {
+						$filtered_terms[$tax_slug][$term->term_id] = $term;
+					} elseif ( $qty_changed ) {
+						$json['qty_in_stock'] = $product->get_stock();
+						
+						/**
+						 * Filter the out of stock alert message
+						 *
+						 * @since 3.0
+						 * @param string The default message.
+						 * @param MP_Product The product that is out of stock.
+						 */
+						$json['out_of_stock'] = apply_filters('mp_product/out_of_stock_alert', sprintf(__('We\'re sorry, we only have %d of this item in stock right now.', 'mp'), $json['qty_in_stock']), $product);
+					}
 				}
 			}
 		}
@@ -649,6 +667,27 @@ class MP_Product {
 		
 		return $price;
 	}
+	
+	/**
+	 * Get the current inventory in stock
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return int/array Number of units in stock or an array containing the number of units in stock for each variation.
+	 */
+	public function get_stock() {
+		if ( $this->has_variations() ) {
+			$stock = array();
+			$variations = $this->get_variations();
+			foreach ( $variations as $variation ) {
+				$stock[$variation->ID] = $variation->get_stock();
+			}
+		} else {
+			$stock = $this->get_meta('inventory', 0);
+		}
+		
+		return $stock;
+	}
 
 	/*
 	 * Get the product image
@@ -869,23 +908,29 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param int $qty The quantity to check against.
+	 * @return bool
 	 */
-	public function in_stock() {
-		$track_inventory = $this->get_meta('track_inventory');
-		if ( ($track_inventory && $this->get_meta('inventory')) || ! $track_inventory ) {
-			return true;
-		}
-		
+	public function in_stock( $qty = 1 ) {		
 		$has_stock = false;
+		
 		if ( $this->has_variations() ) {
 			$variations = $this->get_variations();		
 			foreach ( $variations as $variation ) {
-				if ( $variation->get_meta('track_inventory') && ! $variation->get_meta('inventory') ) {
-					$has_stock = false;	
+				if ( $variation->get_meta('track_inventory') ) {
+					$inventory = $variation->get_meta('inventory', 0);
+					$has_stock = ( $inventory >= $qty );
 				} else {
 					$has_stock = true;
 					break;
 				}
+			}
+		} else {
+			if ( $this->get_meta('track_inventory') ) {
+				$inventory = $this->get_meta('inventory', 0);
+				$has_stock = ( $inventory >= $qty );
+			} else {
+				$has_stock = true;
 			}
 		}
 		
