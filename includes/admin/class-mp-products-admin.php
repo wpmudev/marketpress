@@ -669,6 +669,7 @@ class MP_Products_Screen {
 			'title' => __('Variations', 'mp'),
 			'post_type' => MP_Product::get_post_type(),
 			'context' => 'normal',
+			'desc' => __('Create your product variations here. You can reorder variations by using the number to left of each variation, or delete one by clicking the "x" to the right of each variation. <strong>NOTE: The variation that shows up first in this list will be considered the "main variation". The details from this variation will be used in product listings.</strong>', 'mp'),
 			'conditional' => array(
 				'name' => 'has_variations',
 				'value' => 1,
@@ -872,7 +873,7 @@ class MP_Products_Screen {
 				$slug = $mp_product_atts->generate_slug($att->attribute_id);
 				$terms = get_terms($slug, 'hide_empty=0');
 				$terms = $mp_product_atts->sort($terms, false);
-				$options = array();
+				$options = array('');
 				
 				foreach ( $terms as $term ) {
 					$options[$term->term_id] = $term->name;
@@ -882,6 +883,8 @@ class MP_Products_Screen {
 					'name' => $slug,
 					'label' => array('text' => $att->attribute_name),
 					'options' => $options,
+					'multiple' => false,
+					'placeholder' => sprintf(__('Select a %s', 'mp'), $att->attribute_name),
 					'conditional' => array(
 						'name' => 'product_type',
 						'value' => array('physical', 'digital'),
