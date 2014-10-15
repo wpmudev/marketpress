@@ -12,8 +12,8 @@ Change Log:
 - New: Product variations have been rebuilt from the ground up!
 - New: Setup wizard
 - New: Regular/Sale price can now be bulk/quick edited
-- New: Product attributes
-- Added new default theme
+- New: Set store capabilities for all of your user roles!
+- Added new default store style
 - Added Bahrain Dinars to the list of available currencies.
 - Added links to settings/network settings on plugins page.
 - Settings metaboxes now use ajax instead of page refresh where applicable.
