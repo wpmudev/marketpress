@@ -75,9 +75,23 @@ class MP_Cart {
 	 * @action wp_ajax_mp_update_cart, wp_ajax_nopriv_mp_update_cart
 	 */
 	public function ajax_update_cart() {
-		$item_id = mp_get_post_value('product_id', null);
+		$item = mp_get_post_value('product', null);
 		$qty = mp_get_post_value('qty', 1);
 
+		if ( is_null($item_id) ) {
+			wp_send_json_error();
+		}
+		
+		if ( is_array($item) ) {
+			if ( $product_id = mp_arr_get_value('product_id', $item) ) {
+				unset($item['product_id']);
+				$product = new MP_Product($product_id);
+				if ( $variation = $product->get_variations_by_attributes($item, 0) ) {
+					$item_id = $variation->ID;
+				}
+			}
+		}
+		
 		if ( is_null($item_id) ) {
 			wp_send_json_error();
 		}

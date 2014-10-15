@@ -33,6 +33,18 @@ var mp_cart = {};
 			},
 			"ignore" : "",
 			"submitHandler" : function(form){
+				var $form = $(form),
+						item = {},
+						qty = $form.find('[name="product_quantity"]').val();
+						
+				// Build item object
+				item['product_id'] = $form.find('[name="product_id"]').val();
+				$form.find('[name^="product_attr_"]').each(function(){
+					var $this = $(this);
+					item[$this.attr('name')] = $this.val();
+				});
+				
+				mp_cart.addItem($form, item, qty);
 			}
 		});
 		
@@ -98,7 +110,7 @@ var mp_cart = {};
 		// we use the AjaxQ plugin here because we need to queue multiple add-to-cart requests http://wp.mu/96f
 		$.ajaxq('addtocart', {
 			"data" : {
-				"product_id" : item,
+				"product" : item,
 				"qty" : qty,
 				"cart_action" : "add_item"
 			},
