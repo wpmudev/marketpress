@@ -99,7 +99,7 @@ class MP_Product {
 			die(__('The product specified could not be found', 'mp'));
 		}
 		?>
-<form class="mp_product_options_cb" method="post" action="<?php echo get_permalink(mp_get_setting('pages->cart')); ?>">
+<form class="mp_product_options_cb" method="post" data-ajax-url="<?php echo admin_url('admin-ajax.php?action=mp_update_cart'); ?>" action="<?php echo get_permalink(mp_get_setting('pages->cart')); ?>">
 	<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
 	<input type="hidden" name="product_qty_changed" value="0" />
 	<div class="mp_product_options_image">
@@ -133,7 +133,7 @@ class MP_Product {
 	public function ajax_update_attributes() {
 		$product_atts = MP_Product_Attributes::get_instance();
 		$all_atts = $product_atts->get();
-		$tax_query = $filtered_atts = $taxonomies = $filtered_terms = array();
+		$attributes = $filtered_atts = $taxonomies = $filtered_terms = array();
 		$json = array('out_of_stock' => false, 'qty_in_stock' => 0);
 		$product_id = mp_get_post_value('product_id');
 		$qty = mp_get_post_value('product_quantity', 1);
@@ -146,21 +146,13 @@ class MP_Product {
 		foreach ( $_POST as $key => $val ) {
 			if ( false !== strpos($key, $product_atts::SLUGBASE) ) {
 				$taxonomies[] = $key;
-				$tax_query[] = array(
-					'taxonomy' => $key,
-					'terms' => $val,
-				);
+				$attributes[$key] = $val;
 			}
 		}
 		
-		// Get variations that have all selected attributes
-		$posts = get_posts(array(
-			'post_type' => 'mp_product_variation',
-			'posts_per_page' => -1,
-			'post_parent' => mp_get_post_value('product_id'),
-			'tax_query' => array('relation' => 'AND') + $tax_query,
-		));
-		
+		$product = new MP_Product($product_id);
+		$variations = $product->get_variations_by_attributes($attributes);
+				
 		// Filter out taxonomies that already have values and are still valid
 		foreach ( $all_atts as $att ) {
 			$slug = $product_atts->generate_slug($att->attribute_id);
@@ -170,9 +162,7 @@ class MP_Product {
 		}
 		
 		// Make sure all attribute terms are unique and in stock
-		foreach ( $posts as $post ) {
-			$product = new MP_Product($post);
-			
+		foreach ( $variations as $variation ) {
 			foreach ( $filtered_atts as $tax_slug ) {
 				$terms = get_the_terms($post->ID, $tax_slug);
 				
@@ -217,7 +207,7 @@ class MP_Product {
 	 * @since 3.0
 	 * @access public
 	 * @uses $post
-	 * @param int/WP_Post $product Optional if in the loop
+	 * @param int/object/WP_Post $product Optional if in the loop.
 	 */
 	public function __construct( $product = null ) {
 		if ( is_null($product) && in_the_loop() ) {
@@ -225,15 +215,7 @@ class MP_Product {
 			$product = $post;
 		}
 		
-		if ( $product instanceof WP_Post ) {
-			$this->ID = $product->ID;
-			$this->_post = $product;
-			$this->_exists = true;
-			$this->_post_queried = true;
-		} elseif ( is_numeric($product) ) {
-			$this->ID = $product;
-			$this->_get_post();
-		}
+		$this->_get_post($product);		
 	}
 	
 	/**
@@ -380,13 +362,59 @@ class MP_Product {
 		
 		$this->_variation_ids = array();
 		while ( $query->have_posts() ) : $query->the_post();
-			$this->_variations[] = $variation = new MP_Product(get_the_ID());
+			$this->_variations[] = $variation = new MP_Product();
 			$this->_variation_ids[] = $variation->ID;
 		endwhile;
 		
 		wp_reset_postdata();
 		
 		return $this->_variations;
+	}
+	
+	/**
+	 * Get variations by the given attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $attributes An array of attribute arrays in $taxonomy => $term_id format.
+	 * @param int If only one variation is desired set the index that you would like to retrieve.
+	 * @return array/MP_Product
+	 */
+	public function get_variations_by_attributes( $attributes, $index = null ) {
+		$cache_key = 'get_variations_by_attributes_' . $this->ID;
+		$cache = wp_cache_get($cache_key, 'mp_product');
+		if ( false !== $cache ) {
+			if ( is_null($index) ) {
+				return $cache;
+			} else {
+				return mp_arr_get_value($index, $cache);
+			}
+		}
+		
+		$tax_query = array();
+		foreach ( $attributes as $taxomony => $term_id ) {
+			$tax_query[] = array(
+				'taxonomy' => $taxonomy,
+				'terms' => $term_id,
+			);
+		}
+		
+		$query = new WP_Query(array(
+			'post_type' => 'mp_product_variation',
+			'posts_per_page' => -1,
+			'post_parent' => mp_get_post_value('product_id'),
+			'tax_query' => array('relation' => 'AND') + $tax_query,
+		));
+		
+		$variations = array();
+		while ( $query->have_posts() ) : $query->the_post();
+			$variations[] = new MP_Product();
+		endwhile;
+		
+		wp_reset_postdata();
+		wp_cache_set($cache_key, $variations, 'mp_product');
+	
+		return ( is_null($index) ) ? $variations : mp_arr_get_value($index, $variations);
 	}
 
 	/*
@@ -395,7 +423,7 @@ class MP_Product {
 	 * @param bool $echo Optional, whether to echo
 	 * @param string $context Options are list or single
 	 */
- 	function buy_button( $echo = true, $context = 'list' ) {
+ 	public function buy_button( $echo = true, $context = 'list' ) {
 		// Display an external link
 		$button = '';
 		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
@@ -1164,14 +1192,22 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access protected
+	 * @param int/object/WP_Post $product
 	 */
-	protected function _get_post() {
+	protected function _get_post( $product ) {
 		$this->_post_queried = true;
-		$this->_post = get_post($this->ID);
-		$this->_exists = true;
+		
+		if ( $product instanceof WP_Post ) {
+			$this->_post = $product;
+		} else {
+			$this->_post = get_post($product);
+		}
 		
 		if ( is_null($this->_post) ) {
 			$this->_exists = false;
+		} else {
+			$this->_exists = true;
+			$this->ID = $product->ID;
 		}
 	}
 }
