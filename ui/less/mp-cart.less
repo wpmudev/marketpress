@@ -193,7 +193,21 @@
 		.transition(color 300ms);
 	}
 	
-	.mp-floating-cart-item-qty {
+	.mp-floating-cart-item-attribute {
 		color: #666;
+		display: table;
+		width: 100%;
+		
+		> em,
+		> strong {
+			display: table-cell;
+			font-style: normal;
+			font-weight: 400;
+			width: 50%;
+		}
+		
+		> strong {
+			color: #333;
+		}
 	}
 }

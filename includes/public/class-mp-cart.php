@@ -274,7 +274,19 @@ class MP_Cart {
 						<a class="mp-floating-cart-item-link" href="' . $product->url(false) . '">' . $product->image(false, 'floating-cart', 50) . '
 							<div class="mp-floating-cart-item-content">
 								<h3 class="mp-floating-cart-item-title">' . $product->title(false) . '</h3>
-								<span class="mp-floating-cart-item-qty">' . sprintf(__('Quantity: %d', 'mp'), $qty) . '</span>
+								<span class="mp-floating-cart-item-attribute"><strong>' . __('Quantity', 'mp') . ':</strong> <em>' . $qty . '</em></span>';
+				
+				// Display attributes
+				if ( $product->is_variation() ) {
+					$attributes = $product->get_attributes();
+					foreach ( $attributes as $taxonomy => $att ) {
+						$term = current($att['terms']);
+						$html .= '
+									<span class="mp-floating-cart-item-attribute"><strong>' . $att['name'] . ':</strong> <em>' . $term . '</em></span>';
+					}
+				}
+				
+				$html .= '
 							</div>
 						</a>
 					</li>';

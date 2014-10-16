@@ -1144,7 +1144,7 @@ class MP_Product {
 	 */
 	public function title( $echo = true ) {
 		if ( $this->is_variation() ) {
-			$title = get_the_title($this->_post->post_parent) . ' - ' . $this->get_meta('name');
+			$title = get_the_title($this->_post->post_parent);
 		} else {
 			$title = $this->_post->post_title;
 		}

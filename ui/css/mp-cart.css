@@ -172,7 +172,22 @@
   -webkit-transition: color 300ms;
   transition: color 300ms;
 }
-#mp-floating-cart-items-list .mp-floating-cart-item-qty,
-#mp-floating-cart-item .mp-floating-cart-item-qty {
+#mp-floating-cart-items-list .mp-floating-cart-item-attribute,
+#mp-floating-cart-item .mp-floating-cart-item-attribute {
   color: #666;
+  display: table;
+  width: 100%;
+}
+#mp-floating-cart-items-list .mp-floating-cart-item-attribute > em,
+#mp-floating-cart-item .mp-floating-cart-item-attribute > em,
+#mp-floating-cart-items-list .mp-floating-cart-item-attribute > strong,
+#mp-floating-cart-item .mp-floating-cart-item-attribute > strong {
+  display: table-cell;
+  font-style: normal;
+  font-weight: 400;
+  width: 50%;
+}
+#mp-floating-cart-items-list .mp-floating-cart-item-attribute > strong,
+#mp-floating-cart-item .mp-floating-cart-item-attribute > strong {
+  color: #333;
 }
