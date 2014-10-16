@@ -350,7 +350,11 @@ class MP_Cart {
 	 */
 	public function item_count( $echo = true ) {
 		$items = $this->get_items();
-		$numitems = count($items);
+		$numitems = 0;
+		
+		foreach ( $items as $item_id => $qty ) {
+			$numitems += $qty;
+		}
 		
 		if ( $numitems == 0 ) {
 			$snippet = __('0 items', 'mp');
