@@ -97,6 +97,7 @@ th.column-ID {
 				'value' => 'CUSTOM',
 				'action' => 'hide',
 			),
+			'width' => '33%',
 		));
 		$repeater = $metabox->add_field('repeater', array(
 			'name' => 'product_attribute_terms',
