@@ -746,6 +746,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			'width' => 'element',
 		));
 		$metabox->add_field('section', array(
+			'name' => 'section_advanced_settings',
 			'title' => __('Advanced Settings', 'mp'),
 			'subtitle' => __('Optional settings to control advanced options', 'mp'),
 		));
