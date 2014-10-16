@@ -164,13 +164,13 @@ class MP_Product {
 		// Make sure all attribute terms are unique and in stock
 		foreach ( $variations as $variation ) {
 			foreach ( $filtered_atts as $tax_slug ) {
-				$terms = get_the_terms($post->ID, $tax_slug);
+				$terms = get_the_terms($variation->ID, $tax_slug);
 				
 				foreach ( $terms as $term ) {
-					if ( $product->in_stock($qty) ) {
+					if ( $variation->in_stock($qty) ) {
 						$filtered_terms[$tax_slug][$term->term_id] = $term;
 					} elseif ( $qty_changed ) {
-						$json['qty_in_stock'] = $product->get_stock();
+						$json['qty_in_stock'] = $variation->get_stock();
 						
 						/**
 						 * Filter the out of stock alert message
@@ -392,7 +392,7 @@ class MP_Product {
 		}
 		
 		$tax_query = array();
-		foreach ( $attributes as $taxomony => $term_id ) {
+		foreach ( $attributes as $taxonomy => $term_id ) {
 			$tax_query[] = array(
 				'taxonomy' => $taxonomy,
 				'terms' => $term_id,
@@ -402,7 +402,7 @@ class MP_Product {
 		$query = new WP_Query(array(
 			'post_type' => 'mp_product_variation',
 			'posts_per_page' => -1,
-			'post_parent' => mp_get_post_value('product_id'),
+			'post_parent' => $this->ID,
 			'tax_query' => array('relation' => 'AND') + $tax_query,
 		));
 		
@@ -1207,7 +1207,7 @@ class MP_Product {
 			$this->_exists = false;
 		} else {
 			$this->_exists = true;
-			$this->ID = $product->ID;
+			$this->ID = $this->_post->ID;
 		}
 	}
 }

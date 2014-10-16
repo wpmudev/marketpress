@@ -13,14 +13,17 @@ var mp_cart = {};
 			e.preventDefault();
 			
 			var $this = $(this);
-			mp_cart.addItem($this, $this.find('[name="product_id"]').val());
-		});
-		
-		$('#mp_product_list').on('click', '.mp_variations_flyout a', function(e){
-			e.preventDefault();
 			
-			var $this = $(this), $form = $this.closest('.mp_buy_form');
-			mp_cart.addItem($form, $this.attr('data-product-id'));
+			$this.on('mp_cart/before_add_item', function(e, item, qty){
+				$this.addClass('invisible');
+				$('body').children('.mp-ajax-loader').clone().insertAfter($this).show();
+			});
+			
+			$this.on('mp_cart/after_add_item', function(e, resp, item, qty){
+				$this.removeClass('invisible').next('.mp-ajax-loader').remove();
+			});
+			
+			mp_cart.addItem($this, $this.find('[name="product_id"]').val());
 		});
 	};
 	
@@ -34,14 +37,23 @@ var mp_cart = {};
 			"ignore" : "",
 			"submitHandler" : function(form){
 				var $form = $(form),
+						$loadingGraphic = $('#cboxLoadingOverlay'),
 						item = {},
 						qty = $form.find('[name="product_quantity"]').val();
 						
 				// Build item object
 				item['product_id'] = $form.find('[name="product_id"]').val();
-				$form.find('[name^="product_attr_"]').each(function(){
+				$form.find('[name^="product_attr_"]').filter(':checked').each(function(){
 					var $this = $(this);
 					item[$this.attr('name')] = $this.val();
+				});
+				
+				$loadingGraphic.show();
+				
+				$form.on('mp_cart/after_add_item', function(e, resp){
+					if ( resp.success ) {
+						$.colorbox.close();
+					}
 				});
 				
 				mp_cart.addItem($form, item, qty);
@@ -103,11 +115,17 @@ var mp_cart = {};
 		if ( qty === undefined ) {
 			qty = 1;
 		}
+
+		/**
+		 * Fires before adding an item to the cart
+		 *
+		 * @since 3.0
+		 * @param object/int item The item id or item object (if a variation).
+		 * @param int qty The quantity added.
+		 */
+		$form.trigger('mp_cart/before_add_item', [ item, qty ]);
 		
-		$form.addClass('invisible');
-		$('body').children('.mp-ajax-loader').clone().insertAfter($form).show();
-		
-		// we use the AjaxQ plugin here because we need to queue multiple add-to-cart requests http://wp.mu/96f
+		// We use the AjaxQ plugin here because we need to queue multiple add-to-cart requests http://wp.mu/96f
 		$.ajaxq('addtocart', {
 			"data" : {
 				"product" : item,
@@ -118,7 +136,15 @@ var mp_cart = {};
 			"url" : $form.attr('data-ajax-url'),
 		})
 		.success(function(resp){
-			$form.removeClass('invisible').next('.mp-ajax-loader').remove();
+			/**
+			 * Fires after successfully adding an item to the cart
+			 *
+			 * @since 3.0
+			 * @param object resp The response object,
+			 * @param object/int item The item id or item object (if a variation).
+			 * @param int qty The quantity added.
+			 */
+			$form.trigger('mp_cart/after_add_item', [ resp, item, qty ]);
 			
 			if ( resp.success ) {
 				mp_cart.update(resp.data);

@@ -77,8 +77,9 @@ class MP_Cart {
 	public function ajax_update_cart() {
 		$item = mp_get_post_value('product', null);
 		$qty = mp_get_post_value('qty', 1);
-
-		if ( is_null($item_id) ) {
+		$item_id = null;
+		
+		if ( is_null($item) ) {
 			wp_send_json_error();
 		}
 		
