@@ -444,32 +444,35 @@ if ( ! function_exists('mp_product') ) {
 	 */
 	function mp_product( $echo = true, $product_id = null, $title = true, $content = 'full', $image = 'single', $meta = true ) {
 		if ( function_exists('icl_object_id') ) {
-			$product_id = icl_object_id($product_id, 'product', false);	
+			$product_id = icl_object_id($product_id, MP_Product::get_post_type(), false);	
 		}
 		
 		$product = new MP_Product($product_id);
+		$form_id = 'mp_buy_form_' . $product_id;
 
 		$return = '
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
-				<span style="display:none" class="date updated">' . get_the_time($product_id) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
+				<span style="display:none" class="date updated">' . get_the_time($product->ID) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		
 		if ( $title) {
 			$return .= '
-				<h3 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url(false) . '">' . $product->title(false) . '</a></h3>';
+				<h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url(false) . '">' . $product->title(false) . '</a></h1>';
 		}
 
-		if ( ! empty($meta) ) {
+		if ( $meta ) {
 			$return .= '
 				<div class="mp_product_meta">';
 				
-			//price
+			// Price
 			$return .= $product->display_price(false);
-			//button
+			// Button
 			$return .= $product->buy_button(false, 'single');
 			
 			$return .= '
 				</div>';
 		}
+
+		$return .= $product->content_tab_labels(false);
 		
 		if ( ! empty($content) ) {
 			$return .= '
@@ -479,25 +482,24 @@ if ( ! function_exists('mp_product') ) {
 				$return .= $product->image(false, $image);
 			}
 			
-			
 			$return .= '
 					<div itemprop="description" class="mp_product_content_text">';
 								
 			if ( $content == 'excerpt' ) {
-				$return .= $product->excerpt($product->post_excerpt, $product->post_content);
+				$return .= $product->excerpt();
 			} else {
-				$return .= apply_filters('the_content', $product->post_content);
+				$return .= $product->content(false);
 			}
-			
+						
 			$return .= '
-					</div>
-				</div>';
+						</div>
+					</div>';
 		}
 		
 		$return .= '
 			</div>';
 
-		$return = apply_filters('mp_product', $return, $product_id, $title, $content, $image, $meta);
+		$return = apply_filters('mp_product', $return, $product->ID, $title, $content, $image, $meta);
 
 		if ( $echo ) {
 			echo $return;
