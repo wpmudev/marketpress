@@ -292,7 +292,8 @@ class MP_Products_Screen {
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
 		$this->init_product_details_metabox();
-		$this->init_variations_metabox();		
+		$this->init_variations_metabox();
+		$this->init_related_products_metabox();
 	}
 		
 	/**
@@ -437,6 +438,29 @@ class MP_Products_Screen {
 		);
 		
 		return null; // Returning null will bypass internal save mechanism
+	}
+
+	/**
+	 * Initializes the related products metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_related_products_metabox() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-related-products-metabox',
+			'title' => __('Related Products', 'mp'),
+			'post_type' => MP_Product::get_post_type(),
+			'context' => 'side',
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'related_products',
+			'multiple' => true,
+			'query' => array(
+				'post_type' => MP_Product::get_post_type(),
+				'posts_per_page' => -1,
+			),
+		));
 	}
 
 	/**
