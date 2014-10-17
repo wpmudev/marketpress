@@ -126,6 +126,7 @@ class MP_Public {
 			));
 			
 			if ( $template === '' ) {
+				add_filter('the_title', create_function('$title', '')); // Hide the title
 				add_filter('the_content', array(&$this, 'single_product_content'));
 			}
 		}
@@ -222,7 +223,7 @@ class MP_Public {
 			remove_filter('the_content', array(&$this, 'single_product_content'));
 			
 			$show_img = ( mp_get_setting('show_img') ) ? 'single' : false;
-			return mp_product(false, null, false, 'full', $show_img);
+			return mp_product(false, null, true, 'full', $show_img);
 		}
 		
 		return $content;
