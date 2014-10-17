@@ -16,6 +16,9 @@
   margin: 0;
   padding: 0;
 }
+#mp_product_list .mp_product_name {
+  font-size: 16px;
+}
 #colorbox .mp_product_options_att_input_label input[type="radio"]:checked + span {
   background: #448cf8;
   color: #fff;
@@ -157,7 +160,6 @@
 #colorbox .mp_product_name,
 #mp_single_product .mp_product_name,
 #mp_product_list .mp_product_name {
-  font-size: 16px;
   font-weight: 700;
   margin-bottom: 10px;
 }
@@ -220,22 +222,21 @@
   padding: 0;
   text-align: left;
 }
-#mp_single_product .mp_product_content {
-  border-top: 2px solid #eaeaea;
-  margin-top: 30px;
-  padding-top: 30px;
-}
-#mp_single_product .mp_product_meta {
-  position: relative;
-}
 #mp_single_product .mp_buy_form {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  text-align: right;
+  border-top: 2px solid #eaeaea;
+  clear: both;
+  margin-top: 30px;
+  padding-top: 25px;
 }
-#mp_single_product .mp_buy_form input {
-  margin-top: 0;
+#mp_single_product .mp_product_options_att:nth-child(even) {
+  clear: left;
+  float: left;
+  width: 48%;
+}
+#mp_single_product .mp_product_options_att:nth-child(odd) {
+  clear: right;
+  float: right;
+  width: 48%;
 }
 #mp_single_product .mp_savings_amt {
   font-size: 1em;
