@@ -33,7 +33,6 @@ label.error:before {
   cursor: pointer;
 }
 .postbox.wpmudev-postbox .inside {
-  font-size: 14px;
   margin: 0 !important;
   padding: 0;
   /** 
