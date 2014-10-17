@@ -416,7 +416,7 @@ class MP_Product {
 	
 		return ( is_null($index) ) ? $variations : mp_arr_get_value($index, $variations);
 	}
-
+	
 	/*
 	 * Displays the buy or add to cart button
 	 *
@@ -445,12 +445,7 @@ class MP_Product {
 						$button .= '<button class="mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
 					}
 				} else {
-					$button .= $variation_select;
-
-					//add quantity field if not downloadable
-					if ( mp_get_setting('show_quantity') && ! $this->is_download() ) {
-						$button .= '<span class="mp_quantity"><label>' . __('Quantity:', 'mp') . ' <input class="mp_quantity_field" type="text" size="1" name="quantity" value="1" /></label></span>&nbsp;';
-					}
+					$button .= $this->attribute_fields(false);
 
 					if ( mp_get_setting('product_button_type') == 'addcart') {
 						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
@@ -469,6 +464,75 @@ class MP_Product {
 			echo $button;
 		} else {
 			return $button;
+		}
+	}
+	
+	/**
+	 * Get the product content
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 */
+	public function content( $echo = true ) {
+		$content = $this->_post->post_content;
+		if ( $this->has_variations() ) {
+			$content = $this->get_variation()->post_content;
+		}
+		
+		$content = apply_filters('the_content', $content);
+		
+		if ( $echo ) {
+			echo $content;
+		} else {
+			return $content;
+		}
+	}
+	
+	/**
+	 * Get the product's content tab labels
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 */
+	public function content_tab_labels( $echo = true ) {
+		/**
+		 * Filter the product tabs array
+		 *
+		 * @since 3.0
+		 * @param array The default product tabs.
+		 * @param MP_Product The current product object.
+		 */
+		$tabs = (array) apply_filters('mp_product/content_tab_labels_array', array(
+			'mp-product-overview' => __('Overview', 'mp'),
+			'mp-related-products' => __('Related Products', 'mp'),
+		), $this);
+		
+		$html = '
+			<ul class="mp_product_tab_labels clearfix">';
+		
+		foreach ( $tabs as $slug => $label ) {
+			$html .= '
+				<li class="mp_product_tab_label"><a class="mp_product_tab_label_link" href="#' . esc_attr($slug) . '">' . $label . '</a></li>';
+		}
+		
+		$html .= '
+			</ul>';
+		
+		/**
+		 * Filter the product tabs html
+		 *
+		 * @since 3.0
+		 * @param string The current HTML markup.
+		 * @param MP_Product The current product object.
+		 */
+		$html = apply_filters('mp_product/content_tab_labels', $html, $this);
+			
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
 		}
 	}
 	
@@ -735,16 +799,20 @@ class MP_Product {
 		 */
 		$post_id = apply_filters('mp_product_image_id', $this->ID);
 		
-		$post = $this->_post;
 		if ( $post_id != $this->ID ) {
 			$this->ID = $post_id;
 			$this->_post = $post = get_post($post_id);
 		}
 		
-		$image_post_id = $post_id;
-		$post_thumbnail_id = get_post_thumbnail_id($post_id);
+		$image_post_id = $this->ID;
+		if ( $this->has_variations() ) {
+			$image_post_id = $this->get_variation()->ID;
+		}
+		
+		$post_thumbnail_id = get_post_thumbnail_id($this->ID);
 		$class = $title = $link = $img_align = '';
 		$img_classes = array('mp_product_image_' . $context, 'photo');
+		$title = esc_attr($this->title(false));
 		
 		if ( ! is_null($align) ) {
 			$align = 'align' . $align;
@@ -767,14 +835,9 @@ class MP_Product {
 					}
 				}
 	
-				$link = get_permalink($post_id);
-				$title = esc_attr($post->post_title);
+				$link = get_permalink($this->ID);
 				$link_class = ' class="mp_img_link"';
 				$img_align = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
-				
-				if ( $this->has_variations() ) {
-					$image_post_id = $this->get_variation()->ID;
-				}
 			break;
 			
 			case 'floating-cart' :
@@ -797,38 +860,15 @@ class MP_Product {
 
 				if ( mp_get_setting('disable_large_image') ) {
 					$link = '';
-					$title = esc_attr($post->post_title);
 				} else {
-					$temp = wp_get_attachment_image_src($post_thumbnail_id, 'large');
-					$link = $temp[0];
+					$link = $this->image_url(false);
 					$title = __('View Larger Image &raquo;', 'mp');
 				}
 
 				$link_class = ' class="mp_product_image_link mp_lightbox"';
 				$img_align = is_null($align) ? mp_get_setting('image_alignment_single') : $align;
 				
-				// Get variant images
-				if ( $this->has_variations() ) {
-					$variant_images = array();
-					$variations = $this->get_variations();
-					$variant_images[] = '
-						<a class="mp_variant_image_link selected" href="' . $this->image_url(false) . '">
-							<img width="40" height="40" src="' . $this->image_url(false, 40) . '" alt="" />
-							<span class="mp_variant_alt_image"><img src="' . $this->image_url(false, $size) . '" alt="" /></span>
-							<div class="mp_variant_alt_content">' . apply_filters('the_content', $this->post_content) . '</div>
-						</a>';
-					
-					foreach ( $variations as $variation ) {
-						$variant_images[] = '
-							<a class="mp_variant_image_link" href="' . $variation->image_url(false) . '">
-								<img width="40" height="40" src="' . $variation->image_url(false, 40) . '" alt="" />
-								<span class="mp_variant_alt_image"><img src="' . $variation->image_url(false, $size) . '" alt="" /></span>
-								<div class="mp_variant_alt_content">' . (( strlen($variation->post_content) > 0 ) ? apply_filters('the_content', $variation->post_content) : apply_filters('the_content', $this->post_content)) . '</div>
-							</a>';
-					}
-				}
-				
-				// in case another plugin is loadin glightbox
+				// in case another plugin is loading lightbox
 				if ( mp_get_setting('show_lightbox') ) {
 					$link_class .= ' rel="lightbox"';
 					wp_enqueue_script('mp-lightbox');
@@ -846,8 +886,6 @@ class MP_Product {
 				//link
 				$link = get_permalink($post_id);
 				$link_class = ' class="mp_img_link"';
-				
-				$title = esc_attr($post->post_title);
 			break;
 		}
 		
@@ -881,10 +919,6 @@ class MP_Product {
 			$snippet .= $image;
 		}
 		
-		if ( ! empty($variant_images) ) {
-			$snippet .= apply_filters('mp_product_variant_images', '<div class="mp_product_variant_images clearfix">' . implode('', $variant_images) . '</div>', $variations, $post_id);
-		}
-
 		$snippet .= '
 			</div>';
 		
