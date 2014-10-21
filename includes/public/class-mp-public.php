@@ -38,6 +38,22 @@ class MP_Public {
 		add_filter('get_post_metadata', array(&$this, 'remove_product_post_thumbnail'), 999, 4);
 		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles_scripts'));
 	}
+
+	/**
+	 * Hide the single product title
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter the_title
+	 * @return string
+	 */
+	public function hide_single_product_title( $title ) {
+		if ( in_the_loop() && is_main_query() ) {
+			$title = '';
+		}
+		
+		return $title;
+	}
 	
 	/**
 	 * Check if the current page is a store page
@@ -80,7 +96,7 @@ class MP_Public {
 		wp_enqueue_script('mp-frontend', mp_plugin_url('ui/js/frontend.js'), array('hover-intent'), MP_VERSION, true);
 		wp_enqueue_script('mp-select2', mp_plugin_url('ui/select2/select2.min.js'), array('mp-frontend'), MP_VERSION, true);
 	}
-
+	
 	/**
 	 * Load template for a store page
 	 *
@@ -126,7 +142,7 @@ class MP_Public {
 			));
 			
 			if ( $template === '' ) {
-				add_filter('the_title', create_function('$title', '')); // Hide the title
+				add_filter('the_title', array(&$this, 'hide_single_product_title'));
 				add_filter('the_content', array(&$this, 'single_product_content'));
 			}
 		}
