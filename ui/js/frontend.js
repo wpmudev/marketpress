@@ -41,11 +41,25 @@ var marketpress = {};
 			$('.mp_product_content_text').html(newText);
 		});
 	}
+	
+	marketpress.initProductTabs = function(){
+		$('.mp_product_tab_label_link').click(function(e){
+			e.preventDefault();
+			
+			var $this = $(this),
+					$tab = $this.parent(),
+					$target = $($this.attr('href'));
+					
+			$tab.addClass('current').siblings().removeClass('current');
+			$target.show().siblings('.mp_product_content').hide();
+		});
+	}
 }(jQuery));
 
 jQuery(document).ready(function(){
 	marketpress.initSelect2();
 	marketpress.initToggleVariations();
+	marketpress.initProductTabs();
 });
 
 window.onload = function(){

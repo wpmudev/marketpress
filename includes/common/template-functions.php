@@ -476,7 +476,7 @@ if ( ! function_exists('mp_product') ) {
 		
 		if ( ! empty($content) ) {
 			$return .= '
-				<div class="mp_product_content clearfix">';
+				<div id="mp-product-overview" class="mp_product_content clearfix">';
 				
 			if ( $image ) {
 				$return .= $product->image(false, $image);
@@ -496,9 +496,16 @@ if ( ! function_exists('mp_product') ) {
 					</div>';
 		}
 		
+		if ( mp_get_setting('related_products->show') ) {
+			$products = $product->get_related_products();
+			$return .= '
+				<div id="mp-related-products" class="mp_product_content clearfix">
+				</div>';
+		}
+
 		$return .= '
 			</div>';
-
+		
 		$return = apply_filters('mp_product', $return, $product->ID, $title, $content, $image, $meta);
 
 		if ( $echo ) {

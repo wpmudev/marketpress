@@ -195,17 +195,22 @@
 	
 	.mp_product_tab_labels {
 		border-bottom: 2px solid #eaeaea;
-		margin-top: 25px;
+		margin: 25px 0;
 		padding: 0 15px;
 	}
 	
 	.mp_product_tab_label {
 		float: left;
+		
+		&.current {
+			.mp_product_tab_label_link {
+				background: #eaeaea;
+				border-radius: 4px 4px 0 0;
+			}
+		}
 	}
 	
 	.mp_product_tab_label_link {
-		background: #eaeaea;
-		border-radius: 4px 4px 0 0;
 		display: block;
 		line-height: 50px;
 		padding: 0 15px;

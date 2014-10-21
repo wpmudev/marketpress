@@ -497,24 +497,31 @@ class MP_Product {
 	 * @param bool $echo
 	 */
 	public function content_tab_labels( $echo = true ) {
+		$tabs = array(
+			'mp-product-overview' => __('Overview', 'mp'),
+		);
+		
+		if ( mp_get_setting('related_products->show') ) {
+			$tabs['mp-related-products'] = __('Related Products', 'mp');
+		}
+		
 		/**
 		 * Filter the product tabs array
 		 *
 		 * @since 3.0
-		 * @param array The default product tabs.
-		 * @param MP_Product The current product object.
+		 * @param array $tabs The default product tabs.
+		 * @param MP_Product $this The current product object.
 		 */
-		$tabs = (array) apply_filters('mp_product/content_tab_labels_array', array(
-			'mp-product-overview' => __('Overview', 'mp'),
-			'mp-related-products' => __('Related Products', 'mp'),
-		), $this);
-		
+		$tabs = (array) apply_filters('mp_product/content_tab_labels_array', $tabs, $this);
+				
 		$html = '
 			<ul class="mp_product_tab_labels clearfix">';
 		
+		$index = 0;
 		foreach ( $tabs as $slug => $label ) {
 			$html .= '
-				<li class="mp_product_tab_label"><a class="mp_product_tab_label_link" href="#' . esc_attr($slug) . '">' . $label . '</a></li>';
+				<li class="mp_product_tab_label' . (( $index == 0 ) ? ' current' : '') . '"><a class="mp_product_tab_label_link" href="#' . esc_attr($slug) . '">' . $label . '</a></li>';
+			$index ++;
 		}
 		
 		$html .= '
@@ -524,8 +531,8 @@ class MP_Product {
 		 * Filter the product tabs html
 		 *
 		 * @since 3.0
-		 * @param string The current HTML markup.
-		 * @param MP_Product The current product object.
+		 * @param string $html The current HTML markup.
+		 * @param MP_Product $this The current product object.
 		 */
 		$html = apply_filters('mp_product/content_tab_labels', $html, $this);
 			
@@ -758,6 +765,31 @@ class MP_Product {
 		}
 		
 		return $price;
+	}
+	
+	/**
+	 * Get related products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $args {
+	 *		An array of arguments. Optional.
+	 *
+	 *		@type bool $echo Echo or return.
+	 *		@type bool $in_same_category Optional, whether to limit related to the same category.
+	 * 		@type int $limit. Optional The number of products we want to retrieve.
+	 * 		@type bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list.
+	 * 		@type bool $in_same_tags Optional, whether to limit related to same tags.
+	 */
+	public function get_related_products( $args = array() ) {
+		$relate_by = mp_get_setting('related_products->relate_by');
+		$args = array_replace_recursive($args, array(
+			'echo' => false,
+			'in_same_category' => ( $relate_by == 'both' || $relate_by == 'category' ),
+			'in_same_tags' => ( $relate_by == 'both' || $relate_by == 'tags' ),
+			'simple_list' => mp_get_setting('related_products->simple_list'),
+			'limit' => mp_get_setting('related_products->show_limit'),
+		));
 	}
 	
 	/**
