@@ -105,7 +105,7 @@ class MP_Store_Settings_General {
 		}
 		
 		$wpdb->update($wpdb->posts, array('post_type' => 'mp_product'), array('post_type' => 'product'));
-		update_option('mp_flush_rewrite', 1);
+		update_option('mp_flush_rewrites', 1);
 	}
 	
 	/**

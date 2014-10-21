@@ -400,10 +400,18 @@ class Marketpress {
 	 * @action init
 	 */
 	public function maybe_flush_rewrites() {
-		if ( get_option('mp_flush_rewrite') ) {
-			flush_rewrite_rules();
-			delete_option('mp_flush_rewrite');
+		$flush_rewrites = get_option('mp_flush_rewrites');
+		
+		if ( $flush_rewrites === false ) {
+			add_option('mp_flush_rewrites', 0);
 		}
+		
+		if ( $flush_rewrites ) {
+			flush_rewrite_rules();
+			update_option('mp_flush_rewrites', 1);
+		}
+		
+		
 	}
 	
 	/**

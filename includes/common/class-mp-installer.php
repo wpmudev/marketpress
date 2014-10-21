@@ -237,14 +237,11 @@ class MP_Installer {
 
 		// Only run these on first install
 		if ( empty($old_settings) ) {
-			// Define settings that don't need to autoload for efficiency
-			add_option('mp_coupons', '', '', 'no');
-
 			add_action('widgets_init', array(&$this, 'add_default_widget'), 11);
 	 	}
 
 		//add action to flush rewrite rules after we've added them for the first time
-		update_option('mp_flush_rewrite', 1);
+		update_option('mp_flush_rewrites', 1);
 
 		update_option('mp_version', MP_VERSION);
 	}
