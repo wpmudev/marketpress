@@ -160,7 +160,7 @@
 }
 #mp_single_product .mp_product_tab_labels {
   border-bottom: 2px solid #eaeaea;
-  margin: 25px 0;
+  margin: 75px 0 25px;
   padding: 0 15px;
 }
 #mp_single_product .mp_product_tab_label {
@@ -169,6 +169,8 @@
 #mp_single_product .mp_product_tab_label.current .mp_product_tab_label_link {
   background: #eaeaea;
   border-radius: 4px 4px 0 0;
+  color: #000;
+  font-weight: 700;
 }
 #mp_single_product .mp_product_tab_label_link {
   display: block;

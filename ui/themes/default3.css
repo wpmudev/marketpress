@@ -19,7 +19,8 @@
 #mp_product_list .mp_product_name {
   font-size: 16px;
 }
-#colorbox .mp_product_options_att_input_label input[type="radio"]:checked + span {
+#colorbox .mp_product_options_att_input_label input[type="radio"]:checked + span,
+#mp_single_product .mp_product_options_att_input_label input[type="radio"]:checked + span {
   background: #448cf8;
   color: #fff;
 }
