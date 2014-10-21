@@ -270,7 +270,7 @@ class MP_Cart {
 				$product = new MP_Product($item);
 			
 				$html .= '
-					<li class="mp-floating-cart-item">
+					<li class="mp-floating-cart-item" id="mp-floating-cart-item-' . $product->ID . '">
 						<a class="mp-floating-cart-item-link" href="' . $product->url(false) . '">' . $product->image(false, 'floating-cart', 50) . '
 							<div class="mp-floating-cart-item-content">
 								<h3 class="mp-floating-cart-item-title">' . $product->title(false) . '</h3>
