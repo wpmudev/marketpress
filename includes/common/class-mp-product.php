@@ -1049,7 +1049,7 @@ class MP_Product {
 	 * @access public
 	 */
 	public function is_variation() {
-		return ( ! empty($this->_post->post_parent) );
+		return ( $this->_post->post_type == 'mp_product_variation' );
 	}
 	
 	/**
