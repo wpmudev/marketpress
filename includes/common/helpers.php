@@ -72,9 +72,19 @@ if ( ! function_exists('mp_popular_country_list') ) :
 		$sorted = array();
 		$countries = mp()->popular_countries;
 		
+		/**
+		 * Filter the popular countries list
+		 *
+		 * @since 3.0
+		 * @param array $countries The default popular countries.
+		 */
+		$countries = apply_filters('mp_popular_country_list', $countries);
+		
 		foreach ( $countries as $code => $country ) {
 			$sorted[$code] = $country;
 		}
+		
+		asort($sorted);
 		
 		return $sorted;
 	}
