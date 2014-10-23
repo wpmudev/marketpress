@@ -485,10 +485,18 @@ if ( ! function_exists('mp_product') ) {
 		if ( function_exists('icl_object_id') ) {
 			$product_id = icl_object_id($product_id, MP_Product::get_post_type(), false);	
 		}
-		
+				
 		$product = new MP_Product($product_id);
 		$form_id = 'mp_buy_form_' . $product_id;
-
+		
+		$variation = false;
+		if ( $variation_id = get_query_var('mp_variation_id') ) {
+			$variation = new MP_Product($variation_id);
+			if ( ! $variation->exists() ) {
+				$variation = false;
+			}
+		}
+		
 		$return = '
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
 				<span style="display:none" class="date updated">' . get_the_time($product->ID) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
@@ -503,9 +511,17 @@ if ( ! function_exists('mp_product') ) {
 				<div class="mp_product_meta">';
 				
 			// Price
-			$return .= $product->display_price(false);
+			$return .= ( $variation ) ? $variation->display_price(false) : $product->display_price(false);
+			
 			// Button
-			$return .= $product->buy_button(false, 'single');
+			$selected_atts = array();
+			if ( $variation ) {
+				$atts = $variation->get_attributes();
+				foreach ( $atts as $slug => $att ) {
+					$selected_atts[$slug] = key($att['terms']);
+				}
+			}
+			$return .= $product->buy_button(false, 'single', $selected_atts);
 			
 			$return .= '
 				</div>';
@@ -518,16 +534,16 @@ if ( ! function_exists('mp_product') ) {
 				<div id="mp-product-overview" class="mp_product_content clearfix">';
 				
 			if ( $image ) {
-				$return .= $product->image(false, $image);
+				$return .= ( $variation ) ? $variation->image(false, $image) : $product->image(false, $image);
 			}
 			
 			$return .= '
 					<div itemprop="description" class="mp_product_content_text">';
 								
 			if ( $content == 'excerpt' ) {
-				$return .= $product->excerpt();
+				$return .= ( $variation ) ? $variation->excerpt() : $product->excerpt();
 			} else {
-				$return .= $product->content(false);
+				$return .= ( $variation ) ? $variation->content(false) : $product->content(false);
 			}
 						
 			$return .= '

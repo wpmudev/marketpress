@@ -129,10 +129,10 @@ class MP_Public {
 	 * @since 3.0
 	 * @access public
 	 * @filter single_template
-	 * @uses $post
+	 * @uses $post, $wp_query
 	 */
 	public function load_single_product_template( $template ) {
-		global $post;
+		global $post, $wp_query;
 		
 		if ( get_post_type() == MP_Product::get_post_type() ) {
 			$template = locate_template(array(
@@ -142,8 +142,26 @@ class MP_Public {
 			));
 			
 			if ( $template === '' ) {
-				add_filter('the_title', array(&$this, 'hide_single_product_title'));
-				add_filter('the_content', array(&$this, 'single_product_content'));
+				$ok = true;
+				
+				if ( $variation_id = get_query_var('mp_variation_id') ) {
+					$variation = new MP_Product($variation_id);
+					
+					// Make sure variation actually exists, otherwise trigger a 404 error
+					if ( ! $variation->exists() ) {
+						$ok = false;
+						$wp_query->set_404();
+						$template = locate_template(array(
+							'404.php',
+							'index.php',
+						));
+					}
+				}
+				
+				if ( $ok ) {
+					add_filter('the_title', array(&$this, 'hide_single_product_title'));
+					add_filter('the_content', array(&$this, 'single_product_content'));
+				}
 			}
 		}
 		

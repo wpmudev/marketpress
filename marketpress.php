@@ -369,6 +369,40 @@ class Marketpress {
 		add_action('init', array(&$this, 'maybe_flush_rewrites'), 99);
 		// Fix insecure images
 		add_filter('wp_get_attachment_url', array(&$this, 'fix_insecure_images'), 10, 2);
+		// Setup rewrites for single product page
+		add_filter('rewrite_rules_array', array(&$this, 'add_product_variation_rewrites'));
+		// Add custom query vars
+		add_filter('query_vars', array(&$this, 'add_query_vars'));
+	}
+	
+	/**
+	 * Add rewrite rules for direct-links to a specific product variation
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter rewrite_rules_array
+	 */
+	public function add_product_variation_rewrites( $rewrites ) {
+		$new_rules = array();
+		
+		if ( $post_id = mp_get_setting('pages->products') ) {
+			$uri = get_page_uri($post_id);
+			$new_rules[$uri . '/([^/]+)/variation/([^/]+)'] = 'index.php?' . MP_Product::get_post_type() . '=$matches[1]&post_type=' . MP_Product::get_post_type() . '&name=$matches[1]&mp_variation_id=$matches[2]';
+		}
+		
+		return $new_rules + $rewrites;
+	}
+	
+	/**
+	 * Add custom query vars
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter query_vars
+	 */
+	public function add_query_vars( $vars ) {
+		$vars[] = 'mp_variation_id';
+		return $vars;
 	}
 	
 	/**

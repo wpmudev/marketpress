@@ -299,10 +299,10 @@ class MP_Product {
 	 * @since 3.0
 	 * @access public
 	 * @param bool $echo
+	 * @param array $selected_atts Optional, the attributes that should be selected by default.
 	 */
-	public function attribute_fields( $echo = true ) {
+	public function attribute_fields( $echo = true, $selected_atts = array() ) {
 		$atts = $this->get_attributes();
-		$selected_att = null;
 		$html = '
 			<div class="mp_product_options_atts clearfix">';
 		
@@ -314,7 +314,9 @@ class MP_Product {
 			
 			$index = 0;
 			foreach ( $att['terms'] as $term_id => $term_name ) {
-				$html .= $this->attribute_field($term_id, $term_name, $slug, ( $index == 0 ) ? true : false);
+				$required = ( $index == 0 );
+				$checked = ( $term_id == mp_arr_get_value($slug, $selected_atts) );
+				$html .= $this->attribute_field($term_id, $term_name, $slug, $required, $checked);
 				$index ++;
 			}
 			
@@ -466,11 +468,11 @@ class MP_Product {
 	/*
 	 * Displays the buy or add to cart button
 	 *
-	 * @param bool $echo Optional, whether to echo
-	 * @param string $context Options are list or single
+	 * @param bool $echo Optional, whether to echo. Defaults to true.
+	 * @param string $context Optional, options are list or single. Defaults to list.
+	 * @param array $selected_atts Optional, the attributes that should be selected by default.
 	 */
- 	public function buy_button( $echo = true, $context = 'list' ) {
-		// Display an external link
+ 	public function buy_button( $echo = true, $context = 'list', $selected_atts = array() ) {
 		$button = '';
 		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
 			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
@@ -491,7 +493,7 @@ class MP_Product {
 						$button .= '<button class="mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
 					}
 				} else {
-					$button .= $this->attribute_fields(false);
+					$button .= $this->attribute_fields(false, $selected_atts);
 
 					if ( mp_get_setting('product_button_type') == 'addcart') {
 						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
@@ -600,18 +602,22 @@ class MP_Product {
 	 */
 	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
 		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id($this->get_variation()->ID) : get_post_thumbnail_id($this->ID);
+		$atts = '';
 		
 		if ( empty($thumb_id) ) {
-			return false;
+			$attributes = array_merge(array(
+				'src' => apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')),
+				'width' => get_option('thumbnail_size_w'),
+				'height' => get_option('thumbnail_size_h'),
+			), $attributes);
+		} else {
+			$data = wp_get_attachment_image_src($thumb_id, $size, false);
+			$attributes = array_merge(array(
+				'src' => $data[0],
+				'width' => $data[1],
+				'height' => $data[2]
+			), $attributes);
 		}
-		
-		$data = wp_get_attachment_image_src($thumb_id, $size, false);
-		$attributes = array_merge(array(
-			'src' => $data[0],
-			'width' => $data[1],
-			'height' => $data[2]
-		), $attributes);
-		$atts = '';
 		
 		foreach ( $attributes as $name => $value ) {
 			$atts .= ' ' . $name . '="' . esc_attr($value) . '"';
@@ -1163,6 +1169,19 @@ class MP_Product {
 	}
 	
 	/**
+	 * Get a product's attribute
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $attribute
+	 * @return int The term id of the specified attribute. False if no terms exist.
+	 */
+	public function get_attribute( $attribute ) {
+		$terms = get_the_terms($this->ID, $attribute);
+		return ( is_array($terms) ) ? array_shift($terms) : false;
+	}
+	
+	/**
 	 * Get the product attributes
 	 *
 	 * @since 3.0
@@ -1265,7 +1284,7 @@ class MP_Product {
 	 */
 	public function url( $echo = true ) {
 		if ( $this->is_variation() ) {
-			$url = get_permalink($this->_post->post_parent) . '#!variation=' . $this->ID;
+			$url = get_permalink($this->_post->post_parent) . 'variation/' . $this->ID;
 		} else {
 			$url = get_permalink($this->ID);
 		}
@@ -1380,6 +1399,8 @@ class MP_Product {
 		}
 		
 		if ( is_null($this->_post) ) {
+			$this->_exists = false;
+		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != 'mp_product_variation' ) {
 			$this->_exists = false;
 		} else {
 			$this->_exists = true;
