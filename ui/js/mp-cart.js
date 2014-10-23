@@ -8,7 +8,7 @@ var mp_cart = {};
 	 * @since 3.0
 	 * @type object
 	 */
-	mp_cart.productFormArgs = {
+	mp_cart.productFormValidationArgs = {
 		"errorClass" : "mp_input_error",
 		"errorElement" : "span",
 		"errorPlacement" : function(error, element){
@@ -29,13 +29,7 @@ var mp_cart = {};
 			});
 			
 			$loadingGraphic.show();
-			
-			$form.on('mp_cart/after_add_item', function(e, resp){
-				if ( resp.success ) {
-					$.colorbox.close();
-				}
-			});
-			
+						
 			mp_cart.addItem($form, item, qty);
 		}
 	};
@@ -75,7 +69,14 @@ var mp_cart = {};
 		});
 		
 		$('#mp_single_product').on('change', '.mp_product_options_att_input_label input', this.updateProductAttributes);
-		$('#mp_single_product').find('.mp_buy_form').validate(this.productAttributeValidationArgs);
+		$('#mp_single_product').find('.mp_buy_form')
+			.on('mp_cart/before_add_item', function(e, item, qty){
+				marketpress.loadingOverlay('show');
+			})
+			.on('mp_cart/after_add_item', function(e, resp, item, qty){
+				marketpress.loadingOverlay('hide');
+			})
+			.validate(this.productFormValidationArgs);
 	};
 	
 	/**
@@ -85,7 +86,14 @@ var mp_cart = {};
 	 * @event cbox_complete
 	 */
 	mp_cart.initCboxListeners = function(){
-		$('.mp_product_options_cb').validate(this.productAttributeValidationArgs);
+		$('.mp_product_options_cb')
+			.on('mp_cart/after_add_item', function(e, resp){
+				if ( resp.success ) {
+					$.colorbox.close();
+				}
+			})
+			.validate(this.productFormValidationArgs);
+
 		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label input', this.updateProductAttributes);
 	};
 	
@@ -97,11 +105,11 @@ var mp_cart = {};
 	mp_cart.updateProductAttributes = function(){
 		var $this = $(this),
 				$form = $this.closest('form'),
-				$loadingGraphic = $('#cboxLoadingOverlay'),
-				$qtyChanged = $form.find('input[name="product_qty_changed"]');
+				$container = ( $('#colorbox').is(':visible') ) ? $form : $('#mp_single_product'),
+				$qtyChanged = $form.find('input[name="product_qty_changed"]'),
 				url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 		
-		$loadingGraphic.show();
+		marketpress.loadingOverlay('show');
 		$this.closest('.mp_product_options_att').nextAll('.mp_product_options_att').find(':radio').prop('checked', false);
 		
 		if ( ! $this.is(':radio') ) {
@@ -111,9 +119,25 @@ var mp_cart = {};
 		}
 		
 		$.post(url, $form.serialize(), function(resp){
-			$loadingGraphic.hide();
+			marketpress.loadingOverlay('hide');
 			
-			if ( resp.success ) {
+			if ( resp.success ) {				
+				if ( resp.data.image ) {
+					$container.find('.mp_product_image_single').attr('src', resp.data.image);
+				}
+				
+				if ( resp.data.description ) {
+					$container.find('.mp_product_content_text').html(resp.data.description);
+				}
+				
+				if ( resp.data.excerpt ) {
+					$container.find('.mp_product_options_excerpt').html(resp.data.excerpt);
+				}
+				
+				if ( resp.data.price ) {
+					$container.find('.mp_product_price').replaceWith(resp.data.price);
+				}
+				
 				$.each(resp.data, function(index, value){
 					if ( index == 'qty_in_stock' || index == 'out_of_stock' ) {
 						return;
@@ -126,6 +150,16 @@ var mp_cart = {};
 					alert(resp.data.out_of_stock);
 					$form.find('input[name="product_quantity"]').val(resp.data.qty_in_stock);
 				}
+				
+				/**
+				 * Fires after a product's attributes are updated via ajax
+				 *
+				 * @since 3.0
+				 * @param object resp The ajax response object.
+				 */
+				$(document).trigger('mp_cart/after_update_product_attributes', [ resp ]);
+
+				$.colorbox.resize();
 			}
 		});
 	};
@@ -181,19 +215,21 @@ var mp_cart = {};
 			"type" : "POST",
 			"url" : $form.attr('data-ajax-url'),
 		})
-		.success(function(resp){
-			/**
-			 * Fires after successfully adding an item to the cart
-			 *
-			 * @since 3.0
-			 * @param object resp The response object,
-			 * @param object/int item The item id or item object (if a variation).
-			 * @param int qty The quantity added.
-			 */
-			$form.trigger('mp_cart/after_add_item', [ resp, item, qty ]);
-			
+		.success(function(resp){			
 			if ( resp.success ) {
+				/**
+				 * Fires after successfully adding an item to the cart
+				 *
+				 * @since 3.0
+				 * @param object resp The response object,
+				 * @param object/int item The item id or item object (if a variation).
+				 * @param int qty The quantity added.
+				 */
+				$form.trigger('mp_cart/after_add_item', [ resp, item, qty ]);
+				
 				mp_cart.update(resp.data);
+				
+				$form.get(0).reset();
 				
 				setTimeout(function(){
 					$('#mp-floating-cart').trigger('click');
