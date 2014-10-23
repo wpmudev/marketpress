@@ -118,24 +118,33 @@ if ( ! function_exists('mp_cart_link') ) :
 	/**
 	 * Display the current shopping cart link. If global cart is on reflects global location
 	 * @since 3.0
-	 * @param bool $echo Optional, whether to echo. Defaults to true
+	 * @param bool $echo Optional, whether to echo. Defaults to true.
 	 * @param bool $url Optional, whether to return a link or url. Defaults to show link.
 	 * @param string $link_text Optional, text to show in link.
 	 */
-	function mp_cart_link( $echo = true, $url = false, $link_text = '' ) {
+	function mp_cart_link( $echo = true, $url = false, $link_text = false ) {
 		if ( mp()->global_cart && ! mp_is_main_site() ) {
 			switch_to_blog(MP_ROOT_BLOG);
-			$link = get_permalink(mp_get_setting('pages->checkout'));
+			$link = get_permalink(mp_get_setting('pages->cart'));
 			restore_current_blog();
 		} else {
-			$link = get_permalink(mp_get_setting('pages->checkout'));
+			$link = get_permalink(mp_get_setting('pages->cart'));
 		}
 
 		if ( ! $url ) {
-			$text = ($link_text) ? $link_text : __('Shopping Cart', 'mp');
+			$text = ( $link_text ) ? $link_text : __('Shopping Cart', 'mp');
 			$link = '<a href="' . $link . '" class="mp_cart_link">' . $text . '</a>';
 		}
 
+		/**
+		 * Filter the cart link
+		 *
+		 * @since 3.0
+		 * @param string $link The current link.
+		 * @param bool $echo Optional, whether to echo. Defaults to true.
+		 * @param bool $url Optional, whether to return a link or url. Defaults to show link.
+		 * @param string $link_text Optional, text to show in link.
+		 */
 		$link = apply_filters('mp_cart_link', $link, $echo, $url, $link_text);
 
 		if ( $echo ) {
