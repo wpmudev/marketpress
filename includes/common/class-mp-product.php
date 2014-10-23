@@ -103,10 +103,11 @@ class MP_Product {
 	<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
 	<input type="hidden" name="product_qty_changed" value="0" />
 	<div class="mp_product_options_image">
-		<img class="mp_product_options_thumb" src="<?php $product->image_url(true, 'medium'); ?>" />
+		<?php $product->image_custom(true, 'medium', array('class' => 'mp_product_options_thumb')); ?>
 	</div>
 	<div class="mp_product_options_content">
 		<h3 class="mp_product_name"><?php echo $product->post_title; ?></h3>
+		<?php $product->display_price(); ?>
 		<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div>
 		<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div>
 		<?php
@@ -134,7 +135,14 @@ class MP_Product {
 		$product_atts = MP_Product_Attributes::get_instance();
 		$all_atts = $product_atts->get();
 		$attributes = $filtered_atts = $taxonomies = $filtered_terms = array();
-		$json = array('out_of_stock' => false, 'qty_in_stock' => 0);
+		$json = array(
+			'out_of_stock' => false,
+			'qty_in_stock' => 0,
+			'image' => false,
+			'description' => false,
+			'excerpt' => false,
+			'price' => false,
+		);
 		$product_id = mp_get_post_value('product_id');
 		$qty = mp_get_post_value('product_quantity', 1);
 		$qty_changed = (bool) mp_get_post_value('product_qty_changed');
@@ -198,6 +206,42 @@ class MP_Product {
 			}
 		}
 		
+		// Attempt to get a unique variation image depending on user selection
+		$images = array();
+		foreach ( $variations as $variation ) {
+			$images[$variation->image_url(false, null, 'single')] = '';
+		}
+		if ( count($images) == 1 ) {
+			$json['image'] = key($images);
+		}
+		
+		// Attempt to get a unique product description depending on user selection
+		$descs = array();
+		foreach ( $variations as $variation ) {
+			$descs[$variation->content(false)] = '';
+		}
+		if ( count($descs) == 1 ) {
+			$json['description'] = key($descs);
+		}
+
+		// Attempt to get a unique product excerpt depending on user selection
+		$excerpts = array();
+		foreach ( $variations as $variation ) {
+			$excerpts[$variation->excerpt()] = '';
+		}
+		if ( count($excerpts) == 1 ) {
+			$json['excerpt'] = key($excerpts);
+		}
+
+		// Attempt to get a unique product price depending on user selection
+		$prices = array();
+		foreach ( $variations as $variation ) {
+			$prices[$variation->display_price(false)] = '';
+		}
+		if ( count($prices) == 1 ) {
+			$json['price'] = key($prices);
+		}
+		
 		wp_send_json_success($json);
 	}
 	
@@ -257,9 +301,10 @@ class MP_Product {
 	 * @param bool $echo
 	 */
 	public function attribute_fields( $echo = true ) {
-		$html = '';
 		$atts = $this->get_attributes();
 		$selected_att = null;
+		$html = '
+			<div class="mp_product_options_atts clearfix">';
 		
 		foreach ( $atts as $slug => $att ) {
 			$html .= '
@@ -280,14 +325,15 @@ class MP_Product {
 		
 		$input_id = 'mp_product_options_att_quantity';
 		$html .= '
-				<div class="mp_product_options_att">
+				<div class="mp_product_options_att"' . (( mp_get_setting('show_quantity') ) ? '' : ' style="display:none"') . '>
 					<strong class="mp_product_options_att_label">' . __('Quantity', 'mp') . '</strong>
 					<div class="clearfix">
 						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
 							<input id="' . $input_id . '" class="required digits" type="text" name="product_quantity" value="1" />
 						</label>
 					</div>
-				</div>';					
+				</div>
+			</div>';					
 
 		
 		/**
@@ -544,6 +590,43 @@ class MP_Product {
 	}
 	
 	/**
+	 * Get custom image tag
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo
+	 * @param string/int/array $size
+	 * @param array $attributes
+	 */
+	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
+		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id($this->get_variation()->ID) : get_post_thumbnail_id($this->ID);
+		
+		if ( empty($thumb_id) ) {
+			return false;
+		}
+		
+		$data = wp_get_attachment_image_src($thumb_id, $size, false);
+		$attributes = array_merge(array(
+			'src' => $data[0],
+			'width' => $data[1],
+			'height' => $data[2]
+		), $attributes);
+		$atts = '';
+		
+		foreach ( $attributes as $name => $value ) {
+			$atts .= ' ' . $name . '="' . esc_attr($value) . '"';
+		}
+		
+		$img = '<img' . $atts . ' />';
+		
+		if ( $echo ) {
+			echo $img;
+		} else {
+			return $img;
+		}
+	}
+	
+	/**
 	 * Get the display product price
 	 *
 	 * @since 3.0
@@ -771,25 +854,48 @@ class MP_Product {
 	 * Get related products
 	 *
 	 * @since 3.0
-	 * @access public
 	 * @param array $args {
-	 *		An array of arguments. Optional.
+	 *		Optional, an array of arguments.
 	 *
-	 *		@type bool $echo Echo or return.
-	 *		@type bool $in_same_category Optional, whether to limit related to the same category.
-	 * 		@type int $limit. Optional The number of products we want to retrieve.
-	 * 		@type bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list.
-	 * 		@type bool $in_same_tags Optional, whether to limit related to same tags.
+	 * 		@type string $relate_by Optional, how to relate the products - either category, tag, or both.
+	 * 		@type bool $echo Optional, echo or return.
+	 * 		@type int $limit. Optional, the number of products to retrieve.
+	 *		@type string $view. Optional, how to display related products - either grid or list.
+	 * }
 	 */
-	public function get_related_products( $args = array() ) {
-		$relate_by = mp_get_setting('related_products->relate_by');
-		$args = array_replace_recursive($args, array(
+	function related_products( $args = array() ) {
+		$args = array_replace_recursive(array(
+			'relate_by' => mp_get_setting('related_products->relate_by'),
 			'echo' => false,
-			'in_same_category' => ( $relate_by == 'both' || $relate_by == 'category' ),
-			'in_same_tags' => ( $relate_by == 'both' || $relate_by == 'tags' ),
-			'simple_list' => mp_get_setting('related_products->simple_list'),
 			'limit' => mp_get_setting('related_products->show_limit'),
-		));
+			'view' => mp_get_setting('related_products->view'),
+		), $args);
+		
+		extract($args);
+		
+		$html = '';
+		$query_args = array(
+			'post_type' => MP_Product::get_post_type(),
+			'posts_per_page' => $limit,
+		);
+		
+		//! TODO: finish coding MP_Product::related_products()
+		
+		/**
+		 * Filter the related products html
+		 *
+		 * @since 3.0
+		 * @param string $html The current html.
+		 * @param MP_Product $this The current product object.
+		 * @param array $args The array of arguments that were passed to the method.
+		 */
+		$html = apply_filters('mp_product/related_products', $html, $this, $args);
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
 	}
 	
 	/**
@@ -970,9 +1076,13 @@ class MP_Product {
 	 * @access public
 	 * @param bool $echo
 	 * @param string/int $size
+	 * @param string $view Either single or list. Optional.
 	 */
-	public function image_url( $echo = true, $size = 'large' ) {
-		if ( $thesize = intval($size) ) {
+	public function image_url( $echo = true, $size = null, $view = null ) {
+		if ( is_null($size) ) {
+			$img_size = mp_get_image_size($view);
+			$size = ( $img_size['label'] == 'custom' ) ? array($size['width'], $size['height']) : $img_size['label'];
+		} elseif ( $thesize = intval($size) ) {
 			$size = array($thesize, $thesize);
 		}
 		
