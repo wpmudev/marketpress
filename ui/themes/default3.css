@@ -236,3 +236,10 @@
 #mp_single_product .mp_sale_price {
   font-size: 1.4em;
 }
+#colorbox .mp_product_price {
+  margin-bottom: 20px;
+}
+#colorbox .mp_normal_price,
+#colorbox .mp_sale_price {
+  text-align: left;
+}

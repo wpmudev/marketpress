@@ -116,6 +116,10 @@
 #mp_single_product .mp_product_options_excerpt p {
   margin-bottom: 10px;
 }
+#colorbox .mp_normal_price,
+#mp_single_product .mp_normal_price {
+  text-align: left;
+}
 #mp_product_options_att_quantity {
   border: 2px solid #ddd;
   padding: 3px 6px;
