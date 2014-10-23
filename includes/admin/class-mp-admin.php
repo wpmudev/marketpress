@@ -37,6 +37,18 @@ class MP_Admin {
 		add_filter('set-screen-option', array(&$this, 'save_orders_screen_options'), 10, 3);
 		//set custom post-updated messages
 		add_filter('post_updated_messages', array(&$this, 'post_updated_messages'));
+		//enqueue styles and scripts
+		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
+	}
+	
+	/**
+	 * Enqueue styles and scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function enqueue_styles_scripts() {
+		wp_enqueue_style('mp-admin', mp_plugin_url('includes/admin/ui/css/admin.css'), array(), MP_VERSION);
 	}
 	
 	/**
