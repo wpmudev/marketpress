@@ -248,6 +248,36 @@ if ( ! function_exists('mp_format_currency') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_image_size') ) :
+	/**
+	 * Get the image size per presentation settings
+	 *
+	 * @since 3.0
+	 * @param string $view Either "single" or "list".
+	 * @return array
+	 */
+	function mp_get_image_size( $view ) {
+		$prefix = ( $view == 'single' ) ? 'product' : 'list';
+		$size = mp_get_setting($prefix . '_img_size');
+		
+		if ( $size == 'custom' ) {
+			$size = array(
+				'label' => 'custom',
+				'width' => intval(mp_get_setting($prefix . '_img_size_custom->width')),
+				'height' => intval(mp_get_setting($prefix . '_img_size_custom->height')),
+			);
+		} else {
+			$size = array(
+				'label' => $size,
+				'width' => get_option($size . '_size_w'),
+				'height' => get_option($size . 'size_h'),
+			);
+		}
+		
+		return $size;
+	}
+endif;
+
 if ( ! function_exists('mp_is_shop_page') ) :
 	/**
 	 * Check if current page is a shop page
@@ -497,10 +527,8 @@ if ( ! function_exists('mp_product') ) {
 		}
 		
 		if ( mp_get_setting('related_products->show') ) {
-			$products = $product->get_related_products();
 			$return .= '
-				<div id="mp-related-products" class="mp_product_content clearfix">
-				</div>';
+				<div id="mp-related-products" class="mp_product_content clearfix">' . $product->related_products() . ' </div>';
 		}
 
 		$return .= '
@@ -625,5 +653,46 @@ if ( ! function_exists('mp_products_filter') ) :
 			</div>';
 	
 		return apply_filters('mp_products_filter', $return);
+	}
+endif;
+
+if ( ! function_exists('mp_related_products') ) :
+	/**
+	 * Get related products
+	 *
+	 * @since 3.0
+	 * @param int $product_id.
+	 * @param string $relate_by Optional, how to relate the products - either by category, tag, or both.
+	 * @param bool $echo Echo or return.
+	 * @param int $limit. Optional The number of products we want to retrieve.
+	 * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list.
+	 */
+	function mp_related_products() {
+		_deprecated_function('mp_related_products', '3.0', 'MP_Product::related_products()');
+		
+		$defaults = array(
+			'product_id' => null,
+			'echo' => false,
+			'relate_by' => mp_get_setting('related_products->relate_by'),
+			'limit' => mp_get_setting('related_products->show_limit'),
+			'simple_list' => mp_get_setting('related_products->simple_list'),
+		));
+		$args = array_replace_recursive($defaults, array_combine(array_keys($defaults), func_get_args());
+		$html = '';
+		
+		if ( ! is_null($args['product_id']) ) {
+			$product = new MP_Product($args['product_id']);
+		
+			if ( $product->exists() ) {
+				$args['echo'] = false;
+				$html .= $product->related_products($args);
+			}
+		}
+		
+		if ( $args['echo'] ) {
+			echo $html;
+		} else {
+			return $html;
+		}
 	}
 endif;
