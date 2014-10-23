@@ -171,6 +171,7 @@ Thanks again!", 'mp'
 	 	'relate_by' => 'both',
 	 	'simple_list' => 0,
 	 	'show_limit' => 3,
+	 	'view' => 'grid',
 	),
 );
 
