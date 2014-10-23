@@ -367,6 +367,27 @@ jQuery(document).ready(function($){
 				'digits' => 1,
 			),
 		));
+		$metabox->add_field('select', array(
+			'name' => 'order_by',
+			'label' => array('text' => __('Sort Products By', 'mp')),
+			'options' => array(
+				'title' => __('Product Name', 'mp'),
+				'date' => __('Publish Date', 'mp'),
+				'ID' => __('Product ID', 'mp'),
+				'author' => __('Product Author', 'mp'),
+				'sales' => __('Number of Sales', 'mp'),
+				'price' => __('Product Price', 'mp'),
+				'rand' => __('Random', 'mp'),
+			),
+		));
+		$metabox->add_field('radio_group', array(
+			'name' => 'order',
+			'label' => array('text' => __('Sort Order', 'mp')),
+			'options' => array(
+				'DESC' => __('Descending', 'mp'),
+				'ASC' => __('Ascending', 'mp'),
+			),
+		));
 	}
 
 	/**
@@ -413,10 +434,14 @@ jQuery(document).ready(function($){
 				'action' => 'show',
 			),
 		));
-		$metabox->add_field('checkbox', array(
-			'name' => 'related_products[simple_list]',
-			'label' => array('text' => __('Show Related Products As Simple List?', 'mp')),
+		$metabox->add_field('radio_group', array(
+			'name' => 'related_products[view]',
+			'label' => array('text' => __('Related Products Layout', 'mp')),
 			'message' => __('Yes', 'mp'),
+			'options' => array(
+				'list' => __('Display as list', 'mp'),
+				'grid' => __('Display as grid', 'mp'),
+			),
 			'conditional' => array(
 				'name' => 'related_products[show]',
 				'value' => '1',
