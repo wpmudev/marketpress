@@ -676,8 +676,8 @@ if ( ! function_exists('mp_related_products') ) :
 			'relate_by' => mp_get_setting('related_products->relate_by'),
 			'limit' => mp_get_setting('related_products->show_limit'),
 			'simple_list' => mp_get_setting('related_products->simple_list'),
-		));
-		$args = array_replace_recursive($defaults, array_combine(array_keys($defaults), func_get_args());
+		);
+		$args = array_replace_recursive($defaults, array_combine(array_keys($defaults), func_get_args()));
 		$html = '';
 		
 		if ( ! is_null($args['product_id']) ) {
