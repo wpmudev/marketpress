@@ -642,8 +642,12 @@ class WPMUDEV_Metabox {
 		endif; ?>
 							<div class="wpmudev-fields clearfix">
 		<?php
-		foreach ( $this->fields as $field ) : ?>
-								<div class="wpmudev-field <?php echo str_replace('_', '-', strtolower(get_class($field))); ?>">
+		foreach ( $this->fields as $field ) :
+			$classes = array('wpmudev-field', str_replace('_', '-', strtolower(get_class($field))));
+			if ( empty($field->args['desc']) ) {
+				$classes[] = 'no-field-desc';
+			} ?>
+								<div class="<?php echo implode(' ', $classes); ?>">
 		<?php
 			if ( ! empty($field->args['label']['text']) ) : ?>
 									<div class="wpmudev-field-label"><?php echo $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : ''); ?></div>

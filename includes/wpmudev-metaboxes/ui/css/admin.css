@@ -101,6 +101,9 @@ label.error:before {
 .postbox.wpmudev-postbox .inside .wpmudev-field.shaded {
   background: #fafafa;
 }
+.postbox.wpmudev-postbox .inside .wpmudev-field.no-field-desc .wpmudev-field-label {
+  margin-bottom: 10px;
+}
 .postbox.wpmudev-postbox .inside .wpmudev-field-label {
   font-weight: 700;
 }
