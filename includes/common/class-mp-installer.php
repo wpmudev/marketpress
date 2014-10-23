@@ -352,11 +352,11 @@ class MP_Installer {
 	 */
 	public function backup_legacy_settings( $settings ) {
 		if ( ! get_option('mp_settings_legacy') ) {
-			add_option('mp_settings_legacy', $settings, '', false);
+			add_option('mp_settings_legacy', $settings, '', 'no');
 		}
 		
 		if ( ! get_option('mp_coupons_legacy') ) {
-			add_option('mp_coupons_legacy', get_option('mp_coupons'), '', false);
+			add_option('mp_coupons_legacy', get_option('mp_coupons'), '', 'no');
 		}
 	}
 	
@@ -394,6 +394,9 @@ class MP_Installer {
 		if ( 'TRL' == mp_get_setting('currency') ) {
 			$settings['currency'] = 'TRY';
 		}
+		
+		//set theme to new default 3.0 theme
+		$settings['store_theme'] = 'default3';
 
 		return $settings;
 	}	
