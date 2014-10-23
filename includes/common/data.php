@@ -19,13 +19,6 @@ $this->defaults = array(
 		'list_view'=> NULL,
 		'filters' => NULL,
 	),
-	'related_products' => array(
-		'product_id' => NULL,
-		'relate_by' => 'both',
-		'echo' => false,
-		'limit' => NULL,
-		'simple_list' => NULL,
-	),
 );
 
 /*
