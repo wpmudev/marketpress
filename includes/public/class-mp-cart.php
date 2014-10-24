@@ -105,6 +105,31 @@ class MP_Cart {
 		
 		wp_send_json_error();
 	}
+
+	/**
+	 * Convert an array of items to an array of MP_Product objects
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $items
+	 * @return array
+	 */
+	protected function _convert_to_objects( $items ) {
+		$posts = get_posts(array(
+			'post__in' => array_keys($items),
+			'posts_per_page' => -1,
+			'post_type' => array(MP_Product::get_post_type(), 'mp_product_variation'),
+		));
+		
+		$products = array();
+		foreach ( $posts as $post ) {
+			$product = new MP_Product($post);
+			$product->qty = array_shift($items);
+			$products[] = $product;
+		}
+		
+		return $products;
+	}
 	
 	/**
 	 * Get cart cookie
@@ -185,7 +210,133 @@ class MP_Cart {
 		
 		return $total;
 	}
-	
+		
+	/**
+	 * Display the cart contents
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $args {
+	 * 		Optional, an array of arguments.
+	 *
+	 *		@type bool $echo Optional, whether to echo or return. Defaults to false.
+	 *		@type string $view Optional, how to display the cart contents - either list or table or a custom view name. Defaults to list.
+	 * }
+	 */
+	public function display( $args = array() ) {
+		$args = $args2 = array_replace_recursive(array(
+			'echo' => false,
+			'view' => 'list',
+		), $args);
+		$products = $this->_convert_to_objects($this->get_items());
+		
+		extract($args);
+		
+		$html = '
+			<div id="mp-cart" class="mp-cart-' . $view . '">';
+		
+		foreach ( $products as $product ) {
+			$html .= '
+				<div class="mp-cart-item clearfix" id="mp-cart-item-' . $product->ID . '">
+					<div class="mp-cart-item-thumb">' . $product->image_custom(false, 75) . '</div>
+					<div class="mp-cart-item-title"><h2>' . $product->title(false) . '</h2></div>
+					<div class="mp-cart-item-price">' . $product->display_price(false) . '</div>
+					<div class="mp-cart-item-qty">' .
+						$this->dropdown_quantity(array('echo' => false, 'class' => 'mp_select2', 'selected' => $product->qty)) . '<br />
+						<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>
+					</div>
+				</div>';
+		}
+		
+		$html .= '
+			</div>
+			<div class="clearfix">
+				<div id="cart-meta">
+					<div class="cart-meta-line">
+						<strong class="cart-meta-line-label">' . __('Product Total', 'mp') . '</strong>
+						<span class="cart-meta-line-amount">' . mp_format_currency('', $this->get_total()) . '</span>
+					</div>
+					<div class="cart-meta-line">
+						<strong class="cart-meta-line-label">' . sprintf(__('Estimated %s', 'mp'), mp_get_setting('tax->label')) . '</strong>
+						<span class="cart-meta-line-amount">' . mp_format_currency('', $this->get_total()) . '</span>
+					</div>
+					<div class="cart-meta-line">
+						<strong class="cart-meta-line-label">' . __('Estimated Order Total', 'mp') . '</strong>
+						<span class="cart-meta-line-amount">' . mp_format_currency('', $this->get_total()) . '</span>
+					</div>
+
+				</div>
+			</div>';
+		
+		/**
+		 * Filter the cart contents html
+		 *
+		 * @since 3.0
+		 * @param string $html The current html.
+		 * @param MP_Cart $this The current MP_Cart object.
+		 * @param array $args The array of arguments as passed to the method.
+		 */
+		$html = apply_filters('mp_cart/display', $html, $this, $args);
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
+	}
+
+	/**
+	 * Display the item quantity dropdown
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $args {
+	 *		Optional, an array of arguments.
+	 *
+	 * 		@type int $max Optional, the max quantity allowed. Defaults to 10.
+	 * 		@type int $selected Optional, the selected option. Defaults to 1.
+	 *		@type bool $echo Optional, whether to echo or return. Defaults to true.
+	 * }
+	 */
+	public function dropdown_quantity( $args = array() ) {
+		/**
+		 * Change the default max quantity allowed
+		 *
+		 * @since 3.0
+		 * @param int The default maximum.
+		 */
+		$max = apply_filters('mp_cart/quantity_dropdown/max_default', 10);
+		$defaults = array(
+			'max' => $max,
+			'selected' => 1,
+			'echo' => true,
+			'name' => '',
+			'class' => 'mp-cart-item-qty-field',
+			'id' => '',
+		);
+		$args = array_replace_recursive($defaults, $args);
+		
+		extract($args);
+		
+		// Build select field attributes
+		$attributes = mp_array_to_attributes(compact('name', 'class', 'id'));
+		
+		$html = '
+			<select' . $attributes . '>';
+		for ( $i = 1; $i <= $max; $i ++ ) {
+			$html .= '
+				<option value="' . $i . '" ' . selected($i, $selected, false) . '>' . number_format_i18n($i, 0) . '</option>'; 
+		}
+		$html .= '
+			</select>';
+			
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}		
+	}
+		
 	/**
 	 * Empty cart
 	 *
@@ -367,7 +518,7 @@ class MP_Cart {
 			return $snippet;
 		}
 	}
-	
+
 	/**
 	 * Set the cart id
 	 *
