@@ -37,6 +37,21 @@ class MP_Public {
 		add_filter('page_template', array(&$this, 'load_page_template'));
 		add_filter('get_post_metadata', array(&$this, 'remove_product_post_thumbnail'), 999, 4);
 		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles_scripts'));
+		add_filter('comments_open', array(&$this, 'disable_comments_on_store_pages'), 10, 2);
+	}
+	
+	/**
+	 * Disable comments on store pages
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function disable_comments_on_store_pages( $open, $post_id ) {
+		if ( get_post_type($post_id) == MP_Product::get_post_type() || get_post_meta($post_id, '_mp_store_page', true) !== '' ) {
+			$open = false;
+		}
+		
+		return $open;
 	}
 
 	/**
