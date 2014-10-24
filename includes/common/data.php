@@ -26,6 +26,7 @@ MarketPress Data Structures
 */
 $this->default_settings = array(
 	'base_country' => 'US',
+	'zip_label' => __('Zip Code', 'mp'),
 	'tax' => array(
 		'rate' => 0,
 		'label' => __('Taxes', 'mp'),
