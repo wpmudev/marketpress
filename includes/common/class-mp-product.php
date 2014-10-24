@@ -602,13 +602,16 @@ class MP_Product {
 	 */
 	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
 		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id($this->get_variation()->ID) : get_post_thumbnail_id($this->ID);
-		$atts = '';
+		
+		if ( $intsize = intval($size) ) {
+			$size = array($intsize, $intsize);
+		}
 		
 		if ( empty($thumb_id) ) {
 			$attributes = array_merge(array(
 				'src' => apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')),
-				'width' => get_option('thumbnail_size_w'),
-				'height' => get_option('thumbnail_size_h'),
+				'width' => ( is_array($size) ) ? $intsize : get_option('thumbnail_size_w'),
+				'height' => ( is_array($size) ) ? $intsize : get_option('thumbnail_size_h'),
 			), $attributes);
 		} else {
 			$data = wp_get_attachment_image_src($thumb_id, $size, false);
@@ -619,11 +622,7 @@ class MP_Product {
 			), $attributes);
 		}
 		
-		foreach ( $attributes as $name => $value ) {
-			$atts .= ' ' . $name . '="' . esc_attr($value) . '"';
-		}
-		
-		$img = '<img' . $atts . ' />';
+		$img = '<img' . mp_array_to_attributes($attributes) . ' />';
 		
 		if ( $echo ) {
 			echo $img;
