@@ -679,6 +679,24 @@ if ( ! function_exists('mp_array_map_recursive') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_array_to_attributes') ) :
+	/**
+	 * Convert an array of attributes to an html string
+	 *
+	 * @since 3.0
+	 * @param array $attributes
+	 * @return string
+	 */
+	function mp_array_to_attributes( $attributes ) {
+		$atts = '';
+		foreach ( $attributes as $key => $val ) {
+			$atts .= ' ' . $key . '="' . esc_attr($val) . '"';
+		}
+		
+		return $atts;
+	}
+endif;
+
 if ( ! function_exists('mp_is_main_site') ) :
 	/**
 	 * Checks if the current blog is the main site
