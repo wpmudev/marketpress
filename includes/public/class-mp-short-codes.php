@@ -44,6 +44,7 @@ class MP_Short_Codes {
     add_shortcode('mp_product_price', array(&$this, 'mp_product_price_sc'));
     add_shortcode('mp_product_meta', array(&$this, 'mp_product_meta_sc'));
     add_shortcode('mp_product_sku', array(&$this, 'mp_product_sku_sc'));
+    add_shortcode('mp_cart', array(&$this, 'mp_cart_sc'));
 
     //store links
     add_shortcode('mp_cart_link', array(&$this, 'mp_cart_link_sc'));
@@ -51,6 +52,20 @@ class MP_Short_Codes {
     add_shortcode('mp_products_link', array(&$this, 'mp_products_link_sc'));
     add_shortcode('mp_orderstatus_link', array(&$this, 'mp_orderstatus_link_sc'));
     add_shortcode('mp_store_navigation', array(&$this, 'mp_store_navigation_sc'));	
+	}
+	
+	/**
+	 * Display cart contents
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $atts {
+	 *		Optional, an array of arguments.
+	 * }
+	 */
+	public function mp_cart_sc( $atts, $content = null ) {
+		$atts['echo'] = false;
+		return MP_Cart::get_instance()->display($atts);
 	}
 	
   /**
