@@ -97,6 +97,26 @@ class MP_Installer {
 	}
 	
 	/**
+	 * Update tax settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $settings
+	 * @return array
+	 */
+	public function update_tax_settings( $settings ) {
+		if ( $rates = mp_arr_get_value('tax->rate->canada_rate', $settings) ) {
+			foreach ( $rates as $key => $value ) {
+				mp_push_to_array($settings, "tax->canada_rate->{$key}", $value);
+			}
+			
+			unset($settings['tax']['rate']['canada_rate']);
+		}
+		
+		return $settings;
+	}
+	
+	/**
 	 * Add admin menu items and enqueue scripts
 	 *
 	 * @since 3.0
@@ -389,6 +409,7 @@ class MP_Installer {
 		$this->update_coupon_schema();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);
+		$settings = $this->update_tax_settings($settings);
 		
 		//currency changes
 		if ( 'TRL' == mp_get_setting('currency') ) {
