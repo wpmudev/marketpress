@@ -35,7 +35,7 @@ class MP_Cart {
 	 * @access protected
 	 * @var int
 	 */
-	protected $_id_original = null
+	protected $_id_original = null;
 	
 	/**
 	 * Refers to the cart cookie id
