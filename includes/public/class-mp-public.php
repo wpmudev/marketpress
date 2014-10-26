@@ -129,6 +129,7 @@ class MP_Public {
 			$template = locate_template(array('mp_productlist.php'));
 		} elseif ( mp_get_setting('pages->cart') == $post->ID ) {
 			$template = locate_template(array('mp_cart.php'));
+			$this->start_session();
 		} elseif ( mp_get_setting('pages->checkout') == $post->ID ) {
 			$template = locate_template(array('mp_checkout.php', 'mp_cart.php'));
 		} elseif ( mp_get_setting('pages->order_status') == $post->ID ) {
@@ -276,6 +277,20 @@ class MP_Public {
 		}
 		
 		return $content;
+	}
+	
+	/**
+	 * Start session
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function start_session() {
+		$sess_id = session_id();
+		
+		if ( empty($sess_id) ) {
+			session_start();
+		}
 	}
 	
 	/**
