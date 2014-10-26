@@ -525,7 +525,7 @@ class MP_Installer {
 				'post_title' => strtoupper($code),
 				'post_content' => '',
 				'post_status' => 'publish',
-				'post_type' => 'product_coupon',
+				'post_type' => 'mp_coupon',
 			));
 			
 			foreach ( $metadata as $name => $data ) {

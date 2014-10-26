@@ -112,6 +112,7 @@ class MP_Store_Settings_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type());		
 		add_submenu_page('store-settings', __('Store Settings: Capabilities', 'mp'), __('User Capabilities', 'mp'), $cap, 'store-settings-capabilities', false);
 		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
+		add_submenu_page('store-settings', __('Store Settings: Add Ons', 'mp'), __('Add Ons', 'mp'), $cap, 'store-settings-addons', false);
 		add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
 
 	 	if ( ! WPMUDEV_REMOVE_BRANDING ) {
@@ -124,6 +125,7 @@ class MP_Store_Settings_Admin {
 			add_action('store-settings_page_store-settings-capabilities', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-setup-wizard', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-addons', array(&$this, 'add_help_tab'));
 		}
 	}
 	

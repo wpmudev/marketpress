@@ -169,7 +169,7 @@ class Marketpress {
 		)));
 
 		//! Register product_coupon post type
-		register_post_type('product_coupon', array(
+		register_post_type('mp_coupon', array(
 			'labels' => array(
 				'name' => __('Coupons', 'mp'),
 				'singular_name' => __('Coupon', 'mp'),
@@ -186,7 +186,7 @@ class Marketpress {
 				'not_found_in_trash' => __('No Coupons found in Trash', 'mp'),
 				'view' => __('View Coupon', 'mp')
 			),
-			'capability_type' => array('product_coupon', 'product_coupons'),
+			'capability_type' => array('mp_coupon', 'mp_coupons'),
 			//'map_meta_cap' => true,
 			'public' => false,
 			'publicly_queryable' => true,
@@ -363,6 +363,8 @@ class Marketpress {
 		add_action('init', array(&$this, 'includes'), 0);
 		// Load gateway/shipping plugins
 		add_action('init', array(&$this, 'load_plugins'), 0);
+		// Register system addons
+		add_action('init', array(&$this, 'register_addons'), 0);
 		// Setup custom types
 		add_action('init', array(&$this, 'register_custom_types'), 1);
 		// Maybe flush rewrites
@@ -373,6 +375,21 @@ class Marketpress {
 		add_filter('rewrite_rules_array', array(&$this, 'add_product_variation_rewrites'));
 		// Add custom query vars
 		add_filter('query_vars', array(&$this, 'add_query_vars'));
+	}
+	
+	/**
+	 * Register add ons
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function register_addons() {
+		MP_Addons::get_instance()->register(array(
+			'label' => __('Coupons', 'mp'),
+			'desc' => __('Offer and accept coupon codes', 'mp'),
+			'class' => 'MP_Coupons',
+			'path' => mp_plugin_dir('includes/addons/class-mp-coupons.php')
+		));		
 	}
 	
 	/**
@@ -455,7 +472,7 @@ class Marketpress {
 	public function includes() {
 		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
-		require_once $this->plugin_dir('includes/common/class-mp-coupons.php');
+		require_once $this->plugin_dir('includes/common/class-mp-addons.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');

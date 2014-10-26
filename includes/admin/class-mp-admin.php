@@ -59,7 +59,6 @@ class MP_Admin {
 	 */
 	public function includes() {
 		require_once mp_plugin_dir('includes/admin/class-mp-orders-admin.php');
-		require_once mp_plugin_dir('includes/admin/class-mp-product-coupons-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-products-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-product-attributes-admin.php');
 		require_once mp_plugin_dir('includes/admin/class-mp-store-settings-admin.php');

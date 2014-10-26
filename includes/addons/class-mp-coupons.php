@@ -1,6 +1,6 @@
 <?php
 
-class MP_Product_Coupons_Screen {
+class MP_Coupons {
 	/**
 	 * Refers to a single instance of the class
 	 *
@@ -19,7 +19,7 @@ class MP_Product_Coupons_Screen {
 	 */
 	public static function get_instance() {
 		if ( is_null(self::$_instance) ) {
-			self::$_instance = new MP_Product_Coupons_Screen();
+			self::$_instance = new MP_Coupons();
 		}
 		return self::$_instance;
 	}
@@ -34,9 +34,9 @@ class MP_Product_Coupons_Screen {
 		// Add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
 		// Modify coupon list table columns/data
-		add_filter('manage_product_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
-		add_action('manage_product_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
-		add_filter('manage_edit-product_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
+		add_filter('manage_mp_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
+		add_action('manage_mp_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
+		add_filter('manage_edit-mp_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
 		add_action('pre_get_posts', array(&$this, 'sort_product_coupons'));
 		// Custom css/javascript
 		add_action('admin_print_styles', array(&$this, 'print_css'));
@@ -57,7 +57,7 @@ class MP_Product_Coupons_Screen {
 	 * @action wpmudev_field_get_value_coupon_code
 	 */
 	public function get_coupon_code_value( $value, $post_id, $raw, $field ) {
-		return get_the_title($post_id);
+		return ( get_post_status($post_id) == 'auto-draft' ) ? '' : get_the_title($post_id);
 	}
 	
 	/**
@@ -71,7 +71,7 @@ class MP_Product_Coupons_Screen {
 	 * @return array
 	 */
 	public function save_coupon_data( $data, $post ) {
-		if ( $data['post_type'] != 'product_coupon' || empty($_POST['coupon_code']) ) {
+		if ( $data['post_type'] != 'mp_coupon' || empty($_POST['coupon_code']) ) {
 			return $data;
 		}
 		
@@ -91,7 +91,7 @@ class MP_Product_Coupons_Screen {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-coupons-metabox',
 			'title' => __('Coupon Settings'),
-			'post_type' => 'product_coupon',
+			'post_type' => 'mp_coupon',
 			'context' => 'normal',
 		));
 		$metabox->add_field('text', array(
@@ -193,7 +193,7 @@ class MP_Product_Coupons_Screen {
 	 * @param object $query
 	 */
 	public function sort_product_coupons( $query ) {
-		if ( $query->get('post_type') != 'product_coupon' || get_current_screen()->id != 'edit-product_coupon' ) {
+		if ( $query->get('post_type') != 'mp_coupon' || get_current_screen()->id != 'edit-mp_coupon' ) {
 			//bail
 			return;
 		}
@@ -271,13 +271,13 @@ class MP_Product_Coupons_Screen {
 	 * @action admin_print_footer_scripts
 	 */
 	public function print_js() {
-		if ( get_current_screen()->id != 'product_coupon' ) return;
+		if ( get_current_screen()->id != 'mp_coupon' ) return;
 		?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
-		$('#menu-posts-product, #menu-posts-product > a')
+		$('#menu-posts-product, #menu-posts-product > a, #menu-posts-mp_product, #menu-posts-mp_product > a')
 			.addClass('wp-menu-open wp-has-current-submenu')
-			.find('a[href="edit.php?post_type=product_coupon"]').parent().addClass('current');
+			.find('a[href="edit.php?post_type=mp_coupon"]').parent().addClass('current');
 	});
 </script>
 		<?php
@@ -292,7 +292,7 @@ class MP_Product_Coupons_Screen {
 	 */
 	public function add_menu_items() {
 		//manage coupons
-		add_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=product_coupon');
+		add_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=mp_coupon');
 	}
 	
 	/**
@@ -359,6 +359,37 @@ class MP_Product_Coupons_Screen {
 				echo ucwords(str_replace('_', ' ', $applies_to));
 		}
 	}
+	
+	/**
+	 * Get applied coupons from session
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_applied() {
+		if ( is_multisite() ) {
+			$blog_id = get_current_blog_id();
+			$coupons = mp_get_session_value("mp_cart_coupons->{$blog_id}", array());
+		} else {
+			$coupons = mp_get_session_value('mp_cart_coupons', array());
+		}
+		
+		return $coupons;
+	}
+	
+	/**
+	 * Get all coupons from db
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function get_all() {
+		$coupons = get_posts(array(
+			'post_type' => 'mp_coupon',
+			'posts_per_page' => -1,
+		));
+	}
 }
 
-MP_Product_Coupons_Screen::get_instance();
+MP_Coupons::get_instance();
