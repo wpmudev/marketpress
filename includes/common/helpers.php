@@ -99,9 +99,7 @@ if ( ! function_exists('mp_get_states') ) :
 	 * @return array
 	 */
 	function mp_get_states( $country ) {
-		if ( ! in_array($country, array('US','CA','GB','AU')) ) {
-			return array();
-		}
+		$list = array();
 		
 		switch ( $country ) {
 			case 'US' :
@@ -127,7 +125,7 @@ endif;
 
 if ( ! function_exists('mp_get_theme_list') ) :
 	/**
-	 * 
+	 * Get a list of MP themes
 	 *
 	 * @since 3.0
 	 * @access public
@@ -441,7 +439,6 @@ if ( ! function_exists('mp_arr_get_value') ) :
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
 	 */
-	
 	function mp_arr_get_value( $key, $array, $default = false ) {
 		$keys = explode('->', $key);
 		$keys = array_map('trim', $keys);
@@ -479,7 +476,6 @@ if ( ! function_exists('mp_get_get_value') ) :
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
 	 */	 
-	
 	function mp_get_get_value( $key, $default = false ) {
 		return mp_arr_get_value($key, $_GET, $default);
 	}
@@ -496,7 +492,6 @@ if ( ! function_exists('mp_get_post_value') ) :
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
 	 */	 
-	
 	function mp_get_post_value( $key, $default = false ) {
 		return mp_arr_get_value($key, $_POST, $default);
 	}
@@ -513,9 +508,8 @@ if ( ! function_exists('mp_get_session_value') ) :
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
 	 */	 
-	
 	function mp_get_session_value( $key, $default = false ) {
-		return mp_arr_get_value($key, $_POST, $default);
+		return ( session_id() == '' ) ? $default : mp_arr_get_value($key, $_SESSION, $default);
 	}
 endif;
 
@@ -532,7 +526,6 @@ if ( ! function_exists('mp_get_setting') ) :
 	 * @param mixed $default Returns when setting is not set
 	 * @return mixed
 	 */
-	 
 	function mp_get_setting( $key, $default = null ) {
 		$settings = get_option('mp_settings');
 		
