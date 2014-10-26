@@ -70,8 +70,8 @@ class MP_Store_Settings_General {
 		add_action('wpmudev_field/print_scripts/currency', array(&$this, 'update_currency_symbol'));
 		add_action('wpmudev_field/print_scripts/product_post_type', array(&$this, 'product_post_type_alert'));
 		add_action('wpmudev_metabox/after_settings_metabox_saved', array(&$this, 'update_product_post_type'));
-		add_filter('wpmudev_field/format_value/tax[rate]', array(&$this, 'format_tax_rate_value'), 10, 2);
-		add_filter('wpmudev_field/sanitize_for_db/tax[rate]', array(&$this, 'save_tax_rate_value'), 10, 3);
+		add_filter('wpmudev_field/format_value', array(&$this, 'format_tax_rate_value'), 10, 2);
+		add_filter('wpmudev_field/sanitize_for_db', array(&$this, 'save_tax_rate_value'), 10, 3);
 		add_action('init', array(&$this, 'init_metaboxes'));
 	}
 	
@@ -140,11 +140,15 @@ jQuery(document).ready(function($){
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field/get_value/tax[rate]
+	 * @filter wpmudev_field/get_value
 	 * @return string
 	 */
 	public function format_tax_rate_value( $value, $field ) {
-		return ($value * 100);
+		if ( $field->args['name'] == 'tax[rate]' || strpos($field->args['name'], 'tax[canada_rate]') === 0 ) {
+			return ($value * 100);
+		}
+		
+		return $value;
 	}
 	
 	/**
@@ -152,11 +156,15 @@ jQuery(document).ready(function($){
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field/sanitize_for_db/tax[rate]
+	 * @filter wpmudev_field/sanitize_for_db
 	 * @return string
 	 */
 	public function save_tax_rate_value( $value, $post_id, $field ) {
-		return ( $value > 0 ) ? ($value / 100) : 0;
+		if ( $field->args['name'] == 'tax[rate]' || strpos($field->args['name'], 'tax[canada_rate]') === 0 ) {
+			return ( $value > 0 ) ? ($value / 100) : 0;
+		}
+		
+		return $value;
 	}
 
 	/**
@@ -419,7 +427,29 @@ jQuery(document).ready(function($){
 			'validation' => array(
 				'number' => true,
 			),
+			'conditional' => array(
+				'name' => 'base_country',
+				'value' => 'CA',
+				'action' => 'hide',
+			),
 		));
+		
+		// Create field for each canadian province
+		foreach ( mp()->canadian_provinces as $key => $label ) {
+			$metabox->add_field('text', array(
+				'name' => 'tax[canada_rate][' . $key . ']',
+				'desc' => '<a target="_blank" href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada">' . __('Current Rates', 'mp') . '</a>',
+				'label' => array('text' => sprintf(__('%s Tax Rate', 'mp'), $label)),
+				'custom' => array('style' => 'width:75px'),
+				'after_field' => '%',
+				'conditional' => array(
+					'name' => 'base_country',
+					'value' => 'CA',
+					'action' => 'show',
+				),
+			));
+		}
+		
 		$metabox->add_field('text', array(
 			'name' => 'tax[label]',
 			'label' => array('text' => __('Tax Label', 'mp')),
