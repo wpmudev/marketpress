@@ -257,6 +257,33 @@ if ( ! function_exists('mp_format_currency') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_current_user_zipcode') ) :
+	/**
+	 * Get the current user's zipcode
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string The zipcode. False, if no zipcode could be retrieved.
+	 */
+	function mp_get_current_user_zipcode() {
+		$user = wp_get_current_user();
+		$address = $user->get('mp_shipping_info');
+		$zipcode = false;
+		
+		if ( is_array($address) ) {
+			// Try to get from usermeta
+			$zipcode = mp_arr_get_value('zip', $address);
+		}
+		
+		if ( false === $zipcode ) {
+			// Try to get from cookie
+			$zipcode = mp_get_cookie_value('zip');
+		}
+		
+		return $zipcode;
+	}
+endif;
+
 if ( ! function_exists('mp_get_image_size') ) :
 	/**
 	 * Get the image size per presentation settings
