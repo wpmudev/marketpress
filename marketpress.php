@@ -444,8 +444,6 @@ class Marketpress {
 			flush_rewrite_rules();
 			update_option('mp_flush_rewrites', 1);
 		}
-		
-		
 	}
 	
 	/**
@@ -457,6 +455,7 @@ class Marketpress {
 	public function includes() {
 		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
+		require_once $this->plugin_dir('includes/common/class-mp-coupons.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
@@ -486,6 +485,15 @@ class Marketpress {
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {
+			case 'download_only_cart' :
+				_deprecated_function($method, '3.0', 'MP_Cart::download_only');
+				$cart = MP_Cart::get_instance();
+				$cart->set_id($args[0]);
+				$is_download_only = $cart->is_download_only();
+				$cart->reset_id();
+				return $is_download_only;
+			break;
+			
 			case 'get_setting' :
 				_deprecated_function($method, '3.0', 'mp_get_setting');
 				return call_user_func_array('mp_get_setting', $args);
@@ -509,6 +517,12 @@ class Marketpress {
 			case 'product_price' :
 				_deprecated_function($method, '3.0', 'mp_product_price');
 				return call_user_func_array('mp_product_price', $args);
+			break;
+			
+			case 'tax_price' :
+				_deprecated_function($method, '3.0', 'MP_Cart::tax_price');
+				$mp_cart = MP_Cart::get_instance();
+				return call_user_func_array(array($mp_cart, $method), $args);
 			break;
 			
 			default :
