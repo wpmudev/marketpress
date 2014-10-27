@@ -31,22 +31,48 @@ class MP_Coupons {
 	 * @access private
 	 */
 	private function __construct() {
-		// Add menu items
-		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
-		// Modify coupon list table columns/data
-		add_filter('manage_mp_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
-		add_action('manage_mp_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
-		add_filter('manage_edit-mp_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
-		add_action('pre_get_posts', array(&$this, 'sort_product_coupons'));
-		// Custom css/javascript
-		add_action('admin_print_styles', array(&$this, 'print_css'));
-		add_action('admin_print_footer_scripts', array(&$this, 'print_js'));
-		// On coupon save update post title to equal coupon code field
-		add_filter('wp_insert_post_data', array(&$this, 'save_coupon_data'), 99, 2);
-		// Init metaboxes
-		add_action('init', array(&$this, 'init_metaboxes'));
-		// Get coupon code value
-		add_filter('wpmudev_field/before_get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
+		if ( is_admin() ) {
+			// Add menu items
+			add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
+			// Modify coupon list table columns/data
+			add_filter('manage_mp_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
+			add_action('manage_mp_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
+			add_filter('manage_edit-mp_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
+			add_action('pre_get_posts', array(&$this, 'sort_product_coupons'));
+			// Custom css/javascript
+			add_action('admin_print_styles', array(&$this, 'print_css'));
+			add_action('admin_print_footer_scripts', array(&$this, 'print_js'));
+			// On coupon save update post title to equal coupon code field
+			add_filter('wp_insert_post_data', array(&$this, 'save_coupon_data'), 99, 2);
+			// Init metaboxes
+			add_action('init', array(&$this, 'init_metaboxes'));
+			add_action('init', array(&$this, 'init_settings_metaboxes'));
+			// Get coupon code value
+			add_filter('wpmudev_field/before_get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
+		} else {
+			add_filter('mp_cart/after_cart_html', array(&$this, 'coupon_form_cart'), 10, 3);
+			add_action('wp_print_styles', array(&$this, 'print_css_frontend'));
+			add_action('wp_footer', array(&$this, 'print_js_frontend'), 25);
+		}
+	}
+	
+	/**
+	 * Display the coupon form
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_cart/after_cart_html
+	 */
+	public function coupon_form_cart( $html, $cart, $display_args ) {
+		$html .= '
+			<div id="mp-coupon-form">
+				<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
+				<input type="text" name="mp_cart_coupon" value="" />
+				<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
+				wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Please note that some codes can\'t be used with others, just be sure to enter one at a time.', 'mp'))) . '
+			</div>';
+			
+		return $html;
 	}
 	
 	/**
@@ -86,6 +112,7 @@ class MP_Coupons {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @action init
 	 */
 	public function init_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
@@ -185,6 +212,32 @@ class MP_Coupons {
 	}
 	
 	/**
+	 * Init settings metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action init
+	 */
+	public function init_settings_metaboxes() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-coupons-settings-metabox',
+			'title' => __('Coupons Settings'),
+			'page_slugs' => array('store-settings-addons'),
+			'option_name' => 'mp_settings',
+		));
+		$metabox->add_field('text', array(
+			'name' => 'coupons[form_title]',
+			'label' => array('text' => __('Form Title', 'mp')),
+			'default_value' => __('Have a coupon code?', 'mp'),
+		));
+		$metabox->add_field('wysiwyg', array(
+			'name' => 'coupons[help_text]',
+			'label' => array('text' => __('Help Text', 'mp')),
+			'default_value' => __('More than one code? That\'s OK! Please note that some codes can\'t be used with others, just be sure to enter one at a time.', 'mp'),
+		));
+	}
+	
+	/**
 	 * Changes the sort order of product coupons
 	 *
 	 * @since 3.0
@@ -264,6 +317,34 @@ class MP_Coupons {
 	}
 	
 	/**
+	 * Print frontend styles
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_print_styles
+	 */
+	public function print_css_frontend() {
+		if ( ! mp_is_shop_page('cart') ) { return; }
+		?>
+<style type="text/css">
+input[name="mp_cart_coupon"] {
+	text-transform: uppercase;
+}
+#mp-coupon-form {
+	border-bottom: 2px solid #eaeaea;
+	border-top: 2px solid #eaeaea;
+	padding-bottom: 25px;
+	margin-bottom: 25px;
+}
+#mp-coupon-form p {
+	margin: 20px 0 0;
+	padding: 0;
+} 
+</style>
+		<?php
+	}
+	
+	/**
 	 * Prints applicable javascript
 	 *
 	 * @since 3.0
@@ -282,7 +363,34 @@ class MP_Coupons {
 </script>
 		<?php
 	}
-	
+
+	/**
+	 * Print frontend scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_print_scripts
+	 */
+	public function print_js_frontend() {
+		if ( ! mp_is_shop_page('cart') ) { return; }
+		?>
+<script type="text/javascript">
+jQuery(document).ready(function($){
+	$('#mp-cart-form').submit(function(e){
+		var $this = $(this),
+				$couponCode = $this.find('[name="mp_cart_coupon"]'),
+				couponCode = $couponCode.val().toUpperCase().replace(/[^A-Z0-9]/g, '');
+		
+		if ( couponCode.length > 0 ) {
+			e.preventDefault();
+			mp_cart.applyCoupon(couponCode);
+		}
+	});
+});
+</script>
+		<?php
+	}
+		
 	/**
 	 * Adds menu items to the admin menu
 	 *
