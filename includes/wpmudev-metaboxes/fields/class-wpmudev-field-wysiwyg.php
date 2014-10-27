@@ -151,7 +151,7 @@ jQuery(document).ready(function($){
 	 * @param mixed $post_id
 	 */		
 	public function sanitize_for_db( $value, $post_id ) {
-		$value = wp_kses_post($value);
+		$value = wp_kses_post(stripslashes($value));
 		return parent::sanitize_for_db($value, $post_id);
 	}
 
