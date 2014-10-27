@@ -133,8 +133,23 @@ class Marketpress {
 		//! Register product_category taxonomy
 		register_taxonomy('product_category', MP_Product::get_post_type(), apply_filters('mp_register_product_category', array(
 			'hierarchical' => true,
-			'label' => __('Product Categories', 'mp'),
-			'singular_label' => __('Product Category', 'mp'),
+			'labels' => array(
+				'name' => _x('Product Categories', 'product_category', 'mp'),
+				'singular_name' => _x('Product Category', 'product_category', 'mp'),
+				'all_items' => __('All Product Categories', 'mp'),
+				'edit_item' => __('Edit Product Category', 'mp'),
+				'view_item' => __('View Product Category', 'mp'),
+				'update_item' => __('Update Product Category', 'mp'),
+				'add_new_item' => __('Add New Product Category', 'mp'),
+				'new_item_name' => __('New Product Category Name', 'mp'),
+				'parent_item' => __('Parent Product Category', 'mp'),
+				'parent_item_colon' => __('Parent Product Category:', 'mp'),
+				'search_items' => __('Search Product Categories', 'mp'),
+				'separate_items_with_commas' => __('Separate product categories with commas', 'mp'),
+				'add_or_remove_items' => __('Add or remove product categories', 'mp'),
+				'choose_from_most_used' => __('Choose from the most used product categories', 'mp'),
+				'not_found' => __('No product categories found', 'mp'),
+			),
 			'capabilities' => array(
 				'manage_terms' => 'manage_product_categories',
 				'edit_terms' => 'manage_product_categories',
@@ -145,15 +160,30 @@ class Marketpress {
 			'show_admin_column' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products') . '/' . mp_get_setting('slugs->category')
+				'slug' => mp_get_setting('pages->products'),
 			),
 		)));
 		
 		//! Register product_tag taxonomy
 		register_taxonomy('product_tag', MP_Product::get_post_type(), apply_filters('mp_register_product_tag', array(
 			'hierarchical' => false,
-			'label' => __('Product Tags', 'mp'),
-			'singular_label' => __('Product Tag', 'mp'),
+			'labels' => array(
+				'name' => _x('Product Tags', 'product_tag', 'mp'),
+				'singular_name' => _x('Product Tag', 'product_tag', 'mp'),
+				'all_items' => __('All Product Tags', 'mp'),
+				'edit_item' => __('Edit Product Tag', 'mp'),
+				'view_item' => __('View Product Tag', 'mp'),
+				'update_item' => __('Update Product Tag', 'mp'),
+				'add_new_item' => __('Add New Product Tag', 'mp'),
+				'new_item_name' => __('New Product Tag Name', 'mp'),
+				'parent_item' => __('Parent Product Tag', 'mp'),
+				'parent_item_colon' => __('Parent Product Tag:', 'mp'),
+				'search_items' => __('Search Product Tags', 'mp'),
+				'separate_items_with_commas' => __('Separate product tags with commas', 'mp'),
+				'add_or_remove_items' => __('Add or remove product tags', 'mp'),
+				'choose_from_most_used' => __('Choose from the most used product tags', 'mp'),
+				'not_found' => __('No product tags found', 'mp'),
+			),
 			'capabilities' => array(
 				'manage_terms' => 'manage_product_tags',
 				'edit_terms' => 'manage_product_tags',
@@ -164,7 +194,7 @@ class Marketpress {
 			'show_ui' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products') . '/' . mp_get_setting('slugs->tag')
+				'slug' => mp_get_setting('pages->products'),
 			),
 		)));
 
@@ -219,10 +249,9 @@ class Marketpress {
 			'publicly_queryable' => true,
 			'capability_type' => array('product', 'products'),
       'menu_icon' => ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-cart' : mp_plugin_url('ui/images/marketpress-icon.png'),
-			//'map_meta_cap' => true,
 			'hierarchical' => false,
 			'rewrite' => array(
-				'slug' => mp_get_setting('slugs->store') . '/' . mp_get_setting('slugs->products'),
+				'slug' => mp_get_setting('pages->products'),
 				'with_front' => false
 			),
 			'query_var' => true,
@@ -255,7 +284,6 @@ class Marketpress {
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'capability_type' => array('store_order', 'store_orders'),
-			//'map_meta_cap' => true,
 			'hierarchical' => false,
 			'rewrite' => false,
 			'query_var' => false,
