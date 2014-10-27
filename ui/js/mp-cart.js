@@ -242,6 +242,29 @@ var mp_cart = {};
 	};
 	
 	/**
+	 * Apply a coupon code to the cart
+	 *
+	 * @since 3.0
+	 * @param string couponCode The coupon code to apply.
+	 */
+	mp_cart.applyCoupon = function( couponCode ){
+		if ( couponCode === undefined ) {
+			return false;
+		}
+		
+		marketpress.loadingOverlay('show');
+		
+		var url = mp_cart_i18n.ajaxurl + '?action=mp_cart_apply_coupon',
+				data = { "coupon_code" : couponCode };
+		
+		//! TODO: need to code ajax request on backend and frontend response
+		
+		$.post(url, data).done(function(resp){
+			marketpress.loadingOverlay('hide');
+		});
+	};
+	
+	/**
 	 * Update the cart html
 	 *
 	 * @since 3.0
