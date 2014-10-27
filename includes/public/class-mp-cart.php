@@ -288,35 +288,72 @@ class MP_Cart {
 	 * }
 	 */
 	public function display( $args = array() ) {
-		$args = $args2 = array_replace_recursive(array(
+		$html = '';
+		$args = array_replace_recursive(array(
 			'echo' => false,
 			'view' => 'list',
 		), $args);
 		$products = $this->_convert_to_objects($this->get_items());
-		
+
 		extract($args);
 		
-		$html = '
-			<div id="mp-cart" class="mp-cart-' . $view . '">';
+		/**
+		 * Add html before cart
+		 *
+		 * @since 3.0
+		 * @param string
+		 * @param MP_Cart $this The current cart object.
+		 * @param array $args The arguments that were passed to the display method.
+		 */
+		$before_cart_html = apply_filters('mp_cart/before_cart_html', '', $this, $args);
+		
+		/**
+		 * Add html after cart
+		 *
+		 * @since 3.0
+		 * @param string
+		 * @param MP_Cart $this The current cart object.
+		 * @param array $args The arguments that were passed to the display method.
+		 */
+		$after_cart_html = apply_filters('mp_cart/after_cart_html', '', $this, $args);
+		
+		$html .= '
+			<form id="mp-cart-form" method="post">';
+		
+		if ( ! empty($before_cart_html) ) {
+			$html .= '
+				<div id="mp-cart-before" class="clearfix">' . $before_cart_html . '</div>';
+		}
+
+		$html .= '
+				<div id="mp-cart" class="mp-cart-' . $view . '">';
 		
 		foreach ( $products as $product ) {
 			$html .= '
-				<div class="mp-cart-item clearfix" id="mp-cart-item-' . $product->ID . '">
-					<div class="mp-cart-item-thumb">' . $product->image_custom(false, 75) . '</div>
-					<div class="mp-cart-item-title"><h2>' . $product->title(false) . '</h2></div>
-					<div class="mp-cart-item-price">' . $product->display_price(false) . '</div>
-					<div class="mp-cart-item-qty">' .
-						$this->dropdown_quantity(array('echo' => false, 'class' => 'mp_select2', 'selected' => $product->qty)) . '<br />
-						<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>
-					</div>
-				</div>';
+					<div class="mp-cart-item clearfix" id="mp-cart-item-' . $product->ID . '">
+						<div class="mp-cart-item-thumb">' . $product->image_custom(false, 75) . '</div>
+						<div class="mp-cart-item-title"><h2>' . $product->title(false) . '</h2></div>
+						<div class="mp-cart-item-price">' . $product->display_price(false) . '</div>
+						<div class="mp-cart-item-qty">' .
+							$this->dropdown_quantity(array('echo' => false, 'class' => 'mp_select2', 'name' => 'mp_cart_qty[' . $product->ID . ']', 'selected' => $product->qty)) . '<br />
+							<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>
+						</div>
+					</div>';
 		}
 		
 		$html .= '
-			</div>
-			<div class="clearfix">' .
-				$this->cart_meta(false) . '
-			</div>';
+				</div>';
+		
+		if ( ! empty($after_cart_html) ) {
+			$html .= '
+				<div id="mp-cart-after" class="clearfix">' . $after_cart_html . '</div>';
+		}
+
+		$html .= '
+				<div class="clearfix">' .
+					$this->cart_meta(false) . '
+				</div>
+			</form>';
 		
 		/**
 		 * Filter the cart contents html
@@ -418,7 +455,7 @@ class MP_Cart {
 	public function enqueue_styles_scripts() {
 		global $post;
 		
-		if ( ! mp_is_shop_page() || mp_get_setting('pages->cart') == $post->ID ) {
+		if ( ! mp_is_shop_page() ) {
 			return;
 		}
 		
