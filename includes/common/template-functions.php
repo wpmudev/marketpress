@@ -319,9 +319,11 @@ if ( ! function_exists('mp_is_shop_page') ) :
 	 * Check if current page is a shop page
 	 *
 	 * @since 3.0
+	 * @param string $page The specific page to check - e.g. "cart".
+	 * @return bool
 	 */
-	function mp_is_shop_page() {
-		return MP_Public::get_instance()->is_store_page();
+	function mp_is_shop_page( $page = null ) {
+		return MP_Public::get_instance()->is_store_page($page);
 	}
 endif;
 

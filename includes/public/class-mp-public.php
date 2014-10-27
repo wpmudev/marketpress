@@ -74,9 +74,15 @@ class MP_Public {
 	 * Check if the current page is a store page
 	 *
 	 * @since 3.0
+	 * @param string $page The specific page to check - e.g. "cart".
+	 * @return bool
 	 */
-	function is_store_page() {
-		return ( get_post_meta(get_the_ID(), '_mp_store_page', true) !== '' || is_singular(MP_Product::get_post_type()) || is_tax(array('product_category', 'product_tag')) );
+	function is_store_page( $page = null ) {
+		if ( is_null($page) ) {
+			return ( get_post_meta(get_the_ID(), '_mp_store_page', true) !== '' || is_singular(MP_Product::get_post_type()) || is_tax(array('product_category', 'product_tag')) );
+		} else {
+			return ( get_post_meta(get_the_ID(), '_mp_store_page', true) == $page );
+		}
 	}
 	
 	/**
