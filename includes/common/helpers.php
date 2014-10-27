@@ -590,6 +590,17 @@ function mp_arr_search( $array, $path ) {
 }
 endif;
 
+if ( ! function_exists('mp_register_addon') ) :
+	/**
+	 * Wrapper function for MP_Addons::register()
+	 * 
+	 * @since 3.0
+	 */
+	function mp_register_addon( $args = array() ) {
+		MP_Addons::get_instance()->register($args);
+	}
+endif;
+
 if ( ! function_exists('mp_update_setting') ) :
 	/**
 	 * Update a specific setting
