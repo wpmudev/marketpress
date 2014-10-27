@@ -38,7 +38,7 @@ class MP_Addons {
 	 */
 	public function disable( $addons ) {
 		foreach ( (array) $addons as $addon ) {
-			if ( $key = array_search($addon, $this->addons_enabled) ) {
+			if ( false !== ($key = array_search($addon, $this->_addons_enabled)) ) {
 				unset($this->_addons_enabled[$key]);
 			}
 		}
@@ -58,7 +58,9 @@ class MP_Addons {
 			$this->_addons_enabled[] = $addon;
 		}
 		
-		mp_update_setting('addons', array_unique($this->_addons_enabled));
+		array_unique($this->_addons_enabled);
+		
+		mp_update_setting('addons', $this->_addons_enabled);
 	}
 	
 	/**
@@ -84,6 +86,18 @@ class MP_Addons {
 			self::$_instance = new MP_Addons();
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * Get an add-on object from it's class name
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $class The class name of the add-on.
+	 * @return object The add-on. False, if add-on is not found.
+	 */
+	public function get_addon( $class ) {
+		return mp_arr_get_value($class, $this->_addons);
 	}
 	
 	/**
