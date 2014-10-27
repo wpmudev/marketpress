@@ -22,6 +22,7 @@ class MP_Addons_List_Table extends WP_List_Table {
 			'label' => __('Name', 'mp'),		
 			'desc' => __('Description', 'mp'),
 			'status' => __('Status', 'mp'),
+			'settings' => '',
 		);
 	}
 	
@@ -43,16 +44,17 @@ class MP_Addons_List_Table extends WP_List_Table {
 		foreach ( $addons as $addon ) {
 			if ( MP_Addons::get_instance()->is_addon_enabled($addon->class) ) {
 				$enabled = true;
-				$status = '<a class="button mp-enable-disable-addon" href="#"><span class="mp-addon-status enabled"></span>' . __('Disable', 'mp') . '</a>';
+				$status = '<a class="button mp-enable-disable-addon" title="' . __('Disable add-on', 'mp') . '" href="#"><span class="mp-addon-status enabled"></span>' . __('Enabled', 'mp') . '</a>';
 			} else {
 				$enabled = false;
-				$status = '<a class="button mp-enable-disable-addon" href="#"><span class="mp-addon-status disabled"></span>' . __('Enable', 'mp') . '</a>';	
+				$status = '<a class="button mp-enable-disable-addon" title="' . __('Enable add-on', 'mp') . '" href="#"><span class="mp-addon-status disabled"></span>' . __('Disabled', 'mp') . '</a>';	
 			}
 
 			$data[] = array(
 				'ID' => $addon->class,
 				'label' => $addon->label,
 				'desc' => $addon->desc,
+				'class' => $addon->class,
 				'status' => $status,
 				'enabled' => $enabled,
 			);
@@ -110,5 +112,9 @@ class MP_Addons_List_Table extends WP_List_Table {
 	
 	function column_status( $item ) {
 		return $item['status'];
+	}
+	
+	function column_settings( $item ) {
+		return '<a href="' . add_query_arg('addon', $item['class']) . '">' . __('Settings', 'mp') . '</a>';
 	}
 }

@@ -23,6 +23,37 @@ class MP_Store_Settings_Addons {
 		}
 		return self::$_instance;
 	}
+	
+	/**
+	 * Display add-on settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_addon_settings() {
+		$addon = mp_get_get_value('addon');
+		$addon_obj = MP_Addons::get_instance()->get_addon($addon);
+		
+		if ( false === $addon_obj ) {
+			wp_die();
+		}
+		?>
+<div class="wrap mp-wrap">
+	<?php
+	require_once mp_plugin_dir('includes/admin/class-mp-addons-list-table.php');
+	$list_table = new MP_Addons_List_Table();
+	$list_table->prepare_items();	?>
+	<div class="icon32"><img src="<?php echo mp_plugin_url('ui/images/settings.png'); ?>" /></div>
+	<h2 class="mp-settings-title"><?php printf(__('Store Settings: Add Ons: %s', 'mp'), $addon_obj->label); ?></h2>
+	<div class="clear"></div>
+	<div class="mp-settings">
+		<form method="post">
+		<?php do_action('wpmudev_metabox/render_settings_metaboxes'); ?>
+		</form>
+	</div>
+</div>
+		<?php
+	}
 
 	/**
 	 * Add metaboxes
@@ -69,11 +100,11 @@ jQuery(document).ready(function($){
 		
 		$cb.prop('checked', true);
 		
-		if ( $this.has('.enabled') ) {
+		if ( $this.find('.enabled').length ) {
 			$bulkActions.val('disable');
 		}
 		
-		if ( $this.has('.disabled') ) {
+		if ( $this.find('.disabled').length ) {
 			$bulkActions.val('enable');
 		}
 		
@@ -99,7 +130,22 @@ jQuery(document).ready(function($){
 </div>
 	<?php
 	}
-
+	
+	/**
+	 * Display settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action 
+	 */
+	public function display_settings() {
+		if ( $addon = mp_get_get_value('addon') ) {
+			$this->display_addon_settings();
+		} else {
+			$this->display_list_table();
+		}
+	}
+	
 	/**
 	 * Constructor function
 	 *
@@ -107,7 +153,7 @@ jQuery(document).ready(function($){
 	 * @access private
 	 */
 	private function __construct() {
-		add_action('store-settings_page_store-settings-addons', array(&$this, 'display_list_table'));
+		add_action('store-settings_page_store-settings-addons', array(&$this, 'display_settings'));
 	}
 }
 
