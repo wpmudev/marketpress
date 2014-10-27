@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: MarketPress
+Plugin Name: MarketPress (CoursePress Pro Bundle)  
 Version: 2.9.5.4
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
@@ -513,7 +513,7 @@ Thanks again!", 'mp')
 		// Load up the localization file if we're using WordPress in a different language
 		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
 		$mu_plugins = wp_get_mu_plugins();
-		$lang_dir = dirname(plugin_basename($this->plugin_file)) . '/marketpress-includes/languages/';
+		$lang_dir = dirname(plugin_basename($this->plugin_file)) . 'includes/marketpress/marketpress-includes/languages/';
 		$custom_path = WP_LANG_DIR . '/marketpress/mp-' . get_locale() . '.mo';
 		
 		if ( file_exists($custom_path) ) {
@@ -532,8 +532,8 @@ Thanks again!", 'mp')
 	function init_vars() {
 		//setup proper directories
 		$this->plugin_file = __FILE__;
-		$this->plugin_dir = plugin_dir_path(__FILE__) . 'marketpress-includes/';
-		$this->plugin_url = plugin_dir_url(__FILE__) . 'marketpress-includes/';
+		$this->plugin_dir = plugin_dir_path(__FILE__) . 'includes/marketpress/marketpress-includes/';
+		$this->plugin_url = plugin_dir_url(__FILE__) . 'includes/marketpress/marketpress-includes/';
 
 		//load constants
 		require_once( $this->plugin_dir . 'constants.php' );
