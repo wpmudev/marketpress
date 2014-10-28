@@ -412,11 +412,11 @@ class Marketpress {
 	 * @access public
 	 */
 	public function register_addons() {
-		MP_Addons::get_instance()->register(array(
+		mp_register_addon(array(
 			'label' => __('Coupons', 'mp'),
 			'desc' => __('Offer and accept coupon codes', 'mp'),
 			'class' => 'MP_Coupons',
-			'path' => mp_plugin_dir('includes/addons/class-mp-coupons.php')
+			'path' => mp_plugin_dir('includes/addons/mp-coupons/class-mp-coupons.php')
 		));		
 	}
 	
@@ -530,6 +530,18 @@ class Marketpress {
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {
+			case 'coupon_applicable' :
+				_deprecated_function($method, '3.0', 'MP_Coupon::is_applicable');
+				$is_applicable = false;
+				
+				if ( class_exists('MP_Coupon') ) {
+					$coupon = new MP_Coupon($args[0]);
+					$is_applicable = $coupon->is_applicable($args[1]);
+				}
+				
+				return $is_applicable;
+			break;
+			
 			case 'download_only_cart' :
 				_deprecated_function($method, '3.0', 'MP_Cart::download_only');
 				$cart = MP_Cart::get_instance();
