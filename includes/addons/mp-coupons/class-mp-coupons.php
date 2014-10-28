@@ -11,6 +11,15 @@ class MP_Coupons {
 	private static $_instance = null;
 	
 	/**
+	 * Refers to all of the coupons
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_coupons = null;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -31,13 +40,22 @@ class MP_Coupons {
 	 * @access private
 	 */
 	private function __construct() {
+		require_once mp_plugin_dir('includes/addons/mp-coupons/class-mp-coupon.php');
+		
+		$this->_install();
+		
 		if ( is_admin() ) {
-			// Add menu items
-			add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
-			// Modify coupon list table columns/data
 			add_filter('manage_mp_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
 			add_action('manage_mp_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
 			add_filter('manage_edit-mp_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
+
+			if ( mp_doing_ajax() ) {
+				return;
+			}
+			
+			// Add menu items
+			add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
+			// Modify coupon list table columns/data
 			add_action('pre_get_posts', array(&$this, 'sort_product_coupons'));
 			// Custom css/javascript
 			add_action('admin_print_styles', array(&$this, 'print_css'));
@@ -57,6 +75,18 @@ class MP_Coupons {
 	}
 	
 	/**
+	 * Install
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _install() {
+		if ( false === get_option('mp_coupons') ) {
+			add_option('mp_coupons', array());
+		}
+	}
+	
+	/**
 	 * Display the coupon form
 	 *
 	 * @since 3.0
@@ -67,7 +97,9 @@ class MP_Coupons {
 		$html .= '
 			<div id="mp-coupon-form">
 				<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
-				<input type="text" name="mp_cart_coupon" value="" />
+				<span class="mp-cart-input">
+					<input type="text" name="mp_cart_coupon" value="" />
+				</span>
 				<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
 				wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Please note that some codes can\'t be used with others, just be sure to enter one at a time.', 'mp'))) . '
 			</div>';
@@ -83,7 +115,8 @@ class MP_Coupons {
 	 * @action wpmudev_field_get_value_coupon_code
 	 */
 	public function get_coupon_code_value( $value, $post_id, $raw, $field ) {
-		return ( get_post_status($post_id) == 'auto-draft' ) ? '' : get_the_title($post_id);
+		$post = get_post($post_id);
+		return ( get_post_status($post_id) == 'auto-draft' ) ? '' : $post->post_name;
 	}
 	
 	/**
@@ -101,8 +134,11 @@ class MP_Coupons {
 			return $data;
 		}
 		
-		$data['post_title'] = strtoupper($_POST['coupon_code']);
+		$code = preg_replace('/[^A-Z0-9_-]/', '', strtoupper($_POST['coupon_code']));
+		
+		$data['post_title'] = $code;
 		$data['post_status'] = 'publish';
+		$data['post_name'] = '';
 		
 		return $data;
 	}
@@ -383,7 +419,18 @@ jQuery(document).ready(function($){
 		
 		if ( couponCode.length > 0 ) {
 			e.preventDefault();
-			mp_cart.applyCoupon(couponCode);
+			
+			$couponCode.removeClass('error').siblings('.cart-error').remove();
+			
+			$this.on('mp_cart/apply_coupon/success', function(e, data){
+				
+			});
+			
+			$this.on('mp_cart/apply_coupon/error', function(e, message){
+				$couponCode.addClass('error').before('<span class="cart-error">' + message + '</span>');
+			});
+			
+			mp_cart.applyCoupon(couponCode, $this);
 		}
 	});
 });
@@ -491,13 +538,32 @@ jQuery(document).ready(function($){
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @return array
 	 */
 	public function get_all() {
-		$coupons = get_posts(array(
+		if ( ! is_null($this->_coupons) ) {
+			return $this->_coupons;
+		}
+		
+		$this->_coupons = get_posts(array(
 			'post_type' => 'mp_coupon',
 			'posts_per_page' => -1,
 		));
+		
+		return $this->_coupons;
 	}
 }
 
 MP_Coupons::get_instance();
+
+if ( ! function_exists('mp_coupons') ) :
+	/**
+	 * Get the MP_Coupons instance
+	 *
+	 * @since 3.0
+	 * @return MP_Coupons
+	 */
+	function mp_coupons() {
+		return MP_Coupons::get_instance();
+	}
+endif;
