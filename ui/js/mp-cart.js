@@ -246,10 +246,15 @@ var mp_cart = {};
 	 *
 	 * @since 3.0
 	 * @param string couponCode The coupon code to apply.
+	 * @param object $scope Optional, the scope of the triggered events. Defaults to document.
 	 */
-	mp_cart.applyCoupon = function( couponCode ){
+	mp_cart.applyCoupon = function( couponCode, $scope ){
 		if ( couponCode === undefined ) {
 			return false;
+		}
+		
+		if ( $scope === undefined ) {
+			var $scope = $(document);
 		}
 		
 		marketpress.loadingOverlay('show');
@@ -261,6 +266,24 @@ var mp_cart = {};
 		
 		$.post(url, data).done(function(resp){
 			marketpress.loadingOverlay('hide');
+			
+			if ( resp.success ) {
+				/**
+				 * Fires on coupon success
+				 *
+				 * @since 3.0
+				 * @param object Any applicable data.
+				 */
+				$scope.trigger('mp_cart/apply_coupon/success', [ resp.data ]);				
+			} else {
+				/**
+				 * Fires on coupon error
+				 *
+				 * @since 3.0
+				 * @param string The applicable error message.
+				 */
+				$scope.trigger('mp_cart/apply_coupon/error', [ resp.data.message ]);
+			}
 		});
 	};
 	
