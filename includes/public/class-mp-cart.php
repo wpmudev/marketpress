@@ -87,6 +87,31 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Apply coupon (ajax)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_cart_apply_coupon, wp_ajax_nopriv_mp_cart_apply_coupon
+	 */
+	public function ajax_apply_coupon() {
+		$coupon_code = mp_get_post_value('coupon_code');
+		
+		if ( ! $coupon_code ) {
+			wp_send_json_error(array(
+				'message' => __('Invalid coupon code', 'mp'),
+			));
+		}
+		
+		$coupon = new MP_Coupon($coupon_code);
+		
+		if ( ! $coupon->exists() ) {
+			wp_send_json_error(array(
+				'message' => __('Invalid coupon code', 'mp'),
+			));
+		}
+	}
+	
+	/**
 	 * Update the cart (ajax)
 	 *
 	 * @since 3.0
@@ -928,6 +953,8 @@ jQuery(document).ready(function($){
 		// Ajax hooks
 		add_action('wp_ajax_mp_update_cart', array(&$this, 'ajax_update_cart'));
 		add_action('wp_ajax_nopriv_mp_update_cart', array(&$this, 'ajax_update_cart'));
+		add_action('wp_ajax_mp_cart_apply_coupon', array(&$this, 'ajax_apply_coupon'));
+		add_action('wp_ajax_nopriv_mp_cart_apply_coupon', array(&$this, 'ajax_apply_coupon'));
 	}
 }
 
