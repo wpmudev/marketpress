@@ -4,6 +4,16 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+2.9.5.5
+----------------------------------------------------------------------
+- Added: "mp_imported_products_post_status" filter - gives the ability to set the post status of imported products
+- Fixed: when importing products via CSV and products have the same featured image only the first product attaches the image
+- Fixed: when using embedded Stripe checkout form the selected currency isn't being reflected in the payment form
+- Fixed: bug with mp_list_products short code and pagination
+- Fixed: bug with tax calculations due to over-rounding
+- Fixed: bug with PayPal Express gateway when tax shipping is enabled
+- Fixed: bug with automatic emails some times not being RFC5322 compliant due to line length
+
 2.9.5.4
 ----------------------------------------------------------------------
 - Fixed: Shipping tax not being calculated correctly when using tax-inclusive pricing
