@@ -1031,16 +1031,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
 
       //shipping line
-      $shipping_tax = 0;
       if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
 				$total += $shipping_price;
 				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
-				$shipping_tax = ($mp->shipping_tax_price($shipping_price) - $shipping_price);
       }
 
       //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
       if ( ! $this->get_setting('tax->tax_inclusive') ) {
-      	$tax_price = ($mp->tax_price(false) + $shipping_tax);
+      	$tax_price = $mp->tax_price(false);
 				$total += $tax_price;
 				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
       }
@@ -1057,14 +1055,14 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $j++;
     }
     
-    //echo '<pre>'; print_r($this->deformatNVP($request)); echo '</pre>';die;
+    //$debug = $this->deformatNVP($request);
     
     if (is_multisite())
       switch_to_blog($current_blog_id);
-
+      
 		$nvpstr .= $request;
 		$_SESSION['nvpstr'] = $request;
-
+		
     //'---------------------------------------------------------------------------------------------------------------
     //' Make the API call to PayPal
     //' If the API call succeded, then redirect the buyer to PayPal to begin to authorize payment.
