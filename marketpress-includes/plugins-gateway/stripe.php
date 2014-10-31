@@ -119,6 +119,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 								data-key="' . $this->publishable_key . '"
 								data-amount="' . $total . '"
 								data-name="' . get_bloginfo('title') . '"
+								data-currency="' . $this->currency . '"
 								data-description="' . __('Your Order', 'mp') . '"
 								data-image="">
 							</script>
