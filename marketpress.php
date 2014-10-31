@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.5.4
+Version: 2.9.5.5
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 */
 
 class MarketPress {
-	var $version = '2.9.5.4';
+	var $version = '2.9.5.5';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -1901,6 +1901,7 @@ Thanks again!", 'mp')
 		
 		if ( isset($_POST['per_page']) ) {
 			$args['per_page'] = intval($_POST['per_page']);
+			$args['paginate'] = true;
 		}
 
 		if ( isset($_POST['product_category']) && is_numeric($_POST['product_category']) ) {
@@ -2627,6 +2628,7 @@ Thanks again!", 'mp')
 	}
 
 	//returns the calculated price for shipping. Returns False if shipping address is not available
+	//MP3
 	function shipping_price($format = false, $cart = false) {
 		global $mp_shipping_active_plugins;
 
@@ -2860,34 +2862,34 @@ Thanks again!", 'mp')
 		case 'US':
 		 //USA taxes are only for orders delivered inside the state
 		 if ($country == 'US' && $state == $this->get_setting('base_province'))
-		 $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+		 $price = ($total * $this->get_setting('tax->rate')) + $special_total;
 		 break;
 
 		case 'CA':
 			 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 			if ( $country == 'CA' && array_key_exists($state, $this->canadian_provinces) ) {
 				if (!is_null($this->get_setting("tax->canada_rate->$state")))
-					$price = round(($total * $this->get_setting("tax->canada_rate->$state")) + $special_total, 2);
+					$price = ($total * $this->get_setting("tax->canada_rate->$state")) + $special_total;
 				else //backwards compat with pre 2.2 if per province rates are not set
-					$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+					$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 			}
 			 break;
 
 		case 'AU':
 			 //Australia taxes orders in country
 			 if ($country == 'AU')
-			 $price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+			 $price = ($total * $this->get_setting('tax->rate')) + $special_total;
 			 break;
 
 		default:
 			 //EU countries charge VAT within the EU
 			 if ( in_array($this->get_setting('base_country'), $this->eu_countries) ) {
 			 if (in_array($country, $this->eu_countries))
-				$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+				$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 			 } else {
 			 //all other countries use the tax outside preference
 			 if ($this->get_setting('tax->tax_outside') || (!$this->get_setting('tax->tax_outside') && $country == $this->get_setting('base_country')))
-				$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+				$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 			 }
 			 break;
 	}
@@ -2897,7 +2899,8 @@ Thanks again!", 'mp')
 		}
 	
 		$price += $shipping_tax;
-		$price = apply_filters( 'mp_tax_price', $price, $total, $cart, $country, $state );
+		$price = apply_filters('mp_tax_price', $price, $total, $cart, $country, $state);
+		$price = round($price, 2);
 		 
 		if ( $format ) {
 			return $this->format_currency('', $price);
@@ -4224,6 +4227,7 @@ Thanks again!", 'mp')
 	}
 
 	//checks if a given cart is only downloadable products
+	//MP3
 	function download_only_cart($cart) {
 		foreach ((array)$cart as $product_id => $variations) {
 			foreach ((array)$variations as $variation => $data) {
@@ -4640,7 +4644,7 @@ Thanks again!", 'mp')
 		add_filter( 'wp_mail_from', create_function('', '$settings = get_option("mp_settings");return isset($settings["store_email"]) ? $settings["store_email"] : get_option("admin_email");') );
 
 		//convert all newlines and tabs to their approriate html markup
-		$msg = str_replace(array("\r\n", "\n", "\t"), array('<br />', '<br />', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'), $msg);
+		$msg = str_replace(array("\r\n", "\n", "\t"), array("<br />\n", "<br />\n", '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'), $msg);
 		
 		return wp_mail($to, $subject, $msg, "Content-Type: text/html; charset=UTF-8");
 	}
@@ -4664,8 +4668,9 @@ Thanks again!", 'mp')
 
 				//show download link if set
 				if ($order->post_status != 'order_received' && $download_url = $this->get_download_url($product_id, $order->post_title)) {
-				$order_info .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
-					$order_info_sku .= "\t\t" . __('Download: ', 'mp') . $download_url . "\n";
+					$download_link = '<a href="' . $download_url . '">' . $download_url . '</a>';
+					$order_info .= "\t\t" . __('Download: ', 'mp') . $download_link . "\n";
+					$order_info_sku .= "\t\t" . __('Download: ', 'mp') . $download_link . "\n";
 				}
 
 				// FPM: Product Custom Fields
@@ -4718,7 +4723,7 @@ Thanks again!", 'mp')
 	 $order_info .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
 		$order_info_sku .= "\n" . __('Order Total:', 'mp') . ' ' . number_format_i18n((float)$order->mp_order_total, 2) . ' ' . $order->mp_payment_info['currency'];
 
-	 //// Shipping Info
+	 // Shipping Info
 
 		if ((is_array($order->mp_cart_info) && $this->download_only_cart($order->mp_cart_info)) || $this->get_setting('shipping->method') == 'none') { //if the cart is only digital products
 			$shipping_info = __('No shipping required for this order.', 'mp');
@@ -4745,14 +4750,14 @@ Thanks again!", 'mp')
 				$shipping_info .= "\n" . __('Tracking Number:', 'mp') . ' ' . $order->mp_shipping_info['tracking_num'];
 		}
 		
-		if (!empty($order->mp_shipping_info['special_instructions']))
+		if (!empty($order->mp_shipping_info['special_instructions'])) //! Special instructions
 			$shipping_info .= "\n" . __('Special Instructions:', 'mp') . ' ' . $order->mp_shipping_info['special_instructions'];
 		
 		$order_notes = '';
 		if (!empty($order->mp_order_notes))
 		$order_notes = __('Order Notes:', 'mp') . "\n" . $order->mp_order_notes;
 
-	 //// Payment Info
+	 // Payment Info
 	 $payment_info = __('Payment Method:', 'mp') . ' ' . $order->mp_payment_info['gateway_public_name'];
 
 		if ($order->mp_payment_info['method'])
