@@ -121,6 +121,14 @@ class WP_eCommerceImporter extends MarketPress_Importer {
 			$product['comment_status'] = 'closed';
 			$product['comment_count'] = 0;
 			
+			/**
+			 * Filter the imported post status
+			 *
+			 * @since 2.9.5.5
+			 * @param string The default post status - e.g. "draft"
+			 */
+			$product['post_status'] = apply_filters('mp_imported_product_post_status', 'draft');
+			
 			//add tags
 			$tags = wp_get_object_terms($old_id, 'product_tag');
 			if (is_array($tags) && count($tags)) {
@@ -313,11 +321,18 @@ class CsvImporter extends MarketPress_Importer {
 			//import product
 			$product['post_title'] = $row['title'];
 			$product['post_content'] = $row['description'];
-			$product['post_status'] = 'draft';
 			$product['post_type'] = 'product';
 			$product['comment_status'] = 'closed';
 			$product['comment_count'] = 0;
-			
+
+			/**
+			 * Filter the imported post status
+			 *
+			 * @since 2.9.5.5
+			 * @param string The default post status - e.g. "draft"
+			 */
+			$product['post_status'] = apply_filters('mp_imported_product_post_status', 'draft');
+							
 			//add tags
 			if (!empty($row['tags']))
 				$product['tax_input']['product_tag'] = trim($row['tags']);
@@ -376,32 +391,51 @@ class CsvImporter extends MarketPress_Importer {
 			
 			//add featured images
 			if (isset($row['image']) && !empty($row['image'])) {
-				
 				// Determine if this file is in our server
-				$local = false;
-				$img_location = str_replace($dirs['baseurl'], $dirs['basedir'], $row['image']);
-				if ( file_exists($img_location) ) {
-					$local = true;
-				} else if ( file_exists($dirs['basedir'] . '/' . ltrim($row['image'], '/')) ) {
-					$local = true;
-					$img_location = $dirs['basedir'] . '/' . ltrim($row['image'], '/');
+				$img_location = '/' . str_replace($dirs['baseurl'], $dirs['basedir'], $row['image']); // make sure this is a path and not a url
+				$img_location = str_replace('//', '/', $img_location); // remove double slashes - just in case
+				
+				if ( false === strpos($img_location, $dirs['basedir']) ) {
+					$img_location_rel = $img_location;
+					$img_location_abs = $dirs['basedir'] . $img_location;
+				} else {
+					$img_location_rel = str_replace($dirs['basedir'], '', $img_location);
+					$img_location_abs = $img_location;
 				}
-				if ( $local ) { //just resize without downloading as it's on our server
-					preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_location, $matches );
-					$file_array = array();
-					$file_array['name'] = basename($matches[0]);
-					$file_array['tmp_name'] = $img_location;
+				
+				$img_location_rel = ltrim($img_location_rel, '/');
+								
+				// Check if image exists in database
+				$cache_key = md5($row['image']);
+				$attachment_id = wp_cache_get($cache_key, 'mp_csv_importer');
+				if ( false === $attachment_id ) {
+					$attachment_id = $wpdb->get_var($wpdb->prepare("
+						SELECT post_id
+						FROM $wpdb->postmeta
+						WHERE meta_key = '_wp_attached_file'
+						AND meta_value = %s
+						LIMIT 1", $img_location_rel
+					));
+				}
+				
+				if ( $attachment_id ) {
+					update_post_meta($new_id, '_thumbnail_id', $attachment_id);
+				} elseif ( file_exists($img_location_abs) ) {
+					preg_match('/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $img_location_abs, $matches);
+					$file_array = array(
+						'name' => basename($matches[0]),
+						'tmp_name' => $img_location_abs,
+					);
 					
-					// do the validation and storage stuff
-					$id = media_handle_sideload( $file_array, $new_id, $row['title'] );
-					// If error storing permanently, unlink
-					if ( !is_wp_error($id) ) {
+					// Attach image to post
+					$attachment_id = media_handle_sideload($file_array, $new_id, $row['title']);
+					if ( ! is_wp_error($attachment_id) ) {
 						// add featured image to post
-						add_post_meta($new_id, '_thumbnail_id', $id);
+						update_post_meta($new_id, '_thumbnail_id', $attachment_id);
 					}
 				} else { //download the image and attach
 					require_once(ABSPATH . '/wp-admin/includes/file.php');
-					$img_html = media_sideload_image( $row['image'], $new_id, $row['title'] );
+					$img_html = media_sideload_image($row['image'], $new_id, $row['title']);
 					if ( !is_wp_error($img_html) ) {
 						//figure out the id
 						$args = array(
@@ -410,17 +444,19 @@ class CsvImporter extends MarketPress_Importer {
 							'post_mime_type' => 'image',
 							'post_parent' => $new_id,
 							'post_type' => 'attachment'
-							);
+						);
 						
 						$get_children_array = get_children($args, ARRAY_A);  //returns Array ( [$image_ID]... 
 						$rekeyed_array = array_values($get_children_array);
 						$child_image = $rekeyed_array[0];  
-						
+						$attachment_id = $child_image['ID'];
 						// add featured image to post
-						add_post_meta($new_id, '_thumbnail_id', $child_image['ID']);
+						update_post_meta($new_id, '_thumbnail_id', $attachment_id);
+						wp_cache_set($cache_key, $attachment_id, 'mp_csv_importer');
 					}
 				}
 				
+				wp_cache_set($cache_key, $attachment_id, 'mp_csv_importer');
 	    }
 
 			//inc count
