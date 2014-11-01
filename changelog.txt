@@ -4,6 +4,10 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+2.9.5.6
+----------------------------------------------------------------------
+- Fixed: products being set to draft status after being ordered
+
 2.9.5.5
 ----------------------------------------------------------------------
 - Added: "mp_imported_products_post_status" filter - gives the ability to set the post status of imported products

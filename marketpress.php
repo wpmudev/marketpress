@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.5.5
+Version: 2.9.5.6
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 */
 
 class MarketPress {
-	var $version = '2.9.5.5';
+	var $version = '2.9.5.6';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -3834,28 +3834,29 @@ Thanks again!", 'mp')
 				if ($stock[$variation] <= $this->get_setting('inventory_threshhold')) {
 					$this->low_stock_notification($product_id, $variation, $stock[$variation]);
 				}
+			
+				//set status to draft if needed
+				if ( $this->get_setting('inventory_remove') && $stock[$variation] <= 0 ) {		
+					$post = get_post( $product_id );
+					$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
+					clean_post_cache( $post->ID );
+					$old_status = $post->post_status;
+					$post->post_status = 'draft';
+					wp_transition_post_status( 'draft', $old_status, $post );
+					
+					do_action( 'edit_post', $post->ID, $post );
+					do_action( 'save_post', $post->ID, $post );
+					do_action( 'wp_insert_post', $post->ID, $post );
+				}
 			}
 			
 			//update sales count
 			$count = get_post_meta($product_id, 'mp_sales_count', true);
-			$count = $count + $data['quantity'];
+			$count += $data['quantity'];
 			update_post_meta($product_id, 'mp_sales_count', $count);
 			
 			//for plugins into product sales
 			do_action( 'mp_product_sale', $product_id, $variation, $data, $paid );
-			
-			if ( $this->get_setting('inventory_remove') && $stock[$variation] <= 0 ) {		
-				$post = get_post( $product_id );
-				$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
-				clean_post_cache( $post->ID );
-				$old_status = $post->post_status;
-				$post->post_status = 'draft';
-				wp_transition_post_status( 'draft', $old_status, $post );
-				
-				do_action( 'edit_post', $post->ID, $post );
-				do_action( 'save_post', $post->ID, $post );
-				do_action( 'wp_insert_post', $post->ID, $post );
-			}
 		}
 	}
 		$item_count = array_sum($items);
