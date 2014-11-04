@@ -28,6 +28,19 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 		$this->args['custom']['data-multiple'] = (int) $this->args['multiple'];
 		$this->args['custom']['data-query'] = http_build_query($this->args['query']);
 	}
+
+	/**
+	 * Formats the field value for display.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param mixed $value
+	 * @param mixed $post_id
+	 */
+	public function format_value( $value, $post_id ) {
+		$values = explode(',', $value);
+		return parent::format_value($values, $post_id);
+	}
 	
 	/**
 	 * Searches posts
