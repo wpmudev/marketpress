@@ -527,9 +527,17 @@ class Marketpress {
 	
 	/**
 	 * Catch deprecated functions
+	 *
+	 * @since 3.0
+	 * @access public
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {
+			case 'is_valid_zip' :
+				_deprecated_function($method, '3.0', 'mp_is_valid_zip');
+				return call_user_func_array('mp_is_valid_zip', $args);
+			break;
+			
 			case 'coupon_applicable' :
 				_deprecated_function($method, '3.0', 'MP_Coupon::is_applicable');
 				$is_applicable = false;
@@ -578,7 +586,7 @@ class Marketpress {
 			
 			case 'tax_price' :
 				_deprecated_function($method, '3.0', 'MP_Cart::tax_price');
-				$mp_cart = MP_Cart::get_instance();
+				$mp_cart = mp_cart();
 				return call_user_func_array(array($mp_cart, $method), $args);
 			break;
 			
