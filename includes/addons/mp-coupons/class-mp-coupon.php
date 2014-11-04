@@ -38,24 +38,20 @@ class MP_Coupon {
 	protected $_exists = null;
 	
 	/**
-	 * Refers to whether or not the class has attempted to fetch the internal WP_Post object or not.
-	 *
-	 * @since 3.0
-	 * @access protected
-	 * @type bool
-	 */
-	protected $_post_queried = false;
-	
-	/**
 	 * Constructor
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param string $code A coupon code.
+	 * @param string/int $coupon A coupon code or coupon ID.
 	 */
-	public function __construct( $code ) {
-		$this->_code = preg_replace('/[^A-Z0-9_-]/', '', strtolower($code));
-		$this->_get_post($code);
+	public function __construct( $coupon ) {
+		if ( is_numeric($coupon) ) {
+			$this->ID = $coupon;
+		} else {
+			$this->_code = strtolower(preg_replace('/[^A-Z0-9_-]/', '', strtoupper($coupon)));			
+		}
+		
+		$this->_get_post();
 	}
 	
 	/**
@@ -85,16 +81,26 @@ class MP_Coupon {
 	 * @access protected
 	 * @param string $code
 	 */
-	protected function _get_post( $code ) {
-		$posts = get_posts(array(
-			'name' => $code,
-			'post_type' => 'mp_coupon',
-			'posts_per_page' => 1,
-			'post_status' => 'publish',
-		));
-		
-		if ( ! empty($posts) ) {
-			$this->_post = current($posts);
+	protected function _get_post() {
+		if ( is_null($this->ID) ) {
+			if ( $_post = wp_cache_get($this->_code, 'mp_coupon') ) {
+				$this->_post = $_post;
+			} else {
+				$posts = get_posts(array(
+					'name' => $this->_code,
+					'post_type' => 'mp_coupon',
+					'posts_per_page' => 1,
+					'post_status' => 'publish',
+				));
+				
+				if ( ! empty($posts) ) {
+					$this->_post = current($posts);
+				}
+				
+				wp_cache_set($this->_code, $this->_post, 'mp_coupon');
+			}
+		} else {
+			$this->_post = get_post($this->ID);
 		}
 		
 		if ( is_null($this->_post) ) {
@@ -106,7 +112,63 @@ class MP_Coupon {
 			$this->ID = $this->_post->ID;
 		}
 	}
+	
+	/**
+	 * Get coupon discount amount
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 * @param bool $format Optional, whether to format the discount amount or not. Defaults to true.
+	 */
+	public function discount_amt( $echo = true, $format = true ) {
+		$discount = $this->get_meta('discount');
+		$product_ids = $this->get_products(true);
+		
+		$discount_amt = 0;
+		foreach ( $product_ids as $product_id ) {
+			$product = new MP_Product($product_id);
+			$product_price = $product->get_price('lowest');
+			
+			if ( 'subtotal' == $this->get_meta('discount_type') ) {
+				$discount_amt += ($this->get_price($product_price) - $product_price);
+			} else {
+				$discount_amt += (($this->get_price($product_price) - $product_price) * mp_cart()->get_item_qty($product_id));
+			}
+		}
+		
+		if ( $format ) {
+			$discount_amt = mp_format_currency('', $discount_amt);
+		}
+		
+		if ( $echo ) {
+			echo $discount_amt;
+		} else {
+			return $discount_amt;
+		}
+	}
 
+	/**
+	 * Get discount meta formatted
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	public function discount_formatted( $echo = true ) {
+		$discount = $discount_display = $this->get_meta('discount');
+		
+		if ( false === strpos($discount, '%') ) {
+			$discount_display = mp_format_currency('', $discount);
+		}
+		
+		if ( $echo ) {
+			echo $discount_display;
+		} else {
+			return $discount_display;
+		}
+	}
+		
 	/**
 	 * Check if a product exists
 	 *
@@ -151,43 +213,169 @@ class MP_Coupon {
 		
 		return $default;
 	}
-
+	
 	/**
-	 * Checks a coupon to see if it can be applied to a product
+	 * Get the coupon price
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param float $price The price to calculate.
+	 * @return float
+	 */
+	public function get_price( $price ) {
+		$discount = $this->get_meta('discount');
+		
+		if ( false !== strpos($discount, '%') )	{
+			// Percentage discount
+			$discount_amt = abs(str_replace('%', '', $discount)) / 100;
+			$new_price = ($price - ($price * $discount_amt));
+		} else {
+			// Fix amount discount
+			$new_price = ($price - abs($discount));
+		}
+		
+		return (float) $new_price;
+	}
+	
+	/**
+	 * Get the products that the coupon can be applied to
 	 *
 	 * @param int The product to check.
-	 * @return bool
+	 * @param bool $ids_only If true, only return product IDs.
+	 * @return array An array of products that the coupon can be applied to.
 	 */
-	function is_applicable( $product_id ) {
-		$can_apply = true;
-		$coupons = mp_coupons()->get();
+	function get_products( $ids_only = false ) {
+		$products = mp_cart()->get_items();
 		$applies_to = $this->get_meta('applies_to');
 		
-		if ( isset($applies_to['type']) && isset($applies_to['id']) ) {
-			$what = $applies_to['type']; // the type will be 'product', 'category'
-			$item_id	= $applies_to['id']; // the is is either id post ID or the term ID depending on the above
+		switch( $applies_to ) {
+			case 'product':
+				$products = array();
+				$cart_products = mp_cart()->get_items_as_objects();
+				$coupon_products = $this->get_meta('product');
+				
+				foreach ( $cart_products as $product ) {
+					$product_id = $product->ID;
+					if ( $product->is_variation() ) {
+						$product_id = $product->post_parent;
+					}
+					
+					if ( in_array($product_id, $coupon_products) ) {
+						if ( $ids_only ) {
+							$products[] = $product->ID;
+						} else {
+							$products[$product->ID] = mp_cart()->get_line_item($product);
+						}
+					}
+				}
+			break;
 			 
-			switch( $what ) {
-				case 'product':
-				 	$can_apply = ( $product_id == $item_id ) ? true : false;
-					break;
-				 
-				case 'category':
-				 	$terms = get_the_terms($product_id, 'product_category');
-				 	$can_apply = false;
-				 	
+			case 'category':
+				$products = array();
+				$cart_products = mp_cart()->get_items_as_objects();
+				$coupon_terms = $this->get_meta('category');
+				
+				foreach ( $cart_products as $product ) {
+			 		$terms = get_the_terms($item->ID, 'product_category');
+			 		
+			 		$product_id = $product->ID;
+					if ( $product->is_variation() ) {
+						$product_id = $product->post_parent;
+					}
+					
 				 	if ( is_array($terms) ) {
-						foreach ( $terms as $term) {
-							if ( $term->term_id == $item_id ) {
-								$can_apply = true;
-								break;
+						foreach ( $terms as $term ) {
+							if ( in_array($term->term_id, $coupon_terms) ) {
+								if ( $ids_only ) {
+									$products[] = $product->ID;
+								} else {
+									$products[$product->ID] = mp_cart()->get_line_item($product);
+								}
 							}
 						}
 					}
-				break;
+				}
+			break;
+			
+			//! TODO - code other coupon cases
+		}
+		
+		return $products;
+	}
+	
+	/**
+	 * Check if coupon is valid
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function is_valid() {
+		$now = time();
+		$is_valid = true;
+
+		if ( ! $this->exists() ) {
+			$is_valid = false;
+		} elseif ( $this->remaining_uses(false, true) == 0 ) {
+			$is_valid = false;
+		} elseif ( $now < strtotime($this->get_meta('start_date', 0, false)) ) {
+			$is_valid = false;
+		} elseif ( $this->get_meta('has_end_date') && ($now > strtotime($this->get_meta('end_date', 0, false))) ) {
+			$is_valid = false;
+		} elseif ( ! $this->get_meta('can_be_combined') ) {
+			$applied = mp_coupons()->get_applied_as_objects();
+			
+			if ( count($applied) == 1 ) {
+				//! TODO: make sure this coupon can be combined with coupons that are already applied
 			}
 		}
 		
-		return $can_apply;
+		/**
+		 * Filter is coupon is valid
+		 *
+		 * @since 3.0
+		 * @param bool Is valid?
+		 * @param MP_Coupon The current coupon object.
+		 */
+		return apply_filters('mp_coupon/is_valid', $is_valid, $this);
+	}
+	
+	/**
+	 * Display coupon meta value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $name The name of the meta to get.
+	 * @param mixed $default The default value to return if meta doesn't exist or is an empty string. Optional.
+	 * @param bool $raw Whether to return the raw meta or the formatted value. Optional.
+	 * @return mixed
+	 */
+	public function meta( $name, $default = false, $raw = false ) {
+		echo $this->get_meta($name, $default, $raw);
+	}
+	
+	/**
+	 * Get remaining uses
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 * @param bool $numeric Optional, whether to return numeric value or string (e.g. "Unlimited" uses). Defaults to false.
+	 */
+	public function remaining_uses( $echo = true, $numeric = false ) {
+		$max_uses = $this->get_meta('max_uses');
+		$remaining = ( $numeric ) ? 9999999 : __('Unlimited', 'mp');
+		
+		if ( $max_uses ) {
+			$max_uses = (float) $max_uses;
+			$times_used = (float) $this->get_meta('times_used', 0);
+			$remaining = ($max_uses - $times_used);
+		}
+		
+		if ( $echo ) {
+			echo $remaining;
+		} else {
+			return $remaining;
+		}
 	}
 }

@@ -20,6 +20,34 @@ class MP_Coupons {
 	protected $_coupons = null;
 	
 	/**
+	 * Refers to the applied coupons
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_coupons_applied = null;
+
+	/**
+	 * Refers to the applied coupons as objects
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_coupons_applied_objects = null;
+	
+	/**
+	 * Refers to the build of the addon
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var int
+	 */
+	public $build = 1;
+
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -44,12 +72,27 @@ class MP_Coupons {
 		
 		$this->_install();
 		
+		if ( ! is_admin() || mp_doing_ajax() ) {
+			$this->get_applied();
+			
+			add_filter('mp_cart/after_cart_html', array(&$this, 'coupon_form_cart'), 10, 3);
+			add_filter('mp_product/get_price', array(&$this, 'product_price'), 10, 2);
+			add_filter('mp_cart/get_total', array(&$this, 'cart_total'), 10, 2);
+			add_filter('mp_cart/cart_meta/product_total', array(&$this, 'cart_meta_product_total'), 10, 2);
+			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_css_frontend'));
+			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_js_frontend'), 25);
+		}
+		
 		if ( is_admin() ) {
 			add_filter('manage_mp_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
 			add_action('manage_mp_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
 			add_filter('manage_edit-mp_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
 
 			if ( mp_doing_ajax() ) {
+				add_action('wp_ajax_mp_coupons_remove', array(&$this, 'ajax_remove_coupon'));
+				add_action('wp_ajax_nopriv_mp_coupons_remove', array(&$this, 'ajax_remove_coupon'));								
+				add_action('wp_ajax_mp_coupons_apply', array(&$this, 'ajax_apply_coupon'));
+				add_action('wp_ajax_nopriv_mp_coupons_apply', array(&$this, 'ajax_apply_coupon'));				
 				return;
 			}
 			
@@ -67,13 +110,31 @@ class MP_Coupons {
 			add_action('init', array(&$this, 'init_settings_metaboxes'));
 			// Get coupon code value
 			add_filter('wpmudev_field/before_get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
-		} else {
-			add_filter('mp_cart/after_cart_html', array(&$this, 'coupon_form_cart'), 10, 3);
-			add_action('wp_print_styles', array(&$this, 'print_css_frontend'));
-			add_action('wp_footer', array(&$this, 'print_js_frontend'), 25);
 		}
 	}
 	
+	/**
+	 * Convert an array of coupon IDs to objects
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @uses $wpdb
+	 * @param array $coupons
+	 * @return array
+	 */
+	protected function _convert_to_objects( $coupons ) {
+		if ( ! is_null($this->_coupons_applied_objects) ) {
+			return $this->_coupons_applied_objects;
+		}
+		
+		$this->_coupons_applied_objects = array();
+		foreach ( $coupons as $coupon ) {
+			$this->_coupons_applied_objects[$coupon] = new MP_Coupon($coupon);
+		}
+		
+		return $this->_coupons_applied_objects;
+	}
+		
 	/**
 	 * Install
 	 *
@@ -81,9 +142,170 @@ class MP_Coupons {
 	 * @access protected
 	 */
 	protected function _install() {
+		$db_build = mp_get_setting('coupons->build', 0);
+		
+		if ( $this->build == $db_build ) {
+			return;
+		}
+		
 		if ( false === get_option('mp_coupons') ) {
 			add_option('mp_coupons', array());
 		}
+		
+		if ( $db_build < 1 ) {
+			$this->_update_coupon_schema();
+		}
+		
+		mp_update_setting('coupons->build', $this->build);
+	}
+		
+	/**
+	 * Updates the coupon schema.
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	public function _update_coupon_schema() {
+		$coupons = get_option('mp_coupons');
+		
+		if ( empty($coupons) ) {
+			//no coupons to update
+			return false;
+		}
+		
+		//include WPMUDEV Metaboxes/Fields
+		include_once mp_plugin_dir('includes/wpmudev-metaboxes/class-wpmudev-field.php');
+		mp_include_dir(mp_plugin_dir('includes/wpmudev-metaboxes/fields'));
+		
+		foreach ( $coupons as $code => $coupon ) {
+			$type = isset($coupon['applies_to']['type']) ? $coupon['applies_to']['type'] : 'all';
+			$id = isset($coupon['applies_to']['id']) ? $coupon['applies_to']['id'] : '';
+			
+			$metadata = array(
+				'discount' => array(
+					'type' => 'WPMUDEV_Field_Text',
+					'value' => ( $coupon['discount_type'] == 'pct' ) ? $coupon['discount'] . '%' : $coupon['discount'],
+				),
+				'max_uses' => array(
+					'type' => 'WPMUDEV_Field_Text',
+					'value' => $coupon['uses'],
+				),
+				'applies_to' => array(
+					'type' => 'WPMUDEV_Field_Radio_Group',
+					'value' => $type,
+				),
+				'applies_to' => array(
+					'type' => 'WPMUDEV_Field_Radio_Group',
+					'value' => 'item',
+				),
+				'category' => array(
+					'type' => 'WPMUDEV_Field_Taxonomy_Select',
+					'value' => ( $type == 'category' ) ? $id : '',
+				),
+				'product' => array(
+					'type' => 'WPMUDEV_Field_Post_Select',
+					'value' => ( $type == 'product' ) ? $id : '',
+				),
+				'start_date' => array(
+					'type' => 'WPMUDEV_Field_Datepicker',
+					'value' => date('Y-m-d', $coupon['start']),
+				),
+				'has_end_date' => array(
+					'type' => 'WPMUDEV_Field_Checkbox',
+					'value' => ( empty($coupon['end']) ) ? '0' : '1', 
+				),
+				'end_date' => array(
+					'type' => 'WPMUDEV_Field_Datepicker',
+					'value' =>  ( empty($coupon['end']) ) ? '' : date('Y-m-d', $coupon['end']),
+				),
+			);
+			
+			$post_id = wp_insert_post(array(
+				'post_title' => strtoupper($code),
+				'post_content' => '',
+				'post_status' => 'publish',
+				'post_type' => 'mp_coupon',
+			));
+			
+			foreach ( $metadata as $name => $data ) {
+				$type = $data['type'];
+				$field = new $type(array('name' => $name, 'value_only' => true));
+				$field->save_value($post_id, $name, $data['value'], true);
+			}
+		}
+		
+		delete_option('mp_coupons');
+	}
+	
+	/**
+	 * Update coupon session data
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _update_session() {
+		if ( is_multisite() ) {
+			$blog_id = get_current_blog_id();
+			mp_update_session_value("mp_cart_coupons->{$blog_id}", $this->_coupons_applied);
+		} else {
+			mp_update_session_value('mp_cart_coupons', $this->_coupons_applied);
+		}
+	}
+	
+	/**
+	 * Filter the cart product total
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_cart/cart_meta/product_total
+	 */
+	public function cart_meta_product_total( $html, $cart ) {
+		if ( ! $this->has_applied() ) {
+			return $html;
+		}
+		
+		$coupons = $this->get_applied_as_objects();
+		
+		$html .= '
+			<div id="mp-cart-meta-line-coupons" class="mp-cart-meta-line clearfix">
+				<strong class="mp-cart-meta-line-label">' . __('Coupon Discounts', 'mp') . '</strong>
+				<span class="mp-cart-meta-line-amount">' . mp_format_currency('', $this->get_total_discount_amt()) . '</span>
+				<div class="clear"></div>
+				<ul id="mp-cart-meta-line-coupons-list">';
+		
+		foreach ( $coupons as $coupon ) {
+			$html .= '
+					<li class="mp-cart-coupon clearfix">
+						<strong class="mp-cart-meta-line-label">' . $coupon->post_title . ' <a class="mp-cart-coupon-remove-link" href="javascript:mp_coupons.remove(' . $coupon->ID . ')">(' . __('Remove', 'mp') . ')</a></strong>
+						<span class="mp-cart-meta-line-amount">' . $coupon->discount_amt(false) . '</span>
+					</li>';
+		}
+		
+		$html .= '
+				</ul>
+			</div>';
+
+		return $html;
+	}
+	
+	/**
+	 * Filter the cart total
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_cart/get_total
+	 * @return float
+	 */
+	public function cart_total( $total, $cart ) {
+		$items = $cart->get_items_as_objects();
+		
+		$total = 0;
+		foreach ( $items as $item ) {
+			$price = $item->get_price();
+			$total += mp_arr_get_value('coupon', $price, mp_arr_get_value('lowest', $price));
+		}
+		
+		return $total;
 	}
 	
 	/**
@@ -118,6 +340,35 @@ class MP_Coupons {
 		$post = get_post($post_id);
 		return ( get_post_status($post_id) == 'auto-draft' ) ? '' : $post->post_name;
 	}
+	
+	/**
+	 * Get total discount amount
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	public function get_total_discount_amt() {
+		$coupons = $this->get_applied_as_objects();
+		$amt = 0;
+		
+		foreach ( $coupons as $coupon ) {
+			$amt += $coupon->discount_amt(false, false);
+		}
+		
+		return $amt;
+	}
+	
+	/**
+	 * Determine if there are applied coupons
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 public function has_applied() {
+		 return ( ! empty($this->_coupons_applied) );
+	 }
 	
 	/**
 	 * Save the coupon data
@@ -171,6 +422,30 @@ class MP_Coupons {
 			'custom_validation_message' => __('Value must either be a decimal number or a percentage', 'mp'),
 			'label' => array('text' => __('Discount Amount', 'mp')),
 		));
+		$metabox->add_field('radio_group', array(
+			'name' => 'discount_type',
+			'label' => array('text' => __('How should the discount amount be applied?', 'mp')),
+			'default_value' => 'item',	
+			'options' => array(
+				'item' => __('Apply to each applicable item and quantity ordered', 'mp'),
+				'subtotal' => __('Apply to each applicable item once per cart', 'mp')
+			),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => 'can_be_combined',
+			'label' => array('text' => __('Can this coupon be combined with other coupons?', 'mp')),
+		));
+		$metabox->add_field('post_select', array(
+			'name' => 'allowed_coupon_combos',
+			'label' => array('text' => __('Select combinable coupons', 'mp')),
+			'desc' => __('Leave blank to allow all other coupons.', 'mp'),
+			'multiple' => true,
+			'conditional' => array(
+				'name' => 'can_be_combined',
+				'value' => '1',
+				'action' => 'show',
+			),
+		));
 		$metabox->add_field('text', array(
 			'name' => 'max_uses',
 			'desc' => __('Enter the maximum number of times this coupon can be used.', 'mp'),
@@ -186,7 +461,7 @@ class MP_Coupons {
 				'all' => __('All Products', 'mp'),
 				'category' => __('Category', 'mp'),
 				'product' => __('Product', 'mp'),
-				'user_role' => __('User Role', 'mp'),
+				'user' => __('User', 'mp'),
 			),
 		));
 		$metabox->add_field('post_select', array(
@@ -215,13 +490,13 @@ class MP_Coupons {
 				'action' => 'show',
 			),			
 		));
-		$metabox->add_field('user_role_select', array(
-			'name' => 'user_role',
+		$metabox->add_field('user_select', array(
+			'name' => 'user',
 			'validation' => array('required' => true),
-			'label' => array('text' => __('User Role', 'mp')),
+			'label' => array('text' => __('User', 'mp')),
 			'conditional' => array(
 				'name' => 'applies_to',
-				'value' => 'user_role',
+				'value' => 'user',
 				'action' => 'show',
 			),						
 		));
@@ -232,7 +507,7 @@ class MP_Coupons {
 			'default_value' => date('Y-m-d'),
 		));
 		$metabox->add_field('checkbox', array(
-			'name' => 'indefinite',
+			'name' => 'has_end_date',
 			'label' => array('text' => __('Does coupon have an end date?', 'mp')),
 			'message' => __('Yes', 'mp'),
 		));
@@ -240,7 +515,7 @@ class MP_Coupons {
 			'name' => 'end_date',
 			'label' => array('text' => __('End Date', 'mp')),
 			'conditional' => array(
-				'name' =>	'indefinite',
+				'name' =>	'has_end_date',
 				'value' => '1',
 				'action' => 'show',
 			),
@@ -353,34 +628,6 @@ class MP_Coupons {
 	}
 	
 	/**
-	 * Print frontend styles
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_print_styles
-	 */
-	public function print_css_frontend() {
-		if ( ! mp_is_shop_page('cart') ) { return; }
-		?>
-<style type="text/css">
-input[name="mp_cart_coupon"] {
-	text-transform: uppercase;
-}
-#mp-coupon-form {
-	border-bottom: 2px solid #eaeaea;
-	border-top: 2px solid #eaeaea;
-	padding-bottom: 25px;
-	margin-bottom: 25px;
-}
-#mp-coupon-form p {
-	margin: 20px 0 0;
-	padding: 0;
-} 
-</style>
-		<?php
-	}
-	
-	/**
 	 * Prints applicable javascript
 	 *
 	 * @since 3.0
@@ -399,44 +646,6 @@ input[name="mp_cart_coupon"] {
 </script>
 		<?php
 	}
-
-	/**
-	 * Print frontend scripts
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_print_scripts
-	 */
-	public function print_js_frontend() {
-		if ( ! mp_is_shop_page('cart') ) { return; }
-		?>
-<script type="text/javascript">
-jQuery(document).ready(function($){
-	$('#mp-cart-form').submit(function(e){
-		var $this = $(this),
-				$couponCode = $this.find('[name="mp_cart_coupon"]'),
-				couponCode = $couponCode.val().toUpperCase().replace(/[^A-Z0-9]/g, '');
-		
-		if ( couponCode.length > 0 ) {
-			e.preventDefault();
-			
-			$couponCode.removeClass('error').siblings('.cart-error').remove();
-			
-			$this.on('mp_cart/apply_coupon/success', function(e, data){
-				
-			});
-			
-			$this.on('mp_cart/apply_coupon/error', function(e, message){
-				$couponCode.addClass('error').before('<span class="cart-error">' + message + '</span>');
-			});
-			
-			mp_cart.applyCoupon(couponCode, $this);
-		}
-	});
-});
-</script>
-		<?php
-	}
 		
 	/**
 	 * Adds menu items to the admin menu
@@ -449,6 +658,130 @@ jQuery(document).ready(function($){
 		//manage coupons
 		add_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), __('Coupons', 'mp'), __('Coupons', 'mp'), apply_filters('mp_coupons_capability', 'edit_coupons'), 'edit.php?post_type=mp_coupon');
 	}
+	
+	/**
+	 * Apply a coupon
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param MP_Coupon $coupon The coupon object to apply.
+	 */
+	public function apply_coupon( $coupon ) {
+		if ( ! $coupon instanceof MP_Coupon ) {
+			return false;
+		}
+		
+		if ( ! in_array($coupon->ID, $this->_coupons_applied) ) {
+			$this->_coupons_applied[] = $coupon->ID;
+			$this->_update_session();
+		}
+	}
+
+	/**
+	 * Apply coupon (ajax)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_cart_apply_coupon, wp_ajax_nopriv_mp_cart_apply_coupon
+	 */
+	public function ajax_apply_coupon() {
+		$coupon_code = mp_get_post_value('coupon_code');
+
+		if ( false === $coupon_code ) {
+			wp_send_json_error(array(
+				'message' => __('Invalid coupon code', 'mp'),
+			));
+		}
+
+		$coupon = new MP_Coupon($coupon_code);
+		
+		if ( ! $coupon->is_valid() ) {
+			wp_send_json_error(array(
+				'message' => __('Coupon can\'t be applied to this cart', 'mp'),
+			));
+		}
+		
+		$this->apply_coupon($coupon);
+		
+		if ( $products = $coupon->get_products() ) {
+			wp_send_json_success(array(
+				'products' => $products,
+				'cart_meta' => mp_cart()->cart_meta(false),
+			));
+		}
+		
+		wp_send_json_error(array(
+			'message' => __('No applicable products could be found in cart', 'mp'),
+		));
+	}
+	
+	/**
+	 * Remove coupon (ajax)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_cart_remove_coupon, wp_ajax_nopriv_mp_cart_remove_coupon
+	 */
+	public function ajax_remove_coupon(){
+		$coupon_id = mp_get_post_value('coupon_id');
+		
+		if ( $this->remove_coupon($coupon_id) ) {
+			$coupon = new MP_Coupon($coupon_id);
+			$products = $coupon->get_products();
+			
+			wp_send_json_success(array(
+				'products' => $products,
+				'cartmeta' => mp_cart()->cart_meta(false),
+			));
+		}
+		
+		wp_send_json_error(array('message' => __('An error occurred while removing your coupon. Please try again.', 'mp')));
+	}
+	
+	/**
+	 * Remove a given coupon
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $coupon_id The coupon ID to remove.
+	 * @return bool
+	 */
+	public function remove_coupon( $coupon_id ) {
+		if ( false !== ($key = array_search($coupon_id, $this->_coupons_applied)) ) {
+			unset($this->_coupons_applied[$key]);
+			$this->_update_session();
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Change the product price to reflect coupon value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_cart/get_price
+	 * @return array
+	 */
+	public function product_price( $price, $product ) { return $price;
+		$coupons = $this->get_applied_as_objects();
+		$price['coupon'] = $price['lowest'];
+		
+		foreach ( $coupons as $coupon ) {
+			$products = $coupon->get_products(true);
+			if ( in_array($product->ID, $products) ) {
+				if ( $coupon->get_meta('discount_type') == 'item' ) {
+					$price['lowest'] = $price['sale']['amount'] = $price['coupon'] = $coupon->get_price($price['lowest']);
+				} else {
+					$price['coupon'] = $coupon->get_price($price['lowest']);
+				}
+			}
+		}
+		
+		return $price;
+	}
+	 
 	
 	/**
 	 * Defines the column headers for the product coupon list table
@@ -481,28 +814,29 @@ jQuery(document).ready(function($){
 	 * @param int $post_id The current post id
 	 */
 	public function product_coupon_column_data( $column, $post_id ) {
+		$coupon = new MP_Coupon($post_id);
+		
 		switch ( $column ) {
 			//! Discount
 			case 'discount' :
-				field_value('discount', $post_id);
+				$coupon->discount_formatted();
 			break;
 			
 			//! Remaining Uses
 			case 'remaining' :
-				echo (float) get_field_value('max_uses', $post_id) - (float) get_post_meta($post_id, 'times_used', true);
+				$coupon->remaining_uses();
 			break;
 			
 			//! Used
 			case 'used' :
-				echo (float) get_post_meta($post_id, 'times_used', true);
+				$coupon->meta('times_used', 0);
 			break;
 			
 			//! Valid Dates
 			case 'valid_dates' :
-				$end = get_field_value('end_date', $post_id);
-				echo get_field_value('start_date', $post_id) . ' &mdash;<br />';
+				echo $coupon->get_meta('start_date') . ' &mdash;<br />';
 				
-				if ( $end ) {
+				if ( ($end = $coupon->get_meta('end_date')) && $this->get_meta('has_end_date') ) {
 					echo $end;
 				} else {
 					_e('No end', 'mp');
@@ -510,27 +844,43 @@ jQuery(document).ready(function($){
 			break;
 			
 			case 'applies_to' :
-				$applies_to = get_field_value('applies_to', $post_id);
+				$applies_to = $coupon->get_meta('applies_to');
 				echo ucwords(str_replace('_', ' ', $applies_to));
+			break;
 		}
 	}
-	
+
 	/**
-	 * Get applied coupons from session
+	 * Enqueue frontend styles
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @return array
+	 * @action wp_enqueue_scripts
 	 */
-	public function get_applied() {
-		if ( is_multisite() ) {
-			$blog_id = get_current_blog_id();
-			$coupons = mp_get_session_value("mp_cart_coupons->{$blog_id}", array());
-		} else {
-			$coupons = mp_get_session_value('mp_cart_coupons', array());
+	public function enqueue_css_frontend() {
+		if ( ! mp_is_shop_page('cart') ) {
+			return;
 		}
 		
-		return $coupons;
+		wp_enqueue_style('mp-coupons', mp_plugin_url('includes/addons/mp-coupons/ui/css/mp-coupons.css'), array(), MP_VERSION);
+	}
+	
+	/**
+	 * Enqueue frontend scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_print_scripts
+	 */
+	public function enqueue_js_frontend() {
+		if ( ! mp_is_shop_page('cart') ) {
+			return;
+		}
+		
+		wp_enqueue_script('mp-coupons', mp_plugin_url('includes/addons/mp-coupons/ui/js/mp-coupons.js'), array('jquery', 'mp-cart'), MP_VERSION);
+		wp_localize_script('mp-coupons', 'mp_coupons_i18n', array(
+			'ajaxurl' => admin_url('admin-ajax.php'),
+		));
 	}
 	
 	/**
@@ -551,6 +901,40 @@ jQuery(document).ready(function($){
 		));
 		
 		return $this->_coupons;
+	}
+
+	/**
+	 * Get applied coupons from session
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @return array
+	 */
+	public function get_applied() {
+		if ( ! is_null($this->_coupons_applied) ) {
+			return $this->_coupons_applied;
+		}
+		
+		if ( is_multisite() ) {
+			$blog_id = get_current_blog_id();
+			$this->_coupons_applied = mp_get_session_value("mp_cart_coupons->{$blog_id}", array());
+		} else {
+			$this->_coupons_applied = mp_get_session_value('mp_cart_coupons', array());
+		}
+		
+		return $this->_coupons_applied;
+	}
+	
+	/**
+	 * Get applied coupons as objects
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_applied_as_objects() {
+		$applied = $this->get_applied();
+		return $this->_convert_to_objects($applied);
 	}
 }
 

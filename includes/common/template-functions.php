@@ -27,7 +27,7 @@ if ( ! function_exists('_mp_products_html_grid')) :
 			
 			$img = $product->image(false, 'list');
 			
-			$excerpt = mp_get_setting('show_excerpt') ? '<p class="mp_excerpt">' . $product->excerpt() . '</p>' : '';
+			$excerpt = mp_get_setting('show_excerpt') ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
 			$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $product->ID);
 	
 			$pinit = $product->pinit_button('all_view');
@@ -57,8 +57,8 @@ if ( ! function_exists('_mp_products_html_grid')) :
 							' . $pinit .'
 							<h3 class="mp_product_name entry-title" itemprop="name">
 								<a href="' . get_permalink($product->ID) . '">' . $product->post_title . '</a>
-							</h3>
-							<div>' . $mp_product_list_content . '</div>
+							</h3>'
+							. $mp_product_list_content . '
 						</div>
 
 						<div class="mp_price_buy">
@@ -215,14 +215,21 @@ if ( ! function_exists('mp_format_currency') ) :
 			$decimal_place = 2;
 			$zero = '0.00';
 		}
+		
+		//handle negative numbers
+		$negative_symbol = '';
+		if ( $amount < 0 ) {
+			$negative_symbol = '-';
+			$amount = abs($amount);
+		}
 
 		//format currency amount according to preference
 		if ( $amount ) {
 			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
-				return $symbol . number_format_i18n($amount, $decimal_place);
+				return $negative_symbol . $symbol . number_format_i18n($amount, $decimal_place);
 			
 			if ( mp_get_setting('curr_symbol_position') == 2 )
-				return $symbol . ' ' . number_format_i18n($amount, $decimal_place);
+				return $negative_symbol . $symbol . ' ' . number_format_i18n($amount, $decimal_place);
 			
 			if ( mp_get_setting('curr_symbol_position') == 3 )
 				return number_format_i18n($amount, $decimal_place) . $symbol;
@@ -313,6 +320,28 @@ if ( ! function_exists('mp_get_image_size') ) :
 		return $size;
 	}
 endif;
+
+if ( ! function_exists('mp_store_page_url') ) {
+	/**
+	 * Get a store page url
+	 *
+	 * @since 3.0
+	 * @param string $page The page to get the URL for.
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	function mp_store_page_url( $page, $echo = true ) {
+		$url = '';
+		if ( $post_id = mp_get_setting("pages->{$page}") ) {
+			$url = get_permalink($post_id);
+		}
+		
+		if ( $echo ) {
+			echo $url;
+		} else {
+			return $url;
+		}
+	}
+}
 
 if ( ! function_exists('mp_is_shop_page') ) :
 	/**

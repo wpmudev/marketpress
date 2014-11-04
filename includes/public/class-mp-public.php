@@ -116,6 +116,11 @@ class MP_Public {
 		wp_enqueue_script('hover-intent', mp_plugin_url('ui/js/hoverintent.min.js'), array('jquery'), MP_VERSION, true);
 		wp_enqueue_script('mp-frontend', mp_plugin_url('ui/js/frontend.js'), array('hover-intent'), MP_VERSION, true);
 		wp_enqueue_script('mp-select2', mp_plugin_url('ui/select2/select2.min.js'), array('mp-frontend'), MP_VERSION, true);
+		
+		wp_localize_script('mp-frontend', 'mp_i18n', array(
+			'ajaxurl' => admin_url('admin-ajax.php'),
+			'loadingImage' => mp_plugin_url('ui/images/loading.gif'),
+		));
 	}
 	
 	/**
@@ -286,14 +291,13 @@ class MP_Public {
 	}
 	
 	/**
-	 * Start session
+	 * Safely start session
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
 	public function start_session() {
 		$sess_id = session_id();
-		
 		if ( empty($sess_id) ) {
 			session_start();
 		}

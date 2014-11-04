@@ -406,7 +406,6 @@ class MP_Installer {
 	public function update_3000( $settings ) {
 		$this->_db_update_required();
 		$this->backup_legacy_settings($settings);
-		$this->update_coupon_schema();
 		$settings = $this->update_notification_settings($settings);
 		$settings = $this->update_presentation_settings($settings);
 		$settings = $this->update_tax_settings($settings);
@@ -463,81 +462,7 @@ class MP_Installer {
 			}
 		}
 	}
-	
-	/**
-	 * Updates the coupon schema.
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function update_coupon_schema() {
-		$coupons = get_option('mp_coupons');
 		
-		if ( empty($coupons) ) {
-			//no coupons to update
-			return false;
-		}
-		
-		//include WPMUDEV Metaboxes/Fields
-		include_once mp_plugin_dir('includes/wpmudev-metaboxes/class-wpmudev-field.php');
-		mp_include_dir(mp_plugin_dir('includes/wpmudev-metaboxes/fields'));
-		
-		foreach ( $coupons as $code => $coupon ) {
-			$type = isset($coupon['applies_to']['type']) ? $coupon['applies_to']['type'] : 'all';
-			$id = isset($coupon['applies_to']['id']) ? $coupon['applies_to']['id'] : '';
-			
-			$metadata = array(
-				'discount' => array(
-					'type' => 'WPMUDEV_Field_Text',
-					'value' => ( $coupon['discount_type'] == 'pct' ) ? $coupon['discount'] . '%' : $coupon['discount'],
-				),
-				'max_uses' => array(
-					'type' => 'WPMUDEV_Field_Text',
-					'value' => $coupon['uses'],
-				),
-				'applies_to' => array(
-					'type' => 'WPMUDEV_Field_Radio_Group',
-					'value' => $type,
-				),
-				'category' => array(
-					'type' => 'WPMUDEV_Field_Taxonomy_Select',
-					'value' => ( $type == 'category' ) ? $id : '',
-				),
-				'product' => array(
-					'type' => 'WPMUDEV_Field_Post_Select',
-					'value' => ( $type == 'product' ) ? $id : '',
-				),
-				'start_date' => array(
-					'type' => 'WPMUDEV_Field_Datepicker',
-					'value' => date('Y-m-d', $coupon['start']),
-				),
-				'indefinite' => array(
-					'type' => 'WPMUDEV_Field_Checkbox',
-					'value' => ( empty($coupon['end']) ) ? '0' : '1', 
-				),
-				'end_date' => array(
-					'type' => 'WPMUDEV_Field_Datepicker',
-					'value' =>  ( empty($coupon['end']) ) ? '' : date('Y-m-d', $coupon['end']),
-				),
-			);
-			
-			$post_id = wp_insert_post(array(
-				'post_title' => strtoupper($code),
-				'post_content' => '',
-				'post_status' => 'publish',
-				'post_type' => 'mp_coupon',
-			));
-			
-			foreach ( $metadata as $name => $data ) {
-				$type = $data['type'];
-				$field = new $type(array('name' => $name, 'value_only' => true));
-				$field->save_value($post_id, $name, $data['value'], true);
-			}
-		}
-		
-		delete_option('mp_coupons');
-	}
-	
 	/**
 	 * Set flag that db update is required
 	 *

@@ -11,6 +11,15 @@ class MP_Product {
 	var $ID = null;
 	
 	/**
+	 * Refers to the product's qty
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var int
+	 */
+	var $qty = 1;
+	
+	/**
 	 * Refers to the product's variations.
 	 *
 	 * @since 3.0
@@ -47,6 +56,15 @@ class MP_Product {
 	protected $_on_sale = null;
 	
 	/**
+	 * Refers to the product's price
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param array
+	 */
+	protected $_price = null;
+	
+	/**
 	 * Refers to the product's internal WP_Post object.
 	 *
 	 * @since 3.0
@@ -63,15 +81,6 @@ class MP_Product {
 	 * @type bool
 	 */
 	protected $_exists = null;
-	
-	/**
-	 * Refers to whether or not the class has attempted to fetch the internal WP_Post object or not.
-	 *
-	 * @since 3.0
-	 * @access protected
-	 * @type bool
-	 */
-	protected $_post_queried = false;
 	
 	/**
 	 * Get the internal post type for products.
@@ -650,19 +659,29 @@ class MP_Product {
 				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest'])  . '</strong>';
 			}
 		} elseif ( $this->on_sale() ) {
-			$percent_off = round((($price['regular'] - $price['sale']['amount']) * 100) / $price['regular']) . '%';
-			$snippet .= '<strike class="mp_normal_price">' . mp_format_currency('', $price['regular']) . '</strike>';
+			$amt_off = mp_format_currency('', ($price['highest'] - $price['lowest']) * $this->qty);
 			
-			if ( ($end_date = $price['sale']['end_date']) && ($days_left = $price['sale']['days_left']) ) {
-				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s', 'mp'), $percent_off) . sprintf(_n(' - only 1 day left!', ' - only %s days left!', $days_left, 'mp'), $days_left) . '</span>';
+			if ( $this->qty > 1 ) {
+				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency('', ($price['lowest'] * $this->qty)) . '</strong>';
+				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf(__('%s each', 'mp'), mp_format_currency('', $price['sale']['amount'])) . ')</span>';
 			} else {
-				$snippet .= '<span class="mp_savings_amt">' . sprintf(__('Save: %s', 'mp'), $percent_off) . '</span>';
+				$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency('', $price['sale']['amount']) . '</strong>';
 			}
 			
-			$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency('', $price['sale']['amount']) . '</strong>';
+			$snippet .= '<span class="mp_normal_price">' . __('Reg: ', 'mp') . mp_format_currency('', ($price['regular'] * $this->qty)) . '</span>';
+
+			if ( ($end_date = $price['sale']['end_date']) && ($days_left = $price['sale']['days_left']) ) {
+				$snippet .= '<strong class="mp_savings_amt">' . sprintf(__('You Save: %s', 'mp'), $amt_off) . sprintf(_n(' - only 1 day left!', ' - only %s days left!', $days_left, 'mp'), $days_left) . '</strong>';
+			} else {
+				$snippet .= '<strong class="mp_savings_amt">' . sprintf(__('You Save: %s', 'mp'), $amt_off) . '</strong>';
+			}
 		} else {
-			$snippet .= '
-			<strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['regular']) . '</strong>';
+			if ( $this->qty > 1 ) {
+				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency('', ($price['lowest'] * $this->qty)) . '</strong>';
+				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf(__('%s each', 'mp'), mp_format_currency('', $price['lowest'])) . ')</span>';
+			} else {
+				$snippet .= '<strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['lowest']) . '</strong>';
+			}
 		}
 		
 		$snippet .= '</div>';
@@ -778,9 +797,17 @@ class MP_Product {
 				$on_sale = false;
 			}
 		}
+			
+		/**
+		 * Filter the on sale flag
+		 *
+		 * @since 3.0
+		 * @param bool $on_sale The default on-sale flag.
+		 * @param MP_Product $this The current product.
+		 */
+		$this->_on_sale = apply_filters('mp_product/on_sale', $on_sale, $this);
 		
-		$this->_on_sale = $on_sale;
-		return $on_sale;
+		return $this->_on_sale;
 	}
 	
 	/**
@@ -790,13 +817,22 @@ class MP_Product {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @return array
+	 * @param string $what Optional, the subset of the price array to be returned.
+	 * @return array/float
 	 */
-	public function get_price() {
+	public function get_price( $what = null ) {
+		if ( ! is_null($this->_price) ) {
+			if ( ! is_null($what) ) {
+				return mp_arr_get_value($what, $this->_price);
+			}
+			
+			return $this->_price;
+		}
+		
 		$price = array(
 			'regular' => (float) $this->get_meta('regular_price'),
-			'lowest' => '',
-			'highest' => '',
+			'lowest' => (float) $this->get_meta('regular_price'),
+			'highest' => (float) $this->get_meta('regular_price'),
 			'sale' => array(
 				'amount' => false,
 				'start_date' => false,
@@ -819,14 +855,13 @@ class MP_Product {
 				}
 			}
 			
-			$price['lowest'] = min($prices);
-			$price['highest'] = max($prices);
+			$price['lowest'] = (float) min($prices);
+			$price['highest'] = (float) max($prices);
 		} elseif ( $this->on_sale() && ($sale_price = $this->get_meta('sale_price_amount')) ) {
 			$start_date_obj = new DateTime($this->get_meta('sale_price_start_date', date('Y-m-d'), true));
 			$days_left = false;
 			
-			if ( method_exists($start_date_obj, 'diff') ) {
-				// The diff method is only available PHP version >= 5.3
+			if ( method_exists($start_date_obj, 'diff') ) { // The diff method is only available PHP version >= 5.3
 				$end_date_obj = new DateTime($this->get_meta('sale_price_end_date', date('Y-m-d'), true));
 				$diff = $start_date_obj->diff($end_date_obj);
 				$days_left = $diff->d;
@@ -844,6 +879,7 @@ class MP_Product {
 				}
 			}
 			
+			$price['lowest'] = (float) $sale_price;
 			$price['sale'] = array(
 				'amount' => (float) $sale_price,
 				'start_date' => $this->get_meta('sale_price_start_date', false),
@@ -851,8 +887,39 @@ class MP_Product {
 				'days_left' => $days_left,
 			);
 		}
+			
+		/**
+		 * Filter the price array
+		 *
+		 * @since 3.0
+		 * @param array The current pricing array.
+		 * @param MP_Product The current product.
+		 */
+		$this->_price = apply_filters('mp_product/get_price', $price, $this);
 		
-		return $price;
+		if ( mp_arr_get_value('sale->amount', $price) != mp_arr_get_value('sale->amount', $this->_price) ) {
+			/* Filter changed sale price so let's flip the on-sale flag so the sale
+			price will show up accordingly */
+			$this->_on_sale = true;
+		}
+		
+		if ( ! is_null($what) ) {
+			return mp_arr_get_value($what, $this->_price);
+		}
+		
+		return $this->_price;
+	}
+
+	/**
+	 * Get the product's lowest price
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float The product's lowest price.
+	 */
+	public function price_lowest() {
+		$price = $this->get_price();
+		return $price['lowest'];
 	}
 	
 	/**
@@ -1389,13 +1456,7 @@ class MP_Product {
 	 * @param int/object/WP_Post $product
 	 */
 	protected function _get_post( $product ) {
-		$this->_post_queried = true;
-		
-		if ( $product instanceof WP_Post ) {
-			$this->_post = $product;
-		} else {
-			$this->_post = get_post($product);
-		}
+		$this->_post = get_post($product);
 		
 		if ( is_null($this->_post) ) {
 			$this->_exists = false;

@@ -14,7 +14,7 @@ endif;
 
 if ( ! function_exists('mp_push_to_array') ) :
 	/**
-	 * Pushes a value with a given array with given key
+	 * Pushes a value to a given array with given key
 	 *
 	 * @since 1.0
 	 * @access public
@@ -32,13 +32,36 @@ if ( ! function_exists('mp_push_to_array') ) :
 	    if ( ! is_array($branch) ) {
 		  	$branch = array();
 	    }	
-	        
+	      
 	    $branch = &$branch[$key];
     }
     
     $branch = $value;
 	}
 endif;
+
+if ( ! function_exists('mp_cart') ) :
+	/**
+	 * Get the MP_Cart instance
+	 *
+	 * @since 3.0
+	 */
+	function mp_cart() {
+		return MP_Cart::get_instance();
+	}
+endif;
+
+if ( ! function_exists('mp_checkout') ) :
+	/**
+	 * Get the MP_Checkout instance
+	 *
+	 * @since 3.0
+	 */
+	function mp_checkout() {
+		return MP_Checkout::get_instance();
+	}
+endif;
+
 
 if ( ! function_exists('mp_country_list') ) :
 	/**
@@ -188,6 +211,34 @@ if ( ! function_exists('mp_is_pro_site') ) :
 		}
 		
 		return is_pro_site($blog_id, $level);
+	}
+endif;
+
+if ( ! function_exists('mp_is_valid_zip') ) :
+	/**
+	 * Check if zipcode is valid
+	 *
+	 * @since 3.0
+	 * @param string $zip
+	 * @param string $country
+	 */
+	function mp_is_valid_zip( $zip, $country ) {
+		if ( mp_arr_get_value($country, mp()->countries_no_postcode) ) {
+			//given country doesn't use post codes so zip is always valid
+			return true;
+		}
+		
+		if ( empty($zip) ) {
+			//no post code provided
+			return false;
+		}
+			
+		if ( strlen($zip) < 3 ) {
+			//post code is too short - see http://wp.mu/8wg
+			return false;
+		}
+			
+		return true;
 	}
 endif;
 
@@ -497,6 +548,23 @@ if ( ! function_exists('mp_get_post_value') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_request_value') ) :
+	/**
+	 * Safely retreives a value from the $_REQUEST array
+	 *
+	 * @since 3.0
+	 * @uses mp_arr_get_value()
+	 *	 
+	 * @param string $key (e.g. key1->key2->key3)
+	 * @param mixed $default The default value to return if $key is not found within $array
+	 * @return mixed
+	 */	 
+	function mp_get_request_value( $key, $default = false ) {
+		return mp_arr_get_value($key, $_REQUEST, $default);
+	}
+endif;
+
+
 if ( ! function_exists('mp_get_session_value') ) :
 	/**
 	 * Safely retreives a value from the $_SESSION array
@@ -509,7 +577,8 @@ if ( ! function_exists('mp_get_session_value') ) :
 	 * @return mixed
 	 */	 
 	function mp_get_session_value( $key, $default = false ) {
-		return ( session_id() == '' ) ? $default : mp_arr_get_value($key, $_SESSION, $default);
+		mp_public()->start_session();
+		return mp_arr_get_value($key, $_SESSION, $default);
 	}
 endif;
 
@@ -617,6 +686,22 @@ if ( ! function_exists('mp_update_setting') ) :
 		return update_option('mp_settings', $settings);
 	}
 endif;
+
+if ( ! function_exists('mp_update_session_value') ) :
+	/**
+	 * Update a session variable
+	 *
+	 * @since 3.0
+	 *
+	 * @param string $key The key to update
+	 * @param mixed $value The value to use
+	 */
+	function mp_update_session_value( $key, $value ) {
+		mp_public()->start_session();
+		mp_push_to_array($_SESSION, $key, $value);
+	}
+endif;
+
 
 if ( ! function_exists('mp_update_network_setting') ) :
 	/**

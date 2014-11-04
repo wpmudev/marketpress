@@ -1,5 +1,3 @@
-var marketpress = {};
-
 (function($){
 	$.fn.equalHeights = function(){
 		var maxHeight = 0;
@@ -14,6 +12,35 @@ var marketpress = {};
 	}
 }(jQuery));
 
+(function($){
+	/**
+	 * Preload loading icon
+	 *
+	 * @since 3.0
+	 */
+	$('<img />').get(0).src = mp_i18n.loadingImage;
+	
+	/**
+	 * Add or remove cart ajax loading icon
+	 *
+	 * @since 3.0
+	 */
+	$.fn.ajaxLoading = function( action ){
+		if ( action === undefined ) {
+			var action = 'show';	
+		}
+		
+		return this.each(function(){
+			if ( 'show' == action ) {
+				$(this).hide().after('<img src="' + mp_i18n.loadingImage + '" alt="" />');
+			} else {
+				$(this).show().next('img').remove();
+			}
+		});
+	};
+}(jQuery));
+
+var marketpress = {};
 (function($){
 	/**
 	 * Show or hide the loading overlay
@@ -51,7 +78,11 @@ var marketpress = {};
 	 */
 	marketpress.equalizeProductGrid = function(){
 		$('.mp_grid_row').each(function(){
-			$(this).find('.mp_one_product').equalHeights().find('.mp_price_buy').addClass('sticky');
+			var $this = $(this);
+			
+			$this.find('.mp_product_detail').equalHeights();
+			$this.find('.mp_one_product').equalHeights();
+			$this.find('.mp_buy_form').addClass('sticky');
 		});
 	};
 	
@@ -61,7 +92,7 @@ var marketpress = {};
 	 * @since 3.0
 	 */
 	marketpress.initSelect2 = function(){
-		$('.mp_select2').select2({
+		$('select.mp_select2').not('.select2-offscreen').select2({
 			"dropdownAutoWidth" : 1,
 			"minimumResultsForSearch" : -1	// hide the search box
 		});
@@ -84,6 +115,51 @@ var marketpress = {};
 			$target.show().siblings('.mp_product_content').hide();
 		});
 	};
+	
+	/**
+	 * Trigger events after an ajax request
+	 *
+	 * @since 3.0
+	 * @param string event The base event string.
+	 * @param object resp The ajax response object.
+	 * @param object $scope Optional, the scope for triggered events. Defaults to document.
+	 */
+	marketpress.ajaxEvent = function( event, resp, $scope ) {
+		if ( $scope === undefined ) {
+			var $scope = $(document);
+		}
+		
+		var successEvent = event + '/success';
+		var errorEvent = event + '/error';
+		
+		/**
+		 * Fires whether the response was successful or not
+		 *
+		 * @since 3.0
+		 * @param object The response data.
+		 */
+		$scope.trigger(event, [ resp ]);
+		
+		if ( resp.success ) {
+			/**
+			 * Fires on success
+			 *
+			 * @since 3.0
+			 * @param object The response data object.
+			 */
+			$scope.trigger(successEvent.replace('//', '/'), [ resp.data ]);
+		} else {
+			var message = ( resp.data === undefined ) ? '' : resp.data.message;
+			
+			/**
+			 * Fires on error
+			 *
+			 * @since 3.0
+			 * @param string Any applicable error message.
+			 */
+			$scope.trigger(errorEvent.replace('//', '/'), [ message ]);				
+		}
+	}
 }(jQuery));
 
 jQuery(document).ready(function(){

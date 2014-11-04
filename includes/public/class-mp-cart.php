@@ -56,6 +56,15 @@ class MP_Cart {
 	protected $_is_download_only = null;
 	
 	/**
+	 * Refers to the cart total
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_total = array();
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -87,28 +96,17 @@ class MP_Cart {
 	}
 	
 	/**
-	 * Apply coupon (ajax)
+	 * Get cart price (taxes into account tax rules)
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @action wp_ajax_mp_cart_apply_coupon, wp_ajax_nopriv_mp_cart_apply_coupon
+	 * @param float $price The individual product price.
+	 * @param int $qty The quantity of the product.
+	 * @return float
 	 */
-	public function ajax_apply_coupon() {
-		$coupon_code = mp_get_post_value('coupon_code');
-		
-		if ( ! $coupon_code ) {
-			wp_send_json_error(array(
-				'message' => __('Invalid coupon code', 'mp'),
-			));
-		}
-		
-		$coupon = new MP_Coupon($coupon_code);
-		
-		if ( ! $coupon->exists() ) {
-			wp_send_json_error(array(
-				'message' => __('Invalid coupon code', 'mp'),
-			));
-		}
+	public function cart_price( $price, $qty ) {
+		$price = ($price * $qty);
+		return ( mp_get_setting('tax->tax_inclusive') ) ? ($price / (1 + (float) mp_get_setting('tax->rate'))) : $price;
 	}
 	
 	/**
@@ -145,11 +143,21 @@ class MP_Cart {
 				$this->add_item($item_id, $qty);
 				wp_send_json_success($this->floating_cart_html());
 			break;
+			
+			case 'update_item' :
+				$this->update_item($item_id, $qty);
+				$product = new MP_Product($item_id);
+				$product->qty = $qty;
+				wp_send_json_success(array(
+					'product' => array($item_id => $this->get_line_item($product)),
+					'cartmeta' => $this->cart_meta(false),
+				));
+			break;
 		}
 		
 		wp_send_json_error();
 	}
-
+	
 	/**
 	 * Convert an array of items to an array of MP_Product objects
 	 *
@@ -159,13 +167,19 @@ class MP_Cart {
 	 * @return array
 	 */
 	protected function _convert_to_objects( $items ) {
-		$posts = get_posts(array(
-			'post__in' => array_keys($items),
-			'posts_per_page' => -1,
-			'post_type' => array(MP_Product::get_post_type(), 'mp_product_variation'),
-		));
+		$cache_key = implode(',', $items);
+		if ( $_posts = wp_cache_get($cache_key, 'mp_cart') ) {
+			$posts = $_posts;
+		} else {
+			$posts = get_posts(array(
+				'post__in' => array_keys($items),
+				'posts_per_page' => -1,
+				'post_type' => array(MP_Product::get_post_type(), 'mp_product_variation'),
+				'orderby' => 'post__in'
+			));
+			wp_cache_set($cache_key, $posts, 'mp_cart');
+		}
 		
-		$products = array();
 		foreach ( $posts as $post ) {
 			$product = new MP_Product($post);
 			$product->qty = array_shift($items);
@@ -190,7 +204,7 @@ class MP_Cart {
 		}
 		
 		$this->_items = $global_cart;
-	 
+		
 		if ( $global ) {
 			return $this->get_all_items();
 		} else {
@@ -210,14 +224,19 @@ class MP_Cart {
 	}
 		
 	/**
-	 * Get a single item from the cart
+	 * Get a single item quantity from the cart
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param 
+	 * @param int $item_id
+	 * @return int The quantity in the cart. False if item doesn't exist in cart.
 	 */
-	public function get_item( $item_id ) {
+	public function get_item_qty( $item_id ) {
+		if ( $qty = mp_arr_get_value($this->_id . '->' . $item_id, $this->_items) ) {
+			return (int) $qty;
+		}
 		
+		return false;
 	}
 
 	/**
@@ -225,9 +244,110 @@ class MP_Cart {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @return array
 	 */
 	public function get_items() {
 		return mp_arr_get_value($this->_id, $this->_items, array());
+	}
+	
+	/**
+	 * Gets cart items as objects
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_items_as_objects() {
+		$items = $this->get_items();
+		return $this->_convert_to_objects($items);
+	}
+
+	/**
+	 * Get cart line item html
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param MP_Product/int $product The product to get the html for.
+	 * @return string
+	 */
+	public function get_line_item( $product ) {
+		if ( ! $product instanceof MP_Product ) {
+			$product = new MP_Product($product);
+		}
+		
+		/**
+		 * Filter cart columns array
+		 *
+		 * @since 3.0
+		 * @param array The cart columns array.
+		 */
+		$cart_columns = (array) apply_filters('mp_cart/cart_columns_array', array(
+			'thumb',
+			'title',
+			'price-qty',
+			'shipping-method',
+		));
+		
+		$html = '
+			<div class="mp-cart-item clearfix" id="mp-cart-item-' . $product->ID . '">';
+			
+		foreach ( $cart_columns as $column ) {
+			$html .= '
+				<div class="mp-cart-item-column mp-cart-item-column-' . $column . '">';
+			
+			switch ( $column ) {
+				case 'thumb' :
+					$column_html = $product->image_custom(false, 75);
+				break;
+				
+				case 'title' :
+					$column_html = '<h2>' . $product->title(false) . '</h2>';
+				break;
+				
+				case 'price-qty' :
+					$column_html = $product->display_price(false) . '
+						<div class="mp-cart-item-qty">' .
+							$this->dropdown_quantity(array(
+								'echo' => false,
+								'class' => 'mp_select2',
+								'name' => 'mp_cart_qty[' . $product->ID . ']',
+								'selected' => $product->qty,
+							)) . '<br />
+							<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>
+						</div>';
+				break;
+				
+				case 'shipping-method' :
+					$column_html = apply_filters('mp_cart/shipping_field', '');
+				break;
+			}
+			
+			/**
+			 * Filter the column html
+			 *
+			 * @since 3.0
+			 * @param string The current column html.
+			 * @param string The current column slug.
+			 * @param MP_Product The current product.
+			 * @param MP_Cart The current cart object.
+		  */
+			$html .= apply_filters('mp_cart/column_html', $column_html, $column, $product, $this);
+			
+			$html .= '
+				</div>';
+		}
+
+		$html .= '</div>';
+		
+		/**
+		 * Filter the line item html
+		 *
+		 * @since 3.0
+		 * @param string $html The current line html.
+		 * @param MP_Product $product The current product object.
+		 * @param MP_Cart $this The current cart object.
+		 */			
+		return apply_filters('mp_cart/get_line_item', $html, $product, $this);
 	}
 	
 	/**
@@ -235,26 +355,37 @@ class MP_Cart {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @return float
+	 * @param string $what Optional, the subset of the total array to be returned. Defaults to all.
+	 * @return array
 	 */
-	public function get_total() {
+	public function get_total( $what = null ) {
 		$items = $this->get_items();
 		$total = 0;
 		
 		foreach ( $items as $item => $qty ) {
 			$product = new MP_Product($item);
 			$price_obj = $product->get_price();
-
-			if ( $product->has_coupon() ) {
-				$total += $price_obj['coupon'] * $qty;
-			} elseif ( $product->on_sale() ) {
-				$total += ($price_obj['sale']['amount'] * $qty);
-			} else {
-				$total += ($price_obj['regular'] * $qty);
-			}
+			$total += ($price_obj['lowest'] * $qty);
 		}
 		
-		return $total;
+		$this->_total['products'] = $total;
+		
+		/**
+		 * Filter the cart total
+		 *
+		 * @since 3.0
+		 * @param float The cart total.
+		 * @param MP_Cart The current cart object.
+		 */
+		$total = apply_filters('mp_cart/get_total', $total, $this);
+		
+		$this->_total['subtotal'] = $total;
+		
+		if ( ! is_null($what) ) {
+			return mp_arr_get_value($what, $this->_total, 0);
+		}
+		
+		return $this->_total;
 	}
 	
 	/**
@@ -267,6 +398,7 @@ class MP_Cart {
 	public function cart_meta( $echo = true ) {
 		$zipcode = mp_get_current_user_zipcode();
 		$html = '';
+		$total = $this->get_total();
 		
 		if ( empty($zipcode) ) {
 			// Show the zipcode lightbox
@@ -276,22 +408,86 @@ class MP_Cart {
 			$header = sprintf(__('Estimated Total for %s', 'mp'), $zipcode);
 		}
 		
-		$html .= '
+		/**
+		 * Filter the header text
+		 *
+		 * @since 3.0
+		 * @param string The current header text.
+		 * @param MP_Cart The current cart object.
+		 */
+		$header = apply_filters('mp_cart/cart_meta/header', $header, $this);		
+		
+		$line = '
 			<div id="mp-cart-meta">
 				<div class="mp-cart-meta-header">' . $header . '</div>
 				<div id="mp-cart-meta-line-product-total" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . __('Product Total', 'mp') . '</strong>
-					<span class="mp-cart-meta-line-amount">' . mp_format_currency('', $this->get_total()) . '</span>
-				</div>
+					<span class="mp-cart-meta-line-amount">' . mp_format_currency('', $total['products']) . '</span>
+				</div>';
+		
+		/**
+		 * Filter the product total html
+		 *
+		 * @since 3.0
+		 * @param string The current product total html.
+		 * @param MP_Cart The current cart object.
+		 */
+		$html .= apply_filters('mp_cart/cart_meta/product_total', $line, $this);
+
+		$line = '
+				<div id="mp-cart-meta-line-estimated-shipping" class="mp-cart-meta-line clearfix">
+					<strong class="mp-cart-meta-line-label">' . __('Estimated Shipping', 'mp') . '</strong>
+					<span class="mp-cart-meta-line-amount"></span>
+				</div>';
+
+		/**
+		 * Filter the estimated shipping html
+		 *
+		 * @since 3.0
+		 * @param string The current estimated shipping total html.
+		 * @param MP_Cart The current cart object.
+		 */
+		$html .= apply_filters('mp_cart/cart_meta/shipping_total', $line, $this);
+		
+		$line = '
 				<div id="mp-cart-meta-line-estimated-tax" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . sprintf(__('Estimated %s', 'mp'), mp_get_setting('tax->label')) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . mp_format_currency('', $this->get_total()) . '</span>
-				</div>
+					<span class="mp-cart-meta-line-amount">' . $this->tax_price(true) . '</span>
+				</div>';
+
+		/**
+		 * Filter the estimated tax html
+		 *
+		 * @since 3.0
+		 * @param string The current estimated tax html.
+		 * @param MP_Cart The current cart object.
+		 */
+		$html .= apply_filters('mp_cart/cart_meta/estimated_tax_line', $line, $this);
+		
+		$line = '		
 				<div id="mp-cart-meta-line-order-total" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . __('Estimated Order Total', 'mp') . '</strong>
-					<span class="mp-cart-meta-line-amount">' . mp_format_currency('', $this->get_total()) . '</span>
+					<span class="mp-cart-meta-line-amount">' . mp_format_currency('', 0) . '</span>
 				</div>
 			</div>';
+
+		/**
+		 * Filter the order total html
+		 *
+		 * @since 3.0
+		 * @param string The current order total html.
+		 * @param MP_Cart The current cart object.
+		 */
+		$html .= apply_filters('mp_cart/cart_meta/order_total', $line, $this);
+		
+		/**
+		 * Filter the cart meta html
+		 *
+		 * @since 3.0
+		 * @param string The current cart meta html.
+		 * @param MP_Cart The current cart object.
+		 */
+		$html = apply_filters('mp_cart/cart_meta', $html, $this);
 		
 		if ( $echo ) {
 			echo $html;
@@ -309,18 +505,36 @@ class MP_Cart {
 	 * 		Optional, an array of arguments.
 	 *
 	 *		@type bool $echo Optional, whether to echo or return. Defaults to false.
-	 *		@type string $view Optional, how to display the cart contents - either list or table or a custom view name. Defaults to list.
 	 * }
 	 */
 	public function display( $args = array() ) {
 		$html = '';
 		$args = array_replace_recursive(array(
 			'echo' => false,
-			'view' => 'list',
 		), $args);
-		$products = $this->_convert_to_objects($this->get_items());
-
+		
 		extract($args);
+		
+		if ( ! $this->has_items() ) {
+			$message = sprintf(__('There are no items in your cart - <a href="%s">go add some</a>!', 'mp'), mp_store_page_url('products', false));
+			
+			/**
+			 * Filter the no items in your cart message
+			 *
+			 * @since 3.0
+			 * @param string $message The default message.
+			 */
+			$message = apply_filters('mp_cart/no_items_message', $message);
+			
+			if ( $echo ) {
+				echo $message;
+				return;
+			} {
+				return $message;
+			}
+		}
+		
+		$products = $this->_convert_to_objects($this->get_items());
 		
 		/**
 		 * Add html before cart
@@ -349,21 +563,20 @@ class MP_Cart {
 			$html .= '
 				<div id="mp-cart-before" class="clearfix">' . $before_cart_html . '</div>';
 		}
+		
+		/**
+		 * Filter the cart class attribute for easier styling
+		 *
+		 * @since 3.0
+		 * @param string The default class.
+		 */
+		$class_attr = apply_filters('mp_cart/cart_class_attribute', 'mp-cart-default');
 
 		$html .= '
-				<div id="mp-cart" class="mp-cart-' . $view . '">';
+				<div id="mp-cart" class="' . $class_attr . '">';
 		
 		foreach ( $products as $product ) {
-			$html .= '
-					<div class="mp-cart-item clearfix" id="mp-cart-item-' . $product->ID . '">
-						<div class="mp-cart-item-thumb">' . $product->image_custom(false, 75) . '</div>
-						<div class="mp-cart-item-title"><h2>' . $product->title(false) . '</h2></div>
-						<div class="mp-cart-item-price">' . $product->display_price(false) . '</div>
-						<div class="mp-cart-item-qty">' .
-							$this->dropdown_quantity(array('echo' => false, 'class' => 'mp_select2', 'name' => 'mp_cart_qty[' . $product->ID . ']', 'selected' => $product->qty)) . '<br />
-							<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>
-						</div>
-					</div>';
+			$html .= $this->get_line_item($product);
 		}
 		
 		$html .= '
@@ -396,7 +609,7 @@ class MP_Cart {
 			return $html;
 		}
 	}
-
+	
 	/**
 	 * Display the item quantity dropdown
 	 *
@@ -493,7 +706,7 @@ class MP_Cart {
 		wp_enqueue_script('jquery-validate-methods', mp_plugin_url('ui/js/jquery.validate.methods.min.js'), array('jquery-validate'), MP_VERSION, true);
 		wp_enqueue_script('ajaxq', mp_plugin_url('ui/js/ajaxq.min.js'), array('jquery'), MP_VERSION, true);
 		wp_enqueue_script('colorbox', mp_plugin_url('ui/js/jquery.colorbox-min.js'), array('jquery'), MP_VERSION, true);
-		wp_enqueue_script('mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array('ajaxq', 'colorbox', 'jquery-validate'), MP_VERSION, true);
+		wp_enqueue_script('mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array('ajaxq', 'colorbox', 'jquery-validate', 'jquery-effects-core'), MP_VERSION, true);
 		
 		// Localize scripts
 		wp_localize_script('mp-cart', 'mp_cart_i18n', array(
@@ -514,14 +727,14 @@ class MP_Cart {
 			$echo = false;
 		}
 		
-		if ( (! mp_is_shop_page() || mp_get_setting('pages->cart') == get_the_ID()) && ! mp_doing_ajax() ) {
+		if ( (! mp_is_shop_page() || mp_is_shop_page('cart')) && ! mp_doing_ajax() ) {
 			return;
 		}
 		
 		$items = $this->get_items();
 		$html = '
 		<div id="mp-floating-cart"' . (( $this->has_items() ) ? ' class="has-items"' : '') . '>
-			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . mp_format_currency('', $this->get_total()) . '</span> ' . $this->item_count(false) . '</div>
+			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . mp_format_currency('', $this->get_total('products')) . '</span> ' . $this->item_count(false) . '</div>
 			<div id="mp-floating-cart-contents">';
 	
 		if ( $this->has_items() ) {
@@ -628,7 +841,7 @@ class MP_Cart {
 		
 		return $this->_is_download_only;
 	}
-	
+		
 	/**
 	 * Display the item count
 	 *
@@ -690,58 +903,60 @@ class MP_Cart {
 	 * @return float The calculated price. False, if shipping address is not available
 	 */
 	public function shipping_price( $format = false ) {
-		$products = $this->_convert_to_objects($items);
+		$products = $this->get_items_as_objects();
 		$shipping_plugins = MP_Shipping_API::get_active_plugins();
 		$total = $this->get_total();
+		$user = wp_get_current_user();
+
+		//get address
+		$meta = $user->get('mp_shipping_info');
+		$address1 = mp_get_session_value('mp_shipping_info->address1', mp_arr_get_value('address1', $meta));
+		$address2 = mp_get_session_value('mp_shipping_info->address2', mp_arr_get_value('address2', $meta));
+		$city = mp_get_session_value('mp_shipping_info->city', mp_arr_get_value('city', $meta));
+		$state = mp_get_session_value('mp_shipping_info->state', mp_arr_get_value('state', $meta));
+		$zip = mp_get_session_value('mp_shipping_info->zip', mp_arr_get_value('zip', $meta));
+		$country = mp_get_session_value('mp_shipping_info->country', mp_arr_get_value('country', $meta));
+		$selected_sub_option = mp_get_session_value('mp_shipping_info->shipping_sub_option', null);
+		$selected_option = mp_arr_get_value(mp_get_session_value('mp_shipping_info->shipping_option'), $shipping_plugins);
 		
-
-	 //get address
-	 $meta = get_user_meta(get_current_user_id(), 'mp_shipping_info', true);
-	 $address1 = isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : (isset($meta['address1']) ? $meta['address1'] : '');
-	 $address2 = isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : (isset($meta['address2']) ? $meta['address2'] : '');
-	 $city = isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : (isset($meta['city']) ? $meta['city'] : '');
-	 $state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : (isset($meta['state']) ? $meta['state'] : '');
-	 $zip = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : (isset($meta['zip']) ? $meta['zip'] : '');
-	 $country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : (isset($meta['country']) ? $meta['country'] : '');
-	 $selected_option = isset($_SESSION['mp_shipping_info']['shipping_sub_option']) ? $_SESSION['mp_shipping_info']['shipping_sub_option'] : null;
-
-	 //check required fields
-	 if ( empty($address1) || empty($city) || !$this->is_valid_zip($zip, $country) || empty($country) || !(is_array($cart) && count($cart)) )
-		return false;
+		//check required fields
+		if ( empty($address1) || empty($city) || ! mp_is_valid_zip($zip, $country) || empty($country) || ! $this->has_items() ) {
+			return false;
+		}
 
 		//don't charge shipping if only digital products
-	 if ( $this->download_only_cart($cart) ) {
-		$price = 0;
-	 } else if ( $this->get_setting('shipping->method') == 'calculated' && isset($_SESSION['mp_shipping_info']['shipping_option']) && isset($mp_shipping_active_plugins[$_SESSION['mp_shipping_info']['shipping_option']]) ) {
+		if ( $this->is_download_only() ) {
+			$price = 0;
+	 	} else if ( mp_get_setting('shipping->method') == 'calculated' && $shipping_option ) {
 			//shipping plugins tie into this to calculate their shipping cost
-			$price = apply_filters( 'mp_calculate_shipping_'.$_SESSION['mp_shipping_info']['shipping_option'], 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+			$price = apply_filters('mp_calculate_shipping_' . $selected_option, 0, $total, $products, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 		} else {
 			//shipping plugins tie into this to calculate their shipping cost
-			$price = apply_filters( 'mp_calculate_shipping_'.$this->get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+			$price = apply_filters('mp_calculate_shipping_' . mp_get_setting('shipping->method'), 0, $total, $products, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 		}
 		
 		//calculate extra shipping
-	 $extras = array();
-	 foreach ($cart as $product_id => $variations) {
-			$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-			foreach ($variations as $variation => $data) {
-				 if (!$data['download'])
-			 	$extras[] = $shipping_meta['extra_cost'] * $data['quantity'];
+		$extras = array();
+		foreach ( $products as $product ) {
+			if ( ! $product->is_download() ) {
+				$extras[] = $product->get_meta('extra_cost') * $product->qty;
 			}
-	 }
-	 $extra = array_sum($extras);
+	 	}
+	 	$extra = array_sum($extras);
 
-	 //merge
-	 $price = round($price + $extra, 2);
-	 
+	 	//merge
+	 	$price = round($price + $extra, 2);
+	 	
 		//boot if shipping plugin didn't return at least 0
-		if (empty($price))
+		if ( empty($price) ) {
 			return false;
+		}
 		
-		if ($format)
-			return $this->format_currency('', $price);
-		else
+		if ( $format ) {
+			return mp_format_currency('', $price);
+		} else {
 			return round($price, 2);
+		}
 	}
 	
 	/**
@@ -770,14 +985,14 @@ jQuery(document).ready(function($){
 	}
 	
 	/**
-	 * Gets the calculated price for taxes based on a bunch of foreign tax laws.
+	 * Get the calculated price for taxes based on a bunch of foreign tax laws.
 	 *
 	 * @access public
 	 * @param bool $format (optional) Format number as currency when returned
 	 * @return string/float 
 	 */
-	function tax_price( $format = false ) {
-		$items = $this->get_items();
+	public function tax_price( $format = false ) {
+		$items = $this->get_items_as_objects();
 
 		//get address
 		$user = wp_get_current_user();
@@ -787,7 +1002,7 @@ jQuery(document).ready(function($){
 		$country = mp_get_session_value('mp_shipping_info->country', mp_arr_get_value('country', $shipping_info));
 
 		//if we've skipped the shipping page and no address is set, use base for tax calculation
-		if ( $this->download_only_cart($cart) || mp_get_setting('tax->tax_inclusive') || mp_get_setting('shipping->method') == 'none' ) {
+		if ( $this->is_download_only() || mp_get_setting('tax->tax_inclusive') || mp_get_setting('shipping->method') == 'none' ) {
 			if ( empty($country) ) {
 				$country = mp_get_setting('base_country');
 			}
@@ -797,43 +1012,39 @@ jQuery(document).ready(function($){
 			}
 		}
 
-		//get total after any coupons
-		$totals = array();
-		$special_totals = array();
-		$coupon_code = $this->get_coupon_code();
+		$totals = $special_totals = array();
 	 
-		foreach ($cart as $product_id => $variations) {
+		foreach ( $items as $item ) {
 			//check for special rate
-			$special = (bool)get_post_meta($product_id, 'mp_is_special_tax', true);
+			$special_rate = (float) $item->get_meta('special_tax_rate');
+			$special = false;
 			
-			if ( $special ) {
-				$special_rate = get_post_meta($product_id, 'mp_special_tax', true);
+			if ( $special_rate > 0 ) {
+				$special = true;
 			}
 			
-			foreach ( $variations as $variation => $data ) {
-				//if not taxing digital goods, skip them completely
-				if ( ! mp_get_setting('tax->tax_digital') && isset($data['download']) && is_array($data['download']) ) {
-					continue;
-				}
+			// If not taxing digital goods, skip them completely
+			if ( ! mp_get_setting('tax->tax_digital') && $item->is_download() ) {
+				continue;
+			}
 
-				$product_price = $this->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-			
-				if ( mp_get_setting('tax->tax_inclusive') ) {
-					$product_price = $product_price / (1 + (float) mp_get_setting('tax->rate'));
-				}
-			
-				if ( $special ) {
-					$special_totals[] = $product_price * $special_rate;
-				} else {
-					$totals[] = $product_price;
-				}
+			$price = $item->get_price('lowest');
+			$product_price = $this->cart_price($price, $item->qty);
+		
+			if ( $special ) {
+				$special_totals[] = $product_price * $special_rate;
+			} else {
+				$totals[] = $product_price;
 			}
 		}
 		
 		$total = array_sum($totals);
 		$special_total = array_sum($special_totals);
 		
-		//add in shipping?
+		// Reduce coupons
+		$total += mp_coupons()->get_total_discount_amt();
+		
+		// Add in shipping?
 		$shipping_tax = 0;
 		if ( mp_get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price() ) ) {
 			if ( mp_get_setting('tax->tax_inclusive') ) {
@@ -844,7 +1055,7 @@ jQuery(document).ready(function($){
 		}
 		
 		//check required fields
-		if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
+		if ( empty($country) || ! $this->has_items() || ($total + $special_total) <= 0 ) {
 			return false;
 		}
 	
@@ -852,7 +1063,7 @@ jQuery(document).ready(function($){
 			case 'US':
 				// USA taxes are only for orders delivered inside the state
 				if ( $country == 'US' && $state == mp_get_setting('base_province') ) {
-					$price = round(($total * mp_get_setting('tax->rate')) + $special_total, 2);
+					$price = ($total * mp_get_setting('tax->rate')) + $special_total;
 				}
 			break;
 	
@@ -860,9 +1071,9 @@ jQuery(document).ready(function($){
 				 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 				if ( $country == 'CA' && array_key_exists($state, mp()->canadian_provinces) ) {
 					if ( $tax_rate = mp_get_setting("tax->canada_rate->$state") ) {
-						$price = round(($total * $tax_rate) + $special_total, 2);
+						$price = ($total * $tax_rate) + $special_total;
 					} else { //backwards compat with pre 2.2 if per province rates are not set
-						$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+						$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 					}
 				}
 			break;
@@ -870,7 +1081,7 @@ jQuery(document).ready(function($){
 			case 'AU':
 				//Australia taxes orders in country
 				if ( $country == 'AU' ) {
-					$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+					$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 				}
 			break;
 	
@@ -878,12 +1089,12 @@ jQuery(document).ready(function($){
 				//EU countries charge VAT within the EU
 				if ( in_array(mp_get_setting('base_country'), mp()->eu_countries) ) {
 					if ( in_array($country, mp()->eu_countries) ) {
-						$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+						$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 					}
 				} else {
 					//all other countries use the tax outside preference
 					if ( mp_get_setting('tax->tax_outside') || (! mp_get_setting('tax->tax_outside') && $country == mp_get_setting('base_country')) ) {
-						$price = round(($total * $this->get_setting('tax->rate')) + $special_total, 2);
+						$price = ($total * $this->get_setting('tax->rate')) + $special_total;
 					}
 				}
 			break;
@@ -907,12 +1118,25 @@ jQuery(document).ready(function($){
 		 */
 		$price = apply_filters('mp_tax_price', $price, $total, $this, $country, $state);
 		$price = apply_filters('mp_cart/tax_price', $price, $total, $this, $country, $state);
-			 
+		
 		if ( $format ) {
-			return $this->format_currency('', $price);
+			return mp_format_currency('', $price);
 		} else {
 			return $price;
 		}
+	}
+	
+	/**
+	 * Update an item quantity
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $item_id The item to update.
+	 * @param int $qty The qty to update the item to.
+	 */
+	public function update_item( $item_id, $qty ) {
+		mp_push_to_array($this->_items, $this->_id . '->' . $item_id, $qty);
+		$this->_update_cart_cookie();
 	}
 		
 	/**
@@ -953,8 +1177,6 @@ jQuery(document).ready(function($){
 		// Ajax hooks
 		add_action('wp_ajax_mp_update_cart', array(&$this, 'ajax_update_cart'));
 		add_action('wp_ajax_nopriv_mp_update_cart', array(&$this, 'ajax_update_cart'));
-		add_action('wp_ajax_mp_cart_apply_coupon', array(&$this, 'ajax_apply_coupon'));
-		add_action('wp_ajax_nopriv_mp_cart_apply_coupon', array(&$this, 'ajax_apply_coupon'));
 	}
 }
 

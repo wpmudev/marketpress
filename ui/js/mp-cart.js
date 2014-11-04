@@ -3,6 +3,40 @@ var mp_cart = {};
 
 (function($){
 	/**
+	 * Add or remove a cart error
+	 *
+	 * @since 3.0
+	 * @param object options {
+	 *		Optional, an options object.
+	 *
+	 *		@type string action Either add or remove.
+	 *		@type string message The error message if adding an errror.
+	 * }
+	 */
+	$.fn.mpCartError = function( options ){
+		var settings = $.extend({
+			"action" : "add",
+			"message" : ""
+		}, options);
+		
+		return this.each(function(){
+			var $this = $(this);
+			
+			if ( settings.action == 'remove' ) {
+				$this.removeClass('error').prev('.cart-error').remove();
+			} else if ( settings.action == 'add' ) {
+				if ( $this.prev('.cart-error').length ) {
+					$this.addClass('error').prev('.cart-error').html(settings.message);
+				} else {
+					$this.addClass('error').before('<span class="cart-error">' + settings.message + '</span>');
+				}
+				
+				$this.prev('.cart-error').css('top', ($this.prev('.cart-error').outerHeight() * -1));
+			}
+		});
+	};
+
+	/**
 	 * Refers to the validation args for the add-to-cart/buy-now form
 	 *
 	 * @since 3.0
@@ -44,13 +78,13 @@ var mp_cart = {};
 		this.initCartListeners();
 		this.initProductOptionsLightbox();
 	};
-	
+
 	/**
-	 * Initialize cart listeners
+	 * Initialize product list listeners
 	 *
 	 * @since 3.0
 	 */
-	mp_cart.initCartListeners = function(){
+	mp_cart.initProductListListeners = function(){
 		$('#mp_product_list').on('submit', '.mp_buy_form', function(e){
 			e.preventDefault();
 			
@@ -66,8 +100,15 @@ var mp_cart = {};
 			});
 			
 			mp_cart.addItem($this, $this.find('[name="product_id"]').val());
-		});
-		
+		});	
+	};
+	
+	/**
+	 * Initalize single product listeners
+	 *
+	 * @since 3.0
+	 */
+	mp_cart.initSingleProductListeners = function(){
 		$('#mp_single_product').on('change', '.mp_product_options_att_input_label input', this.updateProductAttributes);
 		$('#mp_single_product').find('.mp_buy_form')
 			.on('mp_cart/before_add_item', function(e, item, qty){
@@ -77,6 +118,33 @@ var mp_cart = {};
 				marketpress.loadingOverlay('hide');
 			})
 			.validate(this.productFormValidationArgs);
+	};
+	
+	/**
+	 * Initialize cart form listeners
+	 *
+	 * @since 3.0
+	 */
+	mp_cart.initCartFormListeners = function(){
+		$('#mp-cart-form')
+			.on('change', 'select[name^="mp_cart_qty"]', function(e){
+				var $this = $(this),
+						itemId = $this.attr('name').match(/[0-9]+/ig),
+						qty = e.val;
+				
+				mp_cart.updateItemQty(itemId[0], qty, $('#mp-cart-form'));
+			});
+	};
+	
+	/**
+	 * Initialize cart listeners
+	 *
+	 * @since 3.0
+	 */
+	mp_cart.initCartListeners = function(){
+		mp_cart.initProductListListeners();
+		mp_cart.initSingleProductListeners();
+		mp_cart.initCartFormListeners();
 	};
 	
 	/**
@@ -96,7 +164,7 @@ var mp_cart = {};
 
 		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label input', this.updateProductAttributes);
 	};
-	
+		
 	/**
 	 * Update product attributes via ajax
 	 *
@@ -120,6 +188,7 @@ var mp_cart = {};
 		
 		$.post(url, $form.serialize(), function(resp){
 			marketpress.loadingOverlay('hide');
+			marketpress.ajaxEvent('mp_cart/after_update_product_attributes', resp);
 			
 			if ( resp.success ) {				
 				if ( resp.data.image ) {
@@ -151,14 +220,6 @@ var mp_cart = {};
 					$form.find('input[name="product_quantity"]').val(resp.data.qty_in_stock);
 				}
 				
-				/**
-				 * Fires after a product's attributes are updated via ajax
-				 *
-				 * @since 3.0
-				 * @param object resp The ajax response object.
-				 */
-				$(document).trigger('mp_cart/after_update_product_attributes', [ resp ]);
-
 				$.colorbox.resize();
 			}
 		});
@@ -215,18 +276,10 @@ var mp_cart = {};
 			"type" : "POST",
 			"url" : $form.attr('data-ajax-url'),
 		})
-		.success(function(resp){			
+		.done(function(resp){
+			marketpress.ajaxEvent('mp_cart/after_add_item', resp, $form);
+			
 			if ( resp.success ) {
-				/**
-				 * Fires after successfully adding an item to the cart
-				 *
-				 * @since 3.0
-				 * @param object resp The response object,
-				 * @param object/int item The item id or item object (if a variation).
-				 * @param int qty The quantity added.
-				 */
-				$form.trigger('mp_cart/after_add_item', [ resp, item, qty ]);
-				
 				mp_cart.update(resp.data);
 				
 				$form.get(0).reset();
@@ -242,52 +295,6 @@ var mp_cart = {};
 	};
 	
 	/**
-	 * Apply a coupon code to the cart
-	 *
-	 * @since 3.0
-	 * @param string couponCode The coupon code to apply.
-	 * @param object $scope Optional, the scope of the triggered events. Defaults to document.
-	 */
-	mp_cart.applyCoupon = function( couponCode, $scope ){
-		if ( couponCode === undefined ) {
-			return false;
-		}
-		
-		if ( $scope === undefined ) {
-			var $scope = $(document);
-		}
-		
-		marketpress.loadingOverlay('show');
-		
-		var url = mp_cart_i18n.ajaxurl + '?action=mp_cart_apply_coupon',
-				data = { "coupon_code" : couponCode };
-		
-		//! TODO: need to code ajax request on backend and frontend response
-		
-		$.post(url, data).done(function(resp){
-			marketpress.loadingOverlay('hide');
-			
-			if ( resp.success ) {
-				/**
-				 * Fires on coupon success
-				 *
-				 * @since 3.0
-				 * @param object Any applicable data.
-				 */
-				$scope.trigger('mp_cart/apply_coupon/success', [ resp.data ]);				
-			} else {
-				/**
-				 * Fires on coupon error
-				 *
-				 * @since 3.0
-				 * @param string The applicable error message.
-				 */
-				$scope.trigger('mp_cart/apply_coupon/error', [ resp.data.message ]);
-			}
-		});
-	};
-	
-	/**
 	 * Update the cart html
 	 *
 	 * @since 3.0
@@ -296,6 +303,43 @@ var mp_cart = {};
 	mp_cart.update = function( html ){
 		$('#mp-floating-cart').replaceWith(html);
 		this.initCartAnimation();
+	};
+	
+	/**
+	 * Update an item's qty
+	 *
+	 * @since 3.0
+	 * @param int itemID The item ID to update.
+	 * @param int qty The new qty.
+	 * @param object $scope Optional, the scope of triggered events. Defaults to document.
+	 */
+	mp_cart.updateItemQty = function( itemId, qty, $scope ){
+		var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
+		var data = {
+			"product" : itemId,
+			"qty" : qty,
+			"cart_action" : "update_item"
+		};
+		
+		if ( $scope === undefined ) {
+			var $scope = $(document);
+		}
+		
+		marketpress.loadingOverlay('show');
+		
+		$.post(url, data).done(function(resp){
+			marketpress.loadingOverlay('hide');
+			marketpress.ajaxEvent('mp_cart/update_item_qty', resp, $scope);
+			
+			if ( resp.success ) {
+				$.each(resp.data.product, function(key, val){
+					var $item = $('#mp-cart-item-' + key);
+					$item.replaceWith(val);
+				});
+				$('#mp-cart-meta').replaceWith(resp.data.cartmeta);
+				marketpress.initSelect2();
+			}
+		});
 	};
 	
 	/**
