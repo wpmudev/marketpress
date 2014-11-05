@@ -584,10 +584,16 @@ class Marketpress {
 				return call_user_func_array('mp_product_price', $args);
 			break;
 			
-			case 'tax_price' :
-				_deprecated_function($method, '3.0', 'MP_Cart::tax_price');
+			case 'shipping_price' :
+				_deprecated_function($method, '3.0', 'MP_Cart::shipping_total');
 				$mp_cart = mp_cart();
-				return call_user_func_array(array($mp_cart, $method), $args);
+				return call_user_func_array(array($mp_cart, 'shipping_total'), $args);
+			break;
+			
+			case 'tax_price' :
+				_deprecated_function($method, '3.0', 'MP_Cart::tax_total');
+				$mp_cart = mp_cart();
+				return call_user_func_array(array($mp_cart, 'tax_total'), $args);
 			break;
 			
 			default :
