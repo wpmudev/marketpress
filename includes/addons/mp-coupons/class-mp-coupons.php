@@ -77,7 +77,8 @@ class MP_Coupons {
 			
 			add_filter('mp_cart/after_cart_html', array(&$this, 'coupon_form_cart'), 10, 3);
 			add_filter('mp_product/get_price', array(&$this, 'product_price'), 10, 2);
-			add_filter('mp_cart/get_total', array(&$this, 'cart_total'), 10, 2);
+			add_filter('mp_cart/product_total', array(&$this, 'product_total'), 10, 2);
+			add_filter('mp_cart/total', array(&$this, 'cart_total'), 10, 3);
 			add_filter('mp_cart/cart_meta/product_total', array(&$this, 'cart_meta_product_total'), 10, 2);
 			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_css_frontend'));
 			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_js_frontend'), 25);
@@ -258,6 +259,7 @@ class MP_Coupons {
 	 * @since 3.0
 	 * @access public
 	 * @filter mp_cart/cart_meta/product_total
+	 * @return string
 	 */
 	public function cart_meta_product_total( $html, $cart ) {
 		if ( ! $this->has_applied() ) {
@@ -293,19 +295,11 @@ class MP_Coupons {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter mp_cart/get_total
+	 * @filter mp_cart/total
 	 * @return float
 	 */
-	public function cart_total( $total, $cart ) {
-		$items = $cart->get_items_as_objects();
-		
-		$total = 0;
-		foreach ( $items as $item ) {
-			$price = $item->get_price();
-			$total += mp_arr_get_value('coupon', $price, mp_arr_get_value('lowest', $price));
-		}
-		
-		return $total;
+	public function cart_total( $total, $_total, $cart ) {
+		return floatval($total + $this->get_total_discount_amt());
 	}
 	
 	/**
@@ -314,6 +308,7 @@ class MP_Coupons {
 	 * @since 3.0
 	 * @access public
 	 * @filter mp_cart/after_cart_html
+	 * @return string
 	 */
 	public function coupon_form_cart( $html, $cart, $display_args ) {
 		$html .= '
@@ -335,6 +330,7 @@ class MP_Coupons {
 	 * @since 3.0
 	 * @access public
 	 * @action wpmudev_field_get_value_coupon_code
+	 * @return string
 	 */
 	public function get_coupon_code_value( $value, $post_id, $raw, $field ) {
 		$post = get_post($post_id);
@@ -356,7 +352,7 @@ class MP_Coupons {
 			$amt += $coupon->discount_amt(false, false);
 		}
 		
-		return $amt;
+		return (float) $amt;
 	}
 	
 	/**
@@ -761,18 +757,19 @@ class MP_Coupons {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter mp_cart/get_price
+	 * @filter mp_product/get_price
 	 * @return array
 	 */
-	public function product_price( $price, $product ) { return $price;
+	public function product_price( $price, $product ) {
 		$coupons = $this->get_applied_as_objects();
-		$price['coupon'] = $price['lowest'];
 		
 		foreach ( $coupons as $coupon ) {
 			$products = $coupon->get_products(true);
 			if ( in_array($product->ID, $products) ) {
+				$price['before_coupon'] = $price['lowest'];
+					
 				if ( $coupon->get_meta('discount_type') == 'item' ) {
-					$price['lowest'] = $price['sale']['amount'] = $price['coupon'] = $coupon->get_price($price['lowest']);
+					$price['lowest'] = $price['coupon'] = $coupon->get_price($price['lowest']);
 				} else {
 					$price['coupon'] = $coupon->get_price($price['lowest']);
 				}
@@ -782,7 +779,24 @@ class MP_Coupons {
 		return $price;
 	}
 	 
-	
+	/**
+	 * Filter the product total
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_cart/product_total
+	 * @return float
+	 */
+	public function product_total( $total, $items ) {
+		$total = 0;
+		foreach ( $items as $item ) {
+			$price = $item->get_price();
+			$total += (mp_arr_get_value('before_coupon', $price, mp_arr_get_value('lowest', $price, 0)) * $item->qty);
+		}
+		
+		return (float) $total;
+	}
+		
 	/**
 	 * Defines the column headers for the product coupon list table
 	 *
