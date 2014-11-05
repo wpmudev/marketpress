@@ -769,7 +769,7 @@ class MP_Coupons {
 				$price['before_coupon'] = $price['lowest'];
 					
 				if ( $coupon->get_meta('discount_type') == 'item' ) {
-					$price['lowest'] = $price['coupon'] = $coupon->get_price($price['lowest']);
+					$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $coupon->get_price($price['lowest']);
 				} else {
 					$price['coupon'] = $coupon->get_price($price['lowest']);
 				}
