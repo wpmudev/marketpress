@@ -537,7 +537,7 @@ class MP_Cart {
 		$html .= '
 				<div id="mp-cart-meta-wrap" class="clearfix">' .
 					$this->cart_meta(false) . '
-					<a class="mp-button" id="mp-button-checkout" href="' . mp_store_page_url('checkout') . '">' . __('Proceed to Checkout', 'mp') . '</a>
+					<a class="mp-button" id="mp-button-checkout" href="' . mp_store_page_url('checkout', false) . '">' . __('Proceed to Checkout', 'mp') . '</a>
 				</div>
 			</form>';
 		
