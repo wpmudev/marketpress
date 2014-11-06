@@ -739,6 +739,18 @@ if ( ! function_exists('mp_products_filter') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_province_field') ) :
+/*
+ * Display state/province dropdown field
+ *
+ * @param string $country two-digit country code
+ * @param string $selected state code form value to be shown/selected
+ */
+function mp_province_field( $country = 'US', $selected = null ) {
+	_deprecated_function('mp_province_field', '3.0', 'MP_Checkout::province_field');
+}
+endif;
+
 if ( ! function_exists('mp_related_products') ) :
 	/**
 	 * Get related products
