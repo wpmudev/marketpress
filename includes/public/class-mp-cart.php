@@ -674,14 +674,14 @@ class MP_Cart {
 			$echo = false;
 		}
 		
-		if ( (! mp_is_shop_page() || mp_is_shop_page('cart')) && ! mp_doing_ajax() ) {
+		if ( (! mp_is_shop_page() || mp_is_shop_page('cart') || mp_is_shop_page('checkout')) && ! mp_doing_ajax() ) {
 			return;
 		}
 		
 		$items = $this->get_items();
 		$html = '
 		<div id="mp-floating-cart"' . (( $this->has_items() ) ? ' class="has-items"' : '') . '>
-			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . mp_format_currency('', $this->get_total('products')) . '</span> ' . $this->item_count(false) . '</div>
+			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . $this->product_total(true) . '</span> ' . $this->item_count(false) . '</div>
 			<div id="mp-floating-cart-contents">';
 	
 		if ( $this->has_items() ) {
