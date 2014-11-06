@@ -92,6 +92,7 @@ class MP_Public {
 	 * @access public
 	 */
 	public function includes() {
+		require_once mp_plugin_dir('includes/public/class-mp-checkout.php');
 		require_once mp_plugin_dir('includes/public/class-mp-cart.php');
 		require_once mp_plugin_dir('includes/public/class-mp-short-codes.php');
 	}
