@@ -45,6 +45,7 @@ class MP_Short_Codes {
     add_shortcode('mp_product_meta', array(&$this, 'mp_product_meta_sc'));
     add_shortcode('mp_product_sku', array(&$this, 'mp_product_sku_sc'));
     add_shortcode('mp_cart', array(&$this, 'mp_cart_sc'));
+    add_shortcode('mp_checkout', array(&$this, 'mp_checkout_sc'));
 
     //store links
     add_shortcode('mp_cart_link', array(&$this, 'mp_cart_link_sc'));
@@ -52,6 +53,17 @@ class MP_Short_Codes {
     add_shortcode('mp_products_link', array(&$this, 'mp_products_link_sc'));
     add_shortcode('mp_orderstatus_link', array(&$this, 'mp_orderstatus_link_sc'));
     add_shortcode('mp_store_navigation', array(&$this, 'mp_store_navigation_sc'));	
+	}
+	
+	/**
+	 * Display checkout form
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function mp_checkout_sc( $atts, $content = null ) {
+		$atts['echo'] = false;
+		return mp_checkout()->display($atts);
 	}
 	
 	/**
