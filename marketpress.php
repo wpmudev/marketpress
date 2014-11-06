@@ -403,6 +403,8 @@ class Marketpress {
 		add_filter('rewrite_rules_array', array(&$this, 'add_product_variation_rewrites'));
 		// Add custom query vars
 		add_filter('query_vars', array(&$this, 'add_query_vars'));
+		// Filter billing info user meta
+		add_filter('get_user_metadata', array(&$this, 'get_user_billing_info'), 10, 4);
 	}
 	
 	/**
@@ -489,6 +491,32 @@ class Marketpress {
 			flush_rewrite_rules();
 			update_option('mp_flush_rewrites', 1);
 		}
+	}
+	
+	/**
+	 * Get user billing info
+	 *
+	 * Before 3.0 only shipping info was captured. This function will return the
+	 * shipping info if billing info doesn't exist for the given user.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter get_user_metadata
+	 */
+	public function get_user_billing_info( $value, $user_id, $meta_key, $single ) {
+		if ( $meta_key != 'mp_billing_info' ) {
+			return $value;
+		}
+		
+		remove_filter('get_user_metadata', array(&$this, 'get_user_billing_info'));
+		
+		if ( metadata_exists('user', $user_id, 'mp_billing_info') ) {
+			return $value;
+		}
+		
+		add_filter('get_user_metadata', array(&$this, 'get_user_billing_info'), 10, 4);
+		
+		return get_user_meta($user_id, 'mp_shipping_info', false);
 	}
 	
 	/**
