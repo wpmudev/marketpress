@@ -96,6 +96,10 @@ var marketpress = {};
 			"dropdownAutoWidth" : 1,
 			"minimumResultsForSearch" : -1	// hide the search box
 		});
+		
+		$('select.mp_select2_search').not('.select2-offscreen').select2({
+			"dropdownAutoWidth" : 1
+		});
 	};
 	
 	/**
