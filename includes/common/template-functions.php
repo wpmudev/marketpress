@@ -291,6 +291,40 @@ if ( ! function_exists('mp_get_current_user_zipcode') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_user_address_part') ) :
+	/**
+	 * Get user address part
+	 *
+	 * @since 3.0
+	 * @param string $what What to get (e.g. address1, address2, etc)
+	 * @param string $type Either shipping or billing.
+	 * @param WP_User/int $user Optional, an WP_User object or a user ID. Defaults to the current user.
+	 * @return string
+	 */
+	function mp_get_user_address_part( $what, $type, $user = null ) {
+		if ( is_null($user) ) {
+			$user = wp_get_current_user();
+		} elseif ( ! $user instanceof WP_User && false === ($user = get_user_by('id', $user)) ) {
+			return false;
+		}
+		
+		$meta = $user->get("mp_{$type}_info");
+		
+		if ( 'first_name' == $what || 'last_name' == $what ) {
+			$name = mp_get_session_value("mp_shipping_info->name", mp_arr_get_value('name', $meta, ''));
+			$name_parts = explode(' ', $name);
+			
+			if ( 'first_name' == $what ) {
+				return mp_arr_get_value('0', $name_parts, '');
+			} else {
+				return mp_arr_get_value('1', $name_parts, '');
+			}
+		} else {
+			return mp_get_session_value("mp_shipping_info->{$what}", mp_arr_get_value($what, $meta, ''));
+		}
+	}
+endif;
+
 if ( ! function_exists('mp_get_image_size') ) :
 	/**
 	 * Get the image size per presentation settings
