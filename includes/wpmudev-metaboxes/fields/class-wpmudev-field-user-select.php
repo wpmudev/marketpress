@@ -29,6 +29,19 @@ class WPMUDEV_Field_User_Select extends WPMUDEV_Field {
 	}
 
 	/**
+	 * Formats the field value for display.
+	 *
+	 * @since 1.0
+	 * @access public
+	 * @param mixed $value
+	 * @param mixed $post_id
+	 */
+	public function format_value( $value, $post_id ) {
+		$values = explode(',', $value);
+		return parent::format_value($values, $post_id);
+	}
+	
+	/**
 	 * Prints scripts
 	 *
 	 * @since 3.0
