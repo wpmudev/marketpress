@@ -430,6 +430,8 @@ class WPMUDEV_Field {
 	 * @param int $order
 	 */
 	public function set_order( $order ) {
+		$order = (float) $order;
+		
 		if ( false !== strpos($this->_name, $this->args['original_name'] . '[') ) {
 			$this->args['name'] = preg_replace('#' . $this->args['original_name'] . '\[#', "[$order][" . $this->args['original_name'] . ']', $this->_name, 1);
 		} else {

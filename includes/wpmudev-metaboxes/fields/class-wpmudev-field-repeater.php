@@ -91,7 +91,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 	 * @return mixed
 	 */
-	public function get_value( $post_id, $raw = false ) {	
+	public function get_value( $post_id, $raw = false ) {
 		$value = null;
 		
 		/**
@@ -161,7 +161,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 				if ( mp_arr_get_value('existing', $array2) ) {
 					$post_id = key(mp_arr_get_value('existing', $array2));
 					$value = mp_arr_get_value("existing->$post_id", $array2);
-					$sorted['_' . $post_id][$input_name] = $value; 
+					$sorted['_' . ltrim($post_id, '_')][$input_name] = $value; 
 				} elseif ( mp_arr_get_value('new', $array2)) {
 					$value = mp_arr_get_value('new->0', $array2);
 					$sorted[$idx][$input_name] = $value;
@@ -171,7 +171,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 						if ( mp_arr_get_value('existing', $array3) ) {
 							$post_id = key(mp_arr_get_value('existing', $array3));
 							$value = mp_arr_get_value("existing->$post_id", $array3);
-							$sorted['_' . $post_id][$input_name][$input_name2] = $value; 
+							$sorted['_' . ltrim($post_id, '_')][$input_name][$input_name2] = $value; 
 						} elseif ( mp_arr_get_value('new', $array3)) {
 							$value = mp_arr_get_value('new->0', $array3);
 							$sorted[$idx][$input_name][$input_name2] = $value;
