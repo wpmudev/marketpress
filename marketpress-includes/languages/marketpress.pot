@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 2.9.5.6\n"
+"Project-Id-Version: MarketPress 2.9.5.7\n"
 "Report-Msgid-Bugs-To: http://premium.wpmudev.org\n"
-"POT-Creation-Date: 2014-11-01 11:38:37+00:00\n"
+"POT-Creation-Date: 2014-11-07 20:56:47+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
