@@ -4,6 +4,10 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+2.9.5.7
+----------------------------------------------------------------------
+- Fixed: Paymill gateway is using SSL v3 which is suspectible to POODLE vulnerability
+
 2.9.5.6
 ----------------------------------------------------------------------
 - Fixed: products being set to draft status after being ordered
