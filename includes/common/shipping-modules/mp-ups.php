@@ -326,8 +326,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*
 	* return array $shipping_options
 	*/
-	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
-
+	function shipping_options( $items, $address1, $address2, $city, $state, $zip, $country ) {
 		$shipping_options = array();
 
 		$this->address1 = $address1;
@@ -337,16 +336,11 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$this->destination_zip = $zip;
 		$this->country = $country;
 
-		if ( is_array($cart) ) {
-			foreach ($cart as $product_id => $variations) {
-				$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-				$shipping_meta['weight'] = (is_numeric($shipping_meta['weight']) ) ? $shipping_meta['weight'] : 0;
-				
-				foreach ( $variations as $variation => $product ) {
-					$qty = $product['quantity'];
-					$weight = (empty($shipping_meta['weight']) ) ? $this->get_setting('default_weight') : $shipping_meta['weight'];
-					$this->weight += floatval($weight) * $qty;
-				}
+		if ( is_array($items) ) {
+			foreach ( $items as $product_id => $qty ) {
+				$product = new MP_Product($product_id);
+				$weight = $product->get_weight();
+				$this->weight += ($weight * $qty);
 			}
 		}
 
@@ -363,8 +357,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		//ups won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
 
-		$max_weight = floatval($this->get_setting('max_weight'), 75);
-		$max_weight = ($max_weight > 0) ? $max_weight : 75;
+		$max_weight = 75;
 
 		//Properties should already be converted to weight in decimal pounds and Pounds and Ounces
 		//Figure out how many boxes
@@ -376,12 +369,12 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$this->pounds = intval($this->pkg_weight);
 		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
 
-		if($this->settings['base_country'] == 'US') {
+		if ( $this->get_setting('base_country') == 'US' ) {
 			// Can't use zip+4
-			$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
+			$this->base_zip = substr(mp_get_setting('base_zip'), 0, 5);
 		}
 
-		if($this->country == 'US') {
+		if ( $this->country == 'US' ) {
 			// Can't use zip+4
 			$this->destination_zip = substr($this->destination_zip, 0, 5);
 		}
@@ -406,10 +399,14 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$shipping_options = array_filter($this->get_setting('services', array()), create_function('$val', 'return ($val == 1);'));
 
 		//Assume equal size packages. Find the best matching box size
-		$boxes = $this->get_setting('boxes');
+		$boxes = (array) $this->get_setting('boxes');
 		$box = $largest_box = false;
 		$index = 1;
 		$box_count = count($boxes);
+		
+		if ( $box_count == 0 ) {
+			return false;
+		}
 
 		foreach ( $boxes as $thebox ) {
 			// Find largest box
@@ -448,9 +445,9 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$auth_dom->formatOutput = true;
 		$root = $auth_dom->appendChild($auth_dom->createElement('AccessRequest'));
 		$root->setAttribute('xml:lang', 'en-US');
-		$root->appendChild($auth_dom->createElement('AccessLicenseNumber',$this->ups_settings['api_key']));
-		$root->appendChild($auth_dom->createElement('UserId',$this->ups_settings['user_id']));
-		$root->appendChild($auth_dom->createElement('Password',$this->ups_settings['password']));
+		$root->appendChild($auth_dom->createElement('AccessLicenseNumber', $this->get_setting('api_key')));
+		$root->appendChild($auth_dom->createElement('UserId', $this->get_setting('user_id')));
+		$root->appendChild($auth_dom->createElement('Password', $this->get_setting('password')));
 
 		//Rate request XML
 		$dom = new DOMDocument('1.0', 'utf-8');
@@ -468,17 +465,17 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		$request->appendChild($dom->createElement('RequestOption', 'Shop'));
 
 		$pickup = $root->appendChild($dom->createElement('PickupType'));
-		$pickup->appendChild($dom->createElement('Code', $this->ups_settings['pickup_type']));
+		$pickup->appendChild($dom->createElement('Code', $this->get_setting('pickup_type')));
 
 		//Shipper
 		$shipment = $root->appendChild($dom->createElement('Shipment'));
 		$shipment->appendChild($dom->createElement('NegotiatedRatesIndicator'));
 		$shipper = $shipment->appendChild($dom->createElement('Shipper'));
-		$shipper->appendChild($dom->createElement('ShipperNumber', htmlentities($this->ups_settings['shipper_number'])));
+		$shipper->appendChild($dom->createElement('ShipperNumber', htmlentities($this->get_setting('shipper_number'))));
 		$address = $shipper->appendChild($dom->createElement('Address'));
-		$address->appendChild($dom->createElement('StateProvinceCode', $this->settings['base_province']));
-		$address->appendChild($dom->createElement('PostalCode', $this->settings['base_zip']));
-		$address->appendChild($dom->createElement('CountryCode', $this->settings['base_country']));
+		$address->appendChild($dom->createElement('StateProvinceCode', $this->get_setting('base_province')));
+		$address->appendChild($dom->createElement('PostalCode', $this->get_setting('base_zip')));
+		$address->appendChild($dom->createElement('CountryCode', $this->get_setting('base_country')));
 		//Ship to
 		$shipto = $shipment->appendChild($dom->createElement('ShipTo'));
 		$address = $shipto->appendChild($dom->createElement('Address'));
@@ -491,9 +488,9 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		//Ship from
 		$shipfrom = $shipment->appendChild($dom->createElement('ShipFrom'));
 		$address = $shipfrom->appendChild($dom->createElement('Address'));
-		$address->appendChild($dom->createElement('StateProvinceCode', $this->settings['base_province']));
-		$address->appendChild($dom->createElement('PostalCode', $this->settings['base_zip']));
-		$address->appendChild($dom->createElement('CountryCode', $this->settings['base_country']));
+		$address->appendChild($dom->createElement('StateProvinceCode', mp_get_setting('base_province')));
+		$address->appendChild($dom->createElement('PostalCode', mp_get_setting('base_zip')));
+		$address->appendChild($dom->createElement('CountryCode', mp_get_setting('base_country')));
 		//Package
 		$package = $shipment->appendChild($dom->createElement('Package'));
 
@@ -592,7 +589,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc(mp()->get_cart_cookie());
+		$_SESSION['mp_cart_crc'] = $this->crc(mp_cart()->get_items());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
 		
 		unset($xpath);
@@ -670,8 +667,8 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*
 	* @return float, Converted to the current units_used
 	*/
-	private function as_inches($units){
-		$units = ($this->settings['shipping']['system'] == 'metric') ? floatval($units) / 2.54 : floatval($units);
+	private function as_inches( $units ){
+		$units = ( mp_get_setting('shipping->system') == 'metric' ) ? floatval($units) / 2.54 : floatval($units);
 		return round($units,2);
 	}
 
@@ -681,8 +678,8 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	*
 	* @return float, Converted to pounds
 	*/
-	private function as_pounds($units){
-		$units = ($this->settings['shipping']['system'] == 'metric') ? floatval($units) * 2.2 : floatval($units);
+	private function as_pounds( $units ){
+		$units = ( mp_get_setting('shipping->system') == 'metric' ) ? floatval($units) * 2.2 : floatval($units);
 		return round($units, 2);
 	}
 
@@ -692,7 +689,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* @return string
 	*/
 	private function get_units_weight(){
-		return ($this->settings['shipping']['system'] == 'english') ? __('Pounds','mp') : __('Kilograms', 'mp');
+		return ( mp_get_setting('shipping->system') == 'english' ) ? __('Pounds','mp') : __('Kilograms', 'mp');
 	}
 
 	/**
@@ -701,7 +698,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* @return string
 	*/
 	private function get_units_length(){
-		return ($this->settings['shipping']['system'] == 'english') ? __('Inches','mp') : __('Centimeters', 'mp');
+		return ( mp_get_setting('shipping->system') ) ? __('Inches','mp') : __('Centimeters', 'mp');
 	}
 
 } //End MP_Shipping_UPS

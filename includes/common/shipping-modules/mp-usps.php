@@ -6,6 +6,9 @@ Author: Arnold Bailey (Incsub)
 class MP_Shipping_USPS extends MP_Shipping_API {
 	//build of the plugin
 	public $build = 2;
+	
+	//base zip
+	public $base_zip = null;
 
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
 	public $plugin_name = 'usps';
@@ -48,9 +51,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 	public $domestic_handling = 0;
 	public $intl_handling = 0;
-
-	private $settings = '';
-	private $usps_settings;
 
 	private $pkg_count = 0;
 	private $pkg_weight = 0;
@@ -134,8 +134,9 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		'First Class International Parcel' =>
 		new USPS_Service( 15, __('First Class International Parcel', 'mp') ),
-
 		);
+		
+		$this->base_zip = mp_get_setting('base_zip');
 	}
 
 	function default_boxes() {
@@ -283,7 +284,52 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			'name' => $this->get_field_name('services'),
 			'label' => array('text' => __('Offered Domestic Services', 'mp')),
 			'options' => $services,
+			'width' => '50%',
 		));
+		
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('domestic_handling'),
+			'label' => array('text' => __('Handling Charge per Domestic Shipment', 'mp')),
+		));
+
+		$services = array();
+		foreach ( $this->intl_services as $service => $detail ) {
+			$services[$service] = $detail->name . ' ' . $detail->delivery;
+		}
+		$metabox->add_field('checkbox_group', array(
+			'name' => $this->get_field_name('intl_services'),
+			'label' => array('text' => __('Offered International Services', 'mp')),
+			'options' => $services,
+			'width' => '50%',
+		));
+		
+		$metabox->add_field('text', array(
+			'name' => $this->get_field_name('intl_handling'),
+			'label' => array('text' => __('Handling Charge per International Shipment', 'mp')),
+		));
+
+		$boxes = $metabox->add_field('repeater', array(
+			'name' => $this->get_field_name('boxes'),
+			'label' => array('text' => __('Standard Boxes and Weight Limits', 'mp')),
+			'default_value' => $this->default_boxes(),
+			'desc' => __('Enter your standard box sizes as LengthxWidthxHeight (e.g. 12x8x6) For each box defined enter the maximum weight it can contain. <strong>Note: the shipping prices this plugin calculates are estimates. If they are consistently too low or too high, please check that the list of boxes above and the product weights are accurate and complete.</strong>', 'mp'),
+			'add_row_label' => __('Add Box', 'mp'),
+		));
+		
+		if ( $boxes instanceof WPMUDEV_Field ) {
+			$boxes->add_sub_field('text', array(
+				'name' => 'name',
+				'label' => array('text' => __('Name', 'mp')),
+			));
+			$boxes->add_sub_field('text', array(
+				'name' => 'size',
+				'label' => array('text' => __('Size', 'mp')),
+			));
+			$boxes->add_sub_field('text', array(
+				'name' => 'weight',
+				'label' => array('text' => __('Max Weight', 'mp')),
+			));
+		}
 	}
 	
 	/**
@@ -303,12 +349,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 							<td>
 								<?php foreach($this->services as $service => $detail): ?>
 								<label>
-									<input type="checkbox" name="mp[shipping][usps][services][<?php echo $service; ?>]" value="1" <?php checked( $this->usps_settings['services'][$service] ); ?> />&nbsp;<?php echo $detail->name . $detail->delivery; ?>
+									<input type="checkbox" name="mp[shipping][usps][services][<?php echo $service; ?>]" value="1" <?php checked( $this->get_setting("services->$service") ); ?> />&nbsp;<?php echo $detail->name . $detail->delivery; ?>
 								</label>
 
 								<?php
-								if(isset($detail->max_weight) ):
-								$max_weight = empty($this->usps_settings['flat_weights'][$service]) ? $detail->max_weight : $this->usps_settings['flat_weights'][$service];
+								if ( isset($detail->max_weight) ):
+									$max_weight = $this->get_setting("flat_weights->$service", $detail->max_weight);
 								?>
 								<?php _e('@ Max', 'mp'); ?> <input type="text" size="1" name="mp[shipping][usps][flat_weights][<?php echo $service; ?>]" value="<?php esc_attr_e( $max_weight); ?>" />
 								<?php echo $this->get_units_weight(); ?>
@@ -322,7 +368,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 						<tr>
 							<th scope="row"><?php _e('Handling Charge per Domestic Shipment ', 'mp') ?></th>
 							<td>
-								<input type="text" name="mp[shipping][usps][domestic_handling]" value="<?php echo (empty($this->usps_settings['domestic_handling']) ) ? '0.00' : esc_attr($this->usps_settings['domestic_handling']); ?>" size="20" maxlength="20" />
+								<input type="text" name="mp[shipping][usps][domestic_handling]" value="<?php echo esc_attr($this->get_setting('domestic_handling', '0.00')); ?>" size="20" maxlength="20" />
 							</td>
 						</tr>
 
@@ -331,12 +377,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 							<td>
 								<?php foreach($this->intl_services as $service => $detail): ?>
 								<label>
-									<input type="checkbox" name="mp[shipping][usps][intl_services][<?php echo $service; ?>]" value="1" <?php checked($this->usps_settings['intl_services'][$service]); ?> />&nbsp;<?php echo $detail->name; ?>
+									<input type="checkbox" name="mp[shipping][usps][intl_services][<?php echo $service; ?>]" value="1" <?php checked($this->get_setting("intl_services->$service")); ?> />&nbsp;<?php echo $detail->name; ?>
 								</label>
 
 								<?php
 								if(isset($detail->max_weight) ):
-								$max_weight = empty($this->usps_settings['flat_weights'][$service]) ? $detail->max_weight : $this->usps_settings['flat_weights'][$service];
+								$max_weight = $this->get_setting("flat_weights->$service", $detail->max_weight);
 								?>
 								<?php _e('@ Max', 'mp'); ?> <input type="text" size="1" name="mp[shipping][usps][flat_weights][<?php echo $service; ?>]" value="<?php esc_attr_e($max_weight); ?>" />
 								<?php echo $this->get_units_weight(); ?>
@@ -350,7 +396,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 						<tr>
 							<th scope="row"><?php _e('Handling Charge per Interntional Shipment', 'mp') ?></th>
 							<td>
-								<input type="text" name="mp[shipping][usps][intl_handling]" value="<?php echo (empty($this->usps_settings['intl_handling']) ) ? '0.00' : esc_attr($this->usps_settings['intl_handling']); ?>" size="20" maxlength="20" />
+								<input type="text" name="mp[shipping][usps][intl_handling]" value="<?php echo esc_attr($this->get_setting('intl_handling', '0.00')); ?>" size="20" maxlength="20" />
 							</td>
 						</tr>
 
@@ -381,8 +427,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 									<tbody>
 										<?php
 										$this->default_boxes();
-										if ($this->usps_settings['boxes']) {
-											foreach ( $this->usps_settings['boxes']['name'] as $key => $value){
+										if ($this->get_setting('boxes')) {
+											foreach ( $this->get_setting('boxes->name') as $key => $value){
 												$this->box_row_html($key);
 											}
 										}
@@ -459,9 +505,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* return float $price
 	*/
 	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
-		global $mp;
-
-
 		if(! $this->crc_ok())
 		{
 			//Price added to this object
@@ -486,9 +529,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	*
 	* return array $shipping_options
 	*/
-	function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
-		global $mp;
-
+	function shipping_options( $items, $address1, $address2, $city, $state, $zip, $country ) {
 		//Check the shipping options to see if we already have a valid shipping price
 		//
 		/*
@@ -522,14 +563,12 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$this->country = $country;
 		$this->destination_zip = $zip;
 
-		if( is_array($cart) ) {
-			foreach ($cart as $product_id => $variations) {
-				$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-				foreach($variations as $variation => $product) {
-					$this->pkg_max = max($this->pkg_max, floatval($shipping_meta['weight']));
-					$qty = $product['quantity'];
-					$this->weight += floatval($shipping_meta['weight']) * $qty;
-				}
+		if( is_array($items) ) {
+			foreach ( $items as $product_id => $qty ) {
+				$product = new MP_Product($product_id);
+				$weight = $product->get_weight();
+				$this->pkg_max = max($this->pkg_max, $weight);
+				$this->weight += ($weight * $qty);
 			}
 		}
 
@@ -547,9 +586,9 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//USPS won't accept a zero weight Package
 		$this->weight = max($this->weight, 0.1);
 
-		if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+		if ( in_array(mp_get_setting('base_country'), array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI')) ){
 			// Can't use zip+4
-			$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
+			$this->base_zip = substr($this->base_zip, 0, 5);
 		}
 
 		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
@@ -571,17 +610,16 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	}
 
 	function calculate_packages(){
-
-		$this->usps_settings['max_weight'] = ( empty($this->usps_settings['max_weight'])) ? 50 : $this->usps_settings['max_weight'];
-
 		//Assume equal size packages. Find the best matching box size
-		$diff = floatval($this->usps_settings['max_weight']);
+		$max_weight = (float) $this->get_setting('max_weight', 50);
 		$found = -1;
 		$largest = -1.0;
-
+		
 		//See if it fits in one box
-		foreach($this->usps_settings['boxes']['weight'] as $key => $weight) {
-			//			//Find largest
+		foreach( $this->get_setting('boxes', array()) as $key => $box ) {
+			$weight = $box['weight'];
+			
+			//Find largest
 			if( $weight > $largest) {
 				$largest = $weight;
 				$found = $key;
@@ -592,8 +630,8 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 				break;
 			}
 		}
-
-		$allowed_weight = min($this->usps_settings['boxes']['weight'][$found], $this->usps_settings['max_weight']);
+		
+		$allowed_weight = min($this->get_setting("boxes->{$found}->weight", 0), $max_weight);
 
 		if($allowed_weight >= $this->weight || $allowed_weight <= 0){
 			$this->pkg_count = 1;
@@ -604,7 +642,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		}
 
 		//found our box
-		$this->pkg_dims = explode('x', strtolower($this->usps_settings['boxes']['size'][$found]));
+		$this->pkg_dims = explode('x', strtolower($this->get_setting("boxes->{$found}->size")));
 		foreach($this->pkg_dims as &$dim) $dim = $this->as_inches($dim);
 		sort($this->pkg_dims); //Sort so two lowest values are used for Girth
 
@@ -628,10 +666,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* return array $shipping_options
 	*/
 	function ratev4_request(){
-		global $mp;
-		
-		$settings = get_option('mp_settings');
-		$shipping_options = isset($settings['shipping']['usps']['services']) ? (array) $settings['shipping']['usps']['services'] : array();
+		$shipping_options = $this->get_setting('services', array());
 		$temp = array();
 		
 		//determine which options are enabled
@@ -652,17 +687,17 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$dom = new DOMDocument('1.0', 'utf-8');
 		$dom->formatOutput = true;
 		$root = $dom->appendChild($dom->createElement('RateV4Request'));
-		$root->setAttribute('USERID', $this->usps_settings['api_username']);
+		$root->setAttribute('USERID', $this->get_setting('api_username'));
 		$root->appendChild($dom->createElement('Revision','2'));
 
 
 		//foreach( $shipping_options as $service => $name)
 
-		$service = ($this->usps_shipping['online'] == 'online') ? 'ONLINE' : 'ALL';
+		$service = ($this->get_setting('online') == 'online') ? 'ONLINE' : 'ALL';
 		$package = $root->appendChild($dom->createElement('Package'));
 		$package->setAttribute('ID', $service);
 		$package->appendChild($dom->createElement('Service', $service));
-		$package->appendChild($dom->createElement('ZipOrigination', $this->settings['base_zip']));
+		$package->appendChild($dom->createElement('ZipOrigination', $this->base_zip));
 		$package->appendChild($dom->createElement('ZipDestination', $this->destination_zip));
 		$package->appendChild($dom->createElement('Pounds', $this->pounds));
 		$package->appendChild($dom->createElement('Ounces', $this->ounces));
@@ -731,7 +766,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 			//Check for flat rate boxes
 			if( isset( $this->services[$service]->max_weight ) ){ //Is it flat rate
-				$max_weight = $this->as_pounds($this->usps_settings['flat_weights'][$service]);
+				$max_weight = $this->as_pounds($this->get_setting("flat_weights->$service"));
 				if( $this->pkg_max <= $max_weight ){
 					$box_count = ceil($this->weight / $max_weight);
 				}
@@ -760,7 +795,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 			else
 			{
-				$handling = floatval($this->usps_settings['domestic_handling']) * $box_count; // Add handling times number of packages.
+				$handling = floatval($this->get_setting('domestic_handling')) * $box_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
@@ -782,7 +817,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
+		$_SESSION['mp_cart_crc'] = $this->crc(mp_cart()->get_items());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
 
 		unset($xpath);
@@ -803,8 +838,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	function ratev2_request(){
 		global $mp;
 
-		$settings = get_option('mp_settings');
-		$shipping_options = isset($settings['shipping']['usps']['intl_services']) ? (array) $settings['shipping']['usps']['intl_services'] : array();
+		$shipping_options = $this->get_setting('intl_services', array());
 		$temp = array();
 		
 		//determine which options are enabled
@@ -824,7 +858,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//Build XML. **Despite being XML the order of elements is important in a RateV2 request**
 		$dom = new DOMDocument('1.0', 'utf-8');
 		$root = $dom->appendChild($dom->createElement('IntlRateV2Request'));
-		$root->setAttribute('USERID', $this->usps_settings['api_username']);
+		$root->setAttribute('USERID', $this->get_setting('api_username'));
 		$root->appendChild($dom->createElement('Revision','2'));
 
 
@@ -845,7 +879,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//$package->appendChild($gxg);
 
 		$package->appendChild($dom->createElement('ValueOfContents', $total));  //For insurance?
-		$package->appendChild($dom->createElement('Country', $mp->countries[$this->country]));
+		$package->appendChild($dom->createElement('Country', mp()->countries[$this->country]));
 
 		// If greater than 12" it's a LARGE parcel otherwise REGULAR
 		$this->size = ($this->pkg_dims[2] > 12) ? 'LARGE' : 'REGULAR';
@@ -863,7 +897,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			$package->appendChild($dom->createElement('Girth', 2 * ($this->pkg_dims[0] + $this->pkg_dims[1])));
 
 		}
-		$package->appendChild($dom->createElement('OriginZip', $this->settings['base_zip']));
+		$package->appendChild($dom->createElement('OriginZip', $this->base_zip));
 		$package->appendChild($dom->createElement('CommercialFlag', 'N'));
 
 
@@ -910,7 +944,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 			//Check for flat rate boxes
 			if( isset( $this->intl_services[$service]->max_weight ) ){ //Is it flat rate
-				$max_weight = $this->as_pounds($this->usps_settings['flat_weights'][$service]);
+				$max_weight = $this->as_pounds($this->get_setting("flat_weights->$service"));
 				if( $this->pkg_max <= $max_weight ){
 					$box_count = ceil($this->weight / $max_weight);
 				}
@@ -928,7 +962,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			}
 			else
 			{
-				$handling = floatval($this->usps_settings['intl_handling']) * $box_count; // Add handling times number of packages.
+				$handling = floatval($this->get_setting('intl_handling')) * $box_count; // Add handling times number of packages.
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
@@ -949,7 +983,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc($mp->get_cart_cookie());
+		$_SESSION['mp_cart_crc'] = $this->crc(mp_cart()->get_items());
 		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
 
 		unset($xpath);
@@ -965,8 +999,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* @return boolean true | false
 	*/
 	private function crc_ok(){
-		global $mp;
-
 		//Assume it changed
 		$result = false;
 
@@ -976,7 +1008,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 			//Did the cart change since last calculation
 			if ( is_numeric($_SESSION['mp_shipping_info']['shipping_cost'])){
 
-				if($_SESSION['mp_cart_crc'] == $this->crc($mp->get_cart_cookie())){
+				if($_SESSION['mp_cart_crc'] == $this->crc(mp_cart()->get_items())){
 					//Did the shipping info change
 					if($_SESSION['mp_shipping_crc'] == $this->crc($_SESSION['mp_shipping_info'])){
 						$result = true;
@@ -1007,7 +1039,6 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	*
 	*/
 	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
-		global $mp;
 		if ( isset($this->services[$shipping_option])){
 			$option = $this->services[$shipping_option]->name;
 		}
@@ -1019,11 +1050,11 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		$handling = is_numeric($handling) ? $handling : 0;
 		$total = $price + $handling;
 		
-		if ( $mp->get_setting('tax->tax_inclusive') && $mp->get_setting('tax->tax_shipping') ) {
-			$total = $mp->shipping_tax_price($total);
+		if ( mp_get_setting('tax->tax_inclusive') && mp_get_setting('tax->tax_shipping') ) {
+			$total = $this->shipping_tax_price($total);
 		}
 
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, $mp->format_currency('', $total));
+		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, mp_format_currency('', $total));
 		return $option;
 	}
 
@@ -1034,7 +1065,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* @return float, Converted to the current units_used
 	*/
 	private function as_inches($units){
-		$units = ($this->settings['shipping']['system'] == 'metric') ? floatval($units) / 2.54 : floatval($units);
+		$units = ( mp_get_setting('shipping->system') == 'metric' ) ? floatval($units) / 2.54 : floatval($units);
 		return round($units,2);
 	}
 
@@ -1045,7 +1076,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* @return float, Converted to pounds
 	*/
 	private function as_pounds($units){
-		$units = ($this->settings['shipping']['system'] == 'metric') ? floatval($units) * 2.2 : floatval($units);
+		$units = ( mp_get_setting('shipping->system') == 'metric')  ? floatval($units) * 2.2 : floatval($units);
 		return round($units, 2);
 	}
 
@@ -1055,7 +1086,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* @return string
 	*/
 	private function get_units_weight(){
-		return ($this->settings['shipping']['system'] == 'english') ? __('Pounds','mp') : __('Kilograms', 'mp');
+		return ( mp_get_setting('shipping->system') == 'english' ) ? __('Pounds','mp') : __('Kilograms', 'mp');
 	}
 
 	/**
@@ -1064,7 +1095,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 	* @return string
 	*/
 	private function get_units_length(){
-		return ($this->settings['shipping']['system'] == 'english') ? __('Inches','mp') : __('Centimeters', 'mp');
+		return ( mp_get_setting('shipping->system') == 'english' ) ? __('Inches','mp') : __('Centimeters', 'mp');
 	}
 
 } //End MP_Shipping_USPS
