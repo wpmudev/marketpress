@@ -220,6 +220,19 @@
 		background: #448cf8;
 		color: #fff;
 	}
+	
+	.mp-shipping-option-label {
+		input:checked {
+			+ span:after {
+				background: #448cf8;
+			}
+		}
+		
+		> span,
+		> span:after {
+			border-color: #448cf8;
+		}
+	}
 }
 
 #mp-cart-form {

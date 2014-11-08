@@ -48,6 +48,23 @@
 			.boxSizing(border-box);
 			width: 100%;
 		}
+		
+		input[type="checkbox"],
+		input[type="radio"] {
+			display: inline-block;
+			margin-right: 5px;
+			vertical-align: top;
+			
+			+ span {
+				display: inline-block;
+				line-height: 1;
+				vertical-align: top;
+			}
+		}
+	}
+	
+	.mp-checkbox-row {
+		padding-top: 10px;
 	}
 	
 	.mp-checkout-column {
@@ -88,6 +105,57 @@
 		margin-right: 20px;
 		text-align: center;
 		width: 40px;
+	}
+	
+	.mp-shipping-option-label {
+		position: relative;
+		cursor: pointer;
+		display: block;
+		line-height: 20px;
+		margin-bottom: 15px;
+		
+		input {
+			position: absolute;
+			opacity: 0;
+				
+			&:checked {
+				+ span:after {
+					position: absolute;
+						top: 0;
+						left: 0;
+					background: #eaeaea;
+					border-color: #fff;
+					content: "";
+					height: 12px;
+					margin: 0;
+					width: 12px;
+				}
+			}
+		}
+		
+		> span,
+		> span:after {
+			position: relative;
+			border: 2px solid #eaeaea;
+			border-radius: 20px;
+			display: inline-block;
+			height: 20px;
+			overflow: hidden;
+			margin-right: 10px;
+			vertical-align: top;
+			width: 20px;
+		}
+		
+		&:hover {
+			input:checked {
+				+ span:after {
+					background: #000;
+				}
+			}
+			> span {
+				border-color: #000;
+			}
+		}
 	}
 }
 
