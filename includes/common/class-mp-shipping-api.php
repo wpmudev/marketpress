@@ -440,8 +440,30 @@ if (!class_exists('MP_Shipping_API')) {
  * Shipping handler class
  */
 class MP_Shipping_Handler {
+	/**
+	 * Refers to a single instance of the class
+	 *
+	 * @since 3.0
+	 * @access private
+	 * @var object
+	 */
+	private static $_instance = null;
+	
+	/**
+	 * Gets the single instance of the class
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return object
+	 */
+	public static function get_instance() {
+		if ( is_null(self::$_instance) ) {
+			self::$_instance = new MP_Shipping_Handler();
+		}
+		return self::$_instance;
+	}
 
-	function __construct() {
+	private function __construct() {
 		add_filter( 'mp_checkout_shipping_field', array(&$this, 'extra_shipping_box'), 99 ); //run last
 		add_filter( 'mp_checkout_shipping_field_readonly', array(&$this, 'extra_shipping_box_label'), 99 ); //run last
 		add_action( 'mp_shipping_process', array(&$this, 'process_shipping_form') );
@@ -574,4 +596,5 @@ class MP_Shipping_Handler {
 		return $shipping_meta;
 	}
 }
-$mpsh = new MP_Shipping_Handler();
+
+$GLOBALS['mpsh'] = MP_Shipping_Handler::get_instance();
