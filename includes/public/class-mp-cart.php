@@ -452,12 +452,14 @@ class MP_Cart {
 	 * 		Optional, an array of arguments.
 	 *
 	 *		@type bool $echo Optional, whether to echo or return. Defaults to false.
+	 *		@type string $view Optional, the cart view.
 	 * }
 	 */
 	public function display( $args = array() ) {
 		$html = '';
 		$args = array_replace_recursive(array(
 			'echo' => false,
+			'view' => null,
 		), $args);
 		
 		extract($args);
@@ -897,12 +899,12 @@ class MP_Cart {
 	
 			//get address
 			$meta = $user->get('mp_shipping_info');
-			$address1 = mp_get_session_value('mp_shipping_info->address1', mp_arr_get_value('address1', $meta));
-			$address2 = mp_get_session_value('mp_shipping_info->address2', mp_arr_get_value('address2', $meta));
-			$city = mp_get_session_value('mp_shipping_info->city', mp_arr_get_value('city', $meta));
-			$state = mp_get_session_value('mp_shipping_info->state', mp_arr_get_value('state', $meta));
-			$zip = mp_get_session_value('mp_shipping_info->zip', mp_arr_get_value('zip', $meta));
-			$country = mp_get_session_value('mp_shipping_info->country', mp_arr_get_value('country', $meta));
+			$address1 = mp_get_user_address_part('address1', 'shipping');
+			$address2 = mp_get_user_address_part('address2', 'shipping');
+			$city = mp_get_user_address_part('city', 'shipping');
+			$state = mp_get_user_address_part('state', 'shipping');
+			$zip = mp_get_user_address_part('zip', 'shipping');
+			$country = mp_get_user_address_part('country', 'shipping');
 			$selected_sub_option = mp_get_session_value('mp_shipping_info->shipping_sub_option', null);
 			$selected_option = mp_arr_get_value(mp_get_session_value('mp_shipping_info->shipping_option'), $shipping_plugins);
 			
@@ -914,7 +916,7 @@ class MP_Cart {
 			//don't charge shipping if only digital products
 			if ( $this->is_download_only() ) {
 				$price = 0;
-		 	} else if ( mp_get_setting('shipping->method') == 'calculated' && $shipping_option ) {
+		 	} else if ( mp_get_setting('shipping->method') == 'calculated' && $selected_option ) {
 				//shipping plugins tie into this to calculate their shipping cost
 				$price = apply_filters('mp_calculate_shipping_' . $selected_option, 0, $total, $products, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 			} else {
