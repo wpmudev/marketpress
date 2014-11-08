@@ -474,6 +474,30 @@ class MP_Product {
 		return ( is_null($index) ) ? $variations : mp_arr_get_value($index, $variations);
 	}
 	
+	/**
+	 * Get product weight
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param float $default The default weight if a weight isn't set for the product.
+	 * @return float
+	 */
+	public function get_weight() {
+		$lbs = (float) $this->get_meta('weight_pounds', 0);
+		$oz = (float) $this->get_meta('weight_ounces', 0);
+		$weight = 0;
+		
+		if ( $lbs || $oz ) {
+			$weight = $lbs;
+			
+			if ( $oz > 0 ) {
+				$weight += ($oz / 16);
+			}
+		}
+				
+		return $weight;
+	}
+	
 	/*
 	 * Displays the buy or add to cart button
 	 *
