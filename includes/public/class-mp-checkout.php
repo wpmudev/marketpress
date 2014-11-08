@@ -371,6 +371,26 @@ class MP_Checkout {
 		 */
 		return apply_filters('mp_checkout/section_login', $html);
 	}
+
+	/**
+	 * Display the order review section
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function section_order_review() {
+		$html = '' .
+			$this->section_heading(__('Review', 'mp'), true);
+		
+		/**
+		 * Filter the section payment html
+		 *
+		 * @since 3.0
+		 * @param string The current html.
+		 */
+		return apply_filters('mp_checkout/order_review', $html);
+	}
 	
 	/**
 	 * Display the payment section
