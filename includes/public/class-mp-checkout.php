@@ -40,6 +40,7 @@ class MP_Checkout {
 	 * @access private
 	 */
 	private function __construct() {
+		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
 	}
 	
 	/**
@@ -51,64 +52,61 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function address_fields( $type ) {
+		$user = wp_get_current_user();
+		$meta = $user->get("mp_{$type}_info");
+		$country = mp_get_user_address_part('country', $type);
+		
 		$html = '
 			<div class="mp-checkout-form-row">
 				<label>' . __('Country', 'mp') . '</label>' .
-				$this->country_dropdown($type) . '
+				$this->country_dropdown($type, $country) . '
 			</div>
 			<div class="mp-checkout-form-row">
 				<label>' . __('Name', 'mp') . '</label>
 				<div class="mp-checkout-input-complex clearfix">
 					<label class="mp-checkout-column">
-						<input type="text" name="' . $this->field_name('first_name', $type) . '" /><br />
+						<input type="text" name="' . $this->field_name('first_name', $type) . '" value="' . mp_get_user_address_part('first_name', $type) . '" /><br />
 						<span>' . __('First', 'mp') . '</span>
 					</label>
 					<label class="mp-checkout-column">
-						<input type="text" name="' . $this->field_name('last_name', $type) . '" /><br />
+						<input type="text" name="' . $this->field_name('last_name', $type) . '" value="' . mp_get_user_address_part('last_name', $type) . '" /><br />
 						<span>' . __('Last', 'mp') . '</span>
 					</label>
 				</div>
 			</div>
 			<div class="mp-checkout-form-row">
 				<label>' . __('Company', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('company', $type) . '" />
+				<input type="text" name="' . $this->field_name('company', $type) . '" value="' . mp_get_user_address_part('company', $type) . '" />
 			</div>
 			<div class="mp-checkout-form-row">
 				<label>' . __('Address Line 1', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('address1', $type) . '" placeholder="' . __('Street address, P.O. box, company name, c/o', 'mp') . '" />
+				<input type="text" name="' . $this->field_name('address1', $type) . '" placeholder="' . __('Street address, P.O. box, company name, c/o', 'mp') . '" value="' . mp_get_user_address_part('address1', $type) . '" />
 			</div>
 			<div class="mp-checkout-form-row">
 				<label>' . __('Address Line 2', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('address2', $type) . '" placeholder="' . __('Apartment, suite, unit, building, floor, etc', 'mp') . '" />
+				<input type="text" name="' . $this->field_name('address2', $type) . '" placeholder="' . __('Apartment, suite, unit, building, floor, etc', 'mp') . '" value="' . mp_get_user_address_part('address2', $type) . '" />
 			</div>
 			<div class="mp-checkout-form-row">
 				<label>' . __('Town/City', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('city', $type) . '" />
+				<input type="text" name="' . $this->field_name('city', $type) . '" value="' . mp_get_user_address_part('city', $type) . '" />
 			</div>
 			<div class="mp-checkout-form-row">
 				<div class="mp-checkout-input-complex clearfix">
 					<div class="mp-checkout-column">
 						 <label>' . __('State/Province', 'mp') . '</label>' .
-						$this->province_field('US', 'billing') . '
+						$this->province_field($country, $type, mp_get_user_address_part('state', $type)) . '
 					</div>
 					<div class="mp-checkout-column">
 						 <label>' . __('Post/Zip Code', 'mp') . '</label>
-						 <input type="text" name="' . $this->field_name('zip', $type) . '" />
+						 <input type="text" name="' . $this->field_name('zip', $type) . '" value="' . mp_get_user_address_part('zip', $type) . '" />
 					</div>
 				</div>
 			</div>
 			<div class="mp-checkout-form-row">
 				<label>' . __('Phone', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('phone', $type) . '" />
+				<input type="text" name="' . $this->field_name('phone', $type) . '" value="' . mp_get_user_address_part('phone', $type) . '" />
 			</div>';
 			
-		if ( 'billing' == $type ) {
-			$html .= '
-			<div class="mp-checkout-form-row">
-				<label><input type="checkbox" name="copy_to_shipping" value="1" /> ' . __('Shipping address different than billing?', 'mp') . '</label>
-			</div>'; 
-		}
-		
 		/**
 		 * Filter address field html
 		 *
@@ -131,8 +129,10 @@ class MP_Checkout {
 	public function country_dropdown( $type, $selected = null ) {
 		$html = '
 			<select class="mp_select2_search" name="' . $this->field_name('country', $type) . '">';
-			
-		foreach ( mp_get_setting('shipping->allowed_countries', array()) as $code ) {
+		
+		$countries = explode(',', mp_get_setting('shipping->allowed_countries', ''));
+		
+		foreach ( $countries as $code ) {
 			$html .= '
 				<option value="' . $code . '"' . selected($selected, $code, false) . '>' . esc_attr(mp()->countries[$code]) . '</option>';
 		}
@@ -166,13 +166,13 @@ class MP_Checkout {
 		$sections = apply_filters('mp_checkout/sections_array', array(
 			'login-register',
 			'billing-shipping-address',
-			'shipping-method',
-			'payment-method',
+			'shipping',
+			'payment',
 			'order-review',
 		));
 		
 		$html = '
-			<div id="mp-checkout" class="clearfix">';
+			<form id="mp-checkout" class="clearfix" method="post">';
 		
 		foreach ( $sections as $section ) {
 			$method = 'section_' . str_replace('-', '_', $section);
@@ -184,12 +184,24 @@ class MP_Checkout {
 		}
 		
 		$html .= '
-			</div>';
+			</form>';
 		
 		if ( $echo ) {
 			echo $html;
 		} else {
 			return $html;
+		}
+	}
+	
+	/**
+	 * Enqueue scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function enqueue_scripts() {
+		if ( mp_is_shop_page('checkout') ) {
+			wp_enqueue_script('mp-checkout', mp_plugin_url('ui/js/mp-checkout.js'), array('jquery'), MP_VERSION, true);
 		}
 	}
 	
@@ -238,8 +250,17 @@ class MP_Checkout {
 			break;
 		}	
 
+		/**
+		 * Filter the state/province list
+		 *
+		 * @since 3.0
+		 * @param array $list The current state/province list.
+		 * @param string $country The current country.
+		 */
+		$list = apply_filters('mp_checkout/province_field_list', $list, $country);
+		
 		$content = '';
-		if ( false !== $list ) {
+		if ( false !== $list ) {			
 			$content .= '<select class="mp_select2_search" name="' . $this->field_name('state', $type) . '">';
 			foreach ( $list as $abbr => $label ) {
 				$content .= '<option value="' . $abbr . '"' . selected($selected, $abbr, false) . '>' . esc_attr($label) . '</option>';
@@ -249,6 +270,14 @@ class MP_Checkout {
 			$content .= '<input name="state" type="text" value="' . esc_attr($selected) . '" />';
 		}
 
+		/**
+		 * Filter the province field content
+		 *
+		 * @since 3.0
+		 * @param string $content The current content.
+		 * @param string $country The current country.
+		 * @param string $selected The selected state/province.
+		 */
 		$content = apply_filters('mp_checkout/province_field', $content, $country, $selected);
 
 		if ( mp_doing_ajax() ) {
@@ -269,12 +298,15 @@ class MP_Checkout {
 		$html = '' .
 			$this->section_heading(__('Billing/Shipping Info', 'mp'), true) . '
 			<div class="clearfix">
-				<div id="mp-checkout-column-billing-address" class="mp-checkout-column">
-					<h3>' . __('Billing Address', 'mp') . '</h3>' .
+				<div id="mp-checkout-column-billing-info" class="mp-checkout-column">
+					<h3>' . __('Billing', 'mp') . '</h3>' .
 					$this->address_fields('billing') . '
+					<div class="mp-checkout-form-row mp-checkbox-row">
+						<label><input type="checkbox" name="enable_shipping_address" value="1" ' . checked(1, wp_get_current_user()->get('mp_enable_shipping_address'), false) . ' /> <span>' . __('Shipping address different than billing?', 'mp') . '</span></label>
+					</div>
 				</div>
-				<div id="mp-checkout-column-shipping-address" class="mp-checkout-column">
-					<h3>' . __('Shipping Address', 'mp') . '</h3>' .
+				<div id="mp-checkout-column-shipping-info" class="mp-checkout-column">
+					<h3>' . __('Shipping', 'mp') . '</h3>' .
 					$this->address_fields('shipping') . '
 				</div>
 			</div>';
@@ -320,17 +352,15 @@ class MP_Checkout {
 		if ( ! is_user_logged_in() && ! MP_HIDE_LOGIN_OPTION ) {
 			$html = '' .
 				$this->section_heading(__('Login/Register', 'mp'), true) . '
-				<form action="' . admin_url('admin-ajax.php?action=mp_checkout_login') . '" method="post">
-					<div class="mp-checkout-form-row">
-						<label for="mp-checkout-email">' . __('E-Mail Address', 'mp') . '</label>
-						<input type="text" name="email" />
-					</div>
-					<div class="mp-checkout-form-row">
-						<label for="mp-checkout-password">' . __('Password', 'mp') . '</label>
-						<input type="password" name="password" />
-					</div>
-					<button type="submit" class="mp-button">' . __('Login', 'mp') . '</label>
-				</form>';
+				<div class="mp-checkout-form-row">
+					<label for="mp-checkout-email">' . __('E-Mail Address', 'mp') . '</label>
+					<input type="text" name="email" />
+				</div>
+				<div class="mp-checkout-form-row">
+					<label for="mp-checkout-password">' . __('Password', 'mp') . '</label>
+					<input type="password" name="password" />
+				</div>
+				<button type="submit" class="mp-button">' . __('Login', 'mp') . '</label>';
 		}
 		
 		/**
@@ -340,6 +370,81 @@ class MP_Checkout {
 		 * @param string The current html.
 		 */
 		return apply_filters('mp_checkout/section_login', $html);
+	}
+	
+	/**
+	 * Display the payment section
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function section_payment() {
+		$html = '' .
+			$this->section_heading(__('Payment', 'mp'), true);
+		
+		/**
+		 * Filter the section payment html
+		 *
+		 * @since 3.0
+		 * @param string The current html.
+		 */
+		return apply_filters('mp_checkout/section_payment', $html);
+	}
+	
+	/**
+	 * Display the shipping section
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function section_shipping() {
+		$active_plugins = MP_Shipping_API::get_active_plugins();
+		$items = mp_cart()->get_items();
+		$address1 = mp_get_user_address_part('address1', 'shipping');
+		$address2 = mp_get_user_address_part('address2', 'shipping');
+		$city = mp_get_user_address_part('city', 'shipping');
+		$state = mp_get_user_address_part('state', 'shipping');
+		$zip = mp_get_user_address_part('zip', 'shipping');
+		$country = mp_get_user_address_part('country', 'shipping');
+		
+		$html = '' .
+			$this->section_heading(__('Shipping', 'mp'), true);
+		
+		
+		switch ( mp_get_setting('shipping->method') ) {
+			case 'calculated' :
+				foreach ( $active_plugins as $plugin ) {
+					$html .= '
+						<div class="mp-shipping-method">
+							<h4>' . $plugin->public_name . '</h4>';
+					
+					$options = $plugin->shipping_options($items, $address1, $address2, $city, $state, $zip, $country);
+					foreach ( $options as $method => $label ) {
+						$input_id = 'mp-shipping-option-' . $plugin->plugin_name . '-' . sanitize_title($method);
+						$html .= '
+							<label class="mp-shipping-option-label" for="' . $input_id . '">
+								<input id="' . $input_id . '" type="radio" name="shipping_method" value="' . $plugin->plugin_name . '->' . $method . '" />
+								<span></span>' . $label . '
+							</label>';
+					}
+					$html .= '
+						</div>';
+				}
+			break;
+			
+			default :
+			break;
+		}
+
+		
+		/**
+		 * Filter the shipping section html
+		 *
+		 * @since 3.0
+		 * @param string The current html.
+		 */
+		return apply_filters('mp_checkout/section_shipping', $html);		
 	}
 }
 
