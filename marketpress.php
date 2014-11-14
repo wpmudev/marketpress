@@ -28,16 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 define('MP_VERSION', '3.0a.1');
 
-class Marketpress {
-	/**
-	 * Refers to whether or not we're using global cart
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @var bool
-	 */
-	var $global_cart = false;
-	
+class Marketpress {	
 	/**
 	 * 
 	 *
@@ -251,7 +242,7 @@ class Marketpress {
       'menu_icon' => ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-cart' : mp_plugin_url('ui/images/marketpress-icon.png'),
 			'hierarchical' => false,
 			'rewrite' => array(
-				'slug' => mp_get_setting('pages->products'),
+				'slug' => mp_store_page_uri('products', false),
 				'with_front' => false
 			),
 			'query_var' => true,
