@@ -715,7 +715,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 }
 
 //only load on multisite
-if ( is_multisite() && ! mp()->global_cart ) {
+if ( is_multisite() && ! mp_cart()->is_global ) {
 	//! TODO: code network settings
 	
 	//set names here to be able to translate
