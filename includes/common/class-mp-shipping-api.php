@@ -83,7 +83,7 @@ if (!class_exists('MP_Shipping_API')) {
 	    	return;
     	}
     	
-			if ( ! is_admin() && mp()->global_cart ) {
+			if ( ! is_admin() && mp_cart()->is_global ) {
 				/* global cart is being used so we need to go through the cart contents and
 				get the active shipping method for each blog in the cart */
 				

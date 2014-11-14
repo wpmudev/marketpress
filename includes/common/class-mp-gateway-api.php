@@ -112,7 +112,7 @@ if( ! class_exists('MP_Gateway_API') ) {
 				$class = $plugin[0];
 				
 				// If global cart is enabled force it
-				if ( mp()->global_cart ) {
+				if ( mp_cart()->is_global ) {
 					if ( $code == mp_get_network_setting('global_gateway') && class_exists($class) ) {
 						self::$_active_gateways[$code] = new $class;
 						break;
