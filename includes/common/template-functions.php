@@ -123,7 +123,7 @@ if ( ! function_exists('mp_cart_link') ) :
 	 * @param string $link_text Optional, text to show in link.
 	 */
 	function mp_cart_link( $echo = true, $url = false, $link_text = false ) {
-		if ( mp()->global_cart && ! mp_is_main_site() ) {
+		if ( mp_cart()->is_global && ! mp_is_main_site() ) {
 			switch_to_blog(MP_ROOT_BLOG);
 			$link = get_permalink(mp_get_setting('pages->cart'));
 			restore_current_blog();
@@ -354,6 +354,29 @@ if ( ! function_exists('mp_get_image_size') ) :
 		return $size;
 	}
 endif;
+
+if ( ! function_exists('mp_store_page_uri') ) {
+	/**
+	 * Get a store page uri
+	 *
+	 * @since 3.0
+	 * @param string $page The page to get the uri for.
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	function mp_store_page_uri( $page, $echo = true ) {
+		$url = '';
+		if ( $post_id = mp_get_setting("pages->{$page}") ) {
+			$url = get_page_uri($post_id);
+		}
+		
+		if ( $echo ) {
+			echo $url;
+		} else {
+			return $url;
+		}
+	}
+}
+
 
 if ( ! function_exists('mp_store_page_url') ) {
 	/**
