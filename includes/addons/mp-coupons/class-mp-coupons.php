@@ -26,7 +26,7 @@ class MP_Coupons {
 	 * @access protected
 	 * @var array
 	 */
-	protected $_coupons_applied = null;
+	protected $_coupons_applied = array();
 
 	/**
 	 * Refers to the applied coupons as objects
@@ -35,7 +35,7 @@ class MP_Coupons {
 	 * @access protected
 	 * @var array
 	 */
-	protected $_coupons_applied_objects = null;
+	protected $_coupons_applied_objects = array();
 	
 	/**
 	 * Refers to the build of the addon
@@ -124,11 +124,6 @@ class MP_Coupons {
 	 * @return array
 	 */
 	protected function _convert_to_objects( $coupons ) {
-		if ( ! is_null($this->_coupons_applied_objects) ) {
-			return $this->_coupons_applied_objects;
-		}
-		
-		$this->_coupons_applied_objects = array();
 		foreach ( $coupons as $coupon ) {
 			$this->_coupons_applied_objects[$coupon] = new MP_Coupon($coupon);
 		}
@@ -318,7 +313,7 @@ class MP_Coupons {
 					<input type="text" name="mp_cart_coupon" value="" />
 				</span>
 				<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
-				wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Please note that some codes can\'t be used with others, just be sure to enter one at a time.', 'mp'))) . '
+				wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp'))) . '
 			</div>';
 			
 		return $html;
@@ -540,7 +535,7 @@ class MP_Coupons {
 		$metabox->add_field('wysiwyg', array(
 			'name' => 'coupons[help_text]',
 			'label' => array('text' => __('Help Text', 'mp')),
-			'default_value' => __('More than one code? That\'s OK! Please note that some codes can\'t be used with others, just be sure to enter one at a time.', 'mp'),
+			'default_value' => __('More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp'),
 		));
 	}
 	
@@ -925,10 +920,6 @@ class MP_Coupons {
 	 * @return array
 	 */
 	public function get_applied() {
-		if ( ! is_null($this->_coupons_applied) ) {
-			return $this->_coupons_applied;
-		}
-		
 		if ( is_multisite() ) {
 			$blog_id = get_current_blog_id();
 			$this->_coupons_applied = mp_get_session_value("mp_cart_coupons->{$blog_id}", array());
