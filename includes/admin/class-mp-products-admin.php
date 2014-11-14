@@ -347,7 +347,19 @@ class MP_Products_Screen {
 					break;
 					
 					default :
-						$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
+						if ( false !== (strpos($subfield->args['original_name'], 'product_attr_')) ) {
+							$terms = get_the_terms($variation->ID, $subfield->args['original_name']);
+							$term = false;
+							
+							if ( is_array($terms) ) {
+								$term_obj = array_shift($terms);
+								$term = $term_obj->term_id;
+							}
+							
+							$meta[$subfield->args['original_name']] = $term;
+						} else {
+							$meta[$subfield->args['original_name']] = $subfield->get_value($variation->ID, $subfield->args['original_name']);
+						}
 					break;
 				}
 			}
@@ -414,10 +426,11 @@ class MP_Products_Screen {
 					}
 					
 					$subfield = $field->subfields[$index];
-					$subfield->save_value($variation_id, $name, $value, true);
 					
 					if ( strpos($name, 'product_attr_') !== false ) {
 						wp_set_post_terms($variation_id, $subfield->sanitize_for_db($value, $variation_id), $name);	
+					} else {
+						$subfield->save_value($variation_id, $name, $value, true);
 					}
 					
 					$index ++;
