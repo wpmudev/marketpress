@@ -65,6 +65,15 @@ class MP_Cart {
 	protected $_total = array();
 	
 	/**
+	 * Refers to whether or not we're using global cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var bool
+	 */
+	public $is_global = false;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -1035,17 +1044,7 @@ jQuery(document).ready(function($){
 			
 			$total = array_sum($totals);
 			$special_total = array_sum($special_totals);
-			
-			// Add in shipping?
-			$shipping_tax = 0;
-			if ( mp_get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_total() ) ) {
-				if ( mp_get_setting('tax->tax_inclusive') ) {
-					$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
-				} else {
-					$shipping_tax = $shipping_price * (float) mp_get_setting('tax->rate');
-				}
-			}
-			
+						
 			//check required fields
 			if ( empty($country) || ! $this->has_items() || ($total + $special_total) <= 0 ) {
 				return false;
@@ -1094,9 +1093,19 @@ jQuery(document).ready(function($){
 			
 			if ( empty($price) ) {
 				$price = 0;
+			} else {
+				// Add in shipping?
+				$shipping_tax = 0;
+				if ( mp_get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_total() ) ) {
+					if ( mp_get_setting('tax->tax_inclusive') ) {
+						$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
+					} else {
+						$shipping_tax = $shipping_price * (float) mp_get_setting('tax->rate');
+					}
+				}
+				
+				$price += $shipping_tax;
 			}
-			
-			$price += $shipping_tax;
 			
 			/**
 			 * Filter the tax price
