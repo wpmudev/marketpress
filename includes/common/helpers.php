@@ -47,6 +47,10 @@ if ( ! function_exists('mp_cart') ) :
 	 * @since 3.0
 	 */
 	function mp_cart() {
+		if ( ! class_exists('MP_Cart') ) {
+			require_once mp_plugin_dir('includes/public/class-mp-cart.php');
+		}
+		
 		return MP_Cart::get_instance();
 	}
 endif;
@@ -58,6 +62,10 @@ if ( ! function_exists('mp_checkout') ) :
 	 * @since 3.0
 	 */
 	function mp_checkout() {
+		if ( ! class_exists('MP_Checkout') ) {
+			require_once mp_plugin_dir('includes/public/class-mp-checkout.php');
+		}
+		
 		return MP_Checkout::get_instance();
 	}
 endif;
@@ -371,6 +379,10 @@ if ( ! function_exists('mp_admin') ) :
 	 */
 	 
 	function mp_admin() {
+		if ( ! class_exists('MP_Admin') ) {
+			require_once mp_plugin_dir('includes/admin/class-mp-admin.php');
+		}
+		
 		return MP_Admin::get_instance();
 	}
 endif;
@@ -384,6 +396,9 @@ if ( ! function_exists('mp_public') ) :
 	 */
 	 
 	function mp_public() {
+		if ( ! class_exists('MP_Pubic') ) {
+			require_once mp_plugin_dir('includes/public/class-mp-public.php');
+		}
 		return MP_Public::get_instance();
 	}
 endif;
