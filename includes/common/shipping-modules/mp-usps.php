@@ -818,7 +818,7 @@ class MP_Shipping_USPS extends MP_Shipping_API {
 		//Update the session. Save the currently calculated CRCs
 		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
 		$_SESSION['mp_cart_crc'] = $this->crc(mp_cart()->get_items());
-		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
+		$_SESSION['mp_shipping_crc'] = $this->crc(mp_get_session_value('mp_shipping_info'));
 
 		unset($xpath);
 		unset($dom);
