@@ -4,6 +4,14 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+2.9.5.8
+----------------------------------------------------------------------
+- Added: products are no longer set to "draft" status when using the "hide out of stock products" setting -- instead they're now set to a status of "out_of_stock"
+- Fixed: tax being charged on shipping even if tax shouldn't be charged
+- Fixed: download url incorrect in order confirmation email for products being transitioned to a draft status due to "hide out of stock products" setting
+- Fixed: user can't download purchased files when product is out of stock
+- Fixed: bug with pagination when using [mp_list_global_products] on front page
+
 2.9.5.7
 ----------------------------------------------------------------------
 - Fixed: Paymill gateway is using SSL v3 which is suspectible to POODLE vulnerability

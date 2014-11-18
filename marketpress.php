@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.5.7
+Version: 2.9.5.8
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 */
 
 class MarketPress {
-	var $version = '2.9.5.7';
+	var $version = '2.9.5.8';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -160,6 +160,11 @@ class MarketPress {
 		add_action( 'option_rewrite_rules', array(&$this, 'check_rewrite_rules') );
 		add_action( 'init', array(&$this, 'flush_rewrite_check'), 99 );
 		
+		//Downloads
+		add_action( 'pre_get_posts', array(&$this, 'include_draft_products_for_downloads') );
+		add_filter( 'posts_results', array(&$this, 'set_publish_status_for_draft_product_downloads'), 10, 2 );
+		add_action( 'template_redirect', array(&$this, 'maybe_serve_download') );
+		
 		if ( MP_HIDE_MENUS === false ) { //allows you to hide MP menus
 			add_filter( 'wp_list_pages', array(&$this, 'filter_list_pages'), 10, 2 );
 		}
@@ -200,6 +205,56 @@ class MarketPress {
 		add_action( 'personal_options_update', array(&$this, 'user_profile_update') );
 		add_action( 'edit_user_profile', array(&$this, 'user_profile_fields') );
 		add_action( 'show_user_profile', array(&$this, 'user_profile_fields') );
+	}
+
+	/**
+	 * Force post status to publish for single products that are in draft status
+	 *
+	 * By default, WP won't allow access to single posts that are in draft status
+	 * which will prevent users from downloading files they purchased.
+	 *
+	 * @since 2.9.5.8
+	 * @access public
+	 * @filter posts_results
+	 */
+	function set_publish_status_for_draft_product_downloads( $posts, $query ) {
+		if ( 'product' == $query->get('post_type') && $query->get('product') && isset($_GET['orderid']) && ($order = $this->get_order($_GET['orderid'])) ) {
+			$posts[0]->post_status = 'publish';
+		}
+		
+		return $posts;
+	}
+	
+	/**
+	 * Modify query object to allow drafts for single products
+	 *
+	 * If a product is set to draft status (out-of-stock) then the user won't be
+	 * able to download their files.
+	 *
+	 * @since 2.9.5.8
+	 * @access public
+	 * @action pre_get_posts
+	 */
+	function include_draft_products_for_downloads( $query ) {
+		if ( 'product' == $query->get('post_type') && $query->get('product') && isset($_GET['orderid']) && ($order = $this->get_order($_GET['orderid'])) ) {
+			$query->set('post_status', array('draft', 'publish'));
+		}
+	}
+	
+	/**
+	 * Maybe serve a download
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action template_redirect
+	 */
+	function maybe_serve_download() {
+		global $wp_query;
+		
+		if ( 'product' == $wp_query->get('post_type') && $wp_query->get('product') && isset($_GET['orderid']) && ($order = $this->get_order($_GET['orderid'])) ) {
+			$product_id = get_queried_object_id();
+			$this->serve_download($product_id);
+		}
 	}
 	
 	function post_updated_messages( $messages ) {
@@ -1073,6 +1128,14 @@ Thanks again!", 'mp')
 				),
 		)));
 
+		// Register "out-of-stock" status for products - @version 2.9.5.8
+		register_post_status('out_of_stock', array(
+			'label'				=> __('Out of Stock', 'mp'),
+			'label_count' => _n_noop(__('Out of Stock <span class="count">(%s)</span>', 'mp'), __('Out of Stock <span class="count">(%s)</span>', 'mp')),
+			'post_type'		=> 'product',
+			'public'			=> false
+		));
+
 		//register the orders post type
 		register_post_type('mp_order', apply_filters('mp_register_post_type_mp_order', array(
 			'labels' => array('name' => __('Orders', 'mp'),
@@ -1235,15 +1298,12 @@ Thanks again!", 'mp')
 	 
 		//only filter public side
 		if (is_admin()) return;
-
+		
 	 //load proper theme for single product page display
 	 if ($wp_query->is_single && $wp_query->query_vars['post_type'] == 'product') {
 		//check for custom theme templates
 		$product_name = get_query_var('product');
 		$product_id = (int) $wp_query->get_queried_object_id();
-
-		//serve download if it exists
-		$this->serve_download($product_id);
 
 		$templates = array();
 	 	if ( $product_name )
@@ -2842,17 +2902,7 @@ Thanks again!", 'mp')
 		
 	$total = array_sum($totals);
 	$special_total = array_sum($special_totals);
-	
-	//add in shipping?
-	$shipping_tax = 0;
-	if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) ) {
-		if ( $this->get_setting('tax->tax_inclusive') ) {
-			$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
-		} else {
-			$shipping_tax = $shipping_price * (float) $this->get_setting('tax->rate');
-		}
-	}
-	
+		
 	//check required fields
 	if ( empty($country) || !(is_array($cart) && count($cart)) || ($total + $special_total) <= 0 ) {
 		return false;
@@ -2896,9 +2946,20 @@ Thanks again!", 'mp')
 	
 		if ( empty($price) ) {
 			$price = 0;
+		} else {
+			//add in shipping?
+			$shipping_tax = 0;
+			if ( $this->get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_price()) ) {
+				if ( $this->get_setting('tax->tax_inclusive') ) {
+					$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
+				} else {
+					$shipping_tax = $shipping_price * (float) $this->get_setting('tax->rate');
+				}
+			}
+			
+			$price += $shipping_tax;
 		}
 	
-		$price += $shipping_tax;
 		$price = apply_filters('mp_tax_price', $price, $total, $cart, $country, $state);
 		$price = round($price, 2);
 		 
@@ -3835,18 +3896,9 @@ Thanks again!", 'mp')
 					$this->low_stock_notification($product_id, $variation, $stock[$variation]);
 				}
 			
-				//set status to draft if needed
 				if ( $this->get_setting('inventory_remove') && $stock[$variation] <= 0 ) {		
-					$post = get_post( $product_id );
-					$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post->ID ) );
-					clean_post_cache( $post->ID );
-					$old_status = $post->post_status;
-					$post->post_status = 'draft';
-					wp_transition_post_status( 'draft', $old_status, $post );
-					
-					do_action( 'edit_post', $post->ID, $post );
-					do_action( 'save_post', $post->ID, $post );
-					do_action( 'wp_insert_post', $post->ID, $post );
+					// Flag product as out of stock - @version 2.9.5.8
+					wp_update_post(array('ID' => $product_id, 'post_status' => 'out_of_stock'));
 				}
 			}
 			
@@ -4244,8 +4296,8 @@ Thanks again!", 'mp')
 	 $url = get_post_meta($product_id, 'mp_file', true);
 	 if (!$url)
 		return false;
-
-		return get_permalink($product_id) . "?orderid=$order_id";
+	
+		return add_query_arg('orderid', $order_id, get_permalink($product_id));
 	}
 
 	//serves a downloadble product file
@@ -4313,6 +4365,10 @@ Thanks again!", 'mp')
 		} else {
 			// File is remote so we need to download it first
 			require_once(ABSPATH . '/wp-admin/includes/file.php');
+			
+			//don't verify ssl connections
+			add_filter('https_local_ssl_verify', create_function('$ssl_verify', 'return false;'));
+			add_filter('https_ssl_verify', create_function('$ssl_verify', 'return false;'));
 
 			$tmp = download_url($url); //we download the url so we can serve it via php, completely obfuscating original source
 
@@ -6350,7 +6406,7 @@ Notification Preferences: %s', 'mp');
 					 <td>
 					 <label><input value="1" name="mp[inventory_remove]" type="radio"<?php checked($this->get_setting('inventory_remove'), 1); ?>> <?php _e('Yes', 'mp') ?></label>
 							<label><input value="0" name="mp[inventory_remove]" type="radio"<?php checked($this->get_setting('inventory_remove'), 0); ?>> <?php _e('No', 'mp') ?></label>
-					 <br /><span class="description"><?php _e('This will set the product to draft if inventory of all variations is gone.', 'mp') ?></span>
+					 <br /><span class="description"><?php _e('This will set the product to an "out_of_stock" status if inventory of all variations is gone.', 'mp') ?></span>
 					 </td>
 					 </tr>
 					 <tr id="mp-downloads-setting">

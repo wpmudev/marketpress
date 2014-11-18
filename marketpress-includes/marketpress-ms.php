@@ -1400,8 +1400,9 @@ function mp_list_global_products( $args ) {
 	}
 	
 	// get page
-	if ( get_query_var('paged') )
-		$page = get_query_var('paged');
+	if ( get_query_var('paged') || get_query_var('page') ) {
+		$page = (int) max(get_query_var('paged'), get_query_var('page'));
+	}
 	
 	//adjust for mysql (0 is lowest)
 	$page = $page - 1;
@@ -1580,7 +1581,7 @@ function _mp_global_products_html_grid( $results, $args ) {
 			</div>';
 	endforeach;
 
-	$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
+	$html .= ( count($results) > 0 ) ? '<div class="clear"></div>' : '';
 	
 	$post = $current_post; //wp_reset_postdata() doesn't work here
 	
@@ -1659,21 +1660,23 @@ function mp_global_products_nav_link( $args = '', $query = null ) {
 		$max_pages = 1;
 	
 	//setup current page
-	if ( get_query_var('paged') ) {
-		$paged = intval(get_query_var('paged'));
+	if ( get_query_var('page') || get_query_var('paged') ) {
+		$paged = (int) max(get_query_var('page'), get_query_var('paged'));
 	} else {
-		$paged = $page; //pages start at 1 for our uses
+		$paged = (int) $page; //pages start at 1 for our uses
 	}
 	
-	if ($paged < 1)
+	if ( $paged < 1 ) {
 		$paged = 1;
+	}
 	
 	//if only one page skip
-	if ($paged > $max_pages)
+	if ( $paged > $max_pages ) {
 		return '';
+	}
 	
 	//only have sep if there's both prev and next results
-	if ($paged < 2 || $paged >= $max_pages) {
+	if ( $paged < 2 || $paged >= $max_pages ) {
 		$sep = '';
 	}
 	
@@ -1683,9 +1686,12 @@ function mp_global_products_nav_link( $args = '', $query = null ) {
 		//previous
 		if ( $paged > 1 ) {
 			$attr = apply_filters( 'previous_posts_link_attributes', '' );
-			$prevpage = intval($paged) - 1;
-			if ( $prevpage < 1 )
+			$prevpage = ($paged - 1);
+			
+			if ( $prevpage < 1 ) {
 				$prevpage = 1;
+			}
+			
 			$return .= '<a href="' . get_pagenum_link($prevpage) . "\" $attr>". preg_replace( '/&([^#])(?![a-z]{1,8};)/', '&#038;$1', $prelabel ) .'</a>';
 		}
 		
@@ -1694,7 +1700,7 @@ function mp_global_products_nav_link( $args = '', $query = null ) {
 		$nextpage = intval($paged) + 1;
 		if ( $nextpage <= $max_pages ) {
 			$attr = apply_filters( 'next_posts_link_attributes', '' );
-			$nextpage = intval($paged) + 1;
+			$nextpage = ($paged + 1);
 			$return .= '<a href="' . get_pagenum_link($nextpage) . "\" $attr>" . preg_replace('/&([^#])(?![a-z]{1,8};)/i', '&#038;$1', $nxtlabel ) . '</a>';
 		}
 		
