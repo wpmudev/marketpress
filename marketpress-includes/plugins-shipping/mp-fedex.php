@@ -602,7 +602,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	function rate_request( $international = false) {
 		global $mp;
 
-		$shipping_options = $this->fedex_settings['services'];
+		$shipping_options = array_filter($this->fedex_settings['services'], create_function('$val', 'return ($val == 1);'));
 
 		//Assume equal size packages. Find the best matching box size
 		$this->fedex_settings['max_weight'] = ( empty($this->fedex_settings['max_weight'])) ? 50 : $this->fedex_settings['max_weight'];

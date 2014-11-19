@@ -4,6 +4,8 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+- Fixed: Fedex displaying all available services at checkout instead of only the services selected
+
 2.9.5.8
 ----------------------------------------------------------------------
 - Added: products are no longer set to "draft" status when using the "hide out of stock products" setting -- instead they're now set to a status of "out_of_stock"
