@@ -3,40 +3,6 @@ var mp_cart = {};
 
 (function($){
 	/**
-	 * Add or remove a cart error
-	 *
-	 * @since 3.0
-	 * @param object options {
-	 *		Optional, an options object.
-	 *
-	 *		@type string action Either add or remove.
-	 *		@type string message The error message if adding an errror.
-	 * }
-	 */
-	$.fn.mpCartError = function( options ){
-		var settings = $.extend({
-			"action" : "add",
-			"message" : ""
-		}, options);
-		
-		return this.each(function(){
-			var $this = $(this);
-			
-			if ( settings.action == 'remove' ) {
-				$this.removeClass('error').prev('.cart-error').remove();
-			} else if ( settings.action == 'add' ) {
-				if ( $this.prev('.cart-error').length ) {
-					$this.addClass('error').prev('.cart-error').html(settings.message);
-				} else {
-					$this.addClass('error').before('<span class="cart-error">' + settings.message + '</span>');
-				}
-				
-				$this.prev('.cart-error').css('top', ($this.prev('.cart-error').outerHeight() * -1));
-			}
-		});
-	};
-
-	/**
 	 * Refers to the validation args for the add-to-cart/buy-now form
 	 *
 	 * @since 3.0
