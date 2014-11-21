@@ -101,6 +101,32 @@ class MP_Ajax {
 	}
 	
 	/**
+	 * Process ajax login
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_nopriv_mp_ajax_login
+	 */
+	public function ajax_login() {
+		check_ajax_referer( 'mp-login-nonce', 'mp_login_nonce' );
+		
+		$info = array(
+			'user_login' => mp_get_post_value( 'email', '' ),
+			'user_password' => mp_get_post_value( 'pass', '' ),
+			'remember' => true,
+		);
+		
+		$user_signon = wp_signon( $info, false );
+		if ( is_wp_error( $user_signon ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Invalid email address and/or password', 'mp' ),
+			) );
+		}
+		
+		wp_send_json_success();
+	}
+	
+	/**
 	 * Bulk edit products
 	 *
 	 * @since 3.0
@@ -143,7 +169,9 @@ class MP_Ajax {
 		add_action('wp_ajax_nopriv_mp_product_get_variations_lightbox', array('MP_Product', 'ajax_display_variations_lightbox'));
 		// Update product attributes
 		add_action('wp_ajax_mp_product_update_attributes', array('MP_Product', 'ajax_update_attributes'));
-		add_action('wp_ajax_nopriv_mp_product_update_attributes', array('MP_Product', 'ajax_update_attributes'));		
+		add_action('wp_ajax_nopriv_mp_product_update_attributes', array('MP_Product', 'ajax_update_attributes'));
+		// Ajax login
+		add_action( 'wp_ajax_nopriv_mp_ajax_login', array( &$this, 'ajax_login' ) );
 	}
 }
 
