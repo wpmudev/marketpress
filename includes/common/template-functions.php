@@ -291,6 +291,146 @@ if ( ! function_exists('mp_get_current_user_zipcode') ) :
 	}
 endif;
 
+if ( ! function_exists('mp_get_user_address_array') ) :
+	/**
+	 * Get full user address
+	 *
+	 * @since 3.0
+	 * @param string $what Either shipping or billing.
+	 * @param WP_User/int $user Optional, an WP_User object or a user ID. Defaults to the current user.
+	 * @return array False, on error.
+	 */
+	function mp_get_user_address( $what, $user = null ) {
+		if ( is_null($user) ) {
+			$user = wp_get_current_user();
+		} elseif ( ! $user instanceof WP_User && false === ($user = get_user_by('id', $user)) ) {
+			return false;
+		}
+		
+		$data = $user->get("mp_{$what}_info");
+		
+		if ( empty($meta) ) {
+			$data = mp_get_session_value("mp_{$what}_info");
+		}
+		
+		return $data;
+	}
+endif;
+
+if ( ! function_exists('mp_list_payment_options') ) :
+	/**
+	 * List available payment options (if there is more than one)
+	 *
+	 * @since 3.0
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	function mp_list_payment_options( $echo = true ) {
+		$gateways = MP_Gateway_API::get_active_gateways();
+		$html = '';
+		
+		$options = array();
+		foreach ( $gateways as $code => $gateway ) {
+			$options[$code] = $gateway->public_name;
+		}
+		
+		/**
+		 * Filter the options array before formatting to html
+		 *
+		 * @since 3.0
+		 * @param array $options
+		 */
+		$options = (array) apply_filters('mp_payment_options_array', $options);
+		
+		if ( count($options) > 1 ) {
+			$index = 0;
+			foreach ( $options as $code => $label ) {
+				$checked = '';
+				if ( $selected = mp_get_session_value('mp_payment_method') ) {
+					if ( $selected == $code ) {
+						$checked = ' checked';
+					}
+				} elseif ( $index == 0 ) {
+					$checked = ' checked';
+				}
+				
+				$input_id = 'mp-gateway-option-' . $code;
+				$html .= '
+					<label class="mp-checkout-option-label" for="' . $input_id . '">
+						<input id="' . $input_id . '" type="radio" name="payment_method" value="' . $code . '"' . $checked . ' autocomplete="off" />
+						<span></span>' . $label . '
+					</label>';
+				
+				$index ++;
+			}
+		}
+		
+		/**
+		 * Filter the payment options html
+		 *
+		 * @since 3.0
+		 * @param string $html The current html.
+		 */
+		$html = apply_filters('mp_list_payment_options', $html);
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
+	}
+endif;
+
+if ( ! function_exists( 'mp_list_plugin_shipping_options' ) ) :
+	/**
+	 * Display an array of shipping plugin shipping options as html
+	 *
+	 * @since 3.0
+	 * @param MP_Shipping_API $plugin A shipping plugin object.
+	 * @param bool $echo Optional, whether to echo or return. Defaults to return.
+	 * @return string
+	 */
+	function mp_list_plugin_shipping_options( $plugin, $echo = false ) {
+		if ( ! $plugin instanceof MP_Shipping_API ) {
+			trigger_error( $plugin . ' is not an instance of MP_Shipping_API', E_USER_ERROR );
+		}
+		
+		$address1 = mp_get_user_address_part('address1', 'shipping');
+		$address2 = mp_get_user_address_part('address2', 'shipping');
+		$city = mp_get_user_address_part('city', 'shipping');
+		$state = mp_get_user_address_part('state', 'shipping');
+		$zip = mp_get_user_address_part('zip', 'shipping');
+		$country = mp_get_user_address_part('country', 'shipping');
+		
+		$items = mp_cart()->get_items();
+		$options = $plugin->shipping_options( $items, $address1, $address2, $city, $state, $zip, $country );
+		
+		$html = '';
+		foreach ( (array) $options as $method => $label ) {
+			$input_id = 'mp-shipping-option-' . $plugin->plugin_name . '-' . sanitize_title( $method );
+			$html .= '
+				<label class="mp-checkout-option-label" for="' . $input_id . '">
+					<input id="' . $input_id . '" type="radio" name="shipping_method" value="' . $plugin->plugin_name . '->' . $method . '" autocomplete="off" />
+					<span></span>' . $label . '
+				</label>';
+		}
+		
+		/**
+		 * Filter the shipping options list html
+		 *
+		 * @since 3.0
+		 * @param string $html Current html.
+		 * @param array $options An array of shipping options.
+		 */
+		$html = apply_filters( 'mp_list_shipping_options', $html, $options );
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
+	}
+endif;
+
 if ( ! function_exists('mp_get_user_address_part') ) :
 	/**
 	 * Get user address part
@@ -405,7 +545,7 @@ if ( ! function_exists('mp_is_shop_page') ) :
 	 * Check if current page is a shop page
 	 *
 	 * @since 3.0
-	 * @param string $page The specific page to check - e.g. "cart".
+	 * @param array/string $page The specific page to check - e.g. "cart".
 	 * @return bool
 	 */
 	function mp_is_shop_page( $page = null ) {
