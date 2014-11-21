@@ -12,6 +12,25 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_quote_it' ) ) :
+	/**
+	 * Wrap string in single or double quotes
+	 *
+	 * @since 3.0
+	 * @param string $text The text to wrap.
+	 * @param string $type Optional, either "single" or "double". Defaults to "double".
+	 * @return string
+	 */
+	function mp_quote_it( $text, $type = 'double' ) {
+		$char = '"';
+		if ( $type == 'single' ) {
+			$char = "'";
+		}
+		
+		return $char . $text . $char;
+	}
+endif;
+
 if ( ! function_exists('mp_push_to_array') ) :
 	/**
 	 * Pushes a value to a given array with given key
