@@ -269,15 +269,20 @@ if( ! class_exists('MP_Gateway_API') ) {
     }
     
 		//creates the payment method selections
-		function _payment_form_wrapper($content, $cart, $shipping_info) {
-      $hidden = (count(self::$_active_gateways) > 1 && $_SESSION['mp_payment_method'] != $this->plugin_name) ? ' style="display:none;"' : '';
+		function _payment_form_wrapper($content, $cart = null, $billing_info = null) {
+			if ( is_null($cart) ) {
+				$cart = mp_cart()->get_items();
+			}
+			
+			if ( is_null($billing_info) ) {
+				$billing_info = mp_get_user_address('billing');
+			}
+			
+      $hidden = (count(self::$_active_gateways) > 1 && mp_get_session_value('mp_payment_method') != $this->plugin_name) ? ' style="display:none;"' : '';
         
-      $content .= '<div class="mp_gateway_form" id="' . $this->plugin_name . '"' . $hidden . '>';
-      $content .= $this->payment_form($cart, $shipping_info);
-
-      $content .= '<p class="mp_cart_direct_checkout">';
-      $content .= '<input type="submit" name="mp_payment_submit" id="mp_payment_confirm" value="' . __('Continue Checkout &raquo;', 'mp') . '" />';
-      $content .= '</p></div>';
+      $content .= '<div class="mp_gateway_form" id="mp-gateway-form-' . $this->plugin_name . '"' . $hidden . '>';
+      $content .= $this->payment_form($cart, $billing_info);
+      $content .= '</div>';
       
       return $content;
     }
