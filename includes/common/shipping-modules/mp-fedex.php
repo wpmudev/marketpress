@@ -514,6 +514,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*/
 	function rate_request( $international = false ) {
 		$shipping_options = $this->get_setting('services', array());
+		
+		//Filter out all options that aren't enabled in settings
+		$shipping_options = array_filter($shipping_options, create_function('$val', 'return ($val == 1);'));
 
 		//Assume equal size packages. Find the best matching box size
 		$boxes = $this->get_setting('boxes');
