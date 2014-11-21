@@ -81,7 +81,8 @@ class MP_Public {
 		if ( is_null($page) ) {
 			return ( get_post_meta(get_the_ID(), '_mp_store_page', true) !== '' || is_singular(MP_Product::get_post_type()) || is_tax(array('product_category', 'product_tag')) );
 		} else {
-			return ( get_post_meta(get_the_ID(), '_mp_store_page', true) == $page );
+			$page = (array) $page;
+			return ( in_array(get_post_meta(get_the_ID(), '_mp_store_page', true), $page) );
 		}
 	}
 	
@@ -109,19 +110,21 @@ class MP_Public {
 		}
 		
 		// CSS
-		wp_enqueue_style('mp-frontend', mp_plugin_url('ui/css/frontend.css'), false, MP_VERSION);
-		wp_enqueue_style('mp-theme', mp_plugin_url('ui/themes/' . mp_get_setting('store_theme') . '.css'), array('mp-frontend'), MP_VERSION);
-		wp_enqueue_style('mp-select2', mp_plugin_url('ui/select2/select2.css'), false, MP_VERSION);
+		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
+		wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
+		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css'), false, MP_VERSION );
 		
 		// JS
-		wp_enqueue_script('hover-intent', mp_plugin_url('ui/js/hoverintent.min.js'), array('jquery'), MP_VERSION, true);
-		wp_enqueue_script('mp-frontend', mp_plugin_url('ui/js/frontend.js'), array('hover-intent'), MP_VERSION, true);
-		wp_enqueue_script('mp-select2', mp_plugin_url('ui/select2/select2.min.js'), array('mp-frontend'), MP_VERSION, true);
+		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js'), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js'), array( 'jquery' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js'), array( 'jquery-ui-tooltip', 'hover-intent', 'select2' ), MP_VERSION, true );
 		
-		wp_localize_script('mp-frontend', 'mp_i18n', array(
-			'ajaxurl' => admin_url('admin-ajax.php'),
-			'loadingImage' => mp_plugin_url('ui/images/loading.gif'),
-		));
+		// Localize js
+		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
+		) );
 	}
 	
 	/**
