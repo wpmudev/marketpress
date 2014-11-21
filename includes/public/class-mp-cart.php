@@ -74,6 +74,15 @@ class MP_Cart {
 	public $is_global = false;
 	
 	/**
+	 * Refers to if the current cart is editable
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @type bool
+	 */
+	public $is_editable = true;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -318,17 +327,17 @@ class MP_Cart {
 				break;
 				
 				case 'qty' :
-					$column_html = $this->dropdown_quantity(array(
-						'echo' => false,
-						'class' => 'mp_select2',
-						'name' => 'mp_cart_qty[' . $product->ID . ']',
-						'selected' => $product->qty,
-					)) . '<br />
-					<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>';
-				break;
-				
-				case 'shipping-method' :
-					$column_html = apply_filters('mp_cart/shipping_field', '');
+					if ( $this->is_editable ) {
+						$column_html = $this->dropdown_quantity(array(
+							'echo' => false,
+							'class' => 'mp_select2',
+							'name' => 'mp_cart_qty[' . $product->ID . ']',
+							'selected' => $product->qty,
+						)) . '<br />
+						<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $product->ID . ')">' . __('Remove', 'mp') . '</a>';
+					} else {
+						$column_html = $product->qty;
+					}
 				break;
 			}
 			
@@ -368,29 +377,36 @@ class MP_Cart {
 	 * @param bool $echo Optional, whether to echo or return. Defaults to true.
 	 */
 	public function cart_meta( $echo = true ) {
-		$zipcode = mp_get_current_user_zipcode();
 		$html = '';
 		
-		if ( empty($zipcode) ) {
-			// Show the zipcode lightbox
-			add_action('wp_footer', array(&$this, 'show_zipcode_popup'));
-			$header = __('Estimated Total', 'mp');
-		} else {
-			$header = sprintf(__('Estimated Total for %s', 'mp'), $zipcode);
+		if ( $this->is_editable ) {
+			$zipcode = mp_get_current_user_zipcode();
+			
+			if ( empty($zipcode) ) {
+				$header = __('Estimated Total', 'mp');
+			} else {
+				$header = sprintf(__('Estimated Total for %s', 'mp'), $zipcode);
+			}
+		
+			/**
+			 * Filter the header text
+			 *
+			 * @since 3.0
+			 * @param string The current header text.
+			 * @param MP_Cart The current cart object.
+			 */
+			$header = apply_filters('mp_cart/cart_meta/header', $header, $this);		
 		}
 		
-		/**
-		 * Filter the header text
-		 *
-		 * @since 3.0
-		 * @param string The current header text.
-		 * @param MP_Cart The current cart object.
-		 */
-		$header = apply_filters('mp_cart/cart_meta/header', $header, $this);		
-		
 		$line = '
-			<div id="mp-cart-meta">
-				<div class="mp-cart-meta-header">' . $header . '</div>
+			<div id="mp-cart-meta">';
+		
+		if ( ! empty($header) ) {
+			$line .= '
+				<div class="mp-cart-meta-header">' . $header . '</div>';
+		}
+		
+		$line .= '
 				<div id="mp-cart-meta-line-product-total" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . __('Product Total', 'mp') . '</strong>
 					<span class="mp-cart-meta-line-amount">' . $this->product_total(true, true) . '</span>
@@ -407,8 +423,8 @@ class MP_Cart {
 
 		$line = '
 				<div id="mp-cart-meta-line-estimated-tax" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . sprintf(__('Estimated %s', 'mp'), mp_get_setting('tax->label')) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->tax_total(true) . '</span>
+					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? sprintf(__('Estimated %s', 'mp'), mp_get_setting('tax->label')) : mp_get_setting('tax->label')) . '</strong>
+					<span class="mp-cart-meta-line-amount">' . $this->tax_total(true, true) . '</span>
 				</div>';
 
 		/**
@@ -422,7 +438,7 @@ class MP_Cart {
 		
 		$line = '		
 				<div id="mp-cart-meta-line-order-total" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . __('Estimated Order Total', 'mp') . '</strong>
+					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __('Estimated Total', 'mp') : __('Order Total', 'mp')) . '</strong>
 					<span class="mp-cart-meta-line-amount">' . $this->total(true) . '</span>
 				</div>
 			</div>';
@@ -462,6 +478,7 @@ class MP_Cart {
 	 *
 	 *		@type bool $echo Optional, whether to echo or return. Defaults to false.
 	 *		@type string $view Optional, the cart view.
+	 *		@type bool $editable Optional, whether the cart is editable. Defaults to true.
 	 * }
 	 */
 	public function display( $args = array() ) {
@@ -469,9 +486,12 @@ class MP_Cart {
 		$args = array_replace_recursive(array(
 			'echo' => false,
 			'view' => null,
+			'editable' => true,
 		), $args);
 		
 		extract($args);
+		
+		$this->is_editable = $editable;
 		
 		if ( ! $this->has_items() ) {
 			$message = sprintf(__('There are no items in your cart - <a href="%s">go add some</a>!', 'mp'), mp_store_page_url('products', false));
@@ -494,6 +514,14 @@ class MP_Cart {
 		
 		$products = $this->_convert_to_objects($this->get_items());
 		
+		if ( $editable ) {	
+			$html .= '
+				<form id="mp-cart-form" method="post">';
+		} else {
+			$html .= '
+				<div id="mp-cart-form">';
+		}
+
 		/**
 		 * Add html before cart
 		 *
@@ -504,6 +532,32 @@ class MP_Cart {
 		 */
 		$before_cart_html = apply_filters('mp_cart/before_cart_html', '', $this, $args);
 		
+		if ( ! empty($before_cart_html) ) {
+			$html .= '
+				<div id="mp-cart-before" class="clearfix">' . $before_cart_html . '</div>';
+		}
+		
+		/**
+		 * Filter the cart classes array
+		 *
+		 * @since 3.0
+		 * @param array The default classes.
+		 */
+		$classes = (array) apply_filters('mp_cart/cart_classes', array(
+			'mp-cart-default',
+			( $editable ) ? 'mp-cart-editable' : 'mp-cart-readonly',
+		));
+
+		$html .= '
+				<div id="mp-cart" class="' . implode(' ', $classes) . '">';
+		
+		foreach ( $products as $product ) {
+			$html .= $this->get_line_item($product);
+		}
+		
+		$html .= '
+				</div>';
+
 		/**
 		 * Add html after cart
 		 *
@@ -514,32 +568,6 @@ class MP_Cart {
 		 */
 		$after_cart_html = apply_filters('mp_cart/after_cart_html', '', $this, $args);
 		
-		$html .= '
-			<form id="mp-cart-form" method="post">';
-		
-		if ( ! empty($before_cart_html) ) {
-			$html .= '
-				<div id="mp-cart-before" class="clearfix">' . $before_cart_html . '</div>';
-		}
-		
-		/**
-		 * Filter the cart class attribute for easier styling
-		 *
-		 * @since 3.0
-		 * @param string The default class.
-		 */
-		$class_attr = apply_filters('mp_cart/cart_class_attribute', 'mp-cart-default');
-
-		$html .= '
-				<div id="mp-cart" class="' . $class_attr . '">';
-		
-		foreach ( $products as $product ) {
-			$html .= $this->get_line_item($product);
-		}
-		
-		$html .= '
-				</div>';
-		
 		if ( ! empty($after_cart_html) ) {
 			$html .= '
 				<div id="mp-cart-after" class="clearfix">' . $after_cart_html . '</div>';
@@ -547,10 +575,27 @@ class MP_Cart {
 
 		$html .= '
 				<div id="mp-cart-meta-wrap" class="clearfix">' .
-					$this->cart_meta(false) . '
-					<a class="mp-button" id="mp-button-checkout" href="' . mp_store_page_url('checkout', false) . '">' . __('Proceed to Checkout', 'mp') . '</a>
-				</div>
+					$this->cart_meta(false, $editable);
+		
+		if ( $editable ) {
+			$html .= '
+					<a class="mp-button mp-button-checkout mp-has-tooltip mp-button-medium" href="' . mp_store_page_url('checkout', false) . '">' . __('Proceed to Checkout', 'mp') . '</a>';
+		} else {
+			$html .= '
+					<button class="mp-button-checkout mp-button mp-button-submit-order mp-has-tooltip" type="submit">' . __('Submit Order', 'mp') . '</button>';
+		}
+		
+		$html .= '
+					<div class="mp-tooltip-content"><p class="mp-secure-checkout-tooltip-text">' . __( ' <strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' ) . '</p></div>
+				</div>';
+		
+		if ( $editable ) {
+			$html .= '
 			</form>';
+		} else {
+			$html .= '
+			</div>';
+		}
 		
 		/**
 		 * Filter the cart contents html
@@ -635,10 +680,18 @@ class MP_Cart {
 		 * @param int The cart id
 		 * @param array The items in the cart before being emptied
 		 */
-		do_action('mp_cart/empty', $this->_id, $this->get_items());
+		do_action( 'mp_cart/before_empty_cart', $this->_id, $this->get_items() );
 		
-		$this->_items[$this->_id] = array();
+		$this->_items[ $this->_id ] = array();
 		$this->_update_cart_cookie();
+	
+		/**
+		 * Fires right after the cart is emptied
+		 *
+		 * @since 3.0
+		 * @param int The cart id
+		 */
+		do_action( 'mp_cart/after_empty_cart', $this->_id );
 	}
 	
 	/**
@@ -657,19 +710,19 @@ class MP_Cart {
 		}
 		
 		// Styles
-		wp_enqueue_style('colorbox', mp_plugin_url('ui/css/colorbox.css'), false, MP_VERSION);
+		wp_enqueue_style( 'colorbox', mp_plugin_url( 'ui/css/colorbox.css' ), false, MP_VERSION );
 		
 		// Scripts
-		wp_enqueue_script('jquery-validate', mp_plugin_url('ui/js/jquery.validate.min.js'), array('jquery'), MP_VERSION, true);
-		wp_enqueue_script('jquery-validate-methods', mp_plugin_url('ui/js/jquery.validate.methods.min.js'), array('jquery-validate'), MP_VERSION, true);
-		wp_enqueue_script('ajaxq', mp_plugin_url('ui/js/ajaxq.min.js'), array('jquery'), MP_VERSION, true);
-		wp_enqueue_script('colorbox', mp_plugin_url('ui/js/jquery.colorbox-min.js'), array('jquery'), MP_VERSION, true);
-		wp_enqueue_script('mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array('ajaxq', 'colorbox', 'jquery-validate', 'jquery-effects-core'), MP_VERSION, true);
+		wp_register_script( 'jquery-validate', mp_plugin_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'jquery-validate-methods', mp_plugin_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), MP_VERSION, true );
+		wp_register_script( 'ajaxq', mp_plugin_url( 'ui/js/ajaxq.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-cart', mp_plugin_url('ui/js/mp-cart.js'), array( 'ajaxq', 'colorbox', 'jquery-validate' ), MP_VERSION, true);
 		
 		// Localize scripts
-		wp_localize_script('mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl' => admin_url('admin-ajax.php'),
-		));
+		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
+			'ajaxurl' => admin_url( 'admin-ajax.php'),
+		) );
 	}
 	
 	/**
@@ -963,38 +1016,14 @@ class MP_Cart {
 	}
 	
 	/**
-	 * Show the lightbox popup form
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_footer
-	 */
-	public function show_zipcode_popup() {
-		?>
-<div style="display:none">
-	<form id="mp-zipcode-form" action="<?php echo admin_url('admin-ajax.php?action=mp-update-zipcode'); ?>" method="post">
-		<h2><?php printf(__('Enter your %s', 'mp'), mp_get_setting('zipcode_label', 'zip code')); ?></h2>
-	</form>
-</div>
-<script type="text/javascript">
-jQuery(document).ready(function($){
-	$.colorbox({
-		"inline" : true,
-		"href" : "#mp-zipcode-form"
-	});
-});
-</script>
-		<?php
-	}
-	
-	/**
 	 * Get the calculated price for taxes based on a bunch of foreign tax laws.
 	 *
 	 * @access public
-	 * @param bool $format (optional) Format number as currency when returned
+	 * @param bool $format (optional) Format number as currency when returned.
+	 * @param bool $format (optional) Estimate taxes if user hasn't entered their address yet.
 	 * @return string/float 
 	 */
-	public function tax_total( $format = false ) {
+	public function tax_total( $format = false, $estimate = false ) {
 		if ( false === mp_arr_get_value('tax', $this->_total) ) {
 			$items = $this->get_items_as_objects();
 	
@@ -1044,6 +1073,17 @@ jQuery(document).ready(function($){
 			
 			$total = array_sum($totals);
 			$special_total = array_sum($special_totals);
+			
+			//estimate?
+			if ( $estimate ) {
+				if ( empty($country) ) {
+					$country = mp_get_setting('base_country');
+				}
+				
+				if ( empty($state) ) {
+					$state = mp_get_setting('base_province');
+				}
+			}
 						
 			//check required fields
 			if ( empty($country) || ! $this->has_items() || ($total + $special_total) <= 0 ) {
