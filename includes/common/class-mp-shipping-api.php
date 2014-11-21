@@ -3,7 +3,6 @@
 MarketPress Shipping Plugin Base Class
 */
 if (!class_exists('MP_Shipping_API')) {
-
   class MP_Shipping_API {
 		//build of the gateway plugin
 		var $build = null;
