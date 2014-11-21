@@ -273,7 +273,7 @@ class MP_Coupons {
 		foreach ( $coupons as $coupon ) {
 			$html .= '
 					<li class="mp-cart-coupon clearfix">
-						<strong class="mp-cart-meta-line-label">' . $coupon->post_title . ' <a class="mp-cart-coupon-remove-link" href="javascript:mp_coupons.remove(' . $coupon->ID . ')">(' . __('Remove', 'mp') . ')</a></strong>
+						<strong class="mp-cart-meta-line-label">' . $coupon->post_title . (( $cart->is_editable ) ? ' <a class="mp-cart-coupon-remove-link" href="javascript:mp_coupons.remove(' . $coupon->ID . ')">(' . __('Remove', 'mp') . ')</a>' : '') . '</strong>
 						<span class="mp-cart-meta-line-amount">' . $coupon->discount_amt(false) . '</span>
 					</li>';
 		}
@@ -305,17 +305,19 @@ class MP_Coupons {
 	 * @filter mp_cart/after_cart_html
 	 * @return string
 	 */
-	public function coupon_form_cart( $html, $cart, $display_args ) {
-		$html .= '
-			<div id="mp-coupon-form">
-				<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
-				<span class="mp-cart-input">
-					<input type="text" name="mp_cart_coupon" value="" />
-				</span>
-				<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
-				wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp'))) . '
-			</div>';
-			
+	public function coupon_form_cart( $html, $cart, $args ) {
+		if ( $cart->is_editable ) {
+			$html .= '
+				<div id="mp-coupon-form">
+					<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
+					<span class="mp-cart-input">
+						<input type="text" name="mp_cart_coupon" value="" />
+					</span>
+					<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
+					wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp'))) . '
+				</div>';
+		}
+		
 		return $html;
 	}
 	
@@ -867,7 +869,7 @@ class MP_Coupons {
 	 * @action wp_enqueue_scripts
 	 */
 	public function enqueue_css_frontend() {
-		if ( ! mp_is_shop_page('cart') ) {
+		if ( ! mp_is_shop_page(array('cart', 'checkout')) ) {
 			return;
 		}
 		
@@ -889,6 +891,10 @@ class MP_Coupons {
 		wp_enqueue_script('mp-coupons', mp_plugin_url('includes/addons/mp-coupons/ui/js/mp-coupons.js'), array('jquery', 'mp-cart'), MP_VERSION);
 		wp_localize_script('mp-coupons', 'mp_coupons_i18n', array(
 			'ajaxurl' => admin_url('admin-ajax.php'),
+			'messages' => array(
+				'required' => __('Please enter a code', 'mp'),
+				'added' => __('Coupon added successfully', 'mp'),
+			),
 		));
 	}
 	
