@@ -234,7 +234,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 						jQuery(document).ready(function($){
 							var gateway = $(".mp_choose_gateway").val();
 							if( gateway	 === "stripe" ) {
-								$("#stripe .mp_cart_direct_checkout").hide();
+								$("#mp-gateway-form-stripe .mp_cart_direct_checkout").hide();
 								$("#mp_payment_confirm").click(function(e){
 									e.preventDefault();
 									$("#mp_payment_form").submit();
@@ -242,7 +242,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 							}
 							$(".mp_choose_gateway").change(function(){
 								if($(this).val() === "stripe") {
-									$("#stripe .mp_cart_direct_checkout").hide();
+									$("#mp-gateway-form-stripe .mp_cart_direct_checkout").hide();
 									$("#mp_payment_confirm").click(function(e){
 										e.preventDefault();
 										$("#mp_payment_form").submit();
@@ -251,69 +251,51 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 							});
 						});
 					</script>
-		<div align="right">
-					<form action="" method="POST">
-					<script
-							src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
-							data-key="' . $this->publishable_key . '"
-							data-amount="' . $total . '"
-							data-name="' . get_bloginfo('title') . '"
-							data-currency="' . $this->currency . '"
-							data-description="' . __('Your Order', 'mp') . '"
-							data-image="">
-						</script>
-					</form></div>';
+					<div align="right">
+						<form action="" method="POST">
+							<script
+									src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
+									data-key="' . $this->publishable_key . '"
+									data-amount="' . $total . '"
+									data-name="' . get_bloginfo('title') . '"
+									data-currency="' . $this->currency . '"
+									data-description="' . __('Your Order', 'mp') . '"
+									data-image="">
+							</script>
+						</form>
+					</div>';
 
 					return $content;
 			}
 
-			$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
+			$name = mp_get_user_address_part('name', 'billing');
 
 			$content = '';
 
 			$content .= '<div id="stripe_checkout_errors"></div>';
 
-			$content .= '<table class="mp_cart_billing">
-			<thead><tr>
-				<th colspan="2">' . __('Enter Your Credit Card Information:', 'mp') . '</th>
-			</tr></thead>
-			<tbody>
-				<tr>
-				<td align="right">' . __('Cardholder Name:', 'mp') . '</td><td>
-				<input size="35" id="cc_name" type="text" value="' . esc_attr($name) . '" /> </td>
-				</tr>';
-			$content .= '<tr>';
-			$content .= '<td>';
-			$content .= __('Card Number', 'mp');
-			$content .= '</td>';
-			$content .= '<td>';
-			$content .= '<input type="text" size="30" autocomplete="off" id="cc_number"/>';
-			$content .= '</td>';
-			$content .= '</tr>';
-			$content .= '<tr>';
-			$content .= '<td>';
-			$content .= __('Expiration:', 'mp');
-			$content .= '</td>';
-			$content .= '<td>';
-			$content .= '<select id="cc_month">';
-			$content .= $this->_print_month_dropdown();
-			$content .= '</select>';
-			$content .= '<span> / </span>';
-			$content .= '<select id="cc_year">';
-			$content .= $this->_print_year_dropdown('', true);
-			$content .= '</select>';
-			$content .= '</td>';
-			$content .= '</tr>';
-			$content .= '<tr>';
-			$content .= '<td>';
-			$content .= __('CVC:', 'mp');
-			$content .= '</td>';
-			$content .= '<td>';
-			$content .= '<input type="text" size="4" autocomplete="off" id="cc_cvv2" />';
-			$content .= '</td>';
-			$content .= '</tr>';
-			$content .= '</table>';
-			$content .= '<span id="stripe_processing" style="display: none;float: right;"><img src="' . mp()->plugin_url . 'images/loading.gif" /> ' . __('Processing...', 'psts') . '</span>';
+			$content .= '
+				<div class="mp-checkout-form-row">
+					<label>' . __('Cardholder Name', 'mp') . '</label>
+					<input type="text" id="mp-stripe-name" value="' . esc_attr($name) . '" />
+				</div>
+				<div class="mp-checkout-form-row">
+					<label>' . __('Card Number', 'mp') . '</label>
+					<input type="text" pattern="\d*" autocomplete="cc-number" id="mp-stripe-cc-num" class="mp-input-cc-num" style="width:200px" />
+				</div>
+				<div class="mp-checkout-form-row">
+					<div class="mp-checkout-input-complex clearfix">
+						<div class="mp-checkout-column">
+							<label>' . __( 'Expiration', 'mp' ) . '</label>
+							<input type="text" autocomplete="cc-exp" id="mp-stripe-cc-expiry" class="mp-input-cc-expiry" style="width:100px" />
+						</div>
+						<div class="mp-checkout-column">
+							<label>' . __( 'Security Code ', 'mp' ) . ' <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
+							<input id="mp-stripe-cc-cvc" class="mp-input-cc-cvc" type="text" autocomplete="off" style="width:75px;" />
+						</div>
+					</div>
+				</div>';
+				
 			return $content;
 	}
 
@@ -450,28 +432,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			return $content;
 	}
 
-	/**
-   * Updates the gateway settings
-   *
-   * @since 3.0
-   * @access public
-   * @param array $settings
-   * @return array
-   */
-  public function update( $settings ) {
-  	if ( $val = $this->get_setting('private_key') ) {
-	  	mp_push_to_array($settings, 'gateways->stripe->api_credentials->private_key', $val);
-	  	unset($settings['gateways']['stripe']['private_key']);	
-  	}
-  	
-  	if ( $val = $this->get_setting('publishable_key') ) {
-	  	mp_push_to_array($settings, 'gateways->stripe->api_credentials->publishable_key', $val);
-	  	unset($settings['gateways']['stripe']['publishable_key']);	
-  	}
-  	
-    return $settings;
-  }
-  
   /**
    * Initialize the settings metabox
    *

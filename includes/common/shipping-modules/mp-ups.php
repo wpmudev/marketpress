@@ -3,7 +3,12 @@
 MarketPress UPS Calculated Shipping Plugin
 Author: Arnold Bailey (Incsub)
 */
-class MP_Shipping_UPS extends MP_Shipping_API {
+
+if ( ! class_exists('MP_Shipping_API_Calculated') ) {
+	require_once mp_plugin_dir('includes/common/class-mp-shipping-api-calculated.php');	
+}
+
+class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 	//build of the plugin
 	public $build = 2;
 
@@ -102,73 +107,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 		}
 		
 		return array();
-	}
-
-	/**
-   * Updates the plugin settings
-   *
-   * @since 3.0
-   * @access public
-   * @param array $settings
-   * @return array
-   */
-  public function update( $settings ) {
-		// Added in 2.9.5.1 - make sure we set the old default which was daily pickup
-		if ( ! $this->get_setting('pickup_type') ) {
-			mp_push_to_array($settings, 'shipping->ups->pickup_type', '01');
-		}
-  
-  	// Update boxes
-  	if ( $this->get_setting('boxes->name') ) {
-	  	$boxes = array();
-	  	$old_boxes = $this->get_setting('boxes');
-	  	
-			foreach ( $old_boxes['name'] as $idx => $val ) {
-				if ( empty($val) ) {
-					continue;
-				}
-				
-				$boxes[] = array(
-					'ID' => $idx,
-					'name' => $val,
-					'size' => $old_boxes['size'][$idx],
-					'weight' => $old_boxes['weight'][$idx],
-				);
-			}
-			
-			mp_push_to_array($settings, 'shipping->ups->boxes', $boxes);
-  	}
-  	
-    return $settings;
-  }
-
-	/**
-	* Echo anything you want to add to the top of the shipping screen
-	*/
-	function before_shipping_form($content) {
-		return $content;
-	}
-
-	/**
-	* Echo anything you want to add to the bottom of the shipping screen
-	*/
-	function after_shipping_form($content) {
-		return $content;
-	}
-
-	/**
-	* Echo a table row with any extra shipping fields you need to add to the shipping checkout form
-	*/
-	function extra_shipping_field($content) {
-		return $content;
-	}
-
-	/**
-	* Use this to process any additional field you may add. Use the $_POST global,
-	*  and be sure to save it to both the cookie and usermeta if logged in.
-	*/
-	function process_shipping_form() {
-
 	}
 
   /**
@@ -276,43 +214,6 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	}
 
 	/**
-	* Save any per-product shipping fields from the shipping metabox using update_post_meta
-	*
-	* @param array $shipping_meta, save anything from the $_POST global
-	* return array $shipping_meta
-	*/
-	function save_shipping_metabox($shipping_meta) {
-
-		return $shipping_meta;
-	}
-	
-	/**
-	* Use this function to return your calculated price as an integer or float
-	*
-	* @param int $price, always 0. Modify this and return
-	* @param float $total, cart total after any coupons and before tax
-	* @param array $cart, the contents of the shopping cart for advanced calculations
-	* @param string $address1
-	* @param string $address2
-	* @param string $city
-	* @param string $state, state/province/region
-	* @param string $zip, postal code
-	* @param string $country, ISO 3166-1 alpha-2 country code
-	* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
-	*
-	* return float $price
-	*/
-	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-		if( ! $this->crc_ok() ) {
-			//Price added to this object
-			$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
-		}
-
-		$price = floatval($_SESSION['mp_shipping_info']['shipping_cost']);
-		return $price;
-	}
-
-	/**
 	* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
 	*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
 	*
@@ -327,6 +228,11 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 	* return array $shipping_options
 	*/
 	function shipping_options( $items, $address1, $address2, $city, $state, $zip, $country ) {
+		if ( $this->_crc_ok() && ($shipping_options = mp_get_session_value('mp_shipping_options->' . $this->plugin_name)) ) {
+			// CRC is ok - just return the shipping options already stored in session
+			return $this->_format_shipping_options($shipping_options);
+		}
+		
 		$shipping_options = array();
 
 		$this->address1 = $address1;
@@ -346,13 +252,13 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
 		if( $this->weight == 0 ) { //Nothing to ship
-			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
-			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
+			mp_update_session_value('mp_shipping_info->shipping_sub_option', __('Free Shipping', 'mp'));
+			mp_update_session_value('mp_shipping_info->shipping_cost', 0);
 			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
 		}
 
 		// Got our totals  make sure we're in decimal pounds.
-		$this->weight = $this->as_pounds($this->weight);
+		$this->weight = $this->_as_pounds($this->weight);
 
 		//ups won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
@@ -378,18 +284,11 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 			// Can't use zip+4
 			$this->destination_zip = substr($this->destination_zip, 0, 5);
 		}
-
+		
 		$shipping_options = $this->rate_request();
 		
 		return $shipping_options;
 
-	}
-
-	/**For uasort below
-	*/
-	function compare_rates($a, $b){
-		if($a['rate'] == $b['rate']) return 0;
-		return ($a['rate'] < $b['rate']) ? -1 : 1;
 	}
 
 	/**
@@ -436,7 +335,7 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		//found our box
 		$dims = explode('x', strtolower($box['size']));
-		foreach($dims as &$dim) $dim = $this->as_inches($dim);
+		foreach($dims as &$dim) $dim = $this->_as_inches($dim);
 
 		sort($dims); //Sort so two lowest values are used for Girth
 
@@ -572,10 +471,8 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
 
 				//match it up if there is already a selection
-				if ( ! empty($_SESSION['mp_shipping_info']['shipping_sub_option']) ) {
-					if ( $_SESSION['mp_shipping_info']['shipping_sub_option'] == $service ) {
-						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate + $handling;
-					}
+				if ( ($suboption = mp_get_session_value('mp_shipping_info->shipping_sub_option')) && ($suboption == $service) ) {
+					mp_update_session_value('mp_shipping_info->shipping_cost', ($rate + $handling));
 				}
 			}
 		}
@@ -584,123 +481,19 @@ class MP_Shipping_UPS extends MP_Shipping_API {
 
 		$shipping_options = array();
 		foreach ( $mp_shipping_options as $service => $options ) {
-			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
+			$shipping_options[$service] = $this->_format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
 		}
 
 		//Update the session. Save the currently calculated CRCs
-		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc(mp_cart()->get_items());
-		$_SESSION['mp_shipping_crc'] = $this->crc(mp_get_session_value('mp_shipping_info'));
+		mp_update_session_value('mp_shipping_options->' . $this->plugin_name, $mp_shipping_options);
+		mp_update_session_value('mp_cart_crc', $this->crc(mp_cart()->get_items()));
+		mp_update_session_value('mp_shipping_crc', $this->crc(mp_get_session_value('mp_shipping_info')));
 		
 		unset($xpath);
 		unset($dom);
 
 		return $shipping_options;
 	}
-
-	/**Used to detect changes in shopping cart between calculations
-	* @param (mixed) $item to calculate CRC of
-	*
-	* @return CRC32 of the serialized item
-	*/
-	public function crc($item = ''){
-		return crc32(serialize($item));
-	}
-
-	/**
-	* Tests the $_SESSION cart cookie and mp_shipping_info to see if the data changed since last calculated
-	* Returns true if the either the crc for cart or shipping info has changed
-	*
-	* @return boolean true | false
-	*/
-	private function crc_ok(){
-		//Assume it changed
-		$result = false;
-
-		//Check the shipping options to see if we already have a valid shipping price
-		if(isset($_SESSION['mp_shipping_options'])){
-			//We have a set of prices. Are they still valid?
-			//Did the cart change since last calculation
-			if ( is_numeric($_SESSION['mp_shipping_info']['shipping_cost'])){
-
-				if($_SESSION['mp_cart_crc'] == $this->crc(mp()->get_cart_cookie())){
-					//Did the shipping info change
-					if($_SESSION['mp_shipping_crc'] == $this->crc($_SESSION['mp_shipping_info'])){
-						$result = true;
-					}
-				}
-			}
-		}
-		return $result;
-	}
-
-	// Conversion Helpers
-
-	/**
-	* Formats a choice for the Shipping options dropdown
-	* @param array $shipping_option, a $this->services key
-	* @param float $price, the price to display
-	*
-	* @return string, Formatted string with shipping method name delivery time and price
-	*
-	*/
-	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
-		if ( isset($this->services[$shipping_option]) ) {
-			$option = $this->services[$shipping_option]->name;
-		}
-
-		$price = is_numeric($price) ? $price : 0;
-		$handling = is_numeric($handling) ? $handling : 0;
-		$total = $price + $handling;
-		
-		if ( mp_get_setting('tax->tax_inclusive') && mp_get_setting('tax->tax_shipping') ) {
-			$total = mp()->shipping_tax_price($total);
-		}
-
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, mp_format_currency('', $total));
-		return $option;
-	}
-
-	/**
-	* Returns an inch measurement depending on the current setting of [shipping] [system]
-	* @param float $units
-	*
-	* @return float, Converted to the current units_used
-	*/
-	private function as_inches( $units ){
-		$units = ( mp_get_setting('shipping->system') == 'metric' ) ? floatval($units) / 2.54 : floatval($units);
-		return round($units,2);
-	}
-
-	/**
-	* Returns a pounds measurement depending on the current setting of [shipping] [system]
-	* @param float $units
-	*
-	* @return float, Converted to pounds
-	*/
-	private function as_pounds( $units ){
-		$units = ( mp_get_setting('shipping->system') == 'metric' ) ? floatval($units) * 2.2 : floatval($units);
-		return round($units, 2);
-	}
-
-	/**
-	* Returns a the string describing the units of weight for the [mp_shipping][system] in effect
-	*
-	* @return string
-	*/
-	private function get_units_weight(){
-		return ( mp_get_setting('shipping->system') == 'english' ) ? __('Pounds','mp') : __('Kilograms', 'mp');
-	}
-
-	/**
-	* Returns a the string describing the units of length for the [mp_shipping][system] in effect
-	*
-	* @return string
-	*/
-	private function get_units_length(){
-		return ( mp_get_setting('shipping->system') ) ? __('Inches','mp') : __('Centimeters', 'mp');
-	}
-
 } //End MP_Shipping_UPS
 
 

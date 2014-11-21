@@ -303,11 +303,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    *  at checkout.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
+   * @param array $shipping_info. Contains billing info and email in case you need it
    */
-  function payment_form($global_cart, $shipping_info) {
-    if (isset($_GET['cancel']))
-      echo '<div class="mp_checkout_error">' . __('Your PayPal transaction has been canceled.', 'mp') . '</div>';
+  function payment_form( $items, $billing_info ) {
+	  return '';
   }
 
   /**
@@ -935,10 +934,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
       $i = 0;
       $coupon_code = mp()->get_coupon_code();
-
+			$coupon_amt = 0;
+			
       foreach ($cart as $product_id => $variations) {
         foreach ($variations as $variation => $data) {
-					$price = mp()->coupon_value_product($coupon_code, $data['price'], $product_id);
+					if ( $coupon_code ) {
+						$price_coupon = mp()->coupon_value_product($coupon_code, ($data['price'] * $data['quantity']), $product_id);
+						$price = ($data['price'] * $data['quantity']);
+						$coupon_amt = ($price - $price_coupon);
+					}
 
 					//skip free products to avoid paypal error
 					if ($price <= 0)
@@ -954,6 +958,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				  $i++;
 				}
       }
+      
+      if ( $coupon_amt ) {
+	      $price = ($coupon_amt * -1);
+	      $totals[] = $price;
+			  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name('Coupon');
+			  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($price);
+			  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($coupon_code);
+			  $request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
+			  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";	    	  
+      }
+      
       $total = array_sum($totals);
 
       $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
