@@ -50,7 +50,10 @@ var mp_coupons = {};
 					$('#mp-cart-meta').replaceWith(resp.data.cartmeta);
 					marketpress.initSelect2();
 				} else {
-					alert(resp.data.message);
+					$( '#mp-coupon-tooltip' )
+						.tooltip( 'option', 'content', resp.data.message )
+						.tooltip( 'option', 'tooltipClass', 'error' )
+						.tooltip( 'open' );
 				}
 			});
 		},
@@ -106,6 +109,7 @@ var mp_coupons = {};
 					$( '#mp-cart-item-' + index ).replaceWith( value );
 				});
 				$( '#mp-cart-meta').replaceWith( data.cart_meta );
+				marketpress.initSelect2();
 				$tooltip
 					.tooltip( 'option', 'content', mp_coupons_i18n.messages.added )
 					.tooltip( 'option', 'tooltipClass', 'success' )
