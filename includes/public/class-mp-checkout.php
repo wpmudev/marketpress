@@ -11,13 +11,31 @@ class MP_Checkout {
 	private static $_instance = null;
 	
 	/**
+	 * Refers to the current checkout step
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var string
+	 */
+	protected $_step = null;
+
+	/**
 	 * Refers to the current checkout step number
 	 *
 	 * @since 3.0
 	 * @access protected
 	 * @var int
 	 */
-	protected $_step = 1;
+	protected $_stepnum = 1;
+	
+	/**
+	 * Refers to the checkout sections
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_sections = array();
 	
 	/**
 	 * Gets the single instance of the class
@@ -155,58 +173,7 @@ class MP_Checkout {
 		foreach ( $address_fields as $field ) {
 			$html .= '<div class="mp-checkout-form-row">' . $this->form_field( $field ) . '</div>';
 		}
-		
-		/*$html = '
-			<div class="mp-checkout-form-row">
-				<label>' . __('Country', 'mp') . '</label>' .
-				$this->country_dropdown($type, $country) . '
-			</div>
-			<div class="mp-checkout-form-row">
-				<label>' . __('Name', 'mp') . '</label>
-				<div class="mp-checkout-input-complex clearfix">
-					<label class="mp-checkout-column">
-						<input type="text" name="' . $this->field_name('first_name', $type) . '" value="' . mp_get_user_address_part('first_name', $type) . '" /><br />
-						<span>' . __('First', 'mp') . '</span>
-					</label>
-					<label class="mp-checkout-column">
-						<input type="text" name="' . $this->field_name('last_name', $type) . '" value="' . mp_get_user_address_part('last_name', $type) . '" /><br />
-						<span>' . __('Last', 'mp') . '</span>
-					</label>
-				</div>
-			</div>
-			<div class="mp-checkout-form-row">
-				<label>' . __('Company', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('company', $type) . '" value="' . mp_get_user_address_part('company', $type) . '" />
-			</div>
-			<div class="mp-checkout-form-row">
-				<label>' . __('Address Line 1', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('address1', $type) . '" placeholder="' . __('Street address, P.O. box, company name, c/o', 'mp') . '" value="' . mp_get_user_address_part('address1', $type) . '" />
-			</div>
-			<div class="mp-checkout-form-row">
-				<label>' . __('Address Line 2', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('address2', $type) . '" placeholder="' . __('Apartment, suite, unit, building, floor, etc', 'mp') . '" value="' . mp_get_user_address_part('address2', $type) . '" />
-			</div>
-			<div class="mp-checkout-form-row">
-				<label>' . __('Town/City', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('city', $type) . '" value="' . mp_get_user_address_part('city', $type) . '" />
-			</div>
-			<div class="mp-checkout-form-row">
-				<div class="mp-checkout-input-complex clearfix">
-					<div class="mp-checkout-column">
-						 <label>' . __('State/Province', 'mp') . '</label>' .
-						$this->province_field($country, $type, mp_get_user_address_part('state', $type)) . '
-					</div>
-					<div class="mp-checkout-column">
-						 <label>' . __('Post/Zip Code', 'mp') . '</label>
-						 <input type="text" name="' . $this->field_name('zip', $type) . '" value="' . mp_get_user_address_part('zip', $type) . '" />
-					</div>
-				</div>
-			</div>
-			<div class="mp-checkout-form-row">
-				<label>' . __('Phone', 'mp') . '</label>
-				<input type="text" name="' . $this->field_name('phone', $type) . '" value="' . mp_get_user_address_part('phone', $type) . '" />
-			</div>';*/
-			
+					
 		/**
 		 * Filter address field html
 		 *
@@ -267,7 +234,7 @@ class MP_Checkout {
 		 * @since 3.0
 		 * @param array The current sections array.
 		 */
-		$sections = apply_filters( 'mp_checkout/sections_array', array(
+		$this->_sections = apply_filters( 'mp_checkout/sections_array', array(
 			'login-register',
 			'billing-shipping-address',
 			'shipping',
@@ -278,8 +245,9 @@ class MP_Checkout {
 		$html = '
 			<form id="mp-checkout" class="clearfix" method="post" novalidate>';
 		
-		foreach ( $sections as $section ) {
+		foreach ( $this->_sections as $section ) {
 			$method = 'section_' . str_replace( '-', '_', $section );
+			$this->_step = $section;
 			
 			if ( method_exists( $this, $method ) ) {
 				$tmp_html = $this->$method();
@@ -289,12 +257,23 @@ class MP_Checkout {
 				}
 				
 				$html .= '
-				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section">' . $tmp_html . '</div>';
+				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section" data-cycle-hash="' . $section . '">' . $tmp_html . '</div>';
+				
+				$this->_stepnum ++;
 			}
 		}
 		
 		$html .= '
 			</form>';
+			
+		/**
+		 * Filter the checkout form html
+		 *
+		 * @since 3.0
+		 * @param string $html The current html.
+		 * @param array $this->_sections An array of sections to display.
+		 */
+		$html = apply_filters( 'mp_checkout/display', $html, $this->_sections );
 		
 		if ( $echo ) {
 			echo $html;
@@ -424,7 +403,34 @@ class MP_Checkout {
 		return $html;
 	}
 
-	
+	/**
+	 * Get the previous/next step html link
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $what Either "prev" or "next".
+	 * @return string
+	 */
+	public function step_link( $what ) {
+		$hash = $this->url_hash( $what );
+		$text = '';
+		$classes = array( 'mp-button', "mp-button-checkout-{$what}-step" );
+		
+		switch ( $what ) {
+			case 'prev' :
+				$text = __( '&laquo; Previous Step', 'mp' );
+				$classes[] = 'mp-button-secondary';
+			break;
+			
+			case 'next' :
+				$text = __( 'Next Step &raquo;', 'mp' );
+				$classes[] = 'mp-button-medium';
+			break;
+		}
+		
+		return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
+	}
+
 	/**
 	 * Display state/province field
 	 *
@@ -514,7 +520,10 @@ class MP_Checkout {
 					$this->address_fields('shipping') . '
 				</div>
 			</div>
-			<p><a class="mp-button mp-button-medium mp-button-checkout-next-step" href="#">' . __( 'Next Step', 'mp' ) . '</a></p>';
+			<div class="clearfix mp-checkout-buttons">' .
+				$this->step_link( 'prev' ) .
+				$this->step_link( 'next' ) . '
+			</div>';
 			
 		return $html;
 	}
@@ -534,8 +543,7 @@ class MP_Checkout {
 		
 		if ( $step ) {
 			$html .= '
-				<span class="mp-checkout-step-num">' . $this->_step . '</span>';
-			$this->_step ++;
+				<span class="mp-checkout-step-num">' . $this->_stepnum . '</span>';
 		}
 		
 		$html .= $text . '
@@ -573,7 +581,7 @@ class MP_Checkout {
 					<div class="mp-checkout-column" style="padding-left:25px">
 						<h4>' . __( 'First-time customer?', 'mp') . '</h4>
 						<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-						<p><a class="mp-button mp-button-medium mp-button-checkout-next-step" href="#step2">' . __( 'Continue as Guest', 'mp' ) . '</a></p>
+						<p><a class="mp-button mp-button-medium mp-button-checkout-next-step" href="' . $this->url_hash( 'next' ) . '">' . __( 'Continue as Guest', 'mp' ) . '</a></p>
 					</div>
 				</div>';
 		}
@@ -633,6 +641,11 @@ class MP_Checkout {
 		}
 		
 		$html .= $form;
+		$html .= '
+			<div class="mp-checkout-buttons clearfix">' .
+				$this->step_link( 'prev' ) .
+				$this->step_link( 'next' ) . '
+			</div>';
 		
 		/**
 		 * Filter the section payment html
@@ -675,6 +688,12 @@ class MP_Checkout {
 			default :
 			break;
 		}
+		
+		$html .= '
+						<div class="clearfix mp-checkout-buttons">' .
+							$this->step_link( 'prev' ) .
+							$this->step_link( 'next' ) . '
+						</div>';
 
 		
 		/**
@@ -686,6 +705,30 @@ class MP_Checkout {
 		 * @param array $active_plugins The currently active shipping plugins.
 		 */
 		return apply_filters( 'mp_checkout/section_shipping', $html, $shipping_method, $active_plugins );		
+	}
+	
+	/**
+	 * Get current/next url hash
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $what Either "prev" or "next".
+	 * @return string
+	 */
+	public function url_hash( $what ) {
+		$key = array_search( $this->_step, $this->_sections );
+		
+		switch ( $what ) {
+			case 'next' :
+				$slug = mp_arr_get_value( ($key + 1), $this->_sections, '' );
+			break;
+			
+			case 'prev' :
+				$slug = mp_arr_get_value( ($key - 1), $this->_sections, '' );
+			break;
+		}
+		
+		return '#' . $slug;
 	}
 }
 
