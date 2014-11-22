@@ -55,20 +55,15 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		initCheckoutSteps : function(){
-			var startingSlide = this.getHash( 'step', 1 );
-			if ( startingSlide <= 0 ) {
-				startingSlide = 1;
-			}
-			
-			$( '#mp-checkout' ).cycle({
+			$checkout.cycle({
 				allowWrap : false,
 				autoHeight : "calc",
 				fx : "scrollHorz",
 				log : false,
+				prev : "#mp-checkout .mp-button-checkout-prev-step",
 				next : "#mp-checkout .mp-button-checkout-next-step",
 				slideActiveClass : "current",
 				slides : "> .mp-checkout-section",
-				startingSlide : (startingSlide - 1),
 				timeout : 0
 			});
 		},
