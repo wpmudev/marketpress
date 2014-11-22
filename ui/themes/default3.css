@@ -88,7 +88,8 @@
 #mp_single_product .mp-button:hover,
 #mp_product_list .mp-button:hover,
 #mp-cart-form .mp-button:hover {
-  background-color: #000;
+  background-color: #000 !important;
+  color: #fff !important;
 }
 #colorbox .mp-button:before,
 #mp-checkout .mp-button:before,
@@ -154,6 +155,14 @@
 #mp-cart-form .mp-button.mp-button-medium {
   font-size: 16px;
   padding: 10px 15px;
+}
+#colorbox .mp-button.mp-button-secondary,
+#mp-checkout .mp-button.mp-button-secondary,
+#mp_single_product .mp-button.mp-button-secondary,
+#mp_product_list .mp-button.mp-button-secondary,
+#mp-cart-form .mp-button.mp-button-secondary {
+  background: #aaa;
+  color: #eaeaea;
 }
 #colorbox .mp-button.mp_button_addcart:before,
 #mp-checkout .mp-button.mp_button_addcart:before,
@@ -331,6 +340,11 @@
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQCAMAAAAVv241AAAAP1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////9Du/pqAAAAFHRSTlMAeLYdsfsx7vJcn8yt3elMwDoLDTC4YrkAAABiSURBVHgBdcxJDoAgEETRAmUeBK37n9UGEnXjX/GSpgBcqriagryArZLGkHmgMZ6ALVRAp14HrEBg7EE6nLmQ+RTgXuQFL2uUzwMJdmCfaLL1gFb9IeoPVhrlRcThjZ8xbTervAn5A5BiZwAAAABJRU5ErkJggg==) no-repeat;
   width: 12px;
   display: inline-block !important;
+}
+#mp-checkout .mp-checkout-buttons {
+  border-top: 2px solid #eaeaea;
+  margin-top: 30px;
+  padding-top: 30px;
 }
 #mp-checkout .mp-checkout-step-num {
   background: #448cf8;
