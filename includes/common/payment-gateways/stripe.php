@@ -286,7 +286,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 				<div class="mp-checkout-form-row">
 					<div class="mp-checkout-input-complex clearfix">
 						<div class="mp-checkout-column">
-							<label>' . __( 'Expiration', 'mp' ) . '</label>
+							<label>' . __( 'Expiration', 'mp' ) . ' <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> format', 'mp' ) . '</span></label>
 							<input type="text" autocomplete="cc-exp" id="mp-stripe-cc-expiry" class="mp-input-cc-expiry" style="width:100px" />
 						</div>
 						<div class="mp-checkout-column">
