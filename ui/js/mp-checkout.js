@@ -55,16 +55,67 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		initCheckoutSteps : function(){
+			var $checkout = $(' #mp-checkout' );
+			
+			// Initialize steps
 			$checkout.cycle({
 				allowWrap : false,
 				autoHeight : "calc",
 				fx : "scrollHorz",
 				log : false,
 				prev : "#mp-checkout .mp-button-checkout-prev-step",
-				next : "#mp-checkout .mp-button-checkout-next-step",
 				slideActiveClass : "current",
 				slides : "> .mp-checkout-section",
 				timeout : 0
+			});
+			
+			// Validate form
+			$checkout.validate({
+				highlight : function(){
+					// Intentionally left blank
+				},
+				unhighlight : function( element, errorClass, validClass ){
+					var $tip = $( element ).prev( '.mp-tooltip' );
+					if ( $tip.length > 0 ) {
+						$tip.tooltip( 'close' );
+					}
+				},
+				showErrors : function( errorMap, errorList ){
+					$.each( errorMap, function( inputName, message ){
+						var $input = $( '[name="' + inputName + '"]' );
+						var $tip = $input.prev( '.mp-tooltip' );
+						
+						if ( $tip.length == 0 ) {
+							$input.before( '<div class="mp-tooltip" />');
+							$tip = $input.prev( '.mp-tooltip' );
+							$tip.uniqueId().tooltip({
+								content : "",
+								items : "#" + $tip.attr( 'id' ),
+								tooltipClass : "error",
+								show : 300,
+								hide : 300,
+								position : {
+									of : $input,
+									my : "center bottom-10",
+									at : "center top"
+								}
+							});
+						}
+						
+						$tip.tooltip( 'option', 'content', message );
+						$tip.tooltip( 'open' );
+					});
+					
+					this.defaultShowErrors();
+				}
+			});
+			
+			// Handle next step click
+			$checkout.find( '.mp-button-checkout-next-step' ).click( function( e ){
+				e.preventDefault();
+				if ( $checkout.valid() ) {
+					$checkout.cycle( 'next' );
+				}
 			});
 		},
 		
