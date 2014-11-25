@@ -388,36 +388,6 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	}
 
 	/**
-	* Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
-	*  array. Don't forget to return!
-	*/
-	function process_shipping_settings($settings) {
-		//handle domestic services checkboxes
-		foreach ( $this->services as $service => $detail ) {
-			if ( !isset($_POST['mp']['shipping']['usps']['services'][$service]) )
-				$settings['shipping']['usps']['services'][$service] = 0;	
-		}
-		
-		//handle international services checkboxes
-		foreach ( $this->intl_services as $service => $detail ) {
-			if ( !isset($_POST['mp']['shipping']['usps']['intl_services'][$service]) )
-				$settings['shipping']['usps']['intl_services'][$service] = 0;	
-		}
-
-		return $settings;
-	}
-
-	/**
-	* Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
-	*
-	* @param array $shipping_meta, the contents of the post meta. Use to retrieve any previously saved product meta
-	* @param array $settings, access saved settings via $settings array.
-	*/
-	function shipping_metabox($shipping_meta, $settings) {
-
-	}
-
-	/**
 	* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
 	*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
 	*
@@ -432,13 +402,13 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	* return array $shipping_options
 	*/
 	function shipping_options( $items, $address1, $address2, $city, $state, $zip, $country ) {
-		if ( $this->_crc_ok() && ($shipping_options = mp_get_session_value('mp_shipping_options->' . $this->plugin_name)) ) {
+		if ( $this->_crc_ok() && ($shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name )) ) {
 			// CRC is ok - just return the shipping options already stored in session
-			return $this->_format_shipping_options($shipping_options);
+			return $this->_format_shipping_options( $shipping_options );
 		}
 
 		// Not ok then calculate them
-		$settings = get_option('mp_settings');
+		$settings = get_option( 'mp_settings' );
 
 		$this->weight = 0;
 		$this->pound = 0;
@@ -454,37 +424,37 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 		$this->country = $country;
 		$this->destination_zip = $zip;
 
-		if( is_array($items) ) {
+		if( is_array( $items ) ) {
 			foreach ( $items as $product_id => $qty ) {
-				$product = new MP_Product($product_id);
+				$product = new MP_Product( $product_id );
 				$weight = $product->get_weight();
-				$this->pkg_max = max($this->pkg_max, $weight);
+				$this->pkg_max = max( $this->pkg_max, $weight );
 				$this->weight += ($weight * $qty);
 			}
 		}
 
 		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
-		if($this->weight == 0){ //Nothing to ship
+		if( $this->weight == 0 ){ //Nothing to ship
 			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
 			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
 			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
 		}
 
 		// Got our totals  make sure we're in decimal pounds.
-		$this->weight = $this->_as_pounds($this->weight);
-		$this->pkg_max = $this->_as_pounds($this->pkg_max);
+		$this->weight = $this->_as_pounds( $this->weight );
+		$this->pkg_max = $this->_as_pounds( $this->pkg_max );
 
 		//USPS won't accept a zero weight Package
-		$this->weight = max($this->weight, 0.1);
+		$this->weight = max( $this->weight, 0.1 );
 
-		if ( in_array(mp_get_setting('base_country'), array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI')) ){
+		if ( in_array( mp_get_setting( 'base_country' ), array( 'US','UM','AS','FM','GU','MH','MP','PW','PR','PI' ) ) ) {
 			// Can't use zip+4
-			$this->base_zip = substr($this->base_zip, 0, 5);
+			$this->base_zip = substr( $this->base_zip, 0, 5 );
 		}
 
-		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+		if ( in_array( $this->country, array( 'US','UM','AS','FM','GU','MH','MP','PW','PR','PI' ) ) ) {
 			// Can't use zip+4
-			$this->destination_zip = substr($this->destination_zip, 0, 5);
+			$this->destination_zip = substr( $this->destination_zip, 0, 5 );
 			$shipping_options = $this->ratev4_request();
 		} else {
 			$shipping_options = $this->ratev2_request();
@@ -549,20 +519,12 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	* return array $shipping_options
 	*/
 	function ratev4_request(){
-		$shipping_options = $this->get_setting('services', array());
-		$temp = array();
+		$shipping_options = array_filter( $this->get_setting( 'services', array() ), create_function( '$enabled', 'return ( $enabled );' ) );
 		
-		//determine which options are enabled
-		foreach ( $shipping_options as $service => $enabled ) {
-			if ( $enabled )
-				$temp[$service] = $enabled;
-		}
-		
-		$shipping_options = $temp;
-		
-		if ( count($shipping_options) == 0 )
+		if ( count($shipping_options) == 0 ) {
 			//no services enabled - bail
 			return array();
+		}
 			
 		$this->calculate_packages();
 
@@ -716,22 +678,12 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	* return array $shipping_options
 	*/
 	function ratev2_request(){
-		global $mp;
-
-		$shipping_options = $this->get_setting('intl_services', array());
-		$temp = array();
+		$shipping_options = array_filter( $this->get_setting( 'intl_services', array() ), create_function( '$val', 'return ($val == 1);' ) );
 		
-		//determine which options are enabled
-		foreach ( $shipping_options as $service => $enabled ) {
-			if ( $enabled )
-				$temp[$service] = $enabled;
-		}
-		
-		$shipping_options = $temp;
-		
-		if ( count($shipping_options) == 0 )
+		if ( count($shipping_options) == 0 ) {
 			//no services enabled - bail
 			return array();
+		}
 
 		$this->calculate_packages();
 
