@@ -428,10 +428,15 @@ if ( ! function_exists('mp_doing_ajax') ) :
 	 *
 	 * @since 3.0
 	 * @uses DOING_AJAX
+	 * @param string $action Optional, the ajax action to check.
 	 * @return bool
 	 */
-	function mp_doing_ajax() {
-		return ( defined('DOING_AJAX') && DOING_AJAX );
+	function mp_doing_ajax( $action = null ) {
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && (is_null( $action ) || $action == mp_get_request_value( 'action' )) ) {
+			return true;
+		}
+		
+		return false;
 	}
 endif;
 
