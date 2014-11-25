@@ -422,6 +422,21 @@ class MP_Cart {
 		$html .= apply_filters('mp_cart/cart_meta/product_total', $line, $this);
 
 		$line = '
+				<div id="mp-cart-meta-line-shipping-total" class="mp-cart-meta-line clearfix">
+					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp'), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</strong>
+					<span class="mp-cart-meta-line-amount">' . $this->shipping_total( true ) . '</span>
+				</div>';
+
+		/**
+		 * Filter the shipping total html
+		 *
+		 * @since 3.0
+		 * @param string The current shipping total html.
+		 * @param MP_Cart The current cart object.
+		 */
+		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $line, $this );
+
+		$line = '
 				<div id="mp-cart-meta-line-estimated-tax" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? sprintf(__('Estimated %s', 'mp'), mp_get_setting('tax->label')) : mp_get_setting('tax->label')) . '</strong>
 					<span class="mp-cart-meta-line-amount">' . $this->tax_total(true, true) . '</span>
