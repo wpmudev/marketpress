@@ -11,7 +11,7 @@ var mp_checkout;
 			this.initShippingAddressListeners();
 			this.initPaymentOptionListeners();
 			this.initUpdateShippingMethodsListeners();
-			this.initCardValidationListeners();
+			this.initCardValidation();
 			this.initAjaxLogin();
 			this.initCheckoutSteps();
 		},
@@ -57,52 +57,120 @@ var mp_checkout;
 		initCheckoutSteps : function(){
 			var $checkout = $(' #mp-checkout' );
 			
-			// Initialize steps
+			/* Maybe hide previous button - we use this instead of the "prev" option
+			because slides can dynamically be updated and the prev button would stop
+			working */
+			$( document ).on( 'cycle-initialized cycle-after', '#mp-checkout', function( e, opts ){
+				var $btn = $checkout.find( '.mp-button-checkout-prev-step' );
+				
+				var slideNum = (opts.currSlide + 1)
+				if ( opts.slideNum !== undefined ) {
+					slideNum = opts.slideNum;
+				}
+				
+				if ( slideNum == 1 ) {
+					$btn.addClass( 'disabled' );
+				} else {
+					$btn.removeClass( 'disabled' );
+				}
+			} );
+			
+			// Init previous button events
+			$checkout.on( 'click', '.mp-button-checkout-prev-step', function( e ){
+				e.preventDefault();
+				$checkout.cycle( 'prev' );
+			} );
+			
+			// Initialize step transitions
 			$checkout.cycle({
 				allowWrap : false,
-				autoHeight : "calc",
-				fx : "scrollHorz",
+				autoHeight : "container",
 				log : false,
-				prev : "#mp-checkout .mp-button-checkout-prev-step",
+				nowrap : true,
 				slideActiveClass : "current",
 				slides : "> .mp-checkout-section",
+				sync : false,
 				timeout : 0
 			});
 			
+			// Hide field errors when going back
+			$checkout.on( 'cycle-prev', function( e, opts ){
+				$( '.mp-tooltip' ).tooltip( 'close' );
+			} );
+			
 			// Validate form
 			$checkout.validate({
+				ignore : function( index, element ){
+					return ( ! $( element).closest( '.cycle-slide.current' ).length );
+				},
 				highlight : function(){
 					// Intentionally left blank
 				},
 				unhighlight : function( element, errorClass, validClass ){
-					var $tip = $( element ).prev( '.mp-tooltip' );
+					var $tip = $( element ).siblings( '.mp-tooltip' );
 					if ( $tip.length > 0 ) {
 						$tip.tooltip( 'close' );
+					}
+				},
+				submitHandler : function( form ){
+					var $form = $( form );
+					
+					if ( $form.valid() ) {
+						if ( $checkout.hasClass( 'last-step' ) ) {
+							marketpress.loadingOverlay( 'show' );
+							form.submit();
+						} else {
+							var step = $checkout.find( '.cycle-slide.current' ).attr( 'id' );
+							
+							switch ( step ) {
+								case 'mp-checkout-section-billing-shipping-address' :
+									var url = mp_i18n.ajaxurl + '?action=mp_update_shipping_section';
+									marketpress.loadingOverlay( 'show' );
+									
+									$.post( url, $form.serialize() ).done( function( resp ){
+										$( '#mp-checkout-section-shipping' ).find( '.mp-checkout-section-content' ).html( resp );
+										marketpress.loadingOverlay( 'hide' );
+										$checkout.cycle( 'next' );
+									} );
+								break;
+								
+								default :
+									/**
+									 * Fires when going to the next checkout step
+									 *
+									 * @since 3.0
+									 * @param string The step being transitioned from.
+									 * @param jQuery The current form object
+									 */
+									$( document ).trigger( 'mp_checkout/next_step', [ step, $form ] );
+								break;
+							}
+						}
 					}
 				},
 				showErrors : function( errorMap, errorList ){
 					$.each( errorMap, function( inputName, message ){
 						var $input = $( '[name="' + inputName + '"]' );
-						var $tip = $input.prev( '.mp-tooltip' );
+						var $tip = $input.siblings( '.mp-tooltip' );
 						
 						if ( $tip.length == 0 ) {
-							$input.before( '<div class="mp-tooltip" />');
-							$tip = $input.prev( '.mp-tooltip' );
+							$input.after( '<div class="mp-tooltip" />');
+							$tip = $input.siblings( '.mp-tooltip' );
 							$tip.uniqueId().tooltip({
 								content : "",
 								items : "#" + $tip.attr( 'id' ),
 								tooltipClass : "error",
 								show : 300,
-								hide : 300,
-								position : {
-									of : $input,
-									my : "center bottom-10",
-									at : "center top"
-								}
+								hide : 300
 							});
 						}
 						
 						$tip.tooltip( 'option', 'content', message );
+						$tip.tooltip( 'option', 'position', {
+							of : $input,
+							my : "center bottom-10",
+							at : "center top"
+						} );
 						$tip.tooltip( 'open' );
 					});
 					
@@ -110,11 +178,13 @@ var mp_checkout;
 				}
 			});
 			
-			// Handle next step click
-			$checkout.find( '.mp-button-checkout-next-step' ).click( function( e ){
-				e.preventDefault();
-				if ( $checkout.valid() ) {
-					$checkout.cycle( 'next' );
+			// Add/remove "last-step" class when on last step
+			$checkout.on( 'cycle-after', function( evt, opts ){
+				console.log( opts );
+				if ( opts.currSlide == (opts.slideCount - 1) ) {
+					$checkout.addClass( 'last-step' );
+				} else {
+					$checkout.removeClass( 'last-step' );
 				}
 			});
 		},
@@ -181,14 +251,19 @@ var mp_checkout;
 		},
 		
 		/**
-		 * Initialize events related to credit card validation
+		 * Initialize credit card validation events/rules
 		 *
 		 * @since 3.0
 		 */
-		initCardValidationListeners : function(){
+		initCardValidation : function(){
 			$( '.mp-input-cc-num' ).payment( 'formatCardNumber' );
 			$( '.mp-input-cc-expiry' ).payment( 'formatCardExpiry' );
-			$( '.mp-input-cc-cvc' ).payment( 'formatCardCVC' )
+			$( '.mp-input-cc-cvc' ).payment( 'formatCardCVC' );
+			
+			// Validate card number
+			$.validator.addMethod( 'ccnum', function( val, element){
+				return this.optional( element ) || $.payment.validateCardNumber( val );
+			}, 'Invalid credit card number' );
 		},
 		
 		/**
@@ -202,9 +277,13 @@ var mp_checkout;
 			
 			$input.change( function(){
 				var $this = $( this ),
-						$target = $( '#mp-gateway-form-' + $this.val() );
+						$target = $( '#mp-gateway-form-' + $this.val() ),
+						$checkout = $( '#mp-checkout' );
 				
 				$target.show().siblings( '.mp_gateway_form' ).hide();
+				$checkout.animate({
+					height : $checkout.find( '.cycle-slide.current' ).outerHeight()
+				}, 300);
 			});
 			
 			if ( $input.filter( ':checked' ).length ) {
