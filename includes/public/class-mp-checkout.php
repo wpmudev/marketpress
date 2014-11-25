@@ -59,6 +59,10 @@ class MP_Checkout {
 	 */
 	private function __construct() {
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
+		
+		// Refresh shipping section
+		add_action( 'wp_ajax_mp_update_shipping_section', array( &$this, 'ajax_update_shipping_section' ) );
+		add_action( 'wp_ajax_nopriv_mp_update_shipping_section', array( &$this, 'ajax_update_shipping_section' ) );
 	}
 	
 	/**
@@ -185,6 +189,28 @@ class MP_Checkout {
 	}
 	
 	/**
+	 * Update shipping section
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_update_shipping_section, wp_ajax_nopriv_mp_update_shipping_section
+	 */
+	public function ajax_update_shipping_section() {
+		$type = 'billing';
+		if ( mp_get_post_value( 'enable_shipping_address') ) {
+			$type = 'shipping';	
+		}
+		
+		$data = (array) mp_get_post_value( "{$type}", array() );
+		foreach ( $data as $key => $value ) {			
+			mp_update_session_value( "mp_shipping_info->{$key}", $value );
+		}
+		
+		echo $this->section_shipping();
+		die;
+	}
+	
+	/**
 	 * Display country dropdown
 	 *
 	 * @since 3.0
@@ -257,7 +283,9 @@ class MP_Checkout {
 				}
 				
 				$html .= '
-				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section" data-cycle-hash="' . $section . '">' . $tmp_html . '</div>';
+				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section">
+					<div class="mp-checkout-section-content">' . $tmp_html . '</div>
+				</div>';
 				
 				$this->_stepnum ++;
 			}
@@ -298,6 +326,10 @@ class MP_Checkout {
 		wp_register_script( 'jquery-validate-methods', mp_plugin_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery', 'jquery-validate' ), MP_VERSION, true );
 		wp_register_script( 'jquery-payment', mp_plugin_url( 'ui/js/jquery.payment.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_enqueue_script( 'mp-checkout', mp_plugin_url( 'ui/js/mp-checkout.js' ), array( 'jquery-payment', 'jquery-validate-methods', 'jquery-cycle' ), MP_VERSION, true );
+		
+		wp_localize_script( 'mp-checkout', 'mp_checkout_i18n', array(
+			'ccnum' => __( 'Invalid credit card number', 'mp' ),
+		));
 	}
 	
 	/**
@@ -345,12 +377,12 @@ class MP_Checkout {
 		
 		// Convert validation arg into attributes
 		foreach ( (array) mp_arr_get_value( 'validation', $field, array() ) as $key => $val ) {
-			if ( is_bool( $val ) || is_int( $val ) ) {
-				$atts .= " $key";
-			} else {
-				$val = mp_quote_it( $val );
-				$atts .= " {$key}={$val}";
+			if ( is_bool( $val ) ) {
+				$val = ( $val ) ? 'true': 'false';
 			}
+			
+			$val = mp_quote_it( $val );
+			$atts .= " data-rule-{$key}={$val}";
 		}
 		
 		// Convert atts arg into attributes
@@ -420,15 +452,17 @@ class MP_Checkout {
 			case 'prev' :
 				$text = __( '&laquo; Previous Step', 'mp' );
 				$classes[] = 'mp-button-secondary';
+				return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
 			break;
 			
 			case 'next' :
 				$text = __( 'Next Step &raquo;', 'mp' );
 				$classes[] = 'mp-button-medium';
+				return '<button class="' . implode( ' ', $classes ) . '" type="submit">' . $text . '</button>';
 			break;
 		}
 		
-		return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
+		return false;
 	}
 
 	/**
@@ -667,9 +701,12 @@ class MP_Checkout {
 	public function section_shipping() {
 		$active_plugins = MP_Shipping_API::get_active_plugins();
 		$shipping_method = mp_get_setting('shipping->method');
+		$html = '';
 		
-		$html = '' .
-			$this->section_heading(__('Shipping', 'mp'), true);
+		if ( ! mp_doing_ajax() ) {
+			$html = '' .
+				$this->section_heading(__('Shipping', 'mp'), true);
+		}
 		
 		
 		switch ( $shipping_method ) {
