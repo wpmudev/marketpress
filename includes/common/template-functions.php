@@ -394,12 +394,14 @@ if ( ! function_exists( 'mp_list_plugin_shipping_options' ) ) :
 			trigger_error( $plugin . ' is not an instance of MP_Shipping_API', E_USER_ERROR );
 		}
 		
-		$address1 = mp_get_user_address_part('address1', 'shipping');
-		$address2 = mp_get_user_address_part('address2', 'shipping');
-		$city = mp_get_user_address_part('city', 'shipping');
-		$state = mp_get_user_address_part('state', 'shipping');
-		$zip = mp_get_user_address_part('zip', 'shipping');
-		$country = mp_get_user_address_part('country', 'shipping');
+		$what =  ( mp_get_post_value( 'enable_shipping_address' ) ) ? 'shipping' : 'billing';
+		
+		$address1 = mp_get_user_address_part( 'address1', $what );
+		$address2 = mp_get_user_address_part( 'address2', $what );
+		$city = mp_get_user_address_part( 'city', $what );
+		$state = mp_get_user_address_part( 'state', $what );
+		$zip = mp_get_user_address_part( 'zip', $what );
+		$country = mp_get_user_address_part( 'country', $what );
 		
 		$items = mp_cart()->get_items();
 		$options = $plugin->shipping_options( $items, $address1, $address2, $city, $state, $zip, $country );
@@ -409,7 +411,7 @@ if ( ! function_exists( 'mp_list_plugin_shipping_options' ) ) :
 			$input_id = 'mp-shipping-option-' . $plugin->plugin_name . '-' . sanitize_title( $method );
 			$html .= '
 				<label class="mp-checkout-option-label" for="' . $input_id . '">
-					<input id="' . $input_id . '" type="radio" name="shipping_method" value="' . $plugin->plugin_name . '->' . $method . '" autocomplete="off" />
+					<input id="' . $input_id . '" type="radio" name="shipping_method" value="' . $plugin->plugin_name . '->' . $method . '" autocomplete="off" data-rule-required="true" data-msg-required="' . __( 'Please choose a shipping method', 'mp' ) . '" />
 					<span></span>' . $label . '
 				</label>';
 		}
@@ -442,25 +444,25 @@ if ( ! function_exists('mp_get_user_address_part') ) :
 	 * @return string
 	 */
 	function mp_get_user_address_part( $what, $type, $user = null ) {
-		if ( is_null($user) ) {
+		if ( is_null( $user ) ) {
 			$user = wp_get_current_user();
-		} elseif ( ! $user instanceof WP_User && false === ($user = get_user_by('id', $user)) ) {
+		} elseif ( ! $user instanceof WP_User && false === ($user = get_user_by( 'id', $user )) ) {
 			return false;
 		}
 		
-		$meta = $user->get("mp_{$type}_info");
+		$meta = $user->get( "mp_{$type}_info" );
 		
 		if ( 'first_name' == $what || 'last_name' == $what ) {
-			$name = mp_get_session_value("mp_shipping_info->name", mp_arr_get_value('name', $meta, ''));
-			$name_parts = explode(' ', $name);
+			$name = mp_get_session_value( "mp_shipping_info->name", mp_arr_get_value( 'name', $meta, '' ) );
+			$name_parts = explode( ' ', $name );
 			
 			if ( 'first_name' == $what ) {
-				return mp_arr_get_value('0', $name_parts, '');
+				return mp_arr_get_value( '0', $name_parts, '' );
 			} else {
-				return mp_arr_get_value('1', $name_parts, '');
+				return mp_arr_get_value( '1', $name_parts, '' );
 			}
 		} else {
-			return mp_get_session_value("mp_shipping_info->{$what}", mp_arr_get_value($what, $meta, ''));
+			return mp_get_session_value( "mp_shipping_info->{$what}", mp_arr_get_value( $what, $meta, '' ) );
 		}
 	}
 endif;
