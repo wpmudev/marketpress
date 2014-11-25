@@ -295,13 +295,13 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 	* rate_request - Makes the actual call to UPS
 	*/
 	function rate_request() {
-		$shipping_options = array_filter($this->get_setting('services', array()), create_function('$val', 'return ($val == 1);'));
+		$shipping_options = array_filter( $this->get_setting( 'services', array() ), create_function( '$val', 'return ($val == 1);' ) );
 
 		//Assume equal size packages. Find the best matching box size
-		$boxes = (array) $this->get_setting('boxes');
+		$boxes = (array) $this->get_setting( 'boxes' );
 		$box = $largest_box = false;
 		$index = 1;
-		$box_count = count($boxes);
+		$box_count = count( $boxes );
 		
 		if ( $box_count == 0 ) {
 			return false;
@@ -313,7 +313,7 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 				$largest_box = $thebox;
 			}
 			
-			if ( floatval($this->weight) <= floatval($thebox['weight']) || ($index == $box_count && $box === false) ) {
+			if ( floatval( $this->weight ) <= floatval( $thebox['weight'] ) || ( $index == $box_count && $box === false ) ) {
 				$box = $thebox;
 				break;
 			}
@@ -325,19 +325,21 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 			$this->pkg_count = 1;
 			$this->pkg_weight = $this->weight;
 		} else {
-			$this->pkg_count = ceil($this->weight / $box['weight']); // Avoid zero
+			$this->pkg_count = ceil( $this->weight / $box['weight'] ); // Avoid zero
 			$this->pkg_weight = $this->weight / $this->pkg_count;
 		}
 
 		// Fix up pounds by converting multiples of 16 ounces to pounds
-		$this->pounds = intval($this->pkg_weight);
-		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
+		$this->pounds = intval( $this->pkg_weight );
+		$this->ounces = round( ($this->pkg_weight - $this->pounds) * 16 );
 
 		//found our box
-		$dims = explode('x', strtolower($box['size']));
-		foreach($dims as &$dim) $dim = $this->_as_inches($dim);
+		$dims = explode( 'x', strtolower( $box['size'] ) );
+		foreach($dims as &$dim) {
+			$dim = $this->_as_inches( $dim );
+		}
 
-		sort($dims); //Sort so two lowest values are used for Girth
+		sort( $dims ); //Sort so two lowest values are used for Girth
 
 		//Build Authorization XML
 		$auth_dom = new DOMDocument('1.0', 'utf-8');
@@ -460,11 +462,19 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 		$mp_shipping_options = $shipping_options;
 		
 		foreach ( $shipping_options as $service => $option ) {
-			$nodes = $xpath->query('//ratedshipment[service/code="' . $this->services[$service]->code . '"]/totalcharges/monetaryvalue');
-			$rate = floatval($nodes->item(0)->textContent) * $this->pkg_count;
+			$nodes = $xpath->query('//ratedshipment[service/code="' . $this->services[ $service ]->code . '"]/totalcharges/monetaryvalue');
+			$node = $nodes->item(0);
+			
+			if ( is_null( $node ) ) {
+				// This service isn't availble to the buyer's address
+				unset( $mp_shipping_options[ $service ] );
+				continue;
+			}
+			
+			$rate = floatval( $node->nodeValue ) * $this->pkg_count;
 
 			if ( $rate == 0) {  //Not available for this combination
-				unset($mp_shipping_options[$service]);
+				unset( $mp_shipping_options[ $service ] );
 			} else {
 				$handling = floatval($this->get_setting('domestic_handling')) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]->delivery;
