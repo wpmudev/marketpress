@@ -77,7 +77,7 @@ if (!class_exists('MP_Shipping_API')) {
      * @return array
      */
     public static function load_active_plugins() {
-    	if ( ! empty(self::$_active_plugins) ) {
+    	if ( ! empty( self::$_active_plugins ) ) {
     		// We already loaded the active plugins. No need to continue.
 	    	return;
     	}
@@ -86,39 +86,39 @@ if (!class_exists('MP_Shipping_API')) {
 				/* global cart is being used so we need to go through the cart contents and
 				get the active shipping method for each blog in the cart */
 				
-				$cart = $this->get_cart_contents(true);
-				$blogs = array_keys($cart);
+				$cart = mp_cart()->get_items( true );
+				$blogs = array_keys( $cart );
 				$current_blog_id = get_current_blog_id();
 				$methods = array();
 				
 				foreach ( $blogs as $blog_id ) {
-					switch_to_blog($blog_id);
+					switch_to_blog( $blog_id );
 					
-					$shipping = mp_get_setting('shipping');
+					$shipping = mp_get_setting( 'shipping' );
 					
 					//load only selected shipping method
-					$class = mp_arr_get_value($shipping['method'] . '->0', self::$_plugins);
-					if ( class_exists($class) ) {
-						self::$_active_plugins[$shipping['method']] = new $class;
+					$class = mp_arr_get_value( $shipping['method'] . '->0', self::$_plugins );
+					if ( class_exists( $class ) ) {
+						self::$_active_plugins[ $shipping['method'] ] = new $class;
 					}
 				}
 				
-				switch_to_blog($current_blog_id);
+				switch_to_blog( $current_blog_id );
 			} else {
-				$shipping = mp_get_setting('shipping');
-				if ( is_admin() ) {
+				$shipping = mp_get_setting( 'shipping' );
+				if ( is_admin() && ! mp_doing_ajax( 'mp_update_shipping_section' ) ) {
 					// In admin, load all shipping plugins so we can retrieve their settings
 					foreach ( self::$_plugins as $code => $plugin ) {
 						$class = $plugin[0];
-						if ( class_exists($class) && ! array_key_exists($code, self::$_active_plugins) ) {
-							self::$_active_plugins_admin[$code] = new $class;
+						if ( class_exists( $class ) && ! array_key_exists( $code, self::$_active_plugins ) ) {
+							self::$_active_plugins_admin[ $code ] = new $class;
 						}
 					}
 					
 					return;
 				}
 				
-				if ( mp_get_setting('shipping->method') == 'calculated' ) {
+				if ( mp_get_setting( 'shipping->method' ) == 'calculated' ) {
 					//load just the calculated ones
 					foreach ( self::$_plugins as $code => $plugin ) {
 						if ( $plugin[2] ) {
@@ -129,9 +129,9 @@ if (!class_exists('MP_Shipping_API')) {
 					}
 				} else {			
 					//load only selected shipping method
-					$class = mp_arr_get_value($shipping['method'] . '->0', self::$_plugins);
-					if ( class_exists($class) ) {
-						self::$_active_plugins[$shipping['method']] = new $class;
+					$class = mp_arr_get_value( $shipping['method'] . '->0', self::$_plugins );
+					if ( class_exists( $class ) ) {
+						self::$_active_plugins[ $shipping['method'] ] = new $class;
 					}
 				}
 			}
