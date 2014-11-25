@@ -277,21 +277,21 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			$content .= '
 				<div class="mp-checkout-form-row">
 					<label>' . __('Cardholder Name', 'mp') . '</label>
-					<input type="text" id="mp-stripe-name" value="' . esc_attr($name) . '" />
+					<input id="mp-stripe-name" name="stripe_cc_name" type="text" value="' . esc_attr($name) . '" />
 				</div>
 				<div class="mp-checkout-form-row">
 					<label>' . __('Card Number', 'mp') . '</label>
-					<input type="text" pattern="\d*" autocomplete="cc-number" id="mp-stripe-cc-num" class="mp-input-cc-num" style="width:200px" />
+					<input id="mp-stripe-cc-num" name="stripe_cc_num" type="text" pattern="\d*" autocomplete="cc-number" data-rule-required="true" data-rule-ccnum="true" class="mp-input-cc-num" style="width:200px" />
 				</div>
 				<div class="mp-checkout-form-row">
 					<div class="mp-checkout-input-complex clearfix">
 						<div class="mp-checkout-column">
 							<label>' . __( 'Expiration', 'mp' ) . ' <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> format', 'mp' ) . '</span></label>
-							<input type="text" autocomplete="cc-exp" id="mp-stripe-cc-expiry" class="mp-input-cc-expiry" style="width:100px" />
+							<input type="text" name="stripe_cc_exp" autocomplete="cc-exp" id="mp-stripe-cc-expiry" class="mp-input-cc-expiry" style="width:100px" />
 						</div>
 						<div class="mp-checkout-column">
 							<label>' . __( 'Security Code ', 'mp' ) . ' <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
-							<input id="mp-stripe-cc-cvc" class="mp-input-cc-cvc" type="text" autocomplete="off" style="width:75px;" />
+							<input id="mp-stripe-cc-cvc" name="stripe_cc_cvc" class="mp-input-cc-cvc" type="text" autocomplete="off" style="width:75px;" />
 						</div>
 					</div>
 				</div>';
