@@ -120,31 +120,17 @@ var mp_checkout;
 							marketpress.loadingOverlay( 'show' );
 							form.submit();
 						} else {
-							var step = $checkout.find( '.cycle-slide.current' ).attr( 'id' );
+							var url = mp_i18n.ajaxurl + '?action=mp_update_checkout_data';
+							marketpress.loadingOverlay( 'show' );
 							
-							switch ( step ) {
-								case 'mp-checkout-section-billing-shipping-address' :
-									var url = mp_i18n.ajaxurl + '?action=mp_update_shipping_section';
-									marketpress.loadingOverlay( 'show' );
-									
-									$.post( url, $form.serialize() ).done( function( resp ){
-										$( '#mp-checkout-section-shipping' ).find( '.mp-checkout-section-content' ).html( resp );
-										marketpress.loadingOverlay( 'hide' );
-										$checkout.cycle( 'next' );
-									} );
-								break;
+							$.post( url, $form.serialize() ).done( function( resp ){
+								$.each( resp.data, function( index, value ){
+									$( '#' + index ).find( '.mp-checkout-section-content' ).html( value );
+								} );
 								
-								default :
-									/**
-									 * Fires when going to the next checkout step
-									 *
-									 * @since 3.0
-									 * @param string The step being transitioned from.
-									 * @param jQuery The current form object
-									 */
-									$( document ).trigger( 'mp_checkout/next_step', [ step, $form ] );
-								break;
-							}
+								marketpress.loadingOverlay( 'hide' );
+								$checkout.cycle( 'next' );
+							} );
 						}
 					}
 				},
@@ -180,8 +166,7 @@ var mp_checkout;
 			
 			// Add/remove "last-step" class when on last step
 			$checkout.on( 'cycle-after', function( evt, opts ){
-				console.log( opts );
-				if ( opts.currSlide == (opts.slideCount - 1) ) {
+				if ( opts.slideNum == opts.slideCount ) {
 					$checkout.addClass( 'last-step' );
 				} else {
 					$checkout.removeClass( 'last-step' );
