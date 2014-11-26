@@ -35,7 +35,12 @@ class MP_Checkout {
 	 * @access protected
 	 * @var array
 	 */
-	protected $_sections = array();
+	protected $_sections = array(
+		'login-register',
+		'billing-shipping-address',
+		'shipping',
+		'order-review-payment',
+	);
 	
 	/**
 	 * Gets the single instance of the class
@@ -58,11 +63,56 @@ class MP_Checkout {
 	 * @access private
 	 */
 	private function __construct() {
-		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
+		/**
+		 * Filter the checkout sections array
+		 *
+		 * @since 3.0
+		 * @param array The current sections array.
+		 */
+		$this->_sections = apply_filters( 'mp_checkout/sections_array', $this->_sections );
 		
-		// Refresh shipping section
-		add_action( 'wp_ajax_mp_update_shipping_section', array( &$this, 'ajax_update_shipping_section' ) );
-		add_action( 'wp_ajax_nopriv_mp_update_shipping_section', array( &$this, 'ajax_update_shipping_section' ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
+		add_filter( 'mp_cart/after_cart_html', array( &$this, 'payment_form' ), 10, 3 );
+		
+		// Update checkout data
+		add_action( 'wp_ajax_mp_update_checkout_data', array( &$this, 'ajax_update_checkout_data' ) );
+		add_action( 'wp_ajax_nopriv_mp_update_checkout_data', array( &$this, 'ajax_update_checkout_data' ) );
+	}
+	
+	/**
+	 * Update shipping section
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _update_shipping_section() {
+		$type = 'billing';
+		if ( mp_get_post_value( 'enable_shipping_address') ) {
+			$type = 'shipping';	
+		}
+		
+		$data = (array) mp_get_post_value( "{$type}", array() );
+		foreach ( $data as $key => $value ) {			
+			mp_update_session_value( "mp_shipping_info->{$key}", $value );
+		}
+		
+		return $this->section_shipping();
+	}
+	
+	/**
+	 * Update order review/payment section
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _update_order_review_payment_section() {
+		if ( $shipping_method = mp_get_post_value( 'shipping_method' ) ) {
+			list( $shipping_option, $shipping_sub_option ) = explode( '->', $shipping_method );
+			mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_option );
+			mp_update_session_value( 'mp_shipping_info->shipping_sub_option', $shipping_sub_option );
+		}
+		
+		return $this->section_order_review_payment();
 	}
 	
 	/**
@@ -189,25 +239,19 @@ class MP_Checkout {
 	}
 	
 	/**
-	 * Update shipping section
+	 * Update checkout data
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @action wp_ajax_mp_update_shipping_section, wp_ajax_nopriv_mp_update_shipping_section
+	 * @action wp_ajax_mp_update_checkout_data, wp_ajax_nopriv_mp_update_checkout_data
 	 */
-	public function ajax_update_shipping_section() {
-		$type = 'billing';
-		if ( mp_get_post_value( 'enable_shipping_address') ) {
-			$type = 'shipping';	
-		}
+	public function ajax_update_checkout_data() {
+		$sections = array(
+			'mp-checkout-section-shipping' => $this->_update_shipping_section(),
+			'mp-checkout-section-order-review-payment' => $this->_update_order_review_payment_section(),
+		);
 		
-		$data = (array) mp_get_post_value( "{$type}", array() );
-		foreach ( $data as $key => $value ) {			
-			mp_update_session_value( "mp_shipping_info->{$key}", $value );
-		}
-		
-		echo $this->section_shipping();
-		die;
+		wp_send_json_success( $sections );
 	}
 	
 	/**
@@ -253,21 +297,7 @@ class MP_Checkout {
 		), $args );
 		
 		extract( $args );
-		
-		/**
-		 * Filter the checkout sections array
-		 *
-		 * @since 3.0
-		 * @param array The current sections array.
-		 */
-		$this->_sections = apply_filters( 'mp_checkout/sections_array', array(
-			'login-register',
-			'billing-shipping-address',
-			'shipping',
-			'payment',
-			'order-review',
-		) );
-		
+				
 		$html = '
 			<form id="mp-checkout" class="clearfix" method="post" novalidate>';
 		
@@ -466,6 +496,36 @@ class MP_Checkout {
 	}
 
 	/**
+	 * Display payment form
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_cart/after_cart_html
+	 */
+	public function payment_form( $html, $cart, $display_args ) {
+		if ( $cart->is_editable ) {
+			// Cart isn't editable - bail
+			return $html;
+		}
+		
+		/**
+		 * Filter the payment form html
+		 *
+		 * @since 3.0
+		 * @param string
+		 */
+		$form = apply_filters( 'mp_checkout_payment_form', '' );
+		
+		if ( empty( $form ) ) {
+			$form = wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
+		} else {
+			$html .= mp_list_payment_options( false );
+		}
+		
+		return $html;
+	}
+	
+	/**
 	 * Display state/province field
 	 *
 	 * @since 3.0
@@ -635,7 +695,7 @@ class MP_Checkout {
 	 * @access public
 	 * @return string
 	 */
-	public function section_order_review() {
+	public function section_order_review_payment() {
 		$html = '' .
 			$this->section_heading(__('Review', 'mp'), true) .
 			mp_cart()->display(array('editable' => false));
@@ -647,49 +707,6 @@ class MP_Checkout {
 		 * @param string The current html.
 		 */
 		return apply_filters('mp_checkout/order_review', $html);
-	}
-	
-	/**
-	 * Display the payment section
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @return string
-	 */
-	public function section_payment() {
-		$html = '' .
-			$this->section_heading(__('Payment', 'mp'), true);
-			
-		/**
-		 * Filter the section payment html
-		 *
-		 * @since 3.0
-		 * @param string
-		 */
-		$form = apply_filters('mp_checkout_payment_form', '');
-		
-		if ( empty($form) ) {
-			$form = wpautop(__('There are no available gateways to process this payment.', 'mp'));
-		} else {
-			$html .= mp_list_payment_options(false);
-		}
-		
-		$html .= $form;
-		$html .= '
-			<div class="mp-checkout-buttons clearfix">' .
-				$this->step_link( 'prev' ) .
-				$this->step_link( 'next' ) . '
-			</div>';
-		
-		/**
-		 * Filter the section payment html
-		 *
-		 * @since 3.0
-		 * @param string The current html.
-		 */		
-		$html = apply_filters('mp_checkout/section_payment', $html);
-		
-		return $html;
 	}
 	
 	/**
@@ -707,7 +724,6 @@ class MP_Checkout {
 			$html = '' .
 				$this->section_heading(__('Shipping', 'mp'), true);
 		}
-		
 		
 		switch ( $shipping_method ) {
 			case 'calculated' :
