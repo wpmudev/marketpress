@@ -423,7 +423,7 @@ class MP_Cart {
 
 		$line = '
 				<div id="mp-cart-meta-line-shipping-total" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp'), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</strong>
+					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __( 'Estimated Shipping', 'mp') : __( 'Shipping' )) . '</strong>
 					<span class="mp-cart-meta-line-amount">' . $this->shipping_total( true ) . '</span>
 				</div>';
 
@@ -572,16 +572,16 @@ class MP_Cart {
 		
 		$html .= '
 				</div>';
-
+				
 		/**
-		 * Add html after cart
+		 * Filter html after cart
 		 *
 		 * @since 3.0
 		 * @param string
 		 * @param MP_Cart $this The current cart object.
 		 * @param array $args The arguments that were passed to the display method.
 		 */
-		$after_cart_html = apply_filters('mp_cart/after_cart_html', '', $this, $args);
+		$after_cart_html = apply_filters( 'mp_cart/after_cart_html', '', $this, $args );
 		
 		if ( ! empty($after_cart_html) ) {
 			$html .= '
@@ -975,15 +975,15 @@ class MP_Cart {
 			$user = wp_get_current_user();
 	
 			//get address
-			$meta = $user->get('mp_shipping_info');
-			$address1 = mp_get_user_address_part('address1', 'shipping');
-			$address2 = mp_get_user_address_part('address2', 'shipping');
-			$city = mp_get_user_address_part('city', 'shipping');
-			$state = mp_get_user_address_part('state', 'shipping');
-			$zip = mp_get_user_address_part('zip', 'shipping');
-			$country = mp_get_user_address_part('country', 'shipping');
-			$selected_sub_option = mp_get_session_value('mp_shipping_info->shipping_sub_option', null);
-			$selected_option = mp_arr_get_value(mp_get_session_value('mp_shipping_info->shipping_option'), $shipping_plugins);
+			$what =  ( mp_get_post_value( 'enable_shipping_address' ) ) ? 'shipping' : 'billing';
+			$address1 = mp_get_user_address_part( 'address1', $what );
+			$address2 = mp_get_user_address_part( 'address2', $what );
+			$city = mp_get_user_address_part( 'city', $what );
+			$state = mp_get_user_address_part( 'state', $what );
+			$zip = mp_get_user_address_part( 'zip', $what );
+			$country = mp_get_user_address_part( 'country', $what );
+			$selected_sub_option = mp_get_session_value( 'mp_shipping_info->shipping_sub_option', null );
+			$selected_option = mp_get_session_value( 'mp_shipping_info->shipping_option' );
 			
 			//check required fields
 			if ( empty($address1) || empty($city) || ! mp_is_valid_zip($zip, $country) || empty($country) || ! $this->has_items() ) {
