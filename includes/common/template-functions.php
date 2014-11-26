@@ -395,6 +395,8 @@ if ( ! function_exists( 'mp_list_plugin_shipping_options' ) ) :
 		}
 		
 		$what =  ( mp_get_post_value( 'enable_shipping_address' ) ) ? 'shipping' : 'billing';
+		$shipping_option = mp_get_session_value( 'mp_shipping_info->shipping_option' );
+		$shipping_sub_option = mp_get_session_value( 'mp_shipping_info->shipping_sub_option' );
 		
 		$address1 = mp_get_user_address_part( 'address1', $what );
 		$address2 = mp_get_user_address_part( 'address2', $what );
@@ -409,9 +411,18 @@ if ( ! function_exists( 'mp_list_plugin_shipping_options' ) ) :
 		$html = '';
 		foreach ( (array) $options as $method => $label ) {
 			$input_id = 'mp-shipping-option-' . $plugin->plugin_name . '-' . sanitize_title( $method );
+			$checked = ( $plugin->plugin_name == $shipping_option && $method == $shipping_sub_option ) ? ' checked' : '';
 			$html .= '
 				<label class="mp-checkout-option-label" for="' . $input_id . '">
-					<input id="' . $input_id . '" type="radio" name="shipping_method" value="' . $plugin->plugin_name . '->' . $method . '" autocomplete="off" data-rule-required="true" data-msg-required="' . __( 'Please choose a shipping method', 'mp' ) . '" />
+					<input
+						id="' . $input_id . '"
+						type="radio"
+						name="shipping_method"
+						value="' . $plugin->plugin_name . '->' . $method . '"
+						autocomplete="off"
+						data-rule-required="true"
+						data-msg-required="' . __( 'Please choose a shipping method', 'mp' ) . '"' .
+						$checked . ' />
 					<span></span>' . $label . '
 				</label>';
 		}
