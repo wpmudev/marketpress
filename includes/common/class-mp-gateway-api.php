@@ -118,7 +118,7 @@ if( ! class_exists('MP_Gateway_API') ) {
 						break;
 					}
 				} elseif ( ! is_network_admin() ) {
-					if ( is_admin() && class_exists($class) && ! array_key_exists($code, self::$_active_gateways) ) {
+					if ( is_admin() && ! mp_doing_ajax( 'mp_update_checkout_data' ) && class_exists($class) && ! array_key_exists($code, self::$_active_gateways) ) {
 						// Load all gateways for admin
 						self::$_active_gateways_admin[$code] = new $class;
 					} elseif ( mp_arr_get_value("allowed->{$code}", $gateways) && class_exists($class) && ! $plugin[3] ) {
