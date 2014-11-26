@@ -106,7 +106,7 @@ if (!class_exists('MP_Shipping_API')) {
 				switch_to_blog( $current_blog_id );
 			} else {
 				$shipping = mp_get_setting( 'shipping' );
-				if ( is_admin() && ! mp_doing_ajax( 'mp_update_shipping_section' ) ) {
+				if ( is_admin() && ! mp_doing_ajax( 'mp_update_checkout_data' ) ) {
 					// In admin, load all shipping plugins so we can retrieve their settings
 					foreach ( self::$_plugins as $code => $plugin ) {
 						$class = $plugin[0];
