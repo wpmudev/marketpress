@@ -128,7 +128,7 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * return float $price
 		 */
 		public function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-			if ( ! $this->crc_ok() ) {
+			if ( ! $this->_crc_ok() ) {
 				//Price added to this object
 				$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
 			}
