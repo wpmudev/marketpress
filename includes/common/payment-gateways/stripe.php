@@ -195,17 +195,15 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	}
 
 	function enqueue_scripts() {
-			if (!is_admin() && get_query_var('pagename') == 'cart' && get_query_var('checkoutstep') == 'checkout') {
-
-					wp_enqueue_script('js-stripe', 'https://js.stripe.com/v1/', array('jquery'));
-					wp_enqueue_script('stripe-token', mp()->plugin_url . 'plugins-gateway/stripe-files/stripe_token.js', array('js-stripe', 'jquery'));
-					wp_localize_script('stripe-token', 'stripe', array('publisher_key' => $this->publishable_key,
-							'name' => __('Please enter the full Cardholder Name.', 'mp'),
-							'number' => __('Please enter a valid Credit Card Number.', 'mp'),
-							'expiration' => __('Please choose a valid expiration date.', 'mp'),
-							'cvv2' => __('Please enter a valid card security code. This is the 3 digits on the signature panel, or 4 digits on the front of Amex cards.', 'mp')
-					));
-			}
+		if ( ! mp_is_shop_page( 'checkout' ) ) {
+			return;
+		}
+		
+		wp_enqueue_script( 'js-stripe', 'https://js.stripe.com/v2/', array( 'jquery' ), false );
+		wp_enqueue_script( 'stripe-token', mp_plugin_url( 'includes/common/payment-gateways/stripe-files/stripe_token.js' ), array( 'js-stripe', 'jquery-ui-core' ), MP_VERSION );
+		wp_localize_script( 'stripe-token', 'stripe', array(
+			'publisher_key' => $this->publishable_key
+		));
 	}
 
 	/**
@@ -268,30 +266,45 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 					return $content;
 			}
 
-			$name = mp_get_user_address_part('name', 'billing');
+			$name = mp_get_user_address_part( 'name', 'billing' );
 
-			$content = '';
-
-			$content .= '<div id="stripe_checkout_errors"></div>';
-
-			$content .= '
+			$content = '
 				<div class="mp-checkout-form-row">
-					<label>' . __('Cardholder Name', 'mp') . '</label>
-					<input id="mp-stripe-name" name="stripe_cc_name" type="text" value="' . esc_attr($name) . '" />
+					<label>' . __('Cardholder Name', 'mp') . '<span class="mp-field-required">*</span></label>
+					<input
+						id="mp-stripe-name"
+						type="text"
+						value="' . esc_attr($name) . '" />
 				</div>
 				<div class="mp-checkout-form-row">
-					<label>' . __('Card Number', 'mp') . '</label>
-					<input id="mp-stripe-cc-num" name="stripe_cc_num" type="text" pattern="\d*" autocomplete="cc-number" data-rule-required="true" data-rule-ccnum="true" class="mp-input-cc-num" style="width:200px" />
+					<label>' . __('Card Number', 'mp') . '<span class="mp-field-required">*</span></label>
+					<input
+						id="mp-stripe-cc-num"
+						type="text"
+						pattern="\d*"
+						autocomplete="cc-number"
+						class="mp-input-cc-num"
+						style="width:200px" />
 				</div>
 				<div class="mp-checkout-form-row">
 					<div class="mp-checkout-input-complex clearfix">
 						<div class="mp-checkout-column">
-							<label>' . __( 'Expiration', 'mp' ) . ' <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> format', 'mp' ) . '</span></label>
-							<input type="text" name="stripe_cc_exp" autocomplete="cc-exp" id="mp-stripe-cc-expiry" class="mp-input-cc-expiry" style="width:100px" />
+							<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> format', 'mp' ) . '</span></label>
+							<input
+								type="text"
+								autocomplete="cc-exp"
+								id="mp-stripe-cc-exp"
+								class="mp-input-cc-exp"
+								style="width:100px" />
 						</div>
 						<div class="mp-checkout-column">
-							<label>' . __( 'Security Code ', 'mp' ) . ' <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
-							<input id="mp-stripe-cc-cvc" name="stripe_cc_cvc" class="mp-input-cc-cvc" type="text" autocomplete="off" style="width:75px;" />
+							<label>' . __( 'Security Code ', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
+							<input
+								id="mp-stripe-cc-cvc"
+								class="mp-input-cc-cvc"
+								type="text"
+								autocomplete="off"
+								style="width:75px;" />
 						</div>
 					</div>
 				</div>';
@@ -464,11 +477,11 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		
 		if ( $creds instanceof WPMUDEV_Field ) {
 			$creds->add_field('text', array(
-				'name' => $this->get_field_name('private_key'),
+				'name' => 'private_key',
 				'label' => array('text' => __('Private Key', 'mp')),
 			));
 			$creds->add_field('text', array(
-				'name' => $this->get_field_name('publishable_key'),
+				'name' => 'publishable_key',
 				'label' => array('text' => __('Publishable Key', 'mp')),
 			));
 		}
