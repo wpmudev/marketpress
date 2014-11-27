@@ -214,23 +214,24 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 	}
 
 	/**
-	* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
-	*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
+	* For calculated shipping modules, use this method to return an associative
+	* array of the sub-options. The key will be what's saved as selected in the
+	* session. Note the shipping parameters won't always be set. If they are, add
+	* the prices to the labels for each option.
 	*
-	* @param array $cart, the contents of the shopping cart for advanced calculations
+	* @param array $cart The contents of the shopping cart for advanced calculations
 	* @param string $address1
 	* @param string $address2
 	* @param string $city
-	* @param string $state, state/province/region
-	* @param string $zip, postal code
-	* @param string $country, ISO 3166-1 alpha-2 country code
-	*
+	* @param string $state State/province/region
+	* @param string $zip Postal code
+	* @param string $country ISO 3166-1 alpha-2 country code
 	* return array $shipping_options
 	*/
-	function shipping_options( $items, $address1, $address2, $city, $state, $zip, $country ) {
+	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
 		if ( $this->_crc_ok() && ($shipping_options = mp_get_session_value('mp_shipping_options->' . $this->plugin_name)) ) {
 			// CRC is ok - just return the shipping options already stored in session
-			return $this->_format_shipping_options($shipping_options);
+			return $this->_format_shipping_options( $shipping_options );
 		}
 		
 		$shipping_options = array();
@@ -241,12 +242,17 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 		$this->state = $state;
 		$this->destination_zip = $zip;
 		$this->country = $country;
-
-		if ( is_array($items) ) {
-			foreach ( $items as $product_id => $qty ) {
-				$product = new MP_Product($product_id);
+		
+		if ( is_array( $cart ) ) {
+			foreach ( $cart as $key => $val ) {
+				if ( $val instanceof MP_Product ) {
+					$product = $val;
+				} else {
+					$product = new MP_Product( $key );
+				}
+				
 				$weight = $product->get_weight();
-				$this->weight += ($weight * $qty);
+				$this->weight += ($weight * $product->qty);
 			}
 		}
 
