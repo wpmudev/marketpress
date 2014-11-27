@@ -311,7 +311,7 @@ class MP_Coupons {
 				<div id="mp-coupon-form">
 					<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
 					<span class="mp-cart-input">
-						<input type="text" name="mp_cart_coupon" value="" />
+						<input type="text" name="mp_cart_coupon" class="mp-input-small" value="" />
 					</span>
 					<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
 					wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp'))) . '
