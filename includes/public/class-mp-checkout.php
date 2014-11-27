@@ -35,12 +35,7 @@ class MP_Checkout {
 	 * @access protected
 	 * @var array
 	 */
-	protected $_sections = array(
-		'login-register',
-		'billing-shipping-address',
-		'shipping',
-		'order-review-payment',
-	);
+	protected $_sections = array();
 	
 	/**
 	 * Gets the single instance of the class
@@ -69,7 +64,12 @@ class MP_Checkout {
 		 * @since 3.0
 		 * @param array The current sections array.
 		 */
-		$this->_sections = apply_filters( 'mp_checkout/sections_array', $this->_sections );
+		$this->_sections = apply_filters( 'mp_checkout/sections_array', array(
+			'login-register' 						=> __( 'Login/Register', 'mp'),
+			'billing-shipping-address' 	=> __( 'Billing/Shipping Address', 'mp' ),
+			'shipping' 									=> __( 'Shipping Method', 'mp' ),
+			'order-review-payment' 			=> __( 'Review Order/Payment', 'mp' ),
+		) );
 		
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 		add_filter( 'mp_cart/after_cart_html', array( &$this, 'payment_form' ), 10, 3 );
@@ -301,7 +301,7 @@ class MP_Checkout {
 		$html = '
 			<form id="mp-checkout" class="clearfix" method="post" novalidate>';
 		
-		foreach ( $this->_sections as $section ) {
+		foreach ( $this->_sections as $section => $heading_text ) {
 			$method = 'section_' . str_replace( '-', '_', $section );
 			$this->_step = $section;
 			
@@ -313,7 +313,14 @@ class MP_Checkout {
 				}
 				
 				$html .= '
-				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section">
+				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section">';
+				
+				if ( ! mp_doing_ajax( 'mp_update_checkout_data' ) ) {
+					$html .= $this->section_heading( $heading_text, true );
+				}
+				
+				$html .= '
+					<div class="mp-checkout-section-errors"></div>
 					<div class="mp-checkout-section-content">' . $tmp_html . '</div>
 				</div>';
 				
@@ -358,7 +365,13 @@ class MP_Checkout {
 		wp_enqueue_script( 'mp-checkout', mp_plugin_url( 'ui/js/mp-checkout.js' ), array( 'jquery-payment', 'jquery-validate-methods', 'jquery-cycle' ), MP_VERSION, true );
 		
 		wp_localize_script( 'mp-checkout', 'mp_checkout_i18n', array(
-			'ccnum' => __( 'Invalid credit card number', 'mp' ),
+			'cc_num' => __( 'Please enter a valid credit card number', 'mp' ),
+			'cc_exp' => __( 'Please enter a valid card expiration', 'mp' ),
+			'cc_cvc' => __(' Please enter a valid card security code', 'mp' ),
+			'cc_fullname' => __( 'Please enter a valid first and last name', 'mp' ),
+			'errors' => __( '<h4>Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span style="color:#d60303">red</span> below. Entering into a field will reveal the actual error message.</p>', 'mp' ),
+			'error_plural' => __( 'errors', 'mp' ),
+			'error_singular' => __( 'error', 'mp' ),
 		));
 	}
 	
@@ -516,11 +529,27 @@ class MP_Checkout {
 		 */
 		$form = apply_filters( 'mp_checkout_payment_form', '' );
 		
+		/**
+		 * Filter the payment form heading text
+		 *
+		 * @since 3.0
+		 * @param string
+		 */
+		$heading = '<h3>' . apply_filters( 'mp_checkout/payment_form/heading_text', __( 'Payment', 'mp' ) ) . '</h3>';
+		
+		$html .= '
+			<div id="mp-checkout-payment-form">' .
+				$heading;
+		
 		if ( empty( $form ) ) {
-			$form = wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
+			$html .= wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
 		} else {
-			$html .= mp_list_payment_options( false );
+			$html .= '<div id="mp-payment-options-list">' . mp_list_payment_options( false ) . '</div>';
 		}
+		
+		$html .= $form;
+		$html .= '
+			</div>';
 		
 		return $html;
 	}
@@ -599,8 +628,7 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function section_billing_shipping_address() {
-		$html = '' .
-			$this->section_heading(__('Billing/Shipping Info', 'mp'), true) . '
+		$html = '
 			<div class="clearfix">
 				<div id="mp-checkout-column-billing-info" class="mp-checkout-column">
 					<h3>' . __('Billing', 'mp') . '</h3>' .
@@ -656,8 +684,7 @@ class MP_Checkout {
 	public function section_login_register() {
 		$html = '';
 		if ( ! is_user_logged_in() && ! MP_HIDE_LOGIN_OPTION ) { 
-			$html = wp_nonce_field( 'mp-login-nonce', 'mp_login_nonce' ) .
-				$this->section_heading( __('Login/Register', 'mp' ), true ) . '
+			$html = wp_nonce_field( 'mp-login-nonce', 'mp_login_nonce' ) . '
 				<div class="clearfix">
 					<div class="mp-checkout-column" style="padding-right:25px">
 						<h4>' . __( 'Have an account?', 'mp') . '</h4>
@@ -696,9 +723,9 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function section_order_review_payment() {
-		$html = '' .
-			$this->section_heading(__('Review', 'mp'), true) .
-			mp_cart()->display(array('editable' => false));
+		$html = mp_cart()->display( array(
+			'editable' => false
+		) );
 		
 		/**
 		 * Filter the section payment html
@@ -706,7 +733,7 @@ class MP_Checkout {
 		 * @since 3.0
 		 * @param string The current html.
 		 */
-		return apply_filters('mp_checkout/order_review', $html);
+		return apply_filters( 'mp_checkout/order_review', $html );
 	}
 	
 	/**
