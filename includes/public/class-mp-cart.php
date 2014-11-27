@@ -454,7 +454,7 @@ class MP_Cart {
 		$line = '		
 				<div id="mp-cart-meta-line-order-total" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __('Estimated Total', 'mp') : __('Order Total', 'mp')) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->total(true) . '</span>
+					<span class="mp-cart-meta-line-amount">' . $this->total( true ) . '</span>
 				</div>
 			</div>';
 
@@ -590,18 +590,48 @@ class MP_Cart {
 
 		$html .= '
 				<div id="mp-cart-meta-wrap" class="clearfix">' .
-					$this->cart_meta(false, $editable);
+					$this->cart_meta( false, $editable );
+
+		/**
+		 * Filter the checkout button tooltip text
+		 *
+		 * @since 3.0
+		 * @param string The current tooltip text.
+		 */
+		$tooltip_text = apply_filters( 'mp_cart/checkout_button/tooltip_text', __( '<strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' ) );
+
+		/**
+		 * Filter the checkout button text
+		 *
+		 * @since 3.0
+		 * @param string The current button text.
+		 */
+		$button_text = apply_filters( 'mp_cart/checkout_button/text', (( $this->is_editable ) ? __( 'Proceed to Checkout', 'mp' ) : __( 'Submit Order', 'mp' )) );
+		
+		// Set button classes
+		$button_classes = array(
+			'mp-button',
+			'mp-button-checkout',
+			'mp-button-padlock',
+			(( ! empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
+		);
 		
 		if ( $editable ) {
+			$button_classes[] = 'mp-button-medium';
 			$html .= '
-					<a class="mp-button mp-button-checkout mp-has-tooltip mp-button-medium" href="' . mp_store_page_url('checkout', false) . '">' . __('Proceed to Checkout', 'mp') . '</a>';
+					<a class="' . implode( ' ', $button_classes ) . '" href="' . mp_store_page_url( 'checkout', false ) . '">' . $button_text . '</a>';
 		} else {
+			$button_classes[] = 'mp-button-large';
 			$html .= '
-					<button class="mp-button-checkout mp-button mp-button-submit-order mp-has-tooltip" type="submit">' . __('Submit Order', 'mp') . '</button>';
+					<button class="' . implode( ' ', $button_classes ) . '" type="submit">' . $button_text . '</button>';
+		}
+		
+		if ( ! empty( $tooltip_text ) ) {
+			$html .= '
+					<div class="mp-tooltip-content"><p class="mp-secure-checkout-tooltip-text">' . $tooltip_text . '</p></div>';
 		}
 		
 		$html .= '
-					<div class="mp-tooltip-content"><p class="mp-secure-checkout-tooltip-text">' . __( ' <strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' ) . '</p></div>
 				</div>';
 		
 		if ( $editable ) {
@@ -1196,8 +1226,8 @@ class MP_Cart {
 	 * @return float
 	 */
 	public function total( $format = false ) {
-		if ( false === mp_arr_get_value('total', $this->_total) ) {
-			$total = ($this->product_total() + $this->tax_total());
+		if ( false === mp_arr_get_value( 'total', $this->_total ) ) {
+			$total = ( $this->product_total() + $this->tax_total() + $this->shipping_total() );
 			
 			/**
 			 * Filter the total
@@ -1207,12 +1237,12 @@ class MP_Cart {
 			 * @param array An array containing all of the applicable cart subtotals (e.g. tax, shipping, etc)
 			 * @param MP_Cart The current cart object.
 			 */
-			$total = apply_filters('mp_cart/total', $total, $this->_total, $this);
+			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
 			
 			$this->_total['total'] = $total;
 		}
 		
-		$total = mp_arr_get_value('total', $this->_total, 0);
+		$total = mp_arr_get_value( 'total', $this->_total, 0) ;
 		
 		if ( $format ) {
 			return mp_format_currency('', $total);
