@@ -93,7 +93,7 @@ var mp_checkout;
 				timeout : 0
 			});
 			
-			// Hide field errors when going back
+			// Hide field errors when going to previous step
 			$checkout.on( 'cycle-prev', function( e, opts ){
 				$( '.mp-tooltip' ).tooltip( 'close' );
 			} );
@@ -103,13 +103,19 @@ var mp_checkout;
 				ignore : function( index, element ){
 					return ( ! $( element).closest( '.cycle-slide.current' ).length );
 				},
-				highlight : function(){
-					// Intentionally left blank
+				highlight : function( element, errorClass ){
+					$( element ).addClass( 'mp-input-error' ).prev( 'label' ).addClass( 'mp-label-error' );
 				},
 				unhighlight : function( element, errorClass, validClass ){
 					var $tip = $( element ).siblings( '.mp-tooltip' );
 					if ( $tip.length > 0 ) {
 						$tip.tooltip( 'close' );
+					}
+					
+					$( element ).removeClass( 'mp-input-error' ).prev( 'label' ).removeClass( 'mp-label-error' );
+					
+					if ( $( '.mp-input-error' ).length == 0 ) {
+						$( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' ).removeClass( 'show' );
 					}
 				},
 				submitHandler : function( form ){
@@ -117,8 +123,17 @@ var mp_checkout;
 					
 					if ( $form.valid() ) {
 						if ( $checkout.hasClass( 'last-step' ) ) {
-							marketpress.loadingOverlay( 'show' );
-							form.submit();
+							var gateway = $( '[name="payment_method"]' ).filter( ':checked' ).val();
+							
+							/**
+							 * Trigger checkout event
+							 *
+							 * For gateways to tie into and process checkout.
+							 *
+							 * @since 3.0
+							 * @param jQuery $form The checkout form object.
+							 */
+							$( document ).trigger( 'mp_checkout_process_' + gateway, $form );
 						} else {
 							var url = mp_i18n.ajaxurl + '?action=mp_update_checkout_data';
 							marketpress.loadingOverlay( 'show' );
@@ -128,6 +143,7 @@ var mp_checkout;
 									$( '#' + index ).find( '.mp-checkout-section-content' ).html( value );
 								} );
 								
+								mp_checkout.initCardValidation();
 								marketpress.loadingOverlay( 'hide' );
 								$checkout.cycle( 'next' );
 							} );
@@ -135,6 +151,14 @@ var mp_checkout;
 					}
 				},
 				showErrors : function( errorMap, errorList ){
+					var errorVerb = ( $( errorMap ).length > 1 ) ? mp_checkout_i18n.error_plural : mp_checkout_i18n.error_singular;
+					var errorString = mp_checkout_i18n.errors.replace( '%d', $( errorMap ).length ).replace( '%s', errorVerb );
+					$( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' ).html( errorString ).addClass( 'show' );
+					
+					$checkout.animate({
+						height : $checkout.find( '.cycle-slide.current' ).outerHeight()
+					}, 300);
+					
 					$.each( errorMap, function( inputName, message ){
 						var $input = $( '[name="' + inputName + '"]' );
 						var $tip = $input.siblings( '.mp-tooltip' );
@@ -157,7 +181,14 @@ var mp_checkout;
 							my : "center bottom-10",
 							at : "center top"
 						} );
-						$tip.tooltip( 'open' );
+						
+						$input.on( 'focus', function() {
+							$tip.tooltip( 'open' );
+						} );
+						
+						$input.on( 'blur', function() {
+							$tip.tooltip( 'close' );
+						} );
 					});
 					
 					this.defaultShowErrors();
@@ -245,10 +276,27 @@ var mp_checkout;
 			$( '.mp-input-cc-expiry' ).payment( 'formatCardExpiry' );
 			$( '.mp-input-cc-cvc' ).payment( 'formatCardCVC' );
 			
-			// Validate card number
-			$.validator.addMethod( 'ccnum', function( val, element){
+			// Validate card fullname
+			$.validator.addMethod( 'cc-fullname', function( val, element){
+				var pattern = /^([a-z]+)([ ]{1})([a-z]+)$/ig;
+				return this.optional( element ) || pattern.test( val );
+			}, mp_checkout_i18n.cc_fullname );
+			
+			// Validate card numbers
+			$.validator.addMethod( 'cc-num', function( val, element){
 				return this.optional( element ) || $.payment.validateCardNumber( val );
-			}, 'Invalid credit card number' );
+			}, mp_checkout_i18n.cc_num );
+			
+			// Validate card expiration
+			$.validator.addMethod( 'cc-exp', function( val, element){
+				var dateObj = $.payment.cardExpiryVal( val );
+				return this.optional( element ) || $.payment.validateCardExpiry( dateObj.month, dateObj.year );
+			}, mp_checkout_i18n.cc_exp );
+			
+			// Validate card cvc
+			$.validator.addMethod( 'cc-cvc', function( val, element){
+				return this.optional( element ) || $.payment.validateCardCVC( val );
+			}, mp_checkout_i18n.cc_cvc );
 		},
 		
 		/**
@@ -258,9 +306,7 @@ var mp_checkout;
 		 * @access public
 		 */
 		initPaymentOptionListeners : function(){
-			var $input = $( 'input[name="payment_method"]' );
-			
-			$input.change( function(){
+			$( '.mp-checkout-section' ).on( 'change', 'input[name="payment_method"]', function(){
 				var $this = $( this ),
 						$target = $( '#mp-gateway-form-' + $this.val() ),
 						$checkout = $( '#mp-checkout' );
@@ -271,6 +317,8 @@ var mp_checkout;
 				}, 300);
 			});
 			
+			// On load, open the payment form for the selected payment option
+			var $input = $( 'input[name="payment_method"]' );
 			if ( $input.filter( ':checked' ).length ) {
 				$input.filter( ':checked' ).trigger( 'click' );
 			} else {
