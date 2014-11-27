@@ -135,6 +135,10 @@
 		label {
 			display: block;
 			margin-bottom: 2px;
+			
+			&.mp-label-error {
+				color: #d60303;
+			}
 		}
 		
 		input[type="text"],
@@ -142,6 +146,10 @@
 		textarea {
 			.boxSizing(border-box);
 			width: 100%;
+			
+			&.mp-input-error {
+				border-color: #d60303;
+			}
 		}
 		
 		input[type="checkbox"],
@@ -183,6 +191,30 @@
 		
 		&:first-child {
 			float: left;
+		}
+	}
+	
+	.mp-checkout-section-errors {
+		background: #fff0f0;
+		border: 2px solid #d60303;
+		border-radius: 4px;
+		color: #000;
+		display: none;
+		line-height: 1.3;
+		padding: 15px;
+		
+		h4 {
+			margin: 0;
+			padding: 0 0 15px;
+		}
+		
+		p {
+			margin: 0;
+			padding: 0;
+		}
+		
+		&.show {
+			display: block;
 		}
 	}
 	
@@ -280,6 +312,20 @@
 	label.error {
 		display: none !important;
 	}
+}
+
+#mp-checkout-payment-form {
+	margin-bottom: 25px;
+	padding: 25px 0;
+	
+	h3 {
+		margin: 0 0 25px;
+		padding: 0;
+	}
+}
+
+#mp-payment-options-list {
+	padding-bottom: 15px;
 }
 
 #mp-floating-cart {
