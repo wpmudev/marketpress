@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 2.9.5.8
+Version: 2.9.5.9
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	 02111-1307	 USA
 */
 
 class MarketPress {
-	var $version = '2.9.5.8';
+	var $version = '2.9.5.9';
 	var $location;
 	var $plugin_dir = '';
 	var $plugin_url = '';
@@ -161,8 +161,8 @@ class MarketPress {
 		add_action( 'init', array(&$this, 'flush_rewrite_check'), 99 );
 		
 		//Downloads
-		add_action( 'pre_get_posts', array(&$this, 'include_draft_products_for_downloads') );
-		add_filter( 'posts_results', array(&$this, 'set_publish_status_for_draft_product_downloads'), 10, 2 );
+		add_action( 'pre_get_posts', array(&$this, 'include_out_of_stock_products_for_downloads') );
+		add_filter( 'posts_results', array(&$this, 'set_publish_status_for_out_of_stock_product_downloads'), 10, 2 );
 		add_action( 'template_redirect', array(&$this, 'maybe_serve_download') );
 		
 		if ( MP_HIDE_MENUS === false ) { //allows you to hide MP menus
@@ -208,16 +208,16 @@ class MarketPress {
 	}
 
 	/**
-	 * Force post status to publish for single products that are in draft status
+	 * Force post status to publish for single products that are in out_of_stock status
 	 *
-	 * By default, WP won't allow access to single posts that are in draft status
-	 * which will prevent users from downloading files they purchased.
+	 * By default, WP won't allow access to single posts that are in out_of_stock
+	 * status which will prevent users from downloading files they purchased.
 	 *
 	 * @since 2.9.5.8
 	 * @access public
 	 * @filter posts_results
 	 */
-	function set_publish_status_for_draft_product_downloads( $posts, $query ) {
+	function set_publish_status_for_out_of_stock_product_downloads( $posts, $query ) {
 		if ( 'product' == $query->get('post_type') && $query->get('product') && isset($_GET['orderid']) && ($order = $this->get_order($_GET['orderid'])) ) {
 			$posts[0]->post_status = 'publish';
 		}
@@ -228,23 +228,23 @@ class MarketPress {
 	/**
 	 * Modify query object to allow drafts for single products
 	 *
-	 * If a product is set to draft status (out-of-stock) then the user won't be
+	 * If a product is set to out_of_stock status then the user won't be
 	 * able to download their files.
 	 *
 	 * @since 2.9.5.8
 	 * @access public
 	 * @action pre_get_posts
 	 */
-	function include_draft_products_for_downloads( $query ) {
+	function include_out_of_stock_products_for_downloads( $query ) {
 		if ( 'product' == $query->get('post_type') && $query->get('product') && isset($_GET['orderid']) && ($order = $this->get_order($_GET['orderid'])) ) {
-			$query->set('post_status', array('draft', 'publish'));
+			$query->set('post_status', array('out_of_stock', 'publish'));
 		}
 	}
 	
 	/**
 	 * Maybe serve a download
 	 *
-	 * @since 3.0
+	 * @since 2.9.5.8
 	 * @access public
 	 * @action template_redirect
 	 */

@@ -4,7 +4,10 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+2.9.5.9
+----------------------------------------------------------------------
 - Fixed: Fedex displaying all available services at checkout instead of only the services selected
+- Fixed: PayPal Express is only applying coupon to one item
 
 2.9.5.8
 ----------------------------------------------------------------------
