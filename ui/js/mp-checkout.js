@@ -11,9 +11,70 @@ var mp_checkout;
 			this.initShippingAddressListeners();
 			this.initPaymentOptionListeners();
 			this.initUpdateShippingMethodsListeners();
+			this.initUpdateStateFieldListeners();
 			this.initCardValidation();
-			this.initAjaxLogin();
 			this.initCheckoutSteps();
+		},
+		
+		/**
+		 * Update state list when country changes
+		 *
+		 * @since 3.0
+		 */
+		initUpdateStateFieldListeners : function() {
+			$( '[name="billing[country]"], [name="shipping[country]"]' ).on( 'change', function() {
+				var $this = $( this );
+				var url = mp_i18n.ajaxurl + '?action=mp_checkout_get_states';
+				
+				if ( $this.attr( 'name' ).indexOf( 'billing' ) == 0 ) {
+					var $target = $( '[name="billing[state]"]' );
+					var type = 'billing';
+				} else {
+					var $target = $( '[name="shipping[state]"]' );
+					var type = 'shipping';
+				}
+				
+				var data = {
+					country : $this.val(),
+					type : type
+				}
+				
+				$target.select2( 'destroy' ).ajaxLoading( 'show' );
+						
+				$.post( url, data ).done( function( resp ) {
+					if ( resp.success ) {
+						if ( resp.data.countries ) {
+							$target.html( resp.data.countries ).ajaxLoading( 'hide' );
+							$target.closest( '.mp-checkout-column' ).show();
+							marketpress.initSelect2();
+						} else {
+							$target.closest( '.mp-checkout-column' ).hide();
+						}
+					}
+				} );
+			} );
+		},
+		
+		/**
+		 * Show the checkout form
+		 *
+		 * @since 3.0
+		 */
+		showForm : function() {
+			$( '#mp-checkout' ).show();
+		},
+		
+		/**
+		 * Adjust height of #mp-checkout to the height of the active step
+		 *
+		 * @since 3.0
+		 */
+		autoHeight : function() {
+			var $checkout = $( '#mp-checkout' );
+			
+			$checkout.animate({
+				height : $checkout.find( '.cycle-slide.current' ).outerHeight()
+			}, 300);
 		},
 		
 		/**
@@ -48,7 +109,44 @@ var mp_checkout;
 			
 			return hashPairs[ what ];
 		},
+
+		/**
+		 * Show/hide checkout section error summary
+		 *
+		 * @since 3.0
+		 * @param string action Either "show" or "hide".
+		 * @param int count The number of errors.
+		 */
+		errorSummary : function( action, count ) {
+			var $section = $( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' );
+			var $checkout = $( '#mp-checkout' );
+			
+			if ( 'show' == action ) {
+				var errorVerb = ( count > 1 ) ? mp_checkout_i18n.error_plural : mp_checkout_i18n.error_singular;
+				var errorString = mp_checkout_i18n.errors.replace( '%d', count ).replace( '%s', errorVerb );
+				$section.html( errorString ).addClass( 'show' );
+			} else {
+				$section.removeClass( 'show' );
+			}
+			
+			mp_checkout.autoHeight();
+		},
 		
+		/**
+		 * Execute when on the last step of checkout
+		 *
+		 * @since 3.0
+		 * @event cycle-initialized, cycle-after
+		 */
+		lastStep : function( evt, opts ) {
+			var $checkout = $( '#mp-checkout' );
+			if ( opts.slideNum == opts.slideCount || opts.currSlide == (opts.slideCount - 1) ) {
+				$checkout.addClass( 'last-step' );
+			} else {
+				$checkout.removeClass( 'last-step' );
+			}
+		},
+				
 		/**
 		 * Initialize checkout steps
 		 *
@@ -57,9 +155,7 @@ var mp_checkout;
 		initCheckoutSteps : function(){
 			var $checkout = $(' #mp-checkout' );
 			
-			/* Maybe hide previous button - we use this instead of the "prev" option
-			because slides can dynamically be updated and the prev button would stop
-			working */
+			// Setup cycle-initialized and cycle-after events
 			$( document ).on( 'cycle-initialized cycle-after', '#mp-checkout', function( e, opts ){
 				var $btn = $checkout.find( '.mp-button-checkout-prev-step' );
 				
@@ -72,6 +168,12 @@ var mp_checkout;
 					$btn.addClass( 'disabled' );
 				} else {
 					$btn.removeClass( 'disabled' );
+				}
+				
+				if ( slideNum == opts.slideCount ) {
+					$checkout.addClass( 'last-step' );
+				} else {
+					$checkout.removeClass( 'last-step' );
 				}
 			} );
 			
@@ -97,11 +199,13 @@ var mp_checkout;
 			$checkout.on( 'cycle-prev', function( e, opts ){
 				$( '.mp-tooltip' ).tooltip( 'close' );
 			} );
-			
+
 			// Validate form
 			$checkout.validate({
+				onkeyup : false,
+				onclick : false,
 				ignore : function( index, element ){
-					return ( ! $( element).closest( '.cycle-slide.current' ).length );
+					return ( ! $( element ).closest( '.cycle-slide.current' ).length || $( element ).is( ':hidden' ) );
 				},
 				highlight : function( element, errorClass ){
 					$( element ).addClass( 'mp-input-error' ).prev( 'label' ).addClass( 'mp-label-error' );
@@ -114,12 +218,14 @@ var mp_checkout;
 					
 					$( element ).removeClass( 'mp-input-error' ).prev( 'label' ).removeClass( 'mp-label-error' );
 					
-					if ( $( '.mp-input-error' ).length == 0 ) {
-						$( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' ).removeClass( 'show' );
+					if ( this.numberOfInvalids() == 0 ) {
+						mp_checkout.errorSummary( 'hide' );
 					}
 				},
 				submitHandler : function( form ){
 					var $form = $( form );
+					var $email = $form.find( '[name="mp_login_email"]' );
+					var $pass = $form.find( '[name="mp_login_password"]' );
 					
 					if ( $form.valid() ) {
 						if ( $checkout.hasClass( 'last-step' ) ) {
@@ -134,6 +240,47 @@ var mp_checkout;
 							 * @param jQuery $form The checkout form object.
 							 */
 							$( document ).trigger( 'mp_checkout_process_' + gateway, $form );
+						} else if ( $.trim( $email.val() ).length > 0 && $.trim( $pass.val() ).length > 0 ) {
+							var $btn = $( '#mp-button-checkout-login' );
+							$btn.ajaxLoading();
+							
+							// Destroy any tooltips
+							if ( $( '#mp-login-tooltip' ).length > 0 ) {
+								$( '#mp-login-tooltip' ).remove();
+							}
+							
+							var data = {
+								action : "mp_ajax_login",
+								email : $email.val(),
+								pass : $pass.val(),
+								mp_login_nonce : $this.find( '[name="mp_login_nonce"]' ).val()
+							};
+							
+							$.post( mp_i18n.ajaxurl, data ).done( function( resp ){
+								if ( resp.success ) {
+									window.location.href = window.location.href;
+								} else {
+									$btn.ajaxLoading( 'hide' );
+									$email.before( '<a id="mp-login-tooltip"></a>' );
+									$( '#mp-login-tooltip' ).tooltip({
+										items : '#mp-login-tooltip',
+										content : resp.data.message,
+										tooltipClass : "error",
+										open : function( event, ui ){
+											setTimeout( function(){
+												$( '#mp-login-tooltip' ).tooltip( 'destroy' );
+											}, 4000);
+										},
+										position : {
+											of : $email,
+											my : "center bottom-10",
+											at : "center top"
+										},
+										show : 300,
+										hide : 300
+									}).tooltip( 'open' );
+								}
+							});
 						} else {
 							var url = mp_i18n.ajaxurl + '?action=mp_update_checkout_data';
 							marketpress.loadingOverlay( 'show' );
@@ -150,14 +297,11 @@ var mp_checkout;
 						}
 					}
 				},
+				
 				showErrors : function( errorMap, errorList ){
-					var errorVerb = ( $( errorMap ).length > 1 ) ? mp_checkout_i18n.error_plural : mp_checkout_i18n.error_singular;
-					var errorString = mp_checkout_i18n.errors.replace( '%d', $( errorMap ).length ).replace( '%s', errorVerb );
-					$( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' ).html( errorString ).addClass( 'show' );
-					
-					$checkout.animate({
-						height : $checkout.find( '.cycle-slide.current' ).outerHeight()
-					}, 300);
+					if ( this.numberOfInvalids() > 0 ) {
+						mp_checkout.errorSummary( 'show', this.numberOfInvalids() );
+					}
 					
 					$.each( errorMap, function( inputName, message ){
 						var $input = $( '[name="' + inputName + '"]' );
@@ -183,7 +327,9 @@ var mp_checkout;
 						} );
 						
 						$input.on( 'focus', function() {
-							$tip.tooltip( 'open' );
+							if ( $input.hasClass( 'mp-input-error' ) ) {
+								$tip.tooltip( 'open' );
+							}
 						} );
 						
 						$input.on( 'blur', function() {
@@ -192,73 +338,6 @@ var mp_checkout;
 					});
 					
 					this.defaultShowErrors();
-				}
-			});
-			
-			// Add/remove "last-step" class when on last step
-			$checkout.on( 'cycle-after', function( evt, opts ){
-				if ( opts.slideNum == opts.slideCount ) {
-					$checkout.addClass( 'last-step' );
-				} else {
-					$checkout.removeClass( 'last-step' );
-				}
-			});
-		},
-		
-		/**
-		 * Initialize AJAX login
-		 *
-		 * @since 3.0
-		 */
-		initAjaxLogin : function(){
-			$( '#mp-checkout' ).submit( function( e ){
-				var $this = $( this ),
-						$email = $this.find( '[name="mp_login_email"]' ),
-						$pass = $this.find( '[name="mp_login_password"]' ),
-						$btn = $( '#mp-button-checkout-login' );
-				
-				if ( $.trim( $email.val() ).length > 0 && $.trim( $pass.val() ).length > 0 ) {
-					e.preventDefault();
-					
-					$btn.ajaxLoading();
-					
-					// Destroy any tooltips
-					if ( $( '#mp-login-tooltip' ).length > 0 ) {
-						$( '#mp-login-tooltip' ).remove();
-					}
-					
-					var data = {
-						action : "mp_ajax_login",
-						email : $email.val(),
-						pass : $pass.val(),
-						mp_login_nonce : $this.find( '[name="mp_login_nonce"]' ).val()
-					};
-					
-					$.post( mp_i18n.ajaxurl, data ).done( function( resp ){
-						if ( resp.success ) {
-							window.location.reload();
-						} else {
-							$btn.ajaxLoading( 'hide' );
-							$email.before( '<a id="mp-login-tooltip"></a>' );
-							$( '#mp-login-tooltip' ).tooltip({
-								items : '#mp-login-tooltip',
-								content : resp.data.message,
-								tooltipClass : "error",
-								open : function( event, ui ){
-									setTimeout( function(){
-										$( '#mp-login-tooltip' ).tooltip( 'destroy' );
-									}, 4000);
-								},
-								position : {
-									of : $email,
-									my : "center bottom-10",
-									at : "center top"
-								},
-								show : 300,
-								hide : 300
-							}).tooltip( 'open' );
-						}
-					});
 				}
 			});
 		},
@@ -273,7 +352,7 @@ var mp_checkout;
 		 */
 		initCardValidation : function(){
 			$( '.mp-input-cc-num' ).payment( 'formatCardNumber' );
-			$( '.mp-input-cc-expiry' ).payment( 'formatCardExpiry' );
+			$( '.mp-input-cc-exp' ).payment( 'formatCardExpiry' );
 			$( '.mp-input-cc-cvc' ).payment( 'formatCardCVC' );
 			
 			// Validate card fullname
@@ -312,9 +391,12 @@ var mp_checkout;
 						$checkout = $( '#mp-checkout' );
 				
 				$target.show().siblings( '.mp_gateway_form' ).hide();
-				$checkout.animate({
-					height : $checkout.find( '.cycle-slide.current' ).outerHeight()
-				}, 300);
+				
+				if ( $target.find( '.mp-input-error' ).filter( ':visible' ).length > 0 ) {
+					$checkout.valid();	
+				} else {
+					mp_checkout.errorSummary( 'hide' );
+				}
 			});
 			
 			// On load, open the payment form for the selected payment option
@@ -358,6 +440,7 @@ var mp_checkout;
 }( jQuery ));
 
 jQuery( document ).ready( function( $ ){
+	mp_checkout.showForm();
 	mp_checkout.initListeners();
 	mp_checkout.toggleShippingAddressFields();
 });
