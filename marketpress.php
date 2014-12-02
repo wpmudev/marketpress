@@ -278,7 +278,7 @@ class Marketpress {
 			'hierarchical' => false,
 			'rewrite' => false,
 			'query_var' => false,
-			'supports' => array(),
+			'supports' => array( 'title' ),
 		)));
 		
 		//! Register product_variation post type
@@ -315,13 +315,6 @@ class Marketpress {
 			'label'				=> __('Closed', 'mp'),
 			'label_count' => _n_noop('Closed <span class="count">(%s)</span>', 'Closed <span class="count">(%s)</span>', 'mp'),
 			'post_type'		=> 'mp_order',
-			'public'			=> false
-		) );
-		register_post_status('trash', array(
-			'label'			 	=> _x('Trash', 'post' ),
-			'label_count' => _n_noop('Trash <span class="count">(%s)</span>', 'Trash <span class="count">(%s)</span>', 'mp'),
-			'show_in_admin_status_list' => true,
-			'post_type'	 	=> 'mp_order',
 			'public'			=> false
 		) );
 		
@@ -390,8 +383,8 @@ class Marketpress {
 		add_action('init', array(&$this, 'maybe_flush_rewrites'), 99);
 		// Fix insecure images
 		add_filter('wp_get_attachment_url', array(&$this, 'fix_insecure_images'), 10, 2);
-		// Setup rewrites for single product page
-		add_filter('rewrite_rules_array', array(&$this, 'add_product_variation_rewrites'));
+		// Setup rewrite rules
+		add_filter('rewrite_rules_array', array(&$this, 'add_rewrite_rules'));
 		// Add custom query vars
 		add_filter('query_vars', array(&$this, 'add_query_vars'));
 		// Filter billing info user meta
@@ -414,18 +407,25 @@ class Marketpress {
 	}
 	
 	/**
-	 * Add rewrite rules for direct-links to a specific product variation
+	 * Add rewrite rules
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @filter rewrite_rules_array
 	 */
-	public function add_product_variation_rewrites( $rewrites ) {
+	public function add_rewrite_rules( $rewrites ) {
 		$new_rules = array();
 		
-		if ( $post_id = mp_get_setting('pages->products') ) {
-			$uri = get_page_uri($post_id);
-			$new_rules[$uri . '/([^/]+)/variation/([^/]+)'] = 'index.php?' . MP_Product::get_post_type() . '=$matches[1]&post_type=' . MP_Product::get_post_type() . '&name=$matches[1]&mp_variation_id=$matches[2]';
+		// Product variations
+		if ( $post_id = mp_get_setting( 'pages->products' ) ) {
+			$uri = get_page_uri( $post_id );
+			$new_rules[ $uri . '/([^/]+)/variation/([^/]+)/?' ] = 'index.php?' . MP_Product::get_post_type() . '=$matches[1]&post_type=' . MP_Product::get_post_type() . '&name=$matches[1]&mp_variation_id=$matches[2]';
+		}
+		
+		// Order status
+		if ( $post_id = mp_get_setting( 'pages->order_status' ) ) {
+			$uri = get_page_uri( $post_id );
+			$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 		}
 		
 		return $new_rules + $rewrites;
@@ -440,6 +440,7 @@ class Marketpress {
 	 */
 	public function add_query_vars( $vars ) {
 		$vars[] = 'mp_variation_id';
+		$vars[] = 'mp_order_id';
 		return $vars;
 	}
 	
@@ -520,6 +521,7 @@ class Marketpress {
 		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
 		require_once $this->plugin_dir('includes/common/class-mp-addons.php');
+		require_once $this->plugin_dir('includes/common/class-mp-order.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
@@ -552,6 +554,43 @@ class Marketpress {
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {
+			case 'get_download_url' :
+				_deprecated_function( $method, '3.0', 'MP_Product::download_url' );
+				$product = new MP_Product( $args[0] );
+				return $product->download_url( $args[1], false );
+			case 'mail' :
+				_deprecated_function( $method, '3.0', 'mp_send_email' );
+				return call_user_func_array( 'mp_send_email', $args );
+			break;
+			
+			case 'order_notification' :
+				_deprecated_function( $method, '3.0', 'MP_Order::send_notifications' );
+				$order = new MP_Order( $args[0] );
+				$order->send_notifications();
+			break;
+			
+			case 'get_order' :
+				_deprecated_function( $method, '3.0', 'MP_Order' );
+			break;
+			
+			case 'low_stock_notification' :
+				_deprecated_function( $method, '3.0', 'MP_Product::low_stock_notification' );
+			break;
+			
+			case 'create_order' :
+				_deprecated_function( $method, '3.0', 'MP_Order::save' );
+			break;
+			
+			case 'generate_order_id' :
+				_deprecated_function( $method, '3.0', 'MP_Order' );
+				$order = new MP_Order();
+				return $order->get_id();
+			break;
+			
+			case 'cart_checkout_error' :
+				_deprecated_function($method, '3.0', 'MP_Checkout::add_error OR MP_Checkout::get_error');
+			break;
+			
 			case 'is_valid_zip' :
 				_deprecated_function($method, '3.0', 'mp_is_valid_zip');
 				return call_user_func_array('mp_is_valid_zip', $args);
