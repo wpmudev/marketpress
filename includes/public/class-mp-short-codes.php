@@ -46,6 +46,7 @@ class MP_Short_Codes {
     add_shortcode('mp_product_sku', array(&$this, 'mp_product_sku_sc'));
     add_shortcode('mp_cart', array(&$this, 'mp_cart_sc'));
     add_shortcode('mp_checkout', array(&$this, 'mp_checkout_sc'));
+    add_shortcode('mp_order_status', array(&$this, 'mp_order_status_sc'));
 
     //store links
     add_shortcode('mp_cart_link', array(&$this, 'mp_cart_link_sc'));
@@ -53,6 +54,22 @@ class MP_Short_Codes {
     add_shortcode('mp_products_link', array(&$this, 'mp_products_link_sc'));
     add_shortcode('mp_orderstatus_link', array(&$this, 'mp_orderstatus_link_sc'));
     add_shortcode('mp_store_navigation', array(&$this, 'mp_store_navigation_sc'));	
+	}
+	
+	/**
+	 * Display order status
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $atts {
+	 *		Optional, an array of attributes
+	 *
+	 *		@type string $order_id Optional, the specific order id to show.
+	 * }
+	 */
+	public function mp_order_status_sc( $atts, $content = null ) {
+		$atts['echo'] = false;
+		return mp_order_status( $atts );
 	}
 	
 	/**
