@@ -171,6 +171,14 @@ class MP_Cart {
 					'cartmeta' => $this->cart_meta(false),
 				));
 			break;
+			
+			case 'remove_item' :
+				$this->remove_item( $item_id );
+				wp_send_json_success( array(
+					'cartmeta' => $this->cart_meta( false ),
+					'item_count' => $this->item_count( false, false ),
+				) );
+			break;
 		}
 		
 		wp_send_json_error();
@@ -588,51 +596,53 @@ class MP_Cart {
 				<div id="mp-cart-after" class="clearfix">' . $after_cart_html . '</div>';
 		}
 
-		$html .= '
-				<div id="mp-cart-meta-wrap" class="clearfix">' .
-					$this->cart_meta( false, $editable );
-
-		/**
-		 * Filter the checkout button tooltip text
-		 *
-		 * @since 3.0
-		 * @param string The current tooltip text.
-		 */
-		$tooltip_text = apply_filters( 'mp_cart/checkout_button/tooltip_text', __( '<strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' ) );
-
-		/**
-		 * Filter the checkout button text
-		 *
-		 * @since 3.0
-		 * @param string The current button text.
-		 */
-		$button_text = apply_filters( 'mp_cart/checkout_button/text', (( $this->is_editable ) ? __( 'Proceed to Checkout', 'mp' ) : __( 'Submit Order', 'mp' )) );
-		
-		// Set button classes
-		$button_classes = array(
-			'mp-button',
-			'mp-button-checkout',
-			'mp-button-padlock',
-			(( ! empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
-		);
-		
-		if ( $editable ) {
-			$button_classes[] = 'mp-button-medium';
+		if ( $view != 'order-status' ) {
 			$html .= '
-					<a class="' . implode( ' ', $button_classes ) . '" href="' . mp_store_page_url( 'checkout', false ) . '">' . $button_text . '</a>';
-		} else {
-			$button_classes[] = 'mp-button-large';
+					<div id="mp-cart-meta-wrap" class="clearfix">' .
+						$this->cart_meta( false, $editable );
+	
+			/**
+			 * Filter the checkout button tooltip text
+			 *
+			 * @since 3.0
+			 * @param string The current tooltip text.
+			 */
+			$tooltip_text = apply_filters( 'mp_cart/checkout_button/tooltip_text', __( '<strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' ) );
+	
+			/**
+			 * Filter the checkout button text
+			 *
+			 * @since 3.0
+			 * @param string The current button text.
+			 */
+			$button_text = apply_filters( 'mp_cart/checkout_button/text', (( $this->is_editable ) ? __( 'Proceed to Checkout', 'mp' ) : __( 'Submit Order', 'mp' )) );
+			
+			// Set button classes
+			$button_classes = array(
+				'mp-button',
+				'mp-button-checkout',
+				'mp-button-padlock',
+				(( ! empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
+			);
+			
+			if ( $editable ) {
+				$button_classes[] = 'mp-button-medium';
+				$html .= '
+						<a class="' . implode( ' ', $button_classes ) . '" href="' . mp_store_page_url( 'checkout', false ) . '">' . $button_text . '</a>';
+			} else {
+				$button_classes[] = 'mp-button-large';
+				$html .= '
+						<button class="' . implode( ' ', $button_classes ) . '" type="submit">' . $button_text . '</button>';
+			}
+			
+			if ( ! empty( $tooltip_text ) ) {
+				$html .= '
+						<div class="mp-tooltip-content"><p class="mp-secure-checkout-tooltip-text">' . $tooltip_text . '</p></div>';
+			}
+			
 			$html .= '
-					<button class="' . implode( ' ', $button_classes ) . '" type="submit">' . $button_text . '</button>';
+					</div>';
 		}
-		
-		if ( ! empty( $tooltip_text ) ) {
-			$html .= '
-					<div class="mp-tooltip-content"><p class="mp-secure-checkout-tooltip-text">' . $tooltip_text . '</p></div>';
-		}
-		
-		$html .= '
-				</div>';
 		
 		if ( $editable ) {
 			$html .= '
@@ -722,10 +732,9 @@ class MP_Cart {
 		 * Fires right before the cart is emptied
 		 *
 		 * @since 3.0
-		 * @param int The cart id
-		 * @param array The items in the cart before being emptied
+		 * @param MP_Cart $this The current cart object.
 		 */
-		do_action( 'mp_cart/before_empty_cart', $this->_id, $this->get_items() );
+		do_action( 'mp_cart/before_empty_cart', $this );
 		
 		$this->_items[ $this->_id ] = array();
 		$this->_update_cart_cookie();
@@ -734,9 +743,9 @@ class MP_Cart {
 		 * Fires right after the cart is emptied
 		 *
 		 * @since 3.0
-		 * @param int The cart id
+		 * @param MP_Cart $this The current cart object.
 		 */
-		do_action( 'mp_cart/after_empty_cart', $this->_id );
+		do_action( 'mp_cart/after_empty_cart', $this );
 	}
 	
 	/**
@@ -903,9 +912,10 @@ class MP_Cart {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param bool $echo
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 * @param bool $format Optional, whether for format or not. Defaults to true.
 	 */
-	public function item_count( $echo = true ) {
+	public function item_count( $echo = true, $format = true ) {
 		$items = $this->get_items();
 		$numitems = 0;
 		
@@ -913,10 +923,13 @@ class MP_Cart {
 			$numitems += $qty;
 		}
 		
-		if ( $numitems == 0 ) {
-			$snippet = __('0 items', 'mp');
-		} else {
-			$snippet = sprintf(_n('1 item', '%s items', $numitems, 'mp'), $numitems);
+		$snippet = $numitems;
+		if ( $format ) {
+			if ( $numitems == 0 ) {
+				$snippet = __('0 items', 'mp');
+			} else {
+				$snippet = sprintf(_n('1 item', '%s items', $numitems, 'mp'), $numitems);
+			}
 		}
 		
 		if ( $echo ) {
@@ -966,6 +979,20 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Remove an item
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $item_id The item ID to remove.
+	 */
+	public function remove_item( $item_id ) {
+		if ( mp_arr_get_value( $this->_id . '->' . $item_id, $this->_items ) ) {
+			unset( $this->_items[ $this->_id ][ $item_id ] );
+			$this->_update_cart_cookie();
+		}
+	}
+	
+	/**
 	 * Reset cart ID back to the original
 	 *
 	 * @since 3.0
@@ -988,6 +1015,38 @@ class MP_Cart {
 		if ( is_null($this->_id_original) ) {
 			$this->_id_original = $id;
 		}
+	}
+	
+	/**
+	 * Get the amount of tax applied to the shipping total
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $format Optional, whether to format the returned value or not. Defaults to false.
+	 * @return float/string
+	 */
+	public function shipping_tax_total( $format = false ) {
+		$shipping_tax = 0;
+		
+		if ( mp_get_setting( 'tax->tax_shipping' ) && ($shipping_price = $this->shipping_total() ) ) {
+			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+				$shipping_tax = ($shipping_price - $this->before_tax_price( $shipping_price ));
+			} else {
+				$shipping_tax = ($shipping_price * (float) mp_get_setting( 'tax->rate' ));
+			}
+		}
+		
+		/**
+		 * Filter the shipping tax amount
+		 *
+		 * @since 3.0
+		 * @param int $shipping_tax The current shipping tax amount.
+		 * @param float $shipping_price The current shipping price including tax
+		 * @param MP_Cart $this The current cart object.
+		 */
+		$shipping_tax = (float) apply_filters( 'mp_cart/shipping_tax_amt', $shipping_tax, $shipping_price, $this );
+		
+		return ( $format ) ? mp_format_currency( '', $shipping_tax ) : $shipping_tax;
 	}
 	
 	/**
@@ -1074,11 +1133,10 @@ class MP_Cart {
 	
 			//get address
 			$user = wp_get_current_user();
-			$shipping_info = $user->get('mp_shipping_info');
-	
-			$state = mp_get_session_value('mp_shipping_info->state', mp_arr_get_value('state', $shipping_info));
-			$country = mp_get_session_value('mp_shipping_info->country', mp_arr_get_value('country', $shipping_info));
-	
+			$shipping_info = mp_get_user_address( 'shipping' );
+			$state = mp_arr_get_value( 'state', $shipping_info );
+			$country = mp_arr_get_value( 'country', $shipping_info );
+			
 			//if we've skipped the shipping page and no address is set, use base for tax calculation
 			if ( $this->is_download_only() || mp_get_setting('tax->tax_inclusive') || mp_get_setting('shipping->method') == 'none' ) {
 				if ( empty($country) ) {
@@ -1180,16 +1238,7 @@ class MP_Cart {
 				$price = 0;
 			} else {
 				// Add in shipping?
-				$shipping_tax = 0;
-				if ( mp_get_setting('tax->tax_shipping') && ($shipping_price = $this->shipping_total() ) ) {
-					if ( mp_get_setting('tax->tax_inclusive') ) {
-						$shipping_tax = $shipping_price - $this->before_tax_price($shipping_price);
-					} else {
-						$shipping_tax = $shipping_price * (float) mp_get_setting('tax->rate');
-					}
-				}
-				
-				$price += $shipping_tax;
+				$price += $this->shipping_tax_total();
 			}
 			
 			/**
