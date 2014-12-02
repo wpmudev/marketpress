@@ -121,10 +121,10 @@ class MP_Product {
 		<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div>
 		<?php
 			if ( mp_get_setting('product_button_type') == 'addcart') : ?>
-		<button class="mp_button_addcart" type="submit" name="addcart"><?php _e('Add To Cart', 'mp'); ?></button>
+		<button class="mp-button mp_button_addcart" type="submit" name="addcart"><?php _e('Add To Cart', 'mp'); ?></button>
 		<?php
 			elseif ( mp_get_setting('product_button_type') == 'buynow' ) : ?>
-		<button class="mp_button_buynow" type="submit" name="buynow"><?php _e('Buy Now', 'mp'); ?></button>
+		<button class="mp-button mp_button_buynow" type="submit" name="buynow"><?php _e('Buy Now', 'mp'); ?></button>
 		<?php
 			endif; ?>
 	</div>
@@ -519,19 +519,19 @@ class MP_Product {
 				
 				if ( $context == 'list' ) {
 					if ( $this->has_variations() ) {
-						$button .= '<a class="mp_link_buynow has_variations" data-href="' . admin_url('admin-ajax.php?action=mp_product_get_variations_lightbox&amp;product_id=' . $this->ID) . '" href="' . $this->url(false) . '">' . __('Choose Options', 'mp') . '</a>';
+						$button .= '<a class="mp-button mp_link_buynow has_variations" data-href="' . admin_url('admin-ajax.php?action=mp_product_get_variations_lightbox&amp;product_id=' . $this->ID) . '" href="' . $this->url(false) . '">' . __('Choose Options', 'mp') . '</a>';
 					} else if ( mp_get_setting('list_button_type') == 'addcart' ) {
-						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
+						$button .= '<button class="mp-button mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
 					} else if ( mp_get_setting('list_button_type') == 'buynow' ) {
-						$button .= '<button class="mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
+						$button .= '<button class="mp-button mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
 					}
 				} else {
 					$button .= $this->attribute_fields(false, $selected_atts);
 
 					if ( mp_get_setting('product_button_type') == 'addcart') {
-						$button .= '<button class="mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
+						$button .= '<button class="mp-button mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
 					} else if (mp_get_setting('product_button_type') == 'buynow') {
-						$button .= '<button class="mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
+						$button .= '<button class="mp-button mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
 					}
 				}
 			}
@@ -725,6 +725,30 @@ class MP_Product {
 		} else {
 			return $snippet;
 		}
+	}
+	
+	/**
+	 * Get the product's download url - if applicable
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $order_id The order ID for the download.
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	public function download_url( $order_id, $echo = true ) {
+		$url = false;
+		if ( $this->is_download() ) {
+			$url = add_query_arg( 'orderid', $order_id, $this->url( false ) );
+		}
+		
+		/**
+		 * Filter the product's download url
+		 *
+		 * @since 3.0
+		 * @param string $url The current url.
+		 * @param string $order_id The order ID.
+		 */
+		return apply_filters( 'mp_product/download_url', $url, $order_id );
 	}
 
 	/**
@@ -1259,6 +1283,52 @@ class MP_Product {
 	}
 	
 	/**
+	 * Send low-stock notification
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function low_stock_notification() {
+		$stock = $this->get_stock();
+		
+		if ( $this->get_meta( 'mp_stock_email_sent' ) && $stock  > 0 ) {
+			// Already sent - bail
+			return;
+		}
+		
+		// Only send the email once - we set this before doing anything else to avoid race conditions
+		$this->update_meta( 'mp_stock_email_sent', true );
+		
+		$name = $this->title( false );
+		if ( $this->is_variation() ) {
+			$name .= ': ' . $this->get_meta( 'name' );
+		}
+
+		$subject = __( 'Low Product Inventory Notification', 'mp' );
+		$msg = __( 'This message is being sent to notify you of low stock of a product in your online store according to your preferences.
+
+Product: %s
+Current Inventory: %s
+Link: %s
+
+Edit Product: %s
+Notification Preferences: %s', 'mp' );
+	 $msg = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc') );
+	 
+	 /**
+	  * Filter the low stock notification message
+	  *
+	  * @since 3.0
+	  * @param string $msg The current message text.
+	  * @param int $this->ID The product's ID.
+		*/
+	 $msg = apply_filters( 'mp_low_stock_notification', $msg, $this->ID );
+	 
+	 mp_send_email( mp_get_store_email(), $subject, $msg );
+	}
+
+	
+	/**
 	 * Get a product's attribute
 	 *
 	 * @since 3.0
@@ -1385,6 +1455,39 @@ class MP_Product {
 			return $url;
 		}
 	}
+	
+	/**
+	 * Get the product's edit url
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo Optional, defaults to true.
+	 */
+	public function url_edit( $echo = true ) {
+		if ( $this->is_variation() ) {
+			$url = get_edit_post_link( $this->_post->post_parent );
+		} else {
+			$url = get_edit_post_link( $this->ID );
+		}
+		
+		if ( $echo ) {
+			echo $url;
+		}	else {
+			return $url;
+		}
+	}
+	
+	/**
+	 * Update product meta
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $name The name of the meta to update.
+	 * @param mixed $value The new value.
+	 */
+	public function update_meta( $name, $value ) {
+		update_field_value( $name, $value, $this->ID );
+	}
 
 	/**
 	 * Get Pinterest PinIt button
@@ -1429,7 +1532,7 @@ class MP_Product {
 	 */
 	public function title( $echo = true ) {
 		if ( $this->is_variation() ) {
-			$title = get_the_title($this->_post->post_parent);
+			$title = get_the_title( $this->_post->post_parent ) . ': ' . $this->get_meta( 'name' );
 		} else {
 			$title = $this->_post->post_title;
 		}
@@ -1480,7 +1583,7 @@ class MP_Product {
 	 * @param int/object/WP_Post $product
 	 */
 	protected function _get_post( $product ) {
-		$this->_post = get_post($product);
+		$this->_post = get_post( $product );
 		
 		if ( is_null($this->_post) ) {
 			$this->_exists = false;
