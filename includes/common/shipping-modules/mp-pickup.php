@@ -31,7 +31,7 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 		add_action('mp_order_status_output',array(&$this, 'show_instructions_order_status' ));
 		
 		//filter the email output
-		add_filter('mp_order_notification_body', array(&$this, 'add_instructions_to_order_email'), 10, 2 );
+		add_filter('mp_order/notification_body', array(&$this, 'add_instructions_to_order_email'), 10, 2 );
 	}
 	
 	
@@ -67,14 +67,14 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	/**
 	 * Filter the new order email 
 	 */
-	function add_instructions_to_order_email($text, $order) {
+	function add_instructions_to_order_email(  $text, $order ) {
 		global $mp;
-		$used_pickup = ( isset( $order->mp_shipping_info['shipping_option'] ) && $order->mp_shipping_info['shipping_option'] == 'pickup' ) ? true : false;
+		$used_pickup = ( ($shipping_option = $order->get_meta( 'mp_shipping_info->shipping_option')) && $shipping_option == 'pickup' ) ? true : false;
 		
-		if( $used_pickup ) {
-			$settings = $mp->get_setting('shipping');
-			$text .= "\n\n" .__('Pickup Instructions', 'mp');
-			$text .= "\n".esc_attr($settings['pickup']['pickup-instructions']);
+		if ( $used_pickup ) {
+			$settings = mp_get_setting( 'shipping' );
+			$text .= "\n\n" . __('Pickup Instructions', 'mp');
+			$text .= "\n" . esc_attr( mp_get_setting( 'shipping->pickup->pickup-instructions' ) );
 		}
 		
 		return $text;
