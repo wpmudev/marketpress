@@ -38,6 +38,15 @@ class MP_Checkout {
 	protected $_sections = array();
 	
 	/**
+	 * Refers to the checkout errors
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_errors = array();
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -77,6 +86,14 @@ class MP_Checkout {
 		// Update checkout data
 		add_action( 'wp_ajax_mp_update_checkout_data', array( &$this, 'ajax_update_checkout_data' ) );
 		add_action( 'wp_ajax_nopriv_mp_update_checkout_data', array( &$this, 'ajax_update_checkout_data' ) );
+		
+		// Process checkout
+		add_action( 'wp_ajax_mp_process_checkout', array( &$this, 'ajax_process_checkout' ) );
+		add_action( 'wp_ajax_nopriv_mp_process_checkout', array( &$this, 'ajax_process_checkout' ) );
+		
+		// Get state list
+		add_action( 'wp_ajax_mp_checkout_get_states', array( &$this, 'ajax_get_states' ) );
+		add_action( 'wp_ajax_nopriv_mp_checkout_get_states', array( &$this, 'ajax_get_states' ) );
 	}
 	
 	/**
@@ -86,14 +103,20 @@ class MP_Checkout {
 	 * @access protected
 	 */
 	protected function _update_shipping_section() {
-		$type = 'billing';
-		if ( mp_get_post_value( 'enable_shipping_address') ) {
-			$type = 'shipping';	
+		$data = (array) mp_get_post_value( 'billing', array() );
+		foreach ( $data as $key => $value ) {
+			$value = trim( $value );
+			mp_update_session_value( "mp_billing_info->{$key}", $value );
 		}
 		
-		$data = (array) mp_get_post_value( "{$type}", array() );
-		foreach ( $data as $key => $value ) {			
-			mp_update_session_value( "mp_shipping_info->{$key}", $value );
+		if ( mp_get_post_value( 'enable_shipping_address') ) {
+			$data = (array) mp_get_post_value( 'billing', array() );
+			foreach ( $data as $key => $value ) {
+				$value = trim( $value );	
+				mp_update_session_value( "mp_shipping_info->{$key}", $value );
+			}
+		} else {
+			mp_update_session_value( 'mp_shipping_info', mp_get_session_value( 'mp_billing_info' ) );
 		}
 		
 		return $this->section_shipping();
@@ -114,7 +137,7 @@ class MP_Checkout {
 		
 		return $this->section_order_review_payment();
 	}
-	
+		
 	/**
 	 * Display address fields
 	 *
@@ -125,6 +148,41 @@ class MP_Checkout {
 	 */
 	public function address_fields( $type ) {
 		$country = mp_get_user_address_part('country', $type);
+		
+		// Country list
+		$allowed_countries = explode(',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+		$countries = array();
+		foreach ( $allowed_countries as $country ) {
+			$countries[ $country ] = mp()->countries[ $country ];
+		}
+		
+		// State/zip fields
+		$state_zip_fields = array();
+		if ( $states = $this->get_states( $country ) ) {
+			$state_zip_fields[] = array(
+				'type' => 'select',
+				'label' => __('State/Province', 'mp'),
+				'name' => $this->field_name( 'state', $type ),
+				'options' => $states,
+				'value' => mp_get_user_address_part('state', $type),
+				'atts' => array(
+					'class' => 'mp_select2_search',
+				),
+				'validation' => array(
+					'required' => true,
+				),
+			);
+		}
+		$state_zip_fields[] = array(
+			'type' => 'text',
+			'label' => mp_get_setting('zip_label'),
+			'name' => $this->field_name( 'zip', $type ),
+			'value' => mp_get_user_address_part('zip', $type),
+			'validation' => array(
+				'required' => true,
+			),
+		);
+		
 		$address_fields = array(
 			array(
 				'type' => 'complex',
@@ -145,6 +203,16 @@ class MP_Checkout {
 						'name' => $this->field_name( 'last_name', $type ),
 						'value' => mp_get_user_address_part('last_name', $type),
 					),
+				),
+			),
+			array(
+				'type' => 'text',
+				'label' => __( 'Email Address', 'mp' ),
+				'name' => $this->field_name( 'email', $type ),
+				'value' => mp_get_user_address_part( 'email', $type ),
+				'validation' => array(
+					'required' => true,
+					'email' => true,
 				),
 			),
 			array(
@@ -184,27 +252,18 @@ class MP_Checkout {
 				),
 			),
 			array(
-				'type' => 'complex',
-				'subfields' => array(
-					array(
-						'type' => 'text',
-						'label' => __('State/Province', 'mp'),
-						'name' => $this->field_name( 'state', $type ),
-						'value' => mp_get_user_address_part('state', $type),
-						'validation' => array(
-							'required' => true,
-						),
-					),
-					array(
-						'type' => 'text',
-						'label' => mp_get_setting('zip_label'),
-						'name' => $this->field_name( 'zip', $type ),
-						'value' => mp_get_user_address_part('zip', $type),
-						'validation' => array(
-							'required' => true,
-						),
-					),
+				'type' => 'select',
+				'label' => __( 'Country', 'mp' ),
+				'name' => $this->field_name( 'country', $type ),
+				'options' => $countries,
+				'value' => $country,
+				'atts' => array(
+					'class' => 'mp_select2_search',
 				),
+			),
+			array(
+				'type' => 'complex',
+				'subfields' => $state_zip_fields,
 			),
 			array(
 				'type' => 'text',
@@ -239,6 +298,100 @@ class MP_Checkout {
 	}
 	
 	/**
+	 * Add checkout error
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $msg The error message.
+	 * @param string $context The context of the error message.
+	 */
+	public function add_error( $msg, $context ) {
+		$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+		mp_push_to_array( $this->_errors, $key, $msg );
+	}
+	
+	/**
+	 * Get checkout error
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function get_error( $context ) {
+		$error = mp_arr_get_value( $context, $this->_errors );
+		
+		/**
+		 * Filter the error string
+		 *
+		 * @since 3.0
+		 * @param string $error The error string.
+		 * @param string $context The error context.
+		 */
+		return apply_filters( 'mp_checkout/get_error', $error, $key );
+	}
+	
+	/**
+	 * Get states list
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_checkout_get_states, wp_ajax_nopriv_mp_checkout_get_states
+	 */
+	public function ajax_get_states() {
+		$countries = false;
+		if ( $country = mp_get_post_value( 'country' ) ) {
+			$_countries = $this->get_states( $country );
+			$countries = '';
+			$selected = mp_get_user_address_part( 'state', mp_get_post_value( 'type' ) );
+			foreach ( $_countries as $val => $label ) {
+				$countries .= '<option value="' . $val . '" ' . selected( $selected, $val, false ) . '>' . $label . '</option>'; 
+			}
+		}
+		
+		wp_send_json_success( array( 'countries' => $countries ) );
+	}
+
+	/**
+	 * Process checkout
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_process_checkout, wp_ajax_nopriv_mp_process_checkout
+	 */
+	public function ajax_process_checkout() {
+		if ( $payment_method = mp_get_post_value( 'payment_method' ) ) {
+			$cart = mp_cart();
+			$billing_info = mp_get_user_address( 'billing' );
+			$shipping_info = mp_get_user_address( 'shipping' );
+			
+			/**
+			 * For gateways to tie into and process payment
+			 *
+			 * @since 3.0
+			 * @param MP_Cart $cart An MP_Cart object.
+			 * @param array $billing_info An array of buyer billing info.
+			 * @param array $shipping_info An array of buyer shipping info.
+			 */
+			do_action( 'mp_process_payment_' . $payment_method, $cart, $billing_info, $shipping_info );
+			
+			if ( $this->has_errors() ) {
+				// There are errors - bail
+				wp_send_json_error( array(
+					'errors' => $this->_errors,
+				) );
+			}
+			
+			$order = wp_cache_get( 'order_object', 'mp' );
+			wp_send_json_success( array( 'redirect_url' => $order->tracking_url( false ) ) );
+		}
+		
+		wp_send_json_error( array(
+			'errors' => array(
+				'general' => __( 'An unknown error occurred. Please try again.', 'mp' ),
+			),
+		) );
+	}
+	
+	/**
 	 * Update checkout data
 	 *
 	 * @since 3.0
@@ -252,32 +405,6 @@ class MP_Checkout {
 		);
 		
 		wp_send_json_success( $sections );
-	}
-	
-	/**
-	 * Display country dropdown
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @param string $type Either billing or shipping.
-	 * @param string $selected The selected country.
-	 * @return string
-	 */
-	public function country_dropdown( $type, $selected = null ) {
-		$html = '
-			<select class="mp_select2_search" name="' . $this->field_name('country', $type) . '">';
-		
-		$countries = explode(',', mp_get_setting('shipping->allowed_countries', ''));
-		
-		foreach ( $countries as $code ) {
-			$html .= '
-				<option value="' . $code . '"' . selected($selected, $code, false) . '>' . esc_attr(mp()->countries[$code]) . '</option>';
-		}
-		
-		$html .= '
-			</select>';
-			
-		return $html;
 	}
 	
 	/**
@@ -297,9 +424,15 @@ class MP_Checkout {
 		), $args );
 		
 		extract( $args );
+		
+		if ( ! mp_cart()->has_items() ) {
+			return sprintf( __( '<h3>Oops!</h3><p>Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p>', 'mp' ), mp_store_page_url( 'products', false ) ) . '</p>';
+		}
 				
 		$html = '
-			<form id="mp-checkout" class="clearfix" method="post" novalidate>';
+			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
+			<form id="mp-checkout" class="clearfix" method="post" style="display:none" novalidate>' .
+				wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
 		
 		foreach ( $this->_sections as $section => $heading_text ) {
 			$method = 'section_' . str_replace( '-', '_', $section );
@@ -369,7 +502,7 @@ class MP_Checkout {
 			'cc_exp' => __( 'Please enter a valid card expiration', 'mp' ),
 			'cc_cvc' => __(' Please enter a valid card security code', 'mp' ),
 			'cc_fullname' => __( 'Please enter a valid first and last name', 'mp' ),
-			'errors' => __( '<h4>Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span style="color:#d60303">red</span> below. Entering into a field will reveal the actual error message.</p>', 'mp' ),
+			'errors' => __( '<h4>Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span style="color:#d60303">red</span> below. Entering into a field will reveal the actual error that occurred.</p>', 'mp' ),
 			'error_plural' => __( 'errors', 'mp' ),
 			'error_singular' => __( 'error', 'mp' ),
 		));
@@ -405,6 +538,7 @@ class MP_Checkout {
 	 *		@type array $atts An array of custom attributes.
 	 *		@type string $value The value of the field.
 	 *		@type array $subfields For complex fields, an array of subfields.
+	 *		@param array $options Required, if a select field.
 	 * }
 	 * @return string
 	 */
@@ -440,6 +574,21 @@ class MP_Checkout {
 			case 'hidden' :
 				$html .= '
 				<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . ' />';
+			break;
+			
+			case 'select' :
+				$atts .= ' autocomplete="off"';
+				$html .= '
+				<select name="' . mp_arr_get_value( 'name', $field, '' ) . '" ' . $atts . '>';
+				
+				$options = (array) mp_arr_get_value( 'options', $field, array() );
+				foreach ( $options as $value => $label ) {
+					$html .= '
+					<option value="' . esc_attr( $value ) . '" ' . selected( $value, mp_arr_get_value( 'value', $field ), false ) . '>' . esc_attr( $label ) . '</option>';
+				}
+				
+				$html .= '
+				</select>';
 			break;
 			
 			case 'complex' :
@@ -516,7 +665,7 @@ class MP_Checkout {
 	 * @filter mp_cart/after_cart_html
 	 */
 	public function payment_form( $html, $cart, $display_args ) {
-		if ( $cart->is_editable ) {
+		if ( $cart->is_editable || $display_args['view'] == 'order-status' ) {
 			// Cart isn't editable - bail
 			return $html;
 		}
@@ -539,7 +688,8 @@ class MP_Checkout {
 		
 		$html .= '
 			<div id="mp-checkout-payment-form">' .
-				$heading;
+				$heading . '
+				<div id="mp-checkout-payment-form-errors"></div>';
 		
 		if ( empty( $form ) ) {
 			$html .= wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
@@ -555,19 +705,13 @@ class MP_Checkout {
 	}
 	
 	/**
-	 * Display state/province field
+	 * Get an array of states/provinces for a given country
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @param string $country A country.
-	 * @param string $type Either billing or shipping.
-	 * @param string $selected Optional, the selected country.
 	 */
-	public function province_field( $country, $type, $selected = null ) {
-		if ( mp_doing_ajax() && ($_country = mp_get_post_value('country')) ) {
-			$country = $_country;
-		}
-
+	public function get_states( $country ) {
 		$list = false;
 		switch ( $country ) {
 			case 'US' :
@@ -590,34 +734,18 @@ class MP_Checkout {
 		 * @param array $list The current state/province list.
 		 * @param string $country The current country.
 		 */
-		$list = apply_filters('mp_checkout/province_field_list', $list, $country);
-		
-		$content = '';
-		if ( false !== $list ) {			
-			$content .= '<select class="mp_select2_search" name="' . $this->field_name('state', $type) . '">';
-			foreach ( $list as $abbr => $label ) {
-				$content .= '<option value="' . $abbr . '"' . selected($selected, $abbr, false) . '>' . esc_attr($label) . '</option>';
-			}
-			$content .= '</select>';
-		} else {
-			$content .= '<input name="state" type="text" value="' . esc_attr($selected) . '" />';
-		}
-
-		/**
-		 * Filter the province field content
-		 *
-		 * @since 3.0
-		 * @param string $content The current content.
-		 * @param string $country The current country.
-		 * @param string $selected The selected state/province.
-		 */
-		$content = apply_filters('mp_checkout/province_field', $content, $country, $selected);
-
-		if ( mp_doing_ajax() ) {
-			die($content);
-		} else {
-			return $content;
-		}
+		return apply_filters( 'mp_checkout/province_field_list', $list, $country );
+	}
+	
+	/**
+	 * Check if there are any errors
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function has_errors() {
+		return ( count( $this->_errors ) );
 	}
 	
 	/**
