@@ -439,6 +439,8 @@ class MP_Orders_Admin {
 	public function orders_column_data( $column, $post_id ) {
 		global $post;
 		
+		$order = new MP_Order( $post_id );
+		
 		switch ( $column ) {
 			//! Order Status
 			case 'mp_orders_status' :
@@ -505,8 +507,8 @@ class MP_Orders_Admin {
 			
 			//! Order From
 			case 'mp_orders_name' :
-				$shipping_info = get_post_meta($post_id, 'mp_shipping_info', true);
-				echo '<a href="mailto:' . urlencode($shipping_info['name']) . ' &lt;' . esc_attr($shipping_info['email']) . '&gt;?subject=' . urlencode(sprintf(__('Regarding Your Order (%s)', 'mp'), get_the_title($post_id))) . '">' . esc_html($shipping_info['name']) . '</a>';		
+				$name = $order->get_name();
+				echo '<a href="mailto:' . urlencode( $name ) . ' &lt;' . esc_attr( $order->get_meta( 'mp_shipping_info->email' ) ) . '&gt;?subject=' . urlencode( sprintf( __( 'Regarding Your Order (%s)', 'mp' ), $order->get_id() ) ) . '">' . esc_html( $name ) . '</a>';		
 			break;
 			
 			//! Order Items
@@ -529,9 +531,16 @@ class MP_Orders_Admin {
 			
 			//! Order Discount
 			case 'mp_orders_discount' :
-				$discount = get_post_meta($post_id, 'mp_discount_info', true);
-				if ( $discount ) {
-					echo $discount['discount'] . ' (' . strtoupper($discount['code']) . ')';
+				if ( $coupons = $order->get_meta( 'mp_discount_info' ) ) {
+					foreach ( (array) $coupons as $key => $val ) {
+						if ( $key == 'discount' ) {
+							echo $val;
+						} elseif ( $key == 'code' ) {
+							echo ' (' . strtoupper( $val ) . ')';
+						} else {
+							echo mp_format_currency( '', $val ) . ' (' . $key . ')';
+						}
+					}
 				} else {
 					_e('N/A', 'mp');
 				}
