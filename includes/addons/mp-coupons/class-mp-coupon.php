@@ -79,7 +79,6 @@ class MP_Coupon {
 	 *
 	 * @since 3.0
 	 * @access protected
-	 * @param string $code
 	 */
 	protected function _get_post() {
 		if ( is_null($this->ID) ) {
@@ -110,6 +109,7 @@ class MP_Coupon {
 		} else {
 			$this->_exists = true;
 			$this->ID = $this->_post->ID;
+			$this->_code = $this->post_title;
 		}
 	}
 	
@@ -178,6 +178,16 @@ class MP_Coupon {
 	 */
 	public function exists() {
 		return $this->_exists;
+	}
+	
+	/**
+	 * Get coupon code
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function get_code() {
+		return $this->_code;
 	}
 	
 	/**
@@ -377,5 +387,28 @@ class MP_Coupon {
 		} else {
 			return $remaining;
 		}
+	}
+	
+	/**
+	 * Update meta value
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $name The name of the meta to update.
+	 * @param mixed $value The new value of the meta.
+	 */
+	public function update_meta( $name, $value ) {
+		update_field_value( $name, $value, $this->ID );
+	}
+	
+	/**
+	 * Use a coupon
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function use_coupon() {
+		$uses = (float) $this->get_meta( 'times_used', 0 ) + 1;
+		$this->update_meta( 'times_used', $uses );
 	}
 }
