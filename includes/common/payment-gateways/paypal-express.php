@@ -941,7 +941,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					if ( $coupon_code ) {
 						$price_coupon = mp()->coupon_value_product($coupon_code, ($data['price'] * $data['quantity']), $product_id);
 						$price = ($data['price'] * $data['quantity']);
-						$coupon_amt = ($price - $price_coupon);
+						$coupon_amt += ($price - $price_coupon);
 					}
 
 					//skip free products to avoid paypal error
