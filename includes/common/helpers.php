@@ -12,6 +12,217 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_filter_email' ) ) :
+	/**
+	 * Replace short codes in email messages with dynamic content
+	 *
+	 * @since 3.0
+	 * @uses $blog_id
+	 * @param MP_Order $order An MP_Order object.
+	 * @param string $text The email text including short codes.
+	 * @param bool $escape Optional, whether to escape string or not. Defaults to false.
+	 */
+	function mp_filter_email( $order, $text, $escape = false ) {
+		global $blog_id; 
+		$bid = ( is_multisite() ) ? $blog_id : 1;
+		
+		// Currency
+		$currency = $order->get_meta( 'currency', '' );
+
+		// Cart
+		$cart = $order->get_meta( 'mp_cart_info' );
+		$items = $cart->get_items_as_objects();
+		
+		// Order info
+		if ( count( $items ) > 0 ) {
+			$order_info = '<table width="100%">
+<tr>
+<th align="left">' . __( 'Item', 'mp' ) . '</th>
+<th align="left">' . __( 'Sku', 'mp' ) . '</th>
+<th align="right">' . __( 'Qty', 'mp' ) . '</th>
+<th align="right">' . __( 'Price', 'mp' ) . '</th>
+<th align="right">' . __( 'Total', 'mp' ) . '</th>
+</tr>';
+			
+			foreach ( $items as $item ) {
+				$price = ($item->get_price( 'lowest' ) * $item->qty);
+				
+				//show download link if set
+				$download_link = false;
+				if ( $order->post_status != 'order_received' && ($download_url = $item->download_url( $order->get_id(), false )) ) {
+					$download_link = '<a href="' . $download_url . '">' . __( 'Download', 'mp' ) . '</a>';
+				}
+				
+				$order_info .= "<tr>
+<td>" . $item->title( false ) . (( $download_link ) ? '<br />' . $download_link : '') . '</td>
+<td>' . $item->get_meta( 'sku', '' ) . '</td>
+<td align="right">' . number_format_i18n( $item->qty ) . '</td>
+<td align="right">' . mp_format_currency( $currency, $item->get_price( 'lowest' ) ) . '</td>
+<td align="right">'. mp_format_currency( $currency, $price ) . '</td>
+</tr>' . "\n";
+
+				/*
+				
+				//! TODO: What is this?
+				
+				// FPM: Product Custom Fields
+				$cf_key = $bid .':'. $product_id .':'. $variation;
+				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
+					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
+
+					$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
+					if (isset($mp_custom_field_label[$variation]))
+						$label_text = esc_attr($mp_custom_field_label[$variation]);
+					else
+						$label_text = __('Product Personalization: ', 'mp');
+
+					$order_info .= "\t\t" . $label_text	 ."\n";
+					$order_info_sku .= "\t\t" . $label_text	 ."\n";
+					foreach($cf_items as $idx => $cf_item) {
+						$item_cnt = intval($idx)+1;
+						$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item	."\n";
+						$order_info_sku .= "\t\t\t" . $item_cnt .". ". $cf_item	 ."\n";
+					}
+				}
+				$order_info .= "\n";
+				$order_info_sku .= "\n";*/
+			}
+		}
+		
+		$order_info .= "</table><br /><br />";
+		
+		// Coupon lines
+		if ( $coupons = $order->get_meta( 'mp_discount_info' ) ) {
+			$order_info .= "<strong>" . __('Coupons:', 'mp') . "</strong>";
+			
+			foreach ( $coupons as $code => $discount ) {
+				$order_info .= $code . "\t" . mp_format_currency( $currency, $discount ) . "<br />\n";
+			}
+		}
+		
+		// Shipping line
+		if ( $shipping_total = $order->get_meta( 'mp_shipping_total' ) ) {
+			$order_info .= '<strong>' . __('Shipping:', 'mp') . '</strong> ' . mp_format_currency( $currency, $shipping_total ) . "<br />\n";
+		}
+		
+		// Tax line
+		if ( $tax_total = $order->get_meta( 'mp_tax_total' ) ) {
+			$order_info .= '<strong>' . esc_html( mp_get_setting( 'tax->label', __( 'Taxes', 'mp' ) ) ) . ':</strong> ' . mp_format_currency( $currency, $tax_total ) . "<br />\n";
+		}
+		
+		// Total line
+		if ( $order_total = $order->get_meta( 'mp_order_total' ) ) {
+			$order_info .= '<strong>' . __('Order Total:', 'mp') . '</strong> ' . mp_format_currency( $currency, $order_total ) . "<br />\n";
+		}
+		
+		// Cart
+		$cart = $order->get_meta( 'mp_cart_info' );
+	
+		// Shipping/Billing Info
+		$types = array( 'billing' => __( 'Billing Address', 'mp' ), 'shipping' => __( 'Shipping Address', 'mp' ) );
+		$shipping_billing_info = '<table width="100%"><tr>';
+		if ( $cart->is_download_only() || mp_get_setting( 'shipping->method' ) == 'none' ) {
+			$shipping_billing_info .= '<td align="left"><h3>' . __( 'Shipping', 'mp' ) . '</h3>' . __( 'No shipping required for this order.', 'mp' ) . '</td>';
+			$type = array( 'billing' => __( 'Billing', 'mp' ) );
+		}
+		
+		foreach ( $types as $type => $label ) {
+			$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
+			$shipping_billing_info .=  $order->get_name( $type ) . "<br />\n";
+			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address1" ) . "<br />\n";
+			
+			if ( $order->get_meta( "mp_{$type}_info->address2" ) ) {
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address2" ) . "<br />\n";
+			}
+			
+			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $order->get_meta( "mp_{$type}_info->state" ) . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $order->get_meta( "mp_{$type}_info->country" ) . "<br /><br />\n";
+			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
+			
+			if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->phone" ) . "<br />\n";
+			}
+			
+			$shipping_billing_info .= '</td>';
+		}
+		
+		$shipping_billing_info .= '</tr></table><br /><br />';
+		
+		// If actually shipped show method, else customer's shipping choice.
+		if ( $order->get_meta( 'mp_shipping_info->method') && $order->get_meta( 'mp_shipping_info->method' != 'other' ) ) {
+			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $order->get_meta( 'mp_shipping_info->method' );
+		} elseif ( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) {
+			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ;
+		}
+	
+		if ( $order->get_meta( 'mp_shipping_info->tracking_num' ) ) {
+			$shipping_billing_info .= "<br /><strong>" . __('Tracking Number:', 'mp') . ':</strong> ' . $order->get_meta( 'mp_shipping_info->tracking_num' );
+		}
+		
+		// Special Instructions
+		if ( $order->get_meta( 'mp_shipping_info->special_instructions' ) ) {
+			$shipping_billing_info .= "<br /><strong>" . __('Special Instructions:', 'mp') . ':</strong>' . wordwrap( $order->get_meta( 'mp_shipping_info->special_instructions' ) );
+		}
+			
+		$order_notes = '';
+		if ( $order->get_meta( 'mp_order_notes') ) {
+			$order_notes = '<strong>' . __('Order Notes:', 'mp') . ':</strong>' . wordwrap( $order->get_meta( 'mp_order_notes' ) ) . "<br />\n";
+		}
+	
+		// Payment Info
+		$payment_info = '<strong>' . __('Payment Method:', 'mp') . '</strong> ' . $order->get_meta( 'mp_payment_info->gateway_public_name' ) . "<br />\n";
+	
+		if ( $order->get_meta( 'mp_payment_info->method' ) ) {
+			$payment_info .= '<strong>' . __('Payment Type:', 'mp') . '</strong> ' . $order->get_meta( 'mp_payment_info->method' ) . "<br />\n";
+		}
+	
+		if ( $order->get_meta( 'mp_payment_info->transaction_id' ) ) {
+			$payment_info .= '<strong>' . __('Transaction ID:', 'mp') . '</strong> ' . $order->get_meta( 'mp_payment_info->transaction_id' ) . "<br />\n";
+		}
+	
+		$payment_info .= '<strong>' .__('Payment Total:', 'mp') . '</strong> ' . mp_format_currency( $currency, $order->get_meta( 'mp_payment_info->total' ) ) . "<br /><br />\n";
+		
+		 if ( $order->post_status == 'order_received' ) {
+			$payment_info .= __('Your payment for this order is not yet complete. Here is the latest status:', 'mp') . "\n";
+			$statuses = $order->get_meta( 'mp_payment_info->status' );
+			krsort( $statuses ); //sort with latest status at the top
+			$status = reset( $statuses );
+			$timestamp = key( $statuses );
+			$payment_info .= mp_format_date( $timestamp ) . ': ' . $status;
+		} else {
+			$payment_info .= __('Your payment for this order is complete.', 'mp');
+		}
+	
+		// Total
+		$order_total = mp_format_currency( $currency, $order->get_meta( 'mp_payment_info->total' ) );
+	
+		// Tracking URL
+		$tracking_url = $order->tracking_url( false );
+	
+		// Setup search/replace
+		$search_replace = array(
+			'CUSTOMERNAME' => $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ), 
+			'ORDERID' => $order->get_id(),
+			'ORDERINFOSKU' => $order_info,
+			'ORDERINFO' => $order_info,
+			'SHIPPINGINFO' => $shipping_billing_info,
+			'PAYMENTINFO' => $payment_info,
+			'TOTAL' => $order_total,
+			'TRACKINGURL' => $tracking_url,
+			'ORDERNOTES' => $order_notes,
+		);
+		
+		// Escape for sprintf() if required
+		if ( $escape ) {
+			$search_replace = array_map( create_function('$a', 'return str_replace("%","%%",$a);'), $search_replace );
+		}
+			
+		// Replace
+		$text = str_replace( array_keys( $search_replace ), array_values( $search_replace ), $text );
+	
+		return $text;
+	}
+endif;
+
 if ( ! function_exists( 'mp_quote_it' ) ) :
 	/**
 	 * Wrap string in single or double quotes
