@@ -105,7 +105,7 @@ if( ! class_exists('MP_Gateway_API') ) {
 	    	return;
     	}
     	
-			$gateways = mp_get_setting('gateways');
+			$gateways = mp_get_setting( 'gateways' );
 			$network_enabled = ( is_multisite() && ! mp_is_main_site() && ! is_super_admin() ) ? true : false;
 			
 			foreach ( self::get_gateways($network_enabled) as $code => $plugin ) {
@@ -215,9 +215,9 @@ if( ! class_exists('MP_Gateway_API') ) {
      *  it will redirect to the next step.
      *
      * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-     * @param array $shipping_info. Contains shipping info and email in case you need it
+     * @param array $billing_info. Contains billing info and email in case you need it
      */
-		function process_payment($cart, $shipping_info) {
+		function process_payment ( $cart, $billing_info ) {
       wp_die( __("You must override the process_payment() method in your {$this->admin_name} payment gateway plugin!", 'mp') );
     }
 
@@ -398,10 +398,10 @@ if( ! class_exists('MP_Gateway_API') ) {
       $this->on_creation();
       
       //check required vars
-      if ( empty($this->plugin_name) || empty($this->admin_name) || empty($this->public_name) )
+      if ( empty( $this->plugin_name ) || empty( $this->admin_name ) || empty( $this->public_name ) )
         wp_die( __("You must override all required vars in your {$this->admin_name} payment gateway plugin!", 'mp') );
 
-      add_filter('mp_checkout_payment_form', array(&$this, '_payment_form_wrapper'), 10, 3);
+      /*add_filter('mp_checkout_payment_form', array(&$this, '_payment_form_wrapper'), 10, 3);
       add_action('template_redirect', array(&$this, '_checkout_confirmation_hook'));
       add_filter('mp_payment_form_skip_' . $this->plugin_name, array(&$this, '_payment_form_skip'));
       add_action('mp_payment_submit_' . $this->plugin_name, array(&$this, 'process_payment_form'), 10, 2);
@@ -410,7 +410,10 @@ if( ! class_exists('MP_Gateway_API') ) {
       add_filter('mp_order_notification_' . $this->plugin_name, array(&$this, 'order_confirmation_email'), 10, 2);
       add_action('mp_checkout_payment_pre_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation'));
       add_filter('mp_checkout_payment_confirmation_' . $this->plugin_name, array(&$this, 'order_confirmation_msg'), 10, 2);
-      add_action('mp_handle_payment_return_' . $this->plugin_name, array(&$this, 'process_ipn_return') );
+      add_action('mp_handle_payment_return_' . $this->plugin_name, array(&$this, 'process_ipn_return') );*/
+      
+      add_filter( 'mp_checkout_payment_form', array( &$this, '_payment_form_wrapper' ), 10, 3 );
+      add_action( 'mp_process_payment_' . $this->plugin_name, array( &$this, 'process_payment' ), 10, 3 );
 
 			if ( is_admin() ) {
       	$this->init_settings_metabox();
