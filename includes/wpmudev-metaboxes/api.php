@@ -44,6 +44,39 @@ if ( ! function_exists('field_value') ) :
 	}
 endif;
 
+if ( ! function_exists('update_field_value') ) :	
+	/**
+	 * Update a field's value
+	 *
+	 * @since 1.0
+	 * @param string $name The field's name.
+	 * @param mixed $value The field's new value.
+	 * @param int $post_id (optional) Defaults to current post id.
+	 * @uses $post
+	 */
+	function update_field_value( $name, $value, $post_id = null ) {
+		global $post;
+		
+		if ( is_null( $post_id ) ) {
+			$post_id = $post->ID;
+		}
+		
+		$class = get_post_meta( $post_id, '_' . $name, true );
+
+		if ( ! class_exists( $class ) ) {
+			return false;
+		}
+		
+		$field = new $class( array(
+			'name' => $name,
+			'value_only' => true,
+		));
+		
+		$field->save_value( $post_id, $name, $value );
+	}
+endif;
+
+
 if ( ! function_exists('array_replace_recursive') ) :
 	/**
 	 * Recursively replace one array with another. Provides compatibility for PHP version < 5.3
