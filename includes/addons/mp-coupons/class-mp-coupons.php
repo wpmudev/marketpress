@@ -82,6 +82,8 @@ class MP_Coupons {
 			add_filter('mp_cart/cart_meta/product_total', array(&$this, 'cart_meta_product_total'), 10, 2);
 			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_css_frontend'));
 			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_js_frontend'), 25);
+			add_action( 'mp_cart/after_empty_cart', array( &$this, 'remove_all_coupons' ), 10, 1 );
+			add_action( 'mp_order/new_order', array(& $this, 'process_new_order' ), 10, 1 );
 		}
 		
 		if ( is_admin() ) {
@@ -388,7 +390,29 @@ class MP_Coupons {
 	}
 	
 	/**
-	 * Initializes the coupon metaboxes
+	 * Process coupons when a new order is created
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action mp_order/new_order
+	 */
+	public function process_new_order( $order ) {
+		$applied = $this->get_applied_as_objects();
+		$discount_info = array();
+		
+		foreach ( $applied as $applied ) {
+			$discount_info[ $applied->get_code() ] = $applied->discount_amt( false, false );
+			$applied->use_coupon();
+		}
+		
+		add_post_meta( $order->ID, 'mp_discount_info', $discount_info, true );
+		
+		// Remove all coupons from session
+		$this->remove_all_coupons();
+	}
+	
+	/**
+	 * Initialize the coupon metaboxes
 	 *
 	 * @since 3.0
 	 * @access public
@@ -694,9 +718,8 @@ class MP_Coupons {
 			));
 		}
 		
-		$this->apply_coupon($coupon);
-		
 		if ( $products = $coupon->get_products() ) {
+			$this->apply_coupon( $coupon );
 			wp_send_json_success(array(
 				'products' => $products,
 				'cart_meta' => mp_cart()->cart_meta(false),
@@ -729,6 +752,18 @@ class MP_Coupons {
 		}
 		
 		wp_send_json_error(array('message' => __('An error occurred while removing your coupon. Please try again.', 'mp')));
+	}
+	
+	/**
+	 * Remove all coupons
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action mp_cart/after_empty_cart
+	 */
+	public function remove_all_coupons() {
+		$this->_coupons_applied = array();
+		$this->_update_session();
 	}
 	
 	/**
