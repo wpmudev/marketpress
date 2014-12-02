@@ -18,6 +18,9 @@ if (!class_exists('MP_Shipping_API')) {
 
 		//set to true if you want to add per-product weight shipping field
     var $use_weight = false;
+    
+    //refers to the current shipping weight
+    var $weight = 0;
 
     /**
      * Refers to the registered plugins set by register_plugin()
