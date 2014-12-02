@@ -212,19 +212,15 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
-	function payment_form($cart, $shipping_info) {
-			//check to see if we're using the embedded form
-			$embedded_form = $this->get_setting('embedded_form_type');
-
-			//if we are create the form button
-			if ( $embedded_form ) {
+	function payment_form( $cart, $shipping_info ) {
+			if ( $this->get_setting( 'embedded_form_type' ) ) {
+				// Use embedded form
 					$totals = array();
 					$description = '';
-					$coupon = mp()->get_coupon_code();
-					foreach ($cart as $product_id => $variations) {
-							foreach ($variations as $variation => $data) {
-									$totals[] = mp()->coupon_value_product($coupon, $data['price'] * $data['quantity'], $product_id) ;
-							}
+					foreach ( $cart as $product_id => $variations ) {
+						foreach ($variations as $variation => $data) {
+								$totals[] = mp()->coupon_value_product($coupon, $data['price'] * $data['quantity'], $product_id) ;
+						}
 					}
 
 					$total = array_sum($totals) * 100; //get the total as cents
@@ -274,6 +270,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 					<input
 						id="mp-stripe-name"
 						type="text"
+						data-rule-required="true"
+						data-rule-cc-fullname="true"
 						value="' . esc_attr($name) . '" />
 				</div>
 				<div class="mp-checkout-form-row">
@@ -284,17 +282,21 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 						pattern="\d*"
 						autocomplete="cc-number"
 						class="mp-input-cc-num"
+						data-rule-required="true"
+						data-rule-cc-num="true"
 						style="width:200px" />
 				</div>
 				<div class="mp-checkout-form-row">
 					<div class="mp-checkout-input-complex clearfix">
 						<div class="mp-checkout-column">
-							<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> format', 'mp' ) . '</span></label>
+							<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
 							<input
 								type="text"
 								autocomplete="cc-exp"
 								id="mp-stripe-cc-exp"
 								class="mp-input-cc-exp"
+								data-rule-required="true"
+								data-rule-cc-exp="true"
 								style="width:100px" />
 						</div>
 						<div class="mp-checkout-column">
@@ -304,6 +306,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 								class="mp-input-cc-cvc"
 								type="text"
 								autocomplete="off"
+								data-rule-required="true"
+								data-rule-cc-cvc="true"
 								style="width:75px;" />
 						</div>
 					</div>
@@ -404,26 +408,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	}
 
 	/**
-	 * Use this to process any fields you added. Use the $_POST global,
-	 * and be sure to save it to both the $_SESSION and usermeta if logged in.
-	 * DO NOT save credit card details to usermeta as it's not PCI compliant.
-	 * Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-	 * it will redirect to the next step.
-	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
-	 */
-	function process_payment_form($cart, $shipping_info) {
-			if (!isset($_POST['stripeToken']))
-					mp()->cart_checkout_error(__('The Stripe Token was not generated correctly. Please try again.', 'mp'));
-
-			//save to session
-			if (!mp()->checkout_error) {
-					$_SESSION['stripeToken'] = $_POST['stripeToken'];
-			}
-	}
-
-	/**
 	 * Filters the order confirmation email message body. You may want to append something to
 	 *	the message. Optional
 	 *
@@ -504,83 +488,80 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	
 	/**
 	 * Use this to do the final payment. Create the order then process the payment. If
-	 *	you know the payment is successful right away go ahead and change the order status
-	 *	as well.
-	 *	Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-	 *	it will redirect to the next step.
+	 * you know the payment is successful right away go ahead and change the order status
+	 * as well.
 	 *
 	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 * @param array $billing_info. Contains billing info and email in case you need it
 	 */
-	function process_payment($cart, $shipping_info) {
-			//make sure token is set at this point
-			if (!isset($_SESSION['stripeToken'])) {
-					mp()->cart_checkout_error(__('The Stripe Token was not generated correctly. Please go back and try again.', 'mp'));
-					return false;
+	function process_payment( $cart, $billing_info, $shipping_info ) {
+		//make sure token is set at this point
+		$token = mp_get_post_value( 'stripe_token' );
+		if ( false === $token ) {
+			mp_cart()->add_error( __( 'The Stripe Token was not generated correctly. Please go back and try again.', 'mp'), 'payment' );
+			return false;
+		}
+
+		//setup the Stripe API
+		if ( ! class_exists( 'Stripe' ) ) {
+			require_once mp_plugin_dir( 'includes/common/payment-gateways/stripe-files/lib/Stripe.php' );
+		}
+		
+		Stripe::setApiKey( $this->private_key );
+
+		$totals = array(
+			'product_total' => mp_cart()->product_total( false ),
+			'shipping_total' => mp_cart()->shipping_total( false ),
+			'tax_price' => 0,
+		);
+
+    // Get tax price, if applicable
+    if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
+    	$totals['tax_price'] = mp_cart()->tax_total( false );
+    }
+    
+    // Create a new order object
+    $order = new MP_Order();
+    $order_id = $order->get_id();
+    
+    // Calc total
+    $total = array_sum( $totals );
+
+		try {
+			// create the charge on Stripe's servers - this will charge the user's card
+			$charge = Stripe_Charge::create( array(
+				'amount' => round( $total * 100 ), // amount in cents
+				'currency' => strtolower( $this->currency ),
+				'card' => $token,
+				'description' => sprintf( __( '%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo( 'name' ), $order_id, mp_get_user_address_part( 'email', 'billing') ),
+			) );
+			
+			if ( $charge->paid == 'true' ) {
+				//setup our payment details
+				$timestamp = time();
+				$payment_info = array(
+					'gateway_public_name' => $this->public_name,
+					'gateway_private_name' => $this->admin_name,
+					'method' => sprintf( __( '%1$s Card ending in %2$s - Expires %3$s', 'mp' ), $charge->card->type, $charge->card->last4, $charge->card->exp_month . '/' . $charge->card->exp_year ),
+					'transaction_id' => $charge->id,
+					'status' => array(
+						$timestamp => __( 'Paid', 'mp' ),
+					),
+					'total' => $total,
+					'currency' => $this->currency,
+				);
+				
+				$order->save( array(
+					'cart' => $cart,
+					'payment_info' => $payment_info,
+					'billing_info' => $billing_info,
+					'shipping_info' => $shipping_info,
+					'paid' => true
+				) );
 			}
-
-			//setup the Stripe API
-			if (!class_exists('Stripe')) {
-					require_once(mp()->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php");
-			}
-			Stripe::setApiKey($this->private_key);
-
-			$totals = array();
-			$coupon_code = mp()->get_coupon_code();
-			foreach ($cart as $product_id => $variations) {
-				foreach ($variations as $variation => $data) {
-					$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-					$totals[] = $price;
-				}
-			}
-			$total = array_sum($totals);
-
-			//shipping line
-	    $shipping_tax = 0;
-	    if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
-				$total += $shipping_price;
-				$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-	    }
-	
-	    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-	    if ( ! mp_get_setting('tax->tax_inclusive') ) {
-	    	$tax_price = (mp()->tax_price(false) + $shipping_tax);
-				$total += $tax_price;
-	    }
-          
-			$order_id = mp()->generate_order_id();
-
-			try {
-					// create the charge on Stripe's servers - this will charge the user's card
-					$charge = Stripe_Charge::create(array(
-											"amount" => round($total * 100), // amount in cents, again
-											"currency" => strtolower($this->currency),
-											"card" => $_SESSION['stripeToken'],
-											"description" => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']))
-					);
-
-					if ($charge->paid == 'true') {
-
-							//setup our payment details
-							$payment_info = array();
-							$payment_info['gateway_public_name'] = $this->public_name;
-							$payment_info['gateway_private_name'] = $this->admin_name;
-							$payment_info['method'] = sprintf(__('%1$s Card ending in %2$s - Expires %3$s', 'mp'), $charge->card->type, $charge->card->last4, $charge->card->exp_month . '/' . $charge->card->exp_year);
-							$payment_info['transaction_id'] = $charge->id;
-							$timestamp = time();
-							$payment_info['status'][$timestamp] = __('Paid', 'mp');
-							$payment_info['total'] = $total;
-							$payment_info['currency'] = $this->currency;
-
-							$order = mp()->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
-							unset($_SESSION['stripeToken']);
-							mp()->set_cart_cookie(Array());
-					}
-			} catch (Exception $e) {
-					unset($_SESSION['stripeToken']);
-					mp()->cart_checkout_error(sprintf(__('There was an error processing your card: "%s". Please <a href="%s">go back and try again</a>.', 'mp'), $e->getMessage(), mp_checkout_step_url('checkout')));
-					return false;
-			}
+		} catch ( Exception $e ) {
+			mp_checkout()->add_error( sprintf( __( 'There was an error processing your card: "%s". Please try again.', 'mp'), $e->getMessage() ), 'payment' );
+		}
 	}
 
 	/**
