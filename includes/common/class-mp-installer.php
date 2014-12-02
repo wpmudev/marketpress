@@ -271,21 +271,23 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @uses $wpdb, $charset_collate
+	 * @uses $wpdb
 	 */
 	public function create_product_attributes_table() {
-		global $wpdb, $charset_collate;
+		global $wpdb;
 		
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		
+		$charset_collate = $wpdb->get_charset_collate();
 		$table_name = $wpdb->prefix . 'mp_product_attributes';
-		dbDelta("CREATE TABLE $table_name (
+		$sql = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
 			attribute_terms_sort_order enum('ASC','DESC') DEFAULT NULL,
 			PRIMARY KEY  (attribute_id)
-		) $charset_collate");
+		) $charset_collate;";
+		
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
 	}
 	
 	/**
