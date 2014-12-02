@@ -152,7 +152,7 @@ var mp_cart = {};
 			$qtyChanged.val('0');
 		}
 		
-		$.post(url, $form.serialize(), function(resp){
+		$.post( url, $form.serialize() ).done( function( resp ){
 			marketpress.loadingOverlay('hide');
 			marketpress.ajaxEvent('mp_cart/after_update_product_attributes', resp);
 			
@@ -188,7 +188,7 @@ var mp_cart = {};
 				
 				$.colorbox.resize();
 			}
-		});
+		} );
 	};
 	
 	/**
@@ -197,13 +197,13 @@ var mp_cart = {};
 	 * @since 3.0
 	 */
 	mp_cart.initProductOptionsLightbox = function(){
-		$('.mp_link_buynow').filter('.has_variations').colorbox({
+		$( '.mp_link_buynow' ).filter( '.has_variations' ).colorbox( {
 			"close" : "x",
 			"href" : function(){
-				return $(this).attr('data-href');
+				return $( this ).attr( 'data-href' );
 			},
 			"overlayClose" : false
-		});
+		} );
 	};
 	
 	/**
@@ -259,6 +259,38 @@ var mp_cart = {};
 			}
 		});
 	};
+	
+	/**
+	 * Remove an item from the shopping cart
+	 *
+	 * @since 3.0
+	 * @param int itemId The item ID to remove.
+	 */
+	mp_cart.removeItem = function( itemId ) {
+		if ( itemId === undefined ) {
+			return false;
+		}
+		
+		var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
+		var data = {
+			"product" : itemId,
+			"cart_action" : "remove_item"
+		};
+		
+		marketpress.loadingOverlay( 'show' );
+		
+		$.post( url, data ).done( function( resp ) {
+			if ( resp.success ) {
+				if ( resp.data.item_count == 0 ) {
+					window.location.href = window.location.href;
+				} else {
+					$( '#mp-cart-item-' + itemId ).remove();
+					$( '#mp-cart-meta' ).replaceWith( resp.data.cartmeta );
+					marketpress.loadingOverlay( 'hide' );
+				}
+			}
+		} );
+	}
 	
 	/**
 	 * Update the cart html
