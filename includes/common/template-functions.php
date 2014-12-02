@@ -1,4 +1,17 @@
 <?php
+	
+if ( ! function_exists( '_mp_order_status_overview' ) ) :
+	/**
+	 * Display the order status overview html.
+	 *
+	 * @since 3.0
+	 * @return string
+	 */
+	function _mp_order_status_overview() {
+		//! TODO: order status overview html
+		return '';
+	}
+endif;
 
 if ( ! function_exists('_mp_products_html_grid')) :
 	/**
@@ -89,6 +102,34 @@ if ( ! function_exists('_mp_products_html_grid')) :
 		wp_reset_postdata();
 		
 		return apply_filters('_mp_products_html_grid', $html, $custom_query);
+	}
+endif;
+
+if ( ! function_exists( 'mp_before_tax_price' ) ) :
+	/**
+	 * Get the price before taxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function before_tax_price( $tax_price, $product_id = null ) {
+		//if tax inclusve pricing is turned off just return given price
+		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
+			return $tax_price;
+		}
+
+		$product = new MP_Product( $product_id );
+		if ( $product->exists() && ($tax_rate = $product->get_meta( 'special_tax_rate' )) ){
+			$rate = $tax_rate;
+		} else {
+			if	( 'CA' == mp_get_setting( 'tax->base_country' ) ) {
+				$rate = mp_get_setting( 'tax->canada_rate->' . mp_get_setting( 'base_province' ) );
+			} else {
+				$rate = mp_get_setting( 'tax->rate' );
+			}
+		}
+
+		return $tax_price / ($rate + 1);
 	}
 endif;
 
@@ -264,6 +305,24 @@ if ( ! function_exists('mp_format_currency') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_format_date' ) ) :
+	/**
+	 * Format a date according to settings
+	 *
+	 * @since 3.0
+	 * @param int $timestamp
+	 * @param bool $date_only Optional, whether to return just the date part or include the time as well. Defaults to include time.
+	 */
+	function mp_format_date( $timestamp, $date_only = false ) {
+		$format = get_option( 'date_format' );
+		if ( ! $date_only ) {
+			$format .= ' - ' . get_option( 'time_format' );
+		}
+		
+		return date_i18n( $format, $timestamp );
+	}
+endif;
+
 if ( ! function_exists('mp_get_current_user_zipcode') ) :
 	/**
 	 * Get the current user's zipcode
@@ -291,7 +350,7 @@ if ( ! function_exists('mp_get_current_user_zipcode') ) :
 	}
 endif;
 
-if ( ! function_exists('mp_get_user_address_array') ) :
+if ( ! function_exists('mp_get_user_address') ) :
 	/**
 	 * Get full user address
 	 *
@@ -508,6 +567,43 @@ if ( ! function_exists('mp_get_image_size') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_get_order_history' ) ) :
+	/**
+	 * Get order history for a given user
+	 *
+	 * @since 3.0
+	 * @param int $user_id Optional, the user's ID. Defaults to the current user ID.
+	 * @return array
+	 */
+	function mp_get_order_history( $user_id = null ) {
+		if ( is_null( $user_id ) ) {
+			$user_id = get_current_user_id();
+		}
+		
+		if ( is_multisite() ) {
+			global $blog_id;
+			$key = 'mp_order_history_' . $blog_id;
+		} else {
+			$key = 'mp_order_history';
+		}
+		
+		if ( $user_id ) {
+			$orders = (array) get_user_meta( $user_id, $key, true );
+		} else {
+			$orders = (array) mp_get_cookie_value( $key, array() );
+		}
+		
+		/**
+		 * Filter the user's order history
+		 *
+		 * @since 3.0
+		 * @param array $orders The current array of orders.
+		 * @param int $user_id The user's ID.
+		 */
+		return apply_filters( 'mp_get_order_history', $orders, $user_id );
+	}
+endif;
+
 if ( ! function_exists('mp_store_page_uri') ) {
 	/**
 	 * Get a store page uri
@@ -529,7 +625,6 @@ if ( ! function_exists('mp_store_page_uri') ) {
 		}
 	}
 }
-
 
 if ( ! function_exists('mp_store_page_url') ) {
 	/**
@@ -712,6 +807,47 @@ if ( ! function_exists('mp_list_products') ) :
 			echo $content;
 		} else {
 			return $content;
+		}
+	}
+endif;
+
+if ( ! function_exists( 'mp_order_status' ) ) :
+	/**
+	 * Display the order status page html
+	 *
+	 * @since 3.0
+	 * @param array $args {
+	 *		Optional, an array of arguments.
+	 *
+	 *		@type bool $echo Optional, whether to echo or return. Defaults to echo.
+	 *		@type string $order_id Optional, the specific order ID to show. If empty, defaults to order status overview page.
+	 * }
+	 */
+	function mp_order_status( $args ) {
+		$args = array_replace_recursive( array(
+			'echo' => false,
+			'order_id' => get_query_var( 'mp_order_id', null ),
+		), $args );
+		
+		extract( $args );
+		
+		$html = '';
+		if ( is_null( $order_id ) ) {
+			$html .= _mp_order_status_overview();
+		} else {
+			$order = new MP_Order( $order_id );
+			if ( $order->exists() ) {
+				$html .= $order->details( false );
+			} else {
+				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+				$html .= _mp_order_status_overview();
+			}
+		}
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
 		}
 	}
 endif;
@@ -999,5 +1135,50 @@ if ( ! function_exists('mp_related_products') ) :
 		} else {
 			return $html;
 		}
+	}
+endif;
+
+if ( ! function_exists( 'mp_get_store_email' ) ) :
+	/**
+	 * Get the store admin email address
+	 *
+	 * @since 3.0
+	 * @return string
+	 */
+	function mp_get_store_email() {
+		return ( $email = mp_get_setting( 'store_email' ) ) ? $email : get_option( 'admin_email' );
+	}
+endif;
+
+if ( ! function_exists( 'mp_send_email' ) ) :
+	/**
+	 * Send an email
+	 *
+	 * @since 3.0
+	 * @param string $email The email address to send to.
+	 * @param string $subject The subject of the email.
+	 * @param string $msg The email message.
+	 * @return bool
+	 */
+	function mp_send_email( $email, $subject, $msg ) {
+		//remove any other filters
+		remove_all_filters( 'wp_mail_from' );
+		remove_all_filters( 'wp_mail_from_name' );
+
+		//convert all tabs to their approriate html markup
+		$msg = str_replace( array( "\t" ), array( '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ), $msg );
+		
+		// set headers
+		$headers = array(
+			'From' => wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) . '<' . mp_get_store_email() . '>',
+			'Content-Type' => 'text/html; charset=UTF-8',
+		);
+		
+		$header = '';
+		foreach ( $headers as $key => $val ) {
+			$header .= "{$key}: {$val}\r\n";
+		}
+						
+		return wp_mail( $email, $subject, $msg, $header );		
 	}
 endif;
