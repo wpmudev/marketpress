@@ -144,9 +144,10 @@ class MP_Checkout {
 	 * @since 3.0
 	 * @access public
 	 * @param string $type Either billing or shipping.
+	 * @param bool $value_only Optional, whether the fields should display their values only. Defaults to false.
 	 * @return string
 	 */
-	public function address_fields( $type ) {
+	public function address_fields( $type, $value_only = false ) {
 		$country = mp_get_user_address_part('country', $type);
 		
 		// Country list
@@ -252,6 +253,10 @@ class MP_Checkout {
 				),
 			),
 			array(
+				'type' => 'complex',
+				'subfields' => $state_zip_fields,
+			),
+			array(
 				'type' => 'select',
 				'label' => __( 'Country', 'mp' ),
 				'name' => $this->field_name( 'country', $type ),
@@ -260,10 +265,6 @@ class MP_Checkout {
 				'atts' => array(
 					'class' => 'mp_select2_search',
 				),
-			),
-			array(
-				'type' => 'complex',
-				'subfields' => $state_zip_fields,
 			),
 			array(
 				'type' => 'text',
@@ -284,6 +285,12 @@ class MP_Checkout {
 		
 		$html = '';
 		foreach ( $address_fields as $field ) {
+			$field['value_only'] = $value_only;
+			
+			if ( $value_only ) {
+				$field['label'] = false;
+			}
+			
 			$html .= '<div class="mp-checkout-form-row">' . $this->form_field( $field ) . '</div>';
 		}
 					
@@ -539,6 +546,7 @@ class MP_Checkout {
 	 *		@type string $value The value of the field.
 	 *		@type array $subfields For complex fields, an array of subfields.
 	 *		@param array $options Required, if a select field.
+	 *		@param bool $value_only Whether the field should just display the value or the enter the field.
 	 * }
 	 * @return string
 	 */
@@ -572,23 +580,31 @@ class MP_Checkout {
 			case 'text' :
 			case 'password' :
 			case 'hidden' :
-				$html .= '
-				<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . ' />';
+				if ( mp_arr_get_value( 'value_only', $field ) ) {
+					$html .= mp_arr_get_value( 'value', $field, '' );
+				} else {
+					$html .= '
+					<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . ' />';
+				}
 			break;
 			
 			case 'select' :
-				$atts .= ' autocomplete="off"';
-				$html .= '
-				<select name="' . mp_arr_get_value( 'name', $field, '' ) . '" ' . $atts . '>';
-				
-				$options = (array) mp_arr_get_value( 'options', $field, array() );
-				foreach ( $options as $value => $label ) {
+				if ( mp_arr_get_value( 'value_only', $field ) ) {
+					$html .= mp_arr_get_value( 'value', $field );
+				} else {
+					$atts .= ' autocomplete="off"';
 					$html .= '
-					<option value="' . esc_attr( $value ) . '" ' . selected( $value, mp_arr_get_value( 'value', $field ), false ) . '>' . esc_attr( $label ) . '</option>';
+					<select name="' . mp_arr_get_value( 'name', $field, '' ) . '" ' . $atts . '>';
+					
+					$options = (array) mp_arr_get_value( 'options', $field, array() );
+					foreach ( $options as $value => $label ) {
+						$html .= '
+						<option value="' . esc_attr( $value ) . '" ' . selected( $value, mp_arr_get_value( 'value', $field ), false ) . '>' . esc_attr( $label ) . '</option>';
+					}
+					
+					$html .= '
+					</select>';
 				}
-				
-				$html .= '
-				</select>';
 			break;
 			
 			case 'complex' :
@@ -596,8 +612,10 @@ class MP_Checkout {
 				<div class="mp-checkout-input-complex clearfix">';
 				
 				foreach ( (array) mp_arr_get_value( 'subfields', $field, array() ) as $subfield ) {
+					$subfield['value_only'] = mp_arr_get_value( 'value_only', $field );
+					
 					$top_label = true;
-					if ( ($label = mp_arr_get_value( 'label', $subfield )) && mp_arr_get_value( 'label', $field ) ) {
+					if ( (($label = mp_arr_get_value( 'label', $subfield )) && mp_arr_get_value( 'label', $field )) || $subfield['value_only'] ) {
 						$top_label = false;
 						unset( $subfield['label'] );
 					}
@@ -610,7 +628,7 @@ class MP_Checkout {
 					<div class="mp-checkout-column">' .
 						$this->form_field( $subfield );
 					
-					if ( ! $top_label ) {
+					if ( ! $top_label && ! $subfield['value_only'] ) {
 						$html .= '
 						<span>' . $label . '</span>';
 					}
@@ -851,9 +869,22 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function section_order_review_payment() {
-		$html = mp_cart()->display( array(
-			'editable' => false
-		) );
+		$html = '
+			<div class="clearfix">
+				<div class="mp-checkout-column">
+					<h3>' . __( 'Billing Address', 'mp' ) . '</h3>' .
+					$this->address_fields( 'billing', true ) . '
+				</div>
+				<div class="mp-checkout-column">
+					<h3>' . __( 'Shipping Address', 'mp' ) . '</h3>' .
+					$this->address_fields( 'shipping', true ) . '
+				</div>
+			</div>
+			<h3>' . __( 'Cart', 'mp' ) . '</h3>' .
+			
+			mp_cart()->display( array(
+				'editable' => false
+			) );
 		
 		/**
 		 * Filter the section payment html
