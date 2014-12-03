@@ -199,6 +199,21 @@ var mp_checkout;
 			$checkout.on( 'cycle-prev', function( e, opts ){
 				$( '.mp-tooltip' ).tooltip( 'close' );
 			} );
+			
+			// Trim values before validating
+			$.each( $.validator.methods, function( key, val ) {
+				$.validator.methods[ key ] = function() {
+					if ( arguments.length > 0 ) {
+						var $el = $( arguments[1] );
+						var newVal = $.trim( $el.val() );
+						
+						$el.val( newVal );
+						arguments[0] = newVal;
+					}
+					
+					return val.apply( this, arguments );
+				}
+			} );
 
 			// Validate form
 			$checkout.validate({
