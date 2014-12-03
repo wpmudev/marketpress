@@ -792,7 +792,7 @@ class MP_Cart {
 			$echo = false;
 		}
 		
-		if ( (! mp_is_shop_page() || mp_is_shop_page('cart') || mp_is_shop_page('checkout')) && ! mp_doing_ajax() ) {
+		if ( (! mp_is_shop_page() || mp_is_shop_page('cart') || mp_is_shop_page( 'checkout' )) && ! mp_doing_ajax() ) {
 			return;
 		}
 		
