@@ -295,8 +295,11 @@ class WPMUDEV_Metabox {
 	 */
 	public static function add_metaboxes_below_title() {
 		global $post, $wp_meta_boxes;
-		do_meta_boxes(get_current_screen(), 'below_title', $post);
-		unset($wp_meta_boxes[get_post_type($post)]['below_title']);
+		
+		if ( is_array( $wp_meta_boxes ) && mp_arr_get_value( $post->post_type . '->below_title', $wp_meta_boxes ) ) {
+			do_meta_boxes( get_current_screen(), 'below_title', $post );
+			unset( $wp_meta_boxes[ $post->post_type ]['below_title'] );
+		}
 	}
 	
 	/**
