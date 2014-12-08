@@ -31,6 +31,9 @@ class MP_Orders_Admin {
 	 * @access private
 	 */
 	private function __construct() {
+		//meta boxes
+		add_action( 'add_meta_boxes_mp_order', array( &$this, 'add_meta_boxes' ) );
+		add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
 		//add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
 		//change the "enter title here" text
@@ -47,6 +50,209 @@ class MP_Orders_Admin {
 		add_action('load-edit.php', array(&$this, 'process_bulk_actions'));
 		//bulk update admin notice
 		add_action('admin_notices', array(&$this, 'admin_notices'));
+		//remove submit div
+		add_action( 'admin_menu', create_function( '', 'remove_meta_box( "submitdiv", "mp_order", "side" ); remove_meta_box( "titlediv", "mp_order", "core" );' ) );
+	}
+	
+	/**
+	 * Save meta boxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action save_post
+	 */
+	public function save_meta_boxes( $post_id ) {
+		if ( mp_doing_autosave() ) {
+			return;
+		}
+		
+		$order = new MP_Order( $post_id );
+		$order->update_meta( 'mp_shipping_info->tracking_num', mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
+		$order->update_meta( 'mp_shipping_info->method', mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
+		
+		if ( $order_notes = mp_get_post_value( 'mp->order_notes' ) ) {
+			$order->update_meta( 'mp_shipping_info->method', sanitize_text_field( $order_notes ) );
+		} else {
+			$order->delete_meta( 'mp_shipping_info->method' );
+		}
+	}
+	
+	/**
+	 * Add meta boxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action add_meta_boxes_mp_order
+	 */
+	public function add_meta_boxes() {
+		add_meta_box( 'mp-order-details-metabox', __( 'Order Details', 'mp' ), array( &$this, 'meta_box_order_details' ), 'mp_order', 'normal', 'core' );
+		add_meta_box( 'mp-order-customer-info-metabox', __( 'Customer Info', 'mp' ), array( &$this, 'meta_box_customer_info' ), 'mp_order', 'normal', 'core' );
+		add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array( &$this, 'meta_box_shipping_info' ), 'mp_order', 'normal', 'core' );
+		add_meta_box( 'mp-order-notes-metabox', __( 'Order Notes', 'mp' ), array( &$this, 'meta_box_order_notes' ), 'mp_order', 'normal', 'core' );
+		add_meta_box( 'mp-order-actions-metabox', __( 'Order Actions', 'mp' ), array( &$this, 'meta_box_order_actions' ), 'mp_order', 'side', 'core' );				
+		add_meta_box( 'mp-order-history-metabox', __( 'Order History', 'mp' ), array( &$this, 'meta_box_order_history' ), 'mp_order', 'side', 'core' );
+		add_meta_box( 'mp-order-payment-info-metabox', __( 'Payment Information', 'mp' ), array( &$this, 'meta_box_payment_info' ), 'mp_order', 'side', 'core' );
+	}
+
+	/**
+	 * Display the payment info meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_payment_info( $post ) {
+		$order = new MP_Order( $post );
+		?>
+		<div class="misc-pub-section"><strong><?php _e( 'Gateway', 'mp' ); ?>:</strong><br /><?php echo $order->get_meta( 'mp_payment_info->gateway_private_name' ); ?></div>
+		<div class="misc-pub-section"><strong><?php _e( 'Type', 'mp' ); ?>:</strong><br /><?php echo $order->get_meta( 'mp_payment_info->method' ); ?></div>
+		<div class="misc-pub-section"><strong><?php _e( 'Transaction ID', 'mp' ); ?>:</strong><br /><?php echo $order->get_meta( 'mp_payment_info->transaction_id' ); ?></div>		
+		<div class="misc-pub-section" style="background:#f5f5f5;border-top:1px solid #ddd;"><strong><?php _e( 'Payment Total', 'mp' ); ?>:</strong><br /><?php echo mp_format_currency( '', $order->get_meta( 'mp_payment_info->total' ) ); ?></div>		
+		<?php
+	}
+	
+	/**
+	 * Display the order history meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_order_history( $post ) {
+		$order = new MP_Order( $post );
+		$meta_keys = array(
+			'mp_closed_time' => __( 'Closed', 'mp' ),
+			'mp_shipped_time' => __( 'Shipped', 'mp' ),
+			'mp_paid_time' => __( 'Paid', 'mp' ),
+			'mp_received_time' => __( 'Received', 'mp' ),
+		);
+		
+		$index = 1;
+		foreach ( $meta_keys as $key => $label ) :
+			if ( $timestamp = $order->get_meta( $key ) ) : ?>
+				<div class="misc-pub-section"><strong><?php echo $label; ?>:</strong><br /><?php echo mp_format_date( $timestamp ); ?></div>
+				<?php echo ( $index == count( $meta_keys ) ) ? '' : '<hr />'; ?>
+			<?php
+			endif;
+			
+			$index ++;
+		endforeach;
+	}
+
+	/**
+	 * Display the order actions meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_order_actions( $post ) {
+		$order = new MP_Order( $post );
+		$statuses = get_post_stati( array( 'post_type' => 'mp_order' ), 'objects' );
+		?>
+		<div id="misc-publishing-actions">
+			<div class="misc-pub-section">
+				<label for="post_status"><?php _e( 'Order Status', 'mp' ); ?></label>
+				<select id="post_status" name="post_status">
+					<?php foreach ( $statuses as $key => $status ) : ?>
+					<option value="<?php echo $key; ?>" <?php selected( $key, $order->post_status ); ?>><?php echo $status->label; ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+		</div>
+		<div id="major-publishing-actions">
+				<div id="publishing-action">
+						<span class="spinner"></span>
+					<?php submit_button( __( 'Save Changes', 'mp' ), 'primary', null, false, array( 'id' => 'publish' ) ); ?>
+				</div>
+				<div class="clear"></div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Display the order notes meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_order_notes( $post ) {
+		$order = new MP_Order( $post );
+		?>
+		<textarea class="widefat" name="mp[order_notes]" rows="5"></textarea>
+		<?php
+	}
+	
+	/**
+	 * Display the shipping info meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_shipping_info( $post ) {
+		$order = new MP_Order( $post );
+		$carriers = array(
+			'ups' => __( 'UPS', 'mp' ),
+			'fedex' => __( 'FedEx', 'mp' ),
+			'dhl' => __( 'DHL', 'mp' ),
+			'other' => __( 'Other', 'mp' ),
+		);
+		
+		/**
+		 * Filter shipping carriers
+		 *
+		 * @since 3.0
+		 * @param array $carrier An array of carriers.
+		 */
+		$carriers = apply_filters( 'mp_shipping_carriers_array', $carriers );
+		?>
+		<table width="100%" class="form-table">
+			<tr>
+				<th scope="row"><?php _e( 'Method:', 'mp' ); ?></th>
+				<td><?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php _e( 'Amount Collected:', 'mp' ); ?></th>
+				<td><?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_info->shipping_cost', 0 ) ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php _e( 'Tracking Info:', 'mp' ); ?></th>
+				<td>
+					<select name="mp[tracking_info][shipping_method]" style="vertical-align:top">
+						<option value=""><?php _e( 'Carrier', 'mp' ); ?></option>
+						<?php foreach ( $carriers as $val => $label ) : ?>
+						<option value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
+						<?php endforeach; ?>
+					</select>
+					<input type="text" name="mp[tracking_info][tracking_num]" placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>" value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:250px" />
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+	
+	/**
+	 * Display the customer info meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_customer_info( $post ) {
+		$order = new MP_Order( $post );
+		echo $order->get_addresses();
+	}
+	
+	/**
+	 * Display the order details meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_order_details( $post ) {
+		$order = new MP_Order( $post );
+		$cart = $order->get_cart();
+		$cart->display( array(
+			'echo' => true,
+			'view' => 'order-status',
+			'editable' => false,
+		) );
 	}
 	
 	/**
@@ -315,6 +521,16 @@ class MP_Orders_Admin {
 	.widefat td.mp_orders_status {
 		overflow: visible;
 	}
+	
+	#post-body-content {
+		display: none;
+	}
+	
+	#mp-order-history-metabox .inside,
+	#mp-order-payment-info-metabox .inside,
+	#mp-order-actions-metabox .inside {
+		padding: 0;
+	}
 </style>		
 		<?php
 	}
@@ -386,7 +602,13 @@ class MP_Orders_Admin {
 	 * @action admin_menu
 	 */
 	public function add_menu_items() {
-		$order_cap = apply_filters('mp_orders_cap', 'edit_others_orders');
+		/**
+		 * Filter the store orders capability
+		 *
+		 * @since 3.0
+		 * @param string $order_cap The current store order capability
+		 */
+		$order_cap = apply_filters( 'mp_orders_cap', 'edit_store_orders' );
 	 
 		if ( current_user_can($order_cap) && ! mp_get_setting('disable_cart') ) {
 			$num_posts = wp_count_posts('mp_order'); //get order count
