@@ -265,4 +265,4 @@ class MP_Setup_Wizard {
 	}
 }
 
-MP_Setup_Wizard::get_instance();
+//MP_Setup_Wizard::get_instance();
