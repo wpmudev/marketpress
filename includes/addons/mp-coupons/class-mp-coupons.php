@@ -72,6 +72,8 @@ class MP_Coupons {
 		
 		$this->_install();
 		
+		add_action( 'init', array( &$this, 'register_post_type' ) );
+		
 		if ( ! is_admin() || mp_doing_ajax() ) {
 			$this->get_applied();
 			
@@ -752,6 +754,40 @@ class MP_Coupons {
 		}
 		
 		wp_send_json_error(array('message' => __('An error occurred while removing your coupon. Please try again.', 'mp')));
+	}
+	
+	/**
+	 * Register post type
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function register_post_type() {
+		register_post_type('mp_coupon', array(
+			'labels' => array(
+				'name' => __('Coupons', 'mp'),
+				'singular_name' => __('Coupon', 'mp'),
+				'menu_name' => __('Manage Coupons', 'mp'),
+				'all_items' => __('Coupons', 'mp'),
+				'add_new' => __('Create New', 'mp'),
+				'add_new_item' => __('Create New Coupon', 'mp'),
+				'edit_item' => __('Edit Coupon', 'mp'),
+				'edit' => __('Edit', 'mp'),
+				'new_item' => __('New Coupon', 'mp'),
+				'view_item' => __('View Coupon', 'mp'),
+				'search_items' => __('Search Coupons', 'mp'),
+				'not_found' => __('No Coupons Found', 'mp'),
+				'not_found_in_trash' => __('No Coupons found in Trash', 'mp'),
+				'view' => __('View Coupon', 'mp')
+			),
+			'capability_type' => array('mp_coupon', 'mp_coupons'),
+			'map_meta_cap' => true,
+			'public' => false,
+			'publicly_queryable' => true,
+			'show_ui' => true,
+			'show_in_menu' => false,
+			'supports' => array(''),
+		));		
 	}
 	
 	/**

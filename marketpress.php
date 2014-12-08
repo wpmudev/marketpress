@@ -189,33 +189,6 @@ class Marketpress {
 			),
 		)));
 
-		//! Register product_coupon post type
-		register_post_type('mp_coupon', array(
-			'labels' => array(
-				'name' => __('Coupons', 'mp'),
-				'singular_name' => __('Coupon', 'mp'),
-				'menu_name' => __('Manage Coupons', 'mp'),
-				'all_items' => __('Coupons', 'mp'),
-				'add_new' => __('Create New', 'mp'),
-				'add_new_item' => __('Create New Coupon', 'mp'),
-				'edit_item' => __('Edit Coupon', 'mp'),
-				'edit' => __('Edit', 'mp'),
-				'new_item' => __('New Coupon', 'mp'),
-				'view_item' => __('View Coupon', 'mp'),
-				'search_items' => __('Search Coupons', 'mp'),
-				'not_found' => __('No Coupons Found', 'mp'),
-				'not_found_in_trash' => __('No Coupons found in Trash', 'mp'),
-				'view' => __('View Coupon', 'mp')
-			),
-			'capability_type' => array('mp_coupon', 'mp_coupons'),
-			//'map_meta_cap' => true,
-			'public' => false,
-			'publicly_queryable' => true,
-			'show_ui' => true,
-			'show_in_menu' => false,
-			'supports' => array(''),
-		));
-
 		//! Register product post type
 		register_post_type(MP_Product::get_post_type(), apply_filters('mp_register_post_type', array(
 			'labels' => array(
@@ -241,6 +214,7 @@ class Marketpress {
 			'capability_type' => array('product', 'products'),
       'menu_icon' => ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-cart' : mp_plugin_url('ui/images/marketpress-icon.png'),
 			'hierarchical' => false,
+			'map_meta_cap' => true,
 			'rewrite' => array(
 				'slug' => mp_store_page_uri('products', false),
 				'with_front' => false
@@ -261,25 +235,31 @@ class Marketpress {
 		)));
 
 		//! Register mp_order post type
-		register_post_type('mp_order', apply_filters('mp_register_post_type_mp_order', array(
-			'labels' => array(
-				'name' => __('Orders', 'mp'),
-				'singular_name' => __('Order', 'mp'),
-				'edit' => __('Edit', 'mp'),
-				'view_item' => __('View Order', 'mp'),
-				'search_items' => __('Search Orders', 'mp'),
-				'not_found' => __('No Orders Found', 'mp')
-			),
-			'description' => __('Orders from your e-commerce store.', 'mp'),
+		register_post_type( 'mp_order', apply_filters( 'mp_register_post_type_mp_order', array( 
+			'labels' => array( 
+				'name' => __( 'Orders', 'mp' ),
+				'singular_name' => __( 'Order', 'mp' ),
+				'add_new' => _x( 'Add New', 'mp_order', 'mp' ),
+				'add_new_item' => __( 'Add New Order', 'mp' ),
+				'edit_item' => __( 'Edit Order', 'mp' ),
+				'new_item' => __( 'New Order', 'mp' ),
+				'view_item' => __( 'View Order', 'mp' ),
+				'search_items' => __( 'Search Orders', 'mp' ),
+				'not_found' => __( 'No orders found', 'mp' ),
+				'not_found_in_trash' => __( 'No orders found in trash', 'mp' ),
+				'parent_item_colon' => __( 'Parent Order', 'mp' ),
+			 ),
+			'description' => __( 'Orders from your e-commerce store.', 'mp' ),
 			'public' => false,
 			'show_ui' => true,
 			'show_in_menu' => false,
-			'capability_type' => array('store_order', 'store_orders'),
+			'capability_type' => array( 'store_order', 'store_orders' ),
+			'map_meta_cap' => true,
 			'hierarchical' => false,
 			'rewrite' => false,
 			'query_var' => false,
-			'supports' => array( 'title' ),
-		)));
+			'supports' => array( '' ),
+		 ) ) );
 		
 		//! Register product_variation post type
 		register_post_type('mp_product_variation', array(
@@ -428,7 +408,7 @@ class Marketpress {
 			$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 		}
 		
-		return $new_rules + $rewrites;
+		return $rewrites + $new_rules;
 	}
 	
 	/**
