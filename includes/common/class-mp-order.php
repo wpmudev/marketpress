@@ -72,11 +72,13 @@ class MP_Order {
 	 * @since 3.0
 	 * @access public
 	 * @uses $post
-	 * @param int/string $order Optional, either a post id or an order id. If neither are provided a new order will be created. 
+	 * @param int/string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created. 
 	 */
 	public function __construct( $order = null ) {
 		if ( ! is_null( $order ) ) {
-			if ( is_numeric( $order ) ) {
+			if ( $order instanceof WP_Post ) {
+				$this->ID = $order->ID;
+			} elseif ( is_numeric( $order ) ) {
 				$this->ID = $order;
 			} else {
 				$this->_order_id = $order;	
@@ -86,6 +88,38 @@ class MP_Order {
 		} else {
 			$this->_generate_id();
 		}
+	}
+	
+	/**
+	 * Convert legacy cart info from orders crated in < 3.0
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param array $items Cart info from an order created in < 3.0.
+	 * @return MP_Cart
+	 */
+	protected function _convert_legacy_cart( $items ) {
+		$cart = new MP_Cart( false );
+		
+		foreach ( $items as $product_id => $variations ) {
+			foreach ( $variations as $variation_id => $product ) {
+				$item = new MP_Product( $product_id );
+				$item->set_price( array(
+					'regular' => (float) $product['price'],
+					'lowest' => (float) $product['price'],
+					'highest' => (float) $product['price'],
+					'sale' => array(
+						'amount' => false,
+						'start_date' => false,
+						'end_date' => false,
+						'days_left' => false,
+					),
+				) );
+				$cart->add_item( $product_id, $product['quantity'] );
+			}
+		}
+		
+		return $cart;
 	}
 
 	/**
@@ -154,8 +188,6 @@ class MP_Order {
 				if ( ! empty( $_post ) ) {
 					$this->_post = get_post( $_post );
 				}
-				
-				wp_cache_set( $this->_order_id, $this->_post, 'mp_order' );
 			}
 		} else {
 			$this->_post = get_post( $this->ID );
@@ -168,6 +200,8 @@ class MP_Order {
 		} else {
 			$this->_exists = true;
 			$this->ID = $this->_post->ID;
+			$this->_order_id = $this->_post->post_name;
+			wp_cache_set( $this->_order_id, $this->_post, 'mp_order' );
 		}
 	}
 	
@@ -313,6 +347,22 @@ You can manage this order here: %s', 'mp');
 	}
 	
 	/**
+	 * Delete meta data
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $key_string The meta key to delete (e.g. meta_name->key1->key2)
+	 */
+	public function delete_meta( $key_string ) {
+		$keys = explode( '->', $key_string );
+		$meta_key = array_shift( $keys );
+		$meta = get_post_meta( $this->ID, $meta_key, true );
+		
+		mp_delete_from_array( $meta, implode( '->', $keys ) );
+		update_post_meta( $this->ID, $meta_key, $meta );		
+	}
+	
+	/**
 	 * Display the order details
 	 *
 	 * @since 3.0
@@ -320,93 +370,15 @@ You can manage this order here: %s', 'mp');
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function details( $echo = true ) {
-		$html = '
-			<div id="mp-order-details">
-				<h3>' . __('Order #', 'mp' ) . ' ' . $this->get_id() . '</h3>
-				<div id="mp-order-details-head" class="clearfix">';
-		
-		// Cart
-		$cart = $this->get_meta( 'mp_cart_info' );
-		
-		// Currency
+		$cart = $this->get_cart();
 		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
+		$html = '';
 		
-		// Received time
-		$received = ( $time = $this->get_meta( 'mp_received_time' ) ) ? mp_format_date( $time, true ) : false;
-		
-		// Status
-		$status = __( 'Received', 'mp' );
-		$status_extra = '';
-		switch ( $this->_post->post_status ) {
-			case 'order_shipped' :
-				$status = __( 'Shipped', 'mp' );
-				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
-					$status = $this->tracking_link( false );
-				}
-			break;
-			
-			case 'order_paid' :
-				$status = __( 'In Process', 'mp' );
-			break;
-			
-			case 'order_closed' :
-				$status = __( 'Closed', 'mp' );
-			break;
-		}
-		
-		$tooltip_content = '
-			<div class="clearfix"><strong style="float:left;padding-right:15px;">' . __( 'Taxes:', 'mp' ) . '</strong><span style="float:right">' . $cart->tax_total( true ) . '</span></div>
-			<div class="clearfix"><strong style="float:left;padding-right:15px;">' . __( 'Shipping:', 'mp' ) . '</strong><span style="float:right">' . $cart->shipping_total( true ) . '</span></div>';
-
-		/**
-		 * Filter the order total tooltip content
-		 *
-		 * @since 3.0
-		 * @param string $tooltip_content
-		 * @param MP_Order $this The current order object.
-		 */
-		$tooltip_content = apply_filters( 'mp_order/tooltip_content_total', $tooltip_content, $this );
-		
-		$html .= '
-					<div class="mp-order-details-head-col"><strong>' . __( 'Order Received', 'mp' ) . '</strong> ' . $received . '</div>
-					<div class="mp-order-details-head-col"><strong>' . __( 'Current Status', 'mp' ) . '</strong> ' . $status . '</div>
-					<div class="mp-order-details-head-col">
-						<strong>' . __( 'Total', 'mp' ) . '</strong>
-						<a href="javascript:;" class="mp-has-tooltip">' . mp_format_currency( $currency, $this->get_meta( 'mp_order_total', '' ) ) . '</a>
-						<div class="mp-tooltip-content">
-							<div class="clearfix">' . $tooltip_content . '</div>
-						</div>
-					</div>';
-					
-		$html .= '
-				</div>' .
-			
-				$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) . '
-				
-				<div class="clearfix">
-					<div style="float:left;width:48%">
-						<h4>Shipping Address</h4>' .
-						$this->get_meta( 'mp_shipping_info->first_name', '' ) . ' ' . $this->get_meta( 'mp_shipping_info->last_name', '' ) . '<br />' .
-						$this->get_meta( 'mp_shipping_info->address1', '' ) . '<br />' .
-						(( $address2 = $this->get_meta( 'mp_shipping_info->address2', '' ) ) ? $address2 . '<br />' : '' ) .
-						(( $city = $this->get_meta( 'mp_shipping_info->city', '' ) ) ? $city : '' ) .
-						(( $state = $this->get_meta( 'mp_shipping_info->state', '' ) ) ? ', ' . $state . ' ' : '' ) .
-						(( $zip = $this->get_meta( 'mp_shipping_info->zip', '' ) ) ? $zip . '<br />' : '' ) .
-						(( $phone = $this->get_meta( 'mp_shipping_info->phone', '' ) ) ? $phone . '<br />' : '' ) .
-						(( $email = $this->get_meta( 'mp_shipping_info->email', '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' ) . '
-					</div>
-					<div style="float:right;width:48%">
-						<h4>Billing Address</h4>' .
-						$this->get_meta( 'mp_billing_info->first_name', '' ) . ' ' . $this->get_meta( 'mp_billing_info->last_name', '' ) . '<br />' .
-						$this->get_meta( 'mp_billing_info->address1', '' ) . '<br />' .
-						(( $address2 = $this->get_meta( 'mp_billing_info->address2', '' ) ) ? $address2 . '<br />' : '' ) .
-						(( $city = $this->get_meta( 'mp_billing_info->city', '' ) ) ? $city : '' ) .
-						(( $state = $this->get_meta( 'mp_billing_info->state', '' ) ) ? ', ' . $state . ' ' : '' ) .
-						(( $zip = $this->get_meta( 'mp_billing_info->zip', '' ) ) ? $zip . '<br />' : '' ) .
-						(( $phone = $this->get_meta( 'mp_billing_info->phone', '' ) ) ? $phone . '<br />' : '' ) .
-						(( $email = $this->get_meta( 'mp_billing_info->email', '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' ) . '
-					</div>
-				</div>
+		$html = '
+			<div id="mp-order-details">' .
+				$this->header( false ) .
+				$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) .
+				$this->get_addresses() . '
 			</div>';
 			
 		/**
@@ -435,6 +407,81 @@ You can manage this order here: %s', 'mp');
 	 */
 	public function exists() {
 		return $this->_exists;
+	}
+	
+	/**
+	 * Get an address html
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function get_address( $type ) {
+		$html = '' .
+			$this->get_meta( "mp_{$type}_info->first_name", '' ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name", '' ) . '<br />' .
+			$this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
+			(( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
+			(( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
+			(( $state = $this->get_meta( "mp_{$type}_info->state", '' ) ) ? ', ' . $state . ' ' : '' ) .
+			(( $zip = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
+			(( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
+			(( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+		
+		/**
+		 * Filter the address html
+		 *
+		 * @since 3.0
+		 * @param string $html The current address html.
+		 * @param string $type Either "billing" or "shipping".
+		 * @param MP_Order $this The current order object.
+		 */
+		return apply_filters( 'mp_order/get_address', $html, $type, $this );
+	}
+	
+	/**
+	 * Get billing/shipping addresses
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function get_addresses() {
+		$html = '
+			<div class="clearfix">
+			<div style="float:left;width:48%">
+				<h4>' . __( 'Shipping Address', 'mp' ) . '</h4>' .
+				$this->get_address( 'shipping' ) . '
+			</div>
+			<div style="float:right;width:48%">
+				<h4>' . __( 'Billing Address', 'mp' ) . '</h4>' .
+				$this->get_address( 'billing' ) . '
+			</div>
+		</div>';
+		
+		/**
+		 * Filter the addresses html
+		 *
+		 * @since 3.0
+		 * @param string $html The current address html.
+		 * @param MP_Order $this The current order object.
+		 */
+		return apply_filters( 'mp_order/get_addresses', $html, $this );		
+	}
+	
+	/**
+	 * Get the cart object from meta data
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return MP_Cart
+	 */
+	public function get_cart() {
+		$cart = $this->get_meta( 'mp_cart_info' );
+		
+		if ( ! $cart instanceof MP_Cart ) {
+			$cart = $this->_convert_legacy_cart( $cart );
+		}
+		
+		return $cart;
 	}
 	
 	/**
@@ -481,6 +528,100 @@ You can manage this order here: %s', 'mp');
 		}
 		
 		return ( ! empty( $fullname ) ) ? $fullname : $this->get_meta( "mp_{$type}_info->first_name" ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name" );
+	}
+	
+	/**
+	 * Display the order header
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function header( $echo = true ) {
+		$html = '
+			<h3>' . __('Order #', 'mp' ) . ' ' . (( get_query_var( 'mp_order_id' ) ) ? $this->get_id() : '<a href="' . $this->tracking_url( false ) . '">' . $this->get_id() . '</a>') . '</h3>
+			<div class="clearfix mp-order-details-head" id="mp-order-details-head-' . $this->ID . '">';
+		
+		// Currency
+		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
+		
+		// Cart
+		$cart = $this->get_meta( 'mp_cart_info' );
+		
+		if ( $cart instanceof MP_Cart ) {
+			$tax_total = $cart->tax_total( true );
+			$shipping_total = $cart->shipping_total( true );
+		} else {
+			$tax_total = mp_format_currency( $currency, $this->get_meta( 'mp_tax_total', 0 ) );
+			$shipping_total = mp_format_currency( $currency, $this->get_meta( 'mp_shipping_total', 0 ) );
+		}
+				
+		// Currency
+		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
+		
+		// Received time
+		$received = ( $time = $this->get_meta( 'mp_received_time' ) ) ? mp_format_date( $time, true ) : false;
+		
+		// Status
+		$status = __( 'Received', 'mp' );
+		$status_extra = '';
+		switch ( $this->_post->post_status ) {
+			case 'order_shipped' :
+				$status = __( 'Shipped', 'mp' );
+				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
+					$status = $this->tracking_link( false );
+				}
+			break;
+			
+			case 'order_paid' :
+				$status = __( 'In Process', 'mp' );
+			break;
+			
+			case 'order_closed' :
+				$status = __( 'Closed', 'mp' );
+			break;
+		}
+		
+		$tooltip_content = '
+			<div class="clearfix"><strong style="float:left;padding-right:15px;">' . __( 'Taxes:', 'mp' ) . '</strong><span style="float:right">' . $tax_total . '</span></div>
+			<div class="clearfix"><strong style="float:left;padding-right:15px;">' . __( 'Shipping:', 'mp' ) . '</strong><span style="float:right">' . $shipping_total . '</span></div>';
+
+		/**
+		 * Filter the order total tooltip content
+		 *
+		 * @since 3.0
+		 * @param string $tooltip_content
+		 * @param MP_Order $this The current order object.
+		 */
+		$tooltip_content = apply_filters( 'mp_order/tooltip_content_total', $tooltip_content, $this );
+		
+		$html .= '
+			<div class="mp-order-details-head-col"><strong>' . __( 'Order Received', 'mp' ) . '</strong> ' . $received . '</div>
+			<div class="mp-order-details-head-col"><strong>' . __( 'Current Status', 'mp' ) . '</strong> ' . $status . '</div>
+			<div class="mp-order-details-head-col">
+				<strong>' . __( 'Total', 'mp' ) . '</strong>
+				<a href="javascript:;" class="mp-has-tooltip">' . mp_format_currency( $currency, $this->get_meta( 'mp_order_total', '' ) ) . '</a>
+				<div class="mp-tooltip-content">
+					<div class="clearfix">' . $tooltip_content . '</div>
+				</div>
+			</div>';
+					
+		$html .= '
+			</div>';
+			
+		/**
+		 * Filter the order header html
+		 *
+		 * @since 3.0
+		 * @param string $html The current order header html.
+		 * @param MP_Order $this The current order object.
+		 */
+		$html = apply_filters( 'mp_order/header', $html, $this );
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
 	}
 		
 	/**
@@ -700,6 +841,10 @@ You can manage this order here: %s', 'mp');
 			case 'USPS' :
 				$url = 'http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum=' . $tracking_number;
 			break;
+			
+			case 'DHL' :
+				$url = 'http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB=' . $tracking_number;
+			break;
 		
 			default :
 				/**
@@ -766,5 +911,21 @@ You can manage this order here: %s', 'mp');
 		} else {
 			return $url;
 		}
+	}
+	
+	/**
+	 * Update meta data
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $key The meta key to update (e.g. meta_name->key1->key2)
+	 * @param mixed $value
+	 */
+	public function update_meta( $key, $value ) {
+		$keys = explode( '->', $key );
+		$meta_key = array_shift( $keys );
+		$meta = get_post_meta( $this->ID, $meta_key, true );
+		mp_push_to_array( $meta, implode( '->', $keys ), $value );
+		update_post_meta( $this->ID, $meta_key, $meta );
 	}
 }
