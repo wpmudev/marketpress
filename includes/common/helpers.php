@@ -242,12 +242,37 @@ if ( ! function_exists( 'mp_quote_it' ) ) :
 	}
 endif;
 
+if ( ! function_exists('mp_delete_from_array') ) :
+	/**
+	 * Deletes a key from a given array
+	 *
+	 * @since 1.0
+	 * @param array $array The array to work with.
+	 * @param string $key_string
+	 */
+	function mp_delete_from_array( &$array, $key_string ) {
+    $keys = explode('->', $key_string);
+    $branch = &$array;
+    
+    while ( count($keys) ) {
+    	$key = array_shift($keys);
+    	
+	    if ( ! is_array($branch) ) {
+		  	return false;
+	    }	
+	      
+	    $branch = &$branch[$key];
+    }
+    
+    unset( $branch );
+	}
+endif;
+
 if ( ! function_exists('mp_push_to_array') ) :
 	/**
 	 * Pushes a value to a given array with given key
 	 *
 	 * @since 1.0
-	 * @access public
 	 * @param array $array The array to work with.
 	 * @param string $key_string
 	 * @param mixed $value
@@ -762,7 +787,7 @@ if ( ! function_exists('mp_get_cookie_value') ) :
 	 * @return mixed
 	 */	 
 	function mp_get_cookie_value( $key, $default = false ) {
-		return stripslashes(mp_arr_get_value($key, $_COOKIE, $default));
+		return stripslashes_deep( mp_arr_get_value( $key, $_COOKIE, $default ) );
 	}
 endif;
 
