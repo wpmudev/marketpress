@@ -32,28 +32,62 @@ class MP_Short_Codes {
 	 */
 	private function __construct() {
     //register our shortcodes
-    add_shortcode('mp_tag_cloud', array(&$this, 'mp_tag_cloud_sc'));
-    add_shortcode('mp_list_categories', array(&$this, 'mp_list_categories_sc'));
-    add_shortcode('mp_dropdown_categories', array(&$this, 'mp_dropdown_categories_sc'));
-    add_shortcode('mp_popular_products', array(&$this, 'mp_popular_products_sc'));
-		add_shortcode('mp_related_products', array(&$this, 'mp_related_products_sc'));
-    add_shortcode('mp_list_products', array(&$this, 'mp_list_products_sc'));
-    add_shortcode('mp_product', array(&$this, 'mp_product_sc'));
-    add_shortcode('mp_product_image', array(&$this, 'mp_product_image_sc'));
-    add_shortcode('mp_buy_button', array(&$this, 'mp_buy_button_sc'));
-    add_shortcode('mp_product_price', array(&$this, 'mp_product_price_sc'));
-    add_shortcode('mp_product_meta', array(&$this, 'mp_product_meta_sc'));
-    add_shortcode('mp_product_sku', array(&$this, 'mp_product_sku_sc'));
-    add_shortcode('mp_cart', array(&$this, 'mp_cart_sc'));
-    add_shortcode('mp_checkout', array(&$this, 'mp_checkout_sc'));
-    add_shortcode('mp_order_status', array(&$this, 'mp_order_status_sc'));
+    add_shortcode( 'mp_tag_cloud', array( &$this, 'mp_tag_cloud_sc' ) );
+    add_shortcode( 'mp_list_categories', array( &$this, 'mp_list_categories_sc' ) );
+    add_shortcode( 'mp_dropdown_categories', array( &$this, 'mp_dropdown_categories_sc' ) );
+    add_shortcode( 'mp_popular_products', array( &$this, 'mp_popular_products_sc' ) );
+		add_shortcode( 'mp_related_products', array( &$this, 'mp_related_products_sc' ) );
+    add_shortcode( 'mp_list_products', array( &$this, 'mp_list_products_sc' ) );
+    add_shortcode( 'mp_product', array( &$this, 'mp_product_sc' ) );
+    add_shortcode( 'mp_product_image', array( &$this, 'mp_product_image_sc' ) );
+    add_shortcode( 'mp_buy_button', array( &$this, 'mp_buy_button_sc' ) );
+    add_shortcode( 'mp_product_price', array( &$this, 'mp_product_price_sc' ) );
+    add_shortcode( 'mp_product_meta', array( &$this, 'mp_product_meta_sc' ) );
+    add_shortcode( 'mp_product_sku', array( &$this, 'mp_product_sku_sc' ) );
+    add_shortcode( 'mp_cart', array( &$this, 'mp_cart_sc' ) );
+    add_shortcode( 'mp_checkout', array( &$this, 'mp_checkout_sc' ) );
+    add_shortcode( 'mp_order_status', array( &$this, 'mp_order_status_sc' ) );
+    add_shortcode( 'mp_order_lookup_form', array( &$this, 'mp_order_lookup_form_sc' ) );
 
     //store links
-    add_shortcode('mp_cart_link', array(&$this, 'mp_cart_link_sc'));
-    add_shortcode('mp_store_link', array(&$this, 'mp_store_link_sc'));
-    add_shortcode('mp_products_link', array(&$this, 'mp_products_link_sc'));
-    add_shortcode('mp_orderstatus_link', array(&$this, 'mp_orderstatus_link_sc'));
-    add_shortcode('mp_store_navigation', array(&$this, 'mp_store_navigation_sc'));	
+    add_shortcode( 'mp_cart_link', array( &$this, 'mp_cart_link_sc' ) );
+    add_shortcode( 'mp_store_link', array( &$this, 'mp_store_link_sc' ) );
+    add_shortcode( 'mp_products_link', array( &$this, 'mp_products_link_sc' ) );
+    add_shortcode( 'mp_orderstatus_link', array( &$this, 'mp_orderstatus_link_sc' ) );
+    add_shortcode( 'mp_store_navigation', array( &$this, 'mp_store_navigation_sc' ) );	
+	}
+	
+	/**
+	 * Parse shortcode parameters
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param array $atts The atts to parse.
+	 * @return array
+	 */
+	protected function _parse_atts( $atts ) {
+		foreach ( $atts as $key => &$value ) {
+			if ( 'true' == $value || '1' == $value ) {
+				$value = true;
+			} elseif ( 'false' == $value || '0' == $value ) {
+				$value = false;
+			}
+		}
+		
+		return $atts;
+	}
+	
+	/**
+	 * Display order lookup form
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function mp_order_lookup_form_sc( $atts, $content = '' ) {
+		return mp_order_lookup_form( array(
+			'echo' => false,
+			'content' => $content,
+		) );
 	}
 	
 	/**
@@ -88,13 +122,10 @@ class MP_Short_Codes {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param array $atts {
-	 *		Optional, an array of arguments.
-	 * }
 	 */
 	public function mp_cart_sc( $atts, $content = null ) {
 		$atts['echo'] = false;
-		return MP_Cart::get_instance()->display($atts);
+		return MP_Cart::get_instance()->display( $atts );
 	}
 	
   /**
@@ -122,7 +153,8 @@ class MP_Short_Codes {
    *
    */
   function mp_tag_cloud_sc($atts) {
-    return mp_tag_cloud(false, $atts);
+	  $atts = $this->_parse_atts( $atts );
+    return mp_tag_cloud( false, $atts );
   }
 
   /**
@@ -153,8 +185,9 @@ class MP_Short_Codes {
    *     "depth" (int) - The max depth.
    *
    */
-  function mp_list_categories_sc($atts) {
-    return mp_list_categories(false, $atts);
+  function mp_list_categories_sc( $atts ) {
+	  $atts = $this->_parse_atts( $atts );
+    return mp_list_categories( false, $atts );
   }
 
   /**
@@ -187,8 +220,9 @@ class MP_Short_Codes {
    * the "depth" argument.
    *
    */
-  function mp_dropdown_categories_sc($atts) {
-    return mp_dropdown_categories(false, $atts);
+  function mp_dropdown_categories_sc( $atts ) {
+	  $atts = $this->_parse_atts( $atts );
+    return mp_dropdown_categories( false, $atts );
   }
 
   /**
@@ -196,10 +230,13 @@ class MP_Short_Codes {
    *
    * @param int num Optional, max number of products to display. Defaults to 5
    */
-  function mp_popular_products_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_popular_products_sc( $atts ) {
+    $atts = shortcode_atts(array(
   		'number' => 5,
-  	), $atts));
+  	), $atts);
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
     return mp_popular_products(false, $number);
   }
@@ -214,9 +251,10 @@ class MP_Short_Codes {
    * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
    */
   function mp_related_products_sc($atts) {
-  	global $mp;
-  	$args = shortcode_atts($mp->defaults['related_products'], $atts);
-		return mp_related_products($args);
+	  $atts['echo'] = false;
+  	$args = shortcode_atts( mp()->defaults['related_products'], $atts );
+  	$args = $this->_parse_atts( $args );
+		return mp_related_products( $args );
   }
 
   /*
@@ -233,12 +271,11 @@ class MP_Short_Codes {
    * @param bool filters Optional, show filters
    */
   function mp_list_products_sc($atts) {
-  	global $mp;
-  	
-    $args = shortcode_atts($mp->defaults['list_products'], $atts);
-    $args['echo'] = false;
+	  $atts['echo'] = false;
+    $args = shortcode_atts( mp()->defaults['list_products'], $atts );
+    $args = $this->_parse_atts( $args );
     
-    return mp_list_products($args);
+    return mp_list_products( $args );
   }
 	
 	/*
@@ -251,15 +288,18 @@ class MP_Short_Codes {
 	* @param bool $meta Whether to display the product meta
   */
   function mp_product_sc($atts) {
-    extract(shortcode_atts(array(
+    $atts = shortcode_atts( array(
   		'product_id' => false,
   		'title' => true,
   		'content' => 'full',
   		'image' => 'single',
   		'meta' => true
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_product(false, $product_id, $title, $content, $image, $meta);
+    return mp_product( false, $product_id, $title, $content, $image, $meta );
   }
 	
 	/**
@@ -271,14 +311,17 @@ class MP_Short_Codes {
 		* @param string $align An option alignment of the image
 	 */
   function mp_product_image_sc($atts) {
-    extract(shortcode_atts(array(
+    $atts = shortcode_atts( array(
   		'context' => 'single',
 			'product_id' => NULL,
 			'size' => NULL,
 			'align' => NULL,
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_product_image(false, $context, $product_id, $size, $align);
+    return mp_product_image( false, $context, $product_id, $size, $align );
   }
 	
 	/*
@@ -287,13 +330,16 @@ class MP_Short_Codes {
 	 * @param string $context Options are list or single
 	 * @param int $post_id The post_id for the product. Optional if in the loop
 	 */
-  function mp_buy_button_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_buy_button_sc( $atts ) {
+    $atts = shortcode_atts( array(
   		'context' => 'single',
 			'product_id' => NULL
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_buy_button(false, $context, $product_id);
+    return mp_buy_button( false, $context, $product_id );
   }
 
 	/*
@@ -302,13 +348,16 @@ class MP_Short_Codes {
 	 * @param int $product_id The post_id for the product. Optional if in the loop
 	 * @param sting $label A label to prepend to the price. Defaults to "Price: "
 	 */
-  function mp_product_price_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_product_price_sc( $atts ) {
+    $atts = shortcode_atts( array(
   		'label' => true,
 			'product_id' => NULL
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_product_price(false, $product_id, $label);
+    return mp_product_price( false, $product_id, $label );
   }
 	
 	/*
@@ -318,16 +367,19 @@ class MP_Short_Codes {
 	 * @param int $product_id The post_id for the product. Optional if in the loop
 	 * @param sting $label A label to prepend to the price. Defaults to "Price: "
 	 */
-  function mp_product_meta_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_product_meta_sc( $atts ) {
+    $atts = shortcode_atts(array(
 			'context' => 'single',
   		'label' => true,
 			'product_id' => NULL
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 		
 		$content = '<div class="mp_product_meta">';
-		$content .= mp_product_price(false, $product_id, $label);
-		$content .= mp_buy_button(false, $context, $product_id);
+		$content .= mp_product_price( false, $product_id, $label );
+		$content .= mp_buy_button( false, $context, $product_id );
 		$content .= '</div>';
     return $content;
   }
@@ -338,11 +390,14 @@ class MP_Short_Codes {
 	 * @param int $product_id The post_id for the product. Optional if in the loop
 	 * @param string $seperator The seperator to put between skus, default ', '
 	 */
-  function mp_product_sku_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_product_sku_sc( $atts ) {
+    $atts = shortcode_atts(array(
   		'seperator' => false,
 			'product_id' => NULL
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 		
 		return mp_product_sku( false, $product_id, $seperator );
   }
@@ -352,13 +407,16 @@ class MP_Short_Codes {
    * @param bool url Optional, whether to return a link or url. Defaults to show link.
    * @param string link_text Optional, text to show in link.
    */
-  function mp_cart_link_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_cart_link_sc( $atts ) {
+    $atts = shortcode_atts(array(
   		'url' => false,
   		'link_text' => '',
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_cart_link(false, $url, $link_text);
+    return mp_cart_link( false, $url, $link_text );
   }
 
   /**
@@ -366,13 +424,16 @@ class MP_Short_Codes {
    * @param bool url Optional, whether to return a link or url. Defaults to show link.
    * @param string link_text Optional, text to show in link.
    */
-  function mp_store_link_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_store_link_sc( $atts ) {
+    $atts = shortcode_atts(array(
   		'url' => false,
   		'link_text' => '',
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_store_link(false, $url, $link_text);
+    return mp_store_link( false, $url, $link_text );
   }
 
   /**
@@ -380,13 +441,16 @@ class MP_Short_Codes {
    * @param bool url Optional, whether to return a link or url. Defaults to show link.
    * @param string link_text Optional, text to show in link.
    */
-  function mp_products_link_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_products_link_sc( $atts ) {
+    $atts = shortcode_atts(array(
   		'url' => false,
   		'link_text' => '',
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_products_link(false, $url, $link_text);
+    return mp_products_link( false, $url, $link_text );
   }
 
   /**
@@ -394,13 +458,16 @@ class MP_Short_Codes {
    * @param bool url Optional, whether to return a link or url. Defaults to show link.
    * @param string link_text Optional, text to show in link.
    */
-  function mp_orderstatus_link_sc($atts) {
-    extract(shortcode_atts(array(
+  function mp_orderstatus_link_sc( $atts ) {
+    $atts = shortcode_atts(array(
   		'url' => false,
   		'link_text' => '',
-  	), $atts));
+  	), $atts );
+  	$atts = $this->_parse_atts( $atts );
+  	
+  	extract( $atts );
 
-    return mp_orderstatus_link(false, $url, $link_text);
+    return mp_orderstatus_link( false, $url, $link_text );
   }
 
 	/**
