@@ -37,17 +37,17 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 			$result = false;
 	
 			//Check the shipping options to see if we already have a valid shipping price
-			if ( mp_get_session_value('mp_shipping_options->' . $this->plugin_name) ){
+			if ( mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ){
 				/* We have a set of prices. Are they still valid?
 				Did the cart change since last calculation? */
-				if ( mp_get_session_value('mp_cart_crc') == $this->crc(mp_cart()->get_items()) ) {
+				if ( mp_get_session_value( 'mp_cart_crc' ) == $this->crc( mp_cart()->get_items() ) ) {
 					//Did the shipping info change?
-					if ( mp_get_session_value('mp_shipping_crc') == $this->crc(mp_get_session_value('mp_shipping_info')) ) {
+					if ( mp_get_session_value( 'mp_shipping_crc' ) == $this->crc( mp_get_session_value( 'mp_shipping_info' ) ) ) {
 						$result = true;
 					}
 				}
 			}
-			
+				
 			return $result;
 		}
 
