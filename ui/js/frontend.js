@@ -18,23 +18,24 @@
 	 *
 	 * @since 3.0
 	 */
-	$('<img />').get(0).src = mp_i18n.loadingImage;
+	$( '<img />' ).get( 0 ).src = mp_i18n.loadingImage;
 	
 	/**
 	 * Add or remove cart ajax loading icon
 	 *
 	 * @since 3.0
+	 * @param string action Optional, either "show" or "hide". Defaults to "show".
 	 */
 	$.fn.ajaxLoading = function( action ){
-		if ( action === undefined ) {
+		if ( typeof( action ) == 'undefined' ) {
 			var action = 'show';	
 		}
 		
 		return this.each(function(){
 			if ( 'show' == action ) {
-				$(this).hide().after('<img src="' + mp_i18n.loadingImage + '" alt="" />');
+				$( this ).hide().after( '<img src="' + mp_i18n.loadingImage + '" alt="" />' );
 			} else {
-				$(this).show().next('img').remove();
+				$( this ).show().next( 'img' ).remove();
 			}
 		});
 	};
@@ -130,6 +131,61 @@ var marketpress = {};
 		},
 		
 		/**
+		 * Initialize order look up
+		 *
+		 * @since 3.0
+		 */
+		initOrderLookup : function(){
+			var $form = $( '#mp-order-lookup-form' );
+			var $btn = $form.find( '[type="submit"]' );
+			var $input = $form.find( 'input' );
+			
+			$form.on( 'submit', function( e ) {
+				e.preventDefault();
+				
+				if ( $btn.is( ':hidden' ) ) {
+					// Already searching for an order - bail
+					return;
+				}
+				
+				var data = $form.serialize();
+				
+				$btn.ajaxLoading( 'show' );
+				$input.prop( 'disabled', true );
+				
+				$.post( $form.attr( 'action' ), data ).done( function( resp ) {
+					if ( resp.success ) {
+						window.location.href = resp.data.redirect_url;
+					} else {
+						var $tooltip = $input.prev( '.mp-tooltip' );
+						
+						$btn.ajaxLoading( 'hide' );
+						$input.prop( 'disabled', false );
+						
+						if ( $tooltip.length == 0 ) {
+							$input.before( '<div class="mp-tooltip"></div>' );
+							$tooltip = $input.prev( '.mp-tooltip' );
+							$tooltip.tooltip( {
+								items : ".mp-tooltip",
+								tooltipClass : "error",
+								position : {
+									of : $input,
+									my : "center bottom-10",
+									at : "center top"
+								},
+								hide : 300,
+								show : 300
+							} );
+						}
+						
+						$tooltip.tooltip( 'option', 'content', resp.data.error_message );
+						$tooltip.tooltip( 'open' );
+					}
+				} );
+			} );
+		},
+		
+		/**
 		 * Initialize content tabs on the single product template
 		 *
 		 * @since 3.0
@@ -198,6 +254,7 @@ jQuery(document).ready(function(){
 	marketpress.initSelect2();
 	marketpress.initProductTabs();
 	marketpress.initToolTips();
+	marketpress.initOrderLookup();
 });
 
 window.onload = function(){
