@@ -7,9 +7,41 @@ if ( ! function_exists( '_mp_order_status_overview' ) ) :
 	 * @since 3.0
 	 * @return string
 	 */
-	function _mp_order_status_overview() {
-		//! TODO: order status overview html
-		return '';
+	function _mp_order_status_overview() {		
+		$history = mp_get_order_history();
+		$page = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+		$per_page = get_option( 'posts_per_page' );
+		$offset = ($page - 1) * $per_page;
+		$total_pages = ceil( count( $history ) / $per_page );
+		$html = '
+			<div id="mp-order-history">';
+		
+		if ( count( $history ) > 0 )  {
+			$history = array_slice( $history, $offset, $per_page );
+			$html .= '
+				<h2>' . __( 'Order History', 'mp' ) . '</h2>';
+			
+			foreach ( $history as $timestamp => $order ) {
+				$order = new MP_Order( $order['id'] );
+				$html .= $order->header( false );
+			}
+			
+			if ( $total_pages > 1 ) {
+				$big = 99999999;
+				$html .= '<div id="mp-order-history-pagination">';
+				$html .= paginate_links( array(
+					'base' => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+					'current' => $page,
+					'total' => $total_pages,
+				) );
+				$html .= '</div>';
+			}
+		}
+		
+		$html .= '
+			</div>';
+		
+		return $html;
 	}
 endif;
 
@@ -205,6 +237,76 @@ if ( ! function_exists('mp_checkout_step_url') ) :
 	 */
 	function mp_checkout_step_url( $checkout_step ) {
 		return ( is_admin() ) ? '' : apply_filters('mp_checkout_step_url', mp_cart_link(false, true) . trailingslashit($checkout_step), $checkout_step);
+	}
+endif;
+
+if ( ! function_exists( 'mp_create_store_page' ) ) :
+	/**
+	 * Create a store page
+	 *
+	 * @since 3.0
+	 * @param string $type The type of page to create.
+	 * @return int $post_id The ID of the newly created page.
+	 */
+	function mp_create_store_page( $type ) {
+		$args = array();
+		$defaults = array(
+			'post_status' => 'publish',
+			'post_type' => 'page',
+		);
+		
+		switch ( $type ) {
+			case 'store' :
+				$args = array(
+					'post_title' => __( 'Store', 'mp' ),
+					'post_content' => __( "Welcome to our online store! Feel free to browse around:\n\n[mp_store_navigation]\n\nCheck out our most popular products:\n\n[mp_popular_products]\n\nBrowse by category:\n\n[mp_list_categories]\n\nBrowse by tag:\n\n[mp_tag_cloud]", 'mp' ),
+				);
+			break;
+			
+			case 'network_store_page' :
+				$args = array(
+					'post_title' => __( 'Global Store', 'mp' ),
+					'post_content' => __( "Welcome to our market place!\n\nCheck out our network of products:\n\n[mp_list_global_products]\n\nBrowse by category:\n\n[mp_global_categories_list]\n\nBrowse by tag:\n\n[mp_global_tag_cloud]", 'mp' ),
+				);
+			break;
+			
+			case 'products' :
+				$args = array(
+					'post_title' => __( 'Products', 'mp' ),
+					'post_content' => '[mp_list_products]',
+					'post_parent' => mp_get_setting( 'pages->store', 0 ),
+				);
+			break;
+			
+			case 'cart' :
+				$args = array(
+					'post_title' => __( 'Cart', 'mp' ),
+					'post_content' => '[mp_cart]',
+					'post_parent' => mp_get_setting( 'pages->store', 0 ),
+				);
+			break;
+			
+			case 'checkout' :
+				$args = array(
+					'post_title' => __( 'Checkout', 'mp' ),
+					'post_content' => '[mp_cart]',
+					'post_parent' => mp_get_setting( 'pages->store', 0 )
+				);
+			break;
+			
+			case 'order_status' :
+				$args = array(
+					'post_title' => __( 'Order Status', 'mp' ),
+					'post_content' => "[mp_order_lookup_form]\n<h2>" . __( 'Order Search', 'mp' ) . "</h2>\n<p>" . __( 'If you have your order ID you can look it up using the form below.', 'mp' ) . "</p>[/mp_order_lookup_form]\n[mp_order_status]\n",
+					'post_parent' => mp_get_setting( 'pages->store', 0 )
+				);
+			break;
+		}
+		
+		$post_id = wp_insert_post( array_merge( $defaults, $args ) );
+		MP_Pages_Admin::get_instance()->save_store_page_value( $type, $post_id, false );
+		
+		return $post_id;
 	}
 endif;
 
@@ -572,7 +674,7 @@ if ( ! function_exists( 'mp_get_order_history' ) ) :
 	 * Get order history for a given user
 	 *
 	 * @since 3.0
-	 * @param int $user_id Optional, the user's ID. Defaults to the current user ID.
+	 * @param int $user_id The ID of the user to retrieve order history for.
 	 * @return array
 	 */
 	function mp_get_order_history( $user_id = null ) {
@@ -600,7 +702,12 @@ if ( ! function_exists( 'mp_get_order_history' ) ) :
 		 * @param array $orders The current array of orders.
 		 * @param int $user_id The user's ID.
 		 */
-		return apply_filters( 'mp_get_order_history', $orders, $user_id );
+		$orders = (array) apply_filters( 'mp_get_order_history', $orders, $user_id );
+		
+		// Put orders in reverse chronological order
+		krsort( $orders );
+		
+		return $orders;
 	}
 endif;
 
@@ -807,6 +914,53 @@ if ( ! function_exists('mp_list_products') ) :
 			echo $content;
 		} else {
 			return $content;
+		}
+	}
+endif;
+
+if ( ! function_exists( 'mp_order_lookup_form' ) ) :
+	/**
+	 * Display a form for looking up orders
+	 *
+	 * @since 3.0
+	 * @param array $args {
+	 * 		Optional, an array of arguments.
+	 *
+	 * 		@type bool $echo Optional, whether to echo or return. Defaults to echo.
+	 *		@type string $content Optional, the content to display before the form.
+	 * }
+	 */
+	function mp_order_lookup_form( $args = array() ) {
+		$_args = array_replace_recursive( array(
+			'echo' => true,
+			'content' => '',
+		), $args );
+		
+		extract( $_args );
+		
+		if ( get_query_var( 'mp_order_id' ) ) {
+			return '';
+		}
+		
+		$form = '
+			<form id="mp-order-lookup-form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
+				<div class="mp-order-lookup-form-content">' . $content . '</div>
+				<input type="text" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" /> <button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+			</form>';
+			
+		/**
+		 * Filter the order lookup form html
+		 *
+		 * @since 3.0
+		 * @param string $form The form HTML.
+		 * @param array $args Any arguments passed to the function.
+		 */
+		$form = apply_filters( 'mp_order_lookup_form', $form, $args );
+			
+		if ( $echo ) {
+			echo $form;
+		} else {
+			return $form;
 		}
 	}
 endif;
