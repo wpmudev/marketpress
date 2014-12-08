@@ -983,7 +983,7 @@ class MP_Product {
 	 *		@type string $view. Optional, how to display related products - either grid or list.
 	 * }
 	 */
-	function related_products( $args = array() ) {
+	public function related_products( $args = array() ) {
 		$args = array_replace_recursive(array(
 			'relate_by' => mp_get_setting('related_products->relate_by'),
 			'echo' => false,
@@ -1016,6 +1016,17 @@ class MP_Product {
 		} else {
 			return $html;
 		}
+	}
+	
+	/**
+	 * Set price
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $price The pricing array.
+	 */
+	public function set_price( $price ) {
+		$this->_price = $price;
 	}
 	
 	/**
