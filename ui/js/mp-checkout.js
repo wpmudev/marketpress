@@ -24,7 +24,7 @@ var mp_checkout;
 		initUpdateStateFieldListeners : function() {
 			$( '[name="billing[country]"], [name="shipping[country]"]' ).on( 'change', function() {
 				var $this = $( this );
-				var url = mp_i18n.ajaxurl + '?action=mp_checkout_get_states';
+				var url = mp_i18n.ajaxurl + '?action=mp_update_states_dropdown';
 				
 				if ( $this.attr( 'name' ).indexOf( 'billing' ) == 0 ) {
 					var $target = $( '[name="billing[state]"]' );
@@ -43,8 +43,8 @@ var mp_checkout;
 						
 				$.post( url, data ).done( function( resp ) {
 					if ( resp.success ) {
-						if ( resp.data.countries ) {
-							$target.html( resp.data.countries ).ajaxLoading( 'hide' );
+						if ( resp.data.states ) {
+							$target.html( resp.data.states ).ajaxLoading( 'hide' );
 							$target.closest( '.mp-checkout-column' ).show();
 							marketpress.initSelect2();
 						} else {
