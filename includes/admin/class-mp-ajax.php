@@ -23,14 +23,7 @@ class MP_Ajax {
 		}
 		return self::$_instance;
 	}
-	
-	/**
-	 * 
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	
+
 	/**
 	 * Process ajax login
 	 *
@@ -106,7 +99,7 @@ class MP_Ajax {
 				'action' => 'edit',
 			), get_admin_url( null, 'post.php' ) ) . '">' . __( 'Edit Page', 'mp' ) . '</a>',
 		) );
-	}
+	}	
 	
 	/**
 	 * Look up an order by it's ID
@@ -128,6 +121,27 @@ class MP_Ajax {
 		wp_send_json_error( array(
 			'error_message' => __( 'Oops... we could not locate any orders by that ID. Please double check your order ID and try again.', 'mp' ),
 		) );
+	}
+
+	/**
+	 * Update state dropdown list
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_update_states_dropdown, wp_ajax_nopriv_mp_update_states_dropdown
+	 */
+	public function update_states_dropdown() {
+		$states = false;
+		if ( $country = mp_get_post_value( 'country' ) ) {
+			$_states = mp_get_states( $country );
+			$states = '';
+			$selected = mp_get_user_address_part( 'state', mp_get_post_value( 'type' ) );
+			foreach ( $_states as $val => $label ) {
+				$states .= '<option value="' . $val . '" ' . selected( $selected, $val, false ) . '>' . $label . '</option>'; 
+			}
+		}
+		
+		wp_send_json_success( array( 'states' => $states ) );
 	}
 	
 	/**
@@ -151,6 +165,9 @@ class MP_Ajax {
 		// Look up order
 		add_action( 'wp_ajax_mp_lookup_order', array( &$this, 'lookup_order' ) );
 		add_action( 'wp_ajax_nopriv_mp_lookup_order', array( &$this, 'lookup_order' ) );
+		// Get state list
+		add_action( 'wp_ajax_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
+		add_action( 'wp_ajax_nopriv_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
 	}
 }
 
