@@ -1,6 +1,5 @@
 <?php
 
-add_action('wp_ajax_mp_update_states_dropdown', array('MP_Store_Settings_General', 'ajax_mp_update_states_dropdown'));
 add_action('wp_ajax_mp_update_currency', array('MP_Store_Settings_General', 'ajax_mp_update_currency'));
 
 class MP_Store_Settings_General {
@@ -27,22 +26,6 @@ class MP_Store_Settings_General {
 		return self::$_instance;
 	}
 	
-	/**
-	 * Gets an updated list of states based upon the given country
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_ajax_mp_update_states_dropdown
-	 */
-	public static function ajax_mp_update_states_dropdown() {
-		if ( check_ajax_referer('mp_update_states_dropdown', 'nonce', false ) ) {
-			$states = mp_get_states(mp_get_get_value('base_country'));
-			wp_send_json_success($states);
-		}
-		
-		wp_send_json_error();
-	}
-
 	/**
 	 * Gets an updated currency symbol based upon a given currency code
 	 *
@@ -223,14 +206,11 @@ jQuery(document).ready(function($){
 	$country.on('change', function(e){
 		var data = [
 			{
-				"name" : "base_country",
+				"name" : "country",
 				"value" : e.val
 			},{
 				"name" : "action",
 				"value" : "mp_update_states_dropdown"
-			},{
-				"name" : "nonce",
-				"value" : "<?php echo wp_create_nonce('mp_update_states_dropdown'); ?>"
 			}
 		];
 		
@@ -244,7 +224,7 @@ jQuery(document).ready(function($){
 			if ( resp.success ) {
 				$state.empty();
 				
-				$.each(resp.data, function(val, text){
+				$.each(resp.data.states, function(val, text){
 					var $option = $('<option></option>').attr('value', val).text(text);
 					$state.append($option)
 				});
