@@ -74,10 +74,10 @@ class MP_Checkout {
 		 * @param array The current sections array.
 		 */
 		$this->_sections = apply_filters( 'mp_checkout/sections_array', array(
-			'login-register' 						=> __( 'Login/Register', 'mp'),
-			'billing-shipping-address' 	=> __( 'Billing/Shipping Address', 'mp' ),
-			'shipping' 									=> __( 'Shipping Method', 'mp' ),
-			'order-review-payment' 			=> __( 'Review Order/Payment', 'mp' ),
+			'login-register' => __( 'Login/Register', 'mp'),
+			'billing-shipping-address' => __( 'Billing/Shipping Address', 'mp' ),
+			'shipping' => __( 'Shipping Method', 'mp' ),
+			'order-review-payment' => __( 'Review Order/Payment', 'mp' ),
 		) );
 		
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
@@ -90,10 +90,6 @@ class MP_Checkout {
 		// Process checkout
 		add_action( 'wp_ajax_mp_process_checkout', array( &$this, 'ajax_process_checkout' ) );
 		add_action( 'wp_ajax_nopriv_mp_process_checkout', array( &$this, 'ajax_process_checkout' ) );
-		
-		// Get state list
-		add_action( 'wp_ajax_mp_checkout_get_states', array( &$this, 'ajax_get_states' ) );
-		add_action( 'wp_ajax_nopriv_mp_checkout_get_states', array( &$this, 'ajax_get_states' ) );
 	}
 	
 	/**
@@ -159,7 +155,7 @@ class MP_Checkout {
 		
 		// State/zip fields
 		$state_zip_fields = array();
-		if ( $states = $this->get_states( $country ) ) {
+		if ( $states = mp_get_states( $country ) ) {
 			$state_zip_fields[] = array(
 				'type' => 'select',
 				'label' => __('State/Province', 'mp'),
@@ -336,27 +332,6 @@ class MP_Checkout {
 		return apply_filters( 'mp_checkout/get_error', $error, $key );
 	}
 	
-	/**
-	 * Get states list
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_ajax_mp_checkout_get_states, wp_ajax_nopriv_mp_checkout_get_states
-	 */
-	public function ajax_get_states() {
-		$countries = false;
-		if ( $country = mp_get_post_value( 'country' ) ) {
-			$_countries = $this->get_states( $country );
-			$countries = '';
-			$selected = mp_get_user_address_part( 'state', mp_get_post_value( 'type' ) );
-			foreach ( $_countries as $val => $label ) {
-				$countries .= '<option value="' . $val . '" ' . selected( $selected, $val, false ) . '>' . $label . '</option>'; 
-			}
-		}
-		
-		wp_send_json_success( array( 'countries' => $countries ) );
-	}
-
 	/**
 	 * Process checkout
 	 *
@@ -721,40 +696,7 @@ class MP_Checkout {
 		
 		return $html;
 	}
-	
-	/**
-	 * Get an array of states/provinces for a given country
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @param string $country A country.
-	 */
-	public function get_states( $country ) {
-		$list = false;
-		switch ( $country ) {
-			case 'US' :
-				$list = mp()->usa_states;
-			break;
-			
-			case 'CA' :
-				$list = mp()->canadian_provinces;
-			break;
-			
-			case 'AU' :
-				$list = mp()->australian_states;
-			break;
-		}	
-
-		/**
-		 * Filter the state/province list
-		 *
-		 * @since 3.0
-		 * @param array $list The current state/province list.
-		 * @param string $country The current country.
-		 */
-		return apply_filters( 'mp_checkout/province_field_list', $list, $country );
-	}
-	
+		
 	/**
 	 * Check if there are any errors
 	 *

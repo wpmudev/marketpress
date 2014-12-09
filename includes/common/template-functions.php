@@ -639,6 +639,42 @@ if ( ! function_exists('mp_get_user_address_part') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_get_states' ) ) :
+	/**
+	 * Get an array of states/provinces for a given country
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $country A country code.
+	 * @return string
+	 */
+	function mp_get_states( $country ) {
+		$list = false;
+		switch ( $country ) {
+			case 'US' :
+				$list = mp()->usa_states;
+			break;
+			
+			case 'CA' :
+				$list = mp()->canadian_provinces;
+			break;
+			
+			case 'AU' :
+				$list = mp()->australian_states;
+			break;
+		}	
+
+		/**
+		 * Filter the state/province list
+		 *
+		 * @since 3.0
+		 * @param array $list The current state/province list.
+		 * @param string $country The current country.
+		 */
+		return apply_filters( 'mp_get_states', $list, $country );
+	}
+endif;
+
 if ( ! function_exists('mp_get_image_size') ) :
 	/**
 	 * Get the image size per presentation settings
