@@ -44,7 +44,7 @@ class MP_Orders_Admin {
 		add_filter('manage_edit-mp_order_sortable_columns', array(&$this, 'orders_sortable_columns'));
 		add_action('pre_get_posts', array(&$this, 'modify_query'));
 		//custom css/javascript
-		add_action('admin_print_styles', array(&$this, 'print_css'));
+		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_css'));
 		add_action('admin_print_footer_scripts', array(&$this, 'print_js'));
 		//process custom bulk actions
 		add_action('load-edit.php', array(&$this, 'process_bulk_actions'));
@@ -67,13 +67,14 @@ class MP_Orders_Admin {
 		}
 		
 		$order = new MP_Order( $post_id );
-		$order->update_meta( 'mp_shipping_info->tracking_num', mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
-		$order->update_meta( 'mp_shipping_info->method', mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
+		$order->update_meta( 'mp_shipping_info->tracking_num', trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) ) );
+		$order->update_meta( 'mp_shipping_info->method', trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) ) );
 		
-		if ( $order_notes = mp_get_post_value( 'mp->order_notes' ) ) {
-			$order->update_meta( 'mp_shipping_info->method', sanitize_text_field( $order_notes ) );
+		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
+		if ( ! empty( $order_notes ) ) {
+			$order->update_meta( 'mp_order_notes',  $order_notes );
 		} else {
-			$order->delete_meta( 'mp_shipping_info->method' );
+			$order->delete_meta( 'mp_order_notes' );
 		}
 	}
 	
@@ -87,11 +88,11 @@ class MP_Orders_Admin {
 	public function add_meta_boxes() {
 		add_meta_box( 'mp-order-details-metabox', __( 'Order Details', 'mp' ), array( &$this, 'meta_box_order_details' ), 'mp_order', 'normal', 'core' );
 		add_meta_box( 'mp-order-customer-info-metabox', __( 'Customer Info', 'mp' ), array( &$this, 'meta_box_customer_info' ), 'mp_order', 'normal', 'core' );
-		add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array( &$this, 'meta_box_shipping_info' ), 'mp_order', 'normal', 'core' );
 		add_meta_box( 'mp-order-notes-metabox', __( 'Order Notes', 'mp' ), array( &$this, 'meta_box_order_notes' ), 'mp_order', 'normal', 'core' );
-		add_meta_box( 'mp-order-actions-metabox', __( 'Order Actions', 'mp' ), array( &$this, 'meta_box_order_actions' ), 'mp_order', 'side', 'core' );				
+		add_meta_box( 'mp-order-actions-metabox', __( 'Order Actions', 'mp' ), array( &$this, 'meta_box_order_actions' ), 'mp_order', 'side', 'high' );				
 		add_meta_box( 'mp-order-history-metabox', __( 'Order History', 'mp' ), array( &$this, 'meta_box_order_history' ), 'mp_order', 'side', 'core' );
 		add_meta_box( 'mp-order-payment-info-metabox', __( 'Payment Information', 'mp' ), array( &$this, 'meta_box_payment_info' ), 'mp_order', 'side', 'core' );
+		add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array( &$this, 'meta_box_shipping_info' ), 'mp_order', 'side', 'core' );
 	}
 
 	/**
@@ -176,7 +177,7 @@ class MP_Orders_Admin {
 	public function meta_box_order_notes( $post ) {
 		$order = new MP_Order( $post );
 		?>
-		<textarea class="widefat" name="mp[order_notes]" rows="5"></textarea>
+		<textarea class="widefat" name="mp[order_notes]" rows="5"><?php echo $order->get_meta( 'mp_order_notes', '' ); ?></textarea>
 		<?php
 	}
 	
@@ -203,28 +204,27 @@ class MP_Orders_Admin {
 		 */
 		$carriers = apply_filters( 'mp_shipping_carriers_array', $carriers );
 		?>
-		<table width="100%" class="form-table">
-			<tr>
-				<th scope="row"><?php _e( 'Method:', 'mp' ); ?></th>
-				<td><?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?></td>
-			</tr>
-			<tr>
-				<th scope="row"><?php _e( 'Amount Collected:', 'mp' ); ?></th>
-				<td><?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_info->shipping_cost', 0 ) ); ?></td>
-			</tr>
-			<tr>
-				<th scope="row"><?php _e( 'Tracking Info:', 'mp' ); ?></th>
-				<td>
-					<select name="mp[tracking_info][shipping_method]" style="vertical-align:top">
-						<option value=""><?php _e( 'Carrier', 'mp' ); ?></option>
-						<?php foreach ( $carriers as $val => $label ) : ?>
-						<option value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
-						<?php endforeach; ?>
-					</select>
-					<input type="text" name="mp[tracking_info][tracking_num]" placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>" value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:250px" />
-				</td>
-			</tr>
-		</table>
+		<div class="misc-pub-section">
+			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br />
+			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_info->shipping_cost', 0 ) ); ?>
+		</div>
+		<div class="misc-pub-section">
+			<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br />
+			<?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?>
+		</div>
+		<div class="misc-pub-section">
+			<strong><?php _e( 'Actual Shipping Method', 'mp' ); ?>:</strong><br />
+			<select name="mp[tracking_info][shipping_method]" style="vertical-align:top;width:100%;">
+				<option value=""><?php _e( 'Select One', 'mp' ); ?></option>
+				<?php foreach ( $carriers as $val => $label ) : ?>
+				<option value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+		<div class="misc-pub-section">
+			<strong><?php _e( 'Tracking Number', 'mp' ); ?>:</strong><br />
+			<input type="text" name="mp[tracking_info][tracking_num]" placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>" value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%" />
+		</div>
 		<?php
 	}
 	
@@ -236,7 +236,7 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_customer_info( $post ) {
 		$order = new MP_Order( $post );
-		echo $order->get_addresses();
+		echo $order->get_addresses( true );
 	}
 	
 	/**
@@ -406,136 +406,6 @@ class MP_Orders_Admin {
 	}
 	
 	/**
-	 * Prints applicable CSS
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action admin_print_styles
-	 */
-	public function print_css() {
-		if ( get_current_screen()->post_type != 'mp_order' ) return;
-		?>
-<style type="text/css">
-	.wrap .add-new-h2 {
-		display: none;
-	}
-	
-	div.mp_order_status {
-		position: relative;
-	}
-	
-	div.mp_order_status img {
-		display: none;
-		margin: 2px 0;
-	}
-	
-	div.mp_order_status .mp_order_status_menu {
-		position: absolute;
-			top: -10px;
-			left: 40px;
-			z-index: 10;
-		background: #fff;
-		border: 1px solid #ccc;
-			-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, .2);
-		box-shadow: 0 0 5px rgba(0, 0, 0, .2);
-		display: none;
-		margin: 0;
-		padding: 10px;
-		white-space: nowrap;
-		text-align: left;
-	}
-	
-	div.mp_order_status .mp_order_status_menu a,
-	div.mp_order_status .mp_order_status_menu span {
-		display: block;
-		line-height: 1;
-		margin: 0;
-		padding: 5px 8px;
-	}
-	
-	div.mp_order_status .mp_order_status_menu span {
-		color: #999;
-	}
-	
-	div.mp_order_status .mp_order_status_menu li {
-		position: relative;
-		display: inline-block;
-		margin: 0;
-		padding: 0;
-	}
-	
-	div.mp_order_status .mp_order_status_menu li.current span {
-		color: #999;
-	}
-	
-	div.mp_order_status .mp_order_status_menu li:before {
-		position: absolute;
-			top: 1px;
-			left: -4px;
-		color: #ccc;
-		content: "|";
-	}
-	
-	div.mp_order_status .mp_order_status_menu li:first-child:before,
-	div.mp_order_status .mp_order_status_menu li:first-child + li:before {
-		display: none;
-	}
-
-	div.mp_order_status:hover .mp_order_status_menu {
-		display: block;
-	}
-		
-	div.mp_order_status:before {
-		display: inline-block;
-		font: 400 20px/1 dashicons;
-		-webkit-font-smoothing: antialiased;
-	}
-	
-	div.mp_order_status.loading img {
-		display: inline-block;
-	}
-	
-	div.mp_order_status.loading:before {
-		display: none;
-	}
-	
-	div.mp_order_status.order_received:before {
-		content: "\f154";
-	}
-	
-	div.mp_order_status.order_paid:before {
-		content: "\f459";
-	}
-	
-	div.mp_order_status.order_shipped:before,
-	div.mp_order_status.order_closed:before {
-		content: "\f155";
-	}
-	
-	.widefat .column-mp_orders_status,
-	.widefat .column-mp_orders_items {
-		text-align: center;
-		width: 50px;
-	}
-	
-	.widefat td.mp_orders_status {
-		overflow: visible;
-	}
-	
-	#post-body-content {
-		display: none;
-	}
-	
-	#mp-order-history-metabox .inside,
-	#mp-order-payment-info-metabox .inside,
-	#mp-order-actions-metabox .inside {
-		padding: 0;
-	}
-</style>		
-		<?php
-	}
-	
-	/**
 	 * Prints applicable javascript
 	 *
 	 * @since 3.0
@@ -543,9 +413,12 @@ class MP_Orders_Admin {
 	 * @action admin_print_footer_scripts
 	 */
 	public function print_js() {
-		if ( get_current_screen()->post_type != 'mp_order' ) return;
+		if ( get_current_screen()->post_type != 'mp_order' ) {
+			return;
+		}
 		?>
 <script type="text/javascript">
+( function( $ ) {
 	jQuery(document).ready(function($){
 		var setActiveAdminMenu = function(){
 			$('#menu-posts-product, #menu-posts-product > a')
@@ -570,9 +443,72 @@ class MP_Orders_Admin {
 			});
 		};
 		
+		var initCopyBillingAddress = function() {
+			$( '#mp-order-copy-billing-address' ).on( 'click', function( e ) {
+				e.preventDefault();
+				
+				$( '[name^="mp[billing_info]"]' ).each( function() {
+					var $this = $( this );
+					var name = $this.attr( 'name' );
+					var targetName = name.replace( 'billing_info', 'shipping_info' );
+					var $targetField = $( '[name="' + targetName + '"]' );
+					
+					$targetField.val( $this.val() );
+				} );
+			} );
+		};
+		
+		var initSelect2Fields = function() {
+			$( 'select.mp-select2' ).not( '.select2-offscreen' ).select2( {
+				dropdownAutoWidth : false,
+				width : "element"
+			} );
+		};
+		
+		var initUpdateStatesDropdown = function() {
+			$( '[name="mp[billing_info][country]"], [name="mp[shipping_info][country]"]' ).on( 'change', function() {
+				var $this = $( this );
+				var url = ajaxurl + '?action=mp_update_states_dropdown';
+				
+				if ( $this.attr( 'name' ).indexOf( 'billing_info' ) >= 0 ) {
+					var $target = $( '[name="mp[billing_info][state]"]' );
+					var type = 'billing';
+				} else {
+					var $target = $( '[name="mp[shipping_info][state]"]' );
+					var type = 'shipping';
+				}
+				
+				var data = {
+					country : $this.val(),
+					type : type
+				}
+				
+				$target.select2( 'destroy' ).hide().next( 'img' ).show();
+				$this.select2( 'disable' );
+						
+				$.post( url, data ).done( function( resp ) {
+					$this.select2( 'enable' );
+					
+					if ( resp.success ) {
+						if ( resp.data.states ) {
+							$target.html( resp.data.states ).show().next( 'img' ).hide();
+							$target.closest( 'tr' ).show();
+							initSelect2Fields();
+						} else {
+							$target.closest( 'tr' ).hide();
+						}
+					}
+				} );
+			} );			
+		};
+		
 		setActiveAdminMenu();
 		modifyBulkActionsInput();
+		initCopyBillingAddress();
+		initSelect2Fields();
+		initUpdateStatesDropdown();
 	});
+}( jQuery ) );
 </script>
 		<?php
 	}
@@ -593,6 +529,22 @@ class MP_Orders_Admin {
 		
 		return __('Enter coupon code here', 'mp');
 	}
+
+	/**
+	 * Enqueue CSS
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_enqueue_scripts
+	 */
+	public function enqueue_css() {
+		if ( get_current_screen()->post_type != 'mp_order' ) {
+			return;
+		}
+		
+		wp_enqueue_style( 'mp-admin-orders', mp_plugin_url( 'includes/admin/ui/css/admin-orders.css' ), false, MP_VERSION );
+	}
+	
 	
 	/**
 	 * Adds menu items to the admin menu
