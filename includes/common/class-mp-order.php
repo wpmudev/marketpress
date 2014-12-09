@@ -358,8 +358,12 @@ You can manage this order here: %s', 'mp');
 		$meta_key = array_shift( $keys );
 		$meta = get_post_meta( $this->ID, $meta_key, true );
 		
-		mp_delete_from_array( $meta, implode( '->', $keys ) );
-		update_post_meta( $this->ID, $meta_key, $meta );		
+		if ( count( $keys ) > 0 ) {
+			mp_delete_from_array( $meta, implode( '->', $keys ) );
+			update_post_meta( $this->ID, $meta_key, $meta );
+		} else {
+			delete_post_meta( $this->ID, $meta_key );
+		}	
 	}
 	
 	/**
@@ -414,18 +418,93 @@ You can manage this order here: %s', 'mp');
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param string $type Either "billing" or "shipping".
+	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
 	 * @return string
 	 */
-	public function get_address( $type ) {
-		$html = '' .
-			$this->get_meta( "mp_{$type}_info->first_name", '' ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name", '' ) . '<br />' .
-			$this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
-			(( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
-			(( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
-			(( $state = $this->get_meta( "mp_{$type}_info->state", '' ) ) ? ', ' . $state . ' ' : '' ) .
-			(( $zip = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
-			(( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
-			(( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+	public function get_address( $type, $editable = false ) {
+		if ( ! $editable ) {
+			$html = '' .
+				$this->get_meta( "mp_{$type}_info->first_name", '' ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name", '' ) . '<br />' .
+				$this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
+				(( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
+				(( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
+				(( $state = $this->get_meta( "mp_{$type}_info->state", '' ) ) ? ', ' . $state . ' ' : '' ) .
+				(( $zip = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
+				(( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
+				(( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+		} else {
+			$prefix = 'mp[' . $type . '_info]';
+			
+			// Country dropdown
+			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+			$country_options = '';
+			foreach ( $allowed_countries as $country ) {
+				$country_options .= '<option value="' . $country . '" ' . selected( $country, $this->get_meta( "mp_{$type}_info->country", '' ), false ) . '>' . mp()->countries[ $country ] . '</option>' . "\n";
+			}
+			
+			// State dropdown
+			$states = mp_get_states( $this->get_meta( "mp_{$type}_info->country" ) );
+			$state_options = '';
+			if ( is_array( $states ) ) {
+				foreach ( $states as $key => $val ) {
+					$state_options .= '<option value="' . $key . '" ' . selected( $key, $this->get_meta( "mp_{$type}_info->state", '' ), false ) . '>' . $val . '</option>' . "\n";
+				}
+			}
+	
+			$html = '
+				<table class="form-table">
+					<tr>
+						<th scope="row">' . __( 'First Name', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[first_name]" value="' . $this->get_meta( "mp_{$type}_info->first_name", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Last Name', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[last_name]" value="' . $this->get_meta( "mp_{$type}_info->last_name", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Address 1', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[address1]" value="' .$this->get_meta( "mp_{$type}_info->address1", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Address 2', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[address2]" value="' . $this->get_meta( "mp_{$type}_info->address2", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'City', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[city]" value="' . $this->get_meta( "mp_{$type}_info->city", '' ) . '" /></td>
+					</tr>';
+			
+			if ( is_array( $states ) ) {
+				$html .= '
+					<tr>
+						<th scope="row">' . __( 'State', 'mp' ) . '</th>
+						<td>
+							<select class="mp-select2" name="' . $prefix . '[state]" style="width:100%">' . $state_options . '</select>
+							<img src="' . admin_url( 'images/wpspin_light.gif' ) . '" alt="" style="display:none" />
+						</td>
+					</tr>';
+			}
+			
+			$html .= '
+					<tr>
+						<th scope="row">' . mp_get_setting( 'zip_label' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[zip]" value="' . $this->get_meta( "mp_{$type}_info->zip", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Country', 'mp' ) . '</th>
+						<td><select class="mp-select2" name="' . $prefix . '[country]" style="width:100%">' . $country_options . '</select></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Phone', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[phone]" value="' . $this->get_meta( "mp_{$type}_info->phone", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Email', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[email]" value="' . $this->get_meta( "mp_{$type}_info->email", '' ) . '" /></td>
+					</tr>
+				</table>';
+		}
 		
 		/**
 		 * Filter the address html
@@ -443,17 +522,19 @@ You can manage this order here: %s', 'mp');
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
 	 */
-	public function get_addresses() {
+	public function get_addresses( $editable = false ) {
 		$html = '
 			<div class="clearfix">
 			<div style="float:left;width:48%">
-				<h4>' . __( 'Shipping Address', 'mp' ) . '</h4>' .
-				$this->get_address( 'shipping' ) . '
+				<h4>' . __( 'Billing Address', 'mp' ) . '</h4>' .
+				$this->get_address( 'billing', $editable ) .
+				(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
 			</div>
 			<div style="float:right;width:48%">
-				<h4>' . __( 'Billing Address', 'mp' ) . '</h4>' .
-				$this->get_address( 'billing' ) . '
+				<h4>' . __( 'Shipping Address', 'mp' ) . '</h4>' .
+				$this->get_address( 'shipping', $editable ) . '
 			</div>
 		</div>';
 		
@@ -925,7 +1006,12 @@ You can manage this order here: %s', 'mp');
 		$keys = explode( '->', $key );
 		$meta_key = array_shift( $keys );
 		$meta = get_post_meta( $this->ID, $meta_key, true );
-		mp_push_to_array( $meta, implode( '->', $keys ), $value );
-		update_post_meta( $this->ID, $meta_key, $meta );
+		
+		if ( count( $keys ) > 0 ) {
+			mp_push_to_array( $meta, implode( '->', $keys ), $value );
+			update_post_meta( $this->ID, $meta_key, $meta );
+		} else {
+			update_post_meta( $this->ID, $meta_key, $value );
+		}
 	}
 }
