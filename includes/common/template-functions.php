@@ -289,7 +289,7 @@ if ( ! function_exists( 'mp_create_store_page' ) ) :
 			case 'checkout' :
 				$args = array(
 					'post_title' => __( 'Checkout', 'mp' ),
-					'post_content' => '[mp_cart]',
+					'post_content' => '[mp_checkout]',
 					'post_parent' => mp_get_setting( 'pages->store', 0 )
 				);
 			break;
