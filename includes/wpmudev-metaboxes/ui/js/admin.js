@@ -210,9 +210,9 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 			if ( action == 'show' ) {
 				if ( operator == 'AND' ) {
 					if ( testConditionals(conditionals, $this) != conditionals.length ) {
-						$container.hide().next('p.submit').hide();
+						hideContainer( $container );
 					} else {
-						$container.fadeIn(500).next('p.submit').fadeIn(500)
+						showContainer( $container );
 					}
 				} else {
 					if ( testConditionals(conditionals, $this) == 0 ) {
@@ -241,6 +241,51 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 				
 			initRowShading();
 		});
+	};
+	
+	var hideContainer = function( $container ) {
+		/**
+		 * Triggers right before a field container is hidden
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param jQuery $container The jQuery object to be hidden.
+		 */
+		$( document ).trigger( 'wpmudev_metaboxes/before_hide_field_container', [ $container ] );
+		
+		$container.hide().next( 'p.submit' ).hide();
+		
+		/**
+		 * Triggers right after a field container is hidden
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param jQuery $container The jQuery object that was hidden.
+		 */
+		$( document ).trigger( 'wpmudev_metaboxes/after_hide_field_container', [ $container ] );
+
+	};
+	
+	var showContainer = function( $container ) {
+		/**
+		 * Triggers right before a field container is show
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param jQuery $container The jQuery object to be shown.
+		 */
+		$( document ).trigger( 'wpmudev_metaboxes/before_show_field_container', [ $container ] );
+
+		$container.fadeIn(500, function() {
+			/**
+			 * Triggers right after a field container is fully shown
+			 *
+			 * @since 3.0
+			 * @access public
+			 * @param jQuery $container The jQuery object that was shown.
+			 */
+			$( document ).trigger( 'wpmudev_metaboxes/after_show_field', [ $container ] );
+		} ).next( 'p.submit' ).fadeIn( 500 )
 	};
 
 	var initValidation = function(){
