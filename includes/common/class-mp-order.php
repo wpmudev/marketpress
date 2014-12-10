@@ -206,13 +206,32 @@ class MP_Order {
 	}
 	
 	/**
+	 * Send email to buyers
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param string $subject The email subject text.
+	 * @param string $msg The email message text.
+	 */
+	protected function _send_email_to_buyers( $subject, $msg ) {
+		$billing_email = $this->get_meta( 'mp_billing_info->email', '' );
+		$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
+		mp_send_email( $billing_email, $subject, $msg );
+		
+		if ( $billing_email != $shipping_email ) {
+			// Billing email is different than shipping email so let's send an email to the shipping email too
+			mp_send_email( $shipping_email, $subject, $msg );
+		}
+	}
+	
+	/**
 	 * Send new order notifications
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	protected function _send_notifications() {
-		$subject =  mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->subject' ) ) ) );
+	protected function _send_new_order_notifications() {
+		$subject =  mp_filter_email( $this, stripslashes( mp_get_setting( 'email->new_order->subject' ) ) );
 		$msg = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->text' ) ) ) );
 		
 		if ( has_filter( 'mp_order_notification_subject' ) ) {
@@ -246,16 +265,8 @@ class MP_Order {
 		$msg = apply_filters( 'mp_order/notification_body', $msg, $this );
 		$msg = apply_filters( 'mp_order/notification_body_' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
 
-		// Send email to buyer
-		$billing_email = $this->get_meta( 'mp_billing_info->email', '' );
-		$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
-		$email_sent = mp_send_email( $billing_email, $subject, $msg );
-		
-		if ( $billing_email != $shipping_email ) {
-			// Billing email is different than shipping email so let's send an email to the shipping email too
-			$email_sent = mp_send_email( $shipping_email, $subject, $msg );
-		}
-		
+		$this->_send_email_to_buyers( $subject, $msg );
+				
 		// Send message to admin
 		$subject = __('New Order Notification: ORDERID', 'mp');
 		$msg = __('A new order (ORDERID) was created in your store:<br /><br />
@@ -293,36 +304,104 @@ You can manage this order here: %s', 'mp');
 	}
 	
 	/**
+	 * Send notification that the order has shipped
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _send_shipment_notification() {
+		$subject = stripslashes( mp_get_setting( 'email->order_shipped->subject' ) );
+		$msg = nl2br( stripslashes( mp_get_setting( 'email->order_shipped->text' ) ) );
+
+		if ( has_filter( 'mp_shipped_order_notification_subject' ) ) {
+			trigger_error( 'The <strong>mp_shipped_order_notification_subject</strong> hook has been replaced with <strong>mp_order/shipment_notification_subject</strong> as of MP 3.0', E_USER_ERROR );
+		}
+		
+		if ( has_filter( 'mp_shipped_order_notification_body' ) ) {
+			trigger_error( 'The <strong>mp_shipped_order_notification_body</strong> hook has been replaced with <strong>mp_order/shipment_notification_body</strong> as of MP 3.0', E_USER_ERROR );
+		}
+		
+		if ( has_filter( 'mp_shipped_order_notification' ) ) {
+			trigger_error( 'The <strong>mp_shipped_order_notification</strong> hook has been replaced with <strong>mp_order/shipment_notification</strong> as of MP 3.0', E_USER_ERROR );
+		}
+		
+		/**
+		 * Filter the shipment notification subject
+		 *
+		 * @since 3.0
+		 * @param string $subject The email subject.
+		 * @param MP_Order $this The current order object.
+		 */
+		$subject = apply_filters( 'mp_order/shipment_notification_subject', $subject , $this );
+		$subject = mp_filter_email( $this, $subject );
+	 
+		/**
+		 * Filter the shipment notification body before string replacements happen
+		 *
+		 * @since 3.0
+		 * @param string $msg The email message.
+		 * @param MP_Order $this The current order object.
+		 */
+		$msg = apply_filters( 'mp_order/shipment_notification_body', $msg, $this );
+		$msg = mp_filter_email( $this, $msg );
+		
+		/**
+		 * Filter the shipment notification body after string replacements happen
+		 *
+		 * @since 3.0
+		 * @param string $msg The email message.
+		 * @param MP_Order $this The current order object.
+		 */
+		$msg = apply_filters( 'mp_order/shipment_notification', $msg, $this );
+		
+		$this->_send_email_to_buyers( $subject, $msg );
+	}
+	
+	/**
 	 * Change the order status
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param string $status The new order status.
+	 * @param bool $update_post Whether to update the post status or not.
 	 */
-	public function change_status( $status ) {
+	public function change_status( $status, $update_post = false ) {
+		$cache_key = 'order_status_changed_' . $status . '_' . $this->ID;
+		if ( wp_cache_get( $cache_key , 'mp_order' ) ) {
+			// Order status already updated - bail
+			return;
+		}
+		wp_cache_set( $cache_key, true, 'mp_order' );
+		
 		$action = "mp_order_{$status}";
-		$post_status = 'order_' . $status;
+		
+		if ( false === strpos( $status, 'order_' ) && 'trash' != $status ) {
+			$status = 'order_' . $status;
+		}
 		
 		switch ( $status ) {
-			case 'received' :
+			case 'order_received' :
 				add_post_meta( $this->ID, 'mp_received_time', time(), true );
 			break;
 			
-			case 'paid' :
+			case 'order_paid' :
 				add_post_meta( $this->ID, 'mp_paid_time', time(), true );
 			break;
 			
-			case 'shipped' :
+			case 'order_shipped' :
 				add_post_meta( $this->ID, 'mp_shipped_time', time(), true );
+				if ( ! $this->get_cart()->is_download_only() ) {
+					$this->_send_shipment_notification();
+				}
 			break;
 			
-			case 'closed' :
+			case 'order_closed' :
 				add_post_meta( $this->ID, 'mp_closed_time', time(), true );
 			break;
 			
 			case 'trash' :
 				add_post_meta( $this->ID, 'mp_trashed_time', time(), true );
 				$action = 'mp_order_trashed';
-				$post_status = 'trash';
 			break;
 			
 			default :
@@ -340,10 +419,12 @@ You can manage this order here: %s', 'mp');
 		do_action( $action, $this );
 
 		// Update the order status
-		wp_update_post( array(
-			'ID' => $this->ID,
-			'post_status' => $status,
-		) );
+		if ( $update_post ) {
+			wp_update_post( array(
+				'ID' => $this->ID,
+				'post_status' => $status,
+			) );
+		}
 	}
 	
 	/**
@@ -842,7 +923,7 @@ You can manage this order here: %s', 'mp');
 		
 		// If applicable, update order status to paid
 		if ( $paid ) {
-			$this->change_status( 'paid' );
+			$this->change_status( 'order_paid', true );
 		}
 
 		// Update order history
@@ -888,11 +969,11 @@ You can manage this order here: %s', 'mp');
 		mp_cart()->empty_cart();		
 		
 		// Send new order email
-		$this->_send_notifications();
+		$this->_send_new_order_notifications();
 
 		// If paid and the cart is only digital products mark it shipped
 		if ( $paid && mp_cart()->is_download_only() ) {
-			$this->change_status( 'shipped' );
+			$this->change_status( 'order_shipped', true );
 		}
 
 		// Cache the ID for later use
@@ -910,7 +991,7 @@ You can manage this order here: %s', 'mp');
 		$tracking_number = esc_attr( $this->get_meta( 'mp_shipping_info->tracking_num' ) );
 		$method = $this->get_meta( 'mp_shipping_info->method' );
 		
-		switch ( $method ) {
+		switch ( strtoupper( $method ) ) {
 			case 'UPS' :
 				$url = 'http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=' . $tracking_number . '&track.x=0&track.y=0';
 			break;
