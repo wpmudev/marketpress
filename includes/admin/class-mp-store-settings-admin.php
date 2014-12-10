@@ -113,7 +113,7 @@ class MP_Store_Settings_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Capabilities', 'mp'), __('User Capabilities', 'mp'), $cap, 'store-settings-capabilities', false);
 		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 		add_submenu_page('store-settings', __('Store Settings: Add Ons', 'mp'), __('Add Ons', 'mp'), $cap, 'store-settings-addons', false);
-		add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
+		//add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
 
 	 	if ( ! WPMUDEV_REMOVE_BRANDING ) {
 			add_action('load-toplevel_page_store-settings', array(&$this, 'add_help_tab'));
