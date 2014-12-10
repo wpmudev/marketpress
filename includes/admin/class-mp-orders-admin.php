@@ -34,6 +34,8 @@ class MP_Orders_Admin {
 		//meta boxes
 		add_action( 'add_meta_boxes_mp_order', array( &$this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+		//perform some actions when order status changes
+		add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 );
 		//add menu items
 		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
 		//change the "enter title here" text
@@ -67,8 +69,19 @@ class MP_Orders_Admin {
 		}
 		
 		$order = new MP_Order( $post_id );
-		$order->update_meta( 'mp_shipping_info->tracking_num', trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) ) );
-		$order->update_meta( 'mp_shipping_info->method', trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) ) );
+		
+		// update tracking info
+		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
+		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
+		$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
+		$order->update_meta( 'mp_shipping_info->method', $shipment_method );
+		
+		// update status to shipped?
+		if ( ! empty( $tracking_num) && ! empty( $shipment_method ) && 'shipped' != $order->post_status && 'shipped' != mp_get_post_value( 'post_status' ) ) {
+			remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+			$order->change_status( 'order_shipped', true );
+			add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+		}
 		
 		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
 		if ( ! empty( $order_notes ) ) {
@@ -357,7 +370,27 @@ class MP_Orders_Admin {
 		
 		exit;
 	}
-	
+
+	/**
+	 * Change order status
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action transition_post_status
+	 */
+	public function change_order_status( $new_status, $old_status, $post ) {
+		if ( $new_status == $old_status ) {
+			// status hasn't changed - bail
+		}
+		
+		if ( $post->post_type != 'mp_order' ) {
+			// this isn't an order - bail
+		}
+		
+		$order = new MP_Order( $post );
+		$order->change_status( $new_status, false );
+	}
+		
 	/**
 	 * Modifies the query object for orders
 	 *
@@ -421,7 +454,7 @@ class MP_Orders_Admin {
 ( function( $ ) {
 	jQuery(document).ready(function($){
 		var setActiveAdminMenu = function(){
-			$('#menu-posts-product, #menu-posts-product > a')
+			$('#menu-posts-product, #menu-posts-product > a, #menu-posts-mp_product, #menu-posts-mp_product > a')
 				.addClass('wp-menu-open wp-has-current-submenu')
 				.find('a[href="edit.php?post_type=mp_order"]').parent().addClass('current');
 		};
