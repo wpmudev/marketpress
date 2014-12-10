@@ -15,22 +15,27 @@ var mp_cart = {};
 			error.appendTo(element.closest('.mp_product_options_att').find('.mp_product_options_att_label'));
 		},
 		"ignore" : "",
-		"submitHandler" : function(form){
-			var $form = $(form),
-					$loadingGraphic = $('#cboxLoadingOverlay'),
-					item = {},
-					qty = $form.find('[name="product_quantity"]').val();
-					
-			// Build item object
-			item['product_id'] = $form.find('[name="product_id"]').val();
-			$form.find('[name^="product_attr_"]').filter(':checked').each(function(){
-				var $this = $(this);
-				item[$this.attr('name')] = $this.val();
-			});
+		"submitHandler" : function( form ) {
+			var $form = $( form );
+			var qty = $form.find( '[name="product_quantity"]' ).val();
+			var product_id = $form.find( '[name="product_id"]' ).val();
+			var item;
 			
-			$loadingGraphic.show();
-						
-			mp_cart.addItem($form, item, qty);
+			if ( $form.find( '[name^="product_attr_"]' ).length > 0 ) {
+				// Product has attributes, build item object accordingly
+				item = {};
+				item['product_id'] = product_id;
+				$form.find( '[name^="product_attr_"]' ).filter( ':checked' ).each( function() {
+					var $this = $( this );
+					item[ $this.attr('name') ] = $this.val();
+				} );
+			} else {
+				// Product doesn't have attributes, just submit product_id as item
+				item = product_id;
+			}
+			
+			marketpress.loadingOverlay( 'show' );
+			mp_cart.addItem( $form, item, qty );
 		}
 	};
 		
