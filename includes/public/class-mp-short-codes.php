@@ -238,7 +238,7 @@ class MP_Short_Codes {
   	
   	extract( $atts );
 
-    return mp_popular_products(false, $number);
+    return mp_popular_products( false, $number );
   }
   
   /**

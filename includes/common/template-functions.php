@@ -1064,6 +1064,68 @@ if ( ! function_exists('mp_pinit_button') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_popular_products' ) ) :
+/**
+ * Displays a list of popular products ordered by sales.
+ *
+ * @since 3.0
+ * @param bool $echo Optional, whether to echo or return
+ * @param int $num Optional, max number of products to display. Defaults to 5
+ */
+function mp_popular_products( $echo = true, $num = 5 ) {
+		$num = (int) $num;
+		$custom_query = new WP_Query( array(
+			'post_type' => MP_Product::get_post_type(),
+			'post_status' => 'publish',
+			'posts_per_page' => $num,
+			'meta_query' => array(
+				array(
+					'key' => 'mp_sales_count',
+					'value' => '0',
+					'compare' => '>',
+					'type' => 'NUMERIC',
+				),
+			),
+			'orderby' => 'meta_value_num',
+			'meta_key' => 'mp_sales_count',
+			'order' => 'DESC',
+		) );
+		
+		$content = '
+			<ul id="mp_popular_products">';
+		
+		if ( $custom_query->have_posts() ) {
+			while ( $custom_query->have_posts() ) : $custom_query->the_post();
+				$content .= '
+				<li><a href="' . get_permalink() . '">' . get_the_title() . '</a></li>';
+			endwhile;
+			wp_reset_postdata();
+		} else {
+				$content .= '
+				<li>' . __( 'No Products', 'mp' ) . '</li>';
+		}
+		
+		$content .= '
+			</ul>';
+		
+		/**
+		 * Filter the popular products html
+		 *
+		 * @since 3.0
+		 * @param string $content The current HTML markup.
+		 * @param int $num The number of products to display.
+		 */
+		$content = apply_filters( 'mp_popular_products', $content, $num );
+		
+		if ( $echo ) {
+			echo $content;
+		} else {
+			return $content;
+		}
+}
+endif;
+
+
 if ( ! function_exists('mp_product') ) {
 	/*
 	 * Displays a single product according to preference
