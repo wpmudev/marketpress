@@ -67,17 +67,21 @@ class MP_Products_Screen {
 	 */
 	public function maybe_hide_core_metaboxes( $field ) {
 		?>
-		<script type="text/javascript">
-		jQuery(document).ready(function($){
-			$('[name="has_variations"]').change(function(){
-				if ( $(this).prop('checked') ) {
-					$('#postimagediv, #postdivrich, #postexcerpt').fadeOut(300);
-				} else {
-					$('#postimagediv, #postdivrich, #postexcerpt').fadeIn(300);
-				}
-			}).trigger('change');
-		});
-		</script>
+<script type="text/javascript">
+jQuery( document ).ready( function( $ ) {
+	$( '[name="has_variations"]' ).change( function() {
+		var $elms = $('#postimagediv, #postdivrich, #postexcerpt');
+		
+		if ( $( this ).prop( 'checked' ) ) {
+			$elms.hide();
+		} else {
+			tinymce.execCommand( 'mceRemoveEditor', false, 'content' );
+			$elms.show();
+			tinymce.execCommand( 'mceAddEditor', false, 'content' );
+		}
+	} ).trigger( 'change' );
+});
+</script>
 		<?php
 	}
 	
