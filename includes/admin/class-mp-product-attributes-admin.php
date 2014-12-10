@@ -183,90 +183,108 @@ th.column-ID {
 		
 		$product_atts = MP_Product_Attributes::get_instance();
 		$table_name = MP_Product_Attributes::get_instance()->get_table_name();
-		$redirect_url = remove_query_arg(array('action', 'action2'));
+		$redirect_url = remove_query_arg( array( 'action', 'action2' ) );
 		
 		if ( mp_get_get_value('action') == 'mp_add_product_attribute' ) {
-			$wpdb->insert($table_name, array(
-				'attribute_name' => mp_get_post_value('product_attribute_name', ''),
-				'attribute_terms_sort_by' => mp_get_post_value('product_attribute_terms_sort_by', ''),
-				'attribute_terms_sort_order' => mp_get_post_value('product_attribute_terms_sort_order', ''),
+			$wpdb->insert( $table_name, array(
+				'attribute_name' => mp_get_post_value( 'product_attribute_name', '' ),
+				'attribute_terms_sort_by' => mp_get_post_value( 'product_attribute_terms_sort_by', '' ),
+				'attribute_terms_sort_order' => mp_get_post_value( 'product_attribute_terms_sort_order', '' ),
 			));
 			$attribute_id = $wpdb->insert_id;
-			$attribute_slug = $product_atts->generate_slug($attribute_id);
+			$attribute_slug = $product_atts->generate_slug( $attribute_id );
 		
 			//temporarily register the taxonomy - otherwise we won't be able to insert terms below
-			register_taxonomy($attribute_slug, 'product', array(
+			register_taxonomy( $attribute_slug, MP_Product::get_post_type(), array(
 				'show_ui' => false,
 				'show_in_nav_menus' => false,
 				'hierarchical' => true,
 			));
 		
 			//insert terms
-			foreach ( mp_get_post_value('product_attribute_terms->name->new', array()) as $key => $term_name ) {
-				if ( $term_slug = mp_get_post_value('product_attribute_terms->slug->new->' . $key) ) {
-					wp_insert_term($term_name, $attribute_slug, array('slug' => substr(sanitize_key($term_slug), 0, 32)));
+			foreach ( mp_get_post_value( 'product_attribute_terms->name->new', array() ) as $key => $term_name ) {
+				if ( $term_slug = mp_get_post_value( 'product_attribute_terms->slug->new->' . $key) ) {
+					wp_insert_term( $term_name, $attribute_slug, array( 'slug' => substr( sanitize_key( $term_slug ), 0, 32 ) ) );
 				} else {
-					wp_insert_term($term_name, $attribute_slug);
+					wp_insert_term( $term_name, $attribute_slug );
 				}
 			}
 			
 			//redirect
-			wp_redirect(add_query_arg(array('attribute_id' => $attribute_id, 'action' => 'mp_edit_product_attribute', 'mp_message' => 'mp_product_attribute_added'), $redirect_url));			
+			wp_redirect( add_query_arg( array(
+				'attribute_id' => $attribute_id,
+				'action' => 'mp_edit_product_attribute',
+				'mp_message' => 'mp_product_attribute_added'
+			), $redirect_url ) );			
 		} else {
 			$term_ids = array();
-			$attribute_id = mp_get_get_value('attribute_id');
-			$attribute_slug = $product_atts->generate_slug($attribute_id);
-			$wpdb->update($table_name, array(
-				'attribute_name' => mp_get_post_value('product_attribute_name', ''),
-				'attribute_terms_sort_by' => mp_get_post_value('product_attribute_terms_sort_by', ''),
-				'attribute_terms_sort_order' => mp_get_post_value('product_attribute_terms_sort_order', ''),
-			), array('attribute_id' => $attribute_id));
+			$attribute_id = mp_get_get_value( 'attribute_id' );
+			$attribute_slug = $product_atts->generate_slug( $attribute_id );
+			$wpdb->update( $table_name, array(
+				'attribute_name' => mp_get_post_value( 'product_attribute_name', '' ),
+				'attribute_terms_sort_by' => mp_get_post_value( 'product_attribute_terms_sort_by', '' ),
+				'attribute_terms_sort_order' => mp_get_post_value( 'product_attribute_terms_sort_order', '' ),
+			), array(
+				'attribute_id' => $attribute_id
+			) );
 
 			//insert terms
 			$order = 0;
-			foreach ( mp_get_post_value('product_attribute_terms', array()) as $order => $array ) {
+			foreach ( mp_get_post_value( 'product_attribute_terms', array() ) as $order => $array ) {
 				$term_args = array();
 					
-				if ( mp_arr_get_value('slug->new', $array) ) {
-					$term_slug = mp_arr_get_value('slug->new->0', $array);
-					$term_name = mp_arr_get_value('name->new->0', $array);
+				if ( mp_arr_get_value( 'slug->new', $array ) ) {
+					$term_slug = mp_arr_get_value( 'slug->new->0', $array );
+					$term_name = mp_arr_get_value( 'name->new->0', $array );
 					
-					if ( ! empty($term_slug) ) {
-						$term_args['slug'] = substr(sanitize_key($term_slug), 0, 32);
+					if ( ! empty( $term_slug ) ) {
+						$term_args['slug'] = substr( sanitize_key( $term_slug ), 0, 32 );
 					}
 					
-					$term = wp_insert_term($term_name, $attribute_slug, $term_args);
+					$term = wp_insert_term( $term_name, $attribute_slug, $term_args );
 					
-					if ( ! is_wp_error($term) ) {
+					if ( ! is_wp_error( $term ) ) {
 						$term_ids[] = $term_id = $term['term_id'];
 					} else {
 						// term slug already exists, get existing term slug
 						$term_ids[] = $term_id = $term->error_data['term_exists'];
 					}
 				} else {
-					$term_id = $term_ids[] = key(mp_arr_get_value('slug->existing', $array));
-					$term_args['slug'] = mp_arr_get_value("slug->existing->$term_id", $array);
-					$term_args['name'] = mp_arr_get_value("name->existing->$term_id", $array);
+					$term_id = $term_ids[] = key( mp_arr_get_value( 'slug->existing', $array ) );
+					$term_args['slug'] = mp_arr_get_value( "slug->existing->$term_id", $array );
+					$term_args['name'] = mp_arr_get_value( "name->existing->$term_id", $array );
 					
-					if ( ! empty($term_args['slug']) ) {
-						$term_args['slug'] = substr(sanitize_key($term_args['slug']), 0, 32);
+					if ( ! empty( $term_args['slug'] ) ) {
+						$term_args['slug'] = substr( sanitize_key( $term_args['slug'] ), 0, 32 );
 					}
 					
-					wp_update_term($term_id, $attribute_slug, $term_args);					
+					wp_update_term( $term_id, $attribute_slug, $term_args );					
 				}
 				
 				// Update term order
-				$wpdb->update($wpdb->terms, array('term_order' => ($order + 1)), array('term_id' => $term_id));
+				$wpdb->update( $wpdb->terms, array(
+					'term_order' => ($order + 1)
+				), array(
+					'term_id' => $term_id
+				) );
 			}
 			
-			//remove deleted terms
-			$unused_terms = get_terms($attribute_slug, array('hide_empty' => false, 'exclude' => $term_ids));
+			// Remove deleted terms
+			$unused_terms = get_terms( $attribute_slug, array(
+				'hide_empty' => false,
+				'exclude' => $term_ids
+			) );
+			
 			foreach ( $unused_terms as $term ) {
-				wp_delete_term($term->term_id, $attribute_slug);
+				wp_delete_term( $term->term_id, $attribute_slug );
 			}
 			
 			//redirect
-			wp_redirect(add_query_arg(array('attribute_id' => $attribute_id, 'action' => 'mp_edit_product_attribute', 'mp_message' => 'mp_product_attribute_updated'), $redirect_url));			
+			wp_redirect( add_query_arg( array(
+				'attribute_id' => $attribute_id,
+				'action' => 'mp_edit_product_attribute',
+				'mp_message' => 'mp_product_attribute_updated'
+			), $redirect_url ) );			
 		}
 		
 		exit;
