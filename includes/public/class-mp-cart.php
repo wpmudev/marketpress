@@ -1238,7 +1238,7 @@ class MP_Cart {
 						if ( $tax_rate = mp_get_setting("tax->canada_rate->$state") ) {
 							$price = ($total * $tax_rate) + $special_total;
 						} else { //backwards compat with pre 2.2 if per province rates are not set
-							$price = ($total * $this->get_setting('tax->rate')) + $special_total;
+							$price = ($total * mp_get_setting('tax->rate')) + $special_total;
 						}
 					}
 				break;
@@ -1246,7 +1246,7 @@ class MP_Cart {
 				case 'AU':
 					//Australia taxes orders in country
 					if ( $country == 'AU' ) {
-						$price = ($total * $this->get_setting('tax->rate')) + $special_total;
+						$price = ($total * mp_get_setting('tax->rate')) + $special_total;
 					}
 				break;
 		
@@ -1254,12 +1254,12 @@ class MP_Cart {
 					//EU countries charge VAT within the EU
 					if ( in_array(mp_get_setting('base_country'), mp()->eu_countries) ) {
 						if ( in_array($country, mp()->eu_countries) ) {
-							$price = ($total * $this->get_setting('tax->rate')) + $special_total;
+							$price = ($total * mp_get_setting('tax->rate')) + $special_total;
 						}
 					} else {
 						//all other countries use the tax outside preference
 						if ( mp_get_setting('tax->tax_outside') || (! mp_get_setting('tax->tax_outside') && $country == mp_get_setting('base_country')) ) {
-							$price = ($total * $this->get_setting('tax->rate')) + $special_total;
+							$price = ($total * mp_get_setting('tax->rate')) + $special_total;
 						}
 					}
 				break;
