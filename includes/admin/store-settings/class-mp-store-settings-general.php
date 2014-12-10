@@ -199,37 +199,26 @@ jQuery(document).ready(function($){
 	public function update_states_dropdown( $field ) {
 		?>
 <script type="text/javascript">
-jQuery(document).ready(function($){
-	var $country = $('select[name="base_country"]'),
-			$state = $('select[name="base_province"]');
+jQuery( document ).ready( function( $ ){
+	var $country = $( 'select[name="base_country"]' ),
+			$state = $( 'select[name="base_province"]' );
 			
-	$country.on('change', function(e){
-		var data = [
-			{
-				"name" : "country",
-				"value" : e.val
-			},{
-				"name" : "action",
-				"value" : "mp_update_states_dropdown"
-			}
-		];
+	$country.on( 'change', function() {
+		var data = {
+			country : $country.val(),
+			action : "mp_update_states_dropdown"
+		};
 		
-		$country.select2('enable', false).isWorking(true);
-		$state.select2('enable', false);
+		$country.select2( 'enable', false ).isWorking( true );
+		$state.select2( 'enable', false );
 		
-		$.get(ajaxurl, $.param(data)).done(function(resp){
-			$country.select2('enable', true).isWorking(false);
-			$state.select2('enable', true);
+		$.post( ajaxurl, data ).done( function( resp ){
+			$country.select2( 'enable', true ).isWorking( false );
+			$state.select2( 'enable', true );
 			
 			if ( resp.success ) {
-				$state.empty();
-				
-				$.each(resp.data.states, function(val, text){
-					var $option = $('<option></option>').attr('value', val).text(text);
-					$state.append($option)
-				});
-				
-				$state.trigger('change');
+				$state.html( resp.data.states );
+				$state.trigger( 'change' );
 			}
 		});
 	});

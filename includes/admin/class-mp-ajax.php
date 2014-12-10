@@ -134,7 +134,7 @@ class MP_Ajax {
 		$states = false;
 		if ( $country = mp_get_post_value( 'country' ) ) {
 			$_states = mp_get_states( $country );
-			$states = '';
+			$states = '<option value="">' . __( 'Select One', 'mp' ) . '</option>';
 			$selected = mp_get_user_address_part( 'state', mp_get_post_value( 'type' ) );
 			foreach ( $_states as $val => $label ) {
 				$states .= '<option value="' . $val . '" ' . selected( $selected, $val, false ) . '>' . $label . '</option>'; 
