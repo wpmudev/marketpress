@@ -655,7 +655,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 
 		uasort($mp_shipping_options, array($this,'compare_rates') );
 
-		$shipping_options = $this->__format_shipping_options($mp_shipping_options);
+		$shipping_options = $this->_format_shipping_options($mp_shipping_options);
 
 		//Update the session. Save the currently calculated CRCs
 		mp_update_session_value('mp_shipping_options->' . $this->plugin_name, $mp_shipping_options);
