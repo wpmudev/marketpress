@@ -59,7 +59,7 @@ class MP_Store_Settings_Admin {
 				'store-settings_page_store-settings-payments',
 				'store-settings_page_store-settings-importers',
 				'store-settings_page_store-settings-capabilities',
-				'store-settings_page_store-setup-wizard',
+				//'store-settings_page_store-setup-wizard',
 			);
 			
 			foreach ( $screen_ids as $screen_id ) {
