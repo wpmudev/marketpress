@@ -129,6 +129,9 @@ class MP_Product_Attributes {
 		} else {
 			$wpdb->delete($this->get_table_name(), array('attribute_id' => $ids));
 		}
+		
+		// Force update of cache
+		$this->_atts = null;
 	}
 	
 	/**
