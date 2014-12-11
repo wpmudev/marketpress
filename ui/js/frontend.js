@@ -246,6 +246,19 @@ var marketpress = {};
 				 */
 				$scope.trigger(errorEvent.replace('//', '/'), [ message ]);				
 			}
+		},
+		
+		/**
+		 * Initialize product image lightbox
+		 *
+		 * @since 3.0
+		 */
+		initImageLightbox : function() {
+			$( '.mp_product_image_link' ).filter( '.mp_lightbox' ).colorbox( {
+				maxWidth : "90%",
+				maxHeight : "90%",
+				close : "x"
+			} );
 		}
 	};
 }(jQuery));
@@ -255,6 +268,7 @@ jQuery(document).ready(function(){
 	marketpress.initProductTabs();
 	marketpress.initToolTips();
 	marketpress.initOrderLookup();
+	marketpress.initImageLightbox();
 });
 
 window.onload = function(){

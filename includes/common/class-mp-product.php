@@ -1128,20 +1128,14 @@ class MP_Product {
 				}
 
 				if ( mp_get_setting('disable_large_image') ) {
-					$link = '';
+					$link = false;
 				} else {
-					$link = $this->image_url(false);
+					$link = $this->image_url(false, 'fullsize' );
 					$title = __('View Larger Image &raquo;', 'mp');
 				}
 
 				$link_class = ' class="mp_product_image_link mp_lightbox"';
 				$img_align = is_null($align) ? mp_get_setting('image_alignment_single') : $align;
-				
-				// in case another plugin is loading lightbox
-				if ( mp_get_setting('show_lightbox') ) {
-					$link_class .= ' rel="lightbox"';
-					wp_enqueue_script('mp-lightbox');
-				}
 			break;
 			
 			case 'widget' :

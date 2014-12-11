@@ -118,7 +118,8 @@ class MP_Public {
 		// JS
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js'), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js'), array( 'jquery' ), MP_VERSION, true );
-		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js'), array( 'jquery-ui-tooltip', 'hover-intent', 'select2' ), MP_VERSION, true );
+		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js'), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'select2' ), MP_VERSION, true );
 		
 		// Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
