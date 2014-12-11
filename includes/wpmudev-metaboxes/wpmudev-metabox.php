@@ -752,7 +752,7 @@ class WPMUDEV_Metabox {
 			foreach ( $this->fields as $field ) {
 				$post_key = $field->get_post_key($field->args['name']);
 				$value = $field->get_post_value($post_key);
-
+			
 				if ( $field instanceof WPMUDEV_Field_Repeater ) {
 					$values = $field->sort_subfields($value);
 					

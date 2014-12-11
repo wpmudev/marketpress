@@ -155,30 +155,49 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @return array
 	 */
 	public function sort_subfields( $unsorted ) {
-		$sorted = array();
-		foreach ( $unsorted as $idx => $array ) {
-			foreach ( $array as $input_name => $array2 ) {
-				if ( mp_arr_get_value('existing', $array2) ) {
-					$post_id = key(mp_arr_get_value('existing', $array2));
-					$value = mp_arr_get_value("existing->$post_id", $array2);
-					$sorted['_' . ltrim($post_id, '_')][$input_name] = $value; 
-				} elseif ( mp_arr_get_value('new', $array2)) {
-					$value = mp_arr_get_value('new->0', $array2);
-					$sorted[$idx][$input_name] = $value;
-				} else {
-					// Complex fields need one additional loop
-					foreach ( $array2 as $input_name2 => $array3 ) {
-						if ( mp_arr_get_value('existing', $array3) ) {
-							$post_id = key(mp_arr_get_value('existing', $array3));
-							$value = mp_arr_get_value("existing->$post_id", $array3);
-							$sorted['_' . ltrim($post_id, '_')][$input_name][$input_name2] = $value; 
-						} elseif ( mp_arr_get_value('new', $array3)) {
-							$value = mp_arr_get_value('new->0', $array3);
-							$sorted[$idx][$input_name][$input_name2] = $value;
-						}
+		$sorted = $name_keys = array();
+		
+		// Get the base field name for the repeater field
+		$this_name_parts = explode( '[', $this->args['name'] );
+		$this_name_parts = array_map( create_function( '$val', 'return rtrim( $val, "]" );' ), $this_name_parts );
+		$this_name_key = implode( '->', $this_name_parts );
+		
+		// Loop through the fields and setup the appropriate name keys (e.g. $key1->$key2->$key3)
+		foreach ( $unsorted as $idx => $fields ) {
+			foreach ( $this->subfields as $index => $field ) {
+				$name_parts = explode( '[', $field->args['name_base'] );
+				$name_parts = array_map( create_function( '$val', 'return rtrim( $val, "]" );' ), $name_parts );
+				$name_key = implode( '->', $name_parts );
+				$name_key = str_replace( $this_name_key, $idx, $name_key );
+				
+				if ( $field instanceof WPMUDEV_Field_Complex ) {
+					$subfields = $fields[ $field->args['original_name'] ];
+					foreach ( $subfields as $name => $subfield ) {
+						$name_keys[] = $name_key . '->' . $name;
 					}
+				} else {
+					$name_keys[] = $name_key;
 				}
 			}
+		}
+		
+		/* Loop through the name keys and get the type (either existing or new), id and value
+		and then add to the $sorted array */
+		foreach ( $name_keys as $name_key ) {
+			$keys = explode( '->', $name_key );
+			$array = mp_arr_get_value( $name_key, $unsorted );
+			$type = key( $array );
+			$array = current( $array );
+			$id = key( $array );
+			$val = current( $array );
+			
+			array_shift( $keys ); // we don't need the first key so disgard it
+			
+			if ( 'existing' == $type ) {
+				$id = '_' . ltrim( $id, '_' );
+			}
+			
+			mp_push_to_array( $sorted, $id . '->' . implode( '->', $keys ), $val );
 		}
 		
 		return $sorted;
@@ -464,7 +483,7 @@ jQuery(document).ready(function($){
 				$this.val('');
 			}
 			
-			$this.attr('name', newName + '[]');
+			$this.attr('name', newName + '[' + $clonedRow.index() + ']');
 		});
 		
 		$clonedRow.find('.wpmudev-subfield-inner').show();
@@ -523,7 +542,9 @@ jQuery(document).ready(function($){
 		if ( isset($args['name']) ) {
 			// Some fields (e.g. section) don't use the name argument
 			$args['original_name'] = $args['name'];
-			$args['name'] = $this->args['name'] . '[' . $args['name'] . '][new][]'; //repeater fields should be an array
+			$args['name_base'] = $this->args['name'] . '[' . $args['name'] . ']';
+			$args['name'] = $args['name_base'] . '[new][]'; //repeater fields should be an array
+			
 		}
 		
 		$args['echo'] = false;

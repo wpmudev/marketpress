@@ -207,6 +207,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		
 		$args['echo'] = false;
 		$args['original_name'] = $args['name'];
+		$args['name_base'] = $this->args['original_name'];
 		
 		if ( $this->is_subfield ) {
 			$args['name'] = str_replace('[new]', '[' . $args['name'] . '][new]', $this->args['name']);

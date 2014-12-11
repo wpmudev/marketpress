@@ -83,6 +83,7 @@ class WPMUDEV_Field {
 	 *
 	 *		@type string $name The field's name attribute.
 	 *		@type string $original_name The field's original name (subfield name attributes get changed)
+	 *		@type string $name_base The field's base name (for subfields)
 	 *		@type string $id The field's id attribute.
 	 *		@type string $class The field's class attribute.
 	 *		@type string $style The field's style attribute.
@@ -137,6 +138,8 @@ class WPMUDEV_Field {
 	public function __construct( $args = array() ) {
 		$this->args = array_replace_recursive(array(
 			'name' => '',
+			'original_name' => '',
+			'name_base' => '',
 			'id' => '',
 			'class' => '',
 			'style' => '',
@@ -430,9 +433,15 @@ class WPMUDEV_Field {
 	 * @param int $order
 	 */
 	public function set_order( $order ) {
+		// Set field order
 		$order = (float) $order;
-		$this->args['name'] = preg_replace('#\[#', "[$order][", $this->_name, 1);
 		$this->_order = $order;
+		
+		// Set name according to order
+		$name_parts = explode( '[', $this->args['name_base'] );
+		$find = array_pop( $name_parts );
+		$name_start = implode( '[', $name_parts );
+		$this->args['name'] = str_replace( $find, "$order][$find", $this->_name );
 	}
 	
 	/**
