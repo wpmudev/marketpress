@@ -191,16 +191,23 @@ var marketpress = {};
 		 * @since 3.0
 		 */	
 		initProductTabs : function(){
-			$('.mp_product_tab_label_link').click(function(e){
+			$( '.mp_product_tab_label_link' ).click( function( e ) {
 				e.preventDefault();
 				
-				var $this = $(this),
+				var $this = $( this ),
 						$tab = $this.parent(),
-						$target = $($this.attr('href'));
+						$target = $( $this.attr( 'href' ) );
 						
-				$tab.addClass('current').siblings().removeClass('current');
-				$target.show().siblings('.mp_product_content').hide();
+				$tab.addClass( 'current' ).siblings().removeClass( 'current' );
+				$target.show().siblings( '.mp_product_content' ).hide();
 			});
+			
+			if ( window.location.hash.length > 0 ) {
+				var $target = $( '[href="' + window.location.hash + '"]' );
+				if ( $target.length > 0 ) {
+					$target.trigger( 'click' );
+				}
+			}
 		},
 		
 		/**
