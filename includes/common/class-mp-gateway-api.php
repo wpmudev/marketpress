@@ -270,8 +270,8 @@ if( ! class_exists('MP_Gateway_API') ) {
     
 		//creates the payment method selections
 		function _payment_form_wrapper($content, $cart = null, $billing_info = null) {
-			if ( is_null($cart) ) {
-				$cart = mp_cart()->get_items();
+			if ( is_null( $cart ) ) {
+				$cart = mp_cart();
 			}
 			
 			if ( is_null($billing_info) ) {
