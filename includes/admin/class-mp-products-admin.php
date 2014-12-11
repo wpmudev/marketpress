@@ -474,7 +474,9 @@ jQuery( document ).ready( function( $ ) {
 		$metabox->add_field('post_select', array(
 			'name' => 'related_products',
 			'multiple' => true,
+			'placeholder' => __( 'Choose Products', 'mp' ),
 			'query' => array(
+				'post__not_in' => array( get_the_ID() ),
 				'post_type' => MP_Product::get_post_type(),
 				'posts_per_page' => -1,
 			),
