@@ -488,7 +488,13 @@ class Marketpress {
 		
 		add_filter('get_user_metadata', array(&$this, 'get_user_billing_info'), 10, 4);
 		
-		return get_user_meta($user_id, 'mp_shipping_info', false);
+		$meta = get_user_meta($user_id, 'mp_shipping_info', false);
+		
+		/* There is a small bug in WP core with the get_user_metadata filter that
+		will raise a PHP notice if an associative array is returned and $single is
+		set to true. This is because WP core assumes that the returned array will
+		be numerically index. */
+		return ( $single && is_array( $meta ) ) ? array( $meta ) : $meta;
 	}
 	
 	/**
@@ -500,13 +506,13 @@ class Marketpress {
 	public function includes() {
 		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
+		require_once $this->plugin_dir('includes/common/class-mp-product-attributes.php');		
 		require_once $this->plugin_dir('includes/common/class-mp-addons.php');
 		require_once $this->plugin_dir('includes/common/class-mp-order.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
 		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
-		require_once $this->plugin_dir('includes/common/class-mp-product-attributes.php');
 		require_once $this->plugin_dir('includes/common/template-functions.php');
 		
 		if ( is_admin() ) {
