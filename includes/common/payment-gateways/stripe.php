@@ -213,107 +213,58 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function payment_form( $cart, $shipping_info ) {
-			if ( $this->get_setting( 'embedded_form_type' ) ) {
-				// Use embedded form
-					$totals = array();
-					$description = '';
-					foreach ( $cart as $product_id => $variations ) {
-						foreach ($variations as $variation => $data) {
-								$totals[] = mp()->coupon_value_product($coupon, $data['price'] * $data['quantity'], $product_id) ;
-						}
-					}
+		$name = mp_get_user_address_part( 'name', 'billing' );
 
-					$total = array_sum($totals) * 100; //get the total as cents
-					$content = '<script>
-						jQuery(document).ready(function($){
-							var gateway = $(".mp_choose_gateway").val();
-							if( gateway	 === "stripe" ) {
-								$("#mp-gateway-form-stripe .mp_cart_direct_checkout").hide();
-								$("#mp_payment_confirm").click(function(e){
-									e.preventDefault();
-									$("#mp_payment_form").submit();
-								});
-							}
-							$(".mp_choose_gateway").change(function(){
-								if($(this).val() === "stripe") {
-									$("#mp-gateway-form-stripe .mp_cart_direct_checkout").hide();
-									$("#mp_payment_confirm").click(function(e){
-										e.preventDefault();
-										$("#mp_payment_form").submit();
-									});
-								}
-							});
-						});
-					</script>
-					<div align="right">
-						<form action="" method="POST">
-							<script
-									src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button"
-									data-key="' . $this->publishable_key . '"
-									data-amount="' . $total . '"
-									data-name="' . get_bloginfo('title') . '"
-									data-currency="' . $this->currency . '"
-									data-description="' . __('Your Order', 'mp') . '"
-									data-image="">
-							</script>
-						</form>
-					</div>';
-
-					return $content;
-			}
-
-			$name = mp_get_user_address_part( 'name', 'billing' );
-
-			$content = '
-				<div class="mp-checkout-form-row">
-					<label>' . __('Cardholder Name', 'mp') . '<span class="mp-field-required">*</span></label>
-					<input
-						id="mp-stripe-name"
-						type="text"
-						data-rule-required="true"
-						data-rule-cc-fullname="true"
-						value="' . esc_attr($name) . '" />
-				</div>
-				<div class="mp-checkout-form-row">
-					<label>' . __('Card Number', 'mp') . '<span class="mp-field-required">*</span></label>
-					<input
-						id="mp-stripe-cc-num"
-						type="text"
-						pattern="\d*"
-						autocomplete="cc-number"
-						class="mp-input-cc-num"
-						data-rule-required="true"
-						data-rule-cc-num="true"
-						style="width:200px" />
-				</div>
-				<div class="mp-checkout-form-row">
-					<div class="mp-checkout-input-complex clearfix">
-						<div class="mp-checkout-column">
-							<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
-							<input
-								type="text"
-								autocomplete="cc-exp"
-								id="mp-stripe-cc-exp"
-								class="mp-input-cc-exp"
-								data-rule-required="true"
-								data-rule-cc-exp="true"
-								style="width:100px" />
-						</div>
-						<div class="mp-checkout-column">
-							<label>' . __( 'Security Code ', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
-							<input
-								id="mp-stripe-cc-cvc"
-								class="mp-input-cc-cvc"
-								type="text"
-								autocomplete="off"
-								data-rule-required="true"
-								data-rule-cc-cvc="true"
-								style="width:75px;" />
-						</div>
+		$content = '
+			<div class="mp-checkout-form-row">
+				<label>' . __('Cardholder Name', 'mp') . '<span class="mp-field-required">*</span></label>
+				<input
+					id="mp-stripe-name"
+					type="text"
+					data-rule-required="true"
+					data-rule-cc-fullname="true"
+					value="' . esc_attr($name) . '" />
+			</div>
+			<div class="mp-checkout-form-row">
+				<label>' . __('Card Number', 'mp') . '<span class="mp-field-required">*</span></label>
+				<input
+					id="mp-stripe-cc-num"
+					type="text"
+					pattern="\d*"
+					autocomplete="cc-number"
+					class="mp-input-cc-num"
+					data-rule-required="true"
+					data-rule-cc-num="true"
+					style="width:200px" />
+			</div>
+			<div class="mp-checkout-form-row">
+				<div class="mp-checkout-input-complex clearfix">
+					<div class="mp-checkout-column">
+						<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
+						<input
+							type="text"
+							autocomplete="cc-exp"
+							id="mp-stripe-cc-exp"
+							class="mp-input-cc-exp"
+							data-rule-required="true"
+							data-rule-cc-exp="true"
+							style="width:100px" />
 					</div>
-				</div>';
-				
-			return $content;
+					<div class="mp-checkout-column">
+						<label>' . __( 'Security Code ', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
+						<input
+							id="mp-stripe-cc-cvc"
+							class="mp-input-cc-cvc"
+							type="text"
+							autocomplete="off"
+							data-rule-required="true"
+							data-rule-cc-cvc="true"
+							style="width:75px;" />
+					</div>
+				</div>
+			</div>';
+			
+		return $content;
 	}
 
 	/**
@@ -478,11 +429,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			'options' => $this->currencies,
 			'default_value' => mp_get_setting('currency'),
 			'desc' => __('Selecting a currency other than that used for your store may cause problems at checkout.', 'mp'),
-		));
-		$metabox->add_field('checkbox', array(
-			'name' => $this->get_field_name('embedded_form_type'),
-			'label' => array('text' => __('Use Default Embedded Form?', 'mp')),
-			'value' => 'default',
 		));
 	}
 	
