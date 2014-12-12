@@ -72,7 +72,11 @@ if ( ! function_exists( '_mp_products_html' ) ) :
 		while ( $custom_query->have_posts() ) : $custom_query->the_post();
 			$product = new MP_Product();
 			
-			$img = $product->image( false, 'list' );
+			$align = null;
+			if ( 'list' == mp_get_setting( 'list_view' ) ) {
+				$align = mp_get_setting( 'image_alignment_list' );
+			}
+			$img = $product->image( false, 'list', null, $align );
 			
 			$excerpt = mp_get_setting( 'show_excerpt' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
 			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
@@ -103,11 +107,13 @@ if ( ! function_exists( '_mp_products_html' ) ) :
 					<div class="mp_one_product"' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '>
 						<div class="mp_product_detail">
 							' . $img . '
-							' . $pinit .'
-							<h3 class="mp_product_name entry-title" itemprop="name">
-								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
-							</h3>'
-							. $mp_product_list_content . '
+							<div class="mp_product_content">
+								' . $pinit .'
+								<h3 class="mp_product_name entry-title" itemprop="name">
+									<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+								</h3>'
+								. $mp_product_list_content . '
+							</div>
 						</div>
 
 						<div class="mp_price_buy">
