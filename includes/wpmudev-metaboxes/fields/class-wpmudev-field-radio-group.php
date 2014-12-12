@@ -20,6 +20,8 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 			'options' => array(),
 			'width' => null,
 		), $args);
+		
+		//FB::log( print_r( $this->args, true ) );
 	}
 	
 	/**
@@ -30,27 +32,32 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id = null ) {
-		if ( is_null($this->args['width']) ) {
+		$args = $this->args;
+		
+		if ( is_null( $args['width'] ) ) {
 			$width = '100%';
-			if ( count($this->args['options']) > 0 ) {
-				$width = max(floor(100 / count($this->args['options'])), 20) . '%';
+			if ( count( $args['options'] ) > 0 ) {
+				$width = max( floor(100 / count( $args['options'] ) ), 20) . '%';
 			}
 		} else {
 			$width = $this->args['width'];
 		}
 		
+		
 		$this->before_field(); ?>
-		<div class="wpmudev-radio-group <?php echo $this->args['orientation']; ?>">
+		<div class="wpmudev-radio-group <?php echo $args['orientation']; ?>">
 		<?php
-		foreach ( $this->args['options'] as $value => $label ) {
-			$field = new WPMUDEV_Field_Radio(array_replace_recursive($this->args, array(
-				'name' => $this->args['name'],
-				'value' => $value,
-				'default_value' => $this->args['default_value'],
-				'label' => array('text' => $label),
-				'width' => $width,
-			)));
-			$field->display($post_id);
+		foreach ( $args['options'] as $value => $label ) {
+			/* these attributes are already set so we don't want to re-run the
+			initialization logic for each radio field */
+			$args['conditional'] = false; 
+			
+			$args['value'] = $value;
+			$args['label'] = array( 'text' => $label );
+			$args['width'] = $width;
+			
+			$field = new WPMUDEV_Field_Radio( $args );
+			$field->display( $post_id );
 		} ?>
 		</div>
 		<?php

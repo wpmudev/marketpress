@@ -46,6 +46,7 @@ class WPMUDEV_Field_Checkbox_Group extends WPMUDEV_Field {
 		<?php
 		foreach ( $this->args['options'] as $value => $label ) {
 			$field = new WPMUDEV_Field_Checkbox(array_replace_recursive($this->args, array(
+				'conditional' => false,
 				'name' => $this->args['name'] . '[' . $value . ']',
 				'default_value' => $this->args['default_value'],
 				'value' => ( $this->args['use_options_values'] ) ? $value : 1,
