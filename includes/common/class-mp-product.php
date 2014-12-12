@@ -984,22 +984,67 @@ class MP_Product {
 	 * }
 	 */
 	public function related_products( $args = array() ) {
-		$args = array_replace_recursive(array(
-			'relate_by' => mp_get_setting('related_products->relate_by'),
+		$html = '';
+		$args = array_replace_recursive( array(
+			'relate_by' => mp_get_setting( 'related_products->relate_by' ),
 			'echo' => false,
-			'limit' => mp_get_setting('related_products->show_limit'),
-			'view' => mp_get_setting('related_products->view'),
+			'limit' => mp_get_setting( 'related_products->show_limit' ),
+			'view' => mp_get_setting( 'related_products->view' ),
 		), $args);
 		
-		extract($args);
+		extract( $args );
 		
-		$html = '';
 		$query_args = array(
 			'post_type' => MP_Product::get_post_type(),
 			'posts_per_page' => $limit,
 		);
 		
-		//! TODO: finish coding MP_Product::related_products()
+		if ( $related_products = $this->get_meta( 'related_products' ) ) {
+			$query_args['post__in'] = $related_products;
+		} else {
+			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
+			$count = 0;
+			
+			if ( 'categories' != $relate_by ) {
+				$terms = get_the_terms( $post_id, 'product_tag' );
+				$ids = wp_list_pluck( $terms, 'term_id' );
+				$query_args['tax_query'][] = array(
+					'taxonomy' => 'product_tag',
+					'terms' => $ids,
+				);
+				$count ++;
+			}
+			
+			if ( 'tags' != $relate_by ) {
+				$terms = get_the_terms( $post_id, 'product_category' );
+				$ids = wp_list_pluck( $terms, 'term_id' );
+				$query_args['tax_query'][] = array(
+					'taxonomy' => 'product_category',
+					'terms' => $ids,
+				);
+				$count ++;
+			}
+			
+			if ( $count > 1 ) {
+				$query_args['tax_query']['relation'] = 'AND';
+			}
+		}
+		
+		$product_query = new WP_Query( $query_args );
+		
+		if ( $product_query->have_posts() ) {
+			switch ( $view ) {
+				case 'grid' :
+					$html .= _mp_products_html_grid( $product_query );
+				break;
+				
+				case 'list' :
+					$html .= _mp_products_html_list( $product_query );
+				break;
+			}
+		} else {
+			$html .= wpautop( __(' There are no related products for this item.', 'mp' ) );
+		}
 		
 		/**
 		 * Filter the related products html
@@ -1007,9 +1052,10 @@ class MP_Product {
 		 * @since 3.0
 		 * @param string $html The current html.
 		 * @param MP_Product $this The current product object.
+		 * @param WP_Query $product_query The WP_Query object used to populate the related products.
 		 * @param array $args The array of arguments that were passed to the method.
 		 */
-		$html = apply_filters('mp_product/related_products', $html, $this, $args);
+		$html = apply_filters( 'mp_product/related_products', $html, $this, $product_query, $args );
 		
 		if ( $echo ) {
 			echo $html;

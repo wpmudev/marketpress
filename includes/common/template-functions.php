@@ -45,6 +45,124 @@ if ( ! function_exists( '_mp_order_status_overview' ) ) :
 	}
 endif;
 
+if ( ! function_exists( '_mp_products_html' ) ) :
+	/**
+	 * Display products according to preference
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $view Either "grid" or "list".
+	 * @param WP_Query $custom_query A WP_Query object.
+	 * @return string
+	 */
+	function _mp_products_html( $view, $custom_query ) {
+		$html = '';
+		$per_row = (int) mp_get_setting( 'per_row' );
+		$width = round( 100 / $per_row, 1 ) . '%';
+		$column = 1;
+		
+		//get image width
+		if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
+			$img_width = mp_get_setting( 'list_img_width' ) . 'px';
+		} else {
+			$size = mp_get_setting( 'list_img_size' );
+			$img_width = get_option( $size . '_size_w' ) . 'px';
+		}
+		
+		while ( $custom_query->have_posts() ) : $custom_query->the_post();
+			$product = new MP_Product();
+			
+			$img = $product->image( false, 'list' );
+			
+			$excerpt = mp_get_setting( 'show_excerpt' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
+			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
+	
+			$pinit = $product->pinit_button( 'all_view' );
+
+			$class = array();
+			$class[] = ( strlen( $img ) > 0 ) ? 'mp_thumbnail' : '';
+			$class[] = ( strlen( $excerpt ) > 0 ) ? 'mp_excerpt' : '';
+			$class[] = ( $product->has_variations() ) ? 'mp_price_variations' : '';
+			$class[] = ( $product->on_sale() ) ? 'mp_on_sale' : '';
+			
+			if ( 'grid' == $view ) {
+				if ( $column == 1 ) {
+					$class[] = 'first';
+					$html .= '<div class="mp_grid_row">';
+					$column ++;
+				} elseif ( $column == $per_row ) {
+					$class[] = 'last';
+					$column = 1;
+				}
+			}
+			
+			$class = array_filter( $class, create_function( '$s', 'return ( ! empty( $s ) );' ) );
+
+			$html .= '
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . '"' . (( 'grid' == $view ) ? ' style="width: ' . $width . '"' : '') . '>
+					<div class="mp_one_product"' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '>
+						<div class="mp_product_detail">
+							' . $img . '
+							' . $pinit .'
+							<h3 class="mp_product_name entry-title" itemprop="name">
+								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+							</h3>'
+							. $mp_product_list_content . '
+						</div>
+
+						<div class="mp_price_buy">
+							' . $product->display_price( false ) . '
+							' . $product->buy_button( false, 'list' ) . '
+							' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
+						</div>
+						
+						<div style="display:none">
+							<span class="entry-title">' . $product->title( false ) . '</span> was last modified:
+							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
+							<span class="author vcard"><span class="fn">' . get_the_author_meta( 'display_name' ) . '</span></span>
+						</div>
+					</div>
+				</div>';
+			
+			if ( $column == 1 && $view == 'grid' ) {
+				$html .= '</div><!-- END .mp_grid_row -->';				
+			}
+		endwhile;
+		
+		if ( $column != 1 && $view == 'grid' ) {
+			$html .= '</div><!-- END .mp_grid_row -->';
+		}
+
+		if ( $view == 'grid' ) {
+			$html .= ( $custom_query->found_posts > 0 ) ? '<div class="clear"></div>' : '';
+		}
+		
+		wp_reset_postdata();
+		
+		/**
+		 * Filter the product list html content
+		 *
+		 * @since 3.0
+		 * @param string $html.
+		 * @param WP_Query $custom_query.
+		 */
+		return apply_filters( "_mp_products_html_{$view}", $html, $custom_query );
+	}
+endif;
+
+if ( ! function_exists( '_mp_products_html_list' ) ) :
+	/**
+	 * Display product list in list layout
+	 *
+	 * @since 3.0
+	 * @param WP_Query $custom_query
+	 * @return string
+	 */
+	function _mp_products_html_list( $custom_query ) {
+		return _mp_products_html( 'list', $custom_query );
+	}
+endif;
+
 if ( ! function_exists('_mp_products_html_grid')) :
 	/**
 	 * Display product list in grid layout
@@ -54,86 +172,7 @@ if ( ! function_exists('_mp_products_html_grid')) :
 	 * @return string
 	 */
 	function _mp_products_html_grid( $custom_query ) {
-		$html = '';
-		$per_row = (int) mp_get_setting('per_row');
-		$width = round(100 / $per_row, 1) . '%';
-		$column = 1;
-		
-		//get image width
-		if ( mp_get_setting('list_img_size') == 'custom' ) {
-			$img_width = mp_get_setting('list_img_width') . 'px';
-		} else {
-			$size = mp_get_setting('list_img_size');
-			$img_width = get_option($size . "_size_w") . 'px';
-		}
-		
-		while ( $custom_query->have_posts() ) : $custom_query->the_post();
-			$product = new MP_Product();
-			
-			$img = $product->image(false, 'list');
-			
-			$excerpt = mp_get_setting('show_excerpt') ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
-			$mp_product_list_content = apply_filters('mp_product_list_content', $excerpt, $product->ID);
-	
-			$pinit = $product->pinit_button('all_view');
-
-			$class = array();
-			$class[] = strlen($img) > 0 ? 'mp_thumbnail' : '';
-			$class[] = strlen($excerpt) > 0 ? 'mp_excerpt' : '';
-			$class[] = ( $product->has_variations() ) ? 'mp_price_variations' : '';
-			$class[] = ( $product->on_sale() ) ? 'mp_on_sale' : '';
-			
-			if ( $column == 1 ) {
-				$class[] = 'first';
-				$html .= '<div class="mp_grid_row">';
-				$column ++;
-			} elseif ( $column == $per_row ) {
-				$class[] = 'last';
-				$column = 1;
-			}
-			
-			$class = array_filter($class, create_function('$s', 'return ( ! empty($s) );'));
-
-			$html .= '
-				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode($class, ' ') . '" style="width: ' . $width . '">
-					<div class="mp_one_product" style="width:' . $img_width . '">
-						<div class="mp_product_detail">
-							' . $img . '
-							' . $pinit .'
-							<h3 class="mp_product_name entry-title" itemprop="name">
-								<a href="' . get_permalink($product->ID) . '">' . $product->post_title . '</a>
-							</h3>'
-							. $mp_product_list_content . '
-						</div>
-
-						<div class="mp_price_buy">
-							' . $product->display_price(false) . '
-							' . $product->buy_button(false, 'list') . '
-							' . apply_filters('mp_product_list_meta', '', $product->ID) . '
-						</div>
-						
-						<div style="display:none">
-							<span class="entry-title">' . get_the_title() . '</span> was last modified:
-							<time class="updated">' . get_the_time('Y-m-d\TG:i') . '</time> by
-							<span class="author vcard"><span class="fn">' . get_the_author_meta('display_name') . '</span></span>
-						</div>
-					</div>
-				</div>';
-			
-			if ( $column == 1 ) {
-				$html .= '</div><!-- END .mp_grid_row -->';				
-			}
-		endwhile;
-		
-		if ( $column != 1 ) {
-			$html .= '</div><!-- END .mp_grid_row -->';
-		}
-
-		$html .= ($custom_query->found_posts > 0) ? '<div class="clear"></div>' : '';
-		
-		wp_reset_postdata();
-		
-		return apply_filters('_mp_products_html_grid', $html, $custom_query);
+		return _mp_products_html( 'grid', $custom_query );
 	}
 endif;
 
@@ -1203,8 +1242,8 @@ if ( ! function_exists('mp_product') ) {
 			}
 						
 			$return .= '
-						</div>
-					</div>';
+					</div>
+				</div>';
 		}
 		
 		if ( mp_get_setting('related_products->show') ) {
