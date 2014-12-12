@@ -340,9 +340,16 @@ jQuery(document).ready(function($){
 				'alignright' => __('Right', 'mp'),
 			),
 			'conditional' => array(
-				'name' => 'show_thumbnail',
-				'value' => '1',
+				'operator' => 'AND',
 				'action' => 'show',
+				array(
+					'name' => 'show_thumbnail',
+					'value' => '1',
+				),
+				array(
+					'name' => 'list_view',
+					'value' => 'list',
+				),
 			),
 		));
 		$metabox->add_field('checkbox', array(
