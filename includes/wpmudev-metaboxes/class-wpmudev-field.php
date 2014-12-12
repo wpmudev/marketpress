@@ -124,8 +124,8 @@ class WPMUDEV_Field {
 	 *		Conditionally hide/show this field if another field value is a certain value.
 	 *
 	 *		Example 1: array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show');
-	 *		Example 2: array('operator' => 'AND', array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'), array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'));
-	 *		Example 3: array('operator' => 'OR', array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'), array('name' => 'field_name', 'value' => 'field_value', 'action' => 'show'));
+	 *		Example 2: array('operator' => 'AND', 'action' => 'show', array('name' => 'field_name', 'value' => 'field_value'), array('name' => 'field_name', 'value' => 'field_value'));
+	 *		Example 3: array('operator' => 'OR', 'action' => 'show', array('name' => 'field_name', 'value' => 'field_value'), array('name' => 'field_name', 'value' => 'field_value'));
 	 *
 	 *		@type string $name The name of the field to do the comparison on.
 	 *		@type string $value The value to check against. Use "-1" to check for a checkbox being unchecked.
