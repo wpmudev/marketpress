@@ -1129,7 +1129,7 @@ class MP_Product {
 		$img_classes = array('mp_product_image_' . $context, 'photo');
 		$title = esc_attr($this->title(false));
 		
-		if ( ! is_null($align) ) {
+		if ( ! is_null( $align ) && false === strpos( $align, 'align' ) ) {
 			$align = 'align' . $align;
 		}
 
