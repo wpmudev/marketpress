@@ -513,10 +513,10 @@ if ( ! function_exists('mp_get_user_address') ) :
 			return false;
 		}
 		
-		$data = $user->get("mp_{$what}_info");
+		$data = mp_get_session_value("mp_{$what}_info");
 		
 		if ( empty($data) ) {
-			$data = mp_get_session_value("mp_{$what}_info");
+			$data = $user->get("mp_{$what}_info");
 		}
 		
 		return $data;

@@ -506,7 +506,7 @@ You can manage this order here: %s', 'mp');
 	public function get_address( $type, $editable = false ) {
 		if ( ! $editable ) {
 			$html = '' .
-				$this->get_meta( "mp_{$type}_info->first_name", '' ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name", '' ) . '<br />' .
+				$this->get_name( $type ) . '<br />' .
 				$this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
 				(( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
 				(( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
