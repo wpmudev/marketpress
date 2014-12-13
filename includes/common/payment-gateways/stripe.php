@@ -437,8 +437,9 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 * you know the payment is successful right away go ahead and change the order status
 	 * as well.
 	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $billing_info. Contains billing info and email in case you need it
+	 * @param MP_Cart $cart. Contains the MP_Cart object.
+	 * @param array $billing_info. Contains billing info and email in case you need it.
+	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
 		//make sure token is set at this point
@@ -452,18 +453,18 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		if ( ! class_exists( 'Stripe' ) ) {
 			require_once mp_plugin_dir( 'includes/common/payment-gateways/stripe-files/lib/Stripe.php' );
 		}
-		
+				
 		Stripe::setApiKey( $this->private_key );
 
 		$totals = array(
-			'product_total' => mp_cart()->product_total( false ),
-			'shipping_total' => mp_cart()->shipping_total( false ),
+			'product_total' => $cart->product_total( false ),
+			'shipping_total' => $cart->shipping_total( false ),
 			'tax_price' => 0,
 		);
 
     // Get tax price, if applicable
     if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
-    	$totals['tax_price'] = mp_cart()->tax_total( false );
+    	$totals['tax_price'] = $cart->tax_total( false );
     }
     
     // Create a new order object
