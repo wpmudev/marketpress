@@ -29,6 +29,25 @@ if ( ! function_exists('get_field_value') ) :
 	}
 endif;
 
+if ( ! function_exists( 'field_exists' ) ) :
+	/**
+	 * Check if a field exists given a field name
+	 *
+	 * @since 3.0
+	 * @param string $name The name of the field. 
+	 * @param int $post_id The post ID to check.
+	 * @return bool
+	 */
+	function field_exists( $name, $post_id ) {
+		$key = $name;
+		if ( false === strpos( $name, '_' ) ) {
+			$key = '_' . $name;
+		}
+		
+		return ( metadata_exists( 'post', $post_id, $key ) );
+	}
+endif;
+
 if ( ! function_exists('field_value') ) :	
 	/**
 	 * Displays a field's value
