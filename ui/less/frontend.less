@@ -138,6 +138,36 @@
 	}
 }
 
+#mp_product_nav {
+	text-align: center;
+}
+
+#mp_product_nav_inner {
+	border: 1px solid #eaeaea;
+	border-radius: 5px;
+	display: inline-block;
+	font-size: .8em;
+	line-height: 1;
+	text-transform: uppercase;
+	vertical-align: top;
+	
+	.page-numbers {
+		border-left: 1px solid #eaeaea;
+		display: block;
+		float: left;
+		padding: 8px;
+		
+		&:first-child {
+			border-left: none;
+		}
+		
+		&.current {
+			background: #eaeaea;
+			font-weight: 700;
+		}
+	}	
+}
+
 #mp-order-history-pagination {
 	padding-top: 30px;
 	
