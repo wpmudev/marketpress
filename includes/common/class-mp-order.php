@@ -859,6 +859,12 @@ You can manage this order here: %s', 'mp');
 		// Save payment info
 		add_post_meta( $this->ID, 'mp_payment_info', $payment_info, true );
 		
+		// Update user shipping billing info
+		if ( $user_id ) {
+			update_user_meta( $user_id, 'mp_billing_info', $billing_info );
+			update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+		}
+		
 		$item_count = 0;
 		foreach ( $items as $item ) {
 			$item_count += $item->qty;
