@@ -190,14 +190,13 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 			$array = current( $array );
 			$id = key( $array );
 			$val = current( $array );
-			
-			array_shift( $keys ); // we don't need the first key so disgard it
+			$idx = array_shift( $keys );
 			
 			if ( 'existing' == $type ) {
 				$id = '_' . ltrim( $id, '_' );
 			}
 			
-			mp_push_to_array( $sorted, $id . '->' . implode( '->', $keys ), $val );
+			mp_push_to_array( $sorted, $idx . '->' . $id . '->' . implode( '->', $keys ), $val );
 		}
 		
 		return $sorted;
