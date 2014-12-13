@@ -151,7 +151,7 @@ class Marketpress {
 			'show_admin_column' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_get_setting('pages->products'),
+				'slug' => mp_store_page_uri( 'products', false ),
 			),
 		)));
 		
@@ -185,7 +185,7 @@ class Marketpress {
 			'show_ui' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_get_setting('pages->products'),
+				'slug' => mp_store_page_uri( 'products', false ),
 			),
 		)));
 
