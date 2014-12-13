@@ -151,7 +151,7 @@ class Marketpress {
 			'show_admin_column' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_store_page_uri( 'products', false ),
+				'slug' => mp_store_page_uri( 'products', false ) . '/category',
 			),
 		)));
 		
@@ -185,7 +185,7 @@ class Marketpress {
 			'show_ui' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_store_page_uri( 'products', false ),
+				'slug' => mp_store_page_uri( 'products', false ) . '/tag',
 			),
 		)));
 
@@ -391,10 +391,29 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @uses $wp_rewrite
 	 * @filter rewrite_rules_array
 	 */
-	public function add_rewrite_rules( $rewrites ) {
+	public function add_rewrite_rules( $rewrite_rules ) {
+		global $wp_rewrite;
+		
 		$new_rules = array();
+		
+		/*
+		Product categories/tags
+		
+		This is necessary, otherwise product cats and tags will return 404 errors
+		due to how rewrite rules are generated for pages.
+		
+		@see http://wordpress.stackexchange.com/questions/4127/custom-taxonomy-and-pages-rewrite-slug-conflict-gives-404
+		*/
+		if ( $post_id = mp_get_setting( 'pages->products' ) ) {
+			$page_structure = $wp_rewrite->get_page_permastruct();
+			$uri = get_page_uri( $post_id );
+			$wp_rewrite->add_rewrite_tag( '%pagename%', "({$uri})", 'pagename=' );
+			$page_rewrite_rules = $wp_rewrite->generate_rewrite_rules( $page_structure, EP_PAGES );
+			$rewrite_rules = array_merge( $page_rewrite_rules, $rewrite_rules );
+		}
 		
 		// Product variations
 		if ( $post_id = mp_get_setting( 'pages->products' ) ) {
@@ -408,7 +427,7 @@ class Marketpress {
 			$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 		}
 		
-		return $rewrites + $new_rules;
+		return $rewrite_rules + $new_rules;
 	}
 	
 	/**
