@@ -690,7 +690,7 @@ class WPMUDEV_Metabox {
 	}
 	
 	/**
-	 * Pushes a value with a given array with given key
+	 * Pushes a value to a given array with given key
 	 *
 	 * @since 1.0
 	 * @access public
@@ -723,18 +723,18 @@ class WPMUDEV_Metabox {
 	 * @param int $post_id The current post ID
 	 */
 	public function save_fields( $post_id ) {
-		if ( ! isset($_POST[$this->nonce_name]) || ! $this->is_active() || (isset($_POST[$this->nonce_name]) && ! wp_verify_nonce($_POST[$this->nonce_name], $this->nonce_action)) ) {
+		if ( ! isset( $_POST[ $this->nonce_name ] ) || ! $this->is_active() || (isset( $_POST[ $this->nonce_name ] ) && ! wp_verify_nonce( $_POST[ $this->nonce_name ], $this->nonce_action ) ) ) {
 			// Bail - nonce is not set or could not be verified or metabox is not active for current page
 			return;
 		}
 		
-		if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			// Bail - this is an autosave, our form has not been submitted
 			return;
 		}
 
 		// Avoid infinite loops later (e.g. when calling wp_insert_post, etc)
-		remove_action('save_post', array(&$this, 'save_fields'));
+		remove_action( 'save_post', array( &$this, 'save_fields' ) );
 
 		/**
 		 * Runs right before save_fields is run, but after nonces have been verified.
@@ -742,44 +742,43 @@ class WPMUDEV_Metabox {
 		 * @since 3.0
 		 * @param WPMUDEV_Metabox $this The current metabox
 		 */
-		do_action('wpmudev_metabox/before_save_fields', $this);
-		do_action('wpmudev_metabox/before_save_fields/' . $this->args['id'], $this);
+		do_action( 'wpmudev_metabox/before_save_fields', $this );
+		do_action( 'wpmudev_metabox/before_save_fields/' . $this->args['id'], $this );
 		
 		// For settings metaboxes we don't want to call the internal save methods for each field
-		if ( ! is_numeric($post_id) ) {
-			$settings = ( ! empty($this->args['site_option_name']) ) ? get_site_option($post_id, array()) : get_option($post_id, array());
+		if ( ! is_numeric( $post_id ) ) {
+			$settings = ( ! empty( $this->args['site_option_name'] ) ) ? get_site_option( $post_id, array() ) : get_option( $post_id, array() );
 			
 			foreach ( $this->fields as $field ) {
-				$post_key = $field->get_post_key($field->args['name']);
-				$value = $field->get_post_value($post_key);
+				$post_key = $field->get_post_key( $field->args['name'] );
+				$value = $field->get_post_value( $post_key );
 			
 				if ( $field instanceof WPMUDEV_Field_Repeater ) {
-					$values = $field->sort_subfields($value);
+					$values = $field->sort_subfields( $value );
+					$data = array();
 					
-					if ( count($values) == 2 ) {
-						$values = array_merge($values['existing'], $values['new']);
-					}
-					
-					foreach ( $values as $idx => $array ) {
-						$index = 0;                                                                                                                                                                                                                     
-						foreach ( $array as $idx2 => $val ) {
-							$values[$idx][$index] = $field->subfields[$index]->sanitize_for_db($val, $post_id);
-							$index ++;
+					foreach ( $values as $order => $array ) {
+						foreach ( $array as $id => $array2 ) {
+							$index = 0;
+							foreach ( $array2 as $name => $val ) {
+								$data[ $order ][ $name ] = $field->subfields[ $index ]->sanitize_for_db( $val, $post_id );
+								$index ++;
+							}
 						}
 					}
 					
-					$value = $values;
+					$value = $data;
 				} else {
-					$value = $field->sanitize_for_db($value, $post_id);
+					$value = $field->sanitize_for_db( $value, $post_id );
 				}
 				
-				$this->push_to_array($settings, $post_key, $value);
+				$this->push_to_array( $settings, $post_key, $value );
 			}
 			
-			if ( ! empty($this->args['site_option_name']) ) {
-				update_site_option($post_id, $settings);
+			if ( ! empty( $this->args['site_option_name'] ) ) {
+				update_site_option( $post_id, $settings );
 			} else {
-				update_option($post_id, $settings);
+				update_option( $post_id, $settings );
 			}
 			
 			/**
@@ -788,33 +787,33 @@ class WPMUDEV_Metabox {
 			 * @since 3.0
 			 * @param WPMUDEV_Metabox $this The metabox that was saved.
 			 */
-			do_action('wpmudev_metabox/after_settings_metabox_saved', $this);
-			do_action('wpmudev_metabox/after_settings_metabox_saved/' . $this->args['id'], $this);
+			do_action( 'wpmudev_metabox/after_settings_metabox_saved', $this );
+			do_action( 'wpmudev_metabox/after_settings_metabox_saved/' . $this->args['id'], $this );
 			
-			if ( did_action('wpmudev_metabox/after_settings_metabox_saved') == count(self::$metaboxes) ) {
+			if ( did_action( 'wpmudev_metabox/after_settings_metabox_saved' ) == count( self::$metaboxes ) ) {
 				/**
 				 * Fires after all of the settings metaboxes have been saved
 				 *
 				 * @since 3.0
 				 */
-				do_action('wpmudev_metabox/after_all_settings_metaboxes_saved');
-				do_action('wpmudev_metabox/after_all_settings_metaboxes_saved/' . $_REQUEST['page']);
+				do_action( 'wpmudev_metabox/after_all_settings_metaboxes_saved' );
+				do_action( 'wpmudev_metabox/after_all_settings_metaboxes_saved/' . $_REQUEST['page'] );
 				
 				// Redirect to avoid accidental saves on page refresh
-				wp_redirect(add_query_arg('wpmudev_metabox_settings_saved', 1), 301);
+				wp_redirect( add_query_arg( 'wpmudev_metabox_settings_saved', 1), 301 );
 				exit;
 			}
 		} else {
 			// Make sure $post_id isn't a revision
-			if ( wp_is_post_revision($post_id) ) {
+			if ( wp_is_post_revision( $post_id ) ) {
 				return;
 			}
 
 			// Make sure we only run once
-			if ( wp_cache_get('save_fields', 'wpmudev_metaboxes') ) {
+			if ( wp_cache_get( 'save_fields', 'wpmudev_metaboxes' ) ) {
 				return;
 			}
-			wp_cache_set('save_fields', true, 'wpmudev_metaboxes');
+			wp_cache_set( 'save_fields', true, 'wpmudev_metaboxes' );
 		
 			/**
 			 * Fires after the appropriate nonce's have been verified for fields to tie into.
@@ -822,7 +821,7 @@ class WPMUDEV_Metabox {
 			 * @since 3.0
 			 * @param int $post_id Post ID.
 			 */
-			do_action('wpmudev_metabox/save_fields', $post_id);
+			do_action( 'wpmudev_metabox/save_fields', $post_id );
 		}
 	}
 	

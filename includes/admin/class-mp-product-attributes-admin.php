@@ -146,8 +146,11 @@ th.column-ID {
 			case 'product_attribute_terms_sort_by' :
 			case 'product_attribute_terms_sort_order' :
 				$table_name = $wpdb->prefix . 'mp_product_attributes';
-				$attribute = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE attribute_id = %d", mp_get_get_value('attribute_id')));
-				$key = str_replace('product_', '', $field->args['name']);
+				$attribute = $wpdb->get_row( $wpdb->prepare("
+					SELECT * FROM $table_name
+					WHERE attribute_id = %d", mp_get_get_value( 'attribute_id' )
+				) );
+				$key = str_replace( 'product_', '', $field->args['name'] );
 				$value = $attribute->$key;
 			break;
 			
@@ -184,6 +187,7 @@ th.column-ID {
 		$product_atts = MP_Product_Attributes::get_instance();
 		$table_name = MP_Product_Attributes::get_instance()->get_table_name();
 		$redirect_url = remove_query_arg( array( 'action', 'action2' ) );
+		$terms = $metabox->fields[3]->sort_subfields( mp_get_post_value( 'product_attribute_terms' ) );
 		
 		if ( mp_get_get_value('action') == 'mp_add_product_attribute' ) {
 			$wpdb->insert( $table_name, array(
@@ -193,7 +197,7 @@ th.column-ID {
 			));
 			$attribute_id = $wpdb->insert_id;
 			$attribute_slug = $product_atts->generate_slug( $attribute_id );
-		
+			
 			//temporarily register the taxonomy - otherwise we won't be able to insert terms below
 			register_taxonomy( $attribute_slug, MP_Product::get_post_type(), array(
 				'show_ui' => false,
@@ -202,11 +206,11 @@ th.column-ID {
 			));
 		
 			//insert terms
-			foreach ( mp_get_post_value( 'product_attribute_terms->name->new', array() ) as $key => $term_name ) {
-				if ( $term_slug = mp_get_post_value( 'product_attribute_terms->slug->new->' . $key) ) {
-					wp_insert_term( $term_name, $attribute_slug, array( 'slug' => substr( sanitize_key( $term_slug ), 0, 32 ) ) );
+			foreach ( $terms as $term ) {
+				if ( ! empty( $term['slug'] ) ) {
+					wp_insert_term( $term['name'], $attribute_slug, array( 'slug' => substr( sanitize_key( $term['slug'] ), 0, 32 ) ) );
 				} else {
-					wp_insert_term( $term_name, $attribute_slug );
+					wp_insert_term( $term['name'], $attribute_slug );
 				}
 			}
 			
@@ -229,14 +233,15 @@ th.column-ID {
 			) );
 
 			//insert terms
-			$order = 0;
-			foreach ( mp_get_post_value( 'product_attribute_terms', array() ) as $order => $array ) {
+			foreach ( $terms as $order => $term ) {
+				$id = key( $term );
+				$term = current( $term );
+
 				$term_args = array();
+				$term_slug = $term['slug'];
+				$term_name = $term['name'];
 					
-				if ( mp_arr_get_value( 'slug->new', $array ) ) {
-					$term_slug = mp_arr_get_value( 'slug->new->0', $array );
-					$term_name = mp_arr_get_value( 'name->new->0', $array );
-					
+				if ( false === strpos( $id, '_' ) ) {
 					if ( ! empty( $term_slug ) ) {
 						$term_args['slug'] = substr( sanitize_key( $term_slug ), 0, 32 );
 					}
@@ -250,9 +255,9 @@ th.column-ID {
 						$term_ids[] = $term_id = $term->error_data['term_exists'];
 					}
 				} else {
-					$term_id = $term_ids[] = key( mp_arr_get_value( 'slug->existing', $array ) );
-					$term_args['slug'] = mp_arr_get_value( "slug->existing->$term_id", $array );
-					$term_args['name'] = mp_arr_get_value( "name->existing->$term_id", $array );
+					$term_id = $term_ids[] = substr( $id, 1 );
+					$term_args['slug'] = $term_slug;
+					$term_args['name'] = $term_name;
 					
 					if ( ! empty( $term_args['slug'] ) ) {
 						$term_args['slug'] = substr( sanitize_key( $term_args['slug'] ), 0, 32 );
