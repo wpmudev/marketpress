@@ -132,6 +132,7 @@ class MP_Public {
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
+			'productsURL' => mp_store_page_url( 'products', false ),
 			'productCats' => $cats,
 		) );
 	}
