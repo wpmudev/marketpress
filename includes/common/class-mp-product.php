@@ -1537,7 +1537,11 @@ Notification Preferences: %s', 'mp' );
 	 * @param mixed $value The new value.
 	 */
 	public function update_meta( $name, $value ) {
-		update_field_value( $name, $value, $this->ID );
+		if ( field_exists( $name, $this->ID ) ) {
+			update_field_value( $name, $value, $this->ID );
+		} else {
+			update_post_meta( $this->ID, $name, $value );
+		}
 	}
 
 	/**
