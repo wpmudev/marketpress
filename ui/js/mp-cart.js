@@ -47,7 +47,6 @@ var mp_cart = {};
 	mp_cart.init = function(){
 		this.initCartAnimation();
 		this.initCartListeners();
-		this.initProductOptionsLightbox();
 	};
 
 	/**
@@ -71,7 +70,7 @@ var mp_cart = {};
 			});
 			
 			mp_cart.addItem($this, $this.find('[name="product_id"]').val());
-		});	
+		});
 	};
 	
 	/**
@@ -116,6 +115,7 @@ var mp_cart = {};
 		mp_cart.initProductListListeners();
 		mp_cart.initSingleProductListeners();
 		mp_cart.initCartFormListeners();
+		mp_cart.initProductOptionsLightbox();
 	};
 	
 	/**
