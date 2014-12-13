@@ -868,7 +868,7 @@ if ( ! function_exists('mp_list_products') ) :
 	function mp_list_products() {
 		// Init args
 		$func_args = func_get_args();
-		$args = array_replace_recursive(mp()->defaults['list_products'], $func_args);
+		$args = mp_parse_args( $func_args, mp()->defaults['list_products'] );
 		$args['nopaging'] = false;
 		
 		// Init query params
@@ -899,13 +899,13 @@ if ( ! function_exists('mp_list_products') ) :
 			$tax_query[] = array(
 				'taxonomy' => 'product_category',
 				'field' => 'slug',
-				'terms' => $wp_query->get('term'),
+				'terms' => get_query_var('term'),
 			);
 		} elseif ( get_query_var('taxonomy') == 'product_tag' ) {
 			$tax_query[] = array(
 				'taxonomy' => 'product_tag',
 				'field' => 'slug',
-				'terms' => $wp_query->get('term'),
+				'terms' => get_query_var('term'),
 			);
 		}
 		
@@ -936,7 +936,7 @@ if ( ! function_exists('mp_list_products') ) :
 			// Get order by
 			if ( ! is_null($args['order_by']) ) {
 				if ( 'price' == $args['order_by'] ) {
-					$query['meta_key'] = 'mp_price_sort';
+					$query['meta_key'] = 'regular_price';
 					$query['orderby'] = 'meta_value_num';
 				} else if ( 'sales' == $args['order_by'] ) {
 					$query['meta_key'] = 'mp_sales_count';
@@ -945,7 +945,7 @@ if ( ! function_exists('mp_list_products') ) :
 					$query['orderby'] = $args['order_by'];
 				}
 			} elseif ( 'price' == mp_get_setting('order_by') ) {
-				$query['meta_key'] = 'mp_price_sort';
+				$query['meta_key'] = 'regular_price';
 				$query['orderby'] = 'meta_value_num';
 			} elseif ( 'sales' == mp_get_setting('order_by') ) {
 				$query['meta_key'] = 'mp_sales_count';
@@ -987,9 +987,17 @@ if ( ! function_exists('mp_list_products') ) :
 		}
 	
 		$content .= '</div>';
-		//$content .= ( ! $args['nopaging'] ) ? mp_products_nav(false, $custom_query) : '';
+
+		$content .= ( ! $args['nopaging'] ) ? mp_products_nav( false, $custom_query ) : '';
 		
-		$content = apply_filters('mp_list_products', $content, $args);
+		/**
+		 * Filter product list html
+		 *
+		 * @since 3.0
+		 * @param string $content The current html content.
+		 * @param array $args The arguments passed to mp_list_products
+		 */
+		$content = apply_filters( 'mp_list_products', $content, $args );
 	
 		if ( $args['echo'] ) {
 			echo $content;
@@ -1311,6 +1319,54 @@ if ( ! function_exists('mp_product_image') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_products_nav' ) ) :
+	/**
+	 * Get the current product list/grid navigation
+	 *
+	 * @param bool $echo Optional, whether to echo. Defaults to true
+	 * @param WP_Query object $custom_query
+	 */
+	function mp_products_nav( $echo = true, $custom_query ) {
+		$html = '';
+		
+		if ( $custom_query->max_num_pages > 1 ) {
+			$big = 999999999;
+			
+			$html = '
+				<div id="mp_product_nav">
+					<div id="mp_product_nav_inner" class="clearfix">';
+			
+			$html .= paginate_links( array(
+				'base' => '%_%',
+				'format' => '?paged=%#%',
+				'total' => $custom_query->max_num_pages,
+				'current' => max( 1, $custom_query->get( 'paged' ) ),
+				'prev_text' => __( 'Prev', 'mp' ),
+				'next_text' => __( 'Next', 'mp' ),
+			) );
+			
+			$html .= '
+					</div>
+				</div>';
+		}
+		
+		/**
+		 * Filter the products nav html
+		 *
+		 * @since 3.0
+		 * @param string $html
+		 * @param WP_Query $custom_query
+		 */
+		$html = apply_filters( 'mp_products_nav', $html, $custom_query );
+	
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
+	}
+endif;
+
 if ( ! function_exists('mp_products_filter') ) :
 	/**
 	 * Display product filters
@@ -1324,7 +1380,8 @@ if ( ! function_exists('mp_products_filter') ) :
 	function mp_products_filter( $hidden = false, $per_page = null, $query = null ) {
 		$default = '-1';
 		if ( $query instanceof WP_Query && $query->get('taxonomy') == 'product_category' ) {
-			$default = $query->get('taxonomy');
+			$term = get_term_by( 'slug', $query->get( 'term' ), $query->get( 'taxonomy' ) );
+			$default = $term->term_id;
 		} elseif ( 'product_category' == get_query_var('taxonomy') ) {
 			$term = get_queried_object(); //must do this for number tags
 			$default = $term->term_id;
@@ -1375,6 +1432,7 @@ if ( ! function_exists('mp_products_filter') ) :
 						</div>' .
 						
 						(( is_null($per_page) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />') . '
+						<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
 				</form>
 			</div>';
 	
