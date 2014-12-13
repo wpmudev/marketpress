@@ -104,7 +104,7 @@ if ( ! function_exists( '_mp_products_html' ) ) :
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . '"' . (( 'grid' == $view ) ? ' style="width: ' . $width . '"' : '') . '>
-					<div class="mp_one_product"' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '>
+					<div class="mp_one_product clearfix"' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '>
 						<div class="mp_product_detail">
 							' . $img . '
 							<div class="mp_product_content">
@@ -515,7 +515,7 @@ if ( ! function_exists('mp_get_user_address') ) :
 		
 		$data = $user->get("mp_{$what}_info");
 		
-		if ( empty($meta) ) {
+		if ( empty($data) ) {
 			$data = mp_get_session_value("mp_{$what}_info");
 		}
 		
@@ -547,27 +547,25 @@ if ( ! function_exists('mp_list_payment_options') ) :
 		 */
 		$options = (array) apply_filters('mp_payment_options_array', $options);
 		
-		if ( count($options) > 1 ) {
-			$index = 0;
-			foreach ( $options as $code => $label ) {
-				$checked = '';
-				if ( $selected = mp_get_session_value('mp_payment_method') ) {
-					if ( $selected == $code ) {
-						$checked = ' checked';
-					}
-				} elseif ( $index == 0 ) {
+		$index = 0;
+		foreach ( $options as $code => $label ) {
+			$checked = '';
+			if ( $selected = mp_get_session_value('mp_payment_method') ) {
+				if ( $selected == $code ) {
 					$checked = ' checked';
 				}
-				
-				$input_id = 'mp-gateway-option-' . $code;
-				$html .= '
-					<label class="mp-checkout-option-label" for="' . $input_id . '">
-						<input id="' . $input_id . '" type="radio" name="payment_method" value="' . $code . '"' . $checked . ' autocomplete="off" />
-						<span></span>' . $label . '
-					</label>';
-				
-				$index ++;
+			} elseif ( $index == 0 ) {
+				$checked = ' checked';
 			}
+			
+			$input_id = 'mp-gateway-option-' . $code;
+			$html .= '
+				<label class="mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options) == 1 ) ? ' style="display:none"' : '') . '>
+					<input id="' . $input_id . '" type="radio" name="payment_method" value="' . $code . '"' . $checked . ' autocomplete="off" />
+					<span></span>' . $label . '
+				</label>';
+			
+			$index ++;
 		}
 		
 		/**
