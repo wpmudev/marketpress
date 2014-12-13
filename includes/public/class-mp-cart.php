@@ -20,6 +20,14 @@ class MP_Cart {
 	protected $_items = array();
 	
 	/**
+	 * Refers to the cart's items that are in the user's cart cookie, but are no longer available
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected $_items_unavailable = array( 'deleted' => array(), 'stock_issue' => array() );
+	
+	/**
 	 * Refers to the current cart ID
 	 *
 	 * @since 3.0
@@ -304,7 +312,45 @@ class MP_Cart {
 	 * @return array
 	 */
 	public function get_items() {
-		return mp_arr_get_value($this->_id, $this->_items, array());
+		$items = mp_arr_get_value( $this->_id, $this->_items, array() );
+		
+		// Check for products that are no longer in stock or have been deleted
+		//! TODO
+		/*if ( ! wp_cache_get( 'items_checked', 'mp_cart' ) ) {
+			wp_cache_set( 'items_checked', true, 'mp_cart' );
+			
+			$update_cookie = false;
+			
+			foreach ( $items as $product_id => $qty ) {
+				$product = new MP_Product( $product_id );
+				
+				if ( ! $product->exists() ) {
+					// Product has been deleted. Flag it as such and remove from $items array.
+					$this->_items_unavailable[ 'deleted' ][] = $product_id;
+					unset( $items[ $product_id ] );
+					$update_cookie = true;
+				} elseif ( ! $product->in_stock( $qty ) ) {
+					// Not enough of product available in stock. Adjust stock to available stock and set flag.
+					if ( $product->get_stock() <= 0 ) {
+						$this->_items_unavailable[ 'deleted' ][] = $product_id;
+						unset( $items[ $product_id ] );
+					} else {
+						$this->_items_unavailable[ 'stock_issue' ][] = $product_id;
+						$items[ $product_id ] = $product->get_stock();
+					}
+					
+					$update_cookie = true;
+				}
+			}
+			
+			$this->_items = $items;
+			
+			if ( $update_cookie ) {
+				$this->_update_cart_cookie();
+			}
+		}*/
+		
+		return $items;
 	}
 	
 	/**
@@ -1343,6 +1389,34 @@ class MP_Cart {
 		mp_push_to_array($this->_items, $this->_id . '->' . $item_id, $qty);
 		$this->_update_cart_cookie();
 	}
+	
+	/**
+	 * Alert about unavailable items or stock issues
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_footer
+	 */
+	public function unavailable_items_alert() {
+		if ( count( $this->_items_unavailable['deleted'] ) == 0 && count( $this->_items_unavailable['stock_issue'] ) == 0 ) {
+			// No items unavailable or have stock issues - bail
+			return;
+		}
+		
+		$message = '';
+		if ( count( $this->_items_unavailable['deleted'] ) != 0 ) {
+			$message .= __( 'Some items in your cart are no longer available. We have removed these items from your cart automatically.', 'mp' ) . '\n\n';
+		}
+		
+		if ( count( $this->_items_unavailable['stock_issue'] ) != 0 ) {
+			$message .= __( 'Some items in your cart have fallen below the quantity you currently have in your cart. We have adjusted the quantity in your cart automatically.', 'mp' );
+		}
+		?>
+		<script type="text/javascript">
+		alert("<?php echo $message; ?>");
+		</script>
+		<?php
+	}
 		
 	/**
 	 * Update the cart cookie
@@ -1359,7 +1433,7 @@ class MP_Cart {
 		$expire = strtotime('+1 month');
 		if ( empty($this->_items) ) {
 			if ( $cart_cookie = mp_get_cookie_value($this->_cookie_id) ) {
-				$expire = strotime('-1 month');
+				$expire = strtotime('-1 month');
 			} else {
 				return;
 			}
@@ -1391,6 +1465,7 @@ class MP_Cart {
 		
 		// Display the floating cart html
 		add_action( 'wp_footer', array( &$this, 'floating_cart_html' ) );
+		add_action( 'wp_footer', array( &$this, 'unavailable_items_alert' ) );
 		
 		// Ajax hooks
 		add_action( 'wp_ajax_mp_update_cart', array( &$this, 'ajax_update_cart' ) );
