@@ -507,7 +507,7 @@ class Marketpress {
 		
 		add_filter('get_user_metadata', array(&$this, 'get_user_billing_info'), 10, 4);
 		
-		$meta = get_user_meta($user_id, 'mp_shipping_info', false);
+		$meta = get_user_meta($user_id, 'mp_shipping_info', true);
 		
 		/* There is a small bug in WP core with the get_user_metadata filter that
 		will raise a PHP notice if an associative array is returned and $single is
