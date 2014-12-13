@@ -385,38 +385,41 @@ jQuery( document ).ready( function( $ ) {
 	public function save_product_variations( $value, $post_id, $field ) {
 		global $wpdb;
 		
-		$variations = mp_get_post_value('variations', array());
-		$sorted = $field->sort_subfields($variations);
-		$menu_order = 1;
+		$variations = mp_get_post_value( 'variations', array() );
+		$sorted = $field->sort_subfields( $variations );
 		$ids = array();
 		$delete_where = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = 'mp_product_variation'";
 		
-		if ( mp_get_post_value('has_variations', false) ) {
-			foreach ( $sorted as $variation_id => $fields ) {
-				if ( strpos($variation_id, '_') === false ) {
-						$variation_id = $ids[] = wp_insert_post(array(
-							'post_content' => mp_arr_get_value('description', $fields, ''),
+		
+		if ( mp_get_post_value( 'has_variations', false ) ) {
+			foreach ( $sorted as $order => $array ) {
+				$variation_id = key( $array );
+				$fields = current( $array );
+				
+				if ( false === strpos( $variation_id, '_' ) ) {
+						$variation_id = $ids[] = wp_insert_post( array(
+							'post_content' => mp_arr_get_value( 'description', $fields, '' ),
 							'post_title' => 'Product Variation of ' . $post_id,
 							'post_status' => 'publish',
 							'post_type' => 'mp_product_variation',
 							'post_parent' => $post_id,
-							'menu_order' => $menu_order,
+							'menu_order' => $order,
 						));
 				} else {					
-					$ids[] = $variation_id = substr($variation_id, 1);
-					wp_update_post(array(
+					$ids[] = $variation_id = substr( $variation_id, 1 );
+					wp_update_post( array(
 						'ID' => $variation_id,
-						'post_content' => mp_arr_get_value('description', $fields, ''),
+						'post_content' => mp_arr_get_value( 'description', $fields, '' ),
 						'post_status' => 'publish',
-						'menu_order' => $menu_order,
+						'menu_order' => $order,
 					));
 				}
 				
 				// Update post thumbnail
-				if ( empty($fields['image']) ) {
-					delete_post_thumbnail($variation_id);
+				if ( empty( $fields['image'] ) ) {
+					delete_post_thumbnail( $variation_id );
 				} else {
-					set_post_thumbnail($variation_id, $fields['image']);
+					set_post_thumbnail( $variation_id, $fields['image'] );
 				}
 				
 				// Unset the fields that shouldn't be saved as post meta
@@ -429,18 +432,16 @@ jQuery( document ).ready( function( $ ) {
 						continue;
 					}
 					
-					$subfield = $field->subfields[$index];
+					$subfield = $field->subfields[ $index ];
 					
-					if ( strpos($name, 'product_attr_') !== false ) {
-						wp_set_post_terms($variation_id, $subfield->sanitize_for_db($value, $variation_id), $name);	
+					if ( false !== strpos( $name, 'product_attr_' ) ) {
+						wp_set_post_terms( $variation_id, $subfield->sanitize_for_db( $value, $variation_id ), $name );	
 					} else {
-						$subfield->save_value($variation_id, $name, $value, true);
+						$subfield->save_value( $variation_id, $name, $value, true );
 					}
 					
 					$index ++;
 				}
-				
-				$menu_order ++;
 			}
 			
 			$delete_where .= " AND {$wpdb->posts}.ID NOT IN (" . implode(',', $ids) . ")";
