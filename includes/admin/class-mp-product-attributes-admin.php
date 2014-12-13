@@ -206,7 +206,10 @@ th.column-ID {
 			));
 		
 			//insert terms
-			foreach ( $terms as $term ) {
+			foreach ( $terms as $order => $term ) {
+				$id = key( $term );
+				$term = current( $term );
+				
 				if ( ! empty( $term['slug'] ) ) {
 					wp_insert_term( $term['name'], $attribute_slug, array( 'slug' => substr( sanitize_key( $term['slug'] ), 0, 32 ) ) );
 				} else {
