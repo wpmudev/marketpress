@@ -32,12 +32,12 @@ class MP_Public {
 	 */
 	private function __construct() {
 		$this->includes();
-		add_filter('taxonomy_template', array(&$this, 'load_taxonomy_template'));
-		add_filter('single_template', array(&$this, 'load_single_product_template'));
-		add_filter('page_template', array(&$this, 'load_page_template'));
-		add_filter('get_post_metadata', array(&$this, 'remove_product_post_thumbnail'), 999, 4);
-		add_action('wp_enqueue_scripts', array(&$this, 'frontend_styles_scripts'));
-		add_filter('comments_open', array(&$this, 'disable_comments_on_store_pages'), 10, 2);
+		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
+		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
+		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
+		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
+		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
 	}
 	
 	/**
@@ -121,10 +121,18 @@ class MP_Public {
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js'), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'select2' ), MP_VERSION, true );
 		
+		// Get product category links
+		$terms = get_terms( 'product_category'  );
+		$cats = array();
+		foreach ( $terms as $term ) {
+			$cats[ $term->term_id ] = get_term_link( $term );
+		}
+		
 		// Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
+			'productCats' => $cats,
 		) );
 	}
 	
@@ -261,14 +269,14 @@ class MP_Public {
 	}
 	
 	/**
-	 * Hide the post thumbnail on single product template
+	 * Hide the post thumbnail on single product, product category and product tag templates
 	 *
 	 * @since 3.0
 	 * @access public
 	 * @filter get_post_metadata
 	 */
 	public function remove_product_post_thumbnail( $content, $post_id, $meta_key, $single ) {
-		if ( is_singular(MP_Product::get_post_type()) && is_main_query() && $meta_key == '_thumbnail_id' ) {
+		if ( (is_singular( MP_Product::get_post_type() ) || is_tax( array( 'product_category', 'product_tax' ) )) && is_main_query() && in_the_loop() && $meta_key == '_thumbnail_id' ) {
 			return false;
 		}
 		
@@ -316,13 +324,26 @@ class MP_Public {
 	 * @filter the_title
 	 */
 	public function taxonomy_title( $title ) {
-		if ( ! in_the_loop() ) {
+		if ( ! in_the_loop() || ! is_main_query() ) {
 			return $title;
 		}
 		
-		$tax = get_taxonomy(get_query_var('taxonomy'));
-		$term = get_term_by('slug', get_query_var('term'), get_query_var('taxonomy'));
-		return $tax->singular_label . ': ' . $term->name;
+		$tax = get_taxonomy( get_query_var( 'taxonomy' ) );
+		$tax_labels = get_taxonomy_labels( $tax );
+		$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
+		$title = $tax_labels->singular_name . ': ' . $term->name;
+		
+		/**
+		 * Filter the taxonomy title for product category/tag templates
+		 *
+		 * @since 3.0
+		 * @param string $title A title.
+		 * @param Object $tax A taxonomy object.
+		 * @param Object $term A term object.
+		 */
+		$title = apply_filters( 'mp_taxonomy_title', $title, $tax, $term );
+		
+		return $title;
 	}
 	
 	/**
@@ -333,9 +354,12 @@ class MP_Public {
 	 * @filter the_content
 	 */
 	public function taxonomy_content( $content ) {
-		if ( ! in_the_loop() ) {
+		if ( ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
+		
+		// don't remove post thumbnails from products
+		remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );
 		
 		return mp_list_products();
 	}
