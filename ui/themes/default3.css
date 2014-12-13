@@ -60,6 +60,15 @@
 #mp-cart-form a {
   text-decoration: none;
 }
+#colorbox .mp_no_stock,
+#mp-checkout .mp_no_stock,
+#mp_single_product .mp_no_stock,
+#mp_product_list .mp_no_stock,
+#mp-order-lookup-form .mp_no_stock,
+#mp-cart-form .mp_no_stock {
+  display: block;
+  margin-top: 30px;
+}
 #colorbox .mp-button,
 #mp-checkout .mp-button,
 #mp_single_product .mp-button,
