@@ -995,7 +995,31 @@ if ( ! function_exists('mp_update_network_setting') ) :
 	}
 endif;
 
-
+if ( ! function_exists( 'mp_parse_args' ) ) :
+	/**
+	 * Convert old style arguments (broken out into variables) into an associative array
+	 * @param mixed $args
+	 * @param array $defaults
+	 * @return array
+	 */
+	function mp_parse_args( $args, $defaults ) {
+		if ( ! isset( $args[0] ) ) {
+			return $defaults;
+		}
+		
+		if ( (isset( $args[0] ) && is_array( $args[0] ) ) || (isset( $args[0] ) && ! is_numeric( $args[0] ) && ! is_bool( $args[0] ) ) ) {
+			return array_replace_recursive( $defaults, $args[0] );
+		}
+		
+		$tmp_args = array();
+		foreach ( $defaults as $key => $value ) {
+			$val = array_shift( $args );
+			$tmp_args[ $key ] = ! is_null( $val ) ? $val : $value;
+		}
+		
+		return $tmp_args;
+	}
+endif;
 if ( ! function_exists('mp_plugin_url') ) :
 	/**
 	 * Returns a url with given path relative to the plugin's root
