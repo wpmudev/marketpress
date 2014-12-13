@@ -266,6 +266,84 @@ var marketpress = {};
 				maxHeight : "90%",
 				close : "x"
 			} );
+		},
+		
+		/**
+		 * Initialize product filters/pagination
+		 *
+		 * @since 3.0
+		 */
+		initProductFiltersPagination : function() {
+			var $form = $( '#mp_product_list_refine' );
+			
+			$form.on( 'change', 'select', function( e ) {
+				var $this = $( this );
+				
+				// Redirect if product category dropdown changed
+				if ( 'product_category' == $this.attr( 'name' ) ) {
+					var val = $this.val();
+					
+					marketpress.loadingOverlay( 'show' );
+					
+					if ( typeof( mp_i18n.productCats[ val ] ) == 'undefined' ) {
+						window.location.href = mp_i18n.productsURL;
+					} else {
+						window.location.href = mp_i18n.productCats[ val ];
+					}
+					
+					return;
+				}
+			} );
+			
+			$( '#mp_product_nav' ).parent().on( 'click', '#mp_product_nav a', function( e ) {
+				e.preventDefault();
+				
+				var $this = $( this );
+				var href = $this.attr( 'href' );
+				var query = marketpress.unserialize( href );
+				
+				$form.find( 'input[name="page"]' ).val( query.paged );
+				marketpress.updateProductList();
+			} );
+		},
+		
+		updateProductList : function() {
+			var $form = $( '#mp_product_list_refine' );
+			var data = $form.serialize();
+			var url = mp_i18n.ajaxurl + '?action=mp_update_product_list';
+			
+			marketpress.loadingOverlay( 'show' );
+			
+			$.post( url, data ).done( function( resp ) {
+				marketpress.loadingOverlay( 'hide' );
+				$( '#mp_product_nav' ).remove();
+				$( '#mp_product_list' ).replaceWith( resp );
+				mp_cart.initCartListeners();
+			} );
+		},
+		
+		/**
+		 * Unserialize a string
+		 *
+		 * @since 3.0
+		 * @param string str A serialized string or a url containing a querystring
+		 * @return object
+		 */
+		unserialize : function( str ) {
+			if ( str.indexOf( '?' ) >= 0 ) {
+				var strParts = str.split( '?' );
+				str = strParts[1];
+			}
+			
+			var dataPairs = str.split( '&' );
+			var obj = {};
+			
+			$.each( dataPairs, function( index, value ) {
+				var tmp = value.split( '=' );
+				obj[ tmp[0] ] = tmp[1];
+			} );
+			
+			return obj;
 		}
 	};
 }(jQuery));
@@ -276,6 +354,7 @@ jQuery(document).ready(function(){
 	marketpress.initToolTips();
 	marketpress.initOrderLookup();
 	marketpress.initImageLightbox();
+	marketpress.initProductFiltersPagination();
 });
 
 window.onload = function(){
