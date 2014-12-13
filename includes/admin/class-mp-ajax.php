@@ -122,6 +122,32 @@ class MP_Ajax {
 			'error_message' => __( 'Oops... we could not locate any orders by that ID. Please double check your order ID and try again.', 'mp' ),
 		) );
 	}
+	
+	/**
+	 * Update product list
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_nopriv_mp_update_product_list, wp_ajax_mp_update_product_list
+	 */
+	public function update_product_list() {
+		$page = mp_get_post_value( 'page', 1 );
+		$per_page = mp_get_post_value( 'per_page', 1 );
+		$category = mp_get_post_value( 'product_category' );
+		list( $order_by, $order ) = explode( '-', mp_get_post_value( 'order' ) );
+		
+		if ( empty( $order ) ) {
+			$order_by = $order = null;
+		}
+		
+		mp_list_products( array(
+			'page' => $page,
+			'order_by' => $order_by,
+			'order' => ( ! is_null( $order ) ) ? strtoupper( $order ) : $order,
+		) );
+		
+		die;
+	}
 
 	/**
 	 * Update state dropdown list
@@ -168,6 +194,9 @@ class MP_Ajax {
 		// Get state list
 		add_action( 'wp_ajax_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
 		add_action( 'wp_ajax_nopriv_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
+		// Update product list
+		add_action( 'wp_ajax_mp_update_product_list', array( &$this, 'update_product_list' ) );
+		add_action( 'wp_ajax_nopriv_mp_update_product_list', array( &$this, 'update_product_list' ) );
 	}
 }
 
