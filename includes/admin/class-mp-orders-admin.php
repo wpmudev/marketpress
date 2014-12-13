@@ -68,11 +68,17 @@ class MP_Orders_Admin {
 			return;
 		}
 		
+		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
+		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
+		
+		if ( empty( $tracking_num ) && empty( $shipment_method ) ) {
+			// Tracking num and shipment method are empty - bail
+			return;
+		}
+		
 		$order = new MP_Order( $post_id );
 		
 		// update tracking info
-		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
-		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
 		$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
 		$order->update_meta( 'mp_shipping_info->method', $shipment_method );
 		
