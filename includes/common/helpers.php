@@ -302,8 +302,8 @@ if ( ! function_exists('mp_cart') ) :
 	 * @since 3.0
 	 */
 	function mp_cart() {
-		if ( ! class_exists('MP_Cart') ) {
-			require_once mp_plugin_dir('includes/public/class-mp-cart.php');
+		if ( ! class_exists( 'MP_Cart' ) ) {
+			require_once mp_plugin_dir( 'includes/common/class-mp-cart.php' );
 		}
 		
 		return MP_Cart::get_instance();
