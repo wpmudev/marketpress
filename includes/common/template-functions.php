@@ -355,6 +355,27 @@ if ( ! function_exists( 'mp_create_store_page' ) ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_display_currency' ) ) :
+	/**
+	 * Format a number as currency without the symbol
+	 *
+	 * @since 3.0
+	 * @param float $amount The amount to format.
+	 * @param int $dec_places Optional, the number of decimal places to show.
+	 * @return string
+	 */
+	function mp_display_currency( $amount, $dec_places = null ) {
+		if ( is_null( $dec_places ) ) {
+			$dec_places = 2;
+			if ( $amount == (int) $amount ) {
+				$dec_places = 0;
+			}
+		}
+		
+		return number_format( $amount, $dec_places, '.', '' );
+	}
+endif;
+
 if ( ! function_exists('mp_format_currency') ) :
 	/**
 	 * Formats currency
@@ -396,7 +417,7 @@ if ( ! function_exists('mp_format_currency') ) :
 		$symbol = apply_filters('mp_format_currency_symbol', $symbol, $currency);
 
 		//check decimal option
-		if ( mp_get_setting('curr_decimal') === '0' ) {
+		if ( $amount == (int) $amount ) {
 			$decimal_place = 0;
 			$zero = '0';
 		} else {
@@ -668,6 +689,18 @@ if ( ! function_exists('mp_get_user_address_part') ) :
 		$meta = $user->get( "mp_{$type}_info" );
 		
 		if ( 'first_name' == $what || 'last_name' == $what ) {
+			if ( 'first_name' == $what ) {
+				$first_name = mp_get_session_value( "mp_shipping_info->first_name", mp_arr_get_value( 'first_name', $meta, '' ) );
+				if ( ! empty( $first_name ) ) {
+					return $first_name;
+				}
+			} else {
+				$last_name = mp_get_session_value( "mp_shipping_info->last_name", mp_arr_get_value( 'last_name', $meta, '' ) );
+				if ( ! empty( $last_name ) ) {
+					return $last_name;
+				}
+			}
+			
 			$name = mp_get_session_value( "mp_shipping_info->name", mp_arr_get_value( 'name', $meta, '' ) );
 			$name_parts = explode( ' ', $name );
 			
