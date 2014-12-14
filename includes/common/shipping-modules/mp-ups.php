@@ -204,16 +204,6 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
   }
 
 	/**
-	* Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
-	*
-	* @param array $shipping_meta, the contents of the post meta. Use to retrieve any previously saved product meta
-	* @param array $settings, access saved settings via $settings array.
-	*/
-	function shipping_metabox($shipping_meta, $settings) {
-
-	}
-
-	/**
 	* For calculated shipping modules, use this method to return an associative
 	* array of the sub-options. The key will be what's saved as selected in the
 	* session. Note the shipping parameters won't always be set. If they are, add
