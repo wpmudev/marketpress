@@ -532,6 +532,7 @@ class Marketpress {
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
 		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
 		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
+		require_once $this->plugin_dir('includes/common/class-mp-cart.php');
 		require_once $this->plugin_dir('includes/common/template-functions.php');
 		
 		if ( is_admin() ) {
@@ -559,10 +560,17 @@ class Marketpress {
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {
+			case 'display_currency' :
+				_deprecated_function( $method, '3.0', 'mp_display_currency' );
+				return call_user_func_array( 'mp_display_currency', $args );
+			break;
+			
 			case 'get_download_url' :
 				_deprecated_function( $method, '3.0', 'MP_Product::download_url' );
 				$product = new MP_Product( $args[0] );
 				return $product->download_url( $args[1], false );
+			break;
+			
 			case 'mail' :
 				_deprecated_function( $method, '3.0', 'mp_send_email' );
 				return call_user_func_array( 'mp_send_email', $args );
