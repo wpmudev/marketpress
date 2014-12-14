@@ -58,6 +58,7 @@ class MP_Store_Settings_Admin {
 				'store-settings_page_store-settings-shipping',
 				'store-settings_page_store-settings-payments',
 				'store-settings_page_store-settings-importers',
+				'store-settings_page_store-settings-exporters',
 				'store-settings_page_store-settings-capabilities',
 				//'store-settings_page_store-setup-wizard',
 			);
@@ -112,6 +113,7 @@ class MP_Store_Settings_Admin {
 		add_submenu_page('store-settings', __('Store Settings: Product Tags', 'mp'), __('Product Tags', 'mp'), apply_filters('mp_manage_product_tags_cap', 'manage_categories'), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type());		
 		add_submenu_page('store-settings', __('Store Settings: Capabilities', 'mp'), __('User Capabilities', 'mp'), $cap, 'store-settings-capabilities', false);
 		add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
+		add_submenu_page('store-settings', __('Store Settings: Exporters', 'mp'), __('Exporters', 'mp'), $cap, 'store-settings-exporters', false);		
 		add_submenu_page('store-settings', __('Store Settings: Add Ons', 'mp'), __('Add Ons', 'mp'), $cap, 'store-settings-addons', false);
 		//add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
 
@@ -124,6 +126,7 @@ class MP_Store_Settings_Admin {
 			add_action('store-settings_page_store-settings-product-attributes', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-capabilities', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-importers', array(&$this, 'add_help_tab'));
+			add_action('store-settings_page_store-settings-exporters', array(&$this, 'add_help_tab'));			
 			add_action('store-settings_page_store-setup-wizard', array(&$this, 'add_help_tab'));
 			add_action('store-settings_page_store-settings-addons', array(&$this, 'add_help_tab'));
 		}
@@ -222,6 +225,10 @@ jQuery(document).ready(function($){
 			case 'store-settings_page_store-settings-importers' :
 				$title .= __('Importers', 'mp');
 			break;
+
+			case 'store-settings_page_store-settings-exporters' :
+				$title .= __('Exporters', 'mp');
+			break;
 			
 			case 'store-settings_page_store-settings-productattributes' :
 				$title = ( mp_get_get_value('action') == 'mp_add_product_attribute' ) ? __('Add Product Attribute', 'mp') : __('Edit Product Attribute', 'mp');
@@ -257,7 +264,15 @@ jQuery(document).ready(function($){
 			 *
 			 * @since 3.0
 			 */
-			do_action('wpmudev_metabox/render_settings_metaboxes'); ?>
+			do_action('wpmudev_metabox/render_settings_metaboxes');
+			
+			/**
+			 * Render settings
+			 *
+			 * @since 3.0
+			 */
+			do_action( 'mp_render_settings/' . mp_get_current_screen()->id );
+			?>
 		</form>
 	</div>
 </div>
