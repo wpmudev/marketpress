@@ -54,6 +54,21 @@ class MP_Orders_Admin {
 		add_action('admin_notices', array(&$this, 'admin_notices'));
 		//remove submit div
 		add_action( 'admin_menu', create_function( '', 'remove_meta_box( "submitdiv", "mp_order", "side" ); remove_meta_box( "titlediv", "mp_order", "core" );' ) );
+		//add export form
+		add_action( 'mp_render_settings/store-settings_page_store-settings-exporters', array( &$this, 'export_order_form' ) );
+	}
+	
+	/**
+	 * Display the export order form
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb, $wp_locale
+	 * @action in_admin_footer
+	 */
+	public function export_order_form() {
+		require_once mp_plugin_dir( 'includes/admin/class-mp-exporter-orders.php' );
+		MP_Exporter_Orders::export_form();
 	}
 	
 	/**
