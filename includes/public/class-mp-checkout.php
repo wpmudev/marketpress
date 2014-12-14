@@ -80,6 +80,11 @@ class MP_Checkout {
 			'order-review-payment' => __( 'Review Order/Payment', 'mp' ),
 		) );
 		
+		if ( 'calculated' != mp_get_setting( 'shipping->method') ) {
+			// Don't need shipping step if not using calculated shipping
+			unset( $this->_sections['shipping'] );
+		}
+		
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 		add_filter( 'mp_cart/after_cart_html', array( &$this, 'payment_form' ), 10, 3 );
 		
@@ -125,10 +130,16 @@ class MP_Checkout {
 	 * @access protected
 	 */
 	protected function _update_order_review_payment_section() {
-		if ( $shipping_method = mp_get_post_value( 'shipping_method' ) ) {
-			list( $shipping_option, $shipping_sub_option ) = explode( '->', $shipping_method );
-			mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_option );
-			mp_update_session_value( 'mp_shipping_info->shipping_sub_option', $shipping_sub_option );
+		$shipping_method =  mp_get_setting( 'shipping->method' );
+		if ( 'calculated' == $shipping_method ) {
+			if ( $shipping_method = mp_get_post_value( 'shipping_method' ) ) {
+				list( $shipping_option, $shipping_sub_option ) = explode( '->', $shipping_method );
+				mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_option );
+				mp_update_session_value( 'mp_shipping_info->shipping_sub_option', $shipping_sub_option );
+			}
+		} else {
+			mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_method );
+			mp_update_session_value( 'mp_shipping_info->shipping_sub_option', '' );
 		}
 		
 		return $this->section_order_review_payment();
