@@ -1179,9 +1179,8 @@ class MP_Cart {
 		 	//merge
 		 	$price = round($price + $extra, 2);
 		 	
-			//boot if shipping plugin didn't return at least 0
-			if ( empty($price) ) {
-				return false;
+			if ( empty( $price ) ) {
+				$price = 0;
 			}
 			
 			$this->_total['shipping'] = $price;
@@ -1189,10 +1188,14 @@ class MP_Cart {
 		
 		$shipping_total = mp_arr_get_value('shipping', $this->_total, 0);
 		
-		if ( $format ) {
-			return mp_format_currency('', $shipping_total);
+		if ( empty( $price ) ) {
+			return __( 'FREE', 'mp' );
 		} else {
-			return round($shipping_total, 2);
+			if ( $format ) {
+				return mp_format_currency('', $shipping_total);
+			} else {
+				return round($shipping_total, 2);
+			}
 		}
 	}
 	
