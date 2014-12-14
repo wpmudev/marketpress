@@ -83,6 +83,15 @@ class MP_Product {
 	protected $_exists = null;
 	
 	/**
+	 * Refers to the product's content tabs
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @type array
+	 */
+	var $content_tabs = array();
+	
+	/**
 	 * Get the internal post type for products.
 	 *
 	 * @since 3.0
@@ -268,7 +277,8 @@ class MP_Product {
 			$product = $post;
 		}
 		
-		$this->_get_post($product);		
+		$this->_get_post($product);
+		$this->_set_content_tabs();
 	}
 	
 	/**
@@ -577,31 +587,14 @@ class MP_Product {
 	 * @access public
 	 * @param bool $echo
 	 */
-	public function content_tab_labels( $echo = true ) {
-		$tabs = array(
-			'mp-product-overview' => __('Overview', 'mp'),
-		);
-		
-		if ( mp_get_setting('related_products->show') ) {
-			$tabs['mp-related-products'] = __('Related Products', 'mp');
-		}
-		
-		/**
-		 * Filter the product tabs array
-		 *
-		 * @since 3.0
-		 * @param array $tabs The default product tabs.
-		 * @param MP_Product $this The current product object.
-		 */
-		$tabs = (array) apply_filters('mp_product/content_tab_labels_array', $tabs, $this);
-				
+	public function content_tab_labels( $echo = true ) {				
 		$html = '
 			<ul class="mp_product_tab_labels clearfix">';
 		
 		$index = 0;
-		foreach ( $tabs as $slug => $label ) {
+		foreach ( $this->content_tabs as $slug => $label ) {
 			$html .= '
-				<li class="mp_product_tab_label' . (( $index == 0 ) ? ' current' : '') . '"><a class="mp_product_tab_label_link" href="#' . esc_attr($slug) . '">' . $label . '</a></li>';
+				<li class="mp_product_tab_label' . (( $index == 0 ) ? ' current' : '') . '"><a class="mp_product_tab_label_link" href="#' . esc_attr( $slug ) . '">' . $label . '</a></li>';
 			$index ++;
 		}
 		
@@ -615,7 +608,7 @@ class MP_Product {
 		 * @param string $html The current HTML markup.
 		 * @param MP_Product $this The current product object.
 		 */
-		$html = apply_filters('mp_product/content_tab_labels', $html, $this);
+		$html = apply_filters( 'mp_product/content_tab_labels', $html, $this );
 			
 		if ( $echo ) {
 			echo $html;
@@ -1648,5 +1641,33 @@ Notification Preferences: %s', 'mp' );
 			$this->_exists = true;
 			$this->ID = $this->_post->ID;
 		}
+	}
+	
+	/**
+	 * Set content tabs
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _set_content_tabs() {
+		$tabs = array();
+		
+		if ( mp_get_setting( 'related_products->show' ) ) {
+			$tabs['mp-related-products'] = __( 'Related Products', 'mp' );
+		}
+		
+		/**
+		 * Filter the product tabs array
+		 *
+		 * @since 3.0
+		 * @param array $tabs The default product tabs.
+		 * @param MP_Product $this The current product object.
+		 */
+		$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
+		
+		// Make sure product overview tab is always at the beginning
+		$tabs = array( 'mp-product-overview' => __( 'Overview', 'mp' ) ) + $tabs;
+		
+		$this->content_tabs = $tabs;
 	}
 }

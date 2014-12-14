@@ -1257,16 +1257,47 @@ if ( ! function_exists('mp_product') ) {
 					</div>
 				</div>';
 		}
+		// Remove overview tab as it's already been manually output above
+		array_shift( $product->content_tabs ); 
 		
-		if ( mp_get_setting('related_products->show') ) {
-			$return .= '
-				<div id="mp-related-products" class="mp_product_content clearfix">' . $product->related_products() . ' </div>';
+		foreach ( $product->content_tabs as $slug => $label ) {
+			switch ( $slug ) {
+				case 'mp-related-products' :
+					if ( mp_get_setting( 'related_products->show' ) ) {
+						$return .= '<div id="mp-related-products" class="mp_product_content clearfix" style="display:none">' . $product->related_products() . ' </div>';
+					}
+				break;
+				
+				default :
+					/**
+					 * Filter the content tab html
+					 *
+					 * @since 3.0
+					 * @param string
+					 * @param string $slug The tab slug.
+					 */
+					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
+					
+					$return .= '<div id="' . esc_attr( $slug ) . '" class="mp_product_content clearfix" style="display:none">' . $tab . '</div>';
+				break;
+			}
 		}
 
 		$return .= '
 			</div>';
 		
-		$return = apply_filters('mp_product', $return, $product->ID, $title, $content, $image, $meta);
+		/**
+		 * Filter the product html
+		 *
+		 * @since 3.0
+		 * @param string $return The current product html.
+		 * @param int $product->ID The product's ID.
+		 * @param bool $title Whether to display the title.
+		 * @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'.
+		 * @param bool/string $image Whether and what context of image size to display. Options are false, 'single', or 'list'. Default 'single'.
+		 * @param bool $meta Whether to display the product meta.
+		 */
+		$return = apply_filters( 'mp_product', $return, $product->ID, $title, $content, $image, $meta );
 
 		if ( $echo ) {
 			echo $return;
