@@ -803,7 +803,6 @@ You can manage this order here: %s', 'mp');
 	 *		@type float $shipping_total Optional, the shipping total. Defaults to the calculated total.
 	 *		@type float $shipping_tax_total Optional, the tax amount for shipping. Defaults to the calculated total.
 	 *		@type float $tax_total Optional, the tax total. Defaults to the calculated total.
-	 *		@type array $coupons Optional, an array of coupons that were used. Defaults to the cart coupons.
 	 */
 	public function save( $args ) {
 		$args = array_replace_recursive( array(
@@ -816,7 +815,6 @@ You can manage this order here: %s', 'mp');
 			'shipping_total' => mp_cart()->shipping_total( false ),
 			'shipping_tax_total' => mp_cart()->shipping_tax_total( false ),
 			'tax_total' => mp_cart()->tax_total( false ),
-			'coupons' => mp_coupons()->get_applied(),
 		), $args );
 		
 		extract( $args );
