@@ -509,7 +509,7 @@ class MP_Cart {
 		$line = '
 				<div id="mp-cart-meta-line-shipping-total" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __( 'Estimated Shipping', 'mp') : __( 'Shipping' )) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->shipping_total( true ) . '</span>
+					<span class="mp-cart-meta-line-amount">' . (( false !== ( $shipping_total = $this->shipping_total( true ) ) ) ? $shipping_total : __( 'TBD', 'mp' )) . '</span>
 				</div>';
 
 		/**
