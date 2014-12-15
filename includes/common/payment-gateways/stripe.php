@@ -24,7 +24,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	//whether if this is the only enabled gateway it can skip the payment_form step
 	var $skip_form = false;
 	//api vars
-	var $publishable_key, $private_key, $currency;
+	var $publishable_key, $secret_key, $currency;
 	
 	/**
 	 * Gateway currencies
@@ -187,7 +187,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		$this->method_button_img_url = mp_plugin_url('images/cc-button.png');
 
 		$this->publishable_key = $this->get_setting('api_credentials->publishable_key');
-		$this->private_key = $this->get_setting('api_credentials->private_key');
+		$this->secret_key = $this->get_setting('api_credentials->secret_key');
 		$this->force_ssl = (bool) $this->get_setting('is_ssl');
 		$this->currency = $this->get_setting('currency', 'USD');
 
@@ -285,7 +285,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			if (!class_exists('Stripe')) {
 					require_once(mp()->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php");
 			}
-			Stripe::setApiKey($this->private_key);
+			Stripe::setApiKey($this->secret_key);
 			try {
 					$token = Stripe_Token::retrieve($_SESSION['stripeToken']);
 			} catch (Exception $e) {
@@ -412,8 +412,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		
 		if ( $creds instanceof WPMUDEV_Field ) {
 			$creds->add_field('text', array(
-				'name' => 'private_key',
-				'label' => array('text' => __('Private Key', 'mp')),
+				'name' => 'secret_key',
+				'label' => array('text' => __('Secret Key', 'mp')),
 			));
 			$creds->add_field('text', array(
 				'name' => 'publishable_key',
@@ -454,7 +454,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			require_once mp_plugin_dir( 'includes/common/payment-gateways/stripe-files/lib/Stripe.php' );
 		}
 				
-		Stripe::setApiKey( $this->private_key );
+		Stripe::setApiKey( $this->secret_key );
 
 		$totals = array(
 			'product_total' => $cart->product_total( false ),
