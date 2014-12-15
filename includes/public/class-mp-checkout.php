@@ -801,7 +801,7 @@ class MP_Checkout {
 					<div class="mp-checkout-column" style="padding-left:25px">
 						<h4>' . __( 'First-time customer?', 'mp') . '</h4>
 						<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-						<p><a class="mp-button mp-button-medium mp-button-checkout-next-step" href="' . $this->url_hash( 'next' ) . '">' . __( 'Continue as Guest', 'mp' ) . '</a></p>
+						<p><button type="submit" class="mp-button mp-button-medium mp-button-checkout-next-step">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
 					</div>
 				</div>';
 		}
