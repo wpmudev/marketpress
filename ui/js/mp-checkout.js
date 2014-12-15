@@ -268,7 +268,7 @@ var mp_checkout;
 								action : "mp_ajax_login",
 								email : $email.val(),
 								pass : $pass.val(),
-								mp_login_nonce : $this.find( '[name="mp_login_nonce"]' ).val()
+								mp_login_nonce : $form.find( '[name="mp_login_nonce"]' ).val()
 							};
 							
 							$.post( mp_i18n.ajaxurl, data ).done( function( resp ){
