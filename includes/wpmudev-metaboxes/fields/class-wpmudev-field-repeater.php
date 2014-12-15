@@ -238,7 +238,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 						<th style="width:15px">&nbsp;</th>
 			<?php
 			foreach ( $this->subfields as $index => $subfield ) : ?>
-						<th><?php echo $subfield->args['label']['text']; ?><small class="wpmudev-subfield-desc"><?php echo $subfield->args['desc']; ?></small></th>
+						<th><?php echo $subfield->args['label']['text'] . ' ' . (( ! empty($subfield->args['desc']) ) ? '<span class="wpmudev-metabox-tooltip dashicons dashicons-editor-help"><span>' . $subfield->args['desc'] . '</span></span>' : ''); ?></th>
 			<?php
 			endforeach; ?>		
 			
