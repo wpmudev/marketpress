@@ -365,6 +365,8 @@ if ( ! function_exists( 'mp_display_currency' ) ) :
 	 * @return string
 	 */
 	function mp_display_currency( $amount, $dec_places = null ) {
+		$amount = (float) $amount;
+		
 		if ( is_null( $dec_places ) ) {
 			$dec_places = 2;
 			if ( $amount == (int) $amount ) {
