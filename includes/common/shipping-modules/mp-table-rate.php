@@ -1,6 +1,8 @@
 <?php
 
 class MP_Shipping_Table_Rate extends MP_Shipping_API {
+	//build of the plugin
+	var $build = 2;
 	
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
 	var $plugin_name = 'table_rate';
@@ -20,6 +22,9 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	function on_creation() {
 		//declare here for translation
 		$this->public_name = __('Table Rate', 'mp');
+		
+		add_filter( 'wpmudev_field/get_value/shipping[table_rate][rates]', array( &$this, 'get_rates_value' ), 10, 4 );
+		add_filter( 'wpmudev_field/sanitize_for_db', array( &$this, 'sanitize_rates' ), 10, 3);
 	}
 	
 	/**
@@ -44,6 +49,50 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
   }
   
   /**
+   * Get rates sorted by price from highest to lowest
+   *
+   * @since 3.0
+   * @access public
+   * @return array
+   */
+  public function get_rates() {
+	  $rates = (array) $this->get_setting( 'rates', array() );
+	  usort( $rates, array( &$this, 'sort_rates' ) );
+	  return $rates;
+  }
+  
+  /**
+   * Filter the rates field value
+   *
+   * @since 3.0
+   * @access public
+   */
+  public function get_rates_value( $value, $post_id, $raw, $field ) {
+	  usort( $value, array( &$this, 'sort_rates' ) );
+	  return $value;
+  }
+  
+  /**
+   * Sort rates from highest to lowest
+   *
+   * @since 3.0
+   * @access public
+   * @param array $a
+   * @param array $b
+   * @return int
+   */
+  public function sort_rates( $a, $b ) {
+	  $mincost1 = (float) $a['mincost'];
+	  $mincost2 = (float) $b['mincost'];
+	  
+	  if ( $mincost1 == $mincost2 ) {
+		  return 0;
+	  }
+	  
+	  return ( $mincost2 > $mincost1 ) ? 1 : -1;
+  }
+  
+  /**
    * Initialize the settings metabox
    *
    * @since 3.0
@@ -54,7 +103,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			'id' => $this->generate_metabox_id(),
 			'page_slugs' => array( 'store-settings-shipping', 'store-settings_page_store-settings-shipping' ),
 			'title' => sprintf( __( '%s Settings', 'mp' ), $this->public_name ),
-			'desc' => __( 'Be sure to enter a shipping price for every option or those customers may get free shipping. Each layer must be a higher price than the one above it.', 'mp' ),
+			'desc' => __( 'Be sure to enter a shipping price for every option or those customers may get free shipping. Don\'t worry about sorting as this will be done automatically upon saving.', 'mp' ),
 			'option_name' => 'mp_settings',
 			'conditional' => array(
 				'action' => 'show',
@@ -63,13 +112,15 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			),
 		));
 		$layers = $metabox->add_field( 'repeater', array(
-			'name' => 'shipping[table_rate]',
+			'name' => $this->get_field_name( 'rates' ),
+			'sortable' => false,
 		) );
 		
 		if ( $layers instanceof WPMUDEV_Field ) {
 			$layers->add_sub_field( 'text', array(
 				'name' => 'mincost',
 				'label' => array( 'text' => __( 'Cart Total', 'mp' ) ),
+				'desc' => __( 'If cart total is greater than or equal to this value then the rates from that row will be used during checkout.', 'mp' ),
 			) );
 			
 			if ( 'US' == mp_get_setting( 'base_country') ) {
@@ -112,168 +163,42 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			) );
 		}
 	}
-
-  
+	
 	/**
-	 * Echo a settings meta box with whatever settings you need for you shipping module.
-	 *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
-	 *  You can access saved settings via $settings array.
-	 */
-	function shipping_settings_box($settings) {
-		global $mp;
-		?>
-		<script type="text/javascript">
-				jQuery(document).ready(function ($) {
-					$("#mp-table-rate-rows").change(function() {
-						$("#mp-shipping-form").submit();
-					});
-				});
-		</script>
-		<div id="mp_table_rate" class="postbox">
-		<h3 class='hndle'><span><?php _e('Table Rate Settings', 'mp'); ?></span></h3>
-		<div class="inside">
-			<span class="description"><?php _e('Be sure to enter a shipping price for every option unless you want a certain tier to get get free shipping. Each layer should generally be a higher price than the previous. Note that order total that it is compared to is pre-tax.', 'mp') ?></span>
-		<table class="form-table">
-		<tr>
-			<td scope="row"><?php _e('Number of Layers:', 'mp');?>
-				<select name="mp[shipping][table-rate][rowcount]" id="mp-table-rate-rows">
-					<?php 
-					for ( $k = 1; $k <= 20; $k++ ) {	
-						?>
-						<option value="<?php echo $k; ?>" <?php selected($mp->get_setting('shipping->table-rate->rowcount'), $k); ?>><?php echo $k; ?></option>
-						<?php 
-					}	
-					?>
-					</select>
-			</td>
-		</tr>
-		<tr>
-			<th>
-				<?php _e('Each layer must be a higher price than the one above it.', 'mp') ?>
-			</th>
-		</tr>
-		<?php
-		switch ($mp->get_setting('base_country')) {
-				case 'US':
-				?>
-					<tr>
-						<td scope="row">
-						<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][0][mincost]" value="0.01" size="5" maxlength="10" disabled="disabled" /><?php _e(' and above.', 'mp'); ?>
-						<?php _e('Shipping Cost - Lower 48 States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][lower_48]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->lower_48')); ?>" size="5" maxlength="10" />
-						<?php _e('Hawaii and Alaska:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][hi_ak]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->hi_ak')); ?>" size="5" maxlength="10" />
-						<?php _e('Canada:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][canada]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->canada')); ?>" size="5" maxlength="10" />
-						<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][international]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->international')); ?>" size="5" maxlength="10" />
-						</td>
-					</tr>
-					<?php 
-					for ( $i = 1; $i < $mp->get_setting('shipping->table-rate->rowcount'); $i++ ) { 
-					?>
-					<tr>
-							<td scope="row">
-							<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][<?php echo $i; ?>][mincost]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->mincost")); ?>" size="5" maxlength="10" /><?php _e(' and above.', 'mp'); ?>
-							<?php _e('Shipping Cost - Lower 48 States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][lower_48]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->lower_48")); ?>" size="5" maxlength="10" />
-							<?php _e('Hawaii and Alaska:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][hi_ak]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->hi_ak")); ?>" size="5" maxlength="10" />
-							<?php _e('Canada:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][canada]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->canada")); ?>" size="5" maxlength="10" />
-							<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][international]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->international")); ?>" size="5" maxlength="10" />
-							</td>
-					</tr>
-					<?php
-					}
-					break;
-					case 'CA':
-							?>
-						<tr>
-							<td scope="row">
-								<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][0][mincost]" value="0.01" size="5" maxlength="10" disabled="disabled" /><?php _e(' and above.', 'mp'); ?>
-								<?php _e('Shipping Cost - In Country:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][in_country]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->in_country')); ?>" size="5" maxlength="10" />
-								<?php _e('United States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][usa]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->usa')); ?>" size="5" maxlength="10" />
-								<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][international]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->international')); ?>" size="5" maxlength="10" />
-							</td>
-						</tr>
-						<?php 
-						for ( $i = 1; $i < $mp->get_setting('shipping->table-rate->rowcount'); $i++ ) { 
-						?>
-							<tr>
-								<td scope="row">
-									<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][<?php echo $i; ?>][mincost]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->mincost")); ?>" size="5" maxlength="10" /><?php _e(' and above.', 'mp'); ?>
-									<?php _e('Shipping Cost - In Country:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][in_country]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->in_country")); ?>" size="5" maxlength="10" />
-									<?php _e('United States:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][usa]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->usa")); ?>" size="5" maxlength="10" />
-									<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][international]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->international")); ?>" size="5" maxlength="10" />
-								</td>
-							</tr>
-						<?php
-						}
-					break;
-					default:
-						if ( in_array($mp->get_setting('base_country'), $mp->eu_countries) ) {
-						?>
-							<tr>
-								<td scope="row">
-									<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][0][mincost]" value="0.01" size="5" maxlength="10" disabled="disabled" /><?php _e(' and above.', 'mp'); ?>
-									<?php _e('Shipping Cost - In Country:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][in_country]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->in_country')); ?>" size="5" maxlength="10" />
-									<?php _e('European Union:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][eu]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->eu')); ?>" size="5" maxlength="10" />
-									<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][international]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->international')); ?>" size="5" maxlength="10" />
-								</td>
-							</tr>
-							<?php 
-							for ( $i = 1; $i < $mp->get_setting('shipping->table-rate->rowcount'); $i++ ) { 
-							?>
-								<tr>
-									<td scope="row">
-										<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][<?php echo $i; ?>][mincost]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->mincost")); ?>" size="5" maxlength="10" /><?php _e(' and above.', 'mp'); ?>
-											<?php _e('Shipping Cost - In Country:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][in_country]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->in_country")); ?>" size="5" maxlength="10" />
-										<?php _e('European Union:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][eu]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->eu")); ?>" size="5" maxlength="10" />
-										<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][international]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->international")); ?>" size="5" maxlength="10" />
-										</td>
-									</tr>
-							<?php
-							}
-						}	else {
-							?>
-							<tr>
-								<td scope="row">
-									<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][0][mincost]" value="0.01" size="5" maxlength="10" disabled="disabled" /><?php _e(' and above.', 'mp'); ?>
-									<?php _e('Shipping Cost - In Country:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][in_country]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->in_country')); ?>" size="5" maxlength="10" />
-									<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][0][international]" value="<?php echo esc_attr($mp->get_setting('shipping->table-rate->0->international')); ?>" size="5" maxlength="10" />
-								</td>
-							</tr>
-							<?php 
-							for ( $i = 1; $i < $mp->get_setting('shipping->table-rate->rowcount'); $i++ ) { 
-							?>
-								<tr>
-									<td scope="row">
-										<?php _e('If price is ', 'mp'); echo $mp->format_currency(); ?><input type="text" name="mp[shipping][table-rate][<?php echo $i; ?>][mincost]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->mincost")); ?>" size="5" maxlength="10" /><?php _e(' and above.', 'mp'); ?>
-											<?php _e('Shipping Cost - In Country:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][in_country]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->in_country")); ?>" size="5" maxlength="10" />
-										<?php _e('International:', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-rate][<?php echo $i?>][international]" value="<?php echo esc_attr($mp->get_setting("shipping->table-rate->{$i}->international")); ?>" size="5" maxlength="10" />
-										</td>
-									</tr>
-							<?php
-							}
-						}
-					}
-					?>
-				</table>
-		</div>
-		</div>
-		<?php
+   * Updates the plugin settings
+   *
+   * @since 3.0
+   * @access public
+   * @param array $settings
+   * @return array
+   */
+  public function update( $settings ) {
+	  $layers = mp_arr_get_value( 'shipping->table_rate', $settings );
+	  
+	  if ( ! is_array( $layers ) ) {
+			return $settings;
+	  }
+	  
+	  foreach ( $layers as $index => $layer ) {
+		  //! TODO
+	  }
+	  
+	  return $settings;
 	}
 	
 	/**
-	 * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
-	 *  array. Don't forget to return!
+	 * Sanitize rates before saving
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wpmudev_field/sanitize_for_db
 	 */
-	function process_shipping_settings($settings) {
-		//sanitize the price fields
-		function sanitize_rates(&$value, $key) {
-			global $mp;
-			if (!is_array($value) && $key != 'rowcount')
-				$value = $mp->display_currency(preg_replace('/[^0-9.]/', '', $value));
+	public function sanitize_rates( $value, $post_id, $field ) {
+		if ( false !== strpos( $field->args['name'], 'shipping[table_rate][rates]' ) ) {
+			return $value;
 		}
 		
-		if (is_array($settings['shipping']['table-rate']))
-			array_walk_recursive($settings['shipping']['table-rate'], 'sanitize_rates');
-			
-		return $settings;
+		return mp_display_currency( $value, 2 );
 	}
 	
 	/**
@@ -310,78 +235,66 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		* @param string $zip, postal code
 		* @param string $country, ISO 3166-1 alpha-2 country code
 		* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
-		*
-		* return float $price
+		* @return float $price
 		*/
-	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-		global $mp;
+	function calculate_shipping( $price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option ) {
+		$rates = $this->get_rates();
+		$base_country = mp_get_setting( 'base_country' );
 		
-		switch ($mp->get_setting('base_country')) {
+		$rate = array();
+		foreach ( $rates as $rate ) {
+			if ( $total >= mp_arr_get_value( 'mincost', $rate, 0 ) ) {
+				break;
+			}
+		}
+		
+		switch ( $base_country ) {
 			case 'US':
-			
-			for ($i = $mp->get_setting('shipping->table-rate->rowcount') - 1; $i >= 0; $i--) 
-				{
-					if ($total >= $mp->get_setting("shipping->table-rate->{$i}->mincost")) 
-					{
-						if ($country == 'US') 
-						{
-							if($state == 'HI' || $state == 'AK')
-								$price = $mp->get_setting("shipping->table-rate->{$i}->hi_ak");	
-							else
-								$price = $mp->get_setting("shipping->table-rate->{$i}->lower_48");
-						}
-						else if ($country == 'CA')
-							$price = $mp->get_setting("shipping->table-rate->{$i}->canada");
-						else
-							$price = $mp->get_setting("shipping->table-rate->{$i}->international");
-					break;
+				if ( $country == 'US' ) {
+					if ( $state == 'HI' || $state == 'AK' ) {
+						$price = mp_arr_get_value( 'hi_ak', $rate, 0 );
+					} else {
+						$price = mp_arr_get_value( 'lower_48', $rate, 0 );
 					}
+				} elseif ( $country == 'CA' ) {
+					$price = mp_arr_get_value( 'canada', $rate, 0 );
+				} else {
+					$price = mp_arr_get_value( 'international', $rate, 0 );
 				}
-		break;
+			break;
+			
 		case 'CA':
-			for ($i = $mp->get_setting('shipping->table-rate->rowcount') - 1; $i >= 0; $i--)
-			{
-				if ($total >= $mp->get_setting("shipping->table-rate->{$i}->mincost"))
-				{
-					if ($country == 'CA')
-						$price = $mp->get_setting("shipping->table-rate->{$i}->in_country");
-					else if ($country == 'US')
-						$price = $mp->get_setting("shipping->table-rate->{$i}->usa");
-					else
-						$price = $mp->get_setting("shipping->table-rate->{$i}->international");
-					break;
-				}
+			if ( $country == 'CA' ) {
+				$price = mp_arr_get_value( 'in_country', $rate, 0 );
+			} elseif ($country == 'US') {
+				$price = mp_arr_get_value( 'usa', $rate, 0 );
+			} else {
+				$price = mp_arr_get_value( 'international', $rate, 0 );
 			}
 		break;
+		
 		default:
-			for ($i = $mp->get_setting('shipping->table-rate->rowcount') - 1; $i >= 0; $i--) 
-				{
-				if ($total >= $mp->get_setting("shipping->table-rate->{$i}->mincost")) 
-					{
-					if ( in_array($mp->get_setting('base_country'), $mp->eu_countries) )  //in european union
-						{
-						if ($country == $mp->get_setting('base_country')) 
-							$price = $mp->get_setting("shipping->table-rate->{$i}->in_country");
-						else if (in_array($country, $mp->eu_countries))
-							$price = $mp->get_setting("shipping->table-rate->{$i}->eu");
-						else
-							$price = $mp->get_setting("shipping->table-rate->{$i}->international");
-						}
-						else  //all other countries
-						{
-						if ($country == $mp->get_setting('base_country')) 
-							$price = $mp->get_setting("shipping->table-rate->{$i}->in_country");
-						else
-							$price = $mp->get_setting("shipping->table-rate->{$i}->international");
-					}
-					break;
-					}
+			if ( in_array( $country, mp()->eu_countries ) ) {
+				//in european union
+				if ( $base_country == $country ) { 
+					$price = mp_arr_get_value( 'in_country', $rate, 0 );
+				} elseif ( in_array( $country, mp()->eu_countries) ) {
+					$price = mp_arr_get_value( 'eu', $rate, 0 );
+				} else {
+					$price = mp_arr_get_value( 'international', $rate, 0 );
+				}
+			} else {
+				//all other countries
+				if ( $country == $base_country ) { 
+					$price = mp_arr_get_value( 'in_country', $rate, 0 );
+				} else {
+					$price = mp_arr_get_value( 'international', $rate, 0 );
+				}
 			}
 		}
 	
-		return $price;
+		return (float) $price;
 	}
-
 }
 
 //register plugin - uncomment to register
