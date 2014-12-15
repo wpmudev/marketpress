@@ -1,14 +1,9 @@
 <?php
-/*
-MarketPress Table-Rate Shipping Plugin
-Author: Nick Bunn (Salty Dog Interactive for Incsub)
-Version: 1.1
-*/
 
 class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
-	var $plugin_name = 'table-rate';
+	var $plugin_name = 'table_rate';
 	
 	//public name of your method, for lists and such.
 	var $public_name = '';
@@ -49,13 +44,76 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
   }
   
   /**
-   * Use this to process any additional field you may add. Use the $_POST global,
-   *  and be sure to save it to both the cookie and usermeta if logged in.
+   * Initialize the settings metabox
+   *
+   * @since 3.0
+   * @access public
    */
-	function process_shipping_form() {
+  public function init_settings_metabox() {
+		$metabox = new WPMUDEV_Metabox( array(
+			'id' => $this->generate_metabox_id(),
+			'page_slugs' => array( 'store-settings-shipping', 'store-settings_page_store-settings-shipping' ),
+			'title' => sprintf( __( '%s Settings', 'mp' ), $this->public_name ),
+			'desc' => __( 'Be sure to enter a shipping price for every option or those customers may get free shipping. Each layer must be a higher price than the one above it.', 'mp' ),
+			'option_name' => 'mp_settings',
+			'conditional' => array(
+				'action' => 'show',
+				'name' => 'shipping[method]',
+				'value' => 'table_rate',
+			),
+		));
+		$layers = $metabox->add_field( 'repeater', array(
+			'name' => 'shipping[table_rate]',
+		) );
+		
+		if ( $layers instanceof WPMUDEV_Field ) {
+			$layers->add_sub_field( 'text', array(
+				'name' => 'mincost',
+				'label' => array( 'text' => __( 'Cart Total', 'mp' ) ),
+			) );
+			
+			if ( 'US' == mp_get_setting( 'base_country') ) {
+				$layers->add_sub_field( 'text', array(
+					'name' => 'lower_48',
+					'label' => array( 'text' => __( 'Lower 48 States', 'mp' ) ),
+				) );
+				$layers->add_sub_field( 'text', array(
+					'name' => 'hi_ak',
+					'label' => array( 'text' => __( 'Hawaii and Alaska', 'mp' ) ),
+				) );
+				$layers->add_sub_field( 'text', array(
+					'name' => 'canada',
+					'label' => array( 'text' => __( 'Canada', 'mp' ) ),
+				) );
+			} else {
+				$layers->add_sub_field( 'text', array(
+					'name' => 'in_country',
+					'label' => array( 'text' => __( 'In Country', 'mp' ) ),
+				) );
+				
+				if ( 'US' == mp_get_setting( 'base_country') ) {
+					$layers->add_sub_field( 'text', array(
+						'name' => 'usa',
+						'label' => array( 'text' => __( 'United States', 'mp' ) ),
+					) );
+				}
+				
+				if ( in_array( mp_get_setting( 'base_country' ), mp()->eu_countries ) ) {
+					$layers->add_sub_field( 'text', array(
+						'name' => 'eu',
+						'label' => array( 'text' => __( 'European Union', 'mp' ) ),
+					) );
+				}
+			}
+			
+			$layers->add_sub_field( 'text', array(
+				'name' => 'international',
+				'label' => array( 'text' => __( 'International', 'mp' ) ),
+			) );
+		}
+	}
 
-  }
-	
+  
 	/**
 	 * Echo a settings meta box with whatever settings you need for you shipping module.
 	 *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
@@ -327,4 +385,4 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 }
 
 //register plugin - uncomment to register
-MP_Shipping_API::register_plugin( 'MP_Shipping_Table_Rate', 'table-rate', __('Table Rate', 'mp') );
+MP_Shipping_API::register_plugin( 'MP_Shipping_Table_Rate', 'table_rate', __('Table Rate', 'mp') );
