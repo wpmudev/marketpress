@@ -20,8 +20,6 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 			'options' => array(),
 			'width' => null,
 		), $args);
-		
-		//FB::log( print_r( $this->args, true ) );
 	}
 	
 	/**
