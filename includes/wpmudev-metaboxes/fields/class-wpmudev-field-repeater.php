@@ -21,12 +21,14 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 *
 	 *		@type string $layout How to display the repeater subfields - either "table" or "rows".
 	 *		@type string $add_row_label The label for the add row button.
+	 *		@type bool $sortable Whether the fields should be sortable or not. Defaults to true.
 	 * }
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
 			'layout' => 'table',
 			'add_row_label' => __('Add Row', 'wpmudev_metaboxes'),
+			'sortable' => true,
 		), $args);
 	}
 	
@@ -232,7 +234,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		<div class="<?php echo $class; ?>"<?php echo $atts; ?>>
 		<?php		
 		if ( $this->args['layout'] == 'table' ) : ?>
-			<table class="wpmudev-subfields widefat">
+			<table class="wpmudev-subfields widefat<?php echo ( ! $this->args['sortable'] ) ? ' no-sorting' : ''; ?>">
 				<thead>
 					<tr>
 						<th style="width:15px">&nbsp;</th>
@@ -371,7 +373,7 @@ jQuery(document).ready(function($){
 		});
 	};
 	
-	$('.wpmudev-subfields').sortable({
+	$('.wpmudev-subfields').not( '.no-sorting' ).sortable({
 		"axis" : "y",
 		"forceHelperSize" : true,
 		"forcePlaceholderSize" : true,
