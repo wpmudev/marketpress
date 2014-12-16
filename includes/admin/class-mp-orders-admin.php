@@ -240,7 +240,7 @@ class MP_Orders_Admin {
 		?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br />
-			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_info->shipping_cost', 0 ) ); ?>
+			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
 		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
 		<div class="misc-pub-section">
