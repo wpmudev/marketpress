@@ -97,6 +97,8 @@ if ( ! function_exists( '_mp_products_html' ) ) :
 				} elseif ( $column == $per_row ) {
 					$class[] = 'last';
 					$column = 1;
+				} else {
+					$column ++;
 				}
 			}
 			
