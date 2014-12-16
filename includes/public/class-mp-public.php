@@ -38,9 +38,22 @@ class MP_Public {
 		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
-		add_action( 'init', array( &$this, 'maybe_start_session' ) );
+		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
 	}
-	
+
+	/**
+	 * Safely start session
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	public function _start_session() {
+		$sess_id = session_id();
+		if ( empty($sess_id) ) {
+			session_start();
+		}
+	}
+		
 	/**
 	 * Disable comments on store pages
 	 *
@@ -281,7 +294,7 @@ class MP_Public {
 			return;
 		}
 		
-		$this->start_session();
+		$this->_start_session();
 	}
 	
 	/**
@@ -317,19 +330,6 @@ class MP_Public {
 		}
 		
 		return $content;
-	}
-	
-	/**
-	 * Safely start session
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function start_session() {
-		$sess_id = session_id();
-		if ( empty($sess_id) ) {
-			session_start();
-		}
 	}
 	
 	/**

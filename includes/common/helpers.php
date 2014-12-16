@@ -844,6 +844,10 @@ if ( ! function_exists('mp_get_session_value') ) :
 	/**
 	 * Safely retreives a value from the $_SESSION array
 	 *
+	 * NOTE: this function is designed to only be used on cart and checkout pages.
+	 * Use them any where else and they will not work as the session is only started
+	 * on these pages!
+	 *
 	 * @since 3.0
 	 * @uses mp_arr_get_value()
 	 *	 
@@ -852,7 +856,6 @@ if ( ! function_exists('mp_get_session_value') ) :
 	 * @return mixed
 	 */	 
 	function mp_get_session_value( $key, $default = false ) {
-		mp_public()->start_session();
 		return mp_arr_get_value($key, $_SESSION, $default);
 	}
 endif;
@@ -966,13 +969,15 @@ if ( ! function_exists('mp_update_session_value') ) :
 	/**
 	 * Update a session variable
 	 *
-	 * @since 3.0
+	 * NOTE: this function is designed to only be used on cart and checkout pages.
+	 * Use them any where else and they will not work as the session is only started
+	 * on these pages!
 	 *
+	 * @since 3.0
 	 * @param string $key The key to update
 	 * @param mixed $value The value to use
 	 */
 	function mp_update_session_value( $key, $value ) {
-		mp_public()->start_session();
 		mp_push_to_array($_SESSION, $key, $value);
 	}
 endif;
