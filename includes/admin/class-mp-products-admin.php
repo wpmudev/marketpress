@@ -75,9 +75,10 @@ jQuery( document ).ready( function( $ ) {
 		if ( $( this ).prop( 'checked' ) ) {
 			$elms.hide();
 		} else {
-			tinymce.execCommand( 'mceRemoveEditor', false, 'content' );
 			$elms.show();
-			tinymce.execCommand( 'mceAddEditor', false, 'content' );
+			/* This is required to fix a bug in webkit with the WYSIWYG showing up all
+			garbled after unhiding */
+			$( window ).trigger( 'scroll' ); 
 		}
 	} ).trigger( 'change' );
 });
