@@ -213,18 +213,10 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function payment_form( $cart, $shipping_info ) {
-		$name = mp_get_user_address_part( 'name', 'billing' );
+		$name = mp_get_user_address_part( 'first_name', 'billing' ) . ' ' . mp_get_user_address_part( 'last_name', 'billing' );
 
 		$content = '
-			<div class="mp-checkout-form-row">
-				<label>' . __('Cardholder Name', 'mp') . '<span class="mp-field-required">*</span></label>
-				<input
-					id="mp-stripe-name"
-					type="text"
-					data-rule-required="true"
-					data-rule-cc-fullname="true"
-					value="' . esc_attr($name) . '" />
-			</div>
+			<input id="mp-stripe-name" type="hidden" value="' . esc_attr($name) . '" />
 			<div class="mp-checkout-form-row">
 				<label>' . __('Card Number', 'mp') . '<span class="mp-field-required">*</span></label>
 				<input
