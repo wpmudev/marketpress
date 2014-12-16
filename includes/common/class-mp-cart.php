@@ -1188,7 +1188,7 @@ class MP_Cart {
 		
 		$shipping_total = mp_arr_get_value('shipping', $this->_total, 0);
 		
-		if ( empty( $price ) ) {
+		if ( empty( $shipping_total ) ) {
 			return __( 'FREE', 'mp' );
 		} else {
 			if ( $format ) {
