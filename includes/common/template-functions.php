@@ -433,6 +433,9 @@ if ( ! function_exists('mp_format_currency') ) :
 			$negative_symbol = '-';
 			$amount = abs($amount);
 		}
+		
+		// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
+		$amount = (float) $amount;
 
 		//format currency amount according to preference
 		if ( $amount ) {
