@@ -38,6 +38,7 @@ class MP_Public {
 		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
+		add_action( 'init', array( &$this, 'maybe_start_session' ) );
 	}
 	
 	/**
@@ -266,6 +267,21 @@ class MP_Public {
 		}
 		
 		return $template;
+	}
+	
+	/**
+	 * Maybe start the session
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action init
+	 */
+	public function maybe_start_session() {
+		if ( ! mp_is_shop_page( 'checkout' ) && ! mp_is_shop_page( 'cart' ) ) {
+			return;
+		}
+		
+		$this->start_session();
 	}
 	
 	/**
