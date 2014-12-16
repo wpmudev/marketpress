@@ -292,6 +292,8 @@ var marketpress = {};
 					}
 					
 					return;
+				} else {
+					marketpress.updateProductList();
 				}
 			} );
 			
@@ -307,6 +309,12 @@ var marketpress = {};
 			} );
 		},
 		
+		/**
+		 * Update product list
+		 *
+		 * @since 3.0
+		 * @access public
+		 */
 		updateProductList : function() {
 			var $form = $( '#mp_product_list_refine' );
 			var data = $form.serialize();
