@@ -194,7 +194,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	 * @action wpmudev_field/sanitize_for_db
 	 */
 	public function sanitize_rates( $value, $post_id, $field ) {
-		if ( false !== strpos( $field->args['name'], 'shipping[table_rate][rates]' ) ) {
+		if ( false === strpos( $field->args['name'], 'shipping[table_rate][rates]' ) ) {
 			return $value;
 		}
 		
