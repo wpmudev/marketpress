@@ -1277,7 +1277,7 @@ class MP_Cart {
 				case 'US':
 					// USA taxes are only for orders delivered inside the state
 					if ( $country == 'US' && $state == mp_get_setting('base_province') ) {
-						$price = ($total * mp_get_setting('tax->rate')) + $special_total;
+						$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
 					}
 				break;
 		
@@ -1285,9 +1285,9 @@ class MP_Cart {
 					 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 					if ( $country == 'CA' && array_key_exists($state, mp()->canadian_provinces) ) {
 						if ( $tax_rate = mp_get_setting("tax->canada_rate->$state") ) {
-							$price = ($total * $tax_rate) + $special_total;
+							$tax_amt = ($total * $tax_rate) + $special_total;
 						} else { //backwards compat with pre 2.2 if per province rates are not set
-							$price = ($total * mp_get_setting('tax->rate')) + $special_total;
+							$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
 						}
 					}
 				break;
@@ -1295,7 +1295,7 @@ class MP_Cart {
 				case 'AU':
 					//Australia taxes orders in country
 					if ( $country == 'AU' ) {
-						$price = ($total * mp_get_setting('tax->rate')) + $special_total;
+						$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
 					}
 				break;
 		
@@ -1303,38 +1303,38 @@ class MP_Cart {
 					//EU countries charge VAT within the EU
 					if ( in_array(mp_get_setting('base_country'), mp()->eu_countries) ) {
 						if ( in_array($country, mp()->eu_countries) ) {
-							$price = ($total * mp_get_setting('tax->rate')) + $special_total;
+							$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
 						}
 					} else {
 						//all other countries use the tax outside preference
 						if ( mp_get_setting('tax->tax_outside') || (! mp_get_setting('tax->tax_outside') && $country == mp_get_setting('base_country')) ) {
-							$price = ($total * mp_get_setting('tax->rate')) + $special_total;
+							$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
 						}
 					}
 				break;
 			}
 			
-			if ( empty($price) ) {
-				$price = 0;
-			} else {
-				// Add in shipping?
-				$price += $this->shipping_tax_total();
+			if ( empty( $tax_amt ) ) {
+				$tax_amt = 0;
 			}
+			
+			// Add in shipping?
+			$tax_amt += $this->shipping_tax_total();
 			
 			/**
 			 * Filter the tax price
 			 *
 			 * @since 3.0
-			 * @param float $price The calculated tax price.
+			 * @param float $tax_amt The calculated tax price.
 			 * @param float $total The cart total.
 			 * @param MP_Cart $this The current cart object.
 			 * @param string $country The user's country.
 			 * @param string $state $the user's state/province.
 			 */
-			$price = apply_filters('mp_tax_price', $price, $total, $this, $country, $state);
-			$price = apply_filters('mp_cart/tax_total', $price, $total, $this, $country, $state);
+			$tax_amt = apply_filters('mp_tax_price', $tax_amt, $total, $this, $country, $state);
+			$tax_amt = apply_filters('mp_cart/tax_total', $tax_amt, $total, $this, $country, $state);
 			
-			$this->_total['tax'] = $price;
+			$this->_total['tax'] = $tax_amt;
 		}
 		
 		$tax_total = mp_arr_get_value('tax', $this->_total, 0);
