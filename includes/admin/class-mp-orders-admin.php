@@ -242,10 +242,12 @@ class MP_Orders_Admin {
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br />
 			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_info->shipping_cost', 0 ) ); ?>
 		</div>
+		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br />
 			<?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?>
 		</div>
+		<?php endif; ?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Actual Shipping Method', 'mp' ); ?>:</strong><br />
 			<select name="mp[tracking_info][shipping_method]" style="vertical-align:top;width:100%;">
