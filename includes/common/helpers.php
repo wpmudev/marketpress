@@ -150,7 +150,8 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		// If actually shipped show method, else customer's shipping choice.
 		if ( $order->get_meta( 'mp_shipping_info->method') && $order->get_meta( 'mp_shipping_info->method' != 'other' ) ) {
 			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $order->get_meta( 'mp_shipping_info->method' );
-		} elseif ( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) {
+		// If using calculated shipping, show the carrier and shipping option selected
+		} elseif ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) {
 			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ;
 		}
 	
