@@ -160,32 +160,34 @@ class MP_Checkout {
 		// Country list
 		$allowed_countries = explode(',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		$countries = array();
-		foreach ( $allowed_countries as $country ) {
-			$countries[ $country ] = mp()->countries[ $country ];
+		foreach ( $allowed_countries as $_country ) {
+			$countries[ $_country ] = mp()->countries[ $_country ];
 		}
 		
 		// State/zip fields
 		$state_zip_fields = array();
-		if ( $states = mp_get_states( $country ) ) {
-			$state_zip_fields[] = array(
-				'type' => 'select',
-				'label' => __('State/Province', 'mp'),
-				'name' => $this->field_name( 'state', $type ),
-				'options' => $states,
-				'value' => mp_get_user_address_part('state', $type),
-				'atts' => array(
-					'class' => 'mp_select2_search',
-				),
-				'validation' => array(
-					'required' => true,
-				),
-			);
-		}
+		$states = mp_get_states( $country );
+		$state_zip_fields[] = array(
+			'type' => 'select',
+			'label' => __('State/Province', 'mp'),
+			'name' => $this->field_name( 'state', $type ),
+			'options' => $states,
+			'hidden' => ( empty( $states ) ),
+			'value' => mp_get_user_address_part('state', $type),
+			'atts' => array(
+				'class' => 'mp_select2_search',
+			),
+			'validation' => array(
+				'required' => true,
+			),
+		);
+		
 		$state_zip_fields[] = array(
 			'type' => 'text',
 			'label' => mp_get_setting('zip_label'),
 			'name' => $this->field_name( 'zip', $type ),
 			'value' => mp_get_user_address_part('zip', $type),
+			'hidden' => array_key_exists( $country, mp()->countries_no_postcode ),
 			'validation' => array(
 				'required' => true,
 			),
@@ -298,7 +300,7 @@ class MP_Checkout {
 				$field['label'] = false;
 			}
 			
-			$html .= '<div class="mp-checkout-form-row">' . $this->form_field( $field ) . '</div>';
+			$html .= '<div class="mp-checkout-form-row"' . (( mp_arr_get_value( 'hidden', $field ) ) ? ' style="display:none"' : '') . '>' . $this->form_field( $field ) . '</div>';
 		}
 					
 		/**
@@ -611,7 +613,7 @@ class MP_Checkout {
 					}
 
 					$html .= '
-					<div class="mp-checkout-column">' .
+					<div class="mp-checkout-column"' . (( mp_arr_get_value( 'hidden', $subfield ) ) ? ' style="display:none"' : '') . '>' .
 						$this->form_field( $subfield );
 					
 					if ( ! $top_label && ! $subfield['value_only'] ) {

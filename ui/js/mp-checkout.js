@@ -17,7 +17,7 @@ var mp_checkout;
 		},
 		
 		/**
-		 * Update state list when country changes
+		 * Update state list/zipcode field when country changes
 		 *
 		 * @since 3.0
 		 */
@@ -27,11 +27,15 @@ var mp_checkout;
 				var url = mp_i18n.ajaxurl + '?action=mp_update_states_dropdown';
 				
 				if ( $this.attr( 'name' ).indexOf( 'billing' ) == 0 ) {
-					var $target = $( '[name="billing[state]"]' );
+					var $state = $( '[name="billing[state]"]' );
+					var $zip = $( '[name="billing[zip]"]' );
 					var type = 'billing';
+					var $row = $state.closest( '.mp-checkout-form-row' );
 				} else {
-					var $target = $( '[name="shipping[state]"]' );
+					var $state = $( '[name="shipping[state]"]' );
+					var $zip = $( '[name="shipping[zip]"]' )
 					var type = 'shipping';
+					var $row = $state.closest( '.mp-checkout-form-row' );
 				}
 				
 				var data = {
@@ -39,16 +43,24 @@ var mp_checkout;
 					type : type
 				}
 				
-				$target.select2( 'destroy' ).ajaxLoading( 'show' );
+				$state.select2( 'destroy' );
+				$row.ajaxLoading( 'show' );
 						
 				$.post( url, data ).done( function( resp ) {
 					if ( resp.success ) {
+						$row.ajaxLoading( 'false' );
 						if ( resp.data.states ) {
-							$target.html( resp.data.states ).ajaxLoading( 'hide' );
-							$target.closest( '.mp-checkout-column' ).show();
+							$state.html( resp.data.states );
+							$state.closest( '.mp-checkout-column' ).show();
 							marketpress.initSelect2();
 						} else {
-							$target.closest( '.mp-checkout-column' ).hide();
+							$state.closest( '.mp-checkout-column' ).hide();
+						}
+						
+						if ( resp.data.show_zipcode ) {
+							$zip.closest( '.mp-checkout-column' ).show();
+						} else {
+							$zip.closest( '.mp-checkout-column' ).hide();
 						}
 					}
 				} );
@@ -220,7 +232,7 @@ var mp_checkout;
 				onkeyup : false,
 				onclick : false,
 				ignore : function( index, element ){
-					return ( ! $( element ).closest( '.cycle-slide.current' ).length || $( element ).is( ':hidden' ) );
+					return ( ! $( element ).closest( '.cycle-slide.current' ).length || $( element ).is( ':hidden' ) || $( element ).prop( 'disabled' ) );
 				},
 				highlight : function( element, errorClass ){
 					$( element ).addClass( 'mp-input-error' ).prev( 'label' ).addClass( 'mp-label-error' );

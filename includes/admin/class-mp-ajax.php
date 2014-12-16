@@ -150,7 +150,7 @@ class MP_Ajax {
 	}
 
 	/**
-	 * Update state dropdown list
+	 * Update state dropdown list and determine if zip code field should be shown
 	 *
 	 * @since 3.0
 	 * @access public
@@ -158,16 +158,25 @@ class MP_Ajax {
 	 */
 	public function update_states_dropdown() {
 		$states = false;
+		$show_zipcode = true;
+		
 		if ( $country = mp_get_post_value( 'country' ) ) {
 			$_states = mp_get_states( $country );
-			$states = '<option value="">' . __( 'Select One', 'mp' ) . '</option>';
-			$selected = mp_get_user_address_part( 'state', mp_get_post_value( 'type' ) );
-			foreach ( $_states as $val => $label ) {
-				$states .= '<option value="' . $val . '" ' . selected( $selected, $val, false ) . '>' . $label . '</option>'; 
+			
+			if ( $_states ) {
+				$states = '<option value="">' . __( 'Select One', 'mp' ) . '</option>';
+				$selected = mp_get_user_address_part( 'state', mp_get_post_value( 'type' ) );
+				foreach ( $_states as $val => $label ) {
+					$states .= '<option value="' . $val . '" ' . selected( $selected, $val, false ) . '>' . $label . '</option>'; 
+				}
+			}
+			
+			if ( array_key_exists( $country, mp()->countries_no_postcode ) ) {
+				$show_zipcode = false;
 			}
 		}
 		
-		wp_send_json_success( array( 'states' => $states ) );
+		wp_send_json_success( array( 'states' => $states, 'show_zipcode' => $show_zipcode ) );
 	}
 	
 	/**
