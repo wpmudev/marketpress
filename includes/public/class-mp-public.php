@@ -47,10 +47,10 @@ class MP_Public {
 	 * @since 3.0
 	 * @access protected
 	 */
-	public function _start_session() {
+	public function start_session() {
 		$sess_id = session_id();
 		if ( empty($sess_id) ) {
-			session_start();
+			@session_start();
 		}
 	}
 		
@@ -167,7 +167,6 @@ class MP_Public {
 			$template = locate_template(array('mp_productlist.php'));
 		} elseif ( mp_get_setting('pages->cart') == $post->ID ) {
 			$template = locate_template(array('mp_cart.php'));
-			$this->start_session();
 		} elseif ( mp_get_setting('pages->checkout') == $post->ID ) {
 			$template = locate_template(array('mp_checkout.php', 'mp_cart.php'));
 		} elseif ( mp_get_setting('pages->order_status') == $post->ID ) {
@@ -294,7 +293,7 @@ class MP_Public {
 			return;
 		}
 		
-		$this->_start_session();
+		$this->start_session();
 	}
 	
 	/**

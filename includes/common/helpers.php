@@ -856,7 +856,8 @@ if ( ! function_exists('mp_get_session_value') ) :
 	 * @return mixed
 	 */	 
 	function mp_get_session_value( $key, $default = false ) {
-		return mp_arr_get_value($key, $_SESSION, $default);
+		mp_public()->start_session();
+		return mp_arr_get_value( $key, $_SESSION, $default );
 	}
 endif;
 
@@ -978,7 +979,8 @@ if ( ! function_exists('mp_update_session_value') ) :
 	 * @param mixed $value The value to use
 	 */
 	function mp_update_session_value( $key, $value ) {
-		mp_push_to_array($_SESSION, $key, $value);
+		mp_public()->start_session();
+		mp_push_to_array( $_SESSION, $key, $value );
 	}
 endif;
 
