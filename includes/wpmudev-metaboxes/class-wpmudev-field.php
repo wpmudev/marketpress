@@ -198,13 +198,20 @@ class WPMUDEV_Field {
 		}
 		
 		foreach ( $this->args['validation'] as $key => $val ) {
-			if ( $key == 'custom' ) {
-				$this->args['custom']['data-custom-validation'] = $val;
+			if ( is_bool( $val ) ) {
+				if ( $val ) {
+					$val = 'true';
+				} else {
+					$val = 'false';
+				}
 			}
-			elseif ( $val === true ) {
-				$this->args['class'] .= " $key";
+			
+			if ( $key == 'custom' ) {
+				$index = max( (int) wp_cache_get( 'custom_validation_index', 'wpmudev_field' ), 0 );
+				$this->args['custom']["data-rule-custom-{$index}"] = $val;
+				wp_cache_set( 'custom_validation_index', ($index + 1), 'wpmudev_field' );
 			} else {
-				$this->args['custom'][$key] = $val;
+				$this->args['custom']["data-rule-{$key}"] = $val;
 			}
 		}
 	}

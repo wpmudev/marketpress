@@ -589,6 +589,11 @@ jQuery( document ).ready( function( $ ) {
 					'value' => 1,
 				),
 			),
+			'validation' => array(
+				'required' => true,
+				'digits' => true,
+				'min' => 0,
+			),
 		));
 		$metabox->add_field('file', array(
 			'name' => 'file_url',
@@ -597,7 +602,10 @@ jQuery( document ).ready( function( $ ) {
 				'name' => 'product_type',
 				'value' => 'digital',
 				'action' => 'show',
-			),	
+			),
+			'validation' => array(
+				'url' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => 'external_url',
@@ -607,6 +615,9 @@ jQuery( document ).ready( function( $ ) {
 				'value' => 'external',
 				'action' => 'show',
 			),	
+			'validation' => array(
+				'url' => true,
+			),
 		));
 		
 		// Price Tab
@@ -622,6 +633,11 @@ jQuery( document ).ready( function( $ ) {
 				'value' => array('physical', 'digital'),
 				'action' => 'show',
 			),
+			'validation' => array(
+				'required' => true,
+				'number' => true,
+				'min' => 0,
+			),
 		));
 		$sale_price = $metabox->add_field('complex', array(
 			'name' => 'sale_price',
@@ -630,13 +646,17 @@ jQuery( document ).ready( function( $ ) {
 				'name' => 'product_type',
 				'value' => array('physical', 'digital'),
 				'action' => 'show',
-			),												
+			),											
 		));
 		
 		if ( $sale_price instanceof WPMUDEV_Field ) {
 			$sale_price->add_field('text', array(
 				'name' => 'amount',
 				'label' => array('text' => __('Price', 'mp')),
+				'validation' => array(
+					'number' => true,
+					'min' => 0,
+				),
 			));
 			$sale_price->add_field('datepicker', array(
 				'name' => 'start_date',
@@ -662,7 +682,11 @@ jQuery( document ).ready( function( $ ) {
 				'name' => 'product_type',
 				'value' => array('physical', 'digital'),
 				'action' => 'show',
-			),	
+			),
+			'validation' => array(
+				'number' => true,
+				'min' => 0,
+			),
 		));			
 		
 		// Shipping Tab
@@ -677,17 +701,23 @@ jQuery( document ).ready( function( $ ) {
 				'name' => 'product_type',
 				'value' => 'physical',
 				'action' => 'show',
-			),				
+			),			
 		));
 		
 		if ( $weight instanceof WPMUDEV_Field ) {
 			$weight->add_field('text', array(
 				'name' => 'pounds',
 				'label' => array('text' => __('Pounds', 'mp')),
+				'validation' => array(
+					'digits' => true,
+				),
 			));
 			$weight->add_field('text', array(
 				'name' => 'ounces',
 				'label' => array('text' => __('Ounces', 'mp')),
+				'validation' => array(
+					'digits' => true,
+				),
 			));
 		}
 		
@@ -699,7 +729,11 @@ jQuery( document ).ready( function( $ ) {
 				'name' => 'product_type',
 				'value' => array('physical', 'digital'),
 				'action' => 'show',
-			),	
+			),
+			'validation' => array(
+				'number' => true,
+				'min' => 0,
+			),
 		));
 	}
 		
@@ -764,6 +798,9 @@ jQuery( document ).ready( function( $ ) {
 			$repeater->add_sub_field('text', array(
 				'name' => 'name',
 				'label' => array('text' => __('Name', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'sku',
@@ -798,6 +835,11 @@ jQuery( document ).ready( function( $ ) {
 						'value' => 1,
 					),
 				),
+				'validation' => array(
+					'required' => true,
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 			$repeater->add_sub_field('file', array(
 				'name' => 'file_url',
@@ -806,7 +848,10 @@ jQuery( document ).ready( function( $ ) {
 					'name' => 'product_type',
 					'value' => 'digital',
 					'action' => 'show',
-				),	
+				),
+				'validation' => array(
+					'url' => true,
+				),
 			));
 			$repeater->add_sub_field('wysiwyg', array(
 				'name' => 'description',
@@ -820,13 +865,16 @@ jQuery( document ).ready( function( $ ) {
 					'name' => 'product_type',
 					'value' => 'external',
 					'action' => 'show',
-				),	
+				),
+				'validation' => array(
+					'url' => true,
+				),
 			));
 			
 			// Price Tab
 			$repeater->add_sub_field('tab', array(
 				'name' => 'tab_price',
-				'slug' => 'price'
+				'slug' => 'price',
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'regular_price',
@@ -835,6 +883,10 @@ jQuery( document ).ready( function( $ ) {
 					'name' => 'product_type',
 					'value' => array('physical', 'digital'),
 					'action' => 'show',
+				),
+				'validation' => array(
+					'required' => true,
+					'number' => true,
 				),
 			));
 			$sale_price = $repeater->add_sub_field('complex', array(
@@ -849,6 +901,10 @@ jQuery( document ).ready( function( $ ) {
 			$sale_price->add_field('text', array(
 				'name' => 'amount',
 				'label' => array('text' => __('Price', 'mp')),
+				'validation' => array(
+					'number' => true,
+					'min' => 0,
+				),
 			));
 			$sale_price->add_field('datepicker', array(
 				'name' => 'start_date',
@@ -871,15 +927,23 @@ jQuery( document ).ready( function( $ ) {
 					'name' => 'product_type',
 					'value' => 'physical',
 					'action' => 'show',
-				),				
+				),
 			));
 			$weight->add_field('text', array(
 				'name' => 'pounds',
 				'label' => array('text' => __('Pounds', 'mp')),
+				'validation' => array(
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 			$weight->add_field('text', array(
 				'name' => 'ounces',
 				'label' => array('text' => __('Ounces', 'mp')),
+				'validation' => array(
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'extra_shipping_cost',
@@ -889,7 +953,11 @@ jQuery( document ).ready( function( $ ) {
 					'name' => 'product_type',
 					'value' => array('physical', 'digital'),
 					'action' => 'show',
-				),	
+				),
+				'validation' => array(
+					'number' => true,
+					'min' => 0,
+				),
 			));
 			
 			// Taxes Tab
@@ -905,7 +973,11 @@ jQuery( document ).ready( function( $ ) {
 					'name' => 'product_type',
 					'value' => array('physical', 'digital'),
 					'action' => 'show',
-				),	
+				),
+				'validation' => array(
+					'number' => true,
+					'min' => 0,
+				),
 			));
 			
 			// Attributes Tab
@@ -936,6 +1008,9 @@ jQuery( document ).ready( function( $ ) {
 						'value' => array('physical', 'digital'),
 						'action' => 'show',
 					),	
+					'validation' => array(
+						'required' => true,
+					),
 				));
 			}
 		}
