@@ -340,6 +340,19 @@ label.error {
 			padding: 7px 12px;
 			text-decoration: none;
 			text-transform: uppercase;
+			
+			&.has-error {
+				color: #ea0000 !important;
+			}
+		}
+		
+		.wpmudev-field-tab-wrap {
+			&.inactive {
+				position: absolute;
+					top: 9999px;
+					left: 9999px;
+					z-index: -1;
+			}
 		}
 		
 		/**
