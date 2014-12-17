@@ -69,7 +69,7 @@ class WPMUDEV_Field_Tab_Labels extends WPMUDEV_Field {
 					$target = $this.closest('.wpmudev-field-tab-labels').siblings('.wpmudev-field-tab-wrap[data-slug="' + $this.attr('href').substr(1) + '"]');
 			
 			$this.parent().addClass('active').siblings().removeClass('active');
-			$target.show().siblings('.wpmudev-field-tab-wrap').hide();
+			$target.removeClass( 'inactive' ).siblings('.wpmudev-field-tab-wrap').addClass( 'inactive' );
 		});
 		$('.wpmudev-field-tab-label').filter('.active').find('.wpmudev-field-tab-label-link').trigger('click');
 	}
