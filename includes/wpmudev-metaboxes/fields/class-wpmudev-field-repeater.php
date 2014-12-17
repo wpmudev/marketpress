@@ -537,8 +537,8 @@ jQuery(document).ready(function($){
 		}
 		
 		//subfields don't support validation (yet) so make sure these arguments are set accordingly
-		$args['validation'] = array();
-		$args['custom_validation_message'] = '';
+		//$args['validation'] = array();
+		//$args['custom_validation_message'] = '';
 		
 		if ( isset($args['name']) ) {
 			// Some fields (e.g. section) don't use the name argument

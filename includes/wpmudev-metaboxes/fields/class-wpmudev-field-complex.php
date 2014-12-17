@@ -201,10 +201,6 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 			return false;	
 		}
 		
-		//subfields don't support validation (yet) so make sure these arguments are reset accordingly
-		$args['validation'] = array();
-		$args['custom_validation_message'] = '';
-		
 		$args['echo'] = false;
 		$args['original_name'] = $args['name'];
 		$args['name_base'] = $this->args['original_name'];
