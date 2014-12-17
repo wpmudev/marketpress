@@ -138,6 +138,14 @@ class WPMUDEV_Metabox {
 	public static $did_metabox_count = 0;
 	
 	/**
+	 * If the run once actions/methods have been run
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public static $did_run_once = false;
+	
+	/**
 	 * Save the state of the metabox (open or closed)
 	 *
 	 * @since 1.0
@@ -270,19 +278,25 @@ class WPMUDEV_Metabox {
 		
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace('-', '_', $this->args['id']) . '_save_fields';
 		$this->nonce_name = $this->nonce_action . '_nonce';
+
+		// These only need to be run once
+		if ( ! self::$did_run_once ) {
+			$this->localize();
+			add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_styles' ) );
+			add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) );
+			add_action( 'admin_notices', array( &$this, 'admin_notices' ) );
+			add_action( 'network_admin_notices', array( &$this, 'admin_notices' ) );
+			self::$did_run_once = true;
+		}
 	
-		$this->localize();
 		$this->init_conditional_logic();
 		$this->add_html_classes();
 		
-		add_action('admin_enqueue_scripts', array(&$this, 'maybe_enqueue_styles_scripts'));		
-		add_action('add_meta_boxes_' . $this->args['post_type'], array(&$this, 'add_meta_boxes'), $this->args['order']);
-		add_action('wpmudev_metabox/render_settings_metaboxes', array(&$this, 'maybe_render'), $this->args['order']);
-		add_action('save_post', array(&$this, 'maybe_save_fields'));
-		add_filter('postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array(&$this, 'add_meta_box_classes'));
-		add_action('admin_notices', array(&$this, 'admin_notices'));
-		add_action('network_admin_notices', array(&$this, 'admin_notices'));
-		add_action('init', array(&$this, 'maybe_save_settings_fields'), 99);
+		add_action( 'add_meta_boxes_' . $this->args['post_type'], array( &$this, 'add_meta_boxes' ), $this->args['order'] );
+		add_action( 'wpmudev_metabox/render_settings_metaboxes', array( &$this, 'maybe_render' ), $this->args['order'] );
+		add_filter( 'postbox_classes_' . $this->args['post_type'] . '_' . $this->args['id'], array( &$this, 'add_meta_box_classes' ) );
+		add_action( 'save_post', array( &$this, 'maybe_save_fields' ) );
+		add_action( 'init', array( &$this, 'maybe_save_settings_fields' ), 99 );
 	}
 	
 	/**
@@ -388,14 +402,12 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */
 	public function admin_notices() {
-		if ( isset($_GET['wpmudev_metabox_settings_saved']) && ! wp_cache_get('settings_saved', 'wpmudev_metaboxes') ) {
-			echo '<div class="updated"><p>' . __('Settings Saved', 'wpmudev_metaboxes') . '</p></div>';
-			wp_cache_set('settings_saved', true, 'wpmudev_metaboxes'); // Only show the message once per screen
+		if ( isset( $_GET['wpmudev_metabox_settings_saved'] ) ) {
+			echo '<div class="updated"><p>' . __( 'Settings Saved', 'wpmudev_metaboxes' ) . '</p></div>';
 		}
 		
-		if ( isset($_GET['wpmudev_metabox_settings_failed']) && ! wp_cache_get('settings_failed', 'wpmudev_metaboxes') ) {
-			echo '<div class="error"><p>' . __('Due to prolonged inactivity on this page, one or more settings were not saved. Please try again.', 'wpmudev_metaboxes') . '</p></div>';
-			wp_cache_set('settings_failed', true, 'wpmudev_metaboxes'); // Only show the message once per screen
+		if ( isset( $_GET['wpmudev_metabox_settings_failed'] ) ) {
+			echo '<div class="error"><p>' . __( 'Due to prolonged inactivity on this page, one or more settings were not saved. Please try again.', 'wpmudev_metaboxes' ) . '</p></div>';
 		}
 	}
 
@@ -428,20 +440,6 @@ class WPMUDEV_Metabox {
 		
 		$opt_name = ( ! empty($this->args['site_option_name']) ) ? $this->args['site_option_name'] : $this->args['option_name'];
 		$this->save_fields($opt_name);
-	}
-	
-	/**
-	 * Maybe enqueue styles scripts
-	 *
-	 * @since 1.0
-	 * @access public
-	 * @action admin_enqueue_scripts
-	 */
-	public function maybe_enqueue_styles_scripts() {
-		if ( $this->is_active() ) {
-			$this->admin_enqueue_styles();
-			$this->admin_enqueue_scripts();
-		}	
 	}
 	
 	/**
@@ -484,17 +482,23 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */	
 	public function admin_enqueue_scripts() {
-		wp_enqueue_script('jquery-validate', $this->class_url('ui/js/jquery.validate.min.js'), array('jquery'), '1.12');
-		wp_enqueue_script('wpmudev-metaboxes-admin', $this->class_url('ui/js/admin.js'), array('jquery', 'jquery-validate', 'jquery-effects-highlight'), WPMUDEV_METABOX_VERSION, true);
+		wp_register_script( 'jquery-validate', $this->class_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), '1.12' );
+		wp_register_script( 'jquery-validate-methods', $this->class_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), '1.12' );
+		wp_enqueue_script( 'wpmudev-metaboxes-admin', $this->class_url( 'ui/js/admin.js' ), array( 'jquery-validate-methods', 'jquery-effects-highlight' ), WPMUDEV_METABOX_VERSION, true );
 		
-		$default_messages = array(
-			'alphanumeric_error_msg' => __('Please enter only letters and numbers', 'wpmudev_metaboxes'),
+		$messages = array(
+			'alphanumeric_error_msg' => __( 'Please enter only letters and numbers', 'wpmudev_metaboxes' ),
 		);
 		
-		wp_localize_script('wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes_Validation_Messages', array_merge($default_messages, $this->validation_messages));
-		wp_localize_script('wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes', array(
-			'spinner_url' => admin_url('images/spinner.gif'),
-		));
+		wp_localize_script( 'wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes_Validation_Messages', $messages );
+		wp_localize_script( 'wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes', array(
+			'spinner_url' => admin_url( 'images/spinner.gif' ),
+			'error' => __( 'error', 'mp' ),
+			'errors' => __( 'errors', 'mp' ),
+			'has' => __( 'has', 'mp' ),
+			'have' => __( 'have', 'mp' ),
+			'form_error_msg' => __( 'Oops! The form contains %s1 which %s2 been highlighted below.', 'mp' ) . "\n" . __( 'Please fix the %s1 and then try submitting the form again.', 'mp' ),
+		) );
 	}
 	
 	/**
