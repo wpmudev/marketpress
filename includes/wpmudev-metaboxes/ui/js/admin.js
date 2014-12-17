@@ -291,34 +291,79 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 	var initValidation = function(){
 		var $form = $("form#post, form#mp-main-form");
 
+		$form.find( '[data-custom-validation]' ).each( function() {
+			var $this = $( this );
+			var atts = this.attributes;
+			var rule = {};
+			
+			$.each( atts, function( index, attr ) {
+				if ( attr.name.indexOf( 'data-rule-custom-' ) >= 0 ) {
+					rule.name = attr.name.replace( 'data-rule-custom-', '' );
+					rule.val = attr.value;
+				}
+			} );
+			
+			rule.message = $this.attr( 'data-msg-' + rule.name );
+			
+			$.validator.addMethod( ruleName, function( value, element, params ){
+				return this.optional( element ) || new RegExp( rule.val + '{' + value.length + '}', 'ig' ).test( value );
+			}, rule.message );
+		} );		
+
 		//initialize the form validation		
-		$form.validate({
-			"errorPlacement" : function(error, element){
-				error.appendTo(element.parent());
+		var validator = $form.validate({
+			errorPlacement : function( error, element ) {
+				error.appendTo( element.parent() );
 			},
-			"wrapper" : "div"
+			focusInvalid : false,
+			highlight : function( element, errorClass ) {
+				var $elm = $( element );
+				var $tabWrap = $elm.closest( '.wpmudev-field-tab-wrap' );
+				
+				if ( $tabWrap.length > 0 ) {
+					var slug = $tabWrap.attr( 'data-slug' );
+					var $tabWrapParent = $elm.closest( '.wpmudev-subfield-group, .wpmudev-fields' );
+					var $tabLink = $tabWrapParent.find( '.wpmudev-field-tab-label-link' ).filter( '[href="#' + slug + '"]' );
+					$tabLink.addClass( 'has-error' );
+				}
+			},
+			unhighlight : function( element, errorClass, validClass ) {
+				var $elm = $( element );
+				var $tabWrap = $elm.closest( '.wpmudev-field-tab-wrap' );
+				
+				if ( $tabWrap.length > 0 ) {
+					var slug = $tabWrap.attr( 'data-slug' );
+					var $tabWrapParent = $elm.closest( '.wpmudev-subfield-group, .wpmudev-fields' );
+					var $tabLink = $tabWrapParent.find( '.wpmudev-field-tab-label-link' ).filter( '[href="#' + slug + '"]' );
+					$tabLink.removeClass( 'has-error' );
+				}				
+			},
+			ignore : function( index, element ){
+				var $elm = $( element );
+				// ignore all elements that are hidden or disabled
+				return ( $elm.is( ':hidden' ) || $elm.prop( 'disabled' ) );
+			},
+			wrapper : "div"
 		});
 		
-		$form.find('#publish, [type="submit"]').click(function(e){
+		$form.on( 'invalid-form.validate', function() {
+			var errorCount = validator.numberOfInvalids();
+			var msg = WPMUDEV_Metaboxes.form_error_msg;
+			
+			if ( errorCount == 1 ) {
+				msg = msg.replace( /%s1/g, errorCount + ' ' + WPMUDEV_Metaboxes.error ).replace( /%s2/g, WPMUDEV_Metaboxes.has );
+			} else {
+				msg = msg.replace( /%s1/g, errorCount + ' ' + WPMUDEV_Metaboxes.errors ).replace( /%s2/g, WPMUDEV_Metaboxes.have );
+			}
+			
+			alert( msg );
+		} );
+		
+		$form.find( '#publish, [type="submit"]' ).click( function( e ) {
 			if ( ! $form.valid() ) {
 				e.preventDefault();
 			}
-		});
-		
-		$('[data-custom-validation]').each(function(){
-			var $this = $(this),
-					nameParts = $this.attr('name').split('['), //take into account array fields
-					ruleName = nameParts[0],
-					rules = {};
-			
-			rules[ruleName] = $this.attr('data-custom-validation');
-			
-			$.validator.addMethod(ruleName, function(value, element, params){
-				return this.optional(element) || new RegExp(params + '{' + value.length + '}', 'ig').test(value);
-			}, WPMUDEV_Metaboxes_Validation_Messages[ruleName]);
-
-			$this.rules('add', rules);
-		});		
+		} );
 	}
 
 }(jQuery));
