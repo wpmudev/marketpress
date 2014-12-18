@@ -662,10 +662,16 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 			$api_creds->add_field('text', array(
 				'name' => $this->get_field_name('api_key'),
 				'label' => array('text' => __('API Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$api_creds->add_field('text', array(
 				'name' => $this->get_field_name('api_password'),
 				'label' => array('text' => __('API Password', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		
@@ -683,10 +689,16 @@ class MP_Gateway_eWay30 extends MP_Gateway_API {
 			$api_creds->add_field('text', array(
 				'name' => $this->get_field_name('api_key'),
 				'label' => array('text' => __('API Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$api_creds->add_field('text', array(
 				'name' => $this->get_field_name('api_pass'),
 				'label' => array('text' => __('API Password', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 	}

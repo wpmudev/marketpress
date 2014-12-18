@@ -354,10 +354,16 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('private_key'),
 				'label' => array('text' => __('Secret API Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('public_key'),
 				'label' => array('text' => __('Publishable API Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		
@@ -369,6 +375,9 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 			'width' => 'element',
 			'options' => array('' => __('Select One', 'mp')) + $this->currencies,
 			'default_value' => mp_get_setting('currency'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
   }
 	/**

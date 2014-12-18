@@ -263,11 +263,11 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 			));
 			$boxes->add_sub_field('text', array(
 				'name' => 'size',
-				'label' => array('text' => __('Size', 'mp')),
+				'label' => array('text' => sprintf( __( 'Size (%s)', 'mp' ), mp_dimension_label() ) ),
 			));
 			$boxes->add_sub_field('text', array(
 				'name' => 'weight',
-				'label' => array('text' => __('Max Weight', 'mp')),
+				'label' => array('text' => sprintf( __( 'Max Weight (%s)', 'mp' ), mp_weight_label() ) ),
 			));
 		}
 	}

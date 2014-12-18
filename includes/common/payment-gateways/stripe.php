@@ -406,10 +406,16 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => 'secret_key',
 				'label' => array('text' => __('Secret Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => 'publishable_key',
 				'label' => array('text' => __('Publishable Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		

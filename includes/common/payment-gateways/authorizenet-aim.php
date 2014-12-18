@@ -731,10 +731,16 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => 'api_user',
 				'label' => array('text' => __('Login ID', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => 'api_key',
 				'label' => array('text' => __('Transaction Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		
@@ -744,6 +750,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			'multiple' => false,
 			'options' => array_merge(array('' => __('Select One', 'mp')), $this->currencies),
 			'width' => 'element',
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('section', array(
 			'name' => 'section_advanced_settings',
@@ -808,6 +817,9 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			'name' => 'gateways[' . $this->plugin_name . '][custom_api]',
 			'label' => array('text' => __('Custom API URL', 'mp')),
 			'desc' => __('Many other gateways have Authorize.net API emulators. To use one of these gateways input their API post url here.', 'mp'),
+			'validation' => array(
+				'url' => true,
+			),
 		));
 	}
 }

@@ -365,6 +365,9 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('private_key'),
 			'label' => array('text' => __('API Key', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => $this->get_field_name('transactionSpeed'),

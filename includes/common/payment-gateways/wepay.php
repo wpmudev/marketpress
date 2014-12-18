@@ -379,18 +379,30 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('client_id'),
 				'label' => array('text' => __('Client ID', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('client_secret'),
 				'label' => array('text' => __('Client Secret', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('access_token'),
 				'label' => array('text' => __('Access Token', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('account_id'),
 				'label' => array('text' => __('Account ID', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 	}

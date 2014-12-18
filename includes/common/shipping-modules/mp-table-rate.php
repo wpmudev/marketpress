@@ -127,25 +127,50 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 				$layers->add_sub_field( 'text', array(
 					'name' => 'lower_48',
 					'label' => array( 'text' => __( 'Lower 48 States', 'mp' ) ),
+					'validation' => array(
+						'required' => true,
+						'number' => true,
+						'min' => 0,
+					),
 				) );
 				$layers->add_sub_field( 'text', array(
 					'name' => 'hi_ak',
 					'label' => array( 'text' => __( 'Hawaii and Alaska', 'mp' ) ),
+					'validation' => array(
+						'required' => true,
+						'number' => true,
+						'min' => 0,
+					),
 				) );
 				$layers->add_sub_field( 'text', array(
 					'name' => 'canada',
 					'label' => array( 'text' => __( 'Canada', 'mp' ) ),
+					'validation' => array(
+						'required' => true,
+						'number' => true,
+						'min' => 0,
+					),
 				) );
 			} else {
 				$layers->add_sub_field( 'text', array(
 					'name' => 'in_country',
 					'label' => array( 'text' => __( 'In Country', 'mp' ) ),
+					'validation' => array(
+						'required' => true,
+						'number' => true,
+						'min' => 0,
+					),
 				) );
 				
 				if ( 'US' == mp_get_setting( 'base_country') ) {
 					$layers->add_sub_field( 'text', array(
 						'name' => 'usa',
 						'label' => array( 'text' => __( 'United States', 'mp' ) ),
+						'validation' => array(
+							'required' => true,
+							'number' => true,
+							'min' => 0,
+						),
 					) );
 				}
 				
@@ -153,6 +178,11 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 					$layers->add_sub_field( 'text', array(
 						'name' => 'eu',
 						'label' => array( 'text' => __( 'European Union', 'mp' ) ),
+						'validation' => array(
+							'required' => true,
+							'number' => true,
+							'min' => 0,
+						),
 					) );
 				}
 			}
@@ -160,6 +190,11 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			$layers->add_sub_field( 'text', array(
 				'name' => 'international',
 				'label' => array( 'text' => __( 'International', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+					'number' => true,
+					'min' => 0,
+				),
 			) );
 		}
 	}

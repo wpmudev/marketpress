@@ -456,10 +456,16 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => 'UserName',
 				'label' => array('text' => __('Username', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => 'CustomerID',
 				'label' => array('text' => __('Customer ID', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		

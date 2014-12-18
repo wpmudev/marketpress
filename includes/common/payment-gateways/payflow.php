@@ -754,18 +754,30 @@ class MP_Gateway_Payflow extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('user'),
 				'label' => array('text' => __('User', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('vendor'),
 				'label' => array('text' => __('Vendor', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('partner'),
 				'label' => array('text' => __('Partner', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('password'),
 				'label' => array('text' => __('Password', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		

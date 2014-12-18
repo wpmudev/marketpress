@@ -385,6 +385,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			'name' => $this->get_field_name('email'),
 			'label' => array('text' => __('Email Address', 'mp')),
 			'validation' => array(
+				'required' => true,
 				'email' => true
 			),
 		));

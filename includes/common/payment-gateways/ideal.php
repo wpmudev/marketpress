@@ -357,10 +357,16 @@ class MP_Gateway_IDeal extends MP_Gateway_API {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('merchant_id'),
 			'label' => array('text' => __('Merchant ID', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('ideal_hash'),
 			'label' => array('text' => __('Secret Key', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => $this->get_field_name('mode'),

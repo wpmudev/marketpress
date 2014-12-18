@@ -266,6 +266,9 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('encryptionKey'),
 			'label' => array('text' => __('Encryption Key', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('_LOG_DIR_'),
@@ -274,14 +277,23 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('_BILLER_CODE_'),
 			'label' => array('text' => __('Biller Code', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('_USERNAME_'),
 			'label' => array('text' => __('User Name', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('_PASSWORD_'),
 			'label' => array('text' => __('Password', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('file', array(
 			'name' => $this->get_field_name('_CA_FILE_'),
@@ -290,6 +302,9 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('merchantId'),
 			'label' => array('text' => __('Merchant ID', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
   }
   

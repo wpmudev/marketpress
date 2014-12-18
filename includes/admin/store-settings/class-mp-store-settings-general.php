@@ -272,6 +272,7 @@ jQuery( document ).ready( function( $ ){
 			'desc' => __('At what low stock count do you want to be warned for products you have enabled inventory tracking for?', 'mp'),
 			'style' => 'width:50px;',
 			'validation' => array(
+				'required' => true,
 				'digits' => true,
 			),
 		));
@@ -287,6 +288,7 @@ jQuery( document ).ready( function( $ ){
 			'desc' => __('How many times may a customer download a file they have purchased? (It\'s best to set this higher than one in case they have any problems downloading)', 'mp'),
 			'style' => 'width:50px;',
 			'validation' => array(
+				'required' => true,
 				'digits' => true,
 			),
 		));
@@ -468,6 +470,9 @@ jQuery( document ).ready( function( $ ){
 			'label' => array('text' => __('Base Country', 'mp')),
 			'options' => array('' => __('Select A Country')) + mp()->countries,
 			'width' => 'element',
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		
 		$states = mp_get_states(mp_get_setting('base_country'));
@@ -483,6 +488,9 @@ jQuery( document ).ready( function( $ ){
 				'value' => array('US','CA','GB','AU'),
 				'action' => 'show',
 			),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => 'base_zip',
@@ -496,12 +504,18 @@ jQuery( document ).ready( function( $ ){
 				'value' => array('US','CA','GB','AU', 'UM','AS','FM','GU','MH','MP','PW','PR','PI'),
 				'action' => 'show',
 			),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => 'zip_label',
 			'label' => array('text' => __('Zip/Postal Code Label', 'mp')),
 			'custom' => array(
 				'style' => 'width:300px',
+			),
+			'validation' => array(
+				'required' => true,
 			),
 		));
 	}

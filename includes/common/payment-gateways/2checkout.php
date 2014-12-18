@@ -322,10 +322,16 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => 'sid',
 				'label' => array('text' => __('Seller ID', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => 'secret_word',
 				'label' => array('text' => __('Secret Word', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		
@@ -335,6 +341,9 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			'multiple' => false,
 			'options' => array_merge(array('' => __('Select One', 'mp')), $this->currencies),
 			'width' => 'element',
+			'validation' => array(
+				'required' => true,
+			),
 		));
   }
 

@@ -256,10 +256,16 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('private_key'),
 				'label' => array('text' => __('Private Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => $this->get_field_name('public_key'),
 				'label' => array('text' => __('Public Key', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		

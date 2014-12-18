@@ -64,11 +64,17 @@ class MP_Store_Settings_Notifications {
 			$new_order->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$new_order->add_field('textarea', array(
 				'name' => 'text',
 				'label' => array('text' => __('Text', 'mp')),
 				'custom' => array('rows' => 15),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		
@@ -82,11 +88,17 @@ class MP_Store_Settings_Notifications {
 			$order_shipped->add_field('text', array(
 				'name' => 'subject',
 				'label' => array('text' => __('Subject', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$order_shipped->add_field('textarea', array(
 				'name' => 'text',
 				'label' => array('text' => __('Text', 'mp')),
 				'custom' => array('rows' => 15),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}		
 	}

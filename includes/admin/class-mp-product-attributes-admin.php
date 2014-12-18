@@ -72,6 +72,9 @@ th.column-ID {
 			'name' => 'product_attribute_name',
 			'label' => array('text' => __('Attribute Name', 'mp')),
 			'desc' => __('The name of the attribute (e.g. color, size, etc)', 'mp'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'product_attribute_terms_sort_by',

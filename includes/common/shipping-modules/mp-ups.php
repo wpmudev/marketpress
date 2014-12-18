@@ -142,14 +142,23 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('api_key'),
 			'label' => array('text' => __('Developer Kit Access Key', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		)); 
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('user_id'),
 			'label' => array('text' => __('User ID', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('password'),
 			'label' => array('text' => __('Password', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('shipper_number'),
@@ -191,14 +200,25 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 			$boxes->add_sub_field('text', array(
 				'name' => 'name',
 				'label' => array('text' => __('Name', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$boxes->add_sub_field('text', array(
 				'name' => 'size',
-				'label' => array('text' => __('Size', 'mp')),
+				'label' => array('text' => sprintf( __( 'Size (%s)', 'mp' ), mp_dimension_label() ) ),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$boxes->add_sub_field('text', array(
 				'name' => 'weight',
-				'label' => array('text' => __('Max Weight', 'mp')),
+				'label' => array( 'text' => sprintf( __( 'Max Weight (%s)', 'mp' ), mp_weight_label() ) ),
+				'validation' => array(
+					'required' => true,
+					'number' => true,
+					'min' => 0,
+				),
 			));
 		}
   }

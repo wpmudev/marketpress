@@ -170,30 +170,45 @@ jQuery(document).ready(function($){
 			'desc' => __('This page will be used as the root for your store.', 'mp'),
 			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
 			'placeholder' => __('Choose a Page', 'mp'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('post_select', array(
 			'name' => 'pages[products]',
 			'label' => array('text' => __('Products List', 'mp')),
 			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
 			'placeholder' => __('Choose a Page', 'mp'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('post_select', array(
 			'name' => 'pages[cart]',
 			'label' => array('text' => __('Shopping Cart', 'mp')),
 			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
 			'placeholder' => __('Choose a Page', 'mp'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('post_select', array(
 			'name' => 'pages[checkout]',
 			'label' => array('text' => __('Checkout', 'mp')),
 			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
 			'placeholder' => __('Choose a Page', 'mp'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('post_select', array(
 			'name' => 'pages[order_status]',
 			'label' => array('text' => __('Order Status', 'mp')),
 			'query' => array('post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC'),
 			'placeholder' => __('Choose a Page', 'mp'),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 	}
 
@@ -323,10 +338,20 @@ jQuery(document).ready(function($){
 			$custom_size->add_field('text', array(
 				'name' => 'width',
 				'label' => array('text' => __('Width', 'mp')),
+				'validation' => array(
+					'required' => true,
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 			$custom_size->add_field('text', array(
 				'name' => 'height',
 				'label' => array('text' => __('Height', 'mp')),
+				'validation' => array(
+					'required' => true,
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 		}
 		
@@ -371,6 +396,7 @@ jQuery(document).ready(function($){
 				'action' => 'show',
 			),
 			'validation' => array(
+				'required' => true,
 				'digits' => 1,
 			),
 		));
@@ -424,6 +450,7 @@ jQuery(document).ready(function($){
 				'action' => 'show',
 			),
 			'validation' => array(
+				'required' => true,
 				'digits' => 1,
 			),
 		));
@@ -527,10 +554,20 @@ jQuery(document).ready(function($){
 			$custom_size->add_field('text', array(
 				'name' => 'width',
 				'label' => array('text' => __('Width', 'mp')),
+				'validation' => array(
+					'required' => true,
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 			$custom_size->add_field('text', array(
 				'name' => 'height',
 				'label' => array('text' => __('Height', 'mp')),
+				'validation' => array(
+					'required' => true,
+					'digits' => true,
+					'min' => 0,
+				),
 			));
 		}
 		

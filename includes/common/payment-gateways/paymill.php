@@ -318,10 +318,16 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 				$creds->add_field('text', array(
 					'name' => $this->get_field_name('private_key'),
 					'label' => array('text' => __('Private Key', 'mp')),
+					'validation' => array(
+						'required' => true,
+					),
 				));
 				$creds->add_field('text', array(
 					'name' => $this->get_field_name('public_key'),
 					'label' => array('text' => __('Public Key', 'mp')),
+					'validation' => array(
+						'required' => true,
+					),
 				));			
 			}
 			
@@ -332,6 +338,9 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 				'multiple' => false,
 				'width' => 'element',
 				'options' => array('' => __('Select One', 'mp')) + $this->currencies,
+				'validation' => array(
+					'required' => true,
+				),
 			));
 	  }
 	  

@@ -264,14 +264,23 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$creds->add_field('text', array(
 				'name' => 'username',
 				'label' => array('text' => __('Username', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => 'password',
 				'label' => array('text' => __('Password', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$creds->add_field('text', array(
 				'name' => 'signature',
 				'label' => array('text' => __('Signature', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
 		

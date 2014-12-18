@@ -240,14 +240,23 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('api_key'),
 			'label' => array('text' => __('API Key', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('api_password'),
 			'label' => array('text' => __('API Password', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('account'),
 			'label' => array('text' => __('Account ID', 'mp')),
+			'validation' => array(
+				'required' => true,
+			),
 		));
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('meter'),
@@ -279,10 +288,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				'FEDEX_10KG_BOX' => __('Fedex 10kg Box', 'mp'),
 			),
 		));
-		$metabox->add_field('text', array(
-			'name' => $this->get_field_name('max_weight'),
-			'label' => array('text' => __('Max Weight Per Package', 'mp')),
-		));
 		$metabox->add_field('checkbox', array(
 			'name' => $this->get_field_name('commercial'),
 			'label' => array('text' => __('Allow Commercial Delivery?', 'mp')),
@@ -309,12 +314,22 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			'name' => $this->get_field_name('domestic_handling'),
 			'default_value' => '0.00',
 			'label' => array('text' => __('Handling Charge per Domestic Shipment', 'mp')),
+			'validation' => array(
+				'required' => true,
+				'number' => true,
+				'min' => 0,
+			),
 		));
 		
 		$metabox->add_field('text', array(
 			'name' => $this->get_field_name('intl_handling'),
 			'default_value' => '0.00',
 			'label' => array('text' => __('Handling Charge per International Shipment', 'mp')),
+			'validation' => array(
+				'required' => true,
+				'number' => true,
+				'min' => 0,
+			),
 		));
 		
 		$default_boxes = $this->default_boxes();
@@ -344,15 +359,24 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		if ( $repeater instanceof WPMUDEV_Field ) {
 			$repeater->add_sub_field('text', array(
 				'name' => 'name',
-				'label' => array('text' => __('Box Name', 'mp')),
+				'label' => array('text' => __('Name', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'size',
-				'label' => array('text' => __('Box Dimensions', 'mp')),
+				'label' => array('text' => sprintf( __( 'Size (%s)', 'mp' ), mp_dimension_label() ) ),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 			$repeater->add_sub_field('text', array(
 				'name' => 'weight',
-				'label' => array('text' => __('Max Weight Per Box', 'mp')),
+				'label' => array( 'text' => sprintf( __( 'Max Weight (%s)', 'mp' ), mp_weight_label() ) ),
+				'validation' => array(
+					'required' => true,
+				),
 			));
 		}
   }
@@ -455,9 +479,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 
 		//ups won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
-
-		$max_weight = floatval($this->ups[max_weight]);
-		$max_weight = ($max_weight > 0) ? $max_weight : 75;
 
 		if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
 			// Can't use zip+4
