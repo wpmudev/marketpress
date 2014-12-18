@@ -43,7 +43,6 @@ var mp_checkout;
 					type : type
 				}
 				
-				$state.select2( 'destroy' );
 				$row.ajaxLoading( 'show' );
 						
 				$.post( url, data ).done( function( resp ) {
@@ -51,8 +50,7 @@ var mp_checkout;
 						$row.ajaxLoading( 'false' );
 						if ( resp.data.states ) {
 							$state.html( resp.data.states );
-							$state.closest( '.mp-checkout-column' ).show();
-							marketpress.initSelect2();
+							$state.trigger( 'change' ).closest( '.mp-checkout-column' ).show();
 						} else {
 							$state.closest( '.mp-checkout-column' ).hide();
 						}
@@ -441,27 +439,46 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		toggleShippingAddressFields : function(){
-			var $cb = $( 'input[name="enable_shipping_address"]' ),
-					$shippingFields = $( '[name^="shipping["]' );
+			var $cb = $( 'input[name="enable_shipping_address"]' );
 			
 			if ( $cb.prop( 'checked' ) ) {
-				$shippingFields.each( function(){
-					$( this ).prop( 'disabled', false );
-				});
+				$( '#mp-checkout-column-shipping-info' ).show().addClass( 'mp-checkout-column' );
+				$( '#mp-checkout-column-billing-info' ).addClass( 'mp-checkout-column' );
 			} else {
-				$shippingFields.each( function(){
-					$( this ).prop( 'disabled', true );
-				});
+				$( '#mp-checkout-column-shipping-info' ).hide().removeClass( 'mp-checkout-column' );
+				$( '#mp-checkout-column-billing-info' ).removeClass( 'mp-checkout-column' );
 			}
 		},
 	
 		/**
-		 * Initialize events related to enabling/disable shipping address fields
+		 * Initialize events related to shipping address fields
 		 *
 		 * @since 3.0
 		 */
 		initShippingAddressListeners : function(){
-			$( 'input[name="enable_shipping_address"]' ).change( mp_checkout.toggleShippingAddressFields );
+			var $enableShippingAddress = $( 'input[name="enable_shipping_address"]' );
+			
+			// Enable billing address fields
+			$enableShippingAddress.change( mp_checkout.toggleShippingAddressFields );
+			
+			// Copy billing field to shipping field (if shipping address isn't enabled)
+			$( '[name^="billing["]' ).on( 'change keyup', function() {
+				if ( $enableShippingAddress.is( ':checked' ) ) {
+					// Shipping address checkbox is checked - bail
+					return;
+				}
+				
+				var $this = $( this );
+				var name = $this.attr( 'name' );
+				var $target = $( '[name="' + name.replace( 'billing', 'shipping' ) + '"]' );
+				
+				if ( $target.length == 0 ) {
+					// Input doesn't exist - bail
+					return;
+				}
+				
+				$target.val( $this.val() ).trigger( 'change' );
+			} );
 		}
 	};
 }( jQuery ));

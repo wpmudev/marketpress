@@ -110,7 +110,10 @@ class MP_Checkout {
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
 		}
 		
-		if ( mp_get_post_value( 'enable_shipping_address') ) {
+		$enable_shipping_address = mp_get_post_value( 'enable_shipping_address' );
+		mp_update_session_value( 'enable_shipping_address', $enable_shipping_address );
+		
+		if ( $enable_shipping_address ) {
 			$data = (array) mp_get_post_value( 'billing', array() );
 			foreach ( $data as $key => $value ) {
 				$value = trim( $value );	
@@ -729,16 +732,17 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function section_billing_shipping_address() {
+		$enable_shipping_address = ( mp_get_user_address( 'shipping' ) == mp_get_user_address( 'billing' ) );
 		$html = '
 			<div class="clearfix">
-				<div id="mp-checkout-column-billing-info" class="mp-checkout-column">
+				<div id="mp-checkout-column-billing-info"' . (( $enable_shipping_address ) ? ' class="mp-checkout-column"' : '') . '>
 					<h3>' . __('Billing', 'mp') . '</h3>' .
 					$this->address_fields('billing') . '
 					<div class="mp-checkout-form-row mp-checkbox-row">
-						<label><input type="checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked(1, wp_get_current_user()->get('mp_enable_shipping_address'), false) . ' /> <span>' . __('Shipping address different than billing?', 'mp') . '</span></label>
+						<label><input type="checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . ' /> <span>' . __('Shipping address different than billing?', 'mp') . '</span></label>
 					</div>
 				</div>
-				<div id="mp-checkout-column-shipping-info" class="mp-checkout-column">
+				<div id="mp-checkout-column-shipping-info"' . (( $enable_shipping_address ) ? ' class="mp-checkout-column"' : ' style="display:none"') . '>
 					<h3>' . __('Shipping', 'mp') . '</h3>' .
 					$this->address_fields('shipping') . '
 				</div>
