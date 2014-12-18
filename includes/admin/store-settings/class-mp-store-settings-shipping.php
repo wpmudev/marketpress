@@ -55,6 +55,21 @@ class MP_Store_Settings_Shipping {
 					
 					$input.val(euCountries).trigger('change');
 				});
+				
+				// Update weight/dimension labels
+				$( 'input[name="shipping[system]"]' ).change( function() {
+					switch ( $( this).val() ) {
+						case 'english' :
+							$( '.mp-dimension-label' ).find( '.mp-units' ).html( 'in' );
+							$( '.mp-weight-label' ).find( '.mp-units' ).html( 'lbs' );
+						break;
+						
+						case 'metric' :
+							$( '.mp-dimension-label' ).find( '.mp-units' ).html( 'cm' );
+							$( '.mp-weight-label' ).find( '.mp-units' ).html( 'kgs' );
+						break;
+					}
+				} );
 			});
 		}(jQuery));
 		</script>
