@@ -277,7 +277,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 								<div class="wpmudev-subfield-inner clearfix">
 										<?php
 						if ( ! empty($subfield->args['label']['text']) ) : ?>
-										<label class="wpmudev-subfield-label <?php echo $subfield->args['label']['class']; ?>"><?php echo $subfield->args['label']['text'] . (( ! empty($subfield->args['desc']) ) ? '<span class="wpmudev-metabox-tooltip dashicons dashicons-editor-help"><span>' . $subfield->args['desc'] . '</span></span>' : ''); ?></label>
+										<label class="wpmudev-subfield-label <?php echo $subfield->args['label']['class']; ?>"><?php echo $subfield->args['label']['text'] . (( ! empty( $subfield->args['custom']['data-rule-required'] ) ) ? '<span class="required">*</span>' : '') . (( ! empty($subfield->args['desc']) ) ? '<span class="wpmudev-metabox-tooltip dashicons dashicons-editor-help"><span>' . $subfield->args['desc'] . '</span></span>' : ''); ?></label>
 										<?php
 						endif; ?>
 									<div class="wpmudev-subfield-input"><?php $subfield->display($post_id); ?></div>

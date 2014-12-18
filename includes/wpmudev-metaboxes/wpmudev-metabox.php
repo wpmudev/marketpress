@@ -657,7 +657,7 @@ class WPMUDEV_Metabox {
 								<div class="<?php echo implode(' ', $classes); ?>">
 		<?php
 			if ( ! empty($field->args['label']['text']) ) : ?>
-									<div class="wpmudev-field-label"><?php echo $field->args['label']['text'] . (( strpos($field->args['class'], 'required') !== false ) ? '<span class="required">*</span>' : ''); ?></div>
+									<div class="wpmudev-field-label"><?php echo $field->args['label']['text'] . (( ! empty( $field->args['custom']['data-rule-required'] ) ) ? '<span class="required">*</span>' : ''); ?></div>
 		<?php
 			endif;
 			

@@ -174,7 +174,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 				}
 				
 				if ( $this->args['layout'] == 'columns' ) :  ?>
-			<label class="wpmudev-field-complex-label" style="width:<?php echo $label_width ; ?>"><?php $field->display($post_id); ?><span><?php echo $field->args['label']['text']; ?></span></label>
+			<label class="wpmudev-field-complex-label" style="width:<?php echo $label_width ; ?>"><?php $field->display($post_id); ?><span><?php echo $field->args['label']['text'] . (( ! empty( $field->args['custom']['data-rule-required'] ) ) ? '<span class="required">*</span>' : ''); ?></span></label>
 		<?php
 				else : ?>
 			<label class="wpmudev-field-complex-label"><?php $field->display($post_id); ?><span><?php echo $field->args['label']['text']; ?></span></label>			
