@@ -874,6 +874,58 @@ if ( ! function_exists('mp_store_page_url') ) {
 	}
 }
 
+if ( ! function_exists( 'mp_weight_label' ) ) :
+	/**
+	 * Display the appropriate weight label (kgs/lbs) according to settings
+	 *
+	 * @since 3.0
+	 * @param int/float $val
+	 * @return string
+	 */
+	function mp_weight_label( $val = null ) {
+		$units = ( 'english' == mp_get_setting( 'shipping->system') ) ? 'lbs' : 'kgs';
+		$html = '<span class="mp-weight-label">' . (( ! is_null( $val ) ) ? $val : '') . '<span class="mp-units">' . $units . '</span>' . '</span>';
+		
+		/**
+		 * Filter the weight label
+		 *
+		 * @since 3.0
+		 * @param string $html
+		 * @param int/float $val
+		 * @param string $units Either "kgs" or "lbs".
+		 */
+		$html = apply_filters( 'mp_weight_label', $html, $val, $units );
+		
+		return $html;
+	}
+endif;
+
+if ( ! function_exists( 'mp_dimension_label' ) ) :
+	/**
+	 * Display the appropriate dimension label (in/cm) according to settings
+	 *
+	 * @since 3.0
+	 * @param int/float $val
+	 */
+	function mp_dimension_label( $val = null ) {
+		$units = ( 'english' == mp_get_setting( 'shipping->system') ) ? 'in' : 'cm';
+		$html = '<span class="mp-dimension-label">' . (( ! is_null( $val ) ) ? $val : '') . '<span class="mp-units">' . $units . '</span>' . '</span>';
+		
+		/**
+		 * Filter the dimension label
+		 *
+		 * @since 3.0
+		 * @param string $html
+		 * @param int/float $val
+		 * @param string $units Either "in" or "cm".
+		 */
+		$html = apply_filters( 'mp_dimension_label', $html, $val, $units );
+		
+		return $html;
+	}
+endif;
+
+
 if ( ! function_exists('mp_is_shop_page') ) :
 	/**
 	 * Check if current page is a shop page
