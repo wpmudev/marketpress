@@ -470,6 +470,10 @@ class MP_Coupons {
 			'desc' => __('Enter the maximum number of times this coupon can be used.', 'mp'),
 			'class' => 'digits',
 			'label' => array('text' => __('Max Uses', 'mp')),
+			'validation' => array(
+				'digits' => true,
+				'min' => 0,
+			),
 		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'applies_to',
