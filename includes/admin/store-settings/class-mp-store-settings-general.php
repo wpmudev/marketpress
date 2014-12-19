@@ -345,7 +345,7 @@ jQuery( document ).ready( function( $ ){
 			'option_name' => 'mp_settings',
 		));
 		
-		$currencies = apply_filters('mp_currencies', mp()->currencies);
+		$currencies = mp()->currencies;
 		$options = array('' => __('Select a Currency', 'mp'));
 		
 		foreach ( $currencies as $key => $value ) {

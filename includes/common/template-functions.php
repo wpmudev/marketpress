@@ -391,7 +391,7 @@ if ( ! function_exists('mp_format_currency') ) :
 	 * @return string
 	 */
 	function mp_format_currency( $currency = '', $amount = false ) {
-		$currencies = apply_filters('mp_currencies', mp()->currencies);
+		$currencies = mp()->currencies;
 		
 		if ( empty($currency) ) {
 			$currency = mp_get_setting('currency', 'USD');

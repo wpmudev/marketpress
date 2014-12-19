@@ -682,11 +682,19 @@ class Marketpress {
 	private function _init_vars() {
 		//setup proper directories
 		$this->_plugin_file = __FILE__;
-		$this->_plugin_dir = plugin_dir_path(__FILE__);
-		$this->_plugin_url = plugin_dir_url(__FILE__);
+		$this->_plugin_dir = plugin_dir_path( __FILE__ );
+		$this->_plugin_url = plugin_dir_url( __FILE__ );
 
 		//load data structures
-		require_once $this->plugin_dir('includes/common/data.php');
+		require_once $this->plugin_dir( 'includes/common/data.php' );
+		
+		/**
+		 * Filter the currencies list
+		 *
+		 * @since 3.0
+		 * @param array $this->currencies An array of available currencies
+		 */
+		$this->currencies = apply_filters( 'mp_currencies', $this->currencies );
 	}
 }
 
