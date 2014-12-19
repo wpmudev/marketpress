@@ -732,7 +732,7 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function section_billing_shipping_address() {
-		$enable_shipping_address = ( mp_get_user_address( 'shipping' ) == mp_get_user_address( 'billing' ) );
+		$enable_shipping_address = ( mp_get_user_address( 'shipping' ) != mp_get_user_address( 'billing' ) );
 		$html = '
 			<div class="clearfix">
 				<div id="mp-checkout-column-billing-info" class="mp-checkout-column' . (( $enable_shipping_address ) ? '' : ' fullwidth') . '">
