@@ -440,13 +440,18 @@ var mp_checkout;
 		 */
 		toggleShippingAddressFields : function(){
 			var $cb = $( 'input[name="enable_shipping_address"]' );
+			var $shippingInfo = $( '#mp-checkout-column-shipping-info' );
+			var $billingInfo = $( '#mp-checkout-column-billing-info' );
 			
 			if ( $cb.prop( 'checked' ) ) {
-				$( '#mp-checkout-column-shipping-info' ).show().addClass( 'mp-checkout-column' );
-				$( '#mp-checkout-column-billing-info' ).addClass( 'mp-checkout-column' );
+				$billingInfo.removeClass( 'fullwidth' );
+				setTimeout( function() {
+					$shippingInfo.fadeIn( 500 );
+				}, 550 );
 			} else {
-				$( '#mp-checkout-column-shipping-info' ).hide().removeClass( 'mp-checkout-column' );
-				$( '#mp-checkout-column-billing-info' ).removeClass( 'mp-checkout-column' );
+				$shippingInfo.fadeOut( 500, function() {
+					$billingInfo.addClass( 'fullwidth' );
+				} );
 			}
 		},
 	

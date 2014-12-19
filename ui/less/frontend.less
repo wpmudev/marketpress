@@ -239,10 +239,16 @@
 	
 	.mp-checkout-column {
 		float: right;
+		.transition( width 500ms );
 		width: 48%;
 		
 		&:first-child {
 			float: left;
+			width: 48%;
+		}
+		
+		&.fullwidth {
+			width: 100%;
 		}
 	}
 	

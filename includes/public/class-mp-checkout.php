@@ -735,14 +735,14 @@ class MP_Checkout {
 		$enable_shipping_address = ( mp_get_user_address( 'shipping' ) == mp_get_user_address( 'billing' ) );
 		$html = '
 			<div class="clearfix">
-				<div id="mp-checkout-column-billing-info"' . (( $enable_shipping_address ) ? ' class="mp-checkout-column"' : '') . '>
+				<div id="mp-checkout-column-billing-info" class="mp-checkout-column' . (( $enable_shipping_address ) ? '' : ' fullwidth') . '">
 					<h3>' . __('Billing', 'mp') . '</h3>' .
 					$this->address_fields('billing') . '
 					<div class="mp-checkout-form-row mp-checkbox-row">
 						<label><input type="checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . ' /> <span>' . __('Shipping address different than billing?', 'mp') . '</span></label>
 					</div>
 				</div>
-				<div id="mp-checkout-column-shipping-info"' . (( $enable_shipping_address ) ? ' class="mp-checkout-column"' : ' style="display:none"') . '>
+				<div id="mp-checkout-column-shipping-info" class="mp-checkout-column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
 					<h3>' . __('Shipping', 'mp') . '</h3>' .
 					$this->address_fields('shipping') . '
 				</div>
