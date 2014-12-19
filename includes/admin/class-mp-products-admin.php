@@ -628,11 +628,6 @@ jQuery( document ).ready( function( $ ) {
 		$metabox->add_field('text', array(
 			'name' => 'regular_price',
 			'label' => array('text' => __('Regular Price', 'mp')),
-			'conditional' => array(
-				'name' => 'product_type',
-				'value' => array('physical', 'digital'),
-				'action' => 'show',
-			),
 			'validation' => array(
 				'required' => true,
 				'number' => true,
@@ -642,11 +637,6 @@ jQuery( document ).ready( function( $ ) {
 		$sale_price = $metabox->add_field('complex', array(
 			'name' => 'sale_price',
 			'label' => array('text' => __('Sale Price', 'mp')),
-			'conditional' => array(
-				'name' => 'product_type',
-				'value' => array('physical', 'digital'),
-				'action' => 'show',
-			),											
 		));
 		
 		if ( $sale_price instanceof WPMUDEV_Field ) {
