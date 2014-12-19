@@ -1313,7 +1313,13 @@ class MP_Product {
 	 * @return bool
 	 */
 	public function is_download() {
-		return ( $this->get_meta('product_type') == 'digital' && $this->get_meta('file_url') );
+		$product_type = $this->get_meta( 'product_type' );
+		if ( $this->is_variation() ) {
+			$parent = new MP_Product( $this->_post->post_parent );
+			$product_type = $parent->get_meta( 'product_type' );
+		}
+		
+		return ( 'digital' == $product_type && $this->get_meta( 'file_url' ) );
 	}
 
 	/**

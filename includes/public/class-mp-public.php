@@ -32,13 +32,21 @@ class MP_Public {
 	 */
 	private function __construct() {
 		$this->includes();
-		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
-		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
-		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
+		
 		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
 		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
+		
+		// Template Stuff
+		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
+		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
+		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
+		
+		//Downloads
+		add_action( 'pre_get_posts', array(&$this, 'include_out_of_stock_products_for_downloads') );
+		add_filter( 'posts_results', array(&$this, 'set_publish_status_for_out_of_stock_product_downloads'), 10, 2 );
+		add_action( 'template_redirect', array(&$this, 'maybe_serve_download') );
 	}
 
 	/**
@@ -109,6 +117,22 @@ class MP_Public {
 	public function includes() {
 		require_once mp_plugin_dir('includes/public/class-mp-checkout.php');
 		require_once mp_plugin_dir('includes/public/class-mp-short-codes.php');
+	}
+
+	/**
+	 * Modify query object to allow drafts for single products
+	 *
+	 * If a product is set to out_of_stock status then the user won't be
+	 * able to download their files.
+	 *
+	 * @since 2.9.5.8
+	 * @access public
+	 * @action pre_get_posts
+	 */
+	public function include_out_of_stock_products_for_downloads( $query ) {
+		if ( MP_Product::get_post_type() == $query->get( 'post_type' ) && $query->get( MP_Product::get_post_type() ) && ($order = mp_get_get_value( 'orderid' ) ) ) {
+			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
+		}
 	}
 	
 	/**
@@ -280,6 +304,20 @@ class MP_Public {
 		
 		return $template;
 	}
+
+	/**
+	 * Maybe serve a download
+	 *
+	 * @since 2.9.5.8
+	 * @access public
+	 * @action template_redirect
+	 */
+	function maybe_serve_download() {
+		if ( MP_Product::get_post_type() == get_query_var( 'post_type' ) && get_query_var( MP_Product::get_post_type() ) && ( $order = mp_get_get_value( 'orderid' ) ) ) {
+			$product_id = ( $variation_id = get_query_var( 'mp_variation_id' ) ) ? $variation_id : get_queried_object_id();
+			$this->serve_download( $product_id );
+		}
+	}
 	
 	/**
 	 * Maybe start the session
@@ -309,6 +347,186 @@ class MP_Public {
 		}
 		
 		return $content;
+	}
+
+	/**
+	 * Serve a file download
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function serve_download( $product_id ) {
+		$order_id = mp_get_get_value( 'orderid' );
+		if ( ! $order_id ) {
+			return false;
+		}
+
+		//get the order
+		$order = new MP_Order( $order_id );
+		if ( ! $order->exists() ) {
+			wp_die( __( 'Sorry, the link is invalid for this download.', 'mp' ) );
+		}
+		
+		//check that order is paid
+		if ( $order->post_status == 'order_received' ) {
+			wp_die( __( 'Sorry, your order has been marked as unpaid.', 'mp' ) );
+		}
+
+		//get the product object
+		$product = new MP_Product( $product_id );
+
+		//get the cart object
+		$cart = $order->get_cart();
+		
+		$url = $product->get_meta( 'file_url' );
+
+		//get download count
+		$download_count = mp_arr_get_value( $product_id, $cart->download_count );
+		if ( false === $download_count ) {
+			$cart->download_count[ $product_id ] = 0;
+		}
+		$download_count = (int) $download_count;
+		
+		//check for too many downloads
+		$max_downloads = mp_get_setting( 'max_downloads', 5 );
+		if ( $download_count >= $max_downloads ) {
+			wp_die( sprintf( __( 'Sorry, our records show you\'ve downloaded this file %d out of %d times allowed. Please contact us if you still need help.', 'mp' ), $download_count ), $max_downloads );
+		}
+
+		/**
+		 * Triggered when a file is served for download
+		 *
+		 * @since 3.0
+		 * @param string $url The url of the file being served.
+		 * @param MP_Order $order The order object associated with the file
+		 * @param int $download_count The number of times the file has been downloaded.
+		 */
+		do_action( 'mp_serve_download', $url, $order, $download_count );
+
+		/* if large downloads have been enabled just redirect to the actual file for download
+		instead of trying to mask the file name */
+		if ( mp_get_setting( 'use_alt_download_method' ) || MP_LARGE_DOWNLOADS === true ) {
+			//record the download attempt
+			$cart->download_count[ $product_id ] += 1;
+			$order->update_meta( 'mp_cart_info', $cart );
+			
+			wp_redirect( $url );
+			exit;
+		}
+		
+		set_time_limit( 0 ); //try to prevent script from timing out
+
+		//create unique filename
+		$ext = ltrim( strrchr( basename( $url ), '.' ), '.' );
+		$filename = sanitize_file_name( strtolower( get_the_title( $product_id ) ) . '.' . $ext );
+
+		$dirs = wp_upload_dir();
+		$location = str_replace( $dirs['baseurl'], $dirs['basedir'], $url );
+		if ( file_exists( $location ) ) {
+			// File is in our server
+			$tmp = $location;
+			$not_delete = true;
+		} else {
+			// File is remote so we need to download it first
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			
+			//don't verify ssl connections
+			add_filter( 'https_local_ssl_verify', create_function( '$ssl_verify', 'return false;' ) );
+			add_filter( 'https_ssl_verify', create_function( '$ssl_verify', 'return false;' ) );
+
+			$tmp = download_url( $url ); //we download the url so we can serve it via php, completely obfuscating original source
+
+			if ( is_wp_error( $tmp ) ) {
+				@unlink( $tmp );
+				trigger_error( "MarketPress was unable to download the file $url for serving as download: " . $tmp->get_error_message(), E_USER_WARNING );
+				wp_die( __( 'Whoops, there was a problem loading up this file for your download. Please contact us for help.', 'mp' ) );
+			}
+		}
+
+		if ( file_exists( $tmp ) ) {
+		 	$chunksize = (8 * 1024); //number of bytes per chunk
+			$buffer = '';
+			$filesize = filesize( $tmp );
+			$length = $filesize;
+			list( $fileext, $filetype ) = wp_check_filetype( $tmp );
+			
+			if ( empty( $filetype ) ) {
+				$filetype = 'application/octet-stream';
+			}
+			
+			ob_clean(); //kills any buffers set by other plugins
+			
+			if( isset( $_SERVER['HTTP_RANGE'] ) ) {
+				//partial download headers
+				preg_match( '/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches );
+				$offset = intval( $matches[1] );
+				$length = intval( $matches[2] ) - $offset;
+				$fhandle = fopen( $filePath, 'r' );
+				fseek( $fhandle, $offset ); // seek to the requested offset, this is 0 if it's not a partial content request
+				$data = fread( $fhandle, $length );
+				fclose( $fhandle );
+				header( 'HTTP/1.1 206 Partial Content' );
+				header( 'Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $filesize );
+			}
+			
+			header( 'Accept-Ranges: bytes' );
+			header( 'Content-Description: File Transfer' );
+			header( 'Content-Type: ' . $filetype );
+			header( 'Content-Disposition: attachment;filename="' . $filename . '"' );
+			header( 'Expires: -1' );
+			header( 'Cache-Control: public, must-revalidate, post-check=0, pre-check=0' );
+			header( 'Pragma: public' );
+			header( 'Content-Length: ' . $filesize );
+			
+			if ( $filesize > $chunksize ) {
+				$handle = fopen( $tmp, 'rb' );
+				
+				if ( $handle === false ) {
+					trigger_error( "MarketPress was unable to read the file $tmp for serving as download.", E_USER_WARNING );
+					return false;
+				}
+				
+				while ( ! feof( $handle ) && ( connection_status() === CONNECTION_NORMAL ) ) {
+					$buffer = fread( $handle, $chunksize );
+					echo $buffer;
+				}
+				
+				ob_end_flush();
+				fclose( $handle );
+			} else {
+				ob_clean();
+				flush();
+				readfile( $tmp );
+			}
+
+			if ( ! $not_delete ) {
+				@unlink( $tmp );
+			}
+		}
+
+		//record download attempt
+		$cart->download_count[ $product_id ] += 1;
+		$order->update_meta( 'mp_cart_info', $cart );
+		
+		exit;
+	}
+
+	/**
+	 * Force post status to publish for single products that are in out_of_stock status
+	 *
+	 * By default, WP won't allow access to single posts that are in out_of_stock
+	 * status which will prevent users from downloading files they purchased.
+	 *
+	 * @since 2.9.5.8
+	 * @access public
+	 * @filter posts_results
+	 */
+	function set_publish_status_for_out_of_stock_product_downloads( $posts, $query ) {
+		if ( MP_Product::get_post_type() == $query->get( 'post_type' ) && $query->get( MP_Product::get_post_type() ) && ($order = mp_get_get_value( 'orderid' ) ) ) {
+			$posts[0]->post_status = 'publish';
+		}
+		
+		return $posts;
 	}
 	
 	/**
