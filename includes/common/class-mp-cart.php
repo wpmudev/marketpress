@@ -405,6 +405,9 @@ class MP_Cart {
 				
 				case 'title' :
 					$column_html = '<h2>' . $product->title(false) . '</h2>';
+					if ( ! $this->is_editable && $product->is_download() && mp_is_shop_page( 'order_status' ) ) {
+						$column_html .= '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
+					}					
 				break;
 				
 				case 'price' :
