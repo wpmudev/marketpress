@@ -861,6 +861,10 @@ class MP_Checkout {
 	 * @access public
 	 */
 	public function section_shipping() {
+		if ( mp_cart()->is_download_only() || 0 == mp_cart()->shipping_weight()) {
+			return false;
+		}
+		
 		$active_plugins = MP_Shipping_API::get_active_plugins();
 		$shipping_method = mp_get_setting('shipping->method');
 		$html = '';
