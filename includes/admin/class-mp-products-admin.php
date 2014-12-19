@@ -211,35 +211,34 @@ jQuery( document ).ready( function( $ ) {
 		
 		switch ( $column ) {
 			case 'product_variations' :
-				$names = array('&mdash;');
 				if ( $product->has_variations() ) {
+					$names = array();
 					foreach ( $variations as $variation ) {
 						$names[] = $variation->get_meta('name');
 					}
+				} else {
+					$names = array( '&mdash;' );
 				}
+				
 				echo implode('<br />', $names);
 			break;
 			
 			case 'product_sku' :
-				$skus = array($product->get_meta('sku'));
-				
 				if ( $product->has_variations() ) {
+					$skus = array();
 					foreach ( $variations as $variation ) {
 						$skus[] = $variation->get_meta('sku');
 					}
-					echo implode('<br />', $skus);
+				} else {
+					$skus = array( $product->get_meta( 'sku', '&mdash;' ) );					
 				}
+				
+				echo implode('<br />', $skus);
 			break;
 			
 			case 'product_price' :
-				$price = $product->get_price();
-				if ( $product->on_sale() ) {
-					$prices = array('<strike>' . mp_format_currency('', $price['regular']) . '</strike> ' . mp_format_currency('', $price['sale']['amount']));
-				} else {
-					$prices = array(mp_format_currency('', $price['regular']));
-				}
-				
 				if ( $product->has_variations() ) {
+					$prices = array();
 					foreach ( $variations as $variation ) {
 						$price = $variation->get_price();
 						if ( $variation->on_sale() ) {
@@ -247,6 +246,13 @@ jQuery( document ).ready( function( $ ) {
 						} else {
 							$prices[] = mp_format_currency('', $price['regular']);
 						}
+					}
+				} else {
+					$price = $product->get_price();
+					if ( $product->on_sale() ) {
+						$prices = array('<strike>' . mp_format_currency('', $price['regular']) . '</strike> ' . mp_format_currency('', $price['sale']['amount']));
+					} else {
+						$prices = array(mp_format_currency('', $price['regular']));
 					}
 				}
 				
@@ -262,28 +268,29 @@ jQuery( document ).ready( function( $ ) {
 			break;
 			
 			case 'product_stock' :
-				$stock = array($product->get_meta('inventory', '&mdash;'));
-				
 				if ( $product->has_variations() ) {
+					$stock = array();
 					foreach ( $variations as $variation ) {
 						$stock[] = $variation->get_meta('inventory', '&mdash;');
 					}
+				} else {
+					$stock = array($product->get_meta('inventory', '&mdash;'));
 				}
 				
 				echo implode('<br />', $stock);
 			break;
 			
 			case 'product_sales' :
-				$sales = array($product->get_meta('sales_count', 0));
-				
 				if ( $product->has_variations() ) {
+					$sales = array();
 					foreach ( $variations as $variation ) {
 						$sales[] = $variation->get_meta('sales_count', 0);
 					}
+				} else {
+					$sales = array($product->get_meta('sales_count', 0));
 				}
 				
 				echo implode('<br />', $sales);
-				
 			break;
 		}
 	}
