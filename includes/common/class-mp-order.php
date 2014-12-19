@@ -115,6 +115,11 @@ class MP_Order {
 						'days_left' => false,
 					),
 				) );
+				
+				if ( isset( $product['download'] ) ) {
+					$cart->download_count[ $product_id ] = mp_arr_get_value( 'download->downloaded', $product, 0 );
+				}
+				
 				$cart->add_item( $product_id, $product['quantity'] );
 			}
 		}
