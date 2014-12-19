@@ -928,7 +928,7 @@ if ( ! function_exists('mp_is_shop_page') ) :
 	 * @return bool
 	 */
 	function mp_is_shop_page( $page = null ) {
-		return MP_Public::get_instance()->is_store_page($page);
+		return ( is_admin() ) ? false : MP_Public::get_instance()->is_store_page( $page );
 	}
 endif;
 
