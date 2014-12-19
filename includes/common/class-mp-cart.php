@@ -1200,6 +1200,24 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Get the total shipping weight
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	public function shipping_weight() {
+		$products = $this->get_items_as_objects();
+		$weight = 0;
+		
+		foreach ( $products as $product ) {
+			$weight += $product->get_weight();
+		}
+		
+		return (float) $weight;
+	}
+	
+	/**
 	 * Get the calculated price for taxes based on a bunch of foreign tax laws.
 	 *
 	 * @access public
