@@ -99,6 +99,15 @@ class MP_Cart {
 	 */
 	public $is_editable = true;
 	
+	/**Refers to the number of times products have been downloaded
+	 * 
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @type array
+	 */
+	public $download_count = array();
+	
 	/**
 	 * Gets the single instance of the class
 	 *
