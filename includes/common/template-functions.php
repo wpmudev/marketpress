@@ -423,10 +423,8 @@ if ( ! function_exists('mp_format_currency') ) :
 		//check decimal option
 		if ( $amount == (int) $amount ) {
 			$decimal_place = 0;
-			$zero = '0';
 		} else {
 			$decimal_place = 2;
-			$zero = '0.00';
 		}
 		
 		//handle negative numbers
@@ -436,47 +434,42 @@ if ( ! function_exists('mp_format_currency') ) :
 			$amount = abs($amount);
 		}
 		
-		// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
-		$amount = (float) $amount;
-
-		//format currency amount according to preference
-		if ( $amount ) {
-			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
-				return $negative_symbol . $symbol . number_format_i18n($amount, $decimal_place);
+		if ( $amount === false ) {
+			// just return symbol
+			$formatted = $symbol;
+		} else {		
+			// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
+			$amount = (float) $amount;
+		
+			switch ( mp_get_setting( 'curr_symbol_position' ) ) {
+				case 1 :
+					$formatted = $negative_symbol . $symbol . number_format_i18n( $amount, $decimal_place );
+				break;
 			
-			if ( mp_get_setting('curr_symbol_position') == 2 )
-				return $negative_symbol . $symbol . ' ' . number_format_i18n($amount, $decimal_place);
-			
-			if ( mp_get_setting('curr_symbol_position') == 3 )
-				return number_format_i18n($amount, $decimal_place) . $symbol;
+				case 2 :
+					$formatted = $negative_symbol . $symbol . ' ' . number_format_i18n( $amount, $decimal_place );
+				break;
 				
-			if ( mp_get_setting('curr_symbol_position') == 4 )
-				return number_format_i18n($amount, $decimal_place) . ' ' . $symbol;
-		} else if ( $amount === false ) {
-			return $symbol;
-		} else {
-			if ( mp_get_setting('curr_symbol_position') == 1 || ! mp_get_setting('curr_symbol_position') )
-				return $symbol . $zero;
-			
-			if ( mp_get_setting('curr_symbol_position') == 2 )
-				return $symbol . ' ' . $zero;
-			
-			if ( mp_get_setting('curr_symbol_position') == 3 )
-				return $zero . $symbol;
-			
-			if ( mp_get_setting('curr_symbol_position') == 4 )
-				return $zero . ' ' . $symbol;
+				case 3 :
+					$formatted = number_format_i18n( $amount, $decimal_place ) . $symbol;
+				break;
+				
+				case 4 :
+					$formatted =  number_format_i18n( $amount, $decimal_place ) . ' ' . $symbol;
+				break;
+			}
 		}
 		
 		/**
 		 * Filter the formatted currency
 		 *
 		 * @since 3.0
+		 * @param string $formatted
 		 * @param string $currency
 		 * @param string $symbol
 		 * @param float $amount
 		 */
-		return apply_filters('mp_format_currency', $currency, $symbol, $amount);
+		return apply_filters( 'mp_format_currency', $formatted, $currency, $symbol, $amount );
 	}
 endif;
 
