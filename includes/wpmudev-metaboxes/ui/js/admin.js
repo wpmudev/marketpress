@@ -332,6 +332,11 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 				var $tabWrap = $elm.closest( '.wpmudev-field-tab-wrap' );
 				
 				if ( $tabWrap.length > 0 ) {
+					if ( $tabWrap.find( 'label.error' ).filter( ':visible' ).length > 0 ) {
+						// There are other errors in this tab group - bail
+						return;	
+					}
+					
 					var slug = $tabWrap.attr( 'data-slug' );
 					var $tabWrapParent = $elm.closest( '.wpmudev-subfield-group, .wpmudev-fields' );
 					var $tabLink = $tabWrapParent.find( '.wpmudev-field-tab-label-link' ).filter( '[href="#' + slug + '"]' );
