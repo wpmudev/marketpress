@@ -73,6 +73,7 @@ class MP_Store_Settings_General {
 		$this->init_location_settings();
 		$this->init_tax_settings();
 		$this->init_currency_settings();
+		$this->init_download_settings();
 		$this->init_misc_settings();
 		$this->init_advanced_settings();
 	}
@@ -254,6 +255,42 @@ jQuery( document ).ready( function( $ ){
 	}
 
 	/**
+	 * Init download settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_download_settings() {
+		$metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-settings-general-downloads',
+			'page_slugs' => array('store-settings', 'toplevel_page_store-settings'),
+			'title' => __('Download Settings', 'mp'),
+			'option_name' => 'mp_settings',
+		));
+		$metabox->add_field('text', array(
+			'name' => 'max_downloads',
+			'label' => array('text' => __('Maximum Downloads', 'mp')),
+			'desc' => __('How many times may a customer download a file they have purchased? (It\'s best to set this higher than one in case they have any problems downloading)', 'mp'),
+			'style' => 'width:50px;',
+			'validation' => array(
+				'required' => true,
+				'digits' => true,
+			),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => 'use_alt_download_method',
+			'label' => array('text' => __('Use Alternative Download Method?', 'mp')),
+			'desc' => __('If you\'re having issues downloading large files and have worked with your hosting provider to increase your memory limits, try enabling this - just keep in mind, it\'s not as secure!', 'mp'),
+		));
+		$metabox->add_field('checkbox', array(
+			'name' => 'download_order_limit',
+			'label' => array('text' => __('Limit Digital Products Per-order?', 'mp')),
+			'desc' => __('This will prevent multiples of the same downloadable product form being added to the cart. Per-product custom limits will override this.', 'mp'),
+			'message' => __('Yes', 'mp'),
+		));
+	}
+	
+	/**
 	 * Init misc settings
 	 *
 	 * @since 3.0
@@ -280,22 +317,6 @@ jQuery( document ).ready( function( $ ){
 			'name' => 'inventory_remove',
 			'label' => array('text' => __('Hide Out of Stock Products?', 'mp')),
 			'desc' => __('This will set the product to draft if inventory of all variations is gone.', 'mp'),
-			'message' => __('Yes', 'mp'),
-		));
-		$metabox->add_field('text', array(
-			'name' => 'max_downloads',
-			'label' => array('text' => __('Maximum Downloads', 'mp')),
-			'desc' => __('How many times may a customer download a file they have purchased? (It\'s best to set this higher than one in case they have any problems downloading)', 'mp'),
-			'style' => 'width:50px;',
-			'validation' => array(
-				'required' => true,
-				'digits' => true,
-			),
-		));
-		$metabox->add_field('checkbox', array(
-			'name' => 'download_order_limit',
-			'label' => array('text' => __('Limit Digital Products Per-order?', 'mp')),
-			'desc' => __('This will prevent multiples of the same downloadable product form being added to the cart. Per-product custom limits will override this.', 'mp'),
 			'message' => __('Yes', 'mp'),
 		));
 		$metabox->add_field('checkbox', array(
