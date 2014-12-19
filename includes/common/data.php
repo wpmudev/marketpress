@@ -45,6 +45,7 @@ $this->default_settings = array(
 	'inventory_threshhold' => 3,
 	'inventory_remove' => 0,
 	'max_downloads' => 5,
+	'use_alt_download_method' => 0,
 	'download_order_limit' => 1,
 	'force_login' => 0,
 	'ga_ecommerce' => 'none',
