@@ -1010,7 +1010,7 @@ You can manage this order here: %s', 'mp');
 			break;
 			
 			case 'USPS' :
-				$url = 'http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?origTrackNum=' . $tracking_number;
+				$url = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' . $tracking_number;
 			break;
 			
 			case 'DHL' :
