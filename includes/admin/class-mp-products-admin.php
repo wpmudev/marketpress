@@ -50,12 +50,59 @@ class MP_Products_Screen {
 		add_action('bulk_edit_custom_box', array(&$this, 'bulk_edit_custom_box'), 10, 2);
 		add_action('admin_print_scripts-edit.php', array(&$this, 'enqueue_bulk_quick_edit_js'));
 		add_action('save_post', array(&$this, 'save_quick_edit'), 10, 2);
+		// Product screen scripts
+		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 		// Product attributes save/get value
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
 			add_filter('wpmudev_field/save_value/' . $mp_product_atts->generate_slug($att->attribute_id), array(&$this, 'save_product_attribute'), 10, 3);
 		}
+	}
+	
+	/**
+	 * Print js related to displaying/hiding of product attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action in_admin_footer
+	 */
+	public function toggle_product_attributes_js() {
+		if ( get_current_screen()->id != MP_Product::get_post_type() ) {
+			// not product screen - bail
+			return;
+		}
+		?>
+<script type="text/javascript">
+( function( $ ) {
+	var $inputs = $( 'input[name="tax_input[product_category][]"]' );
+	
+	var toggleProductAttributes = function() {
+		var selectors = [];
+		var $subfield = $( '.wpmudev-subfield' );
+		
+		if ( $inputs.filter( ':checked' ).length == 0 ) {
+			// no categories checked - reset all product attributes to visible
+			$subfield.has( '[name*="product_attr_"]' ).removeClass( 'wpmudev-field-hidden' );
+			return;
+		}
+		
+		// hide all product attributes
+		$subfield.has( '[name*="product_attr_"]' ).addClass( 'wpmudev-field-hidden' );
+		
+		// loop through checked input and show associated attributes
+		$inputs.filter( ':checked' ).each( function() {
+			$subfield.has( '[data-product-category-' + $( this ).val() + ']' ).removeClass( 'wpmudev-field-hidden' );
+		} );
+	};
+	
+	$( document ).ready( function() {
+		toggleProductAttributes();
+		$inputs.on( 'change', toggleProductAttributes );
+	} );
+}( jQuery ) );
+</script>
+		<?php
 	}
 	
 	/**
@@ -980,7 +1027,8 @@ jQuery( document ).ready( function( $ ) {
 			// Attributes Tab
 			$repeater->add_sub_field('tab', array(
 				'name' => 'tab_attributes',
-				'slug' => 'attributes'
+				'slug' => 'attributes',
+				'desc' => __( 'Each product variation needs to have product attributes assigned to it so the system knows how to differentiate one product variation from the other. It is <strong>important</strong> that you assign a category to this product before choosing any attributes.', 'mp' ),
 			));
 			$mp_product_atts = MP_Product_Attributes::get_instance();
 			$atts = $mp_product_atts->get();
@@ -988,16 +1036,9 @@ jQuery( document ).ready( function( $ ) {
 				$slug = $mp_product_atts->generate_slug($att->attribute_id);
 				$terms = get_terms($slug, 'hide_empty=0');
 				$terms = $mp_product_atts->sort($terms, false);
-				$options = array('');
-				
-				foreach ( $terms as $term ) {
-					$options[$term->term_id] = $term->name;
-				}
-				
-				$repeater->add_sub_field('advanced_select', array(
+				$args = array(
 					'name' => $slug,
 					'label' => array('text' => $att->attribute_name),
-					'options' => $options,
 					'multiple' => false,
 					'placeholder' => sprintf(__('Select a %s', 'mp'), $att->attribute_name),
 					'conditional' => array(
@@ -1008,7 +1049,23 @@ jQuery( document ).ready( function( $ ) {
 					'validation' => array(
 						'required' => true,
 					),
-				));
+				);
+				
+				// Set options
+				$options = array('');
+				foreach ( $terms as $term ) {
+					$args['options'][ $term->term_id ] = $term->name;
+				}
+				
+				// Set associated product categories
+				$cats = $mp_product_atts->get_associated_categories( $att->attribute_id );
+				$custom = array();
+				foreach ( $cats as $cat_id ) {
+					$key = 'data-product-category-' . $cat_id;
+					$args['custom'][ $key ] = 'true';
+				}
+				
+				$repeater->add_sub_field( 'advanced_select', $args );
 			}
 		}
 	}	

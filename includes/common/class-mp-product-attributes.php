@@ -78,6 +78,34 @@ class MP_Product_Attributes {
 	}
 	
 	/**
+	 * Get product categories associated with a given attribute
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 * @param int $att_id An attribute ID.
+	 * @return array
+	 */
+	public function get_associated_categories( $att_id ) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
+		$cache_key = 'associated_categories_' . $att_id;
+		$results = wp_cache_get( $cache_key, 'mp_product_attributes' );
+		
+		if ( false === $results ) {
+			$results = $wpdb->get_results( $wpdb->prepare( "
+				SELECT term_id
+				FROM $table_name
+				WHERE attribute_id = %d", $att_id
+			) );
+			wp_cache_set( $cache_key, $results, 'mp_product_attributes' );
+		}
+		
+		return wp_list_pluck( $results, 'term_id' );
+	}
+	
+	/**
 	 * Get a single product attribute
 	 *
 	 * @since 3.0

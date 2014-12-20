@@ -87,6 +87,18 @@ th.column-ID {
 				'CUSTOM' => __('Custom', 'mp'),
 			),
 		));
+		mp()->register_custom_types();
+		$cats = get_terms( 'product_category', array(
+			'hide_empty' => false,
+			'fields' => 'id=>name'
+		) );
+		$metabox->add_field('advanced_select', array(
+			'name' => 'product_attribute_categories',
+			'label' => array('text' => __('Product Categories', 'mp')),
+			'placeholder' => __( 'Select Product Categories', 'mp' ),
+			'desc' => __( 'Select the product category/categories that this attribute should be available to. If you don\'t select any categories then this attribute will apply to all product categories.', 'mp' ),
+			'options' => $cats,
+		));
 		$metabox->add_field('radio_group', array(
 			'name' => 'product_attribute_terms_sort_order',
 			'label' => array('text' => __('Sort Order', 'mp')),
@@ -149,12 +161,36 @@ th.column-ID {
 			case 'product_attribute_terms_sort_by' :
 			case 'product_attribute_terms_sort_order' :
 				$table_name = $wpdb->prefix . 'mp_product_attributes';
-				$attribute = $wpdb->get_row( $wpdb->prepare("
-					SELECT * FROM $table_name
-					WHERE attribute_id = %d", mp_get_get_value( 'attribute_id' )
-				) );
+				$cache_key = 'attribute_row_' . mp_get_get_value( 'attribute_id' );
+				$attribute = wp_cache_get( $cache_key, 'mp_product_attributes' );
+				
+				if ( false === $attribute ) {
+					$attribute = $wpdb->get_row( $wpdb->prepare("
+						SELECT * FROM $table_name
+						WHERE attribute_id = %d", mp_get_get_value( 'attribute_id' )
+					) );
+					wp_cache_set( $cache_key, $attribute, 'mp_product_attributes' );
+				}
+				
 				$key = str_replace( 'product_', '', $field->args['name'] );
 				$value = $attribute->$key;
+			break;
+			
+			case 'product_attribute_categories' :
+				$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
+				$cache_key = 'attribute_categories_' . mp_get_get_value( 'attribute_id' );
+				$results = wp_cache_get( $cache_key, 'mp_product_attributes' );
+				
+				if ( false === $results ) {
+					$results = $wpdb->get_results( $wpdb->prepare( "
+						SELECT term_id
+						FROM $table_name
+						WHERE attribute_id = %s", mp_get_get_value( 'attribute_id' )
+					) );
+					wp_cache_set( $cache_key, $results, 'mp_product_attributes' );
+				}
+				
+				$value = wp_list_pluck( $results, 'term_id' );
 			break;
 			
 			case 'product_attribute_terms' :
@@ -167,10 +203,12 @@ th.column-ID {
 				$product_atts->sort_terms_by_custom_order($terms);
 				
 				foreach ( $terms as $term ) {
-					$value[] = array('ID' => $term->term_id, 'name' => $term->name, 'slug' => $term->slug);
+					$value[] = array(
+						'ID' => $term->term_id,
+						'name' => $term->name,
+						'slug' => $term->slug,
+					);
 				}
-				
-				
 			break;
 		}
 		
@@ -189,8 +227,15 @@ th.column-ID {
 		
 		$product_atts = MP_Product_Attributes::get_instance();
 		$table_name = MP_Product_Attributes::get_instance()->get_table_name();
+		$table_name_terms = $wpdb->prefix . 'mp_product_attributes_terms';
 		$redirect_url = remove_query_arg( array( 'action', 'action2' ) );
-		$terms = $metabox->fields[3]->sort_subfields( mp_get_post_value( 'product_attribute_terms' ) );
+		
+		foreach (  $metabox->fields as $k => $field ) {
+			if ( 'product_attribute_terms' == $field->args['name'] ) {
+				$terms = $metabox->fields[ $k ]->sort_subfields( mp_get_post_value( 'product_attribute_terms' ) );
+				break;
+			}
+		}
 		
 		if ( mp_get_get_value('action') == 'mp_add_product_attribute' ) {
 			$wpdb->insert( $table_name, array(
@@ -218,6 +263,19 @@ th.column-ID {
 				} else {
 					wp_insert_term( $term['name'], $attribute_slug );
 				}
+			}
+			
+			//insert product categories
+			if ( $cats = mp_get_post_value( 'product_attribute_categories' ) ) {
+				$cats = explode( ',', $cats );
+				$sql = "INSERT INTO $table_name_terms (attribute_id, term_id) VALUES ";
+				
+				foreach ( $cats as $term_id ) {
+					$sql .= $wpdb->prepare( "(%s, %s),", $attribute_id, $term_id );
+				}
+				
+				$sql = rtrim( $sql, ',' ); //remove trailing comma
+				$wpdb->query( $sql );
 			}
 			
 			//redirect
@@ -285,9 +343,22 @@ th.column-ID {
 				'hide_empty' => false,
 				'exclude' => $term_ids
 			) );
-			
 			foreach ( $unused_terms as $term ) {
 				wp_delete_term( $term->term_id, $attribute_slug );
+			}
+
+			//update product categories
+			$wpdb->delete( $table_name_terms, array( 'attribute_id' => $attribute_id ) );
+			if ( $cats = mp_get_post_value( 'product_attribute_categories' ) ) {
+				$cats = explode( ',', $cats );
+				$sql = "INSERT INTO $table_name_terms (attribute_id, term_id) VALUES ";
+				
+				foreach ( $cats as $term_id ) {
+					$sql .= $wpdb->prepare( "(%s, %s),", $attribute_id, $term_id );
+				}
+				
+				$sql = rtrim( $sql, ',' ); //remove trailing comma
+				$wpdb->query( $sql );
 			}
 			
 			//redirect
