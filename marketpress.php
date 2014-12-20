@@ -472,15 +472,17 @@ class Marketpress {
 	 * @action init
 	 */
 	public function maybe_flush_rewrites() {
-		$flush_rewrites = get_option('mp_flush_rewrites');
+		$flush_rewrites = get_option( 'mp_flush_rewrites' );
 		
 		if ( $flush_rewrites === false ) {
-			add_option('mp_flush_rewrites', 0);
+			// option doesn't exist - flush rewrites and option to db
+			$flush_rewrites = true;
+			add_option( 'mp_flush_rewrites', 0 );
 		}
 		
 		if ( $flush_rewrites ) {
 			flush_rewrite_rules();
-			update_option('mp_flush_rewrites', 1);
+			update_option( 'mp_flush_rewrites', 0 );
 		}
 	}
 	
