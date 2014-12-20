@@ -248,12 +248,12 @@ class MP_Installer {
 		// Update settings
 		update_option('mp_settings', $settings);
 		
-		// Create product attributes table if it doesn't exist
-		$this->create_product_attributes_table();
 		// Give admin role all store capabilities
 		$this->add_admin_store_caps();
 		// Add "term_order" to $wpdb->terms table
 		$this->add_term_order_column();
+		// Create/update product attributes table
+		$this->create_product_attributes_table();
 
 		// Only run these on first install
 		if ( empty($old_settings) ) {
@@ -276,7 +276,11 @@ class MP_Installer {
 	public function create_product_attributes_table() {
 		global $wpdb;
 		
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		
 		$charset_collate = $wpdb->get_charset_collate();
+		
+		// Create mp_product_attributes table
 		$table_name = $wpdb->prefix . 'mp_product_attributes';
 		$sql = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -285,8 +289,15 @@ class MP_Installer {
 			attribute_terms_sort_order enum('ASC','DESC') DEFAULT NULL,
 			PRIMARY KEY  (attribute_id)
 		) $charset_collate;";
+		dbDelta( $sql );
 		
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		// Create mp_product_attributes_terms table
+		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
+		$sql = "CREATE TABLE $table_name (
+			attribute_id int(11) unsigned NOT NULL,
+			term_id bigint(20) unsigned NOT NULL,
+			PRIMARY KEY  (attribute_id, term_id)
+		) $charset_collate;";
 		dbDelta( $sql );
 	}
 	
