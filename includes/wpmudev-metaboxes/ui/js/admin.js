@@ -44,7 +44,7 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 		/* initializing conditional logic here instead of document.ready() to prevent
 		issues with wysiwyg editor not getting proper height */
 		initConditionals();
-		$(':checkbox, :radio, select').change(initConditionals);
+		$( '.wpmudev-postbox' ).find( ':checkbox, :radio, select' ).change( initConditionals );
 	}
 	
 	$(document).on('wpmudev_repeater_field/after_add_field_group', function(e){
