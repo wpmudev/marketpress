@@ -45,6 +45,7 @@ class WPMUDEV_Field_Tab extends WPMUDEV_Field {
 		?>
 <input type="hidden" <?php echo $this->parse_atts(); ?> value="" />
 <a class="wpmudev-field-tab-anchor" name="<?php echo $this->args['slug']; ?>"></a>
+<div class="wpmudev-field-tab-desc"><?php echo wpautop( $this->args['desc'] ); ?></div>
 		<?php
 	}
 }
