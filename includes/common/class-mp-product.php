@@ -1591,6 +1591,15 @@ Notification Preferences: %s', 'mp' );
 			$title = $this->_post->post_title;
 		}
 		
+		/**
+		 * Filter the product title
+		 *
+		 * @since 3.0
+		 * @param string $title The product title.
+		 * @param MP_Product $this The current product object.
+		 */
+		$title = apply_filters( 'mp_product/title', $title, $this );
+		
 		if ( $echo ) {
 			echo $title;
 		} else {
