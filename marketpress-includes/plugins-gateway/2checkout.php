@@ -101,23 +101,40 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
      */
     function process_payment($cart, $shipping_info) {
         global $mp;
-
+        
         $timestamp = time();
-        $settings = get_option('mp_settings');
-
-        $url = "https://www.2checkout.com/checkout/purchase";
-
-        $params = array();
+        $settings = get_option( 'mp_settings' );
+				$params = array();
+				
+				if ( $this->SandboxFlag == 'sandbox' ) {
+					$url = "https://sandbox.2checkout.com/checkout/purchase";
+					$params['demo'] = 'Y';
+				} else {
+        	$url = "https://www.2checkout.com/checkout/purchase";
+        }
 
         $params['sid'] = $this->API_Username;
-        $params['cart_order_id'] = $_SESSION['mp_order'];
-        $params['x_receipt_link_url'] = mp_checkout_step_url('confirmation');
+        $params['cart_order_id'] = $params['merchant_order_id'] = $_SESSION['mp_order'];
+        $params['x_receipt_link_url'] = mp_checkout_step_url( 'confirmation' );
         $params['skip_landing'] = '1';
         $params['fixed'] = 'Y';
         $params['currency_code'] = $this->currencyCode;
-
-        if ($this->SandboxFlag == 'sandbox') {
-            $params['demo'] = 'Y';
+        $params['mode'] = '2CO';
+        
+        // set shipping address
+        foreach ( $shipping_info as $k => $v ) {
+	        switch ( $k ) {
+		        case 'address1' :
+		        case 'address2' :
+		        	$k = 'ship_street_' . $k;
+		        break;
+		        
+		        default :
+		        	$k = 'ship_' . $k;
+		        break;
+	        }
+	        
+	        $params[ $k ] = $v;
         }
 
         $totals = array();
@@ -126,59 +143,63 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
         $params["id_type"] = 1;
         $coupon_code = $mp->get_coupon_code();
 
-        foreach ($cart as $product_id => $variations) {
-            foreach ($variations as $variation => $data) {
-								$price = $mp->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-                $totals[] = $price;
-
-                $suffix = "_{$counter}";
-
-                $sku = empty($data['SKU']) ? $product_id : $data['SKU'];
-                $params["c_prod{$suffix}"] = "{$sku},{$data['quantity']}";
-                $params["c_name{$suffix}"] = $data['name'];
-                $params["c_description{$suffix}"] = $data['url'];
-                $params["c_price{$suffix}"] = $data['price'];
-                if ($data['download'])
-                    $params["c_tangible{$suffix}"] = 'N';
-                else
-                    $params["c_tangible{$suffix}"] = 'Y';
-                $counter++;
+        foreach ( $cart as $product_id => $variations ) {
+          foreach ( $variations as $variation => $data ) {
+						$price = (float) $mp->coupon_value_product( $coupon_code, $data['price'], $product_id );
+						$totals[] = ($price * $data['quantity']);
+						
+						$prefix = 'li_' . $counter;
+            $sku = empty( $data['SKU'] ) ? $product_id : $data['SKU'];
+            $params["{$prefix}_product_id"] = $sku;
+            $params["{$prefix}_name"] = $data['name'];
+            $params["{$prefix}_quantity"] = $data['quantity'];
+            $params["{$prefix}_description"] = $data['url'];
+            $params["{$prefix}_price"] = $price;
+            $params["{$prefix}_type"] = 'product';
+            
+            if ( $data['download'] ) {
+              $params["{$prefix}_tangible"] = 'N';
+            } else {
+              $params["{$prefix}_tangible"] = 'Y';
             }
-        }
-
-        $total = array_sum($totals);
-
-        //tax line
-        if ( ! $mp->get_setting('tax->tax_inclusive') ) {
-        	$total += round(($total + $mp->tax_price()), 2);
+            
+            $counter ++;
+          }
         }
 
 	      $shipping_tax = 0;
-	      if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
-					$total += $shipping_price;
-					$params['sh_cost'] = $shipping_price;
-					$shipping_tax = ($mp->shipping_tax_price($shipping_price) - $shipping_price);
+	      if ( ($shipping_price = $mp->shipping_price( false )) !== false ) {
+		      $prefix = 'li_' . $counter;
+		      $params["{$prefix}_product_id"] = 'shipping';
+		      $params["{$prefix}_name"] = 'Shipping';
+        	$params["{$prefix}_type"] = 'shipping';
+					$params["{$prefix}_price"] = $shipping_price;
+					$shipping_tax = ($mp->shipping_tax_price( $shipping_price ) - $shipping_price);
+					
+					$counter += 1;
+					$totals[] = $shipping_price;
 	      }
-	
-	      //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-	      if ( ! $mp->get_setting('tax->tax_inclusive') ) {
-	      	$tax_price = ($mp->tax_price(false) + $shipping_tax);
-					$total += $tax_price;
-	      }
-				
-        $params['total'] = $total;
 
-        $param_list = array();
-
-        foreach ($params as $k => $v) {
-            $param_list[] = "{$k}=" . rawurlencode($v);
+        //tax line
+        if ( ! $mp->get_setting( 'tax->tax_inclusive' ) ) {
+	        $tax_price =  round( ($mp->tax_price( false ) + $shipping_tax), 2 );
+	        $prefix = 'li_' . $counter;
+	        $params["{$prefix}_product_id"] = 'taxes';
+	        $params["{$prefix}_name"] = 'Taxes';
+        	$params["{$prefix}_type"] = 'tax';
+        	$params["{$prefix}_price"] = $tax_price;
+        	
+        	$counter += 1;
+        	$totals[] = $tax_price;
         }
+	
+				$params['total'] = array_sum( $totals );
 
-        $param_str = implode('&', $param_list);
+        $url .= '?' . http_build_query( $params );
 
-        wp_redirect("{$url}?{$param_str}");
+        wp_redirect( $url );
 
-        exit(0);
+        die;
     }
 
     /**
@@ -272,7 +293,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
                     <tr>
                         <th scope="row"><?php _e('2Checkout Credentials', 'mp') ?></th>
                         <td>
-                            <span class="description"><?php print sprintf(__('You must login to 2Checkout vendor dashboard to obtain the seller ID and secret word. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://www.2checkout.com/community/blog/knowledge-base/suppliers/tech-support/3rd-party-carts/md5-hash-checking/where-do-i-set-up-the-secret-word"); ?></span>
+                            <span class="description"><?php print sprintf(__('You must login to 2Checkout vendor dashboard to obtain the seller ID and secret word. <a target="_blank" href="%s">Instructions &raquo;</a>', 'mp'), "http://help.2checkout.com/articles/FAQ/Where-do-I-set-up-the-Secret-Word/"); ?></span>
                             <p>
                                 <label><?php _e('Seller ID', 'mp') ?><br />
                                     <input value="<?php echo esc_attr($settings['gateways']['2checkout']['sid']); ?>" size="30" name="mp[gateways][2checkout][sid]" type="text" />
