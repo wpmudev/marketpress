@@ -1517,11 +1517,14 @@ if ( ! function_exists('mp_products_filter') ) :
 		$current_order = strtolower($query->get('order_by') . '-' . $query->get('order'));
 		$options = array(
 				array('0', '', __('Default', 'mp')),
-				array('date', 'desc', __('Release Date', 'mp')),
-				array('title', 'asc', __('Name', 'mp')),
+				array('date', 'desc', __('Release Date (Latest to Oldest)', 'mp')),
+				array('date', 'asc', __('Release Date (Oldest to Latest)', 'mp')),
+				array('title', 'asc', __('Name (A-Z)', 'mp')),
+				array('title', 'desc', __('Name (Z-A)', 'mp')),
 				array('price', 'asc', __('Price (Low to High)', 'mp')),
 				array('price', 'desc', __('Price (High to Low)', 'mp')),
-				array('sales', 'desc', __('Popularity', 'mp'))
+				array('sales', 'desc', __('Popularity (Most Popular - Least Popular)', 'mp')),
+				array('sales', 'asc', __('Popularity (Least Popular - Most Popular)', 'mp'))
 		);
 		$options_html = '';
 		foreach ($options as $k => $t) {

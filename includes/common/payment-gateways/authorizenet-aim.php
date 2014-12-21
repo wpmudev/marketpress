@@ -922,24 +922,24 @@ if (!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
                     $this->declined = false;
                     $this->error = false;
                     $this->method = $this->getMethod();
-										break;
+									break(2);
 									
 									case 'Declined' :
 										$this->approved = false;
                     $this->declined = true;
                     $this->error = false;
-                    break;
+                  break(2);
                   
                   case 'HeldForReview' :
                   	$this->approved = true;
                     $this->declined = false;
                     $this->error = false;
                     $this->held_for_review = true;
-                    break;
+                  break(2);
                     
                   case 'Error' :
                   	$count ++;
-                  	break;
+                  break;
                 }
 						}
 				}
