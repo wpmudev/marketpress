@@ -1326,8 +1326,9 @@ Thanks again!", 'mp')
 			remove_action( 'genesis_entry_content', 'genesis_do_post_content' );
 			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
 			add_action('genesis_entry_content', 'the_content');
+			
 			// ultimatum fixes Run this action before loop starts to print
-			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);
+			add_action( 'ultimatum_before_post_title', array( &$this, 'ultimatum_fixes_forMP' ), 1 );
 		}
 
 		$this->is_shop_page = true;
@@ -1422,7 +1423,7 @@ Thanks again!", 'mp')
 				add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_content', array(&$this, 'checkout_theme'), 99 );
 			// ultimatum fixes Run this action before loop starts to print
-			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
+			add_action( 'ultimatum_before_post_title', array( &$this, 'ultimatum_fixes_forMP' ) , 1 ); 			
 		}
 
 		$wp_query->is_page = 1;
@@ -1453,7 +1454,7 @@ Thanks again!", 'mp')
 			add_filter( 'wp_title', array(&$this, 'wp_title_output'), 19, 3 );
 			add_filter( 'the_content', array(&$this, 'orderstatus_theme'), 99 );
 			// ultimatum fixes Run this action before loop starts to print
-			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
+			add_action( 'ultimatum_before_post_title', array( &$this, 'ultimatum_fixes_forMP' ) , 1 ); 			
 		}
 
 		$wp_query->is_page = 1;
@@ -1518,7 +1519,7 @@ Thanks again!", 'mp')
 			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
 			add_action('genesis_entry_content', 'the_content');
 			// ultimatum fixes Run this action before loop starts to print
-			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
+			add_action( 'ultimatum_before_post_title', array( &$this, 'ultimatum_fixes_forMP' ) , 1 ); 			
 		}
 
 		$wp_query->is_page = 1;
@@ -1621,7 +1622,7 @@ Thanks again!", 'mp')
 			remove_action( 'genesis_entry_header', 'genesis_post_info', 12 );
 			add_action('genesis_entry_content', 'the_content');
 			// ultimatum fixes Run this action before loop starts to print
-			add_action('ultimatum_before_post_title','ultimatum_fixes_forMP',1);			
+			add_action( 'ultimatum_before_post_title', array( &$this, 'ultimatum_fixes_forMP' ) , 1 ); 			
 		}
 
 		$this->is_shop_page = true;
