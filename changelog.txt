@@ -8,6 +8,7 @@ Change Log:
 - Fixed: PHP warnings when using Ultimatum theme
 - Fixed: 2Checkout doubling price after being redirected
 - Fixed: infinite loop bug in Authorize.net gateway
+- Fixed: order-by dropdown doesn't always show default value from presentation settings
 - Added: Updated 2Checkout gateway to latest API
 
 2.9.5.9
