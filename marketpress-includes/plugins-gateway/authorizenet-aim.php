@@ -612,7 +612,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
         $payment->setParameter("x_customer_ip", $_SERVER['REMOTE_ADDR']);
 
         $payment->process();
-
+        
         if ( $payment->isApproved() ) {
           $paid = ( $payment->isHeldForReview() ) ? false : true;
 
@@ -871,57 +871,57 @@ if (!class_exists('MP_Gateway_Worker_AuthorizeNet_AIM')) {
 				}
 
         function process($retries = 1) {
-            global $mp;
+          global $mp;
 
-            $this->_prepareParameters();
-            $query_string = rtrim($this->fields, "&");
+          $this->_prepareParameters();
+          $query_string = rtrim($this->fields, "&");
 
-            $count = 0;
-            while ($count < $retries) {
-                $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | Authorize.net AIM Plugin/{$mp->version}";
-                $args['body'] = $query_string;
-                $args['sslverify'] = false;
-                $args['timeout'] = 30;
+          $count = 0;
+          while ($count < $retries) {
+            $args['user-agent'] = "MarketPress/{$mp->version}: http://premium.wpmudev.org/project/e-commerce | Authorize.net AIM Plugin/{$mp->version}";
+            $args['body'] = $query_string;
+            $args['sslverify'] = false;
+            $args['timeout'] = 30;
+            
+            //use built in WP http class to work with most server setups
+            $response = wp_remote_post($this->url, $args);
 
-                //use built in WP http class to work with most server setups
-                $response = wp_remote_post($this->url, $args);
-
-                if (is_array($response) && isset($response['body'])) {
-                    $this->response = $response['body'];
-                } else {
-                    $this->response = "";
-                    $this->error = true;
-                    return;
-                }
-
-                $this->parseResults();
-                
-                switch ( $this->getResultResponseFull() ) {
-	                case 'Approved' :
-	                	$this->approved = true;
-                    $this->declined = false;
-                    $this->error = false;
-                    $this->method = $this->getMethod();
-										break;
-									
-									case 'Declined' :
-										$this->approved = false;
-                    $this->declined = true;
-                    $this->error = false;
-                    break;
-                  
-                  case 'HeldForReview' :
-                  	$this->approved = true;
-                    $this->declined = false;
-                    $this->error = false;
-                    $this->held_for_review = true;
-                    break;
-                    
-                  case 'Error' :
-                  	$count ++;
-                  	break;
-                }
+            if (is_array($response) && isset($response['body'])) {
+                $this->response = $response['body'];
+            } else {
+                $this->response = "";
+                $this->error = true;
+                return;
             }
+            
+            $this->parseResults();
+            
+            switch ( $this->getResultResponseFull() ) {
+              case 'Approved' :
+              	$this->approved = true;
+                $this->declined = false;
+                $this->error = false;
+                $this->method = $this->getMethod();
+							break(2);
+							
+							case 'Declined' :
+								$this->approved = false;
+                $this->declined = true;
+                $this->error = false;
+              break(2);
+              
+              case 'HeldForReview' :
+              	$this->approved = true;
+                $this->declined = false;
+                $this->error = false;
+                $this->held_for_review = true;
+              break(2);
+                
+              case 'Error' :
+              	$count ++;
+              break;
+            }
+          }
         }
 
         function parseResults() {
