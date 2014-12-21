@@ -304,7 +304,6 @@ $this->countries_no_postcode = array(
   "SL" => "Sierra Leone",
   "SB" => "Solomon Islands",
   "SO" => "Somalia",
-  "ZA" => "South Africa",
   "SR" => "Suriname",
   "SY" => "Syrian Arab Republic",
   "TZ" => "Tanzania, United Republic Of",
