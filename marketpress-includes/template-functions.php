@@ -2640,7 +2640,7 @@ function mp_products_filter( $hidden = false, $per_page = null, $category = null
 				'echo' => 0,
 				'hierarchical' => true
 		));
-		
+
 		if ( is_null($order_by) ) {
 			$order_by = $mp->get_setting('order_by');
 		}
@@ -2652,34 +2652,35 @@ function mp_products_filter( $hidden = false, $per_page = null, $category = null
 		$current_order = strtolower($order_by . '-' . $order);
 		$options = array(
 				array('0', '', __('Default', 'mp')),
-				array('date', 'desc', __('Release Date', 'mp')),
-				array('title', 'asc', __('Name', 'mp')),
+				array('date', 'desc', __('Release Date (Latest to Oldest)', 'mp')),
+				array('date', 'asc', __('Release Date (Oldest to Latest)', 'mp')),
+				array('title', 'asc', __('Name (A-Z)', 'mp')),
+				array('title', 'desc', __('Name (Z-A)', 'mp')),
 				array('price', 'asc', __('Price (Low to High)', 'mp')),
 				array('price', 'desc', __('Price (High to Low)', 'mp')),
-				array('sales', 'desc', __('Popularity', 'mp'))
+				array('sales', 'desc', __('Popularity (Most Popular - Least Popular)', 'mp')),
+				array('sales', 'asc', __('Popularity (Least Popular - Most Popular)', 'mp'))
 		);
 		$options_html = '';
-		foreach ($options as $k => $t) {
-				$value = $t[0] . '-' . $t[1];
-				$selected = $current_order == $value ? 'selected' : '';
+		foreach ( $options as $k => $t ) {
+			$value = $t[0] . '-' . $t[1];
+			$selected = ( $current_order == $value ) ? 'selected' : '';
 
-				$options_html.='<option value="' . $value . '" ' . $selected . '>
-							' . $t[2] . '
-						</option>';
+			$options_html .= '<option value="' . $value . '" ' . $selected . '>' . $t[2] . '</option>';
 		}
 
 		$return = '
 			<a name="mp-product-list-top"></a>
 			<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
 				<form name="mp_product_list_refine" class="mp_product_list_refine" method="get">
-						<div class="one_filter">
+						<div class="one_filter" >
 							<span>' . __('Category', 'mp') . '</span>
 							' . $terms . '
 						</div>
 
 						<div class="one_filter">
 							<span>' . __('Order By', 'mp') . '</span>
-							<select name="order">
+							<select name="order" style="width:200px">
 								' . $options_html . '
 							</select>
 						</div>' .
