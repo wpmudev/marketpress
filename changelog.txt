@@ -4,6 +4,12 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+- Fixed: South Africa should require zip code during checkout
+- Fixed: PHP warnings when using Ultimatum theme
+- Fixed: 2Checkout doubling price after being redirected
+- Fixed: infinite loop bug in Authorize.net gateway
+- Added: Updated 2Checkout gateway to latest API
+
 2.9.5.9
 ----------------------------------------------------------------------
 - Fixed: Fedex displaying all available services at checkout instead of only the services selected
