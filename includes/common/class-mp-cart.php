@@ -521,7 +521,7 @@ class MP_Cart {
 		$line = '
 				<div id="mp-cart-meta-line-shipping-total" class="mp-cart-meta-line clearfix">
 					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __( 'Estimated Shipping', 'mp') : __( 'Shipping' )) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . (( false !== ( $shipping_total = $this->shipping_total( true ) ) ) ? $shipping_total : __( 'TBD', 'mp' )) . '</span>
+					<span class="mp-cart-meta-line-amount">' . $this->shipping_total( true ) . '</span>
 				</div>';
 
 		/**
@@ -1201,7 +1201,7 @@ class MP_Cart {
 		$shipping_total = mp_arr_get_value('shipping', $this->_total, 0);
 		
 		if ( empty( $shipping_total ) ) {
-			return __( 'FREE', 'mp' );
+			return '&mdash;';
 		} else {
 			if ( $format ) {
 				return mp_format_currency('', $shipping_total);
@@ -1226,7 +1226,15 @@ class MP_Cart {
 			$weight += $product->get_weight();
 		}
 		
-		return (float) $weight;
+		/**
+		 * Filter the cart shipping weight
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param float $weight The current shipping weight.
+		 * @param MP_Cart $this The MP_Cart object.
+		 */
+		return (float) apply_filters( 'mp_cart/shipping_weight', $weight, $this );
 	}
 	
 	/**
