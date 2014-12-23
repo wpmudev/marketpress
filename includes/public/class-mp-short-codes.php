@@ -66,6 +66,10 @@ class MP_Short_Codes {
 	 * @return array
 	 */
 	protected function _parse_atts( $atts ) {
+		if ( ! is_array( $atts ) ) {
+			return array();
+		}
+		
 		foreach ( $atts as $key => &$value ) {
 			if ( 'true' == $value || '1' == $value ) {
 				$value = true;
@@ -152,7 +156,7 @@ class MP_Short_Codes {
    * other ignored, if they are both set.
    *
    */
-  function mp_tag_cloud_sc($atts) {
+  function mp_tag_cloud_sc( $atts ) {
 	  $atts = $this->_parse_atts( $atts );
     return mp_tag_cloud( false, $atts );
   }
