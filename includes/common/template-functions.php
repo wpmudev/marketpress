@@ -544,6 +544,60 @@ if ( ! function_exists('mp_get_user_address') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_list_categories' ) ) :
+/**
+ * Display or retrieve the HTML list of product categories.
+ *
+ * The list of arguments is below:
+ *		 'show_option_all' (string) - Text to display for showing all categories.
+ *		 'orderby' (string) default is 'ID' - What column to use for ordering the
+ * categories.
+ *		 'order' (string) default is 'ASC' - What direction to order categories.
+ *		 'show_last_update' (bool|int) default is 0 - See {@link
+ * walk_category_dropdown_tree()}
+ *		 'show_count' (bool|int) default is 0 - Whether to show how many posts are
+ * in the category.
+ *		 'hide_empty' (bool|int) default is 1 - Whether to hide categories that
+ * don't have any posts attached to them.
+ *		 'use_desc_for_title' (bool|int) default is 1 - Whether to use the
+ * description instead of the category title.
+ *		 'feed' - See {@link get_categories()}.
+ *		 'feed_type' - See {@link get_categories()}.
+ *		 'feed_image' - See {@link get_categories()}.
+ *		 'child_of' (int) default is 0 - See {@link get_categories()}.
+ *		 'exclude' (string) - See {@link get_categories()}.
+ *		 'exclude_tree' (string) - See {@link get_categories()}.
+ *		 'current_category' (int) - See {@link get_categories()}.
+ *		 'hierarchical' (bool) - See {@link get_categories()}.
+ *		 'title_li' (string) - See {@link get_categories()}.
+ *		 'depth' (int) - The max depth.
+ *
+ * @param bool $echo Optional. Whether or not to echo.
+ * @param string|array $args Optional. Override default arguments.
+ */
+function mp_list_categories( $echo = true, $args = array() ) {
+	$args['taxonomy'] = 'product_category';
+	$args['echo'] = false;
+
+	$list = '<ul id="mp_category_list">' . wp_list_categories( $args ) . '</ul>';
+
+	/**
+	 * Filter the category list html
+	 *
+	 * @since 3.0
+	 * @param string $list
+	 * @param array $args
+	 */
+	$list = apply_filters( 'mp_list_categories', $list, $args );
+
+	if ( $echo ) {
+		echo $list;
+	} else {
+		return $list;
+	}
+}
+endif;
+
 if ( ! function_exists('mp_list_payment_options') ) :
 	/**
 	 * List available payment options (if there is more than one)
@@ -630,8 +684,8 @@ if ( ! function_exists( 'mp_list_plugin_shipping_options' ) ) :
 		$zip = mp_get_user_address_part( 'zip', $what );
 		$country = mp_get_user_address_part( 'country', $what );
 		
-		$items = mp_cart()->get_items();
-		$options = $plugin->shipping_options( $items, $address1, $address2, $city, $state, $zip, $country );
+		$cart = mp_cart();
+		$options = $plugin->shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country );
 		
 		$html = '';
 		foreach ( (array) $options as $method => $label ) {
