@@ -545,7 +545,7 @@ class MP_Checkout {
 		$atts = $html = '';	
 		
 		// Display label?
-		if ( $label = mp_arr_get_value( 'label', $field ) ) {
+		if ( ($label = mp_arr_get_value( 'label', $field )) && 'checkbox' != mp_arr_get_value( 'type', $field, '' ) ) {
 			$required = ( mp_arr_get_value( 'validation->required', $field ) ) ? ' <span class="mp-field-required">*</span>' : '';
 			$html .= '
 				<label>' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
@@ -561,8 +561,16 @@ class MP_Checkout {
 			$atts .= " data-rule-{$key}={$val}";
 		}
 		
+		// Get attributes
+		$attributes = (array) mp_arr_get_value( 'atts', $field, array() );
+		
+		// Add ID attribute
+		if ( false === mp_arr_get_value( 'id', $attributes ) ) {
+			$attributes['id'] = 'mp-checkout-field-' . uniqid( true );
+		}
+		
 		// Convert atts arg into attributes
-		foreach ( (array) mp_arr_get_value( 'atts', $field, array() ) as $key => $val ) {
+		foreach ( $attributes as $key => $val ) {
 			$val = mp_quote_it( $val );
 			$atts .= " {$key}={$val}";
 		}
@@ -571,11 +579,16 @@ class MP_Checkout {
 			case 'text' :
 			case 'password' :
 			case 'hidden' :
+			case 'checkbox' :
 				if ( mp_arr_get_value( 'value_only', $field ) ) {
 					$html .= mp_arr_get_value( 'value', $field, '' );
 				} else {
 					$html .= '
 					<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . ' />';
+					
+					if ( 'checkbox' == mp_arr_get_value( 'type', $field, '' ) ) {
+						$html .= '<label for="' . $attributes['id'] . '">' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
+					}
 				}
 			break;
 			
@@ -861,7 +874,7 @@ class MP_Checkout {
 	 * @access public
 	 */
 	public function section_shipping() {
-		if ( mp_cart()->is_download_only() || 0 == mp_cart()->shipping_weight()) {
+		if ( mp_cart()->is_download_only() || 0 == mp_cart()->shipping_weight() ) {
 			return false;
 		}
 		
