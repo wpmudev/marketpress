@@ -205,18 +205,16 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$result = mp()->create_order($order_id, $cart, $shipping_info, $payment_info, false);
 	}
 
-  /**
-   * Use this to do the final payment. Create the order then process the payment. If
-   *  you know the payment is successful right away go ahead and change the order status
-   *  as well.
-   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-   *  it will redirect to the next step.
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
-   */
-	function process_payment($cart, $shipping_info) {
-		;
+	/**
+	 * Use this to do the final payment. Create the order then process the payment. If
+	 * you know the payment is successful right away go ahead and change the order status
+	 * as well.
+	 *
+	 * @param MP_Cart $cart. Contains the MP_Cart object.
+	 * @param array $billing_info. Contains billing info and email in case you need it.
+	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 */
+	function process_payment( $cart, $billing_info, $shipping_info ) {
 	}
 	
   /**

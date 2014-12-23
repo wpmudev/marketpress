@@ -39,10 +39,11 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @access public
 	 * @action save_post
 	 * @param int $post_id
-	 * @param string $meta_key
-	 * @param $value (optional)
+	 * @param string $meta_key The meta key to use when storing the field value. Defaults to null.
+	 * @param mixed $value The value of the field. Defaults to null.
+	 * @param bool $force Whether to bypass the is_subfield check. Subfields normally don't run their own save routine. Defaults to false.
 	 */
-	public function save_value( $post_id, $meta_key = null, $value = null ) {
+	public function save_value( $post_id, $meta_key = null, $value = null, $force = false ) {
 		if ( is_null($value) ) {
 			$post_key = $this->get_post_key();
 			$value = $this->get_post_value($post_key, null);
@@ -90,10 +91,11 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 	 * @since 1.0
 	 * @access public
 	 * @param mixed $post_id
+	 * @param string $meta_key
 	 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
 	 * @return mixed
 	 */
-	public function get_value( $post_id, $raw = false ) {
+	public function get_value( $post_id, $meta_key = null, $raw = false ) {
 		$value = null;
 		
 		/**

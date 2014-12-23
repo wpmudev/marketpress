@@ -686,8 +686,9 @@ class WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param int $post_id
 	 */
-	public function display() {
+	public function display( $post_id ) {
 		wp_die(__('You must the WPMUDEV_Field::display() method in your form field class', 'wpmudev_metaboxes'), E_USER_ERROR);
 	}
 	
@@ -696,8 +697,9 @@ class WPMUDEV_Field {
 	 *
 	 * @since 1.0
 	 * @access public
+	 * @param array $args An array of arguments.
 	 */
-	public function on_creation() {
+	public function on_creation( $args ) {
 	}
 	
 	/**

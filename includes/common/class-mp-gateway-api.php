@@ -207,17 +207,16 @@ if( ! class_exists('MP_Gateway_API') ) {
       wp_die( __("You must override the confirm_payment_form() method in your {$this->admin_name} payment gateway plugin!", 'mp') );
     }
 
-    /**
-     * Use this to do the final payment. Create the order then process the payment. If
-     *  you know the payment is successful right away go ahead and change the order status
-     *  as well.
-     *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-     *  it will redirect to the next step.
-     *
-     * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-     * @param array $billing_info. Contains billing info and email in case you need it
-     */
-		function process_payment ( $cart, $billing_info ) {
+		/**
+		 * Use this to do the final payment. Create the order then process the payment. If
+		 * you know the payment is successful right away go ahead and change the order status
+		 * as well.
+		 *
+		 * @param MP_Cart $cart. Contains the MP_Cart object.
+		 * @param array $billing_info. Contains billing info and email in case you need it.
+		 * @param array $shipping_info. Contains shipping info and email in case you need it
+		 */
+		function process_payment( $cart, $billing_info, $shipping_info ) {
       wp_die( __("You must override the process_payment() method in your {$this->admin_name} payment gateway plugin!", 'mp') );
     }
 
