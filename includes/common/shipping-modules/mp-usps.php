@@ -402,7 +402,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	* return array $shipping_options
 	*/
 	function shipping_options( $items, $address1, $address2, $city, $state, $zip, $country ) {
-		if ( $this->_crc_ok() && ($shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name )) ) {
+		if ( $this->_crc_ok() && false !== ($shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name )) ) {
 			// CRC is ok - just return the shipping options already stored in session
 			return $this->_format_shipping_options( $shipping_options );
 		}
@@ -637,9 +637,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 
 			if($rate == 0){  //Not available for this combination
 				unset($mp_shipping_options[$service]);
-			}
-			else
-			{
+			} else {
 				$handling = floatval($this->get_setting('domestic_handling')) * $box_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
@@ -653,19 +651,15 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 			}
 		}
 
-		uasort($mp_shipping_options, array($this,'compare_rates') );
-
-		$shipping_options = $this->_format_shipping_options($mp_shipping_options);
+		uasort( $mp_shipping_options, array( $this, 'compare_rates' ) );
 
 		//Update the session. Save the currently calculated CRCs
-		mp_update_session_value('mp_shipping_options->' . $this->plugin_name, $mp_shipping_options);
-		mp_update_session_value('mp_cart_crc', $this->crc(mp_cart()->get_items()));
-		mp_update_session_value('mp_shipping_crc', $this->crc(mp_get_session_value('mp_shipping_info')));
-
+		$this->_crc_update( $mp_shipping_options );
+		
 		unset($xpath);
 		unset($dom);
 
-		return $shipping_options;
+		return $this->_format_shipping_options( $mp_shipping_options );;
 	}
 
 	/**
@@ -811,9 +805,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 		$shipping_options = $this->__format_shipping_options($mp_shipping_options);
 
 		//Update the session. Save the currently calculated CRCs
-		mp_update_session_value('mp_shipping_options->' . $this->plugin_name, $mp_shipping_options);
-		mp_update_session_value('mp_cart_crc', $this->crc(mp_cart()->get_items()));
-		mp_update_session_value('mp_shipping_crc', $this->crc(mp_get_session_value('mp_shipping_info')));
+		$this->_crc_update( $mp_shipping_options );
 
 		unset($xpath);
 		unset($dom);

@@ -8,9 +8,14 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * @param float $units
 		 * @return float, Converted to the current units_used
 		 */
-		protected function _as_inches($units){
-			$units = ( mp_get_setting('shipping->system') == 'metric' ) ? floatval($units) / 2.54 : floatval($units);
-			return round($units,2);
+		protected function _as_inches( $units ) {
+			$units = (float) $units;
+			
+			if ( 'metric' == mp_get_setting( 'shipping->system' ) ) {
+				$units = ($units * 2.54);
+			}
+			
+			return round( $units, 2 );
 		}
 	
 		/**
@@ -19,9 +24,14 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * @param float $units
 		 * @return float, Converted to pounds
 		 */
-		protected function _as_pounds($units){
-			$units = ( mp_get_setting('shipping->system') == 'metric')  ? floatval($units) * 2.2 : floatval($units);
-			return round($units, 2);
+		protected function _as_pounds( $units ) {
+			$units = (float) $units;
+			
+			if ( 'metric' == mp_get_setting( 'shipping->system' ) ) {
+				$units = ($units * 2.2);
+			}
+			
+			return round( $units, 2 );
 		}
 
 		/**
@@ -35,20 +45,33 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		protected function _crc_ok() {
 			//Assume it changed
 			$result = false;
-	
+			
 			//Check the shipping options to see if we already have a valid shipping price
-			if ( mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ){
+			if ( false !== mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ){
 				/* We have a set of prices. Are they still valid?
 				Did the cart change since last calculation? */
 				if ( mp_get_session_value( 'mp_cart_crc' ) == $this->crc( mp_cart()->get_items() ) ) {
 					//Did the shipping info change?
-					if ( mp_get_session_value( 'mp_shipping_crc' ) == $this->crc( mp_get_session_value( 'mp_shipping_info' ) ) ) {
+					if ( mp_get_session_value( 'mp_shipping_crc' ) == $this->crc( mp_get_user_address( 'shipping' ) ) ) {
 						$result = true;
 					}
 				}
 			}
-				
+			
 			return $result;
+		}
+		
+		/**
+		 * Update CRCs and cached shipping options
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param array $shipping_option An array of unformatted shipping options.
+		 */
+		public function _crc_update( $shipping_options ) {
+			mp_update_session_value( 'mp_shipping_options->' . $this->plugin_name, $shipping_options);
+			mp_update_session_value( 'mp_cart_crc', $this->crc( mp_cart()->get_items() ) );
+			mp_update_session_value( 'mp_shipping_crc', $this->crc( mp_get_user_address( 'shipping' ) ) );
 		}
 
 		/**
@@ -58,7 +81,7 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * @param float $price, the price to display
 		 * @return string, Formatted string with shipping method name delivery time and price
 		 */
-		protected function _format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
+		protected function _format_shipping_option( $shipping_option = '', $price = '', $delivery = '', $handling='' ){
 			if ( isset($this->services[$shipping_option])){
 				$option = $this->services[$shipping_option]->name;
 			}
@@ -89,7 +112,7 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		protected function _format_shipping_options( $unformatted ) {
 			$shipping_options = array();
 			foreach( $unformatted as $service => $options ){
-				$shipping_options[$service] = $this->_format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
+				$shipping_options[ $service ] = $this->_format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
 			}
 			return $shipping_options;
 		}
@@ -127,17 +150,17 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
 		 * return float $price
 		 */
-		public function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
+		public function calculate_shipping( $price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option ) {
 			if ( ! $this->_crc_ok() ) {
 				//Price added to this object
-				$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
+				$this->shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country );
 			}
 			
-			return (float) mp_get_session_value('mp_shipping_info->shipping_cost', 0);
+			return (float) mp_get_session_value( 'mp_shipping_info->shipping_cost', 0 );
 		}
 		
 		/**
-		 * For uasort below
+		 * For uasort
 		 */
 		public function compare_rates( $a, $b ) {
 			if ( $a['rate'] == $b['rate'] ) {
@@ -154,7 +177,7 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * @return CRC32 of the serialized item
 		 */
 		public function crc( $item = '' ) {
-			return crc32(serialize($item));
+			return crc32( serialize( $item ) );
 		}
 	}
 }

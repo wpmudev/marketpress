@@ -185,11 +185,17 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
 
     }
 
-    /**
-     * Echo a table row with any extra shipping fields you need to add to the form
-     */
-		function extra_shipping_field($content) {
-
+		/**
+		 * Add additional shipping fields
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @filter mp_checkout/address_fields_array
+		 * @param array $fields
+		 * @param string $type
+		 */
+		public function extra_shipping_field( $fields, $type ) {
+			return $fields;
     }
 
     /**
@@ -327,6 +333,21 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
     }
     
     /**
+     * Set session variables and return free shipping array
+     *
+     * @since 3.0
+     * @access protected
+     * @return array
+     */
+    protected function _free_shipping() {
+			mp_update_session_value( 'mp_shipping_info->shipping_sub_option', __('Free Shipping', 'mp') );
+			mp_update_session_value( 'mp_shipping_info->shipping_cost', 0 );
+			return array(
+				__( 'Free Shipping', 'mp' ) => __( 'Free Shipping - 0.00', 'mp' ),
+			);
+    }
+    
+    /**
      * Initialize the settings metabox
      *
      * @since 3.0
@@ -411,24 +432,10 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
     function __construct() {
 			$this->maybe_update();
 			$this->on_creation();
-
-      add_filter( 'mp_checkout_before_shipping', array(&$this, 'before_shipping_form') );
-      add_filter( 'mp_checkout_after_shipping', array(&$this, 'after_shipping_form') );
-      add_filter( 'mp_checkout_shipping_field', array(&$this, 'extra_shipping_field') );
-      add_action( 'mp_shipping_process', array(&$this, 'process_shipping_form') );
-      add_action( 'mp_shipping_settings', array(&$this, 'shipping_settings_box') );
-      add_filter( 'mp_shipping_settings_filter', array(&$this, 'process_shipping_settings') );
-
+			
+			add_filter( 'mp_checkout/address_fields_array', array( &$this, 'extra_shipping_field' ), 10, 2 );
 			add_filter( "mp_calculate_shipping_{$this->plugin_name}", array(&$this, 'calculate_shipping'), 10, 10 );
-
 			add_filter( "mp_shipping_options_{$this->plugin_name}", array(&$this, 'shipping_options'), 10, 7 );
-
-			//private
-			if ( $this->use_weight && ! mp()->weight_printed ) {
-				add_action( 'mp_shipping_metabox', array(&$this, '_weight_shipping_metabox'), 10, 2 );
-				add_filter( 'mp_save_shipping_meta', array(&$this, '_weight_save_shipping_metabox') );
-				mp()->weight_printed = true;
-			}
 
 			if ( is_admin() ) {
       	$this->init_settings_metabox();

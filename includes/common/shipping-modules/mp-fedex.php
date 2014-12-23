@@ -1,9 +1,8 @@
 <?php
-/*
-MarketPress Example Shipping Plugin Template
-*/
+	
+require_once mp_plugin_dir( 'includes/common/class-mp-shipping-api-calculated.php' );
 
-class MP_Shipping_FedEx extends MP_Shipping_API {
+class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
 	//build of the plugin
 	public $build = 2;
 	
@@ -36,8 +35,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		//get services
 		$this->get_services();
 		
-		// Get settings for convenience sake
-		$this->settings = get_option('mp_settings');
+		//make copy of settings
+		$this->settings = get_option( 'mp_settings' );
 	}
 	
 	/**
@@ -115,11 +114,34 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	}
 
 	/**
-	* Echo a table row with any extra shipping fields you need to add to the shipping checkout form
-	*/
-	function extra_shipping_field($content) {
+	 * Add additional shipping fields
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_checkout/address_fields_array
+	 * @param array $fields
+	 * @param string $type
+	 */
+	public function extra_shipping_field( $fields, $type ) {
+		if ( ! $this->get_setting( 'commercial' ) ) {
+			$fields[] = array(
+				'type' => 'hidden',
+				'name' => mp_checkout()->field_name( 'residential', $type ),
+				'value' => 1,
+			);			
+		} else {
+			$fields[] = array(
+				'type' => 'checkbox',
+				'label' => __( 'This is a residential address', 'mp' ),
+				'name' => mp_checkout()->field_name( 'residential', $type ),
+				'value' => 1,
+				'atts' => array(
+					'checked' => ( mp_get_user_address_part( 'residential', $type ) ),
+				),
+			);
+		}
 
-		$this->residential = true;
+		/*$this->residential = true;
 		if ( ! $this->get_setting('commercial') ) { //force residential
 			$content .= '<input type="hidden" name="residential" value="1" />';
 			$_SESSION['mp_shipping_info']['residential'] = true;
@@ -142,9 +164,9 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			<small><em>' . __('Check if delivery is to a residence.', 'mp') . '</em></small>
 			</td>
 			</tr>';
-		}
+		}*/
 
-		return $content;
+		return $fields;
 	}
 
 	/**
@@ -169,14 +191,14 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
   public function update( $settings ) {
   	// Update services
   	$services = array();
-		foreach ( $this->get_setting('services', array()) as $k => $v ) {
-			if ( is_numeric($v) && $v ) {
-				$services[] = $k;
+		foreach ( $this->get_setting( 'services', array() ) as $k => $v ) {
+			if ( is_numeric( $v ) && $v ) {
+				$services[ $k ] = $v;
 			}
 		}
 		
-  	if ( ! empty($services) ) {
-	  	mp_push_to_array($settings, 'shipping->fedex->services', $services);
+  	if ( ! empty( $services ) ) {
+	  	mp_push_to_array( $settings, 'shipping->fedex->services', $services );
   	}
   	
   	// Update boxes
@@ -274,7 +296,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				'STATION' => __('Station', 'mp'),
 			),
 		));
-		$metabox->add_field('advanced_select', array(
+		/*$metabox->add_field('advanced_select', array(
 			'name' => $this->get_field_name('packaging'),
 			'label' => array('text' => __('Default Packaging', 'mp')),
 			'multiple' => false,
@@ -287,50 +309,56 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 				'FEDEX_25KG_BOX' => __('Fedex 25kg Box', 'mp'),
 				'FEDEX_10KG_BOX' => __('Fedex 10kg Box', 'mp'),
 			),
-		));
+		));*/
 		$metabox->add_field('checkbox', array(
 			'name' => $this->get_field_name('commercial'),
 			'label' => array('text' => __('Allow Commercial Delivery?', 'mp')),
 			'desc' => __('When checked the customer can chose Residential or Commercial delivery with Residential the default. Unchecked it\'s only Residential rates.', 'mp'),
 		));
 		
-		$services = array('domestic|disabled' => __('Domestic Services', 'mp'));
+		$services = array();
 		foreach ( $this->services as $service => $detail ) {
 			$services[$service] = $detail->name . ' ' . $detail->delivery;
 		}
 		
-		$services['international|disabled'] = __('International Services', 'mp');
+		$metabox->add_field( 'checkbox_group', array(
+			'name' => $this->get_field_name( 'services' ),
+			'label' => array( 'text' => __( 'Domestic Services', 'mp' ) ),
+			'options' => $services,
+			'width' => '33.3%',
+		) );
+
+		$metabox->add_field( 'text', array(
+			'name' => $this->get_field_name( 'domestic_handling' ),
+			'default_value' => '0.00',
+			'label' => array( 'text' => __( 'Handling Charge per Domestic Shipment', 'mp' ) ),
+			'validation' => array(
+				'number' => true,
+				'min' => 0,
+			),
+		) );
+		
+		$services = array();
 		foreach ( $this->intl_services as $service => $detail ) {
 			$services[$service] = $detail->name . ' ' . $detail->delivery;
 		}
+
+		$metabox->add_field( 'checkbox_group', array(
+			'name' => $this->get_field_name( 'services' ),
+			'label' => array( 'text' => __( 'International Services', 'mp' ) ),
+			'options' => $services,
+			'width' => '33.3%',
+		) );
 		
-		$metabox->add_field('advanced_select', array(
-			'name' => $this->get_field_name('services'),
-			'label' => array('text' => __('Services', 'mp')),
-			'options' => $services
-		));
-		
-		$metabox->add_field('text', array(
-			'name' => $this->get_field_name('domestic_handling'),
+		$metabox->add_field( 'text', array(
+			'name' => $this->get_field_name( 'intl_handling' ),
 			'default_value' => '0.00',
-			'label' => array('text' => __('Handling Charge per Domestic Shipment', 'mp')),
+			'label' => array( 'text' => __( 'Handling Charge per International Shipment', 'mp' ) ),
 			'validation' => array(
-				'required' => true,
 				'number' => true,
 				'min' => 0,
 			),
-		));
-		
-		$metabox->add_field('text', array(
-			'name' => $this->get_field_name('intl_handling'),
-			'default_value' => '0.00',
-			'label' => array('text' => __('Handling Charge per International Shipment', 'mp')),
-			'validation' => array(
-				'required' => true,
-				'number' => true,
-				'min' => 0,
-			),
-		));
+		) );
 		
 		$default_boxes = $this->default_boxes();
 		$boxes = array();
@@ -403,32 +431,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	}
 
 	/**
-	* Use this function to return your calculated price as an integer or float
-	*
-	* @param int $price, always 0. Modify this and return
-	* @param float $total, cart total after any coupons and before tax
-	* @param array $cart, the contents of the shopping cart for advanced calculations
-	* @param string $address1
-	* @param string $address2
-	* @param string $city
-	* @param string $state, state/province/region
-	* @param string $zip, postal code
-	* @param string $country, ISO 3166-1 alpha-2 country code
-	* @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
-	*
-	* return float $price
-	*/
-	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
-		if( ! $this->crc_ok() ) {
-			//Price added to this object
-			$this->shipping_options($cart, $address1, $address2, $city, $state, $zip, $country);
-		}
-
-		$price = floatval($_SESSION['mp_shipping_info']['shipping_cost']);
-		return $price;
-	}
-
-	/**
 	* For calculated shipping modules, use this method to return an associative array of the sub-options. The key will be what's saved as selected
 	*  in the session. Note the shipping parameters won't always be set. If they are, add the prices to the labels for each option.
 	*
@@ -442,8 +444,12 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	*
 	* return array $shipping_options
 	*/
-	function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
-
+	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
+		if ( $this->_crc_ok() && false !== ($shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name) ) ) {
+			// CRC is ok - just return the shipping options already stored in session
+			return $this->_format_shipping_options( $shipping_options );
+		}
+		
 		$shipping_options = array();
 
 		$this->address1 = $address1;
@@ -452,81 +458,66 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		$this->state = $state;
 		$this->destination_zip = $zip;
 		$this->country = $country;
-
-		$this->residential = $_SESSION['mp_shipping_info']['residential'];
-
-		if( is_array($cart) ) {
-			$shipping_meta['weight'] = (is_numeric($shipping_meta['weight']) ) ? $shipping_meta['weight'] : 0;
-			foreach ($cart as $product_id => $variations) {
-				$shipping_meta = get_post_meta($product_id, 'mp_shipping', true);
-				foreach($variations as $variation => $product) {
-					$qty = $product['quantity'];
-					$weight = (empty($shipping_meta['weight']) ) ? $this->ups_settings['default_weight'] : $shipping_meta['weight'];
-					$this->weight += floatval($weight) * $qty;
-				}
-			}
-		}
-
-		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
-		if($this->weight == 0){ //Nothing to ship
-			$_SESSION['mp_shipping_info']['shipping_sub_option'] = __('Free Shipping', 'mp');
-			$_SESSION['mp_shipping_info']['shipping_cost'] =  0;
-			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
+		$this->residential = mp_get_session_value( 'mp_shipping_info->residential' );
+		$this->weight = $cart->shipping_weight();
+		
+		if( $this->weight == 0 ) {
+			// Nothing to ship
+			return $this->_free_shipping();
 		}
 
 		// Got our totals  make sure we're in decimal pounds.
-		$this->weight = $this->as_pounds($this->weight);
+		$this->weight = $this->_as_pounds( $this->weight );
 
 		//ups won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
 
-		if (in_array($this->settings['base_country'], array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+		if ( in_array( mp_get_setting( 'base_country' ), array( 'US','UM','AS','FM','GU','MH','MP','PW','PR','PI' ) ) && strlen( mp_get_setting( 'base_zip', '' ) ) > 5 ) {
 			// Can't use zip+4
-			$this->settings['base_zip'] = substr($this->settings['base_zip'], 0, 5);
+			$this->settings['base_zip'] = substr( $this->settings['base_zip'], 0, 5 );
 		}
 
-		if (in_array($this->country, array('US','UM','AS','FM','GU','MH','MP','PW','PR','PI'))){
+		if ( in_array( $this->country, array( 'US','UM','AS','FM','GU','MH','MP','PW','PR','PI' ) ) ) {
 			// Can't use zip+4
-			$this->destination_zip = substr($this->destination_zip, 0, 5);
+			$this->destination_zip = substr( $this->destination_zip, 0, 5 );
 		}
-		if ($this->country == $this->settings['base_country']) {
+		if ( $this->country == $this->settings['base_country'] ) {
 			$shipping_options = $this->rate_request();
 		} else {
-			$shipping_options = $this->rate_request(true);
+			$shipping_options = $this->rate_request( true );
 		}
 
 		return $shipping_options;
 	}
 
 	function packages($dimensions, $weight){
-		$height = (empty($dimensions[0]) ) ? 0 : $dimensions[0];
-		$width = (empty($dimensions[1]) ) ? 0 : $dimensions[1];
-		$length = (empty($dimensions[2]) ) ? 0 : $dimensions[2];
+		$height = ( empty( $dimensions[0] ) ) ? 0 : (int) $dimensions[0];
+		$width = ( empty( $dimensions[1] ) ) ? 0 : (int) $dimensions[1];
+		$length = ( empty( $dimensions[2] ) ) ? 0 : (int) $dimensions[2];
 
 		$count = $this->pkg_count;
 		$packages =
-		'<v13:PackageCount>' . $count . '</v13:PackageCount>
-		';
+		'<v13:PackageCount>' . $count . '</v13:PackageCount>';
 
-		for($i=0; $i < $count;$i++) {
-
-			$packages .=
-			'<v13:RequestedPackageLineItems>
-			<v13:SequenceNumber>' . $count . '</v13:SequenceNumber>
-			<v13:GroupNumber>1</v13:GroupNumber>
-			<v13:GroupPackageCount>1</v13:GroupPackageCount>
-			<v13:Weight>
-			<v13:Units>LB</v13:Units>
-			<v13:Value>' . $weight . '</v13:Value>
-			</v13:Weight>
-			<v13:Dimensions>
-			<v13:Length>' . intval($length) . '</v13:Length>
-			<v13:Width>' . intval($width) . '</v13:Width>
-			<v13:Height>' . intval($height) . '</v13:Height>
-			<v13:Units>IN</v13:Units>
-			</v13:Dimensions>
+		for ( $i = 0; $i < $count; $i++ ) {
+			$packages .= '
+			<v13:RequestedPackageLineItems>
+				<v13:SequenceNumber>' . $count . '</v13:SequenceNumber>
+				<v13:GroupNumber>1</v13:GroupNumber>
+				<v13:GroupPackageCount>1</v13:GroupPackageCount>
+				<v13:Weight>
+					<v13:Units>LB</v13:Units>
+					<v13:Value>' . $weight . '</v13:Value>
+				</v13:Weight>
+				<v13:Dimensions>
+					<v13:Length>' . $length . '</v13:Length>
+					<v13:Width>' . $width . '</v13:Width>
+					<v13:Height>' . $height . '</v13:Height>
+					<v13:Units>IN</v13:Units>
+				</v13:Dimensions>
 			</v13:RequestedPackageLineItems>';
 		}
+		
 		return $packages;
 	}
 
@@ -534,24 +525,29 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 	* rate_request - Makes the actual call to fedex
 	*/
 	function rate_request( $international = false ) {
-		$shipping_options = $this->get_setting('services', array());
+		$shipping_options = $this->get_setting( 'services', array() );
+		$services = ( $international ) ? $this->intl_services : $this->services;
 		
 		//Filter out all options that aren't enabled in settings
-		$shipping_options = array_filter($shipping_options, create_function('$val', 'return ($val == 1);'));
-
+		$shipping_options = array_filter( $shipping_options, create_function( '$val', 'return ($val == 1);') );
+		
+		//Filter out all options that aren't in the $services array
+		foreach ( $services as $code => $service ) {
+			if ( ! array_key_exists( $code, $shipping_options ) ) {
+				unset( $services[ $code ] );
+			}
+		}
+		
 		//Assume equal size packages. Find the best matching box size
-		$boxes = $this->get_setting('boxes');
-		$box = $largest_box = false;
+		$boxes = $this->get_setting( 'boxes' );
+		$box = false;
 		$index = 1;
-		$box_count = count($boxes);
+		$box_count = count( $boxes );
 
 		foreach ( $boxes as $thebox ) {
-			// Find largest box
-			if ( $thebox['weight'] > $this->weight || ($index == $box_count && $box === false) ) {
-				$largest_box = $thebox;
-			}
+			$box_weight = (float) $thebox['weight'];
 			
-			if ( floatval($this->weight) <= floatval($thebox['weight']) || ($index == $box_count && $box === false) ) {
+			if ( $this->weight <= $box_weight || ($index == $box_count && $box === false) ) {
 				$box = $thebox;
 				break;
 			}
@@ -568,108 +564,106 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 		}
 		
 		// Fixup pounds by converting multiples of 16 ounces to pounds
-		$this->pounds = intval($this->pkg_weight);
-		$this->ounces = round(($this->pkg_weight - $this->pounds) * 16);
+		$this->pounds = (int) $this->pkg_weight;
+		$this->ounces = round( ($this->pkg_weight - $this->pounds) * 16 );
 
 		//found our box
-		$dims = explode('x', strtolower($box['size']));
-		foreach($dims as &$dim) $dim = $this->as_inches($dim);
-
-		sort($dims); //Sort so two lowest values are used for Girth
-
-		$packages = $this->packages($dims, $this->pkg_weight);
-
-		$xml_req = '<?xml version="1.0" encoding="UTF-8"?>
-		<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v13="http://fedex.com/ws/rate/v13">
-		<SOAP-ENV:Body>
-		<v13:RateRequest>
-		<v13:WebAuthenticationDetail>
-		<v13:UserCredential>
-		<v13:Key>' . $this->get_setting('api_key') . '</v13:Key>
-		<v13:Password>' . $this->get_setting('api_password') . '</v13:Password>
-		</v13:UserCredential>
-		</v13:WebAuthenticationDetail>
-		<v13:ClientDetail>
-		<v13:AccountNumber>' . $this->get_setting('account') . '</v13:AccountNumber>
-		<v13:MeterNumber>' . $this->get_setting('meter') . '</v13:MeterNumber>
-		</v13:ClientDetail>
-		<v13:TransactionDetail>
-		<v13:CustomerTransactionId>Marketpress Rates Request</v13:CustomerTransactionId>
-		</v13:TransactionDetail>
-		<v13:Version>
-		<v13:ServiceId>crs</v13:ServiceId>
-		<v13:Major>13</v13:Major>
-		<v13:Intermediate>0</v13:Intermediate>
-		<v13:Minor>0</v13:Minor>
-		</v13:Version>
-		<v13:RequestedShipment>
-		<v13:DropoffType>' . $this->get_setting('dropoff') . '</v13:DropoffType>
-		<v13:PackagingType>' . $this->get_setting('packaging') . '</v13:PackagingType>
-		<v13:PreferredCurrency>' . mp_get_setting('currency') . '</v13:PreferredCurrency>
-		<v13:Shipper>
-		<v13:Address>
-		<v13:StateOrProvinceCode>' . mp_get_setting('base_province') . '</v13:StateOrProvinceCode>
-		<v13:PostalCode>' . mp_get_setting('base_zip') . '</v13:PostalCode>
-		<v13:CountryCode>' . mp_get_setting('base_country') . '</v13:CountryCode>
-		</v13:Address>
-		</v13:Shipper>
-		<v13:Recipient>
-		<v13:Address>
-		<v13:StreetLines>' . $this->address1 . '</v13:StreetLines>
-		<v13:StreetLines>' . $this->address2 . '</v13:StreetLines>
-		<v13:City>' . $this->city . '</v13:City>
-		<v13:StateOrProvinceCode>' . $this->state . '</v13:StateOrProvinceCode>
-		<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
-		<v13:CountryCode>' . $this->country . '</v13:CountryCode>';
-
-		if ( ! empty($this->residential) || $this->get_setting('commercial') ) {
-			$xml_req .= '
-			<v13:Residential>true</v13:Residential>';
-		} else {
-			$xml_req .= '
-			<v13:Residential>false</v13:Residential>';
+		$dims = explode( 'x', strtolower( $box['size'] ) );
+		foreach( $dims as &$dim ) {
+			$dim = $this->_as_inches( $dim );
 		}
 
-		$xml_req .= '
-		</v13:Address>
-		</v13:Recipient>
-		<v13:ShippingChargesPayment>
-		<v13:PaymentType>SENDER</v13:PaymentType>
-		<v13:Payor>
-		<v13:ResponsibleParty>
-		<v13:AccountNumber>' . $this->get_setting('account') . '</v13:AccountNumber>
-		</v13:ResponsibleParty>
-		</v13:Payor>
-		</v13:ShippingChargesPayment>
-		<v13:RateRequestTypes>LIST</v13:RateRequestTypes>
-		';
-		$xml_req .= $packages . '
+		sort( $dims ); //Sort so two lowest values are used for Girth
 
-		</v13:RequestedShipment>
-		</v13:RateRequest>
-		</SOAP-ENV:Body>
-		</SOAP-ENV:Envelope>';
+		$packages = $this->packages( $dims, $this->pkg_weight );
+		
+		$xml_req = '
+		<?xml version="1.0" encoding="UTF-8"?>
+		<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v13="http://fedex.com/ws/rate/v13">
+			<soapenv:Body>
+				<v13:RateRequest>
+					<v13:WebAuthenticationDetail>
+						<v13:UserCredential>
+							<v13:Key>' . $this->get_setting( 'api_key' ) . '</v13:Key>
+							<v13:Password>' . $this->get_setting( 'api_password' ) . '</v13:Password>
+						</v13:UserCredential>
+					</v13:WebAuthenticationDetail>
+					<v13:ClientDetail>
+						<v13:AccountNumber>' . $this->get_setting('account') . '</v13:AccountNumber>
+						<v13:MeterNumber>' . $this->get_setting('meter') . '</v13:MeterNumber>
+					</v13:ClientDetail>
+					<v13:TransactionDetail>
+						<v13:CustomerTransactionId>Marketpress Rates Request</v13:CustomerTransactionId>
+					</v13:TransactionDetail>
+					<v13:Version>
+						<v13:ServiceId>crs</v13:ServiceId>
+						<v13:Major>13</v13:Major>
+						<v13:Intermediate>0</v13:Intermediate>
+						<v13:Minor>0</v13:Minor>
+					</v13:Version>
+					<v13:RequestedShipment>
+						<v13:DropoffType>' . $this->get_setting( 'dropoff' ) . '</v13:DropoffType>
+						<v13:PackagingType>' . $this->get_setting( 'packaging' ) . '</v13:PackagingType>
+						<v13:PreferredCurrency>' . mp_get_setting( 'currency' ) . '</v13:PreferredCurrency>
+						<v13:Shipper>
+							<v13:Address>
+								<v13:StateOrProvinceCode>' . mp_get_setting( 'base_province' ) . '</v13:StateOrProvinceCode>
+								<v13:PostalCode>' . mp_get_setting( 'base_zip' ) . '</v13:PostalCode>
+								<v13:CountryCode>' . mp_get_setting( 'base_country' ) . '</v13:CountryCode>
+							</v13:Address>
+						</v13:Shipper>
+						<v13:Recipient>
+							<v13:Address>
+								<v13:StreetLines>' . $this->address1 . '</v13:StreetLines>
+								<v13:StreetLines>' . $this->address2 . '</v13:StreetLines>
+								<v13:City>' . $this->city . '</v13:City>
+								<v13:StateOrProvinceCode>' . $this->state . '</v13:StateOrProvinceCode>
+								<v13:PostalCode>' . $this->destination_zip . '</v13:PostalCode>
+								<v13:CountryCode>' . $this->country . '</v13:CountryCode>
+								<v13:Residential>' . (( ! empty($this->residential) || $this->get_setting('commercial') ) ? 'true' : 'false') . '</v13:Residential>
+							</v13:Address>
+						</v13:Recipient>
+						<v13:ShippingChargesPayment>
+							<v13:PaymentType>SENDER</v13:PaymentType>
+							<v13:Payor>
+								<v13:ResponsibleParty>
+									<v13:AccountNumber>' . $this->get_setting( 'account' ) . '</v13:AccountNumber>
+								</v13:ResponsibleParty>
+							</v13:Payor>
+						</v13:ShippingChargesPayment>
+						<v13:RateRequestTypes>LIST</v13:RateRequestTypes>' .
+		
+						$packages . '
 
+					</v13:RequestedShipment>
+				</v13:RateRequest>
+			</soapenv:Body>
+		</soapenv:Envelope>';
+		
+		// Remove all tabs and line breaks - otherwise Fedex won't be able to process request
+		$xml_req = str_replace( array( "\t", "\r\n", "\n" ), '', $xml_req );
+		
 		//We have the XML make the call
-		$url = ( $this->get_setting('mode') == 'sandbox' ) ? $this->sandbox_uri : $this->production_uri;
+		$url = ( 'sandbox' == $this->get_setting( 'mode' ) ) ? $this->sandbox_uri : $this->production_uri;
 
-		//var_dump($xml_req);
-		$response = wp_remote_request($url, array(
-			'headers' => array('Content-Type: text/xml'),
-			'method' => 'POST',
+		$response = wp_remote_post( $url, array(
+			'headers' => array( 'Content-Type: text/xml' ),
 			'body' => $xml_req,
 			'sslverify' => false,
-		));
+		) );
 		
-		if ( is_wp_error($response) ) {
-			return array('error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>');
-		}
-		else {
+		if ( is_wp_error( $response ) ) {
+			return array(
+				'error' => '<div class="mp_checkout_error">' . $response->get_error_message() . '</div>',
+			);
+		} else {
 			$loaded = ( $response['response']['code'] == '200' );
 			$body = $response['body'];
-			
-			if ( ! $loaded){
-				return array('error' => '<div class="mp_checkout_error">FedEx: ' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>');
+						
+			if ( ! $loaded ) {
+				return array(
+					'error' => '<div class="mp_checkout_error">FedEx: ' . $response['response']['code'] . "&mdash;" . $response['response']['message'] . '</div>',
+				);
 			}
 		}
 
@@ -678,213 +672,79 @@ class MP_Shipping_FedEx extends MP_Shipping_API {
 			$dom = new DOMDocument();
 			$dom->encoding = 'utf-8';
 			$dom->formatOutput = true;
-			$dom->loadHTML($body);
+			$dom->loadHTML( $body );
 			libxml_clear_errors();
 		}
 
 		//Process the return XML
 
 		//Clear any old price
-		unset($_SESSION['mp_shipping_info']['shipping_cost']);
+		unset( $_SESSION['mp_shipping_info']['shipping_cost'] );
 
-		$xpath = new DOMXPath($dom);
+		$xpath = new DOMXPath( $dom );
 
 		//Check for errors
-		$nodes = $xpath->query('//highestseverity');
-		if( in_array( $nodes->item(0)->textContent, array('ERROR', 'FAILURE', 'WARNING' ) ) ) {
-			$nodes = $xpath->query('//message');
-			$this->rate_error = $nodes->item(0)->textContent;
-			return array('error' => '<div class="mp_checkout_error">FedEx: ' . $this->rate_error . '</div>');
+		$nodes = $xpath->query( '//highestseverity' );
+		if ( in_array( $nodes->item( 0 )->textContent, array( 'ERROR', 'FAILURE', 'WARNING' ) ) ) {
+			$nodes = $xpath->query( '//message' );
+			$this->rate_error = $nodes->item( 0 )->textContent;
+			return array(
+				'error' => '<div class="mp_checkout_error">FedEx: ' . $this->rate_error . '</div>',
+			);
 		}
 
-		//Good to go
-
-		$service_set = ( $international ) ? $this->intl_services : $this->services;
-		if(! is_array($shipping_options)) $shipping_options = array();
-		$mp_shipping_options = $shipping_options;
-		foreach( $shipping_options as $key => $service ) {
-			$nodes = $xpath->query('//ratereplydetails[servicetype="' . $service_set[$service]->code . '"]//totalnetcharge/amount');
-			$rate = floatval($nodes->item(0)->textContent);// * $this->pkg_count;
-
-			if ( $rate == 0 ) {  //Not available for this combination
-				unset($mp_shipping_options[$key]);
-			}
-			else {
-				$handling = ($international) ? $this->get_setting('intl_handling') : $this->get_setting('domestic_handling');
-				$handling = floatval($handling) * $this->pkg_count; // Add handling times number of packages.
-				$delivery = $service_set[$service]->delivery;
-				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
+		$mp_shipping_options = array();
+		foreach ( $services as $code => $service ) {
+			$nodes = $xpath->query( '//ratereplydetails[servicetype="' . $code . '"]//totalnetcharge/amount' );
+			$rate = (float) $nodes->item( 0 )->textContent;
+			
+			if ( $rate == 0 ) { 
+				// Not available for this combination
+				unset( $mp_shipping_options[ $key ] );
+			} else {
+				$handling = ( $international ) ? (float) $this->get_setting( 'intl_handling' ) : (float) $this->get_setting( 'domestic_handling' );
+				$handling = ($handling * $this->pkg_count); // Add handling times number of packages.
+				$delivery = $service->delivery;
+				$mp_shipping_options[ $code ] = array(
+					'rate' => $rate,
+					'delivery' => $delivery,
+					'handling' => $handling,
+				);
 
 				//match it up if there is already a selection
-				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
-					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
-						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate + $handling;
-					}
+				if ( ($suboption = mp_get_session_value( 'mp_shipping_info->shipping_sub_option' )) && ($suboption == $service) ) {
+					mp_update_session_value( 'mp_shipping_info->shipping_cost', ($rate + $handling) );
 				}
 			}
 		}
-
+		
 		//Sort low to high rate
-		uasort($mp_shipping_options, array($this,'compare_rates') );
-
-		//If no cost matched yet set to the first one which is now the cheapest.
-		if( empty($_SESSION['mp_shipping_info']['shipping_cost']) ){
-			//Get the first one
-			reset($mp_shipping_options);
-			$service = current($mp_shipping_options);
-			$_SESSION['mp_shipping_info']['shipping_sub_option'] = $service;
-			$_SESSION['mp_shipping_info']['shipping_cost'] =  $mp_shipping_options[$service]['rate'] + $mp_shipping_options[$service]['handling'];
-		}
-
-		$shipping_options = array();
-		foreach( $mp_shipping_options as $service => $options ){
-			$shipping_options[$service] = $this->format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
-		}
+		uasort( $mp_shipping_options, array( $this, 'compare_rates' ) );
 
 		//Update the session. Save the currently calculated CRCs
-		$_SESSION['mp_shipping_options'] = $mp_shipping_options;
-		$_SESSION['mp_cart_crc'] = $this->crc(mp()->get_cart_cookie());
-		$_SESSION['mp_shipping_crc'] = $this->crc($_SESSION['mp_shipping_info']);
+		$this->_crc_update( $mp_shipping_options );
 
-		unset($xpath);
-		unset($dom);
+		unset( $xpath );
+		unset( $dom );
 
-		return $shipping_options;
+		return $this->_format_shipping_options( $mp_shipping_options );
 	}
-
-	/**For uasort above
-	*/
-	function compare_rates($a, $b){
-		if($a['rate'] == $b['rate']) return 0;
-		return ($a['rate'] < $b['rate']) ? -1 : 1;
-	}
-
-
-	/**
-	* Tests the $_SESSION cart cookie and mp_shipping_info to see if the data changed since last calculated
-	* Returns true if the either the crc for cart or shipping info has changed
-	*
-	* @return boolean true | false
-	*/
-	private function crc_ok(){
-		//Assume it changed
-		$result = false;
-
-		//Check the shipping options to see if we already have a valid shipping price
-		if ( isset($_SESSION['mp_shipping_options']) ) {
-			//We have a set of prices. Are they still valid?
-			//Did the cart change since last calculation
-			if ( is_numeric($_SESSION['mp_shipping_info']['shipping_cost'])){
-
-				if($_SESSION['mp_cart_crc'] == $this->crc(mp()->get_cart_cookie())){
-					//Did the shipping info change
-					if($_SESSION['mp_shipping_crc'] == $this->crc($_SESSION['mp_shipping_info'])){
-						$result = true;
-					}
-				}
-			}
-		}
-		return $result;
-	}
-
-	/**Used to detect changes in shopping cart between calculations
-	* @param (mixed) $item to calculate CRC of
-	*
-	* @return CRC32 of the serialized item
-	*/
-	public function crc($item = ''){
-		return crc32(serialize($item));
-	}
-
-
-	// Conversion Helpers
-
-	/**
-	* Formats a choice for the Shipping options dropdown
-	* @param array $shipping_option, a $this->services key
-	* @param float $price, the price to display
-	*
-	* @return string, Formatted string with shipping method name delivery time and price
-	*
-	*/
-	private function format_shipping_option($shipping_option = '', $price = '', $delivery = '', $handling=''){
-		if ( in_array($shipping_option, $this->services) ) {
-			$option = $this->services[$shipping_option]->name;
-		} elseif (  in_array($shipping_option, $this->intl_services) ) {
-			$option = $this->intl_services[$shipping_option]->name;
-		}
-
-		$price = is_numeric($price) ? $price : 0;
-		$handling = is_numeric($handling) ? $handling : 0;
-		$total = $price + $handling;
-		
-		if ( mp_get_setting('tax->tax_inclusive') && mp_get_setting('tax->tax_shipping') ) {
-			$total = mp()->shipping_tax_price($total);
-		}
-
-		$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, mp_format_currency('', $total) );
-		return $option;
-	}
-
-	/**
-	* Returns an inch measurement depending on the current setting of [shipping] [system]
-	* @param float $units
-	*
-	* @return float, Converted to the current units_used
-	*/
-	private function as_inches($units){
-		$units = ($this->settings['shipping']['system'] == 'metric') ? floatval($units) / 2.54 : floatval($units);
-		return round($units,2);
-	}
-
-	/**
-	* Returns a pounds measurement depending on the current setting of [shipping] [system]
-	* @param float $units
-	*
-	* @return float, Converted to pounds
-	*/
-	private function as_pounds($units){
-		$units = ($this->settings['shipping']['system'] == 'metric') ? floatval($units) * 2.2 : floatval($units);
-		return round($units, 2);
-	}
-
-	/**
-	* Returns a the string describing the units of weight for the [mp_shipping][system] in effect
-	*
-	* @return string
-	*/
-	private function get_units_weight(){
-		return ($this->settings['shipping']['system'] == 'english') ? __('Pounds','mp') : __('Kilograms', 'mp');
-	}
-
-	/**
-	* Returns a the string describing the units of length for the [mp_shipping][system] in effect
-	*
-	* @return string
-	*/
-	private function get_units_length(){
-		return ($this->settings['shipping']['system'] == 'english') ? __('Inches','mp') : __('Centimeters', 'mp');
-	}
-
 }
 
 if(! class_exists('FedEx_Service') ):
-class FedEx_Service
-{
-	public $code;
-	public $name;
-	public $delivery;
-	public $rate;
-
-	function __construct($code, $name, $delivery, $rate = null)
-	{
-		$this->code = $code;
-		$this->name = $name;
-		$this->delivery = $delivery;
-		$this->rate = $rate;
-
+	class FedEx_Service {
+		public $code;
+		public $name;
+		public $delivery;
+		public $rate;
+	
+		function __construct( $code, $name, $delivery, $rate = null ) {
+			$this->code = $code;
+			$this->name = $name;
+			$this->delivery = $delivery;
+			$this->rate = $rate;
+		}
 	}
-}
 endif;
 
 MP_Shipping_API::register_plugin('MP_Shipping_FedEx', 'fedex', __('FedEx (beta)', 'mp'), true);

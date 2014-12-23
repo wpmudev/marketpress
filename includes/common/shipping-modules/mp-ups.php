@@ -239,7 +239,7 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 	* return array $shipping_options
 	*/
 	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
-		if ( $this->_crc_ok() && ($shipping_options = mp_get_session_value('mp_shipping_options->' . $this->plugin_name)) ) {
+		if ( $this->_crc_ok() && false !== ($shipping_options = mp_get_session_value('mp_shipping_options->' . $this->plugin_name)) ) {
 			// CRC is ok - just return the shipping options already stored in session
 			return $this->_format_shipping_options( $shipping_options );
 		}
@@ -252,29 +252,15 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 		$this->state = $state;
 		$this->destination_zip = $zip;
 		$this->country = $country;
+		$this->weight = $cart->shipping_weight();
 		
-		if ( is_array( $cart ) ) {
-			foreach ( $cart as $key => $val ) {
-				if ( $val instanceof MP_Product ) {
-					$product = $val;
-				} else {
-					$product = new MP_Product( $key );
-				}
-				
-				$weight = $product->get_weight();
-				$this->weight += ($weight * $product->qty);
-			}
-		}
-
-		//If whole shipment is zero weight then there's nothing to ship. Return Free Shipping
-		if( $this->weight == 0 ) { //Nothing to ship
-			mp_update_session_value('mp_shipping_info->shipping_sub_option', __('Free Shipping', 'mp'));
-			mp_update_session_value('mp_shipping_info->shipping_cost', 0);
-			return array(__('Free Shipping', 'mp') => __('Free Shipping - 0.00', 'mp') );
+		if( $this->weight == 0 ) {
+			// Nothing to ship
+			return $this->_free_shipping();
 		}
 
 		// Got our totals  make sure we're in decimal pounds.
-		$this->weight = $this->_as_pounds($this->weight);
+		$this->weight = $this->_as_pounds( $this->weight );
 
 		//ups won't accept a zero weight Package
 		$this->weight = ($this->weight == 0) ? 0.1 : $this->weight;
@@ -503,22 +489,15 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 			}
 		}
 
-		uasort($mp_shipping_options, array($this,'compare_rates') );
-
-		$shipping_options = array();
-		foreach ( $mp_shipping_options as $service => $options ) {
-			$shipping_options[$service] = $this->_format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
-		}
+		uasort( $mp_shipping_options, array( $this,'compare_rates' ) );
 
 		//Update the session. Save the currently calculated CRCs
-		mp_update_session_value('mp_shipping_options->' . $this->plugin_name, $mp_shipping_options);
-		mp_update_session_value('mp_cart_crc', $this->crc(mp_cart()->get_items()));
-		mp_update_session_value('mp_shipping_crc', $this->crc(mp_get_session_value('mp_shipping_info')));
+		$this->_crc_update( $mp_shipping_options );
 		
 		unset($xpath);
 		unset($dom);
 
-		return $shipping_options;
+		return $this->_format_shipping_options( $mp_shipping_options );
 	}
 } //End MP_Shipping_UPS
 
