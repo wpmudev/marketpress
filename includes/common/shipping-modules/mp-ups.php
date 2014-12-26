@@ -434,14 +434,7 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 			}
 		}
 
-		if ( $loaded ) {
-			libxml_use_internal_errors(true);
-			$dom = new DOMDocument();
-			$dom->encoding = 'utf-8';
-			$dom->formatOutput = true;
-			$dom->loadHTML($body);
-			libxml_clear_errors();
-		}
+		$dom = $this->_parse_xml( $body );
 
 		//Process the return XML
 		//Clear any old price
@@ -481,11 +474,6 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
 				$handling = floatval($this->get_setting('domestic_handling')) * $this->pkg_count; // Add handling times number of packages.
 				$delivery = $this->services[$service]->delivery;
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
-
-				//match it up if there is already a selection
-				if ( ($suboption = mp_get_session_value('mp_shipping_info->shipping_sub_option')) && ($suboption == $service) ) {
-					mp_update_session_value('mp_shipping_info->shipping_cost', ($rate + $handling));
-				}
 			}
 		}
 

@@ -542,7 +542,7 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function form_field( $field ) {
-		$atts = $html = '';	
+		$atts = $html = $required = '';	
 		
 		// Display label?
 		if ( ($label = mp_arr_get_value( 'label', $field )) && 'checkbox' != mp_arr_get_value( 'type', $field, '' ) ) {

@@ -27,35 +27,6 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
     $this->public_name = __('Weight Rate', 'mp');
 	}
 
-  /**
-   * Echo anything you want to add to the top of the shipping screen
-   */
-	function before_shipping_form($content) {
-		return $content;
-  }
-  
-  /**
-   * Echo anything you want to add to the bottom of the shipping screen
-   */
-	function after_shipping_form($content) {
-		return $content;
-  }
-  
-  /**
-   * Echo a table row with any extra shipping fields you need to add to the shipping checkout form
-   */
-	function extra_shipping_field($content) {
-		return $content;
-  }
-  
-  /**
-   * Use this to process any additional field you may add. Use the $_POST global,
-   *  and be sure to save it to both the cookie and usermeta if logged in.
-   */
-	function process_shipping_form() {
-
-  }
-
 	/**
    * Echo a settings meta box with whatever settings you need for you shipping module.
    *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".

@@ -81,23 +81,23 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 * @param float $price, the price to display
 		 * @return string, Formatted string with shipping method name delivery time and price
 		 */
-		protected function _format_shipping_option( $shipping_option = '', $price = '', $delivery = '', $handling='' ){
-			if ( isset($this->services[$shipping_option])){
-				$option = $this->services[$shipping_option]->name;
-			}
-			elseif ( isset($this->intl_services[$shipping_option])){
-				$option = $this->intl_services[$shipping_option]->name;
+		protected function _format_shipping_option( $shipping_option = '', $price = '', $delivery = '', $handling='' ) {
+			if ( $_option = mp_arr_get_value( $shipping_option, $this->services ) ) {
+				$option = $_option->name;
+			} elseif ( $_option = mp_arr_get_value( $shipping_option, $this->intl_services ) ){
+				$option = $_option->name;
 			}
 	
-			$price = is_numeric($price) ? $price : 0;
-			$handling = is_numeric($handling) ? $handling : 0;
-			$total = $price + $handling;
+			$price = is_numeric( $price ) ? $price : 0;
+			$handling = is_numeric( $handling ) ? $handling : 0;
+			$total = ($price + $handling);
 			
-			if ( mp_get_setting('tax->tax_inclusive') && mp_get_setting('tax->tax_shipping') ) {
-				$total = $this->shipping_tax_price($total);
+			if ( mp_get_setting( 'tax->tax_inclusive' ) && mp_get_setting( 'tax->tax_shipping' ) ) {
+				$total = $this->shipping_tax_price( $total );
 			}
 	
 			$option .=  sprintf(__(' %1$s - %2$s', 'mp'), $delivery, mp_format_currency('', $total));
+			
 			return $option;
 		}	
 
@@ -111,9 +111,15 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 */
 		protected function _format_shipping_options( $unformatted ) {
 			$shipping_options = array();
-			foreach( $unformatted as $service => $options ){
-				$shipping_options[ $service ] = $this->_format_shipping_option($service, $options['rate'], $options['delivery'], $options['handling']);
+			foreach( $unformatted as $service => $option ){
+				$shipping_options[ $service ] = $this->_format_shipping_option( $service, $option['rate'], $option['delivery'], $option['handling'] );
+				
+				//match it up if there is already a selection
+				if ( ($suboption = mp_get_session_value( 'mp_shipping_info->shipping_sub_option' )) && ($suboption == $service) ) {
+					mp_update_session_value( 'mp_shipping_info->shipping_cost', ($option['rate'] + $option['handling']) );
+				}
 			}
+			
 			return $shipping_options;
 		}
 	
@@ -133,6 +139,25 @@ if ( ! class_exists('MP_Shipping_API_Calculated') ) {
 		 */
 		protected function _get_units_weight(){
 			return ( mp_get_setting('shipping->system') == 'english' ) ? __('Pounds','mp') : __('Kilograms', 'mp');
+		}
+		
+		/**
+		 * Parse XML string into DOMDocument object
+		 *
+		 * @since 3.0
+		 * @access protected
+		 * @param string $xml
+		 * @return DOMDocument
+		 */
+		protected function _parse_xml( $xml ) {
+			libxml_use_internal_errors( true );
+			$dom = new DOMDocument();
+			$dom->encoding = 'utf-8';
+			$dom->formatOutput = true;
+			$dom->loadHTML( $xml );
+			libxml_clear_errors();
+			
+			return $dom;
 		}
 	
 		/**

@@ -171,20 +171,6 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
 
 		}
 
-    /**
-     * Echo anything you want to add to the top of the shipping screen
-     */
-		function before_shipping_form($content) {
-
-    }
-
-    /**
-     * Echo anything you want to add to the bottom of the shipping screen
-     */
-		function after_shipping_form($content) {
-
-    }
-
 		/**
 		 * Add additional shipping fields
 		 *
@@ -196,55 +182,6 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
 		 */
 		public function extra_shipping_field( $fields, $type ) {
 			return $fields;
-    }
-
-    /**
-     * Use this to process any additional field you may add. Use the $_POST global,
-     *  and be sure to save it to both the cookie and usermeta if logged in.
-     */
-		function process_shipping_form() {
-
-    }
-
-		/**
-     * Echo a settings meta box with whatever settings you need for you shipping module.
-     *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
-     *  You can access saved settings via $settings array.
-     */
-		function shipping_settings_box($settings) {
-
-    }
-
-    /**
-     * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
-     *  array. Don't forget to return!
-     */
-		function process_shipping_settings($settings) {
-
-      return $settings;
-    }
-
-    /**
-     * Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
-     *
-     * @param array $shipping_meta, the contents of the post meta. Use to retrieve any previously saved product meta
-     * @param array $settings, access saved settings via $settings array.
-     */
-		function shipping_metabox($shipping_meta, $settings) {
-      //it is required to override this method if $use_metabox is set to true
-      if ($this->use_metabox)
-        wp_die( __("You must override the shipping_metabox() method in your {$this->public_name} shipping plugin if \$use_metabox is set to true!", 'mp') );
-    }
-
-    /**
-     * Save any per-product shipping fields from the shipping metabox using update_post_meta
-     *
-     * @param array|string $shipping_meta, save anything from the $_POST global
-     * return array|string $shipping_meta
-     */
-		function save_shipping_metabox($shipping_meta) {
-
-      return $shipping_meta;
     }
 
     /**
@@ -282,10 +219,8 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
 			*
 			* return array $shipping_options
 			*/
-		function shipping_options($cart, $address1, $address2, $city, $state, $zip, $country) {
-
+		function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
 			$shipping_options = array();
-
       return $shipping_options;
     }
 

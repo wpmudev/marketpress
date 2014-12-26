@@ -96,10 +96,16 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 		return $content;
   }
   
-  /**
-   * Echo a table row with any extra shipping fields you need to add to the shipping checkout form
-   */
-	function extra_shipping_field($content) {
+	/**
+	 * Add additional shipping fields
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_checkout/address_fields_array
+	 * @param array $fields
+	 * @param string $type
+	 */
+	public function extra_shipping_field( $fields, $type ) {
 		return $content;
   }
   

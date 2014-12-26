@@ -667,14 +667,7 @@ class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
 			}
 		}
 
-		if ( $loaded ) {
-			libxml_use_internal_errors(true);
-			$dom = new DOMDocument();
-			$dom->encoding = 'utf-8';
-			$dom->formatOutput = true;
-			$dom->loadHTML( $body );
-			libxml_clear_errors();
-		}
+		$dom = $this->_parse_xml( $body );
 
 		//Process the return XML
 
@@ -696,11 +689,15 @@ class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
 		$mp_shipping_options = array();
 		foreach ( $services as $code => $service ) {
 			$nodes = $xpath->query( '//ratereplydetails[servicetype="' . $code . '"]//totalnetcharge/amount' );
-			$rate = (float) $nodes->item( 0 )->textContent;
 			
-			if ( $rate == 0 ) { 
+			$rate = 0;
+			if ( ! is_null( $nodes->item( 0 ) ) ) {
+				$rate = (float) $nodes->item( 0 )->textContent;
+			}
+			
+			if ( 0 == $rate ) { 
 				// Not available for this combination
-				unset( $mp_shipping_options[ $key ] );
+				unset( $mp_shipping_options[ $code ] );
 			} else {
 				$handling = ( $international ) ? (float) $this->get_setting( 'intl_handling' ) : (float) $this->get_setting( 'domestic_handling' );
 				$handling = ($handling * $this->pkg_count); // Add handling times number of packages.
@@ -710,11 +707,6 @@ class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
 					'delivery' => $delivery,
 					'handling' => $handling,
 				);
-
-				//match it up if there is already a selection
-				if ( ($suboption = mp_get_session_value( 'mp_shipping_info->shipping_sub_option' )) && ($suboption == $service) ) {
-					mp_update_session_value( 'mp_shipping_info->shipping_cost', ($rate + $handling) );
-				}
 			}
 		}
 		

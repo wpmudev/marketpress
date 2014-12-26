@@ -1147,7 +1147,8 @@ class MP_Cart {
 	 */
 	public function shipping_total( $format = false ) {
 		if ( false === mp_arr_get_value('shipping', $this->_total) ) {
-			$products = $this->get_items_as_objects();
+			$cart = mp_cart();
+			$products = $cart->get_items_as_objects();
 			$shipping_plugins = MP_Shipping_API::get_active_plugins();
 			$total = $this->product_total();
 			$user = wp_get_current_user();
@@ -1173,10 +1174,10 @@ class MP_Cart {
 				$price = 0;
 		 	} else if ( mp_get_setting('shipping->method') == 'calculated' && $selected_option ) {
 				//shipping plugins tie into this to calculate their shipping cost
-				$price = apply_filters('mp_calculate_shipping_' . $selected_option, 0, $total, $products, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+				$price = apply_filters('mp_calculate_shipping_' . $selected_option, 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 			} else {
 				//shipping plugins tie into this to calculate their shipping cost
-				$price = apply_filters('mp_calculate_shipping_' . mp_get_setting('shipping->method'), 0, $total, $products, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+				$price = apply_filters('mp_calculate_shipping_' . mp_get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 			}
 			
 			//calculate extra shipping

@@ -32,34 +32,6 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
 	}
 
   /**
-   * Echo anything you want to add to the top of the shipping screen
-   */
-	function before_shipping_form() {
-
-  }
-
-  /**
-   * Echo anything you want to add to the bottom of the shipping screen
-   */
-	function after_shipping_form() {
-
-  }
-
-  /**
-   * Echo a table row with any extra shipping fields you need to add to the form
-   */
-	function extra_shipping_field() {
-
-  }
-
-  /**
-   * Use this to process any additional field you may add. Use the $_POST global,
-   *  and be sure to save it to both the cookie and usermeta if logged in.
-   */
-	function process_shipping_form() {
-
-  }
-
 	/**
    * Echo a settings meta box with whatever settings you need for you shipping module.
    *  Form field names should be prefixed with mp[shipping][plugin_name], like "mp[shipping][plugin_name][mysetting]".
@@ -154,10 +126,11 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
    * @param string $state, state/province/region
    * @param string $zip, postal code
    * @param string $country, ISO 3166-1 alpha-2 country code
+   * @param string $selected_option, if a calculated shipping module, passes the currently selected sub shipping option if set
    *
    * return float $price
    */
-	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country) {
+	function calculate_shipping($price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option) {
 		global $mp;
     $settings = get_option('mp_settings');
 		

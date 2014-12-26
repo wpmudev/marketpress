@@ -27,27 +27,6 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		add_filter( 'wpmudev_field/sanitize_for_db', array( &$this, 'sanitize_rates' ), 10, 3);
 	}
 	
-	/**
-   * Echo anything you want to add to the top of the shipping screen
-   */
-	function before_shipping_form($content) {
-		return $content;
-  }
-  
-  /**
-   * Echo anything you want to add to the bottom of the shipping screen
-   */
-	function after_shipping_form($content) {
-		return $content;
-  }
-  
-  /**
-   * Echo a table row with any extra shipping fields you need to add to the shipping checkout form
-   */
-	function extra_shipping_field($content) {
-		return $content;
-  }
-  
   /**
    * Get rates sorted by price from highest to lowest
    *

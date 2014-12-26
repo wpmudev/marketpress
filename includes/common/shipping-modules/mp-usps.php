@@ -743,14 +743,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 			}
 		}
 
-		if ($loaded){
-
-			libxml_use_internal_errors(true);
-			$dom = new DOMDocument();
-			$dom->encoding = 'utf-8';
-			$dom->loadHTML($body);
-			libxml_clear_errors();
-		}
+		$dom = $this->_parse_xml( $body );
 
 		//Process the return XML
 
@@ -790,13 +783,6 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 			{
 				$handling = floatval($this->get_setting('intl_handling')) * $box_count; // Add handling times number of packages.
 				$mp_shipping_options[$service] = array('rate' => $rate, 'delivery' => $delivery, 'handling' => $handling);
-
-				//match it up if there is already a selection
-				if (! empty($_SESSION['mp_shipping_info']['shipping_sub_option'])){
-					if ($_SESSION['mp_shipping_info']['shipping_sub_option'] == $service){
-						$_SESSION['mp_shipping_info']['shipping_cost'] =  $rate + $handling;
-					}
-				}
 			}
 		}
 
