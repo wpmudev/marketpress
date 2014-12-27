@@ -83,10 +83,14 @@ jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
 				$this.children('span').append('<a class="wpmudev-metabox-tooltip-button" href="#">x</a>');
 			}
 			
-			$this.children('span').css({
-				"display" : "block",
-				"margin-top" : -($this.children('span').outerHeight() / 2)
-			});
+			$this.children('span').css( 'display', 'block' ).position( {
+				my : "left center",
+				at : "right center",
+				of : $this,
+				using : function( pos, feedback ) {
+					$( this ).css( pos ).removeClass( 'right left' ).addClass( feedback.horizontal );
+				}
+			} );
 		});
 		
 		$('.wpmudev-field').on('click', '.wpmudev-metabox-tooltip-button', function(e){

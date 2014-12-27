@@ -484,7 +484,7 @@ class WPMUDEV_Metabox {
 	public function admin_enqueue_scripts() {
 		wp_register_script( 'jquery-validate', $this->class_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), '1.12' );
 		wp_register_script( 'jquery-validate-methods', $this->class_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), '1.12' );
-		wp_enqueue_script( 'wpmudev-metaboxes-admin', $this->class_url( 'ui/js/admin.js' ), array( 'jquery-validate-methods', 'jquery-effects-highlight' ), WPMUDEV_METABOX_VERSION, true );
+		wp_enqueue_script( 'wpmudev-metaboxes-admin', $this->class_url( 'ui/js/admin.js' ), array( 'jquery-validate-methods', 'jquery-ui-position', 'jquery-effects-highlight' ), WPMUDEV_METABOX_VERSION, true );
 		
 		$messages = array(
 			'alphanumeric_error_msg' => __( 'Please enter only letters and numbers', 'wpmudev_metaboxes' ),

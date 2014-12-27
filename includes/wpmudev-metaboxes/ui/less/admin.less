@@ -132,13 +132,11 @@ label.error {
 			
 			> span {
 				position: absolute;
-					top: 50%;
-					left: 30px;
 					z-index: 100;
-				background: #fafafa;
-				border: 1px solid #fff;
+				background: #fff;
+				border: 1px solid #ccc;
 				border-radius: 5px;
-				.boxShadow(-3px 0 10px 1px rgba(0, 0, 0, .12));
+				.boxShadow(0 0 3px rgba(0, 0, 0, .2));
 				color: #555;
 				display: none;
 				font: 12px/1.3 Verdana, Geneva, sans-serif;
@@ -146,18 +144,46 @@ label.error {
 				text-align: left;
 				width: 255px;
 				
-				&:before {
+				&:before,
+				&:after {
 					position: absolute;
 						top: 50%;
-						left: -10px;
-					border-top: 10px solid transparent;
-					border-right: 10px solid #fafafa;
-					border-bottom: 10px solid transparent;
-					content: "";
-					font-size: 0;
-					line-height: 0;
-					margin-top: -12px;
+						right: 100%;
+					border: solid transparent;
+					content: " ";
+					height: 0;
+					pointer-events: none;
 					width: 0;
+				}
+				
+				&:after {
+					border-right-color: #fff;
+					border-width: 8px;
+					margin-top: -8px;
+				}
+				
+				&:before {
+					border-right-color: #ccc;
+					border-width: 11px;
+					margin-top: -11px;
+				}
+				
+				&.right {
+					&:before,
+					&:after {
+						right: auto;
+						left: 100%;
+					}
+					
+					&:after {
+						border-left-color: #fff;
+						border-right-color: transparent;
+					}
+					
+					&:before {
+						border-left-color: #ccc;
+						border-right-color: transparent;
+					}					
 				}
 			}
 		}
