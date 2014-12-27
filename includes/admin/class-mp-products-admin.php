@@ -697,9 +697,13 @@ jQuery( document ).ready( function( $ ) {
 			$sale_price->add_field('text', array(
 				'name' => 'amount',
 				'label' => array('text' => __('Price', 'mp')),
+				'custom' => array(
+					'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
+				),
 				'validation' => array(
 					'number' => true,
 					'min' => 0,
+					'lessthan' => '[name*="regular_price"]'
 				),
 			));
 			$sale_price->add_field('datepicker', array(
@@ -945,9 +949,13 @@ jQuery( document ).ready( function( $ ) {
 			$sale_price->add_field('text', array(
 				'name' => 'amount',
 				'label' => array('text' => __('Price', 'mp')),
+				'custom' => array(
+					'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
+				),
 				'validation' => array(
 					'number' => true,
 					'min' => 0,
+					'lessthan' => '[name*="regular_price"]'
 				),
 			));
 			$sale_price->add_field('datepicker', array(

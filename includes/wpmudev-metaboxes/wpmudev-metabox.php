@@ -488,6 +488,7 @@ class WPMUDEV_Metabox {
 		
 		$messages = array(
 			'alphanumeric_error_msg' => __( 'Please enter only letters and numbers', 'wpmudev_metaboxes' ),
+			'lessthan_error_msg' => __( 'Value must be less than {0}', 'wpmudev_metaboxes' ),
 		);
 		
 		wp_localize_script( 'wpmudev-metaboxes-admin', 'WPMUDEV_Metaboxes_Validation_Messages', $messages );

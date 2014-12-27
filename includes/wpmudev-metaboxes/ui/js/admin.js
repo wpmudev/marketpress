@@ -1,7 +1,12 @@
 jQuery.validator.addMethod('alphanumeric', function(value, element){
 	return this.optional(element) || new RegExp('[a-z0-9]{' + value.length + '}', 'ig').test(value);
 }, WPMUDEV_Metaboxes_Validation_Messages.alphanumeric_error_msg);
-jQuery.validator.addClassRules('alphanumeric', { "alphanumeric" : true });
+
+jQuery.validator.addMethod( 'lessthan', function( value, element, param ) {
+	var $elm = jQuery( element );
+	var $parent = ( $elm.closest( '.wpmudev-subfield-group' ).length > 0 )? $elm.closest( '.wpmudev-subfield-group' ) : $elm.closest( '.wpmudev-field' );
+	return this.optional( element ) || value <= $parent.find( param ).val();
+}, jQuery.validator.format( WPMUDEV_Metaboxes_Validation_Messages.lessthan_error_msg ) );
 
 (function($){
 	$(document).ready(function(){
