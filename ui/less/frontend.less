@@ -229,7 +229,7 @@
 		.mp-button {
 			float: right;
 			
-			&:first-child {
+			&.mp-button-checkout-prev-step {
 				float: left;
 				margin-top: 3px;
 			}
@@ -257,6 +257,10 @@
 		&.fullwidth {
 			width: 100%;
 		}
+	}
+	
+	.mp-checkout-section-content {
+		display: none;
 	}
 	
 	.mp-checkout-section-errors {
@@ -298,10 +302,20 @@
 	.mp-checkout-section {
 		margin-bottom: 40px;
 		width: 100%;
+		
+		&.current {
+			.mp-checkout-section-content {
+				display: block;
+			}
+		}
 	}
 	
 	.mp-checkout-section-heading {
 		line-height: 40px;
+	}
+	
+	.mp-checkout-section-heading-link {
+		color: inherit;
 	}
 	
 	.mp-checkout-step-num {
