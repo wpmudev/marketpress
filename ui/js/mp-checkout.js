@@ -10,10 +10,11 @@ var mp_checkout;
 		initListeners : function(){
 			this.initShippingAddressListeners();
 			this.initPaymentOptionListeners();
-			this.initUpdateShippingMethodsListeners();
 			this.initUpdateStateFieldListeners();
 			this.initCardValidation();
 			this.initCheckoutSteps();
+			
+			$( document ).on( 'mp_checkout/step_changed', this.lastStep );
 		},
 		
 		/**
@@ -75,19 +76,6 @@ var mp_checkout;
 		},
 		
 		/**
-		 * Adjust height of #mp-checkout to the height of the active step
-		 *
-		 * @since 3.0
-		 */
-		autoHeight : function() {
-			var $checkout = $( '#mp-checkout' );
-			
-			$checkout.animate({
-				height : $checkout.find( '.cycle-slide.current' ).outerHeight()
-			}, 300);
-		},
-		
-		/**
 		 * Get a value from a hashed query string
 		 *
 		 * @since 3.0
@@ -138,23 +126,59 @@ var mp_checkout;
 			} else {
 				$section.removeClass( 'show' );
 			}
-			
-			mp_checkout.autoHeight();
 		},
 		
 		/**
 		 * Execute when on the last step of checkout
 		 *
 		 * @since 3.0
-		 * @event cycle-initialized, cycle-after
+		 * @event mp_checkout/step_changed
 		 */
-		lastStep : function( evt, opts ) {
+		lastStep : function( evt, $out, $in ) {
 			var $checkout = $( '#mp-checkout' );
-			if ( opts.slideNum == opts.slideCount || opts.currSlide == (opts.slideCount - 1) ) {
+			
+			if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
 				$checkout.addClass( 'last-step' );
 			} else {
 				$checkout.removeClass( 'last-step' );
 			}
+		},
+		
+		/**
+		 * Go to next step in checkout
+		 *
+		 * @since 3.0
+		 */
+		nextStep : function() {
+			var $current = $( '.mp-checkout-section' ).filter( '.current' );
+			var $next = $current.next( '.mp-checkout-section' );
+			this.changeStep( $current, $next );
+		},
+		
+		/**
+		 * Change checkout steps
+		 *
+		 * @since 3.0
+		 * @param jQuery $out The jquery object being transitioned FROM
+		 * @param jQuery $in The jquery object being transitioned TO
+		 */
+		changeStep : function( $out, $in ) {
+			$out.find( '.mp-tooltip' ).tooltip( 'close' );
+			$out.find( '.mp-checkout-section-content' ).slideUp( 500, function() {
+				$out.removeClass( 'current' );
+				$in.find( '.mp-checkout-section-content' ).slideDown( 500, function() {
+					$in.addClass( 'current' );
+				} );
+			} );
+			
+			/**
+			 * Fires after a step change
+			 *
+			 * @since 3.0
+			 * @param jQuery $out The jquery object being transitioned FROM
+			 * @param jQuery $in The jquery object being transitioned TO
+			 */
+			$( document ).trigger( 'mp_checkout/step_changed', [ $out, $in ] );			
 		},
 				
 		/**
@@ -164,52 +188,7 @@ var mp_checkout;
 		 */
 		initCheckoutSteps : function(){
 			var $checkout = $(' #mp-checkout' );
-			
-			// Setup cycle-initialized and cycle-after events
-			$( document ).on( 'cycle-initialized cycle-after', '#mp-checkout', function( e, opts ){
-				var $btn = $checkout.find( '.mp-button-checkout-prev-step' );
-				
-				var slideNum = (opts.currSlide + 1)
-				if ( opts.slideNum !== undefined ) {
-					slideNum = opts.slideNum;
-				}
-				
-				if ( slideNum == 1 ) {
-					$btn.addClass( 'disabled' );
-				} else {
-					$btn.removeClass( 'disabled' );
-				}
-				
-				if ( slideNum == opts.slideCount ) {
-					$checkout.addClass( 'last-step' );
-				} else {
-					$checkout.removeClass( 'last-step' );
-				}
-			} );
-			
-			// Init previous button events
-			$checkout.on( 'click', '.mp-button-checkout-prev-step', function( e ){
-				e.preventDefault();
-				$checkout.cycle( 'prev' );
-			} );
-			
-			// Initialize step transitions
-			$checkout.cycle({
-				allowWrap : false,
-				autoHeight : "container",
-				log : false,
-				nowrap : true,
-				slideActiveClass : "current",
-				slides : "> .mp-checkout-section",
-				sync : false,
-				timeout : 0
-			});
-			
-			// Hide field errors when going to previous step
-			$checkout.on( 'cycle-prev', function( e, opts ){
-				$( '.mp-tooltip' ).tooltip( 'close' );
-			} );
-			
+						
 			// Trim values before validating
 			$.each( $.validator.methods, function( key, val ) {
 				$.validator.methods[ key ] = function() {
@@ -224,13 +203,27 @@ var mp_checkout;
 					return val.apply( this, arguments );
 				}
 			} );
+			
+			// Go to step when clicking on section heading
+			$checkout.find( '.mp-checkout-section-heading-link' ).on( 'click', function( e ) {
+				e.preventDefault();
+				
+				var $this = $( this );
+				var $section = $this.closest( '.mp-checkout-section' );
+				var $current = $section.nextAll( '.current' );
+				
+				if ( $current.length > 0 ) {
+					// section is before the current step - ok to proceed
+					mp_checkout.changeStep( $current, $section );
+				}
+			} );
 
 			// Validate form
 			$checkout.validate({
 				onkeyup : false,
 				onclick : false,
 				ignore : function( index, element ){
-					return ( ! $( element ).closest( '.cycle-slide.current' ).length || $( element ).is( ':hidden' ) || $( element ).prop( 'disabled' ) );
+					return ( $( element ).is( ':hidden' ) || $( element ).prop( 'disabled' ) );
 				},
 				highlight : function( element, errorClass ){
 					$( element ).addClass( 'mp-input-error' ).prev( 'label' ).addClass( 'mp-label-error' );
@@ -317,7 +310,7 @@ var mp_checkout;
 								
 								mp_checkout.initCardValidation();
 								marketpress.loadingOverlay( 'hide' );
-								$checkout.cycle( 'next' );
+								mp_checkout.nextStep();
 							} );
 						}
 					}
@@ -365,9 +358,6 @@ var mp_checkout;
 					this.defaultShowErrors();
 				}
 			});
-		},
-		
-		initUpdateShippingMethodsListeners : function(){
 		},
 		
 		/**

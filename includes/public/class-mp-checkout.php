@@ -122,8 +122,6 @@ class MP_Checkout {
 		} else {
 			mp_update_session_value( 'mp_shipping_info', mp_get_session_value( 'mp_billing_info' ) );
 		}
-		
-		return $this->section_shipping();
 	}
 	
 	/**
@@ -144,8 +142,6 @@ class MP_Checkout {
 			mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_method );
 			mp_update_session_value( 'mp_shipping_info->shipping_sub_option', '' );
 		}
-		
-		return $this->section_order_review_payment();
 	}
 		
 	/**
@@ -397,9 +393,12 @@ class MP_Checkout {
 	 * @action wp_ajax_mp_update_checkout_data, wp_ajax_nopriv_mp_update_checkout_data
 	 */
 	public function ajax_update_checkout_data() {
+		$this->_update_shipping_section();
+		$this->_update_order_review_payment_section();
+		
 		$sections = array(
-			'mp-checkout-section-shipping' => $this->_update_shipping_section(),
-			'mp-checkout-section-order-review-payment' => $this->_update_order_review_payment_section(),
+			'mp-checkout-section-shipping' => $this->section_shipping(),
+			'mp-checkout-section-order-review-payment' => $this->section_order_review_payment(),
 		);
 		
 		wp_send_json_success( $sections );
@@ -443,8 +442,13 @@ class MP_Checkout {
 					continue;
 				}
 				
+				$classes = array( 'mp-checkout-section' );
+				if ( 1 === $this->_stepnum ) {
+					$classes[] = 'current';
+				}
+				
 				$html .= '
-				<div id="mp-checkout-section-' . $section . '" class="mp-checkout-section">';
+				<div id="mp-checkout-section-' . $section . '" class="' . implode( ' ', $classes ) . '">';
 				
 				if ( ! mp_doing_ajax( 'mp_update_checkout_data' ) ) {
 					$html .= $this->section_heading( $heading_text, true );
@@ -664,6 +668,10 @@ class MP_Checkout {
 		
 		switch ( $what ) {
 			case 'prev' :
+				if ( 1 === $this->_stepnum ) {
+					return false;
+				}
+				
 				$text = __( '&laquo; Previous Step', 'mp' );
 				$classes[] = 'mp-button-secondary';
 				return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
@@ -745,7 +753,10 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function section_billing_shipping_address() {
-		$enable_shipping_address = ( mp_get_user_address( 'shipping' ) != mp_get_user_address( 'billing' ) );
+		$shipping_addr = (array) mp_get_user_address( 'shipping' );
+		$billing_addr = (array) mp_get_user_address( 'billing' );
+		$enable_shipping_address = ( $shipping_addr !== $billing_addr );
+		
 		$html = '
 			<div class="clearfix">
 				<div id="mp-checkout-column-billing-info" class="mp-checkout-column' . (( $enable_shipping_address ) ? '' : ' fullwidth') . '">
@@ -786,7 +797,8 @@ class MP_Checkout {
 				<span class="mp-checkout-step-num">' . $this->_stepnum . '</span>';
 		}
 		
-		$html .= $text . '
+		$html .= '
+				<a href="javascript:;" class="mp-checkout-section-heading-link">' . $text . '</a>
 			</h2>';
 			
 		return $html;
@@ -881,11 +893,6 @@ class MP_Checkout {
 		$active_plugins = MP_Shipping_API::get_active_plugins();
 		$shipping_method = mp_get_setting('shipping->method');
 		$html = '';
-		
-		if ( ! mp_doing_ajax() ) {
-			$html = '' .
-				$this->section_heading(__('Shipping', 'mp'), true);
-		}
 		
 		switch ( $shipping_method ) {
 			case 'calculated' :

@@ -82,8 +82,6 @@
 		} else {
 			$errors.removeClass( 'show' );
 		}
-		
-		mp_checkout.autoHeight();
 	}
 	
 	/**
