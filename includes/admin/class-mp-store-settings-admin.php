@@ -231,7 +231,7 @@ jQuery(document).ready(function($){
 			break;
 			
 			case 'store-settings_page_store-settings-productattributes' :
-				$title = ( mp_get_get_value('action') == 'mp_add_product_attribute' ) ? __('Add Product Attribute', 'mp') : __('Edit Product Attribute', 'mp');
+				$title = ( mp_get_get_value('action') == 'mp_add_product_attribute' ) ? __('Add Product Attribute', 'mp') : sprintf( __( 'Edit Product Attribute %s', 'mp' ), '<a class="add-new-h2" href="' . admin_url( 'admin.php?page=store-settings-productattributes&amp;action=mp_add_product_attribute' ) . '">' . __( 'Add Attribute', 'mp' ) . '</a>' );
 			break;
 			
 			case 'store-settings_page_store-settings-capabilities' :
