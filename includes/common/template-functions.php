@@ -540,6 +540,16 @@ if ( ! function_exists('mp_get_user_address') ) :
 			$data = $user->get("mp_{$what}_info");
 		}
 		
+		foreach ( $data as $k => $v ) {
+			switch ( $k ) {
+				case 'shipping_option' :
+				case 'shipping_sub_option' :
+				case 'shipping_cost' :
+					unset( $data[ $k ] );
+				break;
+			}
+		}
+		
 		return $data;
 	}
 endif;
