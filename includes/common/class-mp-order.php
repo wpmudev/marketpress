@@ -975,7 +975,20 @@ You can manage this order here: %s', 'mp');
 		do_action( 'mp_order/new_order', $this );
 
 		// Empty cart
-		mp_cart()->empty_cart();		
+		mp_cart()->empty_cart();
+		
+		// Remove session variables
+		if ( mp_get_session_value( 'mp_shipping_info' ) ) {
+			foreach ( $_SESSION['mp_shipping_info'] as $key => $val ) {
+				switch ( $key ) {
+					case 'shipping_option' :
+					case 'shipping_sub_option' :
+					case 'shipping_cost' :
+						unset( $_SESSION[ $key ] );
+					break;
+				}
+			}
+		}
 		
 		// Send new order email
 		$this->_send_new_order_notifications();
