@@ -493,9 +493,14 @@ class MP_Product {
 	 * @return float
 	 */
 	public function get_weight() {
+		$weight = 0;
+		
+		if ( $this->is_download() ) {
+			return $weight;
+		}
+		
 		$lbs = (float) $this->get_meta('weight_pounds', 0);
 		$oz = (float) $this->get_meta('weight_ounces', 0);
-		$weight = 0;
 		
 		if ( $lbs || $oz ) {
 			$weight = $lbs;
