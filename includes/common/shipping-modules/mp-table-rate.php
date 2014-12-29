@@ -47,7 +47,10 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
    * @access public
    */
   public function get_rates_value( $value, $post_id, $raw, $field ) {
-	  usort( $value, array( &$this, 'sort_rates' ) );
+	  if ( is_array( $value ) ) {
+	  	usort( $value, array( &$this, 'sort_rates' ) );
+	  }
+	  
 	  return $value;
   }
   
@@ -100,6 +103,11 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 				'name' => 'mincost',
 				'label' => array( 'text' => __( 'Cart Total', 'mp' ) ),
 				'desc' => __( 'If cart total is greater than or equal to this value then the rates from that row will be used during checkout.', 'mp' ),
+				'validation' => array(
+					'required' => true,
+					'number' => true,
+					'min' => 0.01,
+				),				
 			) );
 			
 			if ( 'US' == mp_get_setting( 'base_country') ) {
@@ -213,27 +221,6 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		}
 		
 		return mp_display_currency( $value, 2 );
-	}
-	
-	/**
-	 * Echo any per-product shipping fields you need to add to the product edit screen shipping metabox
-	 *
-	 * @param array $shipping_meta, the contents of the post meta. Use to retrieve any previously saved product meta
-	 * @param array $settings, access saved settings via $settings array.
-	 */
-	function shipping_metabox($shipping_meta, $settings) {
-		
-	}
-	
-	/**
-	 * Save any per-product shipping fields from the shipping metabox using update_post_meta
-	 *
-	 * @param array $shipping_meta, save anything from the $_POST global
-	 * return array $shipping_meta
-	 */
-	function save_shipping_metabox($shipping_meta) {
-
-		return $shipping_meta;
 	}
 	
 	/**
