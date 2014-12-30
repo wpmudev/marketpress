@@ -250,7 +250,15 @@ var mp_cart = {};
 		.done(function(resp){
 			marketpress.ajaxEvent('mp_cart/after_add_item', resp, $form);
 			
+			var buttonType = $form.find( '[type="submit"]' ).attr( 'name' );
+			
 			if ( resp.success ) {
+				if ( 'buynow' == buttonType ) {
+					// buy now button - redirect to cart
+					window.location.href = $form.attr( 'action' );
+					return;	
+				}
+				
 				mp_cart.update(resp.data);
 				
 				$form.get(0).reset();
