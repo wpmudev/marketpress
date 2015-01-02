@@ -897,8 +897,9 @@ if ( ! function_exists('mp_store_page_uri') ) {
 	 */
 	function mp_store_page_uri( $page, $echo = true ) {
 		$url = '';
-		if ( $post_id = mp_get_setting("pages->{$page}") ) {
-			$url = get_page_uri($post_id);
+
+		if ( $post_id = mp_get_setting( "pages->{$page}" ) ) {
+			$url = get_page_uri( $post_id );
 		}
 		
 		if ( $echo ) {
@@ -919,8 +920,8 @@ if ( ! function_exists('mp_store_page_url') ) {
 	 */
 	function mp_store_page_url( $page, $echo = true ) {
 		$url = '';
-		if ( $post_id = mp_get_setting("pages->{$page}") ) {
-			$url = get_permalink($post_id);
+		if ( $post_id = mp_get_setting( "pages->{$page}" ) ) {
+			$url = get_permalink( $post_id );
 		}
 		
 		if ( $echo ) {
