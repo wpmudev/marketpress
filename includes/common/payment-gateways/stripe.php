@@ -302,13 +302,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	}
 
 	/**
-	 * Runs before page load incase you need to run any scripts before loading the success message page
-	 */
-	function order_confirmation($order) {
-			
-	}
-
-	/**
 	 * Print the years
 	 */
 	function _print_year_dropdown($sel = '', $pfp = false) {
@@ -348,28 +341,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			$output .= "<option " . ($sel == 12 ? ' selected' : '') . "	 value='12'>12 - Dec</option>";
 
 			return($output);
-	}
-
-	/**
-	 * Filters the order confirmation email message body. You may want to append something to
-	 *	the message. Optional
-	 *
-	 * Don't forget to return!
-	 */
-	function order_confirmation_email($msg, $order = null) {
-			return $msg;
-	}
-
-	/**
-	 * Return any html you want to show on the confirmation screen after checkout. This
-	 *	should be a payment details box and message.
-	 *
-	 * Don't forget to return!
-	 */
-	function order_confirmation_msg($content, $order) {
-			if ($order->post_status == 'order_paid')
-					$content .= '<p>' . sprintf(__('Your payment for this order totaling %s is complete.', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
-			return $content;
 	}
 
   /**
