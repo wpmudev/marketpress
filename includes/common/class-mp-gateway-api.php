@@ -179,7 +179,29 @@ if( ! class_exists('MP_Gateway_API') ) {
      * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
      * @param array $shipping_info. Contains shipping info and email in case you need it
      */
-    function payment_form($cart, $shipping_info) {
+    function payment_form( $cart, $shipping_info ) {
+    }
+    
+    /**
+     * Maybe print checkout scripts
+     *
+     * @since 3.0
+     * @access public
+     * @action wp_footer
+     */
+    final function maybe_print_checkout_scripts() {
+	    if ( mp_is_shop_page( 'checkout' ) ) {
+		    $this->print_checkout_scripts();
+	    }
+    }
+    
+    /**
+     * Print checkout scripts
+     *
+     * @since 3.0
+     * @access public
+     */
+    function print_checkout_scripts() {
     }
     
     /**
@@ -223,8 +245,8 @@ if( ! class_exists('MP_Gateway_API') ) {
     /**
      * Runs before page load incase you need to run any scripts before loading the success message page
      */
-		function order_confirmation($order) {
-      wp_die( __("You must override the order_confirmation() method in your {$this->admin_name} payment gateway plugin!", 'mp') );
+		function process_checkout_return() {
+      wp_die( __("You must override the process_checkout_return() method in your {$this->admin_name} payment gateway plugin!", 'mp') );
     }
 
 		/**
@@ -259,12 +281,16 @@ if( ! class_exists('MP_Gateway_API') ) {
 		
 		//populates ipn_url var
 		function _generate_ipn_url() {
-      $this->ipn_url = home_url(mp_get_setting('slugs->store') . '/payment-return/' . $this->plugin_name);
+      $this->ipn_url = admin_url( 'admin-ajax.php?action=mp_process_ipn_' . $this->plugin_name );
     }
     
-		//populates ipn_url var
-		function _payment_form_skip($var) {
-			return $this->skip_form;
+    /**
+     * Populate the checkout return url
+     *
+     * @since 3.0
+     */
+    function _get_checkout_return_url() {
+	    return admin_url( 'admin-ajax.php?action=mp_process_checkout_return_' . $this->plugin_name );
     }
     
 		//creates the payment method selections
@@ -284,16 +310,6 @@ if( ! class_exists('MP_Gateway_API') ) {
       $content .= '</div>';
       
       return $content;
-    }
-    
-    //calls the order_confirmation() method on the correct page
-    function _checkout_confirmation_hook() {
-      global $wp_query;
-
-      if ($wp_query->query_vars['pagename'] == 'cart') {
-        if (isset($wp_query->query_vars['checkoutstep']) && $wp_query->query_vars['checkoutstep'] == 'confirmation')
-          do_action( 'mp_checkout_payment_pre_confirmation_' . $_SESSION['mp_payment_method'], mp()->get_order($_SESSION['mp_order']) );
-      }
     }
     
     /**
@@ -413,6 +429,11 @@ if( ! class_exists('MP_Gateway_API') ) {
       
       add_filter( 'mp_checkout_payment_form', array( &$this, '_payment_form_wrapper' ), 10, 3 );
       add_action( 'mp_process_payment_' . $this->plugin_name, array( &$this, 'process_payment' ), 10, 3 );
+      add_action( 'mp_order_confirmation', array( &$this, 'order_confirmation' ) );
+      add_action( 'wp_footer', array( &$this, 'maybe_print_checkout_scripts' ) );
+      add_action( 'wp_ajax_nopriv_mp_process_ipn_' . $this->plugin_name, array( &$this, 'process_ipn_return' ) );
+      add_action( 'wp_ajax_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
+      add_action( 'wp_ajax_nopriv_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
 
 			if ( is_admin() ) {
       	$this->init_settings_metabox();
