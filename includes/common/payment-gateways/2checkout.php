@@ -374,24 +374,6 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	}
 	
 	/**
-	 * Print checkout scripts
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	function print_checkout_scripts() {
-		 ?>
-<script type="text/javascript">
-(function( $ ){
-	$( document ).on( 'mp_checkout_process_2checkout', function( e, $form ) {
-		$form.get(0).submit();
-	} );
-}( jQuery ));
-</script>
-		 <?php
-	}
-
-	/**
 	 * INS and payment return
 	 */
 	function process_ipn_return() {
@@ -405,7 +387,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		$tco_vendor_order_id = mp_get_request_value( 'vendor_order_id' );
 		$tco_invoice_status = mp_get_request_value( 'invoice_status' );
 		$tco_hash = mp_get_request_value( 'md5_hash' );
-		$total = mp_get_request_value( 'invoice_list_amount' );
+		$total = (float) mp_get_request_value( 'invoice_list_amount' );
 		$payment_method = ucfirst( mp_get_request_value( 'payment_type' ) );
 
 		$order = new MP_Order( $tco_vendor_order_id );
@@ -430,7 +412,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			die( 'Thank you very much for letting us know. REF: Not success' );
 		}
 
-		if ( intval( $total ) >= $order->get_meta( 'mp_order_total' ) ) {
+		if ( $total >= $order->get_meta( 'mp_order_total' ) ) {
 			$payment_info = $order->get_meta( 'mp_payment_info' );
 			$payment_info['transaction_id'] = $tco_invoice_id;
 			$payment_info['method'] = $payment_method;
@@ -440,9 +422,10 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 
 			header( 'HTTP/1.0 200 OK' );
 			header( 'Content-type: text/plain; charset=UTF-8' );
-			print 'Thank you very much for letting us know';
-			exit;
+			die( 'Thank you very much for letting us know' );
 		}
+		
+		exit;
 	}
 
 }
