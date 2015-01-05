@@ -95,6 +95,10 @@ class MP_Checkout {
 		// Process checkout
 		add_action( 'wp_ajax_mp_process_checkout', array( &$this, 'ajax_process_checkout' ) );
 		add_action( 'wp_ajax_nopriv_mp_process_checkout', array( &$this, 'ajax_process_checkout' ) );
+		
+		// Maybe process checkout confirm
+		add_action( 'wp', array( &$this, 'maybe_process_checkout_confirm' ) );
+		add_action( 'wp', array( &$this, 'maybe_process_checkout' ) );
 	}
 	
 	/**
@@ -320,28 +324,35 @@ class MP_Checkout {
 	 * @param string $msg The error message.
 	 * @param string $context The context of the error message.
 	 */
-	public function add_error( $msg, $context ) {
+	public function add_error( $msg, $context = 'general' ) {
 		$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
-		mp_push_to_array( $this->_errors, $key, $msg );
+		
+		if ( ! isset( $this->_errors[ $context ] ) ) {
+			$this->_errors[ $context ] = array();
+		}
+		
+		$this->_errors[ $context ][] = $msg;
 	}
 	
 	/**
-	 * Get checkout error
+	 * Get checkout errors
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param string $context Optional, the error context. Defaults to "general".
+	 * @return array
 	 */
-	public function get_error( $context ) {
-		$error = mp_arr_get_value( $context, $this->_errors );
+	public function get_errors( $context = 'general' ) {
+		$errors = mp_arr_get_value( $context, $this->_errors );
 		
 		/**
 		 * Filter the error string
 		 *
 		 * @since 3.0
-		 * @param string $error The error string.
+		 * @param array $errors The error array.
 		 * @param string $context The error context.
 		 */
-		return apply_filters( 'mp_checkout/get_error', $error, $key );
+		return (array) apply_filters( 'mp_checkout/get_errors', $errors, $context );
 	}
 	
 	/**
@@ -370,7 +381,7 @@ class MP_Checkout {
 			if ( $this->has_errors() ) {
 				// There are errors - bail
 				wp_send_json_error( array(
-					'errors' => $this->_errors,
+					'errors' => mp_arr_get_value( 'general', $this->_errors )
 				) );
 			}
 			
@@ -455,7 +466,7 @@ class MP_Checkout {
 				}
 				
 				$html .= '
-					<div class="mp-checkout-section-errors"></div>
+					<div class="mp-checkout-section-errors' . (( $this->has_errors() ) ? ' show' : '') . '">' . $this->print_errors( 'general', false ) . '</div>
 					<div class="mp-checkout-section-content">' . $tmp_html . '</div>
 				</div>';
 				
@@ -686,6 +697,76 @@ class MP_Checkout {
 		
 		return false;
 	}
+	
+	/**
+	 * Maybe process order
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp
+	 */
+	public function maybe_process_checkout() {
+		if ( wp_verify_nonce( mp_get_post_value( 'mp_checkout_nonce' ), 'mp_process_checkout' ) ) {
+			$payment_method = mp_get_post_value( 'payment_method' );
+			$cart = mp_cart();
+			$billing_info = mp_get_user_address( 'billing' );
+			$shipping_info = mp_get_user_address( 'shipping' );
+			
+			/**
+			 * For gateways to tie into and process payment
+			 *
+			 * @since 3.0
+			 * @param MP_Cart $cart An MP_Cart object.
+			 * @param array $billing_info An array of buyer billing info.
+			 * @param array $shipping_info An array of buyer shipping info.
+			 */
+			do_action( 'mp_process_payment_' . $payment_method, $cart, $billing_info, $shipping_info );
+		}
+	}
+	
+	/**
+	 * Maybe process order confirmation
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp
+	 */
+	public function maybe_process_checkout_confirm() {
+		if ( get_query_var( 'mp_checkout_confirm' ) ) {
+			/**
+			 * For gateways to tie into
+			 *
+			 * @since 3.0
+			 */
+			do_action( 'mp_order_confirmation' );
+		}
+	}
+	
+	/**
+	 * Print errors (if applicable)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $context Optional, the error context. Defaults to "general".
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	public function print_errors( $context = 'general', $echo = true ) {
+		$error_string = '';
+		
+		if ( $errors = $this->get_errors( $context ) ) {
+			$error_string .= '<h4>' . __( 'Oops! An error occurred while process your payment.', 'mp' ) . '</h4>';
+			
+			foreach ( $errors as $error ) {
+				$error_string .= $error;
+			}
+		}
+		
+		if ( $echo ) {
+			echo $error_string;
+		} else {
+			return $error_string;
+		}
+	}
 
 	/**
 	 * Display payment form
@@ -739,10 +820,11 @@ class MP_Checkout {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param string $context Optional, the context of the errors. Defaults to "general".
 	 * @return bool
 	 */
-	public function has_errors() {
-		return ( count( $this->_errors ) );
+	public function has_errors( $context = 'general' ) {
+		return ( mp_arr_get_value( $context, $this->_errors ) ) ? true : false;
 	}
 	
 	/**
