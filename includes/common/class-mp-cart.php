@@ -154,7 +154,7 @@ class MP_Cart {
 	}
 	
 	/**
-	 * Get cart price (taxes into account tax rules)
+	 * Get cart price (takes into account tax rules)
 	 *
 	 * @since 3.0
 	 * @access public
@@ -995,7 +995,7 @@ class MP_Cart {
 		
 		return $this->_is_download_only;
 	}
-		
+	
 	/**
 	 * Display the item count
 	 *
@@ -1089,6 +1089,7 @@ class MP_Cart {
 	 */
 	public function reset_id() {
 		$this->_id = $this->_id_original;
+		$this->_id_original = null;
 	}
 	
 	/**
@@ -1099,11 +1100,11 @@ class MP_Cart {
 	 * @param int $id
 	 */
 	public function set_id( $id ) {
-		$this->_id = $id;
-		
-		if ( is_null($this->_id_original) ) {
-			$this->_id_original = $id;
+		if ( is_null( $this->_id_original ) ) {
+			$this->_id_original = $this->_id;
 		}
+		
+		$this->_id = $id;
 	}
 	
 	/**
