@@ -202,6 +202,16 @@ if( ! class_exists('MP_Gateway_API') ) {
      * @access public
      */
     function print_checkout_scripts() {
+	    ?>
+<script type="text/javascript">
+(function( $ ){
+	$( document ).on( 'mp_checkout_process_<?php echo $this->plugin_name; ?>', function( e, $form ) {
+		marketpress.loadingOverlay( 'show' );
+		$form.get( 0 ).submit();
+	} );
+}( jQuery ));
+</script>
+	    <?php
     }
     
     /**
@@ -281,7 +291,7 @@ if( ! class_exists('MP_Gateway_API') ) {
 		
 		//populates ipn_url var
 		function _generate_ipn_url() {
-      $this->ipn_url = admin_url( 'admin-ajax.php?action=mp_process_ipn_' . $this->plugin_name );
+      $this->ipn_url = admin_url( 'admin-ajax.php?action=mp_process_ipn_return_' . $this->plugin_name );
     }
     
     /**
@@ -431,7 +441,8 @@ if( ! class_exists('MP_Gateway_API') ) {
       add_action( 'mp_process_payment_' . $this->plugin_name, array( &$this, 'process_payment' ), 10, 3 );
       add_action( 'mp_order_confirmation', array( &$this, 'order_confirmation' ) );
       add_action( 'wp_footer', array( &$this, 'maybe_print_checkout_scripts' ) );
-      add_action( 'wp_ajax_nopriv_mp_process_ipn_' . $this->plugin_name, array( &$this, 'process_ipn_return' ) );
+      add_action( 'wp_ajax_nopriv_mp_process_ipn_return_' . $this->plugin_name, array( &$this, 'process_ipn_return' ) );
+      add_action( 'wp_ajax_mp_process_ipn_return_' . $this->plugin_name, array( &$this, 'process_ipn_return' ) );
       add_action( 'wp_ajax_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
       add_action( 'wp_ajax_nopriv_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
 
