@@ -1,15 +1,11 @@
 <?php
-/*
-MarketPress PayPal Express Gateway Plugin
-Author: Aaron Edwards (Incsub)
-*/
 
 class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	//build
 	var $build = 2;
 	
-  //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-  var $plugin_name = 'paypal-express';
+  //private gateway slug. Lowercase alpha (a-z) and underscores (_) only please!
+  var $plugin_name = 'paypal_express';
 
   //name of your gateway, for the admin side.
   var $admin_name = '';
@@ -113,7 +109,170 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     'US'	=> 'United States'
   );
 
-  /****** Below are the public methods you may overwrite via a plugin ******/
+	/**
+	 * Process an API call
+	 *
+	 * @since 3.0
+	 * @param string $method
+	 * @param array $request
+	 * @access protected
+	 * @return array
+	 */
+	protected function _api_call( $method, $request ) {
+		$request['METHOD'] = $method;
+		$request['VERSION'] = $this->version;
+		$request['PWD'] = $this->API_Password;
+		$request['USER'] = $this->API_Username;
+		$request['SIGNATURE'] = $this->API_Signature;
+		
+		//allow easy debugging
+		if ( defined( "MP_DEBUG_API_$method" ) ) {
+			var_dump( $request );
+			die;
+		}
+
+		//make API call
+	  $response = wp_remote_post( $this->API_Endpoint, array(
+	  	'user-agent' => 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/' . MP_VERSION,
+			'body' => http_build_query( $request ),
+			'sslverify' => false,
+			'timeout' => 60,
+			'httpversion' => '1.1',	//api call will fail without this!
+		) );
+		
+	  if ( is_wp_error( $response ) || 200 != wp_remote_retrieve_response_code( $response ) ) {
+	    mp_checkout()->add_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
+	    return false;
+	  } else {
+	    return $this->_deformat_nvp( $response['body'] );
+	  }
+	}
+
+	/**
+	 * Take NVPString and convert it to an associative array and it will decode the response
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @return array
+	 */
+	protected function _deformat_nvp( $nvpstr ) {
+		parse_str( $nvpstr, $nvparray );
+		return $nvparray;
+	}
+
+	/**
+	 * Redirect to PayPal site
+	 *
+	 * @since 3.0
+	 * @param string $token A token as supplied by SetExpressCheckout API call
+	 * @access protected
+	 */
+	function _redirect_to_paypal( $token ) {
+	  wp_redirect( $this->paypalURL . $token );
+	  exit;
+	}
+
+ 
+	/**
+	 * Prepare the parameters for the SetExpressCheckout API Call
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+  protected function _set_express_checkout( $cart, $billing_info, $shipping_info, $order_id )	{
+	  $blog_id = $current_blog_id = get_current_blog_id();
+	  $items = $cart->get_items_as_objects();
+	  $subtotal = 0;
+	  
+	  $request = array();
+	  $request['RETURNURL'] = $this->returnURL;
+	  $request['CANCELURL'] = $this->cancelURL;
+    $request['ADDROVERRIDE'] = 1;
+    $request['NOSHIPPING'] = 2;
+    $request['LANDINGPAGE'] = 'Billing';
+    $request['SOLUTIONTYPE'] = 'Sole';
+    $request['LOCALECODE'] = $this->locale;
+    $request['EMAIL'] = mp_arr_get_value( 'email', $billing_info, '' );
+
+    //formatting
+    $request['HDRIMG'] = $this->get_setting( 'header_img', '' );
+    $request['HDRBORDERCOLOR'] = $this->get_setting( 'header_border', '' );
+    $request['HDRBACKCOLOR'] = $this->get_setting( 'header_back', '' );
+    $request['PAYFLOWCOLOR'] = $this->get_setting( 'page_back', '' );
+
+		//setup payment request
+    //$request['PAYMENTREQUEST_0_SELLERPAYPALACCOUNTID'] = $this->API_Username;
+    $request['PAYMENTREQUEST_0_PAYMENTACTION'] = $this->payment_action;
+    $request['PAYMENTREQUEST_0_CURRENCYCODE'] = $this->currencyCode;
+    $request['PAYMENTREQUEST_0_NOTIFYURL'] = $this->ipn_url;
+
+		if ( ! $cart->is_download_only() && 'none' != mp_get_setting( 'shipping->method' ) ) {
+			$request['PAYMENTREQUEST_0_SHIPTONAME'] = $this->trim_name( mp_arr_get_value( 'name', $shipping_info, '' ), 128 );
+			$request['PAYMENTREQUEST_0_SHIPTOSTREET'] = $this->trim_name( mp_arr_get_value( 'address1', $shipping_info, '' ), 100 );
+			$request['PAYMENTREQUEST_0_SHIPTOSTREET2'] = $this->trim_name( mp_arr_get_value( 'address2', $shipping_info, '' ), 100 );
+			$request['PAYMENTREQUEST_0_SHIPTOCITY'] = $this->trim_name( mp_arr_get_value( 'city', $shipping_info, '' ), 40 );
+			$request['PAYMENTREQUEST_0_SHIPTOSTATE'] = $this->trim_name( mp_arr_get_value( 'state', $shipping_info, '' ), 40 );
+			$request['PAYMENTREQUEST_0_SHIPTOZIP'] = $this->trim_name( mp_arr_get_value( 'zip', $shipping_info, '' ), 20 );
+			$request['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $this->trim_name( mp_arr_get_value( 'country', $shipping_info, '' ), 2 );
+			$request['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = $this->trim_name( mp_arr_get_value( 'phone', $shipping_info, '' ), 20 );
+		}
+
+		$i = 0;
+    foreach ( $items as $item ) {
+	    $price = $item->get_price( 'lowest' );
+
+			if ( $price <= 0 ) {
+				//skip free products to avoid paypal error
+				continue;
+			}
+			
+			$subtotal += $price;
+
+		  $request["PAYMENTREQUEST_0_NAME{$i}"] = $this->trim_name( $item->title( false ) );
+		  $request["PAYMENTREQUEST_0_AMT{$i}"] = $price;
+		  $request["PAYMENTREQUEST_0_NUMBER{$i}"] = $item->get_meta( 'sku', '' );
+		  $request["PAYMENTREQUEST_0_QTY{$i}"] = $item->qty;
+		  $request["PAYMENTREQUEST_0_ITEMURL{$i}"] = $item->url( false );
+		  $request["PAYMENTREQUEST_0_ITEMCATEGORY{$i}"] = 'Physical';
+		  $i++;
+		}
+      
+    $request["PAYMENTREQUEST_0_ITEMAMT"] = $subtotal; //items subtotal
+
+    //shipping total
+    if ( ($shipping_price = $cart->shipping_total( false )) !== false ) {
+			$request["PAYMENTREQUEST_0_SHIPPINGAMT"] = $shipping_price;
+    }
+
+    //tax total - only if tax inclusive pricing is off. It it's on it would screw up the totals.
+    if ( ! mp_get_setting('tax->tax_inclusive') ) {
+    	$tax_total = $cart->tax_total( false );
+			$request["PAYMENTREQUEST_0_TAXAMT"] = $tax_total;
+    }
+
+    //order details
+    $request["PAYMENTREQUEST_0_DESC"] = $this->trim_name( sprintf( __( '%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo( 'name' ), $order_id ) );
+    $request["PAYMENTREQUEST_0_AMT"] = $cart->total( false );
+    $request["PAYMENTREQUEST_0_INVNUM"] = $order_id;
+    $request["PAYMENTREQUEST_0_PAYMENTREQUESTID"] = $blog_id . ':' . $order_id;
+
+    if ( $this->payment_action == 'Sale' ) {
+			$request["PAYMENTREQUEST_0_ALLOWEDPAYMENTMETHOD"] = 'InstantPaymentOnly';
+    }
+    
+		$nvpstr = http_build_query( $request );
+		mp_update_session_value( 'nvpstr', $nvpstr );
+
+    $response = $this->_api_call( 'SetExpressCheckout', $request );
+    $ack = strtoupper( mp_arr_get_value( 'ACK', $response, '' ) );
+    
+    if( 'SUCCESS' == $ack || 'SUCCESSWITHWARNING' == $ack )	{
+      $token = mp_arr_get_value( 'TOKEN', $response, '' );
+      mp_update_session_value( 'TOKEN', $token );
+    }
+    
+    return $response;
+  }
 
   /**
    * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
@@ -132,8 +291,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     $this->API_Signature = $this->get_setting('api_credentials->signature');
     $this->currencyCode = $this->get_setting('currency', mp_get_setting('currency'));
     $this->locale = $this->get_setting('locale');
-    $this->returnURL = urlencode(mp_checkout_step_url('confirm-checkout'));
-  	$this->cancelURL = urlencode(mp_checkout_step_url('checkout')) . "?cancel=1";
+    $this->returnURL = $this->_get_checkout_return_url();
+  	$this->cancelURL = add_query_arg( 'cancel', '1', mp_store_page_url( 'checkout', false ) );
     $this->version = "69.0"; //api version
 
     // Set api urls
@@ -157,16 +316,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
   function update( $settings ) {
 		if ( ($api_user = $this->get_setting('api_user')) && ($api_pass = $this->get_setting('api_pass')) && ($api_sig = $this->get_setting('api_sig')) ) {
 	    // Update api user
-	    mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->username', $api_user);
+	    mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->username', $api_user);
 	    
 	    // Update api pass
-	    mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->password', $api_pass);
+	    mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->password', $api_pass);
 	    
 	    // Update api signature
-	    mp_push_to_array($settings, 'gateways->paypal-express->api_credentials->signature', $api_sig);
+	    mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->signature', $api_sig);
 	    
 	    // Unset old keys
-	    unset($settings['gateways']['paypal-express']['api_user'], $settings['gateways']['paypal-express']['api_pass'], $settings['gateways']['paypal-express']['api_sig']);
+	    unset($settings['gateways']['paypal_express']['api_user'], $settings['gateways']['paypal_express']['api_pass'], $settings['gateways']['paypal_express']['api_sig']);
 	  }
 	  
 	  return $settings;
@@ -306,16 +465,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		));	  
   }
   
-	/**
-   * Echo fields you need to add to the payment screen, like your credit card info fields.
+  /**
+   * Return fields you need to add to the payment screen, like your credit card info fields.
    *  If you don't need to add form fields set $skip_form to true so this page can be skipped
    *  at checkout.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains billing info and email in case you need it
+   * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function payment_form( $items, $billing_info ) {
-	  return '';
+  function payment_form( $cart, $shipping_info ) {
+	  return __( 'You will be redirected to the PayPal site to finalize your payment.', 'mp' );
   }
 
   /**
@@ -447,12 +606,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
    * @param array $shipping_info. Contains shipping info and email in case you need it
    */
-  function process_payment_form($global_cart, $shipping_info) {
+  /*function process_payment_form($global_cart, $shipping_info) {
     ;
     
     //create order id for paypal invoice
     $order_id = mp()->generate_order_id();
-    /*
     foreach ($global_cart as $bid => $cart) {
       foreach ($cart as $product_id => $data) {
 				if ('deal' == get_post_type($product_id)) {
@@ -460,9 +618,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				}
       }
     }
-    */
     //set it up with PayPal
-    $result = $this->SetExpressCheckout($global_cart, $shipping_info, $order_id);
+    $result = $this->_set_express_checkout($global_cart, $shipping_info, $order_id);
     
     //check response
     if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
@@ -477,7 +634,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
       $error = '<br /><ul>' . $error . '</ul>';
       mp()->cart_checkout_error( __('There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp') . $error );
     }
-  }
+  } */
 
   /**
    * Return the chosen payment details here for final confirmation. You probably don't need
@@ -543,9 +700,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 * @param array $billing_info. Contains billing info and email in case you need it.
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
-	function process_payment( $cart, $billing_info, $shipping_info ) {
-    global $blog_id, $site_id, $switched_stack, $switched;
-
+	/*function process_payment( $cart, $billing_info, $shipping_info ) {
 	  $blog_id = (is_multisite()) ? $blog_id : 1;
 	  $current_blog_id = $blog_id;
 
@@ -687,48 +842,31 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
     } else {
       mp()->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase with PayPal. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) );
     }
-  }
+  } */
+  
+  function process_payment( $cart, $billing_info, $shipping_info ) {
+    //create order id for paypal invoice
+    $order = new MP_Order();
+    $order_id = $order->get_id();
+    
+    //set it up with PayPal
+    $result = $this->_set_express_checkout( $cart, $billing_info, $shipping_info, $order_id );
+    
+    //check response
+    if( 'Success' == mp_arr_get_value( 'ACK', $result ) || 'SuccessWithWarning' == mp_arr_get_value( 'ACK', $result ) )	{
+      $token = urldecode( mp_arr_get_value( 'TOKEN', $result ) );
+      $this->_redirect_to_paypal( $token );
+    } else { //whoops, error
+	    $error = '<ul>';
+      for ( $i = 0; $i <= 5; $i++ ) { //print the first 5 errors
+        if ( $errorcode = mp_arr_get_value( "L_ERRORCODE{$i}", $result ) ) {
+          $error .= '<li>' . $errorcode . ' - ' . mp_arr_get_value( "L_SHORTMESSAGE{$i}", $result ) . ' - ' . mp_arr_get_value( "L_LONGMESSAGE{$i}", $result ) . '</li>';
+        }
+      }
+      $error .= '</ul>';
+      mp_checkout()->add_error( wpautop( __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) ) . $error );
+    }
 
-	/**
-   * Runs before page load incase you need to run any scripts before loading the success message page
-   */
-	function order_confirmation($order) {
-
-  }
-
-  /**
-   * Filters the order confirmation email message body. You may want to append something to
-   *  the message. Optional
-   *
-   * Don't forget to return!
-   */
-	function order_confirmation_email($msg, $order) {
-    return $msg;
-  }
-
-  /**
-   * Return any html you want to show on the confirmation screen after checkout. This
-   *  should be a payment details box and message.
-   *
-   * Don't forget to return!
-   */
-  function order_confirmation_msg($content, $order) {
-    if (mp()->global_cart) {
-		  $content .= '<p>' . sprintf(__('Your order(s) for %s store(s) totaling %s were successful.', 'mp'), $_SESSION['store_count'], mp()->format_currency($this->currencyCode, $_SESSION['final_amt'])) . '</p>';
-			/* TODO - create a list of sep store orders*/
-	  } else {
-	    if ($order->post_status == 'order_received') {
-	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
-	      $statuses = $order->mp_payment_info['status'];
-	      krsort($statuses); //sort with latest status at the top
-	      $status = reset($statuses);
-	      $timestamp = key($statuses);
-	      $content .= '<p><strong>' . mp()->format_date($timestamp) . ':</strong> ' . esc_html($status) . '</p>';
-	    } else {
-	      $content .= '<p>' . sprintf(__('Your PayPal payment for this order totaling %s is complete. The PayPal transaction number is <strong>%s</strong>.', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';	  		    	 	 	 		  
-	    }
-		}
-    return $content;
   }
 
 	/**
@@ -873,161 +1011,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		}
   }
 
-  /**** PayPal API methods *****/
-
-
-	//Purpose: 	Prepares the parameters for the SetExpressCheckout API Call.
-  function SetExpressCheckout($global_cart, $shipping_info, $order_id)	{
-    global $blog_id;
-	  $blog_id = (is_multisite()) ? $blog_id : 1;
-	  $current_blog_id = $blog_id;
-	  
-	  if ( ! mp()->global_cart ) {
-	  	$selected_cart[$blog_id] = $global_cart;
-	  } else {
-	    $selected_cart = $global_cart;
-    }
-    
-    $nvpstr = "";
-    $nvpstr .= "&ReturnUrl=" . $this->returnURL;
-    $nvpstr .= "&CANCELURL=" . $this->cancelURL;
-    $nvpstr .= "&ADDROVERRIDE=1";
-    $nvpstr .= "&NOSHIPPING=2";
-    $nvpstr .= "&LANDINGPAGE=Billing";
-    $nvpstr .= "&SOLUTIONTYPE=Sole";
-    $nvpstr .= "&LOCALECODE=" . $this->locale;
-    $nvpstr .= "&EMAIL=" . urlencode($shipping_info['email']);
-
-    //formatting
-    $nvpstr .= "&HDRIMG=" . urlencode($this->get_setting('header_img', ''));
-    $nvpstr .= "&HDRBORDERCOLOR=" . urlencode($this->get_setting('header_border', ''));
-    $nvpstr .= "&HDRBACKCOLOR=" . urlencode($this->get_setting('header_back', ''));
-    $nvpstr .= "&PAYFLOWCOLOR=" . urlencode($this->get_setting('page_back', ''));
-
-    //loop through cart items
-    $j = 0;
-		$request = '';
-    foreach ( $selected_cart as $bid => $cart ) {
-      if ( ! is_array($cart) || count($cart) == 0 ) {
-				continue;
-      }
-      
-      if ( is_multisite() && $bid != $blog_id ) {
-				switch_to_blog($bid);
-      }
-
-			$merchant_email = $this->get_setting('merchant_email');
-			//if a seller hasn't configured paypal skip
-			if ( mp()->global_cart && empty($merchant_email) )
-				continue;
-			
-      $totals = array();
-
-      $request .= "&PAYMENTREQUEST_{$j}_SELLERID=" . $bid;
-      $request .= "&PAYMENTREQUEST_{$j}_SELLERPAYPALACCOUNTID=" . $merchant_email;
-      $request .= "&PAYMENTREQUEST_{$j}_PAYMENTACTION=" . $this->payment_action;
-      $request .= "&PAYMENTREQUEST_{$j}_CURRENCYCODE=" . $this->currencyCode;
-      $request .= "&PAYMENTREQUEST_{$j}_NOTIFYURL=" . $this->ipn_url;  //this is supposed to be in DoExpressCheckoutPayment, but I put it here as well as docs are lacking
-
-			if (!mp()->download_only_cart($cart) && $this->get_setting('shipping->method') != 'none') {
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTONAME=" . $this->trim_name($shipping_info['name'], 32);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET=" . $this->trim_name($shipping_info['address1'], 100);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTREET2=" . $this->trim_name($shipping_info['address2'], 100);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOCITY=" . $this->trim_name($shipping_info['city'], 40);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOSTATE=" . $this->trim_name($shipping_info['state'], 40);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOCOUNTRYCODE=" . $this->trim_name($shipping_info['country'], 2);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOZIP=" . $this->trim_name($shipping_info['zip'], 20);
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPTOPHONENUM=" . $this->trim_name($shipping_info['phone'], 20);
-			}
-
-      $i = 0;
-      $coupon_code = mp()->get_coupon_code();
-			$coupon_amt = 0;
-			
-      foreach ($cart as $product_id => $variations) {
-        foreach ($variations as $variation => $data) {
-					if ( $coupon_code ) {
-						$price_coupon = mp()->coupon_value_product($coupon_code, ($data['price'] * $data['quantity']), $product_id);
-						$price = ($data['price'] * $data['quantity']);
-						$coupon_amt += ($price - $price_coupon);
-					}
-
-					//skip free products to avoid paypal error
-					if ($price <= 0)
-						continue;
-
-				  $totals[] = $price * $data['quantity'];
-				  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name($data['name']);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($price);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($data['SKU']);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=" . urlencode($data['quantity']);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMURL$i=" . urlencode($data['url']);
-				  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";
-				  $i++;
-				}
-      }
-      
-      if ( $coupon_amt ) {
-	      $price = ($coupon_amt * -1);
-	      $totals[] = $price;
-			  $request .= "&L_PAYMENTREQUEST_{$j}_NAME$i=" . $this->trim_name('Coupon');
-			  $request .= "&L_PAYMENTREQUEST_{$j}_AMT$i=" . urlencode($price);
-			  $request .= "&L_PAYMENTREQUEST_{$j}_NUMBER$i=" . urlencode($coupon_code);
-			  $request .= "&L_PAYMENTREQUEST_{$j}_QTY$i=1";
-			  $request .= "&L_PAYMENTREQUEST_{$j}_ITEMCATEGORY$i=Physical";	    	  
-      }
-      
-      $total = array_sum($totals);
-
-      $request .= "&PAYMENTREQUEST_{$j}_ITEMAMT=" . $total; //items subtotal
-
-      //shipping line
-      if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
-				$total += $shipping_price;
-				$request .= "&PAYMENTREQUEST_{$j}_SHIPPINGAMT=" . $shipping_price; //shipping total
-      }
-
-      //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-      if ( ! $this->get_setting('tax->tax_inclusive') ) {
-      	$tax_price = $mp->tax_price(false);
-				$total += $tax_price;
-				$request .= "&PAYMENTREQUEST_{$j}_TAXAMT=" . $tax_price; //taxes total
-      }
-
-      //order details
-      $request .= "&PAYMENTREQUEST_{$j}_DESC=" . $this->trim_name(sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id)); //cart name
-      $request .= "&PAYMENTREQUEST_{$j}_AMT=" . $total; //cart total
-      $request .= "&PAYMENTREQUEST_{$j}_INVNUM=" . $order_id;
-      $request .= "&PAYMENTREQUEST_{$j}_PAYMENTREQUESTID=" . $bid . ":" . $order_id;
-
-      if ($this->payment_action == 'Sale') {
-				$request .= "&PAYMENTREQUEST_{$j}_ALLOWEDPAYMENTMETHOD=InstantPaymentOnly";
-      }
-      $j++;
-    }
-    
-    //echo '<pre>'; print_r($this->deformatNVP($request)); echo '</pre>';die;
-    
-    if (is_multisite())
-      switch_to_blog($current_blog_id);
-
-		$nvpstr .= $request;
-		$_SESSION['nvpstr'] = $request;
-
-    //'---------------------------------------------------------------------------------------------------------------
-    //' Make the API call to PayPal
-    //' If the API call succeded, then redirect the buyer to PayPal to begin to authorize payment.
-    //' If an error occured, show the resulting errors
-    //'---------------------------------------------------------------------------------------------------------------
-    $resArray = $this->api_call("SetExpressCheckout", $nvpstr);
-    $ack = strtoupper($resArray["ACK"]);
-    if($ack=="SUCCESS" || $ack=="SUCCESSWITHWARNING")	{
-      $token = urldecode($resArray["TOKEN"]);
-      $_SESSION['TOKEN'] = $token;
-    }
-    return $resArray;
-  }
-
 	//Purpose: 	Prepares the parameters for the GetExpressCheckoutDetails API Call.
 	function GetExpressCheckoutDetails( $token )	{
 		//'--------------------------------------------------------------
@@ -1051,7 +1034,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		//' 	an action to complete the payment.
 		//'	If failed, show the error
 		//'---------------------------------------------------------------------------
-    $resArray = $this->api_call("GetExpressCheckoutDetails", $nvpstr);
+    $resArray = $this->_api_call("GetExpressCheckoutDetails", $nvpstr);
     $ack = strtoupper($resArray["ACK"]);
 		if($ack == "SUCCESS" || $ack=="SUCCESSWITHWARNING") {
 			$_SESSION['payer_id'] =	$resArray['PAYERID'];
@@ -1070,7 +1053,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 	  /* Make the call to PayPal to finalize payment
 	    */
-	  return $this->api_call("DoExpressCheckoutPayment", $nvpstr);
+	  return $this->_api_call("DoExpressCheckoutPayment", $nvpstr);
 	}
 
 	//Purpose: 	Prepares the parameters for the DoAuthorization API Call.
@@ -1083,7 +1066,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 	  /* Make the call to PayPal to finalize payment
 	   */
-	  return $this->api_call("DoAuthorization", $nvpstr);
+	  return $this->_api_call("DoAuthorization", $nvpstr);
 	}
 
 	//Purpose: 	Prepares the parameters for the DoCapture API Call.
@@ -1096,73 +1079,18 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 	  /* Make the call to PayPal to finalize payment
 	   */
-	  return $this->api_call("DoCapture", $nvpstr);
-	}
-
-	/**
-	  '-------------------------------------------------------------------------------------------------------------------------------------------
-	  * $this->api_call: Function to perform the API call to PayPal using API signature
-	  * @methodName is name of API  method.
-	  * @nvpStr is nvp string.
-	  * returns an associtive array containing the response from the server.
-	  '-------------------------------------------------------------------------------------------------------------------------------------------
-	*/
-	function api_call($methodName, $nvpStr) {
-	  //NVPRequest for submitting to server
-	  $query_string = "METHOD=" . urlencode($methodName) . "&VERSION=" . urlencode($this->version) . "&PWD=" . urlencode($this->API_Password) . "&USER=" . urlencode($this->API_Username) . "&SIGNATURE=" . urlencode($this->API_Signature) . $nvpStr;
-	  //build args
-	  $args['user-agent'] = "MarketPress/{mp()->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/{mp()->version}";
-	  $args['body'] = $query_string;
-	  $args['sslverify'] = false;
-	  $args['timeout'] = 60;
-	  $args['httpversion'] = '1.1';	//api call will fail without this!
-	  
-		//allow easy debugging
-		if ( defined("MP_DEBUG_API_$methodName") ) {
-			print_r( $this->deformatNVP($query_string) );
-			die;
-		}
-
-	  //use built in WP http class to work with most server setups
-	  $response = wp_remote_post($this->API_Endpoint, $args);
-	  if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-	    mp()->cart_checkout_error( __('There was a problem connecting to PayPal. Please try again.', 'mp') );
-	    return false;
-	  } else {
-	    //convert NVPResponse to an Associative Array
-	    $nvpResArray = $this->deformatNVP($response['body']);
-	    return $nvpResArray;
-	  }
-	}
-
-	/*'----------------------------------------------------------------------------------
-	 Purpose: Redirects to PayPal.com site.
-	 Inputs:  NVP string.
-	 Returns:
-	----------------------------------------------------------------------------------
-	*/
-	function RedirectToPayPal($token) {
-	  // Redirect to paypal.com here
-	  $payPalURL = $this->paypalURL . $token;
-	  wp_redirect($payPalURL);
-	  exit;
-	}
-
-
-	//This function will take NVPString and convert it to an Associative Array and it will decode the response.
-	function deformatNVP($nvpstr) {
-		parse_str($nvpstr, $nvpArray);
-		return $nvpArray;
+	  return $this->_api_call("DoCapture", $nvpstr);
 	}
 
 	function trim_name($name, $length = 127) {
-		while (strlen(urlencode($name)) > $length)
-			$name = substr($name, 0, -1);
+		while ( strlen( urlencode( $name ) ) > $length ) {
+			$name = substr( $name, 0, -1 );
+		}
 
-		return urlencode($name);
+		return urldecode( $name );
 	}
 
 }
 
 //register shipping plugin
-mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal-express', __('PayPal Express Checkout', 'mp'), true );
+mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal_express', __('PayPal Express Checkout', 'mp'), true );
