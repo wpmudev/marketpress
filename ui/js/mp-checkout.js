@@ -257,7 +257,7 @@ var mp_checkout;
 							 * @since 3.0
 							 * @param jQuery $form The checkout form object.
 							 */
-							$( document ).trigger( 'mp_checkout_process_' + gateway, $form );
+							$( document ).trigger( 'mp_checkout_process_' + gateway, [ $form ] );
 						} else if ( $.trim( $email.val() ).length > 0 && $.trim( $pass.val() ).length > 0 ) {
 							var $btn = $( '#mp-button-checkout-login' );
 							$btn.ajaxLoading();
