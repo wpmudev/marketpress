@@ -1,6 +1,12 @@
 ( function( $ ) {
 	$( document ).on( 'mp_checkout_process_stripe', processCheckout );
 	$( document ).ready( init );
+
+	$( document ).on( 'mp_checkout/step_changed', function( evt, $out, $in ) {
+		if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
+			addInputNames();
+		}
+	} );	
 	
 	/**
 	 * Add input names for jQuery validation plugin
@@ -11,7 +17,6 @@
 	 * @since 3.0
 	 */
 	function addInputNames() {
-		/*  */ 
 		$( '#mp-stripe-name' ).attr( 'name', 'mp_stripe_name' );
 		$( '#mp-stripe-cc-num' ).attr( 'name', 'mp_stripe_cc_num' );
 		$( '#mp-stripe-cc-exp' ).attr( 'name', 'mp_stripe_cc_exp' );
@@ -34,12 +39,6 @@
 	 */
 	function init() {
 		Stripe.setPublishableKey( stripe.publisher_key );
-		
-		$( document ).on( 'cycle-after cycle-initialized', '#mp-checkout', function( evt, opts ){
-			if ( opts.slideNum == opts.slideCount || opts.currSlide == (opts.slideCount - 1) ) {
-				addInputNames();
-			}
-		} );
 	}
 	
 	/**
@@ -60,7 +59,7 @@
 		
 		Stripe.card.createToken( {
 			name : $name.val(),
-			number : $number.val(),
+			number : $number.val().replace( /[^0-9]/ig, '' ),
 			exp_month : expObj.month,
 			exp_year : expObj.year,
 			cvc : $cvc.val()

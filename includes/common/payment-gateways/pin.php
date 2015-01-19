@@ -8,7 +8,7 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 	//build
 	var $build = 2;
 	//private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-	var $plugin_name = 'PIN';
+	var $plugin_name = 'pin';
 	//name of your gateway, for the admin side.
 	var $admin_name = '';
 	//public name of your gateway, for lists and such.
@@ -56,205 +56,35 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 		$this->force_ssl = $this->get_setting('is_ssl');
 		$this->currency = $this->get_setting('currency', 'AUD');
 		
-		add_action('wp_enqueue_scripts', array(&$this, 'enqueue_scripts'));
+		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 	}
 
 	function enqueue_scripts() {
-		if ( ! is_admin() && get_query_var('pagename') == 'cart' && get_query_var('checkoutstep') == 'checkout' ) {
-			if ( $this->get_setting('is_ssl') ) {
-				wp_enqueue_script('js-pin', 'https://api.pin.net.au/pin.js', array('jquery'));
-			} else {
-				wp_enqueue_script('js-pin', 'https://test-api.pin.net.au/pin.js', array('jquery'));
-			}
-
-			wp_enqueue_script('pin-handler', mp()->plugin_url . 'plugins-gateway/pin-files/pin-handler.js', array('js-pin', 'jquery'));
-			wp_localize_script('pin-handler', 'pin_vars', array(
-				'publishable_api_key' => $this->public_key,
-			));
+		if ( ! mp_is_shop_page( 'checkout' ) ) {
+			return;
 		}
+
+		wp_enqueue_script( 'js-pin', 'https://cdn.pin.net.au/pin.v2.js', array( 'jquery' ), null );
+
+		wp_enqueue_script( 'pin-handler', mp_plugin_url( 'includes/common/payment-gateways/pin-files/pin-handler.js' ), array( 'js-pin' ), MP_VERSION );
+		wp_localize_script( 'pin-handler', 'pin_vars', array(
+			'publishable_api_key' => $this->public_key,
+			'mode' => ( $this->force_ssl ) ? 'live' : 'test',
+		) );
 	}
 
 	/**
-	 * Return fields you need to add to the top of the payment screen, like your credit card info fields
+	 * Display the payment form
 	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 * @since 3.0
+	 * @access public
+   * @param array $cart. Contains the cart contents for the current blog
+   * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
-	function payment_form($cart, $shipping_info) {
-			$name = isset($_SESSION['mp_shipping_info']['name']) ? $_SESSION['mp_shipping_info']['name'] : '';
-			$address1 = isset($_SESSION['mp_shipping_info']['address1']) ? $_SESSION['mp_shipping_info']['address1'] : '';
-			$address2 = isset($_SESSION['mp_shipping_info']['address2']) ? $_SESSION['mp_shipping_info']['address2'] : '';
-			$city = isset($_SESSION['mp_shipping_info']['city']) ? $_SESSION['mp_shipping_info']['city'] : '';
-			$state = isset($_SESSION['mp_shipping_info']['state']) ? $_SESSION['mp_shipping_info']['state'] : '';
-			$postcode = isset($_SESSION['mp_shipping_info']['zip']) ? $_SESSION['mp_shipping_info']['zip'] : '';
-			$country = isset($_SESSION['mp_shipping_info']['country']) ? $_SESSION['mp_shipping_info']['country'] : '';
-
-			$content = '';
-
-			$content .= '<div id="pin_checkout_errors"><ul></ul></div>';
-
-			$content .= '<table class="mp_cart_billing">
-			<thead><tr>
-				<th colspan="2">' . __('Enter Your Credit Card Information:', 'mp') . '</th>
-			</tr></thead>
-			<tbody>
-				<tr>
-				<td align="right">' . __('Cardholder Name:', 'mp') . '</td>
-				<td><input size="35" id="cc-name" type="text" value="' . esc_attr($name) . '" /> </td>
-				</tr>';
-
-			$content .= '<tr>
-				<td align="right">' . __('Address 1:', 'mp') . '</td>
-				<td><input id="address-line1" type="text" value="' . esc_attr($address1) . '" /> </td>
-				</tr>';
-
-			$content .= '<tr>
-				<td align="right">' . __('Address 2:', 'mp') . '</td>
-				<td><input id="address-line2" type="text" value="' . esc_attr($address2) . '" /> </td>
-				</tr>';
-
-			$content .= '<tr>
-				<td align="right">' . __('City:', 'mp') . '</td>
-				<td><input id="address-city" type="text" value="' . esc_attr($city) . '" /> </td>
-				</tr>';
-
-			$content .= '<tr>
-				<td align="right">' . __('State:', 'mp') . '</td>
-				<td><input id="address-state" type="text" value="' . esc_attr($state) . '" /> </td>
-				</tr>';
-
-			$content .= '<tr>
-				<td align="right">' . __('Postcode:', 'mp') . '</td>
-				<td><input id="address-postcode" type="text" value="' . esc_attr($postcode) . '" /> </td>
-				</tr>';
-
-			$content .= '<tr>
-				<td align="right">' . __('Country:', 'mp') . '</td>
-				<td><input id="address-country" type="text" value="' . esc_attr($country) . '" /> </td>
-				</tr>';
-
-			$totals = array();
-			foreach ($cart as $product_id => $variations) {
-					foreach ($variations as $variation => $data) {
-							$totals[] = mp()->before_tax_price($data['price'], $product_id) * $data['quantity'];
-					}
-			}
-
-			$total = array_sum($totals);
-
-			//coupon line
-			if ($coupon = mp()->coupon_value(mp()->get_coupon_code(), $total)) {
-					$total = $coupon['new_total'];
-			}
-
-			//shipping line
-			$shipping_tax = 0;
-			if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
-				$total += $shipping_price;
-				$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-			}
+  public function payment_form( $cart, $shipping_info ) {
+	  return $this->_cc_default_form( false );
+	}
 	
-			//tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-			if ( ! mp_get_setting('tax->tax_inclusive') ) {
-				$tax_price = (mp()->tax_price(false) + $shipping_tax);
-				$total += $tax_price;
-			}
-				 
-			$content .= '<tr>';
-			$content .= '<td>';
-			$content .= __('Card Number', 'mp');
-			$content .= '</td>';
-			$content .= '<td>';
-			$content .= '<input type="text" size="30" autocomplete="off" id="cc-number"/>';
-			$content .= '</td>';
-			$content .= '</tr>';
-			$content .= '<tr>';
-			$content .= '<td>';
-			$content .= __('Expiration:', 'mp');
-			$content .= '</td>';
-			$content .= '<td>';
-			$content .= '<select id="cc-expiry-month">';
-			$content .= $this->_print_month_dropdown();
-			$content .= '</select>';
-			$content .= '<span> / </span>';
-			$content .= '<select id="cc-expiry-year">';
-			$content .= $this->_print_year_dropdown('', true);
-			$content .= '</select>';
-			$content .= '</td>';
-			$content .= '</tr>';
-			$content .= '<tr>';
-			$content .= '<td>';
-			$content .= __('CVC:', 'mp');
-			$content .= '</td>';
-			$content .= '<td>';
-			$content .= '<input type="text" size="4" autocomplete="off" id="cc-cvc" />';
-			$content .= '</td>';
-			$content .= '</tr>';
-			$content .= '</table>';
-			$content .= '<span id="pin_processing" style="display: none;float: right;"><img src="' . mp()->plugin_url . 'images/loading.gif" /> ' . __('Processing...', 'psts') . '</span>';
-			return $content;
-	}
-
-	/**
-	 * Return the chosen payment details here for final confirmation. You probably don't need
-	 *	to post anything in the form as it should be in your $_SESSION var already.
-	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
-	 */
-	function confirm_payment_form($cart, $shipping_info) {
-			
-	}
-
-	/**
-	 * Runs before page load incase you need to run any scripts before loading the success message page
-	 */
-	function order_confirmation($order) {
-			
-	}
-
-	/**
-	 * Print the years
-	 */
-	function _print_year_dropdown($sel = '', $pfp = false) {
-			$localDate = getdate();
-			$minYear = $localDate["year"];
-			$maxYear = $minYear + 15;
-
-			$output = "<option value=''>--</option>";
-			for ($i = $minYear; $i < $maxYear; $i++) {
-					if ($pfp) {
-							$output .= "<option value='" . substr($i, 0, 4) . "'" . ($sel == (substr($i, 0, 4)) ? ' selected' : '') .
-											">" . $i . "</option>";
-					} else {
-							$output .= "<option value='" . substr($i, 2, 2) . "'" . ($sel == (substr($i, 2, 2)) ? ' selected' : '') .
-											">" . $i . "</option>";
-					}
-			}
-			return($output);
-	}
-
-	/**
-	 * Print the months
-	 */
-	function _print_month_dropdown($sel = '') {
-			$output = "<option value=''>--</option>";
-			$output .= "<option " . ($sel == 1 ? ' selected' : '') . " value='01'>01 - " . __('Jan', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 2 ? ' selected' : '') . "	value='02'>02 - " . __('Feb', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 3 ? ' selected' : '') . "	value='03'>03 - " . __('Mar', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 4 ? ' selected' : '') . "	value='04'>04 - " . __('Apr', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 5 ? ' selected' : '') . "	value='05'>05 - " . __('May', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 6 ? ' selected' : '') . "	value='06'>06 - " . __('Jun', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 7 ? ' selected' : '') . "	value='07'>07 - " . __('Jul', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 8 ? ' selected' : '') . "	value='08'>08 - " . __('Aug', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 9 ? ' selected' : '') . "	value='09'>09 - " . __('Sep', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 10 ? ' selected' : '') . "	 value='10'>10 - " . __('Oct', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 11 ? ' selected' : '') . "	 value='11'>11 - " . __('Nov', 'mp') . "</option>";
-			$output .= "<option " . ($sel == 12 ? ' selected' : '') . "	 value='12'>12 - " . __('Dec', 'mp') . "</option>";
-
-			return($output);
-	}
-
 	/**
 	 * Use this to process any fields you added. Use the $_POST global,
 	 * and be sure to save it to both the $_SESSION and usermeta if logged in.
@@ -299,35 +129,35 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 	}
 	
 	/**
-   * Updates the gateway settings
-   *
-   * @since 3.0
-   * @access public
-   * @param array $settings
-   * @return array
-   */
-  public function update( $settings ) {
-  	if ( $val = $this->get_setting('private_key') ) {
-    	mp_push_to_array($settings, 'gateways->pin->api_credentials->private_key', $val);
-    	unset($settings['gateways']['api']['private_key']);	
-  	}
-  	
-  	if ( $val = $this->get_setting('public_key') ) {
-    	mp_push_to_array($settings, 'gateways->pin->api_credentials->public_key', $val);
-    	unset($settings['gateways']['api']['public_key']);	
-  	}
-  	
-    return $settings;
-  }
+	 * Updates the gateway settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $settings
+	 * @return array
+	 */
+	public function update( $settings ) {
+		if ( $val = $this->get_setting('private_key') ) {
+			mp_push_to_array($settings, 'gateways->pin->api_credentials->private_key', $val);
+			unset($settings['gateways']['api']['private_key']);	
+		}
+		
+		if ( $val = $this->get_setting('public_key') ) {
+			mp_push_to_array($settings, 'gateways->pin->api_credentials->public_key', $val);
+			unset($settings['gateways']['api']['public_key']);	
+		}
+		
+		return $settings;
+	}
 	
 	/**
-   * Initialize the settings metabox
-   *
-   * @since 3.0
-   * @access public
-   */
-  public function init_settings_metabox() {
-  	$metabox = new WPMUDEV_Metabox(array(
+	 * Initialize the settings metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_settings_metabox() {
+		$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
 			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
@@ -352,15 +182,15 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 		
 		if ( $creds instanceof WPMUDEV_Field ) {
 			$creds->add_field('text', array(
-				'name' => $this->get_field_name('private_key'),
-				'label' => array('text' => __('Secret API Key', 'mp')),
+				'name' => 'private_key',
+				'label' => array('text' => __('Secret Key', 'mp')),
 				'validation' => array(
 					'required' => true,
 				),
 			));
 			$creds->add_field('text', array(
-				'name' => $this->get_field_name('public_key'),
-				'label' => array('text' => __('Publishable API Key', 'mp')),
+				'name' => 'public_key',
+				'label' => array('text' => __('Publishable Key', 'mp')),
 				'validation' => array(
 					'required' => true,
 				),
@@ -379,8 +209,8 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 				'required' => true,
 			),
 		));
-  }
-  
+	}
+	
 	/**
 	 * Use this to do the final payment. Create the order then process the payment. If
 	 * you know the payment is successful right away go ahead and change the order status
@@ -391,116 +221,103 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
-			$settings = get_option('mp_settings');
+		die( 'here' );
+		//make sure token is set at this point
+		if ( ! isset($_SESSION['card_token']) ) {
+				mp()->cart_checkout_error(__('The PIN Token was not generated correctly. Please go back and try again.', 'mp'));
+				return false;
+		}
 
-			//make sure token is set at this point
-			if ( ! isset($_SESSION['card_token']) ) {
-					mp()->cart_checkout_error(__('The PIN Token was not generated correctly. Please go back and try again.', 'mp'));
-					return false;
-			}
+		if ( $this->force_ssl ) {
+			$this->api_url = 'https://api.pin.net.au/1/charges';
+		} else {
+			$this->api_url = 'https://test-api.pin.net.au/1/charges';
+		}
+		
+		$token = $_SESSION['card_token'];
 
-			if ($this->force_ssl) {
-					define('PIN_API_CHARGE_URL', 'https://api.pin.net.au/1/charges');
-			} else {
-					define('PIN_API_CHARGE_URL', 'https://test-api.pin.net.au/1/charges');
-			}
+		if ($token) {
 
-			define('PIN_API_KEY', $this->private_key);
+				$totals = array();
+				$coupon_code = mp()->get_coupon_code();
+				
+				foreach ($cart as $product_id => $variations) {
+						foreach ($variations as $variation => $data) {
+							$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
+							$totals[] = $price;
+						}
+				}
 
-			$token = $_SESSION['card_token'];
+				$total = array_sum($totals);
 
-			if ($token) {
+				//shipping line
+				$shipping_tax = 0;
+				if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
+					$total += $shipping_price;
+					$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
+				}
+		
+				//tax line if tax inclusive pricing is off. It it's on it would screw up the totals
+				if ( ! mp_get_setting('tax->tax_inclusive') ) {
+					$tax_price = (mp()->tax_price(false) + $shipping_tax);
+					$total += $tax_price;
+				}
+				
+				$order_id = mp()->generate_order_id();
 
-					$totals = array();
-					$coupon_code = mp()->get_coupon_code();
+				try {
+					$args = array(
+						'httpversion' => '1.1',
+						'timeout' => mp_get_api_timeout( $this->plugin_name ),
+						'blocking' => true,
+						'compress' => true,
+						'headers' => array(
+							'Authorization' => 'Basic ' . base64_encode( $this->private_key . ':' . '' ),
+						),
+						'body' => array(
+							'amount' => (int) $total * 100,
+							'currency' => strtolower( $this->currency ),
+							'description' => sprintf( __( '%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo( 'name' ), $order_id, $_SESSION['mp_shipping_info']['email']),
+							'email' => mp_arr_get_value( 'email', $billing_info, '' ),
+							'ip_address' => $_SESSION['ip_address'],
+							'card_token' => $_SESSION['card_token']
+						),
+					);
+
+					$charge = wp_remote_post( $this->api_url, $args );
 					
-					foreach ($cart as $product_id => $variations) {
-							foreach ($variations as $variation => $data) {
-								$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-								$totals[] = $price;
-							}
-					}
+					$charge = json_decode( $charge['body'], true );
 
-					$total = array_sum($totals);
+					$charge = $charge['response'];
 
-					//shipping line
-					$shipping_tax = 0;
-					if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
-						$total += $shipping_price;
-						$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-					}
-			
-					//tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-					if ( ! mp_get_setting('tax->tax_inclusive') ) {
-						$tax_price = (mp()->tax_price(false) + $shipping_tax);
-						$total += $tax_price;
-					}
-					
-					$order_id = mp()->generate_order_id();
+					if ( $charge['success'] == true ) {
+							//setup our payment details
+							$payment_info = array();
+							$payment_info['gateway_public_name'] = $this->public_name;
+							$payment_info['gateway_private_name'] = $this->admin_name;
+							$payment_info['method'] = sprintf(__('%1$s Card %2$s', 'mp'), ucfirst($charge['card']['scheme']), $charge['card']['display_number']);
+							$payment_info['transaction_id'] = $charge['token'];
+							$timestamp = time();
+							$payment_info['status'][$timestamp] = __('Paid', 'mp');
+							$payment_info['total'] = $total;
+							$payment_info['currency'] = $this->currency;
 
-					try {
+							$order = mp()->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
 
-							$args = array(
-									'method' => 'POST',
-									'httpversion' => '1.1',
-									'timeout' => apply_filters('http_request_timeout', 30),
-									'blocking' => true,
-									'compress' => true,
-									'headers' => array('Authorization' => 'Basic ' . base64_encode(PIN_API_KEY . ':' . '')),
-									'body' => array(
-											'amount' => (int) $total * 100,
-											'currency' => strtolower($this->currency),
-											'description' => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']),
-											'email' => $_SESSION['mp_shipping_info']['email'],
-											'ip_address' => $_SESSION['ip_address'],
-											'card_token' => $_SESSION['card_token']
-									),
-									'cookies' => array()
-							);
-
-							$charge = wp_remote_post(PIN_API_CHARGE_URL, $args);
-
-							$charge = json_decode($charge['body'], true);
-
-							$charge = $charge['response'];
-
-							if ($charge['success'] == true) {
-									//setup our payment details
-									$payment_info = array();
-									$payment_info['gateway_public_name'] = $this->public_name;
-									$payment_info['gateway_private_name'] = $this->admin_name;
-									$payment_info['method'] = sprintf(__('%1$s Card %2$s', 'mp'), ucfirst($charge['card']['scheme']), $charge['card']['display_number']);
-									$payment_info['transaction_id'] = $charge['token'];
-									$timestamp = time();
-									$payment_info['status'][$timestamp] = __('Paid', 'mp');
-									$payment_info['total'] = $total;
-									$payment_info['currency'] = $this->currency;
-
-									$order = mp()->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
-
-									unset($_SESSION['card_token']);
-									mp()->set_cart_cookie(Array());
-							} else {
-									unset($_SESSION['card_token']);
-									mp()->cart_checkout_error(sprintf(__('There was an error processing your card. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')));
-									return false;
-							}
-					} catch (Exception $e) {
 							unset($_SESSION['card_token']);
-							mp()->cart_checkout_error(sprintf(__('There was an error processing your card: "%s". Please <a href="%s">go back and try again</a>.', 'mp'), $e->getMessage(), mp_checkout_step_url('checkout')));
+							mp()->set_cart_cookie(Array());
+					} else {
+							unset($_SESSION['card_token']);
+							mp()->cart_checkout_error(sprintf(__('There was an error processing your card. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')));
 							return false;
 					}
+			} catch (Exception $e) {
+					unset($_SESSION['card_token']);
+					mp()->cart_checkout_error(sprintf(__('There was an error processing your card: "%s". Please <a href="%s">go back and try again</a>.', 'mp'), $e->getMessage(), mp_checkout_step_url('checkout')));
+					return false;
 			}
+		}
 	}
-
-	/**
-	 * INS and payment return
-	 */
-	function process_ipn_return() {
-			;
-			$settings = get_option('mp_settings');
-	}
-
 }
 
 //register payment gateway plugin

@@ -25,6 +25,8 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	var $skip_form = true;
 	//credit card vars
 	var $API_Username, $API_Password, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
+  //if the gateway uses the order confirmation step during checkout (e.g. PayPal)
+  var $use_confirmation_step = true;
 	
 	/**
 	 * Refers to the gateways currencies
@@ -282,8 +284,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		$hash = strtoupper( md5( $this->API_Password . $this->API_Username . $order_num . $total ) );
 
 		if ( mp_get_request_value( 'key' ) == $hash && $mp_order_num ) {
-			 $status = __('The order has been received', 'mp');
-			 $paid = apply_filters('mp_twocheckout_post_order_paid_status', true);
+			$status = __('The order has been received', 'mp');
 	
 			$payment_info = array(
 				'gateway_public_name' => $this->public_name,
@@ -301,10 +302,10 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			 $order->save( array(
 				'cart' => mp_cart(),
 				'payment_info' => $payment_info,
-				'paid' => $paid,
+				'paid' => true,
 			 ) );
 			 
-			 wp_redirect( mp_store_page_url( 'order_status', false ) . $mp_order_num );
+			 wp_redirect( $order->tracking_url( false ) );
 		}
 		
 		die;
@@ -322,7 +323,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
-			'desc' => sprintf( __( '<ol><li>Set the "Return Method" within <a target="_blank" href="https://www.2checkout.com/sandbox/acct/detail_company_info">Site Management</a> to <strong>Header Redirect</strong> and set the "Return URL" to <strong>%s</strong></li><li>Set your <a target="https://www.2checkout.com/sandbox/notifications/">notifications url</a> to <strong>%s</strong></li></ol>', 'mp' ), $this->_get_checkout_return_url(), $this->ipn_url ),
+			'desc' => sprintf( __( '<ol><li>Set the "Return Method" within <a target="_blank" href="https://www.2checkout.com/sandbox/acct/detail_company_info">Site Management</a> to <strong>Header Redirect</strong> and set the "Return URL" to <strong>%s</strong></li><li>Set your <a target="https://www.2checkout.com/sandbox/notifications/">notifications url</a> to <strong>%s</strong></li></ol>', 'mp' ), $this->return_url, $this->ipn_url ),
 			'conditional' => array(
 				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
 				'value' => 1,

@@ -4,110 +4,110 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	//build
 	var $build = 2;
 	
-  //private gateway slug. Lowercase alpha (a-z) and underscores (_) only please!
-  var $plugin_name = 'paypal_express';
+	//private gateway slug. Lowercase alpha (a-z) and underscores (_) only please!
+	var $plugin_name = 'paypal_express';
 
-  //name of your gateway, for the admin side.
-  var $admin_name = '';
+	//name of your gateway, for the admin side.
+	var $admin_name = '';
 
-  //public name of your gateway, for lists and such.
-  var $public_name = '';
+	//public name of your gateway, for lists and such.
+	var $public_name = '';
 
-  //url for an image for your checkout method. Displayed on checkout form if set
-  var $method_img_url = '';
+	//url for an image for your checkout method. Displayed on checkout form if set
+	var $method_img_url = '';
 
-  //url for an submit button image for your checkout method. Displayed on checkout form if set
-  var $method_button_img_url = '';
+	//url for an submit button image for your checkout method. Displayed on checkout form if set
+	var $method_button_img_url = '';
 
-  //whether or not ssl is needed for checkout page
-  var $force_ssl = false;
+	//whether or not ssl is needed for checkout page
+	var $force_ssl = false;
 
-  //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
-  var $ipn_url;
+	//always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
+	var $ipn_url;
 
-  //whether if this is the only enabled gateway it can skip the payment_form step
-  var $skip_form = true;
+	//only required for global capable gateways. The maximum stores that can checkout at once
+	var $max_stores = 10;
 
-  //only required for global capable gateways. The maximum stores that can checkout at once
-  var $max_stores = 10;
+	// Payment action
+	var $payment_action = 'Sale';
 
-  // Payment action
-  var $payment_action = 'Sale';
-
-  //paypal vars
-  var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $paypalURL, $version, $currencyCode, $locale;
-  
-  /**
-   * List of supported currencies
-   *
-   * @since 3.0
-   * @access public
-   * @var array
-   */
-  var $currencies = array(
-      'AUD' => 'AUD - Australian Dollar',
-      'BRL' => 'BRL - Brazilian Real',
-      'CAD' => 'CAD - Canadian Dollar',
-      'CHF' => 'CHF - Swiss Franc',
-      'CZK' => 'CZK - Czech Koruna',
-      'DKK' => 'DKK - Danish Krone',
-      'EUR' => 'EUR - Euro',
-      'GBP' => 'GBP - Pound Sterling',
-      'ILS' => 'ILS - Israeli Shekel',
-      'HKD' => 'HKD - Hong Kong Dollar',
-      'HUF' => 'HUF - Hungarian Forint',
-      'JPY' => 'JPY - Japanese Yen',
-      'MYR' => 'MYR - Malaysian Ringgits',
-      'MXN' => 'MXN - Mexican Peso',
-      'NOK' => 'NOK - Norwegian Krone',
-      'NZD' => 'NZD - New Zealand Dollar',
-      'PHP' => 'PHP - Philippine Pesos',
-      'PLN' => 'PLN - Polish Zloty',
+	//paypal vars
+	var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $cancelURL, $API_Endpoint, $paypalURL, $version, $currencyCode, $locale;
+	
+	//use confirmation step
+	var $use_confirmation_step = true;
+	
+	/**
+	 * List of supported currencies
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var array
+	 */
+	var $currencies = array(
+			'AUD' => 'AUD - Australian Dollar',
+			'BRL' => 'BRL - Brazilian Real',
+			'CAD' => 'CAD - Canadian Dollar',
+			'CHF' => 'CHF - Swiss Franc',
+			'CZK' => 'CZK - Czech Koruna',
+			'DKK' => 'DKK - Danish Krone',
+			'EUR' => 'EUR - Euro',
+			'GBP' => 'GBP - Pound Sterling',
+			'ILS' => 'ILS - Israeli Shekel',
+			'HKD' => 'HKD - Hong Kong Dollar',
+			'HUF' => 'HUF - Hungarian Forint',
+			'JPY' => 'JPY - Japanese Yen',
+			'MYR' => 'MYR - Malaysian Ringgits',
+			'MXN' => 'MXN - Mexican Peso',
+			'NOK' => 'NOK - Norwegian Krone',
+			'NZD' => 'NZD - New Zealand Dollar',
+			'PHP' => 'PHP - Philippine Pesos',
+			'PLN' => 'PLN - Polish Zloty',
 			'RUB' => 'RUB - Russian Rubles',
-      'SEK' => 'SEK - Swedish Krona',
-      'SGD' => 'SGD - Singapore Dollar',
-      'TWD' => 'TWD - Taiwan New Dollars',
-      'THB' => 'THB - Thai Baht',
+			'SEK' => 'SEK - Swedish Krona',
+			'SGD' => 'SGD - Singapore Dollar',
+			'TWD' => 'TWD - Taiwan New Dollars',
+			'THB' => 'THB - Thai Baht',
 			'TRY' => 'TRY - Turkish lira',
-      'USD' => 'USD - U.S. Dollar'
-  );
-  
-  /**
-   * List of support locales
-   *
-   * @since 3.0
-   * @access public
-   * @var array
-   */
-  var $locales = array(
-    'AR'	=> 'Argentina',
-    'AU'	=> 'Australia',
-    'AT'	=> 'Austria',
-    'BE'	=> 'Belgium',
-    'BR'	=> 'Brazil',
-    'CA'	=> 'Canada',
-    'CN'	=> 'China',
+			'USD' => 'USD - U.S. Dollar'
+	);
+	
+	/**
+	 * List of support locales
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @var array
+	 */
+	var $locales = array(
+		'AR'	=> 'Argentina',
+		'AU'	=> 'Australia',
+		'AT'	=> 'Austria',
+		'BE'	=> 'Belgium',
+		'BR'	=> 'Brazil',
+		'CA'	=> 'Canada',
+		'CN'	=> 'China',
 		'FI'	=> 'Finland',
-    'FR'	=> 'France',
-    'DE'	=> 'Germany',
-    'HK'	=> 'Hong Kong',
-    'IE'	=> 'Ireland',
-    'IL'	=> 'Israel',
-    'IT'	=> 'Italy',
-    'JP'	=> 'Japan',
-    'MX'	=> 'Mexico',
-    'NL'	=> 'Netherlands',
-    'NZ'	=> 'New Zealand',
+		'FR'	=> 'France',
+		'DE'	=> 'Germany',
+		'HK'	=> 'Hong Kong',
+		'IE'	=> 'Ireland',
+		'IL'	=> 'Israel',
+		'IT'	=> 'Italy',
+		'JP'	=> 'Japan',
+		'MX'	=> 'Mexico',
+		'NL'	=> 'Netherlands',
+		'NZ'	=> 'New Zealand',
 		'PL'	=> 'Poland',
 		'RU'	=> 'Russia',
-    'SG'	=> 'Singapore',
-    'ES'	=> 'Spain',
-    'SE'	=> 'Sweden',
-    'CH'	=> 'Switzerland',
+		'SG'	=> 'Singapore',
+		'ES'	=> 'Spain',
+		'SE'	=> 'Sweden',
+		'CH'	=> 'Switzerland',
 		'TR' 	=> 'Turkey',
-    'GB'	=> 'United Kingdom',
-    'US'	=> 'United States'
-  );
+		'GB'	=> 'United Kingdom',
+		'US'	=> 'United States'
+	);
 
 	/**
 	 * Process an API call
@@ -130,22 +130,21 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			var_dump( $request );
 			die;
 		}
-
+		
 		//make API call
-	  $response = wp_remote_post( $this->API_Endpoint, array(
-	  	'user-agent' => 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/' . MP_VERSION,
+		$response = wp_remote_post( $this->API_Endpoint, array(
+			'user-agent' => 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/' . MP_VERSION,
 			'body' => http_build_query( $request ),
 			'sslverify' => false,
-			'timeout' => 60,
+			'timeout' => mp_get_api_timeout( $this->plugin_name ),
 			'httpversion' => '1.1',	//api call will fail without this!
 		) );
 		
-	  if ( is_wp_error( $response ) || 200 != wp_remote_retrieve_response_code( $response ) ) {
-	    mp_checkout()->add_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
-	    return false;
-	  } else {
-	    return $this->_deformat_nvp( $response['body'] );
-	  }
+		if ( is_wp_error( $response ) || 200 != wp_remote_retrieve_response_code( $response ) ) {
+			return new WP_Error( '', __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
+		} else {
+			return $this->_deformat_nvp( $response['body'] );
+		}
 	}
 
 	/**
@@ -161,6 +160,58 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	}
 
 	/**
+	 * Prepare the parameters for the DoExpressCheckoutPayment API Call
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param string $token
+	 * @param string $payer_id
+	 */
+	protected function _do_express_checkout_payment( $token, $payer_id ) {
+		$saved_request = (array) mp_get_session_value( 'paypal_request', array() );
+		$request = array_merge( $saved_request , array(
+			'TOKEN' => $token,
+			'PAYERID' => $payer_id,
+			'BUTTONSOURCE' => 'incsub_SP',
+		) );
+		
+		return $this->_api_call( 'DoExpressCheckoutPayment', $request );
+	}
+	
+	/**
+	 * Get error string from result array
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $result
+	 * @return string
+	 */
+	protected function _get_error( $result ) {
+		for ( $i = 0; $i <= 5; $i++ ) {
+			if ( isset($result["L_ERRORCODE{$i}"] ) ) {
+				$error .= '<li>' . $result["L_ERRORCODE{$i}"] . ' - ' . $result["L_LONGMESSAGE{$i}"] . '</li>';
+			 }
+		}
+		
+		return $error;
+	}
+
+	/**
+	 * Prepare the parameters for the GetExpressCheckoutDetails API Call
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @return array
+	 */
+	protected function _get_express_checkout_details( $token )	{
+		$request = array(
+			'TOKEN' => $token,
+		);
+		
+		return $this->_api_call( 'GetExpressCheckoutDetails', $request );
+	}
+	
+	/**
 	 * Redirect to PayPal site
 	 *
 	 * @since 3.0
@@ -168,8 +219,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 * @access protected
 	 */
 	function _redirect_to_paypal( $token ) {
-	  wp_redirect( $this->paypalURL . $token );
-	  exit;
+		 wp_redirect( $this->paypalURL . $token );
+		 exit;
 	}
 
  
@@ -179,35 +230,39 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 * @since 3.0
 	 * @access protected
 	 */
-  protected function _set_express_checkout( $cart, $billing_info, $shipping_info, $order_id )	{
-	  $blog_id = $current_blog_id = get_current_blog_id();
-	  $items = $cart->get_items_as_objects();
-	  $subtotal = 0;
-	  
-	  $request = array();
-	  $request['RETURNURL'] = $this->returnURL;
-	  $request['CANCELURL'] = $this->cancelURL;
-    $request['ADDROVERRIDE'] = 1;
-    $request['NOSHIPPING'] = 2;
-    $request['LANDINGPAGE'] = 'Billing';
-    $request['SOLUTIONTYPE'] = 'Sole';
-    $request['LOCALECODE'] = $this->locale;
-    $request['EMAIL'] = mp_arr_get_value( 'email', $billing_info, '' );
+	protected function _set_express_checkout( $cart, $billing_info, $shipping_info, $order_id )	{
+		$blog_id = $current_blog_id = get_current_blog_id();
+		$items = $cart->get_items_as_objects();
+		$subtotal = 0;
+		 
+		$request = array();
+		$request['RETURNURL'] = $this->return_url;
+		$request['CANCELURL'] = $this->cancel_url;
+		$request['ADDROVERRIDE'] = 1;
+		$request['NOSHIPPING'] = 0; // don't display shipping fields by default
+		$request['ALLOWNOTE'] = 0; // dont allow buyers to add note
+		$request['LANDINGPAGE'] = 'Billing';
+		$request['SOLUTIONTYPE'] = 'Sole';
+		$request['LOCALECODE'] = $this->locale;
+		$request['CHANNELTYPE'] = 'Merchant';
+		$request['TOTALTYPE'] = 'Total';
+		$request['EMAIL'] = mp_arr_get_value( 'email', $billing_info, '' );
 
-    //formatting
-    $request['HDRIMG'] = $this->get_setting( 'header_img', '' );
-    $request['HDRBORDERCOLOR'] = $this->get_setting( 'header_border', '' );
-    $request['HDRBACKCOLOR'] = $this->get_setting( 'header_back', '' );
-    $request['PAYFLOWCOLOR'] = $this->get_setting( 'page_back', '' );
+		//formatting
+		$request['HDRIMG'] = $this->get_setting( 'header_img', '' );
+		$request['HDRBORDERCOLOR'] = $this->get_setting( 'header_border', '' );
+		$request['HDRBACKCOLOR'] = $this->get_setting( 'header_back', '' );
+		$request['PAYFLOWCOLOR'] = $this->get_setting( 'page_back', '' );
 
 		//setup payment request
-    //$request['PAYMENTREQUEST_0_SELLERPAYPALACCOUNTID'] = $this->API_Username;
-    $request['PAYMENTREQUEST_0_PAYMENTACTION'] = $this->payment_action;
-    $request['PAYMENTREQUEST_0_CURRENCYCODE'] = $this->currencyCode;
-    $request['PAYMENTREQUEST_0_NOTIFYURL'] = $this->ipn_url;
+		$request['PAYMENTREQUEST_0_PAYMENTACTION'] = $this->payment_action;
+		$request['PAYMENTREQUEST_0_CURRENCYCODE'] = $this->currencyCode;
+		$request['PAYMENTREQUEST_0_NOTIFYURL'] = $this->ipn_url;
+		$request['PAYMENTREQUEST_0_CUSTOM'] = $this->_crc( $cart->get_items() );
 
-		if ( ! $cart->is_download_only() && 'none' != mp_get_setting( 'shipping->method' ) ) {
-			$request['PAYMENTREQUEST_0_SHIPTONAME'] = $this->trim_name( mp_arr_get_value( 'name', $shipping_info, '' ), 128 );
+		if ( 'none' != mp_get_setting( 'shipping->method' ) ) {
+			$name = mp_arr_get_value( 'first_name', $shipping_info, '' ) . ' ' . mp_arr_get_value( 'last_name', $shipping_info, '' );
+			$request['PAYMENTREQUEST_0_SHIPTONAME'] = $this->trim_name( $name , 128 );
 			$request['PAYMENTREQUEST_0_SHIPTOSTREET'] = $this->trim_name( mp_arr_get_value( 'address1', $shipping_info, '' ), 100 );
 			$request['PAYMENTREQUEST_0_SHIPTOSTREET2'] = $this->trim_name( mp_arr_get_value( 'address2', $shipping_info, '' ), 100 );
 			$request['PAYMENTREQUEST_0_SHIPTOCITY'] = $this->trim_name( mp_arr_get_value( 'city', $shipping_info, '' ), 40 );
@@ -215,11 +270,12 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$request['PAYMENTREQUEST_0_SHIPTOZIP'] = $this->trim_name( mp_arr_get_value( 'zip', $shipping_info, '' ), 20 );
 			$request['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $this->trim_name( mp_arr_get_value( 'country', $shipping_info, '' ), 2 );
 			$request['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = $this->trim_name( mp_arr_get_value( 'phone', $shipping_info, '' ), 20 );
+			$request['NOSHIPPING'] = 2; //enable shipping fields
 		}
 
 		$i = 0;
-    foreach ( $items as $item ) {
-	    $price = $item->get_price( 'lowest' );
+		foreach ( $items as $item ) {
+			$price = $item->get_price( 'lowest' );
 
 			if ( $price <= 0 ) {
 				//skip free products to avoid paypal error
@@ -227,118 +283,108 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			}
 			
 			$subtotal += $price;
-
-		  $request["PAYMENTREQUEST_0_NAME{$i}"] = $this->trim_name( $item->title( false ) );
-		  $request["PAYMENTREQUEST_0_AMT{$i}"] = $price;
-		  $request["PAYMENTREQUEST_0_NUMBER{$i}"] = $item->get_meta( 'sku', '' );
-		  $request["PAYMENTREQUEST_0_QTY{$i}"] = $item->qty;
-		  $request["PAYMENTREQUEST_0_ITEMURL{$i}"] = $item->url( false );
-		  $request["PAYMENTREQUEST_0_ITEMCATEGORY{$i}"] = 'Physical';
-		  $i++;
+			$request["PAYMENTREQUEST_0_NAME{$i}"] = $this->trim_name( $item->title( false ) );
+			$request["PAYMENTREQUEST_0_AMT{$i}"] = $price;
+			$request["PAYMENTREQUEST_0_NUMBER{$i}"] = $item->get_meta( 'sku', '' );
+			$request["PAYMENTREQUEST_0_QTY{$i}"] = $item->qty;
+			$request["PAYMENTREQUEST_0_ITEMURL{$i}"] = $item->url( false );
+			$request["PAYMENTREQUEST_0_ITEMCATEGORY{$i}"] = 'Physical';
+			$i++;
 		}
-      
-    $request["PAYMENTREQUEST_0_ITEMAMT"] = $subtotal; //items subtotal
+			
+		$request["PAYMENTREQUEST_0_ITEMAMT"] = $subtotal; //items subtotal
 
-    //shipping total
-    if ( ($shipping_price = $cart->shipping_total( false )) !== false ) {
+		//shipping total
+		if ( ($shipping_price = $cart->shipping_total( false )) !== false ) {
 			$request["PAYMENTREQUEST_0_SHIPPINGAMT"] = $shipping_price;
-    }
+		}
 
-    //tax total - only if tax inclusive pricing is off. It it's on it would screw up the totals.
-    if ( ! mp_get_setting('tax->tax_inclusive') ) {
-    	$tax_total = $cart->tax_total( false );
+		//tax total - only if tax inclusive pricing is off. It it's on it would screw up the totals.
+		if ( ! mp_get_setting('tax->tax_inclusive') ) {
+			$tax_total = $cart->tax_total( false );
 			$request["PAYMENTREQUEST_0_TAXAMT"] = $tax_total;
-    }
+		}
 
-    //order details
-    $request["PAYMENTREQUEST_0_DESC"] = $this->trim_name( sprintf( __( '%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo( 'name' ), $order_id ) );
-    $request["PAYMENTREQUEST_0_AMT"] = $cart->total( false );
-    $request["PAYMENTREQUEST_0_INVNUM"] = $order_id;
-    $request["PAYMENTREQUEST_0_PAYMENTREQUESTID"] = $blog_id . ':' . $order_id;
+		//order details
+		$request["PAYMENTREQUEST_0_DESC"] = $this->trim_name( sprintf( __( '%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo( 'name' ), $order_id ) );
+		$request["PAYMENTREQUEST_0_AMT"] = $cart->total( false );
+		$request["PAYMENTREQUEST_0_INVNUM"] = $order_id;
+		$request["PAYMENTREQUEST_0_PAYMENTREQUESTID"] = $blog_id . ':' . $order_id;
 
-    if ( $this->payment_action == 'Sale' ) {
+		if ( $this->payment_action == 'Sale' ) {
 			$request["PAYMENTREQUEST_0_ALLOWEDPAYMENTMETHOD"] = 'InstantPaymentOnly';
-    }
-    
-		$nvpstr = http_build_query( $request );
-		mp_update_session_value( 'nvpstr', $nvpstr );
+		}
+		
+		// save this request to session for later use
+		mp_update_session_value( 'paypal_request', $request );
+		
+		return $this->_api_call( 'SetExpressCheckout', $request );
+	}
 
-    $response = $this->_api_call( 'SetExpressCheckout', $request );
-    $ack = strtoupper( mp_arr_get_value( 'ACK', $response, '' ) );
-    
-    if( 'SUCCESS' == $ack || 'SUCCESSWITHWARNING' == $ack )	{
-      $token = mp_arr_get_value( 'TOKEN', $response, '' );
-      mp_update_session_value( 'TOKEN', $token );
-    }
-    
-    return $response;
-  }
+	/**
+	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
+	 */
+	function on_creation() {
+		//set names here to be able to translate
+		$this->admin_name = __('PayPal Express Checkout', 'mp');
+		$this->public_name = __('PayPal', 'mp');
 
-  /**
-   * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
-   */
-  function on_creation() {
-    //set names here to be able to translate
-    $this->admin_name = __('PayPal Express Checkout', 'mp');
-    $this->public_name = __('PayPal', 'mp');
+		//dynamic button img, see: https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECButtonIntegration
+		$this->method_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&buttontype=ecmark&locale=' . get_locale();
+		$this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
 
-    //dynamic button img, see: https://cms.paypal.com/us/cgi-bin/?&cmd=_render-content&content_ID=developer/e_howto_api_ECButtonIntegration
-    $this->method_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&buttontype=ecmark&locale=' . get_locale();
-    $this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
+		$this->API_Username = $this->get_setting('api_credentials->username');
+		$this->API_Password = $this->get_setting('api_credentials->password');
+		$this->API_Signature = $this->get_setting('api_credentials->signature');
+		$this->currencyCode = $this->get_setting('currency', mp_get_setting('currency'));
+		$this->locale = $this->get_setting('locale');
+		$this->cancelURL = add_query_arg( 'cancel', '1', mp_store_page_url( 'checkout', false ) );
+		$this->version = '69.0'; //api version
 
-    $this->API_Username = $this->get_setting('api_credentials->username');
-    $this->API_Password = $this->get_setting('api_credentials->password');
-    $this->API_Signature = $this->get_setting('api_credentials->signature');
-    $this->currencyCode = $this->get_setting('currency', mp_get_setting('currency'));
-    $this->locale = $this->get_setting('locale');
-    $this->returnURL = $this->_get_checkout_return_url();
-  	$this->cancelURL = add_query_arg( 'cancel', '1', mp_store_page_url( 'checkout', false ) );
-    $this->version = "69.0"; //api version
-
-    // Set api urls
-  	if ( $this->get_setting('mode') == 'sandbox' )	{
-  		$this->API_Endpoint = "https://api-3t.sandbox.paypal.com/nvp";
-  		$this->paypalURL = "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=";
-  	} else {
-  		$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
-  		$this->paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
-    }
-  }
-  
-  /**
-   * Updates the gateway settings
-   *
-   * @since 3.0
-   * @access public
-   * @param array $settings
-   * @return array
-   */
-  function update( $settings ) {
+		// Set api urls
+		if ( $this->get_setting('mode') == 'sandbox' )	{
+			$this->API_Endpoint = "https://api-3t.sandbox.paypal.com/nvp";
+			$this->paypalURL = "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=";
+		} else {
+			$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
+			$this->paypalURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
+		}
+	}
+	
+	/**
+	 * Updates the gateway settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $settings
+	 * @return array
+	 */
+	function update( $settings ) {
 		if ( ($api_user = $this->get_setting('api_user')) && ($api_pass = $this->get_setting('api_pass')) && ($api_sig = $this->get_setting('api_sig')) ) {
-	    // Update api user
-	    mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->username', $api_user);
-	    
-	    // Update api pass
-	    mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->password', $api_pass);
-	    
-	    // Update api signature
-	    mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->signature', $api_sig);
-	    
-	    // Unset old keys
-	    unset($settings['gateways']['paypal_express']['api_user'], $settings['gateways']['paypal_express']['api_pass'], $settings['gateways']['paypal_express']['api_sig']);
-	  }
-	  
-	  return $settings;
-  }
+			 // Update api user
+			 mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->username', $api_user);
+			 
+			 // Update api pass
+			 mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->password', $api_pass);
+			 
+			 // Update api signature
+			 mp_push_to_array($settings, 'gateways->paypal_express->api_credentials->signature', $api_sig);
+			 
+			 // Unset old keys
+			 unset($settings['gateways']['paypal_express']['api_user'], $settings['gateways']['paypal_express']['api_pass'], $settings['gateways']['paypal_express']['api_sig']);
+		 }
+		 
+		 return $settings;
+	}
 
-  /**
-   * Init network settings metaboxes
-   *
-   * @since 3.0
-   * @access public
-   */
-  function init_network_settings_metabox() {
-	  $metabox = new WPMUDEV_Metabox(array(
+	/**
+	 * Init network settings metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function init_network_settings_metabox() {
+		 $metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
 			'page_slugs' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
 			'title' => __('Paypal Express Network Settings', 'mp'),
@@ -359,15 +405,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		));
 		$this->common_metabox_fields($metabox);
 	}
-	  
-  /**
-   * Init settings metaboxes
-   *
-   * @since 3.0
-   * @access public
-   */
-  function init_settings_metabox() {
-	  $metabox = new WPMUDEV_Metabox(array(
+		 
+	/**
+	 * Init settings metaboxes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function init_settings_metabox() {
+		 $metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
 			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => __('Paypal Express Checkout Settings', 'mp'),
@@ -380,32 +426,32 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			),
 		));
 		$this->common_metabox_fields($metabox);
-  }
-  
-  /**
-   * Both network settings and blog setting use these same fields
-   *
-   * @since 3.0
-   * @access public
-   * @param WPMUDEV_Metabox $metabox
-   */
-  function common_metabox_fields( $metabox ) {
+	}
+
+	/**
+	 * Both network settings and blog setting use these same fields
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param WPMUDEV_Metabox $metabox
+	 */
+	function common_metabox_fields( $metabox ) {
 		$metabox->add_field('advanced_select', array(
-			'name' => 'gateways[' . $this->plugin_name . '][locale]',
+			'name' => $this->get_field_name( 'locale' ),
 			'label' => array('text' => __('Locale', 'mp')),
 			'multiple' => false,
 			'options' => $this->locales,
 			'width' => 'element',
 		));
 		$metabox->add_field('advanced_select', array(
-			'name' => 'gateways[' . $this->plugin_name . '][currency]',
+			'name' => $this->get_field_name( 'currency' ),
 			'label' => array('text' => __('Currency', 'mp')),
 			'multiple' => false,
 			'options' => $this->currencies,
 			'width' => 'element',
 		));
 		$metabox->add_field('radio_group', array(
-			'name' => 'gateways[' . $this->plugin_name . '][mode]',
+			'name' => $this->get_field_name( 'mode' ),
 			'label' => array('text' => __('Mode', 'mp')),
 			'default_value' => 'sandbox',
 			'options' => array(
@@ -414,7 +460,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			),
 		));
 		$creds = $metabox->add_field('complex', array(
-			'name' => 'gateways[' . $this->plugin_name . '][api_credentials]',
+			'name' => $this->get_field_name( 'api_credentials' ),
 			'label' => array('text' => __('API Credentials', 'mp')),
 			'desc' => __('You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">Instructions &raquo;</a>', 'mp'),
 		));
@@ -444,642 +490,373 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		}
 		
 		$metabox->add_field('file', array(
-			'name' => 'gateways' . $this->plugin_name . '][header_img]',
+			'name' => $this->get_field_name( 'header_img' ),
 			'label' => array('text' => __('Header Image', 'mp')),
 			'desc' => __('URL for an image you want to appear at the top left of the payment page. The image has a maximum size of 750 pixels wide by 90 pixels high. PayPal recommends that you provide an image that is stored on a secure (https) server. If you do not specify an image, the business name is displayed.', 'mp'),
 		));
 		$metabox->add_field('colorpicker', array(
-			'name' => 'gateways[' . $this->plugin_name . '][header_border]',
+			'name' => $this->get_field_name( 'header_border' ),
 			'label' => array('text' => __('Header Border Color', 'mp')),
 			'desc' => __('Sets the border color around the header of the payment page. The border is a 2-pixel perimeter around the header space, which is 750 pixels wide by 90 pixels high. By default, the color is black.', 'mp'),
 		));
 		$metabox->add_field('colorpicker', array(
-			'name' => 'gateways[' . $this->plugin_name . '][header_back]',
+			'name' => $this->get_field_name( 'header_back' ),
 			'label' => array('text' => __('Header Background Color', 'mp')),
 			'desc' => __('Sets the background color for the header of the payment page. By default, the color is white.', 'mp'),
 		));
 		$metabox->add_field('colorpicker', array(
-			'name' => 'gateways[' . $this->plugin_name . '][page_back]',
+			'name' => $this->get_field_name( 'page_back' ),
 			'label' => array('text' => __('Page Background Color', 'mp')),
 			'desc' => __('Sets the background color for the payment page. By default, the color is white.', 'mp'),
-		));	  
-  }
-  
+		));		
+	}
+	
   /**
-   * Return fields you need to add to the payment screen, like your credit card info fields.
-   *  If you don't need to add form fields set $skip_form to true so this page can be skipped
-   *  at checkout.
+   * Get the confirm order html
    *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
+   * @since 3.0
+   * @access public
+   * @filter mp_checkout/confirm_order_html/{plugin_name}
    */
-  function payment_form( $cart, $shipping_info ) {
-	  return __( 'You will be redirected to the PayPal site to finalize your payment.', 'mp' );
-  }
+  public function confirm_order_html( $html ) {
+		$html .= '
+			<input type="hidden" name="mp_paypal_token" value="' . mp_get_get_value( 'token' ) . '" />
+			<input type="hidden" name="mp_paypal_payer_id" value="' . mp_get_get_value( 'PayerID' ) . '" />
+			<div style="display:none"><input type="radio" name="payment_method" value="' . $this->plugin_name . '" checked /></div>';
+		$html .= parent::confirm_order_html( $html );
+		return $html;
+	}
+	
+	/**
+	 * Return fields you need to add to the payment screen, like your credit card info fields.
+	 *	If you don't need to add form fields set $skip_form to true so this page can be skipped
+	 *	at checkout.
+	 *
+	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 */
+	function payment_form( $cart, $shipping_info ) {
+		return __( 'You will be redirected to the PayPal site to finalize your payment.', 'mp' );
+	}
 
-  /**
-   * Use this to authorize ordered transactions.
-   *
-   * @param array $order Contains the list of order ids
-   */
-  function process_payment_authorize($orders) {
-    if (is_array($orders)) {
-      foreach ($orders as $order) {
+	/**
+	 * Use this to authorize ordered transactions.
+	 *
+	 * @param array $order Contains the list of order ids
+	 */
+	function process_payment_authorize($orders) {
+		if (is_array($orders)) {
+			foreach ($orders as $order) {
 				$transaction_id = $order['transaction_id'];
 				$amount = $order['amount'];
 
 				$authorization = $this->DoAuthorization($transaction_id, $amount);
 
 				switch ($result["PAYMENTSTATUS"]) {
-				  case 'Canceled-Reversal':
-				    $status = __('A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.', 'mp');
-				    $authorized = true;
-				    break;
-				  case 'Expired':
-				    $status = __('The authorization period for this payment has been reached.', 'mp');
-				    $authorized = false;
-				    break;
-				  case 'Voided':
-				    $status = __('An authorization for this transaction has been voided.', 'mp');
-				    $authorized = false;
-				    break;
-				  case 'Failed':
-				    $status = __('The payment has failed. This happens only if the payment was made from your customer\'s bank account.', 'mp');
-				    $authorized = false;
-				    break;
-				  case 'Partially-Refunded':
-				    $status = __('The payment has been partially refunded.', 'mp');
-				    $authorized = true;
-				    break;
-				  case 'In-Progress':
-				    $status = __('The transaction has not terminated, e.g. an authorization may be awaiting completion.', 'mp');
-				    $authorized = false;
-				    break;
-				  case 'Completed':
-				    $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
-				    $authorized = true;
-				    break;
-				  case 'Processed':
-				    $status = __('A payment has been accepted.', 'mp');
-				    $authorized = true;
-				    break;
-				  case 'Reversed':
-				    $status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer', 'mp');
-				    $reverse_reasons = array(
-				      'none' => '',
-				      'chargeback' => __('A reversal has occurred on this transaction due to a chargeback by your customer.', 'mp'),
-				      'guarantee' => __('A reversal has occurred on this transaction due to your customer triggering a money-back guarantee.', 'mp'),
-				      'buyer-complaint' => __('A reversal has occurred on this transaction due to a complaint about the transaction from your customer.', 'mp'),
-				      'refund' => __('A reversal has occurred on this transaction because you have given the customer a refund.', 'mp'),
-				      'other' => __('A reversal has occurred on this transaction due to an unknown reason.', 'mp')
-				      );
-				    $status .= ': ' . $reverse_reasons[$result["REASONCODE"]];
-				    $authorized = false;
-				    break;
-				  case 'Refunded':
-				    $status = __('You refunded the payment.', 'mp');
-				    $authorized = false;
-				    break;
-				  case 'Denied':
-				    $status = __('You denied the payment when it was marked as pending.', 'mp');
-				    $authorized = false;
-				    break;
-				  case 'Pending':
-				    $pending_str = array(
-				      'address' => __('The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences  section of your Profile.', 'mp'),
-				      'authorization' => __('The payment is pending because it has been authorized but not settled. You must capture the funds first.', 'mp'),
-				      'echeck' => __('The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp'),
-				      'intl' => __('The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp'),
-				      'multi-currency' => __('You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp'),
-				      'order' => __('The payment is pending because it is part of an order that has been authorized but not settled.', 'mp'),
-				      'paymentreview' => __('The payment is pending while it is being reviewed by PayPal for risk.', 'mp'),
-				      'unilateral' => __('The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp'),
-				      'upgrade' => __('The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp'),
-				      'verify' => __('The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp'),
-				      'other' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp'),
-				      '*' => ''
-				    );
-				    $status = __('The payment is pending', 'mp');
+					case 'Canceled-Reversal':
+						$status = __('A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.', 'mp');
+						$authorized = true;
+						break;
+					case 'Expired':
+						$status = __('The authorization period for this payment has been reached.', 'mp');
+						$authorized = false;
+						break;
+					case 'Voided':
+						$status = __('An authorization for this transaction has been voided.', 'mp');
+						$authorized = false;
+						break;
+					case 'Failed':
+						$status = __('The payment has failed. This happens only if the payment was made from your customer\'s bank account.', 'mp');
+						$authorized = false;
+						break;
+					case 'Partially-Refunded':
+						$status = __('The payment has been partially refunded.', 'mp');
+						$authorized = true;
+						break;
+					case 'In-Progress':
+						$status = __('The transaction has not terminated, e.g. an authorization may be awaiting completion.', 'mp');
+						$authorized = false;
+						break;
+					case 'Completed':
+						$status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
+						$authorized = true;
+						break;
+					case 'Processed':
+						$status = __('A payment has been accepted.', 'mp');
+						$authorized = true;
+						break;
+					case 'Reversed':
+						$status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer', 'mp');
+						$reverse_reasons = array(
+							'none' => '',
+							'chargeback' => __('A reversal has occurred on this transaction due to a chargeback by your customer.', 'mp'),
+							'guarantee' => __('A reversal has occurred on this transaction due to your customer triggering a money-back guarantee.', 'mp'),
+							'buyer-complaint' => __('A reversal has occurred on this transaction due to a complaint about the transaction from your customer.', 'mp'),
+							'refund' => __('A reversal has occurred on this transaction because you have given the customer a refund.', 'mp'),
+							'other' => __('A reversal has occurred on this transaction due to an unknown reason.', 'mp')
+							);
+						$status .= ': ' . $reverse_reasons[$result["REASONCODE"]];
+						$authorized = false;
+						break;
+					case 'Refunded':
+						$status = __('You refunded the payment.', 'mp');
+						$authorized = false;
+						break;
+					case 'Denied':
+						$status = __('You denied the payment when it was marked as pending.', 'mp');
+						$authorized = false;
+						break;
+					case 'Pending':
+						$pending_str = array(
+							'address' => __('The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences	 section of your Profile.', 'mp'),
+							'authorization' => __('The payment is pending because it has been authorized but not settled. You must capture the funds first.', 'mp'),
+							'echeck' => __('The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp'),
+							'intl' => __('The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp'),
+							'multi-currency' => __('You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp'),
+							'order' => __('The payment is pending because it is part of an order that has been authorized but not settled.', 'mp'),
+							'paymentreview' => __('The payment is pending while it is being reviewed by PayPal for risk.', 'mp'),
+							'unilateral' => __('The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp'),
+							'upgrade' => __('The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp'),
+							'verify' => __('The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp'),
+							'other' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp'),
+							'*' => ''
+						);
+						$status = __('The payment is pending', 'mp');
 						if (isset($pending_str[$result["PENDINGREASON"]]))
 							$status .= ': ' . $pending_str[$result["PENDINGREASON"]];
-				    $authorized = false;
-				    break;
-				  default:
-				    // case: various error cases
-				    $authorized = false;
+						$authorized = false;
+						break;
+					default:
+						// case: various error cases
+						$authorized = false;
 				}
 
 				if ($authorized) {
-				  update_post_meta($order['order_id'], 'mp_deal', 'authorized');
-				  update_post_meta($order['order_id'], 'mp_deal_authorization_id', $authorization['TRANSACTIONID']);
+					update_post_meta($order['order_id'], 'mp_deal', 'authorized');
+					update_post_meta($order['order_id'], 'mp_deal_authorization_id', $authorization['TRANSACTIONID']);
 				}
-      }
-    }
-  }
+			}
+		}
+	}
 
-  /**
-   * Use this to capture authorized transactions.
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $authorizations Contains the list of authorization ids
-   */
-  function process_payment_capture($authorizations) {
-    if (is_array($authorizations)) {
-      foreach ($authorizations as $authorization) {
+	/**
+	 * Use this to capture authorized transactions.
+	 *
+	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
+	 * @param array $authorizations Contains the list of authorization ids
+	 */
+	function process_payment_capture($authorizations) {
+		if (is_array($authorizations)) {
+			foreach ($authorizations as $authorization) {
 				$transaction_id = $authorization['transaction_id'];
 				$amount = $authorization['amount'];
 
 				$capture = $this->DoCapture($transaction_id, $amount);
 
 				update_post_meta($authorization['deal_id'], 'mp_deal', 'captured');
-      }
-    }
-  }
-
-  /**
-   * Use this to process any fields you added. Use the $_POST global,
-   *  and be sure to save it to both the $_SESSION and usermeta if logged in.
-   *  DO NOT save credit card details to usermeta as it's not PCI compliant.
-   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-   *  it will redirect to the next step.
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
-   */
-  /*function process_payment_form($global_cart, $shipping_info) {
-    ;
-    
-    //create order id for paypal invoice
-    $order_id = mp()->generate_order_id();
-    foreach ($global_cart as $bid => $cart) {
-      foreach ($cart as $product_id => $data) {
-				if ('deal' == get_post_type($product_id)) {
-				  $this->payment_action = 'Order';
-				}
-      }
-    }
-    //set it up with PayPal
-    $result = $this->_set_express_checkout($global_cart, $shipping_info, $order_id);
-    
-    //check response
-    if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
-      $token = urldecode($result["TOKEN"]);
-      $this->RedirectToPayPal($token);
-    } else { //whoops, error
-      for ($i = 0; $i <= 5; $i++) { //print the first 5 errors
-        if (isset($result["L_ERRORCODE$i"])) {
-          $error .= "<li>{$result["L_ERRORCODE$i"]} - {$result["L_SHORTMESSAGE$i"]} - {$result["L_LONGMESSAGE$i"]}</li>";
-        }
-      }
-      $error = '<br /><ul>' . $error . '</ul>';
-      mp()->cart_checkout_error( __('There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp') . $error );
-    }
-  } */
-
-  /**
-   * Return the chosen payment details here for final confirmation. You probably don't need
-   *  to post anything in the form as it should be in your $_SESSION var already.
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
-   */
-  function confirm_payment_form($global_cart, $shipping_info) {
-    ;
-
-    $content = '';
-
-    if (isset($_GET['token']) && isset($_GET['PayerID'])) {
-      $_SESSION['token'] = $_GET['token'];
-      $_SESSION['PayerID'] = $_GET['PayerID'];
-
-      //get details from PayPal
-      $result = $this->GetExpressCheckoutDetails($_SESSION['token']);
-
-      //check response
-  		if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
-
-        $account_name = ($result["BUSINESS"]) ? $result["BUSINESS"] : $result["EMAIL"];
-
-        //set final amount
-        $_SESSION['final_amt'] = 0;
-				$_SESSION['store_count'] = 0;
-
-				for ($i=0; $i<10; $i++) {
-				  if (!isset($result['PAYMENTREQUEST_'.$i.'_AMT'])) {
-				    continue;
-				  }
-				  $_SESSION['final_amt'] += $result['PAYMENTREQUEST_'.$i.'_AMT'];
-					$_SESSION['store_count']++;
-				}
-
-        //print payment details
-        $content .= '<p>' . sprintf(__('Please confirm your final payment for this order totaling %s. It will be made via your "%s" PayPal account.', 'mp'), mp()->format_currency('', $_SESSION['final_amt']), $account_name) . '</p>';
-
-  		} else { //whoops, error
-        for ($i = 0; $i <= 5; $i++) { //print the first 5 errors
-          if (isset($result["L_ERRORCODE$i"]))
-            $error .= "<li>{$result["L_ERRORCODE$i"]} - {$result["L_SHORTMESSAGE$i"]} - {$result["L_LONGMESSAGE$i"]}</li>";
-        }
-        $error = '<br /><ul>' . $error . '</ul>';
-        $content .= '<div class="mp_checkout_error">' . sprintf(__('There was a problem with your PayPal transaction. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . $error . '</div>';
-      }
-
-    } else {
-      $content .= '<div class="mp_checkout_error">' . sprintf(__('Whoops, looks like you skipped a step! Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . '</div>';
-    }
-
-    return $content;
-  }
-
-	/**
-	 * Use this to do the final payment. Create the order then process the payment. If
-	 * you know the payment is successful right away go ahead and change the order status
-	 * as well.
-	 *
-	 * @param MP_Cart $cart. Contains the MP_Cart object.
-	 * @param array $billing_info. Contains billing info and email in case you need it.
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
-	 */
-	/*function process_payment( $cart, $billing_info, $shipping_info ) {
-	  $blog_id = (is_multisite()) ? $blog_id : 1;
-	  $current_blog_id = $blog_id;
-
-	  if (!mp()->global_cart)
-	  	$selected_cart[$blog_id] = $global_cart;
-	  else
-	    $selected_cart = $global_cart;
-
-    if (isset($_SESSION['token']) && isset($_SESSION['PayerID']) && isset($_SESSION['final_amt'])) {
-      //attempt the final payment
-      $result = $this->DoExpressCheckoutPayment($_SESSION['token'], $_SESSION['PayerID']);
-
-      //check response
-      if($result["ACK"] == "Success" || $result["ACK"] == "SuccessWithWarning")	{
-
-        //setup our payment details
-  			$payment_info['gateway_public_name'] = $this->public_name;
-        $payment_info['gateway_private_name'] = $this->admin_name;
-				for ($i=0; $i<10; $i++) {
-				  if (!isset($result['PAYMENTINFO_'.$i.'_PAYMENTTYPE'])) {
-				    continue;
-				  }
-				  $payment_info['method'] = ($result["PAYMENTINFO_{$i}_PAYMENTTYPE"] == 'echeck') ? __('eCheck', 'mp') : __('PayPal balance, Credit Card, or Instant Transfer', 'mp');
-				  $payment_info['transaction_id'] = $result["PAYMENTINFO_{$i}_TRANSACTIONID"];
-
-				  $timestamp = time();//strtotime($result["PAYMENTINFO_{$i}_ORDERTIME"]);
-				  //setup status
-				  switch ($result["PAYMENTINFO_{$i}_PAYMENTSTATUS"]) {
-				    case 'Canceled-Reversal':
-				      $status = __('A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.', 'mp');
-				      $paid = true;
-				      break;
-				    case 'Expired':
-				      $status = __('The authorization period for this payment has been reached.', 'mp');
-				      $paid = false;
-				      break;
-				    case 'Voided':
-				      $status = __('An authorization for this transaction has been voided.', 'mp');
-				      $paid = false;
-				      break;
-				    case 'Failed':
-				      $status = __('The payment has failed. This happens only if the payment was made from your customer\'s bank account.', 'mp');
-				      $paid = false;
-				      break;
-				    case 'Partially-Refunded':
-				      $status = __('The payment has been partially refunded.', 'mp');
-				      $paid = true;
-				      break;
-				    case 'In-Progress':
-				      $status = __('The transaction has not terminated, e.g. an authorization may be awaiting completion.', 'mp');
-				      $paid = false;
-				      break;
-				    case 'Completed':
-				      $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
-				      $paid = true;
-				      break;
-				    case 'Processed':
-				      $status = __('A payment has been accepted.', 'mp');
-				      $paid = true;
-				      break;
-				    case 'Reversed':
-				      $status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer:', 'mp');
-				      $reverse_reasons = array(
-								'none' => '',
-								'chargeback' => __('A reversal has occurred on this transaction due to a chargeback by your customer.', 'mp'),
-								'guarantee' => __('A reversal has occurred on this transaction due to your customer triggering a money-back guarantee.', 'mp'),
-								'buyer-complaint' => __('A reversal has occurred on this transaction due to a complaint about the transaction from your customer.', 'mp'),
-								'refund' => __('A reversal has occurred on this transaction because you have given the customer a refund.', 'mp'),
-								'other' => __('A reversal has occurred on this transaction due to an unknown reason.', 'mp')
-								);
-				      $status .= '<br />' . $reverse_reasons[$result["PAYMENTINFO_{$i}_REASONCODE"]];
-				      $paid = false;
-				      break;
-				    case 'Refunded':
-				      $status = __('You refunded the payment.', 'mp');
-				      $paid = false;
-				      break;
-				    case 'Denied':
-				      $status = __('You denied the payment when it was marked as pending.', 'mp');
-				      $paid = false;
-				      break;
-				    case 'Pending':
-				      $pending_str = array(
-								'address' => __('The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences  section of your Profile.', 'mp'),
-								'authorization' => __('The payment is pending because it has been authorized but not settled. You must capture the funds first.', 'mp'),
-								'echeck' => __('The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp'),
-								'intl' => __('The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp'),
-								'multi-currency' => __('You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp'),
-								'order' => __('The payment is pending because it is part of an order that has been authorized but not settled.', 'mp'),
-								'paymentreview' => __('The payment is pending while it is being reviewed by PayPal for risk.', 'mp'),
-								'unilateral' => __('The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp'),
-								'upgrade' => __('The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp'),
-								'verify' => __('The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp'),
-								'other' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp'),
-								'*' => ''
-				      );
-				      $status = __('The payment is pending.', 'mp');
-				      $status .= '<br />' . $pending_str[$result["PAYMENTINFO_{$i}_PENDINGREASON"]];
-				      $paid = false;
-				      break;
-				    default:
-				      // case: various error cases
-				      $paid = false;
-				  }
-				  $status = $result["PAYMENTINFO_{$i}_PAYMENTSTATUS"] . ': '. $status;
-
-				  //status's are stored as an array with unix timestamp as key
-				  $payment_info['status'] = array();
-				  $payment_info['status'][$timestamp] = $status;
-				  $payment_info['currency'] = $result["PAYMENTINFO_{$i}_CURRENCYCODE"];
-				  $payment_info['total'] = $result["PAYMENTINFO_{$i}_AMT"];
-
-				  $payment_info['note'] = $result["NOTE"]; //optional, only shown if gateway supports it
-
-					//figure out blog_id of this payment to put the order into it
-          $unique_id = ($result["PAYMENTINFO_{$i}_PAYMENTREQUESTID"]) ? $result["PAYMENTINFO_{$i}_PAYMENTREQUESTID"] : $result["PAYMENTREQUEST_{$i}_PAYMENTREQUESTID"]; //paypal docs messed up, not sure which is valid return
-					@list($bid, $order_id) = explode(':', $unique_id);
-
-          if (is_multisite())
-						switch_to_blog($bid, true);
-
-					//succesful payment, create our order now
-	        mp()->create_order($_SESSION['mp_order'], $selected_cart[$bid], $shipping_info, $payment_info, $paid);
-				}
-
-        if (is_multisite())
-    			switch_to_blog($current_blog_id, true);
-
-        //success. Do nothing, it will take us to the confirmation page
-      } else { //whoops, error
-
-				for ($i = 0; $i <= 5; $i++) { //print the first 5 errors
-          if (isset($result["L_ERRORCODE$i"]))
-            $error .= "<li>{$result["L_ERRORCODE$i"]} - {$result["L_SHORTMESSAGE$i"]} - ".stripslashes($result["L_LONGMESSAGE$i"])."</li>";
-        }
-        $error = '<br /><ul>' . $error . '</ul>';
-        mp()->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase with PayPal. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) . $error );
-      }
-    } else {
-      mp()->cart_checkout_error( sprintf(__('There was a problem finalizing your purchase with PayPal. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')) );
-    }
-  } */
-  
-  function process_payment( $cart, $billing_info, $shipping_info ) {
-    //create order id for paypal invoice
-    $order = new MP_Order();
-    $order_id = $order->get_id();
-    
-    //set it up with PayPal
-    $result = $this->_set_express_checkout( $cart, $billing_info, $shipping_info, $order_id );
-    
-    //check response
-    if( 'Success' == mp_arr_get_value( 'ACK', $result ) || 'SuccessWithWarning' == mp_arr_get_value( 'ACK', $result ) )	{
-      $token = urldecode( mp_arr_get_value( 'TOKEN', $result ) );
-      $this->_redirect_to_paypal( $token );
-    } else { //whoops, error
-	    $error = '<ul>';
-      for ( $i = 0; $i <= 5; $i++ ) { //print the first 5 errors
-        if ( $errorcode = mp_arr_get_value( "L_ERRORCODE{$i}", $result ) ) {
-          $error .= '<li>' . $errorcode . ' - ' . mp_arr_get_value( "L_SHORTMESSAGE{$i}", $result ) . ' - ' . mp_arr_get_value( "L_LONGMESSAGE{$i}", $result ) . '</li>';
-        }
-      }
-      $error .= '</ul>';
-      mp_checkout()->add_error( wpautop( __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) ) . $error );
-    }
-
-  }
-
-	/**
-   * Use to handle any payment returns from your gateway to the ipn_url. Do not echo anything here. If you encounter errors
-   *  return the proper headers to your ipn sender. Exits after.
-   */
-	function process_ipn_return() {
-    // PayPal IPN handling code
-    if ( mp_get_post_value('payment_status') && mp_get_post_value('txn_type') ) {
-
-			if ( $this->get_setting('mode') == 'sandbox' ) {
-        $domain = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
-			} else {
-				$domain = 'https://www.paypal.com/cgi-bin/webscr';
 			}
+		}
+	}
 
-			$req = 'cmd=_notify-validate';
+	function process_payment( $cart, $billing_info, $shipping_info ) {
+		if ( ($token = mp_get_post_value( 'mp_paypal_token' )) && ($payer_id = mp_get_post_value( 'mp_paypal_payer_id' )) ) {
+			// Buyer has already setup payment with PayPal - process order
+			$error = false;
+			$response = $this->_do_express_checkout_payment( $token, $payer_id );
 			
-			foreach ( $_POST as $k => $v ) {
-				if ( get_magic_quotes_gpc() ) {
-					$v = stripslashes($v);
+			if ( ! is_wp_error( $response ) ) {
+				if ( 'Success' == mp_arr_get_value( 'ACK', $response ) || 'SuccessWithWarning' == mp_arr_get_value( 'ACK', $response ) ) {
+					if ( $order_id = mp_get_session_value( 'paypal_request->PAYMENTREQUEST_0_INVNUM' ) ) {
+						$order = new MP_Order( $order_id );
+						$order->save( array(
+							'payment_info' => array(
+								'gateway_public_name' => $this->public_name,
+								'gateway_private_name' => $this->admin_name,
+								'status' => array(
+									$timestamp => __( 'Paid', 'mp' ),
+								),
+								'total' => $cart->total(),
+								'currency' => $this->currencyCode,
+								'transaction_id' => mp_arr_get_value( 'TRANSACTIONID', $response ),
+								'method' => __( 'Credit Card', 'mp' ),
+							),
+							'cart' => mp_cart(),
+							'paid' => true,
+						) );
+						
+						unset( $_SESSION['paypal_request'] );
+						
+						wp_redirect( $order->tracking_url( false ) );
+						exit;
+					}
+				} else {
+					$error = $this->_get_error( $response );
 				}
-				
-				$req .= '&' . $k . '=' . urlencode($v);
+			} else {
+				$error = $response->get_error_message();
 			}
 
-      $args['user-agent'] = 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/' . MP_VERSION;
-      $args['body'] = $req;
-      $args['sslverify'] = false;
-			$args['timeout'] = 30;
-
-      //use built in WP http class to work with most server setups
-    	$response = wp_remote_post($domain, $args);
-
-    	//check results
-    	if ( is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200 || $response['body'] != 'VERIFIED' ) {
-        header("HTTP/1.1 503 Service Unavailable");
-        _e( 'There was a problem verifying the IPN string with PayPal. Please try again.', 'mp' );
-        exit;
-      }
-
-			// process PayPal response
-			switch ( mp_get_post_value('payment_status') ) {
-
-			  case 'Canceled-Reversal':
-          $status = __('A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.', 'mp');
-          $paid = true;
-					break;
-
-        case 'Expired':
-          $status = __('The authorization period for this payment has been reached.', 'mp');
-          $paid = false;
-					break;
-
-        case 'Voided':
-          $status = __('An authorization for this transaction has been voided.', 'mp');
-          $paid = false;
-					break;
-
-        case 'Failed':
-          $status = __("The payment has failed. This happens only if the payment was made from your customer's bank account.", 'mp');
-          $paid = false;
-					break;
-
-   			case 'Partially-Refunded':
-          $status = __('The payment has been partially refunded.', 'mp');
-          $paid = true;
-					break;
-
-				case 'In-Progress':
-          $status = __('The transaction has not terminated, e.g. an authorization may be awaiting completion.', 'mp');
-          $paid = false;
-					break;
-
-				case 'Completed':
-          $status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
-          $paid = true;
-					break;
-
-				case 'Processed':
-					$status = __('A payment has been accepted.', 'mp');
-          $paid = true;
-					break;
-
-				case 'Reversed':
-					$status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer:', 'mp');
-          $reverse_reasons = array(
-            'none' => '',
-            'chargeback' => __('A reversal has occurred on this transaction due to a chargeback by your customer.', 'mp'),
-            'guarantee' => __('A reversal has occurred on this transaction due to your customer triggering a money-back guarantee.', 'mp'),
-            'buyer-complaint' => __('A reversal has occurred on this transaction due to a complaint about the transaction from your customer.', 'mp'),
-            'refund' => __('A reversal has occurred on this transaction because you have given the customer a refund.', 'mp'),
-            'other' => __('A reversal has occurred on this transaction due to an unknown reason.', 'mp')
-            );
-          $status .= '<br />' . $reverse_reasons[$result["PAYMENTINFO_0_REASONCODE"]];
-          $paid = false;
-					break;
-
-				case 'Refunded':
-					$status = __('You refunded the payment.', 'mp');
-          $paid = false;
-					break;
-
-				case 'Denied':
-					$status = __('You denied the payment when it was marked as pending.', 'mp');
-          $paid = false;
-					break;
-
-				case 'Pending':
-					$pending_str = array(
-						'address' => __('The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences  section of your Profile.', 'mp'),
-						'authorization' => __('The payment is pending because it has been authorized but not settled. You must capture the funds first.', 'mp'),
-						'echeck' => __('The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp'),
-						'intl' => __('The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp'),
-						'multi-currency' => __('You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp'),
-            'order' => __('The payment is pending because it is part of an order that has been authorized but not settled.', 'mp'),
-            'paymentreview' => __('The payment is pending while it is being reviewed by PayPal for risk.', 'mp'),
-            'unilateral' => __('The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp'),
-						'upgrade' => __('The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp'),
-						'verify' => __('The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp'),
-						'other' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp'),
-            '*' => ''
-						);
-          $status = __('The payment is pending.', 'mp');
-          $status .= '<br />' . $pending_str[$_POST["pending_reason"]];
-          $paid = false;
-					break;
-
-				default:
-					// case: various error cases
+			if ( false !== $error ) {
+				mp_checkout()->add_error( $error, 'order-review-payment' );
 			}
-      $status = mp_get_post_value('payment_status') . ': '. $status;
-
-      //record transaction
-      mp()->update_order_payment_status(mp_get_post_value('invoice'), $status, $paid);
-
+			
+			return;
+		}
+		
+		//create order id for paypal invoice
+		$order = new MP_Order();
+		$order_id = $order->get_id();
+		
+		//set it up with PayPal
+		$result = $this->_set_express_checkout( $cart, $billing_info, $shipping_info, $order_id );
+		
+		//check response
+		if ( ! is_wp_error( $result ) ) {
+			if( 'Success' == mp_arr_get_value( 'ACK', $result ) || 'SuccessWithWarning' == mp_arr_get_value( 'ACK', $result ) )	{
+				$token = urldecode( mp_arr_get_value( 'TOKEN', $result ) );
+				$this->_redirect_to_paypal( $token );
+			} else {
+				$error = $this->_get_error( $result );
+				mp_checkout()->add_error( $error, 'order-review-payment' );
+			}
 		} else {
-			// Did not find expected POST variables. Possible access attempt from a non PayPal site.
-			header('Status: 404 Not Found');
+			mp_checkout()->add_error( $result->get_error_message(), 'order-review-payment' );
+		}
+	}
+
+	/**
+	 * Use to handle any payment returns from your gateway to the ipn_url. Do not echo anything here. If you encounter errors
+	 *	return the proper headers to your ipn sender. Exits after.
+	 */
+	function process_ipn_return() {
+		$payment_status = mp_get_post_value( 'payment_status' );
+		$txn_type = mp_get_post_value( 'txn_type' );
+		$invoice = mp_get_post_value( 'invoice' );
+		
+		if ( empty( $payment_status) || empty( $txn_type ) || empty( $invoice ) ) {
+			header( 'Status: 404 Not Found' );
 			echo 'Error: Missing POST variables. Identification is not possible.';
 			exit;
 		}
-  }
-
-	//Purpose: 	Prepares the parameters for the GetExpressCheckoutDetails API Call.
-	function GetExpressCheckoutDetails( $token )	{
-		//'--------------------------------------------------------------
-		//' At this point, the buyer has completed authorizing the payment
-		//' at PayPal.  The function will call PayPal to obtain the details
-		//' of the authorization, incuding any shipping information of the
-		//' buyer.  Remember, the authorization is not a completed transaction
-		//' at this state - the buyer still needs an additional step to finalize
-		//' the transaction
-		//'--------------------------------------------------------------
-
-	    //'---------------------------------------------------------------------------
-		//' Build a second API request to PayPal, using the token as the
-		//'  ID to get the details on the payment authorization
-		//'---------------------------------------------------------------------------
-	  $nvpstr = "&TOKEN=" . $token;
-
-		//'---------------------------------------------------------------------------
-		//' Make the API call and store the results in an array.
-		//'	If the call was a success, show the authorization details, and provide
-		//' 	an action to complete the payment.
-		//'	If failed, show the error
-		//'---------------------------------------------------------------------------
-    $resArray = $this->_api_call("GetExpressCheckoutDetails", $nvpstr);
-    $ack = strtoupper($resArray["ACK"]);
-		if($ack == "SUCCESS" || $ack=="SUCCESSWITHWARNING") {
-			$_SESSION['payer_id'] =	$resArray['PAYERID'];
+		
+		$domain = 'https://www.paypal.com/cgi-bin/webscr';
+		if ( 'sandbox' == $this->get_setting( 'mode' ) ) {
+			$domain = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
 		}
-		return $resArray;
-	}
 
+		if ( get_magic_quotes_gpc() ) {
+			$_POST = array_map( 'stripslashes', $_POST );
+		}
 
-	//Purpose: 	Prepares the parameters for the DoExpressCheckoutPayment API Call.
-	function DoExpressCheckoutPayment($token, $payer_id) {
+		$req = array_merge( array( 'cmd' => '_notify-validate' ), $_POST );
+				
+		$response = wp_remote_post( $domain, array(
+			'user-agent' => 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | PayPal Express Plugin/' . MP_VERSION,
+			'body' => http_build_query( $req ),
+			'sslverify' => false,
+			'timeout' => mp_get_api_timeout( $this->plugin_name ),
+		) );
 
-		$nvpstr  = '&TOKEN=' . urlencode($token);
-	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
-		$nvpstr .= '&BUTTONSOURCE=incsub_SP';
-		$nvpstr .= $_SESSION['nvpstr'];
+		//check results
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response) != 200 || $response['body'] != 'VERIFIED' ) {
+			header("HTTP/1.1 503 Service Unavailable");
+			_e( 'There was a problem verifying the IPN string with PayPal. Please try again.', 'mp' );
+			exit;
+		}
+		
+		$order = new MP_Order( $invoice );
 
-	  /* Make the call to PayPal to finalize payment
-	    */
-	  return $this->_api_call("DoExpressCheckoutPayment", $nvpstr);
-	}
+		// process PayPal response
+		switch ( $payment_status ) {
+			 case 'Canceled-Reversal':
+				$status = __( 'A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.', 'mp' );
+				$paid = true;
+			break;
 
-	//Purpose: 	Prepares the parameters for the DoAuthorization API Call.
-	function DoAuthorization($transaction_id, $final_amt) {
+			case 'Expired':
+				$status = __('The authorization period for this payment has been reached.', 'mp');
+				$paid = false;
+			break;
 
-	  $nvpstr .= '&TRANSACTIONID=' . urlencode($transaction_id);
-	  $nvpstr .= '&AMT=' . $final_amt;
-	  $nvpstr .= '&TRANSACTIONENTITY=Order';
-	  $nvpstr .= '&CURRENCYCODE=' . $this->currencyCode;
+			case 'Voided':
+				$status = __('An authorization for this transaction has been voided.', 'mp');
+				$paid = false;
+			break;
 
-	  /* Make the call to PayPal to finalize payment
-	   */
-	  return $this->_api_call("DoAuthorization", $nvpstr);
-	}
+			case 'Failed':
+				$status = __("The payment has failed. This happens only if the payment was made from your customer's bank account.", 'mp');
+				$paid = false;
+			break;
 
-	//Purpose: 	Prepares the parameters for the DoCapture API Call.
-	function DoCapture($transaction_id, $final_amt) {
+ 			case 'Partially-Refunded':
+				$status = __('The payment has been partially refunded.', 'mp');
+				$paid = true;
+			break;
 
-	  $nvpstr .= '&AUTHORIZATIONID=' . urlencode($transaction_id);
-	  $nvpstr .= '&AMT=' . $final_amt;
-	  $nvpstr .= '&CURRENCYCODE=' . $this->currencyCode;
-	  $nvpstr .= '&COMPLETETYPE=Complete';
+			case 'In-Progress':
+				$status = __('The transaction has not terminated, e.g. an authorization may be awaiting completion.', 'mp');
+				$paid = false;
+			break;
 
-	  /* Make the call to PayPal to finalize payment
-	   */
-	  return $this->_api_call("DoCapture", $nvpstr);
+			case 'Completed':
+				$status = __('The payment has been completed, and the funds have been added successfully to your account balance.', 'mp');
+				$paid = true;
+			break;
+
+			case 'Processed':
+				$status = __('A payment has been accepted.', 'mp');
+				break;
+
+			case 'Reversed':
+				$status = __('A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer:', 'mp');
+				$reverse_reasons = array(
+					'none' => '',
+					'chargeback' => __('A reversal has occurred on this transaction due to a chargeback by your customer.', 'mp'),
+					'guarantee' => __('A reversal has occurred on this transaction due to your customer triggering a money-back guarantee.', 'mp'),
+					'buyer-complaint' => __('A reversal has occurred on this transaction due to a complaint about the transaction from your customer.', 'mp'),
+					'refund' => __('A reversal has occurred on this transaction because you have given the customer a refund.', 'mp'),
+					'other' => __('A reversal has occurred on this transaction due to an unknown reason.', 'mp')
+					);
+				$status .= '<br />' . mp_arr_get_value( mp_get_post_value( 'reason_code' ), $reverse_reasons, '' );
+				$paid = false;
+			break;
+
+			case 'Refunded':
+				$status = __('You refunded the payment.', 'mp');
+				$paid = false;
+			break;
+
+			case 'Denied':
+				$status = __('You denied the payment when it was marked as pending.', 'mp');
+				$paid = false;
+			break;
+
+			case 'Pending':
+				$pending_str = array(
+					'address' => __('The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences	 section of your Profile.', 'mp'),
+					'authorization' => __('The payment is pending because it has been authorized but not settled. You must capture the funds first.', 'mp'),
+					'echeck' => __('The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp'),
+					'intl' => __('The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp'),
+					'multi-currency' => __('You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp'),
+					'order' => __('The payment is pending because it is part of an order that has been authorized but not settled.', 'mp'),
+					'paymentreview' => __('The payment is pending while it is being reviewed by PayPal for risk.', 'mp'),
+					'unilateral' => __('The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp'),
+					'upgrade' => __('The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp'),
+					'verify' => __('The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp'),
+					'other' => __('The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp'),
+					'*' => ''
+					);
+				$status = __('The payment is pending.', 'mp');
+				$status .= '<br />' . mp_arr_get_value( mp_get_post_value( 'pending_reason' ), $pending_str, '' );
+				$paid = false;
+			break;
+		}
+		
+		if ( $order->post_status == 'order_paid' || $order->post_status == 'order_received' ) {
+			$order->change_status( ( $paid ) ? 'paid' : 'received' );
+		}
+		
+		$order->log_ipn_status( $payment_status . ': ' . $status );
 	}
 
 	function trim_name($name, $length = 127) {

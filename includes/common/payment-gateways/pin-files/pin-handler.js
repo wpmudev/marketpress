@@ -1,81 +1,116 @@
-jQuery(function($) {
+( function( $ ) {
+	var api = new Pin.Api( pin_vars.publishable_api_key, pin_vars.mode );
 
-    // Firstly, set the publishable key
-    //
-    // This can either be your live publishable key or test publishable key, depending
-    // on which script you included above
+	$( document ).on( 'mp_checkout/step_changed', function( evt, $out, $in ) {
+		if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
+			addInputNames();
+		}
+	} );	
+	  
+	$( document ).on( 'mp_checkout_process_pin', function( e, $form ) {
+		removeInputNames();
+		
+		console.log( $( '#mp-cc-exp' ).val() ); /*
+    var expObj = $.payment.cardExpiryVal( $( '#mp-cc-exp' ).val() );
+    var card = {
+      number: $( '#mp-cc-num' ).val().replace( /[^0-9]/ig, '' ),
+      name: $( '#mp-cc-name' ).val(),
+      expiry_month: expObj.month,
+      expiry_year: expObj.year,
+      cvc: $( '#mp-cc-cvc' ).val(),
+      address_line1: $( 'input[name="billing[address1]"]' ).val(),
+      address_line2: $( 'input[name="billing[address2]"]' ).val(),
+      address_city: $( 'input[name="billing[city]"]' ).val(),
+      address_state: $( 'input[name="billing[state]"]' ).val(),
+      address_postcode: $( 'input[name="billing[zip]"]' ).val(),
+      address_country: $( 'input[name="billing[country]"]' ).val()
+    };
 
-    Pin.setPublishableKey(pin_vars.publishable_api_key);
+    // Request a token for the card from Pin
+    api.createCardToken( card ).then( handleSuccess, handError ).done(); */
+  } );
 
-    // Now we can call Pin.js on form submission to retrieve a card token and submit
-    // it to the server
+	/**
+	 * Add input names for jQuery validation plugin
+	 *
+	 * Not ideal, but the jQuery validate plugin requires fields to have names
+	 * so this function will add them at the last possible minute
+	 *
+	 * @since 3.0
+	 */
+	function addInputNames() {
+		$( '#mp-cc-num' ).attr( 'name', 'mp_cc_num' );
+		$( '#mp-cc-exp' ).attr( 'name', 'mp_cc_exp' );
+		$( '#mp-cc-cvc' ).attr( 'name', 'mp_cc_cvc' );
+	}
 
-    var $form = jQuery('#mp_payment_form'),
-            $submitButton = jQuery("#mp_payment_confirm"),
-            $errors = jQuery('#pin_checkout_errors');
+	/**
+	 * Remove CC input names before submitting form for PCI compliance
+	 *
+	 * @since 3.0
+	 */
+	function removeInputNames() {
+		$( '#mp-cc-num, #mp-cc-exp, #mp-cc-cvc' ).removeAttr( 'name' );
+	}
+  
+	/**
+	 * Handle the success response from the createCardToken method
+	 *
+	 * @since 3.0
+	 * @param object card
+	 */
+	function handleSuccess( card ) {
+    var $div = $( '#mp-gateway-form-pin' );
+    var $form = $( '#mp-checkout' );
+    
+    // Add the card token and ip address of the customer to the form
+    // You will need to post these to Pin when creating the charge.
+    $('<input>')
+      .attr( { type: 'hidden', name: 'card_token' })
+      .val( response.response.token )
+      .appendTo( $div );
+            
+    $('<input>')
+      .attr( { type: 'hidden', name: 'ip_address' } )
+      .val( response.ip_address )
+      .appendTo( $div );
+    
+    //$form.get( 0 ).submit();
+  };
 
-    $form.submit(function(e) {
-
-        e.preventDefault();
-        $errors.hide();
-
-        // Disable the submit button to prevent multiple clicks
-        $submitButton.attr({disabled: true});
-
-        // Fetch details required for the createToken call to Pin
-        var card = {
-            number: $('#cc-number').val(),
-            name: $('#cc-name').val(),
-            expiry_month: $('#cc-expiry-month').val(),
-            expiry_year: $('#cc-expiry-year').val(),
-            cvc: $('#cc-cvc').val(),
-            address_line1: $('#address-line1').val(),
-            address_line2: $('#address-line2').val(),
-            address_city: $('#address-city').val(),
-            address_state: $('#address-state').val(),
-            address_postcode: $('#address-postcode').val(),
-            address_country: $('#address-country').val()
-        };
-
-        // Request a token for the card from Pin
-        Pin.createToken(card, handlePinResponse);
-    });
-
-    function handlePinResponse(response) {
-        var $form = jQuery('#mp_payment_form');
-
-        if (response.response) {
-            // Add the card token and ip address of the customer to the form
-            // You will need to post these to Pin when creating the charge.
-            $('<input>')
-                    .attr({type: 'hidden', name: 'card_token'})
-                    .val(response.response.token)
-                    .appendTo($form);
-            $('<input>')
-                    .attr({type: 'hidden', name: 'ip_address'})
-                    .val(response.ip_address)
-                    .appendTo($form);
-
-            // Resubmit the form
-            $form.get(0).submit();
-
-        } else {
-            var $errorList = $errors.find('ul');
-
-            $errors.find('h3').text(response.error_description);
-            $errorList.empty();
-
-            if (response.messages) {
-                $.each(response.messages, function(index, errorMessage) {
-                    $('<li>')
-                            .html('<font color="red">' + errorMessage.message + '</font>')
-                            .appendTo($errorList);
-                });
-            }
-
-            $errors.show();
-            $submitButton.removeAttr('disabled');
-        }
+	/**
+	 * Handle the error response from the createCardToken method
+	 *
+	 * @since 3.0
+	 * @param object response
+	 */
+	function handleError( response ) {
+    if ( response.messages ) {
+      var $errorList = $( '<ul>' );
+      $.each( response.messages, function( index, errorMessage ) {
+        $('<li>')
+          .html( errorMessage.message )
+          .appendTo( $errorList );
+      });
     }
-    ;
-});
+
+    errorMessage( 'show', $errorList.html(), false );		
+  };
+  
+  /**
+	 * Show/hide the payment error message
+	 *
+	 * @since 3.0
+	 * @param string action Either "show" or "hide".
+	 * @param string message The message to show. Required if action is "show".
+	 */
+	function errorMessage( action, message ) {
+		var $errors = $( '#mp-checkout-payment-form-errors' );
+		
+		if ( 'show' == action ) {
+			$errors.html( message ).addClass( 'show' );
+		} else {
+			$errors.removeClass( 'show' );
+		}
+	}
+}( jQuery ) );

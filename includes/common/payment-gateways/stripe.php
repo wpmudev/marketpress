@@ -199,7 +199,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			return;
 		}
 		
-		wp_enqueue_script( 'js-stripe', 'https://js.stripe.com/v2/', array( 'jquery' ), false );
+		wp_enqueue_script( 'js-stripe', 'https://js.stripe.com/v2/', array( 'jquery' ), null );
 		wp_enqueue_script( 'stripe-token', mp_plugin_url( 'includes/common/payment-gateways/stripe-files/stripe_token.js' ), array( 'js-stripe', 'jquery-ui-core' ), MP_VERSION );
 		wp_localize_script( 'stripe-token', 'stripe', array(
 			'publisher_key' => $this->publishable_key
@@ -414,7 +414,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		//make sure token is set at this point
 		$token = mp_get_post_value( 'stripe_token' );
 		if ( false === $token ) {
-			mp_cart()->add_error( __( 'The Stripe Token was not generated correctly. Please go back and try again.', 'mp'), 'payment' );
+			mp_checkout()->add_error( __( 'The Stripe Token was not generated correctly. Please go back and try again.', 'mp'), 'order-review-payment' );
 			return false;
 		}
 

@@ -91,6 +91,15 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
   var $skip_form = true;
   
   /**
+   * The API base url
+   *
+   * @since 3.0
+   * @access public
+   * @var string
+   */
+  var $api_url = '';
+  
+  /**
    * The gateway's currencies 
    *
    * @since 3.0
@@ -124,6 +133,9 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
     'NL'	=> 'Dutch'
   );
 
+  //if the gateway uses the order confirmation step during checkout (e.g. PayPal)
+  var $use_confirmation_step = true;
+
 
   /****** Below are the public methods you may overwrite via a plugin ******/
 
@@ -134,61 +146,19 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
     //set names here to be able to translate
     $this->admin_name = __('eWay Shared Payments', 'mp');
     $this->public_name = __('Credit Card', 'mp');
-
-    $this->method_img_url = mp_plugin_url('images/credit_card.png');
-    $this->method_button_img_url = mp_plugin_url('images/cc-button.png');
- 
-    $this->returnURL = mp_checkout_step_url('confirmation');
-  	$this->cancelURL = mp_checkout_step_url('checkout') . "?eway-cancel=1";
+    $this->returnURL = mp_store_page_url( 'checkout-confirm', false );
+  	$this->cancelURL = mp_store_page_url( 'checkout', false ) . "?eway-cancel=1";
 
     //set api urls
-  	if ( $this->get_setting('mode') == 'sandbox')	{
+  	if ( 'sandbox' == $this->get_setting( 'mode' ) )	{
   		$this->CustomerID = '87654321';
   		$this->UserName = 'TestAccount';
+  		$this->api_url = 'https://payment.ewaygateway.com';
   	} else {
-  		$this->CustomerID = $this->get_setting('CustomerID');
-  		$this->UserName = $this->get_setting('UserName');
+  		$this->CustomerID = $this->get_setting( 'CustomerID' );
+  		$this->UserName = $this->get_setting( 'UserName' );
+  		$this->api_url = 'https://au.ewaygateway.com';
     }
-  }
-
-/**
-   * Return fields you need to add to the payment screen, like your credit card info fields
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
-   */
-  function payment_form($cart, $shipping_info) {
-    ;
-    if (isset($_GET['eway-cancel'])) {
-      echo '<div class="mp_checkout_error">' . __('Your eWay transaction has been canceled.', 'mp') . '</div>';
-    }
-  }
-  
-  /**
-   * Use this to process any fields you added. Use the $_POST global,
-   *  and be sure to save it to both the $_SESSION and usermeta if logged in.
-   *  DO NOT save credit card details to usermeta as it's not PCI compliant.
-   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
-   *  it will redirect to the next step.
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
-   */
-	function process_payment_form($cart, $shipping_info) {
-    ;
-  }
-  
-  /**
-   * Return the chosen payment details here for final confirmation. You probably don't need
-   *  to post anything in the form as it should be in your $_SESSION var already.
-   *
-   * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-   * @param array $shipping_info. Contains shipping info and email in case you need it
-   */
-	function confirm_payment_form($cart, $shipping_info) {
-    ;
-    //print payment details
-    return '<img src="'.mp()->plugin_url . 'images/ewaylogo.png" border="0" alt="'.__('Checkout with eWay', 'mp').'">';
   }
 
 	/**
@@ -201,23 +171,22 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
-    global $current_user;
-    
     $timestamp = time();
     
-    $order_id = mp()->generate_order_id();
+    $order = new MP_Order();
+    $order_id = $order->get_id();
     
     $params = array();
 		$params['CustomerID'] = $this->CustomerID;
   	$params['UserName'] = $this->UserName;
 		$params['MerchantInvoice'] = $order_id;
 		$params['MerchantReference'] = $order_id;
-		$params['Currency'] = $this->get_setting('Currency');
-		$params['Language'] = $this->get_setting('Language');
-		$params['ReturnURL'] = $this->returnURL;
+		$params['Currency'] = $this->get_setting( 'Currency' );
+		$params['Language'] = $this->get_setting( 'Language' );
+		$params['ReturnURL'] = $this->return_url;
 		$params['CancelURL'] = $this->cancelURL;
 		$params['ModifiableCustomerDetails'] = 'false';
-		$params['InvoiceDescription'] = sprintf(__('%s Store Purchase - Order ID: %s', 'mp'), get_bloginfo('name'), $order_id); //cart name
+		$params['InvoiceDescription'] = sprintf( __( '%s Store Purchase - Order ID: %s', 'mp' ), get_bloginfo( 'name' ), $order_id ); //cart name
 		
 		if ( $company_name = $this->get_setting('CompanyName') ) {
 			$params['CompanyName'] = $company_name;
@@ -246,142 +215,103 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 		$params['CustomerEmail'] = mp_arr_get_value('email', $shipping_info);
 		
 		//add shipping info if set
-		if ( ! mp()->download_only_cart($cart) && mp_get_setting('shipping->method') != 'none' && mp_arr_get_value('name', $shipping_info) ) {	
-			$names = explode(' ', mp_arr_get_value('name', $shipping_info, ''));
-			$params['CustomerFirstName'] = array_shift($names);
-			$params['CustomerLastName'] = ( ! empty($names) ) ? array_shift($names) : ''; //grab last name
+		if ( ! $cart->is_download_only() && mp_get_setting( 'shipping->method' ) != 'none' && mp_arr_get_value( 'first_name', $shipping_info ) ) {	
+			$params['CustomerFirstName'] = mp_arr_get_value( 'first_name', $shipping_info );
+			$params['CustomerLastName'] = mp_arr_get_value( 'last_name', $shipping_info );
 			$params['CustomerAddress'] = mp_arr_get_value('address1', $shipping_info);
 			
-			if ( $address2 = mp_arr_get_value('address2', $shipping_info) ) {
+			if ( $address2 = mp_arr_get_value( 'address2', $shipping_info ) ) {
 				$params['CustomerAddress'] = $params['CustomerAddress'] . ' ' . $address2;
 			}
 			
-			$params['CustomerPhone'] = mp_arr_get_value('phone', $shipping_info);
-			$params['CustomerPostCode'] = mp_arr_get_value('zip', $shipping_info);
-			$params['CustomerCity'] = mp_arr_get_value('city', $shipping_info);
-			$params['CustomerState'] = mp_arr_get_value('state', $shipping_info);
-			$params['CustomerCountry'] = mp_arr_get_value('country', $shipping_info);
+			$params['CustomerPhone'] = mp_arr_get_value( 'phone', $shipping_info );
+			$params['CustomerPostCode'] = mp_arr_get_value( 'zip', $shipping_info );
+			$params['CustomerCity'] = mp_arr_get_value( 'city', $shipping_info );
+			$params['CustomerState'] = mp_arr_get_value( 'state', $shipping_info );
+			$params['CustomerCountry'] = mp_arr_get_value( 'country', $shipping_info );
 		}
     
-    $totals = array();
-		$product_count = 0;
-		$coupon_code = mp()->get_coupon_code();
+    $total = $cart->total( false );
+		$product_count = $cart->item_count( false );
 		
-    foreach ( $cart as $product_id => $variations ) {
-			foreach ( $variations as $data ) {
-				$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);			
-				$totals[] = $price;
-				$product_count++;
-			}
-    }
-    $total = array_sum($totals);
+    $params['Amount'] = number_format( $total, 2, '.', '' );
     
-		//shipping line
-    $shipping_tax = 0;
-    if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
-			$total += $shipping_price;
-			$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-    }
-
-    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-    if ( ! mp_get_setting('tax->tax_inclusive') ) {
-    	$tax_price = (mp()->tax_price(false) + $shipping_tax);
-			$total += $tax_price;
-    }
-				
-    $params['Amount'] = number_format( round( $total, 2 ), 2, '.', '');
-    
-    $result = $this->api_call('https://au.ewaygateway.com/Request', $params);
+    $result = $this->api_call( $this->api_url . '/Request', $params );
 		
-		if ($result) {
+		if ( false !== $result ) {
 			libxml_use_internal_errors(true);
-			$xml = new SimpleXMLElement($result);
-			if (!$xml) {
-				mp()->cart_checkout_error( __('There was a problem parsing the response from eWay. Please try again.', 'mp') );
+			$xml = new SimpleXMLElement( $result) ;
+			if ( ! $xml ) {
+				mp_checkout()->add_error( '<li>' . __( 'There was a problem parsing the response from eWay. Please try again.', 'mp' ) . '</li>', 'order-review-payment' );
 				return false;
 			}
 
-			if ($xml->Result == 'True') {
-				wp_redirect($xml->URI);
+			if ( $xml->Result == 'True' ) {
+				wp_redirect( $xml->URI );
 				exit;
 			} else {
-				mp()->cart_checkout_error( sprintf(__('There was a problem setting up the transaction with eWay: %s', 'mp'), $xml->Error) );
-				return false;
+				mp_checkout()->add_error( '<li>' . sprintf(__( 'There was a problem setting up the transaction with eWay: %s', 'mp' ), $xml->Error ) . '</li>', 'order-review-payment' );
 			}
 		}
   }
-  
-  /**
-   * Filters the order confirmation email message body. You may want to append something to
-   *  the message. Optional
-   *
-   * Don't forget to return!
-   */
-  function order_confirmation_email($msg, $order) {
-    return $msg;
+
+	/**
+	 * Display the payment form
+	 *
+	 * @since 3.0
+	 * @access public
+   * @param array $cart. Contains the cart contents for the current blog
+   * @param array $shipping_info. Contains shipping info and email in case you need it
+	 */
+  public function payment_form( $cart, $shipping_info ) {
+    return __( 'You will be redirected to https://www.eway.com.au to finalize your payment.', 'mp' );
   }
-  
+    
   /**
-   * Return any html you want to show on the confirmation screen after checkout. This
-   *  should be a payment details box and message.
+   * Process order confirmation before page loads (e.g. verify callback data, etc)
    *
-   * Don't forget to return!
+   * @since 3.0
+   * @access public
+   * @action mp_checkout/confirm_order/{plugin_name}
    */
-	function order_confirmation_msg($content, $order) {
-    $content = '';
-		
-		if (!$order)
-			return '<p><a href="'.mp_checkout_step_url('confirm-checkout').'">' . __('Please go back and try again.', 'mp') . '</a></p>';
-		
-    if ($order->post_status == 'order_received') {
-      $content .= '<p>' . sprintf(__('Your payment via eWay for this order totaling %s is in progress. Here is the latest status:', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
-      $statuses = $order->mp_payment_info['status'];
-      krsort($statuses); //sort with latest status at the top
-      $status = reset($statuses);
-      $timestamp = key($statuses);
-      $content .= '<p><strong>' . mp()->format_date($timestamp) . ':</strong> ' . esc_html($status) . '</p>';
-    } else {
-      $content .= '<p>' . sprintf(__('Your payment for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
-    }
-    return $content;
-  }
-  
-  /**
-   * Runs before page load incase you need to run any scripts before loading the success message page
-   */
-	function order_confirmation($order) {
-		if ( $payment_code = mp_get_post_value('AccessPaymentCode') ) {
+  public function process_confirm_order() {
+		if ( $payment_code = mp_get_post_value( 'AccessPaymentCode' ) ) {
 			$params = array();
 			$params['CustomerID'] = $this->CustomerID;
 			$params['UserName'] = $this->UserName;
 			$params['AccessPaymentCode'] = $payment_code;
 			
-			$result = $this->api_call('https://au.ewaygateway.com/Result', $params);
-			if ($result) {
-				libxml_use_internal_errors(true);
-				$xml = new SimpleXMLElement($result);
-				if (!$xml) {
-					mp()->cart_checkout_error( __('There was a problem parsing the response from eWay. Please try again.', 'mp') );
+			$result = $this->api_call( $this->api_url . '/Result', $params );
+			if ( $result ) {
+				libxml_use_internal_errors( true );
+				$xml = new SimpleXMLElement( $result );
+				if ( ! $xml ) {
+					mp_checkout()->add_error( '<li>' . __( 'There was a problem parsing the response from eWay. Please try again.', 'mp' ) . '</li>', 'order-review-payment' );
 					return false;
 				}
 
-				if ($xml->TrxnStatus == 'True') {	
-					$status = __('Received - The order has been received, awaiting payment confirmation.', 'mp');
-					//setup our payment details
+				if ( strtolower( $xml->TrxnStatus ) == 'true' ) {
+					$timestamp = time();
+					$payment_info = array();
 					$payment_info['gateway_public_name'] = $this->public_name;
 					$payment_info['gateway_private_name'] = $this->admin_name;
-					$payment_info['method'] = __('Credit Card', 'mp');
-					$payment_info['transaction_id'] = (string)$xml->TrxnNumber;
-					$timestamp = time();
-					$payment_info['status'][$timestamp] = sprintf(__('Paid - The card has been processed - %s', 'mp'), (string)$xml->TrxnResponseMessage);
-					$payment_info['total'] = (string)$xml->ReturnAmount;
-					$payment_info['currency'] = $this->get_setting('Currency');
+					$payment_info['method'] = __( 'Credit Card', 'mp' );
+					$payment_info['transaction_id'] = (string) $xml->TrxnNumber;
+					$payment_info['status'][ $timestamp ] = sprintf( __( 'Paid - The card has been processed - %s', 'mp'), (string) $xml->TrxnResponseMessage );
+					$payment_info['total'] = (string) $xml->ReturnAmount;
+					$payment_info['currency'] = $this->get_setting( 'Currency' );
+
+					$order = new MP_Order( $xml->MerchantInvoice );					
+					$order->save( array(
+						'cart' => mp_cart(),
+						'payment_info' => $payment_info,
+						'paid' => true,
+					) );
 					
-					$order = mp()->create_order(mp_get_session_value('mp_order'), mp()->get_cart_contents(), mp_get_session_value('mp_shipping_info'), $payment_info, true);
-				} else {
-					mp()->cart_checkout_error( sprintf(__('There was a problem with your credit card information: %s', 'mp'), $xml->TrxnResponseMessage) );
-					wp_redirect($this->cancelURL);
+					wp_redirect( $order->tracking_url( false ) );
 					exit;
+				} else {
+					mp_checkout()->add_error( '<li>' . sprintf( __( 'There was a problem with your credit card information: %s', 'mp' ), $xml->TrxnResponseMessage ) . '</li>', 'order-review-payment' );
 				}
 			}
 		}
@@ -440,7 +370,7 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 			'name' => $this->get_field_name('mode'),
 			'label' => array('text' => __('Gateway Mode', 'mp')),
 			'default_value' => 'sandbox',
-			'desc' => sprintf(__('Note when testing in sandbox mode it will use the default eWay test API credentials. You must also test in AUD currency as that is what the sandbox account is in. <a href="%s" target="_blank">It is important that you read and follow the testing instructions &raquo;</a>', 'mp'), 'http://www.eway.com.au/Developer/Testing/'),
+			'desc' => __('Note when testing in sandbox mode it will use the default eWay test API credentials. Also, please note that cart total needs to be a whole number (e.g. 10.00) in order to generate a successful transaction, otherwise the transaction will fail.', 'mp'),
 			'options' => array(
 				'sandbox' => __('Sandbox', 'mp'),
 				'live' => __('Live', 'mp'),
@@ -508,39 +438,26 @@ class MP_Gateway_eWay_Shared extends MP_Gateway_API {
 		));
 	}
 		
-	/**
-   * Use to handle any payment returns from your gateway to the ipn_url. Do not echo anything here. If you encounter errors
-   *  return the proper headers to your ipn sender. Exits after.
-   */
-	function process_ipn_return() {
-  }
-
-	function api_call($url, $fields) {
-	  $param_list = array();
-    foreach ($fields as $k => $v) {
-      $param_list[] = "{$k}=".rawurlencode($v);
-    }
-
-    $url .= '?' . implode('&', $param_list);
+	function api_call( $url, $fields ) {
+    $url .= '?' . http_build_query( $fields );
 		
 	  //build args
+	  $args = array();
 	  $args['user-agent'] = 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | eWay Shared Payments Gateway/' . MP_VERSION;
 	  $args['sslverify'] = false;
-	  $args['timeout'] = 60;
+	  $args['timeout'] = mp_get_api_timeout( $this->plugin_name );
 
-	  //use built in WP http class to work with most server setups
-	  $response = wp_remote_get($url, $args);
-	  if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-	    mp()->cart_checkout_error( __('There was a problem connecting to eWay. Please try again.', 'mp') );
+	  $response = wp_remote_get( $url, $args );
+	  if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response) != 200 ) {
+	    mp_checkout()->add_error( '<li>' . __( 'There was a problem connecting to eWay. Please try again.', 'mp' ) . '</li>', 'order-review-payment' );
 	    return false;
 	  } else {
 	    return $response['body'];
 	  }
 	}
-
-
 }
 
 //register gateway only if SimpleXML module installed
-if (class_exists("SimpleXMLElement"))
+if ( class_exists( 'SimpleXMLElement' ) ) {
 	mp_register_gateway_plugin( 'MP_Gateway_eWay_Shared', 'eway', __('eWay Shared Payments', 'mp') );
+}
