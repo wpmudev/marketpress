@@ -790,6 +790,21 @@ You can manage this order here: %s', 'mp');
 			return $html;
 		}
 	}
+	
+	/**
+	 * Log IPN history status
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $status The status text to log.
+	 */
+	public function log_ipn_status( $status ) {
+		wp_insert_comment( array(
+			'comment_post_ID' => $this->ID,
+			'comment_type' => 'comment',
+			'comment_content' => esc_html( $status ),
+		) );
+	}
 		
 	/**
 	 * Save the order to the database
