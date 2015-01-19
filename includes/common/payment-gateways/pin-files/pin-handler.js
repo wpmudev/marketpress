@@ -8,9 +8,9 @@
 	} );	
 	  
 	$( document ).on( 'mp_checkout_process_pin', function( e, $form ) {
+		marketpress.loadingOverlay( 'show' );
 		removeInputNames();
 		
-		console.log( $( '#mp-cc-exp' ).val() ); /*
     var expObj = $.payment.cardExpiryVal( $( '#mp-cc-exp' ).val() );
     var card = {
       number: $( '#mp-cc-num' ).val().replace( /[^0-9]/ig, '' ),
@@ -27,7 +27,7 @@
     };
 
     // Request a token for the card from Pin
-    api.createCardToken( card ).then( handleSuccess, handError ).done(); */
+    api.createCardToken( card ).then( handleSuccess, handleError ).done();
   } );
 
 	/**
@@ -67,15 +67,10 @@
     // You will need to post these to Pin when creating the charge.
     $('<input>')
       .attr( { type: 'hidden', name: 'card_token' })
-      .val( response.response.token )
+      .val( card.token )
       .appendTo( $div );
-            
-    $('<input>')
-      .attr( { type: 'hidden', name: 'ip_address' } )
-      .val( response.ip_address )
-      .appendTo( $div );
-    
-    //$form.get( 0 ).submit();
+                
+    $form.get( 0 ).submit();
   };
 
 	/**
@@ -85,16 +80,19 @@
 	 * @param object response
 	 */
 	function handleError( response ) {
+		marketpress.loadingOverlay( 'hide' );
+		
+		var $errorList = $( '<ul>' );
+		
     if ( response.messages ) {
-      var $errorList = $( '<ul>' );
       $.each( response.messages, function( index, errorMessage ) {
-        $('<li>')
+        $( '<li>' )
           .html( errorMessage.message )
           .appendTo( $errorList );
       });
     }
 
-    errorMessage( 'show', $errorList.html(), false );		
+    errorMessage( 'show', '<p>' + response.error_description + '</p>' + $errorList.wrap('<div>').parent().html(), false );		
   };
   
   /**
