@@ -534,10 +534,12 @@ if ( ! function_exists('mp_get_user_address') ) :
 			return false;
 		}
 		
-		$data = mp_get_session_value("mp_{$what}_info");
-		
-		if ( empty($data) ) {
-			$data = $user->get("mp_{$what}_info");
+		if ( $_data = mp_get_session_value("mp_{$what}_info") ) {
+			$data = $_data;
+		} elseif ( empty( $data ) && is_user_logged_in() ) {
+			$data = $user->get( "mp_{$what}_info" );
+		} else {
+			return false;
 		}
 		
 		foreach ( $data as $k => $v ) {
@@ -621,7 +623,7 @@ if ( ! function_exists('mp_list_payment_options') ) :
 		
 		$options = array();
 		foreach ( $gateways as $code => $gateway ) {
-			$options[$code] = $gateway->public_name;
+			$options[ $code ] = $gateway->public_name;
 		}
 		
 		/**
@@ -646,7 +648,13 @@ if ( ! function_exists('mp_list_payment_options') ) :
 			$input_id = 'mp-gateway-option-' . $code;
 			$html .= '
 				<label class="mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options) == 1 ) ? ' style="display:none"' : '') . '>
-					<input id="' . $input_id . '" type="radio" name="payment_method" value="' . $code . '"' . $checked . ' autocomplete="off" />
+					<input
+						data-mp-use-confirmation-step="' . (( $gateways[ $code ]->use_confirmation_step ) ? 'true' : 'false') . '"
+						id="' . $input_id . '"
+						type="radio"
+						name="payment_method"
+						value="' . $code . '"' . $checked . '
+						autocomplete="off" />
 					<span></span>' . $label . '
 				</label>';
 			
@@ -896,10 +904,15 @@ if ( ! function_exists('mp_store_page_uri') ) {
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	function mp_store_page_uri( $page, $echo = true ) {
-		$url = '';
-
+		$url = $append = '';
+		
+		if ( $page == 'confirm_order' ) {
+			$append = 'confirm/';
+			$page = 'checkout';	
+		}
+		
 		if ( $post_id = mp_get_setting( "pages->{$page}" ) ) {
-			$url = get_page_uri( $post_id );
+			$url = trailingslashit( get_page_uri( $post_id ) ) . $append;
 		}
 		
 		if ( $echo ) {
@@ -919,11 +932,17 @@ if ( ! function_exists('mp_store_page_url') ) {
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	function mp_store_page_url( $page, $echo = true ) {
-		$url = '';
-		if ( $post_id = mp_get_setting( "pages->{$page}" ) ) {
-			$url = get_permalink( $post_id );
+		$url = $append = '';
+		
+		if ( $page == 'confirm_order' ) {
+			$append = 'confirm/';
+			$page = 'checkout';	
 		}
 		
+		if ( $post_id = mp_get_setting( "pages->{$page}" ) ) {
+			$url = trailingslashit( get_permalink( $post_id ) ) . $append;
+		}
+				
 		if ( $echo ) {
 			echo $url;
 		} else {
