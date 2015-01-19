@@ -257,7 +257,7 @@ $( document ).on( 'mp_checkout_process_<?php echo $this->plugin_name; ?>', funct
   protected function _cc_default_form( $use_names = true ) {
 		$name = mp_get_user_address_part( 'first_name', 'billing' ) . ' ' . mp_get_user_address_part( 'last_name', 'billing' );
 		$form = '
-			<input type="hidden" name="mp_cc_name" value="' . esc_attr( $name ) . '" />
+			<input type="hidden" id="mp-cc-name" name="mp_cc_name" value="' . esc_attr( $name ) . '" />
 			<div class="mp-checkout-form-row">
 				<label>' . __('Card Number', 'mp') . '<span class="mp-field-required">*</span></label>
 				<input
