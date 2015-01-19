@@ -359,7 +359,7 @@ class MP_Cart {
 			}
 		}*/
 		
-		return $items;
+		return (array) $items;
 	}
 	
 	/**
@@ -689,44 +689,77 @@ class MP_Cart {
 			$html .= '
 					<div id="mp-cart-meta-wrap" class="clearfix">' .
 						$this->cart_meta( false, $editable );
-	
+
+			$button_text = __( 'Submit Order' );
+			$button_alt_text = __( 'Continue &raquo;' );
+		
+			if ( get_query_var( 'mp_confirm_order_step' ) ) {
+				$tooltip_text = __( '<strong>You are about to submit your order!</strong><br />Please review your order details before continuing. You will be charged immediately upon clicking "Submit Order".', 'mp' );
+			} else {
+				$tooltip_text = __( '<strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' );
+			}
+			
 			/**
 			 * Filter the checkout button tooltip text
 			 *
 			 * @since 3.0
 			 * @param string The current tooltip text.
 			 */
-			$tooltip_text = apply_filters( 'mp_cart/checkout_button/tooltip_text', __( '<strong>Secure Checkout</strong><br />Shopping is always safe and secure.', 'mp' ) );
-	
+			$tooltip_text = apply_filters( 'mp_cart/checkout_button/tooltip_text', $tooltip_text );
+						
+			if ( $editable ) {	
+				$button_text = __( 'Checkout', 'mp' );
+				$p_class = 'mp-secure-checkout-tooltip-text';
+				$button_classes = array(
+					'mp-button',
+					'mp-button-checkout',
+					'mp-button-padlock',
+					'mp-button-large',
+					(( ! empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
+				);
+			} elseif ( get_query_var( 'mp_confirm_order_step' ) ) {
+				$button_classes = array(
+					'mp-button',
+					'mp-button-checkout',
+					'mp-button-large',
+					(( ! empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
+				);
+			} else {
+				$button_classes = array(
+					'mp-button',
+					'mp-button-checkout',
+					'mp-button-large',
+				);
+			}
+
 			/**
 			 * Filter the checkout button text
 			 *
 			 * @since 3.0
 			 * @param string The current button text.
 			 */
-			$button_text = apply_filters( 'mp_cart/checkout_button/text', (( $this->is_editable ) ? __( 'Proceed to Checkout', 'mp' ) : __( 'Submit Order', 'mp' )) );
-			
-			// Set button classes
-			$button_classes = array(
-				'mp-button',
-				'mp-button-checkout',
-				'mp-button-padlock',
-				(( ! empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
-			);
-			
-			if ( $editable ) {
-				$button_classes[] = 'mp-button-medium';
+			$button_text = apply_filters( 'mp_cart/checkout_button/text', $button_text );
+
+			/**
+			 * Filter the checkout button classes
+			 *
+			 * @since 3.0
+			 * @param array The current button classes.
+			 * @param bool $editable Whether the cart is editable or not.
+			 */
+			$button_classes = apply_filters( 'mp_cart/checkout_button/classes', $button_classes, $editable );
+				
+			if ( $editable ) {				
 				$html .= '
 						<a class="' . implode( ' ', $button_classes ) . '" href="' . mp_store_page_url( 'checkout', false ) . '">' . $button_text . '</a>';
 			} else {
-				$button_classes[] = 'mp-button-large';
 				$html .= '
-						<button class="' . implode( ' ', $button_classes ) . '" type="submit">' . $button_text . '</button>';
+						<button class="' . implode( ' ', $button_classes ) . '" type="submit" data-mp-alt-html="' . $button_alt_text . '">' . $button_text . '</button>';
 			}
-			
+
 			if ( ! empty( $tooltip_text ) ) {
 				$html .= '
-						<div class="mp-tooltip-content"><p class="mp-secure-checkout-tooltip-text">' . $tooltip_text . '</p></div>';
+						<div class="mp-tooltip-content"><p' . (( empty( $p_class ) ) ? '' : ' class="mp-secure-checkout-tooltip-text"') . '>' . $tooltip_text . '</p></div>';
 			}
 			
 			$html .= '
@@ -1414,9 +1447,9 @@ class MP_Cart {
 		$total = mp_arr_get_value( 'total', $this->_total, 0) ;
 		
 		if ( $format ) {
-			return mp_format_currency('', $total);
+			return mp_format_currency( '', $total );
 		} else {
-			return round($total, 2);
+			return round( $total, 2 );
 		}
 	}
 	
