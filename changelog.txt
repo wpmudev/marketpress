@@ -22,7 +22,10 @@ Change Log:
 - Settings metaboxes now use ajax instead of page refresh where applicable.
 - Added screen options tab on orders screen - users can now specify how many orders per page they want.
 - Added on-demand (jQuery) data validation on most settings screens.
-- Removed Google Checkout payment gateway. This will eventually be replaced by Google Wallet.
+- Removed Google Checkout payment gateway.
+- Removed BitPay payment gateway.
+- Removed iDEAL payment gateway.
+- Removed Skrill/Moneybooker payment gateway.
 
 2.9 - 1/22/2014 - Aaron Edwards, Arnold, Marko Miljus, Ryan Welcher, Jonathan Cowher
 ----------------------------------------------------------------------
