@@ -11,6 +11,15 @@ class MP_Orders_Admin {
 	private static $_instance = null;
 	
 	/**
+	 * Refers to the order's IPN history
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_ipn_history = null;
+	
+	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since 3.0
@@ -72,6 +81,31 @@ class MP_Orders_Admin {
 	}
 	
 	/**
+	 * Get IPN history
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array False, if no IPN history exists.
+	 */
+	public function get_ipn_history() {
+		if ( ! is_null( $this->_ipn_history ) ) {
+			return $this->_ipn_history;	
+		}
+		
+		$this->_ipn_history = get_comments( array(
+			'status' => 'approve',
+			'post_id' => $post->ID,
+		) );
+		
+		if ( count( $this->_ipn_history ) == 0 ) {
+			return false;
+		}
+		
+		return $this->_ipn_history;
+	}
+	
+	
+	/**
 	 * Save meta boxes
 	 *
 	 * @since 3.0
@@ -120,9 +154,13 @@ class MP_Orders_Admin {
 	 * @action add_meta_boxes_mp_order
 	 */
 	public function add_meta_boxes() {
+		// Normal boxes
 		add_meta_box( 'mp-order-details-metabox', __( 'Order Details', 'mp' ), array( &$this, 'meta_box_order_details' ), 'mp_order', 'normal', 'core' );
 		add_meta_box( 'mp-order-customer-info-metabox', __( 'Customer Info', 'mp' ), array( &$this, 'meta_box_customer_info' ), 'mp_order', 'normal', 'core' );
 		add_meta_box( 'mp-order-notes-metabox', __( 'Order Notes', 'mp' ), array( &$this, 'meta_box_order_notes' ), 'mp_order', 'normal', 'core' );
+		add_meta_box( 'mp-order-ipn-history-metabox', __( 'IPN History', 'mp' ), array( &$this, 'meta_box_order_ipn_history' ), 'mp_order', 'normal', 'core' );
+		
+		// Side boxes
 		add_meta_box( 'mp-order-actions-metabox', __( 'Order Actions', 'mp' ), array( &$this, 'meta_box_order_actions' ), 'mp_order', 'side', 'high' );				
 		add_meta_box( 'mp-order-history-metabox', __( 'Order History', 'mp' ), array( &$this, 'meta_box_order_history' ), 'mp_order', 'side', 'core' );
 		add_meta_box( 'mp-order-payment-info-metabox', __( 'Payment Information', 'mp' ), array( &$this, 'meta_box_payment_info' ), 'mp_order', 'side', 'core' );
@@ -172,6 +210,30 @@ class MP_Orders_Admin {
 		endforeach;
 	}
 
+	/**
+	 * Display the order IPN history meta box
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function meta_box_order_ipn_history( $post ) {
+		$history = get_comments( array(
+			'status' => 'approve',
+			'post_id' => $post->ID,
+		) );
+		
+		if ( count( $history ) == 0 ) {
+			_e( 'There is no IPN history to show at this time', 'mp' );
+			return;
+		}
+		
+		echo '<ul>';
+		foreach ( $history as $item ) {
+			echo '<strong>' . date( get_option( 'date_format'), strtotime( $item->comment_date ) ) . ':</strong> ' . $item->comment_content;
+		}
+		echo '</ul>';
+	}
+	
 	/**
 	 * Display the order actions meta box
 	 *
