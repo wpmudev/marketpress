@@ -12,6 +12,30 @@ if ( ! function_exists('mp') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_get_api_timeout' ) ) :
+	/**
+	 * Get the number of seconds before an API call should timeout
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param string $key Optional, a unique key for the timeout.
+	 * @return int
+	 */
+	function mp_get_api_timeout( $key = '' ) {
+	  /**
+	   * Filter the api timeout
+	   *
+	   * @since 3.0
+	   * @param int $timeout The current timeout value.
+	   */
+	  $timeout = apply_filters( 'mp_api_timeout', 5 );
+	  $timeout = apply_filters( 'mp_api_timeout/' . $key, $timeout );
+	  
+	  return (int) $timeout;
+	}
+endif;
+
+
 if ( ! function_exists( 'mp_filter_email' ) ) :
 	/**
 	 * Replace short codes in email messages with dynamic content
@@ -60,32 +84,6 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 <td align="right">' . mp_format_currency( $currency, $item->get_price( 'lowest' ) ) . '</td>
 <td align="right">'. mp_format_currency( $currency, $price ) . '</td>
 </tr>' . "\n";
-
-				/*
-				
-				//! TODO: What is this?
-				
-				// FPM: Product Custom Fields
-				$cf_key = $bid .':'. $product_id .':'. $variation;
-				if (isset($order->mp_shipping_info['mp_custom_fields'][$cf_key])) {
-					$cf_items = $order->mp_shipping_info['mp_custom_fields'][$cf_key];
-
-					$mp_custom_field_label = get_post_meta($product_id, 'mp_custom_field_label', true);
-					if (isset($mp_custom_field_label[$variation]))
-						$label_text = esc_attr($mp_custom_field_label[$variation]);
-					else
-						$label_text = __('Product Personalization: ', 'mp');
-
-					$order_info .= "\t\t" . $label_text	 ."\n";
-					$order_info_sku .= "\t\t" . $label_text	 ."\n";
-					foreach($cf_items as $idx => $cf_item) {
-						$item_cnt = intval($idx)+1;
-						$order_info .= "\t\t\t" . $item_cnt .". ". $cf_item	."\n";
-						$order_info_sku .= "\t\t\t" . $item_cnt .". ". $cf_item	 ."\n";
-					}
-				}
-				$order_info .= "\n";
-				$order_info_sku .= "\n";*/
 			}
 		}
 		
