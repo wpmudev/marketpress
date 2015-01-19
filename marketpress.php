@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: MarketPress
-Version: 3.0a.8
+Version: 3.0a.9
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -26,7 +26,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 */
 
-define('MP_VERSION', '3.0a.8');
+define('MP_VERSION', '3.0a.9');
 
 class Marketpress {	
 	/**
@@ -151,7 +151,7 @@ class Marketpress {
 			'show_admin_column' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_store_page_uri( 'products', false ) . '/category',
+				'slug' => mp_store_page_uri( 'products', false ) . 'category',
 			),
 		)));
 		
@@ -185,7 +185,7 @@ class Marketpress {
 			'show_ui' => true,
 			'rewrite' => array(
 				'with_front' => false,
-				'slug' => mp_store_page_uri( 'products', false ) . '/tag',
+				'slug' => mp_store_page_uri( 'products', false ) . 'tag',
 			),
 		)));
 
@@ -216,7 +216,7 @@ class Marketpress {
 			'hierarchical' => false,
 			'map_meta_cap' => true,
 			'rewrite' => array(
-				'slug' => mp_store_page_uri('products', false),
+				'slug' => rtrim( mp_store_page_uri('products', false), '/' ),
 				'with_front' => false
 			),
 			'query_var' => true,
@@ -427,6 +427,12 @@ class Marketpress {
 			$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 		}
 		
+		// Order confirmation
+		if ( $post_id = mp_get_setting( 'pages->checkout' ) ) {
+			$uri = get_page_uri( $post_id );
+			$new_rules[ $uri . '/confirm/?' ] = 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1';
+		}
+		
 		return $rewrite_rules + $new_rules;
 	}
 	
@@ -440,6 +446,7 @@ class Marketpress {
 	public function add_query_vars( $vars ) {
 		$vars[] = 'mp_variation_id';
 		$vars[] = 'mp_order_id';
+		$vars[] = 'mp_confirm_order_step';
 		return $vars;
 	}
 	
