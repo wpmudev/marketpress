@@ -439,9 +439,10 @@ class MP_Checkout {
 				
 		$html = '
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
-			<form id="mp-checkout" class="clearfix" method="post" style="display:none" novalidate>' .
+			<form id="mp-checkout" class="clearfix' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
 				wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
 		
+		$did_current = false;
 		foreach ( $this->_sections as $section => $heading_text ) {
 			$method = 'section_' . str_replace( '-', '_', $section );
 			$this->_step = $section;
@@ -453,20 +454,32 @@ class MP_Checkout {
 					continue;
 				}
 				
+				$id = 'mp-checkout-section-' . $section;
 				$classes = array( 'mp-checkout-section' );
-				if ( 1 === $this->_stepnum ) {
+				if ( ( $this->has_errors( $section ) ) && ! $did_current ) {
 					$classes[] = 'current';
+					$did_current = true;
+				} else {
+					if ( get_query_var( 'mp_confirm_order_step' ) ) {
+						if ( 'order-review-payment' == $section && ! $did_current ) {
+							$classes[] = 'current';
+						}
+					} elseif ( 1 === $this->_stepnum && ! $did_current ) {
+						$classes[] = 'current';
+						$did_current = true;
+					}
 				}
 				
 				$html .= '
-				<div id="mp-checkout-section-' . $section . '" class="' . implode( ' ', $classes ) . '">';
+				<div id="' . $id . '" class="' . implode( ' ', $classes ) . '">';
 				
 				if ( ! mp_doing_ajax( 'mp_update_checkout_data' ) ) {
-					$html .= $this->section_heading( $heading_text, true );
+					$link = ( get_query_var( 'mp_confirm_order_step' ) ) ?  mp_store_page_url( 'checkout', false ) : 'javascript:;';
+					$html .= $this->section_heading( $heading_text, $link, true );
 				}
 				
 				$html .= '
-					<div class="mp-checkout-section-errors' . (( $this->has_errors() ) ? ' show' : '') . '">' . $this->print_errors( 'general', false ) . '</div>
+					<div class="mp-checkout-section-errors' . (( $this->has_errors( $section ) ) ? ' show' : '') . '">' . $this->print_errors( $section, false ) . '</div>
 					<div class="mp-checkout-section-content">' . $tmp_html . '</div>
 				</div>';
 				
@@ -712,6 +725,9 @@ class MP_Checkout {
 			$billing_info = mp_get_user_address( 'billing' );
 			$shipping_info = mp_get_user_address( 'shipping' );
 			
+			// Save payment method to session
+			mp_update_session_value( 'mp_payment_method', $payment_method );
+			
 			/**
 			 * For gateways to tie into and process payment
 			 *
@@ -732,13 +748,13 @@ class MP_Checkout {
 	 * @action wp
 	 */
 	public function maybe_process_checkout_confirm() {
-		if ( get_query_var( 'mp_checkout_confirm' ) ) {
+		if ( get_query_var( 'mp_confirm_order_step' ) ) {
 			/**
-			 * For gateways to tie into
+			 * For gateways to tie into before page loads
 			 *
 			 * @since 3.0
 			 */
-			do_action( 'mp_order_confirmation' );
+			do_action( 'mp_checkout/confirm_order/' . mp_get_session_value( 'mp_payment_method', '' ) );
 		}
 	}
 	
@@ -754,11 +770,16 @@ class MP_Checkout {
 		$error_string = '';
 		
 		if ( $errors = $this->get_errors( $context ) ) {
-			$error_string .= '<h4>' . __( 'Oops! An error occurred while process your payment.', 'mp' ) . '</h4>';
-			
+			$error_string .= '
+				<h4>' . __( 'Oops! An error occurred while processing your payment.', 'mp' ) . '</h4>
+				<ul>';
+
 			foreach ( $errors as $error ) {
 				$error_string .= $error;
 			}
+			
+			$error_string .= '
+				</ul>';
 		}
 		
 		if ( $echo ) {
@@ -780,15 +801,7 @@ class MP_Checkout {
 			// Cart isn't editable - bail
 			return $html;
 		}
-		
-		/**
-		 * Filter the payment form html
-		 *
-		 * @since 3.0
-		 * @param string
-		 */
-		$form = apply_filters( 'mp_checkout_payment_form', '' );
-		
+
 		/**
 		 * Filter the payment form heading text
 		 *
@@ -801,11 +814,28 @@ class MP_Checkout {
 			<div id="mp-checkout-payment-form">' .
 				$heading . '
 				<div id="mp-checkout-payment-form-errors"></div>';
-		
-		if ( empty( $form ) ) {
-			$html .= wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
+				
+		if ( get_query_var( 'mp_confirm_order_step' ) ) {
+			/**
+			 * For gateways to tie into and display payment confirmation info
+			 *
+			 * @since 3.0
+			 */
+			$form = apply_filters( 'mp_checkout/confirm_order_html/' . mp_get_session_value( 'mp_payment_method', '' ), '' );
 		} else {
-			$html .= '<div id="mp-payment-options-list">' . mp_list_payment_options( false ) . '</div>';
+			/**
+			 * For gateways to tie into and display payment forms
+			 *
+			 * @since 3.0
+			 * @param string
+			 */
+			$form = apply_filters( 'mp_checkout_payment_form', '' );
+			
+			if ( empty( $form ) ) {
+				$html .= wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
+			} else {
+				$html .= '<div id="mp-payment-options-list">' . mp_list_payment_options( false ) . '</div>';
+			}
 		}
 		
 		$html .= $form;
@@ -867,10 +897,11 @@ class MP_Checkout {
 	 * @since 3.0
 	 * @access public
 	 * @param string $text Heading text.
+	 * @param string $link Optional, the link url for the heading.
 	 * @param bool $step Optional, whether to show the current step num next to the heading text.
 	 * @return string
 	 */
-	public function section_heading( $text, $step = false ) {
+	public function section_heading( $text, $link = false, $step = false ) {
 		$html = '
 			<h2 class="mp-checkout-section-heading clearfix">';
 		
@@ -879,8 +910,15 @@ class MP_Checkout {
 				<span class="mp-checkout-step-num">' . $this->_stepnum . '</span>';
 		}
 		
+		if ( false !== $link ) {
+			$html .= '
+				<a href="' . $link . '" class="mp-checkout-section-heading-link">' . $text . '</a>';
+		} else {
+			$html .= '
+				<span class="mp-checkout-section-heading-link">' . $text . '</span>';
+		}
+		
 		$html .= '
-				<a href="javascript:;" class="mp-checkout-section-heading-link">' . $text . '</a>
 			</h2>';
 			
 		return $html;
