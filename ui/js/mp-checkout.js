@@ -511,8 +511,7 @@ var mp_checkout;
 		 */
 		triggerStepChange : function() {
 			var $current = $( '.mp-checkout-section' ).filter( '.current' );
-			var $next = $current.next( '.mp-checkout-section' );
-			$( document ).trigger( 'mp_checkout/step_changed', [ $current, $next ] );
+			$( document ).trigger( 'mp_checkout/step_changed', [ $current, $current ] );
 		}
 	};
 }( jQuery ));
