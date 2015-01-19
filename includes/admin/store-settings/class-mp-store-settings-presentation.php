@@ -161,7 +161,7 @@ jQuery(document).ready(function($){
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-settings-presentation-pages-slugs',
 			'page_slugs' => array('store-settings-presentation', 'store-settings_page_store-settings-presentation'),
-			'title' => __('Store Pages &amp; Slugs', 'mp'),
+			'title' => __('Store Pages', 'mp'),
 			'option_name' => 'mp_settings',			
 		));
 		$metabox->add_field('post_select', array(
