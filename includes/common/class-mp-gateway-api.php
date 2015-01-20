@@ -184,6 +184,24 @@ class MP_Gateway_API {
   }
   
   /**
+   * Check if gateway is set to force SSL and, if so, redirect to SSL checkout
+   *
+   * @since 3.0
+   * @access public
+   * @action wp
+   * @uses $post
+   */
+  public function maybe_force_ssl() {
+	  global $post;
+	  
+	  if ( $this->force_ssl && ! is_ssl() && mp_is_shop_page( 'checkout' ) ) {
+		  $url = str_replace( 'http://', 'https://', get_permalink( $post->ID ) );
+		  wp_redirect( $url );
+		  exit;
+	  }
+  }
+  
+  /**
    * Maybe print checkout scripts
    *
    * @since 3.0
@@ -502,6 +520,7 @@ $( document ).on( 'mp_checkout_process_<?php echo $this->plugin_name; ?>', funct
     add_action( 'wp_ajax_mp_process_ipn_return_' . $this->plugin_name, array( &$this, 'process_ipn_return' ) );
     add_action( 'wp_ajax_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
     add_action( 'wp_ajax_nopriv_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
+    add_action( 'wp', array( &$this, 'maybe_force_ssl' ) );
 
 		if ( is_admin() ) {
     	$this->init_settings_metabox();
