@@ -1084,7 +1084,7 @@ class MP_Products_Screen {
 
 	function custom_placeholder_title( $placeholder, $post ) {
 		if ( $post->post_type == MP_Product::get_post_type() ) {
-			$placeholder = __( 'Enter your product name here' );
+			$placeholder = __( 'Enter your product name here', 'mp' );
 		}
 		return $placeholder;
 	}
