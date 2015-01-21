@@ -180,15 +180,15 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 	
 		$payment_info .= '<strong>' .__('Payment Total:', 'mp') . '</strong> ' . mp_format_currency( $currency, $order->get_meta( 'mp_payment_info->total' ) ) . "<br /><br />\n";
 		
-		 if ( $order->post_status == 'order_received' ) {
+		if ( $order->post_status == 'order_paid' ) {
+			$payment_info .= __('Your payment for this order is complete.', 'mp');
+		} else {			
 			$payment_info .= __('Your payment for this order is not yet complete. Here is the latest status:', 'mp') . "\n";
 			$statuses = $order->get_meta( 'mp_payment_info->status' );
 			krsort( $statuses ); //sort with latest status at the top
 			$status = reset( $statuses );
 			$timestamp = key( $statuses );
 			$payment_info .= mp_format_date( $timestamp ) . ': ' . $status;
-		} else {
-			$payment_info .= __('Your payment for this order is complete.', 'mp');
 		}
 	
 		// Total
