@@ -1082,13 +1082,20 @@ class MP_Products_Screen {
 		}
 	}
 
+	/**
+	 * Add custom title placeholder to product edit screen
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter enter_title_here
+	 */
 	function custom_placeholder_title( $placeholder, $post ) {
 		if ( $post->post_type == MP_Product::get_post_type() ) {
 			$placeholder = __( 'Enter your product name here', 'mp' );
 		}
+		
 		return $placeholder;
 	}
-
 }
 
 MP_Products_Screen::get_instance();
