@@ -22,6 +22,7 @@ Change Log:
 - Settings metaboxes now use ajax instead of page refresh where applicable.
 - Added screen options tab on orders screen - users can now specify how many orders per page they want.
 - Added on-demand (jQuery) data validation on most settings screens.
+- Removed Cubepoints payment gateway as it no longer in active development.
 - Removed Google Checkout payment gateway.
 - Removed BitPay payment gateway.
 - Removed iDEAL payment gateway.
