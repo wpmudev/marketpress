@@ -268,7 +268,7 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$msg = apply_filters( 'mp_order/notification_body', $msg, $this );
-		$msg = apply_filters( 'mp_order/notification_body_' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
+		$msg = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
 
 		$this->_send_email_to_buyers( $subject, $msg );
 				
@@ -462,11 +462,21 @@ You can manage this order here: %s', 'mp');
 	public function details( $echo = true ) {
 		$cart = $this->get_cart();
 		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
-		$html = '';
+		
+		/**
+		 * Filter the confirmation text
+		 *
+		 * @since 3.0
+		 * @param string The current confirmation text.
+		 * @param MP_Order The order object.
+		 */
+		$confirmation_text = apply_filters( 'mp_order/confirmation_text', '', $this );
+		$confirmation_text = apply_filters( 'mp_order/confirmation_text/' . $this->get_meta( 'mp_payment_info->gateway_plugin_name' ), $confirmation_text, $this );
 		
 		$html = '
 			<div id="mp-order-details">' .
 				$this->header( false ) .
+				$confirmation_text .
 				$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) .
 				$this->get_addresses() . '
 			</div>';
@@ -859,7 +869,7 @@ You can manage this order here: %s', 'mp');
 		}
 		
 		$this->ID = $post_id;
-		$this->_post = get_post( $post_id );
+		$this->_get_post();
 
 		$items = $cart->get_items_as_objects();
 		foreach ( $items as &$item ) {
@@ -990,7 +1000,7 @@ You can manage this order here: %s', 'mp');
 		do_action( 'mp_order/new_order', $this );
 
 		// Empty cart
-		mp_cart()->empty_cart();
+		$cart->empty_cart();
 		
 		// Remove session variables
 		if ( mp_get_session_value( 'mp_shipping_info' ) ) {
@@ -1009,7 +1019,7 @@ You can manage this order here: %s', 'mp');
 		$this->_send_new_order_notifications();
 
 		// If paid and the cart is only digital products mark it shipped
-		if ( $paid && mp_cart()->is_download_only() ) {
+		if ( $paid && $cart->is_download_only() ) {
 			$this->change_status( 'order_shipped', true );
 		}
 

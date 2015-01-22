@@ -58,7 +58,14 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 		
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 	}
-
+	
+	/**
+	 * Enqueue checkout scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_enqueue_scripts
+	 */
 	function enqueue_scripts() {
 		if ( ! mp_is_shop_page( 'checkout' ) ) {
 			return;
@@ -84,7 +91,17 @@ class MP_Gateway_PIN extends MP_Gateway_API {
   public function payment_form( $cart, $shipping_info ) {
 	  return $this->_cc_default_form( false );
 	}
-	
+
+  /**
+   * Print checkout scripts
+   *
+   * @since 3.0
+   * @access public
+   */
+  function print_checkout_scripts() {
+	  // Intentionally left blank
+	}
+		
 	/**
 	 * Use this to process any fields you added. Use the $_POST global,
 	 * and be sure to save it to both the $_SESSION and usermeta if logged in.
@@ -221,11 +238,11 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
-		die( 'here' );
-		//make sure token is set at this point
-		if ( ! isset($_SESSION['card_token']) ) {
-				mp()->cart_checkout_error(__('The PIN Token was not generated correctly. Please go back and try again.', 'mp'));
-				return false;
+		$card_token = mp_get_post_value( 'card_token' );
+
+		if ( empty( $card_token ) ) {
+			mp_checkout()->add_error( __( 'The PIN Token was not generated correctly. Please go back and try again.', 'mp' ) );
+			return false;
 		}
 
 		if ( $this->force_ssl ) {
@@ -234,88 +251,60 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 			$this->api_url = 'https://test-api.pin.net.au/1/charges';
 		}
 		
-		$token = $_SESSION['card_token'];
-
-		if ($token) {
-
-				$totals = array();
-				$coupon_code = mp()->get_coupon_code();
-				
-				foreach ($cart as $product_id => $variations) {
-						foreach ($variations as $variation => $data) {
-							$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
-							$totals[] = $price;
-						}
-				}
-
-				$total = array_sum($totals);
-
-				//shipping line
-				$shipping_tax = 0;
-				if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
-					$total += $shipping_price;
-					$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-				}
+		$total = $cart->total( false );
 		
-				//tax line if tax inclusive pricing is off. It it's on it would screw up the totals
-				if ( ! mp_get_setting('tax->tax_inclusive') ) {
-					$tax_price = (mp()->tax_price(false) + $shipping_tax);
-					$total += $tax_price;
-				}
+		$order = new MP_Order();
+		$order_id = $order->get_id();
+
+		try {
+			$args = array(
+				'httpversion' => '1.1',
+				'timeout' => mp_get_api_timeout( $this->plugin_name ),
+				'blocking' => true,
+				'compress' => true,
+				'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( $this->private_key . ':' . '' ),
+				),
+				'body' => array(
+					'amount' => ($total * 100),
+					'currency' => strtolower( $this->currency ),
+					'description' => sprintf( __( '%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo( 'name' ), $order_id, mp_arr_get_value( 'email', $billing_info, '' ) ),
+					'email' => mp_arr_get_value( 'email', $billing_info, '' ),
+					'ip_address' => $_SERVER['REMOTE_ADDR'],
+					'card_token' => $card_token,
+				),
+			);
+
+			$charge = wp_remote_post( $this->api_url, $args );
+			$charge = json_decode( $charge['body'], true );
+			$charge = $charge['response'];
+
+			if ( $charge['success'] == true ) {
+				//setup our payment details
+				$payment_info = array();
+				$payment_info['gateway_public_name'] = $this->public_name;
+				$payment_info['gateway_private_name'] = $this->admin_name;
+				$payment_info['method'] = sprintf( __( '%1$s Card %2$s', 'mp' ), ucfirst( $charge['card']['scheme'] ), $charge['card']['display_number'] );
+				$payment_info['transaction_id'] = $charge['token'];
+				$payment_info['status'][ time() ] = __('Paid', 'mp');
+				$payment_info['total'] = $total;
+				$payment_info['currency'] = $this->currency;
+
+				$order->save( array(
+					'payment_info' => $payment_info,
+					'cart' => $cart,
+					'paid' => true,
+				) );
 				
-				$order_id = mp()->generate_order_id();
-
-				try {
-					$args = array(
-						'httpversion' => '1.1',
-						'timeout' => mp_get_api_timeout( $this->plugin_name ),
-						'blocking' => true,
-						'compress' => true,
-						'headers' => array(
-							'Authorization' => 'Basic ' . base64_encode( $this->private_key . ':' . '' ),
-						),
-						'body' => array(
-							'amount' => (int) $total * 100,
-							'currency' => strtolower( $this->currency ),
-							'description' => sprintf( __( '%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo( 'name' ), $order_id, $_SESSION['mp_shipping_info']['email']),
-							'email' => mp_arr_get_value( 'email', $billing_info, '' ),
-							'ip_address' => $_SESSION['ip_address'],
-							'card_token' => $_SESSION['card_token']
-						),
-					);
-
-					$charge = wp_remote_post( $this->api_url, $args );
-					
-					$charge = json_decode( $charge['body'], true );
-
-					$charge = $charge['response'];
-
-					if ( $charge['success'] == true ) {
-							//setup our payment details
-							$payment_info = array();
-							$payment_info['gateway_public_name'] = $this->public_name;
-							$payment_info['gateway_private_name'] = $this->admin_name;
-							$payment_info['method'] = sprintf(__('%1$s Card %2$s', 'mp'), ucfirst($charge['card']['scheme']), $charge['card']['display_number']);
-							$payment_info['transaction_id'] = $charge['token'];
-							$timestamp = time();
-							$payment_info['status'][$timestamp] = __('Paid', 'mp');
-							$payment_info['total'] = $total;
-							$payment_info['currency'] = $this->currency;
-
-							$order = mp()->create_order($order_id, $cart, $_SESSION['mp_shipping_info'], $payment_info, true);
-
-							unset($_SESSION['card_token']);
-							mp()->set_cart_cookie(Array());
-					} else {
-							unset($_SESSION['card_token']);
-							mp()->cart_checkout_error(sprintf(__('There was an error processing your card. Please <a href="%s">go back and try again</a>.', 'mp'), mp_checkout_step_url('checkout')));
-							return false;
-					}
-			} catch (Exception $e) {
-					unset($_SESSION['card_token']);
-					mp()->cart_checkout_error(sprintf(__('There was an error processing your card: "%s". Please <a href="%s">go back and try again</a>.', 'mp'), $e->getMessage(), mp_checkout_step_url('checkout')));
-					return false;
+				wp_redirect( $order->tracking_url( false ) );
+				exit;
+			} else {
+				mp_checkout()->add_error( __( '<li>There was an error processing your card. Please verify your credit card information and try again.</li>', 'mp' ), 'order-review-payment' );
+				return false;
 			}
+		} catch ( Exception $e ) {
+			mp_checkout()->add_error( sprintf( __( '<li>There was an error processing your card: "%s". Please verify your credit card information and try again.</li>', 'mp' ), $e->getMessage() ), 'order-review-payment' );
+			return false;
 		}
 	}
 }

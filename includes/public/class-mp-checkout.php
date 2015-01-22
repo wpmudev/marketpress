@@ -441,8 +441,17 @@ class MP_Checkout {
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
 			<form id="mp-checkout" class="clearfix' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
 				wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
-		
-		$did_current = false;
+
+		/* Loop through each section to determine if a particular section has errors.
+		If so, set that section as the current section */
+		$visible_section = null;
+		foreach ( $this->_sections as $section => $heading_text ) {
+			if ( ( $this->has_errors( $section ) ) ) {
+				$visible_section = $section;
+				break;
+			}
+		}
+				
 		foreach ( $this->_sections as $section => $heading_text ) {
 			$method = 'section_' . str_replace( '-', '_', $section );
 			$this->_step = $section;
@@ -456,18 +465,17 @@ class MP_Checkout {
 				
 				$id = 'mp-checkout-section-' . $section;
 				$classes = array( 'mp-checkout-section' );
-				if ( ( $this->has_errors( $section ) ) && ! $did_current ) {
-					$classes[] = 'current';
-					$did_current = true;
-				} else {
-					if ( get_query_var( 'mp_confirm_order_step' ) ) {
-						if ( 'order-review-payment' == $section && ! $did_current ) {
-							$classes[] = 'current';
-						}
-					} elseif ( 1 === $this->_stepnum && ! $did_current ) {
+
+				if ( ! is_null( $visible_section ) ) {
+					if ( $section == $visible_section ) {
 						$classes[] = 'current';
-						$did_current = true;
 					}
+				} elseif ( get_query_var( 'mp_confirm_order_step' ) ) {
+					if ( 'order-review-payment' == $section ) {
+						$classes[] = 'current';
+					}
+				} elseif ( 1 === $this->_stepnum ) {
+					$classes[] = 'current';
 				}
 				
 				$html .= '

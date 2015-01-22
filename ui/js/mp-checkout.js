@@ -188,7 +188,7 @@ var mp_checkout;
 				} );
 			} );			
 		},
-				
+		
 		/**
 		 * Initialize checkout steps
 		 *
@@ -258,7 +258,6 @@ var mp_checkout;
 						if ( $checkout.hasClass( 'last-step' ) ) {
 							var gateway = $( '[name="payment_method"]' ).filter( ':checked' ).val();
 							
-							return false;				
 							/**
 							 * Trigger checkout event
 							 *
@@ -503,6 +502,16 @@ var mp_checkout;
 				
 				$target.val( $this.val() ).trigger( 'change' );
 			} );
+		},
+		
+		/**
+		 * Trigger step change event
+		 *
+		 * @since 3.0
+		 */
+		triggerStepChange : function() {
+			var $current = $( '.mp-checkout-section' ).filter( '.current' );
+			$( document ).trigger( 'mp_checkout/step_changed', [ $current, $current ] );
 		}
 	};
 }( jQuery ));
@@ -511,4 +520,5 @@ jQuery( document ).ready( function( $ ){
 	mp_checkout.showForm();
 	mp_checkout.initListeners();
 	mp_checkout.toggleShippingAddressFields();
+	mp_checkout.triggerStepChange();	
 });

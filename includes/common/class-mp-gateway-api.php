@@ -184,6 +184,24 @@ class MP_Gateway_API {
   }
   
   /**
+   * Check if gateway is set to force SSL and, if so, redirect to SSL checkout
+   *
+   * @since 3.0
+   * @access public
+   * @action wp
+   * @uses $post
+   */
+  public function maybe_force_ssl() {
+	  global $post;
+	  
+	  if ( $this->force_ssl && ! is_ssl() && mp_is_shop_page( 'checkout' ) ) {
+		  $url = str_replace( 'http://', 'https://', get_permalink( $post->ID ) );
+		  wp_redirect( $url );
+		  exit;
+	  }
+  }
+  
+  /**
    * Maybe print checkout scripts
    *
    * @since 3.0
@@ -257,7 +275,7 @@ $( document ).on( 'mp_checkout_process_<?php echo $this->plugin_name; ?>', funct
   protected function _cc_default_form( $use_names = true ) {
 		$name = mp_get_user_address_part( 'first_name', 'billing' ) . ' ' . mp_get_user_address_part( 'last_name', 'billing' );
 		$form = '
-			<input type="hidden" name="mp_cc_name" value="' . esc_attr( $name ) . '" />
+			<input type="hidden" id="mp-cc-name" name="mp_cc_name" value="' . esc_attr( $name ) . '" />
 			<div class="mp-checkout-form-row">
 				<label>' . __('Card Number', 'mp') . '<span class="mp-field-required">*</span></label>
 				<input
@@ -502,6 +520,7 @@ $( document ).on( 'mp_checkout_process_<?php echo $this->plugin_name; ?>', funct
     add_action( 'wp_ajax_mp_process_ipn_return_' . $this->plugin_name, array( &$this, 'process_ipn_return' ) );
     add_action( 'wp_ajax_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
     add_action( 'wp_ajax_nopriv_mp_process_checkout_return_' . $this->plugin_name, array( &$this, 'process_checkout_return' ) );
+    add_action( 'wp', array( &$this, 'maybe_force_ssl' ) );
 
 		if ( is_admin() ) {
     	$this->init_settings_metabox();
