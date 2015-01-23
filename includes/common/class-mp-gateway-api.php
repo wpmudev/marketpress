@@ -216,8 +216,8 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 			<script type="text/javascript">
 				( function( $ ) {
 					$( document ).on( 'mp_checkout_process_<?php echo $this->plugin_name; ?>', function( e, $form ) {
-						//marketpress.loadingOverlay( 'show' );
-						//$form.get( 0 ).submit();
+						marketpress.loadingOverlay( 'show' );
+						$form.get( 0 ).submit();
 
 					} );
 				}( jQuery ) );

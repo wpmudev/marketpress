@@ -286,7 +286,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 	function process_payment( $cart, $billing_info, $shipping_info ) {
 		//make sure token is set at this point
 		$token = mp_get_post_value( 'paymill_token' );
-		
+
 		if ( false === $token ) {
 			mp_checkout()->add_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ), 'order-review-payment' );
 			return false;
@@ -363,6 +363,10 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 	 */
 	function process_ipn_return() {
 		
+	}
+
+	function print_checkout_scripts() {
+		// Intentionally left blank
 	}
 
 }

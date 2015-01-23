@@ -446,6 +446,10 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	function process_ipn_return() {
 		
 	}
+	
+	function print_checkout_scripts() {
+		// Intentionally left blank
+	}
 
 }
 
