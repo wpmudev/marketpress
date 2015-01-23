@@ -2,7 +2,7 @@
 
 /*
   MarketPress Stripe Gateway Plugin
-  Author: Aaron Edwards, Marko Miljus
+  Author - Aaron Edwards, Marko Miljus
  */
 
 class MP_Gateway_Stripe extends MP_Gateway_API {
@@ -35,147 +35,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 * @access public
 	 * @var array
 	 */
-	var $currencies = array(
-		"AED"	 => 'AED: United Arab Emirates Dirham',
-		"AFN"	 => 'AFN: Afghan Afghani*',
-		"ALL"	 => 'ALL: Albanian Lek',
-		"AMD"	 => 'AMD: Armenian Dram',
-		"ANG"	 => 'ANG: Netherlands Antillean Gulden',
-		"AOA"	 => 'AOA: Angolan Kwanza*',
-		"ARS"	 => 'ARS: Argentine Peso*',
-		"AUD"	 => 'AUD: Australian Dollar*',
-		"AWG"	 => 'AWG: Aruban Florin',
-		"AZN"	 => 'AZN: Azerbaijani Manat',
-		"BAM"	 => 'BAM: Bosnia & Herzegovina Convertible Mark',
-		"BBD"	 => 'BBD: Barbadian Dollar',
-		"BDT"	 => 'BDT: Bangladeshi Taka',
-		"BGN"	 => 'BGN: Bulgarian Lev',
-		"BIF"	 => 'BIF: Burundian Franc',
-		"BMD"	 => 'BMD: Bermudian Dollar',
-		"BND"	 => 'BND: Brunei Dollar',
-		"BOB"	 => 'BOB: Bolivian Boliviano*',
-		"BRL"	 => 'BRL: Brazilian Real*',
-		"BSD"	 => 'BSD: Bahamian Dollar',
-		"BWP"	 => 'BWP: Botswana Pula',
-		"BZD"	 => 'BZD: Belize Dollar',
-		"CAD"	 => 'CAD: Canadian Dollar*',
-		"CDF"	 => 'CDF: Congolese Franc',
-		"CHF"	 => 'CHF: Swiss Franc',
-		"CLP"	 => 'CLP: Chilean Peso*',
-		"CNY"	 => 'CNY: Chinese Renminbi Yuan',
-		"COP"	 => 'COP: Colombian Peso*',
-		"CRC"	 => 'CRC: Costa Rican Colón*',
-		"CVE"	 => 'CVE: Cape Verdean Escudo*',
-		"CZK"	 => 'CZK: Czech Koruna*',
-		"DJF"	 => 'DJF: Djiboutian Franc*',
-		"DKK"	 => 'DKK: Danish Krone',
-		"DOP"	 => 'DOP: Dominican Peso',
-		"DZD"	 => 'DZD: Algerian Dinar',
-		"EEK"	 => 'EEK: Estonian Kroon*',
-		"EGP"	 => 'EGP: Egyptian Pound',
-		"ETB"	 => 'ETB: Ethiopian Birr',
-		"EUR"	 => 'EUR: Euro',
-		"FJD"	 => 'FJD: Fijian Dollar',
-		"FKP"	 => 'FKP: Falkland Islands Pound*',
-		"GBP"	 => 'GBP: British Pound',
-		"GEL"	 => 'GEL: Georgian Lari',
-		"GIP"	 => 'GIP: Gibraltar Pound',
-		"GMD"	 => 'GMD: Gambian Dalasi',
-		"GNF"	 => 'GNF: Guinean Franc*',
-		"GTQ"	 => 'GTQ: Guatemalan Quetzal*',
-		"GYD"	 => 'GYD: Guyanese Dollar',
-		"HKD"	 => 'HKD: Hong Kong Dollar',
-		"HNL"	 => 'HNL: Honduran Lempira*',
-		"HRK"	 => 'HRK: Croatian Kuna',
-		"HTG"	 => 'HTG: Haitian Gourde',
-		"HUF"	 => 'HUF: Hungarian Forint',
-		"IDR"	 => 'IDR: Indonesian Rupiah',
-		"ILS"	 => 'ILS: Israeli New Sheqel',
-		"INR"	 => 'INR: Indian Rupee*',
-		"ISK"	 => 'ISK: Icelandic Króna',
-		"JMD"	 => 'JMD: Jamaican Dollar',
-		"JPY"	 => 'JPY: Japanese Yen',
-		"KES"	 => 'KES: Kenyan Shilling',
-		"KGS"	 => 'KGS: Kyrgyzstani Som',
-		"KHR"	 => 'KHR: Cambodian Riel',
-		"KMF"	 => 'KMF: Comorian Franc',
-		"KRW"	 => 'KRW: South Korean Won',
-		"KYD"	 => 'KYD: Cayman Islands Dollar',
-		"KZT"	 => 'KZT: Kazakhstani Tenge',
-		"LAK"	 => 'LAK: Lao Kip*',
-		"LBP"	 => 'LBP: Lebanese Pound',
-		"LKR"	 => 'LKR: Sri Lankan Rupee',
-		"LRD"	 => 'LRD: Liberian Dollar',
-		"LSL"	 => 'LSL: Lesotho Loti',
-		"LTL"	 => 'LTL: Lithuanian Litas',
-		"LVL"	 => 'LVL: Latvian Lats',
-		"MAD"	 => 'MAD: Moroccan Dirham',
-		"MDL"	 => 'MDL: Moldovan Leu',
-		"MGA"	 => 'MGA: Malagasy Ariary',
-		"MKD"	 => 'MKD: Macedonian Denar',
-		"MNT"	 => 'MNT: Mongolian Tögrög',
-		"MOP"	 => 'MOP: Macanese Pataca',
-		"MRO"	 => 'MRO: Mauritanian Ouguiya',
-		"MUR"	 => 'MUR: Mauritian Rupee*',
-		"MVR"	 => 'MVR: Maldivian Rufiyaa',
-		"MWK"	 => 'MWK: Malawian Kwacha',
-		"MXN"	 => 'MXN: Mexican Peso*',
-		"MYR"	 => 'MYR: Malaysian Ringgit',
-		"MZN"	 => 'MZN: Mozambican Metical',
-		"NAD"	 => 'NAD: Namibian Dollar',
-		"NGN"	 => 'NGN: Nigerian Naira',
-		"NIO"	 => 'NIO: Nicaraguan Córdoba*',
-		"NOK"	 => 'NOK: Norwegian Krone',
-		"NPR"	 => 'NPR: Nepalese Rupee',
-		"NZD"	 => 'NZD: New Zealand Dollar',
-		"PAB"	 => 'PAB: Panamanian Balboa*',
-		"PEN"	 => 'PEN: Peruvian Nuevo Sol*',
-		"PGK"	 => 'PGK: Papua New Guinean Kina',
-		"PHP"	 => 'PHP: Philippine Peso',
-		"PKR"	 => 'PKR: Pakistani Rupee',
-		"PLN"	 => 'PLN: Polish Złoty',
-		"PYG"	 => 'PYG: Paraguayan Guaraní*',
-		"QAR"	 => 'QAR: Qatari Riyal',
-		"RON"	 => 'RON: Romanian Leu',
-		"RSD"	 => 'RSD: Serbian Dinar',
-		"RUB"	 => 'RUB: Russian Ruble',
-		"RWF"	 => 'RWF: Rwandan Franc',
-		"SAR"	 => 'SAR: Saudi Riyal',
-		"SBD"	 => 'SBD: Solomon Islands Dollar',
-		"SCR"	 => 'SCR: Seychellois Rupee',
-		"SEK"	 => 'SEK: Swedish Krona',
-		"SGD"	 => 'SGD: Singapore Dollar',
-		"SHP"	 => 'SHP: Saint Helenian Pound*',
-		"SLL"	 => 'SLL: Sierra Leonean Leone',
-		"SOS"	 => 'SOS: Somali Shilling',
-		"SRD"	 => 'SRD: Surinamese Dollar*',
-		"STD"	 => 'STD: São Tomé and Príncipe Dobra',
-		"SVC"	 => 'SVC: Salvadoran Colón*',
-		"SZL"	 => 'SZL: Swazi Lilangeni',
-		"THB"	 => 'THB: Thai Baht',
-		"TJS"	 => 'TJS: Tajikistani Somoni',
-		"TOP"	 => 'TOP: Tongan Paʻanga',
-		"TRY"	 => 'TRY: Turkish Lira',
-		"TTD"	 => 'TTD: Trinidad and Tobago Dollar',
-		"TWD"	 => 'TWD: New Taiwan Dollar',
-		"TZS"	 => 'TZS: Tanzanian Shilling',
-		"UAH"	 => 'UAH: Ukrainian Hryvnia',
-		"UGX"	 => 'UGX: Ugandan Shilling',
-		"USD"	 => 'USD: United States Dollar',
-		"UYI"	 => 'UYI: Uruguayan Peso*',
-		"UZS"	 => 'UZS: Uzbekistani Som',
-		"VEF"	 => 'VEF: Venezuelan Bolívar*',
-		"VND"	 => 'VND: Vietnamese Đồng',
-		"VUV"	 => 'VUV: Vanuatu Vatu',
-		"WST"	 => 'WST: Samoan Tala',
-		"XAF"	 => 'XAF: Central African Cfa Franc',
-		"XCD"	 => 'XCD: East Caribbean Dollar',
-		"XOF"	 => 'XOF: West African Cfa Franc*',
-		"XPF"	 => 'XPF: Cfp Franc*',
-		"YER"	 => 'YER: Yemeni Rial',
-		"ZAR"	 => 'ZAR: South African Rand',
-		"ZMW"	 => 'ZMW: Zambian Kwacha',
-	);
+	var $currencies = array();
 
 	/**
 	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
@@ -192,6 +52,148 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		$this->secret_key		 = $this->get_setting( 'api_credentials->secret_key' );
 		$this->force_ssl		 = (bool) $this->get_setting( 'is_ssl' );
 		$this->currency			 = $this->get_setting( 'currency', 'USD' );
+
+		$this->currencies = array(
+			"AED"	 => __( 'AED - United Arab Emirates Dirham', 'mp' ),
+			"AFN"	 => __( 'AFN - Afghan Afghani*', 'mp' ),
+			"ALL"	 => __( 'ALL - Albanian Lek', 'mp' ),
+			"AMD"	 => __( 'AMD - Armenian Dram', 'mp' ),
+			"ANG"	 => __( 'ANG - Netherlands Antillean Gulden', 'mp' ),
+			"AOA"	 => __( 'AOA - Angolan Kwanza*', 'mp' ),
+			"ARS"	 => __( 'ARS - Argentine Peso*', 'mp' ),
+			"AUD"	 => __( 'AUD - Australian Dollar*', 'mp' ),
+			"AWG"	 => __( 'AWG - Aruban Florin', 'mp' ),
+			"AZN"	 => __( 'AZN - Azerbaijani Manat', 'mp' ),
+			"BAM"	 => __( 'BAM - Bosnia & Herzegovina Convertible Mark', 'mp' ),
+			"BBD"	 => __( 'BBD - Barbadian Dollar', 'mp' ),
+			"BDT"	 => __( 'BDT - Bangladeshi Taka', 'mp' ),
+			"BGN"	 => __( 'BGN - Bulgarian Lev', 'mp' ),
+			"BIF"	 => __( 'BIF - Burundian Franc', 'mp' ),
+			"BMD"	 => __( 'BMD - Bermudian Dollar', 'mp' ),
+			"BND"	 => __( 'BND - Brunei Dollar', 'mp' ),
+			"BOB"	 => __( 'BOB - Bolivian Boliviano*', 'mp' ),
+			"BRL"	 => __( 'BRL - Brazilian Real*', 'mp' ),
+			"BSD"	 => __( 'BSD - Bahamian Dollar', 'mp' ),
+			"BWP"	 => __( 'BWP - Botswana Pula', 'mp' ),
+			"BZD"	 => __( 'BZD - Belize Dollar', 'mp' ),
+			"CAD"	 => __( 'CAD - Canadian Dollar*', 'mp' ),
+			"CDF"	 => __( 'CDF - Congolese Franc', 'mp' ),
+			"CHF"	 => __( 'CHF - Swiss Franc', 'mp' ),
+			"CLP"	 => __( 'CLP - Chilean Peso*', 'mp' ),
+			"CNY"	 => __( 'CNY - Chinese Renminbi Yuan', 'mp' ),
+			"COP"	 => __( 'COP - Colombian Peso*', 'mp' ),
+			"CRC"	 => __( 'CRC - Costa Rican Colón*', 'mp' ),
+			"CVE"	 => __( 'CVE - Cape Verdean Escudo*', 'mp' ),
+			"CZK"	 => __( 'CZK - Czech Koruna*', 'mp' ),
+			"DJF"	 => __( 'DJF - Djiboutian Franc*', 'mp' ),
+			"DKK"	 => __( 'DKK - Danish Krone', 'mp' ),
+			"DOP"	 => __( 'DOP - Dominican Peso', 'mp' ),
+			"DZD"	 => __( 'DZD - Algerian Dinar', 'mp' ),
+			"EEK"	 => __( 'EEK - Estonian Kroon*', 'mp' ),
+			"EGP"	 => __( 'EGP - Egyptian Pound', 'mp' ),
+			"ETB"	 => __( 'ETB - Ethiopian Birr', 'mp' ),
+			"EUR"	 => __( 'EUR - Euro', 'mp' ),
+			"FJD"	 => __( 'FJD - Fijian Dollar', 'mp' ),
+			"FKP"	 => __( 'FKP - Falkland Islands Pound*', 'mp' ),
+			"GBP"	 => __( 'GBP - British Pound', 'mp' ),
+			"GEL"	 => __( 'GEL - Georgian Lari', 'mp' ),
+			"GIP"	 => __( 'GIP - Gibraltar Pound', 'mp' ),
+			"GMD"	 => __( 'GMD - Gambian Dalasi', 'mp' ),
+			"GNF"	 => __( 'GNF - Guinean Franc*', 'mp' ),
+			"GTQ"	 => __( 'GTQ - Guatemalan Quetzal*', 'mp' ),
+			"GYD"	 => __( 'GYD - Guyanese Dollar', 'mp' ),
+			"HKD"	 => __( 'HKD - Hong Kong Dollar', 'mp' ),
+			"HNL"	 => __( 'HNL - Honduran Lempira*', 'mp' ),
+			"HRK"	 => __( 'HRK - Croatian Kuna', 'mp' ),
+			"HTG"	 => __( 'HTG - Haitian Gourde', 'mp' ),
+			"HUF"	 => __( 'HUF - Hungarian Forint', 'mp' ),
+			"IDR"	 => __( 'IDR - Indonesian Rupiah', 'mp' ),
+			"ILS"	 => __( 'ILS - Israeli New Sheqel', 'mp' ),
+			"INR"	 => __( 'INR - Indian Rupee*', 'mp' ),
+			"ISK"	 => __( 'ISK - Icelandic Króna', 'mp' ),
+			"JMD"	 => __( 'JMD - Jamaican Dollar', 'mp' ),
+			"JPY"	 => __( 'JPY - Japanese Yen', 'mp' ),
+			"KES"	 => __( 'KES - Kenyan Shilling', 'mp' ),
+			"KGS"	 => __( 'KGS - Kyrgyzstani Som', 'mp' ),
+			"KHR"	 => __( 'KHR - Cambodian Riel', 'mp' ),
+			"KMF"	 => __( 'KMF - Comorian Franc', 'mp' ),
+			"KRW"	 => __( 'KRW - South Korean Won', 'mp' ),
+			"KYD"	 => __( 'KYD - Cayman Islands Dollar', 'mp' ),
+			"KZT"	 => __( 'KZT - Kazakhstani Tenge', 'mp' ),
+			"LAK"	 => __( 'LAK - Lao Kip*', 'mp' ),
+			"LBP"	 => __( 'LBP - Lebanese Pound', 'mp' ),
+			"LKR"	 => __( 'LKR - Sri Lankan Rupee', 'mp' ),
+			"LRD"	 => __( 'LRD - Liberian Dollar', 'mp' ),
+			"LSL"	 => __( 'LSL - Lesotho Loti', 'mp' ),
+			"LTL"	 => __( 'LTL - Lithuanian Litas', 'mp' ),
+			"LVL"	 => __( 'LVL - Latvian Lats', 'mp' ),
+			"MAD"	 => __( 'MAD - Moroccan Dirham', 'mp' ),
+			"MDL"	 => __( 'MDL - Moldovan Leu', 'mp' ),
+			"MGA"	 => __( 'MGA - Malagasy Ariary', 'mp' ),
+			"MKD"	 => __( 'MKD - Macedonian Denar', 'mp' ),
+			"MNT"	 => __( 'MNT - Mongolian Tögrög', 'mp' ),
+			"MOP"	 => __( 'MOP - Macanese Pataca', 'mp' ),
+			"MRO"	 => __( 'MRO - Mauritanian Ouguiya', 'mp' ),
+			"MUR"	 => __( 'MUR - Mauritian Rupee*', 'mp' ),
+			"MVR"	 => __( 'MVR - Maldivian Rufiyaa', 'mp' ),
+			"MWK"	 => __( 'MWK - Malawian Kwacha', 'mp' ),
+			"MXN"	 => __( 'MXN - Mexican Peso*', 'mp' ),
+			"MYR"	 => __( 'MYR - Malaysian Ringgit', 'mp' ),
+			"MZN"	 => __( 'MZN - Mozambican Metical', 'mp' ),
+			"NAD"	 => __( 'NAD - Namibian Dollar', 'mp' ),
+			"NGN"	 => __( 'NGN - Nigerian Naira', 'mp' ),
+			"NIO"	 => __( 'NIO - Nicaraguan Córdoba*', 'mp' ),
+			"NOK"	 => __( 'NOK - Norwegian Krone', 'mp' ),
+			"NPR"	 => __( 'NPR - Nepalese Rupee', 'mp' ),
+			"NZD"	 => __( 'NZD - New Zealand Dollar', 'mp' ),
+			"PAB"	 => __( 'PAB - Panamanian Balboa*', 'mp' ),
+			"PEN"	 => __( 'PEN - Peruvian Nuevo Sol*', 'mp' ),
+			"PGK"	 => __( 'PGK - Papua New Guinean Kina', 'mp' ),
+			"PHP"	 => __( 'PHP - Philippine Peso', 'mp' ),
+			"PKR"	 => __( 'PKR - Pakistani Rupee', 'mp' ),
+			"PLN"	 => __( 'PLN - Polish Złoty', 'mp' ),
+			"PYG"	 => __( 'PYG - Paraguayan Guaraní*', 'mp' ),
+			"QAR"	 => __( 'QAR - Qatari Riyal', 'mp' ),
+			"RON"	 => __( 'RON - Romanian Leu', 'mp' ),
+			"RSD"	 => __( 'RSD - Serbian Dinar', 'mp' ),
+			"RUB"	 => __( 'RUB - Russian Ruble', 'mp' ),
+			"RWF"	 => __( 'RWF - Rwandan Franc', 'mp' ),
+			"SAR"	 => __( 'SAR - Saudi Riyal', 'mp' ),
+			"SBD"	 => __( 'SBD - Solomon Islands Dollar', 'mp' ),
+			"SCR"	 => __( 'SCR - Seychellois Rupee', 'mp' ),
+			"SEK"	 => __( 'SEK - Swedish Krona', 'mp' ),
+			"SGD"	 => __( 'SGD - Singapore Dollar', 'mp' ),
+			"SHP"	 => __( 'SHP - Saint Helenian Pound*', 'mp' ),
+			"SLL"	 => __( 'SLL - Sierra Leonean Leone', 'mp' ),
+			"SOS"	 => __( 'SOS - Somali Shilling', 'mp' ),
+			"SRD"	 => __( 'SRD - Surinamese Dollar*', 'mp' ),
+			"STD"	 => __( 'STD - São Tomé and Príncipe Dobra', 'mp' ),
+			"SVC"	 => __( 'SVC - Salvadoran Colón*', 'mp' ),
+			"SZL"	 => __( 'SZL - Swazi Lilangeni', 'mp' ),
+			"THB"	 => __( 'THB - Thai Baht', 'mp' ),
+			"TJS"	 => __( 'TJS - Tajikistani Somoni', 'mp' ),
+			"TOP"	 => __( 'TOP - Tongan Paʻanga', 'mp' ),
+			"TRY"	 => __( 'TRY - Turkish Lira', 'mp' ),
+			"TTD"	 => __( 'TTD - Trinidad and Tobago Dollar', 'mp' ),
+			"TWD"	 => __( 'TWD - New Taiwan Dollar', 'mp' ),
+			"TZS"	 => __( 'TZS - Tanzanian Shilling', 'mp' ),
+			"UAH"	 => __( 'UAH - Ukrainian Hryvnia', 'mp' ),
+			"UGX"	 => __( 'UGX - Ugandan Shilling', 'mp' ),
+			"USD"	 => __( 'USD - United States Dollar', 'mp' ),
+			"UYI"	 => __( 'UYI - Uruguayan Peso*', 'mp' ),
+			"UZS"	 => __( 'UZS - Uzbekistani Som', 'mp' ),
+			"VEF"	 => __( 'VEF - Venezuelan Bolívar*', 'mp' ),
+			"VND"	 => __( 'VND - Vietnamese Đồng', 'mp' ),
+			"VUV"	 => __( 'VUV - Vanuatu Vatu', 'mp' ),
+			"WST"	 => __( 'WST - Samoan Tala', 'mp' ),
+			"XAF"	 => __( 'XAF - Central African Cfa Franc', 'mp' ),
+			"XCD"	 => __( 'XCD - East Caribbean Dollar', 'mp' ),
+			"XOF"	 => __( 'XOF - West African Cfa Franc*', 'mp' ),
+			"XPF"	 => __( 'XPF - Cfp Franc*', 'mp' ),
+			"YER"	 => __( 'YER - Yemeni Rial', 'mp' ),
+			"ZAR"	 => __( 'ZAR - South African Rand', 'mp' ),
+			"ZMW"	 => __( 'ZMW - Zambian Kwacha', 'mp' ),
+		);
 
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_scripts' ) );
 	}
@@ -311,23 +313,23 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 */
 	public function init_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'			 => $this->generate_metabox_id(),
-			'page_slugs'	 => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
-			'title'			 => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
-			'option_name'	 => 'mp_settings',
-			'desc'			 => __( 'Stripe makes it easy to start accepting credit cards directly on your site with full PCI compliance. Accept Visa, MasterCard, American Express, Discover, JCB, and Diners Club cards directly on your site. You don\'t need a merchant account or gateway. Stripe handles everything, including storing cards, subscriptions, and direct payouts to your bank account. Credit cards go directly to Stripe\'s secure environment, and never hit your servers so you can avoid most PCI requirements.', 'mp' ),
-			'conditional'	 => array(
-				'name'	 => 'gateways[allowed][' . $this->plugin_name . ']',
-				'value'	 => 1,
-				'action' => 'show',
-			),
+		'id' => $this->generate_metabox_id(),
+		'page_slugs' => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
+		'title' => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
+		'option_name' => __('mp_settings',
+		'desc' => __( 'Stripe makes it easy to start accepting credit cards directly on your site with full PCI compliance. Accept Visa, MasterCard, American Express, Discover, JCB, and Diners Club cards directly on your site. You don\'t need a merchant account or gateway. Stripe handles everything, including storing cards, subscriptions, and direct payouts to your bank account. Credit cards go directly to Stripe\'s secure environment, and never hit your servers so you can avoid most PCI requirements.', 'mp' ),
+		'conditional' => array(
+		'name' => __('gateways[allowed][' . $this->plugin_name . ']',
+		'value' => 1,
+		'action' => __('show',
+		),
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'	 => $this->get_field_name( 'is_ssl' ),
 			'label'	 => array( 'text' => __( 'Force SSL?', 'mp' ) ),
 			'desc'	 => __( 'When in live mode Stripe recommends you have an SSL certificate setup for the site where the checkout form will be displayed.', 'mp' ),
 		) );
-		$creds	 = $metabox->add_field( 'complex', array(
+		$creds = $metabox->add_field( 'complex', array(
 			'name'	 => $this->get_field_name( 'api_credentials' ),
 			'label'	 => array( 'text' => __( 'API Credentials', 'mp' ) ),
 			'desc'	 => __( 'You must login to Stripe to <a target="_blank" href="https://manage.stripe.com/#account/apikeys">get your API credentials</a>. You can enter your test credentials, then live ones when ready.', 'mp' ),
@@ -335,29 +337,29 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 
 		if ( $creds instanceof WPMUDEV_Field ) {
 			$creds->add_field( 'text', array(
-				'name'		 => 'secret_key',
-				'label'		 => array( 'text' => __( 'Secret Key', 'mp' ) ),
-				'validation' => array(
-					'required' => true,
-				),
+			'name' => __('secret_key',
+			'label' => array( 'text' => __( 'Secret Key', 'mp' ) ),
+			'validation' => array(
+			'required' => true,
+			),
 			) );
 			$creds->add_field( 'text', array(
-				'name'		 => 'publishable_key',
-				'label'		 => array( 'text' => __( 'Publishable Key', 'mp' ) ),
-				'validation' => array(
-					'required' => true,
-				),
+			'name' => __('publishable_key',
+			'label' => array( 'text' => __( 'Publishable Key', 'mp' ) ),
+			'validation' => array(
+			'required' => true,
+			),
 			) );
 		}
 
 		$metabox->add_field( 'advanced_select', array(
-			'name'			 => $this->get_field_name( 'currency' ),
-			'label'			 => array( 'text' => __( 'Currency', 'mp' ) ),
-			'multiple'		 => false,
-			'width'			 => 'element',
-			'options'		 => $this->currencies,
-			'default_value'	 => mp_get_setting( 'currency' ),
-			'desc'			 => __( 'Selecting a currency other than that used for your store may cause problems at checkout.', 'mp' ),
+		'name' => $this->get_field_name( 'currency' ),
+		'label' => array( 'text' => __( 'Currency', 'mp' ) ),
+		'multiple' => false,
+		'width' => __('element',
+		'options' => $this->currencies,
+		'default_value' => mp_get_setting( 'currency' ),
+		'desc' => __( 'Selecting a currency other than that used for your store may cause problems at checkout.', 'mp' ),
 		) );
 	}
 
@@ -373,6 +375,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	function process_payment( $cart, $billing_info, $shipping_info ) {
 		//make sure token is set at this point
 		$token = mp_get_post_value( 'stripe_token' );
+
 		if ( false === $token ) {
 			mp_checkout()->add_error( __( 'The Stripe Token was not generated correctly. Please go back and try again.', 'mp' ), 'order-review-payment' );
 			return false;
@@ -409,7 +412,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 				'amount'		 => round( $total * 100 ), // amount in cents
 				'currency'		 => strtolower( $this->currency ),
 				'card'			 => $token,
-				'description'	 => sprintf( __( '%s Store Purchase - Order ID: %s, Email: %s', 'mp' ), get_bloginfo( 'name' ), $order_id, mp_get_user_address_part( 'email', 'billing' ) ),
+				'description'	 => sprintf( __( '%s Store Purchase - Order ID - %s, Email - %s', 'mp' ), get_bloginfo( 'name' ), $order_id, mp_get_user_address_part( 'email', 'billing' ) ),
 			) );
 
 			if ( $charge->paid == 'true' ) {
@@ -436,7 +439,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 				) );
 			}
 		} catch ( Exception $e ) {
-			mp_checkout()->add_error( sprintf( __( 'There was an error processing your card: "%s". Please try again.', 'mp' ), $e->getMessage() ), 'payment' );
+			mp_checkout()->add_error( sprintf( __( 'There was an error processing your card - "%s". Please try again.', 'mp' ), $e->getMessage() ), 'payment' );
 		}
 	}
 
@@ -446,7 +449,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	function process_ipn_return() {
 		
 	}
-	
+
 	function print_checkout_scripts() {
 		// Intentionally left blank
 	}
