@@ -39,7 +39,7 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
      * @since 3.0
      * @event mp_checkout_process_stripe
      */
-    function paymill_process_checkout( $form ) {
+    function paymill_process_checkout( e, $form ) {
         marketpress.loadingOverlay( 'show' );
         paymill_removeInputNames();
 
@@ -106,13 +106,15 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
             paymill_error_message( 'hide' );
 
             // Submit order for processing
-            //$( '#mp-checkout' ).append( '<input type="hidden" name="paymill_token" value="' + token + '" />' );
+            $( '#mp-checkout' ).append( '<input type="hidden" name="paymill_token" value="' + token + '" />' );
 
             //return false;
-            var data = $( '#mp-checkout' ).serialize() + '&paymill_token=' + token;
+            
+            var data = $( '#mp-checkout' ).serialize();
             var url = mp_i18n.ajaxurl + '?action=mp_process_checkout';
 
             $.post( url, data ).done( function( resp ) {
+                //console.log(resp);
                 if ( resp.success ) {
                     window.location.href = resp.data.redirect_url;
                 } else {

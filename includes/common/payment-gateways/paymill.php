@@ -286,7 +286,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 	function process_payment( $cart, $billing_info, $shipping_info ) {
 		//make sure token is set at this point
 		$token = mp_get_post_value( 'paymill_token' );
-
+		
 		if ( false === $token ) {
 			mp_checkout()->add_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ), 'order-review-payment' );
 			return false;
@@ -295,8 +295,6 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 
 		define( 'PAYMILL_API_HOST', 'https://api.paymill.com/v2/' );
 		define( 'PAYMILL_API_KEY', $this->private_key );
-
-		$token = $_SESSION[ 'paymillToken' ];
 
 		if ( $token ) {
 			require mp_plugin_dir( 'includes/common/payment-gateways/paymill-files/lib/Services/Paymill/Transactions.php' );
@@ -352,11 +350,8 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 						'shipping_info'	 => $shipping_info,
 						'paid'			 => true
 					) );
-
-					unset( $_SESSION[ 'paymillToken' ] );
 				}
 			} catch ( Exception $e ) {
-				unset( $_SESSION[ 'paymillToken' ] );
 				mp_checkout()->add_error( sprintf( __( 'There was an error processing your card: "%s". Please try again.', 'mp' ), $e->getMessage() ), 'payment' );
 				return false;
 			}
