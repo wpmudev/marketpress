@@ -2,12 +2,11 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
 
 ( function( $ ) {
 
-    $( document ).on( 'mp_checkout_process_paymill', processCheckout );
-    $( document ).ready( init );
+    $( document ).on( 'mp_checkout_process_paymill', paymill_process_checkout );
 
     $( document ).on( 'mp_checkout/step_changed', function( evt, $out, $in ) {
         if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
-            addInputNames();
+            paymill_addInputNames();
         }
     } );
 
@@ -19,7 +18,7 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
      *
      * @since 3.0
      */
-    function addInputNames() {
+    function paymill_addInputNames() {
         $( '#mp-paymill-name' ).attr( 'name', 'mp_paymill_name' );
         $( '#mp-paymill-cc-num' ).attr( 'name', 'mp_paymill_cc_num' );
         $( '#mp-paymill-cc-exp' ).attr( 'name', 'mp_paymill_cc_exp' );
@@ -31,28 +30,18 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
      *
      * @since 3.0
      */
-    function removeInputNames() {
+    function paymill_removeInputNames() {
         $( '#mp-paymill-name, #mp-paymill-cc-num, #mp-paymill-cc-exp, #mp-paymill-cc-cvc' ).removeAttr( 'name' );
     }
-
-    /**
-     * Initialization function
-     *
-     * @since 3.0
-     */
-    function init() {
-
-    }
-
     /**
      * Process checkout
      *
      * @since 3.0
      * @event mp_checkout_process_stripe
      */
-    function processCheckout( $form ) {
+    function paymill_process_checkout( $form ) {
         marketpress.loadingOverlay( 'show' );
-        removeInputNames();
+        paymill_removeInputNames();
 
         var $name = $( '#mp-paymill-name' );
         var $number = $( '#mp-paymill-cc-num' );
@@ -70,7 +59,7 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
             cardholdername: $name.val(),
             amount: $amount.val(),
             currency: $currency.val()
-        }, responseHandler );
+        }, paymill_response_handler );
     }
 
     /**
@@ -80,7 +69,7 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
      * @param string action Either "show" or "hide".
      * @param string message The message to show. Required if action is "show".
      */
-    function errorMessage( action, message ) {
+    function paymill_error_message( action, message ) {
         var $errors = $( '#mp-checkout-payment-form-errors' );
 
         if ( 'show' == action ) {
@@ -95,8 +84,11 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
      *
      * @since 3.0
      */
-    function responseHandler( error, response ) {
+    function paymill_response_handler( error, response ) {
+        //console.log(response);
+
         if ( response.error ) {
+ 
             var error_message = '';
             if ( error.apierror == 'field_invalid_card_cvc' ) {
                 error_message = paymill_token.invalid_cvc;
@@ -108,12 +100,15 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
                 error_message = error.apierror;
             }
             marketpress.loadingOverlay( 'hide' );
-            errorMessage( 'show', error_message );
+            paymill_error_message( 'show', error_message );
         } else {
-            var token = result.token;
-            errorMessage( 'hide' );
+            var token = response.token;
+            paymill_error_message( 'hide' );
 
             // Submit order for processing
+            //$( '#mp-checkout' ).append( '<input type="hidden" name="paymill_token" value="' + token + '" />' );
+
+            //return false;
             var data = $( '#mp-checkout' ).serialize() + '&paymill_token=' + token;
             var url = mp_i18n.ajaxurl + '?action=mp_process_checkout';
 
@@ -127,7 +122,7 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
                     $.each( resp.data.errors, function( index, value ) {
                         message += value + '<br />';
                     } );
-                    errorMessage( 'show', message );
+                    paymill_error_message( 'show', message );
                 }
             } );
         }

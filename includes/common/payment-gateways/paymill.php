@@ -169,9 +169,11 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 	 */
 	function confirm_payment_form( $cart, $shipping_info ) {
 		//make sure token is set at this point
-		if ( !isset( $_SESSION[ 'paymillToken' ] ) ) {
-			mp()->cart_checkout_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ) );
+		if ( !isset( $_POST[ 'paymillToken' ] ) ) {
+			mp_checkout()->add_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ) );
 			return false;
+		} else {
+			$_SESSION[ 'paymillToken' ] = $_POST[ 'paymillToken' ];
 		}
 
 		$content = '';
@@ -282,11 +284,14 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
-//make sure token is set at this point
-		if ( !isset( $_SESSION[ 'paymillToken' ] ) ) {
-			mp()->cart_checkout_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ) );
+		//make sure token is set at this point
+		$token = mp_get_post_value( 'paymill_token' );
+
+		if ( false === $token ) {
+			mp_checkout()->add_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ), 'order-review-payment' );
 			return false;
 		}
+
 
 		define( 'PAYMILL_API_HOST', 'https://api.paymill.com/v2/' );
 		define( 'PAYMILL_API_KEY', $this->private_key );
