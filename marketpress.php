@@ -13,8 +13,8 @@ WDP ID: 144
 Copyright 2009-2015 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
-the Free Software Foundation.
+it under the terms of the GNU General Public License (Version 2 - GPLv2) as
+published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 */
 
-define('MP_VERSION', '3.0a.10');
+define( 'MP_VERSION', '3.0a.10' );
 
 class Marketpress {	
 	/**
@@ -460,15 +460,15 @@ class Marketpress {
 	 */
 	public function fix_insecure_images( $url, $post_id ) {
 		//Skip file attachments
-    if ( ! wp_attachment_is_image($post_id) ) {
-    	return $url;
-    }
-    
-    if ( is_ssl() ) {
-	    $url = str_replace('http://', 'https://', $url);
-    }
-    
-    return $url;
+	    if ( ! wp_attachment_is_image( $post_id ) ) {
+	    	return $url;
+	    }
+	    
+	    if ( is_ssl() ) {
+		    $url = str_replace( 'http://', 'https://', $url );
+	    }
+	    
+	    return $url;
 	}
 	
 	/**
@@ -482,7 +482,7 @@ class Marketpress {
 		$flush_rewrites = get_option( 'mp_flush_rewrites' );
 		
 		if ( $flush_rewrites === false ) {
-			// option doesn't exist - flush rewrites and option to db
+			// option doesn't exist - flush rewrites and add option to db
 			$flush_rewrites = true;
 			add_option( 'mp_flush_rewrites', 0 );
 		}
@@ -521,7 +521,7 @@ class Marketpress {
 		/* There is a small bug in WP core with the get_user_metadata filter that
 		will raise a PHP notice if an associative array is returned and $single is
 		set to true. This is because WP core assumes that the returned array will
-		be numerically index. */
+		be numerically indexed. */
 		return ( $single && is_array( $meta ) ) ? array( $meta ) : $meta;
 	}
 	
@@ -544,13 +544,17 @@ class Marketpress {
 		require_once $this->plugin_dir('includes/common/class-mp-cart.php');
 		require_once $this->plugin_dir('includes/common/template-functions.php');
 		
+		if ( is_multisite() ) {
+			require_once $this->plugin_dir('includes/multisite/class-mp-multisite.php');
+			
+			if ( is_admin() ) {
+				require_once $this->plugin_dir('includes/multisite/class-mp-admin-multisite.php');
+			}
+		}
+		
 		if ( is_admin() ) {
 			require_once $this->plugin_dir('includes/admin/class-mp-admin.php');
 			require_once $this->plugin_dir('includes/admin/class-mp-pages-admin.php');
-			
-			if ( is_multisite() ) {
-				require_once $this->plugin_dir('includes/admin/class-mp-admin-multisite.php');
-			}
 			
 			if ( mp_doing_ajax() ) {
 				require_once $this->plugin_dir('includes/admin/class-mp-ajax.php');
@@ -604,7 +608,7 @@ class Marketpress {
 			break;
 			
 			case 'generate_order_id' :
-				_deprecated_function( $method, '3.0', 'MP_Order' );
+				_deprecated_function( $method, '3.0', 'MP_Order::get_id' );
 				$order = new MP_Order();
 				return $order->get_id();
 			break;
