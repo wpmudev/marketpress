@@ -313,23 +313,23 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	 */
 	public function init_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
-		'id' => $this->generate_metabox_id(),
-		'page_slugs' => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
-		'title' => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
-		'option_name' => __('mp_settings',
-		'desc' => __( 'Stripe makes it easy to start accepting credit cards directly on your site with full PCI compliance. Accept Visa, MasterCard, American Express, Discover, JCB, and Diners Club cards directly on your site. You don\'t need a merchant account or gateway. Stripe handles everything, including storing cards, subscriptions, and direct payouts to your bank account. Credit cards go directly to Stripe\'s secure environment, and never hit your servers so you can avoid most PCI requirements.', 'mp' ),
-		'conditional' => array(
-		'name' => __('gateways[allowed][' . $this->plugin_name . ']',
-		'value' => 1,
-		'action' => __('show',
-		),
+			'id'			 => $this->generate_metabox_id(),
+			'page_slugs'	 => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
+			'title'			 => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
+			'option_name'	 => 'mp_settings',
+			'desc'			 => __( 'Stripe makes it easy to start accepting credit cards directly on your site with full PCI compliance. Accept Visa, MasterCard, American Express, Discover, JCB, and Diners Club cards directly on your site. You don\'t need a merchant account or gateway. Stripe handles everything, including storing cards, subscriptions, and direct payouts to your bank account. Credit cards go directly to Stripe\'s secure environment, and never hit your servers so you can avoid most PCI requirements.', 'mp' ),
+			'conditional'	 => array(
+				'name'	 => 'gateways[allowed][' . $this->plugin_name . ']',
+				'value'	 => 1,
+				'action' => 'show',
+			),
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'	 => $this->get_field_name( 'is_ssl' ),
 			'label'	 => array( 'text' => __( 'Force SSL?', 'mp' ) ),
 			'desc'	 => __( 'When in live mode Stripe recommends you have an SSL certificate setup for the site where the checkout form will be displayed.', 'mp' ),
 		) );
-		$creds = $metabox->add_field( 'complex', array(
+		$creds	 = $metabox->add_field( 'complex', array(
 			'name'	 => $this->get_field_name( 'api_credentials' ),
 			'label'	 => array( 'text' => __( 'API Credentials', 'mp' ) ),
 			'desc'	 => __( 'You must login to Stripe to <a target="_blank" href="https://manage.stripe.com/#account/apikeys">get your API credentials</a>. You can enter your test credentials, then live ones when ready.', 'mp' ),
@@ -337,29 +337,29 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 
 		if ( $creds instanceof WPMUDEV_Field ) {
 			$creds->add_field( 'text', array(
-			'name' => __('secret_key',
-			'label' => array( 'text' => __( 'Secret Key', 'mp' ) ),
-			'validation' => array(
-			'required' => true,
-			),
+				'name'		 => 'secret_key',
+				'label'		 => array( 'text' => __( 'Secret Key', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+				),
 			) );
 			$creds->add_field( 'text', array(
-			'name' => __('publishable_key',
-			'label' => array( 'text' => __( 'Publishable Key', 'mp' ) ),
-			'validation' => array(
-			'required' => true,
-			),
+				'name'		 => 'publishable_key',
+				'label'		 => array( 'text' => __( 'Publishable Key', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+				),
 			) );
 		}
 
 		$metabox->add_field( 'advanced_select', array(
-		'name' => $this->get_field_name( 'currency' ),
-		'label' => array( 'text' => __( 'Currency', 'mp' ) ),
-		'multiple' => false,
-		'width' => __('element',
-		'options' => $this->currencies,
-		'default_value' => mp_get_setting( 'currency' ),
-		'desc' => __( 'Selecting a currency other than that used for your store may cause problems at checkout.', 'mp' ),
+			'name'			 => $this->get_field_name( 'currency' ),
+			'label'			 => array( 'text' => __( 'Currency', 'mp' ) ),
+			'multiple'		 => false,
+			'width'			 => 'element',
+			'options'		 => $this->currencies,
+			'default_value'	 => mp_get_setting( 'currency' ),
+			'desc'			 => __( 'Selecting a currency other than that used for your store may cause problems at checkout.', 'mp' ),
 		) );
 	}
 
