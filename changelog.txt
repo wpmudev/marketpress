@@ -4,6 +4,8 @@ Author: Aaron Edwards (incsub)
 Change Log:
 ----------------------------------------------------------------------
 
+2.9.6
+----------------------------------------------------------------------
 - Fixed: South Africa should require zip code during checkout
 - Fixed: PHP warnings when using Ultimatum theme
 - Fixed: 2Checkout doubling price after being redirected

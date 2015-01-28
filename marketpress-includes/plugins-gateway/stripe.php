@@ -90,6 +90,19 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 								}
 						}
 
+						//shipping line
+				    $shipping_tax = 0;
+				    if ( ($shipping_price = $mp->shipping_price(false)) !== false ) {
+							$totals[] = $shipping_price;
+							$shipping_tax = ($mp->shipping_tax_price($shipping_price) - $shipping_price);
+				    }
+				
+				    //tax line if tax inclusive pricing is off. It it's on it would screw up the totals
+				    if ( ! $mp->get_setting('tax->tax_inclusive') ) {
+				    	$tax_price = ($mp->tax_price(false) + $shipping_tax);
+							$totals[] = $tax_price;
+				    }
+
 						$total = array_sum($totals) * 100; //get the total as cents
 						$content = '<script>
 							jQuery(document).ready(function($){
@@ -587,14 +600,13 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 				try {
 						// create the charge on Stripe's servers - this will charge the user's card
 						$charge = Stripe_Charge::create(array(
-												"amount" => round($total * 100), // amount in cents, again
-												"currency" => strtolower($this->currency),
-												"card" => $_SESSION['stripeToken'],
-												"description" => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']))
+							"amount" => round($total * 100), // amount in cents, again
+							"currency" => strtolower($this->currency),
+							"card" => $_SESSION['stripeToken'],
+							"description" => sprintf(__('%s Store Purchase - Order ID: %s, Email: %s', 'mp'), get_bloginfo('name'), $order_id, $_SESSION['mp_shipping_info']['email']))
 						);
 
 						if ($charge->paid == 'true') {
-
 								//setup our payment details
 								$payment_info = array();
 								$payment_info['gateway_public_name'] = $this->public_name;

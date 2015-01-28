@@ -1,14 +1,14 @@
-# Copyright (C) 2014 MarketPress
+# Copyright (C) 2015 MarketPress
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 2.9.5.9\n"
+"Project-Id-Version: MarketPress 2.9.6\n"
 "Report-Msgid-Bugs-To: http://premium.wpmudev.org\n"
-"POT-Creation-Date: 2014-12-01 02:16:39+00:00\n"
+"POT-Creation-Date: 2015-01-14 13:57:17+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
@@ -121,7 +121,7 @@ msgstr ""
 msgid "Marketplace Products"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:380 marketpress.php:1805
+#: marketpress-includes/marketpress-ms.php:380 marketpress.php:1806
 msgid "Product Category: %s"
 msgstr ""
 
@@ -129,7 +129,7 @@ msgstr ""
 msgid "Marketplace Product Categories"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:387 marketpress.php:1808
+#: marketpress-includes/marketpress-ms.php:387 marketpress.php:1809
 msgid "Product Tag: %s"
 msgstr ""
 
@@ -148,18 +148,18 @@ msgstr ""
 msgid "MarketPress"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:596 marketpress.php:6056
+#: marketpress-includes/marketpress-ms.php:596 marketpress.php:6057
 msgid "Nice Try..."
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:616 marketpress.php:6123
-#: marketpress.php:6971 marketpress.php:7329 marketpress.php:7487
-#: marketpress.php:7616
+#: marketpress-includes/marketpress-ms.php:616 marketpress.php:6124
+#: marketpress.php:6972 marketpress.php:7330 marketpress.php:7488
+#: marketpress.php:7617
 msgid "Settings saved."
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:637 marketpress.php:6134
-#: marketpress.php:6996 marketpress.php:7517 marketpress.php:7635
+#: marketpress-includes/marketpress-ms.php:637 marketpress.php:6135
+#: marketpress.php:6997 marketpress.php:7518 marketpress.php:7636
 msgid "General Settings"
 msgstr ""
 
@@ -171,14 +171,14 @@ msgstr ""
 #: marketpress-includes/marketpress-ms.php:650
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:751
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:778
-#: marketpress-includes/plugins-gateway/payflow.php:786 marketpress.php:6290
-#: marketpress.php:6309 marketpress.php:6317 marketpress.php:6325
-#: marketpress.php:6333 marketpress.php:6376 marketpress.php:6407
-#: marketpress.php:6430 marketpress.php:6439 marketpress.php:6447
-#: marketpress.php:6470 marketpress.php:7022 marketpress.php:7045
-#: marketpress.php:7052 marketpress.php:7086 marketpress.php:7094
-#: marketpress.php:7102 marketpress.php:7132 marketpress.php:7162
-#: marketpress.php:7196 marketpress.php:7203 marketpress.php:7227
+#: marketpress-includes/plugins-gateway/payflow.php:786 marketpress.php:6291
+#: marketpress.php:6310 marketpress.php:6318 marketpress.php:6326
+#: marketpress.php:6334 marketpress.php:6377 marketpress.php:6408
+#: marketpress.php:6431 marketpress.php:6440 marketpress.php:6448
+#: marketpress.php:6471 marketpress.php:7023 marketpress.php:7046
+#: marketpress.php:7053 marketpress.php:7087 marketpress.php:7095
+#: marketpress.php:7103 marketpress.php:7133 marketpress.php:7163
+#: marketpress.php:7197 marketpress.php:7204 marketpress.php:7228
 msgid "Yes"
 msgstr ""
 
@@ -186,14 +186,14 @@ msgstr ""
 #: marketpress-includes/marketpress-ms.php:651
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:752
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:779
-#: marketpress-includes/plugins-gateway/payflow.php:787 marketpress.php:6291
-#: marketpress.php:6310 marketpress.php:6318 marketpress.php:6326
-#: marketpress.php:6334 marketpress.php:6378 marketpress.php:6408
-#: marketpress.php:6431 marketpress.php:6440 marketpress.php:6448
-#: marketpress.php:6471 marketpress.php:7023 marketpress.php:7046
-#: marketpress.php:7053 marketpress.php:7087 marketpress.php:7095
-#: marketpress.php:7103 marketpress.php:7133 marketpress.php:7163
-#: marketpress.php:7197 marketpress.php:7204 marketpress.php:7228
+#: marketpress-includes/plugins-gateway/payflow.php:787 marketpress.php:6292
+#: marketpress.php:6311 marketpress.php:6319 marketpress.php:6327
+#: marketpress.php:6335 marketpress.php:6379 marketpress.php:6409
+#: marketpress.php:6432 marketpress.php:6441 marketpress.php:6449
+#: marketpress.php:6472 marketpress.php:7024 marketpress.php:7047
+#: marketpress.php:7054 marketpress.php:7088 marketpress.php:7096
+#: marketpress.php:7104 marketpress.php:7134 marketpress.php:7164
+#: marketpress.php:7198 marketpress.php:7205 marketpress.php:7229
 msgid "No"
 msgstr ""
 
@@ -263,19 +263,19 @@ msgstr ""
 #: marketpress-includes/marketpress-ms.php:784
 #: marketpress-includes/marketpress-ms.php:1866
 #: marketpress-includes/marketpress-ms.php:1940 marketpress.php:1065
-#: marketpress.php:2027 marketpress.php:8253 marketpress.php:8263
+#: marketpress.php:2028 marketpress.php:8254 marketpress.php:8264
 msgid "Product Categories"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:788
 #: marketpress-includes/marketpress-ms.php:1865
 #: marketpress-includes/marketpress-ms.php:1939 marketpress.php:1076
-#: marketpress.php:2028 marketpress.php:8368
+#: marketpress.php:2029 marketpress.php:8369
 msgid "Product Tags"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:801 marketpress.php:6074
-#: marketpress.php:6080 marketpress.php:7702
+#: marketpress-includes/marketpress-ms.php:801 marketpress.php:6075
+#: marketpress.php:6081 marketpress.php:7703
 msgid "Shortcodes"
 msgstr ""
 
@@ -293,10 +293,10 @@ msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:811
 #: marketpress-includes/marketpress-ms.php:837
-#: marketpress-includes/marketpress-ms.php:853 marketpress.php:7736
-#: marketpress.php:7749 marketpress.php:7765 marketpress.php:7786
-#: marketpress.php:7803 marketpress.php:7819 marketpress.php:7833
-#: marketpress.php:7847 marketpress.php:7861 marketpress.php:7882
+#: marketpress-includes/marketpress-ms.php:853 marketpress.php:7737
+#: marketpress.php:7750 marketpress.php:7766 marketpress.php:7787
+#: marketpress.php:7804 marketpress.php:7820 marketpress.php:7834
+#: marketpress.php:7848 marketpress.php:7862 marketpress.php:7883
 msgid "Optional Attributes:"
 msgstr ""
 
@@ -321,11 +321,11 @@ msgstr ""
 msgid "\"order\" - Direction to order products by. Can be: DESC, ASC. Default: DESC"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:818 marketpress.php:7772
+#: marketpress-includes/marketpress-ms.php:818 marketpress.php:7773
 msgid "\"category\" - Limits list to a specific product category. Use the category Slug"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:819 marketpress.php:7773
+#: marketpress-includes/marketpress-ms.php:819 marketpress.php:7774
 msgid "\"tag\" - Limits list to a specific product tag. Use the tag Slug"
 msgstr ""
 
@@ -355,10 +355,10 @@ msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:826
 #: marketpress-includes/marketpress-ms.php:842
-#: marketpress-includes/marketpress-ms.php:860 marketpress.php:7739
-#: marketpress.php:7755 marketpress.php:7775 marketpress.php:7793
-#: marketpress.php:7809 marketpress.php:7823 marketpress.php:7837
-#: marketpress.php:7851 marketpress.php:7866 marketpress.php:7886
+#: marketpress-includes/marketpress-ms.php:860 marketpress.php:7740
+#: marketpress.php:7756 marketpress.php:7776 marketpress.php:7794
+#: marketpress.php:7810 marketpress.php:7824 marketpress.php:7838
+#: marketpress.php:7852 marketpress.php:7867 marketpress.php:7887
 msgid "Example:"
 msgstr ""
 
@@ -419,9 +419,9 @@ msgstr ""
 msgid "You may also use the mp_global_categories_list() template function in your theme with the same arguments."
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:870 marketpress.php:6485
-#: marketpress.php:7298 marketpress.php:7458 marketpress.php:7595
-#: marketpress.php:7677
+#: marketpress-includes/marketpress-ms.php:870 marketpress.php:6486
+#: marketpress.php:7299 marketpress.php:7459 marketpress.php:7596
+#: marketpress.php:7678
 msgid "Save Changes"
 msgstr ""
 
@@ -430,16 +430,16 @@ msgid "%d Products"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1301
-#: marketpress-includes/template-functions.php:2899
-#: marketpress-includes/template-functions.php:2905 marketpress.php:509
+#: marketpress-includes/template-functions.php:2900
+#: marketpress-includes/template-functions.php:2906 marketpress.php:509
 #: marketpress.php:1090 marketpress.php:1092 marketpress.php:1093
-#: marketpress.php:1768 marketpress.php:1776 marketpress.php:1837
+#: marketpress.php:1769 marketpress.php:1777 marketpress.php:1838
 msgid "Products"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1430
 #: marketpress-includes/template-functions.php:198
-#: marketpress-includes/template-functions.php:1733 marketpress.php:8148
+#: marketpress-includes/template-functions.php:1733 marketpress.php:8149
 msgid "No Products"
 msgstr ""
 
@@ -473,62 +473,62 @@ msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1771
 #: marketpress-includes/marketpress-ms.php:1861
-#: marketpress-includes/marketpress-ms.php:1914 marketpress.php:8031
-#: marketpress.php:8197 marketpress.php:8314 marketpress.php:8371
+#: marketpress-includes/marketpress-ms.php:1914 marketpress.php:8032
+#: marketpress.php:8198 marketpress.php:8315 marketpress.php:8372
 msgid "Title:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1772 marketpress.php:8032
-#: marketpress.php:8198
+#: marketpress-includes/marketpress-ms.php:1772 marketpress.php:8033
+#: marketpress.php:8199
 msgid "Custom Text:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1776 marketpress.php:8202
+#: marketpress-includes/marketpress-ms.php:1776 marketpress.php:8203
 msgid "List Settings"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1778 marketpress.php:8204
+#: marketpress-includes/marketpress-ms.php:1778 marketpress.php:8205
 msgid "Number of Products:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1781 marketpress.php:8207
+#: marketpress-includes/marketpress-ms.php:1781 marketpress.php:8208
 msgid "Order Products By:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1783 marketpress.php:7213
-#: marketpress.php:8210
+#: marketpress-includes/marketpress-ms.php:1783 marketpress.php:7214
+#: marketpress.php:8211
 msgid "Publish Date"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1784 marketpress.php:2019
-#: marketpress.php:7212 marketpress.php:8209
+#: marketpress-includes/marketpress-ms.php:1784 marketpress.php:2020
+#: marketpress.php:7213 marketpress.php:8210
 msgid "Product Name"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1785 marketpress.php:7216
-#: marketpress.php:8213
+#: marketpress-includes/marketpress-ms.php:1785 marketpress.php:7217
+#: marketpress.php:8214
 msgid "Number of Sales"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1786 marketpress.php:7217
-#: marketpress.php:7828 marketpress.php:8214
+#: marketpress-includes/marketpress-ms.php:1786 marketpress.php:7218
+#: marketpress.php:7829 marketpress.php:8215
 msgid "Product Price"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1787 marketpress.php:7218
-#: marketpress.php:8215
+#: marketpress-includes/marketpress-ms.php:1787 marketpress.php:7219
+#: marketpress.php:8216
 msgid "Random"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1789
-#: marketpress-includes/marketpress-ms.php:1923 marketpress.php:7220
-#: marketpress.php:8217
+#: marketpress-includes/marketpress-ms.php:1923 marketpress.php:7221
+#: marketpress.php:8218
 msgid "Descending"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1790
-#: marketpress-includes/marketpress-ms.php:1924 marketpress.php:7221
-#: marketpress.php:8218
+#: marketpress-includes/marketpress-ms.php:1924 marketpress.php:7222
+#: marketpress.php:8219
 msgid "Ascending"
 msgstr ""
 
@@ -537,7 +537,7 @@ msgid "Limit To Product Category:"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1794
-#: marketpress-includes/marketpress-ms.php:1798 marketpress.php:8227
+#: marketpress-includes/marketpress-ms.php:1798 marketpress.php:8228
 msgid "Enter the Slug"
 msgstr ""
 
@@ -545,15 +545,15 @@ msgstr ""
 msgid "Limit To Product Tag:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1801 marketpress.php:8230
+#: marketpress-includes/marketpress-ms.php:1801 marketpress.php:8231
 msgid "Display Settings"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1803 marketpress.php:8232
+#: marketpress-includes/marketpress-ms.php:1803 marketpress.php:8233
 msgid "Show Thumbnail"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1804 marketpress.php:8233
+#: marketpress-includes/marketpress-ms.php:1804 marketpress.php:8234
 msgid "Thumbnail Size:"
 msgstr ""
 
@@ -561,9 +561,9 @@ msgstr ""
 msgid "Content To Show:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1810 marketpress.php:6459
-#: marketpress.php:7072 marketpress.php:7181 marketpress.php:7287
-#: marketpress.php:7524
+#: marketpress-includes/marketpress-ms.php:1810 marketpress.php:6460
+#: marketpress.php:7073 marketpress.php:7182 marketpress.php:7288
+#: marketpress.php:7525
 msgid "None"
 msgstr ""
 
@@ -575,7 +575,7 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1818 marketpress.php:8238
+#: marketpress-includes/marketpress-ms.php:1818 marketpress.php:8239
 msgid "Show Price"
 msgstr ""
 
@@ -616,7 +616,6 @@ msgid "Order Categories By:"
 msgstr ""
 
 #: marketpress-includes/marketpress-ms.php:1920
-#: marketpress-includes/template-functions.php:2656
 msgid "Name"
 msgstr ""
 
@@ -628,7 +627,7 @@ msgstr ""
 msgid "Number of Categories:"
 msgstr ""
 
-#: marketpress-includes/marketpress-ms.php:1934 marketpress.php:8321
+#: marketpress-includes/marketpress-ms.php:1934 marketpress.php:8322
 msgid "Show product counts"
 msgstr ""
 
@@ -668,8 +667,8 @@ msgid "Choose a Shipping Method:"
 msgstr ""
 
 #: marketpress-includes/marketpress-shipping.php:268
-#: marketpress-includes/marketpress-shipping.php:292 marketpress.php:4802
-#: marketpress.php:4804
+#: marketpress-includes/marketpress-shipping.php:292 marketpress.php:4803
+#: marketpress.php:4805
 msgid "Shipping Method:"
 msgstr ""
 
@@ -714,21 +713,21 @@ msgid "Store Content"
 msgstr ""
 
 #: marketpress-includes/marketpress-stats.php:99 marketpress.php:1091
-#: marketpress.php:6867
+#: marketpress.php:6868
 msgid "Product"
 msgid_plural "Products"
 msgstr[0] ""
 msgstr[1] ""
 
 #: marketpress-includes/marketpress-stats.php:110 marketpress.php:1066
-#: marketpress.php:6866 marketpress.php:7259
+#: marketpress.php:6867 marketpress.php:7260
 msgid "Product Category"
 msgid_plural "Product Categories"
 msgstr[0] ""
 msgstr[1] ""
 
 #: marketpress-includes/marketpress-stats.php:122 marketpress.php:1077
-#: marketpress.php:7263
+#: marketpress.php:7264
 msgid "Product Tag"
 msgid_plural "Product Tags"
 msgstr[0] ""
@@ -744,24 +743,24 @@ msgstr ""
 
 #: marketpress-includes/marketpress-stats.php:163
 #: marketpress-includes/template-functions.php:1172 marketpress.php:1172
-#: marketpress.php:2253 marketpress.php:2284 marketpress.php:2287
-#: marketpress.php:2294 marketpress.php:5244 marketpress.php:5250
-#: marketpress.php:5256 marketpress.php:5262 marketpress.php:5268
-#: marketpress.php:5857 marketpress.php:5965 marketpress.php:6038
+#: marketpress.php:2254 marketpress.php:2285 marketpress.php:2288
+#: marketpress.php:2295 marketpress.php:5245 marketpress.php:5251
+#: marketpress.php:5257 marketpress.php:5263 marketpress.php:5269
+#: marketpress.php:5858 marketpress.php:5966 marketpress.php:6039
 msgid "Shipped"
 msgstr ""
 
 #: marketpress-includes/marketpress-stats.php:174 marketpress.php:1178
-#: marketpress.php:2255 marketpress.php:2285 marketpress.php:2288
-#: marketpress.php:2290 marketpress.php:5245 marketpress.php:5251
-#: marketpress.php:5257 marketpress.php:5263 marketpress.php:5269
-#: marketpress.php:5858 marketpress.php:5966 marketpress.php:6039
+#: marketpress.php:2256 marketpress.php:2286 marketpress.php:2289
+#: marketpress.php:2291 marketpress.php:5246 marketpress.php:5252
+#: marketpress.php:5258 marketpress.php:5264 marketpress.php:5270
+#: marketpress.php:5859 marketpress.php:5967 marketpress.php:6040
 msgid "Closed"
 msgstr ""
 
 #: marketpress-includes/plugins-gateway/2checkout.php:38
 #: marketpress-includes/plugins-gateway/2checkout.php:39
-#: marketpress-includes/plugins-gateway/2checkout.php:409
+#: marketpress-includes/plugins-gateway/2checkout.php:430
 msgid "2Checkout"
 msgstr ""
 
@@ -769,19 +768,19 @@ msgstr ""
 msgid "Your 2Checkout transaction has been canceled."
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:203
+#: marketpress-includes/plugins-gateway/2checkout.php:224
 msgid "Your payment via 2Checkout for this order totaling %s is not yet complete. Here is the latest status:"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:210
+#: marketpress-includes/plugins-gateway/2checkout.php:231
 msgid "Your payment via 2Checkout for this order totaling %s is complete. The transaction number is <strong>%s</strong>."
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:231
+#: marketpress-includes/plugins-gateway/2checkout.php:252
 msgid "The order has been received"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:236
+#: marketpress-includes/plugins-gateway/2checkout.php:257
 #: marketpress-includes/plugins-gateway/cubepoints.php:141
 #: marketpress-includes/plugins-gateway/paymill.php:422
 #: marketpress-includes/plugins-gateway/pin.php:463
@@ -790,22 +789,22 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/wepay.php:493
 #: marketpress-includes/template-functions.php:1169
 #: marketpress-includes/template-functions.php:1173 marketpress.php:1166
-#: marketpress.php:2251 marketpress.php:2283 marketpress.php:2293
-#: marketpress.php:5243 marketpress.php:5249 marketpress.php:5255
-#: marketpress.php:5261 marketpress.php:5267 marketpress.php:5856
-#: marketpress.php:5964 marketpress.php:6037
+#: marketpress.php:2252 marketpress.php:2284 marketpress.php:2294
+#: marketpress.php:5244 marketpress.php:5250 marketpress.php:5256
+#: marketpress.php:5262 marketpress.php:5268 marketpress.php:5857
+#: marketpress.php:5965 marketpress.php:6038
 msgid "Paid"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:257
+#: marketpress-includes/plugins-gateway/2checkout.php:278
 msgid "2Checkout Settings"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:259
+#: marketpress-includes/plugins-gateway/2checkout.php:280
 msgid "Resell your inventory via 2Checkout.com. This gateway requires that the setting in 2Checkout for \"Return Method\" inside Account -> Site Management be set to \"Header Redirect\"."
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:262
+#: marketpress-includes/plugins-gateway/2checkout.php:283
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:685
 #: marketpress-includes/plugins-gateway/google-checkout.php:279
 #: marketpress-includes/plugins-gateway/ideal.php:365
@@ -813,7 +812,7 @@ msgstr ""
 msgid "Mode"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:266
+#: marketpress-includes/plugins-gateway/2checkout.php:287
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:689
 #: marketpress-includes/plugins-gateway/eway.php:338
 #: marketpress-includes/plugins-gateway/payflow.php:722
@@ -824,7 +823,7 @@ msgstr ""
 msgid "Sandbox"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:267
+#: marketpress-includes/plugins-gateway/2checkout.php:288
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:690
 #: marketpress-includes/plugins-gateway/eway.php:339
 #: marketpress-includes/plugins-gateway/ideal.php:369
@@ -834,27 +833,27 @@ msgstr ""
 msgid "Live"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:273
+#: marketpress-includes/plugins-gateway/2checkout.php:294
 msgid "2Checkout Credentials"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:275
+#: marketpress-includes/plugins-gateway/2checkout.php:296
 msgid "You must login to 2Checkout vendor dashboard to obtain the seller ID and secret word. <a target=\"_blank\" href=\"%s\">Instructions &raquo;</a>"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:277
+#: marketpress-includes/plugins-gateway/2checkout.php:298
 msgid "Seller ID"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:282
+#: marketpress-includes/plugins-gateway/2checkout.php:303
 msgid "Secret word"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:289
+#: marketpress-includes/plugins-gateway/2checkout.php:310
 msgid "2Checkout Currency"
 msgstr ""
 
-#: marketpress-includes/plugins-gateway/2checkout.php:291
+#: marketpress-includes/plugins-gateway/2checkout.php:312
 #: marketpress-includes/plugins-gateway/moneybookers.php:323
 #: marketpress-includes/plugins-gateway/stripe.php:359
 msgid "Selecting a currency other than that used for your store may cause problems at checkout."
@@ -893,8 +892,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:159
 #: marketpress-includes/plugins-gateway/payflow.php:436
 #: marketpress-includes/template-functions.php:816
-#: marketpress-includes/template-functions.php:899 marketpress.php:4514
-#: marketpress.php:4590 marketpress.php:5547
+#: marketpress-includes/template-functions.php:899 marketpress.php:4515
+#: marketpress.php:4591 marketpress.php:5548
 msgid "Email:"
 msgstr ""
 
@@ -903,8 +902,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:165
 #: marketpress-includes/plugins-gateway/payflow.php:440
 #: marketpress-includes/template-functions.php:823
-#: marketpress-includes/template-functions.php:903 marketpress.php:4519
-#: marketpress.php:4595 marketpress.php:4788 marketpress.php:5542
+#: marketpress-includes/template-functions.php:903 marketpress.php:4520
+#: marketpress.php:4596 marketpress.php:4789 marketpress.php:5543
 msgid "Full Name:"
 msgstr ""
 
@@ -913,16 +912,16 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:171
 #: marketpress-includes/plugins-gateway/payflow.php:444
 #: marketpress-includes/template-functions.php:838
-#: marketpress-includes/template-functions.php:907 marketpress.php:4524
-#: marketpress.php:4600 marketpress.php:4789 marketpress.php:5539
-#: marketpress.php:5552
+#: marketpress-includes/template-functions.php:907 marketpress.php:4525
+#: marketpress.php:4601 marketpress.php:4790 marketpress.php:5540
+#: marketpress.php:5553
 msgid "Address:"
 msgstr ""
 
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:166
 #: marketpress-includes/plugins-gateway/payflow.php:174
-#: marketpress-includes/template-functions.php:841 marketpress.php:4527
-#: marketpress.php:4603
+#: marketpress-includes/template-functions.php:841 marketpress.php:4528
+#: marketpress.php:4604
 msgid "Street address, P.O. box, company name, c/o"
 msgstr ""
 
@@ -932,15 +931,15 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:450
 #: marketpress-includes/plugins-gateway/pin.php:105
 #: marketpress-includes/template-functions.php:845
-#: marketpress-includes/template-functions.php:913 marketpress.php:4531
-#: marketpress.php:4607 marketpress.php:4791 marketpress.php:5558
+#: marketpress-includes/template-functions.php:913 marketpress.php:4532
+#: marketpress.php:4608 marketpress.php:4792 marketpress.php:5559
 msgid "Address 2:"
 msgstr ""
 
 #: marketpress-includes/plugins-gateway/authorizenet-aim.php:173
 #: marketpress-includes/plugins-gateway/payflow.php:181
-#: marketpress-includes/template-functions.php:847 marketpress.php:4534
-#: marketpress.php:4610
+#: marketpress-includes/template-functions.php:847 marketpress.php:4535
+#: marketpress.php:4611
 msgid "Apartment, suite, unit, building, floor, etc."
 msgstr ""
 
@@ -950,8 +949,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:456
 #: marketpress-includes/plugins-gateway/pin.php:110
 #: marketpress-includes/template-functions.php:851
-#: marketpress-includes/template-functions.php:919 marketpress.php:4538
-#: marketpress.php:4614 marketpress.php:4792 marketpress.php:5564
+#: marketpress-includes/template-functions.php:919 marketpress.php:4539
+#: marketpress.php:4615 marketpress.php:4793 marketpress.php:5565
 msgid "City:"
 msgstr ""
 
@@ -960,8 +959,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:192
 #: marketpress-includes/plugins-gateway/payflow.php:462
 #: marketpress-includes/template-functions.php:856
-#: marketpress-includes/template-functions.php:925 marketpress.php:4543
-#: marketpress.php:4619 marketpress.php:4794 marketpress.php:5570
+#: marketpress-includes/template-functions.php:925 marketpress.php:4544
+#: marketpress.php:4620 marketpress.php:4795 marketpress.php:5571
 msgid "State/Province/Region:"
 msgstr ""
 
@@ -970,8 +969,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:198
 #: marketpress-includes/plugins-gateway/payflow.php:468
 #: marketpress-includes/template-functions.php:861
-#: marketpress-includes/template-functions.php:931 marketpress.php:4548
-#: marketpress.php:4624 marketpress.php:4795 marketpress.php:5576
+#: marketpress-includes/template-functions.php:931 marketpress.php:4549
+#: marketpress.php:4625 marketpress.php:4796 marketpress.php:5577
 msgid "Postal/Zip Code:"
 msgstr ""
 
@@ -981,8 +980,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:472
 #: marketpress-includes/plugins-gateway/pin.php:125
 #: marketpress-includes/template-functions.php:828
-#: marketpress-includes/template-functions.php:936 marketpress.php:4553
-#: marketpress.php:4629 marketpress.php:4796 marketpress.php:5581
+#: marketpress-includes/template-functions.php:936 marketpress.php:4554
+#: marketpress.php:4630 marketpress.php:4797 marketpress.php:5582
 msgid "Country:"
 msgstr ""
 
@@ -991,8 +990,8 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/payflow.php:217
 #: marketpress-includes/plugins-gateway/payflow.php:478
 #: marketpress-includes/template-functions.php:866
-#: marketpress-includes/template-functions.php:942 marketpress.php:4565
-#: marketpress.php:4641 marketpress.php:4798 marketpress.php:5587
+#: marketpress-includes/template-functions.php:942 marketpress.php:4566
+#: marketpress.php:4642 marketpress.php:4799 marketpress.php:5588
 msgid "Phone Number:"
 msgstr ""
 
@@ -1590,7 +1589,7 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/eway30.php:190
 #: marketpress-includes/plugins-gateway/simplify.php:127
 #: marketpress-includes/template-functions.php:895 marketpress.php:1097
-#: marketpress.php:1143 marketpress.php:6634 marketpress.php:6750
+#: marketpress.php:1143 marketpress.php:6635 marketpress.php:6751
 msgid "Edit"
 msgstr ""
 
@@ -1767,13 +1766,13 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/ideal.php:115
 #: marketpress-includes/plugins-gateway/payway.php:123
 #: marketpress-includes/template-functions.php:1327
-#: marketpress-includes/template-functions.php:2856 marketpress.php:2229
-#: marketpress.php:2366 marketpress.php:6072
+#: marketpress-includes/template-functions.php:2857 marketpress.php:2230
+#: marketpress.php:2367 marketpress.php:6073
 msgid "Shipping"
 msgstr ""
 
 #: marketpress-includes/plugins-gateway/ideal.php:130
-#: marketpress-includes/plugins-gateway/payway.php:141 marketpress.php:2230
+#: marketpress-includes/plugins-gateway/payway.php:141 marketpress.php:2231
 msgid "Tax"
 msgstr ""
 
@@ -2168,7 +2167,7 @@ msgstr ""
 #: marketpress-includes/plugins-gateway/pin.php:309
 #: marketpress-includes/plugins-gateway/stripe.php:332
 #: marketpress-includes/plugins-gateway/stripe.php:337
-#: marketpress-includes/plugins-gateway/wepay.php:311 marketpress.php:5025
+#: marketpress-includes/plugins-gateway/wepay.php:311 marketpress.php:5026
 msgid "More Info &raquo;"
 msgstr ""
 
@@ -4008,7 +4007,7 @@ msgid "My Plugin"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:306
-#: marketpress-includes/template-functions.php:325 marketpress.php:7744
+#: marketpress-includes/template-functions.php:325 marketpress.php:7745
 msgid "Related Products"
 msgstr ""
 
@@ -4066,21 +4065,21 @@ msgid "Apply &raquo;"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:498
-#: marketpress-includes/template-functions.php:636 marketpress.php:4769
-#: marketpress.php:4770 marketpress.php:5513
+#: marketpress-includes/template-functions.php:636 marketpress.php:4770
+#: marketpress.php:4771 marketpress.php:5514
 msgid "Shipping:"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:508
 #: marketpress-includes/template-functions.php:645
 #: marketpress-includes/template-functions.php:1332 marketpress.php:314
-#: marketpress.php:4775 marketpress.php:4776 marketpress.php:5519
-#: marketpress.php:6302
+#: marketpress.php:4776 marketpress.php:4777 marketpress.php:5520
+#: marketpress.php:6303
 msgid "Taxes"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:519
-#: marketpress-includes/template-functions.php:652 marketpress.php:5523
+#: marketpress-includes/template-functions.php:652 marketpress.php:5524
 msgid "Cart Total:"
 msgstr ""
 
@@ -4148,8 +4147,8 @@ msgstr ""
 msgid "Enter Your Shipping Information:"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:873 marketpress.php:4811
-#: marketpress.php:5528
+#: marketpress-includes/template-functions.php:873 marketpress.php:4812
+#: marketpress.php:5529
 msgid "Special Instructions:"
 msgstr ""
 
@@ -4189,11 +4188,11 @@ msgstr ""
 msgid "Checkout &raquo;"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1122 marketpress.php:3174
+#: marketpress-includes/template-functions.php:1122 marketpress.php:3175
 msgid "There are no items in your cart."
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1123 marketpress.php:3177
+#: marketpress-includes/template-functions.php:1123 marketpress.php:3178
 msgid "Browse Products &raquo;"
 msgstr ""
 
@@ -4201,22 +4200,22 @@ msgstr ""
 msgid "Order Details (%s):"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1156 marketpress.php:5300
+#: marketpress-includes/template-functions.php:1156 marketpress.php:5301
 msgid "Current Status"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:1167
 #: marketpress-includes/template-functions.php:1170
 #: marketpress-includes/template-functions.php:1174 marketpress.php:1160
-#: marketpress.php:2249 marketpress.php:2292 marketpress.php:5242
-#: marketpress.php:5248 marketpress.php:5254 marketpress.php:5260
-#: marketpress.php:5266 marketpress.php:5855 marketpress.php:5963
-#: marketpress.php:6036
+#: marketpress.php:2250 marketpress.php:2293 marketpress.php:5243
+#: marketpress.php:5249 marketpress.php:5255 marketpress.php:5261
+#: marketpress.php:5267 marketpress.php:5856 marketpress.php:5964
+#: marketpress.php:6037
 msgid "Received"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1183 marketpress.php:1820
-#: marketpress.php:5335
+#: marketpress-includes/template-functions.php:1183 marketpress.php:1821
+#: marketpress.php:5336
 msgid "Payment Information"
 msgstr ""
 
@@ -4236,24 +4235,24 @@ msgstr ""
 msgid "Payment Total"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1203 marketpress.php:5393
+#: marketpress-includes/template-functions.php:1203 marketpress.php:5394
 msgid "Order Information"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1207 marketpress.php:5400
+#: marketpress-includes/template-functions.php:1207 marketpress.php:5401
 msgid "Item"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1208 marketpress.php:5401
+#: marketpress-includes/template-functions.php:1208 marketpress.php:5402
 msgid "Quantity"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1209 marketpress.php:2022
-#: marketpress.php:2517 marketpress.php:5402
+#: marketpress-includes/template-functions.php:1209 marketpress.php:2023
+#: marketpress.php:2518 marketpress.php:5403
 msgid "Price"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1210 marketpress.php:5403
+#: marketpress-includes/template-functions.php:1210 marketpress.php:5404
 msgid "Subtotal"
 msgstr ""
 
@@ -4262,7 +4261,7 @@ msgid "Download"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:1281
-#: marketpress-includes/template-functions.php:3110 marketpress.php:5477
+#: marketpress-includes/template-functions.php:3111 marketpress.php:5478
 msgid "Product Personalization:"
 msgstr ""
 
@@ -4278,7 +4277,7 @@ msgstr ""
 msgid "Awaiting Payment"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1312 marketpress.php:5499
+#: marketpress-includes/template-functions.php:1312 marketpress.php:5500
 msgid "No products could be found for this order"
 msgstr ""
 
@@ -4290,8 +4289,8 @@ msgstr ""
 msgid "Order Total"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1340 marketpress.php:1818
-#: marketpress.php:5537
+#: marketpress-includes/template-functions.php:1340 marketpress.php:1819
+#: marketpress.php:5538
 msgid "Shipping Information"
 msgstr ""
 
@@ -4331,11 +4330,11 @@ msgstr ""
 msgid "Tracking Number"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1407 marketpress.php:5623
+#: marketpress-includes/template-functions.php:1407 marketpress.php:5624
 msgid "Order Notes"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1411 marketpress.php:5290
+#: marketpress-includes/template-functions.php:1411 marketpress.php:5291
 msgid "&laquo; Back"
 msgstr ""
 
@@ -4388,7 +4387,7 @@ msgstr ""
 msgid "Track your DHL package &raquo;"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:1575 marketpress.php:7524
+#: marketpress-includes/template-functions.php:1575 marketpress.php:7525
 msgid "Select:"
 msgstr ""
 
@@ -4443,86 +4442,102 @@ msgid "Default"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:2655
-msgid "Release Date"
+msgid "Release Date (Latest to Oldest)"
+msgstr ""
+
+#: marketpress-includes/template-functions.php:2656
+msgid "Release Date (Oldest to Latest)"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:2657
-msgid "Price (Low to High)"
+msgid "Name (A-Z)"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:2658
-msgid "Price (High to Low)"
+msgid "Name (Z-A)"
 msgstr ""
 
 #: marketpress-includes/template-functions.php:2659
-msgid "Popularity"
+msgid "Price (Low to High)"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2676 marketpress.php:8224
+#: marketpress-includes/template-functions.php:2660
+msgid "Price (High to Low)"
+msgstr ""
+
+#: marketpress-includes/template-functions.php:2661
+msgid "Popularity (Most Popular - Least Popular)"
+msgstr ""
+
+#: marketpress-includes/template-functions.php:2662
+msgid "Popularity (Least Popular - Most Popular)"
+msgstr ""
+
+#: marketpress-includes/template-functions.php:2677 marketpress.php:8225
 msgid "Category"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2681
+#: marketpress-includes/template-functions.php:2682
 msgid "Order By"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2715
-#: marketpress-includes/template-functions.php:2900 marketpress.php:518
-#: marketpress.php:1016 marketpress.php:1769 marketpress.php:7980
-#: marketpress.php:8022
+#: marketpress-includes/template-functions.php:2716
+#: marketpress-includes/template-functions.php:2901 marketpress.php:518
+#: marketpress.php:1016 marketpress.php:1770 marketpress.php:7981
+#: marketpress.php:8023
 msgid "Shopping Cart"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2741
+#: marketpress-includes/template-functions.php:2742
 msgid "Visit Store"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2767
+#: marketpress-includes/template-functions.php:2768
 msgid "View Products"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2793
+#: marketpress-includes/template-functions.php:2794
 msgid "Next Page &raquo;"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2796
+#: marketpress-includes/template-functions.php:2797
 msgid "&laquo; Previous Page"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2823
+#: marketpress-includes/template-functions.php:2824
 msgid "Check Order Status"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2855
+#: marketpress-includes/template-functions.php:2856
 msgid "Review Cart"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2857
+#: marketpress-includes/template-functions.php:2858
 msgid "Checkout"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2858
+#: marketpress-includes/template-functions.php:2859
 msgid "Confirm"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2859
+#: marketpress-includes/template-functions.php:2860
 msgid "Order Complete"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:2901 marketpress.php:527
-#: marketpress.php:1770
+#: marketpress-includes/template-functions.php:2902 marketpress.php:527
+#: marketpress.php:1771
 msgid "Order Status"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:3053
+#: marketpress-includes/template-functions.php:3054
 msgid "required"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:3055
+#: marketpress-includes/template-functions.php:3056
 msgid "optional"
 msgstr ""
 
-#: marketpress-includes/template-functions.php:3159
+#: marketpress-includes/template-functions.php:3160
 msgid "Product Extra Fields"
 msgstr ""
 
@@ -4650,7 +4665,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: marketpress.php:875 marketpress.php:5765
+#: marketpress.php:875 marketpress.php:5766
 msgid "Manage Orders"
 msgstr ""
 
@@ -4742,7 +4757,7 @@ msgstr ""
 msgid "View Order"
 msgstr ""
 
-#: marketpress.php:1145 marketpress.php:5826 marketpress.php:5828
+#: marketpress.php:1145 marketpress.php:5827 marketpress.php:5829
 msgid "Search Orders"
 msgstr ""
 
@@ -4781,494 +4796,494 @@ msgid_plural "Trash <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:1377
+#: marketpress.php:1378
 msgid "The coupon previously applied to your cart has been removed because it is no longer applicable"
 msgstr ""
 
-#: marketpress.php:1716
+#: marketpress.php:1717
 msgid "None - Custom theme template"
 msgstr ""
 
-#: marketpress.php:1818
+#: marketpress.php:1819
 msgid "Checkout Information"
 msgstr ""
 
-#: marketpress.php:1822
+#: marketpress.php:1823
 msgid "Confirm Your Purchase"
 msgstr ""
 
-#: marketpress.php:1824
+#: marketpress.php:1825
 msgid "Order Confirmation"
 msgstr ""
 
-#: marketpress.php:1826 marketpress.php:1828
+#: marketpress.php:1827 marketpress.php:1829
 msgid "Your Shopping Cart"
 msgstr ""
 
-#: marketpress.php:1833
+#: marketpress.php:1834
 msgid "Track Your Order"
 msgstr ""
 
-#: marketpress.php:1867
+#: marketpress.php:1868
 msgid "Categorized in "
 msgstr ""
 
-#: marketpress.php:1987
+#: marketpress.php:1988
 msgid "View all categories"
 msgstr ""
 
-#: marketpress.php:2018
+#: marketpress.php:2019
 msgid "Thumbnail"
 msgstr ""
 
-#: marketpress.php:2020
+#: marketpress.php:2021
 msgid "Variations"
 msgstr ""
 
-#: marketpress.php:2021 marketpress.php:2516 marketpress.php:5399
+#: marketpress.php:2022 marketpress.php:2517 marketpress.php:5400
 msgid "SKU"
 msgstr ""
 
-#: marketpress.php:2024
+#: marketpress.php:2025
 msgid "Stock"
 msgstr ""
 
-#: marketpress.php:2025
+#: marketpress.php:2026
 msgid "Sales"
 msgstr ""
 
-#: marketpress.php:2057
+#: marketpress.php:2058
 msgid "Edit &raquo;"
 msgstr ""
 
-#: marketpress.php:2072 marketpress.php:2082 marketpress.php:2119
-#: marketpress.php:2334 marketpress.php:3586 marketpress.php:5442
-#: marketpress.php:5493
+#: marketpress.php:2073 marketpress.php:2083 marketpress.php:2120
+#: marketpress.php:2335 marketpress.php:3587 marketpress.php:5443
+#: marketpress.php:5494
 msgid "N/A"
 msgstr ""
 
-#: marketpress.php:2151
+#: marketpress.php:2152
 msgid "Copy"
 msgstr ""
 
-#: marketpress.php:2224
+#: marketpress.php:2225
 msgid "Status"
 msgstr ""
 
-#: marketpress.php:2225
+#: marketpress.php:2226
 msgid "Order ID"
 msgstr ""
 
-#: marketpress.php:2226
+#: marketpress.php:2227
 msgid "Order Date"
 msgstr ""
 
-#: marketpress.php:2227
+#: marketpress.php:2228
 msgid "From"
 msgstr ""
 
-#: marketpress.php:2228
+#: marketpress.php:2229
 msgid "Items"
 msgstr ""
 
-#: marketpress.php:2231 marketpress.php:6628 marketpress.php:6825
+#: marketpress.php:2232 marketpress.php:6629 marketpress.php:6826
 msgid "Discount"
 msgstr ""
 
-#: marketpress.php:2232
+#: marketpress.php:2233
 msgid "Total"
 msgstr ""
 
-#: marketpress.php:2257 marketpress.php:5327
+#: marketpress.php:2258 marketpress.php:5328
 msgid "Trashed"
 msgstr ""
 
-#: marketpress.php:2259
+#: marketpress.php:2260
 msgid "View Order Details"
 msgstr ""
 
-#: marketpress.php:2263
+#: marketpress.php:2264
 msgid "Y/m/d g:i:s A"
 msgstr ""
 
-#: marketpress.php:2270
+#: marketpress.php:2271
 msgid "%s ago"
 msgstr ""
 
-#: marketpress.php:2272
+#: marketpress.php:2273
 msgid "Y/m/d"
 msgstr ""
 
-#: marketpress.php:2279
+#: marketpress.php:2280
 msgid "View &#8220;%s&#8221;"
 msgstr ""
 
-#: marketpress.php:2283 marketpress.php:2293 marketpress.php:5243
-#: marketpress.php:5261 marketpress.php:5267
+#: marketpress.php:2284 marketpress.php:2294 marketpress.php:5244
+#: marketpress.php:5262 marketpress.php:5268
 msgid "Mark as Paid"
 msgstr ""
 
-#: marketpress.php:2284 marketpress.php:2287 marketpress.php:2294
-#: marketpress.php:5244 marketpress.php:5250 marketpress.php:5262
-#: marketpress.php:5268
+#: marketpress.php:2285 marketpress.php:2288 marketpress.php:2295
+#: marketpress.php:5245 marketpress.php:5251 marketpress.php:5263
+#: marketpress.php:5269
 msgid "Mark as Shipped"
 msgstr ""
 
-#: marketpress.php:2285 marketpress.php:2288 marketpress.php:2290
-#: marketpress.php:5245 marketpress.php:5251 marketpress.php:5257
-#: marketpress.php:5269
+#: marketpress.php:2286 marketpress.php:2289 marketpress.php:2291
+#: marketpress.php:5246 marketpress.php:5252 marketpress.php:5258
+#: marketpress.php:5270
 msgid "Mark as Closed"
 msgstr ""
 
-#: marketpress.php:2292 marketpress.php:5260 marketpress.php:5266
+#: marketpress.php:2293 marketpress.php:5261 marketpress.php:5267
 msgid "Mark as Received"
 msgstr ""
 
-#: marketpress.php:2298 marketpress.php:5270 marketpress.php:5860
-#: marketpress.php:5968 marketpress.php:6617
+#: marketpress.php:2299 marketpress.php:5271 marketpress.php:5861
+#: marketpress.php:5969 marketpress.php:6618
 msgid "Delete"
 msgstr ""
 
-#: marketpress.php:2298
+#: marketpress.php:2299
 msgid "Delete Permanently"
 msgstr ""
 
-#: marketpress.php:2300 marketpress.php:5246 marketpress.php:5252
-#: marketpress.php:5258 marketpress.php:5264 marketpress.php:5862
-#: marketpress.php:5970
+#: marketpress.php:2301 marketpress.php:5247 marketpress.php:5253
+#: marketpress.php:5259 marketpress.php:5265 marketpress.php:5863
+#: marketpress.php:5971
 msgid "Trash"
 msgstr ""
 
-#: marketpress.php:2315
+#: marketpress.php:2316
 msgid "Regarding Your Order (%s)"
 msgstr ""
 
-#: marketpress.php:2352
+#: marketpress.php:2353
 msgid "Enter Product title here"
 msgstr ""
 
-#: marketpress.php:2359
+#: marketpress.php:2360
 msgid "Product Details"
 msgstr ""
 
-#: marketpress.php:2369
+#: marketpress.php:2370
 msgid "Product Download"
 msgstr ""
 
-#: marketpress.php:2382 marketpress.php:7798
+#: marketpress.php:2383 marketpress.php:7799
 msgid "Product Image"
 msgstr ""
 
-#: marketpress.php:2509 marketpress.php:5996 marketpress.php:6456
-#: marketpress.php:7003 marketpress.php:7564
+#: marketpress.php:2510 marketpress.php:5997 marketpress.php:6457
+#: marketpress.php:7004 marketpress.php:7565
 msgid "Upgrade Now"
 msgstr ""
 
-#: marketpress.php:2509
+#: marketpress.php:2510
 msgid "Upgrade to enable item personalization &raquo;"
 msgstr ""
 
-#: marketpress.php:2515
+#: marketpress.php:2516
 msgid "Variation Name"
 msgstr ""
 
-#: marketpress.php:2516
+#: marketpress.php:2517
 msgid "Stock Keeping Unit - Your custom Product ID number"
 msgstr ""
 
-#: marketpress.php:2518
+#: marketpress.php:2519
 msgid "When checked these override the normal price."
 msgstr ""
 
-#: marketpress.php:2518
+#: marketpress.php:2519
 msgid "Sale Price"
 msgstr ""
 
-#: marketpress.php:2519
+#: marketpress.php:2520
 msgid "When checked inventory tracking will be enabled."
 msgstr ""
 
-#: marketpress.php:2519
+#: marketpress.php:2520
 msgid "Inventory"
 msgstr ""
 
-#: marketpress.php:2520
+#: marketpress.php:2521
 msgid "Should this product be personalizable by the customer?"
 msgstr ""
 
-#: marketpress.php:2520
+#: marketpress.php:2521
 msgid "Personalize"
 msgstr ""
 
-#: marketpress.php:2541 marketpress.php:2567
+#: marketpress.php:2542 marketpress.php:2568
 msgid "Remove Variation"
 msgstr ""
 
-#: marketpress.php:2548 marketpress.php:2573
+#: marketpress.php:2549 marketpress.php:2574
 msgid "Description:"
 msgstr ""
 
-#: marketpress.php:2551
+#: marketpress.php:2552
 msgid "Required"
 msgstr ""
 
-#: marketpress.php:2574
+#: marketpress.php:2575
 msgid "Required:"
 msgstr ""
 
-#: marketpress.php:2584
+#: marketpress.php:2585
 msgid "Add Variation"
 msgstr ""
 
-#: marketpress.php:2586
+#: marketpress.php:2587
 msgid "Product variations are not allowed for Downloadable or Externally Linked products."
 msgstr ""
 
-#: marketpress.php:2590
+#: marketpress.php:2591
 msgid "Some examples are linking to a song/album in iTunes, or linking to a product on another site with your own affiliate link."
 msgstr ""
 
-#: marketpress.php:2590
+#: marketpress.php:2591
 msgid "External Link"
 msgstr ""
 
-#: marketpress.php:2590
+#: marketpress.php:2591
 msgid "When set this overrides the purchase button with a link to this URL."
 msgstr ""
 
-#: marketpress.php:2595
+#: marketpress.php:2596
 msgid "Depending on local tax laws, some items are tax-free or a have different sales tax rate. You can set that here."
 msgstr ""
 
-#: marketpress.php:2595
+#: marketpress.php:2596
 msgid "Special Tax Rate?"
 msgstr ""
 
-#: marketpress.php:2596
+#: marketpress.php:2597
 msgid "Rate:"
 msgstr ""
 
-#: marketpress.php:2600
+#: marketpress.php:2601
 msgid "Limit the order to a certain amount of this product."
 msgstr ""
 
-#: marketpress.php:2601
+#: marketpress.php:2602
 msgid "Limit Per Order?"
 msgstr ""
 
-#: marketpress.php:2604
+#: marketpress.php:2605
 msgid "Limit:"
 msgstr ""
 
-#: marketpress.php:2630
+#: marketpress.php:2631
 msgid "File URL"
 msgstr ""
 
-#: marketpress.php:2631
+#: marketpress.php:2632
 msgid "Upload File"
 msgstr ""
 
-#: marketpress.php:3039 marketpress.php:3200 marketpress.php:3203
+#: marketpress.php:3040 marketpress.php:3201 marketpress.php:3204
 msgid "Sorry, currently it's not possible to checkout with items from more than %s stores."
 msgstr ""
 
-#: marketpress.php:3103
+#: marketpress.php:3104
 msgid "Sorry, we don't have enough of <strong>%1$s</strong> in stock. Your cart quantity has been changed to <strong>%2$s</strong>."
 msgstr ""
 
-#: marketpress.php:3118
+#: marketpress.php:3119
 msgid "Sorry, there is a per order limit of %1$s for \"%2$s\". Your cart quantity has been changed to %3$s."
 msgstr ""
 
-#: marketpress.php:3218 marketpress.php:3221
+#: marketpress.php:3219 marketpress.php:3222
 msgid "Sorry, we don't have enough of this item in stock. (%s remaining)"
 msgstr ""
 
-#: marketpress.php:3247 marketpress.php:3250 marketpress.php:3304
+#: marketpress.php:3248 marketpress.php:3251 marketpress.php:3305
 msgid "Sorry, there is a per order limit of %1$s for \"%2$s\"."
 msgstr ""
 
-#: marketpress.php:3289
+#: marketpress.php:3290
 msgid "Sorry, there is not enough stock for \"%s\". (%s remaining)"
 msgstr ""
 
-#: marketpress.php:3326
+#: marketpress.php:3327
 msgid "Item(s) Removed"
 msgstr ""
 
-#: marketpress.php:3369
+#: marketpress.php:3370
 msgid "Coupon Successfully Applied"
 msgstr ""
 
-#: marketpress.php:3371
+#: marketpress.php:3372
 msgid "Coupon Was Not Applied"
 msgstr ""
 
-#: marketpress.php:3374
+#: marketpress.php:3375
 msgid "Invalid Coupon Code"
 msgstr ""
 
-#: marketpress.php:3380
+#: marketpress.php:3381
 msgid "Coupon Removed"
 msgstr ""
 
-#: marketpress.php:3386
+#: marketpress.php:3387
 msgid "Please enter a valid Email Address."
 msgstr ""
 
-#: marketpress.php:3393
+#: marketpress.php:3394
 msgid "Please enter your Full Name."
 msgstr ""
 
-#: marketpress.php:3397
+#: marketpress.php:3398
 msgid "Please enter your Street Address."
 msgstr ""
 
-#: marketpress.php:3400
+#: marketpress.php:3401
 msgid "Please enter your City."
 msgstr ""
 
-#: marketpress.php:3403
+#: marketpress.php:3404
 msgid "Please enter your State/Province/Region."
 msgstr ""
 
-#: marketpress.php:3406
+#: marketpress.php:3407
 msgid "Please enter a valid two-letter State abbreviation."
 msgstr ""
 
-#: marketpress.php:3408
+#: marketpress.php:3409
 msgid "Please enter a valid two-letter Canadian Province abbreviation."
 msgstr ""
 
-#: marketpress.php:3413
+#: marketpress.php:3414
 msgid "Please enter a valid Zip/Postal Code."
 msgstr ""
 
-#: marketpress.php:3416
+#: marketpress.php:3417
 msgid "Please enter your Country."
 msgstr ""
 
-#: marketpress.php:3419
+#: marketpress.php:3420
 msgid "No valid shipping options found. Please check your address carefully."
 msgstr ""
 
-#: marketpress.php:3441
+#: marketpress.php:3442
 msgid "Required product extra information."
 msgstr ""
 
-#: marketpress.php:3583 marketpress.php:3584
+#: marketpress.php:3584 marketpress.php:3585
 msgid "Manual Checkout"
 msgstr ""
 
-#: marketpress.php:3585
+#: marketpress.php:3586
 msgid "N/A - Free order"
 msgstr ""
 
-#: marketpress.php:3587
+#: marketpress.php:3588
 msgid "Completed"
 msgstr ""
 
-#: marketpress.php:3629
+#: marketpress.php:3630
 msgid "Sorry, one or more products are no longer available. Please review your cart."
 msgstr ""
 
-#: marketpress.php:4040 marketpress.php:5665
+#: marketpress.php:4041 marketpress.php:5666
 msgid "Cheatin&#8217; uh?"
 msgstr ""
 
-#: marketpress.php:4312
+#: marketpress.php:4313
 msgid "Sorry, the link is invalid for this download."
 msgstr ""
 
-#: marketpress.php:4316
+#: marketpress.php:4317
 msgid "Sorry, your order has been marked as unpaid."
 msgstr ""
 
-#: marketpress.php:4328
+#: marketpress.php:4329
 msgid "Whoops, we were unable to find the file for this download. Please contact us for help."
 msgstr ""
 
-#: marketpress.php:4333
+#: marketpress.php:4334
 msgid "Sorry, our records show you've downloaded this file %d out of %d times allowed. Please contact us if you still need help."
 msgstr ""
 
-#: marketpress.php:4378
+#: marketpress.php:4379
 msgid "Whoops, there was a problem loading up this file for your download. Please contact us for help."
 msgstr ""
 
-#: marketpress.php:4511
+#: marketpress.php:4512
 msgid "Shipping Info"
 msgstr ""
 
-#: marketpress.php:4587
+#: marketpress.php:4588
 msgid "Billing Info"
 msgstr ""
 
-#: marketpress.php:4587
+#: marketpress.php:4588
 msgid "Same as Shipping"
 msgstr ""
 
-#: marketpress.php:4716
+#: marketpress.php:4717
 msgid "Items:"
 msgstr ""
 
-#: marketpress.php:4729 marketpress.php:4730
+#: marketpress.php:4730 marketpress.php:4731
 msgid "Download: "
 msgstr ""
 
-#: marketpress.php:4742
+#: marketpress.php:4743
 msgid "Product Personalization: "
 msgstr ""
 
-#: marketpress.php:4763 marketpress.php:4764
+#: marketpress.php:4764 marketpress.php:4765
 msgid "Coupon Code:"
 msgstr ""
 
-#: marketpress.php:4780 marketpress.php:4781
+#: marketpress.php:4781 marketpress.php:4782
 msgid "Order Total:"
 msgstr ""
 
-#: marketpress.php:4786
+#: marketpress.php:4787
 msgid "No shipping required for this order."
 msgstr ""
 
-#: marketpress.php:4807
+#: marketpress.php:4808
 msgid "Tracking Number:"
 msgstr ""
 
-#: marketpress.php:4815
+#: marketpress.php:4816
 msgid "Order Notes:"
 msgstr ""
 
-#: marketpress.php:4818
+#: marketpress.php:4819
 msgid "Payment Method:"
 msgstr ""
 
-#: marketpress.php:4821 marketpress.php:5343
+#: marketpress.php:4822 marketpress.php:5344
 msgid "Payment Type:"
 msgstr ""
 
-#: marketpress.php:4824 marketpress.php:5349
+#: marketpress.php:4825 marketpress.php:5350
 msgid "Transaction ID:"
 msgstr ""
 
-#: marketpress.php:4826 marketpress.php:5354
+#: marketpress.php:4827 marketpress.php:5355
 msgid "Payment Total:"
 msgstr ""
 
-#: marketpress.php:4829
+#: marketpress.php:4830
 msgid "Your payment for this order is not yet complete. Here is the latest status:"
 msgstr ""
 
-#: marketpress.php:4836
+#: marketpress.php:4837
 msgid "Your payment for this order is complete."
 msgstr ""
 
-#: marketpress.php:4875
+#: marketpress.php:4876
 msgid "New Order Notification: ORDERID"
 msgstr ""
 
-#: marketpress.php:4876
+#: marketpress.php:4877
 msgid ""
 "A new order (ORDERID) was created in your store:\n"
 "\n"
@@ -5286,11 +5301,11 @@ msgid ""
 "You can manage this order here: %s"
 msgstr ""
 
-#: marketpress.php:4937
+#: marketpress.php:4938
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: marketpress.php:4938
+#: marketpress.php:4939
 msgid ""
 "This message is being sent to notify you of low stock of a product in your online store according to your preferences.\n"
 "\n"
@@ -5302,1313 +5317,1313 @@ msgid ""
 "Notification Preferences: %s"
 msgstr ""
 
-#: marketpress.php:5201
+#: marketpress.php:5202
 msgid "Invalid Order ID"
 msgstr ""
 
-#: marketpress.php:5214
+#: marketpress.php:5215
 msgid "This order has been marked as Shipped."
 msgstr ""
 
-#: marketpress.php:5222
+#: marketpress.php:5223
 msgid "Order details have been saved!"
 msgstr ""
 
-#: marketpress.php:5227
+#: marketpress.php:5228
 msgid "Order Details (%s)"
 msgstr ""
 
-#: marketpress.php:5235
+#: marketpress.php:5236
 msgid "Order Actions"
 msgstr ""
 
-#: marketpress.php:5238
+#: marketpress.php:5239
 msgid "Change Order Status:"
 msgstr ""
 
-#: marketpress.php:5313 marketpress.php:5316 marketpress.php:5320
-#: marketpress.php:5325
+#: marketpress.php:5314 marketpress.php:5317 marketpress.php:5321
+#: marketpress.php:5326
 msgid "Received:"
 msgstr ""
 
-#: marketpress.php:5315 marketpress.php:5319 marketpress.php:5324
+#: marketpress.php:5316 marketpress.php:5320 marketpress.php:5325
 msgid "Paid:"
 msgstr ""
 
-#: marketpress.php:5318 marketpress.php:5323
+#: marketpress.php:5319 marketpress.php:5324
 msgid "Shipped:"
 msgstr ""
 
-#: marketpress.php:5322
+#: marketpress.php:5323
 msgid "Closed:"
 msgstr ""
 
-#: marketpress.php:5338
+#: marketpress.php:5339
 msgid "Payment Gateway:"
 msgstr ""
 
-#: marketpress.php:5362
+#: marketpress.php:5363
 msgid "Payment Transaction History"
 msgstr ""
 
-#: marketpress.php:5404
+#: marketpress.php:5405
 msgid "Downloads"
 msgstr ""
 
-#: marketpress.php:5491
+#: marketpress.php:5492
 msgid " (Limit Reached)"
 msgstr ""
 
-#: marketpress.php:5507
+#: marketpress.php:5508
 msgid "Coupon Discount:"
 msgstr ""
 
-#: marketpress.php:5520
+#: marketpress.php:5521
 msgid "(inclusive)"
 msgstr ""
 
-#: marketpress.php:5593
+#: marketpress.php:5594
 msgid "Cost:"
 msgstr ""
 
-#: marketpress.php:5596
+#: marketpress.php:5597
 msgid "Shipping Method & Tracking Number:"
 msgstr ""
 
-#: marketpress.php:5599
+#: marketpress.php:5600
 msgid "Choose Method:"
 msgstr ""
 
-#: marketpress.php:5604
+#: marketpress.php:5605
 msgid "Other"
 msgstr ""
 
-#: marketpress.php:5608 marketpress.php:5627
+#: marketpress.php:5609 marketpress.php:5628
 msgid "Save &raquo;"
 msgstr ""
 
-#: marketpress.php:5608
+#: marketpress.php:5609
 msgid "Save & Mark as Shipped &raquo;"
 msgstr ""
 
-#: marketpress.php:5613
+#: marketpress.php:5614
 msgid "Special Note:"
 msgstr ""
 
-#: marketpress.php:5623
+#: marketpress.php:5624
 msgid "These notes will be displayed on the order status page"
 msgstr ""
 
-#: marketpress.php:5696
+#: marketpress.php:5697
 msgid "%s order marked as Received."
 msgid_plural "%s orders marked as Received."
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5704
+#: marketpress.php:5705
 msgid "%s order marked as Paid."
 msgid_plural "%s orders marked as Paid."
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5712
+#: marketpress.php:5713
 msgid "%s order marked as Shipped."
 msgid_plural "%s orders marked as Shipped."
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5720
+#: marketpress.php:5721
 msgid "%s order Closed."
 msgid_plural "%s orders Closed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5729
+#: marketpress.php:5730
 msgid "%s order moved to Trash."
 msgid_plural "%s orders moved to Trash."
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5738 marketpress.php:5749
+#: marketpress.php:5739 marketpress.php:5750
 msgid "%s order Deleted."
 msgid_plural "%s orders Deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5767
+#: marketpress.php:5768
 msgid "Search results for &#8220;%s&#8221;"
 msgstr ""
 
-#: marketpress.php:5793
+#: marketpress.php:5794
 msgctxt "posts"
 msgid "All <span class=\"count\">(%s)</span>"
 msgid_plural "All <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:5844
+#: marketpress.php:5845
 msgid "&laquo;"
 msgstr ""
 
-#: marketpress.php:5845
+#: marketpress.php:5846
 msgid "&raquo;"
 msgstr ""
 
-#: marketpress.php:5854 marketpress.php:5962
+#: marketpress.php:5855 marketpress.php:5963
 msgid "Change Status"
 msgstr ""
 
-#: marketpress.php:5865 marketpress.php:5973
+#: marketpress.php:5866 marketpress.php:5974
 msgid "Apply"
 msgstr ""
 
-#: marketpress.php:5880 marketpress.php:6015
+#: marketpress.php:5881 marketpress.php:6016
 msgid "Show all dates"
 msgstr ""
 
-#: marketpress.php:5900
+#: marketpress.php:5901
 msgid "Filter"
 msgstr ""
 
-#: marketpress.php:5905 marketpress.php:5976
+#: marketpress.php:5906 marketpress.php:5977
 msgid "Empty Trash"
 msgstr ""
 
-#: marketpress.php:5913
+#: marketpress.php:5914
 msgid "Displaying %s&#8211;%s of %s"
 msgstr ""
 
-#: marketpress.php:5987
+#: marketpress.php:5988
 msgid "No Orders Yet"
 msgstr ""
 
-#: marketpress.php:5994
+#: marketpress.php:5995
 msgid "Export Orders"
 msgstr ""
 
-#: marketpress.php:5996
+#: marketpress.php:5997
 msgid "Upgrade to enable CSV order exports &raquo;"
 msgstr ""
 
-#: marketpress.php:6035
+#: marketpress.php:6036
 msgid "All Statuses"
 msgstr ""
 
-#: marketpress.php:6041
+#: marketpress.php:6042
 msgid "Download &raquo;"
 msgstr ""
 
-#: marketpress.php:6069 marketpress.php:6588
+#: marketpress.php:6070 marketpress.php:6589
 msgid "Coupons"
 msgstr ""
 
-#: marketpress.php:6070 marketpress.php:6079
+#: marketpress.php:6071 marketpress.php:6080
 msgid "Presentation"
 msgstr ""
 
-#: marketpress.php:6071
+#: marketpress.php:6072
 msgid "Messages"
 msgstr ""
 
-#: marketpress.php:6073
+#: marketpress.php:6074
 msgid "Payments"
 msgstr ""
 
-#: marketpress.php:6075 marketpress.php:6081
+#: marketpress.php:6076 marketpress.php:6082
 msgid "Importers"
 msgstr ""
 
-#: marketpress.php:6090
+#: marketpress.php:6091
 msgid "General"
 msgstr ""
 
-#: marketpress.php:6141
+#: marketpress.php:6142
 msgid "Location Settings"
 msgstr ""
 
-#: marketpress.php:6143
+#: marketpress.php:6144
 msgid "This is the base location that shipping and tax rates will be calculated from."
 msgstr ""
 
-#: marketpress.php:6146
+#: marketpress.php:6147
 msgid "Base Country"
 msgstr ""
 
-#: marketpress.php:6184
+#: marketpress.php:6185
 msgid "Base State/Province/Region"
 msgstr ""
 
-#: marketpress.php:6200
+#: marketpress.php:6201
 msgid "Base Zip/Postal Code"
 msgstr ""
 
-#: marketpress.php:6211
+#: marketpress.php:6212
 msgid "Tax Settings"
 msgstr ""
 
-#: marketpress.php:6219
+#: marketpress.php:6220
 msgid "%s Tax Rate"
 msgstr ""
 
-#: marketpress.php:6230
+#: marketpress.php:6231
 msgid "Total Tax Rates (VAT,GST,PST,HST)"
 msgstr ""
 
-#: marketpress.php:6232
+#: marketpress.php:6233
 msgid "Current Rates &raquo;"
 msgstr ""
 
-#: marketpress.php:6249 marketpress.php:6273
+#: marketpress.php:6250 marketpress.php:6274
 msgid "VAT Tax Rate"
 msgstr ""
 
-#: marketpress.php:6260
+#: marketpress.php:6261
 msgid "GST Tax Rate"
 msgstr ""
 
-#: marketpress.php:6282
+#: marketpress.php:6283
 msgid "Country Total Tax Rate (VAT, GST, Etc.)"
 msgstr ""
 
-#: marketpress.php:6288
+#: marketpress.php:6289
 msgid "Tax Orders Outside Your Base Country?"
 msgstr ""
 
-#: marketpress.php:6300
+#: marketpress.php:6301
 msgid "Tax Label"
 msgstr ""
 
-#: marketpress.php:6303
+#: marketpress.php:6304
 msgid "The label shown for the tax line item in the cart. Taxes, VAT, GST, etc."
 msgstr ""
 
-#: marketpress.php:6307
+#: marketpress.php:6308
 msgid "Apply Tax To Shipping Fees?"
 msgstr ""
 
-#: marketpress.php:6311
+#: marketpress.php:6312
 msgid "Please see your local tax laws. Most areas charge tax on shipping fees."
 msgstr ""
 
-#: marketpress.php:6315
+#: marketpress.php:6316
 msgid "Enter Prices Inclusive of Tax?"
 msgstr ""
 
-#: marketpress.php:6319
+#: marketpress.php:6320
 msgid "Enabling this option allows you to enter and show all prices inclusive of tax, while still listing the tax total as a line item in shopping carts. Please see your local tax laws."
 msgstr ""
 
-#: marketpress.php:6323
+#: marketpress.php:6324
 msgid "Apply Tax to Downloadable Products?"
 msgstr ""
 
-#: marketpress.php:6327
+#: marketpress.php:6328
 msgid "Please see your local tax laws. Note if this is enabled and a downloadable only cart, rates will be the default for your base location."
 msgstr ""
 
-#: marketpress.php:6331
+#: marketpress.php:6332
 msgid "Collect Address on Downloadable Only Cart?"
 msgstr ""
 
-#: marketpress.php:6335
+#: marketpress.php:6336
 msgid "If you need to tax downloadable products and don't want to default to the rates to your base location, enable this to always collect the shipping address."
 msgstr ""
 
-#: marketpress.php:6343
+#: marketpress.php:6344
 msgid "Currency Settings"
 msgstr ""
 
-#: marketpress.php:6345
+#: marketpress.php:6346
 msgid "These preferences affect display only. Your payment gateway of choice may not support every currency listed here."
 msgstr ""
 
-#: marketpress.php:6348
+#: marketpress.php:6349
 msgid "Store Currency"
 msgstr ""
 
-#: marketpress.php:6360
+#: marketpress.php:6361
 msgid "Currency Symbol Position"
 msgstr ""
 
-#: marketpress.php:6373
+#: marketpress.php:6374
 msgid "Show Decimal in Prices"
 msgstr ""
 
-#: marketpress.php:6386
+#: marketpress.php:6387
 msgid "Miscellaneous Settings"
 msgstr ""
 
-#: marketpress.php:6390
+#: marketpress.php:6391
 msgid "Inventory Warning Threshold"
 msgstr ""
 
-#: marketpress.php:6392
+#: marketpress.php:6393
 msgid "At what low stock count do you want to be warned for products you have enabled inventory tracking for?"
 msgstr ""
 
-#: marketpress.php:6405
+#: marketpress.php:6406
 msgid "Hide Out of Stock Products"
 msgstr ""
 
-#: marketpress.php:6409
+#: marketpress.php:6410
 msgid "This will set the product to an \"out_of_stock\" status if inventory of all variations is gone."
 msgstr ""
 
-#: marketpress.php:6413
+#: marketpress.php:6414
 msgid "Maximum Downloads"
 msgstr ""
 
-#: marketpress.php:6415
+#: marketpress.php:6416
 msgid "How many times may a customer download a file they have purchased? (It's best to set this higher than one in case they have any problems downloading)"
 msgstr ""
 
-#: marketpress.php:6428
+#: marketpress.php:6429
 msgid "Limit Digital Products Per-order"
 msgstr ""
 
-#: marketpress.php:6432
+#: marketpress.php:6433
 msgid "This will prevent multiples of the same downloadable product form being added to the cart. Per-product custom limits will override this."
 msgstr ""
 
-#: marketpress.php:6436
+#: marketpress.php:6437
 msgid "Force Login"
 msgstr ""
 
-#: marketpress.php:6441
+#: marketpress.php:6442
 msgid "Whether or not customers must be registered and logged in to checkout. (Not recommended: Enabling this can lower conversions)"
 msgstr ""
 
-#: marketpress.php:6445
+#: marketpress.php:6446
 msgid "Product Listings Only"
 msgstr ""
 
-#: marketpress.php:6449
+#: marketpress.php:6450
 msgid "This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the \"Buy Now\" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links."
 msgstr ""
 
-#: marketpress.php:6453
+#: marketpress.php:6454
 msgid "Google Analytics Ecommerce Tracking"
 msgstr ""
 
-#: marketpress.php:6456
+#: marketpress.php:6457
 msgid "Upgrade to enable Google Analytics Ecommerce Tracking &raquo;"
 msgstr ""
 
-#: marketpress.php:6460
+#: marketpress.php:6461
 msgid "Asynchronous Tracking Code"
 msgstr ""
 
-#: marketpress.php:6461
+#: marketpress.php:6462
 msgid "Old Tracking Code"
 msgstr ""
 
-#: marketpress.php:6462
+#: marketpress.php:6463
 msgid "Universal Analytics"
 msgstr ""
 
-#: marketpress.php:6464
+#: marketpress.php:6465
 msgid "If you already use Google Analytics for your website, you can track detailed ecommerce information by enabling this setting. Choose whether you are using the new asynchronous or old tracking code. Before Google Analytics can report ecommerce activity for your website, you must enable ecommerce tracking on the profile settings page for your website. Also keep in mind that some gateways do not reliably show the receipt page, so tracking may not be accurate in those cases. It is recommended to use the PayPal gateway for the most accurate data. <a href=\"http://analytics.blogspot.com/2009/05/how-to-use-ecommerce-tracking-in-google.html\" target=\"_blank\">More information &raquo;</a>"
 msgstr ""
 
-#: marketpress.php:6468
+#: marketpress.php:6469
 msgid "Special Instructions Field"
 msgstr ""
 
-#: marketpress.php:6472
+#: marketpress.php:6473
 msgid "Enabling this field will display a textbox on the shipping checkout page for users to enter special instructions for their order. Useful for product personalization, etc. Note you may want to <a href=\"%s\">adjust the message on the shipping page."
 msgstr ""
 
-#: marketpress.php:6511
+#: marketpress.php:6512
 msgid "Coupon(s) succesfully deleted."
 msgstr ""
 
-#: marketpress.php:6524
+#: marketpress.php:6525
 msgid "Please enter a valid Coupon Code"
 msgstr ""
 
-#: marketpress.php:6528
+#: marketpress.php:6529
 msgid "Please enter a valid Discount Amount"
 msgstr ""
 
-#: marketpress.php:6532
+#: marketpress.php:6533
 msgid "Please choose a valid Discount Type"
 msgstr ""
 
-#: marketpress.php:6536
+#: marketpress.php:6537
 msgid "Please enter a valid Start Date"
 msgstr ""
 
-#: marketpress.php:6540
+#: marketpress.php:6541
 msgid "Please enter a valid End Date not earlier than the Start Date"
 msgstr ""
 
-#: marketpress.php:6556
+#: marketpress.php:6557
 msgid "Please choose a Product Category to apply the coupon to"
 msgstr ""
 
-#: marketpress.php:6564
+#: marketpress.php:6565
 msgid "Please choose an Individual Product to apply the coupon to"
 msgstr ""
 
-#: marketpress.php:6574
+#: marketpress.php:6575
 msgid "Coupon succesfully saved."
 msgstr ""
 
-#: marketpress.php:6589
+#: marketpress.php:6590
 msgid "You can create, delete, or update coupon codes for your store here."
 msgstr ""
 
-#: marketpress.php:6627 marketpress.php:6822
+#: marketpress.php:6628 marketpress.php:6823
 msgid "Coupon Code"
 msgstr ""
 
-#: marketpress.php:6629 marketpress.php:6826
+#: marketpress.php:6630 marketpress.php:6827
 msgid "Start Date"
 msgstr ""
 
-#: marketpress.php:6630 marketpress.php:6828
+#: marketpress.php:6631 marketpress.php:6829
 msgid "Expire Date"
 msgstr ""
 
-#: marketpress.php:6631
+#: marketpress.php:6632
 msgid "Used"
 msgstr ""
 
-#: marketpress.php:6632
+#: marketpress.php:6633
 msgid "Remaining Uses"
 msgstr ""
 
-#: marketpress.php:6633
+#: marketpress.php:6634
 msgid "Applies to"
 msgstr ""
 
-#: marketpress.php:6696
+#: marketpress.php:6697
 msgid "No End"
 msgstr ""
 
-#: marketpress.php:6714
+#: marketpress.php:6715
 msgid "Unlimited"
 msgstr ""
 
-#: marketpress.php:6733
+#: marketpress.php:6734
 msgid "Associated %s Deleted"
 msgstr ""
 
-#: marketpress.php:6740 marketpress.php:6865
+#: marketpress.php:6741 marketpress.php:6866
 msgid "All Products"
 msgstr ""
 
-#: marketpress.php:6764
+#: marketpress.php:6765
 msgid "No coupons yet."
 msgstr ""
 
-#: marketpress.php:6793
+#: marketpress.php:6794
 msgid "Edit Coupon"
 msgstr ""
 
-#: marketpress.php:6795
+#: marketpress.php:6796
 msgid "Add Coupon"
 msgstr ""
 
-#: marketpress.php:6823
+#: marketpress.php:6824
 msgid "Letters and Numbers only"
 msgstr ""
 
-#: marketpress.php:6829
+#: marketpress.php:6830
 msgid "No end if blank"
 msgstr ""
 
-#: marketpress.php:6832
+#: marketpress.php:6833
 msgid "Allowed Uses"
 msgstr ""
 
-#: marketpress.php:6833
+#: marketpress.php:6834
 msgid "Unlimited if blank"
 msgstr ""
 
-#: marketpress.php:6837
+#: marketpress.php:6838
 msgid "Applies To"
 msgstr ""
 
-#: marketpress.php:6904
+#: marketpress.php:6905
 msgid "No Product Categories"
 msgstr ""
 
-#: marketpress.php:6913
+#: marketpress.php:6914
 msgid "Post ID"
 msgstr ""
 
-#: marketpress.php:6934
+#: marketpress.php:6935
 msgid "Save Coupon"
 msgstr ""
 
-#: marketpress.php:6961
+#: marketpress.php:6962
 msgid "Store base URL conflicts with another page"
 msgstr ""
 
-#: marketpress.php:6989
+#: marketpress.php:6990
 msgid "Presentation Settings"
 msgstr ""
 
-#: marketpress.php:7000
+#: marketpress.php:7001
 msgid "Store Style"
 msgstr ""
 
-#: marketpress.php:7003
+#: marketpress.php:7004
 msgid "Upgrade to enable all styles &raquo;"
 msgstr ""
 
-#: marketpress.php:7006
+#: marketpress.php:7007
 msgid "This option changes the built-in css styles for store pages."
 msgstr ""
 
-#: marketpress.php:7008
+#: marketpress.php:7009
 msgid "For a custom css style, save your css file with the \"MarketPress Style: NAME\" header in the \"%s/marketpress-styles/\" folder and it will appear in this list so you may select it. You can also select \"None\" and create custom theme templates and css to make your own completely unique store design. More information on that <a href=\"%sthemes/Themeing_MarketPress.txt\">here &raquo;</a>"
 msgstr ""
 
-#: marketpress.php:7009
+#: marketpress.php:7010
 msgid "Full-featured MarketPress Themes:"
 msgstr ""
 
-#: marketpress.php:7010 marketpress.php:7013
+#: marketpress.php:7011 marketpress.php:7014
 msgid "Download Now &raquo;"
 msgstr ""
 
-#: marketpress.php:7011
+#: marketpress.php:7012
 msgid "FrameMarket/GridMarket"
 msgstr ""
 
-#: marketpress.php:7012
+#: marketpress.php:7013
 msgid "The ultimate MarkePress theme brings visual perfection to WordPress e-commerce. This professional front-end does all the work for you!"
 msgstr ""
 
-#: marketpress.php:7014
+#: marketpress.php:7015
 msgid "SimpleMarket"
 msgstr ""
 
-#: marketpress.php:7015
+#: marketpress.php:7016
 msgid "The SimpleMarket Theme uses an HTML 5 responsive design so your e-commerce site looks great across all screen-sizes and devices such as smartphones or tablets!"
 msgstr ""
 
-#: marketpress.php:7020
+#: marketpress.php:7021
 msgid "Show breadcrumbs for purchase process?"
 msgstr ""
 
-#: marketpress.php:7024
+#: marketpress.php:7025
 msgid "Show previous, current and next steps when a customer is purchasing their cart, shown below the title."
 msgstr ""
 
-#: marketpress.php:7032
+#: marketpress.php:7033
 msgid "Single Product Settings"
 msgstr ""
 
-#: marketpress.php:7036 marketpress.php:7153
+#: marketpress.php:7037 marketpress.php:7154
 msgid "Checkout Button Type"
 msgstr ""
 
-#: marketpress.php:7038 marketpress.php:7155
+#: marketpress.php:7039 marketpress.php:7156
 msgid "Add To Cart"
 msgstr ""
 
-#: marketpress.php:7039 marketpress.php:7156
+#: marketpress.php:7040 marketpress.php:7157
 msgid "Buy Now"
 msgstr ""
 
-#: marketpress.php:7043
+#: marketpress.php:7044
 msgid "Show Quantity Option"
 msgstr ""
 
-#: marketpress.php:7050
+#: marketpress.php:7051
 msgid "Show Product Image"
 msgstr ""
 
-#: marketpress.php:7057
+#: marketpress.php:7058
 msgid "Product Image Size"
 msgstr ""
 
-#: marketpress.php:7059 marketpress.php:7169
+#: marketpress.php:7060 marketpress.php:7170
 msgid "WP Thumbnail size"
 msgstr ""
 
-#: marketpress.php:7060 marketpress.php:7170
+#: marketpress.php:7061 marketpress.php:7171
 msgid "WP Medium size"
 msgstr ""
 
-#: marketpress.php:7061 marketpress.php:7171
+#: marketpress.php:7062 marketpress.php:7172
 msgid "WP Large size"
 msgstr ""
 
-#: marketpress.php:7062 marketpress.php:7172
+#: marketpress.php:7063 marketpress.php:7173
 msgid "Custom"
 msgstr ""
 
-#: marketpress.php:7063 marketpress.php:7173
+#: marketpress.php:7064 marketpress.php:7174
 msgid "Height"
 msgstr ""
 
-#: marketpress.php:7064 marketpress.php:7174
+#: marketpress.php:7065 marketpress.php:7175
 msgid "Width"
 msgstr ""
 
-#: marketpress.php:7068
+#: marketpress.php:7069
 msgid "Product Image Alignment"
 msgstr ""
 
-#: marketpress.php:7073 marketpress.php:7182
+#: marketpress.php:7074 marketpress.php:7183
 msgid "Center"
 msgstr ""
 
-#: marketpress.php:7074 marketpress.php:7183
+#: marketpress.php:7075 marketpress.php:7184
 msgid "Left"
 msgstr ""
 
-#: marketpress.php:7075 marketpress.php:7184
+#: marketpress.php:7076 marketpress.php:7185
 msgid "Right"
 msgstr ""
 
-#: marketpress.php:7084
+#: marketpress.php:7085
 msgid "Show Image Lightbox"
 msgstr ""
 
-#: marketpress.php:7088
+#: marketpress.php:7089
 msgid "Makes clicking the single product image open an instant zoomed preview."
 msgstr ""
 
-#: marketpress.php:7092
+#: marketpress.php:7093
 msgid "Disable Large Image display"
 msgstr ""
 
-#: marketpress.php:7096
+#: marketpress.php:7097
 msgid "Disables \"Display Larger Image\" function. Clicking a product image will not display a larger image."
 msgstr ""
 
-#: marketpress.php:7100
+#: marketpress.php:7101
 msgid "Show Related Products"
 msgstr ""
 
-#: marketpress.php:7110
+#: marketpress.php:7111
 msgid "Related Products Settings"
 msgstr ""
 
-#: marketpress.php:7114
+#: marketpress.php:7115
 msgid "Related Product Limit"
 msgstr ""
 
-#: marketpress.php:7120
+#: marketpress.php:7121
 msgid "Relate Products By"
 msgstr ""
 
-#: marketpress.php:7123
+#: marketpress.php:7124
 msgid "Category &amp; Tags"
 msgstr ""
 
-#: marketpress.php:7124
+#: marketpress.php:7125
 msgid "Category Only"
 msgstr ""
 
-#: marketpress.php:7125
+#: marketpress.php:7126
 msgid "Tags Only"
 msgstr ""
 
-#: marketpress.php:7130
+#: marketpress.php:7131
 msgid "Show Related Products As Simple List"
 msgstr ""
 
-#: marketpress.php:7134
+#: marketpress.php:7135
 msgid "Setting to \"No\" will use the List/Grid View setting."
 msgstr ""
 
-#: marketpress.php:7142
+#: marketpress.php:7143
 msgid "Product List Settings"
 msgstr ""
 
-#: marketpress.php:7146
+#: marketpress.php:7147
 msgid "Product List View"
 msgstr ""
 
-#: marketpress.php:7148
+#: marketpress.php:7149
 msgid "List View"
 msgstr ""
 
-#: marketpress.php:7149
+#: marketpress.php:7150
 msgid "Grid View"
 msgstr ""
 
-#: marketpress.php:7160
+#: marketpress.php:7161
 msgid "Show Product Thumbnail"
 msgstr ""
 
-#: marketpress.php:7167
+#: marketpress.php:7168
 msgid "Product Thumbnail Size"
 msgstr ""
 
-#: marketpress.php:7177
+#: marketpress.php:7178
 msgid "Product Thumbnail Alignment"
 msgstr ""
 
-#: marketpress.php:7194
+#: marketpress.php:7195
 msgid "Show Excerpts"
 msgstr ""
 
-#: marketpress.php:7201
+#: marketpress.php:7202
 msgid "Paginate Products"
 msgstr ""
 
-#: marketpress.php:7205
+#: marketpress.php:7206
 msgid "Products per page"
 msgstr ""
 
-#: marketpress.php:7209
+#: marketpress.php:7210
 msgid "Order Products By"
 msgstr ""
 
-#: marketpress.php:7214 marketpress.php:8211
+#: marketpress.php:7215 marketpress.php:8212
 msgid "Product ID"
 msgstr ""
 
-#: marketpress.php:7215 marketpress.php:8212
+#: marketpress.php:7216 marketpress.php:8213
 msgid "Product Author"
 msgstr ""
 
-#: marketpress.php:7225
+#: marketpress.php:7226
 msgid "Show Product Filters"
 msgstr ""
 
-#: marketpress.php:7230
+#: marketpress.php:7231
 msgid "Show \"Product Category\" and \"Order By\" filters at the top of listings pages. Uses AJAX for instant updates based on user selection."
 msgstr ""
 
-#: marketpress.php:7238
+#: marketpress.php:7239
 msgid "Store URL Slugs"
 msgstr ""
 
-#: marketpress.php:7238
+#: marketpress.php:7239
 msgid "Customizes the url structure of your store"
 msgstr ""
 
-#: marketpress.php:7242
+#: marketpress.php:7243
 msgid "Store Base"
 msgstr ""
 
-#: marketpress.php:7244
+#: marketpress.php:7245
 msgid "This page will be created so you can change it's content and the order in which it appears in navigation menus if your theme supports it."
 msgstr ""
 
-#: marketpress.php:7247 marketpress.php:7760
+#: marketpress.php:7248 marketpress.php:7761
 msgid "Products List"
 msgstr ""
 
-#: marketpress.php:7251 marketpress.php:7414
+#: marketpress.php:7252 marketpress.php:7415
 msgid "Shopping Cart Page"
 msgstr ""
 
-#: marketpress.php:7255 marketpress.php:7399
+#: marketpress.php:7256 marketpress.php:7400
 msgid "Order Status Page"
 msgstr ""
 
-#: marketpress.php:7272
+#: marketpress.php:7273
 msgid "Social"
 msgstr ""
 
-#: marketpress.php:7277
+#: marketpress.php:7278
 msgid "Show \"Pin It\" button"
 msgstr ""
 
-#: marketpress.php:7279
+#: marketpress.php:7280
 msgid "Off"
 msgstr ""
 
-#: marketpress.php:7280
+#: marketpress.php:7281
 msgid "Single View"
 msgstr ""
 
-#: marketpress.php:7281
+#: marketpress.php:7282
 msgid "All View"
 msgstr ""
 
-#: marketpress.php:7285
+#: marketpress.php:7286
 msgid "Pin Count"
 msgstr ""
 
-#: marketpress.php:7288
+#: marketpress.php:7289
 msgid "Above"
 msgstr ""
 
-#: marketpress.php:7289
+#: marketpress.php:7290
 msgid "Beside"
 msgstr ""
 
-#: marketpress.php:7333
+#: marketpress.php:7334
 msgid "Messages Settings"
 msgstr ""
 
-#: marketpress.php:7340
+#: marketpress.php:7341
 msgid "Email Notifications"
 msgstr ""
 
-#: marketpress.php:7344
+#: marketpress.php:7345
 msgid "Store Admin Email"
 msgstr ""
 
-#: marketpress.php:7347
+#: marketpress.php:7348
 msgid "The email address that new order notifications are sent to and received from."
 msgstr ""
 
-#: marketpress.php:7352
+#: marketpress.php:7353
 msgid "New Order"
 msgstr ""
 
-#: marketpress.php:7354
+#: marketpress.php:7355
 msgid "The email text sent to your customer to confirm a new order. These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed."
 msgstr ""
 
-#: marketpress.php:7355 marketpress.php:7366
+#: marketpress.php:7356 marketpress.php:7367
 msgid "Subject:"
 msgstr ""
 
-#: marketpress.php:7357 marketpress.php:7368
+#: marketpress.php:7358 marketpress.php:7369
 msgid "Text:"
 msgstr ""
 
-#: marketpress.php:7363
+#: marketpress.php:7364
 msgid "Order Shipped"
 msgstr ""
 
-#: marketpress.php:7365
+#: marketpress.php:7366
 msgid "The email text sent to your customer when you mark an order as \"Shipped\". These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL, ORDERNOTES. No HTML allowed."
 msgstr ""
 
-#: marketpress.php:7378
+#: marketpress.php:7379
 msgid "Store Pages"
 msgstr ""
 
-#: marketpress.php:7382
+#: marketpress.php:7383
 msgid "Store Page"
 msgstr ""
 
-#: marketpress.php:7384
+#: marketpress.php:7385
 msgid "The main store page is an actual page on your site. You can edit it here:"
 msgstr ""
 
-#: marketpress.php:7387
+#: marketpress.php:7388
 msgid "Edit Page &raquo;"
 msgstr ""
 
-#: marketpress.php:7392
+#: marketpress.php:7393
 msgid "Product Listing Pages"
 msgstr ""
 
-#: marketpress.php:7394
+#: marketpress.php:7395
 msgid "Displayed at the top of the product listing pages. Optional, HTML allowed."
 msgstr ""
 
-#: marketpress.php:7401
+#: marketpress.php:7402
 msgid "Displayed at the top of the Order Status page. Optional, HTML allowed."
 msgstr ""
 
-#: marketpress.php:7410
+#: marketpress.php:7411
 msgid "Shopping Cart Pages"
 msgstr ""
 
-#: marketpress.php:7416
+#: marketpress.php:7417
 msgid "Displayed at the top of the Shopping Cart page. Optional, HTML allowed."
 msgstr ""
 
-#: marketpress.php:7421
+#: marketpress.php:7422
 msgid "Shipping Form Page"
 msgstr ""
 
-#: marketpress.php:7423
+#: marketpress.php:7424
 msgid "Displayed at the top of the Shipping Form page. Optional, HTML allowed."
 msgstr ""
 
-#: marketpress.php:7428
+#: marketpress.php:7429
 msgid "Payment Form Page"
 msgstr ""
 
-#: marketpress.php:7430
+#: marketpress.php:7431
 msgid "Displayed at the top of the Payment Form page. Optional, HTML allowed."
 msgstr ""
 
-#: marketpress.php:7435
+#: marketpress.php:7436
 msgid "Order Confirmation Page"
 msgstr ""
 
-#: marketpress.php:7437
+#: marketpress.php:7438
 msgid "Displayed at the top of the final Order Confirmation page. HTML allowed."
 msgstr ""
 
-#: marketpress.php:7442
+#: marketpress.php:7443
 msgid "Order Complete Page"
 msgstr ""
 
-#: marketpress.php:7444
+#: marketpress.php:7445
 msgid "Displayed at the top of the page notifying customers of a successful order. HTML allowed."
 msgstr ""
 
-#: marketpress.php:7510
+#: marketpress.php:7511
 msgid "Shipping Settings"
 msgstr ""
 
-#: marketpress.php:7522
+#: marketpress.php:7523
 msgid "Choose Target Countries"
 msgstr ""
 
-#: marketpress.php:7524
+#: marketpress.php:7525
 msgid "All"
 msgstr ""
 
-#: marketpress.php:7524
+#: marketpress.php:7525
 msgid "EU"
 msgstr ""
 
-#: marketpress.php:7532
+#: marketpress.php:7533
 msgid "These are the countries you will sell and ship to."
 msgstr ""
 
-#: marketpress.php:7537
+#: marketpress.php:7538
 msgid "Select Shipping Method"
 msgstr ""
 
-#: marketpress.php:7540
+#: marketpress.php:7541
 msgid "No Shipping"
 msgstr ""
 
-#: marketpress.php:7551
+#: marketpress.php:7552
 msgid "Calculated Options"
 msgstr ""
 
-#: marketpress.php:7561
+#: marketpress.php:7562
 msgid "Select Shipping Options"
 msgstr ""
 
-#: marketpress.php:7564
+#: marketpress.php:7565
 msgid "Upgrade to enable Calculated Shipping options &raquo;"
 msgstr ""
 
-#: marketpress.php:7566
+#: marketpress.php:7567
 msgid "Select which calculated shipping methods the customer will be able to choose from:"
 msgstr ""
 
-#: marketpress.php:7579
+#: marketpress.php:7580
 msgid "Measurement System"
 msgstr ""
 
-#: marketpress.php:7581
+#: marketpress.php:7582
 msgid "English (Pounds)"
 msgstr ""
 
-#: marketpress.php:7582
+#: marketpress.php:7583
 msgid "Metric (Kilograms)"
 msgstr ""
 
-#: marketpress.php:7627
+#: marketpress.php:7628
 msgid "Payment Settings"
 msgstr ""
 
-#: marketpress.php:7639
+#: marketpress.php:7640
 msgid "Select Payment Gateway(s)"
 msgstr ""
 
-#: marketpress.php:7658
+#: marketpress.php:7659
 msgid "Upgrade"
 msgstr ""
 
-#: marketpress.php:7658
+#: marketpress.php:7659
 msgid "Pro Only &raquo;"
 msgstr ""
 
-#: marketpress.php:7689
+#: marketpress.php:7690
 msgid "MarketPress Shortcodes"
 msgstr ""
 
-#: marketpress.php:7694
+#: marketpress.php:7695
 msgid "General Information"
 msgstr ""
 
-#: marketpress.php:7704
+#: marketpress.php:7705
 msgid "Shortcodes allow you to include dynamic store content in posts and pages on your site. Simply type or paste them into your post or page content where you would like them to appear. Optional attributes can be added in a format like <em>[shortcode attr1=\"value\" attr2=\"value\"]</em>."
 msgstr ""
 
-#: marketpress.php:7707 marketpress.php:8337
+#: marketpress.php:7708 marketpress.php:8338
 msgid "Product Tag Cloud"
 msgstr ""
 
-#: marketpress.php:7710
+#: marketpress.php:7711
 msgid "Displays a cloud or list of your product tags."
 msgstr ""
 
-#: marketpress.php:7711 marketpress.php:7719 marketpress.php:7727
+#: marketpress.php:7712 marketpress.php:7720 marketpress.php:7728
 msgid "Optional Attributes &raquo;"
 msgstr ""
 
-#: marketpress.php:7715
+#: marketpress.php:7716
 msgid "Product Categories List"
 msgstr ""
 
-#: marketpress.php:7718
+#: marketpress.php:7719
 msgid "Displays an HTML list of your product categories."
 msgstr ""
 
-#: marketpress.php:7723
+#: marketpress.php:7724
 msgid "Product Categories Dropdown"
 msgstr ""
 
-#: marketpress.php:7726
+#: marketpress.php:7727
 msgid "Displays an HTML dropdown of your product categories."
 msgstr ""
 
-#: marketpress.php:7731
+#: marketpress.php:7732
 msgid "Popular Products List"
 msgstr ""
 
-#: marketpress.php:7734
+#: marketpress.php:7735
 msgid "Displays a list of popular products ordered by sales."
 msgstr ""
 
-#: marketpress.php:7738
+#: marketpress.php:7739
 msgid "\"number\" - max number of products to display. Defaults to 5."
 msgstr ""
 
-#: marketpress.php:7747
+#: marketpress.php:7748
 msgid "Displays a products related to the one being viewed."
 msgstr ""
 
-#: marketpress.php:7751
+#: marketpress.php:7752
 msgid "\"product_id\" - The product to show related items for."
 msgstr ""
 
-#: marketpress.php:7752
+#: marketpress.php:7753
 msgid "\"relate_by\" - Whether to limit the related items to products in the same category, tags or both. Defaults to the value set in presentation settings.."
 msgstr ""
 
-#: marketpress.php:7753
+#: marketpress.php:7754
 msgid "\"limit\" - How many related items to show. Defaults to the value set in presentation settings."
 msgstr ""
 
-#: marketpress.php:7754
+#: marketpress.php:7755
 msgid "\"simple_list\" - Whether to display the items as a simple list or based on the list/grid view setting. Defaults to the value set in presentation settings."
 msgstr ""
 
-#: marketpress.php:7763
+#: marketpress.php:7764
 msgid "Displays a list of products according to preference. Optional attributes default to the values in Presentation Settings -> Product List."
 msgstr ""
 
-#: marketpress.php:7767
+#: marketpress.php:7768
 msgid "\"paginate\" - Whether to paginate the product list. This is useful to only show a subset."
 msgstr ""
 
-#: marketpress.php:7768
+#: marketpress.php:7769
 msgid "\"page\" - The page number to display in the product list if \"paginate\" is set to true."
 msgstr ""
 
-#: marketpress.php:7769
+#: marketpress.php:7770
 msgid "\"per_page\" - How many products to display in the product list if \"paginate\" is set to true."
 msgstr ""
 
-#: marketpress.php:7770
+#: marketpress.php:7771
 msgid "\"order_by\" - What field to order products by. Can be: title, date, ID, author, price, sales, rand (random)."
 msgstr ""
 
-#: marketpress.php:7771
+#: marketpress.php:7772
 msgid "\"order\" - Direction to order products by. Can be: DESC, ASC"
 msgstr ""
 
-#: marketpress.php:7774
+#: marketpress.php:7775
 msgid "\"list_view\" - 1 for list view, 0 (default) for grid view"
 msgstr ""
 
-#: marketpress.php:7776
+#: marketpress.php:7777
 msgid "\"filters\" - 1 to show product filters, 0 to not show filters"
 msgstr ""
 
-#: marketpress.php:7781
+#: marketpress.php:7782
 msgid "Single Product"
 msgstr ""
 
-#: marketpress.php:7784
+#: marketpress.php:7785
 msgid "Displays a single product according to preference."
 msgstr ""
 
-#: marketpress.php:7788
+#: marketpress.php:7789
 msgid "\"product_id\" - The ID of the product to display. This is the Post ID, you can find it in the url of a product edit page."
 msgstr ""
 
-#: marketpress.php:7789
+#: marketpress.php:7790
 msgid "\"title\" - Whether to display the product title."
 msgstr ""
 
-#: marketpress.php:7790
+#: marketpress.php:7791
 msgid "\"content\" - Whether and what type of content to display. Options are false/0, \"full\", or \"excerpt\". Default \"full\""
 msgstr ""
 
-#: marketpress.php:7791
+#: marketpress.php:7792
 msgid "\"image\" - Whether and what context of image size to display. Options are false/0, \"single\", or \"list\". Default \"single\""
 msgstr ""
 
-#: marketpress.php:7792
+#: marketpress.php:7793
 msgid "\"meta\" - Whether to display the product meta (price, buy button)."
 msgstr ""
 
-#: marketpress.php:7801
+#: marketpress.php:7802
 msgid "Displays the featured image of a given product."
 msgstr ""
 
-#: marketpress.php:7805 marketpress.php:7821 marketpress.php:7835
-#: marketpress.php:7849 marketpress.php:7863
+#: marketpress.php:7806 marketpress.php:7822 marketpress.php:7836
+#: marketpress.php:7850 marketpress.php:7864
 msgid "\"product_id\" - The ID for the product.\tThis is the Post ID, you can find it in the url of a product edit page. Optional if shortcode is in the loop."
 msgstr ""
 
-#: marketpress.php:7806
+#: marketpress.php:7807
 msgid "\"context\" - What context for preset size options. Options are list, single, or widget, default single."
 msgstr ""
 
-#: marketpress.php:7807
+#: marketpress.php:7808
 msgid "\"size\" - Set a custom pixel width/height. If omitted defaults to the size set by \"context\"."
 msgstr ""
 
-#: marketpress.php:7808
+#: marketpress.php:7809
 msgid "\"align\" - Set the alignment of the image. If omitted defaults to the alignment set in presentation settings."
 msgstr ""
 
-#: marketpress.php:7814
+#: marketpress.php:7815
 msgid "Product Buy Button"
 msgstr ""
 
-#: marketpress.php:7817
+#: marketpress.php:7818
 msgid "Displays the buy or add to cart button."
 msgstr ""
 
-#: marketpress.php:7822 marketpress.php:7865
+#: marketpress.php:7823 marketpress.php:7866
 msgid "\"context\" - What context for display. Options are list or single, default single which shows all variations."
 msgstr ""
 
-#: marketpress.php:7831
+#: marketpress.php:7832
 msgid "Displays the product price (and sale price)."
 msgstr ""
 
-#: marketpress.php:7836 marketpress.php:7864
+#: marketpress.php:7837 marketpress.php:7865
 msgid "\"label\" - A label to prepend to the price. Defaults to \"Price: \"."
 msgstr ""
 
-#: marketpress.php:7842
+#: marketpress.php:7843
 msgid "Product SKU"
 msgstr ""
 
-#: marketpress.php:7845
+#: marketpress.php:7846
 msgid "Displays the product SKU number(s)."
 msgstr ""
 
-#: marketpress.php:7850
+#: marketpress.php:7851
 msgid "\"seperator\" - If there are variation, what to seperate the list of SKUs with. Defaults to a comma \", \"."
 msgstr ""
 
-#: marketpress.php:7856
+#: marketpress.php:7857
 msgid "Product Meta"
 msgstr ""
 
-#: marketpress.php:7859
+#: marketpress.php:7860
 msgid "Displays the full product meta box with price and buy now/add to cart button."
 msgstr ""
 
-#: marketpress.php:7871
+#: marketpress.php:7872
 msgid "Store Links"
 msgstr ""
 
-#: marketpress.php:7874
+#: marketpress.php:7875
 msgid "Displays a link or url to the current shopping cart page."
 msgstr ""
 
-#: marketpress.php:7876
+#: marketpress.php:7877
 msgid "Displays a link or url to the current store page."
 msgstr ""
 
-#: marketpress.php:7878
+#: marketpress.php:7879
 msgid "Displays a link or url to the current products list page."
 msgstr ""
 
-#: marketpress.php:7880
+#: marketpress.php:7881
 msgid "Displays a link or url to the order status page."
 msgstr ""
 
-#: marketpress.php:7884
+#: marketpress.php:7885
 msgid "\"url\" - Whether to return a clickable link or url. Can be: true, false. Defaults to showing link."
 msgstr ""
 
-#: marketpress.php:7885
+#: marketpress.php:7886
 msgid "\"link_text\" - The text to show in the link."
 msgstr ""
 
-#: marketpress.php:7891
+#: marketpress.php:7892
 msgid "Store Navigation List"
 msgstr ""
 
-#: marketpress.php:7894
+#: marketpress.php:7895
 msgid "Displays a list of links to your store pages."
 msgstr ""
 
-#: marketpress.php:7914
+#: marketpress.php:7915
 msgid "Import Products"
 msgstr ""
 
-#: marketpress.php:7979
+#: marketpress.php:7980
 msgid "Shows dynamic shopping cart contents along with a checkout button for your MarketPress store."
 msgstr ""
 
-#: marketpress.php:8036 marketpress.php:8243 marketpress.php:8327
-#: marketpress.php:8375
+#: marketpress.php:8037 marketpress.php:8244 marketpress.php:8328
+#: marketpress.php:8376
 msgid "Only show on store pages"
 msgstr ""
 
-#: marketpress.php:8050
+#: marketpress.php:8051
 msgid "Shows a customizable list of products from your MarketPress store."
 msgstr ""
 
-#: marketpress.php:8051
+#: marketpress.php:8052
 msgid "Product List"
 msgstr ""
 
-#: marketpress.php:8179
+#: marketpress.php:8180
 msgid "Our Products"
 msgstr ""
 
-#: marketpress.php:8221
+#: marketpress.php:8222
 msgid "Taxonomy Filter:"
 msgstr ""
 
-#: marketpress.php:8223
+#: marketpress.php:8224
 msgid "No Filter"
 msgstr ""
 
-#: marketpress.php:8225
+#: marketpress.php:8226
 msgid "Tag"
 msgstr ""
 
-#: marketpress.php:8236
+#: marketpress.php:8237
 msgid "Show Excerpt"
 msgstr ""
 
-#: marketpress.php:8240
+#: marketpress.php:8241
 msgid "Show Buy Button"
 msgstr ""
 
-#: marketpress.php:8252
+#: marketpress.php:8253
 msgid "A list or dropdown of product categories from your MarketPress store."
 msgstr ""
 
-#: marketpress.php:8275
+#: marketpress.php:8276
 msgid "Select Category"
 msgstr ""
 
-#: marketpress.php:8318
+#: marketpress.php:8319
 msgid "Show as dropdown"
 msgstr ""
 
-#: marketpress.php:8324
+#: marketpress.php:8325
 msgid "Show hierarchy"
 msgstr ""
 
-#: marketpress.php:8336
+#: marketpress.php:8337
 msgid "Your most used product tags in cloud format from your MarketPress store."
 msgstr ""
 #. Plugin Name of the plugin/theme
