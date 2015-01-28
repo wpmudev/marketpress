@@ -42,6 +42,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 	 */
 	function on_creation() {
+
 		//set names here to be able to translate
 		if ( is_super_admin() ) {
 			$this->admin_name = __( 'PayPal Chained Payments', 'mp' );
@@ -59,7 +60,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$this->currencyCode	 = mp_get_setting( 'currency', 'USD' );
 		$this->locale		 = mp_get_setting( 'locale' );
 		$this->returnURL	 = $this->return_url;
-		$this->cancelURL	 = $this->cancel_url;
+		$this->cancelURL	 = mp_store_page_url( 'checkout', false ); //$this->cancel_url;
 
 		$this->currencies = array(
 			'AUD'	 => __( 'AUD - Australian Dollar', 'mp' ),
@@ -90,7 +91,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		);
 
 		//set api urls
-		if ( mp_get_setting( 'gateways->paypal-chained->mode' ) == 'sandbox' ) {
+		//if ( mp_get_setting( 'gateways->paypal-chained->mode' ) == 'sandbox' ) {
+		if ( $this->get_setting( 'mode' ) == 'sandbox' ) {
 			$this->API_Endpoint	 = "https://svcs.sandbox.paypal.com/AdaptivePayments/";
 			$this->paypalURL	 = "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey=";
 			$this->API_Username	 = $this->get_network_setting( 'api_user_sandbox' );
@@ -116,8 +118,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function payment_form( $cart, $shipping_info ) {
-		if ( isset( $_GET[ 'mp_checkout_cancel_' . $this->plugin_name ] ) ) {
-			mp_checkout()->add_error( __( 'Your PayPal transaction has been canceled.', 'mp' ), 'general' );
+		if ( mp_get_request_value( 'mp_checkout_cancel_' . $this->plugin_name ) == '1' ) {
+			mp_checkout()->add_error( __( 'Your PayPal transaction has been canceled.', 'mp' ), 'order-review-payment' );
 			return false;
 		} else {
 			return __( 'You will be redirected to the PayPal site to finalize your payment.', 'mp' );
@@ -176,9 +178,6 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	 * Runs before page load incase you need to run any scripts before loading the success message page
 	 */
 	function process_checkout_return() {
-
-		//check if created already by IPN
-		//if ( !$order ) {
 
 		if ( session_id() == '' ) {
 			session_start();
@@ -266,7 +265,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 				$cart			 = get_transient( 'mp_order_' . $order_id . '_cart' );
 				$shipping_info	 = get_transient( 'mp_order_' . $order_id . '_shipping_info' );
 				$billing_info	 = get_transient( 'mp_order_' . $order_id . '_billing_info' );
-				//$order_id		 = mp()->create_order( $result[ "trackingId" ], $cart, $shipping_info, $payment_info, $paid );
+
 				delete_transient( 'mp_order_' . $order_id . '_cart' );
 				delete_transient( 'mp_order_' . $order_id . '_shipping_info' );
 				delete_transient( 'mp_order_' . $order_id . '_billing_info' );
@@ -279,7 +278,6 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 				) );
 				wp_redirect( $order->tracking_url( false ) );
 			} else {
-				//mp()->cart_checkout_error( sprintf( __( 'Sorry, your order was not completed. Please <a href="%s">go back and try again</a>.', 'mp' ), mp_checkout_step_url( 'checkout' ) ));
 				mp_checkout()->add_error( __( 'Sorry, your order was not completed.', 'mp' ) );
 				return false;
 			}
@@ -292,9 +290,6 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			mp_checkout()->add_error( sprintf( __( 'There was a problem connecting to PayPal to check the status of your purchase. Please <a href="%s">check the status of your order here &raquo;</a>', 'mp' ) . $error ) ); // mp_orderstatus_link( false, true )
 			return false;
 		}
-		//} else {
-		//	mp()->set_cart_cookie( Array() );
-		//}
 	}
 
 	/**
@@ -362,172 +357,192 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	}
 
 	/**
+	 * Updates the gateway settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param array $settings
+	 * @return array
+	 */
+	function update( $settings ) {
+		if ( ($mode	 = $this->get_setting( 'mode' )) && ($email	 = $this->get_setting( 'email' )) ) {
+			// Update api user
+			mp_push_to_array( $settings, 'gateways->paypal-chained->email', $email );
+
+			// Update api pass
+			mp_push_to_array( $settings, 'gateways->paypal-chained->mode', $mode );
+
+			// Unset old keys
+			unset( $settings[ 'gateways' ][ 'paypal-chained' ][ 'email' ], $settings[ 'gateways' ][ 'paypal-chained' ][ 'mode' ] );
+		}
+
+		return $settings;
+	}
+
+	/**
 	 * Use to handle any payment returns from your gateway to the ipn_url. Do not echo anything here. If you encounter errors
 	 * 	return the proper headers to your ipn sender. Exits after.
 	 */
 	function process_ipn_return() {
-		// PayPal IPN handling code
-		if ( isset( $_POST[ 'transaction_type' ] ) && isset( $_POST[ 'trackingId' ] ) ) {
 
-			$settings = get_option( 'mp_settings' );
+		$txn_type	 = mp_get_post_value( 'transaction_type' );
+		$tracking_id = mp_get_post_value( 'tracking_id' );
 
-			if ( $settings[ 'gateways' ][ 'paypal-chained' ][ 'mode' ] == 'sandbox' ) {
-				$domain = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
-			} else {
-				$domain = 'https://www.paypal.com/cgi-bin/webscr';
-			}
-
-			// We need to pull raw data and build our own copy of $_POST in order to workaround of invalid POST keys that Adaptive IPN request uses.
-			$raw_post_data = file_get_contents( 'php://input' );
-
-			$raw_post_array = explode( '&', $raw_post_data );
-
-			$_YOUR_POST = array();
-
-			foreach ( $raw_post_array as $keyval ) {
-				$keyval						 = explode( '=', $keyval );
-				if ( count( $keyval ) == 2 )
-					$_YOUR_POST[ $keyval[ 0 ] ]	 = urldecode( $keyval[ 1 ] );
-			}
-
-			if ( count( $_YOUR_POST ) < 3 ) {
-				$_YOUR_POST			 = $_POST;
-				$original_post_used	 = TRUE;
-			} else {
-				$original_post_used = FALSE;
-			}
-
-			// Build final $_req postback request
-			if ( $original_post_used ) {
-				$req = 'cmd=_notify-validate';
-				foreach ( $_YOUR_POST as $key => $value ) {
-					$value = urlencode( stripslashes( $value ) );
-					$req .= "&$key=$value";
-				}
-			} else {
-				$req = $raw_post_data . '&cmd=_notify-validate';
-			}
-
-			$args[ 'user-agent' ]	 = "MarketPress/{mp()->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Chained Payments Plugin/{mp()->version}";
-			$args[ 'body' ]			 = $req;
-			$args[ 'sslverify' ]	 = false;
-
-			//use built in WP http class to work with most server setups
-			$response = wp_remote_post( $domain, $args );
-
-			//check results
-			if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 || $response[ 'body' ] != 'VERIFIED' ) {
-				header( "HTTP/1.1 503 Service Unavailable" );
-				_e( 'There was a problem verifying the IPN string with PayPal. Please try again.', 'mp' );
-				exit;
-			}
-
-			//no errors, so fix up our $_POST array
-			$result = $this->decodePayPalIPN( $raw_post_data );
-
-			//setup our payment details
-			$payment_info[ 'gateway_public_name' ]	 = $this->public_name;
-			$payment_info[ 'gateway_private_name' ]	 = $this->admin_name;
-			$payment_info[ 'method' ]				 = __( 'PayPal balance, Credit Card, or Instant Transfer', 'mp' );
-			$payment_info[ 'transaction_id' ]		 = $result[ "transaction" ][ 0 ][ "id" ];
-
-			$timestamp	 = time();
-			$order_id	 = $result[ "trackingId" ];
-
-			//setup status
-			switch ( strtoupper( $result[ "transaction" ][ 0 ][ "status" ] ) ) {
-
-				case 'PARTIALLY_REFUNDED':
-					$status			 = __( 'The payment has been partially refunded.', 'mp' );
-					$create_order	 = true;
-					$paid			 = true;
-					break;
-
-				case 'COMPLETED':
-				case 'SUCCESS':
-					$status			 = __( 'The payment has been completed, and the funds have been added successfully to your account balance.', 'mp' );
-					$create_order	 = true;
-					$paid			 = true;
-					break;
-
-				case 'PROCESSING':
-					$status			 = __( 'The transaction is in progress.', 'mp' );
-					$create_order	 = true;
-					$paid			 = true;
-					break;
-
-				case 'REVERSED':
-					$status			 = __( 'You refunded the payment.', 'mp' );
-					$create_order	 = false;
-					$paid			 = false;
-					break;
-
-				case 'DENIED':
-					$status			 = __( 'The transaction was rejected by the receiver (you).', 'mp' );
-					$create_order	 = false;
-					$paid			 = false;
-					break;
-
-				case 'PENDING':
-					$pending_str = array(
-						'ADDRESS_CONFIRMATION'	 => __( 'The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences section of your Profile.', 'mp' ),
-						'ECHECK'				 => __( 'The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp' ),
-						'INTERNATIONAL'			 => __( 'The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp' ),
-						'MULTI_CURRENCY'		 => __( 'You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp' ),
-						'RISK'					 => __( 'The payment is pending while it is being reviewed by PayPal for risk.', 'mp' ),
-						'UNILATERAL'			 => __( 'The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp' ),
-						'UPGRADE'				 => __( 'The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp' ),
-						'VERIFY'				 => __( 'The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp' ),
-						'OTHER'					 => __( 'The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp' )
-					);
-
-					$status			 = __( 'The payment is pending', 'mp' );
-					$status .= ': ' . $pending_str[ $result[ "transaction" ][ 0 ][ "pending_reason" ] ];
-					$create_order	 = true;
-					$paid			 = false;
-					break;
-
-				default:
-					// case: various error cases
-					$create_order	 = false;
-					$paid			 = false;
-			}
-
-			$status = $result[ "transaction" ][ 0 ][ "status" ] . ': ' . $status;
-
-			//status's are stored as an array with unix timestamp as key
-			$payment_info[ 'status' ][ $timestamp ]	 = $status;
-			$payment_info[ 'total' ]				 = substr( $result[ "transaction" ][ 0 ][ "amount" ], 4 );
-			$payment_info[ 'currency' ]				 = substr( $result[ "transaction" ][ 0 ][ "amount" ], 0, 3 );
-
-			if ( mp()->get_order( $order_id ) ) {
-				mp()->update_order_payment_status( $order_id, $status, $paid );
-			} else if ( $create_order ) {
-				//succesful payment, create our order now
-				$cart			 = get_transient( 'mp_order_' . $order_id . '_cart' );
-				$billing_info	 = get_transient( 'mp_order_' . $order_id . '_billing_info' );
-				$shipping_info	 = get_transient( 'mp_order_' . $order_id . '_shipping_info' );
-
-				$order = new MP_Order( $order_id );
-				$order->save( array(
-					'cart'			 => $cart,
-					'payment_info'	 => $payment_info,
-					'paid'			 => true,
-				) );
-
-				//$success = mp()->create_order( $order_id, $cart, $shipping_info, $payment_info, $paid, $user_id, $shipping_total, $tax_total, $coupon_code );
-				//if successful delete transients
-				//if ( $success ) {
-				delete_transient( 'mp_order_' . $order_id . '_cart' );
-				delete_transient( 'mp_order_' . $order_id . '_billing_info' );
-				delete_transient( 'mp_order_' . $order_id . '_shipping_info' );
-				//}
-			}
-		} else {
-			// Did not find expected POST variables. Possible access attempt from a non PayPal site.
-			//header('Status: 404 Not Found');
+		if ( empty( $txn_type ) || empty( $tracking_id ) ) {
+			header( 'Status: 404 Not Found' );
 			echo 'Error: Missing POST variables. Identification is not possible.';
 			exit;
+		}
+
+		// Read POST data
+		// reading posted data directly from $_POST causes serialization
+		// issues with array data in POST. Reading raw POST data from input stream instead.
+		$raw_post_data	 = file_get_contents( 'php://input' );
+		$raw_post_array	 = explode( '&', $raw_post_data );
+		$myPost			 = array();
+
+		foreach ( $raw_post_array as $keyval ) {
+			$keyval					 = explode( '=', $keyval );
+			if ( count( $keyval ) == 2 )
+				$myPost[ $keyval[ 0 ] ]	 = urldecode( $keyval[ 1 ] );
+		}
+
+		// read the post from PayPal system and add 'cmd'
+		$req = 'cmd=_notify-validate';
+		if ( function_exists( 'get_magic_quotes_gpc' ) ) {
+			$get_magic_quotes_exists = true;
+		}
+
+		foreach ( $myPost as $key => $value ) {
+			if ( $get_magic_quotes_exists == true && get_magic_quotes_gpc() == 1 ) {
+				$value = urlencode( stripslashes( $value ) );
+			} else {
+				$value = urlencode( $value );
+			}
+			$req .= "&$key=$value";
+		}
+
+		// Post IPN data back to PayPal to validate the IPN data is genuine
+		// Without this step anyone can fake IPN data
+		if ( 'sandbox' == $this->get_setting( 'mode' ) ) {
+			$paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
+		} else {
+			$paypal_url = "https://www.paypal.com/cgi-bin/webscr";
+		}
+
+		$response = wp_remote_post( $paypal_url, array(
+			'user-agent' => 'MarketPress/' . MP_VERSION . ': http://premium.wpmudev.org/project/e-commerce | PayPal Chained Payments Plugin/' . MP_VERSION,
+			'body'		 => $req,
+			'sslverify'	 => false,
+			'timeout'	 => mp_get_api_timeout( $this->plugin_name ),
+		) );
+
+		//check results
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 || $response[ 'body' ] != 'VERIFIED' ) {
+			header( "HTTP/1.1 503 Service Unavailable" );
+			_e( 'There was a problem verifying the IPN string with PayPal. Please try again.', 'mp' );
+			exit;
+		}
+
+		header( 'HTTP/1.1 200 OK' );
+
+		$result = $this->decodePayPalIPN( file_get_contents( 'php://input' ) );
+
+		//setup our payment details
+		$payment_info[ 'gateway_public_name' ]	 = $this->public_name;
+		$payment_info[ 'gateway_private_name' ]	 = $this->admin_name;
+		$payment_info[ 'method' ]				 = __( 'PayPal balance, Credit Card, or Instant Transfer', 'mp' );
+		$payment_info[ 'transaction_id' ]		 = $result[ "transaction" ][ 0 ][ "id" ];
+
+		$timestamp	 = time();
+		$order_id	 = $tracking_id;
+
+		//setup status
+		switch ( strtoupper( $result[ "transaction" ][ 0 ][ "status" ] ) ) {
+
+			case 'PARTIALLY_REFUNDED':
+				$status			 = __( 'The payment has been partially refunded.', 'mp' );
+				$create_order	 = true;
+				$paid			 = true;
+				break;
+
+			case 'COMPLETED':
+			case 'SUCCESS':
+				$status			 = __( 'The payment has been completed, and the funds have been added successfully to your account balance.', 'mp' );
+				$create_order	 = true;
+				$paid			 = true;
+				break;
+
+			case 'PROCESSING':
+				$status			 = __( 'The transaction is in progress.', 'mp' );
+				$create_order	 = true;
+				$paid			 = true;
+				break;
+
+			case 'REVERSED':
+				$status			 = __( 'You refunded the payment.', 'mp' );
+				$create_order	 = false;
+				$paid			 = false;
+				break;
+
+			case 'DENIED':
+				$status			 = __( 'The transaction was rejected by the receiver (you).', 'mp' );
+				$create_order	 = false;
+				$paid			 = false;
+				break;
+
+			case 'PENDING':
+				$pending_str = array(
+					'ADDRESS_CONFIRMATION'	 => __( 'The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences section of your Profile.', 'mp' ),
+					'ECHECK'				 => __( 'The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp' ),
+					'INTERNATIONAL'			 => __( 'The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp' ),
+					'MULTI_CURRENCY'		 => __( 'You do not have a balance in the currency sent, and you do not have your Payment Receiving Preferences set to automatically convert and accept this payment. You must manually accept or deny this payment.', 'mp' ),
+					'RISK'					 => __( 'The payment is pending while it is being reviewed by PayPal for risk.', 'mp' ),
+					'UNILATERAL'			 => __( 'The payment is pending because it was made to an email address that is not yet registered or confirmed.', 'mp' ),
+					'UPGRADE'				 => __( 'The payment is pending because it was made via credit card and you must upgrade your account to Business or Premier status in order to receive the funds. It can also mean that you have reached the monthly limit for transactions on your account.', 'mp' ),
+					'VERIFY'				 => __( 'The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp' ),
+					'OTHER'					 => __( 'The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp' )
+				);
+
+				$status			 = __( 'The payment is pending', 'mp' );
+				$status .= ': ' . $pending_str[ $result[ "transaction" ][ 0 ][ "pending_reason" ] ];
+				$create_order	 = true;
+				$paid			 = false;
+				break;
+
+			default:
+				// case: various error cases
+				$create_order	 = false;
+				$paid			 = false;
+		}
+
+		$status = $result[ "transaction" ][ 0 ][ "status" ] . ': ' . $status;
+
+		//status's are stored as an array with unix timestamp as key
+		$payment_info[ 'status' ][ $timestamp ]	 = $status;
+		$payment_info[ 'total' ]				 = substr( $result[ "transaction" ][ 0 ][ "amount" ], 4 );
+		$payment_info[ 'currency' ]				 = substr( $result[ "transaction" ][ 0 ][ "amount" ], 0, 3 );
+
+		$order = new MP_Order( $tracking_id );
+
+		if ( $order->exists() ) {
+			$order->change_status( ( $paid ) ? 'paid' : 'received'  );
+		} else if ( $create_order ) {
+			//succesful payment, create our order now
+			$cart			 = get_transient( 'mp_order_' . $tracking_id . '_cart' );
+			$billing_info	 = get_transient( 'mp_order_' . $tracking_id . '_billing_info' );
+			$shipping_info	 = get_transient( 'mp_order_' . $tracking_id . '_shipping_info' );
+
+			$order = new MP_Order( $tracking_id );
+			$order->save( array(
+				'cart'			 => $cart,
+				'payment_info'	 => $payment_info,
+				'paid'			 => true,
+			) );
+
+			delete_transient( 'mp_order_' . $tracking_id . '_cart' );
+			delete_transient( 'mp_order_' . $tracking_id . '_billing_info' );
+			delete_transient( 'mp_order_' . $tracking_id . '_shipping_info' );
 		}
 	}
 
@@ -577,10 +592,9 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
 	//Purpose: 	Prepares the parameters for the Pay API Call.
 	function Pay( $cart, $shipping_info, $order_id ) {
+
 		$settings			 = get_option( 'mp_settings' );
 		$network_settings	 = get_site_option( 'mp_network_settings' );
-
-		//$coupon_code		 = mp()->get_coupon_code();
 
 		$nvpstr = "actionType=PAY";
 		$nvpstr .= "&returnUrl=" . $this->returnURL;
@@ -624,7 +638,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	function api_call( $methodName, $nvpStr ) {
 
 		//build args
-		$args[ 'headers' ]		 = array(
+		$args[ 'headers' ] = array(
 			'X-PAYPAL-SECURITY-USERID'			 => $this->API_Username,
 			'X-PAYPAL-SECURITY-PASSWORD'		 => $this->API_Password,
 			'X-PAYPAL-SECURITY-SIGNATURE'		 => $this->API_Signature,
@@ -633,6 +647,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			'X-PAYPAL-REQUEST-RESPONSE-FORMAT'	 => 'NV',
 			'X-PAYPAL-APPLICATION-ID'			 => $this->appId
 		);
+
 		$args[ 'user-agent' ]	 = "MarketPress/{mp()->version}: http://premium.wpmudev.org/project/e-commerce | PayPal Chained Payments Plugin/{mp()->version}";
 		$args[ 'body' ]			 = $nvpStr . '&requestEnvelope.errorLanguage=en_US';
 		$args[ 'sslverify' ]	 = false;
@@ -654,7 +669,6 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	function RedirectToPayPal( $token ) {
 		// Redirect to paypal.com here
 		$payPalURL = $this->paypalURL . $token;
-		//header("Location: ".$payPalURL);
 		wp_redirect( $payPalURL );
 		exit;
 	}
@@ -670,7 +684,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 //only load on multisite
 if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 
-   //set names here to be able to translate
+	//set names here to be able to translate
 	if ( is_super_admin() ) {
 		$admin_name = __( 'PayPal Chained Payments', 'mp' );
 	} else {
@@ -728,7 +742,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 
 
 		$metabox->add_field( 'radio_group', array(
-			'name'			 => pp_get_field_name( 'mode' ),
+			'name'			 => pp_get_field_name( 'ppcn_mode' ),
 			'label'			 => array( 'text' => __( 'Gateway Mode', 'mp' ) ),
 			'default_value'	 => 'sandbox',
 			'options'		 => array(
@@ -744,7 +758,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'sandbox',
 				'action' => 'show',
 			),
@@ -756,7 +770,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'sandbox',
 				'action' => 'show',
 			),
@@ -768,7 +782,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'sandbox',
 				'action' => 'show',
 			),
@@ -781,7 +795,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'live',
 				'action' => 'show',
 			),
@@ -793,7 +807,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'live',
 				'action' => 'show',
 			),
@@ -805,7 +819,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'live',
 				'action' => 'show',
 			),
@@ -818,7 +832,7 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
 			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'mode' ),
+				'name'	 => pp_get_field_name( 'ppcn_mode' ),
 				'value'	 => 'live',
 				'action' => 'show',
 			),
