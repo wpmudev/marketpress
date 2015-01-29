@@ -230,7 +230,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 					break;
 
 				case 'PENDING':
-					$pending_str	 = array(
+					$pending_str = array(
 						'ADDRESS_CONFIRMATION'	 => __( 'The payment is pending because your customer did not include a confirmed shipping address and your Payment Receiving Preferences is set such that you want to manually accept or deny each of these payments. To change your preference, go to the Preferences section of your Profile.', 'mp' ),
 						'ECHECK'				 => __( 'The payment is pending because it was made by an eCheck that has not yet cleared.', 'mp' ),
 						'INTERNATIONAL'			 => __( 'The payment is pending because you hold a non-U.S. account and do not have a withdrawal mechanism. You must manually accept or deny this payment from your Account Overview.', 'mp' ),
@@ -241,6 +241,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 						'VERIFY'				 => __( 'The payment is pending because you are not yet verified. You must verify your account before you can accept this payment.', 'mp' ),
 						'OTHER'					 => __( 'The payment is pending for an unknown reason. For more information, contact PayPal customer service.', 'mp' )
 					);
+
 					$status			 = __( 'The payment is pending.', 'mp' );
 					$status .= '<br />' . $pending_str[ $result[ "paymentInfoList_paymentInfo(0)_pendingReason" ] ];
 					$create_order	 = true;
@@ -252,6 +253,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 					$create_order	 = false;
 					$paid			 = false;
 			}
+
 			$status = $result[ "paymentInfoList_paymentInfo(0)_transactionStatus" ] . ': ' . $status;
 
 			//status's are stored as an array with unix timestamp as key
@@ -261,22 +263,29 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
 			//succesful payment, create our order now
 			if ( $create_order ) {
-				$order_id		 = $result[ "trackingId" ];
+				$order_id = $result[ "trackingId" ];
+
 				$cart			 = get_transient( 'mp_order_' . $order_id . '_cart' );
 				$shipping_info	 = get_transient( 'mp_order_' . $order_id . '_shipping_info' );
 				$billing_info	 = get_transient( 'mp_order_' . $order_id . '_billing_info' );
 
-				delete_transient( 'mp_order_' . $order_id . '_cart' );
-				delete_transient( 'mp_order_' . $order_id . '_shipping_info' );
-				delete_transient( 'mp_order_' . $order_id . '_billing_info' );
-
 				$order = new MP_Order( $order_id );
-				$order->save( array(
-					'cart'			 => $cart,
-					'payment_info'	 => $payment_info,
-					'paid'			 => true,
-				) );
+
+				if ( !$order->exists() ) {
+					$order->save( array(
+						'cart'			 => $cart,
+						'payment_info'	 => $payment_info,
+						'billing_info'	 => $billing_info,
+						'shipping_info'	 => $shipping_info,
+						'paid'			 => true,
+					) );
+					//delete_transient( 'mp_order_' . $order_id . '_cart' );
+					//delete_transient( 'mp_order_' . $order_id . '_shipping_info' );
+					//delete_transient( 'mp_order_' . $order_id . '_billing_info' );
+				}
+
 				wp_redirect( $order->tracking_url( false ) );
+				exit;
 			} else {
 				mp_checkout()->add_error( __( 'Sorry, your order was not completed.', 'mp' ) );
 				return false;
@@ -527,6 +536,11 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
 		if ( $order->exists() ) {
 			$order->change_status( ( $paid ) ? 'paid' : 'received'  );
+			
+			delete_transient( 'mp_order_' . $tracking_id . '_cart' );
+			delete_transient( 'mp_order_' . $tracking_id . '_billing_info' );
+			delete_transient( 'mp_order_' . $tracking_id . '_shipping_info' );
+			
 		} else if ( $create_order ) {
 			//succesful payment, create our order now
 			$cart			 = get_transient( 'mp_order_' . $tracking_id . '_cart' );
@@ -534,15 +548,16 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			$shipping_info	 = get_transient( 'mp_order_' . $tracking_id . '_shipping_info' );
 
 			$order = new MP_Order( $tracking_id );
-			$order->save( array(
-				'cart'			 => $cart,
-				'payment_info'	 => $payment_info,
-				'paid'			 => true,
-			) );
 
-			delete_transient( 'mp_order_' . $tracking_id . '_cart' );
-			delete_transient( 'mp_order_' . $tracking_id . '_billing_info' );
-			delete_transient( 'mp_order_' . $tracking_id . '_shipping_info' );
+			if ( !$order->exists() ) {
+				$order->save( array(
+					'cart'			 => $cart,
+					'payment_info'	 => $payment_info,
+					'billing_info'	 => $billing_info,
+					'shipping_info'	 => $shipping_info,
+					'paid'			 => true,
+				) );
+			}
 		}
 	}
 
