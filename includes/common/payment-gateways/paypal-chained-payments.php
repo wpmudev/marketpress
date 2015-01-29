@@ -322,13 +322,16 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	 * @access public
 	 */
 	public function init_settings_metabox() {
-
+		
+		$default_desc = __("Please be aware that we will deduct a ?% fee from the total of each transaction in addition to any fees PayPal may charge you. If for any reason you need to refund a customer for an order, please contact us with a screenshot of the refund receipt in your PayPal history as well as the Transaction ID of our fee deduction so we can issue you a refund. Thank you!", 'mp');
+		$desc_msg = $this->get_network_setting( 'msg' );
+		
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => $this->generate_metabox_id(),
 			'page_slugs'	 => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
 			'title'			 => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
 			'option_name'	 => 'mp_settings',
-			'desc'			 => __( 'Record payments made via PayPal', 'mp' ),
+			'desc'			 => !empty($desc_msg) ? $desc_msg : $default_desc,
 			'conditional'	 => array(
 				'name'	 => 'gateways[allowed][' . $this->plugin_name . ']',
 				'value'	 => 1,
@@ -536,11 +539,10 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
 		if ( $order->exists() ) {
 			$order->change_status( ( $paid ) ? 'paid' : 'received'  );
-			
+
 			delete_transient( 'mp_order_' . $tracking_id . '_cart' );
 			delete_transient( 'mp_order_' . $tracking_id . '_billing_info' );
 			delete_transient( 'mp_order_' . $tracking_id . '_shipping_info' );
-			
 		} else if ( $create_order ) {
 			//succesful payment, create our order now
 			$cart			 = get_transient( 'mp_order_' . $tracking_id . '_cart' );
@@ -745,6 +747,12 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'desc'			 => __( 'Enter a percentage of all store sales to collect as a fee. Decimals allowed.', 'mp' ),
 			'custom'		 => array( 'style' => 'width:60px' ),
 			'before_field'	 => '',
+			'default_value'	 => '0.00',
+			'validation'	 => array(
+				'required'	 => true,
+				'number'	 => true,
+				'min'		 => 0,
+			),
 		) );
 
 		$metabox->add_field( 'text', array(
@@ -753,104 +761,81 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'desc'			 => __( 'Please enter your PayPal email address or business ID you want to recieve fees at.', 'mp' ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-		) );
-
-
-		$metabox->add_field( 'radio_group', array(
-			'name'			 => pp_get_field_name( 'ppcn_mode' ),
-			'label'			 => array( 'text' => __( 'Gateway Mode', 'mp' ) ),
-			'default_value'	 => 'sandbox',
-			'options'		 => array(
-				'sandbox'	 => 'Sandbox',
-				'live'		 => 'Live',
+			'validation'	 => array(
+				'required'	 => true,
+				'email'		 => true,
 			),
 		) );
+
+		$metabox->add_field( 'textarea', array(
+			'name'			 => pp_get_field_name( 'msg' ),
+			'label'			 => array( 'text' => __( 'Gateway Settings Page Message', 'mp' ) ),
+			'desc'			 => __( "This message is displayed at the top of the gateway settings page to store admins. It's a good place to inform them of your fees or put any sales messages.", 'mp' ),
+			'custom'		 => array( 'style' => 'width:400px; height: 150px;' ),
+			'before_field'	 => '',
+		) );
+
+
+		/* $metabox->add_field( 'radio_group', array(
+		  'name'			 => pp_get_field_name( 'ppcn_mode' ),
+		  'label'			 => array( 'text' => __( 'Gateway Mode', 'mp' ) ),
+		  'default_value'	 => 'sandbox',
+		  'options'		 => array(
+		  'sandbox'	 => 'Sandbox',
+		  'live'		 => 'Live',
+		  ),
+		  ) ); */
 
 		$metabox->add_field( 'text', array(
 			'name'			 => pp_get_field_name( 'api_user_sandbox' ),
-			'label'			 => array( 'text' => __( 'API Username', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'API Username (Sandbox)', 'mp' ) ),
 			'desc'			 => __( 'You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">Instructions &raquo;</a>', 'mp' ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'sandbox',
-				'action' => 'show',
-			),
 		) );
 
 		$metabox->add_field( 'password', array(
 			'name'			 => pp_get_field_name( 'api_pass_sandbox' ),
-			'label'			 => array( 'text' => __( 'API Password', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'API Password (Sandbox)', 'mp' ) ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'sandbox',
-				'action' => 'show',
-			),
 		) );
 
 		$metabox->add_field( 'text', array(
 			'name'			 => pp_get_field_name( 'api_sig_sandbox' ),
-			'label'			 => array( 'text' => __( 'Signature', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'Signature (Sandbox)', 'mp' ) ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'sandbox',
-				'action' => 'show',
-			),
 		) );
 
 		$metabox->add_field( 'text', array(
 			'name'			 => pp_get_field_name( 'api_user' ),
-			'label'			 => array( 'text' => __( 'API Username', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'API Username (Live)', 'mp' ) ),
 			'desc'			 => __( 'You must login to PayPal and create an API signature to get your credentials. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">Instructions &raquo;</a>', 'mp' ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'live',
-				'action' => 'show',
-			),
 		) );
 
 		$metabox->add_field( 'password', array(
 			'name'			 => pp_get_field_name( 'api_pass' ),
-			'label'			 => array( 'text' => __( 'API Password', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'API Password (Live)', 'mp' ) ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'live',
-				'action' => 'show',
-			),
 		) );
 
 		$metabox->add_field( 'text', array(
 			'name'			 => pp_get_field_name( 'api_sig' ),
-			'label'			 => array( 'text' => __( 'Signature', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'Signature (Live)', 'mp' ) ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'live',
-				'action' => 'show',
-			),
 		) );
 
 		$metabox->add_field( 'text', array(
 			'name'			 => pp_get_field_name( 'app_id' ),
-			'label'			 => array( 'text' => __( 'Application ID', 'mp' ) ),
+			'label'			 => array( 'text' => __( 'Application ID (Live)', 'mp' ) ),
 			'desc'			 => __( 'You must register this application with PayPal using your business account login to get an Application ID that will work with your API credentials. A bit of a hassle, but worth it! In the near future we will be looking for ways to simplify this process. <a target="_blank" href="https://apps.paypal.com/user/my-account/applications">Register then submit your application</a> while logged in to the developer portal.</a> Note that you do not need an Application ID for testing in sandbox mode. <a target="_blank" href="https://developer.paypal.com/docs/classic/lifecycle/goingLive/#register">More Information &raquo;</a>', 'mp' ),
 			'custom'		 => array( 'style' => 'width:250px' ),
 			'before_field'	 => '',
-			'conditional'	 => array(
-				'name'	 => pp_get_field_name( 'ppcn_mode' ),
-				'value'	 => 'live',
-				'action' => 'show',
-			),
 		) );
 	}
 
