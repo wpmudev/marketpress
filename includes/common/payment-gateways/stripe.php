@@ -264,48 +264,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	}
 
 	/**
-	 * Return the chosen payment details here for final confirmation. You probably don't need
-	 * 	to post anything in the form as it should be in your $_SESSION var already.
-	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
-	 */
-	function confirm_payment_form( $cart, $shipping_info ) {
-		//make sure token is set at this point
-		if ( !isset( $_SESSION[ 'stripeToken' ] ) ) {
-			mp()->cart_checkout_error( __( 'The Stripe Token was not generated correctly. Please go back and try again.', 'mp' ) );
-			return false;
-		}
-
-		//setup the Stripe API
-		if ( !class_exists( 'Stripe' ) ) {
-			require_once(mp()->plugin_dir . "plugins-gateway/stripe-files/lib/Stripe.php");
-		}
-		Stripe::setApiKey( $this->secret_key );
-		try {
-			$token = Stripe_Token::retrieve( $_SESSION[ 'stripeToken' ] );
-		} catch ( Exception $e ) {
-			mp()->cart_checkout_error( sprintf( __( '%s. Please go back and try again.', 'mp' ), $e->getMessage() ) );
-			return false;
-		}
-
-		$content = '';
-		$content .= '<table class="mp_cart_billing">';
-		$content .= '<thead><tr>';
-		$content .= '<th>' . __( 'Billing Information:', 'mp' ) . '</th>';
-		$content .= '<th align="right"><a href="' . mp_checkout_step_url( 'checkout' ) . '">' . __( '&laquo; Edit', 'mp' ) . '</a></th>';
-		$content .= '</tr></thead>';
-		$content .= '<tbody>';
-		$content .= '<tr>';
-		$content .= '<td align="right">' . __( 'Payment method:', 'mp' ) . '</td>';
-		$content .= '<td>' . sprintf( __( 'Your <strong>%1$s Card</strong> ending in <strong>%2$s</strong>. Expires <strong>%3$s</strong>', 'mp' ), $token->card->type, $token->card->last4, $token->card->exp_month . '/' . $token->card->exp_year ) . '</td>';
-		$content .= '</tr>';
-		$content .= '</tbody>';
-		$content .= '</table>';
-		return $content;
-	}
-
-	/**
 	 * Initialize the settings metabox
 	 *
 	 * @since 3.0

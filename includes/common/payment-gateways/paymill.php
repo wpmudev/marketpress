@@ -160,38 +160,6 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 		return $content;
 	}
 
-	/**
-	 * Return the chosen payment details here for final confirmation. You probably don't need
-	 * 	to post anything in the form as it should be in your $_SESSION var already.
-	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
-	 */
-	function confirm_payment_form( $cart, $shipping_info ) {
-		//make sure token is set at this point
-		if ( !isset( $_POST[ 'paymillToken' ] ) ) {
-			mp_checkout()->add_error( __( 'The Paymill Token was not generated correctly. Please go back and try again.', 'mp' ) );
-			return false;
-		} else {
-			$_SESSION[ 'paymillToken' ] = $_POST[ 'paymillToken' ];
-		}
-
-		$content = '';
-		$content .= '<table class="mp_cart_billing">';
-		$content .= '<thead><tr>';
-		$content .= '<th>' . __( 'Billing Information:', 'mp' ) . '</th>';
-		$content .= '<th align="right"><a href="' . mp_checkout_step_url( 'checkout' ) . '">' . __( '&laquo; Edit', 'mp' ) . '</a></th>';
-		$content .= '</tr></thead>';
-		$content .= '<tbody>';
-		$content .= '<tr>';
-		$content .= '<td align="right">' . __( 'Payment method:', 'mp' ) . '</td>';
-		$content .= '<td>' . sprintf( __( 'Your <strong>%1$s Card</strong> ending in <strong>%2$s</strong>.', 'mp' ), $_POST[ 'brand' ], $_POST[ 'last4Digits' ] ) . '</td>';
-		$content .= '</tr>';
-		$content .= '</tbody>';
-		$content .= '</table>';
-		return $content;
-	}
-
 	/* Initialize the settings metabox
 	 *
 	 * @since 3.0
