@@ -79,7 +79,7 @@ var mp_cart = {};
 	 * @since 3.0
 	 */
 	mp_cart.initSingleProductListeners = function(){
-		$('#mp_single_product').on('change', '.mp_product_options_att_input_label input', this.updateProductAttributes);
+		$('#mp_single_product').on('change', '.mp_product_options_att_input_label input, .mp_product_options_att_input_label select', this.updateProductAttributes);
 		$('#mp_single_product').find('.mp_buy_form')
 			.on('mp_cart/before_add_item', function(e, item, qty){
 				marketpress.loadingOverlay('show');
@@ -133,7 +133,7 @@ var mp_cart = {};
 			})
 			.validate(this.productFormValidationArgs);
 
-		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label input', this.updateProductAttributes);
+		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label input, .mp_product_options_att_input_label select', this.updateProductAttributes);
 	};
 		
 	/**
@@ -142,6 +142,7 @@ var mp_cart = {};
 	 * @since 3.0
 	 */
 	mp_cart.updateProductAttributes = function(){
+
 		var $this = $(this),
 				$form = $this.closest('form'),
 				$container = ( $('#colorbox').is(':visible') ) ? $form : $('#mp_single_product'),

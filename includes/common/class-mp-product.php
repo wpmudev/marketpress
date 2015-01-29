@@ -1,6 +1,7 @@
 <?php
 
 class MP_Product {
+
 	/**
 	 * Refers to the product's ID.
 	 *
@@ -9,7 +10,7 @@ class MP_Product {
 	 * @var int
 	 */
 	var $ID = null;
-	
+
 	/**
 	 * Refers to the product's qty
 	 *
@@ -18,7 +19,7 @@ class MP_Product {
 	 * @var int
 	 */
 	var $qty = 1;
-	
+
 	/**
 	 * Refers to the product's variations.
 	 *
@@ -27,7 +28,7 @@ class MP_Product {
 	 * @var array
 	 */
 	protected $_variations = null;
-	
+
 	/**
 	 * Refers to the product's variation IDs
 	 *
@@ -36,7 +37,7 @@ class MP_Product {
 	 * @var array
 	 */
 	protected $_variation_ids = null;
-	
+
 	/**
 	 * Refers to the product's attributes.
 	 *
@@ -45,7 +46,7 @@ class MP_Product {
 	 * @var array
 	 */
 	protected $_attributes = null;
-		
+
 	/**
 	 * Refers to if the product is on sale.
 	 *
@@ -54,7 +55,7 @@ class MP_Product {
 	 * @var bool
 	 */
 	protected $_on_sale = null;
-	
+
 	/**
 	 * Refers to the product's price
 	 *
@@ -63,7 +64,7 @@ class MP_Product {
 	 * @param array
 	 */
 	protected $_price = null;
-	
+
 	/**
 	 * Refers to the product's internal WP_Post object.
 	 *
@@ -72,7 +73,7 @@ class MP_Product {
 	 * @type WP_Post
 	 */
 	protected $_post = null;
-	
+
 	/**
 	 * Refers to the whether the product exists or not.
 	 *
@@ -81,7 +82,7 @@ class MP_Product {
 	 * @type bool
 	 */
 	protected $_exists = null;
-	
+
 	/**
 	 * Refers to the product's content tabs
 	 *
@@ -90,7 +91,7 @@ class MP_Product {
 	 * @type array
 	 */
 	var $content_tabs = array();
-	
+
 	/**
 	 * Get the internal post type for products.
 	 *
@@ -99,9 +100,9 @@ class MP_Product {
 	 * @return string
 	 */
 	public static function get_post_type() {
-		return mp_get_setting('product_post_type') == 'mp_product' ? 'mp_product' : 'product';
+		return mp_get_setting( 'product_post_type' ) == 'mp_product' ? 'mp_product' : 'product';
 	}
-	
+
 	/**
 	 * Display the lightbox for product variations
 	 *
@@ -110,38 +111,37 @@ class MP_Product {
 	 * @action wp_ajax_mp_product_get_variations_lightbox, wp_ajax_nopriv_mp_product_get_variations_lightbox
 	 */
 	public function ajax_display_variations_lightbox() {
-		$product_id = mp_get_get_value('product_id');
-		$product = new MP_Product($product_id);
-		
-		if ( ! $product->exists() ) {
-			die(__('The product specified could not be found', 'mp'));
+		$product_id	 = mp_get_get_value( 'product_id' );
+		$product	 = new MP_Product( $product_id );
+
+		if ( !$product->exists() ) {
+			die( __( 'The product specified could not be found', 'mp' ) );
 		}
 		?>
-<form class="mp_product_options_cb" method="post" data-ajax-url="<?php echo admin_url('admin-ajax.php?action=mp_update_cart'); ?>" action="<?php echo get_permalink(mp_get_setting('pages->cart')); ?>">
-	<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
-	<input type="hidden" name="product_qty_changed" value="0" />
-	<div class="mp_product_options_image">
-		<?php $product->image_custom(true, 'medium', array('class' => 'mp_product_options_thumb')); ?>
-	</div>
-	<div class="mp_product_options_content">
-		<h3 class="mp_product_name"><?php echo $product->post_title; ?></h3>
-		<?php $product->display_price(); ?>
-		<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div>
-		<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div>
-		<?php
-			if ( mp_get_setting('product_button_type') == 'addcart') : ?>
-		<button class="mp-button mp_button_addcart" type="submit" name="addcart"><?php _e('Add To Cart', 'mp'); ?></button>
-		<?php
-			elseif ( mp_get_setting('product_button_type') == 'buynow' ) : ?>
-		<button class="mp-button mp_button_buynow" type="submit" name="buynow"><?php _e('Buy Now', 'mp'); ?></button>
-		<?php
-			endif; ?>
-	</div>
-</form>
+		<form class="mp_product_options_cb" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
+			<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
+			<input type="hidden" name="product_qty_changed" value="0" />
+			<div class="mp_product_options_image">
+				<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
+			</div>
+			<div class="mp_product_options_content">
+				<h3 class="mp_product_name"><?php echo $product->post_title; ?></h3>
+				<?php $product->display_price(); ?>
+				<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div>
+				<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div>
+				<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
+					<button class="mp-button mp_button_addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
+				<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
+					?>
+					<button class="mp-button mp_button_buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
+				<?php endif;
+				?>
+			</div>
+		</form>
 		<?php
 		die;
 	}
-	
+
 	/**
 	 * Update the product attributes based upon selection
 	 *
@@ -150,54 +150,54 @@ class MP_Product {
 	 * @action wp_ajax_mp_product_update_attributes, wp_ajax_nopriv_mp_product_update_attributes
 	 */
 	public function ajax_update_attributes() {
-		$product_atts = MP_Product_Attributes::get_instance();
-		$all_atts = $product_atts->get();
-		$attributes = $filtered_atts = $taxonomies = $filtered_terms = array();
-		$json = array(
-			'out_of_stock' => false,
-			'qty_in_stock' => 0,
-			'image' => false,
-			'description' => false,
-			'excerpt' => false,
-			'price' => false,
+		$product_atts	 = MP_Product_Attributes::get_instance();
+		$all_atts		 = $product_atts->get();
+		$attributes		 = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
+		$json			 = array(
+			'out_of_stock'	 => false,
+			'qty_in_stock'	 => 0,
+			'image'			 => false,
+			'description'	 => false,
+			'excerpt'		 => false,
+			'price'			 => false,
 		);
-		$product_id = mp_get_post_value('product_id');
-		$qty = mp_get_post_value('product_quantity', 1);
-		$qty_changed = (bool) mp_get_post_value('product_qty_changed');
-		
-		if ( empty($product_id) ) {
+		$product_id		 = mp_get_post_value( 'product_id' );
+		$qty			 = mp_get_post_value( 'product_quantity', 1 );
+		$qty_changed	 = (bool) mp_get_post_value( 'product_qty_changed' );
+
+		if ( empty( $product_id ) ) {
 			wp_send_json_error();
 		}
-		
+
 		foreach ( $_POST as $key => $val ) {
-			if ( false !== strpos($key, $product_atts::SLUGBASE) ) {
-				$taxonomies[] = $key;
-				$attributes[$key] = $val;
+			if ( false !== strpos( $key, $product_atts::SLUGBASE ) ) {
+				$taxonomies[]		 = $key;
+				$attributes[ $key ]	 = $val;
 			}
 		}
-		
-		$product = new MP_Product($product_id);
-		$variations = $product->get_variations_by_attributes($attributes);
-				
+
+		$product	 = new MP_Product( $product_id );
+		$variations	 = $product->get_variations_by_attributes( $attributes );
+
 		// Filter out taxonomies that already have values and are still valid
 		foreach ( $all_atts as $att ) {
-			$slug = $product_atts->generate_slug($att->attribute_id);
-			if ( ! in_array($slug, $taxonomies) || $qty_changed ) {
+			$slug = $product_atts->generate_slug( $att->attribute_id );
+			if ( !in_array( $slug, $taxonomies ) || $qty_changed ) {
 				$filtered_atts[] = $slug;
 			}
 		}
-		
+
 		// Make sure all attribute terms are unique and in stock
 		foreach ( $variations as $variation ) {
 			foreach ( $filtered_atts as $tax_slug ) {
-				$terms = get_the_terms($variation->ID, $tax_slug);
-				
+				$terms = get_the_terms( $variation->ID, $tax_slug );
+
 				foreach ( $terms as $term ) {
-					if ( $variation->in_stock($qty) ) {
-						$filtered_terms[$tax_slug][$term->term_id] = $term;
+					if ( $variation->in_stock( $qty ) ) {
+						$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
 					} elseif ( $qty_changed ) {
-						$json['qty_in_stock'] = $variation->get_stock();
-						
+						$json[ 'qty_in_stock' ] = $variation->get_stock();
+
 						/**
 						 * Filter the out of stock alert message
 						 *
@@ -205,64 +205,64 @@ class MP_Product {
 						 * @param string The default message.
 						 * @param MP_Product The product that is out of stock.
 						 */
-						$json['out_of_stock'] = apply_filters('mp_product/out_of_stock_alert', sprintf(__('We\'re sorry, we only have %d of this item in stock right now.', 'mp'), $json['qty_in_stock']), $product);
+						$json[ 'out_of_stock' ] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json[ 'qty_in_stock' ] ), $product );
 					}
 				}
 			}
 		}
-		
+
 		// Format attribute terms for display
 		foreach ( $filtered_terms as $tax_slug => $terms ) {
-			$json[$tax_slug] = '';
-			$index = 0;
-			$terms = $product_atts->sort($terms, false);
+			$json[ $tax_slug ]	 = '';
+			$index				 = 0;
+			$terms				 = $product_atts->sort( $terms, false );
 			foreach ( $terms as $term ) {
-				$checked = ( mp_get_post_value($tax_slug) == $term->term_id ) ? true : false;
-				$required = ( $index == 0 ) ? true : false;
-				$json[$tax_slug] .= self::attribute_field($term->term_id, $term->name, $tax_slug, $required, $checked);
+				$checked	 = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
+				$required	 = ( $index == 0 ) ? true : false;
+				$json[ $tax_slug ] .= self::attribute_field( $term->term_id, $term->name, $tax_slug, $required, $checked );
 				$index ++;
 			}
 		}
-		
+
 		// Attempt to get a unique variation image depending on user selection
 		$images = array();
 		foreach ( $variations as $variation ) {
-			$images[$variation->image_url(false, null, 'single')] = '';
+			$images[ $variation->image_url( false, null, 'single' ) ] = '';
 		}
-		if ( count($images) == 1 ) {
-			$json['image'] = key($images);
+		if ( count( $images ) == 1 ) {
+			$json[ 'image' ] = key( $images );
 		}
-		
+
 		// Attempt to get a unique product description depending on user selection
 		$descs = array();
 		foreach ( $variations as $variation ) {
-			$descs[$variation->content(false)] = '';
+			$descs[ $variation->content( false ) ] = '';
 		}
-		if ( count($descs) == 1 ) {
-			$json['description'] = key($descs);
+		if ( count( $descs ) == 1 ) {
+			$json[ 'description' ] = key( $descs );
 		}
 
 		// Attempt to get a unique product excerpt depending on user selection
 		$excerpts = array();
 		foreach ( $variations as $variation ) {
-			$excerpts[$variation->excerpt()] = '';
+			$excerpts[ $variation->excerpt() ] = '';
 		}
-		if ( count($excerpts) == 1 ) {
-			$json['excerpt'] = key($excerpts);
+		if ( count( $excerpts ) == 1 ) {
+			$json[ 'excerpt' ] = key( $excerpts );
 		}
 
 		// Attempt to get a unique product price depending on user selection
 		$prices = array();
 		foreach ( $variations as $variation ) {
-			$prices[$variation->display_price(false)] = '';
+			$prices[ $variation->display_price( false ) ] = '';
 		}
-		if ( count($prices) == 1 ) {
-			$json['price'] = key($prices);
+		if ( count( $prices ) == 1 ) {
+			$json[ 'price' ] = key( $prices );
 		}
-		
-		wp_send_json_success($json);
+
+		wp_send_json_success( $json );
 	}
-	
+
 	/**
 	 * Constructor function
 	 *
@@ -272,15 +272,15 @@ class MP_Product {
 	 * @param int/object/WP_Post $product Optional if in the loop.
 	 */
 	public function __construct( $product = null ) {
-		if ( is_null($product) && in_the_loop() ) {
+		if ( is_null( $product ) && in_the_loop() ) {
 			global $post;
 			$product = $post;
 		}
-		
-		$this->_get_post($product);
+
+		$this->_get_post( $product );
 		$this->_set_content_tabs();
 	}
-	
+
 	/**
 	 * Display a single attribute field
 	 *
@@ -288,15 +288,20 @@ class MP_Product {
 	 * @access public
 	 */
 	public function attribute_field( $term_id, $term_name, $tax_slug, $required = false, $checked = false ) {
-		$input_id = 'mp_product_options_att_' . $term_id;
-		$class = ( $required ) ? ' class="required"' : '';
-		
+		$input_id	 = 'mp_product_options_att_' . $term_id;
+		$class		 = ( $required ) ? ' class="required"' : '';
+
 		$html = '
-				<label class="mp_product_options_att_input_label" for="' . $input_id . '">
-					<input id="' . $input_id . '"' . $class . ' type="radio" name="' . $tax_slug . '" value="' . $term_id . '"' . (( $checked ) ? ' checked' : '') . ' />
-					<span>' . $term_name . '</span>
-				</label>';
-		
+				<option id="' . $input_id . '" value="' . $term_id . '">
+					' . $term_name . '
+				</option>';
+
+		/*$html = '
+		  <label class="mp_product_options_att_input_label" for="' . $input_id . '">
+		  <input id="' . $input_id . '"' . $class . ' type="radio" name="' . $tax_slug . '" value="' . $term_id . '"' . (( $checked ) ? ' checked' : '') . ' />
+		  <span>' . $term_name . '</span>
+		  </label>';*/
+
 		/**
 		 * Filter the attribute field
 		 *
@@ -307,11 +312,11 @@ class MP_Product {
 		 * @param string $tax_slug
 		 * @param bool $required		 
 		 */
-		$html = apply_filters('mp_product/attribute_field', $html, $term_id, $term_name, $tax_slug, $required);
-		
-		return $html;	
+		$html = apply_filters( 'mp_product/attribute_field', $html, $term_id, $term_name, $tax_slug, $required );
+
+		return $html;
 	}
-	
+
 	/**
 	 * Display the attribute fields
 	 *
@@ -321,42 +326,45 @@ class MP_Product {
 	 * @param array $selected_atts Optional, the attributes that should be selected by default.
 	 */
 	public function attribute_fields( $echo = true, $selected_atts = array() ) {
-		$atts = $this->get_attributes();
-		$html = '
+		$atts	 = $this->get_attributes();
+		$html	 = '
 			<div class="mp_product_options_atts clearfix">';
-		
+
 		foreach ( $atts as $slug => $att ) {
 			$html .= '
 				<div class="mp_product_options_att">
-					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
-					<div class="clearfix" id="mp_' . $slug . '">';
-			
+					<strong class="mp_product_options_att_label">' . $att[ 'name' ] . '</strong>
+					<div class="clearfix mp_product_options_att_input_label" id="mp_' . $slug . '">
+						<select name="mp_' . $slug . '" class="required">';
+
+
 			$index = 0;
-			foreach ( $att['terms'] as $term_id => $term_name ) {
-				$required = ( $index == 0 );
-				$checked = ( $term_id == mp_arr_get_value($slug, $selected_atts) );
-				$html .= $this->attribute_field($term_id, $term_name, $slug, $required, $checked);
+			foreach ( $att[ 'terms' ] as $term_id => $term_name ) {
+				$required	 = ( $index == 0 );
+				$checked	 = ( $term_id == mp_arr_get_value( $slug, $selected_atts ) );
+				$html .= $this->attribute_field( $term_id, $term_name, $slug, $required, $checked );
 				$index ++;
 			}
-			
+
 			$html .= '
+				</select>
 					</div>
 				</div>';
 		}
-		
+
 		$input_id = 'mp_product_options_att_quantity';
 		$html .= '
-				<div class="mp_product_options_att"' . (( mp_get_setting('show_quantity') ) ? '' : ' style="display:none"') . '>
-					<strong class="mp_product_options_att_label">' . __('Quantity', 'mp') . '</strong>
+				<div class="mp_product_options_att"' . (( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"') . '>
+					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="clearfix">
 						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
 							<input id="' . $input_id . '" class="required digits" type="text" name="product_quantity" value="1" />
 						</label>
 					</div>
 				</div>
-			</div>';					
+			</div>';
 
-		
+
 		/**
 		 * Filter the attribute fields
 		 *
@@ -364,16 +372,16 @@ class MP_Product {
 		 * @param string The current html.
 		 * @param MP_Product The current MP_Product object.
 		 */
-		$html = apply_filters('mp_product/attribute_fields', $html, $this);
-		$html = apply_filters('mp_product/attribute_fields/' . $this->ID, $html, $this);
-		
+		$html	 = apply_filters( 'mp_product/attribute_fields', $html, $this );
+		$html	 = apply_filters( 'mp_product/attribute_fields/' . $this->ID, $html, $this );
+
 		if ( $echo ) {
 			echo $html;
 		} else {
 			return $html;
 		}
 	}
-	
+
 	/**
 	 * Get a specific variation by it's index
 	 *
@@ -383,9 +391,9 @@ class MP_Product {
 	 */
 	public function get_variation( $index = 0 ) {
 		$variations = $this->get_variations();
-		return mp_arr_get_value($index, $variations);
+		return mp_arr_get_value( $index, $variations );
 	}
-	
+
 	/**
 	 * Get product variation ids
 	 *
@@ -394,14 +402,14 @@ class MP_Product {
 	 * @return array
 	 */
 	public function get_variation_ids() {
-		if ( ! is_null($this->_variation_ids) ) {
+		if ( !is_null( $this->_variation_ids ) ) {
 			return $this->_variation_ids;
 		}
-		
+
 		$this->get_variations();
 		return $this->_variation_ids;
 	}
-	
+
 	/**
 	 * Get product variations
 	 *
@@ -410,34 +418,34 @@ class MP_Product {
 	 * @return array An array of MP_Product objects.
 	 */
 	public function get_variations() {
-		if ( ! is_null($this->_variations) ) {
-			return $this->_variations;
-		}
-		
-		$this->_variations = array();
-		if ( ! $this->get_meta('has_variations') ) {
+		if ( !is_null( $this->_variations ) ) {
 			return $this->_variations;
 		}
 
-		$query = new WP_Query(array(
-			'post_type' => 'mp_product_variation',
+		$this->_variations = array();
+		if ( !$this->get_meta( 'has_variations' ) ) {
+			return $this->_variations;
+		}
+
+		$query = new WP_Query( array(
+			'post_type'		 => 'mp_product_variation',
 			'posts_per_page' => -1,
-			'orderby' => 'menu_order',
-			'order' => 'ASC',
-			'post_parent' => $this->ID,
-		));		
-		
+			'orderby'		 => 'menu_order',
+			'order'			 => 'ASC',
+			'post_parent'	 => $this->ID,
+		) );
+
 		$this->_variation_ids = array();
 		while ( $query->have_posts() ) : $query->the_post();
-			$this->_variations[] = $variation = new MP_Product();
-			$this->_variation_ids[] = $variation->ID;
+			$this->_variations[]	 = $variation				 = new MP_Product();
+			$this->_variation_ids[]	 = $variation->ID;
 		endwhile;
-		
+
 		wp_reset_postdata();
-		
+
 		return $this->_variations;
 	}
-	
+
 	/**
 	 * Get variations by the given attributes
 	 *
@@ -448,42 +456,42 @@ class MP_Product {
 	 * @return array/MP_Product
 	 */
 	public function get_variations_by_attributes( $attributes, $index = null ) {
-		$cache_key = 'get_variations_by_attributes_' . $this->ID;
-		$cache = wp_cache_get($cache_key, 'mp_product');
+		$cache_key	 = 'get_variations_by_attributes_' . $this->ID;
+		$cache		 = wp_cache_get( $cache_key, 'mp_product' );
 		if ( false !== $cache ) {
-			if ( is_null($index) ) {
+			if ( is_null( $index ) ) {
 				return $cache;
 			} else {
-				return mp_arr_get_value($index, $cache);
+				return mp_arr_get_value( $index, $cache );
 			}
 		}
-		
+
 		$tax_query = array();
 		foreach ( $attributes as $taxonomy => $term_id ) {
 			$tax_query[] = array(
-				'taxonomy' => $taxonomy,
-				'terms' => $term_id,
+				'taxonomy'	 => $taxonomy,
+				'terms'		 => $term_id,
 			);
 		}
-		
-		$query = new WP_Query(array(
-			'post_type' => 'mp_product_variation',
+
+		$query = new WP_Query( array(
+			'post_type'		 => 'mp_product_variation',
 			'posts_per_page' => -1,
-			'post_parent' => $this->ID,
-			'tax_query' => array('relation' => 'AND') + $tax_query,
-		));
-		
+			'post_parent'	 => $this->ID,
+			'tax_query'		 => array( 'relation' => 'AND' ) + $tax_query,
+		) );
+
 		$variations = array();
 		while ( $query->have_posts() ) : $query->the_post();
 			$variations[] = new MP_Product();
 		endwhile;
-		
+
 		wp_reset_postdata();
-		wp_cache_set($cache_key, $variations, 'mp_product');
-	
-		return ( is_null($index) ) ? $variations : mp_arr_get_value($index, $variations);
+		wp_cache_set( $cache_key, $variations, 'mp_product' );
+
+		return ( is_null( $index ) ) ? $variations : mp_arr_get_value( $index, $variations );
 	}
-	
+
 	/**
 	 * Get product weight
 	 *
@@ -494,25 +502,25 @@ class MP_Product {
 	 */
 	public function get_weight() {
 		$weight = 0;
-		
+
 		if ( $this->is_download() ) {
 			return $weight;
 		}
-		
-		$lbs = (float) $this->get_meta('weight_pounds', 0);
-		$oz = (float) $this->get_meta('weight_ounces', 0);
-		
+
+		$lbs = (float) $this->get_meta( 'weight_pounds', 0 );
+		$oz	 = (float) $this->get_meta( 'weight_ounces', 0 );
+
 		if ( $lbs || $oz ) {
 			$weight = $lbs;
-			
+
 			if ( $oz > 0 ) {
 				$weight += ($oz / 16);
 			}
 		}
-				
+
 		return $weight;
 	}
-	
+
 	/*
 	 * Displays the buy or add to cart button
 	 *
@@ -520,33 +528,34 @@ class MP_Product {
 	 * @param string $context Optional, options are list or single. Defaults to list.
 	 * @param array $selected_atts Optional, the attributes that should be selected by default.
 	 */
- 	public function buy_button( $echo = true, $context = 'list', $selected_atts = array() ) {
-		$button = '';
-		if ( $this->get_meta('product_type') == 'external' && ($url = $this->get_meta('external_url')) ) {
-			$button = '<a class="mp_link_buynow" href="' . esc_url($url) . '">' . __('Buy Now &raquo;', 'mp') . '</a>';
-		} elseif ( ! mp_get_setting('disable_cart') ) {
-			$button = '<form class="mp_buy_form" method="post" data-ajax-url="' . admin_url('admin-ajax.php?action=mp_update_cart') . '" action="' . mp_cart_link(false, true) . '">';
 
-			if ( ! $this->in_stock() ) {
-				$button .= '<span class="mp_no_stock">' . __('Out of Stock', 'mp') . '</span>';
+	public function buy_button( $echo = true, $context = 'list', $selected_atts = array() ) {
+		$button	 = '';
+		if ( $this->get_meta( 'product_type' ) == 'external' && ($url	 = $this->get_meta( 'external_url' )) ) {
+			$button = '<a class="mp_link_buynow" href="' . esc_url( $url ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>';
+		} elseif ( !mp_get_setting( 'disable_cart' ) ) {
+			$button = '<form class="mp_buy_form" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
+
+			if ( !$this->in_stock() ) {
+				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';
 			} else {
 				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
-				
+
 				if ( $context == 'list' ) {
 					if ( $this->has_variations() ) {
-						$button .= '<a class="mp-button mp_link_buynow has_variations" data-href="' . admin_url('admin-ajax.php?action=mp_product_get_variations_lightbox&amp;product_id=' . $this->ID) . '" href="' . $this->url(false) . '">' . __('Choose Options', 'mp') . '</a>';
-					} else if ( mp_get_setting('list_button_type') == 'addcart' ) {
-						$button .= '<button class="mp-button mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
-					} else if ( mp_get_setting('list_button_type') == 'buynow' ) {
-						$button .= '<button class="mp-button mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
+						$button .= '<a class="mp-button mp_link_buynow has_variations" data-href="' . admin_url( 'admin-ajax.php?action=mp_product_get_variations_lightbox&amp;product_id=' . $this->ID ) . '" href="' . $this->url( false ) . '">' . __( 'Choose Options', 'mp' ) . '</a>';
+					} else if ( mp_get_setting( 'list_button_type' ) == 'addcart' ) {
+						$button .= '<button class="mp-button mp_button_addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
+					} else if ( mp_get_setting( 'list_button_type' ) == 'buynow' ) {
+						$button .= '<button class="mp-button mp_button_buynow" type="submit" name="buynow">' . __( 'Buy Now', 'mp' ) . '</button>';
 					}
 				} else {
-					$button .= $this->attribute_fields(false, $selected_atts);
+					$button .= $this->attribute_fields( false, $selected_atts );
 
-					if ( mp_get_setting('product_button_type') == 'addcart') {
-						$button .= '<button class="mp-button mp_button_addcart" type="submit" name="addcart">' . __('Add To Cart', 'mp') . '</button>';
-					} else if (mp_get_setting('product_button_type') == 'buynow') {
-						$button .= '<button class="mp-button mp_button_buynow" type="submit" name="buynow">' . __('Buy Now', 'mp') . '</button>';
+					if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) {
+						$button .= '<button class="mp-button mp_button_addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
+					} else if ( mp_get_setting( 'product_button_type' ) == 'buynow' ) {
+						$button .= '<button class="mp-button mp_button_buynow" type="submit" name="buynow">' . __( 'Buy Now', 'mp' ) . '</button>';
 					}
 				}
 			}
@@ -554,7 +563,7 @@ class MP_Product {
 			$button .= '</form>';
 		}
 
-		$button = apply_filters('mp_buy_button_tag', $button, $this->ID, $context);
+		$button = apply_filters( 'mp_buy_button_tag', $button, $this->ID, $context );
 
 		if ( $echo ) {
 			echo $button;
@@ -562,7 +571,7 @@ class MP_Product {
 			return $button;
 		}
 	}
-	
+
 	/**
 	 * Get the product content
 	 *
@@ -575,16 +584,16 @@ class MP_Product {
 		if ( $this->has_variations() ) {
 			$content = $this->get_variation()->post_content;
 		}
-		
-		$content = apply_filters('the_content', $content);
-		
+
+		$content = apply_filters( 'the_content', $content );
+
 		if ( $echo ) {
 			echo $content;
 		} else {
 			return $content;
 		}
 	}
-	
+
 	/**
 	 * Get the product's content tab labels
 	 *
@@ -592,20 +601,20 @@ class MP_Product {
 	 * @access public
 	 * @param bool $echo
 	 */
-	public function content_tab_labels( $echo = true ) {				
+	public function content_tab_labels( $echo = true ) {
 		$html = '
 			<ul class="mp_product_tab_labels clearfix">';
-		
+
 		$index = 0;
 		foreach ( $this->content_tabs as $slug => $label ) {
 			$html .= '
 				<li class="mp_product_tab_label' . (( $index == 0 ) ? ' current' : '') . '"><a class="mp_product_tab_label_link" href="#' . esc_attr( $slug ) . '">' . $label . '</a></li>';
 			$index ++;
 		}
-		
+
 		$html .= '
 			</ul>';
-		
+
 		/**
 		 * Filter the product tabs html
 		 *
@@ -614,14 +623,14 @@ class MP_Product {
 		 * @param MP_Product $this The current product object.
 		 */
 		$html = apply_filters( 'mp_product/content_tab_labels', $html, $this );
-			
+
 		if ( $echo ) {
 			echo $html;
 		} else {
 			return $html;
 		}
 	}
-	
+
 	/**
 	 * Get custom image tag
 	 *
@@ -632,36 +641,36 @@ class MP_Product {
 	 * @param array $attributes
 	 */
 	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
-		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id($this->get_variation()->ID) : get_post_thumbnail_id($this->ID);
-		
-		if ( $intsize = intval($size) ) {
-			$size = array($intsize, $intsize);
+		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id( $this->get_variation()->ID ) : get_post_thumbnail_id( $this->ID );
+
+		if ( $intsize = intval( $size ) ) {
+			$size = array( $intsize, $intsize );
 		}
-		
-		if ( empty($thumb_id) ) {
-			$attributes = array_merge(array(
-				'src' => apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')),
-				'width' => ( is_array($size) ) ? $intsize : get_option('thumbnail_size_w'),
-				'height' => ( is_array($size) ) ? $intsize : get_option('thumbnail_size_h'),
-			), $attributes);
+
+		if ( empty( $thumb_id ) ) {
+			$attributes = array_merge( array(
+				'src'	 => apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ),
+				'width'	 => ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_w' ),
+				'height' => ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_h' ),
+			), $attributes );
 		} else {
-			$data = wp_get_attachment_image_src($thumb_id, $size, false);
-			$attributes = array_merge(array(
-				'src' => $data[0],
-				'width' => $data[1],
-				'height' => $data[2]
-			), $attributes);
+			$data		 = wp_get_attachment_image_src( $thumb_id, $size, false );
+			$attributes	 = array_merge( array(
+				'src'	 => $data[ 0 ],
+				'width'	 => $data[ 1 ],
+				'height' => $data[ 2 ]
+			), $attributes );
 		}
-		
-		$img = '<img' . mp_array_to_attributes($attributes) . ' />';
-		
+
+		$img = '<img' . mp_array_to_attributes( $attributes ) . ' />';
+
 		if ( $echo ) {
 			echo $img;
 		} else {
 			return $img;
 		}
 	}
-	
+
 	/**
 	 * Get the display product price
 	 *
@@ -670,44 +679,44 @@ class MP_Product {
 	 * @param bool $echo
 	 */
 	public function display_price( $echo = true ) {
-		$price = $this->get_price();
+		$price	 = $this->get_price();
 		$snippet = '<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
-		
+
 		if ( $this->has_variations() ) {
 			// Get price range
-			if ( $price['lowest'] != $price['highest'] ) {
-				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest']) . ' - ' .  mp_format_currency('', $price['highest']) . '</strong>';
+			if ( $price[ 'lowest' ] != $price[ 'highest' ] ) {
+				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency( '', $price[ 'lowest' ] ) . ' - ' . mp_format_currency( '', $price[ 'highest' ] ) . '</strong>';
 			} else {
-				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency('', $price['lowest'])  . '</strong>';
+				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency( '', $price[ 'lowest' ] ) . '</strong>';
 			}
 		} elseif ( $this->on_sale() ) {
-			$amt_off = mp_format_currency('', ($price['highest'] - $price['lowest']) * $this->qty);
-			
-			if ( $this->qty > 1 ) {
-				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency('', ($price['lowest'] * $this->qty)) . '</strong>';
-				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf(__('%s each', 'mp'), mp_format_currency('', $price['sale']['amount'])) . ')</span>';
-			} else {
-				$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency('', $price['sale']['amount']) . '</strong>';
-			}
-			
-			$snippet .= '<span class="mp_normal_price">' . __('Reg: ', 'mp') . mp_format_currency('', ($price['regular'] * $this->qty)) . '</span>';
+			$amt_off = mp_format_currency( '', ($price[ 'highest' ] - $price[ 'lowest' ]) * $this->qty );
 
-			if ( ($end_date = $price['sale']['end_date']) && ($days_left = $price['sale']['days_left']) ) {
-				$snippet .= '<strong class="mp_savings_amt">' . sprintf(__('You Save: %s', 'mp'), $amt_off) . sprintf(_n(' - only 1 day left!', ' - only %s days left!', $days_left, 'mp'), $days_left) . '</strong>';
+			if ( $this->qty > 1 ) {
+				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</strong>';
+				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) ) . ')</span>';
 			} else {
-				$snippet .= '<strong class="mp_savings_amt">' . sprintf(__('You Save: %s', 'mp'), $amt_off) . '</strong>';
+				$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) . '</strong>';
+			}
+
+			$snippet .= '<span class="mp_normal_price">' . __( 'Reg: ', 'mp' ) . mp_format_currency( '', ($price[ 'regular' ] * $this->qty ) ) . '</span>';
+
+			if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
+				$snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
+			} else {
+				$snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . '</strong>';
 			}
 		} else {
 			if ( $this->qty > 1 ) {
-				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency('', ($price['lowest'] * $this->qty)) . '</strong>';
-				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf(__('%s each', 'mp'), mp_format_currency('', $price['lowest'])) . ')</span>';
+				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</strong>';
+				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price[ 'lowest' ] ) ) . ')</span>';
 			} else {
-				$snippet .= '<strong class="mp_normal_price" itemprop="price">' . mp_format_currency('', $price['lowest']) . '</strong>';
+				$snippet .= '<strong class="mp_normal_price" itemprop="price">' . mp_format_currency( '', $price[ 'lowest' ] ) . '</strong>';
 			}
 		}
-		
+
 		$snippet .= '</div>';
-		
+
 		/**
 		 * Filter the display price of the product
 		 *
@@ -716,15 +725,15 @@ class MP_Product {
 		 * @param array The current price object
 		 * @param int The product ID
 		 */
-		$snippet = apply_filters('mp_product/display_price', $snippet, $price, $this->ID);
-		
+		$snippet = apply_filters( 'mp_product/display_price', $snippet, $price, $this->ID );
+
 		if ( $echo ) {
 			echo $snippet;
 		} else {
 			return $snippet;
 		}
 	}
-	
+
 	/**
 	 * Get the product's download url - if applicable
 	 *
@@ -738,7 +747,7 @@ class MP_Product {
 		if ( $this->is_download() ) {
 			$url = add_query_arg( 'orderid', $order_id, $this->url( false ) );
 		}
-		
+
 		/**
 		 * Filter the product's download url
 		 *
@@ -757,40 +766,40 @@ class MP_Product {
 	 * @param string $excerpt Optional
 	 * @param string $content Optional
 	 * @return string
-	 */	
+	 */
 	public function excerpt( $excerpt = null, $content = null, $excerpt_more = null ) {
-		if ( is_null($excerpt_more) ) {
-			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink($this->ID) . '">' .	 __('More Info &raquo;', 'mp') . '</a>';
+		if ( is_null( $excerpt_more ) ) {
+			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink( $this->ID ) . '">' . __( 'More Info &raquo;', 'mp' ) . '</a>';
 		}
-		
-		if ( is_null($excerpt) ) {
+
+		if ( is_null( $excerpt ) ) {
 			$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
 		}
-		
-		if ( is_null($content) ) {
+
+		if ( is_null( $content ) ) {
 			$content = $this->has_variations() ? $this->get_variation()->post_content : $this->_post->post_content;
 		}
-		
+
 		if ( $excerpt ) {
-			return apply_filters('get_the_excerpt', $excerpt) . $excerpt_more;
+			return apply_filters( 'get_the_excerpt', $excerpt ) . $excerpt_more;
 		} else {
-			$text = strip_shortcodes($content);
-			$text = str_replace(']]>', ']]&gt;', $text);
-			$text = strip_tags($text);
-			$excerpt_length = apply_filters('excerpt_length', 55);
-			$words = preg_split("/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY);
-			
-			if ( count($words) > $excerpt_length ) {
-				array_pop($words);
-				$text = implode(' ', $words);
-				$text = $text . $excerpt_more;
+			$text			 = strip_shortcodes( $content );
+			$text			 = str_replace( ']]>', ']]&gt;', $text );
+			$text			 = strip_tags( $text );
+			$excerpt_length	 = apply_filters( 'excerpt_length', 55 );
+			$words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
+
+			if ( count( $words ) > $excerpt_length ) {
+				array_pop( $words );
+				$text	 = implode( ' ', $words );
+				$text	 = $text . $excerpt_more;
 			} else {
-				$text = implode(' ', $words);
+				$text = implode( ' ', $words );
 			}
-			
-			$text = wpautop($text);
+
+			$text = wpautop( $text );
 		}
-		
+
 		/**
 		 * Filter the product excerpt
 		 *
@@ -801,9 +810,9 @@ class MP_Product {
 		 * @param int $product_id
 		 * @param string $excerpt_more Optional
 		 */
-		return apply_filters('mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more);
+		return apply_filters( 'mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more );
 	}
-	
+
 	/**
 	 * Determine if product has variations
 	 *
@@ -813,9 +822,9 @@ class MP_Product {
 	 */
 	public function has_variations() {
 		$variations = $this->get_variations();
-		return ( ! empty($variations) );
+		return (!empty( $variations ) );
 	}
-	
+
 	/**
 	 * Determine if product is on sale
 	 *
@@ -824,26 +833,26 @@ class MP_Product {
 	 * @return bool
 	 */
 	public function on_sale() {
-		if ( ! is_null($this->_on_sale) ) {
+		if ( !is_null( $this->_on_sale ) ) {
 			return $this->_on_sale;
 		}
-		
-		$sale_price = $this->get_meta('sale_price_amount');
-		$on_sale = false;
-		
+
+		$sale_price	 = $this->get_meta( 'sale_price_amount' );
+		$on_sale	 = false;
+
 		if ( $sale_price ) {
-			$start_date = $this->get_meta('sale_price_start_date', false, true);
-			$end_date = $this->get_meta('sale_price_end_date', false, true);
-			$time = current_time('Y-m-d');
-			$on_sale = true;
-			
+			$start_date	 = $this->get_meta( 'sale_price_start_date', false, true );
+			$end_date	 = $this->get_meta( 'sale_price_end_date', false, true );
+			$time		 = current_time( 'Y-m-d' );
+			$on_sale	 = true;
+
 			if ( $start_date && $time < $start_date ) {
 				$on_sale = false;
 			} elseif ( $end_date && $time > $end_date ) {
 				$on_sale = false;
 			}
 		}
-			
+
 		/**
 		 * Filter the on sale flag
 		 *
@@ -851,11 +860,11 @@ class MP_Product {
 		 * @param bool $on_sale The default on-sale flag.
 		 * @param MP_Product $this The current product.
 		 */
-		$this->_on_sale = apply_filters('mp_product/on_sale', $on_sale, $this);
-		
+		$this->_on_sale = apply_filters( 'mp_product/on_sale', $on_sale, $this );
+
 		return $this->_on_sale;
 	}
-	
+
 	/**
 	 * Get a product's price
 	 *
@@ -867,73 +876,73 @@ class MP_Product {
 	 * @return array/float
 	 */
 	public function get_price( $what = null ) {
-		if ( ! is_null($this->_price) ) {
-			if ( ! is_null($what) ) {
-				return mp_arr_get_value($what, $this->_price);
+		if ( !is_null( $this->_price ) ) {
+			if ( !is_null( $what ) ) {
+				return mp_arr_get_value( $what, $this->_price );
 			}
-			
+
 			return $this->_price;
 		}
-		
+
 		$price = array(
-			'regular' => (float) $this->get_meta('regular_price'),
-			'lowest' => (float) $this->get_meta('regular_price'),
-			'highest' => (float) $this->get_meta('regular_price'),
-			'sale' => array(
-				'amount' => false,
+			'regular'	 => (float) $this->get_meta( 'regular_price' ),
+			'lowest'	 => (float) $this->get_meta( 'regular_price' ),
+			'highest'	 => (float) $this->get_meta( 'regular_price' ),
+			'sale'		 => array(
+				'amount'	 => false,
 				'start_date' => false,
-				'end_date' => false,
-				'days_left' => false,
+				'end_date'	 => false,
+				'days_left'	 => false,
 			),
 		);
-		
+
 		if ( $this->has_variations() ) {
-			$variations = $this->get_variations();
-			$prices = array();
-			
+			$variations	 = $this->get_variations();
+			$prices		 = array();
+
 			foreach ( $variations as $variation ) {
 				$price = $variation->get_price();
-				
+
 				if ( $variation->on_sale() ) {
-					$prices[] = $price['sale']['amount'];
+					$prices[] = $price[ 'sale' ][ 'amount' ];
 				} else {
-					$prices[] = $price['regular'];
+					$prices[] = $price[ 'regular' ];
 				}
 			}
-			
-			$price['lowest'] = (float) min($prices);
-			$price['highest'] = (float) max($prices);
-		} elseif ( $this->on_sale() && ($sale_price = $this->get_meta('sale_price_amount')) ) {
-			$start_date_obj = new DateTime($this->get_meta('sale_price_start_date', date('Y-m-d'), true));
-			$days_left = false;
-			
-			if ( method_exists($start_date_obj, 'diff') ) { // The diff method is only available PHP version >= 5.3
-				$end_date_obj = new DateTime($this->get_meta('sale_price_end_date', date('Y-m-d'), true));
-				$diff = $start_date_obj->diff($end_date_obj);
-				$days_left = $diff->d;
-				
+
+			$price[ 'lowest' ]	 = (float) min( $prices );
+			$price[ 'highest' ]	 = (float) max( $prices );
+		} elseif ( $this->on_sale() && ($sale_price = $this->get_meta( 'sale_price_amount' )) ) {
+			$start_date_obj	 = new DateTime( $this->get_meta( 'sale_price_start_date', date( 'Y-m-d' ), true ) );
+			$days_left		 = false;
+
+			if ( method_exists( $start_date_obj, 'diff' ) ) { // The diff method is only available PHP version >= 5.3
+				$end_date_obj	 = new DateTime( $this->get_meta( 'sale_price_end_date', date( 'Y-m-d' ), true ) );
+				$diff			 = $start_date_obj->diff( $end_date_obj );
+				$days_left		 = $diff->d;
+
 				/**
 				 * Filter the maximum number of days before the "only x days left" nag shows
 				 *
 				 * @since 3.0
 				 * @param int The default number of days
 				 */
-				$days_limit = apply_filters('mp_product/get_price/days_left_limit', 7);
-				
+				$days_limit = apply_filters( 'mp_product/get_price/days_left_limit', 7 );
+
 				if ( $days_left > $days_limit ) {
 					$days_left = false;
 				}
 			}
-			
-			$price['lowest'] = (float) $sale_price;
-			$price['sale'] = array(
-				'amount' => (float) $sale_price,
-				'start_date' => $this->get_meta('sale_price_start_date', false),
-				'end_date' => $this->get_meta('sale_price_end_date', false),
-				'days_left' => $days_left,
+
+			$price[ 'lowest' ]	 = (float) $sale_price;
+			$price[ 'sale' ]	 = array(
+				'amount'	 => (float) $sale_price,
+				'start_date' => $this->get_meta( 'sale_price_start_date', false ),
+				'end_date'	 => $this->get_meta( 'sale_price_end_date', false ),
+				'days_left'	 => $days_left,
 			);
 		}
-			
+
 		/**
 		 * Filter the price array
 		 *
@@ -941,18 +950,18 @@ class MP_Product {
 		 * @param array The current pricing array.
 		 * @param MP_Product The current product.
 		 */
-		$this->_price = apply_filters('mp_product/get_price', $price, $this);
-		
-		if ( mp_arr_get_value('sale->amount', $price) != mp_arr_get_value('sale->amount', $this->_price) ) {
+		$this->_price = apply_filters( 'mp_product/get_price', $price, $this );
+
+		if ( mp_arr_get_value( 'sale->amount', $price ) != mp_arr_get_value( 'sale->amount', $this->_price ) ) {
 			/* Filter changed sale price so let's flip the on-sale flag so the sale
-			price will show up accordingly */
+			  price will show up accordingly */
 			$this->_on_sale = true;
 		}
-		
-		if ( ! is_null($what) ) {
-			return mp_arr_get_value($what, $this->_price);
+
+		if ( !is_null( $what ) ) {
+			return mp_arr_get_value( $what, $this->_price );
 		}
-		
+
 		return $this->_price;
 	}
 
@@ -965,85 +974,85 @@ class MP_Product {
 	 */
 	public function price_lowest() {
 		$price = $this->get_price();
-		return $price['lowest'];
+		return $price[ 'lowest' ];
 	}
-	
+
 	/**
 	 * Get related products
 	 *
 	 * @since 3.0
 	 * @param array $args {
-	 *		Optional, an array of arguments.
+	 * 		Optional, an array of arguments.
 	 *
 	 * 		@type string $relate_by Optional, how to relate the products - either category, tag, or both.
 	 * 		@type bool $echo Optional, echo or return.
 	 * 		@type int $limit. Optional, the number of products to retrieve.
-	 *		@type string $view. Optional, how to display related products - either grid or list.
+	 * 		@type string $view. Optional, how to display related products - either grid or list.
 	 * }
 	 */
 	public function related_products( $args = array() ) {
-		$html = '';
-		$args = array_replace_recursive( array(
-			'relate_by' => mp_get_setting( 'related_products->relate_by' ),
-			'echo' => false,
-			'limit' => mp_get_setting( 'related_products->show_limit' ),
-			'view' => mp_get_setting( 'related_products->view' ),
-		), $args);
-		
+		$html	 = '';
+		$args	 = array_replace_recursive( array(
+			'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
+			'echo'		 => false,
+			'limit'		 => mp_get_setting( 'related_products->show_limit' ),
+			'view'		 => mp_get_setting( 'related_products->view' ),
+		), $args );
+
 		extract( $args );
-		
+
 		$query_args = array(
-			'post_type' => MP_Product::get_post_type(),
+			'post_type'		 => MP_Product::get_post_type(),
 			'posts_per_page' => $limit,
 		);
-		
+
 		if ( $related_products = $this->get_meta( 'related_products' ) ) {
-			$query_args['post__in'] = $related_products;
+			$query_args[ 'post__in' ] = $related_products;
 		} else {
 			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
-			$count = 0;
-			
+			$count	 = 0;
+
 			if ( 'categories' != $relate_by ) {
-				$terms = get_the_terms( $post_id, 'product_tag' );
-				$ids = wp_list_pluck( $terms, 'term_id' );
-				$query_args['tax_query'][] = array(
-					'taxonomy' => 'product_tag',
-					'terms' => $ids,
+				$terms						 = get_the_terms( $post_id, 'product_tag' );
+				$ids						 = wp_list_pluck( $terms, 'term_id' );
+				$query_args[ 'tax_query' ][] = array(
+					'taxonomy'	 => 'product_tag',
+					'terms'		 => $ids,
 				);
 				$count ++;
 			}
-			
+
 			if ( 'tags' != $relate_by ) {
-				$terms = get_the_terms( $post_id, 'product_category' );
-				$ids = wp_list_pluck( $terms, 'term_id' );
-				$query_args['tax_query'][] = array(
-					'taxonomy' => 'product_category',
-					'terms' => $ids,
+				$terms						 = get_the_terms( $post_id, 'product_category' );
+				$ids						 = wp_list_pluck( $terms, 'term_id' );
+				$query_args[ 'tax_query' ][] = array(
+					'taxonomy'	 => 'product_category',
+					'terms'		 => $ids,
 				);
 				$count ++;
 			}
-			
+
 			if ( $count > 1 ) {
-				$query_args['tax_query']['relation'] = 'AND';
+				$query_args[ 'tax_query' ][ 'relation' ] = 'AND';
 			}
 		}
-		
+
 		$product_query = new WP_Query( $query_args );
-		
+
 		if ( $product_query->have_posts() ) {
 			switch ( $view ) {
 				case 'grid' :
 					$html .= _mp_products_html_grid( $product_query );
-				break;
-				
+					break;
+
 				case 'list' :
 					$html .= _mp_products_html_list( $product_query );
-				break;
+					break;
 			}
 		} else {
-			$html .= wpautop( __(' There are no related products for this item.', 'mp' ) );
+			$html .= wpautop( __( ' There are no related products for this item.', 'mp' ) );
 		}
-		
+
 		/**
 		 * Filter the related products html
 		 *
@@ -1054,14 +1063,14 @@ class MP_Product {
 		 * @param array $args The array of arguments that were passed to the method.
 		 */
 		$html = apply_filters( 'mp_product/related_products', $html, $this, $product_query, $args );
-		
+
 		if ( $echo ) {
 			echo $html;
 		} else {
 			return $html;
 		}
 	}
-	
+
 	/**
 	 * Set price
 	 *
@@ -1072,7 +1081,7 @@ class MP_Product {
 	public function set_price( $price ) {
 		$this->_price = $price;
 	}
-	
+
 	/**
 	 * Get the current inventory in stock
 	 *
@@ -1082,15 +1091,15 @@ class MP_Product {
 	 */
 	public function get_stock() {
 		if ( $this->has_variations() ) {
-			$stock = array();
-			$variations = $this->get_variations();
+			$stock		 = array();
+			$variations	 = $this->get_variations();
 			foreach ( $variations as $variation ) {
-				$stock[$variation->ID] = $variation->get_stock();
+				$stock[ $variation->ID ] = $variation->get_stock();
 			}
 		} else {
-			$stock = $this->get_meta('inventory', 0);
+			$stock = $this->get_meta( 'inventory', 0 );
 		}
-		
+
 		return $stock;
 	}
 
@@ -1103,6 +1112,7 @@ class MP_Product {
 	 * @param int $size An optional width/height for the image if contect is widget
 	 * @param string $align The alignment of the image. Defaults to settings.
 	 */
+
 	public function image( $echo = true, $context = 'list', $size = null, $align = null ) {
 		/**
 		 * Filter the post_id used for the product image
@@ -1110,134 +1120,134 @@ class MP_Product {
 		 * @since 3.0
 		 * @param int $post_id
 		 */
-		$post_id = apply_filters('mp_product_image_id', $this->ID);
-		
+		$post_id = apply_filters( 'mp_product_image_id', $this->ID );
+
 		if ( $post_id != $this->ID ) {
-			$this->ID = $post_id;
-			$this->_post = $post = get_post($post_id);
+			$this->ID	 = $post_id;
+			$this->_post = $post		 = get_post( $post_id );
 		}
-		
+
 		$image_post_id = $this->ID;
 		if ( $this->has_variations() ) {
 			$image_post_id = $this->get_variation()->ID;
 		}
-		
-		$post_thumbnail_id = get_post_thumbnail_id($this->ID);
-		$class = $title = $link = $img_align = '';
-		$img_classes = array('mp_product_image_' . $context, 'photo');
-		$title = esc_attr($this->title(false));
-		
-		if ( ! is_null( $align ) && false === strpos( $align, 'align' ) ) {
+
+		$post_thumbnail_id	 = get_post_thumbnail_id( $this->ID );
+		$class				 = $title				 = $link				 = $img_align			 = '';
+		$img_classes		 = array( 'mp_product_image_' . $context, 'photo' );
+		$title				 = esc_attr( $this->title( false ) );
+
+		if ( !is_null( $align ) && false === strpos( $align, 'align' ) ) {
 			$align = 'align' . $align;
 		}
 
 		switch ( $context ) {
 			case 'list' :
-				if ( ! mp_get_setting('show_thumbnail') ) {
+				if ( !mp_get_setting( 'show_thumbnail' ) ) {
 					return '';
 				}
-	
+
 				//size
-				if ( intval($size) ) {
-					$size = array(intval($size), intval($size));
+				if ( intval( $size ) ) {
+					$size = array( intval( $size ), intval( $size ) );
 				} else {
-					if ( mp_get_setting('list_img_size') == 'custom' ) {
-						$size = array(mp_get_setting('list_img_size_custom->width'), mp_get_setting('list_img_size_custom->height'));
+					if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
+						$size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
 					} else {
-						$size = mp_get_setting('list_img_size');
+						$size = mp_get_setting( 'list_img_size' );
 					}
 				}
-	
-				$link = get_permalink($this->ID);
-				$link_class = ' class="mp_img_link"';
-				$img_align = is_null($align) ? mp_get_setting('image_alignment_list') : $align;
-			break;
-			
+
+				$link		 = get_permalink( $this->ID );
+				$link_class	 = ' class="mp_img_link"';
+				$img_align	 = is_null( $align ) ? mp_get_setting( 'image_alignment_list' ) : $align;
+				break;
+
 			case 'floating-cart' :
-				$img_classes = array('mp-floating-cart-item-image');
-				
-				if ( $size = intval($size) ) {
-					$size = array($size, $size);
+				$img_classes = array( 'mp-floating-cart-item-image' );
+
+				if ( $size = intval( $size ) ) {
+					$size = array( $size, $size );
 				} else {
-					$size = array(50, 50);
+					$size = array( 50, 50 );
 				}
-			break;
-			
+				break;
+
 			case 'single' :
 				// size
-				if ( mp_get_setting('product_img_size') == 'custom' ) {
-					$size = array(mp_get_setting('product_img_size_custom->width'), mp_get_setting('product_img_size_custom->height'));
+				if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
+					$size = array( mp_get_setting( 'product_img_size_custom->width' ), mp_get_setting( 'product_img_size_custom->height' ) );
 				} else {
-					$size = mp_get_setting('product_img_size');
+					$size = mp_get_setting( 'product_img_size' );
 				}
 
-				if ( mp_get_setting('disable_large_image') ) {
+				if ( mp_get_setting( 'disable_large_image' ) ) {
 					$link = false;
 				} else {
-					$link = $this->image_url(false, 'fullsize' );
-					$title = __('View Larger Image &raquo;', 'mp');
+					$link	 = $this->image_url( false, 'fullsize' );
+					$title	 = __( 'View Larger Image &raquo;', 'mp' );
 				}
 
-				$link_class = ' class="mp_product_image_link mp_lightbox"';
-				$img_align = is_null($align) ? mp_get_setting('image_alignment_single') : $align;
-			break;
-			
+				$link_class	 = ' class="mp_product_image_link mp_lightbox"';
+				$img_align	 = is_null( $align ) ? mp_get_setting( 'image_alignment_single' ) : $align;
+				break;
+
 			case 'widget' :
 				//size
-				if ( $size = intval($size) ) {
-				 $size = array($size, $size);
+				if ( $size = intval( $size ) ) {
+					$size = array( $size, $size );
 				} else {
-					$size = array(50, 50);
+					$size = array( 50, 50 );
 				}
 
 				//link
-				$link = get_permalink($post_id);
-				$link_class = ' class="mp_img_link"';
-			break;
+				$link		 = get_permalink( $post_id );
+				$link_class	 = ' class="mp_img_link"';
+				break;
 		}
-		
-		$image = get_the_post_thumbnail($image_post_id, $size, array('itemprop' => 'image', 'class' => implode(' ', $img_classes), 'title' => $title));
 
-		if ( empty($image) ) {
+		$image = get_the_post_thumbnail( $image_post_id, $size, array( 'itemprop' => 'image', 'class' => implode( ' ', $img_classes ), 'title' => $title ) );
+
+		if ( empty( $image ) ) {
 			if ( $context == 'floating-cart' ) {
-				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />';
+				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ) . '" />';
 			} else {
-				if ( ! is_array($size) ) {
-					$size = array(get_option($size . '_size_w'), get_option($size . '_size_h'));
+				if ( !is_array( $size ) ) {
+					$size = array( get_option( $size . '_size_w' ), get_option( $size . '_size_h' ) );
 				}
-				
-				$img_classes[] = 'wp-post-image';
-				$image = '<img width="' . $size[0] . '" height="' . $size[1] . '" itemprop="image" title="' . esc_attr($title) . '" class="' . implode(' ', $img_classes) . '" src="' . apply_filters('mp_default_product_img', mp_plugin_url('ui/images/default-product.png')) . '" />';
+
+				$img_classes[]	 = 'wp-post-image';
+				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ) . '" />';
 			}
 		}
-		
+
 		//force ssl on images (if applicable) http://wp.mu/8s7
 		if ( is_ssl() ) {
-			$image = str_replace('http://', 'https://', $image);
+			$image = str_replace( 'http://', 'https://', $image );
 		}
 
 		$snippet = '
-			<div itemscope class="hmedia' . ( empty($img_align) ? '' : " $img_align") . '">
-				<div style="display:none"><span class="fn">' . get_the_title(get_post_thumbnail_id()) . '</span></div>';
-				
+			<div itemscope class="hmedia' . ( empty( $img_align ) ? '' : " $img_align") . '">
+				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>';
+
 		if ( $link ) {
 			$snippet .= '<a rel="lightbox enclosure" id="product_image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
 		} else {
 			$snippet .= $image;
 		}
-		
+
 		$snippet .= '
 			</div>';
-		
-		$snippet = apply_filters('mp_product_image', $snippet, $context, $post_id, $size);
+
+		$snippet = apply_filters( 'mp_product_image', $snippet, $context, $post_id, $size );
 
 		if ( $echo ) {
 			echo $snippet;
 		} else {
-			return $snippet;	
-		}	
+			return $snippet;
+		}
 	}
-	
+
 	/**
 	 * Get the product image url
 	 *
@@ -1248,34 +1258,34 @@ class MP_Product {
 	 * @param string $view Either single or list. Optional.
 	 */
 	public function image_url( $echo = true, $size = null, $view = null ) {
-		if ( is_null($size) ) {
-			$img_size = mp_get_image_size($view);
-			$size = ( $img_size['label'] == 'custom' ) ? array($size['width'], $size['height']) : $img_size['label'];
-		} elseif ( $thesize = intval($size) ) {
-			$size = array($thesize, $thesize);
+		if ( is_null( $size ) ) {
+			$img_size	 = mp_get_image_size( $view );
+			$size		 = ( $img_size[ 'label' ] == 'custom' ) ? array( $size[ 'width' ], $size[ 'height' ] ) : $img_size[ 'label' ];
+		} elseif ( $thesize = intval( $size ) ) {
+			$size = array( $thesize, $thesize );
 		}
-		
+
 		$post_id = $this->ID;
 		if ( $this->has_variations() ) {
 			$post_id = $this->get_variation()->ID;
 		}
-		
-		if ( has_post_thumbnail($post_id) ) {
-			$img_id = get_post_thumbnail_id($post_id);
-			$img_src = array_shift(wp_get_attachment_image_src($img_id, $size));
+
+		if ( has_post_thumbnail( $post_id ) ) {
+			$img_id	 = get_post_thumbnail_id( $post_id );
+			$img_src = array_shift( wp_get_attachment_image_src( $img_id, $size ) );
 		}
-		
-		if ( empty($img_src) ) {
-			$img_src = mp_plugin_url('ui/images/default-product.png');
+
+		if ( empty( $img_src ) ) {
+			$img_src = mp_plugin_url( 'ui/images/default-product.png' );
 		}
-		
+
 		if ( $echo ) {
 			echo $img_src;
 		} else {
 			return $img_src;
 		}
 	}
-	
+
 	/**
 	 * Check if product is in stock
 	 *
@@ -1284,32 +1294,32 @@ class MP_Product {
 	 * @param int $qty The quantity to check against.
 	 * @return bool
 	 */
-	public function in_stock( $qty = 1 ) {		
+	public function in_stock( $qty = 1 ) {
 		$has_stock = false;
-		
+
 		if ( $this->has_variations() ) {
-			$variations = $this->get_variations();		
+			$variations = $this->get_variations();
 			foreach ( $variations as $variation ) {
-				if ( $variation->get_meta('track_inventory') ) {
-					$inventory = $variation->get_meta('inventory', 0);
-					$has_stock = ( $inventory >= $qty );
+				if ( $variation->get_meta( 'track_inventory' ) ) {
+					$inventory	 = $variation->get_meta( 'inventory', 0 );
+					$has_stock	 = ( $inventory >= $qty );
 				} else {
 					$has_stock = true;
 					break;
 				}
 			}
 		} else {
-			if ( $this->get_meta('track_inventory') ) {
-				$inventory = $this->get_meta('inventory', 0);
-				$has_stock = ( $inventory >= $qty );
+			if ( $this->get_meta( 'track_inventory' ) ) {
+				$inventory	 = $this->get_meta( 'inventory', 0 );
+				$has_stock	 = ( $inventory >= $qty );
 			} else {
 				$has_stock = true;
 			}
 		}
-		
+
 		return $has_stock;
 	}
-	
+
 	/**
 	 * Check if the product is a digital download
 	 *
@@ -1320,10 +1330,10 @@ class MP_Product {
 	public function is_download() {
 		$product_type = $this->get_meta( 'product_type' );
 		if ( $this->is_variation() ) {
-			$parent = new MP_Product( $this->_post->post_parent );
-			$product_type = $parent->get_meta( 'product_type' );
+			$parent			 = new MP_Product( $this->_post->post_parent );
+			$product_type	 = $parent->get_meta( 'product_type' );
 		}
-		
+
 		return ( 'digital' == $product_type && $this->get_meta( 'file_url' ) );
 	}
 
@@ -1336,7 +1346,7 @@ class MP_Product {
 	public function is_variation() {
 		return ( $this->_post->post_type == 'mp_product_variation' );
 	}
-	
+
 	/**
 	 * Send low-stock notification
 	 *
@@ -1345,22 +1355,22 @@ class MP_Product {
 	 */
 	public function low_stock_notification() {
 		$stock = $this->get_stock();
-		
-		if ( $this->get_meta( 'mp_stock_email_sent' ) && $stock  > 0 ) {
+
+		if ( $this->get_meta( 'mp_stock_email_sent' ) && $stock > 0 ) {
 			// Already sent - bail
 			return;
 		}
-		
+
 		// Only send the email once - we set this before doing anything else to avoid race conditions
 		$this->update_meta( 'mp_stock_email_sent', true );
-		
+
 		$name = $this->title( false );
 		if ( $this->is_variation() ) {
 			$name .= ': ' . $this->get_meta( 'name' );
 		}
 
 		$subject = __( 'Low Product Inventory Notification', 'mp' );
-		$msg = __( 'This message is being sent to notify you of low stock of a product in your online store according to your preferences.
+		$msg	 = __( 'This message is being sent to notify you of low stock of a product in your online store according to your preferences.
 
 Product: %s
 Current Inventory: %s
@@ -1368,21 +1378,20 @@ Link: %s
 
 Edit Product: %s
 Notification Preferences: %s', 'mp' );
-	 $msg = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc') );
-	 
-	 /**
-	  * Filter the low stock notification message
-	  *
-	  * @since 3.0
-	  * @param string $msg The current message text.
-	  * @param int $this->ID The product's ID.
-		*/
-	 $msg = apply_filters( 'mp_low_stock_notification', $msg, $this->ID );
-	 
-	 mp_send_email( mp_get_store_email(), $subject, $msg );
+		$msg	 = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc' ) );
+
+		/**
+		 * Filter the low stock notification message
+		 *
+		 * @since 3.0
+		 * @param string $msg The current message text.
+		 * @param int $this->ID The product's ID.
+		 */
+		$msg = apply_filters( 'mp_low_stock_notification', $msg, $this->ID );
+
+		mp_send_email( mp_get_store_email(), $subject, $msg );
 	}
 
-	
 	/**
 	 * Get a product's attribute
 	 *
@@ -1392,10 +1401,10 @@ Notification Preferences: %s', 'mp' );
 	 * @return int The term id of the specified attribute. False if no terms exist.
 	 */
 	public function get_attribute( $attribute ) {
-		$terms = get_the_terms($this->ID, $attribute);
-		return ( is_array($terms) ) ? array_shift($terms) : false;
+		$terms = get_the_terms( $this->ID, $attribute );
+		return ( is_array( $terms ) ) ? array_shift( $terms ) : false;
 	}
-	
+
 	/**
 	 * Get the product attributes
 	 *
@@ -1404,44 +1413,44 @@ Notification Preferences: %s', 'mp' );
 	 * @return array
 	 */
 	public function get_attributes() {
-		if ( ! is_null($this->_attributes) ) {
+		if ( !is_null( $this->_attributes ) ) {
 			return $this->_attributes;
 		}
-		
-		$mp_product_atts = MP_Product_Attributes::get_instance();
-		$all_atts = $mp_product_atts->get();
-		$this->_attributes = array();
-		
-		$ids = array($this->ID);
+
+		$mp_product_atts	 = MP_Product_Attributes::get_instance();
+		$all_atts			 = $mp_product_atts->get();
+		$this->_attributes	 = array();
+
+		$ids = array( $this->ID );
 		if ( $this->has_variations() ) {
 			$ids = $this->get_variation_ids();
 		}
-		
+
 		$taxonomies = array();
 		foreach ( $all_atts as $att ) {
-			$taxonomies[] = $mp_product_atts->generate_slug($att->attribute_id);
+			$taxonomies[] = $mp_product_atts->generate_slug( $att->attribute_id );
 		}
-		
-		$terms = wp_get_object_terms($ids, $taxonomies);
-		$terms_sorted = $mp_product_atts->sort($terms);
-		$names = array();
+
+		$terms			 = wp_get_object_terms( $ids, $taxonomies );
+		$terms_sorted	 = $mp_product_atts->sort( $terms );
+		$names			 = array();
 		foreach ( $terms_sorted as $tax_slug => $terms ) {
-			$tax_id = $mp_product_atts->get_id_from_slug($tax_slug);
-			
+			$tax_id = $mp_product_atts->get_id_from_slug( $tax_slug );
+
 			foreach ( $terms as $term ) {
-				if ( $att = $mp_product_atts->get_one($tax_id) ) {
-					if ( ! array_key_exists($term->taxonomy, $names) ) {
-						mp_push_to_array($this->_attributes, "{$term->taxonomy}->name", $att->attribute_name);
+				if ( $att = $mp_product_atts->get_one( $tax_id ) ) {
+					if ( !array_key_exists( $term->taxonomy, $names ) ) {
+						mp_push_to_array( $this->_attributes, "{$term->taxonomy}->name", $att->attribute_name );
 					}
-					
-					mp_push_to_array($this->_attributes, "{$term->taxonomy}->terms->{$term->term_id}", $term->name);
+
+					mp_push_to_array( $this->_attributes, "{$term->taxonomy}->terms->{$term->term_id}", $term->name );
 				}
 			}
 		}
-		
+
 		return $this->_attributes;
 	}
-	
+
 	/**
 	 * Get product meta value
 	 *
@@ -1453,29 +1462,29 @@ Notification Preferences: %s', 'mp' );
 	 * @return mixed
 	 */
 	public function get_meta( $name, $default = false, $raw = false ) {
-		if ( ! $this->exists() ) {
+		if ( !$this->exists() ) {
 			return $default;
 		}
-		
+
 		$value = false;
-		if ( function_exists('get_field_value') ) {
+		if ( function_exists( 'get_field_value' ) ) {
 			// Try to get WPMUDEV_Field value
-			$value = get_field_value($name, $this->ID, $raw);
+			$value = get_field_value( $name, $this->ID, $raw );
 		}
 
 		if ( $value !== false && $value !== '' ) {
 			return $value;
 		}
-				
+
 		// Try to use regular post meta
-		$meta_val = get_post_meta($this->ID, $name, true);
+		$meta_val = get_post_meta( $this->ID, $name, true );
 		if ( $meta_val !== '' ) {
 			return $meta_val;
 		}
-		
+
 		return $default;
 	}
-	
+
 	/**
 	 * Display product meta value
 	 *
@@ -1487,9 +1496,9 @@ Notification Preferences: %s', 'mp' );
 	 * @return mixed
 	 */
 	public function meta( $name, $default = false, $raw = false ) {
-		echo $this->get_meta($name, $default, $raw);
+		echo $this->get_meta( $name, $default, $raw );
 	}
-	
+
 	/**
 	 * Get the product's url
 	 *
@@ -1499,18 +1508,18 @@ Notification Preferences: %s', 'mp' );
 	 */
 	public function url( $echo = true ) {
 		if ( $this->is_variation() ) {
-			$url = get_permalink($this->_post->post_parent) . 'variation/' . $this->ID;
+			$url = get_permalink( $this->_post->post_parent ) . 'variation/' . $this->ID;
 		} else {
-			$url = get_permalink($this->ID);
+			$url = get_permalink( $this->ID );
 		}
-		
+
 		if ( $echo ) {
 			echo $url;
 		} else {
 			return $url;
 		}
 	}
-	
+
 	/**
 	 * Get the product's edit url
 	 *
@@ -1524,14 +1533,14 @@ Notification Preferences: %s', 'mp' );
 		} else {
 			$url = get_edit_post_link( $this->ID );
 		}
-		
+
 		if ( $echo ) {
 			echo $url;
-		}	else {
+		} else {
 			return $url;
 		}
 	}
-	
+
 	/**
 	 * Update product meta
 	 *
@@ -1556,25 +1565,25 @@ Notification Preferences: %s', 'mp' );
 	 * @param bool $echo
 	 */
 	public function pinit_button( $context = 'single_view', $echo = false ) {
-		$setting = mp_get_setting('social->pinterest->show_pinit_button');
-		
+		$setting = mp_get_setting( 'social->pinterest->show_pinit_button' );
+
 		if ( $setting == 'off' || $setting != $context ) {
 			return '';
 		}
-	
-		$image_info =	wp_get_attachment_image_src(get_post_thumbnail_id($this->ID), 'large');
-		$count_pos = ( $pos = mp_get_setting('social->pinterest->show_pin_count') ) ? $pos : 'none';
-		$url = add_query_arg(array(
-			'url' => get_permalink($this->ID),
-			'description' => get_the_title($this->ID),
-		), '//www.pinterest.com/pin/create/button/');
-		
-		if ( $media = mp_arr_get_value('0', $image_info) ) {
-			$url = add_query_arg('media',  $media, $url);	
+
+		$image_info	 = wp_get_attachment_image_src( get_post_thumbnail_id( $this->ID ), 'large' );
+		$count_pos	 = ( $pos		 = mp_get_setting( 'social->pinterest->show_pin_count' ) ) ? $pos : 'none';
+		$url		 = add_query_arg( array(
+			'url'			 => get_permalink( $this->ID ),
+			'description'	 => get_the_title( $this->ID ),
+		), '//www.pinterest.com/pin/create/button/' );
+
+		if ( $media = mp_arr_get_value( '0', $image_info ) ) {
+			$url = add_query_arg( 'media', $media, $url );
 		}
-		
-		$snippet = apply_filters('mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context);
-	
+
+		$snippet = apply_filters( 'mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context );
+
 		if ( $echo ) {
 			echo $snippet;
 		} else {
@@ -1595,7 +1604,7 @@ Notification Preferences: %s', 'mp' );
 		} else {
 			$title = $this->_post->post_title;
 		}
-		
+
 		/**
 		 * Filter the product title
 		 *
@@ -1604,14 +1613,14 @@ Notification Preferences: %s', 'mp' );
 		 * @param MP_Product $this The current product object.
 		 */
 		$title = apply_filters( 'mp_product/title', $title, $this );
-		
+
 		if ( $echo ) {
 			echo $title;
 		} else {
 			return $title;
 		}
 	}
-	
+
 	/**
 	 * Check if a product exists
 	 *
@@ -1622,7 +1631,7 @@ Notification Preferences: %s', 'mp' );
 	public function exists() {
 		return $this->_exists;
 	}
-	
+
 	/**
 	 * Attempt to get an internal WP_Post object property (e.g post_name, post_status, etc)
 	 *
@@ -1632,17 +1641,17 @@ Notification Preferences: %s', 'mp' );
 	 * @return string The property value or false if the property or post doesn't exist.
 	 */
 	public function __get( $name ) {
-		if ( ! $this->exists() ) {
+		if ( !$this->exists() ) {
 			return false;
 		}
-		
-		if ( property_exists($this->_post, $name) ) {
+
+		if ( property_exists( $this->_post, $name ) ) {
 			return $this->_post->$name;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Attempt to set the internal WP_Post object
 	 *
@@ -1652,17 +1661,17 @@ Notification Preferences: %s', 'mp' );
 	 */
 	protected function _get_post( $product ) {
 		$this->_post = get_post( $product );
-		
-		if ( is_null($this->_post) ) {
+
+		if ( is_null( $this->_post ) ) {
 			$this->_exists = false;
 		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != 'mp_product_variation' ) {
 			$this->_exists = false;
 		} else {
-			$this->_exists = true;
-			$this->ID = $this->_post->ID;
+			$this->_exists	 = true;
+			$this->ID		 = $this->_post->ID;
 		}
 	}
-	
+
 	/**
 	 * Set content tabs
 	 *
@@ -1671,11 +1680,11 @@ Notification Preferences: %s', 'mp' );
 	 */
 	protected function _set_content_tabs() {
 		$tabs = array();
-		
+
 		if ( mp_get_setting( 'related_products->show' ) ) {
-			$tabs['mp-related-products'] = __( 'Related Products', 'mp' );
+			$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
 		}
-		
+
 		/**
 		 * Filter the product tabs array
 		 *
@@ -1684,10 +1693,11 @@ Notification Preferences: %s', 'mp' );
 		 * @param MP_Product $this The current product object.
 		 */
 		$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
-		
+
 		// Make sure product overview tab is always at the beginning
 		$tabs = array( 'mp-product-overview' => __( 'Overview', 'mp' ) ) + $tabs;
-		
+
 		$this->content_tabs = $tabs;
 	}
+
 }
