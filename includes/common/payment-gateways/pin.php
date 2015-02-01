@@ -42,15 +42,17 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 	 */
 	function on_creation() {
 		//set names here to be able to translate
-		$this->admin_name			 = __( 'PIN', 'mp' );
-		$this->public_name			 = __( 'Credit Card', 'mp' );
+		$this->admin_name	 = __( 'PIN', 'mp' );
+		$this->public_name	 = __( 'Credit Card', 'mp' );
+
 		$this->method_img_url		 = mp_plugin_url( 'images/credit_card.png' );
 		$this->method_button_img_url = mp_plugin_url( 'images/cc-button.png' );
-		$this->public_key			 = $this->get_setting( 'api_credentials->public_key' );
-		$this->private_key			 = $this->get_setting( 'api_credentials->private_key' );
-		$this->force_ssl			 = $this->get_setting( 'is_ssl' );
-		$this->currency				 = $this->get_setting( 'currency', 'AUD' );
-		$this->currencies			 = array(
+
+		$this->public_key	 = $this->get_setting( 'api_credentials->public_key' );
+		$this->private_key	 = $this->get_setting( 'api_credentials->private_key' );
+		$this->force_ssl	 = $this->get_setting( 'is_ssl' );
+		$this->currency		 = $this->get_setting( 'currency', 'AUD' );
+		$this->currencies	 = array(
 			"AUD"	 => __( 'AUD - Australian Dollar', 'mp' ),
 			"USD"	 => __( 'USD - United States Dollar', 'mp' ),
 			"NZD"	 => __( 'NZD - New Zealand Dollar', 'mp' ),
@@ -149,12 +151,14 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 				'action' => 'show',
 			),
 		) );
+
 		$metabox->add_field( 'checkbox', array(
 			'name'	 => $this->get_field_name( 'is_ssl' ),
 			'label'	 => array( 'text' => __( 'Force SSL?', 'mp' ) ),
 			'desc'	 => __( 'When in live mode PIN recommends you have an SSL certificate setup for the site where the checkout form will be displayed.', 'mp' ),
 		) );
-		$creds	 = $metabox->add_field( 'complex', array(
+
+		$creds = $metabox->add_field( 'complex', array(
 			'name'	 => $this->get_field_name( 'api_credentials' ),
 			'label'	 => array( 'text' => __( 'API Credentials?', 'mp' ) ),
 			'desc'	 => __( 'You must login to PIN to <a target="_blank" href="https://dashboard.pin.net.au/account">get your API credentials</a>. You can enter your test keys, then live ones when ready.', 'mp' ),
@@ -264,6 +268,8 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 					'shipping_info'	 => $shipping_info,
 					'paid'			 => true
 				) );
+
+				wp_redirect( $order->tracking_url( false ) );
 			} else {
 				mp_checkout()->add_error( __( '<li>There was an error processing your card. Please verify your credit card information and try again.</li>', 'mp' ), 'order-review-payment' );
 				return false;
@@ -277,4 +283,4 @@ class MP_Gateway_PIN extends MP_Gateway_API {
 }
 
 //register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_PIN', 'pin', __( 'PIN (beta)', 'mp' ) );
+mp_register_gateway_plugin( 'MP_Gateway_PIN', 'pin', __( 'PIN', 'mp' ) );
