@@ -378,12 +378,12 @@ class Marketpress {
 	 * @access public
 	 */
 	public function register_addons() {
-		mp_register_addon(array(
-			'label' => __('Coupons', 'mp'),
-			'desc' => __('Offer and accept coupon codes', 'mp'),
+		mp_register_addon( array(
+			'label' => __( 'Coupons', 'mp' ),
+			'desc' => __( 'Offer and accept coupon codes', 'mp' ),
 			'class' => 'MP_Coupons',
-			'path' => mp_plugin_dir('includes/addons/mp-coupons/class-mp-coupons.php')
-		));		
+			'path' => mp_plugin_dir( 'includes/addons/mp-coupons/class-mp-coupons-addon.php' ),
+		) );
 	}
 	
 	/**

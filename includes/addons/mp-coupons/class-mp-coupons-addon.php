@@ -1,6 +1,6 @@
 <?php
 
-class MP_Coupons {
+class MP_Coupons_Addon {
 	/**
 	 * Refers to a single instance of the class
 	 *
@@ -56,7 +56,7 @@ class MP_Coupons {
 	 */
 	public static function get_instance() {
 		if ( is_null(self::$_instance) ) {
-			self::$_instance = new MP_Coupons();
+			self::$_instance = new MP_Coupons_Addon();
 		}
 		return self::$_instance;
 	}
@@ -1024,7 +1024,7 @@ class MP_Coupons {
 	}
 }
 
-MP_Coupons::get_instance();
+MP_Coupons_Addon::get_instance();
 
 if ( ! function_exists('mp_coupons') ) :
 	/**
