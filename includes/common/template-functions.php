@@ -189,26 +189,28 @@ if ( ! function_exists( 'mp_before_tax_price' ) ) :
 	 * Get the price before taxes
 	 *
 	 * @since 3.0
-	 * @access public
+	 * @param float $tax_price The price including tax.
+	 * @param float $rate Optional. The tax rate applied to the price.
 	 */
-	function before_tax_price( $tax_price, $product_id = null ) {
-		//if tax inclusve pricing is turned off just return given price
+	function mp_before_tax_price( $tax_price, $rate = null ) {
 		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
+			// tax inclusve pricing is turned off - just return tax price
 			return $tax_price;
 		}
-
-		$product = new MP_Product( $product_id );
-		if ( $product->exists() && ($tax_rate = $product->get_meta( 'special_tax_rate' )) ){
-			$rate = $tax_rate;
-		} else {
+		
+		if ( is_null( $rate ) ) {
 			if	( 'CA' == mp_get_setting( 'tax->base_country' ) ) {
-				$rate = mp_get_setting( 'tax->canada_rate->' . mp_get_setting( 'base_province' ) );
+				$rate = (float) mp_get_setting( 'tax->canada_rate->' . mp_get_setting( 'base_province' ) );
 			} else {
-				$rate = mp_get_setting( 'tax->rate' );
+				$rate = (float) mp_get_setting( 'tax->rate' );
 			}
 		}
+		
+		if ( ! is_float( $rate ) ) {
+			$rate = (float) $rate;
+		}
 
-		return $tax_price / ($rate + 1);
+		return ($tax_price / ($rate + 1));
 	}
 endif;
 
