@@ -381,9 +381,19 @@ class Marketpress {
 		mp_register_addon( array(
 			'label' => __( 'Coupons', 'mp' ),
 			'desc' => __( 'Offer and accept coupon codes', 'mp' ),
-			'class' => 'MP_Coupons',
+			'class' => 'MP_Coupons_Addon',
 			'path' => mp_plugin_dir( 'includes/addons/mp-coupons/class-mp-coupons-addon.php' ),
+			'has_settings' => true,
 		) );
+		
+		if ( class_exists( 'ProSites' ) ) {
+			mp_register_addon( array(
+				'label' => __( 'Pro Sites', 'mp' ),
+				'desc' => __( 'Grant access to themes and gateways depending on the user\'s Pro Site level', 'mp' ),
+				'class' => 'MP_Prosites_Addon',
+				'path' => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
+			) );
+		}
 	}
 	
 	/**
@@ -535,7 +545,7 @@ class Marketpress {
 		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product-attributes.php');		
-		require_once $this->plugin_dir('includes/common/class-mp-addons.php');
+		require_once $this->plugin_dir('includes/addons/class-mp-addons.php');
 		require_once $this->plugin_dir('includes/common/class-mp-order.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
