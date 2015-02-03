@@ -71,18 +71,14 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @return array
 		 */
 		public static function get_gateways( $network_enabled = false ) {
-			if ( is_multisite() && !mp_is_main_site() && $network_enabled ) {
-				$gateways = array();
-				foreach ( self::$_gateways as $code => $gateway ) {
-					$level = str_replace( 'psts_level_', '', mp_get_network_setting( 'allowed_gateways->' . $code, '' ) );
-					if ( $level == 'full' || mp_is_pro_site( false, $level ) ) {
-						$gateways[ $code ] = $gateway;
-					}
-				}
-				return $gateways;
-			}
-
-			return self::$_gateways;
+			/**
+			 * Filter the gateways list
+			 *
+			 * @since 3.0
+			 * @param array An array of gateways.
+			 * @param bool If multisite installation, only get gateways that are enabled in the store network settings. 
+			 */
+			return apply_filters( 'mp_gateway_api/get_gateways', self::$_gateways, $network_enabled );
 		}
 
 		/**
@@ -98,7 +94,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 				return;
 			}
 
-			$gateways		 = mp_get_setting( 'gateways' );
+			$gateways = mp_get_setting( 'gateways' );
 			$network_enabled = ( is_multisite() && !mp_is_main_site() && !is_super_admin() ) ? true : false;
 
 			foreach ( self::get_gateways( $network_enabled ) as $code => $plugin ) {
