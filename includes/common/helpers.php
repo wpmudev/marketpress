@@ -452,8 +452,9 @@ if ( ! function_exists('mp_get_theme_list') ) :
 		 *
 		 * @since 3.0
 		 * @param array $theme_list An array of themes.
+		 * @param array $allowed_theme An array of allowed themes.		 
 		 */
-		return apply_filters( 'mp_get_theme_list', $theme_list );		 
+		return apply_filters( 'mp_get_theme_list', $theme_list, $allowed_themes );		 
 	 }
 endif;
 

@@ -69,7 +69,7 @@ class MP_Prosites_Addon {
 	 * @access public
 	 * @filter mp_get_theme_list
 	 */
-	public function get_theme_list( $allowed_themes, $theme_list ) {
+	public function get_theme_list( $theme_list, $allowed_themes ) {
 		if ( is_multisite() && ! is_network_admin() ) {
 			foreach ( $theme_list as $key => $theme ) {
 				if ( $permissions = mp_arr_get_value( $key, $allowed_themes ) ) {
@@ -133,7 +133,7 @@ class MP_Prosites_Addon {
 		add_filter( 'mp_admin_multisite/theme_permissions_options', array( &$this, 'permissions_options' ) );
 		add_filter( 'mp_admin_multisite/gateway_permissions_options', array( &$this, 'permissions_options' ) );
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
-		add_filter( 'mp_get_theme_list', array( &$this, 'theme_list' ), 10, 2 );
+		add_filter( 'mp_get_theme_list', array( &$this, 'get_theme_list' ), 10, 2 );
 	}
 }
 
