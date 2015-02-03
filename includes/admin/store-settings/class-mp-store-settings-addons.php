@@ -40,7 +40,7 @@ class MP_Store_Settings_Addons {
 		?>
 <div class="wrap mp-wrap">
 	<?php
-	require_once mp_plugin_dir('includes/admin/class-mp-addons-list-table.php');
+	require_once mp_plugin_dir('includes/addons/class-mp-addons-list-table.php');
 	$list_table = new MP_Addons_List_Table();
 	$list_table->prepare_items();	?>
 	<div class="icon32"><img src="<?php echo mp_plugin_url('ui/images/settings.png'); ?>" /></div>
@@ -114,7 +114,7 @@ jQuery(document).ready(function($){
 </script>
 <div class="wrap mp-wrap">
 	<?php
-	require_once mp_plugin_dir('includes/admin/class-mp-addons-list-table.php');
+	require_once mp_plugin_dir('includes/addons/class-mp-addons-list-table.php');
 	$list_table = new MP_Addons_List_Table();
 	$list_table->prepare_items();	?>
 	<div class="icon32"><img src="<?php echo mp_plugin_url('ui/images/settings.png'); ?>" /></div>
