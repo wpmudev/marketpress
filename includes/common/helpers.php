@@ -435,45 +435,26 @@ if ( ! function_exists('mp_get_theme_list') ) :
 				$theme_data = get_file_data($theme, array('name' => 'MarketPress Style'));
 				$key = basename($theme, '.css');
 				
-				if ( $name = mp_arr_get_value('name', $theme_data) ) {
-					if ( is_multisite() && ! is_network_admin() ) {
-						if ( $permissions = mp_arr_get_value($key, $allowed_themes) ) {
-							$level = str_replace('psts_level_', '', $permissions);
-							
-							if ( $permissions != 'full' || ! mp_is_pro_site(false, $level) ) {
-								continue;
-							}
-						}
-					}
-					
+				if ( $name = mp_arr_get_value('name', $theme_data) ) {					
 					if ( is_multisite() && is_network_admin() ) {
-						$theme_list[basename($theme, '.css')] = array('path' => $theme, 'name' => $name);
+						$theme_list[ $key ] = array('path' => $theme, 'name' => $name);
 					} else {
-						$theme_list[basename($theme, '.css')] = $name;
+						$theme_list[ $key ] = $name;
 					}
 				}
 			}
 		}
 		
-		asort($theme_list);
+		asort( $theme_list );
 		
-		return $theme_list;		 
+		/**
+		 * Filter the theme list
+		 *
+		 * @since 3.0
+		 * @param array $theme_list An array of themes.
+		 */
+		return apply_filters( 'mp_get_theme_list', $theme_list );		 
 	 }
-endif;
-
-if ( ! function_exists('mp_is_pro_site') ) :
-	/**
-	 * Check if the is_pro_site() function exists and if so calls it
-	 *
-	 * @since 3.0
-	 */
-	function mp_is_pro_site( $blog_id = false, $level = false ) {
-		if ( ! function_exists('is_pro_site') ) {
-			return true;
-		}
-		
-		return is_pro_site($blog_id, $level);
-	}
 endif;
 
 if ( ! function_exists('mp_is_valid_zip') ) :
@@ -942,9 +923,10 @@ if ( ! function_exists('mp_register_addon') ) :
 	 * Wrapper function for MP_Addons::register()
 	 * 
 	 * @since 3.0
+	 * @param array $args
 	 */
 	function mp_register_addon( $args = array() ) {
-		MP_Addons::get_instance()->register($args);
+		MP_Addons::get_instance()->register( $args );
 	}
 endif;
 
