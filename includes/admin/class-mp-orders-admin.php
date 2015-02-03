@@ -117,25 +117,21 @@ class MP_Orders_Admin {
 			return;
 		}
 		
+		$order = new MP_Order( $post_id );
 		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
 		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
 		
-		if ( empty( $tracking_num ) && empty( $shipment_method ) ) {
-			// Tracking num and shipment method are empty - bail
-			return;
-		}
-		
-		$order = new MP_Order( $post_id );
-		
-		// update tracking info
-		$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
-		$order->update_meta( 'mp_shipping_info->method', $shipment_method );
-		
-		// update status to shipped?
-		if ( ! empty( $tracking_num) && ! empty( $shipment_method ) && 'shipped' != $order->post_status && 'shipped' != mp_get_post_value( 'post_status' ) ) {
-			remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
-			$order->change_status( 'order_shipped', true );
-			add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+		if ( ! empty( $tracking_num ) && !empty( $shipment_method ) ) {
+			// update tracking info
+			$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
+			$order->update_meta( 'mp_shipping_info->method', $shipment_method );
+			
+			// update status to shipped?
+			if ( 'shipped' != $order->post_status && 'shipped' == mp_get_post_value( 'post_status' ) ) {
+				remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+				$order->change_status( 'order_shipped', true );
+				add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+			}			
 		}
 		
 		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
