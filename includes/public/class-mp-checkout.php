@@ -525,11 +525,10 @@ class MP_Checkout {
 			return;
 		}
 		
-		wp_register_script( 'jquery-cycle', mp_plugin_url( 'ui/js/jquery.cycle.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'jquery-validate', mp_plugin_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'jquery-validate-methods', mp_plugin_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery', 'jquery-validate' ), MP_VERSION, true );
 		wp_register_script( 'jquery-payment', mp_plugin_url( 'ui/js/jquery.payment.min.js' ), array( 'jquery' ), MP_VERSION, true );
-		wp_enqueue_script( 'mp-checkout', mp_plugin_url( 'ui/js/mp-checkout.js' ), array( 'jquery-payment', 'jquery-validate-methods', 'jquery-cycle' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-checkout', mp_plugin_url( 'ui/js/mp-checkout.js' ), array( 'jquery-payment', 'jquery-validate-methods' ), MP_VERSION, true );
 		
 		wp_localize_script( 'mp-checkout', 'mp_checkout_i18n', array(
 			'cc_num' => __( 'Please enter a valid credit card number', 'mp' ),
@@ -942,7 +941,7 @@ class MP_Checkout {
 	public function section_login_register() {
 		$html = '';
 		if ( ! is_user_logged_in() && ! MP_HIDE_LOGIN_OPTION ) { 
-			$html = wp_nonce_field( 'mp-login-nonce', 'mp_login_nonce' ) . '
+			$html = wp_nonce_field( 'mp-login-nonce', 'mp_login_nonce', true, false ) . '
 				<div class="clearfix">
 					<div class="mp-checkout-column" style="padding-right:25px">
 						<h4>' . __( 'Have an account?', 'mp') . '</h4>
@@ -955,7 +954,7 @@ class MP_Checkout {
 							<label for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
 							<input type="password" name="mp_login_password" />
 						</div>
-						<button id="mp-button-checkout-login" type="submit" class="mp-button mp-button-medium">' . __( 'Login', 'mp' ) . '</label>
+						<button id="mp-button-checkout-login" type="submit" class="mp-button mp-button-medium">' . __( 'Login', 'mp' ) . '</button>
 					</div>
 					<div class="mp-checkout-column" style="padding-left:25px">
 						<h4>' . __( 'First-time customer?', 'mp') . '</h4>
