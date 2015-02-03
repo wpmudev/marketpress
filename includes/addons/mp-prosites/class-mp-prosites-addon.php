@@ -49,8 +49,8 @@ class MP_Prosites_Addon {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function get_gateways( $gateways, $network_enabled ) {
-		if ( is_multisite() && ! mp_is_main_site() && $network_enabled ) {
+	public function get_gateways( $gateways ) {
+		if ( is_multisite() && ! is_network_admin() ) {
 			foreach ( $gateways as $code => $gateway ) {
 				$level = str_replace( 'psts_level_', '', mp_get_network_setting( 'allowed_gateways->' . $code, '' ) );
 				if ( $level != 'full' && ! is_pro_site( false, $level ) ) {
@@ -132,7 +132,7 @@ class MP_Prosites_Addon {
 		add_action( 'mp_addons/enable/MP_Prosites_Addon', array( &$this, 'on_enable' ) );
 		add_filter( 'mp_admin_multisite/theme_permissions_options', array( &$this, 'permissions_options' ) );
 		add_filter( 'mp_admin_multisite/gateway_permissions_options', array( &$this, 'permissions_options' ) );
-		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ), 10, 2 );
+		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 		add_filter( 'mp_get_theme_list', array( &$this, 'theme_list' ), 10, 2 );
 	}
 }
