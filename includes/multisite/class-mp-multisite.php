@@ -40,18 +40,13 @@ class MP_Multisite {
 	 * @access private
 	 */
 	private function __construct() {
-		if ( is_network_admin() ) {
-			// Network admin stuff
-			$this->maybe_install();
-		} elseif ( is_admin() ) {
-			if ( mp_doing_ajax() ) {
-				// Ajax stuff
-			} else {
-				// Non-ajax stuff
-			}
-		} else {
-			// Front end stuff
+		$this->maybe_install();
+		
+		if ( mp_get_network_setting( 'global_gateway' ) ) {
+			mp_cart()->is_global = true;
 		}
+		
+		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 	}
 
 	/**
@@ -85,6 +80,34 @@ class MP_Multisite {
 			switch_to_blog( $current_blog_id );
 		}
 	}
+	
+	/**
+	 * Filter out gateways that aren't allowed according to network admin settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_gateway_api/get_gateways
+	 */
+	public function get_gateways( $gateways ) {
+		if ( ! is_network_admin() ) {
+			if ( mp_cart()->is_global ) {
+				$code = mp_get_network_setting( 'global_gateway' );
+				$gateways = array( $code => $gateways[ $code ] );
+			} else {
+				$allowed = mp_get_network_setting( 'allowed_gateways' );
+				
+				if ( is_array( $allowed ) ) {
+					foreach ( $gateways as $code => $gateway ) {
+						if ( 'full' != $allowed[ $code ] ) {
+							unset( $gateways[ $code ] );
+						}
+					}
+				}
+			}
+		}
+		
+		return $gateways;
+	}
 
 	/**
 	 * Check to see if install sequence needs to be run
@@ -100,22 +123,46 @@ class MP_Multisite {
 			return;
 		}
 		
+		$this->ms_settings();
+		$this->ms_tables();
+		
 		switch ( $build ) {
-			case 1 :
-				if ( ! get_site_option( 'mp_network_settings' ) ) {
-					$this->initial_install();
-				}
-			break;
-			
 			case 2 :
 				$this->fix_bad_term_relationships();
 			break;
 		}
 		
-		$this->ms_tables();
-		
 		update_site_option( 'mp_network_build', $this->build );
 		update_option( 'mp_flush_rewrites', 1 );
+	}
+	
+	/**
+	 * Add/update network settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function ms_settings() {
+		$settings = get_site_option( 'mp_network_settings', array() );
+		
+		$default_settings = array(
+			'global_cart' => 0,
+			'allowed_gateways' => array(),
+			'global_gateway' => 'paypal_express',
+			'allowed_themes' => array(
+				'default3' => 'full',
+			),
+		);
+
+		$gateways = MP_Gateway_API::get_gateways();	
+		foreach ( $gateways as $code => $gateway ) {
+			$access = ( $gateway->plugin_name != 'paypal_express' ) ? 'none' : 'full';
+			mp_push_to_array( $default_settings, "allowed_gateways->{$code}", $access );
+		}
+				
+		$new_settings = array_replace_recursive( $default_settings, $settings );
+		
+		update_site_option( 'mp_network_settings', $new_settings );		
 	}
 	
 	/**
