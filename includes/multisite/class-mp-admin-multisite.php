@@ -41,10 +41,7 @@ class MP_Admin_Multisite {
 	 * @access private
 	 */
 	private function __construct() {
-		$this->maybe_update();
-
 		if ( is_network_admin() ) {
-			add_filter( 'wpmudev_field/after_field', array( &$this, 'display_create_page_button' ), 10, 2 );
 			add_action( 'init', array( &$this, 'init_metaboxes' ) );
 			add_action( 'network_admin_menu', array( &$this, 'add_menu_items' ) );
 			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
@@ -105,97 +102,26 @@ class MP_Admin_Multisite {
 	}
 
 	/**
-	 * Display "create page" button next to a given field
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @filter wpmudev_field/after_field
-	 * @uses $switched
-	 */
-	public function display_create_page_button( $html, $field ) {
-		switch ( $field->args[ 'original_name' ] ) {
-			case 'network_store_page' :
-				global $switched;
-
-				if ( get_current_blog_id() != mp_main_site_id() ) {
-					switch_to_blog( mp_main_site_id() );
-				}
-
-				if ( ($post_id = mp_get_network_setting( "network_store_page" )) && get_post_status( $post_id ) !== false ) {
-					$return = '<a target="_blank" class="button mp-edit-page-button" href="' . add_query_arg( array(
-						'post'	 => $post_id,
-						'action' => 'edit',
-					), get_admin_url( null, 'post.php' ) ) . '">' . __( 'Edit Page' ) . '</a>';
-				} else {
-					$return = '<a class="button mp-create-page-button" href="' . wp_nonce_url( get_admin_url( null, 'admin-ajax.php?action=mp_create_store_page&type=network_store_page' ), 'mp_create_store_page' ) . '">' . __( 'Create Page' ) . '</a>';
-				}
-
-				restore_current_blog();
-
-				return $return;
-				break;
-		}
-
-		return $html;
-	}
-
-	/**
-	 * Determines if the update script should be run
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function maybe_update() {
-		if ( !is_null( $this->build ) && $this->build != mp_get_network_setting( 'build' ) ) {
-			$old_settings		 = get_site_option( 'mp_network_settings', array() );
-			$settings			 = $this->update( $old_settings );
-			$settings[ 'build' ]	 = $this->build;
-			update_site_option( 'mp_network_settings', $settings );
-		}
-	}
-
-	/**
-	 * Updates any necessary settings
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @param array $settings
-	 * @return array
-	 */
-	public function update( $settings ) {
-		if ( $pro_levels = mp_get_network_setting( 'gateways_pro_level' ) ) {
-			foreach ( $pro_levels as $gateway => $level ) {
-				$settings[ 'allowed_gateways' ][ $gateway ] = 'psts_level_' . $level;
-			}
-
-			unset( $settings[ 'gateways_pro_level' ] );
-		}
-
-		return $settings;
-	}
-
-	/**
 	 * Initialize metaboxes
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
 	public function init_metaboxes() {
-		$this->init_general_settings_metaboxes();
-		$this->init_global_gateway_settings_metaboxes();
-		$this->init_gateway_permissions_metaboxes();
-		$this->init_theme_permissions_metaboxes();
-		$this->init_marketplace_slugs_metaboxes();
+		$this->init_general_settings_metabox();
+		$this->init_global_gateway_settings_metabox();
+		$this->init_gateway_permissions_metabox();
+		$this->init_theme_permissions_metabox();
 		do_action( 'mp_multisite_init_metaboxes' );
 	}
 
 	/**
-	 * Initialize general settings metaboxes
+	 * Initialize general settings metabox
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_general_settings_metaboxes() {
+	public function init_general_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'				 => 'mp-network-settings-general',
 			'page_slugs'		 => array( 'network-store-settings' ),
@@ -214,12 +140,12 @@ class MP_Admin_Multisite {
 	}
 
 	/**
-	 * Initialize global gateway metaboxes
+	 * Initialize global gateway metabox
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_global_gateway_settings_metaboxes() {
+	public function init_global_gateway_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'				 => 'mp-network-settings-global-gateway',
 			'page_slugs'		 => array( 'network-store-settings' ),
@@ -253,12 +179,12 @@ class MP_Admin_Multisite {
 	}
 
 	/**
-	 * Initialize gateway permissions metaboxes
+	 * Initialize gateway permissions metabox
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_gateway_permissions_metaboxes() {
+	public function init_gateway_permissions_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'				 => 'mp-network-settings-gateway-permissions',
 			'page_slugs'		 => array( 'network-store-settings' ),
@@ -277,46 +203,39 @@ class MP_Admin_Multisite {
 			'none'	 => __( 'No Access', 'mp' ),
 		);
 
-		if ( function_exists( 'psts_levels_select' ) ) {
-			$levels			 = get_site_option( 'psts_levels' );
-			$options_levels	 = array();
-
-			if ( is_array( $levels ) ) {
-				foreach ( $levels as $level => $value ) {
-					$options_levels[ 'psts_level_' . $level ] = $level . ':' . $value[ 'name' ];
-				}
-			}
-
-			$options_permissions[ 'supporter' ] = array(
-				'group_name' => __( 'Pro Site Level', 'mp' ),
-				'options'	 => $options_levels,
-			);
-		}
+		/**
+		 * Filter the gateway permissions options list
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param array $options_permissions An array of options.
+		 */
+		$options_permissions = apply_filters( 'mp_admin_multisite/gateway_permissions_options', $options_permissions );
 
 		$gateways = MP_Gateway_API::get_gateways();
 		foreach ( $gateways as $code => $gateway ) {
 			$metabox->add_field( 'select', array(
 				'name'		 => 'allowed_gateways[' . $code . ']',
-				'label'		 => array( 'text' => $gateway[ 1 ] ),
+				'label'		 => array( 'text' => $gateway[1] ),
 				'options'	 => $options_permissions,
 			) );
 		}
 	}
 
 	/**
-	 * Initialize theme permissions metaboxes
+	 * Initialize theme permissions metabox
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_theme_permissions_metaboxes() {
+	public function init_theme_permissions_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'				 => 'mp-network-settings-theme-permissions',
-			'page_slugs'		 => array( 'network-store-settings' ),
-			'title'				 => __( 'Theme Permissions', 'mp' ),
-			'site_option_name'	 => 'mp_network_settings',
-			'desc'				 => __( 'Set theme access permissions for network stores. For a custom css theme, save your css file with the <strong>MarketPress Theme: NAME</strong> header in the <strong>/marketpress/ui/themes/</strong> folder and it will appear in this list so you may select it.', 'mp' ),
-			'order'				 => 15,
+			'id'				 		=> 'mp-network-settings-theme-permissions',
+			'page_slugs'		 	=> array( 'network-store-settings' ),
+			'title'				 	=> __( 'Theme Permissions', 'mp' ),
+			'site_option_name' 	=> 'mp_network_settings',
+			'desc'				 	=> __( 'Set theme access permissions for network stores. For a custom css theme, save your css file with the <strong>MarketPress Theme: NAME</strong> header in the <strong>/marketpress/ui/themes/</strong> folder and it will appear in this list so you may select it.', 'mp' ),
+			'order'				 	=> 15,
 		) );
 
 		$theme_list = mp_get_theme_list();
@@ -325,22 +244,15 @@ class MP_Admin_Multisite {
 			'full'	 => __( 'All Can Use', 'mp' ),
 			'none'	 => __( 'No Access', 'mp' ),
 		);
-
-		if ( function_exists( 'psts_levels_select' ) ) {
-			$levels			 = get_site_option( 'psts_levels' );
-			$options_levels	 = array();
-
-			if ( is_array( $levels ) ) {
-				foreach ( $levels as $level => $value ) {
-					$options_levels[ 'psts_level_' . $level ] = $level . ':' . $value[ 'name' ];
-				}
-			}
-
-			$options_permissions[ 'supporter' ] = array(
-				'group_name' => __( 'Pro Site Level', 'mp' ),
-				'options'	 => $options_levels,
-			);
-		}
+		
+		/**
+		 * Filter the theme permissions options list
+		 *
+		 * @since 3.0
+		 * @access public
+		 * @param array $options_permissions An array of options.
+		 */
+		$options_permissions = apply_filters( 'mp_admin_multisite/theme_permissions_options', $options_permissions );
 
 		foreach ( $theme_list as $value => $theme ) {
 			$metabox->add_field( 'select', array(
@@ -350,50 +262,6 @@ class MP_Admin_Multisite {
 				'options'	 => $options_permissions,
 			) );
 		}
-	}
-
-	/**
-	 * Initialize marketplace pages metaboxes
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function init_marketplace_slugs_metaboxes() {
-		$metabox = new WPMUDEV_Metabox( array(
-			'id'				 => 'mp-network-settings-slugs',
-			'page_slugs'		 => array( 'network-store-settings' ),
-			'title'				 => __( 'Global MarketPlace Pages', 'mp' ),
-			'site_option_name'	 => 'mp_network_settings',
-			'order'				 => 15,
-		) );
-
-		$metabox->add_field( 'post_select', array(
-			'name'			 => 'network_store_page',
-			'label'			 => array( 'text' => __( 'Network Store Page', 'mp' ) ),
-			'desc'			 => __( 'This page will be used as the root for your global market place', 'mp' ),
-			'query'			 => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder'	 => __( 'Choose a Page', 'mp' ),
-		) );
-
-		$network_page_slug = home_url();
-
-		if ( $network_page = mp_get_network_setting( 'network_store_page' ) ) {
-			$network_page_slug = '/' . trailingslashit( get_page_uri( $network_page ) );
-		}
-
-		$metabox->add_field( 'text', array(
-			'name'			 => 'slugs[categories]',
-			'label'			 => array( 'text' => __( 'Product Categories', 'mp' ) ),
-			'custom'		 => array( 'style' => 'width:150px' ),
-			'before_field'	 => '<span class="mp-network-store-page-slug">' . $network_page_slug . '</span>',
-		) );
-
-		$metabox->add_field( 'text', array(
-			'name'			 => 'slugs[tags]',
-			'label'			 => array( 'text' => __( 'Product Tags', 'mp' ) ),
-			'custom'		 => array( 'style' => 'width:150px' ),
-			'before_field'	 => '<span class="mp-network-store-page-slug">' . $network_page_slug . '</span>',
-		) );
 	}
 
 	/**
@@ -420,14 +288,14 @@ class MP_Admin_Multisite {
 			<div class="clear"></div>
 			<div class="mp-settings">
 				<form id="mp-main-form" method="post" action="<?php echo add_query_arg( array() ); ?>">
-		<?php
-		/**
-		 * Render WPMUDEV Metabox settings
-		 *
-		 * @since 3.0
-		 */
-		do_action( 'wpmudev_metabox/render_settings_metaboxes' );
-		?>
+					<?php
+					/**
+					 * Render WPMUDEV Metabox settings
+					 *
+					 * @since 3.0
+					 */
+					do_action( 'wpmudev_metabox/render_settings_metaboxes' );
+					?>
 				</form>
 			</div>
 		</div>
