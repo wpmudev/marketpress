@@ -948,7 +948,7 @@ class MP_Checkout {
 						<h4>' . __( 'Have an account?', 'mp') . '</h4>
 						<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
 						<div class="mp-checkout-form-row">
-							<label for="mp-checkout-email">' . __('E-Mail Address', 'mp') . '</label>
+							<label for="mp-checkout-email">' . __('E-Mail Address/Username', 'mp') . '</label>
 							<input type="text" name="mp_login_email" />
 						</div>
 						<div class="mp-checkout-form-row">
