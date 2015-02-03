@@ -42,7 +42,7 @@ class MP_Multisite {
 	private function __construct() {
 		$this->maybe_install();
 		
-		if ( mp_get_network_setting( 'global_gateway' ) ) {
+		if ( mp_get_network_setting( 'global_cart' ) ) {
 			mp_cart()->is_global = true;
 		}
 		
