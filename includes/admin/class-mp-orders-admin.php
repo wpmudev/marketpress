@@ -68,6 +68,58 @@ class MP_Orders_Admin {
 	}
 	
 	/**
+	 * Save customer info metabox
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param MP_Order $order
+	 */
+	protected function _save_customer_info_metabox( $order ) {
+		$order->update_meta( 'mp_billing_info', mp_get_post_value( 'mp->billing_info' ) );
+		$order->update_meta( 'mp_shipping_info', mp_get_post_value( 'mp->shipping_info' ) );		
+	}
+	
+	/**
+	 * Save order notes metabox
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param MP_Order $order
+	 */
+	protected function _save_order_notes_metabox( $order ) {
+		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
+		if ( ! empty( $order_notes ) ) {
+			$order->update_meta( 'mp_order_notes',  $order_notes );
+		} else {
+			$order->delete_meta( 'mp_order_notes' );
+		}
+	}
+	
+	/**
+	 * Save shipping info metabox
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @param MP_Order $order
+	 */
+	protected function _save_shipping_info_metabox( $order ) {
+		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
+		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
+		if ( ! empty( $tracking_num ) && !empty( $shipment_method ) ) {
+			// update tracking info
+			$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
+			$order->update_meta( 'mp_shipping_info->method', $shipment_method );
+			
+			// update status to shipped?
+			if ( 'shipped' != $order->post_status && 'shipped' == mp_get_post_value( 'post_status' ) ) {
+				remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+				$order->change_status( 'order_shipped', true );
+				add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+			}			
+		}		
+	}
+	
+	/**
 	 * Display the export order form
 	 *
 	 * @since 3.0
@@ -118,28 +170,10 @@ class MP_Orders_Admin {
 		}
 		
 		$order = new MP_Order( $post_id );
-		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
-		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
 		
-		if ( ! empty( $tracking_num ) && !empty( $shipment_method ) ) {
-			// update tracking info
-			$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
-			$order->update_meta( 'mp_shipping_info->method', $shipment_method );
-			
-			// update status to shipped?
-			if ( 'shipped' != $order->post_status && 'shipped' == mp_get_post_value( 'post_status' ) ) {
-				remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
-				$order->change_status( 'order_shipped', true );
-				add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
-			}			
-		}
-		
-		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
-		if ( ! empty( $order_notes ) ) {
-			$order->update_meta( 'mp_order_notes',  $order_notes );
-		} else {
-			$order->delete_meta( 'mp_order_notes' );
-		}
+		$this->_save_shipping_info_metabox( $order );
+		$this->_save_order_notes_metabox( $order );
+		$this->_save_customer_info_metabox( $order );
 	}
 	
 	/**
