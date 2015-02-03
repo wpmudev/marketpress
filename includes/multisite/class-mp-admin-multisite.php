@@ -47,6 +47,19 @@ class MP_Admin_Multisite {
 			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 			add_action( 'wpmudev_field/print_scripts/network_store_page', array( &$this, 'print_network_store_page_scripts' ) );
 		}
+		
+		add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway'), 10, 4 );
+	}
+	
+	/**
+	 * Force check the global gateway
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wpmudev_field/get_value/gateways[allowed][ {global_gateway} ]
+	 */
+	public function force_check_global_gateway( $value, $post_id, $raw, $field ) {
+		return 1;
 	}
 
 	/**
