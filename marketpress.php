@@ -312,29 +312,14 @@ class Marketpress {
 		if ( mp_get_setting('disable_cart') ) {
 			return;
 		}
-		
-		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
+
+		require_once $this->plugin_dir('includes/common/payment-gateways/class-mp-gateway-api.php');		
 		mp_include_dir($this->plugin_dir('includes/common/payment-gateways'));
-		
-		/**
-		 * Fires after internal gateway plugins are loaded
-		 *
-		 * @since 3.0
-		 */
-		do_action('mp_load_gateway_plugins');
-		
 		MP_Gateway_API::load_active_gateways();
-		
-		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
+
+		require_once $this->plugin_dir('includes/common/shipping-modules/class-mp-shipping-api.php');
+		require_once $this->plugin_dir('includes/common/shipping-modules/class-mp-shipping-api-calculated.php');		
 		mp_include_dir($this->plugin_dir('includes/common/shipping-modules'));
-		
-		/**
-		 * Fires after internal shipping plugins are loaded
-		 *
-		 * @since 3.0
-		 */
-		do_action('mp_load_shipping_plugins');
-		
 		MP_Shipping_API::load_active_plugins();
 	}
 	
@@ -549,8 +534,6 @@ class Marketpress {
 		require_once $this->plugin_dir('includes/common/class-mp-order.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
-		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
-		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
 		require_once $this->plugin_dir('includes/common/class-mp-cart.php');
 		require_once $this->plugin_dir('includes/common/template-functions.php');
 		

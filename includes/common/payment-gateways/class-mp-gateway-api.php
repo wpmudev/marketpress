@@ -45,14 +45,6 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		private static $_active_gateways = array();
 
 		/**
-		 * Refers to the gateways that are loaded for the admin only (we need to load all the gateways for their settings)
-		 *
-		 * @since 3.0
-		 * @access private
-		 */
-		private static $_active_gateways_admin = array();
-
-		/**
 		 * Registers a gateway
 		 *
 		 * @since 3.0
@@ -67,18 +59,16 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 *
 		 * @since 3.0
 		 * @access public
-		 * @param bool $network_enabled If multisite installation, only get gateways that are enabled in the store network settings.
 		 * @return array
 		 */
-		public static function get_gateways( $network_enabled = false ) {
+		public static function get_gateways() {
 			/**
-			 * Filter the gateways list
+			 * Filter the list of registered gateways
 			 *
 			 * @since 3.0
-			 * @param array An array of gateways.
-			 * @param bool If multisite installation, only get gateways that are enabled in the store network settings. 
+			 * @param array An array of registered gateways.
 			 */
-			return apply_filters( 'mp_gateway_api/get_gateways', self::$_gateways, $network_enabled );
+			return apply_filters( 'mp_gateway_api/get_gateways', self::$_gateways );
 		}
 
 		/**
@@ -95,29 +85,18 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 			}
 
 			$gateways = mp_get_setting( 'gateways' );
-			$network_enabled = ( is_multisite() && !mp_is_main_site() && !is_super_admin() ) ? true : false;
-
-			foreach ( self::get_gateways( $network_enabled ) as $code => $plugin ) {
-				$class = $plugin[ 0 ];
-
-				// If global cart is enabled force it
-				if ( mp_cart()->is_global ) {
-					if ( $code == mp_get_network_setting( 'global_gateway' ) && class_exists( $class ) ) {
-						self::$_active_gateways[ $code ] = new $class;
-						break;
-					}
-				} elseif ( !is_network_admin() ) {
-					if ( is_admin() && !mp_doing_ajax( 'mp_update_checkout_data' ) && class_exists( $class ) && !array_key_exists( $code, self::$_active_gateways ) ) {
-						// Load all gateways for admin
-						self::$_active_gateways_admin[ $code ] = new $class;
-					} elseif ( mp_arr_get_value( "allowed->{$code}", $gateways ) && class_exists( $class ) && !$plugin[ 3 ] ) {
-						self::$_active_gateways[ $code ] = new $class;
-					}
-				} elseif ( is_network_admin() ) {
-					if ( !$plugin[ 2 ] ) {
-						continue;
-					}
-
+			
+			foreach ( self::get_gateways() as $code => $plugin ) {
+				$class = $plugin[0];
+				
+				if ( ! class_exists( $class ) ) {
+					continue;
+				}
+				
+				if ( is_admin() && 'store-settings-payments' == mp_get_get_value( 'page' ) ) {
+					// load all gateways when in admin
+					self::$_active_gateways[ $code ] = new $class;
+				} elseif ( mp_arr_get_value( "allowed->{$code}", $gateways ) ) {
 					self::$_active_gateways[ $code ] = new $class;
 				}
 			}
