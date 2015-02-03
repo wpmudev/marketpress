@@ -429,6 +429,10 @@ var mp_checkout;
 						$checkout = $( '#mp-checkout' ),
 						$submit = $checkout.find( ':submit' ).filter( ':visible' );
 				
+				if ( ! $checkout.hasClass( 'last-step' ) ) {
+					return;
+				}
+				
 				$target.show().siblings( '.mp_gateway_form' ).hide();
 				
 				if ( $target.find( '.mp-input-error' ).filter( ':visible' ).length > 0 ) {
