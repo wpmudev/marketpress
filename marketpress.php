@@ -13,8 +13,8 @@ WDP ID: 144
 Copyright 2009-2015 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
-the Free Software Foundation.
+it under the terms of the GNU General Public License (Version 2 - GPLv2) as
+published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 */
 
-define('MP_VERSION', '3.0a.10');
+define( 'MP_VERSION', '3.0a.10' );
 
 class Marketpress {	
 	/**
@@ -312,29 +312,14 @@ class Marketpress {
 		if ( mp_get_setting('disable_cart') ) {
 			return;
 		}
-		
-		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
+
+		require_once $this->plugin_dir('includes/common/payment-gateways/class-mp-gateway-api.php');		
 		mp_include_dir($this->plugin_dir('includes/common/payment-gateways'));
-		
-		/**
-		 * Fires after internal gateway plugins are loaded
-		 *
-		 * @since 3.0
-		 */
-		do_action('mp_load_gateway_plugins');
-		
 		MP_Gateway_API::load_active_gateways();
-		
-		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
+
+		require_once $this->plugin_dir('includes/common/shipping-modules/class-mp-shipping-api.php');
+		require_once $this->plugin_dir('includes/common/shipping-modules/class-mp-shipping-api-calculated.php');		
 		mp_include_dir($this->plugin_dir('includes/common/shipping-modules'));
-		
-		/**
-		 * Fires after internal shipping plugins are loaded
-		 *
-		 * @since 3.0
-		 */
-		do_action('mp_load_shipping_plugins');
-		
 		MP_Shipping_API::load_active_plugins();
 	}
 	
@@ -378,12 +363,22 @@ class Marketpress {
 	 * @access public
 	 */
 	public function register_addons() {
-		mp_register_addon(array(
-			'label' => __('Coupons', 'mp'),
-			'desc' => __('Offer and accept coupon codes', 'mp'),
-			'class' => 'MP_Coupons',
-			'path' => mp_plugin_dir('includes/addons/mp-coupons/class-mp-coupons.php')
-		));		
+		mp_register_addon( array(
+			'label' => __( 'Coupons', 'mp' ),
+			'desc' => __( 'Offer and accept coupon codes', 'mp' ),
+			'class' => 'MP_Coupons_Addon',
+			'path' => mp_plugin_dir( 'includes/addons/mp-coupons/class-mp-coupons-addon.php' ),
+			'has_settings' => true,
+		) );
+		
+		if ( class_exists( 'ProSites' ) ) {
+			mp_register_addon( array(
+				'label' => __( 'Pro Sites', 'mp' ),
+				'desc' => __( 'Grant access to themes and gateways depending on the user\'s Pro Site level', 'mp' ),
+				'class' => 'MP_Prosites_Addon',
+				'path' => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
+			) );
+		}
 	}
 	
 	/**
@@ -460,15 +455,15 @@ class Marketpress {
 	 */
 	public function fix_insecure_images( $url, $post_id ) {
 		//Skip file attachments
-    if ( ! wp_attachment_is_image($post_id) ) {
-    	return $url;
-    }
-    
-    if ( is_ssl() ) {
-	    $url = str_replace('http://', 'https://', $url);
-    }
-    
-    return $url;
+	    if ( ! wp_attachment_is_image( $post_id ) ) {
+	    	return $url;
+	    }
+	    
+	    if ( is_ssl() ) {
+		    $url = str_replace( 'http://', 'https://', $url );
+	    }
+	    
+	    return $url;
 	}
 	
 	/**
@@ -482,7 +477,7 @@ class Marketpress {
 		$flush_rewrites = get_option( 'mp_flush_rewrites' );
 		
 		if ( $flush_rewrites === false ) {
-			// option doesn't exist - flush rewrites and option to db
+			// option doesn't exist - flush rewrites and add option to db
 			$flush_rewrites = true;
 			add_option( 'mp_flush_rewrites', 0 );
 		}
@@ -521,7 +516,7 @@ class Marketpress {
 		/* There is a small bug in WP core with the get_user_metadata filter that
 		will raise a PHP notice if an associative array is returned and $single is
 		set to true. This is because WP core assumes that the returned array will
-		be numerically index. */
+		be numerically indexed. */
 		return ( $single && is_array( $meta ) ) ? array( $meta ) : $meta;
 	}
 	
@@ -533,24 +528,27 @@ class Marketpress {
 	 */
 	public function includes() {
 		require_once $this->plugin_dir('includes/wpmudev-metaboxes/wpmudev-metabox.php');
+		require_once $this->plugin_dir('includes/common/class-mp-mailer.php');
 		require_once $this->plugin_dir('includes/common/helpers.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product-attributes.php');		
-		require_once $this->plugin_dir('includes/common/class-mp-addons.php');
+		require_once $this->plugin_dir('includes/addons/class-mp-addons.php');
 		require_once $this->plugin_dir('includes/common/class-mp-order.php');
 		require_once $this->plugin_dir('includes/common/class-mp-product.php');
 		require_once $this->plugin_dir('includes/common/class-mp-installer.php');
-		require_once $this->plugin_dir('includes/common/class-mp-shipping-api.php');
-		require_once $this->plugin_dir('includes/common/class-mp-gateway-api.php');
 		require_once $this->plugin_dir('includes/common/class-mp-cart.php');
 		require_once $this->plugin_dir('includes/common/template-functions.php');
+		
+		if ( is_multisite() ) {
+			require_once $this->plugin_dir('includes/multisite/class-mp-multisite.php');
+			
+			if ( is_admin() ) {
+				require_once $this->plugin_dir('includes/multisite/class-mp-admin-multisite.php');
+			}
+		}
 		
 		if ( is_admin() ) {
 			require_once $this->plugin_dir('includes/admin/class-mp-admin.php');
 			require_once $this->plugin_dir('includes/admin/class-mp-pages-admin.php');
-			
-			if ( is_multisite() ) {
-				require_once $this->plugin_dir('includes/admin/class-mp-admin-multisite.php');
-			}
 			
 			if ( mp_doing_ajax() ) {
 				require_once $this->plugin_dir('includes/admin/class-mp-ajax.php');
@@ -604,7 +602,7 @@ class Marketpress {
 			break;
 			
 			case 'generate_order_id' :
-				_deprecated_function( $method, '3.0', 'MP_Order' );
+				_deprecated_function( $method, '3.0', 'MP_Order::get_id' );
 				$order = new MP_Order();
 				return $order->get_id();
 			break;

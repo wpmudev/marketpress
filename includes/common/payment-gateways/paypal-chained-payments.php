@@ -10,7 +10,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	//build
 	var $build					 = 2;
 	//private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-	var $plugin_name				 = 'paypal-chained';
+	var $plugin_name				 = 'paypal_chained';
 	//name of your gateway, for the admin side.
 	var $admin_name				 = '';
 	//public name of your gateway, for lists and such.
@@ -91,7 +91,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		);
 
 		//set api urls
-		//if ( mp_get_setting( 'gateways->paypal-chained->mode' ) == 'sandbox' ) {
+		//if ( mp_get_setting( 'gateways->paypal_chained->mode' ) == 'sandbox' ) {
 		if ( $this->get_setting( 'mode' ) == 'sandbox' ) {
 			$this->API_Endpoint	 = "https://svcs.sandbox.paypal.com/AdaptivePayments/";
 			$this->paypalURL	 = "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey=";
@@ -379,10 +379,10 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	function update( $settings ) {
 		if ( ($mode	 = $this->get_setting( 'mode' )) && ($email	 = $this->get_setting( 'email' )) ) {
 			// Update api user
-			mp_push_to_array( $settings, 'gateways->paypal-chained->email', $email );
+			mp_push_to_array( $settings, 'gateways->paypal_chained->email', $email );
 
 			// Update api pass
-			mp_push_to_array( $settings, 'gateways->paypal-chained->mode', $mode );
+			mp_push_to_array( $settings, 'gateways->paypal_chained->mode', $mode );
 
 			// Unset old keys
 			unset( $settings[ 'gateways' ][ 'paypal-chained' ][ 'email' ], $settings[ 'gateways' ][ 'paypal-chained' ][ 'mode' ] );
@@ -609,10 +609,6 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
 	//Purpose: 	Prepares the parameters for the Pay API Call.
 	function Pay( $cart, $shipping_info, $order_id ) {
-
-		$settings			 = get_option( 'mp_settings' );
-		$network_settings	 = get_site_option( 'mp_network_settings' );
-
 		$nvpstr = "actionType=PAY";
 		$nvpstr .= "&returnUrl=" . $this->returnURL;
 		$nvpstr .= "&cancelUrl=" . $this->cancelURL;
@@ -627,15 +623,16 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$base_total	 = $cart->product_total( false );
 
 		//calculate fees / get fees only for base price (excluding taxes and shipping)
-		$fee = round( ($network_settings[ 'gateways' ][ 'paypal-chained' ][ 'percentage' ] * 0.01) * $base_total, 2 );
+		$percentage = $this->get_network_setting( 'percentage', 0 );
+		$fee = round( $percentage * 0.01 * $base_total, 2 );
 
-		$nvpstr .= "&receiverList.receiver(0).email=" . urlencode( $settings[ 'gateways' ][ 'paypal-chained' ][ 'email' ] );
+		$nvpstr .= "&receiverList.receiver(0).email=" . urlencode( $this->get_setting( 'email' ) );
 		$nvpstr .= "&receiverList.receiver(0).amount=" . round( $total, 2 );
 		$nvpstr .= "&receiverList.receiver(0).invoiceId=" . $order_id;
 		$nvpstr .= "&receiverList.receiver(0).paymentType=GOODS";
 		$nvpstr .= "&receiverList.receiver(0).primary=true";
 
-		$nvpstr .= "&receiverList.receiver(1).email=" . urlencode( $network_settings[ 'gateways' ][ 'paypal-chained' ][ 'email' ] );
+		$nvpstr .= "&receiverList.receiver(1).email=" . urlencode( $this->get_network_setting( 'email' ) );
 		$nvpstr .= "&receiverList.receiver(1).amount=" . $fee;
 		$nvpstr .= "&receiverList.receiver(1).paymentType=SERVICE";
 		$nvpstr .= "&receiverList.receiver(1).primary=false";
@@ -699,7 +696,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 }
 
 //only load on multisite
-if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
+if ( is_multisite() && ! mp_cart()->is_global ) {
 
 	//set names here to be able to translate
 	if ( is_super_admin() ) {
@@ -721,12 +718,11 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			$part = '[' . $part . ']';
 		}
 
-		return "gateways[paypal-chained]" . implode( $name_parts );
+		return "gateways[paypal_chained]" . implode( $name_parts );
 	}
 
 	//multisite network options
 	function init_paypal_chained_payments_network_settings_metaboxes() {
-
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'				 => 'mp-network-settings-paypal-chained-payments',
 			'page_slugs'		 => array( 'network-store-settings' ),
@@ -735,9 +731,16 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 			'site_option_name'	 => 'mp_network_settings',
 			'order'				 => 16,
 			'conditional'		 => array(
-				'name'	 => 'global_cart',
-				'value'	 => '1',
-				'action' => 'hide',
+				'operator' => 'AND',
+				'action' => 'show',
+				array(
+					'name'	 => 'global_cart',
+					'value'	 => 1,
+				),
+				array(
+					'name' => 'global_gateway',
+					'value' => 'paypal_chained',
+				),
 			),
 		) );
 
@@ -842,4 +845,4 @@ if ( is_multisite() && !mp_get_network_setting( 'global_cart' ) ) {
 }
 
 //register shipping plugin
-mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', __( 'PayPal Chained Payments', 'mp' ), true );
+mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal_chained', __( 'PayPal Chained Payments', 'mp' ), true );

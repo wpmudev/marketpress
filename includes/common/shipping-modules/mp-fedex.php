@@ -1,7 +1,5 @@
 <?php
 	
-require_once mp_plugin_dir( 'includes/common/class-mp-shipping-api-calculated.php' );
-
 class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
 	//build of the plugin
 	public $build = 2;

@@ -333,7 +333,7 @@ class MP_Coupon {
 		} elseif ( $this->get_meta('has_end_date') && ($now > strtotime($this->get_meta('end_date', 0, false))) ) {
 			$is_valid = false;
 		} elseif ( ! $this->get_meta('can_be_combined') ) {
-			$applied = mp_coupons()->get_applied_as_objects();
+			$applied = mp_coupons_addon()->get_applied_as_objects();
 			
 			if ( count($applied) == 1 ) {
 				//! TODO: make sure this coupon can be combined with coupons that are already applied

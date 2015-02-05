@@ -1153,7 +1153,7 @@ class MP_Cart {
 		
 		if ( mp_get_setting( 'tax->tax_shipping' ) && ($shipping_price = $this->shipping_total() ) ) {
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-				$shipping_tax = ($shipping_price - $this->before_tax_price( $shipping_price ));
+				$shipping_tax = ($shipping_price - mp_before_tax_price( $shipping_price ));
 			} else {
 				$shipping_tax = ($shipping_price * (float) mp_get_setting( 'tax->rate' ));
 			}
@@ -1301,36 +1301,26 @@ class MP_Cart {
 				}
 			}
 	
-			$totals = $special_totals = array();
+			$total = $special_total = 0;
 		 
 			foreach ( $items as $item ) {
 				//check for special rate
 				$special_rate = (float) $item->get_meta('special_tax_rate');
-				$special = false;
-				
-				if ( $special_rate > 0 ) {
-					$special = true;
-				}
 				
 				// If not taxing digital goods, skip them completely
 				if ( ! mp_get_setting('tax->tax_digital') && $item->is_download() ) {
 					continue;
 				}
 	
-				$price = $item->get_price('lowest');
-				$product_price = $this->cart_price($price, $item->qty);
+				$product_price = ($item->before_tax_price() * $item->qty);
 			
-				if ( $special ) {
-					$special_totals[] = $product_price * $special_rate;
+				if ( $special_rate > 0 ) {
+					$special_total += ($product_price * $special_rate);
 				} else {
-					$totals[] = $product_price;
+					$total += $product_price;
 				}
 			}
 			
-			$total = array_sum($totals);
-			$special_total = array_sum($special_totals);
-			
-			//estimate?
 			if ( $estimate ) {
 				if ( empty($country) ) {
 					$country = mp_get_setting('base_country');

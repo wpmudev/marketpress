@@ -6,14 +6,12 @@ if ( ! class_exists('WP_List_Table') ) {
 
 class MP_Addons_List_Table extends WP_List_Table {
 	function __construct() {
-		global $status, $page;
-                
-    //Set parent defaults
-    parent::__construct(array(
-    	'singular' => 'mp_addon',	//singular name of the listed records
+		//Set parent defaults
+		parent::__construct(array(
+		 	'singular' => 'mp_addon',	//singular name of the listed records
 			'plural' => 'mp_addons',	//plural name of the listed records
-			'ajax' => false						//does this table support ajax?
-    ));	
+			'ajax' => false				//does this table support ajax?
+		));	
 	}
 	
 	function get_columns() {
@@ -55,6 +53,7 @@ class MP_Addons_List_Table extends WP_List_Table {
 				'label' => $addon->label,
 				'desc' => $addon->desc,
 				'class' => $addon->class,
+				'has_settings' => $addon->has_settings,
 				'status' => $status,
 				'enabled' => $enabled,
 			);
@@ -84,6 +83,10 @@ class MP_Addons_List_Table extends WP_List_Table {
 				$notice = sprintf(_n('1 add-on disabled', '%s add-ons disabled', $count, 'mp'), $count);
 			break;
 		}
+		
+		/* Get the data again - otherwise the list table won't display the correct
+		enabled/disabled addons */
+		$this->get_data();
 		
 		echo '<div class="updated"><p>' .  $notice . '</p></div>';
 	}
@@ -115,6 +118,10 @@ class MP_Addons_List_Table extends WP_List_Table {
 	}
 	
 	function column_settings( $item ) {
-		return '<a href="' . add_query_arg('addon', $item['class']) . '">' . __('Settings', 'mp') . '</a>';
+		if ( mp_addons()->is_addon_enabled( $item['class'] ) && $item['has_settings'] ) {
+			return '<a href="' . add_query_arg( array( 'page' => 'store-settings-addons', 'addon' => $item['class'] ), admin_url( 'admin.php' ) ) . '">' . __( 'Settings', 'mp' ) . '</a>';
+		}
+		
+		return '';
 	}
 }

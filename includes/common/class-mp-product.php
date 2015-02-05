@@ -521,6 +521,33 @@ class MP_Product {
 		return $weight;
 	}
 
+	/**
+	 * Get the product price before tax
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	public function before_tax_price() {
+		$price = $this->get_price( 'lowest' );
+		
+		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
+			// tax inclusve pricing is turned off - just return given price
+			return $price;
+		}
+		
+		$rate = (float) $this->get_meta( 'special_tax_rate' );
+		if ( $rate == 0 ) {
+			if	( 'CA' == mp_get_setting( 'tax->base_country' ) ) {
+				$rate = mp_get_setting( 'tax->canada_rate->' . mp_get_setting( 'base_province' ) );
+			} else {
+				$rate = mp_get_setting( 'tax->rate' );
+			}
+		}
+		
+		return mp_before_tax_price( $price, $rate );
+	}
+	
 	/*
 	 * Displays the buy or add to cart button
 	 *

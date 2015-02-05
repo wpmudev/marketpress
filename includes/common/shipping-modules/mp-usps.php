@@ -4,10 +4,6 @@ MarketPress USPS Calculated Shipping Plugin
 Author: Arnold Bailey (Incsub)
 */
 
-if ( ! class_exists('MP_Shipping_API_Calculated') ) {
-	require_once mp_plugin_dir('includes/common/class-mp-shipping-api-calculated.php');	
-}
-
 class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	//build of the plugin
 	public $build = 2;

@@ -31,7 +31,8 @@ class MP_Store_Settings_Payments {
 	 * @access private
 	 */
 	private function __construct() {
-		add_action('init', array(&$this, 'add_metaboxes'));
+		add_action( 'init', array( &$this, 'add_metaboxes' ) );
+		add_action( 'admin_head', array( &$this, 'print_styles' ) );
 	}
 	
 	/**
@@ -63,6 +64,22 @@ class MP_Store_Settings_Payments {
 			'options' => $options,
 			'width' => '50%',
 		));
+	}
+	
+	/**
+	 * Print styles
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_head
+	 */
+	public function print_styles() {
+		if ( 'store-settings_page_store-settings-payments' != get_current_screen()->id || ! mp_cart()->is_global ) {
+			// bail - either not on payments settings screen or global cart is not enabled
+			return;
+		}
+		
+		echo '<style type="text/css">#mp-settings-payments, #mp-settings-payments + p.submit { display: none; }</style>';
 	}
 }
 

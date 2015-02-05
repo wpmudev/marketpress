@@ -386,10 +386,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	function init_network_settings_metabox() {
 		 $metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'page_slugs' => array('network-store-settings-network', 'settings_page_network-store-settings-network'),
+			'page_slugs' => array('network-store-settings'),
 			'title' => __('Paypal Express Network Settings', 'mp'),
 			'site_option_name' => 'mp_network_settings',
 			'desc' => __('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">More Info &raquo;</a>', 'mp'),
+			'order' => 16,
 			'conditional' => array(
 				'operator' => 'AND',
 				'action' => 'show',
@@ -415,7 +416,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	function init_settings_metabox() {
 		 $metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
+			'page_slugs' => array('store-settings-payments'),
 			'title' => __('Paypal Express Checkout Settings', 'mp'),
 			'option_name' => 'mp_settings',
 			'desc' => __('Express Checkout is PayPal\'s premier checkout solution, which streamlines the checkout process for buyers and keeps them on your site after making a purchase. Unlike PayPal Pro, there are no additional fees to use Express Checkout, though you may need to do a free upgrade to a business account. <a target="_blank" href="https://developer.paypal.com/webapps/developer/docs/classic/api/apiCredentials/">More Info &raquo;</a>', 'mp'),
@@ -425,7 +426,19 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				'action' => 'show',
 			),
 		));
-		$this->common_metabox_fields($metabox);
+		
+		if ( mp_cart()->is_global ) {
+			$metabox->add_field( 'text', array(
+				'name' => $this->get_field_name( 'merchant_email' ),
+				'label' => array( 'text' => __( 'Merchant Email', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+					'email' => true,
+				),
+			) );
+		} else {
+			$this->common_metabox_fields( $metabox );
+		}
 	}
 
 	/**

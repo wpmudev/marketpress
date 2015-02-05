@@ -45,9 +45,6 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		$this->admin_name	 = __( 'Stripe', 'mp' );
 		$this->public_name	 = __( 'Credit Card', 'mp' );
 
-		$this->method_img_url		 = mp_plugin_url( 'images/credit_card.png' );
-		$this->method_button_img_url = mp_plugin_url( 'images/cc-button.png' );
-
 		$this->publishable_key	 = $this->get_setting( 'api_credentials->publishable_key' );
 		$this->secret_key		 = $this->get_setting( 'api_credentials->secret_key' );
 		$this->force_ssl		 = (bool) $this->get_setting( 'is_ssl' );
@@ -199,7 +196,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	}
 
 	function enqueue_scripts() {
-		if ( !mp_is_shop_page( 'checkout' ) ) {
+		if ( ! mp_is_shop_page( 'checkout' ) ) {
 			return;
 		}
 
@@ -353,7 +350,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		);
 
 		// Get tax price, if applicable
-		if ( !mp_get_setting( 'tax->tax_inclusive' ) ) {
+		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
 			$totals[ 'tax_price' ] = $cart->tax_total( false );
 		}
 
