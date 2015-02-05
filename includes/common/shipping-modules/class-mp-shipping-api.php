@@ -89,7 +89,7 @@ if ( ! class_exists( 'MP_Shipping_API' ) ) {
 				/* global cart is being used so we need to go through the cart contents and
 				get the active shipping method for each blog in the cart */
 				
-				$cart = mp_cart()->get_items( true );
+				$cart = mp_cart()->get_all_items();
 				$blogs = array_keys( $cart );
 				$current_blog_id = get_current_blog_id();
 				$methods = array();
