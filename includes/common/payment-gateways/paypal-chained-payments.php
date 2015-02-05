@@ -302,13 +302,13 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	}
 
 	/**
-	 * Return the chosen payment details here for final confirmation. You probably don't need
-	 * 	to post anything in the form as it should be in your $_SESSION var already.
+	 * Get the confirm order html
 	 *
-	 * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
-	 * @param array $shipping_info. Contains shipping info and email in case you need it
+	 * @since 3.0
+	 * @access public
+	 * @filter mp_checkout/confirm_order_html/{plugin_name}
 	 */
-	function confirm_order_html( $cart, $shipping_info ) {
+	public function confirm_order_html( $html ) {
 		//print payment details
 		$html = '<a href="#" onclick="javascript:window.open(\'https://www.paypal.com/cgi-bin/webscr?cmd=xpt/Marketing/popup/OLCWhatIsPayPal-outside\',\'olcwhatispaypal\',\'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=400, height=350\');return false;"><img	 src="https://www.paypal.com/en_US/i/bnr/horizontal_solution_PPeCheck.gif" border="0" alt="PayPal"></a>';
 		//$html .= parent::confirm_order_html( $html );

@@ -149,7 +149,7 @@ class MP_Product {
 	 * @access public
 	 * @action wp_ajax_mp_product_update_attributes, wp_ajax_nopriv_mp_product_update_attributes
 	 */
-	public function ajax_update_attributes() {
+	public static function ajax_update_attributes() {
 		$product_atts	 = MP_Product_Attributes::get_instance();
 		$all_atts		 = $product_atts->get();
 		$attributes		 = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
