@@ -150,10 +150,10 @@ class MP_Product {
 	 * @action wp_ajax_mp_product_update_attributes, wp_ajax_nopriv_mp_product_update_attributes
 	 */
 	public static function ajax_update_attributes() {
-		$product_atts	 = MP_Product_Attributes::get_instance();
-		$all_atts		 = $product_atts->get();
-		$attributes		 = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
-		$json			 = array(
+		$product_atts = MP_Product_Attributes::get_instance();
+		$all_atts = $product_atts->get();
+		$attributes = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
+		$json = array(
 			'out_of_stock'	 => false,
 			'qty_in_stock'	 => 0,
 			'image'			 => false,
@@ -161,9 +161,9 @@ class MP_Product {
 			'excerpt'		 => false,
 			'price'			 => false,
 		);
-		$product_id		 = mp_get_post_value( 'product_id' );
-		$qty			 = mp_get_post_value( 'product_quantity', 1 );
-		$qty_changed	 = (bool) mp_get_post_value( 'product_qty_changed' );
+		$product_id = mp_get_post_value( 'product_id' );
+		$qty = mp_get_post_value( 'product_quantity', 1 );
+		$qty_changed = (bool) mp_get_post_value( 'product_qty_changed' );
 
 		if ( empty( $product_id ) ) {
 			wp_send_json_error();
@@ -171,8 +171,8 @@ class MP_Product {
 
 		foreach ( $_POST as $key => $val ) {
 			if ( false !== strpos( $key, $product_atts::SLUGBASE ) ) {
-				$taxonomies[]		 = $key;
-				$attributes[ $key ]	 = $val;
+				$taxonomies[] = $key;
+				$attributes[ $key ] = $val;
 			}
 		}
 
@@ -182,7 +182,7 @@ class MP_Product {
 		// Filter out taxonomies that already have values and are still valid
 		foreach ( $all_atts as $att ) {
 			$slug = $product_atts->generate_slug( $att->attribute_id );
-			if ( !in_array( $slug, $taxonomies ) || $qty_changed ) {
+			if ( ! in_array( $slug, $taxonomies ) || $qty_changed ) {
 				$filtered_atts[] = $slug;
 			}
 		}
@@ -213,12 +213,12 @@ class MP_Product {
 
 		// Format attribute terms for display
 		foreach ( $filtered_terms as $tax_slug => $terms ) {
-			$json[ $tax_slug ]	 = '';
-			$index				 = 0;
-			$terms				 = $product_atts->sort( $terms, false );
+			$json[ $tax_slug ] = '';
+			$index = 0;
+			$terms = $product_atts->sort( $terms, false );
 			foreach ( $terms as $term ) {
-				$checked	 = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
-				$required	 = ( $index == 0 ) ? true : false;
+				$checked = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
+				$required = ( $index == 0 ) ? true : false;
 				$json[ $tax_slug ] .= self::attribute_field( $term->term_id, $term->name, $tax_slug, $required, $checked );
 				$index ++;
 			}
@@ -230,7 +230,7 @@ class MP_Product {
 			$images[ $variation->image_url( false, null, 'single' ) ] = '';
 		}
 		if ( count( $images ) == 1 ) {
-			$json[ 'image' ] = key( $images );
+			$json['image'] = key( $images );
 		}
 
 		// Attempt to get a unique product description depending on user selection
@@ -239,7 +239,7 @@ class MP_Product {
 			$descs[ $variation->content( false ) ] = '';
 		}
 		if ( count( $descs ) == 1 ) {
-			$json[ 'description' ] = key( $descs );
+			$json['description'] = key( $descs );
 		}
 
 		// Attempt to get a unique product excerpt depending on user selection
@@ -248,7 +248,7 @@ class MP_Product {
 			$excerpts[ $variation->excerpt() ] = '';
 		}
 		if ( count( $excerpts ) == 1 ) {
-			$json[ 'excerpt' ] = key( $excerpts );
+			$json['excerpt'] = key( $excerpts );
 		}
 
 		// Attempt to get a unique product price depending on user selection
@@ -257,7 +257,7 @@ class MP_Product {
 			$prices[ $variation->display_price( false ) ] = '';
 		}
 		if ( count( $prices ) == 1 ) {
-			$json[ 'price' ] = key( $prices );
+			$json['price'] = key( $prices );
 		}
 
 		wp_send_json_success( $json );
@@ -282,28 +282,16 @@ class MP_Product {
 	}
 
 	/**
-	 * Display a single attribute field
+	 * Display an attribute option
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function attribute_field( $term_id, $term_name, $tax_slug, $required = false, $checked = false ) {
-		$input_id	 = 'mp_product_options_att_' . $term_id;
-		$class		 = ( $required ) ? ' class="required"' : '';
-
-		/*$html = '
-				<option id="' . $input_id . '" value="' . $term_id . '">
-					' . $term_name . '
-				</option>';*/
-
-		$html = '
-		  <label class="mp_product_options_att_input_label" for="' . $input_id . '">
-		  <input id="' . $input_id . '"' . $class . ' type="radio" name="' . $tax_slug . '" value="' . $term_id . '"' . (( $checked ) ? ' checked' : '') . ' />
-		  <span>' . $term_name . '</span>
-		  </label>';
+	public function attribute_option( $term_id, $term_name, $tax_slug, $required = false, $selected = false ) {
+		$html = '<option id="mp_product_options_att_' . $term_id . '" value="' . $term_id . '"' . (( $selected ) ? ' selected' : '') . '>' . $term_name . '</option>';
 
 		/**
-		 * Filter the attribute field
+		 * Filter the attribute option
 		 *
 		 * @since 3.0
 		 * @param string $html
@@ -312,7 +300,7 @@ class MP_Product {
 		 * @param string $tax_slug
 		 * @param bool $required		 
 		 */
-		$html = apply_filters( 'mp_product/attribute_field', $html, $term_id, $term_name, $tax_slug, $required );
+		$html = apply_filters( 'mp_product/attribute_option', $html, $term_id, $term_name, $tax_slug, $required );
 
 		return $html;
 	}
@@ -331,23 +319,33 @@ class MP_Product {
 			<div class="mp_product_options_atts clearfix">';
 
 		foreach ( $atts as $slug => $att ) {
+			/**
+			 * Filter the default option label for the select field
+			 *
+			 * @since 3.0
+			 * @access public
+			 * @param string The default option label.
+			 */
+			$default_option_label = apply_filters( 'mp_product/attribute_fields/default_option_label', sprintf( __( 'Choose a %s', 'mp' ), $att['name'] ) );
+			
 			$html .= '
 				<div class="mp_product_options_att">
-					<strong class="mp_product_options_att_label">' . $att[ 'name' ] . '</strong>
+					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
 					<div class="clearfix mp_product_options_att_input_label" id="mp_' . $slug . '">
-						<!--<select name="' . $slug . '" class="required">-->';
+						<select name="' . $slug . '" class="required">
+							<option value="">' . $default_option_label . '</option>';
 
 
 			$index = 0;
 			foreach ( $att[ 'terms' ] as $term_id => $term_name ) {
-				$required	 = ( $index == 0 );
-				$checked	 = ( $term_id == mp_arr_get_value( $slug, $selected_atts ) );
-				$html .= $this->attribute_field( $term_id, $term_name, $slug, $required, $checked );
+				$required = ( $index == 0 );
+				$checked = ( $term_id == mp_arr_get_value( $slug, $selected_atts ) );
+				$html .= $this->attribute_option( $term_id, $term_name, $slug, $required, $checked );
 				$index ++;
 			}
 
 			$html .= '
-				<!--</select>-->
+						</select>
 					</div>
 				</div>';
 		}
@@ -358,7 +356,7 @@ class MP_Product {
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="clearfix">
 						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
-							<input id="' . $input_id . '" class="required digits" type="text" name="product_quantity" value="1" />
+							<input id="' . $input_id . '" class="required digits" type="number" name="product_quantity" value="1" />
 						</label>
 					</div>
 				</div>
@@ -1286,8 +1284,8 @@ class MP_Product {
 	 */
 	public function image_url( $echo = true, $size = null, $view = null ) {
 		if ( is_null( $size ) ) {
-			$img_size	 = mp_get_image_size( $view );
-			$size		 = ( $img_size[ 'label' ] == 'custom' ) ? array( $size[ 'width' ], $size[ 'height' ] ) : $img_size[ 'label' ];
+			$img_size = mp_get_image_size( $view );
+			$size = ( $img_size['label'] == 'custom' ) ? array( $size['width'], $size['height'] ) : $img_size['label'];
 		} elseif ( $thesize = intval( $size ) ) {
 			$size = array( $thesize, $thesize );
 		}
@@ -1298,18 +1296,36 @@ class MP_Product {
 		}
 
 		if ( has_post_thumbnail( $post_id ) ) {
-			$img_id	 = get_post_thumbnail_id( $post_id );
-			$img_src = array_shift( wp_get_attachment_image_src( $img_id, $size ) );
+			$img_id = get_post_thumbnail_id( $post_id );
+			$img_src = wp_get_attachment_image_src( $img_id, $size );
+			$img_url = array_shift( $img_src );
 		}
 
-		if ( empty( $img_src ) ) {
-			$img_src = mp_plugin_url( 'ui/images/default-product.png' );
+		if ( empty( $img_url ) ) {
+			/**
+			 * Filter the default image url
+			 *
+			 * @since 3.0
+			 * @param string The current default image url.
+			 */
+			$img_url = apply_filters( 'mp_product/default_img_url', mp_plugin_url( 'ui/images/default-product.png' ) );
 		}
+		
+		/**
+		 * Filter the product image url
+		 *
+		 * @since 3.0
+		 * @param string $img_url The current image url.
+		 * @param string/int $size
+		 * @param string $view Either single or list
+		 * @param MP_Product $this The current product object.
+		 */
+		$img_url = apply_filters( 'mp_product/image_url', $img_url, $size, $view, $this );
 
 		if ( $echo ) {
-			echo $img_src;
+			echo $img_url;
 		} else {
-			return $img_src;
+			return $img_url;
 		}
 	}
 

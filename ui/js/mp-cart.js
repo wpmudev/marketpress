@@ -25,7 +25,7 @@ var mp_cart = {};
 				// Product has attributes, build item object accordingly
 				item = {};
 				item['product_id'] = product_id;
-				$form.find( '[name^="product_attr_"]' ).filter( ':checked' ).each( function() {
+				$form.find( '[name^="product_attr_"]' ).each( function() {
 					var $this = $( this );
 					item[ $this.attr('name') ] = $this.val();
 				} );
@@ -79,7 +79,7 @@ var mp_cart = {};
 	 * @since 3.0
 	 */
 	mp_cart.initSingleProductListeners = function(){
-		$('#mp_single_product').on('change', '.mp_product_options_att_input_label input, .mp_product_options_att_input_label select', this.updateProductAttributes);
+		$('#mp_single_product').on('change', '[name^="product_attr_"]', this.updateProductAttributes);
 		$('#mp_single_product').find('.mp_buy_form')
 			.on('mp_cart/before_add_item', function(e, item, qty){
 				marketpress.loadingOverlay('show');
@@ -133,7 +133,7 @@ var mp_cart = {};
 			})
 			.validate(this.productFormValidationArgs);
 
-		$('#cboxLoadedContent').on('change', '.mp_product_options_att_input_label input, .mp_product_options_att_input_label select', this.updateProductAttributes);
+		$('#cboxLoadedContent').on('change', '[name^="product_attr_"]', this.updateProductAttributes);
 	};
 		
 	/**
@@ -142,7 +142,6 @@ var mp_cart = {};
 	 * @since 3.0
 	 */
 	mp_cart.updateProductAttributes = function(){
-
 		var $this = $(this),
 				$form = $this.closest('form'),
 				$container = ( $('#colorbox').is(':visible') ) ? $form : $('#mp_single_product'),
@@ -150,7 +149,7 @@ var mp_cart = {};
 				url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 		
 		marketpress.loadingOverlay('show');
-		$this.closest('.mp_product_options_att').nextAll('.mp_product_options_att').find(':radio').prop('checked', false);
+		$this.closest('.mp_product_options_att').nextAll('.mp_product_options_att').find('[name^="product_attr_"]').val('');
 		
 		if ( ! $this.is(':radio') ) {
 			$qtyChanged.val('1');
