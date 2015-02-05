@@ -332,7 +332,7 @@ class MP_Product {
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
 					<div class="clearfix mp_product_options_att_input_label" id="mp_' . $slug . '">
-						<select name="' . $slug . '" class="required">
+						<select id="mp_' . $slug . '" name="' . $slug . '" class="required">
 							<option value="">' . $default_option_label . '</option>';
 
 
