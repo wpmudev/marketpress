@@ -291,16 +291,16 @@ class MP_Product {
 		$input_id	 = 'mp_product_options_att_' . $term_id;
 		$class		 = ( $required ) ? ' class="required"' : '';
 
-		$html = '
+		/*$html = '
 				<option id="' . $input_id . '" value="' . $term_id . '">
 					' . $term_name . '
-				</option>';
+				</option>';*/
 
-		/*$html = '
+		$html = '
 		  <label class="mp_product_options_att_input_label" for="' . $input_id . '">
 		  <input id="' . $input_id . '"' . $class . ' type="radio" name="' . $tax_slug . '" value="' . $term_id . '"' . (( $checked ) ? ' checked' : '') . ' />
 		  <span>' . $term_name . '</span>
-		  </label>';*/
+		  </label>';
 
 		/**
 		 * Filter the attribute field
@@ -335,7 +335,7 @@ class MP_Product {
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att[ 'name' ] . '</strong>
 					<div class="clearfix mp_product_options_att_input_label" id="mp_' . $slug . '">
-						<select name="mp_' . $slug . '" class="required">';
+						<!--<select name="' . $slug . '" class="required">-->';
 
 
 			$index = 0;
@@ -347,7 +347,7 @@ class MP_Product {
 			}
 
 			$html .= '
-				</select>
+				<!--</select>-->
 					</div>
 				</div>';
 		}
