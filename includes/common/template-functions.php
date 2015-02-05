@@ -1719,24 +1719,6 @@ if ( ! function_exists( 'mp_send_email' ) ) :
 	 * @return bool
 	 */
 	function mp_send_email( $email, $subject, $msg ) {
-		//remove any other filters
-		remove_all_filters( 'wp_mail_from' );
-		remove_all_filters( 'wp_mail_from_name' );
-
-		//convert all tabs to their approriate html markup
-		$msg = str_replace( array( "\t" ), array( '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ), $msg );
-		
-		// set headers
-		$headers = array(
-			'From' => wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) . '<' . mp_get_store_email() . '>',
-			'Content-Type' => 'text/html; charset=UTF-8',
-		);
-		
-		$header = '';
-		foreach ( $headers as $key => $val ) {
-			$header .= "{$key}: {$val}\r\n";
-		}
-						
-		return wp_mail( $email, $subject, $msg, $header );		
+		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
 	}
 endif;
