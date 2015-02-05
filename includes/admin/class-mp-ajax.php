@@ -24,6 +24,43 @@ class MP_Ajax {
 		return self::$_instance;
 	}
 
+	
+	/**
+	 * Constructor function
+	 *
+	 * @since 3.0
+	 * @access private
+	 */
+	private function __construct() {
+		// Create store page
+		add_action( 'wp_ajax_mp_create_store_page', array( &$this, 'create_store_page' ) );
+		// Bulk edit products
+		add_action( 'wp_ajax_mp_bulk_edit_products', array( &$this, 'bulk_edit_products' ) );
+		// Change order status
+		add_action( 'wp_ajax_mp_change_order_status', array( 'MP_Orders_Admin', 'ajax_change_order_status' ) );
+		// Check if an email address exists
+		add_action( 'wp_ajax_nopriv_mp_check_if_email_exists', array( &$this, 'check_if_email_exists' ) );
+		// Create account
+		add_action( 'wp_ajax_nopriv_mp_create_account', array( &$this, 'create_account' ) );
+		// Get product variation colorbox
+		add_action( 'wp_ajax_mp_product_get_variations_lightbox', array( 'MP_Product', 'ajax_display_variations_lightbox' ) );
+		add_action( 'wp_ajax_nopriv_mp_product_get_variations_lightbox', array( 'MP_Product', 'ajax_display_variations_lightbox' ) );
+		// Update product attributes
+		add_action( 'wp_ajax_mp_product_update_attributes', array( 'MP_Product', 'ajax_update_attributes' ) );
+		add_action( 'wp_ajax_nopriv_mp_product_update_attributes', array( 'MP_Product', 'ajax_update_attributes' ) );
+		// Ajax login
+		add_action( 'wp_ajax_nopriv_mp_ajax_login', array( &$this, 'ajax_login' ) );
+		// Look up order
+		add_action( 'wp_ajax_mp_lookup_order', array( &$this, 'lookup_order' ) );
+		add_action( 'wp_ajax_nopriv_mp_lookup_order', array( &$this, 'lookup_order' ) );
+		// Get state list
+		add_action( 'wp_ajax_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
+		add_action( 'wp_ajax_nopriv_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
+		// Update product list
+		add_action( 'wp_ajax_mp_update_product_list', array( &$this, 'update_product_list' ) );
+		add_action( 'wp_ajax_nopriv_mp_update_product_list', array( &$this, 'update_product_list' ) );
+	}
+
 	/**
 	 * Process ajax login
 	 *
@@ -92,6 +129,56 @@ class MP_Ajax {
 		}
 		
 		die;
+	}
+	
+	/**
+	 * Check if an email address exists
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_nopriv_mp_check_if_email_exists
+	 */
+	public function check_if_email_exists() {
+		if ( email_exists( mp_get_request_value( 'email', '' ) ) ) {
+			die( 'false' );
+		}
+		
+		die( 'true' );
+	}
+	
+	/**
+	 * Create account
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_nopriv_mp_create_account
+	 */
+	public function create_account() {
+		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
+			$user_login = uniqid( true );
+			$user_id = wp_insert_user( array(
+				'user_login'	=> $user_login,
+				'user_email'	=> mp_get_post_value( 'email' ),
+				'user_pass'		=> mp_get_post_value( 'password1' ),
+				'first_name'	=> mp_get_post_value( 'name_first' ),
+				'last_name'		=> mp_get_post_value( 'name_last' ),
+				'role'			=> 'subscriber',
+			) );
+			
+			if ( ! is_wp_error( $user_id ) ) {
+				$user_signon = wp_signon( array(
+					'user_login' => $user_login,
+					'user_password' => mp_get_post_value( 'password1' ),
+					'remember' => true,
+				), false );
+				
+				wp_send_json_success();
+			}
+		}
+		
+		wp_send_json_error( array(
+			'message' => __( 'Oops! An unknown error occurred while creating your account. Please try again.', 'mp' ),
+		) );
 	}
 
 	/**
@@ -193,35 +280,6 @@ class MP_Ajax {
 		}
 		
 		wp_send_json_success( array( 'states' => $states, 'show_zipcode' => $show_zipcode ) );
-	}
-	
-	/**
-	 * Constructor function
-	 *
-	 * @since 3.0
-	 * @access private
-	 */
-	private function __construct() {
-		add_action( 'wp_ajax_mp_create_store_page', array( &$this, 'create_store_page' ) );
-		add_action( 'wp_ajax_mp_bulk_edit_products', array( &$this, 'bulk_edit_products' ) );
-		add_action( 'wp_ajax_mp_change_order_status', array( 'MP_Orders_Admin', 'ajax_change_order_status' ) );
-		// Get product variation colorbox
-		add_action( 'wp_ajax_mp_product_get_variations_lightbox', array( 'MP_Product', 'ajax_display_variations_lightbox' ) );
-		add_action( 'wp_ajax_nopriv_mp_product_get_variations_lightbox', array( 'MP_Product', 'ajax_display_variations_lightbox' ) );
-		// Update product attributes
-		add_action( 'wp_ajax_mp_product_update_attributes', array( 'MP_Product', 'ajax_update_attributes' ) );
-		add_action( 'wp_ajax_nopriv_mp_product_update_attributes', array( 'MP_Product', 'ajax_update_attributes' ) );
-		// Ajax login
-		add_action( 'wp_ajax_nopriv_mp_ajax_login', array( &$this, 'ajax_login' ) );
-		// Look up order
-		add_action( 'wp_ajax_mp_lookup_order', array( &$this, 'lookup_order' ) );
-		add_action( 'wp_ajax_nopriv_mp_lookup_order', array( &$this, 'lookup_order' ) );
-		// Get state list
-		add_action( 'wp_ajax_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
-		add_action( 'wp_ajax_nopriv_mp_update_states_dropdown', array( &$this, 'update_states_dropdown' ) );
-		// Update product list
-		add_action( 'wp_ajax_mp_update_product_list', array( &$this, 'update_product_list' ) );
-		add_action( 'wp_ajax_nopriv_mp_update_product_list', array( &$this, 'update_product_list' ) );
 	}
 }
 

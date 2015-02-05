@@ -37,6 +37,7 @@ class MP_Public {
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
 		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
+		add_action( 'wp_footer', array( &$this, 'create_account_lightbox_html' ), 20 );
 		
 		// Template Stuff
 		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
@@ -47,6 +48,72 @@ class MP_Public {
 		add_action( 'pre_get_posts', array(&$this, 'include_out_of_stock_products_for_downloads') );
 		add_filter( 'posts_results', array(&$this, 'set_publish_status_for_out_of_stock_product_downloads'), 10, 2 );
 		add_action( 'template_redirect', array(&$this, 'maybe_serve_download') );
+	}
+	
+	/**
+	 * Output the html for the "create account" lightbox
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_footer
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	public function create_account_lightbox_html( $echo = true ) {
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
+		
+		if ( 'wp_footer' == current_filter() ) {
+			$echo = true;
+		}
+		
+		$html = '
+			<div style="display:none">
+				<div id="mp-create-account-lightbox" class="entry-content">
+					<h2>' . __( 'Create Account', 'mp' ) . '</h2>
+					<form action="' . admin_url( 'admin-ajax.php?action=mp_create_account' ) . '" method="post">' .
+						wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce', true, false ) . '
+						<div class="mp-form-row" class="clearfix">
+							<label for="mp-create-account-name-first">' . __( 'First Name:', 'mp' ) . '<span class="mp-field-required">*</span></label>
+							<div><input id="mp-create-account-name-first" type="text" name="name_first" data-rule-required="true" /></div>
+						</div>
+						<div class="mp-form-row" class="clearfix">
+							<label for="mp-create-account-name-last">' . __( 'Last Name:', 'mp' ) . '<span class="mp-field-required">*</span></label>
+							<div><input id="mp-create-account-name-last" type="text" name="name_last" data-rule-required="true" /></div>
+						</div>
+						<div class="mp-form-row" class="clearfix">
+							<label for="mp-create-account-email">' . __( 'Email:', 'mp' ) . '<span class="mp-field-required">*</span></label>
+							<div><input id="mp-create-account-email" type="email" name="email" data-rule-required="true" data-rule-email="true" data-rule-remote="' . admin_url( 'admin-ajax.php?action=mp_check_if_email_exists' ) . '" data-msg-remote="' . __( 'An account with this email address already exists', 'mp' ) . '" /></div>
+						</div>
+						<div class="mp-form-row">
+							<label for="mp-create-account-password1">' . __( 'Password:', 'mp' ) . '<span class="mp-field-required">*</span></label>
+							<div><input id="mp-create-account-password1" type="password" name="password1" data-rule-required="true" /></div>
+						</div>
+						<div class="mp-form-row">
+							<label for="mp-create-account-password2">' . __( 'Re-enter Password:', 'mp' ) . '<span class="mp-field-required">*</span></label>
+							<div><input id="mp-create-account-password2" type="password" name="password2" data-rule-required="true" data-rule-equalTo="#mp-create-account-password1" data-msg-equalTo="' . __( 'Passwords do not match!', 'mp' ) . '" /></div>
+						</div>
+						<div class="mp-form-row">
+							<button type="submit">' . __( 'Create Account', 'mp' ) . '</button>
+						</div>
+					</form>
+				</div>
+			</div>';
+			
+		/**
+		 * Filter the "create account" lightbox html
+		 *
+		 * @since 3.0
+		 * @param string $html The current html.
+		 */
+		$html = apply_filters( 'mp_public/create_account_lightbox_html', $html );
+		
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
 	}
 
 	/**

@@ -37,6 +37,36 @@
 	color: #ed0303;
 }
 
+.mp-form-row {
+	padding-top: 20px;
+	
+	label {
+		float: left;
+		width: 35%;
+		
+		&.error {
+			color: #ed0303;
+			font-size: .9em;
+			width: auto;
+		}
+		
+		+ div {
+			overflow: hidden;
+		}
+	}
+	
+	input,
+	textarea {
+		.boxSizing( border-box );
+		width: 100%;
+	}
+	
+	input[type="radio"],
+	input[type="checkbox"] {
+		width: auto;
+	}
+}
+
 .mp-tooltip-content {
 	* {
 		display: none;
