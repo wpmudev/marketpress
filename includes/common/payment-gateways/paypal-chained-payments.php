@@ -385,7 +385,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			mp_push_to_array( $settings, 'gateways->paypal_chained->mode', $mode );
 
 			// Unset old keys
-			unset( $settings[ 'gateways' ][ 'paypal-chained' ][ 'email' ], $settings[ 'gateways' ][ 'paypal-chained' ][ 'mode' ] );
+			unset( $settings[ 'gateways' ][ 'paypal_chained' ][ 'email' ], $settings[ 'gateways' ][ 'paypal_chained' ][ 'mode' ] );
 		}
 
 		return $settings;
@@ -706,7 +706,7 @@ if ( is_multisite() && ! mp_cart()->is_global ) {
 	}
 
 	//register gateway plugin
-	mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal-chained', $admin_name );
+	mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal_chained', $admin_name );
 
 	//tie into network settings form
 	add_action( 'mp_multisite_init_metaboxes', 'init_paypal_chained_payments_network_settings_metaboxes' );
