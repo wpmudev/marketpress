@@ -1474,7 +1474,8 @@ Notification Preferences: %s', 'mp' );
 			$ids = $this->get_variation_ids();
 		}
 		
-		$product_categories = get_the_terms( $this->ID, 'product_category' );
+		$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
+		$product_categories = get_the_terms( $post_id, 'product_category' );
 		$product_categories = wp_list_pluck( $product_categories, 'term_id' );
 		
 		// Get all product attributes for this product and it's variations
