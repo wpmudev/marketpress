@@ -48,7 +48,9 @@ class MP_Admin_Multisite {
 			add_action( 'wpmudev_field/print_scripts/network_store_page', array( &$this, 'print_network_store_page_scripts' ) );
 		}
 		
-		add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway'), 10, 4 );
+		if ( mp_cart()->is_global ) {
+			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway'), 10, 4 );
+		}
 	}
 	
 	/**
