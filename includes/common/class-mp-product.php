@@ -151,8 +151,7 @@ class MP_Product {
 	 */
 	public static function ajax_update_attributes() {
 		$product_atts = MP_Product_Attributes::get_instance();
-		$all_atts = $product_atts->get();
-		$attributes = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
+		$attributes = $filtered_atts = $taxonomies = $filtered_terms = array();
 		$json = array(
 			'out_of_stock'	 => false,
 			'qty_in_stock'	 => 0,
@@ -162,12 +161,15 @@ class MP_Product {
 			'price'			 => false,
 		);
 		$product_id = mp_get_post_value( 'product_id' );
+		$product	 = new MP_Product( $product_id );
 		$qty = mp_get_post_value( 'product_quantity', 1 );
 		$qty_changed = (bool) mp_get_post_value( 'product_qty_changed' );
 
-		if ( empty( $product_id ) ) {
+		if ( ! $product->exists() ) {
 			wp_send_json_error();
 		}
+		
+		$all_atts = $product->get_attributes();
 
 		foreach ( $_POST as $key => $val ) {
 			if ( false !== strpos( $key, $product_atts::SLUGBASE ) ) {
@@ -176,17 +178,17 @@ class MP_Product {
 			}
 		}
 
-		$product	 = new MP_Product( $product_id );
+		
 		$variations	 = $product->get_variations_by_attributes( $attributes );
-
+		
 		// Filter out taxonomies that already have values and are still valid
 		foreach ( $all_atts as $att ) {
-			$slug = $product_atts->generate_slug( $att->attribute_id );
+			$slug = $product_atts->generate_slug( $att['id'] );
 			if ( ! in_array( $slug, $taxonomies ) || $qty_changed ) {
 				$filtered_atts[] = $slug;
 			}
 		}
-
+		
 		// Make sure all attribute terms are unique and in stock
 		foreach ( $variations as $variation ) {
 			foreach ( $filtered_atts as $tax_slug ) {
@@ -219,7 +221,7 @@ class MP_Product {
 			foreach ( $terms as $term ) {
 				$checked = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
 				$required = ( $index == 0 ) ? true : false;
-				$json[ $tax_slug ] .= self::attribute_field( $term->term_id, $term->name, $tax_slug, $required, $checked );
+				$json[ $tax_slug ] .= self::attribute_option( $term->term_id, $term->name, $tax_slug, $required, $checked );
 				$index ++;
 			}
 		}
@@ -287,7 +289,7 @@ class MP_Product {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function attribute_option( $term_id, $term_name, $tax_slug, $required = false, $selected = false ) {
+	public static function attribute_option( $term_id, $term_name, $tax_slug, $required = false, $selected = false ) {
 		$html = '<option id="mp_product_options_att_' . $term_id . '" value="' . $term_id . '"' . (( $selected ) ? ' selected' : '') . '>' . $term_name . '</option>';
 
 		/**
@@ -332,7 +334,7 @@ class MP_Product {
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att['name'] . '</strong>
 					<div class="clearfix mp_product_options_att_input_label" id="mp_' . $slug . '">
-						<select id="mp_' . $slug . '" name="' . $slug . '" class="required">
+						<select id="mp_' . $slug . '" name="' . $slug . '" class="required" autocomplete="off">
 							<option value="">' . $default_option_label . '</option>';
 
 
@@ -1453,9 +1455,12 @@ Notification Preferences: %s', 'mp' );
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @uses $wpdb
 	 * @return array
 	 */
 	public function get_attributes() {
+		global $wpdb;
+		
 		if ( !is_null( $this->_attributes ) ) {
 			return $this->_attributes;
 		}
@@ -1468,13 +1473,36 @@ Notification Preferences: %s', 'mp' );
 		if ( $this->has_variations() ) {
 			$ids = $this->get_variation_ids();
 		}
-
-		$taxonomies = array();
-		foreach ( $all_atts as $att ) {
-			$taxonomies[] = $mp_product_atts->generate_slug( $att->attribute_id );
+		
+		$product_categories = get_the_terms( $this->ID, 'product_category' );
+		$product_categories = wp_list_pluck( $product_categories, 'term_id' );
+		
+		// Get all product attributes for this product and it's variations
+		$attributes = $wpdb->get_col( "
+			SELECT DISTINCT t2.taxonomy
+			FROM {$wpdb->term_relationships} AS t1
+			INNER JOIN {$wpdb->term_taxonomy} AS t2 ON t1.term_taxonomy_id = t2.term_taxonomy_id
+			WHERE t1.object_id IN (" . implode( ',', $ids ) . ")
+			AND t2.taxonomy LIKE '" . $mp_product_atts::SLUGBASE . "%'"
+		);
+		
+		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
+		foreach ( $attributes as $k => $attribute ) {
+			$attribute_id = $mp_product_atts->get_id_from_slug( $attribute );
+			$exists = $wpdb->get_var( $wpdb->prepare( "
+				SELECT COUNT(*)
+				FROM {$table_name}
+				WHERE (attribute_id = %d AND term_id IN (" . implode( ',', $product_categories ) . "))
+				OR NOT EXISTS (SELECT attribute_id FROM {$table_name} WHERE attribute_id = %d)", $attribute_id, $attribute_id
+			) );
+			
+			
+			if ( ! $exists ) {
+				unset( $attributes[ $k ] );
+			}
 		}
-
-		$terms			 = wp_get_object_terms( $ids, $taxonomies );
+		
+		$terms			 = wp_get_object_terms( $ids, array_values( $attributes ) );
 		$terms_sorted	 = $mp_product_atts->sort( $terms );
 		$names			 = array();
 		foreach ( $terms_sorted as $tax_slug => $terms ) {
@@ -1482,8 +1510,10 @@ Notification Preferences: %s', 'mp' );
 
 			foreach ( $terms as $term ) {
 				if ( $att = $mp_product_atts->get_one( $tax_id ) ) {
-					if ( !array_key_exists( $term->taxonomy, $names ) ) {
+					if ( ! in_array( $term->taxonomy, $names ) ) {
+						mp_push_to_array( $this->_attributes, "{$term->taxonomy}->id", $tax_id );
 						mp_push_to_array( $this->_attributes, "{$term->taxonomy}->name", $att->attribute_name );
+						$names[] = $att->attribute_name;
 					}
 
 					mp_push_to_array( $this->_attributes, "{$term->taxonomy}->terms->{$term->term_id}", $term->name );

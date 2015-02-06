@@ -43,6 +43,43 @@ class MP_Product_Attributes {
 	}
 
 	/**
+	 * Constructor function
+	 *
+	 * @since 3.0
+	 * @access private
+	 */
+	
+	private function __construct() {
+	}
+
+	/**
+	 * Deletes a product attribute(s)
+	 *
+	 * @since 3.0
+	 * @uses $wpdb
+	 * @access public
+	 * @param array/int $id The ID of the attribute to delete.
+	 */
+	public function delete( $id = false ) {
+		global $wpdb;
+		
+		if ( empty($id) ) {
+			// Require at least one ID to prevent accidental deleting of all attributes 
+			return false;
+		}
+		
+		if ( is_array($id) ) {
+			$wpdb->query('DELETE FROM . ' . $this->get_table_name() . ' WHERE attribute_id IN (' . implode(',', $id) . ')');
+		} else {
+			$wpdb->delete($this->get_table_name(), array('attribute_id' => $ids));
+		}
+		
+		// Force update of cache
+		$this->_atts = null;
+	}
+	
+
+	/**
 	 * Gets all product attributes
 	 *
 	 * @since 3.0
@@ -137,32 +174,6 @@ class MP_Product_Attributes {
 	}
 	
 	/**
-	 * Deletes a product attribute(s)
-	 *
-	 * @since 3.0
-	 * @uses $wpdb
-	 * @access public
-	 * @param array/int $id The ID of the attribute to delete.
-	 */
-	public function delete( $id = false ) {
-		global $wpdb;
-		
-		if ( empty($id) ) {
-			// Require at least one ID to prevent accidental deleting of all attributes 
-			return false;
-		}
-		
-		if ( is_array($id) ) {
-			$wpdb->query('DELETE FROM . ' . $this->get_table_name() . ' WHERE attribute_id IN (' . implode(',', $id) . ')');
-		} else {
-			$wpdb->delete($this->get_table_name(), array('attribute_id' => $ids));
-		}
-		
-		// Force update of cache
-		$this->_atts = null;
-	}
-	
-	/**
 	 * Gets the product attribute table name
 	 *
 	 * @since 3.0
@@ -250,16 +261,6 @@ class MP_Product_Attributes {
 	 */
 	public function sort_terms_by_custom_order( &$terms ) {
 		usort($terms, create_function('$a, $b', 'return ( $a->term_order == $b->term_order ) ? 0 : ( $a->term_order < $b->term_order ) ? -1 : 1;'));
-	}
-	
-	/**
-	 * Constructor function
-	 *
-	 * @since 3.0
-	 * @access private
-	 */
-	
-	private function __construct() {
 	}
 }
 
