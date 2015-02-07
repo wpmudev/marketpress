@@ -1096,6 +1096,11 @@ You can manage this order here: %s', 'mp');
 	public function tracking_url( $echo = true ) {
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
 		
+		if ( did_action( 'mp_order/new_order' ) ) {
+			// Show create-account lightbox after checking out
+			$url .= '#mp-create-account';
+		}
+		
 		/**
 		 * Filter the tracking URL
 		 *
