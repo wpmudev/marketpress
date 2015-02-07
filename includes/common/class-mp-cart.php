@@ -1216,24 +1216,19 @@ class MP_Cart {
 				$price = 0;
 		 	} else if ( mp_get_setting('shipping->method') == 'calculated' && $selected_option ) {
 				//shipping plugins tie into this to calculate their shipping cost
-				$price = apply_filters('mp_calculate_shipping_' . $selected_option, 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+				$price = (float) apply_filters('mp_calculate_shipping_' . $selected_option, 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 			} else {
 				//shipping plugins tie into this to calculate their shipping cost
-				$price = apply_filters('mp_calculate_shipping_' . mp_get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+				$price = (float) apply_filters('mp_calculate_shipping_' . mp_get_setting('shipping->method'), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 			}
 			
 			//calculate extra shipping
-			$extras = array();
 			foreach ( $products as $product ) {
 				if ( ! $product->is_download() ) {
-					$extras[] = $product->get_meta('extra_cost') * $product->qty;
+					$price += $product->get_meta( 'extra_shipping_cost' ) * $product->qty;
 				}
 		 	}
-		 	$extra = array_sum($extras);
 	
-		 	//merge
-		 	$price = $price + $extra;
-		 	
 			if ( empty( $price ) ) {
 				$price = 0;
 			}
