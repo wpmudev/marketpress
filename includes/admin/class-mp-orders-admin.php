@@ -762,93 +762,94 @@ class MP_Orders_Admin {
 		global $post;
 		
 		$order = new MP_Order( $post_id );
+		$html = '';
 		
 		switch ( $column ) {
 			//! Order Status
 			case 'mp_orders_status' :
 				switch ( $post->post_status ) {
-		    	case 'order_received' :
-		    		$text = __('Received', 'mp');
-		    	break;
-		    	
-		    	case 'order_paid' :
-		    		$text = __('Paid', 'mp');
-		    	break;
-		    	
-		    	case 'order_shipped' :
-		    		$text = __('Shipped', 'mp');
-		    	break;
-		    	
-		    	case 'order_closed' :
-		    		$text = __('Closed', 'mp');
-		    	break;
-		    	
-		    	case 'trash' :
-		    		$text = __('Trashed', 'mp');
-		    	break;
+			    	case 'order_received' :
+			    		$text = __('Received', 'mp');
+			    	break;
+			    	
+			    	case 'order_paid' :
+			    		$text = __('Paid', 'mp');
+			    	break;
+			    	
+			    	case 'order_shipped' :
+			    		$text = __('Shipped', 'mp');
+			    	break;
+			    	
+			    	case 'order_closed' :
+			    		$text = __('Closed', 'mp');
+			    	break;
+			    	
+			    	case 'trash' :
+			    		$text = __('Trashed', 'mp');
+			    	break;
 				}
 				
-    		$actions = array(
-    			'order_received' => __('Received', 'mp'),
-    			'order_paid' => __('Paid', 'mp'),
-    			'order_shipped' => __('Shipped', 'mp'),
-    			'order_closed' => __('Closed', 'mp'),
-    		);
+	    		$actions = array(
+	    			'order_received' => __('Received', 'mp'),
+	    			'order_paid' => __('Paid', 'mp'),
+	    			'order_shipped' => __('Shipped', 'mp'),
+	    			'order_closed' => __('Closed', 'mp'),
+	    		);
 				
-				echo '<div class="mp_order_status ' . get_post_status() . '">';
+				$html .= '<div class="mp_order_status ' . get_post_status() . '">';
 				
 				if ( isset($actions) ) {
-					echo '<ul class="mp_order_status_menu">';
-					echo '<li class="item">' . __('Flag as:', 'mp') . '</li>';
+					$html .= '<ul class="mp_order_status_menu">';
+					$html .= '<li class="item">' . __('Flag as:', 'mp') . '</li>';
 					
 					foreach ( $actions as $action => $label ) {
 						if ( $action == $post->post_status ) {
-							echo '<li class="item current"><span>' . $label . '</span></li>';
+							$html .= '<li class="item current"><span>' . $label . '</span></li>';
 						} else {
-							echo '<li class="item"><a href="' . wp_nonce_url(add_query_arg(array('action' => 'mp_change_order_status', 'order_status' => $action, 'order_id' => get_the_title(), 'post_id' => $post_id), admin_url('admin-ajax.php')), 'mp-change-order-status') . '">' . $label . '</a></li>';							
+							$html .= '<li class="item"><a href="' . wp_nonce_url(add_query_arg(array('action' => 'mp_change_order_status', 'order_status' => $action, 'order_id' => get_the_title(), 'post_id' => $post_id), admin_url('admin-ajax.php')), 'mp-change-order-status') . '">' . $label . '</a></li>';							
 						}
 					}
 					
-					echo '</ul>';
+					$html .= '</ul>';
 				}
 				
-					echo '<img src="' . mp_plugin_url('ui/images/ajax-loader.gif') . '" alt="" />';
-				echo '</div>';
+					$html .= '<img src="' . mp_plugin_url('ui/images/ajax-loader.gif') . '" alt="" />';
+				$html .= '</div>';
 			break;
 			
 			//! Order ID
 			case 'mp_orders_id' :
 				$title = _draft_or_post_title($post_id);
-				echo '<strong><a class="row-title" href="' . get_edit_post_link($post_id) . '" title="' . esc_attr(sprintf(__('View order &#8220;%s&#8221;', 'mp'), $title)) . '">' . $title . '</a></strong>';
+				$html .= '<strong><a class="row-title" href="' . get_edit_post_link($post_id) . '" title="' . esc_attr(sprintf(__('View order &#8220;%s&#8221;', 'mp'), $title)) . '">' . $title . '</a></strong>';
 			break;
 			
 			//! Order Date
 			case 'mp_orders_date' :
-				echo get_the_time(get_option('date_format'));
+				$html .= get_the_time(get_option('date_format'));
 			break;
 			
 			//! Order From
 			case 'mp_orders_name' :
 				$name = $order->get_name();
-				echo '<a href="mailto:' . urlencode( $name ) . ' &lt;' . esc_attr( $order->get_meta( 'mp_shipping_info->email' ) ) . '&gt;?subject=' . urlencode( sprintf( __( 'Regarding Your Order (%s)', 'mp' ), $order->get_id() ) ) . '">' . esc_html( $name ) . '</a>';		
+				$html .= '<a href="mailto:' . urlencode( $name ) . ' &lt;' . esc_attr( $order->get_meta( 'mp_shipping_info->email' ) ) . '&gt;?subject=' . urlencode( sprintf( __( 'Regarding Your Order (%s)', 'mp' ), $order->get_id() ) ) . '">' . esc_html( $name ) . '</a>';		
 			break;
 			
 			//! Order Items
 			case 'mp_orders_items' :
 				$items = get_post_meta($post_id, 'mp_order_items', true);
-				echo number_format_i18n($items);
+				$html .= number_format_i18n($items);
 			break;
 			
 			//! Order Shipping
 			case 'mp_orders_shipping' :
 				$shipping = get_post_meta($post_id, 'mp_shipping_total', true);
-				echo mp_format_currency('', $shipping);
+				$html .= mp_format_currency('', $shipping);
 			break;
 			
 			//! Order Tax
 			case 'mp_orders_tax' :
 				$tax = get_post_meta($post_id, 'mp_tax_total', true);
-				echo mp_format_currency('', $tax);
+				$html .= mp_format_currency('', $tax);
 			break;
 			
 			//! Order Discount
@@ -856,24 +857,45 @@ class MP_Orders_Admin {
 				if ( $coupons = $order->get_meta( 'mp_discount_info' ) ) {
 					foreach ( (array) $coupons as $key => $val ) {
 						if ( $key == 'discount' ) {
-							echo $val;
+							$html .= $val;
 						} elseif ( $key == 'code' ) {
-							echo ' (' . strtoupper( $val ) . ')';
+							$html .= ' (' . strtoupper( $val ) . ')';
 						} else {
-							echo mp_format_currency( '', $val ) . ' (' . $key . ')';
+							$html .= mp_format_currency( '', $val ) . ' (' . $key . ')';
 						}
 					}
 				} else {
-					_e('N/A', 'mp');
+					$html .= __('N/A', 'mp');
 				}
 			break;
 			
 			//! Order Total
 			case 'mp_orders_total' :
 				$total = get_post_meta($post_id, 'mp_order_total', true);
-				echo mp_format_currency('', $total);
+				$html .= mp_format_currency('', $total);
 			break;
 		}
+		
+		/**
+		 * Filter the admin column html
+		 *
+		 * @since 3.0
+		 * @param string $html The current admin column $html.
+		 * @param string $column The admin column name.
+		 * @param MP_Order $order The current order object.
+		 */
+		$html = apply_filters( 'mp_orders_admin/order_column_data', $html, $column, $order );
+
+		/**
+		 * Filter the admin column html
+		 *
+		 * @since 3.0
+		 * @param string $html The current admin column $html.
+		 * @param MP_Order $order The current order object.
+		 */
+		$html = apply_filters( 'mp_orders_admin/order_column_data/' . $column, $html, $order );
+		
+		echo $html;
 	}
 }
 
