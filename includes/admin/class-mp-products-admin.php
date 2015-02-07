@@ -729,15 +729,16 @@ class MP_Products_Screen {
 		$metabox->add_field( 'text', array(
 			'name'			 => 'special_tax_rate',
 			'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-			'default_value'	 => '0.00',
+			'default_value'	 => '',
+			'desc' => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
 			'conditional'	 => array(
 				'name'	 => 'product_type',
 				'value'	 => array( 'physical', 'digital' ),
 				'action' => 'show',
 			),
+			'custom_validation_message' => __( 'Please enter a valid tax rate', 'mp' ),
 			'validation'	 => array(
-				'number' => true,
-				'min'	 => 0,
+				'custom' => '[^0-9.%]',
 			),
 		) );
 
@@ -1024,15 +1025,16 @@ class MP_Products_Screen {
 			$repeater->add_sub_field( 'text', array(
 				'name'			 => 'special_tax_rate',
 				'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-				'default_value'	 => '0.00',
+				'desc' => __( 'If you would like this variation to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),				
+				'default_value'	 => '',
 				'conditional'	 => array(
 					'name'	 => 'product_type',
 					'value'	 => array( 'physical', 'digital' ),
 					'action' => 'show',
 				),
+				'custom_validation_message' => __( 'Please enter a valid tax rate', 'mp' ),
 				'validation'	 => array(
-					'number' => true,
-					'min'	 => 0,
+					'custom' => '[^0-9.%]',
 				),
 			) );
 

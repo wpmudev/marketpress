@@ -536,15 +536,21 @@ class MP_Product {
 			return $price;
 		}
 		
-		$rate = (float) $this->get_meta( 'special_tax_rate' );
-		if ( $rate == 0 ) {
-			if	( 'CA' == mp_get_setting( 'tax->base_country' ) ) {
-				$rate = mp_get_setting( 'tax->canada_rate->' . mp_get_setting( 'base_province' ) );
+		$rate = $this->get_meta( 'special_tax_rate' );
+		
+		if ( empty( $rate ) ) {
+			$rate = mp_tax_rate();
+		} else {
+			if ( false !== strpos( $rate, '%') ) {
+				// Special rate is a string percentage - convert to float value
+				$rate = (float) preg_replace( '[^0-9.]', '', $rate );
+				$rate = $rate / 100;
 			} else {
-				$rate = mp_get_setting( 'tax->rate' );
+				// Special rate is a fixed amount - simply subtract it from the item price
+				return $price - $rate;
 			}
 		}
-		
+				
 		return mp_before_tax_price( $price, $rate );
 	}
 	
@@ -1108,7 +1114,59 @@ class MP_Product {
 	public function set_price( $price ) {
 		$this->_price = $price;
 	}
+	
+	/**
+	 * Get the special tax amount for the item
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param bool $echo Optional, whether to echo or return. Defaults to return.
+	 * @return float The special tax amount for the item. False if item doesn't have a special rate.
+	 */
+	public function special_tax_amt( $echo = false ) {
+		$special_tax_rate = $this->get_meta( 'special_tax_rate', '' );
+		
+		if ( empty( $special_tax_rate ) ) {
+			return false;
+		}
 
+		if ( false !== strpos( $special_tax_rate, '%' ) ) {
+			$special_tax_rate = (float) preg_replace( '[^0-9.]', '', $special_tax_rate );
+			$special_tax_rate = $special_tax_rate / 100;
+			$is_fixed_amt = false;
+		} else {
+			$special_tax_rate = (float) $special_tax_rate;
+			$is_fixed_amt = true;
+		}
+		
+		/**
+		 * Filter the special tax rate
+		 *
+		 * @since 3.0
+		 * @param float $special_rate The current special tax rate.
+		 * @param bool $is_fixed_amt Whether the special tax rate is a fixed amount or not.
+		 * @param MP_Product $this The current product object.
+		 */
+		$special_tax_rate = (float) apply_filters( 'mp_product/special_tax_rate', $special_tax_rate, $is_fixed_amt, $this );
+
+		if ( $is_fixed_amt ) {
+			$special_tax_amt = $special_tax_rate;
+		} else {
+			$special_tax_amt = $this->before_tax_price() * $special_tax_rate;
+		}
+		
+		/**
+		 * Filter the special tax price
+		 *
+		 * @since 3.0
+		 * @param float $special_tax_amt The current special tax price.
+		 * @param float $special_tax_rate The current special tax rate.
+		 * @param bool $is_fixed_amt Whether the special tax rate is a fixed amount or not.		 
+		 * @param MP_Product $this The current product object.
+		 */
+		return (float) apply_filters( 'mp_product/special_tax_amt', $special_tax_amt, $special_tax_rate, $is_fixed_amt, $this );
+	}
+	
 	/**
 	 * Get the current inventory in stock
 	 *

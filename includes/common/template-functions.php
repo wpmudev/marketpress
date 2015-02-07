@@ -199,18 +199,10 @@ if ( ! function_exists( 'mp_before_tax_price' ) ) :
 		}
 		
 		if ( is_null( $rate ) ) {
-			if	( 'CA' == mp_get_setting( 'tax->base_country' ) ) {
-				$rate = (float) mp_get_setting( 'tax->canada_rate->' . mp_get_setting( 'base_province' ) );
-			} else {
-				$rate = (float) mp_get_setting( 'tax->rate' );
-			}
+			$rate = mp_tax_rate();
 		}
 		
-		if ( ! is_float( $rate ) ) {
-			$rate = (float) $rate;
-		}
-
-		return ($tax_price / ($rate + 1));
+		return $tax_price / (floatval( $rate ) + 1);
 	}
 endif;
 
@@ -925,7 +917,7 @@ if ( ! function_exists('mp_store_page_uri') ) {
 	}
 }
 
-if ( ! function_exists('mp_store_page_url') ) {
+if ( ! function_exists('mp_store_page_url') ) :
 	/**
 	 * Get a store page url
 	 *
@@ -951,7 +943,88 @@ if ( ! function_exists('mp_store_page_url') ) {
 			return $url;
 		}
 	}
-}
+endif;
+
+if ( ! function_exists( 'mp_tax_rate' ) ) :
+	/**
+	 * Get the tax rate per settings
+	 *
+	 * @since 3.0
+	 * @param bool $echo Optional, whether to echo or return. Defaults to return.
+	 */
+	function mp_tax_rate( $echo = false ) {
+		//get address
+		$state = mp_get_user_address_part( 'state', 'shipping' );
+		$country = mp_get_user_address_part( 'country', 'shipping' );
+		$tax_rate = 0;
+		
+		if ( empty( $country ) ) {
+			$country = mp_get_setting( 'base_country' );
+		}
+		
+		if ( empty( $state ) ) {
+			$state = mp_get_setting( 'base_province' );
+		}
+		
+		switch ( mp_get_setting('base_country') ) {
+			case 'US':
+				// USA taxes are only for orders delivered inside the state
+				if ( $country == 'US' && $state == mp_get_setting('base_province') ) {
+					$tax_rate = (float) mp_get_setting( 'tax->rate' );
+				}
+			break;
+	
+			case 'CA':
+				 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
+				if ( $country == 'CA' && array_key_exists( $state, mp()->canadian_provinces ) ) {
+					if ( $_tax_rate = mp_get_setting( "tax->canada_rate->$state" ) ) {
+						$tax_rate = (float) $_tax_rate;
+					}
+				}
+			break;
+	
+			case 'AU':
+				//Australia taxes orders in country
+				if ( $country == 'AU' ) {
+					$tax_rate = (float) mp_get_setting( 'tax->rate' );
+				}
+			break;
+	
+			default:
+				//EU countries charge VAT within the EU
+				if ( in_array( mp_get_setting('base_country'), mp()->eu_countries ) ) {
+					if ( in_array( $country, mp()->eu_countries ) ) {
+						$tax_rate = (float) mp_get_setting( 'tax->rate' );
+					}
+				} else {
+					//all other countries use the tax outside preference
+					if ( mp_get_setting( 'tax->tax_outside' ) || (! mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
+						$tax_rate = (float) mp_get_setting( 'tax->rate' );
+					}
+				}
+			break;
+		}
+		
+		if ( empty( $tax_rate ) ) {
+			$tax_rate = 0;
+		}
+		
+		/**
+		 * Filter the tax rate
+		 *
+		 * @since 3.0
+		 * @param float
+		 * @param float $tax_rate The current tax rate.
+		 */
+		$tax_rate = (float) apply_filters( 'mp_tax_rate', $tax_rate );
+		
+		if ( $echo ) {
+			echo $tax_rate;
+		} else {
+			return $tax_rate;
+		}
+	}
+endif;
 
 if ( ! function_exists( 'mp_weight_label' ) ) :
 	/**

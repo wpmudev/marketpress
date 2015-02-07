@@ -163,8 +163,14 @@ class MP_Cart {
 	 * @return float
 	 */
 	public function cart_price( $price, $qty ) {
-		$price = ($price * $qty);
-		return ( mp_get_setting('tax->tax_inclusive') ) ? ($price / (1 + (float) mp_get_setting('tax->rate'))) : $price;
+		$cart_price = ($price * $qty);
+		
+		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+			$tax_rate = mp_tax_rate();
+			$cart_price = $cart_price / (1 + $tax_rate);
+		}
+		
+		return $cart_price;
 	}
 	
 	/**
@@ -1150,12 +1156,14 @@ class MP_Cart {
 	 */
 	public function shipping_tax_total( $format = false ) {
 		$shipping_tax = 0;
+		$shipping_price = $this->shipping_total();
 		
-		if ( mp_get_setting( 'tax->tax_shipping' ) && ($shipping_price = $this->shipping_total() ) ) {
+		if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$shipping_tax = ($shipping_price - mp_before_tax_price( $shipping_price ));
 			} else {
-				$shipping_tax = ($shipping_price * (float) mp_get_setting( 'tax->rate' ));
+				$tax_rate = mp_tax_rate();
+				$shipping_tax = ($shipping_price * $tax_rate);
 			}
 		}
 		
@@ -1188,7 +1196,7 @@ class MP_Cart {
 			$user = wp_get_current_user();
 	
 			//get address
-			$what =  ( mp_get_post_value( 'enable_shipping_address' ) ) ? 'shipping' : 'billing';
+			$what =  ( mp_get_user_address( 'shipping' ) != mp_get_user_address( 'billing' ) ) ? 'shipping' : 'billing';
 			$address1 = mp_get_user_address_part( 'address1', $what );
 			$address2 = mp_get_user_address_part( 'address2', $what );
 			$city = mp_get_user_address_part( 'city', $what );
@@ -1224,7 +1232,7 @@ class MP_Cart {
 		 	$extra = array_sum($extras);
 	
 		 	//merge
-		 	$price = round($price + $extra, 2);
+		 	$price = $price + $extra;
 		 	
 			if ( empty( $price ) ) {
 				$price = 0;
@@ -1285,13 +1293,10 @@ class MP_Cart {
 			$items = $this->get_items_as_objects();
 	
 			//get address
-			$user = wp_get_current_user();
-			$shipping_info = mp_get_user_address( 'shipping' );
-			$state = mp_arr_get_value( 'state', $shipping_info );
-			$country = mp_arr_get_value( 'country', $shipping_info );
+			$state = mp_get_user_address_part( 'state', 'shipping' );
+			$country = mp_get_user_address_part( 'country', 'shipping' );
 			
-			//if we've skipped the shipping page and no address is set, use base for tax calculation
-			if ( $this->is_download_only() || mp_get_setting('tax->tax_inclusive') || mp_get_setting('shipping->method') == 'none' ) {
+			if ( $estimate ) {
 				if ( empty($country) ) {
 					$country = mp_get_setting('base_country');
 				}
@@ -1304,82 +1309,30 @@ class MP_Cart {
 			$total = $special_total = 0;
 		 
 			foreach ( $items as $item ) {
-				//check for special rate
-				$special_rate = (float) $item->get_meta('special_tax_rate');
-				
 				// If not taxing digital goods, skip them completely
 				if ( ! mp_get_setting('tax->tax_digital') && $item->is_download() ) {
 					continue;
 				}
-	
-				$product_price = ($item->before_tax_price() * $item->qty);
-			
-				if ( $special_rate > 0 ) {
-					$special_total += ($product_price * $special_rate);
+
+				if ( $special_tax_amt = $item->special_tax_amt() ) {
+					$special_total += $special_tax_amt * $item->qty;
 				} else {
-					$total += $product_price;
+					$total += $item->before_tax_price() * $item->qty;
 				}
 			}
 			
-			if ( $estimate ) {
-				if ( empty($country) ) {
-					$country = mp_get_setting('base_country');
-				}
-				
-				if ( empty($state) ) {
-					$state = mp_get_setting('base_province');
-				}
-			}
-						
 			//check required fields
 			if ( empty($country) || ! $this->has_items() || ($total + $special_total) <= 0 ) {
 				return false;
 			}
-		
-			switch ( mp_get_setting('base_country') ) {
-				case 'US':
-					// USA taxes are only for orders delivered inside the state
-					if ( $country == 'US' && $state == mp_get_setting('base_province') ) {
-						$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
-					}
-				break;
-		
-				case 'CA':
-					 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
-					if ( $country == 'CA' && array_key_exists($state, mp()->canadian_provinces) ) {
-						if ( $tax_rate = mp_get_setting("tax->canada_rate->$state") ) {
-							$tax_amt = ($total * $tax_rate) + $special_total;
-						} else { //backwards compat with pre 2.2 if per province rates are not set
-							$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
-						}
-					}
-				break;
-		
-				case 'AU':
-					//Australia taxes orders in country
-					if ( $country == 'AU' ) {
-						$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
-					}
-				break;
-		
-				default:
-					//EU countries charge VAT within the EU
-					if ( in_array(mp_get_setting('base_country'), mp()->eu_countries) ) {
-						if ( in_array($country, mp()->eu_countries) ) {
-							$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
-						}
-					} else {
-						//all other countries use the tax outside preference
-						if ( mp_get_setting('tax->tax_outside') || (! mp_get_setting('tax->tax_outside') && $country == mp_get_setting('base_country')) ) {
-							$tax_amt = ($total * mp_get_setting('tax->rate')) + $special_total;
-						}
-					}
-				break;
-			}
 			
+			$tax_amt = $total * mp_tax_rate();
 			if ( empty( $tax_amt ) ) {
 				$tax_amt = 0;
 			}
+			
+			// Add in special tax
+			$tax_amt += $special_total;
 			
 			// Add in shipping?
 			$tax_amt += $this->shipping_tax_total();
