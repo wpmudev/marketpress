@@ -379,6 +379,14 @@ class Marketpress {
 				'path' => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
 			) );
 		}
+		
+		/**
+		 * Fires after all internal addons have been registered
+		 *
+		 * @since 3.0
+		 * @access public
+		 */
+		do_action( 'marketpress/register_addons' );
 	}
 	
 	/**
