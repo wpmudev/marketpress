@@ -2,3 +2,8 @@
 	path = includes/admin/dash-notice
 	url = git@bitbucket.org:incsub/wpmudev-dashboard-notification.git
 	branch = master
+	
+[submodule "includes/postindexer"]
+	path = includes/postindexer
+	url = git@bitbucket.org:incsub/post-indexer.git
+	branch = master
