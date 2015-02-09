@@ -50,7 +50,29 @@ class MP_Admin_Multisite {
 		
 		if ( mp_cart()->is_global ) {
 			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway'), 10, 4 );
+			add_action( 'network_admin_notices', array( &$this, 'post_indexer_admin_notice' ) );
 		}
+	}
+	
+	/**
+	 * Get the Post Indexer nag notice html
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @global $wpmudev_un
+	 */
+	protected function _post_indexer_install_html() {
+		global $wpmudev_un;
+		
+		$install_btn = '';
+		if ( isset( $wpmudev_un ) && ! $this->is_post_indexer_installed() ) {
+			if ( $url = $wpmudev_un->auto_install_url( 30 ) ) {
+				$install_btn = '<a class="button-primary" href="' . $url . '">' . __( 'Install Post Indexer', 'mp' ) . '</a>';
+			}
+		}
+		
+		$plugin_url = 'https://premium.wpmudev.org/project/post-indexer';
+		return sprintf( __( '<strong>IMPORTANT!</strong> The MarketPress Global Cart requires the <a target="_blank" href="%s">Post Indexer</a> plugin to also be installed. This feature will not work until <a target="_blank" href="%s">Post Indexer</a> has been installed. %s', 'mp' ), $plugin_url, $plugin_url, $install_btn );
 	}
 	
 	/**
@@ -62,6 +84,21 @@ class MP_Admin_Multisite {
 	 */
 	public function force_check_global_gateway( $value, $post_id, $raw, $field ) {
 		return 1;
+	}
+	
+	/**
+	 * If global cart is enabled and the Post Indexer plugin is not installed, display an admin notice
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action network_admin_notices
+	 */
+	public function post_indexer_admin_notice() {
+		if ( $this->is_post_indexer_installed() ) {
+			return false;
+		}
+		
+		echo '<div class="error"><p>' . $this->_post_indexer_install_html() . '</p></div>';
 	}
 
 	/**
@@ -277,6 +314,17 @@ class MP_Admin_Multisite {
 				'options'	 => $options_permissions,
 			) );
 		}
+	}
+	
+	/**
+	 * Check if Post Indexer plugin is installed
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	public function is_post_indexer_installed() {
+		return ( defined( 'POST_INDEXER_PLUGIN_DIR' ) );
 	}
 
 	/**
