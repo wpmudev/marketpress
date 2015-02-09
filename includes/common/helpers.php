@@ -1092,14 +1092,14 @@ if ( ! function_exists('mp_is_main_site') ) :
 	}
 endif;
 
-if ( ! function_exists('mp_main_site_id') ) :
+if ( ! function_exists('mp_root_blog_id') ) :
 	/**
-	 * Get the main site id
+	 * Get the root blog id
 	 *
 	 * @since 3.0
 	 * @uses $current_site
 	 */
-	function mp_main_site_id() {
+	function mp_root_blog_id() {
 		global $current_site;
 		
 		if ( MP_ROOT_BLOG !== false ) {
