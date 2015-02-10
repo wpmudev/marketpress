@@ -668,6 +668,7 @@ class MP_Products_Screen {
 		$metabox->add_field( 'text', array(
 			'name'			 => 'external_url',
 			'label'			 => array( 'text' => __( 'External URL', 'mp' ) ),
+			'default_value' => 'http://',
 			'conditional'	 => array(
 				'name'	 => 'product_type',
 				'value'	 => 'external',
@@ -914,6 +915,7 @@ class MP_Products_Screen {
 			$repeater->add_sub_field( 'text', array(
 				'name'			 => 'external_url',
 				'label'			 => array( 'text' => __( 'External URL', 'mp' ) ),
+				'default_value' => 'http://',
 				'conditional'	 => array(
 					'name'	 => 'product_type',
 					'value'	 => 'external',
