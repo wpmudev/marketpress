@@ -85,14 +85,14 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 			}
 
 			$gateways = mp_get_setting( 'gateways' );
-			
+
 			foreach ( self::get_gateways() as $code => $plugin ) {
-				$class = $plugin[0];
-				
-				if ( ! class_exists( $class ) ) {
+				$class = $plugin[ 0 ];
+
+				if ( !class_exists( $class ) ) {
 					continue;
 				}
-				
+
 				if ( is_admin() && 'store-settings-payments' == mp_get_get_value( 'page' ) ) {
 					// load all gateways when in admin
 					self::$_active_gateways[ $code ] = new $class;
@@ -473,8 +473,9 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 			$this->on_creation();
 
 			//check required vars
-			if ( empty( $this->plugin_name ) || empty( $this->admin_name ) || empty( $this->public_name ) )
+			if ( empty( $this->plugin_name ) || empty( $this->admin_name ) || empty( $this->public_name ) ) {
 				wp_die( __( "You must override all required vars in your {$this->admin_name} payment gateway plugin!", 'mp' ) );
+			}
 
 			add_filter( 'mp_checkout/confirm_order_html/' . $this->plugin_name, array( &$this, 'confirm_order_html' ) );
 			add_filter( 'mp_checkout_payment_form', array( &$this, '_payment_form_wrapper' ), 10, 3 );
@@ -517,6 +518,8 @@ if ( !function_exists( 'mp_register_gateway_plugin' ) ) :
 			return false;
 		}
 	}
+
+
 
 
 
