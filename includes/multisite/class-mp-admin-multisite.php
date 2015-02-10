@@ -48,9 +48,12 @@ class MP_Admin_Multisite {
 			add_action( 'wpmudev_field/print_scripts/network_store_page', array( &$this, 'print_network_store_page_scripts' ) );
 		}
 		
+		if ( mp_get_network_setting( 'global_cart' ) && ! mp_is_post_indexer_installed() ) {
+			add_action( 'network_admin_notices', array( &$this, 'post_indexer_admin_notice' ) );
+		}
+		
 		if ( mp_cart()->is_global ) {
 			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway'), 10, 4 );
-			add_action( 'network_admin_notices', array( &$this, 'post_indexer_admin_notice' ) );
 		}
 	}
 	
@@ -65,7 +68,7 @@ class MP_Admin_Multisite {
 		global $wpmudev_un;
 		
 		$install_btn = '';
-		if ( isset( $wpmudev_un ) && ! $this->is_post_indexer_installed() ) {
+		if ( isset( $wpmudev_un ) ) {
 			if ( $url = $wpmudev_un->auto_install_url( 30 ) ) {
 				$install_btn = '<a class="button-primary" href="' . $url . '">' . __( 'Install Post Indexer', 'mp' ) . '</a>';
 			}
@@ -94,10 +97,6 @@ class MP_Admin_Multisite {
 	 * @action network_admin_notices
 	 */
 	public function post_indexer_admin_notice() {
-		if ( $this->is_post_indexer_installed() ) {
-			return false;
-		}
-		
 		echo '<div class="error"><p>' . $this->_post_indexer_install_html() . '</p></div>';
 	}
 
@@ -316,17 +315,6 @@ class MP_Admin_Multisite {
 		}
 	}
 	
-	/**
-	 * Check if Post Indexer plugin is installed
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @return bool
-	 */
-	public function is_post_indexer_installed() {
-		return ( defined( 'POST_INDEXER_PLUGIN_DIR' ) );
-	}
-
 	/**
 	 * Add menu items to the network admin menu
 	 *

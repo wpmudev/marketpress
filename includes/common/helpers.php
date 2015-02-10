@@ -1092,6 +1092,18 @@ if ( ! function_exists('mp_is_main_site') ) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_is_post_indexer_installed' ) ) :
+	/**
+	 * Check if Post Indexer plugin is installed
+	 *
+	 * @since 3.0
+	 * @return bool
+	 */
+	function mp_is_post_indexer_installed() {
+		return ( defined( 'POST_INDEXER_PLUGIN_DIR' ) );
+	}
+endif;
+
 if ( ! function_exists('mp_root_blog_id') ) :
 	/**
 	 * Get the root blog id
