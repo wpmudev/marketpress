@@ -1646,6 +1646,15 @@ Notification Preferences: %s', 'mp' );
 		} else {
 			$url = get_permalink( $this->ID );
 		}
+		
+		/**
+		 * Filter the product's URL
+		 *
+		 * @since 3.0
+		 * @param string $url The product's current URL.
+		 * @param MP_Product $this The current product object.
+		 */
+		$url = apply_filters( 'mp_product/url', $url, $this );
 
 		if ( $echo ) {
 			echo $url;

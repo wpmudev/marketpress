@@ -174,6 +174,33 @@ class MP_Cart {
 	}
 	
 	/**
+	 * Get the cart's URL
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function cart_url() {
+		$switched = false;
+		if ( $this->is_global && mp_root_blog_id() != get_current_blog_id() ) {
+			$switched = true;
+		}
+		
+		if ( $switched ) {
+			$switched = true;
+			switch_to_blog( mp_root_blog_id() );
+		}
+		
+		$url = mp_store_page_url( 'cart', false );
+		
+		if ( $switched ) {
+			restore_current_blog();
+		}
+		
+		return $url;
+	}
+	
+	/**
 	 * Update the cart (ajax)
 	 *
 	 * @since 3.0
@@ -301,6 +328,29 @@ class MP_Cart {
 	 */
 	public function get_all_items() {
 		return $this->_items;
+	}
+	
+	/**
+	 * Get the ids of the blogs that contain items in the user's cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return array
+	 */
+	public function get_blog_ids() {
+		$items = $this->get_all_items();
+		return array_keys( $items );
+	}
+	
+	/**
+	 * Get the current blog id of the cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return int
+	 */
+	public function get_blog_id() {
+		return $this->_id;
 	}
 		
 	/**
@@ -924,45 +974,40 @@ class MP_Cart {
 			return;
 		}
 		
-		$items = $this->get_items();
 		$html = '
 		<div id="mp-floating-cart"' . (( $this->has_items() ) ? ' class="has-items"' : '') . '>
 			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . $this->product_total(true) . '</span> ' . $this->item_count(false) . '</div>
 			<div id="mp-floating-cart-contents">';
 	
 		if ( $this->has_items() ) {
+			$blog_ids = $this->get_blog_ids();
 			$html .= '
 				<ul id="mp-floating-cart-items-list">';
-		
-			foreach ( $items as $item => $qty ) {
-				$product = new MP_Product($item);
-			
-				$html .= '
-					<li class="mp-floating-cart-item" id="mp-floating-cart-item-' . $product->ID . '">
-						<a class="mp-floating-cart-item-link" href="' . $product->url(false) . '">' . $product->image(false, 'floating-cart', 50) . '
-							<div class="mp-floating-cart-item-content">
-								<h3 class="mp-floating-cart-item-title">' . $product->title(false) . '</h3>
-								<span class="mp-floating-cart-item-attribute"><strong>' . __('Quantity', 'mp') . ':</strong> <em>' . $qty . '</em></span>';
 				
-				// Display attributes
-				if ( $product->is_variation() ) {
-					$attributes = $product->get_attributes();
-					foreach ( $attributes as $taxonomy => $att ) {
-						$term = current($att['terms']);
-						$html .= '
-									<span class="mp-floating-cart-item-attribute"><strong>' . $att['name'] . ':</strong> <em>' . $term . '</em></span>';
-					}
+			while ( 1 ) {
+				if ( $this->is_global ) {
+					$blog_id = array_shift( $blog_ids );
+					$this->set_id( $blog_id );
+					
+					$html .= '
+						<li><h4 class="mp-floating-cart-store-name">' . get_blog_option( $this->_id, 'blogname' ) . '</h4></li>';	
 				}
 				
-				$html .= '
-							</div>
-						</a>
-					</li>';
+				$items = $this->get_items();
+
+				foreach ( $items as $item => $qty ) {
+					$html .= $this->floating_cart_line_item_html( $item, $qty );
+				}
+				
+				if ( ($this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+					$this->reset_id();
+					break;
+				}
 			}
 			
 			$html .= '
 				</ul>
-				<a id="mp-floating-cart-button" href="' . get_permalink(mp_get_setting('pages->cart')) . '">' . __('View Cart', 'mp') . '</a>';
+				<a id="mp-floating-cart-button" href="' . $this->cart_url() . '">' . __('View Cart', 'mp') . '</a>';
 		} else {
 			$html .= '
 				<div id="mp-floating-cart-no-items">
@@ -985,6 +1030,50 @@ class MP_Cart {
 			return $html;
 		}
 	}
+	
+	/**
+	 * Get the html markup for an individual line item for the floating cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param int $item_id The product's ID.
+	 * @param int $qty The quantity of the product in the cart.
+	 */
+	public function floating_cart_line_item_html( $item_id, $qty ) {
+		$product = new MP_Product( $item_id );
+	
+		$html = '
+			<li class="mp-floating-cart-item" id="mp-floating-cart-item-' . $product->ID . '">
+				<a class="mp-floating-cart-item-link" href="' . $product->url( false ) . '">' . $product->image( false, 'floating-cart', 50 ) . '
+					<div class="mp-floating-cart-item-content">
+						<h3 class="mp-floating-cart-item-title">' . $product->title( false ) . '</h3>
+						<span class="mp-floating-cart-item-attribute"><strong>' . __('Quantity', 'mp') . ':</strong> <em>' . $qty . '</em></span>';
+		
+		// Display attributes
+		if ( $product->is_variation() ) {
+			$attributes = $product->get_attributes();
+			foreach ( $attributes as $taxonomy => $att ) {
+				$term = current( $att['terms'] );
+				$html .= '
+						<span class="mp-floating-cart-item-attribute"><strong>' . $att['name'] . ':</strong> <em>' . $term . '</em></span>';
+			}
+		}
+		
+		$html .= '
+					</div>
+				</a>
+			</li>';
+			
+		/**
+		 * Filter the floating cart line item HTML
+		 *
+		 * @since 3.0
+		 * @param string $html The current line item html.
+		 * @param MP_Product $product The current product object.
+		 * @param int $qty The quantity of the product in the cart.
+		 */
+		return apply_filters( 'mp_cart/floating_cart_line_item_html', $html, $product, $qty );
+	}
 		
 	/**
 	 * Check if cart has a specific item
@@ -1005,8 +1094,19 @@ class MP_Cart {
 	 * @access public
 	 */
 	public function has_items() {
-		$items = $this->get_items();
-		return ( count($items) > 0 );
+		$item_count = 0;
+		
+		if ( $this->is_global ) {
+			$carts = $this->get_all_items();
+			foreach ( $carts as $blog_id => $items ) {
+				$item_count += count( $items );
+			}
+		} else {
+			$items = $this->get_items();
+			$item_count = count( $items );
+		}
+		
+		return ( $item_count > 0 );
 	}
 
 	/**
@@ -1044,11 +1144,25 @@ class MP_Cart {
 	 * @param bool $format Optional, whether for format or not. Defaults to true.
 	 */
 	public function item_count( $echo = true, $format = true ) {
-		$items = $this->get_items();
+		$blog_ids = $this->get_blog_ids();
 		$numitems = 0;
 		
-		foreach ( $items as $item_id => $qty ) {
-			$numitems += $qty;
+		while ( 1 ) {
+			if ( $this->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				$this->set_id( $blog_id );	
+			}
+			
+			$items = $this->get_items();
+			
+			foreach ( $items as $item_id => $qty ) {
+				$numitems += $qty;
+			}
+			
+			if ( ($this->is_global && false === current( $blog_ids )) || ! $this->is_global ) {
+				$this->reset_id();
+				break;
+			}
 		}
 		
 		$snippet = $numitems;
@@ -1077,24 +1191,40 @@ class MP_Cart {
 	 */
 	public function product_total( $format = false ) {
 		if ( false === mp_arr_get_value('product', $this->_total) ) {
-			$items = $this->get_items_as_objects();
 			$total = 0;
+			$blog_ids = $this->get_blog_ids();
+			$this->_total['product'] = 0;
 			
-			foreach ( $items as $item ) {
-				$price = $item->get_price('lowest');
-				$item_subtotal = ($price * $item->qty);
-				$total += $item_subtotal;
+			while ( 1 ) {
+				if ( $this->is_global ) {
+					$blog_id = array_shift( $blog_ids );
+					$this->set_id( $blog_id );
+				}
+				
+				$items = $this->get_items_as_objects();
+				
+				foreach ( $items as $item ) {
+					$price = $item->get_price('lowest');
+					$item_subtotal = ($price * $item->qty);
+					$total += $item_subtotal;
+				}
+
+				/**
+				 * Filter the product total
+				 *
+				 * @since 3.0
+				 * @param float The cart total.
+				 * @param MP_Cart The current cart object.
+				 * @param array The current cart items.
+				 */
+				$this->_total['product'] += (float) apply_filters('mp_cart/product_total', $total, $items);
+				
+				if ( ($this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+					$this->reset_id();
+					break;
+				}
 			}
 			
-			/**
-			 * Filter the product total
-			 *
-			 * @since 3.0
-			 * @param float The cart total.
-			 * @param MP_Cart The current cart object.
-			 * @param array The current cart items.
-			 */
-			$this->_total['product'] = apply_filters('mp_cart/product_total', $total, $items);
 		}
 		
 		$total = mp_arr_get_value('product', $this->_total);
@@ -1129,6 +1259,7 @@ class MP_Cart {
 	public function reset_id() {
 		$this->_id = $this->_id_original;
 		$this->_id_original = null;
+		switch_to_blog( $this->_id );
 	}
 	
 	/**
@@ -1144,6 +1275,7 @@ class MP_Cart {
 		}
 		
 		$this->_id = $id;
+		switch_to_blog( $this->_id );
 	}
 	
 	/**
@@ -1453,7 +1585,13 @@ class MP_Cart {
 			}
 		}
 		
-		setcookie($this->_cookie_id, serialize($this->_items), $expire, COOKIEPATH, COOKIE_DOMAIN);
+		// Set the cookie domain
+		$cookie_domain = COOKIE_DOMAIN;
+		if ( mp_cart()->is_global && is_subdomain_install() ) {
+			$cookie_domain = get_blog_details( mp_main_site_id() )->domain;
+		}
+		
+		setcookie( $this->_cookie_id, serialize( $this->_items ), $expire, '/', $cookie_domain );
 	}
 	
 	/**

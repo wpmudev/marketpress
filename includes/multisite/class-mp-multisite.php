@@ -42,45 +42,33 @@ class MP_Multisite {
 	private function __construct() {
 		$this->maybe_install();
 		
-		if ( mp_get_network_setting( 'global_cart' ) ) {
+		if ( mp_get_network_setting( 'global_cart' ) && mp_is_post_indexer_installed() ) {
 			mp_cart()->is_global = true;
+			$this->post_indexer_set_post_types();
+			
+			add_filter( 'mp_product/url', array( &$this, 'product_url' ), 10, 2 );
 		}
 		
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 	}
 
 	/**
-	 * Fixes bad mp_term_relationships records (e.g. term_id = 0)
+	 * Drop old multisite tables
 	 *
-	 * @since 2.9.4
+	 * @since 3.0
 	 * @access public
-	 * @uses $wpdb
+	 * @global $wpdb
 	 */
-	public function fix_bad_term_relationships() {
+	public function drop_old_ms_tables() {
 		global $wpdb;
 		
-		$current_blog_id = get_current_blog_id();
-		$results = $wpdb->get_results("
-			SELECT t1.post_id AS global_id, t1.term_id, t2.blog_id, t2.post_id
-			FROM {$wpdb->base_prefix}mp_term_relationships t1
-			INNER JOIN {$wpdb->base_prefix}mp_products t2 ON t2.id = t1.post_id 
-			WHERE t1.term_id = 0
-			ORDER BY t2.blog_id ASC
-		");
+		$table1 = $wpdb->base_prefix . 'mp_products';
+		$table2 = $wpdb->base_prefix . 'mp_terms';
+		$table3 = $wpdb->base_prefix . 'mp_term_relationships';
 		
-		if ( is_array($results) ) {
-			foreach ( $results as $row ) {
-				if ( get_current_blog_id() != $row->blog_id ) {
-					switch_to_blog( $row->blog_id );
-				}
-				
-				$this->index_product( $row->post_id );
-			}
-			
-			switch_to_blog( $current_blog_id );
-		}
+		$wpdb->query( "DROP TABLE IF EXISTS $table1, $table2, $table3" );
 	}
-	
+
 	/**
 	 * Filter out gateways that aren't allowed according to network admin settings
 	 *
@@ -108,7 +96,7 @@ class MP_Multisite {
 		
 		return $gateways;
 	}
-
+	
 	/**
 	 * Check to see if install sequence needs to be run
 	 *
@@ -123,17 +111,9 @@ class MP_Multisite {
 			return;
 		}
 		
-		$this->ms_settings();
-		$this->ms_tables();
-		
-		switch ( $build ) {
-			case 2 :
-				$this->fix_bad_term_relationships();
-			break;
-		}
-		
+		$this->drop_old_ms_tables();
+				
 		update_site_option( 'mp_network_build', $this->build );
-		update_option( 'mp_flush_rewrites', 1 );
 	}
 	
 	/**
@@ -153,7 +133,11 @@ class MP_Multisite {
 				'default3' => 'full',
 			),
 		);
-
+		
+		if ( ! class_exists( 'MP_Gateway_API' ) ) {
+			require_once mp_plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
+		}
+		
 		$gateways = MP_Gateway_API::get_gateways();	
 		foreach ( $gateways as $code => $gateway ) {
 			$access = ( $gateway->plugin_name != 'paypal_express' ) ? 'none' : 'full';
@@ -166,56 +150,40 @@ class MP_Multisite {
 	}
 	
 	/**
-	 * Create/update multisite tables
+	 * Make sure product post types are indexed by Post Indexer
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @uses $wpdb
 	 */
-	public function ms_tables() {
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	public function post_indexer_set_post_types() {
+		$pi_post_types = (array) get_site_option( 'postindexer_globalposttypes', array( 'post' ) );
+		$changed = false;
 		
-		$charset_collate = $wpdb->get_charset_collate();
+		foreach ( mp()->post_types as $post_type ) {
+			if ( ! in_array( $post_type, $pi_post_types ) ) {
+				$pi_post_types[] = $post_type;
+				$changed = true;
+			}
+		}
 		
-		// mp_products table
-		dbDelta( "CREATE TABLE {$wpdb->base_prefix}mp_products (
-			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-			site_id bigint(20),
-			blog_id bigint(20),
-			blog_public int(2),
-			post_id bigint(20),
-			post_author bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-			post_title text NOT NULL,
-			post_content longtext NOT NULL,
-			post_permalink text NOT NULL,
-			post_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-			post_date_gmt datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-			post_modified datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-			post_modified_gmt datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-			price decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
-			sales_count bigint(20) unsigned NOT NULL DEFAULT '0',
-			PRIMARY KEY	 (id)
-		) $charset_collate;" );
-		
-		// mp_terms table
-		dbDelta( "CREATE TABLE {$wpdb->base_prefix}mp_terms (
-			term_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-			name varchar(200) NOT NULL DEFAULT '',
-			slug varchar(200) NOT NULL DEFAULT '',
-			type varchar(20) NOT NULL DEFAULT 'product_category',
-			count bigint(10) NOT NULL DEFAULT '0',
-			PRIMARY KEY  (term_id),
-			UNIQUE KEY slug (slug),
-			KEY name (name)
-		) $charset_collate;" );
-
-		// mp_terms_relationships
-		dbDelta( "CREATE TABLE {$wpdb->base_prefix}mp_term_relationships (
-			post_id bigint(20) UNSIGNED NOT NULL,
-			term_id bigint(20) UNSIGNED NOT NULL,
-			PRIMARY KEY  (post_id, term_id),
-			KEY (term_id)
-		) $charset_collate;" );
+		if ( $changed ) {
+			update_site_option( 'postindexer_globalposttypes', $pi_post_types );
+		}
+	}
+	
+	/**
+	 * Get the correct product url when global cart is enabled
+	 *
+	 * When using switch_to_blog $wp_rewrite permastructs don't get updated so
+	 * this is required to get the correct product url.
+	 *
+	 * See https://core.trac.wordpress.org/ticket/20861 for more info.
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function product_url( $url, $product ) {
+		return trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
 	}
 }
 

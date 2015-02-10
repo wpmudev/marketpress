@@ -30,14 +30,14 @@ define( 'MP_VERSION', '3.0a.10' );
 
 class Marketpress {	
 	/**
-	 * 
+	 * Refers to the post types that MarketPress uses
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @var bool
+	 * @var array
 	 */
-	var $weight_printed = false;
-	
+	var $post_types = array( 'mp_product', 'product', 'mp_product_variation' );
+
 	/**
 	 * Refers to the single instance of the class
 	 *
@@ -70,6 +70,7 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access private
+	 * @var string
 	 */
 	private $_plugin_dir = null;
 	
@@ -379,6 +380,14 @@ class Marketpress {
 				'path' => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
 			) );
 		}
+		
+		/**
+		 * Fires after all internal addons have been registered
+		 *
+		 * @since 3.0
+		 * @access public
+		 */
+		do_action( 'marketpress/register_addons' );
 	}
 	
 	/**
