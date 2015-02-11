@@ -7,14 +7,8 @@
 		};
 		
 		var modifyBulkActionsInput = function(){
-			var $select = $('select[name="action"],select[name="action2"]'),
-					options = {
-						"-1" : "<?php _e('Change Status', 'mp'); ?>",
-						"order_received" : "<?php _e('Received', 'mp'); ?>",
-						"order_paid" : "<?php _e('Paid', 'mp'); ?>",
-						"order_shipped" : "<?php _e('Shipped', 'mp'); ?>",
-						"order_closed" : "<?php _e('Closed', 'mp'); ?>",
-					};
+			var $select = $('select[name="action"],select[name="action2"]');
+			var options = mp_admin_orders.bulk_actions;
 					
 			$select.find('option').remove();
 			

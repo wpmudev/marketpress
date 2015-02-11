@@ -429,8 +429,9 @@ class MP_Orders_Admin {
 		
 		$wp_list_table = _get_list_table('WP_Posts_List_Table');
 		$action = $wp_list_table->current_action();
+		
 		$posts = mp_get_get_value('post', array());
-		$valid_actions = array('order_received', 'order_paid', 'order_shipped', 'order_closed');
+		$valid_actions = array('order_received', 'order_paid', 'order_shipped', 'order_closed', 'trash', 'delete_all');
 		$pagenum = $wp_list_table->get_pagenum();		
 		
 		if ( empty($action) ) {
@@ -443,23 +444,35 @@ class MP_Orders_Admin {
 		if ( ! in_array($action, $valid_actions) ) {
 			wp_die(__('An invalid bulk action was requested. Please go back and try again.', 'mp'));
 		}
-		
-		foreach ( $posts as $post_id ) {
-			wp_update_post(array(
-				'ID' => $post_id,
-				'post_status' => $action
-			));
-		}
-	
-		$sendback = remove_query_arg(array('action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', '_status', 'post', 'bulk_edit', 'post_view', 'mp_order_status_updated_single'), wp_get_referer());
+
+		$sendback = remove_query_arg(array('action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', 'post_status', '_status', 'post', 'bulk_edit', 'post_view', 'mp_order_status_updated', 'mp_order_status_updated_single'), wp_get_referer());
 		
 		if ( ! $sendback ) {
 			$sendback = admin_url('edit.php?post_type=mp_order');
 		}
-
-		$sendback = add_query_arg(array('paged' => $pagenum, 'mp_order_status_updated' => 1), $sendback);
 		
-		wp_redirect($sendback);
+		if ( 'delete_all' == $action ) {
+			$posts = get_posts( array(
+				'post_type' => 'mp_order',
+				'post_status' => 'trash',
+				'numberposts' => -1,
+			) );
+			
+			foreach ( $posts as $post ) {
+				wp_delete_post( $post->ID, true );
+			}
+		} else {
+			foreach ( $posts as $post_id ) {
+				wp_update_post(array(
+					'ID' => $post_id,
+					'post_status' => $action
+				));
+			}
+		
+			$sendback = add_query_arg(array('paged' => $pagenum, 'mp_order_status_updated' => 1), $sendback);
+		}
+		
+		wp_redirect( $sendback );
 		exit;
 	}
 	
@@ -599,6 +612,17 @@ class MP_Orders_Admin {
 		
 		wp_enqueue_style( 'mp-admin-orders', mp_plugin_url( 'includes/admin/ui/css/admin-orders.css' ), false, MP_VERSION );
 		wp_enqueue_script( 'mp-admin-orders', mp_plugin_url( 'includes/admin/ui/js/admin-orders.js' ), false, MP_VERSION );
+		
+		wp_localize_script( 'mp-admin-orders', 'mp_admin_orders', array(
+			'bulk_actions' => array(
+				'-1' => __( 'Change Status', 'mp' ),
+				'order_received' => __(' Received', 'mp' ),
+				'order_paid' => __( 'Paid', 'mp' ),
+				'order_shipped' => __( 'Shipped', 'mp' ),
+				'order_closed' => __( 'Closed', 'mp' ),
+				'trash' => __( 'Move To Trash', 'mp' ),
+			),
+		) );
 	}
 	
 	
