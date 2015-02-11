@@ -74,6 +74,10 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_customer_info_metabox( $order ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_customer_info_nonce', 'mp_save_customer_info' ) ) ) {
+			return;
+		}
+		
 		$order->update_meta( 'mp_billing_info', mp_get_post_value( 'mp->billing_info' ) );
 		$order->update_meta( 'mp_shipping_info', mp_get_post_value( 'mp->shipping_info' ) );		
 	}
@@ -86,6 +90,10 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_order_notes_metabox( $order ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_order_notes_nonce', 'mp_save_order_notes' ) ) ) {
+			return;
+		}
+		
 		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
 		if ( ! empty( $order_notes ) ) {
 			$order->update_meta( 'mp_order_notes',  $order_notes );
@@ -102,6 +110,10 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_shipping_info_metabox( $order ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_shipping_info_nonce', 'mp_save_shipping_info' ) ) ) {
+			return;
+		}
+		
 		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
 		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
 		if ( ! empty( $tracking_num ) && !empty( $shipment_method ) ) {
@@ -164,7 +176,7 @@ class MP_Orders_Admin {
 	 * @action save_post
 	 */
 	public function save_meta_boxes( $post_id ) {
-		if ( mp_doing_autosave() ) {
+		if ( mp_doing_autosave() || mp_doing_ajax() ) {
 			return;
 		}
 		
@@ -301,6 +313,7 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_order_notes( $post ) {
 		$order = new MP_Order( $post );
+		wp_nonce_field( 'mp_save_order_notes', 'mp_save_order_notes_nonce' );
 		?>
 		<textarea class="widefat" name="mp[order_notes]" rows="5"><?php echo $order->get_meta( 'mp_order_notes', '' ); ?></textarea>
 		<?php
@@ -328,6 +341,8 @@ class MP_Orders_Admin {
 		 * @param array $carrier An array of carriers.
 		 */
 		$carriers = apply_filters( 'mp_shipping_carriers_array', $carriers );
+		
+		wp_nonce_field( 'mp_save_shipping_info', 'mp_save_shipping_info_nonce' );
 		?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br />
@@ -363,6 +378,7 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_customer_info( $post ) {
 		$order = new MP_Order( $post );
+		wp_nonce_field( 'mp_save_customer_info', 'mp_save_customer_info_nonce' );
 		echo $order->get_addresses( true );
 	}
 	
