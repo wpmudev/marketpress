@@ -1281,7 +1281,6 @@ class MP_Cart {
 		if ( $this->is_global ) {
 			switch_to_blog( $this->_id );
 		}
-		}
 	}
 
 	/**
