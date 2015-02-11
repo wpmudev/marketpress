@@ -297,25 +297,17 @@ class MP_Cart {
 	 * @since 3.0
 	 * @access protected
 	 */
-	protected function _get_cart_cookie( $global = false ) {
+	protected function _get_cart_cookie() {
 		if ( ! $this->_use_cookies ) {
 			// Not using cookies - bail
 			return false;
 		}
 		
 		$this->_cookie_id = 'mp_globalcart_' . COOKIEHASH;
-		$global_cart = array($this->_id => array());
+		$this->_items = array( $this->_id => array() );
 	 
-		if ( $cart_cookie = mp_get_cookie_value($this->_cookie_id) ) {
-			$global_cart = unserialize($cart_cookie);
-		}
-		
-		$this->_items = $global_cart;
-		
-		if ( $global ) {
-			return $this->get_all_items();
-		} else {
-	 		return $this->get_items();
+		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
+			$this->_items = unserialize( $cart_cookie );
 		}
 	}
 
@@ -378,43 +370,6 @@ class MP_Cart {
 	 */
 	public function get_items() {
 		$items = mp_arr_get_value( $this->_id, $this->_items, array() );
-		
-		// Check for products that are no longer in stock or have been deleted
-		//! TODO
-		/*if ( ! wp_cache_get( 'items_checked', 'mp_cart' ) ) {
-			wp_cache_set( 'items_checked', true, 'mp_cart' );
-			
-			$update_cookie = false;
-			
-			foreach ( $items as $product_id => $qty ) {
-				$product = new MP_Product( $product_id );
-				
-				if ( ! $product->exists() ) {
-					// Product has been deleted. Flag it as such and remove from $items array.
-					$this->_items_unavailable[ 'deleted' ][] = $product_id;
-					unset( $items[ $product_id ] );
-					$update_cookie = true;
-				} elseif ( ! $product->in_stock( $qty ) ) {
-					// Not enough of product available in stock. Adjust stock to available stock and set flag.
-					if ( $product->get_stock() <= 0 ) {
-						$this->_items_unavailable[ 'deleted' ][] = $product_id;
-						unset( $items[ $product_id ] );
-					} else {
-						$this->_items_unavailable[ 'stock_issue' ][] = $product_id;
-						$items[ $product_id ] = $product->get_stock();
-					}
-					
-					$update_cookie = true;
-				}
-			}
-			
-			$this->_items = $items;
-			
-			if ( $update_cookie ) {
-				$this->_update_cart_cookie();
-			}
-		}*/
-		
 		return (array) $items;
 	}
 	
@@ -680,7 +635,7 @@ class MP_Cart {
 			}
 		}
 		
-		$products = $this->_convert_to_objects($this->get_items());
+		$products = $this->get_items_as_objects();
 		
 		if ( $editable ) {	
 			$html .= '
@@ -1094,19 +1049,21 @@ class MP_Cart {
 	 * @access public
 	 */
 	public function has_items() {
-		$item_count = 0;
-		
 		if ( $this->is_global ) {
 			$carts = $this->get_all_items();
 			foreach ( $carts as $blog_id => $items ) {
-				$item_count += count( $items );
+				if ( count( $items ) > 0 ) {
+					return true;
+				}
 			}
 		} else {
 			$items = $this->get_items();
-			$item_count = count( $items );
+			if ( count( $items ) > 0 ) {
+				return true;
+			}
 		}
 		
-		return ( $item_count > 0 );
+		return false;
 	}
 
 	/**
@@ -1224,7 +1181,6 @@ class MP_Cart {
 					break;
 				}
 			}
-			
 		}
 		
 		$total = mp_arr_get_value('product', $this->_total);
@@ -1257,9 +1213,16 @@ class MP_Cart {
 	 * @access public
 	 */
 	public function reset_id() {
+		if ( is_null( $this->_id_original ) ) {
+			return;
+		}
+		
 		$this->_id = $this->_id_original;
 		$this->_id_original = null;
-		switch_to_blog( $this->_id );
+		
+		if ( $this->is_global ) {
+			switch_to_blog( $this->_id );
+		}
 	}
 	
 	/**
@@ -1275,7 +1238,10 @@ class MP_Cart {
 		}
 		
 		$this->_id = $id;
-		switch_to_blog( $this->_id );
+		
+		if ( $this->is_global ) {
+			switch_to_blog( $this->_id );
+		}
 	}
 	
 	/**
