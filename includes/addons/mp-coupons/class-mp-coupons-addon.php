@@ -1026,14 +1026,14 @@ class MP_Coupons_Addon {
 
 MP_Coupons_Addon::get_instance();
 
-if ( ! function_exists('mp_coupons') ) :
+if ( ! function_exists('mp_coupons_addon') ) :
 	/**
 	 * Get the MP_Coupons instance
 	 *
 	 * @since 3.0
 	 * @return MP_Coupons
 	 */
-	function mp_coupons() {
-		return MP_Coupons::get_instance();
+	function mp_coupons_addon() {
+		return MP_Coupons_Addon::get_instance();
 	}
 endif;
