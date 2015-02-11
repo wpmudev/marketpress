@@ -74,7 +74,7 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_customer_info_metabox( $order ) {
-		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_customer_info_nonce', 'mp_save_customer_info' ) ) ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_customer_info_nonce' ), 'mp_save_customer_info' ) ) {
 			return;
 		}
 		
@@ -90,7 +90,7 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_order_notes_metabox( $order ) {
-		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_order_notes_nonce', 'mp_save_order_notes' ) ) ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_order_notes_nonce' ), 'mp_save_order_notes' ) ) {
 			return;
 		}
 		
@@ -110,7 +110,7 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_shipping_info_metabox( $order ) {
-		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_shipping_info_nonce', 'mp_save_shipping_info' ) ) ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_shipping_info_nonce' ), 'mp_save_shipping_info' ) ) {
 			return;
 		}
 		
