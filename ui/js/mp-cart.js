@@ -179,11 +179,13 @@ var mp_cart = {};
 				}
 				
 				$.each(resp.data, function(index, value){
-					if ( index == 'qty_in_stock' || index == 'out_of_stock' ) {
+					var $elm = $( '#mp_' + index );
+					
+					if ( index == 'qty_in_stock' || index == 'out_of_stock' || $elm.length == 0 ) {
 						return;
 					}
 					
-					$('#mp_' + index).html(value);
+					$elm.html( value );
 				});
 				
 				if ( resp.data.out_of_stock ) {

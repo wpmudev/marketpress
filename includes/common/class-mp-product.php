@@ -150,9 +150,9 @@ class MP_Product {
 	 * @action wp_ajax_mp_product_update_attributes, wp_ajax_nopriv_mp_product_update_attributes
 	 */
 	public static function ajax_update_attributes() {
-		$product_atts	 = MP_Product_Attributes::get_instance();
-		$attributes		 = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
-		$json			 = array(
+		$product_atts = MP_Product_Attributes::get_instance();
+		$attributes = $filtered_atts = $taxonomies = $filtered_terms = array();
+		$json = array(
 			'out_of_stock'	 => false,
 			'qty_in_stock'	 => 0,
 			'image'			 => false,
@@ -160,25 +160,24 @@ class MP_Product {
 			'excerpt'		 => false,
 			'price'			 => false,
 		);
-		$product_id		 = mp_get_post_value( 'product_id' );
-		$product		 = new MP_Product( $product_id );
-		$qty			 = mp_get_post_value( 'product_quantity', 1 );
-		$qty_changed	 = (bool) mp_get_post_value( 'product_qty_changed' );
+		$product_id = mp_get_post_value( 'product_id' );
+		$product = new MP_Product( $product_id );
+		$qty = mp_get_post_value( 'product_quantity', 1 );
+		$qty_changed = (bool) mp_get_post_value( 'product_qty_changed' );
 
-		if ( !$product->exists() ) {
+		if ( ! $product->exists() ) {
 			wp_send_json_error();
 		}
 
 		$all_atts = $product->get_attributes();
 
 		foreach ( $_POST as $key => $val ) {
-			if ( false !== strpos( $key, $product_atts::SLUGBASE ) ) {
-				$taxonomies[]		 = $key;
-				$attributes[ $key ]	 = $val;
+			if ( false !== strpos( $key, $product_atts::SLUGBASE ) && ! empty( $val ) ) {
+				$taxonomies[] = $key;
+				$attributes[ $key ] = $val;
 			}
 		}
-
-
+		
 		$variations = $product->get_variations_by_attributes( $attributes );
 
 		// Filter out taxonomies that already have values and are still valid
@@ -215,9 +214,9 @@ class MP_Product {
 
 		// Format attribute terms for display
 		foreach ( $filtered_terms as $tax_slug => $terms ) {
-			$json[ $tax_slug ]	 = '';
-			$index				 = 0;
-			$terms				 = $product_atts->sort( $terms, false );
+			$json[ $tax_slug ] = '';
+			$index = 0;
+			$terms = $product_atts->sort( $terms, false );
 			foreach ( $terms as $term ) {
 				$checked	 = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
 				$required	 = ( $index == 0 ) ? true : false;
@@ -333,7 +332,7 @@ class MP_Product {
 			$html .= '
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att[ 'name' ] . '</strong>
-					<div class="clearfix mp_product_options_att_input_label" id="mp_' . $slug . '">
+					<div class="clearfix mp_product_options_att_input_label">
 						<select id="mp_' . $slug . '" name="' . $slug . '" class="required" autocomplete="off">
 							<option value="">' . $default_option_label . '</option>';
 
