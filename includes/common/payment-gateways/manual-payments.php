@@ -32,7 +32,8 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	function on_creation() {
 		//set names here to be able to translate
 		$this->admin_name	 = __( 'Manual Payments', 'mp' );
-		$this->public_name	 = $this->get_setting( 'name', __( 'Manual Payment', 'mp' ) );
+		$public_name = $this->get_setting( 'name', __( 'Manual Payment', 'mp' ) );
+		$this->public_name	 = empty($public_name) ? __( 'Manual Payment', 'mp' ) : $public_name;
 
 		add_filter( 'mp_order/notification_body/manual_payments', array( &$this, 'order_confirmation_email' ), 10, 2 );
 		add_filter( 'mp_order/confirmation_text/' . $this->plugin_name, array( &$this, 'order_confirmation_text' ), 10, 2 );

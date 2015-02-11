@@ -792,7 +792,7 @@ if ( !function_exists( 'mp_arr_get_value' ) ) :
 		$keys	 = explode( '->', $key );
 		$keys	 = array_map( 'trim', $keys );
 		$value	 = mp_arr_search( $array, $key );
-		return ( empty( $value )) ? $default : $value; 		//is_null > empty
+		return ( is_null( $value )) ? $default : $value;
 	}
 
 endif;
