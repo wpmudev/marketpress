@@ -77,44 +77,50 @@ class MP_Coupons_Addon {
 		if ( ! is_admin() || mp_doing_ajax() ) {
 			$this->get_applied();
 			
-			add_filter('mp_cart/after_cart_html', array(&$this, 'coupon_form_cart'), 10, 3);
-			add_filter('mp_product/get_price', array(&$this, 'product_price'), 10, 2);
-			add_filter('mp_cart/product_total', array(&$this, 'product_total'), 10, 2);
-			add_filter('mp_cart/total', array(&$this, 'cart_total'), 10, 3);
-			add_filter('mp_cart/cart_meta/product_total', array(&$this, 'cart_meta_product_total'), 10, 2);
-			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_css_frontend'));
-			add_action('wp_enqueue_scripts', array(&$this, 'enqueue_js_frontend'), 25);
+			if ( mp_cart()->is_global ) {
+				add_filter('mp_cart/after_cart_store_html', array(&$this, 'coupon_form_cart'), 10, 3);
+			} else {
+				add_filter('mp_cart/after_cart_html', array(&$this, 'coupon_form_cart'), 10, 3);
+			}
+			
+			add_filter( 'mp_product/get_price', array( &$this, 'product_price' ), 10, 2 );
+			add_filter( 'mp_cart/product_total', array( &$this, 'product_total' ), 10, 2 );
+			add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
+			add_filter( 'mp_cart/cart_meta/product_total', array( &$this, 'cart_meta_product_total' ), 10, 2 );
+			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_css_frontend' ) );
+			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_js_frontend' ), 25 );
 			add_action( 'mp_cart/after_empty_cart', array( &$this, 'remove_all_coupons' ), 10, 1 );
-			add_action( 'mp_order/new_order', array(& $this, 'process_new_order' ), 10, 1 );
+			add_action( 'mp_order/new_order', array( &$this, 'process_new_order' ), 10, 1 );
+			add_action( 'mp_cart/before_remove_item', array( &$this, 'check_coupons' ), 10, 2 );
 		}
 		
 		if ( is_admin() ) {
-			add_filter('manage_mp_coupon_posts_columns', array(&$this, 'product_coupon_column_headers'));
-			add_action('manage_mp_coupon_posts_custom_column', array(&$this, 'product_coupon_column_data'), 10, 2);
-			add_filter('manage_edit-mp_coupon_sortable_columns', array(&$this, 'product_coupon_sortable_columns'));
+			add_filter( 'manage_mp_coupon_posts_columns', array( &$this, 'product_coupon_column_headers' ) );
+			add_action( 'manage_mp_coupon_posts_custom_column', array( &$this, 'product_coupon_column_data' ), 10, 2 );
+			add_filter( 'manage_edit-mp_coupon_sortable_columns', array( &$this, 'product_coupon_sortable_columns' ) );
 
 			if ( mp_doing_ajax() ) {
-				add_action('wp_ajax_mp_coupons_remove', array(&$this, 'ajax_remove_coupon'));
-				add_action('wp_ajax_nopriv_mp_coupons_remove', array(&$this, 'ajax_remove_coupon'));								
-				add_action('wp_ajax_mp_coupons_apply', array(&$this, 'ajax_apply_coupon'));
-				add_action('wp_ajax_nopriv_mp_coupons_apply', array(&$this, 'ajax_apply_coupon'));				
+				add_action( 'wp_ajax_mp_coupons_remove', array( &$this, 'ajax_remove_coupon' ) );
+				add_action( 'wp_ajax_nopriv_mp_coupons_remove', array( &$this, 'ajax_remove_coupon' ) );								
+				add_action( 'wp_ajax_mp_coupons_apply', array( &$this, 'ajax_apply_coupon' ) );
+				add_action( 'wp_ajax_nopriv_mp_coupons_apply', array( &$this, 'ajax_apply_coupon' ) );				
 				return;
 			}
 			
 			// Add menu items
-			add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
+			add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 			// Modify coupon list table columns/data
-			add_action('pre_get_posts', array(&$this, 'sort_product_coupons'));
+			add_action( 'pre_get_posts', array( &$this, 'sort_product_coupons' ) );
 			// Custom css/javascript
-			add_action('admin_print_styles', array(&$this, 'print_css'));
-			add_action('admin_print_footer_scripts', array(&$this, 'print_js'));
+			add_action( 'admin_print_styles', array( &$this, 'print_css' ) );
+			add_action( 'admin_print_footer_scripts', array( &$this, 'print_js' ) );
 			// On coupon save update post title to equal coupon code field
-			add_filter('wp_insert_post_data', array(&$this, 'save_coupon_data'), 99, 2);
+			add_filter( 'wp_insert_post_data', array( &$this, 'save_coupon_data' ), 99, 2 );
 			// Init metaboxes
-			add_action('init', array(&$this, 'init_metaboxes'));
-			add_action('init', array(&$this, 'init_settings_metaboxes'));
+			add_action( 'init', array( &$this, 'init_metaboxes' ) );
+			add_action( 'init', array( &$this, 'init_settings_metaboxes' ) );
 			// Get coupon code value
-			add_filter('wpmudev_field/before_get_value/coupon_code', array(&$this, 'get_coupon_code_value'), 10, 4);
+			add_filter( 'wpmudev_field/before_get_value/coupon_code', array( &$this, 'get_coupon_code_value' ), 10, 4 );
 		}
 	}
 	
@@ -302,6 +308,33 @@ class MP_Coupons_Addon {
 	}
 	
 	/**
+	 * When an item is removed from the cart, validate applied coupons to ensure they are still valid
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action mp_cart/before_item_removed
+	 * @global $switched
+	 */
+	public function check_coupons( $item_id, $blog_id ) {
+		global $switched;
+		
+		if ( $blog_id != get_current_blog_id() ) {
+			switch_to_blog( $blog_id );
+		}
+		
+		$coupons = $this->get_applied_as_objects();
+		foreach ( $coupons as $coupon ) {
+			if ( ! $coupon->is_valid() ) {
+				$this->remove_coupon( $coupon->ID );
+			}
+		}
+		
+		if ( $switched ) {
+			restore_current_blog();
+		}
+	}
+	
+	/**
 	 * Display the coupon form
 	 *
 	 * @since 3.0
@@ -310,9 +343,10 @@ class MP_Coupons_Addon {
 	 * @return string
 	 */
 	public function coupon_form_cart( $html, $cart, $args ) {
-		if ( $cart->is_editable ) {
+		if ( $cart->is_editable && mp_addons()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
 			$html .= '
-				<div id="mp-coupon-form">
+				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp-coupon-form' . (( $cart->is_global ) ? ' mp-coupon-form-store' : '') . '">
+					<input type="hidden" name="mp_cart_coupon_store_id" value="' . $cart->get_blog_id() . '" />
 					<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
 					<span class="mp-cart-input">
 						<input type="text" name="mp_cart_coupon" class="mp-input-small" value="" />

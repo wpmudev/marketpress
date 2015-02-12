@@ -332,11 +332,17 @@ class MP_Coupon {
 			$is_valid = false;
 		} elseif ( $this->get_meta('has_end_date') && ($now > strtotime($this->get_meta('end_date', 0, false))) ) {
 			$is_valid = false;
-		} elseif ( ! $this->get_meta('can_be_combined') ) {
-			$applied = mp_coupons_addon()->get_applied_as_objects();
-			
-			if ( count($applied) == 1 ) {
-				//! TODO: make sure this coupon can be combined with coupons that are already applied
+		} elseif ( array() == $this->get_products( true ) ) {
+			$is_valid = false;
+		} else {
+			if ( ! $this->get_meta('can_be_combined') ) {
+				$applied = mp_coupons_addon()->get_applied();
+				
+				if ( count($applied) == 1 ) {
+					$is_valid = false;
+				}
+			} else {
+				//! TODO: coupon can be applied with other coupons
 			}
 		}
 		
