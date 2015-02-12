@@ -584,7 +584,6 @@ class MP_Products_Screen {
 			'id'		 => 'mp-product-images-metabox',
 			'title'		 => __( 'Images', 'mp' ),
 			'post_type'	 => MP_Product::get_post_type(),
-			'option_name' => 'mp_settings_x',
 			'context'	 => 'normal',
 		) );
 
