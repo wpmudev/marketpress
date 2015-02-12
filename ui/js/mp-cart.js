@@ -299,8 +299,16 @@ var mp_cart = {};
 				if ( resp.data.item_count == 0 ) {
 					window.location.href = window.location.href;
 				} else {
-					$( '#mp-cart-item-' + itemId ).remove();
+					var $lineItem = $( '#mp-cart-item-' + itemId );
+					
+					if ( $lineItem.siblings( '.mp-cart-item').length == 0 && $lineItem.closest( '.mp-cart-store' ).length > 0 ) {
+						$lineItem.closest( '.mp-cart-store' ).remove();
+					} else {
+						$lineItem.remove();
+					}
+					
 					$( '#mp-cart-meta' ).replaceWith( resp.data.cartmeta );
+					
 					marketpress.loadingOverlay( 'hide' );
 				}
 			}
