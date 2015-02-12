@@ -757,7 +757,7 @@ class MP_Orders_Admin {
 			
 			//! Order Date
 			case 'mp_orders_date' :
-				$html .= get_the_time(get_option('date_format'));
+				$html .= get_the_time(get_option('date_format').' '.get_option('time_format'));
 			break;
 			
 			//! Order From

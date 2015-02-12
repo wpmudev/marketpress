@@ -197,8 +197,8 @@ class Marketpress {
 				'singular_name' => __('Product', 'mp'),
 				'menu_name' => __('Store', 'mp'),
 				'all_items' => __('Products', 'mp'),
-				'add_new' => __('Create New Product', 'mp'),
-				'add_new_item' => __('Create New Product', 'mp'),
+				'add_new' => __('Add New Product', 'mp'),
+				'add_new_item' => __('Add New Product', 'mp'),
 				'edit_item' => __('Edit Product', 'mp'),
 				'edit' => __('Edit', 'mp'),
 				'new_item' => __('New Product', 'mp'),
@@ -483,11 +483,11 @@ class Marketpress {
 	 * @action init
 	 */
 	public function maybe_flush_rewrites() {
-		$flush_rewrites = get_option( 'mp_flush_rewrites', true );
+		$flush_rewrites = get_option( 'mp_flush_rewrites_30', true );
 		
 		if ( $flush_rewrites == true ) {
 			flush_rewrite_rules();
-			update_option( 'mp_flush_rewrites', false );
+			update_option( 'mp_flush_rewrites_30', false );
 		}		
 	}
 	

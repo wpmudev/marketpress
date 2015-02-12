@@ -61,7 +61,7 @@ class MP_Products_Screen {
 		}
 
 		add_filter( 'enter_title_here', array( &$this, 'custom_placeholder_title' ), 10, 2 );
-
+		add_action( 'admin_menu', array( &$this, 'remove_metaboxes' ) );
 	}
 
 	/**
@@ -354,6 +354,7 @@ class MP_Products_Screen {
 	 */
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
+		$this->init_product_images_metabox();
 		$this->init_product_details_metabox();
 		$this->init_variations_metabox();
 		$this->init_related_products_metabox();
@@ -552,23 +553,53 @@ class MP_Products_Screen {
 	public function init_product_type_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'		 => 'mp-product-type-metabox',
-			'title'		 => __( 'Product Type', 'mp' ),
+			'title'		 => __( 'Product Kind <span class="mp_meta_small_desc">(Physical Product, Digital, etc)</span>', 'mp' ),
 			'post_type'	 => MP_Product::get_post_type(),
-			'context'	 => 'below_title',
+			'context'	 => 'normal',
 		) );
-		$metabox->add_field( 'radio_group', array(
+		$metabox->add_field( 'select', array(
 			'name'			 => 'product_type',
 			'default_value'	 => 'physical',
 			'options'		 => array(
-				'physical'	 => __( 'Physical/Tangible Product', 'mp' ),
+				'physical'	 => __( 'Physical / Tangible Product', 'mp' ),
 				'digital'	 => __( 'Digital Download', 'mp' ),
-				'external'	 => __( 'External/Affiliate Link', 'mp' ),
+				'external'	 => __( 'External / Affiliate Link', 'mp' ),
 			),
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'has_variations',
 			'message'	 => __( 'Does this product have variations such as color, size, etc?', 'mp' ),
 		) );
+	}
+
+	/**
+	 * Initializes the product type metabox
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_product_images_metabox() {
+
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'		 => 'mp-product-images-metabox',
+			'title'		 => __( 'Images', 'mp' ),
+			'post_type'	 => MP_Product::get_post_type(),
+			'option_name' => 'mp_settings_x',
+			'context'	 => 'normal',
+		) );
+
+
+		$repeater = $metabox->add_field( 'repeater', array(
+			'name'			 => 'product_images',
+			'layout'		 => 'table',
+			'add_row_label'	 => __( 'Add Image', 'mp' ),
+		) );
+
+		if ( $repeater instanceof WPMUDEV_Field ) {
+			$repeater->add_sub_field( 'image', array(
+				'name'		 => 'product_image',
+			) );
+		}
 	}
 
 	/**
@@ -668,7 +699,7 @@ class MP_Products_Screen {
 		$metabox->add_field( 'text', array(
 			'name'			 => 'external_url',
 			'label'			 => array( 'text' => __( 'External URL', 'mp' ) ),
-			'default_value' => 'http://',
+			'default_value'	 => 'http://',
 			'conditional'	 => array(
 				'name'	 => 'product_type',
 				'value'	 => 'external',
@@ -728,17 +759,17 @@ class MP_Products_Screen {
 			'slug'	 => 'taxes'
 		) );
 		$metabox->add_field( 'text', array(
-			'name'			 => 'special_tax_rate',
-			'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-			'default_value'	 => '',
-			'desc' => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
-			'conditional'	 => array(
+			'name'						 => 'special_tax_rate',
+			'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
+			'default_value'				 => '',
+			'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
+			'conditional'				 => array(
 				'name'	 => 'product_type',
 				'value'	 => array( 'physical', 'digital' ),
 				'action' => 'show',
 			),
-			'custom_validation_message' => __( 'Please enter a valid tax rate', 'mp' ),
-			'validation'	 => array(
+			'custom_validation_message'	 => __( 'Please enter a valid tax rate', 'mp' ),
+			'validation'				 => array(
 				'custom' => '[^0-9.%]',
 			),
 		) );
@@ -915,7 +946,7 @@ class MP_Products_Screen {
 			$repeater->add_sub_field( 'text', array(
 				'name'			 => 'external_url',
 				'label'			 => array( 'text' => __( 'External URL', 'mp' ) ),
-				'default_value' => 'http://',
+				'default_value'	 => 'http://',
 				'conditional'	 => array(
 					'name'	 => 'product_type',
 					'value'	 => 'external',
@@ -1025,17 +1056,17 @@ class MP_Products_Screen {
 				'slug'	 => 'taxes'
 			) );
 			$repeater->add_sub_field( 'text', array(
-				'name'			 => 'special_tax_rate',
-				'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-				'desc' => __( 'If you would like this variation to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),				
-				'default_value'	 => '',
-				'conditional'	 => array(
+				'name'						 => 'special_tax_rate',
+				'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
+				'desc'						 => __( 'If you would like this variation to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
+				'default_value'				 => '',
+				'conditional'				 => array(
 					'name'	 => 'product_type',
 					'value'	 => array( 'physical', 'digital' ),
 					'action' => 'show',
 				),
-				'custom_validation_message' => __( 'Please enter a valid tax rate', 'mp' ),
-				'validation'	 => array(
+				'custom_validation_message'	 => __( 'Please enter a valid tax rate', 'mp' ),
+				'validation'				 => array(
 					'custom' => '[^0-9.%]',
 				),
 			) );
@@ -1097,9 +1128,27 @@ class MP_Products_Screen {
 		if ( $post->post_type == MP_Product::get_post_type() ) {
 			$placeholder = __( 'Enter your product name here', 'mp' );
 		}
-		
+
 		return $placeholder;
 	}
+
+	/**
+	 * Remove metaboxes from the single product admin page
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action admin_menu
+	 */
+	function remove_metaboxes() {
+		if ( apply_filters( 'mp_remove_excerpt_meta_box', true ) ) {
+			remove_meta_box( 'postexcerpt', 'product', 'normal' );
+		}
+
+		if ( apply_filters( 'mp_remove_author_meta_box', true ) ) {
+			remove_meta_box( 'authordiv', 'product', 'normal' );
+		}
+	}
+
 }
 
 MP_Products_Screen::get_instance();
