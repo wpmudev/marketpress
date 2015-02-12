@@ -172,6 +172,7 @@ class MP_Addons {
 	 *
 	 * @since 3.0
 	 * @access protected
+	 * @action init, switch_blog
 	 */
 	public function set_enabled_addons() {
 		$this->_addons_enabled = mp_get_setting( 'addons', array() );
@@ -189,6 +190,7 @@ class MP_Addons {
 	 * @access private
 	 */
 	private function __construct() {
+		add_action( 'switch_blog', array( &$this, 'set_enabled_addons' ) );
 		add_action( 'init', array( &$this, 'set_enabled_addons' ), 5 );
 	}
 }
