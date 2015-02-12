@@ -1552,6 +1552,7 @@ if ( !function_exists( 'mp_product' ) ) {
 		$form_id = 'mp_buy_form_' . $product_id;
 
 		$variation		 = false;
+		
 		if ( $variation_id	 = get_query_var( 'mp_variation_id' ) ) {
 			$variation = new MP_Product( $variation_id );
 			if ( !$variation->exists() ) {
