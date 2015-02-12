@@ -584,6 +584,20 @@
 		}
 	}
 	
+	.mp-floating-cart-store-name {
+		border-top: 1px solid #ddd;
+		font-weight: 700;
+		margin-top: 10px;
+		padding: 10px 15px 0;
+		text-transform: uppercase;
+		
+		&:first-child {
+			border-top: 0;
+			margin-top: 0;
+			padding-top: 0;
+		}
+	}
+	
 	.mp-floating-cart-item-content {
 		font-size: 12px;
 		overflow: hidden;
@@ -675,6 +689,28 @@
 	
 	.mp-cart-item-qty {
 		padding-top: 15px;
+	}
+		
+	&.mp-cart-global {
+		display: block;
+		
+		.mp-cart-store {
+			border-top: 2px solid #eaeaea;
+			padding-top: 30px;
+			
+			&:first-child {
+				border-top: 0;
+				padding-top: 0;
+			}
+		}
+		
+		.mp-cart-store-name {
+		}
+		
+		.mp-cart-store-items	{
+			display: table;
+			width: 100%;
+		}
 	}
 	
 	&.mp-cart-readonly {

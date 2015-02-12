@@ -521,6 +521,17 @@ class MP_Product {
 	}
 
 	/**
+	 * Get the product's ID for global cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function global_id() {
+		return mp_cart()->get_blog_id() . '.' . $this->ID;
+	}
+
+	/**
 	 * Get the product price before tax
 	 *
 	 * @since 3.0
@@ -1583,7 +1594,7 @@ Notification Preferences: %s', 'mp' );
 
 		return $this->_attributes;
 	}
-
+	
 	/**
 	 * Get product meta value
 	 *

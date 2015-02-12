@@ -1,3 +1,11 @@
+/**
+ * Escape special characters in a dynamic jQuery selector (e.g. period, colons, etc)
+ *
+ * @since 3.0
+ */
+String.prototype.escapeSelector = function() {
+	return this.replace( /(:|\.|\[|\])/g, "\\$1" );
+};
 
 var mp_cart = {};
 
@@ -286,6 +294,8 @@ var mp_cart = {};
 			return false;
 		}
 		
+		itemId = itemId.toString();
+		
 		var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
 		var data = {
 			"product" : itemId,
@@ -299,7 +309,7 @@ var mp_cart = {};
 				if ( resp.data.item_count == 0 ) {
 					window.location.href = window.location.href;
 				} else {
-					var $lineItem = $( '#mp-cart-item-' + itemId );
+					var $lineItem = $( '#mp-cart-item-' + itemId.escapeSelector() );
 					
 					if ( $lineItem.siblings( '.mp-cart-item').length == 0 && $lineItem.closest( '.mp-cart-store' ).length > 0 ) {
 						$lineItem.closest( '.mp-cart-store' ).remove();
