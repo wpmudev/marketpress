@@ -1,4 +1,48 @@
+/* GENERAL */
 .mp_meta_small_desc{
     color:#BBB;
     font-weight: normal;
+}
+
+.mp_meta_section_title{
+    color: #4f616e;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.mp_meta_bellow_desc{
+    color:#000;
+    font-weight: normal;
+    width: 100%;
+    display: block;
+    font-size: 12px;
+}
+
+/* PRICE, INVENTORY & VARIANTS */
+.mp-product-field-40{
+    width: 40%;
+    display: inline-block;
+}
+
+.mp-product-field-20{
+    width: 20%;
+    display: inline-block;
+}
+
+.mp-blank-bg{
+    background: transparent !important;
+}
+
+.mp-product-sale-price-holder{
+    background-color: #f7f7f7;
+    border: #dddddd 1px solid;
+    margin: 15px;
+}
+
+.postbox.wpmudev-postbox .inside .wpmudev-field.mp-product-sale-price-holder.shaded{
+    background-color: #f7f7f7;
+}
+
+.postbox.wpmudev-postbox .inside .wpmudev-field.mp-product-sale-price-holder{
+    padding-bottom: 0px;
 }

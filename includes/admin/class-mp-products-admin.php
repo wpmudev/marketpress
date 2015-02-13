@@ -354,10 +354,11 @@ class MP_Products_Screen {
 	 */
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
-		$this->init_product_images_metabox();
+		$this->init_product_price_inventory_variants_metabox();
+		//$this->init_product_images_metabox();
 		$this->init_product_details_metabox();
-		$this->init_variations_metabox();
-		$this->init_related_products_metabox();
+		//$this->init_variations_metabox();
+		//$this->init_related_products_metabox();
 	}
 
 	/**
@@ -553,7 +554,7 @@ class MP_Products_Screen {
 	public function init_product_type_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'		 => 'mp-product-type-metabox',
-			'title'		 => __( 'Product Kind <span class="mp_meta_small_desc">(Physical Product, Digital, etc)</span>', 'mp' ),
+			'title'		 => sprintf( __( 'Product Kind %1$s(Physical Product, Digital, etc)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
 			'post_type'	 => MP_Product::get_post_type(),
 			'context'	 => 'normal',
 		) );
@@ -572,6 +573,75 @@ class MP_Products_Screen {
 		) );
 	}
 
+	public function init_product_price_inventory_variants_metabox() {
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'		 => 'mp-product-price-inventory-variants-metabox',
+			'title'		 => sprintf( __( '%1$sPRICE, INVENTORY & VARIANTS%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'post_type'	 => MP_Product::get_post_type(),
+			'context'	 => 'normal',
+		) );
+
+		$metabox->add_field( 'text', array(
+			'name'			 => 'sku',
+			'placeholder'	 => __( 'Enter SKU', 'mp' ),
+			'label'			 => array( 'text' => sprintf( __( 'SKU %1$s(Stock Keeping Unit)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
+			'class'			 => 'mp-product-field-40 mp-blank-bg'
+		) );
+
+		$metabox->add_field( 'text', array(
+			'name'			 => 'regular_price',
+			'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
+			'placeholder'	 => __( 'Enter Price', 'mp' ),
+			'validation'	 => array(
+				'required'	 => true,
+				'number'	 => true,
+				'min'		 => 0,
+			),
+			'class'			 => 'mp-product-field-20 mp-blank-bg'
+		) );
+
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'has_sale',
+			'message'	 => __( 'Set up a Sale for this Product', 'mp' ),
+		) );
+
+		$sale_price = $metabox->add_field( 'complex', array(
+			'name'			 => 'sale_price',
+			'label'			 => array( 'text' => __( 'Sale Price', 'mp' ) ),
+			'conditional'	 => array(
+				'name'	 => 'has_sale',
+				'value'	 => 1,
+				'action' => 'show',
+			),
+			'custom'		 => array( 'label_type' => 'up' ),
+			'class'			 => 'mp-product-sale-price-holder'
+		) );
+
+		if ( $sale_price instanceof WPMUDEV_Field ) {
+			$sale_price->add_field( 'text', array(
+				'name'			 => 'amount',
+				'placeholder'	 => __( 'Enter Sale Price', 'mp' ),
+				'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
+				'custom'		 => array(
+					'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
+				),
+				'validation'	 => array(
+					'number'	 => true,
+					'min'		 => 0,
+					'lessthan'	 => '[name*="regular_price"]'
+				),
+			) );
+			$sale_price->add_field( 'datepicker', array(
+				'name'	 => 'start_date',
+				'label'	 => array( 'text' => __( 'Start Date (if applicable)', 'mp' ) ),
+			) );
+			$sale_price->add_field( 'datepicker', array(
+				'name'	 => 'end_date',
+				'label'	 => array( 'text' => __( 'End Date (if applicable)', 'mp' ) ),
+			) );
+		}
+	}
+
 	/**
 	 * Initializes the product type metabox
 	 *
@@ -587,7 +657,6 @@ class MP_Products_Screen {
 			'context'	 => 'normal',
 		) );
 
-
 		$repeater = $metabox->add_field( 'repeater', array(
 			'name'			 => 'product_images',
 			'layout'		 => 'table',
@@ -596,7 +665,7 @@ class MP_Products_Screen {
 
 		if ( $repeater instanceof WPMUDEV_Field ) {
 			$repeater->add_sub_field( 'image', array(
-				'name'		 => 'product_image',
+				'name' => 'product_image',
 			) );
 		}
 	}

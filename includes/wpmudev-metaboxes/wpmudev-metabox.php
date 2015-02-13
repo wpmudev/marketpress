@@ -618,7 +618,9 @@ class WPMUDEV_Metabox {
 					<?php $this->before_settings_metabox(); ?>
 					<div id="<?php echo $this->args['id']; ?>" class="<?php echo $this->args['class']; ?>"<?php echo $atts; ?>>
 						<div class="handlediv" title="Click to toggle"><br /><br /></div>
-						<h3 class="hndle"><span><?php echo $this->args['title']; ?></span></h3>
+						<h3 class="hndle">
+							<span><?php echo $this->args['title']; ?></span>
+						</h3>
 						<div class="inside">
 		<?php
 		else :
@@ -654,10 +656,12 @@ class WPMUDEV_Metabox {
 			$classes = array('wpmudev-field', str_replace('_', '-', strtolower(get_class($field))));
 			if ( empty($field->args['desc']) ) {
 				$classes[] = 'no-field-desc';
+				$classes[] = $field->args['class'];
 			} ?>
 								<div class="<?php echo implode(' ', $classes); ?>">
 		<?php
-			if ( ! empty($field->args['label']['text']) ) : ?>
+			if ( ! empty($field->args['label']['text']) ) : 
+?>
 									<div class="wpmudev-field-label"><?php echo $field->args['label']['text'] . (( ! empty( $field->args['custom']['data-rule-required'] ) ) ? '<span class="required">*</span>' : ''); ?></div>
 		<?php
 			endif;

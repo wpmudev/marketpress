@@ -71,7 +71,7 @@ class WPMUDEV_Field {
 	 * @access public
 	 * @var array
 	 */
-	var $default_atts = array('name', 'id', 'class', 'style', 'disabled', 'readonly', 'value');
+	var $default_atts = array('name', 'id', 'class', 'style', 'disabled', 'readonly', 'value', 'placeholder');
 	
 	/**
 	 * Constructor function.
