@@ -919,7 +919,7 @@ class MP_Product {
 	 * @return array/float
 	 */
 	public function get_price( $what = null ) {
-		if ( !is_null( $this->_price ) ) {
+		if ( ! is_null( $this->_price ) ) {
 			if ( !is_null( $what ) ) {
 				return mp_arr_get_value( $what, $this->_price );
 			}

@@ -73,6 +73,7 @@ class MP_Coupons_Addon {
 		$this->_install();
 		
 		add_action( 'init', array( &$this, 'register_post_type' ) );
+		add_action( 'switch_blog', array( &$this, 'get_applied' ) );
 		
 		if ( ! is_admin() || mp_doing_ajax() ) {
 			$this->get_applied();
@@ -135,7 +136,7 @@ class MP_Coupons_Addon {
 	 */
 	protected function _convert_to_objects( $coupons ) {
 		foreach ( $coupons as $coupon ) {
-			$this->_coupons_applied_objects[$coupon] = new MP_Coupon($coupon);
+			$this->_coupons_applied_objects[ $coupon ] = new MP_Coupon( $coupon );
 		}
 		
 		return $this->_coupons_applied_objects;
@@ -252,9 +253,9 @@ class MP_Coupons_Addon {
 	protected function _update_session() {
 		if ( is_multisite() ) {
 			$blog_id = get_current_blog_id();
-			mp_update_session_value("mp_cart_coupons->{$blog_id}", $this->_coupons_applied);
+			mp_update_session_value( "mp_cart_coupons->{$blog_id}", $this->_coupons_applied );
 		} else {
-			mp_update_session_value('mp_cart_coupons', $this->_coupons_applied);
+			mp_update_session_value( 'mp_cart_coupons', $this->_coupons_applied );
 		}
 	}
 	
@@ -283,7 +284,7 @@ class MP_Coupons_Addon {
 		foreach ( $coupons as $coupon ) {
 			$html .= '
 					<li class="mp-cart-coupon clearfix">
-						<strong class="mp-cart-meta-line-label">' . $coupon->post_title . (( $cart->is_editable ) ? ' <a class="mp-cart-coupon-remove-link" href="javascript:mp_coupons.remove(' . $coupon->ID . ')">(' . __('Remove', 'mp') . ')</a>' : '') . '</strong>
+						<strong class="mp-cart-meta-line-label">' . $coupon->post_title . (( $cart->is_editable ) ? ' <a class="mp-cart-coupon-remove-link" href="javascript:mp_coupons.remove(' . $coupon->ID . ', ' . $cart->get_blog_id() . ');">(' . __('Remove', 'mp') . ')</a>' : '') . '</strong>
 						<span class="mp-cart-meta-line-amount">' . $coupon->discount_amt(false) . '</span>
 					</li>';
 		}
@@ -346,13 +347,12 @@ class MP_Coupons_Addon {
 		if ( $cart->is_editable && mp_addons()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
 			$html .= '
 				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp-coupon-form' . (( $cart->is_global ) ? ' mp-coupon-form-store' : '') . '">
-					<input type="hidden" name="mp_cart_coupon_store_id" value="' . $cart->get_blog_id() . '" />
-					<h3>' . mp_get_setting('coupons->form_title', __('Have a coupon code?', 'mp')) . '</h3>
+					<h3>' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
 					<span class="mp-cart-input">
-						<input type="text" name="mp_cart_coupon" class="mp-input-small" value="" />
+						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp-input-small" value="" />
 					</span>
-					<button type="submit" class="mp-button mp-button-check">Apply Code</button>' .
-					wpautop(mp_get_setting('coupons->help_text', __('More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp'))) . '
+					<button type="button" class="mp-button mp-button-check">' . __( 'Apply Code', 'mp' ) . '</button>' .
+					wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) . '
 				</div>';
 		}
 		
@@ -380,11 +380,25 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function get_total_discount_amt() {
-		$coupons = $this->get_applied_as_objects();
 		$amt = 0;
+		$blog_ids = mp_cart()->get_blog_ids();
 		
-		foreach ( $coupons as $coupon ) {
-			$amt += $coupon->discount_amt(false, false);
+		while ( 1 ) {
+			if ( mp_cart()->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				mp_cart()->set_id( $blog_id );
+			}
+				
+			$coupons = $this->get_applied_as_objects();
+			
+			foreach ( $coupons as $coupon ) {
+				$amt += $coupon->discount_amt( false, false );
+			}
+			
+			if ( (mp_cart()->is_global && false === current( $blog_ids )) || ! mp_cart()->is_global ) {
+				mp_cart()->reset_id();
+				break;
+			}
 		}
 		
 		return (float) $amt;
@@ -397,9 +411,9 @@ class MP_Coupons_Addon {
 	 * @access public
 	 * @return bool
 	 */
-	 public function has_applied() {
-		 return ( ! empty($this->_coupons_applied) );
-	 }
+	public function has_applied() {
+		return ( ! empty( $this->_coupons_applied ) );
+	}
 	
 	/**
 	 * Save the coupon data
@@ -728,7 +742,7 @@ class MP_Coupons_Addon {
 			return false;
 		}
 		
-		if ( ! in_array($coupon->ID, $this->_coupons_applied) ) {
+		if ( ! in_array( $coupon->ID, $this->_coupons_applied ) ) {
 			$this->_coupons_applied[] = $coupon->ID;
 			$this->_update_session();
 		}
@@ -742,7 +756,8 @@ class MP_Coupons_Addon {
 	 * @action wp_ajax_mp_cart_apply_coupon, wp_ajax_nopriv_mp_cart_apply_coupon
 	 */
 	public function ajax_apply_coupon() {
-		$coupon_code = mp_get_post_value('coupon_code');
+		$coupon_code = mp_get_post_value( 'coupon_code' );
+		$blog_id = mp_get_post_value( 'blog_id' );
 
 		if ( false === $coupon_code ) {
 			wp_send_json_error(array(
@@ -750,7 +765,11 @@ class MP_Coupons_Addon {
 			));
 		}
 
-		$coupon = new MP_Coupon($coupon_code);
+		if ( mp_cart()->is_global ) {
+			mp_cart()->set_id( $blog_id );
+		}
+		
+		$coupon = new MP_Coupon( $coupon_code );
 		
 		if ( ! $coupon->is_valid() ) {
 			wp_send_json_error(array(
@@ -758,16 +777,11 @@ class MP_Coupons_Addon {
 			));
 		}
 		
-		if ( $products = $coupon->get_products() ) {
-			$this->apply_coupon( $coupon );
-			wp_send_json_success(array(
-				'products' => $products,
-				'cart_meta' => mp_cart()->cart_meta(false),
-			));
-		}
+		$this->apply_coupon( $coupon );
 		
-		wp_send_json_error(array(
-			'message' => __('No applicable products could be found in cart', 'mp'),
+		wp_send_json_success(array(
+			'products' => $coupon->get_products(),
+			'cart_meta' => mp_cart()->cart_meta(false),
 		));
 	}
 	
@@ -780,18 +794,25 @@ class MP_Coupons_Addon {
 	 */
 	public function ajax_remove_coupon(){
 		$coupon_id = mp_get_post_value('coupon_id');
+		$blog_id = mp_get_post_value( 'blog_id' );
 		
-		if ( $this->remove_coupon($coupon_id) ) {
-			$coupon = new MP_Coupon($coupon_id);
-			$products = $coupon->get_products();
-			
-			wp_send_json_success(array(
-				'products' => $products,
-				'cartmeta' => mp_cart()->cart_meta(false),
-			));
+		if ( mp_cart()->is_global ) {
+			mp_cart()->set_id( $blog_id );
 		}
 		
-		wp_send_json_error(array('message' => __('An error occurred while removing your coupon. Please try again.', 'mp')));
+		if ( $this->remove_coupon( $coupon_id ) ) {
+			$coupon = new MP_Coupon( $coupon_id );
+			$products = $coupon->get_products();
+			
+			wp_send_json_success( array(
+				'products' => $products,
+				'cartmeta' => mp_cart()->cart_meta( false ),
+			) );
+		}
+		
+		wp_send_json_error( array(
+			'message' => __( 'An error occurred while removing your coupon. Please try again.', 'mp' ),
+		) );
 	}
 	
 	/**
@@ -1015,14 +1036,14 @@ class MP_Coupons_Addon {
 	 * @return array
 	 */
 	public function get_all() {
-		if ( ! is_null($this->_coupons) ) {
+		if ( ! is_null( $this->_coupons ) ) {
 			return $this->_coupons;
 		}
 		
-		$this->_coupons = get_posts(array(
+		$this->_coupons = get_posts( array(
 			'post_type' => 'mp_coupon',
 			'posts_per_page' => -1,
-		));
+		) );
 		
 		return $this->_coupons;
 	}
@@ -1031,15 +1052,16 @@ class MP_Coupons_Addon {
 	 * Get applied coupons from session
 	 *
 	 * @since 3.0
-	 * @access protected
+	 * @access public
+	 * @action switch_blog
 	 * @return array
 	 */
 	public function get_applied() {
 		if ( is_multisite() ) {
-			$blog_id = get_current_blog_id();
-			$this->_coupons_applied = mp_get_session_value("mp_cart_coupons->{$blog_id}", array());
+			$blog_id = mp_cart()->get_blog_id();
+			$this->_coupons_applied = mp_get_session_value( "mp_cart_coupons->{$blog_id}", array() );
 		} else {
-			$this->_coupons_applied = mp_get_session_value('mp_cart_coupons', array());
+			$this->_coupons_applied = mp_get_session_value( 'mp_cart_coupons', array() );
 		}
 		
 		return $this->_coupons_applied;
@@ -1054,7 +1076,7 @@ class MP_Coupons_Addon {
 	 */
 	public function get_applied_as_objects() {
 		$applied = $this->get_applied();
-		return $this->_convert_to_objects($applied);
+		return $this->_convert_to_objects( $applied );
 	}
 }
 

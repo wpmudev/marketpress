@@ -274,7 +274,8 @@ class MP_Coupon {
 						if ( $ids_only ) {
 							$products[] = $product->ID;
 						} else {
-							$products[$product->ID] = mp_cart()->get_line_item($product);
+							$key = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+							$products[ $key ] = mp_cart()->get_line_item( $product );
 						}
 					}
 				}
@@ -299,7 +300,8 @@ class MP_Coupon {
 								if ( $ids_only ) {
 									$products[] = $product->ID;
 								} else {
-									$products[$product->ID] = mp_cart()->get_line_item($product);
+									$key = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+									$products[ $key ] = mp_cart()->get_line_item( $product );
 								}
 							}
 						}
