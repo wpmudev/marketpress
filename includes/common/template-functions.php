@@ -781,12 +781,13 @@ if ( !function_exists( 'mp_list_plugin_shipping_options' ) ) :
 		foreach ( (array) $options as $method => $label ) {
 			$input_id	 = 'mp-shipping-option-' . $plugin->plugin_name . '-' . sanitize_title( $method );
 			$checked	 = ( $plugin->plugin_name == $shipping_option && $method == $shipping_sub_option ) ? ' checked' : '';
+			$input_name = ( mp_cart()->is_global ) ? 'shipping_method[' . mp_cart()->get_blog_id() . ']' : 'shipping_method';
 			$html .= '
 				<label class="mp-checkout-option-label" for="' . $input_id . '">
 					<input
 						id="' . $input_id . '"
 						type="radio"
-						name="shipping_method"
+						name="' . $input_name . '"
 						value="' . $plugin->plugin_name . '->' . $method . '"
 						autocomplete="off"
 						data-rule-required="true"
@@ -1046,9 +1047,9 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 	 */
 	function mp_tax_rate( $echo = false ) {
 		//get address
-		$state		 = mp_get_user_address_part( 'state', 'shipping' );
-		$country	 = mp_get_user_address_part( 'country', 'shipping' );
-		$tax_rate	 = 0;
+		$state = mp_get_user_address_part( 'state', 'shipping' );
+		$country = mp_get_user_address_part( 'country', 'shipping' );
+		$tax_rate = 0;
 
 		if ( empty( $country ) ) {
 			$country = mp_get_setting( 'base_country' );

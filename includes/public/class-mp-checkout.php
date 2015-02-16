@@ -79,9 +79,8 @@ class MP_Checkout {
 			'shipping' => __( 'Shipping Method', 'mp' ),
 			'order-review-payment' => __( 'Review Order/Payment', 'mp' ),
 		) );
-		
-		if ( 'calculated' != mp_get_setting( 'shipping->method') ) {
-			// Don't need shipping step if not using calculated shipping
+			
+		if ( ! $this->_need_shipping_step() ) {
 			unset( $this->_sections['shipping'] );
 		}
 		
@@ -99,6 +98,36 @@ class MP_Checkout {
 		// Maybe process checkout confirm
 		add_action( 'wp', array( &$this, 'maybe_process_checkout_confirm' ) );
 		add_action( 'wp', array( &$this, 'maybe_process_checkout' ) );
+	}
+	
+	/**
+	 * Determine if the shipping step is needed
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @return bool
+	 */
+	protected function _need_shipping_step() {
+		$blog_ids = mp_cart()->get_blog_ids();
+		$need_shipping_step = false;
+		
+		while ( 1 ) {
+			if ( mp_cart()->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				mp_cart()->set_id( $blog_id );	
+			}
+			
+			if ( 'calculated' == mp_get_setting( 'shipping->method') ) {
+				$need_shipping_step = true;
+			}
+			
+			if ( (mp_cart()->is_global && false === current( $blog_ids )) || ! mp_cart()->is_global ) {
+				mp_cart()->reset_id();
+				break;
+			}
+		}	
+		
+		return $need_shipping_step;	
 	}
 	
 	/**
@@ -136,15 +165,28 @@ class MP_Checkout {
 	 */
 	protected function _update_order_review_payment_section() {
 		$shipping_method =  mp_get_setting( 'shipping->method' );
-		if ( 'calculated' == $shipping_method ) {
-			if ( $shipping_method = mp_get_post_value( 'shipping_method' ) ) {
-				list( $shipping_option, $shipping_sub_option ) = explode( '->', $shipping_method );
-				mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_option );
-				mp_update_session_value( 'mp_shipping_info->shipping_sub_option', $shipping_sub_option );
+		$selected = (array) mp_get_post_value( 'shipping_method' );
+		
+		foreach ( $selected as $blog_id => $method ) {
+			if ( 'calculated' == $shipping_method ) {
+				list( $shipping_option, $shipping_sub_option ) = explode( '->', $method );
+				
+				if ( mp_cart()->is_global ) {
+					mp_update_session_value( "mp_shipping_info->shipping_option->{$blog_id}", $shipping_option );
+					mp_update_session_value( "mp_shipping_info->shipping_sub_option->{$blog_id}", $shipping_sub_option );					
+				} else {
+					mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_option );
+					mp_update_session_value( 'mp_shipping_info->shipping_sub_option', $shipping_sub_option );
+				}
+			} else {
+				if ( mp_cart()->is_global ) {
+					mp_update_session_value( "mp_shipping_info->shipping_option->{$blog_id}", $shipping_method );
+					mp_update_session_value( "mp_shipping_info->shipping_sub_option->{$blog_id}", '' );				
+				} else {
+					mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_method );
+					mp_update_session_value( 'mp_shipping_info->shipping_sub_option', '' );
+				}
 			}
-		} else {
-			mp_update_session_value( 'mp_shipping_info->shipping_option', $shipping_method );
-			mp_update_session_value( 'mp_shipping_info->shipping_sub_option', '' );
 		}
 	}
 		
@@ -1017,12 +1059,26 @@ class MP_Checkout {
 			return false;
 		}
 		
-		$active_plugins = MP_Shipping_API::get_active_plugins();
-		$shipping_method = mp_get_setting('shipping->method');
+		$blog_ids = mp_cart()->get_blog_ids();
 		$html = '';
 		
-		switch ( $shipping_method ) {
-			case 'calculated' :
+		while ( 1 ) {
+			if ( mp_cart()->is_global ) {
+				$force = true;
+				$blog_id = array_shift( $blog_ids );
+				mp_cart()->set_id( $blog_id );
+				MP_Shipping_API::load_active_plugins( true );
+			}
+			
+			$active_plugins = MP_Shipping_API::get_active_plugins();
+			$shipping_method = mp_get_setting( 'shipping->method' );
+			
+			if ( 'calculated' == $shipping_method ) {
+				if ( mp_cart()->is_global ) {
+					$html .= '
+						<h3>' . get_option( 'blogname' ) . '</h3>';
+				}
+				
 				foreach ( $active_plugins as $plugin ) {
 					$html .= '
 						<div class="mp-shipping-method">
@@ -1032,10 +1088,12 @@ class MP_Checkout {
 					$html .= '
 						</div>';
 				}
-			break;
+			}
 			
-			default :
-			break;
+			if ( (mp_cart()->is_global && false === current( $blog_ids )) || ! mp_cart()->is_global ) {
+				mp_cart()->reset_id();
+				break;
+			}
 		}
 		
 		$html .= '

@@ -47,6 +47,7 @@ class MP_Multisite {
 			$this->post_indexer_set_post_types();
 			
 			add_filter( 'mp_product/url', array( &$this, 'product_url' ), 10, 2 );
+			add_action( 'switch_blog', array( &$this, 'refresh_autoloaded_options' ) );
 		}
 		
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
@@ -184,6 +185,21 @@ class MP_Multisite {
 	 */
 	public function product_url( $url, $product ) {
 		return trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
+	}
+	
+	/**
+	 * Reload MP settings after switching blogs
+	 *
+	 * When using switch_to_blog auto-loaded options aren't refreshed which causes
+	 * mp_settings to not update accordingly which affects things like tax and
+	 * shipping rates.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action switch_blog
+	 */
+	public function refresh_autoloaded_options() {
+		wp_load_alloptions();
 	}
 }
 
