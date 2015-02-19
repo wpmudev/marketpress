@@ -32,28 +32,30 @@ class MP_Products_Screen {
 	 * @access private
 	 */
 	private function __construct() {
-		// Remove add-new submenu item from store admin menu
+// Remove add-new submenu item from store admin menu
 		add_action( 'admin_menu', array( &$this, 'remove_menu_items' ), 999 );
-		// Hide featured image for variable products
+// Hide featured image for variable products
 		add_action( 'wpmudev_field/print_scripts/has_variations', array( &$this, 'maybe_hide_core_metaboxes' ) );
-		// Product variations save/get value
-		add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations' ), 10, 3 );
-		add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations' ), 10, 4 );
-		// Custom product columns
+// Product variations save/get value
+
+		add_action( 'init', array( &$this, 'save_product_variations' ) );
+//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations' ), 10, 3 );
+//add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
+// Custom product columns
 		add_filter( 'manage_product_posts_columns', array( &$this, 'product_columns_head' ) );
 		add_filter( 'manage_mp_product_posts_columns', array( &$this, 'product_columns_head' ) );
 		add_action( 'manage_product_posts_custom_column', array( &$this, 'product_columns_content' ), 10, 2 );
 		add_action( 'manage_mp_product_posts_custom_column', array( &$this, 'product_columns_content' ), 10, 2 );
-		// Add metaboxes
+// Add metaboxes
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
-		// Add quick/bulk edit capability for product fields
+// Add quick/bulk edit capability for product fields
 		add_action( 'quick_edit_custom_box', array( &$this, 'quick_edit_custom_box' ), 10, 2 );
 		add_action( 'bulk_edit_custom_box', array( &$this, 'bulk_edit_custom_box' ), 10, 2 );
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
-		// Product screen scripts
+// Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
-		// Product attributes save/get value
+// Product attributes save/get value
 		$mp_product_atts = MP_Product_Attributes::get_instance();
 		$atts			 = $mp_product_atts->get();
 		foreach ( $atts as $att ) {
@@ -73,7 +75,7 @@ class MP_Products_Screen {
 	 */
 	public function toggle_product_attributes_js() {
 		if ( get_current_screen()->id != MP_Product::get_post_type() ) {
-			// not product screen - bail
+// not product screen - bail
 			return;
 		}
 		?>
@@ -355,10 +357,10 @@ class MP_Products_Screen {
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
 		$this->init_product_price_inventory_variants_metabox();
-		//$this->init_product_images_metabox();
-		$this->init_product_details_metabox();
-		//$this->init_variations_metabox();
-		//$this->init_related_products_metabox();
+//$this->init_product_images_metabox();
+//$this->init_product_details_metabox();
+//$this->init_variations_metabox();
+//$this->init_related_products_metabox();
 	}
 
 	/**
@@ -435,6 +437,20 @@ class MP_Products_Screen {
 		return $data;
 	}
 
+//calculate all the possible combinations creatable from a given choices array
+	function possible_product_combinations( $groups, $prefix = '' ) {
+		$result	 = array();
+		$group	 = array_shift( $groups );
+		foreach ( $group as $selected ) {
+			if ( $groups ) {
+				$result = array_merge( $result, $this->possible_product_combinations( $groups, $prefix . $selected . '|' ) );
+			} else {
+				$result[] = $prefix . $selected;
+			}
+		}
+		return $result;
+	}
+
 	/**
 	 * Saves the product variations to the database
 	 *
@@ -443,7 +459,170 @@ class MP_Products_Screen {
 	 * @filter wpmudev_field/save_value/variations
 	 * @uses $wpdb
 	 */
-	public function save_product_variations( $value, $post_id, $field ) {
+	public function save_product_variations() {// $post_id, $post, $update 
+		global $wp_taxonomies;
+
+		$variation_names	 = mp_get_post_value( 'variation_names', array() );
+		$variation_values	 = mp_get_post_value( 'variation_values', array() );
+
+		$data = array();
+
+		if ( isset( $variation_values ) && !empty( $variation_values ) ) {
+			//product_attr + '_' + ID atributa i dobijem taxonomy name
+			$product_attributes_categories = mp_get_post_value( 'product_attributes_categories', array() );
+
+			foreach ( $variation_values as $variation_value ) {
+				$data[] = explode( ',', $variation_value );
+			}
+
+			$combinations = $this->possible_product_combinations( $data );
+			var_dump( $combinations );
+			//exit;
+		}
+
+		$taxonomies = array(
+			'post_tag',
+			'my_tax',
+		);
+
+		$args = array(
+			'orderby'			 => 'name',
+			'order'				 => 'ASC',
+			'hide_empty'		 => false,
+			'number'			 => '',
+			'fields'			 => 'all',
+			'hierarchical'		 => true,
+		);
+
+		$terms = get_terms( array('product_attr_9'), $args );
+		
+		var_dump($terms);
+		exit;
+
+		/* $variation_names	 = mp_get_post_value( 'variation_names', array() );
+		  $variation_values	 = mp_get_post_value( 'variation_values', array() );
+
+		  if ( isset( $_POST[ 'variation_values' ] ) ) {
+
+		  $var_order = 0;
+		  foreach ( $variation_names as $variation_name ) {
+		  if ( !empty( $variation_name ) ) {
+
+		  $taxonomy_name = sanitize_key( 'mp_variation_type_' . $variation_name );
+
+		  if ( !taxonomy_exists( $taxonomy_name ) ) {
+		  register_taxonomy(
+		  $taxonomy_name, MP_Product::get_post_type(), //post type name
+		  array(
+		  'hierarchical'	 => true,
+		  'label'			 => $variation_name, //Display name
+		  'query_var'		 => true,
+		  'rewrite'		 => array(
+		  'with_front' => false
+		  )
+		  )
+		  );
+		  }
+		  }
+
+		  $terms = explode( ',', $variation_values[ $var_order ] );
+
+		  foreach ( $terms as $term ) {
+		  wp_insert_term( $term, $taxonomy_name );
+		  }
+
+		  $var_order++;
+		  }
+		  } */
+
+//var_dump($_POST);
+		/* return;
+
+		  global $wpdb;
+
+		  $variations		 = mp_get_post_value( 'variations', array() );
+		  $sorted			 = $field->sort_subfields( $variations );
+		  $ids			 = array();
+		  $delete_where	 = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = 'mp_product_variation'";
+
+
+		  if ( mp_get_post_value( 'has_variations', false ) ) {
+		  foreach ( $sorted as $order => $array ) {
+		  $variation_id	 = key( $array );
+		  $fields			 = current( $array );
+
+		  if ( false === strpos( $variation_id, '_' ) ) {
+		  $variation_id	 = $ids[]			 = wp_insert_post( array(
+		  'post_content'	 => mp_arr_get_value( 'description', $fields, '' ),
+		  'post_title'	 => 'Product Variation of ' . $post_id,
+		  'post_status'	 => 'publish',
+		  'post_type'		 => 'mp_product_variation',
+		  'post_parent'	 => $post_id,
+		  'menu_order'	 => $order,
+		  ) );
+		  } else {
+		  $ids[]			 = $variation_id	 = substr( $variation_id, 1 );
+		  wp_update_post( array(
+		  'ID'			 => $variation_id,
+		  'post_content'	 => mp_arr_get_value( 'description', $fields, '' ),
+		  'post_status'	 => 'publish',
+		  'menu_order'	 => $order,
+		  ) );
+		  }
+
+		  // Update post thumbnail
+		  if ( empty( $fields[ 'image' ] ) ) {
+		  delete_post_thumbnail( $variation_id );
+		  } else {
+		  set_post_thumbnail( $variation_id, $fields[ 'image' ] );
+		  }
+
+		  // Unset the fields that shouldn't be saved as post meta
+		  $fields[ 'description' ] = $fields[ 'image' ]		 = null;
+
+		  $index = 0;
+		  foreach ( $fields as $name => $value ) {
+		  if ( is_null( $value ) ) {
+		  $index ++;
+		  continue;
+		  }
+
+		  $subfield = $field->subfields[ $index ];
+
+		  if ( false !== strpos( $name, 'product_attr_' ) ) {
+		  wp_set_post_terms( $variation_id, $subfield->sanitize_for_db( $value, $variation_id ), $name );
+		  } else {
+		  $subfield->save_value( $variation_id, $name, $value, true );
+		  }
+
+		  $index ++;
+		  }
+		  }
+
+		  $delete_where .= " AND {$wpdb->posts}.ID NOT IN (" . implode( ',', $ids ) . ")";
+		  }
+
+		  // Delete variations that no longer exist
+		  $wpdb->query( "
+		  DELETE FROM $wpdb->posts
+		  USING $wpdb->posts
+		  INNER JOIN $wpdb->postmeta
+		  WHERE $delete_where"
+		  );
+
+		  return null; // Returning null will bypass internal save mechanism
+		 */
+	}
+
+	/**
+	 * Saves the product variations to the database
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wpmudev_field/save_value/variations
+	 * @uses $wpdb
+	 */
+	public function save_product_variations_old( $value, $post_id, $field ) {
 		global $wpdb;
 
 		$variations		 = mp_get_post_value( 'variations', array() );
@@ -476,14 +655,14 @@ class MP_Products_Screen {
 					) );
 				}
 
-				// Update post thumbnail
+// Update post thumbnail
 				if ( empty( $fields[ 'image' ] ) ) {
 					delete_post_thumbnail( $variation_id );
 				} else {
 					set_post_thumbnail( $variation_id, $fields[ 'image' ] );
 				}
 
-				// Unset the fields that shouldn't be saved as post meta
+// Unset the fields that shouldn't be saved as post meta
 				$fields[ 'description' ] = $fields[ 'image' ]		 = null;
 
 				$index = 0;
@@ -508,7 +687,7 @@ class MP_Products_Screen {
 			$delete_where .= " AND {$wpdb->posts}.ID NOT IN (" . implode( ',', $ids ) . ")";
 		}
 
-		// Delete variations that no longer exist
+// Delete variations that no longer exist
 		$wpdb->query( "
 			DELETE FROM $wpdb->posts
 			USING $wpdb->posts
@@ -567,10 +746,10 @@ class MP_Products_Screen {
 				'external'	 => __( 'External / Affiliate Link', 'mp' ),
 			),
 		) );
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'has_variations',
-			'message'	 => __( 'Does this product have variations such as color, size, etc?', 'mp' ),
-		) );
+		/* $metabox->add_field( 'checkbox', array(
+		  'name'		 => 'has_variations',
+		  'message'	 => __( 'Does this product have variations such as color, size, etc?', 'mp' ),
+		  ) ); */
 	}
 
 	public function init_product_price_inventory_variants_metabox() {
@@ -597,7 +776,7 @@ class MP_Products_Screen {
 				'number'	 => true,
 				'min'		 => 0,
 			),
-			'class'			 => 'mp-product-field-20 mp-blank-bg'
+			'class'			 => 'mp-product-field-40 mp-blank-bg'
 		) );
 
 		$metabox->add_field( 'checkbox', array(
@@ -613,8 +792,11 @@ class MP_Products_Screen {
 				'value'	 => 1,
 				'action' => 'show',
 			),
-			'custom'		 => array( 'label_type' => 'up' ),
-			'class'			 => 'mp-product-sale-price-holder'
+			'custom'		 => array(
+				'label_position' => 'up',
+				'label_type'	 => 'standard'
+			),
+			'class'			 => 'mp-product-sale-price-holder mp-special-box'
 		) );
 
 		if ( $sale_price instanceof WPMUDEV_Field ) {
@@ -623,12 +805,12 @@ class MP_Products_Screen {
 				'placeholder'	 => __( 'Enter Sale Price', 'mp' ),
 				'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
 				'custom'		 => array(
-					'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
+//'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
 				),
 				'validation'	 => array(
-					'number'	 => true,
-					'min'		 => 0,
-					'lessthan'	 => '[name*="regular_price"]'
+					'number' => true,
+					'min'	 => 0,
+				//'lessthan'	 => '[name*="regular_price"]'
 				),
 			) );
 			$sale_price->add_field( 'datepicker', array(
@@ -640,6 +822,188 @@ class MP_Products_Screen {
 				'label'	 => array( 'text' => __( 'End Date (if applicable)', 'mp' ) ),
 			) );
 		}
+
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'charge_tax',
+			'message'	 => __( 'Charge Taxes', 'mp' ),
+		) );
+
+		/* $metabox->add_field( 'text', array(
+		  'name'			 => 'special_tax_rate',
+		  'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
+		  'placeholder'	 => __( 'Tax Rate', 'mp' ),
+		  'validation'	 => array(
+		  'required'	 => true,
+		  'number'	 => true,
+		  'min'		 => 0,
+		  ),
+		  'class'			 => 'mp-product-field-20 mp-blank-bg'
+		  ) ); */
+
+		$metabox->add_field( 'text', array(
+			'name'						 => 'special_tax_rate',
+			'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
+			'placeholder'				 => __( 'Tax Rate', 'mp' ),
+			'default_value'				 => '',
+			'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
+			/* 'conditional'				 => array(
+			  'name'	 => 'product_type',
+			  'value'	 => array( 'physical', 'digital' ),
+			  'action' => 'show',
+			  ), */
+			'conditional'				 => array(
+				'name'	 => 'charge_tax',
+				'value'	 => 1,
+				'action' => 'show',
+			),
+			'custom_validation_message'	 => __( 'Please enter a valid tax rate', 'mp' ),
+			'validation'				 => array(
+				'custom' => '[^0-9.%]',
+			),
+			'custom'					 => array(
+				'label_position' => 'up',
+				'label_type'	 => 'standard'
+			),
+			'class'						 => 'mp-product-special-tax-holder mp-special-box'
+		) );
+
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'charge_shipping',
+			'message'	 => sprintf( __( 'Charge Shipping %1$s(not applicable to services and digital products)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+		) );
+
+		$weight = $metabox->add_field( 'complex', array(
+			'name'			 => 'weight',
+			'label'			 => array( 'text' => __( 'Weight', 'mp' ) ),
+			/* 'conditional'	 => array(
+			  'name'	 => 'product_type',
+			  'value'	 => 'physical',
+			  'action' => 'show',
+			  ), */
+			'conditional'	 => array(
+				'name'	 => 'charge_shipping',
+				'value'	 => 1,
+				'action' => 'show',
+			),
+			'custom'		 => array(
+				'label_position' => 'up',
+				'label_type'	 => 'standard'
+			),
+			'class'			 => 'mp-product-shipping-holder mp-special-box'
+		) );
+
+		if ( $weight instanceof WPMUDEV_Field ) {
+			$weight->add_field( 'text', array(
+				'name'		 => 'pounds',
+				'label'		 => array( 'text' => __( 'Pounds', 'mp' ) ),
+				'validation' => array(
+					'digits' => true,
+				),
+			) );
+			$weight->add_field( 'text', array(
+				'name'		 => 'ounces',
+				'label'		 => array( 'text' => __( 'Ounces', 'mp' ) ),
+				'validation' => array(
+					'digits' => true,
+				),
+			) );
+
+			$weight->add_field( 'text', array(
+				'name'			 => 'extra_shipping_cost',
+				'label'			 => array( 'text' => sprintf( __( 'Extra Shipping Cost %1$s(if applicable)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
+				'default_value'	 => '0.00',
+				'validation'	 => array(
+					'number' => true,
+					'min'	 => 0,
+				),
+			) );
+		}
+
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'track_inventory',
+			'message'	 => __( 'Track Product Inventory', 'mp' ),
+		/* 'conditional'	 => array(
+		  'name'	 => 'product_type',
+		  'value'	 => 'physical',
+		  'action' => 'show',
+		  ), */
+		) );
+
+		$inventory = $metabox->add_field( 'complex', array(
+			'name'			 => 'inventory',
+			'label'			 => array( 'text' => __( '', 'mp' ) ),
+			'conditional'	 => array(
+				'name'	 => 'track_inventory',
+				'value'	 => 1,
+				'action' => 'show',
+			),
+			'custom'		 => array(
+				'label_position' => 'up',
+				'label_type'	 => 'standard'
+			),
+			'class'			 => 'mp-product-inventory-holder mp-special-box'
+		) );
+
+		if ( $inventory instanceof WPMUDEV_Field ) {
+			$inventory->add_field( 'text', array(
+				'name'			 => 'inventory',
+				'label'			 => array( 'text' => __( 'Quantity', 'mp' ) ),
+				/* 'conditional'	 => array(
+				  'action'	 => 'show',
+				  'operator'	 => 'AND',
+				  array(
+				  'name'	 => 'product_type',
+				  'value'	 => 'physical',
+				  ),
+				  array(
+				  'name'	 => 'variations[track_inventory]',
+				  'value'	 => 1,
+				  ),
+				  ), */
+				'conditional'	 => array(
+					'name'	 => 'track_inventory',
+					'value'	 => 1,
+					'action' => 'show',
+				),
+				'validation'	 => array(
+					'digits' => true,
+					'min'	 => 0,
+				),
+			) );
+
+			$inventory->add_field( 'checkbox', array(
+				'name'		 => 'out_of_stock_purchase',
+				'message'	 => __( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ),
+			/* 'conditional'	 => array(
+			  'name'	 => 'product_type',
+			  'value'	 => 'physical',
+			  'action' => 'show',
+			  ), */
+			) );
+		}
+
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'has_variation',
+			'label'			 => array( 'text' => '' ),
+			'options'		 => array(
+				'no'	 => __( 'This is a unique product without variations', 'mp' ),
+				'yes'	 => sprintf( __( 'This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+			),
+			'default_value'	 => 'no',
+		) );
+
+		$metabox->add_field( 'variations', array(
+			'name'			 => 'variations_module',
+			'label'			 => array( 'text' => sprintf( __( '%3$sAdd variations for%2$s %1$sProduct%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+			'message'		 => __( 'Variations', 'mp' ),
+			'desc'			 => __( 'Add variations for this product. e.g. If you are selling t-shirts, you can create Color & Size variations', 'mp' ),
+			'conditional'	 => array(
+				'name'	 => 'has_variation',
+				'value'	 => 'yes',
+				'action' => 'show',
+			),
+			'class'			 => 'mp_variations_box'
+		) );
 	}
 
 	/**
@@ -712,7 +1076,7 @@ class MP_Products_Screen {
 			),
 		) );
 
-		// General Tab
+// General Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_general',
 			'slug'	 => 'general'
@@ -778,11 +1142,12 @@ class MP_Products_Screen {
 			),
 		) );
 
-		// Price Tab
+// Price Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_price',
 			'slug'	 => 'price'
 		) );
+
 		$metabox->add_field( 'text', array(
 			'name'		 => 'regular_price',
 			'label'		 => array( 'text' => __( 'Regular Price', 'mp' ) ),
@@ -792,6 +1157,7 @@ class MP_Products_Screen {
 				'min'		 => 0,
 			),
 		) );
+
 		$sale_price = $metabox->add_field( 'complex', array(
 			'name'	 => 'sale_price',
 			'label'	 => array( 'text' => __( 'Sale Price', 'mp' ) ),
@@ -805,9 +1171,9 @@ class MP_Products_Screen {
 					'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
 				),
 				'validation' => array(
-					'number'	 => true,
-					'min'		 => 0,
-					'lessthan'	 => '[name*="regular_price"]'
+					'number' => true,
+					'min'	 => 0,
+				//'lessthan'	 => '[name*="regular_price"]'
 				),
 			) );
 			$sale_price->add_field( 'datepicker', array(
@@ -821,7 +1187,7 @@ class MP_Products_Screen {
 		}
 
 
-		// Tax Tab
+// Tax Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_taxes',
 			'slug'	 => 'taxes'
@@ -842,11 +1208,12 @@ class MP_Products_Screen {
 			),
 		) );
 
-		// Shipping Tab
+// Shipping Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_shipping',
 			'slug'	 => 'shipping'
 		) );
+
 		$weight = $metabox->add_field( 'complex', array(
 			'name'			 => 'weight',
 			'label'			 => array( 'text' => __( 'Weight', 'mp' ) ),
@@ -943,7 +1310,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-			// General Tab
+// General Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_general',
 				'slug'	 => 'general'
@@ -1025,7 +1392,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-			// Price Tab
+// Price Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_price',
 				'slug'	 => 'price',
@@ -1073,7 +1440,7 @@ class MP_Products_Screen {
 				'label'	 => array( 'text' => __( 'End Date (if applicable)', 'mp' ) ),
 			) );
 
-			// Shipping Tab
+// Shipping Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_shipping',
 				'slug'	 => 'shipping'
@@ -1118,7 +1485,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-			// Taxes Tab
+// Taxes Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_taxes',
 				'slug'	 => 'taxes'
@@ -1139,7 +1506,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-			// Attributes Tab
+// Attributes Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_attributes',
 				'slug'	 => 'attributes',
@@ -1166,13 +1533,13 @@ class MP_Products_Screen {
 					),
 				);
 
-				// Set options
+// Set options
 				$options = array( '' );
 				foreach ( $terms as $term ) {
 					$args[ 'options' ][ $term->term_id ] = $term->name;
 				}
 
-				// Set associated product categories
+// Set associated product categories
 				$cats	 = $mp_product_atts->get_associated_categories( $att->attribute_id );
 				$custom	 = array();
 				foreach ( $cats as $cat_id ) {

@@ -174,17 +174,31 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 				if ( $this->is_subfield ) {
 					$field->set_order( $this->_order );
 				}
-
+				
+				$label_width = isset($this->args[ 'custom' ][ 'label_width' ]) ? $this->args[ 'custom' ][ 'label_width' ] : $label_width;
+				
 				if ( $this->args[ 'layout' ] == 'columns' ) :
 					?>
 					<label class="wpmudev-field-complex-label" style="width:<?php echo $label_width; ?>">
-						<?php if ( isset( $this->args[ 'custom' ][ 'label_type' ] ) && $this->args[ 'custom' ][ 'label_type' ] == 'up' ) { ?>
-							<span><?php echo $field->args[ 'label' ][ 'text' ] . ((!empty( $field->args[ 'custom' ][ 'data-rule-required' ] ) ) ? '<span class="required">*</span>' : ''); ?></span>
-						<?php } ?> 
+						<?php if ( isset( $this->args[ 'custom' ][ 'label_position' ] ) && $this->args[ 'custom' ][ 'label_position' ] == 'up' ) { ?>
+							<?php if ( isset( $this->args[ 'custom' ][ 'label_type' ] ) && $this->args[ 'custom' ][ 'label_type' ] == 'standard' ) { ?>
+								<div class="wpmudev-field-label"><?php echo $field->args[ 'label' ][ 'text' ] . ((!empty( $field->args[ 'custom' ][ 'data-rule-required' ] ) ) ? '<span class="required">*</span>' : ''); ?></div>
+							<?php } else { ?>
+								<span><?php echo $field->args[ 'label' ][ 'text' ] . ((!empty( $field->args[ 'custom' ][ 'data-rule-required' ] ) ) ? '<span class="required">*</span>' : ''); ?></span>
+								<?php
+							}
+						}
+						?> 
 						<?php $field->display( $post_id ); ?>
-						<?php if ( !isset( $this->args[ 'custom' ][ 'label_type' ] ) || (isset( $this->args[ 'custom' ][ 'label_type' ] ) && $this->args[ 'custom' ][ 'label_type' ] !== 'up' )) { ?>
-							<span><?php echo $field->args[ 'label' ][ 'text' ] . ((!empty( $field->args[ 'custom' ][ 'data-rule-required' ] ) ) ? '<span class="required">*</span>' : ''); ?></span>
-						<?php } ?> 
+						<?php if ( !isset( $this->args[ 'custom' ][ 'label_position' ] ) || (isset( $this->args[ 'custom' ][ 'label_position' ] ) && $this->args[ 'custom' ][ 'label_position' ] !== 'up' ) ) { ?>
+							<?php if ( isset( $this->args[ 'custom' ][ 'label_type' ] ) && $this->args[ 'custom' ][ 'label_type' ] == 'standard' ) { ?>
+								<div class="wpmudev-field-label"><?php echo $field->args[ 'label' ][ 'text' ] . ((!empty( $field->args[ 'custom' ][ 'data-rule-required' ] ) ) ? '<span class="required">*</span>' : ''); ?></div>
+							<?php } else { ?>
+								<span><?php echo $field->args[ 'label' ][ 'text' ] . ((!empty( $field->args[ 'custom' ][ 'data-rule-required' ] ) ) ? '<span class="required">*</span>' : ''); ?></span>
+								<?php
+							}
+						}
+						?> 
 					</label>
 				<?php else :
 					?>

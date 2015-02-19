@@ -122,6 +122,8 @@ class Marketpress {
 	public function register_custom_types() {
 		global $wp_version;
 		
+		
+		
 		//! Register product_category taxonomy
 		register_taxonomy('product_category', MP_Product::get_post_type(), apply_filters('mp_register_product_category', array(
 			'hierarchical' => true,

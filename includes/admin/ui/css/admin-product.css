@@ -20,12 +20,17 @@
 
 /* PRICE, INVENTORY & VARIANTS */
 .mp-product-field-40{
-    width: 40%;
+    width: 40% !important;
+    display: inline-block;
+}
+
+.mp-product-field-30{
+    width: 30% !important;
     display: inline-block;
 }
 
 .mp-product-field-20{
-    width: 20%;
+    width: 20% !important;
     display: inline-block;
 }
 
@@ -33,10 +38,57 @@
     background: transparent !important;
 }
 
-.mp-product-sale-price-holder{
+div.mp-special-box{
     background-color: #f7f7f7;
     border: #dddddd 1px solid;
     margin: 15px;
+}
+
+.postbox.wpmudev-postbox .inside input[type="text"].mp-product-special-tax-holder{
+    width: 40%;
+}
+
+.postbox.wpmudev-postbox .inside .mp-product-shipping-holder .wpmudev-field-complex-wrap .wpmudev-field-complex-label:first-child,
+.postbox.wpmudev-postbox .inside .mp-product-shipping-holder .wpmudev-field-complex-wrap .wpmudev-field-complex-label:nth-child(2){
+    width: 15% !important;
+}
+
+/* Remove main label in the complex field */
+.mp-product-sale-price-holder > .wpmudev-field-label:first-child,
+.mp-product-shipping-holder  > .wpmudev-field-label:first-child{
+    display: none;
+}
+
+div.mp-product-inventory-holder .wpmudev-field-complex-label:first-child
+{
+    width: 10% !important;
+}
+
+div.mp-product-inventory-holder .wpmudev-field-complex-label:nth-child(2)
+{
+    margin-top: 25px;
+}
+
+/*div.mp-product-inventory-holder .wpmudev-field-complex-label:nth-child(2) span{
+    font-size: 100%;
+    color: #000;
+}*/
+
+.postbox.wpmudev-postbox .inside div.mp-product-inventory-holder .wpmudev-field-complex-wrap .wpmudev-field-complex-label:nth-child(2) span{
+    font-size: 100%;
+    color: #000;
+    font-weight: 700;
+}
+
+.mp-product-sale-price-holder .wpmudev-field-complex-label:first-child{
+    width: 20% !important;
+    margin-right: 1%;
+}
+
+.mp-product-sale-price-holder .wpmudev-field-complex-label:nth-child(2),
+.mp-product-sale-price-holder .wpmudev-field-complex-label:nth-child(3){
+    width: 30% !important;
+    margin-right: 1%;
 }
 
 .postbox.wpmudev-postbox .inside .wpmudev-field.mp-product-sale-price-holder.shaded{
@@ -45,4 +97,69 @@
 
 .postbox.wpmudev-postbox .inside .wpmudev-field.mp-product-sale-price-holder{
     padding-bottom: 0px;
+}
+
+/* Variations */
+
+div.mp_variations_box{
+    border: 1px solid #aed7e9;
+    padding: 10px;
+    margin: 15px;
+}
+
+.postbox.wpmudev-postbox .inside .wpmudev-field.mp_variations_box.shaded{
+    background: #f3f9fc;
+}
+
+.postbox.wpmudev-postbox .inside .wpmudev-field .wpmudev-field-label .mp_variations_title,
+.postbox.wpmudev-postbox .inside .wpmudev-field .wpmudev-field-label .mp_variations_product_name{
+    font-size: 16px;
+}
+
+.variation_create_new_title{
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: left;
+    color: #BBB;
+}
+
+.variation-first-col{
+    width: 33%;
+    display: inline-block;
+    float: left;
+}
+
+.variation-second-col{
+    width: 63%;
+    display: inline-block;
+    margin-left: 1%;
+    float: left;
+}
+
+.variation-third-col{
+    width: 3%;
+    float: left;
+    color: #d0021b;
+    text-align: center;
+}
+
+.variation-third-col .remove .fa-lg{
+    margin-top: 20px;
+}
+
+.variation-second-col textarea{
+    width: 100%;
+}
+
+.variation-row{
+    border-bottom: 1px solid #aed7e9;
+    padding-bottom: 20px;
+    float: left;
+    width: 100%;
+    padding-top: 10px;
+}
+
+.variation-row:last-child{
+    border-bottom: 0px;
 }
