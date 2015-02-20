@@ -47,7 +47,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									<div class="variation-first-col">
 										<div class="wpmudev-field-label"><?php _e( 'Variation Name', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(e.g. Color)', 'mp' ); ?></span></div>
 										<?php
-										$product_taxonomies	 = MP_Product_Attributes_Admin::get_product_attributes_select( 'product_attributes_categories[]', 'name' );
+										$product_taxonomies	 = MP_Product_Attributes_Admin::get_product_attributes_select( 'product_attributes_categories[]', 'id' );
 										?>
 										<span class="variation_create_new_title"><?php _e( 'Or create new variation', 'mp' ); ?></span>
 

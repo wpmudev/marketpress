@@ -435,6 +435,7 @@ class MP_Product {
 		) );
 
 		$this->_variation_ids = array();
+	
 		while ( $query->have_posts() ) : $query->the_post();
 			$this->_variations[]	 = $variation				 = new MP_Product();
 			$this->_variation_ids[]	 = $variation->ID;
@@ -1057,7 +1058,7 @@ class MP_Product {
 
 			if ( 'categories' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_tag' );
-				$ids						 = wp_list_pluck( $terms, 'term_id' );
+				$ids						 = $terms ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_tag',
 					'terms'		 => $ids,
@@ -1067,7 +1068,7 @@ class MP_Product {
 
 			if ( 'tags' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_category' );
-				$ids						 = wp_list_pluck( $terms, 'term_id' );
+				$ids						 = $terms ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_category',
 					'terms'		 => $ids,

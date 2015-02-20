@@ -1545,6 +1545,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 	function mp_product( $echo = true, $product_id = null, $title = true, $content = 'full', $image = 'single',
 					  $meta = true ) {
+		
 		if ( function_exists( 'icl_object_id' ) ) {
 			$product_id = icl_object_id( $product_id, MP_Product::get_post_type(), false );
 		}
@@ -1579,12 +1580,14 @@ if ( !function_exists( 'mp_product' ) ) {
 
 			// Button
 			$selected_atts = array();
+			
 			if ( $variation ) {
 				$atts = $variation->get_attributes();
 				foreach ( $atts as $slug => $att ) {
 					$selected_atts[ $slug ] = key( $att[ 'terms' ] );
 				}
 			}
+			
 			$return .= $product->buy_button( false, 'single', $selected_atts );
 
 			$return .= '
