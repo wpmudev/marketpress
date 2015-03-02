@@ -150,9 +150,9 @@ class MP_Product {
 	 * @action wp_ajax_mp_product_update_attributes, wp_ajax_nopriv_mp_product_update_attributes
 	 */
 	public static function ajax_update_attributes() {
-		$product_atts = MP_Product_Attributes::get_instance();
-		$attributes = $filtered_atts = $taxonomies = $filtered_terms = array();
-		$json = array(
+		$product_atts	 = MP_Product_Attributes::get_instance();
+		$attributes		 = $filtered_atts	 = $taxonomies		 = $filtered_terms	 = array();
+		$json			 = array(
 			'out_of_stock'	 => false,
 			'qty_in_stock'	 => 0,
 			'image'			 => false,
@@ -160,24 +160,24 @@ class MP_Product {
 			'excerpt'		 => false,
 			'price'			 => false,
 		);
-		$product_id = mp_get_post_value( 'product_id' );
-		$product = new MP_Product( $product_id );
-		$qty = mp_get_post_value( 'product_quantity', 1 );
-		$qty_changed = (bool) mp_get_post_value( 'product_qty_changed' );
+		$product_id		 = mp_get_post_value( 'product_id' );
+		$product		 = new MP_Product( $product_id );
+		$qty			 = mp_get_post_value( 'product_quantity', 1 );
+		$qty_changed	 = (bool) mp_get_post_value( 'product_qty_changed' );
 
-		if ( ! $product->exists() ) {
+		if ( !$product->exists() ) {
 			wp_send_json_error();
 		}
 
 		$all_atts = $product->get_attributes();
 
 		foreach ( $_POST as $key => $val ) {
-			if ( false !== strpos( $key, $product_atts::SLUGBASE ) && ! empty( $val ) ) {
-				$taxonomies[] = $key;
-				$attributes[ $key ] = $val;
+			if ( false !== strpos( $key, $product_atts::SLUGBASE ) && !empty( $val ) ) {
+				$taxonomies[]		 = $key;
+				$attributes[ $key ]	 = $val;
 			}
 		}
-		
+
 		$variations = $product->get_variations_by_attributes( $attributes );
 
 		// Filter out taxonomies that already have values and are still valid
@@ -214,9 +214,9 @@ class MP_Product {
 
 		// Format attribute terms for display
 		foreach ( $filtered_terms as $tax_slug => $terms ) {
-			$json[ $tax_slug ] = '';
-			$index = 0;
-			$terms = $product_atts->sort( $terms, false );
+			$json[ $tax_slug ]	 = '';
+			$index				 = 0;
+			$terms				 = $product_atts->sort( $terms, false );
 			foreach ( $terms as $term ) {
 				$checked	 = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
 				$required	 = ( $index == 0 ) ? true : false;
@@ -315,8 +315,9 @@ class MP_Product {
 	 * @param array $selected_atts Optional, the attributes that should be selected by default.
 	 */
 	public function attribute_fields( $echo = true, $selected_atts = array() ) {
-		$atts	 = $this->get_attributes();
-		$html	 = '
+		$atts = $this->get_attributes();
+
+		$html = '
 			<div class="mp_product_options_atts clearfix">';
 
 		foreach ( $atts as $slug => $att ) {
@@ -435,7 +436,7 @@ class MP_Product {
 		) );
 
 		$this->_variation_ids = array();
-	
+
 		while ( $query->have_posts() ) : $query->the_post();
 			$this->_variations[]	 = $variation				 = new MP_Product();
 			$this->_variation_ids[]	 = $variation->ID;
@@ -920,7 +921,7 @@ class MP_Product {
 	 * @return array/float
 	 */
 	public function get_price( $what = null ) {
-		if ( ! is_null( $this->_price ) ) {
+		if ( !is_null( $this->_price ) ) {
 			if ( !is_null( $what ) ) {
 				return mp_arr_get_value( $what, $this->_price );
 			}
@@ -1545,9 +1546,12 @@ Notification Preferences: %s', 'mp' );
 
 		$post_id			 = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 		$product_categories	 = get_the_terms( $post_id, 'product_category' );
+
 		if ( !empty( $product_categories ) ) {
 			$product_categories = wp_list_pluck( $product_categories, 'term_id' );
-		}
+		}/* else {
+			$product_categories = array( 0 );
+		}*/
 
 		// Get all product attributes for this product and it's variations
 		$attributes = $wpdb->get_col( "
@@ -1560,17 +1564,19 @@ Notification Preferences: %s', 'mp' );
 
 		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
 		foreach ( $attributes as $k => $attribute ) {
-			$attribute_id	 = $mp_product_atts->get_id_from_slug( $attribute );
-			$exists			 = $wpdb->get_var( $wpdb->prepare( "
+			$attribute_id = $mp_product_atts->get_id_from_slug( $attribute );
+			if ( !empty( $product_categories ) ) {
+				$exists = $wpdb->get_var( $wpdb->prepare( "
 				SELECT COUNT(*)
 				FROM {$table_name}
 				WHERE (attribute_id = %d AND term_id IN (" . implode( ',', $product_categories ) . "))
 				OR NOT EXISTS (SELECT attribute_id FROM {$table_name} WHERE attribute_id = %d)", $attribute_id, $attribute_id
-			) );
+				) );
 
 
-			if ( !$exists ) {
-				unset( $attributes[ $k ] );
+				if ( !$exists ) {
+					unset( $attributes[ $k ] );
+				}
 			}
 		}
 
@@ -1595,7 +1601,7 @@ Notification Preferences: %s', 'mp' );
 
 		return $this->_attributes;
 	}
-	
+
 	/**
 	 * Get product meta value
 	 *
@@ -1657,7 +1663,7 @@ Notification Preferences: %s', 'mp' );
 		} else {
 			$url = get_permalink( $this->ID );
 		}
-		
+
 		/**
 		 * Filter the product's URL
 		 *

@@ -1,4 +1,17 @@
 /* GENERAL */
+
+.mp-admin-overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: rgba(255,255,255,0.8); /*dim the background*/
+    display: none;
+}
+
+
 .mp_meta_small_desc{
     color:#BBB;
     font-weight: normal;
@@ -162,4 +175,97 @@ div.mp_variations_box{
 
 .variation-row:last-child{
     border-bottom: 0px;
+}
+
+.variation_color_1{
+    color: #27ae60;
+}
+
+.variation_color_2{
+    color: #763eaf;
+}
+
+.variation_color_3{
+    color: #ff9517;
+}
+
+.variation_color_4{
+    color: #3498db;
+}
+
+.variation_color_5{
+    color: #f1c40f;
+}
+
+.variation_color_6{
+    color: #e74c3c;
+}
+
+.variation_color_7{
+    color: #2c3e50;
+}
+
+.variation_color_8{
+    color: #c0392b;
+}
+
+.variation_color_9{
+    color: #C93756;
+}
+
+.variation_color_10{
+    color: #FCC9B9;
+}
+
+.variation_color_11{
+    color: #8DB255;
+}
+
+.variation_color_12{
+    color: #CA6924;
+}
+
+.variation_color_13{
+    color: #95A5A6;
+}
+
+.variation_color_14{
+    color: #2ECC71;
+}
+
+.variation_color_15{
+    color: #1ABC9C;
+}
+
+.variation_color_16{
+    color: #D35400;
+}
+
+.variation_color_17{
+    color: #C0392B;
+}
+
+.variation_color_18{
+    color: #34495E;
+}
+
+.variation_color_19{
+    color: #27ae60;
+}
+
+.variation_color_20{
+    color: #763eaf;
+}
+
+.select_attributes_filter{
+    margin-top:10px;
+    margin-bottom: 10px;
+}
+
+.select_all, .select_none{
+    font-weight: bold;
+}
+
+.select_attributes_filter .variation_color:last-child .separating-pipe{
+    display: none;
 }

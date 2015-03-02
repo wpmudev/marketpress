@@ -10,4 +10,17 @@ jQuery( document ).ready( function( $ ) {
         $( this ).repeatable_fields();
     } );
 
+    $( '.mp_product_attributes_select' ).live( 'change', function() {
+        if ( $( this ).val() == '-1' ) {
+            $( this ).parent().find( '.mp-variation-attribute-name' ).show();
+        } else {
+            $( this ).parent().find( '.mp-variation-attribute-name' ).hide();
+        }
+    } );
+
+    $( '#mp_make_combinations' ).live( 'click', function( event ) {
+
+
+    } );
+
 } );

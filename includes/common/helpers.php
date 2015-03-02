@@ -14,6 +14,23 @@ if ( !function_exists( 'mp' ) ) :
 
 endif;
 
+if ( !function_exists( 'mp_search_array' ) ) :
+
+	function mp_search_array( $array, $key, $value ) {
+		$results = array();
+
+		if ( is_array( $array ) ) {
+			if ( isset( $array[ $key ] ) && $array[ $key ] == $value )
+				$results[] = $array;
+			foreach ( $array as $subarray )
+				$results = array_merge( $results, mp_search_array( $subarray, $key, $value ) );
+		}
+
+		return $results;
+	}
+
+endif;
+
 if ( !function_exists( 'mp_get_api_timeout' ) ) :
 
 	/**
@@ -1168,7 +1185,7 @@ if ( !function_exists( 'mp_is_main_site' ) ) :
 
 endif;
 
-if ( ! function_exists( 'mp_is_post_indexer_installed' ) ) :
+if ( !function_exists( 'mp_is_post_indexer_installed' ) ) :
 
 	/**
 	 * Check if Post Indexer plugin is installed
@@ -1179,9 +1196,11 @@ if ( ! function_exists( 'mp_is_post_indexer_installed' ) ) :
 	function mp_is_post_indexer_installed() {
 		return ( defined( 'POST_INDEXER_PLUGIN_DIR' ) );
 	}
+
 endif;
 
-if ( ! function_exists('mp_root_blog_id') ) :
+if ( !function_exists( 'mp_root_blog_id' ) ) :
+
 	/**
 	 * Get the root blog id
 	 *
@@ -1243,6 +1262,10 @@ if ( !function_exists( 'mp_get_store_caps' ) ) :
 
 		return $store_caps;
 	}
+
+
+
+
 
 
 endif;

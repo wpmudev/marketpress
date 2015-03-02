@@ -159,18 +159,32 @@ class MP_Product_Attributes_Admin {
 		$product_attributes = MP_Product_Attributes_Admin::get_product_attributes();
 		?>
 		<select name="<?php echo $name; ?>" <?php if ( !empty( $id ) ) { ?>id="<?php echo $id; ?>"<?php } ?> class="<?php echo $class; ?>">
+			<option value="-1"><?php _e( '- Create New Variation -', 'mp' ); ?></option>
 			<?php foreach ( $product_attributes as $product_attribute ) {
 				?>
-				<option value="<?php if ( $value_type == 'id' ) {
+				<option value="<?php
+				if ( $value_type == 'id' ) {
 					echo $product_attribute->attribute_id;
 				} else {
-					echo sanitize_key($product_attribute->attribute_name);
-				}; ?>"><?php echo $product_attribute->attribute_name; ?></option>
-			<?php
-		}
-		?>
+					echo sanitize_key( $product_attribute->attribute_name );
+				};
+				?>"><?php echo $product_attribute->attribute_name; ?></option>
+						<?php
+					}
+					?>
 		</select>
 		<?php
+	}
+
+	public static function get_product_attribute_color( $attribute_id, $order = false ) {
+		if ( $order ) {
+			$attribute_id = $order;
+		} else {
+			if ( $attribute_id > 10 ) {
+				$attribute_id = substr( $attribute_id, -1 );
+			}
+		}
+		return 'variation_color_' . $attribute_id;
 	}
 
 	/**

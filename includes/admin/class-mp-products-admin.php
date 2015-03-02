@@ -38,8 +38,8 @@ class MP_Products_Screen {
 		add_action( 'wpmudev_field/print_scripts/has_variations', array( &$this, 'maybe_hide_core_metaboxes' ) );
 // Product variations save/get value
 
-		add_action( 'init', array( &$this, 'save_product_variations' ) );
-//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations' ), 10, 3 );
+		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
+		//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
 // Custom product columns
 		add_filter( 'manage_product_posts_columns', array( &$this, 'product_columns_head' ) );
@@ -280,7 +280,7 @@ class MP_Products_Screen {
 				if ( $product->has_variations() ) {
 					$skus = array();
 					foreach ( $variations as $variation ) {
-						$skus[] = $variation->get_meta( 'sku' );
+						$skus[] = $variation->get_meta( 'sku', '&mdash;' );
 					}
 				} else {
 					$skus = array( $product->get_meta( 'sku', '&mdash;' ) );
@@ -451,28 +451,98 @@ class MP_Products_Screen {
 		return $result;
 	}
 
+	public function term_id( $term, $taxonomy ) {
+		if ( is_numeric( $term ) ) {
+			return $term;
+		} else {
+			$term_insert_response = wp_insert_term( $term, $taxonomy );
+			if ( is_wp_error( $term_insert_response ) ) {
+				if ( term_exists( $term, $taxonomy ) ) {
+					$term = get_term( $term, $taxonomy, OBJECT );
+					return $term->term_id;
+				} else {
+					echo $term_insert_response->get_error_message(); //shouldn't happen ever!
+					exit;
+				}
+			} else {
+				return $term_insert_response[ 'term_id' ];
+			}
+		}
+	}
+
+	public function maybe_create_attribute( $given_taxonomy, $new_taxonomy_name ) {
+		$taxonomy = $given_taxonomy;
+
+		if ( isset( $new_taxonomy_name ) && !empty( $new_taxonomy_name ) ) {
+			global $wpdb;
+
+			$product_atts		 = MP_Product_Attributes::get_instance();
+			$table_name			 = MP_Product_Attributes::get_instance()->get_table_name();
+			$table_name_terms	 = $wpdb->prefix . 'mp_product_attributes_terms';
+
+			$result = $wpdb->get_col( $wpdb->prepare(
+			"SELECT attribute_id FROM $table_name WHERE attribute_name = %s", $new_taxonomy_name
+			) );
+
+			if ( is_array( $result ) ) {
+				$attribute_id = $result[ 0 ]; //get the first attribute with the given name from the array
+			}
+
+			if ( !is_numeric( $attribute_id ) ) {
+				$wpdb->insert( $table_name, array(
+					'attribute_name'			 => $new_taxonomy_name,
+					'attribute_terms_sort_by'	 => 'ID',
+					'attribute_terms_sort_order' => 'ASC',
+				) );
+
+				$attribute_id = $wpdb->insert_id;
+			}
+
+			$attribute_slug = $product_atts->generate_slug( $attribute_id );
+
+			//temporarily register the taxonomy - otherwise we won't be able to insert terms below
+			register_taxonomy( $attribute_slug, MP_Product::get_post_type(), array(
+				'show_ui'			 => false,
+				'show_in_nav_menus'	 => false,
+				'hierarchical'		 => true,
+			) );
+
+			$taxonomy = $attribute_slug;
+		}
+
+		return $taxonomy;
+	}
+
 	/**
-	 * Saves the product variations to the database
+	 * Create variation combinations and saves initial product variations to the database
+	 * Add new terms if don't exist
+	 * Add new taxonomies if don't exist
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter wpmudev_field/save_value/variations
+	 * @action init
 	 * @uses $wpdb
 	 */
-	public function save_product_variations() {// $post_id, $post, $update 
+	
+	public function save_init_product_variations() {
 		global $wp_taxonomies;
 
 		$variation_names	 = mp_get_post_value( 'product_attributes_categories', array() );
+		$new_variation_names = mp_get_post_value( 'variation_names', array() );
 		$variation_values	 = mp_get_post_value( 'variation_values', array() );
+		$post_id			 = mp_get_post_value( 'post_ID' );
 
 		$data = array();
 
 		if ( isset( $variation_values ) && !empty( $variation_values ) ) {
 
+			update_post_meta( $post_id, 'has_variations', 1 );
+
 			$i = 0;
 
 			foreach ( $variation_names as $variation_name ) {
-				$variation_name = 'product_attr_' . $variation_name; //taxonomy name made of the prefix and attribute's ID
+
+				$variation_name = $this->maybe_create_attribute( 'product_attr_' . $variation_name, $new_variation_names[ $i ] ); //taxonomy name made of the prefix and attribute's ID
 
 				$args = array(
 					'orderby'		 => 'name',
@@ -499,27 +569,46 @@ class MP_Products_Screen {
 					);
 
 					reset( $term_object );
-					$data[ $i ][] = $variation_name . '=' . ((!empty( $term_object )) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data[ $i ][]			 = $variation_name . '=' . ((!empty( $term_object )) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data_original[ $i ][]	 = $variation_name . '=' . $variations_single_data;
 				}
 
 				$i++;
 			}
 
-			$combinations = $this->possible_product_combinations( $data );
+			$combinations			 = $this->possible_product_combinations( $data );
+			$combinations_original	 = $this->possible_product_combinations( $data_original );
+
+			$combination_num	 = 1;
+			$combination_index	 = 0;
 
 			foreach ( $combinations as $combination ) {
+
 				$variation_id = wp_insert_post( array(
 					//'ID'			 => $variation_id,
 					'post_title'	 => mp_get_post_value( 'post_title' ),
 					'post_content'	 => '',
 					'post_status'	 => 'publish',
 					'post_type'		 => 'mp_product_variation',
-					'post_parent'	 => mp_get_post_value( 'post_ID' ),
+					'post_parent'	 => $post_id,
 				) );
 
+				/* Make a variation name from the combination */
+				$variation_title_combinations = explode( '|', $combinations_original[ $combination_index ] );
+
+				$variation_name_title = '';
+
+				foreach ( $variation_title_combinations as $variation_title_combination ) {
+					$variation_name_title_array = explode( '=', $variation_title_combination );
+					$variation_name_title .= $variation_name_title_array[ 1 ] . ' ';
+				}
+
+				$sku_post_val	 = mp_get_post_value( 'sku' );
+				$sku			 = isset( $sku_post_val ) && !empty( $sku_post_val ) ? $sku_post_val . '-' . $combination_num : '';
+
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
-					'name'					 => mp_get_post_value( 'post_title' ),
-					'sku'					 => mp_get_post_value( 'sku' ),
+					'name'					 => $variation_name_title, //mp_get_post_value( 'post_title' ),
+					'sku'					 => $sku,
 					'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
 					'inventory'				 => mp_get_post_value( 'inventory[inventory]' ),
 					'out_of_stock_purchase'	 => mp_get_post_value( 'inventory[out_of_stock_purchase]' ),
@@ -535,7 +624,6 @@ class MP_Products_Screen {
 					'weight'				 => '', //array - to do
 					'extra_shipping_cost'	 => mp_get_post_value( 'weight[extra_shipping_cost]' ),
 					'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
-					'has_variations'		 => 1
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
 
@@ -548,12 +636,17 @@ class MP_Products_Screen {
 				$variation_terms = explode( '|', $combination );
 
 				foreach ( $variation_terms as $variation_term ) {
-					$variation_term_vals = explode('=', $variation_term);
-					wp_set_post_terms( $variation_id, $variation_term_vals[1], $variation_term_vals[0], true );
+					$variation_term_vals = explode( '=', $variation_term );
+					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], true );
 				}
+
+				$combination_num++;
+				$combination_index++;
 			}
 
 			//exit;
+		} else {
+			//update_post_meta( $post_id, 'has_variations', 0 );
 		}
 
 
@@ -637,6 +730,10 @@ class MP_Products_Screen {
 
 		  return null; // Returning null will bypass internal save mechanism
 		 */
+	}
+
+	public function save_product_variations_parent_data( $value, $post_id, $field ) {
+		
 	}
 
 	/**
@@ -1017,18 +1114,40 @@ class MP_Products_Screen {
 			'default_value'	 => 'no',
 		) );
 
-		$metabox->add_field( 'variations', array(
-			'name'			 => 'variations_module',
-			'label'			 => array( 'text' => sprintf( __( '%3$sAdd variations for%2$s %1$sProduct%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
-			'message'		 => __( 'Variations', 'mp' ),
-			'desc'			 => __( 'Add variations for this product. e.g. If you are selling t-shirts, you can create Color & Size variations', 'mp' ),
-			'conditional'	 => array(
-				'name'	 => 'has_variation',
-				'value'	 => 'yes',
-				'action' => 'show',
-			),
-			'class'			 => 'mp_variations_box'
-		) );
+		if ( isset( $_GET[ 'post' ] ) ) {
+			$post_id = $_GET[ 'post' ];
+		} else {
+			$post_id = -1;
+		}
+
+		$has_variations = get_post_meta( $post_id, 'has_variations', false );
+
+		if ( $has_variations ) {
+			$metabox->add_field( 'variations', array(
+				'name'			 => 'variations_module',
+				'label'			 => array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+				'message'		 => __( 'Variations', 'mp' ),
+				'conditional'	 => array(
+					'name'	 => 'has_variation',
+					'value'	 => 'yes',
+					'action' => 'show',
+				),
+				'class'			 => 'mp_variations_table_box'
+			) );
+		} else {
+			$metabox->add_field( 'variations', array(
+				'name'			 => 'variations_module',
+				'label'			 => array( 'text' => sprintf( __( '%3$sAdd variations for%2$s %1$sProduct%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+				'message'		 => __( 'Variations', 'mp' ),
+				'desc'			 => __( 'Add variations for this product. e.g. If you are selling t-shirts, you can create Color & Size variations', 'mp' ),
+				'conditional'	 => array(
+					'name'	 => 'has_variation',
+					'value'	 => 'yes',
+					'action' => 'show',
+				),
+				'class'			 => 'mp_variations_box'
+			) );
+		}
 	}
 
 	/**
