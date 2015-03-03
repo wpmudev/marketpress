@@ -177,83 +177,103 @@ div.mp_variations_box{
     border-bottom: 0px;
 }
 
-.variation_color_1{
+.variation_color_1,
+.variation_color_1 a{
     color: #27ae60;
 }
 
-.variation_color_2{
+.variation_color_2,
+.variation_color_2 a{
     color: #763eaf;
 }
 
-.variation_color_3{
+.variation_color_3,
+.variation_color_3 a{
     color: #ff9517;
 }
 
-.variation_color_4{
+.variation_color_4,
+.variation_color_4 a{
     color: #3498db;
 }
 
-.variation_color_5{
+.variation_color_5,
+.variation_color_5 a{
     color: #f1c40f;
 }
 
-.variation_color_6{
+.variation_color_6,
+.variation_color_6 a{
     color: #e74c3c;
 }
 
-.variation_color_7{
+.variation_color_7,
+.variation_color_7 a{
     color: #2c3e50;
 }
 
-.variation_color_8{
+.variation_color_8,
+.variation_color_8 a{
     color: #c0392b;
 }
 
-.variation_color_9{
+.variation_color_9,
+.variation_color_9 a{
     color: #C93756;
 }
 
-.variation_color_10{
+.variation_color_10,
+.variation_color_10 a{
     color: #FCC9B9;
 }
 
-.variation_color_11{
+.variation_color_11,
+.variation_color_11 a{
     color: #8DB255;
 }
 
-.variation_color_12{
+.variation_color_12,
+.variation_color_12 a{
     color: #CA6924;
 }
 
-.variation_color_13{
+.variation_color_13,
+.variation_color_13 a{
     color: #95A5A6;
 }
 
-.variation_color_14{
+.variation_color_14,
+.variation_color_14 a{
     color: #2ECC71;
 }
 
-.variation_color_15{
+.variation_color_15,
+.variation_color_15 a{
     color: #1ABC9C;
 }
 
-.variation_color_16{
+.variation_color_16,
+.variation_color_16 a{
     color: #D35400;
 }
 
-.variation_color_17{
+.variation_color_17,
+.variation_color_17 a{
     color: #C0392B;
 }
 
-.variation_color_18{
+.variation_color_18,
+.variation_color_18 a{
     color: #34495E;
 }
 
-.variation_color_19{
+.variation_color_19,
+.variation_color_19 a{
     color: #27ae60;
 }
 
-.variation_color_20{
+.variation_color_20,
+.variation_color_20 a{
     color: #763eaf;
 }
 
@@ -262,8 +282,20 @@ div.mp_variations_box{
     margin-bottom: 10px;
 }
 
-.select_all, .select_none{
+.select_all a, .select_none a{
     font-weight: bold;
+    color: #000;
+    text-decoration: none;
+}
+
+.select_attributes_filter a{
+    text-decoration: none;
+    outline: 0;
+}
+
+.select_attributes_filter a.selected{
+    text-decoration: underline;
+    outline: 0;
 }
 
 .select_attributes_filter .variation_color:last-child .separating-pipe{

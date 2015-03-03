@@ -71,14 +71,14 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			<span <?php echo $this->parse_atts(); ?>>
 				<div class="select_attributes_filter">
 					<span class="select_title"><?php _e( 'Select:', 'mp' ); ?> | </span>
-					<span class="select_all"><?php _e( 'All', 'mp' ); ?> | </span>
-					<span class="select_none"><?php _e( 'None', 'mp' ); ?> | </span>
+					<span class="select_all"><a href="#" class="select_all_link"><?php _e( 'All', 'mp' ); ?></a> | </span>
+					<span class="select_none"><a href="#" class="select_none_link"><?php _e( 'None', 'mp' ); ?></a> | </span>
 					<?php
 					$order = 1;
 					foreach ( $variation_attributes as $variation_attribute ) {
 						foreach ( $variation_attribute as $term => $term_info ) {
 							?>
-							<span class="variation_color <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo $term; ?>" data-attribute-id="<?php echo $term_info[ 0 ]; ?>"><?php echo $term_info[ 1 ]; ?> <span class="separating-pipe">|</span> </span>
+							<span class="variation_color <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo $term; ?>" data-attribute-id="<?php echo $term_info[ 0 ]; ?>"><a href="#"><?php echo $term_info[ 1 ]; ?></a> <span class="separating-pipe">|</span> </span>
 							<?php
 						}
 						$order++;
@@ -89,7 +89,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 					<thead>
 						<tr>
 							<th scope="col" id="cb" class="manage-column column-cb check-column">
-								<input id="cb-select-all-1" type="checkbox">
+								<input id="cb-select-all" type="checkbox">
 							</th>
 
 							<th scope="col" id="title" class="manage-column">
@@ -122,16 +122,20 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 					</thead>
 
 					<tbody id="the-list">
-						<?php foreach ( $children as $child ) { ?>
-							<tr id="post-1" class="post-1 type-post status-publish format-standard hentry category-uncategorized tag-l tag-m tag-s tag-x tag-xl alternate iedit author-self level-0">
+						<?php
+						$style = '';
+						foreach ( $children as $child ) {
+							$style	 = ( isset( $style ) && 'alternate' == $style ) ? '' : 'alternate';
+							?>
+							<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo $child->ID; ?>" class="hentry <?php echo $style; ?>">
 								<th scope="row" class="check-column">
-									<input id="cb-select-1" type="checkbox" name="post[]" value="1">
+									<input type="checkbox" class="check-column-box" name="selected_variation[]" value="<?php echo $child->ID; ?>">
 								</th>
 								<td class="">
 									IMG
 								</td>
 								<?php
-								$order = 1;
+								$order	 = 1;
 								foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
 									?>
 									<th scope="col" class="manage-column">
@@ -139,7 +143,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										$child_term	 = get_the_terms( $child->ID, 'product_attr_' . $variation_attribute );
 										$child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
 										?>
-										<span class="<?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>"><?php echo is_object( $child_term ) ? $child_term->name : '-'; ?></span>
+										<span class="variation_value variation_term_<?php echo isset( $child_term->term_id ) ? $child_term->term_id : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? $child_term->term_id : ''; ?>" data-attribute-id="<?php echo $variation_attribute; ?>"><?php echo is_object( $child_term ) ? $child_term->name : '-'; ?></span>
 									</th>
 									<?php
 									$order++;
@@ -150,13 +154,13 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								</td>
 								<td class="">
 									<?php
-									$price = get_post_meta( $child->ID, 'regular_price', true );
-									echo mp_format_currency('', $price);
+									$price	 = get_post_meta( $child->ID, 'regular_price', true );
+									echo mp_format_currency( '', $price, 'price editable', 'currency' );
 									?>
 								</td>
 								<td class="">
 									<?php
-									$sku = get_post_meta( $child->ID, 'sku', true );
+									$sku	 = get_post_meta( $child->ID, 'sku', true );
 									echo $sku;
 									?>
 								</td>
@@ -164,7 +168,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									- Weight
 								</td>
 							</tr>
-			<?php } ?>
+						<?php } ?>
 					</tbody>
 				</table>
 			</span>

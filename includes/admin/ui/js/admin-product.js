@@ -18,6 +18,43 @@ jQuery( document ).ready( function( $ ) {
         }
     } );
 
+    $( '.select_attributes_filter a' ).live( 'click', function( event ) {
+        $( '.select_attributes_filter a' ).removeClass( 'selected' );
+
+        if ( $( this ).hasClass( 'selected' ) ) {
+            $( this ).removeClass( 'selected' );
+        } else {
+            $( this ).addClass( 'selected' );
+        }
+
+        //Select All link clicked
+        if ( $( this ).hasClass( 'select_all_link' ) ) {
+            $( '#cb-select-all' ).prop( "checked", true );
+            $( '.check-column .check-column-box' ).prop( "checked", true );
+        }
+
+        //Select None link clicked
+        if ( $( this ).hasClass( 'select_none_link' ) ) {
+            $( '#cb-select-all' ).prop( "checked", false );
+            $( '.check-column .check-column-box' ).prop( "checked", false );
+        }
+
+        //Variation filter clicked
+        if ( !$( this ).hasClass( 'select_none_link' ) && !$( this ).hasClass( 'select_all_link' ) ) {
+            var term_id = $( this ).parent().data( 'term-id' );
+            $( '.check-column .check-column-box' ).prop( "checked", false );
+            $( '.variation_term_' + term_id ).each( function( index ) {
+                $( this ).closest( 'tr' ).find( '.check-column .check-column-box' ).prop( "checked", true );
+            } );
+        }
+
+        event.preventDefault();
+    } );
+
+    $( ".select_attributes_filter a" ).live( 'focus', function( event ) {
+        $( this ).blur();
+    } );
+
     $( '#mp_make_combinations' ).live( 'click', function( event ) {
 
 

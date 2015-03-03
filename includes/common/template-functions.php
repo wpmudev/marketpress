@@ -450,7 +450,7 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 	 * @param float $amount The amount to format
 	 * @return string
 	 */
-	function mp_format_currency( $currency = '', $amount = false ) {
+	function mp_format_currency( $currency = '', $amount = false, $price_class = '', $currency_class = '' ) {
 		$currencies = mp()->currencies;
 
 		if ( empty( $currency ) ) {
@@ -501,21 +501,38 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 			// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
 			$amount = (float) $amount;
 
+
+			if ( !empty( $price_class ) ) {
+				$price_pre	 = '<span class="' . esc_attr( $price_class ) . '">';
+				$price_post	 = '</span>';
+			} else {
+				$price_pre	 = '';
+				$price_post	 = '';
+			}
+
+			if ( !empty( $currency_class ) ) {
+				$currency_pre	 = '<span class="' . esc_attr( $price_class ) . '">';
+				$currency_post	 = '</span>';
+			} else {
+				$currency_pre	 = '';
+				$currency_post	 = '';
+			}
+
 			switch ( mp_get_setting( 'curr_symbol_position' ) ) {
 				case 1 :
-					$formatted = $negative_symbol . $symbol . number_format_i18n( $amount, $decimal_place );
+					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post;
 					break;
 
 				case 2 :
-					$formatted = $negative_symbol . $symbol . ' ' . number_format_i18n( $amount, $decimal_place );
+					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . ' ' . $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post;
 					break;
 
 				case 3 :
-					$formatted = number_format_i18n( $amount, $decimal_place ) . $symbol;
+					$formatted = $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post . $currency_pre . $symbol . $currency_post;
 					break;
 
 				case 4 :
-					$formatted = number_format_i18n( $amount, $decimal_place ) . ' ' . $symbol;
+					$formatted = $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post . ' ' . $currency_pre . $symbol . $currency_post;
 					break;
 			}
 		}
@@ -781,7 +798,7 @@ if ( !function_exists( 'mp_list_plugin_shipping_options' ) ) :
 		foreach ( (array) $options as $method => $label ) {
 			$input_id	 = 'mp-shipping-option-' . $plugin->plugin_name . '-' . sanitize_title( $method );
 			$checked	 = ( $plugin->plugin_name == $shipping_option && $method == $shipping_sub_option ) ? ' checked' : '';
-			$input_name = ( mp_cart()->is_global ) ? 'shipping_method[' . mp_cart()->get_blog_id() . ']' : 'shipping_method';
+			$input_name	 = ( mp_cart()->is_global ) ? 'shipping_method[' . mp_cart()->get_blog_id() . ']' : 'shipping_method';
 			$html .= '
 				<label class="mp-checkout-option-label" for="' . $input_id . '">
 					<input
@@ -1047,9 +1064,9 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 	 */
 	function mp_tax_rate( $echo = false ) {
 		//get address
-		$state = mp_get_user_address_part( 'state', 'shipping' );
-		$country = mp_get_user_address_part( 'country', 'shipping' );
-		$tax_rate = 0;
+		$state		 = mp_get_user_address_part( 'state', 'shipping' );
+		$country	 = mp_get_user_address_part( 'country', 'shipping' );
+		$tax_rate	 = 0;
 
 		if ( empty( $country ) ) {
 			$country = mp_get_setting( 'base_country' );
@@ -1260,7 +1277,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 
 		// Setup pagination
 		if ( (!is_null( $args[ 'paginate' ] ) && !$args[ 'paginate' ]) || (is_null( $args[ 'paginate' ] ) && !mp_get_setting( 'paginate' )) ) {
-			$query[ 'nopaging' ]	 = $args[ 'nopaging' ]	 = true;
+			$query[ 'nopaging' ] = $args[ 'nopaging' ]	 = true;
 		} else {
 			// Figure out per page
 			if ( !is_null( $args[ 'per_page' ] ) ) {
@@ -1273,25 +1290,25 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			if ( !is_null( $args[ 'page' ] ) ) {
 				$query[ 'paged' ] = intval( $args[ 'page' ] );
 			} elseif ( get_query_var( 'paged' ) != '' ) {
-				$query[ 'paged' ]	 = $args[ 'page' ]	 = intval( get_query_var( 'paged' ) );
+				$query[ 'paged' ]	 = $args[ 'page' ]		 = intval( get_query_var( 'paged' ) );
 			}
 
 			// Get order by
 			if ( !is_null( $args[ 'order_by' ] ) ) {
 				if ( 'price' == $args[ 'order_by' ] ) {
-					$query[ 'meta_key' ]	 = 'regular_price';
+					$query[ 'meta_key' ] = 'regular_price';
 					$query[ 'orderby' ]	 = 'meta_value_num';
 				} else if ( 'sales' == $args[ 'order_by' ] ) {
-					$query[ 'meta_key' ]	 = 'mp_sales_count';
+					$query[ 'meta_key' ] = 'mp_sales_count';
 					$query[ 'orderby' ]	 = 'meta_value_num';
 				} else {
 					$query[ 'orderby' ] = $args[ 'order_by' ];
 				}
 			} elseif ( 'price' == mp_get_setting( 'order_by' ) ) {
-				$query[ 'meta_key' ]	 = 'regular_price';
+				$query[ 'meta_key' ] = 'regular_price';
 				$query[ 'orderby' ]	 = 'meta_value_num';
 			} elseif ( 'sales' == mp_get_setting( 'order_by' ) ) {
-				$query[ 'meta_key' ]	 = 'mp_sales_count';
+				$query[ 'meta_key' ] = 'mp_sales_count';
 				$query[ 'orderby' ]	 = 'meta_value_num';
 			} else {
 				$query[ 'orderby' ] = mp_get_setting( 'order_by' );
@@ -1545,7 +1562,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 	function mp_product( $echo = true, $product_id = null, $title = true, $content = 'full', $image = 'single',
 					  $meta = true ) {
-		
+
 		if ( function_exists( 'icl_object_id' ) ) {
 			$product_id = icl_object_id( $product_id, MP_Product::get_post_type(), false );
 		}
@@ -1553,9 +1570,9 @@ if ( !function_exists( 'mp_product' ) ) {
 		$product = new MP_Product( $product_id );
 		$form_id = 'mp_buy_form_' . $product_id;
 
-		$variation		 = false;
-		
-		if ( $variation_id	 = get_query_var( 'mp_variation_id' ) ) {
+		$variation = false;
+
+		if ( $variation_id = get_query_var( 'mp_variation_id' ) ) {
 			$variation = new MP_Product( $variation_id );
 			if ( !$variation->exists() ) {
 				$variation = false;
@@ -1580,14 +1597,14 @@ if ( !function_exists( 'mp_product' ) ) {
 
 			// Button
 			$selected_atts = array();
-			
+
 			if ( $variation ) {
 				$atts = $variation->get_attributes();
 				foreach ( $atts as $slug => $att ) {
 					$selected_atts[ $slug ] = key( $att[ 'terms' ] );
 				}
 			}
-			
+
 			$return .= $product->buy_button( false, 'single', $selected_atts );
 
 			$return .= '
@@ -1925,6 +1942,20 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	function mp_send_email( $email, $subject, $msg ) {
 		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 endif;
