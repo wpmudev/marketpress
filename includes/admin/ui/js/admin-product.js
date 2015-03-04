@@ -1,4 +1,30 @@
 jQuery( document ).ready( function( $ ) {
+
+    $( '#poststuff' ).append( '<div class="mp-admin-overlay"><div class="mp-variation-loading-spin"></div><div class="mp-variation-loading-message">' + mp_product_admin_i18n.creating_vatiations_message + '</div></div>' );
+
+    function mp_variation_message() {
+
+        $( '.mp-variation-loading-spin' ).css( {
+            position: 'absolute',
+            left: ( $( '.mp-admin-overlay' ).width() - $( '.mp-variation-loading-spin' ).outerWidth() ) / 2,
+            top: ( $( '.mp-admin-overlay' ).height() - $( '.mp-variation-loading-spin' ).outerHeight() ) / 2
+        } );
+
+        var new_top = parseInt( $( '.mp-variation-loading-spin' ).css( 'top' ) );
+        new_top = new_top + 50;
+
+        $( '.mp-variation-loading-message' ).css( {
+            position: 'absolute',
+            left: ( $( '.mp-admin-overlay' ).width() - $( '.mp-variation-loading-message' ).outerWidth() ) / 2,
+            top: new_top
+        } );
+    }
+
+    $( window ).resize( function() {
+        mp_variation_message();
+    } );
+    $( window ).resize();
+
     /* Variations product name set */
     $( '.mp_variations_product_name' ).html( $( '#title' ).val() );
 
@@ -56,8 +82,23 @@ jQuery( document ).ready( function( $ ) {
     } );
 
     $( '#mp_make_combinations' ).live( 'click', function( event ) {
+        $( '.mp-admin-overlay' ).show();
+        mp_variation_message();
 
+        var data = $( 'form#post' ).serialize();
+        data['action'] = 'save_init_product_variations';
 
+        $.post(
+            mp_product_admin_i18n.ajaxurl, data
+        ).done( function( data, status ) {
+            if(status == 'success'){
+                $( '.mp-admin-overlay' ).hide();
+            }else{
+                //an error occured
+            }
+        } );
+
+        event.preventDefault();
     } );
 
 } );

@@ -67,7 +67,6 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				}
 			}
 			?>
-			<div class="mp-admin-overlay"></div>
 			<span <?php echo $this->parse_atts(); ?>>
 				<div class="select_attributes_filter">
 					<span class="select_title"><?php _e( 'Select:', 'mp' ); ?> | </span>
@@ -175,7 +174,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			<?php
 		} else {
 			?>
-			<div class="mp-admin-overlay"></div>
+			
 			<span <?php echo $this->parse_atts(); ?>>
 				<div class="repeat">
 					<table class="wrapper" width="100%">

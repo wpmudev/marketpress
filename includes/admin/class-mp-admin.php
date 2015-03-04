@@ -183,6 +183,11 @@ class MP_Admin {
 				wp_enqueue_style( 'mp-product-admin', mp_plugin_url( 'includes/admin/ui/css/admin-product.css' ), array( 'mp-font-awesome' ), MP_VERSION );
 				wp_enqueue_script( 'mp-repeatable-fields', mp_plugin_url( 'includes/admin/ui/js/repeatable-fields.js' ), array( 'jquery' ), MP_VERSION );
 				wp_enqueue_script( 'mp-product-admin', mp_plugin_url( 'includes/admin/ui/js/admin-product.js' ), array( 'mp-repeatable-fields' ), MP_VERSION );
+
+				wp_localize_script( 'mp-product-admin', 'mp_product_admin_i18n', array(
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'creating_vatiations_message' => __( 'Creating variations, please wait...', 'mp' ),
+				) );
 			}
 		}
 

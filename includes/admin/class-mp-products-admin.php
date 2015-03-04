@@ -34,11 +34,12 @@ class MP_Products_Screen {
 	private function __construct() {
 // Remove add-new submenu item from store admin menu
 		add_action( 'admin_menu', array( &$this, 'remove_menu_items' ), 999 );
-// Hide featured image for variable products
+		// Hide featured image for variable products
 		add_action( 'wpmudev_field/print_scripts/has_variations', array( &$this, 'maybe_hide_core_metaboxes' ) );
 // Product variations save/get value
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
+		add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
 		//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
 // Custom product columns
