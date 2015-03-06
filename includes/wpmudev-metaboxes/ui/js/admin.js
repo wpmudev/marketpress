@@ -373,7 +373,7 @@ jQuery.validator.addMethod( 'lessthan', function( value, element, param ) {
 			alert( msg );
 		} );
 		
-		$form.find( '#publish, [type="submit"]' ).click( function( e ) {
+		$form.find( '#publish, #save-post, [type="submit"]' ).click( function( e ) {
 			if ( ! $form.valid() ) {
 				e.preventDefault();
 			}

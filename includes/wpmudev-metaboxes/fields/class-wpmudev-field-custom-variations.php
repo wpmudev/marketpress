@@ -67,6 +67,25 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				}
 			}
 			?>
+			<div class="tablenav top">
+
+				<div class="alignleft actions bulkactions">
+					<label for="bulk-action-selector-top" class="screen-reader-text"><?php _e( 'Select bulk action', 'mp' ); ?></label>
+					<select name="action" id="bulk-action-selector-top">
+						<option value="-1" selected="selected"><?php _e( 'Bulk Actions', 'mp' ); ?></option>
+						<option value="variant_update_images"><?php _e( 'Update Images', 'mp' ); ?></option>
+						<option value="variant_update_inventory"><?php _e( 'Update Inventory', 'mp' ); ?></option>
+						<option value="variant_update_prices"><?php _e( 'Update Prices', 'mp' ); ?></option>
+						<option value="variant_delete"><?php _e( 'Delete Variants', 'mp' ); ?></option>
+					</select>
+					<input type="submit" name="" id="doaction" class="button action" value="Apply">
+				</div>
+
+
+
+
+				<br class="clear">
+			</div>
 			<span <?php echo $this->parse_atts(); ?>>
 				<div class="select_attributes_filter">
 					<span class="select_title"><?php _e( 'Select:', 'mp' ); ?> | </span>
@@ -92,7 +111,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 							</th>
 
 							<th scope="col" id="title" class="manage-column">
-								Img.
+								<?php _e( 'Img.', 'mp' ); ?>
 							</th>
 							<?php foreach ( array_keys( $variation_attributes ) as $variation_attribute ) { ?>
 								<th scope="col" class="manage-column">
@@ -103,19 +122,19 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 							<?php } ?>
 
 							<th scope="col" id="tags" class="manage-column">
-								Inventory
+								<?php _e( 'Inventory', 'mp' ); ?>
 							</th>
 
 							<th scope="col" id="comments" class="manage-column">
-								Price
+								<?php _e( 'Price', 'mp' ); ?>
 							</th>
 
 							<th scope="col" id="date" class="manage-column">
-								SKU
+								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
 
 							<th scope="col" id="date" class="manage-column">
-								Weight
+								<?php _e( 'Weight', 'mp' ); ?>
 							</th>
 						</tr>
 					</thead>
@@ -160,7 +179,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<td class="">
 									<?php
 									$sku	 = get_post_meta( $child->ID, 'sku', true );
-									echo $sku;
+									echo isset($sku) && !empty($sku) ? $sku : '-';
 									?>
 								</td>
 								<td class="">
@@ -174,16 +193,10 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			<?php
 		} else {
 			?>
-			
+
 			<span <?php echo $this->parse_atts(); ?>>
 				<div class="repeat">
 					<table class="wrapper" width="100%">
-						<thead>
-							<tr>
-						<a href="" id="mp_make_combinations">Make combinations</a>
-						<td width="10%" colspan="4"><span class="add">Add</span></td>
-						</tr>
-						</thead>
 						<tbody class="container">
 							<tr class="template row">
 
@@ -214,6 +227,14 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 
 							</tr>
 						</tbody>
+						<tfoot>
+							<tr>
+								<td width="10%" colspan="4">
+									<a class="add mp-add-new-variation button"><?php _e( 'Add Another Variant', 'mp' ); ?></span>
+										<a href="" id="mp_make_combinations" class='button button-primary create-variations-button'><?php _e( 'Create Variations', 'mp' ); ?></a>
+								</td>
+							</tr>
+						</tfoot>
 					</table>
 				</div>
 			</span>

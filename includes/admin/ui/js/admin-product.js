@@ -5,7 +5,7 @@ jQuery( document ).ready( function( $ ) {
     function mp_variation_message() {
 
         $( '.mp-variation-loading-spin' ).css( {
-            position: 'absolute',
+            position: 'fixed',
             left: ( $( '.mp-admin-overlay' ).width() - $( '.mp-variation-loading-spin' ).outerWidth() ) / 2,
             top: ( $( '.mp-admin-overlay' ).height() - $( '.mp-variation-loading-spin' ).outerHeight() ) / 2
         } );
@@ -82,23 +82,52 @@ jQuery( document ).ready( function( $ ) {
     } );
 
     $( '#mp_make_combinations' ).live( 'click', function( event ) {
-        $( '.mp-admin-overlay' ).show();
-        mp_variation_message();
 
-        var data = $( 'form#post' ).serialize();
-        data['action'] = 'save_init_product_variations';
+//alert($( '#original_publish' ).val());
+        if ( $( '#original_publish' ).val() == 'Publish' ) {
+            //$( '.mp-admin-overlay' ).show();
+            $( '#save-post' ).removeAttr( 'dasabled' );
+            //$( '#save-post' ).prop( 'disabled', false );
+            $( '#save-post' ).click();
+            //mp_variation_message();
+        }
 
-        $.post(
-            mp_product_admin_i18n.ajaxurl, data
-        ).done( function( data, status ) {
-            if(status == 'success'){
-                $( '.mp-admin-overlay' ).hide();
-            }else{
-                //an error occured
-            }
-        } );
+        if ( $( '#original_publish' ).val() == 'Update' ) {
+            //$( '.mp-admin-overlay' ).show();
+            $( '#publish' ).removeAttr( 'dasabled' );
+            //$( '#publish' ).prop( 'disabled', false );
+            $( '#publish' ).click();
+            //mp_variation_message();
+        }
+
+        //$( 'form#post' ).submit();
 
         event.preventDefault();
     } );
+
+
+    /*$( '#mp_make_combinations' ).live( 'click', function( event ) {
+     $( '.mp-admin-overlay' ).show();
+     mp_variation_message();
+     
+     var data = $( 'form#post' ).serialize();
+     data['action'] = 'save_init_product_variations';
+     
+     $.post(
+     mp_product_admin_i18n.ajaxurl, data
+     ).done( function( data, status ) {
+     if(status == 'success'){
+     $( '.mp-admin-overlay' ).hide();
+     }else{
+     //an error occured
+     }
+     } );
+     
+     event.preventDefault();
+     } );*/
+    $( '.mp-add-new-variation' ).click();
+
+    //$( '.variation-row' ).css( 'border-bottom', '1px' );
+    //$( '.variation-row:last-child' ).css( 'border-bottom', '0px' );    
 
 } );

@@ -39,7 +39,7 @@ class MP_Products_Screen {
 // Product variations save/get value
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
-		add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
+		//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
 		//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
 // Custom product columns
@@ -524,7 +524,6 @@ class MP_Products_Screen {
 	 * @action init
 	 * @uses $wpdb
 	 */
-	
 	public function save_init_product_variations() {
 		global $wp_taxonomies;
 
@@ -876,244 +875,6 @@ class MP_Products_Screen {
 	}
 
 	public function init_product_price_inventory_variants_metabox() {
-		$metabox = new WPMUDEV_Metabox( array(
-			'id'		 => 'mp-product-price-inventory-variants-metabox',
-			'title'		 => sprintf( __( '%1$sPRICE, INVENTORY & VARIANTS%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
-			'post_type'	 => MP_Product::get_post_type(),
-			'context'	 => 'normal',
-		) );
-
-		$metabox->add_field( 'text', array(
-			'name'			 => 'sku',
-			'placeholder'	 => __( 'Enter SKU', 'mp' ),
-			'label'			 => array( 'text' => sprintf( __( 'SKU %1$s(Stock Keeping Unit)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
-			'class'			 => 'mp-product-field-40 mp-blank-bg'
-		) );
-
-		$metabox->add_field( 'text', array(
-			'name'			 => 'regular_price',
-			'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
-			'placeholder'	 => __( 'Enter Price', 'mp' ),
-			'validation'	 => array(
-				'required'	 => true,
-				'number'	 => true,
-				'min'		 => 0,
-			),
-			'class'			 => 'mp-product-field-40 mp-blank-bg'
-		) );
-
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'has_sale',
-			'message'	 => __( 'Set up a Sale for this Product', 'mp' ),
-		) );
-
-		$sale_price = $metabox->add_field( 'complex', array(
-			'name'			 => 'sale_price',
-			'label'			 => array( 'text' => __( 'Sale Price', 'mp' ) ),
-			'conditional'	 => array(
-				'name'	 => 'has_sale',
-				'value'	 => 1,
-				'action' => 'show',
-			),
-			'custom'		 => array(
-				'label_position' => 'up',
-				'label_type'	 => 'standard'
-			),
-			'class'			 => 'mp-product-sale-price-holder mp-special-box'
-		) );
-
-		if ( $sale_price instanceof WPMUDEV_Field ) {
-			$sale_price->add_field( 'text', array(
-				'name'			 => 'amount',
-				'placeholder'	 => __( 'Enter Sale Price', 'mp' ),
-				'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
-				'custom'		 => array(
-//'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
-				),
-				'validation'	 => array(
-					'number' => true,
-					'min'	 => 0,
-				//'lessthan'	 => '[name*="regular_price"]'
-				),
-			) );
-			$sale_price->add_field( 'datepicker', array(
-				'name'	 => 'start_date',
-				'label'	 => array( 'text' => __( 'Start Date (if applicable)', 'mp' ) ),
-			) );
-			$sale_price->add_field( 'datepicker', array(
-				'name'	 => 'end_date',
-				'label'	 => array( 'text' => __( 'End Date (if applicable)', 'mp' ) ),
-			) );
-		}
-
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'charge_tax',
-			'message'	 => __( 'Charge Taxes', 'mp' ),
-		) );
-
-		/* $metabox->add_field( 'text', array(
-		  'name'			 => 'special_tax_rate',
-		  'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-		  'placeholder'	 => __( 'Tax Rate', 'mp' ),
-		  'validation'	 => array(
-		  'required'	 => true,
-		  'number'	 => true,
-		  'min'		 => 0,
-		  ),
-		  'class'			 => 'mp-product-field-20 mp-blank-bg'
-		  ) ); */
-
-		$metabox->add_field( 'text', array(
-			'name'						 => 'special_tax_rate',
-			'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-			'placeholder'				 => __( 'Tax Rate', 'mp' ),
-			'default_value'				 => '',
-			'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
-			/* 'conditional'				 => array(
-			  'name'	 => 'product_type',
-			  'value'	 => array( 'physical', 'digital' ),
-			  'action' => 'show',
-			  ), */
-			'conditional'				 => array(
-				'name'	 => 'charge_tax',
-				'value'	 => 1,
-				'action' => 'show',
-			),
-			'custom_validation_message'	 => __( 'Please enter a valid tax rate', 'mp' ),
-			'validation'				 => array(
-				'custom' => '[^0-9.%]',
-			),
-			'custom'					 => array(
-				'label_position' => 'up',
-				'label_type'	 => 'standard'
-			),
-			'class'						 => 'mp-product-special-tax-holder mp-special-box'
-		) );
-
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'charge_shipping',
-			'message'	 => sprintf( __( 'Charge Shipping %1$s(not applicable to services and digital products)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
-		) );
-
-		$weight = $metabox->add_field( 'complex', array(
-			'name'			 => 'weight',
-			'label'			 => array( 'text' => __( 'Weight', 'mp' ) ),
-			/* 'conditional'	 => array(
-			  'name'	 => 'product_type',
-			  'value'	 => 'physical',
-			  'action' => 'show',
-			  ), */
-			'conditional'	 => array(
-				'name'	 => 'charge_shipping',
-				'value'	 => 1,
-				'action' => 'show',
-			),
-			'custom'		 => array(
-				'label_position' => 'up',
-				'label_type'	 => 'standard'
-			),
-			'class'			 => 'mp-product-shipping-holder mp-special-box'
-		) );
-
-		if ( $weight instanceof WPMUDEV_Field ) {
-			$weight->add_field( 'text', array(
-				'name'		 => 'pounds',
-				'label'		 => array( 'text' => __( 'Pounds', 'mp' ) ),
-				'validation' => array(
-					'digits' => true,
-				),
-			) );
-			$weight->add_field( 'text', array(
-				'name'		 => 'ounces',
-				'label'		 => array( 'text' => __( 'Ounces', 'mp' ) ),
-				'validation' => array(
-					'digits' => true,
-				),
-			) );
-
-			$weight->add_field( 'text', array(
-				'name'			 => 'extra_shipping_cost',
-				'label'			 => array( 'text' => sprintf( __( 'Extra Shipping Cost %1$s(if applicable)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
-				'default_value'	 => '0.00',
-				'validation'	 => array(
-					'number' => true,
-					'min'	 => 0,
-				),
-			) );
-		}
-
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'track_inventory',
-			'message'	 => __( 'Track Product Inventory', 'mp' ),
-		/* 'conditional'	 => array(
-		  'name'	 => 'product_type',
-		  'value'	 => 'physical',
-		  'action' => 'show',
-		  ), */
-		) );
-
-		$inventory = $metabox->add_field( 'complex', array(
-			'name'			 => 'inventory',
-			'label'			 => array( 'text' => __( '', 'mp' ) ),
-			'conditional'	 => array(
-				'name'	 => 'track_inventory',
-				'value'	 => 1,
-				'action' => 'show',
-			),
-			'custom'		 => array(
-				'label_position' => 'up',
-				'label_type'	 => 'standard'
-			),
-			'class'			 => 'mp-product-inventory-holder mp-special-box'
-		) );
-
-		if ( $inventory instanceof WPMUDEV_Field ) {
-			$inventory->add_field( 'text', array(
-				'name'			 => 'inventory',
-				'label'			 => array( 'text' => __( 'Quantity', 'mp' ) ),
-				/* 'conditional'	 => array(
-				  'action'	 => 'show',
-				  'operator'	 => 'AND',
-				  array(
-				  'name'	 => 'product_type',
-				  'value'	 => 'physical',
-				  ),
-				  array(
-				  'name'	 => 'variations[track_inventory]',
-				  'value'	 => 1,
-				  ),
-				  ), */
-				'conditional'	 => array(
-					'name'	 => 'track_inventory',
-					'value'	 => 1,
-					'action' => 'show',
-				),
-				'validation'	 => array(
-					'digits' => true,
-					'min'	 => 0,
-				),
-			) );
-
-			$inventory->add_field( 'checkbox', array(
-				'name'		 => 'out_of_stock_purchase',
-				'message'	 => __( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ),
-			/* 'conditional'	 => array(
-			  'name'	 => 'product_type',
-			  'value'	 => 'physical',
-			  'action' => 'show',
-			  ), */
-			) );
-		}
-
-		$metabox->add_field( 'radio_group', array(
-			'name'			 => 'has_variation',
-			'label'			 => array( 'text' => '' ),
-			'options'		 => array(
-				'no'	 => __( 'This is a unique product without variations', 'mp' ),
-				'yes'	 => sprintf( __( 'This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
-			),
-			'default_value'	 => 'no',
-		) );
 
 		if ( isset( $_GET[ 'post' ] ) ) {
 			$post_id = $_GET[ 'post' ];
@@ -1123,16 +884,258 @@ class MP_Products_Screen {
 
 		$has_variations = get_post_meta( $post_id, 'has_variations', false );
 
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'		 => 'mp-product-price-inventory-variants-metabox',
+			'title'		 => $has_variations ? __('Product Variations') : sprintf( __( '%1$sPRICE, INVENTORY & VARIANTS%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'post_type'	 => MP_Product::get_post_type(),
+			'context'	 => 'normal',
+		) );
+
+		if ( !$has_variations ) {
+
+			$metabox->add_field( 'text', array(
+				'name'			 => 'sku',
+				'placeholder'	 => __( 'Enter SKU', 'mp' ),
+				'label'			 => array( 'text' => sprintf( __( 'SKU %1$s(Stock Keeping Unit)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
+				'class'			 => 'mp-product-field-40 mp-blank-bg'
+			) );
+
+			$metabox->add_field( 'text', array(
+				'name'			 => 'regular_price',
+				'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
+				'placeholder'	 => __( 'Enter Price', 'mp' ),
+				'validation'	 => array(
+					'required'	 => true,
+					'number'	 => true,
+					'min'		 => 0,
+				),
+				'class'			 => 'mp-product-field-40 mp-blank-bg'
+			) );
+
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'has_sale',
+				'message'	 => __( 'Set up a Sale for this Product', 'mp' ),
+			) );
+
+			$sale_price = $metabox->add_field( 'complex', array(
+				'name'			 => 'sale_price',
+				'label'			 => array( 'text' => __( 'Sale Price', 'mp' ) ),
+				'conditional'	 => array(
+					'name'	 => 'has_sale',
+					'value'	 => 1,
+					'action' => 'show',
+				),
+				'custom'		 => array(
+					'label_position' => 'up',
+					'label_type'	 => 'standard'
+				),
+				'class'			 => 'mp-product-sale-price-holder mp-special-box'
+			) );
+
+			if ( $sale_price instanceof WPMUDEV_Field ) {
+				$sale_price->add_field( 'text', array(
+					'name'			 => 'amount',
+					'placeholder'	 => __( 'Enter Sale Price', 'mp' ),
+					'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
+					'custom'		 => array(
+//'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
+					),
+					'validation'	 => array(
+						'number' => true,
+						'min'	 => 0,
+					//'lessthan'	 => '[name*="regular_price"]'
+					),
+				) );
+				$sale_price->add_field( 'datepicker', array(
+					'name'	 => 'start_date',
+					'label'	 => array( 'text' => __( 'Start Date (if applicable)', 'mp' ) ),
+				) );
+				$sale_price->add_field( 'datepicker', array(
+					'name'	 => 'end_date',
+					'label'	 => array( 'text' => __( 'End Date (if applicable)', 'mp' ) ),
+				) );
+			}
+
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'charge_tax',
+				'message'	 => __( 'Charge Taxes', 'mp' ),
+			) );
+
+			/* $metabox->add_field( 'text', array(
+			  'name'			 => 'special_tax_rate',
+			  'label'			 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
+			  'placeholder'	 => __( 'Tax Rate', 'mp' ),
+			  'validation'	 => array(
+			  'required'	 => true,
+			  'number'	 => true,
+			  'min'		 => 0,
+			  ),
+			  'class'			 => 'mp-product-field-20 mp-blank-bg'
+			  ) ); */
+
+			$metabox->add_field( 'text', array(
+				'name'						 => 'special_tax_rate',
+				'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
+				'placeholder'				 => __( 'Tax Rate', 'mp' ),
+				'default_value'				 => '',
+				'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
+				/* 'conditional'				 => array(
+				  'name'	 => 'product_type',
+				  'value'	 => array( 'physical', 'digital' ),
+				  'action' => 'show',
+				  ), */
+				'conditional'				 => array(
+					'name'	 => 'charge_tax',
+					'value'	 => 1,
+					'action' => 'show',
+				),
+				'custom_validation_message'	 => __( 'Please enter a valid tax rate', 'mp' ),
+				'validation'				 => array(
+					'custom' => '[^0-9.%]',
+				),
+				'custom'					 => array(
+					'label_position' => 'up',
+					'label_type'	 => 'standard'
+				),
+				'class'						 => 'mp-product-special-tax-holder mp-special-box'
+			) );
+
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'charge_shipping',
+				'message'	 => sprintf( __( 'Charge Shipping %1$s(not applicable to services and digital products)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+			) );
+
+			$weight = $metabox->add_field( 'complex', array(
+				'name'			 => 'weight',
+				'label'			 => array( 'text' => __( 'Weight', 'mp' ) ),
+				/* 'conditional'	 => array(
+				  'name'	 => 'product_type',
+				  'value'	 => 'physical',
+				  'action' => 'show',
+				  ), */
+				'conditional'	 => array(
+					'name'	 => 'charge_shipping',
+					'value'	 => 1,
+					'action' => 'show',
+				),
+				'custom'		 => array(
+					'label_position' => 'up',
+					'label_type'	 => 'standard'
+				),
+				'class'			 => 'mp-product-shipping-holder mp-special-box'
+			) );
+
+			if ( $weight instanceof WPMUDEV_Field ) {
+				$weight->add_field( 'text', array(
+					'name'		 => 'pounds',
+					'label'		 => array( 'text' => __( 'Pounds', 'mp' ) ),
+					'validation' => array(
+						'digits' => true,
+					),
+				) );
+				$weight->add_field( 'text', array(
+					'name'		 => 'ounces',
+					'label'		 => array( 'text' => __( 'Ounces', 'mp' ) ),
+					'validation' => array(
+						'digits' => true,
+					),
+				) );
+
+				$weight->add_field( 'text', array(
+					'name'			 => 'extra_shipping_cost',
+					'label'			 => array( 'text' => sprintf( __( 'Extra Shipping Cost %1$s(if applicable)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
+					'default_value'	 => '0.00',
+					'validation'	 => array(
+						'number' => true,
+						'min'	 => 0,
+					),
+				) );
+			}
+
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'track_inventory',
+				'message'	 => __( 'Track Product Inventory', 'mp' ),
+			/* 'conditional'	 => array(
+			  'name'	 => 'product_type',
+			  'value'	 => 'physical',
+			  'action' => 'show',
+			  ), */
+			) );
+
+			$inventory = $metabox->add_field( 'complex', array(
+				'name'			 => 'inventory',
+				'label'			 => array( 'text' => __( '', 'mp' ) ),
+				'conditional'	 => array(
+					'name'	 => 'track_inventory',
+					'value'	 => 1,
+					'action' => 'show',
+				),
+				'custom'		 => array(
+					'label_position' => 'up',
+					'label_type'	 => 'standard'
+				),
+				'class'			 => 'mp-product-inventory-holder mp-special-box'
+			) );
+
+			if ( $inventory instanceof WPMUDEV_Field ) {
+				$inventory->add_field( 'text', array(
+					'name'			 => 'inventory',
+					'label'			 => array( 'text' => __( 'Quantity', 'mp' ) ),
+					/* 'conditional'	 => array(
+					  'action'	 => 'show',
+					  'operator'	 => 'AND',
+					  array(
+					  'name'	 => 'product_type',
+					  'value'	 => 'physical',
+					  ),
+					  array(
+					  'name'	 => 'variations[track_inventory]',
+					  'value'	 => 1,
+					  ),
+					  ), */
+					'conditional'	 => array(
+						'name'	 => 'track_inventory',
+						'value'	 => 1,
+						'action' => 'show',
+					),
+					'validation'	 => array(
+						'digits' => true,
+						'min'	 => 0,
+					),
+				) );
+
+				$inventory->add_field( 'checkbox', array(
+					'name'		 => 'out_of_stock_purchase',
+					'message'	 => __( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ),
+				/* 'conditional'	 => array(
+				  'name'	 => 'product_type',
+				  'value'	 => 'physical',
+				  'action' => 'show',
+				  ), */
+				) );
+			}
+
+			$metabox->add_field( 'radio_group', array(
+				'name'			 => 'has_variation',
+				'label'			 => array( 'text' => '' ),
+				'options'		 => array(
+					'no'	 => __( 'This is a unique product without variations', 'mp' ),
+					'yes'	 => sprintf( __( 'This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+				),
+				'default_value'	 => 'no',
+			) );
+		}
+
 		if ( $has_variations ) {
 			$metabox->add_field( 'variations', array(
 				'name'			 => 'variations_module',
-				'label'			 => array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+				'label'			 => '',//array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
 				'message'		 => __( 'Variations', 'mp' ),
-				'conditional'	 => array(
+				/*'conditional'	 => array(
 					'name'	 => 'has_variation',
 					'value'	 => 'yes',
 					'action' => 'show',
-				),
+				),*/
 				'class'			 => 'mp_variations_table_box'
 			) );
 		} else {

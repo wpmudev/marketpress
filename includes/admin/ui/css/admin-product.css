@@ -1,7 +1,7 @@
 /* GENERAL */
 
 .mp-admin-overlay{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: -20px;
     width: 100%;
@@ -159,6 +159,7 @@ div.mp_variations_box{
     width: 33%;
     display: inline-block;
     float: left;
+    max-width: 250px;
 }
 
 .variation-second-col{
@@ -191,9 +192,6 @@ div.mp_variations_box{
     padding-top: 10px;
 }
 
-.variation-row:last-child{
-    border-bottom: 0px;
-}
 
 .variation_color_1,
 .variation_color_1 a{
@@ -318,4 +316,22 @@ div.mp_variations_box{
 
 .select_attributes_filter .variation_color:last-child .separating-pipe{
     display: none;
+}
+
+select.mp_product_attributes_select {
+    margin-top: 7px;
+    width: 100%;
+}
+
+textarea.variation_values {
+  margin-top: 7px;
+}
+
+a.add.mp-add-new-variation.button{
+    margin-top: 10px;
+}
+
+a.create-variations-button.button{
+    margin-top: 10px;
+    margin-left: 20px;
 }
