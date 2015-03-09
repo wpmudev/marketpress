@@ -450,7 +450,8 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 	 * @param float $amount The amount to format
 	 * @return string
 	 */
-	function mp_format_currency( $currency = '', $amount = false, $price_class = '', $currency_class = '' ) {
+	function mp_format_currency( $currency = '', $amount = false, $price_class = '', $currency_class = '',
+							  $price_holder_arguments = array() ) {
 		$currencies = mp()->currencies;
 
 		if ( empty( $currency ) ) {
@@ -500,10 +501,17 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 		} else {
 			// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
 			$amount = (float) $amount;
-
+			$price_holder_arguments_string = '';
+			if ( is_array( $price_holder_arguments ) && count( $price_holder_arguments ) > 0 ) {
+				foreach ( $price_holder_arguments as $argument_name => $argument_value ) {
+					$price_holder_arguments_string .= ' ' . esc_attr( $argument_name ) . '="' . esc_attr( $argument_value ) . '" ';
+				}
+			} else {
+				$price_holder_arguments_string = '';
+			}
 
 			if ( !empty( $price_class ) ) {
-				$price_pre	 = '<span class="' . esc_attr( $price_class ) . '">';
+				$price_pre	 = '<span class="' . esc_attr( $price_class ) . '" ' . $price_holder_arguments_string . '>';
 				$price_post	 = '</span>';
 			} else {
 				$price_pre	 = '';
@@ -511,7 +519,7 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 			}
 
 			if ( !empty( $currency_class ) ) {
-				$currency_pre	 = '<span class="' . esc_attr( $price_class ) . '">';
+				$currency_pre	 = '<span class="' . esc_attr( $currency_class ) . '">';
 				$currency_post	 = '</span>';
 			} else {
 				$currency_pre	 = '';
@@ -1942,6 +1950,10 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	function mp_send_email( $email, $subject, $msg ) {
 		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
 	}
+
+
+
+
 
 
 

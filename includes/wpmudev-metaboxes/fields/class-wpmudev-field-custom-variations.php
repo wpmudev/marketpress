@@ -145,9 +145,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 						foreach ( $children as $child ) {
 							$style	 = ( isset( $style ) && 'alternate' == $style ) ? '' : 'alternate';
 							?>
-							<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo $child->ID; ?>" class="hentry <?php echo $style; ?>">
+						<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo esc_attr($child->ID); ?>" class="hentry <?php echo $style; ?>">
 								<th scope="row" class="check-column">
-									<input type="checkbox" class="check-column-box" name="selected_variation[]" value="<?php echo $child->ID; ?>">
+									<input type="checkbox" class="check-column-box" name="selected_variation[]" value="<?php echo esc_attr($child->ID); ?>">
 								</th>
 								<td class="">
 									IMG
@@ -161,7 +161,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										$child_term	 = get_the_terms( $child->ID, 'product_attr_' . $variation_attribute );
 										$child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
 										?>
-										<span class="variation_value variation_term_<?php echo isset( $child_term->term_id ) ? $child_term->term_id : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? $child_term->term_id : ''; ?>" data-attribute-id="<?php echo $variation_attribute; ?>"><?php echo is_object( $child_term ) ? $child_term->name : '-'; ?></span>
+										<span class="variation_value variation_term_<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?>" data-attribute-id="<?php echo esc_attr($variation_attribute); ?>"><?php echo is_object( $child_term ) ? esc_attr($child_term->name) : '-'; ?></span>
 									</th>
 									<?php
 									$order++;
@@ -170,17 +170,21 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<td class="">
 									&infin;
 								</td>
-								<td class="">
+								<td class="field_editable" data-field-type="number">
 									<?php
 									$price	 = get_post_meta( $child->ID, 'regular_price', true );
-									echo mp_format_currency( '', $price, 'price editable', 'currency' );
+									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array('data-meta' => 'regular_price', 'data-default' => 0));
 									?>
+									<input type="hidden" class="editable_value" value="" />
 								</td>
-								<td class="">
-									<?php
-									$sku	 = get_post_meta( $child->ID, 'sku', true );
-									echo isset($sku) && !empty($sku) ? $sku : '-';
-									?>
+								<td class="field_editable" data-field-type="text">
+									<span class="original_value field_subtype field_subtype_sku" data-meta="sku" data-default="-">
+										<?php
+										$sku	 = get_post_meta( $child->ID, 'sku', true );
+										echo esc_attr( isset( $sku ) && !empty( $sku ) ? $sku : '-'  );
+										?>
+									</span>
+									<input type="hidden" class="editable_value" value="" />
 								</td>
 								<td class="">
 									- Weight

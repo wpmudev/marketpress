@@ -39,6 +39,7 @@ class MP_Products_Screen {
 // Product variations save/get value
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
+		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
 		//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
 		//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
@@ -515,6 +516,32 @@ class MP_Products_Screen {
 	}
 
 	/**
+	 * Save inline changed data for variations
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 */
+	public function save_inline_variation_post_data() {
+		$post_id = mp_get_post_value( 'post_id' );
+		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
+		
+		if ( isset( $post_id ) && is_numeric( $post_id ) ) {
+
+			$value_type	 = mp_get_post_value( 'meta_name' );
+			$value		 = mp_get_post_value( 'meta_value' );
+
+			switch ( $value_type ) {
+				case 'sku':
+					update_post_meta( $post_id, $value_type, $value );
+					break;
+				default:
+					update_post_meta( $post_id, $value_type, $value );
+			}
+		}
+	}
+
+	/**
 	 * Create variation combinations and saves initial product variations to the database
 	 * Add new terms if don't exist
 	 * Add new taxonomies if don't exist
@@ -886,7 +913,7 @@ class MP_Products_Screen {
 
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'		 => 'mp-product-price-inventory-variants-metabox',
-			'title'		 => $has_variations ? __('Product Variations') : sprintf( __( '%1$sPRICE, INVENTORY & VARIANTS%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'title'		 => $has_variations ? __( 'Product Variations' ) : sprintf( __( '%1$sPRICE, INVENTORY & VARIANTS%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
 			'post_type'	 => MP_Product::get_post_type(),
 			'context'	 => 'normal',
 		) );
@@ -1128,15 +1155,15 @@ class MP_Products_Screen {
 
 		if ( $has_variations ) {
 			$metabox->add_field( 'variations', array(
-				'name'			 => 'variations_module',
-				'label'			 => '',//array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
-				'message'		 => __( 'Variations', 'mp' ),
-				/*'conditional'	 => array(
-					'name'	 => 'has_variation',
-					'value'	 => 'yes',
-					'action' => 'show',
-				),*/
-				'class'			 => 'mp_variations_table_box'
+				'name'		 => 'variations_module',
+				'label'		 => '', //array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+				'message'	 => __( 'Variations', 'mp' ),
+				/* 'conditional'	 => array(
+				  'name'	 => 'has_variation',
+				  'value'	 => 'yes',
+				  'action' => 'show',
+				  ), */
+				'class'		 => 'mp_variations_table_box'
 			) );
 		} else {
 			$metabox->add_field( 'variations', array(

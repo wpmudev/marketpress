@@ -324,7 +324,7 @@ select.mp_product_attributes_select {
 }
 
 textarea.variation_values {
-  margin-top: 7px;
+    margin-top: 7px;
 }
 
 a.add.mp-add-new-variation.button{
@@ -334,4 +334,31 @@ a.add.mp-add-new-variation.button{
 a.create-variations-button.button{
     margin-top: 10px;
     margin-left: 20px;
+}
+
+.field_editable{
+    position: relative;
+}
+
+.original_value{
+    min-width: 50px;
+}
+
+.mp-inline-edit-hover{
+    
+}
+
+.inline-edit-icon{
+    margin-left: 5px;
+}
+
+input.mp_inline_temp_value{
+    line-height: 1 !important;
+    padding: 5px !important;
+    width: 100% !important;
+    max-width: 100px !important;
+    position: absolute;
+    top: 1px;
+    margin-left: -6px;
+    font-size: 13px;
 }
