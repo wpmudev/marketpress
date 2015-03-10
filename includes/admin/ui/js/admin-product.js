@@ -151,6 +151,7 @@ jQuery( document ).ready( function( $ ) {
 
             var post_id = $( this ).closest( 'tr' ).find( '.check-column .check-column-box' ).val( );
             var data_meta = $( this ).attr( 'data-meta' );
+            var data_sub_meta = $( this ).attr( 'data-sub-meta' );
             var data_type = $( this ).closest( 'td' ).attr( 'data-field-type' );
             var data_default = $( this ).attr( 'data-default' );
 
@@ -176,14 +177,14 @@ jQuery( document ).ready( function( $ ) {
                         } else {
                             elem.text( 0 );
                         }
-                        save_inline_post_data( post_id, data_meta, numeric_value );
+                        save_inline_post_data( post_id, data_meta, numeric_value, data_sub_meta );
                     } else {
                         elem.text( $( this ).val( ) );
-                        save_inline_post_data( post_id, data_meta, $( this ).val( ) );
+                        save_inline_post_data( post_id, data_meta, $( this ).val( ), data_sub_meta );
                     }
                 } else {
                     elem.text( data_default );
-                    save_inline_post_data( post_id, data_meta, '' );
+                    save_inline_post_data( post_id, data_meta, '', data_sub_meta );
                 }
 
                 $( this ).remove( );
@@ -210,11 +211,12 @@ jQuery( document ).ready( function( $ ) {
         }
     } );
 
-    function save_inline_post_data( post_id, meta_name, meta_value ) {
+    function save_inline_post_data( post_id, meta_name, meta_value, sub_meta ) {
         var data = {
             action: 'save_inline_post_data',
             post_id: post_id,
             meta_name: meta_name,
+            meta_sub_name: sub_meta,
             meta_value: meta_value,
             ajax_nonce: mp_product_admin_i18n.ajax_nonce
         }

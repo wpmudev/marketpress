@@ -156,13 +156,14 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								$order	 = 1;
 								foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
 									?>
-									<th scope="col" class="manage-column">
+									<td class="field_editable" data-field-type="text">
 										<?php
 										$child_term	 = get_the_terms( $child->ID, 'product_attr_' . $variation_attribute );
 										$child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
 										?>
-										<span class="variation_value variation_term_<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?>" data-attribute-id="<?php echo esc_attr($variation_attribute); ?>"><?php echo is_object( $child_term ) ? esc_attr($child_term->name) : '-'; ?></span>
-									</th>
+										<span data-meta="<?php echo 'product_attr';?>" data-sub-meta="<?php echo 'product_attr_' . $variation_attribute;?>" data-default="-" class="original_value field_subtype field_subtype_product_attribute variation_value variation_term_<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?>" data-attribute-id="<?php echo esc_attr($variation_attribute); ?>"><?php echo is_object( $child_term ) ? esc_attr($child_term->name) : '-'; ?></span>
+										<input type="hidden" class="editable_value" value="" />
+									</td>
 									<?php
 									$order++;
 								}

@@ -454,20 +454,25 @@ class MP_Products_Screen {
 	}
 
 	public function term_id( $term, $taxonomy ) {
+
 		if ( is_numeric( $term ) ) {
 			return $term;
 		} else {
-			$term_insert_response = wp_insert_term( $term, $taxonomy );
-			if ( is_wp_error( $term_insert_response ) ) {
-				if ( term_exists( $term, $taxonomy ) ) {
-					$term = get_term( $term, $taxonomy, OBJECT );
-					return $term->term_id;
-				} else {
-					echo $term_insert_response->get_error_message(); //shouldn't happen ever!
-					exit;
-				}
+			if ( $term_obj = term_exists( $term, $taxonomy ) ) {
+				return $term_obj[ 'term_id' ];
 			} else {
-				return $term_insert_response[ 'term_id' ];
+				$term_insert_response = wp_insert_term( $term, $taxonomy );
+				if ( is_wp_error( $term_insert_response ) ) {
+					if ( term_exists( $term, $taxonomy ) ) {
+						$term = get_term( $term, $taxonomy, OBJECT );
+						return $term->term_id;
+					} else {
+						echo $term_insert_response->get_error_message(); //shouldn't happen ever!
+						exit;
+					}
+				} else {
+					return $term_insert_response[ 'term_id' ];
+				}
 			}
 		}
 	}
@@ -525,16 +530,46 @@ class MP_Products_Screen {
 	public function save_inline_variation_post_data() {
 		$post_id = mp_get_post_value( 'post_id' );
 		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
-		
+
 		if ( isset( $post_id ) && is_numeric( $post_id ) ) {
 
-			$value_type	 = mp_get_post_value( 'meta_name' );
-			$value		 = mp_get_post_value( 'meta_value' );
+			$value_type		 = mp_get_post_value( 'meta_name' );
+			$value_sub_type	 = mp_get_post_value( 'meta_sub_name' );
+			$value			 = mp_get_post_value( 'meta_value' );
 
 			switch ( $value_type ) {
 				case 'sku':
 					update_post_meta( $post_id, $value_type, $value );
 					break;
+				case 'product_attr':
+					$insert_post_terms = wp_set_post_terms( $post_id, $this->term_id( $value, $value_sub_type ), $value_sub_type, false );
+					if ( is_wp_error( $insert_post_terms ) ) {
+						echo $insert_post_terms->get_error_message();
+					} else {
+						global $wpdb;
+
+						$product_atts		 = MP_Product_Attributes::get_instance();
+						$table_name			 = MP_Product_Attributes::get_instance()->get_table_name();
+						$table_name_terms	 = $wpdb->prefix . 'mp_product_attributes_terms';
+
+						$product_attributes = $wpdb->get_results(
+						"SELECT attribute_id FROM $table_name"
+						);
+
+						$variation_name = '';
+
+						foreach ( $product_attributes as $product_attribute ) {
+							$attribute_name	 = 'product_attr_' . $product_attribute->attribute_id;
+							$post_terms		 = wp_get_post_terms( $post_id, $attribute_name );
+							if ( is_array( $post_terms ) && count( $post_terms ) > 0 ) {
+								$variation_name = $variation_name . '' . $post_terms[ 0 ]->name . ' ';
+							}
+						}
+
+						update_post_meta( $post_id, 'name', $variation_name );
+					}
+					break;
+
 				default:
 					update_post_meta( $post_id, $value_type, $value );
 			}
