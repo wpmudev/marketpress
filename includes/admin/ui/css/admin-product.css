@@ -345,7 +345,7 @@ a.create-variations-button.button{
 }
 
 .mp-inline-edit-hover{
-    
+
 }
 
 .inline-edit-icon{
@@ -361,4 +361,40 @@ input.mp_inline_temp_value{
     top: 1px;
     margin-left: -6px;
     font-size: 13px;
+}
+
+.mp_hidden_content{
+    display: none;
+}
+
+.mp_popup_controls{
+    border-top: 1px solid #ddd;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    position: absolute;
+    bottom: 0;
+    width: 90%;
+}
+
+.mp_popup_controls a.button{
+    float: right;
+    margin-left: 15px;
+    display: inline-block;
+}
+
+.mp_popup_content{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.mp_popup_content label{
+    width: 100%;
+    font-weight: bold;
+    display: block;
+}
+
+.mp_popup_content input{
+    width: 100%;
 }

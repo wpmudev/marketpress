@@ -189,7 +189,9 @@ class MP_Admin {
 				wp_localize_script( 'mp-product-admin', 'mp_product_admin_i18n', array(
 					'ajaxurl' => admin_url( 'admin-ajax.php' ),
 					'creating_vatiations_message' => __( 'Creating variations, please wait...', 'mp' ),
-					'ajax_nonce' => $ajax_nonce
+					'ajax_nonce' => $ajax_nonce,
+					'bulk_update_prices_multiple_title' => sprintf(__('Update prices for %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
+					'bulk_update_prices_single_title' => sprintf(__('Update price for %s product variant', 'mp'), '<span class="mp_variants_selected"></span>')
 				) );
 			}
 		}

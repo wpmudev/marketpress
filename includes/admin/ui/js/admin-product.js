@@ -163,7 +163,7 @@ jQuery( document ).ready( function( $ ) {
             var len = $( replaceWith ).val().length * 2;//has to be * 2 because how Opera counts carriage returns
 //            /console.log( $( replaceWith ) );
             //$( replaceWith ).setCursorPosition( 4 );
-            $( replaceWith ).selectRange(len,len);
+            $( replaceWith ).selectRange( len, len );
 
             replaceWith.blur( function( ) {
 
@@ -232,5 +232,64 @@ jQuery( document ).ready( function( $ ) {
             }
         } );
     }
+
+    $( '#variant_bulk_doaction' ).click( function() {
+        var selected_variant_bulk_action = $( '.variant_bulk_selected' ).val();
+        if ( selected_variant_bulk_action == 'variant_update_prices' ) {
+
+            var checked_variants = $( ".check-column-box:checked" ).length;
+
+            if ( checked_variants > 0 ) {
+                var mp_bulk_price_start_val = 0;
+
+                $( '.check-column-box:checked' ).each( function( ) {
+                    mp_bulk_price_start_val = $( this ).closest( 'tr' ).find( '.original_value.field_subtype_price' ).html();
+                    mp_bulk_price_start_val = mp_bulk_price_start_val.replace( ",", "" )
+                } );
+
+                if ( checked_variants > 1 ) {
+                    $( '#mp_bulk_price_title' ).html( mp_product_admin_i18n.bulk_update_prices_multiple_title );
+                } else {
+                    $( '#mp_bulk_price_title' ).html( mp_product_admin_i18n.bulk_update_prices_single_title );
+                }
+
+                $( '.mp_variants_selected' ).html( checked_variants );
+
+                if ( $( '.mp_bulk_price' ).val() == '' ) {
+                    $( '.mp_bulk_price' ).val( mp_bulk_price_start_val );
+                }
+
+                $.colorbox( {
+                    href: $( '#mp_bulk_price' ),
+                    inline: true,
+                    opacity: .7,
+                    width: 380,
+                    height: 235,
+                    title: $( '#mp_bulk_price_title' ).html()
+                } );
+            }
+        }
+    } );
+
+    jQuery( '.mp_bulk_price' ).on( 'keyup', function() {
+        if ( jQuery( '.mp_bulk_price' ).val() == '' || isNaN( jQuery( '.mp_bulk_price' ).val() ) ) {
+            jQuery( '.save-bulk-form' ).attr( 'disabled', true );
+        } else {
+            jQuery( '.save-bulk-form' ).attr( 'disabled', false );
+        }
+    } );
+
+    
+
+    /* Close thickbox window on link / cancel click */
+    $( '.mp_popup_controls a.cancel' ).click( function() {
+        parent.jQuery.colorbox.close();
+        return false;
+    } );
+
+    /*$( '.mp_bulk_price_link' ).click( function() {
+     
+     } );*/
+
 
 } );

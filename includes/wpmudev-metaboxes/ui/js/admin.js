@@ -298,7 +298,7 @@ jQuery.validator.addMethod( 'lessthan', function( value, element, param ) {
 	};
 
 	var initValidation = function(){
-		var $form = $("form#post, form#mp-main-form");
+		var $form = $("form#post, form#mp-main-form, form.bulk-form");
 
 		$form.find( '[data-custom-validation]' ).each( function() {
 			var $this = $( this );
@@ -373,7 +373,7 @@ jQuery.validator.addMethod( 'lessthan', function( value, element, param ) {
 			alert( msg );
 		} );
 		
-		$form.find( '#publish, #save-post, [type="submit"]' ).click( function( e ) {
+		$form.find( '#publish, #save-post,.save-bulk-form, [type="submit"]' ).click( function( e ) {
 			if ( ! $form.valid() ) {
 				e.preventDefault();
 			}

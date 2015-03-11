@@ -32,6 +32,7 @@ class MP_Products_Screen {
 	 * @access private
 	 */
 	private function __construct() {
+		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
 // Remove add-new submenu item from store admin menu
 		add_action( 'admin_menu', array( &$this, 'remove_menu_items' ), 999 );
 		// Hide featured image for variable products
@@ -66,6 +67,17 @@ class MP_Products_Screen {
 
 		add_filter( 'enter_title_here', array( &$this, 'custom_placeholder_title' ), 10, 2 );
 		add_action( 'admin_menu', array( &$this, 'remove_metaboxes' ) );
+	}
+	
+	/**
+	 * Enqueues admin javascript/css
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function enqueue_styles_scripts() {
+		wp_enqueue_style('colorbox', mp_plugin_url('includes/admin/ui/colorbox/colorbox.css'), false, '1.5.10');
+		wp_enqueue_script('colorbox', mp_plugin_url('ui/js/jquery.colorbox-min.js'), false, '1.5.10');
 	}
 
 	/**

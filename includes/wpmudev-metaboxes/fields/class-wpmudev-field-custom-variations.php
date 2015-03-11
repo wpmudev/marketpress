@@ -35,6 +35,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 
 		if ( $has_variations ) {
 
+
 			if ( false === ( $special_query_results = get_transient( 'special_query_results' ) ) ) {
 				// It wasn't there, so regenerate the data and save the transient
 				$special_query_results = new WP_Query( 'cat=5&order=random&tag=tech&post_meta_key=thumbnail' );
@@ -68,24 +69,20 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			}
 			?>
 			<div class="tablenav top">
-
 				<div class="alignleft actions bulkactions">
 					<label for="bulk-action-selector-top" class="screen-reader-text"><?php _e( 'Select bulk action', 'mp' ); ?></label>
-					<select name="action" id="bulk-action-selector-top">
+					<select name="action" id="bulk-action-selector-top" class="variant_bulk_selected">
 						<option value="-1" selected="selected"><?php _e( 'Bulk Actions', 'mp' ); ?></option>
 						<option value="variant_update_images"><?php _e( 'Update Images', 'mp' ); ?></option>
 						<option value="variant_update_inventory"><?php _e( 'Update Inventory', 'mp' ); ?></option>
 						<option value="variant_update_prices"><?php _e( 'Update Prices', 'mp' ); ?></option>
 						<option value="variant_delete"><?php _e( 'Delete Variants', 'mp' ); ?></option>
 					</select>
-					<input type="submit" name="" id="doaction" class="button action" value="Apply">
+					<input type="button" name="" id="variant_bulk_doaction" class="button action" value="Apply">
 				</div>
-
-
-
-
 				<br class="clear">
 			</div>
+
 			<span <?php echo $this->parse_atts(); ?>>
 				<div class="select_attributes_filter">
 					<span class="select_title"><?php _e( 'Select:', 'mp' ); ?> | </span>
@@ -145,9 +142,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 						foreach ( $children as $child ) {
 							$style	 = ( isset( $style ) && 'alternate' == $style ) ? '' : 'alternate';
 							?>
-						<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo esc_attr($child->ID); ?>" class="hentry <?php echo $style; ?>">
+							<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo esc_attr( $child->ID ); ?>" class="hentry <?php echo $style; ?>">
 								<th scope="row" class="check-column">
-									<input type="checkbox" class="check-column-box" name="selected_variation[]" value="<?php echo esc_attr($child->ID); ?>">
+									<input type="checkbox" class="check-column-box" name="selected_variation[]" value="<?php echo esc_attr( $child->ID ); ?>">
 								</th>
 								<td class="">
 									IMG
@@ -161,7 +158,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										$child_term	 = get_the_terms( $child->ID, 'product_attr_' . $variation_attribute );
 										$child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
 										?>
-										<span data-meta="<?php echo 'product_attr';?>" data-sub-meta="<?php echo 'product_attr_' . $variation_attribute;?>" data-default="-" class="original_value field_subtype field_subtype_product_attribute variation_value variation_term_<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? esc_attr($child_term->term_id) : ''; ?>" data-attribute-id="<?php echo esc_attr($variation_attribute); ?>"><?php echo is_object( $child_term ) ? esc_attr($child_term->name) : '-'; ?></span>
+										<span data-meta="<?php echo 'product_attr'; ?>" data-sub-meta="<?php echo 'product_attr_' . $variation_attribute; ?>" data-default="-" class="original_value field_subtype field_subtype_product_attribute variation_value variation_term_<?php echo isset( $child_term->term_id ) ? esc_attr( $child_term->term_id ) : ''; ?> <?php echo MP_Product_Attributes_Admin::get_product_attribute_color( $term_info[ 0 ], $order ); ?>" data-term-id="<?php echo isset( $child_term->term_id ) ? esc_attr( $child_term->term_id ) : ''; ?>" data-attribute-id="<?php echo esc_attr( $variation_attribute ); ?>"><?php echo is_object( $child_term ) ? esc_attr( $child_term->name ) : '-'; ?></span>
 										<input type="hidden" class="editable_value" value="" />
 									</td>
 									<?php
@@ -174,7 +171,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<td class="field_editable" data-field-type="number">
 									<?php
 									$price	 = get_post_meta( $child->ID, 'regular_price', true );
-									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array('data-meta' => 'regular_price', 'data-default' => 0));
+									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array( 'data-meta' => 'regular_price', 'data-default' => 0 ) );
 									?>
 									<input type="hidden" class="editable_value" value="" />
 								</td>
@@ -195,6 +192,22 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 					</tbody>
 				</table>
 			</span>
+			<?php
+			?>
+			<div class="mp_hidden_content">
+				<div id="mp_bulk_price">
+					<div class="mp_popup_content">
+							<label><?php _e( 'Price', 'mp' ); ?></label>
+							<input type="text" name="mp_bulk_price" class="mp_bulk_price" value="" placeholder="<?php echo esc_attr( __( 'Insert the price i.e. 25 or 25.50', 'mp' ) ); ?>" required />
+					</div>
+					<div class="mp_popup_controls">
+						<a href="" class="button button-primary save-bulk-form"><?php _e( 'Update', 'mp' ); ?></a>
+						<a href="" class="preview button cancel"><?php _e( 'Cancel', 'mp' ); ?></a>
+					</div>
+				</div>
+
+				<div id="mp_bulk_price_title"></div>
+			</div>
 			<?php
 		} else {
 			?>
