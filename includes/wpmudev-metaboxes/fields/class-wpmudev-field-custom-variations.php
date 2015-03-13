@@ -165,20 +165,25 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									$order++;
 								}
 								?>
-								<td class="">
-									&infin;
+								<td class="field_editable field_editable_inventory" data-field-type="number">
+									<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
+										<?php
+										$inventory	 = get_post_meta( $child->ID, 'inventory', true );
+										echo esc_attr( isset( $inventory ) && !empty( $inventory ) ? $inventory : '&infin;'  );
+										?>
+									</span>
 								</td>
-								<td class="field_editable" data-field-type="number">
+								<td class="field_editable field_editable_price" data-field-type="number">
 									<?php
-									$price	 = get_post_meta( $child->ID, 'regular_price', true );
+									$price		 = get_post_meta( $child->ID, 'regular_price', true );
 									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array( 'data-meta' => 'regular_price', 'data-default' => 0 ) );
 									?>
-									<input type="hidden" class="editable_value" value="" />
+									<input type="hidden" class="editable_value editable_value_price" value="" />
 								</td>
 								<td class="field_editable" data-field-type="text">
 									<span class="original_value field_subtype field_subtype_sku" data-meta="sku" data-default="-">
 										<?php
-										$sku	 = get_post_meta( $child->ID, 'sku', true );
+										$sku		 = get_post_meta( $child->ID, 'sku', true );
 										echo esc_attr( isset( $sku ) && !empty( $sku ) ? $sku : '-'  );
 										?>
 									</span>
@@ -197,16 +202,43 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			<div class="mp_hidden_content">
 				<div id="mp_bulk_price">
 					<div class="mp_popup_content">
-							<label><?php _e( 'Price', 'mp' ); ?></label>
-							<input type="text" name="mp_bulk_price" class="mp_bulk_price" value="" placeholder="<?php echo esc_attr( __( 'Insert the price i.e. 25 or 25.50', 'mp' ) ); ?>" required />
+						<label><?php _e( 'Price', 'mp' ); ?></label>
+						<input type="text" name="mp_bulk_price" class="mp_bulk_price" value="" placeholder="<?php echo esc_attr( __( 'Insert the price i.e. 25 or 25.50', 'mp' ) ); ?>" required />
 					</div>
-					<div class="mp_popup_controls">
+					<div class="mp_popup_controls mp_price_controls">
 						<a href="" class="button button-primary save-bulk-form"><?php _e( 'Update', 'mp' ); ?></a>
 						<a href="" class="preview button cancel"><?php _e( 'Cancel', 'mp' ); ?></a>
 					</div>
 				</div>
 
 				<div id="mp_bulk_price_title"></div>
+
+				<div id="mp_bulk_inventory">
+					<div class="mp_popup_content">
+						<label><?php _e( 'Inventory', 'mp' ); ?></label>
+						<input type="text" name="mp_bulk_inventory" class="mp_bulk_inventory" value="" placeholder="<?php echo esc_attr( __( 'Insert quantity available. Empty for unlimited.', 'mp' ) ); ?>" required />
+					</div>
+					<div class="mp_popup_controls mp_inventory_controls">
+						<a href="" class="button button-primary save-bulk-form"><?php _e( 'Update', 'mp' ); ?></a>
+						<a href="" class="preview button cancel"><?php _e( 'Cancel', 'mp' ); ?></a>
+					</div>
+				</div>
+
+				<div id="mp_bulk_delete_title"></div>
+
+				<div id="mp_bulk_delete">
+					<div class="mp_popup_content">
+						<label><?php _e( 'Confirmation', 'mp' ); ?></label>
+						<p><?php _e( 'You are about to delete selected variants. <br />If you want to continue please confirm.', 'mp' ); ?></p>
+					</div>
+					<div class="mp_popup_controls mp_delete_controls">
+						<a href="" class="button button-primary delete-bulk-form"><?php _e( 'Confirm', 'mp' ); ?></a>
+						<a href="" class="preview button cancel"><?php _e( 'Cancel', 'mp' ); ?></a>
+					</div>
+				</div>
+
+				<div id="mp_bulk_delete_title"></div>
+
 			</div>
 			<?php
 		} else {

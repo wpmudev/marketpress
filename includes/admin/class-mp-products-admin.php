@@ -32,7 +32,7 @@ class MP_Products_Screen {
 	 * @access private
 	 */
 	private function __construct() {
-		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_styles_scripts'));
+		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 // Remove add-new submenu item from store admin menu
 		add_action( 'admin_menu', array( &$this, 'remove_menu_items' ), 999 );
 		// Hide featured image for variable products
@@ -68,7 +68,7 @@ class MP_Products_Screen {
 		add_filter( 'enter_title_here', array( &$this, 'custom_placeholder_title' ), 10, 2 );
 		add_action( 'admin_menu', array( &$this, 'remove_metaboxes' ) );
 	}
-	
+
 	/**
 	 * Enqueues admin javascript/css
 	 *
@@ -76,8 +76,8 @@ class MP_Products_Screen {
 	 * @access public
 	 */
 	public function enqueue_styles_scripts() {
-		wp_enqueue_style('colorbox', mp_plugin_url('includes/admin/ui/colorbox/colorbox.css'), false, '1.5.10');
-		wp_enqueue_script('colorbox', mp_plugin_url('ui/js/jquery.colorbox-min.js'), false, '1.5.10');
+		wp_enqueue_style( 'colorbox', mp_plugin_url( 'includes/admin/ui/colorbox/colorbox.css' ), false, '1.5.10' );
+		wp_enqueue_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), false, '1.5.10' );
 	}
 
 	/**
@@ -550,6 +550,9 @@ class MP_Products_Screen {
 			$value			 = mp_get_post_value( 'meta_value' );
 
 			switch ( $value_type ) {
+				case 'delete':
+					wp_delete_post( $post_id, true );
+					break;
 				case 'sku':
 					update_post_meta( $post_id, $value_type, $value );
 					break;
@@ -578,12 +581,12 @@ class MP_Products_Screen {
 							}
 						}
 
-						update_post_meta( $post_id, 'name', $variation_name );
+						update_post_meta( $post_id, 'name', sanitize_text_field( $variation_name ) );
 					}
 					break;
 
 				default:
-					update_post_meta( $post_id, $value_type, $value );
+					update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
 			}
 		}
 	}
@@ -600,6 +603,10 @@ class MP_Products_Screen {
 	 */
 	public function save_init_product_variations() {
 		global $wp_taxonomies;
+
+		if ( mp_get_post_value( 'has_variation', 'no' ) == 'no' ) {
+			return;
+		}
 
 		$variation_names	 = mp_get_post_value( 'product_attributes_categories', array() );
 		$new_variation_names = mp_get_post_value( 'variation_names', array() );
@@ -703,7 +710,7 @@ class MP_Products_Screen {
 
 				/* Add default post metas for variation */
 				foreach ( $variation_metas as $meta_key => $meta_value ) {
-					update_post_meta( $variation_id, $meta_key, $meta_value );
+					update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
 				}
 
 				/* Add post terms for the variation */

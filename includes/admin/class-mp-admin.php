@@ -191,7 +191,11 @@ class MP_Admin {
 					'creating_vatiations_message' => __( 'Creating variations, please wait...', 'mp' ),
 					'ajax_nonce' => $ajax_nonce,
 					'bulk_update_prices_multiple_title' => sprintf(__('Update prices for %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
-					'bulk_update_prices_single_title' => sprintf(__('Update price for %s product variant', 'mp'), '<span class="mp_variants_selected"></span>')
+					'bulk_update_prices_single_title' => sprintf(__('Update price for %s product variant', 'mp'), '<span class="mp_variants_selected"></span>'),
+					'bulk_update_inventory_multiple_title' => sprintf(__('Update inventory for %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
+					'bulk_update_inventory_single_title' => sprintf(__('Update inventory for %s product variant', 'mp'), '<span class="mp_variants_selected"></span>'),
+					'bulk_delete_multiple_title' => sprintf(__('Delete %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
+					'bulk_delete_single_title' => sprintf(__('Delete %s product variant', 'mp'), '<span class="mp_variants_selected"></span>')
 				) );
 			}
 		}
