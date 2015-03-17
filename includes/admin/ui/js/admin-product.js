@@ -217,28 +217,6 @@ jQuery( document ).ready( function( $ ) {
         }
     } );
 
-    function save_inline_post_data( post_id, meta_name, meta_value, sub_meta ) {
-        var data = {
-            action: 'save_inline_post_data',
-            post_id: post_id,
-            meta_name: meta_name,
-            meta_sub_name: sub_meta,
-            meta_value: meta_value,
-            ajax_nonce: mp_product_admin_i18n.ajax_nonce
-        }
-
-        $.post(
-            mp_product_admin_i18n.ajaxurl, data
-            ).done( function( data, status ) {
-            if ( status == 'success' ) {
-                //alert( 'success!' );
-            } else {
-                //alert( 'fail!' );
-                //an error occured
-            }
-        } );
-    }
-
     $( '#variant_bulk_doaction' ).click( function() {
         var selected_variant_bulk_action = $( '.variant_bulk_selected' ).val();
         var checked_variants = $( ".check-column-box:checked" ).length;
@@ -313,6 +291,59 @@ jQuery( document ).ready( function( $ ) {
             }
         }
 
+        if ( selected_variant_bulk_action == 'variant_update_images' ) {
+
+            if ( checked_variants > 0 ) {
+
+                wp.media.string.props = function( props, attachment )
+                {
+                    //console.log( props );
+                    //placeholder_image.attr( 'src', props.url );
+                    //placeholder_image.attr( 'width', 30 );
+                    //placeholder_image.attr( 'height', 30 );
+                    //save_inline_post_data( post_id, '_thumbnail_id', props.id, '' );
+
+                    $( '.check-column-box:checked' ).each( function( ) {
+
+                        var placeholder_image = $( this ).closest( 'tr' ).find( '.mp-variation-image img' );
+                        var post_id = $( this ).closest( 'tr' ).find( '.mp-variation-image' ).attr( 'data-post-image-id' );
+
+                        placeholder_image.attr( 'src', attachment.url );
+                        placeholder_image.attr( 'width', 30 );
+                        placeholder_image.attr( 'height', 30 );
+
+                        save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+
+                    } );
+
+
+                    //save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+                }
+
+                wp.media.editor.send.attachment = function( props, attachment )
+                {
+                    $( '.check-column-box:checked' ).each( function( ) {
+
+                        var placeholder_image = $( this ).closest( 'tr' ).find( '.mp-variation-image img' );
+                        var post_id = $( this ).closest( 'tr' ).find( '.mp-variation-image' ).attr( 'data-post-image-id' );
+
+                        placeholder_image.attr( 'src', attachment.url );
+                        placeholder_image.attr( 'width', 30 );
+                        placeholder_image.attr( 'height', 30 );
+
+                        save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+
+                    } );
+
+                };
+
+                wp.media.editor.open( this );
+                return false;
+
+
+            }
+        }
+
         if ( selected_variant_bulk_action == 'variant_delete' ) {
 
             if ( checked_variants > 0 ) {
@@ -337,6 +368,60 @@ jQuery( document ).ready( function( $ ) {
         }
 
     } );
+
+    $( '.mp-variation-image img' ).on( 'click', function() {
+
+        var placeholder_image = $( this );
+        var post_id = $( this ).closest( 'td' ).attr( 'data-post-image-id' );
+
+        wp.media.string.props = function( props, attachment )
+        {
+            //console.log( props );
+            //placeholder_image.attr( 'src', props.url );
+            //placeholder_image.attr( 'width', 30 );
+            //placeholder_image.attr( 'height', 30 );
+            //save_inline_post_data( post_id, '_thumbnail_id', props.id, '' );
+            placeholder_image.attr( 'src', attachment.url );
+            placeholder_image.attr( 'width', 30 );
+            placeholder_image.attr( 'height', 30 );
+            save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+        }
+
+        wp.media.editor.send.attachment = function( props, attachment )
+        {
+            //console.log(attachment.id);
+            placeholder_image.attr( 'src', attachment.url );
+            placeholder_image.attr( 'width', 30 );
+            placeholder_image.attr( 'height', 30 );
+            save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+        };
+
+        wp.media.editor.open( this );
+        return false;
+    } );
+
+
+    function save_inline_post_data( post_id, meta_name, meta_value, sub_meta ) {
+        var data = {
+            action: 'save_inline_post_data',
+            post_id: post_id,
+            meta_name: meta_name,
+            meta_sub_name: sub_meta,
+            meta_value: meta_value,
+            ajax_nonce: mp_product_admin_i18n.ajax_nonce
+        }
+
+        $.post(
+            mp_product_admin_i18n.ajaxurl, data
+            ).done( function( data, status ) {
+            if ( status == 'success' ) {
+                //alert( 'success!' );
+            } else {
+                //alert( 'fail!' );
+                //an error occured
+            }
+        } );
+    }
 
     jQuery( '.mp_bulk_price' ).on( 'keyup', function() {
         if ( jQuery( '.mp_bulk_price' ).val() == '' || isNaN( jQuery( '.mp_bulk_price' ).val() ) ) {
@@ -399,21 +484,24 @@ jQuery( document ).ready( function( $ ) {
 
         $( '.check-column-box:checked' ).each( function( ) {
             $( this ).closest( 'tr' ).remove();
-            //save_inline_post_data( $( this ).val(), 'delete', '', '' );
-
-            if ( $( '.check-column-box' ).length == 0 ) {
-                if ( $( '#original_publish' ).val( ) == 'Publish' ) {
-                    $( '#save-post' ).removeAttr( 'dasabled' );
-                    alert('published click!');
-                    //$( '#save-post' ).click( );
-                }
-
-                if ( $( '#original_publish' ).val( ) == 'Update' ) {
-                    $( '#publish' ).removeAttr( 'dasabled' );
-                    //$( '#publish' ).click( );
-                }
-            }
+            save_inline_post_data( $( this ).val(), 'delete', '', '' );
         } );
+
+
+        if ( $( '.check-column-box' ).length == 0 ) {
+            save_inline_post_data( $( '[name="post_ID"]' ).val(), 'delete_variations', '', '' );
+
+            if ( $( '#original_publish' ).val( ) == 'Publish' ) {
+                $( '#save-post' ).removeAttr( 'dasabled' );
+                //alert('published click!');
+                $( '#save-post' ).click( );
+            }
+
+            if ( $( '#original_publish' ).val( ) == 'Update' ) {
+                $( '#publish' ).removeAttr( 'dasabled' );
+                $( '#publish' ).click( );
+            }
+        }
 
         return false;
         e.preventDefault();
@@ -425,9 +513,6 @@ jQuery( document ).ready( function( $ ) {
         return false;
     } );
 
-    /*$( '.mp_bulk_price_link' ).click( function() {
-     
-     } );*/
-
+    //$( '.variation_values' ).textext( { plugins: 'tags autocomplete' } );
 
 } );

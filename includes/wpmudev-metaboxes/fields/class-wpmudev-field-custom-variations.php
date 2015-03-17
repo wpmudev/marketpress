@@ -71,7 +71,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			<div class="tablenav top">
 				<div class="alignleft actions bulkactions">
 					<label for="bulk-action-selector-top" class="screen-reader-text"><?php _e( 'Select bulk action', 'mp' ); ?></label>
-					<select name="action" id="bulk-action-selector-top" class="variant_bulk_selected">
+					<select id="bulk-action-selector-top" class="variant_bulk_selected">
 						<option value="-1" selected="selected"><?php _e( 'Bulk Actions', 'mp' ); ?></option>
 						<option value="variant_update_images"><?php _e( 'Update Images', 'mp' ); ?></option>
 						<option value="variant_update_inventory"><?php _e( 'Update Inventory', 'mp' ); ?></option>
@@ -140,17 +140,25 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 						<?php
 						$style = '';
 						foreach ( $children as $child ) {
-							$style	 = ( isset( $style ) && 'alternate' == $style ) ? '' : 'alternate';
+							$style = ( isset( $style ) && 'alternate' == $style ) ? '' : 'alternate';
 							?>
 							<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo esc_attr( $child->ID ); ?>" class="hentry <?php echo $style; ?>">
 								<th scope="row" class="check-column">
 									<input type="checkbox" class="check-column-box" name="selected_variation[]" value="<?php echo esc_attr( $child->ID ); ?>">
 								</th>
-								<td class="">
-									IMG
+								<td class="mp-variation-image" data-post-image-id="<?php echo esc_attr( $child->ID ); ?>">
+									<?php
+									if ( has_post_thumbnail( $child->ID ) ) {
+										echo get_the_post_thumbnail( $child->ID, array( 30, 30 ) );
+									} else {
+										global $mp;
+										?>
+										<img src="<?php echo $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ); ?>" />
+										<?php }
+									?>
 								</td>
 								<?php
-								$order	 = 1;
+								$order = 1;
 								foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
 									?>
 									<td class="field_editable" data-field-type="text">
@@ -193,12 +201,11 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									- Weight
 								</td>
 							</tr>
-						<?php } ?>
+			<?php } ?>
 					</tbody>
 				</table>
 			</span>
-			<?php
-			?>
+			<?php ?>
 			<div class="mp_hidden_content">
 				<div id="mp_bulk_price">
 					<div class="mp_popup_content">
@@ -224,7 +231,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 					</div>
 				</div>
 
-				<div id="mp_bulk_delete_title"></div>
+				<div id="mp_bulk_inventory_title"></div>
 
 				<div id="mp_bulk_delete">
 					<div class="mp_popup_content">

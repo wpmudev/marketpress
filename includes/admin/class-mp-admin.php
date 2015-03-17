@@ -185,18 +185,38 @@ class MP_Admin {
 				wp_enqueue_script( 'mp-product-admin', mp_plugin_url( 'includes/admin/ui/js/admin-product.js' ), array( 'mp-repeatable-fields' ), MP_VERSION );
 
 				$ajax_nonce = wp_create_nonce( "mp-ajax-nonce" );
-				
+
 				wp_localize_script( 'mp-product-admin', 'mp_product_admin_i18n', array(
-					'ajaxurl' => admin_url( 'admin-ajax.php' ),
-					'creating_vatiations_message' => __( 'Creating variations, please wait...', 'mp' ),
-					'ajax_nonce' => $ajax_nonce,
-					'bulk_update_prices_multiple_title' => sprintf(__('Update prices for %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
-					'bulk_update_prices_single_title' => sprintf(__('Update price for %s product variant', 'mp'), '<span class="mp_variants_selected"></span>'),
-					'bulk_update_inventory_multiple_title' => sprintf(__('Update inventory for %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
-					'bulk_update_inventory_single_title' => sprintf(__('Update inventory for %s product variant', 'mp'), '<span class="mp_variants_selected"></span>'),
-					'bulk_delete_multiple_title' => sprintf(__('Delete %s product variants', 'mp'), '<span class="mp_variants_selected"></span>'),
-					'bulk_delete_single_title' => sprintf(__('Delete %s product variant', 'mp'), '<span class="mp_variants_selected"></span>')
+					'ajaxurl'								 => admin_url( 'admin-ajax.php' ),
+					'creating_vatiations_message'			 => __( 'Creating variations, please wait...', 'mp' ),
+					'ajax_nonce'							 => $ajax_nonce,
+					'bulk_update_prices_multiple_title'		 => sprintf( __( 'Update prices for %s product variants', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+					'bulk_update_prices_single_title'		 => sprintf( __( 'Update price for %s product variant', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+					'bulk_update_inventory_multiple_title'	 => sprintf( __( 'Update inventory for %s product variants', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+					'bulk_update_inventory_single_title'	 => sprintf( __( 'Update inventory for %s product variant', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+					'bulk_delete_multiple_title'			 => sprintf( __( 'Delete %s product variants', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+					'bulk_delete_single_title'				 => sprintf( __( 'Delete %s product variant', 'mp' ), '<span class="mp_variants_selected"></span>' )
 				) );
+
+				//jquery textext
+				wp_enqueue_script( 'textext.core', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.core.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.ajax', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.ajax.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.arrow', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.arrow.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.autocomplete', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.autocomplete.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.clear', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.clear.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.filter', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.filter.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.focus', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.focus.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.prompt', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.prompt.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.suggestions', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.suggestions.js' ), array( 'jquery' ), MP_VERSION );
+				wp_enqueue_script( 'textext.plugin.tags', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/js/textext.plugin.tags.js' ), array( 'jquery' ), MP_VERSION );
+
+				wp_enqueue_style( 'textext.core', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.core.css' ), array(), MP_VERSION );
+				wp_enqueue_style( 'textext.plugin.arrow', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.arrow.css' ), array(), MP_VERSION );
+				wp_enqueue_style( 'textext.plugin.autocomplete', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.autocomplete.css' ), array(), MP_VERSION );
+				wp_enqueue_style( 'textext.plugin.clear', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.clear.css' ), array(), MP_VERSION );
+				wp_enqueue_style( 'textext.plugin.focus', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.focus.css' ), array(), MP_VERSION );
+				wp_enqueue_style( 'textext.plugin.prompt', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.prompt.css' ), array(), MP_VERSION );
+				wp_enqueue_style( 'textext.plugin.tags', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.tags.css' ), array(), MP_VERSION );
 			}
 		}
 

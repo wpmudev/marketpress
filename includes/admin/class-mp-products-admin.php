@@ -553,6 +553,10 @@ class MP_Products_Screen {
 				case 'delete':
 					wp_delete_post( $post_id, true );
 					break;
+				case 'delete_variations':
+					delete_post_meta($post_id, 'has_variations');
+					//update_post_meta( $post_id, $value_type, $value );
+					break;
 				case 'sku':
 					update_post_meta( $post_id, $value_type, $value );
 					break;
@@ -636,7 +640,9 @@ class MP_Products_Screen {
 				$terms = get_terms( array( $variation_name ), $args );
 
 				/* Put variation values in the array */
-				$variations_data = explode( ',', $variation_values[ $i ] );
+				$variation_values_row = $variation_values[ $i ];
+				$variation_values_row = str_replace(array('[', ']', '"'), '', $variation_values_row);
+				$variations_data = explode( ',', $variation_values_row );
 
 				global $variations_single_data;
 				foreach ( $variations_data as $variations_single_data ) {

@@ -99,15 +99,25 @@
         function after_add( container, new_row ) {
             var row_count = $( container ).attr( 'data-rf-row-count' );
 
+
+
             row_count++;
 
+            new_row.addClass( 'mp-variation-row-count-' + ( ( $( '.repeat .row' ).length ) - 1 ) );
+            new_row.addClass( 'variation_row_color_' + ( ( $( '.repeat .row' ).length ) - 1 ) );
+            
+            var current_class = '.mp-variation-row-count-' + ( ( $( '.repeat .row' ).length ) - 1 );
+
             $( '*', new_row ).each( function() {
+                //$(this).addClass( 'mp-variation-row-count-'+row_count );
                 $.each( this.attributes, function( index, element ) {
                     this.value = this.value.replace( /{{row-count-placeholder}}/, row_count - 1 );
                 } );
             } );
 
-            $( container ).attr( 'data-rf-row-count', row_count );
+            //$( container ).attr( 'data-rf-row-count', row_count );
+            // $( container ).addClass( 'mp-variation-row-count-'+row_count );
+            $( current_class + ' .variation_values' ).textext( { plugins: 'tags autocomplete' } );
         }
     }
 } )( jQuery );
