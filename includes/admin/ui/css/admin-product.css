@@ -50,6 +50,22 @@
 }
 
 /* PRICE, INVENTORY & VARIANTS */
+.mp-product-field-100{
+    width: 100% !important;
+    display: block;
+}
+
+.mp-product-field-98{
+    width: 98% !important;
+    display: block;
+}
+
+.mp-product-field-50{
+    width: 48.2% !important;
+    display: inline-block;
+    margin-right: 1%;
+}
+
 .mp-product-field-40{
     width: 40% !important;
     display: inline-block;
@@ -524,6 +540,7 @@ input.mp_inline_temp_value{
     position: absolute;
     bottom: 0;
     width: 90%;
+    background-color: #fff;
 }
 
 .mp_popup_controls a.button{
@@ -535,6 +552,8 @@ input.mp_inline_temp_value{
 .mp_popup_content{
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 20px;
+    padding-bottom: 40px;
 }
 
 .mp_popup_content label{
@@ -560,4 +579,29 @@ input.mp_inline_temp_value{
     border: 3px solid #763eaf;
     width: 24px;
     height: 24px;
+}
+
+#variation_popup label.error{
+    position: absolute !important;
+}
+
+#variation_popup .mp-variation-field .wpmudev-field-label {
+    margin-bottom: 3px;
+}
+
+#variation_popup .mp_popup_content label{
+    width: auto !important;
+}
+
+#variation_popup .mp-variation-field{
+    margin-bottom: 10px;
+}
+
+#cboxLoadedContent{
+    padding-top: 54px !important;
+}
+
+#cboxLoadedContent .mp_more_popup{
+    overflow-y: auto;
+    height: inherit;
 }

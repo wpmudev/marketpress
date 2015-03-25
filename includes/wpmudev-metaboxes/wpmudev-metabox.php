@@ -258,6 +258,7 @@ class WPMUDEV_Metabox {
 	 * }
 	 */
 	public function __construct( $args = array() ) {
+
 		$this->args = array_replace_recursive( array(
 			'class'				 => 'postbox wpmudev-postbox',
 			'id'				 => '',

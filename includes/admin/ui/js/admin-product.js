@@ -217,6 +217,25 @@ jQuery( document ).ready( function( $ ) {
         }
     } );
 
+
+    /*$( '.field_more a' ).click( function( e ) {
+     
+     //$('.mp_more_popup').html($('#mp-product-price-inventory-variants-metabox').html());
+     
+     var post_id = $( this ).closest( 'tr' ).find( '.check-column-box' ).val();
+     
+     $.colorbox( {
+     href: "http://localhost/marketpress/wp-admin/post.php?post=1103&action=edit", //mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup', //mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup'mp_variation_popup
+     inline: true,
+     opacity: .7,
+     width: 500,
+     height: 235,
+     title: $( '#mp_more_popup_title_' + post_id ).html()
+     } );
+     
+     e.preventDefault();
+     } );*/
+
     $( '#variant_bulk_doaction' ).click( function() {
         var selected_variant_bulk_action = $( '.variant_bulk_selected' ).val();
         var checked_variants = $( ".check-column-box:checked" ).length;
@@ -508,11 +527,71 @@ jQuery( document ).ready( function( $ ) {
     } )
 
     /* Close thickbox window on link / cancel click */
-    $( '.mp_popup_controls a.cancel' ).click( function() {
+    $( '.mp_popup_controls a.cancel' ).live( 'click', function( e ) {
         parent.jQuery.colorbox.close();
         return false;
+        e.preventDefault();
     } );
 
-    //$( '.variation_values' ).textext( { plugins: 'tags autocomplete' } );
+    $( "a.open_ajax" ).live( 'click', function( e ) {
+        $.colorbox( {
+            href: mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup&variation_id=' + ( $( this ).attr( 'data-popup-id' ) ),
+            opacity: .7,
+            inline: false,
+            width: 380,
+            height: 400,
+            title: $( this ).closest( 'tr' ).find( '.field_more .variation_name' ).html(),
+            onClosed: function() {
+                $.colorbox.remove();
+            }
+        } );
+        e.preventDefault();
+        //$.colorbox.remove
+        // return false;
+    } );
+
+
+
+
+    $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'change', function( e ) {
+        // Setup form validation on the #register-form element
+
+        $( "#variation_popup" ).validate( {
+            // Specify the validation rules
+            /*rules: {
+             regular_price: {
+             required: true,
+             number: true,
+             },
+             },
+             // Specify the validation error messages
+             messages: {
+             password: {
+             required: "Please provide a Price",
+             minlength: "Your price must be at least 1 character long"
+             },
+             },*/
+        } );
+
+        $( '.mp-numeric' ).each( function() {
+            $( this ).rules( 'add', {
+                number: true,
+                messages: {
+                    number: "Valid number is required"
+                }
+            } );
+        } );
+
+        $( '.mp-required' ).each( function() {
+            $( this ).rules( 'add', {
+                required: true,
+                messages: {
+                    required: "Input is required"
+                }
+            } );
+        } );
+
+
+    } );
 
 } );

@@ -118,20 +118,24 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								</th>
 							<?php } ?>
 
-							<th scope="col" id="tags" class="manage-column">
+							<th scope="col" id="inventory" class="manage-column">
 								<?php _e( 'Inventory', 'mp' ); ?>
 							</th>
 
-							<th scope="col" id="comments" class="manage-column">
+							<th scope="col" id="price" class="manage-column">
 								<?php _e( 'Price', 'mp' ); ?>
 							</th>
 
-							<th scope="col" id="date" class="manage-column">
+							<th scope="col" id="sku" class="manage-column">
 								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
 
-							<th scope="col" id="date" class="manage-column">
-								<?php _e( 'Weight', 'mp' ); ?>
+																									<!--<th scope="col" id="date" class="manage-column">
+							<?php _e( 'Weight', 'mp' ); ?>
+																									</th>-->
+
+							<th scope="col" id="more" class="manage-column">
+								<?php _e( 'More', 'mp' ); ?>
 							</th>
 						</tr>
 					</thead>
@@ -154,7 +158,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										global $mp;
 										?>
 										<img src="<?php echo $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ); ?>" />
-										<?php }
+									<?php }
 									?>
 								</td>
 								<?php
@@ -188,6 +192,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									?>
 									<input type="hidden" class="editable_value editable_value_price" value="" />
 								</td>
+
 								<td class="field_editable" data-field-type="text">
 									<span class="original_value field_subtype field_subtype_sku" data-meta="sku" data-default="-">
 										<?php
@@ -197,11 +202,15 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									</span>
 									<input type="hidden" class="editable_value" value="" />
 								</td>
-								<td class="">
+								<!--<td class="">
 									- Weight
+								</td>-->
+								<td class="field_more">
+									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr($child->ID);?>"><i class="fa fa-th-large"></i></a>
+									<span class="hidden variation_name"><?php echo get_post_meta( $child->ID, 'name', true );?></span>
 								</td>
 							</tr>
-			<?php } ?>
+						<?php } ?>
 					</tbody>
 				</table>
 			</span>
@@ -245,8 +254,10 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				</div>
 
 				<div id="mp_bulk_delete_title"></div>
-
+				
 			</div>
+
+
 			<?php
 		} else {
 			?>
