@@ -34,8 +34,8 @@ class MarketPress_Stats {
 
 		$this_month = $wpdb->get_row("SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND YEAR(p.post_date) = $year_current AND MONTH(p.post_date) = $month_current AND p.post_status != 'trash'");
 		
-		$year_last = date('Y', strtotime('-1 month'));
-		$month_last = date('m', strtotime("now -30 days"));
+		$year_last = date('Y', strtotime("first day of last month"));
+		$month_last = date('m', strtotime("first day of last month"));
 	
 		$last_month = $wpdb->get_row("SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND YEAR(p.post_date) = $year_last AND MONTH(p.post_date) = $month_last AND p.post_status != 'trash'");	
 		
@@ -63,7 +63,7 @@ class MarketPress_Stats {
 		</div>
 	
 		<div class="table table_discussion">
-			<p class="sub"><?php printf(__('Last Month (%s)', 'mp'), date_i18n('M, Y', strtotime("now -30 days"))); ?></p>
+			<p class="sub"><?php printf(__('Last Month (%s)', 'mp'), date_i18n('M, Y', strtotime("first day of last month"))); ?></p>
 			<table>
 				<tbody>
 					<tr class="first">
