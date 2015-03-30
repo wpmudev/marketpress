@@ -29,13 +29,15 @@ class MarketPress_Stats {
 	
 	function dashboard_widget() {
 		global $wpdb, $mp;
-		$year = date('Y');
-		$month = date('m');
-		$this_month = $wpdb->get_row("SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND YEAR(p.post_date) = $year AND MONTH(p.post_date) = $month AND p.post_status != 'trash'");
+		$year_current = date('Y');
+		$month_current = date('m');
+
+		$this_month = $wpdb->get_row("SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND YEAR(p.post_date) = $year_current AND MONTH(p.post_date) = $month_current AND p.post_status != 'trash'");
 		
-		$year = date('Y', strtotime('-1 month'));
-		$month = date('m', strtotime('-1 month'));
-		$last_month = $wpdb->get_row("SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND YEAR(p.post_date) = $year AND MONTH(p.post_date) = $month AND p.post_status != 'trash'");	
+		$year_last = date('Y', strtotime('-1 month'));
+		$month_last = date('m', strtotime("now -30 days"));
+	
+		$last_month = $wpdb->get_row("SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND YEAR(p.post_date) = $year_last AND MONTH(p.post_date) = $month_last AND p.post_status != 'trash'");	
 		
 		//later get full stats and graph
 		//$stats = $wpdb->get_results("SELECT DATE_FORMAT(p.post_date, '%Y-%m') as date, count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' GROUP BY YEAR(p.post_date), MONTH(p.post_date) ORDER BY date DESC");
@@ -61,7 +63,7 @@ class MarketPress_Stats {
 		</div>
 	
 		<div class="table table_discussion">
-			<p class="sub"><?php printf(__('Last Month (%s)', 'mp'), date_i18n('M, Y', strtotime('-1 month'))); ?></p>
+			<p class="sub"><?php printf(__('Last Month (%s)', 'mp'), date_i18n('M, Y', strtotime("now -30 days"))); ?></p>
 			<table>
 				<tbody>
 					<tr class="first">
