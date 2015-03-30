@@ -69,7 +69,7 @@ class WPMUDEV_Field_Datepicker extends WPMUDEV_Field {
 	 * @param string $format
 	 * @return string
 	 */
-	public function format_date_for_jquery( $format ) {
+	public static function format_date_for_jquery( $format ) {
 		$pattern = array('d', 'j', 'l', 'z', 'F', 'M', 'n', 'm', 'Y', 'y', 'S');
 		$replace = array('dd', 'd', 'DD', 'o', 'MM', 'M', 'm', 'mm', 'yy', 'y', '');
 		

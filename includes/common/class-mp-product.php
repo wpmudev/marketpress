@@ -1550,8 +1550,8 @@ Notification Preferences: %s', 'mp' );
 		if ( !empty( $product_categories ) ) {
 			$product_categories = wp_list_pluck( $product_categories, 'term_id' );
 		}/* else {
-			$product_categories = array( 0 );
-		}*/
+		  $product_categories = array( 0 );
+		  } */
 
 		// Get all product attributes for this product and it's variations
 		$attributes = $wpdb->get_col( "
@@ -1600,6 +1600,20 @@ Notification Preferences: %s', 'mp' );
 		}
 
 		return $this->_attributes;
+	}
+
+	public static function get_variation_meta( $variation_id, $meta_key = '', $default = '' ) {
+		if ( $meta_key == '' ) {
+			$meta_value = get_post_meta( $variation_id );
+		}else{
+			$meta_value = get_post_meta( $variation_id, $meta_key, true );
+		}
+		
+		if(empty($meta_value)){
+			$meta_value = $default;
+		}
+		
+		return $meta_value;
 	}
 
 	/**

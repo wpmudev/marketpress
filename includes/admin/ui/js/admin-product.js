@@ -538,46 +538,74 @@ jQuery( document ).ready( function( $ ) {
             href: mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup&variation_id=' + ( $( this ).attr( 'data-popup-id' ) ),
             opacity: .7,
             inline: false,
-            width: 380,
-            height: 400,
+            width: 400,
+            height: 460,
             title: $( this ).closest( 'tr' ).find( '.field_more .variation_name' ).html(),
             onClosed: function() {
                 $.colorbox.remove();
+            },
+            onLoad: function() {
+
             }
         } );
+
+
+
         e.preventDefault();
         //$.colorbox.remove
         // return false;
     } );
 
+    $( 'body' ).live( 'mp-variation-popup-loaded', function() {
 
+        $( '.fieldset_check' ).each( function() {
+            var controller = $( this ).find( '.has_controller' );
+            if ( controller.is( ':checked' ) ) {
+                $( this ).find( '.has_area' ).show();
+            } else {
+                $( this ).find( '.has_area' ).hide();
+            }
+        } );
+
+
+        $( '.mp-date' ).each( function() {
+            var $this = $( this );
+
+            $this.datepicker( {
+                "dateFormat": "yy-mm-dd", //mp_product_admin_i18n.date_format,
+            } ).keyup( function( e ) {
+                if ( e.keyCode == 8 || e.keyCode == 46 ) {
+                    $.datepicker._clearDate( this );
+                }
+            } );
+            ;
+        } );
+
+
+    } );
+
+    $( '.has_controller' ).live( 'change', function() {
+        var parent_holder = $( this ).closest( '.fieldset_check' );
+        var controller = $( this );
+        if ( controller.is( ':checked' ) ) {
+            parent_holder.find( '.has_area' ).show();
+        } else {
+            parent_holder.find( '.has_area' ).hide();
+        }
+    } );
 
 
     $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'change', function( e ) {
         // Setup form validation on the #register-form element
 
         $( "#variation_popup" ).validate( {
-            // Specify the validation rules
-            /*rules: {
-             regular_price: {
-             required: true,
-             number: true,
-             },
-             },
-             // Specify the validation error messages
-             messages: {
-             password: {
-             required: "Please provide a Price",
-             minlength: "Your price must be at least 1 character long"
-             },
-             },*/
         } );
 
         $( '.mp-numeric' ).each( function() {
             $( this ).rules( 'add', {
                 number: true,
                 messages: {
-                    number: "Valid number is required"
+                    number: mp_product_admin_i18n.message_valid_number_required
                 }
             } );
         } );
@@ -586,12 +614,13 @@ jQuery( document ).ready( function( $ ) {
             $( this ).rules( 'add', {
                 required: true,
                 messages: {
-                    required: "Input is required"
+                    required: mp_product_admin_i18n.message_input_required
                 }
             } );
         } );
 
 
     } );
+
 
 } );

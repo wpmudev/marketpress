@@ -56,12 +56,12 @@
 }
 
 .mp-product-field-98{
-    width: 98% !important;
+    width: 100% !important;
     display: block;
 }
 
 .mp-product-field-50{
-    width: 48.2% !important;
+    width: 48.9% !important;
     display: inline-block;
     margin-right: 1%;
 }
@@ -582,7 +582,11 @@ input.mp_inline_temp_value{
 }
 
 #variation_popup label.error{
-    position: absolute !important;
+    /*position: absolute !important;*/
+}
+
+#variation_popup .regular_price{
+    margin-right: 0%;
 }
 
 #variation_popup .mp-variation-field .wpmudev-field-label {
@@ -597,6 +601,16 @@ input.mp_inline_temp_value{
     margin-bottom: 10px;
 }
 
+.mp_popup_content #variation_popup input[type=checkbox]{
+    width: auto;
+}
+
+#variation_popup fieldset{
+    background-color: #f7f7f7;
+    padding: 10px;
+    margin-top: 10px;
+}
+
 #cboxLoadedContent{
     padding-top: 54px !important;
 }
@@ -604,4 +618,13 @@ input.mp_inline_temp_value{
 #cboxLoadedContent .mp_more_popup{
     overflow-y: auto;
     height: inherit;
+}
+
+.fieldset_check{
+    margin-top: 10px;
+    padding-bottom: 5px;
+}
+
+.mp-product-field-last{
+    margin-right: 0%;
 }

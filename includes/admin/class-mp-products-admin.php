@@ -554,7 +554,7 @@ class MP_Products_Screen {
 					wp_delete_post( $post_id, true );
 					break;
 				case 'delete_variations':
-					delete_post_meta($post_id, 'has_variations');
+					delete_post_meta( $post_id, 'has_variations' );
 					//update_post_meta( $post_id, $value_type, $value );
 					break;
 				case 'sku':
@@ -640,9 +640,9 @@ class MP_Products_Screen {
 				$terms = get_terms( array( $variation_name ), $args );
 
 				/* Put variation values in the array */
-				$variation_values_row = $variation_values[ $i ];
-				$variation_values_row = str_replace(array('[', ']', '"'), '', $variation_values_row);
-				$variations_data = explode( ',', $variation_values_row );
+				$variation_values_row	 = $variation_values[ $i ];
+				$variation_values_row	 = str_replace( array( '[', ']', '"' ), '', $variation_values_row );
+				$variations_data		 = explode( ',', $variation_values_row );
 
 				global $variations_single_data;
 				foreach ( $variations_data as $variations_single_data ) {
@@ -693,23 +693,30 @@ class MP_Products_Screen {
 				$sku_post_val	 = mp_get_post_value( 'sku' );
 				$sku			 = isset( $sku_post_val ) && !empty( $sku_post_val ) ? $sku_post_val . '-' . $combination_num : '';
 
+				$inventory	 = mp_get_post_value( 'inventory' );
+				$sale_price	 = mp_get_post_value( 'sale_price' );
+				$weight		 = mp_get_post_value( 'weight' );
+
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
 					'name'					 => $variation_name_title, //mp_get_post_value( 'post_title' ),
 					'sku'					 => $sku,
 					'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
-					'inventory'				 => mp_get_post_value( 'inventory[inventory]' ),
-					'out_of_stock_purchase'	 => mp_get_post_value( 'inventory[out_of_stock_purchase]' ),
+					'inventory'				 => $inventory[ 'inventory' ],
+					'out_of_stock_purchase'	 => $inventory[ 'out_of_stock_purchase' ],
 					'file_url'				 => '', //to do
 					'external_url'			 => '', //to do
 					'regular_price'			 => mp_get_post_value( 'regular_price' ),
-					'sale_price_amount'		 => mp_get_post_value( 'sale_price[amount]' ),
-					'sale_price_start_date'	 => mp_get_post_value( 'sale_price[start_date]' ),
-					'sale_price_end_date'	 => mp_get_post_value( 'sale_price[end_date]' ),
+					'sale_price_amount'		 => $sale_price[ 'amount' ],
+					'sale_price_start_date'	 => $sale_price[ 'start_date' ],
+					'sale_price_end_date'	 => $sale_price[ 'end_date' ],
 					'sale_price'			 => '', //array - to do
-					'weight_pounds'			 => mp_get_post_value( 'weight[pounds]' ),
-					'weight_ounces'			 => mp_get_post_value( 'weight[ounces]' ),
+					'weight_pounds'			 => $weight[ 'pounds' ],
+					'weight_ounces'			 => $weight[ 'ounces' ],
 					'weight'				 => '', //array - to do
-					'extra_shipping_cost'	 => mp_get_post_value( 'weight[extra_shipping_cost]' ),
+					'charge_shipping'		 => mp_get_post_value( 'charge_shipping' ),
+					'charge_tax'			 => mp_get_post_value( 'charge_tax' ),
+					'has_sale'				 => mp_get_post_value( 'has_sale' ),
+					'extra_shipping_cost'	 => $weight[ 'extra_shipping_cost' ],
 					'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
