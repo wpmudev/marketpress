@@ -817,8 +817,9 @@ function _mp_cart_shipping($editable = false, $echo = false) {
 				$content .= apply_filters('mp_checkout_error_email', '');
 				$content .= '<input size="35" name="email" type="text" value="' . esc_attr($email) . '" /></td>';
 				$content .= '</tr>';
-
-				if ((!$mp->download_only_cart($mp->get_cart_contents()) || $mp->global_cart || $mp->get_setting('tax->downloadable_address')) && $mp->get_setting('shipping->method') != 'none') {
+				
+				if ((!$mp->download_only_cart($mp->get_cart_contents()) || $mp->global_cart || $mp->get_setting('tax->downloadable_address')) && ($mp->get_setting('shipping->method') !== 'none' || ($mp->download_only_cart($mp->get_cart_contents()) && $mp->get_setting('tax->downloadable_address'))) || ($mp->mixed_cart($mp->get_cart_contents()) && $mp->get_setting('tax->downloadable_address'))) {
+				//if ((!$mp->download_only_cart($mp->get_cart_contents()) || $mp->global_cart || $mp->get_setting('tax->downloadable_address')) && $mp->get_setting('shipping->method') != 'none') {
 						$content .= '<tr>';
 						$content .= '<td align="right">' . __('Full Name:', 'mp') . '*</td><td>';
 						$content .= apply_filters('mp_checkout_error_name', '');

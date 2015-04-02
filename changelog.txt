@@ -3,6 +3,11 @@ Author: Aaron Edwards (incsub)
 
 Change Log:
 ----------------------------------------------------------------------
+
+2.9.6.2
+----------------------------------------------------------------------
+- Fixed issue with collecting billing address for digital products (when "Collect Address on Downloadable Only Cart" is checked and shipping method is not set) 
+
 2.9.6.1
 ----------------------------------------------------------------------
 - Fixed issue with Statistics dashboard widget (not showing right previous month)
