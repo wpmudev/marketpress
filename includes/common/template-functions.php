@@ -1043,7 +1043,7 @@ if ( !function_exists( 'mp_store_page_url' ) ) :
 	 */
 	function mp_store_page_url( $page, $echo = true ) {
 		$url	 = $append	 = '';
-
+		
 		if ( $page == 'confirm_order' ) {
 			$append	 = 'confirm/';
 			$page	 = 'checkout';

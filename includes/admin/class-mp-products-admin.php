@@ -41,6 +41,7 @@ class MP_Products_Screen {
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
 		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
+		add_action( 'wp_ajax_edit_variation_post_data', array( &$this, 'edit_variation_post_data' ) );
 		//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
 		//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
@@ -532,6 +533,74 @@ class MP_Products_Screen {
 		return $taxonomy;
 	}
 
+	public function edit_variation_post_data() {
+		$post_id = mp_get_post_value( 'post_id' );
+		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
+
+		if ( isset( $post_id ) && is_numeric( $post_id ) ) {
+
+			foreach ( $_POST as $key => $val ) {
+				$variation_name = '';
+
+				if ( strpos( $key, 'product_attr' ) === 0 ) {
+					$insert_post_terms = wp_set_post_terms( $post_id, $this->term_id( $val, $key ), $key, false );
+					if ( is_wp_error( $insert_post_terms ) ) {
+						echo $insert_post_terms->get_error_message();
+					} else {
+						global $wpdb;
+
+						$product_atts		 = MP_Product_Attributes::get_instance();
+						$table_name			 = MP_Product_Attributes::get_instance()->get_table_name();
+						$table_name_terms	 = $wpdb->prefix . 'mp_product_attributes_terms';
+
+						$product_attributes = $wpdb->get_results(
+						"SELECT attribute_id FROM $table_name"
+						);
+
+						foreach ( $product_attributes as $product_attribute ) {
+							$attribute_name	 = 'product_attr_' . $product_attribute->attribute_id;
+							$post_terms		 = wp_get_post_terms( $post_id, $attribute_name );
+							if ( is_array( $post_terms ) && count( $post_terms ) > 0 ) {
+								$variation_name = $variation_name . '' . $post_terms[ 0 ]->name . ' ';
+							}
+						}
+
+						update_post_meta( $post_id, 'name', sanitize_text_field( $variation_name ) );
+					}
+				}
+			}
+
+			$meta_array_values = array(
+				'sku'					 => mp_get_post_value( 'sku' ),
+				'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
+				'inventory'				 => mp_get_post_value( 'inventory->inventory' ),
+				'out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
+				'regular_price'			 => mp_get_post_value( 'regular_price' ),
+				'has_sale'				 => mp_get_post_value( 'has_sale' ),
+				'sale_price_amount'		 => mp_get_post_value( 'sale_price->amount' ),
+				'sale_price_start_date'	 => mp_get_post_value( 'sale_price->start_date' ),
+				'sale_price_end_date'	 => mp_get_post_value( 'sale_price->end_date' ),
+				'weight_pounds'			 => mp_get_post_value( 'weight->pounds' ),
+				'weight_ounces'			 => mp_get_post_value( 'weight->ounces' ),
+				'weight'				 => '',
+				'charge_shipping'		 => mp_get_post_value( 'charge_shipping' ),
+				'extra_shipping_cost'	 => mp_get_post_value( 'weight->extra_shipping_cost' ),
+				'charge_tax'			 => mp_get_post_value( 'charge_tax' ),
+				'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
+				'file_url'				 => '',
+				'external_url'			 => '',
+			);
+
+			$meta_array_values = apply_filters( 'mp_edit_variation_post_data', $meta_array_values, $post_id );
+
+			foreach ( $meta_array_values as $key => $value ) {
+				update_post_meta( $post_id, $key, $value );
+			}
+		}
+
+		exit;
+	}
+
 	/**
 	 * Save inline changed data for variations
 	 *
@@ -693,30 +762,26 @@ class MP_Products_Screen {
 				$sku_post_val	 = mp_get_post_value( 'sku' );
 				$sku			 = isset( $sku_post_val ) && !empty( $sku_post_val ) ? $sku_post_val . '-' . $combination_num : '';
 
-				$inventory	 = mp_get_post_value( 'inventory' );
-				$sale_price	 = mp_get_post_value( 'sale_price' );
-				$weight		 = mp_get_post_value( 'weight' );
-
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
 					'name'					 => $variation_name_title, //mp_get_post_value( 'post_title' ),
 					'sku'					 => $sku,
 					'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
-					'inventory'				 => $inventory[ 'inventory' ],
-					'out_of_stock_purchase'	 => $inventory[ 'out_of_stock_purchase' ],
+					'inventory'				 => mp_get_post_value( 'inventory->inventory' ),
+					'out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 					'file_url'				 => '', //to do
 					'external_url'			 => '', //to do
 					'regular_price'			 => mp_get_post_value( 'regular_price' ),
-					'sale_price_amount'		 => $sale_price[ 'amount' ],
-					'sale_price_start_date'	 => $sale_price[ 'start_date' ],
-					'sale_price_end_date'	 => $sale_price[ 'end_date' ],
+					'sale_price_amount'		 => mp_get_post_value( 'sale_price->amount' ),
+					'sale_price_start_date'	 => mp_get_post_value( 'sale_price->start_date' ),
+					'sale_price_end_date'	 => mp_get_post_value( 'sale_price->end_date' ),
 					'sale_price'			 => '', //array - to do
-					'weight_pounds'			 => $weight[ 'pounds' ],
-					'weight_ounces'			 => $weight[ 'ounces' ],
+					'weight_pounds'			 => mp_get_post_value( 'weight->pounds' ),
+					'weight_ounces'			 => mp_get_post_value( 'weight->ounces' ),
 					'weight'				 => '', //array - to do
 					'charge_shipping'		 => mp_get_post_value( 'charge_shipping' ),
 					'charge_tax'			 => mp_get_post_value( 'charge_tax' ),
 					'has_sale'				 => mp_get_post_value( 'has_sale' ),
-					'extra_shipping_cost'	 => $weight[ 'extra_shipping_cost' ],
+					'extra_shipping_cost'	 => mp_get_post_value( 'weight->extra_shipping_cost' ),
 					'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 

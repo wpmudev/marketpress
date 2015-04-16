@@ -622,5 +622,24 @@ jQuery( document ).ready( function( $ ) {
 
     } );
 
+    $( '#save-variation-popup-data' ).live( 'click', function( e ) {
+        var form = $( 'form#variation_popup' );
+
+        $.post(
+            //ajax_nonce: mp_product_admin_i18n.ajax_nonce
+        //action: 'save_inline_post_data',
+            mp_product_admin_i18n.ajaxurl, form.serialize()
+            ).done( function( data, status ) {
+            if ( status == 'success' ) {
+                console.log( response );
+            } else {
+                //alert( 'fail!' );
+                //an error occured
+            }
+        } );
+
+        e.preventDefault();
+    } );
+
 
 } );

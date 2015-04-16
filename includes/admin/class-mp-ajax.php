@@ -97,6 +97,9 @@ class MP_Ajax {
 				}
 				?>
 				<form name="variation_popup" id="variation_popup">
+					<input type="hidden" name="action" value="edit_variation_post_data" />
+					<input type="hidden" name="post_id" value="<?php echo esc_attr( $variation_id ); ?>" />
+					<input type="hidden" name="ajax_nonce" value="<?php echo esc_attr(wp_create_nonce( "mp-ajax-nonce" ));?>" />
 
 					<div class="mp-product-field-50 mp-variation-field">
 						<div class="wpmudev-field-label"><?php _e( 'SKU', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(Stock Keeping Unit)', 'mp' ); ?></span></div>
@@ -115,7 +118,7 @@ class MP_Ajax {
 						?>
 						<div class="mp-product-field-100 mp-variation-field">
 							<div class="wpmudev-field-label"><?php echo $product_attributes_array[ $variation_attribute ]; ?><span class="required">*</span></div>
-							<input type="text" name="<?php echo esc_attr( $variation_attribute ); ?>" id="<?php echo esc_attr( $variation_attribute ); ?>" class="mp-required" placeholder="<?php
+							<input type="text" name="product_attr_<?php echo esc_attr( $variation_attribute ); ?>" id="product_attr_<?php echo esc_attr( $variation_attribute ); ?>" class="mp-required" placeholder="<?php
 							esc_attr_e( 'Enter ', 'mp' );
 							echo esc_attr( $product_attributes_array[ $variation_attribute ] );
 							?>" value="<?php echo is_object( $child_term ) ? esc_attr( $child_term->name ) : ''; ?>">
@@ -124,7 +127,7 @@ class MP_Ajax {
 
 					<div class="fieldset_check">
 						<?php
-						$has_sale = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
+						$has_sale		 = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
 						?>
 						<label>
 							<input type="checkbox" name="has_sale" class="has_controller" value="<?php echo $has_sale; ?>" <?php checked( 1, $has_sale, true ); ?>> 
@@ -139,7 +142,7 @@ class MP_Ajax {
 
 					<div class="fieldset_check">
 						<?php
-						$charge_tax = MP_Product::get_variation_meta( $variation_id, 'charge_tax', 0 );
+						$charge_tax		 = MP_Product::get_variation_meta( $variation_id, 'charge_tax', 0 );
 						?>
 						<label>
 							<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>> 
@@ -188,7 +191,7 @@ class MP_Ajax {
 
 			</div>
 			<div class="mp_popup_controls mp_more_controls">
-				<a href="" class="button button-primary save-more-form"><?php _e( 'Save ', 'mp' ); ?></a>
+				<a href="" id="save-variation-popup-data" class="button button-primary save-more-form"><?php _e( 'Save ', 'mp' ); ?></a>
 				<a href="" class="preview button cancel"><?php _e( 'Cancel ', 'mp' ); ?></a>
 			</div>
 			<script>
