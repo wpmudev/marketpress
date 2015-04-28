@@ -175,7 +175,7 @@ class MP_Admin {
 	 * @access public
 	 */
 	public function enqueue_styles_scripts() {
-		global $pagenow, $post_type;
+		global $pagenow, $post_type, $mp;
 
 		if ( !empty( $pagenow ) && ('post-new.php' === $pagenow || 'post.php' === $pagenow ) ) {
 			if ( $post_type == MP_Product::get_post_type() ) {
@@ -201,6 +201,7 @@ class MP_Admin {
 					'date_format'							 => WPMUDEV_Field_Datepicker::format_date_for_jquery( get_option( 'date_format' ) ),
 					'message_valid_number_required'			 => __( 'Valid number is required', 'mp' ),
 					'message_input_required'				 => __( 'Input is required', 'mp' ),
+					'placeholder_image'						 => $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' )
 				) );
 
 				//jquery textext

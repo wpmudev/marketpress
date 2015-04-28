@@ -388,6 +388,7 @@ jQuery( document ).ready( function( $ ) {
 
     } );
 
+
     $( '.mp-variation-image img' ).on( 'click', function() {
 
         var placeholder_image = $( this );
@@ -558,6 +559,77 @@ jQuery( document ).ready( function( $ ) {
 
     $( 'body' ).live( 'mp-variation-popup-loaded', function() {
 
+        $( '#variation_popup a.remove_popup_image' ).on( 'click', function( e ) {
+            var placeholder_image = $( this );
+            var post_id = $( '#variation_id' ).val();
+            var table_placeholder_image = $( '#post-' + post_id ).find( '.mp-variation-image img' );
+
+            table_placeholder_image.attr( 'src', mp_product_admin_i18n.placeholder_image );
+            table_placeholder_image.attr( 'width', 30 );
+            table_placeholder_image.attr( 'height', 30 );
+            
+            placeholder_image.attr( 'src', mp_product_admin_i18n.placeholder_image );
+            placeholder_image.attr( 'width', 75 );
+            placeholder_image.attr( 'height', 75 );
+
+            save_inline_post_data( post_id, '_thumbnail_id', '', '' );
+            e.preventDefault();
+
+        } );
+
+        $( '#variation_popup .mp-variation-image img' ).on( 'click', function() {
+            var placeholder_image = $( this );
+            var post_id = $( '#variation_id' ).val();
+            var table_placeholder_image = $( '#post-' + post_id ).find( '.mp-variation-image img' );
+
+            wp.media.string.props = function( props, attachment )
+            {
+                table_placeholder_image.attr( 'src', attachment.url );
+                table_placeholder_image.attr( 'width', 30 );
+                table_placeholder_image.attr( 'height', 30 );
+                
+                placeholder_image.attr( 'src', attachment.url );
+                placeholder_image.attr( 'width', 75 );
+                placeholder_image.attr( 'height', 75 );
+                
+                save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+            }
+
+            wp.media.editor.send.attachment = function( props, attachment )
+            {
+                table_placeholder_image.attr( 'src', attachment.url );
+                table_placeholder_image.attr( 'width', 30 );
+                table_placeholder_image.attr( 'height', 30 );
+                
+                placeholder_image.attr( 'src', attachment.url );
+                placeholder_image.attr( 'width', 75 );
+                placeholder_image.attr( 'height', 75 );
+                
+                save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
+            };
+
+            wp.media.editor.open( this );
+            return false;
+        } );
+
+        $( '#file_url_button' ).on( 'click', function() {
+
+            var field = $( this ).closest( '#file_url' );
+
+            wp.media.string.props = function( props, attachment )
+            {
+                $( '#file_url' ).val( attachment.url );
+            }
+
+            wp.media.editor.send.attachment = function( props, attachment )
+            {
+                $( '#file_url' ).val( attachment.url );
+            };
+
+            wp.media.editor.open( this );
+            return false;
+        } );
+
         $( '.fieldset_check' ).each( function() {
             var controller = $( this ).find( '.has_controller' );
             if ( controller.is( ':checked' ) ) {
@@ -627,7 +699,7 @@ jQuery( document ).ready( function( $ ) {
 
         $.post(
             //ajax_nonce: mp_product_admin_i18n.ajax_nonce
-        //action: 'save_inline_post_data',
+            //action: 'save_inline_post_data',
             mp_product_admin_i18n.ajaxurl, form.serialize()
             ).done( function( data, status ) {
             if ( status == 'success' ) {

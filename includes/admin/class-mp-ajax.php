@@ -71,6 +71,8 @@ class MP_Ajax {
 				$variation_id	 = (int) $_GET[ 'variation_id' ];
 				$post_id		 = wp_get_post_parent_id( $variation_id );
 
+				$product_type = get_post_meta( $post_id, 'product_type', true );
+
 				$product_attributes			 = MP_Product_Attributes_Admin::get_product_attributes();
 				$product_attributes_array	 = array();
 
@@ -98,18 +100,46 @@ class MP_Ajax {
 				?>
 				<form name="variation_popup" id="variation_popup">
 					<input type="hidden" name="action" value="edit_variation_post_data" />
-					<input type="hidden" name="post_id" value="<?php echo esc_attr( $variation_id ); ?>" />
-					<input type="hidden" name="ajax_nonce" value="<?php echo esc_attr(wp_create_nonce( "mp-ajax-nonce" ));?>" />
+					<input type="hidden" name="post_id" id="variation_id" value="<?php echo esc_attr( $variation_id ); ?>" />
+					<input type="hidden" name="ajax_nonce" value="<?php echo esc_attr( wp_create_nonce( "mp-ajax-nonce" ) ); ?>" />
 
-					<div class="mp-product-field-50 mp-variation-field">
-						<div class="wpmudev-field-label"><?php _e( 'SKU', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(Stock Keeping Unit)', 'mp' ); ?></span></div>
-						<input type="text" name="sku" class="mp-product-field-98 mp-blank-bg" placeholder="<?php esc_attr_e( 'Enter SKU', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sku' ) ); ?>">
+					<div class="mp-product-field-25 mp-variation-field vtop mp-variation-image">
+						<div class="wpmudev-field-label"><a href="#" class="remove_popup_image"><?php _e( 'Remove Image', 'mp' ); ?></a></div>
+						<?php
+						if ( has_post_thumbnail( $variation_id ) ) {
+							echo get_the_post_thumbnail( $variation_id, array( 75, 75 ) );
+						} else {
+							global $mp;
+							?>
+							<img width="75" height="75" src="<?php echo $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ); ?>" />
+						<?php }
+						?>
+						
 					</div>
 
-					<div class="mp-product-field-50 mp-product-field-last mp-variation-field">
+					<div class="mp-product-field-75 mp-variation-field mp-product-field-last">
+						<div class="wpmudev-field-label"><?php _e( 'SKU', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(Stock Keeping Unit)', 'mp' ); ?></span></div>
+						<input type="text" name="sku" class="mp-product-field-98 mp-blank-bg" placeholder="<?php esc_attr_e( 'Enter SKU', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sku' ) ); ?>">
+
 						<div class="wpmudev-field-label"><?php _e( 'Price', 'mp' ); ?><span class="required">*</span></div>
 						<input type="text" name="regular_price" id="regular_price" class="mp-product-field-98 mp-blank-bg mp-numeric mp-required" placeholder="<?php esc_attr_e( 'Enter Price', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'regular_price' ) ); ?>">
 					</div>
+
+					<?php if ( $product_type == 'external' ) {//show these fields only for External URL Products ?>
+						<div class="mp-product-field-100 mp-variation-field">
+							<div class="wpmudev-field-label"><?php _e( 'External Product URL', 'mp' ); ?><span class="required">*</span></div>
+							<input type="text" name="external_url" id="external_url" class="mp-required" placeholder="<?php esc_attr_e( 'http://', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'external_url' ) ); ?>">
+						</div>
+					<?php } ?>
+
+					<?php if ( $product_type == 'digital' ) {//show these fields only for Digital Products ?>
+						<div class="mp-product-field-100 mp-variation-field">
+							<div class="wpmudev-field-label"><?php _e( 'File URL', 'mp' ); ?><span class="required">*</span></div>
+							<input type="text" name="file_url" id="file_url" class="mp-required" placeholder="<?php esc_attr_e( 'http://', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'file_url' ) ); ?>">
+							<input type="button" name="file_url_button" id="file_url_button" value="<?php echo esc_attr( __( 'Browse', 'mp' ) ); ?>" />
+						</div>
+					<?php } ?>
+
 
 					<?php
 					foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
@@ -127,7 +157,7 @@ class MP_Ajax {
 
 					<div class="fieldset_check">
 						<?php
-						$has_sale		 = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
+						$has_sale = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
 						?>
 						<label>
 							<input type="checkbox" name="has_sale" class="has_controller" value="<?php echo $has_sale; ?>" <?php checked( 1, $has_sale, true ); ?>> 
@@ -140,48 +170,56 @@ class MP_Ajax {
 						</fieldset>
 					</div>
 
-					<div class="fieldset_check">
-						<?php
-						$charge_tax		 = MP_Product::get_variation_meta( $variation_id, 'charge_tax', 0 );
-						?>
-						<label>
-							<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>> 
-							<span><?php _e( 'Charge Taxes', 'mp' ); ?></span>
-						</label>
-						<fieldset id="fieldset_charge_tax" class="has_area">
-							<div class="wpmudev-field-desc"><?php _e( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ); ?></div>
-							<?php _e( 'Special Tax Rate', 'mp' ); ?> <input placeholder="<?php esc_attr_e( 'Tax Rate', 'mp' ); ?>" type="text" class="mp-numeric" name="special_tax_rate" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); ?>"><br>
-						</fieldset>
-					</div>
+					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products  ?>
+						<div class="fieldset_check">
+							<?php
+							$charge_tax = MP_Product::get_variation_meta( $variation_id, 'charge_tax', 0 );
+							?>
+							<label>
+								<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>> 
+								<span><?php _e( 'Charge Taxes', 'mp' ); ?></span>
+							</label>
+							<fieldset id="fieldset_charge_tax" class="has_area">
+								<div class="wpmudev-field-desc"><?php _e( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ); ?></div>
+								<?php _e( 'Special Tax Rate', 'mp' ); ?> <input placeholder="<?php esc_attr_e( 'Tax Rate', 'mp' ); ?>" type="text" class="mp-numeric" name="special_tax_rate" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); ?>"><br>
+							</fieldset>
+						</div>
+					<?php } ?>
 
-					<div class="fieldset_check">
-						<?php
-						$charge_shipping = MP_Product::get_variation_meta( $variation_id, 'charge_shipping', 0 );
-						?>
-						<label>
-							<input type="checkbox" name="charge_shipping" class="has_controller" value="1" <?php checked( 1, $charge_shipping, true ); ?>> 
-							<span><?php _e( 'Charge Shipping', 'mp' ); ?></span>
-						</label>
-						<fieldset id="fieldset_has_sale" class="has_area">
-							<?php _e( 'Pounds:', 'mp' ); ?> <input placeholder="" type="text" name="weight[pounds]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_pounds' ) ); ?>"><br>
-							<?php _e( 'Ounces:', 'mp' ); ?> <input name="weight[ounces]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_ounces' ) ); ?>" class="mp-numeric "><br>
-							<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'extra_shipping_cost' ) ); ?>">
-						</fieldset>
-					</div>
+					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products  ?>
+						<div class="fieldset_check">
+							<?php
+							$charge_shipping = MP_Product::get_variation_meta( $variation_id, 'charge_shipping', 0 );
+							?>
+							<label>
+								<input type="checkbox" name="charge_shipping" class="has_controller" value="1" <?php checked( 1, $charge_shipping, true ); ?>> 
+								<span><?php _e( 'Charge Shipping', 'mp' ); ?></span>
+							</label>
+							<fieldset id="fieldset_has_sale" class="has_area">
+								<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products  ?>
+									<?php _e( 'Pounds:', 'mp' ); ?> <input placeholder="" type="text" name="weight[pounds]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_pounds' ) ); ?>"><br>
+									<?php _e( 'Ounces:', 'mp' ); ?> <input name="weight[ounces]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_ounces' ) ); ?>" class="mp-numeric "><br>
+								<?php } ?>
+								<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'extra_shipping_cost' ) ); ?>">
+							</fieldset>
+						</div>
+					<?php } ?>
 
-					<div class="fieldset_check">
-						<?php
-						$track_inventory = MP_Product::get_variation_meta( $variation_id, 'track_inventory', 0 );
-						?>
-						<label>
-							<input type="checkbox" name="track_inventory" class="has_controller" value="1" <?php checked( 1, $track_inventory, true ); ?>> 
-							<span><?php _e( 'Track Product Inventory', 'mp' ); ?></span>
-						</label>
-						<fieldset id="fieldset_has_sale" class="has_area">
-							<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
-							<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
-						</fieldset>
-					</div>
+					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products  ?>
+						<div class="fieldset_check">
+							<?php
+							$track_inventory = MP_Product::get_variation_meta( $variation_id, 'track_inventory', 0 );
+							?>
+							<label>
+								<input type="checkbox" name="track_inventory" class="has_controller" value="1" <?php checked( 1, $track_inventory, true ); ?>> 
+								<span><?php _e( 'Track Product Inventory', 'mp' ); ?></span>
+							</label>
+							<fieldset id="fieldset_has_sale" class="has_area">
+								<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
+								<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
+							</fieldset>
+						</div>
+					<?php } ?>
 
 					<div>
 

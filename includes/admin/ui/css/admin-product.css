@@ -1,5 +1,6 @@
 /* GENERAL */
 
+
 .mp-admin-overlay{
     position: fixed;
     top: 0;
@@ -60,6 +61,30 @@
     display: block;
 }
 
+.mp-product-field-75{
+    width: 73.9% !important;
+    display: inline-block;
+    margin-right: 1%;
+}
+
+.mp-product-field-70{
+    width: 68.9% !important;
+    display: inline-block;
+    margin-right: 1%;
+}
+
+.mp-product-field-65{
+    width: 63.9% !important;
+    display: inline-block;
+    margin-right: 1%;
+}
+
+.mp-product-field-48{
+    width: 46.9% !important;
+    display: inline-block;
+    margin-right: 1%;
+}
+
 .mp-product-field-50{
     width: 48.9% !important;
     display: inline-block;
@@ -76,6 +101,11 @@
     display: inline-block;
 }
 
+.mp-product-field-25{
+    width: 25% !important;
+    display: inline-block;
+}
+
 .mp-product-field-20{
     width: 20% !important;
     display: inline-block;
@@ -83,6 +113,10 @@
 
 .mp-blank-bg{
     background: transparent !important;
+}
+
+.vtop{
+    vertical-align: top;
 }
 
 div.mp-special-box{
@@ -581,6 +615,16 @@ input.mp_inline_temp_value{
     height: 24px;
 }
 
+#variation_popup .mp-variation-image img:hover{
+    border: 3px solid #763eaf;
+    width: 69px;
+    height: 69px;
+}
+
+#variation_popup .remove_popup_image{
+    font-size: 11px;
+}
+
 #variation_popup label.error{
     /*position: absolute !important;*/
 }
@@ -627,4 +671,13 @@ input.mp_inline_temp_value{
 
 .mp-product-field-last{
     margin-right: 0%;
+}
+
+.mp_popup_content input#file_url{
+    width: 70%;
+}
+
+.mp_popup_content input#file_url_button{
+    width: 27%;
+    margin-left: 1%;
 }

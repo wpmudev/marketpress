@@ -31,7 +31,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 	public function display( $post_id ) {
 		$this->before_field();
 		$has_variations = get_post_meta( $post_id, 'has_variations', false );
-
+		$product_type = get_post_meta($post_id, 'product_type', true);
 
 		if ( $has_variations ) {
 
@@ -118,7 +118,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								</th>
 							<?php } ?>
 
-							<th scope="col" id="inventory" class="manage-column">
+							<th scope="col" id="inventory" class="manage-column <?php echo $product_type == 'external' ? 'mp_hidden_content' : '';?>">
 								<?php _e( 'Inventory', 'mp' ); ?>
 							</th>
 
@@ -177,7 +177,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									$order++;
 								}
 								?>
-								<td class="field_editable field_editable_inventory" data-field-type="number">
+								<td class="field_editable field_editable_inventory <?php echo $product_type == 'external' ? 'mp_hidden_content' : '';?>" data-field-type="number" data-hide-field-product-type="external">
 									<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
 										<?php
 										$inventory	 = get_post_meta( $child->ID, 'inventory', true );

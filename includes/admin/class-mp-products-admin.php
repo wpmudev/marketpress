@@ -572,6 +572,8 @@ class MP_Products_Screen {
 
 			$meta_array_values = array(
 				'sku'					 => mp_get_post_value( 'sku' ),
+				'external_url'			 => mp_get_post_value( 'external_url' ),
+				'file_url'				 => mp_get_post_value( 'file_url' ),
 				'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
 				'inventory'				 => mp_get_post_value( 'inventory->inventory' ),
 				'out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
@@ -587,8 +589,6 @@ class MP_Products_Screen {
 				'extra_shipping_cost'	 => mp_get_post_value( 'weight->extra_shipping_cost' ),
 				'charge_tax'			 => mp_get_post_value( 'charge_tax' ),
 				'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
-				'file_url'				 => '',
-				'external_url'			 => '',
 			);
 
 			$meta_array_values = apply_filters( 'mp_edit_variation_post_data', $meta_array_values, $post_id );
@@ -659,7 +659,11 @@ class MP_Products_Screen {
 					break;
 
 				default:
-					update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
+					if ( $value_type == '_thumbnail_id' && $value == '' ) {
+						delete_post_meta( $post_id, '_thumbnail_id' );
+					} else {
+						update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
+					}
 			}
 		}
 	}
