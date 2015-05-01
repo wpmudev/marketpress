@@ -344,8 +344,9 @@ class MP_Products_Screen {
 				} else {
 					$stock = array( $product->get_meta( 'inventory', '&mdash;' ) );
 				}
+				$display_stock = implode( '<br />', $stock );
 
-				echo implode( '<br />', $stock );
+				echo $display_stock == 'Array' ? '&mdash;' : $display_stock;
 				break;
 
 			case 'product_sales' :
@@ -372,10 +373,10 @@ class MP_Products_Screen {
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
 		$this->init_product_price_inventory_variants_metabox();
-//$this->init_product_images_metabox();
-//$this->init_product_details_metabox();
+		//$this->init_product_images_metabox();
+		//$this->init_product_details_metabox();
 //$this->init_variations_metabox();
-//$this->init_related_products_metabox();
+		$this->init_related_products_metabox();
 	}
 
 	/**
@@ -537,6 +538,8 @@ class MP_Products_Screen {
 		$post_id = mp_get_post_value( 'post_id' );
 		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
 
+		$post_meta_errors = 0;
+
 		if ( isset( $post_id ) && is_numeric( $post_id ) ) {
 
 			foreach ( $_POST as $key => $val ) {
@@ -560,6 +563,7 @@ class MP_Products_Screen {
 						foreach ( $product_attributes as $product_attribute ) {
 							$attribute_name	 = 'product_attr_' . $product_attribute->attribute_id;
 							$post_terms		 = wp_get_post_terms( $post_id, $attribute_name );
+
 							if ( is_array( $post_terms ) && count( $post_terms ) > 0 ) {
 								$variation_name = $variation_name . '' . $post_terms[ 0 ]->name . ' ';
 							}
@@ -570,25 +574,33 @@ class MP_Products_Screen {
 				}
 			}
 
+			/* $response_array = array(
+			  'status'		 => 'fail',
+			  'status_message' => __( 'ERROR: Changed can\'t be saved.', 'mp' )
+			  );
+			  echo json_encode( $response_array );
+			  exit; */
+
 			$meta_array_values = array(
-				'sku'					 => mp_get_post_value( 'sku' ),
-				'external_url'			 => mp_get_post_value( 'external_url' ),
-				'file_url'				 => mp_get_post_value( 'file_url' ),
-				'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
-				'inventory'				 => mp_get_post_value( 'inventory->inventory' ),
-				'out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
-				'regular_price'			 => mp_get_post_value( 'regular_price' ),
-				'has_sale'				 => mp_get_post_value( 'has_sale' ),
-				'sale_price_amount'		 => mp_get_post_value( 'sale_price->amount' ),
-				'sale_price_start_date'	 => mp_get_post_value( 'sale_price->start_date' ),
-				'sale_price_end_date'	 => mp_get_post_value( 'sale_price->end_date' ),
-				'weight_pounds'			 => mp_get_post_value( 'weight->pounds' ),
-				'weight_ounces'			 => mp_get_post_value( 'weight->ounces' ),
-				'weight'				 => '',
-				'charge_shipping'		 => mp_get_post_value( 'charge_shipping' ),
-				'extra_shipping_cost'	 => mp_get_post_value( 'weight->extra_shipping_cost' ),
-				'charge_tax'			 => mp_get_post_value( 'charge_tax' ),
-				'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
+				'sku'						 => mp_get_post_value( 'sku' ),
+				'external_url'				 => mp_get_post_value( 'external_url' ),
+				'file_url'					 => mp_get_post_value( 'file_url' ),
+				'track_inventory'			 => mp_get_post_value( 'track_inventory' ),
+				'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
+				'out_of_stock_purchase'		 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
+				'regular_price'				 => mp_get_post_value( 'regular_price' ),
+				'has_sale'					 => mp_get_post_value( 'has_sale' ),
+				'sale_price_amount'			 => mp_get_post_value( 'sale_price->amount' ),
+				'sale_price_start_date'		 => mp_get_post_value( 'sale_price->start_date' ),
+				'sale_price_end_date'		 => mp_get_post_value( 'sale_price->end_date' ),
+				'weight_pounds'				 => mp_get_post_value( 'weight->pounds' ),
+				'weight_ounces'				 => mp_get_post_value( 'weight->ounces' ),
+				'weight'					 => '',
+				'charge_shipping'			 => mp_get_post_value( 'charge_shipping' ),
+				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
+				'charge_tax'				 => mp_get_post_value( 'charge_tax' ),
+				'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
+				'description'				 => mp_get_post_value( 'description' ),
 			);
 
 			$meta_array_values = apply_filters( 'mp_edit_variation_post_data', $meta_array_values, $post_id );
@@ -598,6 +610,12 @@ class MP_Products_Screen {
 			}
 		}
 
+		$response_array = array(
+			'status'		 => 'success',
+			'status_message' => __( 'Changes saved successfully', 'mp' )
+		);
+
+		echo json_encode( $response_array );
 		exit;
 	}
 
@@ -767,26 +785,26 @@ class MP_Products_Screen {
 				$sku			 = isset( $sku_post_val ) && !empty( $sku_post_val ) ? $sku_post_val . '-' . $combination_num : '';
 
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
-					'name'					 => $variation_name_title, //mp_get_post_value( 'post_title' ),
-					'sku'					 => $sku,
-					'track_inventory'		 => mp_get_post_value( 'track_inventory' ),
-					'inventory'				 => mp_get_post_value( 'inventory->inventory' ),
-					'out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
-					'file_url'				 => '', //to do
-					'external_url'			 => '', //to do
-					'regular_price'			 => mp_get_post_value( 'regular_price' ),
-					'sale_price_amount'		 => mp_get_post_value( 'sale_price->amount' ),
-					'sale_price_start_date'	 => mp_get_post_value( 'sale_price->start_date' ),
-					'sale_price_end_date'	 => mp_get_post_value( 'sale_price->end_date' ),
-					'sale_price'			 => '', //array - to do
-					'weight_pounds'			 => mp_get_post_value( 'weight->pounds' ),
-					'weight_ounces'			 => mp_get_post_value( 'weight->ounces' ),
-					'weight'				 => '', //array - to do
-					'charge_shipping'		 => mp_get_post_value( 'charge_shipping' ),
-					'charge_tax'			 => mp_get_post_value( 'charge_tax' ),
-					'has_sale'				 => mp_get_post_value( 'has_sale' ),
-					'extra_shipping_cost'	 => mp_get_post_value( 'weight->extra_shipping_cost' ),
-					'special_tax_rate'		 => mp_get_post_value( 'special_tax_rate' ),
+					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
+					'sku'						 => $sku,
+					'track_inventory'			 => mp_get_post_value( 'track_inventory' ),
+					'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
+					'out_of_stock_purchase'		 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
+					'file_url'					 => '', //to do
+					'external_url'				 => '', //to do
+					'regular_price'				 => mp_get_post_value( 'regular_price' ),
+					'sale_price_amount'			 => mp_get_post_value( 'sale_price->amount' ),
+					'sale_price_start_date'		 => mp_get_post_value( 'sale_price->start_date' ),
+					'sale_price_end_date'		 => mp_get_post_value( 'sale_price->end_date' ),
+					'sale_price'				 => '', //array - to do
+					'weight_pounds'				 => mp_get_post_value( 'weight->pounds' ),
+					'weight_ounces'				 => mp_get_post_value( 'weight->ounces' ),
+					'weight'					 => '', //array - to do
+					'charge_shipping'			 => mp_get_post_value( 'charge_shipping' ),
+					'charge_tax'				 => mp_get_post_value( 'charge_tax' ),
+					'has_sale'					 => mp_get_post_value( 'has_sale' ),
+					'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
+					'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
 
@@ -997,6 +1015,7 @@ class MP_Products_Screen {
 			'context'	 => 'side',
 			'desc'		 => __( 'If you would like, you can choose specific related products instead of using the ones generated by MarketPress', 'mp' ),
 		) );
+
 		$metabox->add_field( 'post_select', array(
 			'name'			 => 'related_products',
 			'multiple'		 => true,
@@ -1120,8 +1139,13 @@ class MP_Products_Screen {
 			}
 
 			$metabox->add_field( 'checkbox', array(
-				'name'		 => 'charge_tax',
-				'message'	 => __( 'Charge Taxes', 'mp' ),
+				'name'			 => 'charge_tax',
+				'message'		 => __( 'Charge Taxes', 'mp' ),
+				'conditional'	 => array(
+					'name'	 => 'product_type',
+					'value'	 => array( 'physical', 'digital' ),
+					'action' => 'show',
+				),
 			) );
 
 			/* $metabox->add_field( 'text', array(
@@ -1164,8 +1188,13 @@ class MP_Products_Screen {
 			) );
 
 			$metabox->add_field( 'checkbox', array(
-				'name'		 => 'charge_shipping',
-				'message'	 => sprintf( __( 'Charge Shipping %1$s(not applicable to services and digital products)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+				'name'			 => 'charge_shipping',
+				'message'		 => sprintf( __( 'Charge Shipping %1$s(not applicable to services and digital products)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+				'conditional'	 => array(
+					'name'	 => 'product_type',
+					'value'	 => 'physical',
+					'action' => 'show',
+				),
 			) );
 
 			$weight = $metabox->add_field( 'complex', array(
@@ -1185,24 +1214,34 @@ class MP_Products_Screen {
 					'label_position' => 'up',
 					'label_type'	 => 'standard'
 				),
-				'class'			 => 'mp-product-shipping-holder mp-special-box'
+				'class'			 => ( 'metric' == mp_get_setting( 'shipping->system' ) ) ? 'mp-product-shipping-holder mp-special-box mp-system-metric' : 'mp-product-shipping-holder mp-special-box'
 			) );
 
 			if ( $weight instanceof WPMUDEV_Field ) {
-				$weight->add_field( 'text', array(
-					'name'		 => 'pounds',
-					'label'		 => array( 'text' => __( 'Pounds', 'mp' ) ),
-					'validation' => array(
-						'digits' => true,
-					),
-				) );
-				$weight->add_field( 'text', array(
-					'name'		 => 'ounces',
-					'label'		 => array( 'text' => __( 'Ounces', 'mp' ) ),
-					'validation' => array(
-						'digits' => true,
-					),
-				) );
+				if ( 'metric' == mp_get_setting( 'shipping->system' ) ) {
+					$weight->add_field( 'text', array(
+						'name'		 => 'pounds',
+						'label'		 => array( 'text' => __( 'Kilograms', 'mp' ) ),
+						'validation' => array(
+							'number' => true,
+						),
+					) );
+				} else {
+					$weight->add_field( 'text', array(
+						'name'		 => 'pounds',
+						'label'		 => array( 'text' => __( 'Pounds', 'mp' ) ),
+						'validation' => array(
+							'digits' => true,
+						),
+					) );
+					$weight->add_field( 'text', array(
+						'name'		 => 'ounces',
+						'label'		 => array( 'text' => __( 'Ounces', 'mp' ) ),
+						'validation' => array(
+							'digits' => true,
+						),
+					) );
+				}
 
 				$weight->add_field( 'text', array(
 					'name'			 => 'extra_shipping_cost',
@@ -1216,13 +1255,13 @@ class MP_Products_Screen {
 			}
 
 			$metabox->add_field( 'checkbox', array(
-				'name'		 => 'track_inventory',
-				'message'	 => __( 'Track Product Inventory', 'mp' ),
-			/* 'conditional'	 => array(
-			  'name'	 => 'product_type',
-			  'value'	 => 'physical',
-			  'action' => 'show',
-			  ), */
+				'name'			 => 'track_inventory',
+				'message'		 => __( 'Track Product Inventory', 'mp' ),
+				'conditional'	 => array(
+					'name'	 => 'product_type',
+					'value'	 => array( 'physical', 'digital' ),
+					'action' => 'show',
+				),
 			) );
 
 			$inventory = $metabox->add_field( 'complex', array(
@@ -1237,7 +1276,7 @@ class MP_Products_Screen {
 					'label_position' => 'up',
 					'label_type'	 => 'standard'
 				),
-				'class'			 => 'mp-product-inventory-holder mp-special-box'
+				'class'			 => 'mp-product-inventory-holder mp-special-box',
 			) );
 
 			if ( $inventory instanceof WPMUDEV_Field ) {
@@ -1284,6 +1323,11 @@ class MP_Products_Screen {
 				'options'		 => array(
 					'no'	 => __( 'This is a unique product without variations', 'mp' ),
 					'yes'	 => sprintf( __( 'This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+				),
+				'conditional'	 => array(
+					'name'	 => 'product_type',
+					'value'	 => array( 'physical', 'digital' ),
+					'action' => 'show',
 				),
 				'default_value'	 => 'no',
 			) );

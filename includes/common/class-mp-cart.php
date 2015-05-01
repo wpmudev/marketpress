@@ -1439,7 +1439,7 @@ class MP_Cart {
 				//calculate extra shipping
 				foreach ( $products as $product ) {
 					if ( !$product->is_download() ) {
-						$price += $product->get_meta( 'extra_shipping_cost' ) * $product->qty;
+						$price += $product->get_meta( 'weight_extra_shipping_cost' ) * $product->qty;
 					}
 				}
 	

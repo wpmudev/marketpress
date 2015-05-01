@@ -210,31 +210,12 @@ jQuery( document ).ready( function( $ ) {
         e.preventDefault( );
     } );
 
-    $( window ).keydown( function( event ) {
+    $( '#mp-product-price-inventory-variants-metabox' ).keydown( function( event ) {//window
         if ( event.keyCode == 13 ) {
             event.preventDefault();
             return false;
         }
     } );
-
-
-    /*$( '.field_more a' ).click( function( e ) {
-     
-     //$('.mp_more_popup').html($('#mp-product-price-inventory-variants-metabox').html());
-     
-     var post_id = $( this ).closest( 'tr' ).find( '.check-column-box' ).val();
-     
-     $.colorbox( {
-     href: "http://localhost/marketpress/wp-admin/post.php?post=1103&action=edit", //mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup', //mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup'mp_variation_popup
-     inline: true,
-     opacity: .7,
-     width: 500,
-     height: 235,
-     title: $( '#mp_more_popup_title_' + post_id ).html()
-     } );
-     
-     e.preventDefault();
-     } );*/
 
     $( '#variant_bulk_doaction' ).click( function() {
         var selected_variant_bulk_action = $( '.variant_bulk_selected' ).val();
@@ -560,14 +541,16 @@ jQuery( document ).ready( function( $ ) {
     $( 'body' ).live( 'mp-variation-popup-loaded', function() {
 
         $( '#variation_popup a.remove_popup_image' ).on( 'click', function( e ) {
-            var placeholder_image = $( this );
+
+            var placeholder_image = $( '#variation_popup .mp-variation-image img' );
+
             var post_id = $( '#variation_id' ).val();
             var table_placeholder_image = $( '#post-' + post_id ).find( '.mp-variation-image img' );
 
             table_placeholder_image.attr( 'src', mp_product_admin_i18n.placeholder_image );
             table_placeholder_image.attr( 'width', 30 );
             table_placeholder_image.attr( 'height', 30 );
-            
+
             placeholder_image.attr( 'src', mp_product_admin_i18n.placeholder_image );
             placeholder_image.attr( 'width', 75 );
             placeholder_image.attr( 'height', 75 );
@@ -587,11 +570,11 @@ jQuery( document ).ready( function( $ ) {
                 table_placeholder_image.attr( 'src', attachment.url );
                 table_placeholder_image.attr( 'width', 30 );
                 table_placeholder_image.attr( 'height', 30 );
-                
+
                 placeholder_image.attr( 'src', attachment.url );
                 placeholder_image.attr( 'width', 75 );
                 placeholder_image.attr( 'height', 75 );
-                
+
                 save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
             }
 
@@ -600,11 +583,11 @@ jQuery( document ).ready( function( $ ) {
                 table_placeholder_image.attr( 'src', attachment.url );
                 table_placeholder_image.attr( 'width', 30 );
                 table_placeholder_image.attr( 'height', 30 );
-                
+
                 placeholder_image.attr( 'src', attachment.url );
                 placeholder_image.attr( 'width', 75 );
                 placeholder_image.attr( 'height', 75 );
-                
+
                 save_inline_post_data( post_id, '_thumbnail_id', attachment.id, '' );
             };
 
@@ -697,11 +680,23 @@ jQuery( document ).ready( function( $ ) {
     $( '#save-variation-popup-data' ).live( 'click', function( e ) {
         var form = $( 'form#variation_popup' );
 
+        $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
+        $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
+
         $.post(
             //ajax_nonce: mp_product_admin_i18n.ajax_nonce
             //action: 'save_inline_post_data',
             mp_product_admin_i18n.ajaxurl, form.serialize()
             ).done( function( data, status ) {
+
+            var response = $.parseJSON( data );
+
+            if ( response.status_message !== '' ) {
+                $( '.mp_ajax_response' ).html( response.status_message );
+                $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
+                $( '.mp_ajax_response' ).addClass( 'mp_ajax_response_' + response.status );
+            }
+
             if ( status == 'success' ) {
                 console.log( response );
             } else {

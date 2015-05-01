@@ -449,6 +449,7 @@ class MP_Public {
 
 		//get download count
 		$download_count = mp_arr_get_value( $product_id, $cart->download_count );
+		
 		if ( false === $download_count ) {
 			$cart->download_count[ $product_id ] = 0;
 		}

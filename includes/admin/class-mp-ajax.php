@@ -114,7 +114,7 @@ class MP_Ajax {
 							<img width="75" height="75" src="<?php echo $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ); ?>" />
 						<?php }
 						?>
-						
+
 					</div>
 
 					<div class="mp-product-field-75 mp-variation-field mp-product-field-last">
@@ -186,7 +186,7 @@ class MP_Ajax {
 						</div>
 					<?php } ?>
 
-					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products  ?>
+					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical and Digital Products  ?>
 						<div class="fieldset_check">
 							<?php
 							$charge_shipping = MP_Product::get_variation_meta( $variation_id, 'charge_shipping', 0 );
@@ -197,15 +197,21 @@ class MP_Ajax {
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
 								<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products  ?>
-									<?php _e( 'Pounds:', 'mp' ); ?> <input placeholder="" type="text" name="weight[pounds]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_pounds' ) ); ?>"><br>
-									<?php _e( 'Ounces:', 'mp' ); ?> <input name="weight[ounces]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_ounces' ) ); ?>" class="mp-numeric "><br>
-								<?php } ?>
-								<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'extra_shipping_cost' ) ); ?>">
+									<?php if ( 'metric' == mp_get_setting( 'shipping->system' ) ) { ?>
+										<?php _e( 'Kilograms:', 'mp' ); ?> <input placeholder="" type="text" name="weight[pounds]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_pounds' ) ); ?>"><br>
+									<?php } else { ?>
+										<?php _e( 'Pounds:', 'mp' ); ?> <input placeholder="" type="text" name="weight[pounds]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_pounds' ) ); ?>"><br>
+										<?php _e( 'Ounces:', 'mp' ); ?> <input name="weight[ounces]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_ounces' ) ); ?>" class="mp-numeric "><br>
+									<?php
+									}
+								}
+								?>
+			<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_extra_shipping_cost' ) ); ?>">
 							</fieldset>
 						</div>
 					<?php } ?>
 
-					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products  ?>
+						<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products    ?>
 						<div class="fieldset_check">
 							<?php
 							$track_inventory = MP_Product::get_variation_meta( $variation_id, 'track_inventory', 0 );
@@ -215,20 +221,24 @@ class MP_Ajax {
 								<span><?php _e( 'Track Product Inventory', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
-								<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
+			<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
 								<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
 							</fieldset>
 						</div>
-					<?php } ?>
+		<?php } ?>
 
-					<div>
-
+					<div class="fieldset_check">
+						<label>
+							<span><?php _e( 'Description', 'mp' ); ?></span>
+							<textarea class="variation_description" name="description" id="description"><?php echo esc_html( MP_Product::get_variation_meta( $variation_id, 'description' ) ); ?></textarea>
+						</label>
 					</div>
 
 				</form>
 
 			</div>
 			<div class="mp_popup_controls mp_more_controls">
+				<span class="mp_ajax_response"></span>
 				<a href="" id="save-variation-popup-data" class="button button-primary save-more-form"><?php _e( 'Save ', 'mp' ); ?></a>
 				<a href="" class="preview button cancel"><?php _e( 'Cancel ', 'mp' ); ?></a>
 			</div>

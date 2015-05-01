@@ -134,6 +134,11 @@ div.mp-special-box{
     width: 15% !important;
 }
 
+.postbox.wpmudev-postbox .inside .mp-product-shipping-holder.mp-system-metric .wpmudev-field-complex-wrap .wpmudev-field-complex-label:first-child,
+.postbox.wpmudev-postbox .inside .mp-product-shipping-holder.mp-system-metric .wpmudev-field-complex-wrap .wpmudev-field-complex-label:nth-child(2){
+    width: 20% !important;
+}
+
 /* Remove main label in the complex field */
 .mp-product-sale-price-holder > .wpmudev-field-label:first-child,
 .mp-product-shipping-holder  > .wpmudev-field-label:first-child{
@@ -680,4 +685,27 @@ input.mp_inline_temp_value{
 .mp_popup_content input#file_url_button{
     width: 27%;
     margin-left: 1%;
+}
+
+.mp_ajax_response{
+    display: inline-block;
+    padding-top: 3px;
+}
+
+.mp_ajax_response_success{
+    color: green;
+}
+
+.mp_ajax_response_fail{
+    color: red;
+}
+
+#variation_popup .variation_description{
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+}
+
+#postimagediv{
+    display: none;
 }
