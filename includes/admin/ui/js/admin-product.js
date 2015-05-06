@@ -2,6 +2,12 @@ jQuery( document ).ready( function( $ ) {
 
     $( '#poststuff' ).append( '<div class="mp-admin-overlay"><div class="mp-variation-loading-spin"></div><div class="mp-variation-loading-message">' + mp_product_admin_i18n.creating_vatiations_message + '</div></div>' );
 
+    /*$( '#mp-product-type-select' ).on( 'change', function() {
+        if ( $( this ).val() == 'external' ) {
+            $('.mp-product-images-metabox').hide();
+        }
+    } );*/
+
     function mp_variation_message( ) {
         $( '.mp-variation-loading-spin' ).css( {
             position: 'fixed',
@@ -18,7 +24,7 @@ jQuery( document ).ready( function( $ ) {
     }
 
     $( window ).resize( function( ) {
-        mp_variation_message( );
+        mp_variation_message();
     } );
 
     $( window ).resize( );

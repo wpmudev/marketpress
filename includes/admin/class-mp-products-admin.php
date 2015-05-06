@@ -187,6 +187,25 @@ class MP_Products_Screen {
 
 		update_post_meta( $post_id, 'regular_price', $price );
 		update_post_meta( $post_id, 'sale_price_amount', $sale_price );
+
+		if ( isset( $_POST[ 'mp_product_images_indexes' ] ) ) {
+
+			$mp_product_images_indexes	 = $_POST[ 'mp_product_images_indexes' ];
+			$mp_product_images			 = explode( ',', $mp_product_images_indexes );
+
+			if ( !empty( $mp_product_images_indexes ) ) {
+				update_post_meta( $post_id, 'mp_product_images', $mp_product_images_indexes );
+
+				if ( isset( $mp_product_images[ 0 ] ) ) {
+					update_post_meta( $post_id, '_thumbnail_id', $mp_product_images[ 0 ] );
+				} else {
+					delete_post_meta( $post_id, '_thumbnail_id' );
+				}
+			}else{
+				delete_post_meta( $post_id, 'mp_product_images' );
+				delete_post_meta( $post_id, '_thumbnail_id' );
+			}
+		}
 	}
 
 	/**
@@ -373,7 +392,7 @@ class MP_Products_Screen {
 	public function init_metaboxes() {
 		$this->init_product_type_metabox();
 		$this->init_product_price_inventory_variants_metabox();
-		//$this->init_product_images_metabox();
+		$this->init_product_images_metabox();
 		//$this->init_product_details_metabox();
 //$this->init_variations_metabox();
 		$this->init_related_products_metabox();
@@ -1043,6 +1062,7 @@ class MP_Products_Screen {
 		) );
 		$metabox->add_field( 'select', array(
 			'name'			 => 'product_type',
+			'id'			 => 'mp-product-type-select',
 			'default_value'	 => 'physical',
 			'options'		 => array(
 				'physical'	 => __( 'Physical / Tangible Product', 'mp' ),
@@ -1200,11 +1220,6 @@ class MP_Products_Screen {
 			$weight = $metabox->add_field( 'complex', array(
 				'name'			 => 'weight',
 				'label'			 => array( 'text' => __( 'Weight', 'mp' ) ),
-				/* 'conditional'	 => array(
-				  'name'	 => 'product_type',
-				  'value'	 => 'physical',
-				  'action' => 'show',
-				  ), */
 				'conditional'	 => array(
 					'name'	 => 'charge_shipping',
 					'value'	 => 1,
@@ -1330,6 +1345,7 @@ class MP_Products_Screen {
 					'action' => 'show',
 				),
 				'default_value'	 => 'no',
+				'class'			 => 'mp_variations_select'
 			) );
 		}
 
@@ -1359,6 +1375,46 @@ class MP_Products_Screen {
 				'class'			 => 'mp_variations_box'
 			) );
 		}
+
+		$metabox->add_field( 'file', array(
+			'name'			 => 'file_url',
+			'label'			 => array( 'text' => __( 'File URL', 'mp' ) ),
+			//'placeholder'	 => __( 'Choose a file', 'mp' ),
+			'button_label'	 => 'Select a file',
+			'conditional'	 => array(
+				'action'	 => 'show',
+				'operator'	 => 'AND',
+				array(
+					'name'	 => 'product_type',
+					'value'	 => 'digital',
+				),
+				array(
+					'name'	 => 'has_variation',
+					'value'	 => 'no',
+				),
+			),
+			'class'			 => 'mp-product-field-50 mp-blank-bg'
+		) );
+
+		$metabox->add_field( 'text', array(
+			'name'			 => 'external_url',
+			'label'			 => array( 'text' => __( 'External Link', 'mp' ) ),
+			//'placeholder'	 => __( 'Choose a file', 'mp' ),
+			'button_label'	 => 'Insert a Link',
+			'conditional'	 => array(
+				'action'	 => 'show',
+				'operator'	 => 'AND',
+				array(
+					'name'	 => 'product_type',
+					'value'	 => 'external',
+				),
+				array(
+					'name'	 => 'has_variation',
+					'value'	 => 'no',
+				),
+			),
+			'class'			 => 'mp-product-field-50 mp-blank-bg'
+		) );
 	}
 
 	/**
@@ -1370,23 +1426,55 @@ class MP_Products_Screen {
 	public function init_product_images_metabox() {
 
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'		 => 'mp-product-images-metabox',
-			'title'		 => __( 'Images', 'mp' ),
-			'post_type'	 => MP_Product::get_post_type(),
-			'context'	 => 'normal',
+			'id'			 => 'mp-product-images-metabox',
+			'title'			 => sprintf( __( '%1$sPRODUCT IMAGES%2$s %3$sAdd images of the product. The first image on the list is the featured image for this product (you can reorder images on the list)%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'post_type'		 => MP_Product::get_post_type(),
+			'context'		 => 'normal',
+			'conditional'	 => array(
+				'action'	 => 'show',
+				'operator'	 => 'OR',
+				array(
+					'name'	 => 'has_variation',
+					'value'	 => 'no',
+				),
+				array(
+					'name'	 => 'product_type',
+					'value'	 => 'external',
+				),
+			),
 		) );
 
-		$repeater = $metabox->add_field( 'repeater', array(
+		$metabox->add_field( 'images', array(
 			'name'			 => 'product_images',
-			'layout'		 => 'table',
-			'add_row_label'	 => __( 'Add Image', 'mp' ),
+			'label'			 => '', //array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+			//'message'	 => __( 'Images', 'mp' ),
+			'conditional'	 => array(
+				'action'	 => 'hide',
+				'operator'	 => 'OR',
+				array(
+					'name'	 => 'product_type',
+					'value'	 => 'external',
+				),
+				array(
+					'name'	 => 'has_variation',
+					'value'	 => 'yes',
+				),
+			),
+			'class'			 => 'mp_product_images'
 		) );
 
-		if ( $repeater instanceof WPMUDEV_Field ) {
-			$repeater->add_sub_field( 'image', array(
-				'name' => 'product_image',
-			) );
-		}
+		/* $repeater = $metabox->add_field( 'repeater', array(
+		  'name'			 => 'product_images',
+		  'layout'		 => 'rows',
+		  'add_row_label'	 => __( 'Add Image', 'mp' ),
+		  'class' => 'mp_product_images'
+		  ) );
+
+		  if ( $repeater instanceof WPMUDEV_Field ) {
+		  $repeater->add_sub_field( 'image', array(
+		  'name' => 'product_image',
+		  ) );
+		  } */
 	}
 
 	/**

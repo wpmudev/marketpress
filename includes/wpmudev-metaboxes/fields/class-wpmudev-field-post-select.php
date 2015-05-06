@@ -23,7 +23,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 			'placeholder' => __('Select Posts', 'mp')
 		), $args);
 		
-		//$this->args['class'] .= ' wpmudev-post-select';	
+		$this->args['class'] .= ' wpmudev-post-select';	
 		$this->args['custom']['data-placeholder'] = $this->args['placeholder'];
 		$this->args['custom']['data-multiple'] = (int) $this->args['multiple'];
 		$this->args['custom']['data-query'] = http_build_query($this->args['query']);
