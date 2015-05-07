@@ -1083,8 +1083,8 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 		if ( empty( $state ) ) {
 			$state = mp_get_setting( 'base_province' );
 		}
-
-		switch ( mp_get_setting( 'base_country' ) ) {
+		
+		switch ( $country ) {//mp_get_setting( 'base_country' )
 			case 'US':
 				// USA taxes are only for orders delivered inside the state
 				if ( $country == 'US' && $state == mp_get_setting( 'base_province' ) ) {
@@ -1116,9 +1116,9 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 					}
 				} else {
 					//all other countries use the tax outside preference
-					if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
+					//if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
 						$tax_rate = (float) mp_get_setting( 'tax->rate' );
-					}
+					//}
 				}
 				break;
 		}

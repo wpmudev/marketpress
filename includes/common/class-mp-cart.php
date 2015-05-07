@@ -225,7 +225,7 @@ class MP_Cart {
 				}
 			}
 		}
-		
+
 		if ( is_null( $item_id ) ) {
 			wp_send_json_error();
 		}
@@ -305,13 +305,13 @@ class MP_Cart {
 		}
 
 		$this->_cookie_id	 = 'mp_globalcart_' . COOKIEHASH;
-		$this->_items = array( $this->_id => array() );
+		$this->_items		 = array( $this->_id => array() );
 
 		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
 			$this->_items = unserialize( $cart_cookie );
 		}
 	}
-	
+
 	/**
 	 * Check if a given item ID is a global item ID
 	 *
@@ -344,13 +344,13 @@ class MP_Cart {
 	 */
 	public function get_blog_ids() {
 		$carts = $this->get_all_items();
-		
+
 		foreach ( $carts as $cart_id => $items ) {
 			if ( empty( $items ) ) {
 				unset( $carts[ $cart_id ] );
 			}
 		}
-		
+
 		return array_keys( $carts );
 	}
 
@@ -414,10 +414,10 @@ class MP_Cart {
 	 * @return string
 	 */
 	public function get_line_item( $product ) {
-		if ( ! $product instanceof MP_Product ) {
+		if ( !$product instanceof MP_Product ) {
 			$product = new MP_Product( $product );
 		}
-		
+
 		$id = ( $this->is_global ) ? $product->global_id() : $product->ID;
 
 		/**
@@ -638,7 +638,7 @@ class MP_Cart {
 
 		$this->is_editable = $editable;
 
-		if ( ! $this->has_items() ) {
+		if ( !$this->has_items() ) {
 			$message = sprintf( __( 'There are no items in your cart - <a href="%s">go add some</a>!', 'mp' ), mp_store_page_url( 'products', false ) );
 
 			/**
@@ -656,7 +656,7 @@ class MP_Cart {
 				return $message;
 			}
 		}
-		
+
 		if ( $editable ) {
 			$html .= '
 				<form id="mp-cart-form" method="post">';
@@ -696,7 +696,7 @@ class MP_Cart {
 				<div id="mp-cart" class="' . implode( ' ', $classes ) . '">';
 
 		$blog_ids = $this->get_blog_ids();
-		
+
 		while ( 1 ) {
 			if ( $this->is_global ) {
 				$blog_id = array_shift( $blog_ids );
@@ -706,16 +706,16 @@ class MP_Cart {
 						<h3 class="mp-cart-store-name"><a href="' . get_home_url( $this->_id ) . '">' . get_option( 'blogname' ) . '</a></h3>
 						<div class="mp-cart-store-items">';
 			}
-			
+
 			$products = $this->get_items_as_objects();
 			foreach ( $products as $product ) {
 				$html .= $this->get_line_item( $product );
 			}
-			
+
 			if ( $this->is_global ) {
 				$html .= '
 						</div>';
-				
+
 				/**
 				 * Filter the html after each store cart items
 				 *
@@ -725,15 +725,15 @@ class MP_Cart {
 				 * @param array $args The arguments that were passed to the display method.				 
 				 */
 				$after_cart_store_items_html = apply_filters( 'mp_cart/after_cart_store_html', '', $this, $args );
-				$after_cart_store_items_html = apply_filters( 'mp_cart/after_cart_store_html/' . $blog_id, $after_cart_store_items_html, $this, $args ); 
-				
+				$after_cart_store_items_html = apply_filters( 'mp_cart/after_cart_store_html/' . $blog_id, $after_cart_store_items_html, $this, $args );
+
 				$html .= $after_cart_store_items_html;
-				
+
 				$html .= '
 					</div>';
 			}
-			
-			if ( ($this->is_global && false === current( $blog_ids )) || ! $this->is_global ) {
+
+			if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global ) {
 				$this->reset_id();
 				break;
 			}
@@ -1122,7 +1122,7 @@ class MP_Cart {
 				}
 			}
 		} else {
-			$items		 = $this->get_items();
+			$items = $this->get_items();
 			if ( count( $items ) > 0 ) {
 				return true;
 			}
@@ -1142,26 +1142,26 @@ class MP_Cart {
 		if ( !is_null( $this->_is_download_only ) ) {
 			return $this->_is_download_only;
 		}
-		
-		$blog_ids = $this->get_blog_ids();
+
+		$blog_ids				 = $this->get_blog_ids();
 		$this->_is_download_only = true;
-		
+
 		while ( 1 ) {
 			if ( $this->is_global ) {
 				$blog_id = array_shift( $blog_ids );
 				$this->set_id( $blog_id );
 			}
-			
+
 			$items = $this->get_items();
-			
+
 			foreach ( $items as $item_id => $qty ) {
 				$product = new MP_Product( $item_id );
-				if ( ! $product->is_download() ) {
+				if ( !$product->is_download() ) {
 					$this->_is_download_only = false;
 				}
 			}
-			
-			if ( ($this->is_global && false === current( $blog_ids )) || ! $this->is_global || ! $this->_is_download_only ) {
+
+			if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global || !$this->_is_download_only ) {
 				$this->reset_id();
 				break;
 			}
@@ -1282,7 +1282,7 @@ class MP_Cart {
 			list( $blog_id, $item_id ) = explode( '.', $item_id );
 			$this->set_id( $blog_id );
 		}
-		
+
 		if ( mp_arr_get_value( $this->_id . '->' . $item_id, $this->_items ) ) {
 			/**
 			 * Fires right before an item has been removed from the cart
@@ -1293,10 +1293,10 @@ class MP_Cart {
 			 * @param int The ID of the site the item was removed from.
 			 */
 			do_action( 'mp_cart/before_remove_item', $item_id, $this->_id );
-			
+
 			unset( $this->_items[ $this->_id ][ $item_id ] );
 			$this->_update_cart_cookie();
-			
+
 			/**
 			 * Fires after an item has been removed from the cart
 			 *
@@ -1307,7 +1307,7 @@ class MP_Cart {
 			 */
 			do_action( 'mp_cart/after_remove_item', $item_id, $this->_id );
 		}
-		
+
 		$this->reset_id();
 	}
 
@@ -1321,10 +1321,10 @@ class MP_Cart {
 		if ( is_null( $this->_id_original ) ) {
 			return;
 		}
-		
-		$this->_id = $this->_id_original;
-		$this->_id_original = null;
-		
+
+		$this->_id			 = $this->_id_original;
+		$this->_id_original	 = null;
+
 		if ( $this->is_global ) {
 			switch_to_blog( $this->_id );
 		}
@@ -1343,7 +1343,7 @@ class MP_Cart {
 		}
 
 		$this->_id = $id;
-		
+
 		if ( $this->is_global ) {
 			switch_to_blog( $this->_id );
 		}
@@ -1358,15 +1358,15 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function shipping_tax_total( $format = false ) {
-		$shipping_tax = 0;
-		$shipping_price = $this->shipping_total();
+		$shipping_tax	 = 0;
+		$shipping_price	 = $this->shipping_total();
 
 		if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$shipping_tax = ($shipping_price - mp_before_tax_price( $shipping_price ));
 			} else {
-				$tax_rate = mp_tax_rate();
-				$shipping_tax = ($shipping_price * $tax_rate);
+				$tax_rate		 = mp_tax_rate();
+				$shipping_tax	 = ($shipping_price * $tax_rate);
 			}
 		}
 
@@ -1393,37 +1393,37 @@ class MP_Cart {
 	public function shipping_total( $format = false ) {
 		if ( false === mp_arr_get_value( 'shipping', $this->_total ) ) {
 			$this->_total[ 'shipping' ] = 0;
-			
+
 			//get address
-			$what = ( mp_get_user_address( 'shipping' ) != mp_get_user_address( 'billing' ) ) ? 'shipping' : 'billing';
-			$address1 = mp_get_user_address_part( 'address1', $what );
-			$address2 = mp_get_user_address_part( 'address2', $what );
-			$city = mp_get_user_address_part( 'city', $what );
-			$state = mp_get_user_address_part( 'state', $what );
-			$zip = mp_get_user_address_part( 'zip', $what );
-			$country = mp_get_user_address_part( 'country', $what );
+			$what		 = ( mp_get_user_address( 'shipping' ) != mp_get_user_address( 'billing' ) ) ? 'shipping' : 'billing';
+			$address1	 = mp_get_user_address_part( 'address1', $what );
+			$address2	 = mp_get_user_address_part( 'address2', $what );
+			$city		 = mp_get_user_address_part( 'city', $what );
+			$state		 = mp_get_user_address_part( 'state', $what );
+			$zip		 = mp_get_user_address_part( 'zip', $what );
+			$country	 = mp_get_user_address_part( 'country', $what );
 
 			//check required fields
 			if ( empty( $address1 ) || empty( $city ) || !mp_is_valid_zip( $zip, $country ) || empty( $country ) || !$this->has_items() ) {
 				return false;
 			}
-			
-			$blog_ids = $this->get_blog_ids();
-			$shipping_plugins = MP_Shipping_API::get_active_plugins();
-			
+
+			$blog_ids			 = $this->get_blog_ids();
+			$shipping_plugins	 = MP_Shipping_API::get_active_plugins();
+
 			while ( 1 ) {
 				$selected_sub_option = mp_get_session_value( 'mp_shipping_info->shipping_sub_option', null );
-				$selected_option = mp_get_session_value( 'mp_shipping_info->shipping_option' );				
-				
+				$selected_option	 = mp_get_session_value( 'mp_shipping_info->shipping_option' );
+
 				if ( $this->is_global ) {
-					$blog_id = array_shift( $blog_ids );
+					$blog_id			 = array_shift( $blog_ids );
 					$this->set_id( $blog_id );
 					$selected_sub_option = mp_get_session_value( "mp_shipping_info->shipping_sub_option->{$blog_id}", null );
-					$selected_option = mp_get_session_value( "mp_shipping_info->shipping_option->{$blog_id}" );									
+					$selected_option	 = mp_get_session_value( "mp_shipping_info->shipping_option->{$blog_id}" );
 				}
 
-				$products = $this->get_items_as_objects();
-				$total = $this->product_total();
+				$products	 = $this->get_items_as_objects();
+				$total		 = $this->product_total();
 
 				//don't charge shipping if only digital products
 				if ( $this->is_download_only() ) {
@@ -1435,21 +1435,21 @@ class MP_Cart {
 					//shipping plugins tie into this to calculate their shipping cost
 					$price = (float) apply_filters( 'mp_calculate_shipping_' . mp_get_setting( 'shipping->method' ), 0, $total, $this, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 				}
-				
+
 				//calculate extra shipping
 				foreach ( $products as $product ) {
 					if ( !$product->is_download() ) {
 						$price += $product->get_meta( 'weight_extra_shipping_cost' ) * $product->qty;
 					}
 				}
-	
+
 				if ( empty( $price ) ) {
 					$price = 0;
 				}
 
 				$this->_total[ 'shipping' ] += $price;
-				
-				if ( ($this->is_global && false === current( $blog_ids )) || ! $this->is_global ) {
+
+				if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global ) {
 					$this->reset_id();
 					break;
 				}
@@ -1477,22 +1477,22 @@ class MP_Cart {
 	 * @return float
 	 */
 	public function shipping_weight() {
-		$blog_ids = $this->get_blog_ids();
-		$weight = 0;
-		
+		$blog_ids	 = $this->get_blog_ids();
+		$weight		 = 0;
+
 		while ( 1 ) {
 			if ( $this->is_global ) {
 				$blog_id = array_shift( $blog_ids );
-				$this->set_id( $blog_id );	
+				$this->set_id( $blog_id );
 			}
-			
+
 			$products = $this->get_items_as_objects();
-			
+
 			foreach ( $products as $product ) {
 				$weight += $product->get_weight();
 			}
-			
-			if ( ($this->is_global && false === current( $blog_ids )) || ! $this->is_global ) {
+
+			if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global ) {
 				$this->reset_id();
 				break;
 			}
@@ -1520,9 +1520,9 @@ class MP_Cart {
 	public function tax_total( $format = false, $estimate = false ) {
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
-			
+
 			//get address
-			$state = mp_get_user_address_part( 'state', 'shipping' );
+			$state	 = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
 
 			if ( $estimate ) {
@@ -1534,45 +1534,50 @@ class MP_Cart {
 					$state = mp_get_setting( 'base_province' );
 				}
 			}
-			
-			if ( empty( $country ) || ! $this->has_items() ) {
+
+			if ( empty( $country ) || !$this->has_items() ) {
 				return false;
 			}
 
 			$blog_ids = $this->get_blog_ids();
-			
+
 			while ( 1 ) {
-				$total = $special_total = 0;
-				
+				$total			 = $special_total	 = 0;
+
 				if ( $this->is_global ) {
 					$blog_id = array_shift( $blog_ids );
 					$this->set_id( $blog_id );
 				}
-				
+
 				$items = $this->get_items_as_objects();
+
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
-					if ( ! mp_get_setting( 'tax->tax_digital' ) && $item->is_download() ) {
-						continue;
+					if ( $item->is_download() && $item->special_tax_amt() ) {
+						
+					} else {
+						if ( !mp_get_setting( 'tax->tax_digital' ) && $item->is_download() ) {
+							continue;
+						}
 					}
-					
+
 					if ( $special_tax_amt = $item->special_tax_amt() ) {
 						$special_total += $special_tax_amt * $item->qty;
 					} else {
 						$total += $item->before_tax_price() * $item->qty;
 					}
 				}
-				
+
 				if ( ($total + $special_total) <= 0 ) {
 					break;
 				}
-				
+
 				// Calculate regular tax
 				$tax_amt += ($total * mp_tax_rate());
-				
+
 				// Add in special tax
 				$tax_amt += $special_total;
-				
+
 				// Add in shipping?
 				$tax_amt += $this->shipping_tax_total();
 
@@ -1588,14 +1593,14 @@ class MP_Cart {
 				 */
 				$tax_amt = apply_filters( 'mp_tax_price', $tax_amt, $total, $this, $country, $state );
 				$tax_amt = apply_filters( 'mp_cart/tax_total', $tax_amt, $total, $this, $country, $state );
-				
-				if ( ($this->is_global && false === current( $blog_ids )) || ! $this->is_global ) {
+
+				if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global ) {
 					$this->reset_id();
 					break;
 				}
 			}
-			
-			$this->_total['tax'] = $tax_amt;
+
+			$this->_total[ 'tax' ] = $tax_amt;
 		}
 
 		$tax_total = mp_arr_get_value( 'tax', $this->_total, 0 );

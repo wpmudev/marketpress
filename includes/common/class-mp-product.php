@@ -1137,8 +1137,8 @@ class MP_Product {
 	 */
 	public function special_tax_amt( $echo = false ) {
 		$special_tax_rate = $this->get_meta( 'special_tax_rate', '' );
-
-		if ( empty( $special_tax_rate ) ) {
+		
+		if ( empty( $special_tax_rate ) || $this->get_meta( 'charge_tax' ) !== '1' ) {
 			return false;
 		}
 
@@ -1449,7 +1449,7 @@ class MP_Product {
 			$product_type	 = $parent->get_meta( 'product_type' );
 		}
 
-		return ( 'digital' == $product_type && $this->get_meta( 'file_url' ) );
+		return ( 'digital' == $product_type );//&& $this->get_meta( 'file_url' )
 	}
 
 	/**

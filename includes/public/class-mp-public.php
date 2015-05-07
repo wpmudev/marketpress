@@ -453,12 +453,13 @@ class MP_Public {
 		if ( false === $download_count ) {
 			$cart->download_count[ $product_id ] = 0;
 		}
+		
 		$download_count = (int) $download_count;
 		
 		//check for too many downloads
 		$max_downloads = mp_get_setting( 'max_downloads', 5 );
 		if ( $download_count >= $max_downloads ) {
-			wp_die( sprintf( __( 'Sorry, our records show you\'ve downloaded this file %d out of %d times allowed. Please contact us if you still need help.', 'mp' ), $download_count ), $max_downloads );
+			wp_die( sprintf( __( 'Sorry, our records show you\'ve downloaded this file %d out of %d times allowed. Please contact us if you still need help.', 'mp' ), $download_count, $max_downloads ) );
 		}
 
 		/**

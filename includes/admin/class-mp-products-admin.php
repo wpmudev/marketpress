@@ -1160,7 +1160,7 @@ class MP_Products_Screen {
 
 			$metabox->add_field( 'checkbox', array(
 				'name'			 => 'charge_tax',
-				'message'		 => __( 'Charge Taxes', 'mp' ),
+				'message'		 => __( 'Charge Taxes (Special Rate)', 'mp' ),
 				'conditional'	 => array(
 					'name'	 => 'product_type',
 					'value'	 => array( 'physical', 'digital' ),
@@ -1209,7 +1209,7 @@ class MP_Products_Screen {
 
 			$metabox->add_field( 'checkbox', array(
 				'name'			 => 'charge_shipping',
-				'message'		 => sprintf( __( 'Charge Shipping %1$s(not applicable to services and digital products)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+				'message'		 => __( 'Charge Shipping', 'mp' ),
 				'conditional'	 => array(
 					'name'	 => 'product_type',
 					'value'	 => 'physical',

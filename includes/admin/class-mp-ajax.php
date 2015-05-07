@@ -177,7 +177,7 @@ class MP_Ajax {
 							?>
 							<label>
 								<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>> 
-								<span><?php _e( 'Charge Taxes', 'mp' ); ?></span>
+								<span><?php _e( 'Charge Taxes (Special Rate)', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_charge_tax" class="has_area">
 								<div class="wpmudev-field-desc"><?php _e( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ); ?></div>
