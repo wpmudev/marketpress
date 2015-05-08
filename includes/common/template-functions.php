@@ -500,8 +500,8 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 			$formatted = $symbol;
 		} else {
 			// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
-			$amount = (float) $amount;
-			$price_holder_arguments_string = '';
+			$amount							 = (float) $amount;
+			$price_holder_arguments_string	 = '';
 			if ( is_array( $price_holder_arguments ) && count( $price_holder_arguments ) > 0 ) {
 				foreach ( $price_holder_arguments as $argument_name => $argument_value ) {
 					$price_holder_arguments_string .= ' ' . esc_attr( $argument_name ) . '="' . esc_attr( $argument_value ) . '" ';
@@ -862,18 +862,18 @@ if ( !function_exists( 'mp_get_user_address_part' ) ) :
 
 		if ( 'first_name' == $what || 'last_name' == $what ) {
 			if ( 'first_name' == $what ) {
-				$first_name = mp_get_session_value( "mp_shipping_info->first_name", mp_arr_get_value( 'first_name', $meta, '' ) );
+				$first_name = mp_get_session_value( "mp_" . $type . "_info->first_name", mp_arr_get_value( 'first_name', $meta, '' ) );
 				if ( !empty( $first_name ) ) {
 					return $first_name;
 				}
 			} else {
-				$last_name = mp_get_session_value( "mp_shipping_info->last_name", mp_arr_get_value( 'last_name', $meta, '' ) );
+				$last_name = mp_get_session_value( "mp_" . $type . "_info->last_name", mp_arr_get_value( 'last_name', $meta, '' ) );
 				if ( !empty( $last_name ) ) {
 					return $last_name;
 				}
 			}
 
-			$name		 = mp_get_session_value( "mp_shipping_info->name", mp_arr_get_value( 'name', $meta, '' ) );
+			$name		 = mp_get_session_value( "mp_" . $type . "_info->name", mp_arr_get_value( 'name', $meta, '' ) );
 			$name_parts	 = explode( ' ', $name );
 
 			if ( 'first_name' == $what ) {
@@ -882,7 +882,7 @@ if ( !function_exists( 'mp_get_user_address_part' ) ) :
 				return mp_arr_get_value( '1', $name_parts, '' );
 			}
 		} else {
-			return mp_get_session_value( "mp_shipping_info->{$what}", mp_arr_get_value( $what, $meta, '' ) );
+			return mp_get_session_value( "mp_" . $type . "_info->{$what}", mp_arr_get_value( $what, $meta, '' ) );
 		}
 	}
 
@@ -1043,7 +1043,7 @@ if ( !function_exists( 'mp_store_page_url' ) ) :
 	 */
 	function mp_store_page_url( $page, $echo = true ) {
 		$url	 = $append	 = '';
-		
+
 		if ( $page == 'confirm_order' ) {
 			$append	 = 'confirm/';
 			$page	 = 'checkout';
@@ -1083,7 +1083,7 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 		if ( empty( $state ) ) {
 			$state = mp_get_setting( 'base_province' );
 		}
-		
+
 		switch ( $country ) {//mp_get_setting( 'base_country' )
 			case 'US':
 				// USA taxes are only for orders delivered inside the state
@@ -1117,7 +1117,7 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 				} else {
 					//all other countries use the tax outside preference
 					//if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
-						$tax_rate = (float) mp_get_setting( 'tax->rate' );
+					$tax_rate = (float) mp_get_setting( 'tax->rate' );
 					//}
 				}
 				break;
@@ -1950,6 +1950,8 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	function mp_send_email( $email, $subject, $msg ) {
 		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
 	}
+
+
 
 
 

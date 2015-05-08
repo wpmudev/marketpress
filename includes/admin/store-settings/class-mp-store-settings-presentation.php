@@ -511,7 +511,7 @@ jQuery(document).ready(function($){
 			'name' => 'show_quantity',
 			'label' => array('text' => __('Show Quantity Field?', 'mp')),
 			'message' => __('Yes', 'mp'),
-			'desc' => __('If enabled, users will be able to choose how many of the product they want to purchase before adding to their cart.', 'mp'),
+			'desc' => __('If enabled, users will be able to choose how many of the product they want to purchase before adding to their cart. If not checked, quantity could be change later on the cart page.', 'mp'),
 		));
 		$metabox->add_field('checkbox', array(
 			'name' => 'show_img',
@@ -632,7 +632,7 @@ jQuery(document).ready(function($){
 		
 		$metabox->add_field('radio_group', array(
 			'name' => 'store_theme',
-			'desc' => sprintf(__('This option changes the built-in css styles for store pages. For a custom css style, save your css file with the "MarketPress Style: NAME" header in the <strong>"%s"</strong> folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a target="_blank" href="%s">here &raquo;</a>.', 'mp'), WP_CONTENT_DIR . 'marketpress-styles/', mp_plugin_url('ui/themes/Theming_MarketPress.txt')), 
+			'desc' => sprintf(__('This option changes the built-in css styles for store pages. For a custom css style, save your css file with the <strong>/* MarketPress Style: Your CSS Theme Name Here */</strong> header line in the <strong>"%s"</strong> folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a target="_blank" href="%s">here &raquo;</a>.', 'mp'), trailingslashit(WP_CONTENT_DIR) . 'marketpress-styles/', mp_plugin_url('ui/themes/Theming_MarketPress.txt')), 
 			'label' => array('text' => __('Store Style', 'mp')),
 			'options' => mp_get_theme_list() + array('none' => __('None - Custom Theme Template', 'mp')),
 			'width' => '50%',

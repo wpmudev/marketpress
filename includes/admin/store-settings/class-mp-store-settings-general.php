@@ -285,7 +285,7 @@ jQuery( document ).ready( function( $ ){
 		$metabox->add_field('checkbox', array(
 			'name' => 'download_order_limit',
 			'label' => array('text' => __('Limit Digital Products Per-order?', 'mp')),
-			'desc' => __('This will prevent multiples of the same downloadable product form being added to the cart. Per-product custom limits will override this.', 'mp'),
+			'desc' => __('This will prevent multiples of the same downloadable product form being added to the cart.', 'mp'),
 			'message' => __('Yes', 'mp'),
 		));
 	}

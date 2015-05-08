@@ -353,12 +353,20 @@ class MP_Product {
 		}
 
 		$input_id = 'mp_product_options_att_quantity';
+
+		$product = new MP_Product( $this->ID );
+		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+			$disabled = 'disabled';
+		} else {
+			$disabled = '';
+		}
+
 		$html .= '
 				<div class="mp_product_options_att"' . (( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"') . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="clearfix">
 						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
-							<input id="' . $input_id . '" class="required digits" type="number" name="product_quantity" value="1" />
+							<input id="' . $input_id . '" class="required digits" type="number" name="product_quantity" value="1" ' . $disabled . '  />
 						</label>
 					</div>
 				</div>
@@ -1137,7 +1145,7 @@ class MP_Product {
 	 */
 	public function special_tax_amt( $echo = false ) {
 		$special_tax_rate = $this->get_meta( 'special_tax_rate', '' );
-		
+
 		if ( empty( $special_tax_rate ) || $this->get_meta( 'charge_tax' ) !== '1' ) {
 			return false;
 		}
@@ -1449,7 +1457,7 @@ class MP_Product {
 			$product_type	 = $parent->get_meta( 'product_type' );
 		}
 
-		return ( 'digital' == $product_type );//&& $this->get_meta( 'file_url' )
+		return ( 'digital' == $product_type ); //&& $this->get_meta( 'file_url' )
 	}
 
 	/**
@@ -1605,14 +1613,14 @@ Notification Preferences: %s', 'mp' );
 	public static function get_variation_meta( $variation_id, $meta_key = '', $default = '' ) {
 		if ( $meta_key == '' ) {
 			$meta_value = get_post_meta( $variation_id );
-		}else{
+		} else {
 			$meta_value = get_post_meta( $variation_id, $meta_key, true );
 		}
-		
-		if(empty($meta_value)){
+
+		if ( empty( $meta_value ) ) {
 			$meta_value = $default;
 		}
-		
+
 		return $meta_value;
 	}
 

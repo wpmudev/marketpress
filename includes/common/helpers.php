@@ -21,9 +21,9 @@ if ( !function_exists( 'mp_search_array' ) ) :
 
 		if ( is_array( $array ) ) {
 			if ( isset( $array[ $key ] ) && $array[ $key ] == $value )
-				$results[] = $array;
+				$results[]	 = $array;
 			foreach ( $array as $subarray )
-				$results = array_merge( $results, mp_search_array( $subarray, $key, $value ) );
+				$results	 = array_merge( $results, mp_search_array( $subarray, $key, $value ) );
 		}
 
 		return $results;
@@ -154,7 +154,7 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 			if ( $order->get_meta( "mp_{$type}_info->address2" ) ) {
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address2" ) . "<br />\n";
 			}
-
+		
 			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $order->get_meta( "mp_{$type}_info->state" ) . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $order->get_meta( "mp_{$type}_info->country" ) . "<br /><br />\n";
 			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
 
@@ -1262,6 +1262,10 @@ if ( !function_exists( 'mp_get_store_caps' ) ) :
 
 		return $store_caps;
 	}
+
+
+
+
 
 
 

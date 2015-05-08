@@ -133,7 +133,12 @@ class MP_Cart {
 	 */
 	public function add_item( $item_id, $qty = 1 ) {
 		if ( $in_cart = $this->has_item( $item_id ) ) {
-			$qty += $in_cart;
+			$product = new MP_Product( $item_id );
+			if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+				$qty = 1;
+			} else {
+				$qty += $in_cart;
+			}
 		}
 
 		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
@@ -458,12 +463,17 @@ class MP_Cart {
 
 				case 'qty' :
 					if ( $this->is_editable ) {
-						$column_html = $this->dropdown_quantity( array(
-							'echo'		 => false,
-							'class'		 => 'mp_select2',
-							'name'		 => 'mp_cart_qty[' . $product->ID . ']',
-							'selected'	 => $product->qty,
-						) ) . '<br />
+						if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+							$column_html = $product->qty;
+						} else {
+							$column_html = $this->dropdown_quantity( array(
+								'echo'		 => false,
+								'class'		 => 'mp_select2',
+								'name'		 => 'mp_cart_qty[' . $product->ID . ']',
+								'selected'	 => $product->qty,
+							) );
+						}
+						$column_html .= '<br />
 						<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $id . ')">' . __( 'Remove', 'mp' ) . '</a>';
 					} else {
 						$column_html = $product->qty;
@@ -1655,6 +1665,11 @@ class MP_Cart {
 	 * @param int $qty The qty to update the item to.
 	 */
 	public function update_item( $item_id, $qty ) {
+		$product = new MP_Product( $item_id );
+		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+			$qty = 1;
+		}
+
 		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
 		$this->_update_cart_cookie();
 	}
