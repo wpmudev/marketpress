@@ -633,13 +633,15 @@ if ( !function_exists( 'mp_get_user_address' ) ) :
 			return false;
 		}
 
-		foreach ( $data as $k => $v ) {
-			switch ( $k ) {
-				case 'shipping_option' :
-				case 'shipping_sub_option' :
-				case 'shipping_cost' :
-					unset( $data[ $k ] );
-					break;
+		if ( !empty( $data ) ) {
+			foreach ( $data as $k => $v ) {
+				switch ( $k ) {
+					case 'shipping_option' :
+					case 'shipping_sub_option' :
+					case 'shipping_cost' :
+						unset( $data[ $k ] );
+						break;
+				}
 			}
 		}
 
@@ -1950,6 +1952,8 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	function mp_send_email( $email, $subject, $msg ) {
 		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
 	}
+
+
 
 
 

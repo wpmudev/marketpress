@@ -177,6 +177,8 @@ class MP_Admin {
 	public function enqueue_styles_scripts() {
 		global $pagenow, $post_type, $mp;
 
+		//wp_enqueue_script( 'mp-chosen', mp_plugin_url( 'includes/admin/ui/chosen/chosen.jquery.min.js' ), array( 'jquery' ), MP_VERSION );
+
 		if ( !empty( $pagenow ) && ('post-new.php' === $pagenow || 'post.php' === $pagenow ) ) {
 			if ( $post_type == MP_Product::get_post_type() ) {
 				wp_enqueue_style( 'mp-font-awesome', mp_plugin_url( 'includes/admin/ui/css/font-awesome.min.css' ), array(), MP_VERSION );

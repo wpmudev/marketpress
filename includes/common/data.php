@@ -421,7 +421,6 @@ $this->countries = array(
   'WF' => 'Wallis And Futuna Islands',
   'EH' => 'Western Sahara',
   'YE' => 'Yemen',
-  'YU' => 'Yugoslavia',
   'ZM' => 'Zambia',
   'ZW' => 'Zimbabwe'
 );
