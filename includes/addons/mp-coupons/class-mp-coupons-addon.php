@@ -390,7 +390,7 @@ class MP_Coupons_Addon {
 			}
 
 			$coupons = $this->get_applied_as_objects();
-
+			
 			foreach ( $coupons as $coupon ) {
 				$amt += $coupon->discount_amt( false, false );
 			}
@@ -981,7 +981,7 @@ class MP_Coupons_Addon {
 			case 'valid_dates' :
 				echo $coupon->get_meta( 'start_date' ) . ' &mdash;<br />';
 
-				if ( ($end = $coupon->get_meta( 'end_date' )) && $this->get_meta( 'has_end_date' ) ) {
+				if ( ($end = $coupon->get_meta( 'end_date' )) && $coupon->get_meta( 'has_end_date' ) ) {
 					echo $end;
 				} else {
 					_e( 'No end', 'mp' );

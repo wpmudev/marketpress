@@ -798,7 +798,7 @@ class MP_Orders_Admin {
 						} elseif ( $key == 'code' ) {
 							$html .= ' (' . strtoupper( $val ) . ')';
 						} else {
-							$html .= mp_format_currency( '', $val ) . ' (' . $key . ')';
+							$html .= mp_format_currency( '', $val ) . ' (' . $key . ')<br />';
 						}
 					}
 				} else {

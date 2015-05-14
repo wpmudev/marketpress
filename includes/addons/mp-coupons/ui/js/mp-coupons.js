@@ -57,9 +57,9 @@ var mp_coupons = {};
 				marketpress.ajaxEvent( 'mp_coupons/remove', resp );
 				
 				if ( resp.success ) {
-					$.each( resp.data.products, function( key, val ) {
+					/*$.each( resp.data.products, function( key, val ) {
 						$( '#mp-cart-item-' + key.escapeSelector() ).replaceWith( val );
-					});
+					});*/
 					$( '#mp-cart-meta' ).replaceWith( resp.data.cartmeta );
 					marketpress.initSelect2();
 				} else {
@@ -126,9 +126,9 @@ var mp_coupons = {};
 					.on( 'mp_cart/apply_coupon/success', function( e, data ){
 						$couponCode.val( '' );
 										
-						$.each( data.products, function( index, value ){
+						/*$.each( data.products, function( index, value ){
 							$( '#mp-cart-item-' + index.escapeSelector() ).replaceWith( value );
-						});
+						});*/
 						$( '#mp-cart-meta').replaceWith( data.cart_meta );
 						marketpress.initSelect2();
 						$tooltip
