@@ -634,8 +634,10 @@ class MP_Product {
 	 */
 	public function content( $echo = true ) {
 		$content = $this->_post->post_content;
-		if ( $this->has_variations() ) {
-			$content = $this->get_variation()->post_content;
+
+		if ( $this->has_variations() || $this->is_variation() ) {
+			$variation_id	 = $this->ID;
+			$content		 = get_post_meta( $variation_id, 'description', true );
 		}
 
 		$content = apply_filters( 'the_content', $content );
@@ -645,6 +647,65 @@ class MP_Product {
 		} else {
 			return $content;
 		}
+	}
+
+	/**
+	 * Get the product's excerpt
+	 *
+	 * @since 3.0
+	 * @param string $excerpt_more Optional
+	 * @param string $excerpt Optional
+	 * @param string $content Optional
+	 * @return string
+	 */
+	public function excerpt( $excerpt = null, $content = null, $excerpt_more = null ) {
+		if ( is_null( $excerpt_more ) ) {
+			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink( $this->ID ) . '">' . __( 'More Info &raquo;', 'mp' ) . '</a>';
+		}
+
+		if ( is_null( $excerpt ) ) {
+			$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
+		}
+
+		if ( is_null( $content ) ) {
+			$content = $this->has_variations() ? $this->get_variation()->post_content : $this->_post->post_content;
+		}
+
+		if ( $excerpt ) {
+			return apply_filters( 'get_the_excerpt', $excerpt ) . $excerpt_more;
+		} else {
+			$text			 = strip_shortcodes( $content );
+			$text			 = str_replace( ']]>', ']]&gt;', $text );
+			$text			 = strip_tags( $text );
+			$excerpt_length	 = apply_filters( 'excerpt_length', 55 );
+			$words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
+
+			if ( count( $words ) > $excerpt_length ) {
+				array_pop( $words );
+				$text	 = implode( ' ', $words );
+				$text	 = $text . $excerpt_more;
+			} else {
+				$text = implode( ' ', $words );
+			}
+
+			$text = wpautop( $text );
+		}
+
+		if ( $this->has_variations() || $this->is_variation() ) {
+			$text = mp_get_the_excerpt( $this->ID, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
+		}
+
+		/**
+		 * Filter the product excerpt
+		 *
+		 * @since 3.0
+		 * @param string $text
+		 * @param string $excerpt
+		 * @param string $content
+		 * @param int $product_id
+		 * @param string $excerpt_more Optional
+		 */
+		return apply_filters( 'mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more );
 	}
 
 	/**
@@ -661,7 +722,7 @@ class MP_Product {
 		$index = 0;
 		foreach ( $this->content_tabs as $slug => $label ) {
 			$html .= '
-				<li class="mp_product_tab_label' . (( $index == 0 ) ? ' current' : '') . '"><a class="mp_product_tab_label_link" href="#' . esc_attr( $slug ) . '">' . $label . '</a></li>';
+				<li class="mp_product_tab_label' . (( $index == 0 ) ? ' current' : '') . '"><a class="mp_product_tab_label_link ' . esc_attr( $slug ) . '" href="#' . esc_attr( $slug ) . '">' . $label . '</a></li>';
 			$index ++;
 		}
 
@@ -809,61 +870,6 @@ class MP_Product {
 		 * @param string $order_id The order ID.
 		 */
 		return apply_filters( 'mp_product/download_url', $url, $order_id );
-	}
-
-	/**
-	 * Get the product's excerpt
-	 *
-	 * @since 3.0
-	 * @param string $excerpt_more Optional
-	 * @param string $excerpt Optional
-	 * @param string $content Optional
-	 * @return string
-	 */
-	public function excerpt( $excerpt = null, $content = null, $excerpt_more = null ) {
-		if ( is_null( $excerpt_more ) ) {
-			$excerpt_more = ' <a class="mp_product_more_link" href="' . get_permalink( $this->ID ) . '">' . __( 'More Info &raquo;', 'mp' ) . '</a>';
-		}
-
-		if ( is_null( $excerpt ) ) {
-			$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
-		}
-
-		if ( is_null( $content ) ) {
-			$content = $this->has_variations() ? $this->get_variation()->post_content : $this->_post->post_content;
-		}
-
-		if ( $excerpt ) {
-			return apply_filters( 'get_the_excerpt', $excerpt ) . $excerpt_more;
-		} else {
-			$text			 = strip_shortcodes( $content );
-			$text			 = str_replace( ']]>', ']]&gt;', $text );
-			$text			 = strip_tags( $text );
-			$excerpt_length	 = apply_filters( 'excerpt_length', 55 );
-			$words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
-
-			if ( count( $words ) > $excerpt_length ) {
-				array_pop( $words );
-				$text	 = implode( ' ', $words );
-				$text	 = $text . $excerpt_more;
-			} else {
-				$text = implode( ' ', $words );
-			}
-
-			$text = wpautop( $text );
-		}
-
-		/**
-		 * Filter the product excerpt
-		 *
-		 * @since 3.0
-		 * @param string $text
-		 * @param string $excerpt
-		 * @param string $content
-		 * @param int $product_id
-		 * @param string $excerpt_more Optional
-		 */
-		return apply_filters( 'mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more );
 	}
 
 	/**
@@ -1877,7 +1883,7 @@ Notification Preferences: %s', 'mp' );
 		$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
 
 		// Make sure product overview tab is always at the beginning
-		$tabs = array( 'mp-product-overview' => __( 'Overview', 'mp' ) ) + $tabs;
+		$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
 
 		$this->content_tabs = $tabs;
 	}

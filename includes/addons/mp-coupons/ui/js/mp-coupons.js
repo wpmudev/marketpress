@@ -125,9 +125,9 @@ var mp_coupons = { };
                     .on( 'mp_cart/apply_coupon/success', function( e, data ) {
                         $couponCode.val( '' );
 
-                        /*$.each( data.products, function( index, value ){
-                         $( '#mp-cart-item-' + index.escapeSelector() ).replaceWith( value );
-                         });*/
+                        /*$.each( data.products, function( index, value ) {
+                            $( '#mp-cart-item-' + index.escapeSelector() ).replaceWith( value );
+                        } );*/
                         $( '#mp-cart-meta' ).replaceWith( data.cart_meta );
                         marketpress.initSelect2();
                         $tooltip

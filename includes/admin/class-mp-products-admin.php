@@ -57,6 +57,7 @@ class MP_Products_Screen {
 		add_action( 'bulk_edit_custom_box', array( &$this, 'bulk_edit_custom_box' ), 10, 2 );
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
+		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 // Product attributes save/get value
@@ -154,6 +155,28 @@ class MP_Products_Screen {
 		<?php
 	}
 
+	public function save_post_quantity_fix( $post_id, $post ) {
+		if ( empty( $_POST ) ) {
+			return $post_id;
+		}
+		
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+		
+		if ( wp_is_post_revision( $post ) ) {
+			return $post_id;
+		}
+		
+		if ( $post->post_type != MP_Product::get_post_type() ) {
+			return $post_id;
+		}
+		
+		$quantity		 = mp_get_post_value( 'inventory->inventory', '' );
+		
+		update_post_meta($post_id, 'quantity', $quantity);
+	}
+
 	/**
 	 * Save the custom quick edit form fields
 	 *
@@ -201,7 +224,7 @@ class MP_Products_Screen {
 				} else {
 					delete_post_meta( $post_id, '_thumbnail_id' );
 				}
-			}else{
+			} else {
 				delete_post_meta( $post_id, 'mp_product_images' );
 				delete_post_meta( $post_id, '_thumbnail_id' );
 			}
@@ -372,10 +395,10 @@ class MP_Products_Screen {
 				if ( $product->has_variations() ) {
 					$sales = array();
 					foreach ( $variations as $variation ) {
-						$sales[] = $variation->get_meta( 'sales_count', 0 );
+						$sales[] = $variation->get_meta( 'mp_sales_count', 0 );
 					}
 				} else {
-					$sales = array( $product->get_meta( 'sales_count', 0 ) );
+					$sales = array( $product->get_meta( 'mp_sales_count', 0 ) );
 				}
 
 				echo implode( '<br />', $sales );

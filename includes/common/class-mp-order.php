@@ -934,7 +934,9 @@ You can manage this order here: %s', 'mp' );
 
 			// Update sales count
 			$count = $item->get_meta( 'mp_sales_count', 0 );
+			
 			$count += $item->qty;
+			
 			$item->update_meta( 'mp_sales_count', $count );
 
 			if ( has_filter( 'mp_product_sale' ) ) {

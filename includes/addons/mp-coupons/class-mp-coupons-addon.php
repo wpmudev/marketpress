@@ -449,7 +449,7 @@ class MP_Coupons_Addon {
 	public function process_new_order( $order ) {
 		$applied		 = $this->get_applied_as_objects();
 		$discount_info	 = array();
-
+		
 		foreach ( $applied as $applied ) {
 			$discount_info[ $applied->get_code() ] = $applied->discount_amt( false, false );
 			$applied->use_coupon();

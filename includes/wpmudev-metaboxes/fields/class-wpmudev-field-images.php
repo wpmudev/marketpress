@@ -166,6 +166,7 @@ class WPMUDEV_Field_Images extends WPMUDEV_Field {
 					frame.open();
 				} );
 
+				mp_product_images_indexes();
 			} );
 		</script>
 		<?php

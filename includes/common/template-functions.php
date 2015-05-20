@@ -1572,6 +1572,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 	function mp_product( $echo = true, $product_id = null, $title = true, $content = 'full', $image = 'single',
 					  $meta = true ) {
+		global $wp_query;
 
 		if ( function_exists( 'icl_object_id' ) ) {
 			$product_id = icl_object_id( $product_id, MP_Product::get_post_type(), false );
@@ -1593,17 +1594,39 @@ if ( !function_exists( 'mp_product' ) ) {
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
 				<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 
+
+
+		if ( $image ) {
+			$return .= '<div class="mp-product-images">';
+			$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
+			$return .= '</div>';
+		}
+
+		if ( $image ) {
+			$return .= '<div class="mp-product-details">';
+		}
+
 		if ( $title ) {
 			$return .= '
 				<h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 		}
 
 		if ( $meta ) {
-			$return .= '
-				<div class="mp_product_meta">';
+			$return .= '<div class="mp_product_meta">';
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
+
+			//Excerpt
+			if ( !$variation ) {
+				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
+				$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
+				$return .= '</div>';
+			} else {
+				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
+				$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
+				$return .= '</div>';
+			}
 
 			// Button
 			$selected_atts = array();
@@ -1617,8 +1640,11 @@ if ( !function_exists( 'mp_product' ) ) {
 
 			$return .= $product->buy_button( false, 'single', $selected_atts );
 
-			$return .= '
-				</div>';
+			$return .= '</div><!--mp-product-details-->';
+		}
+
+		if ( $image ) {
+			$return .= '</div>';
 		}
 
 		$return .= $product->content_tab_labels( false );
@@ -1627,15 +1653,11 @@ if ( !function_exists( 'mp_product' ) ) {
 			$return .= '
 				<div id="mp-product-overview" class="mp_product_content clearfix">';
 
-			if ( $image ) {
-				$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
-			}
-
 			$return .= '
 					<div itemprop="description" class="mp_product_content_text">';
 
 			if ( $content == 'excerpt' ) {
-				$return .= ( $variation ) ? $variation->excerpt() : $product->excerpt();
+				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
 			} else {
 				$return .= ( $variation ) ? $variation->content( false ) : $product->content( false );
 			}
@@ -1953,27 +1975,51 @@ if ( !function_exists( 'mp_send_email' ) ) :
 		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 endif;
+
+function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
+	global $post;
+
+	if ( empty( $post ) ) {
+		$post				 = new StdClass;
+		$post->ID			 = 0;
+		$post->post_excerpt	 = '';
+		$post->post_content	 = '';
+	}
+
+	$old_post = $post;
+
+	if ( $id != $post->ID ) {
+		$post = get_page( $id );
+	}
+
+	$excerpt = trim( $post->post_excerpt );
+
+	if ( !$excerpt ) {
+		$excerpt = $post->post_content;
+	}
+
+	if ( $variation ) {
+		$excerpt = get_post_meta( $id, 'description', true );
+	}
+
+	$excerpt		 = strip_shortcodes( $excerpt );
+	//$excerpt = apply_filters( 'the_content', $excerpt );
+	$excerpt		 = str_replace( ']]>', ']]&gt;', $excerpt );
+	$excerpt		 = strip_tags( $excerpt );
+	$excerpt_length	 = apply_filters( 'excerpt_length', $length );
+	$excerpt_more	 = apply_filters( 'excerpt_more', ' ' . '<a href="#" class="more-link">[...]</a>' );
+
+	$words = preg_split( "/[\n\r\t ]+/", $excerpt, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
+	if ( count( $words ) > $excerpt_length ) {
+		array_pop( $words );
+		$excerpt = implode( ' ', $words );
+		$excerpt = $excerpt . $excerpt_more;
+	} else {
+		$excerpt = implode( ' ', $words );
+	}
+
+	$post = $old_post;
+
+	return apply_filters( 'the_excerpt', $excerpt );
+}

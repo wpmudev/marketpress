@@ -127,13 +127,13 @@ class MP_Coupon {
 		$product_ids = $this->get_products( true );
 
 		$discount_amt = 0;
-		
-		$product_ids = array_keys($product_ids);
-		
+
+		$product_ids = array_keys( $product_ids );
+
 		foreach ( $product_ids as $product_id ) {
 			$product		 = new MP_Product( $product_id );
 			$product_price	 = $product->get_price( 'lowest' );
-						
+
 			if ( 'subtotal' == $this->get_meta( 'discount_type' ) ) {
 				$discount_amt += ($this->get_price( $product_price ) - $product_price);
 			} else {
@@ -259,18 +259,19 @@ class MP_Coupon {
 	 * @return array An array of products that the coupon can be applied to.
 	 */
 	function get_products( $ids_only = false ) {
-		$products	 = mp_cart()->get_items();
-		
-		$applies_to	 = $this->get_meta( 'applies_to' );
-		
+		$products = mp_cart()->get_items();
+
+		$applies_to = $this->get_meta( 'applies_to' );
+
 		switch ( $applies_to ) {
 			case 'product':
 				$products		 = array();
 				$cart_products	 = mp_cart()->get_items_as_objects();
 				$coupon_products = $this->get_meta( 'product' );
-				
+
 				foreach ( $cart_products as $product ) {
 					$product_id = $product->ID;
+					
 					if ( $product->is_variation() ) {
 						$product_id = $product->post_parent;
 					}
@@ -289,19 +290,21 @@ class MP_Coupon {
 			case 'category':
 				$products		 = array();
 				$cart_products	 = mp_cart()->get_items_as_objects();
-				$coupon_terms	 = $this->get_meta( 'category' );
+
+				$coupon_terms = $this->get_meta( 'category' );
 
 				foreach ( $cart_products as $product ) {
-					$terms = get_the_terms( $item->ID, 'product_category' );
+					$terms = get_the_terms( $product->ID, 'product_category' );
 
 					$product_id = $product->ID;
+
 					if ( $product->is_variation() ) {
 						$product_id = $product->post_parent;
 					}
 
 					if ( is_array( $terms ) ) {
 						foreach ( $terms as $term ) {
-							if ( in_array( $term->term_id, $coupon_terms ) ) {
+							if ( in_array( (string) $term->term_id, $coupon_terms ) ) {
 								if ( $ids_only ) {
 									$products[] = $product->ID;
 								} else {
@@ -422,7 +425,9 @@ class MP_Coupon {
 	 */
 	public function use_coupon() {
 		$uses = (float) $this->get_meta( 'times_used', 0 ) + 1;
-		$this->update_meta( 'times_used', $uses );
+
+		update_post_meta( $this->ID, 'times_used', $uses );
+		//$this->update_meta( 'times_used', $uses );
 	}
 
 }
