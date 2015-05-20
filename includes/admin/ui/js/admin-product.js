@@ -3,10 +3,34 @@ jQuery( document ).ready( function( $ ) {
     $( '#poststuff' ).append( '<div class="mp-admin-overlay"><div class="mp-variation-loading-spin"></div><div class="mp-variation-loading-message">' + mp_product_admin_i18n.creating_vatiations_message + '</div></div>' );
 
     /*$( '#mp-product-type-select' ).on( 'change', function() {
-        if ( $( this ).val() == 'external' ) {
-            $('.mp-product-images-metabox').hide();
+     if ( $( this ).val() == 'external' ) {
+     $('.mp-product-images-metabox').hide();
+     }
+     } );*/
+
+    $( '.mp_variations_select' ).live( 'change', function() {
+        var has_variations = $( this );
+        if ( has_variations.val() == 'yes' ) {
+            $( '#postdivrich' ).hide();
+            exit;
+        } else {
+                
+            $( '#postdivrich' ).css( 'opacity', '0' );
+            $( '#postdivrich' ).css( 'visibility', 'hidden' );
+            $( '#postdivrich' ).css( 'display', 'block' );
+
+            $( 'html, body' ).animate( {
+                scrollTop: $( ".meta-box-sortables.ui-sortable" ).offset().top + 50
+            }, 100, function() {
+                $( '#postdivrich' ).css( 'visibility', 'visible' );
+                $( "#postdivrich" ).fadeTo( 400, 1, function() {
+                } );
+            } );
+
+
+            exit;
         }
-    } );*/
+    } );
 
     function mp_variation_message( ) {
         $( '.mp-variation-loading-spin' ).css( {

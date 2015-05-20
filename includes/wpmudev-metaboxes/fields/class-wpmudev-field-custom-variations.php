@@ -282,7 +282,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 
 										<div class="variation-second-col">
 											<div class="wpmudev-field-label"><?php _e( 'Variation Values', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(e.g. White, Grey, Red etc.)', 'mp' ); ?></span></div>
-											<textarea name="variation_values[]" class="variation_values" value="" placeholder="<?php esc_attr_e( __( 'Enter as many values as requred', 'mp' ) ); ?>"></textarea>
+											<textarea name="variation_values[]" class="variation_values" value="" placeholder="<?php esc_attr_e( __( 'Insert a value and press ENTER', 'mp' ) ); ?>"></textarea>
 										</div>
 
 										<div class="variation-third-col">

@@ -40,6 +40,7 @@ class MP_Products_Screen {
 // Product variations save/get value
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
+		add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
 		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
 		add_action( 'wp_ajax_edit_variation_post_data', array( &$this, 'edit_variation_post_data' ) );
 		//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
@@ -159,22 +160,22 @@ class MP_Products_Screen {
 		if ( empty( $_POST ) ) {
 			return $post_id;
 		}
-		
+
 		if ( mp_doing_autosave() ) {
 			return $post_id;
 		}
-		
+
 		if ( wp_is_post_revision( $post ) ) {
 			return $post_id;
 		}
-		
+
 		if ( $post->post_type != MP_Product::get_post_type() ) {
 			return $post_id;
 		}
-		
-		$quantity		 = mp_get_post_value( 'inventory->inventory', '' );
-		
-		update_post_meta($post_id, 'quantity', $quantity);
+
+		$quantity = mp_get_post_value( 'inventory->inventory', '' );
+
+		update_post_meta( $post_id, 'quantity', $quantity );
 	}
 
 	/**
@@ -729,6 +730,27 @@ class MP_Products_Screen {
 	}
 
 	/**
+	 * Hide content editor from admin for products with variations
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action init
+	 */
+	public function hide_main_content_editor_for_variations() {
+		// Get the Post ID.
+		$post_id = $_GET[ 'post' ] ? (int) $_GET[ 'post' ] : (int) $_POST[ 'post_ID' ];
+		if ( !isset( $post_id ) )
+			return;
+
+		if ( get_post_type( $post_id ) == MP_Product::get_post_type() ) {
+			$has_variations = get_post_meta( $post_id, 'has_variations', false );
+			if ( $has_variations ) {
+				remove_post_type_support( MP_Product::get_post_type(), 'editor' );
+			}
+		}
+	}
+
+	/**
 	 * Create variation combinations and saves initial product variations to the database
 	 * Add new terms if don't exist
 	 * Add new taxonomies if don't exist
@@ -847,6 +869,7 @@ class MP_Products_Screen {
 					'has_sale'					 => mp_get_post_value( 'has_sale' ),
 					'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
 					'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
+					'description'				 => mp_get_post_value( 'content' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
 
