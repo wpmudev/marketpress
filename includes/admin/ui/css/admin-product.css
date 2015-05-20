@@ -502,10 +502,16 @@ select.mp_product_attributes_select {
 textarea.variation_values {
     margin-top: 7px;
     width: 100%;
+    padding-top: 6px !important;
 }
 
 .variation-row .text-core .text-wrap{
-    width: 100% !important
+    width: 100% !important;
+}
+
+.variation-row .text-core{
+    min-height: 64px;
+    height: auto !important;
 }
 
 .variation-row .text-wrap{
