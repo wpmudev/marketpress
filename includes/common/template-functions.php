@@ -109,7 +109,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 		$width	 = round( 100 / $per_row, 1 ) . '%';
 		$column	 = 1;
 
-		//get image width
+//get image width
 		if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
 			$img_width = mp_get_setting( 'list_img_width' ) . 'px';
 		} else {
@@ -248,7 +248,7 @@ if ( !function_exists( 'mp_before_tax_price' ) ) :
 	 */
 	function mp_before_tax_price( $tax_price, $rate = null ) {
 		if ( !mp_get_setting( 'tax->tax_inclusive' ) ) {
-			// tax inclusve pricing is turned off - just return tax price
+// tax inclusve pricing is turned off - just return tax price
 			return $tax_price;
 		}
 
@@ -458,9 +458,9 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 			$currency = mp_get_setting( 'currency', 'USD' );
 		}
 
-		// get the currency symbol
+// get the currency symbol
 		if ( $symbol = mp_arr_get_value( "$currency->1", $currencies ) ) {
-			// if many symbols are found, rebuild the full symbol
+// if many symbols are found, rebuild the full symbol
 			$symbols = array_map( 'trim', explode( ', ', $symbol ) );
 			if ( is_array( $symbols ) ) {
 				$symbol = '';
@@ -481,14 +481,14 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 		 */
 		$symbol = apply_filters( 'mp_format_currency_symbol', $symbol, $currency );
 
-		//check decimal option
+//check decimal option
 		if ( $amount == (int) $amount ) {
 			$decimal_place = 0;
 		} else {
 			$decimal_place = 2;
 		}
 
-		//handle negative numbers
+//handle negative numbers
 		$negative_symbol = '';
 		if ( $amount < 0 ) {
 			$negative_symbol = '-';
@@ -496,10 +496,10 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 		}
 
 		if ( $amount === false ) {
-			// just return symbol
+// just return symbol
 			$formatted = $symbol;
 		} else {
-			// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
+// just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
 			$amount							 = (float) $amount;
 			$price_holder_arguments_string	 = '';
 			if ( is_array( $price_holder_arguments ) && count( $price_holder_arguments ) > 0 ) {
@@ -594,12 +594,12 @@ if ( !function_exists( 'mp_get_current_user_zipcode' ) ) :
 		$zipcode = false;
 
 		if ( is_array( $address ) ) {
-			// Try to get from usermeta
+// Try to get from usermeta
 			$zipcode = mp_arr_get_value( 'zip', $address );
 		}
 
 		if ( false === $zipcode ) {
-			// Try to get from cookie
+// Try to get from cookie
 			$zipcode = mp_get_cookie_value( 'zip' );
 		}
 
@@ -996,7 +996,7 @@ if ( !function_exists( 'mp_get_order_history' ) ) :
 		 */
 		$orders = (array) apply_filters( 'mp_get_order_history', $orders, $user_id );
 
-		// Put orders in reverse chronological order
+// Put orders in reverse chronological order
 		krsort( $orders );
 
 		return $orders;
@@ -1073,7 +1073,7 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 	 * @param bool $echo Optional, whether to echo or return. Defaults to return.
 	 */
 	function mp_tax_rate( $echo = false ) {
-		//get address
+//get address
 		$state		 = mp_get_user_address_part( 'state', 'shipping' );
 		$country	 = mp_get_user_address_part( 'country', 'shipping' );
 		$tax_rate	 = 0;
@@ -1088,14 +1088,14 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 
 		switch ( $country ) {//mp_get_setting( 'base_country' )
 			case 'US':
-				// USA taxes are only for orders delivered inside the state
+// USA taxes are only for orders delivered inside the state
 				if ( $country == 'US' && $state == mp_get_setting( 'base_province' ) ) {
 					$tax_rate = (float) mp_get_setting( 'tax->rate' );
 				}
 				break;
 
 			case 'CA':
-				//Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
+//Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
 				if ( $country == 'CA' && array_key_exists( $state, mp()->canadian_provinces ) ) {
 					if ( $_tax_rate = mp_get_setting( "tax->canada_rate->$state" ) ) {
 						$tax_rate = (float) $_tax_rate;
@@ -1104,23 +1104,23 @@ if ( !function_exists( 'mp_tax_rate' ) ) :
 				break;
 
 			case 'AU':
-				//Australia taxes orders in country
+//Australia taxes orders in country
 				if ( $country == 'AU' ) {
 					$tax_rate = (float) mp_get_setting( 'tax->rate' );
 				}
 				break;
 
 			default:
-				//EU countries charge VAT within the EU
+//EU countries charge VAT within the EU
 				if ( in_array( mp_get_setting( 'base_country' ), mp()->eu_countries ) ) {
 					if ( in_array( $country, mp()->eu_countries ) ) {
 						$tax_rate = (float) mp_get_setting( 'tax->rate' );
 					}
 				} else {
-					//all other countries use the tax outside preference
-					//if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
+//all other countries use the tax outside preference
+//if ( mp_get_setting( 'tax->tax_outside' ) || (!mp_get_setting( 'tax->tax_outside' ) && $country == mp_get_setting( 'base_country' )) ) {
 					$tax_rate = (float) mp_get_setting( 'tax->rate' );
-					//}
+//}
 				}
 				break;
 		}
@@ -1236,18 +1236,18 @@ if ( !function_exists( 'mp_list_products' ) ) :
 	 * @param bool $filters Optional, show filters	 
 	 */
 	function mp_list_products() {
-		// Init args
+// Init args
 		$func_args			 = func_get_args();
 		$args				 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
 		$args[ 'nopaging' ]	 = false;
 
-		// Init query params
+// Init query params
 		$query = array(
 			'post_type'		 => MP_Product::get_post_type(),
 			'post_status'	 => 'publish',
 		);
 
-		// Setup taxonomy query
+// Setup taxonomy query
 		$tax_query = array();
 		if ( !is_null( $args[ 'category' ] ) || !is_null( $args[ 'tag' ] ) ) {
 			if ( !is_null( $args[ 'category' ] ) ) {
@@ -1285,25 +1285,25 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			$query[ 'tax_query' ] = $tax_query;
 		}
 
-		// Setup pagination
+// Setup pagination
 		if ( (!is_null( $args[ 'paginate' ] ) && !$args[ 'paginate' ]) || (is_null( $args[ 'paginate' ] ) && !mp_get_setting( 'paginate' )) ) {
 			$query[ 'nopaging' ] = $args[ 'nopaging' ]	 = true;
 		} else {
-			// Figure out per page
+// Figure out per page
 			if ( !is_null( $args[ 'per_page' ] ) ) {
 				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
 			} else {
 				$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
 			}
 
-			// Figure out page
+// Figure out page
 			if ( !is_null( $args[ 'page' ] ) ) {
 				$query[ 'paged' ] = intval( $args[ 'page' ] );
 			} elseif ( get_query_var( 'paged' ) != '' ) {
 				$query[ 'paged' ]	 = $args[ 'page' ]		 = intval( get_query_var( 'paged' ) );
 			}
 
-			// Get order by
+// Get order by
 			if ( !is_null( $args[ 'order_by' ] ) ) {
 				if ( 'price' == $args[ 'order_by' ] ) {
 					$query[ 'meta_key' ] = 'regular_price';
@@ -1325,22 +1325,22 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			}
 		}
 
-		// Get order direction
+// Get order direction
 		$query[ 'order' ] = mp_get_setting( 'order' );
 		if ( !is_null( $args[ 'order' ] ) ) {
 			$query[ 'order' ] = $args[ 'order' ];
 		}
 
-		// The Query
+// The Query
 		$custom_query = new WP_Query( $query );
 
-		// Get layout type
+// Get layout type
 		$layout_type = mp_get_setting( 'list_view' );
 		if ( !is_null( $args[ 'list_view' ] ) ) {
 			$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 		}
 
-		// Build content
+// Build content
 		$content = '';
 
 		if ( !mp_doing_ajax() ) {
@@ -1597,33 +1597,79 @@ if ( !function_exists( 'mp_product' ) ) {
 
 
 		if ( $image ) {
-			$return .= '<div class="mp-product-images">';
-			$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
-			$return .= '</div>';
+			if ( !$product->has_variations() ) {
+
+				$values = get_post_meta( $product->ID, 'mp_product_images', true );
+
+				if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
+					$size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
+				} else {
+					$size = mp_get_setting( 'list_img_size' );
+				}
+
+				if ( $values ) {
+					$return .= "<script>
+								jQuery(document).ready(function() {
+									jQuery('#mp_product_gallery').lightSlider({
+												gallery:true,
+												item:1,
+												loop:true,
+												thumbItem:5,
+												slideMargin:0,
+												enableDrag: true,
+												currentPagerPosition:'left',
+												onSliderLoad: function(el) {
+												el.lightGallery({
+												selector: '#mp_product_gallery .lslide'
+											});
+										}
+									});
+								});
+								</script>";
+					$return .= '<div class = "mp-product-images">';
+
+					$return .= '<ul id = "mp_product_gallery">';
+
+					$values = explode( ',', $values );
+
+					foreach ( $values as $value ) {
+						$img_url = wp_get_attachment_image_src( $value, $size );
+						$return .= '<li data-thumb = "' . $img_url[ 0 ] . '" data-src = "' . $img_url[ 0 ] . '"><img src = "' . $img_url[ 0 ] . '" /></li>';
+					}
+
+					$return .= '</ul>';
+
+					$return .= '</div>';
+				}
+			} else {
+				$return .= '<div class = "mp-product-images">';
+				$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
+				$return .= '</div>';
+			}
 		}
 
 		if ( $image ) {
-			$return .= '<div class="mp-product-details">';
+			$return .= '<div class = "mp-product-details">';
 		}
 
 		if ( $title ) {
 			$return .= '
-				<h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+<h1 itemprop = "name" class = "mp_product_name entry-title"><a href = "' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 		}
 
 		if ( $meta ) {
-			$return .= '<div class="mp_product_meta">';
+			$return .= '<div class = "mp_product_meta">';
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
 
 			//Excerpt
 			if ( !$variation ) {
-				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
+				$return .= '<div class = "mp_product_excerpt mp_product_options_excerpt">';
 				$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
 				$return .= '</div>';
 			} else {
-				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
+				$return .= '<div class = "mp_product_excerpt mp_product_options_excerpt">';
 				$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
 				$return .= '</div>';
 			}
@@ -1651,10 +1697,10 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( !empty( $content ) ) {
 			$return .= '
-				<div id="mp-product-overview" class="mp_product_content clearfix">';
+<div id = "mp-product-overview" class = "mp_product_content clearfix">';
 
 			$return .= '
-					<div itemprop="description" class="mp_product_content_text">';
+<div itemprop = "description" class = "mp_product_content_text">';
 
 			if ( $content == 'excerpt' ) {
 				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
@@ -1663,8 +1709,8 @@ if ( !function_exists( 'mp_product' ) ) {
 			}
 
 			$return .= '
-					</div>
-				</div>';
+</div>
+</div>';
 		}
 		// Remove overview tab as it's already been manually output above
 		array_shift( $product->content_tabs );
@@ -2004,7 +2050,7 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	}
 
 	$excerpt		 = strip_shortcodes( $excerpt );
-	//$excerpt = apply_filters( 'the_content', $excerpt );
+//$excerpt = apply_filters( 'the_content', $excerpt );
 	$excerpt		 = str_replace( ']]>', ']]&gt;', $excerpt );
 	$excerpt		 = strip_tags( $excerpt );
 	$excerpt_length	 = apply_filters( 'excerpt_length', $length );
