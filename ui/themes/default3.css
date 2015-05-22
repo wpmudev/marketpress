@@ -700,3 +700,26 @@ h1.mp_product_name.entry-title{
 #mp_single_product .mp_product_options_att:nth-child(odd){
     width: 100%;
 }
+
+#mp_single_product .mp_button_addcart{
+    float: right;
+}
+
+.mp-social-shares a{
+    display: inline-block;
+    float: left;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.mp-social-shares .fb_iframe_widget{
+    display: inline-block;
+    float: left;
+}
+
+.mp-social-shares .twitter-share-button{
+    display: inline-block;
+    float: left;
+    margin-top: 10px;
+    margin-right: 10px;
+}

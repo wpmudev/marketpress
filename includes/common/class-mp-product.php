@@ -1065,7 +1065,16 @@ class MP_Product {
 			'posts_per_page' => $limit,
 		);
 
-		if ( $related_products = $this->get_meta( 'related_products' ) ) {
+		
+		$related_specified_products_enabled = true;
+		
+		$related_specified_products = $this->get_meta( 'related_products' );
+		
+		if(is_array($related_specified_products) && $related_specified_products[0] == ''){
+			$related_specified_products_enabled = false;
+		}
+		
+		if ( $related_products !== $this->get_meta( 'related_products' ) && $related_specified_products_enabled ) {
 			$query_args[ 'post__in' ] = $related_products;
 		} else {
 			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
@@ -1755,11 +1764,36 @@ Notification Preferences: %s', 'mp' );
 	public function pinit_button( $context = 'single_view', $echo = false ) {
 		$setting = mp_get_setting( 'social->pinterest->show_pinit_button' );
 
-		if ( $setting == 'off' || $setting != $context ) {
-			return '';
+		$single_view_allowed = false;
+
+		if ( $setting == 'all_view' ) {
+			$single_view_allowed = true;
+		} else {
+			$single_view_allowed = false;
 		}
 
-		$image_info	 = wp_get_attachment_image_src( get_post_thumbnail_id( $this->ID ), 'large' );
+		if ( $setting == 'single_view' ) {
+			$single_view_allowed = true;
+		}
+
+		if ( $single_view_allowed && $context == 'single_view' ) {
+			
+		} else {
+			if ( $setting == 'off' && ($setting != $context) ) {
+				return '';
+			}
+		}
+
+		$product = new MP_Product( $this->ID );
+
+		if ( !$product->has_variations() ) {
+			$image_info = wp_get_attachment_image_src( get_post_thumbnail_id( $this->ID ), 'large' );
+		} else {
+			$variation	 = $product->get_variation( 0 );
+			$image_info	 = wp_get_attachment_image_src( get_post_thumbnail_id( $variation->ID ), 'large' );
+		}
+
+
 		$count_pos	 = ( $pos		 = mp_get_setting( 'social->pinterest->show_pin_count' ) ) ? $pos : 'none';
 		$url		 = add_query_arg( array(
 			'url'			 => get_permalink( $this->ID ),
@@ -1772,6 +1806,117 @@ Notification Preferences: %s', 'mp' );
 
 		$snippet = apply_filters( 'mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context );
 
+		if ( $echo ) {
+			echo $snippet;
+		} else {
+			return $snippet;
+		}
+	}
+
+	/**
+	 * Get Twitter button
+	 *
+	 * @since 3.0
+	 * @param string $context
+	 * @param bool $echo
+	 */
+	public function twitter_button( $context = 'single_view', $echo = false ) {
+		$setting = mp_get_setting( 'social->twitter->show_twitter_button' );
+
+		$single_view_allowed = false;
+
+		if ( $setting == 'all_view' ) {
+			$single_view_allowed = true;
+		} else {
+			$single_view_allowed = false;
+		}
+
+		if ( $setting == 'single_view' ) {
+			$single_view_allowed = true;
+		}
+
+		if ( $single_view_allowed && $context == 'single_view' ) {
+			
+		} else {
+			if ( $setting == 'off' && ($setting != $context) ) {
+				return '';
+			}
+		}
+
+		$product = new MP_Product( $this->ID );
+		$url	 = get_permalink( $this->ID );
+
+		$snippet = "<a href='https://twitter.com/share' class='twitter-share-button' data-url='" . $url . "' data-count='none'>" . __( 'Tweet', 'mp' ) . "</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>";
+		if ( $echo ) {
+			echo $snippet;
+		} else {
+			return $snippet;
+		}
+	}
+
+	/**
+	 * Get Facebook button
+	 *
+	 * @since 3.0
+	 * @param string $context
+	 * @param bool $echo
+	 */
+	public function facebook_like_button( $context = 'single_view', $echo = false ) {
+		$setting		 = mp_get_setting( 'social->facebook->show_facebook_like_button' );
+		$setting_action	 = mp_get_setting( 'social->facebook->action' );
+
+		$action = 'like';
+
+		if ( isset( $setting_action ) && !is_null( $setting_action ) ) {
+			$action = $setting_action;
+		} else {
+			$action = 'recommend';
+		}
+
+		$show_share		 = 'false';
+		$setting_share	 = mp_get_setting( 'social->facebook->show_share' );
+
+		if ( isset( $setting_share ) && !is_null( $setting_share ) ) {
+			$show_share = $setting_share == 1 ? 'true' : 'false';
+		} else {
+			$show_share = 'false';
+		}
+
+		$single_view_allowed = false;
+
+		if ( $setting == 'all_view' ) {
+			$single_view_allowed = true;
+		} else {
+			$single_view_allowed = false;
+		}
+
+		if ( $setting == 'single_view' ) {
+			$single_view_allowed = true;
+		}
+
+		if ( $single_view_allowed && $context == 'single_view' ) {
+			
+		} else {
+			if ( $setting == 'off' && ($setting != $context) ) {
+				return '';
+			}
+		}
+
+		$product = new MP_Product( $this->ID );
+		$url	 = get_permalink( $this->ID );
+
+		//$snippet = apply_filters( 'mp_facebook_like_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context );
+
+		$snippet = "<div id='fb-root'></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = '//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.3';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div class='fb-like' data-href='" . $url . "' data-layout='button' data-action='" . $action . "' data-show-faces='false' data-share='" . $show_share . "'></div>
+";
 		if ( $echo ) {
 			echo $snippet;
 		} else {

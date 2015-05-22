@@ -129,7 +129,9 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$excerpt				 = mp_get_setting( 'show_excerpt' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
 			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
 
-			$pinit = $product->pinit_button( 'all_view' );
+			$pinit	 = $product->pinit_button( 'all_view' );
+			$fb		 = $product->facebook_like_button( 'all_view' );
+			$twitter = $product->twitter_button( 'all_view' );
 
 			$class	 = array();
 			$class[] = ( strlen( $img ) > 0 ) ? 'mp_thumbnail' : '';
@@ -158,11 +160,13 @@ if ( !function_exists( '_mp_products_html' ) ) :
 						<div class="mp_product_detail">
 							' . $img . '
 							<div class="mp_product_content">
-								' . $pinit . '
 								<h3 class="mp_product_name entry-title" itemprop="name">
 									<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
-								</h3>'
-			. $mp_product_list_content . '
+								</h3>
+			' . $pinit . '
+			' . $fb . '
+			' . $twitter . '
+			' . $mp_product_list_content . '
 							</div>
 						</div>
 
@@ -1590,6 +1594,10 @@ if ( !function_exists( 'mp_product' ) ) {
 			}
 		}
 
+		$pinit	 = $product->pinit_button( 'single_view' );
+		$fb		 = $product->facebook_like_button( 'single_view' );
+		$twitter = $product->twitter_button( 'single_view' );
+
 		$return = '
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
 				<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
@@ -1685,6 +1693,12 @@ if ( !function_exists( 'mp_product' ) ) {
 			}
 
 			$return .= $product->buy_button( false, 'single', $selected_atts );
+
+			$return .= '<div class="mp-social-shares">';
+			$return .= $pinit;
+			$return .= $fb;
+			$return .= $twitter;
+			$return .= '</div>';
 
 			$return .= '</div><!--mp-product-details-->';
 		}
