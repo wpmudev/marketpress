@@ -196,7 +196,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 	}
 
 	function enqueue_scripts() {
-		if ( ! mp_is_shop_page( 'checkout' ) ) {
+		if ( !mp_is_shop_page( 'checkout' ) ) {
 			return;
 		}
 
@@ -343,23 +343,10 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 
 		Stripe::setApiKey( $this->secret_key );
 
-		$totals = array(
-			'product_total'	 => $cart->product_total( false ),
-			'shipping_total' => $cart->shipping_total( false ),
-			'tax_price'		 => 0,
-		);
-
-		// Get tax price, if applicable
-		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
-			$totals[ 'tax_price' ] = $cart->tax_total( false );
-		}
-
 		// Create a new order object
 		$order		 = new MP_Order();
 		$order_id	 = $order->get_id();
 
-		// Calc total
-		$total = array_sum( $totals );
 
 		try {
 			// create the charge on Stripe's servers - this will charge the user's card
@@ -381,7 +368,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 					'status'				 => array(
 						$timestamp => __( 'Paid', 'mp' ),
 					),
-					'total'					 => $total,
+					'total'					 => $cart->total(),
 					'currency'				 => $this->currency,
 				);
 

@@ -93,6 +93,8 @@ class MP_Coupons_Addon {
 			add_action( 'mp_cart/after_empty_cart', array( &$this, 'remove_all_coupons' ), 10, 1 );
 			add_action( 'mp_order/new_order', array( &$this, 'process_new_order' ), 10, 1 );
 			add_action( 'mp_cart/before_remove_item', array( &$this, 'check_coupons' ), 10, 2 );
+
+			add_filter( 'mp_coupon_total_value', array( &$this, 'max_discount' ), 10, 1 );
 		}
 
 		if ( is_admin() ) {
@@ -305,7 +307,14 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function cart_total( $total, $_total, $cart ) {
-		return floatval( $total + $this->get_total_discount_amt() );
+
+		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
+			$total = $total + (-1 * $total);
+		} else {
+			$total = $total + $this->get_total_discount_amt();
+		}
+
+		return floatval( $total );
 	}
 
 	/**
@@ -372,6 +381,21 @@ class MP_Coupons_Addon {
 		return ( get_post_status( $post_id ) == 'auto-draft' ) ? '' : $post->post_name;
 	}
 
+	public function max_discount( $discount_value ) {
+		
+		remove_filter( 'mp_coupon_total_value', array( &$this, 'max_discount' ), 10 );
+
+		$cart	 = new MP_Cart();
+		
+		$total = ( $cart->product_total() + $cart->tax_total() + $cart->shipping_total() );
+		
+		if ( abs( $discount_value ) >= $total ) {
+			$discount_value = -1 * $total;
+		}
+
+		return $discount_value;
+	}
+
 	/**
 	 * Get total discount amount
 	 *
@@ -380,28 +404,30 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function get_total_discount_amt() {
-		$amt		 = 0;
-		$blog_ids	 = mp_cart()->get_blog_ids();
+		$amt	 = 0;
+		$cart	 = new MP_Cart();
+
+		$blog_ids = $cart->get_blog_ids();
 
 		while ( 1 ) {
-			if ( mp_cart()->is_global ) {
+			if ( $cart->is_global ) {
 				$blog_id = array_shift( $blog_ids );
-				mp_cart()->set_id( $blog_id );
+				$cart->set_id( $blog_id );
 			}
 
 			$coupons = $this->get_applied_as_objects();
-			
+
 			foreach ( $coupons as $coupon ) {
 				$amt += $coupon->discount_amt( false, false );
 			}
 
-			if ( (mp_cart()->is_global && false === current( $blog_ids )) || !mp_cart()->is_global ) {
-				mp_cart()->reset_id();
+			if ( ($cart->is_global && false === current( $blog_ids )) || !$cart->is_global ) {
+				$cart->reset_id();
 				break;
 			}
 		}
 
-		return (float) $amt;
+		return apply_filters( 'mp_coupon_total_value', (float) $amt );
 	}
 
 	/**
@@ -433,7 +459,7 @@ class MP_Coupons_Addon {
 		$code = preg_replace( '/[^A-Z0-9_-]/', '', strtoupper( $_POST[ 'coupon_code' ] ) );
 
 		$data[ 'post_title' ]	 = $code;
-		$data[ 'post_status' ] = 'publish';
+		$data[ 'post_status' ]	 = 'publish';
 		$data[ 'post_name' ]	 = '';
 
 		return $data;
@@ -449,7 +475,7 @@ class MP_Coupons_Addon {
 	public function process_new_order( $order ) {
 		$applied		 = $this->get_applied_as_objects();
 		$discount_info	 = array();
-		
+
 		foreach ( $applied as $applied ) {
 			$discount_info[ $applied->get_code() ] = $applied->discount_amt( false, false );
 			$applied->use_coupon();
@@ -900,7 +926,7 @@ class MP_Coupons_Addon {
 				$price[ 'before_coupon' ] = $price[ 'lowest' ];
 
 				if ( $coupon->get_meta( 'discount_type' ) == 'item' ) {
-					$price[ 'lowest' ]		 = $price[ 'coupon' ]		 = $price[ 'sale' ][ 'amount' ] = $coupon->get_price( $price[ 'lowest' ] );
+					$price[ 'lowest' ]			 = $price[ 'coupon' ]			 = $price[ 'sale' ][ 'amount' ] = $coupon->get_price( $price[ 'lowest' ] );
 				} else {
 					$price[ 'coupon' ] = $coupon->get_price( $price[ 'lowest' ] );
 				}
@@ -1098,6 +1124,18 @@ if ( !function_exists( 'mp_coupons_addon' ) ) :
 	function mp_coupons_addon() {
 		return MP_Coupons_Addon::get_instance();
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 endif;

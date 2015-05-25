@@ -47,16 +47,16 @@ class MP_Admin_Multisite {
 			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 			add_action( 'wpmudev_field/print_scripts/network_store_page', array( &$this, 'print_network_store_page_scripts' ) );
 		}
-		
-		if ( mp_get_network_setting( 'global_cart' ) && ! mp_is_post_indexer_installed() ) {
+
+		if ( mp_get_network_setting( 'global_cart' ) && !mp_is_post_indexer_installed() ) {
 			add_action( 'network_admin_notices', array( &$this, 'post_indexer_admin_notice' ) );
 		}
-		
+
 		if ( mp_cart()->is_global ) {
-			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway'), 10, 4 );
+			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array( &$this, 'force_check_global_gateway' ), 10, 4 );
 		}
 	}
-	
+
 	/**
 	 * Get the Post Indexer nag notice html
 	 *
@@ -66,18 +66,18 @@ class MP_Admin_Multisite {
 	 */
 	protected function _post_indexer_install_html() {
 		global $wpmudev_un;
-		
+
 		$install_btn = '';
 		if ( isset( $wpmudev_un ) ) {
 			if ( $url = $wpmudev_un->auto_install_url( 30 ) ) {
 				$install_btn = '<a class="button-primary" href="' . $url . '">' . __( 'Install Post Indexer', 'mp' ) . '</a>';
 			}
 		}
-		
+
 		$plugin_url = 'https://premium.wpmudev.org/project/post-indexer';
 		return sprintf( __( '<strong>IMPORTANT!</strong> The MarketPress Global Cart requires the <a target="_blank" href="%s">Post Indexer</a> plugin to also be installed. This feature will not work until <a target="_blank" href="%s">Post Indexer</a> has been installed. %s', 'mp' ), $plugin_url, $plugin_url, $install_btn );
 	}
-	
+
 	/**
 	 * Force check the global gateway
 	 *
@@ -88,7 +88,7 @@ class MP_Admin_Multisite {
 	public function force_check_global_gateway( $value, $post_id, $raw, $field ) {
 		return 1;
 	}
-	
+
 	/**
 	 * If global cart is enabled and the Post Indexer plugin is not installed, display an admin notice
 	 *
@@ -264,12 +264,15 @@ class MP_Admin_Multisite {
 		$options_permissions = apply_filters( 'mp_admin_multisite/gateway_permissions_options', $options_permissions );
 
 		$gateways = MP_Gateway_API::get_gateways();
+
 		foreach ( $gateways as $code => $gateway ) {
-			$metabox->add_field( 'select', array(
-				'name'		 => 'allowed_gateways[' . $code . ']',
-				'label'		 => array( 'text' => $gateway[1] ),
-				'options'	 => $options_permissions,
-			) );
+			if ( $code !== 'free_orders' ) {//we don't need to show free orders gateways since it will be automatically activated if needed
+				$metabox->add_field( 'select', array(
+					'name'		 => 'allowed_gateways[' . $code . ']',
+					'label'		 => array( 'text' => $gateway[ 1 ] ),
+					'options'	 => $options_permissions,
+				) );
+			}
 		}
 	}
 
@@ -281,12 +284,12 @@ class MP_Admin_Multisite {
 	 */
 	public function init_theme_permissions_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'				 		=> 'mp-network-settings-theme-permissions',
-			'page_slugs'		 	=> array( 'network-store-settings' ),
-			'title'				 	=> __( 'Theme Permissions', 'mp' ),
-			'site_option_name' 	=> 'mp_network_settings',
-			'desc'				 	=> __( 'Set theme access permissions for network stores. For a custom css theme, save your css file with the <strong>MarketPress Theme: NAME</strong> header in the <strong>/marketpress/ui/themes/</strong> folder and it will appear in this list so you may select it.', 'mp' ),
-			'order'				 	=> 15,
+			'id'				 => 'mp-network-settings-theme-permissions',
+			'page_slugs'		 => array( 'network-store-settings' ),
+			'title'				 => __( 'Theme Permissions', 'mp' ),
+			'site_option_name'	 => 'mp_network_settings',
+			'desc'				 => __( 'Set theme access permissions for network stores. For a custom css theme, save your css file with the <strong>MarketPress Theme: NAME</strong> header in the <strong>/marketpress/ui/themes/</strong> folder and it will appear in this list so you may select it.', 'mp' ),
+			'order'				 => 15,
 		) );
 
 		$theme_list = mp_get_theme_list();
@@ -295,7 +298,7 @@ class MP_Admin_Multisite {
 			'full'	 => __( 'All Can Use', 'mp' ),
 			'none'	 => __( 'No Access', 'mp' ),
 		);
-		
+
 		/**
 		 * Filter the theme permissions options list
 		 *
@@ -314,7 +317,7 @@ class MP_Admin_Multisite {
 			) );
 		}
 	}
-	
+
 	/**
 	 * Add menu items to the network admin menu
 	 *

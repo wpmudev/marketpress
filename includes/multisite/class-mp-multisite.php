@@ -1,6 +1,7 @@
 <?php
 
 class MP_Multisite {
+
 	/**
 	 * Refers to the current multisite build
 	 *
@@ -9,7 +10,7 @@ class MP_Multisite {
 	 * @var int
 	 */
 	var $build = 2;
-	
+
 	/**
 	 * Refers to a single instance of the class
 	 *
@@ -18,7 +19,7 @@ class MP_Multisite {
 	 * @var object
 	 */
 	private static $_instance = null;
-	
+
 	/**
 	 * Gets the single instance of the class
 	 *
@@ -41,15 +42,15 @@ class MP_Multisite {
 	 */
 	private function __construct() {
 		$this->maybe_install();
-		
+
 		if ( mp_get_network_setting( 'global_cart' ) && mp_is_post_indexer_installed() ) {
 			mp_cart()->is_global = true;
 			$this->post_indexer_set_post_types();
-			
+
 			add_filter( 'mp_product/url', array( &$this, 'product_url' ), 10, 2 );
 			add_action( 'switch_blog', array( &$this, 'refresh_autoloaded_options' ) );
 		}
-		
+
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 	}
 
@@ -62,11 +63,11 @@ class MP_Multisite {
 	 */
 	public function drop_old_ms_tables() {
 		global $wpdb;
-		
-		$table1 = $wpdb->base_prefix . 'mp_products';
-		$table2 = $wpdb->base_prefix . 'mp_terms';
-		$table3 = $wpdb->base_prefix . 'mp_term_relationships';
-		
+
+		$table1	 = $wpdb->base_prefix . 'mp_products';
+		$table2	 = $wpdb->base_prefix . 'mp_terms';
+		$table3	 = $wpdb->base_prefix . 'mp_term_relationships';
+
 		$wpdb->query( "DROP TABLE IF EXISTS $table1, $table2, $table3" );
 	}
 
@@ -78,13 +79,13 @@ class MP_Multisite {
 	 * @filter mp_gateway_api/get_gateways
 	 */
 	public function get_gateways( $gateways ) {
-		if ( ! is_network_admin() ) {
+		if ( !is_network_admin() ) {
 			if ( mp_cart()->is_global ) {
-				$code = mp_get_network_setting( 'global_gateway' );
-				$gateways = array( $code => $gateways[ $code ] );
+				$code		 = mp_get_network_setting( 'global_gateway' );
+				$gateways	 = array( $code => $gateways[ $code ] );
 			} else {
-				$allowed = mp_get_network_setting( 'allowed_gateways' );
-				
+				$allowed				 = mp_get_network_setting( 'allowed_gateways' );
+				$allowed[ 'free_orders' ]	 = 'full';//Always allow and activate it automatically later if needed
 				if ( is_array( $allowed ) ) {
 					foreach ( $gateways as $code => $gateway ) {
 						if ( 'full' != $allowed[ $code ] ) {
@@ -94,10 +95,10 @@ class MP_Multisite {
 				}
 			}
 		}
-		
+
 		return $gateways;
 	}
-	
+
 	/**
 	 * Check to see if install sequence needs to be run
 	 *
@@ -106,17 +107,17 @@ class MP_Multisite {
 	 */
 	public function maybe_install() {
 		$build = (int) get_site_option( 'mp_network_build', 1 );
-		
+
 		//check if installed
 		if ( $this->build === $build ) {
 			return;
 		}
-		
+
 		$this->drop_old_ms_tables();
-				
+
 		update_site_option( 'mp_network_build', $this->build );
 	}
-	
+
 	/**
 	 * Add/update network settings
 	 *
@@ -125,31 +126,31 @@ class MP_Multisite {
 	 */
 	public function ms_settings() {
 		$settings = get_site_option( 'mp_network_settings', array() );
-		
+
 		$default_settings = array(
-			'global_cart' => 0,
-			'allowed_gateways' => array(),
-			'global_gateway' => 'paypal_express',
-			'allowed_themes' => array(
+			'global_cart'		 => 0,
+			'allowed_gateways'	 => array(),
+			'global_gateway'	 => 'paypal_express',
+			'allowed_themes'	 => array(
 				'default3' => 'full',
 			),
 		);
-		
-		if ( ! class_exists( 'MP_Gateway_API' ) ) {
+
+		if ( !class_exists( 'MP_Gateway_API' ) ) {
 			require_once mp_plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
 		}
-		
-		$gateways = MP_Gateway_API::get_gateways();	
+
+		$gateways = MP_Gateway_API::get_gateways();
 		foreach ( $gateways as $code => $gateway ) {
 			$access = ( $gateway->plugin_name != 'paypal_express' ) ? 'none' : 'full';
 			mp_push_to_array( $default_settings, "allowed_gateways->{$code}", $access );
 		}
-				
+
 		$new_settings = array_replace_recursive( $default_settings, $settings );
-		
-		update_site_option( 'mp_network_settings', $new_settings );		
+
+		update_site_option( 'mp_network_settings', $new_settings );
 	}
-	
+
 	/**
 	 * Make sure product post types are indexed by Post Indexer
 	 *
@@ -157,21 +158,21 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function post_indexer_set_post_types() {
-		$pi_post_types = (array) get_site_option( 'postindexer_globalposttypes', array( 'post' ) );
-		$changed = false;
-		
+		$pi_post_types	 = (array) get_site_option( 'postindexer_globalposttypes', array( 'post' ) );
+		$changed		 = false;
+
 		foreach ( mp()->post_types as $post_type ) {
-			if ( ! in_array( $post_type, $pi_post_types ) ) {
+			if ( !in_array( $post_type, $pi_post_types ) ) {
 				$pi_post_types[] = $post_type;
-				$changed = true;
+				$changed		 = true;
 			}
 		}
-		
+
 		if ( $changed ) {
 			update_site_option( 'postindexer_globalposttypes', $pi_post_types );
 		}
 	}
-	
+
 	/**
 	 * Get the correct product url when global cart is enabled
 	 *
@@ -186,7 +187,7 @@ class MP_Multisite {
 	public function product_url( $url, $product ) {
 		return trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
 	}
-	
+
 	/**
 	 * Reload MP settings after switching blogs
 	 *
@@ -201,6 +202,7 @@ class MP_Multisite {
 	public function refresh_autoloaded_options() {
 		wp_load_alloptions();
 	}
+
 }
 
 MP_Multisite::get_instance();

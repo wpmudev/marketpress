@@ -719,12 +719,26 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	function mp_list_payment_options( $echo = true ) {
+
 		$gateways	 = MP_Gateway_API::get_active_gateways();
 		$html		 = '';
 
+		$cart	 = new MP_Cart();
+		$total	 = $cart->total( false );
+
 		$options = array();
 		foreach ( $gateways as $code => $gateway ) {
-			$options[ $code ] = $gateway->public_name;
+			if ( $total == 0 ) {
+				if ( $code == 'free_orders' ) {
+					$options[ $code ] = $gateway->public_name;
+				} else {
+					//do not list other payment gateways
+				}
+			} else {
+				if ( $code !== 'free_orders' ) {//do not list free orders if total is > 0
+					$options[ $code ] = $gateway->public_name;
+				}
+			}
 		}
 
 		/**

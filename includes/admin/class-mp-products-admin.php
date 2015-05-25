@@ -387,6 +387,7 @@ class MP_Products_Screen {
 				} else {
 					$stock = array( $product->get_meta( 'inventory', '&mdash;' ) );
 				}
+
 				$display_stock = implode( '<br />', $stock );
 
 				echo $display_stock == 'Array' ? '&mdash;' : $display_stock;
@@ -738,7 +739,7 @@ class MP_Products_Screen {
 	 */
 	public function hide_main_content_editor_for_variations() {
 		// Get the Post ID.
-		$post_id = $_GET[ 'post' ] ? (int) $_GET[ 'post' ] : (int) $_POST[ 'post_ID' ];
+		$post_id = isset( $_GET[ 'post' ] ) ? (int) $_GET[ 'post' ] : (isset( $_POST[ 'post_ID' ] ) ? (int) $_POST[ 'post_ID' ] : '');
 		if ( !isset( $post_id ) )
 			return;
 

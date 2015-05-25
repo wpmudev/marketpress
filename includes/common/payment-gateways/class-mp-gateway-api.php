@@ -100,6 +100,8 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 					self::$_active_gateways[ $code ] = new $class;
 				}
 			}
+
+			self::$_active_gateways[ 'free_orders' ] = new MP_Gateway_FREE_Orders();
 		}
 
 		/**
@@ -353,7 +355,9 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 			$hidden = (count( self::$_active_gateways ) > 1 && mp_get_session_value( 'mp_payment_method' ) != $this->plugin_name) ? ' style="display:none;"' : '';
 
 			$content .= '<div class="mp_gateway_form" id="mp-gateway-form-' . $this->plugin_name . '"' . $hidden . '>';
+
 			$content .= $this->payment_form( $cart, $billing_info );
+
 			$content .= '</div>';
 
 			return $content;
@@ -518,6 +522,20 @@ if ( !function_exists( 'mp_register_gateway_plugin' ) ) :
 			return false;
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

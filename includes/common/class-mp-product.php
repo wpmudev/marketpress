@@ -1074,6 +1074,8 @@ class MP_Product {
 			$related_specified_products_enabled = false;
 		}
 		
+		$related_products = '';
+		
 		if ( $related_products !== $this->get_meta( 'related_products' ) && $related_specified_products_enabled ) {
 			$query_args[ 'post__in' ] = $related_products;
 		} else {

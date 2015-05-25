@@ -140,9 +140,9 @@ class MP_Checkout {
 	 * @access protected
 	 */
 	protected function _update_shipping_section() {
-		
+
 		$data = (array) mp_get_post_value( 'billing', array() );
-		
+
 		foreach ( $data as $key => $value ) {
 			$value = trim( $value );
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
@@ -153,9 +153,9 @@ class MP_Checkout {
 
 		if ( $enable_shipping_address ) {
 			$data = (array) mp_get_post_value( 'shipping', array() );
-	
+
 			foreach ( $data as $key => $value ) {
-				$value = trim( $value );				
+				$value = trim( $value );
 				mp_update_session_value( "mp_shipping_info->{$key}", $value );
 			}
 		} else {
@@ -207,7 +207,7 @@ class MP_Checkout {
 	 */
 	public function address_fields( $type, $value_only = false ) {
 		$country = mp_get_user_address_part( 'country', $type );
-		
+
 		// Country list
 		$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		$countries			 = array();
@@ -953,7 +953,7 @@ class MP_Checkout {
 				    <textarea name="shipping[special_instructions]"></textarea>
 				  </div>';
 		}
-		
+
 		$html .= '
 
 				</div>
