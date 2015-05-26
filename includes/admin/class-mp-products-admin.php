@@ -173,9 +173,9 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 
-		$quantity = mp_get_post_value( 'inventory->inventory', '' );
+		$quantity = mp_get_post_value( 'inv->inventory', '' );
 
-		update_post_meta( $post_id, 'quantity', $quantity );
+		update_post_meta( $post_id, 'inventory', $quantity );
 	}
 
 	/**
@@ -1327,7 +1327,7 @@ class MP_Products_Screen {
 			) );
 
 			$inventory = $metabox->add_field( 'complex', array(
-				'name'			 => 'inventory',
+				'name'			 => 'inv',
 				'label'			 => array( 'text' => __( '', 'mp' ) ),
 				'conditional'	 => array(
 					'name'	 => 'track_inventory',
