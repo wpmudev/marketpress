@@ -268,23 +268,12 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 			require mp_plugin_dir( 'includes/common/payment-gateways/paymill-files/lib/Services/Paymill/Transactions.php' );
 			$transactionsObject = new Services_Paymill_Transactions( PAYMILL_API_KEY, PAYMILL_API_HOST );
 
-			$totals = array(
-				'product_total'	 => $cart->product_total( false ),
-				'shipping_total' => $cart->shipping_total( false ),
-				'tax_price'		 => 0,
-			);
-
-			// Get tax price, if applicable
-			if ( !mp_get_setting( 'tax->tax_inclusive' ) ) {
-				$totals[ 'tax_price' ] = $cart->tax_total( false );
-			}
-
 			// Create a new order object
 			$order		 = new MP_Order();
 			$order_id	 = $order->get_id();
 
 			// Calc total
-			$total = array_sum( $totals );
+			$total = $cart->total(false);
 
 			try {
 				$params = array(
@@ -303,7 +292,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 						'gateway_public_name'	 => $this->public_name,
 						'gateway_private_name'	 => $this->admin_name,
 						'method'				 => sprintf( __( '%1$s Card ending in %2$s - Expires %3$s', 'mp' ), ucfirst( $charge[ 'payment' ][ 'card_type' ] ), $charge[ 'payment' ][ 'last4' ], $charge[ 'payment' ][ 'expire_month' ] . '/' . $charge[ 'payment' ][ 'expire_year' ] ),
-						'transaction_id'		 => $charge->id,
+						'transaction_id'		 => $charge['id'],
 						'status'				 => array(
 							$timestamp => __( 'Paid', 'mp' ),
 						),
