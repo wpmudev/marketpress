@@ -38,7 +38,6 @@ class MP_Gateway_FREE_Orders extends MP_Gateway_API {
 		add_filter( 'WPMUDEV_Field_Checkbox_Group_Arguments_free_orders', array( &$this, 'WPMUDEV_Field_Checkbox_Group_Arguments_free_orders' ), 10, 1 );
 		add_filter( 'WPMUDEV_Field_Checkbox_checked', array( &$this, 'WPMUDEV_Field_Checkbox_Checked_free_orders' ), 10, 2 );
 
-
 		add_filter( 'mp_order/notification_body/free_orders', array( &$this, 'order_confirmation_email' ), 10, 2 );
 		add_filter( 'mp_order/confirmation_text/' . $this->plugin_name, array( &$this, 'order_confirmation_text' ), 10, 2 );
 	}
@@ -50,7 +49,7 @@ class MP_Gateway_FREE_Orders extends MP_Gateway_API {
 
 	public function WPMUDEV_Field_Checkbox_Checked_free_orders( $checked, $name ) {
 		if ( is_admin() && isset( $_GET[ 'page' ] ) && $_GET[ 'page' ] == 'store-settings-payments' && $name == 'gateways[allowed][' . $this->plugin_name . ']' ) {
-			$checked = 'checked';
+			//$checked = 'checked';
 		}
 		return $checked;
 	}
@@ -77,12 +76,13 @@ class MP_Gateway_FREE_Orders extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
-		$payment_info							 = array();
+		$payment_info = array();
 
 		$order = new MP_Order();
 
-		$timestamp		 = time();
-		$payment_info	 = array(
+		$timestamp = time();
+
+		$payment_info = array(
 			'gateway_public_name'	 => $this->public_name,
 			'gateway_private_name'	 => $this->admin_name,
 			'gateway_plugin_name'	 => $this->plugin_name,
@@ -142,7 +142,7 @@ class MP_Gateway_FREE_Orders extends MP_Gateway_API {
 	public function init_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => $this->generate_metabox_id(),
-			'page_slugs'	 => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
+			'page_slugs'	 => array( 'store-settings-payments-x', 'store-settings_page_store-settings-payments' ),
 			'title'			 => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
 			'option_name'	 => 'mp_settings',
 			'desc'			 => __( "This gateway is automatically activated if order totalling 0 and it can't be disabled", 'mp' ),
