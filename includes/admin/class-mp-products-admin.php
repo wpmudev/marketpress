@@ -631,7 +631,7 @@ class MP_Products_Screen {
 				'file_url'					 => mp_get_post_value( 'file_url' ),
 				'inventory_tracking'		 => mp_get_post_value( 'inventory_tracking' ),
 				'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
-				'out_of_stock_purchase'		 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
+				'inv_out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 				'regular_price'				 => mp_get_post_value( 'regular_price' ),
 				'has_sale'					 => mp_get_post_value( 'has_sale' ),
 				'sale_price_amount'			 => mp_get_post_value( 'sale_price->amount' ),
@@ -854,7 +854,7 @@ class MP_Products_Screen {
 					'sku'						 => $sku,
 					'inventory_tracking'		 => mp_get_post_value( 'track_inventory' ),
 					'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
-					'out_of_stock_purchase'		 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
+					'inv_out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 					'file_url'					 => '', //to do
 					'external_url'				 => '', //to do
 					'regular_price'				 => mp_get_post_value( 'regular_price' ),
@@ -1363,8 +1363,7 @@ class MP_Products_Screen {
 						'action' => 'show',
 					),
 					'validation'	 => array(
-						'digits' => true,
-						'min'	 => 0,
+						'integer' => true,
 					),
 				) );
 

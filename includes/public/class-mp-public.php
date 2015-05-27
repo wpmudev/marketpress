@@ -49,6 +49,20 @@ class MP_Public {
 		add_action( 'pre_get_posts', array( &$this, 'include_out_of_stock_products_for_downloads' ) );
 		add_filter( 'posts_results', array( &$this, 'set_publish_status_for_out_of_stock_product_downloads' ), 10, 2 );
 		add_action( 'template_redirect', array( &$this, 'maybe_serve_download' ) );
+
+		add_filter( 'body_class', array( &$this, 'add_mp_body_class' ) );
+	}
+
+	public function add_mp_body_class( $classes ) {
+		if (
+		is_singular( MP_Product::get_post_type() ) ||
+		get_post_type() == MP_Product::get_post_type() ||
+		get_query_var( MP_Product::get_post_type() ) ||
+		$this->is_store_page() ||
+		(is_singular( MP_Product::get_post_type() ) || is_tax( array( 'product_category', 'product_tax' ) )) ) {
+			$classes[] = 'mp-base';
+		}
+		return $classes;
 	}
 
 	/**

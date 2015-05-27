@@ -222,7 +222,7 @@ class MP_Ajax {
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
 								<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
-								<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
+								<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'inv_out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
 							</fieldset>
 						</div>
 					<?php } ?>
