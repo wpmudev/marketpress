@@ -940,11 +940,8 @@ You can manage this order here: %s', 'mp' );
 			
 			$count += $item->qty;
 			
-			/*echo 'quantity:'.$count.'<br />';
-			echo 'qty:'.$item->qty.'<br />';
-			exit;*/
-			
-			$item->update_meta( 'mp_sales_count', $count );
+			//$item->update_meta( 'mp_sales_count', $count );
+			update_post_meta($item->ID, 'mp_sales_count', $count);
 
 			if ( has_filter( 'mp_product_sale' ) ) {
 				trigger_error( 'The <strong>mp_product_sale</strong> hook has been replaced by <strong>mp_order/product_sale</strong> as of MP 3.0.', E_USER_ERROR );
