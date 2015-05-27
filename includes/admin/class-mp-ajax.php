@@ -202,30 +202,30 @@ class MP_Ajax {
 									<?php } else { ?>
 										<?php _e( 'Pounds:', 'mp' ); ?> <input placeholder="" type="text" name="weight[pounds]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_pounds' ) ); ?>"><br>
 										<?php _e( 'Ounces:', 'mp' ); ?> <input name="weight[ounces]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_ounces' ) ); ?>" class="mp-numeric "><br>
-									<?php
+										<?php
 									}
 								}
 								?>
-			<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_extra_shipping_cost' ) ); ?>">
+								<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_extra_shipping_cost' ) ); ?>">
 							</fieldset>
 						</div>
 					<?php } ?>
 
-						<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products    ?>
+					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products    ?>
 						<div class="fieldset_check">
 							<?php
-							$track_inventory = MP_Product::get_variation_meta( $variation_id, 'track_inventory', 0 );
+							$inventory_tracking = MP_Product::get_variation_meta( $variation_id, 'inventory_tracking', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="track_inventory" class="has_controller" value="1" <?php checked( 1, $track_inventory, true ); ?>> 
+								<input type="checkbox" name="inventory_tracking" class="has_controller" value="1" <?php checked( 1, $inventory_tracking, true ); ?>> 
 								<span><?php _e( 'Track Product Inventory', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
-			<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
+								<?php _e( 'Quantity:', 'mp' ); ?> <input placeholder="" type="text" name="inventory[inventory]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'inventory' ) ); ?>" class="mp-numeric mp-required"><br>
 								<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
 							</fieldset>
 						</div>
-		<?php } ?>
+					<?php } ?>
 
 					<div class="fieldset_check">
 						<label>

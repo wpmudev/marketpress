@@ -629,7 +629,7 @@ class MP_Products_Screen {
 				'sku'						 => mp_get_post_value( 'sku' ),
 				'external_url'				 => mp_get_post_value( 'external_url' ),
 				'file_url'					 => mp_get_post_value( 'file_url' ),
-				'track_inventory'			 => mp_get_post_value( 'track_inventory' ),
+				'inventory_tracking'		 => mp_get_post_value( 'inventory_tracking' ),
 				'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
 				'out_of_stock_purchase'		 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 				'regular_price'				 => mp_get_post_value( 'regular_price' ),
@@ -852,7 +852,7 @@ class MP_Products_Screen {
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
 					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
 					'sku'						 => $sku,
-					'track_inventory'			 => mp_get_post_value( 'track_inventory' ),
+					'inventory_tracking'		 => mp_get_post_value( 'track_inventory' ),
 					'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
 					'out_of_stock_purchase'		 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 					'file_url'					 => '', //to do
@@ -1317,7 +1317,7 @@ class MP_Products_Screen {
 			}
 
 			$metabox->add_field( 'checkbox', array(
-				'name'			 => 'track_inventory',
+				'name'			 => 'inventory_tracking',
 				'message'		 => __( 'Track Product Inventory', 'mp' ),
 				'conditional'	 => array(
 					'name'	 => 'product_type',
@@ -1330,7 +1330,7 @@ class MP_Products_Screen {
 				'name'			 => 'inv',
 				'label'			 => array( 'text' => __( '', 'mp' ) ),
 				'conditional'	 => array(
-					'name'	 => 'track_inventory',
+					'name'	 => 'inventory_tracking',
 					'value'	 => 1,
 					'action' => 'show',
 				),
@@ -1353,12 +1353,12 @@ class MP_Products_Screen {
 					  'value'	 => 'physical',
 					  ),
 					  array(
-					  'name'	 => 'variations[track_inventory]',
+					  'name'	 => 'variations[inventory_tracking]',
 					  'value'	 => 1,
 					  ),
 					  ), */
 					'conditional'	 => array(
-						'name'	 => 'track_inventory',
+						'name'	 => 'inventory_tracking',
 						'value'	 => 1,
 						'action' => 'show',
 					),
@@ -1576,7 +1576,7 @@ class MP_Products_Screen {
 			'label'	 => array( 'text' => __( 'SKU', 'mp' ) ),
 		) );
 		$metabox->add_field( 'checkbox', array(
-			'name'			 => 'track_inventory',
+			'name'			 => 'inventory_tracking',
 			'label'			 => array( 'text' => __( 'Track Inventory?', 'mp' ) ),
 			'conditional'	 => array(
 				'name'	 => 'product_type',
@@ -1596,7 +1596,7 @@ class MP_Products_Screen {
 					'value'	 => 'physical',
 				),
 				array(
-					'name'	 => 'track_inventory',
+					'name'	 => 'inventory_tracking',
 					'value'	 => 1,
 				),
 			),
@@ -1821,7 +1821,7 @@ class MP_Products_Screen {
 				'label'	 => array( 'text' => __( 'Image', 'mp' ) ),
 			) );
 			$repeater->add_sub_field( 'checkbox', array(
-				'name'			 => 'track_inventory',
+				'name'			 => 'inventory_tracking',
 				'label'			 => array( 'text' => __( 'Track Inventory?', 'mp' ) ),
 				'conditional'	 => array(
 					'name'	 => 'product_type',
@@ -1841,7 +1841,7 @@ class MP_Products_Screen {
 						'value'	 => 'physical',
 					),
 					array(
-						'name'	 => 'variations[track_inventory]',
+						'name'	 => 'variations[inventory_tracking]',
 						'value'	 => 1,
 					),
 				),

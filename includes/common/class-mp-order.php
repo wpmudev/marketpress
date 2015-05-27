@@ -908,6 +908,7 @@ You can manage this order here: %s', 'mp' );
 		}
 
 		$item_count = 0;
+		
 		foreach ( $items as $item ) {
 			$item_count += $item->qty;
 
@@ -916,7 +917,9 @@ You can manage this order here: %s', 'mp' );
 
 				// Update inventory
 				$new_stock = ($stock - $item->qty);
+				
 				$item->update_meta( 'inventory', $new_stock );
+				$item->update_meta( 'inv_inventory', $new_stock );
 
 				// Send low-stock notification if needed
 				if ( $new_stock <= mp_get_setting( 'inventory_threshhold' ) ) {
@@ -936,6 +939,10 @@ You can manage this order here: %s', 'mp' );
 			$count = $item->get_meta( 'mp_sales_count', 0 );
 			
 			$count += $item->qty;
+			
+			/*echo 'quantity:'.$count.'<br />';
+			echo 'qty:'.$item->qty.'<br />';
+			exit;*/
 			
 			$item->update_meta( 'mp_sales_count', $count );
 

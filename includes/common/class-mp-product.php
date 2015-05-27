@@ -1065,17 +1065,17 @@ class MP_Product {
 			'posts_per_page' => $limit,
 		);
 
-		
+
 		$related_specified_products_enabled = true;
-		
+
 		$related_specified_products = $this->get_meta( 'related_products' );
-		
-		if(is_array($related_specified_products) && $related_specified_products[0] == ''){
+
+		if ( is_array( $related_specified_products ) && $related_specified_products[ 0 ] == '' ) {
 			$related_specified_products_enabled = false;
 		}
-		
+
 		$related_products = '';
-		
+
 		if ( $related_products !== $this->get_meta( 'related_products' ) && $related_specified_products_enabled ) {
 			$query_args[ 'post__in' ] = $related_products;
 		} else {
@@ -1440,7 +1440,7 @@ class MP_Product {
 		if ( $this->has_variations() ) {
 			$variations = $this->get_variations();
 			foreach ( $variations as $variation ) {
-				if ( $variation->get_meta( 'track_inventory' ) ) {
+				if ( $variation->get_meta( 'inventory_tracking' ) ) {
 					$inventory	 = $variation->get_meta( 'inventory', 0 );
 					$has_stock	 = ( $inventory >= $qty );
 				} else {
@@ -1449,7 +1449,7 @@ class MP_Product {
 				}
 			}
 		} else {
-			if ( $this->get_meta( 'track_inventory' ) ) {
+			if ( $this->get_meta( 'inventory_tracking' ) ) {
 				$inventory	 = $this->get_meta( 'inventory', 0 );
 				$has_stock	 = ( $inventory >= $qty );
 			} else {
