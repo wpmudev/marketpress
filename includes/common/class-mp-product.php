@@ -1438,9 +1438,10 @@ class MP_Product {
 		$has_stock = false;
 
 		if ( $this->has_variations() ) {
+			$out_of_stock_purchase = $this->get_meta( 'inv_out_of_stock_purchase' );
 			$variations = $this->get_variations();
 			foreach ( $variations as $variation ) {
-				if ( $variation->get_meta( 'inventory_tracking' ) ) {
+				if ( $variation->get_meta( 'inventory_tracking' ) && $out_of_stock_purchase !== '1' ) {
 					$inventory	 = $variation->get_meta( 'inventory', 0 );
 					$has_stock	 = ( $inventory >= $qty );
 				} else {
@@ -1449,7 +1450,8 @@ class MP_Product {
 				}
 			}
 		} else {
-			if ( $this->get_meta( 'inventory_tracking' ) ) {
+			$out_of_stock_purchase = $this->get_meta( 'inv_out_of_stock_purchase' );
+			if ( $this->get_meta( 'inventory_tracking' ) && $out_of_stock_purchase !== '1' ) {
 				$inventory	 = $this->get_meta( 'inventory', 0 );
 				$has_stock	 = ( $inventory >= $qty );
 			} else {
