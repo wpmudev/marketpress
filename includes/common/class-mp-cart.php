@@ -155,6 +155,7 @@ class MP_Cart {
 	public function admin_enqueue_styles_scripts( $hook ) {
 		if ( 'mp_order' == get_current_screen()->post_type && ('post.php' == $hook || 'edit.php' == $hook) ) {
 			wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), false, MP_VERSION );
+			wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 			wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
 		}
 	}

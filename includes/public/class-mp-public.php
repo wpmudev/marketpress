@@ -223,6 +223,7 @@ class MP_Public {
 		// CSS
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
+		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
 		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 
