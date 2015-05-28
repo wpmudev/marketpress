@@ -181,7 +181,8 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
 										<?php
 										$inventory	 = get_post_meta( $child->ID, 'inventory', true );
-										echo esc_attr( isset( $inventory ) && !empty( $inventory ) ? $inventory : '&infin;'  );
+										//echo $inventory.'<br />';
+										echo esc_attr( isset( $inventory ) && !empty( $inventory ) || $inventory == '0' ? $inventory : '&infin;'  );
 										?>
 									</span>
 								</td>

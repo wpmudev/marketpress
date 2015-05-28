@@ -852,7 +852,7 @@ class MP_Products_Screen {
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
 					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
 					'sku'						 => $sku,
-					'inventory_tracking'		 => mp_get_post_value( 'track_inventory' ),
+					'inventory_tracking'		 => mp_get_post_value( 'inventory_tracking' ),
 					'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
 					'inv_out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 					'file_url'					 => '', //to do
