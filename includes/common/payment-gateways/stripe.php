@@ -347,6 +347,8 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		$order		 = new MP_Order();
 		$order_id	 = $order->get_id();
 
+		// Calc total
+		$total = $cart->total( false );
 
 		try {
 			// create the charge on Stripe's servers - this will charge the user's card

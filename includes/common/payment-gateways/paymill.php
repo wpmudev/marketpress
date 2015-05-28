@@ -273,7 +273,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 			$order_id	 = $order->get_id();
 
 			// Calc total
-			$total = $cart->total(false);
+			$total = $cart->total( false );
 
 			try {
 				$params = array(
@@ -292,7 +292,7 @@ class MP_Gateway_Paymill extends MP_Gateway_API {
 						'gateway_public_name'	 => $this->public_name,
 						'gateway_private_name'	 => $this->admin_name,
 						'method'				 => sprintf( __( '%1$s Card ending in %2$s - Expires %3$s', 'mp' ), ucfirst( $charge[ 'payment' ][ 'card_type' ] ), $charge[ 'payment' ][ 'last4' ], $charge[ 'payment' ][ 'expire_month' ] . '/' . $charge[ 'payment' ][ 'expire_year' ] ),
-						'transaction_id'		 => $charge['id'],
+						'transaction_id'		 => $charge[ 'id' ],
 						'status'				 => array(
 							$timestamp => __( 'Paid', 'mp' ),
 						),
