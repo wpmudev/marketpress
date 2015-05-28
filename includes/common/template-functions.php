@@ -156,7 +156,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' mp-grid-col-'.$per_row.'"' . (( 'grid' == $view ) ? '' : '') . '><!--style="width: ' . $width . '"-->
-					<div class="mp_one_product clearfix"' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '>
+					<div class="mp_one_product clearfix"><!--' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '-->
 						<div class="mp_product_detail">
 							' . $img . '
 							<div class="mp_product_content">

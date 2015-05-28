@@ -107,7 +107,7 @@ var marketpress = { };
                 var $this = $( this );
 
                 $this.find( '.mp_product_detail' ).equalHeights();
-                $this.find( '.mp_one_product' ).equalHeights();
+                //$this.find( '.mp_one_product' ).equalHeights();
                 $this.find( '.mp_buy_form' ).addClass( 'sticky' );
             } );
         },
