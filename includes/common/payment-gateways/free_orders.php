@@ -49,7 +49,7 @@ class MP_Gateway_FREE_Orders extends MP_Gateway_API {
 
 	public function WPMUDEV_Field_Checkbox_Checked_free_orders( $checked, $name ) {
 		if ( is_admin() && isset( $_GET[ 'page' ] ) && $_GET[ 'page' ] == 'store-settings-payments' && $name == 'gateways[allowed][' . $this->plugin_name . ']' ) {
-			//$checked = 'checked';
+			$checked = 'checked';
 		}
 		return $checked;
 	}
@@ -140,17 +140,18 @@ class MP_Gateway_FREE_Orders extends MP_Gateway_API {
 	 * @access public
 	 */
 	public function init_settings_metabox() {
+
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => $this->generate_metabox_id(),
-			'page_slugs'	 => array( 'store-settings-payments-x', 'store-settings_page_store-settings-payments' ),
+			'page_slugs'	 => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
 			'title'			 => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
 			'option_name'	 => 'mp_settings',
 			'desc'			 => __( "This gateway is automatically activated if order totalling 0 and it can't be disabled", 'mp' ),
-			'conditional'	 => array(
-				'name'	 => 'gateways[allowed][' . $this->plugin_name . ']',
-				'value'	 => 1,
-				'action' => 'show',
-			),
+		/* 'conditional'	 => array(
+		  'name'	 => 'gateways[allowed][' . $this->plugin_name . ']',
+		  'value'	 => 1,
+		  'action' => 'show',
+		  ), */
 		) );
 
 		$metabox->add_field( 'checkbox', array(

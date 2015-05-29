@@ -101,7 +101,9 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 				}
 			}
 
-			self::$_active_gateways[ 'free_orders' ] = new MP_Gateway_FREE_Orders();
+			if ( 'store-settings-payments' !== mp_get_get_value( 'page' ) ) {
+				self::$_active_gateways[ 'free_orders' ] = new MP_Gateway_FREE_Orders();
+			}
 		}
 
 		/**
@@ -522,6 +524,8 @@ if ( !function_exists( 'mp_register_gateway_plugin' ) ) :
 			return false;
 		}
 	}
+
+
 
 
 
