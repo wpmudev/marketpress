@@ -104,6 +104,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 	 * @return string
 	 */
 	function _mp_products_html( $view, $custom_query ) {
+
 		$html	 = '';
 		$per_row = (int) mp_get_setting( 'per_row' );
 		$width	 = round( 100 / $per_row, 1 ) . '%';
@@ -155,7 +156,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$class = array_filter( $class, create_function( '$s', 'return ( ! empty( $s ) );' ) );
 
 			$html .= '
-				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' mp-grid-col-'.$per_row.'"' . (( 'grid' == $view ) ? '' : '') . '><!--style="width: ' . $width . '"-->
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) .' '.(( 'grid' == $view ) ? 'mp-grid-col-'.$per_row : '').'"><!--style="width: ' . $width . '"-->
 					<div class="mp_one_product clearfix"><!--' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '-->
 						<div class="mp_product_detail">
 							' . $img . '
