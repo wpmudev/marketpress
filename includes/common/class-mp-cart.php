@@ -1005,7 +1005,7 @@ class MP_Cart {
 
 		$html = '
 		<div id="mp-floating-cart"' . (( $this->has_items() ) ? ' class="has-items"' : '') . '>
-			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . $this->product_total( true ) . '</span> ' . $this->item_count( false ) . '</div>
+			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . $this->product_total( true ) . '</span> ' . $this->item_count( false, true ) . '</div>
 			<div id="mp-floating-cart-contents">';
 
 
@@ -1212,11 +1212,16 @@ class MP_Cart {
 		}
 
 		$snippet = $numitems;
+
 		if ( $format ) {
 			if ( $numitems == 0 ) {
-				$snippet = __( '0 items', 'mp' );
+				$snippet = '<span class="mp-floating-widget-count">0</span>' . '<span class="mp-floating-widget-count-title">' . __( 'items', 'mp' ) . '</span>';
 			} else {
-				$snippet = sprintf( _n( '1 item', '%s items', $numitems, 'mp' ), $numitems );
+				if ( $numitems == 1 ) {
+					$snippet = '<span class="mp-floating-widget-count">1</span>' . '<span class="mp-floating-widget-count-title">' . __( 'item', 'mp' ) . '</span>';
+				} else {
+					$snippet = '<span class="mp-floating-widget-count">' . $numitems . '</span>' . '<span class="mp-floating-widget-count-title">' . __( 'items', 'mp' ) . '</span>';
+				}
 			}
 		}
 
