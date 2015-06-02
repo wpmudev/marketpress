@@ -535,6 +535,12 @@ You can manage this order here: %s', 'mp' );
 			// Country dropdown
 			$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 			$country_options	 = '';
+			
+			if(  mp_all_countries_allowed()){
+				$all_countries = mp()->countries;
+				$allowed_countries = array_keys($all_countries);
+			}
+			
 			foreach ( $allowed_countries as $country ) {
 				$country_options .= '<option value="' . $country . '" ' . selected( $country, $this->get_meta( "mp_{$type}_info->country", '' ), false ) . '>' . mp()->countries[ $country ] . '</option>' . "\n";
 			}

@@ -156,7 +156,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$class = array_filter( $class, create_function( '$s', 'return ( ! empty( $s ) );' ) );
 
 			$html .= '
-				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) .' '.(( 'grid' == $view ) ? 'mp-grid-col-'.$per_row : '').'"><!--style="width: ' . $width . '"-->
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '"><!--style="width: ' . $width . '"-->
 					<div class="mp_one_product clearfix"><!--' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '-->
 						<div class="mp_product_detail">
 							' . $img . '
@@ -2097,4 +2097,14 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	$post = $old_post;
 
 	return apply_filters( 'the_excerpt', $excerpt );
+}
+
+function mp_all_countries_allowed() {
+	$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+	$key				 = array_search( 'all_countries', $allowed_countries );
+	if ( is_numeric( $key ) ) {
+		return true;
+	} else {
+		return false;
+	}
 }

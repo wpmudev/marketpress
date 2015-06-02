@@ -209,8 +209,15 @@ class MP_Checkout {
 		$country = mp_get_user_address_part( 'country', $type );
 
 		// Country list
-		$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
-		$countries			 = array();
+		$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+
+		if ( mp_all_countries_allowed() ) {
+			$all_countries		 = mp()->countries;
+			$allowed_countries	 = array_keys( $all_countries );
+		}
+
+		$countries = array();
+		
 		foreach ( $allowed_countries as $_country ) {
 			$countries[ $_country ] = mp()->countries[ $_country ];
 		}
