@@ -1018,7 +1018,7 @@ class MP_Checkout {
 		if ( !is_user_logged_in() && !MP_HIDE_LOGIN_OPTION ) {
 			$html = wp_nonce_field( 'mp-login-nonce', 'mp_login_nonce', true, false ) . '
 				<div class="clearfix">
-					<div class="mp-checkout-column" style="padding-right:25px">
+					<div class="mp-checkout-column">
 						<h4>' . __( 'Have an account?', 'mp' ) . '</h4>
 						<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
 						<div class="mp-checkout-form-row">
@@ -1031,7 +1031,7 @@ class MP_Checkout {
 						</div>
 						<button id="mp-button-checkout-login" type="submit" class="mp-button mp-button-medium">' . __( 'Login', 'mp' ) . '</button>
 					</div>
-					<div class="mp-checkout-column" style="padding-left:25px">
+					<div class="mp-checkout-column">
 						<h4>' . __( 'First-time customer?', 'mp' ) . '</h4>
 						<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
 						<p><button type="submit" class="mp-button mp-button-medium mp-button-checkout-next-step">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
