@@ -69,7 +69,9 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 
 			foreach ( $history as $timestamp => $order ) {
 				$order = new MP_Order( $order[ 'id' ] );
+				$html .= '<div class="mp-order-details">';
 				$html .= $order->header( false );
+				$html .= '</div>';
 			}
 
 			if ( $total_pages > 1 ) {
@@ -1425,7 +1427,14 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 		$form = '
 			<form id="mp-order-lookup-form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
 				<div class="mp-order-lookup-form-content">' . $content . '</div>
-				<input type="text" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" /> <button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+				<div class="mp-form-group">
+					<div class="mp-form-group-input">
+						<input type="text" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
+					</div>
+					<div class="mp-form-group-submit">
+						<button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+					</div>
+				</div>
 			</form>';
 
 		/**
