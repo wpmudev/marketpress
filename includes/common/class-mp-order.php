@@ -219,11 +219,10 @@ class MP_Order {
 	 * @param string $subject The email subject text.
 	 * @param string $msg The email message text.
 	 */
-	protected function _send_email_to_buyers( $subject, $msg ) {
+	protected function _send_email_to_buyers( $subject, $msg, $attachments=array() ) {
 		$billing_email	 = $this->get_meta( 'mp_billing_info->email', '' );
 		$shipping_email	 = $this->get_meta( 'mp_shipping_info->email', '' );
 
-		$attachments = apply_filters('mp_order_sendmail_attachments',array(),$this);
 		mp_send_email( $billing_email, $subject, $msg,$attachments );
 
 		if ( $billing_email != $shipping_email ) {
@@ -272,8 +271,8 @@ class MP_Order {
 		 */
 		$msg = apply_filters( 'mp_order/notification_body', $msg, $this );
 		$msg = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
-
-		$this->_send_email_to_buyers( $subject, $msg );
+		$attachments = apply_filters('mp_order/sendmail_attachments',array(),$this,'new_order_client');
+		$this->_send_email_to_buyers( $subject, $msg,$attachments );
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
@@ -307,7 +306,7 @@ You can manage this order here: %s', 'mp' );
 		 * @param MP_Order $order
 		 */
 		$msg = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
-		$attachments = apply_filters('mp_order_sendmail_attachments',array(),$this);
+		$attachments = apply_filters('mp_order/sendmail_attachments',array(),$this,'new_order_admin');
 		mp_send_email( mp_get_store_email(), $subject, $msg ,$attachments);
 	}
 
@@ -361,8 +360,8 @@ You can manage this order here: %s', 'mp' );
 		 * @param MP_Order $this The current order object.
 		 */
 		$msg = apply_filters( 'mp_order/shipment_notification', $msg, $this );
-
-		$this->_send_email_to_buyers( $subject, $msg );
+		$attachments = apply_filters('mp_order/sendmail_attachments',array(),$this,'order_shipped_client');
+		$this->_send_email_to_buyers( $subject, $msg ,$attachments);
 	}
 
 	/**
