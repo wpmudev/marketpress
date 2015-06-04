@@ -222,11 +222,13 @@ class MP_Order {
 	protected function _send_email_to_buyers( $subject, $msg ) {
 		$billing_email	 = $this->get_meta( 'mp_billing_info->email', '' );
 		$shipping_email	 = $this->get_meta( 'mp_shipping_info->email', '' );
-		mp_send_email( $billing_email, $subject, $msg );
+
+		$attachments = apply_filters('mp_order_sendmail_attachments',array(),$this);
+		mp_send_email( $billing_email, $subject, $msg,$attachments );
 
 		if ( $billing_email != $shipping_email ) {
 			// Billing email is different than shipping email so let's send an email to the shipping email too
-			mp_send_email( $shipping_email, $subject, $msg );
+			mp_send_email( $shipping_email, $subject, $msg,$attachments );
 		}
 	}
 
@@ -305,8 +307,8 @@ You can manage this order here: %s', 'mp' );
 		 * @param MP_Order $order
 		 */
 		$msg = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
-
-		mp_send_email( mp_get_store_email(), $subject, $msg );
+		$attachments = apply_filters('mp_order_sendmail_attachments',array(),$this);
+		mp_send_email( mp_get_store_email(), $subject, $msg ,$attachments);
 	}
 
 	/**

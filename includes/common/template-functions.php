@@ -1254,7 +1254,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 	 * @param string $category Optional, limit to a product category
 	 * @param string $tag Optional, limit to a product tag
 	 * @param bool $list_view Optional, show as list. Default to presentation settings
-	 * @param bool $filters Optional, show filters	 
+	 * @param bool $filters Optional, show filters
 	 */
 	function mp_list_products() {
 // Init args
@@ -2053,10 +2053,11 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	 * @param string $email The email address to send to.
 	 * @param string $subject The subject of the email.
 	 * @param string $msg The email message.
+	 * @param array $attachments
 	 * @return bool
 	 */
-	function mp_send_email( $email, $subject, $msg ) {
-		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
+	function mp_send_email( $email, $subject, $msg, $attachments = array() ) {
+		return MP_Mailer::get_instance()->send( $email, $subject, $msg ,$attachments);
 	}
 
 endif;
