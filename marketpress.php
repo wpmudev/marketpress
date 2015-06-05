@@ -392,6 +392,14 @@ class Marketpress {
 			) );
 		}
 
+		mp_register_addon( array(
+			'label'			 => __( 'Invoice PDF', 'mp' ),
+			'desc'			 => __( '', 'mp' ),
+			'class'			 => 'MP_PDF_Invoice_Addon',
+			'path'			 => mp_plugin_dir( 'includes/addons/mp-pdf-invoice/class-mp-pdf-invoice-addon.php' ),
+			'has_settings'	 => true,
+		) );
+
 		/**
 		 * Fires after all internal addons have been registered
 		 *

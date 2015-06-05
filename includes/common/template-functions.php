@@ -69,7 +69,9 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 
 			foreach ( $history as $timestamp => $order ) {
 				$order = new MP_Order( $order[ 'id' ] );
+				$html .= '<div class="mp-order-details">';
 				$html .= $order->header( false );
+				$html .= '</div>';
 			}
 
 			if ( $total_pages > 1 ) {
@@ -1256,7 +1258,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 	 * @param string $category Optional, limit to a product category
 	 * @param string $tag Optional, limit to a product tag
 	 * @param bool $list_view Optional, show as list. Default to presentation settings
-	 * @param bool $filters Optional, show filters	 
+	 * @param bool $filters Optional, show filters
 	 */
 	function mp_list_products() {
 // Init args
@@ -1429,7 +1431,14 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 		$form = '
 			<form id="mp-order-lookup-form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
 				<div class="mp-order-lookup-form-content">' . $content . '</div>
-				<input type="text" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" /> <button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+				<div class="mp-form-group">
+					<div class="mp-form-group-input">
+						<input type="text" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
+					</div>
+					<div class="mp-form-group-submit">
+						<button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+					</div>
+				</div>
 			</form>';
 
 		/**
@@ -2068,10 +2077,11 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	 * @param string $email The email address to send to.
 	 * @param string $subject The subject of the email.
 	 * @param string $msg The email message.
+	 * @param array $attachments
 	 * @return bool
 	 */
-	function mp_send_email( $email, $subject, $msg ) {
-		return MP_Mailer::get_instance()->send( $email, $subject, $msg );
+	function mp_send_email( $email, $subject, $msg, $attachments = array() ) {
+		return MP_Mailer::get_instance()->send( $email, $subject, $msg ,$attachments);
 	}
 
 endif;

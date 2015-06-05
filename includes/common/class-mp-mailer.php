@@ -9,7 +9,7 @@ class MP_Mailer {
 	 * @var object
 	 */
 	private static $_instance = null;
-	
+
 	/**
 	 * Gets the single instance of the class
 	 *
@@ -32,7 +32,7 @@ class MP_Mailer {
 	 */
 	private function __construct() {
 	}
-	
+
 	/**
 	 * Send an email
 	 *
@@ -41,15 +41,16 @@ class MP_Mailer {
 	 * @param string $email The email address to send to.
 	 * @param string $subject The subject of the email.
 	 * @param string $msg The email message.
+	 * @param array $attachments
 	 * @return bool
 	 */
-	public function send( $email, $subject, $msg ) {
+	public function send( $email, $subject, $msg, $attachments = array() ) {
 		//remove any other filters
 		remove_all_filters( 'wp_mail_from' );
 		remove_all_filters( 'wp_mail_from_name' );
 		remove_all_filters( 'wp_mail_content_type' );
 		remove_all_filters( 'wp_mail_charset' );
-		
+
 		// add filters
 		add_filter( 'wp_mail_from', array( &$this, 'set_mail_from' ) );
 		add_filter( 'wp_mail_from_name', array( &$this, 'set_mail_from_name' ) );
@@ -58,8 +59,9 @@ class MP_Mailer {
 
 		//convert all tabs to their approriate html markup
 		$msg = str_replace( array( "\t" ), array( '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ), $msg );
-		
-		return wp_mail( $email, $subject, $msg );		
+		$headers = apply_filters('mp_mailer_headers',array());
+		$attachments = apply_filters('mp_mailer_attachments',$attachments);
+		return wp_mail( $email, $subject, $msg,$headers,$attachments );
 	}
 
 	/**
@@ -83,7 +85,7 @@ class MP_Mailer {
 	public function set_mail_content_type( $content_type ) {
 		return 'text/html';
 	}
-	
+
 	/**
 	 * Set the from email
 	 *
