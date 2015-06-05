@@ -101,6 +101,7 @@ class MP_Store_Settings_Shipping {
 			'label'					 => array( 'text' => __( 'Target Countries', 'mp' ) ),
 			'desc'					 => __( 'These are the countries that you will ship to.', 'mp' ),
 			'options'				 => mp_popular_country_list() + array( 'all_countries' => __( 'All Countries', 'mp' ) ) + mp_country_list(), //all_countries|disabled
+			'default_value'			 => array( 'all_countries' => __( 'All Countries', 'mp' ) ),
 			'placeholder'			 => __( 'Choose Countries', 'mp' ),
 			'format_dropdown_header' => '
 				<ul class="select2-all-none">

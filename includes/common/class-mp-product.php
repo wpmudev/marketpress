@@ -193,9 +193,9 @@ class MP_Product {
 
 		// Make sure all attribute terms are unique and in stock
 		foreach ( $variations as $variation ) {
-			$json[ 'status' ] = 'variation loop';
+			$json[ 'status' ]	 = 'variation loop';
 			//foreach ( $filtered_atts as $tax_slug ) {
-			$terms = get_the_terms( $variation->ID, $tax_slug );
+			$terms				 = get_the_terms( $variation->ID, $tax_slug );
 			//foreach ( $terms as $term ) {
 			if ( $variation->in_stock( $qty ) ) {
 
@@ -203,8 +203,8 @@ class MP_Product {
 				//$json[ 'qty_in_stock' ] = $variation->get_stock();
 				//$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
 			} elseif ( $qty_changed || !$variation->in_stock( $qty ) ) {
-				$json[ 'status' ] = 'out of stock';
-				$json[ 'qty_in_stock' ] = $variation->get_stock();
+				$json[ 'status' ]		 = 'out of stock';
+				$json[ 'qty_in_stock' ]	 = $variation->get_stock();
 
 				/**
 				 * Filter the out of stock alert message
@@ -1119,7 +1119,7 @@ class MP_Product {
 		if ( $product_query->have_posts() ) {
 			switch ( $view ) {
 				case 'grid' :
-					$html .= _mp_products_html_grid( $product_query );
+					$html .= _mp_products_html_grid( $product_query, true );
 					break;
 
 				case 'list' :
@@ -1257,6 +1257,7 @@ class MP_Product {
 		}
 
 		$image_post_id = $this->ID;
+
 		if ( $this->has_variations() ) {
 			$image_post_id = $this->get_variation()->ID;
 		}

@@ -281,7 +281,7 @@ class MP_Store_Settings_Presentation {
 			'label'		 => array( 'text' => __( 'Show Share Button', 'mp' ) ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
-		
+
 		$metabox->add_field( 'section', array(
 			'name'	 => 'section_twitter',
 			'title'	 => __( 'Twitter', 'mp' ),
@@ -528,6 +528,24 @@ class MP_Store_Settings_Presentation {
 			'conditional'	 => array(
 				'name'	 => 'related_products[show]',
 				'value'	 => '1',
+				'action' => 'show',
+			),
+		) );
+
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'related_products[per_row]',
+			'label'			 => array( 'text' => __( 'How many products per row?', 'mp' ) ),
+			'desc'			 => __( 'Set the number of products that show up in a grid row to best fit your theme', 'mp' ),
+			'default_value'	 => 3,
+			'options'		 => array(
+				1	 => __( 'One', 'mp' ),
+				2	 => __( 'Two', 'mp' ),
+				3	 => __( 'Three', 'mp' ),
+				4	 => __( 'Four', 'mp' ),
+			),
+			'conditional'	 => array(
+				'name'	 => 'related_products[view]',
+				'value'	 => 'grid',
 				'action' => 'show',
 			),
 		) );

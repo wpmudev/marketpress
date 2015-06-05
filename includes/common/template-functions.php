@@ -103,10 +103,14 @@ if ( !function_exists( '_mp_products_html' ) ) :
 	 * @param WP_Query $custom_query A WP_Query object.
 	 * @return string
 	 */
-	function _mp_products_html( $view, $custom_query ) {
+	function _mp_products_html( $view, $custom_query, $related_products = false ) {
 
-		$html	 = '';
-		$per_row = (int) mp_get_setting( 'per_row' );
+		$html = '';
+		if ( $related_products ) {
+			$per_row = mp_get_setting( 'related_products->per_row' );
+		} else {
+			$per_row = (int) mp_get_setting( 'per_row' );
+		}
 		$width	 = round( 100 / $per_row, 1 ) . '%';
 		$column	 = 1;
 
@@ -236,8 +240,8 @@ if ( !function_exists( '_mp_products_html_grid' ) ) :
 	 * @param WP_Query $custom_query
 	 * @return string
 	 */
-	function _mp_products_html_grid( $custom_query ) {
-		return _mp_products_html( 'grid', $custom_query );
+	function _mp_products_html_grid( $custom_query, $relate_products = false ) {
+		return _mp_products_html( 'grid', $custom_query, $relate_products );
 	}
 
 endif;
@@ -1613,10 +1617,25 @@ if ( !function_exists( 'mp_product' ) ) {
 		$fb		 = $product->facebook_like_button( 'single_view' );
 		$twitter = $product->twitter_button( 'single_view' );
 
+		$has_image = false;
+		if ( !$product->has_variations() ) {
+			$values = get_post_meta( $product->ID, 'mp_product_images', true );
+			if ( $values ) {
+				$has_image = true;
+			}
+		} else {
+			$post_thumbnail_id = get_post_thumbnail_id( $product->ID );
+			if ( $post_thumbnail_id ) {
+				$has_image = true;
+			}
+		}
+
+		$image_alignment = mp_get_setting( 'image_alignment_single' );
+
 		$return = '
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
+				<div class="mp_product ' . ($has_image ? 'mp_product-has-image' : '') . ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignnone') . ' ' . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">
 				<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
-
 
 
 		if ( $image ) {
@@ -1722,6 +1741,7 @@ if ( !function_exists( 'mp_product' ) ) {
 			$return .= '</div>';
 		}
 
+		$return .= '<div class="mp_product_extra">';
 		$return .= $product->content_tab_labels( false );
 
 		if ( !empty( $content ) ) {
@@ -1741,14 +1761,16 @@ if ( !function_exists( 'mp_product' ) ) {
 </div>
 </div>';
 		}
+
 		// Remove overview tab as it's already been manually output above
 		array_shift( $product->content_tabs );
 
 		foreach ( $product->content_tabs as $slug => $label ) {
 			switch ( $slug ) {
 				case 'mp-related-products' :
+					$view = mp_get_setting( 'related_products->view' );
 					if ( mp_get_setting( 'related_products->show' ) ) {
-						$return .= '<div id="mp-related-products" class="mp_product_content clearfix" style="display:none">' . $product->related_products() . ' </div>';
+						$return .= '<div id="mp-related-products" class="mp_product_content ' . (isset( $view ) ? 'mp_' . $view : 'mp_list') . ' clearfix" style="display:none">' . $product->related_products() . ' </div>';
 					}
 					break;
 
@@ -1766,9 +1788,11 @@ if ( !function_exists( 'mp_product' ) ) {
 					break;
 			}
 		}
-
+		$return .= '</div>';
 		$return .= '
-			</div>';
+			
+</div>			
+</div>';
 
 		/**
 		 * Filter the product html
