@@ -1979,12 +1979,12 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 			<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
 				<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp_product_list_refine clearfix" method="get">
 						<div class="one_filter" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-							<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label><br />
+							<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label>
 							' . $terms . '
 						</div>
 	
 						<div class="one_filter">
-							<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label><br />
+							<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label>
 							<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
 								' . $options_html . '
 							</select>
