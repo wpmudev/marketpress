@@ -170,10 +170,12 @@ if ( !function_exists( '_mp_products_html' ) ) :
 								<h3 class="mp_product_name entry-title" itemprop="name">
 									<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
 								</h3>
-			' . $pinit . '
-			' . $fb . '
-			' . $twitter . '
-			' . $mp_product_list_content . '
+								<div class="mp-social-shares">
+									' . $pinit . '
+									' . $fb . '
+									' . $twitter . '
+									' . $mp_product_list_content . '
+								</div>
 							</div>
 						</div>
 
