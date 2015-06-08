@@ -58,6 +58,252 @@ class MP_Installer {
 		) );
 	}
 
+	public function possible_product_combinations( $groups, $prefix = '' ) {
+		$result	 = array();
+		$group	 = array_shift( $groups );
+		foreach ( $group as $selected ) {
+			if ( $groups ) {
+				$result = array_merge( $result, $this->possible_product_combinations( $groups, $prefix . $selected . '|' ) );
+			} else {
+				$result[] = $prefix . $selected;
+			}
+		}
+		return $result;
+	}
+
+	public function get_product_variation_value_by_index( $post_id, $post_meta_name, $index, $single = false,
+													   $default_value = '' ) {
+
+
+		if ( 'mp_shipping->extra_cost' == $post_meta_name ) {
+			$value = get_post_meta( $post_id, 'mp_shipping', false );
+			if ( isset( $value[ 'extra_cost' ] ) ) {
+				return $value[ 'extra_cost' ];
+			} else {
+				return '';
+			}
+		}
+
+		$value = get_post_meta( $post_id, $post_meta_name, $single );
+
+		if ( 'mp_special_tax' == $post_meta_name ) {
+			$value = $value * 100;
+		}
+
+		if ( $value && !empty( $value ) ) {
+			if ( $single ) {
+				return $value;
+			} else {
+				$value = isset( $value[ 0 ][ $index ] ) ? $value[ 0 ][ $index ] : $default_value;
+				return $value;
+			}
+		} else {
+			return $default_value;
+		}
+	}
+
+	public function product_variations_transition( $post_id, $product_type ) {
+		global $wp_taxonomies;
+
+		$variation_values		 = get_post_meta( $post_id, 'mp_var_name', true );
+		//$variation_name		 = 'Variation'; //default variation category / attribute name
+		$variation_names[ 0 ]	 = 'Variation';
+		$data					 = array();
+
+		if ( isset( $variation_values ) && !empty( $variation_values ) ) {
+
+			update_post_meta( $post_id, 'has_variations', 1 );
+
+			$i = 0;
+
+			foreach ( $variation_names as $variation_name ) {
+
+				$variation_name = MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $variation_name, $variation_name ); //taxonomy name made of the prefix and attribute's ID
+
+				$args = array(
+					'orderby'		 => 'name',
+					'hide_empty'	 => false,
+					'fields'		 => 'all',
+					'hierarchical'	 => true,
+				);
+
+				/* Get terms for the given taxonomy (variation name i.e. color, size etc) */
+				$terms = get_terms( array( $variation_name ), $args );
+
+				/* Put variation values in the array */
+				$variation_values_row	 = $variation_values;
+				//$variation_values_row	 = str_replace( array( '[', ']', '"' ), '', $variation_values_row );
+				//$variations_data		 = explode( ',', $variation_values_row );
+				$variations_data		 = $variation_values_row;
+
+				global $variations_single_data;
+				foreach ( $variations_data as $variations_single_data ) {
+
+					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
+					$term_object = array_filter(
+					$terms, function ($e) {
+						global $variations_single_data;
+						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
+					}
+					);
+
+					reset( $term_object );
+					$data[ $i ][]			 = $variation_name . '=' . ((!empty( $term_object )) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data_original[ $i ][]	 = $variation_name . '=' . $variations_single_data;
+				}
+
+				$i++;
+			}
+
+			$combinations			 = $this->possible_product_combinations( $data );
+			$combinations_original	 = $this->possible_product_combinations( $data_original );
+
+			$combination_num	 = 1;
+			$combination_index	 = 0;
+
+			foreach ( $combinations as $combination ) {
+
+				$post_title		 = get_the_title( $post_id );
+				$variation_id	 = wp_insert_post( array(
+					'post_title'	 => $post_title,
+					'post_content'	 => '',
+					'post_status'	 => 'publish',
+					'post_type'		 => 'mp_product_variation',
+					'post_parent'	 => $post_id,
+				) );
+
+				/* Make a variation name from the combination */
+				$variation_title_combinations = explode( '|', $combinations_original[ $combination_index ] );
+
+				$variation_name_title = '';
+
+				foreach ( $variation_title_combinations as $variation_title_combination ) {
+					$variation_name_title_array = explode( '=', $variation_title_combination );
+					$variation_name_title .= $variation_name_title_array[ 1 ] . ' ';
+				}
+
+				$sku						 = $this->get_product_variation_value_by_index( $post_id, 'mp_sku', $combination_index );
+				$inventory_tracking			 = $this->get_product_variation_value_by_index( $post_id, 'mp_track_inventory', $combination_index, true );
+				$inventory					 = $this->get_product_variation_value_by_index( $post_id, 'mp_inventory', $combination_index );
+				$file_url					 = $this->get_product_variation_value_by_index( $post_id, 'mp_file', $combination_index, true );
+				$external_url				 = $this->get_product_variation_value_by_index( $post_id, 'mp_product_link', $combination_index, true );
+				$regular_price				 = $this->get_product_variation_value_by_index( $post_id, 'mp_price', $combination_index );
+				$sale_price					 = $this->get_product_variation_value_by_index( $post_id, 'mp_sale_price', $combination_index );
+				$has_sale					 = $this->get_product_variation_value_by_index( $post_id, 'mp_is_sale', $combination_index, true );
+				$special_tax_rate			 = $this->get_product_variation_value_by_index( $post_id, 'mp_special_tax', $combination_index, true );
+				$description				 = $this->get_product_variation_value_by_index( $post_id, 'mp_custom_field_label', $combination_index );
+				$weight_extra_shipping_cost	 = $this->get_product_variation_value_by_index( $post_id, 'mp_shipping->extra_cost', $combination_index, true );
+
+				$this->post_meta_transition( $post_id, 'mp_shipping', 'weight_extra_shipping_cost' );
+
+				if ( is_numeric( $special_tax_rate ) ) {
+					$charge_tax = 1;
+				} else {
+					$charge_tax = 0;
+				}
+
+				if ( is_numeric( $weight_extra_shipping_cost ) ) {
+					$charge_shipping = 1;
+				} else {
+					$charge_shipping = 0;
+				}
+
+				/*
+				  if ( $old_post_meta_name == 'mp_shipping' ) {
+				  $old_value = get_post_meta( $post_id, $old_post_meta_name, true );
+				  if ( isset( $old_value ) && is_array( $old_value ) ) {
+				  $old_value = $old_value[ 'extra_cost' ];
+				  } else {
+				  $old_value = 0;
+				  }
+
+				  if ( (int) $old_value > 0 ) {
+				  update_post_meta( $post_id, 'charge_shipping', '1' );
+				  }
+				  } */
+				$variation_metas = apply_filters( 'mp_variations_meta', array(
+					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
+					'sku'						 => $sku,
+					'inventory_tracking'		 => $inventory_tracking,
+					'inventory'					 => $inventory,
+					'inv_out_of_stock_purchase'	 => 0,
+					'file_url'					 => $file_url,
+					'external_url'				 => $external_url,
+					'regular_price'				 => $regular_price,
+					'sale_price_amount'			 => $sale_price,
+					'has_sale'					 => $has_sale,
+					'special_tax_rate'			 => $special_tax_rate,
+					'description'				 => $description,
+					'sale_price_start_date'		 => '',
+					'sale_price_end_date'		 => '',
+					'sale_price'				 => '', //array - to do
+					'weight'					 => '', //array - to do
+					'weight_pounds'				 => '',
+					'weight_ounces'				 => '',
+					'charge_shipping'			 => $charge_shipping,
+					'charge_tax'				 => $charge_tax,
+					'weight_extra_shipping_cost' => $weight_extra_shipping_cost,
+				), mp_get_post_value( 'post_ID' ), $variation_id );
+
+				/* Add default post metas for variation */
+				foreach ( $variation_metas as $meta_key => $meta_value ) {
+					update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
+				}
+
+				/* Add post terms for the variation */
+				$variation_terms = explode( '|', $combination );
+
+				foreach ( $variation_terms as $variation_term ) {
+					$variation_term_vals = explode( '=', $variation_term );
+					wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], true );
+				}
+
+				$combination_num++;
+				$combination_index++;
+			}
+			//}
+			//exit;
+		} else {
+			//do nothing
+		}
+	}
+
+	public function post_meta_transition( $post_id, $old_post_meta_name, $new_post_meta_name ) {
+		$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
+
+		if ( is_array( $old_value ) ) {
+			$old_value = $old_value[ 0 ];
+		}
+
+		if ( $new_post_meta_name == 'special_tax_rate' ) {
+			if ( $old_value > 0 ) {
+				update_post_meta( $post_id, 'charge_tax', '1' );
+			} else {
+				update_post_meta( $post_id, 'charge_tax', '0' );
+			}
+			$old_value = $old_value * 100; //20% was marked as 0.2 in the previous version
+		}
+
+		if ( $old_post_meta_name == 'mp_shipping' ) {
+			$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
+			if ( isset( $old_value ) && is_array( $old_value ) ) {
+				$old_value = $old_value[ 'extra_cost' ];
+			} else {
+				$old_value = 0;
+			}
+
+			if ( (int) $old_value > 0 ) {
+				update_post_meta( $post_id, 'charge_shipping', '1' );
+			}
+		}
+
+		/* if($old_post_meta_name == 'mp_shipping->extra_cost'){
+
+		  } */
+
+		update_post_meta( $post_id, $new_post_meta_name, $old_value );
+	}
+
 	/**
 	 * Update product postmeta
 	 *
@@ -81,9 +327,82 @@ class MP_Installer {
 		$page		 = mp_get_post_value( 'page', 1 );
 		$updated	 = ($page * $per_page);
 
-		while ( $query->have_posts() ) : $query->the_post();
-		//! TODO: Update product metadata
-		endwhile;
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$post_id = get_the_ID();
+
+			$variations = get_post_meta( $post_id, 'mp_var_name', true );
+
+			if ( $variations && is_array( $variations ) ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
+				if ( count( $variations ) > 1 ) {
+					//It's a variation product
+
+					$mp_file		 = get_post_meta( $post_id, 'mp_file', true );
+					$mp_product_link = get_post_meta( $post_id, 'mp_product_link', true );
+
+					if ( !empty( $mp_file ) ) {
+						$product_type = 'digital';
+					} else if ( !empty( $mp_product_link ) ) {
+						$product_type = 'external';
+					} else {
+						$product_type = 'physical';
+					}
+
+					update_post_meta( $post_id, 'product_type', $product_type );
+
+					$this->product_variations_transition( $post_id, $product_type );
+				} else {
+					//It's single/regular/non-variant product
+
+					$mp_file		 = get_post_meta( $post_id, 'mp_file', true );
+					$mp_product_link = get_post_meta( $post_id, 'mp_product_link', true );
+
+					if ( !empty( $mp_file ) ) {
+						$product_type = 'digital';
+					} else if ( !empty( $mp_product_link ) ) {
+						$product_type = 'external';
+					} else {
+						$product_type = 'physical';
+
+						$weight_pounds	 = get_post_meta( $post_id, 'weight_pounds', true );
+						$weight_ounces	 = get_post_meta( $post_id, 'weight_ounces', true );
+
+						if ( empty( $weight_ounces ) ) {
+							update_post_meta( $post_id, 'weight_ounces', 0 );
+						}
+
+						if ( empty( $weight_pounds ) ) {
+							update_post_meta( $post_id, 'weight_pounds', 0 );
+						}
+					}
+
+					update_post_meta( $post_id, 'product_type', $product_type );
+
+					$this->post_meta_transition( $post_id, 'mp_sku', 'sku' );
+					$this->post_meta_transition( $post_id, 'mp_price', 'regular_price' );
+					$this->post_meta_transition( $post_id, 'mp_sale_price', 'sale_price_amount' );
+					$this->post_meta_transition( $post_id, 'mp_track_inventory', 'track_inventory' );
+					$this->post_meta_transition( $post_id, 'mp_inventory', 'inventory' );
+					$this->post_meta_transition( $post_id, 'mp_special_tax', 'special_tax_rate' );
+					$this->post_meta_transition( $post_id, 'mp_is_sale', 'has_sale' );
+
+					$this->post_meta_transition( $post_id, 'mp_shipping', 'extra_shipping_cost' );
+					$this->post_meta_transition( $post_id, 'mp_shipping', 'weight_extra_shipping_cost' );
+
+					$this->post_meta_transition( $post_id, 'mp_file', 'file_url' ); //If not empty then mark it as digital product
+					$this->post_meta_transition( $post_id, 'mp_product_link', 'external_url' ); //If not empty then mark it as external product
+				//
+				}
+			}
+			/* $old_sku = get_post_meta( $post_id, 'mp_sku', false );
+			  if ( is_array( $old_sku ) && count( $old_sku[ 0 ] ) == 1 ) {
+			  //single product
+			  echo 'single product, ';
+			  } else {
+			  //variation product
+			  echo 'variation product, ';
+			  } */
+		}
 
 		$response = array(
 			'updated'	 => ceil( $updated / $query->found_posts ) * 100,
@@ -182,7 +501,7 @@ class MP_Installer {
 				</style>
 				<h2><?php _e( 'Product Metadata', 'mp' ); ?></h2>
 				<form id="mp-update-product-postmeta-form" action="<?php echo admin_url( 'admin-ajax.php' ); ?>">
-			<?php wp_nonce_field( 'mp_update_product_postmeta' ); ?>
+					<?php wp_nonce_field( 'mp_update_product_postmeta' ); ?>
 					<input type="hidden" name="action" value="mp_update_product_postmeta" />
 					<input type="hidden" name="page" value="1" />
 					<p class="submit"><input class="button-primary" type="submit" value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>

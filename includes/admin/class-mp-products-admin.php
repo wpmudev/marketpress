@@ -511,7 +511,7 @@ class MP_Products_Screen {
 		return $result;
 	}
 
-	public function term_id( $term, $taxonomy ) {
+	public static function term_id( $term, $taxonomy ) {
 
 		if ( is_numeric( $term ) ) {
 			return $term;
@@ -535,7 +535,7 @@ class MP_Products_Screen {
 		}
 	}
 
-	public function maybe_create_attribute( $given_taxonomy, $new_taxonomy_name ) {
+	public static function maybe_create_attribute( $given_taxonomy, $new_taxonomy_name ) {
 		$taxonomy = $given_taxonomy;
 
 		if ( isset( $new_taxonomy_name ) && !empty( $new_taxonomy_name ) ) {
