@@ -521,6 +521,7 @@ class MP_Installer {
 	 * @action admin_notices
 	 */
 	public function db_update_notice() {
+		
 		if ( !get_option( 'mp_db_update_required' ) || !current_user_can( 'activate_plugins' ) || mp_get_get_value( 'page' ) == 'mp-db-update' ) {
 			return;
 		}
@@ -560,7 +561,7 @@ class MP_Installer {
 			}
 
 			//3.0 update
-			if ( version_compare( $old_version, '3.0', '<' ) ) {
+			if ( version_compare( $old_version, '3.0a.10', '<' ) ) {
 				$settings = $this->update_3000( $settings );
 			}
 		}
