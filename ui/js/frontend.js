@@ -39,13 +39,29 @@
 var marketpress = { };
 ( function( $ ) {
 
+    function equal_height( obj ) {
+        var $this = $( obj );
+        $this.equalHeights();
+        $this.find( '.mp_product_detail' ).equalHeights();
+        $this.find( '.mp_one_product' ).equalHeights();
+        $this.find( '.mp_buy_form' ).addClass( 'sticky' );
+        $this.find( '.hmedia' ).equalHeights();
+    }
+
     $( window ).resize( function( ) {
-        $( '.mp_grid_row' ).each( function( ) {
+        $( '#mp_product_list .mp_grid_row' ).each( function( ) {
             var $this = $( this );
-            $this.find( '.mp_product_detail' ).equalHeights( );
-            $this.find( '.mp_one_product' ).equalHeights( );
+            $this.find( '.mp_product_detail' ).equalHeights();
+            $this.find( '.mp_one_product' ).equalHeights();
             $this.find( '.mp_buy_form' ).addClass( 'sticky' );
+            $this.find( '.hmedia' ).equalHeights();
         } );
+
+        $( '#mp-related-products .mp_grid_row' ).each( function( ) {
+            equal_height( $( this ) );
+        } );
+
+
     } );
 
 
@@ -106,11 +122,17 @@ var marketpress = { };
          * @since 3.0
          */
         equalizeProductGrid: function( ) {
-            $( '.mp_grid_row' ).each( function( ) {
+            $( '#mp_product_list .mp_grid_row' ).each( function( ) {
                 var $this = $( this );
-                $this.find( '.mp_product_detail' ).equalHeights( );
-                $this.find( '.mp_one_product' ).equalHeights( );
+                $this.find( '.mp_product_detail' ).equalHeights();
+                $this.find( '.mp_one_product' ).equalHeights();
                 $this.find( '.mp_buy_form' ).addClass( 'sticky' );
+                $this.find( '.hmedia' ).equalHeights();
+            } );
+
+            $( '#mp-related-products .mp_grid_row' ).each( function( ) {
+                var $this = $( this );
+                //$this.equalHeights();
             } );
         },
         /**
@@ -196,6 +218,7 @@ var marketpress = { };
                     $target = $( $this.attr( 'href' ) );
                 $tab.addClass( 'current' ).siblings( ).removeClass( 'current' );
                 $target.show( ).siblings( '.mp_product_content' ).hide( );
+                equal_height( $( '#mp-related-products .mp_grid_row' ) );
             } );
             if ( window.location.hash.length > 0 ) {
                 var $target = $( '[href="' + window.location.hash + '"]' );

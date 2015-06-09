@@ -1707,7 +1707,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( $title ) {
 			$return .= '
-<h1 itemprop = "name" class = "mp_product_name entry-title"><a href = "' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+<h1 itemprop="name" class = "mp_product_name entry-title"><a href = "' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 		}
 
 		if ( $meta ) {
@@ -1781,6 +1781,10 @@ if ( !function_exists( 'mp_product' ) ) {
 				case 'mp-related-products' :
 					$view = mp_get_setting( 'related_products->view' );
 					if ( mp_get_setting( 'related_products->show' ) ) {
+						$layout_type = mp_get_setting( 'list_view' );
+						if ( !is_null( $args[ 'list_view' ] ) ) {
+							$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
+						}
 						$return .= '<div id="mp-related-products" class="mp_product_content ' . (isset( $view ) ? 'mp_' . $view : 'mp_list') . ' clearfix" style="display:none">' . $product->related_products() . ' </div>';
 					}
 					break;
@@ -2083,7 +2087,7 @@ if ( !function_exists( 'mp_send_email' ) ) :
 	 * @return bool
 	 */
 	function mp_send_email( $email, $subject, $msg, $attachments = array() ) {
-		return MP_Mailer::get_instance()->send( $email, $subject, $msg ,$attachments);
+		return MP_Mailer::get_instance()->send( $email, $subject, $msg, $attachments );
 	}
 
 endif;
