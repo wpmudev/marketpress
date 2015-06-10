@@ -30,8 +30,8 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 	 */
 	public function display( $post_id ) {
 		$this->before_field();
-		$has_variations = get_post_meta( $post_id, 'has_variations', false );
-		$product_type = get_post_meta($post_id, 'product_type', true);
+		$has_variations	 = get_post_meta( $post_id, 'has_variations', false );
+		$product_type	 = get_post_meta( $post_id, 'product_type', true );
 
 		if ( $has_variations ) {
 
@@ -50,7 +50,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				'post_parent'	 => $post_id,
 				'post_type'		 => 'mp_product_variation',
 				'posts_per_page' => -1,
-				'post_status'	 => 'publish'
+				'post_status'	 => 'publish',
 			);
 
 			$children = get_children( $args, OBJECT );
@@ -78,7 +78,11 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 						<option value="variant_update_prices"><?php _e( 'Update Prices', 'mp' ); ?></option>
 						<option value="variant_delete"><?php _e( 'Delete Variants', 'mp' ); ?></option>
 					</select>
-					<input type="button" name="" id="variant_bulk_doaction" class="button action" value="Apply">
+					<input type="button" name="" id="variant_bulk_doaction" class="button action" value="<?php echo esc_attr( __( 'Apply', 'mp' ) ); ?>">
+				</div>
+
+				<div class="variation-right-actions">
+					<input type="button" name="" id="variant_add" class="button action button-primary" value="<?php echo esc_attr( __( 'Add New Variation', 'mp' ) ); ?>">
 				</div>
 				<br class="clear">
 			</div>
@@ -118,7 +122,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								</th>
 							<?php } ?>
 
-							<th scope="col" id="inventory" class="manage-column <?php echo $product_type == 'external' ? 'mp_hidden_content' : '';?>">
+							<th scope="col" id="inventory" class="manage-column <?php echo $product_type == 'external' ? 'mp_hidden_content' : ''; ?>">
 								<?php _e( 'Inventory', 'mp' ); ?>
 							</th>
 
@@ -130,9 +134,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
 
-																									<!--<th scope="col" id="date" class="manage-column">
+																															<!--<th scope="col" id="date" class="manage-column">
 							<?php _e( 'Weight', 'mp' ); ?>
-																									</th>-->
+																															</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -177,7 +181,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									$order++;
 								}
 								?>
-								<td class="field_editable field_editable_inventory <?php echo $product_type == 'external' ? 'mp_hidden_content' : '';?>" data-field-type="number" data-hide-field-product-type="external">
+								<td class="field_editable field_editable_inventory <?php echo $product_type == 'external' ? 'mp_hidden_content' : ''; ?>" data-field-type="number" data-hide-field-product-type="external">
 									<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
 										<?php
 										$inventory	 = get_post_meta( $child->ID, 'inventory', true );
@@ -207,8 +211,8 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									- Weight
 								</td>-->
 								<td class="field_more">
-									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr($child->ID);?>"><i class="fa fa-th-large"></i></a>
-									<span class="hidden variation_name"><?php echo get_post_meta( $child->ID, 'name', true );?></span>
+									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr( $child->ID ); ?>"><i class="fa fa-th-large"></i></a>
+									<span class="hidden variation_name"><?php echo get_post_meta( $child->ID, 'name', true ); ?></span>
 								</td>
 							</tr>
 						<?php } ?>
@@ -255,7 +259,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				</div>
 
 				<div id="mp_bulk_delete_title"></div>
-				
+
 			</div>
 
 

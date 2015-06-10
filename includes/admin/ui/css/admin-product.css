@@ -780,3 +780,11 @@ input.mp_inline_temp_value{
     margin: -15px 0 0 1px;
     color: rgb(214, 6, 40);
 }
+
+.variation-right-actions{
+    float: right;
+}
+
+.variation-right-actions #variant_add{
+    margin-top: 2px;
+}

@@ -14,7 +14,7 @@ jQuery( document ).ready( function( $ ) {
             $( '#postdivrich' ).hide();
             exit;
         } else {
-                
+
             $( '#postdivrich' ).css( 'opacity', '0' );
             $( '#postdivrich' ).css( 'visibility', 'hidden' );
             $( '#postdivrich' ).css( 'display', 'block' );
@@ -568,6 +568,40 @@ jQuery( document ).ready( function( $ ) {
         // return false;
     } );
 
+    $( '#variant_add' ).live( 'click', function( e ) {
+        var url = mp_product_admin_i18n.ajaxurl + '?action=ajax_add_new_variant';
+
+        $.post( url, {
+            action: 'ajax_add_new_variant',
+            parent_post_id: $( '#post_ID' ).val(),
+        } ).done( function( data, status ) {
+            var response = jQuery.parseJSON( data );
+
+            if ( response ) {
+                if ( response.type == true ) {
+                    $.colorbox( {
+                        href: mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup&variation_id=' + response.post_id + '&new_variation',
+                        opacity: .7,
+                        inline: false,
+                        width: 400,
+                        height: 460,
+                        title: '',
+                        onClosed: function() {
+                            $.colorbox.remove();
+                        },
+                        onLoad: function() {
+
+                        }
+                    } );
+                } else {
+                    alert( 'An error occured while trying to create a new variation post' );
+                }
+            }
+
+        } );
+        e.preventDefault();
+    } );
+
     $( 'body' ).live( 'mp-variation-popup-loaded', function() {
 
         $( '#variation_popup a.remove_popup_image' ).on( 'click', function( e ) {
@@ -718,17 +752,20 @@ jQuery( document ).ready( function( $ ) {
             //action: 'save_inline_post_data',
             mp_product_admin_i18n.ajaxurl, form.serialize()
             ).done( function( data, status ) {
-
             var response = $.parseJSON( data );
 
             if ( response.status_message !== '' ) {
                 $( '.mp_ajax_response' ).html( response.status_message );
                 $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
                 $( '.mp_ajax_response' ).addClass( 'mp_ajax_response_' + response.status );
+                if ( $( '#new_variation' ).val() == 'yes' ) {
+                    //window.opener.location.reload( false );
+                    parent.location.reload()
+                }
             }
 
             if ( status == 'success' ) {
-                console.log( response );
+                //console.log( response );
             } else {
                 //alert( 'fail!' );
                 //an error occured

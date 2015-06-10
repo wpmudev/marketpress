@@ -61,6 +61,26 @@ class MP_Ajax {
 		add_action( 'wp_ajax_nopriv_mp_update_product_list', array( &$this, 'update_product_list' ) );
 		//Get variation popup window content
 		add_action( 'wp_ajax_mp_variation_popup', array( &$this, 'variation_popup' ) );
+
+		add_action( 'wp_ajax_ajax_add_new_variant', array( &$this, 'create_new_variation_draft' ) );
+	}
+
+	public function create_new_variation_draft() {
+		$variation_post_draft = array(
+			'post_title'	 => 'Variation Draft',
+			'post_content'	 => '',
+			'post_status'	 => 'draft',
+			'post_type'		 => 'mp_product_variation',
+			'post_parent'	 => (int) $_POST[ 'parent_post_id' ],
+		);
+
+		$variation_post_draft_id = wp_insert_post( $variation_post_draft );
+
+		$response				 = array();
+		$response[ 'type' ]		 = true;
+		$response[ 'post_id' ]	 = $variation_post_draft_id;
+		echo json_encode( $response );
+		exit;
 	}
 
 	public function variation_popup() {
@@ -80,18 +100,26 @@ class MP_Ajax {
 					'post_parent'	 => $post_id,
 					'post_type'		 => 'mp_product_variation',
 					'posts_per_page' => -1,
-					'post_status'	 => 'publish'
+					'post_status'	 => 'publish',
+					'orderby'		 => 'ID',
+					'order'			 => 'ASC',
 				);
-
+				
 				$children = get_children( $args, OBJECT );
 
 				$variation_attributes = array();
 
+				$first_post_id = 0;
+
 				foreach ( $children as $child ) {
+					if ( $first_post_id == 0 ) {
+						$first_post_id = $child->ID;
+					}
+
 					foreach ( $product_attributes as $product_attribute ) {
 						$product_attributes_array[ $product_attribute->attribute_id ] = $product_attribute->attribute_name;
 
-						$child_terms = get_the_terms( $variation_id, 'product_attr_' . $product_attribute->attribute_id );
+						$child_terms = get_the_terms( /*$variation_id*/$first_post_id, 'product_attr_' . $product_attribute->attribute_id );
 						if ( isset( $child_terms[ 0 ]->term_id ) && $child_terms[ 0 ]->name ) {
 							$variation_attributes[ $product_attribute->attribute_id ][ $child_terms[ 0 ]->term_id ] = array( $product_attribute->attribute_id, $child_terms[ 0 ]->name );
 						}
@@ -99,6 +127,11 @@ class MP_Ajax {
 				}
 				?>
 				<form name="variation_popup" id="variation_popup">
+					<?php if ( isset( $_GET[ 'new_variation' ] ) ) {
+						?>
+						<input type="hidden" id="new_variation" name="new_variation" value="yes" />
+					<?php }
+					?>
 					<input type="hidden" name="action" value="edit_variation_post_data" />
 					<input type="hidden" name="post_id" id="variation_id" value="<?php echo esc_attr( $variation_id ); ?>" />
 					<input type="hidden" name="ajax_nonce" value="<?php echo esc_attr( wp_create_nonce( "mp-ajax-nonce" ) ); ?>" />

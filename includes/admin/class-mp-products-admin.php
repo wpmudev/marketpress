@@ -652,6 +652,12 @@ class MP_Products_Screen {
 			foreach ( $meta_array_values as $key => $value ) {
 				update_post_meta( $post_id, $key, $value );
 			}
+
+			$my_post = array(
+				'ID'			 => $post_id,
+				'post_status'	 => 'publish',
+			);
+			wp_update_post( $my_post );
 		}
 
 		$response_array = array(
