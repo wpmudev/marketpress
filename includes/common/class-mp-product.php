@@ -341,7 +341,7 @@ class MP_Product {
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att[ 'name' ] . '</strong>
 					<div class="clearfix mp_product_options_att_input_label">
-						<select id="mp_' . $slug . '" name="' . $slug . '" class="required" autocomplete="off">
+						<select id="mp_' . $slug . '" name="' . $slug . '" class="mp_select2 required" autocomplete="off">
 							<option value="">' . $default_option_label . '</option>';
 
 
