@@ -174,8 +174,8 @@ if ( !function_exists( '_mp_products_html' ) ) :
 									' . $pinit . '
 									' . $fb . '
 									' . $twitter . '
-									' . $mp_product_list_content . '
 								</div>
+									' . $mp_product_list_content . '
 							</div>
 						</div>
 
@@ -202,9 +202,9 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$html .= '</div><!-- END .mp_grid_row -->';
 		}
 
-		if ( $view == 'grid' ) {
+		/*if ( $view == 'grid' ) {
 			$html .= ( $custom_query->found_posts > 0 ) ? '<div class="clear"></div>' : '';
-		}
+		}*/
 
 		wp_reset_postdata();
 
