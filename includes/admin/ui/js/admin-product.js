@@ -4,31 +4,39 @@ jQuery( document ).ready( function( $ ) {
 
     $( '#mp-product-type-select' ).on( 'change', function() {
         if ( $( this ).val() == 'external' || $( this ).val() == 'digital' ) {
-            $('[name="charge_shipping"]').attr('checked', false);
+            $( '[name="charge_shipping"]' ).attr( 'checked', false );
         }
     } );
 
     $( '.mp_variations_select' ).live( 'change', function() {
         var has_variations = $( this );
-        if ( has_variations.val() == 'yes' ) {
-            $( '#postdivrich' ).hide();
-            exit;
-        } else {
 
-            $( '#postdivrich' ).css( 'opacity', '0' );
-            $( '#postdivrich' ).css( 'visibility', 'hidden' );
-            $( '#postdivrich' ).css( 'display', 'block' );
 
-            $( 'html, body' ).animate( {
-                scrollTop: $( ".meta-box-sortables.ui-sortable" ).offset().top + 50
-            }, 100, function() {
-                $( '#postdivrich' ).css( 'visibility', 'visible' );
-                $( "#postdivrich" ).fadeTo( 400, 1, function() {
+
+        if ( $('.mp_variations_box').length == 0) {//it's not auto-draft, hide variation content box
+
+            if ( has_variations.val() == 'yes' ) {
+                $( '#postdivrich' ).hide();
+                exit;
+            } else {
+
+                $( '#postdivrich' ).css( 'opacity', '0' );
+                $( '#postdivrich' ).css( 'visibility', 'hidden' );
+                $( '#postdivrich' ).css( 'display', 'block' );
+
+                $( 'html, body' ).animate( {
+                    scrollTop: $( ".meta-box-sortables.ui-sortable" ).offset().top + 50
+                }, 100, function() {
+                    $( '#postdivrich' ).css( 'visibility', 'visible' );
+                    $( "#postdivrich" ).fadeTo( 400, 1, function() {
+                    } );
                 } );
-            } );
 
 
-            exit;
+                exit;
+            }
+        }else{
+            
         }
     } );
 
