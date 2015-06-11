@@ -1113,20 +1113,26 @@ class MP_Products_Screen {
 			'post_type'	 => MP_Product::get_post_type(),
 			'context'	 => 'normal',
 		) );
+
+		$product_kinds = array(
+			'physical'	 => __( 'Physical / Tangible Product', 'mp' ),
+			'digital'	 => __( 'Digital Download', 'mp' ),
+		//'external'	 => __( 'External / Affiliate Link', 'mp' ),
+		);
+
+		$post_id = (int)$_GET['post'];
+		
+		$has_variations = get_post_meta( $post_id, 'has_variations', false );
+		if ( !$has_variations ) {
+			$product_kinds[ 'external' ] = __( 'External / Affiliate Link', 'mp' );
+		}
+
 		$metabox->add_field( 'select', array(
 			'name'			 => 'product_type',
 			'id'			 => 'mp-product-type-select',
 			'default_value'	 => 'physical',
-			'options'		 => array(
-				'physical'	 => __( 'Physical / Tangible Product', 'mp' ),
-				'digital'	 => __( 'Digital Download', 'mp' ),
-				'external'	 => __( 'External / Affiliate Link', 'mp' ),
-			),
+			'options'		 => $product_kinds
 		) );
-		/* $metabox->add_field( 'checkbox', array(
-		  'name'		 => 'has_variations',
-		  'message'	 => __( 'Does this product have variations such as color, size, etc?', 'mp' ),
-		  ) ); */
 	}
 
 	public function init_product_price_inventory_variants_metabox() {
