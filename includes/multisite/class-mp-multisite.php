@@ -132,7 +132,7 @@ class MP_Multisite {
 			'allowed_gateways'	 => array(),
 			'global_gateway'	 => 'paypal_express',
 			'allowed_themes'	 => array(
-				'default3' => 'full',
+				'default' => 'full',
 			),
 		);
 

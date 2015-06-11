@@ -750,7 +750,7 @@ class MP_Installer {
 		}
 
 		//set theme to new default 3.0 theme
-		$settings[ 'store_theme' ] = 'default3';
+		$settings[ 'store_theme' ] = 'default';
 
 		return $settings;
 	}
