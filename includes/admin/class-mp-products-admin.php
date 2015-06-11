@@ -882,7 +882,7 @@ class MP_Products_Screen {
 
 				/* Add default post metas for variation */
 				foreach ( $variation_metas as $meta_key => $meta_value ) {
-					update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
+					update_post_meta( $variation_id, $meta_key, $meta_key == 'description' ? wp_kses_post( $meta_value ) : sanitize_text_field( $meta_value )  );
 				}
 
 				/* Add post terms for the variation */
@@ -1120,8 +1120,8 @@ class MP_Products_Screen {
 		//'external'	 => __( 'External / Affiliate Link', 'mp' ),
 		);
 
-		$post_id = (int)$_GET['post'];
-		
+		$post_id = (int) $_GET[ 'post' ];
+
 		$has_variations = get_post_meta( $post_id, 'has_variations', false );
 		if ( !$has_variations ) {
 			$product_kinds[ 'external' ] = __( 'External / Affiliate Link', 'mp' );

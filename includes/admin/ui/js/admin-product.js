@@ -13,7 +13,7 @@ jQuery( document ).ready( function( $ ) {
 
 
 
-        if ( $('.mp_variations_box').length == 0) {//it's not auto-draft, hide variation content box
+        if ( $( '.mp_variations_box' ).length == 0 ) {//it's not auto-draft, hide variation content box
 
             if ( has_variations.val() == 'yes' ) {
                 $( '#postdivrich' ).hide();
@@ -35,8 +35,8 @@ jQuery( document ).ready( function( $ ) {
 
                 exit;
             }
-        }else{
-            
+        } else {
+
         }
     } );
 
@@ -554,6 +554,7 @@ jQuery( document ).ready( function( $ ) {
     } );
 
     $( "a.open_ajax" ).live( 'click', function( e ) {
+        //jQuery( '.switch-tmce' ).click();
         $.colorbox( {
             href: mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup&variation_id=' + ( $( this ).attr( 'data-popup-id' ) ),
             opacity: .7,
@@ -563,6 +564,7 @@ jQuery( document ).ready( function( $ ) {
             title: $( this ).closest( 'tr' ).find( '.field_more .variation_name' ).html(),
             onClosed: function() {
                 $.colorbox.remove();
+                //tinyMCE.execCommand("mceRepaint");
             },
             onLoad: function() {
 
@@ -596,6 +598,7 @@ jQuery( document ).ready( function( $ ) {
                         title: '',
                         onClosed: function() {
                             $.colorbox.remove();
+                            //tinyMCE.execCommand("mceRepaint");
                         },
                         onLoad: function() {
 
@@ -629,6 +632,7 @@ jQuery( document ).ready( function( $ ) {
 
             save_inline_post_data( post_id, '_thumbnail_id', '', '' );
             e.preventDefault();
+
 
         } );
 
@@ -751,6 +755,7 @@ jQuery( document ).ready( function( $ ) {
 
     $( '#save-variation-popup-data' ).live( 'click', function( e ) {
         var form = $( 'form#variation_popup' );
+        set_description_content();
 
         $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
         $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
@@ -779,7 +784,6 @@ jQuery( document ).ready( function( $ ) {
                 //an error occured
             }
         } );
-
         e.preventDefault();
     } );
 

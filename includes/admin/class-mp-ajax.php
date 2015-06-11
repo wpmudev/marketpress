@@ -104,7 +104,7 @@ class MP_Ajax {
 					'orderby'		 => 'ID',
 					'order'			 => 'ASC',
 				);
-				
+
 				$children = get_children( $args, OBJECT );
 
 				$variation_attributes = array();
@@ -119,7 +119,7 @@ class MP_Ajax {
 					foreach ( $product_attributes as $product_attribute ) {
 						$product_attributes_array[ $product_attribute->attribute_id ] = $product_attribute->attribute_name;
 
-						$child_terms = get_the_terms( /*$variation_id*/$first_post_id, 'product_attr_' . $product_attribute->attribute_id );
+						$child_terms = get_the_terms( /* $variation_id */$first_post_id, 'product_attr_' . $product_attribute->attribute_id );
 						if ( isset( $child_terms[ 0 ]->term_id ) && $child_terms[ 0 ]->name ) {
 							$variation_attributes[ $product_attribute->attribute_id ][ $child_terms[ 0 ]->term_id ] = array( $product_attribute->attribute_id, $child_terms[ 0 ]->name );
 						}
@@ -263,8 +263,50 @@ class MP_Ajax {
 					<div class="fieldset_check">
 						<label>
 							<span><?php _e( 'Description', 'mp' ); ?></span>
-							<textarea class="variation_description" name="description" id="description"><?php echo esc_html( MP_Product::get_variation_meta( $variation_id, 'description' ) ); ?></textarea>
+							<?php
+							$eid			 = 'variation_editor_id_new_' . rand( 0, 9999999 );
+							$args			 = array(
+								"textarea_name"	 => $eid,
+								"textarea_rows"	 => 5,
+								"quicktags"		 => false,
+								"teeny"			 => true,
+								"editor_class"	 => 'mp-variation-editor',
+							);
+							$editor_content	 = ( MP_Product::get_variation_meta( $variation_id, 'description' ) );
+							wp_editor( $editor_content, $eid, $args );
+							?>
+
+							<script type="text/javascript">
+
+								var str = et_tinyMCEPreInit.replace( /variation_editor_id/gi, '<?php echo $eid; ?>' );
+								var ajax_tinymce_init = JSON.parse( str );
+
+								tinymce.init( ajax_tinymce_init.mceInit['<?php echo $eid; ?>'] );
+
+								//switchEditors.go( 'variation_editor_id_new', tinymce.editors['variation_editor_id_new'] );
+								jQuery( '.switch-html' ).click();
+								tinymce.execCommand( 'mceRepaint' );
+								jQuery( '.switch-html' ).click();
+								
+								function get_tinymce_content( id ) {
+									tinymce.init( {
+										mode: "specific_textareas",
+										editor_selector: "mceEditor",
+									} );
+
+									return tinymce.get( id ).getContent();
+								}
+
+								function set_description_content() {
+									var new_description_content = get_tinymce_content( '<?php echo $eid; ?>' );
+									jQuery( '.variation_description' ).val( new_description_content );
+								}
+
+							</script>
+
+							<textarea style="display: none;" class="variation_description" name="description" id="description"><?php echo esc_html( MP_Product::get_variation_meta( $variation_id, 'description' ) ); ?></textarea>
 						</label>
+
 					</div>
 
 				</form>

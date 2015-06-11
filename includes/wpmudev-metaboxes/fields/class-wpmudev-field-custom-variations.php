@@ -35,7 +35,21 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 
 		if ( $has_variations ) {
 
+// create hidden fake editor
+			echo '<div style="display: none;">';
+			wp_editor( '', 'variation_editor_id' );
+			echo '</div>';
+			?>     
 
+			<script type="text/javascript">
+				/* save config object as json string in a global var - in my case et_tinyMCEPreInit  */
+				jQuery( document ).ready( function( e ) {
+					if ( typeof ( et_tinyMCEPreInit ) == 'undefined' ) {
+						et_tinyMCEPreInit = JSON.stringify( tinyMCEPreInit );
+					}
+				} );
+			</script>
+			<?php
 			if ( false === ( $special_query_results = get_transient( 'special_query_results' ) ) ) {
 				// It wasn't there, so regenerate the data and save the transient
 				$special_query_results = new WP_Query( 'cat=5&order=random&tag=tech&post_meta_key=thumbnail' );
@@ -134,9 +148,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
 
-																															<!--<th scope="col" id="date" class="manage-column">
+																																					<!--<th scope="col" id="date" class="manage-column">
 							<?php _e( 'Weight', 'mp' ); ?>
-																															</th>-->
+																																					</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>

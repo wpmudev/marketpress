@@ -586,6 +586,7 @@ input.mp_inline_temp_value{
     bottom: 0;
     width: 90%;
     background-color: #fff;
+    z-index: 99999;
 }
 
 .mp_popup_controls a.button{
