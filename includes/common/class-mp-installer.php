@@ -394,14 +394,6 @@ class MP_Installer {
 				//
 				}
 			}
-			/* $old_sku = get_post_meta( $post_id, 'mp_sku', false );
-			  if ( is_array( $old_sku ) && count( $old_sku[ 0 ] ) == 1 ) {
-			  //single product
-			  echo 'single product, ';
-			  } else {
-			  //variation product
-			  echo 'variation product, ';
-			  } */
 		}
 
 		$response = array(
@@ -412,6 +404,8 @@ class MP_Installer {
 		if ( $updated >= $query->found_posts ) {
 			$response[ 'is_done' ] = true;
 		}
+
+		update_option( 'mp_db_update_required', 0 );
 
 		wp_send_json_success( $response );
 	}
@@ -521,7 +515,7 @@ class MP_Installer {
 	 * @action admin_notices
 	 */
 	public function db_update_notice() {
-		
+
 		if ( !get_option( 'mp_db_update_required' ) || !current_user_can( 'activate_plugins' ) || mp_get_get_value( 'page' ) == 'mp-db-update' ) {
 			return;
 		}
