@@ -2,11 +2,11 @@ jQuery( document ).ready( function( $ ) {
 
     $( '#poststuff' ).append( '<div class="mp-admin-overlay"><div class="mp-variation-loading-spin"></div><div class="mp-variation-loading-message">' + mp_product_admin_i18n.creating_vatiations_message + '</div></div>' );
 
-    /*$( '#mp-product-type-select' ).on( 'change', function() {
-     if ( $( this ).val() == 'external' ) {
-     $('.mp-product-images-metabox').hide();
-     }
-     } );*/
+    $( '#mp-product-type-select' ).on( 'change', function() {
+        if ( $( this ).val() == 'external' || $( this ).val() == 'digital' ) {
+            $('[name="charge_shipping"]').attr('checked', false);
+        }
+    } );
 
     $( '.mp_variations_select' ).live( 'change', function() {
         var has_variations = $( this );
