@@ -1263,13 +1263,4 @@ if ( !function_exists( 'mp_get_store_caps' ) ) :
 		return $store_caps;
 	}
 
-
-
-
-
-
-
-
-
-
 endif;

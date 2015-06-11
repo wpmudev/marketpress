@@ -1,5 +1,4 @@
 <?php
-
 /*
   Plugin Name: MarketPress
   Version: 3.0a.10
@@ -74,6 +73,7 @@ class Marketpress {
 	 * @var string
 	 */
 	private $_plugin_dir = null;
+	public $plugin_title = null;
 
 	/**
 	 * Gets the single instance of the class
@@ -351,21 +351,78 @@ class Marketpress {
 
 		// Setup custom types
 		add_action( 'init', array( &$this, 'register_custom_types' ), 1 );
-		
+
 		// Maybe flush rewrites
 		add_action( 'init', array( &$this, 'maybe_flush_rewrites' ), 99 );
-		
+
 		// Fix insecure images
 		add_filter( 'wp_get_attachment_url', array( &$this, 'fix_insecure_images' ), 10, 2 );
-		
+
 		// Setup rewrite rules
 		add_filter( 'rewrite_rules_array', array( &$this, 'add_rewrite_rules' ) );
-		
+
 		// Add custom query vars
 		add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
-		
+
 		// Filter billing info user meta
 		add_filter( 'get_user_metadata', array( &$this, 'get_user_billing_info' ), 10, 4 );
+
+		add_action( 'admin_print_styles', array( &$this, 'add_notices' ) );
+
+		add_action( 'admin_init', array( &$this, 'install_actions' ) );
+	}
+
+	function install_actions() {
+		// Install - Add pages button
+		if ( !empty( $_GET[ 'install_mp_pages' ] ) ) {
+
+			$this->create_pages();
+
+			// We no longer need to install pages
+			update_option( 'mp_needs_pages', 0 );
+
+			// Settings redirect
+			wp_redirect( admin_url( 'admin.php?page=store-settings-presentation' ) );
+			exit;
+		}
+	}
+
+	function create_pages() {
+		$page_store_id			 = mp_create_store_page( 'store' );
+		//mp_create_store_page('network_store_page');
+		$page_products_id		 = mp_create_store_page( 'products' );
+		$page_cart_id			 = mp_create_store_page( 'cart' );
+		$page_checkout_id		 = mp_create_store_page( 'checkout' );
+		$page_order_status_id	 = mp_create_store_page( 'order_status' );
+
+		$settings = get_option( 'mp_settings' );
+		mp_push_to_array( $settings, 'pages->store', $page_store_id );
+		mp_push_to_array( $settings, 'pages->products', $page_products_id );
+		mp_push_to_array( $settings, 'pages->cart', $page_cart_id );
+		mp_push_to_array( $settings, 'pages->checkout', $page_checkout_id );
+		mp_push_to_array( $settings, 'pages->order_status', $page_order_status_id );
+		
+		update_option( 'mp_settings', $settings );
+
+		flush_rewrite_rules();
+	}
+
+	function add_notices() {
+		if ( get_option( 'mp_needs_pages', 1 ) == 1 && $_GET[ 'page' ] !== 'store-settings-presentation' && current_user_can( 'manage_options' ) ) {
+			add_action( 'admin_notices', array( $this, 'install_notice' ) );
+		}
+	}
+
+	function install_notice() {
+		// If we have just installed, show a message with the install pages button
+		if ( get_option( 'mp_needs_pages', 1 ) == 1 ) {
+			?>
+			<div id="message" class="updated mp-install-notice">
+				<p><?php printf( __( '<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin automatically.', 'mp' ), $this->plugin_title ); ?></p>
+				<p class="submit"><a href="<?php echo esc_url( add_query_arg( 'install_mp_pages', 'true', admin_url( 'admin.php?page=store-settings-presentation' ) ) ); ?>" class="button-primary"><?php printf( __( 'Install %s Pages', 'mp' ), $this->plugin_title ); ?></a></p>
+			</div>
+			<?php
+		}
 	}
 
 	/**
@@ -713,6 +770,7 @@ class Marketpress {
 		$this->_plugin_file	 = __FILE__;
 		$this->_plugin_dir	 = plugin_dir_path( __FILE__ );
 		$this->_plugin_url	 = plugin_dir_url( __FILE__ );
+		$this->plugin_title	 = __( 'MarketPress', 'mp' );
 
 		//load data structures
 		require_once $this->plugin_dir( 'includes/common/data.php' );
