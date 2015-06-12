@@ -644,7 +644,7 @@ class MP_Products_Screen {
 				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
 				'charge_tax'				 => mp_get_post_value( 'charge_tax' ),
 				'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
-				'description'				 => mp_get_post_value( 'description' ),
+			//'description'				 => mp_get_post_value( 'description' ),
 			);
 
 			$meta_array_values = apply_filters( 'mp_edit_variation_post_data', $meta_array_values, $post_id );
@@ -836,7 +836,7 @@ class MP_Products_Screen {
 				$variation_id = wp_insert_post( array(
 					//'ID'			 => $variation_id,
 					'post_title'	 => mp_get_post_value( 'post_title' ),
-					'post_content'	 => '',
+					'post_content'	 => mp_get_post_value( 'content' ),
 					'post_status'	 => 'publish',
 					'post_type'		 => 'mp_product_variation',
 					'post_parent'	 => $post_id,
@@ -876,13 +876,13 @@ class MP_Products_Screen {
 					'has_sale'					 => mp_get_post_value( 'has_sale' ),
 					'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
 					'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
-					'description'				 => mp_get_post_value( 'content' ),
+				//'description'				 => mp_get_post_value( 'content' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
 
 				/* Add default post metas for variation */
 				foreach ( $variation_metas as $meta_key => $meta_value ) {
-					update_post_meta( $variation_id, $meta_key, $meta_key == 'description' ? wp_kses_post( $meta_value ) : sanitize_text_field( $meta_value )  );
+					update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
 				}
 
 				/* Add post terms for the variation */
@@ -901,88 +901,6 @@ class MP_Products_Screen {
 		} else {
 			//update_post_meta( $post_id, 'has_variations', 0 );
 		}
-
-
-
-		/*
-
-		  //var_dump($_POST);
-		  /* return;
-
-		  global $wpdb;
-
-		  $variations		 = mp_get_post_value( 'variations', array() );
-		  $sorted			 = $field->sort_subfields( $variations );
-		  $ids			 = array();
-		  $delete_where	 = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = 'mp_product_variation'";
-
-
-		  if ( mp_get_post_value( 'has_variations', false ) ) {
-		  foreach ( $sorted as $order => $array ) {
-		  $variation_id	 = key( $array );
-		  $fields			 = current( $array );
-
-		  if ( false === strpos( $variation_id, '_' ) ) {
-		  $variation_id	 = $ids[]			 = wp_insert_post( array(
-		  'post_content'	 => mp_arr_get_value( 'description', $fields, '' ),
-		  'post_title'	 => 'Product Variation of ' . $post_id,
-		  'post_status'	 => 'publish',
-		  'post_type'		 => 'mp_product_variation',
-		  'post_parent'	 => $post_id,
-		  'menu_order'	 => $order,
-		  ) );
-		  } else {
-		  $ids[]			 = $variation_id	 = substr( $variation_id, 1 );
-		  wp_update_post( array(
-		  'ID'			 => $variation_id,
-		  'post_content'	 => mp_arr_get_value( 'description', $fields, '' ),
-		  'post_status'	 => 'publish',
-		  'menu_order'	 => $order,
-		  ) );
-		  }
-
-		  // Update post thumbnail
-		  if ( empty( $fields[ 'image' ] ) ) {
-		  delete_post_thumbnail( $variation_id );
-		  } else {
-		  set_post_thumbnail( $variation_id, $fields[ 'image' ] );
-		  }
-
-		  // Unset the fields that shouldn't be saved as post meta
-		  $fields[ 'description' ] = $fields[ 'image' ]		 = null;
-
-		  $index = 0;
-		  foreach ( $fields as $name => $value ) {
-		  if ( is_null( $value ) ) {
-		  $index ++;
-		  continue;
-		  }
-
-		  $subfield = $field->subfields[ $index ];
-
-		  if ( false !== strpos( $name, 'product_attr_' ) ) {
-		  wp_set_post_terms( $variation_id, $subfield->sanitize_for_db( $value, $variation_id ), $name );
-		  } else {
-		  $subfield->save_value( $variation_id, $name, $value, true );
-		  }
-
-		  $index ++;
-		  }
-		  }
-
-		  $delete_where .= " AND {$wpdb->posts}.ID NOT IN (" . implode( ',', $ids ) . ")";
-		  }
-
-		  // Delete variations that no longer exist
-		  $wpdb->query( "
-		  DELETE FROM $wpdb->posts
-		  USING $wpdb->posts
-		  INNER JOIN $wpdb->postmeta
-		  WHERE $delete_where"
-		  );
-
-		  return null; // Returning null will bypass internal save mechanism
-		 */
 	}
 
 	public function save_product_variations_parent_data( $value, $post_id, $field ) {

@@ -34,21 +34,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 		$product_type	 = get_post_meta( $post_id, 'product_type', true );
 
 		if ( $has_variations ) {
-
-// create hidden fake editor
-			echo '<div style="display: none;">';
-			wp_editor( '', 'variation_editor_id' );
-			echo '</div>';
 			?>     
-
-			<script type="text/javascript">
-				/* save config object as json string in a global var - in my case et_tinyMCEPreInit  */
-				jQuery( document ).ready( function( e ) {
-					if ( typeof ( et_tinyMCEPreInit ) == 'undefined' ) {
-						et_tinyMCEPreInit = JSON.stringify( tinyMCEPreInit );
-					}
-				} );
-			</script>
 			<?php
 			if ( false === ( $special_query_results = get_transient( 'special_query_results' ) ) ) {
 				// It wasn't there, so regenerate the data and save the transient
@@ -148,9 +134,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
 
-																																					<!--<th scope="col" id="date" class="manage-column">
-							<?php _e( 'Weight', 'mp' ); ?>
-																																					</th>-->
+							<th scope="col" id="variation_content" class="manage-column">
+								<?php _e( 'Variation Content', 'mp' ); ?>
+							</th>
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -221,9 +207,11 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									</span>
 									<input type="hidden" class="editable_value" value="" />
 								</td>
-								<!--<td class="">
-									- Weight
-								</td>-->
+
+								<td class="">
+									<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>
+								</td>
+
 								<td class="field_more">
 									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr( $child->ID ); ?>"><i class="fa fa-th-large"></i></a>
 									<span class="hidden variation_name"><?php echo get_post_meta( $child->ID, 'name', true ); ?></span>

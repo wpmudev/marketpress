@@ -644,7 +644,7 @@ class MP_Product {
 
 		if ( $this->has_variations() || $this->is_variation() ) {
 			$variation_id	 = $this->ID;
-			$content		 = get_post_meta( $variation_id, 'description', true );
+			$content		 = get_the_content($variation_id);//get_post_meta( $variation_id, 'description', true );
 		}
 
 		$content = apply_filters( 'the_content', $content );

@@ -370,6 +370,46 @@ class Marketpress {
 		add_action( 'admin_print_styles', array( &$this, 'add_notices' ) );
 
 		add_action( 'admin_init', array( &$this, 'install_actions' ) );
+
+		add_action( 'admin_init', array( &$this, 'variations_admin' ) );
+
+		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
+	}
+
+	function redirect_variation_singles_to_products() {
+		global $post;
+		if ( !is_singular( 'mp_product_variation' ) ) {
+			return;
+		} else {
+			$product_id	 = wp_get_post_parent_id( $post->ID );
+			$url		 = get_permalink( $product_id );
+			wp_redirect( $url );
+			exit;
+		}
+	}
+
+	function variations_admin() {
+
+		// Get the Post ID.
+		$post_id = isset( $_GET[ 'post' ] ) ? (int) $_GET[ 'post' ] : (isset( $_POST[ 'post_ID' ] ) ? (int) $_POST[ 'post_ID' ] : '');
+
+		if ( !isset( $post_id ) )
+			return;
+
+		if ( get_post_type( $post_id ) == 'mp_product_variation' ) {
+			remove_post_type_support( 'mp_product_variation', 'title' );
+			add_action( 'add_meta_boxes', array( &$this, 'mp_product_variation_metaboxes' ) );
+		}
+	}
+
+	function mp_product_variation_metaboxes() {
+		$post_id = isset( $_GET[ 'post' ] ) ? (int) $_GET[ 'post' ] : (isset( $_POST[ 'post_ID' ] ) ? (int) $_POST[ 'post_ID' ] : '');
+		if ( $post_id !== '' ) {
+			$variation_title = get_post_meta( $post_id, 'name', true );
+			?>
+			<input type="hidden" name="variation_title" id="variation_title" value="<?php echo esc_attr( $variation_title ); ?>" />
+			<?php
+		}
 	}
 
 	function install_actions() {

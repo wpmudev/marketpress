@@ -164,9 +164,10 @@ class MP_Installer {
 			foreach ( $combinations as $combination ) {
 
 				$post_title		 = get_the_title( $post_id );
+				$post_content	 = get_the_content( $post_id );
 				$variation_id	 = wp_insert_post( array(
 					'post_title'	 => $post_title,
-					'post_content'	 => '',
+					'post_content'	 => $post_content,
 					'post_status'	 => 'publish',
 					'post_type'		 => 'mp_product_variation',
 					'post_parent'	 => $post_id,

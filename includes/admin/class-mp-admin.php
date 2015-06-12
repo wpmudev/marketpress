@@ -227,6 +227,12 @@ class MP_Admin {
 				wp_enqueue_style( 'textext.plugin.prompt', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.prompt.css' ), array(), MP_VERSION );
 				wp_enqueue_style( 'textext.plugin.tags', mp_plugin_url( 'includes/admin/ui/js/jquery-textext/src/css/textext.plugin.tags.css' ), array(), MP_VERSION );
 			}
+
+
+			if ( $post_type == 'mp_product_variation' ) {
+				wp_enqueue_style( 'mp-product-variation-admin', mp_plugin_url( 'includes/admin/ui/css/admin-product-variation.css' ), false, MP_VERSION );
+				wp_enqueue_script( 'mp-product-variation-admin', mp_plugin_url( 'includes/admin/ui/js/admin-product-variation.js' ), array( 'jquery' ), MP_VERSION );
+			}
 		}
 
 		wp_enqueue_style( 'mp-admin', mp_plugin_url( 'includes/admin/ui/css/admin.css' ), array(), MP_VERSION );
