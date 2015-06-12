@@ -753,7 +753,6 @@ jQuery( document ).ready( function( $ ) {
 
     $( '#save-variation-popup-data' ).live( 'click', function( e ) {
         var form = $( 'form#variation_popup' );
-        set_description_content();
 
         $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
         $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
