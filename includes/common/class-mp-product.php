@@ -644,7 +644,7 @@ class MP_Product {
 
 		if ( $this->has_variations() || $this->is_variation() ) {
 			$variation_id	 = $this->ID;
-			$content		 = get_the_content($variation_id);//get_post_meta( $variation_id, 'description', true );
+			$content		 = get_the_content( $variation_id ); //get_post_meta( $variation_id, 'description', true );
 		}
 
 		$content = apply_filters( 'the_content', $content );
@@ -820,13 +820,13 @@ class MP_Product {
 				$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) . '</strong>';
 			}
 
-			$snippet .= '<span class="mp_normal_price">' . __( 'Reg: ', 'mp' ) . mp_format_currency( '', ($price[ 'regular' ] * $this->qty ) ) . '</span>';
+			$snippet .= '<span class="mp_normal_price mp-strikeout">' . mp_format_currency( '', ($price[ 'regular' ] * $this->qty ) ) . '</span>';
 
-			if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
+			/*if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
 				$snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
 			} else {
 				$snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . '</strong>';
-			}
+			}*/
 		} else {
 			if ( $this->qty > 1 ) {
 				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</strong>';
