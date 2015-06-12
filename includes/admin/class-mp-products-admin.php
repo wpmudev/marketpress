@@ -1038,9 +1038,9 @@ class MP_Products_Screen {
 		//'external'	 => __( 'External / Affiliate Link', 'mp' ),
 		);
 
-		$post_id = (int) $_GET[ 'post' ];
+		$post_id = isset($_GET[ 'post' ]) ? $_GET[ 'post' ] : 0;
 
-		$has_variations = get_post_meta( $post_id, 'has_variations', false );
+		$has_variations = get_post_meta( (int) $post_id, 'has_variations', false );
 		if ( !$has_variations ) {
 			$product_kinds[ 'external' ] = __( 'External / Affiliate Link', 'mp' );
 		}
