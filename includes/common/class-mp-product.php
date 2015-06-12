@@ -1362,7 +1362,7 @@ class MP_Product {
 		}
 
 		$snippet = '
-			<div itemscope class="hmedia' . ( empty( $img_align ) ? '' : " $img_align") . '">
+			<div itemscope class="hmedia">
 				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>';
 
 		if ( $link ) {
