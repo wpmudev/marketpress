@@ -126,7 +126,7 @@ class WPMUDEV_Field_Complex extends WPMUDEV_Field {
 		
 		foreach ( $this->subfields as $index => $subfield ) {
 			$sub_meta_key	 = $sub_meta_keys[] = $meta_key . '_' . $subfield->args[ 'original_name' ];
-			update_post_meta( $post_id, $sub_meta_key, array_shift( $value ) );
+			update_post_meta( $post_id, $sub_meta_key, is_array($value) ? array_shift( $value ) : $value );
 			update_post_meta( $post_id, '_' . $sub_meta_key, get_class( $subfield ) );
 		}
 
