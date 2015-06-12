@@ -405,7 +405,7 @@ class MP_Installer {
 			$response[ 'is_done' ] = true;
 		}
 
-		update_option( 'mp_db_update_required', 0 );
+		delete_option( 'mp_db_update_required' );
 
 		wp_send_json_success( $response );
 	}
@@ -438,7 +438,9 @@ class MP_Installer {
 	 * @action admin_menu
 	 */
 	public function add_menu_items() {
-		add_submenu_page( 'store-settings', __( 'Update Data', 'mp' ), __( 'Update Data', 'mp' ), 'activate_plugins', 'mp-db-update', array( &$this, 'db_update_page' ) );
+		if ( get_option( 'mp_db_update_required' ) ) {
+			add_submenu_page( 'store-settings', __( 'Update Data', 'mp' ), __( 'Update Data', 'mp' ), 'activate_plugins', 'mp-db-update', array( &$this, 'db_update_page' ) );
+		}
 	}
 
 	/**
