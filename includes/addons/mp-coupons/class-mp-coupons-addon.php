@@ -1138,24 +1138,35 @@ class MP_Coupons_Addon {
 		return $this->_convert_to_objects( $applied );
 	}
 
-	public function init_admin_cap( $caps, $cap, $user_id, $args ) {
-		if ( ! user_can( $user_id, 'manage_options' ) ) {
+	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
+		if ( ! in_array( $cap, array( 'edit_mp_coupons', 'publish_mp_coupons', 'delete_mp_coupons' ) ) ) {
 			return $caps;
 		}
+		//check does this user is admin
+		$user = new WP_User( $user_id );
+		if ( ! $user->exists() ) {
+			return $caps;
+		}
+		$role_caps = $user->get_role_caps();
+		if ( ! isset( $role_caps['manage_options'] ) ) {
+			return $caps;
+		}
+
+		unset( $caps[ array_search( $cap, $caps ) ] );
+
 		switch ( $cap ) {
 			case 'edit_mp_coupons':
-				unset( $caps[ array_search( $cap, $caps ) ] );
 				$caps[] = 'edit_posts';
 				break;
 			case 'publish_mp_coupons':
-				unset( $caps[ array_search( $cap, $caps ) ] );
 				$caps[] = 'publish_posts';
 				break;
 			case 'delete_mp_coupons':
-				unset( $caps[ array_search( $cap, $caps ) ] );
 				$caps[] = 'delete_posts';
 				break;
 		}
+
+		return $caps;
 	}
 
 }

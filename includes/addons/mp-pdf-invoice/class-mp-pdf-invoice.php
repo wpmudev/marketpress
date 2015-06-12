@@ -153,8 +153,18 @@ class MP_PDF_Invoice {
 	 * @access private
 	 */
 	private function build_pdf_content( MP_Order $order, $type = self::PDF_INVOICE ) {
-		$billing  = $order->get_address( 'billing' );
-		$shipping = $order->get_address( 'shipping' );
+		$billing  = $this->strip_tags_address( $order->get_address( 'billing' ) );
+		$shipping = $this->strip_tags_address( $order->get_address( 'shipping' ) );
+
+		//both will need country
+		//now the country field
+		$countries = mp_country_list();
+		$country   = $countries[ $order->get_meta( 'mp_billing_info->country' ) ];
+		//we will append the contry the #2 of the array
+		$billing[2]  = $billing[2] . ', ' . $country;
+		$shipping[2] = $shipping[2] . ', ' . $country;
+
+		$email = '';
 
 		$order_details = array();
 		$cart          = $order->get_cart();
@@ -171,8 +181,13 @@ class MP_PDF_Invoice {
 				'', __( "Subtotal", "mp" ), $cart->product_total( true ) );
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>',
 				'', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
+			//get gateway
+			$gateway         = $order->get_meta( 'mp_payment_info->gateway_public_name' );
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>',
-				'', __( "Total", "mp" ), $cart->total( true ) );
+				'', __( "Total", "mp" ), $cart->total( true ) . ' (' . sprintf( __( "Paid with %s", "mp" ), $gateway ) . ')' );
+			//billing & shipping no changes
+			$billing  = implode( '<br/>', $billing );
+			$shipping = implode( '<br/>', $shipping );
 		} elseif ( $type == self::PDF_SLIP ) {
 			//as packing, we don't show price data
 			foreach ( $cart->get_items() as $key => $qty ) {
@@ -182,6 +197,20 @@ class MP_PDF_Invoice {
 					$qty
 				);
 			}
+			//remove shipping email & billing
+			array_pop( $shipping );
+			array_pop( $billing );
+
+			$billing_email  = $order->get_meta( 'mp_billing_info->email' );
+			$shipping_email = $order->get_meta( 'mp_shipping_info->email' );
+
+			$email = sprintf( __( "Email: %s", "mp" ), $billing_email );
+			if ( $shipping_email != $billing_email ) {
+				$email .= '<br/>' . sprintf( __( "Shipping Email: %s", "mp" ), $shipping_email );
+			}
+			//rejoin billing & shipping
+			$billing  = implode( '<br/>', $billing );
+			$shipping = implode( '<br/>', $shipping );
 		}
 
 		$order_details = implode( '', $order_details );
@@ -215,7 +244,8 @@ class MP_PDF_Invoice {
 			'{{billing}}'       => $billing,
 			'{{shipping}}'      => $shipping,
 			'{{order_details}}' => $order_details,
-			'{{logo}}'          => $logo
+			'{{logo}}'          => $logo,
+			'{{email}}'         => $email
 		);
 		$data = apply_filters( 'mp_pdf_invoice_params', $data );
 
@@ -224,6 +254,22 @@ class MP_PDF_Invoice {
 		}
 
 		return $html;
+	}
+
+
+	/**
+	 * @param $address
+	 *
+	 * @since 3.0
+	 */
+	private function strip_tags_address( $address ) {
+		$parts = preg_split( '/<br[^>]*>/i', $address );
+		$parts = array_filter( $parts );
+		foreach ( $parts as $key => $part ) {
+			$parts[ $key ] = strip_tags( $part );
+		}
+
+		return $parts;
 	}
 
 	/**
