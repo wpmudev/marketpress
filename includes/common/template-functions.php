@@ -1645,8 +1645,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		$return = '
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product ' . ($has_image ? 'mp_product-has-image' : '') . ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignnone') . ' ' . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">
-				<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
+				<div class="mp_product ' . ($has_image ? 'mp_product-has-image' : '') . ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignnone') . ' ' . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
 
 
 		if ( $image ) {
@@ -1661,6 +1660,8 @@ if ( !function_exists( 'mp_product' ) ) {
 				}
 
 				if ( $values ) {
+					$return .= '<div class = "mp-product-images">';
+					
 					$return .= "<script>
 								jQuery(document).ready(function() {
 									jQuery('#mp_product_gallery').lightSlider({
@@ -1679,7 +1680,6 @@ if ( !function_exists( 'mp_product' ) ) {
 									});
 								});
 								</script>";
-					$return .= '<div class = "mp-product-images">';
 
 					$return .= '<ul id = "mp_product_gallery">';
 
@@ -1703,6 +1703,8 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( $image ) {
 			$return .= '<div class = "mp-product-details">';
+			
+			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
 		if ( $title ) {
