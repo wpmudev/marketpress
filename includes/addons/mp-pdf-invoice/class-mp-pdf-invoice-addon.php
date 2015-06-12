@@ -145,8 +145,6 @@ class MP_PDF_Invoice_Addon {
 
 		$buttons =
 			'<div class="mp-pdf-invoice-button">' . MP_PDF_Invoice::show_button( $order->ID, MP_PDF_Invoice::PDF_INVOICE ) . '&nbsp;' .
-			MP_PDF_Invoice::show_button( $order->ID, MP_PDF_Invoice::PDF_SLIP )
-			.
 			'</div>';
 
 		return $html . $buttons;

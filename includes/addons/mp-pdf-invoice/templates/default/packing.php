@@ -71,6 +71,9 @@
 				{{shipping}}
 			</td>
 		</tr>
+		<tr>
+			<td colspan="2">{{email}}</td>
+		</tr>
 	</table>
 
 	<div class="clear"></div>
