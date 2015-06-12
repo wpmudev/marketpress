@@ -1776,6 +1776,9 @@ if ( !function_exists( 'mp_product' ) ) {
 		// Remove overview tab as it's already been manually output above
 		array_shift( $product->content_tabs );
 
+		$func_args	 = func_get_args();
+		$args		 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
+
 		foreach ( $product->content_tabs as $slug => $label ) {
 			switch ( $slug ) {
 				case 'mp-related-products' :
@@ -1904,9 +1907,9 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 			  ) ); */
 
 			//echo 'current_page:'.$custom_query->get( 'paged' );
-			
+
 			$html .= paginate_links( array(
-				'base'			 => get_pagenum_link().'?paged=%#%',//'%_%',
+				'base'			 => get_pagenum_link() . '?paged=%#%', //'%_%',
 				'format'		 => '?paged=%#%',
 				'total'			 => $custom_query->max_num_pages,
 				'current'		 => max( 1, $custom_query->get( 'paged' ) ),
