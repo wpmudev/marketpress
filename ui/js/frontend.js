@@ -304,14 +304,14 @@ var marketpress = { };
                     marketpress.updateProductList( );
                 }
             } );
-            $( '#mp_product_nav' ).parent( ).on( 'click', '#mp_product_nav a', function( e ) {
+            /*$( '#mp_product_nav' ).parent( ).on( 'click', '#mp_product_nav a', function( e ) {
                 e.preventDefault( );
                 var $this = $( this );
                 var href = $this.attr( 'href' );
                 var query = marketpress.unserialize( href );
                 $form.find( 'input[name="page"]' ).val( query.paged );
                 marketpress.updateProductList( );
-            } );
+            } );*/
         },
         /**
          * Update product list

@@ -202,9 +202,9 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$html .= '</div><!-- END .mp_grid_row -->';
 		}
 
-		/*if ( $view == 'grid' ) {
-			$html .= ( $custom_query->found_posts > 0 ) ? '<div class="clear"></div>' : '';
-		}*/
+		/* if ( $view == 'grid' ) {
+		  $html .= ( $custom_query->found_posts > 0 ) ? '<div class="clear"></div>' : '';
+		  } */
 
 		wp_reset_postdata();
 
@@ -1894,18 +1894,33 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 				<div id="mp_product_nav">
 					<div id="mp_product_nav_inner" class="clearfix">';
 
+			/* $html .= paginate_links( array(
+			  'base'		 => '%_%',
+			  'format'	 => '?paged=%#%',
+			  'total'		 => $custom_query->max_num_pages,
+			  'current'	 => max( 1, $custom_query->get( 'paged' ) ),
+			  'prev_text'	 => __( 'Prev', 'mp' ),
+			  'next_text'	 => __( 'Next', 'mp' ),
+			  ) ); */
+
+			//echo 'current_page:'.$custom_query->get( 'paged' );
+			
 			$html .= paginate_links( array(
-				'base'		 => '%_%',
-				'format'	 => '?paged=%#%',
-				'total'		 => $custom_query->max_num_pages,
-				'current'	 => max( 1, $custom_query->get( 'paged' ) ),
-				'prev_text'	 => __( 'Prev', 'mp' ),
-				'next_text'	 => __( 'Next', 'mp' ),
+				'base'			 => get_pagenum_link().'?paged=%#%',//'%_%',
+				'format'		 => '?paged=%#%',
+				'total'			 => $custom_query->max_num_pages,
+				'current'		 => max( 1, $custom_query->get( 'paged' ) ),
+				'show_all'		 => false,
+				'prev_next'		 => true,
+				'prev_text'		 => __( 'Prev', 'mp' ),
+				'next_text'		 => __( 'Next', 'mp' ),
+				'add_args'		 => true,
+				'add_fragment'	 => '',
 			) );
 
 			$html .= '
-					</div>
-				</div>';
+</div>
+</div>';
 		}
 
 		/**
@@ -1974,29 +1989,29 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		);
 		$options_html	 = '';
 		foreach ( $options as $k => $t ) {
-			$value = $t[ 0 ] . '-' . $t[ 1 ];
+			$value = $t[ 0 ] . '- ' . $t [ 1 ];
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[ 2 ] . '</option>';
 		}
 
 		$return = '
-			<a name="mp-product-list-top"></a>
-			<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-				<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp_product_list_refine clearfix" method="get">
-						<div class="one_filter" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-							<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label>
-							' . $terms . '
-						</div>
-	
-						<div class="one_filter">
-							<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label>
-							<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-								' . $options_html . '
-							</select>
-						</div>' .
+<a name="mp-product-list-top"></a>
+<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
+	<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp_product_list_refine clearfix" method="get">
+		<div class="one_filter" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+			<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label>
+			' . $terms . '
+		</div>
+
+		<div class="one_filter">
+			<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label>
+			<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+				' . $options_html . '
+			</select>
+		</div>' .
 		(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />') . '
-						<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
-				</form>
-			</div>';
+		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
+	</form>
+</div>';
 
 		return apply_filters( 'mp_products_filter', $return );
 	}
