@@ -168,7 +168,7 @@ var mp_cart = { };
         url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 
         marketpress.loadingOverlay( 'show' );
-        //$this.closest( '.mp_product_options_att' ).nextAll( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
+        $this.closest( '.mp_product_options_att' ).nextAll( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
 
         if ( !$this.is( ':radio' ) ) {
             $qtyChanged.val( '1' );

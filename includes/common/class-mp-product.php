@@ -192,31 +192,36 @@ class MP_Product {
 		}
 
 		// Make sure all attribute terms are unique and in stock
-		foreach ( $variations as $variation ) {
-			$json[ 'status' ]	 = 'variation loop';
-			//foreach ( $filtered_atts as $tax_slug ) {
-			$terms				 = get_the_terms( $variation->ID, $tax_slug );
-			//foreach ( $terms as $term ) {
-			if ( $variation->in_stock( $qty ) ) {
+		if ( count( $variations ) > 0 ) {
+			foreach ( $variations as $variation ) {
+				$json[ 'status' ] = 'variation loop';
+				foreach ( $filtered_atts as $tax_slug ) {
+					$terms = get_the_terms( $variation->ID, $tax_slug );
+					foreach ( $terms as $term ) {
+						if ( $variation->in_stock( $qty ) ) {
 
-				$json[ 'status' ] = 'in stock';
-				//$json[ 'qty_in_stock' ] = $variation->get_stock();
-				//$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
-			} elseif ( $qty_changed || !$variation->in_stock( $qty ) ) {
-				$json[ 'status' ]		 = 'out of stock';
-				$json[ 'qty_in_stock' ]	 = $variation->get_stock();
+							$json[ 'status' ]								 = 'in stock';
+							$json[ 'qty_in_stock' ]							 = $variation->get_stock();
+							$filtered_terms[ $tax_slug ][ $term->term_id ]	 = $term;
+						} elseif ( $qty_changed || !$variation->in_stock( $qty ) ) {
+							$json[ 'status' ]		 = 'out of stock';
+							$json[ 'qty_in_stock' ]	 = $variation->get_stock();
 
-				/**
-				 * Filter the out of stock alert message
-				 *
-				 * @since 3.0
-				 * @param string The default message.
-				 * @param MP_Product The product that is out of stock.
-				 */
-				$json[ 'out_of_stock' ] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json[ 'qty_in_stock' ] ), $product );
+							/**
+							 * Filter the out of stock alert message
+							 *
+							 * @since 3.0
+							 * @param string The default message.
+							 * @param MP_Product The product that is out of stock.
+							 */
+							$json[ 'out_of_stock' ] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json[ 'qty_in_stock' ] ), $product );
+						}
+					}
+				}
 			}
-			//}
-			//}
+		}else{
+			$json[ 'status' ]		 = 'out of stock';
+			$json[ 'out_of_stock' ] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json[ 'qty_in_stock' ] ), $product );
 		}
 
 		// Format attribute terms for display
@@ -822,11 +827,11 @@ class MP_Product {
 
 			$snippet .= '<span class="mp_normal_price mp-strikeout">' . mp_format_currency( '', ($price[ 'regular' ] * $this->qty ) ) . '</span>';
 
-			/*if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
-				$snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
-			} else {
-				$snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . '</strong>';
-			}*/
+			/* if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
+			  $snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
+			  } else {
+			  $snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . '</strong>';
+			  } */
 		} else {
 			if ( $this->qty > 1 ) {
 				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</strong>';
