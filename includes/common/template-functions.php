@@ -1431,11 +1431,11 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 		}
 
 		$form = '
-			<form id="mp-order-lookup-form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
+			<form id="mp-order-lookup-form" class="mp-form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
 				<div class="mp-order-lookup-form-content">' . $content . '</div>
 				<div class="mp-form-group">
 					<div class="mp-form-group-input">
-						<input type="text" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
+						<input type="text" class="mp-input" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
 					</div>
 					<div class="mp-form-group-submit">
 						<button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
@@ -2001,7 +2001,7 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		$return = '
 <a name="mp-product-list-top"></a>
 <div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-	<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp_product_list_refine clearfix" method="get">
+	<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp-form mp_product_list_refine clearfix" method="get">
 		<div class="one_filter" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
 			<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label>
 			' . $terms . '

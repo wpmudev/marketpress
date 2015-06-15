@@ -249,6 +249,9 @@ class MP_Checkout {
 			'validation' => array(
 				'required' => true,
 			),
+			'atts'		 => array(
+				'class' => 'mp-input',
+			),
 		);
 
 		$address_fields = array(
@@ -264,12 +267,18 @@ class MP_Checkout {
 						'label'	 => __( 'First', 'mp' ),
 						'name'	 => $this->field_name( 'first_name', $type ),
 						'value'	 => mp_get_user_address_part( 'first_name', $type ),
+						'atts'		 => array(
+							'class' => 'mp-input',
+						),
 					),
 					array(
 						'type'	 => 'text',
 						'label'	 => __( 'Last', 'mp' ),
 						'name'	 => $this->field_name( 'last_name', $type ),
 						'value'	 => mp_get_user_address_part( 'last_name', $type ),
+						'atts'		 => array(
+							'class' => 'mp-input',
+						),
 					),
 				),
 			),
@@ -282,12 +291,18 @@ class MP_Checkout {
 					'required'	 => true,
 					'email'		 => true,
 				),
+				'atts'		 => array(
+					'class' => 'mp-input',
+				),
 			),
 			array(
 				'type'	 => 'text',
 				'label'	 => __( 'Company', 'mp' ),
 				'name'	 => $this->field_name( 'company_name', $type ),
 				'value'	 => mp_get_user_address_part( 'company_name', $type ),
+				'atts'		 => array(
+					'class' => 'mp-input',
+				),
 			),
 			array(
 				'type'		 => 'text',
@@ -296,6 +311,7 @@ class MP_Checkout {
 				'value'		 => mp_get_user_address_part( 'address1', $type ),
 				'atts'		 => array(
 					'placeholder' => __( 'Street address, P.O. box, company name, c/o', 'mp' ),
+					'class' => 'mp-input',
 				),
 				'validation' => array(
 					'required' => true,
@@ -308,6 +324,7 @@ class MP_Checkout {
 				'value'	 => mp_get_user_address_part( 'address2', $type ),
 				'atts'	 => array(
 					'placeholder' => __( 'Apartment, suite, unit, building, floor, etc', 'mp' ),
+					'class' => 'mp-input',
 				),
 			),
 			array(
@@ -317,6 +334,9 @@ class MP_Checkout {
 				'value'		 => mp_get_user_address_part( 'city', $type ),
 				'validation' => array(
 					'required' => true,
+				),
+				'atts'		 => array(
+					'class' => 'mp-input',
 				),
 			),
 			array(
@@ -338,6 +358,9 @@ class MP_Checkout {
 				'label'	 => __( 'Phone', 'mp' ),
 				'name'	 => $this->field_name( 'phone', $type ),
 				'value'	 => mp_get_user_address_part( 'phone', $type ),
+				'atts'		 => array(
+					'class' => 'mp-input',
+				),
 			),
 		);
 
@@ -494,7 +517,7 @@ class MP_Checkout {
 
 		$html = '
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
-			<form id="mp-checkout" class="clearfix' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
+			<form id="mp-checkout" class="mp-form clearfix' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
 		wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
 
 		/* Loop through each section to determine if a particular section has errors.
@@ -1023,11 +1046,11 @@ class MP_Checkout {
 						<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
 						<div class="mp-checkout-form-row">
 							<label for="mp-checkout-email">' . __( 'E-Mail Address/Username', 'mp' ) . '</label>
-							<input type="text" name="mp_login_email" />
+							<input type="text" name="mp_login_email" class="mp-input" />
 						</div>
 						<div class="mp-checkout-form-row">
 							<label for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
-							<input type="password" name="mp_login_password" />
+							<input type="password" name="mp_login_password" class="mp-input" />
 						</div>
 						<button id="mp-button-checkout-login" type="submit" class="mp-button mp-button-medium">' . __( 'Login', 'mp' ) . '</button>
 					</div>

@@ -368,7 +368,7 @@ class MP_Coupons_Addon {
 				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp-coupon-form' . ( ( $cart->is_global ) ? ' mp-coupon-form-store' : '' ) . '">
 					<h3>' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
 					<span class="mp-cart-input">
-						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp-input-small" value="" />
+						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp-input mp-input-small" value="" />
 					</span>
 					<button type="button" class="mp-button mp-button-check">' . __( 'Apply Code', 'mp' ) . '</button>' .
 			         wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) . '
