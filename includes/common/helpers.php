@@ -154,7 +154,7 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 			if ( $order->get_meta( "mp_{$type}_info->address2" ) ) {
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address2" ) . "<br />\n";
 			}
-		
+
 			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $order->get_meta( "mp_{$type}_info->state" ) . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $order->get_meta( "mp_{$type}_info->country" ) . "<br /><br />\n";
 			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
 
@@ -492,7 +492,7 @@ if ( !function_exists( 'mp_get_theme_list' ) ) :
 		 *
 		 * @since 3.0
 		 * @param array $theme_list An array of themes.
-		 * @param array $allowed_theme An array of allowed themes.		 
+		 * @param array $allowed_theme An array of allowed themes.
 		 */
 		return apply_filters( 'mp_get_theme_list', $theme_list, $allowed_themes );
 	}
@@ -822,7 +822,7 @@ if ( !function_exists( 'mp_get_cookie_value' ) ) :
 	 *
 	 * @since 3.0
 	 * @uses mp_arr_get_value()
-	 * 	 
+	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
@@ -840,7 +840,7 @@ if ( !function_exists( 'mp_get_get_value' ) ) :
 	 *
 	 * @since 3.0
 	 * @uses mp_arr_get_value()
-	 * 	 
+	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
@@ -858,7 +858,7 @@ if ( !function_exists( 'mp_get_post_value' ) ) :
 	 *
 	 * @since 3.0
 	 * @uses mp_arr_get_value()
-	 * 	 
+	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
@@ -876,7 +876,7 @@ if ( !function_exists( 'mp_get_request_value' ) ) :
 	 *
 	 * @since 3.0
 	 * @uses mp_arr_get_value()
-	 * 	 
+	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
@@ -899,7 +899,7 @@ if ( !function_exists( 'mp_get_session_value' ) ) :
 	 *
 	 * @since 3.0
 	 * @uses mp_arr_get_value()
-	 * 	 
+	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
@@ -999,7 +999,7 @@ if ( !function_exists( 'mp_register_addon' ) ) :
 
 	/**
 	 * Wrapper function for MP_Addons::register()
-	 * 
+	 *
 	 * @since 3.0
 	 * @param array $args
 	 */
@@ -1264,3 +1264,17 @@ if ( !function_exists( 'mp_get_store_caps' ) ) :
 	}
 
 endif;
+
+if ( ! function_exists( 'mp_get_single_site_cart' ) ) {
+	function mp_get_single_site_cart() {
+		$items = mp_cart()->get_all_items();
+		$model = new MP_Cart( false );
+		$model->set_id( get_current_blog_id() );
+		$items = isset( $items[ get_current_blog_id() ] ) ? $items[ get_current_blog_id() ] : array();
+		foreach ( $items as $pid => $qty ) {
+			$model->add_item( $pid, $qty );
+		}
+
+		return $model;
+	}
+}
