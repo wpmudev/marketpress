@@ -714,7 +714,7 @@ class MP_Cart {
 				$this->set_id( $blog_id );
 				$html .= '
 					<div id="mp-cart-store-' . $this->_id . '" class="mp-cart-store">
-						<h3 class="mp-cart-store-name"><a href="' . get_home_url( $this->_id ) . '">' . get_option( 'blogname' ) . '</a></h3>
+
 						<div class="mp-cart-store-items">';
 			}
 
@@ -733,7 +733,7 @@ class MP_Cart {
 				 * @since 3.0
 				 * @param string $after_cart_store_items_html The current html.
 				 * @param MP_Cart $this The current cart object.
-				 * @param array $args The arguments that were passed to the display method.				 
+				 * @param array $args The arguments that were passed to the display method.
 				 */
 				$after_cart_store_items_html = apply_filters( 'mp_cart/after_cart_store_html', '', $this, $args );
 				$after_cart_store_items_html = apply_filters( 'mp_cart/after_cart_store_html/' . $blog_id, $after_cart_store_items_html, $this, $args );
@@ -932,7 +932,7 @@ class MP_Cart {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function empty_cart() {
+	public function empty_cart( ) {
 		/**
 		 * Fires right before the cart is emptied
 		 *
@@ -941,7 +941,11 @@ class MP_Cart {
 		 */
 		do_action( 'mp_cart/before_empty_cart', $this );
 
-		$this->_items[ $this->_id ] = array();
+		if ( $this->is_global ) {
+			$this->_items = array();
+		} else {
+			$this->_items[ $this->_id ] = array();
+		}
 		$this->_update_cart_cookie();
 
 		/**
@@ -1011,7 +1015,6 @@ class MP_Cart {
 
 		if ( $this->has_items() ) {
 			$blog_ids = $this->get_blog_ids();
-
 			$html .= '
 				<ul id="mp-floating-cart-items-list">';
 
@@ -1020,8 +1023,9 @@ class MP_Cart {
 					$blog_id = array_shift( $blog_ids );
 					$this->set_id( $blog_id );
 
-					$html .= '
-						<li class="mp-floating-cart-store-name"><a href="' . get_home_url( $this->_id ) . '">' . get_blog_option( $this->_id, 'blogname' ) . '</a></li>';
+					//comment out, we not really need this
+					/*$html .= '
+						<li class="mp-floating-cart-store-name"><a href="' . get_home_url( $this->_id ) . '">' . get_blog_option( $this->_id, 'blogname' ) . '</a></li>';*/
 				}
 
 				$items = $this->get_items();
@@ -1361,7 +1365,10 @@ class MP_Cart {
 		$this->_id = $id;
 
 		if ( $this->is_global ) {
-			switch_to_blog( $this->_id );
+			if(is_int($this->_id)) {
+				//sometime, the _id is cart object, we need to validate
+				switch_to_blog( $this->_id );
+			}
 		}
 	}
 
@@ -1426,7 +1433,6 @@ class MP_Cart {
 
 			$blog_ids			 = $this->get_blog_ids();
 			$shipping_plugins	 = MP_Shipping_API::get_active_plugins();
-
 			while ( 1 ) {
 				$selected_sub_option = mp_get_session_value( 'mp_shipping_info->shipping_sub_option', null );
 				$selected_option	 = mp_get_session_value( 'mp_shipping_info->shipping_option' );
@@ -1438,18 +1444,31 @@ class MP_Cart {
 					$selected_option	 = mp_get_session_value( "mp_shipping_info->shipping_option->{$blog_id}" );
 				}
 
-				$products	 = $this->get_items_as_objects();
-				$total		 = $this->product_total();
+				/**
+				 * in global cart, the prducts can come from any sites, so we will
+				 * have different rules on each site, we need to separate the cart
+				 * for each site
+				 */
+				if ( $this->is_global ) {
+					$cart     = mp_get_single_site_cart();
+					$products = $cart->get_items_as_objects();
+					$total    = $cart->product_total();
+				} else {
+					$cart     = $this;
+					$products = $this->get_items_as_objects();
+					$total    = $this->product_total();
+				}
 
+				do_action( 'mp/cart/before_calculate_shipping' );
 				//don't charge shipping if only digital products
 				if ( $this->is_download_only() ) {
 					$price = 0;
 				} else if ( mp_get_setting( 'shipping->method' ) == 'calculated' && $selected_option ) {
 					//shipping plugins tie into this to calculate their shipping cost
-					$price = (float) apply_filters( 'mp_calculate_shipping_' . $selected_option, 0, $total, $this, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+					$price = (float) apply_filters( 'mp_calculate_shipping_' . $selected_option, 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 				} else {
 					//shipping plugins tie into this to calculate their shipping cost
-					$price = (float) apply_filters( 'mp_calculate_shipping_' . mp_get_setting( 'shipping->method' ), 0, $total, $this, $address1, $address2, $city, $state, $zip, $country, $selected_option );
+					$price = (float) apply_filters( 'mp_calculate_shipping_' . mp_get_setting( 'shipping->method' ), 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 				}
 
 				//calculate extra shipping
@@ -1464,7 +1483,7 @@ class MP_Cart {
 				}
 
 				$this->_total[ 'shipping' ] += $price;
-
+				do_action( 'mp/cart/after_calculate_shipping' );
 				if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global ) {
 					$this->reset_id();
 					break;
@@ -1531,7 +1550,7 @@ class MP_Cart {
 	 * @access public
 	 * @param bool $format (optional) Format number as currency when returned.
 	 * @param bool $format (optional) Estimate taxes if user hasn't entered their address yet.
-	 * @return string/float 
+	 * @return string/float
 	 */
 	public function tax_total( $format = false, $estimate = false ) {
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
@@ -1570,7 +1589,7 @@ class MP_Cart {
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
 					if ( $item->is_download() && $item->special_tax_amt() ) {
-						
+
 					} else {
 						if ( !mp_get_setting( 'tax->tax_digital' ) && $item->is_download() ) {
 							continue;
@@ -1639,7 +1658,6 @@ class MP_Cart {
 	public function total( $format = false ) {
 		if ( false === mp_arr_get_value( 'total', $this->_total ) ) {
 			$total = ( $this->product_total() + $this->tax_total() + $this->shipping_total() );
-
 			/**
 			 * Filter the total
 			 *
