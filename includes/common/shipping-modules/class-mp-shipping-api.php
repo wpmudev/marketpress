@@ -95,7 +95,6 @@ if ( !class_exists( 'MP_Shipping_API' ) ) {
 
 				return;
 			}
-
 			if ( mp_get_setting( 'shipping->method' ) == 'calculated' ) {
 				//load just the calculated ones
 				foreach ( self::$_plugins as $code => $plugin ) {
@@ -109,11 +108,12 @@ if ( !class_exists( 'MP_Shipping_API' ) ) {
 				//load only selected shipping method
 				$plugin	 = mp_arr_get_value( mp_get_setting( 'shipping->method' ), self::$_plugins );
 				$class	 = $plugin[ 0 ];
-
 				if ( class_exists( $class ) ) {
 					self::$_active_plugins[ mp_get_setting( 'shipping->method' ) ] = new $class;
 				}
 			}
+
+			do_action('mp/shipping_api/after_plugins_loaded');
 		}
 
 		/**
@@ -144,7 +144,7 @@ if ( !class_exists( 'MP_Shipping_API' ) ) {
 		 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 		 */
 		function on_creation() {
-			
+
 		}
 
 		/**
