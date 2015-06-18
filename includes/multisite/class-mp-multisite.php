@@ -31,6 +31,7 @@ class MP_Multisite {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new MP_Multisite();
 		}
+
 		return self::$_instance;
 	}
 
@@ -49,9 +50,37 @@ class MP_Multisite {
 
 			add_filter( 'mp_product/url', array( &$this, 'product_url' ), 10, 2 );
 			add_action( 'switch_blog', array( &$this, 'refresh_autoloaded_options' ) );
+			add_action( 'mp/cart/before_calculate_shipping', array( &$this, 'load_shipping_plugins' ) );
+			add_action( 'mp_order/get_cart', array( &$this, 'maybe_show_cart_global' ), 10, 2 );
 		}
 
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
+	}
+
+	public function maybe_show_cart_global( $cart, MP_Order $order ) {
+		if ( ! $order->exists() ) {
+			return $cart;
+		}
+
+		$id                 = $order->get_id();
+		$global_order_index = get_site_option( 'mp_global_order_index', array() );
+
+		if ( isset( $global_order_index[ $id ] ) ) {
+			return $global_order_index[ $id ];
+		}
+
+		return $cart;
+	}
+
+	/**
+	 * @since 3.0
+	 */
+	public function load_shipping_plugins() {
+		/**
+		 * Shipping plugin will load in very first runtime, and only for the single site. So in global cart,
+		 * sometime it won't load the necessary, we need to check and load it
+		 */
+		MP_Shipping_API::load_active_plugins( true );
 	}
 
 	/**
@@ -64,9 +93,9 @@ class MP_Multisite {
 	public function drop_old_ms_tables() {
 		global $wpdb;
 
-		$table1	 = $wpdb->base_prefix . 'mp_products';
-		$table2	 = $wpdb->base_prefix . 'mp_terms';
-		$table3	 = $wpdb->base_prefix . 'mp_term_relationships';
+		$table1 = $wpdb->base_prefix . 'mp_products';
+		$table2 = $wpdb->base_prefix . 'mp_terms';
+		$table3 = $wpdb->base_prefix . 'mp_term_relationships';
 
 		$wpdb->query( "DROP TABLE IF EXISTS $table1, $table2, $table3" );
 	}
@@ -79,13 +108,13 @@ class MP_Multisite {
 	 * @filter mp_gateway_api/get_gateways
 	 */
 	public function get_gateways( $gateways ) {
-		if ( !is_network_admin() ) {
+		if ( ! is_network_admin() ) {
 			if ( mp_cart()->is_global ) {
-				$code		 = mp_get_network_setting( 'global_gateway' );
-				$gateways	 = array( $code => $gateways[ $code ] );
+				$code     = mp_get_network_setting( 'global_gateway' );
+				$gateways = array( $code => $gateways[ $code ] );
 			} else {
-				$allowed				 = mp_get_network_setting( 'allowed_gateways' );
-				$allowed[ 'free_orders' ]	 = 'full';//Always allow and activate it automatically later if needed
+				$allowed                = mp_get_network_setting( 'allowed_gateways' );
+				$allowed['free_orders'] = 'full';//Always allow and activate it automatically later if needed
 				if ( is_array( $allowed ) ) {
 					foreach ( $gateways as $code => $gateway ) {
 						if ( 'full' != $allowed[ $code ] ) {
@@ -128,15 +157,15 @@ class MP_Multisite {
 		$settings = get_site_option( 'mp_network_settings', array() );
 
 		$default_settings = array(
-			'global_cart'		 => 0,
-			'allowed_gateways'	 => array(),
-			'global_gateway'	 => 'paypal_express',
-			'allowed_themes'	 => array(
+			'global_cart'      => 0,
+			'allowed_gateways' => array(),
+			'global_gateway'   => 'paypal_express',
+			'allowed_themes'   => array(
 				'default' => 'full',
 			),
 		);
 
-		if ( !class_exists( 'MP_Gateway_API' ) ) {
+		if ( ! class_exists( 'MP_Gateway_API' ) ) {
 			require_once mp_plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
 		}
 
@@ -158,13 +187,13 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function post_indexer_set_post_types() {
-		$pi_post_types	 = (array) get_site_option( 'postindexer_globalposttypes', array( 'post' ) );
-		$changed		 = false;
+		$pi_post_types = (array) get_site_option( 'postindexer_globalposttypes', array( 'post' ) );
+		$changed       = false;
 
 		foreach ( mp()->post_types as $post_type ) {
-			if ( !in_array( $post_type, $pi_post_types ) ) {
+			if ( ! in_array( $post_type, $pi_post_types ) ) {
 				$pi_post_types[] = $post_type;
-				$changed		 = true;
+				$changed         = true;
 			}
 		}
 
