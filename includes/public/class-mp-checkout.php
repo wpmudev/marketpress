@@ -209,7 +209,11 @@ class MP_Checkout {
 		$country = mp_get_user_address_part( 'country', $type );
 
 		// Country list
-		$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+		if(is_array(mp_get_setting( 'shipping->allowed_countries', '' ))) {
+			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
+		}else{
+			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+		}
 
 		if ( mp_all_countries_allowed() ) {
 			$all_countries		 = mp()->countries;
@@ -1120,6 +1124,7 @@ class MP_Checkout {
 	 * @access public
 	 */
 	public function section_shipping() {
+
 		if ( mp_cart()->is_download_only() || 0 == mp_cart()->shipping_weight() ) {
 			return false;
 		}
@@ -1128,6 +1133,7 @@ class MP_Checkout {
 		$html		 = '';
 
 		while ( 1 ) {
+
 			if ( mp_cart()->is_global ) {
 				$force	 = true;
 				$blog_id = array_shift( $blog_ids );
