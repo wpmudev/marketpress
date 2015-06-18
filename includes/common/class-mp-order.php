@@ -679,7 +679,7 @@ You can manage this order here: %s', 'mp' );
 			$cart = $this->_convert_legacy_cart( $cart );
 		}
 
-		return $cart;
+		return apply_filters( 'mp_order/get_cart', $cart, $this );
 	}
 
 	/**
