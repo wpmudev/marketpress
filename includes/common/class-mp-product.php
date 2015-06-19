@@ -1590,6 +1590,7 @@ Notification Preferences: %s', 'mp' );
 		$this->_attributes	 = array();
 
 		$ids = array( $this->ID );
+
 		if ( $this->has_variations() ) {
 			$ids = $this->get_variation_ids();
 		}
@@ -1599,10 +1600,10 @@ Notification Preferences: %s', 'mp' );
 
 		if ( !empty( $product_categories ) ) {
 			$product_categories = wp_list_pluck( $product_categories, 'term_id' );
-		}/* else {
-		  $product_categories = array( 0 );
-		  } */
-
+		} /*else {
+			$product_categories = array( 0 );
+		}*/
+		
 		// Get all product attributes for this product and it's variations
 		$attributes = $wpdb->get_col( "
 			SELECT DISTINCT t2.taxonomy
@@ -1613,9 +1614,10 @@ Notification Preferences: %s', 'mp' );
 		);
 
 		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
+
 		foreach ( $attributes as $k => $attribute ) {
 			$attribute_id = $mp_product_atts->get_id_from_slug( $attribute );
-			if ( !empty( $product_categories ) ) {
+			/*if ( !empty( $product_categories ) ) {
 				$exists = $wpdb->get_var( $wpdb->prepare( "
 				SELECT COUNT(*)
 				FROM {$table_name}
@@ -1627,7 +1629,7 @@ Notification Preferences: %s', 'mp' );
 				if ( !$exists ) {
 					unset( $attributes[ $k ] );
 				}
-			}
+			}*/
 		}
 
 		$terms			 = wp_get_object_terms( $ids, array_values( $attributes ) );
