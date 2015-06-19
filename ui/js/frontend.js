@@ -142,10 +142,12 @@ var marketpress = { };
          */
         initSelect2: function( ) {
             $( 'select.mp_select2' ).not( '.select2-offscreen' ).select2( {
+	            "dropdownCssClass": "mp_select2",
                 "dropdownAutoWidth": 1,
                 "minimumResultsForSearch": -1	// hide the search box
             } );
             $( 'select.mp_select2_search' ).not( '.select2-offscreen' ).select2( {
+	            "dropdownCssClass": "mp_select2",
                 "dropdownAutoWidth": 1
             } );
         },

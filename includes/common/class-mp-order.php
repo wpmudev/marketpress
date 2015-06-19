@@ -679,7 +679,7 @@ You can manage this order here: %s', 'mp' );
 			$cart = $this->_convert_legacy_cart( $cart );
 		}
 
-		return $cart;
+		return apply_filters( 'mp_order/get_cart', $cart, $this );
 	}
 
 	/**
@@ -856,6 +856,12 @@ You can manage this order here: %s', 'mp' );
 	 * 		@type float $tax_total Optional, the tax total. Defaults to the calculated total.
 	 */
 	public function save( $args ) {
+		/**
+		 * store the current blog id, after the mp_cart() running shipping_total,shipping_tax_total & tax_total
+		 * the blog id will revert the main, in some case this is a bug
+		*/
+		$current_blog_id = get_current_blog_id();
+
 		$args = array_replace_recursive( array(
 			'cart'				 => null,
 			'payment_info'		 => null,
@@ -869,6 +875,14 @@ You can manage this order here: %s', 'mp' );
 		), $args );
 
 		extract( $args );
+
+		/**
+		 * revert back to the current cart
+		 * todo check if the single cart got ths bug too
+		 */
+		if ( mp_cart()->is_global ) {
+			switch_to_blog( $current_blog_id );
+		}
 
 		// Check required fields
 		if ( is_null( $cart ) || is_null( $payment_info ) ) {

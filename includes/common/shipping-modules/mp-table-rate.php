@@ -3,30 +3,30 @@
 class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	//build of the plugin
 	var $build = 2;
-	
+
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
 	var $plugin_name = 'table_rate';
-	
+
 	//public name of your method, for lists and such.
 	var $public_name = '';
-	
+
 	//set to true if you need to use the shipping_metabox() method to add per-product shipping options
 	var $use_metabox = false;
-	
+
 	//set to true if you want to add per-product weight shipping field
 	var $use_weight = false;
-	
+
 	/**
 	 * Runs when your class is instantiated. Use to setup your plugin instead of __construct()
 	 */
 	function on_creation() {
 		//declare here for translation
 		$this->public_name = __('Table Rate', 'mp');
-		
+
 		add_filter( 'wpmudev_field/get_value/shipping[table_rate][rates]', array( &$this, 'get_rates_value' ), 10, 4 );
 		add_filter( 'wpmudev_field/sanitize_for_db', array( &$this, 'sanitize_rates' ), 10, 3);
 	}
-	
+
   /**
    * Get rates sorted by price from highest to lowest
    *
@@ -39,7 +39,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	  usort( $rates, array( &$this, 'sort_rates' ) );
 	  return $rates;
   }
-  
+
   /**
    * Filter the rates field value
    *
@@ -50,10 +50,10 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	  if ( is_array( $value ) ) {
 	  	usort( $value, array( &$this, 'sort_rates' ) );
 	  }
-	  
+
 	  return $value;
   }
-  
+
   /**
    * Sort rates from highest to lowest
    *
@@ -66,14 +66,14 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
   public function sort_rates( $a, $b ) {
 	  $mincost1 = (float) $a['mincost'];
 	  $mincost2 = (float) $b['mincost'];
-	  
+
 	  if ( $mincost1 == $mincost2 ) {
 		  return 0;
 	  }
-	  
+
 	  return ( $mincost2 > $mincost1 ) ? 1 : -1;
   }
-  
+
   /**
    * Initialize the settings metabox
    *
@@ -97,7 +97,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			'name' => $this->get_field_name( 'rates' ),
 			'sortable' => false,
 		) );
-		
+
 		if ( $layers instanceof WPMUDEV_Field ) {
 			$layers->add_sub_field( 'text', array(
 				'name' => 'mincost',
@@ -107,9 +107,9 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 					'required' => true,
 					'number' => true,
 					'min' => 0.01,
-				),				
+				),
 			) );
-			
+
 			if ( 'US' == mp_get_setting( 'base_country') ) {
 				$layers->add_sub_field( 'text', array(
 					'name' => 'lower_48',
@@ -148,7 +148,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 						'min' => 0,
 					),
 				) );
-				
+
 				if ( 'US' == mp_get_setting( 'base_country') ) {
 					$layers->add_sub_field( 'text', array(
 						'name' => 'usa',
@@ -160,7 +160,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 						),
 					) );
 				}
-				
+
 				if ( in_array( mp_get_setting( 'base_country' ), mp()->eu_countries ) ) {
 					$layers->add_sub_field( 'text', array(
 						'name' => 'eu',
@@ -173,7 +173,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 					) );
 				}
 			}
-			
+
 			$layers->add_sub_field( 'text', array(
 				'name' => 'international',
 				'label' => array( 'text' => __( 'International', 'mp' ) ),
@@ -185,7 +185,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 			) );
 		}
 	}
-	
+
 	/**
    * Updates the plugin settings
    *
@@ -196,18 +196,18 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
    */
   public function update( $settings ) {
 	  $layers = mp_arr_get_value( 'shipping->table_rate', $settings );
-	  
+
 	  if ( ! is_array( $layers ) ) {
 			return $settings;
 	  }
-	  
+
 	  foreach ( $layers as $index => $layer ) {
 		  //! TODO
 	  }
-	  
+
 	  return $settings;
 	}
-	
+
 	/**
 	 * Sanitize rates before saving
 	 *
@@ -219,10 +219,10 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		if ( false === strpos( $field->args['name'], 'shipping[table_rate][rates]' ) ) {
 			return $value;
 		}
-		
+
 		return mp_display_currency( $value, 2 );
 	}
-	
+
 	/**
 		* Use this function to return your calculated price as an integer or float
 		*
@@ -241,14 +241,20 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	function calculate_shipping( $price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option ) {
 		$rates = $this->get_rates();
 		$base_country = mp_get_setting( 'base_country' );
-		
+
 		$rate = array();
-		foreach ( $rates as $rate ) {
-			if ( $total >= mp_arr_get_value( 'mincost', $rate, 0 ) ) {
+		//finding the right rate
+		foreach ( $rates as $r ) {
+			if ( $total >= mp_arr_get_value( 'mincost', $r, 0 ) ) {
+				$rate = $r;
 				break;
 			}
 		}
-		
+		//this cart doesn't meet the min cost, just return the price
+		if ( empty( $rate ) ) {
+			return $price;
+		}
+
 		switch ( $base_country ) {
 			case 'US':
 				if ( $country == 'US' ) {
@@ -263,7 +269,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 					$price = mp_arr_get_value( 'international', $rate, 0 );
 				}
 			break;
-			
+
 		case 'CA':
 			if ( $country == 'CA' ) {
 				$price = mp_arr_get_value( 'in_country', $rate, 0 );
@@ -273,11 +279,11 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 				$price = mp_arr_get_value( 'international', $rate, 0 );
 			}
 		break;
-		
+
 		default:
 			if ( in_array( $country, mp()->eu_countries ) ) {
 				//in european union
-				if ( $base_country == $country ) { 
+				if ( $base_country == $country ) {
 					$price = mp_arr_get_value( 'in_country', $rate, 0 );
 				} elseif ( in_array( $country, mp()->eu_countries) ) {
 					$price = mp_arr_get_value( 'eu', $rate, 0 );
@@ -286,14 +292,14 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 				}
 			} else {
 				//all other countries
-				if ( $country == $base_country ) { 
+				if ( $country == $base_country ) {
 					$price = mp_arr_get_value( 'in_country', $rate, 0 );
 				} else {
 					$price = mp_arr_get_value( 'international', $rate, 0 );
 				}
 			}
 		}
-	
+
 		return (float) $price;
 	}
 }

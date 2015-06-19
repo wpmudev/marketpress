@@ -732,7 +732,7 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 		$gateways	 = MP_Gateway_API::get_active_gateways();
 		$html		 = '';
 
-		$cart	 = new MP_Cart();
+		$cart	 = MP_Cart::get_instance();
 		$total	 = $cart->total( false );
 
 		$options = array();
@@ -749,7 +749,6 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 				}
 			}
 		}
-
 		/**
 		 * Filter the options array before formatting to html
 		 *
@@ -2160,7 +2159,11 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 }
 
 function mp_all_countries_allowed() {
-	$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+	if(is_array(mp_get_setting( 'shipping->allowed_countries', '' ) )){
+		$allowed_countries=mp_get_setting( 'shipping->allowed_countries', '' ) ;
+	}else {
+		$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+	}
 	$key				 = array_search( 'all_countries', $allowed_countries );
 	if ( is_numeric( $key ) ) {
 		return true;
