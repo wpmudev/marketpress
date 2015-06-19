@@ -614,7 +614,7 @@ class WPMUDEV_Metabox {
 			if ( self::$did_metabox_count == 0 ) :
 				?>
 				<div id="poststuff">
-					<div class="meta-box-sortables">
+					<div class="meta-box-sortables <?php echo esc_attr(get_current_screen()->id);?>">
 					<?php endif;
 					?>
 					<?php $this->before_settings_metabox(); ?>

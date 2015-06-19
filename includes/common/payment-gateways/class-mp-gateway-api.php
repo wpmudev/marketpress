@@ -79,31 +79,35 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @return array
 		 */
 		public static function load_active_gateways() {
-			if ( !empty( self::$_active_gateways ) ) {
-				// We already loaded the active gateways. No need to continue.
-				return;
-			}
-
-			$gateways = mp_get_setting( 'gateways' );
-
-			foreach ( self::get_gateways() as $code => $plugin ) {
-				$class = $plugin[ 0 ];
-
-				if ( !class_exists( $class ) ) {
-					continue;
+			?>
+				<?php
+				if ( !empty( self::$_active_gateways ) ) {
+					// We already loaded the active gateways. No need to continue.
+					return;
 				}
 
-				if ( is_admin() && 'store-settings-payments' == mp_get_get_value( 'page' ) ) {
-					// load all gateways when in admin
-					self::$_active_gateways[ $code ] = new $class;
-				} elseif ( mp_arr_get_value( "allowed->{$code}", $gateways ) ) {
-					self::$_active_gateways[ $code ] = new $class;
-				}
-			}
+				$gateways = mp_get_setting( 'gateways' );
 
-			if ( 'store-settings-payments' !== mp_get_get_value( 'page' ) ) {
-				self::$_active_gateways[ 'free_orders' ] = new MP_Gateway_FREE_Orders();
-			}
+				foreach ( self::get_gateways() as $code => $plugin ) {
+					$class = $plugin[ 0 ];
+
+					if ( !class_exists( $class ) ) {
+						continue;
+					}
+
+					if ( is_admin() && 'store-settings-payments' == mp_get_get_value( 'page' ) ) {
+						// load all gateways when in admin
+						self::$_active_gateways[ $code ] = new $class;
+					} elseif ( mp_arr_get_value( "allowed->{$code}", $gateways ) ) {
+						self::$_active_gateways[ $code ] = new $class;
+					}
+				}
+
+				if ( 'store-settings-payments' !== mp_get_get_value( 'page' ) ) {
+					self::$_active_gateways[ 'free_orders' ] = new MP_Gateway_FREE_Orders();
+				}
+				?>
+			<?php
 		}
 
 		/**
@@ -524,6 +528,8 @@ if ( !function_exists( 'mp_register_gateway_plugin' ) ) :
 			return false;
 		}
 	}
+
+
 
 
 
