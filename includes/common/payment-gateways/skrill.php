@@ -218,7 +218,7 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 		global $current_user;
 
 		$timestamp = time();
-		
+
 		$url = 'https://www.moneybookers.com/app/payment.pl';
 
 		$order = new MP_Order();
@@ -233,7 +233,7 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 		$params[ 'return_url' ]			 = $this->return_url;
 		$params[ 'return_url_text' ]	 = __( 'Complete Checkout', 'mp' );
 		$params[ 'cancel_url' ]			 = $this->cancel_url . '?moneybookers_cancel';
-		$params[ 'status_url' ]			 = $this->ipn_url . '?order_id=' . $order_id;
+		$params[ 'status_url' ]			 = $this->ipn_url; //add_query_arg( 'order_id', $order_id, $this->ipn_url );
 		$params[ 'confirmation_note' ]	 = $this->confirmationNote;
 
 		if ( $logourl = $this->get_setting( 'logourl' ) ) {
@@ -271,10 +271,25 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 
 		$param_str = implode( '&', $param_list );
 
-		set_transient( 'mp_order_' . $order_id . '_cart', $cart, 60 * 60 * 12 );
-		set_transient( 'mp_order_' . $order_id . '_shipping', $shipping_info, 60 * 60 * 12 );
-		set_transient( 'mp_order_' . $order_id . '_billing', $billing_info, 60 * 60 * 12 );
-		set_transient( 'mp_order_' . $order_id . '_userid', $current_user->ID, 60 * 60 * 12 );
+		$payment_info = array(
+			'gateway_public_name'	 => $this->public_name,
+			'gateway_private_name'	 => $this->admin_name,
+			'status'				 => array(
+				$timestamp => __( 'Pending payment', 'mp' ),
+			),
+			'total'					 => mp_cart()->total( false ),
+			'currency'				 => $this->currencyCode,
+			'transaction_id'		 => $order_id,
+			'method'				 => __( 'Skrill', 'mp' ),
+		);
+
+		$order->save( array(
+			'cart'			 => $cart,
+			'payment_info'	 => $payment_info,
+			'billing_info'	 => $billing_info,
+			'shipping_info'	 => $shipping_info,
+			'paid'			 => false,
+		) );
 
 		wp_redirect( "{$url}?{$param_str}" );
 		exit( 0 );
@@ -293,24 +308,6 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 
 		$order = new MP_Order( $order_id );
 
-		$payment_info = array(
-			'gateway_public_name'	 => $this->public_name,
-			'gateway_private_name'	 => $this->admin_name,
-			'status'				 => array(
-				$timestamp => __( 'Paid', 'mp' ),
-			),
-			'total'					 => mp_cart()->total( false ),
-			'currency'				 => $this->currencyCode,
-			'transaction_id'		 => $order_id,
-			'method'				 => __( 'Skrill', 'mp' ),
-		);
-
-		$order->save( array(
-			'cart'			 => mp_cart(),
-			'payment_info'	 => $payment_info,
-			'paid'			 => false,
-		) );
-
 		wp_redirect( $order->tracking_url( false ) );
 		die;
 	}
@@ -320,11 +317,24 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 	 */
 	function process_ipn_return() {
 
+		$message_body = $_SERVER[ 'HTTP_USER_AGENT' ] . '<br />';
+
+		foreach ( $_POST as $key => $value ) {
+			$message .= "Field " . htmlspecialchars( $key ) . " = " . htmlspecialchars( $value ) . "<br>";
+		}
+
+		$message_body = $message_body . '' . $message;
+		wp_mail( 'marko.ic@gmail.com', 'ipn triggered', 'test' );
+		wp_mail( 'marko.ic@gmail.com', 'IPN STATUS', $message_body );
+		
+		$order_id	 = mp_get_get_value( 'order_id' );
+		$order		 = new MP_Order( $order_id );
 		$order->log_ipn_status( __( 'Skrill IPN message received.', 'mp' ) );
 
 		if ( $_SERVER[ 'HTTP_USER_AGENT' ] != 'Moneybookers Merchant Payment Agent' ) {
+			wp_mail( 'marko.ic@gmail.com', '(Code: WA)', 'Invalid request (Code: WA)' );
 			header( 'HTTP/1.0 403 Forbidden' );
-			exit( 'Invalid request' );
+			exit( 'Invalid request (Code: WA)' );
 		}
 
 		if ( mp_get_post_value( 'transaction_id' ) ) {
@@ -419,8 +429,9 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 			header( 'HTTP/1.0 200 OK' );
 			exit( 'Successfully recieved!' );
 		} else {
+			wp_mail( 'marko.ic@gmail.com', '(Code: TID)', 'Invalid request (Code: TID)' );
 			header( 'HTTP/1.0 403 Forbidden' );
-			exit( 'Invalid request' );
+			exit( 'Invalid request (Code: TID)' );
 		}
 	}
 
