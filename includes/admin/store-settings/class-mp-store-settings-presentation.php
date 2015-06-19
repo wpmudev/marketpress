@@ -240,6 +240,7 @@ class MP_Store_Settings_Presentation {
 				'single_view'	 => __( 'Single View', 'mp' ),
 				'all_view'		 => __( 'All View', 'mp' ),
 			),
+			'default_value'	 => 'off',
 		) );
 
 		$metabox->add_field( 'radio_group', array(
@@ -265,6 +266,7 @@ class MP_Store_Settings_Presentation {
 				'single_view'	 => __( 'Single View', 'mp' ),
 				'all_view'		 => __( 'All View', 'mp' ),
 			),
+			'default_value'	 => 'off',
 		) );
 
 		$metabox->add_field( 'radio_group', array(

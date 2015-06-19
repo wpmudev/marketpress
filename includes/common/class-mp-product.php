@@ -219,9 +219,9 @@ class MP_Product {
 					}
 				}
 			}
-		}else{
+		} else {
 			$json[ 'status' ]		 = 'out of stock';
-			$json[ 'out_of_stock' ] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json[ 'qty_in_stock' ] ), $product );
+			$json[ 'out_of_stock' ]	 = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json[ 'qty_in_stock' ] ), $product );
 		}
 
 		// Format attribute terms for display
@@ -1791,6 +1791,10 @@ Notification Preferences: %s', 'mp' );
 	public function pinit_button( $context = 'single_view', $echo = false ) {
 		$setting = mp_get_setting( 'social->pinterest->show_pinit_button' );
 
+		if ( empty( $setting ) || $setting == '' ) {
+			$setting = 'off';
+		}
+
 		$single_view_allowed = false;
 
 		if ( $setting == 'all_view' ) {
@@ -1801,6 +1805,10 @@ Notification Preferences: %s', 'mp' );
 
 		if ( $setting == 'single_view' ) {
 			$single_view_allowed = true;
+		}
+
+		if ( $setting == 'off' ) {
+			return '';
 		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
@@ -1850,6 +1858,10 @@ Notification Preferences: %s', 'mp' );
 	public function twitter_button( $context = 'single_view', $echo = false ) {
 		$setting = mp_get_setting( 'social->twitter->show_twitter_button' );
 
+		if ( empty( $setting ) || $setting == '' ) {
+			$setting = 'off';
+		}
+
 		$single_view_allowed = false;
 
 		if ( $setting == 'all_view' ) {
@@ -1860,6 +1872,10 @@ Notification Preferences: %s', 'mp' );
 
 		if ( $setting == 'single_view' ) {
 			$single_view_allowed = true;
+		}
+
+		if ( $setting == 'off' ) {
+			return '';
 		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
@@ -1892,6 +1908,10 @@ Notification Preferences: %s', 'mp' );
 		$setting		 = mp_get_setting( 'social->facebook->show_facebook_like_button' );
 		$setting_action	 = mp_get_setting( 'social->facebook->action' );
 
+		if ( empty( $setting ) || $setting == '' ) {
+			$setting = 'off';
+		}
+
 		$action = 'like';
 
 		if ( isset( $setting_action ) && !is_null( $setting_action ) ) {
@@ -1919,6 +1939,10 @@ Notification Preferences: %s', 'mp' );
 
 		if ( $setting == 'single_view' ) {
 			$single_view_allowed = true;
+		}
+
+		if ( $setting == 'off' ) {
+			return '';
 		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
