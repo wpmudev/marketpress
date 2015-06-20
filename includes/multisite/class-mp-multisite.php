@@ -55,13 +55,49 @@ class MP_Multisite {
 		}
 
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
+		//shortcode
+		add_shortcode( 'mp_list_global_products', array( &$this, 'mp_list_global_products_sc' ) );
+		add_shortcode( 'mp_global_categories_list', array( &$this, 'mp_global_categories_list_sc' ) );
+		add_shortcode( 'mp_global_tag_cloud', array( &$this, 'mp_global_tag_cloud_sc' ) );
 	}
 
+	function mp_global_tag_cloud_sc( $atts ) {
+		return mp_global_taxonomy_list( 'product_tag', $atts, false );
+	}
+
+	/**
+	 * @param $atts
+	 *
+	 * @return string
+	 * @since 3.0
+	 */
+	function mp_global_categories_list_sc( $atts ) {
+		return mp_global_taxonomy_list( 'product_category', $atts, false );
+	}
+
+	/**
+	 * @param $atts
+	 *
+	 * @return string
+	 */
+	function mp_list_global_products_sc( $atts ) {
+		$atts['echo'] = false;
+		$args         = shortcode_atts( mp()->defaults['list_products'], $atts );
+
+		return mp_global_list_products( $args );
+	}
+
+	/**
+	 * @param $cart
+	 * @param MP_Order $order
+	 *
+	 * @return mixed
+	 */
 	public function maybe_show_cart_global( $cart, MP_Order $order ) {
-		if ( ! $order->exists() ) {
+		//order not exist
+		if ( ! $order->exists() || is_admin() ) {
 			return $cart;
 		}
-
 		$id                 = $order->get_id();
 		$global_order_index = get_site_option( 'mp_global_order_index', array() );
 

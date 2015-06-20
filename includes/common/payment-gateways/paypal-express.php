@@ -193,6 +193,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 * @return string
 	 */
 	protected function _get_error( $result ) {
+		$error = '';
+		var_dump($result);
 		for ( $i = 0; $i <= 5; $i ++ ) {
 			if ( isset( $result["L_ERRORCODE{$i}"] ) ) {
 				$error .= '<li>' . $result["L_ERRORCODE{$i}"] . ' - ' . $result["L_LONGMESSAGE{$i}"] . '</li>';
@@ -369,15 +371,17 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				continue;
 			}
 
-			if ( is_multisite() && $bid != $blog_id ) {
+			if ( $cart->is_global && $bid != $blog_id ) {
 				switch_to_blog( $bid );
 			}
 
-			//check if the current merchant don't have email setting, we bypass
-			$merchant_email = mp_get_setting( 'gateways->paypal_express->merchant_email' );
-			$merchant_email = trim( $merchant_email );
-			if ( empty( $merchant_email ) || strlen( $merchant_email ) == 0 ) {
-				continue;
+			if($cart->is_global) {
+				//check if the current merchant don't have email setting, we bypass
+				$merchant_email = mp_get_setting( 'gateways->paypal_express->merchant_email' );
+				$merchant_email = trim( $merchant_email );
+				if ( empty( $merchant_email ) || strlen( $merchant_email ) == 0 ) {
+					continue;
+				}
 			}
 
 			//setup payment request
@@ -385,8 +389,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$request[ 'PAYMENTREQUEST_' . $index . '_CURRENCYCODE' ]          = $this->currencyCode;
 			$request[ 'PAYMENTREQUEST_' . $index . '_NOTIFYURL' ]             = $this->ipn_url;
 			$request[ 'PAYMENTREQUEST_' . $index . '_CUSTOM' ]                = $this->_crc( $cart->get_items() );
-			$request[ 'PAYMENTREQUEST_' . $index . '_SELLERID' ]              = $bid;
-			$request[ 'PAYMENTREQUEST_' . $index . '_SELLERPAYPALACCOUNTID' ] = $merchant_email;
+			if(isset($merchant_email)) {
+				///merchant email provided, case global cart
+				$request[ 'PAYMENTREQUEST_' . $index . '_SELLERPAYPALACCOUNTID' ] = $merchant_email;
+				$request[ 'PAYMENTREQUEST_' . $index . '_SELLERID' ]              = $bid;
+			}
 			//set shipping
 			if ( 'none' != mp_get_setting( 'shipping->method' ) ) {
 				$name                                                         = mp_arr_get_value( 'first_name', $shipping_info, '' ) . ' ' . mp_arr_get_value( 'last_name', $shipping_info, '' );
@@ -447,7 +454,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			}
 			$index ++;
 
-			if ( is_multisite() ) {
+			if ( $cart->is_global ) {
 				switch_to_blog( $blog_id );
 			}
 		}

@@ -65,7 +65,7 @@ class MP_Pages_Admin {
 		if ( is_multisite() && mp_is_main_site() && is_super_admin() ) {
 			$options['network_store_page'] = __('Network Store Base', 'mp');
 		}
-		
+
 		$metabox->add_field('select', array(
 			'name' => 'mp_store_page',
 			'desc' => __('You can choose to make this page one of the following core store pages.', 'mp'),
@@ -89,9 +89,8 @@ class MP_Pages_Admin {
 		$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page', 'meta_value' => $value));
 		
 		update_post_meta($post_id, '_mp_store_page', $value);
-		
-		if ( $value == 'network_store_page' ) {
-			mp_update_network_setting('network_store_page', $post_id);	
+		if ( in_array( $value, array( 'network_store_page', 'network_categories', 'network_tags' ) ) ) {
+			mp_update_network_setting("pages->$value", $post_id);
 		} else {
 			mp_update_setting("pages->$value", $post_id);
 		}

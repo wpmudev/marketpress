@@ -670,7 +670,7 @@ class Marketpress {
 
 		if ( is_multisite() ) {
 			require_once $this->plugin_dir( 'includes/multisite/class-mp-multisite.php' );
-
+			require_once $this->plugin_dir( 'includes/multisite/template-functions.php' );
 			if ( is_admin() ) {
 				require_once $this->plugin_dir( 'includes/multisite/class-mp-admin-multisite.php' );
 			}

@@ -381,11 +381,11 @@ if ( !function_exists( 'mp_create_store_page' ) ) :
 
 			case 'network_store_page' :
 				$args = array(
-					'post_title'	 => __( 'Global Store', 'mp' ),
-					'post_content'	 => __( "Welcome to our market place!\n\nCheck out our network of products:\n\n[mp_list_global_products]\n\nBrowse by category:\n\n[mp_global_categories_list]\n\nBrowse by tag:\n\n[mp_global_tag_cloud]", 'mp' ),
+					'post_title'     => __( 'Global Store', 'mp' ),
+					'post_content'   => __( "Welcome to our market place!\n\nCheck out our network of products:\n\n[mp_list_global_products]\n\nBrowse by category:\n\n[mp_global_categories_list]\n\nBrowse by tag:\n\n[mp_global_tag_cloud]", 'mp' ),
+					'comment_status' => 'closed'
 				);
 				break;
-
 			case 'products' :
 				$args = array(
 					'post_title'	 => __( 'Products', 'mp' ),
