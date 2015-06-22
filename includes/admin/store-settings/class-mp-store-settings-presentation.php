@@ -90,6 +90,7 @@ class MP_Store_Settings_Presentation {
 		$this->init_product_list_settings();
 		$this->init_social_settings();
 		$this->init_store_pages_slugs_settings();
+		$this->init_miscellaneous_settings();
 	}
 
 	/**
@@ -233,9 +234,9 @@ class MP_Store_Settings_Presentation {
 		) );
 
 		$metabox->add_field( 'radio_group', array(
-			'name'		 => 'social[pinterest][show_pinit_button]',
-			'label'		 => array( 'text' => __( 'Show "Pin It" Button', 'mp' ) ),
-			'options'	 => array(
+			'name'			 => 'social[pinterest][show_pinit_button]',
+			'label'			 => array( 'text' => __( 'Show "Pin It" Button', 'mp' ) ),
+			'options'		 => array(
 				'off'			 => __( 'Off', 'mp' ),
 				'single_view'	 => __( 'Single View', 'mp' ),
 				'all_view'		 => __( 'All View', 'mp' ),
@@ -259,9 +260,9 @@ class MP_Store_Settings_Presentation {
 		) );
 
 		$metabox->add_field( 'radio_group', array(
-			'name'		 => 'social[facebook][show_facebook_like_button]',
-			'label'		 => array( 'text' => __( 'Show Facebook Like Button', 'mp' ) ),
-			'options'	 => array(
+			'name'			 => 'social[facebook][show_facebook_like_button]',
+			'label'			 => array( 'text' => __( 'Show Facebook Like Button', 'mp' ) ),
+			'options'		 => array(
 				'off'			 => __( 'Off', 'mp' ),
 				'single_view'	 => __( 'Single View', 'mp' ),
 				'all_view'		 => __( 'All View', 'mp' ),
@@ -412,8 +413,8 @@ class MP_Store_Settings_Presentation {
 			'options'		 => array(
 				//'alignnone'		 => __( 'None', 'mp' ),
 				//'aligncenter'	 => __( 'Center', 'mp' ),
-				'alignleft'		 => __( 'Left', 'mp' ),
-				'alignright'	 => __( 'Right', 'mp' ),
+				'alignleft'	 => __( 'Left', 'mp' ),
+				'alignright' => __( 'Right', 'mp' ),
 			),
 			'conditional'	 => array(
 				'operator'	 => 'AND',
@@ -470,6 +471,26 @@ class MP_Store_Settings_Presentation {
 			'options'	 => array(
 				'DESC'	 => __( 'Descending', 'mp' ),
 				'ASC'	 => __( 'Ascending', 'mp' ),
+			),
+		) );
+	}
+
+	public function init_miscellaneous_settings() {
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'			 => 'mp-settings-miscellaneous-product-list',
+			'page_slugs'	 => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
+			'title'			 => __( 'Miscellaneous Settings', 'mp' ),
+			'desc'			 => __( '', 'mp' ),
+			'option_name'	 => 'mp_settings',
+		) );
+
+		$metabox->add_field( 'text', array(
+			'name'			 => 'per_page_order_history',
+			'label'			 => array( 'text' => __( 'Order Status Entries Per Page', 'mp' ) ),
+			'default_value'	 => get_option( 'posts_per_page' ),
+			'validation'	 => array(
+				'required'	 => true,
+				'digits'	 => 1,
 			),
 		) );
 	}

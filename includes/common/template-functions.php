@@ -54,12 +54,13 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 	 * @return string
 	 */
 	function _mp_order_status_overview() {
-		$history	 = mp_get_order_history();
-		$page		 = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
-		$per_page	 = get_option( 'posts_per_page' );
-		$offset		 = ($page - 1) * $per_page;
-		$total_pages = ceil( count( $history ) / $per_page );
-		$html		 = '
+		$history		 = mp_get_order_history();
+		$page			 = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+		$per_page_value	 = mp_get_setting( 'per_page_order_history' );
+		$per_page		 = isset( $per_page_value ) ? $per_page_value : get_option( 'posts_per_page' );
+		$offset			 = ($page - 1) * $per_page;
+		$total_pages	 = ceil( count( $history ) / $per_page );
+		$html			 = '
 			<div id="mp-order-history">';
 
 		if ( count( $history ) > 0 ) {
