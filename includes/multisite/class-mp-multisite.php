@@ -44,9 +44,9 @@ class MP_Multisite {
 	private function __construct() {
 		$this->maybe_install();
 
-		if ( mp_get_network_setting( 'global_cart' ) && mp_is_post_indexer_installed() ) {
+		if ( mp_get_network_setting( 'global_cart' ) ) {
 			mp_cart()->is_global = true;
-			$this->post_indexer_set_post_types();
+			//$this->post_indexer_set_post_types();
 
 			add_filter( 'mp_product/url', array( &$this, 'product_url' ), 10, 2 );
 			add_action( 'switch_blog', array( &$this, 'refresh_autoloaded_options' ) );
@@ -145,7 +145,7 @@ class MP_Multisite {
 	 */
 	public function get_gateways( $gateways ) {
 		if ( ! is_network_admin() ) {
-			if ( mp_cart()->is_global ) {
+			if ( mp_get_network_setting('global_cart') ) {
 				$code     = mp_get_network_setting( 'global_gateway' );
 				$gateways = array( $code => $gateways[ $code ] );
 			} else {

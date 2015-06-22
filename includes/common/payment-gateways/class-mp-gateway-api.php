@@ -79,22 +79,29 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @return array
 		 */
 		public static function load_active_gateways() {
-			?>
-				<?php
-				if ( !empty( self::$_active_gateways ) ) {
-					// We already loaded the active gateways. No need to continue.
-					return;
+			if ( ! empty( self::$_active_gateways ) ) {
+				// We already loaded the active gateways. No need to continue.
+				return;
+			}
+
+			if (is_multisite() && mp_get_network_setting( 'global_cart' ) ) {
+				//if this is global cart, we will need to get from network admin
+				$gateways = mp_get_network_setting( 'global_gateway' );
+			} else {
+				$gateways = mp_get_setting( 'gateways' );
+			}
+
+			foreach ( self::get_gateways() as $code => $plugin ) {
+				$class = $plugin[0];
+
+				if ( ! class_exists( $class ) ) {
+					continue;
 				}
 
-				$gateways = mp_get_setting( 'gateways' );
-
-				foreach ( self::get_gateways() as $code => $plugin ) {
-					$class = $plugin[ 0 ];
-
-					if ( !class_exists( $class ) ) {
-						continue;
-					}
-
+				//in global mode, we only load one gateway for all
+				if (is_multisite() && mp_get_network_setting( 'global_cart' ) && $code == $gateways ) {
+					self::$_active_gateways[ $code ] = new $class;
+				} else {
 					if ( is_admin() && 'store-settings-payments' == mp_get_get_value( 'page' ) ) {
 						// load all gateways when in admin
 						self::$_active_gateways[ $code ] = new $class;
@@ -102,12 +109,11 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 						self::$_active_gateways[ $code ] = new $class;
 					}
 				}
+			}
 
-				if ( 'store-settings-payments' !== mp_get_get_value( 'page' ) ) {
-					self::$_active_gateways[ 'free_orders' ] = new MP_Gateway_FREE_Orders();
-				}
-				?>
-			<?php
+			if ( 'store-settings-payments' !== mp_get_get_value( 'page' ) ) {
+				self::$_active_gateways['free_orders'] = new MP_Gateway_FREE_Orders();
+			}
 		}
 
 		/**
@@ -142,7 +148,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @access public
 		 */
 		public function on_creation() {
-			
+
 		}
 
 		/**
@@ -205,7 +211,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 					} );
 				}( jQuery ) );
 			</script>
-			<?php
+		<?php
 		}
 
 		/**
@@ -229,7 +235,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @action mp_checkout/confirm_order/{plugin_name}
 		 */
 		public function process_confirm_order() {
-			
+
 		}
 
 		/**
@@ -237,7 +243,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 *  return the proper headers. Exits after.
 		 */
 		function process_ipn_return() {
-			
+
 		}
 
 		/**
@@ -256,7 +262,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 				<label>' . __( 'Card Number', 'mp' ) . '<span class="mp-field-required">*</span></label>
 				<input
 					type="text" ' .
-			(( $use_names ) ? 'name="mp_cc_num"' : 'id="mp-cc-num"' ) . '
+			            (( $use_names ) ? 'name="mp_cc_num"' : 'id="mp-cc-num"' ) . '
 					
 					pattern="\d*"
 					autocomplete="cc-number"
@@ -271,7 +277,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 						<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
 						<input
 							type="text" ' .
-			(( $use_names ) ? 'name="mp_cc_exp"' : 'id="mp-cc-exp"' ) . '
+			            (( $use_names ) ? 'name="mp_cc_exp"' : 'id="mp-cc-exp"' ) . '
 					
 							autocomplete="cc-exp"
 							class="mp-input-cc-exp"
@@ -284,7 +290,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 						<input
 							class="mp-input-cc-cvc"
 							type="text" ' .
-			(( $use_names ) ? 'name="mp_cc_cvc"' : 'id="mp-cc-cvc"' ) . '
+			            (( $use_names ) ? 'name="mp_cc_cvc"' : 'id="mp-cc-cvc"' ) . '
 					
 							name="mp_cc_cvc"
 							autocomplete="off"
@@ -509,7 +515,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 
 	}
 
-	endif;
+endif;
 
 if ( !function_exists( 'mp_register_gateway_plugin' ) ) :
 

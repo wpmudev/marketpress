@@ -58,7 +58,7 @@ class MP_Admin_Multisite {
 			add_action( 'network_admin_notices', array( &$this, 'post_indexer_admin_notice' ) );
 		}
 
-		if ( mp_cart()->is_global ) {
+		if ( mp_get_network_setting( 'global_cart' ) ) {
 			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array(
 				&$this,
 				'force_check_global_gateway'
