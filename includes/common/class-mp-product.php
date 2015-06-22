@@ -378,7 +378,7 @@ class MP_Product {
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="clearfix">
 						<label class="mp_product_options_att_input_label" for="' . $input_id . '">
-							<input id="' . $input_id . '" class="mp-input required digits" type="number" name="product_quantity" value="1" ' . $disabled . '  />
+							<input id="' . $input_id . '" class="mp-input required digits" min="1" type="number" name="product_quantity" value="1" ' . $disabled . '  />
 						</label>
 					</div>
 				</div>
