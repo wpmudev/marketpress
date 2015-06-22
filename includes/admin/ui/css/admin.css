@@ -47,3 +47,7 @@
   /* Good browsers */
   opacity: 0;
 }
+
+.post-type-mp_coupon #message a{
+    display: none;
+}
