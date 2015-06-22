@@ -410,8 +410,8 @@ class MP_Store_Settings_Presentation {
 			'name'			 => 'image_alignment_list',
 			'label'			 => array( 'text' => __( 'Image Alignment', 'mp' ) ),
 			'options'		 => array(
-				'alignnone'		 => __( 'None', 'mp' ),
-				'aligncenter'	 => __( 'Center', 'mp' ),
+				//'alignnone'		 => __( 'None', 'mp' ),
+				//'aligncenter'	 => __( 'Center', 'mp' ),
 				'alignleft'		 => __( 'Left', 'mp' ),
 				'alignright'	 => __( 'Right', 'mp' ),
 			),
@@ -644,7 +644,7 @@ class MP_Store_Settings_Presentation {
 			'name'			 => 'image_alignment_single',
 			'label'			 => array( 'text' => __( 'Image Alignment', 'mp' ) ),
 			'options'		 => array(
-				'alignnone'		 => __( 'None', 'mp' ),
+				//'alignnone'		 => __( 'None', 'mp' ),
 				'aligncenter'	 => __( 'Center', 'mp' ),
 				'alignleft'		 => __( 'Left', 'mp' ),
 				'alignright'	 => __( 'Right', 'mp' ),

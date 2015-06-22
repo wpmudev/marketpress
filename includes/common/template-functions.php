@@ -161,9 +161,13 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$class = array_filter( $class, create_function( '$s', 'return ( ! empty( $s ) );' ) );
 
+			$image_alignment = mp_get_setting( 'image_alignment_list' );
+
+			$align_class = ($view == 'list') ? ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignleft') : '';
+
 			$html .= '
-				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '"><!--style="width: ' . $width . '"-->
-					<div class="mp_one_product clearfix"><!--' . (( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '') . '-->
+				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
+					<div class="mp_one_product clearfix ' . $align_class . '">
 						<div class="mp_product_detail">
 							' . $img . '
 							<div class="mp_product_content">
@@ -380,14 +384,14 @@ if ( !function_exists( 'mp_create_store_page' ) ) :
 				break;
 
 			case 'network_store_page' :
-				$args = array(
-					'post_title'     => __( 'Global Store', 'mp' ),
-					'post_content'   => __( "Welcome to our market place!\n\nCheck out our network of products:\n\n[mp_list_global_products]\n\nBrowse by category:\n\n[mp_global_categories_list]\n\nBrowse by tag:\n\n[mp_global_tag_cloud]", 'mp' ),
+				$args	 = array(
+					'post_title'	 => __( 'Global Store', 'mp' ),
+					'post_content'	 => __( "Welcome to our market place!\n\nCheck out our network of products:\n\n[mp_list_global_products]\n\nBrowse by category:\n\n[mp_global_categories_list]\n\nBrowse by tag:\n\n[mp_global_tag_cloud]", 'mp' ),
 					'comment_status' => 'closed'
 				);
 				break;
 			case 'products' :
-				$args = array(
+				$args	 = array(
 					'post_title'	 => __( 'Products', 'mp' ),
 					'post_content'	 => '[mp_list_products]',
 					'post_parent'	 => mp_get_setting( 'pages->store', 0 ),
@@ -1644,7 +1648,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		$return = '
 			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product ' . ($has_image ? 'mp_product-has-image' : '') . ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignnone') . ' ' . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
+				<div class="mp_product ' . ($has_image ? 'mp_product-has-image' : '') . ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . ' ' . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
 
 
 		if ( $image ) {
@@ -1660,7 +1664,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 				if ( $values ) {
 					$return .= '<div class = "mp-product-images">';
-					
+
 					$return .= "<script>
 								jQuery(document).ready(function() {
 									jQuery('#mp_product_gallery').lightSlider({
@@ -1702,7 +1706,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( $image ) {
 			$return .= '<div class = "mp-product-details">';
-			
+
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
@@ -2159,12 +2163,12 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 }
 
 function mp_all_countries_allowed() {
-	if(is_array(mp_get_setting( 'shipping->allowed_countries', '' ) )){
-		$allowed_countries=mp_get_setting( 'shipping->allowed_countries', '' ) ;
-	}else {
+	if ( is_array( mp_get_setting( 'shipping->allowed_countries', '' ) ) ) {
+		$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
+	} else {
 		$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 	}
-	$key				 = array_search( 'all_countries', $allowed_countries );
+	$key = array_search( 'all_countries', $allowed_countries );
 	if ( is_numeric( $key ) ) {
 		return true;
 	} else {
