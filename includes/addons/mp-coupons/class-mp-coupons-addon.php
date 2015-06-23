@@ -131,7 +131,7 @@ class MP_Coupons_Addon {
 
 			// Get coupon code value
 			add_filter( 'wpmudev_field/before_get_value/coupon_code', array( &$this, 'get_coupon_code_value' ), 10, 4 );
-			add_action( 'map_meta_cap', array( &$this, 'map_meta_cap' ), 10, 4 );
+			add_action( 'user_has_cap', array( &$this, 'user_has_cap' ), 10, 4 );
 		}
 	}
 
@@ -889,12 +889,26 @@ class MP_Coupons_Addon {
 				'view'               => __( 'View Coupon', 'mp' )
 			),
 			'capability_type'    => array( 'mp_coupon', 'mp_coupons' ),
+			'capabilities'       => array(
+				'publish_posts'       => 'publish_mp_coupons',
+				'edit_posts'          => 'edit_mp_coupons',
+				'edit_others_posts'   => 'edit_others_mp_coupons',
+				'delete_posts'        => 'delete_mp_coupons',
+				'delete_others_posts' => 'delete_others_mp_coupons',
+				'read_private_posts'  => 'read_private_mp_coupons',
+				'edit_post'           => 'edit_mp_coupon',
+				'delete_post'         => 'delete_mp_coupon',
+				'read_post'           => 'read_mp_coupon',
+			),
 			'map_meta_cap'       => true,
-			'public'             => false,
-			'publicly_queryable' => true,
+			'public'             => true,
 			'show_ui'            => true,
 			'show_in_menu'       => false,
+			'hierarchical'       => false,
+			'rewrite'            => false,
+			'query_var'          => false,
 			'supports'           => array( '' ),
+			'publicly_queryable' => true,
 		) );
 	}
 
@@ -1138,37 +1152,28 @@ class MP_Coupons_Addon {
 		return $this->_convert_to_objects( $applied );
 	}
 
-	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
-		if ( ! in_array( $cap, array( 'edit_mp_coupons', 'publish_mp_coupons', 'delete_mp_coupons' ) ) ) {
-			return $caps;
-		}
+	public function user_has_cap( $allcaps, $caps, $args, $user ) {
 		//check does this user is admin
-		$user = new WP_User( $user_id );
-		if ( ! $user->exists() ) {
-			return $caps;
-		}
 		$role_caps = $user->get_role_caps();
 		if ( ! isset( $role_caps['manage_options'] ) ) {
-			return $caps;
+			return $allcaps;
 		}
-
-		unset( $caps[ array_search( $cap, $caps ) ] );
-
-		switch ( $cap ) {
-			case 'edit_mp_coupons':
-				$caps[] = 'edit_posts';
-				break;
-			case 'publish_mp_coupons':
-				$caps[] = 'publish_posts';
-				break;
-			case 'delete_mp_coupons':
-				$caps[] = 'delete_posts';
-				break;
+		//we need to check this is for only coupon post type
+		$post_type = get_post_type_object( 'mp_coupon' );
+		if ( ! is_object( $post_type ) ) {
+			return $allcaps;
 		}
-
-		return $caps;
+		$pt_cap = (array) $post_type->cap;
+		//do manualy map
+		foreach ( $caps as $cap ) {
+			if ( $found = array_search( $cap, $pt_cap ) ) {
+				if ( isset( $role_caps[ $found ] ) && $role_caps[ $found ] == true ) {
+					$allcaps[ $cap ] = true;
+				}
+			}
+		}
+		return $allcaps;
 	}
-
 }
 
 MP_Coupons_Addon::get_instance();
