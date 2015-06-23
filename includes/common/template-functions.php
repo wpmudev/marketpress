@@ -168,22 +168,21 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
 					<div class="mp_one_product clearfix ' . $align_class . '">
-						<div class="mp_product_detail">
+						<div class="mp-product-images">
 							' . $img . '
-							<div class="mp_product_content">
-								<h3 class="mp_product_name entry-title" itemprop="name">
-									<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
-								</h3>
-								<div class="mp-social-shares">
-									' . $pinit . '
-									' . $fb . '
-									' . $twitter . '
-								</div>
-									' . $mp_product_list_content . '
-							</div>
 						</div>
-
-						<div class="mp_price_buy">
+						<div class="mp-product-meta">
+							<h3 class="mp_product_name entry-title" itemprop="name">
+								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+							</h3>
+							<div class="mp-social-shares">
+								' . $pinit . '
+								' . $fb . '
+								' . $twitter . '
+							</div>
+								' . $mp_product_list_content . '
+						</div>
+						<div class="mp-product-buy">
 							' . $product->display_price( false ) . '
 							' . $product->buy_button( false, 'list' ) . '
 							' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
