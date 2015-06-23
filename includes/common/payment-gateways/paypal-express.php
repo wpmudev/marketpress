@@ -589,7 +589,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			),
 		) );
 
-		if ( mp_cart()->is_global ) {
+		if ( mp_get_network_setting('global_cart') ) {
 			$metabox->add_field( 'text', array(
 				'name'       => $this->get_field_name( 'merchant_email' ),
 				'label'      => array( 'text' => __( 'Merchant Email', 'mp' ) ),

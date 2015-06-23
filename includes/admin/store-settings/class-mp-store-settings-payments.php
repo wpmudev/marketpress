@@ -77,7 +77,7 @@ class MP_Store_Settings_Payments {
 	 */
 	public function print_styles() {
 
-		if ( 'store-settings_page_store-settings-payments' != get_current_screen()->id || !mp_cart()->is_global ) {
+		if ( 'store-settings_page_store-settings-payments' != get_current_screen()->id || !(is_multisite() && mp_get_network_setting('global_cart')) ) {
 			// bail - either not on payments settings screen or global cart is not enabled
 			return;
 		}
