@@ -132,7 +132,8 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			if ( 'list' == mp_get_setting( 'list_view' ) ) {
 				$align = mp_get_setting( 'image_alignment_list' );
 			}
-			$img = $product->image( false, 'list', null, $align );
+
+			$img = $product->image( false, 'list', null, $align, false );
 
 			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
 			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
@@ -168,7 +169,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
-					<div class="mp_one_product clearfix ' . $align_class . '">
+					<div class="mp_one_product ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' : '') . ' clearfix ' . $align_class . '">
 						<div class="mp-product-images">
 							' . $img . '
 						</div>

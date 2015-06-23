@@ -1247,7 +1247,7 @@ class MP_Product {
 	 * @param string $align The alignment of the image. Defaults to settings.
 	 */
 
-	public function image( $echo = true, $context = 'list', $size = null, $align = null ) {
+	public function image( $echo = true, $context = 'list', $size = null, $align = null, $show_empty = true ) {
 		/**
 		 * Filter the post_id used for the product image
 		 *
@@ -1268,6 +1268,11 @@ class MP_Product {
 		}
 
 		$post_thumbnail_id	 = get_post_thumbnail_id( $this->ID );
+		
+		if(!$show_empty && !is_numeric( $post_thumbnail_id)){
+			return '';
+		}
+		
 		$class				 = $title				 = $link				 = $img_align			 = '';
 		$img_classes		 = array( 'mp_product_image_' . $context, 'photo' );
 		$title				 = esc_attr( $this->title( false ) );
