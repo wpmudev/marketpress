@@ -1025,7 +1025,7 @@ You can manage this order here: %s', 'mp' );
 			$timestamp				 = time();
 			$orders[ $timestamp ]	 = $new_order;
 			$expire					 = time() + 31536000; // 1 year expire
-			setcookie( $key, serialize( $orders ), $expire, COOKIEPATH, COOKIEDOMAIN );
+			setcookie( $key, serialize( $orders ), $expire, COOKIEPATH, COOKIE_DOMAIN );
 		}
 
 		if ( has_filter( 'mp_new_order' ) ) {
