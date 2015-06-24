@@ -169,27 +169,27 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
-					<div class="mp_one_product ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' : '') . ' clearfix ' . $align_class . '">
+					<div class="'. (( 'grid' == $view ) ? 'mp_one_product' : 'mp_product') . ' ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' . $align_class : ''). '">
 						<div class="mp-product-images">
 							' . $img . '
 						</div>
-						<div class="mp-product-meta">
-							<h3 class="mp_product_name entry-title" itemprop="name">
-								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
-							</h3>
-							<div class="mp-social-shares">
-								' . $pinit . '
-								' . $fb . '
-								' . $twitter . '
+						<div class="mp-product-details">
+ 							<h3 class="mp_product_name entry-title" itemprop="name">
+ 								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+ 							</h3>
+							<div class="mp-product-meta">
+								' . $product->display_price( false ) . '
+ 								' . $mp_product_list_content . '
+								' . $product->buy_button( false, 'list' ) . '
+								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
+								<div class="mp-social-shares">
+									' . $pinit . '
+									' . $fb . '
+									' . $twitter . '
+								</div>
 							</div>
-								' . $mp_product_list_content . '
-						</div>
-						<div class="mp-product-buy">
-							' . $product->display_price( false ) . '
-							' . $product->buy_button( false, 'list' ) . '
-							' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
-						</div>
-						
+ 						</div>
+	
 						<div style="display:none">
 							<span class="entry-title">' . $product->title( false ) . '</span> was last modified:
 							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
