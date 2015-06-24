@@ -133,7 +133,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 				$align = mp_get_setting( 'image_alignment_list' );
 			}
 
-			$img = $product->image( false, 'list', null, $align, false );
+			$img = $product->image( false, 'list', null, $align, true );
 
 			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
 			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );

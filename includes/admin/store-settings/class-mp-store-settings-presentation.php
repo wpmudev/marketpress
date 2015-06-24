@@ -308,7 +308,7 @@ class MP_Store_Settings_Presentation {
 	 * @access public
 	 */
 	public function init_product_list_settings() {
-		$metabox	 = new WPMUDEV_Metabox( array(
+		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => 'mp-settings-presentation-product-list',
 			'page_slugs'	 => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
 			'title'			 => __( 'Product List/Grid Settings', 'mp' ),
@@ -354,6 +354,24 @@ class MP_Store_Settings_Presentation {
 			'label'		 => array( 'text' => __( 'Show Product Thumbnail?', 'mp' ) ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
+
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'show_thumbnail_placeholder',
+			'label'		 => array( 'text' => __( 'Show default product placeholder thumbnail when product image is not available?', 'mp' ) ),
+			'message'	 => __( 'Yes', 'mp' ),
+		) );
+
+		$metabox->add_field( 'file', array(
+			'name'			 => 'thumbnail_placeholder',
+			'label'			 => array( 'text' => __( 'Select default placeholder image thumbnail when product image is not available (if empty, plugin\'s built-in image will be used)', 'mp' ) ),
+			'message'		 => __( 'Yes', 'mp' ),
+			'conditional'	 => array(
+				'name'	 => 'show_thumbnail_placeholder',
+				'value'	 => '1',
+				'action' => 'show',
+			),
+		) );
+
 		$metabox->add_field( 'select', array(
 			'name'			 => 'list_img_size',
 			'label'			 => array( 'text' => __( 'Image Size', 'mp' ) ),
