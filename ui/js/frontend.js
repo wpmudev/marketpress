@@ -424,7 +424,38 @@ var marketpress = { };
                 overlayClose: false,
                 width: 450
             } );
-        }
+        },
+        /**
+         * Initialize global product filters/pagination
+         *
+         * @since 3.0
+         */
+        initGlobalProductFiltersPagination: function( ) {
+            var $form = $( '#mp_global_product_list_refine' );
+            $form.on( 'change', 'select', function( e ) {
+                var $this = $( this );
+                //we don't filter by taxonomy in global, so just bypass
+                marketpress.updateGlobalProductList( );
+            } );
+        },
+        /**
+         * Update global product list
+         *
+         * @since 3.0
+         * @access public
+         */
+        updateGlobalProductList: function( ) {
+            var $form = $( '#mp_global_product_list_refine' );
+            var data = $form.serialize( );
+            var url = mp_i18n.ajaxurl + '?action=mp_global_update_product_list';
+            marketpress.loadingOverlay( 'show' );
+            $.post( url, data ).done( function( resp ) {
+                marketpress.loadingOverlay( 'hide' );
+                $( '#mp_product_nav' ).remove( );
+                $( '#mp_product_list' ).replaceWith( resp );
+                mp_cart.initCartListeners( );
+            } );
+        },
     };
 }( jQuery ) );
 jQuery( document ).ready( function( ) {
@@ -435,6 +466,7 @@ jQuery( document ).ready( function( ) {
     marketpress.initImageLightbox( );
     marketpress.initProductFiltersPagination( );
     marketpress.initCreateAccountLightboxListeners( );
+    marketpress.initGlobalProductFiltersPagination();
 } );
 window.onload = function( ) {
     marketpress.equalizeProductGrid( );

@@ -59,6 +59,9 @@ class MP_Multisite {
 		add_shortcode( 'mp_list_global_products', array( &$this, 'mp_list_global_products_sc' ) );
 		add_shortcode( 'mp_global_categories_list', array( &$this, 'mp_global_categories_list_sc' ) );
 		add_shortcode( 'mp_global_tag_cloud', array( &$this, 'mp_global_tag_cloud_sc' ) );
+		//filter global product list
+		add_action( 'wp_ajax_mp_global_update_product_list', array( &$this, 'filter_products' ) );
+		add_action( 'wp_ajax_nopriv_mp_global_update_product_list', array( &$this, 'filter_products' ) );
 		//for indexer
 		//index products
 		add_action( 'wp_insert_post', array( &$this, 'save_post' ), 10, 3 );
@@ -68,6 +71,21 @@ class MP_Multisite {
 		add_action( 'mp_checkout/product_sale', array( &$this, 'record_sale' ), 10, 2 );
 	}
 
+	public function filter_products() {
+		$page = mp_get_post_value( 'page', 1 );
+		list( $order_by, $order ) = explode( '-', mp_get_post_value( 'order' ) );
+		echo mp_global_list_products( array(
+			'page'     => $page,
+			'order_by' => trim( $order_by ),
+			'order'    => trim( $order )
+		) );
+		die;
+	}
+
+	/**
+	 * @since 3.0
+	 * @access public
+	 */
 	public function register_post_type() {
 		register_post_type( 'mp_ms_indexer', array(
 			'public'             => false,
@@ -80,6 +98,15 @@ class MP_Multisite {
 		) );
 	}
 
+	/**
+	 * This function use for the hook mp_checkout/product_sale, we will need to update the sales count of index
+	 *
+	 * @param MP_Product $item
+	 * @param $paid
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function record_sale( MP_Product $item, $paid ) {
 		$current_blog_id = get_current_blog_id();
 		$index           = $this->find_index( get_current_blog_id(), $item->ID );
@@ -94,6 +121,12 @@ class MP_Multisite {
 		}
 	}
 
+	/**
+	 * @param $post_id
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function untrash_post( $post_id ) {
 		$post = get_post( $post_id );
 		if ( ! is_object( $post ) ) {
@@ -112,6 +145,12 @@ class MP_Multisite {
 		}
 	}
 
+	/**
+	 * @param $post_id
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function delete_product( $post_id ) {
 		$post = get_post( $post_id );
 		if ( ! is_object( $post ) ) {
@@ -129,6 +168,13 @@ class MP_Multisite {
 		}
 	}
 
+	/**
+	 * @param $post_id
+	 * @param $post
+	 * @param $update
+	 *
+	 * @since 3.0
+	 */
 	public function save_post( $post_id, $post, $update ) {
 		// If this is just a revision, don't send the email.
 		if ( wp_is_post_revision( $post_id ) ) {
@@ -147,6 +193,15 @@ class MP_Multisite {
 		}
 	}
 
+	/**
+	 * This is use for find an index
+	 *
+	 * @param $blog_id
+	 * @param $product_id
+	 *
+	 * @return mixed
+	 * @since 3.0
+	 */
 	public function find_index( $blog_id, $product_id ) {
 		switch_to_blog( 1 );
 		$query = new WP_Query( array(
@@ -168,6 +223,15 @@ class MP_Multisite {
 		return $query->post_count > 0 ? $query->posts[0] : null;
 	}
 
+	/**
+	 * Add an index base on product id & blog id
+	 *
+	 * @param $blog_id
+	 * @param $product_id
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function add_index( $blog_id, $product_id ) {
 		//gather data
 		$post    = get_post( $product_id );
@@ -176,15 +240,17 @@ class MP_Multisite {
 			'blog_id'        => $blog_id,
 			'post_id'        => $post->ID,
 			'regular_price'  => $product->get_price( 'lowest' ),
-			'mp_sales_count' => $product->get_meta( 'mp_sales_count' )
+			'mp_sales_count' => $product->get_meta( 'mp_sales_count' ),
 		);
 
 		//start to insert index
 		switch_to_blog( 1 );
 		$id = wp_insert_post( array(
-			'post_title'  => $post->post_title,
-			'post_type'   => 'mp_ms_indexer',
-			'post_status' => 'publish',
+			'post_title'    => $post->post_title,
+			'post_type'     => 'mp_ms_indexer',
+			'post_status'   => 'publish',
+			'post_date'     => $post->post_date,
+			'post_date_gmt' => $post->post_date_gmt
 		) );
 
 		foreach ( $metas as $key => $val ) {
@@ -193,6 +259,14 @@ class MP_Multisite {
 		switch_to_blog( $blog_id );
 	}
 
+	/**
+	 * This is use for index the products within network
+	 *
+	 * @return array
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
 	public function index_content() {
 		//build an index with the whole site
 		$data       = array();
@@ -213,7 +287,7 @@ class MP_Multisite {
 						'blog_id'        => $blog['blog_id'],
 						'post'           => $post->to_array(),
 						'regular_price'  => $product->get_price( 'lowest' ),
-						'mp_sales_count' => $product->get_meta( 'mp_sales_count' )
+						'mp_sales_count' => $product->get_meta( 'mp_sales_count' ),
 					);
 				}
 			}
@@ -269,9 +343,11 @@ class MP_Multisite {
 			$args = $row['post'];
 
 			$id = wp_insert_post( array(
-				'post_title'  => $args['post_title'],
-				'post_type'   => 'mp_ms_indexer',
-				'post_status' => 'publish',
+				'post_title'    => $args['post_title'],
+				'post_type'     => 'mp_ms_indexer',
+				'post_status'   => 'publish',
+				'post_date'     => $args['post_date'],
+				'post_date_gmt' => $args['post_date_gmt']
 			) );
 			update_post_meta( $id, 'blog_id', $row['blog_id'] );
 			update_post_meta( $id, 'post_id', $args['ID'] );
@@ -287,6 +363,11 @@ class MP_Multisite {
 		);
 	}
 
+	/**
+	 * @param $atts
+	 *
+	 * @return string
+	 */
 	function mp_global_tag_cloud_sc( $atts ) {
 		return mp_global_taxonomy_list( 'product_tag', $atts, false );
 	}
