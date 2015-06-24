@@ -1998,29 +1998,34 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		);
 		$options_html	 = '';
 		foreach ( $options as $k => $t ) {
-			$value = $t[ 0 ] . '- ' . $t [ 1 ];
+			$value = $t[ 0 ] . '-' . $t [ 1 ];
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[ 2 ] . '</option>';
 		}
 
 		$return = '
-<a name="mp-product-list-top"></a>
-<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-	<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp-form mp_product_list_refine clearfix" method="get">
-		<div class="one_filter" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-			<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label>
-			' . $terms . '
-		</div>
-
-		<div class="one_filter">
-			<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label>
-			<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-				' . $options_html . '
-			</select>
-		</div>' .
-		(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />') . '
-		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
-	</form>
-</div>';
+		<a id="mp_product_top"></a>
+		<!-- Products Filter -->
+		<section class="mp_products_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
+			<form id="mp_products_filter_refine" name="mp_products_filter_refine" class="mp_form" method="get">
+			
+				<div class="mp_form_col mp_products_filter_col mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+					<label for="mp_product_category">' . __( 'Category', 'mp' ) . '</label>
+					' . $terms . '
+				</div><!-- mp_listing_products_category -->
+				
+				<div class="mp_form_col mp_products_filter_col mp_products_filter_orderby">
+					<label for="mp_sort_orderby">' . __( 'Order By', 'mp' ) . '</label>
+					<select id="mp_sort_orderby" class="mp_select2" name="product_orderby">
+						' . $options_html . '
+					</select>
+				</div><!-- mp_products_filter_orderby -->
+				
+				' .(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">') . '
+				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
+			
+			</form><!-- mp_products_filter_refine -->
+		</section><!-- end mp_products_filter -->
+		';
 
 		return apply_filters( 'mp_products_filter', $return );
 	}
