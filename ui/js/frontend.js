@@ -288,7 +288,7 @@ var marketpress = { };
          * @since 3.0
          */
         initProductFiltersPagination: function( ) {
-            var $form = $( '#mp_product_list_refine' );
+            var $form = $( '#mp_products_filter_refine' );
             $form.on( 'change', 'select', function( e ) {
                 var $this = $( this );
                 // Redirect if product category dropdown changed
@@ -322,7 +322,7 @@ var marketpress = { };
          * @access public
          */
         updateProductList: function( ) {
-            var $form = $( '#mp_product_list_refine' );
+            var $form = $( '#mp_products_filter_refine' );
             var data = $form.serialize( );
             var url = mp_i18n.ajaxurl + '?action=mp_update_product_list';
             marketpress.loadingOverlay( 'show' );

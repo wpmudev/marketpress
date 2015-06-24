@@ -169,27 +169,27 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
-					<div class="mp_one_product ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' : '') . ' clearfix ' . $align_class . '">
+					<div class="'. (( 'grid' == $view ) ? 'mp_one_product' : 'mp_product') . ' ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' . $align_class : ''). '">
 						<div class="mp-product-images">
 							' . $img . '
 						</div>
-						<div class="mp-product-meta">
-							<h3 class="mp_product_name entry-title" itemprop="name">
-								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
-							</h3>
-							<div class="mp-social-shares">
-								' . $pinit . '
-								' . $fb . '
-								' . $twitter . '
+						<div class="mp-product-details">
+ 							<h3 class="mp_product_name entry-title" itemprop="name">
+ 								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+ 							</h3>
+							<div class="mp-product-meta">
+								' . $product->display_price( false ) . '
+ 								' . $mp_product_list_content . '
+								' . $product->buy_button( false, 'list' ) . '
+								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
+								<div class="mp-social-shares">
+									' . $pinit . '
+									' . $fb . '
+									' . $twitter . '
+								</div>
 							</div>
-								' . $mp_product_list_content . '
-						</div>
-						<div class="mp-product-buy">
-							' . $product->display_price( false ) . '
-							' . $product->buy_button( false, 'list' ) . '
-							' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
-						</div>
-						
+ 						</div>
+	
 						<div style="display:none">
 							<span class="entry-title">' . $product->title( false ) . '</span> was last modified:
 							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
@@ -1998,29 +1998,34 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		);
 		$options_html	 = '';
 		foreach ( $options as $k => $t ) {
-			$value = $t[ 0 ] . '- ' . $t [ 1 ];
+			$value = $t[ 0 ] . '-' . $t [ 1 ];
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[ 2 ] . '</option>';
 		}
 
 		$return = '
-<a name="mp-product-list-top"></a>
-<div class="mp_list_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-	<form id="mp_product_list_refine" name="mp_product_list_refine" class="mp-form mp_product_list_refine clearfix" method="get">
-		<div class="one_filter" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-			<label for="mp-product-category">' . __( 'Category', 'mp' ) . '</label>
-			' . $terms . '
-		</div>
-
-		<div class="one_filter">
-			<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label>
-			<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-				' . $options_html . '
-			</select>
-		</div>' .
-		(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />') . '
-		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
-	</form>
-</div>';
+		<a id="mp_product_top"></a>
+		<!-- Products Filter -->
+		<section class="mp_products_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
+			<form id="mp_products_filter_refine" name="mp_products_filter_refine" class="mp_form" method="get">
+			
+				<div class="mp_form_col mp_products_filter_col mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+					<label for="mp_product_category">' . __( 'Category', 'mp' ) . '</label>
+					' . $terms . '
+				</div><!-- mp_listing_products_category -->
+				
+				<div class="mp_form_col mp_products_filter_col mp_products_filter_orderby">
+					<label for="mp_sort_orderby">' . __( 'Order By', 'mp' ) . '</label>
+					<select id="mp_sort_orderby" class="mp_select2" name="product_orderby">
+						' . $options_html . '
+					</select>
+				</div><!-- mp_products_filter_orderby -->
+				
+				' .(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">') . '
+				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
+			
+			</form><!-- mp_products_filter_refine -->
+		</section><!-- end mp_products_filter -->
+		';
 
 		return apply_filters( 'mp_products_filter', $return );
 	}
