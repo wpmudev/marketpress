@@ -418,7 +418,7 @@ if ( !function_exists( 'mp_create_store_page' ) ) :
 			case 'order_status' :
 				$args = array(
 					'post_title'	 => __( 'Order Status', 'mp' ),
-					'post_content'	 => "[mp_order_lookup_form]\n<h2>" . __( 'Order Search', 'mp' ) . "</h2>\n<p>" . __( 'If you have your order ID you can look it up using the form below.', 'mp' ) . "</p>[/mp_order_lookup_form]\n[mp_order_status]\n",
+					'post_content'	 => "[mp_order_lookup_form]<h2>" . __( 'Order Search', 'mp' ) . "</h2><p>" . __( 'If you have your order ID you can look it up using the form below.', 'mp' ) . "</p>[/mp_order_lookup_form][mp_order_status]",
 					'post_parent'	 => mp_get_setting( 'pages->store', 0 )
 				);
 				break;
@@ -1435,13 +1435,13 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 		}
 
 		$form = '
-			<form id="mp-order-lookup-form" class="mp-form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
-				<div class="mp-order-lookup-form-content">' . $content . '</div>
-				<div class="mp-form-group">
-					<div class="mp-form-group-input">
-						<input type="text" class="mp-input" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
+			<form id="mp_order_lookup_form" class="mp_form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
+				<div class="mp_order_lookup_form_content">' . $content . '</div>
+				<div class="mp_form_group">
+					<div class="mp_form_group_field">
+						<input type="text" class="mp_form_input" id="mp_order_id_input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
 					</div>
-					<div class="mp-form-group-submit">
+					<div class="mp_form_group_field">
 						<button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
 					</div>
 				</div>
@@ -2004,24 +2004,26 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		<a id="mp_product_top"></a>
 		<!-- Products Filter -->
 		<section class="mp_products_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-			<form id="mp_products_filter_refine" name="mp_products_filter_refine" class="mp_form" method="get">
+			<form id="mp_products_filter_form" name="mp_products_filter_form" class="mp_form" method="get">
 			
-				<div class="mp_form_col mp_products_filter_col mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-					<label for="mp_product_category">' . __( 'Category', 'mp' ) . '</label>
-					' . $terms . '
-				</div><!-- mp_listing_products_category -->
-				
-				<div class="mp_form_col mp_products_filter_col mp_products_filter_orderby">
-					<label for="mp_sort_orderby">' . __( 'Order By', 'mp' ) . '</label>
-					<select id="mp_sort_orderby" class="mp_select2" name="product_orderby">
-						' . $options_html . '
-					</select>
-				</div><!-- mp_products_filter_orderby -->
+				<div class="mp_form_fields">
+					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+						<label for="mp_product_category">' . __( 'Category', 'mp' ) . '</label>
+						' . $terms . '
+					</div><!-- mp_listing_products_category -->
+
+					<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
+						<label for="mp_sort_orderby">' . __( 'Order By', 'mp' ) . '</label>
+						<select id="mp_sort_orderby" class="mp_select2" name="order">
+							' . $options_html . '
+						</select>
+					</div><!-- mp_products_filter_orderby -->
+				</div>
 				
 				' .(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">') . '
 				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
 			
-			</form><!-- mp_products_filter_refine -->
+			</form><!-- mp_products_filter_form -->
 		</section><!-- end mp_products_filter -->
 		';
 

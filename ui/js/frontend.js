@@ -157,7 +157,7 @@ var marketpress = { };
          * @since 3.0
          */
         initOrderLookup: function( ) {
-            var $form = $( '#mp-order-lookup-form' );
+            var $form = $( '#mp_order_lookup_form' );
             var $btn = $form.find( '[type="submit"]' );
             var $input = $form.find( 'input' );
             $form.on( 'submit', function( e ) {
@@ -288,7 +288,7 @@ var marketpress = { };
          * @since 3.0
          */
         initProductFiltersPagination: function( ) {
-            var $form = $( '#mp_products_filter_refine' );
+            var $form = $( '#mp_products_filter_form' );
             $form.on( 'change', 'select', function( e ) {
                 var $this = $( this );
                 // Redirect if product category dropdown changed
@@ -322,13 +322,13 @@ var marketpress = { };
          * @access public
          */
         updateProductList: function( ) {
-            var $form = $( '#mp_products_filter_refine' );
+            var $form = $( '#mp_products_filter_form' );
             var data = $form.serialize( );
             var url = mp_i18n.ajaxurl + '?action=mp_update_product_list';
             marketpress.loadingOverlay( 'show' );
             $.post( url, data ).done( function( resp ) {
                 marketpress.loadingOverlay( 'hide' );
-                $( '#mp_product_nav' ).remove( );
+                $( '.mp_products_nav' ).remove( );
                 $( '#mp_product_list' ).replaceWith( resp );
                 mp_cart.initCartListeners( );
             } );
