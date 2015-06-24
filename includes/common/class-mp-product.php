@@ -1267,15 +1267,19 @@ class MP_Product {
 			$image_post_id = $this->get_variation()->ID;
 		}
 
-		$post_thumbnail_id	 = get_post_thumbnail_id( $this->ID );
-		
-		if(!$show_empty && !is_numeric( $post_thumbnail_id)){
-			return '';
+		$post_thumbnail_id = get_post_thumbnail_id( $image_post_id );
+
+		if ( mp_get_setting( 'show_thumbnail_placeholder' ) == '1' ) {
+			//do nothing, placeholder image should be shown
+		} else {
+			if ( (!is_numeric( $post_thumbnail_id ) ) ) {
+				return '';
+			}
 		}
-		
-		$class				 = $title				 = $link				 = $img_align			 = '';
-		$img_classes		 = array( 'mp_product_image_' . $context, 'photo' );
-		$title				 = esc_attr( $this->title( false ) );
+
+		$class		 = $title		 = $link		 = $img_align	 = '';
+		$img_classes = array( 'mp_product_image_' . $context, 'photo' );
+		$title		 = esc_attr( $this->title( false ) );
 
 		if ( !is_null( $align ) && false === strpos( $align, 'align' ) ) {
 			$align = 'align' . $align;
@@ -1349,15 +1353,19 @@ class MP_Product {
 		$image = get_the_post_thumbnail( $image_post_id, $size, array( 'itemprop' => 'image', 'class' => implode( ' ', $img_classes ), 'title' => $title ) );
 
 		if ( empty( $image ) ) {
+			$thumbnail_placeholder = mp_get_setting( 'thumbnail_placeholder' );
+			
+			$placeholder_image = !empty($thumbnail_placeholder) ? $thumbnail_placeholder : mp_plugin_url( 'ui/images/default-product.png' );
+			
 			if ( $context == 'floating-cart' ) {
-				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ) . '" />';
+				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" />';
 			} else {
 				if ( !is_array( $size ) ) {
 					$size = array( get_option( $size . '_size_w' ), get_option( $size . '_size_h' ) );
 				}
 
 				$img_classes[]	 = 'wp-post-image';
-				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ) . '" />';
+				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" />';
 			}
 		}
 
@@ -1605,10 +1613,10 @@ Notification Preferences: %s', 'mp' );
 
 		if ( !empty( $product_categories ) ) {
 			$product_categories = wp_list_pluck( $product_categories, 'term_id' );
-		} /*else {
-			$product_categories = array( 0 );
-		}*/
-		
+		} /* else {
+		  $product_categories = array( 0 );
+		  } */
+
 		// Get all product attributes for this product and it's variations
 		$attributes = $wpdb->get_col( "
 			SELECT DISTINCT t2.taxonomy
@@ -1622,19 +1630,19 @@ Notification Preferences: %s', 'mp' );
 
 		foreach ( $attributes as $k => $attribute ) {
 			$attribute_id = $mp_product_atts->get_id_from_slug( $attribute );
-			/*if ( !empty( $product_categories ) ) {
-				$exists = $wpdb->get_var( $wpdb->prepare( "
-				SELECT COUNT(*)
-				FROM {$table_name}
-				WHERE (attribute_id = %d AND term_id IN (" . implode( ',', $product_categories ) . "))
-				OR NOT EXISTS (SELECT attribute_id FROM {$table_name} WHERE attribute_id = %d)", $attribute_id, $attribute_id
-				) );
+			/* if ( !empty( $product_categories ) ) {
+			  $exists = $wpdb->get_var( $wpdb->prepare( "
+			  SELECT COUNT(*)
+			  FROM {$table_name}
+			  WHERE (attribute_id = %d AND term_id IN (" . implode( ',', $product_categories ) . "))
+			  OR NOT EXISTS (SELECT attribute_id FROM {$table_name} WHERE attribute_id = %d)", $attribute_id, $attribute_id
+			  ) );
 
 
-				if ( !$exists ) {
-					unset( $attributes[ $k ] );
-				}
-			}*/
+			  if ( !$exists ) {
+			  unset( $attributes[ $k ] );
+			  }
+			  } */
 		}
 
 		$terms			 = wp_get_object_terms( $ids, array_values( $attributes ) );
