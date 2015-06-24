@@ -9,47 +9,9 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 
 // Init query params
 		$query = array(
-			'post_type'   => MP_Product::get_post_type(),
+			'post_type'   => 'mp_ms_indexer',
 			'post_status' => 'publish',
 		);
-
-// Setup taxonomy query
-		$tax_query = array();
-		if ( ! is_null( $args['category'] ) || ! is_null( $args['tag'] ) ) {
-			if ( ! is_null( $args['category'] ) ) {
-				$tax_query[] = array(
-					'taxonomy' => 'product_category',
-					'field'    => 'slug',
-					'terms'    => sanitize_title( $args['category'] ),
-				);
-			}
-
-			if ( ! is_null( $args['tag'] ) ) {
-				$tax_query[] = array(
-					'taxonomy' => 'product_tag',
-					'field'    => 'slug',
-					'terms'    => sanitize_title( $args['tag'] ),
-				);
-			}
-		} elseif ( get_query_var( 'taxonomy' ) == 'product_category' ) {
-			$tax_query[] = array(
-				'taxonomy' => 'product_category',
-				'field'    => 'slug',
-				'terms'    => get_query_var( 'term' ),
-			);
-		} elseif ( get_query_var( 'taxonomy' ) == 'product_tag' ) {
-			$tax_query[] = array(
-				'taxonomy' => 'product_tag',
-				'field'    => 'slug',
-				'terms'    => get_query_var( 'term' ),
-			);
-		}
-
-		if ( count( $tax_query ) > 1 ) {
-			$query['tax_query'] = array_merge( array( 'relation' => 'AND' ), $tax_query );
-		} elseif ( count( $tax_query ) == 1 ) {
-			$query['tax_query'] = $tax_query;
-		}
 
 // Setup pagination
 		if ( ( ! is_null( $args['paginate'] ) && ! $args['paginate'] ) || ( is_null( $args['paginate'] ) && ! mp_get_setting( 'paginate' ) ) ) {
@@ -98,8 +60,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		}
 
 		// The Query
-		$custom_query = new Network_Query( $query );
-
+		$custom_query = new WP_Query( $query );
 		// Get layout type
 		$layout_type = mp_get_setting( 'list_view' );
 		if ( ! is_null( $args['list_view'] ) ) {
@@ -135,7 +96,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		 * @param array $args The arguments passed to mp_list_products
 		 */
 		$content = apply_filters( 'mp_global_list_products', $content, $args );
-		network_reset_postdata();
+		wp_reset_postdata();
 		if ( $args['echo'] ) {
 			echo $content;
 		} else {
@@ -157,7 +118,7 @@ if ( ! function_exists( '_mp_global_products_html_grid' ) ) {
 }
 
 if ( ! function_exists( '_mp_global_products_html' ) ) {
-	function _mp_global_products_html( $view, $custom_query ) {
+	function _mp_global_products_html( $view, WP_Query $custom_query ) {
 		$html    = '';
 		$per_row = (int) mp_get_setting( 'per_row' );
 		$width   = round( 100 / $per_row, 1 ) . '%';
@@ -172,9 +133,14 @@ if ( ! function_exists( '_mp_global_products_html' ) ) {
 		}
 		$current_blog_id = get_current_blog_id();
 		foreach ( $custom_query->get_posts() as $post ) {
-			switch_to_blog( $post->BLOG_ID );
-			$product = new MP_Product( $post->ID );
-
+			$blog_id    = get_post_meta( $post->ID, 'blog_id', true );
+			$product_id = get_post_meta( $post->ID, 'post_id', true );
+			switch_to_blog( $blog_id );
+			$product = new MP_Product( $product_id );
+			if ( $product->exists() == false ) {
+				var_dump($post);
+				var_dump( $product_id );
+			}
 			$align = null;
 			if ( 'list' == mp_get_setting( 'list_view' ) ) {
 				$align = mp_get_setting( 'image_alignment_list' );
@@ -244,6 +210,8 @@ if ( ! function_exists( '_mp_global_products_html' ) ) {
 			if ( $column == 1 && $view == 'grid' ) {
 				$html .= '</div><!-- END .mp_grid_row -->';
 			}
+			//restore back to root
+			switch_to_blog(1);
 		}
 		switch_to_blog( $current_blog_id );
 		if ( $column != 1 && $view == 'grid' ) {
@@ -277,15 +245,9 @@ if ( ! function_exists( 'mp_global_taxonomy_list' ) ) :
 		$atts = wp_parse_args( $atts, $defaults );
 		extract( $atts );
 
-		global $wpdb;
-		$sql = "
-		SELECT * FROM {$wpdb->base_prefix}network_terms terms, {$wpdb->base_prefix}network_term_taxonomy tt, {$wpdb->base_prefix}network_term_relationships tr
-WHERE terms.`term_id` = tt.term_id AND tr.`term_taxonomy_id`= tt.`term_taxonomy_id`
-AND tt.taxonomy=%s
-GROUP BY terms.term_id ORDER BY {$order_by} {$order} LIMIT {$limit}
-		";
+		$key     = 'mp_' . $taxonomy;
+		$results = get_site_option( $key );
 
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $taxonomy ) );
 		if ( $taxonomy == 'product_tag' ) {
 			$html = _mp_global_tags_cloud( $results, $taxonomy );
 		} else {
@@ -304,11 +266,11 @@ if ( ! function_exists( '_mp_global_categories_list' ) ) {
 		$html            = '<ul id="mp_category_list">';
 		$current_blog_id = get_current_blog_id();
 		foreach ( $results as $row ) {
-			switch_to_blog( $row->blog_id );
-			$url = get_term_link( $row->slug, $taxonomy );
+			switch_to_blog( $row['blog_id'] );
+			$url = get_term_link( $row['slug'], $taxonomy );
 			if ( ! is_wp_error( $url ) ) {
-				$html .= '<li class="cat-item cat-item-' . $row->term_id . '">
-			<a href="' . $url . '">' . $row->name . '</a>
+				$html .= '<li class="cat-item cat-item-' . $row['term_id'] . '">
+			<a href="' . $url . '">' . $row['name'] . '</a>
 			</li>';
 			}
 		}
@@ -324,10 +286,10 @@ if ( ! function_exists( '_mp_global_tags_cloud' ) ) {
 		$html            = '<div id="mp_tag_cloud">';
 		$current_blog_id = get_current_blog_id();
 		foreach ( $results as $row ) {
-			switch_to_blog( $row->blog_id );
-			$url  = get_term_link( $row->slug, $taxonomy );
+			switch_to_blog( $row['blog_id'] );
+			$url = get_term_link( $row['slug'], $taxonomy );
 			if ( ! is_wp_error( $url ) ) {
-				$html .= '<a href="' . $url . '" class="tag-link tag-link-' . $row->term_id . '" title="">' . $row->name . '</a> ';
+				$html .= '<a href="' . $url . '" class="tag-link tag-link-' . $row['term_id'] . '" title="">' . $row['name'] . '</a> ';
 			}
 		}
 		$html .= '</div>';

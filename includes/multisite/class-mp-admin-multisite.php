@@ -53,11 +53,7 @@ class MP_Admin_Multisite {
 			add_filter( 'wpmudev_field/after_field', array( &$this, 'display_create_page_button' ), 10, 2 );
 			add_action( 'wpmudev_field/print_scripts', array( &$this, 'create_store_page_js' ) );
 		}
-
-		if ( mp_get_network_setting( 'global_cart' ) && ! mp_is_post_indexer_installed() ) {
-			add_action( 'network_admin_notices', array( &$this, 'post_indexer_admin_notice' ) );
-		}
-
+		add_action( 'wp_ajax_mp_index_products', array( &$this, 'index_products' ) );
 		if ( mp_get_network_setting( 'global_cart' ) ) {
 			add_filter( 'wpmudev_field/get_value/gateways[allowed][' . mp_get_network_setting( 'global_gateway', '' ) . ']', array(
 				&$this,
@@ -170,6 +166,7 @@ class MP_Admin_Multisite {
 	 */
 	public function init_metaboxes() {
 		$this->init_general_settings_metabox();
+		$this->init_indexer_metabox();
 		$this->init_global_gateway_settings_metabox();
 		$this->init_gateway_permissions_metabox();
 		$this->init_theme_permissions_metabox();
@@ -198,6 +195,72 @@ class MP_Admin_Multisite {
 		$metabox->add_field( 'checkbox', array(
 			'name'  => 'global_cart',
 			'label' => array( 'text' => __( 'Enable Global Shopping Cart?', 'mp' ) ),
+		) );
+	}
+
+	/**
+	 * Display indexer information
+	 */
+	public function init_indexer_metabox() {
+		$count = wp_count_posts( 'mp_ms_indexer' );
+		$html  = sprintf( __( "%d products have been indexed in whole network", "mp" ), $count->publish ) . '<br/><br/>';
+		$html .= '<button type="button" class="button mp_index_products">' . __( "Index Products", "mp" ) . '</button>';
+		$html .= '<p class="index-status" style="display: none;">' . __( "Please hold on...", "mp" ) . '</p>';
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'               => 'mp-post-indexer',
+			'page_slugs'       => array( 'network-store-settings' ),
+			'title'            => __( 'Product Indexer', 'mp' ),
+			'desc'             => $html,
+			'site_option_name' => '',
+			'order'            => 0,
+		) );
+
+		add_action( 'admin_footer', array( &$this, 'index_products_script' ) );
+	}
+
+	function index_products_script() {
+		if ( is_network_admin() ) {
+			?>
+			<script type="text/javascript">
+				jQuery(document).ready(function ($) {
+					$('.mp_index_products').click(function () {
+						var that = $(this);
+						$.ajax({
+							type: 'POST',
+							data: {
+								action: 'mp_index_products',
+								_nonce: '<?php echo wp_create_nonce('mp_index_products') ?>'
+							},
+							url: ajaxurl,
+							beforeSend: function () {
+								that.attr('disabled', 'disabled');
+								$('.index-status').css('display', 'block');
+							},
+							success: function (data) {
+								that.removeAttr('disabled');
+								$('.index-status').text(data.text);
+							}
+						})
+					})
+				})
+			</script>
+		<?php
+		}
+	}
+
+	public function index_products() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die();
+		}
+
+		if ( ! wp_verify_nonce( mp_get_post_value( '_nonce' ), 'mp_index_products' ) ) {
+			die();
+		}
+
+		$result = MP_Multisite::get_instance()->index_content();
+
+		wp_send_json( array(
+			'text' => sprintf( __( "%d products get indexed", "mp" ), $result['count'] )
 		) );
 	}
 
@@ -397,24 +460,6 @@ class MP_Admin_Multisite {
 				'required' => true,
 			),
 		) );
-		/*$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[network_categories]',
-			'label'       => array( 'text' => __( 'Marketplace Categories', 'mp' ) ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );
-		$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[network_tags]',
-			'label'       => array( 'text' => __( 'Marketplace Tags', 'mp' ) ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );*/
 	}
 
 	/**
@@ -425,7 +470,7 @@ class MP_Admin_Multisite {
 	 * filter wpmudev_field/after_field
 	 */
 	public function display_create_page_button( $html, $field ) {
-		switch ( $field->args[ 'original_name' ] ) {
+		switch ( $field->args['original_name'] ) {
 			case 'pages[network_store_page]' :
 				$type = 'network_store_page';
 				break;
@@ -440,9 +485,9 @@ class MP_Admin_Multisite {
 		}
 
 		if ( isset( $type ) ) {
-			if ( ($post_id = mp_get_network_setting( "pages->$type" )) && get_post_status( $post_id ) !== false ) {
+			if ( ( $post_id = mp_get_network_setting( "pages->$type" ) ) && get_post_status( $post_id ) !== false ) {
 				return '<a target="_blank" class="button mp-edit-page-button" href="' . add_query_arg( array(
-					'post'	 => $post_id,
+					'post'   => $post_id,
 					'action' => 'edit',
 				), get_admin_url( null, 'post.php' ) ) . '">' . __( 'Edit Page' ) . '</a>';
 			} else {
@@ -461,31 +506,31 @@ class MP_Admin_Multisite {
 	 * @action wpmudev_field/print_scripts
 	 */
 	public function create_store_page_js( $field ) {
-		if ( $field->args[ 'original_name' ] !== 'pages[network_store_page]' ) {
+		if ( $field->args['original_name'] !== 'pages[network_store_page]' ) {
 			return;
 		}
 		?>
 		<script type="text/javascript">
-			jQuery( document ).ready( function( $ ) {
-				$( '.mp-create-page-button' ).click( function( e ) {
+			jQuery(document).ready(function ($) {
+				$('.mp-create-page-button').click(function (e) {
 					e.preventDefault();
 
-					var $this = $( this ),
-						$select = $this.siblings( '[name^="pages"]' );
+					var $this = $(this),
+						$select = $this.siblings('[name^="pages"]');
 
-					$this.isWorking( true );
+					$this.isWorking(true);
 
-					$.getJSON( $this.attr( 'href' ), function( resp ) {
-						if ( resp.success ) {
-							$select.attr( 'data-select2-value', resp.data.select2_value ).select2( 'val', resp.data.post_id ).trigger( 'change' );
-							$this.isWorking( false ).replaceWith( resp.data.button_html );
+					$.getJSON($this.attr('href'), function (resp) {
+						if (resp.success) {
+							$select.attr('data-select2-value', resp.data.select2_value).select2('val', resp.data.post_id).trigger('change');
+							$this.isWorking(false).replaceWith(resp.data.button_html);
 						} else {
-							alert( '<?php _e( 'An error occurred while creating the store page. Please try again.', 'mp' ); ?>' );
-							$this.isWorking( false );
+							alert('<?php _e( 'An error occurred while creating the store page. Please try again.', 'mp' ); ?>');
+							$this.isWorking(false);
 						}
-					} );
-				} );
-			} );
+					});
+				});
+			});
 		</script>
 	<?php
 	}
