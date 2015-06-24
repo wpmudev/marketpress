@@ -1900,8 +1900,7 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 			$big = 999999999;
 
 			$html = '
-				<div id="mp_product_nav">
-					<div id="mp_product_nav_inner" class="clearfix">';
+				<nav class="mp_products_nav">';
 
 			/* $html .= paginate_links( array(
 			  'base'		 => '%_%',
@@ -1928,8 +1927,7 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 			) );
 
 			$html .= '
-</div>
-</div>';
+				</nav>';
 		}
 
 		/**
