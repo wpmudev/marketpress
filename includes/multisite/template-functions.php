@@ -58,7 +58,6 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		if ( ! is_null( $args['order'] ) ) {
 			$query['order'] = $args['order'];
 		}
-
 		// The Query
 		$custom_query = new WP_Query( $query );
 		// Get layout type
@@ -72,7 +71,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 
 		if ( ! mp_doing_ajax() ) {
 			$per_page = ( is_null( $args['per_page'] ) ) ? null : $args['per_page'];
-			//$content .= ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) ? mp_products_filter( false, $per_page, $custom_query ) : mp_products_filter( true, $per_page, $custom_query );
+			$content .= ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) ? mp_global_products_filter( false, $per_page, $custom_query ) : mp_global_products_filter( true, $per_page, $custom_query );
 		}
 
 		$content .= '<div id="mp_product_list" class="clearfix hfeed mp_' . $layout_type . '">';
@@ -104,6 +103,58 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		}
 	}
 }
+
+if ( ! function_exists( 'mp_global_products_filter' ) ) :
+
+	/**
+	 * Display product filters
+	 *
+	 * @since 3.0
+	 *
+	 * @param bool $hidden Are the filters hidden or visible?
+	 * @param int $per_page The number of posts per page
+	 * @param WP_Query $query
+	 *
+	 * @return string
+	 */
+	function mp_global_products_filter( $hidden = false, $per_page = null, $query = null ) {
+		$current_order = strtolower( $query->get( 'order_by' ) . '-' . $query->get( 'order' ) );
+		$options       = array(
+			array( '0', '', __( 'Default', 'mp' ) ),
+			array( 'date', 'desc', __( 'Release Date (Latest to Oldest)', 'mp' ) ),
+			array( 'date', 'asc', __( 'Release Date (Oldest to Latest)', 'mp' ) ),
+			array( 'title', 'asc', __( 'Name (A-Z)', 'mp' ) ),
+			array( 'title', 'desc', __( 'Name (Z-A)', 'mp' ) ),
+			array( 'price', 'asc', __( 'Price (Low to High)', 'mp' ) ),
+			array( 'price', 'desc', __( 'Price (High to Low)', 'mp' ) ),
+			array( 'sales', 'desc', __( 'Popularity (Most Popular - Least Popular)', 'mp' ) ),
+			array( 'sales', 'asc', __( 'Popularity (Least Popular - Most Popular)', 'mp' ) )
+		);
+		$options_html  = '';
+		foreach ( $options as $k => $t ) {
+			$value = $t[0] . '- ' . $t [1];
+			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[2] . '</option>';
+		}
+
+		$return = '
+<a name="mp-product-list-top"></a>
+<div class="mp_list_filter"' . ( ( $hidden ) ? ' style="display:none"' : '' ) . '>
+	<form id="mp_global_product_list_refine" name="mp_global_product_list_refine" class="mp-form mp_global_product_list_refine clearfix" method="get">
+		<div class="one_filter">
+			<label for="mp-sort-order">' . __( 'Order By', 'mp' ) . '</label>
+			<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+				' . $options_html . '
+			</select>
+		</div>' .
+		          ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />' ) . '
+		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
+	</form>
+</div>';
+
+		return apply_filters( 'mp_global_products_filter', $return );
+	}
+
+endif;
 
 if ( ! function_exists( '_mp_global_products_html_list' ) ) {
 	function _mp_global_products_html_list( $custom_query ) {
@@ -137,9 +188,8 @@ if ( ! function_exists( '_mp_global_products_html' ) ) {
 			$product_id = get_post_meta( $post->ID, 'post_id', true );
 			switch_to_blog( $blog_id );
 			$product = new MP_Product( $product_id );
-			if ( $product->exists() == false ) {
-				var_dump($post);
-				var_dump( $product_id );
+			if ( !is_object($product) || $product->exists() == false ) {
+				continue;
 			}
 			$align = null;
 			if ( 'list' == mp_get_setting( 'list_view' ) ) {
@@ -211,7 +261,7 @@ if ( ! function_exists( '_mp_global_products_html' ) ) {
 				$html .= '</div><!-- END .mp_grid_row -->';
 			}
 			//restore back to root
-			switch_to_blog(1);
+			switch_to_blog( 1 );
 		}
 		switch_to_blog( $current_blog_id );
 		if ( $column != 1 && $view == 'grid' ) {
