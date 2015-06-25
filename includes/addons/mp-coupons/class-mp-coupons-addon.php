@@ -365,12 +365,12 @@ class MP_Coupons_Addon {
 	public function coupon_form_cart( $html, $cart, $args ) {
 		if ( $cart->is_editable && mp_addons()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
 			$html .= '
-				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp-coupon-form' . ( ( $cart->is_global ) ? ' mp-coupon-form-store' : '' ) . '">
+				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp_coupon-form' . ( ( $cart->is_global ) ? ' mp-coupon-form-store' : '' ) . '">
 					<h3>' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
-					<span class="mp-cart-input">
-						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp-input mp-input-small" value="" />
+					<span class="mp_coupon_input">
+						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp_form_input mp_form_input-small" value="" />
 					</span>
-					<button type="button" class="mp-button mp-button-check">' . __( 'Apply Code', 'mp' ) . '</button>' .
+					<button type="button" class="mp_button mp_button-check">' . __( 'Apply Code', 'mp' ) . '</button>' .
 			         wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) . '
 				</div>';
 		}

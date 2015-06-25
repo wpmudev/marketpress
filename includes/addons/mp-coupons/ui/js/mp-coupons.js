@@ -76,7 +76,7 @@ var mp_coupons = { };
          * @since 3.0
          */
         initCouponFormListeners: function() {
-            $( '.mp-coupon-form' ).each( function() {
+            $( '.mp_coupon-form' ).each( function() {
                 var $couponForm = $( this );
                 var $couponCode = $couponForm.find( '[name^="mp_cart_coupon"]' );
                 var storeID = $couponCode.attr( 'name' ).replace( /[^0-9]/ig, '' );

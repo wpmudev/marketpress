@@ -777,7 +777,7 @@ class MP_Checkout {
 	public function step_link( $what ) {
 		$hash	 = $this->url_hash( $what );
 		$text	 = '';
-		$classes = array( 'mp-button', "mp-button-checkout-{$what}-step" );
+		$classes = array( 'mp_button', "mp_button-checkout-{$what}-step" );
 
 		switch ( $what ) {
 			case 'prev' :
@@ -786,13 +786,13 @@ class MP_Checkout {
 				}
 
 				$text		 = __( '&laquo; Previous Step', 'mp' );
-				$classes[]	 = 'mp-button-secondary';
+				$classes[]	 = 'mp_button-secondary';
 				return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
 				break;
 
 			case 'next' :
 				$text		 = __( 'Next Step &raquo;', 'mp' );
-				$classes[]	 = 'mp-button-medium';
+				$classes[]	 = 'mp_button-medium';
 				return '<button class="' . implode( ' ', $classes ) . '" type="submit">' . $text . '</button>';
 				break;
 		}
@@ -992,7 +992,7 @@ class MP_Checkout {
 
 				</div>
 			</div>
-			<div class="clearfix mp-checkout-buttons">' .
+			<div class="mp_checkout-buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
 			</div>';
@@ -1056,12 +1056,12 @@ class MP_Checkout {
 							<label class="mp_form_label" for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
 							<input type="password" name="mp_login_password" class="mp_form_input" />
 						</div>
-						<button id="mp-button-checkout-login" type="submit" class="mp-button mp-button-medium">' . __( 'Login', 'mp' ) . '</button>
+						<button id="mp-button-checkout-login" type="submit" class="mp_button mp_button-medium">' . __( 'Login', 'mp' ) . '</button>
 					</div>
 					<div class="mp-checkout-column">
 						<h4>' . __( 'First-time customer?', 'mp' ) . '</h4>
 						<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-						<p><button type="submit" class="mp-button mp-button-medium mp-button-checkout-next-step">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
+						<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
 					</div>
 				</div>';
 		}
@@ -1168,7 +1168,7 @@ class MP_Checkout {
 		}
 
 		$html .= '
-						<div class="clearfix mp-checkout-buttons">' .
+						<div class="mp_checkout-buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
 						</div>';

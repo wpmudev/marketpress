@@ -225,7 +225,7 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initProductOptionsLightbox = function() {
-        $( '.mp_link_buynow' ).filter( '.has_variations' ).colorbox( {
+        $( '.mp_link-buynow' ).filter( '.mp_button-has_variations' ).colorbox( {
             "close": "x",
             "href": function() {
                 return $( this ).attr( 'data-href' );

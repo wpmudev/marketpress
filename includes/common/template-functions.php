@@ -77,13 +77,13 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 
 			if ( $total_pages > 1 ) {
 				$big = 99999999;
-				$html .= '<div id="mp-order-history-pagination">';
+				$html .= '<nav class="mp_listings_nav">';
 				$html .= paginate_links( array(
 					'base'		 => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
 					'current'	 => $page,
 					'total'		 => $total_pages,
 				) );
-				$html .= '</div>';
+				$html .= '</nav>';
 			}
 		}
 
@@ -1435,14 +1435,14 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 		}
 
 		$form = '
-			<form id="mp_order_lookup_form" class="mp_form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
-				<div class="mp_order_lookup_form_content">' . $content . '</div>
+			<form id="mp-order-lookup-form" class="mp_form mp_form-order-lookup" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
+				<div class="mp_form_content">' . $content . '</div>
 				<div class="mp_form_group">
 					<div class="mp_form_group_field">
 						<input type="text" class="mp_form_input" id="mp_order_id_input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
 					</div>
 					<div class="mp_form_group_field">
-						<button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+						<button type="submit" class="mp_button">' . __( 'Look Up', 'mp' ) . '</button>
 					</div>
 				</div>
 			</form>';
@@ -1900,7 +1900,7 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 			$big = 999999999;
 
 			$html = '
-				<nav class="mp_products_nav">';
+				<nav class="mp_listings_nav">';
 
 			/* $html .= paginate_links( array(
 			  'base'		 => '%_%',
@@ -2004,7 +2004,7 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		<a id="mp_product_top"></a>
 		<!-- Products Filter -->
 		<section class="mp_products_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-			<form id="mp_products_filter_form" name="mp_products_filter_form" class="mp_form" method="get">
+			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
 			
 				<div class="mp_form_fields">
 					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
