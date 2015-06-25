@@ -775,7 +775,7 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 
 			$input_id = 'mp-gateway-option-' . $code;
 			$html .= '
-				<label class="mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options ) == 1 ) ? ' style="display:none"' : '') . '>
+				<label class="mp_form_label mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options ) == 1 ) ? ' style="display:none"' : '') . '>
 					<input
 						data-mp-use-confirmation-step="' . (( $gateways[ $code ]->use_confirmation_step ) ? 'true' : 'false') . '"
 						id="' . $input_id . '"
@@ -841,7 +841,7 @@ if ( !function_exists( 'mp_list_plugin_shipping_options' ) ) :
 			$checked	 = ( $plugin->plugin_name == $shipping_option && $method == $shipping_sub_option ) ? ' checked' : '';
 			$input_name	 = ( mp_cart()->is_global ) ? 'shipping_method[' . mp_cart()->get_blog_id() . ']' : 'shipping_method';
 			$html .= '
-				<label class="mp-checkout-option-label" for="' . $input_id . '">
+				<label class="mp_form_label mp-checkout-option-label" for="' . $input_id . '">
 					<input
 						id="' . $input_id . '"
 						type="radio"
@@ -2008,12 +2008,12 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 			
 				<div class="mp_form_fields">
 					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-						<label for="mp_product_category">' . __( 'Category', 'mp' ) . '</label>
+						<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
 						' . $terms . '
 					</div><!-- mp_listing_products_category -->
 
 					<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
-						<label for="mp_sort_orderby">' . __( 'Order By', 'mp' ) . '</label>
+						<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
 						<select id="mp_sort_orderby" class="mp_select2" name="order">
 							' . $options_html . '
 						</select>

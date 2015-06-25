@@ -17,7 +17,7 @@ var mp_cart = { };
      * @type object
      */
     mp_cart.productFormValidationArgs = {
-        "errorClass": "mp_input_error",
+        "errorClass": "mp_form_input_error",
         "errorElement": "span",
         "errorPlacement": function( error, element ) {
             error.appendTo( element.closest( '.mp_product_options_att' ).find( '.mp_product_options_att_label' ) );
@@ -104,13 +104,13 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initCartFormListeners = function() {
-        $( '#mp-cart-form' )
+        $( '#mp_cart_form' )
             .on( 'change', 'select[name^="mp_cart_qty"]', function( e ) {
                 var $this = $( this ),
                     itemId = $this.attr( 'name' ).match( /[0-9]+/ig ),
                     qty = e.val;
 
-                mp_cart.updateItemQty( itemId[0], qty, $( '#mp-cart-form' ) );
+                mp_cart.updateItemQty( itemId[0], qty, $( '#mp_cart_form' ) );
             } );
     };
 

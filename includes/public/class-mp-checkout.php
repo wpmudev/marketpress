@@ -254,7 +254,7 @@ class MP_Checkout {
 				'required' => true,
 			),
 			'atts'		 => array(
-				'class' => 'mp-input',
+				'class' => 'mp_form_input',
 			),
 		);
 
@@ -272,7 +272,7 @@ class MP_Checkout {
 						'name'	 => $this->field_name( 'first_name', $type ),
 						'value'	 => mp_get_user_address_part( 'first_name', $type ),
 						'atts'		 => array(
-							'class' => 'mp-input',
+							'class' => 'mp_form_input',
 						),
 					),
 					array(
@@ -281,7 +281,7 @@ class MP_Checkout {
 						'name'	 => $this->field_name( 'last_name', $type ),
 						'value'	 => mp_get_user_address_part( 'last_name', $type ),
 						'atts'		 => array(
-							'class' => 'mp-input',
+							'class' => 'mp_form_input',
 						),
 					),
 				),
@@ -296,7 +296,7 @@ class MP_Checkout {
 					'email'		 => true,
 				),
 				'atts'		 => array(
-					'class' => 'mp-input',
+					'class' => 'mp_form_input',
 				),
 			),
 			array(
@@ -305,7 +305,7 @@ class MP_Checkout {
 				'name'	 => $this->field_name( 'company_name', $type ),
 				'value'	 => mp_get_user_address_part( 'company_name', $type ),
 				'atts'		 => array(
-					'class' => 'mp-input',
+					'class' => 'mp_form_input',
 				),
 			),
 			array(
@@ -315,7 +315,7 @@ class MP_Checkout {
 				'value'		 => mp_get_user_address_part( 'address1', $type ),
 				'atts'		 => array(
 					'placeholder' => __( 'Street address, P.O. box, company name, c/o', 'mp' ),
-					'class' => 'mp-input',
+					'class' => 'mp_form_input',
 				),
 				'validation' => array(
 					'required' => true,
@@ -328,7 +328,7 @@ class MP_Checkout {
 				'value'	 => mp_get_user_address_part( 'address2', $type ),
 				'atts'	 => array(
 					'placeholder' => __( 'Apartment, suite, unit, building, floor, etc', 'mp' ),
-					'class' => 'mp-input',
+					'class' => 'mp_form_input',
 				),
 			),
 			array(
@@ -340,7 +340,7 @@ class MP_Checkout {
 					'required' => true,
 				),
 				'atts'		 => array(
-					'class' => 'mp-input',
+					'class' => 'mp_form_input',
 				),
 			),
 			array(
@@ -363,7 +363,7 @@ class MP_Checkout {
 				'name'	 => $this->field_name( 'phone', $type ),
 				'value'	 => mp_get_user_address_part( 'phone', $type ),
 				'atts'		 => array(
-					'class' => 'mp-input',
+					'class' => 'mp_form_input',
 				),
 			),
 		);
@@ -521,7 +521,7 @@ class MP_Checkout {
 
 		$html = '
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
-			<form id="mp-checkout" class="mp-form clearfix' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
+			<form id="mp_checkout_form" class="mp_form' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
 		wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
 
 		/* Loop through each section to determine if a particular section has errors.
@@ -617,7 +617,7 @@ class MP_Checkout {
 			'cc_exp'		 => __( 'Please enter a valid card expiration', 'mp' ),
 			'cc_cvc'		 => __( ' Please enter a valid card security code', 'mp' ),
 			'cc_fullname'	 => __( 'Please enter a valid first and last name', 'mp' ),
-			'errors'		 => __( '<h4>Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span style="color:#d60303">red</span> below. Entering into a field will reveal the actual error that occurred.</p>', 'mp' ),
+			'errors'		 => __( '<h4>Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span>red</span> below. Entering into a field will reveal the actual error that occurred.</p>', 'mp' ),
 			'error_plural'	 => __( 'errors', 'mp' ),
 			'error_singular' => __( 'error', 'mp' ),
 		) );
@@ -665,7 +665,7 @@ class MP_Checkout {
 		if ( ($label = mp_arr_get_value( 'label', $field )) && 'checkbox' != mp_arr_get_value( 'type', $field, '' ) ) {
 			$required = ( mp_arr_get_value( 'validation->required', $field ) ) ? ' <span class="mp-field-required">*</span>' : '';
 			$html .= '
-				<label>' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
+				<label class="mp_form_label">' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
 		}
 
 		// Convert validation arg into attributes
@@ -704,7 +704,7 @@ class MP_Checkout {
 					<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . ' />';
 
 					if ( 'checkbox' == mp_arr_get_value( 'type', $field, '' ) ) {
-						$html .= '<label for="' . $attributes[ 'id' ] . '">' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
+						$html .= '<label class="mp_form_label" for="' . $attributes[ 'id' ] . '">' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
 					}
 				}
 				break;
@@ -751,7 +751,7 @@ class MP_Checkout {
 
 					if ( !$top_label && !$subfield[ 'value_only' ] ) {
 						$html .= '
-						<span>' . $label . '</span>';
+						<span class="mp_form_help-text">' . $label . '</span>';
 					}
 
 					$html .= '
@@ -970,7 +970,7 @@ class MP_Checkout {
 		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
 			$html .= '
 					<div class="mp-checkout-form-row mp-checkbox-row">
-						<label><input type="checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . ' /> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
+						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . ' /> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
 					</div>
 				';
 		}
@@ -983,7 +983,7 @@ class MP_Checkout {
 
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
 			$html .= '<div class="mp-checkout-form-row">
-					<label>' . __( 'Special Instructions', 'mp' ) . '</label>	
+					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
 				    <textarea name="shipping[special_instructions]"></textarea>
 				  </div>';
 		}
@@ -1049,12 +1049,12 @@ class MP_Checkout {
 						<h4>' . __( 'Have an account?', 'mp' ) . '</h4>
 						<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
 						<div class="mp-checkout-form-row">
-							<label for="mp-checkout-email">' . __( 'E-Mail Address/Username', 'mp' ) . '</label>
-							<input type="text" name="mp_login_email" class="mp-input" />
+							<label class="mp_form_label" for="mp-checkout-email">' . __( 'E-Mail Address/Username', 'mp' ) . '</label>
+							<input type="text" name="mp_login_email" class="mp_form_input" />
 						</div>
 						<div class="mp-checkout-form-row">
-							<label for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
-							<input type="password" name="mp_login_password" class="mp-input" />
+							<label class="mp_form_label" for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
+							<input type="password" name="mp_login_password" class="mp_form_input" />
 						</div>
 						<button id="mp-button-checkout-login" type="submit" class="mp-button mp-button-medium">' . __( 'Login', 'mp' ) . '</button>
 					</div>

@@ -72,7 +72,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		showForm : function() {
-			$( '#mp-checkout' ).show();
+			$( '#mp_checkout_form' ).show();
 		},
 		
 		/**
@@ -117,7 +117,7 @@ var mp_checkout;
 		 */
 		errorSummary : function( action, count ) {
 			var $section = $( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' );
-			var $checkout = $( '#mp-checkout' );
+			var $checkout = $( '#mp_checkout_form' );
 			
 			if ( undefined === $checkout.data( 'mp-submitted' ) ) {
 				/* form hasn't been submitted so bail. fixes issue with error summary
@@ -141,7 +141,7 @@ var mp_checkout;
 		 * @event mp_checkout/step_changed
 		 */
 		lastStep : function( evt, $out, $in ) {
-			var $checkout = $( '#mp-checkout' );
+			var $checkout = $( '#mp_checkout_form' );
 			
 			if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
 				$checkout.addClass( 'last-step' );
@@ -195,7 +195,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		initCheckoutSteps : function(){
-			var $checkout = $(' #mp-checkout' );
+			var $checkout = $(' #mp_checkout_form' );
 			var formSubmitted = false;
 						
 			// Trim values before validating
@@ -233,7 +233,7 @@ var mp_checkout;
 					return ( $( element ).is( ':hidden' ) || $( element ).prop( 'disabled' ) );
 				},
 				highlight : function( element, errorClass ){
-					$( element ).addClass( 'mp-input-error' ).prev( 'label' ).addClass( 'mp-label-error' );
+					$( element ).addClass( 'mp_form_input_error' ).prev( 'label' ).addClass( 'mp_form_label_error' );
 				},
 				unhighlight : function( element, errorClass, validClass ){
 					var $tip = $( element ).siblings( '.mp-tooltip' );
@@ -241,7 +241,7 @@ var mp_checkout;
 						$tip.tooltip( 'close' );
 					}
 					
-					$( element ).removeClass( 'mp-input-error' ).prev( 'label' ).removeClass( 'mp-label-error' );
+					$( element ).removeClass( 'mp_form_input_error' ).prev( 'label' ).removeClass( 'mp_form_label_error' );
 					
 					if ( this.numberOfInvalids() == 0 ) {
 						mp_checkout.errorSummary( 'hide' );
@@ -354,7 +354,7 @@ var mp_checkout;
 						} );
 						
 						$input.on( 'focus', function() {
-							if ( $input.hasClass( 'mp-input-error' ) ) {
+							if ( $input.hasClass( 'mp_form_input_error' ) ) {
 								$tip.tooltip( 'open' );
 							}
 						} );
@@ -426,7 +426,7 @@ var mp_checkout;
 			$( '.mp-checkout-section' ).on( 'click change', 'input[name="payment_method"]', function(){
 				var $this = $( this ),
 						$target = $( '#mp-gateway-form-' + $this.val() ),
-						$checkout = $( '#mp-checkout' ),
+						$checkout = $( '#mp_checkout_form' ),
 						$submit = $checkout.find( ':submit' ).filter( ':visible' );
 				
 				if ( ! $checkout.hasClass( 'last-step' ) ) {
@@ -435,7 +435,7 @@ var mp_checkout;
 				
 				$target.show().siblings( '.mp_gateway_form' ).hide();
 				
-				if ( $target.find( '.mp-input-error' ).filter( ':visible' ).length > 0 ) {
+				if ( $target.find( '.mp_form_input.error' ).filter( ':visible' ).length > 0 ) {
 					$checkout.valid();	
 				} else {
 					mp_checkout.errorSummary( 'hide' );

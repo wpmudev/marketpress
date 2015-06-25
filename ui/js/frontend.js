@@ -159,7 +159,7 @@ var marketpress = { };
         initOrderLookup: function( ) {
             var $form = $( '#mp_order_lookup_form' );
             var $btn = $form.find( '[type="submit"]' );
-            var $input = $form.find( 'input' );
+            var $input = $form.find( 'input[type="text"]' );
             $form.on( 'submit', function( e ) {
                 e.preventDefault( );
                 if ( $btn.is( ':hidden' ) ) {

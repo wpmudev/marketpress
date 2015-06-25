@@ -670,10 +670,10 @@ class MP_Cart {
 
 		if ( $editable ) {
 			$html .= '
-				<form class="mp-form" id="mp-cart-form" method="post">';
+				<form class="mp_form" id="mp_cart_form" method="post">';
 		} else {
 			$html .= '
-				<div id="mp-cart-form">';
+				<div id="mp_cart_form">';
 		}
 
 		/**
