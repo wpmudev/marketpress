@@ -63,7 +63,7 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initProductListListeners = function() {
-        $( '#mp_product_list' ).on( 'submit', '.mp_buy_form', function( e ) {
+        $( '#mp_product_list' ).on( 'submit', '.mp_form-buy', function( e ) {
             e.preventDefault();
 
             var $this = $( this );
@@ -88,7 +88,7 @@ var mp_cart = { };
      */
     mp_cart.initSingleProductListeners = function() {
         $( '#mp_single_product' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-        $( '#mp_single_product' ).find( '.mp_buy_form' )
+        $( '#mp_single_product' ).find( '.mp_form-buy' )
             .on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 marketpress.loadingOverlay( 'show' );
             } )
@@ -104,13 +104,13 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initCartFormListeners = function() {
-        $( '#mp_cart_form' )
-            .on( 'change', 'select[name^="mp_cart_qty"]', function( e ) {
+        $( '#mp-cart-form' )
+            .on( 'change', 'select[name^="mp_cart_item-qty"]', function( e ) {
                 var $this = $( this ),
                     itemId = $this.attr( 'name' ).match( /[0-9]+/ig ),
                     qty = e.val;
 
-                mp_cart.updateItemQty( itemId[0], qty, $( '#mp_cart_form' ) );
+                mp_cart.updateItemQty( itemId[0], qty, $( '#mp-cart-form' ) );
             } );
     };
 
@@ -324,13 +324,13 @@ var mp_cart = { };
                 } else {
                     var $lineItem = $( '#mp-cart-item-' + itemId.escapeSelector() );
 
-                    if ( $lineItem.siblings( '.mp-cart-item' ).length == 0 && $lineItem.closest( '.mp-cart-store' ).length > 0 ) {
-                        $lineItem.closest( '.mp-cart-store' ).remove();
+                    if ( $lineItem.siblings( '.mp_cart_item' ).length == 0 && $lineItem.closest( '.mp_cart_store' ).length > 0 ) {
+                        $lineItem.closest( '.mp_cart_store' ).remove();
                     } else {
                         $lineItem.remove();
                     }
 
-                    $( '#mp-cart-meta' ).replaceWith( resp.data.cartmeta );
+                    $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
 
                     marketpress.loadingOverlay( 'hide' );
                 }
@@ -380,7 +380,7 @@ var mp_cart = { };
                     var $item = $( '#mp-cart-item-' + key );
                     $item.replaceWith( val );
                 } );
-                $( '#mp-cart-meta' ).replaceWith( resp.data.cartmeta );
+                $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
                 marketpress.initSelect2();
             }
         } );

@@ -60,7 +60,7 @@ var mp_coupons = { };
                         /*$.each( resp.data.products, function( key, val ) {
                          $( '#mp-cart-item-' + key.escapeSelector() ).replaceWith( val );
                          });*/
-                        $( '#mp-cart-meta' ).replaceWith( resp.data.cartmeta );
+                        $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
                         marketpress.initSelect2();
                     } else {
                         $( '#mp-coupon-tooltip-' + storeID )
@@ -76,7 +76,7 @@ var mp_coupons = { };
          * @since 3.0
          */
         initCouponFormListeners: function() {
-            $( '.mp_coupon-form' ).each( function() {
+            $( '.mp_coupon_form' ).each( function() {
                 var $couponForm = $( this );
                 var $couponCode = $couponForm.find( '[name^="mp_cart_coupon"]' );
                 var storeID = $couponCode.attr( 'name' ).replace( /[^0-9]/ig, '' );
@@ -128,7 +128,7 @@ var mp_coupons = { };
                         /*$.each( data.products, function( index, value ) {
                             $( '#mp-cart-item-' + index.escapeSelector() ).replaceWith( value );
                         } );*/
-                        $( '#mp-cart-meta' ).replaceWith( data.cart_meta );
+                        $( '#mp-cart-resume' ).replaceWith( data.cart_meta );
                         marketpress.initSelect2();
                         $tooltip
                             .on( 'tooltipopen.mp_coupons', function( e, ui ) {

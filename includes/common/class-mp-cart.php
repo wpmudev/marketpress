@@ -440,11 +440,11 @@ class MP_Cart {
 		) );
 
 		$html = '
-			<div class="mp-cart-item clearfix" id="mp-cart-item-' . $id . '">';
+			<div class="mp_cart_item" id="mp-cart-item-' . $id . '">';
 
 		foreach ( $cart_columns as $column ) {
 			$html .= '
-				<div class="mp-cart-item-column mp-cart-item-column-' . $column . '">';
+				<div class="mp_cart_item_content mp_cart_item_content-' . $column . '">';
 
 			switch ( $column ) {
 				case 'thumb' :
@@ -470,12 +470,12 @@ class MP_Cart {
 							$column_html = $this->dropdown_quantity( array(
 								'echo'		 => false,
 								'class'		 => 'mp_select2',
-								'name'		 => 'mp_cart_qty[' . $product->ID . ']',
+								'name'		 => 'mp_cart_item-qty[' . $product->ID . ']',
 								'selected'	 => $product->qty,
 							) );
 						}
 						$column_html .= '<br />
-						<a class="mp-cart-item-remove-link" href="javascript:mp_cart.removeItem(' . $id . ')">' . __( 'Remove', 'mp' ) . '</a>';
+						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.removeItem(' . $id . ')">' . __( 'Remove', 'mp' ) . '</a>';
 					} else {
 						$column_html = $product->qty;
 					}
@@ -494,10 +494,10 @@ class MP_Cart {
 			$html .= apply_filters( 'mp_cart/column_html', $column_html, $column, $product, $this );
 
 			$html .= '
-				</div>';
+				</div><!-- end mp_cart_item_content -->';
 		}
 
-		$html .= '</div>';
+		$html .= '</div><!-- end mp_cart_item -->';
 
 		/**
 		 * Filter the line item html
@@ -540,18 +540,19 @@ class MP_Cart {
 		}
 
 		$line = '
-			<div id="mp-cart-meta">';
+			<!-- MP Cart Resume -->
+			<div id="mp-cart-resume" class="mp_cart_resume">';
 
 		if ( !empty( $header ) ) {
 			$line .= '
-				<div class="mp-cart-meta-header">' . $header . '</div>';
+				<div class="mp_cart_resume_head">' . $header . '</div>';
 		}
 
 		$line .= '
-				<div id="mp-cart-meta-line-product-total" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . __( 'Product Total', 'mp' ) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->product_total( true, true ) . '</span>
-				</div>';
+				<div class="mp_cart_resume_item mp_cart_resume_item-product-total">
+					<span class="mp_cart_resume_item_label">' . __( 'Product Total', 'mp' ) . '</span>
+					<span class="mp_cart_resume_item_amount">' . $this->product_total( true, true ) . '</span>
+				</div><!-- end mp_cart_resume_item_product-total -->';
 
 		/**
 		 * Filter the product total html
@@ -563,10 +564,10 @@ class MP_Cart {
 		$html .= apply_filters( 'mp_cart/cart_meta/product_total', $line, $this );
 
 		$line = '
-				<div id="mp-cart-meta-line-shipping-total" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping' )) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->shipping_total( true ) . '</span>
-				</div>';
+				<div class="mp_cart_resume_item mp_cart_resume_item-shipping-total">
+					<span class="mp_cart_resume_item_label">' . (( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping' )) . '</span>
+					<span class="mp_cart_resume_item_amount">' . $this->shipping_total( true ) . '</span>
+				</div><!-- end mp_cart_resume_item-shipping-total -->';
 
 		/**
 		 * Filter the shipping total html
@@ -578,10 +579,10 @@ class MP_Cart {
 		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $line, $this );
 
 		$line = '
-				<div id="mp-cart-meta-line-estimated-tax" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' )) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->tax_total( true, true ) . '</span>
-				</div>';
+				<div class="mp_cart_resume_item mp_cart_resume_item-estimated-tax">
+					<span class="mp_cart_resume_item_label">' . (( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' )) . '</span>
+					<span class="mp_cart_resume_item_amount">' . $this->tax_total( true, true ) . '</span>
+				</div><!-- end mp_cart_resume_item-estimated-tax -->';
 
 		/**
 		 * Filter the estimated tax html
@@ -592,12 +593,12 @@ class MP_Cart {
 		 */
 		$html .= apply_filters( 'mp_cart/cart_meta/estimated_tax_line', $line, $this );
 
-		$line = '		
-				<div id="mp-cart-meta-line-order-total" class="mp-cart-meta-line clearfix">
-					<strong class="mp-cart-meta-line-label">' . (( $this->is_editable ) ? __( 'Estimated Total', 'mp' ) : __( 'Order Total', 'mp' )) . '</strong>
-					<span class="mp-cart-meta-line-amount">' . $this->total( true ) . '</span>
-				</div>
-			</div>';
+		$line = '
+				<div class="mp_cart_resume_item mp_cart_resume_item-order-total">
+					<span class="mp_cart_resume_item_label">' . (( $this->is_editable ) ? __( 'Estimated Total', 'mp' ) : __( 'Order Total', 'mp' )) . '</span>
+					<span class="mp_cart_resume_item_amount">' . $this->total( true ) . '</span>
+				</div><!-- end mp_cart_resume_item-order-total -->
+			</div><!-- end mp_cart-resume -->';
 
 		/**
 		 * Filter the order total html
@@ -650,7 +651,11 @@ class MP_Cart {
 		$this->is_editable = $editable;
 
 		if ( !$this->has_items() ) {
-			$message = sprintf( __( 'There are no items in your cart - <a href="%s">go add some</a>!', 'mp' ), mp_store_page_url( 'products', false ) );
+			$message = '<div class="mp_cart_empty">';
+			$message .= '<p class="mp_cart_empty_message">';
+			$message .= sprintf( __( 'There are no items in your cart - <a href="%s">go add some</a> !', 'mp' ), mp_store_page_url( 'products', false ) );
+			$message .= '</p><!-- end mp_cart_empty_message -->';
+			$message .= '</div><!-- end mp_cart_empty -->';
 
 			/**
 			 * Filter the no items in your cart message
@@ -670,10 +675,10 @@ class MP_Cart {
 
 		if ( $editable ) {
 			$html .= '
-				<form class="mp_form" id="mp_cart_form" method="post">';
+				<form class="mp_form mp_form-cart" id="mp-cart-form" method="post">';
 		} else {
 			$html .= '
-				<div id="mp_cart_form">';
+				<div id="mp-cart-form" class="mp_form mp_form-cart">';
 		}
 
 		/**
@@ -688,7 +693,8 @@ class MP_Cart {
 
 		if ( !empty( $before_cart_html ) ) {
 			$html .= '
-				<div id="mp-cart-before" class="clearfix">' . $before_cart_html . '</div>';
+				<!-- MP Cart Before -->
+				<div id="mp-cart-before" class="mp_cart_before">' . $before_cart_html . '</div><!-- end mp_cart_before -->';
 		}
 
 		/**
@@ -698,13 +704,14 @@ class MP_Cart {
 		 * @param array The default classes.
 		 */
 		$classes = (array) apply_filters( 'mp_cart/cart_classes', array(
-			'mp-cart-default',
-			( $this->is_global ) ? 'mp-cart-global' : '',
-			( $editable ) ? 'mp-cart-editable' : 'mp-cart-readonly',
+			'mp_cart-default',
+			( $this->is_global ) ? 'mp_cart-global' : '',
+			( $editable ) ? 'mp_cart-editable' : 'mp_cart-readonly',
 		) );
 
 		$html .= '
-				<div id="mp-cart" class="' . implode( ' ', $classes ) . '">';
+				<!-- MP Cart -->
+				<div id="mp-cart" class="mp_cart ' . implode( ' ', $classes ) . '">';
 
 		$blog_ids = $this->get_blog_ids();
 
@@ -713,9 +720,9 @@ class MP_Cart {
 				$blog_id = array_shift( $blog_ids );
 				$this->set_id( $blog_id );
 				$html .= '
-					<div id="mp-cart-store-' . $this->_id . '" class="mp-cart-store">
+					<div id="mp-cart-store-' . $this->_id . '" class="mp_cart_store">
 
-						<div class="mp-cart-store-items">';
+						<div class="mp_cart_store_items">';
 			}
 
 			$products = $this->get_items_as_objects();
@@ -725,7 +732,7 @@ class MP_Cart {
 
 			if ( $this->is_global ) {
 				$html .= '
-						</div>';
+						</div><!-- end mp_cart_store_items -->';
 
 				/**
 				 * Filter the html after each store cart items
@@ -741,7 +748,7 @@ class MP_Cart {
 				$html .= $after_cart_store_items_html;
 
 				$html .= '
-					</div>';
+					</div><!-- end mp_cart_store -->';
 			}
 
 			if ( ($this->is_global && false === current( $blog_ids )) || !$this->is_global ) {
@@ -751,7 +758,7 @@ class MP_Cart {
 		}
 
 		$html .= '
-				</div>';
+				</div><!-- end mp_cart -->';
 
 		/**
 		 * Filter html after cart
@@ -765,12 +772,14 @@ class MP_Cart {
 
 		if ( !empty( $after_cart_html ) ) {
 			$html .= '
-				<div id="mp-cart-after" class="clearfix">' . $after_cart_html . '</div>';
+				<!-- MP Cart After -->
+				<div id="mp-cart-after" class="mp_cart_after">' . $after_cart_html . '</div><!-- end mp_cart_after -->';
 		}
 
 		if ( $view != 'order-status' ) {
 			$html .= '
-					<div id="mp-cart-meta-wrap" class="clearfix">' .
+					<!-- MP Cart Meta -->
+					<div id="mp-cart-meta" class="mp_cart_meta">' .
 			$this->cart_meta( false, $editable );
 
 			$button_text	 = __( 'Submit Order' );
@@ -846,7 +855,7 @@ class MP_Cart {
 			}
 
 			$html .= '
-					</div>';
+					</div><!-- end mp_cart_meta -->';
 		}
 
 		if ( $editable ) {
@@ -1008,15 +1017,18 @@ class MP_Cart {
 
 
 		$html = '
+		<!-- MP Floating Cart / Mini-Cart -->
 		<div id="mp-floating-cart" class="mp_mini_cart ' . (( $this->has_items() ) ? 'has-items' : '') . '">
-			<div class="mp_mini_cart-ribbon"><span class="mp_mini_cart-total">' . $this->product_total( true ) . '</span> ' . $this->item_count( false, true ) . '</div>
-			<div class="mp_mini_cart-contents">';
+			<div class="mp_mini_cart_ribbon">
+				<span class="mp_mini_cart_total">' . $this->product_total( true ) . '</span> ' . $this->item_count( false, true ) . '
+			</div>
+			<div class="mp_mini_cart_content">';
 
 
 		if ( $this->has_items() ) {
 			$blog_ids = $this->get_blog_ids();
 			$html .= '
-				<ul class="mp_mini_cart-items">';
+				<ul class="mp_mini_cart_items">';
 
 			while ( 1 ) {
 				if ( $this->is_global ) {
@@ -1041,19 +1053,19 @@ class MP_Cart {
 			}
 
 			$html .= '
-				</ul>
-				<a class="mp_button mp_mini_cart-button" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
+				</ul><!-- end mp_mini_cart_content -->
+				<a class="mp_button mp_button-mini-cart" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
 		} else {
 			$html .= '
-				<div class="mp_mini_cart-items-empty">
+				<div class="mp_mini_cart_items-empty">
 					<p><strong>' . __( 'Your shopping cart is empty.', 'mp' ) . '</strong></p>
 					<p>' . __( 'As you add browse items and add them to your add cart they will show up here.', 'mp' ) . '</p>
-				</div>';
+				</div><!-- end mp_mini_cart_items-empty -->';
 		}
 
 		$html .= '
-			</div>
-		</div>';
+			</div><!-- end mp_mini_cart_content -->
+		</div><!-- end mp_mini_cart -->';
 
 		if ( !mp_doing_ajax() ) {
 			$html .= '<span class="mp-ajax-loader" style="display:none"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt="" /> ' . __( 'Adding...', 'mp' ) . '</span>';
@@ -1078,11 +1090,11 @@ class MP_Cart {
 		$product = new MP_Product( $item_id );
 
 		$html = '
-			<li class="mp_mini_cart-item" id="mp-floating-cart-item-' . $product->ID . '">
-				<a class="mp_mini_cart-item-link" href="' . $product->url( false ) . '">' . $product->image( false, 'floating-cart', 50 ) . '
-					<div class="mp_mini_cart-item-content">
-						<h3 class="mp_mini_cart-item-title">' . $product->title( false ) . '</h3>
-						<span class="mp_mini_cart-item-attribute"><strong>' . __( 'Quantity', 'mp' ) . ':</strong> <em>' . $qty . '</em></span>';
+			<li class="mp_mini_cart_item" id="mp-floating-cart-item-' . $product->ID . '">
+				<a class="mp_mini_cart_item-link" href="' . $product->url( false ) . '">' . $product->image( false, 'floating-cart', 50 ) . '
+					<div class="mp_mini_cart_item-content">
+						<h3 class="mp_mini_cart_item-title">' . $product->title( false ) . '</h3>
+						<span class="mp_mini_cart_item-attribute"><strong>' . __( 'Quantity', 'mp' ) . ':</strong> <em>' . $qty . '</em></span>';
 
 		// Display attributes
 		if ( $product->is_variation() ) {
@@ -1090,7 +1102,7 @@ class MP_Cart {
 			foreach ( $attributes as $taxonomy => $att ) {
 				$term = current( $att[ 'terms' ] );
 				$html .= '
-						<span class="mp_mini_cart-item-attribute"><strong>' . $att[ 'name' ] . ':</strong> <em>' . $term . '</em></span>';
+						<span class="mp_mini_cart_item-attribute"><strong>' . $att[ 'name' ] . ':</strong> <em>' . $term . '</em></span>';
 			}
 		}
 
@@ -1219,12 +1231,12 @@ class MP_Cart {
 
 		if ( $format ) {
 			if ( $numitems == 0 ) {
-				$snippet = '<span class="mp_mini_cart-count">0</span>' . '<span class="mp_mini_cart-count-title">' . __( 'items', 'mp' ) . '</span>';
+				$snippet = '<span class="mp_mini_cart_count">0</span>' . '<span class="mp_mini_cart_count-title">' . __( 'items', 'mp' ) . '</span>';
 			} else {
 				if ( $numitems == 1 ) {
-					$snippet = '<span class="mp_mini_cart-count">1</span>' . '<span class="mp_mini_cart-count-title">' . __( 'item', 'mp' ) . '</span>';
+					$snippet = '<span class="mp_mini_cart_count">1</span>' . '<span class="mp_mini_cart_count-title">' . __( 'item', 'mp' ) . '</span>';
 				} else {
-					$snippet = '<span class="mp_mini_cart-count">' . $numitems . '</span>' . '<span class="mp_mini_cart-count-title">' . __( 'items', 'mp' ) . '</span>';
+					$snippet = '<span class="mp_mini_cart_count">' . $numitems . '</span>' . '<span class="mp_mini_cart_count-title">' . __( 'items', 'mp' ) . '</span>';
 				}
 			}
 		}

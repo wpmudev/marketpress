@@ -72,7 +72,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		showForm : function() {
-			$( '#mp_checkout_form' ).show();
+			$( '#mp-checkout-form' ).show();
 		},
 		
 		/**
@@ -117,7 +117,7 @@ var mp_checkout;
 		 */
 		errorSummary : function( action, count ) {
 			var $section = $( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' );
-			var $checkout = $( '#mp_checkout_form' );
+			var $checkout = $( '#mp-checkout-form' );
 			
 			if ( undefined === $checkout.data( 'mp-submitted' ) ) {
 				/* form hasn't been submitted so bail. fixes issue with error summary
@@ -141,7 +141,7 @@ var mp_checkout;
 		 * @event mp_checkout/step_changed
 		 */
 		lastStep : function( evt, $out, $in ) {
-			var $checkout = $( '#mp_checkout_form' );
+			var $checkout = $( '#mp-checkout-form' );
 			
 			if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
 				$checkout.addClass( 'last-step' );
@@ -195,7 +195,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		initCheckoutSteps : function(){
-			var $checkout = $(' #mp_checkout_form' );
+			var $checkout = $(' #mp-checkout-form' );
 			var formSubmitted = false;
 						
 			// Trim values before validating
@@ -426,7 +426,7 @@ var mp_checkout;
 			$( '.mp-checkout-section' ).on( 'click change', 'input[name="payment_method"]', function(){
 				var $this = $( this ),
 						$target = $( '#mp-gateway-form-' + $this.val() ),
-						$checkout = $( '#mp_checkout_form' ),
+						$checkout = $( '#mp-checkout-form' ),
 						$submit = $checkout.find( ':submit' ).filter( ':visible' );
 				
 				if ( ! $checkout.hasClass( 'last-step' ) ) {

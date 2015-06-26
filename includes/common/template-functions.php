@@ -780,7 +780,7 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 
 			$input_id = 'mp-gateway-option-' . $code;
 			$html .= '
-				<label class="mp_form_label mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options ) == 1 ) ? ' style="display:none"' : '') . '>
+				<label class="mp_form_label mp_form_label-checkout-option" for="' . $input_id . '"' . (( count( $options ) == 1 ) ? ' style="display:none"' : '') . '>
 					<input
 						data-mp-use-confirmation-step="' . (( $gateways[ $code ]->use_confirmation_step ) ? 'true' : 'false') . '"
 						id="' . $input_id . '"
@@ -846,7 +846,7 @@ if ( !function_exists( 'mp_list_plugin_shipping_options' ) ) :
 			$checked	 = ( $plugin->plugin_name == $shipping_option && $method == $shipping_sub_option ) ? ' checked' : '';
 			$input_name	 = ( mp_cart()->is_global ) ? 'shipping_method[' . mp_cart()->get_blog_id() . ']' : 'shipping_method';
 			$html .= '
-				<label class="mp_form_label mp-checkout-option-label" for="' . $input_id . '">
+				<label class="mp_form_label mp_form_label-checkout-option" for="' . $input_id . '">
 					<input
 						id="' . $input_id . '"
 						type="radio"
@@ -1444,7 +1444,7 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 				<div class="mp_form_content">' . $content . '</div>
 				<div class="mp_form_group">
 					<div class="mp_form_group_field">
-						<input type="text" class="mp_form_input" id="mp_order_id_input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
+						<input type="text" class="mp_form_input" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
 					</div>
 					<div class="mp_form_group_field">
 						<button type="submit" class="mp_button">' . __( 'Look Up', 'mp' ) . '</button>

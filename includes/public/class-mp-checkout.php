@@ -521,7 +521,7 @@ class MP_Checkout {
 
 		$html = '
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
-			<form id="mp_checkout_form" class="mp_form' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
+			<form id="mp-checkout-form" class="mp_form' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . ' mp_form-checkout" method="post" style="display:none" novalidate>' .
 		wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
 
 		/* Loop through each section to determine if a particular section has errors.
@@ -992,7 +992,7 @@ class MP_Checkout {
 
 				</div>
 			</div>
-			<div class="mp_checkout-buttons">' .
+			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
 			</div>';
@@ -1168,7 +1168,7 @@ class MP_Checkout {
 		}
 
 		$html .= '
-						<div class="mp_checkout-buttons">' .
+						<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
 						</div>';
