@@ -1,5 +1,22 @@
 jQuery( document ).ready( function( $ ) {
 
+    $( 'textarea.variation_values' ).live( 'keyup', function( e ) {
+
+        var keyCode = e.keyCode || e.which;
+
+        if ( keyCode == '9' ) {
+
+            // the prevent default allow you to stay in focus in the input and keep adding tags in
+            //var press = jQuery.Event( "keyup" );
+            //press.which = '13';
+            //press.originalEvent = KeyboardEvent;
+            // $( 'textarea.variation_values' ).val( $( 'textarea.variation_values' ).val() );
+            //$( 'textarea.variation_values' ).trigger( press );
+            //alert($( 'textarea.variation_values' ).val());
+            e.preventDefault();
+        }
+    } );
+
     $( '#poststuff' ).append( '<div class="mp-admin-overlay"><div class="mp-variation-loading-spin"></div><div class="mp-variation-loading-message">' + mp_product_admin_i18n.creating_vatiations_message + '</div></div>' );
 
     $( '#mp-product-type-select' ).on( 'change', function() {

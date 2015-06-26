@@ -60,7 +60,7 @@ class MP_Store_Settings_Admin {
 				'store-settings_page_store-settings-importers',
 				'store-settings_page_store-settings-exporters',
 				'store-settings_page_store-settings-capabilities',
-				//'store-settings_page_store-setup-wizard',
+				'store-settings_page_store-setup-wizard',
 			);
 			
 			foreach ( $screen_ids as $screen_id ) {
@@ -102,6 +102,7 @@ class MP_Store_Settings_Admin {
 		
 		//store settings
 		$cap = apply_filters('mp_store_settings_cap', 'manage_store_settings');
+		
 		add_menu_page(__('Store Settings', 'mp'), __('Store Settings', 'mp'), $cap, 'store-settings', create_function('', ''), ( version_compare($wp_version, '3.8', '>=') ) ? 'dashicons-admin-settings' : mp_plugin_url('ui/images/marketpress-icon.png'), '99.33');
 		add_submenu_page('store-settings', __('Store Settings: General', 'mp'), __('General', 'mp'), $cap, 'store-settings', false);		
 		add_submenu_page('store-settings', __('Store Settings: Presentation', 'mp'), __('Presentation', 'mp'), $cap, 'store-settings-presentation', false);
@@ -115,7 +116,7 @@ class MP_Store_Settings_Admin {
 		//add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 		//add_submenu_page('store-settings', __('Store Settings: Exporters', 'mp'), __('Exporters', 'mp'), $cap, 'store-settings-exporters', false);		
 		add_submenu_page('store-settings', __('Store Settings: Add Ons', 'mp'), __('Add Ons', 'mp'), $cap, 'store-settings-addons', false);
-		//add_submenu_page('store-settings', __('Store Setup Wizard', 'mp'), __('Setup Wizard', 'mp'), $cap, 'store-setup-wizard', false);
+		add_submenu_page('store-settings', __('Quick Setup', 'mp'), __('Quick Setup', 'mp'), $cap, 'store-setup-wizard', false);
 
 	 	if ( ! WPMUDEV_REMOVE_BRANDING ) {
 			add_action('load-toplevel_page_store-settings', array(&$this, 'add_help_tab'));
@@ -239,7 +240,7 @@ jQuery(document).ready(function($){
 			break;
 			
 			case 'store-settings_page_store-setup-wizard' :
-				$title = __('Store Setup Wizard', 'mp');
+				$title = __('Quick Setup', 'mp');
 			break;
 			
 			default :
