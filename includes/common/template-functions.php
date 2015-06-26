@@ -61,19 +61,24 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 		$offset			 = ($page - 1) * $per_page;
 		$total_pages	 = ceil( count( $history ) / $per_page );
 		$html			 = '
-			<div id="mp-order-history">';
+			<!-- Order History -->
+			<section id="mp-order-history">';
 
 		if ( count( $history ) > 0 ) {
 			$history = array_slice( $history, $offset, $per_page );
 			$html .= '
-				<h2>' . __( 'Order History', 'mp' ) . '</h2>';
+				<h2 class="mp_title">' . __( 'Order History', 'mp' ) . '</h2>' .
+				
+				'<div class="mp_order_details">';
 
 			foreach ( $history as $timestamp => $order ) {
 				$order = new MP_Order( $order[ 'id' ] );
-				$html .= '<div class="mp-order-details">';
+				$html .= '<div class="mp_order">';
 				$html .= $order->header( false );
-				$html .= '</div>';
+				$html .= '</div><!-- end mo_order -->';
 			}
+			
+			$html .= '</div><!-- end mp_order_details -->';
 
 			if ( $total_pages > 1 ) {
 				$big = 99999999;
@@ -88,7 +93,7 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 		}
 
 		$html .= '
-			</div>';
+			</section><!-- end mp-order-history -->';
 
 		return $html;
 	}
