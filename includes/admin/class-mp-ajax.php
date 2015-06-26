@@ -450,7 +450,21 @@ class MP_Ajax {
 		$page		 = mp_get_post_value( 'page', 1 );
 		$per_page	 = mp_get_post_value( 'per_page', 1 );
 		$category	 = mp_get_post_value( 'product_category' );
-		list( $order_by, $order ) = explode( '-', mp_get_post_value( 'order' ) );
+		$post_order	 = mp_get_post_value( 'order' );
+
+		list( $order_by, $order ) = explode( '-', $post_order );
+
+		if ( session_id() == '' ) {
+			session_start();
+		}
+
+		if ( isset( $post_order ) ) {
+			$_SESSION[ 'mp_product_list_order_by' ]	 = $order_by;
+			$_SESSION[ 'mp_product_list_order' ]	 = $order;
+		} else {
+			$order_by	 = $_SESSION[ 'mp_product_list_order_by' ];
+			$order		 = $_SESSION[ 'mp_product_list_order' ];
+		}
 
 		if ( empty( $order ) ) {
 			$order_by	 = $order		 = null;
@@ -460,10 +474,7 @@ class MP_Ajax {
 			(
 			'page'		 => $page,
 			'order_by'	 => $order_by,
-			'order'		 => (!is_null( $order )
-
-			) ?
-			strtoupper( $order ) : $order,
+			'order'		 => (!is_null( $order )) ? strtoupper( $order ) : $order,
 		) );
 
 		die;

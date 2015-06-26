@@ -32,22 +32,63 @@
 }
 
 .meta-box-sortables.store-settings_page_store-settings-payments{
-   /* IE 8 */
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    /* IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 
-  /* IE 5-7 */
-  filter: alpha(opacity=0);
+    /* IE 5-7 */
+    filter: alpha(opacity=0);
 
-  /* Netscape */
-  -moz-opacity: 0;
+    /* Netscape */
+    -moz-opacity: 0;
 
-  /* Safari 1.x */
-  -khtml-opacity: 00;
+    /* Safari 1.x */
+    -khtml-opacity: 00;
 
-  /* Good browsers */
-  opacity: 0;
+    /* Good browsers */
+    opacity: 0;
 }
 
 .post-type-mp_coupon #message a{
     display: none;
+}
+
+/* Quick Setup Wizard */
+
+#mp-quick-setup-wizard{
+    padding: 20px;
+}
+
+#mp-quick-setup-wizard.postbox.wpmudev-postbox .handlediv,
+#mp-quick-setup-wizard.postbox.wpmudev-postbox h3.hndle{
+    display: none;
+}
+
+#mp-quick-setup-wizard .mp-tab-navigation{
+    border-top: 1px solid #f0f0f0;
+    margin-top: 40px;
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+#mp-quick-setup-wizard .mp-tab-navigation a{
+    float: right;
+    margin: 25px 30px 25px 25px;
+}
+
+#mp-quick-setup-wizard .mp-quick-settings-one-half{
+    width: 50%;
+    float: left;
+    text-align: center;
+}
+
+#mp-quick-setup-wizard .mp-quick-settings-one-third{
+    width: 33%;
+    float: left;
+    text-align: center; 
+}
+
+#mp-quick-setup-wizard .mp-quick-settings-two-thirds{
+    width: 66%;
+    float: left;
+    text-align: center; 
 }

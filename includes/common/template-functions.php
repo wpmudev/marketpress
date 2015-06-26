@@ -169,7 +169,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$html .= '
 				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
-					<div class="'. (( 'grid' == $view ) ? 'mp_one_product' : 'mp_product') . ' ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' . $align_class : ''). '">
+					<div class="' . (( 'grid' == $view ) ? 'mp_one_product' : 'mp_product') . ' ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' . $align_class : '') . '">
 						<div class="mp-product-images">
 							' . $img . '
 						</div>
@@ -1334,6 +1334,18 @@ if ( !function_exists( 'mp_list_products' ) ) :
 				$query[ 'paged' ]	 = $args[ 'page' ]		 = intval( get_query_var( 'paged' ) );
 			}
 
+			//Get session values for order and order_by
+			if ( session_id() == '' ) {
+				session_start();
+			}
+
+			if ( isset( $_SESSON[ 'mp_product_list_order_by' ] ) ) {
+				$query[ 'order_by' ] = $_SESSON[ 'mp_product_list_order_by' ];
+			}
+			if ( isset( $_SESSON[ 'mp_product_list_order' ] ) ) {
+				$query[ 'order' ] = $_SESSON[ 'mp_product_list_order' ];
+			}
+
 // Get order by
 			if ( !is_null( $args[ 'order_by' ] ) ) {
 				if ( 'price' == $args[ 'order_by' ] ) {
@@ -1361,6 +1373,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 		if ( !is_null( $args[ 'order' ] ) ) {
 			$query[ 'order' ] = $args[ 'order' ];
 		}
+
 
 // The Query
 		$custom_query = new WP_Query( $query );
@@ -1914,8 +1927,8 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 			//echo 'current_page:'.$custom_query->get( 'paged' );
 
 			$html .= paginate_links( array(
-				'base'			 => get_pagenum_link() . '?paged=%#%', //'%_%',
-				'format'		 => '?paged=%#%',
+				'base'			 => '?paged=%#%', //'%_%',
+				'format'		 => '', //?paged=%#%
 				'total'			 => $custom_query->max_num_pages,
 				'current'		 => max( 1, $custom_query->get( 'paged' ) ),
 				'show_all'		 => false,
@@ -1982,8 +1995,17 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 			'hierarchical'		 => true
 		) );
 
-		$current_order	 = strtolower( $query->get( 'order_by' ) . '-' . $query->get( 'order' ) );
-		$options		 = array(
+		if ( session_id() == '' ) {
+			session_start();
+		}
+
+		$current_order = strtolower( $query->get( 'order_by' ) . '-' . $query->get( 'order' ) );
+
+		if ( isset( $_SESSION[ 'mp_product_list_order_by' ] ) && isset( $_SESSION[ 'mp_product_list_order' ] ) ) {
+			$current_order = $_SESSION[ 'mp_product_list_order_by' ] . '-' . $_SESSION[ 'mp_product_list_order' ];
+		}
+
+		$options = array(
 			array( '0', '', __( 'Default', 'mp' ) ),
 			array( 'date', 'desc', __( 'Release Date (Latest to Oldest)', 'mp' ) ),
 			array( 'date', 'asc', __( 'Release Date (Oldest to Latest)', 'mp' ) ),
@@ -1994,7 +2016,8 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 			array( 'sales', 'desc', __( 'Popularity (Most Popular - Least Popular)', 'mp' ) ),
 			array( 'sales', 'asc', __( 'Popularity (Least Popular - Most Popular)', 'mp' ) )
 		);
-		$options_html	 = '';
+
+		$options_html = '';
 		foreach ( $options as $k => $t ) {
 			$value = $t[ 0 ] . '-' . $t [ 1 ];
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[ 2 ] . '</option>';
@@ -2020,7 +2043,7 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 					</div><!-- mp_products_filter_orderby -->
 				</div>
 				
-				' .(( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">') . '
+				' . (( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">') . '
 				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
 			
 			</form><!-- mp_products_filter_form -->
