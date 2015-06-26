@@ -520,6 +520,8 @@ class MP_Checkout {
 		}
 
 		$html = '
+			<!-- MP Checkout -->
+			<section id="mp-checkout" class="mp_checkout">
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
 			<form id="mp-checkout-form" class="mp_form' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . ' mp_form-checkout" method="post" style="display:none" novalidate>' .
 		wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
@@ -546,7 +548,7 @@ class MP_Checkout {
 				}
 
 				$id		 = 'mp-checkout-section-' . $section;
-				$classes = array( 'mp-checkout-section' );
+				$classes = array( 'mp_checkout_section', 'mp_checkout_section-'.$section);
 
 				if ( !is_null( $visible_section ) ) {
 					if ( $section == $visible_section ) {
@@ -569,8 +571,8 @@ class MP_Checkout {
 				}
 
 				$html .= '
-					<div class="mp-checkout-section-errors' . (( $this->has_errors( $section ) ) ? ' show' : '') . '">' . $this->print_errors( $section, false ) . '</div>
-					<div class="mp-checkout-section-content">' . $tmp_html . '</div>
+					<div class="mp_checkout_section_errors' . (( $this->has_errors( $section ) ) ? ' show' : '') . '">' . $this->print_errors( $section, false ) . '</div><!-- end mp_checkout_section_errors -->
+					<div class="mp_checkout_section_content">' . $tmp_html . '</div><!-- end mp_checkout_section_content -->
 				</div>';
 
 				$this->_stepnum ++;
@@ -578,7 +580,8 @@ class MP_Checkout {
 		}
 
 		$html .= '
-			</form>';
+			</form>
+			</section><!-- end mp-checkout -->';
 
 		/**
 		 * Filter the checkout form html
@@ -1012,19 +1015,19 @@ class MP_Checkout {
 	 */
 	public function section_heading( $text, $link = false, $step = false ) {
 		$html = '
-			<h2 class="mp-checkout-section-heading clearfix">';
+			<h2 class="mp_checkout_section_heading">';
 
 		if ( $step ) {
 			$html .= '
-				<span class="mp-checkout-step-num">' . $this->_stepnum . '</span>';
+				<span class="mp_checkout_step_num">' . $this->_stepnum . '</span>';
 		}
 
 		if ( false !== $link ) {
 			$html .= '
-				<a href="' . $link . '" class="mp-checkout-section-heading-link">' . $text . '</a>';
+				<a href="' . $link . '" class="mp_checkout_section_heading-link">' . $text . '</a>';
 		} else {
 			$html .= '
-				<span class="mp-checkout-section-heading-link">' . $text . '</span>';
+				<span class="mp_checkout_section_heading-link">' . $text . '</span>';
 		}
 
 		$html .= '

@@ -694,7 +694,7 @@ class MP_Cart {
 		if ( !empty( $before_cart_html ) ) {
 			$html .= '
 				<!-- MP Cart Before -->
-				<div id="mp-cart-before" class="mp_cart_before">' . $before_cart_html . '</div><!-- end mp_cart_before -->';
+				<section id="mp-cart-before" class="mp_cart_before">' . $before_cart_html . '</section><!-- end mp_cart_before -->';
 		}
 
 		/**
@@ -711,7 +711,7 @@ class MP_Cart {
 
 		$html .= '
 				<!-- MP Cart -->
-				<div id="mp-cart" class="mp_cart ' . implode( ' ', $classes ) . '">';
+				<section id="mp-cart" class="mp_cart ' . implode( ' ', $classes ) . '">';
 
 		$blog_ids = $this->get_blog_ids();
 
@@ -758,7 +758,7 @@ class MP_Cart {
 		}
 
 		$html .= '
-				</div><!-- end mp_cart -->';
+				</section><!-- end mp_cart -->';
 
 		/**
 		 * Filter html after cart
@@ -773,13 +773,13 @@ class MP_Cart {
 		if ( !empty( $after_cart_html ) ) {
 			$html .= '
 				<!-- MP Cart After -->
-				<div id="mp-cart-after" class="mp_cart_after">' . $after_cart_html . '</div><!-- end mp_cart_after -->';
+				<section id="mp-cart-after" class="mp_cart_after">' . $after_cart_html . '</section><!-- end mp_cart_after -->';
 		}
 
 		if ( $view != 'order-status' ) {
 			$html .= '
 					<!-- MP Cart Meta -->
-					<div id="mp-cart-meta" class="mp_cart_meta">' .
+					<section id="mp-cart-meta" class="mp_cart_meta">' .
 			$this->cart_meta( false, $editable );
 
 			$button_text	 = __( 'Submit Order' );
@@ -855,15 +855,15 @@ class MP_Cart {
 			}
 
 			$html .= '
-					</div><!-- end mp_cart_meta -->';
+					</section><!-- end mp_cart_meta -->';
 		}
 
 		if ( $editable ) {
 			$html .= '
-			</form>';
+			</form><!-- end mp-cart-form -->';
 		} else {
 			$html .= '
-			</div>';
+			</div><!-- end mp-cart-form -->';
 		}
 
 		/**
