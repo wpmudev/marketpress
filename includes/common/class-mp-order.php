@@ -476,12 +476,21 @@ You can manage this order here: %s', 'mp' );
 		$confirmation_text	 = apply_filters( 'mp_order/confirmation_text/' . $this->get_meta( 'mp_payment_info->gateway_plugin_name' ), $confirmation_text, $this );
 
 		$html = '
-			<div id="mp-order-details">' .
-		$this->header( false ) .
-		$confirmation_text .
-		$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) .
-		$this->get_addresses() . '
-			</div>';
+			<!-- MP Single Order Details -->
+			<section id="mp-single-order-details">
+				<div class="mp_order_details">
+					<div class="mp_order">' .
+						$this->header( false ) .
+					'</div><!-- end mp_order -->' .
+					$confirmation_text . '
+					<div class="mp_order-cart">' .
+						$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) . '
+					</div><!-- end mp_order-cart -->
+					<div class="mp_order-address">' .
+						$this->get_addresses() . '
+					</div><!-- end mp_order-address -->
+				</div><!-- end mp_order_details -->
+			</section><!-- end mp-single-order-details -->';
 
 		/**
 		 * Filter the order details
@@ -636,7 +645,7 @@ You can manage this order here: %s', 'mp' );
 	 */
 	public function get_addresses( $editable = false ) {
 		$html = '
-			<div class="clearfix">
+			<div class="clearfix mp_address">
 			<div style="float:left;width:48%">
 				<h4>' . __( 'Billing Address', 'mp' ) . '</h4>' .
 		$this->get_address( 'billing', $editable ) .
@@ -736,8 +745,8 @@ You can manage this order here: %s', 'mp' );
 	 */
 	public function header( $echo = true ) {
 		$html = '
-			<h3>' . __( 'Order #', 'mp' ) . ' ' . (( get_query_var( 'mp_order_id' ) ) ? $this->get_id() : '<a href="' . $this->tracking_url( false ) . '">' . $this->get_id() . '</a>') . '</h3>
-			<div class="clearfix mp-order-details-head" id="mp-order-details-head-' . $this->ID . '">';
+			<h3 class="mp_order-head">' . __( 'Order #', 'mp' ) . ' ' . (( get_query_var( 'mp_order_id' ) ) ? $this->get_id() : '<a href="' . $this->tracking_url( false ) . '">' . $this->get_id() . '</a>') . '</h3>
+			<div class="mp_order-detail" id="mp-order-detail-' . $this->ID . '">';
 
 		// Currency
 		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
@@ -793,18 +802,18 @@ You can manage this order here: %s', 'mp' );
 		$tooltip_content = apply_filters( 'mp_order/tooltip_content_total', $tooltip_content, $this );
 
 		$html .= '
-			<div class="mp-order-details-head-col"><strong>' . __( 'Order Received', 'mp' ) . '</strong> ' . $received . '</div>
-			<div class="mp-order-details-head-col"><strong>' . __( 'Current Status', 'mp' ) . '</strong> ' . $status . '</div>
-			<div class="mp-order-details-head-col">
-				<strong>' . __( 'Total', 'mp' ) . '</strong>
+			<div class="mp_order-detail-item"><h5>' . __( 'Order Received', 'mp' ) . '</h5> <span>' . $received . '</span></div><!-- end mp_order-detail-item -->
+			<div class="mp_order-detail-item"><h5>' . __( 'Current Status', 'mp' ) . '</h5> <span>' . $status . '</span></div><!-- end mp_order-detail-item -->
+			<div class="mp_order-detail-item">
+				<h5>' . __( 'Total', 'mp' ) . '</h5>
 				<a href="javascript:;" class="mp-has-tooltip">' . mp_format_currency( $currency, $this->get_meta( 'mp_order_total', '' ) ) . '</a>
 				<div class="mp-tooltip-content">
 					<div class="clearfix">' . $tooltip_content . '</div>
 				</div>
-			</div>';
+			</div><!-- end mp_order-detail-item -->';
 
 		$html .= '
-			</div>';
+			</div><!-- end mp_order-detail -->';
 
 		/**
 		 * Filter the order header html

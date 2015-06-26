@@ -61,34 +61,39 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 		$offset			 = ($page - 1) * $per_page;
 		$total_pages	 = ceil( count( $history ) / $per_page );
 		$html			 = '
-			<div id="mp-order-history">';
+			<!-- Order History -->
+			<section id="mp-order-history">';
 
 		if ( count( $history ) > 0 ) {
 			$history = array_slice( $history, $offset, $per_page );
 			$html .= '
-				<h2>' . __( 'Order History', 'mp' ) . '</h2>';
+				<h2 class="mp_title">' . __( 'Order History', 'mp' ) . '</h2>' .
+				
+				'<div class="mp_order_details">';
 
 			foreach ( $history as $timestamp => $order ) {
 				$order = new MP_Order( $order[ 'id' ] );
-				$html .= '<div class="mp-order-details">';
+				$html .= '<div class="mp_order">';
 				$html .= $order->header( false );
-				$html .= '</div>';
+				$html .= '</div><!-- end mo_order -->';
 			}
+			
+			$html .= '</div><!-- end mp_order_details -->';
 
 			if ( $total_pages > 1 ) {
 				$big = 99999999;
-				$html .= '<div id="mp-order-history-pagination">';
+				$html .= '<nav class="mp_listings_nav">';
 				$html .= paginate_links( array(
 					'base'		 => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
 					'current'	 => $page,
 					'total'		 => $total_pages,
 				) );
-				$html .= '</div>';
+				$html .= '</nav>';
 			}
 		}
 
 		$html .= '
-			</div>';
+			</section><!-- end mp-order-history -->';
 
 		return $html;
 	}
@@ -775,7 +780,7 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 
 			$input_id = 'mp-gateway-option-' . $code;
 			$html .= '
-				<label class="mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options ) == 1 ) ? ' style="display:none"' : '') . '>
+				<label class="mp_form_label mp-checkout-option-label" for="' . $input_id . '"' . (( count( $options ) == 1 ) ? ' style="display:none"' : '') . '>
 					<input
 						data-mp-use-confirmation-step="' . (( $gateways[ $code ]->use_confirmation_step ) ? 'true' : 'false') . '"
 						id="' . $input_id . '"
@@ -841,7 +846,7 @@ if ( !function_exists( 'mp_list_plugin_shipping_options' ) ) :
 			$checked	 = ( $plugin->plugin_name == $shipping_option && $method == $shipping_sub_option ) ? ' checked' : '';
 			$input_name	 = ( mp_cart()->is_global ) ? 'shipping_method[' . mp_cart()->get_blog_id() . ']' : 'shipping_method';
 			$html .= '
-				<label class="mp-checkout-option-label" for="' . $input_id . '">
+				<label class="mp_form_label mp-checkout-option-label" for="' . $input_id . '">
 					<input
 						id="' . $input_id . '"
 						type="radio"
@@ -1448,14 +1453,14 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 		}
 
 		$form = '
-			<form id="mp_order_lookup_form" class="mp_form" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
-				<div class="mp_order_lookup_form_content">' . $content . '</div>
+			<form id="mp-order-lookup-form" class="mp_form mp_form-order-lookup" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
+				<div class="mp_form_content">' . $content . '</div>
 				<div class="mp_form_group">
 					<div class="mp_form_group_field">
 						<input type="text" class="mp_form_input" id="mp_order_id_input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
 					</div>
 					<div class="mp_form_group_field">
-						<button type="submit" class="mp-button">' . __( 'Look Up', 'mp' ) . '</button>
+						<button type="submit" class="mp_button">' . __( 'Look Up', 'mp' ) . '</button>
 					</div>
 				</div>
 			</form>';
@@ -1913,7 +1918,7 @@ if ( !function_exists( 'mp_products_nav' ) ) :
 			$big = 999999999;
 
 			$html = '
-				<nav class="mp_products_nav">';
+				<nav class="mp_listings_nav">';
 
 			/* $html .= paginate_links( array(
 			  'base'		 => '%_%',
@@ -2027,16 +2032,16 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		<a id="mp_product_top"></a>
 		<!-- Products Filter -->
 		<section class="mp_products_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
-			<form id="mp_products_filter_form" name="mp_products_filter_form" class="mp_form" method="get">
+			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
 			
 				<div class="mp_form_fields">
 					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-						<label for="mp_product_category">' . __( 'Category', 'mp' ) . '</label>
+						<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
 						' . $terms . '
 					</div><!-- mp_listing_products_category -->
 
 					<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
-						<label for="mp_sort_orderby">' . __( 'Order By', 'mp' ) . '</label>
+						<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
 						<select id="mp_sort_orderby" class="mp_select2" name="order">
 							' . $options_html . '
 						</select>

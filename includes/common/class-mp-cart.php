@@ -670,10 +670,10 @@ class MP_Cart {
 
 		if ( $editable ) {
 			$html .= '
-				<form class="mp-form" id="mp-cart-form" method="post">';
+				<form class="mp_form" id="mp_cart_form" method="post">';
 		} else {
 			$html .= '
-				<div id="mp-cart-form">';
+				<div id="mp_cart_form">';
 		}
 
 		/**
@@ -794,24 +794,24 @@ class MP_Cart {
 				$button_text	 = __( 'Checkout', 'mp' );
 				$p_class		 = 'mp-secure-checkout-tooltip-text';
 				$button_classes	 = array(
-					'mp-button',
-					'mp-button-checkout',
-					'mp-button-padlock',
-					'mp-button-large',
+					'mp_button',
+					'mp_button-checkout',
+					'mp_button-padlock',
+					'mp_button-large',
 					((!empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
 				);
 			} elseif ( get_query_var( 'mp_confirm_order_step' ) ) {
 				$button_classes = array(
-					'mp-button',
-					'mp-button-checkout',
-					'mp-button-large',
+					'mp_button',
+					'mp_button-checkout',
+					'mp_button-large',
 					((!empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
 				);
 			} else {
 				$button_classes = array(
-					'mp-button',
-					'mp-button-checkout',
-					'mp-button-large',
+					'mp_button',
+					'mp_button-checkout',
+					'mp_button-large',
 				);
 			}
 
@@ -1008,15 +1008,15 @@ class MP_Cart {
 
 
 		$html = '
-		<div id="mp-floating-cart"' . (( $this->has_items() ) ? ' class="has-items"' : '') . '>
-			<div id="mp-floating-cart-tab" class="clearfix"><span id="mp-floating-cart-total">' . $this->product_total( true ) . '</span> ' . $this->item_count( false, true ) . '</div>
-			<div id="mp-floating-cart-contents">';
+		<div id="mp-floating-cart" class="mp_mini_cart ' . (( $this->has_items() ) ? 'has-items' : '') . '">
+			<div class="mp_mini_cart-ribbon"><span class="mp_mini_cart-total">' . $this->product_total( true ) . '</span> ' . $this->item_count( false, true ) . '</div>
+			<div class="mp_mini_cart-contents">';
 
 
 		if ( $this->has_items() ) {
 			$blog_ids = $this->get_blog_ids();
 			$html .= '
-				<ul id="mp-floating-cart-items-list">';
+				<ul class="mp_mini_cart-items">';
 
 			while ( 1 ) {
 				if ( $this->is_global ) {
@@ -1042,10 +1042,10 @@ class MP_Cart {
 
 			$html .= '
 				</ul>
-				<a id="mp-floating-cart-button" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
+				<a class="mp_button mp_mini_cart-button" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
 		} else {
 			$html .= '
-				<div id="mp-floating-cart-no-items">
+				<div class="mp_mini_cart-items-empty">
 					<p><strong>' . __( 'Your shopping cart is empty.', 'mp' ) . '</strong></p>
 					<p>' . __( 'As you add browse items and add them to your add cart they will show up here.', 'mp' ) . '</p>
 				</div>';
@@ -1078,11 +1078,11 @@ class MP_Cart {
 		$product = new MP_Product( $item_id );
 
 		$html = '
-			<li class="mp-floating-cart-item" id="mp-floating-cart-item-' . $product->ID . '">
-				<a class="mp-floating-cart-item-link" href="' . $product->url( false ) . '">' . $product->image( false, 'floating-cart', 50 ) . '
-					<div class="mp-floating-cart-item-content">
-						<h3 class="mp-floating-cart-item-title">' . $product->title( false ) . '</h3>
-						<span class="mp-floating-cart-item-attribute"><strong>' . __( 'Quantity', 'mp' ) . ':</strong> <em>' . $qty . '</em></span>';
+			<li class="mp_mini_cart-item" id="mp-floating-cart-item-' . $product->ID . '">
+				<a class="mp_mini_cart-item-link" href="' . $product->url( false ) . '">' . $product->image( false, 'floating-cart', 50 ) . '
+					<div class="mp_mini_cart-item-content">
+						<h3 class="mp_mini_cart-item-title">' . $product->title( false ) . '</h3>
+						<span class="mp_mini_cart-item-attribute"><strong>' . __( 'Quantity', 'mp' ) . ':</strong> <em>' . $qty . '</em></span>';
 
 		// Display attributes
 		if ( $product->is_variation() ) {
@@ -1090,7 +1090,7 @@ class MP_Cart {
 			foreach ( $attributes as $taxonomy => $att ) {
 				$term = current( $att[ 'terms' ] );
 				$html .= '
-						<span class="mp-floating-cart-item-attribute"><strong>' . $att[ 'name' ] . ':</strong> <em>' . $term . '</em></span>';
+						<span class="mp_mini_cart-item-attribute"><strong>' . $att[ 'name' ] . ':</strong> <em>' . $term . '</em></span>';
 			}
 		}
 
@@ -1219,12 +1219,12 @@ class MP_Cart {
 
 		if ( $format ) {
 			if ( $numitems == 0 ) {
-				$snippet = '<span class="mp-floating-widget-count">0</span>' . '<span class="mp-floating-widget-count-title">' . __( 'items', 'mp' ) . '</span>';
+				$snippet = '<span class="mp_mini_cart-count">0</span>' . '<span class="mp_mini_cart-count-title">' . __( 'items', 'mp' ) . '</span>';
 			} else {
 				if ( $numitems == 1 ) {
-					$snippet = '<span class="mp-floating-widget-count">1</span>' . '<span class="mp-floating-widget-count-title">' . __( 'item', 'mp' ) . '</span>';
+					$snippet = '<span class="mp_mini_cart-count">1</span>' . '<span class="mp_mini_cart-count-title">' . __( 'item', 'mp' ) . '</span>';
 				} else {
-					$snippet = '<span class="mp-floating-widget-count">' . $numitems . '</span>' . '<span class="mp-floating-widget-count-title">' . __( 'items', 'mp' ) . '</span>';
+					$snippet = '<span class="mp_mini_cart-count">' . $numitems . '</span>' . '<span class="mp_mini_cart-count-title">' . __( 'items', 'mp' ) . '</span>';
 				}
 			}
 		}
