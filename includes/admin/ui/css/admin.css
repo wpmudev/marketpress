@@ -70,7 +70,8 @@
     margin-right: -20px;
 }
 
-#mp-quick-setup-wizard .mp-tab-navigation a{
+#mp-quick-setup-wizard .mp-tab-navigation a,
+#mp-quick-setup-wizard .mp-tab-navigation .button-primary{
     float: right;
     margin: 25px 30px 25px 25px;
 }
@@ -78,17 +79,22 @@
 #mp-quick-setup-wizard .mp-quick-settings-one-half{
     width: 50%;
     float: left;
-    text-align: center;
 }
 
 #mp-quick-setup-wizard .mp-quick-settings-one-third{
     width: 33%;
     float: left;
-    text-align: center; 
 }
 
 #mp-quick-setup-wizard .mp-quick-settings-two-thirds{
     width: 66%;
     float: left;
-    text-align: center; 
+}
+
+#mp-quick-setup-wizard .p-title{
+    font-weight: bold;
+}
+
+.store-settings_page_store-setup-wizard p.submit{
+    display: none;
 }

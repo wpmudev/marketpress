@@ -69,6 +69,7 @@ class MP_Setup_Wizard {
 
 		if ( isset( $quick_setup_step ) ) {
 
+			/* Store Location */
 			$metabox = new WPMUDEV_Metabox( array(
 				'id'				 => 'mp-quick-setup-wizard-location',
 				'page_slugs'		 => array( 'store-setup-wizard' ),
@@ -134,6 +135,151 @@ class MP_Setup_Wizard {
 				'validation' => array(
 					'required' => true,
 				),
+			) );
+
+
+			/* Sale to countries */
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'			 => 'mp-quick-setup-wizard-countries',
+				'page_slugs'	 => array( 'store-setup-wizard' ),
+				'title'			 => __( 'Countries', 'mp' ),
+				'option_name'	 => 'mp_settings',
+				'order'			 => 1,
+			) );
+
+			// Target Countries
+			$metabox->add_field( 'advanced_select', array(
+				'name'					 => 'shipping[allowed_countries]',
+				'label'					 => array( 'text' => __( 'Target Countries', 'mp' ) ),
+				'desc'					 => __( 'These are the countries that you will ship to.', 'mp' ),
+				'options'				 => mp_popular_country_list() + array( 'all_countries' => __( 'All Countries', 'mp' ) ) + mp_country_list(), //all_countries|disabled
+				'default_value'			 => array( 'all_countries' => __( 'All Countries', 'mp' ) ),
+				'placeholder'			 => __( 'Choose Countries', 'mp' ),
+				'format_dropdown_header' => '
+				<ul class="select2-all-none">
+					<li class="select2-none">' . __( 'None', 'mp' ) . '</li>
+					<li class="select2-all">' . __( 'All', 'mp' ) . '</li>
+					<li class="select2-eu" data-countries="' . implode( ',', mp()->eu_countries ) . '">' . __( 'EU', 'mp' ) . '</li>
+				</ul>',
+			) );
+
+
+			/* Currency options */
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'			 => 'mp-quick-setup-wizard-currency',
+				'page_slugs'	 => array( 'store-setup-wizard' ),
+				'title'			 => __( 'Currency Settings', 'mp' ),
+				'option_name'	 => 'mp_settings',
+			) );
+
+			$currencies	 = mp()->currencies;
+			$options	 = array( '' => __( 'Select a Currency', 'mp' ) );
+
+			foreach ( $currencies as $key => $value ) {
+				$options[ $key ] = esc_attr( $value[ 0 ] ) . ' - ' . mp_format_currency( $key );
+			}
+
+			$metabox->add_field( 'advanced_select', array(
+				'name'			 => 'currency',
+				'placeholder'	 => __( 'Select a Currency', 'mp' ),
+				'multiple'		 => false,
+				'label'			 => array( 'text' => __( 'Store Currency', 'mp' ) ),
+				'options'		 => $options,
+				'width'			 => 'element',
+			) );
+			$metabox->add_field( 'radio_group', array(
+				'name'			 => 'curr_symbol_position',
+				'label'			 => array( 'text' => __( 'Currency Symbol Position', 'mp' ) ),
+				'default_value'	 => '1',
+				'orientation'	 => 'horizontal',
+				'options'		 => array(
+					'1'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>100',
+					'2'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span> 100',
+					'3'	 => '100<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
+					'4'	 => '100 <span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
+				),
+			) );
+
+
+			/* Tax options */
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'			 => 'mp-quick-setup-wizard-tax',
+				'page_slugs'	 => array( 'store-setup-wizard' ),
+				'title'			 => __( 'Tax Settings', 'mp' ),
+				'option_name'	 => 'mp_settings',
+			) );
+
+			$metabox->add_field( 'text', array(
+				'name'			 => 'tax[rate]',
+				'label'			 => array( 'text' => __( 'Default Tax Rate', 'mp' ) ),
+				'after_field'	 => '%',
+				'style'			 => 'width:75px',
+				'validation'	 => array(
+					'number' => true,
+				),
+				'placeholder'	 => '10',
+				'conditional'	 => array(
+					'name'	 => 'base_country',
+					'value'	 => 'CA',
+					'action' => 'hide',
+				),
+			) );
+
+			// Create field for each canadian province
+			foreach ( mp()->canadian_provinces as $key => $label ) {
+				$metabox->add_field( 'text', array(
+					'name'			 => 'tax[canada_rate][' . $key . ']',
+					'desc'			 => '<a target="_blank" href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada">' . __( 'Current Rates', 'mp' ) . '</a>',
+					'label'			 => array( 'text' => sprintf( __( '%s Tax Rate', 'mp' ), $label ) ),
+					'custom'		 => array( 'style' => 'width:75px' ),
+					'after_field'	 => '%',
+					'conditional'	 => array(
+						'name'	 => 'base_country',
+						'value'	 => 'CA',
+						'action' => 'show',
+					),
+				) );
+			}
+
+			$metabox->add_field( 'text', array(
+				'name'			 => 'tax[label]',
+				'label'			 => array( 'text' => __( 'Tax Label', 'mp' ) ),
+				'style'			 => 'width:300px',
+				'placeholder'	 => __( 'I.e. Taxes, VAT, GST, etc', 'mp' )
+			) );
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'tax[tax_shipping]',
+				'label'		 => array( 'text' => __( 'Apply Tax To Shipping Fees?', 'mp' ) ),
+				'message'	 => __( 'Yes', 'mp' ),
+			) );
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'tax[tax_inclusive]',
+				'label'		 => array( 'text' => __( 'Enter Prices Inclusive of Tax?', 'mp' ) ),
+				'message'	 => __( 'Yes', 'mp' ),
+			) );
+			$metabox->add_field( 'checkbox', array(
+				'name'		 => 'tax[tax_digital]',
+				'label'		 => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
+				'message'	 => __( 'Yes', 'mp' ),
+			) );
+
+
+			// Measurement System
+
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'			 => 'mp-quick-setup-wizard-measurement-system',
+				'page_slugs'	 => array( 'store-setup-wizard' ),
+				'title'			 => __( 'Measurement System', 'mp' ),
+				'option_name'	 => 'mp_settings',
+			) );
+
+			$metabox->add_field( 'radio_group', array(
+				'name'			 => 'shipping[system]',
+				'options'		 => array(
+					'english'	 => __( 'Pounds', 'mp' ),
+					'metric'	 => __( 'Kilograms', 'mp' ),
+				),
+				'default_value'	 => 'english',
 			) );
 		}
 

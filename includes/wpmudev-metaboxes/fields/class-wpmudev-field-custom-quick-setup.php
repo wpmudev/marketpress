@@ -52,12 +52,20 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 			<div id="mp-quick-setup-tabs">
 				<ul>
 					<li><a href="#tabs-1"><?php _e( 'Locations', 'mp' ); ?></a></li>
-					<li><a href="#tabs-2"><?php _e( 'Currency', 'mp' ); ?></a></li>
+					<li><a href="#tabs-2"><?php _e( 'Currency & Tax', 'mp' ); ?></a></li>
 					<li><a href="#tabs-3"><?php _e( 'Metric System', 'mp' ); ?></a></li>
 				</ul>
 				<div id="tabs-1" class="mp-quick-setup-tab">
-					<div class="mp-tab-content mp-tab-locations">
-						
+					<div class="mp-tab-content">
+						<div class="mp-tab-locations mp-quick-settings-one-third">
+							<p class="p-title"><?php _e( 'Locations', 'mp' ); ?></p>
+							<p><?php _e( 'Where is your online store based?', 'mp' ); ?></p>
+						</div>
+						<div class="mp-tab-countries mp-quick-settings-two-thirds">
+							<p class="p-title">&nbsp;</p>
+							<p><?php _e( 'And, which countries do you want to sell to?', 'mp' ); ?></p>
+						</div>
+						<div class="clearfix"></div>
 					</div>
 					<div class="mp-tab-navigation">
 						<a href="" class="button-secondary"><?php _e( 'Next', 'mp' ); ?></a>
@@ -65,7 +73,15 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 				</div>
 				<div id="tabs-2" class="mp-quick-setup-tab">
 					<div class="mp-tab-content">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+						<div class="mp-tab-currency">
+							<p class="p-title"><?php _e( 'Currency', 'mp' ); ?></p>
+							<p><?php _e( 'What currency do you want to sell with?', 'mp' ); ?></p>
+						</div>
+						<div class="mp-tab-tax">
+							<p class="p-title"><?php _e( 'Tax', 'mp' ); ?></p>
+							<p><?php _e( 'Do you want to apply tax for your products? You can customize this for each product and vatiation', 'mp' ); ?></p>
+						</div>
+						<div class="clearfix"></div>
 					</div>
 					<div class="mp-tab-navigation">
 						<a href="" class="button-secondary"><?php _e( 'Next', 'mp' ); ?></a>
@@ -73,10 +89,14 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 				</div>
 				<div id="tabs-3" class="mp-quick-setup-tab">
 					<div class="mp-tab-content">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+						<div class="mp-tab-measurement-system">
+							<p><?php _e( 'And what metric system do you want to use?', 'mp' ); ?></p>
+						</div>
+
 					</div>
 					<div class="mp-tab-navigation">
-						<a href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '3' ), 'admin.php' ) ); ?>" class="button-primary"><?php _e( 'Finish Setup', 'mp' ); ?></a>
+						<input class="button-primary" type="submit" name="submit_settings" value="<?php _e( 'Finish Setup', 'mp' ); ?>" />
+						<!--<a href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '3' ), 'admin.php' ) ); ?>" class="button-primary"><?php _e( 'Finish Setup', 'mp' ); ?></a>-->
 					</div>
 				</div>
 			</div>
@@ -88,12 +108,12 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 			<p><?php _e( 'That\'s all your new store needs to work! However every store needs products...Get started adding products bellow, or jump straight into configuring your stores settings further.', 'mp' ); ?></p>
 
 			<div class="mp-quick-settings-one-half">
-			<?php _e( 'Add your first product for sale and get familliar with adding products.', 'mp' ); ?>
+				<?php _e( 'Add your first product for sale and get familliar with adding products.', 'mp' ); ?>
 				<a href="" class="button-primary add-product"><?php _e( 'Add Product', 'mp' ); ?></a>
 			</div>
 
 			<div class="mp-quick-settings-one-half">
-			<?php _e( 'Configure shipping rates, emails and your store\'s appearance. ', 'mp' ); ?>
+				<?php _e( 'Configure shipping rates, emails and your store\'s appearance. ', 'mp' ); ?>
 				<a href="" class="button-primary configure-store"><?php _e( 'Configure Store', 'mp' ); ?></a>
 			</div>
 			<?php
