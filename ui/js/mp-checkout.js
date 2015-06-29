@@ -31,12 +31,12 @@ var mp_checkout;
 					var $state = $( '[name="billing[state]"]' );
 					var $zip = $( '[name="billing[zip]"]' );
 					var type = 'billing';
-					var $row = $state.closest( '.mp-checkout-form-row' );
+					var $row = $state.closest( '.mp_checkout_fields' );
 				} else {
 					var $state = $( '[name="shipping[state]"]' );
 					var $zip = $( '[name="shipping[zip]"]' )
 					var type = 'shipping';
-					var $row = $state.closest( '.mp-checkout-form-row' );
+					var $row = $state.closest( '.mp_checkout_fields' );
 				}
 				
 				var data = {
@@ -51,15 +51,15 @@ var mp_checkout;
 						$row.ajaxLoading( 'false' );
 						if ( resp.data.states ) {
 							$state.html( resp.data.states );
-							$state.trigger( 'change' ).closest( '.mp-checkout-column' ).show();
+							$state.trigger( 'change' ).closest( '.mp_checkout_column' ).show();
 						} else {
-							$state.closest( '.mp-checkout-column' ).hide();
+							$state.closest( '.mp_checkout_column' ).hide();
 						}
 						
 						if ( resp.data.show_zipcode ) {
-							$zip.closest( '.mp-checkout-column' ).show();
+							$zip.closest( '.mp_checkout_column' ).show();
 						} else {
-							$zip.closest( '.mp-checkout-column' ).hide();
+							$zip.closest( '.mp_checkout_column' ).hide();
 						}
 					}
 				} );
