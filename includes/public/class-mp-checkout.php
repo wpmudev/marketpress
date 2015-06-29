@@ -385,7 +385,7 @@ class MP_Checkout {
 				$field[ 'label' ] = false;
 			}
 
-			$html .= '<div class="mp-checkout-form-row"' . (( mp_arr_get_value( 'hidden', $field ) ) ? ' style="display:none"' : '') . '>' . $this->form_field( $field ) . '</div>';
+			$html .= '<div class="mp_checkout_field"' . (( mp_arr_get_value( 'hidden', $field ) ) ? ' style="display:none"' : '') . '>' . $this->form_field( $field ) . '</div>';
 		}
 
 		/**
@@ -516,12 +516,14 @@ class MP_Checkout {
 		extract( $args );
 
 		if ( !mp_cart()->has_items() ) {
-			return sprintf( __( '<h3>Oops!</h3><p>Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p>', 'mp' ), mp_store_page_url( 'products', false ) ) . '</p>';
+			return sprintf( __( '<h3 class="mp_sub_title">Oops!</h3><p>Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p>', 'mp' ), mp_store_page_url( 'products', false ) ) . '</p>';
 		}
 
 		$html = '
+			<!-- MP Checkout -->
+			<section id="mp-checkout" class="mp_checkout">
 			<noscript>' . __( 'Javascript is required in order to checkout. Please enable Javascript in your browser and then refresh this page.', 'mp' ) . '</noscript>
-			<form id="mp_checkout_form" class="mp_form' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . '" method="post" style="display:none" novalidate>' .
+			<form id="mp-checkout-form" class="mp_form' . (( get_query_var( 'mp_confirm_order_step' ) ) ? ' last-step' : '') . ' mp_form-checkout" method="post" style="display:none" novalidate>' .
 		wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', true, false );
 
 		/* Loop through each section to determine if a particular section has errors.
@@ -546,7 +548,7 @@ class MP_Checkout {
 				}
 
 				$id		 = 'mp-checkout-section-' . $section;
-				$classes = array( 'mp-checkout-section' );
+				$classes = array( 'mp_checkout_section', 'mp_checkout_section-'.$section);
 
 				if ( !is_null( $visible_section ) ) {
 					if ( $section == $visible_section ) {
@@ -569,8 +571,8 @@ class MP_Checkout {
 				}
 
 				$html .= '
-					<div class="mp-checkout-section-errors' . (( $this->has_errors( $section ) ) ? ' show' : '') . '">' . $this->print_errors( $section, false ) . '</div>
-					<div class="mp-checkout-section-content">' . $tmp_html . '</div>
+					<div class="mp_checkout_section_errors' . (( $this->has_errors( $section ) ) ? ' show' : '') . '">' . $this->print_errors( $section, false ) . '</div><!-- end mp_checkout_section_errors -->
+					<div class="mp_checkout_section_content">' . $tmp_html . '</div><!-- end mp_checkout_section_content -->
 				</div>';
 
 				$this->_stepnum ++;
@@ -578,7 +580,8 @@ class MP_Checkout {
 		}
 
 		$html .= '
-			</form>';
+			</form>
+			</section><!-- end mp-checkout -->';
 
 		/**
 		 * Filter the checkout form html
@@ -617,7 +620,7 @@ class MP_Checkout {
 			'cc_exp'		 => __( 'Please enter a valid card expiration', 'mp' ),
 			'cc_cvc'		 => __( ' Please enter a valid card security code', 'mp' ),
 			'cc_fullname'	 => __( 'Please enter a valid first and last name', 'mp' ),
-			'errors'		 => __( '<h4>Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span>red</span> below. Entering into a field will reveal the actual error that occurred.</p>', 'mp' ),
+			'errors'		 => __( '<h4 class="mp_sub_title">Oops! We found %d %s in the form below.</h4><p>Fields that have errors are highlighted in <span>red</span> below. Entering into a field will reveal the actual error that occurred.</p>', 'mp' ),
 			'error_plural'	 => __( 'errors', 'mp' ),
 			'error_singular' => __( 'error', 'mp' ),
 		) );
@@ -730,7 +733,7 @@ class MP_Checkout {
 
 			case 'complex' :
 				$html .= '
-				<div class="mp-checkout-input-complex clearfix">';
+				<div class="mp_checkout_fields">';
 
 				foreach ( (array) mp_arr_get_value( 'subfields', $field, array() ) as $subfield ) {
 					$subfield[ 'value_only' ] = mp_arr_get_value( 'value_only', $field );
@@ -746,7 +749,7 @@ class MP_Checkout {
 					}
 
 					$html .= '
-					<div class="mp-checkout-column"' . (( mp_arr_get_value( 'hidden', $subfield ) ) ? ' style="display:none"' : '') . '>' .
+					<div class="mp_checkout_column mp_checkout_field"' . (( mp_arr_get_value( 'hidden', $subfield ) ) ? ' style="display:none"' : '') . '>' .
 					$this->form_field( $subfield );
 
 					if ( !$top_label && !$subfield[ 'value_only' ] ) {
@@ -755,7 +758,7 @@ class MP_Checkout {
 					}
 
 					$html .= '
-					</div>';
+					</div><!-- end mp_checkout_column/mp_checkout_field -->';
 				}
 
 				$html .= '
@@ -860,7 +863,7 @@ class MP_Checkout {
 
 		if ( $errors = $this->get_errors( $context ) ) {
 			$error_string .= '
-				<h4>' . __( 'Oops! An error occurred while processing your payment.', 'mp' ) . '</h4>
+				<h4 class="mp_sub_title">' . __( 'Oops! An error occurred while processing your payment.', 'mp' ) . '</h4>
 				<ul>';
 
 			foreach ( $errors as $error ) {
@@ -897,7 +900,7 @@ class MP_Checkout {
 		 * @since 3.0
 		 * @param string
 		 */
-		$heading = '<h3>' . apply_filters( 'mp_checkout/payment_form/heading_text', __( 'Payment', 'mp' ) ) . '</h3>';
+		$heading = '<h3 class="mp_sub_title">' . apply_filters( 'mp_checkout/payment_form/heading_text', __( 'Payment', 'mp' ) ) . '</h3>';
 
 		$html .= '
 			<div id="mp-checkout-payment-form">' .
@@ -959,9 +962,8 @@ class MP_Checkout {
 		$enable_shipping_address = ( $shipping_addr !== $billing_addr );
 
 		$html = '
-			<div class="clearfix">
-				<div id="mp-checkout-column-billing-info" class="mp-checkout-column' . (( $enable_shipping_address ) ? '' : ' fullwidth') . '">
-					<h3>' . __( 'Billing', 'mp' ) . '</h3>' .
+				<div id="mp-checkout-column-billing-info" class="mp_checkout_column' . (( $enable_shipping_address ) ? '' : ' fullwidth') . '">
+					<h3 class="mp_sub_title">' . __( 'Billing', 'mp' ) . '</h3>' .
 		$this->address_fields( 'billing' ) . '';
 
 		$cart				 = mp_cart();
@@ -969,7 +971,7 @@ class MP_Checkout {
 
 		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
 			$html .= '
-					<div class="mp-checkout-form-row mp-checkbox-row">
+					<div class="mp_checkout_field mp_checkout_checkbox">
 						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . ' /> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
 					</div>
 				';
@@ -977,12 +979,12 @@ class MP_Checkout {
 
 		$html .= '
 			</div>
-				<div id="mp-checkout-column-shipping-info" class="mp-checkout-column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
-					<h3>' . __( 'Shipping', 'mp' ) . '</h3>' .
+				<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
+					<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
 		$this->address_fields( 'shipping' ) . '';
 
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
-			$html .= '<div class="mp-checkout-form-row">
+			$html .= '<div class="mp_checkout_field">
 					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
 				    <textarea name="shipping[special_instructions]"></textarea>
 				  </div>';
@@ -991,11 +993,10 @@ class MP_Checkout {
 		$html .= '
 
 				</div>
-			</div>
-			<div class="mp_checkout-buttons">' .
+			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
-			</div>';
+			</div><!-- end mp_checkout_buttons -->';
 
 		return $html;
 	}
@@ -1012,19 +1013,19 @@ class MP_Checkout {
 	 */
 	public function section_heading( $text, $link = false, $step = false ) {
 		$html = '
-			<h2 class="mp-checkout-section-heading clearfix">';
+			<h2 class="mp_checkout_section_heading">';
 
 		if ( $step ) {
 			$html .= '
-				<span class="mp-checkout-step-num">' . $this->_stepnum . '</span>';
+				<span class="mp_checkout_step_num">' . $this->_stepnum . '</span>';
 		}
 
 		if ( false !== $link ) {
 			$html .= '
-				<a href="' . $link . '" class="mp-checkout-section-heading-link">' . $text . '</a>';
+				<a href="' . $link . '" class="mp_checkout_section_heading-link">' . $text . '</a>';
 		} else {
 			$html .= '
-				<span class="mp-checkout-section-heading-link">' . $text . '</span>';
+				<span class="mp_checkout_section_heading-link">' . $text . '</span>';
 		}
 
 		$html .= '
@@ -1044,26 +1045,25 @@ class MP_Checkout {
 		$html = '';
 		if ( !is_user_logged_in() && !MP_HIDE_LOGIN_OPTION ) {
 			$html = wp_nonce_field( 'mp-login-nonce', 'mp_login_nonce', true, false ) . '
-				<div class="clearfix">
-					<div class="mp-checkout-column">
-						<h4>' . __( 'Have an account?', 'mp' ) . '</h4>
-						<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
-						<div class="mp-checkout-form-row">
-							<label class="mp_form_label" for="mp-checkout-email">' . __( 'E-Mail Address/Username', 'mp' ) . '</label>
-							<input type="text" name="mp_login_email" class="mp_form_input" />
-						</div>
-						<div class="mp-checkout-form-row">
-							<label class="mp_form_label" for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
-							<input type="password" name="mp_login_password" class="mp_form_input" />
-						</div>
-						<button id="mp-button-checkout-login" type="submit" class="mp_button mp_button-medium">' . __( 'Login', 'mp' ) . '</button>
-					</div>
-					<div class="mp-checkout-column">
-						<h4>' . __( 'First-time customer?', 'mp' ) . '</h4>
-						<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-						<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
-					</div>
-				</div>';
+				<div class="mp_checkout_column">
+					<h4 class="mp_sub_title">' . __( 'Have an account?', 'mp' ) . '</h4>
+					<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
+					<div class="mp_checkout_field">
+						<label class="mp_form_label" for="mp-checkout-email">' . __( 'E-Mail Address/Username', 'mp' ) . '</label>
+						<input type="text" name="mp_login_email" class="mp_form_input" />
+					</div><!-- end mp_checkout_field -->
+					<div class="mp_checkout_field">
+						<label class="mp_form_label" for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
+						<input type="password" name="mp_login_password" class="mp_form_input" />
+					</div><!-- end mp_checkout_field -->
+					<button id="mp-button-checkout-login" type="submit" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
+				</div><!-- end mp_checkout_column -->
+				<div class="mp_checkout_column">
+					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
+					<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
+					<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
+				</div><!-- end mp_checkout_column -->
+				';
 		}
 		/**
 		 * Filter the section login html
@@ -1087,23 +1087,21 @@ class MP_Checkout {
 		$is_download_only	 = $cart->is_download_only();
 
 		$html = '
-			<div class="clearfix">
-				<div class="mp-checkout-column">
-					<h3>' . __( 'Billing Address', 'mp' ) . '</h3>' .
+			<div class="mp_checkout_column">
+				<h3 class="mp_sub_title">' . __( 'Billing Address', 'mp' ) . '</h3>' .
 		$this->address_fields( 'billing', true ) . '
-				</div>';
+			</div><!-- end mp_checkout_column -->';
 
 		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
 			$html .= '
-				<div class="mp-checkout-column">
-					<h3>' . __( 'Shipping Address', 'mp' ) . '</h3>' .
+				<div class="mp_checkout_column">
+					<h3 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h3>' .
 			$this->address_fields( 'shipping', true ) . '
-				</div>';
+				</div><!-- end mp_checkout_column -->';
 		}
 
 		$html .= '
-			</div>
-			<h3>' . __( 'Cart', 'mp' ) . '</h3>' .
+			<h3 class="mp_sub_title">' . __( 'Cart', 'mp' ) . '</h3>' .
 		mp_cart()->display( array(
 			'editable' => false
 		) );
@@ -1168,7 +1166,7 @@ class MP_Checkout {
 		}
 
 		$html .= '
-						<div class="mp_checkout-buttons">' .
+						<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
 						</div>';

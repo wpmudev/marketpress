@@ -31,12 +31,12 @@ var mp_checkout;
 					var $state = $( '[name="billing[state]"]' );
 					var $zip = $( '[name="billing[zip]"]' );
 					var type = 'billing';
-					var $row = $state.closest( '.mp-checkout-form-row' );
+					var $row = $state.closest( '.mp_checkout_fields' );
 				} else {
 					var $state = $( '[name="shipping[state]"]' );
 					var $zip = $( '[name="shipping[zip]"]' )
 					var type = 'shipping';
-					var $row = $state.closest( '.mp-checkout-form-row' );
+					var $row = $state.closest( '.mp_checkout_fields' );
 				}
 				
 				var data = {
@@ -51,15 +51,15 @@ var mp_checkout;
 						$row.ajaxLoading( 'false' );
 						if ( resp.data.states ) {
 							$state.html( resp.data.states );
-							$state.trigger( 'change' ).closest( '.mp-checkout-column' ).show();
+							$state.trigger( 'change' ).closest( '.mp_checkout_column' ).show();
 						} else {
-							$state.closest( '.mp-checkout-column' ).hide();
+							$state.closest( '.mp_checkout_column' ).hide();
 						}
 						
 						if ( resp.data.show_zipcode ) {
-							$zip.closest( '.mp-checkout-column' ).show();
+							$zip.closest( '.mp_checkout_column' ).show();
 						} else {
-							$zip.closest( '.mp-checkout-column' ).hide();
+							$zip.closest( '.mp_checkout_column' ).hide();
 						}
 					}
 				} );
@@ -72,7 +72,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		showForm : function() {
-			$( '#mp_checkout_form' ).show();
+			$( '#mp-checkout-form' ).show();
 		},
 		
 		/**
@@ -116,8 +116,8 @@ var mp_checkout;
 		 * @param int count The number of errors.
 		 */
 		errorSummary : function( action, count ) {
-			var $section = $( '.mp-checkout-section' ).filter( '.current' ).find( '.mp-checkout-section-errors' );
-			var $checkout = $( '#mp_checkout_form' );
+			var $section = $( '.mp_checkout_section' ).filter( '.current' ).find( '.mp_checkout_section_errors' );
+			var $checkout = $( '#mp-checkout-form' );
 			
 			if ( undefined === $checkout.data( 'mp-submitted' ) ) {
 				/* form hasn't been submitted so bail. fixes issue with error summary
@@ -141,9 +141,9 @@ var mp_checkout;
 		 * @event mp_checkout/step_changed
 		 */
 		lastStep : function( evt, $out, $in ) {
-			var $checkout = $( '#mp_checkout_form' );
+			var $checkout = $( '#mp-checkout-form' );
 			
-			if ( $in.next( '.mp-checkout-section' ).length == 0 ) {
+			if ( $in.next( '.mp_checkout_section' ).length == 0 ) {
 				$checkout.addClass( 'last-step' );
 			} else {
 				$checkout.removeClass( 'last-step' );
@@ -156,8 +156,8 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		nextStep : function() {
-			var $current = $( '.mp-checkout-section' ).filter( '.current' );
-			var $next = $current.next( '.mp-checkout-section' );
+			var $current = $( '.mp_checkout_section' ).filter( '.current' );
+			var $next = $current.next( '.mp_checkout_section' );
 			this.changeStep( $current, $next );
 		},
 		
@@ -170,9 +170,9 @@ var mp_checkout;
 		 */
 		changeStep : function( $out, $in ) {
 			$out.find( '.mp-tooltip' ).tooltip( 'close' );
-			$out.find( '.mp-checkout-section-content' ).slideUp( 500, function() {
+			$out.find( '.mp_checkout_section_content' ).slideUp( 500, function() {
 				$out.removeClass( 'current' );
-				$in.find( '.mp-checkout-section-content' ).slideDown( 500, function() {
+				$in.find( '.mp_checkout_section_content' ).slideDown( 500, function() {
 					$in.addClass( 'current' );
 					
 					/**
@@ -195,7 +195,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		initCheckoutSteps : function(){
-			var $checkout = $(' #mp_checkout_form' );
+			var $checkout = $(' #mp-checkout-form' );
 			var formSubmitted = false;
 						
 			// Trim values before validating
@@ -214,9 +214,9 @@ var mp_checkout;
 			} );
 			
 			// Go to step when clicking on section heading
-			$checkout.find( '.mp-checkout-section-heading-link' ).on( 'click', function( e ) {
+			$checkout.find( '.mp_checkout_section_heading-link' ).on( 'click', function( e ) {
 				var $this = $( this );
-				var $section = $this.closest( '.mp-checkout-section' );
+				var $section = $this.closest( '.mp_checkout_section' );
 				var $current = $section.nextAll( '.current' );
 				
 				if ( $current.length > 0 ) {
@@ -314,7 +314,7 @@ var mp_checkout;
 							
 							$.post( url, $form.serialize() ).done( function( resp ){
 								$.each( resp.data, function( index, value ){
-									$( '#' + index ).find( '.mp-checkout-section-content' ).html( value );
+									$( '#' + index ).find( '.mp_checkout_section_content' ).html( value );
 								} );
 								
 								mp_checkout.initCardValidation();
@@ -423,10 +423,10 @@ var mp_checkout;
 		 * @access public
 		 */
 		initPaymentOptionListeners : function(){
-			$( '.mp-checkout-section' ).on( 'click change', 'input[name="payment_method"]', function(){
+			$( '.mp_checkout_section' ).on( 'click change', 'input[name="payment_method"]', function(){
 				var $this = $( this ),
 						$target = $( '#mp-gateway-form-' + $this.val() ),
-						$checkout = $( '#mp_checkout_form' ),
+						$checkout = $( '#mp-checkout-form' ),
 						$submit = $checkout.find( ':submit' ).filter( ':visible' );
 				
 				if ( ! $checkout.hasClass( 'last-step' ) ) {
@@ -514,7 +514,7 @@ var mp_checkout;
 		 * @since 3.0
 		 */
 		triggerStepChange : function() {
-			var $current = $( '.mp-checkout-section' ).filter( '.current' );
+			var $current = $( '.mp_checkout_section' ).filter( '.current' );
 			$( document ).trigger( 'mp_checkout/step_changed', [ $current, $current ] );
 		}
 	};

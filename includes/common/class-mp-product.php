@@ -598,7 +598,7 @@ class MP_Product {
 		if ( $this->get_meta( 'product_type' ) == 'external' && ($url	 = $this->get_meta( 'external_url' )) ) {
 			$button = '<a class="mp_link-buynow" href="' . esc_url( $url ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>';
 		} elseif ( !mp_get_setting( 'disable_cart' ) ) {
-			$button = '<form class="mp_form mp_buy_form" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
+			$button = '<form class="mp_form mp_form-buy" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
 
 			if ( !$this->in_stock() ) {
 				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';

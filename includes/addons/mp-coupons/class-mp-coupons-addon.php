@@ -287,23 +287,22 @@ class MP_Coupons_Addon {
 		$coupons = $this->get_applied_as_objects();
 
 		$html .= '
-			<div id="mp-cart-meta-line-coupons" class="mp-cart-meta-line clearfix">
-				<strong class="mp-cart-meta-line-label">' . __( 'Coupon Discounts', 'mp' ) . '</strong>
-				<span class="mp-cart-meta-line-amount">' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
-				<div class="clear"></div>
-				<ul id="mp-cart-meta-line-coupons-list">';
+			<div class="mp_cart_resume_item mp_cart_resume_item-coupons">
+				<span class="mp_cart_resume_item_label">' . __( 'Coupon Discounts', 'mp' ) . '</span>
+				<span class="mp_cart_resume_item_amount">' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
+				<ul class="mp_cart_resume_coupons_list">';
 
 		foreach ( $coupons as $coupon ) {
 			$html .= '
-					<li class="mp-cart-coupon clearfix">
-						<strong class="mp-cart-meta-line-label">' . $coupon->post_title . ( ( $cart->is_editable ) ? ' <a class="mp-cart-coupon-remove-link" href="javascript:mp_coupons.remove(' . $coupon->ID . ', ' . $cart->get_blog_id() . ');">(' . __( 'Remove', 'mp' ) . ')</a>' : '' ) . '</strong>
-						<span class="mp-cart-meta-line-amount">' . $coupon->discount_amt( false ) . '</span>
-					</li>';
+					<li class="mp_cart_coupon">
+						<span class="mp_cart_resume_item_label">' . $coupon->post_title . ( ( $cart->is_editable ) ? ' <a class="mp_cart_coupon_remove_item" href="javascript:mp_coupons.remove(' . $coupon->ID . ', ' . $cart->get_blog_id() . ');">(' . __( 'Remove', 'mp' ) . ')</a>' : '' ) . '</span>
+						<span class="mp_cart_resume_item_amount">' . $coupon->discount_amt( false ) . '</span>
+					</li><!-- end mp_cart_coupon -->';
 		}
 
 		$html .= '
-				</ul>
-			</div>';
+				</ul><!-- end mp_cart_resume_coupons_list -->
+			</div><!-- end mp_cart_resume_item_coupons -->';
 
 		return $html;
 	}
@@ -365,8 +364,8 @@ class MP_Coupons_Addon {
 	public function coupon_form_cart( $html, $cart, $args ) {
 		if ( $cart->is_editable && mp_addons()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
 			$html .= '
-				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp_coupon-form' . ( ( $cart->is_global ) ? ' mp-coupon-form-store' : '' ) . '">
-					<h3>' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
+				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp_coupon_form' . ( ( $cart->is_global ) ? ' mp_coupon_form-store' : '' ) . '">
+					<h3 class="mp_sub_title">' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
 					<span class="mp_coupon_input">
 						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp_form_input mp_form_input-small" value="" />
 					</span>

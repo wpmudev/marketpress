@@ -44,7 +44,7 @@ var marketpress = { };
         $this.equalHeights();
         $this.find( '.mp_product_detail' ).equalHeights();
         $this.find( '.mp_one_product' ).equalHeights();
-        $this.find( '.mp_buy_form' ).addClass( 'sticky' );
+        $this.find( '.mp_form-buy' ).addClass( 'sticky' );
         $this.find( '.hmedia' ).equalHeights();
     }
 
@@ -53,7 +53,7 @@ var marketpress = { };
             var $this = $( this );
             $this.find( '.mp_product_detail' ).equalHeights();
             $this.find( '.mp_one_product' ).equalHeights();
-            $this.find( '.mp_buy_form' ).addClass( 'sticky' );
+            $this.find( '.mp_forn-buy' ).addClass( 'sticky' );
             $this.find( '.hmedia' ).equalHeights();
         } );
 
@@ -126,7 +126,7 @@ var marketpress = { };
                 var $this = $( this );
                 $this.find( '.mp_product_detail' ).equalHeights();
                 $this.find( '.mp_one_product' ).equalHeights();
-                $this.find( '.mp_buy_form' ).addClass( 'sticky' );
+                $this.find( '.mp_form-buy' ).addClass( 'sticky' );
                 $this.find( '.hmedia' ).equalHeights();
             } );
 
