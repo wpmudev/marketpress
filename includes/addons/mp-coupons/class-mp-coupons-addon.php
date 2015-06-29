@@ -365,7 +365,7 @@ class MP_Coupons_Addon {
 		if ( $cart->is_editable && mp_addons()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
 			$html .= '
 				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp_coupon_form' . ( ( $cart->is_global ) ? ' mp_coupon_form-store' : '' ) . '">
-					<h3>' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
+					<h3 class="mp_sub_title">' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
 					<span class="mp_coupon_input">
 						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp_form_input mp_form_input-small" value="" />
 					</span>

@@ -545,7 +545,7 @@ class MP_Cart {
 
 		if ( !empty( $header ) ) {
 			$line .= '
-				<div class="mp_cart_resume_head">' . $header . '</div>';
+				<div class="mp_cart_resume_head"><h3 class="mp_sub_title">' . $header . '</h3></div>';
 		}
 
 		$line .= '
