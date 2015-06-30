@@ -208,7 +208,7 @@ var marketpress = { };
 
             $( '.mp_product_meta a.more-link' ).live( 'click', function( e ) {
                 e.preventDefault( );
-                $( '#mp_single_product a.mp_product_tab_label_link.mp-product-overview' ).click( );
+                $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
                 $( 'html, body' ).animate( {
                     scrollTop: $( "a.mp_product_tab_label_link.mp-product-overview" ).offset( ).top - 30
                 }, 500 );
@@ -219,7 +219,7 @@ var marketpress = { };
                     $tab = $this.parent( ),
                     $target = $( $this.attr( 'href' ) );
                 $tab.addClass( 'current' ).siblings( ).removeClass( 'current' );
-                $target.show( ).siblings( '.mp_product_content' ).hide( );
+                $target.show( ).siblings( '.mp_product_tab_content' ).hide( );
                 equal_height( $( '#mp-related-products .mp_grid_row' ) );
             } );
             if ( window.location.hash.length > 0 ) {

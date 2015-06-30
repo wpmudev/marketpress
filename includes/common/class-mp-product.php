@@ -127,8 +127,8 @@ class MP_Product {
 			<div class="mp_product_options_content">
 				<h3 class="mp_product_name"><?php echo $product->post_title; ?></h3>
 				<?php $product->display_price(); ?>
-				<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div>
-				<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div>
+				<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
+				<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
 				<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
 					<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
 				<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
@@ -330,7 +330,7 @@ class MP_Product {
 		$atts = $this->get_attributes();
 
 		$html = '
-			<div class="mp_product_options_atts clearfix">';
+			<div class="mp_product_options_atts">';
 
 		foreach ( $atts as $slug => $att ) {
 			/**
@@ -345,7 +345,7 @@ class MP_Product {
 			$html .= '
 				<div class="mp_product_options_att">
 					<strong class="mp_product_options_att_label">' . $att[ 'name' ] . '</strong>
-					<div class="clearfix mp_product_options_att_input_label">
+					<div class="mp_product_options_att_input_label">
 						<select id="mp_' . $slug . '" name="' . $slug . '" class="mp_select2 required" autocomplete="off">
 							<option value="">' . $default_option_label . '</option>';
 
@@ -360,8 +360,8 @@ class MP_Product {
 
 			$html .= '
 						</select>
-					</div>
-				</div>';
+					</div><!-- end mp_product_options_att_input_label -->
+				</div><!-- end mp_product_options_att -->';
 		}
 
 		$input_id = 'mp_product_options_att_quantity';
@@ -376,12 +376,12 @@ class MP_Product {
 		$html .= '
 				<div class="mp_product_options_att"' . (( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"') . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
-					<div class="clearfix">
+					<div class="mp_form_field mp_product_options_att_field">
 						<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"></label>
-						<input id="' . $input_id . '" class="mp_form_input required digits" min="1" type="number" name="product_quantity" value="1" ' . $disabled . '  />
-					</div>
-				</div>
-			</div>';
+						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="1" type="number" name="product_quantity" value="1" ' . $disabled . '  />
+					</div><!-- end mp_product_options_att_field -->
+				</div><!-- end mp_product_options_att -->
+			</div><!-- end mp_product_options_atts -->';
 
 
 		/**
@@ -598,7 +598,7 @@ class MP_Product {
 		if ( $this->get_meta( 'product_type' ) == 'external' && ($url	 = $this->get_meta( 'external_url' )) ) {
 			$button = '<a class="mp_link-buynow" href="' . esc_url( $url ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>';
 		} elseif ( !mp_get_setting( 'disable_cart' ) ) {
-			$button = '<form class="mp_form mp_form-buy" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
+			$button = '<form id="mp-buy-product-' . $this->ID . '-form" class="mp_form mp_form-buy-product" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
 
 			if ( !$this->in_stock() ) {
 				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';
@@ -624,7 +624,7 @@ class MP_Product {
 				}
 			}
 
-			$button .= '</form>';
+			$button .= '</form><!-- end mp-buy-product-form -->';
 		}
 
 		$button = apply_filters( 'mp_buy_button_tag', $button, $this->ID, $context );
@@ -728,7 +728,7 @@ class MP_Product {
 	 */
 	public function content_tab_labels( $echo = true ) {
 		$html = '
-			<ul class="mp_product_tab_labels clearfix">';
+			<ul class="mp_product_tab_labels">';
 
 		$index = 0;
 		foreach ( $this->content_tabs as $slug => $label ) {
@@ -738,7 +738,7 @@ class MP_Product {
 		}
 
 		$html .= '
-			</ul>';
+			</ul><!-- end mp_product_tab_labels -->';
 
 		/**
 		 * Filter the product tabs html
@@ -1131,7 +1131,7 @@ class MP_Product {
 					break;
 			}
 		} else {
-			$html .= wpautop( __( ' There are no related products for this item.', 'mp' ) );
+			$html .= wpautop( __( '<p class="mp_related_products_empty_message">There are no related products for this item.</p>', 'mp' ) );
 		}
 
 		/**

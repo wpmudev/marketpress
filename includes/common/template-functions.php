@@ -1697,8 +1697,9 @@ if ( !function_exists( 'mp_product' ) ) {
 		$image_alignment = mp_get_setting( 'image_alignment_single' );
 
 		$return = '
-			<div id="mp_single_product" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product ' . ($has_image ? 'mp_product-has-image' : '') . ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . ' ' . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
+			<!-- MP Single Product -->
+			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
+				<div class="mp_product ' . ($has_image ? 'mp_product-has-image mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') .'' : '') . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
 
 
 		if ( $image ) {
@@ -1713,11 +1714,11 @@ if ( !function_exists( 'mp_product' ) ) {
 				}
 
 				if ( $values ) {
-					$return .= '<div class = "mp-product-images">';
+					$return .= '<div class = "mp_product_images">';
 
 					$return .= "<script>
 								jQuery(document).ready(function() {
-									jQuery('#mp_product_gallery').lightSlider({
+									jQuery('#mp-product-gallery').lightSlider({
 												gallery:true,
 												item:1,
 												loop:true,
@@ -1727,14 +1728,14 @@ if ( !function_exists( 'mp_product' ) ) {
 												currentPagerPosition:'left',
 												onSliderLoad: function(el) {
 												el.lightGallery({
-												selector: '#mp_product_gallery .lslide'
+												selector: '#mp-product-gallery .lslide'
 											});
 										}
 									});
 								});
 								</script>";
 
-					$return .= '<ul id = "mp_product_gallery">';
+					$return .= '<ul id = "mp-product-gallery" class="mp_product_gallery">';
 
 					$values = explode( ',', $values );
 
@@ -1743,19 +1744,19 @@ if ( !function_exists( 'mp_product' ) ) {
 						$return .= '<li data-thumb = "' . $img_url[ 0 ] . '" data-src = "' . $img_url[ 0 ] . '"><img src = "' . $img_url[ 0 ] . '" /></li>';
 					}
 
-					$return .= '</ul>';
+					$return .= '</ul><!-- end mp_product_gallery -->';
 
-					$return .= '</div>';
+					$return .= '</div><!-- end mp_product_images -->';
 				}
 			} else {
 				$return .= '<div class = "mp-product-images">';
 				$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
-				$return .= '</div>';
+				$return .= '</div><!-- end mp_product_images -->';
 			}
 		}
 
 		if ( $image ) {
-			$return .= '<div class = "mp-product-details">';
+			$return .= '<div class="mp_product_details">';
 
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
@@ -1775,11 +1776,11 @@ if ( !function_exists( 'mp_product' ) ) {
 			if ( !$variation ) {
 				$return .= '<div class = "mp_product_excerpt mp_product_options_excerpt">';
 				$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
-				$return .= '</div>';
+				$return .= '</div><!-- end mp_product_excerpt -->';
 			} else {
 				$return .= '<div class = "mp_product_excerpt mp_product_options_excerpt">';
 				$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
-				$return .= '</div>';
+				$return .= '</div><!-- end mp_product_excerpt -->';
 			}
 
 			// Button
@@ -1794,17 +1795,17 @@ if ( !function_exists( 'mp_product' ) ) {
 
 			$return .= $product->buy_button( false, 'single', $selected_atts );
 
-			$return .= '<div class="mp-social-shares">';
+			$return .= '<div class="mp_social_shares">';
 			$return .= $pinit;
 			$return .= $fb;
 			$return .= $twitter;
-			$return .= '</div>';
+			$return .= '</div><!-- end mp_social_shares -->';
 
-			$return .= '</div><!--mp-product-details-->';
+			$return .= '</div><!-- end mp_product_meta-->';
 		}
 
 		if ( $image ) {
-			$return .= '</div>';
+			$return .= '</div><!-- end mp_product_details-->';
 		}
 
 		$return .= '<div class="mp_product_extra">';
@@ -1812,10 +1813,10 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( !empty( $content ) ) {
 			$return .= '
-<div id = "mp-product-overview" class = "mp_product_content clearfix">';
+<div id="mp-product-overview" class="mp_product_tab_content mp_product_tab_content-overview">';
 
 			$return .= '
-<div itemprop = "description" class = "mp_product_content_text">';
+<div itemprop="description" class="mp_product_tab_content_text">';
 
 			if ( $content == 'excerpt' ) {
 				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
@@ -1824,8 +1825,8 @@ if ( !function_exists( 'mp_product' ) ) {
 			}
 
 			$return .= '
-</div>
-</div>';
+</div><!-- end mp_product_tab_content_text -->
+</div><!-- end mp-product-overview -->';
 		}
 
 		// Remove overview tab as it's already been manually output above
@@ -1843,7 +1844,10 @@ if ( !function_exists( 'mp_product' ) ) {
 						if ( !is_null( $args[ 'list_view' ] ) ) {
 							$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 						}
-						$return .= '<div id="mp-related-products" class="mp_product_content ' . (isset( $view ) ? 'mp_' . $view : 'mp_list') . ' clearfix" style="display:none">' . $product->related_products() . ' </div>';
+						$return .= '
+						<div id="mp-related-products" class="mp_product_tab_content mp_product_tab_content-related-products" style="display:none">
+							<div class="mp_product_tab_content_products mp_products mp_products-related ' . (isset( $view ) ? 'mp_' . $view : 'mp_list') . '">' . $product->related_products() . ' </div>
+						</div><!-- end mp-related-products -->';
 					}
 					break;
 
@@ -1857,15 +1861,18 @@ if ( !function_exists( 'mp_product' ) ) {
 					 */
 					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
 
-					$return .= '<div id="' . esc_attr( $slug ) . '" class="mp_product_content clearfix" style="display:none">' . $tab . '</div>';
+					$return .= '
+					<div id="' . esc_attr( $slug ) . '" class="mp_product_tab_content mp_product_tab_content-related-products" style="display:none">
+						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
+					</div><!-- end '. esc_attr( $slug ) . ' -->';
 					break;
 			}
 		}
-		$return .= '</div>';
+		$return .= '</div><!-- end mp_product_extra -->';
 		$return .= '
 			
-</div>			
-</div>';
+</div><!-- end mp_product -->	
+</section><!-- end mp-single-product -->';
 
 		/**
 		 * Filter the product html
