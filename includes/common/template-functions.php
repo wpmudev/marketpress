@@ -1,5 +1,37 @@
 <?php
 
+if ( !function_exists( 'mp_number_format' ) ) {
+
+	function mp_number_format( $amount ) {
+
+		$decimals = apply_filters( 'mp_number_format_decimals', 2 );
+
+		switch ( mp_get_setting( 'price_format' ) ) {
+			case 'us' :
+				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ".", $thousands_sep	 = "," );
+				break;
+
+			case 'eu' :
+				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ",", $thousands_sep	 = "." );
+				break;
+
+			case 'frc' :
+				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ",", $thousands_sep	 = "&nbsp;" );
+				break;
+
+			case 'frd' :
+				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ".", $thousands_sep	 = "&nbsp;" );
+				break;
+
+			default ://us
+				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ".", $thousands_sep	 = "," );
+		}
+
+		return $formatted;
+	}
+
+}
+
 if ( !function_exists( 'mp_tag_cloud' ) ) :
 
 	/**
@@ -68,8 +100,7 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 			$history = array_slice( $history, $offset, $per_page );
 			$html .= '
 				<h2 class="mp_title">' . __( 'Order History', 'mp' ) . '</h2>' .
-				
-				'<div class="mp_order_details">';
+			'<div class="mp_order_details">';
 
 			foreach ( $history as $timestamp => $order ) {
 				$order = new MP_Order( $order[ 'id' ] );
@@ -77,7 +108,7 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 				$html .= $order->header( false );
 				$html .= '</div><!-- end mo_order -->';
 			}
-			
+
 			$html .= '</div><!-- end mp_order_details -->';
 
 			if ( $total_pages > 1 ) {
@@ -551,19 +582,19 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 
 			switch ( mp_get_setting( 'curr_symbol_position' ) ) {
 				case 1 :
-					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post;
+					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post;
 					break;
 
 				case 2 :
-					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . ' ' . $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post;
+					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . '&nbsp;' . $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post;
 					break;
 
 				case 3 :
-					$formatted = $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post . $currency_pre . $symbol . $currency_post;
+					$formatted = $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post . $currency_pre . $symbol . $currency_post;
 					break;
 
 				case 4 :
-					$formatted = $price_pre . number_format_i18n( $amount, $decimal_place ) . $price_post . ' ' . $currency_pre . $symbol . $currency_post;
+					$formatted = $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post . '&nbsp;' . $currency_pre . $symbol . $currency_post;
 					break;
 			}
 		}

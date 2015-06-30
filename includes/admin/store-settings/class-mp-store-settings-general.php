@@ -381,6 +381,7 @@ class MP_Store_Settings_General {
 			'options'		 => $options,
 			'width'			 => 'element',
 		) );
+		
 		$metabox->add_field( 'radio_group', array(
 			'name'			 => 'curr_symbol_position',
 			'label'			 => array( 'text' => __( 'Currency Symbol Position', 'mp' ) ),
@@ -391,6 +392,19 @@ class MP_Store_Settings_General {
 				'2'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span> 100',
 				'3'	 => '100<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
 				'4'	 => '100 <span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
+			),
+		) );
+		
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'price_format',
+			'label'			 => array( 'text' => __( 'Price Format', 'mp' ) ),
+			'default_value'	 => 'en',
+			'orientation'	 => 'horizontal',
+			'options'		 => array(
+				'en'	 => '1,123.45',
+				'eu'	 => '1.123,45',
+				'frc'	 => '1 123,45',
+				'frd'	 => '1 123.45',
 			),
 		) );
 	}
