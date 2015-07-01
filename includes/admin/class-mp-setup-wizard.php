@@ -112,7 +112,7 @@ class MP_Setup_Wizard {
 			$metabox->add_field( 'text', array(
 				'name'			 => 'base_zip',
 				'label'			 => array( 'text' => __( 'Base Zip/Postal Code', 'mp' ) ),
-				'style'			 => 'width:150px;',
+				'style'			 => 'max-width: 150px;',
 				'custom'		 => array(
 					'minlength' => 3,
 				),
@@ -130,7 +130,7 @@ class MP_Setup_Wizard {
 				'name'		 => 'zip_label',
 				'label'		 => array( 'text' => __( 'Zip/Postal Code Label', 'mp' ) ),
 				'custom'	 => array(
-					'style' => 'width:300px',
+					'style' => 'max-width: 300px',
 				),
 				'validation' => array(
 					'required' => true,
@@ -213,7 +213,7 @@ class MP_Setup_Wizard {
 				'name'			 => 'tax[rate]',
 				'label'			 => array( 'text' => __( 'Default Tax Rate', 'mp' ) ),
 				'after_field'	 => '%',
-				'style'			 => 'width:75px',
+				'style'			 => 'max-width:75px',
 				'validation'	 => array(
 					'number' => true,
 				),
@@ -244,7 +244,7 @@ class MP_Setup_Wizard {
 			$metabox->add_field( 'text', array(
 				'name'			 => 'tax[label]',
 				'label'			 => array( 'text' => __( 'Tax Label', 'mp' ) ),
-				'style'			 => 'width:300px',
+				'style'			 => 'max-width: 300px',
 				'placeholder'	 => __( 'I.e. Taxes, VAT, GST, etc', 'mp' )
 			) );
 			$metabox->add_field( 'checkbox', array(
