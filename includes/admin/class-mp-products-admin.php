@@ -298,6 +298,7 @@ class MP_Products_Screen {
 	public function product_columns_head( $columns ) {
 		return array(
 			'cb'						 => '<input type="checkbox" />',
+			'product_image'				 => __( 'Img', 'mp' ),
 			'title'						 => __( 'Product Name', 'mp' ),
 			'product_variations'		 => __( 'Variations', 'mp' ),
 			'product_sku'				 => __( 'SKU', 'mp' ),
@@ -321,53 +322,91 @@ class MP_Products_Screen {
 		$variations	 = $product->get_variations();
 
 		switch ( $column ) {
+			case 'product_image' :
+				if ( $product->has_variations() ) {
+					$variation_has_thumbnail = false;
+
+					foreach ( $variations as $variation ) {
+						if ( has_post_thumbnail( $variation->ID ) && $variation_has_thumbnail == false ) {
+							$variation_has_thumbnail = $variation->ID;
+						}
+					}
+
+					if ( is_numeric( $variation_has_thumbnail ) ) {
+						$image = get_the_post_thumbnail( $variation_has_thumbnail, array( 30, 30 ) );
+					} else {
+						$image = '<img src="' . mp_plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ) . '">';
+					}
+				} else {
+					if ( has_post_thumbnail( $post_id ) ) {
+						$image = get_the_post_thumbnail( $post_id, array( 30, 30 ) );
+					} else {
+						$image = '<img src="' . mp_plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ) . '">';
+					}
+				}
+
+				echo $image;
+				break;
 			case 'product_variations' :
 				if ( $product->has_variations() ) {
 					$names = array();
 					foreach ( $variations as $variation ) {
 						$names[] = $variation->get_meta( 'name' );
 					}
+					$names = count( $names );
 				} else {
-					$names = array( '&mdash;' );
+					$names = '&mdash;';
 				}
 
-				echo implode( '<br />', $names );
+				echo $names; //implode( '<br />', $names );
 				break;
 
 			case 'product_sku' :
 				if ( $product->has_variations() ) {
-					$skus = array();
-					foreach ( $variations as $variation ) {
-						$skus[] = $variation->get_meta( 'sku', '&mdash;' );
-					}
+					$skus	 = array();
+					/* foreach ( $variations as $variation ) {
+					  $skus[] = $variation->get_meta( 'sku', '&mdash;' );
+					  } */
+					$skus	 = '&mdash;';
 				} else {
-					$skus = array( $product->get_meta( 'sku', '&mdash;' ) );
+					$skus = $product->get_meta( 'sku', '&mdash;' );
 				}
 
-				echo implode( '<br />', $skus );
+				//echo implode( '<br />', $skus );
+				echo $skus;
 				break;
 
 			case 'product_price' :
 				if ( $product->has_variations() ) {
-					$prices = array();
-					foreach ( $variations as $variation ) {
-						$price = $variation->get_price();
-						if ( $variation->on_sale() ) {
-							$prices[] = '<strike>' . mp_format_currency( '', $price[ 'regular' ] ) . '</strike> ' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] );
-						} else {
-							$prices[] = mp_format_currency( '', $price[ 'regular' ] );
-						}
+					$prices			 = array();
+					//$price = $prices->get_price();
+					$variation_price = $product->get_price();
+					if ( $variation_price[ 'lowest' ] !== $variation_price[ 'highest' ] ) {
+						$prices = mp_format_currency( '', $variation_price[ 'lowest' ] ) . ' - ' . mp_format_currency( '', $variation_price[ 'highest' ] );
+					} else {
+						$prices = mp_format_currency( '', $variation_price[ 'lowest' ] );
 					}
+					/* foreach ( $variations as $variation ) {
+					  $price = $prices->get_price();
+					  var_dump($price);
+					  if ( $variation->on_sale() ) {
+					  //$prices[] = '<strike>' . mp_format_currency( '', $price[ 'regular' ] ) . '</strike> ' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] );
+					  } else {
+					  //$prices[] = mp_format_currency( '', $price[ 'regular' ] );
+					  }
+
+					  $prices = mp_format_currency( '', $price[ 'lowest' ] ).' - '.mp_format_currency( '', $price[ 'highest' ] );
+					  } */
 				} else {
 					$price = $product->get_price();
 					if ( $product->on_sale() ) {
-						$prices = array( '<strike>' . mp_format_currency( '', $price[ 'regular' ] ) . '</strike> ' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) );
+						$prices = '<strike>' . mp_format_currency( '', $price[ 'regular' ] ) . '</strike> ' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] );
 					} else {
-						$prices = array( mp_format_currency( '', $price[ 'regular' ] ) );
+						$prices = mp_format_currency( '', $price[ 'regular' ] );
 					}
 				}
 
-				echo implode( '<br />', $prices );
+				echo $prices;
 				echo '
 					<div style="display:none">
 						<div id="quick-edit-product-content-' . $post_id . '">
@@ -380,30 +419,34 @@ class MP_Products_Screen {
 
 			case 'product_stock' :
 				if ( $product->has_variations() ) {
-					$stock = array();
 					foreach ( $variations as $variation ) {
-						$stock[] = $variation->get_meta( 'inventory', '&mdash;' );
+						$stock_val = $variation->get_meta( 'inventory', '&mdash;' );
+						if ( is_numeric( $stock_val ) ) {
+							$stock = $stock + $variation->get_meta( 'inventory', '&mdash;' );
+						} else {
+							$stock = '&mdash;';
+						}
 					}
 				} else {
-					$stock = array( $product->get_meta( 'inventory', '&mdash;' ) );
+					$stock = $product->get_meta( 'inventory', '&mdash;' );
 				}
 
-				$display_stock = implode( '<br />', $stock );
+				$display_stock = $stock;
 
-				echo $display_stock == 'Array' ? '&mdash;' : $display_stock;
+				echo $display_stock == 'Array' ? '&mdash;' : is_numeric( $display_stock ) ? $display_stock : '&mdash;';
 				break;
 
 			case 'product_sales' :
 				if ( $product->has_variations() ) {
-					$sales = array();
+					$sales = 0;
 					foreach ( $variations as $variation ) {
-						$sales[] = $variation->get_meta( 'mp_sales_count', 0 );
+						$sales = $sales + $variation->get_meta( 'mp_sales_count', 0 );
 					}
 				} else {
-					$sales = array( $product->get_meta( 'mp_sales_count', 0 ) );
+					$sales = $product->get_meta( 'mp_sales_count', 0 );
 				}
 
-				echo implode( '<br />', $sales );
+				echo $sales;
 				break;
 		}
 	}
@@ -1038,7 +1081,7 @@ class MP_Products_Screen {
 		//'external'	 => __( 'External / Affiliate Link', 'mp' ),
 		);
 
-		$post_id = isset($_GET[ 'post' ]) ? $_GET[ 'post' ] : 0;
+		$post_id = isset( $_GET[ 'post' ] ) ? $_GET[ 'post' ] : 0;
 
 		$has_variations = get_post_meta( (int) $post_id, 'has_variations', false );
 		if ( !$has_variations ) {

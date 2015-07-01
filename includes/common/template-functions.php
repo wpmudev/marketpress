@@ -1363,7 +1363,8 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			if ( !is_null( $args[ 'per_page' ] ) ) {
 				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
 			} else {
-				$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
+				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
+				//$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
 			}
 
 // Figure out page
