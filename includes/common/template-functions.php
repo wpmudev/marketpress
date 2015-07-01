@@ -171,7 +171,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$img = $product->image( false, 'list', null, $align, true );
 
-			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
+			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_product_excerpt">' . $product->excerpt() . '</div><!-- end mp_product_excerpt -->' : '';
 			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
 
 			$pinit	 = $product->pinit_button( 'all_view' );
@@ -187,7 +187,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			if ( 'grid' == $view ) {
 				if ( $column == 1 ) {
 					$class[] = 'first';
-					$html .= '<div class="mp_grid_row">';
+					$html .= '<div class="mp_products_items">';
 					$column ++;
 				} elseif ( $column == $per_row ) {
 					$class[] = 'last';
@@ -204,43 +204,46 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$align_class = ($view == 'list') ? ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignleft') : '';
 
 			$html .= '
-				<div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . (( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '') . '">
-					<div class="' . (( 'grid' == $view ) ? 'mp_one_product' : 'mp_product') . ' ' . ((strlen( $img ) > 0 ) ? 'mp_product-has-image' . $align_class : '') . '">
-						<div class="mp-product-images">
+				<div class="mp_product_item'.(( 'grid' == $view ) ? ' mp_product_item-col-' . $per_row : '') . '">
+					<div itemscope itemtype="http://schema.org/Product" class="mp_product' . ((strlen( $img ) > 0 ) ? ' mp_product-has-image' . $align_class : '') . ' ' . implode( $class, ' ' ) . '">
+					
+						<div class="mp_product_images">
 							' . $img . '
-						</div>
-						<div class="mp-product-details">
+						</div><!-- end mp_product_images -->
+						
+						<div class="mp_product_details">
  							<h3 class="mp_product_name entry-title" itemprop="name">
  								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
  							</h3>
-							<div class="mp-product-meta">
+							<div class="mp_product_meta">
 								' . $product->display_price( false ) . '
  								' . $mp_product_list_content . '
 								' . $product->buy_button( false, 'list' ) . '
 								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
-								<div class="mp-social-shares">
+								<div class="mp_social_shares">
 									' . $pinit . '
 									' . $fb . '
 									' . $twitter . '
-								</div>
-							</div>
- 						</div>
+								</div><!-- end mp_social_shares -->
+							</div><!-- end mp_product_meta -->
+ 						</div><!-- end mp_product_meta -->
 	
 						<div style="display:none">
 							<span class="entry-title">' . $product->title( false ) . '</span> was last modified:
 							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
 							<span class="author vcard"><span class="fn">' . get_the_author_meta( 'display_name' ) . '</span></span>
 						</div>
-					</div>
-				</div>';
+						
+					</div><!-- end mp_product -->
+				</div><!-- end mp_product_item -->';
 
 			if ( $column == 1 && $view == 'grid' ) {
-				$html .= '</div><!-- END .mp_grid_row -->';
+				$html .= '</div><!-- end mp_products_items -->';
 			}
 		endwhile;
 
 		if ( $column != 1 && $view == 'grid' ) {
-			$html .= '</div><!-- END .mp_grid_row -->';
+			$html .= '</div><!-- end mp_products_items -->';
 		}
 
 		/* if ( $view == 'grid' ) {
@@ -1419,6 +1422,8 @@ if ( !function_exists( 'mp_list_products' ) ) :
 		if ( !is_null( $args[ 'list_view' ] ) ) {
 			$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 		}
+		
+		//$layout_type_output = (( 'grid' == $layout_type ) ? 'mp_products-grid' : 'mp_products-list');
 
 // Build content
 		$content = '';
@@ -1428,15 +1433,15 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			$content .= ( (is_null( $args[ 'filters' ] ) && 1 == mp_get_setting( 'show_filters' )) || $args[ 'filters' ] ) ? mp_products_filter( false, $per_page, $custom_query ) : mp_products_filter( true, $per_page, $custom_query );
 		}
 
-		$content .= '<div id="mp_product_list" class="clearfix hfeed mp_' . $layout_type . '">';
+		$content .= '<!-- MP Product List --><section id="mp-products" class="hfeed mp_products mp_products-' . $layout_type . '">';
 
 		if ( $last = $custom_query->post_count ) {
 			$content .= $layout_type == 'grid' ? _mp_products_html_grid( $custom_query ) : _mp_products_html_list( $custom_query );
 		} else {
-			$content .= '<div id="mp_no_products">' . apply_filters( 'mp_product_list_none', __( 'No Products', 'mp' ) ) . '</div>';
+			$content .= '<div id="mp-products-empty">' . apply_filters( 'mp_product_list_none', __( 'No Products', 'mp' ) ) . '</div><!-- end mp-no-products -->';
 		}
 
-		$content .= '</div>';
+		$content .= '</div><!-- end mp-products -->';
 
 		$content .= (!$args[ 'nopaging' ] ) ? mp_products_nav( false, $custom_query ) : '';
 
@@ -1699,7 +1704,7 @@ if ( !function_exists( 'mp_product' ) ) {
 		$return = '
 			<!-- MP Single Product -->
 			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product ' . ($has_image ? 'mp_product-has-image mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') .'' : '') . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
+				<div class="mp_product ' . ($has_image ? 'mp_product-has-image mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
 
 
 		if ( $image ) {
@@ -1864,7 +1869,7 @@ if ( !function_exists( 'mp_product' ) ) {
 					$return .= '
 					<div id="' . esc_attr( $slug ) . '" class="mp_product_tab_content mp_product_tab_content-related-products" style="display:none">
 						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
-					</div><!-- end '. esc_attr( $slug ) . ' -->';
+					</div><!-- end ' . esc_attr( $slug ) . ' -->';
 					break;
 			}
 		}
@@ -2067,7 +2072,7 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 		}
 
 		$return = '
-		<a id="mp_product_top"></a>
+		<a id="mp-product-top"></a>
 		<!-- Products Filter -->
 		<section class="mp_products_filter"' . (( $hidden ) ? ' style="display:none"' : '') . '>
 			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">

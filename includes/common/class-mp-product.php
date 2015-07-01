@@ -1302,7 +1302,7 @@ class MP_Product {
 				}
 
 				$link		 = get_permalink( $this->ID );
-				$link_class	 = ' class="mp_img_link"';
+				$link_class	 = ' class="mp_product_img_link"';
 				$img_align	 = is_null( $align ) ? mp_get_setting( 'image_alignment_list' ) : $align;
 				break;
 
@@ -1378,7 +1378,7 @@ class MP_Product {
 				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>';
 
 		if ( $link ) {
-			$snippet .= '<a rel="lightbox enclosure" id="product_image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
+			$snippet .= '<a rel="lightbox enclosure" id="mp-product-image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
 		} else {
 			$snippet .= $image;
 		}

@@ -63,18 +63,18 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initProductListListeners = function() {
-        $( '#mp_product_list' ).on( 'submit', '.mp_form-buy-product', function( e ) {
+        $( '#mp-products' ).on( 'submit', '.mp_form-buy-product', function( e ) {
             e.preventDefault();
 
             var $this = $( this );
 
             $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 $this.addClass( 'invisible' );
-                $( 'body' ).children( '.mp-ajax-loader' ).clone().insertAfter( $this ).show();
+                $( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
             } );
 
             $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                $this.removeClass( 'invisible' ).next( '.mp-ajax-loader' ).remove();
+                $this.removeClass( 'invisible' ).next( '.mp_ajax_loader' ).remove();
             } );
 
             mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
