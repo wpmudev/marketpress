@@ -1360,7 +1360,8 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			if ( !is_null( $args[ 'per_page' ] ) ) {
 				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
 			} else {
-				$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
+				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
+				//$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
 			}
 
 // Figure out page
@@ -1699,7 +1700,7 @@ if ( !function_exists( 'mp_product' ) ) {
 		$return = '
 			<!-- MP Single Product -->
 			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product ' . ($has_image ? 'mp_product-has-image mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') .'' : '') . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
+				<div class="mp_product ' . ($has_image ? 'mp_product-has-image mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? 'mp_product-has-variations' : '') . '">';
 
 
 		if ( $image ) {
@@ -1864,7 +1865,7 @@ if ( !function_exists( 'mp_product' ) ) {
 					$return .= '
 					<div id="' . esc_attr( $slug ) . '" class="mp_product_tab_content mp_product_tab_content-related-products" style="display:none">
 						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
-					</div><!-- end '. esc_attr( $slug ) . ' -->';
+					</div><!-- end ' . esc_attr( $slug ) . ' -->';
 					break;
 			}
 		}

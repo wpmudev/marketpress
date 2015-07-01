@@ -979,7 +979,7 @@ class MP_Product {
 					$prices[] = $price[ 'regular' ];
 				}
 			}
-
+			
 			$price[ 'lowest' ]	 = (float) min( $prices );
 			$price[ 'highest' ]	 = (float) max( $prices );
 		} elseif ( $this->on_sale() && ($sale_price = $this->get_meta( 'sale_price_amount' )) ) {

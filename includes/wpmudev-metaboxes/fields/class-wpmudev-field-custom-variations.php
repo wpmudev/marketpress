@@ -134,6 +134,10 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
 
+							<th scope="col" id="sales" class="manage-column">
+								<?php _e( 'Sales', 'mp' ); ?>
+							</th>
+
 							<th scope="col" id="variation_content" class="manage-column">
 								<?php _e( 'Variation Content', 'mp' ); ?>
 							</th>
@@ -207,6 +211,16 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									</span>
 									<input type="hidden" class="editable_value" value="" />
 								</td>
+
+								<td class="field" data-field-type="text">
+									<span>
+										<?php
+										$sales		 = get_post_meta( $child->ID, 'mp_sales_count', true );
+										echo esc_attr( isset( $sales ) && !empty( $sales ) ? $sales : '0'  );
+										?>
+									</span>
+								</td>
+
 
 								<td class="">
 									<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>

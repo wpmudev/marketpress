@@ -58,6 +58,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		if ( ! is_null( $args['order'] ) ) {
 			$query['order'] = $args['order'];
 		}
+		
 		// The Query
 		$custom_query = new WP_Query( $query );
 		// Get layout type
