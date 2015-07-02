@@ -413,6 +413,7 @@ class Marketpress {
 	}
 
 	function install_actions() {
+
 // Install - Add pages button
 		if ( !empty( $_GET[ 'install_mp_pages' ] ) ) {
 
@@ -422,7 +423,7 @@ class Marketpress {
 			update_option( 'mp_needs_pages', 0 );
 
 // Settings redirect
-			wp_redirect( admin_url( 'admin.php?page=store-settings-presentation&mp_pages_created' ) );
+			wp_redirect( admin_url( 'admin.php?page=store-setup-wizard&quick_setup_step=2&mp_pages_created' ) );
 			exit;
 		}
 	}
@@ -448,9 +449,9 @@ class Marketpress {
 	}
 
 	function add_notices() {
-		if ( get_option( 'mp_needs_pages', 1 ) == 1 && $_GET[ 'page' ] !== 'store-settings-presentation' && current_user_can( 'manage_options' ) ) {
-			add_action( 'admin_notices', array( $this, 'install_notice' ) );
-		}
+		/* if ( get_option( 'mp_needs_pages', 1 ) == 1 && $_GET[ 'page' ] !== 'store-settings-presentation' && current_user_can( 'manage_options' ) ) {
+		  add_action( 'admin_notices', array( $this, 'install_notice' ) );
+		  } */
 		if ( isset( $_GET[ 'mp_pages_created' ] ) ) {
 			add_action( 'admin_notices', array( $this, 'pages_created_notice' ) );
 		}
@@ -838,3 +839,25 @@ class Marketpress {
 }
 
 $GLOBALS[ 'mp' ] = Marketpress::get_instance();
+
+register_activation_hook( __FILE__, 'mp_plugin_activate' );
+add_action( 'admin_init', 'mp_plugin_redirect' );
+
+function mp_plugin_activate() {
+	if ( get_option( 'mp_plugin_do_activation_redirect', '1' ) == '1' ) {
+		update_option( 'mp_plugin_do_activation_redirect', '1' );
+	}
+}
+
+function mp_plugin_redirect() {
+	$need_redirection = get_option( 'mp_plugin_do_activation_redirect', '0' );
+
+	if ( $need_redirection == '1' ) {
+		update_option( 'mp_plugin_do_activation_redirect', '0' );
+
+		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) ) {
+			wp_redirect( admin_url( add_query_arg( array( 'page' => 'store-setup-wizard' ), 'admin.php' ) ) );
+			exit;
+		}
+	}
+}

@@ -614,7 +614,7 @@ class WPMUDEV_Metabox {
 			if ( self::$did_metabox_count == 0 ) :
 				?>
 				<div id="poststuff">
-					<div class="meta-box-sortables <?php echo esc_attr(get_current_screen()->id);?>">
+					<div class="meta-box-sortables <?php echo esc_attr( get_current_screen()->id ); ?>">
 					<?php endif;
 					?>
 					<?php $this->before_settings_metabox(); ?>
@@ -656,7 +656,7 @@ class WPMUDEV_Metabox {
 						<div class="wpmudev-fields clearfix">
 							<?php
 							foreach ( $this->fields as $field ) :
-								$classes = array( $field->args[ 'class' ].' wpmudev-field', str_replace( '_', '-', strtolower( get_class( $field ) ) ) );
+								$classes = array( $field->args[ 'class' ] . ' wpmudev-field', str_replace( '_', '-', strtolower( get_class( $field ) ) ) );
 								if ( empty( $field->args[ 'desc' ] ) ) {
 									$classes[]	 = 'no-field-desc';
 									$classes[]	 = $field->args[ 'class' ];
@@ -812,7 +812,12 @@ class WPMUDEV_Metabox {
 				do_action( 'wpmudev_metabox/after_all_settings_metaboxes_saved/' . $_REQUEST[ 'page' ] );
 
 				// Redirect to avoid accidental saves on page refresh
-				wp_redirect( add_query_arg( 'wpmudev_metabox_settings_saved', 1 ), 301 );
+				$quick_setup_step = mp_get_get_value( 'quick_setup_step' );
+				if ( isset( $quick_setup_step ) && $quick_setup_step == '2' ) {
+					wp_redirect( add_query_arg( 'quick_setup_step', 3 ), 301 );
+				} else {
+					wp_redirect( add_query_arg( 'wpmudev_metabox_settings_saved', 1 ), 301 );
+				}
 				exit;
 			}
 		} else {

@@ -251,16 +251,19 @@ class MP_Setup_Wizard {
 				'name'		 => 'tax[tax_shipping]',
 				'label'		 => array( 'text' => __( 'Apply Tax To Shipping Fees?', 'mp' ) ),
 				'message'	 => __( 'Yes', 'mp' ),
+				'class' => 'mp-quick-field-inline-block'
 			) );
 			$metabox->add_field( 'checkbox', array(
 				'name'		 => 'tax[tax_inclusive]',
 				'label'		 => array( 'text' => __( 'Enter Prices Inclusive of Tax?', 'mp' ) ),
 				'message'	 => __( 'Yes', 'mp' ),
+				'class' => 'mp-quick-field-inline-block'
 			) );
 			$metabox->add_field( 'checkbox', array(
 				'name'		 => 'tax[tax_digital]',
 				'label'		 => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
 				'message'	 => __( 'Yes', 'mp' ),
+				'class' => 'mp-quick-field-inline-block'
 			) );
 
 
@@ -494,7 +497,7 @@ class MP_Setup_Wizard {
 	 * @access private
 	 */
 	private function __construct() {
-		add_action( 'admin_notices', array( &$this, 'nag_message' ) );
+		//add_action( 'admin_notices', array( &$this, 'nag_message' ) );
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
 	}
 
