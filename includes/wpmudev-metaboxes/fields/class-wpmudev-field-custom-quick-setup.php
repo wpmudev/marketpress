@@ -78,11 +78,11 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 									<div class="mp_tab_content_locations mp_content_col mp_content_col-one-third">
 										<p class="mp_tab_content_label"><strong><?php _e( 'Locations', 'mp' ); ?></strong></p>
 										<p><?php _e( 'Where is your online store based?', 'mp' ); ?></p>
-									</div>
+									</div><!-- end mp_tab_content_locations -->
 									<div class="mp_tab_content_countries mp_content_col mp_content_col-two-thirds">
 										<p class="mp_tab_content_label">&nbsp;</p>
 										<p><?php _e( 'And, which countries do you want to sell to?', 'mp' ); ?></p>
-									</div>
+									</div><!-- end mp_tab_content_countries -->
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
 									<a href="#" class="button-secondary mp_button"><?php _e( 'Next', 'mp' ); ?></a>
@@ -91,11 +91,11 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 							
 							<div id="mp-quick-setup-tab-currency-and-tax" class="mp_tab">
 								<div class="mp_tab_content">
-									<div class="mp_tab_content_currency">
+									<div class="mp_tab_content_currency mp_content_col mp_content_col-one-half">
 										<p class="mp_tab_content_label"><?php _e( 'Currency', 'mp' ); ?></p>
 										<p><?php _e( 'What currency do you want to sell with?', 'mp' ); ?></p>
 									</div><!-- end mp_tab_content_currency -->
-									<div class="mp_tab_content_tax">
+									<div class="mp_tab_content_tax mp_content_col mp_content_col-one-half">
 										<p class="mp_tab_content_label"><?php _e( 'Tax', 'mp' ); ?></p>
 										<p><?php _e( 'Do you want to apply tax for your products? <em>You can customize this for each product and variation</em>.', 'mp' ); ?></p>
 									</div><!-- end mp_tab_content_tax -->
