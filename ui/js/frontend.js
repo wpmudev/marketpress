@@ -59,7 +59,7 @@ var marketpress = { };
             $this.find( '.hmedia' ).equalHeights();
         } );
 
-        $( '#mp-related-products.mp_products-grid' ).each( function( ) {
+        $( '#mp-related-products .mp_products-grid' ).each( function( ) {
             equal_height( $( this ) );
         } );
 
@@ -101,11 +101,11 @@ var marketpress = { };
          */
         initToolTips: function( ) {
             $( document ).tooltip( {
-                "items": ".mp-tooltip-help, .mp-has-tooltip",
+                "items": ".mp_tooltip-help, .mp_tooltip",
                 "content": function( ) {
                     var $this = $( this );
-                    if ( $this.is( '.mp-has-tooltip' ) ) {
-                        $this = $this.next( '.mp-tooltip-content' );
+                    if ( $this.is( '.mp_tooltip' ) ) {
+                        $this = $this.next( '.mp_tooltip_content' );
                     }
 
                     return $this.html( );
@@ -133,7 +133,7 @@ var marketpress = { };
                 $this.find( '.hmedia' ).equalHeights();
             } );
 
-            $( '#mp-related-products.mp_products-grid' ).each( function( ) {
+            $( '#mp-related-products .mp_products-grid' ).each( function( ) {
                 var $this = $( this );
                 //$this.equalHeights();
             } );
@@ -177,14 +177,14 @@ var marketpress = { };
                     if ( resp.success ) {
                         window.location.href = resp.data.redirect_url;
                     } else {
-                        var $tooltip = $input.prev( '.mp-tooltip' );
+                        var $tooltip = $input.prev( '.mp_tooltip' );
                         $btn.ajaxLoading( 'hide' );
                         $input.prop( 'disabled', false );
                         if ( $tooltip.length == 0 ) {
-                            $input.before( '<div class="mp-tooltip"></div>' );
-                            $tooltip = $input.prev( '.mp-tooltip' );
+                            $input.before( '<div class="mp_tooltip"></div>' );
+                            $tooltip = $input.prev( '.mp_tooltip' );
                             $tooltip.tooltip( {
-                                items: ".mp-tooltip",
+                                items: ".mp_tooltip",
                                 tooltipClass: "error",
                                 position: {
                                     of: $input,
@@ -223,7 +223,7 @@ var marketpress = { };
                     $target = $( $this.attr( 'href' ) );
                 $tab.addClass( 'current' ).siblings( ).removeClass( 'current' );
                 $target.show( ).siblings( '.mp_product_tab_content' ).hide( );
-                equal_height( $( '#mp-related-products .mp_grid_row' ) );
+                //equal_heights( $( '#mp-related-products .mp_products-grid' ) );
             } );
             if ( window.location.hash.length > 0 ) {
                 var $target = $( '[href="' + window.location.hash + '"]' );

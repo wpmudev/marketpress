@@ -474,7 +474,7 @@ class MP_Cart {
 								'selected'	 => $product->qty,
 							) );
 						}
-						$column_html .= '<br />
+						$column_html .= '
 						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.removeItem(' . $id . ')">' . __( 'Remove', 'mp' ) . '</a>';
 					} else {
 						$column_html = $product->qty;
@@ -807,14 +807,14 @@ class MP_Cart {
 					'mp_button-checkout',
 					'mp_button-padlock',
 					'mp_button-large',
-					((!empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
+					((!empty( $tooltip_text ) ) ? 'mp_tooltip' : ''),
 				);
 			} elseif ( get_query_var( 'mp_confirm_order_step' ) ) {
 				$button_classes = array(
 					'mp_button',
 					'mp_button-checkout',
 					'mp_button-large',
-					((!empty( $tooltip_text ) ) ? 'mp-has-tooltip' : ''),
+					((!empty( $tooltip_text ) ) ? 'mp_tooltip' : ''),
 				);
 			} else {
 				$button_classes = array(
@@ -851,7 +851,7 @@ class MP_Cart {
 
 			if ( !empty( $tooltip_text ) ) {
 				$html .= '
-						<div class="mp-tooltip-content"><p' . (( empty( $p_class ) ) ? '' : ' class="mp-secure-checkout-tooltip-text"') . '>' . $tooltip_text . '</p></div>';
+						<div class="mp_tooltip_content"><p' . (( empty( $p_class ) ) ? '' : ' class="mp-secure-checkout-tooltip-text"') . '>' . $tooltip_text . '</p></div>';
 			}
 
 			$html .= '

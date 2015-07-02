@@ -516,7 +516,7 @@ class MP_Checkout {
 		extract( $args );
 
 		if ( !mp_cart()->has_items() ) {
-			return sprintf( __( '<h3 class="mp_sub_title">Oops!</h3><p>Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p>', 'mp' ), mp_store_page_url( 'products', false ) ) . '</p>';
+			return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></<div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
 		}
 
 		$html = '

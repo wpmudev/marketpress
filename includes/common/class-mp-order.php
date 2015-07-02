@@ -477,7 +477,7 @@ You can manage this order here: %s', 'mp' );
 
 		$html = '
 			<!-- MP Single Order Details -->
-			<section id="mp-single-order-details">
+			<section id="mp-single-order-details" class="mp_orders">
 				<div class="mp_order_details">
 					<div class="mp_order">' .
 						$this->header( false ) .
@@ -645,24 +645,24 @@ You can manage this order here: %s', 'mp' );
 	 */
 	public function get_addresses( $editable = false ) {
 		$html = '
-			<div class="clearfix mp_customer-address">
-			<div style="float:left;width:48%">
-				<h4>' . __( 'Billing Address', 'mp' ) . '</h4>' .
-		$this->get_address( 'billing', $editable ) .
-		(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
-			</div>';
-		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
-			$html .= '
-			<div style="float:right;width:48%">
-				<h4>' . __( 'Shipping Address', 'mp' ) . '</h4>' .
-			$this->get_address( 'shipping', $editable ) . '';
+			<div class="mp_customer_address">
+				<div class="mp_content_col mp_content_col-one-half">
+					<h4 class="mp_sub_title">' . __( 'Billing Address', 'mp' ) . '</h4>' .
+					$this->get_address( 'billing', $editable ) .
+					(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
+				</div>';
+				if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
+				$html .= '
+				<div class="mp_content_col mp_content_col-one-half">
+					<h4 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h4>' .
+					$this->get_address( 'shipping', $editable ) . '';
 
-			$html .= '
-			</div>';
+					$html .= '
+				</div>';
 		}
 
 		$html .= '
-		</div>';
+		</div><!-- end mp_customer_address -->';
 
 		/**
 		 * Filter the addresses html
@@ -789,8 +789,15 @@ You can manage this order here: %s', 'mp' );
 		}
 
 		$tooltip_content = '
-			<div class="clearfix"><strong style="float:left;padding-right:15px;">' . __( 'Taxes:', 'mp' ) . '</strong><span style="float:right">' . $tax_total . '</span></div>
-			<div class="clearfix"><strong style="float:left;padding-right:15px;">' . __( 'Shipping:', 'mp' ) . '</strong><span style="float:right">' . $shipping_total . '</span></div>';
+			<div class="mp_tooltip_content_item">
+				<div class="mp_tooltip_content_item_label">' . __( 'Taxes:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
+				<div class="mp_tooltip_content_item_value">' . $tax_total . '</div><!-- end mp_tooltip_content_item_value -->
+			</div><!-- end mp_tooltip_content_item -->
+			<div class="mp_tooltip_content_item">
+				<div class="mp_tooltip_content_item_label">' . __( 'Shipping:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
+				<div class="mp_tooltip_content_item_value">' . $shipping_total . '</div><!-- end mp_tooltip_content_item_value -->
+			</div><!-- end mp_tooltip_content_item -->
+		';
 
 		/**
 		 * Filter the order total tooltip content
@@ -806,10 +813,10 @@ You can manage this order here: %s', 'mp' );
 			<div class="mp_order_detail_item"><h5>' . __( 'Current Status', 'mp' ) . '</h5> <span>' . $status . '</span></div><!-- end mp_order_detail_item -->
 			<div class="mp_order_detail_item">
 				<h5>' . __( 'Total', 'mp' ) . '</h5>
-				<a href="javascript:;" class="mp-has-tooltip">' . mp_format_currency( $currency, $this->get_meta( 'mp_order_total', '' ) ) . '</a>
-				<div class="mp-tooltip-content">
-					<div class="clearfix">' . $tooltip_content . '</div>
-				</div>
+				<a href="javascript:;" class="mp_tooltip">' . mp_format_currency( $currency, $this->get_meta( 'mp_order_total', '' ) ) . '</a>
+				<div class="mp_tooltip_content">
+					' . $tooltip_content . '
+				</div><!-- end mp_tooltip_content -->
 			</div><!-- end mp_order_detail_item -->';
 
 		$html .= '

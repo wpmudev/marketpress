@@ -805,26 +805,26 @@ class MP_Product {
 	 */
 	public function display_price( $echo = true ) {
 		$price	 = $this->get_price();
-		$snippet = '<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
+		$snippet = '<!-- MP Product Price --><div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 
 		if ( $this->has_variations() ) {
 			// Get price range
 			if ( $price[ 'lowest' ] != $price[ 'highest' ] ) {
-				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency( '', $price[ 'lowest' ] ) . ' - ' . mp_format_currency( '', $price[ 'highest' ] ) . '</strong>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price[ 'lowest' ] ) . ' - ' . mp_format_currency( '', $price[ 'highest' ] ) . '</span>';
 			} else {
-				$snippet .= '<strong class="mp_normal_price">' . mp_format_currency( '', $price[ 'lowest' ] ) . '</strong>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price[ 'lowest' ] ) . '</span>';
 			}
 		} elseif ( $this->on_sale() ) {
 			$amt_off = mp_format_currency( '', ($price[ 'highest' ] - $price[ 'lowest' ]) * $this->qty );
 
 			if ( $this->qty > 1 ) {
-				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</strong>';
-				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) ) . ')</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) ) . ')</span>';
 			} else {
-				$snippet .= '<strong class="mp_sale_price" itemprop="price">' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) . '</strong>';
+				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] ) . '</span>';
 			}
 
-			$snippet .= '<span class="mp_normal_price mp-strikeout">' . mp_format_currency( '', ($price[ 'regular' ] * $this->qty ) ) . '</span>';
+			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', ($price[ 'regular' ] * $this->qty ) ) . '</span>';
 
 			/* if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
 			  $snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
@@ -833,14 +833,14 @@ class MP_Product {
 			  } */
 		} else {
 			if ( $this->qty > 1 ) {
-				$snippet .= '<strong class="mp_extended_price">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</strong>';
-				$snippet .= '<span class="mp_each_price" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price[ 'lowest' ] ) ) . ')</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ($price[ 'lowest' ] * $this->qty ) ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price[ 'lowest' ] ) ) . ')</span>';
 			} else {
-				$snippet .= '<strong class="mp_normal_price" itemprop="price">' . mp_format_currency( '', $price[ 'lowest' ] ) . '</strong>';
+				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $price[ 'lowest' ] ) . '</span>';
 			}
 		}
 
-		$snippet .= '</div>';
+		$snippet .= '</div><!-- end mp_product_price -->';
 
 		/**
 		 * Filter the display price of the product
