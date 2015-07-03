@@ -42,8 +42,9 @@ var marketpress = { };
     function equal_height( obj ) {
         var $this = $( obj );
         $this.equalHeights();
-        $this.find( '.mp_product_details' ).equalHeights();
-        $this.find( '.mp_product_meta' ).equalHeights();
+        //$this.find( '.mp_product_name' ).equalHeights();
+        //$this.find( '.mp_product_meta' ).equalHeights();
+        //$this.find( '.mp_product_details' ).equalHeights();
         //$this.find( '.mp_product' ).equalHeights();
         //$this.find( '.mp_product_name' ).equalHeights();
         //$this.find( '.mp_product_meta' ).equalHeights();
@@ -54,8 +55,9 @@ var marketpress = { };
     $( window ).resize( function( ) {
         $( '#mp-products.mp_products-grid' ).each( function( ) {
             var $this = $( this );
-            $this.find( '.mp_product_details' ).equalHeights();
+            //$this.find( '.mp_product_name' ).equalHeights();
             $this.find( '.mp_product_meta' ).equalHeights();
+            //$this.find( '.mp_product_details' ).equalHeights();
             //$this.find( '.mp_product' ).equalHeights();
             //$this.find( '.mp_product_name' ).equalHeights();
             //$this.find( '.mp_product_meta' ).equalHeights();
@@ -130,8 +132,9 @@ var marketpress = { };
         equalizeProductGrid: function( ) {
             $( '#mp-products.mp_products-grid' ).each( function( ) {
                 var $this = $( this );
-                $this.find( '.mp_product_details' ).equalHeights();
+                //$this.find( '.mp_product_name' ).equalHeights();
                 $this.find( '.mp_product_meta' ).equalHeights();
+                //$this.find( '.mp_product_details' ).equalHeights();
                 //$this.find( '.mp_product' ).equalHeights();
                 //$this.find( '.mp_product_name' ).equalHeights();
                 //$this.find( '.mp_product_meta' ).equalHeights();

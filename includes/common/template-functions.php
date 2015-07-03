@@ -219,14 +219,15 @@ if ( !function_exists( '_mp_products_html' ) ) :
 	 							</h3>
 								' . $product->display_price( false ) . '
  								' . $mp_product_list_content . '
+ 								
+ 								<div class="mp_social_shares">
+									' . $pinit . '
+									' . $fb . '
+									' . $twitter . '
+								</div><!-- end mp_social_shares -->
+ 								
 							</div><!-- end mp_product_meta -->
-							
-							<div class="mp_social_shares">
-								' . $pinit . '
-								' . $fb . '
-								' . $twitter . '
-							</div><!-- end mp_social_shares -->
-							
+
 							<div class="mp_product_callout">
 								' . $product->buy_button( false, 'list' ) . '
 								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
