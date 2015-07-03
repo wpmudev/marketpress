@@ -138,9 +138,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'Sales', 'mp' ); ?>
 							</th>
 
-							<th scope="col" id="variation_content" class="manage-column">
+							<!--<th scope="col" id="variation_content" class="manage-column">
 								<?php _e( 'Variation Content', 'mp' ); ?>
-							</th>
+							</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -222,9 +222,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								</td>
 
 
-								<td class="">
+								<!--<td class="">
 									<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>
-								</td>
+								</td>-->
 
 								<td class="field_more">
 									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr( $child->ID ); ?>"><i class="fa fa-th-large"></i></a>

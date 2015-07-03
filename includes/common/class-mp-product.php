@@ -647,8 +647,14 @@ class MP_Product {
 		$content = $this->_post->post_content;
 
 		if ( $this->has_variations() || $this->is_variation() ) {
-			$variation_id	 = $this->ID;
-			$content		 = get_the_content( $variation_id ); //get_post_meta( $variation_id, 'description', true );
+
+			$content = get_the_content( $this->ID ); //get_post_meta( $variation_id, 'description', true );
+
+			$parent_post_id	 = wp_get_post_parent_id( $this->ID );
+			$parent_post	 = get_post( $parent_post_id );
+			if ( !empty( $parent_post->post_content ) && ($parent_post->post_content !== $content) ) {
+				$content = $parent_post->post_content . "\r\n" . $content;
+			}
 		}
 
 		$content = apply_filters( 'the_content', $content );
@@ -979,7 +985,7 @@ class MP_Product {
 					$prices[] = $price[ 'regular' ];
 				}
 			}
-			
+
 			$price[ 'lowest' ]	 = (float) min( $prices );
 			$price[ 'highest' ]	 = (float) max( $prices );
 		} elseif ( $this->on_sale() && ($sale_price = $this->get_meta( 'sale_price_amount' )) ) {
@@ -1353,9 +1359,9 @@ class MP_Product {
 
 		if ( empty( $image ) ) {
 			$thumbnail_placeholder = mp_get_setting( 'thumbnail_placeholder' );
-			
-			$placeholder_image = !empty($thumbnail_placeholder) ? $thumbnail_placeholder : mp_plugin_url( 'ui/images/default-product.png' );
-			
+
+			$placeholder_image = !empty( $thumbnail_placeholder ) ? $thumbnail_placeholder : mp_plugin_url( 'ui/images/default-product.png' );
+
 			if ( $context == 'floating-cart' ) {
 				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" />';
 			} else {

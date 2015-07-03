@@ -259,6 +259,23 @@ class MP_Ajax {
 							</fieldset>
 						</div>
 					<?php } ?>
+					<div class="fieldset_check">
+						<?php
+						$has_variation_content	 = MP_Product::get_variation_meta( $variation_id, 'has_variation_content', 0 );
+						$variation_content_type	 = MP_Product::get_variation_meta( $variation_id, 'variation_content_type', 'plain' );
+						?>
+						<label>
+							<input type="checkbox" name="has_variation_content" class="has_controller" value="1" <?php checked( 1, $has_variation_content, true ); ?>> 
+							<span><?php _e( 'Additional Content / Information for this Variation', 'mp' ); ?></span>
+						</label>
+						<fieldset id="fieldset_has_variation_content" class="has_area">
+							<?php $variation				 = get_post( $variation_id ); ?>
+							<input type="radio" name="variation_content_type" class="variation_content_type" value="plain" <?php checked( 'plain', $variation_content_type, true ); ?>><?php _e( 'Plain Text Only', 'mp' ); ?>
+							<textarea id="variation_content_type_plain" class="variation_content_type_plain" name="variation_content_type_plain"><?php echo esc_attr( strip_tags( $variation->post_content ) ); ?></textarea>
+							<br /><br/>
+							<input type="radio" name="variation_content_type" class="variation_content_type" value="html" <?php checked( 'html', $variation_content_type, true ); ?>><?php _e( 'HTML Markup', 'mp' ); ?><a class="button variation_description_button" id="variation_description_button" href="<?php echo admin_url( 'post.php?post=' . $variation_id . '&action=edit' ); ?>" target="_blank"><?php _e( 'Edit Description', 'mp' ); ?></a>
+						</fieldset>
+					</div>
 				</form>
 
 			</div>
@@ -459,8 +476,9 @@ class MP_Ajax {
 		}
 
 		if ( isset( $post_order ) ) {
-			$_SESSION[ 'mp_product_list_order_by' ]	 = $order_by;
-			$_SESSION[ 'mp_product_list_order' ]	 = $order;
+			$_SESSION[
+			'mp_product_list_order_by' ]	 = $order_by;
+			$_SESSION[ 'mp_product_list_order' ]		 = $order;
 		} else {
 			$order_by	 = $_SESSION[ 'mp_product_list_order_by' ];
 			$order		 = $_SESSION[ 'mp_product_list_order' ];
@@ -470,11 +488,11 @@ class MP_Ajax {
 			$order_by	 = $order		 = null;
 		}
 
-		mp_list_products( array
-			(
+		mp_list_products( array(
 			'page'		 => $page,
 			'order_by'	 => $order_by,
-			'order'		 => (!is_null( $order )) ? strtoupper( $order ) : $order,
+			'order'		 => (!
+			is_null( $order ) ) ? strtoupper( $order ) : $order,
 		) );
 
 		die;
@@ -513,6 +531,14 @@ class MP_Ajax {
 }
 
 MP_Ajax::get_instance();
+
+
+
+
+
+
+
+
 
 
 

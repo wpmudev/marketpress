@@ -204,7 +204,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 			$align_class = ($view == 'list') ? ' mp_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'alignleft') : '';
 
 			$html .= '
-				<div class="mp_product_item'.(( 'grid' == $view ) ? ' mp_product_item-col-' . $per_row : '') . '">
+				<div class="mp_product_item' . (( 'grid' == $view ) ? ' mp_product_item-col-' . $per_row : '') . '">
 					<div itemscope itemtype="http://schema.org/Product" class="mp_product' . ((strlen( $img ) > 0 ) ? ' mp_product-has-image' . $align_class : '') . ' ' . implode( $class, ' ' ) . '">
 					
 						<div class="mp_product_images">
@@ -1429,9 +1429,8 @@ if ( !function_exists( 'mp_list_products' ) ) :
 		if ( !is_null( $args[ 'list_view' ] ) ) {
 			$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 		}
-		
-		//$layout_type_output = (( 'grid' == $layout_type ) ? 'mp_products-grid' : 'mp_products-list');
 
+		//$layout_type_output = (( 'grid' == $layout_type ) ? 'mp_products-grid' : 'mp_products-list');
 // Build content
 		$content = '';
 
@@ -1775,7 +1774,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( $meta ) {
 			$return .= '<div class="mp_product_meta">';
-			
+
 			if ( $title ) {
 				$return .= ' <h1 itemprop="name" class ="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 			}
@@ -1793,9 +1792,9 @@ if ( !function_exists( 'mp_product' ) ) {
 				$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
 				$return .= '</div><!-- end mp_product_excerpt -->';
 			}
-			
+
 			$return .= '</div><!-- end mp_product_meta-->';
-			
+
 			// Callout
 			$return .= '<div class="mp_product_callout">';
 
@@ -1812,7 +1811,7 @@ if ( !function_exists( 'mp_product' ) ) {
 			$return .= $product->buy_button( false, 'single', $selected_atts );
 
 			$return .= '</div><!-- end mp_product_callout-->';
-			
+
 			$return .= '<div class="mp_social_shares">';
 			$return .= $pinit;
 			$return .= $fb;
@@ -2205,7 +2204,7 @@ endif;
 
 function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	global $post;
-
+	
 	if ( empty( $post ) ) {
 		$post				 = new StdClass;
 		$post->ID			 = 0;
@@ -2226,7 +2225,11 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	}
 
 	if ( $variation ) {
-		$excerpt = get_post_meta( $id, 'description', true );
+		$parent_post_id	 = wp_get_post_parent_id( $id );
+		$parent_post	 = get_post( $parent_post_id );
+		if ( !empty( $parent_post->post_content ) ) {
+			$excerpt = $parent_post->post_content . "\r\n" . $excerpt;
+		}
 	}
 
 	$excerpt		 = strip_shortcodes( $excerpt );

@@ -657,7 +657,8 @@ input.mp_inline_temp_value{
     margin-bottom: 10px;
 }
 
-.mp_popup_content #variation_popup input[type=checkbox]{
+.mp_popup_content #variation_popup input[type=checkbox],
+.mp_popup_content #variation_popup input[type=radio]{
     width: auto;
 }
 
@@ -788,4 +789,16 @@ input.mp_inline_temp_value{
 
 .variation-right-actions #variant_add{
     margin-top: 2px;
+}
+
+textarea.variation_content_type_plain{
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    min-height: 100px;
+}
+
+#fieldset_has_variation_content a.variation_description_button{
+    margin-top: -5px;
+    margin-left: 15px;
 }

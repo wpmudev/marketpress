@@ -184,17 +184,18 @@ var mp_cart = { };
             marketpress.ajaxEvent( 'mp_cart/after_update_product_attributes', resp );
 
             if ( resp.success ) {
+
                 //console.log( resp.data );
                 if ( resp.data.image ) {
                     $container.find( '.mp_product_image_single' ).attr( 'src', resp.data.image );
                 }
 
                 //if ( resp.data.description ) {
-                    $container.find( '.mp_product_content_text' ).html( resp.data.description );
+                $container.find( '.mp_product_tab_content_text' ).html( resp.data.description );
                 //}
 
                 //if ( resp.data.excerpt ) {
-                    $container.find( '.mp_product_options_excerpt' ).html( resp.data.excerpt );
+                $container.find( '.mp_product_excerpt' ).html( resp.data.excerpt );
                 //}
 
                 if ( resp.data.price ) {

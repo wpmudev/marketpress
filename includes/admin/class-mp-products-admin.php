@@ -40,7 +40,7 @@ class MP_Products_Screen {
 // Product variations save/get value
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
-		add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
+		//add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
 		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
 		add_action( 'wp_ajax_edit_variation_post_data', array( &$this, 'edit_variation_post_data' ) );
 		//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
@@ -687,6 +687,8 @@ class MP_Products_Screen {
 				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
 				'charge_tax'				 => mp_get_post_value( 'charge_tax' ),
 				'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
+				'has_variation_content'		 => mp_get_post_value( 'has_variation_content' ),
+				'variation_content_type'	 => mp_get_post_value( 'variation_content_type' ),
 			//'description'				 => mp_get_post_value( 'description' ),
 			);
 
@@ -700,6 +702,22 @@ class MP_Products_Screen {
 				'ID'			 => $post_id,
 				'post_status'	 => 'publish',
 			);
+
+			$has_variation_content			 = mp_get_post_value( 'has_variation_content' );
+			$variation_content_type			 = mp_get_post_value( 'variation_content_type' );
+			$variation_content_type_plain	 = mp_get_post_value( 'variation_content_type_plain' );
+
+
+			if ( isset( $has_variation_content ) && $has_variation_content == '1' ) {
+
+				if ( isset( $variation_content_type ) && $variation_content_type == 'plain' ) {
+					$my_post[ 'post_content' ] = $variation_content_type_plain;
+				} else {
+					//do nothing, variation has html markup saved or should have one
+				}
+			} else {
+				$my_post[ 'post_content' ] = '';
+			}
 			wp_update_post( $my_post );
 		}
 
@@ -879,7 +897,7 @@ class MP_Products_Screen {
 				$variation_id = wp_insert_post( array(
 					//'ID'			 => $variation_id,
 					'post_title'	 => mp_get_post_value( 'post_title' ),
-					'post_content'	 => mp_get_post_value( 'content' ),
+					'post_content'	 => '', //mp_get_post_value( 'content' ),
 					'post_status'	 => 'publish',
 					'post_type'		 => 'mp_product_variation',
 					'post_parent'	 => $post_id,
