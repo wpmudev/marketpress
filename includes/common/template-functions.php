@@ -212,21 +212,27 @@ if ( !function_exists( '_mp_products_html' ) ) :
 						</div><!-- end mp_product_images -->
 						
 						<div class="mp_product_details">
- 							<h3 class="mp_product_name entry-title" itemprop="name">
- 								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
- 							</h3>
+ 
 							<div class="mp_product_meta">
+								<h3 class="mp_product_name entry-title" itemprop="name">
+	 								<a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+	 							</h3>
 								' . $product->display_price( false ) . '
  								' . $mp_product_list_content . '
+							</div><!-- end mp_product_meta -->
+							
+							<div class="mp_social_shares">
+								' . $pinit . '
+								' . $fb . '
+								' . $twitter . '
+							</div><!-- end mp_social_shares -->
+							
+							<div class="mp_product_callout">
 								' . $product->buy_button( false, 'list' ) . '
 								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
-								<div class="mp_social_shares">
-									' . $pinit . '
-									' . $fb . '
-									' . $twitter . '
-								</div><!-- end mp_social_shares -->
-							</div><!-- end mp_product_meta -->
- 						</div><!-- end mp_product_meta -->
+							</div><!-- end mp_product_callout -->
+							
+ 						</div><!-- end mp_product_details -->
 	
 						<div style="display:none">
 							<span class="entry-title">' . $product->title( false ) . '</span> was last modified:
@@ -1767,18 +1773,17 @@ if ( !function_exists( 'mp_product' ) ) {
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
-		if ( $title ) {
-			$return .= '
-<h1 itemprop="name" class ="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-		}
-
 		if ( $meta ) {
 			$return .= '<div class="mp_product_meta">';
+			
+			if ( $title ) {
+				$return .= ' <h1 itemprop="name" class ="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+			}
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
 
-			//Excerpt
+			// Excerpt
 			if ( !$variation ) {
 				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
 				$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
@@ -1788,6 +1793,11 @@ if ( !function_exists( 'mp_product' ) ) {
 				$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
 				$return .= '</div><!-- end mp_product_excerpt -->';
 			}
+			
+			$return .= '</div><!-- end mp_product_meta-->';
+			
+			// Callout
+			$return .= '<div class="mp_product_callout">';
 
 			// Button
 			$selected_atts = array();
@@ -1801,13 +1811,13 @@ if ( !function_exists( 'mp_product' ) ) {
 
 			$return .= $product->buy_button( false, 'single', $selected_atts );
 
+			$return .= '</div><!-- end mp_product_callout-->';
+			
 			$return .= '<div class="mp_social_shares">';
 			$return .= $pinit;
 			$return .= $fb;
 			$return .= $twitter;
 			$return .= '</div><!-- end mp_social_shares -->';
-
-			$return .= '</div><!-- end mp_product_meta-->';
 		}
 
 		if ( $image ) {

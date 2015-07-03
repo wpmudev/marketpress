@@ -169,7 +169,7 @@ var mp_checkout;
 		 * @param jQuery $in The jquery object being transitioned TO
 		 */
 		changeStep : function( $out, $in ) {
-			$out.find( '.mp-tooltip' ).tooltip( 'close' );
+			$out.find( '.mp_tooltip' ).tooltip( 'close' );
 			$out.find( '.mp_checkout_section_content' ).slideUp( 500, function() {
 				$out.removeClass( 'current' );
 				$in.find( '.mp_checkout_section_content' ).slideDown( 500, function() {
@@ -236,7 +236,7 @@ var mp_checkout;
 					$( element ).addClass( 'mp_form_input_error' ).prev( 'label' ).addClass( 'mp_form_label_error' );
 				},
 				unhighlight : function( element, errorClass, validClass ){
-					var $tip = $( element ).siblings( '.mp-tooltip' );
+					var $tip = $( element ).siblings( '.mp_tooltip' );
 					if ( $tip.length > 0 ) {
 						$tip.tooltip( 'close' );
 					}
@@ -332,11 +332,11 @@ var mp_checkout;
 					
 					$.each( errorMap, function( inputName, message ){
 						var $input = $( '[name="' + inputName + '"]' );
-						var $tip = $input.siblings( '.mp-tooltip' );
+						var $tip = $input.siblings( '.mp_tooltip' );
 						
 						if ( $tip.length == 0 ) {
-							$input.after( '<div class="mp-tooltip" />');
-							$tip = $input.siblings( '.mp-tooltip' );
+							$input.after( '<div class="mp_tooltip" />');
+							$tip = $input.siblings( '.mp_tooltip' );
 							$tip.uniqueId().tooltip({
 								content : "",
 								items : "#" + $tip.attr( 'id' ),

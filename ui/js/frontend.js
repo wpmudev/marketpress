@@ -15,7 +15,7 @@
      *
      * @since 3.0
      */
-    $( '<img />' ).get( 0 ).src = mp_i18n.loadingImage;
+    $( '<img>' ).get( 0 ).src = mp_i18n.loadingImage;
     /**
      * Add or remove cart ajax loading icon
      *
@@ -29,7 +29,7 @@
 
         return this.each( function( ) {
             if ( 'show' == action ) {
-                $( this ).hide( ).after( '<img src="' + mp_i18n.loadingImage + '" alt="" />' );
+                $( this ).hide( ).after( '<img src="' + mp_i18n.loadingImage + '" alt="">' );
             } else {
                 $( this ).show( ).next( 'img' ).remove( );
             }
@@ -42,21 +42,25 @@ var marketpress = { };
     function equal_height( obj ) {
         var $this = $( obj );
         $this.equalHeights();
-        $this.find( '.mp_product' ).equalHeights();
-        $this.find( '.mp_product_name' ).equalHeights();
+        $this.find( '.mp_product_details' ).equalHeights();
         $this.find( '.mp_product_meta' ).equalHeights();
-        $this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
-        $this.find( '.hmedia' ).equalHeights();
+        //$this.find( '.mp_product' ).equalHeights();
+        //$this.find( '.mp_product_name' ).equalHeights();
+        //$this.find( '.mp_product_meta' ).equalHeights();
+        //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
+        //$this.find( '.hmedia' ).equalHeights();
     }
 
     $( window ).resize( function( ) {
         $( '#mp-products.mp_products-grid' ).each( function( ) {
             var $this = $( this );
-            $this.find( '.mp_product' ).equalHeights();
-            $this.find( '.mp_product_name' ).equalHeights();
+            $this.find( '.mp_product_details' ).equalHeights();
             $this.find( '.mp_product_meta' ).equalHeights();
-            $this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
-            $this.find( '.hmedia' ).equalHeights();
+            //$this.find( '.mp_product' ).equalHeights();
+            //$this.find( '.mp_product_name' ).equalHeights();
+            //$this.find( '.mp_product_meta' ).equalHeights();
+            //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
+            //$this.find( '.hmedia' ).equalHeights();
         } );
 
         $( '#mp-related-products .mp_products-grid' ).each( function( ) {
@@ -126,11 +130,13 @@ var marketpress = { };
         equalizeProductGrid: function( ) {
             $( '#mp-products.mp_products-grid' ).each( function( ) {
                 var $this = $( this );
-                $this.find( '.mp_product' ).equalHeights();
-                $this.find( '.mp_product_name' ).equalHeights();
+                $this.find( '.mp_product_details' ).equalHeights();
                 $this.find( '.mp_product_meta' ).equalHeights();
-                $this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
-                $this.find( '.hmedia' ).equalHeights();
+                //$this.find( '.mp_product' ).equalHeights();
+                //$this.find( '.mp_product_name' ).equalHeights();
+                //$this.find( '.mp_product_meta' ).equalHeights();
+                //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
+                //$this.find( '.hmedia' ).equalHeights();
             } );
 
             $( '#mp-related-products .mp_products-grid' ).each( function( ) {
