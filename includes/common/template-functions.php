@@ -1785,11 +1785,11 @@ if ( !function_exists( 'mp_product' ) ) {
 
 			// Excerpt
 			if ( !$variation ) {
-				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
+				$return .= '<div class="mp_product_excerpt">';
 				$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
 				$return .= '</div><!-- end mp_product_excerpt -->';
 			} else {
-				$return .= '<div class="mp_product_excerpt mp_product_options_excerpt">';
+				$return .= '<div class="mp_product_excerpt mp_product_excerpt-variation">';
 				$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
 				$return .= '</div><!-- end mp_product_excerpt -->';
 			}
