@@ -1726,7 +1726,7 @@ if ( !function_exists( 'mp_product' ) ) {
 				}
 
 				if ( $values ) {
-					$return .= '<div class = "mp_single_product_images">';
+					$return .= '<div class="mp_single_product_images">';
 
 					$return .= "<script>
 								jQuery(document).ready(function() {
