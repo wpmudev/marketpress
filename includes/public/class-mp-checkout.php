@@ -666,7 +666,7 @@ class MP_Checkout {
 
 		// Display label?
 		if ( ($label = mp_arr_get_value( 'label', $field )) && 'checkbox' != mp_arr_get_value( 'type', $field, '' ) ) {
-			$required = ( mp_arr_get_value( 'validation->required', $field ) ) ? ' <span class="mp-field-required">*</span>' : '';
+			$required = ( mp_arr_get_value( 'validation->required', $field ) ) ? ' <span class="mp_field_required">*</span>' : '';
 			$html .= '
 				<label class="mp_form_label">' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
 		}

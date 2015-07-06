@@ -1829,7 +1829,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 		if ( !empty( $content ) ) {
 			$return .= '
-<div id="mp-product-overview" class="mp_product_tab_content mp_product_tab_content-overview">';
+<div id="mp-product-overview" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
 
 			$return .= '
 <div itemprop="description" class="mp_product_tab_content_text">';
@@ -1861,7 +1861,7 @@ if ( !function_exists( 'mp_product' ) ) {
 							$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 						}
 						$return .= '
-						<div id="mp-related-products" class="mp_product_tab_content mp_product_tab_content-related-products" style="display:none">
+						<div id="mp-related-products" class="mp_product_tab_content mp_product_tab_content-related-products">
 							<div class="mp_product_tab_content_products mp_products mp_products-related ' . (isset( $view ) ? 'mp_products-' . $view : 'mp_products-list') . '">' . $product->related_products() . ' </div>
 						</div><!-- end mp-related-products -->';
 					}

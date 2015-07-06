@@ -65,8 +65,10 @@ var marketpress = { };
             //$this.find( '.hmedia' ).equalHeights();
         } );
 
-        $( '#mp-related-products .mp_products-grid' ).each( function( ) {
-            equal_height( $( this ) );
+        $( '#mp-related-products .mp_products-grid .mp_product_meta' ).each( function( ) {
+            //equal_height( $( this ) );
+            var $this = $( this );
+            $this.find( '.mp_product_meta' ).equalHeights();
         } );
 
 
@@ -144,6 +146,7 @@ var marketpress = { };
 
             $( '#mp-related-products .mp_products-grid' ).each( function( ) {
                 var $this = $( this );
+                $this.find( '.mp_product_meta' ).equalHeights();
                 //$this.equalHeights();
             } );
         },
@@ -231,8 +234,9 @@ var marketpress = { };
                     $tab = $this.parent( ),
                     $target = $( $this.attr( 'href' ) );
                 $tab.addClass( 'current' ).siblings( ).removeClass( 'current' );
-                $target.show( ).siblings( '.mp_product_tab_content' ).hide( );
-                //equal_heights( $( '#mp-related-products .mp_products-grid' ) );
+                //$target.show().siblings( '.mp_product_tab_content' ).hide();
+                $target.addClass( 'mp_product_tab_content-current' ).siblings( '.mp_product_tab_content' ).removeClass( 'mp_product_tab_content-current' );
+                //equal_heights( $( '#mp-related-products .mp_products-grid .mp_product_meta' ) );
             } );
             if ( window.location.hash.length > 0 ) {
                 var $target = $( '[href="' + window.location.hash + '"]' );
