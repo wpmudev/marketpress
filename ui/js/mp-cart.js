@@ -233,7 +233,18 @@ var mp_cart = { };
             "href": function() {
                 return $( this ).attr( 'data-href' );
             },
-            "overlayClose": false
+            "overlayClose": false,
+            "trapFocus": false,
+            onLoad:function(){
+		        $("#colorbox").removeAttr("tabindex"); //remove tabindex before select2 init
+		    },
+		    onComplete:function(){
+		         $("select.mp_select2").select2({
+			         "dropdownCssClass": "mp_select2",
+					 "dropdownAutoWidth": 1,
+					 "minimumResultsForSearch": -1
+		         });
+		    }
         } );
     };
 
