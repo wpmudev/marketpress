@@ -127,21 +127,29 @@ class MP_Product {
 				</div><!-- end mp_product_options_image -->
 				
 				<div class="mp_product_options_details">
-					<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
 					
-					<form id="mp-product-options-cb-form" class="mp_form mp_form-product-options-cb" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
-						<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
-						<input type="hidden" name="product_qty_changed" value="0">
-						<?php $product->display_price(); ?>
+					<div class="mp_product_options_meta">
+						<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
 						<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
-						<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
-						<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
-							<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
-						<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
-							?>
-							<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
-						<?php endif; ?>
-					</form>
+					</div><!-- end mp_product_options_meta -->
+					
+					<div class="mp_product_options_callout">
+						
+						<form id="mp-product-options-callout-form" class="mp_form mp_form-mp-product-options-callout" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
+							<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
+							<input type="hidden" name="product_qty_changed" value="0">
+							<?php $product->display_price(); ?>
+							<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
+							<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
+								<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
+							<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
+								?>
+								<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
+							<?php endif; ?>
+						</form><!-- end mp-product-options-callout-form -->
+						
+					</div><!-- end mp_product_options_callout -->
+
 				</div><!-- end mp_product_options_details -->
 
 			</div><!-- end mp_product_options -->
