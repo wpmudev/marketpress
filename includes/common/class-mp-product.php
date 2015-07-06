@@ -118,26 +118,42 @@ class MP_Product {
 			die( __( 'The product specified could not be found', 'mp' ) );
 		}
 		?>
-		<form class="mp_product_options_cb" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
-			<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>" />
-			<input type="hidden" name="product_qty_changed" value="0" />
-			<div class="mp_product_options_image">
-				<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
-			</div>
-			<div class="mp_product_options_content">
-				<h3 class="mp_product_name"><?php echo $product->post_title; ?></h3>
-				<?php $product->display_price(); ?>
-				<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
-				<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
-				<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
-					<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
-				<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
-					?>
-					<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
-				<?php endif;
-				?>
-			</div>
-		</form>
+		<!-- MP Product Lightbox -->
+		<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope itemtype="http://schema.org/Product">
+			<div class="mp_product mp_product_options">
+				
+				<div class="mp_product_options_image">
+					<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
+				</div><!-- end mp_product_options_image -->
+				
+				<div class="mp_product_options_details">
+					
+					<div class="mp_product_options_meta">
+						<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
+						<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
+					</div><!-- end mp_product_options_meta -->
+					
+					<div class="mp_product_options_callout">
+						
+						<form id="mp-product-options-callout-form" class="mp_form mp_form-mp-product-options-callout" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
+							<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
+							<input type="hidden" name="product_qty_changed" value="0">
+							<?php $product->display_price(); ?>
+							<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
+							<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
+								<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
+							<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
+								?>
+								<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
+							<?php endif; ?>
+						</form><!-- end mp-product-options-callout-form -->
+						
+					</div><!-- end mp_product_options_callout -->
+
+				</div><!-- end mp_product_options_details -->
+
+			</div><!-- end mp_product_options -->
+		</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
 		<?php
 		die;
 	}
@@ -378,7 +394,7 @@ class MP_Product {
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
 						<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"></label>
-						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="1" type="number" name="product_quantity" value="1" ' . $disabled . '  />
+						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="1" type="number" name="product_quantity" value="1" ' . $disabled . '>
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
 			</div><!-- end mp_product_options_atts -->';
@@ -603,7 +619,7 @@ class MP_Product {
 			if ( !$this->in_stock() ) {
 				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';
 			} else {
-				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '" />';
+				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '">';
 
 				if ( $context == 'list' ) {
 					if ( $this->has_variations() ) {
@@ -1363,14 +1379,14 @@ class MP_Product {
 			$placeholder_image = !empty( $thumbnail_placeholder ) ? $thumbnail_placeholder : mp_plugin_url( 'ui/images/default-product.png' );
 
 			if ( $context == 'floating-cart' ) {
-				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" >';
+				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '">';
 			} else {
 				if ( !is_array( $size ) ) {
 					$size = array( get_option( $size . '_size_w' ), get_option( $size . '_size_h' ) );
 				}
 
 				$img_classes[]	 = 'wp-post-image';
-				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" >';
+				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '">';
 			}
 		}
 
@@ -1859,7 +1875,7 @@ Notification Preferences: %s', 'mp' );
 			$url = add_query_arg( 'media', $media, $url );
 		}
 
-		$snippet = apply_filters( 'mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png" /></a>', $this->ID, $context );
+		$snippet = apply_filters( 'mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png"></a>', $this->ID, $context );
 
 		if ( $echo ) {
 			echo $snippet;

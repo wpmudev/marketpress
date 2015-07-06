@@ -1068,7 +1068,7 @@ class MP_Cart {
 		</div><!-- end mp_mini_cart -->';
 
 		if ( !mp_doing_ajax() ) {
-			$html .= '<span class="mp_ajax_loader" style="display:none"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt="" /> ' . __( 'Adding...', 'mp' ) . '</span>';
+			$html .= '<span class="mp_ajax_loader" style="display:none"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>';
 		}
 
 		if ( $echo ) {

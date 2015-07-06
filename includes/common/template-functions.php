@@ -828,7 +828,7 @@ if ( !function_exists( 'mp_list_payment_options' ) ) :
 						type="radio"
 						name="payment_method"
 						value="' . $code . '"' . $checked . '
-						autocomplete="off" />
+						autocomplete="off">
 					<span></span>' . $label . '
 				</label>';
 
@@ -1500,13 +1500,13 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 				<div class="mp_form_content">' . $content . '</div>
 				<div class="mp_form_group">
 					<div class="mp_form_group_field">
-						<input type="text" class="mp_form_input" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '" />
+						<input type="text" class="mp_form_input" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '">
 					</div>
 					<div class="mp_form_group_field">
 						<button type="submit" class="mp_button">' . __( 'Look Up', 'mp' ) . '</button>
 					</div>
 				</div>
-			</form>';
+			</form><!-- end mp-order-lookup-form -->';
 
 		/**
 		 * Filter the order lookup form html
@@ -1753,7 +1753,7 @@ if ( !function_exists( 'mp_product' ) ) {
 
 					foreach ( $values as $value ) {
 						$img_url = wp_get_attachment_image_src( $value, $size );
-						$return .= '<li data-thumb = "' . $img_url[ 0 ] . '" data-src = "' . $img_url[ 0 ] . '"><img src = "' . $img_url[ 0 ] . '" /></li>';
+						$return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
 					}
 
 					$return .= '</ul><!-- end mp_product_gallery -->';
@@ -1777,7 +1777,7 @@ if ( !function_exists( 'mp_product' ) ) {
 			$return .= '<div class="mp_product_meta">';
 
 			if ( $title ) {
-				$return .= ' <h1 itemprop="name" class ="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+				$return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 			}
 
 			// Price
