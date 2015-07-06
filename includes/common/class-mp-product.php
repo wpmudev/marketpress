@@ -793,7 +793,7 @@ class MP_Product {
 			), $attributes );
 		}
 
-		$img = '<img' . mp_array_to_attributes( $attributes ) . ' />';
+		$img = '<img' . mp_array_to_attributes( $attributes ) . '>';
 
 		if ( $echo ) {
 			echo $img;
@@ -1363,14 +1363,14 @@ class MP_Product {
 			$placeholder_image = !empty( $thumbnail_placeholder ) ? $thumbnail_placeholder : mp_plugin_url( 'ui/images/default-product.png' );
 
 			if ( $context == 'floating-cart' ) {
-				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" />';
+				$image = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" >';
 			} else {
 				if ( !is_array( $size ) ) {
 					$size = array( get_option( $size . '_size_w' ), get_option( $size . '_size_h' ) );
 				}
 
 				$img_classes[]	 = 'wp-post-image';
-				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" />';
+				$image			 = '<img width="' . $size[ 0 ] . '" height="' . $size[ 1 ] . '" itemprop="image" title="' . esc_attr( $title ) . '" class="' . implode( ' ', $img_classes ) . '" src="' . apply_filters( 'mp_default_product_img', $placeholder_image ) . '" >';
 			}
 		}
 
