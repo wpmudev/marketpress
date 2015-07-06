@@ -921,6 +921,11 @@ class MP_Cart {
 
 		$html = '
 			<select' . $attributes . '>';
+		
+		if($selected >= $max){
+			$max = $selected;
+		}
+		
 		for ( $i = 1; $i <= $max; $i ++ ) {
 			$html .= '
 				<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
