@@ -54,14 +54,43 @@ class MP_Public {
 	}
 
 	public function add_mp_body_class( $classes ) {
+
+		//Add global .mp class on all MarketPress pages
 		if (
 		is_singular( MP_Product::get_post_type() ) ||
 		get_post_type() == MP_Product::get_post_type() ||
 		get_query_var( MP_Product::get_post_type() ) ||
 		$this->is_store_page() ||
-		(is_singular( MP_Product::get_post_type() ) || is_tax( array( 'product_category', 'product_tax' ) )) ) {
+		(is_singular( MP_Product::get_post_type() ) || is_tax( array( 'product_category', 'product_tag' ) )) ) {
 			$classes[] = 'mp';
 		}
+
+		//Add class for mp singles
+		if ( is_singular( MP_Product::get_post_type() ) ) {
+			$classes[] = 'mp-single';
+		}
+		//Add class for mp category page
+		if ( is_archive( MP_Product::get_post_type() ) && is_tax( array( 'product_category' ) ) ) {
+			$classes[] = 'mp-category';
+		}
+		//Add class for mp tag pages
+		if ( is_archive( MP_Product::get_post_type() ) && is_tax( array( 'product_tag' ) ) ) {
+			$classes[] = 'mp-tag';
+		}
+
+		if ( is_page( mp_get_setting( 'page->cart' ) ) ) {
+			$classes[] = 'mp-cart';
+		}
+
+		if ( is_page( mp_get_setting( 'page->checkout' ) ) ) {
+			$classes[] = 'mp-checkout';
+		}
+
+		if ( is_page( mp_get_setting( 'page->order_status' ) ) ) {
+			$classes[] = 'mp-order-status';
+		}
+
+
 		return $classes;
 	}
 
@@ -87,7 +116,7 @@ class MP_Public {
 			<div id="mp-create-account-lightbox" class="mp_lightbox mp_create_account">
 				<h2 class="mp_title">' . __( 'Create Account', 'mp' ) . '</h2>
 				<form id="mp-create-account-form" class="mp_form mp_form-create-account" action="' . admin_url( 'admin-ajax.php?action=mp_create_account' ) . '" method="post">' .
-	wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce', true, false ) . '
+		wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce', true, false ) . '
 	
 					<div class="mp_form_field">
 						<label for="mp-create-account-name-first" class="mp_form_label">' . __( 'First Name:', 'mp' ) . '<span class="mp-field-required">*</span></label>
