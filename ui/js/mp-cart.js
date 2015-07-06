@@ -65,17 +65,24 @@ var mp_cart = { };
     mp_cart.initProductListListeners = function() {
         $( '#mp-products' ).on( 'submit', '.mp_form-buy-product', function( e ) {
             e.preventDefault();
+            $( '.mp_ajax_loader' ).remove();
 
             var $this = $( this );
 
             $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 $this.addClass( 'invisible' );
-                $( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
+                //$( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
+                if ( $( ".mp_ajax_loader" ).length ) {
+
+                } else {
+                    $( mp_cart_i18n.ajax_loader ).insertAfter( $this ).show();
+                }
                 //marketpress.loadingOverlay( 'show' );
             } );
 
             $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                $this.removeClass( 'invisible' ).next( '.mp_ajax_loader' ).remove();
+                $this.removeClass( 'invisible' );//.next( '.mp_ajax_loader' ).remove();
+                $( '.mp_ajax_loader' ).remove();
                 //marketpress.loadingOverlay( 'hide' );
             } );
 
@@ -235,16 +242,16 @@ var mp_cart = { };
             },
             "overlayClose": false,
             "trapFocus": false,
-            onLoad:function(){
-		        $("#colorbox").removeAttr("tabindex"); //remove tabindex before select2 init
-		    },
-		    onComplete:function(){
-		         $("select.mp_select2").select2({
-			         "dropdownCssClass": "mp_select2",
-					 "dropdownAutoWidth": 1,
-					 "minimumResultsForSearch": -1
-		         });
-		    }
+            onLoad: function() {
+                $( "#colorbox" ).removeAttr( "tabindex" ); //remove tabindex before select2 init
+            },
+            onComplete: function() {
+                $( "select.mp_select2" ).select2( {
+                    "dropdownCssClass": "mp_select2",
+                    "dropdownAutoWidth": 1,
+                    "minimumResultsForSearch": -1
+                } );
+            }
         } );
     };
 

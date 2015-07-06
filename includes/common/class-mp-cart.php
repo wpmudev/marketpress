@@ -994,6 +994,7 @@ class MP_Cart {
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'ajax_loader' => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>'
 		) );
 	}
 
