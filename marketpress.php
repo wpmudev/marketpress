@@ -374,6 +374,16 @@ class Marketpress {
 		add_action( 'admin_init', array( &$this, 'variations_admin' ) );
 
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
+
+		add_filter( 'post_thumbnail_html', array( &$this, 'post_thumbnail_html5' ), 10, 5 );
+	}
+
+	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
+		$post_type = get_post_type( $post_id );
+		if ( $post_type == MP_Product::get_post_type() || $post_type == 'mp_product_variation' ) {
+			$html = str_replace( "/>", ">", $html );
+		}
+		return $html;
 	}
 
 	function redirect_variation_singles_to_products() {
