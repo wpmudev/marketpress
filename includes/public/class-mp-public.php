@@ -55,38 +55,40 @@ class MP_Public {
 
 	public function add_mp_body_class( $classes ) {
 
+		$post_type	 = MP_Product::get_post_type();
+		$settings	 = get_option( 'mp_settings' );
 		//Add global .mp class on all MarketPress pages
 		if (
-		is_singular( MP_Product::get_post_type() ) ||
-		get_post_type() == MP_Product::get_post_type() ||
-		get_query_var( MP_Product::get_post_type() ) ||
+		is_singular( $post_type ) ||
+		get_post_type() == $post_type ||
+		get_query_var( $post_type ) ||
 		$this->is_store_page() ||
-		(is_singular( MP_Product::get_post_type() ) || is_tax( array( 'product_category', 'product_tag' ) )) ) {
+		(is_singular( $post_type ) || is_tax( array( 'product_category', 'product_tag' ) )) ) {
 			$classes[] = 'mp';
 		}
 
 		//Add class for mp singles
-		if ( is_singular( MP_Product::get_post_type() ) ) {
+		if ( is_singular( $post_type ) ) {
 			$classes[] = 'mp-single';
 		}
 		//Add class for mp category page
-		if ( is_archive( MP_Product::get_post_type() ) && is_tax( array( 'product_category' ) ) ) {
+		if ( is_archive( $post_type ) && is_tax( array( 'product_category' ) ) ) {
 			$classes[] = 'mp-category';
 		}
 		//Add class for mp tag pages
-		if ( is_archive( MP_Product::get_post_type() ) && is_tax( array( 'product_tag' ) ) ) {
+		if ( is_archive( $post_type ) && is_tax( array( 'product_tag' ) ) ) {
 			$classes[] = 'mp-tag';
 		}
 
-		if ( is_page( mp_get_setting( 'page->cart' ) ) ) {
+		if ( is_page( $settings[ 'pages' ][ 'cart' ] ) ) {
 			$classes[] = 'mp-cart';
 		}
 
-		if ( is_page( mp_get_setting( 'page->checkout' ) ) ) {
+		if ( is_page( $settings[ 'pages' ][ 'checkout' ] ) ) {
 			$classes[] = 'mp-checkout';
 		}
 
-		if ( is_page( mp_get_setting( 'page->order_status' ) ) ) {
+		if ( is_page( $settings[ 'pages' ][ 'order_status' ] ) ) {
 			$classes[] = 'mp-order-status';
 		}
 
