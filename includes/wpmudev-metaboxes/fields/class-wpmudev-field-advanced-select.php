@@ -185,7 +185,7 @@ class WPMUDEV_Field_Advanced_Select extends WPMUDEV_Field {
 		}
 
 		$this->before_field();
-
+		
 		if ( $this->args[ 'multiple' ] ) :
 			$this->args[ 'custom' ][ 'data-options' ] = implode( '||', $options );
 			echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . implode( ',', $vals ) . '" />';
