@@ -60,7 +60,7 @@ class MP_Public {
 		get_query_var( MP_Product::get_post_type() ) ||
 		$this->is_store_page() ||
 		(is_singular( MP_Product::get_post_type() ) || is_tax( array( 'product_category', 'product_tax' ) )) ) {
-			$classes[] = 'mp-base';
+			$classes[] = 'mp';
 		}
 		return $classes;
 	}
