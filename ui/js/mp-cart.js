@@ -135,7 +135,7 @@ var mp_cart = { };
      * @event cbox_complete
      */
     mp_cart.initCboxListeners = function() {
-        $( '.mp_product_options_cb' )
+        $( '#mp-product-options-cb-form' )
             .on( 'mp_cart/after_add_item', function( e, resp ) {
                 if ( resp.success ) {
                     $.colorbox.close();

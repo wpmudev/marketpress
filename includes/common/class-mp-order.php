@@ -593,7 +593,7 @@ You can manage this order here: %s', 'mp' );
 						<th scope="row">' . __( 'State', 'mp' ) . '</th>
 						<td>
 							<select class="mp-select2" name="' . $prefix . '[state]" style="width:100%">' . $state_options . '</select>
-							<img src="' . admin_url( 'images/wpspin_light.gif' ) . '" alt="" style="display:none" />
+							<img src="' . admin_url( 'images/wpspin_light.gif' ) . '" alt="" style="display:none">
 						</td>
 					</tr>';
 			}
@@ -601,7 +601,7 @@ You can manage this order here: %s', 'mp' );
 			$html .= '
 					<tr>
 						<th scope="row">' . mp_get_setting( 'zip_label' ) . '</th>
-						<td><input type="text" name="' . $prefix . '[zip]" value="' . $this->get_meta( "mp_{$type}_info->zip", '' ) . '" /></td>
+						<td><input type="text" name="' . $prefix . '[zip]" value="' . $this->get_meta( "mp_{$type}_info->zip", '' ) . '"></td>
 					</tr>
 					<tr>
 						<th scope="row">' . __( 'Country', 'mp' ) . '</th>
@@ -609,11 +609,11 @@ You can manage this order here: %s', 'mp' );
 					</tr>
 					<tr>
 						<th scope="row">' . __( 'Phone', 'mp' ) . '</th>
-						<td><input type="text" name="' . $prefix . '[phone]" value="' . $this->get_meta( "mp_{$type}_info->phone", '' ) . '" /></td>
+						<td><input type="text" name="' . $prefix . '[phone]" value="' . $this->get_meta( "mp_{$type}_info->phone", '' ) . '"></td>
 					</tr>
 					<tr>
 						<th scope="row">' . __( 'Email', 'mp' ) . '</th>
-						<td><input type="text" name="' . $prefix . '[email]" value="' . $this->get_meta( "mp_{$type}_info->email", '' ) . '" /></td>
+						<td><input type="text" name="' . $prefix . '[email]" value="' . $this->get_meta( "mp_{$type}_info->email", '' ) . '"></td>
 					</tr>';
 			if ( $this->get_meta( 'mp_' . $type . '_info->special_instructions' ) ) {
 				$html .= '<tr>

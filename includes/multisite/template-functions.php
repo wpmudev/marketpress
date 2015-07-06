@@ -147,8 +147,8 @@ if ( ! function_exists( 'mp_global_products_filter' ) ) :
 				' . $options_html . '
 			</select>
 		</div>' .
-		          ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '" />' ) . '
-		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '" />
+		          ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
+		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
 	</form>
 </div>';
 

@@ -704,7 +704,7 @@ class MP_Checkout {
 					$html .= mp_arr_get_value( 'value', $field, '' );
 				} else {
 					$html .= '
-					<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . ' />';
+					<input name="' . mp_arr_get_value( 'name', $field, '' ) . '" type="' . mp_arr_get_value( 'type', $field, '' ) . '" value="' . mp_arr_get_value( 'value', $field, '' ) . '"' . $atts . '>';
 
 					if ( 'checkbox' == mp_arr_get_value( 'type', $field, '' ) ) {
 						$html .= '<label class="mp_form_label" for="' . $attributes[ 'id' ] . '">' . mp_arr_get_value( 'label', $field, '' ) . $required . '</label>';
@@ -762,7 +762,7 @@ class MP_Checkout {
 				}
 
 				$html .= '
-				</div>';
+				</div><!-- end mp_checkout_fields -->';
 				break;
 		}
 
@@ -926,13 +926,13 @@ class MP_Checkout {
 			if ( empty( $form ) ) {
 				$html .= wpautop( __( 'There are no available gateways to process this payment.', 'mp' ) );
 			} else {
-				$html .= '<div id="mp-payment-options-list">' . mp_list_payment_options( false ) . '</div>';
+				$html .= '<div id="mp-payment-options-list">' . mp_list_payment_options( false ) . '</div><!-- end mp-payment-options-list -->';
 			}
 		}
 
 		$html .= $form;
 		$html .= '
-			</div>';
+			</div><!-- end mp-checkout-payment-form -->';
 
 		return $html;
 	}
@@ -972,13 +972,13 @@ class MP_Checkout {
 		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
 			$html .= '
 					<div class="mp_checkout_field mp_checkout_checkbox">
-						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . ' /> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
-					</div>
+						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . '> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
+					</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
 				';
 		}
 
 		$html .= '
-			</div>
+			</div><!-- end mp-checkout-column-billing-info -->
 				<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
 					<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
 		$this->address_fields( 'shipping' ) . '';
@@ -987,12 +987,12 @@ class MP_Checkout {
 			$html .= '<div class="mp_checkout_field">
 					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
 				    <textarea name="shipping[special_instructions]"></textarea>
-				  </div>';
+				  </div><!-- end mp_checkout_field -->';
 		}
 
 		$html .= '
 
-				</div>
+				</div><!-- end mp-checkout-column-shipping-info -->
 			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
@@ -1050,11 +1050,11 @@ class MP_Checkout {
 					<p>' . __( 'Sign in to speed up the checkout process.', 'mp' ) . '</p>
 					<div class="mp_checkout_field">
 						<label class="mp_form_label" for="mp-checkout-email">' . __( 'E-Mail Address/Username', 'mp' ) . '</label>
-						<input type="text" name="mp_login_email" class="mp_form_input" />
+						<input type="text" name="mp_login_email" class="mp_form_input">
 					</div><!-- end mp_checkout_field -->
 					<div class="mp_checkout_field">
 						<label class="mp_form_label" for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
-						<input type="password" name="mp_login_password" class="mp_form_input" />
+						<input type="password" name="mp_login_password" class="mp_form_input">
 					</div><!-- end mp_checkout_field -->
 					<button id="mp-button-checkout-login" type="submit" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
 				</div><!-- end mp_checkout_column -->
@@ -1150,12 +1150,12 @@ class MP_Checkout {
 
 				foreach ( $active_plugins as $plugin ) {
 					$html .= '
-						<div class="mp-shipping-method">
+						<div class="mp_shipping_method">
 							<h4>' . $plugin->public_name . '</h4>';
 
 					$html .= mp_list_plugin_shipping_options( $plugin );
 					$html .= '
-						</div>';
+						</div><!-- end mp_shipping_method -->';
 				}
 			}
 
@@ -1169,7 +1169,7 @@ class MP_Checkout {
 						<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
-						</div>';
+						</div><!-- end mp_checkout_buttons -->';
 
 
 		/**
