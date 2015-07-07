@@ -376,11 +376,11 @@ var marketpress = { };
          * @since 3.0
          */
         initCreateAccountLightboxListeners: function( ) {
-            var $lb = $( '#mp-create-account-lightbox' );
+            var $lb = $( '#mp-create-account-form' );
             var $emailLabel = $( 'label[for="mp-create-account-email"]' );
             var $emailInput = $( '#mp-create-account-email' );
-            var $submitButton = $lb.find( ':submit' );
-            if ( '#mp-create-account' != window.location.hash || 0 == $lb.length ) {
+            var $submitButton = $lb.find( '.mp_button-create-account' );
+            if ( '#mp-create-account-lightbox' != window.location.hash || 0 == $lb.length ) {
                 // Bail
                 return false;
             }
@@ -391,7 +391,7 @@ var marketpress = { };
                 }
 
                 if ( $emailLabel.find( '.mp-loading-placeholder' ).length == 0 ) {
-                    $emailLabel.append( '&nbsp;&nbsp;&nbsp;<span class="mp-loading-placeholder"></span>' );
+                    $emailLabel.append( '<span class="mp-loading-placeholder"></span>' );
                 }
 
                 $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'show' );
@@ -407,7 +407,8 @@ var marketpress = { };
                 $emailInput.prop( 'disabled', false );
                 $submitButton.prop( 'disabled', false );
             } );
-            $lb.find( 'form' ).validate( {
+            //$lb.find( 'form' ).validate( {
+	        $lb.validate( {
                 highlight: function( ) {
                     setTimeout( function( ) {
                         $.colorbox.resize( );

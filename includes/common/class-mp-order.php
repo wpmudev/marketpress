@@ -1155,7 +1155,7 @@ You can manage this order here: %s', 'mp' );
 
 		if ( did_action( 'mp_order/new_order' ) ) {
 			// Show create-account lightbox after checking out
-			$url .= '#mp-create-account';
+			$url .= '#mp-create-account-lightbox';
 		}
 
 		/**
