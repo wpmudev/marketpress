@@ -407,7 +407,8 @@ class MP_Products_Screen {
 				}
 
 				echo $prices;
-				echo '
+				if ( !$product->has_variations() ) {
+					echo '
 					<div style="display:none">
 						<div id="quick-edit-product-content-' . $post_id . '">
 							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price[ 'regular' ] . '" /></span></label>
@@ -415,10 +416,12 @@ class MP_Products_Screen {
 							<input type="hidden" name="quick_edit_product_nonce" value="' . wp_create_nonce( 'quick_edit_product' ) . '" />
 						</div>
 					</div>';
+				}
 				break;
 
 			case 'product_stock' :
 				if ( $product->has_variations() ) {
+					$stock = 0;
 					foreach ( $variations as $variation ) {
 						$stock_val = $variation->get_meta( 'inventory', '&mdash;' );
 						if ( is_numeric( $stock_val ) ) {
