@@ -695,6 +695,7 @@ class Marketpress {
 				require_once $this->plugin_dir( 'includes/admin/class-mp-ajax.php' );
 				require_once $this->plugin_dir( 'includes/public/class-mp-public.php' );
 			}
+			require_once $this->plugin_dir( 'includes/admin/class-mp-dashboard-widgets.php' );
 		} else {
 			require_once $this->plugin_dir( 'includes/public/class-mp-public.php' );
 		}
