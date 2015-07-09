@@ -146,10 +146,11 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 		$html = '';
 		if ( $related_products ) {
-			$per_row = mp_get_setting( 'related_products->per_row' );
+			$per_row = mp_get_setting( 'related_products->per_row', 3 );
 		} else {
 			$per_row = (int) mp_get_setting( 'per_row', 3 );
 		}
+
 		$width	 = round( 100 / $per_row, 1 ) . '%';
 		$column	 = 1;
 
@@ -2205,7 +2206,7 @@ endif;
 
 function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	global $post;
-	
+
 	if ( empty( $post ) ) {
 		$post				 = new StdClass;
 		$post->ID			 = 0;
