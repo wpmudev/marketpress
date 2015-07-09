@@ -200,6 +200,10 @@ var mp_cart = { };
                 //if ( resp.data.description ) {
                 $container.find( '.mp_product_tab_content_text' ).html( resp.data.description );
                 //}
+                //update content for lightbox
+                if ($('.mp_product_options_excerpt').size() > 0) {
+                    $('.mp_product_options_excerpt').html(resp.data.description);
+                }
 
                 //if ( resp.data.excerpt ) {
                 $container.find( '.mp_product_excerpt' ).html( resp.data.excerpt );
