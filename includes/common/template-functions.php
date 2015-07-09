@@ -148,7 +148,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 		if ( $related_products ) {
 			$per_row = mp_get_setting( 'related_products->per_row' );
 		} else {
-			$per_row = (int) mp_get_setting( 'per_row' );
+			$per_row = (int) mp_get_setting( 'per_row', 3 );
 		}
 		$width	 = round( 100 / $per_row, 1 ) . '%';
 		$column	 = 1;
