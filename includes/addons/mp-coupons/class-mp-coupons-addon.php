@@ -550,6 +550,9 @@ class MP_Coupons_Addon {
 				'value'  => '1',
 				'action' => 'show',
 			),
+			'query'       => array(
+				'post_type' => 'mp_coupon'
+			)
 		) );
 		$metabox->add_field( 'text', array(
 			'name'       => 'max_uses',
@@ -738,7 +741,7 @@ class MP_Coupons_Addon {
 				width: 20%;
 			}
 		</style>
-	<?php
+		<?php
 
 	}
 
@@ -761,7 +764,7 @@ class MP_Coupons_Addon {
 					.find('a[href="edit.php?post_type=mp_coupon"]').parent().addClass('current');
 			});
 		</script>
-	<?php
+		<?php
 
 	}
 
@@ -1171,6 +1174,7 @@ class MP_Coupons_Addon {
 				}
 			}
 		}
+
 		return $allcaps;
 	}
 }
@@ -1188,18 +1192,6 @@ if ( ! function_exists( 'mp_coupons_addon' ) ) :
 	function mp_coupons_addon() {
 		return MP_Coupons_Addon::get_instance();
 	}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 endif;
