@@ -161,6 +161,9 @@ class MP_Setup_Wizard {
 					<li class="select2-all">' . __( 'All', 'mp' ) . '</li>
 					<li class="select2-eu" data-countries="' . implode( ',', mp()->eu_countries ) . '">' . __( 'EU', 'mp' ) . '</li>
 				</ul>',
+				'validation' => array(
+					'required' => true,
+				),
 			) );
 
 
