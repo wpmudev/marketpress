@@ -11,6 +11,7 @@ class MP_Setup_Wizard {
 	 */
 	private static $_instance = null;
 
+	//data https://xcitestudios.com/blog/2012/10/22/countrycurrency-list-for-c-json-php-and-html-select/
 	private $country_currencies = array(
 		"AF" => "AFN",
 		"AL" => "ALL",
