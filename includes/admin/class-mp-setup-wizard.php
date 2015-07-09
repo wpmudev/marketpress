@@ -11,6 +11,252 @@ class MP_Setup_Wizard {
 	 */
 	private static $_instance = null;
 
+	private $country_currencies = array(
+		"AF" => "AFN",
+		"AL" => "ALL",
+		"DZ" => "DZD",
+		"AS" => "USD",
+		"AD" => "EUR",
+		"AO" => "AOA",
+		"AI" => "XCD",
+		"AG" => "XCD",
+		"AR" => "ARP",
+		"AM" => "AMD",
+		"AW" => "AWG",
+		"AU" => "AUD",
+		"AT" => "EUR",
+		"AZ" => "AZN",
+		"BS" => "BSD",
+		"BH" => "BHD",
+		"BD" => "BDT",
+		"BB" => "BBD",
+		"BY" => "BYR",
+		"BE" => "EUR",
+		"BZ" => "BZD",
+		"BJ" => "XOF",
+		"BM" => "BMD",
+		"BT" => "BTN",
+		"BO" => "BOV",
+		"BA" => "BAM",
+		"BW" => "BWP",
+		"BV" => "NOK",
+		"BR" => "BRL",
+		"IO" => "USD",
+		"BN" => "BND",
+		"BG" => "BGL",
+		"BF" => "XOF",
+		"BI" => "BIF",
+		"KH" => "KHR",
+		"CM" => "XAF",
+		"CA" => "CAD",
+		"CV" => "CVE",
+		"KY" => "KYD",
+		"CF" => "XAF",
+		"TD" => "XAF",
+		"CL" => "CLF",
+		"CN" => "CNY",
+		"CX" => "AUD",
+		"CC" => "AUD",
+		"CO" => "COU",
+		"KM" => "KMF",
+		"CG" => "XAF",
+		"CD" => "CDF",
+		"CK" => "NZD",
+		"CR" => "CRC",
+		"HR" => "HRK",
+		"CU" => "CUP",
+		"CY" => "EUR",
+		"CZ" => "CZK",
+		"CS" => "CSJ",
+		"CI" => "XOF",
+		"DK" => "DKK",
+		"DJ" => "DJF",
+		"DM" => "XCD",
+		"DO" => "DOP",
+		"EC" => "USD",
+		"EG" => "EGP",
+		"SV" => "USD",
+		"GQ" => "EQE",
+		"ER" => "ERN",
+		"EE" => "EEK",
+		"ET" => "ETB",
+		"FK" => "FKP",
+		"FO" => "DKK",
+		"FJ" => "FJD",
+		"FI" => "FIM",
+		"FR" => "XFO",
+		"GF" => "EUR",
+		"PF" => "XPF",
+		"TF" => "EUR",
+		"GA" => "XAF",
+		"GM" => "GMD",
+		"GE" => "GEL",
+		"DD" => "DDM",
+		"DE" => "EUR",
+		"GH" => "GHC",
+		"GI" => "GIP",
+		"GR" => "GRD",
+		"GL" => "DKK",
+		"GD" => "XCD",
+		"GP" => "EUR",
+		"GU" => "USD",
+		"GT" => "GTQ",
+		"GN" => "GNE",
+		"GW" => "GWP",
+		"GY" => "GYD",
+		"HT" => "USD",
+		"HM" => "AUD",
+		"VA" => "EUR",
+		"HN" => "HNL",
+		"HK" => "HKD",
+		"HU" => "HUF",
+		"IS" => "ISJ",
+		"IN" => "INR",
+		"ID" => "IDR",
+		"IR" => "IRR",
+		"IQ" => "IQD",
+		"IE" => "IEP",
+		"IL" => "ILS",
+		"IT" => "ITL",
+		"JM" => "JMD",
+		"JP" => "JPY",
+		"JO" => "JOD",
+		"KZ" => "KZT",
+		"KE" => "KES",
+		"KI" => "AUD",
+		"KP" => "KPW",
+		"KR" => "KRW",
+		"KW" => "KWD",
+		"KG" => "KGS",
+		"LA" => "LAJ",
+		"LV" => "LVL",
+		"LB" => "LBP",
+		"LS" => "ZAR",
+		"LR" => "LRD",
+		"LY" => "LYD",
+		"LI" => "CHF",
+		"LT" => "LTL",
+		"LU" => "LUF",
+		"MO" => "MOP",
+		"MK" => "MKN",
+		"MG" => "MGF",
+		"MW" => "MWK",
+		"MY" => "MYR",
+		"MV" => "MVR",
+		"ML" => "MAF",
+		"MT" => "MTL",
+		"MH" => "USD",
+		"MQ" => "EUR",
+		"MR" => "MRO",
+		"MU" => "MUR",
+		"YT" => "EUR",
+		"MX" => "MXV",
+		"FM" => "USD",
+		"MD" => "MDL",
+		"MC" => "MCF",
+		"MN" => "MNT",
+		"ME" => "EUR",
+		"MS" => "XCD",
+		"MA" => "MAD",
+		"MZ" => "MZM",
+		"MM" => "MMK",
+		"NA" => "ZAR",
+		"NR" => "AUD",
+		"NP" => "NPR",
+		"NL" => "NLG",
+		"AN" => "ANG",
+		"NC" => "XPF",
+		"NZ" => "NZD",
+		"NI" => "NIO",
+		"NE" => "XOF",
+		"NG" => "NGN",
+		"NU" => "NZD",
+		"NF" => "AUD",
+		"MP" => "USD",
+		"NO" => "NOK",
+		"OM" => "OMR",
+		"PK" => "PKR",
+		"PW" => "USD",
+		"PA" => "USD",
+		"PG" => "PGK",
+		"PY" => "PYG",
+		"YD" => "YDD",
+		"PE" => "PEH",
+		"PH" => "PHP",
+		"PN" => "NZD",
+		"PL" => "PLN",
+		"PT" => "TPE",
+		"PR" => "USD",
+		"QA" => "QAR",
+		"RO" => "ROK",
+		"RU" => "RUB",
+		"RW" => "RWF",
+		"RE" => "EUR",
+		"SH" => "SHP",
+		"KN" => "XCD",
+		"LC" => "XCD",
+		"PM" => "EUR",
+		"VC" => "XCD",
+		"WS" => "WST",
+		"SM" => "EUR",
+		"ST" => "STD",
+		"SA" => "SAR",
+		"SN" => "XOF",
+		"RS" => "CSD",
+		"SC" => "SCR",
+		"SL" => "SLL",
+		"SG" => "SGD",
+		"SK" => "SKK",
+		"SI" => "SIT",
+		"SB" => "SBD",
+		"SO" => "SOS",
+		"ZA" => "ZAL",
+		"ES" => "ESB",
+		"LK" => "LKR",
+		"SD" => "SDG",
+		"SR" => "SRG",
+		"SJ" => "NOK",
+		"SZ" => "SZL",
+		"SE" => "SEK",
+		"CH" => "CHW",
+		"SY" => "SYP",
+		"TW" => "TWD",
+		"TJ" => "TJR",
+		"TZ" => "TZS",
+		"TH" => "THB",
+		"TL" => "USD",
+		"TG" => "XOF",
+		"TK" => "NZD",
+		"TO" => "TOP",
+		"TT" => "TTD",
+		"TN" => "TND",
+		"TR" => "TRY",
+		"TM" => "TMM",
+		"TC" => "USD",
+		"TV" => "AUD",
+		"SU" => "SUR",
+		"UG" => "UGS",
+		"UA" => "UAK",
+		"AE" => "AED",
+		"GB" => "GBP",
+		"US" => "USS",
+		"UM" => "USD",
+		"UY" => "UYI",
+		"UZ" => "UZS",
+		"VU" => "VUV",
+		"VE" => "VEB",
+		"VN" => "VND",
+		"VG" => "USD",
+		"VI" => "USD",
+		"WF" => "XPF",
+		"EH" => "MAD",
+		"YE" => "YER",
+		"YU" => "YUM",
+		"ZR" => "ZRZ",
+		"ZM" => "ZMK",
+		"ZW" => "ZWC"
+	);
+
 	/**
 	 * Gets the single instance of the class
 	 *
@@ -22,6 +268,7 @@ class MP_Setup_Wizard {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new MP_Setup_Wizard();
 		}
+
 		return self::$_instance;
 	}
 
@@ -33,7 +280,7 @@ class MP_Setup_Wizard {
 	 * @action admin_notices
 	 */
 	public function nag_message() {
-		if ( mp_get_setting( 'mp_setup_complete' ) || mp_get_get_value( 'page' ) == 'store-setup-wizard' || mp_get_get_value( 'page' ) == 'mp-db-update' || !current_user_can( apply_filters( 'mp_store_settings_cap', 'manage_store_settings' ) ) ) {
+		if ( mp_get_setting( 'mp_setup_complete' ) || mp_get_get_value( 'page' ) == 'store-setup-wizard' || mp_get_get_value( 'page' ) == 'mp-db-update' || ! current_user_can( apply_filters( 'mp_store_settings_cap', 'manage_store_settings' ) ) ) {
 			return;
 		}
 		?>
@@ -51,18 +298,18 @@ class MP_Setup_Wizard {
 	 */
 	public function init_metaboxes() {
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'				 => 'mp-quick-setup-wizard',
-			'page_slugs'		 => array( 'store-setup-wizard' ),
-			'title'				 => __( 'Quick Setup', 'mp' ),
-			'option_name'		 => 'mp_settings',
+			'id'                 => 'mp-quick-setup-wizard',
+			'page_slugs'         => array( 'store-setup-wizard' ),
+			'title'              => __( 'Quick Setup', 'mp' ),
+			'option_name'        => 'mp_settings',
 			'show_submit_button' => false,
 		) );
 
 		$metabox->add_field( 'quick_setup', array(
-			'name'		 => 'quick_setup',
-			'label'		 => '',
-			'message'	 => __( 'Quick Setup', 'mp' ),
-			'class'		 => 'mp_quick_setup'
+			'name'    => 'quick_setup',
+			'label'   => '',
+			'message' => __( 'Quick Setup', 'mp' ),
+			'class'   => 'mp_quick_setup'
 		) );
 
 		$quick_setup_step = mp_get_get_value( 'quick_setup_step' );
@@ -71,21 +318,21 @@ class MP_Setup_Wizard {
 
 			/* Store Location */
 			$metabox = new WPMUDEV_Metabox( array(
-				'id'				 => 'mp-quick-setup-wizard-location',
-				'page_slugs'		 => array( 'store-setup-wizard' ),
-				'title'				 => __( 'Location', 'mp' ),
-				'option_name'		 => 'mp_settings',
+				'id'                 => 'mp-quick-setup-wizard-location',
+				'page_slugs'         => array( 'store-setup-wizard' ),
+				'title'              => __( 'Location', 'mp' ),
+				'option_name'        => 'mp_settings',
 				'show_submit_button' => false,
 			) );
 
 			$metabox->add_field( 'advanced_select', array(
-				'name'			 => 'base_country',
-				'placeholder'	 => __( 'Select a Country', 'mp' ),
-				'multiple'		 => false,
-				'label'			 => array( 'text' => __( 'Base Country', 'mp' ) ),
-				'options'		 => array( '' => __( 'Select A Country' ) ) + mp()->countries,
-				'width'			 => 'element',
-				'validation'	 => array(
+				'name'        => 'base_country',
+				'placeholder' => __( 'Select a Country', 'mp' ),
+				'multiple'    => false,
+				'label'       => array( 'text' => __( 'Base Country', 'mp' ) ),
+				'options'     => array( '' => __( 'Select A Country' ) ) + mp()->countries,
+				'width'       => 'element',
+				'validation'  => array(
 					'required' => true,
 				),
 			) );
@@ -93,43 +340,43 @@ class MP_Setup_Wizard {
 			$states = mp_get_states( mp_get_setting( 'base_country' ) );
 
 			$metabox->add_field( 'advanced_select', array(
-				'name'			 => 'base_province',
-				'placeholder'	 => __( 'Select a State/Province/Region', 'mp' ),
-				'multiple'		 => false,
-				'label'			 => array( 'text' => __( 'Base State/Province/Region', 'mp' ) ),
-				'options'		 => $states,
-				'width'			 => 'element',
-				'conditional'	 => array(
-					'name'	 => 'base_country',
-					'value'	 => array( 'US', 'CA', 'GB', 'AU' ),
+				'name'        => 'base_province',
+				'placeholder' => __( 'Select a State/Province/Region', 'mp' ),
+				'multiple'    => false,
+				'label'       => array( 'text' => __( 'Base State/Province/Region', 'mp' ) ),
+				'options'     => $states,
+				'width'       => 'element',
+				'conditional' => array(
+					'name'   => 'base_country',
+					'value'  => array( 'US', 'CA', 'GB', 'AU' ),
 					'action' => 'show',
 				),
-				'validation'	 => array(
+				'validation'  => array(
 					'required' => true,
 				),
 			) );
 
 			$metabox->add_field( 'text', array(
-				'name'			 => 'base_zip',
-				'label'			 => array( 'text' => __( 'Base Zip/Postal Code', 'mp' ) ),
-				'style'			 => 'max-width: 150px;',
-				'custom'		 => array(
+				'name'        => 'base_zip',
+				'label'       => array( 'text' => __( 'Base Zip/Postal Code', 'mp' ) ),
+				'style'       => 'max-width: 150px;',
+				'custom'      => array(
 					'minlength' => 3,
 				),
-				'conditional'	 => array(
-					'name'	 => 'base_country',
-					'value'	 => array( 'US', 'CA', 'GB', 'AU', 'UM', 'AS', 'FM', 'GU', 'MH', 'MP', 'PW', 'PR', 'PI' ),
+				'conditional' => array(
+					'name'   => 'base_country',
+					'value'  => array( 'US', 'CA', 'GB', 'AU', 'UM', 'AS', 'FM', 'GU', 'MH', 'MP', 'PW', 'PR', 'PI' ),
 					'action' => 'show',
 				),
-				'validation'	 => array(
+				'validation'  => array(
 					'required' => true,
 				),
 			) );
 
 			$metabox->add_field( 'text', array(
-				'name'		 => 'zip_label',
-				'label'		 => array( 'text' => __( 'Zip/Postal Code Label', 'mp' ) ),
-				'custom'	 => array(
+				'name'       => 'zip_label',
+				'label'      => array( 'text' => __( 'Zip/Postal Code Label', 'mp' ) ),
+				'custom'     => array(
 					'style' => 'max-width: 300px',
 				),
 				'validation' => array(
@@ -140,28 +387,29 @@ class MP_Setup_Wizard {
 
 			/* Sale to countries */
 			$metabox = new WPMUDEV_Metabox( array(
-				'id'			 => 'mp-quick-setup-wizard-countries',
-				'page_slugs'	 => array( 'store-setup-wizard' ),
-				'title'			 => __( 'Countries', 'mp' ),
-				'option_name'	 => 'mp_settings',
-				'order'			 => 1,
+				'id'          => 'mp-quick-setup-wizard-countries',
+				'page_slugs'  => array( 'store-setup-wizard' ),
+				'title'       => __( 'Countries', 'mp' ),
+				'option_name' => 'mp_settings',
+				'order'       => 1,
 			) );
 
 			// Target Countries
 			$metabox->add_field( 'advanced_select', array(
-				'name'					 => 'shipping[allowed_countries]',
-				'label'					 => array( 'text' => __( 'Target Countries', 'mp' ) ),
-				'desc'					 => __( 'These are the countries that you will ship to.', 'mp' ),
-				'options'				 => mp_popular_country_list() + array( 'all_countries' => __( 'All Countries', 'mp' ) ) + mp_country_list(), //all_countries|disabled
-				'default_value'			 => array( 'all_countries' => __( 'All Countries', 'mp' ) ),
-				'placeholder'			 => __( 'Choose Countries', 'mp' ),
+				'name'                   => 'shipping[allowed_countries]',
+				'label'                  => array( 'text' => __( 'Target Countries', 'mp' ) ),
+				'desc'                   => __( 'These are the countries that you will ship to.', 'mp' ),
+				'options'                => mp_popular_country_list() + array( 'all_countries' => __( 'All Countries', 'mp' ) ) + mp_country_list(),
+				//all_countries|disabled
+				'default_value'          => array( 'all_countries' => __( 'All Countries', 'mp' ) ),
+				'placeholder'            => __( 'Choose Countries', 'mp' ),
 				'format_dropdown_header' => '
 				<ul class="select2-all-none">
 					<li class="select2-none">' . __( 'None', 'mp' ) . '</li>
 					<li class="select2-all">' . __( 'All', 'mp' ) . '</li>
 					<li class="select2-eu" data-countries="' . implode( ',', mp()->eu_countries ) . '">' . __( 'EU', 'mp' ) . '</li>
 				</ul>',
-				'validation' => array(
+				'validation'             => array(
 					'required' => true,
 				),
 			) );
@@ -169,61 +417,61 @@ class MP_Setup_Wizard {
 
 			/* Currency options */
 			$metabox = new WPMUDEV_Metabox( array(
-				'id'			 => 'mp-quick-setup-wizard-currency',
-				'page_slugs'	 => array( 'store-setup-wizard' ),
-				'title'			 => __( 'Currency Settings', 'mp' ),
-				'option_name'	 => 'mp_settings',
+				'id'          => 'mp-quick-setup-wizard-currency',
+				'page_slugs'  => array( 'store-setup-wizard' ),
+				'title'       => __( 'Currency Settings', 'mp' ),
+				'option_name' => 'mp_settings',
 			) );
 
-			$currencies	 = mp()->currencies;
-			$options	 = array( '' => __( 'Select a Currency', 'mp' ) );
+			$currencies = mp()->currencies;
+			$options    = array( '' => __( 'Select a Currency', 'mp' ) );
 
 			foreach ( $currencies as $key => $value ) {
-				$options[ $key ] = esc_attr( $value[ 0 ] ) . ' - ' . mp_format_currency( $key );
+				$options[ $key ] = esc_attr( $value[0] ) . ' - ' . mp_format_currency( $key );
 			}
 
 			$metabox->add_field( 'advanced_select', array(
-				'name'			 => 'currency',
-				'placeholder'	 => __( 'Select a Currency', 'mp' ),
-				'multiple'		 => false,
-				'label'			 => array( 'text' => __( 'Store Currency', 'mp' ) ),
-				'options'		 => $options,
-				'width'			 => 'element',
+				'name'        => 'currency',
+				'placeholder' => __( 'Select a Currency', 'mp' ),
+				'multiple'    => false,
+				'label'       => array( 'text' => __( 'Store Currency', 'mp' ) ),
+				'options'     => $options,
+				'width'       => 'element',
 			) );
 			$metabox->add_field( 'radio_group', array(
-				'name'			 => 'curr_symbol_position',
-				'label'			 => array( 'text' => __( 'Currency Symbol Position', 'mp' ) ),
-				'default_value'	 => '1',
-				'orientation'	 => 'horizontal',
-				'options'		 => array(
-					'1'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>100',
-					'2'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span> 100',
-					'3'	 => '100<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
-					'4'	 => '100 <span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
+				'name'          => 'curr_symbol_position',
+				'label'         => array( 'text' => __( 'Currency Symbol Position', 'mp' ) ),
+				'default_value' => '1',
+				'orientation'   => 'horizontal',
+				'options'       => array(
+					'1' => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>100',
+					'2' => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span> 100',
+					'3' => '100<span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
+					'4' => '100 <span class="mp-currency-symbol">' . mp_format_currency( mp_get_setting( 'currency', 'USD' ) ) . '</span>',
 				),
 			) );
 
 
 			/* Tax options */
 			$metabox = new WPMUDEV_Metabox( array(
-				'id'			 => 'mp-quick-setup-wizard-tax',
-				'page_slugs'	 => array( 'store-setup-wizard' ),
-				'title'			 => __( 'Tax Settings', 'mp' ),
-				'option_name'	 => 'mp_settings',
+				'id'          => 'mp-quick-setup-wizard-tax',
+				'page_slugs'  => array( 'store-setup-wizard' ),
+				'title'       => __( 'Tax Settings', 'mp' ),
+				'option_name' => 'mp_settings',
 			) );
 
 			$metabox->add_field( 'text', array(
-				'name'			 => 'tax[rate]',
-				'label'			 => array( 'text' => __( 'Default Tax Rate', 'mp' ) ),
-				'after_field'	 => '%',
-				'style'			 => 'max-width:75px',
-				'validation'	 => array(
+				'name'        => 'tax[rate]',
+				'label'       => array( 'text' => __( 'Default Tax Rate', 'mp' ) ),
+				'after_field' => '%',
+				'style'       => 'max-width:75px',
+				'validation'  => array(
 					'number' => true,
 				),
-				'placeholder'	 => '10',
-				'conditional'	 => array(
-					'name'	 => 'base_country',
-					'value'	 => 'CA',
+				'placeholder' => '10',
+				'conditional' => array(
+					'name'   => 'base_country',
+					'value'  => 'CA',
 					'action' => 'hide',
 				),
 			) );
@@ -231,61 +479,61 @@ class MP_Setup_Wizard {
 			// Create field for each canadian province
 			foreach ( mp()->canadian_provinces as $key => $label ) {
 				$metabox->add_field( 'text', array(
-					'name'			 => 'tax[canada_rate][' . $key . ']',
-					'desc'			 => '<a target="_blank" href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada">' . __( 'Current Rates', 'mp' ) . '</a>',
-					'label'			 => array( 'text' => sprintf( __( '%s Tax Rate', 'mp' ), $label ) ),
-					'custom'		 => array( 'style' => 'width:75px' ),
-					'after_field'	 => '%',
-					'conditional'	 => array(
-						'name'	 => 'base_country',
-						'value'	 => 'CA',
+					'name'        => 'tax[canada_rate][' . $key . ']',
+					'desc'        => '<a target="_blank" href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada">' . __( 'Current Rates', 'mp' ) . '</a>',
+					'label'       => array( 'text' => sprintf( __( '%s Tax Rate', 'mp' ), $label ) ),
+					'custom'      => array( 'style' => 'width:75px' ),
+					'after_field' => '%',
+					'conditional' => array(
+						'name'   => 'base_country',
+						'value'  => 'CA',
 						'action' => 'show',
 					),
 				) );
 			}
 
 			$metabox->add_field( 'text', array(
-				'name'			 => 'tax[label]',
-				'label'			 => array( 'text' => __( 'Tax Label', 'mp' ) ),
-				'style'			 => 'max-width: 300px',
-				'placeholder'	 => __( 'I.e. Taxes, VAT, GST, etc', 'mp' )
+				'name'        => 'tax[label]',
+				'label'       => array( 'text' => __( 'Tax Label', 'mp' ) ),
+				'style'       => 'max-width: 300px',
+				'placeholder' => __( 'I.e. Taxes, VAT, GST, etc', 'mp' )
 			) );
 			$metabox->add_field( 'checkbox', array(
-				'name'		 => 'tax[tax_shipping]',
-				'label'		 => array( 'text' => __( 'Apply Tax To Shipping Fees?', 'mp' ) ),
-				'message'	 => __( 'Yes', 'mp' ),
-				'class' => 'mp-quick-field-inline-block'
+				'name'    => 'tax[tax_shipping]',
+				'label'   => array( 'text' => __( 'Apply Tax To Shipping Fees?', 'mp' ) ),
+				'message' => __( 'Yes', 'mp' ),
+				'class'   => 'mp-quick-field-inline-block'
 			) );
 			$metabox->add_field( 'checkbox', array(
-				'name'		 => 'tax[tax_inclusive]',
-				'label'		 => array( 'text' => __( 'Enter Prices Inclusive of Tax?', 'mp' ) ),
-				'message'	 => __( 'Yes', 'mp' ),
-				'class' => 'mp-quick-field-inline-block'
+				'name'    => 'tax[tax_inclusive]',
+				'label'   => array( 'text' => __( 'Enter Prices Inclusive of Tax?', 'mp' ) ),
+				'message' => __( 'Yes', 'mp' ),
+				'class'   => 'mp-quick-field-inline-block'
 			) );
 			$metabox->add_field( 'checkbox', array(
-				'name'		 => 'tax[tax_digital]',
-				'label'		 => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
-				'message'	 => __( 'Yes', 'mp' ),
-				'class' => 'mp-quick-field-inline-block'
+				'name'    => 'tax[tax_digital]',
+				'label'   => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
+				'message' => __( 'Yes', 'mp' ),
+				'class'   => 'mp-quick-field-inline-block'
 			) );
 
 
 			// Measurement System
 
 			$metabox = new WPMUDEV_Metabox( array(
-				'id'			 => 'mp-quick-setup-wizard-measurement-system',
-				'page_slugs'	 => array( 'store-setup-wizard' ),
-				'title'			 => __( 'Measurement System', 'mp' ),
-				'option_name'	 => 'mp_settings',
+				'id'          => 'mp-quick-setup-wizard-measurement-system',
+				'page_slugs'  => array( 'store-setup-wizard' ),
+				'title'       => __( 'Measurement System', 'mp' ),
+				'option_name' => 'mp_settings',
 			) );
 
 			$metabox->add_field( 'radio_group', array(
-				'name'			 => 'shipping[system]',
-				'options'		 => array(
-					'english'	 => __( 'Pounds', 'mp' ),
-					'metric'	 => __( 'Kilograms', 'mp' ),
+				'name'          => 'shipping[system]',
+				'options'       => array(
+					'english' => __( 'Pounds', 'mp' ),
+					'metric'  => __( 'Kilograms', 'mp' ),
 				),
-				'default_value'	 => 'english',
+				'default_value' => 'english',
 			) );
 		}
 
@@ -502,6 +750,29 @@ class MP_Setup_Wizard {
 	private function __construct() {
 		//add_action( 'admin_notices', array( &$this, 'nag_message' ) );
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
+		add_action( 'wp_ajax_mp_preset_currency_base_country', array( &$this, 'determine_currency' ) );
+	}
+
+	/**
+	 * Find currency base on country
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	function determine_currency() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die;
+		}
+
+		$code = mp_get_post_value( 'country', '' );
+		if ( empty( $code ) ) {
+			die;
+		}
+
+		if ( isset( $this->country_currencies[ $code ] ) ) {
+			echo $this->country_currencies[ $code ];
+		}
+		die;
 	}
 
 }
