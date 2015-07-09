@@ -93,7 +93,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 									</div><!-- end mp_tab_content_countries -->
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
-									<a href="#" class="button-secondary mp_button"><?php _e( 'Next', 'mp' ); ?></a>
+									<a href="#" class="button-secondary mp_button mp-tab-nav-next"><?php _e( 'Next', 'mp' ); ?></a>
 								</div><!-- end mp_tab_navigation -->
 							</div><!-- end mp-quick-setup-tab-locations -->
 
@@ -109,7 +109,8 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 									</div><!-- end mp_tab_content_tax -->
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
-									<a href="#" class="button-secondary mp_button"><?php _e( 'Next', 'mp' ); ?></a>
+									<a href="#" class="button-secondary mp_button mp-tab-nav-back"><?php _e( 'Back', 'mp' ); ?></a>
+									<a href="#" class="button-secondary mp_button mp-tab-nav-next"><?php _e( 'Next', 'mp' ); ?></a>
 								</div><!-- end mp_tab_navigation -->
 							</div><!-- end mp-quick-setup-tab-currency-and-tax -->
 
@@ -120,6 +121,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 									</div><!-- end mp_tab_content_system -->
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
+									<a href="#" class="button-secondary mp_button mp-tab-nav-back"><?php _e( 'Back', 'mp' ); ?></a>
 									<input class="button-primary mp_button" type="submit" name="submit_settings" value="<?php _e( 'Finish Setup', 'mp' ); ?>" />
 									<!--<a href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '3' ), 'admin.php' ) ); ?>" class="button-primary"><?php _e( 'Finish Setup', 'mp' ); ?></a>-->
 								</div><!-- end mp_tab_navigation -->
