@@ -83,7 +83,7 @@ $this->default_settings = array(
 	'order' => 'DESC',
 	'show_purchase_breadcrumbs' => 1,
 	'shipping' => array (
-		'allowed_countries' => array ('CA', 'US'),
+		'allowed_countries' => array ('all_countries'),
 		'method' => 'flat-rate',
 		'system' => 'english'
 	),
