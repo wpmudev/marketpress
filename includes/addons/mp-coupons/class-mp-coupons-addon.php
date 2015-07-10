@@ -364,14 +364,20 @@ class MP_Coupons_Addon {
 	public function coupon_form_cart( $html, $cart, $args ) {
 		if ( $cart->is_editable && mp_addons()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
 			$html .= '
-				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp_coupon_form' . ( ( $cart->is_global ) ? ' mp_coupon_form-store' : '' ) . '">
-					<h3 class="mp_sub_title">' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
-					<span class="mp_coupon_input">
-						<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp_form_input mp_form_input-small" value="">
-					</span>
-					<button type="button" class="mp_button mp_button-check">' . __( 'Apply Code', 'mp' ) . '</button>' .
+				<div id="mp-coupon-form-store-' . $cart->get_blog_id() . '" class="mp_form mp_coupon_form' . ( ( $cart->is_global ) ? ' mp_coupon_form-store' : '' ) . '">
+					<div class="mp_form_content">
+						<h3 class="mp_sub_title">' . mp_get_setting( 'coupons->form_title', __( 'Have a coupon code?', 'mp' ) ) . '</h3>
+					</div>
+					<div class="mp_form_group">
+						<div class="mp_form_group_field">
+							<input type="text" name="mp_cart_coupon[' . $cart->get_blog_id() . ']" class="mp_form_input" value="">
+						</div>
+						<div class="mp_form_group_field">
+							<button type="button" class="mp_button mp_button-check">' . __( 'Apply Code', 'mp' ) . '</button>
+						</div>
+					</div>'.
 			         wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) . '
-				</div>';
+				</div><!-- end mp-coupon-form-store-' . $cart->get_blog_id() . ' -->';
 		}
 
 		return $html;
