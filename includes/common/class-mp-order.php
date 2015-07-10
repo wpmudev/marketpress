@@ -651,7 +651,8 @@ You can manage this order here: %s', 'mp' );
 					$this->get_address( 'billing', $editable ) .
 					(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
 				</div>';
-				if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
+
+				if ( !$this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
 				$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h4>' .
