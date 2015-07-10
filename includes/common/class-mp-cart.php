@@ -452,7 +452,7 @@ class MP_Cart {
 					break;
 
 				case 'title' :
-					$column_html = '<h2 class="mp_cart_item_title">' . $product->title( false ) . '</h2>';
+					$column_html = '<h2 class="mp_cart_item_title">' . sprintf( '<a target="_blank" href="%s">%s</a>', $product->url( false ), $product->title( false ) ) . '</h2>';
 					if ( !$this->is_editable && $product->is_download() && mp_is_shop_page( 'order_status' ) ) {
 						$column_html .= '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
 					}
