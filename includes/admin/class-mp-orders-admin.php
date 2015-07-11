@@ -120,7 +120,6 @@ class MP_Orders_Admin {
 			// update tracking info
 			$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
 			$order->update_meta( 'mp_shipping_info->method', $shipment_method );
-			
 			// update status to shipped?
 			if ( 'shipped' != $order->post_status && 'shipped' == mp_get_post_value( 'post_status' ) ) {
 				remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
@@ -181,10 +180,12 @@ class MP_Orders_Admin {
 		}
 		
 		$order = new MP_Order( $post_id );
-		
-		$this->_save_shipping_info_metabox( $order );
+
 		$this->_save_order_notes_metabox( $order );
 		$this->_save_customer_info_metabox( $order );
+		//we need to swap the save shipping info after save customer info,
+		//or the new shipping data (shippinng method, number) get overwrited & removed
+		$this->_save_shipping_info_metabox( $order );
 	}
 	
 	/**
