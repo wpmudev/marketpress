@@ -1062,7 +1062,8 @@ if ( !function_exists( 'mp_get_order_history' ) ) :
 		if ( $user_id ) {
 			$orders = (array) get_user_meta( $user_id, $key, true );
 		} else {
-			$orders = (array) mp_get_cookie_value( $key, array() );
+			//cookie values is serialize format, we will have to unserialize
+			$orders = maybe_unserialize( mp_get_cookie_value( $key, array() ) );
 		}
 
 		/**
@@ -1371,8 +1372,8 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			if ( !is_null( $args[ 'per_page' ] ) ) {
 				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
 			} else {
-				$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
-				//$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
+				//$query[ 'posts_per_page' ] = intval( $args[ 'per_page' ] );
+				$query[ 'posts_per_page' ] = intval( mp_get_setting( 'per_page' ) );
 			}
 
 // Figure out page
@@ -1384,7 +1385,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 
 			//Get session values for order and order_by
 			if ( session_id() == '' ) {
-				session_start();
+				@session_start();
 			}
 
 			if ( isset( $_SESSON[ 'mp_product_list_order_by' ] ) ) {
@@ -1496,7 +1497,8 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 			return '';
 		}
 
-		$form = '
+		if ( is_user_logged_in() ) {
+			$form = '
 			<form id="mp-order-lookup-form" class="mp_form mp_form-order-lookup" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
 				<div class="mp_form_content">' . $content . '</div>
 				<div class="mp_form_group">
@@ -1508,6 +1510,11 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 					</div>
 				</div>
 			</form><!-- end mp-order-lookup-form -->';
+		} else {
+			$form = wp_login_form( array(
+				'echo' => false,
+			) );
+		}
 
 		/**
 		 * Filter the order lookup form html
@@ -1549,16 +1556,51 @@ if ( !function_exists( 'mp_order_status' ) ) :
 		extract( $args );
 
 		$html = '';
-		if ( is_null( $order_id ) ) {
-			$html .= _mp_order_status_overview();
-		} else {
-			$order = new MP_Order( $order_id );
-			if ( $order->exists() ) {
-				$html .= $order->details( false );
-			} else {
-				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+
+		//check does user logged in
+		if(is_user_logged_in()) {
+			if ( is_null( $order_id ) ) {
 				$html .= _mp_order_status_overview();
+			} else {
+				$order = new MP_Order( $order_id );
+				if ( $order->exists() ) {
+					//only owner can see
+					if ( $order->post_author != get_current_user_id() ) {
+						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+					} else {
+						$html .= $order->details( false );
+					}
+				} else {
+					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+					$html .= _mp_order_status_overview();
+				}
 			}
+		} else {
+			//we will try to find the order by history cookie, separate code for prevent conflict later
+			//$orders = mp_get_cookie_value( 'mp_order_history', array() );
+			$orders = mp_get_order_history();
+			if ( is_array( $orders ) ) {
+				$order = new MP_Order( $order_id );
+				if ( $order->exists() ) {
+					$found = false;
+					foreach ( $orders as $key => $val ) {
+						if ( $val['id'] == $order->ID ) {
+							//this order belonged to this user
+							$found = true;
+							break;
+						}
+					}
+					if ( $found == true ) {
+						$html .= $order->details( false );
+					} else {
+						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+					}
+				} else {
+					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+					$html .= _mp_order_status_overview();
+				}
+			}
+
 		}
 
 		if ( $echo ) {
