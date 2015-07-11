@@ -87,6 +87,50 @@
 				} );
 			} );
 		};
+
+		var handleOtherShippingMethod = function () {
+			$('select[name="mp[tracking_info][shipping_method]"]').change(function (e) {
+				if ($(this).val() == 'other') {
+					$('.mp-order-custom-shipping-method').removeClass('mp-hide');
+				} else {
+					$('.mp-order-custom-shipping-method').addClass('mp-hide');
+				}
+
+				var option = $(e.target.options[e.target.selectedIndex]);
+				if (option.data('original') == 1) {
+					$('.mp-remove-custom-carrier').removeClass('mp-hide');
+				} else {
+					$('.mp-remove-custom-carrier').addClass('mp-hide');
+				}
+			}).change();
+		};
+
+		var removeCustomShippingMethod = function () {
+			$('.mp-remove-custom-carrier').click(function (e) {
+				e.preventDefault();
+				var selected = $('select[name="mp[tracking_info][shipping_method]"]').val();
+				var that = $(this);
+				$.ajax({
+					type: "POST",
+					url: ajaxurl,
+					data: {
+						action: 'mp_remove_custom_shipping_method',
+						id: selected
+					},
+					beforeSend: function () {
+						that.attr('disabled', 'disabled');
+					},
+					success: function (data) {
+						if (data.status == 'success') {
+							$('select[name="mp[tracking_info][shipping_method]"] option[value="' + selected + '"]').remove();
+							$('select[name="mp[tracking_info][shipping_method]"]').change();
+						} else {
+							alert(data.err);
+						}
+					}
+				})
+			})
+		};
 		
 		setActiveAdminMenu();
 		modifyBulkActionsInput();
@@ -94,5 +138,7 @@
 		initSelect2Fields();
 		initUpdateStatesDropdown();
 		initCustomerInfoLightbox();
+		handleOtherShippingMethod();
+		removeCustomShippingMethod();
 	});
 }( jQuery ) );

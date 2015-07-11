@@ -51,3 +51,7 @@
 .post-type-mp_coupon #message a{
     display: none;
 }
+
+.mp-hide{
+    display: none;
+}

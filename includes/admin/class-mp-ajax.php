@@ -63,6 +63,8 @@ class MP_Ajax {
 		add_action( 'wp_ajax_mp_variation_popup', array( &$this, 'variation_popup' ) );
 
 		add_action( 'wp_ajax_ajax_add_new_variant', array( &$this, 'create_new_variation_draft' ) );
+
+		add_action( 'wp_ajax_mp_remove_custom_shipping_method', array( &$this, 'mp_remove_custom_shipping_method' ) );
 	}
 
 	public function create_new_variation_draft() {
@@ -193,7 +195,7 @@ class MP_Ajax {
 						$has_sale = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
 						?>
 						<label>
-							<input type="checkbox" name="has_sale" class="has_controller" value="<?php echo $has_sale; ?>" <?php checked( 1, $has_sale, true ); ?>> 
+							<input type="checkbox" name="has_sale" class="has_controller" value="<?php echo $has_sale; ?>" <?php checked( 1, $has_sale, true ); ?>>
 							<span><?php _e( 'Set up a Sale for this Product', 'mp' ); ?></span>
 						</label>
 						<fieldset id="fieldset_has_sale" class="has_area">
@@ -209,7 +211,7 @@ class MP_Ajax {
 							$charge_tax = MP_Product::get_variation_meta( $variation_id, 'charge_tax', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>> 
+								<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>>
 								<span><?php _e( 'Charge Taxes (Special Rate)', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_charge_tax" class="has_area">
@@ -225,7 +227,7 @@ class MP_Ajax {
 							$charge_shipping = MP_Product::get_variation_meta( $variation_id, 'charge_shipping', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="charge_shipping" class="has_controller" value="1" <?php checked( 1, $charge_shipping, true ); ?>> 
+								<input type="checkbox" name="charge_shipping" class="has_controller" value="1" <?php checked( 1, $charge_shipping, true ); ?>>
 								<span><?php _e( 'Charge Shipping', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
@@ -250,7 +252,7 @@ class MP_Ajax {
 							$inventory_tracking = MP_Product::get_variation_meta( $variation_id, 'inventory_tracking', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="inventory_tracking" class="has_controller" value="1" <?php checked( 1, $inventory_tracking, true ); ?>> 
+								<input type="checkbox" name="inventory_tracking" class="has_controller" value="1" <?php checked( 1, $inventory_tracking, true ); ?>>
 								<span><?php _e( 'Track Product Inventory', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
@@ -265,7 +267,7 @@ class MP_Ajax {
 						$variation_content_type	 = MP_Product::get_variation_meta( $variation_id, 'variation_content_type', 'plain' );
 						?>
 						<label>
-							<input type="checkbox" name="has_variation_content" class="has_controller" value="1" <?php checked( 1, $has_variation_content, true ); ?>> 
+							<input type="checkbox" name="has_variation_content" class="has_controller" value="1" <?php checked( 1, $has_variation_content, true ); ?>>
 							<span><?php _e( 'Additional Content / Information for this Variation', 'mp' ); ?></span>
 						</label>
 						<fieldset id="fieldset_has_variation_content" class="has_area">
@@ -526,6 +528,27 @@ class MP_Ajax {
 		}
 
 		wp_send_json_success( array( 'states' => $states, 'show_zipcode' => $show_zipcode ) );
+	}
+
+	/**
+	 * Remove custom shipping method
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function mp_remove_custom_shipping_method() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$id                     = mp_get_post_value( 'id' );
+		$custom_shipping_method = mp_get_setting( 'shipping->custom_method', array() );
+		unset( $custom_shipping_method[ $id ] );
+		mp_update_setting( 'shipping->custom_method', $custom_shipping_method );
+
+		wp_send_json( array(
+			'status' => 'success'
+		) );
 	}
 
 }
