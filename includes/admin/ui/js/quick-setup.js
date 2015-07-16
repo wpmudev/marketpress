@@ -36,10 +36,10 @@ jQuery(document).ready(function ($) {
     $(".mp_tab_content_tax").append($("#mp-quick-setup-wizard-tax").html());
     $("#mp-quick-setup-wizard-tax").remove();
 
-    $(".mp_tab_content_system").append($("#mp-quick-setup-wizard-measurement-system").html());
+    $(".mp_tab_content_metric_system").append($("#mp-quick-setup-wizard-measurement-system").html());
     $("#mp-quick-setup-wizard-measurement-system").remove();
 
-    $('body').on('change', 'select[name="base_country"]', function () {
+    $('#mp-quick-setup-tab-metric-system').on('change', 'select[name="base_country"]', function () {
         $.ajax({
             type: 'POST',
             url: ajaxurl,
@@ -59,11 +59,11 @@ jQuery(document).ready(function ($) {
         })
     })
 
-    $('body').on('click', 'input[name="mp-charge-shipping"]', function () {
+    $('#mp-quick-setup-tab-metric-system').on('click', 'input[name="mp-charge-shipping"]', function () {
         if ($(this).val() == 0) {
-            $('.mp_tab_content_shipping_details').addClass('mp-hide');
+            $('.mp_tab_content_shipping_details').slideUp();
         } else {
-            $('.mp_tab_content_shipping_details').removeClass('mp-hide');
+            $('.mp_tab_content_shipping_details').slideDown();
         }
     })
 });

@@ -114,29 +114,36 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 								</div><!-- end mp_tab_navigation -->
 							</div><!-- end mp-quick-setup-tab-currency-and-tax -->
 
-							<div id="mp-quick-setup-tab-metric-system" class="mp-quick_tab">
+							<div id="mp-quick-setup-tab-metric-system" class="mp_tab">
 								<div class="mp_tab_content">
-									<div class="mp_tab_content_system">
-										<p><?php _e( 'And what metric system do you want to use?', 'mp' ); ?></p>
-									</div><!-- end mp_tab_content_system -->
-									<div class="mp_tab_content_shipping">
-										<p><?php _e( 'I want to charge shipping', 'mp' ); ?></p>
-
-										<div class="wpmudev-radio-group horizontal">
-											<label style="width:50%">
-												<input type="radio" name="mp-charge-shipping" value="1"
-												<span><?php _e( "Yes", "mp" ) ?></span>
-											</label>
-											<label style="width:50%">
-												<input type="radio" name="mp-charge-shipping" value="0"
-												<span><?php _e( "No", "mp" ) ?></span>
-											</label>
-										</div>
-										<div class="mp_tab_content_shipping_details mp-hide">
-											<?php do_action( 'mp_wizard_shipping_section' ) ?>
-											<?php do_action( 'mp_wizard_shipping_rule_section' ) ?>
-										</div>
-									</div><!-- end mp_tab_content_shipping -->
+									
+									<div class="mp_tab_content_block">
+										<div class="mp_tab_content_metric_system">
+											<p><?php _e( 'And what metric system do you want to use?', 'mp' ); ?></p>
+										</div><!-- end mp_tab_content_metric_system -->
+									</div><!-- end mp_tab_content_block -->
+									
+									<div class="mp_tab_content_block">
+										<div class="mp_tab_content_shipping">
+											<p><?php _e( 'I want to charge shipping', 'mp' ); ?></p>
+	
+											<div class="wpmudev-radio-group horizontal">
+												<label style="width:50%">
+													<input type="radio" name="mp-charge-shipping" value="1"
+													<span><?php _e( "Yes", "mp" ) ?></span>
+												</label>
+												<label style="width:50%">
+													<input type="radio" name="mp-charge-shipping" value="0"
+													<span><?php _e( "No", "mp" ) ?></span>
+												</label>
+											</div>
+											<div class="mp_tab_content_shipping_details">
+												<?php do_action( 'mp_wizard_shipping_section' ) ?>
+												<?php do_action( 'mp_wizard_shipping_rule_section' ) ?>
+											</div>
+										</div><!-- end mp_tab_content_shipping -->
+									</div><!-- end mp_tab_content_block -->
+									
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
 									<a href="#" class="button-secondary mp_button mp_button_tab_nav-prev"><?php _e( 'Back', 'mp' ); ?></a>
