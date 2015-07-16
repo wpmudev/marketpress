@@ -232,7 +232,11 @@ class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
   public function init_settings_metabox() {
   	$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'page_slugs' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'page_slugs' => array(
+				'store-settings-shipping',
+				'store-settings_page_store-settings-shipping',
+				'store-setup-wizard'
+			),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->public_name),
 			'option_name' => 'mp_settings',
 			'conditional' => array(

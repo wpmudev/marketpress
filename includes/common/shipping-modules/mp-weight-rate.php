@@ -102,7 +102,11 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
   public function init_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id' => $this->generate_metabox_id(),
-			'page_slugs' => array( 'store-settings-shipping', 'store-settings_page_store-settings-shipping' ),
+			'page_slugs' => array(
+				'store-settings-shipping',
+				'store-settings_page_store-settings-shipping',
+				'store-setup-wizard'
+			),
 			'title' => sprintf( __( '%s Settings', 'mp' ), $this->public_name ),
 			'desc' => __( 'Be sure to enter a shipping price for every option or those customers may get free shipping. Don\'t worry about sorting as this will be done automatically upon saving.', 'mp' ),
 			'option_name' => 'mp_settings',

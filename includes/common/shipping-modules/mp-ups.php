@@ -114,7 +114,11 @@ class MP_Shipping_UPS extends MP_Shipping_API_Calculated {
   public function init_settings_metabox() {
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => $this->generate_metabox_id(),
-			'page_slugs' => array('store-settings-shipping', 'store-settings_page_store-settings-shipping'),
+			'page_slugs' => array(
+				'store-settings-shipping',
+				'store-settings_page_store-settings-shipping',
+				'store-setup-wizard'
+			),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->public_name),
 			'desc' => __('In order to use UPS, you will need a UPS Developer Kit access key and the UPS user ID and password associated with the access key.  Set these up for free <a href="https://www.ups.com/upsdeveloperkit" target="_blank">here</a>. If this information is missing or incorrect, an error will appear during the checkout process and the buyer will not be able to complete the transaction.', 'mp'),
 			'option_name' => 'mp_settings',

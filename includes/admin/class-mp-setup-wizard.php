@@ -306,6 +306,33 @@ class MP_Setup_Wizard {
 			'show_submit_button' => false,
 		) );
 
+		/*	$metabox->add_field( 'tab_labels', array(
+				'name' => 'wizard-tab-labels',
+				'tabs' => array(
+					array(
+						'active' => true,
+						'slug'   => 'location',
+						'label'  => __( 'Locations', 'mp' )
+					),
+					array(
+						'active' => false,
+						'slug'   => 'currency-tax',
+						'label'  => __( 'Currency & Tax', 'mp' )
+					),
+					array(
+						'active' => false,
+						'slug'   => 'metric-system',
+						'label'  => __( 'Metric System', 'mp' )
+					)
+				)
+			) );
+
+			$metabox->add_field( 'tab', array(
+				'name' => 'wizard-content',
+				'desc' => 'test'
+			) );*/
+
+
 		$metabox->add_field( 'quick_setup', array(
 			'name'    => 'quick_setup',
 			'label'   => '',
@@ -536,6 +563,62 @@ class MP_Setup_Wizard {
 				),
 				'default_value' => 'english',
 			) );
+
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'                 => 'mp-quick-setup-wizard-shipping',
+				'page_slugs'         => array( 'store-setup-wizard' ),
+				'title'              => __( 'Measurement System', 'mp' ),
+				'option_name'        => 'mp_settings',
+				'class'              => '',
+				'show_submit_button' => false
+			) );
+
+// Shipping Methods
+			$options        = array( 'none' => __( 'No Shipping', 'mp' ) );
+			$plugins        = MP_Shipping_API::get_plugins();
+			$has_calculated = false;
+
+			foreach ( $plugins as $code => $plugin ) {
+				if ( $plugin[2] ) {
+					$has_calculated = true;
+					continue;
+				}
+
+				$options[ $code ] = $plugin[1];
+			}
+
+			if ( $has_calculated ) {
+				$options['calculated'] = __( 'Calculated Options', 'mp' );
+			}
+
+			$metabox->add_field( 'radio_group', array(
+				'name'          => 'shipping[method]',
+				'label'         => array( 'text' => __( 'Shipping Method', 'mp' ) ),
+				'options'       => $options,
+				'default_value' => 'none',
+			) );
+
+			// Selected Calculated Shipping Options
+			$options = array();
+			foreach ( $plugins as $slug => $plugin ) {
+				if ( $plugin[2] ) {
+					$options[ $slug ] = $plugin[1];
+				}
+			}
+
+			$metabox->add_field( 'checkbox_group', array(
+				'name'               => 'shipping[calc_methods]',
+				'label'              => array( 'text' => __( 'Select Shipping Options', 'mp' ) ),
+				'desc'               => __( 'Select which calculated shipping methods the customer will be able to choose from.', 'mp' ),
+				'options'            => $options,
+				'use_options_values' => true,
+				'conditional'        => array(
+					'name'   => 'shipping[method]',
+					'value'  => 'calculated',
+					'action' => 'show',
+				),
+			) );
+
 		}
 
 
@@ -752,6 +835,30 @@ class MP_Setup_Wizard {
 		//add_action( 'admin_notices', array( &$this, 'nag_message' ) );
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
 		add_action( 'wp_ajax_mp_preset_currency_base_country', array( &$this, 'determine_currency' ) );
+		if ( isset( $_GET['page'] ) && $_GET['page'] == 'store-setup-wizard' ) {
+			add_filter( 'wpmudev_metabox/init_args', array( &$this, 'update_settings_for_shipping_rule' ) );
+		}
+	}
+
+	public function update_settings_for_shipping_rule( $args ) {
+		$ids = array(
+			'mp-settings-shipping-plugin-fedex',
+			'mp-settings-shipping-plugin-flat_rate',
+			'mp-settings-shipping-plugin-table_rate',
+			'mp-settings-shipping-plugin-ups',
+			'mp-settings-shipping-plugin-usps',
+			'mp-settings-shipping-plugin-weight_rate',
+			'mp-quick-setup-wizard-shipping'
+		);
+		if ( $args['id'] == 'mp-quick-setup-wizard-shipping' ) {
+			$args['hook'] = 'mp_wizard_shipping_section';
+		} elseif ( in_array( $args['id'], $ids ) ) {
+			$args['hook']               = 'mp_wizard_shipping_rule_section';
+			$args['class']              = '';
+			$args['show_submit_button'] = false;
+		}
+
+		return $args;
 	}
 
 	/**

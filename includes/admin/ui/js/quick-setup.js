@@ -49,9 +49,9 @@ jQuery(document).ready(function ($) {
             },
             success: function (data) {
                 if (data.length > 0) {
-                    if($('select[name="currency"] option[value='+data+']').size()) {
+                    if ($('select[name="currency"] option[value=' + data + ']').size()) {
                         $('select[name="currency"]').val(data).change();
-                    }else{
+                    } else {
                         $('select[name="currency"]').val('USD').change();
                     }
                 }
@@ -59,4 +59,11 @@ jQuery(document).ready(function ($) {
         })
     })
 
+    $('body').on('click', 'input[name="mp-charge-shipping"]', function () {
+        if ($(this).val() == 0) {
+            $('.mp_tab_content_shipping_details').addClass('mp-hide');
+        } else {
+            $('.mp_tab_content_shipping_details').removeClass('mp-hide');
+        }
+    })
 });

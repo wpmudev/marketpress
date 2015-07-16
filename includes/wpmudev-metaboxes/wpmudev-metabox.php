@@ -260,22 +260,25 @@ class WPMUDEV_Metabox {
 	public function __construct( $args = array() ) {
 
 		$this->args = array_replace_recursive( array(
-			'class'				 => 'postbox wpmudev-postbox',
-			'id'				 => '',
-			'title'				 => '',
-			'desc'				 => null,
-			'post_type'			 => '',
-			'page_slugs'		 => array(),
-			'context'			 => 'advanced',
-			'priority'			 => 'default',
-			'option_name'		 => '',
-			'site_option_name'	 => '',
-			'order'				 => 10,
-			'conditional'		 => array(),
-			'custom'			 => array(),
+			'class'              => 'postbox wpmudev-postbox',
+			'id'                 => '',
+			'title'              => '',
+			'desc'               => null,
+			'post_type'          => '',
+			'page_slugs'         => array(),
+			'context'            => 'advanced',
+			'priority'           => 'default',
+			'option_name'        => '',
+			'site_option_name'   => '',
+			'order'              => 10,
+			'conditional'        => array(),
+			'custom'             => array(),
+			'hook'               => 'wpmudev_metabox/render_settings_metaboxes',
 			'show_submit_button' => true,
 			'submit_button_text' => __( 'Save Changes', 'wpmudev_metaboxes' ),
 		), $args );
+
+		$this->args = apply_filters( 'wpmudev_metabox/init_args', $this->args );
 
 		$this->nonce_action	 = 'wpmudev_metabox_' . str_replace( '-', '_', $this->args[ 'id' ] ) . '_save_fields';
 		$this->nonce_name	 = $this->nonce_action . '_nonce';
@@ -294,7 +297,11 @@ class WPMUDEV_Metabox {
 		$this->add_html_classes();
 
 		add_action( 'add_meta_boxes_' . $this->args[ 'post_type' ], array( &$this, 'add_meta_boxes' ), $this->args[ 'order' ] );
-		add_action( 'wpmudev_metabox/render_settings_metaboxes', array( &$this, 'maybe_render' ), $this->args[ 'order' ] );
+
+		add_action( $this->args['hook'], array(
+			&$this,
+			'maybe_render'
+		), $this->args['order'] );
 		add_filter( 'postbox_classes_' . $this->args[ 'post_type' ] . '_' . $this->args[ 'id' ], array( &$this, 'add_meta_box_classes' ) );
 		add_action( 'save_post', array( &$this, 'maybe_save_fields' ) );
 		add_action( 'init', array( &$this, 'maybe_save_settings_fields' ), 99 );
