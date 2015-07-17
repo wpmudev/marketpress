@@ -26,6 +26,10 @@
   box-shadow: none;
 }
 
+#mp-quick-setup-wizard.postbox.wpmudev-postbox .inside .wpmudev-subfield-delete-group {
+  position: relative;
+}
+
 #mp-quick-setup-wizard .mp_tab_content .wpmudev-field {
   margin-top: 20px;
 }
