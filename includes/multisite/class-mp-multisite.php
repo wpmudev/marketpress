@@ -460,7 +460,7 @@ class MP_Multisite {
 				$allowed['free_orders'] = 'full';//Always allow and activate it automatically later if needed
 				if ( is_array( $allowed ) ) {
 					foreach ( $gateways as $code => $gateway ) {
-						if ( 'full' != $allowed[ $code ] ) {
+						if ( isset( $allowed[ $code ] ) && 'full' != $allowed[ $code ] ) {
 							unset( $gateways[ $code ] );
 						}
 					}
