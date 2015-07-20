@@ -114,11 +114,11 @@ class MP_Orders_Admin {
 			return;
 		}
 
-		$tracking_num = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
+		$tracking_num    = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
 		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
-
+		$custom_method   = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
 		//check for the custom shipping method here
-		if ( $shipment_method == 'other' && ! empty( trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) ) )  ) {
+		if ( $shipment_method == 'other' && ! empty( $custom_method ) ) {
 			//so if shippin method = custom, & user provided a new method name, we will use tht method name
 			$method_name     = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
 			$shipment_method = sanitize_title( $method_name );
