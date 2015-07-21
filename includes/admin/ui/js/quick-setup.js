@@ -13,6 +13,11 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
     });
 
+    $('#mp-quick-setup-tab-metric-system .mp_tab_navigation .mp_button_tab_nav-next').click(function (e) {
+        $('#mp-quick-setup-tabs').tabs({active: 3});
+        e.preventDefault();
+    });
+
     $('#mp-quick-setup-tab-currency-and-tax .mp_tab_navigation .mp_button_tab_nav-prev').click(function (e) {
         $('#mp-quick-setup-tabs').tabs({active: 0});
         e.preventDefault();
@@ -20,6 +25,11 @@ jQuery(document).ready(function ($) {
 
     $('#mp-quick-setup-tab-metric-system .mp_tab_navigation .mp_button_tab_nav-prev').click(function (e) {
         $('#mp-quick-setup-tabs').tabs({active: 1});
+        e.preventDefault();
+    });
+    
+    $('#mp-quick-setup-tab-payment-gateway .mp_tab_navigation .mp_button_tab_nav-prev').click(function (e) {
+        $('#mp-quick-setup-tabs').tabs({active: 2});
         e.preventDefault();
     });
 
