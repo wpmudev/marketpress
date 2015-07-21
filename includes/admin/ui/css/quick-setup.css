@@ -198,7 +198,7 @@
     border-top-color: #cbcbcb;
     border-left-color: #cbcbcb;
     display: inline-block;
-    width: 33.33%;
+    width: 25%;
   }
   .mp_quick_setup_tabs .mp_tab_label:first-child {
     border-left: none;
@@ -470,4 +470,15 @@ a.mp_link-skip-step:focus {
 .mp_quick_setup_step-3 .mp_button-add-product,
 .mp_quick_setup_step-3 .mp_button-configure-store {
   margin-top: 20px;
+}
+
+/*style for payment tabs*/
+#mp-quick-setup-wizard.postbox.wpmudev-postbox .mp_quicksetup_gateway_details h3.hndle {
+  display: block;
+}
+#mp-quick-setup-wizard.postbox.wpmudev-postbox #mp-settings-payments h3.hndle{
+  display: none;
+}
+.mp_quicksetup_gateway_details .postbox.wpmudev-postbox .inside{
+  padding: 10px;
 }

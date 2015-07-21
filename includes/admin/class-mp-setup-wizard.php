@@ -619,6 +619,33 @@ class MP_Setup_Wizard {
 				),
 			) );
 
+			//payment gateway
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'                 => 'mp-quick-setup-wizard-payment',
+				'page_slugs'         => array( 'store-setup-wizard' ),
+				'title'              => __( 'Payment Gateways', 'mp' ),
+				'option_name'        => 'mp_settings',
+				'class'              => '',
+				'show_submit_button' => false,
+				'hook'               => 'mp_wizard_payment_gateway_section'
+			) );
+
+			$gateways = MP_Gateway_API::get_gateways( true );
+
+			$manual_payments = $gateways['manual_payments'];
+			$options         = array(
+				'manual_payments' => $manual_payments[1],
+				'other'           => __( "Other Gateways", "mp" )
+			);
+
+			$metabox->add_field( 'radio_group', array(
+				'name'          => 'wizard_payment',
+				'label'         => array( 'text' => __( 'Setup your payment gateway', 'mp' ) ),
+				'options'       => $options,
+				'default_value' => 'none',
+			) );
+
+
 		}
 
 
@@ -837,7 +864,28 @@ class MP_Setup_Wizard {
 		add_action( 'wp_ajax_mp_preset_currency_base_country', array( &$this, 'determine_currency' ) );
 		if ( isset( $_GET['page'] ) && $_GET['page'] == 'store-setup-wizard' ) {
 			add_filter( 'wpmudev_metabox/init_args', array( &$this, 'update_settings_for_shipping_rule' ) );
+			/**
+			 * Payment widzard having 2 radios default gateway & other, we don't store this value inside db,
+			 * use this hook for return the right
+			 */
+			/*add_filter( 'wpmudev_field/get_value/wizard_payment', array(
+				&$this,
+				'determine_default_payment_value'
+			), 10, 4 );*/
 		}
+	}
+
+	public function determine_default_payment_value( $value, $post_id, $raw, $instance ) {
+		$activate_gateways = MP_Gateway_API::get_active_gateways();
+		//unset freeorder, as it is auto activate
+		unset( $activate_gateways['free_orders'] );
+		//determine to select other or manual
+		$selected = 'manual_payments';
+		if ( count( $activate_gateways ) > 1 ) {
+			$selected = 'other';
+		}
+
+		return $selected;
 	}
 
 	public function update_settings_for_shipping_rule( $args ) {
@@ -852,10 +900,21 @@ class MP_Setup_Wizard {
 		);
 		if ( $args['id'] == 'mp-quick-setup-wizard-shipping' ) {
 			$args['hook'] = 'mp_wizard_shipping_section';
+		} elseif ( $args['id'] == 'mp-settings-payments' ) {
+			$args['hook']  = 'mp_wizard_payment_gateway_details';
+			$args['class'] = '';
+			$args['page_slugs'][]       = 'store-setup-wizard';
 		} elseif ( in_array( $args['id'], $ids ) ) {
 			$args['hook']               = 'mp_wizard_shipping_rule_section';
 			$args['class']              = '';
 			$args['show_submit_button'] = false;
+		} elseif ( strpos( $args['id'], 'mp-settings-gateway' ) === 0 ) {
+			if ( $args['id'] != 'mp-settings-gateway-free_orders' ) {
+				$args['page_slugs'][]       = 'store-setup-wizard';
+				$args['hook']               = 'mp_wizard_payment_gateway_details';
+				$args['show_submit_button'] = false;
+				//$args['class']              = 'mp-wizard-gateway-detail';
+			}
 		}
 
 		return $args;

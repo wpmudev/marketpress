@@ -65,5 +65,14 @@ jQuery(document).ready(function ($) {
         } else {
             $('.mp_tab_content_shipping_details').slideDown();
         }
-    })
+    });
+    $('#mp-quick-setup-tab-payment-gateway').on('click', 'input[name="wizard_payment"]', function () {
+        if ($(this).val() != 'other') {
+            $('.mp_quicksetup_gateway_details').slideUp();
+        } else {
+            $('.mp_quicksetup_gateway_details').slideDown();
+        }
+    });
+
+    $('input[name="wizard_payment"]:checked').click();
 });

@@ -77,6 +77,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 							<li class="mp_tab_label"><a class="mp_tab_label_link" href="#mp-quick-setup-tab-locations"><span class="dashicons-before dashicons-admin-site mp_icon mp_icon-inline mp_icon-rounded"></span> <?php _e( 'Locations', 'mp' ); ?></a></li>
 							<li class="mp_tab_label"><a class="mp_tab_label_link" href="#mp-quick-setup-tab-currency-and-tax"><span class="dashicons-before dashicons-tag mp_icon mp_icon-inline mp_icon-rounded"></span> <?php _e( 'Currency & Tax', 'mp' ); ?></a></li>
 							<li class="mp_tab_label"><a class="mp_tab_label_link" href="#mp-quick-setup-tab-metric-system"><span class="dashicons-before dashicons-cart mp_icon mp_icon-inline mp_icon-rounded"></span> <?php _e( 'Metric System', 'mp' ); ?></a></li>
+							<li class="mp_tab_label"><a class="mp_tab_label_link" href="#mp-quick-setup-tab-payment-gateway"><span class="dashicons-before dashicons-feedback mp_icon mp_icon-inline mp_icon-rounded"></span> <?php _e( 'Payment Gateway', 'mp' ); ?></a></li>
 						</ul><!-- end mp_tabs_labels -->
 
 						<div class="mp_tabs_content">
@@ -116,17 +117,17 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 
 							<div id="mp-quick-setup-tab-metric-system" class="mp_tab">
 								<div class="mp_tab_content">
-									
+
 									<div class="mp_tab_content_block">
 										<div class="mp_tab_content_metric_system">
 											<p><?php _e( 'And what metric system do you want to use?', 'mp' ); ?></p>
 										</div><!-- end mp_tab_content_metric_system -->
 									</div><!-- end mp_tab_content_block -->
-									
+
 									<div class="mp_tab_content_block">
 										<div class="mp_tab_content_shipping">
 											<p><?php _e( 'I want to charge shipping', 'mp' ); ?></p>
-	
+
 											<div class="wpmudev-radio-group horizontal">
 												<label style="width:50%">
 													<input type="radio" name="mp-charge-shipping" value="1"
@@ -143,15 +144,33 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 											</div>
 										</div><!-- end mp_tab_content_shipping -->
 									</div><!-- end mp_tab_content_block -->
-									
+
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
 									<a href="#" class="button-secondary mp_button mp_button_tab_nav-prev"><?php _e( 'Back', 'mp' ); ?></a>
-									<input class="button-primary mp_button mp_button_tab_nav-finish" type="submit" name="submit_settings" value="<?php _e( 'Finish Setup', 'mp' ); ?>" />
+									<a href="#" class="button-secondary mp_button mp_button_tab_nav-next"><?php _e( 'Next', 'mp' ); ?></a>
 									<!--<a href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '3' ), 'admin.php' ) ); ?>" class="button-primary"><?php _e( 'Finish Setup', 'mp' ); ?></a>-->
 								</div><!-- end mp_tab_navigation -->
 							</div><!-- mp-quick-setup-tab-metric-system -->
-
+							<!-- open payment gateway tab section -->
+							<div id="mp-quick-setup-tab-payment-gateway">
+								<div class="mp_tab_content">
+									<?php do_action( 'mp_wizard_payment_gateway_section' ) ?>
+									<div class="mp_quicksetup_gateway_details">
+										<hr/>
+										<?php do_action( 'mp_wizard_payment_gateway_details' ) ?>
+									</div>
+								</div>
+								<!-- end mp_tab_content -->
+								<div class="mp_tab_navigation">
+									<a href="#"
+									   class="button-secondary mp_button mp_button_tab_nav-prev"><?php _e( 'Back', 'mp' ); ?></a>
+									<input class="button-primary mp_button mp_button_tab_nav-finish" type="submit"
+									       name="submit_settings" value="<?php _e( 'Finish Setup', 'mp' ); ?>"/>
+								</div>
+								<!-- end mp_tab_navigation -->
+							</div>
+							<!-- end payment gateway tab section -->
 						</div><!-- end mp_tabs_content -->
 
 					</div><!-- end mp_quick_setup_tabs -->

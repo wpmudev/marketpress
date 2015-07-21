@@ -79,6 +79,7 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 		 * @return array
 		 */
 		public static function load_active_gateways() {
+
 			if ( ! empty( self::$_active_gateways ) ) {
 				// We already loaded the active gateways. No need to continue.
 				return;
@@ -102,8 +103,8 @@ if ( !class_exists( 'MP_Gateway_API' ) ) :
 				if (is_multisite() && mp_get_network_setting( 'global_cart' ) && $code == $gateways ) {
 					self::$_active_gateways[ $code ] = new $class;
 				} else {
-					if ( is_admin() && 'store-settings-payments' == mp_get_get_value( 'page' ) ) {
-						// load all gateways when in admin
+					if ( is_admin() && ( 'store-settings-payments' == mp_get_get_value( 'page' ) || 'store-setup-wizard' == mp_get_get_value( 'page' ) ) ) {
+						// load all gateways when in admin or quicksetup
 						self::$_active_gateways[ $code ] = new $class;
 					} elseif ( mp_arr_get_value( "allowed->{$code}", $gateways ) ) {
 						self::$_active_gateways[ $code ] = new $class;
