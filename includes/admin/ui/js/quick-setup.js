@@ -69,11 +69,11 @@ jQuery(document).ready(function ($) {
         })
     })
 
-    $('#mp-quick-setup-tab-metric-system').on('click', 'input[name="mp-charge-shipping"]', function () {
-        if ($(this).val() == 0) {
-            $('.mp_tab_content_shipping_details').slideUp();
-        } else {
+    $('#mp-quick-setup-tab-metric-system').on('click', 'input[name="mp_charge_shipping"]', function () {
+        if ($(this).val() == 1) {
             $('.mp_tab_content_shipping_details').slideDown();
+        } else {
+            $('.mp_tab_content_shipping_details').slideUp();
         }
     });
     $('#mp-quick-setup-tab-payment-gateway').on('click', 'input[name="wizard_payment"]', function () {

@@ -565,6 +565,26 @@ class MP_Setup_Wizard {
 			) );
 
 			$metabox = new WPMUDEV_Metabox( array(
+				'id'                 => 'mp-quick-setup-is-wizard-shipping',
+				'page_slugs'         => array( 'store-setup-wizard' ),
+				'title'              => '',
+				'option_name'        => '',
+				'class'              => '',
+				'hook'               => 'mp_wizard_shipping_section',
+				'show_submit_button' => false
+			) );
+			$metabox->add_field( 'radio_group', array(
+				'name'          => 'mp_charge_shipping',
+				'options'       => array(
+					'1' => __( 'Yes', 'mp' ),
+					'0' => __( 'No', 'mp' ),
+				),
+				'label'         => array(
+					'text'  => __( 'I want to charge shipping', 'mp' ),
+				),
+				'default_value' => '0',
+			) );
+			$metabox = new WPMUDEV_Metabox( array(
 				'id'                 => 'mp-quick-setup-wizard-shipping',
 				'page_slugs'         => array( 'store-setup-wizard' ),
 				'title'              => __( 'Measurement System', 'mp' ),
@@ -642,7 +662,7 @@ class MP_Setup_Wizard {
 				'name'          => 'wizard_payment',
 				'label'         => array( 'text' => __( 'Setup your payment gateway', 'mp' ) ),
 				'options'       => $options,
-				'default_value' => 'none',
+				'default_value' => 'manual_payments',
 			) );
 
 
@@ -899,13 +919,13 @@ class MP_Setup_Wizard {
 			'mp-quick-setup-wizard-shipping'
 		);
 		if ( $args['id'] == 'mp-quick-setup-wizard-shipping' ) {
-			$args['hook'] = 'mp_wizard_shipping_section';
+			$args['hook'] = 'mp_wizard_shipping_rule_section';
 		} elseif ( $args['id'] == 'mp-settings-payments' ) {
-			$args['hook']  = 'mp_wizard_payment_gateway_details';
-			$args['class'] = '';
-			$args['page_slugs'][]       = 'store-setup-wizard';
+			$args['hook']         = 'mp_wizard_payment_gateway_details';
+			$args['class']        = '';
+			$args['page_slugs'][] = 'store-setup-wizard';
 		} elseif ( in_array( $args['id'], $ids ) ) {
-			$args['hook']               = 'mp_wizard_shipping_rule_section';
+			$args['hook']               = '_mp_wizard_shipping_rule_section';
 			$args['class']              = '';
 			$args['show_submit_button'] = false;
 		} elseif ( strpos( $args['id'], 'mp-settings-gateway' ) === 0 ) {
