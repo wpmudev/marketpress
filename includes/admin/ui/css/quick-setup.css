@@ -45,6 +45,7 @@
 #mp-quick-setup-wizard .mp_tab_content p.mp_tab_content_label,
 #mp-quick-setup-wizard .mp_tab_content .wpmudev-field-label {
   color: #23282d;
+  font-family: 'Open Sans', Arial, sans-serif;
   font-size: 16px;
   font-size: 1rem;
   font-weight: 600;
@@ -52,12 +53,24 @@
   margin-bottom: 10px;
 }
 
-#mp-quick-setup-wizard .mp_tab_content .wpmudev-field-desc {
+#mp-quick-setup-wizard .mp_tab_content .wpmudev-field-desc,
+#mp-quick-setup-wizard .mp_tab_content .wpmudev-metabox-desc {
   color: #5a6773;
+  font-family: 'Open Sans', Arial, sans-serif;
   font-size: 14px;
   font-size: 0.875rem;
   line-height: 1.4285714286em;
   margin: 0 0 10px;
+  padding: 0;
+}
+
+#mp-quick-setup-is-wizard-shipping .inside .wpmudev-field-label {
+  color: #5a6773;
+  font-size: 14px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4285714286em;
+  margin: 0 0 15px;
   padding: 0;
 }
 
@@ -259,6 +272,16 @@
 .mp_quick_setup_tabs .mp_tab_content_shipping_details {
   display: none;
   margin-top: 15px;
+}
+
+.mp_quick_setup_tabs .mp_tab_content_payment_gateway_details {
+  display: none;
+  margin-top: 15px;
+}
+
+.mp_quick_setup_tabs .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox {
+  margin-top: 20px;
+  padding: 15px;
 }
 
 .mp_quick_setup_tabs .mp_tab_navigation {
@@ -470,20 +493,4 @@ a.mp_link-skip-step:focus {
 .mp_quick_setup_step-3 .mp_button-add-product,
 .mp_quick_setup_step-3 .mp_button-configure-store {
   margin-top: 20px;
-}
-
-/*style for payment tabs*/
-#mp-quick-setup-wizard.postbox.wpmudev-postbox .mp_quicksetup_gateway_details h3.hndle {
-  display: block;
-}
-#mp-quick-setup-wizard.postbox.wpmudev-postbox #mp-settings-payments h3.hndle{
-  display: none;
-}
-.mp_quicksetup_gateway_details .postbox.wpmudev-postbox .inside{
-  padding: 10px;
-}
-#mp-quick-setup-is-wizard-shipping .inside .wpmudev-field-label{
-  font-weight: normal;
-    color: #5a6773;
-    font-size: 14px;
 }

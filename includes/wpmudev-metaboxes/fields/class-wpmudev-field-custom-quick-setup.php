@@ -141,21 +141,20 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 									<!--<a href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '3' ), 'admin.php' ) ); ?>" class="button-primary"><?php _e( 'Finish Setup', 'mp' ); ?></a>-->
 								</div><!-- end mp_tab_navigation -->
 							</div><!-- mp-quick-setup-tab-metric-system -->
-							<!-- open payment gateway tab section -->
-							<div id="mp-quick-setup-tab-payment-gateway">
+							
+
+							<div id="mp-quick-setup-tab-payment-gateway" class="mp_tab">
 								<div class="mp_tab_content">
-									<?php do_action( 'mp_wizard_payment_gateway_section' ) ?>
-									<div class="mp_quicksetup_gateway_details">
-										<hr/>
-										<?php do_action( 'mp_wizard_payment_gateway_details' ) ?>
-									</div>
-								</div>
-								<!-- end mp_tab_content -->
+									<div class="mp_tab_content_payment_gateway">
+										<?php do_action( 'mp_wizard_payment_gateway_section' ) ?>
+										<div class="mp_tab_content_payment_gateway_details">
+											<?php do_action( 'mp_wizard_payment_gateway_details' ) ?>
+										</div><!-- end mp_tab_content_payment_gateway_details -->
+									</div><!-- end mp_tab_content_payment_gateway -->
+								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">
-									<a href="#"
-									   class="button-secondary mp_button mp_button_tab_nav-prev"><?php _e( 'Back', 'mp' ); ?></a>
-									<input class="button-primary mp_button mp_button_tab_nav-finish" type="submit"
-									       name="submit_settings" value="<?php _e( 'Finish Setup', 'mp' ); ?>"/>
+									<a href="#" class="button-secondary mp_button mp_button_tab_nav-prev"><?php _e( 'Back', 'mp' ); ?></a>
+									<input class="button-primary mp_button mp_button_tab_nav-finish" type="submit" name="submit_settings" value="<?php _e( 'Finish Setup', 'mp' ); ?>">
 								</div>
 								<!-- end mp_tab_navigation -->
 							</div>

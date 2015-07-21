@@ -78,9 +78,9 @@ jQuery(document).ready(function ($) {
     });
     $('#mp-quick-setup-tab-payment-gateway').on('click', 'input[name="wizard_payment"]', function () {
         if ($(this).val() != 'other') {
-            $('.mp_quicksetup_gateway_details').slideUp();
+            $('.mp_tab_content_payment_gateway_details').slideUp();
         } else {
-            $('.mp_quicksetup_gateway_details').slideDown();
+            $('.mp_tab_content_payment_gateway_details').slideDown();
         }
     });
 
