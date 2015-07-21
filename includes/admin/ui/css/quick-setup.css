@@ -482,3 +482,8 @@ a.mp_link-skip-step:focus {
 .mp_quicksetup_gateway_details .postbox.wpmudev-postbox .inside{
   padding: 10px;
 }
+#mp-quick-setup-is-wizard-shipping .inside .wpmudev-field-label{
+  font-weight: normal;
+    color: #5a6773;
+    font-size: 14px;
+}
