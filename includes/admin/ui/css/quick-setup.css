@@ -74,6 +74,11 @@
   padding: 0;
 }
 
+#mp-quick-setup-tab-payment-gateway .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox h3.hndle {
+  display: block;
+  padding: 15px;
+}
+
 #mp-quick-setup-wizard h3.mp_title {
   font-size: 22px;
   font-size: 1.375rem;
@@ -281,6 +286,9 @@
 
 .mp_quick_setup_tabs .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox {
   margin-top: 20px;
+}
+
+.mp_quick_setup_tabs .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox .inside {
   padding: 15px;
 }
 
