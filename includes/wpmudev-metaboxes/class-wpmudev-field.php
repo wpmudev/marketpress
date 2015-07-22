@@ -141,7 +141,7 @@ class WPMUDEV_Field {
 			'name'						 => '',
 			'original_name'				 => '',
 			'name_base'					 => '',
-			'id'						 => '',
+			'id'						 => $this->get_id(),
 			'class'						 => '',
 			'style'						 => '',
 			'disabled'					 => '',
@@ -279,7 +279,7 @@ class WPMUDEV_Field {
 	 *
 	 * @since 3.0.0
 	 * @uses mp_arr_get_value()
-	 * 	 
+	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
 	 * @return mixed
@@ -294,7 +294,8 @@ class WPMUDEV_Field {
 			$value = isset( $_POST[ $keys[ 0 ] ] ) ? $_POST[ $keys[ 0 ] ] : null;
 		}
 
-		return ( is_null( $value ) ) ? $default : $value;
+		$value = ( is_null( $value ) ) ? $default : $value;
+		return apply_filters( 'wpmudev_fields/get_post_value_' . implode( '_', $keys ), $value );
 	}
 
 	/**
@@ -483,7 +484,7 @@ class WPMUDEV_Field {
 		 * @param mixed $value The return value
 		 * @param mixed $post_id The current post id or option name
 		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
-		 * @param object $this Refers to the current field object		 
+		 * @param object $this Refers to the current field object
 		 */
 		$value	 = apply_filters( 'wpmudev_field/before_get_value', $value, $post_id, $raw, $this );
 		$value	 = apply_filters( 'wpmudev_field/before_get_value/' . $this->args[ 'name' ], $value, $post_id, $raw, $this );
@@ -526,7 +527,7 @@ class WPMUDEV_Field {
 		 * @param mixed $value The return value
 		 * @param mixed $post_id The current post id or option name
 		 * @param bool $raw Whether or not to get the raw/unformatted value as saved in the db
-		 * @param object $this Refers to the current field object		 
+		 * @param object $this Refers to the current field object
 		 */
 		$value	 = apply_filters( 'wpmudev_field/get_value', $value, $post_id, $raw, $this );
 		$value	 = apply_filters( 'wpmudev_field/get_value/' . $this->args[ 'name' ], $value, $post_id, $raw, $this );
@@ -637,7 +638,7 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function print_scripts() {
-		
+
 	}
 
 	/**
@@ -701,7 +702,7 @@ class WPMUDEV_Field {
 	 * @param array $args An array of arguments.
 	 */
 	public function on_creation( $args ) {
-		
+
 	}
 
 	/**
@@ -711,7 +712,7 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function enqueue_scripts() {
-		
+
 	}
 
 	/**
@@ -721,7 +722,7 @@ class WPMUDEV_Field {
 	 * @access public
 	 */
 	public function enqueue_styles() {
-		
+
 	}
 
 	/**
@@ -761,7 +762,7 @@ class WPMUDEV_Field {
 
 		foreach ( $args[ 'custom' ] as $key => $val ) {
 			if ( is_array( $val ) ) {
-				
+
 			} else {
 				$atts .= $key . '="' . esc_attr( $val ) . '" ';
 			}
@@ -788,7 +789,7 @@ class WPMUDEV_Field {
 	 */
 	public function get_id() {
 		if ( empty( $this->args[ 'id' ] ) ) {
-			$this->args[ 'id' ] = 'wpmudev-field-' . uniqid( true );
+			$this->args[ 'id' ] = 'wpmudev-field-' . uniqid(true );
 		}
 
 		/**
