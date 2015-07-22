@@ -53,6 +53,7 @@ class MP_PDF_Invoice_Addon {
 		}
 		add_action( 'add_meta_boxes_mp_order', array( &$this, 'add_meta_box' ) );
 		add_action( 'wp_ajax_mp_invoice_pdf_generate', array( &$this, 'generate_pdf' ) );
+		add_action( 'wp_ajax_nopriv_mp_invoice_pdf_generate', array( &$this, 'generate_pdf' ) );
 		add_filter( 'mp_order/details', array( &$this, 'pdf_buttons_order_status' ), 99, 2 );
 		add_filter( 'mp_order/sendmail_attachments', array( &$this, 'mp_order_sendmail_attachments' ), 20, 3 );
 	}
@@ -81,7 +82,32 @@ class MP_PDF_Invoice_Addon {
 			$gen->generate_pdf( $order->get_id(), mp_get_get_value( 'type', MP_PDF_Invoice::PDF_INVOICE ), $settings['download'] == 'download' ? true : false );
 			die;
 		} else {
-			die( __( "You can't download this order invoice", "mp" ) );
+			//user stil not loggin
+			$orders = mp_get_order_history();
+			if ( is_array( $orders ) ) {
+				$order = new MP_Order( $order_id );
+				if ( $order->exists() ) {
+					$found = false;
+					foreach ( $orders as $key => $val ) {
+						if ( $val['id'] == $order->ID ) {
+							//this order belonged to this user
+							$found = true;
+							break;
+						}
+					}
+					if ( $found == true ) {
+						$gen      = new MP_PDF_Invoice();
+						$settings = mp_get_setting( 'pdf_invoice' );
+						$gen->generate_pdf( $order->get_id(), mp_get_get_value( 'type', MP_PDF_Invoice::PDF_INVOICE ), $settings['download'] == 'download' ? true : false );
+					} else {
+						die( __( "You can't download this order invoice", "mp" ) );
+					}
+				} else {
+					die( __( "You can't download this order invoice", "mp" ) );
+				}
+			} else {
+				die( __( "You can't download this order invoice", "mp" ) );
+			}
 		}
 	}
 
