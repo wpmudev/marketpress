@@ -306,33 +306,6 @@ class MP_Setup_Wizard {
 			'show_submit_button' => false,
 		) );
 
-		/*	$metabox->add_field( 'tab_labels', array(
-				'name' => 'wizard-tab-labels',
-				'tabs' => array(
-					array(
-						'active' => true,
-						'slug'   => 'location',
-						'label'  => __( 'Locations', 'mp' )
-					),
-					array(
-						'active' => false,
-						'slug'   => 'currency-tax',
-						'label'  => __( 'Currency & Tax', 'mp' )
-					),
-					array(
-						'active' => false,
-						'slug'   => 'metric-system',
-						'label'  => __( 'Metric System', 'mp' )
-					)
-				)
-			) );
-
-			$metabox->add_field( 'tab', array(
-				'name' => 'wizard-content',
-				'desc' => 'test'
-			) );*/
-
-
 		$metabox->add_field( 'quick_setup', array(
 			'name'    => 'quick_setup',
 			'label'   => '',
@@ -351,6 +324,7 @@ class MP_Setup_Wizard {
 				'title'              => __( 'Location', 'mp' ),
 				'option_name'        => 'mp_settings',
 				'show_submit_button' => false,
+				'ajax_save'          => true
 			) );
 
 			$metabox->add_field( 'advanced_select', array(

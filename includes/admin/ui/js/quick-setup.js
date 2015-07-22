@@ -27,7 +27,7 @@ jQuery(document).ready(function ($) {
         $('#mp-quick-setup-tabs').tabs({active: 1});
         e.preventDefault();
     });
-    
+
     $('#mp-quick-setup-tab-payment-gateway .mp_tab_navigation .mp_button_tab_nav-prev').click(function (e) {
         $('#mp-quick-setup-tabs').tabs({active: 2});
         e.preventDefault();
@@ -49,13 +49,14 @@ jQuery(document).ready(function ($) {
     $(".mp_tab_content_metric_system").append($("#mp-quick-setup-wizard-measurement-system").html());
     $("#mp-quick-setup-wizard-measurement-system").remove();
 
-    $('#mp-quick-setup-tab-metric-system').on('change', 'select[name="base_country"]', function () {
+
+    $(document).on('wpmudev_fields_saved_field_base_country', function (e, data) {
         $.ajax({
             type: 'POST',
             url: ajaxurl,
             data: {
                 action: 'mp_preset_currency_base_country',
-                country: $(this).val()
+                country: data
             },
             success: function (data) {
                 if (data.length > 0) {
@@ -67,7 +68,9 @@ jQuery(document).ready(function ($) {
                 }
             }
         })
-    })
+        //we also need to reload the shipping tab
+        $('#mp-settings-shipping-plugin-flat_rate').load(window.location.href + ' #mp-settings-shipping-plugin-flat_rate');
+    });
 
     $('#mp-quick-setup-tab-metric-system').on('click', 'input[name="mp_charge_shipping"]', function () {
         if ($(this).val() == 1) {
@@ -76,6 +79,7 @@ jQuery(document).ready(function ($) {
             $('.mp_tab_content_shipping_details').slideUp();
         }
     });
+    $('input[name="mp_charge_shipping"]:checked').click();
     $('#mp-quick-setup-tab-payment-gateway').on('click', 'input[name="wizard_payment"]', function () {
         if ($(this).val() != 'other') {
             $('.mp_tab_content_payment_gateway_details').slideUp();
