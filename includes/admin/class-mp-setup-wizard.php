@@ -337,7 +337,7 @@ class MP_Setup_Wizard {
 			'name'    => 'quick_setup',
 			'label'   => '',
 			'message' => __( 'Quick Setup', 'mp' ),
-			'class'   => 'mp_quick_setup'
+			'class'   => 'mp_quick_setup',
 		) );
 
 		$quick_setup_step = mp_get_get_value( 'quick_setup_step' );
@@ -545,7 +545,6 @@ class MP_Setup_Wizard {
 				'class'   => 'mp-quick-field-inline-block'
 			) );
 
-
 			// Measurement System
 
 			$metabox = new WPMUDEV_Metabox( array(
@@ -580,7 +579,7 @@ class MP_Setup_Wizard {
 					'0' => __( 'No', 'mp' ),
 				),
 				'label'         => array(
-					'text'  => __( 'I want to charge shipping', 'mp' ),
+					'text' => __( 'I want to charge shipping', 'mp' ),
 				),
 				'default_value' => '0',
 			) );
@@ -892,6 +891,21 @@ class MP_Setup_Wizard {
 				&$this,
 				'determine_default_payment_value'
 			), 10, 4 );*/
+			add_filter( 'wpmudev_metabox/after_settings_metabox_saved', array( &$this, 'maybe_save_manual_payment' ) );
+		}
+	}
+
+	public function maybe_save_manual_payment( $metabox ) {
+		if ( $metabox->args['id'] == 'mp-quick-setup-wizard-payment' ) {
+			foreach ( $metabox->fields as $field ) {
+				$post_key = $field->get_post_key( $field->args['name'] );
+				$value    = $field->get_post_value( $post_key );
+				if ( $value == 'manual_payments' ) {
+					$allowed                    = mp_get_setting( 'gateways->allowed' );
+					$allowed['manual_payments'] = 1;
+					mp_update_setting( 'gateways->allowed', $allowed );
+				}
+			}
 		}
 	}
 
