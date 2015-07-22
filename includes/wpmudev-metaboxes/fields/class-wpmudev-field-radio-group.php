@@ -45,17 +45,22 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 		$this->before_field(); ?>
 		<div class="wpmudev-radio-group <?php echo $args['orientation']; ?>">
 		<?php
+		$index = 0;
 		foreach ( $args['options'] as $value => $label ) {
 			/* these attributes are already set so we don't want to re-run the
 			initialization logic for each radio field */
-			$args['conditional'] = false; 
-			
+			$args['conditional'] = false;
+
 			$args['value'] = $value;
 			$args['label'] = array( 'text' => $label );
 			$args['width'] = $width;
-			
+			//we will need to update the id field
+			if ( ! empty( $args['id'] ) ) {
+				$args['id'] = $args['id'] . '_' . $index;
+			}
 			$field = new WPMUDEV_Field_Radio( $args );
 			$field->display( $post_id );
+			$index ++;
 		} ?>
 		</div>
 		<?php

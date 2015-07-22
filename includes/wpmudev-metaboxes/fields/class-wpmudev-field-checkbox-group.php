@@ -46,16 +46,22 @@ class WPMUDEV_Field_Checkbox_Group extends WPMUDEV_Field {
 		?>
 		<div class="wpmudev-checkbox-group <?php echo $this->args[ 'orientation' ]; ?>">
 			<?php
-			foreach ( $this->args[ 'options' ] as $value => $label ) {
+			$index = 0;
+			foreach ( $this->args['options'] as $value => $label ) {
+				//we will need to update the id field
+				if ( ! empty( $this->args['id'] ) ) {
+					$this->args['id'] = $this->args['id'] . '_' . $index;
+				}
 				$field = new WPMUDEV_Field_Checkbox( array_replace_recursive( $this->args, apply_filters( 'WPMUDEV_Field_Checkbox_Group_Arguments_' . $value, array(
-					'conditional'	 => false,
-					'name'			 => $this->args[ 'name' ] . '[' . $value . ']',
-					'default_value'	 => $this->args[ 'default_value' ],
-					'value'			 => ( $this->args[ 'use_options_values' ] ) ? $value : 1,
-					'message'		 => $label,
-					'width'			 => $width,
+					'conditional'   => false,
+					'name'          => $this->args['name'] . '[' . $value . ']',
+					'default_value' => $this->args['default_value'],
+					'value'         => ( $this->args['use_options_values'] ) ? $value : 1,
+					'message'       => $label,
+					'width'         => $width,
 				) ) ) );
 				$field->display( $post_id );
+				$index ++;
 			}
 			?>
 		</div>
