@@ -98,20 +98,24 @@ class MP_Dashboard_Widgets {
 		<div class="main store-management">
 			<ul class="store-management-left">
 				<li><span><?php _e( 'Manage', 'mp' ); ?></span></li>
-				<li><a href=""><?php _e( 'Orders', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Coupons', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Products', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Categories', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Tags', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'edit.php?post_type=mp_order' ); ?>"><?php _e( 'Orders', 'mp' ); ?></a></li>
+				<?php
+				if ( MP_Addons::get_instance()->is_addon_enabled( 'MP_Coupons_Addon' ) ) {
+					?>
+					<li><a href="<?php echo admin_url( 'edit.php?post_type=mp_coupon' ); ?>"><?php _e( 'Coupons', 'mp' ); ?></a></li>
+				<?php } ?>
+				<li><a href="<?php echo admin_url( 'edit.php?post_type=' . MP_Product::get_post_type() ); ?>"><?php _e( 'Products', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'edit-tags.php?taxonomy=product_category&post_type=' . MP_Product::get_post_type() ); ?>"><?php _e( 'Categories', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type() ); ?>"><?php _e( 'Tags', 'mp' ); ?></a></li>
 			</ul>
 			<ul class="store-management-right">
 				<li><span><?php _e( 'Configure', 'mp' ); ?></span></li>
-				<li><a href=""><?php _e( 'Presentation', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Email Notifications', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Shipping Rates', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Payment Gateways', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'User Capabilities', 'mp' ); ?></a></li>
-				<li><a href=""><?php _e( 'Add-ons', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-presentation' ); ?>"><?php _e( 'Presentation', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-notifications' ); ?>"><?php _e( 'Email Notifications', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-shipping' ); ?>"><?php _e( 'Shipping Rates', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-payments' ); ?>"><?php _e( 'Payment Gateways', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-capabilities' ); ?>"><?php _e( 'User Capabilities', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-addons' ); ?>"><?php _e( 'Add-ons', 'mp' ); ?></a></li>
 			</ul>
 		</div>
 		<br clear="both" />
