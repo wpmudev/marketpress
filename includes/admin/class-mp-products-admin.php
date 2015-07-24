@@ -741,9 +741,10 @@ class MP_Products_Screen {
 	 * @uses $wpdb
 	 */
 	public function save_inline_variation_post_data() {
+
 		$post_id = mp_get_post_value( 'post_id' );
 		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
-
+		
 		if ( isset( $post_id ) && is_numeric( $post_id ) ) {
 
 			$value_type		 = mp_get_post_value( 'meta_name' );
@@ -794,6 +795,9 @@ class MP_Products_Screen {
 					if ( $value_type == '_thumbnail_id' && $value == '' ) {
 						delete_post_meta( $post_id, '_thumbnail_id' );
 					} else {
+						if($value_type == 'inventory'){
+							update_post_meta( $post_id, 'inv_inventory', sanitize_text_field( $value ) );
+						}
 						update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
 					}
 			}

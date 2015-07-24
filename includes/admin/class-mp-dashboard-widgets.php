@@ -32,7 +32,7 @@ class MP_Dashboard_Widgets {
 	 * @access private
 	 */
 	private function __construct() {
-		//enqueue styles and scripts
+//enqueue styles and scripts
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 		add_action( 'wp_dashboard_setup', array( &$this, 'add_mp_dashboard_widgets' ) );
 	}
@@ -47,8 +47,28 @@ class MP_Dashboard_Widgets {
 		global $pagenow, $mp;
 
 		if ( !empty( $pagenow ) && ('index.php' === $pagenow) ) {
+
+			$ajax_nonce = wp_create_nonce( "mp-ajax-nonce" );
+
 			wp_enqueue_style( 'mp-product-variation-admin', mp_plugin_url( 'includes/admin/ui/css/mp-dashboard-widgets.css' ), false, MP_VERSION );
 			wp_enqueue_script( 'mp-product-variation-admin', mp_plugin_url( 'includes/admin/ui/js/mp-dashboard-widgets.js' ), array( 'jquery' ), MP_VERSION );
+
+			wp_localize_script( 'mp-product-variation-admin', 'mp_product_admin_i18n', array(
+				'ajaxurl'								 => admin_url( 'admin-ajax.php' ),
+				'creating_vatiations_message'			 => __( 'Creating variations, please wait...', 'mp' ),
+				'ajax_nonce'							 => $ajax_nonce,
+				'bulk_update_prices_multiple_title'		 => sprintf( __( 'Update prices for %s product variants', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+				'bulk_update_prices_single_title'		 => sprintf( __( 'Update price for %s product variant', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+				'bulk_update_inventory_multiple_title'	 => sprintf( __( 'Update inventory for %s product variants', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+				'bulk_update_inventory_single_title'	 => sprintf( __( 'Update inventory for %s product variant', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+				'bulk_delete_multiple_title'			 => sprintf( __( 'Delete %s product variants', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+				'bulk_delete_single_title'				 => sprintf( __( 'Delete %s product variant', 'mp' ), '<span class="mp_variants_selected"></span>' ),
+				'date_format'							 => WPMUDEV_Field_Datepicker::format_date_for_jquery( get_option( 'date_format' ) ),
+				'message_valid_number_required'			 => __( 'Valid number is required', 'mp' ),
+				'message_input_required'				 => __( 'Input is required', 'mp' ),
+				'saving_message'						 => __( 'Please wait...saving in progress...', 'mp' ),
+				'placeholder_image'						 => $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' )
+			) );
 		}
 	}
 
@@ -58,6 +78,158 @@ class MP_Dashboard_Widgets {
 		}
 		wp_add_dashboard_widget( 'mp_store_report', __( 'Store Reports', 'mp' ), array( &$this, 'mp_store_report_display' ) );
 		wp_add_dashboard_widget( 'mp_store_management', __( 'Store Management', 'mp' ), array( &$this, 'mp_store_management_display' ) );
+		wp_add_dashboard_widget( 'mp_low_stock', __( 'Low Stock', 'mp' ), array( &$this, 'mp_low_stock_display' ) );
+	}
+
+	public function mp_low_stock_display() {
+		$inventory_threshhold = mp_get_setting( 'inventory_threshhold' );
+
+		$out_of_stock_query = new WP_Query( array(
+			'post_type'		 => array( MP_Product::get_post_type(), 'mp_product_variation' ),
+			'post_status'	 => 'publish',
+			'posts_per_page' => 10,
+			'meta_query'	 => array(
+				'relation' => 'AND',
+				array(
+					'key'		 => 'inventory_tracking',
+					'value'		 => '1',
+					'compare'	 => '=',
+					'type'		 => 'NUMERIC',
+				),
+				array(
+					'key'		 => 'inventory',
+					'value'		 => $inventory_threshhold,
+					'compare'	 => '<=',
+					'type'		 => 'NUMERIC',
+				),
+			),
+		) );
+		?>
+		<table class="wp-list-table widefat fixed striped posts">
+			<thead>
+				<tr>
+					<th scope="col" id="mp_product_name" class="manage-column column-tags"><?php _e( 'Product Name', 'mp' ); ?></th>
+					<th scope="col" id="mp_variation_name" class="manage-column column-tags"><?php _e( 'Variation', 'mp' ); ?></th>
+					<th scope="col" id="mp_stock_level" class="manage-column column-tags"><?php _e( 'Stock Level', 'mp' ); ?></th>
+				</tr>
+			</thead>
+
+			<tbody id="the-list">
+				<?php
+				if ( $out_of_stock_query->have_posts() ) {
+					while ( $out_of_stock_query->have_posts() ) {
+						$out_of_stock_query->the_post();
+						$edit_link		 = '';
+						$is_variation	 = false;
+
+						$inventory = get_post_meta( get_the_ID(), 'inventory', true );
+
+						if ( get_post_type( get_the_ID() ) == MP_Product::get_post_type() ) {
+							$is_variation	 = false;
+							$edit_link		 = get_edit_post_link();
+						} else {
+							$is_variation	 = true;
+							$post_parent	 = wp_get_post_parent_id( get_the_ID() );
+							$edit_link		 = get_edit_post_link( $post_parent );
+							$post_id		 = $post_parent;
+
+							//Variation names
+
+							/* $product_attributes			 = MP_Product_Attributes_Admin::get_product_attributes();
+							  $product_attributes_array	 = array();
+
+							  $args = array(
+							  'post_parent'	 => $post_id,
+							  'post_type'		 => 'mp_product_variation',
+							  'posts_per_page' => -1,
+							  'post_status'	 => 'publish',
+							  'orderby'		 => 'ID',
+							  'order'			 => 'ASC',
+							  );
+
+							  $children = get_children( $args, OBJECT );
+
+							  $variation_attributes = array();
+
+							  $first_post_id = 0;
+
+							  foreach ( $children as $child ) {
+							  if ( $first_post_id == 0 ) {
+							  $first_post_id = $child->ID;
+							  }
+
+							  foreach ( $product_attributes as $product_attribute ) {
+							  $product_attributes_array[ $product_attribute->attribute_id ] = $product_attribute->attribute_name;
+
+							  $child_terms = get_the_terms( $first_post_id, 'product_attr_' . $product_attribute->attribute_id );
+							  if ( isset( $child_terms[ 0 ]->term_id ) && $child_terms[ 0 ]->name ) {
+							  $variation_attributes[ $product_attribute->attribute_id ][ $child_terms[ 0 ]->term_id ] = array( $product_attribute->attribute_id, $child_terms[ 0 ]->name );
+							  }
+							  }
+							  }
+
+
+
+							  foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
+							  $child_term	 = get_the_terms( $variation_id, 'product_attr_' . $variation_attribute );
+							  $child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
+
+							  $attribute_title = $product_attributes_array[ $variation_attribute ];
+							  $attribute_value = is_object( $child_term ) ? esc_attr( $child_term->name ) : '';
+
+							  $variation_title .= $attribute_title . ' ' . $attribute_value . ', ';
+							  }
+
+							 */
+							//End Variation names
+						}
+						?>
+						<tr class="iedit author-self level-0 type-post status-publish format-standard hentry category-uncategorized">
+							<th scope="row" class="check-column mp_hidden_content">
+								<input type="checkbox" class="check-column-box" name="" value="<?php echo esc_attr( get_the_ID() ); ?>">
+							</th>
+
+							<td class="post-title page-title column-title">
+								<strong><a class="row-title" href="<?php echo esc_attr( $edit_link ); ?>"><?php the_title(); ?></a></strong>
+								<!--<div class="row-actions">
+									<span class="edit">
+										<a href="<?php echo esc_attr( $edit_link ); ?>"><?php _e( 'Edit', 'mp' ); ?>
+										</a> | 
+									</span>
+
+				<span class="inline hide-if-no-js"><a href="#" class="editinline"><?php _e( 'Update', 'mp' ); ?></a></span>
+								</div>-->
+							</td>
+
+							<td class="tags column-tags">
+								<?php
+								if ( $is_variation ) {
+									echo get_post_meta( get_the_ID(), 'name', true );
+								} else {
+									echo '—';
+								}
+								?>
+							</td>	
+
+							<td class="tags column-tags <?php echo $inventory <= 0 ? 'mp_low_stock_red' : 'mp_low_stock_yellow'; ?> field_editable field_editable_inventory" data-field-type="number" data-hide-field-product-type="external">
+								<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
+									<?php
+									echo esc_attr( isset( $inventory ) && !empty( $inventory ) || $inventory == '0' ? $inventory : '&infin;'  );
+									?>
+								</span>
+							</td>	
+
+						</tr>
+						<?php
+					}
+				}
+				?>
+
+
+			</tbody>
+
+		</table>
+		<?php
 	}
 
 	public function mp_store_report_display() {
