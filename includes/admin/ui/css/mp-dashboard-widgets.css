@@ -71,4 +71,25 @@
     font-weight: bold;
 }
 
+.mp-dashboard-section-stock-orders{
+    float: left;
+    width: 33%;
+    text-align: center;
+}
+
+.mp-dashboard-stock-orders-title{
+    color: #0073aa;
+    font-size: 20px;
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: normal;
+    margin-top: 20px;
+}
+
+.mp-dashboard-stock-orders-subtitle{
+    color: #ccc;
+    font-size: 13px;
+    display: block;
+}
 
