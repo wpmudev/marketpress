@@ -107,7 +107,7 @@ class MP_Dashboard_Widgets {
 			$count_posts			 = wp_count_posts( 'mp_order' );
 			$inventory_threshhold	 = mp_get_setting( 'inventory_threshhold' );
 
-			$custom_query = new WP_Query( array(
+			$out_of_stock_query = new WP_Query( array(
 				'post_type'		 => array( MP_Product::get_post_type(), 'mp_product_variation' ),
 				'post_status'	 => 'publish',
 				'posts_per_page' => -1,
@@ -119,12 +119,18 @@ class MP_Dashboard_Widgets {
 						'compare'	 => '=',
 						'type'		 => 'NUMERIC',
 					),
+					array(
+						'key'		 => 'inventory',
+						'value'		 => $inventory_threshhold,
+						'compare'	 => '<=',
+						'type'		 => 'NUMERIC',
+					),
 				),
 			) );
 
 			$received_orders	 = $count_posts->order_received;
 			$paid_orders		 = $count_posts->order_paid;
-			$low_stock_products	 = $custom_query->found_posts;
+			$low_stock_products	 = $out_of_stock_query->found_posts;
 			?>
 			<span class="mp-dashboard-section-title"><?php _e( 'Stock & Orders', 'mp' ); ?></span>
 
@@ -169,6 +175,9 @@ class MP_Dashboard_Widgets {
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-payments' ); ?>"><?php _e( 'Payment Gateways', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-capabilities' ); ?>"><?php _e( 'User Capabilities', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-addons' ); ?>"><?php _e( 'Add-ons', 'mp' ); ?></a></li>
+				<?php if ( function_exists( 'register_nav_menus' ) ) { ?>
+					<li><a href="<?php echo admin_url( 'nav-menus.php' ); ?>"><?php _e( 'Add Pages to Menu', 'mp' ); ?></a></li>
+				<?php } ?>
 			</ul>
 		</div>
 		<br clear="both" />
