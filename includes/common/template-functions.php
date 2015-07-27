@@ -1552,7 +1552,7 @@ if ( !function_exists( 'mp_order_status' ) ) :
 		$html = '';
 
 		//check does user logged in
-		if(is_user_logged_in()) {
+		if ( is_user_logged_in() ) {
 			if ( is_null( $order_id ) ) {
 				$html .= _mp_order_status_overview();
 			} else {
@@ -1572,14 +1572,14 @@ if ( !function_exists( 'mp_order_status' ) ) :
 		} else {
 			//we will try to find the order by history cookie, separate code for prevent conflict later
 			//$orders = mp_get_cookie_value( 'mp_order_history', array() );
-			if ( ! is_null( $order_id ) ) {
+			if ( !is_null( $order_id ) ) {
 				$orders = mp_get_order_history();
 				if ( is_array( $orders ) ) {
 					$order = new MP_Order( $order_id );
 					if ( $order->exists() ) {
 						$found = false;
 						foreach ( $orders as $key => $val ) {
-							if ( $val['id'] == $order->ID ) {
+							if ( $val[ 'id' ] == $order->ID ) {
 								//this order belonged to this user
 								$found = true;
 								break;

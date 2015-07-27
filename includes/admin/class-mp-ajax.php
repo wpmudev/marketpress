@@ -197,7 +197,7 @@ class MP_Ajax {
 						$has_sale = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
 						?>
 						<label>
-							<input type="checkbox" name="has_sale" class="has_controller" value="<?php echo $has_sale; ?>" <?php checked( 1, $has_sale, true ); ?>>
+							<input type="checkbox" name="has_sale" class="has_controller" <?php checked( 1, $has_sale, true ); ?>>
 							<span><?php _e( 'Set up a Sale for this Product', 'mp' ); ?></span>
 						</label>
 						<fieldset id="fieldset_has_sale" class="has_area">
@@ -213,7 +213,7 @@ class MP_Ajax {
 							$charge_tax = MP_Product::get_variation_meta( $variation_id, 'charge_tax', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="charge_tax" class="has_controller" value="1" <?php checked( 1, $charge_tax, true ); ?>>
+								<input type="checkbox" name="charge_tax" class="has_controller" <?php checked( 1, $charge_tax, true ); ?>>
 								<span><?php _e( 'Charge Taxes (Special Rate)', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_charge_tax" class="has_area">
@@ -229,7 +229,7 @@ class MP_Ajax {
 							$charge_shipping = MP_Product::get_variation_meta( $variation_id, 'charge_shipping', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="charge_shipping" class="has_controller" value="1" <?php checked( 1, $charge_shipping, true ); ?>>
+								<input type="checkbox" name="charge_shipping" class="has_controller" <?php checked( 1, $charge_shipping, true ); ?>>
 								<span><?php _e( 'Charge Shipping', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">
@@ -254,7 +254,7 @@ class MP_Ajax {
 							$inventory_tracking = MP_Product::get_variation_meta( $variation_id, 'inventory_tracking', 0 );
 							?>
 							<label>
-								<input type="checkbox" name="inventory_tracking" class="has_controller" value="1" <?php checked( 1, $inventory_tracking, true ); ?>>
+								<input type="checkbox" name="inventory_tracking" class="has_controller" <?php checked( 1, $inventory_tracking, true ); ?>>
 								<span><?php _e( 'Track Product Inventory', 'mp' ); ?></span>
 							</label>
 							<fieldset id="fieldset_has_sale" class="has_area">

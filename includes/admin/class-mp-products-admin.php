@@ -35,16 +35,16 @@ class MP_Products_Screen {
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 // Remove add-new submenu item from store admin menu
 		add_action( 'admin_menu', array( &$this, 'remove_menu_items' ), 999 );
-		// Hide featured image for variable products
+// Hide featured image for variable products
 		add_action( 'wpmudev_field/print_scripts/has_variations', array( &$this, 'maybe_hide_core_metaboxes' ) );
 // Product variations save/get value
 
 		add_action( 'init', array( &$this, 'save_init_product_variations' ) );
-		//add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
+//add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
 		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
 		add_action( 'wp_ajax_edit_variation_post_data', array( &$this, 'edit_variation_post_data' ) );
-		//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
-		//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
+//add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
+//add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
 // Custom product columns
 		add_filter( 'manage_product_posts_columns', array( &$this, 'product_columns_head' ) );
@@ -372,14 +372,14 @@ class MP_Products_Screen {
 					$skus = $product->get_meta( 'sku', '&mdash;' );
 				}
 
-				//echo implode( '<br />', $skus );
+//echo implode( '<br />', $skus );
 				echo $skus;
 				break;
 
 			case 'product_price' :
 				if ( $product->has_variations() ) {
 					$prices			 = array();
-					//$price = $prices->get_price();
+//$price = $prices->get_price();
 					$variation_price = $product->get_price();
 					if ( $variation_price[ 'lowest' ] !== $variation_price[ 'highest' ] ) {
 						$prices = mp_format_currency( '', $variation_price[ 'lowest' ] ) . ' - ' . mp_format_currency( '', $variation_price[ 'highest' ] );
@@ -464,7 +464,7 @@ class MP_Products_Screen {
 		$this->init_product_type_metabox();
 		$this->init_product_price_inventory_variants_metabox();
 		$this->init_product_images_metabox();
-		//$this->init_product_details_metabox();
+//$this->init_product_details_metabox();
 //$this->init_variations_metabox();
 		$this->init_related_products_metabox();
 	}
@@ -611,7 +611,7 @@ class MP_Products_Screen {
 
 			$attribute_slug = $product_atts->generate_slug( $attribute_id );
 
-			//temporarily register the taxonomy - otherwise we won't be able to insert terms below
+//temporarily register the taxonomy - otherwise we won't be able to insert terms below
 			register_taxonomy( $attribute_slug, MP_Product::get_post_type(), array(
 				'show_ui'			 => false,
 				'show_in_nav_menus'	 => false,
@@ -622,6 +622,14 @@ class MP_Products_Screen {
 		}
 
 		return $taxonomy;
+	}
+
+	public function on_to_val( $on ) {
+		if ( $on == 'on' || $on == '1' ) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 
 	public function edit_variation_post_data() {
@@ -675,20 +683,20 @@ class MP_Products_Screen {
 				'sku'						 => mp_get_post_value( 'sku' ),
 				'external_url'				 => mp_get_post_value( 'external_url' ),
 				'file_url'					 => mp_get_post_value( 'file_url' ),
-				'inventory_tracking'		 => mp_get_post_value( 'inventory_tracking' ),
+				'inventory_tracking'		 => $this->on_to_val( mp_get_post_value( 'inventory_tracking' ) ),
 				'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
 				'inv_out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 				'regular_price'				 => mp_get_post_value( 'regular_price' ),
-				'has_sale'					 => mp_get_post_value( 'has_sale' ),
+				'has_sale'					 => $this->on_to_val( mp_get_post_value( 'has_sale' ) ),
 				'sale_price_amount'			 => mp_get_post_value( 'sale_price->amount' ),
 				'sale_price_start_date'		 => mp_get_post_value( 'sale_price->start_date' ),
 				'sale_price_end_date'		 => mp_get_post_value( 'sale_price->end_date' ),
 				'weight_pounds'				 => mp_get_post_value( 'weight->pounds' ),
 				'weight_ounces'				 => mp_get_post_value( 'weight->ounces' ),
 				'weight'					 => '',
-				'charge_shipping'			 => mp_get_post_value( 'charge_shipping' ),
+				'charge_shipping'			 => $this->on_to_val( mp_get_post_value( 'charge_shipping' ) ),
 				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
-				'charge_tax'				 => mp_get_post_value( 'charge_tax' ),
+				'charge_tax'				 => $this->on_to_val( mp_get_post_value( 'charge_tax' ) ),
 				'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
 				'has_variation_content'		 => mp_get_post_value( 'has_variation_content' ),
 				'variation_content_type'	 => mp_get_post_value( 'variation_content_type' ),
@@ -716,7 +724,7 @@ class MP_Products_Screen {
 				if ( isset( $variation_content_type ) && $variation_content_type == 'plain' ) {
 					$my_post[ 'post_content' ] = $variation_content_type_plain;
 				} else {
-					//do nothing, variation has html markup saved or should have one
+//do nothing, variation has html markup saved or should have one
 				}
 			} else {
 				$my_post[ 'post_content' ] = '';
@@ -741,6 +749,7 @@ class MP_Products_Screen {
 	 * @uses $wpdb
 	 */
 	public function save_inline_variation_post_data() {
+
 		$post_id = mp_get_post_value( 'post_id' );
 		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
 
@@ -756,7 +765,7 @@ class MP_Products_Screen {
 					break;
 				case 'delete_variations':
 					delete_post_meta( $post_id, 'has_variations' );
-					//update_post_meta( $post_id, $value_type, $value );
+//update_post_meta( $post_id, $value_type, $value );
 					break;
 				case 'sku':
 					update_post_meta( $post_id, $value_type, $value );
@@ -794,7 +803,21 @@ class MP_Products_Screen {
 					if ( $value_type == '_thumbnail_id' && $value == '' ) {
 						delete_post_meta( $post_id, '_thumbnail_id' );
 					} else {
-						update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
+						if ( $value_type == 'inventory' ) {
+							update_post_meta( $post_id, 'inv_inventory', sanitize_text_field( $value ) );
+						}
+
+						if ( $value_type == 'sale_price_amount' ) {//exeption when saving sale price amount
+							if ( is_numeric( $value ) ) {
+								update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
+								update_post_meta( $post_id, 'has_sale', '1' );
+							} else {
+								update_post_meta( $post_id, $value_type, '' );
+								update_post_meta( $post_id, 'has_sale', '0' );
+							}
+						} else {
+							update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
+						}
 					}
 			}
 		}
@@ -808,7 +831,7 @@ class MP_Products_Screen {
 	 * @action init
 	 */
 	public function hide_main_content_editor_for_variations() {
-		// Get the Post ID.
+// Get the Post ID.
 		$post_id = isset( $_GET[ 'post' ] ) ? (int) $_GET[ 'post' ] : (isset( $_POST[ 'post_ID' ] ) ? (int) $_POST[ 'post_ID' ] : '');
 		if ( !isset( $post_id ) )
 			return;
@@ -898,7 +921,7 @@ class MP_Products_Screen {
 			foreach ( $combinations as $combination ) {
 
 				$variation_id = wp_insert_post( array(
-					//'ID'			 => $variation_id,
+//'ID'			 => $variation_id,
 					'post_title'	 => mp_get_post_value( 'post_title' ),
 					'post_content'	 => '', //mp_get_post_value( 'content' ),
 					'post_status'	 => 'publish',
@@ -961,9 +984,9 @@ class MP_Products_Screen {
 				$combination_index++;
 			}
 
-			//exit;
+//exit;
 		} else {
-			//update_post_meta( $post_id, 'has_variations', 0 );
+//update_post_meta( $post_id, 'has_variations', 0 );
 		}
 	}
 
@@ -1487,7 +1510,7 @@ class MP_Products_Screen {
 		$metabox->add_field( 'images', array(
 			'name'			 => 'product_images',
 			'label'			 => '', //array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
-			//'message'	 => __( 'Images', 'mp' ),
+//'message'	 => __( 'Images', 'mp' ),
 			'conditional'	 => array(
 				'action'	 => 'hide',
 				'operator'	 => 'OR',
