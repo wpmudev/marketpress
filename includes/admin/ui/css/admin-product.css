@@ -561,6 +561,10 @@ a.create-variations-button.button{
     margin-left: 5px;
 }
 
+.mp_strikethrough{
+    text-decoration: line-through !important;
+}
+
 input.mp_inline_temp_value{
     line-height: 1 !important;
     padding: 5px !important;

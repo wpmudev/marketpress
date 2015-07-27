@@ -130,6 +130,10 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'Price', 'mp' ); ?>
 							</th>
 
+							<th scope="col" id="sale_price" class="manage-column">
+								<?php _e( 'Sale Price', 'mp' ); ?>
+							</th>
+
 							<th scope="col" id="sku" class="manage-column">
 								<?php _e( 'SKU', 'mp' ); ?>
 							</th>
@@ -138,9 +142,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'Sales', 'mp' ); ?>
 							</th>
 
-							<!--<th scope="col" id="variation_content" class="manage-column">
-								<?php _e( 'Variation Content', 'mp' ); ?>
-							</th>-->
+																																														<!--<th scope="col" id="variation_content" class="manage-column">
+							<?php _e( 'Variation Content', 'mp' ); ?>
+																																														</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -193,18 +197,43 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										?>
 									</span>
 								</td>
-								<td class="field_editable field_editable_price" data-field-type="number">
+
+								<?php
+								$has_sale	 = get_post_meta( $child->ID, 'has_sale', true );
+								if ( $has_sale == 1 ) {
+									$additional_class = 'mp_strikethrough';
+								} else {
+									$additional_class = '';
+								}
+								?>
+								<td class="field_editable field_editable_price <?php echo esc_attr( $additional_class ); ?>" data-field-type="number">
 									<?php
-									$price		 = get_post_meta( $child->ID, 'regular_price', true );
+									$price = get_post_meta( $child->ID, 'regular_price', true );
 									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array( 'data-meta' => 'regular_price', 'data-default' => 0 ) );
 									?>
 									<input type="hidden" class="editable_value editable_value_price" value="" />
 								</td>
 
+								<td class="field_editable field_editable_sale_price_amount" data-field-type="number">
+									<?php
+									if ( $has_sale == 1 ) {
+										$sale_price_amount = get_post_meta( $child->ID, 'sale_price_amount', true );
+										echo mp_format_currency( '', $sale_price_amount, 'original_value field_subtype field_subtype_sale_price_amount', 'currency', array( 'data-meta' => 'sale_price_amount', 'data-default' => '-' ) );
+									} else {
+										?>
+										<span class="original_value field_subtype field_subtype_sale_price_amount" data-meta="sale_price_amount" data-default="-">
+											-
+										</span>
+										<?php
+									}
+									?>
+									<input type="hidden" class="editable_value editable_value_sale_price_amount" value="" />
+								</td>
+
 								<td class="field_editable" data-field-type="text">
 									<span class="original_value field_subtype field_subtype_sku" data-meta="sku" data-default="-">
 										<?php
-										$sku		 = get_post_meta( $child->ID, 'sku', true );
+										$sku	 = get_post_meta( $child->ID, 'sku', true );
 										echo esc_attr( isset( $sku ) && !empty( $sku ) ? $sku : '-'  );
 										?>
 									</span>
@@ -214,16 +243,16 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<td class="field" data-field-type="text">
 									<span>
 										<?php
-										$sales		 = get_post_meta( $child->ID, 'mp_sales_count', true );
+										$sales	 = get_post_meta( $child->ID, 'mp_sales_count', true );
 										echo esc_attr( isset( $sales ) && !empty( $sales ) ? $sales : '0'  );
 										?>
 									</span>
 								</td>
 
 
-								<!--<td class="">
-									<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>
-								</td>-->
+																																																						<!--<td class="">
+																																																						<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>
+																																																						</td>-->
 
 								<td class="field_more">
 									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr( $child->ID ); ?>"><i class="fa fa-th-large"></i></a>
