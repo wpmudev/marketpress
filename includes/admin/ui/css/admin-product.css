@@ -806,3 +806,15 @@ textarea.variation_content_type_plain{
     margin-top: -5px;
     margin-left: 15px;
 }
+
+.mp_variation_invalid{
+    border: 1px solid red !important;
+}
+
+.mp_variation_valid_name{
+    border: 1px solid #ddd;
+}
+
+.mp_variation_valid_values{
+    border: 1px solid #9daccc;
+}

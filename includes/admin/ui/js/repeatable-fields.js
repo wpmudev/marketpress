@@ -101,6 +101,7 @@
 
             row_count++;
 
+            new_row.addClass( 'mp-variation-row' );
             new_row.addClass( 'mp-variation-row-count-' + ( ( $( '.repeat .row' ).length ) - 1 ) );
             new_row.addClass( 'variation_row_color_' + ( ( $( '.repeat .row' ).length ) - 1 ) );
 

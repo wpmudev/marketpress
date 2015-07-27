@@ -142,9 +142,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'Sales', 'mp' ); ?>
 							</th>
 
-																																														<!--<th scope="col" id="variation_content" class="manage-column">
+																																																	<!--<th scope="col" id="variation_content" class="manage-column">
 							<?php _e( 'Variation Content', 'mp' ); ?>
-																																														</th>-->
+																																																	</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -330,8 +330,8 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										</div>
 
 										<div class="variation-second-col">
-											<div class="wpmudev-field-label"><?php _e( 'Variation Values', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(e.g. White, Grey, Red etc.)', 'mp' ); ?></span></div>
-											<textarea name="variation_values[]" class="variation_values" value="" placeholder="<?php esc_attr_e( __( 'Insert a value and press ENTER', 'mp' ) ); ?>"></textarea>
+											<div class="wpmudev-field-label"><?php _e( 'Variation Values', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(e.g. White, Grey, Red etc.)', 'mp' ); ?> - <strong><?php _e( 'Insert a value and press ENTER', 'mp' ); ?></strong></span></div>
+											<textarea name="variation_values[]" class="variation_values mp-variation-field-required" value="" placeholder="<?php esc_attr_e( __( 'Insert a value and press ENTER', 'mp' ) ); ?>"></textarea>
 										</div>
 
 										<div class="variation-third-col">

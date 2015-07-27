@@ -1,5 +1,22 @@
 jQuery( document ).ready( function( $ ) {
 
+    $( '.mp-variation-row .mp-variation-attribute-name' ).live( 'keyup', function( e ) {
+        if ( $( this ).val() == '' ) {
+            $( this ).addClass( 'mp_variation_invalid' );
+        } else {
+            $( this ).removeClass( 'mp_variation_invalid' );
+        }
+    } );
+
+    $( '.mp-variation-row .text-wrap' ).live( 'click', function( e ) {
+        
+        //if ( $( this ).val() == '' || $( this ).val() == '[]' ) {
+          //  $( this ).parent().find( '.mp-variation-field-required' ).addClass( 'mp_variation_invalid' );
+        //} else {
+            $( this ).parent().find( '.mp-variation-field-required' ).removeClass( 'mp_variation_invalid' );
+        //}
+    } );
+
     $( 'textarea.variation_values' ).live( 'keyup', function( e ) {
 
         var keyCode = e.keyCode || e.which;
@@ -126,26 +143,56 @@ jQuery( document ).ready( function( $ ) {
 
         event.preventDefault( );
     } );
+
     $( ".select_attributes_filter a" ).live( 'focus', function( event ) {
         $( this ).blur( );
     } );
+
     $( '#mp_make_combinations' ).live( 'click', function( event ) {
 
-//alert($( '#original_publish' ).val());
-        if ( $( '#original_publish' ).val( ) == 'Publish' ) {
-//$( '.mp-admin-overlay' ).show();
-            $( '#save-post' ).removeAttr( 'dasabled' );
-            //$( '#save-post' ).prop( 'disabled', false );
-            $( '#save-post' ).click( );
-            //mp_variation_message();
-        }
+        var variation_errors = 0;
 
-        if ( $( '#original_publish' ).val( ) == 'Update' ) {
+        $( '.mp-variation-row .mp-variation-attribute-name' ).each( function( index ) {
+            if ( $( this ).css( 'display' ) == 'none' ) {
+                //do nothing, validation is not needed
+            } else {
+                if ( $( this ).val() == '' ) {
+                    $( this ).addClass( 'mp_variation_invalid' );
+                    variation_errors++;
+                } else {
+                    $( this ).removeClass( 'mp_variation_invalid' );
+                }
+            }
+        } );
+
+        $( '.mp-variation-row .text-wrap input[type="hidden"]' ).each( function( index ) {
+            if ( $( this ).val() == '' || $( this ).val() == '[]' ) {
+                $( this ).parent().find( '.mp-variation-field-required' ).addClass( 'mp_variation_invalid' );
+                variation_errors++;
+            } else {
+                $( this ).parent().find( '.mp-variation-field-required' ).removeClass( 'mp_variation_invalid' );
+            }
+        } );
+
+
+        if ( variation_errors == 0 ) {
+
+//alert($( '#original_publish' ).val());
+            if ( $( '#original_publish' ).val( ) == 'Publish' ) {
 //$( '.mp-admin-overlay' ).show();
-            $( '#publish' ).removeAttr( 'dasabled' );
-            //$( '#publish' ).prop( 'disabled', false );
-            $( '#publish' ).click( );
-            //mp_variation_message();
+                $( '#save-post' ).removeAttr( 'dasabled' );
+                //$( '#save-post' ).prop( 'disabled', false );
+                $( '#save-post' ).click( );
+                //mp_variation_message();
+            }
+
+            if ( $( '#original_publish' ).val( ) == 'Update' ) {
+//$( '.mp-admin-overlay' ).show();
+                $( '#publish' ).removeAttr( 'dasabled' );
+                //$( '#publish' ).prop( 'disabled', false );
+                $( '#publish' ).click( );
+                //mp_variation_message();
+            }
         }
 
 //$( 'form#post' ).submit();
@@ -754,4 +801,5 @@ jQuery( document ).ready( function( $ ) {
             e.preventDefault( );
         }
     } );
+
 } );
