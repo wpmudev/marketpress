@@ -624,6 +624,14 @@ class MP_Products_Screen {
 		return $taxonomy;
 	}
 
+	public function on_to_val( $on ) {
+		if ( $on == 'on' || $on == '1' ) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
 	public function edit_variation_post_data() {
 		$post_id = mp_get_post_value( 'post_id' );
 		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
@@ -675,20 +683,20 @@ class MP_Products_Screen {
 				'sku'						 => mp_get_post_value( 'sku' ),
 				'external_url'				 => mp_get_post_value( 'external_url' ),
 				'file_url'					 => mp_get_post_value( 'file_url' ),
-				'inventory_tracking'		 => mp_get_post_value( 'inventory_tracking' ),
+				'inventory_tracking'		 => $this->on_to_val( mp_get_post_value( 'inventory_tracking' ) ),
 				'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
 				'inv_out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
 				'regular_price'				 => mp_get_post_value( 'regular_price' ),
-				'has_sale'					 => mp_get_post_value( 'has_sale' ),
+				'has_sale'					 => $this->on_to_val( mp_get_post_value( 'has_sale' ) ),
 				'sale_price_amount'			 => mp_get_post_value( 'sale_price->amount' ),
 				'sale_price_start_date'		 => mp_get_post_value( 'sale_price->start_date' ),
 				'sale_price_end_date'		 => mp_get_post_value( 'sale_price->end_date' ),
 				'weight_pounds'				 => mp_get_post_value( 'weight->pounds' ),
 				'weight_ounces'				 => mp_get_post_value( 'weight->ounces' ),
 				'weight'					 => '',
-				'charge_shipping'			 => mp_get_post_value( 'charge_shipping' ),
+				'charge_shipping'			 => $this->on_to_val( mp_get_post_value( 'charge_shipping' ) ),
 				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
-				'charge_tax'				 => mp_get_post_value( 'charge_tax' ),
+				'charge_tax'				 => $this->on_to_val( mp_get_post_value( 'charge_tax' ) ),
 				'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
 				'has_variation_content'		 => mp_get_post_value( 'has_variation_content' ),
 				'variation_content_type'	 => mp_get_post_value( 'variation_content_type' ),
@@ -744,7 +752,7 @@ class MP_Products_Screen {
 
 		$post_id = mp_get_post_value( 'post_id' );
 		check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
-		
+
 		if ( isset( $post_id ) && is_numeric( $post_id ) ) {
 
 			$value_type		 = mp_get_post_value( 'meta_name' );
@@ -795,7 +803,7 @@ class MP_Products_Screen {
 					if ( $value_type == '_thumbnail_id' && $value == '' ) {
 						delete_post_meta( $post_id, '_thumbnail_id' );
 					} else {
-						if($value_type == 'inventory'){
+						if ( $value_type == 'inventory' ) {
 							update_post_meta( $post_id, 'inv_inventory', sanitize_text_field( $value ) );
 						}
 						update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
