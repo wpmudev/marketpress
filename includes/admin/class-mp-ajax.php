@@ -40,6 +40,8 @@ class MP_Ajax {
 		add_action( 'wp_ajax_mp_change_order_status', array( 'MP_Orders_Admin', 'ajax_change_order_status' ) );
 		// Check if an email address exists
 		add_action( 'wp_ajax_nopriv_mp_check_if_email_exists', array( &$this, 'check_if_email_exists' ) );
+		//check if an username already exist, for validation
+		add_action( 'wp_ajax_nopriv_mp_check_if_username_exists', array( &$this, 'check_if_username_exists' ) );
 		// Create account
 		add_action( 'wp_ajax_nopriv_mp_create_account', array( &$this, 'create_account' ) );
 		// Get product variation colorbox
@@ -380,6 +382,20 @@ class MP_Ajax {
 	}
 
 	/**
+	 * Check if an username exists
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @access wp_ajax_nopriv_mp_check_if_username_exists
+	 */
+	public function check_if_username_exists() {
+		if ( username_exists( mp_get_request_value( 'username', '' ) ) ) {
+			die ( 'false' );
+		}
+
+		die( 'true' );
+	}
+	/**
 	 * Create account
 	 *
 	 * @since 3.0
@@ -388,9 +404,8 @@ class MP_Ajax {
 	 */
 	public function create_account() {
 		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
-			$user_login	 = uniqid( true );
 			$user_id	 = wp_insert_user( array(
-				'user_login' => $user_login,
+				'user_login' => mp_get_post_value('username'),
 				'user_email' => mp_get_post_value( 'email' ),
 				'user_pass'	 => mp_get_post_value( 'password1' ),
 				'first_name' => mp_get_post_value( 'name_first' ),
@@ -400,10 +415,21 @@ class MP_Ajax {
 
 			if ( !is_wp_error( $user_id ) ) {
 				$user_signon = wp_signon( array(
-					'user_login'	 => $user_login,
+					'user_login'	 =>  mp_get_post_value('username'),
 					'user_password'	 => mp_get_post_value( 'password1' ),
 					'remember'		 => true,
 				), false );
+
+				$order_id = mp_get_post_value( 'order_id', 0 );
+				if ( $order_id != 0 ) {
+					$order = new MP_Order( $order_id );
+					if ( $order->exists() && $order->post_author == 0 ) {
+						//assign this order to this user
+						$post              = get_post( $order->ID );
+						$post->post_author = $user_id;
+						wp_update_post( $post->to_array() );
+					}
+				}
 
 				wp_send_json_success();
 			}
