@@ -73,16 +73,7 @@ class MP_Dashboard_Widgets {
 		}
 	}
 
-	public function add_mp_dashboard_widgets() {
-		if ( !current_user_can( apply_filters( 'mp_can_view_dashboard_widgets_capability_needed', 'manage_options' ) ) ) {
-			return;
-		}
-		wp_add_dashboard_widget( 'mp_store_report', __( 'Store Reports', 'mp' ), array( &$this, 'mp_store_report_display' ) );
-		wp_add_dashboard_widget( 'mp_store_management', __( 'Store Management', 'mp' ), array( &$this, 'mp_store_management_display' ) );
-		wp_add_dashboard_widget( 'mp_low_stock', __( 'Low Stock', 'mp' ), array( &$this, 'mp_low_stock_display' ) );
-	}
-
-	public function mp_low_stock_display() {
+	public function mp_dashboard_low_stock_query() {
 		$inventory_threshhold = mp_get_setting( 'inventory_threshhold' );
 
 		$out_of_stock_query = new WP_Query( array(
@@ -113,6 +104,25 @@ class MP_Dashboard_Widgets {
 				)
 			),
 		) );
+		
+		return $out_of_stock_query;
+	}
+
+	public function add_mp_dashboard_widgets() {
+		if ( !current_user_can( apply_filters( 'mp_can_view_dashboard_widgets_capability_needed', 'manage_options' ) ) ) {
+			return;
+		}
+		wp_add_dashboard_widget( 'mp_store_report', __( 'Store Reports', 'mp' ), array( &$this, 'mp_store_report_display' ) );
+		wp_add_dashboard_widget( 'mp_store_management', __( 'Store Management', 'mp' ), array( &$this, 'mp_store_management_display' ) );
+		
+		$out_of_stock_query = $this->mp_dashboard_low_stock_query();
+		
+		$low_stock_count = $out_of_stock_query->found_posts;
+		wp_add_dashboard_widget( 'mp_low_stock', sprintf(__( 'Low Stock (%s)', 'mp' ), $low_stock_count), array( &$this, 'mp_low_stock_display' ) );
+	}
+
+	public function mp_low_stock_display() {
+		$out_of_stock_query = $this->mp_dashboard_low_stock_query();
 		?>
 
 		<?php if ( $out_of_stock_query->have_posts() ) { ?>
