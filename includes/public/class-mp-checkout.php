@@ -1056,7 +1056,7 @@ class MP_Checkout {
 						<label class="mp_form_label" for="mp-checkout-password">' . __( 'Password', 'mp' ) . '</label>
 						<input type="password" name="mp_login_password" class="mp_form_input">
 					</div><!-- end mp_checkout_field -->
-					<button id="mp-button-checkout-login" type="submit" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
+					<button id="mp-button-checkout-login" type="button" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
 				</div><!-- end mp_checkout_column -->
 				<div class="mp_checkout_column">
 					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>

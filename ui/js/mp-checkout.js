@@ -13,7 +13,7 @@ var mp_checkout;
 			this.initUpdateStateFieldListeners();
 			this.initCardValidation();
 			this.initCheckoutSteps();
-			
+			this.listenToLogin();
 			$( document ).on( 'mp_checkout/step_changed', this.lastStep );
 		},
 		
@@ -253,7 +253,8 @@ var mp_checkout;
 					var $form = $( form );
 					var $email = $form.find( '[name="mp_login_email"]' );
 					var $pass = $form.find( '[name="mp_login_password"]' );
-					
+
+
 					if ( $form.valid() ) {
 						if ( $checkout.hasClass( 'last-step' ) ) {
 							var gateway = $( '[name="payment_method"]' ).filter( ':checked' ).val();
@@ -516,6 +517,37 @@ var mp_checkout;
 		triggerStepChange : function() {
 			var $current = $( '.mp_checkout_section' ).filter( '.current' );
 			$( document ).trigger( 'mp_checkout/step_changed', [ $current, $current ] );
+		},
+
+		/**
+		 * Because we have 2 context in login pharse, so we will have to determine which button click to add/removerules
+		 *
+		 */
+		listenToLogin: function () {
+			//if login click, we will add those rules
+			$(document).on('click', '.mp_button-checkout-login', function () {
+				$('input[name="mp_login_email"]').rules('add', {
+					required: true
+				});
+				$('input[name="mp_login_password"]').rules('add', {
+					required: true
+				});
+				$(this).closest('form').submit();
+			})
+			//else, we have to remove the rules
+			$(document).on('click', 'button[type="submit"]', function () {
+				$('input[name="mp_login_email"]').rules('remove');
+				$('input[name="mp_login_password"]').rules('remove');
+				$(this).closest('form').submit();
+			})
+			//our form is multiple next/pre button, so we unbind the enter trigger
+			$('#mp-checkout-form').on('keyup keypress', function(e) {
+				var code = e.keyCode || e.which;
+				if (code == 13) {
+					e.preventDefault();
+					return false;
+				}
+			});
 		}
 	};
 }( jQuery ));

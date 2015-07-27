@@ -304,7 +304,7 @@ class MP_Ajax {
 	 * @action wp_ajax_nopriv_mp_ajax_login
 	 */
 	public function ajax_login() {
-		check_ajax_referer( 'mp-login-nonce ', 'mp_login_nonce' );
+		check_ajax_referer( 'mp-login-nonce', 'mp_login_nonce' );
 
 		$error_message = __( 'Oops!You entered an invalid username and or password ', 'mp' );
 
@@ -329,6 +329,7 @@ class MP_Ajax {
 		);
 
 		$user_signon = wp_signon( $info, false );
+
 		if ( is_wp_error( $user_signon ) ) {
 			wp_send_json_error( array(
 				'message' => $error_message,
