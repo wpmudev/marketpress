@@ -437,5 +437,5 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 
 }
 
-//register payment gateway plugin
-mp_register_gateway_plugin( 'MP_Gateway_Skrill', 'skrill', __( 'Skrill (Moneybookers)', 'mp' ) );
+//register payment gateway plugin - moved for 3.1 release
+//mp_register_gateway_plugin( 'MP_Gateway_Skrill', 'skrill', __( 'Skrill (Moneybookers)', 'mp' ) );
