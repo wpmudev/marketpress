@@ -48,7 +48,7 @@ if ( !function_exists( 'mp_get_api_timeout' ) ) :
 		 * @since 3.0
 		 * @param int $timeout The current timeout value.
 		 */
-		$timeout = apply_filters( 'mp_api_timeout', 5 );
+		$timeout = apply_filters( 'mp_api_timeout', 30 );
 		$timeout = apply_filters( 'mp_api_timeout/' . $key, $timeout );
 
 		return (int) $timeout;
