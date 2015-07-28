@@ -464,4 +464,30 @@ jQuery( document ).ready( function( $ ) {
     } );
 
 
+    $( '#mp_dashboard_widget_inventory_threshhold' ).live( 'change', function( e ) {
+        var form = $( 'form#inventory_threshhold_form' );
+        $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
+        $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
+        $.post(
+            //ajax_nonce: mp_product_admin_i18n.ajax_nonce
+            //action: 'save_inline_post_data',
+            mp_product_admin_i18n.ajaxurl, form.serialize( )
+            ).done( function( data, status ) {
+            var response = $.parseJSON( data );
+            if ( response.status_message !== '' ) {
+                $( '.mp_ajax_response' ).html( response.status_message );
+                $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
+                $( '.mp_ajax_response' ).addClass( 'mp_ajax_response_' + response.status );
+            }
+
+            if ( status == 'success' ) {
+                //console.log( response );
+            } else {
+                //alert( 'fail!' );
+                //an error occured
+            }
+        } );
+        e.preventDefault();
+    } );
+
 } );

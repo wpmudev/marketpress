@@ -43,6 +43,8 @@ class MP_Products_Screen {
 //add_action( 'admin_init', array( &$this, 'hide_main_content_editor_for_variations' ) );
 		add_action( 'wp_ajax_save_inline_post_data', array( &$this, 'save_inline_variation_post_data' ) );
 		add_action( 'wp_ajax_edit_variation_post_data', array( &$this, 'edit_variation_post_data' ) );
+
+		add_action( 'wp_ajax_save_inventory_threshhold', array( &$this, 'save_inventory_threshhold' ) );
 //add_action( 'wp_ajax_save_init_product_variations', array( &$this, 'save_init_product_variations' ) );
 //add_filter( 'wpmudev_field/save_value/variations', array( &$this, 'save_product_variations_parent_data' ), 10, 3 );
 //add_filter( 'wpmudev_field/before_get_value/variations', array( &$this, 'get_product_variations_old' ), 10, 4 );
@@ -630,6 +632,25 @@ class MP_Products_Screen {
 		} else {
 			return 0;
 		}
+	}
+
+	public function save_inventory_threshhold() {
+		//check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
+
+		if ( mp_update_setting( 'inventory_threshhold', mp_get_post_value( 'inventory_threshhold' ) ) ) {
+			$response_array = array(
+				'status'		 => 'success',
+				'status_message' => __( 'Option saved successfully.', 'mp' )
+			);
+		} else {
+			$response_array = array(
+				'status'		 => 'fail',
+				'status_message' => __( 'Option cannot be saved. Try again.', 'mp' )
+			);
+		}
+
+		echo json_encode( $response_array );
+		exit;
 	}
 
 	public function edit_variation_post_data() {

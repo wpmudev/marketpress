@@ -104,7 +104,7 @@ class MP_Dashboard_Widgets {
 				)
 			),
 		) );
-		
+
 		return $out_of_stock_query;
 	}
 
@@ -114,11 +114,11 @@ class MP_Dashboard_Widgets {
 		}
 		wp_add_dashboard_widget( 'mp_store_report', __( 'Store Reports', 'mp' ), array( &$this, 'mp_store_report_display' ) );
 		wp_add_dashboard_widget( 'mp_store_management', __( 'Store Management', 'mp' ), array( &$this, 'mp_store_management_display' ) );
-		
+
 		$out_of_stock_query = $this->mp_dashboard_low_stock_query();
-		
+
 		$low_stock_count = $out_of_stock_query->found_posts;
-		wp_add_dashboard_widget( 'mp_low_stock', sprintf(__( 'Low Stock (%s)', 'mp' ), $low_stock_count), array( &$this, 'mp_low_stock_display' ) );
+		wp_add_dashboard_widget( 'mp_low_stock', sprintf( __( 'Low Stock (%s)', 'mp' ), $low_stock_count ), array( &$this, 'mp_low_stock_display' ) );
 	}
 
 	public function mp_low_stock_display() {
@@ -250,12 +250,34 @@ class MP_Dashboard_Widgets {
 				</tbody>
 
 			</table>
+
 			<?php
 		} else {
 			?>
 			<p><?php _e( 'No products out of stock.', 'mp' ); ?></p>
 			<?php
 		}
+
+		$inventory_threshhold		 = mp_get_setting( 'inventory_threshhold' );
+		$max_inventory_threshhold	 = apply_filters( 'mp_dashboard_widget_max_inventory_threshhold', 20 );
+		?>
+		<div class="mp_dashboard_widget_inventory_threshhold_wrap">
+			<form id="inventory_threshhold_form" method="post">
+				<input type="hidden" name="action" value="save_inventory_threshhold">
+				<span class="mp-dashboard-section-title"><?php _e( 'Inventory Warning Threshold', 'mp' ); ?></span>
+				<select name="inventory_threshhold" id="mp_dashboard_widget_inventory_threshhold">
+					<?php
+					for ( $i = 0; $i <= $max_inventory_threshhold; $i++ ) {
+						?>
+						<option value="<?php echo $i; ?>" <?php selected( $i, $inventory_threshhold, true ); ?>><?php echo $i; ?></option>
+						<?php
+					}
+					?>
+				</select>
+				<span class="mp_ajax_response"></span>
+			</form>
+		</div>
+		<?php
 	}
 
 	public function mp_store_report_display() {
