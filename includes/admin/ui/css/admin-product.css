@@ -37,7 +37,7 @@
 }
 
 .mp_meta_section_title{
-    color: #4f616e;
+    color: #23282d;//#4f616e;
     font-weight: bold;
     font-size: 15px;
 }
@@ -817,4 +817,16 @@ textarea.variation_content_type_plain{
 
 .mp_variation_valid_values{
     border: 1px solid #9daccc;
+}
+
+#screen-options-wrap .mp_meta_bellow_desc,
+#screen-options-wrap .mp_meta_small_desc{
+    display: none;
+}
+
+#screen-options-wrap .mp_meta_section_title {
+    color: #444;
+    font-weight: normal;
+    font-size: 13px;
+    text-transform: capitalize;
 }

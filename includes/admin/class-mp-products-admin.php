@@ -1152,7 +1152,7 @@ class MP_Products_Screen {
 
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'		 => 'mp-product-price-inventory-variants-metabox',
-			'title'		 => $has_variations ? __( 'Product Variations' ) : sprintf( __( '%1$sPRICE, INVENTORY & VARIANTS%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'title'		 => $has_variations ? __( 'Product Variations' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
 			'post_type'	 => MP_Product::get_post_type(),
 			'context'	 => 'normal',
 		) );
@@ -1490,7 +1490,7 @@ class MP_Products_Screen {
 
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => 'mp-product-images-metabox',
-			'title'			 => sprintf( __( '%1$sPRODUCT IMAGES%2$s %3$sAdd images of the product. The first image on the list is the featured image for this product (you can reorder images on the list)%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'title'			 => sprintf( __( '%1$sProduct Images%2$s %3$sAdd images of the product. The first image on the list is the featured image for this product (you can reorder images on the list)%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
 			'post_type'		 => MP_Product::get_post_type(),
 			'context'		 => 'normal',
 			'conditional'	 => array(
