@@ -635,7 +635,9 @@ class MP_Products_Screen {
 	}
 
 	public function save_inventory_threshhold() {
-		//check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
+//check_ajax_referer( 'mp-ajax-nonce', 'ajax_nonce' );
+
+		$output = '';
 
 		if ( mp_update_setting( 'inventory_threshhold', mp_get_post_value( 'inventory_threshhold' ) ) ) {
 			$response_array = array(
@@ -645,9 +647,80 @@ class MP_Products_Screen {
 		} else {
 			$response_array = array(
 				'status'		 => 'fail',
-				'status_message' => __( 'Option cannot be saved. Try again.', 'mp' )
+				'status_message' => __( 'Option cannot be saved. Try again.', 'mp' ),
 			);
 		}
+
+		$out_of_stock_query = MP_Dashboard_Widgets::mp_dashboard_low_stock_query();
+
+		if ( $out_of_stock_query->have_posts() ) {
+
+			$output .= '<table class="wp-list-table widefat fixed striped posts">
+					<thead>
+						<tr>
+							<th scope="col" id="mp_product_name" class="manage-column column-tags">' . __( 'Product Name', 'mp' ) . '</th>
+							<th scope="col" id="mp_variation_name" class="manage-column column-tags">' . __( 'Variation', 'mp' ) . '</th>
+							<th scope="col" id="mp_stock_level" class="manage-column column-tags">' . __( 'Stock Level', 'mp' ) . '</th>
+						</tr>
+					</thead>
+
+					<tbody id="the-list">';
+
+			if ( $out_of_stock_query->have_posts() ) {
+				while ( $out_of_stock_query->have_posts() ) {
+					$out_of_stock_query->the_post();
+					$edit_link		 = '';
+					$is_variation	 = false;
+
+					$inventory = get_post_meta( get_the_ID(), 'inventory', true );
+
+					if ( get_post_type( get_the_ID() ) == MP_Product::get_post_type() ) {
+						$is_variation	 = false;
+						$edit_link		 = get_edit_post_link();
+					} else {
+						$is_variation	 = true;
+						$post_parent	 = wp_get_post_parent_id( get_the_ID() );
+						$edit_link		 = get_edit_post_link( $post_parent );
+						$post_id		 = $post_parent;
+					}
+					?>
+
+					<?php
+					$output .= '<tr class="iedit author-self level-0 type-post status-publish format-standard hentry category-uncategorized">
+							<th scope="row" class="check-column mp_hidden_content">
+								<input type="checkbox" class="check-column-box" name="" value="' . esc_attr( get_the_ID() ) . '">
+							</th>
+
+							<td class="post-title page-title column-title">
+								<strong><a class="row-title" href="' . esc_attr( $edit_link ) . '">' . get_the_title() . '</a></strong>
+							</td>
+
+							<td class="tags column-tags">';
+
+					if ( $is_variation ) {
+						$output .= get_post_meta( get_the_ID(), 'name', true );
+					} else {
+						$output .= '—';
+					}
+
+					$output .= '</td>
+
+						<td class = "tags column-tags ' . ($inventory <= 0 ? 'mp_low_stock_red' : 'mp_low_stock_yellow') . ' field_editable field_editable_inventory" data-field-type = "number" data-hide-field-product-type = "external">
+							<span class = "original_value field_subtype field_subtype_inventory" data-meta = "inventory" data-default = "&infin;">
+								' . esc_attr( isset( $inventory ) && !empty( $inventory ) || $inventory == '0' ? $inventory : '&infin;'  ) . '
+							</span>
+						</td>	
+						</tr>';
+				}
+			}
+			$output . '</tbody>
+				</table>';
+		} else {
+			$output .= '<p>' . __( 'No products out of stock.', 'mp' ) . '</p>';
+		}
+
+		$response_array[ 'output' ]			 = $output;
+		$response_array[ 'low_stock_value' ] = $out_of_stock_query->found_posts;
 
 		echo json_encode( $response_array );
 		exit;
@@ -721,7 +794,7 @@ class MP_Products_Screen {
 				'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
 				'has_variation_content'		 => mp_get_post_value( 'has_variation_content' ),
 				'variation_content_type'	 => mp_get_post_value( 'variation_content_type' ),
-			//'description'				 => mp_get_post_value( 'description' ),
+//'description'				 => mp_get_post_value( 'description' ),
 			);
 
 			$meta_array_values = apply_filters( 'mp_edit_variation_post_data', $meta_array_values, $post_id );
@@ -984,7 +1057,7 @@ class MP_Products_Screen {
 					'has_sale'					 => mp_get_post_value( 'has_sale' ),
 					'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
 					'special_tax_rate'			 => mp_get_post_value( 'special_tax_rate' ),
-				//'description'				 => mp_get_post_value( 'content' ),
+//'description'				 => mp_get_post_value( 'content' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
 
@@ -1090,10 +1163,10 @@ class MP_Products_Screen {
 
 // Delete variations that no longer exist
 		$wpdb->query( "
-			DELETE FROM $wpdb->posts
-			USING $wpdb->posts
-			INNER JOIN $wpdb->postmeta
-			WHERE $delete_where"
+DELETE FROM $wpdb->posts
+USING $wpdb->posts
+INNER JOIN $wpdb->postmeta
+WHERE $delete_where"
 		);
 
 		return null; // Returning null will bypass internal save mechanism
@@ -1143,7 +1216,7 @@ class MP_Products_Screen {
 		$product_kinds = array(
 			'physical'	 => __( 'Physical / Tangible Product', 'mp' ),
 			'digital'	 => __( 'Digital Download', 'mp' ),
-		//'external'	 => __( 'External / Affiliate Link', 'mp' ),
+//'external'	 => __( 'External / Affiliate Link', 'mp' ),
 		);
 
 		$post_id = isset( $_GET[ 'post' ] ) ? $_GET[ 'post' ] : 0;
@@ -1225,7 +1298,7 @@ class MP_Products_Screen {
 					'placeholder'	 => __( 'Enter Sale Price', 'mp' ),
 					'label'			 => array( 'text' => __( 'Price', 'mp' ) ),
 					'custom'		 => array(
-//'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
+					//'data-msg-lessthan' => __( 'Value must be less than regular price', 'mp' ),
 					),
 					'validation'	 => array(
 						'number' => true,
@@ -1531,7 +1604,7 @@ class MP_Products_Screen {
 		$metabox->add_field( 'images', array(
 			'name'			 => 'product_images',
 			'label'			 => '', //array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
-//'message'	 => __( 'Images', 'mp' ),
+			//'message'	 => __( 'Images', 'mp' ),
 			'conditional'	 => array(
 				'action'	 => 'hide',
 				'operator'	 => 'OR',
@@ -1603,7 +1676,7 @@ class MP_Products_Screen {
 			),
 		) );
 
-// General Tab
+		// General Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_general',
 			'slug'	 => 'general'
@@ -1669,7 +1742,7 @@ class MP_Products_Screen {
 			),
 		) );
 
-// Price Tab
+		// Price Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_price',
 			'slug'	 => 'price'
@@ -1714,7 +1787,7 @@ class MP_Products_Screen {
 		}
 
 
-// Tax Tab
+		// Tax Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_taxes',
 			'slug'	 => 'taxes'
@@ -1735,7 +1808,7 @@ class MP_Products_Screen {
 			),
 		) );
 
-// Shipping Tab
+		// Shipping Tab
 		$metabox->add_field( 'tab', array(
 			'name'	 => 'product_tab_shipping',
 			'slug'	 => 'shipping'
@@ -1837,7 +1910,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-// General Tab
+			// General Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_general',
 				'slug'	 => 'general'
@@ -1919,7 +1992,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-// Price Tab
+			// Price Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_price',
 				'slug'	 => 'price',
@@ -1967,7 +2040,7 @@ class MP_Products_Screen {
 				'label'	 => array( 'text' => __( 'End Date (if applicable)', 'mp' ) ),
 			) );
 
-// Shipping Tab
+			// Shipping Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_shipping',
 				'slug'	 => 'shipping'
@@ -2012,7 +2085,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-// Taxes Tab
+			// Taxes Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_taxes',
 				'slug'	 => 'taxes'
@@ -2033,7 +2106,7 @@ class MP_Products_Screen {
 				),
 			) );
 
-// Attributes Tab
+			// Attributes Tab
 			$repeater->add_sub_field( 'tab', array(
 				'name'	 => 'tab_attributes',
 				'slug'	 => 'attributes',
@@ -2060,13 +2133,13 @@ class MP_Products_Screen {
 					),
 				);
 
-// Set options
+				// Set options
 				$options = array( '' );
 				foreach ( $terms as $term ) {
 					$args[ 'options' ][ $term->term_id ] = $term->name;
 				}
 
-// Set associated product categories
+				// Set associated product categories
 				$cats	 = $mp_product_atts->get_associated_categories( $att->attribute_id );
 				$custom	 = array();
 				foreach ( $cats as $cat_id ) {

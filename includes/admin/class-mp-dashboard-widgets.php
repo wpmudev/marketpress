@@ -73,7 +73,7 @@ class MP_Dashboard_Widgets {
 		}
 	}
 
-	public function mp_dashboard_low_stock_query() {
+	public static function mp_dashboard_low_stock_query() {
 		$inventory_threshhold = mp_get_setting( 'inventory_threshhold' );
 
 		$out_of_stock_query = new WP_Query( array(
@@ -118,146 +118,85 @@ class MP_Dashboard_Widgets {
 		$out_of_stock_query = $this->mp_dashboard_low_stock_query();
 
 		$low_stock_count = $out_of_stock_query->found_posts;
-		wp_add_dashboard_widget( 'mp_low_stock', sprintf( __( 'Low Stock (%s)', 'mp' ), $low_stock_count ), array( &$this, 'mp_low_stock_display' ) );
+		wp_add_dashboard_widget( 'mp_low_stock', sprintf( __( 'Low Stock (<span class="low_stock_value">%s</span>)', 'mp' ), $low_stock_count ), array( &$this, 'mp_low_stock_display' ) );
 	}
 
 	public function mp_low_stock_display() {
 		$out_of_stock_query = $this->mp_dashboard_low_stock_query();
 		?>
+		<div class="mp-dashboard-widget-low-stock-wrap">
+			<?php if ( $out_of_stock_query->have_posts() ) { ?>
+				<table class="wp-list-table widefat fixed striped posts">
+					<thead>
+						<tr>
+							<th scope="col" id="mp_product_name" class="manage-column column-tags"><?php _e( 'Product Name', 'mp' ); ?></th>
+							<th scope="col" id="mp_variation_name" class="manage-column column-tags"><?php _e( 'Variation', 'mp' ); ?></th>
+							<th scope="col" id="mp_stock_level" class="manage-column column-tags"><?php _e( 'Stock Level', 'mp' ); ?></th>
+						</tr>
+					</thead>
 
-		<?php if ( $out_of_stock_query->have_posts() ) { ?>
-			<table class="wp-list-table widefat fixed striped posts">
-				<thead>
-					<tr>
-						<th scope="col" id="mp_product_name" class="manage-column column-tags"><?php _e( 'Product Name', 'mp' ); ?></th>
-						<th scope="col" id="mp_variation_name" class="manage-column column-tags"><?php _e( 'Variation', 'mp' ); ?></th>
-						<th scope="col" id="mp_stock_level" class="manage-column column-tags"><?php _e( 'Stock Level', 'mp' ); ?></th>
-					</tr>
-				</thead>
-
-				<tbody id="the-list">
-					<?php
-					if ( $out_of_stock_query->have_posts() ) {
-						while ( $out_of_stock_query->have_posts() ) {
-							$out_of_stock_query->the_post();
-							$edit_link		 = '';
-							$is_variation	 = false;
-
-							$inventory = get_post_meta( get_the_ID(), 'inventory', true );
-
-							if ( get_post_type( get_the_ID() ) == MP_Product::get_post_type() ) {
+					<tbody id="the-list">
+						<?php
+						if ( $out_of_stock_query->have_posts() ) {
+							while ( $out_of_stock_query->have_posts() ) {
+								$out_of_stock_query->the_post();
+								$edit_link		 = '';
 								$is_variation	 = false;
-								$edit_link		 = get_edit_post_link();
-							} else {
-								$is_variation	 = true;
-								$post_parent	 = wp_get_post_parent_id( get_the_ID() );
-								$edit_link		 = get_edit_post_link( $post_parent );
-								$post_id		 = $post_parent;
 
-								//Variation names
+								$inventory = get_post_meta( get_the_ID(), 'inventory', true );
 
-								/* $product_attributes			 = MP_Product_Attributes_Admin::get_product_attributes();
-								  $product_attributes_array	 = array();
+								if ( get_post_type( get_the_ID() ) == MP_Product::get_post_type() ) {
+									$is_variation	 = false;
+									$edit_link		 = get_edit_post_link();
+								} else {
+									$is_variation	 = true;
+									$post_parent	 = wp_get_post_parent_id( get_the_ID() );
+									$edit_link		 = get_edit_post_link( $post_parent );
+									$post_id		 = $post_parent;
+								}
+								?>
+								<tr class="iedit author-self level-0 type-post status-publish format-standard hentry category-uncategorized">
+									<th scope="row" class="check-column mp_hidden_content">
+										<input type="checkbox" class="check-column-box" name="" value="<?php echo esc_attr( get_the_ID() ); ?>">
+									</th>
 
-								  $args = array(
-								  'post_parent'	 => $post_id,
-								  'post_type'		 => 'mp_product_variation',
-								  'posts_per_page' => -1,
-								  'post_status'	 => 'publish',
-								  'orderby'		 => 'ID',
-								  'order'			 => 'ASC',
-								  );
+									<td class="post-title page-title column-title">
+										<strong><a class="row-title" href="<?php echo esc_attr( $edit_link ); ?>"><?php the_title(); ?></a></strong>
+									</td>
 
-								  $children = get_children( $args, OBJECT );
-
-								  $variation_attributes = array();
-
-								  $first_post_id = 0;
-
-								  foreach ( $children as $child ) {
-								  if ( $first_post_id == 0 ) {
-								  $first_post_id = $child->ID;
-								  }
-
-								  foreach ( $product_attributes as $product_attribute ) {
-								  $product_attributes_array[ $product_attribute->attribute_id ] = $product_attribute->attribute_name;
-
-								  $child_terms = get_the_terms( $first_post_id, 'product_attr_' . $product_attribute->attribute_id );
-								  if ( isset( $child_terms[ 0 ]->term_id ) && $child_terms[ 0 ]->name ) {
-								  $variation_attributes[ $product_attribute->attribute_id ][ $child_terms[ 0 ]->term_id ] = array( $product_attribute->attribute_id, $child_terms[ 0 ]->name );
-								  }
-								  }
-								  }
-
-
-
-								  foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
-								  $child_term	 = get_the_terms( $variation_id, 'product_attr_' . $variation_attribute );
-								  $child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
-
-								  $attribute_title = $product_attributes_array[ $variation_attribute ];
-								  $attribute_value = is_object( $child_term ) ? esc_attr( $child_term->name ) : '';
-
-								  $variation_title .= $attribute_title . ' ' . $attribute_value . ', ';
-								  }
-
-								 */
-								//End Variation names
-							}
-							?>
-							<tr class="iedit author-self level-0 type-post status-publish format-standard hentry category-uncategorized">
-								<th scope="row" class="check-column mp_hidden_content">
-									<input type="checkbox" class="check-column-box" name="" value="<?php echo esc_attr( get_the_ID() ); ?>">
-								</th>
-
-								<td class="post-title page-title column-title">
-									<strong><a class="row-title" href="<?php echo esc_attr( $edit_link ); ?>"><?php the_title(); ?></a></strong>
-									<!--<div class="row-actions">
-										<span class="edit">
-											<a href="<?php echo esc_attr( $edit_link ); ?>"><?php _e( 'Edit', 'mp' ); ?>
-											</a> | 
-										</span>
-
-					<span class="inline hide-if-no-js"><a href="#" class="editinline"><?php _e( 'Update', 'mp' ); ?></a></span>
-									</div>-->
-								</td>
-
-								<td class="tags column-tags">
-									<?php
-									if ( $is_variation ) {
-										echo get_post_meta( get_the_ID(), 'name', true );
-									} else {
-										echo '—';
-									}
-									?>
-								</td>	
-
-								<td class="tags column-tags <?php echo $inventory <= 0 ? 'mp_low_stock_red' : 'mp_low_stock_yellow'; ?> field_editable field_editable_inventory" data-field-type="number" data-hide-field-product-type="external">
-									<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
+									<td class="tags column-tags">
 										<?php
-										echo esc_attr( isset( $inventory ) && !empty( $inventory ) || $inventory == '0' ? $inventory : '&infin;'  );
+										if ( $is_variation ) {
+											echo get_post_meta( get_the_ID(), 'name', true );
+										} else {
+											echo '—';
+										}
 										?>
-									</span>
-								</td>	
+									</td>	
 
-							</tr>
-							<?php
+									<td class="tags column-tags <?php echo $inventory <= 0 ? 'mp_low_stock_red' : 'mp_low_stock_yellow'; ?> field_editable field_editable_inventory" data-field-type="number" data-hide-field-product-type="external">
+										<span class="original_value field_subtype field_subtype_inventory" data-meta="inventory" data-default="&infin;">
+											<?php
+											echo esc_attr( isset( $inventory ) && !empty( $inventory ) || $inventory == '0' ? $inventory : '&infin;'  );
+											?>
+										</span>
+									</td>	
+								</tr>
+								<?php
+							}
 						}
-					}
-					?>
-
-
-				</tbody>
-
-			</table>
-
-			<?php
-		} else {
+						?>
+					</tbody>
+				</table>
+				<?php
+			} else {
+				?>
+				<p><?php _e( 'No products out of stock.', 'mp' ); ?></p>
+				<?php
+			}
 			?>
-			<p><?php _e( 'No products out of stock.', 'mp' ); ?></p>
-			<?php
-		}
-
+		</div>
+		<?php
 		$inventory_threshhold		 = mp_get_setting( 'inventory_threshhold' );
 		$max_inventory_threshhold	 = apply_filters( 'mp_dashboard_widget_max_inventory_threshhold', 20 );
 		?>
@@ -325,32 +264,13 @@ class MP_Dashboard_Widgets {
 
 			<?php
 			$count_posts			 = wp_count_posts( 'mp_order' );
-			$inventory_threshhold	 = mp_get_setting( 'inventory_threshhold' );
 
-			$out_of_stock_query = new WP_Query( array(
-				'post_type'		 => array( MP_Product::get_post_type(), 'mp_product_variation' ),
-				'post_status'	 => 'publish',
-				'posts_per_page' => -1,
-				'meta_query'	 => array(
-					'relation' => 'AND',
-					array(
-						'key'		 => 'inventory_tracking',
-						'value'		 => '1',
-						'compare'	 => '=',
-						'type'		 => 'NUMERIC',
-					),
-					array(
-						'key'		 => 'inventory',
-						'value'		 => $inventory_threshhold,
-						'compare'	 => '<=',
-						'type'		 => 'NUMERIC',
-					),
-				),
-			) );
+			$out_of_stock_query	 = MP_Dashboard_Widgets::mp_dashboard_low_stock_query();
 
 			$received_orders	 = $count_posts->order_received;
 			$paid_orders		 = $count_posts->order_paid;
 			$low_stock_products	 = $out_of_stock_query->found_posts;
+			
 			?>
 			<span class="mp-dashboard-section-title"><?php _e( 'Stock & Orders', 'mp' ); ?></span>
 
@@ -363,7 +283,7 @@ class MP_Dashboard_Widgets {
 				<span class="mp-dashboard-stock-orders-subtitle"><?php _e( 'paid', 'mp' ); ?></span>
 			</div>
 			<div class="mp-dashboard-section-stock-orders">
-				<span class="mp-dashboard-stock-orders-title"><?php printf( _n( '%s product', '%s products', $low_stock_products, 'mp' ), $low_stock_products ); ?></span>
+				<span class="mp-dashboard-stock-orders-title"><?php printf( _n( '<span class="low_stock_value">%s</span> product', '<span class="low_stock_value">%s</span> products', $low_stock_products, 'mp' ), $low_stock_products ); ?></span>
 				<span class="mp-dashboard-stock-orders-subtitle"><?php _e( 'low in stock', 'mp' ); ?></span>
 			</div>
 		</div>

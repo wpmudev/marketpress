@@ -104,15 +104,25 @@ jQuery( document ).ready( function( $ ) {
             meta_value: meta_value,
             ajax_nonce: mp_product_admin_i18n.ajax_nonce
         }
-
         $.post(
             mp_product_admin_i18n.ajaxurl, data
             ).done( function( data, status ) {
             if ( status == 'success' ) {
-                //alert( 'success!' );
-            } else {
-                //alert( 'fail!' );
-                //an error occured
+                var form = $( 'form#inventory_threshhold_form' );
+                $.post(
+                    mp_product_admin_i18n.ajaxurl, form.serialize()
+                    ).done( function( data, status ) {
+                    var response = $.parseJSON( data );
+
+                    if ( response.status_message !== '' ) {
+                        $( '.mp-dashboard-widget-low-stock-wrap' ).html( response.output );
+                        $( '.low_stock_value' ).html( response.low_stock_value );
+
+                        $( ".original_value" ).each( function( index ) {
+                            $( this ).inlineEdit( $( '<input name="temp" class="mp_inline_temp_value" type="text" value="" />' ), $( 'input.editable_value' ) );//' + $.trim( $( this ).html( ) ) + '
+                        } );
+                    }
+                } );
             }
         } );
     }
@@ -474,10 +484,17 @@ jQuery( document ).ready( function( $ ) {
             mp_product_admin_i18n.ajaxurl, form.serialize( )
             ).done( function( data, status ) {
             var response = $.parseJSON( data );
+
             if ( response.status_message !== '' ) {
                 $( '.mp_ajax_response' ).html( response.status_message );
                 $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
                 $( '.mp_ajax_response' ).addClass( 'mp_ajax_response_' + response.status );
+                $( '.mp-dashboard-widget-low-stock-wrap' ).html( response.output );
+                $( '.low_stock_value' ).html( response.low_stock_value );
+
+                $( ".original_value" ).each( function( index ) {
+                    $( this ).inlineEdit( $( '<input name="temp" class="mp_inline_temp_value" type="text" value="" />' ), $( 'input.editable_value' ) );//' + $.trim( $( this ).html( ) ) + '
+                } );
             }
 
             if ( status == 'success' ) {
