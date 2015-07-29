@@ -157,11 +157,11 @@ class MP_PDF_Invoice {
 
 		//both will need country
 		//now the country field
-		$countries	 = mp_country_list();
-		$country	 = $countries[ $order->get_meta( 'mp_billing_info->country' ) ];
+		$countries		 = mp_country_list();
+		$country		 = $countries[ $order->get_meta( 'mp_billing_info->country' ) ];
 		//we will append the contry the #2 of the array
 		$billing[ 2 ]	 = $billing[ 2 ] . ', ' . $country;
-		$shipping[ 2 ] = $shipping[ 2 ] . ', ' . $country;
+		$shipping[ 2 ]	 = $shipping[ 2 ] . ', ' . $country;
 
 		$email = '';
 
@@ -176,11 +176,25 @@ class MP_PDF_Invoice {
 			}
 			//times for the subtotal
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Subtotal", "mp" ), $cart->product_total( true ) );
-			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
+
+			if ( $cart->shipping_total() > 0 ) {
+				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
+			}
+
+			$tax_label = mp_get_setting( 'tax->label', __( 'Tax', 'mp' ) );
+
+			if ( $cart->tax_total() ) {
+				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', $tax_label, $cart->tax_total( true ) );
+			}
+
 			//get gateway
 			$gateway		 = $order->get_meta( 'mp_payment_info->gateway_public_name' );
-			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Total", "mp" ), $cart->total( true ) . ' (' . sprintf( __( "Paid with %s", "mp" ), $gateway ) . ')' );
-			//billing & shipping no changes
+			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Total", "mp" ), $cart->total( true ) );
+			
+			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg"></td><td class="no-bg"></td></tr>', sprintf( __( "Payment Method: %s", "mp" ), $gateway ) );
+			
+
+//billing & shipping no changes
 			$billing		 = implode( '<br/>', $billing );
 			$shipping		 = implode( '<br/>', $shipping );
 		} elseif ( $type == self::PDF_SLIP ) {
