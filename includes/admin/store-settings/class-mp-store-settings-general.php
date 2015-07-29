@@ -347,7 +347,7 @@ class MP_Store_Settings_General {
 		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'special_instructions',
 			'label'		 => array( 'text' => __( 'Show Special Instructions Field?', 'mp' ) ),
-			'desc'		 => sprintf( __( 'Enabling this field will display a textbox on the shipping checkout page for users to enter special instructions for their order. Useful for product personalization, etc. Note you may want to <a href="%s">adjust the message</a> on the shipping page.', 'mp' ), admin_url( 'admin.php?page=store-settings-messaging' ) ),
+			'desc'		 => __( 'Enabling this field will display a textbox on the shipping checkout page for users to enter special instructions for their order. Useful for product personalization, etc.', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
 	}
