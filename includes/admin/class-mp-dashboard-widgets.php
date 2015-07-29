@@ -124,7 +124,9 @@ class MP_Dashboard_Widgets {
 	public function mp_low_stock_display() {
 		$out_of_stock_query = $this->mp_dashboard_low_stock_query();
 		?>
+		<div class='mp-dashboard-widget-low-stock-wrap-overlay'></div>
 		<div class="mp-dashboard-widget-low-stock-wrap">
+
 			<?php if ( $out_of_stock_query->have_posts() ) { ?>
 				<table class="wp-list-table widefat fixed striped posts">
 					<thead>
@@ -231,10 +233,10 @@ class MP_Dashboard_Widgets {
 		$month_current	 = date( 'm' );
 		$year_current	 = date( 'Y' );
 
-		$today					 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date LIKE '" . $year_current . "-" . $month_current . "-" . $day_current . "%' AND p.post_status != 'trash'" );
-		$yesterday				 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date LIKE '" . $yesterday_date . "%' AND p.post_status != 'trash'" );
-		$seven_days				 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date >= '" . $seven_days_date . "' AND p.post_status != 'trash'" );
-		$thirty_days			 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date >= '" . $thirty_days_date . "' AND p.post_status != 'trash'" );
+		$today		 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date LIKE '" . $year_current . "-" . $month_current . "-" . $day_current . "%' AND p.post_status != 'trash'" );
+		$yesterday	 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date LIKE '" . $yesterday_date . "%' AND p.post_status != 'trash'" );
+		$seven_days	 = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date >= '" . $seven_days_date . "' AND p.post_status != 'trash'" );
+		$thirty_days = $wpdb->get_row( "SELECT count(p.ID) as count, sum(m.meta_value) as total, avg(m.meta_value) as average FROM $wpdb->posts p JOIN $wpdb->postmeta m ON p.ID = m.post_id WHERE p.post_type = 'mp_order' AND m.meta_key = 'mp_order_total' AND p.post_date >= '" . $thirty_days_date . "' AND p.post_status != 'trash'" );
 		?>
 		<p><span><?php _e( "Welcome back! Here's a quick summary of your store's performance.", 'mp' ); ?></span></p>
 		<div class="main store-report">
@@ -263,14 +265,13 @@ class MP_Dashboard_Widgets {
 			</div>
 
 			<?php
-			$count_posts			 = wp_count_posts( 'mp_order' );
+			$count_posts = wp_count_posts( 'mp_order' );
 
-			$out_of_stock_query	 = MP_Dashboard_Widgets::mp_dashboard_low_stock_query();
+			$out_of_stock_query = MP_Dashboard_Widgets::mp_dashboard_low_stock_query();
 
 			$received_orders	 = $count_posts->order_received;
 			$paid_orders		 = $count_posts->order_paid;
 			$low_stock_products	 = $out_of_stock_query->found_posts;
-			
 			?>
 			<span class="mp-dashboard-section-title"><?php _e( 'Stock & Orders', 'mp' ); ?></span>
 

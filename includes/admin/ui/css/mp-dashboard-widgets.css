@@ -160,3 +160,17 @@ input.mp_inline_temp_value{
 .mp_ajax_response_fail{
     color: red;
 }
+
+.mp-dashboard-widget-low-stock-wrap-overlay{
+    position: absolute;
+    width: 96.8%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 999;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    display: none;
+}

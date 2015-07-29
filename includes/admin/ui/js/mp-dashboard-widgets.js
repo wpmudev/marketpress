@@ -96,6 +96,7 @@ jQuery( document ).ready( function( $ ) {
 
 
     function save_inline_post_data( post_id, meta_name, meta_value, sub_meta ) {
+        $( '.mp-dashboard-widget-low-stock-wrap-overlay' ).show();
         var data = {
             action: 'save_inline_post_data',
             post_id: post_id,
@@ -112,6 +113,8 @@ jQuery( document ).ready( function( $ ) {
                 $.post(
                     mp_product_admin_i18n.ajaxurl, form.serialize()
                     ).done( function( data, status ) {
+
+                    $( '.mp-dashboard-widget-low-stock-wrap-overlay' ).hide();
                     var response = $.parseJSON( data );
 
                     if ( response.status_message !== '' ) {
@@ -475,6 +478,9 @@ jQuery( document ).ready( function( $ ) {
 
 
     $( '#mp_dashboard_widget_inventory_threshhold' ).live( 'change', function( e ) {
+
+        $( '.mp-dashboard-widget-low-stock-wrap-overlay' ).show();
+
         var form = $( 'form#inventory_threshhold_form' );
         $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
         $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
@@ -483,6 +489,7 @@ jQuery( document ).ready( function( $ ) {
             //action: 'save_inline_post_data',
             mp_product_admin_i18n.ajaxurl, form.serialize( )
             ).done( function( data, status ) {
+            $( '.mp-dashboard-widget-low-stock-wrap-overlay' ).hide();
             var response = $.parseJSON( data );
 
             if ( response.status_message !== '' ) {
