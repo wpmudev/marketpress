@@ -932,6 +932,7 @@ if ( !function_exists( 'mp_get_user_address_part' ) ) :
 	 * @return string
 	 */
 	function mp_get_user_address_part( $what, $type, $user = null ) {
+
 		if ( is_null( $user ) ) {
 			$user = wp_get_current_user();
 		} elseif ( !$user instanceof WP_User && false === ($user = get_user_by( 'id', $user )) ) {
@@ -962,6 +963,7 @@ if ( !function_exists( 'mp_get_user_address_part' ) ) :
 				return mp_arr_get_value( '1', $name_parts, '' );
 			}
 		} else {
+			//echo 'type:'.$type;
 			return mp_get_session_value( "mp_" . $type . "_info->{$what}", mp_arr_get_value( $what, $meta, '' ) );
 		}
 	}

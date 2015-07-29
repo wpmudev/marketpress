@@ -207,11 +207,11 @@ class MP_Checkout {
 	 */
 	public function address_fields( $type, $value_only = false ) {
 		$country = mp_get_user_address_part( 'country', $type );
-
+		
 		// Country list
-		if(is_array(mp_get_setting( 'shipping->allowed_countries', '' ))) {
+		if ( is_array( mp_get_setting( 'shipping->allowed_countries', '' ) ) ) {
 			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
-		}else{
+		} else {
 			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		}
 
@@ -221,7 +221,9 @@ class MP_Checkout {
 		}
 
 		$countries = array();
-		
+
+		//$countries[''] = __('Select One', 'mp');
+
 		foreach ( $allowed_countries as $_country ) {
 			$countries[ $_country ] = mp()->countries[ $_country ];
 		}
@@ -271,7 +273,7 @@ class MP_Checkout {
 						'label'	 => __( 'First', 'mp' ),
 						'name'	 => $this->field_name( 'first_name', $type ),
 						'value'	 => mp_get_user_address_part( 'first_name', $type ),
-						'atts'		 => array(
+						'atts'	 => array(
 							'class' => 'mp_form_input',
 						),
 					),
@@ -280,7 +282,7 @@ class MP_Checkout {
 						'label'	 => __( 'Last', 'mp' ),
 						'name'	 => $this->field_name( 'last_name', $type ),
 						'value'	 => mp_get_user_address_part( 'last_name', $type ),
-						'atts'		 => array(
+						'atts'	 => array(
 							'class' => 'mp_form_input',
 						),
 					),
@@ -304,7 +306,7 @@ class MP_Checkout {
 				'label'	 => __( 'Company', 'mp' ),
 				'name'	 => $this->field_name( 'company_name', $type ),
 				'value'	 => mp_get_user_address_part( 'company_name', $type ),
-				'atts'		 => array(
+				'atts'	 => array(
 					'class' => 'mp_form_input',
 				),
 			),
@@ -314,8 +316,8 @@ class MP_Checkout {
 				'name'		 => $this->field_name( 'address1', $type ),
 				'value'		 => mp_get_user_address_part( 'address1', $type ),
 				'atts'		 => array(
-					'placeholder' => __( 'Street address, P.O. box, company name, c/o', 'mp' ),
-					'class' => 'mp_form_input',
+					'placeholder'	 => __( 'Street address, P.O. box, company name, c/o', 'mp' ),
+					'class'			 => 'mp_form_input',
 				),
 				'validation' => array(
 					'required' => true,
@@ -327,8 +329,8 @@ class MP_Checkout {
 				'name'	 => $this->field_name( 'address2', $type ),
 				'value'	 => mp_get_user_address_part( 'address2', $type ),
 				'atts'	 => array(
-					'placeholder' => __( 'Apartment, suite, unit, building, floor, etc', 'mp' ),
-					'class' => 'mp_form_input',
+					'placeholder'	 => __( 'Apartment, suite, unit, building, floor, etc', 'mp' ),
+					'class'			 => 'mp_form_input',
 				),
 			),
 			array(
@@ -348,13 +350,17 @@ class MP_Checkout {
 				'subfields'	 => $state_zip_fields,
 			),
 			array(
-				'type'		 => 'select',
-				'label'		 => __( 'Country', 'mp' ),
-				'name'		 => $this->field_name( 'country', $type ),
-				'options'	 => $countries,
-				'value'		 => $country,
-				'atts'		 => array(
+				'type'			 => 'select',
+				'label'			 => __( 'Country', 'mp' ),
+				'name'			 => $this->field_name( 'country', $type ),
+				'options'		 => array_merge( array( '' => __( 'Select One', 'mp' ) ), $countries ), //array_merge(array('' => __('Select One', 'mp')), $this->currencies),
+				'value'			 => $country,
+				'default_value'	 => '',
+				'atts'			 => array(
 					'class' => 'mp_select2_search',
+				),
+				'validation'	 => array(
+					'required' => true,
 				),
 			),
 			array(
@@ -362,7 +368,7 @@ class MP_Checkout {
 				'label'	 => __( 'Phone', 'mp' ),
 				'name'	 => $this->field_name( 'phone', $type ),
 				'value'	 => mp_get_user_address_part( 'phone', $type ),
-				'atts'		 => array(
+				'atts'	 => array(
 					'class' => 'mp_form_input',
 				),
 			),
@@ -548,7 +554,7 @@ class MP_Checkout {
 				}
 
 				$id		 = 'mp-checkout-section-' . $section;
-				$classes = array( 'mp_checkout_section', 'mp_checkout_section-'.$section);
+				$classes = array( 'mp_checkout_section', 'mp_checkout_section-' . $section );
 
 				if ( !is_null( $visible_section ) ) {
 					if ( $section == $visible_section ) {
