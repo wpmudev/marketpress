@@ -88,6 +88,9 @@ class MP_Coupons_Addon {
 			add_filter( 'mp_product/get_price', array( &$this, 'product_price' ), 10, 2 );
 			add_filter( 'mp_cart/product_total', array( &$this, 'product_total' ), 10, 2 );
 			add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
+
+			add_filter( 'mp_cart/tax_total', array( &$this, 'tax_total' ), 10, 3 );
+
 			add_filter( 'mp_cart/cart_meta/product_total', array( &$this, 'cart_meta_product_total' ), 10, 2 );
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_css_frontend' ) );
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_js_frontend' ), 25 );
@@ -337,6 +340,25 @@ class MP_Coupons_Addon {
 		}
 
 		return floatval( $total );
+	}
+
+	public function tax_total( $tax_amount, $total, $obj ) {
+
+		$percent = $total / 100;
+
+		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
+			$total_pre = $total + ( - 1 * $total );
+		} else {
+			$total_pre = $total + $this->get_total_discount_amt();
+		}
+		
+		$discount_value = ($total - $total_pre);
+		
+		$init_tax_percentage = $tax_amount / $percent;
+		
+		$total_pre = $total_pre * ($init_tax_percentage / 100);
+
+		return $total_pre; //$obj->product_total(false);
 	}
 
 	/**
@@ -1212,6 +1234,16 @@ if ( !function_exists( 'mp_coupons_addon' ) ) :
 	function mp_coupons_addon() {
 		return MP_Coupons_Addon::get_instance();
 	}
+
+
+
+
+
+
+
+
+
+
 
 
 

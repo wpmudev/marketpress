@@ -167,6 +167,7 @@ class MP_PDF_Invoice {
 
 		$order_details	 = array();
 		$cart			 = $order->get_cart();
+		
 		if ( $type == self::PDF_INVOICE ) {
 
 			foreach ( $cart->get_items() as $key => $qty ) {
@@ -190,13 +191,13 @@ class MP_PDF_Invoice {
 			//get gateway
 			$gateway		 = $order->get_meta( 'mp_payment_info->gateway_public_name' );
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Total", "mp" ), $cart->total( true ) );
-			
+
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg"></td><td class="no-bg"></td></tr>', sprintf( __( "Payment Method: %s", "mp" ), $gateway ) );
-			
+
 
 //billing & shipping no changes
-			$billing		 = implode( '<br/>', $billing );
-			$shipping		 = implode( '<br/>', $shipping );
+			$billing	 = implode( '<br/>', $billing );
+			$shipping	 = implode( '<br/>', $shipping );
 		} elseif ( $type == self::PDF_SLIP ) {
 			//as packing, we don't show price data
 			foreach ( $cart->get_items() as $key => $qty ) {

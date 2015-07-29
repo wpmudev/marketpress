@@ -356,7 +356,7 @@ var mp_checkout;
 						
 						$input.on( 'focus', function() {
 							if ( $input.hasClass( 'mp_form_input_error' ) ) {
-								$tip.tooltip( 'open' );
+								//$tip.tooltip( 'open' );
 							}
 						} );
 						
