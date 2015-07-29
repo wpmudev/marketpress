@@ -4,6 +4,7 @@
  * @author: Hoang Ngo
  */
 class MP_PDF_Invoice {
+
 	const PDF_INVOICE = 'invoice', PDF_SLIP = 'slip';
 
 	private $settings;
@@ -13,7 +14,7 @@ class MP_PDF_Invoice {
 	 * @access public
 	 */
 	public function __construct() {
-		if ( ! class_exists( 'DOMPDF' ) ) {
+		if ( !class_exists( 'DOMPDF' ) ) {
 			require_once dirname( __FILE__ ) . '/vendors/dompdf/dompdf_config.inc.php';
 		}
 		$this->settings = mp_get_setting( 'pdf_invoice' );
@@ -34,18 +35,16 @@ class MP_PDF_Invoice {
 		}
 		//if current user is not the owner of this order or not admin, false
 		if ( get_current_user_id() == $order->post_author || current_user_can( 'manage_options' ) ) {
-			$wpnonce = wp_create_nonce( $order_id );
+			$wpnonce	 = wp_create_nonce( $order_id );
 			//build html
 			$http_params = array(
-				'action'   => 'mp_invoice_pdf_generate',
-				'wpnonce'  => $wpnonce,
-				'order_id' => $order->post_name,
-				'type'     => $type
+				'action'	 => 'mp_invoice_pdf_generate',
+				'wpnonce'	 => $wpnonce,
+				'order_id'	 => $order->post_name,
+				'type'		 => $type
 			);
 			$http_params = apply_filters( 'mp_pdf_invoice_button_params', $http_params, $type, $order );
-			$html        = sprintf( '<a target="_blank" href="%s" class="button">%s</a>',
-				add_query_arg( $http_params, admin_url( 'admin-ajax.php' ) ),
-				$type == self::PDF_INVOICE ? __( "PDF Invoice", "mp" ) : __( "PDF Packing Slip", "mp" )
+			$html		 = sprintf( '<a target="_blank" href="%s" class="button">%s</a>', add_query_arg( $http_params, admin_url( 'admin-ajax.php' ) ), $type == self::PDF_INVOICE ? __( "PDF Invoice", "mp" ) : __( "PDF Packing Slip", "mp" )
 			);
 
 			return apply_filters( 'mp_pdf_invoice_button', $html, $http_params, $type, $order );
@@ -76,8 +75,8 @@ class MP_PDF_Invoice {
 		if ( $download ) {
 			//check does the runtime path exist
 			$runtime = $this->create_runtime_dir();
-			if ( ! is_dir( $runtime ) || ! is_writable( $runtime ) ) {
-				die ( sprintf( __( "The dir %s not exist or not writeable", "mp" ), $runtime ) );
+			if ( !is_dir( $runtime ) || !is_writable( $runtime ) ) {
+				die( sprintf( __( "The dir %s not exist or not writeable", "mp" ), $runtime ) );
 			}
 			if ( $type == self::PDF_INVOICE ) {
 				$file = 'invoice_' . $order->post_name . '.pdf';
@@ -96,7 +95,7 @@ class MP_PDF_Invoice {
 			header( "Content-Length: " . filesize( $tmp_pdf ) );
 			flush(); // this doesn't really matter.
 			$fp = fopen( $tmp_pdf, "r" );
-			while ( ! feof( $fp ) ) {
+			while ( !feof( $fp ) ) {
 				echo fread( $fp, 65536 );
 				flush(); // this is essential for large downloads
 			}
@@ -130,7 +129,7 @@ class MP_PDF_Invoice {
 		$dompdf->render();
 
 		$runtime = $this->create_runtime_dir();
-		if ( ! is_dir( $runtime ) || ! is_writable( $runtime ) ) {
+		if ( !is_dir( $runtime ) || !is_writable( $runtime ) ) {
 			return false;
 		}
 		if ( $type == self::PDF_INVOICE ) {
@@ -153,74 +152,68 @@ class MP_PDF_Invoice {
 	 * @access private
 	 */
 	private function build_pdf_content( MP_Order $order, $type = self::PDF_INVOICE ) {
-		$billing  = $this->strip_tags_address( $order->get_address( 'billing' ) );
-		$shipping = $this->strip_tags_address( $order->get_address( 'shipping' ) );
+		$billing	 = $this->strip_tags_address( $order->get_address( 'billing' ) );
+		$shipping	 = $this->strip_tags_address( $order->get_address( 'shipping' ) );
 
 		//both will need country
 		//now the country field
-		$countries = mp_country_list();
-		$country   = $countries[ $order->get_meta( 'mp_billing_info->country' ) ];
+		$countries	 = mp_country_list();
+		$country	 = $countries[ $order->get_meta( 'mp_billing_info->country' ) ];
 		//we will append the contry the #2 of the array
-		$billing[2]  = $billing[2] . ', ' . $country;
-		$shipping[2] = $shipping[2] . ', ' . $country;
+		$billing[ 2 ]	 = $billing[ 2 ] . ', ' . $country;
+		$shipping[ 2 ] = $shipping[ 2 ] . ', ' . $country;
 
 		$email = '';
 
-		$order_details = array();
-		$cart          = $order->get_cart();
+		$order_details	 = array();
+		$cart			 = $order->get_cart();
 		if ( $type == self::PDF_INVOICE ) {
+
 			foreach ( $cart->get_items() as $key => $qty ) {
-				$product         = new MP_Product( $key );
-				$order_details[] = sprintf( '<tr><td>%s</td><td>%s</td><td>%s</td></tr>',
-					$product->title( false ),
-					$qty, $product->display_price( false )
+				$product		 = new MP_Product( $key );
+				$order_details[] = sprintf( '<tr><td>%s</td><td>%s</td><td>%s</td></tr>', $product->title( false ), $qty, mp_format_currency( '', $product->get_price( 'lowest' ) )//$product->display_price( false )
 				);
 			}
 			//times for the subtotal
-			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>',
-				'', __( "Subtotal", "mp" ), $cart->product_total( true ) );
-			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>',
-				'', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
+			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Subtotal", "mp" ), $cart->product_total( true ) );
+			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
 			//get gateway
-			$gateway         = $order->get_meta( 'mp_payment_info->gateway_public_name' );
-			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>',
-				'', __( "Total", "mp" ), $cart->total( true ) . ' (' . sprintf( __( "Paid with %s", "mp" ), $gateway ) . ')' );
+			$gateway		 = $order->get_meta( 'mp_payment_info->gateway_public_name' );
+			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Total", "mp" ), $cart->total( true ) . ' (' . sprintf( __( "Paid with %s", "mp" ), $gateway ) . ')' );
 			//billing & shipping no changes
-			$billing  = implode( '<br/>', $billing );
-			$shipping = implode( '<br/>', $shipping );
+			$billing		 = implode( '<br/>', $billing );
+			$shipping		 = implode( '<br/>', $shipping );
 		} elseif ( $type == self::PDF_SLIP ) {
 			//as packing, we don't show price data
 			foreach ( $cart->get_items() as $key => $qty ) {
-				$product         = new MP_Product( $key );
-				$order_details[] = sprintf( '<tr><td>%s</td><td>%s</td></tr>',
-					$product->title( false ),
-					$qty
+				$product		 = new MP_Product( $key );
+				$order_details[] = sprintf( '<tr><td>%s</td><td>%s</td></tr>', $product->title( false ), $qty
 				);
 			}
 			//remove shipping email & billing
 			array_pop( $shipping );
 			array_pop( $billing );
 
-			$billing_email  = $order->get_meta( 'mp_billing_info->email' );
-			$shipping_email = $order->get_meta( 'mp_shipping_info->email' );
+			$billing_email	 = $order->get_meta( 'mp_billing_info->email' );
+			$shipping_email	 = $order->get_meta( 'mp_shipping_info->email' );
 
 			$email = sprintf( __( "Email: %s", "mp" ), $billing_email );
 			if ( $shipping_email != $billing_email ) {
 				$email .= '<br/>' . sprintf( __( "Shipping Email: %s", "mp" ), $shipping_email );
 			}
 			//rejoin billing & shipping
-			$billing  = implode( '<br/>', $billing );
-			$shipping = implode( '<br/>', $shipping );
+			$billing	 = implode( '<br/>', $billing );
+			$shipping	 = implode( '<br/>', $shipping );
 		}
 
-		$order_details = implode( '', $order_details );
+		$order_details	 = implode( '', $order_details );
 		//prepare logo
-		$logo = '';
-		if ( ! empty( $this->settings['template_logo'] ) && function_exists( 'gd_info' ) ) {
-			$logo = sprintf( '<img height="80" src="%s"/>', $this->settings['template_logo'] );
+		$logo			 = '';
+		if ( !empty( $this->settings[ 'template_logo' ] ) && function_exists( 'gd_info' ) ) {
+			$logo = sprintf( '<img height="80" src="%s"/>', $this->settings[ 'template_logo' ] );
 		}
 
-		$template = $this->settings['template'];
+		$template = $this->settings[ 'template' ];
 		if ( empty( $template ) ) {
 			//use the default
 			$template = dirname( __FILE__ ) . '/templates/default';
@@ -228,26 +221,26 @@ class MP_PDF_Invoice {
 
 		switch ( $type ) {
 			case self::PDF_INVOICE :
-				$template = $template . '/invoice.php';
+				$template	 = $template . '/invoice.php';
 				break;
 			case self::PDF_SLIP:
-				$template = $template . '/packing.php';
+				$template	 = $template . '/packing.php';
 				break;
 		}
 
 		ob_start();
 		include $template;
 
-		$html = ob_get_clean();
-		$data = array(
-			'{{order_id}}'      => $order->get_id(),
-			'{{billing}}'       => $billing,
-			'{{shipping}}'      => $shipping,
-			'{{order_details}}' => $order_details,
-			'{{logo}}'          => $logo,
-			'{{email}}'         => $email
+		$html	 = ob_get_clean();
+		$data	 = array(
+			'{{order_id}}'		 => $order->get_id(),
+			'{{billing}}'		 => $billing,
+			'{{shipping}}'		 => $shipping,
+			'{{order_details}}'	 => $order_details,
+			'{{logo}}'			 => $logo,
+			'{{email}}'			 => $email
 		);
-		$data = apply_filters( 'mp_pdf_invoice_params', $data );
+		$data	 = apply_filters( 'mp_pdf_invoice_params', $data );
 
 		foreach ( $data as $key => $val ) {
 			$html = str_replace( $key, $val, $html );
@@ -256,15 +249,14 @@ class MP_PDF_Invoice {
 		return $html;
 	}
 
-
 	/**
 	 * @param $address
 	 *
 	 * @since 3.0
 	 */
 	private function strip_tags_address( $address ) {
-		$parts = preg_split( '/<br[^>]*>/i', $address );
-		$parts = array_filter( $parts );
+		$parts	 = preg_split( '/<br[^>]*>/i', $address );
+		$parts	 = array_filter( $parts );
 		foreach ( $parts as $key => $part ) {
 			$parts[ $key ] = strip_tags( $part );
 		}
@@ -277,12 +269,13 @@ class MP_PDF_Invoice {
 	 * @since 3.0
 	 */
 	private function create_runtime_dir() {
-		$wpdir        = wp_upload_dir();
-		$runtime_path = $wpdir['basedir'] . '/mp_pdf_invoice';
-		if ( ! is_dir( $runtime_path ) ) {
+		$wpdir			 = wp_upload_dir();
+		$runtime_path	 = $wpdir[ 'basedir' ] . '/mp_pdf_invoice';
+		if ( !is_dir( $runtime_path ) ) {
 			mkdir( $runtime_path, 0777, true );
 		}
 
 		return $runtime_path;
 	}
+
 }
