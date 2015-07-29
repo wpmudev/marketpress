@@ -184,12 +184,16 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 				}
 			}
 		}
-		
+
 		/* Loop through the name keys and get the type (either existing or new), id and value
 		and then add to the $sorted array */
 		foreach ( $name_keys as $name_key ) {
 			$keys = explode( '->', $name_key );
 			$array = mp_arr_get_value( $name_key, $unsorted );
+			if(!is_array($array)){
+				//in case $array is not an array, we move next
+				continue;
+			}
 			$type = key( $array );
 			$array = current( $array );
 			$id = key( $array );
@@ -535,7 +539,7 @@ jQuery(document).ready(function($){
 		$class = 'WPMUDEV_Field_' . ucfirst($type);
 		
 		if ( ! class_exists($class) ) {
-			return false;	
+			return false;
 		}
 		
 		//subfields don't support validation (yet) so make sure these arguments are set accordingly
