@@ -45,6 +45,8 @@ class MP_Public {
 		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
 		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
 
+		add_action( 'pre_get_posts', array( &$this, 'custom_taxonomy_limit_posts' ) );
+
 		//Downloads
 		add_action( 'pre_get_posts', array( &$this, 'include_out_of_stock_products_for_downloads' ) );
 		add_filter( 'posts_results', array( &$this, 'set_publish_status_for_out_of_stock_product_downloads' ), 10, 2 );
@@ -152,7 +154,7 @@ class MP_Public {
 					<div class="mp_form_callout">
 						<button type="submit" class="mp_button mp_button-alt mp_button-create-account">' . __( 'Create Account', 'mp' ) . '</button>
 					</div>
-					<input type="hidden" name="order_id" value="'.get_query_var('mp_order_id').'"/>
+					<input type="hidden" name="order_id" value="' . get_query_var( 'mp_order_id' ) . '"/>
 				</form>
 			</div><!-- end mp-create-account-lightbox -->';
 
@@ -239,6 +241,17 @@ class MP_Public {
 	public function includes() {
 		require_once mp_plugin_dir( 'includes/public/class-mp-checkout.php' );
 		require_once mp_plugin_dir( 'includes/public/class-mp-short-codes.php' );
+	}
+
+	public function custom_taxonomy_limit_posts( $query ) {
+		// not an admin page and it is the main query
+
+		if ( !is_admin() && $query->is_main_query() ) {
+
+			if ( is_tax() && isset( $query->query_vars[ 'product_category' ] ) || isset( $query->query_vars[ 'product_tag' ] ) ) {
+				$query->set( 'posts_per_page', mp_get_setting( 'per_page', get_option( 'posts_per_page' ) ) );
+			}
+		}
 	}
 
 	/**

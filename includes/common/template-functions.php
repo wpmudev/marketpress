@@ -1427,6 +1427,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 
 
 // The Query
+		//var_dump($query);
 		$custom_query = new WP_Query( $query );
 
 // Get layout type
