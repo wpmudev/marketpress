@@ -351,14 +351,18 @@ class MP_Coupons_Addon {
 		} else {
 			$total_pre = $total + $this->get_total_discount_amt();
 		}
-		
+
 		$discount_value = ($total - $total_pre);
-		
+
 		$init_tax_percentage = $tax_amount / $percent;
-		
+
 		$total_pre = $total_pre * ($init_tax_percentage / 100);
 
-		return $total_pre; //$obj->product_total(false);
+		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+			$total_pre = $tax_amount;
+		}
+
+		return $tax_amount;
 	}
 
 	/**
@@ -1234,6 +1238,8 @@ if ( !function_exists( 'mp_coupons_addon' ) ) :
 	function mp_coupons_addon() {
 		return MP_Coupons_Addon::get_instance();
 	}
+
+
 
 
 

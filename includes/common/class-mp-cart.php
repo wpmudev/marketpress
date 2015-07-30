@@ -921,11 +921,11 @@ class MP_Cart {
 
 		$html = '
 			<select' . $attributes . '>';
-		
-		if($selected >= $max){
+
+		if ( $selected >= $max ) {
 			$max = $selected;
 		}
-		
+
 		for ( $i = 1; $i <= $max; $i ++ ) {
 			$html .= '
 				<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
@@ -946,7 +946,7 @@ class MP_Cart {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function empty_cart( ) {
+	public function empty_cart() {
 		/**
 		 * Fires right before the cart is emptied
 		 *
@@ -998,8 +998,8 @@ class MP_Cart {
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl' => admin_url( 'admin-ajax.php' ),
-			'ajax_loader' => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>'
+			'ajaxurl'		 => admin_url( 'admin-ajax.php' ),
+			'ajax_loader'	 => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>'
 		) );
 	}
 
@@ -1042,8 +1042,8 @@ class MP_Cart {
 					$this->set_id( $blog_id );
 
 					//comment out, we not really need this
-					/*$html .= '
-						<li class="mp-floating-cart-store-name"><a href="' . get_home_url( $this->_id ) . '">' . get_blog_option( $this->_id, 'blogname' ) . '</a></li>';*/
+					/* $html .= '
+					  <li class="mp-floating-cart-store-name"><a href="' . get_home_url( $this->_id ) . '">' . get_blog_option( $this->_id, 'blogname' ) . '</a></li>'; */
 				}
 
 				$items = $this->get_items();
@@ -1383,7 +1383,7 @@ class MP_Cart {
 		$this->_id = $id;
 
 		if ( $this->is_global ) {
-			if(is_int($this->_id)) {
+			if ( is_int( $this->_id ) ) {
 				//sometime, the _id is cart object, we need to validate
 				switch_to_blog( $this->_id );
 			}
@@ -1468,13 +1468,13 @@ class MP_Cart {
 				 * for each site
 				 */
 				if ( $this->is_global ) {
-					$cart     = mp_get_single_site_cart();
-					$products = $cart->get_items_as_objects();
-					$total    = $cart->product_total();
+					$cart		 = mp_get_single_site_cart();
+					$products	 = $cart->get_items_as_objects();
+					$total		 = $cart->product_total();
 				} else {
-					$cart     = $this;
-					$products = $this->get_items_as_objects();
-					$total    = $this->product_total();
+					$cart		 = $this;
+					$products	 = $this->get_items_as_objects();
+					$total		 = $this->product_total();
 				}
 
 				do_action( 'mp/cart/before_calculate_shipping' );
@@ -1607,7 +1607,7 @@ class MP_Cart {
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
 					if ( $item->is_download() && $item->special_tax_amt() ) {
-
+						
 					} else {
 						if ( !mp_get_setting( 'tax->tax_digital' ) && $item->is_download() ) {
 							continue;
@@ -1684,6 +1684,12 @@ class MP_Cart {
 			 * @param array An array containing all of the applicable cart subtotals (e.g. tax, shipping, etc)
 			 * @param MP_Cart The current cart object.
 			 */
+			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+				$pre_total	 = $this->product_total() + $this->shipping_total();
+				$tax_rate	 = mp_tax_rate();
+				$total		 = $pre_total / (1 + $tax_rate) + $this->tax_total();
+			}
+
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
 
 			$this->_total[ 'total' ] = $total;
