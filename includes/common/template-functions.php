@@ -1390,11 +1390,15 @@ if ( !function_exists( 'mp_list_products' ) ) :
 				@session_start();
 			}
 
-			if ( isset( $_SESSON[ 'mp_product_list_order_by' ] ) ) {
-				$query[ 'order_by' ] = $_SESSON[ 'mp_product_list_order_by' ];
-			}
-			if ( isset( $_SESSON[ 'mp_product_list_order' ] ) ) {
-				$query[ 'order' ] = $_SESSON[ 'mp_product_list_order' ];
+			$order_by	 = isset( $_SESSION[ 'mp_product_list_order_by' ] ) ? $_SESSION[ 'mp_product_list_order_by' ] : '';
+			$order		 = isset( $_SESSION[ 'mp_product_list_order' ] ) ? $_SESSION[ 'mp_product_list_order' ] : '';
+
+			if ( !empty( $order_by ) && !empty( $order ) ) {
+				$query[ 'orderby' ]	 = $order_by;
+				$query[ 'order' ]	 = $order;
+
+				$args[ 'order_by' ]	 = $order_by;
+				$args[ 'order' ]	 = $order;
 			}
 
 // Get order by

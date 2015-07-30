@@ -40,14 +40,14 @@ class MP_Public {
 		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
 		add_action( 'wp_footer', array( &$this, 'create_account_lightbox_html' ), 20 );
 
-		// Template Stuff
+// Template Stuff
 		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
 		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
 		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
 
 		add_action( 'pre_get_posts', array( &$this, 'custom_taxonomy_limit_posts' ) );
 
-		//Downloads
+//Downloads
 		add_action( 'pre_get_posts', array( &$this, 'include_out_of_stock_products_for_downloads' ) );
 		add_filter( 'posts_results', array( &$this, 'set_publish_status_for_out_of_stock_product_downloads' ), 10, 2 );
 		add_action( 'template_redirect', array( &$this, 'maybe_serve_download' ) );
@@ -59,7 +59,7 @@ class MP_Public {
 
 		$post_type	 = MP_Product::get_post_type();
 		$settings	 = get_option( 'mp_settings' );
-		//Add global .mp class on all MarketPress pages
+//Add global .mp class on all MarketPress pages
 		if (
 		is_singular( $post_type ) ||
 		get_post_type() == $post_type ||
@@ -69,15 +69,15 @@ class MP_Public {
 			$classes[] = 'mp';
 		}
 
-		//Add class for mp singles
+//Add class for mp singles
 		if ( is_singular( $post_type ) ) {
 			$classes[] = 'mp-single';
 		}
-		//Add class for mp category page
+//Add class for mp category page
 		if ( is_archive( $post_type ) && is_tax( array( 'product_category' ) ) ) {
 			$classes[] = 'mp-category';
 		}
-		//Add class for mp tag pages
+//Add class for mp tag pages
 		if ( is_archive( $post_type ) && is_tax( array( 'product_tag' ) ) ) {
 			$classes[] = 'mp-tag';
 		}
@@ -108,7 +108,7 @@ class MP_Public {
 	 */
 	public function create_account_lightbox_html( $echo = true ) {
 		if ( is_user_logged_in() ) {
-			// Bail - user is logged in (e.g. already has an account)
+// Bail - user is logged in (e.g. already has an account)
 			return false;
 		}
 
@@ -243,8 +243,26 @@ class MP_Public {
 		require_once mp_plugin_dir( 'includes/public/class-mp-short-codes.php' );
 	}
 
+	public function products_order( $query ) {
+
+		if ( !is_admin() ) {
+
+			//if ( is_page( mp_get_setting( 'pages->products' ) ) || is_tax() && isset( $query->query_vars[ 'product_category' ] ) || isset( $query->query_vars[ 'product_tag' ] ) ) {
+			//if ( is_tax() && isset( $query->query_vars[ 'product_category' ] ) || isset( $query->query_vars[ 'product_tag' ] ) ) {
+			$order_by	 = isset( $_SESSION[ 'mp_product_list_order_by' ] ) ? $_SESSION[ 'mp_product_list_order_by' ] : '';
+			$order		 = isset( $_SESSION[ 'mp_product_list_order' ] ) ? $_SESSION[ 'mp_product_list_order' ] : '';
+
+			if ( !empty( $order_by ) && !empty( $order ) ) {
+				$query->set( 'orderby', $order_by );
+				$query->set( 'order', $order );
+			}
+			//}
+			//}
+		}
+	}
+
 	public function custom_taxonomy_limit_posts( $query ) {
-		// not an admin page and it is the main query
+// not an admin page and it is the main query
 
 		if ( !is_admin() && $query->is_main_query() ) {
 
@@ -287,27 +305,27 @@ class MP_Public {
 			return;
 		}
 
-		// CSS
+// CSS
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
 		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 
-		// JS
+// JS
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'select2' ), MP_VERSION, true );
 
-		// Get product category links
+// Get product category links
 		$terms	 = get_terms( 'product_category' );
 		$cats	 = array();
 		foreach ( $terms as $term ) {
 			$cats[ $term->term_id ] = get_term_link( $term );
 		}
 
-		// Localize js
+// Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
 			'ajaxurl'		 => admin_url( 'admin-ajax.php' ),
 			'loadingImage'	 => mp_plugin_url( 'ui/images/loading.gif' ),
@@ -366,7 +384,7 @@ class MP_Public {
 				if ( $variation_id = get_query_var( 'mp_variation_id' ) ) {
 					$variation = new MP_Product( $variation_id );
 
-					// Make sure variation actually exists, otherwise trigger a 404 error
+// Make sure variation actually exists, otherwise trigger a 404 error
 					if ( !$variation->exists() ) {
 						$ok			 = false;
 						$wp_query->set_404();
@@ -434,13 +452,13 @@ class MP_Public {
 		}
 
 		if ( strpos( $template, 'page.php' ) !== false ) {
-			// Hide edit-post links
+// Hide edit-post links
 			add_filter( 'edit_post_link', create_function( '', 'return "";' ) );
-			// Filter output of the_title()
+// Filter output of the_title()
 			add_filter( 'the_title', array( &$this, 'taxonomy_title' ) );
-			// Filter output of the_content()
+// Filter output of the_content()
 			add_filter( 'the_content', array( &$this, 'taxonomy_content' ) );
-			// Only show the first post	
+// Only show the first post	
 			$wp_query->post_count = 1;
 		}
 
@@ -503,26 +521,26 @@ class MP_Public {
 			return false;
 		}
 
-		//get the order
+//get the order
 		$order = new MP_Order( $order_id );
 		if ( !$order->exists() ) {
 			wp_die( __( 'Sorry, the link is invalid for this download.', 'mp' ) );
 		}
 
-		//check that order is paid
+//check that order is paid
 		if ( $order->post_status == 'order_received' ) {
 			wp_die( __( 'Sorry, your order has been marked as unpaid.', 'mp' ) );
 		}
 
-		//get the product object
+//get the product object
 		$product = new MP_Product( $product_id );
 
-		//get the cart object
+//get the cart object
 		$cart = $order->get_cart();
 
 		$url = $product->get_meta( 'file_url' );
 
-		//get download count
+//get download count
 		$download_count = mp_arr_get_value( $product_id, $cart->download_count );
 
 		if ( false === $download_count ) {
@@ -531,7 +549,7 @@ class MP_Public {
 
 		$download_count = (int) $download_count;
 
-		//check for too many downloads
+//check for too many downloads
 		$max_downloads = mp_get_setting( 'max_downloads', 5 );
 		if ( $download_count >= $max_downloads ) {
 			wp_die( sprintf( __( 'Sorry, our records show you\'ve downloaded this file %d out of %d times allowed. Please contact us if you still need help.', 'mp' ), $download_count, $max_downloads ) );
@@ -550,7 +568,7 @@ class MP_Public {
 		/* if large downloads have been enabled just redirect to the actual file for download
 		  instead of trying to mask the file name */
 		if ( mp_get_setting( 'use_alt_download_method' ) || MP_LARGE_DOWNLOADS === true ) {
-			//record the download attempt
+//record the download attempt
 			$cart->download_count[ $product_id ] += 1;
 			$order->update_meta( 'mp_cart_info', $cart );
 
@@ -559,21 +577,21 @@ class MP_Public {
 		}
 
 		set_time_limit( 0 ); //try to prevent script from timing out
-		//create unique filename
+//create unique filename
 		$ext		 = ltrim( strrchr( basename( $url ), '.' ), '.' );
 		$filename	 = sanitize_file_name( strtolower( get_the_title( $product_id ) ) . '.' . $ext );
 
 		$dirs		 = wp_upload_dir();
 		$location	 = str_replace( $dirs[ 'baseurl' ], $dirs[ 'basedir' ], $url );
 		if ( file_exists( $location ) ) {
-			// File is in our server
+// File is in our server
 			$tmp		 = $location;
 			$not_delete	 = true;
 		} else {
-			// File is remote so we need to download it first
+// File is remote so we need to download it first
 			require_once ABSPATH . '/wp-admin/includes/file.php';
 
-			//don't verify ssl connections
+//don't verify ssl connections
 			add_filter( 'https_local_ssl_verify', create_function( '$ssl_verify', 'return false;' ) );
 			add_filter( 'https_ssl_verify', create_function( '$ssl_verify', 'return false;' ) );
 
@@ -600,7 +618,7 @@ class MP_Public {
 			ob_clean(); //kills any buffers set by other plugins
 
 			if ( isset( $_SERVER[ 'HTTP_RANGE' ] ) ) {
-				//partial download headers
+//partial download headers
 				preg_match( '/bytes=(\d+)-(\d+)?/', $_SERVER[ 'HTTP_RANGE' ], $matches );
 				$offset	 = intval( $matches[ 1 ] );
 				$length	 = intval( $matches[ 2 ] ) - $offset;
@@ -647,7 +665,7 @@ class MP_Public {
 			}
 		}
 
-		//record download attempt
+//record download attempt
 		$cart->download_count[ $product_id ] += 1;
 		$order->update_meta( 'mp_cart_info', $cart );
 
@@ -734,7 +752,7 @@ class MP_Public {
 			return $content;
 		}
 
-		// don't remove post thumbnails from products
+// don't remove post thumbnails from products
 		remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );
 
 		return mp_list_products();

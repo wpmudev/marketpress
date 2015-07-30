@@ -391,11 +391,12 @@ class MP_Ajax {
 	 */
 	public function check_if_username_exists() {
 		if ( username_exists( mp_get_request_value( 'username', '' ) ) ) {
-			die ( 'false' );
+			die( 'false' );
 		}
 
 		die( 'true' );
 	}
+
 	/**
 	 * Create account
 	 *
@@ -405,8 +406,8 @@ class MP_Ajax {
 	 */
 	public function create_account() {
 		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
-			$user_id	 = wp_insert_user( array(
-				'user_login' => mp_get_post_value('username'),
+			$user_id = wp_insert_user( array(
+				'user_login' => mp_get_post_value( 'username' ),
 				'user_email' => mp_get_post_value( 'email' ),
 				'user_pass'	 => mp_get_post_value( 'password1' ),
 				'first_name' => mp_get_post_value( 'name_first' ),
@@ -416,7 +417,7 @@ class MP_Ajax {
 
 			if ( !is_wp_error( $user_id ) ) {
 				$user_signon = wp_signon( array(
-					'user_login'	 =>  mp_get_post_value('username'),
+					'user_login'	 => mp_get_post_value( 'username' ),
 					'user_password'	 => mp_get_post_value( 'password1' ),
 					'remember'		 => true,
 				), false );
@@ -426,8 +427,8 @@ class MP_Ajax {
 					$order = new MP_Order( $order_id );
 					if ( $order->exists() && $order->post_author == 0 ) {
 						//assign this order to this user
-						$post              = get_post( $order->ID );
-						$post->post_author = $user_id;
+						$post				 = get_post( $order->ID );
+						$post->post_author	 = $user_id;
 						wp_update_post( $post->to_array() );
 					}
 				}
@@ -505,9 +506,8 @@ class MP_Ajax {
 		}
 
 		if ( isset( $post_order ) ) {
-			$_SESSION[
-			'mp_product_list_order_by' ]	 = $order_by;
-			$_SESSION[ 'mp_product_list_order' ]		 = $order;
+			$_SESSION[ 'mp_product_list_order_by' ]	 = $order_by;
+			$_SESSION[ 'mp_product_list_order' ]	 = $order;
 		} else {
 			$order_by	 = $_SESSION[ 'mp_product_list_order_by' ];
 			$order		 = $_SESSION[ 'mp_product_list_order' ];
@@ -517,12 +517,20 @@ class MP_Ajax {
 			$order_by	 = $order		 = null;
 		}
 
-		mp_list_products( array(
+
+		//get_category
+		$mp_product_list_args = array(
 			'page'		 => $page,
 			'order_by'	 => $order_by,
-			'order'		 => (!
-			is_null( $order ) ) ? strtoupper( $order ) : $order,
-		) );
+			'order'		 => (!is_null( $order ) ) ? strtoupper( $order ) : $order,
+		);
+
+		if ( isset( $category ) && $category > 0 ) {
+			$cat								 = get_term( $category, 'product_category' );
+			$mp_product_list_args[ 'category' ]	 = $cat->slug;
+		}
+
+		mp_list_products( $mp_product_list_args );
 
 		die;
 	}
@@ -564,12 +572,12 @@ class MP_Ajax {
 	 * @access public
 	 */
 	public function mp_remove_custom_shipping_method() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( !current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$id                     = mp_get_post_value( 'id' );
-		$custom_shipping_method = mp_get_setting( 'shipping->custom_method', array() );
+		$id						 = mp_get_post_value( 'id' );
+		$custom_shipping_method	 = mp_get_setting( 'shipping->custom_method', array() );
 		unset( $custom_shipping_method[ $id ] );
 		mp_update_setting( 'shipping->custom_method', $custom_shipping_method );
 
