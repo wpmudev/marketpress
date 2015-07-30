@@ -167,7 +167,14 @@ class MP_PDF_Invoice {
 
 		$order_details	 = array();
 		$cart			 = $order->get_cart();
-		
+
+		$total_discount_value	 = 0;
+		if ( $coupons				 = $order->get_meta( 'mp_discount_info' ) ) {
+			foreach ( (array) $coupons as $key => $val ) {
+				$total_discount_value = $total_discount_value + $val;
+			}
+		}
+
 		if ( $type == self::PDF_INVOICE ) {
 
 			foreach ( $cart->get_items() as $key => $qty ) {
@@ -177,6 +184,11 @@ class MP_PDF_Invoice {
 			}
 			//times for the subtotal
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Subtotal", "mp" ), $cart->product_total( true ) );
+
+
+			if ( $total_discount_value !== 0 ) {
+				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Discount", "mp" ), mp_format_currency( '', $total_discount_value ) );
+			}
 
 			if ( $cart->shipping_total() > 0 ) {
 				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
