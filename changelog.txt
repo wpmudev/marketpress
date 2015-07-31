@@ -1,5 +1,5 @@
 ﻿Plugin Name: MarketPress
-Author: Aaron Edwards (incsub)
+Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoand Ngo (Incsub), Jonathan Cowher (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
@@ -9,13 +9,13 @@ Change Log:
 ----------------------------------------------------------------------
 - TONS of code cleanup/optimizations - 99% of PHP notices/warnings have been cleaned up
 - New: Short codes can now be inserted via a popup wizard that is available from within the TinyMCE editor
-- New: Product variations have been rebuilt from the ground up!
+- New: Product variations have been rebuilt from the ground up
 - New: Setup wizard
 - New: Regular/Sale price can now be bulk/quick edited
-- New: Set store capabilities for all of your user roles!
+- New: Set store capabilities for all of your user roles
 - New: Add-on system
 - Coupons are now an add-on and can be disabled if not being used
-- Admin interface has been rebuilt from the ground up!
+- Admin interface has been rebuilt from the ground up
 - Added new default store style
 - Added Bahrain Dinars to the list of available currencies.
 - Added links to settings/network settings on plugins page.
