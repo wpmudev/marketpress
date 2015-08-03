@@ -528,6 +528,11 @@ jQuery( document ).ready( function( $ ) {
     } );
     //Price controls
     jQuery( '.mp_popup_controls.mp_price_controls a.save-bulk-form' ).on( 'click', function( e ) {
+        //LINK can't disabled, so we have to check
+        if($(this).attr('disabled')=='disabled'){
+            e.preventDefault();
+            return false;
+        }
 
         var global_price_set = jQuery( '.mp_bulk_price' ).val( );
         parent.jQuery.colorbox.close( );
@@ -541,6 +546,11 @@ jQuery( document ).ready( function( $ ) {
     } );
     //Inventory controls
     jQuery( '.mp_popup_controls.mp_inventory_controls a.save-bulk-form' ).on( 'click', function( e ) {
+        //LINK can't disabled, so we have to check
+        if($(this).attr('disabled')=='disabled'){
+            e.preventDefault();
+            return false;
+        }
 
         var global_inventory_set = jQuery( '.mp_bulk_inventory' ).val( );
         if ( global_inventory_set == '' || isNaN( global_inventory_set ) ) {
