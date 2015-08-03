@@ -106,7 +106,7 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 * @param string $type
 	 */
 	public function extra_shipping_field( $fields, $type ) {
-		return $content;
+		return $fields;
   }
   
   /**

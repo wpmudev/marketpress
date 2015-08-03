@@ -528,6 +528,11 @@ jQuery( document ).ready( function( $ ) {
     } );
     //Price controls
     jQuery( '.mp_popup_controls.mp_price_controls a.save-bulk-form' ).on( 'click', function( e ) {
+        //LINK can't disabled, so we have to check
+        if($(this).attr('disabled')=='disabled'){
+            e.preventDefault();
+            return false;
+        }
 
         var global_price_set = jQuery( '.mp_bulk_price' ).val( );
         parent.jQuery.colorbox.close( );
@@ -541,6 +546,11 @@ jQuery( document ).ready( function( $ ) {
     } );
     //Inventory controls
     jQuery( '.mp_popup_controls.mp_inventory_controls a.save-bulk-form' ).on( 'click', function( e ) {
+        //LINK can't disabled, so we have to check
+        if($(this).attr('disabled')=='disabled'){
+            e.preventDefault();
+            return false;
+        }
 
         var global_inventory_set = jQuery( '.mp_bulk_inventory' ).val( );
         if ( global_inventory_set == '' || isNaN( global_inventory_set ) ) {
@@ -593,14 +603,19 @@ jQuery( document ).ready( function( $ ) {
             href: mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup&variation_id=' + ( $( this ).attr( 'data-popup-id' ) ),
             opacity: .7,
             inline: false,
-            width: 400,
-            height: 460,
+            //width: 400,
+            //height: 460,
             title: $( this ).closest( 'tr' ).find( '.field_more .variation_name' ).html( ),
             onClosed: function( ) {
                 $.colorbox.remove( );
             },
+            onOpen: function( ) {
+            },
             onLoad: function( ) {
-
+				$('#cboxClose').hide();
+            },
+            onComplete: function( ) {
+                $('#cboxClose').show();
             }
         } );
         e.preventDefault( );

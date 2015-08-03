@@ -54,7 +54,7 @@ class WPMUDEV_Field_Checkbox extends WPMUDEV_Field {
 					if ( !$this.prop( 'checked' ) ) {
 						$this.after( '<input type="hidden" name="' + $this.attr( 'name' ) + '" value="0" />' );
 					} else {
-						$this.next( ':hidden' ).remove();
+						$this.parent().find( 'input[type="hidden"]' ).remove();
 					}
 				};
 
