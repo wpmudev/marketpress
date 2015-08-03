@@ -217,7 +217,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 		$name = mp_get_user_address_part( 'first_name', 'billing' ) . ' ' . mp_get_user_address_part( 'last_name', 'billing' );
 
 		$content = '
-			<input id="mp-stripe-name" type="hidden" value="' . esc_attr( $name ) . '" />
+			<input id="mp-stripe-name" type="hidden" value="' . esc_attr( $name ) . '">
 			<div class="mp_checkout_field">
 				<label class="mp_form_label">' . __( 'Card Number', 'mp' ) . ' <span class="mp_field_required">*</span></label>
 				<input id="mp-stripe-cc-num" type="text" pattern="\d*" autocomplete="cc-number" class="mp_form_input mp_form_input-cc-num mp-input-cc-num" data-rule-required="true" data-rule-cc-num="true">
