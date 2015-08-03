@@ -233,7 +233,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			<div class="mp-checkout-form-row">
 				<div class="mp-checkout-input-complex clearfix">
 					<div class="mp-checkout-column">
-						<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
+						<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp_tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
 						<input
 							type="text"
 							autocomplete="cc-exp"
@@ -244,7 +244,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 							style="width:100px" />
 					</div>
 					<div class="mp-checkout-column">
-						<label>' . __( 'Security Code ', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp-tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
+						<label>' . __( 'Security Code ', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp_tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
 						<input
 							id="mp-stripe-cc-cvc"
 							class="mp-input-cc-cvc"
