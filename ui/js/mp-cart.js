@@ -220,7 +220,7 @@ var mp_cart = { };
                         return;
                     }
 
-                    $elm.html( value );
+                    //$elm.html( value );
                 } );
 
                 if ( resp.data.out_of_stock ) {
