@@ -86,7 +86,7 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 	 * @return string
 	 */
 	function _mp_order_status_overview() {
-		$history		 = mp_get_order_history();
+		$history		 = array_filter(mp_get_order_history());
 		$page			 = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
 		$per_page_value	 = mp_get_setting( 'per_page_order_history' );
 		$per_page		 = isset( $per_page_value ) ? $per_page_value : get_option( 'posts_per_page' );
@@ -101,7 +101,6 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 			$html .= '
 				<h2 class="mp_title">' . __( 'Order History', 'mp' ) . '</h2>' .
 			'<div class="mp_order_details">';
-
 			foreach ( $history as $timestamp => $order ) {
 				$order = new MP_Order( $order[ 'id' ] );
 				$html .= '<div class="mp_order">';
