@@ -1,5 +1,5 @@
 ﻿Plugin Name: MarketPress
-Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoand Ngo (Incsub), Jonathan Cowher (Incsub)
+Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------

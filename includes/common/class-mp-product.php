@@ -110,7 +110,7 @@ class MP_Product {
 	 * @access public
 	 * @action wp_ajax_mp_product_get_variations_lightbox, wp_ajax_nopriv_mp_product_get_variations_lightbox
 	 */
-	public function ajax_display_variations_lightbox() {
+	public static function ajax_display_variations_lightbox() {
 		$product_id	 = mp_get_get_value( 'product_id' );
 		$product	 = new MP_Product( $product_id );
 
