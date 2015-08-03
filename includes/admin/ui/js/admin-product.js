@@ -9,11 +9,11 @@ jQuery( document ).ready( function( $ ) {
     } );
 
     $( '.mp-variation-row .text-wrap' ).live( 'click', function( e ) {
-        
+
         //if ( $( this ).val() == '' || $( this ).val() == '[]' ) {
-          //  $( this ).parent().find( '.mp-variation-field-required' ).addClass( 'mp_variation_invalid' );
+        //  $( this ).parent().find( '.mp-variation-field-required' ).addClass( 'mp_variation_invalid' );
         //} else {
-            $( this ).parent().find( '.mp-variation-field-required' ).removeClass( 'mp_variation_invalid' );
+        $( this ).parent().find( '.mp-variation-field-required' ).removeClass( 'mp_variation_invalid' );
         //}
     } );
 
@@ -148,7 +148,7 @@ jQuery( document ).ready( function( $ ) {
         $( this ).blur( );
     } );
 
-    $( '#mp_make_combinations' ).live( 'click', function( event ) {
+    $( '#mp_make_combinations, #publishing-action #publish' ).live( 'click', function( event ) {//
 
         var variation_errors = 0;
 
@@ -193,6 +193,10 @@ jQuery( document ).ready( function( $ ) {
                 $( '#publish' ).click( );
                 //mp_variation_message();
             }
+        } else {
+            $( 'html, body' ).animate( {
+                scrollTop: $( ".mp_variations_title" ).offset().top + 50
+            }, 100 );
         }
 
 //$( 'form#post' ).submit();
@@ -529,7 +533,7 @@ jQuery( document ).ready( function( $ ) {
     //Price controls
     jQuery( '.mp_popup_controls.mp_price_controls a.save-bulk-form' ).on( 'click', function( e ) {
         //LINK can't disabled, so we have to check
-        if($(this).attr('disabled')=='disabled'){
+        if ( $( this ).attr( 'disabled' ) == 'disabled' ) {
             e.preventDefault();
             return false;
         }
@@ -547,7 +551,7 @@ jQuery( document ).ready( function( $ ) {
     //Inventory controls
     jQuery( '.mp_popup_controls.mp_inventory_controls a.save-bulk-form' ).on( 'click', function( e ) {
         //LINK can't disabled, so we have to check
-        if($(this).attr('disabled')=='disabled'){
+        if ( $( this ).attr( 'disabled' ) == 'disabled' ) {
             e.preventDefault();
             return false;
         }
@@ -612,10 +616,10 @@ jQuery( document ).ready( function( $ ) {
             onOpen: function( ) {
             },
             onLoad: function( ) {
-				$('#cboxClose').hide();
+                $( '#cboxClose' ).hide();
             },
             onComplete: function( ) {
-                $('#cboxClose').show();
+                $( '#cboxClose' ).show();
             }
         } );
         e.preventDefault( );
