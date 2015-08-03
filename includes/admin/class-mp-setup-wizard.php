@@ -662,10 +662,19 @@ class MP_Setup_Wizard {
 				&$this,
 				'determine_is_charge_shipping'
 			), 10, 4 );
+			add_filter( 'wpmudev_field/get_value/wizard_payment', array(
+				&$this,
+				'determine_is_use_paymentgateway'
+			), 10, 4 );
 			add_filter( 'wpmudev_metabox/after_settings_metabox_saved', array( &$this, 'maybe_save_manual_payment' ) );
 		}
 	}
 
+	/**
+	 * if payment gateway is manual payment, we need to save it to the gateway list
+	 *
+	 * @param $metabox
+	 */
 	public function maybe_save_manual_payment( $metabox ) {
 		if ( $metabox->args['id'] == 'mp-quick-setup-wizard-payment' ) {
 			foreach ( $metabox->fields as $field ) {
@@ -680,6 +689,37 @@ class MP_Setup_Wizard {
 		}
 	}
 
+	/**
+	 * @param $value
+	 * @param $post_id
+	 * @param $raw
+	 * @param $instance
+	 *
+	 * @return string
+	 */
+	public function determine_is_use_paymentgateway( $value, $post_id, $raw, $instance ) {
+		$gateways = mp_get_setting( 'gateways->allowed' );
+		unset( $gateways['manual_payments'] );
+		foreach ( $gateways as $key => $val ) {
+			if ( $val == 1 ) {
+				$value = 'other';
+				break;
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * If any shipping method configed, open the box instead of noshipping
+	 *
+	 * @param $value
+	 * @param $post_id
+	 * @param $raw
+	 * @param $instance
+	 *
+	 * @return int
+	 */
 	public function determine_is_charge_shipping( $value, $post_id, $raw, $instance ) {
 		//check if this already having shipping configed
 		if ( mp_get_setting( 'shipping->method' ) && mp_get_setting( 'shipping->method' ) != 'none' ) {
