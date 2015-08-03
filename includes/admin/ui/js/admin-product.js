@@ -593,14 +593,19 @@ jQuery( document ).ready( function( $ ) {
             href: mp_product_admin_i18n.ajaxurl + '?action=mp_variation_popup&variation_id=' + ( $( this ).attr( 'data-popup-id' ) ),
             opacity: .7,
             inline: false,
-            width: 400,
-            height: 460,
+            //width: 400,
+            //height: 460,
             title: $( this ).closest( 'tr' ).find( '.field_more .variation_name' ).html( ),
             onClosed: function( ) {
                 $.colorbox.remove( );
             },
+            onOpen: function( ) {
+            },
             onLoad: function( ) {
-
+				$('#cboxClose').hide();
+            },
+            onComplete: function( ) {
+                $('#cboxClose').show();
             }
         } );
         e.preventDefault( );
