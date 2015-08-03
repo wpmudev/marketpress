@@ -218,42 +218,18 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 
 		$content = '
 			<input id="mp-stripe-name" type="hidden" value="' . esc_attr( $name ) . '" />
-			<div class="mp-checkout-form-row">
-				<label>' . __( 'Card Number', 'mp' ) . '<span class="mp-field-required">*</span></label>
-				<input
-					id="mp-stripe-cc-num"
-					type="text"
-					pattern="\d*"
-					autocomplete="cc-number"
-					class="mp-input-cc-num"
-					data-rule-required="true"
-					data-rule-cc-num="true"
-					style="width:200px" />
+			<div class="mp_checkout_field">
+				<label class="mp_form_label">' . __( 'Card Number', 'mp' ) . ' <span class="mp_field_required">*</span></label>
+				<input id="mp-stripe-cc-num" type="text" pattern="\d*" autocomplete="cc-number" class="mp_form_input mp_form_input-cc-num mp-input-cc-num" data-rule-required="true" data-rule-cc-num="true">
 			</div>
-			<div class="mp-checkout-form-row">
-				<div class="mp-checkout-input-complex clearfix">
-					<div class="mp-checkout-column">
-						<label>' . __( 'Expiration', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp_tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
-						<input
-							type="text"
-							autocomplete="cc-exp"
-							id="mp-stripe-cc-exp"
-							class="mp-input-cc-exp"
-							data-rule-required="true"
-							data-rule-cc-exp="true"
-							style="width:100px" />
-					</div>
-					<div class="mp-checkout-column">
-						<label>' . __( 'Security Code ', 'mp' ) . '<span class="mp-field-required">*</span> <span class="mp_tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2" /></span></label>
-						<input
-							id="mp-stripe-cc-cvc"
-							class="mp-input-cc-cvc"
-							type="text"
-							autocomplete="off"
-							data-rule-required="true"
-							data-rule-cc-cvc="true"
-							style="width:75px;" />
-					</div>
+			<div class="mp_checkout_fields">
+				<div class="mp_checkout_column mp_checkout_field">
+					<label class="mp_form_label">' . __( 'Expiration', 'mp' ) . ' <span class="mp_field_required">*</span> <span class="mp_tooltip-help">' . __( 'Enter in <strong>MM/YYYY</strong> or <strong>MM/YY</strong> format', 'mp' ) . '</span></label>
+					<input type="text" autocomplete="cc-exp" id="mp-stripe-cc-exp" class="mp_form_input mp_form_input-cc-exp mp-input-cc-exp" data-rule-required="true" data-rule-cc-exp="true">
+				</div>
+				<div class="mp_checkout_column mp_checkout_field">
+					<label class="mp_form_label">' . __( 'Security Code ', 'mp' ) . ' <span class="mp_field_required">*</span> <span class="mp_tooltip-help"><img src="' . mp_plugin_url( 'ui/images/cvv_2.jpg' ) . '" alt="CVV2"></span></label>
+					<input id="mp-stripe-cc-cvc" class="mp_form_input mp_form_input-cc-cvc mp-input-cc-cvc" type="text" autocomplete="off" data-rule-required="true" data-rule-cc-cvc="true">
 				</div>
 			</div>';
 
