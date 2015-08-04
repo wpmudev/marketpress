@@ -1507,13 +1507,13 @@ if ( !function_exists( 'mp_order_lookup_form' ) ) :
 			<form id="mp-order-lookup-form" class="mp_form mp_form-order-lookup" method="post" action="' . admin_url( 'admin-ajax.php?action=mp_lookup_order' ) . '">
 				<div class="mp_form_content">' . $content . '</div>
 				<div class="mp_form_group">
-					<div class="mp_form_group_field">
+					<div class="mp_form_group_input">
 						<input type="text" class="mp_form_input" id="mp-order-id-input" name="order_id" placeholder="' . __( 'Order ID', 'mp' ) . '">
 					</div>
-					<div class="mp_form_group_field">
-						<button type="submit" class="mp_button">' . __( 'Look Up', 'mp' ) . '</button>
-					</div>
-				</div>
+					<div class="mp_form_group_btn">
+				  		<button class="mp_button" type="submit">' . __( 'Look Up', 'mp' ) . '</button>
+				  	</div>
+			    </div>
 			</form><!-- end mp-order-lookup-form -->';
 
 		/**
