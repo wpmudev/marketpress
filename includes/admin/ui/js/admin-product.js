@@ -158,11 +158,13 @@ jQuery( document ).ready( function( $ ) {
 
             $( '.mp-variation-row .mp-variation-attribute-name' ).each( function( index ) {
 
-                if ( $( this ).val() == '' ) {
-                    $( this ).addClass( 'mp_variation_invalid' );
-                    variation_errors++;
-                } else {
-                    $( this ).removeClass( 'mp_variation_invalid' );
+                if ( $( this ).is( ":visible" ) ) {
+                    if ( $( this ).val() == '' ) {
+                        $( this ).addClass( 'mp_variation_invalid' );
+                        variation_errors++;
+                    } else {
+                        $( this ).removeClass( 'mp_variation_invalid' );
+                    }
                 }
 
             } );
@@ -206,33 +208,11 @@ jQuery( document ).ready( function( $ ) {
                 event.preventDefault();
             }
 
-//$( 'form#post' ).submit();
-
         }
 
     } );
-    /*$( '#mp_make_combinations' ).live( 'click', function( event ) {
-     $( '.mp-admin-overlay' ).show();
-     mp_variation_message();
-     
-     var data = $( 'form#post' ).serialize();
-     data['action'] = 'save_init_product_variations';
-     
-     $.post(
-     mp_product_admin_i18n.ajaxurl, data
-     ).done( function( data, status ) {
-     if(status == 'success'){
-     $( '.mp-admin-overlay' ).hide();
-     }else{
-     //an error occured
-     }
-     } );
-     
-     event.preventDefault();
-     } );*/
-    $( '.mp-add-new-variation' ).click( );
-    //$( '.variation-row' ).css( 'border-bottom', '1px' );
-    //$( '.variation-row:last-child' ).css( 'border-bottom', '0px' );    
+
+    $( '.mp-add-new-variation' ).click();
 
 } );
 /* INLINE EDIT */
