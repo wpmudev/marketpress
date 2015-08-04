@@ -150,58 +150,66 @@ jQuery( document ).ready( function( $ ) {
 
     $( '#mp_make_combinations, #publishing-action #publish' ).live( 'click', function( event ) {//
 
-        var variation_errors = 0;
+        var caller_id = $( this ).attr( 'id' );
 
-        $( '.mp-variation-row .mp-variation-attribute-name' ).each( function( index ) {
-            if ( $( this ).css( 'display' ) == 'none' ) {
-                //do nothing, validation is not needed
-            } else {
+        if ( $( '.mp_variations_box' ).is( ":visible" ) ) {
+
+            var variation_errors = 0;
+
+            $( '.mp-variation-row .mp-variation-attribute-name' ).each( function( index ) {
+
                 if ( $( this ).val() == '' ) {
                     $( this ).addClass( 'mp_variation_invalid' );
                     variation_errors++;
                 } else {
                     $( this ).removeClass( 'mp_variation_invalid' );
                 }
-            }
-        } );
 
-        $( '.mp-variation-row .text-wrap input[type="hidden"]' ).each( function( index ) {
-            if ( $( this ).val() == '' || $( this ).val() == '[]' ) {
-                $( this ).parent().find( '.mp-variation-field-required' ).addClass( 'mp_variation_invalid' );
-                variation_errors++;
-            } else {
-                $( this ).parent().find( '.mp-variation-field-required' ).removeClass( 'mp_variation_invalid' );
-            }
-        } );
+            } );
+
+            $( '.mp-variation-row .text-wrap input[type="hidden"]' ).each( function( index ) {
+                if ( $( this ).val() == '' || $( this ).val() == '[]' ) {
+                    $( this ).parent().find( '.mp-variation-field-required' ).addClass( 'mp_variation_invalid' );
+                    variation_errors++;
+                } else {
+                    $( this ).parent().find( '.mp-variation-field-required' ).removeClass( 'mp_variation_invalid' );
+                }
+            } );
 
 
-        if ( variation_errors == 0 ) {
+            if ( variation_errors == 0 ) {
 
 //alert($( '#original_publish' ).val());
-            if ( $( '#original_publish' ).val( ) == 'Publish' ) {
+                if ( $( '#original_publish' ).val( ) == 'Publish' ) {
 //$( '.mp-admin-overlay' ).show();
-                $( '#save-post' ).removeAttr( 'dasabled' );
-                //$( '#save-post' ).prop( 'disabled', false );
-                $( '#save-post' ).click( );
-                //mp_variation_message();
+                    $( '#save-post' ).removeAttr( 'disabled' );
+                    //$( '#save-post' ).prop( 'disabled', false );
+                    $( '#save-post' ).click( );
+                    //mp_variation_message();
+                }
+
+                if ( $( '#original_publish' ).val( ) == 'Update' ) {
+//$( '.mp-admin-overlay' ).show();
+                    $( '#publish' ).removeAttr( 'disabled' );
+                    //$( '#publish' ).prop( 'disabled', false );
+                    $( '#publish' ).click( );
+                    //mp_variation_message();
+                }
+            } else {
+                event.preventDefault();
+                $( 'html, body' ).animate( {
+                    scrollTop: $( ".mp_variations_title" ).offset().top + 50
+                }, 100 );
             }
 
-            if ( $( '#original_publish' ).val( ) == 'Update' ) {
-//$( '.mp-admin-overlay' ).show();
-                $( '#publish' ).removeAttr( 'dasabled' );
-                //$( '#publish' ).prop( 'disabled', false );
-                $( '#publish' ).click( );
-                //mp_variation_message();
+            if ( caller_id == 'mp_make_combinations' ) {
+                event.preventDefault();
             }
-        } else {
-            $( 'html, body' ).animate( {
-                scrollTop: $( ".mp_variations_title" ).offset().top + 50
-            }, 100 );
-        }
 
 //$( 'form#post' ).submit();
 
-        event.preventDefault( );
+        }
+
     } );
     /*$( '#mp_make_combinations' ).live( 'click', function( event ) {
      $( '.mp-admin-overlay' ).show();
