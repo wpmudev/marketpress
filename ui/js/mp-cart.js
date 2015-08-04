@@ -180,10 +180,10 @@ var mp_cart = { };
         $this.closest( '.mp_product_options_att' ).nextAll( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
         //the this contex is product attributes select, there's no radio situation, so comment those value for now
         /*if ( !$this.is( ':radio' ) ) {
-            $qtyChanged.val( '1' );
-        } else {
-            $qtyChanged.val( '0' );
-        }*/
+         $qtyChanged.val( '1' );
+         } else {
+         $qtyChanged.val( '0' );
+         }*/
 
         $.post( url, $form.serialize() ).done( function( resp ) {
 
@@ -201,8 +201,8 @@ var mp_cart = { };
                 $container.find( '.mp_product_tab_content_text' ).html( resp.data.description );
                 //}
                 //update content for lightbox
-                if ($('.mp_product_options_excerpt').size() > 0) {
-                    $('.mp_product_options_excerpt').html(resp.data.description);
+                if ( $( '.mp_product_options_excerpt' ).size() > 0 ) {
+                    $( '.mp_product_options_excerpt' ).html( resp.data.description );
                 }
 
                 //if ( resp.data.excerpt ) {
@@ -301,13 +301,18 @@ var mp_cart = { };
                 var buttonType = $form.find( '[type="submit"]' ).attr( 'name' );
 
                 if ( resp.success ) {
+
+                    if ( resp.data.cart_updated === false ) {
+                        alert( mp_cart_i18n.cart_updated_error_limit );
+                    }
+
                     if ( 'buynow' == buttonType ) {
                         // buy now button - redirect to cart
                         window.location.href = $form.attr( 'action' );
                         return;
                     }
 
-                    mp_cart.update( resp.data );
+                    mp_cart.update( resp.data.minicart );
 
                     $form.get( 0 ).reset();
 

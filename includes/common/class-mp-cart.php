@@ -132,17 +132,48 @@ class MP_Cart {
 	 * @param int $qty The quantity of the item
 	 */
 	public function add_item( $item_id, $qty = 1 ) {
+		$cart_updated = true;
+
 		if ( $in_cart = $this->has_item( $item_id ) ) {
 			$product = new MP_Product( $item_id );
 			if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
 				$qty = 1;
 			} else {
+
+				$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
+
+				if ( is_numeric( $per_order_limit ) ) {
+					if ( $per_order_limit >= ($qty + $in_cart) ) {
+						$qty += $in_cart;
+						$cart_updated = true;
+					} else {
+						$qty			 = $per_order_limit;
+						$cart_updated	 = false;
+					}
+				} else {
+					$qty += $in_cart;
+					$cart_updated = true;
+				}
+			}
+		} else {
+			$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
+			if ( is_numeric( $per_order_limit ) ) {
+				if ( $per_order_limit >= ($qty) ) {
+					$cart_updated = true;
+				} else {
+					$qty			 = $per_order_limit;
+					$cart_updated	 = false;
+				}
+			} else {
 				$qty += $in_cart;
+				$cart_updated = true;
 			}
 		}
 
 		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
 		$this->_update_cart_cookie();
+
+		return $cart_updated;
 	}
 
 	/**
@@ -238,8 +269,12 @@ class MP_Cart {
 
 		switch ( mp_get_post_value( 'cart_action' ) ) {
 			case 'add_item' :
-				$this->add_item( $item_id, $qty );
-				wp_send_json_success( $this->floating_cart_html() );
+				$cart_updated = $this->add_item( $item_id, $qty );
+				//wp_send_json_success( $this->floating_cart_html() );
+				wp_send_json_success( array(
+					'minicart'		 => $this->floating_cart_html(),
+					'cart_updated'	 => $cart_updated,
+				) );
 				break;
 
 			case 'update_item' :
@@ -472,6 +507,7 @@ class MP_Cart {
 								'class'		 => 'mp_select2',
 								'name'		 => 'mp_cart_item-qty[' . $product->ID . ']',
 								'selected'	 => $product->qty,
+								'id'		 => $product->ID
 							) );
 						}
 						$column_html .= '
@@ -903,7 +939,8 @@ class MP_Cart {
 		 * @since 3.0
 		 * @param int The default maximum.
 		 */
-		$max		 = apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
+		$max = apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
+
 		$defaults	 = array(
 			'max'		 => $max,
 			'selected'	 => 1,
@@ -915,6 +952,16 @@ class MP_Cart {
 		$args		 = array_replace_recursive( $defaults, $args );
 
 		extract( $args );
+
+		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
+
+		if ( is_numeric( $per_order_limit ) ) {
+			if ( $per_order_limit >= $max ) {
+				//max is max, not the per order limit
+			} else {
+				$max = $per_order_limit;
+			}
+		}
 
 		// Build select field attributes
 		$attributes = mp_array_to_attributes( compact( 'name', 'class', 'id' ) );
@@ -998,8 +1045,9 @@ class MP_Cart {
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl'		 => admin_url( 'admin-ajax.php' ),
-			'ajax_loader'	 => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>'
+			'ajaxurl'					 => admin_url( 'admin-ajax.php' ),
+			'ajax_loader'				 => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
+			'cart_updated_error_limit'	 => __( 'Cart update notice: this item has a limit per order.', 'mp' )
 		) );
 	}
 

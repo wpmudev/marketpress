@@ -775,6 +775,7 @@ class MP_Products_Screen {
 
 			$meta_array_values = array(
 				'sku'						 => mp_get_post_value( 'sku' ),
+				'per_order_limit'			 => mp_get_post_value( 'per_order_limit' ),
 				'external_url'				 => mp_get_post_value( 'external_url' ),
 				'file_url'					 => mp_get_post_value( 'file_url' ),
 				'inventory_tracking'		 => $this->on_to_val( mp_get_post_value( 'inventory_tracking' ) ),
@@ -1036,9 +1037,12 @@ class MP_Products_Screen {
 				$sku_post_val	 = mp_get_post_value( 'sku' );
 				$sku			 = isset( $sku_post_val ) && !empty( $sku_post_val ) ? $sku_post_val . '-' . $combination_num : '';
 
+				delete_post_meta( $post_id, 'per_order_limit' );
+
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
 					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
 					'sku'						 => $sku,
+					'per_order_limit'			 => mp_get_post_value( 'per_order_limit' ),
 					'inventory_tracking'		 => mp_get_post_value( 'inventory_tracking' ),
 					'inventory'					 => mp_get_post_value( 'inventory->inventory' ),
 					'inv_out_of_stock_purchase'	 => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
@@ -1268,6 +1272,23 @@ WHERE $delete_where"
 					'required'	 => true,
 					'number'	 => true,
 					'min'		 => 0,
+				),
+				'class'			 => 'mp-product-field-40 mp-blank-bg'
+			) );
+
+			$metabox->add_field( 'text', array(
+				'name'			 => 'per_order_limit',
+				'label'			 => array( 'text' => sprintf( __( 'Limit Per Order %1$s(limit the number of the item a shopper can buy per order)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
+				'placeholder'	 => __( 'Unlimited', 'mp' ),
+				'validation'	 => array(
+					'required'	 => false,
+					'number'	 => true,
+					'min'		 => 0,
+				),
+				'conditional'	 => array(
+					'name'	 => 'product_type',
+					'value'	 => 'physical',
+					'action' => 'show',
 				),
 				'class'			 => 'mp-product-field-40 mp-blank-bg'
 			) );

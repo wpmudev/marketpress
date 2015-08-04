@@ -702,6 +702,7 @@ input.mp_inline_temp_value{
 .mp_ajax_response{
     display: inline-block;
     padding-top: 3px;
+    font-size: 12px;
 }
 
 .mp_ajax_response_success{

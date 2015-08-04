@@ -121,20 +121,20 @@ class MP_Product {
 		<!-- MP Product Lightbox -->
 		<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope itemtype="http://schema.org/Product">
 			<div class="mp_product mp_product_options">
-				
+
 				<div class="mp_product_options_image">
 					<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
 				</div><!-- end mp_product_options_image -->
-				
+
 				<div class="mp_product_options_details">
-					
+
 					<div class="mp_product_options_meta">
 						<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
 						<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
 					</div><!-- end mp_product_options_meta -->
-					
+
 					<div class="mp_product_options_callout">
-						
+
 						<form id="mp-product-options-callout-form" class="mp_form mp_form-mp-product-options-callout" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
 							<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
 							<input type="hidden" name="product_qty_changed" value="0">
@@ -147,7 +147,7 @@ class MP_Product {
 								<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
 							<?php endif; ?>
 						</form><!-- end mp-product-options-callout-form -->
-						
+
 					</div><!-- end mp_product_options_callout -->
 
 				</div><!-- end mp_product_options_details -->
@@ -383,10 +383,43 @@ class MP_Product {
 		$input_id = 'mp_product_options_att_quantity';
 
 		$product = new MP_Product( $this->ID );
+
 		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
 			$disabled = 'disabled';
 		} else {
 			$disabled = '';
+		}
+
+		$per_order_limit = get_post_meta( $this->ID, 'per_order_limit', true );
+
+		$max				 = '';
+		$product_quantity	 = 1;
+
+		if ( $product->has_variations() ) {
+			
+		} else {
+
+			if ( is_numeric( $per_order_limit ) ) {
+				$max = 'max="' . esc_attr( $per_order_limit ) . '"';
+			}
+
+			$cart_items = mp_cart()->get_all_items();
+
+			if ( isset( $cart_items[ get_current_blog_id() ] ) ) {
+				if ( isset( $cart_items[ get_current_blog_id() ][ $this->ID ] ) ) {//item is located in the cart
+					$cart_quantity = $cart_items[ get_current_blog_id() ][ $this->ID ];
+					if ( is_numeric( $per_order_limit ) ) {
+						$max_product_quantity = $per_order_limit - $cart_quantity;
+						if ( $max_product_quantity == 0 ) {
+							$product_quantity	 = 0;
+							$max				 = 'max="' . esc_attr( $max_product_quantity ) . '"';
+							$disabled			 = 'disabled';
+						} else {
+							$max = 'max="' . esc_attr( $max_product_quantity ) . '"';
+						}
+					}
+				}
+			}
 		}
 
 		$html .= '
@@ -394,7 +427,7 @@ class MP_Product {
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
 						<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"></label>
-						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="1" type="number" name="product_quantity" value="1" ' . $disabled . '>
+						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="1" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
 			</div><!-- end mp_product_options_atts -->';
@@ -1096,7 +1129,7 @@ class MP_Product {
 		$query_args = array(
 			'post_type'		 => MP_Product::get_post_type(),
 			'posts_per_page' => $limit,
-			'post__not_in' => array( ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID )
+			'post__not_in'	 => array( ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID )
 		);
 
 
