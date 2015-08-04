@@ -178,12 +178,12 @@ var mp_cart = { };
 
         marketpress.loadingOverlay( 'show' );
         $this.closest( '.mp_product_options_att' ).nextAll( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
-
-        if ( !$this.is( ':radio' ) ) {
+        //the this contex is product attributes select, there's no radio situation, so comment those value for now
+        /*if ( !$this.is( ':radio' ) ) {
             $qtyChanged.val( '1' );
         } else {
             $qtyChanged.val( '0' );
-        }
+        }*/
 
         $.post( url, $form.serialize() ).done( function( resp ) {
 
@@ -220,7 +220,7 @@ var mp_cart = { };
                         return;
                     }
 
-                    //$elm.html( value );
+                    $elm.html( value );
                 } );
 
                 if ( resp.data.out_of_stock ) {
