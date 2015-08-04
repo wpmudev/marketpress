@@ -155,6 +155,9 @@ class MP_Public {
 						<button type="submit" class="mp_button mp_button-alt mp_button-create-account">' . __( 'Create Account', 'mp' ) . '</button>
 					</div>
 					<input type="hidden" name="order_id" value="' . get_query_var( 'mp_order_id' ) . '"/>
+						<script>
+							jQuery("#mp-create-account-form").append("<input type=\'hidden\' name=\'mp-submit-check\' value=\'1\' />");
+						</script>
 				</form>
 			</div><!-- end mp-create-account-lightbox -->';
 
