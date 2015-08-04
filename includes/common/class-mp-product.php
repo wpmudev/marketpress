@@ -114,46 +114,188 @@ class MP_Product {
 		$product_id	 = mp_get_get_value( 'product_id' );
 		$product	 = new MP_Product( $product_id );
 
+		/*$image	 = 'single';
+		$title	 = true;
+		$content = 'full';
+		$meta	 = true;
+
 		if ( !$product->exists() ) {
 			die( __( 'The product specified could not be found', 'mp' ) );
 		}
+
+		$variation = false;
+
+		if ( $variation_id = $product->ID ) {
+			$variation = new MP_Product( $variation_id );
+			if ( !$variation->exists() ) {
+				$variation = false;
+			}
+		}
+
+		$has_image = false;
+		if ( !$product->has_variations() ) {
+			$values = get_post_meta( $product->ID, 'mp_product_images', true );
+			if ( $values ) {
+				$has_image = true;
+			}
+		} else {
+			$post_thumbnail_id = get_post_thumbnail_id( $product->ID );
+			if ( $post_thumbnail_id ) {
+				$has_image = true;
+			}
+		}
+
+		$image_alignment = mp_get_setting( 'image_alignment_single' );
 		?>
 		<!-- MP Product Lightbox -->
-		<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope itemtype="http://schema.org/Product">
-			<div class="mp_product mp_product_options">
+		<?php
+		$return			 = '
+			<!-- MP Single Product -->
+			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
+				<div class="mp_product mp_single_product' . ($has_image ? ' mp_single_product-has-image mp_single_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? ' mp_single_product-has-variations' : '') . '">';
 
-				<div class="mp_product_options_image">
-					<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
-				</div><!-- end mp_product_options_image -->
+		$content = 'full';
+		$values	 = get_post_meta( $product->ID, 'mp_product_images', true );
 
-				<div class="mp_product_options_details">
+		if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
+			$size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
+		} else {
+			$size = mp_get_setting( 'list_img_size' );
+		}
 
-					<div class="mp_product_options_meta">
-						<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
-						<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
-					</div><!-- end mp_product_options_meta -->
+		if ( !$product->has_variations() ) {
 
-					<div class="mp_product_options_callout">
 
-						<form id="mp-product-options-callout-form" class="mp_form mp_form-mp-product-options-callout" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
-							<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
-							<input type="hidden" name="product_qty_changed" value="0">
-							<?php $product->display_price(); ?>
-							<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
-							<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
-								<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
-							<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
-								?>
-								<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
-							<?php endif; ?>
-						</form><!-- end mp-product-options-callout-form -->
+			if ( $values ) {
+				$return .= '<div class="mp_single_product_images">';
 
-					</div><!-- end mp_product_options_callout -->
+				$return .= "<script>
+								jQuery(document).ready(function() {
+									jQuery('#mp-product-gallery').lightSlider({
+												gallery:true,
+												item:1,
+												loop:true,
+												thumbItem:5,
+												slideMargin:0,
+												enableDrag: true,
+												currentPagerPosition:'left',
+												onSliderLoad: function(el) {
+												el.lightGallery({
+												selector: '#mp-product-gallery .lslide'
+											});
+										}
+									});
+								});
+								</script>";
 
-				</div><!-- end mp_product_options_details -->
+				$return .= '<ul id="mp-product-gallery" class="mp_product_gallery">';
 
-			</div><!-- end mp_product_options -->
-		</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
+				$values = explode( ',', $values );
+
+				foreach ( $values as $value ) {
+					$img_url = wp_get_attachment_image_src( $value, $size );
+					$return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
+				}
+
+				$return .= '</ul><!-- end mp_product_gallery -->';
+
+				$return .= '</div><!-- end mp_single_product_images -->';
+			}
+		} else {
+			$return .= '<div class="mp_single_product_images">';
+			$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
+			$return .= '</div><!-- end mp_single_product_images -->';
+		}
+
+		$return .= '<div class="mp_single_product_details">';
+
+		$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
+
+		$return .= '<div class="mp_product_meta">';
+
+		if ( $title ) {
+			$return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+		}
+
+		// Price
+		$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
+
+		// Excerpt
+		if ( !$variation ) {
+			$return .= '<div class="mp_product_excerpt">';
+			$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
+			$return .= '</div><!-- end mp_product_excerpt -->';
+		} else {
+			$return .= '<div class="mp_product_excerpt mp_product_excerpt-variation">';
+			$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
+			$return .= '</div><!-- end mp_product_excerpt -->';
+		}
+
+		$return .= '</div><!-- end mp_product_meta-->';
+
+		// Callout
+		$return .= '<div class="mp_product_callout">';
+
+		// Button
+		$selected_atts = array();
+
+		if ( $variation ) {
+			$atts = $variation->get_attributes();
+			foreach ( $atts as $slug => $att ) {
+				$selected_atts[ $slug ] = key( $att[ 'terms' ] );
+			}
+		}
+
+		$return .= $product->buy_button( false, 'single', $selected_atts );
+
+		$return .= '</div><!-- end mp_product_callout-->';
+
+		$return .= '</div><!-- end mp_single_product_details-->';
+
+		$return .= '
+</div><!-- end mp_product/mp_single_product -->	
+</section><!-- end mp-single-product -->';
+		echo $return;
+		 
+		 */
+		?>
+		<?php if ( 0 == 0 ) { ?>
+			<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope itemtype="http://schema.org/Product">
+				<div class="mp_product mp_product_options">
+
+					<div class="mp_product_options_image">
+						<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
+					</div><!-- end mp_product_options_image -->
+
+					<div class="mp_product_options_details">
+
+						<div class="mp_product_options_meta">
+							<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
+							<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
+						</div><!-- end mp_product_options_meta -->
+
+						<div class="mp_product_options_callout">
+
+							<form id="mp-product-options-callout-form" class="mp_form mp_form-mp-product-options-callout" method="post" data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>" action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
+								<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
+								<input type="hidden" name="product_qty_changed" value="0">
+								<?php $product->display_price(); ?>
+								<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
+								<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
+									<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
+								<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :
+									?>
+									<button class="mp_button mp_button-buynow" type="submit" name="buynow"><?php _e( 'Buy Now', 'mp' ); ?></button>
+								<?php endif; ?>
+							</form><!-- end mp-product-options-callout-form -->
+
+						</div><!-- end mp_product_options_callout -->
+
+					</div><!-- end mp_product_options_details -->
+
+				</div><!-- end mp_product_options -->
+			</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
+		<?php } ?>
 		<?php
 		die;
 	}
