@@ -8,21 +8,21 @@
 class MP_Gateway_ManualPayments extends MP_Gateway_API {
 
 	//private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
-	var $plugin_name = 'manual_payments';
+	var $plugin_name				 = 'manual_payments';
 	//name of your gateway, for the admin side.
-	var $admin_name = '';
+	var $admin_name				 = '';
 	//public name of your gateway, for lists and such.
-	var $public_name = 'Manual Payment';
+	var $public_name				 = 'Manual Payment';
 	//url for an image for your checkout method. Displayed on method form
-	var $method_img_url = '';
+	var $method_img_url			 = '';
 	//url for an submit button image for your checkout method. Displayed on checkout form if set
-	var $method_button_img_url = '';
+	var $method_button_img_url	 = '';
 	//whether or not ssl is needed for checkout page
-	var $force_ssl = false;
+	var $force_ssl				 = false;
 	//always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
 	var $ipn_url;
 	//whether if this is the only enabled gateway it can skip the payment_form step
-	var $skip_form = false;
+	var $skip_form				 = false;
 
 	/*	 * **** Below are the public methods you may overwrite via a plugin ***** */
 
@@ -32,8 +32,8 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	function on_creation() {
 		//set names here to be able to translate
 		$this->admin_name	 = __( 'Manual Payments', 'mp' );
-		$public_name = $this->get_setting( 'name', __( 'Manual Payment', 'mp' ) );
-		$this->public_name	 = empty($public_name) ? __( 'Manual Payment', 'mp' ) : $public_name;
+		$public_name		 = $this->get_setting( 'name', __( 'Manual Payment', 'mp' ) );
+		$this->public_name	 = empty( $public_name ) ? __( 'Manual Payment', 'mp' ) : $public_name;
 
 		add_filter( 'mp_order/notification_body/manual_payments', array( &$this, 'order_confirmation_email' ), 10, 2 );
 		add_filter( 'mp_order/confirmation_text/' . $this->plugin_name, array( &$this, 'order_confirmation_text' ), 10, 2 );
@@ -66,15 +66,21 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		$payment_info[ 'gateway_private_name' ]	 = $this->admin_name;
 		$payment_info[ 'gateway_plugin_name' ]	 = $this->plugin_name;
 		$payment_info[ 'status' ][ time() ]		 = __( 'Invoiced', 'mp' );
-		$payment_info[ 'total' ]					 = $cart->total();
+		$payment_info[ 'total' ]				 = $cart->total();
 		$payment_info[ 'currency' ]				 = mp_get_setting( 'currency' );
-		$payment_info[ 'method' ]					 = __( 'Manual/Invoice', 'mp' );
+		$payment_info[ 'method' ]				 = __( 'Manual/Invoice', 'mp' );
 
 		$order = new MP_Order();
-		$order->save( array(
+		/*$order->save( array(
 			'payment_info'	 => $payment_info,
 			'cart'			 => $cart,
 			'paid'			 => false,
+		) );*/
+
+		$order->save( array(
+			'cart'			 => $cart,
+			'payment_info'	 => $payment_info,
+			'paid'			 => false
 		) );
 
 		wp_redirect( $order->tracking_url( false ) );

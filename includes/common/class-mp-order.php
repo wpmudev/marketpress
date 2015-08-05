@@ -462,6 +462,7 @@ You can manage this order here: %s', 'mp' );
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function details( $echo = true ) {
+		
 		$cart		 = $this->get_cart();
 		$currency	 = $this->get_meta( 'mp_payment_info->currency', '' );
 

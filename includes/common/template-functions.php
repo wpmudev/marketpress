@@ -697,7 +697,7 @@ if ( !function_exists( 'mp_get_user_address' ) ) :
 			return false;
 		}
 
-		if ( !empty( $data ) ) {
+		/*if ( !empty( $data ) ) {
 			foreach ( $data as $k => $v ) {
 				switch ( $k ) {
 					case 'shipping_option' :
@@ -707,7 +707,7 @@ if ( !function_exists( 'mp_get_user_address' ) ) :
 						break;
 				}
 			}
-		}
+		}*/
 
 		return $data;
 	}
