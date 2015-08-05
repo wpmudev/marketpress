@@ -1,6 +1,7 @@
 <?php
 
 class MP_Orders_Admin {
+
 	/**
 	 * Refers to a single instance of the class
 	 *
@@ -27,7 +28,7 @@ class MP_Orders_Admin {
 	 * @return object
 	 */
 	public static function get_instance() {
-		if ( is_null(self::$_instance) ) {
+		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new MP_Orders_Admin();
 		}
 		return self::$_instance;
@@ -46,20 +47,20 @@ class MP_Orders_Admin {
 		//perform some actions when order status changes
 		add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 );
 		//add menu items
-		add_action('admin_menu', array(&$this, 'add_menu_items'), 9);
+		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 		//change the "enter title here" text
-		add_filter('enter_title_here', array(&$this, 'enter_title_here'));
+		add_filter( 'enter_title_here', array( &$this, 'enter_title_here' ) );
 		//modify coupon list table columns/data
-		add_filter('manage_mp_order_posts_columns', array(&$this, 'orders_column_headers'));
-		add_action('manage_mp_order_posts_custom_column', array(&$this, 'orders_column_data'), 10, 2);
-		add_filter('manage_edit-mp_order_sortable_columns', array(&$this, 'orders_sortable_columns'));
-		add_action('pre_get_posts', array(&$this, 'modify_query'));
+		add_filter( 'manage_mp_order_posts_columns', array( &$this, 'orders_column_headers' ) );
+		add_action( 'manage_mp_order_posts_custom_column', array( &$this, 'orders_column_data' ), 10, 2 );
+		add_filter( 'manage_edit-mp_order_sortable_columns', array( &$this, 'orders_sortable_columns' ) );
+		add_action( 'pre_get_posts', array( &$this, 'modify_query' ) );
 		//custom css/javascript
-		add_action('admin_enqueue_scripts', array(&$this, 'enqueue_css_js'));
+		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_css_js' ) );
 		//process custom bulk actions
-		add_action('load-edit.php', array(&$this, 'process_bulk_actions'));
+		add_action( 'load-edit.php', array( &$this, 'process_bulk_actions' ) );
 		//bulk update admin notice
-		add_action('admin_notices', array(&$this, 'admin_notices'));
+		add_action( 'admin_notices', array( &$this, 'admin_notices' ) );
 		//remove submit div
 		add_action( 'admin_menu', create_function( '', 'remove_meta_box( "submitdiv", "mp_order", "side" ); remove_meta_box( "titlediv", "mp_order", "core" );' ) );
 		//add export form
@@ -74,7 +75,7 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_customer_info_metabox( $order ) {
-		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_customer_info_nonce' ), 'mp_save_customer_info' ) ) {
+		if ( !wp_verify_nonce( mp_get_post_value( 'mp_save_customer_info_nonce' ), 'mp_save_customer_info' ) ) {
 			return;
 		}
 
@@ -90,13 +91,13 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_order_notes_metabox( $order ) {
-		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_order_notes_nonce' ), 'mp_save_order_notes' ) ) {
+		if ( !wp_verify_nonce( mp_get_post_value( 'mp_save_order_notes_nonce' ), 'mp_save_order_notes' ) ) {
 			return;
 		}
 
 		$order_notes = sanitize_text_field( trim( mp_get_post_value( 'mp->order_notes', '' ) ) );
-		if ( ! empty( $order_notes ) ) {
-			$order->update_meta( 'mp_order_notes',  $order_notes );
+		if ( !empty( $order_notes ) ) {
+			$order->update_meta( 'mp_order_notes', $order_notes );
 		} else {
 			$order->delete_meta( 'mp_order_notes' );
 		}
@@ -110,21 +111,21 @@ class MP_Orders_Admin {
 	 * @param MP_Order $order
 	 */
 	protected function _save_shipping_info_metabox( $order ) {
-		if ( ! wp_verify_nonce( mp_get_post_value( 'mp_save_shipping_info_nonce' ), 'mp_save_shipping_info' ) ) {
+		if ( !wp_verify_nonce( mp_get_post_value( 'mp_save_shipping_info_nonce' ), 'mp_save_shipping_info' ) ) {
 			return;
 		}
 
-		$tracking_num    = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
+		$tracking_num	 = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
 		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
-		$custom_method   = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
+		$custom_method	 = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
 		//check for the custom shipping method here
-		if ( $shipment_method == 'other' && ! empty( $custom_method ) ) {
+		if ( $shipment_method == 'other' && !empty( $custom_method ) ) {
 			//so if shippin method = custom, & user provided a new method name, we will use tht method name
-			$method_name     = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
+			$method_name	 = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
 			$shipment_method = sanitize_title( $method_name );
 		}
 
-		if ( ! empty( $tracking_num ) && !empty( $shipment_method ) ) {
+		if ( !empty( $tracking_num ) && !empty( $shipment_method ) ) {
 			// update tracking info
 			$order->update_meta( 'mp_shipping_info->tracking_num', $tracking_num );
 			$order->update_meta( 'mp_shipping_info->method', $shipment_method );
@@ -133,7 +134,7 @@ class MP_Orders_Admin {
 			if ( isset( $method_name ) ) {
 				$custom_shipping_method = mp_get_setting( 'shipping->custom_method', array() );
 				//if method not exist
-				if ( ! isset( $custom_shipping_method[ $shipment_method ] ) ) {
+				if ( !isset( $custom_shipping_method[ $shipment_method ] ) ) {
 					$custom_shipping_method[ $shipment_method ] = $method_name;
 					mp_update_setting( 'shipping->custom_method', $custom_shipping_method );
 				}
@@ -169,13 +170,13 @@ class MP_Orders_Admin {
 	 * @return array False, if no IPN history exists.
 	 */
 	public function get_ipn_history() {
-		if ( ! is_null( $this->_ipn_history ) ) {
+		if ( !is_null( $this->_ipn_history ) ) {
 			return $this->_ipn_history;
 		}
 
 		$this->_ipn_history = get_comments( array(
-			'status' => 'approve',
-			'post_id' => $post->ID,
+			'status'	 => 'approve',
+			'post_id'	 => $post->ID,
 		) );
 
 		if ( count( $this->_ipn_history ) == 0 ) {
@@ -184,7 +185,6 @@ class MP_Orders_Admin {
 
 		return $this->_ipn_history;
 	}
-
 
 	/**
 	 * Save meta boxes
@@ -251,20 +251,21 @@ class MP_Orders_Admin {
 	 * @access public
 	 */
 	public function meta_box_order_history( $post ) {
-		$order = new MP_Order( $post );
-		$meta_keys = array(
-			'mp_closed_time' => __( 'Closed', 'mp' ),
-			'mp_shipped_time' => __( 'Shipped', 'mp' ),
-			'mp_paid_time' => __( 'Paid', 'mp' ),
-			'mp_received_time' => __( 'Received', 'mp' ),
+		$order		 = new MP_Order( $post );
+		$meta_keys	 = array(
+			'mp_closed_time'	 => __( 'Closed', 'mp' ),
+			'mp_shipped_time'	 => __( 'Shipped', 'mp' ),
+			'mp_paid_time'		 => __( 'Paid', 'mp' ),
+			'mp_received_time'	 => __( 'Received', 'mp' ),
 		);
 
 		$index = 1;
 		foreach ( $meta_keys as $key => $label ) :
-			if ( $timestamp = $order->get_meta( $key ) ) : ?>
+			if ( $timestamp = $order->get_meta( $key ) ) :
+				?>
 				<div class="misc-pub-section"><strong><?php echo $label; ?>:</strong><br /><?php echo mp_format_date( $timestamp ); ?></div>
 				<?php echo ( $index == count( $meta_keys ) ) ? '' : '<hr />'; ?>
-			<?php
+				<?php
 			endif;
 
 			$index ++;
@@ -279,8 +280,8 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_order_ipn_history( $post ) {
 		$history = get_comments( array(
-			'status' => 'approve',
-			'post_id' => $post->ID,
+			'status'	 => 'approve',
+			'post_id'	 => $post->ID,
 		) );
 
 		if ( count( $history ) == 0 ) {
@@ -290,7 +291,7 @@ class MP_Orders_Admin {
 
 		echo '<ul>';
 		foreach ( $history as $item ) {
-			echo '<strong>' . date( get_option( 'date_format'), strtotime( $item->comment_date ) ) . ':</strong> ' . $item->comment_content;
+			echo '<strong>' . date( get_option( 'date_format' ), strtotime( $item->comment_date ) ) . ':</strong> ' . $item->comment_content;
 		}
 		echo '</ul>';
 	}
@@ -302,25 +303,25 @@ class MP_Orders_Admin {
 	 * @access public
 	 */
 	public function meta_box_order_actions( $post ) {
-		$order = new MP_Order( $post );
-		$statuses = get_post_stati( array( 'post_type' => 'mp_order' ), 'objects' );
+		$order		 = new MP_Order( $post );
+		$statuses	 = get_post_stati( array( 'post_type' => 'mp_order' ), 'objects' );
 		?>
 		<div id="misc-publishing-actions">
 			<div class="misc-pub-section">
 				<label for="post_status"><?php _e( 'Order Status', 'mp' ); ?></label>
 				<select id="post_status" name="post_status">
 					<?php foreach ( $statuses as $key => $status ) : ?>
-					<option value="<?php echo $key; ?>" <?php selected( $key, $order->post_status ); ?>><?php echo $status->label; ?></option>
-					<?php endforeach; ?>
+						<option value="<?php echo $key; ?>" <?php selected( $key, $order->post_status ); ?>><?php echo $status->label; ?></option>
+		<?php endforeach; ?>
 				</select>
 			</div>
 		</div>
 		<div id="major-publishing-actions">
-				<div id="publishing-action">
-						<span class="spinner"></span>
-					<?php submit_button( __( 'Save Changes', 'mp' ), 'primary', null, false, array( 'id' => 'publish' ) ); ?>
-				</div>
-				<div class="clear"></div>
+			<div id="publishing-action">
+				<span class="spinner"></span>
+		<?php submit_button( __( 'Save Changes', 'mp' ), 'primary', null, false, array( 'id' => 'publish' ) ); ?>
+			</div>
+			<div class="clear"></div>
 		</div>
 		<?php
 	}
@@ -346,12 +347,12 @@ class MP_Orders_Admin {
 	 * @access public
 	 */
 	public function meta_box_shipping_info( $post ) {
-		$order = new MP_Order( $post );
-		$carriers = array(
-			'ups'   => __( 'UPS', 'mp' ),
-			'fedex' => __( 'FedEx', 'mp' ),
-			'dhl'   => __( 'DHL', 'mp' ),
-			'other' => __( 'Other', 'mp' ),
+		$order		 = new MP_Order( $post );
+		$carriers	 = array(
+			'ups'	 => __( 'UPS', 'mp' ),
+			'fedex'	 => __( 'FedEx', 'mp' ),
+			'dhl'	 => __( 'DHL', 'mp' ),
+			'other'	 => __( 'Other', 'mp' ),
 		);
 
 		//get the custom method
@@ -369,21 +370,21 @@ class MP_Orders_Admin {
 		?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br />
-			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
+		<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
 		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
-		<div class="misc-pub-section">
-			<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br />
+			<div class="misc-pub-section">
+				<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br />
 			<?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?>
-		</div>
+			</div>
 		<?php endif; ?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Actual Shipping Method', 'mp' ); ?>:</strong><br />
 			<select name="mp[tracking_info][shipping_method]" style="vertical-align:top;width:100%;">
 				<option value=""><?php _e( 'Select One', 'mp' ); ?></option>
 				<?php foreach ( $carriers as $val => $label ) : ?>
-				<option data-original="<?php echo isset( $custom_carriers[ $val ] ) ? 1 : 0 ?>" value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
-				<?php endforeach; ?>
+					<option data-original="<?php echo isset( $custom_carriers[ $val ] ) ? 1 : 0 ?>" value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
+		<?php endforeach; ?>
 			</select>
 			<a class="mp-hide mp-remove-custom-carrier" href="#"><?php _e( "Remove", "mp" ) ?></a>
 		</div>
@@ -395,8 +396,8 @@ class MP_Orders_Admin {
 			</div>
 			<strong><?php _e( 'Tracking Number', 'mp' ); ?>:</strong><br/>
 			<input type="text" name="mp[tracking_info][tracking_num]"
-			       placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"
-			       value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%"/>
+				   placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"
+				   value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%"/>
 		</div>
 		<?php
 	}
@@ -420,12 +421,12 @@ class MP_Orders_Admin {
 	 * @access public
 	 */
 	public function meta_box_order_details( $post ) {
-		$order = new MP_Order( $post );
-		$cart = $order->get_cart();
+		$order	 = new MP_Order( $post );
+		$cart	 = $order->get_cart();
 		$cart->display( array(
-			'echo' => true,
-			'view' => 'order-status',
-			'editable' => false,
+			'echo'		 => true,
+			'view'		 => 'order-status',
+			'editable'	 => false,
 		) );
 	}
 
@@ -437,12 +438,12 @@ class MP_Orders_Admin {
 	 */
 	public function admin_notices() {
 		if ( get_current_screen()->id == 'edit-mp_order' ) {
-			if ( mp_get_get_value('mp_order_status_updated') ) {
-				echo '<div class="updated"><p>' . __('Order statuses successfully updated.', 'mp') . '</p></div>';
+			if ( mp_get_get_value( 'mp_order_status_updated' ) ) {
+				echo '<div class="updated"><p>' . __( 'Order statuses successfully updated.', 'mp' ) . '</p></div>';
 			}
 
-			if ( $order_id = mp_get_get_value('mp_order_status_updated_single') ) {
-				echo '<div class="updated"><p>' . sprintf(__('The order status for order ID <strong>%1$s</strong> was updated successfully.', 'mp'), $order_id) . '</p></div>';
+			if ( $order_id = mp_get_get_value( 'mp_order_status_updated_single' ) ) {
+				echo '<div class="updated"><p>' . sprintf( __( 'The order status for order ID <strong>%1$s</strong> was updated successfully.', 'mp' ), $order_id ) . '</p></div>';
 			}
 		}
 	}
@@ -458,35 +459,35 @@ class MP_Orders_Admin {
 			return;
 		}
 
-		$wp_list_table = _get_list_table('WP_Posts_List_Table');
-		$action = $wp_list_table->current_action();
+		$wp_list_table	 = _get_list_table( 'WP_Posts_List_Table' );
+		$action			 = $wp_list_table->current_action();
 
-		$posts = mp_get_get_value('post', array());
-		$valid_actions = array('order_received', 'order_paid', 'order_shipped', 'order_closed', 'trash', 'delete_all');
-		$pagenum = $wp_list_table->get_pagenum();
+		$posts			 = mp_get_get_value( 'post', array() );
+		$valid_actions	 = array( 'order_received', 'order_paid', 'order_shipped', 'order_closed', 'trash', 'delete_all' );
+		$pagenum		 = $wp_list_table->get_pagenum();
 
-		if ( empty($action) ) {
+		if ( empty( $action ) ) {
 			//bail - no action specified
 			return;
 		}
 
-		check_admin_referer('bulk-posts');
+		check_admin_referer( 'bulk-posts' );
 
-		if ( ! in_array($action, $valid_actions) ) {
-			wp_die(__('An invalid bulk action was requested. Please go back and try again.', 'mp'));
+		if ( !in_array( $action, $valid_actions ) ) {
+			wp_die( __( 'An invalid bulk action was requested. Please go back and try again.', 'mp' ) );
 		}
 
-		$sendback = remove_query_arg(array('action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', 'post_status', '_status', 'post', 'bulk_edit', 'post_view', 'mp_order_status_updated', 'mp_order_status_updated_single'), wp_get_referer());
+		$sendback = remove_query_arg( array( 'action', 'action2', 'tags_input', 'post_author', 'comment_status', 'ping_status', 'post_status', '_status', 'post', 'bulk_edit', 'post_view', 'mp_order_status_updated', 'mp_order_status_updated_single' ), wp_get_referer() );
 
-		if ( ! $sendback ) {
-			$sendback = admin_url('edit.php?post_type=mp_order');
+		if ( !$sendback ) {
+			$sendback = admin_url( 'edit.php?post_type=mp_order' );
 		}
 
 		if ( 'delete_all' == $action ) {
 			$posts = get_posts( array(
-				'post_type' => 'mp_order',
-				'post_status' => 'trash',
-				'numberposts' => -1,
+				'post_type'		 => 'mp_order',
+				'post_status'	 => 'trash',
+				'numberposts'	 => -1,
 			) );
 
 			foreach ( $posts as $post ) {
@@ -494,13 +495,13 @@ class MP_Orders_Admin {
 			}
 		} else {
 			foreach ( $posts as $post_id ) {
-				wp_update_post(array(
-					'ID' => $post_id,
-					'post_status' => $action
-				));
+				wp_update_post( array(
+					'ID'			 => $post_id,
+					'post_status'	 => $action
+				) );
 			}
 
-			$sendback = add_query_arg(array('paged' => $pagenum, 'mp_order_status_updated' => 1), $sendback);
+			$sendback = add_query_arg( array( 'paged' => $pagenum, 'mp_order_status_updated' => 1 ), $sendback );
 		}
 
 		wp_redirect( $sendback );
@@ -515,31 +516,31 @@ class MP_Orders_Admin {
 	 * @action admin_ajax_mp_change_order_status
 	 */
 	public static function ajax_change_order_status() {
-		$post_id = mp_get_get_value('post_id');
-		$order_id = mp_get_get_value('order_id');
-		$order_status = mp_get_get_value('order_status');
-		$msg = sprintf(__('The order status could not be updated due to unexpected error. Please try again.', 'mp'), $order_id);
+		$post_id		 = mp_get_get_value( 'post_id' );
+		$order_id		 = mp_get_get_value( 'order_id' );
+		$order_status	 = mp_get_get_value( 'order_status' );
+		$msg			 = sprintf( __( 'The order status could not be updated due to unexpected error. Please try again.', 'mp' ), $order_id );
 
-		if ( ! check_ajax_referer('mp-change-order-status', '_wpnonce', false) || false === $order_id || false === $order_status ) {
-			wp_die($msg);
+		if ( !check_ajax_referer( 'mp-change-order-status', '_wpnonce', false ) || false === $order_id || false === $order_status ) {
+			wp_die( $msg );
 		}
 
-		$order_status_old = get_post_status($post_id);
-		$result = wp_update_post(array(
-			'ID' => $post_id,
-			'post_status' => $order_status,
-		), true);
+		$order_status_old	 = get_post_status( $post_id );
+		$result				 = wp_update_post( array(
+			'ID'			 => $post_id,
+			'post_status'	 => $order_status,
+		), true );
 
-		if ( is_wp_error($result) ) {
-			wp_die($msg);
+		if ( is_wp_error( $result ) ) {
+			wp_die( $msg );
 		} else {
-			$sendback = remove_query_arg('mp_order_status_updated', wp_get_referer());
+			$sendback = remove_query_arg( 'mp_order_status_updated', wp_get_referer() );
 
-			if ( empty($sendback) ) {
-				$sendback = admin_url('edit.php?post_type=mp_order');
+			if ( empty( $sendback ) ) {
+				$sendback = admin_url( 'edit.php?post_type=mp_order' );
 			}
 
-			wp_redirect(add_query_arg('mp_order_status_updated_single', $order_id, $sendback));
+			wp_redirect( add_query_arg( 'mp_order_status_updated_single', $order_id, $sendback ) );
 		}
 
 		exit;
@@ -574,25 +575,25 @@ class MP_Orders_Admin {
 	 * @param object $query
 	 */
 	public function modify_query( $query ) {
-		if ( $query->get('post_type') != 'mp_order' || get_current_screen()->id != 'edit-mp_order' ) {
+		if ( $query->get( 'post_type' ) != 'mp_order' || get_current_screen()->id != 'edit-mp_order' ) {
 			//bail
 			return;
 		}
 
 		//set post status
-		$post_status =  mp_get_get_value('post_status', array('order_received', 'order_paid', 'order_shipped'));
-		$query->set('post_status', $post_status);
+		$post_status = mp_get_get_value( 'post_status', array( 'order_received', 'order_paid', 'order_shipped' ) );
+		$query->set( 'post_status', $post_status );
 
-		switch ( get_query_var('orderby') ) {
+		switch ( get_query_var( 'orderby' ) ) {
 			case 'product_coupon_discount' :
-				$query->set('orderby', 'meta_value_num');
-				$query->set('meta_key', 'discount_amount');
-			break;
+				$query->set( 'orderby', 'meta_value_num' );
+				$query->set( 'meta_key', 'discount_amount' );
+				break;
 
 			case 'product_coupon_used' :
-				$query->set('orderby', 'meta_value_num');
-				$query->set('meta_key', 'times_used');
-			break;
+				$query->set( 'orderby', 'meta_value_num' );
+				$query->set( 'meta_key', 'times_used' );
+				break;
 		}
 	}
 
@@ -606,10 +607,10 @@ class MP_Orders_Admin {
 	 * @return array
 	 */
 	public function orders_sortable_columns( $columns ) {
-		return array_merge($columns, array(
-			'discount' => 'product_coupon_discount',
-		 	'used' => 'product_coupon_used',
-		));
+		return array_merge( $columns, array(
+			'discount'	 => 'product_coupon_discount',
+			'used'		 => 'product_coupon_used',
+		) );
 	}
 
 	/**
@@ -626,7 +627,7 @@ class MP_Orders_Admin {
 			return $title;
 		}
 
-		return __('Enter coupon code here', 'mp');
+		return __( 'Enter coupon code here', 'mp' );
 	}
 
 	/**
@@ -646,16 +647,15 @@ class MP_Orders_Admin {
 
 		wp_localize_script( 'mp-admin-orders', 'mp_admin_orders', array(
 			'bulk_actions' => array(
-				'-1' => __( 'Change Status', 'mp' ),
-				'order_received' => __(' Received', 'mp' ),
-				'order_paid' => __( 'Paid', 'mp' ),
-				'order_shipped' => __( 'Shipped', 'mp' ),
-				'order_closed' => __( 'Closed', 'mp' ),
-				'trash' => __( 'Move To Trash', 'mp' ),
+				'-1'			 => __( 'Change Status', 'mp' ),
+				'order_received' => __( ' Received', 'mp' ),
+				'order_paid'	 => __( 'Paid', 'mp' ),
+				'order_shipped'	 => __( 'Shipped', 'mp' ),
+				'order_closed'	 => __( 'Closed', 'mp' ),
+				'trash'			 => __( 'Move To Trash', 'mp' ),
 			),
 		) );
 	}
-
 
 	/**
 	 * Adds menu items to the admin menu
@@ -673,9 +673,9 @@ class MP_Orders_Admin {
 		 */
 		$order_cap = apply_filters( 'mp_orders_cap', 'edit_store_orders' );
 
-		if ( current_user_can($order_cap) && ! mp_get_setting('disable_cart') ) {
-			$num_posts = wp_count_posts('mp_order'); //get order count
-			$count = ( isset($num_posts->order_received) && isset($num_posts->order_paid) )? ($num_posts->order_received + $num_posts->order_paid) : 0;
+		if ( current_user_can( $order_cap ) && !mp_get_setting( 'disable_cart' ) ) {
+			$num_posts	 = wp_count_posts( 'mp_order' ); //get order count
+			$count		 = ( isset( $num_posts->order_received ) && isset( $num_posts->order_paid ) ) ? ($num_posts->order_received + $num_posts->order_paid) : 0;
 
 			if ( $count > 0 ) {
 				$count_output = '&nbsp;<span class="update-plugins"><span class="updates-count count-' . $count . '">' . $count . '</span></span>';
@@ -683,7 +683,7 @@ class MP_Orders_Admin {
 				$count_output = '';
 			}
 
-			$orders_page = add_submenu_page('edit.php?post_type=' . MP_Product::get_post_type(), __('Orders', 'mp'), __('Orders', 'mp') . $count_output, $order_cap, 'edit.php?post_type=mp_order');
+			$orders_page = add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Orders', 'mp' ), __( 'Orders', 'mp' ) . $count_output, $order_cap, 'edit.php?post_type=mp_order' );
 		}
 	}
 
@@ -698,16 +698,16 @@ class MP_Orders_Admin {
 	 */
 	public function orders_column_headers( $columns ) {
 		return array(
-			'cb'									=> '<input type="checkbox" />',
-			'mp_orders_status' 		=> __('Status', 'mp'),
-			'mp_orders_id' 				=> __('Order ID', 'mp'),
-			'mp_orders_date' 			=> __('Order Date', 'mp'),
-			'mp_orders_name' 			=> __('From', 'mp'),
-			'mp_orders_items' 		=> __('Items', 'mp'),
-			'mp_orders_shipping' 	=> __('Shipping', 'mp'),
-			'mp_orders_tax' 			=> __('Tax', 'mp'),
-			'mp_orders_discount' 	=> __('Discount', 'mp'),
-			'mp_orders_total' 		=> __('Total', 'mp'),
+			'cb'				 => '<input type="checkbox" />',
+			'mp_orders_status'	 => __( 'Status', 'mp' ),
+			'mp_orders_id'		 => __( 'Order ID', 'mp' ),
+			'mp_orders_date'	 => __( 'Order Date', 'mp' ),
+			'mp_orders_name'	 => __( 'From', 'mp' ),
+			'mp_orders_items'	 => __( 'Items', 'mp' ),
+			'mp_orders_shipping' => __( 'Shipping', 'mp' ),
+			'mp_orders_tax'		 => __( 'Tax', 'mp' ),
+			'mp_orders_discount' => __( 'Discount', 'mp' ),
+			'mp_orders_total'	 => __( 'Total', 'mp' ),
 		);
 	}
 
@@ -724,72 +724,72 @@ class MP_Orders_Admin {
 	public function orders_column_data( $column, $post_id ) {
 		global $post;
 
-		$order = new MP_Order( $post_id );
-		$html = '';
+		$order	 = new MP_Order( $post_id );
+		$html	 = '';
 
 		switch ( $column ) {
 			//! Order Status
 			case 'mp_orders_status' :
 				switch ( $post->post_status ) {
-			    	case 'order_received' :
-			    		$text = __('Received', 'mp');
-			    	break;
+					case 'order_received' :
+						$text = __( 'Received', 'mp' );
+						break;
 
-			    	case 'order_paid' :
-			    		$text = __('Paid', 'mp');
-			    	break;
+					case 'order_paid' :
+						$text = __( 'Paid', 'mp' );
+						break;
 
-			    	case 'order_shipped' :
-			    		$text = __('Shipped', 'mp');
-			    	break;
+					case 'order_shipped' :
+						$text = __( 'Shipped', 'mp' );
+						break;
 
-			    	case 'order_closed' :
-			    		$text = __('Closed', 'mp');
-			    	break;
+					case 'order_closed' :
+						$text = __( 'Closed', 'mp' );
+						break;
 
-			    	case 'trash' :
-			    		$text = __('Trashed', 'mp');
-			    	break;
+					case 'trash' :
+						$text = __( 'Trashed', 'mp' );
+						break;
 				}
 
-	    		$actions = array(
-	    			'order_received' => __('Received', 'mp'),
-	    			'order_paid' => __('Paid', 'mp'),
-	    			'order_shipped' => __('Shipped', 'mp'),
-	    			'order_closed' => __('Closed', 'mp'),
-	    		);
+				$actions = array(
+					'order_received' => __( 'Received', 'mp' ),
+					'order_paid'	 => __( 'Paid', 'mp' ),
+					'order_shipped'	 => __( 'Shipped', 'mp' ),
+					'order_closed'	 => __( 'Closed', 'mp' ),
+				);
 
 				$html .= '<div class="mp_order_status ' . get_post_status() . '">';
 
-				if ( isset($actions) ) {
+				if ( isset( $actions ) ) {
 					$html .= '<ul class="mp_order_status_menu">';
-					$html .= '<li class="item">' . __('Flag as:', 'mp') . '</li>';
+					$html .= '<li class="item">' . __( 'Flag as:', 'mp' ) . '</li>';
 
 					foreach ( $actions as $action => $label ) {
 						if ( $action == $post->post_status ) {
 							$html .= '<li class="item current"><span>' . $label . '</span></li>';
 						} else {
-							$html .= '<li class="item"><a href="' . wp_nonce_url(add_query_arg(array('action' => 'mp_change_order_status', 'order_status' => $action, 'order_id' => get_the_title(), 'post_id' => $post_id), admin_url('admin-ajax.php')), 'mp-change-order-status') . '">' . $label . '</a></li>';
+							$html .= '<li class="item"><a href="' . wp_nonce_url( add_query_arg( array( 'action' => 'mp_change_order_status', 'order_status' => $action, 'order_id' => get_the_title(), 'post_id' => $post_id ), admin_url( 'admin-ajax.php' ) ), 'mp-change-order-status' ) . '">' . $label . '</a></li>';
 						}
 					}
 
 					$html .= '</ul>';
 				}
 
-					$html .= '<img src="' . mp_plugin_url('ui/images/ajax-loader.gif') . '" alt="" />';
+				$html .= '<img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt="" />';
 				$html .= '</div>';
-			break;
+				break;
 
 			//! Order ID
 			case 'mp_orders_id' :
-				$title = _draft_or_post_title($post_id);
-				$html .= '<strong><a class="row-title" href="' . get_edit_post_link($post_id) . '" title="' . esc_attr(sprintf(__('View order &#8220;%s&#8221;', 'mp'), $title)) . '">' . $title . '</a></strong>';
-			break;
+				$title = _draft_or_post_title( $post_id );
+				$html .= '<strong><a class="row-title" href="' . get_edit_post_link( $post_id ) . '" title="' . esc_attr( sprintf( __( 'View order &#8220;%s&#8221;', 'mp' ), $title ) ) . '">' . $title . '</a></strong>';
+				break;
 
 			//! Order Date
 			case 'mp_orders_date' :
-				$html .= get_the_time(get_option('date_format').' '.get_option('time_format'));
-			break;
+				$html .= get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+				break;
 
 			//! Order From
 			case 'mp_orders_name' :
@@ -797,28 +797,28 @@ class MP_Orders_Admin {
 				$html .= '
 					<div style="display:none">
 						<div id="mp-customer-info-lb-' . $order->ID . '" class="mp-customer-info-lb" style="padding:10px 30px 30px;">' .
-							$order->get_addresses() . '
+				$order->get_addresses() . '
 						</div>
 					</div>';
-			break;
+				break;
 
 			//! Order Items
 			case 'mp_orders_items' :
-				$items = get_post_meta($post_id, 'mp_order_items', true);
-				$html .= number_format_i18n($items);
-			break;
+				$items = get_post_meta( $post_id, 'mp_order_items', true );
+				$html .= number_format_i18n( $items );
+				break;
 
 			//! Order Shipping
 			case 'mp_orders_shipping' :
-				$shipping = get_post_meta($post_id, 'mp_shipping_total', true);
-				$html .= mp_format_currency('', $shipping);
-			break;
+				$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
+				$html .= mp_format_currency( '', $shipping );
+				break;
 
 			//! Order Tax
 			case 'mp_orders_tax' :
-				$tax = get_post_meta($post_id, 'mp_tax_total', true);
-				$html .= mp_format_currency('', $tax);
-			break;
+				$tax = get_post_meta( $post_id, 'mp_tax_total', true );
+				$html .= mp_format_currency( '', $tax );
+				break;
 
 			//! Order Discount
 			case 'mp_orders_discount' :
@@ -833,15 +833,15 @@ class MP_Orders_Admin {
 						}
 					}
 				} else {
-					$html .= __('N/A', 'mp');
+					$html .= __( 'N/A', 'mp' );
 				}
-			break;
+				break;
 
 			//! Order Total
 			case 'mp_orders_total' :
-				$total = get_post_meta($post_id, 'mp_order_total', true);
-				$html .= mp_format_currency('', $total);
-			break;
+				$total = get_post_meta( $post_id, 'mp_order_total', true );
+				$html .= mp_format_currency( '', $total );
+				break;
 		}
 
 		/**
@@ -865,6 +865,7 @@ class MP_Orders_Admin {
 
 		echo $html;
 	}
+
 }
 
 MP_Orders_Admin::get_instance();

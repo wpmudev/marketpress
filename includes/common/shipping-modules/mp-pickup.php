@@ -1,4 +1,5 @@
 <?php
+
 /*
   MarketPress Pickup Shipping Plugin
  */
@@ -29,37 +30,36 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 
 		//filter the email output
 		add_filter( 'mp_order/notification_body', array( &$this, 'add_instructions_to_order_email' ), 10, 2 );
-
 	}
 
 	/**
 	 * Show the special instructions on the confirm page
 	 */
-	/*function show_instructions_confirm_page( $content ) {
-		global $mp;
-		$settings = $mp->get_setting( 'shipping' );
+	/* function show_instructions_confirm_page( $content ) {
+	  global $mp;
+	  $settings = $mp->get_setting( 'shipping' );
 
-		$instructions = isset( $settings[ 'pickup' ][ 'pickup-instructions' ] ) ? $settings[ 'pickup' ][ 'pickup-instructions' ] : false;
-		if ( $instructions ) {
-			$content .= '<tr><td>' . __( 'Pickup Instructions', 'mp' ) . '</td><td>' . esc_textarea( $instructions ) . '</td></tr>';
-		}
-		return $content;
-	}*/
+	  $instructions = isset( $settings[ 'pickup' ][ 'pickup-instructions' ] ) ? $settings[ 'pickup' ][ 'pickup-instructions' ] : false;
+	  if ( $instructions ) {
+	  $content .= '<tr><td>' . __( 'Pickup Instructions', 'mp' ) . '</td><td>' . esc_textarea( $instructions ) . '</td></tr>';
+	  }
+	  return $content;
+	  } */
 
 	/**
 	 * Hook in to show the order instructions on the order status screen
 	 */
 	function show_instructions_order_status( $html, $order ) {
 		global $mp;
-		
+
 		$shipping_option = $order->get_meta( 'mp_shipping_info->shipping_option', '' );
-		$used_pickup = ( isset( $shipping_option ) && $shipping_option == 'pickup' ) ? true : false;
+		$used_pickup	 = ( isset( $shipping_option ) && $shipping_option == 'pickup' ) ? true : false;
 
 		if ( $used_pickup ) {
 			$settings = $mp->get_setting( 'shipping' );
 			$html .= '<h3>' . __( 'Pickup Instructions', 'mp' ) . '</h3>' . ( $settings[ 'pickup' ][ 'pickup-instructions' ] );
 		}
-		
+
 		echo $html;
 	}
 
@@ -68,12 +68,13 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 */
 	function add_instructions_to_order_email( $text, $order ) {
 		global $mp;
-		$used_pickup	 = ( ($shipping_option = $order->get_meta( 'mp_shipping_info->shipping_option' )) && $shipping_option == 'pickup' ) ? true : false;
+		$shipping_option = $order->get_meta( 'mp_shipping_info->shipping_option', '' );
+		$used_pickup	 = ( isset( $shipping_option ) && $shipping_option == 'pickup' ) ? true : false;
 
 		if ( $used_pickup ) {
 			$settings = mp_get_setting( 'shipping' );
 			$text .= "\n\n" . __( 'Pickup Instructions', 'mp' );
-			$text .= "\n" . esc_attr( mp_get_setting( 'shipping->pickup->pickup-instructions' ) );
+			$text .= "\n" . esc_attr( $settings[ 'pickup' ][ 'pickup-instructions' ] );
 		}
 
 		return $text;
@@ -110,15 +111,15 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 * Use this to process any additional field you may add. Use the $_POST global,
 	 *  and be sure to save it to both the cookie and usermeta if logged in.
 	 */
-	/*function process_shipping_form() {
-		if ( isset( $_POST['shipping_method'] ) && $_POST['shipping_method'] == 'pickup->in-store') {
-			echo 'set!:'.$_POST['shipping_method'];
-			$_SESSION['mp_shipping_info']['shipping_option'] = $this->public_name;
-			$_SESSION['mp_shipping_info']['shipping_sub_option'] = $this->get_setting( "pickup-title", __( 'In Store', 'mp' ));
-		}else{
-			echo 'not set!:'.$_POST['shipping_method'];
-		}
-	}*/
+	/* function process_shipping_form() {
+	  if ( isset( $_POST['shipping_method'] ) && $_POST['shipping_method'] == 'pickup->in-store') {
+	  echo 'set!:'.$_POST['shipping_method'];
+	  $_SESSION['mp_shipping_info']['shipping_option'] = $this->public_name;
+	  $_SESSION['mp_shipping_info']['shipping_sub_option'] = $this->get_setting( "pickup-title", __( 'In Store', 'mp' ));
+	  }else{
+	  echo 'not set!:'.$_POST['shipping_method'];
+	  }
+	  } */
 
 	/**
 	 * Initialize the settings metabox
@@ -128,6 +129,7 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 */
 	public function init_settings_metabox() {
 		global $mp;
+		
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => $this->generate_metabox_id(),
 			'page_slugs'	 => array(
@@ -151,6 +153,7 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 				),
 			),
 		) );
+		
 		$metabox->add_field( 'text', array(
 			'name'			 => $this->get_field_name( 'processing-fee' ),
 			'label'			 => array( 'text' => __( 'Pickup Fee', 'mp' ) . ' (' . $mp->format_currency() . ')' ),
@@ -174,13 +177,11 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 		) );
 	}
 
-
 	/**
 	 * Filters posted data from your form. Do anything you need to the $settings['shipping']['plugin_name']
 	 *  array. Don't forget to return!
 	 */
 	function process_shipping_settings( $settings ) {
-
 		return $settings;
 	}
 
@@ -201,7 +202,6 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 * return array $shipping_meta
 	 */
 	function save_shipping_metabox( $shipping_meta ) {
-
 		return $shipping_meta;
 	}
 
@@ -244,7 +244,7 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 * return array $shipping_options 
 	 */
 	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
-		$shipping_options = array( 'in-store' => $this->get_setting( "pickup-title", __( 'In Store', 'mp' )) );
+		$shipping_options = array( 'in-store' => $this->get_setting( "pickup-title", __( 'In Store', 'mp' ) ) );
 		return $shipping_options;
 	}
 
