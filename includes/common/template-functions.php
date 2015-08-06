@@ -1,28 +1,89 @@
 <?php
 
-if (!function_exists('mp_orderstatus_link')) :
-/**
- * Echos the current order status link.
- * @param bool $echo Optional, whether to echo. Defaults to true
- * @param bool $url Optional, whether to return a link or url. Defaults to show link.
- * @param string $link_text Optional, text to show in link.
- * @param string $order Optional, the order id to append to the link
- */
-function mp_orderstatus_link( $echo = true, $url = false, $link_text = '', $order_id = '' ) {
-		global $mp;
-		$link = get_permalink( mp_get_setting( 'pages->order_status' ) );
-		if (!$url) {
-				$text = ($link_text) ? $link_text : __('Check Order Status', 'mp');
-				$link = '<a href="' . $link . '" class="mp_orderstatus_link">' . $text . '</a>';
+if ( !function_exists( 'mp_product_price' ) ) :
+	/*
+	 * Displays the product price (and sale price)
+	 *
+	 * @param bool $echo Optional, whether to echo
+	 * @param int $post_id The post_id for the product. Optional if in the loop
+	 * @param sting $label A label to prepend to the price. Defaults to "Price: "
+	 */
+
+	function mp_product_price( $echo = true, $post_id = NULL, $label = true ) {
+		global $id, $mp;
+
+		$price_html = '';
+
+		$product = new MP_Product( $post_id );
+
+		$label = ($label === true) ? __( 'Price: ', 'mp' ) : $label;//should be empty from 3.0
+
+		$price_html .= $product->display_price( false );
+		
+		$price_html = apply_filters( 'mp_product_price_html', $price_html, $post_id, $label, $product->display_price( false ) );
+
+		if ( $echo )
+			echo $price_html;
+		else
+			return $price_html;
+	}
+
+endif;
+
+if ( !function_exists( 'mp_store_navigation' ) ) :
+
+	/**
+	 * Echos the current store navigation links.
+	 *
+	 * @param bool $echo Optional, whether to echo. Defaults to true
+	 */
+	function mp_store_navigation( $echo = true ) {
+		//navigation
+		if ( !mp_get_setting( 'disable_cart' ) ) {
+			$nav = '<ul class="mp_store_navigation"><li class="page_item"><a href="' . mp_products_link( false, true ) . '" title="' . __( 'Products', 'mp' ) . '">' . __( 'Products', 'mp' ) . '</a></li>';
+			$nav .= '<li class="page_item"><a href="' . mp_cart_link( false, true ) . '" title="' . __( 'Shopping Cart', 'mp' ) . '">' . __( 'Shopping Cart', 'mp' ) . '</a></li>';
+			$nav .= '<li class="page_item"><a href="' . mp_orderstatus_link( false, true ) . '" title="' . __( 'Order Status', 'mp' ) . '">' . __( 'Order Status', 'mp' ) . '</a></li>
+</ul>';
+		} else {
+			$nav = '<ul class="mp_store_navigation">
+<li class="page_item"><a href="' . mp_products_link( false, true ) . '" title="' . __( 'Products', 'mp' ) . '">' . __( 'Products', 'mp' ) . '</a></li>
+</ul>';
 		}
 
-		$link = apply_filters('mp_orderstatus_link', $link, $echo, $url, $link_text);
+		$nav = apply_filters( 'mp_store_navigation', $nav );
 
-		if ($echo)
-				echo $link;
+		if ( $echo )
+			echo $nav;
 		else
-				return $link;
-}
+			return $nav;
+	}
+
+endif;
+
+if ( !function_exists( 'mp_orderstatus_link' ) ) :
+
+	/**
+	 * Echos the current order status link.
+	 * @param bool $echo Optional, whether to echo. Defaults to true
+	 * @param bool $url Optional, whether to return a link or url. Defaults to show link.
+	 * @param string $link_text Optional, text to show in link.
+	 * @param string $order Optional, the order id to append to the link
+	 */
+	function mp_orderstatus_link( $echo = true, $url = false, $link_text = '', $order_id = '' ) {
+		$link = get_permalink( mp_get_setting( 'pages->order_status' ) );
+		if ( !$url ) {
+			$text	 = ($link_text) ? $link_text : __( 'Check Order Status', 'mp' );
+			$link	 = '<a href="' . $link . '" class="mp_orderstatus_link">' . $text . '</a>';
+		}
+
+		$link = apply_filters( 'mp_orderstatus_link', $link, $echo, $url, $link_text );
+
+		if ( $echo )
+			echo $link;
+		else
+			return $link;
+	}
+
 endif;
 
 if ( !function_exists( 'mp_product_link' ) ) :
@@ -486,7 +547,7 @@ if ( !function_exists( 'mp_buy_button' ) ) :
 	 * @param int $post_id The post_id for the product. Optional if in the loop.
 	 */
 	function mp_buy_button( $echo = true, $context = 'list', $post_id = NULL ) {
-		_deprecated_function( 'mp_buy_button', '3.0', 'MP_Product::buy_button' );
+		//_deprecated_function( 'mp_buy_button', '3.0', 'MP_Product::buy_button' );
 
 		$product = new MP_Product( $post_id );
 		$button	 = $product->buy_button( false, $context );

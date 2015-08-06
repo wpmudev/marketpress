@@ -62,7 +62,7 @@ class MP_Shortcode_Builder {
 
 		$query	 = new WP_Query( array(
 			'paged'					 => isset( $_GET[ 'page' ] ) ? $_GET[ 'page' ] : false,
-			'posts_per_page'		 => 10,
+			'posts_per_page'		 => -1,
 			's'						 => isset( $_GET[ 'search_term' ] ) ? $_GET[ 'search_term' ] : false,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
@@ -70,7 +70,7 @@ class MP_Shortcode_Builder {
 			'order'					 => 'ASC',
 			'post_type'				 => MP_Product::get_post_type(),
 		) );
-		$data	 = array( 'posts' => array(), 'posts_per_page' => $args[ 'posts_per_page' ], 'total' => $query->found_posts );
+		$data	 = array( 'posts' => array(), 'posts_per_page' => isset($args[ 'posts_per_page' ]) ? $args[ 'posts_per_page' ] : '-1', 'total' => $query->found_posts );
 
 		while ( $query->have_posts() ) : $query->the_post();
 			$data[ 'posts' ][] = array( 'id' => get_the_ID(), 'text' => get_the_title() );
@@ -967,12 +967,12 @@ class MP_Shortcode_Builder {
 					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
-			<tr>
+			<!--<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'A label to prepend to the price.', 'mp' ); ?></span></span> label</th>
 				<td>
 					<input type="text" name="label" data-default="Price:" value="Price:" />
 				</td>
-			</tr>
+			</tr>-->
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'What context for display.', 'mp' ); ?></span></span> context</th>
 				<td>

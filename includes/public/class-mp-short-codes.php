@@ -96,6 +96,23 @@ class MP_Short_Codes {
 			'productsURL'	 => mp_store_page_url( 'products', false ),
 			'productCats'	 => $cats,
 		) );
+
+		// Styles
+		wp_enqueue_style( 'colorbox', mp_plugin_url( 'ui/css/colorbox.css' ), false, MP_VERSION );
+
+		// Scripts
+		wp_register_script( 'jquery-validate', mp_plugin_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'jquery-validate-methods', mp_plugin_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), MP_VERSION, true );
+		wp_register_script( 'ajaxq', mp_plugin_url( 'ui/js/ajaxq.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-cart', mp_plugin_url( 'ui/js/mp-cart.js' ), array( 'ajaxq', 'colorbox', 'jquery-validate' ), MP_VERSION, true );
+
+		// Localize scripts
+		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
+			'ajaxurl'					 => admin_url( 'admin-ajax.php' ),
+			'ajax_loader'				 => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
+			'cart_updated_error_limit'	 => __( 'Cart update notice: this item has a limit per order.', 'mp' )
+		) );
 	}
 
 	/**
@@ -443,6 +460,8 @@ class MP_Short_Codes {
 		extract( $atts );
 
 		$content = '<div class="mp_product_meta">';
+		//$content .= $product->display_price( false );
+		//$content .= $product->buy_button( false );
 		$content .= mp_product_price( false, $product_id, $label );
 		$content .= mp_buy_button( false, $context, $product_id );
 		$content .= '</div>';
@@ -548,7 +567,7 @@ class MP_Short_Codes {
 	function mp_store_navigation_sc( $atts ) {
 		$this->shortcodes_frontend_styles_scripts();
 		//! TODO: add mp_store_navigation function
-		//return mp_store_navigation(false);
+		return mp_store_navigation( false );
 	}
 
 }
