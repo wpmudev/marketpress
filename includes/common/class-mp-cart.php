@@ -1065,8 +1065,14 @@ class MP_Cart {
 			$echo = false;
 		}
 
-		if ( (!mp_is_shop_page() || mp_is_shop_page( 'cart' ) || mp_is_shop_page( 'checkout' )) && !mp_doing_ajax() ) {
-			return;
+		$cart_needed = apply_filters( 'mp_cart_needed_on_page', false );
+
+		if ( $cart_needed && !mp_doing_ajax() ) {
+			//show floating cart
+		} else {
+			if ( (!mp_is_shop_page() || mp_is_shop_page( 'cart' ) || mp_is_shop_page( 'checkout' )) && !mp_doing_ajax() ) {
+				return;
+			}
 		}
 
 

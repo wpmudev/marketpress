@@ -58,6 +58,14 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_store_navigation', array( &$this, 'mp_store_navigation_sc' ) );
 	}
 
+	public function cart_needed(){
+		add_filter('mp_cart_needed_on_page', array( &$this, 'cart_needed_return' ));
+	}
+	
+	public function cart_needed_return(){
+		return true;
+	}
+	
 	/**
 	 * Enqueue frontend styles and scripts for shortcodes
 	 * Useful when a shortcode is called on non-MP pages
@@ -408,6 +416,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_buy_button_sc( $atts ) {
+		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'context'	 => 'single',
@@ -449,6 +458,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_product_meta_sc( $atts ) {
+		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'context'	 => 'single',

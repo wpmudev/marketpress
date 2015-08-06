@@ -1,5 +1,35 @@
 <?php
 
+if ( !function_exists( 'mp_product_sku' ) ) :
+	/*
+	 * function mp_product_sku
+	 *
+	 * @param bool $echo default true
+	 * @param int $post_id The post_id of the product. Optional if in the loop
+	 * @param string $seperator The seperator to put between skus, default ', '
+	 *
+	 * Returns or echos html of variation SKUs
+	 */
+
+	function mp_product_sku( $echo = true, $post_id = NULL ) {
+		global $id, $mp;
+		$post_id = ( NULL === $post_id ) ? $id : $post_id;
+
+		$sku	 = get_post_meta( $post_id, "sku", true );
+		$html	 = '<span class="mp_product_skus">' . $sku . '</span>';
+
+		$html = apply_filters( 'mp_product_skus', $html, $post_id, $sku );
+
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
+	}
+
+endif;
+
+
 if ( !function_exists( 'mp_product_price' ) ) :
 	/*
 	 * Displays the product price (and sale price)
@@ -16,10 +46,10 @@ if ( !function_exists( 'mp_product_price' ) ) :
 
 		$product = new MP_Product( $post_id );
 
-		$label = ($label === true) ? __( 'Price: ', 'mp' ) : $label;//should be empty from 3.0
+		$label = ($label === true) ? __( 'Price: ', 'mp' ) : $label; //should be empty from 3.0
 
 		$price_html .= $product->display_price( false );
-		
+
 		$price_html = apply_filters( 'mp_product_price_html', $price_html, $post_id, $label, $product->display_price( false ) );
 
 		if ( $echo )

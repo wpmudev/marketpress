@@ -917,12 +917,12 @@ class MP_Shortcode_Builder {
 					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
-			<tr>
+			<!--<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'A label to prepend to the price.', 'mp' ); ?></span></span> label</th>
 				<td>
 					<input type="text" name="label" data-default="Price:" value="Price:" />
 				</td>
-			</tr>
+			</tr>-->
 		</table>
 		<?php
 	}
@@ -941,13 +941,7 @@ class MP_Shortcode_Builder {
 				<td>
 					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
-			</tr>
-			<tr>
-				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'If there are variations, what to seperate the list of SKUs with.', 'mp' ); ?></span></span> seperator</th>
-				<td>
-					<input type="text" name="seperator" data-default="," value="," />
-				</td>
-			</tr>			
+			</tr>		
 		</table>
 		<?php
 	}
