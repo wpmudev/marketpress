@@ -1,5 +1,32 @@
 <?php
 
+if ( !function_exists( 'mp_store_link' ) ) :
+
+	/**
+	 * Echos the current store link.
+	 * @param bool $echo Optional, whether to echo. Defaults to true
+	 * @param bool $url Optional, whether to return a link or url. Defaults to show link.
+	 * @param string $link_text Optional, text to show in link.
+	 */
+	function mp_store_link( $echo = true, $url = false, $link_text = '' ) {
+		global $mp;
+		$link = get_permalink( mp_get_setting( 'pages->store' ) );
+
+		if ( !$url ) {
+			$text	 = ($link_text) ? $link_text : __( 'Visit Store', 'mp' );
+			$link	 = '<a href="' . $link . '" class="mp_store_link">' . $text . '</a>';
+		}
+
+		$link = apply_filters( 'mp_store_link', $link, $echo, $url, $link_text );
+
+		if ( $echo )
+			echo $link;
+		else
+			return $link;
+	}
+
+endif;
+
 /**
  * Display or retrieve the HTML dropdown list of product categories.
  *
