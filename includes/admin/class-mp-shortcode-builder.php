@@ -184,7 +184,7 @@ class MP_Shortcode_Builder {
 				<select name="shortcode">
 					<option value=""><?php _e( 'Select an Action', 'mp' ); ?></option>
 					<?php foreach ( $shortcodes as $shortcode => $label ) : ?>
-						<option value="<?php echo $shortcode; ?>"><?php echo '[' . $shortcode . '] ' . $label; ?></option>
+						<option value="<?php echo esc_attr( $shortcode ); ?>"><?php echo '[' . $shortcode . '] ' . $label; ?></option>
 					<?php endforeach; ?>
 				</select>
 
@@ -304,9 +304,15 @@ class MP_Shortcode_Builder {
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
 					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
-						<?php foreach ( $this->_product_cats as $cat ) : ?>
-							<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
-						<?php endforeach; ?>
+						<?php
+						foreach ( $this->_product_cats as $cat ) :
+							if ( isset( $cat ) ) {
+								?>
+								<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
+								<?php
+							}
+						endforeach;
+						?>
 					</select>
 				</td>
 			</tr>
@@ -314,9 +320,13 @@ class MP_Shortcode_Builder {
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Only include these categories.', 'mp' ); ?></span></span> include</th>
 				<td>
 					<select name="include" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
-						<?php foreach ( $this->_product_cats as $cat ) : ?>
-							<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
-						<?php endforeach; ?>
+						<?php
+						foreach ( $this->_product_cats as $cat ) :
+							if ( isset( $cat ) ) {
+								?>
+								<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
+							<?php }endforeach;
+						?>
 					</select>
 				</td>
 			</tr>
@@ -325,7 +335,7 @@ class MP_Shortcode_Builder {
 				<td>
 					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php foreach ( $this->_product_cats as $cat ) : ?>
-							<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
+							<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -458,7 +468,7 @@ class MP_Shortcode_Builder {
 
 						foreach ( $cats as $cat ) :
 							?>
-							<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
+							<option value="<?php echo esc_attr( $cat->term_id ); ?>"><?php echo $cat->name; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -475,7 +485,7 @@ class MP_Shortcode_Builder {
 
 						foreach ( $cats as $cat ) :
 							?>
-							<option value="<?php echo $cat->term_id; ?>"><?php echo $cat->name; ?></option>
+							<option value="<?php echo esc_attr( $cat->term_id ); ?>"><?php echo $cat->name; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -489,7 +499,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Set the text to show when no categories are listed.', 'mp' ); ?></span></span> show_option_none</th>
 				<td>
-					<input type="text" name="show_option_none" data-default="No Categories" value="No Categories" />
+					<input type="text" name="show_option_none" data-default="<?php echo esc_attr( __( 'No Categories', 'mp' ) ); ?>" value="<?php echo esc_attr( __( 'No Categories', 'mp' ) ); ?>" />
 				</td>
 			</tr>
 			<tr>
@@ -646,7 +656,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'How to relate the products', 'mp' ); ?></span></span> relate_by</th>
 				<td>
-					<select name="relate_by" data-default="<?php echo mp_get_setting( 'related_products->relate_by' ); ?>">
+					<select name="relate_by" data-default="<?php echo esc_attr( mp_get_setting( 'related_products->relate_by' ) ); ?>">
 						<?php
 						$data = array(
 							'both'		 => __( 'Category &amp; Tags', 'mp' ),
@@ -656,7 +666,7 @@ class MP_Shortcode_Builder {
 
 						foreach ( $data as $value => $label ) :
 							?>
-							<option value="<?php echo $value; ?>" <?php selected( $value, mp_get_setting( 'related_products->relate_by' ) ); ?>><?php echo $label; ?></option>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, mp_get_setting( 'related_products->relate_by' ) ); ?>><?php echo $label; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -664,13 +674,13 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'How many related items to show.', 'mp' ); ?></span></span> limit</th>
 				<td>
-					<input type="text" name="limit" data-default="<?php echo mp_get_setting( 'related_products->show_limit' ); ?>" value="<?php echo mp_get_setting( 'related_products->show_limit' ); ?>" />
+					<input type="text" name="limit" data-default="<?php echo esc_attr( mp_get_setting( 'related_products->show_limit' ) ); ?>" value="<?php echo esc_attr( mp_get_setting( 'related_products->show_limit' ) ); ?>" />
 				</td>
 			</tr>
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to display the items as a simple list or based on the list/grid view setting.', 'mp' ); ?></span></span> simple_list</th>
 				<td>
-					<input type="checkbox" name="simple_list" data-default="<?php echo mp_get_setting( 'related_products->simple_list' ); ?>" <?php checked( 1, mp_get_setting( 'related_products->simple_list' ) ); ?> />
+					<input type="checkbox" name="simple_list" data-default="<?php echo esc_attr( mp_get_setting( 'related_products->simple_list' ) ); ?>" <?php checked( 1, mp_get_setting( 'related_products->simple_list' ) ); ?> />
 				</td>
 			</tr>
 		</table>	
@@ -689,7 +699,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to paginate the product list. This is useful to only show a subset.', 'mp' ); ?></span></span> paginate</th>
 				<td>
-					<input type="checkbox" name="paginate" data-default="<?php echo mp_get_setting( 'paginate' ); ?>" value="1" <?php checked( 1, mp_get_setting( 'paginate' ) ); ?> />
+					<input type="checkbox" name="paginate" data-default="<?php echo esc_attr( mp_get_setting( 'paginate' ) ); ?>" value="1" <?php checked( 1, mp_get_setting( 'paginate' ) ); ?> />
 				</td>
 			</tr>
 			<tr>
@@ -701,13 +711,13 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'How many products to display in the product list if "paginate" is set to true.', 'mp' ); ?></span></span> per_page</th>
 				<td>
-					<input type="text" name="per_page" data-default="<?php echo mp_get_setting( 'per_page' ); ?>" value="<?php echo mp_get_setting( 'per_page' ); ?>" />
+					<input type="text" name="per_page" data-default="<?php echo esc_attr( mp_get_setting( 'per_page' ) ); ?>" value="<?php echo esc_attr( mp_get_setting( 'per_page' ) ); ?>" />
 				</td>
 			</tr>
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'What field to order products by.', 'mp' ); ?></span></span> order_by</th>
 				<td>
-					<select name="order_by" data-default="<?php echo mp_get_setting( 'order_by' ); ?>">
+					<select name="order_by" data-default="<?php echo esc_attr( mp_get_setting( 'order_by' ) ); ?>">
 						<?php
 						$data = array(
 							'title'	 => __( 'Product Name', 'mp' ),
@@ -721,7 +731,7 @@ class MP_Shortcode_Builder {
 
 						foreach ( $data as $value => $label ) :
 							?>
-							<option value="<?php echo $value; ?>" <?php selected( $value, mp_get_setting( 'order_by' ) ); ?>><?php echo $label; ?></option>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, mp_get_setting( 'order_by' ) ); ?>><?php echo $label; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -729,8 +739,8 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Direction to order products by.', 'mp' ); ?></span></span> order</th>
 				<td>
-					<label><input type="radio" name="order" data-default="<?php echo mp_get_setting( 'order' ); ?>" value="ASC" <?php checked( 'ASC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Ascending', 'mp' ); ?></label> &nbsp; &nbsp;
-					<label><input type="radio" name="order" data-default="<?php echo mp_get_setting( 'order' ); ?>" value="DESC" <?php checked( 'DESC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Descending', 'mp' ); ?></label>
+					<label><input type="radio" name="order" data-default="<?php echo esc_attr( mp_get_setting( 'order' ) ); ?>" value="ASC" <?php checked( 'ASC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Ascending', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="order" data-default="<?php echo esc_attr( mp_get_setting( 'order' ) ); ?>" value="DESC" <?php checked( 'DESC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Descending', 'mp' ); ?></label>
 				</td>
 			</tr>
 			<tr>
@@ -739,7 +749,7 @@ class MP_Shortcode_Builder {
 					<select name="category" data-default="" class="chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_cats as $term ) : ?>
-							<option value="<?php echo $term->slug; ?>"><?php echo $term->name; ?></option>
+							<option value="<?php echo esc_attr( isset($term->slug) ? $term->slug : '' ); ?>"><?php echo isset($term->name) ? $term->name : ''; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -750,7 +760,7 @@ class MP_Shortcode_Builder {
 					<select name="tag" data-default="" class="chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_tags as $term ) : ?>
-							<option value="<?php echo $term->slug; ?>"><?php echo $term->name; ?></option>
+							<option value="<?php echo esc_attr( isset($term->slug) ? $term->slug : '' ); ?>"><?php echo isset($term->name) ? $term->name : ''; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -758,13 +768,13 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'If checked, products will be displayed as a list - otherwise products will be displayed as a grid.', 'mp' ); ?></span></span> list_view</th>
 				<td>
-					<input type="checkbox" name="list_view" data-default="<?php echo ( mp_get_setting( 'list_view' ) == 'list' ) ? 1 : 0; ?>" value="1" <?php checked( 'list', mp_get_setting( 'list_view' ) ); ?> />
+					<input type="checkbox" name="list_view" data-default="<?php echo esc_attr( ( mp_get_setting( 'list_view' ) == 'list' ) ? 1 : 0  ); ?>" value="1" <?php checked( 'list', mp_get_setting( 'list_view' ) ); ?> />
 				</td>
 			</tr>
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether or not to show the product filters.', 'mp' ); ?></span></span> filters</th>
 				<td>
-					<input type="checkbox" name="filters" data-default="<?php echo mp_get_setting( 'show_filters' ); ?>" value="1" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> />
+					<input type="checkbox" name="filters" data-default="<?php echo esc_attr( mp_get_setting( 'show_filters' ) ); ?>" value="1" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> />
 				</td>
 			</tr>
 		</table>
@@ -856,10 +866,10 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Set the alignment of the image.', 'mp' ); ?></span></span> align</th>
 				<td>
-					<label><input type="radio" name="align" data-default="<?php echo mp_get_setting( 'image_alignment_single' ); ?>" value="alignnone" <?php checked( 'alignnone', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'None', 'mp' ); ?></label> &nbsp; &nbsp;
-					<label><input type="radio" name="align" data-default="<?php echo mp_get_setting( 'image_alignment_single' ); ?>" value="alignleft" <?php checked( 'alignleft', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'Left', 'mp' ); ?></label> &nbsp; &nbsp;
-					<label><input type="radio" name="align" data-default="<?php echo mp_get_setting( 'image_alignment_single' ); ?>" value="alignright" <?php checked( 'alignright', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'Right', 'mp' ); ?></label> &nbsp; &nbsp;
-					<label><input type="radio" name="align" data-default="<?php echo mp_get_setting( 'image_alignment_single' ); ?>" value="aligncenter" <?php checked( 'aligncenter', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'Center', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="align" data-default="<?php echo esc_attr( mp_get_setting( 'image_alignment_single' ) ); ?>" value="alignnone" <?php checked( 'alignnone', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'None', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="align" data-default="<?php echo esc_attr( mp_get_setting( 'image_alignment_single' ) ); ?>" value="alignleft" <?php checked( 'alignleft', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'Left', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="align" data-default="<?php echo esc_attr( mp_get_setting( 'image_alignment_single' ) ); ?>" value="alignright" <?php checked( 'alignright', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'Right', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="align" data-default="<?php echo esc_attr( mp_get_setting( 'image_alignment_single' ) ); ?>" value="aligncenter" <?php checked( 'aligncenter', mp_get_setting( 'image_alignment_single' ) ); ?> /> <?php _e( 'Center', 'mp' ); ?></label> &nbsp; &nbsp;
 				</td>
 			</tr>
 		</table>
