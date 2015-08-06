@@ -1,5 +1,31 @@
 <?php
 
+if ( !function_exists( 'mp_product_link' ) ) :
+
+	/**
+	 * Echos the current product list link.
+	 * @param bool $echo Optional, whether to echo. Defaults to true
+	 * @param bool $url Optional, whether to return a link or url. Defaults to show link.
+	 * @param string $link_text Optional, text to show in link.
+	 */
+	function mp_products_link( $echo = true, $url = false, $link_text = '' ) {
+		$link = get_permalink( mp_get_setting( 'pages->products' ) );
+
+		if ( !$url ) {
+			$text	 = ($link_text) ? $link_text : __( 'View Products', 'mp' );
+			$link	 = '<a href="' . $link . '" class="mp_products_link">' . $text . '</a>';
+		}
+
+		$link = apply_filters( 'mp_products_link', $link, $echo, $url, $link_text );
+
+		if ( $echo )
+			echo $link;
+		else
+			return $link;
+	}
+
+endif;
+
 if ( !function_exists( 'mp_store_link' ) ) :
 
 	/**
@@ -9,7 +35,6 @@ if ( !function_exists( 'mp_store_link' ) ) :
 	 * @param string $link_text Optional, text to show in link.
 	 */
 	function mp_store_link( $echo = true, $url = false, $link_text = '' ) {
-		global $mp;
 		$link = get_permalink( mp_get_setting( 'pages->store' ) );
 
 		if ( !$url ) {
