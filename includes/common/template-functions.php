@@ -1,5 +1,30 @@
 <?php
 
+if (!function_exists('mp_orderstatus_link')) :
+/**
+ * Echos the current order status link.
+ * @param bool $echo Optional, whether to echo. Defaults to true
+ * @param bool $url Optional, whether to return a link or url. Defaults to show link.
+ * @param string $link_text Optional, text to show in link.
+ * @param string $order Optional, the order id to append to the link
+ */
+function mp_orderstatus_link( $echo = true, $url = false, $link_text = '', $order_id = '' ) {
+		global $mp;
+		$link = get_permalink( mp_get_setting( 'pages->order_status' ) );
+		if (!$url) {
+				$text = ($link_text) ? $link_text : __('Check Order Status', 'mp');
+				$link = '<a href="' . $link . '" class="mp_orderstatus_link">' . $text . '</a>';
+		}
+
+		$link = apply_filters('mp_orderstatus_link', $link, $echo, $url, $link_text);
+
+		if ($echo)
+				echo $link;
+		else
+				return $link;
+}
+endif;
+
 if ( !function_exists( 'mp_product_link' ) ) :
 
 	/**
