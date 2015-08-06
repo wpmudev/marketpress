@@ -156,7 +156,7 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 		
 		$metabox->add_field( 'text', array(
 			'name'			 => $this->get_field_name( 'processing-fee' ),
-			'label'			 => array( 'text' => __( 'Pickup Fee', 'mp' ) . ' (' . $mp->format_currency() . ')' ),
+			'label'			 => array( 'text' => __( 'Pickup Fee', 'mp' ) . ' (' . mp_format_currency() . ')' ),
 			'validation'	 => array(
 				'required'	 => true,
 				'number'	 => true,

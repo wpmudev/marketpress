@@ -275,14 +275,14 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
         global $mp;
         
         if ($order->post_status == 'order_received') {
-          $content .= '<p>' . sprintf(__('Your payment via PayFast for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total'])) . '</p>';
+          $content .= '<p>' . sprintf(__('Your payment via PayFast for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), mp_format_currency('', $order->mp_payment_info['total'])) . '</p>';
             $statuses = $order->mp_payment_info['status'];
             krsort($statuses); //sort with latest status at the top
             $status = reset($statuses);
             $timestamp = key($statuses);
           $content .= '<p><strong>' . date(get_option('date_format') . ' - ' . get_option('time_format'), $timestamp) . ':</strong> ' . htmlentities($status) . '</p>';
         } else {
-          $content .= '<p>' . sprintf(__('Your payment via PayFast for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), $mp->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
+          $content .= '<p>' . sprintf(__('Your payment via PayFast for this order totaling %s is complete. The transaction number is <strong>%s</strong>.', 'mp'), mp_format_currency('', $order->mp_payment_info['total']), $order->mp_payment_info['transaction_id']) . '</p>';
         }
         return $content;
     }

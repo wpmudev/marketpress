@@ -169,7 +169,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 
 		$uid = cp_currentUser();
 		$cp_points = '<div id="mp_cp_points">' . __('Your current points: ', 'mp') . cp_getPoints ( cp_currentUser() ) . '</div>';
-    return $cp_points . $content . str_replace( 'TOTAL', mp()->format_currency($order->mp_payment_info['currency'], $order->mp_payment_info['total']), $settings['gateways']['cubepoints']['confirmation'] );
+    return $cp_points . $content . str_replace( 'TOTAL', mp_format_currency('', $order->mp_payment_info['total']), $settings['gateways']['cubepoints']['confirmation'] );
   }
 
   /**

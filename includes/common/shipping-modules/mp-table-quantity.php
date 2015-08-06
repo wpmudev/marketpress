@@ -68,13 +68,13 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
 					</tr>
 					<tr>
 						<td scope="row"><?php _e('If quantity is greater than:', 'mp'); ?> <input type="text" name="mp[shipping][table-quantity][0][minqty]" value="1" size="5" maxlength="10" disabled="disabled" />
-								<?php _e('Shipping Cost: ', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-quantity][0][shipping]" value="<?php echo ($settings['shipping']['table-quantity']['0']['shipping']) ? $mp->display_currency($settings['shipping']['table-quantity']['0']['shipping']) : '0.00'; ?>" size="5" maxlength="10" />
+								<?php _e('Shipping Cost: ', 'mp'); echo mp_format_currency(); ?><input on type="text" name="mp[shipping][table-quantity][0][shipping]" value="<?php echo ($settings['shipping']['table-quantity']['0']['shipping']) ? $mp->display_currency($settings['shipping']['table-quantity']['0']['shipping']) : '0.00'; ?>" size="5" maxlength="10" />
 						</td>
 					</tr>
 					<?php for ( $i = 1; $i < $settings['shipping']['table-quantity']['rowcount']; $i++ ) { ?>
 					<tr>
 						<td scope="row"><?php _e('If quantity is greater than:', 'mp'); ?> <input type="text" name="mp[shipping][table-quantity][<?php echo $i; ?>][minqty]" value="<?php echo ($settings['shipping']['table-quantity'][$i]['minqty']) ? $mp->display_currency($settings['shipping']['table-quantity'][$i]['minqty']) : ($settings['shipping']['table-quantity'][$i-1]['minqty'] + 1); ?>" size="5" maxlength="10" />
-								<?php _e('Shipping Cost: ', 'mp'); echo $mp->format_currency(); ?><input on type="text" name="mp[shipping][table-quantity][<?php echo $i; ?>][shipping]" value="<?php echo ($settings['shipping']['table-quantity'][$i]['shipping']) ? $mp->display_currency($settings['shipping']['table-quantity'][$i]['shipping']) : '0.00'; ?>" size="5" maxlength="10" />
+								<?php _e('Shipping Cost: ', 'mp'); echo mp_format_currency(); ?><input on type="text" name="mp[shipping][table-quantity][<?php echo $i; ?>][shipping]" value="<?php echo ($settings['shipping']['table-quantity'][$i]['shipping']) ? $mp->display_currency($settings['shipping']['table-quantity'][$i]['shipping']) : '0.00'; ?>" size="5" maxlength="10" />
 						</td>
 					</tr>
 					<?php } ?>

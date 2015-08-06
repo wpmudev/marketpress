@@ -505,7 +505,7 @@ class MP_Shipping_Handler {
 		?>
 		<p>
 			<label><?php _e( 'Extra Shipping Cost', 'mp' ); ?>:<br />
-		<?php echo $mp->format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo!empty( $shipping_meta[ 'extra_cost' ] ) ? $mp->display_currency( $shipping_meta[ 'extra_cost' ] ) : '0.00'; ?>" />
+		<?php echo mp_format_currency(); ?><input type="text" size="6" id="mp_extra_shipping_cost" name="mp_extra_shipping_cost" value="<?php echo!empty( $shipping_meta[ 'extra_cost' ] ) ? $mp->display_currency( $shipping_meta[ 'extra_cost' ] ) : '0.00'; ?>" />
 			</label>
 		</p>
 		<?php
