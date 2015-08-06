@@ -1,18 +1,5 @@
 <?php
 
-if ( !function_exists( 'mp_main_site_id' ) ) {
-
-	function mp_main_site_id() {
-		global $current_site;
-		if ( MP_ROOT_BLOG !== false ) {
-			return MP_ROOT_BLOG;
-		} else {
-			return $current_site->blog_id;
-		}
-	}
-
-}
-
 if ( !function_exists( 'mp_global_list_products' ) ) {
 
 	function mp_global_list_products( $args = array() ) {

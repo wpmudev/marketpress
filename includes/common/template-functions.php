@@ -1,5 +1,79 @@
 <?php
 
+/**
+ * Display or retrieve the HTML dropdown list of product categories.
+ *
+ * The list of arguments is below:
+ * 		 'show_option_all' (string) - Text to display for showing all categories.
+ * 		 'show_option_none' (string) - Text to display for showing no categories.
+ * 		 'orderby' (string) default is 'ID' - What column to use for ordering the
+ * categories.
+ * 		 'order' (string) default is 'ASC' - What direction to order categories.
+ * 		 'show_last_update' (bool|int) default is 0 - See {@link get_categories()}
+ * 		 'show_count' (bool|int) default is 0 - Whether to show how many posts are
+ * in the category.
+ * 		 'hide_empty' (bool|int) default is 1 - Whether to hide categories that
+ * don't have any posts attached to them.
+ * 		 'child_of' (int) default is 0 - See {@link get_categories()}.
+ * 		 'exclude' (string) - See {@link get_categories()}.
+ * 		 'depth' (int) - The max depth.
+ * 		 'tab_index' (int) - Tab index for select element.
+ * 		 'name' (string) - The name attribute value for select element.
+ * 		 'id' (string) - The ID attribute value for select element. Defaults to name if omitted.
+ * 		 'class' (string) - The class attribute value for select element.
+ * 		 'selected' (int) - Which category ID is selected.
+ * 		 'taxonomy' (string) - The name of the taxonomy to retrieve. Defaults to category.
+ *
+ * The 'hierarchical' argument, which is disabled by default, will override the
+ * depth argument, unless it is true. When the argument is false, it will
+ * display all of the categories. When it is enabled it will use the value in
+ * the 'depth' argument.
+ *
+ *
+ * @param bool $echo Optional. Whether or not to echo.
+ * @param string|array $args Optional. Override default arguments.
+ */
+if ( !function_exists( 'mp_dropdown_categories' ) ) {
+
+	function mp_dropdown_categories( $echo = true, $args = '' ) {
+		$args[ 'taxonomy' ]		 = 'product_category';
+		$args[ 'echo' ]			 = false;
+		$args[ 'id' ]			 = 'mp_category_dropdown';
+		$args[ 'value_field' ]	 = 'slug';
+
+		$dropdown = wp_dropdown_categories( $args );
+		$dropdown .= '<script type="text/javascript">
+	var dropdown = document.getElementById("mp_category_dropdown");
+	function onCatChange() {
+			location.href = "' . get_home_url() . '/?product_category="+dropdown.options[dropdown.selectedIndex].value;
+	}
+	dropdown.onchange = onCatChange;
+</script>';
+		//get_category_link
+
+		$dropdown = apply_filters( 'mp_dropdown_categories', $dropdown, $args );
+
+		if ( $echo )
+			echo $dropdown;
+		else
+			return $dropdown;
+	}
+
+}
+
+if ( !function_exists( 'mp_main_site_id' ) ) {
+
+	function mp_main_site_id() {
+		global $current_site;
+		if ( MP_ROOT_BLOG !== false ) {
+			return MP_ROOT_BLOG;
+		} else {
+			return $current_site->blog_id;
+		}
+	}
+
+}
+
 if ( !function_exists( 'mp_number_format' ) ) {
 
 	function mp_number_format( $amount ) {
@@ -86,7 +160,7 @@ if ( !function_exists( '_mp_order_status_overview' ) ) :
 	 * @return string
 	 */
 	function _mp_order_status_overview() {
-		$history		 = array_filter(mp_get_order_history());
+		$history		 = array_filter( mp_get_order_history() );
 		$page			 = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
 		$per_page_value	 = mp_get_setting( 'per_page_order_history' );
 		$per_page		 = isset( $per_page_value ) ? $per_page_value : get_option( 'posts_per_page' );
@@ -697,17 +771,17 @@ if ( !function_exists( 'mp_get_user_address' ) ) :
 			return false;
 		}
 
-		/*if ( !empty( $data ) ) {
-			foreach ( $data as $k => $v ) {
-				switch ( $k ) {
-					case 'shipping_option' :
-					case 'shipping_sub_option' :
-					case 'shipping_cost' :
-						unset( $data[ $k ] );
-						break;
-				}
-			}
-		}*/
+		/* if ( !empty( $data ) ) {
+		  foreach ( $data as $k => $v ) {
+		  switch ( $k ) {
+		  case 'shipping_option' :
+		  case 'shipping_sub_option' :
+		  case 'shipping_cost' :
+		  unset( $data[ $k ] );
+		  break;
+		  }
+		  }
+		  } */
 
 		return $data;
 	}

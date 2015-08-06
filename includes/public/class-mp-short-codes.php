@@ -59,6 +59,46 @@ class MP_Short_Codes {
 	}
 
 	/**
+	 * Enqueue frontend styles and scripts for shortcodes
+	 * Useful when a shortcode is called on non-MP pages
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function shortcodes_frontend_styles_scripts() {
+
+		wp_enqueue_script( 'lightslider', mp_plugin_url( 'ui/lightslider/js/lightslider.js' ), array( 'jquery' ), MP_VERSION );
+		wp_enqueue_style( 'lightslider', mp_plugin_url( 'ui/lightslider/css/lightslider.css' ), array(), MP_VERSION );
+// CSS
+		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
+		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
+		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
+
+// JS
+		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'select2' ), MP_VERSION, true );
+
+// Get product category links
+		$terms	 = get_terms( 'product_category' );
+		$cats	 = array();
+		foreach ( $terms as $term ) {
+			$cats[ $term->term_id ] = get_term_link( $term );
+		}
+
+// Localize js
+		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
+			'ajaxurl'		 => admin_url( 'admin-ajax.php' ),
+			'loadingImage'	 => mp_plugin_url( 'ui/images/loading.gif' ),
+			'productsURL'	 => mp_store_page_url( 'products', false ),
+			'productCats'	 => $cats,
+		) );
+	}
+
+	/**
 	 * Parse shortcode parameters
 	 *
 	 * @since 3.0
@@ -89,6 +129,7 @@ class MP_Short_Codes {
 	 * @access public
 	 */
 	public function mp_order_lookup_form_sc( $atts, $content = '' ) {
+		$this->shortcodes_frontend_styles_scripts();
 		return mp_order_lookup_form( array(
 			'echo'		 => false,
 			'content'	 => $content,
@@ -107,6 +148,7 @@ class MP_Short_Codes {
 	 * }
 	 */
 	public function mp_order_status_sc( $atts, $content = null ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ] = false;
 		return mp_order_status( $atts );
 	}
@@ -118,6 +160,7 @@ class MP_Short_Codes {
 	 * @access public
 	 */
 	public function mp_checkout_sc( $atts, $content = null ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ] = false;
 		return mp_checkout()->display( $atts );
 	}
@@ -129,6 +172,7 @@ class MP_Short_Codes {
 	 * @access public
 	 */
 	public function mp_cart_sc( $atts, $content = null ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ] = false;
 		return MP_Cart::get_instance()->display( $atts );
 	}
@@ -158,6 +202,7 @@ class MP_Short_Codes {
 	 *
 	 */
 	function mp_tag_cloud_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts = $this->_parse_atts( $atts );
 		return mp_tag_cloud( false, $atts );
 	}
@@ -191,6 +236,7 @@ class MP_Short_Codes {
 	 *
 	 */
 	function mp_list_categories_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts = $this->_parse_atts( $atts );
 		return mp_list_categories( false, $atts );
 	}
@@ -226,6 +272,7 @@ class MP_Short_Codes {
 	 *
 	 */
 	function mp_dropdown_categories_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts = $this->_parse_atts( $atts );
 		return mp_dropdown_categories( false, $atts );
 	}
@@ -236,6 +283,7 @@ class MP_Short_Codes {
 	 * @param int num Optional, max number of products to display. Defaults to 5
 	 */
 	function mp_popular_products_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'number' => 5,
 		), $atts );
@@ -256,6 +304,7 @@ class MP_Short_Codes {
 	 * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
 	 */
 	function mp_related_products_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ]	 = false;
 		$args			 = shortcode_atts( mp()->defaults[ 'related_products' ], $atts );
 		$args			 = $this->_parse_atts( $args );
@@ -277,6 +326,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_list_products_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ]	 = false;
 		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
 		$args			 = $this->_parse_atts( $args );
@@ -295,6 +345,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_product_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'product_id' => false,
 			'title'		 => true,
@@ -318,6 +369,7 @@ class MP_Short_Codes {
 	 * @param string $align An option alignment of the image
 	 */
 	function mp_product_image_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'context'	 => 'single',
 			'product_id' => NULL,
@@ -339,6 +391,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_buy_button_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'context'	 => 'single',
 			'product_id' => NULL
@@ -358,6 +411,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_product_price_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'label'		 => true,
 			'product_id' => NULL
@@ -378,6 +432,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_product_meta_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'context'	 => 'single',
 			'label'		 => true,
@@ -402,6 +457,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_product_sku_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'seperator'	 => false,
 			'product_id' => NULL
@@ -419,6 +475,7 @@ class MP_Short_Codes {
 	 * @param string link_text Optional, text to show in link.
 	 */
 	function mp_cart_link_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'url'		 => false,
 			'link_text'	 => '',
@@ -436,6 +493,7 @@ class MP_Short_Codes {
 	 * @param string link_text Optional, text to show in link.
 	 */
 	function mp_store_link_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'url'		 => false,
 			'link_text'	 => '',
@@ -453,6 +511,7 @@ class MP_Short_Codes {
 	 * @param string link_text Optional, text to show in link.
 	 */
 	function mp_products_link_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'url'		 => false,
 			'link_text'	 => '',
@@ -470,6 +529,7 @@ class MP_Short_Codes {
 	 * @param string link_text Optional, text to show in link.
 	 */
 	function mp_orderstatus_link_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'url'		 => false,
 			'link_text'	 => '',
@@ -486,6 +546,7 @@ class MP_Short_Codes {
 	 *
 	 */
 	function mp_store_navigation_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
 		//! TODO: add mp_store_navigation function
 		//return mp_store_navigation(false);
 	}

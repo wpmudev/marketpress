@@ -290,7 +290,7 @@ class MP_Public {
 			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
 		}
 	}
-
+	
 	/**
 	 * Enqueue frontend styles and scripts
 	 *
