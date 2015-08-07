@@ -10,6 +10,7 @@ String.prototype.escapeSelector = function() {
 var mp_cart = { };
 
 ( function( $ ) {
+
     /**
      * Refers to the validation args for the add-to-cart/buy-now form
      *
@@ -90,6 +91,44 @@ var mp_cart = { };
         } );
     };
 
+
+
+    mp_cart.initShortcodeProductListeners = function() {
+        $( '.mp-shortcode-wrap' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
+        $( '.mp-shortcode-wrap' ).find( '.mp_form-buy-product' )
+            .on( 'mp_cart/before_add_item', function( e, item, qty ) {
+                marketpress.loadingOverlay( 'show' );
+            } )
+            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+                marketpress.loadingOverlay( 'hide' );
+            } )
+            .validate( this.productFormValidationArgs );
+        /*$( '.mp-shortcode-wrap' ).on( 'submit', '.mp_form-buy-product', function( e ) {
+            e.preventDefault();
+            $( '.mp_ajax_loader' ).remove();
+
+            var $this = $( this );
+
+            $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
+                $this.addClass( 'invisible' );
+                //$( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
+                if ( $( ".mp_ajax_loader" ).length ) {
+
+                } else {
+                    $( mp_cart_i18n.ajax_loader ).insertAfter( $this ).show();
+                }
+                //marketpress.loadingOverlay( 'show' );
+            } );
+
+            $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+                $this.removeClass( 'invisible' );//.next( '.mp_ajax_loader' ).remove();
+                $( '.mp_ajax_loader' ).remove();
+                //marketpress.loadingOverlay( 'hide' );
+            } );
+
+            mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
+        } );*/
+    };
     /**
      * Initalize single product listeners
      *
@@ -131,6 +170,7 @@ var mp_cart = { };
     mp_cart.initCartListeners = function() {
         mp_cart.initProductListListeners();
         mp_cart.initSingleProductListeners();
+        mp_cart.initShortcodeProductListeners();
         mp_cart.initCartFormListeners();
         mp_cart.initProductOptionsLightbox();
     };

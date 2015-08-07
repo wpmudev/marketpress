@@ -58,14 +58,18 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_store_navigation', array( &$this, 'mp_store_navigation_sc' ) );
 	}
 
-	public function cart_needed(){
-		add_filter('mp_cart_needed_on_page', array( &$this, 'cart_needed_return' ));
+	public function shortcode_wrap($content){
+		return '<div class="mp-shortcode-wrap">'.$content.'</div>';
 	}
 	
-	public function cart_needed_return(){
+	public function cart_needed() {
+		add_filter( 'mp_cart_needed_on_page', array( &$this, 'cart_needed_return' ) );
+	}
+
+	public function cart_needed_return() {
 		return true;
 	}
-	
+
 	/**
 	 * Enqueue frontend styles and scripts for shortcodes
 	 * Useful when a shortcode is called on non-MP pages
@@ -351,6 +355,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_list_products_sc( $atts ) {
+		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ]	 = false;
 		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
@@ -426,7 +431,7 @@ class MP_Short_Codes {
 
 		extract( $atts );
 
-		return mp_buy_button( false, $context, $product_id );
+		return $this->shortcode_wrap(mp_buy_button( false, $context, $product_id ));
 	}
 
 	/*
@@ -475,7 +480,7 @@ class MP_Short_Codes {
 		$content .= mp_product_price( false, $product_id, $label );
 		$content .= mp_buy_button( false, $context, $product_id );
 		$content .= '</div>';
-		return $content;
+		return $this->shortcode_wrap($content);
 	}
 
 	/*
@@ -513,7 +518,7 @@ class MP_Short_Codes {
 
 		extract( $atts );
 
-		return mp_cart_link( false, $url, $link_text );
+		return $this->shortcode_wrap(mp_cart_link( false, $url, $link_text ));
 	}
 
 	/**
