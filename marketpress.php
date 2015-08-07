@@ -388,6 +388,7 @@ class Marketpress {
 
 	function load_widgets() {
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
+		require_once( $this->plugin_dir( 'includes/admin/widgets/categories.php' ) );
 	}
 
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
