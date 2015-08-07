@@ -1451,6 +1451,8 @@ class MP_Product {
 		 * @since 3.0
 		 * @param int $post_id
 		 */
+	
+		
 		$post_id = apply_filters( 'mp_product_image_id', $this->ID );
 
 		if ( $post_id != $this->ID ) {

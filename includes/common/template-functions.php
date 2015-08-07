@@ -1,5 +1,97 @@
 <?php
 
+if ( !function_exists( 'mp_get_product_class' ) ) :
+
+	/**
+	 * Retrieve the list of classes for the product as an array.
+	 *
+	 * The class names are add are many. If the post is a sticky, then the 'sticky'
+	 * class name. The class 'hentry' is always added to each post. For each
+	 * category, the class will be added with 'category-' with category slug is
+	 * added. The tags are the same way as the categories with 'tag-' before the tag
+	 * slug. All classes are passed through the filter, 'post_class' with the list
+	 * of classes, followed by $class parameter value, with the post ID as the last
+	 * parameter.
+	 *
+	 *
+	 * @param string|array $class One or more classes to add to the class list.
+	 * @param int $post_id The post_id for the product. Optional if in the loop
+	 * @return array Array of classes.
+	 */
+	function mp_get_product_class( $class = '', $post_id = null ) {
+		global $id;
+		$post_id = ( NULL === $post_id ) ? $id : $post_id;
+
+		$post = get_post( $post_id );
+
+		$classes = array();
+
+		if ( empty( $post ) )
+			return $classes;
+
+		$classes[]	 = 'product-' . $post->ID;
+		$classes[]	 = $post->post_type;
+		$classes[]	 = 'type-' . $post->post_type;
+
+		// sticky for Sticky Posts
+		if ( is_sticky( $post->ID ) )
+			$classes[] = 'sticky';
+
+		// hentry for hAtom compliace
+		$classes[] = 'hentry';
+
+		// Categories
+		$categories = get_the_terms( $post->ID, "product_category" );
+		foreach ( (array) $categories as $cat ) {
+			if ( empty( $cat->slug ) || !isset( $cat->cat_ID ) )
+				continue;
+			$classes[] = 'category-' . sanitize_html_class( $cat->slug, $cat->cat_ID );
+		}
+
+		// Tags
+		$tags = get_the_terms( $post->ID, "product_tag" );
+		foreach ( (array) $tags as $tag ) {
+			if ( empty( $tag->slug ) )
+				continue;
+			$classes[] = 'tag-' . sanitize_html_class( $tag->slug, $tag->term_id );
+		}
+
+		if ( !empty( $class ) ) {
+			if ( !is_array( $class ) )
+				$class	 = preg_split( '#\s+#', $class );
+			$classes = array_merge( $classes, $class );
+		}
+
+		$classes = array_map( 'esc_attr', $classes );
+
+		return apply_filters( 'mp_get_product_class', $classes, $class, $post_id );
+	}
+
+endif;
+
+if ( !function_exists( 'mp_product_class' ) ) :
+
+	/**
+	 * Display the classes for the product div.
+	 *
+	 * @param bool $echo Whether to echo class.
+	 * @param string|array $class One or more classes to add to the class list.
+	 * @param int $post_id The post_id for the product. Optional if in the loop
+	 */
+	function mp_product_class( $echo = true, $class = '', $post_id = null ) {
+		// Separates classes with a single space, collates classes for post DIV
+		$content = 'class="' . join( ' ', mp_get_product_class( $class, $post_id ) ) . '"';
+
+		$content = apply_filters( 'mp_product_class', $content, $class, $post_id );
+
+		if ( $echo )
+			echo $content;
+		else
+			return $content;
+	}
+
+endif;
+
 if ( !function_exists( 'mp_product_sku' ) ) :
 	/*
 	 * function mp_product_sku

@@ -409,8 +409,9 @@ class MP_Short_Codes {
 		$atts	 = $this->_parse_atts( $atts );
 
 		extract( $atts );
-
-		return mp_product_image( false, $context, $product_id, $size, $align );
+		$product = new MP_Product($product_id);
+		$image	 = $product->image( false, $context, $size, $align );
+		return $image;//mp_product_image( false, $context, $product_id, $size, $align );
 	}
 
 	/*

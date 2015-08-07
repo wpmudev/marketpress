@@ -382,6 +382,12 @@ class Marketpress {
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
 
 		add_filter( 'post_thumbnail_html', array( &$this, 'post_thumbnail_html5' ), 10, 5 );
+
+		$this->load_widgets();
+	}
+
+	function load_widgets() {
+		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
 	}
 
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
