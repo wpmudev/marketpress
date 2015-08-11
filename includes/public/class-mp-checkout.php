@@ -401,7 +401,7 @@ class MP_Checkout {
 		 * @param string The current html.
 		 * @param string Either billing or shipping.
 		 */
-		return apply_filters( 'mp_checkout/address_fields', $html, $type );
+		return apply_filters( 'mp_checkout/address_fields', $html, $type, $value_only );
 	}
 
 	/**
