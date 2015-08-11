@@ -394,6 +394,7 @@ class Marketpress {
 
 		//Multisite Widgets
 		require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
+		require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
 	}
 
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
