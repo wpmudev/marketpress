@@ -336,29 +336,39 @@ if ( !function_exists( 'mp_main_site_id' ) ) {
 
 if ( !function_exists( 'mp_number_format' ) ) {
 
-	function mp_number_format( $amount ) {
+	function mp_number_format( $amount, $decimal_place, $force_basic = false ) {
 
-		$decimals = apply_filters( 'mp_number_format_decimals', 2 );
+		if ( (int) ( $amount ) == (float) $amount ) {
+			$int_decimals = 0;
+		} else {
+			$int_decimals = 2;
+		}
 
-		switch ( mp_get_setting( 'price_format' ) ) {
-			case 'us' :
-				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ".", $thousands_sep	 = "," );
-				break;
+		$decimals = apply_filters( 'mp_number_format_decimals', $int_decimals );
 
-			case 'eu' :
-				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ",", $thousands_sep	 = "." );
-				break;
+		if ( $force_basic ) {
+			$formatted		 = number_format( $amount, $int_decimals, $dec_point		 = ".", $thousands_sep	 = "" );
+		} else {
+			switch ( mp_get_setting( 'price_format' ) ) {
+				case 'us' :
+					$formatted		 = number_format( $amount, $decimals, $dec_point		 = ".", $thousands_sep	 = "," );
+					break;
 
-			case 'frc' :
-				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ",", $thousands_sep	 = "&nbsp;" );
-				break;
+				case 'eu' :
+					$formatted		 = number_format( $amount, $decimals, $dec_point		 = ",", $thousands_sep	 = "." );
+					break;
 
-			case 'frd' :
-				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ".", $thousands_sep	 = "&nbsp;" );
-				break;
+				case 'frc' :
+					$formatted		 = number_format( $amount, $decimals, $dec_point		 = ",", $thousands_sep	 = "&nbsp;" );
+					break;
 
-			default ://us
-				$formatted		 = number_format( $amount, $decimals		 = 2, $dec_point		 = ".", $thousands_sep	 = "," );
+				case 'frd' :
+					$formatted		 = number_format( $amount, $decimals, $dec_point		 = ".", $thousands_sep	 = "&nbsp;" );
+					break;
+
+				default ://us
+					$formatted		 = number_format( $amount, $decimals, $dec_point		 = ".", $thousands_sep	 = "," );
+			}
 		}
 
 		return $formatted;
@@ -849,7 +859,8 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 	 * @return string
 	 */
 	function mp_format_currency( $currency = '', $amount = false, $price_class = '', $currency_class = '',
-							  $price_holder_arguments = array() ) {
+							  $price_holder_arguments = array(), $force_basic = false ) {
+
 		$currencies = mp()->currencies;
 
 		if ( empty( $currency ) ) {
@@ -880,7 +891,7 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 		$symbol = apply_filters( 'mp_format_currency_symbol', $symbol, $currency );
 
 //check decimal option
-		if ( $amount == (int) $amount ) {
+		if ( (int) ( $amount ) == (float) $amount ) {
 			$decimal_place = 0;
 		} else {
 			$decimal_place = 2;
@@ -888,6 +899,7 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 
 //handle negative numbers
 		$negative_symbol = '';
+
 		if ( $amount < 0 ) {
 			$negative_symbol = '-';
 			$amount			 = abs( $amount );
@@ -900,6 +912,7 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 // just in case so number_format_i18n doesn't throw an error if $amount is string instead of double
 			$amount							 = (float) $amount;
 			$price_holder_arguments_string	 = '';
+
 			if ( is_array( $price_holder_arguments ) && count( $price_holder_arguments ) > 0 ) {
 				foreach ( $price_holder_arguments as $argument_name => $argument_value ) {
 					$price_holder_arguments_string .= ' ' . esc_attr( $argument_name ) . '="' . esc_attr( $argument_value ) . '" ';
@@ -926,19 +939,19 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 
 			switch ( mp_get_setting( 'curr_symbol_position' ) ) {
 				case 1 :
-					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post;
+					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . $price_pre . mp_number_format( $amount, $decimal_place, $force_basic ) . $price_post;
 					break;
 
 				case 2 :
-					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . '&nbsp;' . $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post;
+					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . '&nbsp;' . $price_pre . mp_number_format( $amount, $decimal_place, $force_basic ) . $price_post;
 					break;
 
 				case 3 :
-					$formatted = $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post . $currency_pre . $symbol . $currency_post;
+					$formatted = $price_pre . mp_number_format( $amount, $decimal_place, $force_basic ) . $price_post . $currency_pre . $symbol . $currency_post;
 					break;
 
 				case 4 :
-					$formatted = $price_pre . mp_number_format( $amount, $decimal_place ) . $price_post . '&nbsp;' . $currency_pre . $symbol . $currency_post;
+					$formatted = $price_pre . mp_number_format( $amount, $decimal_place, $force_basic ) . $price_post . '&nbsp;' . $currency_pre . $symbol . $currency_post;
 					break;
 			}
 		}

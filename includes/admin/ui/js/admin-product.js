@@ -279,7 +279,7 @@ jQuery( document ).ready( function( $ ) {
                         }
 
                         var numeric_value = $( this ).val( );
-                        numeric_value = numeric_value.replace( ",", "" );
+                        numeric_value = numeric_value.replace( ",", "." );
                         if ( $.isNumeric( numeric_value ) ) {
                             elem.text( numeric_value );
                         } else {
@@ -789,6 +789,9 @@ jQuery( document ).ready( function( $ ) {
                 $( '.mp_ajax_response' ).html( response.status_message );
                 $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
                 $( '.mp_ajax_response' ).addClass( 'mp_ajax_response_' + response.status );
+                if ( response.status == 'success' ) {
+                    parent.jQuery.colorbox.close();
+                }
                 if ( $( '#new_variation' ).val( ) == 'yes' ) {
                     //window.opener.location.reload( false );
                     parent.location.reload( )

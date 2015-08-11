@@ -142,9 +142,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'Sales', 'mp' ); ?>
 							</th>
 
-																																																	<!--<th scope="col" id="variation_content" class="manage-column">
+																																																				<!--<th scope="col" id="variation_content" class="manage-column">
 							<?php _e( 'Variation Content', 'mp' ); ?>
-																																																	</th>-->
+																																																				</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -209,7 +209,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<td class="field_editable field_editable_price <?php echo esc_attr( $additional_class ); ?>" data-field-type="number">
 									<?php
 									$price = get_post_meta( $child->ID, 'regular_price', true );
-									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array( 'data-meta' => 'regular_price', 'data-default' => 0 ) );
+									echo mp_format_currency( '', $price, 'original_value field_subtype field_subtype_price', 'currency', array( 'data-meta' => 'regular_price', 'data-default' => 0 ), true );
 									?>
 									<input type="hidden" class="editable_value editable_value_price" value="" />
 								</td>
@@ -218,7 +218,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 									<?php
 									if ( $has_sale == 1 ) {
 										$sale_price_amount = get_post_meta( $child->ID, 'sale_price_amount', true );
-										echo mp_format_currency( '', $sale_price_amount, 'original_value field_subtype field_subtype_sale_price_amount', 'currency', array( 'data-meta' => 'sale_price_amount', 'data-default' => '-' ) );
+										echo mp_format_currency( '', $sale_price_amount, 'original_value field_subtype field_subtype_sale_price_amount', 'currency', array( 'data-meta' => 'sale_price_amount', 'data-default' => '-' ), true );
 									} else {
 										?>
 										<span class="original_value field_subtype field_subtype_sale_price_amount" data-meta="sale_price_amount" data-default="-">
