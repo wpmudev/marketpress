@@ -211,9 +211,6 @@ class MarketPress_Product_List extends WP_Widget {
 			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_thumbnail_placeholder' ); ?>" name="<?php echo $this->get_field_name( 'show_thumbnail_placeholder' ); ?>"<?php checked( $show_thumbnail_placeholder ); ?> />
 			<label for="<?php echo $this->get_field_id( 'show_thumbnail_placeholder' ); ?>"><?php _e( 'Show Thumbnail Placeholder image (if image is not set)', 'mp' ); ?></label><br />
 
-
-
-
 			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_button' ); ?>" name="<?php echo $this->get_field_name( 'show_button' ); ?>"<?php checked( $show_button ); ?> />
 			<label for="<?php echo $this->get_field_id( 'show_button' ); ?>"><?php _e( 'Show Buy Button', 'mp' ); ?></label></p>
 
