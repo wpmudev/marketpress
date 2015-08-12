@@ -34,9 +34,9 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
 			continue;
 
 		if ( $tag[ 'type' ] == 'product_category' )
-			$tag[ 'link' ] = get_home_url( mp_main_site_id(), $settings[ 'slugs' ][ 'marketplace' ] . '/' . $settings[ 'slugs' ][ 'categories' ] . '/' . $tag[ 'slug' ] . '/' );
+			$tag[ 'link' ]	 = get_home_url( mp_main_site_id(), $settings[ 'slugs' ][ 'marketplace' ] . '/' . $settings[ 'slugs' ][ 'categories' ] . '/' . $tag[ 'slug' ] . '/' );
 		else if ( $tag[ 'type' ] == 'product_tag' )
-			$tag[ 'link' ] = get_home_url( mp_main_site_id(), $settings[ 'slugs' ][ 'marketplace' ] . '/' . $settings[ 'slugs' ][ 'tags' ] . '/' . $tag[ 'slug' ] . '/' );
+			$tag[ 'link' ]	 = get_home_url( mp_main_site_id(), $settings[ 'slugs' ][ 'marketplace' ] . '/' . $settings[ 'slugs' ][ 'tags' ] . '/' . $tag[ 'slug' ] . '/' );
 
 		$sorted_tags[ $tag[ 'name' ] ] = $tag;
 	}
@@ -89,12 +89,11 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 
 	function mp_global_list_products( $args = array() ) {
 		// Init args
-		$func_args			 = func_get_args();
-		$args				 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
+		$func_args	 = func_get_args();
+		$args		 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
 		//$args[ 'nopaging' ]	 = false;
-
 // Init query params
-		$query = array(
+		$query		 = array(
 			'post_type'		 => 'mp_ms_indexer',
 			'post_status'	 => 'publish',
 		);
@@ -182,7 +181,9 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 		 * @param array $args The arguments passed to mp_list_products
 		 */
 		$content = apply_filters( 'mp_global_list_products', $content, $args );
+
 		wp_reset_postdata();
+
 		if ( $args[ 'echo' ] ) {
 			echo $content;
 		} else {
@@ -275,19 +276,26 @@ if ( !function_exists( '_mp_global_products_html' ) ) {
 			$size		 = mp_get_setting( 'list_img_size' );
 			$img_width	 = get_option( $size . '_size_w' ) . 'px';
 		}
+
 		$current_blog_id = get_current_blog_id();
+
 		foreach ( $custom_query->get_posts() as $post ) {
 			$blog_id	 = get_post_meta( $post->ID, 'blog_id', true );
 			$product_id	 = get_post_meta( $post->ID, 'post_id', true );
 			switch_to_blog( $blog_id );
-			$product	 = new MP_Product( $product_id );
+
+			$product = new MP_Product( $product_id );
+
 			if ( !is_object( $product ) || $product->exists() == false ) {
 				continue;
 			}
+
 			$align = null;
+
 			if ( 'list' == mp_get_setting( 'list_view' ) ) {
 				$align = mp_get_setting( 'image_alignment_list' );
 			}
+
 			$img = $product->image( false, 'list', null, $align );
 
 			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
