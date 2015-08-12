@@ -971,6 +971,8 @@ class MP_Product {
 			$show_thumbnail_placeholder = true;
 		}
 
+		unset($attributes[ 'show_thumbnail_placeholder' ]);
+		
 		if ( $intsize = intval( $size ) ) {
 			$size = array( $intsize, $intsize );
 		}

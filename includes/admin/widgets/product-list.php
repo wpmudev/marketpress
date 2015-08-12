@@ -76,7 +76,11 @@ class MarketPress_Product_List extends WP_Widget {
 				echo '<h3 class="mp_product_name entry-title" itemprop="name"><a href="' . get_permalink( $post->ID ) . '">' . esc_attr( $post->post_title ) . '</a></h3>';
 
 				if ( $instance[ 'show_thumbnail' ] ) {
-					echo $product->image_custom( false, $instance[ 'size' ], array( 'show_thumbnail_placeholder' => isset( $instance[ 'show_thumbnail_placeholder' ] ) ? $instance[ 'show_thumbnail_placeholder' ] : false ) );
+					echo '<a class="mp_product_img_link" href="' . get_the_permalink( $post->ID ) . '">' . $product->image_custom( false, $instance[ 'size' ], array(
+						'show_thumbnail_placeholder' => isset( $instance[ 'show_thumbnail_placeholder' ] ) ? $instance[ 'show_thumbnail_placeholder' ] : false,
+						'class'						 => 'mp_product_image_list'
+					)
+					) . '</a>';
 				}
 
 				if ( $instance[ 'show_excerpt' ] ) {
