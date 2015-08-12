@@ -88,6 +88,8 @@ function mp_global_tag_cloud( $echo = true, $limit = 45, $seperator = ' ', $incl
 if ( !function_exists( 'mp_global_list_products' ) ) {
 
 	function mp_global_list_products( $args = array() ) {
+
+		//var_dump($args);
 		// Init args
 		$func_args	 = func_get_args();
 		$args		 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
@@ -145,9 +147,13 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 		}
 
 		// The Query
-		$custom_query	 = new WP_Query( $query );
+		$custom_query = new WP_Query( $query );
+
+
+
 		// Get layout type
-		$layout_type	 = mp_get_setting( 'list_view' );
+		$layout_type = mp_get_setting( 'list_view' );
+
 		if ( !is_null( $args[ 'list_view' ] ) ) {
 			$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 		}
@@ -163,7 +169,7 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 		$content .= '<div id="mp_product_list" class="clearfix hfeed mp_' . $layout_type . '">';
 
 		if ( $last = $custom_query->post_count ) {
-			$content .= $layout_type == 'grid' ? _mp_global_products_html_grid( $custom_query ) : _mp_global_products_html_grid( $custom_query );
+			$content .= ($args[ 'version' ] == 3 ? _mp3_global_products_html_grid( $custom_query, $args ) : _mp_global_products_html_grid( $custom_query, $args ));
 		} else {
 			$content .= '<div id="mp_no_products">' . apply_filters( 'mp_global_product_list_none', __( 'No Products', 'mp' ) ) . '</div>';
 		}
@@ -255,15 +261,201 @@ if ( !function_exists( '_mp_global_products_html_list' ) ) {
 
 if ( !function_exists( '_mp_global_products_html_grid' ) ) {
 
-	function _mp_global_products_html_grid( $custom_query ) {
-		return _mp_global_products_html( 'grid', $custom_query );
+	function _mp_global_products_html_grid( $custom_query, $args = array() ) {
+		return _mp_global_products_html( 'grid', $custom_query, $args );
+	}
+
+}
+
+if ( !function_exists( '_mp3_global_products_html_grid' ) ) {
+
+	function _mp3_global_products_html_grid( $custom_query, $args = array() ) {
+		return _mp3_global_products_html( 'grid', $custom_query, $args );
+	}
+
+}
+
+if ( !function_exists( '_mp3_global_products_html' ) ) {
+
+	function _mp3_global_products_html( $view, WP_Query $custom_query, $args = array() ) {
+
+		$view	 = 'widget_list';
+		$html	 = '';
+		$per_row = (int) mp_get_setting( 'per_row' );
+		$width	 = round( 100 / $per_row, 1 ) . '%';
+		$column	 = 1;
+
+		//get image width
+		if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
+			$img_width = mp_get_setting( 'list_img_width' ) . 'px';
+		} else {
+			$size		 = mp_get_setting( 'list_img_size' );
+			$img_width	 = get_option( $size . '_size_w' ) . 'px';
+		}
+
+		$current_blog_id = get_current_blog_id();
+
+		if ( $custom_query->have_posts() ) {
+
+			$html .= '<div id="mp-widget-products-list" class="hfeed mp_widget_products mp_widget_products-list">';
+
+			foreach ( $custom_query->get_posts() as $post ) {
+				$blog_id	 = get_post_meta( $post->ID, 'blog_id', true );
+				$product_id	 = get_post_meta( $post->ID, 'post_id', true );
+
+				switch_to_blog( $blog_id );
+
+				$product = new MP_Product( $product_id );
+
+				if ( !is_object( $product ) || $product->exists() == false ) {
+					continue;
+				}
+
+				$align = null;
+
+				if ( 'list' == mp_get_setting( 'list_view' ) ) {
+					$align = mp_get_setting( 'image_alignment_list' );
+				}
+
+				$img = $product->image( false, 'list', null, $align );
+
+				$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_excerpt">' . $product->excerpt() . '</div>' : '';
+				$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
+
+				$pinit	 = $product->pinit_button( 'all_view' );
+				$fb		 = $product->facebook_like_button( 'all_view' );
+				$twitter = $product->twitter_button( 'all_view' );
+
+				$class	 = array();
+				$class[] = ( strlen( $img ) > 0 ) ? 'mp_thumbnail' : '';
+				$class[] = ( strlen( $excerpt ) > 0 ) ? 'mp_excerpt' : '';
+				$class[] = ( $product->has_variations() ) ? 'mp_price_variations' : '';
+				$class[] = ( $product->on_sale() ) ? 'mp_on_sale' : '';
+
+				if ( 'grid' == $view ) {
+					if ( $column == 1 ) {
+						$class[] = 'first';
+						$html .= '<div class="mp_grid_row">';
+						$column ++;
+					} elseif ( $column == $per_row ) {
+						$class[] = 'last';
+						$column	 = 1;
+					} else {
+						$column ++;
+					}
+				}
+
+				$class = array_filter( $class, create_function( '$s', 'return ( ! empty( $s ) );' ) );
+
+				$html .= '<div class="mp_product_item">';
+				$html .= '<div itemscope itemtype="http://schema.org/Product" ' . mp_product_class( false, array( 'mp_product' ), $post->ID ) . '>';
+				$html .= '<h3 class="mp_product_name entry-title" itemprop="name"><a href="' . get_permalink( $post->ID ) . '">' . $product->title( false ) . '</a></h3>';
+
+				if ( $args[ 'show_thumbnail' ] ) {
+					$html .= '<a class="mp_product_img_link" href="' . $product->url( false ) . '">' . $product->image_custom( false, $args[ 'thumbnail_size' ], array(
+						'show_thumbnail_placeholder' => isset( $args[ 'show_thumbnail_placeholder' ] ) ? $args[ 'show_thumbnail_placeholder' ] : false,
+						'class'						 => 'mp_product_image_list'
+					)
+					) . '</a>';
+				}
+
+				if ( $args[ 'text' ] == 'excerpt' ) {
+					$html .= '<div class="mp_product_excerpt">' . $product->excerpt( $post->post_excerpt, $post->post_content ) . '</div><!-- end mp_product_excerpt -->';
+				}
+
+				if ( $args[ 'text' ] == 'content' ) {
+					$html .= '<div class="mp_product_excerpt">' . $product->content() . '</div><!-- end mp_product_excerpt -->';
+				}
+
+				if ( $args[ 'show_price' ] ) {
+					$html .= '<div class="mp_product_meta">';
+
+					if ( $args[ 'show_price' ] ) {
+						$html .= $product->display_price( false );
+						$html .= $product->buy_button( false, 'list' );
+
+						/* if ( $args[ 'show_button' ] ) {
+						  $html .= $product->buy_button( false, 'list' );
+						  } */
+
+						/*$html .= '<div class="mp_price_buy">
+				  ' . $product->display_price( false ) . '
+				  <a class="mp-button mp_link_buynow" href="' . esc_url( $product->url( false ) ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>
+				  ' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
+				  </div>';*/
+					}
+					$html .= '</div><!-- mp_product_meta -->';
+				}
+
+				$html .= '<div style="display:none">
+							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
+							<span class="author vcard"><span class="fn">' . get_the_author_meta( 'display_name' ) . '</span></span>
+						</div>';
+				$html .= '</div><!-- end mp_product -->';
+				$html .= '</div><!-- end mp_product_item -->';
+
+				/* $html .= '
+				  <div class="mp_product_item">
+				  <div itemscope itemtype="http://schema.org/Product" class="hentry mp_one_tile ' . implode( $class, ' ' ) . ' ' . ( ( 'grid' == $view ) ? 'mp-grid-col-' . $per_row : '' ) . '">
+				  <div class="mp_one_product clearfix"><!--' . ( ( 'grid' == $view ) ? ' style="width:' . $img_width . '"' : '' ) . '-->
+				  <div class="mp_product_detail">
+				  ' . $img . '
+				  <div class="mp_product_content">
+				  <h3 class="mp_product_name entry-title" itemprop="name">
+				  <a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a>
+				  </h3>
+				  <div class="mp-social-shares">
+				  ' . $pinit . '
+				  ' . $fb . '
+				  ' . $twitter . '
+				  </div>
+				  ' . $mp_product_list_content . '
+				  </div>
+				  </div>
+
+				  <div class="mp_price_buy">
+				  ' . $product->display_price( false ) . '
+				  <a class="mp-button mp_link_buynow" href="' . esc_url( $product->url( false ) ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>
+				  ' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
+				  </div>
+
+				  <div style="display:none">
+				  <span class="entry-title">' . $product->title( false ) . '</span> was last modified:
+				  <time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
+				  <span class="author vcard"><span class="fn">' . get_the_author_meta( 'display_name' ) . '</span></span>
+				  </div>
+				  </div>
+				  </div>
+				  </div>'; */
+
+				//restore back to root
+				switch_to_blog( 1 );
+			}
+			$html .= '</div><!-- end mp-widget-products-list -->';
+		} else {
+			$html .= '<div class="mp_widget_empty">' . __( 'No Products', 'mp' ) . '</div><!-- end mp_widget_empty -->';
+		}
+
+		switch_to_blog( $current_blog_id );
+
+
+		/**
+		 * Filter the product list html content
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $html .
+		 * @param WP_Query $custom_query .
+		 */
+		return apply_filters( "_mp_products_html_{$view}", $html, $custom_query );
 	}
 
 }
 
 if ( !function_exists( '_mp_global_products_html' ) ) {
 
-	function _mp_global_products_html( $view, WP_Query $custom_query ) {
+	function _mp_global_products_html( $view, WP_Query $custom_query, $args = array() ) {
+
 		$html	 = '';
 		$per_row = (int) mp_get_setting( 'per_row' );
 		$width	 = round( 100 / $per_row, 1 ) . '%';
@@ -453,4 +645,4 @@ if ( !function_exists( '_mp_global_tags_cloud' ) ) {
 		return $html;
 	}
 
-}
+}	
