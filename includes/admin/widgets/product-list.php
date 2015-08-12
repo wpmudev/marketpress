@@ -4,7 +4,7 @@
 class MarketPress_Product_List extends WP_Widget {
 
 	function MarketPress_Product_List() {
-		$widget_ops = array( 'classname' => 'mp_product_list_widget', 'description' => __( 'Shows a customizable list of products from your MarketPress store.', 'mp' ) );
+		$widget_ops = array( 'classname' => 'mp_widget mp_product_list_widget', 'description' => __( 'Shows a customizable list of products from your MarketPress store.', 'mp' ) );
 		$this->WP_Widget( 'mp_product_list_widget', __( 'Product List', 'mp' ), $widget_ops );
 	}
 
@@ -23,7 +23,7 @@ class MarketPress_Product_List extends WP_Widget {
 		};
 
 		if ( !empty( $instance[ 'custom_text' ] ) )
-			echo '<div id="custom_text">' . $instance[ 'custom_text' ] . '</div>';
+			echo '<div class="mp_widget_custom-text">' . $instance[ 'custom_text' ] . '</div>';
 
 		/* setup our custom query */
 
@@ -67,19 +67,18 @@ class MarketPress_Product_List extends WP_Widget {
 
 		//do we have products?
 		if ( $custom_query->have_posts() ) {
-			echo '<ul id="mp_product_list" class="hfeed">';
+			echo '<div id="mp-widget-products-list" class="hfeed mp_widget_products mp_widget_products-list">';
 			while ( $custom_query->have_posts() ) : $custom_query->the_post();
 
 				$product = new MP_Product( $post->ID );
-				echo '<li itemscope itemtype="http://schema.org/Product" ' . mp_product_class( false, array( 'mp_product', 'hentry' ), $post->ID ) . '>';
+				echo '<div class="mp_product_item">';
+				echo '<div itemscope itemtype="http://schema.org/Product" ' . mp_product_class( false, array( 'mp_product' ), $post->ID ) . '>';
 				echo '<h3 class="mp_product_name entry-title" itemprop="name"><a href="' . get_permalink( $post->ID ) . '">' . esc_attr( $post->post_title ) . '</a></h3>';
 				if ( $instance[ 'show_thumbnail' ] )
 					$product->image( true, 'widget', $post->ID, $instance[ 'size' ] );
 
-				echo '<div class="entry-content" style="margin:0;padding:0;width:auto;">';
-
 				if ( $instance[ 'show_excerpt' ] )
-					echo '<div class="mp_product_content">' . $product->excerpt( $post->post_excerpt, $post->post_content ) . '</div>';
+					echo '<div class="mp_product_excerpt">' . $product->excerpt( $post->post_excerpt, $post->post_content ) . '</div><!-- end mp_product_excerpt -->';
 
 				if ( $instance[ 'show_price' ] || $instance[ 'show_button' ] ) {
 					echo '<div class="mp_product_meta">';
@@ -90,23 +89,23 @@ class MarketPress_Product_List extends WP_Widget {
 					if ( $instance[ 'show_button' ] )
 						echo mp_buy_button( false, 'list', $post->ID );
 
-					echo '</div>';
+					echo '</div><!-- mp_product_meta -->';
 				}
 
-				echo '</div>';
 				echo '<div style="display:none">
 							<time class="updated">' . get_the_time( 'Y-m-d\TG:i' ) . '</time> by
 							<span class="author vcard"><span class="fn">' . get_the_author_meta( 'display_name' ) . '</span></span>
 						</div>';
-				echo '</li>';
+				echo '</div><!-- end mp_product -->';
+				echo '</div><!-- end mp_product_item -->';
 			endwhile;
 			wp_reset_postdata();
-			echo '</ul>';
+			echo '</div><!-- end mp-widget-products-list -->';
 		} else {
 			?>
-			<div class="widget-error">
+			<div class="mp_widget_empty">
 				<?php _e( 'No Products', 'mp' ) ?>
-			</div>
+			</div><!-- end mp_widget_empty -->
 			<?php
 		}
 

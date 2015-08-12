@@ -9,7 +9,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 	class MarketPress_Global_Product_List extends WP_Widget {
 
 		function MarketPress_Global_Product_List() {
-			$widget_ops = array( 'classname' => 'mp_global_product_list_widget', 'description' => __( 'Shows a customizable global list of products from network MarketPress stores.', 'mp' ) );
+			$widget_ops = array( 'classname' => 'mp_widget mp_global_product_list_widget', 'description' => __( 'Shows a customizable global list of products from network MarketPress stores.', 'mp' ) );
 			$this->WP_Widget( 'mp_global_product_list_widget', __( 'Global Product List', 'mp' ), $widget_ops );
 		}
 
@@ -26,8 +26,8 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 				echo $before_title . apply_filters( 'widget_title', $title ) . $after_title;
 			};
 
-			if ( !empty( $instance[ 'custom_text' ] ) )
-				echo '<div id="custom_text">' . $instance[ 'custom_text' ] . '</div>';
+			if ( !empty( $instance[ 'custom-_text' ] ) )
+				echo '<div class="mp_widget_custom_text">' . $instance[ 'custom_text' ] . '</div>';
 
 			$instance[ 'as_list' ]	 = true;
 			$instance[ 'context' ]	 = 'widget';

@@ -4,7 +4,7 @@
 class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 
 	function MarketPress_Tag_Cloud_Widget() {
-		$widget_ops = array( 'classname' => 'mp_tag_cloud_widget', 'description' => __( "Your most used product tags in cloud format from your MarketPress store." ) );
+		$widget_ops = array( 'classname' => 'mp_widget mp_tag_cloud_widget', 'description' => __( "Your most used product tags in cloud format from your MarketPress store." ) );
 		$this->WP_Widget( 'mp_tag_cloud_widget', __( 'Product Tag Cloud', 'mp' ), $widget_ops );
 	}
 
@@ -27,7 +27,7 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 		if ( $title )
 			echo $before_title . $title . $after_title;
 
-		echo '<div>';
+		echo '<div class="mp_widget_tags">';
 
 		wp_tag_cloud( apply_filters( 'widget_tag_cloud_args', array( 'taxonomy' => $current_taxonomy ) ) );
 
