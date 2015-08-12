@@ -91,7 +91,7 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 		// Init args
 		$func_args			 = func_get_args();
 		$args				 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
-		$args[ 'nopaging' ]	 = false;
+		//$args[ 'nopaging' ]	 = false;
 
 // Init query params
 		$query = array(
