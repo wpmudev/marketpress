@@ -74,20 +74,25 @@ class MarketPress_Product_List extends WP_Widget {
 				echo '<div class="mp_product_item">';
 				echo '<div itemscope itemtype="http://schema.org/Product" ' . mp_product_class( false, array( 'mp_product' ), $post->ID ) . '>';
 				echo '<h3 class="mp_product_name entry-title" itemprop="name"><a href="' . get_permalink( $post->ID ) . '">' . esc_attr( $post->post_title ) . '</a></h3>';
-				if ( $instance[ 'show_thumbnail' ] )
-					$product->image( true, 'widget', $post->ID, $instance[ 'size' ] );
 
-				if ( $instance[ 'show_excerpt' ] )
+				if ( $instance[ 'show_thumbnail' ] ) {
+					echo $product->image_custom( false, $instance[ 'size' ], array( 'show_thumbnail_placeholder' => isset( $instance[ 'show_thumbnail_placeholder' ] ) ? $instance[ 'show_thumbnail_placeholder' ] : false ) );
+				}
+
+				if ( $instance[ 'show_excerpt' ] ) {
 					echo '<div class="mp_product_excerpt">' . $product->excerpt( $post->post_excerpt, $post->post_content ) . '</div><!-- end mp_product_excerpt -->';
+				}
 
 				if ( $instance[ 'show_price' ] || $instance[ 'show_button' ] ) {
 					echo '<div class="mp_product_meta">';
 
-					if ( $instance[ 'show_price' ] )
-						echo mp_product_price( false, $post->ID, '' );
+					if ( $instance[ 'show_price' ] ) {
+						echo $product->display_price();
+					}
 
-					if ( $instance[ 'show_button' ] )
-						echo mp_buy_button( false, 'list', $post->ID );
+					if ( $instance[ 'show_button' ] ) {
+						echo $product->buy_button( false, 'list' );
+					}
 
 					echo '</div><!-- mp_product_meta -->';
 				}
@@ -99,7 +104,9 @@ class MarketPress_Product_List extends WP_Widget {
 				echo '</div><!-- end mp_product -->';
 				echo '</div><!-- end mp_product_item -->';
 			endwhile;
+
 			wp_reset_postdata();
+
 			echo '</div><!-- end mp-widget-products-list -->';
 		} else {
 			?>
@@ -123,11 +130,12 @@ class MarketPress_Product_List extends WP_Widget {
 		$instance[ 'taxonomy_type' ] = $new_instance[ 'taxonomy_type' ];
 		$instance[ 'taxonomy' ]		 = ($new_instance[ 'taxonomy_type' ]) ? sanitize_title( $new_instance[ 'taxonomy' ] ) : '';
 
-		$instance[ 'show_thumbnail' ]	 = !empty( $new_instance[ 'show_thumbnail' ] ) ? 1 : 0;
-		$instance[ 'size' ]				 = !empty( $new_instance[ 'size' ] ) ? intval( $new_instance[ 'size' ] ) : 50;
-		$instance[ 'show_excerpt' ]		 = !empty( $new_instance[ 'show_excerpt' ] ) ? 1 : 0;
-		$instance[ 'show_price' ]		 = !empty( $new_instance[ 'show_price' ] ) ? 1 : 0;
-		$instance[ 'show_button' ]		 = !empty( $new_instance[ 'show_button' ] ) ? 1 : 0;
+		$instance[ 'show_thumbnail' ]				 = !empty( $new_instance[ 'show_thumbnail' ] ) ? 1 : 0;
+		$instance[ 'size' ]							 = !empty( $new_instance[ 'size' ] ) ? intval( $new_instance[ 'size' ] ) : 50;
+		$instance[ 'show_excerpt' ]					 = !empty( $new_instance[ 'show_excerpt' ] ) ? 1 : 0;
+		$instance[ 'show_price' ]					 = !empty( $new_instance[ 'show_price' ] ) ? 1 : 0;
+		$instance[ 'show_thumbnail_placeholder' ]	 = !empty( $new_instance[ 'show_thumbnail_placeholder' ] ) ? true : false;
+		$instance[ 'show_button' ]					 = !empty( $new_instance[ 'show_button' ] ) ? 1 : 0;
 
 		$instance[ 'only_store_pages' ] = !empty( $new_instance[ 'only_store_pages' ] ) ? 1 : 0;
 
@@ -149,7 +157,10 @@ class MarketPress_Product_List extends WP_Widget {
 		$size			 = !empty( $instance[ 'size' ] ) ? intval( $instance[ 'size' ] ) : 50;
 		$show_excerpt	 = isset( $instance[ 'show_excerpt' ] ) ? (bool) $instance[ 'show_excerpt' ] : false;
 		$show_price		 = isset( $instance[ 'show_price' ] ) ? (bool) $instance[ 'show_price' ] : false;
-		$show_button	 = isset( $instance[ 'show_button' ] ) ? (bool) $instance[ 'show_button' ] : false;
+
+		$show_thumbnail_placeholder = isset( $instance[ 'show_thumbnail_placeholder' ] ) ? (bool) $instance[ 'show_thumbnail_placeholder' ] : false;
+
+		$show_button = isset( $instance[ 'show_button' ] ) ? (bool) $instance[ 'show_button' ] : false;
 
 		$only_store_pages = isset( $instance[ 'only_store_pages' ] ) ? (bool) $instance[ 'only_store_pages' ] : false;
 		?>
@@ -193,8 +204,16 @@ class MarketPress_Product_List extends WP_Widget {
 
 		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_excerpt' ); ?>" name="<?php echo $this->get_field_name( 'show_excerpt' ); ?>"<?php checked( $show_excerpt ); ?> />
 			<label for="<?php echo $this->get_field_id( 'show_excerpt' ); ?>"><?php _e( 'Show Excerpt', 'mp' ); ?></label><br />
+
 			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_price' ); ?>" name="<?php echo $this->get_field_name( 'show_price' ); ?>"<?php checked( $show_price ); ?> />
 			<label for="<?php echo $this->get_field_id( 'show_price' ); ?>"><?php _e( 'Show Price', 'mp' ); ?></label><br />
+
+			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_thumbnail_placeholder' ); ?>" name="<?php echo $this->get_field_name( 'show_thumbnail_placeholder' ); ?>"<?php checked( $show_thumbnail_placeholder ); ?> />
+			<label for="<?php echo $this->get_field_id( 'show_thumbnail_placeholder' ); ?>"><?php _e( 'Show Thumbnail Placeholder image (if image is not set)', 'mp' ); ?></label><br />
+
+
+
+
 			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_button' ); ?>" name="<?php echo $this->get_field_name( 'show_button' ); ?>"<?php checked( $show_button ); ?> />
 			<label for="<?php echo $this->get_field_id( 'show_button' ); ?>"><?php _e( 'Show Buy Button', 'mp' ); ?></label></p>
 

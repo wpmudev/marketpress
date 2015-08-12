@@ -114,149 +114,149 @@ class MP_Product {
 		$product_id	 = mp_get_get_value( 'product_id' );
 		$product	 = new MP_Product( $product_id );
 
-		/*$image	 = 'single';
-		$title	 = true;
-		$content = 'full';
-		$meta	 = true;
+		/* $image	 = 'single';
+		  $title	 = true;
+		  $content = 'full';
+		  $meta	 = true;
 
-		if ( !$product->exists() ) {
-			die( __( 'The product specified could not be found', 'mp' ) );
-		}
+		  if ( !$product->exists() ) {
+		  die( __( 'The product specified could not be found', 'mp' ) );
+		  }
 
-		$variation = false;
+		  $variation = false;
 
-		if ( $variation_id = $product->ID ) {
-			$variation = new MP_Product( $variation_id );
-			if ( !$variation->exists() ) {
-				$variation = false;
-			}
-		}
+		  if ( $variation_id = $product->ID ) {
+		  $variation = new MP_Product( $variation_id );
+		  if ( !$variation->exists() ) {
+		  $variation = false;
+		  }
+		  }
 
-		$has_image = false;
-		if ( !$product->has_variations() ) {
-			$values = get_post_meta( $product->ID, 'mp_product_images', true );
-			if ( $values ) {
-				$has_image = true;
-			}
-		} else {
-			$post_thumbnail_id = get_post_thumbnail_id( $product->ID );
-			if ( $post_thumbnail_id ) {
-				$has_image = true;
-			}
-		}
+		  $has_image = false;
+		  if ( !$product->has_variations() ) {
+		  $values = get_post_meta( $product->ID, 'mp_product_images', true );
+		  if ( $values ) {
+		  $has_image = true;
+		  }
+		  } else {
+		  $post_thumbnail_id = get_post_thumbnail_id( $product->ID );
+		  if ( $post_thumbnail_id ) {
+		  $has_image = true;
+		  }
+		  }
 
-		$image_alignment = mp_get_setting( 'image_alignment_single' );
-		?>
-		<!-- MP Product Lightbox -->
-		<?php
-		$return			 = '
-			<!-- MP Single Product -->
-			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product mp_single_product' . ($has_image ? ' mp_single_product-has-image mp_single_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? ' mp_single_product-has-variations' : '') . '">';
+		  $image_alignment = mp_get_setting( 'image_alignment_single' );
+		  ?>
+		  <!-- MP Product Lightbox -->
+		  <?php
+		  $return			 = '
+		  <!-- MP Single Product -->
+		  <section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
+		  <div class="mp_product mp_single_product' . ($has_image ? ' mp_single_product-has-image mp_single_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? ' mp_single_product-has-variations' : '') . '">';
 
-		$content = 'full';
-		$values	 = get_post_meta( $product->ID, 'mp_product_images', true );
+		  $content = 'full';
+		  $values	 = get_post_meta( $product->ID, 'mp_product_images', true );
 
-		if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
-			$size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
-		} else {
-			$size = mp_get_setting( 'list_img_size' );
-		}
+		  if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
+		  $size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
+		  } else {
+		  $size = mp_get_setting( 'list_img_size' );
+		  }
 
-		if ( !$product->has_variations() ) {
+		  if ( !$product->has_variations() ) {
 
 
-			if ( $values ) {
-				$return .= '<div class="mp_single_product_images">';
+		  if ( $values ) {
+		  $return .= '<div class="mp_single_product_images">';
 
-				$return .= "<script>
-								jQuery(document).ready(function() {
-									jQuery('#mp-product-gallery').lightSlider({
-												gallery:true,
-												item:1,
-												loop:true,
-												thumbItem:5,
-												slideMargin:0,
-												enableDrag: true,
-												currentPagerPosition:'left',
-												onSliderLoad: function(el) {
-												el.lightGallery({
-												selector: '#mp-product-gallery .lslide'
-											});
-										}
-									});
-								});
-								</script>";
+		  $return .= "<script>
+		  jQuery(document).ready(function() {
+		  jQuery('#mp-product-gallery').lightSlider({
+		  gallery:true,
+		  item:1,
+		  loop:true,
+		  thumbItem:5,
+		  slideMargin:0,
+		  enableDrag: true,
+		  currentPagerPosition:'left',
+		  onSliderLoad: function(el) {
+		  el.lightGallery({
+		  selector: '#mp-product-gallery .lslide'
+		  });
+		  }
+		  });
+		  });
+		  </script>";
 
-				$return .= '<ul id="mp-product-gallery" class="mp_product_gallery">';
+		  $return .= '<ul id="mp-product-gallery" class="mp_product_gallery">';
 
-				$values = explode( ',', $values );
+		  $values = explode( ',', $values );
 
-				foreach ( $values as $value ) {
-					$img_url = wp_get_attachment_image_src( $value, $size );
-					$return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
-				}
+		  foreach ( $values as $value ) {
+		  $img_url = wp_get_attachment_image_src( $value, $size );
+		  $return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
+		  }
 
-				$return .= '</ul><!-- end mp_product_gallery -->';
+		  $return .= '</ul><!-- end mp_product_gallery -->';
 
-				$return .= '</div><!-- end mp_single_product_images -->';
-			}
-		} else {
-			$return .= '<div class="mp_single_product_images">';
-			$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
-			$return .= '</div><!-- end mp_single_product_images -->';
-		}
+		  $return .= '</div><!-- end mp_single_product_images -->';
+		  }
+		  } else {
+		  $return .= '<div class="mp_single_product_images">';
+		  $return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
+		  $return .= '</div><!-- end mp_single_product_images -->';
+		  }
 
-		$return .= '<div class="mp_single_product_details">';
+		  $return .= '<div class="mp_single_product_details">';
 
-		$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
+		  $return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 
-		$return .= '<div class="mp_product_meta">';
+		  $return .= '<div class="mp_product_meta">';
 
-		if ( $title ) {
-			$return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-		}
+		  if ( $title ) {
+		  $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+		  }
 
-		// Price
-		$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
+		  // Price
+		  $return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
 
-		// Excerpt
-		if ( !$variation ) {
-			$return .= '<div class="mp_product_excerpt">';
-			$return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
-			$return .= '</div><!-- end mp_product_excerpt -->';
-		} else {
-			$return .= '<div class="mp_product_excerpt mp_product_excerpt-variation">';
-			$return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
-			$return .= '</div><!-- end mp_product_excerpt -->';
-		}
+		  // Excerpt
+		  if ( !$variation ) {
+		  $return .= '<div class="mp_product_excerpt">';
+		  $return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
+		  $return .= '</div><!-- end mp_product_excerpt -->';
+		  } else {
+		  $return .= '<div class="mp_product_excerpt mp_product_excerpt-variation">';
+		  $return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
+		  $return .= '</div><!-- end mp_product_excerpt -->';
+		  }
 
-		$return .= '</div><!-- end mp_product_meta-->';
+		  $return .= '</div><!-- end mp_product_meta-->';
 
-		// Callout
-		$return .= '<div class="mp_product_callout">';
+		  // Callout
+		  $return .= '<div class="mp_product_callout">';
 
-		// Button
-		$selected_atts = array();
+		  // Button
+		  $selected_atts = array();
 
-		if ( $variation ) {
-			$atts = $variation->get_attributes();
-			foreach ( $atts as $slug => $att ) {
-				$selected_atts[ $slug ] = key( $att[ 'terms' ] );
-			}
-		}
+		  if ( $variation ) {
+		  $atts = $variation->get_attributes();
+		  foreach ( $atts as $slug => $att ) {
+		  $selected_atts[ $slug ] = key( $att[ 'terms' ] );
+		  }
+		  }
 
-		$return .= $product->buy_button( false, 'single', $selected_atts );
+		  $return .= $product->buy_button( false, 'single', $selected_atts );
 
-		$return .= '</div><!-- end mp_product_callout-->';
+		  $return .= '</div><!-- end mp_product_callout-->';
 
-		$return .= '</div><!-- end mp_single_product_details-->';
+		  $return .= '</div><!-- end mp_single_product_details-->';
 
-		$return .= '
-</div><!-- end mp_product/mp_single_product -->	
-</section><!-- end mp-single-product -->';
-		echo $return;
-		 
+		  $return .= '
+		  </div><!-- end mp_product/mp_single_product -->
+		  </section><!-- end mp-single-product -->';
+		  echo $return;
+
 		 */
 		?>
 		<?php if ( 0 == 0 ) { ?>
@@ -965,6 +965,12 @@ class MP_Product {
 	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
 		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id( $this->get_variation()->ID ) : get_post_thumbnail_id( $this->ID );
 
+		if ( isset( $attributes ) && isset( $attributes[ 'show_thumbnail_placeholder' ] ) ) {
+			$show_thumbnail_placeholder = (bool) $attributes[ 'show_thumbnail_placeholder' ];
+		} else {
+			$show_thumbnail_placeholder = true;
+		}
+
 		if ( $intsize = intval( $size ) ) {
 			$size = array( $intsize, $intsize );
 		}
@@ -983,8 +989,11 @@ class MP_Product {
 				'height' => $data[ 2 ]
 			), $attributes );
 		}
-
-		$img = '<img' . mp_array_to_attributes( $attributes ) . '>';
+		if ( !empty( $thumb_id ) || $show_thumbnail_placeholder ) {
+			$img = '<img' . mp_array_to_attributes( $attributes ) . '>';
+		} else {
+			$img = '';
+		}
 
 		if ( $echo ) {
 			echo $img;
@@ -1451,8 +1460,6 @@ class MP_Product {
 		 * @since 3.0
 		 * @param int $post_id
 		 */
-	
-		
 		$post_id = apply_filters( 'mp_product_image_id', $this->ID );
 
 		if ( $post_id != $this->ID ) {
