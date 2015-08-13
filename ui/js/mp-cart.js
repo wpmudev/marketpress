@@ -64,7 +64,7 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initProductListListeners = function() {
-        $( '#mp-products' ).on( 'submit', '.mp_form-buy-product', function( e ) {
+        $( '#mp-products, .mp-multiple-products' ).on( 'submit', '.mp_form-buy-product', function( e ) {
             e.preventDefault();
             $( '.mp_ajax_loader' ).remove();
 

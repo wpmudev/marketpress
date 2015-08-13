@@ -333,6 +333,7 @@ class MP_Short_Codes {
 	 * @param bool $simple_list Optional, whether to show the related products based on the "list_view" setting or as a simple unordered list
 	 */
 	function mp_related_products_sc( $atts ) {
+		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
 		$atts[ 'echo' ]		 = false;
 		//$args			 = shortcode_atts( mp()->defaults[ 'related_products' ], $atts );
@@ -342,7 +343,7 @@ class MP_Short_Codes {
 		$product_id = isset( $atts[ 'product_id' ] ) ? $atts[ 'product_id' ] : 0;
 		if ( $product_id > 0 ) {
 			$product			 = new MP_Product( $product_id );
-			$related_products	 = $product->related_products( $args );
+			$related_products	 = '<div id="mp-related-products" class="mp-multiple-products"><div class="mp_product_tab_content_products mp_products mp_products-related mp_products-list">' . $product->related_products( $args ) . '</div></div>';
 		} else {
 			$related_products = __( 'product_id must be defined', 'mp' );
 		}
