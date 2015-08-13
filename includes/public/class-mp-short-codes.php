@@ -58,10 +58,10 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_store_navigation', array( &$this, 'mp_store_navigation_sc' ) );
 	}
 
-	public function shortcode_wrap($content){
-		return '<div class="mp-shortcode-wrap">'.$content.'</div>';
+	public function shortcode_wrap( $content ) {
+		return '<div class="mp-shortcode-wrap">' . $content . '</div>';
 	}
-	
+
 	public function cart_needed() {
 		add_filter( 'mp_cart_needed_on_page', array( &$this, 'cart_needed_return' ) );
 	}
@@ -334,10 +334,19 @@ class MP_Short_Codes {
 	 */
 	function mp_related_products_sc( $atts ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]	 = false;
-		$args			 = shortcode_atts( mp()->defaults[ 'related_products' ], $atts );
-		$args			 = $this->_parse_atts( $args );
-		return mp_related_products( $args );
+		$atts[ 'echo' ]		 = false;
+		//$args			 = shortcode_atts( mp()->defaults[ 'related_products' ], $atts );
+		$args				 = $this->_parse_atts( $atts );
+		$related_products	 = '';
+
+		$product_id = isset( $atts[ 'product_id' ] ) ? $atts[ 'product_id' ] : 0;
+		if ( $product_id > 0 ) {
+			$product			 = new MP_Product( $product_id );
+			$related_products	 = $product->related_products( $args );
+		} else {
+			$related_products = __( 'product_id must be defined', 'mp' );
+		}
+		return $related_products;
 	}
 
 	/*
@@ -409,9 +418,9 @@ class MP_Short_Codes {
 		$atts	 = $this->_parse_atts( $atts );
 
 		extract( $atts );
-		$product = new MP_Product($product_id);
+		$product = new MP_Product( $product_id );
 		$image	 = $product->image( false, $context, $size, $align );
-		return $image;//mp_product_image( false, $context, $product_id, $size, $align );
+		return $image; //mp_product_image( false, $context, $product_id, $size, $align );
 	}
 
 	/*
@@ -432,7 +441,7 @@ class MP_Short_Codes {
 
 		extract( $atts );
 
-		return $this->shortcode_wrap(mp_buy_button( false, $context, $product_id ));
+		return $this->shortcode_wrap( mp_buy_button( false, $context, $product_id ) );
 	}
 
 	/*
@@ -481,7 +490,7 @@ class MP_Short_Codes {
 		$content .= mp_product_price( false, $product_id, $label );
 		$content .= mp_buy_button( false, $context, $product_id );
 		$content .= '</div>';
-		return $this->shortcode_wrap($content);
+		return $this->shortcode_wrap( $content );
 	}
 
 	/*
@@ -519,7 +528,7 @@ class MP_Short_Codes {
 
 		extract( $atts );
 
-		return $this->shortcode_wrap(mp_cart_link( false, $url, $link_text ));
+		return $this->shortcode_wrap( mp_cart_link( false, $url, $link_text ) );
 	}
 
 	/**
