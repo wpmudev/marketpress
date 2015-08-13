@@ -384,6 +384,7 @@ class MP_Short_Codes {
 	 */
 
 	function mp_product_sc( $atts ) {
+		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
 		$atts	 = shortcode_atts( array(
 			'product_id' => false,
