@@ -104,30 +104,30 @@ var mp_cart = { };
             } )
             .validate( this.productFormValidationArgs );
         /*$( '.mp-shortcode-wrap' ).on( 'submit', '.mp_form-buy-product', function( e ) {
-            e.preventDefault();
-            $( '.mp_ajax_loader' ).remove();
-
-            var $this = $( this );
-
-            $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
-                $this.addClass( 'invisible' );
-                //$( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
-                if ( $( ".mp_ajax_loader" ).length ) {
-
-                } else {
-                    $( mp_cart_i18n.ajax_loader ).insertAfter( $this ).show();
-                }
-                //marketpress.loadingOverlay( 'show' );
-            } );
-
-            $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                $this.removeClass( 'invisible' );//.next( '.mp_ajax_loader' ).remove();
-                $( '.mp_ajax_loader' ).remove();
-                //marketpress.loadingOverlay( 'hide' );
-            } );
-
-            mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
-        } );*/
+         e.preventDefault();
+         $( '.mp_ajax_loader' ).remove();
+         
+         var $this = $( this );
+         
+         $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
+         $this.addClass( 'invisible' );
+         //$( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
+         if ( $( ".mp_ajax_loader" ).length ) {
+         
+         } else {
+         $( mp_cart_i18n.ajax_loader ).insertAfter( $this ).show();
+         }
+         //marketpress.loadingOverlay( 'show' );
+         } );
+         
+         $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+         $this.removeClass( 'invisible' );//.next( '.mp_ajax_loader' ).remove();
+         $( '.mp_ajax_loader' ).remove();
+         //marketpress.loadingOverlay( 'hide' );
+         } );
+         
+         mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
+         } );*/
     };
     /**
      * Initalize single product listeners
@@ -136,7 +136,7 @@ var mp_cart = { };
      */
     mp_cart.initSingleProductListeners = function() {
         $( '#mp-single-product' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-        $( '#mp-single-product' ).find( '.mp_form-buy-product' )
+        $( '#mp-single-product' ).find( '.mp_form-buy-product:not(.mp_no_single)' )
             .on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 marketpress.loadingOverlay( 'show' );
             } )

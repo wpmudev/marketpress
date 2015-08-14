@@ -573,7 +573,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 							</div><!-- end mp_product_meta -->
 
 							<div class="mp_product_callout">
-								' . $product->buy_button( false, 'list' ) . '
+								' . $product->buy_button( false, 'list', array(), true ) . '
 								' . apply_filters( 'mp_product_list_meta', '', $product->ID ) . '
 							</div><!-- end mp_product_callout -->
 							
@@ -2252,7 +2252,7 @@ if ( !function_exists( 'mp_product' ) ) {
 							$layout_type = $args[ 'list_view' ] ? 'list' : 'grid';
 						}
 						$return .= '
-						<div id="mp-related-products" class="mp_product_tab_content mp_product_tab_content-related-products">
+						<div id="mp-related-products" class="mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
 							<div class="mp_product_tab_content_products mp_products mp_products-related ' . (isset( $view ) ? 'mp_products-' . $view : 'mp_products-list') . '">' . $product->related_products() . ' </div>
 						</div><!-- end mp-related-products -->';
 					}
