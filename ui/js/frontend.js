@@ -150,6 +150,17 @@ var marketpress = { };
                 //$this.equalHeights();
             } );
         },
+        getViewportSize: function() {
+	        var viewportWidth = $(window).width(),
+				viewportHeight = $(window).height(),
+				documentHeight = $(document).outerHeight(),
+				minicartMaxHeight = documentHeight - viewportHeight;
+			
+			$('#mp-floating-cart .mp_mini_cart_content').css({
+				"max-height" : minicartMaxHeight,
+				"overflow-y" : "scroll",
+			});
+        },
         /**
          * Initialize select2 elements
          *
@@ -487,4 +498,5 @@ jQuery( document ).ready( function( ) {
 } );
 window.onload = function( ) {
     marketpress.equalizeProductGrid( );
+    marketpress.getViewportSize();
 }
