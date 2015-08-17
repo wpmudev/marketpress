@@ -71,7 +71,6 @@ var marketpress = { };
             $this.find( '.mp_product_meta' ).equalHeights();
         } );
 
-
     } );
 
 
@@ -151,15 +150,31 @@ var marketpress = { };
             } );
         },
         getViewportSize: function() {
-	        var viewportWidth = $(window).width(),
-				viewportHeight = $(window).height(),
-				documentHeight = $(document).outerHeight(),
-				minicartMaxHeight = documentHeight - viewportHeight;
 			
-			$('#mp-floating-cart .mp_mini_cart_content').css({
-				"max-height" : minicartMaxHeight,
-				"overflow-y" : "scroll",
+			function setMiniCartMaxHeight() {
+				
+				var viewportHeight = $(window).height(),
+					bodyHeight = $('body').height(),
+					getNonVisibleSize = (bodyHeight - viewportHeight);
+			
+				if( getNonVisibleSize < viewportHeight ) {
+					var minicartMaxHeight = (viewportHeight / 1.25);
+				} else {
+					var minicartMaxHeight = (viewportHeight / 1.5);
+				}
+				
+				$('#mp-floating-cart .mp_mini_cart_content').css({
+					"max-height" : minicartMaxHeight + 'px',
+					"overflow-y" : "scroll",
+				});
+			}
+			
+			setMiniCartMaxHeight();
+			
+			$(window).on('resize', function(){
+				setMiniCartMaxHeight();
 			});
+			
         },
         /**
          * Initialize select2 elements
@@ -495,8 +510,9 @@ jQuery( document ).ready( function( ) {
     marketpress.initProductFiltersPagination( );
     marketpress.initCreateAccountLightboxListeners( );
     marketpress.initGlobalProductFiltersPagination();
+    marketpress.getViewportSize();
 } );
 window.onload = function( ) {
     marketpress.equalizeProductGrid( );
-    marketpress.getViewportSize();
+    //marketpress.getViewportSize();
 }
