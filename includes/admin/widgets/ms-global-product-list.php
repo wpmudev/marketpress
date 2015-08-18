@@ -15,7 +15,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 
 		function widget( $args, $instance ) {
 			global $mp;
-			
+
 			extract( $args );
 
 			echo $before_widget;
@@ -33,7 +33,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 			$instance[ 'context' ]	 = 'widget';
 			$instance[ 'nopaging' ]	 = true;
 			$instance[ 'version' ]	 = '3';
-			
+
 
 			//list global products
 			mp_global_list_products( $instance );
@@ -68,6 +68,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 
 			$show_price					 = isset( $instance[ 'show_price' ] ) ? (bool) $instance[ 'show_price' ] : false;
 			$show_thumbnail_placeholder	 = isset( $instance[ 'show_thumbnail_placeholder' ] ) ? (bool) $instance[ 'show_thumbnail_placeholder' ] : false;
+			$thumbnail_size				 = isset( $instance[ 'thumbnail_size' ] ) ? $instance[ 'thumbnail_size' ] : false;
 			?>
 			<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php _e( 'Title:', 'mp' ) ?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></label></p>
 			<p><label for="<?php echo esc_attr( $this->get_field_id( 'custom_text' ) ); ?>"><?php _e( 'Custom Text:', 'mp' ) ?><br />

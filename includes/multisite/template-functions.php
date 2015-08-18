@@ -166,7 +166,7 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 			$content .= ( ( is_null( $args[ 'filters' ] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args[ 'filters' ] ) ? mp_global_products_filter( false, $per_page, $custom_query ) : mp_global_products_filter( true, $per_page, $custom_query );
 		}
 
-		$content .= '<div id="mp_product_list" class="clearfix hfeed mp_' . $layout_type . '">';
+		$content .= '<div id="mp_product_list" class="mp-multiple-products clearfix hfeed mp_' . $layout_type . '">';
 
 		if ( $last = $custom_query->post_count ) {
 			$content .= ($args[ 'version' ] == 3 ? _mp3_global_products_html_grid( $custom_query, $args ) : _mp_global_products_html_grid( $custom_query, $args ));
