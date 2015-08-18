@@ -67,7 +67,7 @@ class MarketPress_Product_List extends WP_Widget {
 
 		//do we have products?
 		if ( $custom_query->have_posts() ) {
-			echo '<div id="mp-widget-products-list" class="hfeed mp_widget_products mp_widget_products-list">';
+			echo '<div id="mp-widget-products-list" class="hfeed mp_widget_products mp_widget_products-list mp-multiple-products">';
 			while ( $custom_query->have_posts() ) : $custom_query->the_post();
 
 				$product = new MP_Product( $post->ID );
@@ -95,7 +95,7 @@ class MarketPress_Product_List extends WP_Widget {
 					}
 
 					if ( $instance[ 'show_button' ] ) {
-						echo $product->buy_button( false, 'list' );
+						echo $product->buy_button( false, 'list', array(), true );
 					}
 
 					echo '</div><!-- mp_product_meta -->';
