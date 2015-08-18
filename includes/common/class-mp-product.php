@@ -638,7 +638,7 @@ class MP_Product {
 		}
 
 		$query = new WP_Query( array(
-			'post_type'		 => 'mp_product_variation',
+			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation'),
 			'posts_per_page' => -1,
 			'orderby'		 => 'menu_order',
 			'order'			 => 'ASC',
@@ -686,7 +686,7 @@ class MP_Product {
 		}
 
 		$query = new WP_Query( array(
-			'post_type'		 => 'mp_product_variation',
+			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation'),
 			'posts_per_page' => -1,
 			'post_parent'	 => $this->ID,
 			'tax_query'		 => array( 'relation' => 'AND' ) + $tax_query,
@@ -1730,7 +1730,7 @@ class MP_Product {
 	 * @access public
 	 */
 	public function is_variation() {
-		return ( $this->_post->post_type == 'mp_product_variation' );
+		return ( $this->_post->post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation') );
 	}
 
 	/**
@@ -2271,7 +2271,7 @@ Notification Preferences: %s', 'mp' );
 
 		if ( is_null( $this->_post ) ) {
 			$this->_exists = false;
-		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != 'mp_product_variation' ) {
+		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != apply_filters( 'mp_product_variation_post_type', 'mp_product_variation') ) {
 			$this->_exists = false;
 		} else {
 			$this->_exists	 = true;

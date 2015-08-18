@@ -272,7 +272,7 @@ class Marketpress {
 		) ) );
 
 //! Register product_variation post type
-		register_post_type( 'mp_product_variation', array(
+		register_post_type( apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ), array(
 			'public'			 => false,
 			'show_ui'			 => false,
 			'publicly_queryable' => true,
@@ -399,7 +399,7 @@ class Marketpress {
 
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 		$post_type = get_post_type( $post_id );
-		if ( $post_type == MP_Product::get_post_type() || $post_type == 'mp_product_variation' ) {
+		if ( $post_type == MP_Product::get_post_type() || $post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ) {
 			$html = str_replace( "/>", ">", $html );
 		}
 
@@ -408,7 +408,7 @@ class Marketpress {
 
 	function redirect_variation_singles_to_products() {
 		global $post;
-		if ( !is_singular( 'mp_product_variation' ) ) {
+		if ( !is_singular( apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ) ) {
 			return;
 		} else {
 			$product_id	 = wp_get_post_parent_id( $post->ID );
@@ -427,8 +427,8 @@ class Marketpress {
 			return;
 		}
 
-		if ( get_post_type( $post_id ) == 'mp_product_variation' ) {
-			remove_post_type_support( 'mp_product_variation', 'title' );
+		if ( get_post_type( $post_id ) == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ) {
+			remove_post_type_support( apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ), 'title' );
 			add_action( 'add_meta_boxes', array( &$this, 'mp_product_variation_metaboxes' ) );
 		}
 	}

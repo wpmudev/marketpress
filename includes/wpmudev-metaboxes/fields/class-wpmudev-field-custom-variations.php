@@ -48,7 +48,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 
 			$args = array(
 				'post_parent'	 => $post_id,
-				'post_type'		 => 'mp_product_variation',
+				'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation'),
 				'posts_per_page' => -1,
 				'post_status'	 => 'publish',
 			);

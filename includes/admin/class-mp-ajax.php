@@ -71,10 +71,10 @@ class MP_Ajax {
 
 	public function create_new_variation_draft() {
 		$variation_post_draft = array(
-			'post_title'	 => 'Variation Draft',
+			'post_title'	 => __( 'Variation Draft', 'mp' ),
 			'post_content'	 => '',
 			'post_status'	 => 'draft',
-			'post_type'		 => 'mp_product_variation',
+			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
 			'post_parent'	 => (int) $_POST[ 'parent_post_id' ],
 		);
 
@@ -102,7 +102,7 @@ class MP_Ajax {
 
 				$args = array(
 					'post_parent'	 => $post_id,
-					'post_type'		 => 'mp_product_variation',
+					'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
 					'posts_per_page' => -1,
 					'post_status'	 => 'publish',
 					'orderby'		 => 'ID',
@@ -131,6 +131,7 @@ class MP_Ajax {
 				}
 				?>
 				<form name="variation_popup" id="variation_popup">
+					<?php do_action( 'mp_variation_popup_before_fields' ); ?>
 					<?php if ( isset( $_GET[ 'new_variation' ] ) ) {
 						?>
 						<input type="hidden" id="new_variation" name="new_variation" value="yes" />
@@ -151,8 +152,9 @@ class MP_Ajax {
 							<img width="75" height="75" src="<?php echo $mp->plugin_url( '/includes/admin/ui/images/img-placeholder.jpg' ); ?>" />
 						<?php }
 						?>
-
 					</div>
+
+					<?php do_action( 'mp_variation_popup_after_image' ); ?>
 
 					<div class="mp-product-field-75 mp-variation-field mp-product-field-last">
 						<div class="wpmudev-field-label"><?php _e( 'SKU', 'mp' ); ?> <span class="mp_meta_small_desc"><?php _e( '(Stock Keeping Unit)', 'mp' ); ?></span></div>
@@ -161,6 +163,7 @@ class MP_Ajax {
 						<div class="wpmudev-field-label"><?php _e( 'Price', 'mp' ); ?><span class="required">*</span></div>
 						<input type="text" name="regular_price" id="regular_price" class="mp-product-field-98 mp-blank-bg mp-numeric mp-required" placeholder="<?php esc_attr_e( 'Enter Price', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'regular_price' ) ); ?>">
 					</div>
+					<?php do_action( 'mp_variation_popup_after_sku_and_price' ); ?>
 
 					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
 						<div class="mp-product-field-100 mp-variation-field mp-product-field-last">
@@ -168,6 +171,7 @@ class MP_Ajax {
 							<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-blank-bg mp-numeric mp-required" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
 						</div>
 					<?php } ?>
+					<?php do_action( 'mp_variation_popup_after_order_limit' ); ?>
 
 					<?php if ( $product_type == 'external' ) {//show these fields only for External URL Products ?>
 						<div class="mp-product-field-100 mp-variation-field">
@@ -175,6 +179,7 @@ class MP_Ajax {
 							<input type="text" name="external_url" id="external_url" class="mp-required" placeholder="<?php esc_attr_e( 'http://', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'external_url' ) ); ?>">
 						</div>
 					<?php } ?>
+					<?php do_action( 'mp_variation_popup_after_external_url' ); ?>
 
 					<?php if ( $product_type == 'digital' ) {//show these fields only for Digital Products ?>
 						<div class="mp-product-field-100 mp-variation-field">
@@ -183,7 +188,7 @@ class MP_Ajax {
 							<input type="button" name="file_url_button" id="file_url_button" value="<?php echo esc_attr( __( 'Browse', 'mp' ) ); ?>" />
 						</div>
 					<?php } ?>
-
+					<?php do_action( 'mp_variation_popup_after_file_url' ); ?>
 
 					<?php
 					foreach ( array_keys( $variation_attributes ) as $variation_attribute ) {
@@ -198,6 +203,7 @@ class MP_Ajax {
 							?>" value="<?php echo is_object( $child_term ) ? esc_attr( $child_term->name ) : ''; ?>">
 						</div>
 					<?php } ?>
+					<?php do_action( 'mp_variation_popup_after_attributes' ); ?>
 
 					<div class="fieldset_check">
 						<?php
@@ -213,6 +219,7 @@ class MP_Ajax {
 							<?php _e( 'End Date (if applicable)', 'mp' ); ?> <input name="sale_price[end_date]" type="text" class="mp-date" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_end_date' ) ); ?>">
 						</fieldset>
 					</div>
+					<?php do_action( 'mp_variation_popup_after_sale' ); ?>
 
 					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products  ?>
 						<div class="fieldset_check">
@@ -228,6 +235,7 @@ class MP_Ajax {
 								<?php _e( 'Special Tax Rate', 'mp' ); ?> <input placeholder="<?php esc_attr_e( 'Tax Rate', 'mp' ); ?>" type="text" class="mp-numeric" name="special_tax_rate" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); ?>"><br>
 							</fieldset>
 						</div>
+						<?php do_action( 'mp_variation_popup_after_tax' ); ?>
 					<?php } ?>
 
 					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical and Digital Products  ?>
@@ -253,6 +261,7 @@ class MP_Ajax {
 								<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_extra_shipping_cost' ) ); ?>">
 							</fieldset>
 						</div>
+						<?php do_action( 'mp_variation_popup_after_shipping' ); ?>
 					<?php } ?>
 
 					<?php if ( $product_type == 'physical' || $product_type == 'digital' ) {//show these fields only for Physical and Digital Products    ?>
@@ -269,6 +278,7 @@ class MP_Ajax {
 								<input name="inventory[out_of_stock_purchase]" type="checkbox" <?php checked( 1, MP_Product::get_variation_meta( $variation_id, 'inv_out_of_stock_purchase' ) ); ?> value="1"><?php _e( 'Allow this product to be purchased even if it\'s out of stock', 'mp' ); ?><br>
 							</fieldset>
 						</div>
+						<?php do_action( 'mp_variation_popup_after_inventory_tracking' ); ?>
 					<?php } ?>
 					<div class="fieldset_check">
 						<?php
@@ -287,6 +297,7 @@ class MP_Ajax {
 							<input type="radio" name="variation_content_type" class="variation_content_type" value="html" <?php checked( 'html', $variation_content_type, true ); ?>><?php _e( 'HTML Markup', 'mp' ); ?><a class="button variation_description_button" id="variation_description_button" href="<?php echo admin_url( 'post.php?post=' . $variation_id . '&action=edit' ); ?>" target="_blank"><?php _e( 'Edit Description', 'mp' ); ?></a>
 						</fieldset>
 					</div>
+					<?php do_action( 'mp_variation_popup_after_variation_content_type' ); ?>
 				</form>
 
 			</div>
