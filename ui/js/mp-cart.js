@@ -363,6 +363,7 @@ var mp_cart = { };
                         }, 3000 );
                     }, 100 );
                 }
+                $( window ).trigger( 'resize' );
             } );
     };
 
@@ -405,6 +406,7 @@ var mp_cart = { };
                     marketpress.loadingOverlay( 'hide' );
                 }
             }
+            $( window ).trigger( 'resize' );
         } );
     }
 
