@@ -155,23 +155,55 @@ var marketpress = { };
 				
 				var viewportHeight = $(window).height(),
 					bodyHeight = $('body').height(),
-					getNonVisibleSize = (bodyHeight - viewportHeight);
-			
-				if( getNonVisibleSize < viewportHeight ) {
-					var minicartMaxHeight = (viewportHeight / 1.25);
+					documentHeight = $(document).height(),
+					getNonVisibleSize = (bodyHeight - viewportHeight),
+					miniCart = $('#mp-floating-cart'),
+					miniCartRibbon = miniCart.find('.mp_mini_cart_ribbon'),
+					miniCartRibbonHeight = miniCartRibbon.height(),
+					miniCartContent = miniCart.find('.mp_mini_cart_content'),
+					miniCartContentHeight = miniCartContent.height(),
+					miniCartHeight = (miniCartRibbonHeight + miniCartContentHeight);
+				
+				if( miniCartHeight > viewportHeight ) {
+					
+					if( getNonVisibleSize < viewportHeight ) {
+						var minicartMaxHeight = (viewportHeight / 1.25);
+					} else {
+						var minicartMaxHeight = (viewportHeight / 1.5);
+					}
+					
+					miniCart.each(function(){
+						var $this = $(this);
+						
+						$this.find('.mp_mini_cart_items').css({
+							'margin-top' : '50px'
+						});
+						
+						$this.find('.mp_button-mini-cart').css({
+							"position" : "absolute",
+							"top" : "15px",
+							"left" : 0,
+							"right" : 0,
+							"margin" : "auto 30px"
+						});
+						
+					});
+					
 				} else {
-					var minicartMaxHeight = (viewportHeight / 1.5);
+					/* value 100 = double TOP mini-cart position */
+					var minicartMaxHeight = (viewportHeight - (miniCartRibbonHeight * 2) - 100);
 				}
 				
-				$('#mp-floating-cart .mp_mini_cart_content').css({
+				miniCartContent.css({
 					"max-height" : minicartMaxHeight + 'px',
 					"overflow-y" : "scroll",
 				});
+				
 			}
 			
 			setMiniCartMaxHeight();
 			
-			$(window).on('resize', function(){
+			$(window).on('resize', function() {
 				setMiniCartMaxHeight();
 			});
 			
