@@ -1803,7 +1803,7 @@ if ( !function_exists( 'mp_list_products' ) ) :
 			$content .= '<div id="mp-products-empty">' . apply_filters( 'mp_product_list_none', __( 'No Products', 'mp' ) ) . '</div><!-- end mp-no-products -->';
 		}
 
-		$content .= '</div><!-- end mp-products -->';
+		$content .= '</section><!-- end mp-products -->';
 
 		$content .= (!$args[ 'nopaging' ] ) ? mp_products_nav( false, $custom_query ) : '';
 
