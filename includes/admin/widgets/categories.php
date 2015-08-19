@@ -5,7 +5,7 @@ class MarketPress_Categories_Widget extends WP_Widget {
 
 	function MarketPress_Categories_Widget() {
 		$widget_ops = array( 'classname' => 'widget_categories mp_widget mp_categories_widget', 'description' => __( "A list or dropdown of product categories from your MarketPress store.", 'mp' ) );
-		$this->WP_Widget( 'mp_categories_widget', __( 'Product Categories', 'mp' ), $widget_ops );
+		parent::__construct( 'mp_categories_widget', __( 'Product Categories', 'mp' ), $widget_ops );
 	}
 
 	function widget( $args, $instance ) {

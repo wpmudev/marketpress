@@ -10,7 +10,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 
 		function MarketPress_Global_Product_List() {
 			$widget_ops = array( 'classname' => 'mp_widget mp_global_product_list_widget', 'description' => __( 'Shows a customizable global list of products from network MarketPress stores.', 'mp' ) );
-			$this->WP_Widget( 'mp_global_product_list_widget', __( 'Global Product List', 'mp' ), $widget_ops );
+			parent::__construct( 'mp_global_product_list_widget', __( 'Global Product List', 'mp' ), $widget_ops );
 		}
 
 		function widget( $args, $instance ) {

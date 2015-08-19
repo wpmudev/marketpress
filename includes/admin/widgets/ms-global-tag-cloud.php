@@ -10,7 +10,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 
 		function MarketPress_Global_Tag_Cloud_Widget() {
 			$widget_ops = array( 'classname' => 'mp_widget mp_global_tag_cloud_widget', 'description' => __( "Displays global most used product tags in cloud format from network MarketPress stores." ) );
-			$this->WP_Widget( 'mp_global_tag_cloud_widget', __( 'Global Product Tag Cloud', 'mp' ), $widget_ops );
+			parent::__construct( 'mp_global_tag_cloud_widget', __( 'Global Product Tag Cloud', 'mp' ), $widget_ops );
 		}
 
 		function widget( $args, $instance ) {

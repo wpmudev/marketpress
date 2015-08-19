@@ -5,7 +5,7 @@ class MarketPress_Product_List extends WP_Widget {
 
 	function MarketPress_Product_List() {
 		$widget_ops = array( 'classname' => 'mp_widget mp_product_list_widget', 'description' => __( 'Shows a customizable list of products from your MarketPress store.', 'mp' ) );
-		$this->WP_Widget( 'mp_product_list_widget', __( 'Product List', 'mp' ), $widget_ops );
+		parent::__construct( 'mp_product_list_widget', __( 'Product List', 'mp' ), $widget_ops );
 	}
 
 	function widget( $args, $instance ) {
