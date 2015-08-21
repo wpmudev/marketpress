@@ -473,6 +473,9 @@ tr.variation_row_color_20 .text-core .text-wrap .text-tags .text-tag .text-butto
     margin-top:10px;
     margin-bottom: 10px;
 }
+.select_attributes_filter .separating-pipe {
+	color: #000;
+}
 
 .select_all a, .select_none a{
     font-weight: bold;
