@@ -235,6 +235,7 @@ var mp_cart = { };
                 //console.log( resp.data );
                 if ( resp.data.image ) {
                     $container.find( '.mp_product_image_single' ).attr( 'src', resp.data.image );
+                    $container.find( '.mp_product_image_link' ).attr( 'href', resp.data.image );
                 }
 
                 //if ( resp.data.description ) {

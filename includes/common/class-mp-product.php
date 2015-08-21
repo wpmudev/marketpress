@@ -1477,7 +1477,7 @@ class MP_Product {
 		}
 
 		$image_post_id = $this->ID;
-
+		
 		if ( $this->has_variations() ) {
 			$image_post_id = $this->get_variation()->ID;
 		}
@@ -1493,8 +1493,10 @@ class MP_Product {
 		}
 
 		$class		 = $title		 = $link		 = $img_align	 = '';
+
 		$img_classes = array( 'mp_product_image_' . $context, 'photo' );
-		$title		 = esc_attr( $this->title( false ) );
+
+		$title = esc_attr( $this->title( false ) );
 
 		if ( !is_null( $align ) && false === strpos( $align, 'align' ) ) {
 			$align = 'align' . $align;
@@ -1543,7 +1545,7 @@ class MP_Product {
 				if ( mp_get_setting( 'disable_large_image' ) ) {
 					$link = false;
 				} else {
-					$link	 = $this->image_url( false, 'fullsize' );
+					$link	 = $this->image_url( false, 'fullsize', false );
 					$title	 = __( 'View Larger Image &raquo;', 'mp' );
 				}
 
@@ -1591,7 +1593,7 @@ class MP_Product {
 
 		$snippet = '
 			<div itemscope class="hmedia">
-				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>';
+				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>'; //
 
 		if ( $link ) {
 			$snippet .= '<a rel="lightbox enclosure" id="mp-product-image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
@@ -1620,7 +1622,9 @@ class MP_Product {
 	 * @param string/int $size
 	 * @param string $view Either single or list. Optional.
 	 */
-	public function image_url( $echo = true, $size = null, $view = null ) {
+	public function image_url( $echo = true, $size = null, $view = null, $id = false ) {
+		
+	
 		if ( is_null( $size ) ) {
 			$img_size	 = mp_get_image_size( $view );
 			$size		 = ( $img_size[ 'label' ] == 'custom' ) ? array( $size[ 'width' ], $size[ 'height' ] ) : $img_size[ 'label' ];
@@ -1634,7 +1638,7 @@ class MP_Product {
 		}
 
 		if ( has_post_thumbnail( $post_id ) ) {
-			$img_id	 = get_post_thumbnail_id( $post_id );
+			$img_id	 = get_post_thumbnail_id( $id ? $id : $post_id );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
 			$img_url = array_shift( $img_src );
 		}
