@@ -345,7 +345,7 @@ var marketpress = { };
             $( '.mp_product_image_link' ).filter( '.mp_lightbox' ).colorbox( {
                 maxWidth: "90%",
                 maxHeight: "90%",
-                close: "x"
+                close: "&times;"
             } );
         },
         /**
