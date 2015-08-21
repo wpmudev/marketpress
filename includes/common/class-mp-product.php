@@ -449,7 +449,7 @@ class MP_Product {
 		}
 
 		$this->_get_post( $product );
-		$this->_set_content_tabs();
+		$this->_set_content_tabs( $this );
 	}
 
 	/**
@@ -638,7 +638,7 @@ class MP_Product {
 		}
 
 		$query = new WP_Query( array(
-			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation'),
+			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
 			'posts_per_page' => -1,
 			'orderby'		 => 'menu_order',
 			'order'			 => 'ASC',
@@ -686,7 +686,7 @@ class MP_Product {
 		}
 
 		$query = new WP_Query( array(
-			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation'),
+			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
 			'posts_per_page' => -1,
 			'post_parent'	 => $this->ID,
 			'tax_query'		 => array( 'relation' => 'AND' ) + $tax_query,
@@ -789,7 +789,7 @@ class MP_Product {
 		if ( $this->get_meta( 'product_type' ) == 'external' && ($url	 = $this->get_meta( 'external_url' )) ) {
 			$button = '<a class="mp_link-buynow" href="' . esc_url( $url ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>';
 		} elseif ( !mp_get_setting( 'disable_cart' ) ) {
-			$button = '<form id="mp-buy-product-' . $this->ID . '-form" class="mp_form mp_form-buy-product '.($no_single ? 'mp_no_single' : '').'" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
+			$button = '<form id="mp-buy-product-' . $this->ID . '-form" class="mp_form mp_form-buy-product ' . ($no_single ? 'mp_no_single' : '') . '" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
 
 			if ( !$this->in_stock() ) {
 				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';
@@ -971,8 +971,8 @@ class MP_Product {
 			$show_thumbnail_placeholder = true;
 		}
 
-		unset($attributes[ 'show_thumbnail_placeholder' ]);
-		
+		unset( $attributes[ 'show_thumbnail_placeholder' ] );
+
 		if ( $intsize = intval( $size ) ) {
 			$size = array( $intsize, $intsize );
 		}
@@ -1268,7 +1268,7 @@ class MP_Product {
 	 * 		@type string $view. Optional, how to display related products - either grid or list.
 	 * }
 	 */
-	public function related_products( $args = array() ) {
+	public function related_products( $args = array(), $return_bool = false ) {
 		$html	 = '';
 		$args	 = array_replace_recursive( array(
 			'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
@@ -1284,7 +1284,6 @@ class MP_Product {
 			'posts_per_page' => $limit,
 			'post__not_in'	 => array( ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID )
 		);
-
 
 		$related_specified_products_enabled = true;
 
@@ -1304,7 +1303,7 @@ class MP_Product {
 
 			if ( 'categories' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_tag' );
-				$ids						 = $terms ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_tag',
 					'terms'		 => $ids,
@@ -1314,7 +1313,7 @@ class MP_Product {
 
 			if ( 'tags' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_category' );
-				$ids						 = $terms ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_category',
 					'terms'		 => $ids,
@@ -1330,17 +1329,25 @@ class MP_Product {
 		$product_query = new WP_Query( $query_args );
 
 		if ( $product_query->have_posts() ) {
-			switch ( $view ) {
-				case 'grid' :
-					$html .= _mp_products_html_grid( $product_query, true );
-					break;
+			if ( $return_bool ) {
+				return true;
+			} else {
+				switch ( $view ) {
+					case 'grid' :
+						$html .= _mp_products_html_grid( $product_query, true );
+						break;
 
-				case 'list' :
-					$html .= _mp_products_html_list( $product_query );
-					break;
+					case 'list' :
+						$html .= _mp_products_html_list( $product_query );
+						break;
+				}
 			}
 		} else {
-			$html .= wpautop( __( '<p class="mp_related_products_empty_message">There are no related products for this item.</p>', 'mp' ) );
+			if ( $return_bool ) {
+				return false;
+			} else {
+				$html .= wpautop( __( '<p class="mp_related_products_empty_message">There are no related products for this item.</p>', 'mp' ) );
+			}
 		}
 
 		/**
@@ -1730,7 +1737,7 @@ class MP_Product {
 	 * @access public
 	 */
 	public function is_variation() {
-		return ( $this->_post->post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation') );
+		return ( $this->_post->post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) );
 	}
 
 	/**
@@ -2271,7 +2278,7 @@ Notification Preferences: %s', 'mp' );
 
 		if ( is_null( $this->_post ) ) {
 			$this->_exists = false;
-		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != apply_filters( 'mp_product_variation_post_type', 'mp_product_variation') ) {
+		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ) {
 			$this->_exists = false;
 		} else {
 			$this->_exists	 = true;
@@ -2285,26 +2292,40 @@ Notification Preferences: %s', 'mp' );
 	 * @since 3.0
 	 * @access protected
 	 */
-	protected function _set_content_tabs() {
-		$tabs = array();
+	protected function _set_content_tabs( $product ) {
 
-		if ( mp_get_setting( 'related_products->show' ) ) {
-			$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
+		if ( !is_admin() ) {
+			$tabs = array();
+
+			$args = array(
+				'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
+				'echo'		 => false,
+				'limit'		 => mp_get_setting( 'related_products->show_limit' ),
+				'view'		 => mp_get_setting( 'related_products->view' ),
+			);
+
+			$related_products = $product->related_products( $args, true );
+
+			if ( mp_get_setting( 'related_products->show' ) ) {
+				if ( $related_products !== false ) {
+					$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
+				}
+			}
+
+			/**
+			 * Filter the product tabs array
+			 *
+			 * @since 3.0
+			 * @param array $tabs The default product tabs.
+			 * @param MP_Product $this The current product object.
+			 */
+			$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
+
+			// Make sure product overview tab is always at the beginning
+			$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+
+			$this->content_tabs = $tabs;
 		}
-
-		/**
-		 * Filter the product tabs array
-		 *
-		 * @since 3.0
-		 * @param array $tabs The default product tabs.
-		 * @param MP_Product $this The current product object.
-		 */
-		$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
-
-		// Make sure product overview tab is always at the beginning
-		$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
-
-		$this->content_tabs = $tabs;
 	}
 
 }
