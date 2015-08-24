@@ -1303,7 +1303,7 @@ class MP_Product {
 
 			if ( 'categories' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_tag' );
-				$ids						 = isset( $terms ) && is_array( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms )  ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_tag',
 					'terms'		 => $ids,
@@ -1313,7 +1313,7 @@ class MP_Product {
 
 			if ( 'tags' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_category' );
-				$ids						 = isset( $terms ) && is_array( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_category',
 					'terms'		 => $ids,
