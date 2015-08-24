@@ -58,8 +58,8 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_store_navigation', array( &$this, 'mp_store_navigation_sc' ) );
 	}
 
-	public function shortcode_wrap( $content ) {
-		return '<div class="mp-shortcode-wrap">' . $content . '</div>';
+	public function shortcode_wrap( $content, $class = '' ) {
+		return '<div class="mp-shortcode-wrap ' . esc_attr( $class ) . '">' . $content . '</div>';
 	}
 
 	public function cart_needed() {
@@ -492,7 +492,7 @@ class MP_Short_Codes {
 		$content .= mp_product_price( false, $product_id, $label );
 		$content .= mp_buy_button( false, $context, $product_id );
 		$content .= '</div>';
-		return $this->shortcode_wrap( $content );
+		return $this->shortcode_wrap( $content );//, 'mp-multiple-products'
 	}
 
 	/*
