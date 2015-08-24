@@ -1477,7 +1477,7 @@ class MP_Product {
 		}
 
 		$image_post_id = $this->ID;
-		
+
 		if ( $this->has_variations() ) {
 			$image_post_id = $this->get_variation()->ID;
 		}
@@ -1623,8 +1623,8 @@ class MP_Product {
 	 * @param string $view Either single or list. Optional.
 	 */
 	public function image_url( $echo = true, $size = null, $view = null, $id = false ) {
-		
-	
+
+
 		if ( is_null( $size ) ) {
 			$img_size	 = mp_get_image_size( $view );
 			$size		 = ( $img_size[ 'label' ] == 'custom' ) ? array( $size[ 'width' ], $size[ 'height' ] ) : $img_size[ 'label' ];
@@ -1638,7 +1638,7 @@ class MP_Product {
 		}
 
 		if ( has_post_thumbnail( $post_id ) ) {
-			$img_id	 = get_post_thumbnail_id( $id ? $id : $post_id );
+			$img_id	 = get_post_thumbnail_id( $id ? $id : $post_id  );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
 			$img_url = array_shift( $img_src );
 		}
@@ -2299,21 +2299,21 @@ Notification Preferences: %s', 'mp' );
 	protected function _set_content_tabs( $product ) {
 
 		if ( !is_admin() ) {
-			/*$tabs = array();
+			$tabs = array();
 
 			$args = array(
 				'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
 				'echo'		 => false,
 				'limit'		 => mp_get_setting( 'related_products->show_limit' ),
 				'view'		 => mp_get_setting( 'related_products->view' ),
-			);*/
+			);
 
-			//$related_products = $product->related_products( $args, true );
+			$related_products = $product->related_products( $args, true );
 
 			if ( mp_get_setting( 'related_products->show' ) ) {
-			//	if ( $related_products !== false ) {
+				if ( $related_products !== false ) {
 					$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
-			//	}
+				}
 			}
 
 			/**
