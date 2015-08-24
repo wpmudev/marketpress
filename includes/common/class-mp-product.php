@@ -2299,21 +2299,21 @@ Notification Preferences: %s', 'mp' );
 	protected function _set_content_tabs( $product ) {
 
 		if ( !is_admin() ) {
-			$tabs = array();
+			/*$tabs = array();
 
 			$args = array(
 				'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
 				'echo'		 => false,
 				'limit'		 => mp_get_setting( 'related_products->show_limit' ),
 				'view'		 => mp_get_setting( 'related_products->view' ),
-			);
+			);*/
 
-			$related_products = $product->related_products( $args, true );
+			//$related_products = $product->related_products( $args, true );
 
 			if ( mp_get_setting( 'related_products->show' ) ) {
-				if ( $related_products !== false ) {
+			//	if ( $related_products !== false ) {
 					$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
-				}
+			//	}
 			}
 
 			/**
