@@ -2301,16 +2301,17 @@ Notification Preferences: %s', 'mp' );
 		if ( !is_admin() ) {
 			$tabs = array();
 
-			$args = array(
-				'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
-				'echo'		 => false,
-				'limit'		 => mp_get_setting( 'related_products->show_limit' ),
-				'view'		 => mp_get_setting( 'related_products->view' ),
-			);
-
-			$related_products = $product->related_products( $args, true );
-
 			if ( mp_get_setting( 'related_products->show' ) ) {
+
+				$args = array(
+					'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
+					'echo'		 => false,
+					'limit'		 => mp_get_setting( 'related_products->show_limit' ),
+					'view'		 => mp_get_setting( 'related_products->view' ),
+				);
+
+				$related_products = $product->related_products( $args, true );
+
 				if ( $related_products !== false ) {
 					$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
 				}
