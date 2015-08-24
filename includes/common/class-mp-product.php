@@ -1303,7 +1303,7 @@ class MP_Product {
 
 			if ( 'categories' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_tag' );
-				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms )  ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_tag',
 					'terms'		 => $ids,
@@ -1830,7 +1830,7 @@ Notification Preferences: %s', 'mp' );
 		$post_id			 = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 		$product_categories	 = get_the_terms( $post_id, 'product_category' );
 
-		if ( !empty( $product_categories ) ) {
+		if ( !empty( $product_categories ) && !is_wp_error( $product_categories ) ) {
 			$product_categories = wp_list_pluck( $product_categories, 'term_id' );
 		} /* else {
 		  $product_categories = array( 0 );
