@@ -80,7 +80,7 @@
 			marketpress.loadingOverlay( 'hide' );
 			errorMessage( 'show', data.error.message );
 		} else {
-			var $form = $( '#mp-checkout' );
+			var $form = $( '#mp-checkout-form' );
 			var $paymentForm = $( '#mp-gateway-form-simplify' );
 			
 			$( '<input/>' )

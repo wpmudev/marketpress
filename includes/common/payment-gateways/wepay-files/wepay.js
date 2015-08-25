@@ -86,7 +86,7 @@
 	      errorMessage( 'show', data.error_description );
       } else {
 	      var $paymentForm = $( '#mp-gateway-form-wepay' );
-	      var $form = $( '#mp-checkout' );
+	      var $form = $( '#mp-checkout-form' );
 	      
 	      $( '<input />' )
 	      	.attr( { type : "hidden", name : "wepay_token" } )

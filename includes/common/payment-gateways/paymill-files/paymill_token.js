@@ -106,11 +106,11 @@ var PAYMILL_PUBLIC_KEY = paymill_token.public_key;
             paymill_error_message( 'hide' );
 
             // Submit order for processing
-            $( '#mp-checkout' ).append( '<input type="hidden" name="paymill_token" value="' + token + '" />' );
+            $( '#mp-checkout-form' ).append( '<input type="hidden" name="paymill_token" value="' + token + '" />' );
 
             //return false;
             
-            var data = $( '#mp-checkout' ).serialize();
+            var data = $( '#mp-checkout-form' ).serialize();
             var url = mp_i18n.ajaxurl + '?action=mp_process_checkout';
 
             $.post( url, data ).done( function( resp ) {

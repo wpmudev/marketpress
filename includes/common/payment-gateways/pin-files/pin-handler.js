@@ -61,7 +61,7 @@
 	 */
 	function handleSuccess( card ) {
     var $div = $( '#mp-gateway-form-pin' );
-    var $form = $( '#mp-checkout' );
+    var $form = $( '#mp-checkout-form' );
     
     // Add the card token and ip address of the customer to the form
     // You will need to post these to Pin when creating the charge.

@@ -175,6 +175,7 @@ class MP_Checkout {
 
 		foreach ( $selected as $blog_id => $method ) {
 			if ( 'calculated' == $shipping_method ) {
+
 				list( $shipping_option, $shipping_sub_option ) = explode( '->', $method );
 
 				if ( mp_cart()->is_global ) {
@@ -451,6 +452,7 @@ class MP_Checkout {
 	 * @action wp_ajax_mp_process_checkout, wp_ajax_nopriv_mp_process_checkout
 	 */
 	public function ajax_process_checkout() {
+		
 		if ( $payment_method = mp_get_post_value( 'payment_method' ) ) {
 			$cart			 = mp_cart();
 			$billing_info	 = mp_get_user_address( 'billing' );
