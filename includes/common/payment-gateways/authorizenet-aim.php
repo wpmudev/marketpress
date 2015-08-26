@@ -121,7 +121,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 		$payment->transaction( mp_get_post_value( 'mp_cc_num' ) );
 		
 		foreach ( $items as $item ) {
-			$item_id = ( '' == $item->get_meta( 'sku', '' ) ) ? $item->ID : $this->get_meta( 'sku' );
+			$item_id = ( '' == $item->get_meta( 'sku', '' ) ) ? $item->ID : $item->get_meta( 'sku' );
 			$price = $item->get_price( 'lowest' );
 			$payment->addLineItem( $item_id, substr( $item->title( false ), 0, 31), substr( $item->title( false ) . ' - ' . $item->url( false ), 0, 254), $item->qty, $price, 1 );
 		}
