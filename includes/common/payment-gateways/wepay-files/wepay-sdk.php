@@ -235,6 +235,7 @@ class WePay {
 		curl_setopt(self::$ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt(self::$ch, CURLOPT_TIMEOUT, 30); // 30-second timeout, adjust to taste
 		curl_setopt(self::$ch, CURLOPT_POST, !empty($values)); // WePay's API is not strictly RESTful, so all requests are sent as POST unless there are no request values
+		curl_setopt(self::$ch, CURLOPT_CAINFO, dirname( __FILE__ ) .'/cacert.pem');
 		
 		$uri = self::getDomain() . $endpoint;
 		curl_setopt(self::$ch, CURLOPT_URL, $uri);
