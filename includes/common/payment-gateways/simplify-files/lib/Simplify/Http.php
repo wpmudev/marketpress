@@ -81,6 +81,7 @@ class Simplify_HTTP
         $options[CURLOPT_CUSTOMREQUEST] = $method;
         $options[CURLOPT_RETURNTRANSFER] = true;
         $options[CURLOPT_FAILONERROR] = false;
+		$options[CURLOPT_CAINFO] = dirname( __FILE__ ) .'/data/ca-certificates.crt';
 
         $signature = $this->jwsEncode($publicKey, $privateKey, $url, $payload, $method == self::POST || $method == self::PUT);
 
