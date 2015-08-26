@@ -141,7 +141,13 @@ class MP_Coupons_Addon {
 	}
 
 	function remove_row_actions( $actions, $post ) {
-		global $current_screen;
+		global $current_screen, $post;
+
+		if ( $post->post_type == 'mp_order' ) {
+			unset( $actions[ 'edit' ] );
+			unset( $actions[ 'inline hide-if-no-js' ] );
+		}
+
 		if ( $current_screen->post_type != 'mp_coupon' ) {
 			return $actions;
 		}
@@ -1238,6 +1244,10 @@ if ( !function_exists( 'mp_coupons_addon' ) ) :
 	function mp_coupons_addon() {
 		return MP_Coupons_Addon::get_instance();
 	}
+
+
+
+
 
 
 
