@@ -169,7 +169,7 @@ class MP_Installer {
 					'post_title'	 => $post_title,
 					'post_content'	 => $post_content,
 					'post_status'	 => 'publish',
-					'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation'),
+					'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
 					'post_parent'	 => $post_id,
 				) );
 
@@ -478,7 +478,7 @@ class MP_Installer {
 			<br />
 
 			<?php
-			if ( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'mp_var_name'" ) ) :
+			if ( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'mp_var_name'" ) ) {
 				$postcount = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='product'" );
 				?>
 				<style type="text/css">
@@ -504,7 +504,10 @@ class MP_Installer {
 					<p class="submit"><input class="button-primary" type="submit" value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
 				</form>
 				<?php
-			endif;
+			} else {
+				_e( 'MarketPress performed a quick automatic update successfully!', 'mp' );
+				delete_option( 'mp_db_update_required' );
+			}
 			?>
 		</div>
 		<?php
@@ -558,7 +561,7 @@ class MP_Installer {
 			}
 
 			//3.0 update
-			if ( version_compare( $old_version, '3.0a.10', '<' ) ) {
+			if ( version_compare( $old_version, '3.0', '<' ) ) {
 				$settings = $this->update_3000( $settings );
 			}
 		}
