@@ -164,11 +164,14 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			//go to paypal for final payment confirmation
 			$this->RedirectToPayPal( $paykey );
 		} else { //whoops, error
+			
 			for ( $i = 0; $i <= 5; $i++ ) { //print the first 5 errors
 				if ( isset( $result[ "error($i)_message" ] ) )
 					$error .= "<li>{$result[ "error($i)_errorId" ]} - {$result[ "error($i)_message" ]}</li>";
 			}
 			$error = '<br /><ul>' . $error . '</ul>';
+			echo $error;
+			exit;
 			mp_checkout()->add_error( __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) . $error );
 			return false;
 		}
@@ -322,16 +325,16 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 	 * @access public
 	 */
 	public function init_settings_metabox() {
-		
-		$default_desc = __("Please be aware that we will deduct a ?% fee from the total of each transaction in addition to any fees PayPal may charge you. If for any reason you need to refund a customer for an order, please contact us with a screenshot of the refund receipt in your PayPal history as well as the Transaction ID of our fee deduction so we can issue you a refund. Thank you!", 'mp');
-		$desc_msg = $this->get_network_setting( 'msg' );
-		
+
+		$default_desc	 = __( "Please be aware that we will deduct a ?% fee from the total of each transaction in addition to any fees PayPal may charge you. If for any reason you need to refund a customer for an order, please contact us with a screenshot of the refund receipt in your PayPal history as well as the Transaction ID of our fee deduction so we can issue you a refund. Thank you!", 'mp' );
+		$desc_msg		 = $this->get_network_setting( 'msg' );
+
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => $this->generate_metabox_id(),
 			'page_slugs'	 => array( 'store-settings-payments', 'store-settings_page_store-settings-payments' ),
 			'title'			 => sprintf( __( '%s Settings', 'mp' ), $this->admin_name ),
 			'option_name'	 => 'mp_settings',
-			'desc'			 => !empty($desc_msg) ? $desc_msg : $default_desc,
+			'desc'			 => !empty( $desc_msg ) ? $desc_msg : $default_desc,
 			'conditional'	 => array(
 				'name'	 => 'gateways[allowed][' . $this->plugin_name . ']',
 				'value'	 => 1,
@@ -623,8 +626,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$base_total	 = $cart->product_total( false );
 
 		//calculate fees / get fees only for base price (excluding taxes and shipping)
-		$percentage = $this->get_network_setting( 'percentage', 0 );
-		$fee = round( $percentage * 0.01 * $base_total, 2 );
+		$percentage	 = $this->get_network_setting( 'percentage', 0 );
+		$fee		 = round( $percentage * 0.01 * $base_total, 2 );
 
 		$nvpstr .= "&receiverList.receiver(0).email=" . urlencode( $this->get_setting( 'email' ) );
 		$nvpstr .= "&receiverList.receiver(0).amount=" . round( $total, 2 );
@@ -695,8 +698,8 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 
 }
 
-//only load on multisite
-if ( is_multisite() && ! mp_cart()->is_global ) {
+//only load on multisite and if global cart is disabled
+if ( is_multisite() && !mp_cart()->is_global ) {
 
 	//set names here to be able to translate
 	if ( is_super_admin() ) {
@@ -731,15 +734,15 @@ if ( is_multisite() && ! mp_cart()->is_global ) {
 			'site_option_name'	 => 'mp_network_settings',
 			'order'				 => 16,
 			'conditional'		 => array(
-				'operator' => 'AND',
-				'action' => 'show',
+				'operator'	 => 'AND',
+				'action'	 => 'hide',
 				array(
 					'name'	 => 'global_cart',
 					'value'	 => 1,
 				),
 				array(
-					'name' => 'global_gateway',
-					'value' => 'paypal_chained',
+					'name'	 => 'global_gateway',
+					'value'	 => 'paypal_chained',
 				),
 			),
 		) );
@@ -845,4 +848,4 @@ if ( is_multisite() && ! mp_cart()->is_global ) {
 }
 
 //register shipping plugin
-mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal_chained', __( 'PayPal Chained Payments', 'mp' ), true );
+mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal_chained', __( 'PayPal Chained Payments', 'mp' ) );
