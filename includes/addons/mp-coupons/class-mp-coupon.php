@@ -128,11 +128,18 @@ class MP_Coupon {
 
 		$discount_amt = 0;
 
-		$product_ids = array_keys( $product_ids );
+		//$product_ids = array_keys( $product_ids );
 
 		foreach ( $product_ids as $product_id ) {
 			$product		 = new MP_Product( $product_id );
 			$product_price	 = $product->get_price( 'lowest' );
+
+			$applies_to = $this->get_meta( 'applies_to' );
+			if ( $applies_to == 'all' ) {
+				//if this coupon apply to all, we will have to get the regular price for calculating
+				//as the get_price('lowest') already applied the discount amout
+				$product_price = $product->get_price( 'regular' );
+			}
 
 			if ( 'subtotal' == $this->get_meta( 'discount_type' ) ) {
 				$discount_amt += ($this->get_price( $product_price ) - $product_price);
@@ -313,6 +320,20 @@ class MP_Coupon {
 								}
 							}
 						}
+					}
+				}
+				break;
+			case 'all':
+				$products      = array();
+				$cart_products = mp_cart()->get_items_as_objects();
+
+				foreach ( $cart_products as $product ) {
+					//because this apply to all products inside cart, so we just apply to all
+					if ( $ids_only ) {
+						$products[] = $product->ID;
+					} else {
+						$key              = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+						$products[ $key ] = mp_cart()->get_line_item( $product );
 					}
 				}
 				break;

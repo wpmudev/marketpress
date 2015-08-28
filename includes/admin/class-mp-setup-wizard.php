@@ -698,7 +698,7 @@ class MP_Setup_Wizard {
 	 * @return string
 	 */
 	public function determine_is_use_paymentgateway( $value, $post_id, $raw, $instance ) {
-		$gateways = mp_get_setting( 'gateways->allowed' );
+		$gateways = mp_get_setting( 'gateways->allowed', array() );
 		unset( $gateways['manual_payments'] );
 		foreach ( $gateways as $key => $val ) {
 			if ( $val == 1 ) {
