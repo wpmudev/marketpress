@@ -1243,7 +1243,12 @@ class MP_Cart {
 
 			foreach ( $items as $item_id => $qty ) {
 				$product = new MP_Product( $item_id );
-				if ( !$product->is_download() ) {
+				//we will have to check this product exists or not
+				if ( ! $product->exists() ) {
+					continue;
+				}
+
+				if (!$product->is_download() ) {
 					$this->_is_download_only = false;
 				}
 			}
@@ -1661,7 +1666,7 @@ class MP_Cart {
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
 					if ( $item->is_download() && $item->special_tax_amt() ) {
-						
+
 					} else {
 						if ( !mp_get_setting( 'tax->tax_digital' ) && $item->is_download() ) {
 							continue;
@@ -1711,7 +1716,6 @@ class MP_Cart {
 		}
 
 		$tax_total = mp_arr_get_value( 'tax', $this->_total, 0 );
-
 		if ( $format ) {
 			return mp_format_currency( '', $tax_total );
 		} else {

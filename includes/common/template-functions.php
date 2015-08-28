@@ -2632,8 +2632,9 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	$excerpt		 = str_replace( ']]>', ']]&gt;', $excerpt );
 	$excerpt		 = strip_tags( $excerpt );
 	$excerpt_length	 = apply_filters( 'excerpt_length', $length );
-	$excerpt_more	 = apply_filters( 'excerpt_more', ' ' . '<a href="#" class="more-link">[...]</a>' );
-
+	//update from excerpt_more to mp_excerpt more, as the behavior of product except does'nt exactl
+	$excerpt_more	 = apply_filters( 'excerpt_more', '...');
+	
 	$words = preg_split( "/[\n\r\t ]+/", $excerpt, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
 	if ( count( $words ) > $excerpt_length ) {
 		array_pop( $words );

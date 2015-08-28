@@ -2241,7 +2241,7 @@ WHERE $delete_where"
 	 * @action admin_menu
 	 */
 	function remove_metaboxes() {
-		if ( apply_filters( 'mp_remove_excerpt_meta_box', true ) ) {
+		if ( apply_filters( 'mp_remove_excerpt_meta_box', false ) ) {
 			remove_meta_box( 'postexcerpt', 'product', 'normal' );
 		}
 
