@@ -970,6 +970,7 @@ if ( !function_exists( 'mp_format_currency' ) ) :
 
 endif;
 
+
 if ( !function_exists( 'mp_format_date' ) ) :
 
 	/**
@@ -985,7 +986,9 @@ if ( !function_exists( 'mp_format_date' ) ) :
 			$format .= ' - ' . get_option( 'time_format' );
 		}
 
-		return date_i18n( $format, $timestamp );
+		$date = get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), $format );
+		return $date;
+		//return date_i18n( $format, $timestamp);
 	}
 
 endif;
