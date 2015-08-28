@@ -607,8 +607,10 @@ class MP_Products_Screen {
 			"SELECT attribute_id FROM $table_name WHERE attribute_name = %s", $new_taxonomy_name
 			) );
 
-			if ( is_array( $result ) ) {
+			if ( is_array( $result ) && isset( $result[ 0 ] ) ) {
 				$attribute_id = $result[ 0 ]; //get the first attribute with the given name from the array
+			}else{
+				$attribute_id = '';
 			}
 
 			if ( !is_numeric( $attribute_id ) ) {
@@ -632,7 +634,6 @@ class MP_Products_Screen {
 
 			$taxonomy = $attribute_slug;
 		}
-
 		return $taxonomy;
 	}
 
@@ -1296,9 +1297,8 @@ WHERE $delete_where"
 				'label'			 => array( 'text' => sprintf( __( 'Limit Per Order %1$s(limit the number of the item a shopper can buy per order)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ) ),
 				'placeholder'	 => __( 'Unlimited', 'mp' ),
 				'validation'	 => array(
-					'required'	 => false,
-					'number'	 => true,
-					'min'		 => 0,
+					'number' => true,
+					'min'	 => 0,
 				),
 				'conditional'	 => array(
 					'name'	 => 'product_type',

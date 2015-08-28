@@ -1119,7 +1119,7 @@ class MP_Cart {
 			$html .= '
 				<div class="mp_mini_cart_items-empty">
 					<p><strong>' . __( 'Your shopping cart is empty.', 'mp' ) . '</strong></p>
-					<p>' . __( 'As you add browse items and add them to your add cart they will show up here.', 'mp' ) . '</p>
+					<p>' . __( 'Items/Products added to Cart will show here.', 'mp' ) . '</p>
 				</div><!-- end mp_mini_cart_items-empty -->';
 		}
 
