@@ -317,7 +317,7 @@ class MP_Cart {
 			$posts = get_posts( array(
 				'post__in'		 => array_keys( $items ),
 				'posts_per_page' => -1,
-				'post_type'		 => array( MP_Product::get_post_type(), apply_filters( 'mp_product_variation_post_type', 'mp_product_variation') ),
+				'post_type'		 => array( MP_Product::get_post_type(), apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ),
 				'post_status'	 => array( 'publish', 'out_of_stock', 'trash' ),
 				'orderby'		 => 'post__in'
 			) );
@@ -558,11 +558,16 @@ class MP_Cart {
 
 		if ( $this->is_editable ) {
 			$zipcode = mp_get_current_user_zipcode();
+			$city	 = mp_get_current_user_city();
 
-			if ( empty( $zipcode ) ) {
+			if ( empty( $zipcode ) && empty( $city ) ) {
 				$header = __( 'Estimated Total', 'mp' );
+			} elseif ( empty( $zipcode ) && !empty( $city ) ) {
+				$header = sprintf( __( 'Estimated Total (%s)', 'mp' ), $city );
+			} elseif ( !empty( $zipcode ) && empty( $city ) ) {
+				$header = sprintf( __( 'Estimated Total (%s, %s)', 'mp' ), $zipcode );
 			} else {
-				$header = sprintf( __( 'Estimated Total for %s', 'mp' ), $zipcode );
+				$header = sprintf( __( 'Estimated Total (%s, %s)', 'mp' ), $city, $zipcode );
 			}
 
 			/**
@@ -1244,11 +1249,11 @@ class MP_Cart {
 			foreach ( $items as $item_id => $qty ) {
 				$product = new MP_Product( $item_id );
 				//we will have to check this product exists or not
-				if ( ! $product->exists() ) {
+				if ( !$product->exists() ) {
 					continue;
 				}
 
-				if (!$product->is_download() ) {
+				if ( !$product->is_download() ) {
 					$this->_is_download_only = false;
 				}
 			}
@@ -1666,7 +1671,7 @@ class MP_Cart {
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
 					if ( $item->is_download() && $item->special_tax_amt() ) {
-
+						
 					} else {
 						if ( !mp_get_setting( 'tax->tax_digital' ) && $item->is_download() ) {
 							continue;

@@ -1022,6 +1022,35 @@ if ( !function_exists( 'mp_get_current_user_zipcode' ) ) :
 
 endif;
 
+if ( !function_exists( 'mp_get_current_user_city' ) ) :
+
+	/**
+	 * Get the current user's zipcode
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string The zipcode. False, if no zipcode could be retrieved.
+	 */
+	function mp_get_current_user_city() {
+		$user	 = wp_get_current_user();
+		$address = $user->get( 'mp_shipping_info' );
+		$city = false;
+
+		if ( is_array( $address ) ) {
+// Try to get from usermeta
+			$city = mp_arr_get_value( 'city', $address );
+		}
+
+		if ( false === $city ) {
+// Try to get from cookie
+			$city = mp_get_cookie_value( 'city' );
+		}
+
+		return $city;
+	}
+
+endif;
+
 if ( !function_exists( 'mp_get_user_address' ) ) :
 
 	/**
