@@ -98,7 +98,7 @@
             errorMessage( 'hide' );
 
             // Submit order for processing
-            var data = $( '#mp-checkout' ).serialize() + '&stripe_token=' + response.id;
+            var data = $( '#mp-checkout-form' ).serialize() + '&stripe_token=' + response.id;
             var url = mp_i18n.ajaxurl + '?action=mp_process_checkout';
 
             $.post( url, data ).done( function( resp ) {

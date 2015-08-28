@@ -172,7 +172,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 			<div class="mp_quick_setup_step mp_quick_setup_step-3">
 				<div class="mp_content">
 					<h3 class="mp_title"><?php _e( 'Woohoo! Your online store is up and running.', 'mp' ); ?></h3>
-					<p><?php _e( 'That\'s all your new store needs to work! However every store needs products...Get started adding <br>products bellow, or jump straight into configuring your stores settings further.', 'mp' ); ?></p>
+					<p><?php _e( 'Your store is almost ready for its first customers, but first it needs some products. Get started by adding products below, or jump straight into further configuring your store’s settings.', 'mp' ); ?></p>
 				</div><!-- end mp_content -->
 				<div class="mp_callout">
 					<div class="mp_content_col mp_content_col-one-half">

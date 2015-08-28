@@ -286,8 +286,9 @@ class MP_Admin_Multisite {
 
 		$all_gateways = MP_Gateway_API::get_gateways();
 		$gateways     = array( '' => __( 'Choose a Gateway', 'mp' ) );
-
+		
 		foreach ( $all_gateways as $code => $gateway ) {
+	
 			if ( ! $gateway[2] ) {
 				// Skip non-global gateways
 				continue;

@@ -53,6 +53,8 @@ class MP_Products_Screen {
 		add_filter( 'manage_mp_product_posts_columns', array( &$this, 'product_columns_head' ) );
 		add_action( 'manage_product_posts_custom_column', array( &$this, 'product_columns_content' ), 10, 2 );
 		add_action( 'manage_mp_product_posts_custom_column', array( &$this, 'product_columns_content' ), 10, 2 );
+
+		//add_filter( 'the_title', array( &$this, 'product_admin_title' ), 10, 2 );
 // Add metaboxes
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
 // Add quick/bulk edit capability for product fields
@@ -300,7 +302,6 @@ class MP_Products_Screen {
 	public function product_columns_head( $columns ) {
 		return array(
 			'cb'						 => '<input type="checkbox" />',
-			'product_image'				 => __( 'Img', 'mp' ),
 			'title'						 => __( 'Product Name', 'mp' ),
 			'product_variations'		 => __( 'Variations', 'mp' ),
 			'product_sku'				 => __( 'SKU', 'mp' ),
@@ -309,8 +310,16 @@ class MP_Products_Screen {
 			'product_sales'				 => __( 'Sales', 'mp' ),
 			'taxonomy-product_category'	 => __( 'Categories', 'mp' ),
 			'taxonomy-product_tag'		 => __( 'Tags', 'mp' ),
+			'product_image'				 => __( 'Img', 'mp' ),
 		);
 	}
+
+	/* public function product_admin_title( $title, $id ) {
+	  if ( MP_Product::get_post_type() == get_post_type( $id ) ) {
+	  $title = $id;
+	  }
+	  return $title;
+	  } */
 
 	/**
 	 * Display data for each product admin column
@@ -324,6 +333,7 @@ class MP_Products_Screen {
 		$variations	 = $product->get_variations();
 
 		switch ( $column ) {
+
 			case 'product_image' :
 				if ( $product->has_variations() ) {
 					$variation_has_thumbnail = false;

@@ -1303,7 +1303,7 @@ class MP_Product {
 
 			if ( 'categories' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_tag' );
-				$ids						 = isset( $terms ) && is_array( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_tag',
 					'terms'		 => $ids,
@@ -1313,7 +1313,7 @@ class MP_Product {
 
 			if ( 'tags' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_category' );
-				$ids						 = isset( $terms ) && is_array( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
+				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
 					'taxonomy'	 => 'product_category',
 					'terms'		 => $ids,
@@ -1477,7 +1477,7 @@ class MP_Product {
 		}
 
 		$image_post_id = $this->ID;
-		
+
 		if ( $this->has_variations() ) {
 			$image_post_id = $this->get_variation()->ID;
 		}
@@ -1623,8 +1623,8 @@ class MP_Product {
 	 * @param string $view Either single or list. Optional.
 	 */
 	public function image_url( $echo = true, $size = null, $view = null, $id = false ) {
-		
-	
+
+
 		if ( is_null( $size ) ) {
 			$img_size	 = mp_get_image_size( $view );
 			$size		 = ( $img_size[ 'label' ] == 'custom' ) ? array( $size[ 'width' ], $size[ 'height' ] ) : $img_size[ 'label' ];
@@ -1638,7 +1638,7 @@ class MP_Product {
 		}
 
 		if ( has_post_thumbnail( $post_id ) ) {
-			$img_id	 = get_post_thumbnail_id( $id ? $id : $post_id );
+			$img_id	 = get_post_thumbnail_id( $id ? $id : $post_id  );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
 			$img_url = array_shift( $img_src );
 		}
@@ -1830,7 +1830,7 @@ Notification Preferences: %s', 'mp' );
 		$post_id			 = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 		$product_categories	 = get_the_terms( $post_id, 'product_category' );
 
-		if ( !empty( $product_categories ) ) {
+		if ( !empty( $product_categories ) && !is_wp_error( $product_categories ) ) {
 			$product_categories = wp_list_pluck( $product_categories, 'term_id' );
 		} /* else {
 		  $product_categories = array( 0 );
@@ -2301,16 +2301,17 @@ Notification Preferences: %s', 'mp' );
 		if ( !is_admin() ) {
 			$tabs = array();
 
-			$args = array(
-				'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
-				'echo'		 => false,
-				'limit'		 => mp_get_setting( 'related_products->show_limit' ),
-				'view'		 => mp_get_setting( 'related_products->view' ),
-			);
-
-			$related_products = $product->related_products( $args, true );
-
 			if ( mp_get_setting( 'related_products->show' ) ) {
+
+				$args = array(
+					'relate_by'	 => mp_get_setting( 'related_products->relate_by' ),
+					'echo'		 => false,
+					'limit'		 => mp_get_setting( 'related_products->show_limit' ),
+					'view'		 => mp_get_setting( 'related_products->view' ),
+				);
+
+				$related_products = $product->related_products( $args, true );
+
 				if ( $related_products !== false ) {
 					$tabs[ 'mp-related-products' ] = __( 'Related Products', 'mp' );
 				}
