@@ -870,7 +870,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 										'total'                => $vcart->total(),
 										'currency'             => $this->currencyCode,
 										'transaction_id'       => mp_arr_get_value( 'PAYMENTINFO_' . $index . '_TRANSACTIONID', $response ),
-										'method'               => __( 'Credit Card', 'mp' ),
+										'method'               => __( 'PayPal', 'mp' ),
 									),
 									'cart'               => $vcart,
 									'paid'               => true,

@@ -312,14 +312,14 @@ class MP_Orders_Admin {
 				<select id="post_status" name="post_status">
 					<?php foreach ( $statuses as $key => $status ) : ?>
 						<option value="<?php echo $key; ?>" <?php selected( $key, $order->post_status ); ?>><?php echo $status->label; ?></option>
-		<?php endforeach; ?>
+					<?php endforeach; ?>
 				</select>
 			</div>
 		</div>
 		<div id="major-publishing-actions">
 			<div id="publishing-action">
 				<span class="spinner"></span>
-		<?php submit_button( __( 'Save Changes', 'mp' ), 'primary', null, false, array( 'id' => 'publish' ) ); ?>
+				<?php submit_button( __( 'Save Changes', 'mp' ), 'primary', null, false, array( 'id' => 'publish' ) ); ?>
 			</div>
 			<div class="clear"></div>
 		</div>
@@ -370,12 +370,12 @@ class MP_Orders_Admin {
 		?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br />
-		<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
+			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
 		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
 			<div class="misc-pub-section">
 				<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br />
-			<?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?>
+				<?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?>
 			</div>
 		<?php endif; ?>
 		<div class="misc-pub-section">
@@ -384,7 +384,7 @@ class MP_Orders_Admin {
 				<option value=""><?php _e( 'Select One', 'mp' ); ?></option>
 				<?php foreach ( $carriers as $val => $label ) : ?>
 					<option data-original="<?php echo isset( $custom_carriers[ $val ] ) ? 1 : 0 ?>" value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
-		<?php endforeach; ?>
+				<?php endforeach; ?>
 			</select>
 			<a class="mp-hide mp-remove-custom-carrier" href="#"><?php _e( "Remove", "mp" ) ?></a>
 		</div>
@@ -788,7 +788,8 @@ class MP_Orders_Admin {
 
 			//! Order Date
 			case 'mp_orders_date' :
-				$html .= get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+				$post_date = get_post_time();
+				$html .= mp_format_date( $post_date ); //get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
 				break;
 
 			//! Order From

@@ -41,6 +41,16 @@ class MP_Admin {
 		add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );
 		//enqueue styles and scripts
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
+
+		add_action( 'admin_head', array( &$this, 'admin_head' ) );
+	}
+
+	function admin_head() {
+		if ( 'mp_order' == get_post_type() ) {
+			echo '<style type="text/css">
+    .page-title-action {display:none;}
+    </style>';
+		}
 	}
 
 	/**
