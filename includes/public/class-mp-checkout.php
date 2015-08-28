@@ -176,6 +176,10 @@ class MP_Checkout {
 		foreach ( $selected as $blog_id => $method ) {
 			if ( 'calculated' == $shipping_method ) {
 
+				if ( $method === false ) {
+					return;
+				}
+
 				list( $shipping_option, $shipping_sub_option ) = explode( '->', $method );
 
 				if ( mp_cart()->is_global ) {
@@ -208,7 +212,7 @@ class MP_Checkout {
 	 */
 	public function address_fields( $type, $value_only = false ) {
 		$country = mp_get_user_address_part( 'country', $type );
-		
+
 		// Country list
 		if ( is_array( mp_get_setting( 'shipping->allowed_countries', '' ) ) ) {
 			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
@@ -452,7 +456,7 @@ class MP_Checkout {
 	 * @action wp_ajax_mp_process_checkout, wp_ajax_nopriv_mp_process_checkout
 	 */
 	public function ajax_process_checkout() {
-		
+
 		if ( $payment_method = mp_get_post_value( 'payment_method' ) ) {
 			$cart			 = mp_cart();
 			$billing_info	 = mp_get_user_address( 'billing' );
