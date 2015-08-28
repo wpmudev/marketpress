@@ -1741,6 +1741,10 @@ class MP_Product {
 	 * @access public
 	 */
 	public function is_variation() {
+		if ( is_null( $this->_post ) ) {
+			return false;
+		}
+
 		return ( $this->_post->post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) );
 	}
 
