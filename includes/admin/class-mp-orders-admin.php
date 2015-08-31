@@ -788,8 +788,8 @@ class MP_Orders_Admin {
 
 			//! Order Date
 			case 'mp_orders_date' :
-				$post_date = get_post_time();
-				$html .= mp_format_date( $post_date ); //get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+				$post_date = get_post_time( 'U', true );
+				$html .= mp_format_date( $post_date); //get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
 				break;
 
 			//! Order From
