@@ -104,7 +104,7 @@ class MP_Checkout {
 	}
 
 	/**
-	 * Determine if the shipping step is needed
+	 * Determine if the shipping step is needed, also switch back to the original blog, or it cause weird stuff
 	 *
 	 * @since 3.0
 	 * @access protected
@@ -113,7 +113,7 @@ class MP_Checkout {
 	protected function _need_shipping_step() {
 		$blog_ids			 = mp_cart()->get_blog_ids();
 		$need_shipping_step	 = false;
-
+		$current_blog_id = get_current_blog_id();
 		while ( 1 ) {
 			if ( mp_cart()->is_global ) {
 				$blog_id = array_shift( $blog_ids );
@@ -129,7 +129,7 @@ class MP_Checkout {
 				break;
 			}
 		}
-
+		switch_to_blog($current_blog_id);
 		return $need_shipping_step;
 	}
 
