@@ -1301,7 +1301,7 @@ class MP_Product {
 			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 			$count	 = 0;
 
-			if ( 'categories' != $relate_by ) {
+			if ( 'category' != $relate_by ) {
 				$terms						 = get_the_terms( $post_id, 'product_tag' );
 				$ids						 = isset( $terms ) && is_array( $terms ) && !is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
 				$query_args[ 'tax_query' ][] = array(
