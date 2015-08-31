@@ -745,12 +745,12 @@ class MP_Store_Settings_Presentation {
 			'options'	 => mp_get_theme_list() + array( 'none' => __( 'None - Custom Theme Template', 'mp' ) ),
 			'width'		 => '50%',
 		) );
-		$metabox->add_field( 'checkbox', array(
+		/*$metabox->add_field( 'checkbox', array(
 			'name'		 => 'show_purchase_breadcrumbs',
 			'label'		 => array( 'text' => __( 'Show Breadcrumbs?', 'mp' ) ),
 			'message'	 => __( 'Yes', 'mp' ),
 			'desc'		 => __( 'Shows previous, current and next steps when a customer is checking out -- shown below the title.', 'mp' ),
-		) );
+		) );*/
 	}
 
 }
