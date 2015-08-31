@@ -87,7 +87,7 @@ class MP_Coupons_Addon {
 
 			add_filter( 'mp_product/get_price', array( &$this, 'product_price' ), 10, 2 );
 			add_filter( 'mp_cart/product_total', array( &$this, 'product_total' ), 10, 2 );
-			add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
+			//add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
 
 			add_filter( 'mp_cart/tax_total', array( &$this, 'tax_total' ), 10, 3 );
 
@@ -99,8 +99,6 @@ class MP_Coupons_Addon {
 			add_action( 'mp_cart/before_remove_item', array( &$this, 'check_coupons' ), 10, 2 );
 
 			add_filter( 'mp_coupon_total_value', array( &$this, 'max_discount' ), 10, 1 );
-			//paypal having some specific for network cart checkout
-			add_filter( 'mp_paypal_virtual_cart', array( &$this, 'paypal_vcart_apply_coupon' ), 10, 2 );
 		}
 
 		if ( is_admin() ) {
@@ -340,7 +338,6 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function cart_total( $total, $_total, $cart ) {
-
 		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
 			$total = $total + ( - 1 * $total );
 		} else {
@@ -353,6 +350,9 @@ class MP_Coupons_Addon {
 	public function tax_total( $tax_amount, $total, $obj ) {
 
 		$percent = $total / 100;
+		if ( $percent == 0 ) {
+			return $tax_amount;
+		}
 
 		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
 			$total_pre = $total + ( - 1 * $total );
@@ -871,6 +871,7 @@ class MP_Coupons_Addon {
 
 		if ( mp_cart()->is_global ) {
 			mp_cart()->set_id( $blog_id );
+			switch_to_blog($blog_id);
 		}
 
 		$coupon = new MP_Coupon( $coupon_code );
@@ -1039,7 +1040,7 @@ class MP_Coupons_Addon {
 		$total = 0;
 		foreach ( $items as $item ) {
 			$price = $item->get_price();
-			$total += ( mp_arr_get_value( 'before_coupon', $price, mp_arr_get_value( 'lowest', $price, 0 ) ) * $item->qty );
+			$total += ( mp_arr_get_value( 'coupon', $price, mp_arr_get_value( 'lowest', $price, 0 ) ) * $item->qty );
 		}
 
 		return (float) $total;
@@ -1229,16 +1230,6 @@ class MP_Coupons_Addon {
 		}
 
 		return $allcaps;
-	}
-
-	/**
-	 * only for paypal
-	 */
-	public function paypal_vcart_apply_coupon( $vcart, $cart ) {
-		foreach($this->_coupons_applied as $applied){
-
-		}
-		return $vcart;
 	}
 }
 
