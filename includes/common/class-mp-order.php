@@ -219,15 +219,15 @@ class MP_Order {
 	 * @param string $subject The email subject text.
 	 * @param string $msg The email message text.
 	 */
-	protected function _send_email_to_buyers( $subject, $msg, $attachments=array() ) {
+	protected function _send_email_to_buyers( $subject, $msg, $attachments = array() ) {
 		$billing_email	 = $this->get_meta( 'mp_billing_info->email', '' );
 		$shipping_email	 = $this->get_meta( 'mp_shipping_info->email', '' );
 
-		mp_send_email( $billing_email, $subject, $msg,$attachments );
+		mp_send_email( $billing_email, $subject, $msg, $attachments );
 
 		if ( $billing_email != $shipping_email ) {
 			// Billing email is different than shipping email so let's send an email to the shipping email too
-			mp_send_email( $shipping_email, $subject, $msg,$attachments );
+			mp_send_email( $shipping_email, $subject, $msg, $attachments );
 		}
 	}
 
@@ -269,10 +269,10 @@ class MP_Order {
 		 * @param string $msg The current message.
 		 * @param MP_Order $this The current order object.
 		 */
-		$msg = apply_filters( 'mp_order/notification_body', $msg, $this );
-		$msg = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
-		$attachments = apply_filters('mp_order/sendmail_attachments',array(),$this,'new_order_client');
-		$this->_send_email_to_buyers( $subject, $msg,$attachments );
+		$msg		 = apply_filters( 'mp_order/notification_body', $msg, $this );
+		$msg		 = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
+		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
+		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
@@ -305,9 +305,9 @@ You can manage this order here: %s', 'mp' );
 		 * @param string $msg
 		 * @param MP_Order $order
 		 */
-		$msg = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
-		$attachments = apply_filters('mp_order/sendmail_attachments',array(),$this,'new_order_admin');
-		mp_send_email( mp_get_store_email(), $subject, $msg ,$attachments);
+		$msg		 = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
+		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_admin' );
+		mp_send_email( mp_get_store_email(), $subject, $msg, $attachments );
 	}
 
 	/**
@@ -359,9 +359,9 @@ You can manage this order here: %s', 'mp' );
 		 * @param string $msg The email message.
 		 * @param MP_Order $this The current order object.
 		 */
-		$msg = apply_filters( 'mp_order/shipment_notification', $msg, $this );
-		$attachments = apply_filters('mp_order/sendmail_attachments',array(),$this,'order_shipped_client');
-		$this->_send_email_to_buyers( $subject, $msg ,$attachments);
+		$msg		 = apply_filters( 'mp_order/shipment_notification', $msg, $this );
+		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'order_shipped_client' );
+		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 	}
 
 	/**
@@ -462,7 +462,7 @@ You can manage this order here: %s', 'mp' );
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function details( $echo = true ) {
-		
+
 		$cart		 = $this->get_cart();
 		$currency	 = $this->get_meta( 'mp_payment_info->currency', '' );
 
@@ -481,14 +481,14 @@ You can manage this order here: %s', 'mp' );
 			<section id="mp-single-order-details" class="mp_orders">
 				<div class="mp_order_details">
 					<div class="mp_order">' .
-						$this->header( false ) .
-					'</div><!-- end mp_order -->' .
-					$confirmation_text . '
+		$this->header( false ) .
+		'</div><!-- end mp_order -->' .
+		$confirmation_text . '
 					<div class="mp_order_cart">' .
-						$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) . '
+		$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) . '
 					</div><!-- end mp_order_cart -->
 					<div class="mp_order_address">' .
-						$this->get_addresses() . '
+		$this->get_addresses() . '
 					</div><!-- end mp_order_address -->
 				</div><!-- end mp_order_details -->
 			</section><!-- end mp-single-order-details -->';
@@ -546,12 +546,12 @@ You can manage this order here: %s', 'mp' );
 			// Country dropdown
 			$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 			$country_options	 = '';
-			
-			if(  mp_all_countries_allowed()){
-				$all_countries = mp()->countries;
-				$allowed_countries = array_keys($all_countries);
+
+			if ( mp_all_countries_allowed() ) {
+				$all_countries		 = mp()->countries;
+				$allowed_countries	 = array_keys( $all_countries );
 			}
-			
+
 			foreach ( $allowed_countries as $country ) {
 				$country_options .= '<option value="' . $country . '" ' . selected( $country, $this->get_meta( "mp_{$type}_info->country", '' ), false ) . '>' . mp()->countries[ $country ] . '</option>' . "\n";
 			}
@@ -649,17 +649,17 @@ You can manage this order here: %s', 'mp' );
 			<div class="mp_customer_address">
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Billing Address', 'mp' ) . '</h4>' .
-					$this->get_address( 'billing', $editable ) .
-					(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
+		$this->get_address( 'billing', $editable ) .
+		(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
 				</div>';
 
-				if ( !$this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
-				$html .= '
+		if ( !$this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
+			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h4>' .
-					$this->get_address( 'shipping', $editable ) . '';
+			$this->get_address( 'shipping', $editable ) . '';
 
-					$html .= '
+			$html .= '
 				</div>';
 		}
 
@@ -877,7 +877,7 @@ You can manage this order here: %s', 'mp' );
 		/**
 		 * store the current blog id, after the mp_cart() running shipping_total,shipping_tax_total & tax_total
 		 * the blog id will revert the main, in some case this is a bug
-		*/
+		 */
 		$current_blog_id = get_current_blog_id();
 
 		$args = array_replace_recursive( array(
@@ -947,7 +947,7 @@ You can manage this order here: %s', 'mp' );
 		}
 
 		$item_count = 0;
-		
+
 		foreach ( $items as $item ) {
 			$item_count += $item->qty;
 
@@ -956,7 +956,7 @@ You can manage this order here: %s', 'mp' );
 
 				// Update inventory
 				$new_stock = ($stock - $item->qty);
-				
+
 				$item->update_meta( 'inventory', $new_stock );
 				$item->update_meta( 'inv_inventory', $new_stock );
 
@@ -976,11 +976,11 @@ You can manage this order here: %s', 'mp' );
 
 			// Update sales count
 			$count = $item->get_meta( 'mp_sales_count', 0 );
-			
+
 			$count += $item->qty;
-			
+
 			//$item->update_meta( 'mp_sales_count', $count );
-			update_post_meta($item->ID, 'mp_sales_count', $count);
+			update_post_meta( $item->ID, 'mp_sales_count', $count );
 
 			if ( has_filter( 'mp_product_sale' ) ) {
 				trigger_error( 'The <strong>mp_product_sale</strong> hook has been replaced by <strong>mp_order/product_sale</strong> as of MP 3.0.', E_USER_ERROR );
@@ -1057,6 +1057,7 @@ You can manage this order here: %s', 'mp' );
 		 * @param MP_Order $this The current order object.
 		 */
 		do_action( 'mp_order/new_order', $this );
+		do_action( 'mp_product_created', $this->ID );//support for older integrations
 
 		// Empty cart
 		$cart->empty_cart();

@@ -44,6 +44,8 @@ class MP_Orders_Admin {
 		//meta boxes
 		add_action( 'add_meta_boxes_mp_order', array( &$this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
+		add_action( 'save_post', array( &$this, 'post_status_hook' ), 10, 3 );
+		add_action( 'delete_post', array( &$this, 'delete_post_hook' ) );
 		//perform some actions when order status changes
 		add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 );
 		//add menu items
@@ -184,6 +186,25 @@ class MP_Orders_Admin {
 		}
 
 		return $this->_ipn_history;
+	}
+
+	public function post_status_hook( $post_id, $post, $update ) {
+		if ( mp_doing_autosave() || mp_doing_ajax() ) {
+			return;
+		}
+		if ( MP_Product::get_post_type() != $post->post_type ) {
+			return;
+		}
+
+		if ( $update ) {
+			do_action( 'mp_product_updated', $post_id );
+		} else {
+			do_action( 'mp_product_created', $post_id );
+		}
+	}
+
+	public function delete_post_hook( $post_id ) {
+		do_action( 'mp_product_deleted', $post_id );
 	}
 
 	/**
@@ -789,7 +810,7 @@ class MP_Orders_Admin {
 			//! Order Date
 			case 'mp_orders_date' :
 				$post_date = get_post_time( 'U', true );
-				$html .= mp_format_date( $post_date); //get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+				$html .= mp_format_date( $post_date ); //get_the_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
 				break;
 
 			//! Order From
