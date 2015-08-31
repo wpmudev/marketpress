@@ -871,6 +871,7 @@ class MP_Coupons_Addon {
 
 		if ( mp_cart()->is_global ) {
 			mp_cart()->set_id( $blog_id );
+			switch_to_blog($blog_id);
 		}
 
 		$coupon = new MP_Coupon( $coupon_code );
