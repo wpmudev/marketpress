@@ -691,10 +691,16 @@ class MP_Cart {
 
 		$this->is_editable = $editable;
 
+		$disable_cart = mp_get_setting( 'disable_cart', 0 );
+
 		if ( !$this->has_items() ) {
 			$message = '<div class="mp_cart_empty">';
 			$message .= '<p class="mp_cart_empty_message">';
-			$message .= sprintf( __( 'There are no items in your cart - <a href="%s">go add some</a> !', 'mp' ), mp_store_page_url( 'products', false ) );
+			if ( $disable_cart == '1' ) {
+				$message .= __( 'The cart is disabled.', 'mp' );
+			} else {
+				$message .= sprintf( __( 'There are no items in your cart - <a href="%s">go add some</a> !', 'mp' ), mp_store_page_url( 'products', false ) );
+			}
 			$message .= '</p><!-- end mp_cart_empty_message -->';
 			$message .= '</div><!-- end mp_cart_empty -->';
 
@@ -1064,6 +1070,12 @@ class MP_Cart {
 	 * @action wp_footer
 	 */
 	public function floating_cart_html() {
+
+		$disable_cart = mp_get_setting( 'disable_cart', 0 );
+
+		if ( mp_get_setting( 'disable_cart' ) == '1' ) {
+			return;
+		}
 
 		$echo = true;
 		if ( mp_doing_ajax() ) {
