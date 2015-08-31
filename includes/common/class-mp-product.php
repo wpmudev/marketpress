@@ -614,7 +614,7 @@ class MP_Product {
 		} else {
 			$min_value = 1;
 		}
-		
+
 		$html .= '
 				<div class="mp_product_options_att"' . (( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"') . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
@@ -1520,6 +1520,11 @@ class MP_Product {
 		 * @since 3.0
 		 * @param int $post_id
 		 */
+		
+		if ( empty( $context ) ) {
+			$context = 'single';
+		}
+
 		$post_id = apply_filters( 'mp_product_image_id', $this->ID );
 
 		if ( $post_id != $this->ID ) {
@@ -1586,12 +1591,23 @@ class MP_Product {
 				break;
 
 			case 'single' :
+			
 				// size
-				if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
+				if ( intval( $size ) ) {
+					$size = array( intval( $size ), intval( $size ) );
+				} else {
+					if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
+						$size = array( mp_get_setting( 'product_img_size->width' ), mp_get_setting( 'product_img_size->height' ) );
+					} else {
+						$size = mp_get_setting( 'product_img_size' );
+					}
+				}
+				
+				/*if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
 					$size = array( mp_get_setting( 'product_img_size_custom->width' ), mp_get_setting( 'product_img_size_custom->height' ) );
 				} else {
 					$size = mp_get_setting( 'product_img_size' );
-				}
+				}*/
 
 				if ( mp_get_setting( 'disable_large_image' ) ) {
 					$link = false;
