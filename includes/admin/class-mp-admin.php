@@ -33,7 +33,7 @@ class MP_Admin {
 	 */
 	private function __construct() {
 		$this->_init_dash_notices();
-		$this->_includes();
+		add_action('init',array(&$this,'_includes'),1);
 
 		//save orders screen options
 		add_filter( 'set-screen-option', array( &$this, 'save_orders_screen_options' ), 10, 3 );
@@ -59,7 +59,7 @@ class MP_Admin {
 	 * @since 3.0
 	 * @access public
 	 */
-	protected function _includes() {
+	public function _includes() {
 		require_once mp_plugin_dir( 'includes/admin/class-mp-orders-admin.php' );
 		require_once mp_plugin_dir( 'includes/admin/class-mp-products-admin.php' );
 		require_once mp_plugin_dir( 'includes/admin/class-mp-product-attributes-admin.php' );
@@ -140,7 +140,7 @@ class MP_Admin {
 				$month_count = count( $months );
 
 				if ( !$month_count || ( 1 == $month_count && 0 == $months[ 0 ]->month ) )
-					return;
+					{return;}
 
 				$m = isset( $_GET[ 'm' ] ) ? (int) $_GET[ 'm' ] : 0;
 				?>
@@ -149,7 +149,7 @@ class MP_Admin {
 					<?php
 					foreach ( $months as $arc_row ) {
 						if ( 0 == $arc_row->year )
-							continue;
+							{continue;}
 
 						$month	 = zeroise( $arc_row->month, 2 );
 						$year	 = $arc_row->year;
@@ -261,8 +261,10 @@ class MP_Admin {
 	 * @since 3.0
 	 * @access public
 	 * @filter post_updated_messages
-	 * @param array $messages
-	 * @return array
+	 *
+*@param array $messages
+	 *
+*@return array
 	 */
 	public function post_updated_messages( $messages ) {
 		global $post, $post_ID;
