@@ -302,7 +302,7 @@ class MP_Coupons_Addon {
 	 * @return string
 	 */
 	public function cart_meta_product_total( $html, $cart ) {
-		if ( ! $this->has_applied() ) {
+		if ( ! $this->has_applied() && !$cart->is_global) {
 			return $html;
 		}
 
