@@ -424,7 +424,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Style to display the categories list in. A value of list displays the categories as list items while none generates no special display method (the list items are separated by <br> tags).', 'mp' ); ?></span></span> style</th>
 				<td>
-					<select name="order" data-default="list">
+					<select name="style" data-default="list">
 						<?php foreach ( array( 'list', 'none' ) as $value ) : ?>
 							<option <?php selected( $value, 'list' ); ?>><?php echo $value; ?></option>
 						<?php endforeach; ?>
