@@ -194,7 +194,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 */
 	protected function _get_error( $result ) {
 		$error = '';
-		var_dump($result);
 		for ( $i = 0; $i <= 5; $i ++ ) {
 			if ( isset( $result["L_ERRORCODE{$i}"] ) ) {
 				$error .= '<li>' . $result["L_ERRORCODE{$i}"] . ' - ' . $result["L_LONGMESSAGE{$i}"] . '</li>';
@@ -411,6 +410,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$i = 0;
 			//we need to make a virtual cart for calculating,don't write to cookie
 			$vcart = new MP_Cart( false );
+			$subtotal = 0;
 			foreach ( $items as $product_id => $quantity ) {
 				$item  = new MP_Product( $product_id );
 				$price = $item->get_price( 'lowest' );
@@ -427,10 +427,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$request["L_PAYMENTREQUEST_{$index}_QTY{$i}"]          = $quantity;
 				$request["L_PAYMENTREQUEST_{$index}_ITEMURL{$i}"]      = $item->url( false );
 				$request["L_PAYMENTREQUEST_{$index}_ITEMCATEGORY{$i}"] = 'Physical';
+				$subtotal += $price;
 				$i ++;
 			}
 
-			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->product_total(); //items subtotal
+			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $subtotal; //items subtotal
 
 			//shipping total
 			if ( ( $shipping_price = $vcart->shipping_total( false ) ) !== false ) {
