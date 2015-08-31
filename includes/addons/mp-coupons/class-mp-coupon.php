@@ -132,14 +132,7 @@ class MP_Coupon {
 
 		foreach ( $product_ids as $product_id ) {
 			$product		 = new MP_Product( $product_id );
-			$product_price	 = $product->get_price( 'lowest' );
-
-			$applies_to = $this->get_meta( 'applies_to' );
-			if ( $applies_to == 'all' ) {
-				//if this coupon apply to all, we will have to get the regular price for calculating
-				//as the get_price('lowest') already applied the discount amout
-				$product_price = $product->get_price( 'regular' );
-			}
+			$product_price	 = $product->get_price( 'before_coupon' );
 
 			if ( 'subtotal' == $this->get_meta( 'discount_type' ) ) {
 				$discount_amt += ($this->get_price( $product_price ) - $product_price);
