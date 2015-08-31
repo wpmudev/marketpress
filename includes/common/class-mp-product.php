@@ -476,6 +476,47 @@ class MP_Product {
 		return $html;
 	}
 
+	public function max_product_quantity( $product_id = false, $without_cart_quantity = false ) {
+
+		$id			 = $product_id ? product_id : $this->ID;
+		$cart_items	 = mp_cart()->get_all_items();
+
+		$max = apply_filters( 'mp_cart/max_product_order_default', 100 );
+
+		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
+		$per_order_limit = (int) $per_order_limit;
+
+		$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $id ];
+
+		$inventory				 = get_post_meta( $id, 'inventory', true );
+		$inventory_tracking		 = get_post_meta( $id, 'inventory_tracking', true );
+		$out_of_stock_purchase	 = get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+
+		if ( $inventory_tracking && $out_of_stock_purchase !== '1' ) {
+			if ( $without_cart_quantity ) {
+				$max = $inventory;
+			} else {
+				$max = $inventory - $cart_quantity;
+			}
+		}
+
+		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
+
+		if ( is_numeric( $per_order_limit ) ) {
+			if ( $per_order_limit >= $max ) {
+				//max is max, not the per order limit
+			} else {
+				$max = $per_order_limit;
+			}
+		}
+
+		if ( $max < 0 ) {
+			$max = 0;
+		}
+
+		return $max;
+	}
+
 	/**
 	 * Display the attribute fields
 	 *
@@ -559,17 +600,27 @@ class MP_Product {
 						} else {
 							$max = 'max="' . esc_attr( $max_product_quantity ) . '"';
 						}
+					} else {
+						$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '"';
 					}
 				}
 			}
 		}
 
+		if ( $this->max_product_quantity() == 0 ) {
+			$min_value			 = 0;
+			$product_quantity	 = 0;
+			$disabled			 = 'disabled';
+		} else {
+			$min_value = 1;
+		}
+		
 		$html .= '
 				<div class="mp_product_options_att"' . (( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"') . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
 						<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"></label>
-						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="1" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>
+						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
 			</div><!-- end mp_product_options_atts -->';

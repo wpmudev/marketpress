@@ -140,14 +140,15 @@ class MP_Cart {
 				$qty = 1;
 			} else {
 
+				$max = $product->max_product_quantity(false, true);
 				$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
 
-				if ( is_numeric( $per_order_limit ) ) {
-					if ( $per_order_limit >= ($qty + $in_cart) ) {
+				if ( is_numeric( $max ) ) {
+					if ( $max >= ($qty + $in_cart) ) {
 						$qty += $in_cart;
 						$cart_updated = true;
 					} else {
-						$qty			 = $per_order_limit;
+						$qty			 = $max;
 						$cart_updated	 = false;
 					}
 				} else {
@@ -156,12 +157,15 @@ class MP_Cart {
 				}
 			}
 		} else {
+			$product = new MP_Product( $item_id );
+			$max = $product->max_product_quantity($item_id, true);
+			
 			$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
-			if ( is_numeric( $per_order_limit ) ) {
-				if ( $per_order_limit >= ($qty) ) {
+			if ( is_numeric( $max ) ) {
+				if ( $max >= ($qty) ) {
 					$cart_updated = true;
 				} else {
-					$qty			 = $per_order_limit;
+					$qty			 = $max;
 					$cart_updated	 = false;
 				}
 			} else {
@@ -952,6 +956,18 @@ class MP_Cart {
 		 */
 		$max = apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
 
+		$id						 = (int)$args[ 'id' ];
+		
+		$inventory				 = get_post_meta( $id, 'inventory', true );
+		$inventory_tracking		 = get_post_meta( $id, 'inventory_tracking', true );
+		$out_of_stock_purchase	 = get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+
+		
+		
+		if ( $inventory_tracking && $out_of_stock_purchase !== '1' ) {
+			$max = $inventory;
+		}
+
 		$defaults	 = array(
 			'max'		 => $max,
 			'selected'	 => 1,
@@ -1478,14 +1494,14 @@ class MP_Cart {
 		$shipping_tax	 = 0;
 		$shipping_price	 = $this->shipping_total();
 
-		/*if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
-			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-				$shipping_tax = ($shipping_price - mp_before_tax_price( $shipping_price ));
-			} else {
-				$tax_rate		 = mp_tax_rate();
-				$shipping_tax	 = ($shipping_price * $tax_rate);
-			}
-		}*/
+		/* if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
+		  if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+		  $shipping_tax = ($shipping_price - mp_before_tax_price( $shipping_price ));
+		  } else {
+		  $tax_rate		 = mp_tax_rate();
+		  $shipping_tax	 = ($shipping_price * $tax_rate);
+		  }
+		  } */
 		$tax_rate		 = mp_tax_rate();
 		$shipping_tax	 = ($shipping_price * $tax_rate);
 		/**
@@ -1496,7 +1512,7 @@ class MP_Cart {
 		 * @param float $shipping_price The current shipping price including tax
 		 * @param MP_Cart $this The current cart object.
 		 */
-		$shipping_tax = (float) apply_filters( 'mp_cart/shipping_tax_amt', $shipping_tax, $shipping_price, $this );
+		$shipping_tax	 = (float) apply_filters( 'mp_cart/shipping_tax_amt', $shipping_tax, $shipping_price, $this );
 
 		return ( $format ) ? mp_format_currency( '', $shipping_tax ) : $shipping_tax;
 	}
