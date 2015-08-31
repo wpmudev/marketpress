@@ -624,12 +624,19 @@ class MP_Setup_Wizard {
 			) );
 
 			$gateways = MP_Gateway_API::get_gateways( true );
-
-			$manual_payments = $gateways['manual_payments'];
-			$options         = array(
-				'manual_payments' => $manual_payments[1],
-				'other'           => __( "Other Gateways", "mp" )
-			);
+			if ( isset( $gateways['manual_payments'] ) ) {
+				$manual_payments = $gateways['manual_payments'];
+				$options         = array(
+					'manual_payments' => $manual_payments[1],
+					'other'           => __( "Other Gateways", "mp" )
+				);
+			} else {
+				//fallback to default
+				$options = array(
+					'manual_payments' => __( "Manual Payment", "mp" ),
+					'other'           => __( "Other Gateways", "mp" )
+				);
+			}
 
 			$metabox->add_field( 'radio_group', array(
 				'name'          => 'wizard_payment',

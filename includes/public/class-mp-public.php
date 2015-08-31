@@ -32,7 +32,8 @@ class MP_Public {
 	 * @access private
 	 */
 	private function __construct() {
-		$this->includes();
+		//$this->includes();
+		add_action( 'init', array( &$this, 'includes' ), 1 );
 
 		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
@@ -290,7 +291,7 @@ class MP_Public {
 			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
 		}
 	}
-	
+
 	/**
 	 * Enqueue frontend styles and scripts
 	 *

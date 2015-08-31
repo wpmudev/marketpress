@@ -77,7 +77,7 @@ class MP_Multisite {
 		echo mp_global_list_products( array(
 			'page'     => $page,
 			'order_by' => trim( $order_by ),
-			'order'    => trim( $order )
+			'order'    => trim( $order ),
 		) );
 		die;
 	}
@@ -390,7 +390,6 @@ class MP_Multisite {
 	function mp_list_global_products_sc( $atts ) {
 		$atts['echo'] = false;
 		$args         = shortcode_atts( mp()->defaults['list_products'], $atts );
-
 		return mp_global_list_products( $args );
 	}
 
@@ -453,8 +452,14 @@ class MP_Multisite {
 	public function get_gateways( $gateways ) {
 		if ( ! is_network_admin() ) {
 			if ( mp_get_network_setting( 'global_cart' ) ) {
-				$code     = mp_get_network_setting( 'global_gateway' );
-				$gateways = array( $code => $gateways[ $code ] );
+				$code = mp_get_network_setting( 'global_gateway' );
+				if ( ! empty( $code ) ) {
+					$gateways = array( $code => $gateways[ $code ] );
+				} else {
+					//case no gateway picked in the admin
+					//todo show info to admin
+					$gateways = array();
+				}
 			} else {
 				$allowed                = mp_get_network_setting( 'allowed_gateways' );
 				$allowed['free_orders'] = 'full';//Always allow and activate it automatically later if needed

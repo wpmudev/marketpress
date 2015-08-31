@@ -50,6 +50,7 @@ class MP_Admin_Multisite {
 				&$this,
 				'print_network_store_page_scripts'
 			) );
+			add_action( 'admin_footer', array( &$this, 'footer_script' ) );
 			add_filter( 'wpmudev_field/after_field', array( &$this, 'display_create_page_button' ), 10, 2 );
 			add_action( 'wpmudev_field/print_scripts', array( &$this, 'create_store_page_js' ) );
 		}
@@ -141,7 +142,25 @@ class MP_Admin_Multisite {
 				});
 			});
 		</script>
-	<?php
+		<?php
+	}
+
+	public function footer_script() {
+		?>
+		<script type="text/javascript">
+			jQuery(function ($) {
+				$('input[name="global_cart"]').click(function () {
+					if ($(this).prop('checked') == true) {
+						$('#mp-network-settings-paypal-chained-payments').hide();
+						$('#mp-network-settings-paypal-chained-payments').next('.submit').hide();
+					} else {
+						$('#mp-network-settings-paypal-chained-payments').show();
+						$('#mp-network-settings-paypal-chained-payments').next('.submit').show();
+					}
+				})
+			})
+		</script>
+		<?php
 	}
 
 	/**
@@ -244,7 +263,7 @@ class MP_Admin_Multisite {
 					})
 				})
 			</script>
-		<?php
+			<?php
 		}
 	}
 
@@ -286,9 +305,9 @@ class MP_Admin_Multisite {
 
 		$all_gateways = MP_Gateway_API::get_gateways();
 		$gateways     = array( '' => __( 'Choose a Gateway', 'mp' ) );
-		
+
 		foreach ( $all_gateways as $code => $gateway ) {
-	
+
 			if ( ! $gateway[2] ) {
 				// Skip non-global gateways
 				continue;
@@ -434,7 +453,7 @@ class MP_Admin_Multisite {
 				</form>
 			</div>
 		</div>
-	<?php
+		<?php
 	}
 
 	/**
@@ -533,7 +552,7 @@ class MP_Admin_Multisite {
 				});
 			});
 		</script>
-	<?php
+		<?php
 	}
 
 	/**

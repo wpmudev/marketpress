@@ -244,7 +244,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Style to display the categories list in. A value of list displays the categories as list items while none generates no special display method (the list items are separated by <br> tags).', 'mp' ); ?></span></span> style</th>
 				<td>
-					<select name="order" data-default="list">
+					<select name="style" data-default="list">
 						<?php foreach ( array( 'list', 'none' ) as $value ) : ?>
 							<option <?php selected( $value, 'list' ); ?>><?php echo $value; ?></option>
 						<?php endforeach; ?>
@@ -424,7 +424,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Style to display the categories list in. A value of list displays the categories as list items while none generates no special display method (the list items are separated by <br> tags).', 'mp' ); ?></span></span> style</th>
 				<td>
-					<select name="order" data-default="list">
+					<select name="style" data-default="list">
 						<?php foreach ( array( 'list', 'none' ) as $value ) : ?>
 							<option <?php selected( $value, 'list' ); ?>><?php echo $value; ?></option>
 						<?php endforeach; ?>
@@ -599,8 +599,8 @@ class MP_Shortcode_Builder {
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Sort order.', 'mp' ); ?></span></span> order</th>
 				<td>
 					<label for="mp-tag-cloud-order-asc"><input type="radio" name="order" id="mp-tag-cloud-order-asc" data-default="ASC" value="ASC" checked /> <?php _e( 'Ascending', 'mp' ); ?></label><br />
-					<label for="mp-tag-cloud-orderby-desc"><input type="radio" name="order" id="mp-tag-cloud-order-desc" data-default="ASC" value="DESC" /> <?php _e( 'Descending', 'mp' ); ?></label><br />
-					<label for="mp-tag-cloud-orderby-desc"><input type="radio" name="order" id="mp-tag-cloud-order-desc" data-default="ASC" value="RAND" /> <?php _e( 'Random', 'mp' ); ?></label>
+					<label for="mp-tag-cloud-order-desc"><input type="radio" name="order" id="mp-tag-cloud-order-desc" data-default="ASC" value="DESC" /> <?php _e( 'Descending', 'mp' ); ?></label><br />
+					<label for="mp-tag-cloud-order-rand"><input type="radio" name="order" id="mp-tag-cloud-order-rand" data-default="RAND" value="RAND" /> <?php _e( 'Random', 'mp' ); ?></label>
 				</td>
 			</tr>
 			<tr>

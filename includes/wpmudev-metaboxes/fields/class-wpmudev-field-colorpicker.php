@@ -43,20 +43,24 @@ class WPMUDEV_Field_Colorpicker extends WPMUDEV_Field {
 		?>
 		<script type="text/javascript">
 		jQuery(document).ready(function($) {
-			$('.wpmudev-field-colorpicker-input').ColorPicker({
-		  	"onSubmit": function(hsb, hex, rgb, el) {
-		  		$(el).val(hex);
-		  		$(el).ColorPickerHide();
-		  	},
-		  	"onBeforeShow": function() {
-		  		$(this).ColorPickerSetColor(this.value);
-		  	},
-		    "onChange" : function(hsb, hex, rgb) {
-		  		$(this).val(hex);
-		  	}
-		  }).bind('keyup', function(){
-		  	$(this).ColorPickerSetColor(this.value);
-		  });
+			$('.wpmudev-field-colorpicker-input').each(function(){
+				var that = $(this);
+				$(this).ColorPicker({
+					"onSubmit": function(hsb, hex, rgb, el) {
+						$(el).val(hex);
+						$(el).ColorPickerHide();
+					},
+					"onBeforeShow": function() {
+						$(this).ColorPickerSetColor(this.value);
+					},
+					"onChange" : function(hsb, hex, rgb) {
+						that.val(hex);
+
+					}
+				}).bind('keyup', function(){
+					$(this).ColorPickerSetColor(this.value);
+				});
+			})
 		});
 		</script>		
 		<?php
