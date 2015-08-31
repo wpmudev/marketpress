@@ -70,7 +70,7 @@ class MP_Shortcode_Builder {
 			'order'					 => 'ASC',
 			'post_type'				 => MP_Product::get_post_type(),
 		) );
-		$data	 = array( 'posts' => array(), 'posts_per_page' => isset($args[ 'posts_per_page' ]) ? $args[ 'posts_per_page' ] : '-1', 'total' => $query->found_posts );
+		$data	 = array( 'posts' => array(), 'posts_per_page' => isset( $args[ 'posts_per_page' ] ) ? $args[ 'posts_per_page' ] : '-1', 'total' => $query->found_posts );
 
 		while ( $query->have_posts() ) : $query->the_post();
 			$data[ 'posts' ][] = array( 'id' => get_the_ID(), 'text' => get_the_title() );
@@ -305,13 +305,13 @@ class MP_Shortcode_Builder {
 				<td>
 					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
-						foreach ( $this->_product_cats as $cat ) :
+						foreach ( $this->_product_cats as $cat ) {
 							if ( isset( $cat ) ) {
 								?>
 								<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
 								<?php
 							}
-						endforeach;
+						}
 						?>
 					</select>
 				</td>
@@ -749,7 +749,7 @@ class MP_Shortcode_Builder {
 					<select name="category" data-default="" class="chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_cats as $term ) : ?>
-							<option value="<?php echo esc_attr( isset($term->slug) ? $term->slug : '' ); ?>"><?php echo isset($term->name) ? $term->name : ''; ?></option>
+							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -760,7 +760,7 @@ class MP_Shortcode_Builder {
 					<select name="tag" data-default="" class="chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_tags as $term ) : ?>
-							<option value="<?php echo esc_attr( isset($term->slug) ? $term->slug : '' ); ?>"><?php echo isset($term->name) ? $term->name : ''; ?></option>
+							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
