@@ -111,9 +111,9 @@ class MP_Checkout {
 	 * @return bool
 	 */
 	protected function _need_shipping_step() {
-		$blog_ids			 = mp_cart()->get_blog_ids();
-		$need_shipping_step	 = false;
-		$current_blog_id = get_current_blog_id();
+		$blog_ids           = mp_cart()->get_blog_ids();
+		$need_shipping_step = false;
+		$current_blog_id    = get_current_blog_id();
 		while ( 1 ) {
 			if ( mp_cart()->is_global ) {
 				$blog_id = array_shift( $blog_ids );
@@ -124,12 +124,15 @@ class MP_Checkout {
 				$need_shipping_step = true;
 			}
 
-			if ( (mp_cart()->is_global && false === current( $blog_ids )) || !mp_cart()->is_global ) {
+			if ( ( mp_cart()->is_global && false === current( $blog_ids ) ) || ! mp_cart()->is_global ) {
 				mp_cart()->reset_id();
 				break;
 			}
 		}
-		switch_to_blog($current_blog_id);
+		if ( mp_cart()->is_global ) {
+			switch_to_blog( $current_blog_id );
+		}
+
 		return $need_shipping_step;
 	}
 
