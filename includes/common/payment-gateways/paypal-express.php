@@ -364,6 +364,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 		//build the item details
 		$index = 0;
+
 		//we loop through sites
 		foreach ( $cart->get_all_items() as $bid => $items ) {
 			if ( ! is_array( $items ) || empty( $items ) ) {
@@ -374,7 +375,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog( $bid );
 			}
 
-			if($cart->is_global) {
+			if ( $cart->is_global ) {
 				//check if the current merchant don't have email setting, we bypass
 				$merchant_email = mp_get_setting( 'gateways->paypal_express->merchant_email' );
 				$merchant_email = trim( $merchant_email );
@@ -384,11 +385,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			}
 
 			//setup payment request
-			$request[ 'PAYMENTREQUEST_' . $index . '_PAYMENTACTION' ]         = $this->payment_action;
-			$request[ 'PAYMENTREQUEST_' . $index . '_CURRENCYCODE' ]          = $this->currencyCode;
-			$request[ 'PAYMENTREQUEST_' . $index . '_NOTIFYURL' ]             = $this->ipn_url;
-			$request[ 'PAYMENTREQUEST_' . $index . '_CUSTOM' ]                = $this->_crc( $cart->get_items() );
-			if(isset($merchant_email)) {
+			$request[ 'PAYMENTREQUEST_' . $index . '_PAYMENTACTION' ] = $this->payment_action;
+			$request[ 'PAYMENTREQUEST_' . $index . '_CURRENCYCODE' ]  = $this->currencyCode;
+			$request[ 'PAYMENTREQUEST_' . $index . '_NOTIFYURL' ]     = $this->ipn_url;
+			$request[ 'PAYMENTREQUEST_' . $index . '_CUSTOM' ]        = $this->_crc( $cart->get_items() );
+			if ( isset( $merchant_email ) ) {
 				///merchant email provided, case global cart
 				$request[ 'PAYMENTREQUEST_' . $index . '_SELLERPAYPALACCOUNTID' ] = $merchant_email;
 				$request[ 'PAYMENTREQUEST_' . $index . '_SELLERID' ]              = $bid;
@@ -409,8 +410,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 			$i = 0;
 			//we need to make a virtual cart for calculating,don't write to cookie
-			$vcart = new MP_Cart( false );
-			$subtotal = 0;
+			$vcart    = new MP_Cart( false );
 			foreach ( $items as $product_id => $quantity ) {
 				$item  = new MP_Product( $product_id );
 				$price = $item->get_price( 'lowest' );
@@ -427,11 +427,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$request["L_PAYMENTREQUEST_{$index}_QTY{$i}"]          = $quantity;
 				$request["L_PAYMENTREQUEST_{$index}_ITEMURL{$i}"]      = $item->url( false );
 				$request["L_PAYMENTREQUEST_{$index}_ITEMCATEGORY{$i}"] = 'Physical';
-				$subtotal += $price;
+
 				$i ++;
 			}
 
-			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $subtotal; //items subtotal
+			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->product_total(false); //items subtotal
 
 			//shipping total
 			if ( ( $shipping_price = $vcart->shipping_total( false ) ) !== false ) {
@@ -442,8 +442,11 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$tax_total                                 = $vcart->tax_total( false );
 				$request["PAYMENTREQUEST_{$index}_TAXAMT"] = $tax_total;
+			} else {
+				//incase of inclusive, we will have to submit the shipping tax
+				$tax_total = $vcart->shipping_tax_total(false);
+				$request["PAYMENTREQUEST_{$index}_TAXAMT"] = round( $tax_total, 2 );
 			}
-
 			//order details
 			$request["PAYMENTREQUEST_{$index}_DESC"]             = $this->trim_name( sprintf( __( '%s Store Purchase - Order ID: %s', 'mp' ), get_bloginfo( 'name' ), $order_id ) );
 			$request["PAYMENTREQUEST_{$index}_AMT"]              = $vcart->total( false );
@@ -590,7 +593,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			),
 		) );
 
-		if ( mp_get_network_setting('global_cart') ) {
+		if ( mp_get_network_setting( 'global_cart' ) ) {
 			$metabox->add_field( 'text', array(
 				'name'       => $this->get_field_name( 'merchant_email' ),
 				'label'      => array( 'text' => __( 'Merchant Email', 'mp' ) ),
