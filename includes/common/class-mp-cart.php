@@ -1478,15 +1478,16 @@ class MP_Cart {
 		$shipping_tax	 = 0;
 		$shipping_price	 = $this->shipping_total();
 
-		if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
+		/*if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$shipping_tax = ($shipping_price - mp_before_tax_price( $shipping_price ));
 			} else {
 				$tax_rate		 = mp_tax_rate();
 				$shipping_tax	 = ($shipping_price * $tax_rate);
 			}
-		}
-
+		}*/
+		$tax_rate		 = mp_tax_rate();
+		$shipping_tax	 = ($shipping_price * $tax_rate);
 		/**
 		 * Filter the shipping tax amount
 		 *
