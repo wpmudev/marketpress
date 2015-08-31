@@ -2101,6 +2101,9 @@ if ( !function_exists( 'mp_product' ) ) {
 		}
 
 		$product = new MP_Product( $product_id );
+		if ( ! $product->exists() ) {
+			return;
+		}
 		$form_id = 'mp_buy_form_' . $product_id;
 
 		$variation = false;
