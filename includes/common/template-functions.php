@@ -2665,7 +2665,7 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	$excerpt		 = strip_tags( $excerpt );
 	$excerpt_length	 = apply_filters( 'excerpt_length', $length );
 	//update from excerpt_more to mp_excerpt more, as the behavior of product except does'nt exactl
-	$excerpt_more	 = apply_filters( 'excerpt_more', '...');
+	$excerpt_more	 = apply_filters( 'mp_excerpt_more', '...');
 	
 	$words = preg_split( "/[\n\r\t ]+/", $excerpt, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
 	if ( count( $words ) > $excerpt_length ) {
