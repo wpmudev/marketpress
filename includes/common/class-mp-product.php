@@ -588,7 +588,9 @@ class MP_Product {
 
 			if ( is_numeric( $per_order_limit ) ) {
 				$max = 'max="' . esc_attr( $per_order_limit ) . '"';
-			}
+			}else{
+                            $max = 'max="' . esc_attr( $this->max_product_quantity() ) . '"';
+                        }
 
 			$cart_items = mp_cart()->get_all_items();
 
