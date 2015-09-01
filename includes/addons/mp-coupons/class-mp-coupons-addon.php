@@ -423,7 +423,7 @@ class MP_Coupons_Addon {
 					  		<button type="button" class="mp_button mp_button-check">' . __( 'Apply Code', 'mp' ) . '</button>
 					  	</div>
 				    </div>' .
-			         wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) . '
+			        do_shortcode( wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) ). '
 				</div><!-- end mp-coupon-form-store-' . $cart->get_blog_id() . ' -->';
 		}
 
