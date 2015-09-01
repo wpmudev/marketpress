@@ -39,7 +39,7 @@
 }
 
 #mp-quick-setup-wizard .mp_tab_content p {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 #mp-quick-setup-wizard .mp_tab_content p.mp_tab_content_label,
@@ -77,11 +77,24 @@
 #mp-quick-setup-wizard-shipping .inside .wpmudev-fields .wpmudev-field.wpmudev-field-has-conditional {
   background-color: #f9f9f9;
   border-radius: 5px;
-  padding: 20px;
+  padding: 15px;
 }
 
-#mp-quick-setup-tab-payment-gateway .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox h3.hndle {
+#mp-quick-setup-tab-payment-gateway .mp_tab_content_details-payment-gateway .postbox.wpmudev-postbox {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+#mp-quick-setup-tab-payment-gateway .mp_tab_content_details-payment-gateway .postbox.wpmudev-postbox h3.hndle {
   display: block;
+  padding: 10px 15px;
+}
+
+#mp-quick-setup-tab-payment-gateway .mp_tab_content_details-payment-gateway .postbox.wpmudev-postbox .handlediv {
+  display: block;
+}
+
+#mp-quick-setup-tab-payment-gateway .mp_tab_content_details-payment-gateway .postbox.wpmudev-postbox .inside {
   padding: 15px;
 }
 
@@ -283,14 +296,13 @@
 .mp_quick_setup_tabs .mp_tab_content_details {
   display: none;
   margin-top: 15px;
-}
-
-.mp_quick_setup_tabs .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox {
-  margin-top: 20px;
-}
-
-.mp_quick_setup_tabs .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox .inside {
-  padding: 15px;
+  /*.postbox.wpmudev-postbox {
+					margin-top: $space;
+					
+					.inside {
+						padding: $space--s;
+					}
+				}*/
 }
 
 .mp_quick_setup_tabs .mp_tab_sep {
@@ -511,4 +523,3 @@ a.mp_link-skip-step:focus {
 .mp_quick_setup_step-3 .mp_button-configure-store {
   margin-top: 20px;
 }
-/*# sourceMappingURL=quick-setup.css.map */
