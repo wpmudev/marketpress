@@ -182,19 +182,22 @@ jQuery( document ).ready( function( $ ) {
             if ( variation_errors == 0 ) {
 
 //alert($( '#original_publish' ).val());
-                if ( $( '#original_publish' ).val( ) == 'Publish' ) {
+                if ( $( '#original_publish' ).val() == 'Publish' ) {
 //$( '.mp-admin-overlay' ).show();
                     $( '#save-post' ).removeAttr( 'disabled' );
                     //$( '#save-post' ).prop( 'disabled', false );
-                    $( '#save-post' ).click( );
+                    $( '#save-post' ).click();
                     //mp_variation_message();
                 }
 
-                if ( $( '#original_publish' ).val( ) == 'Update' ) {
+                if ( $( '#original_publish' ).val() == 'Update' ) {
+
 //$( '.mp-admin-overlay' ).show();
-                    $( '#publish' ).removeAttr( 'disabled' );
-                    //$( '#publish' ).prop( 'disabled', false );
-                    $( '#publish' ).click( );
+                    if ( caller_id == 'mp_make_combinations' ) {
+                        $( '#publish' ).removeAttr( 'disabled' );
+                        //$( '#publish' ).prop( 'disabled', false );
+                        $( '#publish' ).click();
+                    }
                     //mp_variation_message();
                 }
             } else {
