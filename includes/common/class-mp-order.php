@@ -992,8 +992,9 @@ You can manage this order here: %s', 'mp' );
 			 * @since 3.0
 			 * @param MP_Product $item The product that was sold.
 			 * @param bool $paid Whether the associated order has been paid.
+			 * @param int $order_id The order ID.
 			 */
-			do_action( 'mp_checkout/product_sale', $item, $paid );
+			do_action( 'mp_checkout/product_sale', $item, $paid, $this->get_id() );
 		}
 
 		// Payment info
