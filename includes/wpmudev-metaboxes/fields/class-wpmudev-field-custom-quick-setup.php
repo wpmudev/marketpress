@@ -120,17 +120,20 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 
 									<div class="mp_tab_content_block">
 										<div class="mp_tab_content_metric_system">
+											<p class="mp_tab_content_label"><?php _e( 'Metric System', 'mp' ); ?></p>
 											<p><?php _e( 'And what metric system do you want to use?', 'mp' ); ?></p>
 										</div><!-- end mp_tab_content_metric_system -->
 									</div><!-- end mp_tab_content_block -->
+									
+									<hr class="mp_sep" />
 
 									<div class="mp_tab_content_block">
 										<div class="mp_tab_content_shipping">
 											<?php do_action( 'mp_wizard_shipping_section' ) ?>
-											<div class="mp_tab_content_shipping_details">
+											<div class="mp_tab_content_details mp_tab_content_details-shipping">
 												<?php do_action( 'mp_wizard_shipping_rule_section' ) ?>
 												<?php do_action( '_mp_wizard_shipping_rule_section' ) ?>
-											</div>
+											</div><!-- end mp_tab_content_details-shipping -->
 										</div><!-- end mp_tab_content_shipping -->
 									</div><!-- end mp_tab_content_block -->
 
@@ -147,9 +150,9 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 								<div class="mp_tab_content">
 									<div class="mp_tab_content_payment_gateway">
 										<?php do_action( 'mp_wizard_payment_gateway_section' ) ?>
-										<div class="mp_tab_content_payment_gateway_details">
+										<div class="mp_tab_content_details mp_tab_content_details-payment-gateway">
 											<?php do_action( 'mp_wizard_payment_gateway_details' ) ?>
-										</div><!-- end mp_tab_content_payment_gateway_details -->
+										</div><!-- end mp_tab_content_details-payment-gateway -->
 									</div><!-- end mp_tab_content_payment_gateway -->
 								</div><!-- end mp_tab_content -->
 								<div class="mp_tab_navigation">

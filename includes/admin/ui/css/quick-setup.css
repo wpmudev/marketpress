@@ -74,6 +74,12 @@
   padding: 0;
 }
 
+#mp-quick-setup-wizard-shipping .inside .wpmudev-fields .wpmudev-field.wpmudev-field-has-conditional {
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  padding: 20px;
+}
+
 #mp-quick-setup-tab-payment-gateway .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox h3.hndle {
   display: block;
   padding: 15px;
@@ -274,12 +280,7 @@
   margin-top: 0;
 }
 
-.mp_quick_setup_tabs .mp_tab_content_shipping_details {
-  display: none;
-  margin-top: 15px;
-}
-
-.mp_quick_setup_tabs .mp_tab_content_payment_gateway_details {
+.mp_quick_setup_tabs .mp_tab_content_details {
   display: none;
   margin-top: 15px;
 }
@@ -290,6 +291,14 @@
 
 .mp_quick_setup_tabs .mp_tab_content_payment_gateway_details .postbox.wpmudev-postbox .inside {
   padding: 15px;
+}
+
+.mp_quick_setup_tabs .mp_tab_sep {
+  background-color: #e4e7e9;
+  display: block;
+  height: 1px;
+  margin: 20px auto 0;
+  width: 100%;
 }
 
 .mp_quick_setup_tabs .mp_tab_navigation {
@@ -502,3 +511,4 @@ a.mp_link-skip-step:focus {
 .mp_quick_setup_step-3 .mp_button-configure-store {
   margin-top: 20px;
 }
+/*# sourceMappingURL=quick-setup.css.map */
