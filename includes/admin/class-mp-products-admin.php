@@ -1035,7 +1035,7 @@ class MP_Products_Screen {
 					'post_title'	 => mp_get_post_value( 'post_title' ),
 					'post_content'	 => '', //mp_get_post_value( 'content' ),
 					'post_status'	 => 'publish',
-					'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+					'post_type'		 => MP_Product::get_variations_post_type(),
 					'post_parent'	 => $post_id,
 				) );
 
@@ -1121,7 +1121,7 @@ class MP_Products_Screen {
 		$variations		 = mp_get_post_value( 'variations', array() );
 		$sorted			 = $field->sort_subfields( $variations );
 		$ids			 = array();
-		$delete_where	 = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = " . apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) . "";
+		$delete_where	 = "{$wpdb->posts}.ID = {$wpdb->postmeta}.post_id AND {$wpdb->posts}.post_parent = $post_id AND {$wpdb->posts}.post_type = " . MP_Product::get_variations_post_type() . "";
 
 
 		if ( mp_get_post_value( 'has_variations', false ) ) {
@@ -1134,7 +1134,7 @@ class MP_Products_Screen {
 						'post_content'	 => mp_arr_get_value( 'description', $fields, '' ),
 						'post_title'	 => 'Product Variation of ' . $post_id,
 						'post_status'	 => 'publish',
-						'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+						'post_type'		 => MP_Product::get_variations_post_type(),
 						'post_parent'	 => $post_id,
 						'menu_order'	 => $order,
 					) );

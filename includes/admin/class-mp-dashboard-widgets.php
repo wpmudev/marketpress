@@ -77,7 +77,7 @@ class MP_Dashboard_Widgets {
 		$inventory_threshhold = mp_get_setting( 'inventory_threshhold' );
 
 		$out_of_stock_query = new WP_Query( array(
-			'post_type'		 => array( MP_Product::get_post_type(), apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ),
+			'post_type'		 => array( MP_Product::get_post_type(), MP_Product::get_variations_post_type() ),
 			'post_status'	 => 'publish',
 			'posts_per_page' => 5,
 			'meta_query'	 => array(

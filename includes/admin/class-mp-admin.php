@@ -239,7 +239,7 @@ class MP_Admin {
 			}
 
 
-			if ( $post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ) {
+			if ( $post_type == MP_Product::get_variations_post_type() ) {
 				wp_enqueue_style( 'mp-product-variation-admin', mp_plugin_url( 'includes/admin/ui/css/admin-product-variation.css' ), false, MP_VERSION );
 				wp_enqueue_script( 'mp-product-variation-admin', mp_plugin_url( 'includes/admin/ui/js/admin-product-variation.js' ), array( 'jquery' ), MP_VERSION );
 			}

@@ -321,7 +321,7 @@ class MP_Cart {
 			$posts = get_posts( array(
 				'post__in'		 => array_keys( $items ),
 				'posts_per_page' => -1,
-				'post_type'		 => array( MP_Product::get_post_type(), apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ),
+				'post_type'		 => array( MP_Product::get_post_type(), MP_Product::get_variations_post_type() ),
 				'post_status'	 => array( 'publish', 'out_of_stock', 'trash' ),
 				'orderby'		 => 'post__in'
 			) );

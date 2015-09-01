@@ -74,7 +74,7 @@ class MP_Ajax {
 			'post_title'	 => __( 'Variation Draft', 'mp' ),
 			'post_content'	 => '',
 			'post_status'	 => 'draft',
-			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+			'post_type'		 => MP_Product::get_variations_post_type(),
 			'post_parent'	 => (int) $_POST[ 'parent_post_id' ],
 		);
 
@@ -102,7 +102,7 @@ class MP_Ajax {
 
 				$args = array(
 					'post_parent'	 => $post_id,
-					'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+					'post_type'		 => MP_Product::get_variations_post_type(),
 					'posts_per_page' => -1,
 					'post_status'	 => 'publish',
 					'orderby'		 => 'ID',

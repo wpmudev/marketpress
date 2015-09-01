@@ -169,7 +169,7 @@ class MP_Installer {
 					'post_title'	 => $post_title,
 					'post_content'	 => $post_content,
 					'post_status'	 => 'publish',
-					'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+					'post_type'		 => MP_Product::get_variations_post_type(),
 					'post_parent'	 => $post_id,
 				) );
 

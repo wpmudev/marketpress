@@ -102,6 +102,10 @@ class MP_Product {
 	public static function get_post_type() {
 		return mp_get_setting( 'product_post_type' ) == 'mp_product' ? 'mp_product' : 'product';
 	}
+	
+	public static function get_variations_post_type() {
+		return apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' );
+	}
 
 	/**
 	 * Display the lightbox for product variations
@@ -689,7 +693,7 @@ class MP_Product {
 		}
 
 		$query = new WP_Query( array(
-			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+			'post_type'		 => MP_Product::get_variations_post_type(),
 			'posts_per_page' => -1,
 			'orderby'		 => 'menu_order',
 			'order'			 => 'ASC',
@@ -737,7 +741,7 @@ class MP_Product {
 		}
 
 		$query = new WP_Query( array(
-			'post_type'		 => apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+			'post_type'		 => MP_Product::get_variations_post_type(),
 			'posts_per_page' => -1,
 			'post_parent'	 => $this->ID,
 			'tax_query'		 => array( 'relation' => 'AND' ) + $tax_query,
@@ -1812,7 +1816,7 @@ class MP_Product {
 			return false;
 		}
 
-		return ( $this->_post->post_type == apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) );
+		return ( $this->_post->post_type == MP_Product::get_variations_post_type() );
 	}
 
 	/**
@@ -2353,7 +2357,7 @@ Notification Preferences: %s', 'mp' );
 
 		if ( is_null( $this->_post ) ) {
 			$this->_exists = false;
-		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ) ) {
+		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != MP_Product::get_variations_post_type() ) {
 			$this->_exists = false;
 		} else {
 			$this->_exists	 = true;
