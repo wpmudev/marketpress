@@ -350,10 +350,10 @@ class Marketpress {
 		add_action( 'init', array( &$this, 'includes' ), 0 );
 
 // Load gateway/shipping plugins
-		add_action( 'init', array( &$this, 'load_plugins' ), 0 );
+		add_action( 'init', array( &$this, 'load_plugins' ), 2 );
 
 // Register system addons
-		add_action( 'init', array( &$this, 'register_addons' ), 0 );
+		add_action( 'init', array( &$this, 'register_addons' ), 2 );
 
 // Setup custom types
 		add_action( 'init', array( &$this, 'register_custom_types' ), 1 );
