@@ -187,8 +187,7 @@ var marketpress = { };
 				}
 				
 				miniCartContent.css({
-					"max-height" : miniCartMaxHeight + 'px',
-					"overflow-y" : "auto"
+					"max-height" : miniCartMaxHeight + 'px'
 				});
 				
 			}
