@@ -744,7 +744,8 @@ class MP_Setup_Wizard {
 			'mp-settings-shipping-plugin-ups',
 			'mp-settings-shipping-plugin-usps',
 			'mp-settings-shipping-plugin-weight_rate',
-			'mp-quick-setup-wizard-shipping'
+			'mp-quick-setup-wizard-shipping',
+			'mp-settings-shipping-plugin-pickup'
 		);
 		if ( $args['id'] == 'mp-quick-setup-wizard-shipping' ) {
 			$args['hook'] = 'mp_wizard_shipping_rule_section';
@@ -756,6 +757,7 @@ class MP_Setup_Wizard {
 			$args['hook']               = '_mp_wizard_shipping_rule_section';
 			$args['class']              = '';
 			$args['show_submit_button'] = false;
+
 		} elseif ( strpos( $args['id'], 'mp-settings-gateway' ) === 0 ) {
 			if ( $args['id'] != 'mp-settings-gateway-free_orders' ) {
 				$args['page_slugs'][]       = 'store-setup-wizard';
@@ -764,7 +766,6 @@ class MP_Setup_Wizard {
 				//$args['class']              = 'mp-wizard-gateway-detail';
 			}
 		}
-
 		return $args;
 	}
 
