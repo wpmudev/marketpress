@@ -74,17 +74,17 @@ jQuery(document).ready(function ($) {
 
     $('#mp-quick-setup-tab-metric-system').on('click', 'input[name="mp_charge_shipping"]', function () {
         if ($(this).val() == 1) {
-            $('.mp_tab_content_shipping_details').slideDown();
+            $('.mp_tab_content_details-shipping').slideDown();
         } else {
-            $('.mp_tab_content_shipping_details').slideUp();
+            $('.mp_tab_content_details-shipping').slideUp();
         }
     });
     $('input[name="mp_charge_shipping"]:checked').click();
     $('#mp-quick-setup-tab-payment-gateway').on('click', 'input[name="wizard_payment"]', function () {
         if ($(this).val() != 'other') {
-            $('.mp_tab_content_payment_gateway_details').slideUp();
+            $('.mp_tab_content_details-payment-gateway').slideUp();
         } else {
-            $('.mp_tab_content_payment_gateway_details').slideDown();
+            $('.mp_tab_content_details-payment-gateway').slideDown();
         }
     });
 
