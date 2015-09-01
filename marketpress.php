@@ -382,13 +382,13 @@ class Marketpress {
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
 
 		add_filter( 'post_thumbnail_html', array( &$this, 'post_thumbnail_html5' ), 10, 5 );
-		
+
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 
 		$this->load_widgets();
 	}
-	
-	function add_menu_items(){
+
+	function add_menu_items() {
 		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
 	}
 
