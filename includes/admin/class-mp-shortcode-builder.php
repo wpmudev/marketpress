@@ -1096,10 +1096,18 @@ class MP_Shortcode_Builder {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function media_buttons() {
+	public function media_buttons( $editor_id ) {
+		// I was trying to get the editor_id here, but it seems the editor is unique, uniqid() is used.
+		
+		$SC_Builder = true;
+		if( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'store-settings-addons' ) {
+			$SC_Builder = false;
+		}
+		if( $SC_Builder ) {
 		?>
 		<a href="javascript:;" class="button mp-shortcode-builder-button" title="<?php _e( 'Add E-Commerce Short Code', 'mp' ); ?>"><span class="wp-media-buttons-icon dashicons dashicons-cart"></span> <?php _e( 'Add E-Commerce Short Code', 'mp' ); ?></a>
 		<?php
+		}
 	}
 
 }
