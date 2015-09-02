@@ -2178,7 +2178,13 @@ if ( !function_exists( 'mp_product' ) ) {
 					$values = explode( ',', $values );
 
 					foreach ( $values as $value ) {
-						$img_url = wp_get_attachment_image_src( $value, $size );
+
+						if( preg_match( '/http:|https:/', $value ) ) {
+							$img_url = array( esc_url( $value ) );
+						} else {
+							$img_url = wp_get_attachment_image_src( $value, $size );
+						}
+
 						$return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
 					}
 
