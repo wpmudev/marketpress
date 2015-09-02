@@ -774,7 +774,8 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether or not to show the product filters.', 'mp' ); ?></span></span> filters</th>
 				<td>
-					<input type="checkbox" name="filters" data-default="<?php echo esc_attr( mp_get_setting( 'show_filters' ) ); ?>" value="1" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> />
+					<label><input type="radio" name="filters" data-default="<?php echo esc_attr( mp_get_setting( 'show_filters' ) ); ?>" value="1" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> /> <?php _e( 'Show', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="filters" data-default="<?php echo esc_attr( mp_get_setting( 'show_filters' ) ); ?>" value="0" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> /> <?php _e( 'Hide', 'mp' ); ?></label>
 				</td>
 			</tr>
 		</table>
