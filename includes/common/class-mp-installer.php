@@ -317,16 +317,17 @@ class MP_Installer {
 			wp_send_json_error();
 		}
 
-		$per_page	 = 100;
-		$query		 = new WP_Query( array(
+		$per_page = 20;
+
+		$query = new WP_Query( array(
 			'cache_results'			 => false,
 			'update_post_term_cache' => false,
 			'post_type'				 => 'product',
-			'posts_per_page'		 => 100,
+			'posts_per_page'		 => $per_page,
 			'paged'					 => max( 1, mp_get_post_value( 'page' ) ),
 		) );
-		$page		 = mp_get_post_value( 'page', 1 );
-		$updated	 = ($page * $per_page);
+
+		$page = mp_get_post_value( 'page', 1 );
 
 		while ( $query->have_posts() ) {
 			$query->the_post();
@@ -397,13 +398,20 @@ class MP_Installer {
 			}
 		}
 
+		$updated = ($page * $per_page);
+
+		$percentage = $query->found_posts / 100;
+
 		$response = array(
-			'updated'	 => ceil( $updated / $query->found_posts ) * 100,
+			'updated'	 => ceil( $updated / $percentage ),
 			'is_done'	 => false,
 		);
 
 		if ( $updated >= $query->found_posts ) {
-			$response[ 'is_done' ] = true;
+			$response = array(
+				'updated'	 => ceil( $updated / $query->found_posts ) * 100,
+				'is_done'	 => true,
+			);
 		}
 
 		delete_option( 'mp_db_update_required' );
@@ -521,7 +529,6 @@ class MP_Installer {
 	 * @action admin_notices
 	 */
 	public function db_update_notice() {
-
 		if ( !get_option( 'mp_db_update_required' ) || !current_user_can( 'activate_plugins' ) || mp_get_get_value( 'page' ) == 'mp-db-update' ) {
 			return;
 		}
