@@ -275,7 +275,7 @@ class MP_Product {
 
 						<div class="mp_product_options_meta">
 							<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
-							<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
+							<div class="mp_product_options_excerpt"><p><?php echo $product->excerpt(); ?></p></div><!-- end mp_product_options_excerpt -->
 						</div><!-- end mp_product_options_meta -->
 
 						<div class="mp_product_options_callout">
