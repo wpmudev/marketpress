@@ -617,7 +617,7 @@ class MP_Installer {
 		$sql		 = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL,
 			term_id bigint(20) unsigned NOT NULL,
-			PRIMARY KEY  (attribute_id, term_id)
+			PRIMARY KEY  (attribute_id,term_id)
 		) $charset_collate;";
 		dbDelta( $sql );
 	}
