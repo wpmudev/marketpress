@@ -515,7 +515,7 @@ if ( !function_exists( '_mp_products_html' ) ) :
 
 			$img = $product->image( false, 'list', null, $align, true );
 
-			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_product_excerpt">' . $product->excerpt() . '</div><!-- end mp_product_excerpt -->' : '';
+			$excerpt				 = mp_get_setting( 'show_excerpts' ) ? '<div class="mp_product_excerpt"><p>' . $product->excerpt() . '</div></p><!-- end mp_product_excerpt -->' : '';
 			$mp_product_list_content = apply_filters( 'mp_product_list_content', $excerpt, $product->ID );
 
 			$pinit	 = $product->pinit_button( 'all_view' );
