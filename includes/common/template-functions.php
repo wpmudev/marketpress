@@ -2126,9 +2126,12 @@ if ( !function_exists( 'mp_product' ) ) {
 				$has_image = true;
 			}
 		} else {
-			$post_thumbnail_id = get_post_thumbnail_id( $product->ID );
-			if ( $post_thumbnail_id ) {
-				$has_image = true;
+			foreach($product->get_variation_ids() as $id) {
+				$post_thumbnail_id = get_post_thumbnail_id( $id );
+				if ( $post_thumbnail_id ) {
+					$has_image = true;
+					break;
+				}
 			}
 		}
 
@@ -2139,17 +2142,15 @@ if ( !function_exists( 'mp_product' ) ) {
 			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
 				<div class="mp_product mp_single_product' . ($has_image ? ' mp_single_product-has-image mp_single_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? ' mp_single_product-has-variations' : '') . '">';
 
+		$values = get_post_meta( $product->ID, 'mp_product_images', true );
 
+		if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
+			$size = array( mp_get_setting( 'product_img_size->width' ), mp_get_setting( 'product_img_size->height' ) );
+		} else {
+			$size = mp_get_setting( 'product_img_size' );
+		}
 		if ( $image ) {
 			if ( !$product->has_variations() ) {
-
-				$values = get_post_meta( $product->ID, 'mp_product_images', true );
-
-				if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
-					$size = array( mp_get_setting( 'product_img_size->width' ), mp_get_setting( 'product_img_size->height' ) );
-				} else {
-					$size = mp_get_setting( 'product_img_size' );
-				}
 
 				if ( $values ) {
 					$return .= '<div class="mp_single_product_images">';
@@ -2194,7 +2195,7 @@ if ( !function_exists( 'mp_product' ) ) {
 				}
 			} else {
 				$return .= '<div class="mp_single_product_images">';
-				$return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
+				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, $image, $size, $image_alignment );
 				$return .= '</div><!-- end mp_single_product_images -->';
 			}
 		}
@@ -2672,7 +2673,7 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	$excerpt_length	 = apply_filters( 'excerpt_length', $length );
 	//update from excerpt_more to mp_excerpt more, as the behavior of product except does'nt exactl
 	$excerpt_more	 = apply_filters( 'mp_excerpt_more', '...');
-	
+
 	$words = preg_split( "/[\n\r\t ]+/", $excerpt, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
 	if ( count( $words ) > $excerpt_length ) {
 		array_pop( $words );
