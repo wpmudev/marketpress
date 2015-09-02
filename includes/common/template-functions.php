@@ -2145,10 +2145,10 @@ if ( !function_exists( 'mp_product' ) ) {
 
 				$values = get_post_meta( $product->ID, 'mp_product_images', true );
 
-				if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
-					$size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
+				if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
+					$size = array( mp_get_setting( 'product_img_size->width' ), mp_get_setting( 'product_img_size->height' ) );
 				} else {
-					$size = mp_get_setting( 'list_img_size' );
+					$size = mp_get_setting( 'product_img_size' );
 				}
 
 				if ( $values ) {
