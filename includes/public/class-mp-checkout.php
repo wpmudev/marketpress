@@ -529,9 +529,16 @@ class MP_Checkout {
 		), $args );
 
 		extract( $args );
-
+		
+		$disable_cart = mp_get_setting( 'disable_cart', 0 );
+		
 		if ( !mp_cart()->has_items() ) {
-			return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></<div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
+		if ( $disable_cart == '1' ) {
+				return __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">The cart is disabled.</p></<div><!-- end mp_cart_empty -->', 'mp' );
+			} else {
+				return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></<div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
+			}
+			
 		}
 
 		$html = '
