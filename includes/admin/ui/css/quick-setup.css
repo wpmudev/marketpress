@@ -74,10 +74,22 @@
   padding: 0;
 }
 
-#mp-quick-setup-wizard-shipping .inside .wpmudev-fields .wpmudev-field.wpmudev-field-has-conditional {
+#mp-content-shipping .inside .wpmudev-fields .wpmudev-field.wpmudev-field-has-conditional {
   background-color: #f9f9f9;
   border-radius: 5px;
   padding: 15px;
+}
+
+#mp-content-shipping .wpmudev-metabox-has-conditional {
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  margin-top: 15px;
+  padding: 15px;
+}
+
+#mp-content-shipping .wpmudev-metabox-has-conditional .wpmudev-subfields {
+  border-color: #e4e7e9;
+  box-shadow: none;
 }
 
 #mp-quick-setup-tab-payment-gateway .mp_tab_content_details-payment-gateway .postbox.wpmudev-postbox {
@@ -309,7 +321,7 @@
   background-color: #e4e7e9;
   display: block;
   height: 1px;
-  margin: 20px auto 0;
+  margin: 10px auto 0;
   width: 100%;
 }
 

@@ -84,11 +84,11 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 
 							<div id="mp-quick-setup-tab-locations" class="mp_tab">
 								<div class="mp_tab_content">
-									<div class="mp_tab_content_locations mp_content_col mp_content_col-one-third">
+									<div id="mp-content-locations" class="mp_tab_content_locations mp_content_col mp_content_col-one-third">
 										<p class="mp_tab_content_label"><strong><?php _e( 'Locations', 'mp' ); ?></strong></p>
 										<p><?php _e( 'Where is your online store based?', 'mp' ); ?></p>
 									</div><!-- end mp_tab_content_locations -->
-									<div class="mp_tab_content_countries mp_content_col mp_content_col-two-thirds">
+									<div id="mp-content-countries" class="mp_tab_content_countries mp_content_col mp_content_col-two-thirds">
 										<p class="mp_tab_content_label">&nbsp;</p>
 										<p><?php _e( 'And, which countries do you want to sell to?', 'mp' ); ?></p>
 									</div><!-- end mp_tab_content_countries -->
@@ -100,11 +100,11 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 
 							<div id="mp-quick-setup-tab-currency-and-tax" class="mp_tab">
 								<div class="mp_tab_content">
-									<div class="mp_tab_content_currency mp_content_col mp_content_col-one-half">
+									<div id="mp-content-currency" class="mp_tab_content_currency mp_content_col mp_content_col-one-half">
 										<p class="mp_tab_content_label"><?php _e( 'Currency', 'mp' ); ?></p>
 										<p><?php _e( 'What currency do you want to sell with?', 'mp' ); ?></p>
 									</div><!-- end mp_tab_content_currency -->
-									<div class="mp_tab_content_tax mp_content_col mp_content_col-one-half">
+									<div id="mp-content-tax" class="mp_tab_content_tax mp_content_col mp_content_col-one-half">
 										<p class="mp_tab_content_label"><?php _e( 'Tax', 'mp' ); ?></p>
 										<p><?php _e( 'Do you want to apply tax for your products? <em>You can customize this for each product and variation</em>.', 'mp' ); ?></p>
 									</div><!-- end mp_tab_content_tax -->
@@ -119,22 +119,22 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 								<div class="mp_tab_content">
 
 									<div class="mp_tab_content_block">
-										<div class="mp_tab_content_metric_system">
+										<div id="mp-content-metric-system" class="mp_tab_content_metric_system">
 											<p class="mp_tab_content_label"><?php _e( 'Metric System', 'mp' ); ?></p>
 											<p><?php _e( 'And what metric system do you want to use?', 'mp' ); ?></p>
-										</div><!-- end mp_tab_content_metric_system -->
+										</div><!-- end mp-content-metric-system -->
 									</div><!-- end mp_tab_content_block -->
 									
-									<hr class="mp_sep" />
+									<hr class="mp_tab_sep" />
 
 									<div class="mp_tab_content_block">
-										<div class="mp_tab_content_shipping">
+										<div id="mp-content-shipping" class="mp_tab_content_shipping">
 											<?php do_action( 'mp_wizard_shipping_section' ) ?>
-											<div class="mp_tab_content_details mp_tab_content_details-shipping">
+											<div id="mp-content-shipping-details" class="mp_tab_content_details mp_tab_content_details-shipping">
 												<?php do_action( 'mp_wizard_shipping_rule_section' ) ?>
 												<?php do_action( '_mp_wizard_shipping_rule_section' ) ?>
-											</div><!-- end mp_tab_content_details-shipping -->
-										</div><!-- end mp_tab_content_shipping -->
+											</div><!-- end mp-content-shipping-details -->
+										</div><!-- end mp-content-shipping -->
 									</div><!-- end mp_tab_content_block -->
 
 								</div><!-- end mp_tab_content -->
@@ -148,7 +148,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 
 							<div id="mp-quick-setup-tab-payment-gateway" class="mp_tab">
 								<div class="mp_tab_content">
-									<div class="mp_tab_content_payment_gateway">
+									<div id="mp-content-payment-gateway" class="mp_tab_content_payment_gateway">
 										<?php do_action( 'mp_wizard_payment_gateway_section' ) ?>
 										<div class="mp_tab_content_details mp_tab_content_details-payment-gateway">
 											<?php do_action( 'mp_wizard_payment_gateway_details' ) ?>
