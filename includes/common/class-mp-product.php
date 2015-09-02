@@ -1019,12 +1019,15 @@ class MP_Product {
 	 */
 	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
 		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id( $this->get_variation()->ID ) : get_post_thumbnail_id( $this->ID );
+		$product_id = ( $this->has_variations() ) ? $this->get_variation()->ID : $this->ID;
 
 		if ( isset( $attributes ) && isset( $attributes[ 'show_thumbnail_placeholder' ] ) ) {
 			$show_thumbnail_placeholder = (bool) $attributes[ 'show_thumbnail_placeholder' ];
 		} else {
 			$show_thumbnail_placeholder = true;
 		}
+
+		$show_thumbnail_placeholder = (bool) apply_filters( 'mp_product_image_show_placeholder', $show_thumbnail_placeholder, $product_id );
 
 		unset( $attributes[ 'show_thumbnail_placeholder' ] );
 
@@ -1033,10 +1036,12 @@ class MP_Product {
 		}
 
 		if ( empty( $thumb_id ) ) {
+			$heigt = ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_h' );
 			$attributes = array_merge( array(
 				'src'	 => apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ),
 				'width'	 => ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_w' ),
 				'height' => ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_h' ),
+				'style'  => 'max-height: ' . $heigt . 'px;'  // Keeping it nice
 			), $attributes );
 		} else {
 			$data		 = wp_get_attachment_image_src( $thumb_id, $size, false );
@@ -1544,7 +1549,8 @@ class MP_Product {
 
 		$post_thumbnail_id = get_post_thumbnail_id( $image_post_id );
 
-		if ( mp_get_setting( 'show_thumbnail_placeholder' ) == '1' ) {
+		$show_thumbnail_placeholder = apply_filters( 'mp_product_image_show_placeholder', mp_get_setting( 'show_thumbnail_placeholder' ), $post_id );
+		if ( (int) $show_thumbnail_placeholder == 1 ) {
 			//do nothing, placeholder image should be shown
 		} else {
 			if ( (!is_numeric( $post_thumbnail_id ) ) ) {
