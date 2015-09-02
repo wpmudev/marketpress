@@ -420,7 +420,7 @@ class MP_Product {
 		// Attempt to get a unique product excerpt depending on user selection
 		$excerpts = array();
 		foreach ( $variations as $variation ) {
-			$excerpts[ $variation->excerpt() ] = '';
+			$excerpts[ mp_get_the_excerpt($product->ID)] = '';
 		}
 		if ( count( $excerpts ) == 1 ) {
 			$json[ 'excerpt' ] = key( $excerpts );
