@@ -666,7 +666,8 @@ class MP_Shipping_FedEx extends MP_Shipping_API_Calculated {
 		$response = wp_remote_post( $url, array(
 			'headers'   => array( 'Content-Type: text/xml' ),
 			'body'      => $xml_req,
-			'sslverify' => false
+			'sslverify' => false,
+			'timeout'   => 30
 		) );
 
 		if ( is_wp_error( $response ) ) {

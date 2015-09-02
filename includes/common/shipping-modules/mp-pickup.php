@@ -223,8 +223,8 @@ class MP_Shipping_Pickup extends MP_Shipping_API {
 	 */
 	function calculate_shipping( $price, $total, $cart, $address1, $address2, $city, $state, $zip, $country,
 							  $selected_option ) {
-		global $mp;
-		$settings	 = $mp->get_setting( 'shipping' );
+
+		$settings = mp_get_setting('shipping');
 		$fee		 = isset( $settings[ 'pickup' ][ 'processing-fee' ] ) ? esc_attr( $settings[ 'pickup' ][ 'processing-fee' ] ) : 0;
 		return floatval( $fee );
 	}

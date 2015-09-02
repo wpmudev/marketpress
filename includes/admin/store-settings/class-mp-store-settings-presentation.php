@@ -452,6 +452,20 @@ class MP_Store_Settings_Presentation {
 			'label'		 => array( 'text' => __( 'Show Excerpts?', 'mp' ) ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
+		$metabox->add_field( 'text', array(
+			'name'		 => 'excerpts_length',
+			'label'		 => array( 'text' => __( 'Excerpts Length', 'mp' ) ),
+			'conditional'	 => array(
+				'name'	 => 'show_excerpts',
+				'value'	 => '1',
+				'action' => 'show',
+			),
+			'validation'	 => array(
+				'required'	 => true,
+				'digits'	 => 1,
+			),
+			'default_value' => 55
+		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'paginate',
 			'label'		 => array( 'text' => __( 'Paginate Products?', 'mp' ) ),

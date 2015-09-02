@@ -275,7 +275,7 @@ class MP_Product {
 
 						<div class="mp_product_options_meta">
 							<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
-							<div class="mp_product_options_excerpt"><?php echo $product->excerpt(); ?></div><!-- end mp_product_options_excerpt -->
+							<div class="mp_product_options_excerpt"><p><?php echo $product->excerpt(); ?></p></div><!-- end mp_product_options_excerpt -->
 						</div><!-- end mp_product_options_meta -->
 
 						<div class="mp_product_options_callout">
@@ -420,7 +420,7 @@ class MP_Product {
 		// Attempt to get a unique product excerpt depending on user selection
 		$excerpts = array();
 		foreach ( $variations as $variation ) {
-			$excerpts[ $variation->excerpt() ] = '';
+			$excerpts[ mp_get_the_excerpt($product->ID)] = '';
 		}
 		if ( count( $excerpts ) == 1 ) {
 			$json[ 'excerpt' ] = key( $excerpts );
@@ -482,15 +482,18 @@ class MP_Product {
 
 	public function max_product_quantity( $product_id = false, $without_cart_quantity = false ) {
 
-		$id			 = $product_id ? product_id : $this->ID;
+		$id			 = $product_id ? $product_id : $this->ID;
 		$cart_items	 = mp_cart()->get_all_items();
 
 		$max = apply_filters( 'mp_cart/max_product_order_default', 100 );
 
 		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
 		$per_order_limit = (int) $per_order_limit;
-
-		$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $id ];
+		if ( isset( $cart_items[ get_current_blog_id() ][ $id ] ) ) {
+			$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $id ];
+		} else {
+			$cart_quantity = 0;
+		}
 
 		$inventory				 = get_post_meta( $id, 'inventory', true );
 		$inventory_tracking		 = get_post_meta( $id, 'inventory_tracking', true );
@@ -927,7 +930,17 @@ class MP_Product {
 		}
 
 		if ( is_null( $excerpt ) ) {
-			$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
+			//this only uses in listing page, so we will use the main product excepts, not variants
+			//$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
+			if ( $this->has_variations() ) {
+				if ( strlen( $this->get_variation()->post_excerpt ) > 0 ) {
+					$excerpt = $this->get_variation()->post_excerpt;
+				} else {
+					$excerpt = $this->_post->post_excerpt;
+				}
+			} else {
+				$excerpt = $this->_post->post_excerpt;
+			}
 		}
 
 		if ( is_null( $content ) ) {
@@ -937,16 +950,16 @@ class MP_Product {
 		if ( $excerpt ) {
 			return apply_filters( 'get_the_excerpt', $excerpt ) . $excerpt_more;
 		} else {
-			$text			 = strip_shortcodes( $content );
-			$text			 = str_replace( ']]>', ']]&gt;', $text );
-			$text			 = strip_tags( $text );
-			$excerpt_length	 = apply_filters( 'excerpt_length', 55 );
-			$words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
+			$text           = strip_shortcodes( $content );
+			$text           = str_replace( ']]>', ']]&gt;', $text );
+			$text           = strip_tags( $text );
+			$excerpt_length = mp_get_setting( 'excerpts_length', 55 );
+			$words          = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
 
 			if ( count( $words ) > $excerpt_length ) {
 				array_pop( $words );
-				$text	 = implode( ' ', $words );
-				$text	 = $text . $excerpt_more;
+				$text = implode( ' ', $words );
+				$text = $text . $excerpt_more;
 			} else {
 				$text = implode( ' ', $words );
 			}
@@ -962,12 +975,14 @@ class MP_Product {
 		 * Filter the product excerpt
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $text
 		 * @param string $excerpt
 		 * @param string $content
 		 * @param int $product_id
 		 * @param string $excerpt_more Optional
 		 */
+
 		return apply_filters( 'mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more );
 	}
 
@@ -1019,12 +1034,15 @@ class MP_Product {
 	 */
 	public function image_custom( $echo = true, $size = 'large', $attributes = array() ) {
 		$thumb_id = ( $this->has_variations() ) ? get_post_thumbnail_id( $this->get_variation()->ID ) : get_post_thumbnail_id( $this->ID );
+		$product_id = ( $this->has_variations() ) ? $this->get_variation()->ID : $this->ID;
 
 		if ( isset( $attributes ) && isset( $attributes[ 'show_thumbnail_placeholder' ] ) ) {
 			$show_thumbnail_placeholder = (bool) $attributes[ 'show_thumbnail_placeholder' ];
 		} else {
 			$show_thumbnail_placeholder = true;
 		}
+
+		$show_thumbnail_placeholder = (bool) apply_filters( 'mp_product_image_show_placeholder', $show_thumbnail_placeholder, $product_id );
 
 		unset( $attributes[ 'show_thumbnail_placeholder' ] );
 
@@ -1033,10 +1051,12 @@ class MP_Product {
 		}
 
 		if ( empty( $thumb_id ) ) {
+			$heigt = ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_h' );
 			$attributes = array_merge( array(
 				'src'	 => apply_filters( 'mp_default_product_img', mp_plugin_url( 'ui/images/default-product.png' ) ),
 				'width'	 => ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_w' ),
 				'height' => ( is_array( $size ) ) ? $intsize : get_option( 'thumbnail_size_h' ),
+				'style'  => 'max-height: ' . $heigt . 'px;'  // Keeping it nice
 			), $attributes );
 		} else {
 			$data		 = wp_get_attachment_image_src( $thumb_id, $size, false );
@@ -1544,7 +1564,8 @@ class MP_Product {
 
 		$post_thumbnail_id = get_post_thumbnail_id( $image_post_id );
 
-		if ( mp_get_setting( 'show_thumbnail_placeholder' ) == '1' ) {
+		$show_thumbnail_placeholder = apply_filters( 'mp_product_image_show_placeholder', mp_get_setting( 'show_thumbnail_placeholder' ), $post_id );
+		if ( (int) $show_thumbnail_placeholder == 1 ) {
 			//do nothing, placeholder image should be shown
 		} else {
 			if ( (!is_numeric( $post_thumbnail_id ) ) ) {

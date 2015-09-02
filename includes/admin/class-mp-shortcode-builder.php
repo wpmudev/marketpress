@@ -421,16 +421,16 @@ class MP_Shortcode_Builder {
 					</select>
 				</td>
 			</tr>
-			<tr>
-				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Style to display the categories list in. A value of list displays the categories as list items while none generates no special display method (the list items are separated by <br> tags).', 'mp' ); ?></span></span> style</th>
+			<!--<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php /*_e( 'Style to display the categories list in. A value of list displays the categories as list items while none generates no special display method (the list items are separated by <br> tags).', 'mp' ); */?></span></span> style</th>
 				<td>
 					<select name="style" data-default="list">
-						<?php foreach ( array( 'list', 'none' ) as $value ) : ?>
-							<option <?php selected( $value, 'list' ); ?>><?php echo $value; ?></option>
-						<?php endforeach; ?>
+						<?php /*foreach ( array( 'list', 'none' ) as $value ) : */?>
+							<option <?php /*selected( $value, 'list' ); */?>><?php /*echo $value; */?></option>
+						<?php /*endforeach; */?>
 					</select>
 				</td>
-			</tr>
+			</tr>-->
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Toggles the display of the current count of posts in each category.', 'mp' ); ?></span></span> show_count</th>
 				<td>
@@ -677,12 +677,12 @@ class MP_Shortcode_Builder {
 					<input type="text" name="limit" data-default="<?php echo esc_attr( mp_get_setting( 'related_products->show_limit' ) ); ?>" value="<?php echo esc_attr( mp_get_setting( 'related_products->show_limit' ) ); ?>" />
 				</td>
 			</tr>
-			<tr>
-				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to display the items as a simple list or based on the list/grid view setting.', 'mp' ); ?></span></span> simple_list</th>
+			<!--<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php /*_e( 'Whether to display the items as a simple list or based on the list/grid view setting.', 'mp' ); */?></span></span> simple_list</th>
 				<td>
-					<input type="checkbox" name="simple_list" data-default="<?php echo esc_attr( mp_get_setting( 'related_products->simple_list' ) ); ?>" <?php checked( 1, mp_get_setting( 'related_products->simple_list' ) ); ?> />
+					<input type="checkbox" name="simple_list" data-default="<?php /*echo esc_attr( mp_get_setting( 'related_products->simple_list' ) ); */?>" <?php /*checked( 1, mp_get_setting( 'related_products->simple_list' ) ); */?> />
 				</td>
-			</tr>
+			</tr>-->
 		</table>	
 		<?php
 	}
