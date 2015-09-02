@@ -482,15 +482,18 @@ class MP_Product {
 
 	public function max_product_quantity( $product_id = false, $without_cart_quantity = false ) {
 
-		$id			 = $product_id ? product_id : $this->ID;
+		$id			 = $product_id ? $product_id : $this->ID;
 		$cart_items	 = mp_cart()->get_all_items();
 
 		$max = apply_filters( 'mp_cart/max_product_order_default', 100 );
 
 		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
 		$per_order_limit = (int) $per_order_limit;
-
-		$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $id ];
+		if ( isset( $cart_items[ get_current_blog_id() ][ $id ] ) ) {
+			$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $id ];
+		} else {
+			$cart_quantity = 0;
+		}
 
 		$inventory				 = get_post_meta( $id, 'inventory', true );
 		$inventory_tracking		 = get_post_meta( $id, 'inventory_tracking', true );
