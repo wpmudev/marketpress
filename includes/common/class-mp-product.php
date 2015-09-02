@@ -927,7 +927,17 @@ class MP_Product {
 		}
 
 		if ( is_null( $excerpt ) ) {
-			$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
+			//this only uses in listing page, so we will use the main product excepts, not variants
+			//$excerpt = $this->has_variations() ? $this->get_variation()->post_excerpt : $this->_post->post_excerpt;
+			if ( $this->has_variations() ) {
+				if ( strlen( $this->get_variation()->post_excerpt ) > 0 ) {
+					$excerpt = $this->get_variation()->post_excerpt;
+				} else {
+					$excerpt = $this->_post->post_excerpt;
+				}
+			} else {
+				$excerpt = $this->_post->post_excerpt;
+			}
 		}
 
 		if ( is_null( $content ) ) {
@@ -937,16 +947,16 @@ class MP_Product {
 		if ( $excerpt ) {
 			return apply_filters( 'get_the_excerpt', $excerpt ) . $excerpt_more;
 		} else {
-			$text			 = strip_shortcodes( $content );
-			$text			 = str_replace( ']]>', ']]&gt;', $text );
-			$text			 = strip_tags( $text );
-			$excerpt_length	 = apply_filters( 'excerpt_length', 55 );
-			$words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
+			$text           = strip_shortcodes( $content );
+			$text           = str_replace( ']]>', ']]&gt;', $text );
+			$text           = strip_tags( $text );
+			$excerpt_length = mp_get_setting( 'excerpts_length', 55 );
+			$words          = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
 
 			if ( count( $words ) > $excerpt_length ) {
 				array_pop( $words );
-				$text	 = implode( ' ', $words );
-				$text	 = $text . $excerpt_more;
+				$text = implode( ' ', $words );
+				$text = $text . $excerpt_more;
 			} else {
 				$text = implode( ' ', $words );
 			}
@@ -962,12 +972,14 @@ class MP_Product {
 		 * Filter the product excerpt
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $text
 		 * @param string $excerpt
 		 * @param string $content
 		 * @param int $product_id
 		 * @param string $excerpt_more Optional
 		 */
+
 		return apply_filters( 'mp_product/excerpt', $text, $excerpt, $content, $this->id, $excerpt_more );
 	}
 
