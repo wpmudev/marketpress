@@ -515,7 +515,7 @@ class MP_Installer {
 					<?php wp_nonce_field( 'mp_update_product_postmeta' ); ?>
 					<input type="hidden" name="action" value="mp_update_product_postmeta" />
 					<input type="hidden" name="page" value="1" />
-					<p class="mp-important"><strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes.', 'mp' ); ?></strong></p>
+					<p class="mp-important"><strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong></p>
 					<p class="submit"><input class="button-primary" type="submit" value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
 				</form>
 				<?php
