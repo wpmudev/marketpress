@@ -4,6 +4,9 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+3.0.0.1
+----------------------------------------------------------------------
+Adding notice for deprecated gateways Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout
 
 3.0
 ----------------------------------------------------------------------
