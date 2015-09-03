@@ -52,7 +52,7 @@ class MP_Installer {
 		wp_localize_script( 'mp-db-update', 'mp_db_update', array(
 			'error_text'	 => __( 'An error occurred while updating. Please refresh this page and try again.', 'mp' ),
 			'progressbar'	 => array(
-				'label_text'	 => __( 'Loading...', 'mp' ),
+				'label_text'	 => __( 'Upgrading Database...Please Wait...', 'mp' ),
 				'complete_text'	 => __( 'Complete!', 'mp' ),
 			),
 		) );
@@ -103,8 +103,9 @@ class MP_Installer {
 	}
 
 	public function product_variations_transition( $post_id, $product_type ) {
-		global $wp_taxonomies;
+		global $wp_taxonomies, $wpdb;
 
+		$variation_values		 = null;
 		$variation_values		 = get_post_meta( $post_id, 'mp_var_name', true );
 		//$variation_name		 = 'Variation'; //default variation category / attribute name
 		$variation_names[ 0 ]	 = 'Variation';
@@ -161,6 +162,12 @@ class MP_Installer {
 			$combination_num	 = 1;
 			$combination_index	 = 0;
 
+			wp_suspend_cache_addition( true );
+			wp_defer_term_counting( true );
+			wp_defer_comment_counting( true );
+
+			$wpdb->query( 'SET autocomit = 0;' );
+
 			foreach ( $combinations as $combination ) {
 
 				$post_title		 = get_the_title( $post_id );
@@ -209,19 +216,6 @@ class MP_Installer {
 					$charge_shipping = 0;
 				}
 
-				/*
-				  if ( $old_post_meta_name == 'mp_shipping' ) {
-				  $old_value = get_post_meta( $post_id, $old_post_meta_name, true );
-				  if ( isset( $old_value ) && is_array( $old_value ) ) {
-				  $old_value = $old_value[ 'extra_cost' ];
-				  } else {
-				  $old_value = 0;
-				  }
-
-				  if ( (int) $old_value > 0 ) {
-				  update_post_meta( $post_id, 'charge_shipping', '1' );
-				  }
-				  } */
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
 					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
 					'sku'						 => $sku,
@@ -256,12 +250,23 @@ class MP_Installer {
 
 				foreach ( $variation_terms as $variation_term ) {
 					$variation_term_vals = explode( '=', $variation_term );
-					wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], true );
+					//has_term( $term, $taxonomy, $post )
+					//wp_set_object_terms
+					if ( !has_term( MP_Products_Screen::term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], $variation_id ) ) {
+						wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], true );
+					}
 				}
 
 				$combination_num++;
 				$combination_index++;
 			}
+
+			$wpdb->query( 'COMMIT;' );
+			$wpdb->query( 'SET autocommit = 1;' );
+
+			wp_suspend_cache_addition( false );
+			wp_defer_term_counting( false );
+			wp_defer_comment_counting( false );
 			//}
 			//exit;
 		} else {
@@ -317,9 +322,11 @@ class MP_Installer {
 			wp_send_json_error();
 		}
 
-		$per_page = 20;
+		ini_set( 'max_execution_time', 0 );
+		set_time_limit( 0 );
 
-		$query = new WP_Query( array(
+		$per_page	 = 20;
+		$query		 = new WP_Query( array(
 			'cache_results'			 => false,
 			'update_post_term_cache' => false,
 			'post_type'				 => 'product',
@@ -327,7 +334,8 @@ class MP_Installer {
 			'paged'					 => max( 1, mp_get_post_value( 'page' ) ),
 		) );
 
-		$page = mp_get_post_value( 'page', 1 );
+		$page	 = mp_get_post_value( 'page', 1 );
+		$updated = ($page * $per_page);
 
 		while ( $query->have_posts() ) {
 			$query->the_post();
@@ -351,6 +359,11 @@ class MP_Installer {
 					}
 
 					update_post_meta( $post_id, 'product_type', $product_type );
+
+					$response = array(
+						'updated'	 => ceil( $updated / $query->found_posts ) * 100,
+						'is_done'	 => false,
+					);
 
 					$this->product_variations_transition( $post_id, $product_type );
 				} else {
@@ -398,20 +411,13 @@ class MP_Installer {
 			}
 		}
 
-		$updated = ($page * $per_page);
-
-		$percentage = $query->found_posts / 100;
-
 		$response = array(
-			'updated'	 => ceil( $updated / $percentage ),
+			'updated'	 => ceil( $updated / $query->found_posts ) * 100,
 			'is_done'	 => false,
 		);
 
 		if ( $updated >= $query->found_posts ) {
-			$response = array(
-				'updated'	 => ceil( $updated / $query->found_posts ) * 100,
-				'is_done'	 => true,
-			);
+			$response[ 'is_done' ] = true;
 		}
 
 		delete_option( 'mp_db_update_required' );
@@ -529,6 +535,7 @@ class MP_Installer {
 	 * @action admin_notices
 	 */
 	public function db_update_notice() {
+
 		if ( !get_option( 'mp_db_update_required' ) || !current_user_can( 'activate_plugins' ) || mp_get_get_value( 'page' ) == 'mp-db-update' ) {
 			return;
 		}
@@ -624,7 +631,7 @@ class MP_Installer {
 		$sql		 = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL,
 			term_id bigint(20) unsigned NOT NULL,
-			PRIMARY KEY  (attribute_id,term_id)
+			PRIMARY KEY  (attribute_id, term_id)
 		) $charset_collate;";
 		dbDelta( $sql );
 	}

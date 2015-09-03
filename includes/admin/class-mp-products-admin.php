@@ -583,8 +583,8 @@ class MP_Products_Screen {
 						$term = get_term( $term, $taxonomy, OBJECT );
 						return $term->term_id;
 					} else {
-						echo $term_insert_response->get_error_message(); //shouldn't happen ever!
-						exit;
+						//echo 'oups!'.$term_insert_response->get_error_message(); //shouldn't happen ever!
+						//exit;
 					}
 				} else {
 					return $term_insert_response[ 'term_id' ];
