@@ -65,3 +65,7 @@
 .select2-search {
     z-index: 10002;
 }
+
+.mp-important{
+    color: red;
+}
