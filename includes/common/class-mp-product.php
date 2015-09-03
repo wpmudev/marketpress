@@ -265,7 +265,7 @@ class MP_Product {
 		?>
 		<?php if ( 0 == 0 ) { ?>
 			<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope itemtype="http://schema.org/Product">
-				<div class="mp_product mp_product_options">
+				<div class="mp_product mp_product_options mp_product_lightbox">
 
 					<div class="mp_product_options_image">
 						<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
@@ -275,7 +275,7 @@ class MP_Product {
 
 						<div class="mp_product_options_meta">
 							<h3 class="mp_product_name" itemprop="name"><?php echo $product->post_title; ?></h3>
-							<div class="mp_product_options_excerpt"><p><?php echo $product->excerpt(); ?></p></div><!-- end mp_product_options_excerpt -->
+							<div class="mp_product_excerpt mp_product_options_excerpt"><p><?php echo $product->excerpt(); ?></p></div><!-- end mp_product_options_excerpt -->
 						</div><!-- end mp_product_options_meta -->
 
 						<div class="mp_product_options_callout">
@@ -284,7 +284,7 @@ class MP_Product {
 								<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
 								<input type="hidden" name="product_qty_changed" value="0">
 								<?php $product->display_price(); ?>
-								<div class="mp_product_options_atts"><?php $product->attribute_fields(); ?></div><!-- end mp_product_options_atts -->
+								<?php $product->attribute_fields(); ?>
 								<?php if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) : ?>
 									<button class="mp_button mp_button-addcart" type="submit" name="addcart"><?php _e( 'Add To Cart', 'mp' ); ?></button>
 								<?php elseif ( mp_get_setting( 'product_button_type' ) == 'buynow' ) :

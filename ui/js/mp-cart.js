@@ -287,6 +287,9 @@ var mp_cart = { };
             },
             "overlayClose": false,
             "trapFocus": false,
+            "width": 300,
+            "overlayClose": true,
+            "escKey": true,
             onLoad: function() {
                 $( "#colorbox" ).removeAttr( "tabindex" ); //remove tabindex before select2 init
             },
