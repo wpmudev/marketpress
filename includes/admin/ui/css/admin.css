@@ -69,3 +69,19 @@
 .mp-important{
     color: red;
 }
+
+.mp-deprecated-notice {
+    position: relative;
+    overflow: hidden;
+}
+
+.mp-deprecated-notice .mp-notice-text {
+    width: 95%;
+}
+
+.mp-deprecated-notice .mp-dismissed-deprecated-notice {
+    text-decoration: none;
+    position: absolute;
+    top: 5px;
+    right: 5px
+}

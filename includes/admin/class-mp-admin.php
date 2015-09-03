@@ -43,6 +43,59 @@ class MP_Admin {
 		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_styles_scripts' ) );
 
 		add_action( 'admin_head', array( &$this, 'admin_head' ) );
+		//add a notice for deprecated gateway
+		if(get_option('mp_deprecated_gateway_notice_showed')!=1){
+		add_action( 'admin_notices', array(&$this,'deprecated_gateway_notice') );
+		add_action('admin_footer',array(&$this,'print_deprecated_notice_scripts'));
+		add_action('wp_ajax_mp_dismissed_deprecated_message',array(&$this,'dismissed_deprecated_messag'));
+		}
+	}
+
+	public function dismissed_deprecated_messag(){
+		if(!current_user_can('manage_options')){
+			return;
+		}
+		update_option('mp_deprecated_gateway_notice_showed',1);
+
+	}
+
+	public function deprecated_gateway_notice(){
+	if(!current_user_can('manage_options')){
+	return;
+	}
+		?>
+		<div class="update-nag mp-deprecated-notice">
+		<div class="mp-notice-text">
+		<?php echo sprintf(__("The following payment gateways have been deprecated, Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout. If you was using one of these gateways, please setup a new payment gateway <a href=\"%s\">here</a>.","marketpress"),admin_url('admin.php?page=store-settings-payments')) ?>
+		</div>
+		<a href="#" class="mp-dismissed-deprecated-notice"><i class="dashicons dashicons-no-alt"></i></a>
+		</div>
+		<?php
+	}
+
+	public function print_deprecated_notice_scripts(){
+	if(!current_user_can('manage_options')){
+	return;
+	}
+		?>
+			<script type="text/javascript">
+				jQuery(function($){
+					$('.mp-dismissed-deprecated-notice').click(function(e){
+					e.preventDefault();
+					$.ajax({
+						type:'POST',
+						data:{
+							action:'mp_dismissed_deprecated_message'
+						},
+						url:ajaxurl,
+						success:function(){
+							$('.mp-deprecated-notice').fadeOut(150)
+						}
+					})
+					})
+				})
+			</script>
+		<?php
 	}
 
 	function admin_head() {
@@ -294,6 +347,8 @@ class MP_Admin {
 
 		return $messages;
 	}
+
+
 
 }
 
