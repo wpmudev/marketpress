@@ -117,11 +117,23 @@ class MP_Public {
 			$echo = true;
 		}
 
+		//we only display this lightbox in order status page, after checkout if user doesn't have account
+		$order_status_id = mp_get_setting( 'pages->order_status' );
+		if ( ! $order_status_id ) {
+			//this page still not created, bail
+			return false;
+		}
+
+		if ( get_the_ID() != $order_status_id ) {
+			//not the page we want
+			return false;
+		}
+
 		$html = '
 			<div id="mp-create-account-lightbox" class="mp_lightbox mp_create_account">
 				<h2 class="mp_title">' . __( 'Create Account', 'mp' ) . '</h2>
 				<form id="mp-create-account-form" class="mp_form mp_form-create-account" action="' . admin_url( 'admin-ajax.php?action=mp_create_account' ) . '" method="post">' .
-		wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce', true, false ) . '
+		        wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce', true, false ) . '
 					<div class="mp_form_field">
 						<label for="mp-create-account-name-first" class="mp_form_label">' . __( 'Username:', 'mp' ) . '<span class="mp-field-required">*</span></label>
 						<input class="mp_form_input" id="mp-create-account-username" type="text" name="username" data-rule-required="true" data-rule-remote="' . admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) . '" data-msg-remote="' . __( 'An account with this username already exists', 'mp' ) . '">
@@ -131,27 +143,27 @@ class MP_Public {
 						<label for="mp-create-account-name-first" class="mp_form_label">' . __( 'First Name:', 'mp' ) . '<span class="mp-field-required">*</span></label>
 						<input class="mp_form_input" id="mp-create-account-name-first" type="text" name="name_first" data-rule-required="true">
 					</div>
-					
+
 					<div class="mp_form_field">
 						<label for="mp-create-account-name-last" class="mp_form_label">' . __( 'Last Name:', 'mp' ) . '<span class="mp-field-required">*</span></label>
 						<input class="mp_form_input" id="mp-create-account-name-last" type="text" name="name_last" data-rule-required="true">
 					</div>
-					
+
 					<div class="mp_form_field">
 						<label for="mp-create-account-email" class="mp_form_label">' . __( 'Email:', 'mp' ) . '<span class="mp-field-required">*</span></label>
 						<input class="mp_form_input" id="mp-create-account-email" type="email" name="email" data-rule-required="true" data-rule-email="true" data-rule-remote="' . admin_url( 'admin-ajax.php?action=mp_check_if_email_exists' ) . '" data-msg-remote="' . __( 'An account with this email address already exists', 'mp' ) . '">
 					</div>
-					
+
 					<div class="mp_form_field">
 						<label for="mp-create-account-password1" class="mp_form_label">' . __( 'Password:', 'mp' ) . '<span class="mp-field-required">*</span></label>
 						<input class="mp_form_input" id="mp-create-account-password1" type="password" name="password1" data-rule-required="true">
 					</div>
-					
+
 					<div class="mp_form_field">
 						<label for="mp-create-account-password2" class="mp_form_label">' . __( 'Re-enter Password:', 'mp' ) . '<span class="mp-field-required">*</span></label>
 						<input class="mp_form_input" id="mp-create-account-password2" type="password" name="password2" data-rule-required="true" data-rule-equalTo="#mp-create-account-password1" data-msg-equalTo="' . __( 'Passwords do not match!', 'mp' ) . '">
 					</div>
-					
+
 					<div class="mp_form_callout">
 						<button type="submit" class="mp_button mp_button-alt mp_button-create-account">' . __( 'Create Account', 'mp' ) . '</button>
 					</div>
