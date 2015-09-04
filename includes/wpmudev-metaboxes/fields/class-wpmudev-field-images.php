@@ -186,6 +186,14 @@ class WPMUDEV_Field_Images extends WPMUDEV_Field {
 			<?php
 			$values = $this->get_value( $post_id, 'mp_product_images', true );
 
+			if ( empty( $values ) ) {
+				$post_thumbnail = get_post_thumbnail_id( $post_id );
+				if ( is_numeric( $post_thumbnail ) ) {
+					$values = $post_thumbnail;
+					update_post_meta($post_id, 'mp_product_images', $post_thumbnail);
+				}
+			}
+
 			if ( $values ) {
 				$values = explode( ',', $values );
 				foreach ( $values as $value ) {

@@ -371,6 +371,11 @@ class MP_Installer {
 				} else {
 					//It's single/regular/non-variant product
 
+					$post_thumbnail = get_post_thumbnail_id( $post_id );
+					if ( is_numeric( $post_thumbnail ) ) {
+						update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
+					}
+
 					$mp_file		 = get_post_meta( $post_id, 'mp_file', true );
 					$mp_product_link = get_post_meta( $post_id, 'mp_product_link', true );
 
