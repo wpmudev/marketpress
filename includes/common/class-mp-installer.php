@@ -324,6 +324,13 @@ class MP_Installer {
 			wp_send_json_error();
 		}
 
+		$old_version = get_option( 'mp_version' );
+		if ( version_compare( $old_version, '3.0', '=' ) || version_compare( $old_version, '3.0.0.1', '=' ) ) {
+			$update_fix_needed = true;
+		} else {
+			$update_fix_needed = false;
+		}
+
 		ini_set( 'max_execution_time', 0 );
 		set_time_limit( 0 );
 
@@ -345,7 +352,7 @@ class MP_Installer {
 
 			$variations = get_post_meta( $post_id, 'mp_var_name', true );
 
-			if ( $variations && is_array( $variations ) ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
+			if ( $variations && is_array( $variations ) && $update_fix_needed == false ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
 				if ( count( $variations ) > 1 ) {
 					//It's a variation product
 
@@ -414,6 +421,11 @@ class MP_Installer {
 					$this->post_meta_transition( $post_id, 'mp_file', 'file_url' ); //If not empty then mark it as digital product
 					$this->post_meta_transition( $post_id, 'mp_product_link', 'external_url' ); //If not empty then mark it as external product
 				//
+				}
+			} else {//update for 3.0 and 3.0.0.1
+				$post_thumbnail = get_post_thumbnail_id( $post_id );
+				if ( is_numeric( $post_thumbnail ) ) {
+					update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
 				}
 			}
 
@@ -501,7 +513,14 @@ class MP_Installer {
 			<br />
 
 			<?php
-			if ( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'mp_var_name'" ) ) {
+			$old_version = get_option( 'mp_version' );
+			if ( version_compare( $old_version, '3.0', '=' ) || version_compare( $old_version, '3.0.0.1', '=' ) ) {
+				$update_fix_needed = true;
+			} else {
+				$update_fix_needed = false;
+			}
+
+			if ( $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'mp_var_name'" ) || $update_fix_needed ) {
 				$postcount = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='product'" );
 				?>
 				<style type="text/css">
@@ -525,6 +544,13 @@ class MP_Installer {
 					<input type="hidden" name="action" value="mp_update_product_postmeta" />
 					<input type="hidden" name="page" value="1" />
 					<p class="mp-important"><strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong></p>
+					<?php
+					if ( is_multisite() ) {
+						?>
+						<p class="mp-important"><strong><?php _e( 'Please update each subsite in your WordPress network where you have older version of the MarketPress plugin.', 'mp' ); ?></strong></p>
+						<?php
+					}
+					?>
 					<p class="submit"><input class="button-primary" type="submit" value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
 				</form>
 				<?php
@@ -584,7 +610,7 @@ class MP_Installer {
 			}
 
 			//3.0 update
-			if ( version_compare( $old_version, '3.0', '<' ) ) {
+			if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
 				$settings = $this->update_3000( $settings );
 			}
 		}
