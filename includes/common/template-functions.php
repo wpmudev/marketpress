@@ -2379,7 +2379,8 @@ if ( !function_exists( 'mp_product_image' ) ) :
 		_deprecated_function( 'mp_product_image', '3.0', 'MP_Product::image()' );
 
 		$product = new MP_Product( $post_id );
-		$image	 = MP_Product::image( false, $context, $size, $align );
+		//$image	 = MP_Product::image( false, $context, $size, $align );
+		$image = $product->image( false, $context, $size, $align );
 
 		if ( $echo ) {
 			echo $image;
@@ -2701,3 +2702,62 @@ function mp_all_countries_allowed() {
 		return false;
 	}
 }
+
+if ( ! function_exists( 'mp_show_cart' ) ) {
+	/**
+	 * @param string $context
+	 * @param null $checkoutstep
+	 * @param bool|true $echo
+	 *
+	 * @return string
+	 */
+	function mp_show_cart( $context = '', $checkoutstep = null, $echo = true ) {
+
+		var_dump($context);
+		var_dump($checkoutstep);
+
+		$content = '';
+
+		if ( get_the_ID() == mp_get_setting( 'pages->checkout' ) ) {
+			$content = MP_Checkout::get_instance()->display( array(
+				'echo' => false
+			) );
+		} elseif ( get_the_ID() == mp_get_setting( 'pages->cart' ) ) {
+			$content = MP_Cart::get_instance()->display( array(
+				'echo' => false
+			) );
+		}
+
+		if ( $echo ) {
+			echo $content;
+		} else {
+			return $content;
+		}
+	}
+}
+
+if (!function_exists('mp_items_in_cart')) :
+	/**
+	 * Determine if there are any items in the cart
+	 *
+	 * @retuns bool whether items are in the cart for the current user.
+	 */
+	function mp_items_in_cart() {
+		if (mp_items_count_in_cart())
+			return true;
+		else
+			return false;
+	}
+endif;
+
+if (!function_exists('mp_items_count_in_cart')) :
+	/**
+	 * Determine count of any items in the cart
+	 *
+	 * @retuns int number of items that are in the cart for the current user.
+	 */
+	function mp_items_count_in_cart() {
+		return mp_cart()->item_count( false, false );
+	}
+endif;
+
