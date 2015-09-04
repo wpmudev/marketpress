@@ -753,10 +753,6 @@ if ( is_plugin_active_for_network( 'marketpress/marketpress.php' ) && ! mp_cart(
 					'name'  => 'global_cart',
 					'value' => 1,
 				),
-				array(
-					'name'  => 'global_gateway',
-					'value' => 'paypal_chained',
-				),
 			),
 		) );
 
