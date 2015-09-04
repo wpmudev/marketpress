@@ -2712,12 +2712,7 @@ if ( ! function_exists( 'mp_show_cart' ) ) {
 	 * @return string
 	 */
 	function mp_show_cart( $context = '', $checkoutstep = null, $echo = true ) {
-
-		var_dump($context);
-		var_dump($checkoutstep);
-
 		$content = '';
-
 		if ( get_the_ID() == mp_get_setting( 'pages->checkout' ) ) {
 			$content = MP_Checkout::get_instance()->display( array(
 				'echo' => false
@@ -2736,21 +2731,22 @@ if ( ! function_exists( 'mp_show_cart' ) ) {
 	}
 }
 
-if (!function_exists('mp_items_in_cart')) :
+if ( ! function_exists( 'mp_items_in_cart' ) ) :
 	/**
 	 * Determine if there are any items in the cart
 	 *
 	 * @retuns bool whether items are in the cart for the current user.
 	 */
 	function mp_items_in_cart() {
-		if (mp_items_count_in_cart())
+		if ( mp_items_count_in_cart() ) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 endif;
 
-if (!function_exists('mp_items_count_in_cart')) :
+if ( ! function_exists( 'mp_items_count_in_cart' ) ) :
 	/**
 	 * Determine count of any items in the cart
 	 *
@@ -2761,3 +2757,44 @@ if (!function_exists('mp_items_count_in_cart')) :
 	}
 endif;
 
+if ( ! function_exists( 'mp_category_list' ) ) :
+	/**
+	 * Retrieve product's category list in either HTML list or custom format.
+	 *
+	 * @param int $product_id Optional. Post ID to retrieve categories.
+	 * @param string $before Optional. Before list.
+	 * @param string $sep Optional. Separate items using this.
+	 * @param string $after Optional. After list.
+	 */
+	function mp_category_list( $product_id = false, $before = '', $sep = ', ', $after = '' ) {
+		$terms = get_the_term_list( $product_id, 'product_category', $before, $sep, $after );
+		if ( $terms ) {
+			return $terms;
+		} else {
+			$return = __( 'Uncategorized', 'mp' );
+		}
+
+		return apply_filters( 'mp_category_list', $return, $product_id, $before, $sep, $after );
+	}
+endif;
+
+
+if (!function_exists('mp_tag_list')) :
+	/**
+	 * Retrieve product's tag list in either HTML list or custom format.
+	 *
+	 * @param int $product_id Optional. Post ID to retrieve categories.
+	 * @param string $before Optional. Before list.
+	 * @param string $sep Optional. Separate items using this.
+	 * @param string $after Optional. After list.
+	 */
+	function mp_tag_list($product_id = false, $before = '', $sep = ', ', $after = '') {
+		$terms = get_the_term_list($product_id, 'product_tag', $before, $sep, $after);
+		if ($terms)
+			return $terms;
+		else
+			$return = __('No Tags', 'mp');
+
+		return apply_filters('mp_tag_list', $return, $product_id, $before, $sep, $after);
+	}
+endif;
