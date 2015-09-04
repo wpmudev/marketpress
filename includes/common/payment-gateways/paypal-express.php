@@ -365,9 +365,15 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		//build the item details
 		$index = 0;
 
+
 		//we loop through sites
 		foreach ( $cart->get_all_items() as $bid => $items ) {
 			if ( ! is_array( $items ) || empty( $items ) ) {
+				continue;
+			}
+
+			//if cart is not global, so we don't check the items not within the site
+			if ( $cart->is_global == false && $bid != $current_blog_id ) {
 				continue;
 			}
 
