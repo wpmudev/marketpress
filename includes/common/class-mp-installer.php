@@ -325,7 +325,7 @@ class MP_Installer {
 		}
 
 		$old_version = get_option( 'mp_version' );
-		if ( version_compare( $old_version, '3.0', '=' ) || version_compare( $old_version, '3.0.0.1', '=' ) ) {
+		if ( version_compare( $old_version, '3.0.0.2', '=' ) ) {
 			$update_fix_needed = true;
 		} else {
 			$update_fix_needed = false;
@@ -514,7 +514,7 @@ class MP_Installer {
 
 			<?php
 			$old_version = get_option( 'mp_version' );
-			if ( version_compare( $old_version, '3.0', '=' ) || version_compare( $old_version, '3.0.0.1', '=' ) ) {
+			if ( version_compare( $old_version, '3.0.0.2', '=' ) ) {
 				$update_fix_needed = true;
 			} else {
 				$update_fix_needed = false;
