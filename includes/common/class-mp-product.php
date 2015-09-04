@@ -2010,7 +2010,7 @@ Notification Preferences: %s', 'mp' );
 	 */
 	public function get_meta( $name, $default = false, $raw = false ) {
 		if ( !$this->exists() ) {
-			return $default;
+			return apply_filters( 'mp_meta/product', $default, $this->ID, $name );
 		}
 
 		$value = false;
@@ -2020,16 +2020,16 @@ Notification Preferences: %s', 'mp' );
 		}
 
 		if ( $value !== false && $value !== '' ) {
-			return $value;
+			return apply_filters( 'mp_meta/product', $value, $this->ID, $name );
 		}
 
 		// Try to use regular post meta
 		$meta_val = get_post_meta( $this->ID, $name, true );
 		if ( $meta_val !== '' ) {
-			return $meta_val;
+			return apply_filters( 'mp_meta/product', $meta_val, $this->ID, $name );
 		}
 
-		return $default;
+		return apply_filters( 'mp_meta/product', $default, $this->ID, $name );
 	}
 
 	/**
