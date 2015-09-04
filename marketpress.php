@@ -597,8 +597,12 @@ class Marketpress {
 
 // Order status
 		if ( $post_id = mp_get_setting( 'pages->order_status' ) ) {
-			$uri								 = get_page_uri( $post_id );
-			$new_rules[ $uri . '/([^/]+)/?' ]	 = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
+			$uri = get_page_uri( $post_id );
+			//$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
+			//this rules match the default page rules, so we have to inject it before the page
+			$rewrite_rules = array_merge( array(
+				$uri . '/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]'
+			), $rewrite_rules );
 		}
 
 // Order confirmation
