@@ -1056,9 +1056,9 @@ class MP_Cart {
 	public function enqueue_styles_scripts() {
 		global $post;
 
-		if ( !mp_is_shop_page() ) {
+		/*if ( !mp_is_shop_page() ) {
 			return;
-		}
+		}*/
 
 		// Styles
 		wp_enqueue_style( 'colorbox', mp_plugin_url( 'ui/css/colorbox.css' ), false, MP_VERSION );
