@@ -324,8 +324,8 @@ class MP_Installer {
 			wp_send_json_error();
 		}
 
-		$old_version = get_option( 'mp_version' );
-		if ( version_compare( $old_version, '3.0', '=' ) || version_compare( $old_version, '3.0.0.1', '=' ) ) {
+		$old_version = get_option( 'mp_previous_version' );
+		if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
 			$update_fix_needed = true;
 		} else {
 			$update_fix_needed = false;
@@ -513,8 +513,8 @@ class MP_Installer {
 			<br />
 
 			<?php
-			$old_version = get_option( 'mp_version' );
-			if ( version_compare( $old_version, '3.0', '=' ) || version_compare( $old_version, '3.0.0.1', '=' ) ) {
+			$old_version = get_option( 'mp_previous_version' );
+			if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
 				$update_fix_needed = true;
 			} else {
 				$update_fix_needed = false;
@@ -633,6 +633,7 @@ class MP_Installer {
 		//add action to flush rewrite rules after we've added them for the first time
 		update_option( 'mp_flush_rewrites', 1 );
 
+		update_option( 'mp_previous_version', $old_version );
 		update_option( 'mp_version', MP_VERSION );
 	}
 
