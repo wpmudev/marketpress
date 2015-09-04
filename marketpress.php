@@ -608,7 +608,10 @@ class Marketpress {
 // Order confirmation
 		if ( $post_id = mp_get_setting( 'pages->checkout' ) ) {
 			$uri								 = get_page_uri( $post_id );
-			$new_rules[ $uri . '/confirm/?' ]	 = 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1';
+			//$new_rules[ $uri . '/confirm/?' ]	 = 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1';
+			$rewrite_rules = array_merge( array(
+				$uri . '/confirm/?'  => 'index.php?pagename=' . $uri . '&mp_confirm_order_step=1'
+			), $rewrite_rules );
 		}
 
 		return $rewrite_rules + $new_rules;
