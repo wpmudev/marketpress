@@ -259,6 +259,8 @@ class MP_Installer {
 
 				$combination_num++;
 				$combination_index++;
+
+				do_action( 'mp_update/variation', $variation_id );
 			}
 
 			$wpdb->query( 'COMMIT;' );
@@ -409,6 +411,8 @@ class MP_Installer {
 				//
 				}
 			}
+
+			do_action( 'mp_update/product', $post_id );
 		}
 
 		$response = array(
