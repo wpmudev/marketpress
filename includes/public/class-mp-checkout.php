@@ -1080,12 +1080,14 @@ class MP_Checkout {
 					</div><!-- end mp_checkout_field -->
 					<button id="mp-button-checkout-login" type="button" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
 				</div><!-- end mp_checkout_column -->
-				<div class="mp_checkout_column">
+				';
+			if ( mp_get_setting( 'force_login' ) == false && ! is_user_logged_in() ) {
+				$html .= '<div class="mp_checkout_column">
 					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
 					<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
 					<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
-				</div><!-- end mp_checkout_column -->
-				';
+				</div><!-- end mp_checkout_column -->';
+			}
 		}
 		/**
 		 * Filter the section login html
