@@ -393,13 +393,13 @@ class MP_Public {
 		global $post, $wp_query;
 
 		if ( get_post_type() == MP_Product::get_post_type() ) {
-			$template = locate_template( array(
+			$custom_template = locate_template( array(
 				"mp_product-{$post->post_name}.php",
 				"mp_product-{$post->ID}.php",
 				"mp_product.php",
 			) );
 
-			if ( $template === '' ) {
+			if ( $custom_template === '' ) {
 				$ok = true;
 
 				if ( $variation_id = get_query_var( 'mp_variation_id' ) ) {
