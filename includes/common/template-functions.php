@@ -2492,7 +2492,11 @@ if ( !function_exists( 'mp_products_filter' ) ) :
 			session_start();
 		}
 
-		$current_order = strtolower( $query->get( 'order_by' ) . '-' . $query->get( 'order' ) );
+		if ( $query instanceof WP_Query ) {
+			$current_order = strtolower( $query->get( 'order_by' ) . '-' . $query->get( 'order' ) );
+		} else {
+			$current_order = '';
+		}
 
 		if ( isset( $_SESSION[ 'mp_product_list_order_by' ] ) && isset( $_SESSION[ 'mp_product_list_order' ] ) ) {
 			$current_order = $_SESSION[ 'mp_product_list_order_by' ] . '-' . $_SESSION[ 'mp_product_list_order' ];
