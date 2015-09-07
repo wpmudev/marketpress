@@ -263,12 +263,14 @@ class MP_Installer {
 				do_action( 'mp_update/variation', $variation_id );
 			}
 
-			$wpdb->query( 'COMMIT;' );
-			$wpdb->query( 'SET autocommit = 1;' );
-
 			wp_suspend_cache_addition( false );
 			wp_defer_term_counting( false );
 			wp_defer_comment_counting( false );
+			
+			$wpdb->query( 'COMMIT;' );
+			$wpdb->query( 'SET autocommit = 1;' );
+
+			
 			//}
 			//exit;
 		} else {
