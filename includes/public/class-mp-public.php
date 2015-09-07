@@ -366,16 +366,22 @@ class MP_Public {
 	public function load_page_template( $template ) {
 		global $post;
 
+		$custom_template = false;
+
 		if ( mp_get_setting( 'pages->store' ) == $post->ID ) {
-			$template = locate_template( array( 'mp_store.php' ) );
+			$custom_template = locate_template( array( 'mp_store.php' ) );
 		} elseif ( mp_get_setting( 'pages->product' ) == $post->ID ) {
-			$template = locate_template( array( 'mp_productlist.php' ) );
+			$custom_template = locate_template( array( 'mp_productlist.php' ) );
 		} elseif ( mp_get_setting( 'pages->cart' ) == $post->ID ) {
-			$template = locate_template( array( 'mp_cart.php' ) );
+			$custom_template = locate_template( array( 'mp_cart.php' ) );
 		} elseif ( mp_get_setting( 'pages->checkout' ) == $post->ID ) {
-			$template = locate_template( array( 'mp_checkout.php', 'mp_cart.php' ) );
+			$custom_template = locate_template( array( 'mp_checkout.php', 'mp_cart.php' ) );
 		} elseif ( mp_get_setting( 'pages->order_status' ) == $post->ID ) {
-			$template = locate_template( array( 'mp_orderstatus.php' ) );
+			$custom_template = locate_template( array( 'mp_orderstatus.php' ) );
+		}
+
+		if ( $custom_template != false ) {
+			return $custom_template;
 		}
 
 		return $template;
