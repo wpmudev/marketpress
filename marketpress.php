@@ -405,7 +405,7 @@ class Marketpress {
 
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 		$post_type = get_post_type( $post_id );
-		if ( $post_type == MP_Product::get_post_type() || $post_type == MP_Product::get_variations_post_type() ) {
+		if ( class_exists( 'MP_Product' ) && ( $post_type == MP_Product::get_post_type() || $post_type == MP_Product::get_variations_post_type() ) ) {
 			$html = str_replace( "/>", ">", $html );
 		}
 
