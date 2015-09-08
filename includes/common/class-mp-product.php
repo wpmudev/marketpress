@@ -102,7 +102,7 @@ class MP_Product {
 	public static function get_post_type() {
 		return mp_get_setting( 'product_post_type' ) == 'mp_product' ? 'mp_product' : 'product';
 	}
-	
+
 	public static function get_variations_post_type() {
 		return apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' );
 	}
@@ -473,7 +473,7 @@ class MP_Product {
 		 * @param int $term_id
 		 * @param string $term_name
 		 * @param string $tax_slug
-		 * @param bool $required		 
+		 * @param bool $required
 		 */
 		$html = apply_filters( 'mp_product/attribute_option', $html, $term_id, $term_name, $tax_slug, $required );
 
@@ -586,7 +586,7 @@ class MP_Product {
 		$product_quantity	 = 1;
 
 		if ( $product->has_variations() ) {
-			
+
 		} else {
 
 			if ( is_numeric( $per_order_limit ) ) {
@@ -1502,7 +1502,7 @@ class MP_Product {
 		 * @since 3.0
 		 * @param float $special_tax_amt The current special tax price.
 		 * @param float $special_tax_rate The current special tax rate.
-		 * @param bool $is_fixed_amt Whether the special tax rate is a fixed amount or not.		 
+		 * @param bool $is_fixed_amt Whether the special tax rate is a fixed amount or not.
 		 * @param MP_Product $this The current product object.
 		 */
 		return (float) apply_filters( 'mp_product/special_tax_amt', $special_tax_amt, $special_tax_rate, $is_fixed_amt, $this );
@@ -1546,7 +1546,7 @@ class MP_Product {
 		 * @since 3.0
 		 * @param int $post_id
 		 */
-		
+
 		if ( empty( $context ) ) {
 			$context = 'single';
 		}
@@ -1618,18 +1618,18 @@ class MP_Product {
 				break;
 
 			case 'single' :
-			
+
 				// size
 				if ( intval( $size ) ) {
 					$size = array( intval( $size ), intval( $size ) );
 				} else {
 					if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
-						$size = array( mp_get_setting( 'product_img_size->width' ), mp_get_setting( 'product_img_size->height' ) );
+						$size = array( mp_get_setting( 'product_img_size_custom->width' ), mp_get_setting( 'product_img_size_custom->height' ) );
 					} else {
 						$size = mp_get_setting( 'product_img_size' );
 					}
 				}
-				
+
 				/*if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
 					$size = array( mp_get_setting( 'product_img_size_custom->width' ), mp_get_setting( 'product_img_size_custom->height' ) );
 				} else {
@@ -1661,7 +1661,30 @@ class MP_Product {
 				break;
 		}
 
-		$image = get_the_post_thumbnail( $image_post_id, $size, array( 'itemprop' => 'image', 'class' => implode( ' ', $img_classes ), 'title' => $title ) );
+		$image = get_the_post_thumbnail( $image_post_id, $size, array(
+			'itemprop' => 'image',
+			'class'    => implode( ' ', $img_classes ),
+			'title'    => $title
+		) );
+
+		if ( ($context == 'single' || $context=='list') && ! empty( $image ) ) {
+			//if single case, we will get the better graphic
+			$image_orignal_url = wp_get_attachment_image_src( get_post_thumbnail_id( $image_post_id ),'full' );
+			$image_url         = mp_resize_image( $image_orignal_url[0], $size );
+			if ( $image_url ) {
+				$atts = '';
+				foreach (
+					array(
+						'itemprop' => 'image',
+						'class'    => implode( ' ', $img_classes ),
+						'title'    => $title
+					) as $key => $value
+				) {
+					$atts .= " $key=\"$value\" ";
+				}
+				$image = sprintf( '<img src="%s" %s />', $image_url[0], $atts );
+			}
+		}
 
 		if ( empty( $image ) ) {
 			$thumbnail_placeholder = mp_get_setting( 'thumbnail_placeholder' );
@@ -2144,7 +2167,7 @@ Notification Preferences: %s', 'mp' );
 		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
-			
+
 		} else {
 			if ( $setting == 'off' && ($setting != $context) ) {
 				return '';
@@ -2211,7 +2234,7 @@ Notification Preferences: %s', 'mp' );
 		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
-			
+
 		} else {
 			if ( $setting == 'off' && ($setting != $context) ) {
 				return '';
@@ -2278,7 +2301,7 @@ Notification Preferences: %s', 'mp' );
 		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
-			
+
 		} else {
 			if ( $setting == 'off' && ($setting != $context) ) {
 				return '';

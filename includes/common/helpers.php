@@ -1374,7 +1374,7 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 			if ( file_exists( $image_path ) ) {
 				//we will check the time of this image
 				$cache_time = apply_filters( 'mp_image_resize_cache_duration', 3 );
-				if ( strtotime( '+' . $cache_time . ' seconds', filemtime( $image_path ) ) <= time() ) {
+				if ( strtotime( '+' . $cache_time . ' days', filemtime( $image_path ) ) <= time() ) {
 					unlink( $image_path );
 				}
 			}
@@ -1387,7 +1387,6 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 				$is_crop = apply_filters( 'mp_image_crop_position', $is_crop, $image, $image_path, $image_url, $size );
 				$image->resize( $size_data[0], $size_data[1], $is_crop );
 				$image->save( $image_path );
-
 			}
 
 			return apply_filters( 'mp_image_after_resize', array(
@@ -1396,5 +1395,11 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 				$size_data[1]
 			) );
 		}
+
+		return false;
 	}
+}
+
+if ( ! function_exists( 'mp_get_the_thumbnail' ) ) {
+
 }

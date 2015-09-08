@@ -2145,10 +2145,11 @@ if ( !function_exists( 'mp_product' ) ) {
 		$values = get_post_meta( $product->ID, 'mp_product_images', true );
 
 		if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
-			$size = array( mp_get_setting( 'product_img_size->width' ), mp_get_setting( 'product_img_size->height' ) );
+			$size = array( mp_get_setting( 'product_img_size_custom->width' ), mp_get_setting( 'product_img_size_custom->height' ) );
 		} else {
 			$size = mp_get_setting( 'product_img_size' );
 		}
+
 		if ( $image ) {
 			if ( !$product->has_variations() ) {
 
@@ -2180,10 +2181,12 @@ if ( !function_exists( 'mp_product' ) ) {
 
 					foreach ( $values as $value ) {
 
-						if( preg_match( '/http:|https:/', $value ) ) {
+						if ( preg_match( '/http:|https:/', $value ) ) {
 							$img_url = array( esc_url( $value ) );
 						} else {
-							$img_url = wp_get_attachment_image_src( $value, $size );
+							//$img_url = wp_get_attachment_image_src( $value, $size );
+							$original_image = wp_get_attachment_image_src( $value, 'full' );
+							$img_url = mp_resize_image( $original_image[0], $size );
 						}
 
 						$return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
