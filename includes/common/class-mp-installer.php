@@ -22,6 +22,7 @@ class MP_Installer {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new MP_Installer();
 		}
+
 		return self::$_instance;
 	}
 
@@ -37,7 +38,10 @@ class MP_Installer {
 		add_action( 'admin_notices', array( &$this, 'db_update_notice' ) );
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 99 );
 		add_action( 'wp_ajax_mp_update_product_postmeta', array( &$this, 'update_product_postmeta' ) );
-		add_action( 'admin_print_scripts-store-settings_page_mp-db-update', array( &$this, 'enqueue_db_update_scripts' ) );
+		add_action( 'admin_print_scripts-store-settings_page_mp-db-update', array(
+			&$this,
+			'enqueue_db_update_scripts'
+		) );
 	}
 
 	/**
@@ -50,17 +54,17 @@ class MP_Installer {
 		wp_enqueue_style( 'jquery-smoothness', mp_plugin_url( 'includes/admin/ui/smoothness/jquery-ui-1.10.4.custom.css' ), '', MP_VERSION );
 		wp_enqueue_script( 'mp-db-update', mp_plugin_url( 'includes/admin/ui/js/db-update.js' ), array( 'jquery-ui-progressbar' ), MP_VERSION );
 		wp_localize_script( 'mp-db-update', 'mp_db_update', array(
-			'error_text'	 => __( 'An error occurred while updating. Please refresh this page and try again.', 'mp' ),
-			'progressbar'	 => array(
-				'label_text'	 => __( 'Upgrading Database...Please Wait...', 'mp' ),
-				'complete_text'	 => __( 'Complete!', 'mp' ),
+			'error_text'  => __( 'An error occurred while updating. Please refresh this page and try again.', 'mp' ),
+			'progressbar' => array(
+				'label_text'    => __( 'Upgrading Database...Please Wait...', 'mp' ),
+				'complete_text' => __( 'Complete!', 'mp' ),
 			),
 		) );
 	}
 
 	public function possible_product_combinations( $groups, $prefix = '' ) {
-		$result	 = array();
-		$group	 = array_shift( $groups );
+		$result = array();
+		$group  = array_shift( $groups );
 		foreach ( $group as $selected ) {
 			if ( $groups ) {
 				$result = array_merge( $result, $this->possible_product_combinations( $groups, $prefix . $selected . '|' ) );
@@ -68,17 +72,20 @@ class MP_Installer {
 				$result[] = $prefix . $selected;
 			}
 		}
+
 		return $result;
 	}
 
-	public function get_product_variation_value_by_index( $post_id, $post_meta_name, $index, $single = false,
-													   $default_value = '' ) {
+	public function get_product_variation_value_by_index(
+		$post_id, $post_meta_name, $index, $single = false,
+		$default_value = ''
+	) {
 
 
 		if ( 'mp_shipping->extra_cost' == $post_meta_name ) {
 			$value = get_post_meta( $post_id, 'mp_shipping', false );
-			if ( isset( $value[ 'extra_cost' ] ) ) {
-				return $value[ 'extra_cost' ];
+			if ( isset( $value['extra_cost'] ) ) {
+				return $value['extra_cost'];
 			} else {
 				return '';
 			}
@@ -90,11 +97,12 @@ class MP_Installer {
 			$value = $value * 100;
 		}
 
-		if ( $value && !empty( $value ) ) {
+		if ( $value && ! empty( $value ) ) {
 			if ( $single ) {
 				return $value;
 			} else {
-				$value = isset( $value[ 0 ][ $index ] ) ? $value[ 0 ][ $index ] : $default_value;
+				$value = isset( $value[0][ $index ] ) ? $value[0][ $index ] : $default_value;
+
 				return $value;
 			}
 		} else {
@@ -105,13 +113,13 @@ class MP_Installer {
 	public function product_variations_transition( $post_id, $product_type ) {
 		global $wp_taxonomies, $wpdb;
 
-		$variation_values		 = null;
-		$variation_values		 = get_post_meta( $post_id, 'mp_var_name', true );
+		$variation_values = null;
+		$variation_values = get_post_meta( $post_id, 'mp_var_name', true );
 		//$variation_name		 = 'Variation'; //default variation category / attribute name
-		$variation_names[ 0 ]	 = 'Variation';
-		$data					 = array();
+		$variation_names[0] = 'Variation';
+		$data               = array();
 
-		if ( isset( $variation_values ) && !empty( $variation_values ) ) {
+		if ( isset( $variation_values ) && ! empty( $variation_values ) ) {
 
 			update_post_meta( $post_id, 'has_variations', 1 );
 
@@ -122,45 +130,46 @@ class MP_Installer {
 				$variation_name = MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $variation_name, $variation_name ); //taxonomy name made of the prefix and attribute's ID
 
 				$args = array(
-					'orderby'		 => 'name',
-					'hide_empty'	 => false,
-					'fields'		 => 'all',
-					'hierarchical'	 => true,
+					'orderby'      => 'name',
+					'hide_empty'   => false,
+					'fields'       => 'all',
+					'hierarchical' => true,
 				);
 
 				/* Get terms for the given taxonomy (variation name i.e. color, size etc) */
 				$terms = get_terms( array( $variation_name ), $args );
 
 				/* Put variation values in the array */
-				$variation_values_row	 = $variation_values;
+				$variation_values_row = $variation_values;
 				//$variation_values_row	 = str_replace( array( '[', ']', '"' ), '', $variation_values_row );
 				//$variations_data		 = explode( ',', $variation_values_row );
-				$variations_data		 = $variation_values_row;
+				$variations_data = $variation_values_row;
 
 				global $variations_single_data;
 				foreach ( $variations_data as $variations_single_data ) {
 
 					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
 					$term_object = array_filter(
-					$terms, function ($e) {
+						$terms, function ( $e ) {
 						global $variations_single_data;
+
 						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
 					}
 					);
 
 					reset( $term_object );
-					$data[ $i ][]			 = $variation_name . '=' . ((!empty( $term_object )) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
-					$data_original[ $i ][]	 = $variation_name . '=' . $variations_single_data;
+					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data_original[ $i ][] = $variation_name . '=' . $variations_single_data;
 				}
 
-				$i++;
+				$i ++;
 			}
 
-			$combinations			 = $this->possible_product_combinations( $data );
-			$combinations_original	 = $this->possible_product_combinations( $data_original );
+			$combinations          = $this->possible_product_combinations( $data );
+			$combinations_original = $this->possible_product_combinations( $data_original );
 
-			$combination_num	 = 1;
-			$combination_index	 = 0;
+			$combination_num   = 1;
+			$combination_index = 0;
 
 			wp_suspend_cache_addition( true );
 			wp_defer_term_counting( true );
@@ -170,14 +179,14 @@ class MP_Installer {
 
 			foreach ( $combinations as $combination ) {
 
-				$post_title		 = get_the_title( $post_id );
-				$post_content	 = get_the_content( $post_id );
-				$variation_id	 = wp_insert_post( array(
-					'post_title'	 => $post_title,
-					'post_content'	 => $post_content,
-					'post_status'	 => 'publish',
-					'post_type'		 => MP_Product::get_variations_post_type(),
-					'post_parent'	 => $post_id,
+				$post_title   = get_the_title( $post_id );
+				$post_content = get_the_content( $post_id );
+				$variation_id = wp_insert_post( array(
+					'post_title'   => $post_title,
+					'post_content' => $post_content,
+					'post_status'  => 'publish',
+					'post_type'    => MP_Product::get_variations_post_type(),
+					'post_parent'  => $post_id,
 				) );
 
 				/* Make a variation name from the combination */
@@ -187,20 +196,20 @@ class MP_Installer {
 
 				foreach ( $variation_title_combinations as $variation_title_combination ) {
 					$variation_name_title_array = explode( '=', $variation_title_combination );
-					$variation_name_title .= $variation_name_title_array[ 1 ] . ' ';
+					$variation_name_title .= $variation_name_title_array[1] . ' ';
 				}
 
-				$sku						 = $this->get_product_variation_value_by_index( $post_id, 'mp_sku', $combination_index );
-				$inventory_tracking			 = $this->get_product_variation_value_by_index( $post_id, 'mp_track_inventory', $combination_index, true );
-				$inventory					 = $this->get_product_variation_value_by_index( $post_id, 'mp_inventory', $combination_index );
-				$file_url					 = $this->get_product_variation_value_by_index( $post_id, 'mp_file', $combination_index, true );
-				$external_url				 = $this->get_product_variation_value_by_index( $post_id, 'mp_product_link', $combination_index, true );
-				$regular_price				 = $this->get_product_variation_value_by_index( $post_id, 'mp_price', $combination_index );
-				$sale_price					 = $this->get_product_variation_value_by_index( $post_id, 'mp_sale_price', $combination_index );
-				$has_sale					 = $this->get_product_variation_value_by_index( $post_id, 'mp_is_sale', $combination_index, true );
-				$special_tax_rate			 = $this->get_product_variation_value_by_index( $post_id, 'mp_special_tax', $combination_index, true );
-				$description				 = $this->get_product_variation_value_by_index( $post_id, 'mp_custom_field_label', $combination_index );
-				$weight_extra_shipping_cost	 = $this->get_product_variation_value_by_index( $post_id, 'mp_shipping->extra_cost', $combination_index, true );
+				$sku                        = $this->get_product_variation_value_by_index( $post_id, 'mp_sku', $combination_index );
+				$inventory_tracking         = $this->get_product_variation_value_by_index( $post_id, 'mp_track_inventory', $combination_index, true );
+				$inventory                  = $this->get_product_variation_value_by_index( $post_id, 'mp_inventory', $combination_index );
+				$file_url                   = $this->get_product_variation_value_by_index( $post_id, 'mp_file', $combination_index, true );
+				$external_url               = $this->get_product_variation_value_by_index( $post_id, 'mp_product_link', $combination_index, true );
+				$regular_price              = $this->get_product_variation_value_by_index( $post_id, 'mp_price', $combination_index );
+				$sale_price                 = $this->get_product_variation_value_by_index( $post_id, 'mp_sale_price', $combination_index );
+				$has_sale                   = $this->get_product_variation_value_by_index( $post_id, 'mp_is_sale', $combination_index, true );
+				$special_tax_rate           = $this->get_product_variation_value_by_index( $post_id, 'mp_special_tax', $combination_index, true );
+				$description                = $this->get_product_variation_value_by_index( $post_id, 'mp_custom_field_label', $combination_index );
+				$weight_extra_shipping_cost = $this->get_product_variation_value_by_index( $post_id, 'mp_shipping->extra_cost', $combination_index, true );
 
 				$this->post_meta_transition( $post_id, 'mp_shipping', 'weight_extra_shipping_cost' );
 
@@ -217,26 +226,26 @@ class MP_Installer {
 				}
 
 				$variation_metas = apply_filters( 'mp_variations_meta', array(
-					'name'						 => $variation_name_title, //mp_get_post_value( 'post_title' ),
-					'sku'						 => $sku,
-					'inventory_tracking'		 => $inventory_tracking,
-					'inventory'					 => $inventory,
-					'inv_out_of_stock_purchase'	 => 0,
-					'file_url'					 => $file_url,
-					'external_url'				 => $external_url,
-					'regular_price'				 => $regular_price,
-					'sale_price_amount'			 => $sale_price,
-					'has_sale'					 => $has_sale,
-					'special_tax_rate'			 => $special_tax_rate,
-					'description'				 => $description,
-					'sale_price_start_date'		 => '',
-					'sale_price_end_date'		 => '',
-					'sale_price'				 => '', //array - to do
-					'weight'					 => '', //array - to do
-					'weight_pounds'				 => '',
-					'weight_ounces'				 => '',
-					'charge_shipping'			 => $charge_shipping,
-					'charge_tax'				 => $charge_tax,
+					'name'                       => $variation_name_title, //mp_get_post_value( 'post_title' ),
+					'sku'                        => $sku,
+					'inventory_tracking'         => $inventory_tracking,
+					'inventory'                  => $inventory,
+					'inv_out_of_stock_purchase'  => 0,
+					'file_url'                   => $file_url,
+					'external_url'               => $external_url,
+					'regular_price'              => $regular_price,
+					'sale_price_amount'          => $sale_price,
+					'has_sale'                   => $has_sale,
+					'special_tax_rate'           => $special_tax_rate,
+					'description'                => $description,
+					'sale_price_start_date'      => '',
+					'sale_price_end_date'        => '',
+					'sale_price'                 => '', //array - to do
+					'weight'                     => '', //array - to do
+					'weight_pounds'              => '',
+					'weight_ounces'              => '',
+					'charge_shipping'            => $charge_shipping,
+					'charge_tax'                 => $charge_tax,
 					'weight_extra_shipping_cost' => $weight_extra_shipping_cost,
 				), mp_get_post_value( 'post_ID' ), $variation_id );
 
@@ -252,13 +261,13 @@ class MP_Installer {
 					$variation_term_vals = explode( '=', $variation_term );
 					//has_term( $term, $taxonomy, $post )
 					//wp_set_object_terms
-					if ( !has_term( MP_Products_Screen::term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], $variation_id ) ) {
-						wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[ 1 ], $variation_term_vals[ 0 ] ), $variation_term_vals[ 0 ], true );
+					if ( ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
+						wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], true );
 					}
 				}
 
-				$combination_num++;
-				$combination_index++;
+				$combination_num ++;
+				$combination_index ++;
 
 				do_action( 'mp_update/variation', $variation_id );
 			}
@@ -266,11 +275,11 @@ class MP_Installer {
 			wp_suspend_cache_addition( false );
 			wp_defer_term_counting( false );
 			wp_defer_comment_counting( false );
-			
+
 			$wpdb->query( 'COMMIT;' );
 			$wpdb->query( 'SET autocommit = 1;' );
 
-			
+
 			//}
 			//exit;
 		} else {
@@ -282,7 +291,7 @@ class MP_Installer {
 		$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
 
 		if ( is_array( $old_value ) ) {
-			$old_value = $old_value[ 0 ];
+			$old_value = array_shift($old_value);
 		}
 
 		if ( $new_post_meta_name == 'special_tax_rate' ) {
@@ -297,7 +306,7 @@ class MP_Installer {
 		if ( $old_post_meta_name == 'mp_shipping' ) {
 			$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
 			if ( isset( $old_value ) && is_array( $old_value ) ) {
-				$old_value = $old_value[ 'extra_cost' ];
+				$old_value = $old_value['extra_cost'];
 			} else {
 				$old_value = 0;
 			}
@@ -322,7 +331,7 @@ class MP_Installer {
 	 * @action wp_ajax_mp_update_product_postmeta
 	 */
 	public function update_product_postmeta() {
-		if ( !wp_verify_nonce( mp_get_post_value( '_wpnonce' ), 'mp_update_product_postmeta' ) ) {
+		if ( ! wp_verify_nonce( mp_get_post_value( '_wpnonce' ), 'mp_update_product_postmeta' ) ) {
 			wp_send_json_error();
 		}
 
@@ -336,34 +345,33 @@ class MP_Installer {
 		ini_set( 'max_execution_time', 0 );
 		set_time_limit( 0 );
 
-		$per_page	 = 20;
-		$query		 = new WP_Query( array(
-			'cache_results'			 => false,
+		$per_page = 20;
+		$query    = new WP_Query( array(
+			'cache_results'          => false,
 			'update_post_term_cache' => false,
-			'post_type'				 => 'product',
-			'posts_per_page'		 => $per_page,
-			'paged'					 => max( 1, mp_get_post_value( 'page' ) ),
+			'post_type'              => 'product',
+			'posts_per_page'         => $per_page,
+			'paged'                  => max( 1, mp_get_post_value( 'page' ) ),
 		) );
 
-		$page	 = mp_get_post_value( 'page', 1 );
-		$updated = ($page * $per_page);
+		$page    = mp_get_post_value( 'page', 1 );
+		$updated = ( $page * $per_page );
 
 		while ( $query->have_posts() ) {
 			$query->the_post();
 			$post_id = get_the_ID();
 
 			$variations = get_post_meta( $post_id, 'mp_var_name', true );
-
-			if ( $variations && is_array( $variations ) && $update_fix_needed == false ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
+			if ( $variations && is_array( $variations ) && $update_fix_needed == true ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
 				if ( count( $variations ) > 1 ) {
 					//It's a variation product
 
-					$mp_file		 = get_post_meta( $post_id, 'mp_file', true );
+					$mp_file         = get_post_meta( $post_id, 'mp_file', true );
 					$mp_product_link = get_post_meta( $post_id, 'mp_product_link', true );
 
-					if ( !empty( $mp_file ) ) {
+					if ( ! empty( $mp_file ) ) {
 						$product_type = 'digital';
-					} else if ( !empty( $mp_product_link ) ) {
+					} else if ( ! empty( $mp_product_link ) ) {
 						$product_type = 'external';
 					} else {
 						$product_type = 'physical';
@@ -372,8 +380,8 @@ class MP_Installer {
 					update_post_meta( $post_id, 'product_type', $product_type );
 
 					$response = array(
-						'updated'	 => ceil( $updated / $query->found_posts ) * 100,
-						'is_done'	 => false,
+						'updated' => ceil( $updated / $query->found_posts ) * 100,
+						'is_done' => false,
 					);
 
 					$this->product_variations_transition( $post_id, $product_type );
@@ -385,18 +393,18 @@ class MP_Installer {
 						update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
 					}
 
-					$mp_file		 = get_post_meta( $post_id, 'mp_file', true );
+					$mp_file         = get_post_meta( $post_id, 'mp_file', true );
 					$mp_product_link = get_post_meta( $post_id, 'mp_product_link', true );
 
-					if ( !empty( $mp_file ) ) {
+					if ( ! empty( $mp_file ) ) {
 						$product_type = 'digital';
-					} else if ( !empty( $mp_product_link ) ) {
+					} else if ( ! empty( $mp_product_link ) ) {
 						$product_type = 'external';
 					} else {
 						$product_type = 'physical';
 
-						$weight_pounds	 = get_post_meta( $post_id, 'weight_pounds', true );
-						$weight_ounces	 = get_post_meta( $post_id, 'weight_ounces', true );
+						$weight_pounds = get_post_meta( $post_id, 'weight_pounds', true );
+						$weight_ounces = get_post_meta( $post_id, 'weight_ounces', true );
 
 						if ( empty( $weight_ounces ) ) {
 							update_post_meta( $post_id, 'weight_ounces', 0 );
@@ -422,7 +430,7 @@ class MP_Installer {
 
 					$this->post_meta_transition( $post_id, 'mp_file', 'file_url' ); //If not empty then mark it as digital product
 					$this->post_meta_transition( $post_id, 'mp_product_link', 'external_url' ); //If not empty then mark it as external product
-				//
+					//
 				}
 			} else {//update for 3.0 and 3.0.0.1
 				$post_thumbnail = get_post_thumbnail_id( $post_id );
@@ -435,12 +443,12 @@ class MP_Installer {
 		}
 
 		$response = array(
-			'updated'	 => ceil( $updated / $query->found_posts ) * 100,
-			'is_done'	 => false,
+			'updated' => ceil( $updated / $query->found_posts ) * 100,
+			'is_done' => false,
 		);
 
 		if ( $updated >= $query->found_posts ) {
-			$response[ 'is_done' ] = true;
+			$response['is_done'] = true;
 		}
 
 		delete_option( 'mp_db_update_required' );
@@ -453,7 +461,9 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param array $settings
+	 *
 	 * @return array
 	 */
 	public function update_tax_settings( $settings ) {
@@ -462,7 +472,7 @@ class MP_Installer {
 				mp_push_to_array( $settings, "tax->canada_rate->{$key}", $value );
 			}
 
-			unset( $settings[ 'tax' ][ 'rate' ][ 'canada_rate' ] );
+			unset( $settings['tax']['rate']['canada_rate'] );
 		}
 
 		return $settings;
@@ -477,7 +487,10 @@ class MP_Installer {
 	 */
 	public function add_menu_items() {
 		if ( get_option( 'mp_db_update_required' ) ) {
-			add_submenu_page( 'store-settings', __( 'Update Data', 'mp' ), __( 'Update Data', 'mp' ), 'activate_plugins', 'mp-db-update', array( &$this, 'db_update_page' ) );
+			add_submenu_page( 'store-settings', __( 'Update Data', 'mp' ), __( 'Update Data', 'mp' ), 'activate_plugins', 'mp-db-update', array(
+				&$this,
+				'db_update_page'
+			) );
 		}
 	}
 
@@ -512,7 +525,7 @@ class MP_Installer {
 			<h2><?php _e( 'Update MarketPress Data', 'mp' ); ?></h2>
 			<h4><?php _e( 'MarketPress requires a database update to continue working correctly.<br />Below you will find a list of items that require your attention.', 'mp' ); ?></h4>
 
-			<br />
+			<br/>
 
 			<?php
 			$old_version = get_option( 'mp_previous_version' );
@@ -530,6 +543,7 @@ class MP_Installer {
 						position: relative;
 						width: 400px;
 					}
+
 					.progress-label {
 						position: absolute;
 						left: 0;
@@ -543,17 +557,23 @@ class MP_Installer {
 				<h2><?php _e( 'Product Metadata', 'mp' ); ?></h2>
 				<form id="mp-update-product-postmeta-form" action="<?php echo admin_url( 'admin-ajax.php' ); ?>">
 					<?php wp_nonce_field( 'mp_update_product_postmeta' ); ?>
-					<input type="hidden" name="action" value="mp_update_product_postmeta" />
-					<input type="hidden" name="page" value="1" />
-					<p class="mp-important"><strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong></p>
+					<input type="hidden" name="action" value="mp_update_product_postmeta"/>
+					<input type="hidden" name="page" value="1"/>
+
+					<p class="mp-important">
+						<strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong>
+					</p>
 					<?php
 					if ( is_multisite() ) {
 						?>
-						<p class="mp-important"><strong><?php _e( 'Please update each subsite in your WordPress network where you have older version of the MarketPress plugin.', 'mp' ); ?></strong></p>
+						<p class="mp-important">
+							<strong><?php _e( 'Please update each subsite in your WordPress network where you have older version of the MarketPress plugin.', 'mp' ); ?></strong>
+						</p>
 						<?php
 					}
 					?>
-					<p class="submit"><input class="button-primary" type="submit" value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
+					<p class="submit"><input class="button-primary" type="submit"
+					                         value="<?php _e( 'Perform Update', 'mp' ); ?>"></p>
 				</form>
 				<?php
 			} else {
@@ -573,7 +593,7 @@ class MP_Installer {
 	 * @action admin_notices
 	 */
 	public function db_update_notice() {
-		if ( !get_option( 'mp_db_update_required' ) || !current_user_can( 'activate_plugins' ) || mp_get_get_value( 'page' ) == 'mp-db-update' ) {
+		if ( ! get_option( 'mp_db_update_required' ) || ! current_user_can( 'activate_plugins' ) || mp_get_get_value( 'page' ) == 'mp-db-update' ) {
 			return;
 		}
 
@@ -596,11 +616,11 @@ class MP_Installer {
 		$old_settings = get_option( 'mp_settings', array() );
 
 		// Filter default settings
-		$default_settings	 = apply_filters( 'mp_default_settings', mp()->default_settings );
-		$settings			 = array_replace_recursive( $default_settings, $old_settings );
+		$default_settings = apply_filters( 'mp_default_settings', mp()->default_settings );
+		$settings         = array_replace_recursive( $default_settings, $old_settings );
 
 		// Only run the follow scripts if this not a fresh install
-		if ( !empty( $old_version ) ) {
+		if ( ! empty( $old_version ) ) {
 			//2.1.4 update
 			if ( version_compare( $old_version, '2.1.4', '<' ) ) {
 				$this->update_214();
@@ -654,8 +674,8 @@ class MP_Installer {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// Create mp_product_attributes table
-		$table_name	 = $wpdb->prefix . 'mp_product_attributes';
-		$sql		 = "CREATE TABLE $table_name (
+		$table_name = $wpdb->prefix . 'mp_product_attributes';
+		$sql        = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
@@ -665,8 +685,8 @@ class MP_Installer {
 		dbDelta( $sql );
 
 		// Create mp_product_attributes_terms table
-		$table_name	 = $wpdb->prefix . 'mp_product_attributes_terms';
-		$sql		 = "CREATE TABLE $table_name (
+		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
+		$sql        = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL,
 			term_id bigint(20) unsigned NOT NULL,
 			PRIMARY KEY  (attribute_id, term_id)
@@ -690,27 +710,28 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param array $settings
 	 */
 	public function update_presentation_settings( $settings ) {
 		if ( $height = mp_get_setting( 'list_img_height' ) ) {
 			mp_push_to_array( $settings, 'list_img_size_custom->height', $height );
-			unset( $settings[ 'list_img_height' ] );
+			unset( $settings['list_img_height'] );
 		}
 
 		if ( $width = mp_get_setting( 'list_img_width' ) ) {
 			mp_push_to_array( $settings, 'list_img_size_custom->width', $width );
-			unset( $settings[ 'list_img_width' ] );
+			unset( $settings['list_img_width'] );
 		}
 
 		if ( $height = mp_get_setting( 'product_img_height' ) ) {
 			mp_push_to_array( $settings, 'product_img_size_custom->height', $height );
-			unset( $settings[ 'product_img_height' ] );
+			unset( $settings['product_img_height'] );
 		}
 
 		if ( $width = mp_get_setting( 'product_img_width' ) ) {
 			mp_push_to_array( $settings, 'product_img_size_custom->width', $width );
-			unset( $settings[ 'product_img_width' ] );
+			unset( $settings['product_img_width'] );
 		}
 
 		return $settings;
@@ -721,27 +742,28 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param array $settings
 	 */
 	public function update_notification_settings( $settings ) {
 		if ( $subject = mp_get_setting( 'email->new_order_subject' ) ) {
 			mp_push_to_array( $settings, 'email->new_order->subject', $subject );
-			unset( $settings[ 'new_order_subject' ] );
+			unset( $settings['new_order_subject'] );
 		}
 
 		if ( $text = mp_get_setting( 'email->new_order_txt' ) ) {
 			mp_push_to_array( $settings, 'email->new_order->text', $text );
-			unset( $settings[ 'email' ][ 'new_order_txt' ] );
+			unset( $settings['email']['new_order_txt'] );
 		}
 
 		if ( $subject = mp_get_setting( 'email->shipped_order_subject' ) ) {
 			mp_push_to_array( $settings, 'email->order_shipped->subject', $subject );
-			unset( $settings[ 'email' ][ 'shipped_order_subject' ] );
+			unset( $settings['email']['shipped_order_subject'] );
 		}
 
 		if ( $text = mp_get_setting( 'email->shipped_order_txt' ) ) {
 			mp_push_to_array( $settings, 'email->order_shipped->text', $text );
-			unset( $settings[ 'email' ][ 'shipped_order_txt' ] );
+			unset( $settings['email']['shipped_order_txt'] );
 		}
 
 		return $settings;
@@ -754,14 +776,15 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param array $settings
 	 */
 	public function backup_legacy_settings( $settings ) {
-		if ( !get_option( 'mp_settings_legacy' ) ) {
+		if ( ! get_option( 'mp_settings_legacy' ) ) {
 			add_option( 'mp_settings_legacy', $settings, '', 'no' );
 		}
 
-		if ( !get_option( 'mp_coupons_legacy' ) ) {
+		if ( ! get_option( 'mp_coupons_legacy' ) ) {
 			add_option( 'mp_coupons_legacy', get_option( 'mp_coupons' ), '', 'no' );
 		}
 	}
@@ -774,8 +797,8 @@ class MP_Installer {
 	 * @action after_switch_theme
 	 */
 	public function add_admin_store_caps() {
-		$role		 = get_role( 'administrator' );
-		$store_caps	 = mp_get_store_caps();
+		$role       = get_role( 'administrator' );
+		$store_caps = mp_get_store_caps();
 
 		foreach ( $store_caps as $cap ) {
 			$role->add_cap( $cap );
@@ -787,22 +810,23 @@ class MP_Installer {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param array $settings
 	 */
 	public function update_3000( $settings ) {
 		$this->_db_update_required();
 		$this->backup_legacy_settings( $settings );
-		$settings	 = $this->update_notification_settings( $settings );
-		$settings	 = $this->update_presentation_settings( $settings );
-		$settings	 = $this->update_tax_settings( $settings );
+		$settings = $this->update_notification_settings( $settings );
+		$settings = $this->update_presentation_settings( $settings );
+		$settings = $this->update_tax_settings( $settings );
 
 		//currency changes
 		if ( 'TRL' == mp_get_setting( 'currency' ) ) {
-			$settings[ 'currency' ] = 'TRY';
+			$settings['currency'] = 'TRY';
 		}
 
 		//set theme to new default 3.0 theme
-		$settings[ 'store_theme' ] = 'default';
+		$settings['store_theme'] = 'default';
 
 		return $settings;
 	}
@@ -833,17 +857,19 @@ class MP_Installer {
 			$meta = get_post_custom( $post_id );
 			//unserialize
 			foreach ( $meta as $key => $val ) {
-				$meta[ $key ]	 = maybe_unserialize( $val[ 0 ] );
-				if ( !is_array( $meta[ $key ] ) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_price_sort" )
-					$meta[ $key ]	 = array( $meta[ $key ] );
+				$meta[ $key ] = maybe_unserialize( $val[0] );
+				if ( ! is_array( $meta[ $key ] ) && $key != "mp_is_sale" && $key != "mp_track_inventory" && $key != "mp_product_link" && $key != "mp_file" && $key != "mp_price_sort" ) {
+					$meta[ $key ] = array( $meta[ $key ] );
+				}
 			}
 
 			//fix price sort field if missing
-			if ( empty( $meta[ "mp_price_sort" ] ) && is_array( $meta[ "mp_price" ] ) ) {
-				if ( $meta[ "mp_is_sale" ] && $meta[ "mp_sale_price" ][ 0 ] )
-					$sort_price	 = $meta[ "mp_sale_price" ][ 0 ];
-				else
-					$sort_price	 = $meta[ "mp_price" ][ 0 ];
+			if ( empty( $meta["mp_price_sort"] ) && is_array( $meta["mp_price"] ) ) {
+				if ( $meta["mp_is_sale"] && $meta["mp_sale_price"][0] ) {
+					$sort_price = $meta["mp_sale_price"][0];
+				} else {
+					$sort_price = $meta["mp_price"][0];
+				}
 				update_post_meta( $post_id, 'mp_price_sort', $sort_price );
 			}
 		}
