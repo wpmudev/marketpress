@@ -2158,7 +2158,6 @@ if ( !function_exists( 'mp_product' ) ) {
 					$return .= "<script>
 								jQuery(document).ready(function() {
 									jQuery('#mp-product-gallery').lightSlider({
-												controls: false,
 												gallery:true,
 												item:1,
 												loop:true,
