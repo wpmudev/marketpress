@@ -1,6 +1,6 @@
 <?php
 
-if ( !function_exists( 'mp' ) ) :
+if ( ! function_exists( 'mp' ) ) :
 
 	/**
 	 * Returns the Marketpress instance
@@ -14,16 +14,18 @@ if ( !function_exists( 'mp' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_search_array' ) ) :
+if ( ! function_exists( 'mp_search_array' ) ) :
 
 	function mp_search_array( $array, $key, $value ) {
 		$results = array();
 
 		if ( is_array( $array ) ) {
-			if ( isset( $array[ $key ] ) && $array[ $key ] == $value )
-				$results[]	 = $array;
-			foreach ( $array as $subarray )
-				$results	 = array_merge( $results, mp_search_array( $subarray, $key, $value ) );
+			if ( isset( $array[ $key ] ) && $array[ $key ] == $value ) {
+				$results[] = $array;
+			}
+			foreach ( $array as $subarray ) {
+				$results = array_merge( $results, mp_search_array( $subarray, $key, $value ) );
+			}
 		}
 
 		return $results;
@@ -31,14 +33,16 @@ if ( !function_exists( 'mp_search_array' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_api_timeout' ) ) :
+if ( ! function_exists( 'mp_get_api_timeout' ) ) :
 
 	/**
 	 * Get the number of seconds before an API call should timeout
 	 *
 	 * @since 3.0
 	 * @access protected
+	 *
 	 * @param string $key Optional, a unique key for the timeout.
+	 *
 	 * @return int
 	 */
 	function mp_get_api_timeout( $key = '' ) {
@@ -46,6 +50,7 @@ if ( !function_exists( 'mp_get_api_timeout' ) ) :
 		 * Filter the api timeout
 		 *
 		 * @since 3.0
+		 *
 		 * @param int $timeout The current timeout value.
 		 */
 		$timeout = apply_filters( 'mp_api_timeout', 30 );
@@ -57,13 +62,14 @@ if ( !function_exists( 'mp_get_api_timeout' ) ) :
 endif;
 
 
-if ( !function_exists( 'mp_filter_email' ) ) :
+if ( ! function_exists( 'mp_filter_email' ) ) :
 
 	/**
 	 * Replace short codes in email messages with dynamic content
 	 *
 	 * @since 3.0
 	 * @uses $blog_id
+	 *
 	 * @param MP_Order $order An MP_Order object.
 	 * @param string $text The email text including short codes.
 	 * @param bool $escape Optional, whether to escape string or not. Defaults to false.
@@ -76,8 +82,8 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 		$currency = $order->get_meta( 'currency', '' );
 
 		// Cart
-		$cart	 = $order->get_meta( 'mp_cart_info' );
-		$items	 = $cart->get_items_as_objects();
+		$cart  = $order->get_meta( 'mp_cart_info' );
+		$items = $cart->get_items_as_objects();
 
 		// Order info
 		if ( count( $items ) > 0 ) {
@@ -91,16 +97,16 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 </tr>';
 
 			foreach ( $items as $item ) {
-				$price = ($item->get_price( 'lowest' ) * $item->qty);
+				$price = ( $item->get_price( 'lowest' ) * $item->qty );
 
 				//show download link if set
-				$download_link	 = false;
-				if ( $order->post_status != 'order_received' && ($download_url	 = $item->download_url( $order->get_id(), false )) ) {
+				$download_link = false;
+				if ( $order->post_status != 'order_received' && ( $download_url = $item->download_url( $order->get_id(), false ) ) ) {
 					$download_link = '<a href="' . $download_url . '">' . __( 'Download', 'mp' ) . '</a>';
 				}
 
 				$order_info .= "<tr>
-<td>" . $item->title( false ) . (( $download_link ) ? '<br />' . $download_link : '') . '</td>
+<td>" . $item->title( false ) . ( ( $download_link ) ? '<br />' . $download_link : '' ) . '</td>
 <td>' . $item->get_meta( 'sku', '' ) . '</td>
 <td align="right">' . number_format_i18n( $item->qty ) . '</td>
 <td align="right">' . mp_format_currency( $currency, $item->get_price( 'lowest' ) ) . '</td>
@@ -122,7 +128,7 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 
 		// Shipping line
 		if ( $shipping_total = $order->get_meta( 'mp_shipping_total' ) ) {
-			$order_info .= '<strong>' . __( 'Shipping:', 'mp' ) . '</strong> ' . (( 0 == $shipping_total ) ? __( 'FREE', 'mp' ) : mp_format_currency( $currency, $shipping_total )) . "<br />\n";
+			$order_info .= '<strong>' . __( 'Shipping:', 'mp' ) . '</strong> ' . ( ( 0 == $shipping_total ) ? __( 'FREE', 'mp' ) : mp_format_currency( $currency, $shipping_total ) ) . "<br />\n";
 		}
 
 		// Tax line
@@ -139,8 +145,11 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 		$cart = $order->get_meta( 'mp_cart_info' );
 
 		// Shipping/Billing Info
-		$types					 = array( 'billing' => __( 'Billing Address', 'mp' ), 'shipping' => __( 'Shipping Address', 'mp' ) );
-		$shipping_billing_info	 = '<table width="100%"><tr>';
+		$types                 = array(
+			'billing'  => __( 'Billing Address', 'mp' ),
+			'shipping' => __( 'Shipping Address', 'mp' )
+		);
+		$shipping_billing_info = '<table width="100%"><tr>';
 		if ( $cart->is_download_only() || mp_get_setting( 'shipping->method' ) == 'none' ) {
 			$shipping_billing_info .= '<td align="left"><h3>' . __( 'Shipping', 'mp' ) . '</h3>' . __( 'No shipping required for this order.', 'mp' ) . '</td>';
 			$type = array( 'billing' => __( 'Billing', 'mp' ) );
@@ -206,10 +215,10 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 			$payment_info .= __( 'Your payment for this order is complete.', 'mp' );
 		} else {
 			$payment_info .= __( 'Your payment for this order is not yet complete. Here is the latest status:', 'mp' ) . "\n";
-			$statuses	 = $order->get_meta( 'mp_payment_info->status' );
+			$statuses = $order->get_meta( 'mp_payment_info->status' );
 			krsort( $statuses ); //sort with latest status at the top
-			$status		 = reset( $statuses );
-			$timestamp	 = key( $statuses );
+			$status    = reset( $statuses );
+			$timestamp = key( $statuses );
 			$payment_info .= mp_format_date( $timestamp ) . ': ' . $status;
 		}
 
@@ -221,15 +230,15 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 
 		// Setup search/replace
 		$search_replace = array(
-			'CUSTOMERNAME'	 => $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ),
-			'ORDERID'		 => $order->get_id(),
-			'ORDERINFOSKU'	 => $order_info,
-			'ORDERINFO'		 => $order_info,
-			'SHIPPINGINFO'	 => $shipping_billing_info,
-			'PAYMENTINFO'	 => $payment_info,
-			'TOTAL'			 => $order_total,
-			'TRACKINGURL'	 => $tracking_url,
-			'ORDERNOTES'	 => $order_notes,
+			'CUSTOMERNAME' => $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ),
+			'ORDERID'      => $order->get_id(),
+			'ORDERINFOSKU' => $order_info,
+			'ORDERINFO'    => $order_info,
+			'SHIPPINGINFO' => $shipping_billing_info,
+			'PAYMENTINFO'  => $payment_info,
+			'TOTAL'        => $order_total,
+			'TRACKINGURL'  => $tracking_url,
+			'ORDERNOTES'   => $order_notes,
 		);
 
 		// Escape for sprintf() if required
@@ -245,14 +254,16 @@ if ( !function_exists( 'mp_filter_email' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_quote_it' ) ) :
+if ( ! function_exists( 'mp_quote_it' ) ) :
 
 	/**
 	 * Wrap string in single or double quotes
 	 *
 	 * @since 3.0
+	 *
 	 * @param string $text The text to wrap.
 	 * @param string $type Optional, either "single" or "double". Defaults to "double".
+	 *
 	 * @return string
 	 */
 	function mp_quote_it( $text, $type = 'double' ) {
@@ -266,23 +277,24 @@ if ( !function_exists( 'mp_quote_it' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_delete_from_array' ) ) :
+if ( ! function_exists( 'mp_delete_from_array' ) ) :
 
 	/**
 	 * Deletes a key from a given array
 	 *
 	 * @since 1.0
+	 *
 	 * @param array $array The array to work with.
 	 * @param string $key_string
 	 */
 	function mp_delete_from_array( &$array, $key_string ) {
-		$keys	 = explode( '->', $key_string );
-		$branch	 = &$array;
+		$keys   = explode( '->', $key_string );
+		$branch = &$array;
 
 		while ( count( $keys ) ) {
 			$key = array_shift( $keys );
 
-			if ( !is_array( $branch ) ) {
+			if ( ! is_array( $branch ) ) {
 				return false;
 			}
 
@@ -294,24 +306,25 @@ if ( !function_exists( 'mp_delete_from_array' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_push_to_array' ) ) :
+if ( ! function_exists( 'mp_push_to_array' ) ) :
 
 	/**
 	 * Pushes a value to a given array with given key
 	 *
 	 * @since 1.0
+	 *
 	 * @param array $array The array to work with.
 	 * @param string $key_string
 	 * @param mixed $value
 	 */
 	function mp_push_to_array( &$array, $key_string, $value ) {
-		$keys	 = explode( '->', $key_string );
-		$branch	 = &$array;
+		$keys   = explode( '->', $key_string );
+		$branch = &$array;
 
 		while ( count( $keys ) ) {
 			$key = array_shift( $keys );
 
-			if ( !is_array( $branch ) ) {
+			if ( ! is_array( $branch ) ) {
 				$branch = array();
 			}
 
@@ -323,7 +336,7 @@ if ( !function_exists( 'mp_push_to_array' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_cart' ) ) :
+if ( ! function_exists( 'mp_cart' ) ) :
 
 	/**
 	 * Get the MP_Cart instance
@@ -331,7 +344,7 @@ if ( !function_exists( 'mp_cart' ) ) :
 	 * @since 3.0
 	 */
 	function mp_cart() {
-		if ( !class_exists( 'MP_Cart' ) ) {
+		if ( ! class_exists( 'MP_Cart' ) ) {
 			require_once mp_plugin_dir( 'includes/common/class-mp-cart.php' );
 		}
 
@@ -340,7 +353,7 @@ if ( !function_exists( 'mp_cart' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_checkout' ) ) :
+if ( ! function_exists( 'mp_checkout' ) ) :
 
 	/**
 	 * Get the MP_Checkout instance
@@ -348,7 +361,7 @@ if ( !function_exists( 'mp_checkout' ) ) :
 	 * @since 3.0
 	 */
 	function mp_checkout() {
-		if ( !class_exists( 'MP_Checkout' ) ) {
+		if ( ! class_exists( 'MP_Checkout' ) ) {
 			require_once mp_plugin_dir( 'includes/public/class-mp-checkout.php' );
 		}
 
@@ -358,7 +371,7 @@ if ( !function_exists( 'mp_checkout' ) ) :
 endif;
 
 
-if ( !function_exists( 'mp_country_list' ) ) :
+if ( ! function_exists( 'mp_country_list' ) ) :
 
 	/**
 	 * Gets the country list without the popular countries
@@ -367,11 +380,11 @@ if ( !function_exists( 'mp_country_list' ) ) :
 	 * @return array
 	 */
 	function mp_country_list() {
-		$sorted		 = array();
-		$countries	 = mp()->countries;
+		$sorted    = array();
+		$countries = mp()->countries;
 
 		foreach ( $countries as $code => $country ) {
-			if ( !in_array( $code, mp()->popular_countries ) ) {
+			if ( ! in_array( $code, mp()->popular_countries ) ) {
 				$sorted[ $code ] = $country;
 			}
 		}
@@ -381,7 +394,7 @@ if ( !function_exists( 'mp_country_list' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_popular_country_list' ) ) :
+if ( ! function_exists( 'mp_popular_country_list' ) ) :
 
 	/**
 	 * Gets the popular country list
@@ -390,13 +403,14 @@ if ( !function_exists( 'mp_popular_country_list' ) ) :
 	 * @return array
 	 */
 	function mp_popular_country_list() {
-		$sorted		 = array();
-		$countries	 = mp()->popular_countries;
+		$sorted    = array();
+		$countries = mp()->popular_countries;
 
 		/**
 		 * Filter the popular countries list
 		 *
 		 * @since 3.0
+		 *
 		 * @param array $countries The default popular countries.
 		 */
 		$countries = apply_filters( 'mp_popular_country_list', $countries );
@@ -412,13 +426,15 @@ if ( !function_exists( 'mp_popular_country_list' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_states' ) ) :
+if ( ! function_exists( 'mp_get_states' ) ) :
 
 	/**
 	 * Gets the states/regions/provinces for a given country
 	 *
 	 * @since 3.0
+	 *
 	 * @param string $country The country code.
+	 *
 	 * @return array
 	 */
 	function mp_get_states( $country ) {
@@ -447,7 +463,7 @@ if ( !function_exists( 'mp_get_states' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_theme_list' ) ) :
+if ( ! function_exists( 'mp_get_theme_list' ) ) :
 
 	/**
 	 * Get a list of MP themes
@@ -456,24 +472,24 @@ if ( !function_exists( 'mp_get_theme_list' ) ) :
 	 * @access public
 	 */
 	function mp_get_theme_list() {
-		$theme_list	 = array();
-		$theme_dirs	 = array( mp_plugin_dir( 'ui/themes' ), WP_CONTENT_DIR . '/marketpress-styles/' );
+		$theme_list = array();
+		$theme_dirs = array( mp_plugin_dir( 'ui/themes' ), WP_CONTENT_DIR . '/marketpress-styles/' );
 
 		foreach ( $theme_dirs as $theme_dir ) {
 			$themes = mp_get_dir_files( $theme_dir, 'css' );
 
-			if ( !$themes ) {
+			if ( ! $themes ) {
 				continue;
 			}
 
 			$allowed_themes = $themes;
-			if ( is_multisite() && !is_network_admin() ) {
+			if ( is_multisite() && ! is_network_admin() ) {
 				$allowed_themes = mp_get_network_setting( 'allowed_themes' );
 			}
 
 			foreach ( $themes as $theme ) {
-				$theme_data	 = get_file_data( $theme, array( 'name' => 'MarketPress Style' ) );
-				$key		 = basename( $theme, '.css' );
+				$theme_data = get_file_data( $theme, array( 'name' => 'MarketPress Style' ) );
+				$key        = basename( $theme, '.css' );
 
 				if ( $name = mp_arr_get_value( 'name', $theme_data ) ) {
 					if ( is_multisite() && is_network_admin() ) {
@@ -491,20 +507,23 @@ if ( !function_exists( 'mp_get_theme_list' ) ) :
 		 * Filter the theme list
 		 *
 		 * @since 3.0
+		 *
 		 * @param array $theme_list An array of themes.
 		 * @param array $allowed_theme An array of allowed themes.
 		 */
+
 		return apply_filters( 'mp_get_theme_list', $theme_list, $allowed_themes );
 	}
 
 endif;
 
-if ( !function_exists( 'mp_is_valid_zip' ) ) :
+if ( ! function_exists( 'mp_is_valid_zip' ) ) :
 
 	/**
 	 * Check if zipcode is valid
 	 *
 	 * @since 3.0
+	 *
 	 * @param string $zip
 	 * @param string $country
 	 */
@@ -529,35 +548,39 @@ if ( !function_exists( 'mp_is_valid_zip' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_dir_files' ) ) :
+if ( ! function_exists( 'mp_get_dir_files' ) ) :
 
 	/**
 	 * Get all files from a given directory
 	 *
 	 * @since 3.0
+	 *
 	 * @param string $dir The full path of the directory
 	 * @param string $ext Get only files with a given extension. Set to NULL to get all files.
+	 *
 	 * @return array or false if no files exist
 	 */
 	function mp_get_dir_files( $dir, $ext = 'php' ) {
 		$myfiles = array();
 
-		if ( !is_null( $ext ) )
+		if ( ! is_null( $ext ) ) {
 			$ext = '.' . $ext;
+		}
 
-		if ( false === file_exists( $dir ) )
+		if ( false === file_exists( $dir ) ) {
 			return false;
+		}
 
-		$dir	 = trailingslashit( $dir );
-		$files	 = glob( $dir . '*' . $ext );
-		$files	 = array_filter( $files, create_function( '$filepath', 'return is_readable($filepath);' ) );
+		$dir   = trailingslashit( $dir );
+		$files = glob( $dir . '*' . $ext );
+		$files = array_filter( $files, create_function( '$filepath', 'return is_readable($filepath);' ) );
 
 		return ( empty( $files ) ) ? false : $files;
 	}
 
 endif;
 
-if ( !function_exists( 'mp_include_dir' ) ) :
+if ( ! function_exists( 'mp_include_dir' ) ) :
 
 	/**
 	 * Includes all files in a given directory
@@ -568,8 +591,9 @@ if ( !function_exists( 'mp_include_dir' ) ) :
 	 * @param string $ext Only include files with this extension
 	 */
 	function mp_include_dir( $dir, $ext = 'php' ) {
-		if ( false === ($files = mp_get_dir_files( $dir, $ext )) )
+		if ( false === ( $files = mp_get_dir_files( $dir, $ext ) ) ) {
 			return false;
+		}
 
 		foreach ( $files as $file ) {
 			include_once $file;
@@ -578,7 +602,7 @@ if ( !function_exists( 'mp_include_dir' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_current_screen' ) ) :
+if ( ! function_exists( 'mp_get_current_screen' ) ) :
 
 	/**
 	 * Safely gets the $current_screen object even before the current_screen hook is fired
@@ -595,37 +619,37 @@ if ( !function_exists( 'mp_get_current_screen' ) ) :
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-			if ( isset( $_GET[ 'page' ] ) ) {
-				$plugin_page = wp_unslash( $_GET[ 'page' ] );
+			if ( isset( $_GET['page'] ) ) {
+				$plugin_page = wp_unslash( $_GET['page'] );
 				$plugin_page = plugin_basename( $plugin_page );
 			}
 
-			if ( isset( $_REQUEST[ 'post_type' ] ) && post_type_exists( $_REQUEST[ 'post_type' ] ) ) {
-				$typenow = $_REQUEST[ 'post_type' ];
+			if ( isset( $_REQUEST['post_type'] ) && post_type_exists( $_REQUEST['post_type'] ) ) {
+				$typenow = $_REQUEST['post_type'];
 			} else {
 				$typenow = '';
 			}
 
-			if ( isset( $_REQUEST[ 'taxonomy' ] ) && taxonomy_exists( $_REQUEST[ 'taxonomy' ] ) ) {
-				$taxnow = $_REQUEST[ 'taxonomy' ];
+			if ( isset( $_REQUEST['taxonomy'] ) && taxonomy_exists( $_REQUEST['taxonomy'] ) ) {
+				$taxnow = $_REQUEST['taxonomy'];
 			} else {
 				$taxnow = '';
 			}
 
 			if ( isset( $plugin_page ) ) {
-				if ( !empty( $typenow ) ) {
+				if ( ! empty( $typenow ) ) {
 					$the_parent = $pagenow . '?post_type=' . $typenow;
 				} else {
 					$the_parent = $pagenow;
 				}
 
-				if ( !$page_hook = get_plugin_page_hook( $plugin_page, $the_parent ) ) {
+				if ( ! $page_hook = get_plugin_page_hook( $plugin_page, $the_parent ) ) {
 					$page_hook = get_plugin_page_hook( $plugin_page, $plugin_page );
 					// backwards compatibility for plugins using add_management_page
 					if ( empty( $page_hook ) && 'edit.php' == $pagenow && '' != get_plugin_page_hook( $plugin_page, 'tools.php' ) ) {
 						// There could be plugin specific params on the URL, so we need the whole query string
-						if ( !empty( $_SERVER[ 'QUERY_STRING' ] ) ) {
-							$query_string = $_SERVER[ 'QUERY_STRING' ];
+						if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+							$query_string = $_SERVER['QUERY_STRING'];
 						} else {
 							$query_string = 'page=' . $plugin_page;
 						}
@@ -655,7 +679,7 @@ if ( !function_exists( 'mp_get_current_screen' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_admin' ) ) :
+if ( ! function_exists( 'mp_admin' ) ) :
 
 	/**
 	 * Returns the MP_Admin instance
@@ -664,7 +688,7 @@ if ( !function_exists( 'mp_admin' ) ) :
 	 * @return object
 	 */
 	function mp_admin() {
-		if ( !class_exists( 'MP_Admin' ) ) {
+		if ( ! class_exists( 'MP_Admin' ) ) {
 			require_once mp_plugin_dir( 'includes/admin/class-mp-admin.php' );
 		}
 
@@ -673,7 +697,7 @@ if ( !function_exists( 'mp_admin' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_public' ) ) :
+if ( ! function_exists( 'mp_public' ) ) :
 
 	/**
 	 * Returns the MP_Public instance
@@ -682,26 +706,29 @@ if ( !function_exists( 'mp_public' ) ) :
 	 * @return object
 	 */
 	function mp_public() {
-		if ( !class_exists( 'MP_Pubic' ) ) {
+		if ( ! class_exists( 'MP_Pubic' ) ) {
 			require_once mp_plugin_dir( 'includes/public/class-mp-public.php' );
 		}
+
 		return MP_Public::get_instance();
 	}
 
 endif;
 
-if ( !function_exists( 'mp_doing_ajax' ) ) :
+if ( ! function_exists( 'mp_doing_ajax' ) ) :
 
 	/**
 	 * Checks if an ajax action is currently being executed
 	 *
 	 * @since 3.0
 	 * @uses DOING_AJAX
+	 *
 	 * @param string $action Optional, the ajax action to check.
+	 *
 	 * @return bool
 	 */
 	function mp_doing_ajax( $action = null ) {
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && (is_null( $action ) || $action == mp_get_request_value( 'action' )) ) {
+		if ( defined( 'DOING_AJAX' ) && DOING_AJAX && ( is_null( $action ) || $action == mp_get_request_value( 'action' ) ) ) {
 			return true;
 		}
 
@@ -710,7 +737,7 @@ if ( !function_exists( 'mp_doing_ajax' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_doing_autosave' ) ) :
+if ( ! function_exists( 'mp_doing_autosave' ) ) :
 
 	/**
 	 * Checks if an autosave action is currently being executed
@@ -726,26 +753,28 @@ if ( !function_exists( 'mp_doing_autosave' ) ) :
 endif;
 
 
-if ( !function_exists( 'array_replace_recursive' ) ) :
+if ( ! function_exists( 'array_replace_recursive' ) ) :
 
 	/**
 	 * Recursively replace one array with another. Provides compatibility for PHP version < 5.3
 	 *
 	 * @since 3.0
+	 *
 	 * @param array $array
 	 * @param array $array1 The values from this array will overwrite the values from $array
+	 *
 	 * @return array
 	 */
 	function array_replace_recursive() {
 		// handle the arguments, merge one by one
-		$args	 = func_get_args();
-		$array	 = $args[ 0 ];
+		$args  = func_get_args();
+		$array = $args[0];
 
-		if ( !is_array( $array ) ) {
+		if ( ! is_array( $array ) ) {
 			return $array;
 		}
 
-		for ( $i = 1; $i < count( $args ); $i++ ) {
+		for ( $i = 1; $i < count( $args ); $i ++ ) {
 			if ( is_array( $args[ $i ] ) ) {
 				$array = recurse( $array, $args[ $i ] );
 			}
@@ -757,7 +786,7 @@ if ( !function_exists( 'array_replace_recursive' ) ) :
 	function recurse( $array, $array1 ) {
 		foreach ( $array1 as $key => $value ) {
 			// create new key in $array, if it is empty or not an array
-			if ( !isset( $array[ $key ] ) || (isset( $array[ $key ] ) && !is_array( $array[ $key ] )) ) {
+			if ( ! isset( $array[ $key ] ) || ( isset( $array[ $key ] ) && ! is_array( $array[ $key ] ) ) ) {
 				$array[ $key ] = array();
 			}
 
@@ -774,7 +803,7 @@ if ( !function_exists( 'array_replace_recursive' ) ) :
 
 endif;
 
-if ( !function_exists( 'debug_to_console' ) ) :
+if ( ! function_exists( 'debug_to_console' ) ) :
 
 	/**
 	 * Send a log to the browser console
@@ -792,7 +821,7 @@ if ( !function_exists( 'debug_to_console' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_arr_get_value' ) ) :
+if ( ! function_exists( 'mp_arr_get_value' ) ) :
 
 	/**
 	 * Safely retrieve a value from an array
@@ -803,19 +832,21 @@ if ( !function_exists( 'mp_arr_get_value' ) ) :
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param array $array The $array to work with
 	 * @param mixed $default The default value to return if $key is not found within $array
+	 *
 	 * @return mixed
 	 */
 	function mp_arr_get_value( $key, $array, $default = false ) {
-		$keys	 = explode( '->', $key );
-		$keys	 = array_map( 'trim', $keys );
-		$value	 = mp_arr_search( $array, $key );
-		return ( is_null( $value )) ? $default : $value;
+		$keys  = explode( '->', $key );
+		$keys  = array_map( 'trim', $keys );
+		$value = mp_arr_search( $array, $key );
+
+		return ( is_null( $value ) ) ? $default : $value;
 	}
 
 endif;
 
 
-if ( !function_exists( 'mp_get_cookie_value' ) ) :
+if ( ! function_exists( 'mp_get_cookie_value' ) ) :
 
 	/**
 	 * Safely retreives a value from the $_COOKIE array
@@ -825,6 +856,7 @@ if ( !function_exists( 'mp_get_cookie_value' ) ) :
 	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
+	 *
 	 * @return mixed
 	 */
 	function mp_get_cookie_value( $key, $default = false ) {
@@ -833,7 +865,7 @@ if ( !function_exists( 'mp_get_cookie_value' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_get_value' ) ) :
+if ( ! function_exists( 'mp_get_get_value' ) ) :
 
 	/**
 	 * Safely retreives a value from the $_GET array
@@ -843,6 +875,7 @@ if ( !function_exists( 'mp_get_get_value' ) ) :
 	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
+	 *
 	 * @return mixed
 	 */
 	function mp_get_get_value( $key, $default = false ) {
@@ -851,7 +884,7 @@ if ( !function_exists( 'mp_get_get_value' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_post_value' ) ) :
+if ( ! function_exists( 'mp_get_post_value' ) ) :
 
 	/**
 	 * Safely retreives a value from the $_POST array
@@ -861,6 +894,7 @@ if ( !function_exists( 'mp_get_post_value' ) ) :
 	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
+	 *
 	 * @return mixed
 	 */
 	function mp_get_post_value( $key, $default = false ) {
@@ -869,7 +903,7 @@ if ( !function_exists( 'mp_get_post_value' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_request_value' ) ) :
+if ( ! function_exists( 'mp_get_request_value' ) ) :
 
 	/**
 	 * Safely retreives a value from the $_REQUEST array
@@ -879,6 +913,7 @@ if ( !function_exists( 'mp_get_request_value' ) ) :
 	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
+	 *
 	 * @return mixed
 	 */
 	function mp_get_request_value( $key, $default = false ) {
@@ -888,7 +923,7 @@ if ( !function_exists( 'mp_get_request_value' ) ) :
 endif;
 
 
-if ( !function_exists( 'mp_get_session_value' ) ) :
+if ( ! function_exists( 'mp_get_session_value' ) ) :
 
 	/**
 	 * Safely retreives a value from the $_SESSION array
@@ -902,16 +937,18 @@ if ( !function_exists( 'mp_get_session_value' ) ) :
 	 *
 	 * @param string $key (e.g. key1->key2->key3)
 	 * @param mixed $default The default value to return if $key is not found within $array
+	 *
 	 * @return mixed
 	 */
 	function mp_get_session_value( $key, $default = false ) {
 		mp_public()->start_session();
+
 		return mp_arr_get_value( $key, $_SESSION, $default );
 	}
 
 endif;
 
-if ( !function_exists( 'mp_get_setting' ) ) :
+if ( ! function_exists( 'mp_get_setting' ) ) :
 	/*
 	 * Safely retrieves a setting
 	 *
@@ -929,8 +966,8 @@ if ( !function_exists( 'mp_get_setting' ) ) :
 
 		$settings = get_option( 'mp_settings' );
 
-		$keys	 = explode( '->', $key );
-		$keys	 = array_map( 'trim', $keys );
+		$keys    = explode( '->', $key );
+		$keys    = array_map( 'trim', $keys );
 		$setting = mp_arr_get_value( $key, $settings, $default );
 
 		return apply_filters( 'mp_setting_' . implode( '', $keys ), $setting, $default );
@@ -938,7 +975,7 @@ if ( !function_exists( 'mp_get_setting' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_network_setting' ) ) :
+if ( ! function_exists( 'mp_get_network_setting' ) ) :
 	/*
 	 * Safely retrieves a network setting
 	 *
@@ -954,13 +991,13 @@ if ( !function_exists( 'mp_get_network_setting' ) ) :
 
 	function mp_get_network_setting( $key, $default = null ) {
 		$settings = wp_cache_get( 'network_settings', 'marketpress' );
-		if ( !$settings ) {
+		if ( ! $settings ) {
 			$settings = get_site_option( 'mp_network_settings', $default, false );
 			wp_cache_set( 'network_settings', $settings, 'marketpress' );
 		}
 
-		$keys	 = explode( '->', $key );
-		$keys	 = array_map( 'trim', $keys );
+		$keys    = explode( '->', $key );
+		$keys    = array_map( 'trim', $keys );
 		$setting = mp_arr_get_value( $key, $settings, $default );
 
 		return apply_filters( 'mp_network_setting_' . implode( '', $keys ), $setting, $default );
@@ -969,7 +1006,7 @@ if ( !function_exists( 'mp_get_network_setting' ) ) :
 endif;
 
 
-if ( !function_exists( 'mp_arr_search' ) ) :
+if ( ! function_exists( 'mp_arr_search' ) ) :
 
 	/**
 	 * Searches an array multidimensional array for a specific path (if it exists)
@@ -978,14 +1015,15 @@ if ( !function_exists( 'mp_arr_search' ) ) :
 	 *
 	 * @param array $array The array we want to search
 	 * @param string $path The path we want to check for (e.g. key1->key2->key3 = $array[key1][key2][key3])
+	 *
 	 * @return mixed
 	 */
 	function mp_arr_search( $array, $path ) {
-		$keys	 = explode( '->', $path );
-		$keys	 = array_map( 'trim', $keys );
+		$keys = explode( '->', $path );
+		$keys = array_map( 'trim', $keys );
 
-		for ( $i = $array; ($key = array_shift( $keys )) !== null; $i = $i[ $key ] ) {
-			if ( !isset( $i[ $key ] ) ) {
+		for ( $i = $array; ( $key = array_shift( $keys ) ) !== null; $i = $i[ $key ] ) {
+			if ( ! isset( $i[ $key ] ) ) {
 				return null;
 			}
 		}
@@ -995,12 +1033,13 @@ if ( !function_exists( 'mp_arr_search' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_register_addon' ) ) :
+if ( ! function_exists( 'mp_register_addon' ) ) :
 
 	/**
 	 * Wrapper function for MP_Addons::register()
 	 *
 	 * @since 3.0
+	 *
 	 * @param array $args
 	 */
 	function mp_register_addon( $args = array() ) {
@@ -1009,7 +1048,7 @@ if ( !function_exists( 'mp_register_addon' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_update_setting' ) ) :
+if ( ! function_exists( 'mp_update_setting' ) ) :
 
 	/**
 	 * Update a specific setting
@@ -1018,17 +1057,19 @@ if ( !function_exists( 'mp_update_setting' ) ) :
 	 *
 	 * @param string $key The key to update
 	 * @param mixed $value The value to use
+	 *
 	 * @return bool
 	 */
 	function mp_update_setting( $key, $value ) {
 		$settings = get_option( 'mp_settings' );
 		mp_push_to_array( $settings, $key, $value );
+
 		return update_option( 'mp_settings', $settings );
 	}
 
 endif;
 
-if ( !function_exists( 'mp_update_session_value' ) ) :
+if ( ! function_exists( 'mp_update_session_value' ) ) :
 
 	/**
 	 * Update a session variable
@@ -1038,6 +1079,7 @@ if ( !function_exists( 'mp_update_session_value' ) ) :
 	 * on these pages!
 	 *
 	 * @since 3.0
+	 *
 	 * @param string $key The key to update
 	 * @param mixed $value The value to use
 	 */
@@ -1049,7 +1091,7 @@ if ( !function_exists( 'mp_update_session_value' ) ) :
 endif;
 
 
-if ( !function_exists( 'mp_update_network_setting' ) ) :
+if ( ! function_exists( 'mp_update_network_setting' ) ) :
 
 	/**
 	 * Update a specific network setting
@@ -1058,44 +1100,48 @@ if ( !function_exists( 'mp_update_network_setting' ) ) :
 	 *
 	 * @param string $key The key to update
 	 * @param mixed $value The value to use
+	 *
 	 * @return bool
 	 */
 	function mp_update_network_setting( $key, $value ) {
 		$settings = get_site_option( 'mp_network_settings' );
 		mp_push_to_array( $settings, $key, $value );
+
 		return update_site_option( 'mp_network_settings', $settings );
 	}
 
 endif;
 
-if ( !function_exists( 'mp_parse_args' ) ) :
+if ( ! function_exists( 'mp_parse_args' ) ) :
 
 	/**
 	 * Convert old style arguments (broken out into variables) into an associative array
+	 *
 	 * @param mixed $args
 	 * @param array $defaults
+	 *
 	 * @return array
 	 */
 	function mp_parse_args( $args, $defaults ) {
-		if ( !isset( $args[ 0 ] ) ) {
+		if ( ! isset( $args[0] ) ) {
 			return $defaults;
 		}
 
-		if ( (isset( $args[ 0 ] ) && is_array( $args[ 0 ] ) ) || (isset( $args[ 0 ] ) && !is_numeric( $args[ 0 ] ) && !is_bool( $args[ 0 ] ) ) ) {
-			return array_replace_recursive( $defaults, $args[ 0 ] );
+		if ( ( isset( $args[0] ) && is_array( $args[0] ) ) || ( isset( $args[0] ) && ! is_numeric( $args[0] ) && ! is_bool( $args[0] ) ) ) {
+			return array_replace_recursive( $defaults, $args[0] );
 		}
 
 		$tmp_args = array();
 		foreach ( $defaults as $key => $value ) {
-			$val				 = array_shift( $args );
-			$tmp_args[ $key ]	 = !is_null( $val ) ? $val : $value;
+			$val              = array_shift( $args );
+			$tmp_args[ $key ] = ! is_null( $val ) ? $val : $value;
 		}
 
 		return $tmp_args;
 	}
 
 endif;
-if ( !function_exists( 'mp_plugin_url' ) ) :
+if ( ! function_exists( 'mp_plugin_url' ) ) :
 
 	/**
 	 * Returns a url with given path relative to the plugin's root
@@ -1103,6 +1149,7 @@ if ( !function_exists( 'mp_plugin_url' ) ) :
 	 * @since 3.0
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	function mp_plugin_url( $path = '' ) {
@@ -1111,7 +1158,7 @@ if ( !function_exists( 'mp_plugin_url' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_plugin_dir' ) ) :
+if ( ! function_exists( 'mp_plugin_dir' ) ) :
 
 	/**
 	 * Returns a path with given path relative to the plugin's root
@@ -1119,6 +1166,7 @@ if ( !function_exists( 'mp_plugin_dir' ) ) :
 	 * @since 3.0
 	 *
 	 * @param string $path
+	 *
 	 * @return string
 	 */
 	function mp_plugin_dir( $path = '' ) {
@@ -1127,12 +1175,14 @@ if ( !function_exists( 'mp_plugin_dir' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_array_map_recursive' ) ) :
+if ( ! function_exists( 'mp_array_map_recursive' ) ) :
 
 	/**
 	 * Execute a give function on each element in a given array
+	 *
 	 * @param string $func The function name to execute
 	 * @param array $array The array to execute on
+	 *
 	 * @return array
 	 */
 	function mp_array_map_recursive( $func, $array ) {
@@ -1145,13 +1195,15 @@ if ( !function_exists( 'mp_array_map_recursive' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_array_to_attributes' ) ) :
+if ( ! function_exists( 'mp_array_to_attributes' ) ) :
 
 	/**
 	 * Convert an array of attributes to an html string
 	 *
 	 * @since 3.0
+	 *
 	 * @param array $attributes
+	 *
 	 * @return string
 	 */
 	function mp_array_to_attributes( $attributes ) {
@@ -1165,7 +1217,7 @@ if ( !function_exists( 'mp_array_to_attributes' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_is_main_site' ) ) :
+if ( ! function_exists( 'mp_is_main_site' ) ) :
 
 	/**
 	 * Checks if the current blog is the main site
@@ -1185,7 +1237,7 @@ if ( !function_exists( 'mp_is_main_site' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_is_post_indexer_installed' ) ) :
+if ( ! function_exists( 'mp_is_post_indexer_installed' ) ) :
 
 	/**
 	 * Check if Post Indexer plugin is installed
@@ -1199,7 +1251,7 @@ if ( !function_exists( 'mp_is_post_indexer_installed' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_root_blog_id' ) ) :
+if ( ! function_exists( 'mp_root_blog_id' ) ) :
 
 	/**
 	 * Get the root blog id
@@ -1219,7 +1271,7 @@ if ( !function_exists( 'mp_root_blog_id' ) ) :
 
 endif;
 
-if ( !function_exists( 'mp_get_store_caps' ) ) :
+if ( ! function_exists( 'mp_get_store_caps' ) ) :
 
 	/**
 	 * Get store capabilities
@@ -1232,12 +1284,12 @@ if ( !function_exists( 'mp_get_store_caps' ) ) :
 			return $store_caps;
 		}
 
-		$store_caps	 = array( 'manage_store_settings' => 'manage_store_settings' );
-		$taxonomies	 = array( 'product_category', 'product_tag' );
-		$pts		 = array( 'product', 'mp_product', 'product_coupon', 'mp_order' );
+		$store_caps = array( 'manage_store_settings' => 'manage_store_settings' );
+		$taxonomies = array( 'product_category', 'product_tag' );
+		$pts        = array( 'product', 'mp_product', 'product_coupon', 'mp_order' );
 
 		foreach ( $taxonomies as $tax_slug ) {
-			if ( !taxonomy_exists( $tax_slug ) ) {
+			if ( ! taxonomy_exists( $tax_slug ) ) {
 				continue;
 			}
 
@@ -1248,7 +1300,7 @@ if ( !function_exists( 'mp_get_store_caps' ) ) :
 		}
 
 		foreach ( $pts as $pt_slug ) {
-			if ( !post_type_exists( $pt_slug ) ) {
+			if ( ! post_type_exists( $pt_slug ) ) {
 				continue;
 			}
 
@@ -1276,5 +1328,73 @@ if ( ! function_exists( 'mp_get_single_site_cart' ) ) {
 		}
 
 		return $model;
+	}
+}
+
+if ( ! function_exists( 'mp_resize_image' ) ) {
+	/**
+	 * @param $image_url
+	 * @param string $size
+	 *
+	 * @return mixed|void
+	 */
+	function mp_resize_image( $image_url, $size = 'thumbnail' ) {
+		$image = wp_get_image_editor( $image_url );
+		if ( ! is_wp_error( $image ) ) {
+			$size_data = array();
+			if ( is_array( $size ) ) {
+				$size_data = $size;
+			} else {
+				switch ( $size ) {
+					case 'thumbnail':
+						$size_data = array(
+							150,
+							150
+						);
+						break;
+					case 'medium':
+						$size_data = array(
+							300,
+							300
+						);
+						break;
+					case 'large':
+						$size_data = array(
+							1024,
+							1024
+						);
+						break;
+				}
+			}
+			//build the path name, and try to check if
+			$filename_data = pathinfo( $image_url );
+			$upload_dir    = wp_upload_dir();
+			$image_path    = $upload_dir['path'] . '/' . $filename_data['filename'] . '-' . $size_data[0] . 'x' . $size_data[1] . '.' . $filename_data['extension'];
+			$image_url     = str_replace( $upload_dir['path'], $upload_dir['url'], $image_path );
+			if ( file_exists( $image_path ) ) {
+				//we will check the time of this image
+				$cache_time = apply_filters( 'mp_image_resize_cache_duration', 3 );
+				if ( strtotime( '+' . $cache_time . ' seconds', filemtime( $image_path ) ) <= time() ) {
+					unlink( $image_path );
+				}
+			}
+
+			if ( ! file_exists( $image_path ) ) {
+				$is_crop = false;
+				if ( $size == 'thumbnail' ) {
+					$is_crop = array( 'left', 'top' );
+				}
+				$is_crop = apply_filters( 'mp_image_crop_position', $is_crop, $image, $image_path, $image_url, $size );
+				$image->resize( $size_data[0], $size_data[1], $is_crop );
+				$image->save( $image_path );
+
+			}
+
+			return apply_filters( 'mp_image_after_resize', array(
+				$image_url,
+				$size_data[0],
+				$size_data[1]
+			) );
+		}
 	}
 }
