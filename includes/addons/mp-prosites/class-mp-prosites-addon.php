@@ -75,7 +75,7 @@ class MP_Prosites_Addon {
 				if ( $permissions = mp_arr_get_value( $key, $allowed_themes ) ) {
 					$level = str_replace( 'psts_level_', '', $permissions );
 					
-					if ( $permissions != 'full' || ! mp_is_pro_site( false, $level ) ) {
+					if ( $permissions != 'full' || ! is_pro_site( false, $level ) ) {
 						unset( $theme_list[ $key ] );
 					}
 				}
