@@ -393,7 +393,8 @@ class Marketpress {
 	}
 
 	function load_widgets() {
-
+		
+		require_once( $this->plugin_dir( 'includes/admin/widgets/cart.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/categories.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-tag-cloud.php' ) );

@@ -90,8 +90,19 @@ var mp_cart = { };
             mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
         } );
     };
-
-
+	
+	/**
+     * Initialize cart buttons listeners
+     *
+     * @since 3.0
+     */
+    mp_cart.initCartButtonListeners = function() {
+        $( '.mp-empty-cart' ).on( 'click', function( e ) {
+            e.preventDefault();
+            mp_cart.emptyCart();
+        } );
+    };
+	
 
     mp_cart.initShortcodeProductListeners = function() {
         $( '.mp-shortcode-wrap' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
@@ -173,6 +184,7 @@ var mp_cart = { };
         mp_cart.initShortcodeProductListeners();
         mp_cart.initCartFormListeners();
         mp_cart.initProductOptionsLightbox();
+		mp_cart.initCartButtonListeners();
     };
 
     /**
@@ -357,7 +369,11 @@ var mp_cart = { };
                     }
 
                     mp_cart.update( resp.data.minicart );
-
+					mp_cart.update_widget( resp.data.widgetcart );
+					
+					//Init button listeners when ajax loaded
+					mp_cart.initCartButtonListeners();
+					
                     $form.get( 0 ).reset();
 
                     setTimeout( function() {
@@ -413,6 +429,26 @@ var mp_cart = { };
             $( window ).trigger( 'resize' );
         } );
     }
+	
+	/**
+     * Remove all items from the shopping cart
+     *
+     * @since 3.0
+     */
+    mp_cart.emptyCart = function() {
+        var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
+        var data = {
+            "cart_action": "empty_cart"
+        };
+
+        $.post( url, data ).done( function( resp ) {
+            if ( resp.success ) {
+                if ( resp.data.item_count == 0 ) {
+                    window.location.href = window.location.href;
+                }
+            }
+        } );
+    }
 
     /**
      * Update the cart html
@@ -423,6 +459,16 @@ var mp_cart = { };
     mp_cart.update = function( html ) {
         $( '#mp-floating-cart' ).replaceWith( html );
         this.initCartAnimation();
+    };
+	
+	/**
+     * Update the cart widget html
+     *
+     * @since 3.0
+     * @param string html The cart html.
+     */
+    mp_cart.update_widget = function( html ) {
+        $( '#mp-cart-widget' ).html( html );
     };
 
     /**
