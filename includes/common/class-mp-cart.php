@@ -1097,7 +1097,7 @@ class MP_Cart {
 
 		$disable_cart = mp_get_setting( 'disable_cart', 0 );
 
-		if ( mp_get_setting( 'disable_cart' ) == '1' ) {
+		if ( mp_get_setting( 'disable_cart' ) == '1' || mp_get_setting( 'disable_minicart' ) == '1') {
 			return;
 		}
 
