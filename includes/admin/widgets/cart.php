@@ -5,7 +5,7 @@ class MarketPress_Shopping_Cart_Widget extends WP_Widget {
 
 	function MarketPress_Shopping_Cart_Widget() {
 		$widget_ops = array( 'classname' => 'mp_cart_widget', 'description' => __( 'Shows dynamic shopping cart contents along with a checkout button for your MarketPress store.', 'mp' ) );
-		$this->WP_Widget( 'mp_cart_widget', __( 'Shopping Cart', 'mp' ), $widget_ops );
+		parent::__construct( 'mp_cart_widget', __( 'Shopping Cart', 'mp' ), $widget_ops );
 	}
 
 	function widget( $args, $instance ) {
