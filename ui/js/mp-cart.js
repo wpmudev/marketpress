@@ -97,7 +97,7 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initCartButtonListeners = function() {
-        $( '.mp-empty-cart' ).on( 'click', function( e ) {
+        $( '.mp_button-widget-cart-empty' ).on( 'click', function( e ) {
             e.preventDefault();
             mp_cart.emptyCart();
         } );
