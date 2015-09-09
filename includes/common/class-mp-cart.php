@@ -1150,6 +1150,7 @@ class MP_Cart {
 	 * @param string $context Cart context widget or floating.
 	 */
 	public function cart_products_html($context = null) {
+		$html = '';
 		if ( $this->has_items() ) {
 			$blog_ids = $this->get_blog_ids();
 			$html .= '
