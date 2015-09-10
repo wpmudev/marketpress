@@ -331,6 +331,12 @@ class MP_Store_Settings_General {
 			'desc'		 => __( 'This option turns MarketPress into more of a product listing plugin, disabling shopping carts, checkout, and order management. This is useful if you simply want to list items you can buy in a store somewhere else, optionally linking the "Buy Now" buttons to an external site. Some examples are a car dealership, or linking to songs/albums in itunes, or linking to products on another site with your own affiliate links.', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'disable_minicart',
+			'label'		 => array( 'text' => __( 'Disable Mini Cart?', 'mp' ) ),
+			'desc'		 => __( 'This option hide floating Mini Cart in top right corner.', 'mp' ),
+			'message'	 => __( 'Yes', 'mp' ),
+		) );
 		$metabox->add_field( 'radio_group', array(
 			'name'			 => 'ga_ecommerce',
 			'label'			 => array( 'text' => __( 'Google Analytics Ecommerce Tracking', 'mp' ) ),

@@ -253,7 +253,7 @@ class MP_Cart {
 		$item	 = $item_id = mp_get_post_value( 'product', null );
 		$qty	 = mp_get_post_value( 'qty', 1 );
 
-		if ( is_null( $item ) ) {
+		if ( mp_get_post_value( 'cart_action' ) != 'empty_cart' && is_null( $item ) ) {
 			wp_send_json_error();
 		}
 
@@ -267,7 +267,7 @@ class MP_Cart {
 			}
 		}
 
-		if ( is_null( $item_id ) ) {
+		if ( mp_get_post_value( 'cart_action' ) != 'empty_cart' && is_null( $item_id ) ) {
 			wp_send_json_error();
 		}
 
@@ -277,6 +277,7 @@ class MP_Cart {
 				//wp_send_json_success( $this->floating_cart_html() );
 				wp_send_json_success( array(
 					'minicart'		 => $this->floating_cart_html(),
+					'widgetcart'		 => $this->cart_products_html('widget'),
 					'cart_updated'	 => $cart_updated,
 				) );
 				break;
@@ -298,6 +299,13 @@ class MP_Cart {
 					'item_count' => $this->item_count( false, false ),
 				) );
 				break;
+				
+			case 'empty_cart' :
+				$this->empty_cart();
+				wp_send_json_success( array(
+					'item_count' => 0,
+				) );
+				break;	
 		}
 
 		wp_send_json_error();
@@ -1089,7 +1097,7 @@ class MP_Cart {
 
 		$disable_cart = mp_get_setting( 'disable_cart', 0 );
 
-		if ( mp_get_setting( 'disable_cart' ) == '1' ) {
+		if ( mp_get_setting( 'disable_cart' ) == '1' || mp_get_setting( 'disable_minicart' ) == '1') {
 			return;
 		}
 
@@ -1117,7 +1125,32 @@ class MP_Cart {
 			</div>
 			<div class="mp_mini_cart_content">';
 
+		$html .= $this->cart_products_html();
 
+		$html .= '
+			</div><!-- end mp_mini_cart_content -->
+		</div><!-- end mp_mini_cart -->';
+
+		if ( !mp_doing_ajax() ) {
+			$html .= '<span class="mp_ajax_loader" style="display:none"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>';
+		}
+
+		if ( $echo ) {
+			echo $html;
+		} else {
+			return $html;
+		}
+	}
+	
+	/**
+	 * Display the cart products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $context Cart context widget or floating.
+	 */
+	public function cart_products_html($context = null) {
+		$html = '';
 		if ( $this->has_items() ) {
 			$blog_ids = $this->get_blog_ids();
 			$html .= '
@@ -1146,8 +1179,16 @@ class MP_Cart {
 			}
 
 			$html .= '
-				</ul><!-- end mp_mini_cart_content -->
-				<a class="mp_button mp_button-mini-cart" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
+				</ul><!-- end mp_mini_cart_content -->';
+			
+			if($context == "widget") {
+				$html .= '
+					<a class="mp_button mp_button-remove mp_button-widget-cart mp_button-widget-cart-empty" href="' . mp_store_page_url( 'cart', false ) . '">' . __( 'Empty Cart', 'mp' ) . '</a>
+					<a class="mp_button mp_button-checkout mp_button-widget-cart" href="' . mp_store_page_url( 'checkout', false ) . '">' . __( 'Checkout', 'mp' ) . '</a>';
+			} else {
+				$html .= '
+					<a class="mp_button mp_button-mini-cart" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
+			}
 		} else {
 			$html .= '
 				<div class="mp_mini_cart_items-empty">
@@ -1155,20 +1196,8 @@ class MP_Cart {
 					<p>' . __( 'Items/Products added to Cart will show here.', 'mp' ) . '</p>
 				</div><!-- end mp_mini_cart_items-empty -->';
 		}
-
-		$html .= '
-			</div><!-- end mp_mini_cart_content -->
-		</div><!-- end mp_mini_cart -->';
-
-		if ( !mp_doing_ajax() ) {
-			$html .= '<span class="mp_ajax_loader" style="display:none"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>';
-		}
-
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
+		
+		return $html;
 	}
 
 	/**

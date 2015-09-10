@@ -4,7 +4,7 @@
 class MarketPress_Product_List extends WP_Widget {
 
 	function MarketPress_Product_List() {
-		$widget_ops = array( 'classname' => 'mp_widget mp_product_list_widget', 'description' => __( 'Shows a customizable list of products from your MarketPress store.', 'mp' ) );
+		$widget_ops = array( 'classname' => 'mp_widget mp_widget_products_list', 'description' => __( 'Shows a customizable list of products from your MarketPress store.', 'mp' ) );
 		parent::__construct( 'mp_product_list_widget', __( 'Product List', 'mp' ), $widget_ops );
 	}
 
@@ -67,7 +67,7 @@ class MarketPress_Product_List extends WP_Widget {
 
 		//do we have products?
 		if ( $custom_query->have_posts() ) {
-			echo '<div id="mp-widget-products-list" class="hfeed mp_widget_products mp_widget_products-list mp-multiple-products">';
+			echo '<div id="mp-products-list-widget" class="hfeed mp_widget_products mp_widget_products-list mp-multiple-products">';
 			while ( $custom_query->have_posts() ) : $custom_query->the_post();
 
 				$product = new MP_Product( $post->ID );
