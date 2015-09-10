@@ -596,7 +596,7 @@ class MP_Cart {
 		$line .= '
 				<div class="mp_cart_resume_item mp_cart_resume_item-product-total">
 					<span class="mp_cart_resume_item_label">' . __( 'Product Total', 'mp' ) . '</span>
-					<span class="mp_cart_resume_item_amount">' . $this->product_total( true, true ) . '</span>
+					<span class="mp_cart_resume_item_amount">' . $this->product_original_total( true, true ) . '</span>
 				</div><!-- end mp_cart_resume_item_product-total -->';
 
 		/**
@@ -1392,6 +1392,63 @@ class MP_Cart {
 		}
 
 		$total = mp_arr_get_value( 'product', $this->_total );
+
+		if ( $format ) {
+			return mp_format_currency( '', $total );
+		} else {
+			return (float) round( $total, 2 );
+		}
+	}
+
+	/**
+	 * This is original product without coupon effect
+	 * @param bool|false $format
+	 *
+	 * @return float|string
+	 */
+	public function product_original_total($format = false ){
+		if ( false === mp_arr_get_value( 'product_original', $this->_total ) ) {
+			$total						 = 0;
+			$blog_ids					 = $this->get_blog_ids();
+			$this->_total[ 'product_original' ]	 = 0;
+
+			while ( 1 ) {
+				if ( $this->is_global ) {
+					$blog_id = array_shift( $blog_ids );
+					$this->set_id( $blog_id );
+				}
+
+				$items = $this->get_items_as_objects();
+
+				foreach ( $items as $item ) {
+					$price = $item->get_price();
+					if ( isset( $price['before_coupon'] ) ) {
+						$price = $price['before_coupon'];
+					} else {
+						$price = $price['lowest'];
+					}
+					$item_subtotal = ( $price * $item->qty );
+					$total += $item_subtotal;
+				}
+
+				/**
+				 * Filter the product original total, also, this variable should be internal
+				 *
+				 * @since 3.0
+				 * @param float The cart total.
+				 * @param MP_Cart The current cart object.
+				 * @param array The current cart items.
+				 */
+				$this->_total[ 'product_original' ] += (float) apply_filters( 'mp_cart/product_original_total', $total, $items );
+
+				if ( ($this->is_global && false === current( $blog_ids ) ) || !$this->is_global ) {
+					$this->reset_id();
+					break;
+				}
+			}
+		}
+
+		$total = mp_arr_get_value( 'product_original', $this->_total );
 
 		if ( $format ) {
 			return mp_format_currency( '', $total );
