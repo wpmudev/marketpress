@@ -548,7 +548,11 @@ class WPMUDEV_Metabox {
 	 * @action save_post
 	 */
 	public function maybe_save_fields( $post_id ) {
+		if ( $this->args['id'] == 'mp-product-price-inventory-variants-metabox' ) {
+
+		}
 		if ( ! $this->is_active() ) {
+
 			return;
 		}
 
@@ -578,7 +582,7 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */
 	public function maybe_render( $post = null ) {
-		if ( ! $this->is_active() ) {
+		if ( ! $this->is_active( true ) ) {
 			return false;
 		}
 
@@ -1083,6 +1087,28 @@ class WPMUDEV_Metabox {
 				$this->is_active = true;
 			} elseif ( $post_id && $pagenow == 'post.php' && $post_type == $this->args['post_type'] ) {
 				$this->is_active = true;
+			}
+
+			//some case, in edit mode the $post different fom the current editing post, we will have to validate
+			if ( $this->is_active == false && is_object( $post ) && isset( $_GET['post'] ) && $pagenow == 'post.php' ) {
+				$get_post_id = $_GET['post'];
+				if ( $get_post_id > 0 && $get_post_id != $post->ID ) {
+					//we will need to use the $get_ppost_id
+					$actual_post = get_post( $get_post_id );
+					if ( is_object( $actual_post ) && $actual_post->post_type == $this->args['post_type'] ) {
+						$this->is_active = true;
+					}
+				}
+			}
+
+			if ( $this->is_active == false && $_SERVER['REQUEST_METHOD'] == 'POST' && mp_get_post_value( 'post_ID', 0 ) != 0 && mp_get_post_value( 'action', 0 ) == 'editpost' ) {
+				$post_post_id = mp_get_post_value( 'post_ID' );
+				if ( $post_post_id != $post->ID ) {
+					$actual_post = get_post( $post_post_id );
+					if ( is_object( $actual_post ) && $actual_post->post_type == $this->args['post_type'] ) {
+						$this->is_active = true;
+					}
+				}
 			}
 		}
 
