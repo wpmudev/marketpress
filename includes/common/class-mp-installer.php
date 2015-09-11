@@ -291,7 +291,7 @@ class MP_Installer {
 		$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
 
 		if ( is_array( $old_value ) ) {
-			$old_value = array_shift($old_value);
+			$old_value = array_shift( $old_value );
 		}
 
 		if ( $new_post_meta_name == 'special_tax_rate' ) {
@@ -486,7 +486,7 @@ class MP_Installer {
 	 * @action admin_menu
 	 */
 	public function add_menu_items() {
-		if ( get_option( 'mp_db_update_required' ) ) {
+		if ( get_option( 'mp_db_update_required' ) || mp_get_get_value( 'force_upgrade', 0 ) == 1 ) {
 			add_submenu_page( 'store-settings', __( 'Update Data', 'mp' ), __( 'Update Data', 'mp' ), 'activate_plugins', 'mp-db-update', array(
 				&$this,
 				'db_update_page'
@@ -639,7 +639,14 @@ class MP_Installer {
 
 		// Update settings
 		update_option( 'mp_settings', $settings );
-
+		if ( ! empty( $old_version ) ) {
+			$settings = get_option( 'mp_settings' );
+			//3.0.0.3 need data from 3.0
+			if ( version_compare( $old_version, '3.0.0.3', '<' ) && version_compare( $old_version, '3.0', ">=" ) ) {
+				$settings = $this->update_3003( $settings );
+				update_option( 'mp_settings', $settings );
+			}
+		}
 		// Give admin role all store capabilities
 		$this->add_admin_store_caps();
 		// Add "term_order" to $wpdb->terms table
@@ -672,7 +679,7 @@ class MP_Installer {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		$charset_collate = $wpdb->get_charset_collate();
-
+//todo check does this created
 		// Create mp_product_attributes table
 		$table_name = $wpdb->prefix . 'mp_product_attributes';
 		$sql        = "CREATE TABLE $table_name (
@@ -803,6 +810,222 @@ class MP_Installer {
 		foreach ( $store_caps as $cap ) {
 			$role->add_cap( $cap );
 		}
+	}
+
+	/**
+	 * When user run into this upgrade, which mean we already having the 3.0.0.2 upgrade
+	 */
+	public function update_3003( $settings ) {
+		//update missing shipping data
+		$legacy_settings = get_option( 'mp_settings_legacy' );
+		if ( ! mp_get_setting( 'shipping->method' ) ) {
+			//in here, no settings was imported by the old version, we will do that
+			mp_push_to_array( $settings, 'shipping', mp_arr_get_value( 'shipping', $legacy_settings ) );
+		}
+
+		//now the gateway setting
+		$old_gateways     = mp_arr_get_value( 'gateways->allowed', $legacy_settings );
+		$current_gateways = mp_get_setting( 'gateways->allowed' );
+		/**
+		 * if client upgrade from < 3.0, the allowed will not same format like 3.0,
+		 * so we have to check
+		 */
+		$allowed = array();
+		if ( count( array_diff( $old_gateways, $current_gateways ) ) == 0 ) {
+			//this is from below 3.0
+			$current_gateways = array_combine( array_values( $old_gateways ), array_values( $old_gateways ) );
+		}
+		foreach ( $old_gateways as $gateway ) {
+			$gateway_30 = str_replace( '-', '_', $gateway );
+			if ( ( isset( $current_gateways[ $gateway_30 ] ) || isset( $current_gateways[ $gateway ] ) ) && $current_gateways[ $gateway_30 ] != 1 ) {
+				//this mean the current gateway doesn't updated, but it having data from old
+				switch ( $gateway_30 ) {
+					case 'paypal_express':
+						$old_data                = mp_arr_get_value( 'gateways->paypal-express', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->paypal_express', $settings );
+						$creds                   = array(
+							'username'  => mp_arr_get_value( 'api_user', $old_data ),
+							'password'  => mp_arr_get_value( 'api_pass', $old_data ),
+							'signature' => mp_arr_get_value( 'api_sig', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['api_user'] );
+						unset( $old_data['api_pass'] );
+						unset( $old_data['api_sig'] );
+						unset( $old_data['merchant_email'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->paypal_express', $data );
+						$allowed['paypal_express'] = 1;
+						unset( $settings['gateways']['paypal-express'] );
+						break;
+					case 'stripe':
+						$old_data                = mp_arr_get_value( 'gateways->stripe', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->stripe', $settings );
+						$creds                   = array(
+							'secret_key'      => mp_arr_get_value( 'private_key', $old_data ),
+							'publishable_key' => mp_arr_get_value( 'publishable_key', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['private_key'] );
+						unset( $old_data['publishable_key'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->stripe', $data );
+						$allowed['stripe'] = 1;
+						break;
+					case 'authorizenet_aim':
+						$old_data                = mp_arr_get_value( 'gateways->authorizenet-aim', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->authorizenet_aim', $settings );
+						$creds                   = array(
+							'api_user' => mp_arr_get_value( 'api_user', $old_data ),
+							'api_key'  => mp_arr_get_value( 'api_key', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['api_key'] );
+						unset( $old_data['api_user'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->authorizenet_aim', $data );
+						$allowed['authorizenet_aim'] = 1;
+						break;
+					case 'payflow':
+						$old_data                = mp_arr_get_value( 'gateways->payflow', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->payflow', $settings );
+						$creds                   = array(
+							'user'     => mp_arr_get_value( 'api_user', $old_data ),
+							'vendor'   => mp_arr_get_value( 'api_vendor', $old_data ),
+							'partner'  => mp_arr_get_value( 'api_partner', $old_data ),
+							'password' => mp_arr_get_value( 'api_pwd', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['api_user'] );
+						unset( $old_data['api_vendor'] );
+						unset( $old_data['api_partner'] );
+						unset( $old_data['api_pwd'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->payflow', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->payflow', 1 );
+						break;
+					case 'manual_payments':
+						$old_data = mp_arr_get_value( 'gateways->manual-payments', $legacy_settings );
+						$data     = mp_arr_get_value( 'gateways->manual_payments', $settings );
+						$data     = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->manual_payments', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->manual_payments', 1 );
+						break;
+					case '2checkout':
+						$old_data                = mp_arr_get_value( 'gateways->2checkout', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->2checkout', $settings );
+						$creds                   = array(
+							'sid'         => mp_arr_get_value( 'sid', $old_data ),
+							'secret_word' => mp_arr_get_value( 'secret_word', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['sid'] );
+						unset( $old_data['secret_word'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->2checkout', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->2checkout', 1 );
+						break;
+					case 'eway':
+						$old_data                = mp_arr_get_value( 'gateways->eway', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->eway', $settings );
+						$creds                   = array(
+							'UserName'   => mp_arr_get_value( 'UserName', $old_data ),
+							'CustomerID' => mp_arr_get_value( 'CustomerID', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['UserName'] );
+						unset( $old_data['CustomerID'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->eway', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->eway', 1 );
+						break;
+					case 'eway31':
+						$old_data                = mp_arr_get_value( 'gateways->eway30', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->eway31', $settings );
+						$creds                   = array(
+							'live'    => array(
+								'api_key'      => mp_arr_get_value( 'UserAPIKeyLive', $old_data ),
+								'api_password' => mp_arr_get_value( 'UserPasswordLive', $old_data )
+							),
+							'sandbox' => array(
+								'api_key'      => mp_arr_get_value( 'UserAPIKeySandbox', $old_data ),
+								'api_password' => mp_arr_get_value( 'UserPasswordSandbox', $old_data )
+							)
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['UserAPIKeyLive'] );
+						unset( $old_data['UserPasswordLive'] );
+						unset( $old_data['UserAPIKeySandbox'] );
+						unset( $old_data['UserPasswordSandbox'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->eway31', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->eway31', 1 );
+						break;
+					case 'paymill':
+						$old_data                = mp_arr_get_value( 'gateways->paymill', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->paymill', $settings );
+						$creds                   = array(
+							'private_key' => mp_arr_get_value( 'private_key', $old_data ),
+							'public_key'  => mp_arr_get_value( 'public_key', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['private_key'] );
+						unset( $old_data['public_key'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->paymill', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->paymill', 1 );
+						break;
+					case 'pin':
+						$old_data                = mp_arr_get_value( 'gateways->pin', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->pin', $settings );
+						$creds                   = array(
+							'private_key' => mp_arr_get_value( 'private_key', $old_data ),
+							'public_key'  => mp_arr_get_value( 'public_key', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['private_key'] );
+						unset( $old_data['public_key'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->pin', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->pin', 1 );
+						break;
+					case 'simplify':
+						$old_data                = mp_arr_get_value( 'gateways->simplify', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->simplify', $settings );
+						$creds                   = array(
+							'private_key' => mp_arr_get_value( 'private_key', $old_data ),
+							'public_key'  => mp_arr_get_value( 'public_key', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['private_key'] );
+						unset( $old_data['public_key'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->simplify', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->simplify', 1 );
+						break;
+					case 'wepay':
+						$old_data                = mp_arr_get_value( 'gateways->wepay', $legacy_settings );
+						$data                    = mp_arr_get_value( 'gateways->wepay', $settings );
+						$creds                   = array(
+							'client_id'     => mp_arr_get_value( 'client_id', $old_data ),
+							'client_secret' => mp_arr_get_value( 'client_secret', $old_data ),
+							'access_token'  => mp_arr_get_value( 'access_token', $old_data ),
+							'account_id'    => mp_arr_get_value( 'account_id', $old_data )
+						);
+						$data['api_credentials'] = $creds;
+						unset( $old_data['client_id'] );
+						unset( $old_data['client_secret'] );
+						unset( $old_data['access_token'] );
+						unset( $old_data['account_id'] );
+						$data = array_merge( $data, $old_data );
+						mp_push_to_array( $settings, 'gateways->wepay', $data );
+						mp_push_to_array( $settings, 'gateways->allowed->wepay', 1 );
+						break;
+				}
+			}
+		}
+
+		return $settings;
 	}
 
 	/**
