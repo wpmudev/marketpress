@@ -818,9 +818,29 @@ class MP_Installer {
 	public function update_3003( $settings ) {
 		//update missing shipping data
 		$legacy_settings = get_option( 'mp_settings_legacy' );
-		if ( ! mp_get_setting( 'shipping->method' ) ) {
+		if ( ! mp_arr_get_value( 'shipping->method', $settings ) ) {
 			//in here, no settings was imported by the old version, we will do that
-			mp_push_to_array( $settings, 'shipping', mp_arr_get_value( 'shipping', $legacy_settings ) );
+			$data      = mp_arr_get_value( 'shipping', $legacy_settings );
+			$method    = mp_arr_get_value( 'method', $data );
+			$method_30 = str_replace( '-', '_', $method );
+			mp_push_to_array( $settings, 'shipping->method', $method_30 );
+			//now we have to import the data of each case
+			$methods = array(
+				'flat-rate',
+				'table-rate',
+				'weight-rate',
+				'fedex',
+				'pickup',
+				'usps',
+			);
+			foreach ( $methods as $use ) {
+				if ( isset( $data[ $use ] ) ) {
+					//this mean the old data uses this
+					//convert to 3.0 key
+					$use_30 = str_replace( '-', '_', $use );
+					mp_push_to_array( $settings, 'shipping->' . $use_30, $data[ $use ] );
+				}
+			}
 		}
 
 		//now the gateway setting
