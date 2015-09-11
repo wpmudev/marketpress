@@ -988,6 +988,17 @@ You can manage this order here: %s', 'mp' );
 			//$item->update_meta( 'mp_sales_count', $count );
 			update_post_meta( $item->ID, 'mp_sales_count', $count );
 
+			// If variation update parent product sales count
+			if( $item->post_parent && $item->post_parent > 0 ) {
+				$parent_id = $item->post_parent;
+				
+				$sales_count = get_post_meta($parent_id, 'mp_sales_count', true);
+				
+				$sales_count += $item->qty;
+				
+				update_post_meta( $parent_id, 'mp_sales_count', $sales_count );
+			}
+			
 			if ( has_filter( 'mp_product_sale' ) ) {
 				trigger_error( 'The <strong>mp_product_sale</strong> hook has been replaced by <strong>mp_order/product_sale</strong> as of MP 3.0.', E_USER_ERROR );
 			}

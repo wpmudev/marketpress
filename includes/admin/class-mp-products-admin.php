@@ -452,14 +452,7 @@ class MP_Products_Screen {
 				break;
 
 			case 'product_sales' :
-				if ( $product->has_variations() ) {
-					$sales = 0;
-					foreach ( $variations as $variation ) {
-						$sales = $sales + $variation->get_meta( 'mp_sales_count', 0 );
-					}
-				} else {
-					$sales = $product->get_meta( 'mp_sales_count', 0 );
-				}
+				$sales = $product->get_meta( 'mp_sales_count', 0 );
 
 				echo $sales;
 				break;
