@@ -607,9 +607,11 @@ class MP_Installer {
 	 * @access public
 	 */
 	public function run() {
-		$old_version = get_option( 'mp_version' );
+		$old_version   = get_option( 'mp_version' );
+		$force_upgrade = mp_get_get_value( 'force_upgrade', 0 );
+		$force_version = mp_get_get_value( 'force_version', false );
 
-		if ( $old_version == MP_VERSION ) {
+		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
 			return;
 		}
 
@@ -622,17 +624,17 @@ class MP_Installer {
 		// Only run the follow scripts if this not a fresh install
 		if ( ! empty( $old_version ) ) {
 			//2.1.4 update
-			if ( version_compare( $old_version, '2.1.4', '<' ) ) {
+			if ( version_compare( $old_version, '2.1.4', '<' ) || ( $force_version !== false && version_compare( $force_version, '2.1.4', '<' ) ) ) {
 				$this->update_214();
 			}
 
 			//2.9.2.3 update
-			if ( version_compare( $old_version, '2.9.2.3', '<' ) ) {
+			if ( version_compare( $old_version, '2.9.2.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '2.9.2.3', '<' ) ) ) {
 				$this->update_2923();
 			}
 
 			//3.0 update
-			if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
+			if ( version_compare( $old_version, '3.0.0.2', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.2', '<' ) ) ) {
 				$settings = $this->update_3000( $settings );
 			}
 		}
@@ -642,7 +644,7 @@ class MP_Installer {
 		if ( ! empty( $old_version ) ) {
 			$settings = get_option( 'mp_settings' );
 			//3.0.0.3 need data from 3.0
-			if ( version_compare( $old_version, '3.0.0.3', '<' ) && version_compare( $old_version, '3.0', ">=" ) ) {
+			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) && version_compare( $old_version, '3.0', ">=" ) ) {
 				$settings = $this->update_3003( $settings );
 				update_option( 'mp_settings', $settings );
 			}
@@ -854,9 +856,15 @@ class MP_Installer {
 		if ( count( array_diff( $old_gateways, $current_gateways ) ) == 0 ) {
 			//this is from below 3.0
 			$current_gateways = array_combine( array_values( $old_gateways ), array_values( $old_gateways ) );
+			foreach ( $current_gateways as $key => $val ) {
+				$new_key                      = str_replace( '-', '_', $key );
+				$current_gateways[ $new_key ] = 0;
+				unset( $current_gateways[ $key ] );
+			}
 		}
 		foreach ( $old_gateways as $gateway ) {
 			$gateway_30 = str_replace( '-', '_', $gateway );
+
 			if ( ( isset( $current_gateways[ $gateway_30 ] ) || isset( $current_gateways[ $gateway ] ) ) && $current_gateways[ $gateway_30 ] != 1 ) {
 				//this mean the current gateway doesn't updated, but it having data from old
 				switch ( $gateway_30 ) {
@@ -875,8 +883,8 @@ class MP_Installer {
 						unset( $old_data['merchant_email'] );
 						$data = array_merge( $data, $old_data );
 						mp_push_to_array( $settings, 'gateways->paypal_express', $data );
-						$allowed['paypal_express'] = 1;
 						unset( $settings['gateways']['paypal-express'] );
+						mp_push_to_array( $settings, 'gateways->allowed->paypal_express', 1 );
 						break;
 					case 'stripe':
 						$old_data                = mp_arr_get_value( 'gateways->stripe', $legacy_settings );
@@ -890,7 +898,7 @@ class MP_Installer {
 						unset( $old_data['publishable_key'] );
 						$data = array_merge( $data, $old_data );
 						mp_push_to_array( $settings, 'gateways->stripe', $data );
-						$allowed['stripe'] = 1;
+						mp_push_to_array( $settings, 'gateways->allowed->stripe', 1 );
 						break;
 					case 'authorizenet_aim':
 						$old_data                = mp_arr_get_value( 'gateways->authorizenet-aim', $legacy_settings );
@@ -904,7 +912,7 @@ class MP_Installer {
 						unset( $old_data['api_user'] );
 						$data = array_merge( $data, $old_data );
 						mp_push_to_array( $settings, 'gateways->authorizenet_aim', $data );
-						$allowed['authorizenet_aim'] = 1;
+						mp_push_to_array( $settings, 'gateways->allowed->authorizenet_aim', 1 );
 						break;
 					case 'payflow':
 						$old_data                = mp_arr_get_value( 'gateways->payflow', $legacy_settings );
