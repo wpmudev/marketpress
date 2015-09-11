@@ -868,13 +868,8 @@ class MP_Installer {
 							break;
 					}
 
-					var_dump( $settings );
-					die;
 				}
 			}
-			echo '<pre>';
-			var_export( $settings );
-			die;
 		}
 
 		//now the gateway setting
