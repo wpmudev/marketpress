@@ -336,12 +336,11 @@ class MP_Installer {
 		}
 
 		$old_version = get_option( 'mp_previous_version' );
-		if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
+		if ( version_compare( $old_version, '3.0.0.3', '<' ) ) {
 			$update_fix_needed = true;
 		} else {
 			$update_fix_needed = false;
 		}
-
 		ini_set( 'max_execution_time', 0 );
 		set_time_limit( 0 );
 
