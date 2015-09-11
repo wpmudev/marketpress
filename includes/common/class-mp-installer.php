@@ -820,7 +820,7 @@ class MP_Installer {
 	public function update_3003( $settings ) {
 		//update missing shipping data
 		$legacy_settings = get_option( 'mp_settings_legacy' );
-		if ( ! mp_arr_get_value( 'shipping->method', $settings ) ) {
+		if ( ! mp_arr_get_value( 'shipping->method', $settings ) || mp_get_get_value( 'force_upgrade_shipping', 0 ) == 1 ) {
 			//in here, no settings was imported by the old version, we will do that
 			$data      = mp_arr_get_value( 'shipping', $legacy_settings );
 			$method    = mp_arr_get_value( 'method', $data );
@@ -840,9 +840,41 @@ class MP_Installer {
 					//this mean the old data uses this
 					//convert to 3.0 key
 					$use_30 = str_replace( '-', '_', $use );
-					mp_push_to_array( $settings, 'shipping->' . $use_30, $data[ $use ] );
+					switch ( $use_30 ) {
+						case 'table_rate':
+							$rates = array();
+							foreach ( mp_arr_get_value( 'table-rate', $data ) as $key => $val ) {
+								if ( ! is_numeric( $key ) ) {
+									continue;
+								}
+								//key is numberic mean data rate
+								$rates[] = $val;
+							}
+							mp_push_to_array( $settings, 'shipping->table_rate->rates', $rates );
+							break;
+						case 'weight_rate':
+							$rates = array();
+							foreach ( mp_arr_get_value( 'weight-rate', $data ) as $key => $val ) {
+								if ( ! is_numeric( $key ) ) {
+									continue;
+								}
+								//key is numberic mean data rate
+								$rates[] = $val;
+							}
+							mp_push_to_array( $settings, 'shipping->weight_rate->rates', $rates );
+							break;
+						default:
+							mp_push_to_array( $settings, 'shipping->' . $use_30, $data[ $use ] );
+							break;
+					}
+
+					var_dump( $settings );
+					die;
 				}
 			}
+			echo '<pre>';
+			var_export( $settings );
+			die;
 		}
 
 		//now the gateway setting
@@ -852,7 +884,6 @@ class MP_Installer {
 		 * if client upgrade from < 3.0, the allowed will not same format like 3.0,
 		 * so we have to check
 		 */
-		$allowed = array();
 		if ( count( array_diff( $old_gateways, $current_gateways ) ) == 0 ) {
 			//this is from below 3.0
 			$current_gateways = array_combine( array_values( $old_gateways ), array_values( $old_gateways ) );
