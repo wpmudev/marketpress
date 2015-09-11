@@ -548,9 +548,6 @@ class WPMUDEV_Metabox {
 	 * @action save_post
 	 */
 	public function maybe_save_fields( $post_id ) {
-		if ( $this->args['id'] == 'mp-product-price-inventory-variants-metabox' ) {
-
-		}
 		if ( ! $this->is_active() ) {
 
 			return;
