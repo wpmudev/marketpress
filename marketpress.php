@@ -720,6 +720,7 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
+		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
 
 		if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
