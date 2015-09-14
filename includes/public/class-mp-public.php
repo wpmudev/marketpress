@@ -325,6 +325,8 @@ class MP_Public {
 		if ( is_singular( MP_Product::get_post_type() ) ) {
 			wp_enqueue_script( 'lightslider', mp_plugin_url( 'ui/lightslider/js/lightslider.js' ), array( 'jquery' ), MP_VERSION );
 			wp_enqueue_style( 'lightslider', mp_plugin_url( 'ui/lightslider/css/lightslider.css' ), array(), MP_VERSION );
+			wp_enqueue_script( 'lightgallery', mp_plugin_url( 'ui/lightgallery/js/lightgallery.js' ), array( 'jquery' ), MP_VERSION );
+			wp_enqueue_style( 'lightgallery', mp_plugin_url( 'ui/lightgallery/css/lightgallery.css' ), array(), MP_VERSION );
 		}
 
 		if ( ! $this->is_store_page() ) {

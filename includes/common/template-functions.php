@@ -2233,6 +2233,19 @@ if ( ! function_exists( 'mp_product' ) ) {
 		} else {
 			$size = mp_get_setting( 'product_img_size' );
 		}
+		
+		$lightbox_code = '';
+		$show_lightbox = mp_get_setting( 'show_lightbox' );
+				
+		if($show_lightbox == 1) {
+			$lightbox_code = "onSliderLoad: function(el) {
+											el.lightGallery({
+												selector: '#mp-product-gallery .lslide',
+												thumbnail: true,
+												zoom: true,
+											});
+										}";
+		}
 
 		if ( $image ) {
 			if ( ! $product->has_variations() ) {
@@ -2243,18 +2256,14 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$return .= "<script>
 								jQuery(document).ready(function() {
 									jQuery('#mp-product-gallery').lightSlider({
-												gallery:true,
-												item:1,
-												loop:true,
-												thumbItem:5,
-												slideMargin:0,
-												enableDrag: true,
-												currentPagerPosition:'left',
-												onSliderLoad: function(el) {
-												el.lightGallery({
-												selector: '#mp-product-gallery .lslide'
-											});
-										}
+										gallery:true,
+										item:1,
+										loop:true,
+										thumbItem:5,
+										slideMargin:0,
+										enableDrag: true,
+										currentPagerPosition:'left',
+										".$lightbox_code."
 									});
 								});
 								</script>";
@@ -2273,7 +2282,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							$img_url        = mp_resize_image( $original_image[0], $size );
 						}
 
-						$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $img_url[0] . '"><img src="' . $img_url[0] . '"></li>';
+						$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
 					}
 
 					$return .= '</ul><!-- end mp_product_gallery -->';

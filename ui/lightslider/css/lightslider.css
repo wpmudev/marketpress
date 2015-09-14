@@ -153,7 +153,7 @@
     background-image: url('../img/controls.png');
     cursor: pointer;
     position: absolute;
-    z-index: 9999;
+    z-index: 1040;
     margin-top: -16px;
     opacity: 0.5;
     -webkit-transition: opacity 0.35s linear 0s;
