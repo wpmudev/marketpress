@@ -287,7 +287,7 @@ class WPMUDEV_Metabox {
 		$this->args = apply_filters( 'wpmudev_metabox/init_args', $this->args );
 
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace( '-', '_', $this->args['id'] ) . '_save_fields';
-		$this->nonce_name   = $this->nonce_action . '_nonce';
+		$this->nonce_name   = md5($this->nonce_action . '_nonce');
 
 		// These only need to be run once
 		if ( ! self::$did_run_once ) {

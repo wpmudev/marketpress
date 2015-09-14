@@ -336,7 +336,7 @@ class MP_Installer {
 		}
 
 		$old_version = get_option( 'mp_previous_version' );
-		if ( version_compare( $old_version, '3.0.0.3', '<=' ) ) {
+		if ( version_compare( $old_version, '3.0.0.3', '<=' ) || mp_get_post_value( 'force_upgrade', 0 ) ) {
 			$update_fix_needed = true;
 		} else {
 			$update_fix_needed = false;
@@ -558,6 +558,8 @@ class MP_Installer {
 					<?php wp_nonce_field( 'mp_update_product_postmeta' ); ?>
 					<input type="hidden" name="action" value="mp_update_product_postmeta"/>
 					<input type="hidden" name="page" value="1"/>
+					<input type="hidden" name="force_upgrade"
+					       value="<?php echo mp_get_get_value( 'force_upgrade', 0 ) ?>"/>
 
 					<p class="mp-important">
 						<strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong>
