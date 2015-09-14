@@ -175,7 +175,7 @@ class MP_Installer {
 			wp_defer_term_counting( true );
 			wp_defer_comment_counting( true );
 
-			$wpdb->query( 'SET autocomit = 0;' );
+			$wpdb->query( 'SET autocommit=0;' );
 
 			foreach ( $combinations as $combination ) {
 
@@ -645,7 +645,7 @@ class MP_Installer {
 		if ( ! empty( $old_version ) ) {
 			$settings = get_option( 'mp_settings' );
 			//3.0.0.3 need data from 3.0
-			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) && version_compare( $old_version, '3.0', ">=" ) ) {
+			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
 				$settings = $this->update_3003( $settings );
 				update_option( 'mp_settings', $settings );
 			}
@@ -821,7 +821,28 @@ class MP_Installer {
 	public function update_3003( $settings ) {
 		//update missing shipping data
 		$legacy_settings = get_option( 'mp_settings_legacy' );
-		if ( ! mp_arr_get_value( 'shipping->method', $settings ) || mp_get_get_value( 'force_upgrade_shipping', 0 ) == 1 ) {
+
+		$can_update_shipping = false;
+		if ( mp_get_get_value( 'force_upgrade_shipping', 0 ) == 1 ) {
+			$can_update_shipping = true;
+		} elseif ( ! mp_arr_get_value( 'shipping->method', $settings ) ) {
+			$can_update_shipping = true;
+		} else {
+			$method = mp_arr_get_value( 'shipping->method', $settings );
+			if ( in_array( $method, array(
+				'flat-rate',
+				'table-rate',
+				'weight-rate',
+			) ) ) {
+				$data = mp_arr_get_value( "shipping->$method", $settings );
+				if ( ! isset( $data['rates'] ) ) {
+					$can_update_shipping = true;
+				}
+			}
+
+		}
+
+		if ( $can_update_shipping ) {
 			//in here, no settings was imported by the old version, we will do that
 			$data      = mp_arr_get_value( 'shipping', $legacy_settings );
 			$method    = mp_arr_get_value( 'method', $data );
@@ -864,6 +885,18 @@ class MP_Installer {
 							}
 							mp_push_to_array( $settings, 'shipping->weight_rate->rates', $rates );
 							break;
+						case 'flat_rate':
+							$rates = array();
+							foreach ( mp_arr_get_value( 'flat-rate', $data ) as $key => $val ) {
+								if ( ! is_numeric( $key ) ) {
+									continue;
+								}
+								//key is numberic mean data rate
+								$rates[] = $val;
+							}
+							mp_push_to_array( $settings, 'shipping->flat_rate->rates', $rates );
+							break;
+							break;
 						default:
 							mp_push_to_array( $settings, 'shipping->' . $use_30, $data[ $use ] );
 							break;
@@ -872,7 +905,6 @@ class MP_Installer {
 				}
 			}
 		}
-
 		//now the gateway setting
 		$old_gateways     = mp_arr_get_value( 'gateways->allowed', $legacy_settings );
 		$current_gateways = mp_get_setting( 'gateways->allowed' );
