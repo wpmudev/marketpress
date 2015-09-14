@@ -442,6 +442,8 @@ class MP_Public {
 					add_filter( 'the_title', array( &$this, 'hide_single_product_title' ) );
 					add_filter( 'the_content', array( &$this, 'single_product_content' ) );
 				}
+			} else {
+				$template = $custom_template;
 			}
 		}
 
