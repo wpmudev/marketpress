@@ -384,12 +384,28 @@ class Marketpress {
 		add_filter( 'post_thumbnail_html', array( &$this, 'post_thumbnail_html5' ), 10, 5 );
 
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
+		
+		add_action( 'plugins_loaded', array( &$this, 'localization' ), 9 );
 
 		$this->load_widgets();
 	}
 
 	function add_menu_items() {
 		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
+	}
+	
+	function localization() {
+		// Load up the localization file if we're using WordPress in a different language
+		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
+		
+		$mu_plugins	 = wp_get_mu_plugins();
+		$lang_dir	 = dirname( plugin_basename( $this->_plugin_file ) ) . '/languages/';
+		
+		if ( in_array( $this->_plugin_file, $mu_plugins ) ) {
+			load_muplugin_textdomain( 'mp', $lang_dir );
+		} else {
+			load_plugin_textdomain( 'mp', false, $lang_dir );
+		}
 	}
 
 	function load_widgets() {
