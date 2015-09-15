@@ -93,7 +93,32 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 		// Init args
 		$func_args	 = func_get_args();
 		$args		 = mp_parse_args( $func_args, mp()->defaults[ 'list_products' ] );
-		//$args[ 'nopaging' ]	 = false;
+
+//Check for arguments when filtering 		
+		if( !isset( $args[ 'nopaging' ] ) )
+			$args[ 'nopaging' ] = false;
+		
+		if( !isset( $args[ 'version' ] ) )
+			$args[ 'version' ] = '';
+		
+		if( isset( $args[ 'widget_id' ] ) && !empty( $args[ 'widget_id' ] ) ) {
+			$args[ 'widget_id' ] = str_replace( 'mp_global_product_list_widget-', '', $args[ 'widget_id' ] );
+			
+			if( !isset( $args[ 'context' ] ) && $args[ 'widget_id' ] != '-1' ) {
+				$widget_settings = get_option( 'widget_mp_global_product_list_widget' );
+				
+				if( isset( $widget_settings[ $args[ 'widget_id' ] ] ) ) {
+					$args[ 'as_list' ]	 = true;
+					$args[ 'context' ]	 = 'widget';
+					$args[ 'nopaging' ]	 = true;
+					$args[ 'version' ]	 = '3';
+					$widget_settings[ $args[ 'widget_id' ] ][ 'order' ] = $args[ 'order' ];
+					$widget_settings[ $args[ 'widget_id' ] ][ 'order_by' ] = $args[ 'order_by' ];
+					$args = array_merge( $args, $widget_settings[ $args[ 'widget_id' ] ]);
+				}
+			}
+		}
+		
 // Init query params
 		$query		 = array(
 			'post_type'		 => 'mp_ms_indexer',
@@ -139,13 +164,18 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 				$query[ 'orderby' ] = mp_get_setting( 'order_by' );
 			}
 		}
+		
+		if( !is_null( $args[ 'category' ] ) ) {
+			$query[ 'taxonomy' ] = 'mp_product_category';
+			$query[ 'term' ] = $args[ 'category' ];
+		}
 
 // Get order direction
 		$query[ 'order' ] = mp_get_setting( 'order' );
 		if ( !is_null( $args[ 'order' ] ) ) {
 			$query[ 'order' ] = $args[ 'order' ];
 		}
-
+		
 		// The Query
 		$custom_query = new WP_Query( $query );
 
@@ -163,7 +193,7 @@ if ( !function_exists( 'mp_global_list_products' ) ) {
 
 		if ( !mp_doing_ajax() ) {
 			$per_page = ( is_null( $args[ 'per_page' ] ) ) ? null : $args[ 'per_page' ];
-			$content .= ( ( is_null( $args[ 'filters' ] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args[ 'filters' ] ) ? mp_global_products_filter( false, $per_page, $custom_query ) : mp_global_products_filter( true, $per_page, $custom_query );
+			$content .= ( ( is_null( $args[ 'filters' ] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args[ 'filters' ] ) ? mp_global_products_filter( false, $per_page, $custom_query, $args ) : mp_global_products_filter( true, $per_page, $custom_query, $args );
 		}
 
 		$content .= '<div id="mp_product_list" class="mp-multiple-products clearfix hfeed mp_' . $layout_type . '">';
@@ -209,10 +239,11 @@ if ( !function_exists( 'mp_global_products_filter' ) ) :
 	 * @param bool $hidden Are the filters hidden or visible?
 	 * @param int $per_page The number of posts per page
 	 * @param WP_Query $query
+	 * @param array $args
 	 *
 	 * @return string
 	 */
-	function mp_global_products_filter( $hidden = false, $per_page = null, $query = null ) {
+	function mp_global_products_filter( $hidden = false, $per_page = null, $query = null, $args = array() ) {
 		$current_order	 = strtolower( $query->get( 'order_by' ) . '-' . $query->get( 'order' ) );
 		$options		 = array(
 			array( '0', '', __( 'Default', 'mp' ) ),
@@ -230,6 +261,10 @@ if ( !function_exists( 'mp_global_products_filter' ) ) :
 			$value = $t[ 0 ] . '- ' . $t [ 1 ];
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[ 2 ] . '</option>';
 		}
+		
+		if( !isset( $args[ 'widget_id' ] ) ) {
+			$args[ 'widget_id' ] = '-1';
+		}
 
 		$return = '
 <a name="mp-product-list-top"></a>
@@ -243,6 +278,7 @@ if ( !function_exists( 'mp_global_products_filter' ) ) :
 		</div>' .
 		( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
 		<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
+		<input type="hidden" name="widget_id" value="' . $args[ 'widget_id' ] . '">
 	</form>
 </div>';
 
