@@ -73,11 +73,13 @@ class MP_Multisite {
 
 	public function filter_products() {
 		$page = mp_get_post_value( 'page', 1 );
+		$widget_id = mp_get_post_value( 'widget_id', -1 );
 		list( $order_by, $order ) = explode( '-', mp_get_post_value( 'order' ) );
 		echo mp_global_list_products( array(
-			'page'     => $page,
-			'order_by' => trim( $order_by ),
-			'order'    => trim( $order ),
+			'page'      => $page,
+			'order_by'  => trim( $order_by ),
+			'order'     => trim( $order ),
+			'widget_id' => $widget_id,
 		) );
 		die;
 	}

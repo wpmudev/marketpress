@@ -33,6 +33,7 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 			$instance[ 'context' ]	 = 'widget';
 			$instance[ 'nopaging' ]	 = true;
 			$instance[ 'version' ]	 = '3';
+			$instance[ 'widget_id' ] = $args[ 'widget_id' ];
 
 
 			//list global products
