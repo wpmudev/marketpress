@@ -73,7 +73,7 @@ class MP_Order {
 	 * @since 3.0
 	 * @access public
 	 * @uses $post
-	 * @param int/string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created. 
+	 * @param int/string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created.
 	 */
 	public function __construct( $order = null ) {
 		if ( !is_null( $order ) ) {
@@ -948,8 +948,18 @@ You can manage this order here: %s', 'mp' );
 
 		// Update user shipping billing info
 		if ( $user_id ) {
-			update_user_meta( $user_id, 'mp_billing_info', $billing_info );
-			update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+			if ( get_user_meta( $user_id, 'mp_billing_info' ) ) {
+				update_user_meta( $user_id, 'mp_billing_info', $billing_info );
+				update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+			} else {
+				/**
+				 * First time save, WordPress will trigger an error as when it query the old meta
+				 * the count('') == 1, so it trying to located the 0 index, which can cause order uncomplete
+				 * force to silent
+				 */
+				@update_user_meta( $user_id, 'mp_billing_info', $billing_info );
+				@update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+			}
 		}
 
 		$item_count = 0;
