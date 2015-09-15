@@ -27,19 +27,18 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 			if ( $title )
 				echo $before_title . $title . $after_title;
 
-			mp_global_tag_cloud( true, 45, ' ', $instance[ 'taxonomy' ] );
+			mp_global_taxonomy_list( 'product_tag', $instance, true );
 
 			echo $after_widget;
 		}
 
 		function update( $new_instance, $old_instance ) {
 			$instance[ 'title' ]	 = strip_tags( stripslashes( $new_instance[ 'title' ] ) );
-			$instance[ 'taxonomy' ]	 = stripslashes( $new_instance[ 'taxonomy' ] );
 			return $instance;
 		}
 
 		function form( $instance ) {
-			$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Global Product Tags', 'mp' ), 'taxonomy' => 'tags' ) );
+			$instance = wp_parse_args( (array) $instance, array( 'title' => __( 'Global Product Tags', 'mp' ), 'taxonomy' => 'product_tag' ) );
 			?>
 			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ) ?></label>
 				<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php
@@ -47,17 +46,11 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 					echo esc_attr( $instance[ 'title' ] );
 				}
 				?>" /></p>
-			<p><label for="<?php echo $this->get_field_id( 'taxonomy' ); ?>"><?php _e( 'Show:', 'mp' ) ?></label>
-				<select class="widefat" id="<?php echo $this->get_field_id( 'taxonomy' ); ?>" name="<?php echo $this->get_field_name( 'taxonomy' ); ?>">
-					<option value="tags" <?php selected( $instance[ 'taxonomy' ], 'tags' ) ?>><?php _e( 'Product Tags', 'mp' ); ?></option>
-					<option value="categories" <?php selected( $instance[ 'taxonomy' ], 'categories' ) ?>><?php _e( 'Product Categories', 'mp' ); ?></option>
-					<option value="both" <?php selected( $instance[ 'taxonomy' ], 'both' ) ?>><?php _e( 'Both', 'mp' ); ?></option>
-				</select></p>
 			<?php
 		}
 
 	}
 
-	//add_action( 'widgets_init', create_function( '', 'return register_widget("MarketPress_Global_Tag_Cloud_Widget");' ) );
+	add_action( 'widgets_init', create_function( '', 'return register_widget("MarketPress_Global_Tag_Cloud_Widget");' ) );
 }
 ?>
