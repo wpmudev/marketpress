@@ -878,7 +878,7 @@ class MP_Product {
 			$button .= '</form><!-- end mp-buy-product-form -->';
 		}
 
-		$button = apply_filters( 'mp_buy_button_tag', $button, $this->ID, $context );
+		$button = apply_filters( 'mp_buy_button_tag', $button, $this->ID, $context, $selected_atts , $no_single );
 
 		if ( $echo ) {
 			echo $button;
