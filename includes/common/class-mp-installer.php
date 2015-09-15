@@ -430,16 +430,16 @@ class MP_Installer {
 					$this->post_meta_transition( $post_id, 'mp_file', 'file_url' ); //If not empty then mark it as digital product
 					$this->post_meta_transition( $post_id, 'mp_product_link', 'external_url' ); //If not empty then mark it as external product
 				}
-				
+
 				//Update sales count
 				$this->update_sales_count( $post_id );
-				
+
 			} else {//update for 3.0 and 3.0.0.1
 				$post_thumbnail = get_post_thumbnail_id( $post_id );
 				if ( is_numeric( $post_thumbnail ) ) {
 					update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
 				}
-				
+
 				//Update sales count
 				$this->update_sales_count( $post_id );
 			}
@@ -498,21 +498,21 @@ class MP_Installer {
 			) );
 		}
 	}
-	
+
 	/**
 	 * Update sales count if undefined
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function update_sales_count($post_id) {
+	public function update_sales_count( $post_id ) {
 		$sales_count = get_post_meta( $post_id, 'mp_sales_count', true );
-		
-		if($sales_count == "") {
+
+		if ( $sales_count == "" ) {
 			update_post_meta( $post_id, 'mp_sales_count', 0 );
 		}
 	}
-	
+
 	/**
 	 * Add term_order column to $wpdb->terms table
 	 *
@@ -702,10 +702,13 @@ class MP_Installer {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		$charset_collate = $wpdb->get_charset_collate();
-//todo check does this created
+
 		// Create mp_product_attributes table
 		$table_name = $wpdb->prefix . 'mp_product_attributes';
-		$sql        = "CREATE TABLE $table_name (
+		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name ) {
+			return;
+		}
+		$sql = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
