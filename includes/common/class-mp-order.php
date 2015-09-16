@@ -282,13 +282,11 @@ class MP_Order {
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg	 = __( 'A new order (ORDERID) was created in your store:<br /><br />
-
-ORDERINFOSKU<br /><br />
-SHIPPINGINFO<br /><br />
-PAYMENTINFO<br /><br />
-
-You can manage this order here: %s', 'mp' );
+		$msg	.= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp');
+		$msg	.= __( 'ORDERINFOSKU<br /><br />', 'mp' );
+		$msg	.= __( 'SHIPPINGINFO<br /><br />', 'mp' );
+		$msg	.= __( 'PAYMENTINFO<br /><br />', 'mp' );
+		$msg	.= __( 'You can manage this order here: %s', 'mp' );
 
 		$subject = mp_filter_email( $this, $subject );
 
