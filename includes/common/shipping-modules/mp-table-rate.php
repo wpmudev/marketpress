@@ -64,8 +64,8 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
    * @return int
    */
   public function sort_rates( $a, $b ) {
-	  $mincost1 = (float) $a['mincost'];
-	  $mincost2 = (float) $b['mincost'];
+	  $mincost1 = (float) mp_arr_get_value( 'mincost', $a, 0 );
+	  $mincost2 = (float) mp_arr_get_value( 'mincost', $b, 0 );
 
 	  if ( $mincost1 == $mincost2 ) {
 		  return 0;

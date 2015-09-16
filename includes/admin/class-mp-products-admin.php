@@ -850,7 +850,7 @@ class MP_Products_Screen {
 			'status_message' => __( 'Changes saved successfully', 'mp' )
 		);
 
-		do_action( 'mp_edit_variation_post_data', $post_id, $POST );
+		do_action( 'mp_edit_variation_post_data', $post_id, $_POST );
 
 		echo json_encode( apply_filters( 'mp_edit_variation_post_data_response_array', $response_array ) );
 		exit;

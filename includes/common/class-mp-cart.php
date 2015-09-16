@@ -1120,7 +1120,7 @@ class MP_Cart {
 			'ajaxq',
 			'colorbox',
 			'jquery-validate'
-		), MP_VERSION, true );
+		), MP_VERSION, false );
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
@@ -1860,7 +1860,7 @@ class MP_Cart {
 						}
 					}
 
-					if ( $special_tax_amt = $item->special_tax_amt() ) {
+					if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
 						$special_total += $special_tax_amt * $item->qty;
 					} else {
 						$total += $item->before_tax_price() * $item->qty;
@@ -2046,7 +2046,7 @@ class MP_Cart {
 				$product = new MP_Product( $id );
 				if ( ! $product->is_variation() ) {
 					$data[ $id ][] = array(
-						'name'             => $product->title(false),
+						'name'             => $product->title( false ),
 						'url'              => get_permalink( $id ),
 						'price'            => $product->get_price( 'lowest' ),
 						'quantity'         => $product->qty,
@@ -2056,8 +2056,8 @@ class MP_Cart {
 				} else {
 					$product_id                 = $product->post_parent;
 					$data[ $product_id ][ $id ] = array(
-						'SKU'              => $product->get_meta('sku'),
-						'name'             => $product->title(false),
+						'SKU'              => $product->get_meta( 'sku' ),
+						'name'             => $product->title( false ),
 						'url'              => get_permalink( $id ),
 						'price'            => $product->get_price( 'lowest' ),
 						'quantity'         => $product->qty,
@@ -2071,6 +2071,7 @@ class MP_Cart {
 				switch_to_blog( $current_blog_id );
 			}
 		}
+
 		return $data;
 	}
 

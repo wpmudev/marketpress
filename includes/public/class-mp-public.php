@@ -330,7 +330,7 @@ class MP_Public {
 		}
 
 		if ( ! $this->is_store_page() ) {
-			//return;
+			return;
 		}
 
 // CSS
@@ -354,7 +354,7 @@ class MP_Public {
 			'colorbox',
 			'hover-intent',
 			'select2'
-		), MP_VERSION, true );
+		), MP_VERSION );
 
 // Get product category links
 		$terms = get_terms( 'product_category' );
