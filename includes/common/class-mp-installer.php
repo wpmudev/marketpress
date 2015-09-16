@@ -345,7 +345,11 @@ class MP_Installer {
 		set_time_limit( 0 );
 
 		$per_page = 20;
-		$query    = new WP_Query( array(
+		//get the total first
+		$total_count = wp_count_posts( MP_Product::get_post_type() );
+		$total_count = $total_count->publish + $total_count->draft + $total_count->private;
+
+		$query = new WP_Query( array(
 			'cache_results'          => false,
 			'update_post_term_cache' => false,
 			'post_type'              => 'product',
@@ -448,11 +452,11 @@ class MP_Installer {
 		}
 
 		$response = array(
-			'updated' => ceil( $updated / $query->found_posts ) * 100,
+			'updated' => round( $updated / $total_count, 2 ) * 100,
 			'is_done' => false,
 		);
 
-		if ( $updated >= $query->found_posts ) {
+		if ( $updated >= $total_count ) {
 			$response['is_done'] = true;
 		}
 
