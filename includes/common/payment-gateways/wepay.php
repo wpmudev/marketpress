@@ -202,6 +202,7 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
 		$card_token = mp_get_post_value( 'wepay_token' );
+
 		if ( ! $card_token ) {
 			mp_checkout()->add_error( __( 'The WePay Card Token was not generated correctly. Please go back and try again.', 'mp' ), 'order-review-payment' );
 			return false;
@@ -224,7 +225,7 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
 			$access_token = $this->access_token;
 
 			// Credit card id to charge
-			$credit_card_id = $_SESSION['payment_method_id'];
+			//$credit_card_id = $_SESSION['payment_method_id'];
 			
 			if ( 'staging' == $this->mode ) {
 				WePay::useStaging( $this->client_id, $this->client_secret );
@@ -240,10 +241,17 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
 				'amount' => $total,
 				'currency' => 'USD',
 				'short_description' => $order_id,
-				'type' => $this->checkout_type,
-				'payment_method_id' => $card_token,
-				'payment_method_type' => 'credit_card'
+				'type' => strtolower($this->checkout_type),
+				//'payment_method_id' => $card_token,
+				//'payment_method_type' => 'credit_card',
+				'payment_method'      => array(
+					'type'            => 'credit_card',
+					'credit_card'     => array(
+						'id'          => $card_token
+					)
+				)
 			) );
+
 
 			if ( isset( $response->state ) && $response->state == 'authorized' ) {
 				$credit_card_response = $wepay->request( '/credit_card', array(
