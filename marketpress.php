@@ -384,10 +384,10 @@ class Marketpress {
 		add_filter( 'post_thumbnail_html', array( &$this, 'post_thumbnail_html5' ), 10, 5 );
 
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
-		
-		add_action( 'plugins_loaded', array( &$this, 'localization' ), 9 );
 
 		$this->load_widgets();
+		
+		$this->localization();
 	}
 
 	function add_menu_items() {

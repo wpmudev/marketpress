@@ -270,7 +270,7 @@ var marketpress = { };
          */
         initProductTabs: function( ) {
 
-            $( '.mp_product_meta a.more-link' ).live( 'click', function( e ) {
+            $( 'body' ).on( 'click', '.mp_product_meta a.more-link', function( e ) {
                 e.preventDefault( );
                 $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
                 $( 'html, body' ).animate( {
