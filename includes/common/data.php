@@ -71,6 +71,7 @@ $this->default_settings = array(
 	),
 	'product_button_type'		 => 'addcart',
 	'show_quantity'				 => 1,
+	'show_single_excerpt'		 => 1,
 	'product_img_size'			 => 'medium',
 	'show_lightbox'				 => 1,
 	'disable_large_image'		 => 0,
