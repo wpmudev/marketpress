@@ -2324,6 +2324,10 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$return .= '</div><!-- end mp_product_excerpt -->';
 				}
 			}
+			
+			if(mp_get_setting( 'show_single_categories' ) == 1) {
+				$return .= mp_category_list( $product_id, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>' );
+			}
 
 			$return .= '</div><!-- end mp_product_meta-->';
 
@@ -2354,6 +2358,10 @@ if ( ! function_exists( 'mp_product' ) ) {
 		if ( $image ) {
 			$return .= '</div><!-- end mp_single_product_details-->';
 		}
+		
+		if(mp_get_setting( 'show_single_tags' ) == 1) {
+			$return .= mp_tag_list( $product_id, '<div class="mp_product_tags">' . __( 'Tagged in ', 'mp' ), ', ', '</div>' );
+		}
 
 		$return .= '<div class="mp_single_product_extra">';
 		$return .= $product->content_tab_labels( false );
@@ -2375,6 +2383,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 </div><!-- end mp_product_tab_content_text -->
 </div><!-- end mp-product-overview -->';
 		}
+		
 
 		// Remove overview tab as it's already been manually output above
 		array_shift( $product->content_tabs );
@@ -2417,6 +2426,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			}
 		}
 		$return .= '</div><!-- end mp_single_product_extra -->';
+		
 		$return .= '
 			
 </div><!-- end mp_product/mp_single_product -->	

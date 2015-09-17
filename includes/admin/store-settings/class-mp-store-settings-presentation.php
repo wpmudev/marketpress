@@ -643,6 +643,18 @@ class MP_Store_Settings_Presentation {
 			'default_value'	 => 1,
 		) );
 		$metabox->add_field( 'checkbox', array(
+			'name'			 => 'show_single_categories',
+			'label'			 => array( 'text' => __( 'Show Categories List?', 'mp' ) ),
+			'message'		 => __( 'Yes', 'mp' ),
+			'desc'		 	 => __( 'Show Categories List?', 'mp' ),
+		) );
+		$metabox->add_field( 'checkbox', array(
+			'name'			 => 'show_single_tags',
+			'label'			 => array( 'text' => __( 'Show Tags List?', 'mp' ) ),
+			'message'		 => __( 'Yes', 'mp' ),
+			'desc'		 	 => __( 'Show Tags List?', 'mp' ),
+		) );
+		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'show_img',
 			'label'		 => array( 'text' => __( 'Show Product Image?', 'mp' ) ),
 			'message'	 => __( 'Yes', 'mp' ),
