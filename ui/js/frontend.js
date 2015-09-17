@@ -1,555 +1,541 @@
-var mp_checkout;
-
 ( function( $ ) {
-    mp_checkout = {
-        /**
-         * Initialize event listeners
-         *
-         * @since 3.0
-         */
-        initListeners: function() {
-            this.initShippingAddressListeners();
-            this.initPaymentOptionListeners();
-            this.initUpdateStateFieldListeners();
-            this.initCardValidation();
-            this.initCheckoutSteps();
-            this.listenToLogin();
-            $( document ).on( 'mp_checkout/step_changed', this.lastStep );
-        },
-        /**
-         * Update state list/zipcode field when country changes
-         *
-         * @since 3.0
-         */
-        initUpdateStateFieldListeners: function() {
-            $( '[name="billing[country]"], [name="shipping[country]"]' ).on( 'change', function() {
-                var $this = $( this );
-                var url = mp_i18n.ajaxurl + '?action=mp_update_states_dropdown';
+    $.fn.equalHeights = function( ) {
+        var maxHeight = 0;
+        this.each( function( ) {
+            maxHeight = Math.max( $( this ).height( ), maxHeight );
+        } );
+        return this.each( function( ) {
+            $( this ).height( maxHeight );
+        } );
+    }
+}( jQuery ) );
+( function( $ ) {
+    /**
+     * Preload loading icon
+     *
+     * @since 3.0
+     */
+    $( '<img>' ).get( 0 ).src = mp_i18n.loadingImage;
+    /**
+     * Add or remove cart ajax loading icon
+     *
+     * @since 3.0
+     * @param string action Optional, either "show" or "hide". Defaults to "show".
+     */
+    $.fn.ajaxLoading = function( action ) {
+        if ( typeof ( action ) == 'undefined' ) {
+            var action = 'show';
+        }
 
-                if ( $this.attr( 'name' ).indexOf( 'billing' ) == 0 ) {
-                    var $state = $( '[name="billing[state]"]' );
-                    var $zip = $( '[name="billing[zip]"]' );
-                    var type = 'billing';
-                    var $row = $state.closest( '.mp_checkout_fields' );
-                } else {
-                    var $state = $( '[name="shipping[state]"]' );
-                    var $zip = $( '[name="shipping[zip]"]' )
-                    var type = 'shipping';
-                    var $row = $state.closest( '.mp_checkout_fields' );
-                }
-
-                var data = {
-                    country: $this.val(),
-                    type: type
-                }
-
-                $row.ajaxLoading( 'show' );
-
-                $.post( url, data ).done( function( resp ) {
-                    if ( resp.success ) {
-                        $row.ajaxLoading( 'false' );
-                        if ( resp.data.states ) {
-                            $state.html( resp.data.states );
-                            $state.trigger( 'change' ).closest( '.mp_checkout_column' ).show();
-                        } else {
-                            $state.closest( '.mp_checkout_column' ).hide();
-                        }
-
-                        if ( resp.data.show_zipcode ) {
-                            $zip.closest( '.mp_checkout_column' ).show();
-                        } else {
-                            $zip.closest( '.mp_checkout_column' ).hide();
-                        }
-                    }
-                } );
-            } );
-        },
-        /**
-         * Show the checkout form
-         *
-         * @since 3.0
-         */
-        showForm: function() {
-            $( '#mp-checkout-form' ).show();
-        },
-        /**
-         * Get a value from a hashed query string
-         *
-         * @since 3.0
-         * @param string what The name of the variable to retrieve.
-         * @param mixed defaultVal Optional, what to return if the variable doesn't exist. Defaults to false.
-         * @return mixed
-         */
-        getHash: function( what, defaultVal ) {
-            var hash = window.location.hash;
-
-            if ( undefined === defaultVal ) {
-                defaultVal = false;
-            }
-
-            if ( 0 > hash.indexOf( '#!' ) || undefined === defaultVal ) {
-                return defaultVal;
-            }
-
-            var hashParts = hash.substr( 2 ).split( '&' ), hashPairs = { };
-
-            $.each( hashParts, function( index, value ) {
-                var tmp = value.split( '=' );
-                hashPairs[ tmp[0] ] = tmp[1];
-            } );
-
-            if ( undefined === hashPairs[ what ] ) {
-                return defaultVal;
-            }
-
-            return hashPairs[ what ];
-        },
-        /**
-         * Show/hide checkout section error summary
-         *
-         * @since 3.0
-         * @param string action Either "show" or "hide".
-         * @param int count The number of errors.
-         */
-        errorSummary: function( action, count ) {
-            var $section = $( '.mp_checkout_section' ).filter( '.current' ).find( '.mp_checkout_section_errors' );
-            var $checkout = $( '#mp-checkout-form' );
-
-            if ( undefined === $checkout.data( 'mp-submitted' ) ) {
-                /* form hasn't been submitted so bail. fixes issue with error summary
-                 being hidden when generated by PHP */
-                return;
-            }
-
+        return this.each( function( ) {
             if ( 'show' == action ) {
-                var errorVerb = ( count > 1 ) ? mp_checkout_i18n.error_plural : mp_checkout_i18n.error_singular;
-                var errorString = mp_checkout_i18n.errors.replace( '%d', count ).replace( '%s', errorVerb );
-                $section.html( errorString ).addClass( 'show' );
+                $( this ).hide( ).after( '<img src="' + mp_i18n.loadingImage + '" alt="">' );
             } else {
-                $section.removeClass( 'show' );
+                $( this ).show( ).next( 'img' ).remove( );
+            }
+        } );
+    };
+}( jQuery ) );
+var marketpress = { };
+( function( $ ) {
+
+    function equal_height( obj ) {
+        var $this = $( obj );
+        $this.equalHeights();
+        //$this.find( '.mp_product_name' ).equalHeights();
+        //$this.find( '.mp_product_meta' ).equalHeights();
+        //$this.find( '.mp_product_details' ).equalHeights();
+        //$this.find( '.mp_product' ).equalHeights();
+        //$this.find( '.mp_product_name' ).equalHeights();
+        //$this.find( '.mp_product_meta' ).equalHeights();
+        //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
+        //$this.find( '.hmedia' ).equalHeights();
+    }
+
+    $( window ).resize( function( ) {
+        $( '#mp-products.mp_products-grid' ).each( function( ) {
+            var $this = $( this );
+            //$this.find( '.mp_product_name' ).equalHeights();
+            $this.find( '.mp_product_meta' ).equalHeights();
+            //$this.find( '.mp_product_details' ).equalHeights();
+            //$this.find( '.mp_product' ).equalHeights();
+            //$this.find( '.mp_product_name' ).equalHeights();
+            //$this.find( '.mp_product_meta' ).equalHeights();
+            //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
+            //$this.find( '.hmedia' ).equalHeights();
+        } );
+
+        $( '#mp-related-products .mp_products-grid .mp_product_meta' ).each( function( ) {
+            //equal_height( $( this ) );
+            var $this = $( this );
+            $this.find( '.mp_product_meta' ).equalHeights();
+        } );
+
+    } );
+
+
+    marketpress = {
+        /**
+         * Show or hide the loading overlay
+         *
+         * @since 3.0
+         * @param string action Either show/hide. Optional.
+         */
+        loadingOverlay: function( action ) {
+            var $overlay = $( '#colorbox' ).is( ':visible' ) ? $( '#cboxLoadingOverlay' ) : $( '#mp-loading-overlay' );
+            if ( action === undefined ) {
+                var action = 'show';
+            }
+
+            if ( $overlay.length == 0 ) {
+                $( 'body' ).append( '<div id="mp-loading-overlay" style="display:none"></div>' );
+                $overlay = $( '#mp-loading-overlay' );
+            }
+
+            switch ( action ) {
+                case 'show' :
+                    $overlay.show( );
+                    break;
+                case 'hide' :
+                    $overlay.hide( );
+                    break;
             }
         },
         /**
-         * Execute when on the last step of checkout
+         * Initialize tooltips
          *
          * @since 3.0
-         * @event mp_checkout/step_changed
          */
-        lastStep: function( evt, $out, $in ) {
-            var $checkout = $( '#mp-checkout-form' );
+        initToolTips: function( ) {
+            $( document ).tooltip( {
+                "items": ".mp_tooltip-help, .mp_tooltip",
+                "content": function( ) {
+                    var $this = $( this );
+                    if ( $this.is( '.mp_tooltip' ) ) {
+                        $this = $this.next( '.mp_tooltip_content' );
+                    }
 
-            if ( $in.next( '.mp_checkout_section' ).length == 0 ) {
-                $checkout.addClass( 'last-step' );
-            } else {
-                $checkout.removeClass( 'last-step' );
-            }
+                    return $this.html( );
+                },
+                "position": {
+                    "my": "center bottom-10",
+                    "at": "center top"
+                },
+                "hide": 300,
+                "show": 300
+            } );
         },
         /**
-         * Go to next step in checkout
+         * Make each product in a product grid row the same height
          *
          * @since 3.0
          */
-        nextStep: function() {
-            var $current = $( '.mp_checkout_section' ).filter( '.current' );
-            var $next = $current.next( '.mp_checkout_section' );
-            this.changeStep( $current, $next );
+        equalizeProductGrid: function( ) {
+            $( '#mp-products.mp_products-grid' ).each( function( ) {
+                var $this = $( this );
+                //$this.find( '.mp_product_name' ).equalHeights();
+                $this.find( '.mp_product_meta' ).equalHeights();
+                //$this.find( '.mp_product_details' ).equalHeights();
+                //$this.find( '.mp_product' ).equalHeights();
+                //$this.find( '.mp_product_name' ).equalHeights();
+                //$this.find( '.mp_product_meta' ).equalHeights();
+                //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
+                //$this.find( '.hmedia' ).equalHeights();
+            } );
+
+            $( '#mp-related-products .mp_products-grid' ).each( function( ) {
+                var $this = $( this );
+                $this.find( '.mp_product_meta' ).equalHeights();
+                //$this.equalHeights();
+            } );
+        },
+        getViewportSize: function() {
+			
+			function setMiniCartMaxHeight() {
+				
+				var viewportHeight = $(window).height(),
+					//bodyHeight = $('body').height(),
+					//documentHeight = $(document).height(),
+					//getNonVisibleSize = (bodyHeight - viewportHeight),
+					miniCart = $('#mp-floating-cart'),
+					miniCartRibbon = miniCart.find('.mp_mini_cart_ribbon'),
+					miniCartRibbonHeight = miniCartRibbon.height(),
+					miniCartContent = miniCart.find('.mp_mini_cart_content'),
+					miniCartContentHeight = miniCartContent.height(),
+					miniCartHeight = (miniCartRibbonHeight + miniCartContentHeight),
+					miniCartMaxHeight = (viewportHeight - (miniCartRibbonHeight * 2) - 100);
+				
+				if( miniCartHeight > viewportHeight || miniCartHeight > miniCartMaxHeight ) {
+					
+					miniCart.each(function() {
+						var $this = $(this);
+						
+						$this.find('.mp_mini_cart_items').css({
+							'margin-top' : '50px'
+						});
+						
+						$this.find('.mp_button-mini-cart').css({
+							"position" : "absolute",
+							"top" : "15px",
+							"left" : 0,
+							"right" : 0,
+							"margin" : "auto 30px"
+						});
+						
+					});
+					
+				}
+				
+				miniCartContent.css({
+					"max-height" : miniCartMaxHeight + 'px'
+				});
+				
+			}
+			
+			setMiniCartMaxHeight();
+			
+			$(window).on('resize', function() {
+				setMiniCartMaxHeight();
+			});
+			
         },
         /**
-         * Change checkout steps
+         * Initialize select2 elements
          *
          * @since 3.0
-         * @param jQuery $out The jquery object being transitioned FROM
-         * @param jQuery $in The jquery object being transitioned TO
          */
-        changeStep: function( $out, $in ) {
-            $out.find( '.mp_tooltip' ).tooltip( 'close' );
-            $out.find( '.mp_checkout_section_content' ).slideUp( 500, function() {
-                $out.removeClass( 'current' );
-                $in.find( '.mp_checkout_section_content' ).slideDown( 500, function() {
-                    $in.addClass( 'current' );
+        initSelect2: function( ) {
+            $( 'select.mp_select2' ).not( '.select2-offscreen' ).select2( {
+	            "dropdownCssClass": "mp_select2",
+                "dropdownAutoWidth": 1,
+                "minimumResultsForSearch": -1	// hide the search box
+            } );
+            $( 'select.mp_select2_search' ).not( '.select2-offscreen' ).select2( {
+	            "dropdownCssClass": "mp_select2",
+                "dropdownAutoWidth": 1
+            } );
+        },
+        /**
+         * Initialize order look up
+         *
+         * @since 3.0
+         */
+        initOrderLookup: function( ) {
+            var $form = $( '#mp-order-lookup-form' );
+            var $btn = $form.find( '[type="submit"]' );
+            var $input = $form.find( 'input[type="text"]' );
+            $form.on( 'submit', function( e ) {
+                e.preventDefault( );
+                if ( $btn.is( ':hidden' ) ) {
+                    // Already searching for an order - bail
+                    return;
+                }
 
-                    /**
-                     * Fires after a step change
-                     *
-                     * @since 3.0
-                     * @param jQuery $out The jquery object being transitioned FROM
-                     * @param jQuery $in The jquery object being transitioned TO
-                     */
-                    $( document ).trigger( 'mp_checkout/step_changed', [ $out, $in ] );
+                var data = $form.serialize( );
+                $btn.ajaxLoading( 'show' );
+                $input.prop( 'disabled', true );
+                $.post( $form.attr( 'action' ), data ).done( function( resp ) {
+                    if ( resp.success ) {
+                        window.location.href = resp.data.redirect_url;
+                    } else {
+                        var $tooltip = $input.prev( '.mp_tooltip' );
+                        $btn.ajaxLoading( 'hide' );
+                        $input.prop( 'disabled', false );
+                        if ( $tooltip.length == 0 ) {
+                            $input.before( '<div class="mp_tooltip"></div>' );
+                            $tooltip = $input.prev( '.mp_tooltip' );
+                            $tooltip.tooltip( {
+                                items: ".mp_tooltip",
+                                tooltipClass: "error",
+                                position: {
+                                    of: $input,
+                                    my: "center bottom-10",
+                                    at: "center top"
+                                },
+                                hide: 300,
+                                show: 300
+                            } );
+                        }
 
-                    mp_checkout.initActivePaymentMethod();
+                        $tooltip.tooltip( 'option', 'content', resp.data.error_message );
+                        $tooltip.tooltip( 'open' );
+                    }
                 } );
             } );
         },
         /**
-         * Initialize checkout steps
+         * Initialize content tabs on the single product template
          *
          * @since 3.0
          */
-        initCheckoutSteps: function() {
-            var $checkout = $( ' #mp-checkout-form' );
-            var formSubmitted = false;
+        initProductTabs: function( ) {
 
-            // Trim values before validating
-            $.each( $.validator.methods, function( key, val ) {
-                $.validator.methods[ key ] = function() {
-                    if ( arguments.length > 0 ) {
-                        var $el = $( arguments[1] );
-                        var newVal = $.trim( $el.val() );
-
-                        $el.val( newVal );
-                        arguments[0] = newVal;
-                    }
-
-                    return val.apply( this, arguments );
-                }
+            $( 'body' ).on( 'click', '.mp_product_meta a.more-link', function( e ) {
+                e.preventDefault( );
+                $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
+                $( 'html, body' ).animate( {
+                    scrollTop: $( "a.mp_product_tab_label_link.mp-product-overview" ).offset( ).top - 30
+                }, 500 );
             } );
-
-            // Go to step when clicking on section heading
-            $checkout.find( '.mp_checkout_section_heading-link' ).on( 'click', function( e ) {
-                var $this = $( this );
-                var $section = $this.closest( '.mp_checkout_section' );
-                var $current = $section.nextAll( '.current' );
-
-                if ( $current.length > 0 ) {
-                    // section is before the current step - ok to proceed
-                    mp_checkout.changeStep( $current, $section );
-                }
+            $( '.mp_product_tab_label_link' ).click( function( e ) {
+                e.preventDefault( );
+                var $this = $( this ),
+                    $tab = $this.parent( ),
+                    $target = $( $this.attr( 'href' ) );
+                $tab.addClass( 'current' ).siblings( ).removeClass( 'current' );
+                //$target.show().siblings( '.mp_product_tab_content' ).hide();
+                $target.addClass( 'mp_product_tab_content-current' ).siblings( '.mp_product_tab_content' ).removeClass( 'mp_product_tab_content-current' );
+                //equal_heights( $( '#mp-related-products .mp_products-grid .mp_product_meta' ) );
             } );
-
-            // Validate form
-            $checkout.validate( {
-                onkeyup: false,
-                onclick: false,
-                ignore: function( index, element ) {
-                    return ( $( element ).is( ':hidden' ) || $( element ).prop( 'disabled' ) );
-                },
-                highlight: function( element, errorClass ) {
-                    $( element ).addClass( 'mp_form_input_error' ).prev( 'label' ).addClass( 'mp_form_label_error' );
-                },
-                unhighlight: function( element, errorClass, validClass ) {
-                    var $tip = $( element ).siblings( '.mp_tooltip' );
-                    if ( $tip.length > 0 ) {
-                        $tip.tooltip( 'close' );
-                    }
-
-                    $( element ).removeClass( 'mp_form_input_error' ).prev( 'label' ).removeClass( 'mp_form_label_error' );
-
-                    if ( this.numberOfInvalids() == 0 ) {
-                        mp_checkout.errorSummary( 'hide' );
-                    }
-                },
-                submitHandler: function( form ) {
-                    $checkout.data( 'mp-submitted', true );
-
-                    var $form = $( form );
-                    var $email = $form.find( '[name="mp_login_email"]' );
-                    var $pass = $form.find( '[name="mp_login_password"]' );
-
-
-                    if ( $form.valid() ) {
-                        var checkout_as_guest = false;
-                        if ($form.find('#is_checkout_as_guest').size() > 0) {
-                            checkout_as_guest = true;
-                        }
-                        if ( $checkout.hasClass( 'last-step' ) ) {
-                            var gateway = $( '[name="payment_method"]' ).filter( ':checked' ).val();
-
-                            /**
-                             * Trigger checkout event
-                             *
-                             * For gateways to tie into and process checkout.
-                             *
-                             * @since 3.0
-                             * @param jQuery $form The checkout form object.
-                             */
-                            $( document ).trigger( 'mp_checkout_process_' + gateway, [ $form ] );
-                        } else if ( $.trim( $email.val() ).length > 0 && $.trim( $pass.val() ).length > 0 && checkout_as_guest==false) {
-                            var $btn = $( '#mp-button-checkout-login' );
-                            $btn.ajaxLoading();
-
-                            // Destroy any tooltips
-                            if ( $( '#mp-login-tooltip' ).length > 0 ) {
-                                $( '#mp-login-tooltip' ).remove();
-                            }
-
-                            var data = {
-                                action: "mp_ajax_login",
-                                email: $email.val(),
-                                pass: $pass.val(),
-                                mp_login_nonce: $form.find( '[name="mp_login_nonce"]' ).val()
-                            };
-
-                            $.post( mp_i18n.ajaxurl, data ).done( function( resp ) {
-                                if ( resp.success ) {
-                                    window.location.href = window.location.href;
-                                } else {
-                                    $btn.ajaxLoading( 'hide' );
-                                    $email.before( '<a id="mp-login-tooltip"></a>' );
-                                    $( '#mp-login-tooltip' ).tooltip( {
-                                        items: '#mp-login-tooltip',
-                                        content: resp.data.message,
-                                        tooltipClass: "error",
-                                        open: function( event, ui ) {
-                                            setTimeout( function() {
-                                                $( '#mp-login-tooltip' ).tooltip( 'destroy' );
-                                            }, 4000 );
-                                        },
-                                        position: {
-                                            of: $email,
-                                            my: "center bottom-10",
-                                            at: "center top"
-                                        },
-                                        show: 300,
-                                        hide: 300
-                                    } ).tooltip( 'open' );
-                                }
-                            } );
-                        } else {
-                            var url = mp_i18n.ajaxurl + '?action=mp_update_checkout_data';
-                            marketpress.loadingOverlay( 'show' );
-
-                            $.post( url, $form.serialize() ).done( function( resp ) {
-                                $.each( resp.data, function( index, value ) {
-                                    $( '#' + index ).find( '.mp_checkout_section_content' ).html( value );
-                                } );
-
-                                mp_checkout.initCardValidation();
-                                marketpress.loadingOverlay( 'hide' );
-                                mp_checkout.nextStep();
-                            } );
-                        }
-                    }
-                },
-                showErrors: function( errorMap, errorList ) {
-                    if ( this.numberOfInvalids() > 0 ) {
-                        mp_checkout.errorSummary( 'show', this.numberOfInvalids() );
-                    }
-
-                    $.each( errorMap, function( inputName, message ) {
-                        var $input = $( '[name="' + inputName + '"]' );
-                        var $tip = $input.siblings( '.mp_tooltip' );
-
-                        if ( $tip.length == 0 ) {
-                            $input.after( '<div class="mp_tooltip" />' );
-                            $tip = $input.siblings( '.mp_tooltip' );
-                            $tip.uniqueId().tooltip( {
-                                content: "",
-                                items: "#" + $tip.attr( 'id' ),
-                                tooltipClass: "error",
-                                show: 300,
-                                hide: 300
-                            } );
-                        }
-
-                        $tip.tooltip( 'option', 'content', message );
-                        $tip.tooltip( 'option', 'position', {
-                            of: $input,
-                            my: "center bottom-10",
-                            at: "center top"
-                        } );
-
-                        $input.on( 'focus', function() {
-                            if ( $input.hasClass( 'mp_form_input_error' ) ) {
-                                //$tip.tooltip( 'open' );
-                            }
-                        } );
-
-                        $input.on( 'blur', function() {
-                            $tip.tooltip( 'close' );
-                        } );
-                    } );
-
-                    this.defaultShowErrors();
+            if ( window.location.hash.length > 0 ) {
+                var $target = $( '[href="' + window.location.hash + '"]' );
+                if ( $target.length > 0 ) {
+                    $target.trigger( 'click' );
                 }
-            } );
-        },
-        /**
-         * Initialize the active/selected payment method
-         *
-         * @since 3.0
-         */
-        initActivePaymentMethod: function() {
-            var $input = $( 'input[name="payment_method"]' );
-            if ( $input.filter( ':checked' ).length ) {
-                $input.filter( ':checked' ).trigger( 'click' );
-            } else {
-                $input.eq( 0 ).trigger( 'click' );
             }
         },
         /**
-         * Initialize credit card validation events/rules
+         * Trigger events after an ajax request
+         *
+         * @since 3.0
+         * @param string event The base event string.
+         * @param object resp The ajax response object.
+         * @param object $scope Optional, the scope for triggered events. Defaults to document.
+         */
+        ajaxEvent: function( event, resp, $scope ) {
+            if ( $scope === undefined ) {
+                var $scope = $( document );
+            }
+
+            var successEvent = event + '/success';
+            var errorEvent = event + '/error';
+            /**
+             * Fires whether the response was successful or not
+             *
+             * @since 3.0
+             * @param object The response data.
+             */
+            $scope.trigger( event, [ resp ] );
+            if ( resp.success ) {
+                /**
+                 * Fires on success
+                 *
+                 * @since 3.0
+                 * @param object The response data object.
+                 */
+                $scope.trigger( successEvent.replace( '//', '/' ), [ resp.data ] );
+            } else {
+                var message = ( resp.data === undefined ) ? '' : resp.data.message;
+                /**
+                 * Fires on error
+                 *
+                 * @since 3.0
+                 * @param string Any applicable error message.
+                 */
+                $scope.trigger( errorEvent.replace( '//', '/' ), [ message ] );
+            }
+        },
+        /**
+         * Initialize product image lightbox
          *
          * @since 3.0
          */
-        initCardValidation: function() {
-            $( '.mp-input-cc-num' ).payment( 'formatCardNumber' );
-            $( '.mp-input-cc-exp' ).payment( 'formatCardExpiry' );
-            $( '.mp-input-cc-cvc' ).payment( 'formatCardCVC' );
-
-            // Validate card fullname
-            $.validator.addMethod( 'cc-fullname', function( val, element ) {
-                var pattern = /^([a-z]+)([ ]{1})([a-z]+)$/ig;
-                return this.optional( element ) || pattern.test( val );
-            }, mp_checkout_i18n.cc_fullname );
-
-            // Validate card numbers
-            $.validator.addMethod( 'cc-num', function( val, element ) {
-                return this.optional( element ) || $.payment.validateCardNumber( val );
-            }, mp_checkout_i18n.cc_num );
-
-            // Validate card expiration
-            $.validator.addMethod( 'cc-exp', function( val, element ) {
-                var dateObj = $.payment.cardExpiryVal( val );
-                return this.optional( element ) || $.payment.validateCardExpiry( dateObj.month, dateObj.year );
-            }, mp_checkout_i18n.cc_exp );
-
-            // Validate card cvc
-            $.validator.addMethod( 'cc-cvc', function( val, element ) {
-                return this.optional( element ) || $.payment.validateCardCVC( val );
-            }, mp_checkout_i18n.cc_cvc );
+        initImageLightbox: function( ) {
+            $( '.mp_product_image_link' ).filter( '.mp_lightbox' ).colorbox( {
+                maxWidth: "90%",
+                maxHeight: "90%",
+                close: "&times;"
+            } );
         },
         /**
-         * Init events related to toggling payment options
+         * Initialize product filters/pagination
+         *
+         * @since 3.0
+         */
+        initProductFiltersPagination: function( ) {
+            var $form = $( '#mp-products-filter-form' );
+            $form.on( 'change', 'select', function( e ) {
+                var $this = $( this );
+                // Redirect if product category dropdown changed
+                if ( 'product_category' == $this.attr( 'name' ) ) {
+                    var val = $this.val( );
+                    marketpress.loadingOverlay( 'show' );
+                    if ( typeof ( mp_i18n.productCats[ val ] ) == 'undefined' ) {
+                        window.location.href = mp_i18n.productsURL;
+                    } else {
+                        window.location.href = mp_i18n.productCats[ val ];
+                    }
+
+                    return;
+                } else {
+                    marketpress.updateProductList( );
+                }
+            } );
+            /*$( '#mp_product_nav' ).parent( ).on( 'click', '#mp_product_nav a', function( e ) {
+                e.preventDefault( );
+                var $this = $( this );
+                var href = $this.attr( 'href' );
+                var query = marketpress.unserialize( href );
+                $form.find( 'input[name="page"]' ).val( query.paged );
+                marketpress.updateProductList( );
+            } );*/
+        },
+        /**
+         * Update product list
          *
          * @since 3.0
          * @access public
          */
-        initPaymentOptionListeners: function() {
-            $( '.mp_checkout_section' ).on( 'click change', 'input[name="payment_method"]', function() {
-                var $this = $( this ),
-                    $target = $( '#mp-gateway-form-' + $this.val() ),
-                    $checkout = $( '#mp-checkout-form' ),
-                    $submit = $checkout.find( ':submit' ).filter( ':visible' );
-
-                if ( !$checkout.hasClass( 'last-step' ) ) {
-                    return;
-                }
-
-                $target.show().siblings( '.mp_gateway_form' ).hide();
-
-                if ( $target.find( '.mp_form_input.error' ).filter( ':visible' ).length > 0 ) {
-                    $checkout.valid();
-                } else {
-                    mp_checkout.errorSummary( 'hide' );
-                }
-
-                if ( undefined === $submit.data( 'data-mp-original-html' ) ) {
-                    $submit.data( 'data-mp-original-html', $submit.html() )
-                }
-
-                if ( 'true' == $this.attr( 'data-mp-use-confirmation-step' ) ) {
-                    $submit.html( $submit.attr( 'data-mp-alt-html' ) );
-                } else {
-                    $submit.html( $submit.data( 'data-mp-original-html' ) );
-                }
+        updateProductList: function( ) {
+            var $form = $( '#mp-products-filter-form' );
+            var data = $form.serialize( );
+            var url = mp_i18n.ajaxurl + '?action=mp_update_product_list';
+            marketpress.loadingOverlay( 'show' );
+            $.post( url, data ).done( function( resp ) {
+                marketpress.loadingOverlay( 'hide' );
+                $( '.mp_listings_nav' ).remove( );
+                $( '#mp-products' ).replaceWith( resp );
+                mp_cart.initCartListeners( );
             } );
-
-            this.initActivePaymentMethod();
         },
         /**
-         * Enable/disable shipping address fields
+         * Unserialize a string
          *
          * @since 3.0
+         * @param string str A serialized string or a url containing a querystring
+         * @return object
          */
-        toggleShippingAddressFields: function() {
-            var $cb = $( 'input[name="enable_shipping_address"]' );
-            var $shippingInfo = $( '#mp-checkout-column-shipping-info' );
-            var $billingInfo = $( '#mp-checkout-column-billing-info' );
-
-            if ( $cb.prop( 'checked' ) ) {
-                $billingInfo.removeClass( 'fullwidth' );
-                setTimeout( function() {
-                    $shippingInfo.fadeIn( 500 );
-                }, 550 );
-            } else {
-                $shippingInfo.fadeOut( 500, function() {
-                    $billingInfo.addClass( 'fullwidth' );
-                } );
+        unserialize: function( str ) {
+            if ( str.indexOf( '?' ) >= 0 ) {
+                var strParts = str.split( '?' );
+                str = strParts[1];
             }
+
+            var dataPairs = str.split( '&' );
+            var obj = { };
+            $.each( dataPairs, function( index, value ) {
+                var tmp = value.split( '=' );
+                obj[ tmp[0] ] = tmp[1];
+            } );
+            return obj;
         },
         /**
-         * Initialize events related to shipping address fields
+         * Init create account lightbox listeners
          *
          * @since 3.0
          */
-        initShippingAddressListeners: function() {
-            var $enableShippingAddress = $( 'input[name="enable_shipping_address"]' );
+        initCreateAccountLightboxListeners: function( ) {
+            var $lb = $( '#mp-create-account-form' );
+            var $emailLabel = $( 'label[for="mp-create-account-email"]' );
+            var $emailInput = $( '#mp-create-account-email' );
+            var $submitButton = $lb.find( '.mp_button-create-account' );
+            if ( '#mp-create-account-lightbox' != window.location.hash || 0 == $lb.length ) {
+                // Bail
+                return false;
+            }
 
-            // Enable billing address fields
-            $enableShippingAddress.change( mp_checkout.toggleShippingAddressFields );
-
-            // Copy billing field to shipping field (if shipping address isn't enabled)
-            $( '[name^="billing["]' ).on( 'change keyup', function() {
-                if ( $enableShippingAddress.is( ':checked' ) ) {
-                    // Shipping address checkbox is checked - bail
+            $( document ).ajaxSend( function( evt, jqxhr, settings ) {
+                if ( settings.url.indexOf( 'action=mp_check_if_email_exists' ) < 0 ) {
                     return;
                 }
 
+                if ( $emailLabel.find( '.mp-loading-placeholder' ).length == 0 ) {
+                    $emailLabel.append( '<span class="mp-loading-placeholder"></span>' );
+                }
+
+                $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'show' );
+                $emailInput.prop( 'disabled', true );
+                $submitButton.prop( 'disabled', true );
+            } );
+            $( document ).ajaxComplete( function( evt, jqxhr, settings ) {
+                if ( settings.url.indexOf( 'action=mp_check_if_email_exists' ) < 0 ) {
+                    return;
+                }
+
+                $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'hide' );
+                $emailInput.prop( 'disabled', false );
+                $submitButton.prop( 'disabled', false );
+            } );
+            //$lb.find( 'form' ).validate( {
+	        $lb.validate( {
+                highlight: function( ) {
+                    setTimeout( function( ) {
+                        $.colorbox.resize( );
+                    }, 100 )
+                },
+                onkeyup: false, // don't validate on keyup as this will send ajax requests on every key stroke!
+                submitHandler: function( form ) {
+                    var $form = $( form );
+                    marketpress.loadingOverlay( 'show' );
+                    $.post( $form.attr( 'action' ), $form.serialize( ) ).done( function( resp ) {
+                        if ( resp.success ) {
+                            window.location.reload( );
+                        } else {
+                            marketpress.loadingOverlay( 'hide' );
+                            alert( resp.data.message );
+                        }
+                    } );
+                },
+                unhighlight: function( ) {
+                    setTimeout( function( ) {
+                        $.colorbox.resize( );
+                    }, 100 )
+                }
+            } );
+            $.colorbox( {
+                close: "x",
+                escKey: false,
+                href: $lb,
+                inline: true,
+                overlayClose: false,
+                width: 450
+            } );
+        },
+        /**
+         * Initialize global product filters/pagination
+         *
+         * @since 3.0
+         */
+        initGlobalProductFiltersPagination: function( ) {
+            var $form = $( '#mp_global_product_list_refine' );
+            $form.on( 'change', 'select', function( e ) {
                 var $this = $( this );
-                var name = $this.attr( 'name' );
-                var $target = $( '[name="' + name.replace( 'billing', 'shipping' ) + '"]' );
-
-                if ( $target.length == 0 ) {
-                    // Input doesn't exist - bail
-                    return;
-                }
-
-                $target.val( $this.val() ).trigger( 'change' );
+                //we don't filter by taxonomy in global, so just bypass
+                marketpress.updateGlobalProductList( );
             } );
         },
         /**
-         * Trigger step change event
+         * Update global product list
          *
          * @since 3.0
+         * @access public
          */
-        triggerStepChange: function() {
-            var $current = $( '.mp_checkout_section' ).filter( '.current' );
-            $( document ).trigger( 'mp_checkout/step_changed', [ $current, $current ] );
+        updateGlobalProductList: function( ) {
+            var $form = $( '#mp_global_product_list_refine' );
+            var data = $form.serialize( );
+            var url = mp_i18n.ajaxurl + '?action=mp_global_update_product_list';
+            marketpress.loadingOverlay( 'show' );
+            $.post( url, data ).done( function( resp ) {
+                marketpress.loadingOverlay( 'hide' );
+                $( '.mp_listings_nav' ).remove( );
+                $( '.mp_global_product_list_widget #mp_product_list' ).replaceWith( resp );
+                mp_cart.initCartListeners( );
+            } );
         },
-        /**
-         * Because we have 2 context in login pharse, so we will have to determine which button click to add/removerules
-         *
-         */
-        listenToLogin: function() {
-            //if login click, we will add those rules
-            $( document ).on( 'click', '.mp_button-checkout-login', function() {
-                $( 'input[name="mp_login_email"]' ).rules( 'add', {
-                    required: true
-                } );
-                $( 'input[name="mp_login_password"]' ).rules( 'add', {
-                    required: true
-                } );
-                var form = $(this).closest('form');
-                form.find('#is_checkout_as_guest').remove();
-                $( this ).closest( 'form' ).submit();
-            } );
-            //else, we have to remove the rules
-            $( document ).on( 'click', '.mp_continue_as_guest', function( e ) {
-                $( 'input[name="mp_login_email"]' ).rules( 'remove' );
-                $( 'input[name="mp_login_password"]' ).rules( 'remove' );
-                var form = $(this).closest('form');
-                if (form.find('#is_checkout_as_guest').size() == 0) {
-                    form.append($('<input id="is_checkout_as_guest"/>'));
-                }
-                //$( '.mp_checkout_section_errors' ).hide();
-                $( this ).closest( 'form' ).submit();
-            } )
-            //our form is multiple next/pre button, so we unbind the enter trigger
-            $( '#mp-checkout-form' ).on( 'keyup keypress', function( e ) {
-                var code = e.keyCode || e.which;
-                if ( code == 13 ) {
-                    e.preventDefault();
-                    return false;
-                }
-            } );
-        }
     };
 }( jQuery ) );
-
-jQuery( document ).ready( function( $ ) {
-    mp_checkout.showForm();
-    mp_checkout.initListeners();
-    mp_checkout.toggleShippingAddressFields();
-    mp_checkout.triggerStepChange();
+jQuery( document ).ready( function( ) {
+    marketpress.initSelect2( );
+    marketpress.initProductTabs( );
+    marketpress.initToolTips( );
+    marketpress.initOrderLookup( );
+    marketpress.initImageLightbox( );
+    marketpress.initProductFiltersPagination( );
+    marketpress.initCreateAccountLightboxListeners( );
+    marketpress.initGlobalProductFiltersPagination();
+    marketpress.getViewportSize();
 } );
+window.onload = function( ) {
+    marketpress.equalizeProductGrid( );
+    //marketpress.getViewportSize();
+}
