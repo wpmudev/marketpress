@@ -158,7 +158,7 @@ class MP_Installer {
 					);
 
 					reset( $term_object );
-					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->slug : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
 					$data_original[ $i ][] = $variation_name . '=' . $variations_single_data;
 				}
 
@@ -256,12 +256,26 @@ class MP_Installer {
 
 				/* Add post terms for the variation */
 				$variation_terms = explode( '|', $combination );
-
 				foreach ( $variation_terms as $variation_term ) {
 					$variation_term_vals = explode( '=', $variation_term );
 					//has_term( $term, $taxonomy, $post )
 					//wp_set_object_terms
-					if ( ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
+					//we need to check, if term is numeric, treat it
+					if ( is_numeric( $variation_term_vals[1] ) ) {
+						//usually this is the term name, check if not exist, we will create with a prefix on slug,
+						//to force it to string, as when wordpress using the term_exist, it will priority the ID than slug, which can cause wrong import
+						$slug = $variation_term_vals[1] . '_mp_attr';
+						if ( ! term_exists( $slug ) ) {
+							$tid = wp_insert_term( $variation_term_vals[1], $variation_term_vals[0], array(
+								'slug' => $slug
+							) );
+							wp_set_post_terms( $variation_id, $tid['term_id'], $variation_term_vals[0], true );
+						}
+						//reassign so it can by pass the below
+						//$variation_term_vals[1] = $slug;
+					}
+
+					if (!isset($slug) && ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
 						wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], true );
 					}
 				}
