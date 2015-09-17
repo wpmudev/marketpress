@@ -71,6 +71,9 @@ $this->default_settings = array(
 	),
 	'product_button_type'		 => 'addcart',
 	'show_quantity'				 => 1,
+	'show_single_excerpt'		 => 1,
+	'show_single_categories'	 => 1,
+	'show_single_tags'		 	 => 1,
 	'product_img_size'			 => 'medium',
 	'show_lightbox'				 => 1,
 	'disable_large_image'		 => 0,
@@ -111,48 +114,12 @@ $this->default_settings = array(
 	'email'						 => array(
 		'new_order'		 => array(
 			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
-			'text'		 => __( "Thank you for your order CUSTOMERNAME!
-
-Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.
-Here is a confirmation of your order details:
-
-Order Information:
-ORDERINFO
-
-Shipping Information:
-SHIPPINGINFO
-
-Payment Information:
-PAYMENTINFO
-
-ORDERNOTES
-
-You can track the latest status of your order here: TRACKINGURL
-
-Thanks again!", 'mp'
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us. \n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO \n\n Shipping Information: \n SHIPPINGINFO \n\n Payment Information: \n PAYMENTINFO \n\n ORDERNOTES \n\n You can track the latest status of your order here: TRACKINGURL \n\n Thanks again!", 'mp'
 			),
 		),
 		'order_shipped'	 => array(
 			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
-			'text'		 => __( "Dear CUSTOMERNAME,
-
-Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.
-Here is a confirmation of your order details:
-
-Order Information:
-ORDERINFO
-
-Shipping Information:
-SHIPPINGINFO
-
-Payment Information:
-PAYMENTINFO
-
-ORDERNOTES
-
-You can track the latest status of your order here: TRACKINGURL
-
-Thanks again!", 'mp'
+			'text'		 => __( "Dear CUSTOMERNAME,\n Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
 			),
 		) ),
 	'social'					 => array(

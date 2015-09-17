@@ -386,10 +386,26 @@ class Marketpress {
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 
 		$this->load_widgets();
+		
+		$this->localization();
 	}
 
 	function add_menu_items() {
 		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
+	}
+	
+	function localization() {
+		// Load up the localization file if we're using WordPress in a different language
+		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
+		
+		$mu_plugins	 = wp_get_mu_plugins();
+		$lang_dir	 = dirname( plugin_basename( $this->_plugin_file ) ) . '/languages/';
+		
+		if ( in_array( $this->_plugin_file, $mu_plugins ) ) {
+			load_muplugin_textdomain( 'mp', $lang_dir );
+		} else {
+			load_plugin_textdomain( 'mp', false, $lang_dir );
+		}
 	}
 
 	function load_widgets() {
@@ -402,6 +418,7 @@ class Marketpress {
 		//Multisite Widgets
 		require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
+		require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-categories.php' ) );
 	}
 
 	function post_thumbnail_html5( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
@@ -720,6 +737,7 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/common/class-mp-installer.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
+		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
 
 		if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );

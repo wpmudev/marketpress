@@ -158,7 +158,7 @@ class MP_Installer {
 					);
 
 					reset( $term_object );
-					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->slug : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
 					$data_original[ $i ][] = $variation_name . '=' . $variations_single_data;
 				}
 
@@ -175,7 +175,7 @@ class MP_Installer {
 			wp_defer_term_counting( true );
 			wp_defer_comment_counting( true );
 
-			$wpdb->query( 'SET autocomit = 0;' );
+			$wpdb->query( 'SET autocommit=0;' );
 
 			foreach ( $combinations as $combination ) {
 
@@ -256,12 +256,26 @@ class MP_Installer {
 
 				/* Add post terms for the variation */
 				$variation_terms = explode( '|', $combination );
-
 				foreach ( $variation_terms as $variation_term ) {
 					$variation_term_vals = explode( '=', $variation_term );
 					//has_term( $term, $taxonomy, $post )
 					//wp_set_object_terms
-					if ( ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
+					//we need to check, if term is numeric, treat it
+					if ( is_numeric( $variation_term_vals[1] ) ) {
+						//usually this is the term name, check if not exist, we will create with a prefix on slug,
+						//to force it to string, as when wordpress using the term_exist, it will priority the ID than slug, which can cause wrong import
+						$slug = $variation_term_vals[1] . '_mp_attr';
+						if ( ! term_exists( $slug ) ) {
+							$tid = wp_insert_term( $variation_term_vals[1], $variation_term_vals[0], array(
+								'slug' => $slug
+							) );
+							wp_set_post_terms( $variation_id, $tid['term_id'], $variation_term_vals[0], true );
+						}
+						//reassign so it can by pass the below
+						//$variation_term_vals[1] = $slug;
+					}
+
+					if (!isset($slug) && ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
 						wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], true );
 					}
 				}
@@ -336,17 +350,20 @@ class MP_Installer {
 		}
 
 		$old_version = get_option( 'mp_previous_version' );
-		if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
+		if ( version_compare( $old_version, '3.0.0.3', '<=' ) || mp_get_post_value( 'force_upgrade', 0 ) ) {
 			$update_fix_needed = true;
 		} else {
 			$update_fix_needed = false;
 		}
-
 		ini_set( 'max_execution_time', 0 );
 		set_time_limit( 0 );
 
 		$per_page = 20;
-		$query    = new WP_Query( array(
+		//get the total first
+		$total_count = wp_count_posts( MP_Product::get_post_type() );
+		$total_count = $total_count->publish + $total_count->draft + $total_count->private;
+
+		$query = new WP_Query( array(
 			'cache_results'          => false,
 			'update_post_term_cache' => false,
 			'post_type'              => 'product',
@@ -430,24 +447,30 @@ class MP_Installer {
 
 					$this->post_meta_transition( $post_id, 'mp_file', 'file_url' ); //If not empty then mark it as digital product
 					$this->post_meta_transition( $post_id, 'mp_product_link', 'external_url' ); //If not empty then mark it as external product
-					//
 				}
+
+				//Update sales count
+				$this->update_sales_count( $post_id );
+
 			} else {//update for 3.0 and 3.0.0.1
 				$post_thumbnail = get_post_thumbnail_id( $post_id );
 				if ( is_numeric( $post_thumbnail ) ) {
 					update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
 				}
+
+				//Update sales count
+				$this->update_sales_count( $post_id );
 			}
 
 			do_action( 'mp_update/product', $post_id );
 		}
 
 		$response = array(
-			'updated' => ceil( $updated / $query->found_posts ) * 100,
+			'updated' => round( $updated / $total_count, 2 ) * 100,
 			'is_done' => false,
 		);
 
-		if ( $updated >= $query->found_posts ) {
+		if ( $updated >= $total_count ) {
 			$response['is_done'] = true;
 		}
 
@@ -491,6 +514,20 @@ class MP_Installer {
 				&$this,
 				'db_update_page'
 			) );
+		}
+	}
+
+	/**
+	 * Update sales count if undefined
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function update_sales_count( $post_id ) {
+		$sales_count = get_post_meta( $post_id, 'mp_sales_count', true );
+
+		if ( $sales_count == "" ) {
+			update_post_meta( $post_id, 'mp_sales_count', 0 );
 		}
 	}
 
@@ -559,6 +596,8 @@ class MP_Installer {
 					<?php wp_nonce_field( 'mp_update_product_postmeta' ); ?>
 					<input type="hidden" name="action" value="mp_update_product_postmeta"/>
 					<input type="hidden" name="page" value="1"/>
+					<input type="hidden" name="force_upgrade"
+					       value="<?php echo mp_get_get_value( 'force_upgrade', 0 ) ?>"/>
 
 					<p class="mp-important">
 						<strong><?php _e( 'Depending on the amount of products you have, this update could take quite some time. Please keep this window open while the update completes. If you have products with multiple variations, the progress bar may move slower, please don\'t exit the window.', 'mp' ); ?></strong>
@@ -644,7 +683,7 @@ class MP_Installer {
 		if ( ! empty( $old_version ) ) {
 			$settings = get_option( 'mp_settings' );
 			//3.0.0.3 need data from 3.0
-			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) && version_compare( $old_version, '3.0', ">=" ) ) {
+			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
 				$settings = $this->update_3003( $settings );
 				update_option( 'mp_settings', $settings );
 			}
@@ -681,10 +720,13 @@ class MP_Installer {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		$charset_collate = $wpdb->get_charset_collate();
-//todo check does this created
+
 		// Create mp_product_attributes table
 		$table_name = $wpdb->prefix . 'mp_product_attributes';
-		$sql        = "CREATE TABLE $table_name (
+		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name ) {
+			return;
+		}
+		$sql = "CREATE TABLE $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
@@ -820,7 +862,28 @@ class MP_Installer {
 	public function update_3003( $settings ) {
 		//update missing shipping data
 		$legacy_settings = get_option( 'mp_settings_legacy' );
-		if ( ! mp_arr_get_value( 'shipping->method', $settings ) || mp_get_get_value( 'force_upgrade_shipping', 0 ) == 1 ) {
+
+		$can_update_shipping = false;
+		if ( mp_get_get_value( 'force_upgrade_shipping', 0 ) == 1 ) {
+			$can_update_shipping = true;
+		} elseif ( ! mp_arr_get_value( 'shipping->method', $settings ) ) {
+			$can_update_shipping = true;
+		} else {
+			$method = mp_arr_get_value( 'shipping->method', $settings );
+			if ( in_array( $method, array(
+				'flat-rate',
+				'table-rate',
+				'weight-rate',
+			) ) ) {
+				$data = mp_arr_get_value( "shipping->$method", $settings );
+				if ( ! isset( $data['rates'] ) ) {
+					$can_update_shipping = true;
+				}
+			}
+
+		}
+
+		if ( $can_update_shipping ) {
 			//in here, no settings was imported by the old version, we will do that
 			$data      = mp_arr_get_value( 'shipping', $legacy_settings );
 			$method    = mp_arr_get_value( 'method', $data );
@@ -863,6 +926,18 @@ class MP_Installer {
 							}
 							mp_push_to_array( $settings, 'shipping->weight_rate->rates', $rates );
 							break;
+						case 'flat_rate':
+							$rates = array();
+							foreach ( mp_arr_get_value( 'flat-rate', $data ) as $key => $val ) {
+								if ( ! is_numeric( $key ) ) {
+									continue;
+								}
+								//key is numberic mean data rate
+								$rates[] = $val;
+							}
+							mp_push_to_array( $settings, 'shipping->flat_rate->rates', $rates );
+							break;
+							break;
 						default:
 							mp_push_to_array( $settings, 'shipping->' . $use_30, $data[ $use ] );
 							break;
@@ -871,7 +946,6 @@ class MP_Installer {
 				}
 			}
 		}
-
 		//now the gateway setting
 		$old_gateways     = mp_arr_get_value( 'gateways->allowed', $legacy_settings );
 		$current_gateways = mp_get_setting( 'gateways->allowed' );

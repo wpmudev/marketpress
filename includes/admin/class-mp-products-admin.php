@@ -180,6 +180,13 @@ class MP_Products_Screen {
 		$quantity = mp_get_post_value( 'inv->inventory', '' );
 
 		update_post_meta( $post_id, 'inventory', $quantity );
+		
+		//Check if sales count is empty string and set to 0
+		$sale_count = get_post_meta( $post_id, 'mp_sales_count', true );
+		
+		if($sale_count == "") {
+			update_post_meta( $post_id, 'mp_sales_count', 0 );
+		}
 	}
 
 	/**
@@ -836,7 +843,7 @@ class MP_Products_Screen {
 			'status_message' => __( 'Changes saved successfully', 'mp' )
 		);
 
-		do_action( 'mp_edit_variation_post_data', $post_id, $POST );
+		do_action( 'mp_edit_variation_post_data', $post_id, $_POST );
 
 		echo json_encode( apply_filters( 'mp_edit_variation_post_data_response_array', $response_array ) );
 		exit;

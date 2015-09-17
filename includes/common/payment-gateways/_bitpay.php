@@ -219,10 +219,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
-			'desc' => __('
-				You can now accept a payment from any country on Earth, with no risk of fraud. To use Bitpay, you need to signup on <a href="https://bitpay.com/start" title="Bitpay signup">Bitpay</a>.
-				After completing the signup process, you can get api keys at <a href="https://bitpay.com/api-keys" title="API keys">Bitpay API key</a>. You can read more about Bitpay at <a href="https://bitpay.com/downloads/bitpayApi.pdf" title="Bitpay documentation">Bitpay API</a>.
-				<strong>Bitpay requires SSL(https) for payment notifications to work.</strong>', 'mp'),
+			'desc' => __('You can now accept a payment from any country on Earth, with no risk of fraud. To use Bitpay, you need to signup on <a href="https://bitpay.com/start" title="Bitpay signup">Bitpay</a>. \n After completing the signup process, you can get api keys at <a href="https://bitpay.com/api-keys" title="API keys">Bitpay API key</a>. You can read more about Bitpay at <a href="https://bitpay.com/downloads/bitpayApi.pdf" title="Bitpay documentation">Bitpay API</a>. \n <strong>Bitpay requires SSL(https) for payment notifications to work.</strong>', 'mp'),
 			'conditional' => array(
 				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
 				'value' => 1,

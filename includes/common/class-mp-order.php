@@ -73,7 +73,7 @@ class MP_Order {
 	 * @since 3.0
 	 * @access public
 	 * @uses $post
-	 * @param int/string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created. 
+	 * @param int/string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created.
 	 */
 	public function __construct( $order = null ) {
 		if ( !is_null( $order ) ) {
@@ -282,13 +282,11 @@ class MP_Order {
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg	 = __( 'A new order (ORDERID) was created in your store:<br /><br />
-
-ORDERINFOSKU<br /><br />
-SHIPPINGINFO<br /><br />
-PAYMENTINFO<br /><br />
-
-You can manage this order here: %s', 'mp' );
+		$msg	.= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp');
+		$msg	.= __( 'ORDERINFOSKU<br /><br />', 'mp' );
+		$msg	.= __( 'SHIPPINGINFO<br /><br />', 'mp' );
+		$msg	.= __( 'PAYMENTINFO<br /><br />', 'mp' );
+		$msg	.= __( 'You can manage this order here: %s', 'mp' );
 
 		$subject = mp_filter_email( $this, $subject );
 
@@ -948,8 +946,18 @@ You can manage this order here: %s', 'mp' );
 
 		// Update user shipping billing info
 		if ( $user_id ) {
-			update_user_meta( $user_id, 'mp_billing_info', $billing_info );
-			update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+			if ( get_user_meta( $user_id, 'mp_billing_info' ) ) {
+				update_user_meta( $user_id, 'mp_billing_info', $billing_info );
+				update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+			} else {
+				/**
+				 * First time save, WordPress will trigger an error as when it query the old meta
+				 * the count('') == 1, so it trying to located the 0 index, which can cause order uncomplete
+				 * force to silent
+				 */
+				@update_user_meta( $user_id, 'mp_billing_info', $billing_info );
+				@update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
+			}
 		}
 
 		$item_count = 0;

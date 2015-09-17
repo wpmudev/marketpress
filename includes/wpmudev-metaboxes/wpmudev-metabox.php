@@ -287,7 +287,7 @@ class WPMUDEV_Metabox {
 		$this->args = apply_filters( 'wpmudev_metabox/init_args', $this->args );
 
 		$this->nonce_action = 'wpmudev_metabox_' . str_replace( '-', '_', $this->args['id'] ) . '_save_fields';
-		$this->nonce_name   = $this->nonce_action . '_nonce';
+		$this->nonce_name   = md5( $this->nonce_action . '_nonce' );
 
 		// These only need to be run once
 		if ( ! self::$did_run_once ) {
@@ -548,9 +548,6 @@ class WPMUDEV_Metabox {
 	 * @action save_post
 	 */
 	public function maybe_save_fields( $post_id ) {
-		if ( $this->args['id'] == 'mp-product-price-inventory-variants-metabox' ) {
-
-		}
 		if ( ! $this->is_active() ) {
 
 			return;
@@ -1101,9 +1098,9 @@ class WPMUDEV_Metabox {
 				}
 			}
 
-			if ( $this->is_active == false && $_SERVER['REQUEST_METHOD'] == 'POST' && mp_get_post_value( 'post_ID', 0 ) != 0 && mp_get_post_value( 'action', 0 ) == 'editpost' ) {
-				$post_post_id = mp_get_post_value( 'post_ID' );
-				if ( $post_post_id != $post->ID ) {
+			if ( $this->is_active == false && $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['post_ID'] ) && $_POST['post_ID'] != 0 && $_POST['action'] == 'editpost' ) {
+				$post_post_id = $_POST['post_ID'];
+				if (!is_object($post) || $post_post_id != $post->ID ) {
 					$actual_post = get_post( $post_post_id );
 					if ( is_object( $actual_post ) && $actual_post->post_type == $this->args['post_type'] ) {
 						$this->is_active = true;

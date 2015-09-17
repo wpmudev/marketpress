@@ -270,7 +270,7 @@ var marketpress = { };
          */
         initProductTabs: function( ) {
 
-            $( '.mp_product_meta a.more-link' ).live( 'click', function( e ) {
+            $( 'body' ).on( 'click', '.mp_product_meta a.more-link', function( e ) {
                 e.preventDefault( );
                 $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
                 $( 'html, body' ).animate( {
@@ -518,7 +518,7 @@ var marketpress = { };
             $.post( url, data ).done( function( resp ) {
                 marketpress.loadingOverlay( 'hide' );
                 $( '.mp_listings_nav' ).remove( );
-                $( '#mp-products' ).replaceWith( resp );
+                $( '.mp_global_product_list_widget #mp_product_list' ).replaceWith( resp );
                 mp_cart.initCartListeners( );
             } );
         },
