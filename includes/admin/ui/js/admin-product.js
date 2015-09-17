@@ -275,19 +275,30 @@ jQuery( document ).ready( function( $ ) {
                     $( this ).parent( ).find( '.currency' ).show();
                     connectWith.val( $( this ).val( ) ).change( );
                     if ( data_type == 'number' ) {
-
-                        if ( $( this ).parent().hasClass( 'field_editable' ) && $( this ).parent().hasClass( 'field_editable_sale_price_amount' ) ) {
-                            var reg_price = $( this ).parent().parent();
-                            reg_price.find( '.field_editable.field_editable_price' ).addClass( 'mp_strikethrough' );
-                        }
-
                         var numeric_value = $( this ).val( );
                         numeric_value = numeric_value.replace( ",", "." );
                         if ( $.isNumeric( numeric_value ) ) {
                             elem.text( numeric_value );
                         } else {
-                            elem.text( 0 );
+							if(numeric_value === '-' || numeric_value === '∞') {
+								if( numeric_value === '∞' ) { 
+									elem.text( '∞' )
+								} else {
+									elem.text( '-' )
+								}
+								numeric_value = '';
+							} else {
+								elem.text( 0 );
+							}
                         }
+						
+						if ( $( this ).parent().hasClass( 'field_editable' ) && $( this ).parent().hasClass( 'field_editable_sale_price_amount' ) ) {
+                            if( numeric_value !== '' ) {
+								var reg_price = $( this ).parent().parent();
+								reg_price.find( '.field_editable.field_editable_price' ).addClass( 'mp_strikethrough' );
+							}
+                        }
+						
                         save_inline_post_data( post_id, data_meta, numeric_value, data_sub_meta );
                     } else {
                         elem.text( $( this ).val( ) );
@@ -320,6 +331,17 @@ jQuery( document ).ready( function( $ ) {
         }
         e.preventDefault( );
     } );
+	$( ".mp_inline_temp_value" ).live( 'keydown', function( e ) {
+		if ( e.keyCode == 9 ) {
+			e.preventDefault( );
+			
+			var parentContainer = $( this ).parent( );
+			var nextContainer = $( this ).parent( ).next( 'td' );
+			nextContainer.find( '.original_value' ).trigger( 'click' );
+			
+            $( this ).blur( );
+        }
+	});
     $( '#mp-product-price-inventory-variants-metabox' ).keydown( function( event ) {//window
         if ( event.keyCode == 13 ) {
             event.preventDefault( );
