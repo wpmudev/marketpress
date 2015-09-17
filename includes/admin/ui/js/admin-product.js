@@ -215,8 +215,6 @@ jQuery( document ).ready( function( $ ) {
 
     } );
 
-    $( '.mp-add-new-variation' ).click();
-
 } );
 /* INLINE EDIT */
 

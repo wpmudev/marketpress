@@ -966,20 +966,22 @@ class MP_Products_Screen {
 	 */
 	public function save_init_product_variations() {
 		global $wp_taxonomies;
-
-		if ( mp_get_post_value( 'has_variation', 'no' ) == 'no' ) {
-			return;
-		}
+		
+		
 
 		$variation_names	 = mp_get_post_value( 'product_attributes_categories', array() );
 		$new_variation_names = mp_get_post_value( 'variation_names', array() );
 		$variation_values	 = mp_get_post_value( 'variation_values', array() );
 		$post_id			 = mp_get_post_value( 'post_ID' );
-
+		$reset_variations 	 = mp_get_post_value( 'reset_variations' );
+		
 		$data = array();
 
-		if ( isset( $variation_values ) && !empty( $variation_values ) ) {
-
+		if ( isset( $variation_values ) && !empty( $variation_values ) && isset( $reset_variations ) && $reset_variations == "true" ) {
+			
+			//Delete all current variations & regenerate all possible combinations
+			$this->maybe_delete_variations_before_generate($post_id);
+			
 			update_post_meta( $post_id, 'has_variations', 1 );
 
 			$i = 0;
@@ -1100,6 +1102,23 @@ class MP_Products_Screen {
 //exit;
 		} else {
 //update_post_meta( $post_id, 'has_variations', 0 );
+		}
+	}
+	
+	public function maybe_delete_variations_before_generate($product_id) {
+		$args = array(
+			'post_parent'	 => $product_id,
+			'post_type'		 => MP_Product::get_variations_post_type(),
+			'posts_per_page' => -1,
+			'post_status'	 => 'publish',
+			'orderby'		 => 'ID',
+			'order'			 => 'ASC',
+		);
+
+		$children = get_children( $args, OBJECT );
+		
+		foreach ($children as $variant) {
+			wp_delete_post( $variant->ID, true);
 		}
 	}
 
@@ -1266,7 +1285,7 @@ WHERE $delete_where"
 
 		$metabox = new WPMUDEV_Metabox( apply_filters( 'mp_metabox_array_mp-product-price-inventory-variants-metabox', array(
 			'id'		 => 'mp-product-price-inventory-variants-metabox',
-			'title'		 => $has_variations ? __( 'Product Variations' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'title'		 => $has_variations ? __( 'Product Variations', 'mp' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
 			'post_type'	 => MP_Product::get_post_type(),
 			'context'	 => 'normal',
 		) ) );
@@ -1523,51 +1542,43 @@ WHERE $delete_where"
 				  'action' => 'show',
 				  ), */
 				) ) );
-			}
-
-			$metabox->add_field( 'radio_group', apply_filters( 'mp_add_field_array_has_variation', array(
-				'name'			 => 'has_variation',
-				'label'			 => array( 'text' => '' ),
-				'options'		 => array(
-					'no'	 => __( 'This is a unique product without variations', 'mp' ),
-					'yes'	 => sprintf( __( 'This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
-				),
-				'conditional'	 => array(
-					'name'	 => 'product_type',
-					'value'	 => array( 'physical', 'digital' ),
-					'action' => 'show',
-				),
-				'default_value'	 => 'no',
-				'class'			 => 'mp_variations_select'
-			) ) );
+			}			
 		}
-
+		
+		$variation_class = 'mp_variations_select';
+		
 		if ( $has_variations ) {
-			$metabox->add_field( 'variations', apply_filters( 'mp_add_field_array_variations_module', array(
-				'name'		 => 'variations_module',
-				'label'		 => '', //array( 'text' => sprintf( __( '%3$sProduct Variations%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
-				'message'	 => __( 'Variations', 'mp' ),
-				/* 'conditional'	 => array(
-				  'name'	 => 'has_variation',
-				  'value'	 => 'yes',
-				  'action' => 'show',
-				  ), */
-				'class'		 => 'mp_variations_table_box'
-			), $has_variations ) );
-		} else {
-			$metabox->add_field( 'variations', apply_filters( 'mp_add_field_array_variations_module', array(
-				'name'			 => 'variations_module',
-				'label'			 => array( 'text' => sprintf( __( '%3$sAdd variations for%2$s %1$sProduct%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
-				'message'		 => __( 'Variations', 'mp' ),
-				'desc'			 => __( 'Add variations for this product. e.g. If you are selling t-shirts, you can create Color & Size variations', 'mp' ),
-				'conditional'	 => array(
-					'name'	 => 'has_variation',
-					'value'	 => 'yes',
-					'action' => 'show',
-				),
-				'class'			 => 'mp_variations_box'
-			), $has_variations ) );
-		}
+			$variation_class .= 'checkbox-variations';
+		} 
+		
+		$metabox->add_field( 'radio_group', apply_filters( 'mp_add_field_array_has_variation', array(
+			'name'			 => 'has_variation',
+			'label'			 => array( 'text' => '' ),
+			'options'		 => array(
+				'no'	 => __( 'This is a unique product without variations', 'mp' ),
+				'yes'	 => sprintf( __( 'This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s', 'mp' ), '<span class="mp_meta_small_desc">', '</span>' ),
+			),
+			'conditional'	 => array(
+				'name'	 => 'product_type',
+				'value'	 => array( 'physical', 'digital' ),
+				'action' => 'show',
+			),
+			'default_value'	 => 'no',
+			'class'			 => $variation_class
+		) ) );
+		
+		$metabox->add_field( 'variations', apply_filters( 'mp_add_field_array_variations_module', array(
+			'name'			 => 'variations_module',
+			'label'			 => $has_variations ? array( 'text' => __( 'Product Variations', 'mp' ) ) : array( 'text' => sprintf( __( '%3$sAdd variations for%2$s %1$sProduct%2$s', 'mp' ), '<span class="mp_variations_product_name">', '</span>', '<span class="mp_variations_title">' ) ),
+			'message'		 => __( 'Variations', 'mp' ),
+			'desc'			 => $has_variations ? '' : __( 'Add variations for this product. e.g. If you are selling t-shirts, you can create Color & Size variations', 'mp' ),
+			'conditional'	 => array(
+				'name'	 => 'has_variation',
+				'value'	 => 'yes',
+				'action' => 'show',
+			),
+			'class'			 => 'mp_variations_box mp_variations_table_box'
+		), $has_variations ) );
 
 		$metabox->add_field( 'file', apply_filters( 'mp_add_field_array_file_url', array(
 			'name'			 => 'file_url',
