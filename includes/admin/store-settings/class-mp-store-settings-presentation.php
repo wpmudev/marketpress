@@ -636,6 +636,13 @@ class MP_Store_Settings_Presentation {
 			'desc'		 => __( 'If enabled, users will be able to choose how many of the product they want to purchase before adding to their cart. If not checked, quantity could be change later on the cart page.', 'mp' ),
 		) );
 		$metabox->add_field( 'checkbox', array(
+			'name'			 => 'show_single_excerpt',
+			'label'			 => array( 'text' => __( 'Show Excerpt?', 'mp' ) ),
+			'message'		 => __( 'Yes', 'mp' ),
+			'desc'		 	 => __( 'If enabled, description excerpt will be added above Add to cart.', 'mp' ),
+			'default_value'	 => 1,
+		) );
+		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'show_img',
 			'label'		 => array( 'text' => __( 'Show Product Image?', 'mp' ) ),
 			'message'	 => __( 'Yes', 'mp' ),

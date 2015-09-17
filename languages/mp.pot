@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.0.0.3-beta\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2015-09-15 15:46:55+00:00\n"
+"POT-Creation-Date: 2015-09-16 09:32:06+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,7 +28,7 @@ msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:21
 #: includes/admin/class-mp-products-admin.php:2038
-#: includes/common/class-mp-product.php:2475
+#: includes/common/class-mp-product.php:2540
 msgid "Description"
 msgstr ""
 
@@ -241,9 +241,9 @@ msgstr ""
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:641
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:714
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:725
-#: includes/common/payment-gateways/_bitpay.php:253
-#: includes/common/payment-gateways/_bitpay.php:260
-#: includes/common/payment-gateways/_bitpay.php:267
+#: includes/common/payment-gateways/_bitpay.php:250
+#: includes/common/payment-gateways/_bitpay.php:257
+#: includes/common/payment-gateways/_bitpay.php:264
 #: includes/common/payment-gateways/authorizenet-aim.php:290
 #: includes/common/payment-gateways/authorizenet-aim.php:325
 #: includes/common/payment-gateways/free_orders.php:160
@@ -273,7 +273,7 @@ msgstr ""
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:833
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:932
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:935
-#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:532
+#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:548
 msgid "Coupons"
 msgstr ""
 
@@ -491,7 +491,7 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:205
 #: includes/admin/class-mp-orders-admin.php:891
-#: includes/common/class-mp-order.php:823 includes/common/helpers.php:96
+#: includes/common/class-mp-order.php:821 includes/common/helpers.php:96
 msgid "Total"
 msgstr ""
 
@@ -513,14 +513,14 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:66
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:66
-#: includes/common/class-mp-order.php:657 includes/common/helpers.php:149
+#: includes/common/class-mp-order.php:655 includes/common/helpers.php:149
 #: includes/public/class-mp-checkout.php:1115
 msgid "Billing Address"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:70
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:70
-#: includes/common/class-mp-order.php:665 includes/common/helpers.php:150
+#: includes/common/class-mp-order.php:663 includes/common/helpers.php:150
 #: includes/public/class-mp-checkout.php:1122
 msgid "Shipping Address"
 msgstr ""
@@ -541,7 +541,7 @@ msgstr ""
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:85
 #: includes/admin/class-mp-products-admin.php:1501
 #: includes/common/class-mp-cart.php:1265
-#: includes/common/class-mp-product.php:629
+#: includes/common/class-mp-product.php:650
 msgid "Quantity"
 msgstr ""
 
@@ -608,7 +608,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:317
 #: includes/admin/class-mp-orders-admin.php:917
 #: includes/admin/class-mp-orders-admin.php:938
-#: includes/common/class-mp-order.php:780
+#: includes/common/class-mp-order.php:778
 #: includes/common/payment-gateways/payfast.php:244 marketpress.php:287
 msgid "Received"
 msgstr ""
@@ -629,7 +629,7 @@ msgstr ""
 #: includes/common/payment-gateways/pin.php:258
 #: includes/common/payment-gateways/simplify.php:181
 #: includes/common/payment-gateways/stripe.php:347
-#: includes/common/payment-gateways/wepay.php:261 marketpress.php:293
+#: includes/common/payment-gateways/wepay.php:269 marketpress.php:293
 msgid "Paid"
 msgstr ""
 
@@ -638,7 +638,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:831
 #: includes/admin/class-mp-orders-admin.php:925
 #: includes/admin/class-mp-orders-admin.php:940
-#: includes/common/class-mp-order.php:784 marketpress.php:299
+#: includes/common/class-mp-order.php:782 marketpress.php:299
 msgid "Shipped"
 msgstr ""
 
@@ -647,7 +647,7 @@ msgstr ""
 #: includes/admin/class-mp-orders-admin.php:832
 #: includes/admin/class-mp-orders-admin.php:929
 #: includes/admin/class-mp-orders-admin.php:941
-#: includes/common/class-mp-order.php:795 marketpress.php:305
+#: includes/common/class-mp-order.php:793 marketpress.php:305
 msgid "Closed"
 msgstr ""
 
@@ -1487,7 +1487,7 @@ msgid "Changes saved successfully"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1210
-#: includes/common/class-mp-product.php:2461
+#: includes/common/class-mp-product.php:2525
 msgid "Related Products"
 msgstr ""
 
@@ -3510,25 +3510,25 @@ msgstr ""
 msgid "Complete!"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:495
+#: includes/common/class-mp-installer.php:499
 msgid "Update Data"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:544
+#: includes/common/class-mp-installer.php:548
 msgid "Update MarketPress Data"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:545
+#: includes/common/class-mp-installer.php:549
 msgid ""
 "MarketPress requires a database update to continue working correctly.<br "
 "/>Below you will find a list of items that require your attention."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:576
+#: includes/common/class-mp-installer.php:580
 msgid "Product Metadata"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:585
+#: includes/common/class-mp-installer.php:589
 msgid ""
 "Depending on the amount of products you have, this update could take quite "
 "some time. Please keep this window open while the update completes. If you "
@@ -3536,21 +3536,21 @@ msgid ""
 "please don't exit the window."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:591
+#: includes/common/class-mp-installer.php:595
 msgid ""
 "Please update each subsite in your WordPress network where you have older "
 "version of the MarketPress plugin."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:597
+#: includes/common/class-mp-installer.php:601
 msgid "Perform Update"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:601
+#: includes/common/class-mp-installer.php:605
 msgid "MarketPress performed a quick automatic update successfully!"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:621
+#: includes/common/class-mp-installer.php:625
 msgid ""
 "MarketPress requires a database update to continue working correctly. <a "
 "class=\"button-primary\" href=\"%s\">Go to update page</a>"
@@ -3561,162 +3561,184 @@ msgid "New Order Notification: ORDERID"
 msgstr ""
 
 #: includes/common/class-mp-order.php:285
-msgid ""
-"A new order (ORDERID) was created in your store:<br /><br />\r\n"
-"\r\n"
-"ORDERINFOSKU<br /><br />\r\n"
-"SHIPPINGINFO<br /><br />\r\n"
-"PAYMENTINFO<br /><br />\r\n"
-"\r\n"
-"You can manage this order here: %s"
+msgid "A new order (ORDERID) was created in your store:<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-order.php:577
+#: includes/common/class-mp-order.php:286
+msgid "ORDERINFOSKU<br /><br />"
+msgstr ""
+
+#: includes/common/class-mp-order.php:287
+msgid "SHIPPINGINFO<br /><br />"
+msgstr ""
+
+#: includes/common/class-mp-order.php:288
+msgid "PAYMENTINFO<br /><br />"
+msgstr ""
+
+#: includes/common/class-mp-order.php:289
+msgid "You can manage this order here: %s"
+msgstr ""
+
+#: includes/common/class-mp-order.php:575
 msgid "First Name"
 msgstr ""
 
-#: includes/common/class-mp-order.php:581
+#: includes/common/class-mp-order.php:579
 msgid "Last Name"
 msgstr ""
 
-#: includes/common/class-mp-order.php:585
+#: includes/common/class-mp-order.php:583
 msgid "Address 1"
 msgstr ""
 
-#: includes/common/class-mp-order.php:589
+#: includes/common/class-mp-order.php:587
 msgid "Address 2"
 msgstr ""
 
-#: includes/common/class-mp-order.php:593
+#: includes/common/class-mp-order.php:591
 msgid "City"
 msgstr ""
 
-#: includes/common/class-mp-order.php:600
+#: includes/common/class-mp-order.php:598
 msgid "State"
 msgstr ""
 
-#: includes/common/class-mp-order.php:614
+#: includes/common/class-mp-order.php:612
 #: includes/public/class-mp-checkout.php:362
 msgid "Country"
 msgstr ""
 
-#: includes/common/class-mp-order.php:618
+#: includes/common/class-mp-order.php:616
 #: includes/public/class-mp-checkout.php:376
 msgid "Phone"
 msgstr ""
 
-#: includes/common/class-mp-order.php:622
+#: includes/common/class-mp-order.php:620
 msgid "Email"
 msgstr ""
 
-#: includes/common/class-mp-order.php:627
+#: includes/common/class-mp-order.php:625
 #: includes/public/class-mp-checkout.php:1010
 msgid "Special Instructions"
 msgstr ""
 
-#: includes/common/class-mp-order.php:659
+#: includes/common/class-mp-order.php:657
 msgid "Copy billing address to shipping address"
 msgstr ""
 
-#: includes/common/class-mp-order.php:756
+#: includes/common/class-mp-order.php:754
 msgid "Order #"
 msgstr ""
 
-#: includes/common/class-mp-order.php:791
+#: includes/common/class-mp-order.php:789
 msgid "In Process"
 msgstr ""
 
-#: includes/common/class-mp-order.php:801
+#: includes/common/class-mp-order.php:799
 msgid "Taxes:"
 msgstr ""
 
-#: includes/common/class-mp-order.php:805 includes/common/helpers.php:131
+#: includes/common/class-mp-order.php:803 includes/common/helpers.php:131
 msgid "Shipping:"
 msgstr ""
 
-#: includes/common/class-mp-order.php:820
+#: includes/common/class-mp-order.php:818
 msgid "Order Received"
 msgstr ""
 
-#: includes/common/class-mp-order.php:821
+#: includes/common/class-mp-order.php:819
 msgid "Current Status"
 msgstr ""
 
-#: includes/common/class-mp-order.php:1157
+#: includes/common/class-mp-order.php:1155
 msgid "Shipped: Track Shipment"
 msgstr ""
 
-#: includes/common/class-mp-product.php:289
-#: includes/common/class-mp-product.php:887
-#: includes/common/class-mp-product.php:895
+#: includes/common/class-mp-product.php:300
+#: includes/common/class-mp-product.php:892
+#: includes/common/class-mp-product.php:900
 msgid "Add To Cart"
 msgstr ""
 
-#: includes/common/class-mp-product.php:292
-#: includes/common/class-mp-product.php:889
-#: includes/common/class-mp-product.php:897
+#: includes/common/class-mp-product.php:304
+#: includes/common/class-mp-product.php:894
+#: includes/common/class-mp-product.php:902
 msgid "Buy Now"
 msgstr ""
 
-#: includes/common/class-mp-product.php:379
-#: includes/common/class-mp-product.php:386
+#: includes/common/class-mp-product.php:396
+#: includes/common/class-mp-product.php:403
 msgid "We're sorry, we only have %d of this item in stock right now."
 msgstr ""
 
-#: includes/common/class-mp-product.php:549
+#: includes/common/class-mp-product.php:570
 msgid "Choose a %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:874
+#: includes/common/class-mp-product.php:879
 #: includes/multisite/template-functions.php:577
 msgid "Buy Now &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:879
+#: includes/common/class-mp-product.php:884
 msgid "Out of Stock"
 msgstr ""
 
-#: includes/common/class-mp-product.php:885
+#: includes/common/class-mp-product.php:890
 msgid "Choose Options"
 msgstr ""
 
-#: includes/common/class-mp-product.php:955
+#: includes/common/class-mp-product.php:963
 msgid "More Info &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1131
-#: includes/common/class-mp-product.php:1146
+#: includes/common/class-mp-product.php:1143
+#: includes/common/class-mp-product.php:1158
 msgid "%s each"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1450
+#: includes/common/class-mp-product.php:1474
 msgid ""
 "<p class=\"mp_related_products_empty_message\">There are no related "
 "products for this item.</p>"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1667
+#: includes/common/class-mp-product.php:1705
 msgid "View Larger Image &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1914
+#: includes/common/class-mp-product.php:1958
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1915
+#: includes/common/class-mp-product.php:1959
 msgid ""
 "This message is being sent to notify you of low stock of a product in your "
-"online store according to your preferences.\r\n"
-"\r\n"
-"Product: %s\r\n"
-"Current Inventory: %s\r\n"
-"Link: %s\r\n"
-"\r\n"
-"Edit Product: %s\r\n"
-"Notification Preferences: %s"
+"online store according to your preferences.<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2271
+#: includes/common/class-mp-product.php:1961
+msgid "Product: %s"
+msgstr ""
+
+#: includes/common/class-mp-product.php:1962
+msgid "Current Inventory: %s"
+msgstr ""
+
+#: includes/common/class-mp-product.php:1963
+msgid "Link: %s<br /><br />"
+msgstr ""
+
+#: includes/common/class-mp-product.php:1965
+msgid "Edit Product: %s"
+msgstr ""
+
+#: includes/common/class-mp-product.php:1966
+msgid "Notification Preferences: %s"
+msgstr ""
+
+#: includes/common/class-mp-product.php:2329
 msgid "Tweet"
 msgstr ""
 
@@ -3779,56 +3801,55 @@ msgstr ""
 
 #: includes/common/data.php:114
 msgid ""
-"Thank you for your order CUSTOMERNAME!\r\n"
-"\r\n"
-"Your order has been received, and any items to be shipped will be processed "
-"as soon as possible. Please refer to your Order ID (ORDERID) whenever "
-"contacting us.\r\n"
-"Here is a confirmation of your order details:\r\n"
-"\r\n"
-"Order Information:\r\n"
-"ORDERINFO\r\n"
-"\r\n"
-"Shipping Information:\r\n"
-"SHIPPINGINFO\r\n"
-"\r\n"
-"Payment Information:\r\n"
-"PAYMENTINFO\r\n"
-"\r\n"
-"ORDERNOTES\r\n"
-"\r\n"
-"You can track the latest status of your order here: TRACKINGURL\r\n"
-"\r\n"
-"Thanks again!"
+"Thank you for your order CUSTOMERNAME!\n"
+"\n"
+" Your order has been received, and any items to be shipped will be "
+"processed as soon as possible. Please refer to your Order ID (ORDERID) "
+"whenever contacting us. \n"
+" Here is a confirmation of your order details:\n"
+"\n"
+" Order Information:\n"
+" ORDERINFO \n"
+"\n"
+" Shipping Information: \n"
+" SHIPPINGINFO \n"
+"\n"
+" Payment Information: \n"
+" PAYMENTINFO \n"
+"\n"
+" ORDERNOTES \n"
+"\n"
+" You can track the latest status of your order here: TRACKINGURL \n"
+"\n"
+" Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:136
+#: includes/common/data.php:118
 msgid "Your Order Has Been Shipped! (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:137
+#: includes/common/data.php:119
 msgid ""
-"Dear CUSTOMERNAME,\r\n"
-"\r\n"
-"Your order has been shipped! Depending on the shipping method and your "
+"Dear CUSTOMERNAME,\n"
+" Your order has been shipped! Depending on the shipping method and your "
 "location it should be arriving shortly. Please refer to your Order ID "
-"(ORDERID) whenever contacting us.\r\n"
-"Here is a confirmation of your order details:\r\n"
-"\r\n"
-"Order Information:\r\n"
-"ORDERINFO\r\n"
-"\r\n"
-"Shipping Information:\r\n"
-"SHIPPINGINFO\r\n"
-"\r\n"
-"Payment Information:\r\n"
-"PAYMENTINFO\r\n"
-"\r\n"
-"ORDERNOTES\r\n"
-"\r\n"
-"You can track the latest status of your order here: TRACKINGURL\r\n"
-"\r\n"
-"Thanks again!"
+"(ORDERID) whenever contacting us.\n"
+"Here is a confirmation of your order details:\n"
+"\n"
+" Order Information:\n"
+" ORDERINFO\n"
+"\n"
+" Shipping Information:\n"
+" SHIPPINGINFO\n"
+"\n"
+" Payment Information:\n"
+" PAYMENTINFO\n"
+"\n"
+" ORDERNOTES\n"
+"\n"
+" You can track the latest status of your order here: TRACKINGURL\n"
+"\n"
+" Thanks again!"
 msgstr ""
 
 #: includes/common/helpers.php:92
@@ -4065,37 +4086,36 @@ msgid ""
 msgstr ""
 
 #: includes/common/payment-gateways/_bitpay.php:150
-#: includes/common/payment-gateways/_bitpay.php:297
+#: includes/common/payment-gateways/_bitpay.php:294
 msgid "Incorrect order invoice, please contact site administrator"
 msgstr ""
 
 #: includes/common/payment-gateways/_bitpay.php:175
-#: includes/common/payment-gateways/_bitpay.php:530
+#: includes/common/payment-gateways/_bitpay.php:527
 msgid "%s - The payment request has been processed - %s"
 msgstr ""
 
 #: includes/common/payment-gateways/_bitpay.php:177
-#: includes/common/payment-gateways/_bitpay.php:520
-#: includes/common/payment-gateways/_bitpay.php:525
+#: includes/common/payment-gateways/_bitpay.php:517
+#: includes/common/payment-gateways/_bitpay.php:522
 msgid "%s - The payment request is under process. Bitpay invoice status - %s"
 msgstr ""
 
 #: includes/common/payment-gateways/_bitpay.php:222
 msgid ""
-"\r\n"
-"\t\t\t\tYou can now accept a payment from any country on Earth, with no "
-"risk of fraud. To use Bitpay, you need to signup on <a "
-"href=\"https://bitpay.com/start\" title=\"Bitpay signup\">Bitpay</a>.\r\n"
-"\t\t\t\tAfter completing the signup process, you can get api keys at <a "
+"You can now accept a payment from any country on Earth, with no risk of "
+"fraud. To use Bitpay, you need to signup on <a "
+"href=\"https://bitpay.com/start\" title=\"Bitpay signup\">Bitpay</a>. \\n"
+" After completing the signup process, you can get api keys at <a "
 "href=\"https://bitpay.com/api-keys\" title=\"API keys\">Bitpay API key</a>. "
 "You can read more about Bitpay at <a "
 "href=\"https://bitpay.com/downloads/bitpayApi.pdf\" title=\"Bitpay "
-"documentation\">Bitpay API</a>.\r\n"
-"\t\t\t\t<strong>Bitpay requires SSL(https) for payment notifications to "
+"documentation\">Bitpay API</a>. \\n"
+" <strong>Bitpay requires SSL(https) for payment notifications to "
 "work.</strong>"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:234
+#: includes/common/payment-gateways/_bitpay.php:231
 #: includes/common/payment-gateways/eway31.php:499
 #: includes/common/payment-gateways/eway31.php:526
 #: includes/common/payment-gateways/mollie.php:83
@@ -4103,63 +4123,63 @@ msgstr ""
 msgid "API Key"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:241
+#: includes/common/payment-gateways/_bitpay.php:238
 msgid "Transaction Speed"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:243
+#: includes/common/payment-gateways/_bitpay.php:240
 msgid ""
 "Speed at which the bitcoin transaction registers as \"confirmed\" to the "
 "store. This overrides your merchant settings on the Bitpay website."
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:245
+#: includes/common/payment-gateways/_bitpay.php:242
 msgid "High"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:246
+#: includes/common/payment-gateways/_bitpay.php:243
 msgid "Medium"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:247
+#: includes/common/payment-gateways/_bitpay.php:244
 msgid "Low"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:252
+#: includes/common/payment-gateways/_bitpay.php:249
 msgid "Full Notifications"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:255
+#: includes/common/payment-gateways/_bitpay.php:252
 msgid "If enabled, you will recieve an email for each status update on payment."
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:259
+#: includes/common/payment-gateways/_bitpay.php:256
 msgid "Enable Debug Log"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:262
+#: includes/common/payment-gateways/_bitpay.php:259
 msgid ""
 "If checked, response fron bitpay will be stored in log file, keep it "
 "disabled unless required."
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:266
+#: includes/common/payment-gateways/_bitpay.php:263
 msgid "Use Test Mode?"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:269
+#: includes/common/payment-gateways/_bitpay.php:266
 msgid ""
 "If enabled, all API calls will be made to <a "
 "href=\"https://test.bitpay.com\">https://test.bitpay.com</a>."
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:539
+#: includes/common/payment-gateways/_bitpay.php:536
 msgid ""
 "%s - The payment not credited in merchants bitpay account, action required. "
 "Bitpay invoice status  - %s"
 msgstr ""
 
-#: includes/common/payment-gateways/_bitpay.php:544
+#: includes/common/payment-gateways/_bitpay.php:541
 msgid "%s - The payment request expired, - %s"
 msgstr ""
 
@@ -6580,7 +6600,7 @@ msgid "There was an error processing your card - \"%s\". Please try again."
 msgstr ""
 
 #: includes/common/payment-gateways/wepay.php:36
-#: includes/common/payment-gateways/wepay.php:291
+#: includes/common/payment-gateways/wepay.php:299
 msgid "WePay"
 msgstr ""
 
@@ -6667,17 +6687,17 @@ msgstr ""
 msgid "Account ID"
 msgstr ""
 
-#: includes/common/payment-gateways/wepay.php:206
+#: includes/common/payment-gateways/wepay.php:207
 msgid ""
 "The WePay Card Token was not generated correctly. Please go back and try "
 "again."
 msgstr ""
 
-#: includes/common/payment-gateways/wepay.php:259
+#: includes/common/payment-gateways/wepay.php:267
 msgid "%1$s"
 msgstr ""
 
-#: includes/common/payment-gateways/wepay.php:275
+#: includes/common/payment-gateways/wepay.php:283
 msgid ""
 "There was an error processing your card: \"%s\". Please check your credit "
 "card info and try again."
@@ -8473,37 +8493,37 @@ msgid_plural "Closed <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: marketpress.php:392
+#: marketpress.php:394
 msgid "Add a Product"
 msgstr ""
 
-#: marketpress.php:503
+#: marketpress.php:519
 msgid "Your pages were created successfully."
 msgstr ""
 
-#: marketpress.php:513
+#: marketpress.php:529
 msgid ""
 "<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin "
 "automatically."
 msgstr ""
 
-#: marketpress.php:517
+#: marketpress.php:533
 msgid "Install %s Pages"
 msgstr ""
 
-#: marketpress.php:533
+#: marketpress.php:549
 msgid "Offer and accept coupon codes"
 msgstr ""
 
-#: marketpress.php:541
+#: marketpress.php:557
 msgid "Pro Sites"
 msgstr ""
 
-#: marketpress.php:542
+#: marketpress.php:558
 msgid "Grant access to themes and gateways depending on the user's Pro Site level"
 msgstr ""
 
-#: marketpress.php:549
+#: marketpress.php:565
 msgid "Invoice PDF"
 msgstr ""
 

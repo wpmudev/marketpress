@@ -1956,15 +1956,15 @@ class MP_Product {
 		}
 
 		$subject = __( 'Low Product Inventory Notification', 'mp' );
-		$msg     = __( 'This message is being sent to notify you of low stock of a product in your online store according to your preferences.
+		$msg     = __( 'This message is being sent to notify you of low stock of a product in your online store according to your preferences.<br /><br />', 'mp' );
 
-Product: %s
-Current Inventory: %s
-Link: %s
+		$msg    .= __( 'Product: %s', 'mp' );
+		$msg    .= __( 'Current Inventory: %s', 'mp' );
+		$msg    .= __( 'Link: %s<br /><br />', 'mp' );
 
-Edit Product: %s
-Notification Preferences: %s', 'mp' );
-		$msg     = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc' ) );
+		$msg    .= __( 'Edit Product: %s', 'mp' );
+		$msg    .= __( 'Notification Preferences: %s', 'mp' );
+		$msg    = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc' ) );
 
 		/**
 		 * Filter the low stock notification message
