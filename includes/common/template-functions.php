@@ -2931,10 +2931,7 @@ if ( ! function_exists( 'mp_tag_list' ) ) :
 		$terms = get_the_term_list( $product_id, 'product_tag', $before, $sep, $after );
 		if ( $terms ) {
 			return $terms;
-		} else {
-			$return = __( 'No Tags', 'mp' );
 		}
-
 		return apply_filters( 'mp_tag_list', $return, $product_id, $before, $sep, $after );
 	}
 endif;
