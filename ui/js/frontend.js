@@ -500,8 +500,20 @@ var marketpress = { };
             var $form = $( '#mp_global_product_list_refine' );
             $form.on( 'change', 'select', function( e ) {
                 var $this = $( this );
-                //we don't filter by taxonomy in global, so just bypass
-                marketpress.updateGlobalProductList( );
+                // Redirect if product category dropdown changed
+                if ( 'product_category' == $this.attr( 'name' ) ) {
+                    var val = $this.val( );
+                    marketpress.loadingOverlay( 'show' );
+                    if ( typeof ( mp_global.cat_urls[ val ] ) == 'undefined' ) {
+                        window.location.href = mp_global.cat_url;
+                    } else {
+                        window.location.href = mp_global.cat_urls[ val ];
+                    }
+
+                    return;
+                } else {
+                    marketpress.updateGlobalProductList( );
+                }
             } );
         },
         /**
@@ -518,7 +530,7 @@ var marketpress = { };
             $.post( url, data ).done( function( resp ) {
                 marketpress.loadingOverlay( 'hide' );
                 $( '.mp_listings_nav' ).remove( );
-                $( '.mp_global_product_list_widget #mp_product_list' ).replaceWith( resp );
+                $( '#mp-products' ).replaceWith( resp );
                 mp_cart.initCartListeners( );
             } );
         },

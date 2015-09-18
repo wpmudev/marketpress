@@ -109,17 +109,17 @@ if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.ph
 			</p>
 
 
-			<p>
-				<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_thumbnail_placeholder' ); ?>" name="<?php echo $this->get_field_name( 'show_thumbnail_placeholder' ); ?>"<?php checked( $show_thumbnail_placeholder ); ?> />
-				<label for="<?php echo $this->get_field_id( 'show_thumbnail_placeholder' ); ?>"><?php _e( 'Show Thumbnail Placeholder image (if image is not set)', 'mp' ); ?></label>
-			</p>
+			<!--<p>
+				<input type="checkbox" class="checkbox" id="<?php /*echo $this->get_field_id( 'show_thumbnail_placeholder' ); */?>" name="<?php /*echo $this->get_field_name( 'show_thumbnail_placeholder' ); */?>"<?php /*checked( $show_thumbnail_placeholder ); */?> />
+				<label for="<?php /*echo $this->get_field_id( 'show_thumbnail_placeholder' ); */?>"><?php /*_e( 'Show Thumbnail Placeholder image (if image is not set)', 'mp' ); */?></label>
+			</p>-->
 
 			<p>
 				<label for="<?php echo esc_attr( $this->get_field_id( 'text' ) ); ?>"><?php _e( 'Content To Show:', 'mp' ) ?></label><br />
 				<select id="<?php echo esc_attr( $this->get_field_id( 'text' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'text' ) ); ?>">
 					<option value="none"<?php selected( $text, 'none' ) ?>><?php _e( 'None', 'mp' ) ?></option>
 					<option value="excerpt"<?php selected( $text, 'excerpt' ) ?>><?php _e( 'Excerpt', 'mp' ) ?></option>
-					<option value="content"<?php selected( $text, 'content' ) ?>><?php _e( 'Content', 'mp' ) ?></option>
+					<!--<option value="content"<?php /*selected( $text, 'content' ) */?>><?php /*_e( 'Content', 'mp' ) */?></option>-->
 				</select>
 			</p>
 

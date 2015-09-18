@@ -812,6 +812,22 @@ if ( ! function_exists( 'mp_create_store_page' ) ) :
 					'comment_status' => 'closed'
 				);
 				break;
+			case 'network_categories' :
+				$args = array(
+					'post_title'     => __( 'Category', 'mp' ),
+					'post_content'   => __( "[mp_global_categories_list]", 'mp' ),
+					'comment_status' => 'closed',
+					'post_parent'    => mp_get_network_setting( 'pages->network_store_page', 0 ),
+				);
+				break;
+			case 'network_tags' :
+				$args = array(
+					'post_title'     => __( 'Tag', 'mp' ),
+					'post_content'   => __( "[mp_global_tag_cloud]", 'mp' ),
+					'comment_status' => 'closed',
+					'post_parent'    => mp_get_network_setting( 'pages->network_store_page', 0 ),
+				);
+				break;
 			case 'products' :
 				$args = array(
 					'post_title'   => __( 'Products', 'mp' ),
@@ -2233,11 +2249,11 @@ if ( ! function_exists( 'mp_product' ) ) {
 		} else {
 			$size = mp_get_setting( 'product_img_size' );
 		}
-		
+
 		$lightbox_code = '';
 		$show_lightbox = mp_get_setting( 'show_lightbox' );
-				
-		if($show_lightbox == 1) {
+
+		if ( $show_lightbox == 1 ) {
 			$lightbox_code = "onSliderLoad: function(el) {
 											el.lightGallery({
 												selector: '#mp-product-gallery .lslide',
@@ -2263,7 +2279,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 										slideMargin:0,
 										enableDrag: true,
 										currentPagerPosition:'left',
-										".$lightbox_code."
+										" . $lightbox_code . "
 									});
 								});
 								</script>";
@@ -2311,8 +2327,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
-			
-			if(mp_get_setting( 'show_single_excerpt' ) == 1) {
+
+			if ( mp_get_setting( 'show_single_excerpt' ) == 1 ) {
 				// Excerpt
 				if ( ! $variation ) {
 					$return .= '<div class="mp_product_excerpt">';
@@ -2324,8 +2340,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$return .= '</div><!-- end mp_product_excerpt -->';
 				}
 			}
-			
-			if(mp_get_setting( 'show_single_categories' ) == 1) {
+
+			if ( mp_get_setting( 'show_single_categories' ) == 1 ) {
 				$return .= mp_category_list( $product_id, '<div class="mp_product_categories">' . __( 'Categorized in ', 'mp' ), ', ', '</div>' );
 			}
 
@@ -2358,8 +2374,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 		if ( $image ) {
 			$return .= '</div><!-- end mp_single_product_details-->';
 		}
-		
-		if(mp_get_setting( 'show_single_tags' ) == 1) {
+
+		if ( mp_get_setting( 'show_single_tags' ) == 1 ) {
 			$return .= mp_tag_list( $product_id, '<div class="mp_product_tags">' . __( 'Tagged in ', 'mp' ), ', ', '</div>' );
 		}
 
@@ -2383,7 +2399,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 </div><!-- end mp_product_tab_content_text -->
 </div><!-- end mp-product-overview -->';
 		}
-		
+
 
 		// Remove overview tab as it's already been manually output above
 		array_shift( $product->content_tabs );
@@ -2426,7 +2442,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			}
 		}
 		$return .= '</div><!-- end mp_single_product_extra -->';
-		
+
 		$return .= '
 			
 </div><!-- end mp_product/mp_single_product -->	

@@ -202,8 +202,9 @@ class MP_Admin_Multisite {
 	 * Display indexer information
 	 */
 	public function init_indexer_metabox() {
-		$count = wp_count_posts( 'mp_ms_indexer' );
-		$html  = sprintf( __( "%d products have been indexed in whole network", "mp" ), $count->publish ) . '<br/><br/>';
+		$count = MP_Multisite::get_instance()->count();
+		//$count='';
+		$html  = sprintf( __( "%d products have been indexed in whole network", "mp" ), $count ) . '<br/><br/>';
 		$html .= '<button type="button" class="button mp_index_products">' . __( "Index Products", "mp" ) . '</button>';
 		$html .= '<p class="index-status" style="display: none;">' . __( "Please hold on...", "mp" ) . '</p>';
 		$metabox = new WPMUDEV_Metabox( array(
@@ -455,6 +456,24 @@ class MP_Admin_Multisite {
 		$metabox->add_field( 'post_select', array(
 			'name'        => 'pages[network_store_page]',
 			'label'       => array( 'text' => __( 'Marketplace', 'mp' ) ),
+			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
+			'placeholder' => __( 'Choose a Page', 'mp' ),
+			'validation'  => array(
+				'required' => true,
+			),
+		) );
+		$metabox->add_field( 'post_select', array(
+			'name'        => 'pages[network_categories]',
+			'label'       => array( 'text' => __( 'Product Categories', 'mp' ) ),
+			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
+			'placeholder' => __( 'Choose a Page', 'mp' ),
+			'validation'  => array(
+				'required' => true,
+			),
+		) );
+		$metabox->add_field( 'post_select', array(
+			'name'        => 'pages[network_tags]',
+			'label'       => array( 'text' => __( 'Product Tags', 'mp' ) ),
 			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
 			'placeholder' => __( 'Choose a Page', 'mp' ),
 			'validation'  => array(

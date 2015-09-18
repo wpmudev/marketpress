@@ -9,7 +9,7 @@ class MP_Multisite {
 	 * @access public
 	 * @var int
 	 */
-	var $build = 2;
+	var $build = 3;
 
 	/**
 	 * Refers to a single instance of the class
@@ -44,7 +44,6 @@ class MP_Multisite {
 	private function __construct() {
 		$this->maybe_install();
 		//we will need to register a post type use for index
-		add_action( 'init', array( &$this, 'register_post_type' ) );
 		if ( mp_get_network_setting( 'global_cart' ) ) {
 			mp_cart()->is_global = true;
 
@@ -53,6 +52,8 @@ class MP_Multisite {
 			add_action( 'mp/cart/before_calculate_shipping', array( &$this, 'load_shipping_plugins' ) );
 			add_action( 'mp_order/get_cart', array( &$this, 'maybe_show_cart_global' ), 10, 2 );
 		}
+		add_filter( 'rewrite_rules_array', array( &$this, 'add_rewrite_rules' ) );
+		add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
 
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 		//shortcode
@@ -69,17 +70,88 @@ class MP_Multisite {
 		add_action( 'trashed_post', array( &$this, 'delete_product' ) );
 		add_action( 'after_delete_post', array( &$this, 'delete_product' ) );
 		add_action( 'mp_checkout/product_sale', array( &$this, 'record_sale' ), 10, 2 );
+
+		add_filter( 'the_content', array( &$this, 'taxonomy_output' ) );
+
+		add_action( 'wp_enqueue_scripts', array( &$this, 'load_scripts' ), 11 );
 	}
 
+	public function load_scripts() {
+		$terms    = mp_global_get_terms( 'product_category' );
+		$cat_urls = array();
+		foreach ( $terms as $term ) {
+			$cat_urls[ $term->term_id ] = mp_global_taxonomy_url( $term->slug, 'product_category' );
+		}
+		wp_localize_script( 'mp-frontend', 'mp_global', array(
+			'cat_urls' => $cat_urls,
+			'cat_url'  => get_permalink( mp_get_network_setting( 'pages->networks_categories' ) )
+		) );
+	}
+
+	public function taxonomy_output( $content ) {
+		if ( ! in_the_loop() ) {
+			return $content;
+		}
+
+		$type     = '';
+		$taxonomy = '';
+		if ( get_the_ID() == mp_get_network_setting( 'pages->network_categories' ) ) {
+			$type     = 'mp_global_category';
+			$taxonomy = 'product_category';
+		} elseif ( get_the_ID() == mp_get_network_setting( 'pages->network_tags' ) ) {
+			$type     = 'mp_global_tag';
+			$taxonomy = 'product_tag';
+		}
+
+		if ( ! empty( $type ) ) {
+			$slug = get_query_var( $type );
+			if ( $slug ) {
+				$content = do_shortcode( '[mp_list_global_products]' );
+			}
+		}
+
+		return $content;
+	}
+
+	public function add_rewrite_rules( $rewrite_rules ) {
+		$new_rules = array();
+
+		if ( $post_id = mp_get_network_setting( 'pages->network_categories' ) ) {
+			$uri                                           = get_page_uri( $post_id );
+			$new_rules[ $uri . '/([^/]+)/page/([^/]*)/?' ] = 'index.php?pagename=' . $uri . '&mp_global_category=$matches[1]&paged=$matches[2]';
+			$new_rules[ $uri . '/([^/]+)/?' ]              = 'index.php?pagename=' . $uri . '&mp_global_category=$matches[1]';
+		}
+
+		if ( $post_id = mp_get_network_setting( 'pages->network_tags' ) ) {
+			$uri                                           = get_page_uri( $post_id );
+			$new_rules[ $uri . '/([^/]+)/page/([^/]*)/?' ] = 'index.php?pagename=' . $uri . '&mp_global_tag=$matches[1]&paged=$matches[2]';
+			$new_rules[ $uri . '/([^/]+)/?' ]              = 'index.php?pagename=' . $uri . '&mp_global_tag=$matches[1]';
+		}
+
+		return $rewrite_rules + $new_rules;
+	}
+
+	public function add_query_vars( $vars ) {
+		$vars[] = 'mp_global_category';
+		$vars[] = 'mp_global_tag';
+
+		return $vars;
+	}
+
+	/**
+	 *
+	 */
 	public function filter_products() {
-		$page = mp_get_post_value( 'page', 1 );
-		$widget_id = mp_get_post_value( 'widget_id', -1 );
+		$page      = mp_get_post_value( 'page', 1 );
+		$widget_id = mp_get_post_value( 'widget_id', - 1 );
 		list( $order_by, $order ) = explode( '-', mp_get_post_value( 'order' ) );
+		$category = mp_get_post_value( 'product_category', null ) > 0 ? mp_get_post_value( 'product_category' ) : null;
 		echo mp_global_list_products( array(
 			'page'      => $page,
 			'order_by'  => trim( $order_by ),
 			'order'     => trim( $order ),
 			'widget_id' => $widget_id,
+			'category'  => $category
 		) );
 		die;
 	}
@@ -110,17 +182,7 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function record_sale( MP_Product $item, $paid ) {
-		$current_blog_id = get_current_blog_id();
-		$index           = $this->find_index( get_current_blog_id(), $item->ID );
-		if ( is_object( $index ) ) {
-			//we need to update the sale count
-			$sale_count = $item->get_meta( 'mp_sales_count' );
-			//turn to the index
-			switch_to_blog( 1 );
-			update_post_meta( $index->ID, 'mp_sales_count', $sale_count );
-			//back to the site
-			switch_to_blog( $current_blog_id );
-		}
+
 	}
 
 	/**
@@ -130,21 +192,9 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function untrash_post( $post_id ) {
+		$this->add_index( get_current_blog_id(), get_post( $post_id ) );
 		$post = get_post( $post_id );
-		if ( ! is_object( $post ) ) {
-			return;
-		}
-
-		if ( $post->post_type != MP_Product::get_post_type() ) {
-			return;
-		}
-		//we will need to re-add the index
-		if ( $post->post_status == 'publish' ) {
-			$exist = is_object( $this->find_index( get_current_blog_id(), $post_id ) );
-			if ( ! $exist ) {
-				$this->add_index( get_current_blog_id(), $post_id );
-			}
-		}
+		$this->index_product_terms( get_current_blog_id(), $post );
 	}
 
 	/**
@@ -154,20 +204,7 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function delete_product( $post_id ) {
-		$post = get_post( $post_id );
-		if ( ! is_object( $post ) ) {
-			return;
-		}
-
-		if ( $post->post_type != MP_Product::get_post_type() ) {
-			return;
-		}
-		$current_blog_id = get_current_blog_id();
-		$exist           = $this->find_index( $current_blog_id, $post_id );
-		if ( is_object( $exist ) ) {
-			switch_to_blog( 1 );
-			wp_delete_post( $exist->ID, true );
-		}
+		$this->delete_index( get_current_blog_id(), $post_id );
 	}
 
 	/**
@@ -178,21 +215,19 @@ class MP_Multisite {
 	 * @since 3.0
 	 */
 	public function save_post( $post_id, $post, $update ) {
-		// If this is just a revision, don't send the email.
-		if ( wp_is_post_revision( $post_id ) ) {
-			return;
-		}
 		if ( $post->post_type != MP_Product::get_post_type() ) {
 			return;
 		}
 
-		if ( $post->post_status == 'publish' ) {
-			//we only index publish product
-			$exist = is_object( $this->find_index( get_current_blog_id(), $post_id ) );
-			if ( ! $exist ) {
-				$this->add_index( get_current_blog_id(), $post_id );
-			}
+		if ( ! $update ) {
+			//this is new product added, create new index
+			$this->add_index( get_current_blog_id(), $post );
+		} else {
+			//find the indexer id
+			$this->update_index( get_current_blog_id(), $post );
 		}
+		//update the terms
+		$this->index_product_terms( get_current_blog_id(), $post );
 	}
 
 	/**
@@ -205,60 +240,189 @@ class MP_Multisite {
 	 * @since 3.0
 	 */
 	public function find_index( $blog_id, $product_id ) {
-		switch_to_blog( 1 );
-		$query = new WP_Query( array(
-			'post_type'   => 'mp_ms_indexer',
-			'post_status' => 'publish',
-			'meta_query'  => array(
-				array(
-					'key'   => 'blog_id',
-					'value' => $blog_id,
-				),
-				array(
-					'key'   => 'post_id',
-					'value' => $product_id,
-				),
-			),
-		) );
-		switch_to_blog( $blog_id );
+		global $wpdb;
+		$sql = $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}mp_products WHERE post_id=%d AND blog_id=%d", $product_id, $blog_id );
 
-		return $query->post_count > 0 ? $query->posts[0] : null;
+		return $wpdb->get_row( $sql );
 	}
 
 	/**
-	 * Add an index base on product id & blog id
-	 *
 	 * @param $blog_id
-	 * @param $product_id
+	 * @param $post
 	 *
-	 * @since 3.0
-	 * @access public
+	 * @return false|int
 	 */
-	public function add_index( $blog_id, $product_id ) {
-		//gather data
-		$post    = get_post( $product_id );
-		$product = new MP_Product( $post->ID );
-		$metas   = array(
-			'blog_id'        => $blog_id,
-			'post_id'        => $post->ID,
-			'regular_price'  => $product->get_price( 'lowest' ),
-			'mp_sales_count' => $product->get_meta( 'mp_sales_count' ),
+	public function add_index( $blog_id, $post ) {
+		global $wpdb;
+		$blog_public  = get_blog_status( $blog_id, 'public' );
+		$product      = new MP_Product( $post->ID );
+		$product_data = array(
+			'site_id'           => $wpdb->siteid,
+			'blog_id'           => $blog_id,
+			'blog_public'       => $blog_public,
+			'post_id'           => $post->ID,
+			'post_author'       => $post->post_author,
+			'post_title'        => $post->post_title,
+			'post_content'      => strip_shortcodes( $post->post_content ),
+			'post_permalink'    => $product->url( false ),
+			'post_date'         => $post->post_date,
+			'post_date_gmt'     => $post->post_date_gmt,
+			'post_modified'     => $post->post_modified,
+			'post_modified_gmt' => $post->post_modified_gmt,
+			'price'             => $product->get_price( 'lowest' ),
+			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
+		$index_id     = $wpdb->insert( $wpdb->base_prefix . 'mp_products', $product_data );
 
-		//start to insert index
-		switch_to_blog( 1 );
-		$id = wp_insert_post( array(
-			'post_title'    => $post->post_title,
-			'post_type'     => 'mp_ms_indexer',
-			'post_status'   => 'publish',
-			'post_date'     => $post->post_date,
-			'post_date_gmt' => $post->post_date_gmt
+		return $index_id;
+	}
+
+	public function update_index( $blog_id, $post ) {
+		global $wpdb;
+		$blog_public = get_blog_status( $blog_id, 'public' );
+		$product     = new MP_Product( $post->ID );
+		$index       = $this->find_index( $blog_id, $post->ID );
+		if ( ! $index ) {
+			return false;
+		}
+		$product_data = array(
+			'site_id'           => $wpdb->siteid,
+			'blog_id'           => $blog_id,
+			'blog_public'       => $blog_public,
+			'post_id'           => $post->ID,
+			'post_author'       => $post->post_author,
+			'post_title'        => $post->post_title,
+			'post_content'      => strip_shortcodes( $post->post_content ),
+			'post_permalink'    => $product->url( false ),
+			'post_date'         => $post->post_date,
+			'post_date_gmt'     => $post->post_date_gmt,
+			'post_modified'     => $post->post_modified,
+			'post_modified_gmt' => $post->post_modified_gmt,
+			'price'             => $product->get_price( 'lowest' ),
+			'sales_count'       => $product->get_meta( 'mp_sales_count' )
+		);
+		unset( $product_data['site_id'] );
+		unset( $product_data['blog_id'] );
+		unset( $product_data['post_id'] );
+
+		$wpdb->update( $wpdb->base_prefix . 'mp_products', $product_data, array(
+			'post_id' => $post->ID,
+			'blog_id' => $blog_id
 		) );
 
-		foreach ( $metas as $key => $val ) {
-			update_post_meta( $id, $key, $val );
+		return $index->id;
+	}
+
+	public function index_product_terms( $blog_id, $post ) {
+		global $wpdb;
+
+		$indexer = $this->find_index( $blog_id, $post->ID );
+		if ( ! $indexer ) {
+			return;
 		}
-		switch_to_blog( $blog_id );
+
+		$index_id = $indexer->id;
+
+		$terms      = wp_get_object_terms( $post->ID, array( 'product_category', 'product_tag' ) );
+		$while_list = array();
+		foreach ( $terms as $term ) {
+			//check if the term exist
+			$exist = mp_global_term_exist( $term->slug, $term->taxonomy );
+			if ( ! is_object( $exist ) ) {
+				//term not exists, just create
+				$term_id = $wpdb->insert( $wpdb->prefix . 'mp_terms', array(
+					'name' => $term->name,
+					'slug' => $term->slug,
+					'type' => $term->taxonomy
+				) );
+			} else {
+				$term_id = $exist->term_id;
+			}
+
+			$sql    = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_term_relationships WHERE post_id = %d AND term_id=%d",
+				$index_id, $term_id
+			);
+			$linked = $wpdb->get_var( $sql );
+			if ( ! $linked ) {
+				$wpdb->insert( $wpdb->base_prefix . 'mp_term_relationships', array(
+					'post_id' => $index_id,
+					'term_id' => $term_id
+				) );
+			}
+
+			$while_list[] = "'$term_id'";
+		}
+
+		if ( empty( $while_list ) ) {
+			$while_list[] = - 1;
+		}
+
+		$while_list = implode( ',', $while_list );
+
+		$sql = "DELETE FROM {$wpdb->base_prefix}mp_term_relationships WHERE post_id = $index_id AND term_id NOT IN ($while_list)";
+		$wpdb->query( $sql );
+	}
+
+	public function delete_index( $blog_id, $product_id ) {
+		global $wpdb;
+
+		$sql = $wpdb->prepare( "DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = {$blog_id} AND p.post_id = %d", $product_id );
+		$wpdb->query( $sql );
+	}
+
+	public function count() {
+		global $wpdb;
+
+		$sql = "SELECT COUNT(*) FROM " . $wpdb->base_prefix . "mp_products";
+
+		return $wpdb->get_var( $sql );
+	}
+
+	/**
+	 * Loop through all the blogs, we will store all the products/categories/tags of the blog
+	 * to global table.
+	 * After store all to the table, started to create relations
+	 */
+	public function index_content() {
+		$this->maybe_create_ms_tables();
+
+		$blogs = wp_get_sites();
+		$count = 0;
+		foreach ( $blogs as $blog ) {
+			switch_to_blog( $blog['blog_id'] );
+			$tmp = new WP_Query( array(
+				'post_type'   => MP_Product::get_post_type(),
+				'nopaging'    => true,
+				'post_status' => 'publish'
+			) );
+			global $wpdb;
+
+			$blog_archived = get_blog_status( $wpdb->blogid, 'archived' );
+			$blog_mature   = get_blog_status( $wpdb->blogid, 'mature' );
+			$blog_spam     = get_blog_status( $wpdb->blogid, 'spam' );
+			$blog_deleted  = get_blog_status( $wpdb->blogid, 'deleted' );
+			if ( $tmp->post_count > 0 ) {
+				foreach ( $tmp->posts as $post ) {
+					if ( $post->post_status != 'published' || $blog_archived || $blog_deleted || $blog_mature || $blog_spam ) {
+						//todo delete index
+					}
+
+					if ( $index = $this->find_index( $blog['blog_id'], $post->ID ) ) {
+						$index_id = $this->update_index( $blog['blog_id'], $post );
+					} else {
+						$index_id = $this->add_index( $blog['blog_id'], $post );
+					}
+
+					//product indexed, now taxonomies & terms
+					$this->index_product_terms( $blog['blog_id'], $post );
+					$count ++;
+				}
+			}
+		}
+
+		return array(
+			'count' => $count
+		);
 	}
 
 	/**
@@ -268,10 +432,12 @@ class MP_Multisite {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @deprecated
 	 */
-	public function index_content() {
+	public function _index_content() {
+		_deprecated_function( 'deprecated from 3.0.0.3', '3.0.0.3' );
 		//build an index with the whole site
-		$data       = array();
+
 		$categories = array();
 		$tags       = array();
 		$blogs      = wp_get_sites();
@@ -391,7 +557,14 @@ class MP_Multisite {
 	 */
 	function mp_list_global_products_sc( $atts ) {
 		$atts['echo'] = false;
-		$args         = shortcode_atts( mp()->defaults['list_products'], $atts );
+		if ( $var = get_query_var( 'mp_global_category' ) ) {
+			$atts['category'] = $var;
+		}
+		if ( $var = get_query_var( 'mp_global_tag' ) ) {
+			$atts['tag'] = $var;
+		}
+		$args = shortcode_atts( mp()->defaults['list_products'], $atts );
+
 		return mp_global_list_products( $args );
 	}
 
@@ -492,9 +665,64 @@ class MP_Multisite {
 			return;
 		}
 
-		$this->drop_old_ms_tables();
+		//$this->drop_old_ms_tables();
+		$this->maybe_create_ms_tables();
+
 
 		update_site_option( 'mp_network_build', $this->build );
+	}
+
+	function maybe_create_ms_tables() {
+		global $wpdb;
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		$table_product = $wpdb->base_prefix . 'mp_products';
+		if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_product ) ) == $table_product ) {
+			$table_1 = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}mp_products` (
+								`id` bigint(20) unsigned NOT NULL auto_increment,
+								`site_id` bigint(20),
+								`blog_id` bigint(20),
+								`blog_public` int(2),
+								`post_id` bigint(20),
+								`post_author` bigint(20) unsigned NOT NULL DEFAULT '0',
+								`post_title` text NOT NULL,
+								`post_content` longtext NOT NULL,
+								`post_excerpt` longtext NOT NULL,
+								`post_permalink` text NOT NULL,
+								`post_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+								`post_date_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+								`post_modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+								`post_modified_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+								`price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
+								`sales_count` bigint(20) unsigned NOT NULL DEFAULT '0',
+								PRIMARY KEY	 (`id`)
+							) ENGINE=MyISAM	 DEFAULT CHARSET=utf8;";
+			dbDelta( $table_1 );
+		}
+		$table_terms = $wpdb->base_prefix . 'mp_terms';
+		if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_terms ) ) == $table_terms ) {
+			$table_2 = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}mp_terms` (
+								`term_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+								`name` varchar(200) NOT NULL DEFAULT '',
+								`slug` varchar(200) NOT NULL DEFAULT '',
+								`type` varchar(20) NOT NULL DEFAULT 'product_category',
+								`count` bigint(10) NOT NULL DEFAULT '0',
+								PRIMARY KEY (`term_id`),
+								KEY `name` (`name`)
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			dbDelta( $table_2 );
+		}
+
+		$table_relations = $wpdb->base_prefix . 'mp_term_relationships';
+		if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_relations ) ) == $table_relations ) {
+			$table_3 = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}mp_term_relationships` (
+								`post_id` bigint(20) unsigned NOT NULL,
+								`term_id` bigint(20) unsigned NOT NULL,
+								PRIMARY KEY ( `post_id` , `term_id` ),
+								KEY (`term_id`)
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+			dbDelta( $table_3 );
+		}
 	}
 
 	/**
