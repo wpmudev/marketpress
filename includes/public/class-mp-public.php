@@ -37,7 +37,8 @@ class MP_Public {
 		add_action( 'init', array( &$this, 'includes' ), 1 );
 
 		add_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
-		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles' ) );
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
 		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
 		add_action( 'wp_footer', array( &$this, 'create_account_lightbox_html' ), 20 );
@@ -328,6 +329,31 @@ class MP_Public {
 			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
 		}
 	}
+	
+	/**
+	 * Enqueue frontend styles and scripts
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	 
+	public function frontend_styles() {
+		//Display styles for all pages
+		
+		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
+			$theme_url = mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' );
+		} else {
+			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
+		}
+		wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
+		
+		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
+		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
+		
+		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
+		
+	}
 
 	/**
 	 * Enqueue frontend styles and scripts
@@ -335,7 +361,7 @@ class MP_Public {
 	 * @since 3.0
 	 * @access public
 	 */
-	public function frontend_styles_scripts() {
+	public function frontend_scripts() {
 
 		if ( is_singular( MP_Product::get_post_type() ) ) {
 			wp_enqueue_script( 'lightslider', mp_plugin_url( 'ui/lightslider/js/lightslider.js' ), array( 'jquery' ), MP_VERSION );
@@ -347,19 +373,6 @@ class MP_Public {
 		if ( ! $this->is_store_page() ) {
 			return;
 		}
-
-// CSS
-		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
-		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
-		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
-
-		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
-			$theme_url = mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' );
-		} else {
-			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
-		}
-		wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
-		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 // JS
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
