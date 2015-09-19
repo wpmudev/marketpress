@@ -427,7 +427,8 @@ class MP_Ajax {
 
 		if ( isset( $mp_submit_check ) && $mp_submit_check == '1' ) {
 			if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
-				$user_id = wp_insert_user( array(
+				
+				$args = apply_filters( 'mp_register_user', array(
 					'user_login' => mp_get_post_value( 'username' ),
 					'user_email' => mp_get_post_value( 'email' ),
 					'user_pass'	 => mp_get_post_value( 'password1' ),
@@ -435,6 +436,8 @@ class MP_Ajax {
 					'last_name'	 => mp_get_post_value( 'name_last' ),
 					'role'		 => 'subscriber',
 				) );
+				
+				$user_id = wp_insert_user($args);
 
 				if ( !is_wp_error( $user_id ) ) {
 					$user_signon = wp_signon( array(
