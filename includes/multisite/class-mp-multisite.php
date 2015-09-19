@@ -330,7 +330,7 @@ class MP_Multisite {
 			$exist = mp_global_term_exist( $term->slug, $term->taxonomy );
 			if ( ! is_object( $exist ) ) {
 				//term not exists, just create
-				$term_id = $wpdb->insert( $wpdb->prefix . 'mp_terms', array(
+				$term_id = $wpdb->insert( $wpdb->base_prefix . 'mp_terms', array(
 					'name' => $term->name,
 					'slug' => $term->slug,
 					'type' => $term->taxonomy

@@ -798,8 +798,11 @@ if ( ! function_exists( 'mp_global_taxonomy_url' ) ) {
 				break;
 		}
 		$page_id = mp_get_network_setting( 'pages->' . $type );
+		switch_to_blog( 1 );
+		$url = site_url( trailingslashit( get_page_uri( $page_id ) . '/' . $slug ) );
+		restore_current_blog();
 
-		return site_url( trailingslashit( get_page_uri( $page_id ) . '/' . $slug ) );
+		return $url;
 	}
 }
 
