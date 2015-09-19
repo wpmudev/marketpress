@@ -2928,6 +2928,7 @@ if ( ! function_exists( 'mp_tag_list' ) ) :
 	 * @param string $after Optional. After list.
 	 */
 	function mp_tag_list( $product_id = false, $before = '', $sep = ', ', $after = '' ) {
+		$return = '';
 		$terms = get_the_term_list( $product_id, 'product_tag', $before, $sep, $after );
 		if ( $terms ) {
 			return $terms;
