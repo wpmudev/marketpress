@@ -1076,19 +1076,41 @@ class MP_Shortcode_Builder {
 	 * @access public
 	 */
 	public function enqueue_styles_scripts() {
-		//wp_enqueue_script( 'chosen', mp_plugin_url( 'includes/admin/ui/chosen/chosen.jquery.min.js' ), array( 'jquery' ), MP_VERSION );
-		wp_enqueue_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
+		if ( isset( $_GET['page'] ) ) {
+			$page = isset( $_GET['page'] );
+		} else {
+			$page = '';
+		}
+		
+		$screenpage = get_current_screen();
 
-		wp_enqueue_style( 'colorbox', mp_plugin_url( 'includes/admin/ui/colorbox/colorbox.css' ), false, MP_VERSION );
-		wp_enqueue_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), false, MP_VERSION );
+		if ( $page == 'store-settings' 
+			|| $page == 'store-settings-presentation' 
+			|| $page == 'store-settings-notifications' 
+			|| $page == 'store-settings-shipping' 
+			|| $page == 'store-settings-payments' 
+			|| $page == 'store-settings-productattributes' 
+			|| $page == 'store-settings-capabilities'
+			|| $page == 'store-settings-addons'
+			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
+			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' || $_GET['post_type'] == 'page') ) 
+			|| ( isset( $screenpage->post_type ) && ($screenpage->post_type == "post" || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon") ) )  {
+				
+			//wp_enqueue_script( 'chosen', mp_plugin_url( 'includes/admin/ui/chosen/chosen.jquery.min.js' ), array( 'jquery' ), MP_VERSION );
+			wp_enqueue_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
 
-		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
-		wp_enqueue_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
+			wp_enqueue_style( 'colorbox', mp_plugin_url( 'includes/admin/ui/colorbox/colorbox.css' ), false, MP_VERSION );
+			wp_enqueue_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), false, MP_VERSION );
 
-		wp_enqueue_script( 'mp-shortcode-builder', mp_plugin_url( 'includes/admin/ui/js/shortcode-builder.js', array( 'colorbox', 'chosen' ), MP_VERSION ) );
-		wp_localize_script( 'mp-shortcode-builder', 'MP_ShortCode_Builder', array(
-			'select_product' => __( 'Select a Product', 'mp' ),
-		) );
+			wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
+			wp_enqueue_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
+
+			wp_enqueue_script( 'mp-shortcode-builder', mp_plugin_url( 'includes/admin/ui/js/shortcode-builder.js', array( 'colorbox', 'chosen' ), MP_VERSION ) );
+			wp_localize_script( 'mp-shortcode-builder', 'MP_ShortCode_Builder', array(
+				'select_product' => __( 'Select a Product', 'mp' ),
+			) );
+			
+		}
 	}
 
 	/**
