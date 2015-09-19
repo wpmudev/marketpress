@@ -416,7 +416,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 			$i = 0;
 			//we need to make a virtual cart for calculating,don't write to cookie
-			$vcart    = new MP_Cart( false );
+			$vcart = new MP_Cart( false );
 			foreach ( $items as $product_id => $quantity ) {
 				$item  = new MP_Product( $product_id );
 				$price = $item->get_price( 'lowest' );
@@ -428,7 +428,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$vcart->add_item( $product_id, $quantity );
 
 				$request["L_PAYMENTREQUEST_{$index}_NAME{$i}"]         = $this->trim_name( $item->title( false ) );
-				$request["L_PAYMENTREQUEST_{$index}_AMT{$i}"]          = $price;
+				$request["L_PAYMENTREQUEST_{$index}_AMT{$i}"]          = round( $price, 2 );
 				$request["L_PAYMENTREQUEST_{$index}_NUMBER{$i}"]       = $item->get_meta( 'sku', '' );
 				$request["L_PAYMENTREQUEST_{$index}_QTY{$i}"]          = $quantity;
 				$request["L_PAYMENTREQUEST_{$index}_ITEMURL{$i}"]      = $item->url( false );
@@ -437,7 +437,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$i ++;
 			}
 
-			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->product_total(false); //items subtotal
+			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->product_total( false ); //items subtotal
 
 			//shipping total
 			if ( ( $shipping_price = $vcart->shipping_total( false ) ) !== false ) {
@@ -450,7 +450,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$request["PAYMENTREQUEST_{$index}_TAXAMT"] = $tax_total;
 			} else {
 				//incase of inclusive, we will have to submit the shipping tax
-				$tax_total = $vcart->shipping_tax_total(false);
+				$tax_total                                 = $vcart->shipping_tax_total( false );
 				$request["PAYMENTREQUEST_{$index}_TAXAMT"] = round( $tax_total, 2 );
 			}
 			//order details
@@ -468,6 +468,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog( $blog_id );
 			}
 		}
+
 		// save this request to session for later use
 		mp_update_session_value( 'paypal_request', $request );
 
