@@ -265,10 +265,14 @@ class MP_Product {
 		 */
 		?>
 		<?php if ( 0 == 0 ) { ?>
+		<?php ob_start( ); ?>
+			<?php do_action( 'mp_public/before_variations_lightbox_form', $product_id, $product ); ?>
 			<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope
 			         itemtype="http://schema.org/Product">
 				<div class="mp_product mp_product_options mp_product_lightbox">
-
+					
+					<?php do_action( 'mp_public/before_variation_fields_lightbox_form', $product_id, $product ); ?>
+					
 					<div class="mp_product_options_image">
 						<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
 					</div>
@@ -311,12 +315,21 @@ class MP_Product {
 
 					</div>
 					<!-- end mp_product_options_details -->
+					
+					<?php do_action( 'mp_public/after_variation_fields_lightbox_form', $product_id, $product ); ?>
 
 				</div>
 				<!-- end mp_product_options -->
 			</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
-		<?php } ?>
-		<?php
+			<?php do_action( 'mp_public/after_variations_lightbox_form', $product_id, $product ); ?>
+		<?php 
+		
+		$html = ob_get_clean( );	
+
+		echo apply_filters( 'mp_display_variations_lightbox', $html, $product_id, $product );
+		
+		}
+
 		die;
 	}
 
