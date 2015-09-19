@@ -53,8 +53,6 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 		$children = get_children( $args, OBJECT );
 
 		$variation_attributes = array();
-		
-		$attributes_variation = array();
 
 		foreach ( $children as $child ) {
 			foreach ( $product_attributes as $product_attribute ) {
@@ -66,14 +64,11 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				}
 			}
 		}
-		
-		foreach ( $variation_attributes as $variation_attribute ) {
-			foreach ( $variation_attribute as $term => $term_info ) {
-				$attributes_variation[ $term_info[ 0 ] ][ ] = $term_info[ 1 ];
-			}
-		}
-		
+
 		?>
+		
+		<?php if( $has_variations ) { ?>
+		
 		<div class="tablenav top">
 			<div class="alignleft actions bulkactions">
 				<label for="bulk-action-selector-top" class="screen-reader-text"><?php _e( 'Select bulk action', 'mp' ); ?></label>
@@ -269,7 +264,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 				</tbody>
 			</table>
 		</span>
-		<?php ?>
+		<?php } ?>
 		<div class="mp_hidden_content">
 			<div id="mp_bulk_price">
 				<div class="mp_popup_content">
@@ -311,27 +306,6 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			<div id="mp_bulk_delete_title"></div>
 
 		</div>
-		
-		<?php 
-			/*
-			 * Print already added variations 
-			 */
-			
-			if( $has_variations ) { 
-				foreach ( array_keys( $variation_attributes ) as $variation_attribute ) { 					
-					
-					if( isset($attributes_variation[ $variation_attribute ]) && !empty( $attributes_variation[ $variation_attribute ] ) ) { 
-						echo '<input type="hidden" name="product_attributes_categories[]" value="' . $variation_attribute . '">';
-						echo '<input type="hidden" name="variation_values[]" value="[' . join( ',', $attributes_variation[ $variation_attribute ] ) . ']">';
-					}
-				}
-				
-				echo '<input type="hidden" name="reset_variations" id="reset_variations_field" value="false">';
-			} else {
-				echo '<input type="hidden" name="reset_variations" id="reset_variations_field" value="true">';
-			}
-		?>
-
 		<span <?php echo $this->parse_atts(); ?>>
 			<div class="repeat">
 				<table class="wrapper" width="100%">
@@ -377,6 +351,13 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 			</div>
 		</span>
 		
+		<?php 
+			if( $has_variations ) { 
+				echo '<input type="hidden" name="reset_variations" id="reset_variations_field" value="false">';
+			} else {
+				echo '<input type="hidden" name="reset_variations" id="reset_variations_field" value="true">';
+			}
+		?>
 		
 		<script type="text/javascript">
 			jQuery( document ).ready( function( $ ) {

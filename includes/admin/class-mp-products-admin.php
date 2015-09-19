@@ -976,12 +976,12 @@ class MP_Products_Screen {
 		$reset_variations 	 = mp_get_post_value( 'reset_variations' );
 		
 		$data = array();
-
-		if ( isset( $variation_values ) && !empty( $variation_values ) && isset( $reset_variations ) && $reset_variations == "true" ) {
+		
+		if ( isset( $variation_values[ 0 ] ) && $variation_values[ 0 ] != '[]' && isset( $reset_variations ) && $reset_variations == "true" ) {
 			
 			//Delete all current variations & regenerate all possible combinations
-			$this->maybe_delete_variations_before_generate($post_id);
-			
+			$this->maybe_delete_variations_before_generate( $post_id );
+
 			update_post_meta( $post_id, 'has_variations', 1 );
 
 			$i = 0;
