@@ -52,11 +52,13 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $name The property name.
+	 *
 	 * @return string The property value or false if the property or post doesn't exist.
 	 */
 	public function __get( $name ) {
-		if ( !$this->exists() ) {
+		if ( ! $this->exists() ) {
 			return false;
 		}
 
@@ -73,10 +75,11 @@ class MP_Order {
 	 * @since 3.0
 	 * @access public
 	 * @uses $post
-	 * @param int/string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created.
+	 *
+	 * @param int /string/WP_Post $order Optional, either a post id, order id or WP_Post object. If none are provided a new order will be created.
 	 */
 	public function __construct( $order = null ) {
-		if ( !is_null( $order ) ) {
+		if ( ! is_null( $order ) ) {
 			if ( $order instanceof WP_Post ) {
 				$this->ID = $order->ID;
 			} elseif ( is_numeric( $order ) ) {
@@ -96,7 +99,9 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access protected
+	 *
 	 * @param array $items Cart info from an order created in < 3.0.
+	 *
 	 * @return MP_Cart
 	 */
 	protected function _convert_legacy_cart( $items ) {
@@ -106,22 +111,22 @@ class MP_Order {
 			foreach ( $variations as $variation_id => $product ) {
 				$item = new MP_Product( $product_id );
 				$item->set_price( array(
-					'regular'	 => (float) $product[ 'price' ],
-					'lowest'	 => (float) $product[ 'price' ],
-					'highest'	 => (float) $product[ 'price' ],
-					'sale'		 => array(
-						'amount'	 => false,
+					'regular' => (float) $product['price'],
+					'lowest'  => (float) $product['price'],
+					'highest' => (float) $product['price'],
+					'sale'    => array(
+						'amount'     => false,
 						'start_date' => false,
-						'end_date'	 => false,
-						'days_left'	 => false,
+						'end_date'   => false,
+						'days_left'  => false,
 					),
 				) );
 
-				if ( isset( $product[ 'download' ] ) ) {
+				if ( isset( $product['download'] ) ) {
 					$cart->download_count[ $product_id ] = mp_arr_get_value( 'download->downloaded', $product, 0 );
 				}
 
-				$cart->add_item( $product_id, $product[ 'quantity' ] );
+				$cart->add_item( $product_id, $product['quantity'] );
 			}
 		}
 
@@ -136,7 +141,7 @@ class MP_Order {
 	 * @return string
 	 */
 	protected function _generate_id() {
-		if ( !is_null( $this->_order_id ) ) {
+		if ( ! is_null( $this->_order_id ) ) {
 			return $this->_order_id;
 		}
 
@@ -145,8 +150,8 @@ class MP_Order {
 		$count = true;
 		while ( $count ) {
 			//make sure it's unique
-			$order_id	 = substr( sha1( uniqid( '' ) ), rand( 1, 24 ), 12 );
-			$count		 = $wpdb->get_var( $wpdb->prepare( "
+			$order_id = substr( sha1( uniqid( '' ) ), rand( 1, 24 ), 12 );
+			$count    = $wpdb->get_var( $wpdb->prepare( "
 				SELECT COUNT(*)
 				FROM {$wpdb->posts}
 				WHERE post_title = %s
@@ -161,6 +166,7 @@ class MP_Order {
 		 * sequential.
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $order_id
 		 */
 		$this->_order_id = apply_filters( 'mp_order_id', $order_id );
@@ -191,7 +197,7 @@ class MP_Order {
 					LIMIT 1
 				", $this->_order_id ) );
 
-				if ( !empty( $_post ) ) {
+				if ( ! empty( $_post ) ) {
 					$this->_post = get_post( $_post );
 				}
 			}
@@ -204,8 +210,8 @@ class MP_Order {
 		} elseif ( $this->_post->post_type != 'mp_order' ) {
 			$this->_exists = false;
 		} else {
-			$this->_exists	 = true;
-			$this->ID		 = $this->_post->ID;
+			$this->_exists   = true;
+			$this->ID        = $this->_post->ID;
 			$this->_order_id = $this->_post->post_name;
 			wp_cache_set( $this->_order_id, $this->_post, 'mp_order' );
 		}
@@ -216,12 +222,13 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access protected
+	 *
 	 * @param string $subject The email subject text.
 	 * @param string $msg The email message text.
 	 */
 	protected function _send_email_to_buyers( $subject, $msg, $attachments = array() ) {
-		$billing_email	 = $this->get_meta( 'mp_billing_info->email', '' );
-		$shipping_email	 = $this->get_meta( 'mp_shipping_info->email', '' );
+		$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
+		$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
 
 		mp_send_email( $billing_email, $subject, $msg, $attachments );
 
@@ -239,23 +246,26 @@ class MP_Order {
 	 */
 	protected function _send_new_order_notifications() {
 		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->new_order->subject' ) ) );
-		$msg	 = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->text' ) ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->text' ) ) ) );
 
 		if ( has_filter( 'mp_order_notification_subject' ) ) {
 			//trigger_error( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0', E_USER_ERROR );
-			error_log('The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0');
+			error_log( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0' );
+
 			return false;
 		}
 
 		if ( has_filter( 'mp_order_notification_body' ) ) {
 			//trigger_error( 'The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0', E_USER_ERROR );
-			error_log('The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0');
+			error_log( 'The <strong>mp_order_notification_body</strong> hook has been replaced with <strong>mp_order/notification_body</strong> as of MP 3.0' );
+
 			return false;
 		}
 
 		if ( has_filter( 'mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) ) ) {
 			//trigger_error( 'The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0', E_USER_ERROR );
-			error_log('The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0');
+			error_log( 'The <strong>mp_order_notification_' . mp_get_post_value( 'payment_method', '' ) . '</strong> hook has been replaced with <strong>mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ) . '</strong> as of MP 3.0' );
+
 			return false;
 		}
 
@@ -263,6 +273,7 @@ class MP_Order {
 		 * Filter the notification subject
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $subject The current subject.
 		 * @param MP_Order $this The current order object.
 		 */
@@ -272,21 +283,22 @@ class MP_Order {
 		 * Filter the notification message
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $msg The current message.
 		 * @param MP_Order $this The current order object.
 		 */
-		$msg		 = apply_filters( 'mp_order/notification_body', $msg, $this );
-		$msg		 = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
+		$msg         = apply_filters( 'mp_order/notification_body', $msg, $this );
+		$msg         = apply_filters( 'mp_order/notification_body/' . mp_get_post_value( 'payment_method', '' ), $msg, $this );
 		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
 		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg	.= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp');
-		$msg	.= __( 'ORDERINFOSKU<br /><br />', 'mp' );
-		$msg	.= __( 'SHIPPINGINFO<br /><br />', 'mp' );
-		$msg	.= __( 'PAYMENTINFO<br /><br />', 'mp' );
-		$msg	.= __( 'You can manage this order here: %s', 'mp' );
+		$msg .= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
+		$msg .= __( 'ORDERINFOSKU<br /><br />', 'mp' );
+		$msg .= __( 'SHIPPINGINFO<br /><br />', 'mp' );
+		$msg .= __( 'PAYMENTINFO<br /><br />', 'mp' );
+		$msg .= __( 'You can manage this order here: %s', 'mp' );
 
 		$subject = mp_filter_email( $this, $subject );
 
@@ -294,22 +306,24 @@ class MP_Order {
 		 * Filter the admin order notification subject
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $subject
 		 * @param MP_Order $this
 		 */
 		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $this );
 
 		$msg = mp_filter_email( $this, $msg, true );
-		$msg = sprintf( $msg, admin_url( 'post.php?post=' . $this->ID . '&action=edit' ) );
+		//$msg = sprintf( $msg, admin_url( 'post.php?post=' . $this->ID . '&action=edit' ) );
 
 		/**
 		 * Filter the admin order notification message
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $msg
 		 * @param MP_Order $order
 		 */
-		$msg		 = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
+		$msg         = apply_filters( 'mp_order_notification_admin_msg', $msg, $this );
 		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_admin' );
 		mp_send_email( mp_get_store_email(), $subject, $msg, $attachments );
 	}
@@ -322,7 +336,7 @@ class MP_Order {
 	 */
 	protected function _send_shipment_notification() {
 		$subject = stripslashes( mp_get_setting( 'email->order_shipped->subject' ) );
-		$msg	 = nl2br( stripslashes( mp_get_setting( 'email->order_shipped->text' ) ) );
+		$msg     = nl2br( stripslashes( mp_get_setting( 'email->order_shipped->text' ) ) );
 
 		if ( has_filter( 'mp_shipped_order_notification_subject' ) ) {
 			trigger_error( 'The <strong>mp_shipped_order_notification_subject</strong> hook has been replaced with <strong>mp_order/shipment_notification_subject</strong> as of MP 3.0', E_USER_ERROR );
@@ -340,6 +354,7 @@ class MP_Order {
 		 * Filter the shipment notification subject
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $subject The email subject.
 		 * @param MP_Order $this The current order object.
 		 */
@@ -350,6 +365,7 @@ class MP_Order {
 		 * Filter the shipment notification body before string replacements happen
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $msg The email message.
 		 * @param MP_Order $this The current order object.
 		 */
@@ -360,10 +376,11 @@ class MP_Order {
 		 * Filter the shipment notification body after string replacements happen
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $msg The email message.
 		 * @param MP_Order $this The current order object.
 		 */
-		$msg		 = apply_filters( 'mp_order/shipment_notification', $msg, $this );
+		$msg         = apply_filters( 'mp_order/shipment_notification', $msg, $this );
 		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'order_shipped_client' );
 		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 	}
@@ -373,6 +390,7 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $status The new order status.
 	 * @param bool $update_post Whether to update the post status or not.
 	 */
@@ -401,7 +419,7 @@ class MP_Order {
 
 			case 'order_shipped' :
 				add_post_meta( $this->ID, 'mp_shipped_time', time(), true );
-				if ( !$this->get_cart()->is_download_only() ) {
+				if ( ! $this->get_cart()->is_download_only() ) {
 					$this->_send_shipment_notification();
 				}
 				break;
@@ -425,6 +443,7 @@ class MP_Order {
 		 * Fires when an order status is updated
 		 *
 		 * @since 3.0
+		 *
 		 * @param MP_Order $this The current order object.
 		 */
 		do_action( $action, $this );
@@ -432,8 +451,8 @@ class MP_Order {
 		// Update the order status
 		if ( $update_post ) {
 			wp_update_post( array(
-				'ID'			 => $this->ID,
-				'post_status'	 => $status,
+				'ID'          => $this->ID,
+				'post_status' => $status,
 			) );
 		}
 	}
@@ -443,12 +462,13 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $key_string The meta key to delete (e.g. meta_name->key1->key2)
 	 */
 	public function delete_meta( $key_string ) {
-		$keys		 = explode( '->', $key_string );
-		$meta_key	 = array_shift( $keys );
-		$meta		 = get_post_meta( $this->ID, $meta_key, true );
+		$keys     = explode( '->', $key_string );
+		$meta_key = array_shift( $keys );
+		$meta     = get_post_meta( $this->ID, $meta_key, true );
 
 		if ( count( $keys ) > 0 ) {
 			mp_delete_from_array( $meta, implode( '->', $keys ) );
@@ -463,36 +483,90 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function details( $echo = true ) {
 
-		$cart		 = $this->get_cart();
-		$currency	 = $this->get_meta( 'mp_payment_info->currency', '' );
+		$cart = $this->get_cart();
 
+		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
+		$cart     = $this->get_meta( 'mp_cart_items' );
+		if ( ! $cart ) {
+			$cart = $this->get_meta( 'mp_cart_info' );
+		}
 		/**
 		 * Filter the confirmation text
 		 *
 		 * @since 3.0
+		 *
 		 * @param string The current confirmation text.
 		 * @param MP_Order The order object.
 		 */
-		$confirmation_text	 = apply_filters( 'mp_order/confirmation_text', '', $this );
-		$confirmation_text	 = apply_filters( 'mp_order/confirmation_text/' . $this->get_meta( 'mp_payment_info->gateway_plugin_name' ), $confirmation_text, $this );
+		$confirmation_text = apply_filters( 'mp_order/confirmation_text', '', $this );
+		$confirmation_text = apply_filters( 'mp_order/confirmation_text/' . $this->get_meta( 'mp_payment_info->gateway_plugin_name' ), $confirmation_text, $this );
+
+		$cart_contents = '';
+		ob_start();
+		?>
+		<?php if ( is_array( $cart ) ): ?>
+			<?php foreach ( $cart as $product_id => $items ): ?>
+				<?php foreach ( $items as $item ): ?>
+					<?php $product = new MP_Product( $product_id ); ?>
+					<div class="mp_cart_item" id="mp-cart-item-104">
+						<div class="mp_cart_item_content mp_cart_item_content-thumb"><img
+								src="<?php echo $product->image_url( false ) ?>"
+								width="75" height="75" style="max-height: 75px;">
+						</div>
+						<!-- end mp_cart_item_content -->
+						<div class="mp_cart_item_content mp_cart_item_content-title">
+							<h2 class="mp_cart_item_title">
+								<a target="_blank"
+								   href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
+							</h2>
+						</div>
+						<!-- end mp_cart_item_content -->
+						<div class="mp_cart_item_content mp_cart_item_content-price"><!-- MP Product Price -->
+							<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope=""
+							     itemprop="offers">
+									<span class="mp_product_price-normal"
+									      itemprop="price"><?php echo mp_format_currency( '', $item['price'] ) ?></span>
+							</div>
+							<!-- end mp_product_price -->
+						</div>
+						<!-- end mp_cart_item_content -->
+						<div
+							class="mp_cart_item_content mp_cart_item_content-qty"><?php echo $item['quantity'] ?>
+						</div>
+						<!-- end mp_cart_item_content --></div><!-- end mp_cart_item -->
+				<?php endforeach; ?>
+			<?php endforeach; ?>
+		<?php else: ?>
+			<?php
+			$cart->display( array(
+				'echo'     => true,
+				'view'     => 'order-status',
+				'editable' => false,
+			) );
+			?>
+		<?php endif; ?>
+		<?php
+
+		$cart_contents = ob_get_clean();
 
 		$html = '
 			<!-- MP Single Order Details -->
 			<section id="mp-single-order-details" class="mp_orders">
 				<div class="mp_order_details">
 					<div class="mp_order">' .
-		$this->header( false ) .
-		'</div><!-- end mp_order -->' .
-		$confirmation_text . '
+		        $this->header( false ) .
+		        '</div><!-- end mp_order -->' .
+		        $confirmation_text . '
 					<div class="mp_order_cart">' .
-		$cart->display( array( 'editable' => false, 'view' => 'order-status' ) ) . '
+		        $cart_contents . '
 					</div><!-- end mp_order_cart -->
 					<div class="mp_order_address">' .
-		$this->get_addresses() . '
+		        $this->get_addresses() . '
 					</div><!-- end mp_order_address -->
 				</div><!-- end mp_order_details -->
 			</section><!-- end mp-single-order-details -->';
@@ -501,6 +575,7 @@ class MP_Order {
 		 * Filter the order details
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $html The current details.
 		 * @param MP_Order $this The current order object.
 		 */
@@ -529,31 +604,33 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $type Either "billing" or "shipping".
 	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
+	 *
 	 * @return string
 	 */
 	public function get_address( $type, $editable = false ) {
-		if ( !$editable ) {
-			$html		 = '' .
-			$this->get_name( $type ) . '<br />' .
-			$this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
-			(( $address2	 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
-			(( $city		 = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
-			(( $state		 = $this->get_meta( "mp_{$type}_info->state", '' ) ) ? ', ' . $state . ' ' : ', ' ) .
-			(( $zip		 = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
-			(( $phone		 = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
-			(( $email		 = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+		if ( ! $editable ) {
+			$html = '' .
+			        $this->get_name( $type ) . '<br />' .
+			        $this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
+			        ( ( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
+			        ( ( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
+			        ( ( $state = $this->get_meta( "mp_{$type}_info->state", '' ) ) ? ', ' . $state . ' ' : ', ' ) .
+			        ( ( $zip = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
+			        ( ( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
+			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
 
 			// Country dropdown
-			$allowed_countries	 = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
-			$country_options	 = '';
+			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+			$country_options   = '';
 
 			if ( mp_all_countries_allowed() ) {
-				$all_countries		 = mp()->countries;
-				$allowed_countries	 = array_keys( $all_countries );
+				$all_countries     = mp()->countries;
+				$allowed_countries = array_keys( $all_countries );
 			}
 
 			foreach ( $allowed_countries as $country ) {
@@ -561,8 +638,8 @@ class MP_Order {
 			}
 
 			// State dropdown
-			$states			 = mp_get_states( $this->get_meta( "mp_{$type}_info->country" ) );
-			$state_options	 = '';
+			$states        = mp_get_states( $this->get_meta( "mp_{$type}_info->country" ) );
+			$state_options = '';
 			if ( is_array( $states ) ) {
 				foreach ( $states as $key => $val ) {
 					$state_options .= '<option value="' . $key . '" ' . selected( $key, $this->get_meta( "mp_{$type}_info->state", '' ), false ) . '>' . $val . '</option>' . "\n";
@@ -634,10 +711,12 @@ class MP_Order {
 		 * Filter the address html
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $html The current address html.
 		 * @param string $type Either "billing" or "shipping".
 		 * @param MP_Order $this The current order object.
 		 */
+
 		return apply_filters( 'mp_order/get_address', $html, $type, $this );
 	}
 
@@ -646,6 +725,7 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
 	 */
 	public function get_addresses( $editable = false ) {
@@ -653,15 +733,15 @@ class MP_Order {
 			<div class="mp_customer_address">
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Billing Address', 'mp' ) . '</h4>' .
-		$this->get_address( 'billing', $editable ) .
-		(( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '') . '
+		        $this->get_address( 'billing', $editable ) .
+		        ( ( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '' ) . '
 				</div>';
 
-		if ( !$this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
+		if ( ! $this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
 			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h4>' .
-			$this->get_address( 'shipping', $editable ) . '';
+			         $this->get_address( 'shipping', $editable ) . '';
 
 			$html .= '
 				</div>';
@@ -674,9 +754,11 @@ class MP_Order {
 		 * Filter the addresses html
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $html The current address html.
 		 * @param MP_Order $this The current order object.
 		 */
+
 		return apply_filters( 'mp_order/get_addresses', $html, $this );
 	}
 
@@ -690,7 +772,7 @@ class MP_Order {
 	public function get_cart() {
 		$cart = $this->get_meta( 'mp_cart_info' );
 
-		if ( !$cart instanceof MP_Cart ) {
+		if ( ! $cart instanceof MP_Cart ) {
 			$cart = $this->_convert_legacy_cart( $cart );
 		}
 
@@ -713,7 +795,9 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $name The name of the meta to retrieve.
+	 *
 	 * @return mixed
 	 */
 	public function get_meta( $name, $default = false ) {
@@ -732,6 +816,7 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $type Optional, either "shipping" or "billing". Defaults to "billing".
 	 */
 	public function get_name( $type = 'billing' ) {
@@ -740,7 +825,7 @@ class MP_Order {
 			$fullname = $this->get_meta( "mp_shipping_info->name" );
 		}
 
-		return (!empty( $fullname ) ) ? $fullname : $this->get_meta( "mp_{$type}_info->first_name" ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name" );
+		return ( ! empty( $fullname ) ) ? $fullname : $this->get_meta( "mp_{$type}_info->first_name" ) . ' ' . $this->get_meta( "mp_{$type}_info->last_name" );
 	}
 
 	/**
@@ -751,7 +836,7 @@ class MP_Order {
 	 */
 	public function header( $echo = true ) {
 		$html = '
-			<h3 class="mp_order_head">' . __( 'Order #', 'mp' ) . ' ' . (( get_query_var( 'mp_order_id' ) ) ? $this->get_id() : '<a href="' . $this->tracking_url( false ) . '">' . $this->get_id() . '</a>') . '</h3>
+			<h3 class="mp_order_head">' . __( 'Order #', 'mp' ) . ' ' . ( ( get_query_var( 'mp_order_id' ) ) ? $this->get_id() : '<a href="' . $this->tracking_url( false ) . '">' . $this->get_id() . '</a>' ) . '</h3>
 			<div class="mp_order_detail" id="mp-order-detail-' . $this->ID . '">';
 
 		// Currency
@@ -761,26 +846,26 @@ class MP_Order {
 		$cart = $this->get_meta( 'mp_cart_info' );
 
 		if ( $cart instanceof MP_Cart ) {
-			$tax_total		 = $cart->tax_total( true );
-			$shipping_total	 = $cart->shipping_total( true );
+			$tax_total      = $cart->tax_total( true );
+			$shipping_total = $cart->shipping_total( true );
 		} else {
-			$tax_total		 = mp_format_currency( $currency, $this->get_meta( 'mp_tax_total', 0 ) );
-			$shipping_total	 = mp_format_currency( $currency, $this->get_meta( 'mp_shipping_total', 0 ) );
+			$tax_total      = mp_format_currency( $currency, $this->get_meta( 'mp_tax_total', 0 ) );
+			$shipping_total = mp_format_currency( $currency, $this->get_meta( 'mp_shipping_total', 0 ) );
 		}
 
 		// Currency
 		$currency = $this->get_meta( 'mp_payment_info->currency', '' );
 
 		// Received time
-		$received	 = ( $time		 = $this->get_meta( 'mp_received_time' ) ) ? mp_format_date( $time, true ) : false;
+		$received = ( $time = $this->get_meta( 'mp_received_time' ) ) ? mp_format_date( $time, true ) : false;
 
 		// Status
-		$status			 = __( 'Received', 'mp' );
-		$status_extra	 = '';
+		$status       = __( 'Received', 'mp' );
+		$status_extra = '';
 		switch ( $this->_post->post_status ) {
 			case 'order_shipped' :
-				$status			 = __( 'Shipped', 'mp' );
-				if ( $tracking_num	 = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
+				$status = __( 'Shipped', 'mp' );
+				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
 					$status = $this->tracking_link( false );
 				}
 				break;
@@ -809,6 +894,7 @@ class MP_Order {
 		 * Filter the order total tooltip content
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $tooltip_content
 		 * @param MP_Order $this The current order object.
 		 */
@@ -832,6 +918,7 @@ class MP_Order {
 		 * Filter the order header html
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $html The current order header html.
 		 * @param MP_Order $this The current order object.
 		 */
@@ -849,13 +936,14 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $status The status text to log.
 	 */
 	public function log_ipn_status( $status ) {
 		wp_insert_comment( array(
-			'comment_post_ID'	 => $this->ID,
-			'comment_type'		 => 'comment',
-			'comment_content'	 => esc_html( $status ),
+			'comment_post_ID' => $this->ID,
+			'comment_type'    => 'comment',
+			'comment_content' => esc_html( $status ),
 		) );
 	}
 
@@ -864,18 +952,19 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param array $args {
-	 * 		An array of arguments
 	 *
-	 * 		@type MP_Cart $cart Required, a MP_Cart object.
-	 * 		@type array $payment_info Required, an array of payment payment info.
-	 * 		@type array $billing_info Optional, an array of billing info. Defaults to the current user billing info.
-	 * 		@type array $shipping_info Optional, an array of shipping info. Defaults to the current user shipping info.
-	 * 		@type bool $paid Optional, whether the order is paid or not. Defaults to false.
-	 * 		@type int $user_id Optional, the user id for the order. Defaults to the current user.
-	 * 		@type float $shipping_total Optional, the shipping total. Defaults to the calculated total.
-	 * 		@type float $shipping_tax_total Optional, the tax amount for shipping. Defaults to the calculated total.
-	 * 		@type float $tax_total Optional, the tax total. Defaults to the calculated total.
+	 * @param array $args {
+	 *        An array of arguments
+	 *
+	 * @type MP_Cart $cart Required, a MP_Cart object.
+	 * @type array $payment_info Required, an array of payment payment info.
+	 * @type array $billing_info Optional, an array of billing info. Defaults to the current user billing info.
+	 * @type array $shipping_info Optional, an array of shipping info. Defaults to the current user shipping info.
+	 * @type bool $paid Optional, whether the order is paid or not. Defaults to false.
+	 * @type int $user_id Optional, the user id for the order. Defaults to the current user.
+	 * @type float $shipping_total Optional, the shipping total. Defaults to the calculated total.
+	 * @type float $shipping_tax_total Optional, the tax amount for shipping. Defaults to the calculated total.
+	 * @type float $tax_total Optional, the tax total. Defaults to the calculated total.
 	 */
 	public function save( $args ) {
 		/**
@@ -885,15 +974,15 @@ class MP_Order {
 		$current_blog_id = get_current_blog_id();
 
 		$args = array_replace_recursive( array(
-			'cart'				 => null,
-			'payment_info'		 => null,
-			'billing_info'		 => mp_get_user_address( 'billing' ),
-			'shipping_info'		 => mp_get_user_address( 'shipping' ),
-			'paid'				 => false,
-			'user_id'			 => get_current_user_id(),
-			'shipping_total'	 => mp_cart()->shipping_total( false ),
+			'cart'               => null,
+			'payment_info'       => null,
+			'billing_info'       => mp_get_user_address( 'billing' ),
+			'shipping_info'      => mp_get_user_address( 'shipping' ),
+			'paid'               => false,
+			'user_id'            => get_current_user_id(),
+			'shipping_total'     => mp_cart()->shipping_total( false ),
 			'shipping_tax_total' => mp_cart()->shipping_tax_total( false ),
-			'tax_total'			 => mp_cart()->tax_total( false ),
+			'tax_total'          => mp_cart()->tax_total( false ),
 		), $args );
 
 		extract( $args );
@@ -913,11 +1002,12 @@ class MP_Order {
 
 		// Create new post
 		$post_id = wp_insert_post( array(
-			'post_title'	 => $this->get_id(),
-			'post_name'		 => $this->get_id(),
-			'post_content'	 => serialize( $cart->get_items() ) . serialize( $shipping_info ) . serialize( $billing_info ), // this is purely for search capabilities
-			'post_status'	 => ( $paid ) ? 'order_paid' : 'order_received',
-			'post_type'		 => 'mp_order',
+			'post_title'   => $this->get_id(),
+			'post_name'    => $this->get_id(),
+			'post_content' => serialize( $cart->get_items() ) . serialize( $shipping_info ) . serialize( $billing_info ),
+			// this is purely for search capabilities
+			'post_status'  => ( $paid ) ? 'order_paid' : 'order_received',
+			'post_type'    => 'mp_order',
 		) );
 
 		// Set the internal post object in case we need to use it right away
@@ -937,6 +1027,7 @@ class MP_Order {
 
 		// Save cart info
 		add_post_meta( $this->ID, 'mp_cart_info', $cart, true );
+		add_post_meta( $this->ID, 'mp_cart_items', $cart->export_to_array(), true );
 		// Save shipping info
 		add_post_meta( $this->ID, 'mp_shipping_info', $shipping_info, true );
 		// Save billing info
@@ -969,7 +1060,7 @@ class MP_Order {
 				$stock = $item->get_stock();
 
 				// Update inventory
-				$new_stock = ($stock - $item->qty);
+				$new_stock = ( $stock - $item->qty );
 
 				$item->update_meta( 'inventory', $new_stock );
 				$item->update_meta( 'inv_inventory', $new_stock );
@@ -982,8 +1073,8 @@ class MP_Order {
 				if ( mp_get_setting( 'inventory_remove' ) && $new_stock <= 0 ) {
 					// Flag product as out of stock - @version 2.9.5.8
 					wp_update_post( array(
-						'ID'			 => $this->ID,
-						'post_status'	 => 'out_of_stock'
+						'ID'          => $this->ID,
+						'post_status' => 'out_of_stock'
 					) );
 				}
 			}
@@ -1004,6 +1095,7 @@ class MP_Order {
 			 * Fires after the sale of a product during checkout
 			 *
 			 * @since 3.0
+			 *
 			 * @param MP_Product $item The product that was sold.
 			 * @param bool $paid Whether the associated order has been paid.
 			 * @param int $order_id The order ID.
@@ -1035,10 +1127,10 @@ class MP_Order {
 		}
 
 		// Update order history
-		$orders		 = mp_get_order_history( $user_id );
-		$new_order	 = array(
-			'id'	 => $this->ID,
-			'total'	 => mp_arr_get_value( 'total', $payment_info ),
+		$orders    = mp_get_order_history( $user_id );
+		$new_order = array(
+			'id'    => $this->ID,
+			'total' => mp_arr_get_value( 'total', $payment_info ),
 		);
 
 		if ( is_multisite() ) {
@@ -1050,14 +1142,14 @@ class MP_Order {
 
 		if ( $user_id ) {
 			// Save to user meta
-			$timestamp				 = time();
-			$orders[ $timestamp ]	 = $new_order;
+			$timestamp            = time();
+			$orders[ $timestamp ] = $new_order;
 			update_user_meta( $user_id, $key, $orders );
 		} else {
 			// Save to cookie
-			$timestamp				 = time();
-			$orders[ $timestamp ]	 = $new_order;
-			$expire					 = time() + 31536000; // 1 year expire
+			$timestamp            = time();
+			$orders[ $timestamp ] = $new_order;
+			$expire               = time() + 31536000; // 1 year expire
 			setcookie( $key, serialize( $orders ), $expire, COOKIEPATH, COOKIE_DOMAIN );
 		}
 
@@ -1069,6 +1161,7 @@ class MP_Order {
 		 * Fires when an order is created
 		 *
 		 * @since 3.0
+		 *
 		 * @param MP_Order $this The current order object.
 		 */
 		do_action( 'mp_order/new_order', $this );
@@ -1079,7 +1172,7 @@ class MP_Order {
 
 		// Remove session variables
 		if ( mp_get_session_value( 'mp_shipping_info' ) ) {
-			foreach ( $_SESSION[ 'mp_shipping_info' ] as $key => $val ) {
+			foreach ( $_SESSION['mp_shipping_info'] as $key => $val ) {
 				switch ( $key ) {
 					case 'shipping_option' :
 					case 'shipping_sub_option' :
@@ -1107,11 +1200,12 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function tracking_link( $echo = true ) {
 		$tracking_number = esc_attr( $this->get_meta( 'mp_shipping_info->tracking_num' ) );
-		$method			 = $this->get_meta( 'mp_shipping_info->method' );
+		$method          = $this->get_meta( 'mp_shipping_info->method' );
 
 		switch ( strtoupper( $method ) ) {
 			case 'UPS' :
@@ -1135,6 +1229,7 @@ class MP_Order {
 				 * Filter the tracking link for methods that don't exists
 				 *
 				 * @since 3.0
+				 *
 				 * @param string $tracking_number
 				 * @param string $method
 				 */
@@ -1146,6 +1241,7 @@ class MP_Order {
 		 * Filter the tracking link
 		 *
 		 * @since 3.0
+		 *
 		 * @param string $url
 		 * @param string $tracking_number
 		 * @param string $method
@@ -1166,6 +1262,7 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function tracking_url( $echo = true ) {
@@ -1181,6 +1278,7 @@ class MP_Order {
 		 *
 		 * @since 3.0
 		 * @access public
+		 *
 		 * @param string $url The tracking URL.
 		 */
 		$url = apply_filters( 'wpml_marketpress_tracking_url', $url );
@@ -1190,6 +1288,7 @@ class MP_Order {
 		 *
 		 * @since 3.0
 		 * @access public
+		 *
 		 * @param string $url The status URL.
 		 * @param MP_Order $this The current order object.
 		 */
@@ -1207,13 +1306,14 @@ class MP_Order {
 	 *
 	 * @since 3.0
 	 * @access public
+	 *
 	 * @param string $key The meta key to update (e.g. meta_name->key1->key2)
 	 * @param mixed $value
 	 */
 	public function update_meta( $key, $value ) {
-		$keys		 = explode( '->', $key );
-		$meta_key	 = array_shift( $keys );
-		$meta		 = get_post_meta( $this->ID, $meta_key, true );
+		$keys     = explode( '->', $key );
+		$meta_key = array_shift( $keys );
+		$meta     = get_post_meta( $this->ID, $meta_key, true );
 
 		if ( count( $keys ) > 0 ) {
 			mp_push_to_array( $meta, implode( '->', $keys ), $value );

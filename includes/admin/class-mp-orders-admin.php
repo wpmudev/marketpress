@@ -530,7 +530,10 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_order_details( $post ) {
 		$order = new MP_Order( $post );
-		$cart  = $order->get_meta( 'mp_cart_info' );
+		$cart  = $order->get_meta( 'mp_cart_items' );
+		if ( ! $cart ) {
+			$cart = $order->get_meta( 'mp_cart_info' );
+		}
 		?>
 		<div id="mp-cart-form" class="mp_form mp_form-cart">
 			<!-- MP Cart -->
@@ -538,10 +541,10 @@ class MP_Orders_Admin {
 				<?php if ( is_array( $cart ) ): ?>
 					<?php foreach ( $cart as $product_id => $items ): ?>
 						<?php foreach ( $items as $item ): ?>
-							<?php $product = new MP_Product($product_id); ?>
+							<?php $product = new MP_Product( $product_id ); ?>
 							<div class="mp_cart_item" id="mp-cart-item-104">
 								<div class="mp_cart_item_content mp_cart_item_content-thumb"><img
-										src="<?php echo $product->image_url(false) ?>"
+										src="<?php echo $product->image_url( false ) ?>"
 										width="75" height="75" style="max-height: 75px;">
 								</div>
 								<!-- end mp_cart_item_content -->
