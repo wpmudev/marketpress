@@ -185,14 +185,19 @@ class MP_PDF_Invoice {
 			//times for the subtotal
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Subtotal", "mp" ), $cart->product_total( true ) );
 
+			$order_details = apply_filters( 'mp_pdf_invoice/order_details/after_subtotal', $order_details, $order, $cart, $type );
 
 			if ( $total_discount_value !== 0 ) {
 				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Discount", "mp" ), mp_format_currency( '', $total_discount_value ) );
 			}
 
+			$order_details = apply_filters( 'mp_pdf_invoice/order_details/after_discount', $order_details, $order, $cart, $type );
+
 			if ( $cart->shipping_total() > 0 ) {
 				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Shipping", "mp" ), $cart->shipping_total( true ) );
 			}
+
+			$order_details = apply_filters( 'mp_pdf_invoice/order_details/after_shipping_total', $order_details, $order, $cart, $type );
 
 			$tax_label = mp_get_setting( 'tax->label', __( 'Tax', 'mp' ) );
 
@@ -200,12 +205,17 @@ class MP_PDF_Invoice {
 				$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', $tax_label, $cart->tax_total( true ) );
 			}
 
+			$order_details = apply_filters( 'mp_pdf_invoice/order_details/after_tax_total', $order_details, $order, $cart, $type );
+
 			//get gateway
 			$gateway		 = $order->get_meta( 'mp_payment_info->gateway_public_name' );
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Total", "mp" ), $cart->total( true ) );
 
+			$order_details = apply_filters( 'mp_pdf_invoice/order_details/after_total', $order_details, $order, $cart, $type );
+
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg"></td><td class="no-bg"></td></tr>', sprintf( __( "Payment Method: %s", "mp" ), $gateway ) );
 
+			$order_details = apply_filters( 'mp_pdf_invoice/order_details/after_payment_method', $order_details, $order, $cart, $type );
 
 //billing & shipping no changes
 			$billing	 = implode( '<br/>', $billing );
