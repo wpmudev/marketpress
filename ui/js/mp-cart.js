@@ -225,9 +225,28 @@ var mp_cart = { };
             if ( resp.success ) {
 
                 //console.log( resp.data );
-                if ( resp.data.image ) {
-                    $container.find( '.mp_product_image_single' ).attr( 'src', resp.data.image );
-                    $container.find( '.mp_product_image_link' ).attr( 'href', resp.data.image );
+                if (resp.data.image) {
+                    if ($container.find('.mp_product_image_link').size() == 0) {
+                        $('.mp_single_product_images').html(
+                            $('<a/>').attr({
+                                'class': 'mp_product_image_link mp_lightbox cboxElement',
+                                'rel': 'lightbox enclosure',
+                                'href': resp.data.image
+                            }).html($('<img/>').attr({
+                                'class': 'mp_product_image_single photo',
+                                'src': resp.data.image
+                            }))
+                        );
+                        //reinit the lightbox
+                        $( '.mp_product_image_link' ).filter( '.mp_lightbox' ).colorbox( {
+                            maxWidth: "90%",
+                            maxHeight: "90%",
+                            close: "&times;"
+                        } );
+                    } else {
+                        $container.find('.mp_product_image_single').attr('src', resp.data.image);
+                        $container.find('.mp_product_image_link').attr('href', resp.data.image);
+                    }
                 }
 
                 //if ( resp.data.description ) {
