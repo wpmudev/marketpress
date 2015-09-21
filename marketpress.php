@@ -80,7 +80,7 @@ class MarketPress {
 		add_action( 'plugins_loaded', array( &$this, 'install' ) );
 		add_action( 'wpmu_new_blog', array( &$this, 'setup_new_blog' ), 10, 6 );
 
-		if ( MP_LITE === false && file_exists( $this->plugin_dir . 'dash-notice/wpmudev-dash-notification.php' ) ) {
+		if ( MP_LITE === false ) {
 			//load dashboard notice
 			global $wpmudev_notices;
 			$wpmudev_notices[] = array( 'id' => 144, 'name' => 'MarketPress', 'screens' => array( 'edit-product', 'product', 'edit-product_category', 'edit-product_tag', 'product_page_marketpress-orders', 'product_page_marketpress', 'settings_page_marketpress-ms-network' ) );
