@@ -1094,7 +1094,7 @@ class MP_Shortcode_Builder {
 			|| $page == 'store-settings-addons'
 			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
 			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' || $_GET['post_type'] == 'page') ) 
-			|| ( isset( $screenpage->post_type ) && ($screenpage->post_type == "post" || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon") ) )  {
+			|| ( isset( $screenpage->post_type ) && ($screenpage->post_type == "post" || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon" || $screenpage->post_type == "page") ) )  {
 				
 			//wp_enqueue_script( 'chosen', mp_plugin_url( 'includes/admin/ui/chosen/chosen.jquery.min.js' ), array( 'jquery' ), MP_VERSION );
 			wp_enqueue_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
