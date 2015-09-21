@@ -1447,14 +1447,14 @@ WHERE $delete_where"
 						'name'		 => 'pounds',
 						'label'		 => array( 'text' => __( 'Pounds', 'mp' ) ),
 						'validation' => array(
-							'digits' => true,
+							'number' => true,
 						),
 					) ) );
 					$weight->add_field( 'text', apply_filters( 'mp_add_field_array_ounces', array(
 						'name'		 => 'ounces',
 						'label'		 => array( 'text' => __( 'Ounces', 'mp' ) ),
 						'validation' => array(
-							'digits' => true,
+							'number' => true,
 						),
 					) ) );
 				}
