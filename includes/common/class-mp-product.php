@@ -2259,6 +2259,10 @@ class MP_Product {
 		if ( $setting == 'off' ) {
 			return '';
 		}
+		
+		if ( $setting == 'single_view' && $context == 'all_view' ) {
+			return '';
+		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
 
@@ -2327,6 +2331,10 @@ class MP_Product {
 		if ( $setting == 'off' ) {
 			return '';
 		}
+		
+		if ( $setting == 'single_view' && $context == 'all_view' ) {
+			return '';
+		}
 
 		if ( $single_view_allowed && $context == 'single_view' ) {
 
@@ -2393,6 +2401,10 @@ class MP_Product {
 		}
 
 		if ( $setting == 'off' ) {
+			return '';
+		}
+		
+		if ( $setting == 'single_view' && $context == 'all_view' ) {
 			return '';
 		}
 
