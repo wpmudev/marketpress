@@ -468,7 +468,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog( $blog_id );
 			}
 		}
-
+var_dump($request);
 		// save this request to session for later use
 		mp_update_session_value( 'paypal_request', $request );
 
@@ -488,7 +488,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		$this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
 
 		$mode = '';
-		if ( is_multisite() && mp_get_network_setting( 'global_cart' ) == 1 ) {
+
+		if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_get_network_setting( 'global_cart' ) == 1 ) {
 			//global cart init
 			$this->API_Username  = $this->get_network_setting( 'api_credentials->username' );
 			$this->API_Password  = $this->get_network_setting( 'api_credentials->password' );
@@ -600,7 +601,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			),
 		) );
 
-		if ( mp_get_network_setting( 'global_cart' ) ) {
+		if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_get_network_setting( 'global_cart' ) ) {
 			$metabox->add_field( 'text', array(
 				'name'       => $this->get_field_name( 'merchant_email' ),
 				'label'      => array( 'text' => __( 'Merchant Email', 'mp' ) ),

@@ -712,7 +712,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 }
 
 //only load on multisite and if global cart is disabled
-if ( is_plugin_active_for_network( 'marketpress/marketpress.php' ) && ! mp_cart()->is_global ) {
+if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && ! mp_cart()->is_global ) {
 
 	//set names here to be able to translate
 	if ( is_super_admin() ) {
@@ -858,6 +858,6 @@ if ( is_plugin_active_for_network( 'marketpress/marketpress.php' ) && ! mp_cart(
 
 //register shipping plugin
 
-if ( is_plugin_active_for_network( 'marketpress/marketpress.php' ) && ! mp_get_network_setting( 'global_cart' ) ) {
+if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && ! mp_get_network_setting( 'global_cart' ) ) {
 	mp_register_gateway_plugin( 'MP_Gateway_Paypal_Chained_Payments', 'paypal_chained', __( 'PayPal Chained Payments', 'mp' ) );
 }

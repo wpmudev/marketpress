@@ -550,7 +550,7 @@ if ( ! function_exists( '_mp3_global_products_html' ) ) {
 					$img = '<div class="mp_product_images">' . $img . '</div>';
 				}
 
-				$button = '<a class="mp_button mp_link-buynow" href="' . $post->post_permalink . '">' . __( 'Buy Now', 'mp' ) . '</a>';
+				$button = '<a class="mp_button mp_link-buynow" href="' . $product->url( false ) . '">' . __( 'Buy Now', 'mp' ) . '</a>';
 
 				$html .= '
 				<div class="mp_product_item' . ( ( 'grid' == $view ) ? ' mp_product_item-col-' . $per_row : '' ) . '">

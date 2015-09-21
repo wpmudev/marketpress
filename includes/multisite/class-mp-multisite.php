@@ -42,6 +42,10 @@ class MP_Multisite {
 	 * @access private
 	 */
 	private function __construct() {
+		if ( ! is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
+			return;
+		}
+
 		$this->maybe_install();
 		//we will need to register a post type use for index
 		if ( mp_get_network_setting( 'global_cart' ) ) {
