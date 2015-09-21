@@ -42,6 +42,10 @@ class MP_Admin_Multisite {
 	 * @access private
 	 */
 	private function __construct() {
+		if ( ! is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
+			return;
+		}
+
 		if ( is_network_admin() ) {
 			add_action( 'init', array( &$this, 'init_metaboxes' ) );
 			add_action( 'network_admin_menu', array( &$this, 'add_menu_items' ) );
@@ -204,7 +208,7 @@ class MP_Admin_Multisite {
 	public function init_indexer_metabox() {
 		$count = MP_Multisite::get_instance()->count();
 		//$count='';
-		$html  = sprintf( __( "%d products have been indexed in whole network", "mp" ), $count ) . '<br/><br/>';
+		$html = sprintf( __( "%d products have been indexed in whole network", "mp" ), $count ) . '<br/><br/>';
 		$html .= '<button type="button" class="button mp_index_products">' . __( "Index Products", "mp" ) . '</button>';
 		$html .= '<p class="index-status" style="display: none;">' . __( "Please hold on...", "mp" ) . '</p>';
 		$metabox = new WPMUDEV_Metabox( array(

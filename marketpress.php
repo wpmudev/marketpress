@@ -743,7 +743,7 @@ class Marketpress {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 		}
 
-		if ( is_multisite() && is_plugin_active_for_network( 'marketpress/marketpress.php' ) ) {
+		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
 			require_once $this->plugin_dir( 'includes/multisite/class-mp-multisite.php' );
 			require_once $this->plugin_dir( 'includes/multisite/template-functions.php' );
 			if ( is_admin() ) {

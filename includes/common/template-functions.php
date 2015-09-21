@@ -2936,3 +2936,13 @@ if ( ! function_exists( 'mp_tag_list' ) ) :
 		return apply_filters( 'mp_tag_list', $return, $product_id, $before, $sep, $after );
 	}
 endif;
+
+if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
+	function mp_get_plugin_slug() {
+		if ( MP_LITE ) {
+			return 'wordpress-ecommerce/marketpress.php';
+		} else {
+			return 'marketpress/marketpress.php';
+		}
+	}
+}
