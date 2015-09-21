@@ -302,7 +302,7 @@ class MP_Coupons_Addon {
 	 * @return string
 	 */
 	public function cart_meta_product_total( $html, $cart ) {
-		if ( ! $this->has_applied() && !$cart->is_global) {
+		if ( ! $this->has_applied() && ! $cart->is_global ) {
 			return $html;
 		}
 
@@ -423,7 +423,7 @@ class MP_Coupons_Addon {
 					  		<button type="button" class="mp_button mp_button-check">' . __( 'Apply Code', 'mp' ) . '</button>
 					  	</div>
 				    </div>' .
-			        do_shortcode( wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) ). '
+			         do_shortcode( wpautop( mp_get_setting( 'coupons->help_text', __( 'More than one code? That\'s OK! Just be sure to enter one at a time.', 'mp' ) ) ) ) . '
 				</div><!-- end mp-coupon-form-store-' . $cart->get_blog_id() . ' -->';
 		}
 
@@ -871,7 +871,7 @@ class MP_Coupons_Addon {
 
 		if ( mp_cart()->is_global ) {
 			mp_cart()->set_id( $blog_id );
-			switch_to_blog($blog_id);
+			switch_to_blog( $blog_id );
 		}
 
 		$coupon = new MP_Coupon( $coupon_code );
@@ -1043,7 +1043,7 @@ class MP_Coupons_Addon {
 			$total += ( mp_arr_get_value( 'coupon', $price, mp_arr_get_value( 'lowest', $price, 0 ) ) * $item->qty );
 		}
 
-		return (float) $total;
+		return (float) round( $total, 2 );
 	}
 
 	/**

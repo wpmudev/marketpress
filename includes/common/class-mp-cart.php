@@ -1816,7 +1816,7 @@ class MP_Cart {
 	 *
 	 * @return string/float
 	 */
-	public function tax_total( $format = false, $estimate = false ) {
+	public function tax_total( $format = false, $estimate = false, $include_shipping_tax = true ) {
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
 
@@ -1877,9 +1877,10 @@ class MP_Cart {
 				// Add in special tax
 				$tax_amt += $special_total;
 
-				// Add in shipping?
-				$tax_amt += $this->shipping_tax_total();
-
+				if($include_shipping_tax) {
+					// Add in shipping?
+					$tax_amt += $this->shipping_tax_total();
+				}
 				/**
 				 * Filter the tax price
 				 *
@@ -1934,9 +1935,9 @@ class MP_Cart {
 			 * @param MP_Cart The current cart object.
 			 */
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-				$pre_total = $this->product_total() + $this->shipping_total();
-				$tax_rate  = mp_tax_rate();
-				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
+				$total = $this->product_total() + $this->shipping_total() + $this->shipping_tax_total();
+				//$tax_rate  = mp_tax_rate();
+				//$total     = $pre_total / ( 1 + $tax_rate ) + ($this->tax_total( false, false ));
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
