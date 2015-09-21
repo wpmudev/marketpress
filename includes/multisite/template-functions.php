@@ -110,19 +110,17 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 
 		if ( isset( $args['widget_id'] ) && ! empty( $args['widget_id'] ) ) {
 			$args['widget_id'] = str_replace( 'mp_global_product_list_widget-', '', $args['widget_id'] );
+			
+			$widget_settings = get_option( 'widget_mp_global_product_list_widget' );
 
-			if ( mp_arr_get_value( 'context', $args, null ) == 'widget' ) {
-				$widget_settings = get_option( 'widget_mp_global_product_list_widget' );
-
-				if ( isset( $widget_settings[ $args['widget_id'] ] ) ) {
-					$args['as_list'] = true;
-					$args['context'] = 'widget';
-					//$args['nopaging']                                  = true;
-					$args['version']                                   = '3';
-					$widget_settings[ $args['widget_id'] ]['order']    = $args['order'];
-					$widget_settings[ $args['widget_id'] ]['order_by'] = $args['order_by'];
-					$args                                              = array_merge( $args, $widget_settings[ $args['widget_id'] ] );
-				}
+			if ( isset( $widget_settings[ $args['widget_id'] ] ) ) {
+				$args['as_list'] = true;
+				$args['context'] = 'widget';
+				//$args['nopaging']                                  = true;
+				$args['version']                                   = '3';
+				$widget_settings[ $args['widget_id'] ]['order']    = $args['order'];
+				$widget_settings[ $args['widget_id'] ]['order_by'] = $args['order_by'];
+				$args                                              = array_merge( $args, $widget_settings[ $args['widget_id'] ] );
 			}
 		}
 
@@ -161,6 +159,10 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 					$query['orderby'] = 'sales_count';
 				} elseif ( 0 != $args['order_by'] ) {
 					$query['orderby'] = $args['order_by'];
+				} elseif ( 'title' == $args['order_by'] ) {
+					$query['orderby'] = 'post_title';
+				} elseif ( 'date' == $args['order_by'] ) {
+					$query['orderby'] = 'post_date';
 				}
 			} elseif ( 'price' == mp_get_setting( 'order_by' ) ) {
 				///$query['meta_key'] = 'regular_price';
@@ -168,6 +170,12 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 			} elseif ( 'sales' == mp_get_setting( 'order_by' ) ) {
 				//$query['meta_key'] = 'mp_sales_count';
 				$query['orderby'] = 'sales_count';
+			} elseif ( 'title' == mp_get_setting( 'order_by' ) ) {
+				//$query['meta_key'] = 'mp_sales_count';
+				$query['orderby'] = 'post_title';
+			} elseif ( 'date' == mp_get_setting( 'order_by' ) ) {
+				//$query['meta_key'] = 'mp_sales_count';
+				$query['orderby'] = 'post_date';
 			} else {
 				$query['orderby'] = mp_get_setting( 'order_by' );
 			}
@@ -192,18 +200,29 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		//build SQL
 		$sql   = "SELECT SQL_CALC_FOUND_ROWS products.* FROM {$wpdb->base_prefix}mp_products products";
 		$join  = "";
-		$where = "";
+		$where = " WHERE post_status = 'publish'";
 		$group = "";
-		if ( mp_arr_get_value( 'taxonomy', $query, null ) != null && mp_arr_get_value( 'term', $query, null ) != null ) {
+		
+		if ( ! empty( $args['category'] ) || ! empty( $args['tag'] ) ) {
 			$join .= " INNER JOIN {$wpdb->base_prefix}mp_term_relationships rel ON rel.post_id = products.id";
 			$join .= " INNER JOIN {$wpdb->base_prefix}mp_terms terms ON terms.term_id = rel.term_id";
-
-			$term_slug = mp_arr_get_value( 'term', $query );
-			if ( is_numeric( $term_slug ) ) {
-				$where .= $wpdb->prepare( " WHERE terms.term_id=%d", mp_arr_get_value( 'term', $query, null ) );
-			} else {
-				$where .= $wpdb->prepare( " WHERE terms.slug=%s", mp_arr_get_value( 'term', $query, null ) );
+			
+			if( ! empty( $args['category'] ) ) {
+				if ( is_numeric( $args['category'] ) ) {
+					$where .= $wpdb->prepare( " AND terms.term_id=%d", $args['category'] );
+				} else {
+					$where .= $wpdb->prepare( " AND terms.slug=%s", $args['category'] );
+				}
 			}
+			
+			if( ! empty( $args['tag'] ) ) {
+				if ( is_numeric( $args['tag'] ) ) {
+					$where .= $wpdb->prepare( " AND terms.term_id=%d", $args['tag'] );
+				} else {
+					$where .= $wpdb->prepare( " AND terms.slug=%s", $args['tag'] );
+				}
+			}
+			
 			$group .= " GROUP BY products.post_id";
 		}
 
@@ -240,20 +259,27 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		if ( ! is_null( $args['list_view'] ) ) {
 			$layout_type = $args['list_view'] ? 'list' : 'grid';
 		}
-
+		
 		// Build content
 		$content = '';
 
 		if ( ! mp_doing_ajax() ) {
 			$per_page = ( is_null( $args['per_page'] ) ) ? null : $args['per_page'];
-			$content .= ( ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) && mp_arr_get_value( 'context', $args, null ) != 'widget' ) ? mp_global_products_filter( false, $per_page, $custom_query, $args ) : mp_global_products_filter( true, $per_page, $custom_query, $args );
+			//$content .= ( ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) && mp_arr_get_value( 'context', $args, null ) != 'widget' ) ? mp_global_products_filter( false, $per_page, $custom_query, $args ) : mp_global_products_filter( true, $per_page, $custom_query, $args );
+			if( isset( $args['context'] ) && $args['context'] == 'widget' ) {
+				$content .= ( ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) ) ? mp_global_products_filter( false, $per_page, $custom_query, $args ) : mp_global_products_filter( true, $per_page, $custom_query, $args );
+			}
 		}
 
 		$extra_id = mp_arr_get_value( 'context', $args, null ) == 'widget' ? '-widget-' . rand() : '';
 		$content .= '<!-- MP Product List --><section id="mp-products' . $extra_id . '" class="hfeed mp_products mp_products-' . $layout_type . '">';
 
 		if ( $last = count( $custom_query ) ) {
-			$content .= mp_arr_get_value( 'context', $args, null ) == 'widget' ? _mp3_global_products_html_widget( $custom_query, $args ) : _mp3_global_products_html_grid( $custom_query, $args );
+			if( isset( $args['context'] ) && $args['context'] == 'widget' ) {
+				$content .= _mp3_global_products_html_widget( $custom_query, $args );
+			} else { 
+				$content .= _mp3_global_products_html_grid( $custom_query, $args );
+			}
 		} else {
 			$content .= '<div id="mp_no_products">' . apply_filters( 'mp_global_product_list_none', __( 'No Products', 'mp' ) ) . '</div>';
 		}
@@ -365,6 +391,11 @@ if ( ! function_exists( 'mp_global_products_filter' ) ) :
 		}
 
 		global $wpdb;
+		
+		/*
+		
+		Product category filter is not used anymore
+		
 		$sql     = "SELECT * FROM {$wpdb->base_prefix}mp_terms WHERE `type`='product_category'";
 		$results = $wpdb->get_results( $sql );
 
@@ -374,15 +405,19 @@ if ( ! function_exists( 'mp_global_products_filter' ) ) :
 			$terms .= '<option value="' . $term->term_id . '">' . $term->name . '</option>';
 		}
 		$terms .= '</select>';
+		
+		<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+			<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
+			' . $terms . '
+		</div><!-- mp_listing_products_category -->
+		
+		*/
 		$return = '
 <a name="mp-product-list-top"></a>
 <div class="mp_list_filter"' . ( ( $hidden ) ? ' style="display:none"' : '' ) . '>
 	<form id="mp_global_product_list_refine" name="mp_global_product_list_refine" class="mp-form mp_global_product_list_refine clearfix" method="get">
 		<div class="mp_form_fields">
-		<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-						<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
-						' . $terms . '
-					</div><!-- mp_listing_products_category -->
+		
 		<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
 			<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
 			<select id="mp-sort-order" class="mp_select2" name="order" data-placeholder="' . __( 'Product Category', 'mp' ) . '">

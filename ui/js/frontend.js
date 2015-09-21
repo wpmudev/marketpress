@@ -530,7 +530,7 @@ var marketpress = { };
             $.post( url, data ).done( function( resp ) {
                 marketpress.loadingOverlay( 'hide' );
                 $( '.mp_listings_nav' ).remove( );
-                $( '#mp-products' ).replaceWith( resp );
+                $( '.mp_global_product_list_widget .mp_products' ).replaceWith( resp );
                 mp_cart.initCartListeners( );
             } );
         },

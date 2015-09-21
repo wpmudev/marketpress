@@ -269,6 +269,7 @@ class MP_Multisite {
 			'post_date_gmt'     => $post->post_date_gmt,
 			'post_modified'     => $post->post_modified,
 			'post_modified_gmt' => $post->post_modified_gmt,
+			'post_status'		=> $post->post_status,
 			'price'             => $product->get_price( 'lowest' ),
 			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
@@ -282,6 +283,7 @@ class MP_Multisite {
 		$blog_public = get_blog_status( $blog_id, 'public' );
 		$product     = new MP_Product( $post->ID );
 		$index       = $this->find_index( $blog_id, $post->ID );
+		
 		if ( ! $index ) {
 			return false;
 		}
@@ -298,6 +300,7 @@ class MP_Multisite {
 			'post_date_gmt'     => $post->post_date_gmt,
 			'post_modified'     => $post->post_modified,
 			'post_modified_gmt' => $post->post_modified_gmt,
+			'post_status'		=> $post->post_status,
 			'price'             => $product->get_price( 'lowest' ),
 			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
@@ -689,6 +692,7 @@ class MP_Multisite {
 								`post_content` longtext NOT NULL,
 								`post_excerpt` longtext NOT NULL,
 								`post_permalink` text NOT NULL,
+								`post_status` varchar(20) NOT NULL,
 								`post_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 								`post_date_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 								`post_modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
