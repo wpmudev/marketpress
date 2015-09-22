@@ -332,6 +332,17 @@ class MP_Store_Settings_General {
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
 		$metabox->add_field( 'checkbox', array(
+			'name'       => 'show_orders',
+			'label'      => array( 'text' => __( 'Show admin Orders page?', 'mp' ) ),
+			'desc'		 => __( 'If unchecked your Orders admin page will be hidden', 'mp' ),
+			'message'	 => __( 'Yes', 'mp' ),
+			'conditional' => array(
+				'name'   => 'disable_cart',
+				'value'  => '1',
+				'action' => 'show',
+			),
+		) );
+		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'disable_minicart',
 			'label'		 => array( 'text' => __( 'Disable Mini Cart?', 'mp' ) ),
 			'desc'		 => __( 'This option hide floating Mini Cart in top right corner.', 'mp' ),

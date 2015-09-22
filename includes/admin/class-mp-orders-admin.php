@@ -855,7 +855,7 @@ class MP_Orders_Admin {
 		 */
 		$order_cap = apply_filters( 'mp_orders_cap', 'edit_store_orders' );
 
-		if ( current_user_can( $order_cap ) && ! mp_get_setting( 'disable_cart' ) ) {
+		if ( current_user_can( $order_cap ) && mp_get_setting( 'show_orders' ) ) {
 			$num_posts = wp_count_posts( 'mp_order' ); //get order count
 			$count     = ( isset( $num_posts->order_received ) && isset( $num_posts->order_paid ) ) ? ( $num_posts->order_received + $num_posts->order_paid ) : 0;
 
