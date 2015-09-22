@@ -359,7 +359,15 @@ if ( ! function_exists( 'mp_number_format' ) ) {
 		} else {
 			$int_decimals = 2;
 		}
-
+		
+		$curr_decimal = mp_get_setting( 'curr_decimal', 1 );
+		
+		if( $curr_decimal == 1 ) {
+			$int_decimals = 2;
+		} else {
+			$int_decimals = 0;
+		}
+		
 		$decimals = apply_filters( 'mp_number_format_decimals', $int_decimals );
 
 		if ( $force_basic ) {
