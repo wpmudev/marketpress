@@ -412,6 +412,14 @@ class MP_Coupon {
 		} elseif ( array() == $this->get_products( true ) ) {
 			$is_valid = false;
 		} else {
+			if ( $this->get_meta( 'applies_to' ) == 'user' ) {
+				$user = $this->get_meta( 'user' );
+
+				if ( !in_array( get_current_user_id(), $user ) ) {
+					$is_valid = false;
+				}
+			}
+
 			if ( ! $this->get_meta( 'can_be_combined' ) ) {
 				$applied = mp_coupons_addon()->get_applied();
 
