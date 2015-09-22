@@ -400,6 +400,59 @@ if ( ! function_exists( 'mp_number_format' ) ) {
 
 }
 
+if ( ! function_exists( 'mp_cart_widget' ) ) :
+
+	/**
+	 * Display a cart widget.
+	 *
+	 * The 'title' argument will accept a string and defaults is empty.
+	 * The 'custom_text' argument will accept a string and defaults is empty.
+	 *
+	 * @param bool $echo Optional. Whether or not to echo.
+	 * @param array|string $args Optional. Override default arguments.
+	 */
+	function mp_cart_widget( $echo = true, $args = array() ) {
+
+		$mini_cart    = '';
+		$title        = '';
+		$custom_text  = '';
+		$cart_content = '';
+
+		$mini_cart .= apply_filters( 'mp_cart_widget_before', '<div class="mp_cart_widget">');
+
+		if ( !empty( $args[ 'title' ] ) ) {
+			$title .= '<div class="mp_cart_widget_title">';
+			$title .= $args[ 'title' ]; 
+			$title .= '</div><!-- end .mp_cart_widget_title -->';
+		};
+
+		$mini_cart .= apply_filters( 'mp_cart_widget_title', $title );
+
+		if ( !empty( $args[ 'custom_text' ] ) ) {
+			$custom_text .= '<div class="mp_cart_widget_custom_text">';
+			$custom_text .= $args[ 'custom_text' ]; 
+			$custom_text .= '</div><!-- end .mp_cart_widget_custom_text -->';
+		};
+
+		$mini_cart .= apply_filters( 'mp_cart_widget_custom_text', $custom_text );
+
+		$cart_content .= '<div class="mp_cart_widget_content">';
+		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget');
+		$cart_content .= '</div><!-- end .mp_cart_widget_content -->';
+
+		$mini_cart .= apply_filters( 'mp_cart_widget_content', $cart_content );
+		
+		$mini_cart .= apply_filters( 'mp_cart_widget_after', '</div><!-- end .mp_cart_widget -->');
+
+		if ( $echo ) {
+			echo $mini_cart;
+		} else {
+			return $mini_cart;
+		}
+	}
+
+endif;
+
 if ( ! function_exists( 'mp_tag_cloud' ) ) :
 
 	/**

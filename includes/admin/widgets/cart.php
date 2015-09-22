@@ -28,9 +28,9 @@ class MarketPress_Shopping_Cart_Widget extends WP_Widget {
 		if ( !empty( $instance[ 'custom_text' ] ) )
 			echo '<div class="custom_text">' . $instance[ 'custom_text' ] . '</div>';
 
-		echo '<div id="mp-cart-widget" class="mp_cart_widget_content">';
+		echo '<div class="mp_cart_widget_content">';
 		echo MP_Cart::get_instance()->cart_products_html('widget');
-		echo '</div><!-- end mp-cart-widget -->';
+		echo '</div><!-- end .mp_cart_widget_content -->';
 
 		echo $after_widget;
 	}
