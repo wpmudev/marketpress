@@ -229,7 +229,7 @@ class MP_Public {
 	 * @access public
 	 */
 	public function disable_comments_on_store_pages( $open, $post_id ) {
-		if ( get_post_type( $post_id ) == MP_Product::get_post_type() || get_post_meta( $post_id, '_mp_store_page', true ) !== '' ) {
+		if ( get_post_type( $post_id ) == MP_Product::get_post_type() || get_post_meta( $post_id, '_mp_store_page', true ) != '' ) {
 			$open = false;
 		}
 
