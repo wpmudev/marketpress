@@ -203,6 +203,16 @@ class MP_Store_Settings_General {
 			jQuery( document ).ready( function( $ ) {
 				var $country = $( 'select[name="base_country"]' ),
 					$state = $( 'select[name="base_province"]' );
+					
+				$country.select2( { 
+					dropdownAutoWidth : false,
+					width : "300px"
+				} );	
+				
+				$state.select2( { 
+					dropdownAutoWidth : false,
+					width : "300px"
+				} );	
 
 				$country.on( 'change', function() {
 					var data = {
@@ -210,11 +220,11 @@ class MP_Store_Settings_General {
 						action: "mp_update_states_dropdown"
 					};
 
-					$country.select2( 'enable', false ).isWorking( true );
+					$country.isWorking( true );
 					$state.select2( 'enable', false );
 
 					$.post( ajaxurl, data ).done( function( resp ) {
-						$country.select2( 'enable', true ).isWorking( false );
+						$country.isWorking( false );
 						$state.select2( 'enable', true );
 
 						if ( resp.success ) {
