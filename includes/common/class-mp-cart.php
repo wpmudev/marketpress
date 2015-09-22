@@ -653,21 +653,23 @@ class MP_Cart {
 		 */
 		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $line, $this );
 
-		$line = '
-				<div class="mp_cart_resume_item mp_cart_resume_item-estimated-tax">
-					<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</span>
-					<span class="mp_cart_resume_item_amount">' . $this->tax_total( true, true ) . '</span>
-				</div><!-- end mp_cart_resume_item-estimated-tax -->';
+		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+			$line = '
+					<div class="mp_cart_resume_item mp_cart_resume_item-estimated-tax">
+						<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</span>
+						<span class="mp_cart_resume_item_amount">' . $this->tax_total( true, true ) . '</span>
+					</div><!-- end mp_cart_resume_item-estimated-tax -->';
 
-		/**
-		 * Filter the estimated tax html
-		 *
-		 * @since 3.0
-		 *
-		 * @param string The current estimated tax html.
-		 * @param MP_Cart The current cart object.
-		 */
-		$html .= apply_filters( 'mp_cart/cart_meta/estimated_tax_line', $line, $this );
+			/**
+			 * Filter the estimated tax html
+			 *
+			 * @since 3.0
+			 *
+			 * @param string The current estimated tax html.
+			 * @param MP_Cart The current cart object.
+			 */
+			$html .= apply_filters( 'mp_cart/cart_meta/estimated_tax_line', $line, $this );
+		}
 
 		$line = '
 				<div class="mp_cart_resume_item mp_cart_resume_item-order-total">
