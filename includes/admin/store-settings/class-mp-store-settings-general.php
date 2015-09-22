@@ -160,12 +160,17 @@ class MP_Store_Settings_General {
 		<script type="text/javascript">
 			jQuery( document ).ready( function( $ ) {
 				var $currency = $( 'select[name="currency"]' );
+				
+				$currency.select2( { 
+					dropdownAutoWidth : false,
+					width : "300px"
+				} );	
 
 				$currency.on( 'change', function( e ) {
 					var data = [
 						{
 							"name": "currency",
-							"value": e.val
+							"value": $(this).val()
 						}, {
 							"name": "action",
 							"value": "mp_update_currency"
@@ -175,12 +180,13 @@ class MP_Store_Settings_General {
 						}
 					];
 
-					$currency.select2( 'enable', false ).isWorking( true );
+					$currency.isWorking( true );
 
 					$.get( ajaxurl, $.param( data ) ).done( function( resp ) {
-						$currency.select2( 'enable', true ).isWorking( false );
+						$currency.isWorking( false );
 
 						if ( resp.success ) {
+							console.log(resp.data);
 							$( '.mp-currency-symbol' ).html( resp.data );
 						}
 					} );
