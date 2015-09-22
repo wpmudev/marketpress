@@ -270,9 +270,9 @@ class MP_Product {
 			<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope
 			         itemtype="http://schema.org/Product">
 				<div class="mp_product mp_product_options mp_product_lightbox">
-					
+
 					<?php do_action( 'mp_public/before_variation_fields_lightbox_form', $product_id, $product ); ?>
-					
+
 					<div class="mp_product_options_image">
 						<?php $product->image_custom( true, 'medium', array( 'class' => 'mp_product_options_thumb' ) ); ?>
 					</div>
@@ -315,19 +315,19 @@ class MP_Product {
 
 					</div>
 					<!-- end mp_product_options_details -->
-					
+
 					<?php do_action( 'mp_public/after_variation_fields_lightbox_form', $product_id, $product ); ?>
 
 				</div>
 				<!-- end mp_product_options -->
 			</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
 			<?php do_action( 'mp_public/after_variations_lightbox_form', $product_id, $product ); ?>
-		<?php 
-		
-		$html = ob_get_clean( );	
+		<?php
+
+		$html = ob_get_clean( );
 
 		echo apply_filters( 'mp_display_variations_lightbox', $html, $product_id, $product );
-		
+
 		}
 
 		die;
@@ -1356,6 +1356,8 @@ class MP_Product {
 			);
 		}
 
+		//we will need to check if we include the price with tax or exclusive
+
 		/**
 		 * Filter the price array
 		 *
@@ -1816,8 +1818,6 @@ class MP_Product {
 	 * @param string $view Either single or list. Optional.
 	 */
 	public function image_url( $echo = true, $size = null, $view = null, $id = false ) {
-
-
 		if ( is_null( $size ) ) {
 			$img_size = mp_get_image_size( $view );
 			$size     = ( $img_size['label'] == 'custom' ) ? array(
@@ -1829,6 +1829,7 @@ class MP_Product {
 		}
 
 		$post_id = $this->ID;
+		$img_url = '';
 		if ( $this->has_variations() ) {
 			$post_id = $this->get_variation()->ID;
 		}
@@ -1839,7 +1840,7 @@ class MP_Product {
 			$img_url = array_shift( $img_src );
 		}
 
-		if ( empty( $img_url ) ) {
+		if ( empty( $img_url ) && mp_get_setting('show_thumbnail_placeholder')) {
 			/**
 			 * Filter the default image url
 			 *
@@ -2259,7 +2260,7 @@ class MP_Product {
 		if ( $setting == 'off' ) {
 			return '';
 		}
-		
+
 		if ( $setting == 'single_view' && $context == 'all_view' ) {
 			return '';
 		}
@@ -2331,7 +2332,7 @@ class MP_Product {
 		if ( $setting == 'off' ) {
 			return '';
 		}
-		
+
 		if ( $setting == 'single_view' && $context == 'all_view' ) {
 			return '';
 		}
@@ -2403,7 +2404,7 @@ class MP_Product {
 		if ( $setting == 'off' ) {
 			return '';
 		}
-		
+
 		if ( $setting == 'single_view' && $context == 'all_view' ) {
 			return '';
 		}

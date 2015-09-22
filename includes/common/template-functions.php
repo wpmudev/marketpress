@@ -2271,7 +2271,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 										}";
 		}
 
-		if ( $image ) {
+		if ( $image && $has_image ) {
 			if ( ! $product->has_variations() ) {
 
 				if ( $values ) {
@@ -2292,11 +2292,11 @@ if ( ! function_exists( 'mp_product' ) ) {
 									});
 								});
 								</script>";
-					
+
 					$return .= '<ul id="mp-product-gallery" class="mp_product_gallery">';
 
 					$values = explode( ',', $values );
-					
+
 					if( $image != "single" ) {
 						foreach ( $values as $value ) {
 
@@ -2312,23 +2312,24 @@ if ( ! function_exists( 'mp_product' ) ) {
 						}
 					} else {
 						if( ! empty( $values[ 0 ] ) ) {
-							
+
 							if ( preg_match( '/http:|https:/', $values[ 0 ] ) ) {
 								$img_url = array( esc_url( $values[ 0 ] ) );
 							} else {
 								$original_image = wp_get_attachment_image_src( $values[ 0 ], 'full' );
 								$img_url        = mp_resize_image( $original_image[0], $size );
 							}
-							
+
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
 						}
 					}
 
 					$return .= '</ul><!-- end mp_product_gallery -->';
 
-					$return .= '</div><!-- end mp_single_product_images -->'; 
+					$return .= '</div><!-- end mp_single_product_images -->';
 				}
 			} else {
+
 				$return .= '<div class="mp_single_product_images">';
 				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, $image, $size, $image_alignment );
 				$return .= '</div><!-- end mp_single_product_images -->';
