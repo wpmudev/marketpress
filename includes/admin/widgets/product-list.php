@@ -84,7 +84,7 @@ class MarketPress_Product_List extends WP_Widget {
 				}
 
 				if ( $instance[ 'show_excerpt' ] ) {
-					echo '<div class="mp_product_excerpt">' . $product->excerpt( $post->post_excerpt, $post->post_content ) . '</div><!-- end mp_product_excerpt -->';
+					echo '<div class="mp_product_excerpt">' . $product->post_excerpt . '</div><!-- end mp_product_excerpt -->';
 				}
 
 				if ( $instance[ 'show_price' ] || $instance[ 'show_button' ] ) {
