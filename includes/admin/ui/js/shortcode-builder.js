@@ -103,32 +103,45 @@
 	};
 
 	var initProductSearchField = function() {
-		$('input.mp-select-product').each(function(){
+		$('.mp-select-product').each(function(){
 			var $this = $(this);
-
+			
 			$this.select2({
 				"multiple" : false,
 				"placeholder" : MP_ShortCode_Builder.select_product,
 				"width" : "100%",
-				"ajax" : {
-					"url" : ajaxurl,
-					"dataType" : "json",
-					"data" : function(term, page){
-						return {
-							"search_term" : term,
-							"page" : page,
-							"action" : "mp_shortcode_builder_search_products"
-						}
+				allowClear: true,
+				ajax: {
+					url: ajaxurl,
+					dataType: 'json',
+					delay: 250,
+					data: function (params) {
+					  return {
+						search_term: params.term, // search term
+						page: params.page,
+						action: "mp_shortcode_builder_search_products"
+					  };
 					},
-					"results" : function(data, page){
-						var more = (page * data.post_per_page) < data.total;
-						return {
-							"results" : data.posts,
-							"more" : more
-						}
-					}
-				}
+					processResults: function (data, page) {
+					  var more = (page * data.post_per_page) < data.total;
+					  return {
+						results: data.posts
+					  };
+					},
+					cache: true
+				},
+				templateResult: FormatResult, // omitted for brevity, see the source of this page
+				templateSelection: FormatSelection, // omitted for brevity, see the source of this page
 			})
 		});
-	}
+	};
+	
+	function FormatResult(data) {
+        return data.text;
+    }
+
+    function FormatSelection(data) {
+        return data.text;
+    }
+	
 }(jQuery));

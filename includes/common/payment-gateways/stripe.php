@@ -341,7 +341,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 				$payment_info	 = array(
 					'gateway_public_name'	 => $this->public_name,
 					'gateway_private_name'	 => $this->admin_name,
-					'method'				 => sprintf( __( '%1$s Card ending in %2$s - Expires %3$s', 'mp' ), $charge->card->type, $charge->card->last4, $charge->card->exp_month . '/' . $charge->card->exp_year ),
+					'method'				 => sprintf( __( '%1$s Card ending in %2$s - Expires %3$s', 'mp' ), $charge->source->brand, $charge->source->last4, $charge->source->exp_month . '/' . $charge->source->exp_year ),
 					'transaction_id'		 => $charge->id,
 					'status'				 => array(
 						$timestamp => __( 'Paid', 'mp' ),

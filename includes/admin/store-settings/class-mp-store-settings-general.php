@@ -413,6 +413,17 @@ class MP_Store_Settings_General {
 				'frd'	 => '1 123.45',
 			),
 		) );
+		
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'curr_decimal',
+			'label'			 => array( 'text' => __( 'Show Decimal in Prices', 'mp' ) ),
+			'default_value'	 => '1',
+			'orientation'	 => 'horizontal',
+			'options'		 => array(
+				'0'	 => '100',
+				'1'	 => '100.00',
+			),
+		) );
 	}
 
 	/**

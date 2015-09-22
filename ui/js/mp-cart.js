@@ -247,6 +247,8 @@ var mp_cart = { };
                         $container.find('.mp_product_image_single').attr('src', resp.data.image);
                         $container.find('.mp_product_image_link').attr('href', resp.data.image);
                     }
+                }else{
+                    $('.mp_product_image_link').remove();
                 }
 
                 //if ( resp.data.description ) {
