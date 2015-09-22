@@ -82,7 +82,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		$currency = $order->get_meta( 'currency', '' );
 
 		// Cart
-		$cart  = $order->get_meta( 'mp_cart_info' );
+		$cart = $order->get_cart();
 		$items = $cart->get_items_as_objects();
 
 		// Order info
@@ -142,7 +142,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		}
 
 		// Cart
-		$cart = $order->get_meta( 'mp_cart_info' );
+		$cart = $order->get_cart();
 
 		// Shipping/Billing Info
 		$types                 = array(

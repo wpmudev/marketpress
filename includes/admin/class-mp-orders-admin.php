@@ -532,7 +532,7 @@ class MP_Orders_Admin {
 		$order = new MP_Order( $post );
 		$cart  = $order->get_meta( 'mp_cart_items' );
 		if ( ! $cart ) {
-			$cart = $order->get_meta( 'mp_cart_info' );
+			$cart = $order->get_cart();
 		}
 		?>
 		<div id="mp-cart-form" class="mp_form mp_form-cart">
