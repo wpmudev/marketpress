@@ -2376,6 +2376,10 @@ if ( ! function_exists( 'mp_product' ) ) {
 			}
 
 			$return .= $product->buy_button( false, 'single', $selected_atts );
+			
+			if ( mp_get_setting( 'show_single_tags' ) == 1 ) {
+				$return .= mp_tag_list( $product_id, '<div class="mp_product_tags">' . __( 'Tagged in ', 'mp' ), ', ', '</div>' );
+			}
 
 			$return .= '</div><!-- end mp_product_callout-->';
 
@@ -2388,10 +2392,6 @@ if ( ! function_exists( 'mp_product' ) ) {
 
 		if ( $image ) {
 			$return .= '</div><!-- end mp_single_product_details-->';
-		}
-
-		if ( mp_get_setting( 'show_single_tags' ) == 1 ) {
-			$return .= mp_tag_list( $product_id, '<div class="mp_product_tags">' . __( 'Tagged in ', 'mp' ), ', ', '</div>' );
 		}
 
 		$return .= '<div class="mp_single_product_extra">';
