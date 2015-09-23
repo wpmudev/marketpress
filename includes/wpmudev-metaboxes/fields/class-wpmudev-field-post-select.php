@@ -27,7 +27,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 		$this->args[ 'class' ] .= ' wpmudev-post-select';
 		$this->args[ 'custom' ][ 'data-placeholder' ]	 = $this->args[ 'placeholder' ];
 		$this->args[ 'custom' ][ 'data-multiple' ]		 = (int) $this->args[ 'multiple' ];
-		$this->args[ 'custom' ][ 'data-query' ]			 = http_build_query( $this->args[ 'query' ] );
+		$this->args[ 'custom' ][ 'data-args' ]			 = http_build_query( $this->args[ 'query' ] );
 	}
 
 	/**
@@ -53,7 +53,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 	public static function search_posts() {
 		add_filter( 'posts_search', array( __CLASS__, 'search_by_title_only' ), 500, 2 );
 
-		parse_str( $_GET[ 'query' ], $args );
+		parse_str( $_GET[ 'args' ], $args );
 
 		$args = array_replace_recursive( array(
 			'posts_per_page' => get_option( 'posts_per_page' ),
@@ -126,13 +126,14 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 		?>
 		<script type="text/javascript">
 			jQuery( document ).ready( function( $ ) {
-				$( 'input.wpmudev-post-select' ).each( function() {
+				$( 'select.wpmudev-post-select' ).each( function() {
 					var $this = $( this ),
 						multiple = Boolean( parseInt( $this.attr( 'data-multiple' ) ) ),
 						args = {
-							"multiple": multiple,
-							"placeholder": $this.attr( 'data-placeholder' ),
-							"initSelection": function( element, callback ) {
+							multiple: multiple,
+							placeholder: $this.attr( 'data-placeholder' ),
+							allowClear: true,
+							initSelection: function( element, callback ) {
 								if ( multiple ) {
 									var data = [ ];
 									$( element.attr( 'data-select2-value' ).split( '||' ) ).each( function() {
@@ -142,37 +143,45 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 								} else {
 									var val = $this.attr( 'data-select2-value' ).split( '->' );
 									var data = { "id": val[0], "text": val[1] };
+									
+									element.append($('<option>', { 
+										value: val[0],
+										text : val[1]
+									}));
+									
+									element.val( val[0] );
 								}
 
 								callback( data );
 							},
-							"ajax": {
-								"url": ajaxurl,
-								"dataType": "json",
-								"data": function( term, page ) {
-									return {
-										"search_term": term,
-										"page": page,
-										"query": $this.attr( 'data-query' ),
-										"action": "wpmudev_field_post_select_search_posts"
-									}
+							ajax: {
+								url: ajaxurl,
+								dataType: 'json',
+								delay: 250,
+								data: function (params) {
+								  return {
+									search_term: params.term, // search term
+									page: params.page,
+									args: $this.attr( 'data-args' ),
+									action: "wpmudev_field_post_select_search_posts"
+								  };
 								},
-								"results": function( data, page ) {
-									var more = ( page * data.post_per_page ) < data.total;
-									return {
-										"results": data.posts,
-										"more": more
-									}
-								}
-							}
+								processResults: function (data, page) {
+								  var more = (page * data.post_per_page) < data.total;
+								  return {
+									results: data.posts
+								  };
+								},
+								cache: true
+							},
 						};
 
 					if ( multiple ) {
 						args.width = '100%';
 					} else {
-						args.dropdownAutoWidth = true;
+						args.width = '15%';
 					}
-
+					
 					$this.select2( args );
 				} );
 
@@ -206,7 +215,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 
 		$this->args[ 'custom' ][ 'data-select2-value' ] = implode( '||', $data );
 		$this->before_field();
-		echo '<input type="hidden" ' . $this->parse_atts() . ' value="' . implode( ',', $ids ) . '" />';
+		echo '<select ' . $this->parse_atts() . '></select>';
 		$this->after_field();
 	}
 
