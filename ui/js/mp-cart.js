@@ -147,7 +147,7 @@ var mp_cart = { };
             .on( 'change', 'select[name^="mp_cart_item-qty"]', function( e ) {
                 var $this = $( this ),
                     itemId = $this.attr( 'name' ).match( /[0-9]+/ig ),
-                    qty = e.val;
+                    qty = $(this).val();
 
                 mp_cart.updateItemQty( itemId[0], qty, $( '#mp-cart-form' ) );
             } );

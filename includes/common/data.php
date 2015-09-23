@@ -39,6 +39,7 @@ $this->default_settings = array(
 	'curr_symbol_position'		 => 1,
 	'curr_decimal'				 => 1,
 	'disable_cart'				 => 0,
+	'show_orders'				 => 1,
 	'hide_popup'				 => 0,
 	'image_alignment_single'	 => 'alignleft',
 	'image_alignment_list'		 => 'alignleft',
