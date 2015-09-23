@@ -468,7 +468,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				switch_to_blog( $blog_id );
 			}
 		}
-var_dump($request);
+
 		// save this request to session for later use
 		mp_update_session_value( 'paypal_request', $request );
 
