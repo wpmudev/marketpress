@@ -686,6 +686,8 @@ class MP_Installer {
 			if ( ( version_compare( $old_version, '3.0.0.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.3', '<' ) ) ) ) {
 				$settings = $this->update_3003( $settings );
 				update_option( 'mp_settings', $settings );
+				//we will remove the mp_db_update_required, so user can re run the wizard
+				update_option( 'mp_db_update_required', 1 );
 			}
 		}
 		// Give admin role all store capabilities

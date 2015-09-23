@@ -1,9 +1,41 @@
 ﻿Plugin Name: MarketPress
-Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub)
+Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+3.0.0.3
+----------------------------------------------------------------------
+- Added: Show/Hide Mini-Cart
+- Added: Cart Widget / Cart Widget Shortcode
+- Added: Global Products List Widget
+- Added: Global Products Categories Widget
+- Added: Global Products Tags Widget
+- Fixed: Various issues with update from 2.9.x to 3.x
+- Fixed: Issue with saving metabox data
+- Fixed: Paypal saving issue
+- Fixed: Coupon message for other users (user specific coupons)
+- Fixed: Product weight
+- Fixed: Load MarketPress styles and scripts on all required pages
+- Fixed: Social Links on single product only option
+- Fixed: Lightbox/Larger image on single product
+- Fixed: mp_product shortcode image set to none
+- Fixed: Stripe payment information incomplete
+- Fixed: Update order status error
+- Fixed: Issue with WP comments open
+- Fixed: Buy button shortcode
+- Security: Added new rules to prevent user registration SPAM
+- Localization: Added .pot support
+- Tweaked: Show how many times coupon get applied
+- Tweaked: Added option to show/hide excerpt on listing and single product
+- Tweaked: Added option to show/hiw product categories and products tags on single product
+- Tweaked: Added option to show prices with decimal
+- Tweaked: Added option to show/hide order menu when cart is disabled
+- Tweaked: Added option to limit by words the excerpt on listings if excerpt is enabled
+- Tweaked: Show excerpt bellow the price on single product if "show excerpt" is enabled
+- Other global fixes and tweaks (small fixes/tweaks and library updates)
+
 3.0.0.1
 ----------------------------------------------------------------------
 Adding notice for deprecated gateways Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout

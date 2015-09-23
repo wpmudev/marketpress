@@ -1,30 +1,30 @@
 <?php
 /*
-  Plugin Name: MarketPress
-  Version: 3.0.0.3-beta
-  Plugin URI: https://premium.wpmudev.org/project/e-commerce/
-  Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
-  Author: WPMU DEV
-  Author URI: http://premium.wpmudev.org
-  Text Domain: mp
-  WDP ID: 144
+Plugin Name: MarketPress
+Version: 3.0.0.3
+Plugin URI: https://premium.wpmudev.org/project/e-commerce/
+Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
+Author: WPMU DEV
+Author URI: http://premium.wpmudev.org
+Text Domain: mp
+WDP ID: 144
 
-  Copyright 2009-2015 Incsub (http://incsub.com)
+Copyright 2009-2015 Incsub (http://incsub.com)
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License (Version 2 - GPLv2) as
-  published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License (Version 2 - GPLv2) as
+published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
-  GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
-  Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub)
+Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub)
  */
 
 define( 'MP_VERSION', '3.0.0.3' );
@@ -738,6 +738,7 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
+		//require_once $this->plugin_dir( 'includes/common/class-mp-taxes.php' );
 
 		if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
