@@ -1433,36 +1433,59 @@ class MP_Product {
 			$related_specified_products_enabled = false;
 		}
 
-		$related_products = '';
-
-		if ( $related_products !== $this->get_meta( 'related_products' ) && $related_specified_products_enabled ) {
-			$query_args['post__in'] = $related_products;
-		} else {
+		// If there are some manual related products for this item
+		if ( '' !== $related_specified_products && $related_specified_products_enabled ) {
+			$query_args['post__in'] = $related_specified_products;
+		}
+		// Else, try to see if there are some category and/or tag related products for this item
+		else { 
 			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 			$count   = 0;
 
 			if ( 'category' != $relate_by ) {
 				$terms                     = get_the_terms( $post_id, 'product_tag' );
 				$ids                       = isset( $terms ) && is_array( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
-				$query_args['tax_query'][] = array(
-					'taxonomy' => 'product_tag',
-					'terms'    => $ids,
-				);
-				$count ++;
+				
+				// If the product has some tags, add these to the Query
+				if ( !empty( $ids ) ) {
+					$query_args['tax_query'][] = array(
+						'taxonomy' => 'product_tag',
+						'terms'    => $ids,
+					);
+					$count ++;					
+				}
 			}
 
 			if ( 'tags' != $relate_by ) {
 				$terms                     = get_the_terms( $post_id, 'product_category' );
 				$ids                       = isset( $terms ) && is_array( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
-				$query_args['tax_query'][] = array(
-					'taxonomy' => 'product_category',
-					'terms'    => $ids,
-				);
-				$count ++;
+				
+				// If the product has some categories, add these to the Query
+				if ( !empty( $ids ) ) {
+					$query_args['tax_query'][] = array(
+						'taxonomy' => 'product_category',
+						'terms'    => $ids,
+					);
+					$count ++;
+				}
 			}
 
 			if ( $count > 1 ) {
 				$query_args['tax_query']['relation'] = 'AND';
+			}
+			
+			// There are no related products
+			if ( $count === 0 ) {
+				if ( $return_bool ) {
+					return false;
+				}
+				else if ( ! $echo ) {
+					return '';
+				}
+				else {
+					echo '';
+					return;
+				}
 			}
 		}
 
