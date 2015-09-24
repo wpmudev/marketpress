@@ -653,7 +653,7 @@ class MP_Cart {
 		 */
 		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $line, $this );
 
-		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+		if ( 0 < $this->tax_total( false, true ) ) {
 			$line = '
 					<div class="mp_cart_resume_item mp_cart_resume_item-estimated-tax">
 						<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</span>
