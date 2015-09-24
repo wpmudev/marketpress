@@ -265,7 +265,7 @@ class MP_Product {
 		 */
 		?>
 		<?php if ( 0 == 0 ) { ?>
-		<?php ob_start( ); ?>
+			<?php ob_start(); ?>
 			<?php do_action( 'mp_public/before_variations_lightbox_form', $product_id, $product ); ?>
 			<section id="mp-product-<?php echo $product->ID; ?>-lightbox" itemscope
 			         itemtype="http://schema.org/Product">
@@ -322,11 +322,11 @@ class MP_Product {
 				<!-- end mp_product_options -->
 			</section><!-- end mp-product-<?php echo $product->ID; ?>-lightbox -->
 			<?php do_action( 'mp_public/after_variations_lightbox_form', $product_id, $product ); ?>
-		<?php
+			<?php
 
-		$html = ob_get_clean( );
+			$html = ob_get_clean();
 
-		echo apply_filters( 'mp_display_variations_lightbox', $html, $product_id, $product );
+			echo apply_filters( 'mp_display_variations_lightbox', $html, $product_id, $product );
 
 		}
 
@@ -1137,8 +1137,16 @@ class MP_Product {
 	 *
 	 * @param bool $echo
 	 */
-	public function display_price( $echo = true ) {
+	public function display_price( $echo = true, $context = '' ) {
 		$price   = $this->get_price();
+		//we will need to check if we include the price with tax or exclusive
+		$table = get_post_meta( $this->_post->ID, 'special_tax_rate', true );
+		if ( empty( $table ) ) {
+			$table = 'standard';
+		}
+		$price['lowest']  = mp_tax()->product_price_with_tax( $price['lowest'], $table, $context );
+		$price['highest'] = mp_tax()->product_price_with_tax( $price['highest'], $table, $context );
+
 		$snippet = '<!-- MP Product Price --><div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 
 		if ( $this->has_variations() ) {
@@ -1355,8 +1363,6 @@ class MP_Product {
 				'days_left'  => $days_left,
 			);
 		}
-
-		//we will need to check if we include the price with tax or exclusive
 
 		/**
 		 * Filter the price array
@@ -1840,7 +1846,7 @@ class MP_Product {
 			$img_url = array_shift( $img_src );
 		}
 
-		if ( empty( $img_url ) && mp_get_setting('show_thumbnail_placeholder')) {
+		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' ) ) {
 			/**
 			 * Filter the default image url
 			 *
@@ -1972,13 +1978,13 @@ class MP_Product {
 		$subject = __( 'Low Product Inventory Notification', 'mp' );
 		$msg     = __( 'This message is being sent to notify you of low stock of a product in your online store according to your preferences.<br /><br />', 'mp' );
 
-		$msg    .= __( 'Product: %s', 'mp' );
-		$msg    .= __( 'Current Inventory: %s', 'mp' );
-		$msg    .= __( 'Link: %s<br /><br />', 'mp' );
+		$msg .= __( 'Product: %s', 'mp' );
+		$msg .= __( 'Current Inventory: %s', 'mp' );
+		$msg .= __( 'Link: %s<br /><br />', 'mp' );
 
-		$msg    .= __( 'Edit Product: %s', 'mp' );
-		$msg    .= __( 'Notification Preferences: %s', 'mp' );
-		$msg    = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc' ) );
+		$msg .= __( 'Edit Product: %s', 'mp' );
+		$msg .= __( 'Notification Preferences: %s', 'mp' );
+		$msg = sprintf( $msg, $name, number_format_i18n( $stock ), $this->url( false ), $this->url_edit( false ), admin_url( 'admin.php?page=mp-settings-general-misc#mp-settings-general-misc' ) );
 
 		/**
 		 * Filter the low stock notification message
