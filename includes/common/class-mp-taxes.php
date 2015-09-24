@@ -173,6 +173,12 @@ class MP_Taxes {
 
 	public function get_tax_address() {
 		$address_type = mp_get_setting( 'tax->tax_calculate_based' );
+		$address      = array(
+			'country' => '',
+			'state'   => '',
+			'city'    => '',
+			'zip'     => '',
+		);
 		switch ( $address_type ) {
 			case 'shipping_address':
 				$address = $this->get_shipping_address();
@@ -323,8 +329,8 @@ class MP_Taxes {
 	public function get_table_rates() {
 		$tables = mp_get_setting( 'tax->tax_tables' );
 		$tables = json_decode( stripslashes( $tables ), true );
-		$data = array(
-			'standard'   => __( "Standard Table", "mp" )
+		$data   = array(
+			'standard' => __( "Standard Table", "mp" )
 		);
 		foreach ( $tables as $table ) {
 			$data[ str_replace( '-', '_', sanitize_title( $table ) ) ] = $table;
