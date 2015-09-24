@@ -1427,7 +1427,7 @@ class MP_Product {
 
 		$query_args = array(
 			'post_type'      => MP_Product::get_post_type(),
-			'posts_per_page' => (int) $limit,
+			'posts_per_page' => intval( $limit ),
 			'post__not_in'   => array( ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID )
 		);
 
