@@ -2299,7 +2299,7 @@ class MP_Product {
 			$url = add_query_arg( 'media', $media, $url );
 		}
 
-		$snippet = apply_filters( 'mp_pinit_button_link', '<a target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png"></a>', $this->ID, $context );
+		$snippet = apply_filters( 'mp_pinit_button_link', '<a class="mp_pin_button" target="_blank" href="' . $url . '" data-pin-do="buttonPin" data-pin-config="' . $count_pos . '"><img src="//assets.pinterest.com/images/pidgets/pin_it_button.png"></a>', $this->ID, $context );
 
 		if ( $echo ) {
 			echo $snippet;
@@ -2433,7 +2433,7 @@ class MP_Product {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = '//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.3';
+  js.src = '//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.4';
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 <div class='fb-like' data-href='" . $url . "' data-layout='button' data-action='" . $action . "' data-show-faces='false' data-share='" . $show_share . "'></div>
