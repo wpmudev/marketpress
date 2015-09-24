@@ -141,9 +141,12 @@ class MP_Store_Settings_General {
 
 		$tables = mp_get_setting( 'tax->tax_tables' );
 		$tables = json_decode( stripslashes( $tables ) );
+		if ( ! is_array( $tables ) ) {
+			$tables = array();
+		}
 
 		$slugs = array();
-		$data  = mp_get_setting( 'tax->tables_data' );
+		$data  = mp_get_setting( 'tax->tables_data',array() );
 
 		foreach ( $tables as $table ) {
 			$slugs[] = str_replace( '-', '_', sanitize_title( $table ) );

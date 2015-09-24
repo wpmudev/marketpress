@@ -329,7 +329,10 @@ class MP_Taxes {
 	public function get_table_rates() {
 		$tables = mp_get_setting( 'tax->tax_tables' );
 		$tables = json_decode( stripslashes( $tables ), true );
-		$data   = array(
+		if ( ! is_array( $tables ) ) {
+			$tables = array();
+		}
+		$data = array(
 			'standard' => __( "Standard Table", "mp" )
 		);
 		foreach ( $tables as $table ) {
