@@ -104,7 +104,7 @@ class WPMUDEV_Field_Images extends WPMUDEV_Field {
 
 						selection.each( function( attachment ) {
 
-							var url = attachment.attributes.sizes.hasOwnProperty( '<?php echo $this->args[ 'preview_size' ]; ?>' ) ? attachment.attributes.sizes['<?php echo $this->args[ 'preview_size' ]; ?>'].url : attachment.attributes.sizes.thumbnail.url,
+							var url = attachment.attributes.sizes.hasOwnProperty( '<?php echo $this->args[ 'preview_size' ]; ?>' ) ? attachment.attributes.sizes['<?php echo $this->args[ 'preview_size' ]; ?>'].url : ( attachment.attributes.sizes.hasOwnProperty( 'thumbnail' ) ? attachment.attributes.sizes.thumbnail.url : attachment.attributes.sizes.full.url ),
 								html = '<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="' + url + '" alt="" data-image-id="' + attachment.id + '" /></div>';
 
 							$( '.mp_images_holder' ).append( html );
@@ -139,7 +139,7 @@ class WPMUDEV_Field_Images extends WPMUDEV_Field {
 						var selection = frame.state().get( 'selection' );
 
 						selection.each( function( attachment ) {
-							var url = attachment.attributes.sizes.hasOwnProperty( '<?php echo $this->args[ 'preview_size' ]; ?>' ) ? attachment.attributes.sizes['<?php echo $this->args[ 'preview_size' ]; ?>'].url : attachment.attributes.sizes.thumbnail.url,
+							var url = attachment.attributes.sizes.hasOwnProperty( '<?php echo $this->args[ 'preview_size' ]; ?>' ) ? attachment.attributes.sizes['<?php echo $this->args[ 'preview_size' ]; ?>'].url : ( attachment.attributes.sizes.hasOwnProperty( 'thumbnail' ) ? attachment.attributes.sizes.thumbnail.url : attachment.attributes.sizes.full.url ),
 								html = '<div class="wpmudev-image-field-preview"><a class="wpmudev-image-field-edit dashicons dashicons-edit" href="#"></a><a class="wpmudev-image-field-delete dashicons dashicons-trash" href="#"></a><img src="' + url + '" alt="" data-image-id="' + attachment.id + '" /></div>';
 
 							$this.parent().replaceWith( html );
