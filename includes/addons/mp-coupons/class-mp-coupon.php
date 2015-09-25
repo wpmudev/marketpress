@@ -341,6 +341,7 @@ class MP_Coupon {
 					}
 				}
 				break;
+            default:
 			case 'all':
 				$products      = array();
 				$cart_products = mp_cart()->get_items_as_objects();
