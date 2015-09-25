@@ -105,21 +105,21 @@ class MP_Store_Settings_Admin {
 		$cap = apply_filters( 'mp_store_settings_cap', 'manage_store_settings' );
 
 		add_menu_page( __( 'Store Settings', 'mp' ), __( 'Store Settings', 'mp' ), $cap, 'store-settings', create_function( '', '' ), ( version_compare( $wp_version, '3.8', '>=' ) ) ? 'dashicons-admin-settings' : mp_plugin_url( 'ui/images/marketpress-icon.png' ), '99.33' );
-		add_submenu_page( 'store-settings', __( 'Store Settings: General', 'mp' ), __( 'General', 'mp' ), $cap, 'store-settings', false );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Presentation', 'mp' ), __( 'Presentation', 'mp' ), $cap, 'store-settings-presentation', false );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Notifications', 'mp' ), __( 'Notifications', 'mp' ), $cap, 'store-settings-notifications', false );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Shipping', 'mp' ), __( 'Shipping', 'mp' ), $cap, 'store-settings-shipping', false );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Payments', 'mp' ), __( 'Payments', 'mp' ), $cap, 'store-settings-payments', false );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Product Attributes', 'mp' ), __( 'Product Attributes', 'mp' ), $cap, 'store-settings-productattributes', false );
+		add_submenu_page( 'store-settings', __( 'Store Settings: General', 'mp' ), __( 'General', 'mp' ), $cap, 'store-settings', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Presentation', 'mp' ), __( 'Presentation', 'mp' ), $cap, 'store-settings-presentation', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Notifications', 'mp' ), __( 'Notifications', 'mp' ), $cap, 'store-settings-notifications', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Shipping', 'mp' ), __( 'Shipping', 'mp' ), $cap, 'store-settings-shipping', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Payments', 'mp' ), __( 'Payments', 'mp' ), $cap, 'store-settings-payments', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Product Attributes', 'mp' ), __( 'Product Attributes', 'mp' ), $cap, 'store-settings-productattributes', array( 'MP_Product_Attributes_Admin', 'display_product_attributes' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Categories', 'mp' ), __( 'Product Categories', 'mp' ), apply_filters( 'mp_manage_product_categories_cap', 'manage_product_categories' ), 'edit-tags.php?taxonomy=product_category&post_type=' . MP_Product::get_post_type() );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Tags', 'mp' ), __( 'Product Tags', 'mp' ), apply_filters( 'mp_manage_product_tags_cap', 'manage_product_tags' ), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type() );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Capabilities', 'mp' ), __( 'User Capabilities', 'mp' ), $cap, 'store-settings-capabilities', false );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Capabilities', 'mp' ), __( 'User Capabilities', 'mp' ), $cap, 'store-settings-capabilities', array( &$this, 'display_settings_form' ) );
 		//add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 		//add_submenu_page('store-settings', __('Store Settings: Exporters', 'mp'), __('Exporters', 'mp'), $cap, 'store-settings-exporters', false);		
-		add_submenu_page( 'store-settings', __( 'Store Settings: Add Ons', 'mp' ), __( 'Add Ons', 'mp' ), $cap, 'store-settings-addons', false );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Add Ons', 'mp' ), __( 'Add Ons', 'mp' ), $cap, 'store-settings-addons', array( MP_Store_Settings_Addons::get_instance(), 'display_settings' ) );
 
 		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) || (isset( $_GET[ 'quick_setup_step' ] )) ) {
-			add_submenu_page( 'store-settings', __( 'Quick Setup', 'mp' ), __( 'Quick Setup', 'mp' ), $cap, 'store-setup-wizard', false );
+			add_submenu_page( 'store-settings', __( 'Quick Setup', 'mp' ), __( 'Quick Setup', 'mp' ), $cap, 'store-setup-wizard', array( &$this, 'display_settings_form' ) );
 		}
 
 		if ( !WPMUDEV_REMOVE_BRANDING ) {
