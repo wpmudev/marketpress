@@ -1100,7 +1100,7 @@ class WPMUDEV_Metabox {
 
 			if ( $this->is_active == false && $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['post_ID'] ) && $_POST['post_ID'] != 0 && $_POST['action'] == 'editpost' ) {
 				$post_post_id = $_POST['post_ID'];
-				if (!is_object($post) || $post_post_id != $post->ID ) {
+				if (!is_object($post) || ( isset( $post->ID ) && $post_post_id != $post->ID ) )  {
 					$actual_post = get_post( $post_post_id );
 					if ( is_object( $actual_post ) && $actual_post->post_type == $this->args['post_type'] ) {
 						$this->is_active = true;
