@@ -135,6 +135,15 @@ var mp_cart = { };
                 marketpress.loadingOverlay( 'hide' );
             } )
             .validate( this.productFormValidationArgs );
+			
+		 $( '.mp_form-buy-product' )
+            .on( 'mp_cart/before_add_item', function( e, item, qty ) {
+                marketpress.loadingOverlay( 'show' );
+            } )
+            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+                marketpress.loadingOverlay( 'hide' );
+            } )
+            .validate( this.productFormValidationArgs );	
     };
 
     /**
