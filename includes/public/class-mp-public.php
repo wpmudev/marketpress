@@ -418,7 +418,7 @@ class MP_Public {
 
 		if ( mp_get_setting( 'pages->store' ) == $post->ID ) {
 			$custom_template = locate_template( array( 'mp_store.php' ) );
-		} elseif ( mp_get_setting( 'pages->product' ) == $post->ID ) {
+		} elseif ( mp_get_setting( 'pages->products' ) == $post->ID ) {
 			$custom_template = locate_template( array( 'mp_productlist.php' ) );
 		} elseif ( mp_get_setting( 'pages->cart' ) == $post->ID ) {
 			$custom_template = locate_template( array( 'mp_cart.php' ) );
