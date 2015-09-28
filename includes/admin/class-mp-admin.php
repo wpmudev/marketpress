@@ -66,7 +66,7 @@ class MP_Admin {
 		?>
 		<div class="update-nag mp-deprecated-notice">
 		<div class="mp-notice-text">
-		<?php echo sprintf(__("The following payment gateways have been deprecated, Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout. If you was using one of these gateways, please setup a new payment gateway <a href=\"%s\">here</a>.","marketpress"),admin_url('admin.php?page=store-settings-payments')) ?>
+		<?php echo sprintf(__("The following payment gateways have been deprecated, Cubepoints, Bitpay, iDEAL, Skrill, Google Checkout. If you were using one of these gateways, please setup a new payment gateway <a href=\"%s\">here</a>.","marketpress"),admin_url('admin.php?page=store-settings-payments')) ?>
 		</div>
 		<a href="#" class="mp-dismissed-deprecated-notice"><i class="dashicons dashicons-no-alt"></i></a>
 		</div>
