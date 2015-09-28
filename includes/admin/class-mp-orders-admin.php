@@ -212,6 +212,28 @@ class MP_Orders_Admin {
 
 	public function delete_post_hook( $post_id ) {
 		do_action( 'mp_product_deleted', $post_id );
+		
+		$user_id = get_current_user_id();
+
+		if ( ! $user_id ) 	return;
+
+		if ( is_multisite() ) {
+			global $blog_id;
+			$key = 'mp_order_history_' . $blog_id;
+		} else {
+			$key = 'mp_order_history';
+		}
+
+		$orders = (array) get_user_meta( $user_id, $key, true );
+
+		foreach ( $orders as $key => $order ) {
+			if ( ! empty( $order['id'] ) && $post_id === $order['id'] ) {			
+				unset( $orders[ $key ] );
+				break;					
+			}
+		}
+
+		update_user_meta( $user_id, $key, $orders );
 	}
 
 	/**
