@@ -1398,7 +1398,7 @@ class MP_Cart {
 			$items = $this->get_items();
 
 			foreach ( $items as $item_id => $qty ) {
-				$numitems += $qty;
+				$numitems += intval($qty);
 			}
 
 			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
