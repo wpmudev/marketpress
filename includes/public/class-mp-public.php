@@ -787,7 +787,7 @@ class MP_Public {
 			remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999, 4 );
 			remove_filter( 'the_content', array( &$this, 'single_product_content' ) );
 
-			$show_img = ( mp_get_setting( 'show_img' ) ) ? 'single' : false;
+			$show_img = ( mp_get_setting( 'show_img' ) ) ? 'list' : false;
 
 			return mp_product( false, null, true, 'full', $show_img );
 		}
