@@ -398,7 +398,7 @@ class MP_Coupon {
 	 * @access public
 	 * @return bool
 	 */
-	public function is_valid() {
+	public function is_valid( $action = '' ) {
 		$now      = time();
 		$is_valid = true;
 
@@ -413,22 +413,24 @@ class MP_Coupon {
 		} elseif ( array() == $this->get_products( true ) ) {
 			$is_valid = false;
 		} else {
-			if ( $this->get_meta( 'applies_to' ) == 'user' ) {
-				$user = $this->get_meta( 'user' );
+			if( $action != 'remove_item' ) {
+				if ( $this->get_meta( 'applies_to' ) == 'user' ) {
+					$user = $this->get_meta( 'user' );
 
-				if ( !in_array( get_current_user_id(), $user ) ) {
-					$is_valid = false;
+					if ( !in_array( get_current_user_id(), $user ) ) {
+						$is_valid = false;
+					}
 				}
-			}
 
-			if ( ! $this->get_meta( 'can_be_combined' ) ) {
-				$applied = mp_coupons_addon()->get_applied();
+				if ( ! $this->get_meta( 'can_be_combined' ) ) {
+					$applied = mp_coupons_addon()->get_applied();
 
-				if ( count( $applied ) == 1 ) {
-					$is_valid = false;
+					if ( count( $applied ) == 1 ) {
+						$is_valid = false;
+					}
+				} else {
+					//! TODO: coupon can be applied with other coupons
 				}
-			} else {
-				//! TODO: coupon can be applied with other coupons
 			}
 		}
 

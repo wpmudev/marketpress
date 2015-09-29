@@ -390,7 +390,7 @@ class MP_Coupons_Addon {
 
 		$coupons = $this->get_applied_as_objects();
 		foreach ( $coupons as $coupon ) {
-			if ( ! $coupon->is_valid() ) {
+			if ( ! $coupon->is_valid('remove_item') ) {
 				$this->remove_coupon( $coupon->ID );
 			}
 		}
