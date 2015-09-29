@@ -45,6 +45,7 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_product_price', array( &$this, 'mp_product_price_sc' ) );
 		add_shortcode( 'mp_product_meta', array( &$this, 'mp_product_meta_sc' ) );
 		add_shortcode( 'mp_product_sku', array( &$this, 'mp_product_sku_sc' ) );
+		add_shortcode( 'mp_product_stock', array( &$this, 'mp_product_stock_sc' ) );
 		add_shortcode( 'mp_cart', array( &$this, 'mp_cart_sc' ) );
 		add_shortcode( 'mp_cart_widget', array( &$this, 'mp_cart_widget_sc' ) );
 		add_shortcode( 'mp_checkout', array( &$this, 'mp_checkout_sc' ) );
@@ -530,6 +531,45 @@ class MP_Short_Codes {
 		extract( $atts );
 
 		return mp_product_sku( false, $product_id, $seperator );
+	}
+	
+	/*
+	 * Displays the product stock quantity
+	 *
+	 * @param int $product_id The post_id for the product.
+	 */
+
+	function mp_product_stock_sc( $atts ) {
+		$atts	 = shortcode_atts( array(
+			'product_id' => NULL
+		), $atts );
+		$atts	 = $this->_parse_atts( $atts );
+
+		extract( $atts );
+		
+		$product = new MP_Product( $product_id );
+		
+		$variations = $product->get_variations();
+		
+		if ( $product->has_variations() ) {
+			$stock = 0;
+			foreach ( $variations as $variation ) {
+				$stock_val = $variation->get_meta( 'inventory', '&mdash;' );
+				if ( is_numeric( $stock_val ) ) {
+					$stock = $stock + $variation->get_meta( 'inventory', '&mdash;' );
+				} else {
+					$stock = '&mdash;';
+				}
+			}
+		} else {
+			$stock = $product->get_meta( 'inventory', '&mdash;' );
+		}
+		
+		if( $stock == '&mdash;' ) {
+			return __( 'Unlimited stock', 'mp' );
+		}
+		
+		return sprintf( __( 'Only %s left in stock...', 'mp' ), $stock );
 	}
 
 	/**
