@@ -1587,6 +1587,17 @@ if ( ! function_exists( 'mp_get_order_history' ) ) :
 			$orders = maybe_unserialize( mp_get_cookie_value( $key, array() ) );
 		}
 
+		foreach ( $orders as $key => $order ) {
+			if ( ! empty( $order['id'] ) ) {			
+				$mp_order = get_post( $order['id'] );
+
+				// if order is deleted or trashed, unset it
+				if ( empty( $mp_order ) || 'trash' === $mp_order->post_status ) {
+					unset( $orders[ $key ] );					
+				}
+			}
+		}
+
 		/**
 		 * Filter the user's order history
 		 *
