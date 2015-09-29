@@ -1915,6 +1915,8 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 				$query['paged'] = intval( $args['page'] );
 			} elseif ( get_query_var( 'paged' ) != '' ) {
 				$query['paged'] = $args['page'] = intval( get_query_var( 'paged' ) );
+			} elseif ( get_query_var( 'page' ) != '' ) {
+				$query['paged'] = $args['page'] = intval( get_query_var( 'page' ) );
 			}
 
 			//Get session values for order and order_by
