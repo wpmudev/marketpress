@@ -136,6 +136,7 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 						multiple = Boolean( parseInt( $this.attr( 'data-multiple' ) ) ),
 						args = {
 							multiple: multiple,
+							closeOnSelect: multiple ? false : true,
 							placeholder: $this.attr( 'data-placeholder' ),
 							allowClear: true,
 							initSelection: function( element, callback ) {
