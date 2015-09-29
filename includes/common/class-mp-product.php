@@ -1139,13 +1139,7 @@ class MP_Product {
 	 */
 	public function display_price( $echo = true, $context = '' ) {
 		$price   = $this->get_price();
-		//we will need to check if we include the price with tax or exclusive
-		$table = get_post_meta( $this->_post->ID, 'special_tax_rate', true );
-		if ( empty( $table ) ) {
-			$table = 'standard';
-		}
-		$price['lowest']  = mp_tax()->product_price_with_tax( $price['lowest'], $table, $context );
-		$price['highest'] = mp_tax()->product_price_with_tax( $price['highest'], $table, $context );
+
 
 		$snippet = '<!-- MP Product Price --><div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 

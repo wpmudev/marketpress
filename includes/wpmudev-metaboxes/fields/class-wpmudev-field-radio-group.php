@@ -59,7 +59,6 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 				$args['id'] = $args['id'] . '_' . $index;
 			}
 			$field = new WPMUDEV_Field_Radio( $args );
-			$field->set_value($value);
 			$field->display( $post_id );
 			$index ++;
 		} ?>

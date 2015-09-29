@@ -1386,21 +1386,6 @@ WHERE $delete_where"
 				),
 			) ) );
 
-			$tax_tables = mp_tax()->get_table_rates();
-
-			$metabox->add_field( 'advanced_select', array(
-				'name'        => 'special_tax_rate',
-				'label'       => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-				'conditional' => array(
-					'name'   => 'charge_tax',
-					'value'  => 1,
-					'action' => 'show',
-				),
-				'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
-				'width'       => 'element',
-				'multiple'    => false,
-				'options'     => $tax_tables
-			) );
 
 			/* $metabox->add_field( 'text', array(
 			  'name'			 => 'special_tax_rate',
@@ -1414,17 +1399,17 @@ WHERE $delete_where"
 			  'class'			 => 'mp-product-field-20 mp-blank-bg'
 			  ) ); */
 
-			/*$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_special_tax_rate', array(
+			$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_special_tax_rate', array(
 				'name'						 => 'special_tax_rate',
 				'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
 				'placeholder'				 => __( 'Tax Rate', 'mp' ),
 				'default_value'				 => '',
 				'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
-				 'conditional'				 => array(
-				  'name'	 => 'product_type',
-				  'value'	 => array( 'physical', 'digital' ),
-				  'action' => 'show',
-				  ),
+				/*'conditional'				 => array(
+					'name'	 => 'product_type',
+					'value'	 => array( 'physical', 'digital' ),
+					'action' => 'show',
+				),*/
 				'conditional'				 => array(
 					'name'	 => 'charge_tax',
 					'value'	 => 1,
@@ -1439,7 +1424,7 @@ WHERE $delete_where"
 					'label_type'	 => 'standard'
 				),
 				'class'						 => 'mp-product-special-tax-holder mp-special-box'
-			) ) );*/
+			) ) );
 
 			$metabox->add_field( 'checkbox', apply_filters( 'mp_add_field_array_charge_shipping', array(
 				'name'        => 'charge_shipping',
