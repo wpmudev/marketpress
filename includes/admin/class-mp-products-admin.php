@@ -1232,7 +1232,7 @@ WHERE $delete_where"
 		) ) );
 
 		$metabox->add_field( 'post_select', apply_filters( 'mp_add_field_array_related_products', array(
-			'name'        => 'related_products',
+			'name'        => 'related_products[]',
 			'multiple'    => true,
 			'placeholder' => __( 'Choose Products', 'mp' ),
 			'query'       => array(

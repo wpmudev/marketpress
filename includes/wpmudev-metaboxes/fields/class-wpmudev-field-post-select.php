@@ -39,7 +39,12 @@ class WPMUDEV_Field_Post_Select extends WPMUDEV_Field {
 	 * @param mixed $post_id
 	 */
 	public function format_value( $value, $post_id ) {
-		$values = explode( ',', $value );
+		if( ! is_array( $value ) ) {
+			$values = explode( ',', $value );
+		}
+		else {
+			$values = $value;
+		}
 		return parent::format_value( $values, $post_id );
 	}
 
