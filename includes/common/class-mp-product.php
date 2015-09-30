@@ -348,6 +348,7 @@ class MP_Product {
 			'out_of_stock' => false,
 			'qty_in_stock' => 0,
 			'image'        => false,
+			'image_full'   => false,
 			'description'  => false,
 			'excerpt'      => false,
 			'price'        => false,
@@ -431,11 +432,14 @@ class MP_Product {
 
 		// Attempt to get a unique variation image depending on user selection
 		$images = array();
+		$images_full = array();
 		foreach ( $variations as $variation ) {
 			$images[ $variation->image_url( false, null, 'single' ) ] = '';
+			$images_full[ $variation->image_url( false, 'full', 'single' ) ] = '';
 		}
 		if ( count( $images ) == 1 ) {
 			$json['image'] = key( $images );
+			$json['image_full'] = key( $images_full );
 		}
 
 		// Attempt to get a unique product description depending on user selection

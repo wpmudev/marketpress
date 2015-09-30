@@ -231,7 +231,7 @@ var mp_cart = { };
                             $('<a/>').attr({
                                 'class': 'mp_product_image_link mp_lightbox cboxElement',
                                 'rel': 'lightbox enclosure',
-                                'href': resp.data.image
+                                'href': resp.data.image_full
                             }).html($('<img/>').attr({
                                 'class': 'mp_product_image_single photo',
                                 'src': resp.data.image
@@ -245,7 +245,7 @@ var mp_cart = { };
                         } );
                     } else {
                         $container.find('.mp_product_image_single').attr('src', resp.data.image);
-                        $container.find('.mp_product_image_link').attr('href', resp.data.image);
+                        $container.find('.mp_product_image_link').attr('href', resp.data.image_full);
                     }
                 }else{
                     $('.mp_product_image_link').remove();
