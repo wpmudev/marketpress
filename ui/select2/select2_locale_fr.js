@@ -4,7 +4,7 @@
 (function ($) {
     "use strict";
 
-    $.extend($.fn.select2.defaults, {
+    $.extend($.fn.mp_select2.defaults, {
         formatMatches: function (matches) { return matches + " résultats sont disponibles, utilisez les flèches haut et bas pour naviguer."; },
         formatNoMatches: function () { return "Aucun résultat trouvé"; },
         formatInputTooShort: function (input, min) { var n = min - input.length; return "Saisissez " + n + " caractère" + (n == 1? "" : "s") + " supplémentaire" + (n == 1? "" : "s") ; },

@@ -97,51 +97,39 @@
 	};
 
 	var initSelect2 = function() {
-		$('.chosen-select').select2({
+		$('.chosen-select').mp_select2({
 			"width" : "100%"
 		});
 	};
 
 	var initProductSearchField = function() {
-		$('.mp-select-product').each(function(){
+		$('input.mp-select-product').each(function(){
 			var $this = $(this);
-			
-			$this.select2({
+
+			$this.mp_select2({
 				"multiple" : false,
 				"placeholder" : MP_ShortCode_Builder.select_product,
 				"width" : "100%",
-				allowClear: true,
-				ajax: {
-					url: ajaxurl,
-					dataType: 'json',
-					delay: 250,
-					data: function (params) {
-					  return {
-						search_term: params.term, // search term
-						page: params.page,
-						action: "mp_shortcode_builder_search_products"
-					  };
+				"ajax" : {
+					"url" : ajaxurl,
+					"dataType" : "json",
+					"data" : function(term, page){
+						return {
+							"search_term" : term,
+							"page" : page,
+							"action" : "mp_shortcode_builder_search_products"
+						}
 					},
-					processResults: function (data, page) {
-					  var more = (page * data.post_per_page) < data.total;
-					  return {
-						results: data.posts
-					  };
-					},
-					cache: true
-				},
-				templateResult: FormatResult, // omitted for brevity, see the source of this page
-				templateSelection: FormatSelection, // omitted for brevity, see the source of this page
+					"results" : function(data, page){
+						var more = (page * data.post_per_page) < data.total;
+						return {
+							"results" : data.posts,
+							"more" : more
+						}
+					}
+				}
 			})
 		});
 	};
-	
-	function FormatResult(data) {
-        return data.text;
-    }
-
-    function FormatSelection(data) {
-        return data.text;
-    }
 	
 }(jQuery));

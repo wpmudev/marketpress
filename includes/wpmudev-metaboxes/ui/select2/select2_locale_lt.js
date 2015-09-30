@@ -7,7 +7,7 @@
 (function ($) {
     "use strict";
 
-    $.extend($.fn.select2.defaults, {
+    $.extend($.fn.mp_select2.defaults, {
         formatNoMatches: function () { return "Atitikmenų nerasta"; },
         formatInputTooShort: function (input, min) { return "Įrašykite dar" + character(min - input.length); },
         formatInputTooLong: function (input, max) { return "Pašalinkite" + character(input.length - max); },

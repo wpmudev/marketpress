@@ -650,7 +650,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The product to show related items for.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select class="mp-select-product" name="product_id"></select>
+					<input type="text" class="mp-select-product" name="product_id" />
 				</td>
 			</tr>
 			<tr>
@@ -794,7 +794,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product to display.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"> </select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<tr>
@@ -845,7 +845,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<tr>
@@ -889,7 +889,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<tr>
@@ -915,7 +915,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<!--<tr>
@@ -940,7 +940,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>		
 		</table>
@@ -959,7 +959,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<!--<tr>

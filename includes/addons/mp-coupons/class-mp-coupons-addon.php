@@ -594,7 +594,7 @@ class MP_Coupons_Addon {
 			'label' => array( 'text' => __( 'Can this coupon be combined with other coupons?', 'mp' ) ),
 		) );
 		$metabox->add_field( 'post_select', array(
-			'name'        => 'allowed_coupon_combos[]',
+			'name'        => 'allowed_coupon_combos',
 			'label'       => array( 'text' => __( 'Select combinable coupons', 'mp' ) ),
 			'desc'        => __( 'Leave blank to allow all other coupons.', 'mp' ),
 			'multiple'    => true,
@@ -630,7 +630,7 @@ class MP_Coupons_Addon {
 			),
 		) );
 		$metabox->add_field( 'post_select', array(
-			'name'        => 'product[]',
+			'name'        => 'product',
 			'validation'  => array( 'required' => true ),
 			'multiple'    => true,
 			'placeholder' => __( 'Select Products', 'mp' ),

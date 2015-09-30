@@ -316,7 +316,7 @@ var mp_cart = { };
                 $( "#colorbox" ).removeAttr( "tabindex" ); //remove tabindex before select2 init
             },
             onComplete: function() {
-                $( "select.mp_select2" ).select2( {
+                $( "select.mp_select2" ).mp_select2( {
                     "dropdownCssClass": "mp_select2",
                     "dropdownAutoWidth": 1,
                     "minimumResultsForSearch": -1
