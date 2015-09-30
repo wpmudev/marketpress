@@ -127,16 +127,7 @@ var mp_cart = { };
      */
     mp_cart.initSingleProductListeners = function() {
         $( '#mp-single-product' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-        $( '#mp-single-product' ).find( '.mp_form-buy-product:not(.mp_no_single)' )
-            .on( 'mp_cart/before_add_item', function( e, item, qty ) {
-                marketpress.loadingOverlay( 'show' );
-            } )
-            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                marketpress.loadingOverlay( 'hide' );
-            } )
-            .validate( this.productFormValidationArgs );
-			
-		 $( '.mp_form-buy-product' )
+        $( '#mp-single-product' ).find( '.mp_form-buy-product' )
             .on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 marketpress.loadingOverlay( 'show' );
             } )
