@@ -1390,7 +1390,7 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 				$image->save( $image_path );
 			}
 
-			$image = apply_filters( 'image_downsize', $image_url, $image_id, array( $size_data[0], $size_data[1] ) );
+			$image = apply_filters( 'image_downsize', array( $image_url, $size_data[0], $size_data[1] ), $image_id, array( $size_data[0], $size_data[1] ) );
 
 			return apply_filters( 'mp_image_after_resize', $image );
 		}
