@@ -389,25 +389,27 @@ class MP_Product {
 				$json['status'] = 'variation loop';
 				foreach ( $filtered_atts as $tax_slug ) {
 					$terms = get_the_terms( $variation->ID, $tax_slug );
-					foreach ( $terms as $term ) {
-						if ( $variation->in_stock( $qty ) ) {
+					if( ! empty( $terms ) ) {
+						foreach ( $terms as $term ) {
+							if ( $variation->in_stock( $qty ) ) {
 
-							$json['status']                                = 'in stock';
-							$json['qty_in_stock']                          = $variation->get_stock();
-							$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
-						} elseif ( $qty_changed || ! $variation->in_stock( $qty ) ) {
-							$json['status']       = 'out of stock';
-							$json['qty_in_stock'] = $variation->get_stock();
+								$json['status']                                = 'in stock';
+								$json['qty_in_stock']                          = $variation->get_stock();
+								$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
+							} elseif ( $qty_changed || ! $variation->in_stock( $qty ) ) {
+								$json['status']       = 'out of stock';
+								$json['qty_in_stock'] = $variation->get_stock();
 
-							/**
-							 * Filter the out of stock alert message
-							 *
-							 * @since 3.0
-							 *
-							 * @param string The default message.
-							 * @param MP_Product The product that is out of stock.
-							 */
-							$json['out_of_stock'] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json['qty_in_stock'] ), $product );
+								/**
+								 * Filter the out of stock alert message
+								 *
+								 * @since 3.0
+								 *
+								 * @param string The default message.
+								 * @param MP_Product The product that is out of stock.
+								 */
+								$json['out_of_stock'] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json['qty_in_stock'] ), $product );
+							}
 						}
 					}
 				}
@@ -454,7 +456,7 @@ class MP_Product {
 		// Attempt to get a unique product excerpt depending on user selection
 		$excerpts = array();
 		foreach ( $variations as $variation ) {
-			$excerpts[ mp_get_the_excerpt( $product->ID ) ] = '';
+			$excerpts[ mp_get_the_excerpt( $product->ID, 18 ) ] = '';
 		}
 		if ( count( $excerpts ) == 1 ) {
 			$json['excerpt'] = key( $excerpts );
@@ -1150,21 +1152,21 @@ class MP_Product {
 		if ( $this->has_variations() ) {
 			// Get price range
 			if ( $price['lowest'] != $price['highest'] ) {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price['lowest'] ) . ' - ' . mp_format_currency( '', $price['highest'] ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ) . ' - ' . mp_format_currency( '', $this->add_price_tax( $price['highest'] ) ) . $this->display_tax_string( false ) . '</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price['lowest'] ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ) . $this->display_tax_string( false ) . '</span>';
 			}
 		} elseif ( $this->on_sale() ) {
-			$amt_off = mp_format_currency( '', ( $price['highest'] - $price['lowest'] ) * $this->qty );
+			$amt_off = mp_format_currency( '', ( $this->add_price_tax( $price['highest'] ) - $this->add_price_tax( $price['lowest'] ) ) * $this->qty ) . $this->display_tax_string( false );
 
 			if ( $this->qty > 1 ) {
-				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ( $price['lowest'] * $this->qty ) ) . '</span>';
-				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price['sale']['amount'] ) ) . ')</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', $this->add_price_tax( ( $price['lowest'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $this->add_price_tax( $price['sale']['amount'] ) ) ) . ') ' . $this->display_tax_string( false ) . '</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $price['sale']['amount'] ) . '</span>';
+				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $this->add_price_tax( $price['sale']['amount'] ) ) . $this->display_tax_string( false ) . '</span>';
 			}
 
-			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', ( $price['regular'] * $this->qty ) ) . '</span>';
+			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->add_price_tax( ( $price['regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
 
 			/* if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
 			  $snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
@@ -1173,10 +1175,10 @@ class MP_Product {
 			  } */
 		} else {
 			if ( $this->qty > 1 ) {
-				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ( $price['lowest'] * $this->qty ) ) . '</span>';
-				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price['lowest'] ) ) . ')</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', $this->add_price_tax( ( $price['lowest'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ) ) . ') ' . $this->display_tax_string( false ) . '</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $price['lowest'] ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ). $this->display_tax_string( false ) . '</span>';
 			}
 		}
 
@@ -1197,6 +1199,54 @@ class MP_Product {
 			echo $snippet;
 		} else {
 			return $snippet;
+		}
+	}
+	
+	/**
+	 * Add tax to the product price
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param double $price
+	 */
+	public function add_price_tax( $price ) {
+		$tax_rate = mp_get_setting( 'tax->rate', '' );
+		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
+		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
+		
+		if(! empty( $tax_rate ) ) {
+			if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+				$price = $price + ($price * $tax_rate);
+			}
+		}
+		
+		return $price;
+	}
+	
+	/**
+	 * Display (tax incl.) or (tax excl.)
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param bool $echo
+	 */
+	public function display_tax_string( $echo = 'false' ) {
+		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
+		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
+		$string = '';
+
+		if( $tax_inclusive != 1 && $include_tax_to_price != 1 ) {
+			$string = '<span class="exclusive_tax"> ' . __('(tax excl.)', 'mp') . '</span>';
+		} elseif( $tax_inclusive == 1 ) {
+			$string = '<span class="inclusve_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
+		}
+		
+		if ( $echo ) {
+			echo $string;
+		} else {
+			return $string;
 		}
 	}
 

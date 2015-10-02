@@ -256,7 +256,7 @@ var mp_cart = { };
                 //}
                 //update content for lightbox
                 if ( $( '.mp_product_options_excerpt' ).size() > 0 ) {
-                    $( '.mp_product_options_excerpt' ).html( resp.data.description );
+                    $( '.mp_product_options_excerpt' ).html( resp.data.excerpt );
                 }
 
                 //if ( resp.data.excerpt ) {
@@ -469,7 +469,7 @@ var mp_cart = { };
      * @param string html The cart html.
      */
     mp_cart.update_widget = function( html ) {
-        $( '#mp-cart-widget' ).html( html );
+        $( '.mp_cart_widget_content' ).html( html );
     };
 
     /**
