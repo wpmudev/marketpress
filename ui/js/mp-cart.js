@@ -469,7 +469,7 @@ var mp_cart = { };
      * @param string html The cart html.
      */
     mp_cart.update_widget = function( html ) {
-        $( '#mp-cart-widget' ).html( html );
+        $( '.mp_cart_widget_content' ).html( html );
     };
 
     /**
