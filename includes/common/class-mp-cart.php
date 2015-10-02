@@ -1945,8 +1945,13 @@ class MP_Cart {
 				$tax_rate  = mp_tax_rate();
 				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
 				
+				$shipping_pre_total = $this->shipping_total();
+				if( mp_get_setting( 'tax->tax_shipping' ) ) {
+					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();
+				}
+				
 				//Shipping price should be added after products price calculation
-				$total     = $total + $this->shipping_total();
+				$total     = $total + $shipping_pre_total;
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
