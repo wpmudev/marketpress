@@ -1637,6 +1637,11 @@ class MP_Product {
 	 */
 
 	public function image( $echo = true, $context = 'list', $size = null, $align = null, $show_empty = true ) {
+
+		if ( empty( $context ) ) {
+			$context = 'single';
+		}
+
 		/**
 		 * Filter the post_id used for the product image
 		 *
@@ -1644,11 +1649,6 @@ class MP_Product {
 		 *
 		 * @param int $post_id
 		 */
-
-		if ( empty( $context ) ) {
-			$context = 'single';
-		}
-
 		$post_id = apply_filters( 'mp_product_image_id', $this->ID );
 
 		if ( $post_id != $this->ID ) {

@@ -2308,6 +2308,13 @@ if ( ! function_exists( 'mp_product' ) ) {
 					break;
 				}
 			}
+
+			// if ( ! $has_image ) {
+			// 	$values = get_post_meta( $product->ID, 'mp_product_images', true );
+			// 	if ( $values ) {
+			// 		$has_image = true;
+			// 	}
+			// }
 		}
 
 		$image_alignment = mp_get_setting( 'image_alignment_single' );
@@ -2399,9 +2406,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$return .= '</div><!-- end mp_single_product_images -->';
 				}
 			} else {
-
 				$return .= '<div class="mp_single_product_images">';
-				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, $image, $size, $image_alignment );
+				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, 'single', $size, $image_alignment );
 				$return .= '</div><!-- end mp_single_product_images -->';
 			}
 		}
