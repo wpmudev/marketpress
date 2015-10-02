@@ -1819,10 +1819,11 @@ class MP_Cart {
 	 *
 	 * @return string/float
 	 */
-	public function tax_total( $format = false, $estimate = false, $include_shipping_tax = true ) {
+	public function tax_total( $format = false, $estimate = false ) {
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
-
+			$include_shipping_tax = mp_get_setting( 'tax->tax_shipping' );
+		
 			//get address
 			$state   = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
@@ -1929,6 +1930,7 @@ class MP_Cart {
 	public function total( $format = false ) {
 		if ( false === mp_arr_get_value( 'total', $this->_total ) ) {
 			$total = ( $this->product_total() + $this->tax_total() + $this->shipping_total() );
+
 			/**
 			 * Filter the total
 			 *
