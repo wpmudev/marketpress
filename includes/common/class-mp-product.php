@@ -388,25 +388,27 @@ class MP_Product {
 				$json['status'] = 'variation loop';
 				foreach ( $filtered_atts as $tax_slug ) {
 					$terms = get_the_terms( $variation->ID, $tax_slug );
-					foreach ( $terms as $term ) {
-						if ( $variation->in_stock( $qty ) ) {
+					if( ! empty( $terms ) ) {
+						foreach ( $terms as $term ) {
+							if ( $variation->in_stock( $qty ) ) {
 
-							$json['status']                                = 'in stock';
-							$json['qty_in_stock']                          = $variation->get_stock();
-							$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
-						} elseif ( $qty_changed || ! $variation->in_stock( $qty ) ) {
-							$json['status']       = 'out of stock';
-							$json['qty_in_stock'] = $variation->get_stock();
+								$json['status']                                = 'in stock';
+								$json['qty_in_stock']                          = $variation->get_stock();
+								$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
+							} elseif ( $qty_changed || ! $variation->in_stock( $qty ) ) {
+								$json['status']       = 'out of stock';
+								$json['qty_in_stock'] = $variation->get_stock();
 
-							/**
-							 * Filter the out of stock alert message
-							 *
-							 * @since 3.0
-							 *
-							 * @param string The default message.
-							 * @param MP_Product The product that is out of stock.
-							 */
-							$json['out_of_stock'] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json['qty_in_stock'] ), $product );
+								/**
+								 * Filter the out of stock alert message
+								 *
+								 * @since 3.0
+								 *
+								 * @param string The default message.
+								 * @param MP_Product The product that is out of stock.
+								 */
+								$json['out_of_stock'] = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $json['qty_in_stock'] ), $product );
+							}
 						}
 					}
 				}
