@@ -1941,9 +1941,12 @@ class MP_Cart {
 			 * @param MP_Cart The current cart object.
 			 */
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-				$pre_total = $this->product_total() + $this->shipping_total();
+				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
 				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
+				
+				//Shipping price should be added after products price calculation
+				$total     = $total + $this->shipping_total();
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
