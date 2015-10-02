@@ -1769,8 +1769,9 @@ class MP_Product {
 
 		if ( ( $context == 'single' || $context == 'list' ) && ! empty( $image ) ) {
 			//if single case, we will get the better graphic
-			$image_orignal_url = wp_get_attachment_image_src( get_post_thumbnail_id( $image_post_id ), 'full' );
-			$image_url         = mp_resize_image( $image_orignal_url[0], $size );
+			$image_id          = get_post_thumbnail_id( $image_post_id );
+			$image_orignal_url = wp_get_attachment_image_src( $image_id, 'full' );
+			$image_url         = mp_resize_image( $image_id, $image_orignal_url[0], $size );
 			if ( $image_url ) {
 				$atts = '';
 				foreach (

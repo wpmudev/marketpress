@@ -1333,12 +1333,13 @@ if ( ! function_exists( 'mp_get_single_site_cart' ) ) {
 
 if ( ! function_exists( 'mp_resize_image' ) ) {
 	/**
+	 * @param $image_id
 	 * @param $image_url
 	 * @param string $size
 	 *
 	 * @return mixed|void
 	 */
-	function mp_resize_image( $image_url, $size = 'thumbnail' ) {
+	function mp_resize_image( $image_id, $image_url, $size = 'thumbnail' ) {
 		$image = wp_get_image_editor( $image_url );
 		if ( ! is_wp_error( $image ) ) {
 			$size_data = array();
@@ -1389,11 +1390,9 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 				$image->save( $image_path );
 			}
 
-			return apply_filters( 'mp_image_after_resize', array(
-				$image_url,
-				$size_data[0],
-				$size_data[1]
-			) );
+			$image = apply_filters( 'image_downsize', array( $image_url, $size_data[0], $size_data[1] ), $image_id, array( $size_data[0], $size_data[1] ) );
+
+			return apply_filters( 'mp_image_after_resize', $image );
 		}
 
 		return false;

@@ -2375,7 +2375,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							} else {
 								//$img_url = wp_get_attachment_image_src( $value, $size );
 								$original_image = wp_get_attachment_image_src( $value, 'full' );
-								$img_url        = mp_resize_image( $original_image[0], $size );
+								$img_url        = mp_resize_image( $value, $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
@@ -2387,7 +2387,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 								$img_url = array( esc_url( $values[ 0 ] ) );
 							} else {
 								$original_image = wp_get_attachment_image_src( $values[ 0 ], 'full' );
-								$img_url        = mp_resize_image( $original_image[0], $size );
+								$img_url        = mp_resize_image( $values[ 0 ], $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
