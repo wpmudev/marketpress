@@ -1,9 +1,43 @@
-﻿Plugin Name: MarketPress
+Plugin Name: MarketPress
 Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+3.0.0.5
+----------------------------------------------------------------------
+- Fixed: Paypal checkout order totals mismatch
+- Fixed: USPS shipping issue
+
+3.0.0.4
+----------------------------------------------------------------------
+- Added: Product stock shortcode
+- Fixed: Mini-cart displayed several times
+- Fixed: Incorrect product added to cart
+- Fixed: Couple issues with select2 compatibility
+- Fixed: Some compatibility issues (images) with Jetpack
+- Fixed: Several coupons issues
+- Fixed: Issue showing only one image on single-product
+- Fixed: Issue adding product image on product edit page
+- Fixed: Product variation images issues
+- Fixed: Problems with languages (admin)
+- Fixed: Metabox (paypal) saving value
+- Fixed: Trashed orders showing on order status page
+- Fixed: Prices not showing with decimal point
+- Fixed: Pagination on home/front page sing mp_list_products shortcode
+- Fixed: Some issues with related products
+- Fixed: Related products limit using mp_related_products shortcode
+- Fixed: Issue with attributes after saving
+- Fixed: Estimated taxes total on cart page
+- Fixed: More issues with update from 2.9 (warnings & reset store options)
+- Localization: Updated language file (.pot)
+- Theming: Added more fixes and checks for old template compatibility
+- Tweaked: Cart widget now updates without refreshing page
+- Tweaked: Users can show how to display prices on front-end (with or without tax)
+- Tweaked: Estimated taxes is not shown on cart page if taxes are disabled
+- Tweaked: Product variation popup now shows excerpt variation instead of main product description
+- Other global fixes and tweaks
 
 3.0.0.3
 ----------------------------------------------------------------------

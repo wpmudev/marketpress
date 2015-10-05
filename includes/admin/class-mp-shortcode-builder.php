@@ -169,6 +169,7 @@ class MP_Shortcode_Builder {
 			'mp_buy_button'			 => __( 'Display the buy or add to cart button.', 'mp' ),
 			'mp_product_price'		 => __( 'Display the product price (and sale price).', 'mp' ),
 			'mp_product_sku'		 => __( 'Display the product SKU number(s).', 'mp' ),
+			'mp_product_stock'		 => __( 'Display the product stock.', 'mp' ),
 			'mp_product_meta'		 => __( 'Display the full product meta box with price and buy now/add to cart button.', 'mp' ),
 			'mp_cart_link'			 => __( 'Display a link or url to the current shopping cart page.', 'mp' ),
 			'mp_store_link'			 => __( 'Display a link or url to the current store page.', 'mp' ),
@@ -937,6 +938,25 @@ class MP_Shortcode_Builder {
 	public function display_mp_product_sku_attributes() {
 		?>
 		<table id="mp-product-sku-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
+				<td>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
+				</td>
+			</tr>		
+		</table>
+		<?php
+	}
+	
+	/**
+	 * Displays the [mp_product_stock] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_product_stock_attributes() {
+		?>
+		<table id="mp-product-stock-shortcode" class="form-table" style="display:none">
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
