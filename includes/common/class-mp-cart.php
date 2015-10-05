@@ -937,6 +937,23 @@ class MP_Cart {
 			 * @param bool $editable Whether the cart is editable or not.
 			 */
 			$button_classes = apply_filters( 'mp_cart/checkout_button/classes', $button_classes, $editable );
+			
+			/**
+			 * Filter the Continue Shopping button classes
+			 *
+			 * @since 3.0
+			 *
+			 * @param array The current button classes.
+			 */
+			 $continue_shopping_button_classes = array(
+				'mp_button',
+				'mp_button-continue-shopping',
+				'mp_button-large',
+			);
+			$continue_shopping_button_classes = apply_filters( 'mp_cart/continue_shopping_button/classes', $continue_shopping_button_classes );
+	
+			// Continue shopping button
+			$html .= sprintf( '<a href="%s" class="' . implode( ' ', $continue_shopping_button_classes ) . '">' .  __( 'Continue Shopping?', 'mp'  ) . '</a>', mp_store_page_url( 'products', false ) );
 
 			if ( $editable ) {
 				$html .= '
@@ -962,24 +979,6 @@ class MP_Cart {
 			$html .= '
 			</div><!-- end mp-cart-form -->';
 		}
-
-		$button_classes = array(
-			'mp_button',
-			'mp_button-continue-shopping',
-			'mp_button-large',
-		);
-
-		/**
-		 * Filter the Continue Shopping button classes
-		 *
-		 * @since 3.0
-		 *
-		 * @param array The current button classes.
-		 */
-		$button_classes = apply_filters( 'mp_cart/continue_shopping_button/classes', $button_classes );
-
-		// Continue shopping button
-		$html .= sprintf( '<a href="%s" class="' . implode( ' ', $button_classes ) . '">' .  __( 'Continue Shopping?', 'mp'  ) . '</a>', mp_store_page_url( 'products', false ) );
 
 		/**
 		 * Filter the cart contents html
