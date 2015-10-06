@@ -163,6 +163,10 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 					$query['orderby'] = 'post_title';
 				} elseif ( 'date' == $args['order_by'] ) {
 					$query['orderby'] = 'post_date';
+				} elseif ( 'rand' == $args['order_by'] ) {
+					$query['orderby'] = 'RAND()';
+				} elseif ( 'author' == $args['order_byd'] ) {
+					$query['orderby'] = 'post_author';
 				}
 			} elseif ( 'price' == mp_get_setting( 'order_by' ) ) {
 				///$query['meta_key'] = 'regular_price';
@@ -176,6 +180,10 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 			} elseif ( 'date' == mp_get_setting( 'order_by' ) ) {
 				//$query['meta_key'] = 'mp_sales_count';
 				$query['orderby'] = 'post_date';
+			} elseif ( 'rand' == mp_get_setting( 'order_by') ) {
+				$query['orderby'] = 'RAND()';
+			} elseif ( 'author' == mp_get_setting( 'order_by') ) {
+				$query['orderby'] = 'post_author';
 			} else {
 				$query['orderby'] = mp_get_setting( 'order_by' );
 			}
