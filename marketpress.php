@@ -386,21 +386,21 @@ class Marketpress {
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 
 		$this->load_widgets();
-		
+
 		$this->localization();
 	}
 
 	function add_menu_items() {
 		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
 	}
-	
+
 	function localization() {
 		// Load up the localization file if we're using WordPress in a different language
 		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
-		
+
 		$mu_plugins	 = wp_get_mu_plugins();
 		$lang_dir	 = dirname( plugin_basename( $this->_plugin_file ) ) . '/languages/';
-		
+
 		if ( in_array( $this->_plugin_file, $mu_plugins ) ) {
 			load_muplugin_textdomain( 'mp', $lang_dir );
 		} else {
@@ -409,7 +409,7 @@ class Marketpress {
 	}
 
 	function load_widgets() {
-		
+
 		require_once( $this->plugin_dir( 'includes/admin/widgets/cart.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/categories.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
@@ -559,6 +559,12 @@ class Marketpress {
 				'class'	 => 'MP_Prosites_Addon',
 				'path'	 => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
 			) );
+			//auto assign
+			if ( mp_addons()->is_addon_enabled( 'MP_Prosites_Addon' ) == false ) {
+				mp_addons()->enable( array(
+					'MP_Prosites_Addon'
+				) );
+			}
 		}
 
 		mp_register_addon( array(

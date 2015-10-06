@@ -9,7 +9,7 @@ class MP_Prosites_Addon {
 	 * @var object
 	 */
 	private static $_instance = null;
-	
+
 	/**
 	 * Gets the single instance of the class
 	 *
@@ -18,31 +18,33 @@ class MP_Prosites_Addon {
 	 * @return object
 	 */
 	public static function get_instance() {
-		if ( is_null(self::$_instance) ) {
+		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new MP_Prosites_Addon();
 		}
+
 		return self::$_instance;
 	}
-	
+
 	/**
 	 * Update pro levels keys when upgrading to 3.0+
 	 *
 	 * @since 3.0
 	 * @access protected
+	 *
 	 * @param array $pro_levels The current pro levels from < 3.0.
 	 */
 	protected function _update_pro_levels( $pro_levels ) {
 		$settings = get_site_option( 'mp_network_settings', array() );
-		
+
 		foreach ( $pro_levels as $gateway => $level ) {
 			$settings['allowed_gateways'][ $gateway ] = 'psts_level_' . $level;
 		}
 
 		unset( $settings['gateways_pro_level'] );
-		
+
 		update_site_option( 'mp_network_settings', $settings );
 	}
-	
+
 	/**
 	 * Filter the list of gateways depending on pro sites level
 	 *
@@ -58,7 +60,7 @@ class MP_Prosites_Addon {
 				}
 			}
 		}
-		
+
 		return $gateways;
 	}
 
@@ -74,17 +76,17 @@ class MP_Prosites_Addon {
 			foreach ( $theme_list as $key => $theme ) {
 				if ( $permissions = mp_arr_get_value( $key, $allowed_themes ) ) {
 					$level = str_replace( 'psts_level_', '', $permissions );
-					
+
 					if ( $permissions != 'full' || ! is_pro_site( false, $level ) ) {
 						unset( $theme_list[ $key ] );
 					}
 				}
 			}
 		}
-		
-		return $theme_list;	
+
+		return $theme_list;
 	}
-	
+
 	/**
 	 * Runs when the addon is enabled
 	 *
@@ -96,7 +98,7 @@ class MP_Prosites_Addon {
 			$this->_update_pro_levels( $pro_levels );
 		}
 	}
-	
+
 	/**
 	 * Add pro sites levels to permissions select dropdown for gateways and themes
 	 *
@@ -105,7 +107,7 @@ class MP_Prosites_Addon {
 	 * @filter mp_admin_multisite/theme_permissions_options, mp_admin_multisite/gateway_permissions_options
 	 */
 	public function permissions_options( $opts ) {
-		$levels = get_site_option( 'psts_levels' );
+		$levels         = get_site_option( 'psts_levels' );
 		$options_levels = array();
 
 		if ( is_array( $levels ) ) {
@@ -116,12 +118,20 @@ class MP_Prosites_Addon {
 
 		$opts['supporter'] = array(
 			'group_name' => __( 'Pro Site Level', 'mp' ),
-			'options'	 => $options_levels,
+			'options'    => $options_levels,
 		);
-		
+
 		return $opts;
 	}
-	
+
+	public function disable_active_deactive_ability( $status, $addon ) {
+		if ( $addon->class == 'MP_Prosites_Addon' ) {
+			$status = __( "Enabled", "mp" );
+		}
+
+		return $status;
+	}
+
 	/**
 	 * Constructor function
 	 *
@@ -134,6 +144,7 @@ class MP_Prosites_Addon {
 		add_filter( 'mp_admin_multisite/gateway_permissions_options', array( &$this, 'permissions_options' ) );
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 		add_filter( 'mp_get_theme_list', array( &$this, 'get_theme_list' ), 10, 2 );
+		add_filter( 'mp_addon_status_column_data', array( &$this, 'disable_active_deactive_ability' ), 10, 2 );
 	}
 }
 
