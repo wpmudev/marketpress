@@ -1248,8 +1248,8 @@ class MP_Cart {
 
 			if ( $context == "widget" ) {
 				$html .= '
-					<a class="mp_button mp_button-remove mp_button-widget-cart mp_button-widget-cart-empty" href="' . mp_store_page_url( 'cart', false ) . '">' . __( 'Empty Cart', 'mp' ) . '</a>
-					<a class="mp_button mp_button-checkout mp_button-widget-cart" href="' . mp_store_page_url( 'checkout', false ) . '">' . __( 'Checkout', 'mp' ) . '</a>';
+					<a class="mp_button mp_button-remove mp_button-widget-cart mp_button-widget-cart-empty" href="#">' . __( 'Empty Cart', 'mp' ) . '</a>
+					<a class="mp_button mp_button-checkout mp_button-widget-cart" href="' . mp_store_page_url( 'cart', false ) . '">' . __( 'Checkout', 'mp' ) . '</a>';
 			} else {
 				$html .= '
 					<a class="mp_button mp_button-mini-cart" href="' . $this->cart_url() . '">' . __( 'View Cart', 'mp' ) . '</a>';
