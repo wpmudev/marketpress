@@ -529,16 +529,16 @@ class MP_Checkout {
 		), $args );
 
 		extract( $args );
-		
+
 		$disable_cart = mp_get_setting( 'disable_cart', 0 );
-		
+
 		if ( !mp_cart()->has_items() ) {
 		if ( $disable_cart == '1' ) {
 				return __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">The cart is disabled.</p></<div><!-- end mp_cart_empty -->', 'mp' );
 			} else {
 				return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></<div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
 			}
-			
+
 		}
 
 		$html = '
@@ -850,7 +850,10 @@ class MP_Checkout {
 			 * @param array $billing_info An array of buyer billing info.
 			 * @param array $shipping_info An array of buyer shipping info.
 			 */
-			do_action( 'mp_process_payment_' . $payment_method, $cart, $billing_info, $shipping_info );
+
+			if ( apply_filters( 'mp_can_checkout', true, $this, $cart, $billing_info, $shipping_info ) == true ) {
+				do_action( 'mp_process_payment_' . $payment_method, $cart, $billing_info, $shipping_info );
+			}
 		}
 	}
 
@@ -981,7 +984,7 @@ class MP_Checkout {
 	public function section_billing_shipping_address() {
 		$shipping_addr			 = (array) mp_get_user_address( 'shipping' );
 		$billing_addr			 = (array) mp_get_user_address( 'billing' );
-		$enable_shipping_address = ( $shipping_addr !== $billing_addr );
+		$enable_shipping_address = mp_get_session_value('enable_shipping_address');
 
 		$html = '
 				<div id="mp-checkout-column-billing-info" class="mp_checkout_column' . (( $enable_shipping_address ) ? '' : ' fullwidth') . '">

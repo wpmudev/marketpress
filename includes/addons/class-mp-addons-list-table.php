@@ -48,6 +48,8 @@ class MP_Addons_List_Table extends WP_List_Table {
 				$status = '<a class="button mp-enable-disable-addon" title="' . __('Enable add-on', 'mp') . '" href="#"><span class="mp-addon-status disabled"></span>' . __('Disabled', 'mp') . '</a>';	
 			}
 
+			$status = apply_filters( 'mp_addon_status_column_data', $status, $addon );
+
 			$data[] = array(
 				'ID' => $addon->class,
 				'label' => $addon->label,
