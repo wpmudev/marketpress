@@ -17,6 +17,11 @@ class MarketPress_Shopping_Cart_Widget extends WP_Widget {
 		if ( $instance[ 'only_store_pages' ] && !mp_is_shop_page() )
 			return;
 
+		$instance[ 'show_product_image' ] = !empty( $instance[ 'show_product_image' ] ) ? 1 : 0;
+		$instance[ 'show_product_qty' ]   = !empty( $instance[ 'show_product_qty' ] ) ? 1 : 0;
+		$instance[ 'show_product_price' ] = !empty( $instance[ 'show_product_price' ] ) ? 1 : 0;
+		$instance[ 'only_store_pages' ]   = !empty( $instance[ 'only_store_pages' ] ) ? 1 : 0;
+
 		extract( $args );
 
 		echo $before_widget;
