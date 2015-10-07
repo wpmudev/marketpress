@@ -347,7 +347,8 @@ var mp_cart = { };
             "data": {
                 "product": item,
                 "qty": qty,
-                "cart_action": "add_item"
+                "cart_action": "add_item",
+                "is_cart_page": mp_cart_i18n.is_cart_page
             },
             "type": "POST",
             "url": $form.attr( 'data-ajax-url' ),
@@ -404,7 +405,8 @@ var mp_cart = { };
         var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
         var data = {
             "product": itemId,
-            "cart_action": "remove_item"
+            "cart_action": "remove_item",
+            "is_cart_page": mp_cart_i18n.is_cart_page
         };
 
         marketpress.loadingOverlay( 'show' );
@@ -485,7 +487,8 @@ var mp_cart = { };
         var data = {
             "product": itemId,
             "qty": qty,
-            "cart_action": "update_item"
+            "cart_action": "update_item",
+            "is_cart_page": mp_cart_i18n.is_cart_page
         };
 
         if ( $scope === undefined ) {
