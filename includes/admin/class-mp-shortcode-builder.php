@@ -304,7 +304,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
-					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						foreach ( $this->_product_cats as $cat ) {
 							if ( isset( $cat ) ) {
@@ -320,7 +320,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Only include these categories.', 'mp' ); ?></span></span> include</th>
 				<td>
-					<select name="include" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="include" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						foreach ( $this->_product_cats as $cat ) :
 							if ( isset( $cat ) ) {
@@ -334,7 +334,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude category-tree from the results. The parameter include must be empty. If the hierarchical parameter is true, then use exclude instead of exclude_tree.', 'mp' ); ?></span></span> exclude_tree</th>
 				<td>
-					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude_tree" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php foreach ( $this->_product_cats as $cat ) : ?>
 							<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
 						<?php endforeach; ?>
@@ -460,7 +460,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
-					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						$cats = get_categories( array(
 							'hide_empty' => 0,
@@ -477,7 +477,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude category-tree from the results. The parameter include must be empty. If the hierarchical parameter is true, then use exclude instead of exclude_tree.', 'mp' ); ?></span></span> exclude_tree</th>
 				<td>
-					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude_tree" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						$cats = get_categories( array(
 							'hide_empty' => 0,
@@ -747,7 +747,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product category.', 'mp' ); ?></span></span> category</th>
 				<td>
-					<select name="category" data-default="" class="chosen-select">
+					<select name="category" data-default="" class="mp-chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_cats as $term ) : ?>
 							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
@@ -758,7 +758,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product tag.', 'mp' ); ?></span></span> tag</th>
 				<td>
-					<select name="tag" data-default="" class="chosen-select">
+					<select name="tag" data-default="" class="mp-chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_tags as $term ) : ?>
 							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>

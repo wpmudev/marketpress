@@ -78,7 +78,7 @@
 	};
 
 	var refreshChosenFields = function() {
-		$('.chosen-select').trigger('chosen:updated');
+		$('.mp-chosen-select').trigger('chosen:updated');
 	};
 
 	var initColorbox = function() {
@@ -97,7 +97,7 @@
 	};
 
 	var initSelect2 = function() {
-		$('.chosen-select').mp_select2({
+		$('.mp-chosen-select').mp_select2({
 			"width" : "100%"
 		});
 	};
