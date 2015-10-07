@@ -180,11 +180,84 @@ class MP_Coupon {
 	 */
 	public function discount_formatted( $echo = true ) {
 		$discount = $discount_display = $this->get_meta( 'discount' );
+		$discount_type = $this->get_meta( 'discount_type', '' );
 
-		if ( false === strpos( $discount, '%' ) ) {
-			$discount_display = mp_format_currency( '', $discount );
+		if( empty( $discount_type ) ) {
+			if ( false === strpos( $discount, '%' ) ) {
+				$discount_display = mp_format_currency( '', $discount );
+			}
+		} else {
+			if ( $discount_type == "percent" ) {
+				$discount_display = $discount . '%';
+			} elseif($discount_type == "fixed") {
+				$discount_display = mp_format_currency( '', $discount );
+			}
 		}
 
+		if ( $echo ) {
+			echo $discount_display;
+		} else {
+			return $discount_display;
+		}
+	}
+	
+	/**
+	 * Get free shipping meta formatted
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	public function free_shipping_formatted( $echo = true ) {
+		$free_shipping = $this->get_meta( 'free_shipping', 0 );
+		
+		if( $free_shipping == 1 ) {
+			$free_shipping = __( 'Yes', 'mp' );
+		} else {
+			$free_shipping = __( 'No', 'mp' );
+		}
+		
+		if ( $echo ) {
+			echo $free_shipping;
+		} else {
+			return $free_shipping;
+		}
+	}
+	
+	/**
+	 * Get discount type meta formatted
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 */
+	public function discount_type_formatted( $echo = true ) {
+		$discount_display = $discount_meta = $this->get_meta( 'discount_type' );
+		$discount = $this->get_meta( 'discount' );
+		
+		switch ( $discount_meta ) {	
+			case 'percent' :
+				$discount_display = __( 'Percent %', 'mp' );
+				break;
+
+			case 'fixed' :
+				$discount_display = __( 'Fixed Amount', 'mp' );
+				break;
+			
+			case 'none' :
+				$discount_display = __( 'None', 'mp' );
+				break;
+				
+			default :
+				if ( false === strpos( $discount, '%' ) ) {
+					$discount_display = __( 'Fixed Amount', 'mp' );
+				} else {
+					$discount_display = __( 'Percent %', 'mp' );
+				}
+		}
+		
 		if ( $echo ) {
 			echo $discount_display;
 		} else {

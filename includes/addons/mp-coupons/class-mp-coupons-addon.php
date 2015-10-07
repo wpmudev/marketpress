@@ -570,7 +570,7 @@ class MP_Coupons_Addon {
 		$general->add_field( 'text', array(
 			'name'       => 'name',
 			'desc'       => __( 'Coupon name to identify the coupons', 'mp' ),
-			'validation' => array( 'required' => true, 'alphanumeric' => true ),
+			'validation' => array( 'required' => true),
 			'label'      => array( 'text' => __( 'Name', 'mp' ) ),
 		) );
 		$general->add_field('textarea', array(
@@ -825,6 +825,11 @@ class MP_Coupons_Addon {
 		}
 
 		switch ( get_query_var( 'orderby' ) ) {
+			case 'product_coupon_title' :
+				$query->set( 'orderby', 'meta_value' );
+				$query->set( 'meta_key', 'name' );
+				break;
+				
 			case 'product_coupon_discount' :
 				$query->set( 'orderby', 'meta_value_num' );
 				$query->set( 'meta_key', 'discount_amount' );
@@ -850,8 +855,8 @@ class MP_Coupons_Addon {
 	 */
 	public function product_coupon_sortable_columns( $columns ) {
 		return array_merge( $columns, array(
-			'discount' => 'product_coupon_discount',
-			'used'     => 'product_coupon_used',
+			'coupon_title'  => 'product_coupon_title',
+			'used'          => 'product_coupon_used',
 		) );
 	}
 
@@ -1155,13 +1160,16 @@ class MP_Coupons_Addon {
 	 */
 	public function product_coupon_column_headers( $columns ) {
 		return array(
-			'cb'          => '<input type="checkbox">',
-			'title'       => __( 'Code', 'mp' ),
-			'discount'    => __( 'Discount', 'mp' ),
-			'used'        => __( 'Used', 'mp' ),
-			'remaining'   => __( 'Remaining Uses', 'mp' ),
-			'valid_dates' => __( 'Valid Dates', 'mp' ),
-			'applies_to'  => __( 'Applies To', 'mp' ),
+			'cb'           => '<input type="checkbox">',
+			'title'        => __( 'Code', 'mp' ),
+			'coupon_title' => __( 'Title', 'mp' ),
+			'applies_to'   => __( 'Applies To', 'mp' ),
+			'discount_type'		   => __( 'Type', 'mp' ),
+			'discount'     => __( 'Amount', 'mp' ),
+			'used'         => __( 'Used', 'mp' ),
+			'remaining'    => __( 'Limit', 'mp' ),
+			'valid_dates'  => __( 'Valid (From - To)', 'mp' ),
+			'shipping'	   => __( 'Free Shipping', 'mp' )
 		);
 	}
 
@@ -1178,7 +1186,22 @@ class MP_Coupons_Addon {
 	public function product_coupon_column_data( $column, $post_id ) {
 		$coupon = new MP_Coupon( $post_id );
 
-		switch ( $column ) {
+		switch ( $column ) {	
+			//! Coupon Title
+			case 'coupon_title' :
+				$coupon->meta( 'name', '' );
+				break;
+			
+			//! Discount Type
+			case 'discount_type' :
+				$coupon->discount_type_formatted();
+				break;
+			
+			//! Free Shipping
+			case 'shipping' :
+				$coupon->free_shipping_formatted();
+				break;
+			
 			//! Discount
 			case 'discount' :
 				$coupon->discount_formatted();
