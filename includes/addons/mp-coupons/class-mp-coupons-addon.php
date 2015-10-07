@@ -560,40 +560,106 @@ class MP_Coupons_Addon {
 	 * @action init
 	 */
 	public function init_metaboxes() {
-		$metabox = new WPMUDEV_Metabox( array(
-			'id'        => 'mp-coupons-metabox',
-			'title'     => __( 'Coupon Settings' ),
+		
+		$general = new WPMUDEV_Metabox( array(
+			'id'		=> 'mp-coupons-general',
+			'title'		=> __( 'General Settings', 'mp' ),
 			'post_type' => 'mp_coupon',
-			'context'   => 'normal',
+			'context'   => 'normal'
 		) );
-		$metabox->add_field( 'text', array(
+		$general->add_field( 'text', array(
+			'name'       => 'name',
+			'desc'       => __( 'Coupon name to identify the coupons', 'mp' ),
+			'validation' => array( 'required' => true, 'alphanumeric' => true ),
+			'label'      => array( 'text' => __( 'Name', 'mp' ) ),
+		) );
+		$general->add_field('textarea', array(
+			'name'		 	=> 'description',
+			'label'		 	=> array('text' => __('Description', 'mp')),
+			'custom' 	 	=> array('rows' => 3),
+		));
+		$general->add_field( 'radio_group', array(
+			'name'          => 'status',
+			'label'         => array( 'text' => __( 'Coupons Status?', 'mp' ) ),
+			'default_value' => 'active',
+			'options'       => array(
+				'active'     => __( 'Active', 'mp' ),
+				'inactive' => __( 'Inactive', 'mp' )
+			),
+		) );
+		$general->add_field( 'text', array(
 			'name'       => 'coupon_code',
 			'desc'       => __( 'Letters and Numbers only.', 'mp' ),
 			'validation' => array( 'required' => true, 'alphanumeric' => true ),
 			'style'      => 'text-transform:uppercase',
 			'label'      => array( 'text' => __( 'Coupon Code', 'mp' ) ),
 		) );
-		$metabox->add_field( 'text', array(
-			'name'                      => 'discount',
-			'desc'                      => __( 'If you would like to give a percentage-based discount make sure to include the percent (%) symbol. Otherwise, the discount will be applied as a fixed amount off.', 'mp' ),
-			'validation'                => array( 'required' => true, 'custom' => '[0-9%.]' ),
-			'custom_validation_message' => __( 'Value must either be a decimal number or a percentage', 'mp' ),
-			'label'                     => array( 'text' => __( 'Discount Amount', 'mp' ) ),
+		$counditions = new WPMUDEV_Metabox( array(
+			'id'        => 'mp-coupons-conditions',
+			'title'     => __( 'Conditions Settings' ),
+			'post_type' => 'mp_coupon',
+			'context'   => 'normal',
 		) );
-		$metabox->add_field( 'radio_group', array(
-			'name'          => 'discount_type',
-			'label'         => array( 'text' => __( 'How should the discount amount be applied?', 'mp' ) ),
-			'default_value' => 'item',
-			'options'       => array(
-				'item'     => __( 'Apply to each applicable item and quantity ordered', 'mp' ),
-				'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
+		$counditions->add_field( 'datepicker', array(
+			'name'          => 'start_date',
+			'validation'    => array( 'required' => true ),
+			'label'         => array( 'text' => __( 'Start Date', 'mp' ) ),
+			'default_value' => date( 'Y-m-d' ),
+		) );
+		$counditions->add_field( 'checkbox', array(
+			'name'    => 'has_end_date',
+			'label'   => array( 'text' => __( 'Does coupon have an end date?', 'mp' ) ),
+			'message' => __( 'Yes', 'mp' ),
+		) );
+		$counditions->add_field( 'datepicker', array(
+			'name'        => 'end_date',
+			'label'       => array( 'text' => __( 'End Date', 'mp' ) ),
+			'conditional' => array(
+				'name'   => 'has_end_date',
+				'value'  => '1',
+				'action' => 'show',
 			),
 		) );
-		$metabox->add_field( 'checkbox', array(
+		$counditions->add_field( 'text', array(
+			'name'       => 'max_uses',
+			'desc'       => __( 'Enter the maximum number of times this coupon can be used. Leave empty for unlimited', 'mp' ),
+			'class'      => 'digits',
+			'label'      => array( 'text' => __( 'Max Uses', 'mp' ) ),
+			'validation' => array(
+				'digits' => true,
+				'min'    => 0,
+			),
+		) );
+		$counditions->add_field( 'text', array(
+			'name'       => 'max_amount',
+			'desc'       => __( 'Minimum amount before coupon become valid', 'mp' ),
+			'class'      => 'digits',
+			'label'      => array( 'text' => __( 'Min. Order Amount', 'mp' ) ),
+			'validation' => array(
+				'digits' => true,
+				'min'    => 0,
+			),
+		) );
+		$counditions->add_field( 'text', array(
+			'name'       => 'max_amount',
+			'desc'       => __( 'Maximum amount for coupon to be valid', 'mp' ),
+			'class'      => 'digits',
+			'label'      => array( 'text' => __( 'Max. Order Amount', 'mp' ) ),
+			'validation' => array(
+				'digits' => true,
+				'min'    => 0,
+			),
+		) );
+		$counditions->add_field( 'checkbox', array(
+			'name'  => 'exclude_specials',
+			'label' => array( 'text' => __( 'Exclude specials?', 'mp' ) ),
+			'desc'  => __( 'If enabled the coupon will be valid only if no specials / sales products are in the cart.', 'mp' ),
+		) );
+		$counditions->add_field( 'checkbox', array(
 			'name'  => 'can_be_combined',
 			'label' => array( 'text' => __( 'Can this coupon be combined with other coupons?', 'mp' ) ),
 		) );
-		$metabox->add_field( 'post_select', array(
+		$counditions->add_field( 'post_select', array(
 			'name'        => 'allowed_coupon_combos',
 			'label'       => array( 'text' => __( 'Select combinable coupons', 'mp' ) ),
 			'desc'        => __( 'Leave blank to allow all other coupons.', 'mp' ),
@@ -607,17 +673,7 @@ class MP_Coupons_Addon {
 				'post_type' => 'mp_coupon'
 			)
 		) );
-		$metabox->add_field( 'text', array(
-			'name'       => 'max_uses',
-			'desc'       => __( 'Enter the maximum number of times this coupon can be used.', 'mp' ),
-			'class'      => 'digits',
-			'label'      => array( 'text' => __( 'Max Uses', 'mp' ) ),
-			'validation' => array(
-				'digits' => true,
-				'min'    => 0,
-			),
-		) );
-		$metabox->add_field( 'radio_group', array(
+		$counditions->add_field( 'radio_group', array(
 			'name'          => 'applies_to',
 			'label'         => array( 'text' => __( 'Applies To', 'mp' ) ),
 			'orientation'   => 'horizontal',
@@ -629,7 +685,7 @@ class MP_Coupons_Addon {
 				'user'     => __( 'User', 'mp' ),
 			),
 		) );
-		$metabox->add_field( 'post_select', array(
+		$counditions->add_field( 'post_select', array(
 			'name'        => 'product',
 			'validation'  => array( 'required' => true ),
 			'multiple'    => true,
@@ -642,7 +698,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
-		$metabox->add_field( 'taxonomy_select', array(
+		$counditions->add_field( 'taxonomy_select', array(
 			'name'        => 'category',
 			'validation'  => array( 'required' => true ),
 			'multiple'    => true,
@@ -655,7 +711,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
-		$metabox->add_field( 'user_select', array(
+		$counditions->add_field( 'user_select', array(
 			'name'        => 'user',
 			'validation'  => array( 'required' => true ),
 			'label'       => array( 'text' => __( 'User', 'mp' ) ),
@@ -665,25 +721,65 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
-		$metabox->add_field( 'datepicker', array(
-			'name'          => 'start_date',
-			'validation'    => array( 'required' => true ),
-			'label'         => array( 'text' => __( 'Start Date', 'mp' ) ),
-			'default_value' => date( 'Y-m-d' ),
-		) );
-		$metabox->add_field( 'checkbox', array(
-			'name'    => 'has_end_date',
-			'label'   => array( 'text' => __( 'Does coupon have an end date?', 'mp' ) ),
-			'message' => __( 'Yes', 'mp' ),
-		) );
-		$metabox->add_field( 'datepicker', array(
-			'name'        => 'end_date',
-			'label'       => array( 'text' => __( 'End Date', 'mp' ) ),
+		$counditions->add_field( 'text', array(
+			'name'       => 'max_uses_user',
+			'desc'       => __( 'Enter the maximum number of times this coupon can be used by user. Leave empty for unlimited', 'mp' ),
+			'class'      => 'digits',
+			'label'      => array( 'text' => __( 'Max Uses', 'mp' ) ),
+			'validation' => array(
+				'digits' => true,
+				'min'    => 0,
+			),
 			'conditional' => array(
-				'name'   => 'has_end_date',
-				'value'  => '1',
+				'name'   => 'applies_to',
+				'value'  => 'user',
 				'action' => 'show',
 			),
+		) );
+		$actions = new WPMUDEV_Metabox( array(
+			'id'        => 'mp-coupons-actions',
+			'title'     => __( 'Actions Settings' ),
+			'post_type' => 'mp_coupon',
+			'context'   => 'normal',
+		) );
+		$actions->add_field( 'radio_group', array(
+			'name'          => 'discount_type',
+			'label'         => array( 'text' => __( 'Discount Type', 'mp' ) ),
+			'default_value' => 'percent',
+			'options'       => array(
+				'percent'     => __( 'Percent %', 'mp' ),
+				'fixed' 	  => __( 'Fixed Amount', 'mp' ),
+				'none'	 	  => __( 'None', 'mp' )
+			),
+		) );
+		$actions->add_field( 'text', array(
+			'name'                      => 'discount',
+			'desc'                      => __( 'If you would like to give a percentage-based discount make sure to include the percent (%) symbol. Otherwise, the discount will be applied as a fixed amount off.', 'mp' ),
+			'validation'                => array( 'required' => true, 'custom' => '[0-9%.]' ),
+			'custom_validation_message' => __( 'Value must either be a decimal number or a percentage', 'mp' ),
+			'label'                     => array( 'text' => __( 'Amount', 'mp' ) ),
+			'conditional' => array(
+				'name'   => 'discount_type',
+				'value'  => array( 'percent', 'fixed' ),
+				'action' => 'show',
+			),
+		) );
+		$actions->add_field( 'radio_group', array(
+			'name'          => 'apply_type',
+			'label'         => array( 'text' => __( 'Apply to?', 'mp' ) ),
+			'default_value' => 'item',
+			'options'       => array(
+				//'item'     => __( 'Apply to each applicable item and quantity ordered', 'mp' ),
+				//'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
+				'order'		 => __( 'Order (with shipping)', 'mp' ),
+				'cart'		 => __( 'Cart (without shipping)', 'mp' ),
+				'products'		 => __( 'Applicable products', 'mp' ),
+			),
+		) );
+		$actions->add_field( 'checkbox', array(
+			'name'  => 'free_shipping',
+			'label' => array( 'text' => __( 'Free Shipping', 'mp' ) ),
+			'desc'	=> __( 'If enabled this coupon will include Free Shipping.', 'mp' )
 		) );
 	}
 
