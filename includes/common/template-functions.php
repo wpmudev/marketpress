@@ -437,7 +437,7 @@ if ( ! function_exists( 'mp_cart_widget' ) ) :
 		$mini_cart .= apply_filters( 'mp_cart_widget_custom_text', $custom_text );
 
 		$cart_content .= '<div class="mp_cart_widget_content">';
-		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget');
+		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget', $args[ 'show_product_image' ], $args[ 'show_product_price' ]);
 		$cart_content .= '</div><!-- end .mp_cart_widget_content -->';
 
 		$mini_cart .= apply_filters( 'mp_cart_widget_content', $cart_content );
@@ -1588,13 +1588,18 @@ if ( ! function_exists( 'mp_get_order_history' ) ) :
 		}
 
 		foreach ( $orders as $key => $order ) {
-			if ( ! empty( $order['id'] ) ) {			
-				$mp_order = get_post( $order['id'] );
+			if ( ! empty( $key ) ) {
+				if ( ! empty( $order['id'] ) ) {			
+					$mp_order = get_post( $order['id'] );
 
-				// if order is deleted or trashed, unset it
-				if ( empty( $mp_order ) || 'trash' === $mp_order->post_status ) {
-					unset( $orders[ $key ] );					
-				}
+					// if order is deleted or trashed, unset it
+					if ( empty( $mp_order ) || 'trash' === $mp_order->post_status || 'auto-draft' === $mp_order->post_status ) {
+						unset( $orders[ $key ] );					
+					}
+				}				
+			}
+			else {
+				unset( $orders[ $key ] );			
 			}
 		}
 

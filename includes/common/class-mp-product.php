@@ -1302,10 +1302,11 @@ class MP_Product {
 			return $this->_on_sale;
 		}
 
+		$has_sale   = $this->get_meta( 'has_sale' );
 		$sale_price = $this->get_meta( 'sale_price_amount' );
 		$on_sale    = false;
 
-		if ( $sale_price ) {
+		if ( $has_sale && $sale_price ) {
 			$start_date = $this->get_meta( 'sale_price_start_date', false, true );
 			$end_date   = $this->get_meta( 'sale_price_end_date', false, true );
 			$time       = current_time( 'Y-m-d' );
