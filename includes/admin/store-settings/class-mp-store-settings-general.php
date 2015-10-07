@@ -357,6 +357,13 @@ class MP_Store_Settings_General {
 			'default_value' => true,
 		) );
 		$metabox->add_field( 'checkbox', array(
+			'name'          => 'show_product_qty',
+			'label'         => array( 'text' => __( 'Show product quantity on Mini Cart?', 'mp' ) ),
+			'desc'          => __( 'Do you want to display the product quantity on floating Mini Cart.', 'mp' ),
+			'message'       => __( 'Yes', 'mp' ),
+			'default_value' => true,
+		) );
+		$metabox->add_field( 'checkbox', array(
 			'name'          => 'show_product_price',
 			'label'         => array( 'text' => __( 'Show product price on Mini Cart?', 'mp' ) ),
 			'desc'          => __( 'Do you want to display the product price on floating Mini Cart.', 'mp' ),

@@ -276,6 +276,7 @@ class MP_Cart {
 		}
 
 		$show_product_image = mp_get_setting( 'show_product_image' ) == '1' ? true : false;
+		$show_product_qty   = mp_get_setting( 'show_product_qty' ) == '1' ? true : false;
 		$show_product_price = mp_get_setting( 'show_product_price' ) == '1' ? true : false;
 
 		switch ( mp_get_post_value( 'cart_action' ) ) {
@@ -284,7 +285,7 @@ class MP_Cart {
 				//wp_send_json_success( $this->floating_cart_html() );
 				wp_send_json_success( array(
 					'minicart'     => $this->floating_cart_html(),
-					'widgetcart'   => $this->cart_products_html( 'widget', $show_product_image, $show_product_price ),
+					'widgetcart'   => $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
 					'cart_updated' => $cart_updated,
 				) );
 				break;
@@ -1184,6 +1185,7 @@ class MP_Cart {
 		}
 
 		$show_product_image = mp_get_setting( 'show_product_image' ) == '1' ? true : false;
+		$show_product_qty   = mp_get_setting( 'show_product_qty' ) == '1' ? true : false;
 		$show_product_price = mp_get_setting( 'show_product_price' ) == '1' ? true : false;
 
 		$html = '
@@ -1194,7 +1196,7 @@ class MP_Cart {
 			</div>
 			<div class="mp_mini_cart_content">';
 
-		$html .= $this->cart_products_html( null, $show_product_image, $show_product_price);
+		$html .= $this->cart_products_html( null, $show_product_image, $show_product_qty, $show_product_price);
 
 		$html .= '
 			</div><!-- end mp_mini_cart_content -->
@@ -1219,9 +1221,10 @@ class MP_Cart {
 	 *
 	 * @param string $context Cart context widget or floating.
 	 * @param bool   $show_product_image Display product image or not.
+	 * @param bool   $show_product_qty Display product quantity or not.
 	 * @param bool   $show_product_price Display product price or not.
 	 */
-	public function cart_products_html( $context = null, $show_product_image = true, $show_product_price = false ) {
+	public function cart_products_html( $context = null, $show_product_image = true, $show_product_qty = true, $show_product_price = false ) {
 		$html = '';
 		if ( $this->has_items() ) {
 			$blog_ids = $this->get_blog_ids();
@@ -1241,7 +1244,7 @@ class MP_Cart {
 				$items = $this->get_items();
 
 				foreach ( $items as $item => $qty ) {
-					$html .= $this->floating_cart_line_item_html( $item, $qty, $show_product_image, $show_product_price );
+					$html .= $this->floating_cart_line_item_html( $item, $qty, $show_product_image, $show_product_qty, $show_product_price );
 				}
 
 				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
@@ -1281,13 +1284,22 @@ class MP_Cart {
 	 * @param int $item_id The product's ID.
 	 * @param int $qty The quantity of the product in the cart.
 	 * @param bool   $show_product_image Display product image or not.
+	 * @param bool   $show_product_qty Display product quantity or not.
 	 * @param bool   $show_product_price Display product price or not.
 	 */
-	public function floating_cart_line_item_html( $item_id, $qty, $show_product_image = true, $show_product_price = false ) {
+	public function floating_cart_line_item_html( $item_id, $qty, $show_product_image = true, $show_product_qty = true, $show_product_price = false ) {
 		$product = new MP_Product( $item_id );
+		
+		$classes = array(
+			'mp_mini_cart_item',
+			$show_product_image ? 'mp_mini_cart_item-has-image' : '',
+			$show_product_qty ? 'mp_mini_cart_item-has-qty' : '',
+			$show_product_price ? 'mp_mini_cart_item-has-price' : '',
+			$show_product_qty || $show_product_price ? 'mp_mini_cart_item-has-attributes' : '',
+		);
 
 		$html = '
-			<li class="mp_mini_cart_item" id="mp-floating-cart-item-' . $product->ID . '">
+			<li class="' . implode( ' ', $classes) . '" id="mp-floating-cart-item-' . $product->ID . '">
 				<a class="mp_mini_cart_item-link" href="' . $product->url( false ) . '">';
 
 		// Display product image
@@ -1297,13 +1309,18 @@ class MP_Cart {
 
 		$html .= '
 					<div class="mp_mini_cart_item-content">
-						<h3 class="mp_mini_cart_item-title">' . $product->title( false ) . '</h3>
-						<span class="mp_mini_cart_item-attribute"><strong>' . __( 'Quantity', 'mp' ) . ':</strong> <em>' . $qty . '</em></span>';
+						<h3 class="mp_mini_cart_item-title">' . $product->title( false ) . '</h3>';
+
+		// Display price
+		if ( $show_product_qty ) {
+			$html .= '
+						<span class="mp_mini_cart_item-attribute mp_mini_cart_item_attribute-qty"><strong>' . __( 'Quantity', 'mp' ) . ':</strong> <em>' . $qty . '</em></span>';
+		}
 
 		// Display price
 		if ( $show_product_price ) {
 			$html .= '
-						<span class="mp_mini_cart_item-attribute"><strong>' . __( 'Price', 'mp' ) . ':</strong> <em>' . $product->display_price( false ) . '</em></span>';
+						<span class="mp_mini_cart_item-attribute mp_mini_cart_item_attribute-price"><strong>' . __( 'Price', 'mp' ) . ':</strong> <em>' . $product->display_price( false ) . '</em></span>';
 		}
 
 		// Display attributes
