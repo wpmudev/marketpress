@@ -527,7 +527,7 @@ class MP_Checkout {
 		$args = array_replace_recursive( array(
 			'echo' => true,
 		), $args );
-
+		$this->_stepnum = 1;
 		extract( $args );
 		
 		$disable_cart = mp_get_setting( 'disable_cart', 0 );
