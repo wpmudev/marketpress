@@ -32,6 +32,10 @@
             }
         } )
             .done( function( resp ) {
+                $.each( resp.data.products, function( key, val ) {
+                    var $item = $( '#mp-cart-item-' + key );
+                    $item.replaceWith( val );
+                } );
                 marketpress.loadingOverlay( 'hide' );
                 marketpress.ajaxEvent( 'mp_cart/apply_coupon', resp, $couponForm );
             } );
@@ -65,9 +69,10 @@ var mp_coupons = { };
                     marketpress.ajaxEvent( 'mp_coupons/remove', resp );
 
                     if ( resp.success ) {
-                        /*$.each( resp.data.products, function( key, val ) {
-                         $( '#mp-cart-item-' + key.escapeSelector() ).replaceWith( val );
-                         });*/
+                        $.each( resp.data.products, function( key, val ) {
+                            var $item = $( '#mp-cart-item-' + key );
+                            $item.replaceWith( val );
+                        } );
                         $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
                         marketpress.initSelect2();
                     } else {

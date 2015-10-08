@@ -171,6 +171,7 @@ class MP_Shortcode_Builder {
 			'mp_product_sku'		 => __( 'Display the product SKU number(s).', 'mp' ),
 			'mp_product_stock'		 => __( 'Display the product stock.', 'mp' ),
 			'mp_product_meta'		 => __( 'Display the full product meta box with price and buy now/add to cart button.', 'mp' ),
+			'mp_cart_widget'		 => __( 'Display the cart widget.', 'mp' ),
 			'mp_cart_link'			 => __( 'Display a link or url to the current shopping cart page.', 'mp' ),
 			'mp_store_link'			 => __( 'Display a link or url to the current store page.', 'mp' ),
 			'mp_products_link'		 => __( 'Display a link or url to the current products list page.', 'mp' ),
@@ -995,6 +996,55 @@ class MP_Shortcode_Builder {
 					<label><input type="radio" value="list" name="context" data-default="single" value="list"> <?php _e( 'List', 'mp' ); ?></label>
 				</td>
 			</tr>			
+		</table>
+		<?php
+	}
+
+	/**
+	 * Displays the [mp_cart_widget] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_cart_widget_attributes() {
+		?>
+		<table id="mp-cart-widget-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The title of the cart.', 'mp' ); ?></span></span> title</th>
+				<td>
+					<input type="text" name="title" data-default="" value="" />
+				</td>
+			</tr>			
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The text displayed before the cart.', 'mp' ); ?></span></span> custom_text</th>
+				<td>
+					<input type="text" name="custom_text" data-default="" value="" />
+				</td>
+			</tr>			
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product image.', 'mp' ); ?></span></span> show_product_image</th>
+				<td>
+					<input type="checkbox" name="show_product_image" data-default="1" value="1" checked />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product quantity.', 'mp' ); ?></span></span> show_product_qty</th>
+				<td>
+					<input type="checkbox" name="show_product_qty" data-default="1" value="1" checked />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product price.', 'mp' ); ?></span></span> show_product_price</th>
+				<td>
+					<input type="checkbox" name="show_product_price" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to display the cart only on store pages or not.', 'mp' ); ?></span></span> only_store_pages</th>
+				<td>
+					<input type="checkbox" name="only_store_pages" value="1" />
+				</td>
+			</tr>
 		</table>
 		<?php
 	}
