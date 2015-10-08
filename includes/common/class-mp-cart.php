@@ -2119,6 +2119,7 @@ class MP_Cart {
 				$product = new MP_Product( $id );
 				if ( ! $product->is_variation() ) {
 					$data[ $id ][] = array(
+						'SKU'              => $product->get_meta( 'sku' ),
 						'name'             => $product->title( false ),
 						'url'              => get_permalink( $id ),
 						'price'            => $product->get_price( 'lowest' ),
