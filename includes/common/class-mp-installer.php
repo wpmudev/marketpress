@@ -38,7 +38,7 @@ class MP_Installer {
 		add_action( 'admin_notices', array( &$this, 'db_update_notice' ) );
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 99 );
 		add_action( 'wp_ajax_mp_update_product_postmeta', array( &$this, 'update_product_postmeta' ) );
-		add_action( 'admin_print_scripts-store-settings_page_mp-db-update', array(
+		add_action( 'admin_enqueue_scripts', array(
 			&$this,
 			'enqueue_db_update_scripts'
 		) );
@@ -51,6 +51,10 @@ class MP_Installer {
 	 * @access public
 	 */
 	public function enqueue_db_update_scripts() {
+		if ( ! get_option( 'mp_db_update_required' ) && mp_get_get_value( 'force_upgrade', 0 ) == 0 ) {
+			return;
+		}
+
 		wp_enqueue_style( 'jquery-smoothness', mp_plugin_url( 'includes/admin/ui/smoothness/jquery-ui-1.10.4.custom.css' ), '', MP_VERSION );
 		wp_enqueue_script( 'mp-db-update', mp_plugin_url( 'includes/admin/ui/js/db-update.js' ), array( 'jquery-ui-progressbar' ), MP_VERSION );
 		wp_localize_script( 'mp-db-update', 'mp_db_update', array(
@@ -275,7 +279,7 @@ class MP_Installer {
 						//$variation_term_vals[1] = $slug;
 					}
 
-					if (!isset($slug) && ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
+					if ( ! isset( $slug ) && ! has_term( MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], $variation_id ) ) {
 						wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], true );
 					}
 				}
@@ -566,7 +570,7 @@ class MP_Installer {
 
 			<?php
 			$old_version = get_option( 'mp_previous_version' );
-			if ( version_compare( $old_version, '3.0.0.2', '<' ) ) {
+			if ( version_compare( $old_version, '3.0.0.3', '<=' ) || mp_get_post_value( 'force_upgrade', 0 ) ) {
 				$update_fix_needed = true;
 			} else {
 				$update_fix_needed = false;
@@ -949,8 +953,11 @@ class MP_Installer {
 			}
 		}
 		//now the gateway setting
-		$old_gateways     = mp_arr_get_value( 'gateways->allowed', $legacy_settings );
-		$current_gateways = mp_get_setting( 'gateways->allowed' );
+		$old_gateways = mp_arr_get_value( 'gateways->allowed', $legacy_settings );
+		if ( ! is_array( $old_gateways ) ) {
+			$old_gateways = array();
+		}
+		$current_gateways = mp_get_setting( 'gateways->allowed', array() );
 		/**
 		 * if client upgrade from < 3.0, the allowed will not same format like 3.0,
 		 * so we have to check

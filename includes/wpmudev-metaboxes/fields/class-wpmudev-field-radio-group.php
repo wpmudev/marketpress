@@ -53,22 +53,17 @@ class WPMUDEV_Field_Radio_Group extends WPMUDEV_Field {
 				initialization logic for each radio field */
 				$args['conditional'] = false;
 
-				$args['value'] = $value;
-				$args['label'] = array( 'text' => $label );
-				$args['width'] = $width;
-				//we will need to update the id field
-				if ( ! empty( $args['id'] ) ) {
-					$args['id'] = $args['id'] . '_' . $index;
-				}
-				$field = new WPMUDEV_Field_Radio( $args );
-				if ( ! is_object( $field->metabox ) ) {
-					$field->metabox = $this->metabox;
-				}
-				//var_dump($value);
-				//$field->set_value($value);
-				$field->display( $post_id );
-				$index ++;
-			} ?>
+			$args['value'] = $value;
+			$args['label'] = array( 'text' => $label );
+			$args['width'] = $width;
+			//we will need to update the id field
+			if ( ! empty( $args['id'] ) ) {
+				$args['id'] = $args['id'] . '_' . $index;
+			}
+			$field = new WPMUDEV_Field_Radio( $args );
+			$field->display( $post_id );
+			$index ++;
+		} ?>
 		</div>
 		<?php
 		$this->after_field();

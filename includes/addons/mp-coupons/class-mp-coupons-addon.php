@@ -390,7 +390,7 @@ class MP_Coupons_Addon {
 
 		$coupons = $this->get_applied_as_objects();
 		foreach ( $coupons as $coupon ) {
-			if ( ! $coupon->is_valid() ) {
+			if ( ! $coupon->is_valid('remove_item') ) {
 				$this->remove_coupon( $coupon->ID );
 			}
 		}
@@ -1010,17 +1010,27 @@ class MP_Coupons_Addon {
 	 * @return array
 	 */
 	public function product_price( $price, $product ) {
-		$coupons = $this->get_applied_as_objects();
+		if (
+			mp_is_shop_page( 'cart' ) ||
+			mp_is_shop_page( 'checkout' ) ||
+			! empty( $_POST['is_cart_page'] ) || 
+			( ! empty( $_GET['action'] ) && ( 
+				$_GET['action'] === 'mp_coupons_apply' || 
+				$_GET['action'] === 'mp_coupons_remove'
+			) )
+		) {
+			$coupons = $this->get_applied_as_objects();
 
-		foreach ( $coupons as $coupon ) {
-			$products = $coupon->get_products( true );
-			if ( in_array( $product->ID, $products ) ) {
-				$price['before_coupon'] = $price['lowest'];
+			foreach ( $coupons as $coupon ) {
+				$products = $coupon->get_products( true );
+				if ( in_array( $product->ID, $products ) ) {
+					$price['before_coupon'] = $price['lowest'];
 
-				if ( $coupon->get_meta( 'discount_type' ) == 'item' ) {
-					$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $coupon->get_price( $price['lowest'] );
-				} else {
-					$price['coupon'] = $coupon->get_price( $price['lowest'] );
+					if ( $coupon->get_meta( 'discount_type' ) == 'item' ) {
+						$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $coupon->get_price( $price['lowest'] );
+					} else {
+						$price['coupon'] = $coupon->get_price( $price['lowest'] );
+					}
 				}
 			}
 		}

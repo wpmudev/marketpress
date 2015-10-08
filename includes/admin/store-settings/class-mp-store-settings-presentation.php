@@ -79,7 +79,7 @@ class MP_Store_Settings_Presentation {
 
 					$.getJSON($this.attr('href'), function (resp) {
 						if (resp.success) {
-							$select.attr('data-select2-value', resp.data.select2_value).select2('val', resp.data.post_id).trigger('change');
+							$select.attr('data-select2-value', resp.data.select2_value).mp_select2('val', resp.data.post_id).trigger('change');
 							$this.isWorking(false).replaceWith(resp.data.button_html);
 						} else {
 							alert('<?php _e( 'An error occurred while creating the store page. Please try again.', 'mp' ); ?>');

@@ -169,7 +169,9 @@ class MP_Shortcode_Builder {
 			'mp_buy_button'			 => __( 'Display the buy or add to cart button.', 'mp' ),
 			'mp_product_price'		 => __( 'Display the product price (and sale price).', 'mp' ),
 			'mp_product_sku'		 => __( 'Display the product SKU number(s).', 'mp' ),
+			'mp_product_stock'		 => __( 'Display the product stock.', 'mp' ),
 			'mp_product_meta'		 => __( 'Display the full product meta box with price and buy now/add to cart button.', 'mp' ),
+			'mp_cart_widget'		 => __( 'Display the cart widget.', 'mp' ),
 			'mp_cart_link'			 => __( 'Display a link or url to the current shopping cart page.', 'mp' ),
 			'mp_store_link'			 => __( 'Display a link or url to the current store page.', 'mp' ),
 			'mp_products_link'		 => __( 'Display a link or url to the current products list page.', 'mp' ),
@@ -303,7 +305,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
-					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						foreach ( $this->_product_cats as $cat ) {
 							if ( isset( $cat ) ) {
@@ -319,7 +321,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Only include these categories.', 'mp' ); ?></span></span> include</th>
 				<td>
-					<select name="include" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="include" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						foreach ( $this->_product_cats as $cat ) :
 							if ( isset( $cat ) ) {
@@ -333,7 +335,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude category-tree from the results. The parameter include must be empty. If the hierarchical parameter is true, then use exclude instead of exclude_tree.', 'mp' ); ?></span></span> exclude_tree</th>
 				<td>
-					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude_tree" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php foreach ( $this->_product_cats as $cat ) : ?>
 							<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
 						<?php endforeach; ?>
@@ -459,7 +461,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
-					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						$cats = get_categories( array(
 							'hide_empty' => 0,
@@ -476,7 +478,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude category-tree from the results. The parameter include must be empty. If the hierarchical parameter is true, then use exclude instead of exclude_tree.', 'mp' ); ?></span></span> exclude_tree</th>
 				<td>
-					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude_tree" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						$cats = get_categories( array(
 							'hide_empty' => 0,
@@ -650,7 +652,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The product to show related items for.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select class="mp-select-product" name="product_id"></select>
+					<input type="text" class="mp-select-product" name="product_id" />
 				</td>
 			</tr>
 			<tr>
@@ -746,7 +748,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product category.', 'mp' ); ?></span></span> category</th>
 				<td>
-					<select name="category" data-default="" class="chosen-select">
+					<select name="category" data-default="" class="mp-chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_cats as $term ) : ?>
 							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
@@ -757,7 +759,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product tag.', 'mp' ); ?></span></span> tag</th>
 				<td>
-					<select name="tag" data-default="" class="chosen-select">
+					<select name="tag" data-default="" class="mp-chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_tags as $term ) : ?>
 							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
@@ -794,7 +796,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product to display.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"> </select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<tr>
@@ -845,7 +847,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<tr>
@@ -889,7 +891,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<tr>
@@ -915,7 +917,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<!--<tr>
@@ -940,7 +942,26 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
+				</td>
+			</tr>		
+		</table>
+		<?php
+	}
+	
+	/**
+	 * Displays the [mp_product_stock] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_product_stock_attributes() {
+		?>
+		<table id="mp-product-stock-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
+				<td>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>		
 		</table>
@@ -959,7 +980,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The ID of the product.', 'mp' ); ?></span></span> product_id</th>
 				<td>
-					<select name="product_id" data-default="" class="mp-select-product"></select>
+					<input type="text" name="product_id" data-default="" class="mp-select-product" />
 				</td>
 			</tr>
 			<!--<tr>
@@ -975,6 +996,55 @@ class MP_Shortcode_Builder {
 					<label><input type="radio" value="list" name="context" data-default="single" value="list"> <?php _e( 'List', 'mp' ); ?></label>
 				</td>
 			</tr>			
+		</table>
+		<?php
+	}
+
+	/**
+	 * Displays the [mp_cart_widget] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_cart_widget_attributes() {
+		?>
+		<table id="mp-cart-widget-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The title of the cart.', 'mp' ); ?></span></span> title</th>
+				<td>
+					<input type="text" name="title" data-default="" value="" />
+				</td>
+			</tr>			
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The text displayed before the cart.', 'mp' ); ?></span></span> custom_text</th>
+				<td>
+					<input type="text" name="custom_text" data-default="" value="" />
+				</td>
+			</tr>			
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product image.', 'mp' ); ?></span></span> show_product_image</th>
+				<td>
+					<input type="checkbox" name="show_product_image" data-default="1" value="1" checked />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product quantity.', 'mp' ); ?></span></span> show_product_qty</th>
+				<td>
+					<input type="checkbox" name="show_product_qty" data-default="1" value="1" checked />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product price.', 'mp' ); ?></span></span> show_product_price</th>
+				<td>
+					<input type="checkbox" name="show_product_price" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to display the cart only on store pages or not.', 'mp' ); ?></span></span> only_store_pages</th>
+				<td>
+					<input type="checkbox" name="only_store_pages" value="1" />
+				</td>
+			</tr>
 		</table>
 		<?php
 	}

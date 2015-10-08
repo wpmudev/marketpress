@@ -12,7 +12,7 @@
         3: function() { return "tři"; },
         4: function() { return "čtyři"; }
     }
-    $.extend($.fn.select2.defaults, {
+    $.extend($.fn.mp_select2.defaults, {
         formatNoMatches: function () { return "Nenalezeny žádné položky"; },
         formatInputTooShort: function (input, min) {
             var n = min - input.length;

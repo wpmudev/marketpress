@@ -513,6 +513,12 @@ class MP_Setup_Wizard {
 				'class'   => 'mp-quick-field-inline-block'
 			) );
 			$metabox->add_field( 'checkbox', array(
+				'name'    => 'tax[include_tax]',
+				'label'   => array( 'text' => __( 'Show Price + Tax?', 'mp' ) ),
+				'message' => __( 'Yes', 'mp' ),
+				'class'   => 'mp-quick-field-inline-block'
+			) );
+			$metabox->add_field( 'checkbox', array(
 				'name'    => 'tax[tax_digital]',
 				'label'   => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
 				'message' => __( 'Yes', 'mp' ),

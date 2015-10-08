@@ -42,7 +42,7 @@ the specific language governing permissions and limitations under the Apache Lic
     "use strict";
     /*global document, window, jQuery, console */
 
-    if (window.Select2 !== undefined) {
+    if (window.mp_Select2 !== undefined) {
         return;
     }
 
@@ -412,7 +412,7 @@ the specific language governing permissions and limitations under the Apache Lic
             timeout = window.setTimeout(function () {
                 var data = options.data, // ajax data function
                     url = ajaxUrl, // ajax url string or function
-                    transport = options.transport || $.fn.select2.ajaxDefaults.transport,
+                    transport = options.transport || $.fn.mp_select2.ajaxDefaults.transport,
                     // deprecated - to be removed in 4.0  - use params instead
                     deprecated = {
                         type: options.type || 'GET', // set type of request (GET or POST)
@@ -420,7 +420,7 @@ the specific language governing permissions and limitations under the Apache Lic
                         jsonpCallback: options.jsonpCallback||undefined,
                         dataType: options.dataType||"json"
                     },
-                    params = $.extend({}, $.fn.select2.ajaxDefaults.params, deprecated);
+                    params = $.extend({}, $.fn.mp_select2.ajaxDefaults.params, deprecated);
 
                 data = data ? data.call(self, query.term, query.page, query.context) : null;
                 url = (typeof url === 'function') ? url.call(self, query.term, query.page, query.context) : url;
@@ -978,7 +978,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
                     populate(results, container, 0);
                 }
-            }, $.fn.select2.defaults, opts);
+            }, $.fn.mp_select2.defaults, opts);
 
             if (typeof(opts.id) !== "function") {
                 idKey = opts.id;
@@ -3326,7 +3326,7 @@ the specific language governing permissions and limitations under the Apache Lic
         }
     });
 
-    $.fn.select2 = function () {
+    $.fn.mp_select2 = function () {
 
         var args = Array.prototype.slice.call(arguments, 0),
             opts,
@@ -3349,7 +3349,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     if ("tags" in opts) {opts.multiple = multiple = true;}
                 }
 
-                select2 = multiple ? new window.Select2["class"].multi() : new window.Select2["class"].single();
+                select2 = multiple ? new window.mp_Select2["class"].multi() : new window.mp_Select2["class"].single();
                 select2.init(opts);
             } else if (typeof(args[0]) === "string") {
 
@@ -3384,7 +3384,7 @@ the specific language governing permissions and limitations under the Apache Lic
     };
 
     // plugin defaults, accessible to users
-    $.fn.select2.defaults = {
+    $.fn.mp_select2.defaults = {
         width: "copy",
         loadMorePadding: 0,
         closeOnSelect: true,
@@ -3451,7 +3451,7 @@ the specific language governing permissions and limitations under the Apache Lic
         }
     };
 
-    $.fn.select2.ajaxDefaults = {
+    $.fn.mp_select2.ajaxDefaults = {
         transport: $.ajax,
         params: {
             type: "GET",
@@ -3461,7 +3461,7 @@ the specific language governing permissions and limitations under the Apache Lic
     };
 
     // exports
-    window.Select2 = {
+    window.mp_Select2 = {
         query: {
             ajax: ajax,
             local: local,

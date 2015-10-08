@@ -11,7 +11,7 @@
         3: function() { return "tri"; },
         4: function() { return "štyri"; }
     }
-    $.extend($.fn.select2.defaults, {
+    $.extend($.fn.mp_select2.defaults, {
         formatNoMatches: function () { return "Nenašli sa žiadne položky"; },
         formatInputTooShort: function (input, min) {
             var n = min - input.length;

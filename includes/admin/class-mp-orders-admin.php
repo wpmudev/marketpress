@@ -219,12 +219,12 @@ class MP_Orders_Admin {
 
 		if ( is_multisite() ) {
 			global $blog_id;
-			$key = 'mp_order_history_' . $blog_id;
+			$order_history_key = 'mp_order_history_' . $blog_id;
 		} else {
-			$key = 'mp_order_history';
+			$order_history_key = 'mp_order_history';
 		}
 
-		$orders = (array) get_user_meta( $user_id, $key, true );
+		$orders = (array) get_user_meta( $user_id, $order_history_key, true );
 
 		foreach ( $orders as $key => $order ) {
 			if ( ! empty( $order['id'] ) && $post_id === $order['id'] ) {			
@@ -233,7 +233,7 @@ class MP_Orders_Admin {
 			}
 		}
 
-		update_user_meta( $user_id, $key, $orders );
+		update_user_meta( $user_id, $order_history_key, $orders );
 	}
 
 	/**

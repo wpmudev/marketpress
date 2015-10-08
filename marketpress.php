@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 3.0.0.3
+Version: 3.0.0.5
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub)
  */
 
-define( 'MP_VERSION', '3.0.0.3' );
+define( 'MP_VERSION', '3.0.0.5' );
 
 class Marketpress {
 
@@ -386,21 +386,21 @@ class Marketpress {
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 
 		$this->load_widgets();
-		
+
 		$this->localization();
 	}
 
 	function add_menu_items() {
 		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
 	}
-	
+
 	function localization() {
 		// Load up the localization file if we're using WordPress in a different language
 		// Place it in this plugin's "languages" folder and name it "mp-[value in wp-config].mo"
-		
+
 		$mu_plugins	 = wp_get_mu_plugins();
 		$lang_dir	 = dirname( plugin_basename( $this->_plugin_file ) ) . '/languages/';
-		
+
 		if ( in_array( $this->_plugin_file, $mu_plugins ) ) {
 			load_muplugin_textdomain( 'mp', $lang_dir );
 		} else {
@@ -409,7 +409,7 @@ class Marketpress {
 	}
 
 	function load_widgets() {
-		
+
 		require_once( $this->plugin_dir( 'includes/admin/widgets/cart.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/categories.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
@@ -559,6 +559,12 @@ class Marketpress {
 				'class'	 => 'MP_Prosites_Addon',
 				'path'	 => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
 			) );
+			//auto assign
+			if ( mp_addons()->is_addon_enabled( 'MP_Prosites_Addon' ) == false ) {
+				mp_addons()->enable( array(
+					'MP_Prosites_Addon'
+				) );
+			}
 		}
 
 		mp_register_addon( array(
@@ -738,7 +744,7 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/common/class-mp-cart.php' );
 		require_once $this->plugin_dir( 'includes/common/template-functions.php' );
 		require_once $this->plugin_dir( 'includes/common/class-mp-backward-compatibility.php' );
-		require_once $this->plugin_dir( 'includes/common/class-mp-taxes.php' );
+		//require_once $this->plugin_dir( 'includes/common/class-mp-taxes.php' );
 
 		if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );

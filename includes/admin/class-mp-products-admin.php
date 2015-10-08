@@ -590,9 +590,9 @@ class MP_Products_Screen {
 		return $result;
 	}
 
-	public static function term_id( $term, $taxonomy ) {
+	public static function term_id( $term, $taxonomy, $ignore_num = 'false' ) {
 
-		if ( is_numeric( $term ) ) {
+		if ( is_numeric( $term ) && $ignore_num == false ) {
 			return $term;
 		} else {
 			if ( $term_obj = term_exists( $term, $taxonomy ) ) {
@@ -772,7 +772,7 @@ class MP_Products_Screen {
 				$variation_name = '';
 
 				if ( strpos( $key, 'product_attr' ) === 0 ) {
-					$insert_post_terms = wp_set_post_terms( $post_id, $this->term_id( $val, $key ), $key, false );
+					$insert_post_terms = wp_set_post_terms( $post_id, $this->term_id( $val, $key, true ), $key, false );
 					if ( is_wp_error( $insert_post_terms ) ) {
 						echo $insert_post_terms->get_error_message();
 					} else {
@@ -902,7 +902,7 @@ class MP_Products_Screen {
 					update_post_meta( $post_id, $value_type, $value );
 					break;
 				case 'product_attr':
-					$insert_post_terms = wp_set_post_terms( $post_id, $this->term_id( $value, $value_sub_type ), $value_sub_type, false );
+					$insert_post_terms = wp_set_post_terms( $post_id, $this->term_id( $value, $value_sub_type, true ), $value_sub_type, false );
 					if ( is_wp_error( $insert_post_terms ) ) {
 						echo $insert_post_terms->get_error_message();
 					} else {
@@ -1115,7 +1115,7 @@ class MP_Products_Screen {
 
 				foreach ( $variation_terms as $variation_term ) {
 					$variation_term_vals = explode( '=', $variation_term );
-					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[1], $variation_term_vals[0] ), $variation_term_vals[0], true );
+					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[1], $variation_term_vals[0], true ), $variation_term_vals[0], true );
 				}
 
 				$combination_num ++;
@@ -1386,21 +1386,6 @@ WHERE $delete_where"
 				),
 			) ) );
 
-			$tax_tables = mp_tax()->get_table_rates();
-
-			$metabox->add_field( 'advanced_select', array(
-				'name'        => 'special_tax_rate',
-				'label'       => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
-				'conditional' => array(
-					'name'   => 'charge_tax',
-					'value'  => 1,
-					'action' => 'show',
-				),
-				'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
-				'width'       => 'element',
-				'multiple'    => false,
-				'options'     => $tax_tables
-			) );
 
 			/* $metabox->add_field( 'text', array(
 			  'name'			 => 'special_tax_rate',
@@ -1414,17 +1399,17 @@ WHERE $delete_where"
 			  'class'			 => 'mp-product-field-20 mp-blank-bg'
 			  ) ); */
 
-			/*$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_special_tax_rate', array(
+			$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_special_tax_rate', array(
 				'name'						 => 'special_tax_rate',
 				'label'						 => array( 'text' => __( 'Special Tax Rate', 'mp' ) ),
 				'placeholder'				 => __( 'Tax Rate', 'mp' ),
 				'default_value'				 => '',
 				'desc'						 => __( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ),
-				 'conditional'				 => array(
-				  'name'	 => 'product_type',
-				  'value'	 => array( 'physical', 'digital' ),
-				  'action' => 'show',
-				  ),
+				/*'conditional'				 => array(
+					'name'	 => 'product_type',
+					'value'	 => array( 'physical', 'digital' ),
+					'action' => 'show',
+				),*/
 				'conditional'				 => array(
 					'name'	 => 'charge_tax',
 					'value'	 => 1,
@@ -1439,7 +1424,7 @@ WHERE $delete_where"
 					'label_type'	 => 'standard'
 				),
 				'class'						 => 'mp-product-special-tax-holder mp-special-box'
-			) ) );*/
+			) ) );
 
 			$metabox->add_field( 'checkbox', apply_filters( 'mp_add_field_array_charge_shipping', array(
 				'name'        => 'charge_shipping',

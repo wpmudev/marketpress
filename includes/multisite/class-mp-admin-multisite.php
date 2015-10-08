@@ -134,7 +134,7 @@ class MP_Admin_Multisite {
 
 					$.getJSON($this.attr('href'), function (resp) {
 						if (resp.success) {
-							$select.attr('data-select2-value', resp.data.select2_value).select2('val', resp.data.post_id).trigger('change');
+							$select.attr('data-select2-value', resp.data.select2_value).mp_select2('val', resp.data.post_id).trigger('change');
 							$this.isWorking(false).replaceWith(resp.data.button_html);
 							$('.mp-network-store-page-slug').html(resp.data.parent_slug);
 						} else {
@@ -546,7 +546,7 @@ class MP_Admin_Multisite {
 
 					$.getJSON($this.attr('href'), function (resp) {
 						if (resp.success) {
-							$select.attr('data-select2-value', resp.data.select2_value).select2('val', resp.data.post_id).trigger('change');
+							$select.attr('data-select2-value', resp.data.select2_value).mp_select2('val', resp.data.post_id).trigger('change');
 							$this.isWorking(false).replaceWith(resp.data.button_html);
 						} else {
 							alert('<?php _e( 'An error occurred while creating the store page. Please try again.', 'mp' ); ?>');

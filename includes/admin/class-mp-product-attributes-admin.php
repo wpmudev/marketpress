@@ -264,7 +264,7 @@ class MP_Product_Attributes_Admin {
 	 * @action wpmudev_metabox_before_save_fields
 	 * @uses $wpdb
 	 */
-	public function save_product_attribute( $metabox ) {
+	public static function save_product_attribute( $metabox ) {
 		global $wpdb;
 
 		$product_atts		 = MP_Product_Attributes::get_instance();

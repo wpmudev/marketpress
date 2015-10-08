@@ -127,16 +127,7 @@ var mp_cart = { };
      */
     mp_cart.initSingleProductListeners = function() {
         $( '#mp-single-product' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-        $( '#mp-single-product' ).find( '.mp_form-buy-product:not(.mp_no_single)' )
-            .on( 'mp_cart/before_add_item', function( e, item, qty ) {
-                marketpress.loadingOverlay( 'show' );
-            } )
-            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                marketpress.loadingOverlay( 'hide' );
-            } )
-            .validate( this.productFormValidationArgs );
-			
-		 $( '.mp_form-buy-product' )
+        $( '#mp-single-product' ).find( '.mp_form-buy-product' )
             .on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 marketpress.loadingOverlay( 'show' );
             } )
@@ -240,7 +231,7 @@ var mp_cart = { };
                             $('<a/>').attr({
                                 'class': 'mp_product_image_link mp_lightbox cboxElement',
                                 'rel': 'lightbox enclosure',
-                                'href': resp.data.image
+                                'href': resp.data.image_full
                             }).html($('<img/>').attr({
                                 'class': 'mp_product_image_single photo',
                                 'src': resp.data.image
@@ -254,7 +245,7 @@ var mp_cart = { };
                         } );
                     } else {
                         $container.find('.mp_product_image_single').attr('src', resp.data.image);
-                        $container.find('.mp_product_image_link').attr('href', resp.data.image);
+                        $container.find('.mp_product_image_link').attr('href', resp.data.image_full);
                     }
                 }else{
                     $('.mp_product_image_link').remove();
@@ -265,7 +256,7 @@ var mp_cart = { };
                 //}
                 //update content for lightbox
                 if ( $( '.mp_product_options_excerpt' ).size() > 0 ) {
-                    $( '.mp_product_options_excerpt' ).html( resp.data.description );
+                    $( '.mp_product_options_excerpt' ).html( resp.data.excerpt );
                 }
 
                 //if ( resp.data.excerpt ) {
@@ -316,7 +307,7 @@ var mp_cart = { };
                 $( "#colorbox" ).removeAttr( "tabindex" ); //remove tabindex before select2 init
             },
             onComplete: function() {
-                $( "select.mp_select2" ).select2( {
+                $( "select.mp_select2" ).mp_select2( {
                     "dropdownCssClass": "mp_select2",
                     "dropdownAutoWidth": 1,
                     "minimumResultsForSearch": -1
@@ -356,7 +347,8 @@ var mp_cart = { };
             "data": {
                 "product": item,
                 "qty": qty,
-                "cart_action": "add_item"
+                "cart_action": "add_item",
+                "is_cart_page": mp_cart_i18n.is_cart_page
             },
             "type": "POST",
             "url": $form.attr( 'data-ajax-url' ),
@@ -413,7 +405,8 @@ var mp_cart = { };
         var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
         var data = {
             "product": itemId,
-            "cart_action": "remove_item"
+            "cart_action": "remove_item",
+            "is_cart_page": mp_cart_i18n.is_cart_page
         };
 
         marketpress.loadingOverlay( 'show' );
@@ -478,7 +471,7 @@ var mp_cart = { };
      * @param string html The cart html.
      */
     mp_cart.update_widget = function( html ) {
-        $( '#mp-cart-widget' ).html( html );
+        $( '.mp_cart_widget_content' ).html( html );
     };
 
     /**
@@ -494,7 +487,8 @@ var mp_cart = { };
         var data = {
             "product": itemId,
             "qty": qty,
-            "cart_action": "update_item"
+            "cart_action": "update_item",
+            "is_cart_page": mp_cart_i18n.is_cart_page
         };
 
         if ( $scope === undefined ) {

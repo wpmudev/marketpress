@@ -437,7 +437,7 @@ if ( ! function_exists( 'mp_cart_widget' ) ) :
 		$mini_cart .= apply_filters( 'mp_cart_widget_custom_text', $custom_text );
 
 		$cart_content .= '<div class="mp_cart_widget_content">';
-		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget');
+		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget', $args[ 'show_product_image' ], $args[ 'show_product_qty' ], $args[ 'show_product_price' ]);
 		$cart_content .= '</div><!-- end .mp_cart_widget_content -->';
 
 		$mini_cart .= apply_filters( 'mp_cart_widget_content', $cart_content );
@@ -1588,13 +1588,18 @@ if ( ! function_exists( 'mp_get_order_history' ) ) :
 		}
 
 		foreach ( $orders as $key => $order ) {
-			if ( ! empty( $order['id'] ) ) {			
-				$mp_order = get_post( $order['id'] );
+			if ( ! empty( $key ) ) {
+				if ( ! empty( $order['id'] ) ) {			
+					$mp_order = get_post( $order['id'] );
 
-				// if order is deleted or trashed, unset it
-				if ( empty( $mp_order ) || 'trash' === $mp_order->post_status ) {
-					unset( $orders[ $key ] );					
-				}
+					// if order is deleted or trashed, unset it
+					if ( empty( $mp_order ) || 'trash' === $mp_order->post_status || 'auto-draft' === $mp_order->post_status ) {
+						unset( $orders[ $key ] );					
+					}
+				}				
+			}
+			else {
+				unset( $orders[ $key ] );			
 			}
 		}
 
@@ -2308,6 +2313,13 @@ if ( ! function_exists( 'mp_product' ) ) {
 					break;
 				}
 			}
+
+			// if ( ! $has_image ) {
+			// 	$values = get_post_meta( $product->ID, 'mp_product_images', true );
+			// 	if ( $values ) {
+			// 		$has_image = true;
+			// 	}
+			// }
 		}
 
 		$image_alignment = mp_get_setting( 'image_alignment_single' );
@@ -2375,7 +2387,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							} else {
 								//$img_url = wp_get_attachment_image_src( $value, $size );
 								$original_image = wp_get_attachment_image_src( $value, 'full' );
-								$img_url        = mp_resize_image( $original_image[0], $size );
+								$img_url        = mp_resize_image( $value, $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
@@ -2387,7 +2399,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 								$img_url = array( esc_url( $values[ 0 ] ) );
 							} else {
 								$original_image = wp_get_attachment_image_src( $values[ 0 ], 'full' );
-								$img_url        = mp_resize_image( $original_image[0], $size );
+								$img_url        = mp_resize_image( $values[ 0 ], $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
@@ -2399,9 +2411,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$return .= '</div><!-- end mp_single_product_images -->';
 				}
 			} else {
-
 				$return .= '<div class="mp_single_product_images">';
-				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, $image, $size, $image_alignment );
+				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, 'single', $size, $image_alignment );
 				$return .= '</div><!-- end mp_single_product_images -->';
 			}
 		}

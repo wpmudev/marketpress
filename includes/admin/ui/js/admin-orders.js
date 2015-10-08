@@ -33,7 +33,7 @@
 		};
 		
 		var initSelect2Fields = function() {
-			$( 'select.mp-select2' ).not( '.select2-offscreen' ).select2( {
+			$( 'select.mp-select2' ).not( '.select2-offscreen' ).mp_select2( {
 				dropdownAutoWidth : false,
 				width : "element"
 			} );
@@ -57,11 +57,11 @@
 					type : type
 				}
 				
-				$target.select2( 'destroy' ).hide().next( 'img' ).show();
-				$this.select2( 'disable' );
+				$target.mp_select2( 'destroy' ).hide().next( 'img' ).show();
+				$this.mp_select2( 'disable' );
 						
 				$.post( url, data ).done( function( resp ) {
-					$this.select2( 'enable' );
+					$this.mp_select2( 'enable' );
 					
 					if ( resp.success ) {
 						if ( resp.data.states ) {

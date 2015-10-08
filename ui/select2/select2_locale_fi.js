@@ -3,7 +3,7 @@
  */
 (function ($) {
     "use strict";
-    $.extend($.fn.select2.defaults, {
+    $.extend($.fn.mp_select2.defaults, {
         formatNoMatches: function () {
             return "Ei tuloksia";
         },
