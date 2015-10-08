@@ -2123,7 +2123,7 @@ class MP_Cart {
 						'name'             => $product->title( false ),
 						'url'              => get_permalink( $id ),
 						'price'            => $product->get_price( 'lowest' ),
-						'quantity'         => $product->qty,
+						'quantity'         => $this->get_item_qty( $id ),
 						'download'         => $product->is_download(),
 						'before_tax_price' => $product->before_tax_price()
 					);
@@ -2134,7 +2134,7 @@ class MP_Cart {
 						'name'             => $product->title( false ),
 						'url'              => get_permalink( $id ),
 						'price'            => $product->get_price( 'lowest' ),
-						'quantity'         => $product->qty,
+						'quantity'         => $this->get_item_qty( $id ),
 						'download'         => $product->is_download(),
 						'before_tax_price' => $product->before_tax_price()
 					);

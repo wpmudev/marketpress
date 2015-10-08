@@ -1019,10 +1019,10 @@ class MP_Order {
 		$this->_get_post();
 
 		$items = $cart->get_items_as_objects();
-		foreach ( $items as &$item ) {
+		foreach ( $items as &$_item ) {
 			/* make sure price is saved to product object so when retrieved later the
 			  correct price is returned */
-			$item->get_price();
+			$_item->get_price();
 		}
 
 		// Save cart info
