@@ -1845,7 +1845,7 @@ class MP_Cart {
 			$products = $this->get_items_as_objects();
 
 			foreach ( $products as $product ) {
-				$weight += $product->get_weight();
+				$weight += $product->get_weight() * $product->qty;
 			}
 
 			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
