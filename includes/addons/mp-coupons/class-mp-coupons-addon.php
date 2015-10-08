@@ -90,6 +90,7 @@ class MP_Coupons_Addon {
 			//add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
 
 			add_filter( 'mp_cart/tax_total', array( &$this, 'tax_total' ), 10, 3 );
+			add_filter( 'mp_cart/shipping_total', array( &$this, 'shipping_total' ), 10, 2 );
 
 			add_filter( 'mp_cart/cart_meta/product_total', array( &$this, 'cart_meta_product_total' ), 10, 2 );
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_css_frontend' ) );
@@ -327,6 +328,32 @@ class MP_Coupons_Addon {
 			</div><!-- end mp_cart_resume_item_coupons -->';
 
 		return $html;
+	}
+	
+	/**
+	 * Filter the cart shipping total
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter mp/cart/after_calculate_shipping
+	 * @return string
+	 */
+	public function shipping_total( $shipping, $cart ) {
+		if ( ! $this->has_applied() && ! $cart->is_global ) {
+			return $shipping;
+		}
+
+		$coupons = $this->get_applied_as_objects();
+		
+		foreach ( $coupons as $coupon ) {
+			$free_shipping = $coupon->get_meta( 'free_shipping', 0 );
+			if( $free_shipping == 1 ) {
+				return 0;
+			}
+		}
+		
+		return $shipping;
+		
 	}
 
 	/**

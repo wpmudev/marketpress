@@ -1801,9 +1801,11 @@ class MP_Cart {
 				if ( empty( $price ) ) {
 					$price = 0;
 				}
-
-				$this->_total['shipping'] += $price;
+				
+				$this->_total['shipping'] += apply_filters( 'mp_cart/shipping_total', $price, $this );
+				
 				do_action( 'mp/cart/after_calculate_shipping' );
+				
 				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
 					$this->reset_id();
 					break;
@@ -1814,7 +1816,7 @@ class MP_Cart {
 		$shipping_total = mp_arr_get_value( 'shipping', $this->_total, 0 );
 
 		if ( empty( $shipping_total ) ) {
-			return '&mdash;';
+			return __( 'Free Shipping', 'mp' );
 		} else {
 			if ( $format ) {
 				return mp_format_currency( '', $shipping_total );
