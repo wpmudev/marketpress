@@ -346,7 +346,24 @@ class MP_Coupon {
 
 		return (float) round( $new_price, 2 );
 	}
-
+	
+	/**
+	 * Check if any of the product in the cart are on sale
+	 *
+	 * @return bool true or false
+	 */
+	function cart_product_on_sale() {
+		$products = mp_cart()->get_items_as_objects();
+		
+		foreach($products as $product) {
+			if($product->on_sale()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Get the products that the coupon can be applied to
 	 *
@@ -474,8 +491,17 @@ class MP_Coupon {
 	public function is_valid( $action = '' ) {
 		$now      = time();
 		$is_valid = true;
-
+		$total = mp_cart()->total();
+		
 		if ( ! $this->exists() ) {
+			$is_valid = false;
+		} elseif ( $this->get_meta( 'status', 0 ) != 'active' ) {
+			$is_valid = false;
+		} elseif ( ! empty ( $this->get_meta( 'min_amount', '' ) ) && $total < $this->get_meta( 'min_amount', 0 ) ) {
+			$is_valid = false;
+		} elseif ( ! empty ( $this->get_meta( 'max_amount', '' ) ) && $total > $this->get_meta( 'max_amount', 0 ) ) {
+			$is_valid = false;	
+		} elseif ( $this->get_meta( 'exclude_specials', false ) && $this->cart_product_on_sale() == true ) {
 			$is_valid = false;
 		} elseif ( $this->remaining_uses( false, true ) == 0 ) {
 			$is_valid = false;

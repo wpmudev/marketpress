@@ -335,7 +335,7 @@ class MP_Coupons_Addon {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @filter mp/cart/after_calculate_shipping
+	 * @filter mp_cart/shipping_total
 	 * @return string
 	 */
 	public function shipping_total( $shipping, $cart ) {
@@ -658,7 +658,7 @@ class MP_Coupons_Addon {
 			),
 		) );
 		$counditions->add_field( 'text', array(
-			'name'       => 'max_amount',
+			'name'       => 'min_amount',
 			'desc'       => __( 'Minimum amount before coupon become valid', 'mp' ),
 			'class'      => 'digits',
 			'label'      => array( 'text' => __( 'Min. Order Amount', 'mp' ) ),
