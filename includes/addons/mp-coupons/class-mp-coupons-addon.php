@@ -1030,6 +1030,7 @@ class MP_Coupons_Addon {
 			mp_is_shop_page( 'checkout' ) ||
 			! empty( $_POST['is_cart_page'] ) || 
 			( ! empty( $_GET['action'] ) && ( 
+				$_GET['action'] === 'mp_process_checkout' || 
 				$_GET['action'] === 'mp_update_checkout_data' || 
 				$_GET['action'] === 'mp_coupons_apply' || 
 				$_GET['action'] === 'mp_coupons_remove'
