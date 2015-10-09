@@ -1216,12 +1216,14 @@ class MP_Product {
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
 		
 		if(! empty( $tax_rate ) ) {
+			//Price with Tax added
 			if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
 				$price = $price + ($price * $tax_rate);
 			}
-
+			//Price with Tax excluded
 			if( $tax_inclusive == 1 && $include_tax_to_price != 1) {
-				$price = $price - ($price * $tax_rate);
+				$taxDivisor = 1 + ($tax_rate / 100);
+				$price = $price / $taxDivisor;
 			}
 		}
 		
