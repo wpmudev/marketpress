@@ -525,11 +525,12 @@ class MP_Store_Settings_General {
 			'label'		 => array( 'text' => __( 'Show Price + Tax?', 'mp' ) ),
 			'desc'		 => __( 'Enabling this option will show Price + Tax, eg. if your price is 100 and your tax 20, your price will be 120', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
-			'conditional' => array(
-				'name'   => 'tax[tax_inclusive]',
-				'value'  => '1',
-				'action' => 'hide',
-			),
+		) );
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'tax[tax_label]',
+			'label'		 => array( 'text' => __( 'Display tax label?', 'mp' ) ),
+			'desc'		 => __( 'Enabling this option will display label `excl. tax` or `incl. tax` after price', 'mp' ),
+			'message'	 => __( 'Yes', 'mp' ),
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'tax[tax_digital]',
