@@ -1268,7 +1268,7 @@ class MP_Order {
 	public function tracking_url( $echo = true ) {
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
 		
-		if ( empty( $this->__get( 'post_author' ) ) ) {
+		if ( empty( $this->post_author ) ) {
 			// Show create-account lightbox after checking out
 			$url .= '#mp-create-account-lightbox';
 		}
