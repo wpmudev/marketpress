@@ -1222,7 +1222,8 @@ class MP_Product {
 			}
 			//Price with Tax excluded
 			if( $tax_inclusive == 1 && $include_tax_to_price != 1) {
-				$taxDivisor = 1 + ($tax_rate / 100);
+				//$taxDivisor = 1 + ($tax_rate / 100);
+				$taxDivisor = 1 + $tax_rate;
 				$price = $price / $taxDivisor;
 			}
 		}
