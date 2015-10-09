@@ -95,6 +95,7 @@ class MP_Coupons_Addon {
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_css_frontend' ) );
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_js_frontend' ), 25 );
 			add_action( 'mp_cart/after_empty_cart', array( &$this, 'remove_all_coupons' ), 10, 1 );
+			add_action( 'mp_cart/after_remove_item', array( &$this, 'check_items_in_cart' ), 10 );
 			add_action( 'mp_order/new_order', array( &$this, 'process_new_order' ), 10, 1 );
 			add_action( 'mp_cart/before_remove_item', array( &$this, 'check_coupons' ), 10, 2 );
 
@@ -978,6 +979,20 @@ class MP_Coupons_Addon {
 	public function remove_all_coupons() {
 		$this->_coupons_applied = array();
 		$this->_update_session();
+	}
+
+	/**
+	 * Check items in cart. If cart is empty, remove all coupons
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function check_items_in_cart() {
+		$cart = mp_cart();
+
+		if( ! $cart->has_items() ) {
+			$this->remove_all_coupons();
+		}
 	}
 
 	/**
