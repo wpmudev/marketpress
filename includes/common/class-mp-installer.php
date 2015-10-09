@@ -309,6 +309,7 @@ class MP_Installer {
 		$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
 
 		if ( is_array( $old_value ) ) {
+			$old_value = array_filter( $old_value );
 			$old_value = array_shift( $old_value );
 		}
 
@@ -323,7 +324,7 @@ class MP_Installer {
 
 		if ( $old_post_meta_name == 'mp_shipping' ) {
 			$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
-			if ( isset( $old_value ) && is_array( $old_value ) ) {
+			if ( isset( $old_value ) && is_array( $old_value ) && count( $old_value ) ) {
 				$old_value = $old_value['extra_cost'];
 			} else {
 				$old_value = 0;
@@ -365,7 +366,7 @@ class MP_Installer {
 		$per_page = 20;
 		//get the total first
 		$total_count = wp_count_posts( MP_Product::get_post_type() );
-		$total_count = $total_count->publish + $total_count->draft + $total_count->private;
+		$total_count = $total_count->publish + $total_count->draft + $total_count->private + $total_count->pending;
 
 		$query = new WP_Query( array(
 			'cache_results'          => false,
@@ -383,6 +384,7 @@ class MP_Installer {
 			$post_id = get_the_ID();
 
 			$variations = get_post_meta( $post_id, 'mp_var_name', true );
+			//var_dump( $post_id );
 			if ( $variations && is_array( $variations ) && $update_fix_needed == true ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
 				if ( count( $variations ) > 1 ) {
 					//It's a variation product
@@ -408,7 +410,6 @@ class MP_Installer {
 					$this->product_variations_transition( $post_id, $product_type );
 				} else {
 					//It's single/regular/non-variant product
-
 					$post_thumbnail = get_post_thumbnail_id( $post_id );
 					if ( is_numeric( $post_thumbnail ) ) {
 						update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
