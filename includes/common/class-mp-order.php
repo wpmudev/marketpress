@@ -623,9 +623,14 @@ class MP_Order {
 			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
-
+			
+			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
+			
 			// Country dropdown
-			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+			if( ! is_array( $allowed_countries ) ) {
+				$allowed_countries = explode( ',', $allowed_countries );
+			}
+			
 			$country_options   = '';
 
 			if ( mp_all_countries_allowed() ) {
