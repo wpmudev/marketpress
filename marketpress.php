@@ -939,11 +939,15 @@ class Marketpress {
 $GLOBALS[ 'mp' ] = Marketpress::get_instance();
 
 register_activation_hook( __FILE__, 'mp_plugin_activate' );
-add_action( 'admin_init', 'mp_plugin_redirect' );
+add_action( 'admin_init', 'mp_plugin_redirect', 99 );
 
 function mp_plugin_activate() {
 	if ( get_option( 'mp_plugin_do_activation_redirect', '1' ) == '1' ) {
 		update_option( 'mp_plugin_do_activation_redirect', '1' );
+	}
+
+	if ( get_option( 'mp_needs_quick_setup' ) == false ) {
+		add_option( 'mp_needs_quick_setup', 1 );
 	}
 }
 
