@@ -108,9 +108,9 @@ var mp_cart = { };
 		var me = this;
 		
         $( '.mp-shortcode-wrap' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-		
-		//We should loop through each form else jQuery validation is passing correct form ID
-		$( '.mp-shortcode-wrap' ).find( '.mp_form-buy-product' ).each(function(){
+
+		//We should loop through each form else jQuery validation is passing wrong form ID
+		$( '.mp_buy_button' ).each(function(){
 			$(this).on( 'mp_cart/before_add_item', function( e, item, qty ) {
 				marketpress.loadingOverlay( 'show' );
 			} )
@@ -119,6 +119,7 @@ var mp_cart = { };
 			} )
 			.validate(me.productFormValidationArgs);
 		});
+		
     };
     /**
      * Initalize single product listeners
@@ -134,7 +135,8 @@ var mp_cart = { };
             .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
                 marketpress.loadingOverlay( 'hide' );
             } )
-            .validate( this.productFormValidationArgs );	
+            .validate( this.productFormValidationArgs );
+	
     };
 
     /**
