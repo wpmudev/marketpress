@@ -5,6 +5,29 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+3.0.0.6
+----------------------------------------------------------------------
+- Fixed: Some cases with trashed orders showing on order status page
+- Fixed: Sale price was applied when not enabled
+- Fixed: Pro Sites add-on status on subsites (network)
+- Fixed: Database error sort products by "random"
+- Fixed: Coupons not showing on checkout page
+- Fixed: Single order URL after checkout/order
+- Fixed: Fatal error on activation (network)
+- Fixed: Stripe not recognizing coupons
+- Fixed: Shipping costs calculation using Weight Rate method
+- Localization: Updated language file (.pot)
+- Theming: Added mp_buy_button function
+- Tweaked: Network widgets only load when network is enabled
+- Tweaked: Cart updated after adding/removing coupons
+- Tweaked: Clear coupons after removing all items from cart
+- Tweaked: Checkout button on cart widget now links to cart page
+- Tweaked: Added options to show/hide image, price and quantity on cart widget, mini-cart and cart shortcode
+- Tweaked: New options for tax display: show prices with/without taxes and show/hide tax label on shop
+- Added: Search orders (admin) by order meta data (SKU, Address, Price, etc...)
+- Added: Continue shopping button on cart page
+- Other global fixes and tweaks
+
 3.0.0.5
 ----------------------------------------------------------------------
 - Fixed: Paypal checkout order totals mismatch

@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.0.0.3\n"
+"Project-Id-Version: MarketPress 3.0.0.6\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2015-10-02 16:20:08+00:00\n"
+"POT-Creation-Date: 2015-10-12 11:11:01+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,11 +17,11 @@ msgstr ""
 #: includes/admin/class-mp-product-attributes-admin.php:129
 #: includes/admin/class-mp-product-attributes-list-table.php:22
 #: includes/admin/class-mp-products-admin.php:1994
-#: includes/admin/class-mp-shortcode-builder.php:595
+#: includes/admin/class-mp-shortcode-builder.php:596
 #: includes/admin/widgets/ms-global-categories.php:70
 #: includes/common/shipping-modules/mp-fedex.php:395
 #: includes/common/shipping-modules/mp-ups.php:202
-#: includes/common/shipping-modules/mp-usps.php:262
+#: includes/common/shipping-modules/mp-usps.php:243
 #: includes/public/class-mp-checkout.php:274
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/class_snapshot_items_table.php:637
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/aws/index.php:519
@@ -38,12 +38,12 @@ msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:21
 #: includes/admin/class-mp-products-admin.php:2058
-#: includes/common/class-mp-product.php:2645
+#: includes/common/class-mp-product.php:2661
 msgid "Description"
 msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:22
-#: includes/admin/class-mp-orders-admin.php:913
+#: includes/admin/class-mp-orders-admin.php:917
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/class_snapshot_archives_table.php:349
 msgid "Status"
 msgstr ""
@@ -61,6 +61,7 @@ msgid "Disable add-on"
 msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:45
+#: includes/addons/mp-prosites/class-mp-prosites-addon.php:129
 msgid "Enabled"
 msgstr ""
 
@@ -72,19 +73,19 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: includes/addons/class-mp-addons-list-table.php:78
+#: includes/addons/class-mp-addons-list-table.php:80
 msgid "1 add-on enabled"
 msgid_plural "%s add-ons enabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/addons/class-mp-addons-list-table.php:83
+#: includes/addons/class-mp-addons-list-table.php:85
 msgid "1 add-on disabled"
 msgid_plural "%s add-ons disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/addons/class-mp-addons-list-table.php:122
+#: includes/addons/class-mp-addons-list-table.php:124
 #: xampphtdocssnapshotwp-contentpluginssnapshot/snapshot.php:382
 #: xampphtdocssnapshotwp-contentpluginssnapshot/snapshot.php:1211
 msgid "Settings"
@@ -96,138 +97,138 @@ msgstr ""
 msgid "Unlimited"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:313
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:314
 msgid "Coupon Discounts"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:320
-#: includes/admin/class-mp-orders-admin.php:475
-#: includes/common/class-mp-cart.php:541
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:321
+#: includes/admin/class-mp-orders-admin.php:479
+#: includes/common/class-mp-cart.php:545
 msgid "Remove"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:416
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:707
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:417
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:708
 msgid "Have a coupon code?"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:423
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:424
 msgid "Apply Code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:426
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:712
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:427
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:713
 msgid "More than one code? That's OK! Just be sure to enter one at a time."
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:565
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:566
 msgid "Coupon Settings"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:571
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:572
 msgid "Letters and Numbers only."
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:574
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:575
 msgid "Coupon Code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:578
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:579
 msgid ""
 "If you would like to give a percentage-based discount make sure to include "
 "the percent (%) symbol. Otherwise, the discount will be applied as a fixed "
 "amount off."
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:580
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:581
 msgid "Value must either be a decimal number or a percentage"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:581
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:582
 msgid "Discount Amount"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:585
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:586
 msgid "How should the discount amount be applied?"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:588
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:589
 msgid "Apply to each applicable item and quantity ordered"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:589
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:590
 msgid "Apply to each applicable item once per cart"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:594
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:595
 msgid "Can this coupon be combined with other coupons?"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:598
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:599
 msgid "Select combinable coupons"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:599
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:600
 msgid "Leave blank to allow all other coupons."
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:612
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:613
 msgid "Enter the maximum number of times this coupon can be used."
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:614
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:615
 msgid "Max Uses"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:622
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1068
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:623
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1095
 msgid "Applies To"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:626
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:627
 msgid "All Products"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:627
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:651
-#: includes/admin/class-mp-shortcode-builder.php:664
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:628
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:652
+#: includes/admin/class-mp-shortcode-builder.php:665
 #: includes/admin/widgets/product-list.php:198
 #: includes/common/template-functions.php:882
-#: includes/common/template-functions.php:2762
+#: includes/common/template-functions.php:2767
 msgid "Category"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:628
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:638
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:629
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:639
 #: marketpress.php:206
 msgid "Product"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:629
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:661
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:630
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:662
 #: includes/common/payment-gateways/paypal-payflow.php:402
 msgid "User"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:636
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:637
 msgid "Select Products"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:649
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:650
 #: includes/admin/widgets/categories.php:30
 msgid "Select Category"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:671
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:672
 #: includes/admin/class-mp-products-admin.php:2121
 msgid "Start Date"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:676
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:677
 msgid "Does coupon have an end date?"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:677
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:678
 #: includes/admin/class-mp-setup-wizard.php:506
 #: includes/admin/class-mp-setup-wizard.php:512
 #: includes/admin/class-mp-setup-wizard.php:518
@@ -240,12 +241,16 @@ msgstr ""
 #: includes/admin/store-settings/class-mp-store-settings-general.php:333
 #: includes/admin/store-settings/class-mp-store-settings-general.php:339
 #: includes/admin/store-settings/class-mp-store-settings-general.php:350
-#: includes/admin/store-settings/class-mp-store-settings-general.php:369
-#: includes/admin/store-settings/class-mp-store-settings-general.php:495
-#: includes/admin/store-settings/class-mp-store-settings-general.php:501
-#: includes/admin/store-settings/class-mp-store-settings-general.php:507
-#: includes/admin/store-settings/class-mp-store-settings-general.php:518
-#: includes/admin/store-settings/class-mp-store-settings-general.php:524
+#: includes/admin/store-settings/class-mp-store-settings-general.php:356
+#: includes/admin/store-settings/class-mp-store-settings-general.php:363
+#: includes/admin/store-settings/class-mp-store-settings-general.php:370
+#: includes/admin/store-settings/class-mp-store-settings-general.php:389
+#: includes/admin/store-settings/class-mp-store-settings-general.php:515
+#: includes/admin/store-settings/class-mp-store-settings-general.php:521
+#: includes/admin/store-settings/class-mp-store-settings-general.php:527
+#: includes/admin/store-settings/class-mp-store-settings-general.php:533
+#: includes/admin/store-settings/class-mp-store-settings-general.php:539
+#: includes/admin/store-settings/class-mp-store-settings-general.php:545
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:302
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:372
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:378
@@ -277,99 +282,99 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:681
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:682
 msgid "End Date"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:700
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:701
 msgid "Coupons Settings"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:706
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:707
 msgid "Form Title"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:711
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:712
 msgid "Help Text"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:833
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:932
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:935
-#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:548
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:834
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:933
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:936
+#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:550
 msgid "Coupons"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:868
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:869
 msgid "Invalid coupon code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:881
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:882
 msgid "Coupon can't be applied to this cart"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:919
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:920
 msgid "An error occurred while removing your coupon. Please try again."
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:933
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:934
 msgid "Coupon"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:934
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:935
 msgid "Manage Coupons"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:936
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:937
 msgid "Create New"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:937
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:938
 msgid "Create New Coupon"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:938
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:939
 msgid "Edit Coupon"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:939
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:940
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:254
 #: marketpress.php:212
 msgid "Edit"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:940
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:941
 msgid "New Coupon"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:941
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:945
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:942
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:946
 msgid "View Coupon"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:942
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:943
 msgid "Search Coupons"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:943
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:944
 msgid "No Coupons Found"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:944
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:945
 msgid "No Coupons found in Trash"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1063
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1090
 msgid "Code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1064
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1091
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:191
-#: includes/admin/class-mp-orders-admin.php:920
+#: includes/admin/class-mp-orders-admin.php:924
 msgid "Discount"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1065
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1092
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/aws/index.php:523
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/dropbox/index.php:212
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/ftp/index.php:183
@@ -378,23 +383,23 @@ msgstr ""
 msgid "Used"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1066
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1093
 msgid "Remaining Uses"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1067
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1094
 msgid "Valid Dates"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1108
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1135
 msgid "No end"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1153
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1180
 msgid "Please enter a code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1154
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1181
 msgid "Coupon added successfully"
 msgstr ""
 
@@ -501,20 +506,20 @@ msgid "Subtotal"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:197
-#: includes/admin/class-mp-orders-admin.php:918
+#: includes/admin/class-mp-orders-admin.php:922
 #: includes/admin/class-mp-products-admin.php:1736
 #: includes/admin/class-mp-products-admin.php:1976
 #: includes/admin/class-mp-store-settings-admin.php:111
 #: includes/admin/class-mp-store-settings-admin.php:223
-#: includes/common/class-mp-cart.php:642 includes/common/helpers.php:154
+#: includes/common/class-mp-cart.php:646 includes/common/helpers.php:154
 #: includes/common/payment-gateways/_ideal.php:137
 #: includes/common/payment-gateways/_payway.php:116
-#: includes/public/class-mp-checkout.php:1005
+#: includes/public/class-mp-checkout.php:1008
 msgid "Shipping"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:202
-#: includes/admin/class-mp-orders-admin.php:919
+#: includes/admin/class-mp-orders-admin.php:923
 #: includes/common/payment-gateways/_ideal.php:148
 #: includes/common/payment-gateways/_payway.php:134
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:108
@@ -522,8 +527,8 @@ msgid "Tax"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:212
-#: includes/admin/class-mp-orders-admin.php:921
-#: includes/common/class-mp-order.php:907 includes/common/helpers.php:96
+#: includes/admin/class-mp-orders-admin.php:925
+#: includes/common/class-mp-order.php:912 includes/common/helpers.php:96
 msgid "Total"
 msgstr ""
 
@@ -545,15 +550,15 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:66
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:66
-#: includes/common/class-mp-order.php:735 includes/common/helpers.php:149
-#: includes/public/class-mp-checkout.php:1115
+#: includes/common/class-mp-order.php:740 includes/common/helpers.php:149
+#: includes/public/class-mp-checkout.php:1118
 msgid "Billing Address"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:70
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:70
-#: includes/common/class-mp-order.php:743 includes/common/helpers.php:150
-#: includes/public/class-mp-checkout.php:1122
+#: includes/common/class-mp-order.php:748 includes/common/helpers.php:150
+#: includes/public/class-mp-checkout.php:1125
 msgid "Shipping Address"
 msgstr ""
 
@@ -562,7 +567,7 @@ msgstr ""
 #: includes/admin/class-mp-dashboard-widgets.php:134
 #: includes/admin/class-mp-products-admin.php:324
 #: includes/admin/class-mp-products-admin.php:695
-#: includes/admin/class-mp-shortcode-builder.php:724
+#: includes/admin/class-mp-shortcode-builder.php:725
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:508
 #: includes/admin/widgets/ms-global-product-list.php:115
 #: includes/admin/widgets/product-list.php:183
@@ -572,7 +577,7 @@ msgstr ""
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:82
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:85
 #: includes/admin/class-mp-products-admin.php:1519
-#: includes/common/class-mp-cart.php:1267
+#: includes/common/class-mp-cart.php:1318
 #: includes/common/class-mp-product.php:669
 msgid "Quantity"
 msgstr ""
@@ -588,7 +593,7 @@ msgstr ""
 #: includes/admin/class-mp-products-admin.php:1837
 #: includes/admin/class-mp-products-admin.php:1968
 #: includes/admin/class-mp-products-admin.php:2108
-#: includes/common/helpers.php:95
+#: includes/common/class-mp-cart.php:1324 includes/common/helpers.php:95
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:130
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:270
 msgid "Price"
@@ -598,7 +603,7 @@ msgstr ""
 msgid "Packing Slip"
 msgstr ""
 
-#: includes/addons/mp-prosites/class-mp-prosites-addon.php:118
+#: includes/addons/mp-prosites/class-mp-prosites-addon.php:120
 msgid "Pro Site Level"
 msgstr ""
 
@@ -637,19 +642,19 @@ msgid "All Statuses"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:219
-#: includes/admin/class-mp-orders-admin.php:339
-#: includes/admin/class-mp-orders-admin.php:947
-#: includes/admin/class-mp-orders-admin.php:968
-#: includes/common/class-mp-order.php:863
+#: includes/admin/class-mp-orders-admin.php:343
+#: includes/admin/class-mp-orders-admin.php:951
+#: includes/admin/class-mp-orders-admin.php:972
+#: includes/common/class-mp-order.php:868
 #: includes/common/payment-gateways/payfast.php:244 marketpress.php:287
 msgid "Received"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:220
-#: includes/admin/class-mp-orders-admin.php:338
-#: includes/admin/class-mp-orders-admin.php:855
-#: includes/admin/class-mp-orders-admin.php:951
-#: includes/admin/class-mp-orders-admin.php:969
+#: includes/admin/class-mp-orders-admin.php:342
+#: includes/admin/class-mp-orders-admin.php:859
+#: includes/admin/class-mp-orders-admin.php:955
+#: includes/admin/class-mp-orders-admin.php:973
 #: includes/common/payment-gateways/2checkout.php:293
 #: includes/common/payment-gateways/_cubepoints.php:130
 #: includes/common/payment-gateways/authorizenet-aim.php:193
@@ -666,20 +671,20 @@ msgid "Paid"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:221
-#: includes/admin/class-mp-orders-admin.php:337
-#: includes/admin/class-mp-orders-admin.php:856
-#: includes/admin/class-mp-orders-admin.php:955
-#: includes/admin/class-mp-orders-admin.php:970
-#: includes/common/class-mp-order.php:867 marketpress.php:299
+#: includes/admin/class-mp-orders-admin.php:341
+#: includes/admin/class-mp-orders-admin.php:860
+#: includes/admin/class-mp-orders-admin.php:959
+#: includes/admin/class-mp-orders-admin.php:974
+#: includes/common/class-mp-order.php:872 marketpress.php:299
 msgid "Shipped"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:222
-#: includes/admin/class-mp-orders-admin.php:336
-#: includes/admin/class-mp-orders-admin.php:857
-#: includes/admin/class-mp-orders-admin.php:959
-#: includes/admin/class-mp-orders-admin.php:971
-#: includes/common/class-mp-order.php:878 marketpress.php:305
+#: includes/admin/class-mp-orders-admin.php:340
+#: includes/admin/class-mp-orders-admin.php:861
+#: includes/admin/class-mp-orders-admin.php:963
+#: includes/admin/class-mp-orders-admin.php:975
+#: includes/common/class-mp-order.php:883 marketpress.php:305
 msgid "Closed"
 msgstr ""
 
@@ -860,7 +865,7 @@ msgstr ""
 
 #: includes/admin/class-mp-ajax.php:236
 #: includes/admin/class-mp-products-admin.php:1405
-#: includes/admin/store-settings/class-mp-store-settings-general.php:456
+#: includes/admin/store-settings/class-mp-store-settings-general.php:476
 msgid "Tax Rate"
 msgstr ""
 
@@ -946,7 +951,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:582
-#: includes/admin/class-mp-orders-admin.php:469
+#: includes/admin/class-mp-orders-admin.php:473
 #: includes/common/payment-gateways/2checkout.php:369
 #: includes/common/payment-gateways/authorizenet-aim.php:264
 #: includes/common/payment-gateways/mollie.php:93
@@ -1062,7 +1067,7 @@ msgid "Manage"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:301
-#: includes/admin/class-mp-orders-admin.php:895 marketpress.php:250
+#: includes/admin/class-mp-orders-admin.php:899 marketpress.php:250
 msgid "Orders"
 msgstr ""
 
@@ -1082,7 +1087,7 @@ msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:309
 #: includes/admin/class-mp-products-admin.php:331
-#: includes/admin/class-mp-shortcode-builder.php:665
+#: includes/admin/class-mp-shortcode-builder.php:666
 msgid "Tags"
 msgstr ""
 
@@ -1128,7 +1133,7 @@ msgid "Cheatin&#8217; uh?"
 msgstr ""
 
 #: includes/admin/class-mp-exporter-orders.php:154
-#: includes/admin/class-mp-orders-admin.php:915
+#: includes/admin/class-mp-orders-admin.php:919
 msgid "Order Date"
 msgstr ""
 
@@ -1137,7 +1142,7 @@ msgid "All Dates"
 msgstr ""
 
 #: includes/admin/class-mp-exporter-orders.php:167
-#: includes/admin/class-mp-orders-admin.php:393
+#: includes/admin/class-mp-orders-admin.php:397
 #: includes/admin/class-mp-pages-admin.php:62
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:225
 #: includes/common/template-functions.php:175
@@ -1145,177 +1150,177 @@ msgstr ""
 msgid "Order Status"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:269
+#: includes/admin/class-mp-orders-admin.php:273
 msgid "Order Details"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:273
+#: includes/admin/class-mp-orders-admin.php:277
 msgid "Customer Info"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:277
+#: includes/admin/class-mp-orders-admin.php:281
 msgid "Order Notes"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:281
+#: includes/admin/class-mp-orders-admin.php:285
 msgid "IPN History"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:287
+#: includes/admin/class-mp-orders-admin.php:291
 msgid "Order Actions"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:291
+#: includes/admin/class-mp-orders-admin.php:295
 #: includes/common/template-functions.php:524
 msgid "Order History"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:295
+#: includes/admin/class-mp-orders-admin.php:299
 #: includes/common/payment-gateways/free_orders.php:176
 msgid "Payment Information"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:299
+#: includes/admin/class-mp-orders-admin.php:303
 msgid "Shipping Info"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:314
+#: includes/admin/class-mp-orders-admin.php:318
 msgid "Gateway"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:316
+#: includes/admin/class-mp-orders-admin.php:320
 msgid "Type"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:318
+#: includes/admin/class-mp-orders-admin.php:322
 msgid "Transaction ID"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:321
+#: includes/admin/class-mp-orders-admin.php:325
 msgid "Payment Total"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:369
+#: includes/admin/class-mp-orders-admin.php:373
 msgid "There is no IPN history to show at this time"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:405
+#: includes/admin/class-mp-orders-admin.php:409
 #: includes/wpmudev-metaboxes/wpmudev-metabox.php:284
 msgid "Save Changes"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:436
+#: includes/admin/class-mp-orders-admin.php:440
 #: includes/common/shipping-modules/mp-ups.php:43
 msgid "UPS"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:437
+#: includes/admin/class-mp-orders-admin.php:441
 #: includes/common/shipping-modules/mp-fedex.php:31
 msgid "FedEx"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:438
+#: includes/admin/class-mp-orders-admin.php:442
 msgid "DHL"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:439
+#: includes/admin/class-mp-orders-admin.php:443
 msgid "Other"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:457
+#: includes/admin/class-mp-orders-admin.php:461
 msgid "Amount Collected"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:462
+#: includes/admin/class-mp-orders-admin.php:466
 msgid "Method Paid For"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:467
+#: includes/admin/class-mp-orders-admin.php:471
 msgid "Actual Shipping Method"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:479
+#: includes/admin/class-mp-orders-admin.php:483
 msgid "Method"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:481
+#: includes/admin/class-mp-orders-admin.php:485
 #: includes/common/payment-gateways/_cubepoints.php:196
 #: includes/common/payment-gateways/free_orders.php:169
 #: includes/common/payment-gateways/manual-payments.php:138
 msgid "Method Name"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:484
-#: includes/admin/class-mp-orders-admin.php:486
+#: includes/admin/class-mp-orders-admin.php:488
+#: includes/admin/class-mp-orders-admin.php:490
 msgid "Tracking Number"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:619
+#: includes/admin/class-mp-orders-admin.php:623
 msgid "Order statuses successfully updated."
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:623
+#: includes/admin/class-mp-orders-admin.php:627
 msgid ""
 "The order status for order ID <strong>%1$s</strong> was updated "
 "successfully."
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:661
+#: includes/admin/class-mp-orders-admin.php:665
 msgid "An invalid bulk action was requested. Please go back and try again."
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:720
+#: includes/admin/class-mp-orders-admin.php:724
 msgid ""
 "The order status could not be updated due to unexpected error. Please try "
 "again."
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:833
+#: includes/admin/class-mp-orders-admin.php:837
 msgid "Enter coupon code here"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:853
+#: includes/admin/class-mp-orders-admin.php:857
 msgid "Change Status"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:854
+#: includes/admin/class-mp-orders-admin.php:858
 msgid " Received"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:858
+#: includes/admin/class-mp-orders-admin.php:862
 msgid "Move To Trash"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:914
-#: includes/common/template-functions.php:2059
+#: includes/admin/class-mp-orders-admin.php:918
+#: includes/common/template-functions.php:2064
 msgid "Order ID"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:916
+#: includes/admin/class-mp-orders-admin.php:920
 msgid "From"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:917
+#: includes/admin/class-mp-orders-admin.php:921
 msgid "Items"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:963
+#: includes/admin/class-mp-orders-admin.php:967
 msgid "Trashed"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:978
+#: includes/admin/class-mp-orders-admin.php:982
 msgid "Flag as:"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:1003
+#: includes/admin/class-mp-orders-admin.php:1007
 msgid "View order &#8220;%s&#8221;"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:1014
+#: includes/admin/class-mp-orders-admin.php:1018
 msgid "Display billing/shipping info for this customer"
 msgstr ""
 
-#: includes/admin/class-mp-orders-admin.php:1054
+#: includes/admin/class-mp-orders-admin.php:1058
 msgid "N/A"
 msgstr ""
 
@@ -1325,12 +1330,12 @@ msgstr ""
 
 #: includes/admin/class-mp-pages-admin.php:57
 #: includes/admin/class-mp-setup-wizard.php:410
-#: includes/admin/class-mp-shortcode-builder.php:751
-#: includes/admin/class-mp-shortcode-builder.php:762
-#: includes/admin/class-mp-shortcode-builder.php:811
-#: includes/admin/class-mp-shortcode-builder.php:821
-#: includes/admin/class-mp-shortcode-builder.php:871
-#: includes/admin/store-settings/class-mp-store-settings-general.php:359
+#: includes/admin/class-mp-shortcode-builder.php:752
+#: includes/admin/class-mp-shortcode-builder.php:763
+#: includes/admin/class-mp-shortcode-builder.php:812
+#: includes/admin/class-mp-shortcode-builder.php:822
+#: includes/admin/class-mp-shortcode-builder.php:872
+#: includes/admin/store-settings/class-mp-store-settings-general.php:379
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:268
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:108
 #: includes/admin/widgets/ms-global-product-list.php:172
@@ -1351,7 +1356,7 @@ msgstr ""
 
 #: includes/admin/class-mp-pages-admin.php:60
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:207
-#: includes/admin/widgets/cart.php:8 includes/admin/widgets/cart.php:48
+#: includes/admin/widgets/cart.php:8 includes/admin/widgets/cart.php:56
 #: includes/common/template-functions.php:174
 #: includes/common/template-functions.php:807
 msgid "Shopping Cart"
@@ -1420,8 +1425,8 @@ msgid "Sort Order"
 msgstr ""
 
 #: includes/admin/class-mp-product-attributes-admin.php:108
-#: includes/admin/class-mp-shortcode-builder.php:602
-#: includes/admin/class-mp-shortcode-builder.php:743
+#: includes/admin/class-mp-shortcode-builder.php:603
+#: includes/admin/class-mp-shortcode-builder.php:744
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:522
 #: includes/admin/widgets/ms-global-categories.php:78
 #: includes/admin/widgets/ms-global-product-list.php:127
@@ -1430,8 +1435,8 @@ msgid "Ascending"
 msgstr ""
 
 #: includes/admin/class-mp-product-attributes-admin.php:109
-#: includes/admin/class-mp-shortcode-builder.php:603
-#: includes/admin/class-mp-shortcode-builder.php:744
+#: includes/admin/class-mp-shortcode-builder.php:604
+#: includes/admin/class-mp-shortcode-builder.php:745
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:521
 #: includes/admin/widgets/ms-global-categories.php:75
 #: includes/admin/widgets/ms-global-product-list.php:124
@@ -1526,7 +1531,7 @@ msgid "Changes saved successfully"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1228
-#: includes/common/class-mp-product.php:2630
+#: includes/common/class-mp-product.php:2646
 msgid "Related Products"
 msgstr ""
 
@@ -1591,7 +1596,7 @@ msgstr ""
 #: includes/admin/class-mp-products-admin.php:1458
 #: includes/admin/class-mp-setup-wizard.php:541
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:166
-#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:141
+#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 msgid "Kilograms"
 msgstr ""
 
@@ -1600,7 +1605,7 @@ msgstr ""
 #: includes/admin/class-mp-products-admin.php:2147
 #: includes/admin/class-mp-setup-wizard.php:540
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:165
-#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:141
+#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 #: includes/common/shipping-modules/class-mp-shipping-api.php:227
 msgid "Pounds"
 msgstr ""
@@ -1712,7 +1717,7 @@ msgid "Add Variation"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1980
-#: includes/admin/class-mp-shortcode-builder.php:193
+#: includes/admin/class-mp-shortcode-builder.php:194
 msgid "Attributes"
 msgstr ""
 
@@ -1771,37 +1776,37 @@ msgid "Location"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:332
-#: includes/admin/store-settings/class-mp-store-settings-general.php:543
+#: includes/admin/store-settings/class-mp-store-settings-general.php:564
 msgid "Select a Country"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:334
-#: includes/admin/store-settings/class-mp-store-settings-general.php:545
+#: includes/admin/store-settings/class-mp-store-settings-general.php:566
 msgid "Base Country"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:335
-#: includes/admin/store-settings/class-mp-store-settings-general.php:546
+#: includes/admin/store-settings/class-mp-store-settings-general.php:567
 msgid "Select A Country"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:346
-#: includes/admin/store-settings/class-mp-store-settings-general.php:556
+#: includes/admin/store-settings/class-mp-store-settings-general.php:577
 msgid "Select a State/Province/Region"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:348
-#: includes/admin/store-settings/class-mp-store-settings-general.php:558
+#: includes/admin/store-settings/class-mp-store-settings-general.php:579
 msgid "Base State/Province/Region"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:363
-#: includes/admin/store-settings/class-mp-store-settings-general.php:572
+#: includes/admin/store-settings/class-mp-store-settings-general.php:593
 msgid "Base Zip/Postal Code"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:380
-#: includes/admin/store-settings/class-mp-store-settings-general.php:588
+#: includes/admin/store-settings/class-mp-store-settings-general.php:609
 msgid "Zip/Postal Code Label"
 msgstr ""
 
@@ -1843,29 +1848,29 @@ msgid "EU"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:424
-#: includes/admin/store-settings/class-mp-store-settings-general.php:383
+#: includes/admin/store-settings/class-mp-store-settings-general.php:403
 msgid "Currency Settings"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:429
 #: includes/admin/class-mp-setup-wizard.php:437
-#: includes/admin/store-settings/class-mp-store-settings-general.php:388
-#: includes/admin/store-settings/class-mp-store-settings-general.php:396
+#: includes/admin/store-settings/class-mp-store-settings-general.php:408
+#: includes/admin/store-settings/class-mp-store-settings-general.php:416
 msgid "Select a Currency"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:439
-#: includes/admin/store-settings/class-mp-store-settings-general.php:398
+#: includes/admin/store-settings/class-mp-store-settings-general.php:418
 msgid "Store Currency"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:445
-#: includes/admin/store-settings/class-mp-store-settings-general.php:405
+#: includes/admin/store-settings/class-mp-store-settings-general.php:425
 msgid "Currency Symbol Position"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:461
-#: includes/admin/store-settings/class-mp-store-settings-general.php:451
+#: includes/admin/store-settings/class-mp-store-settings-general.php:471
 msgid "Tax Settings"
 msgstr ""
 
@@ -1874,17 +1879,17 @@ msgid "Default Tax Rate"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:485
-#: includes/admin/store-settings/class-mp-store-settings-general.php:473
+#: includes/admin/store-settings/class-mp-store-settings-general.php:493
 msgid "Current Rates"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:486
-#: includes/admin/store-settings/class-mp-store-settings-general.php:474
+#: includes/admin/store-settings/class-mp-store-settings-general.php:494
 msgid "%s Tax Rate"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:499
-#: includes/admin/store-settings/class-mp-store-settings-general.php:487
+#: includes/admin/store-settings/class-mp-store-settings-general.php:507
 msgid "Tax Label"
 msgstr ""
 
@@ -1893,22 +1898,22 @@ msgid "I.e. Taxes, VAT, GST, etc"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:505
-#: includes/admin/store-settings/class-mp-store-settings-general.php:493
+#: includes/admin/store-settings/class-mp-store-settings-general.php:513
 msgid "Apply Tax To Shipping Fees?"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:511
-#: includes/admin/store-settings/class-mp-store-settings-general.php:499
+#: includes/admin/store-settings/class-mp-store-settings-general.php:519
 msgid "Enter Prices Inclusive of Tax?"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:517
-#: includes/admin/store-settings/class-mp-store-settings-general.php:505
+#: includes/admin/store-settings/class-mp-store-settings-general.php:525
 msgid "Show Price + Tax?"
 msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:523
-#: includes/admin/store-settings/class-mp-store-settings-general.php:516
+#: includes/admin/store-settings/class-mp-store-settings-general.php:537
 msgid "Apply Tax to Downloadable Products?"
 msgstr ""
 
@@ -2027,158 +2032,162 @@ msgid "Display the full product meta box with price and buy now/add to cart butt
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:174
-msgid "Display a link or url to the current shopping cart page."
+msgid "Display the cart widget."
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:175
-msgid "Display a link or url to the current store page."
+msgid "Display a link or url to the current shopping cart page."
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:176
-msgid "Display a link or url to the current products list page."
+msgid "Display a link or url to the current store page."
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:177
-msgid "Display a link or url to the order status page."
+msgid "Display a link or url to the current products list page."
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:178
+msgid "Display a link or url to the order status page."
+msgstr ""
+
+#: includes/admin/class-mp-shortcode-builder.php:179
 msgid "Display a list of links to your store pages."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:183
-#: includes/admin/class-mp-shortcode-builder.php:1148
+#: includes/admin/class-mp-shortcode-builder.php:184
+#: includes/admin/class-mp-shortcode-builder.php:1198
 msgid "Add E-Commerce Short Code"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:184
+#: includes/admin/class-mp-shortcode-builder.php:185
 msgid "What would you like to do?"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:186
+#: includes/admin/class-mp-shortcode-builder.php:187
 msgid "Select an Action"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:220
-#: includes/admin/class-mp-shortcode-builder.php:400
+#: includes/admin/class-mp-shortcode-builder.php:221
+#: includes/admin/class-mp-shortcode-builder.php:401
 msgid ""
 "If a value is entered, causes the display of a link to all categories if "
 "the style is set to list."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:226
-#: includes/admin/class-mp-shortcode-builder.php:406
+#: includes/admin/class-mp-shortcode-builder.php:227
+#: includes/admin/class-mp-shortcode-builder.php:407
 msgid ""
 "Sort categories alphabetically, by unique Category ID, or by the count of "
 "posts in that Category."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:236
-#: includes/admin/class-mp-shortcode-builder.php:416
+#: includes/admin/class-mp-shortcode-builder.php:237
+#: includes/admin/class-mp-shortcode-builder.php:417
 msgid "Sort order for categories (either ascending or descending)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:246
+#: includes/admin/class-mp-shortcode-builder.php:247
 msgid ""
 "Style to display the categories list in. A value of list displays the "
 "categories as list items while none generates no special display method "
 "(the list items are separated by <br> tags)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:256
-#: includes/admin/class-mp-shortcode-builder.php:436
+#: includes/admin/class-mp-shortcode-builder.php:257
+#: includes/admin/class-mp-shortcode-builder.php:437
 msgid "Toggles the display of the current count of posts in each category."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:262
-#: includes/admin/class-mp-shortcode-builder.php:442
+#: includes/admin/class-mp-shortcode-builder.php:263
+#: includes/admin/class-mp-shortcode-builder.php:443
 msgid "Toggles the display of categories with no posts."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:268
+#: includes/admin/class-mp-shortcode-builder.php:269
 msgid ""
 "Sets whether a category's description is inserted into the title attribute "
 "of the links created (i.e. &lt;a title=\"&lt;em&gt;Category "
 "Description&lt;/em&gt;\" href=\"...)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:274
-#: includes/admin/class-mp-shortcode-builder.php:448
+#: includes/admin/class-mp-shortcode-builder.php:275
+#: includes/admin/class-mp-shortcode-builder.php:449
 msgid ""
 "Only display categories that are children of the category identified by "
 "this parameter."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:280
-#: includes/admin/class-mp-shortcode-builder.php:454
+#: includes/admin/class-mp-shortcode-builder.php:281
+#: includes/admin/class-mp-shortcode-builder.php:455
 msgid "Any"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:287
+#: includes/admin/class-mp-shortcode-builder.php:288
 msgid ""
 "Display a link to each category's rss-2 feed and set the link text to "
 "display. The default is no text and no feed displayed."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:299
+#: includes/admin/class-mp-shortcode-builder.php:300
 msgid ""
 "Set a URI for an image (usually an rss feed icon) to act as a link to each "
 "categories' rss-2 feed. This parameter overrides the feed parameter. There "
 "is no default for this parameter."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:305
-#: includes/admin/class-mp-shortcode-builder.php:461
+#: includes/admin/class-mp-shortcode-builder.php:306
+#: includes/admin/class-mp-shortcode-builder.php:462
 msgid ""
 "Exclude one or more categories from the results. The parameter include must "
 "be empty."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:307
-#: includes/admin/class-mp-shortcode-builder.php:323
-#: includes/admin/class-mp-shortcode-builder.php:337
-#: includes/admin/class-mp-shortcode-builder.php:463
-#: includes/admin/class-mp-shortcode-builder.php:480
+#: includes/admin/class-mp-shortcode-builder.php:308
+#: includes/admin/class-mp-shortcode-builder.php:324
+#: includes/admin/class-mp-shortcode-builder.php:338
+#: includes/admin/class-mp-shortcode-builder.php:464
+#: includes/admin/class-mp-shortcode-builder.php:481
 msgid "Select Categories"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:321
+#: includes/admin/class-mp-shortcode-builder.php:322
 msgid "Only include these categories."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:335
-#: includes/admin/class-mp-shortcode-builder.php:478
+#: includes/admin/class-mp-shortcode-builder.php:336
+#: includes/admin/class-mp-shortcode-builder.php:479
 msgid ""
 "Exclude category-tree from the results. The parameter include must be "
 "empty. If the hierarchical parameter is true, then use exclude instead of "
 "exclude_tree."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:345
-#: includes/admin/class-mp-shortcode-builder.php:495
+#: includes/admin/class-mp-shortcode-builder.php:346
+#: includes/admin/class-mp-shortcode-builder.php:496
 msgid ""
 "Display sub-categories as inner list items (below the parent list item) or "
 "inline."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:351
+#: includes/admin/class-mp-shortcode-builder.php:352
 msgid ""
 "Set the title and style of the outer list item. If present but empty, the "
 "outer list item will not be displayed."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:357
-#: includes/admin/class-mp-shortcode-builder.php:501
+#: includes/admin/class-mp-shortcode-builder.php:358
+#: includes/admin/class-mp-shortcode-builder.php:502
 msgid "Set the text to show when no categories are listed."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:363
+#: includes/admin/class-mp-shortcode-builder.php:364
 msgid ""
 "Sets the number of Categories to display. This causes the SQL LIMIT value "
 "to be defined."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:369
+#: includes/admin/class-mp-shortcode-builder.php:370
 msgid ""
 "This parameter controls how many levels in the hierarchy of Categories are "
 "to be included in the list of Categories. NOTE: The \"hierarchical\" "
@@ -2188,351 +2197,375 @@ msgid ""
 "argument."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:373
+#: includes/admin/class-mp-shortcode-builder.php:374
 msgid "All Categories and child Categories (Default)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:374
+#: includes/admin/class-mp-shortcode-builder.php:375
 msgid "All Categories displayed in flat (no indent) form (overrides hierarchical)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:375
+#: includes/admin/class-mp-shortcode-builder.php:376
 msgid "Show only top level Categories."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:376
+#: includes/admin/class-mp-shortcode-builder.php:377
 msgid ""
 "Value of n (some number) specifies the depth (or level) to descend in "
 "displaying Categories."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:381
-#: includes/admin/class-mp-shortcode-builder.php:513
+#: includes/admin/class-mp-shortcode-builder.php:382
+#: includes/admin/class-mp-shortcode-builder.php:514
 msgid ""
 "Calculates link or post counts by including items from child categories. If "
 "show_counts and hierarchical are true this is automatically set to true."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:503
+#: includes/admin/class-mp-shortcode-builder.php:504
 msgid "No Categories"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:507
+#: includes/admin/class-mp-shortcode-builder.php:508
 msgid "The max depth. This is ignored unless hierarchical is set to true."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:519
+#: includes/admin/class-mp-shortcode-builder.php:520
 msgid "Which category ID is selected."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:525
+#: includes/admin/class-mp-shortcode-builder.php:526
 msgid "The \"id\" attribute value for select element. "
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:531
+#: includes/admin/class-mp-shortcode-builder.php:532
 msgid "The \"name\" attribute value for select element. "
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:537
+#: includes/admin/class-mp-shortcode-builder.php:538
 msgid "The \"tabindex\" attribute value for select element. "
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:556
+#: includes/admin/class-mp-shortcode-builder.php:557
 msgid ""
 "The text size of the tag with the smallest count value (units given by unit "
 "parameter)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:562
+#: includes/admin/class-mp-shortcode-builder.php:563
 msgid ""
 "The text size of the tag with the largest count value (units given by unit "
 "parameter)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:568
+#: includes/admin/class-mp-shortcode-builder.php:569
 msgid ""
 "Unit of measure as pertains to the smallest and largest values. This can be "
 "any CSS length value, e.g. pt, px, em, %."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:574
+#: includes/admin/class-mp-shortcode-builder.php:575
 msgid ""
 "The number of actual tags to display in the cloud. (Use \"0\" to display "
 "all tags.)"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:580
+#: includes/admin/class-mp-shortcode-builder.php:581
 msgid "Format of the cloud display."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:582
+#: includes/admin/class-mp-shortcode-builder.php:583
 msgid "separated by whitespace defined by \"separator\" parameter."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:583
+#: includes/admin/class-mp-shortcode-builder.php:584
 msgid "UL with a class of \"wp-tag-cloud\""
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:587
+#: includes/admin/class-mp-shortcode-builder.php:588
 msgid "The text/space between tags)"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:593
+#: includes/admin/class-mp-shortcode-builder.php:594
 msgid "Order of the tags."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:596
+#: includes/admin/class-mp-shortcode-builder.php:597
 msgid "Count"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:600
+#: includes/admin/class-mp-shortcode-builder.php:601
 msgid "Sort order."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:604
-#: includes/admin/class-mp-shortcode-builder.php:730
+#: includes/admin/class-mp-shortcode-builder.php:605
+#: includes/admin/class-mp-shortcode-builder.php:731
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:514
 #: includes/admin/widgets/ms-global-product-list.php:121
 #: includes/admin/widgets/product-list.php:189
 msgid "Random"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:608
+#: includes/admin/class-mp-shortcode-builder.php:609
 msgid ""
 "Comma separated list of tags (term_id) to exclude. For example, "
 "exclude=5,27 means tags that have the term_id 5 or 27 will NOT be "
 "displayed. Defaults to exclude nothing."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:614
+#: includes/admin/class-mp-shortcode-builder.php:615
 msgid ""
 "Comma separated list of tags (term_id) to include. For example, "
 "include=5,27 means tags that have the term_id 5 or 27 will be the only tags "
 "displayed. Defaults to include everything."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:633
+#: includes/admin/class-mp-shortcode-builder.php:634
 msgid "The maximum number of products to display"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:652
+#: includes/admin/class-mp-shortcode-builder.php:653
 msgid "The product to show related items for."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:658
+#: includes/admin/class-mp-shortcode-builder.php:659
 msgid "How to relate the products"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:663
+#: includes/admin/class-mp-shortcode-builder.php:664
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:582
 msgid "Category &amp; Tags"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:676
+#: includes/admin/class-mp-shortcode-builder.php:677
 msgid "How many related items to show."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:701
+#: includes/admin/class-mp-shortcode-builder.php:702
 msgid "Whether to paginate the product list. This is useful to only show a subset."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:707
+#: includes/admin/class-mp-shortcode-builder.php:708
 msgid ""
 "The page number to display in the product list if \"paginate\" is set to "
 "true."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:713
+#: includes/admin/class-mp-shortcode-builder.php:714
 msgid ""
 "How many products to display in the product list if \"paginate\" is set to "
 "true."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:719
+#: includes/admin/class-mp-shortcode-builder.php:720
 msgid "What field to order products by."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:725
+#: includes/admin/class-mp-shortcode-builder.php:726
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:509
 #: includes/admin/widgets/ms-global-product-list.php:113
 #: includes/admin/widgets/product-list.php:184
 msgid "Publish Date"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:726
+#: includes/admin/class-mp-shortcode-builder.php:727
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:510
 #: includes/admin/widgets/product-list.php:185
 msgid "Product ID"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:727
+#: includes/admin/class-mp-shortcode-builder.php:728
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:511
 #: includes/admin/widgets/product-list.php:186
 msgid "Product Author"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:728
+#: includes/admin/class-mp-shortcode-builder.php:729
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:512
 #: includes/admin/widgets/ms-global-product-list.php:117
 #: includes/admin/widgets/product-list.php:187
 msgid "Number of Sales"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:729
+#: includes/admin/class-mp-shortcode-builder.php:730
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:513
 #: includes/admin/widgets/ms-global-product-list.php:119
 #: includes/admin/widgets/product-list.php:188
 msgid "Product Price"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:741
+#: includes/admin/class-mp-shortcode-builder.php:742
 msgid "Direction to order products by."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:748
+#: includes/admin/class-mp-shortcode-builder.php:749
 msgid "Limits list to a specific product category."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:759
+#: includes/admin/class-mp-shortcode-builder.php:760
 msgid "Limits list to a specific product tag."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:770
+#: includes/admin/class-mp-shortcode-builder.php:771
 msgid ""
 "If checked, products will be displayed as a list - otherwise products will "
 "be displayed as a grid."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:776
+#: includes/admin/class-mp-shortcode-builder.php:777
 msgid "Whether or not to show the product filters."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:778
+#: includes/admin/class-mp-shortcode-builder.php:779
 msgid "Show"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:779
+#: includes/admin/class-mp-shortcode-builder.php:780
 msgid "Hide"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:796
+#: includes/admin/class-mp-shortcode-builder.php:797
 msgid "The ID of the product to display."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:802
+#: includes/admin/class-mp-shortcode-builder.php:803
 msgid "Whether to display the product title."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:808
+#: includes/admin/class-mp-shortcode-builder.php:809
 msgid "Whether and what type of content to display."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:812
+#: includes/admin/class-mp-shortcode-builder.php:813
 #: includes/admin/widgets/ms-global-product-list.php:173
 msgid "Excerpt"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:813
+#: includes/admin/class-mp-shortcode-builder.php:814
 msgid "Full"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:818
+#: includes/admin/class-mp-shortcode-builder.php:819
 msgid "Whether and what context of image size to display."
-msgstr ""
-
-#: includes/admin/class-mp-shortcode-builder.php:822
-#: includes/admin/class-mp-shortcode-builder.php:856
-#: includes/admin/class-mp-shortcode-builder.php:899
-#: includes/admin/class-mp-shortcode-builder.php:994
-msgid "Single"
 msgstr ""
 
 #: includes/admin/class-mp-shortcode-builder.php:823
 #: includes/admin/class-mp-shortcode-builder.php:857
 #: includes/admin/class-mp-shortcode-builder.php:900
 #: includes/admin/class-mp-shortcode-builder.php:995
+msgid "Single"
+msgstr ""
+
+#: includes/admin/class-mp-shortcode-builder.php:824
+#: includes/admin/class-mp-shortcode-builder.php:858
+#: includes/admin/class-mp-shortcode-builder.php:901
+#: includes/admin/class-mp-shortcode-builder.php:996
 msgid "List"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:828
+#: includes/admin/class-mp-shortcode-builder.php:829
 msgid "Whether to display the product meta (e.g. price, buy button)."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:847
-#: includes/admin/class-mp-shortcode-builder.php:891
-#: includes/admin/class-mp-shortcode-builder.php:917
-#: includes/admin/class-mp-shortcode-builder.php:942
-#: includes/admin/class-mp-shortcode-builder.php:961
-#: includes/admin/class-mp-shortcode-builder.php:980
+#: includes/admin/class-mp-shortcode-builder.php:848
+#: includes/admin/class-mp-shortcode-builder.php:892
+#: includes/admin/class-mp-shortcode-builder.php:918
+#: includes/admin/class-mp-shortcode-builder.php:943
+#: includes/admin/class-mp-shortcode-builder.php:962
+#: includes/admin/class-mp-shortcode-builder.php:981
 msgid "The ID of the product."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:853
+#: includes/admin/class-mp-shortcode-builder.php:854
 msgid "What context for preset size options."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:858
+#: includes/admin/class-mp-shortcode-builder.php:859
 msgid "Widget"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:863
+#: includes/admin/class-mp-shortcode-builder.php:864
 msgid ""
 "Set a custom pixel width/height. If omitted defaults to the size set by "
 "\"context\"."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:869
+#: includes/admin/class-mp-shortcode-builder.php:870
 msgid "Set the alignment of the image."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:872
+#: includes/admin/class-mp-shortcode-builder.php:873
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:451
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:738
 msgid "Left"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:873
+#: includes/admin/class-mp-shortcode-builder.php:874
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:452
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:739
 msgid "Right"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:874
+#: includes/admin/class-mp-shortcode-builder.php:875
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:737
 msgid "Center"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:897
-#: includes/admin/class-mp-shortcode-builder.php:992
+#: includes/admin/class-mp-shortcode-builder.php:898
+#: includes/admin/class-mp-shortcode-builder.php:993
 msgid "What context for display."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:923
-#: includes/admin/class-mp-shortcode-builder.php:986
+#: includes/admin/class-mp-shortcode-builder.php:924
+#: includes/admin/class-mp-shortcode-builder.php:987
 msgid "A label to prepend to the price."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:1012
+#: includes/admin/class-mp-shortcode-builder.php:1013
+msgid "The title of the cart."
+msgstr ""
+
+#: includes/admin/class-mp-shortcode-builder.php:1019
+msgid "The text displayed before the cart."
+msgstr ""
+
+#: includes/admin/class-mp-shortcode-builder.php:1025
+msgid "Whether to show or hide the product image."
+msgstr ""
+
+#: includes/admin/class-mp-shortcode-builder.php:1031
+msgid "Whether to show or hide the product quantity."
+msgstr ""
+
 #: includes/admin/class-mp-shortcode-builder.php:1037
+msgid "Whether to show or hide the product price."
+msgstr ""
+
+#: includes/admin/class-mp-shortcode-builder.php:1043
+msgid "Whether to display the cart only on store pages or not."
+msgstr ""
+
 #: includes/admin/class-mp-shortcode-builder.php:1062
+#: includes/admin/class-mp-shortcode-builder.php:1087
+#: includes/admin/class-mp-shortcode-builder.php:1112
 msgid "Whether to return a clickable link or url."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:1018
-#: includes/admin/class-mp-shortcode-builder.php:1043
 #: includes/admin/class-mp-shortcode-builder.php:1068
+#: includes/admin/class-mp-shortcode-builder.php:1093
+#: includes/admin/class-mp-shortcode-builder.php:1118
 msgid "The text to show in the link."
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:1086
+#: includes/admin/class-mp-shortcode-builder.php:1136
 msgid "Insert Short Code"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:1087
+#: includes/admin/class-mp-shortcode-builder.php:1137
 msgid "Reset to Defaults"
 msgstr ""
 
-#: includes/admin/class-mp-shortcode-builder.php:1127
+#: includes/admin/class-mp-shortcode-builder.php:1177
 msgid "Select a Product"
 msgstr ""
 
@@ -2769,10 +2802,34 @@ msgid "This option hide floating Mini Cart in top right corner."
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:354
-msgid "Google Analytics Ecommerce Tracking"
+msgid "Show product image on Mini Cart?"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:355
+msgid "Do you want to display the product image on floating Mini Cart."
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:361
+msgid "Show product quantity on Mini Cart?"
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:362
+msgid "Do you want to display the product quantity on floating Mini Cart."
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:368
+msgid "Show product price on Mini Cart?"
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:369
+msgid "Do you want to display the product price on floating Mini Cart."
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:374
+msgid "Google Analytics Ecommerce Tracking"
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:375
 msgid ""
 "If you already use Google Analytics for your website, you can track "
 "detailed ecommerce information by enabling this setting. Choose whether you "
@@ -2786,76 +2843,86 @@ msgid ""
 "in-google.html\">More information &raquo;</a>"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:360
+#: includes/admin/store-settings/class-mp-store-settings-general.php:380
 msgid "New"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:361
+#: includes/admin/store-settings/class-mp-store-settings-general.php:381
 msgid "Old"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:362
+#: includes/admin/store-settings/class-mp-store-settings-general.php:382
 msgid "Universal"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:367
+#: includes/admin/store-settings/class-mp-store-settings-general.php:387
 msgid "Show Special Instructions Field?"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:368
+#: includes/admin/store-settings/class-mp-store-settings-general.php:388
 msgid ""
 "Enabling this field will display a textbox on the shipping checkout page "
 "for users to enter special instructions for their order. Useful for product "
 "personalization, etc."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:418
+#: includes/admin/store-settings/class-mp-store-settings-general.php:438
 msgid "Price Format"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:431
+#: includes/admin/store-settings/class-mp-store-settings-general.php:451
 msgid "Show Decimal in Prices"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:489
+#: includes/admin/store-settings/class-mp-store-settings-general.php:509
 msgid "The label shown for the tax line item in the cart. Taxes, VAT, GST, etc."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:494
+#: includes/admin/store-settings/class-mp-store-settings-general.php:514
 msgid "Please see your local tax laws. Most areas charge tax on shipping fees."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:500
+#: includes/admin/store-settings/class-mp-store-settings-general.php:520
 msgid ""
 "Enabling this option allows you to enter and show all prices inclusive of "
 "tax, while still listing the tax total as a line item in shopping carts. "
 "Please see your local tax laws."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:506
+#: includes/admin/store-settings/class-mp-store-settings-general.php:526
 msgid ""
 "Enabling this option will show Price + Tax, eg. if your price is 100 and "
 "your tax 20, your price will be 120"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:517
+#: includes/admin/store-settings/class-mp-store-settings-general.php:531
+msgid "Display tax label?"
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:532
+msgid ""
+"Enabling this option will display label `excl. tax` or `incl. tax` after "
+"price"
+msgstr ""
+
+#: includes/admin/store-settings/class-mp-store-settings-general.php:538
 msgid ""
 "Please see your local tax laws. Note if this is enabled and a downloadable "
 "only cart, rates will be the default for your base location."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:522
+#: includes/admin/store-settings/class-mp-store-settings-general.php:543
 msgid "Collect Address on Downloadable Only Cart?"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:523
+#: includes/admin/store-settings/class-mp-store-settings-general.php:544
 msgid ""
 "If you need to tax downloadable products and don't want to default to the "
 "rates to your base location, enable this to always collect the shipping "
 "address. "
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-general.php:538
+#: includes/admin/store-settings/class-mp-store-settings-general.php:559
 msgid "Location Settings"
 msgstr ""
 
@@ -2933,7 +3000,7 @@ msgid "Choose a Page"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:216
-#: includes/common/class-mp-cart.php:898 includes/common/class-mp-cart.php:1234
+#: includes/common/class-mp-cart.php:902 includes/common/class-mp-cart.php:1263
 #: includes/common/template-functions.php:914
 msgid "Checkout"
 msgstr ""
@@ -3278,7 +3345,7 @@ msgid ""
 "MarketPress store."
 msgstr ""
 
-#: includes/admin/widgets/cart.php:53 includes/admin/widgets/categories.php:69
+#: includes/admin/widgets/cart.php:64 includes/admin/widgets/categories.php:69
 #: includes/admin/widgets/ms-global-categories.php:59
 #: includes/admin/widgets/ms-global-product-list.php:87
 #: includes/admin/widgets/ms-global-tag-cloud.php:49
@@ -3287,13 +3354,25 @@ msgstr ""
 msgid "Title:"
 msgstr ""
 
-#: includes/admin/widgets/cart.php:54
+#: includes/admin/widgets/cart.php:65
 #: includes/admin/widgets/ms-global-product-list.php:92
 #: includes/admin/widgets/product-list.php:172
 msgid "Custom Text:"
 msgstr ""
 
-#: includes/admin/widgets/cart.php:58 includes/admin/widgets/categories.php:82
+#: includes/admin/widgets/cart.php:69
+msgid "Display product image"
+msgstr ""
+
+#: includes/admin/widgets/cart.php:71
+msgid "Display product quantity"
+msgstr ""
+
+#: includes/admin/widgets/cart.php:73
+msgid "Display product price"
+msgstr ""
+
+#: includes/admin/widgets/cart.php:75 includes/admin/widgets/categories.php:82
 #: includes/admin/widgets/product-list.php:222
 #: includes/admin/widgets/product-tag-cloud.php:57
 msgid "Only show on store pages"
@@ -3434,10 +3513,10 @@ msgid "Product List"
 msgstr ""
 
 #: includes/admin/widgets/product-list.php:118
-#: includes/common/template-functions.php:2002
-#: includes/common/template-functions.php:2230
-#: includes/multisite/template-functions.php:284
-#: includes/multisite/template-functions.php:597
+#: includes/common/template-functions.php:2007
+#: includes/common/template-functions.php:2235
+#: includes/multisite/template-functions.php:292
+#: includes/multisite/template-functions.php:605
 msgid "No Products"
 msgstr ""
 
@@ -3478,108 +3557,112 @@ msgstr ""
 msgid "Product Tag Cloud"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:519 includes/common/helpers.php:105
+#: includes/common/class-mp-cart.php:523 includes/common/helpers.php:105
 msgid "Download"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:595 includes/common/class-mp-cart.php:676
+#: includes/common/class-mp-cart.php:599 includes/common/class-mp-cart.php:680
 msgid "Estimated Total"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:597
+#: includes/common/class-mp-cart.php:601
 msgid "Estimated Total (%s)"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:599 includes/common/class-mp-cart.php:601
+#: includes/common/class-mp-cart.php:603 includes/common/class-mp-cart.php:605
 msgid "Estimated Total (%s, %s)"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:626
+#: includes/common/class-mp-cart.php:630
 msgid "Product Total"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:642
+#: includes/common/class-mp-cart.php:646
 msgid "Estimated Shipping"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:659
+#: includes/common/class-mp-cart.php:663
 msgid "Estimated %s"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:676
+#: includes/common/class-mp-cart.php:680
 msgid "Order Total"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:740
+#: includes/common/class-mp-cart.php:744
 msgid "The cart is disabled."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:742
+#: includes/common/class-mp-cart.php:746
 msgid "There are no items in your cart - <a href=\"%s\">go add some</a> !"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:879
+#: includes/common/class-mp-cart.php:883
 msgid "Submit Order"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:880
+#: includes/common/class-mp-cart.php:884
 msgid "Continue &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:883
+#: includes/common/class-mp-cart.php:887
 msgid ""
 "<strong>You are about to submit your order!</strong><br />Please review "
 "your order details before continuing. You will be charged immediately upon "
 "clicking \"Submit Order\"."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:885
+#: includes/common/class-mp-cart.php:889
 msgid "<strong>Secure Checkout</strong><br />Shopping is always safe and secure."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1130
-#: includes/common/class-mp-cart.php:1181
+#: includes/common/class-mp-cart.php:961
+msgid "Continue Shopping?"
+msgstr ""
+
+#: includes/common/class-mp-cart.php:1152
+#: includes/common/class-mp-cart.php:1207
 #: includes/public/class-mp-short-codes.php:129
 msgid "Adding..."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1131
+#: includes/common/class-mp-cart.php:1153
 #: includes/public/class-mp-short-codes.php:130
 msgid "Cart update notice: this item has a limit per order."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1233
+#: includes/common/class-mp-cart.php:1262
 msgid "Empty Cart"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1237
+#: includes/common/class-mp-cart.php:1266
 msgid "View Cart"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1242
+#: includes/common/class-mp-cart.php:1271
 msgid "Your shopping cart is empty."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1243
+#: includes/common/class-mp-cart.php:1272
 msgid "Items/Products added to Cart will show here."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1414
-#: includes/common/class-mp-cart.php:1419
+#: includes/common/class-mp-cart.php:1472
+#: includes/common/class-mp-cart.php:1477
 msgid "items"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:1417
+#: includes/common/class-mp-cart.php:1475
 msgid "item"
 msgstr ""
 
-#: includes/common/class-mp-cart.php:2005
+#: includes/common/class-mp-cart.php:2063
 msgid ""
 "Some items in your cart are no longer available. We have removed these "
 "items from your cart automatically."
 msgstr ""
 
-#: includes/common/class-mp-cart.php:2009
+#: includes/common/class-mp-cart.php:2067
 msgid ""
 "Some items in your cart have fallen below the quantity you currently have "
 "in your cart. We have adjusted the quantity in your cart automatically."
@@ -3597,25 +3680,25 @@ msgstr ""
 msgid "Complete!"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:517
+#: includes/common/class-mp-installer.php:518
 msgid "Update Data"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:566
+#: includes/common/class-mp-installer.php:567
 msgid "Update MarketPress Data"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:567
+#: includes/common/class-mp-installer.php:568
 msgid ""
 "MarketPress requires a database update to continue working correctly.<br "
 "/>Below you will find a list of items that require your attention."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:598
+#: includes/common/class-mp-installer.php:599
 msgid "Product Metadata"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:607
+#: includes/common/class-mp-installer.php:608
 msgid ""
 "Depending on the amount of products you have, this update could take quite "
 "some time. Please keep this window open while the update completes. If you "
@@ -3623,21 +3706,21 @@ msgid ""
 "please don't exit the window."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:613
+#: includes/common/class-mp-installer.php:614
 msgid ""
 "Please update each subsite in your WordPress network where you have older "
 "version of the MarketPress plugin."
 msgstr ""
 
-#: includes/common/class-mp-installer.php:619
+#: includes/common/class-mp-installer.php:620
 msgid "Perform Update"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:623
+#: includes/common/class-mp-installer.php:624
 msgid "MarketPress performed a quick automatic update successfully!"
 msgstr ""
 
-#: includes/common/class-mp-installer.php:643
+#: includes/common/class-mp-installer.php:644
 msgid ""
 "MarketPress requires a database update to continue working correctly. <a "
 "class=\"button-primary\" href=\"%s\">Go to update page</a>"
@@ -3667,79 +3750,79 @@ msgstr ""
 msgid "You can manage this order here: %s"
 msgstr ""
 
-#: includes/common/class-mp-order.php:652
+#: includes/common/class-mp-order.php:657
 msgid "First Name"
 msgstr ""
 
-#: includes/common/class-mp-order.php:656
+#: includes/common/class-mp-order.php:661
 msgid "Last Name"
 msgstr ""
 
-#: includes/common/class-mp-order.php:660
+#: includes/common/class-mp-order.php:665
 msgid "Address 1"
 msgstr ""
 
-#: includes/common/class-mp-order.php:664
+#: includes/common/class-mp-order.php:669
 msgid "Address 2"
 msgstr ""
 
-#: includes/common/class-mp-order.php:668
+#: includes/common/class-mp-order.php:673
 msgid "City"
 msgstr ""
 
-#: includes/common/class-mp-order.php:675
+#: includes/common/class-mp-order.php:680
 msgid "State"
 msgstr ""
 
-#: includes/common/class-mp-order.php:689
+#: includes/common/class-mp-order.php:694
 #: includes/public/class-mp-checkout.php:362
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/dropbox/index.php:415
 msgid "Country"
 msgstr ""
 
-#: includes/common/class-mp-order.php:693
+#: includes/common/class-mp-order.php:698
 #: includes/public/class-mp-checkout.php:376
 msgid "Phone"
 msgstr ""
 
-#: includes/common/class-mp-order.php:697
+#: includes/common/class-mp-order.php:702
 msgid "Email"
 msgstr ""
 
-#: includes/common/class-mp-order.php:702
-#: includes/public/class-mp-checkout.php:1010
+#: includes/common/class-mp-order.php:707
+#: includes/public/class-mp-checkout.php:1013
 msgid "Special Instructions"
 msgstr ""
 
-#: includes/common/class-mp-order.php:737
+#: includes/common/class-mp-order.php:742
 msgid "Copy billing address to shipping address"
 msgstr ""
 
-#: includes/common/class-mp-order.php:839
+#: includes/common/class-mp-order.php:844
 msgid "Order #"
 msgstr ""
 
-#: includes/common/class-mp-order.php:874
+#: includes/common/class-mp-order.php:879
 msgid "In Process"
 msgstr ""
 
-#: includes/common/class-mp-order.php:884
+#: includes/common/class-mp-order.php:889
 msgid "Taxes:"
 msgstr ""
 
-#: includes/common/class-mp-order.php:888 includes/common/helpers.php:131
+#: includes/common/class-mp-order.php:893 includes/common/helpers.php:131
 msgid "Shipping:"
 msgstr ""
 
-#: includes/common/class-mp-order.php:904
+#: includes/common/class-mp-order.php:909
 msgid "Order Received"
 msgstr ""
 
-#: includes/common/class-mp-order.php:905
+#: includes/common/class-mp-order.php:910
 msgid "Current Status"
 msgstr ""
 
-#: includes/common/class-mp-order.php:1251
+#: includes/common/class-mp-order.php:1256
 msgid "Shipped: Track Shipment"
 msgstr ""
 
@@ -3752,7 +3835,7 @@ msgstr ""
 #: includes/common/class-mp-product.php:308
 #: includes/common/class-mp-product.php:913
 #: includes/common/class-mp-product.php:921
-#: includes/multisite/template-functions.php:553
+#: includes/multisite/template-functions.php:561
 msgid "Buy Now"
 msgstr ""
 
@@ -3766,7 +3849,7 @@ msgid "Choose a %s"
 msgstr ""
 
 #: includes/common/class-mp-product.php:898
-#: includes/multisite/template-functions.php:705
+#: includes/multisite/template-functions.php:713
 msgid "Buy Now &raquo;"
 msgstr ""
 
@@ -3787,55 +3870,56 @@ msgstr ""
 msgid "%s each"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1241
+#: includes/common/class-mp-product.php:1253
+#: includes/common/class-mp-product.php:1256
 msgid "(tax excl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1243
+#: includes/common/class-mp-product.php:1258
 msgid "(tax incl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1566
+#: includes/common/class-mp-product.php:1583
 msgid ""
 "<p class=\"mp_related_products_empty_message\">There are no related "
 "products for this item.</p>"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1798
+#: includes/common/class-mp-product.php:1814
 msgid "View Larger Image &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2051
+#: includes/common/class-mp-product.php:2067
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2052
+#: includes/common/class-mp-product.php:2068
 msgid ""
 "This message is being sent to notify you of low stock of a product in your "
 "online store according to your preferences.<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2054
+#: includes/common/class-mp-product.php:2070
 msgid "Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2055
+#: includes/common/class-mp-product.php:2071
 msgid "Current Inventory: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2056
+#: includes/common/class-mp-product.php:2072
 msgid "Link: %s<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2058
+#: includes/common/class-mp-product.php:2074
 msgid "Edit Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2059
+#: includes/common/class-mp-product.php:2075
 msgid "Notification Preferences: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2430
+#: includes/common/class-mp-product.php:2446
 msgid "Tweet"
 msgstr ""
 
@@ -3847,60 +3931,60 @@ msgstr ""
 msgid "Zip Code"
 msgstr ""
 
-#: includes/common/data.php:67
+#: includes/common/data.php:68
 #. Translators: change default slugs here
 msgid "store"
 msgstr ""
 
-#: includes/common/data.php:68
+#: includes/common/data.php:69
 msgid "products"
 msgstr ""
 
-#: includes/common/data.php:69
+#: includes/common/data.php:70
 msgid "shopping-cart"
 msgstr ""
 
-#: includes/common/data.php:70
+#: includes/common/data.php:71
 msgid "order-status"
 msgstr ""
 
-#: includes/common/data.php:71
+#: includes/common/data.php:72
 msgid "category"
 msgstr ""
 
-#: includes/common/data.php:72
+#: includes/common/data.php:73
 msgid "tag"
 msgstr ""
 
-#: includes/common/data.php:108
+#: includes/common/data.php:109
 msgid ""
 "<p>If you have any questions about your order please do not hesitate to "
 "contact us.</p>"
 msgstr ""
 
-#: includes/common/data.php:110
+#: includes/common/data.php:111
 msgid ""
 "<p>Please enter your shipping information in the form below to proceed with "
 "your order.</p>"
 msgstr ""
 
-#: includes/common/data.php:112
+#: includes/common/data.php:113
 msgid ""
 "<p>You are almost done! Please do a final review of your order to make sure "
 "everything is correct then click the \"Confirm Payment\" button.</p>"
 msgstr ""
 
-#: includes/common/data.php:113
+#: includes/common/data.php:114
 msgid ""
 "<p>Thank you for your order! We appreciate your business, and please come "
 "back often to check out our new products.</p>"
 msgstr ""
 
-#: includes/common/data.php:118
+#: includes/common/data.php:119
 msgid "Your Order Confirmation (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:119
+#: includes/common/data.php:120
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -3925,11 +4009,11 @@ msgid ""
 " Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:123
+#: includes/common/data.php:124
 msgid "Your Order Has Been Shipped! (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:124
+#: includes/common/data.php:125
 msgid ""
 "Dear CUSTOMERNAME,\n"
 " Your order has been shipped! Depending on the shipping method and your "
@@ -3982,7 +4066,7 @@ msgid "No shipping required for this order."
 msgstr ""
 
 #: includes/common/helpers.php:155 includes/public/class-mp-checkout.php:81
-#: includes/public/class-mp-checkout.php:988
+#: includes/public/class-mp-checkout.php:991
 msgid "Billing"
 msgstr ""
 
@@ -4084,7 +4168,7 @@ msgstr ""
 #: includes/common/shipping-modules/mp-pickup.php:140
 #: includes/common/shipping-modules/mp-table-rate.php:91
 #: includes/common/shipping-modules/mp-ups.php:122
-#: includes/common/shipping-modules/mp-usps.php:186
+#: includes/common/shipping-modules/mp-usps.php:167
 #: includes/common/shipping-modules/mp-weight-rate.php:110
 msgid "%s Settings"
 msgstr ""
@@ -4465,7 +4549,7 @@ msgstr ""
 #: includes/common/payment-gateways/paypal-express.php:663
 #: includes/common/payment-gateways/paypal-payflow.php:423
 #: includes/common/shipping-modules/mp-ups.php:158
-#: includes/public/class-mp-checkout.php:1078
+#: includes/public/class-mp-checkout.php:1081
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/ftp/index.php:304
 msgid "Password"
 msgstr ""
@@ -4710,7 +4794,7 @@ msgstr ""
 
 #: includes/common/payment-gateways/eway.php:387
 #: includes/common/payment-gateways/paypal-express.php:656
-#: includes/common/shipping-modules/mp-usps.php:204
+#: includes/common/shipping-modules/mp-usps.php:185
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/ftp/index.php:298
 msgid "Username"
 msgstr ""
@@ -6809,15 +6893,15 @@ msgid ""
 "card info and try again."
 msgstr ""
 
-#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:99
+#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:103
 msgid " %1$s - %2$s"
 msgstr ""
 
-#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:132
+#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:137
 msgid "Inches"
 msgstr ""
 
-#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:132
+#: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:137
 msgid "Centimeters"
 msgstr ""
 
@@ -6831,13 +6915,13 @@ msgstr ""
 
 #: includes/common/shipping-modules/class-mp-shipping-api.php:256
 #: includes/common/shipping-modules/class-mp-shipping-api.php:259
-#: includes/common/shipping-modules/mp-usps.php:438
-#: includes/common/shipping-modules/mp-usps.php:440
+#: includes/common/shipping-modules/mp-usps.php:436
+#: includes/common/shipping-modules/mp-usps.php:439
 msgid "Free Shipping"
 msgstr ""
 
 #: includes/common/shipping-modules/class-mp-shipping-api.php:259
-#: includes/common/shipping-modules/mp-usps.php:440
+#: includes/common/shipping-modules/mp-usps.php:439
 msgid "Free Shipping - 0.00"
 msgstr ""
 
@@ -7034,7 +7118,7 @@ msgid "Domestic Services"
 msgstr ""
 
 #: includes/common/shipping-modules/mp-fedex.php:339
-#: includes/common/shipping-modules/mp-usps.php:232
+#: includes/common/shipping-modules/mp-usps.php:213
 msgid "Handling Charge per Domestic Shipment"
 msgstr ""
 
@@ -7043,14 +7127,14 @@ msgid "International Services"
 msgstr ""
 
 #: includes/common/shipping-modules/mp-fedex.php:361
-#: includes/common/shipping-modules/mp-usps.php:248
+#: includes/common/shipping-modules/mp-usps.php:229
 msgid "Handling Charge per International Shipment"
 msgstr ""
 
 #: includes/common/shipping-modules/mp-fedex.php:386
 #: includes/common/shipping-modules/mp-ups.php:193
-#: includes/common/shipping-modules/mp-usps.php:253
-#: includes/common/shipping-modules/mp-usps.php:345
+#: includes/common/shipping-modules/mp-usps.php:234
+#: includes/common/shipping-modules/mp-usps.php:338
 msgid "Standard Boxes and Weight Limits"
 msgstr ""
 
@@ -7063,19 +7147,19 @@ msgstr ""
 
 #: includes/common/shipping-modules/mp-fedex.php:388
 #: includes/common/shipping-modules/mp-ups.php:196
-#: includes/common/shipping-modules/mp-usps.php:256
+#: includes/common/shipping-modules/mp-usps.php:237
 msgid "Add Box"
 msgstr ""
 
 #: includes/common/shipping-modules/mp-fedex.php:402
 #: includes/common/shipping-modules/mp-ups.php:209
-#: includes/common/shipping-modules/mp-usps.php:266
+#: includes/common/shipping-modules/mp-usps.php:247
 msgid "Size (%s)"
 msgstr ""
 
 #: includes/common/shipping-modules/mp-fedex.php:409
 #: includes/common/shipping-modules/mp-ups.php:216
-#: includes/common/shipping-modules/mp-usps.php:270
+#: includes/common/shipping-modules/mp-usps.php:251
 msgid "Max Weight (%s)"
 msgstr ""
 
@@ -7341,7 +7425,7 @@ msgid "Handling Charge Per Box Shipped"
 msgstr ""
 
 #: includes/common/shipping-modules/mp-ups.php:195
-#: includes/common/shipping-modules/mp-usps.php:255
+#: includes/common/shipping-modules/mp-usps.php:236
 msgid ""
 "Enter your standard box sizes as LengthxWidthxHeight (e.g. 12x8x6) For each "
 "box defined enter the maximum weight it can contain. <strong>Note: the "
@@ -7354,21 +7438,21 @@ msgstr ""
 msgid "UPS (beta)"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:66
-#: includes/common/shipping-modules/mp-usps.php:828
+#: includes/common/shipping-modules/mp-usps.php:67
+#: includes/common/shipping-modules/mp-usps.php:856
 msgid "USPS"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:71
+#: includes/common/shipping-modules/mp-usps.php:72
 msgid "Express Mail"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:71
+#: includes/common/shipping-modules/mp-usps.php:72
 #: includes/common/shipping-modules/mp-usps.php:74
-#: includes/common/shipping-modules/mp-usps.php:77
+#: includes/common/shipping-modules/mp-usps.php:76
+#: includes/common/shipping-modules/mp-usps.php:78
 #: includes/common/shipping-modules/mp-usps.php:80
-#: includes/common/shipping-modules/mp-usps.php:83
-#: includes/common/shipping-modules/mp-usps.php:86
+#: includes/common/shipping-modules/mp-usps.php:82
 msgid "(1-2 days)"
 msgstr ""
 
@@ -7376,119 +7460,119 @@ msgstr ""
 msgid "Express Mail Hold For Pickup"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:77
+#: includes/common/shipping-modules/mp-usps.php:76
 msgid "Express Mail Sunday/Holiday Delivery"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:80
+#: includes/common/shipping-modules/mp-usps.php:78
 msgid "Express Mail Flat Rate Boxes"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:83
+#: includes/common/shipping-modules/mp-usps.php:80
 msgid "Express Mail Flat Rate Boxes Hold For Pickup"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:86
+#: includes/common/shipping-modules/mp-usps.php:82
 msgid "Express Mail Sunday/Holiday Delivery Flat Rate Boxes"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:89
+#: includes/common/shipping-modules/mp-usps.php:84
 msgid "Priority Mail"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:89
+#: includes/common/shipping-modules/mp-usps.php:84
 msgid "(2-4) days"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:92
+#: includes/common/shipping-modules/mp-usps.php:86
 msgid "Priority Mail Large Flat Rate Box"
 msgstr ""
 
+#: includes/common/shipping-modules/mp-usps.php:86
+#: includes/common/shipping-modules/mp-usps.php:88
+#: includes/common/shipping-modules/mp-usps.php:90
 #: includes/common/shipping-modules/mp-usps.php:92
-#: includes/common/shipping-modules/mp-usps.php:95
-#: includes/common/shipping-modules/mp-usps.php:98
-#: includes/common/shipping-modules/mp-usps.php:101
-#: includes/common/shipping-modules/mp-usps.php:104
+#: includes/common/shipping-modules/mp-usps.php:94
 msgid "(2-4 days)"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:95
+#: includes/common/shipping-modules/mp-usps.php:88
 msgid "Priority Mail Medium Flat Rate Box"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:98
+#: includes/common/shipping-modules/mp-usps.php:90
 msgid "Priority Mail Small Flat Rate Box"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:101
+#: includes/common/shipping-modules/mp-usps.php:92
 msgid "Priority Mail Padded Flat Rate Envelope"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:104
+#: includes/common/shipping-modules/mp-usps.php:94
 msgid "First-Class Mail Parcel"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:107
+#: includes/common/shipping-modules/mp-usps.php:96
 msgid "Media Mail"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:110
+#: includes/common/shipping-modules/mp-usps.php:98
 msgid "Library Mail"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:116
+#: includes/common/shipping-modules/mp-usps.php:104
 msgid "Express Mail International"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:119
+#: includes/common/shipping-modules/mp-usps.php:106
 msgid "Express Mail International Flat Rate Boxes"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:122
+#: includes/common/shipping-modules/mp-usps.php:108
 msgid "Priority Mail International"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:125
+#: includes/common/shipping-modules/mp-usps.php:110
 msgid "Priority Mail International Large Flat Rate Boxes"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:128
+#: includes/common/shipping-modules/mp-usps.php:112
 msgid "Priority Mail International Medium Flat Rate Boxes"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:131
+#: includes/common/shipping-modules/mp-usps.php:114
 msgid "Priority Mail International Small Flat Rate Boxes"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:134
+#: includes/common/shipping-modules/mp-usps.php:116
 msgid "Priority Mail Express International Padded Flat Rate Envelope"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:134
+#: includes/common/shipping-modules/mp-usps.php:116
 msgid "(3-5 days)"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:137
+#: includes/common/shipping-modules/mp-usps.php:118
 msgid "First Class International Parcel"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:149
+#: includes/common/shipping-modules/mp-usps.php:130
 msgid "Flat Rate Small"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:154
+#: includes/common/shipping-modules/mp-usps.php:135
 msgid "Flat Rate Medium 1"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:159
+#: includes/common/shipping-modules/mp-usps.php:140
 msgid "Flat Rate Medium 2"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:164
+#: includes/common/shipping-modules/mp-usps.php:145
 msgid "Flat Rate Large"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:187
+#: includes/common/shipping-modules/mp-usps.php:168
 msgid ""
 "Using this USPS Shipping calculator requires requesting an Ecommerce API "
 "Username and Password. Get your free set of credentials <a "
@@ -7500,76 +7584,76 @@ msgid ""
 "credentials with USPS and go live."
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:208
+#: includes/common/shipping-modules/mp-usps.php:189
 msgid "Maximum Weight Per Package"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:212
+#: includes/common/shipping-modules/mp-usps.php:193
 msgid "Rates Request Type"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:214
+#: includes/common/shipping-modules/mp-usps.php:195
 msgid "Online Rates"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:215
+#: includes/common/shipping-modules/mp-usps.php:196
 msgid "Retail Rates"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:225
+#: includes/common/shipping-modules/mp-usps.php:206
 msgid "Offered Domestic Services"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:241
+#: includes/common/shipping-modules/mp-usps.php:222
 msgid "Offered International Services"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:283
+#: includes/common/shipping-modules/mp-usps.php:264
 msgid "USPS Settings"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:288
+#: includes/common/shipping-modules/mp-usps.php:270
 msgid "USPS Offered Domestic Services"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:299
-#: includes/common/shipping-modules/mp-usps.php:327
+#: includes/common/shipping-modules/mp-usps.php:282
+#: includes/common/shipping-modules/mp-usps.php:316
 msgid "@ Max"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:309
+#: includes/common/shipping-modules/mp-usps.php:294
 msgid "Handling Charge per Domestic Shipment "
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:316
+#: includes/common/shipping-modules/mp-usps.php:303
 msgid "USPS Offered International Services"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:337
+#: includes/common/shipping-modules/mp-usps.php:328
 msgid "Handling Charge per Interntional Shipment"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:348
+#: includes/common/shipping-modules/mp-usps.php:341
 msgid "Enter your standard box sizes as LengthxWidthxHeight"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:350
+#: includes/common/shipping-modules/mp-usps.php:343
 msgid "For each box defined enter the maximum weight it can contain."
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:351
+#: includes/common/shipping-modules/mp-usps.php:344
 msgid "Total weight selects the box size used for calculating Shipping costs."
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:361
+#: includes/common/shipping-modules/mp-usps.php:354
 msgid "Box Name"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:362
+#: includes/common/shipping-modules/mp-usps.php:356
 msgid "Box Dimensions"
 msgstr ""
 
-#: includes/common/shipping-modules/mp-usps.php:363
+#: includes/common/shipping-modules/mp-usps.php:358
 msgid "Max Weight per Box"
 msgstr ""
 
@@ -7657,7 +7741,7 @@ msgid "[mp_global_tag_cloud]"
 msgstr ""
 
 #: includes/common/template-functions.php:906
-#: includes/public/class-mp-checkout.php:1128
+#: includes/public/class-mp-checkout.php:1131
 msgid "Cart"
 msgstr ""
 
@@ -7673,34 +7757,34 @@ msgstr ""
 msgid "Please choose a shipping method"
 msgstr ""
 
-#: includes/common/template-functions.php:2062
+#: includes/common/template-functions.php:2067
 msgid "Look Up"
 msgstr ""
 
-#: includes/common/template-functions.php:2119
 #: includes/common/template-functions.php:2124
-#: includes/common/template-functions.php:2147
-#: includes/common/template-functions.php:2150
+#: includes/common/template-functions.php:2129
+#: includes/common/template-functions.php:2152
+#: includes/common/template-functions.php:2155
 msgid ""
 "Oops! We couldn't locate any orders matching that order number. Please "
 "verify the order number and try again."
 msgstr ""
 
-#: includes/common/template-functions.php:2445
+#: includes/common/template-functions.php:2450
 msgid "Categorized in "
 msgstr ""
 
-#: includes/common/template-functions.php:2466
+#: includes/common/template-functions.php:2471
 msgid "Tagged in "
 msgstr ""
 
-#: includes/common/template-functions.php:2657
-#: includes/multisite/template-functions.php:328
+#: includes/common/template-functions.php:2662
+#: includes/multisite/template-functions.php:336
 msgid "Prev"
 msgstr ""
 
-#: includes/common/template-functions.php:2658
-#: includes/multisite/template-functions.php:329
+#: includes/common/template-functions.php:2663
+#: includes/multisite/template-functions.php:337
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:97
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:114
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:143
@@ -7708,66 +7792,66 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: includes/common/template-functions.php:2714
+#: includes/common/template-functions.php:2719
 msgid "Show All"
 msgstr ""
 
-#: includes/common/template-functions.php:2737
-#: includes/multisite/template-functions.php:373
+#: includes/common/template-functions.php:2742
+#: includes/multisite/template-functions.php:381
 msgid "Default"
 msgstr ""
 
-#: includes/common/template-functions.php:2738
-#: includes/multisite/template-functions.php:374
+#: includes/common/template-functions.php:2743
+#: includes/multisite/template-functions.php:382
 msgid "Release Date (Latest to Oldest)"
 msgstr ""
 
-#: includes/common/template-functions.php:2739
-#: includes/multisite/template-functions.php:375
+#: includes/common/template-functions.php:2744
+#: includes/multisite/template-functions.php:383
 msgid "Release Date (Oldest to Latest)"
 msgstr ""
 
-#: includes/common/template-functions.php:2740
-#: includes/multisite/template-functions.php:376
+#: includes/common/template-functions.php:2745
+#: includes/multisite/template-functions.php:384
 msgid "Name (A-Z)"
 msgstr ""
 
-#: includes/common/template-functions.php:2741
-#: includes/multisite/template-functions.php:377
+#: includes/common/template-functions.php:2746
+#: includes/multisite/template-functions.php:385
 msgid "Name (Z-A)"
 msgstr ""
 
-#: includes/common/template-functions.php:2742
-#: includes/multisite/template-functions.php:378
+#: includes/common/template-functions.php:2747
+#: includes/multisite/template-functions.php:386
 msgid "Price (Low to High)"
 msgstr ""
 
-#: includes/common/template-functions.php:2743
-#: includes/multisite/template-functions.php:379
+#: includes/common/template-functions.php:2748
+#: includes/multisite/template-functions.php:387
 msgid "Price (High to Low)"
 msgstr ""
 
-#: includes/common/template-functions.php:2744
-#: includes/multisite/template-functions.php:380
+#: includes/common/template-functions.php:2749
+#: includes/multisite/template-functions.php:388
 msgid "Popularity (Most Popular - Least Popular)"
 msgstr ""
 
-#: includes/common/template-functions.php:2745
-#: includes/multisite/template-functions.php:381
+#: includes/common/template-functions.php:2750
+#: includes/multisite/template-functions.php:389
 msgid "Popularity (Least Popular - Most Popular)"
 msgstr ""
 
-#: includes/common/template-functions.php:2761
-#: includes/multisite/template-functions.php:423
+#: includes/common/template-functions.php:2766
+#: includes/multisite/template-functions.php:431
 msgid "Product Category"
 msgstr ""
 
-#: includes/common/template-functions.php:2767
-#: includes/multisite/template-functions.php:422
+#: includes/common/template-functions.php:2772
+#: includes/multisite/template-functions.php:430
 msgid "Order By"
 msgstr ""
 
-#: includes/common/template-functions.php:3013
+#: includes/common/template-functions.php:3018
 msgid "Uncategorized"
 msgstr ""
 
@@ -7978,51 +8062,51 @@ msgstr ""
 msgid "Next Step &raquo;"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:888
+#: includes/public/class-mp-checkout.php:891
 msgid "Oops! An error occurred while processing your payment."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:925
+#: includes/public/class-mp-checkout.php:928
 msgid "Payment"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:949
+#: includes/public/class-mp-checkout.php:952
 msgid "There are no available gateways to process this payment."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:997
+#: includes/public/class-mp-checkout.php:1000
 msgid "Shipping address different than billing?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1071
+#: includes/public/class-mp-checkout.php:1074
 msgid "Have an account?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1072
+#: includes/public/class-mp-checkout.php:1075
 msgid "Sign in to speed up the checkout process."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1074
+#: includes/public/class-mp-checkout.php:1077
 msgid "E-Mail Address/Username"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1081
+#: includes/public/class-mp-checkout.php:1084
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/dropbox/index.php:209
 #: xampphtdocssnapshotwp-contentpluginssnapshot/lib/destinations/ftp/index.php:181
 msgid "Login"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1086
+#: includes/public/class-mp-checkout.php:1089
 msgid "First-time customer?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1087
+#: includes/public/class-mp-checkout.php:1090
 msgid ""
 "Proceed to checkout and you'll have an opportunity to create an account at "
 "the end."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1088
+#: includes/public/class-mp-checkout.php:1091
 msgid "Continue as Guest"
 msgstr ""
 
@@ -8087,15 +8171,15 @@ msgid ""
 "contact us for help."
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:366
+#: includes/public/class-mp-short-codes.php:367
 msgid "product_id must be defined"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:569
+#: includes/public/class-mp-short-codes.php:570
 msgid "Unlimited stock"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:572
+#: includes/public/class-mp-short-codes.php:573
 msgid "Only %s left in stock..."
 msgstr ""
 
@@ -8641,33 +8725,33 @@ msgstr[1] ""
 msgid "Add a Product"
 msgstr ""
 
-#: marketpress.php:519
+#: marketpress.php:521
 msgid "Your pages were created successfully."
 msgstr ""
 
-#: marketpress.php:529
+#: marketpress.php:531
 msgid ""
 "<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin "
 "automatically."
 msgstr ""
 
-#: marketpress.php:533
+#: marketpress.php:535
 msgid "Install %s Pages"
 msgstr ""
 
-#: marketpress.php:549
+#: marketpress.php:551
 msgid "Offer and accept coupon codes"
 msgstr ""
 
-#: marketpress.php:557
+#: marketpress.php:559
 msgid "Pro Sites"
 msgstr ""
 
-#: marketpress.php:558
+#: marketpress.php:560
 msgid "Grant access to themes and gateways depending on the user's Pro Site level"
 msgstr ""
 
-#: marketpress.php:565
+#: marketpress.php:573
 msgid "Invoice PDF"
 msgstr ""
 
