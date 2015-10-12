@@ -32,10 +32,12 @@
             }
         } )
             .done( function( resp ) {
-                $.each( resp.data.products, function( key, val ) {
-                    var $item = $( '#mp-cart-item-' + key );
-                    $item.replaceWith( val );
-                } );
+				if( resp.data.products ) {
+					$.each( resp.data.products, function( key, val ) {
+						var $item = $( '#mp-cart-item-' + key );
+						$item.replaceWith( val );
+					} );
+				}
                 marketpress.loadingOverlay( 'hide' );
                 marketpress.ajaxEvent( 'mp_cart/apply_coupon', resp, $couponForm );
             } );
