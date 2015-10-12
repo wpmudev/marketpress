@@ -71,6 +71,10 @@ class MP_Orders_Admin {
 			&$this,
 			'export_order_form'
 		) );
+		//Add custom fields to orders search
+		add_filter( 'posts_join', array( &$this, 'orders_search_join' ) );
+		add_filter( 'posts_where', array( &$this, 'orders_search_where' ) );
+		add_filter( 'posts_groupby', array( &$this, 'orders_search_groupby' ) );
 	}
 
 	/**
@@ -420,7 +424,7 @@ class MP_Orders_Admin {
 		wp_nonce_field( 'mp_save_order_notes', 'mp_save_order_notes_nonce' );
 		?>
 		<textarea class="widefat" name="mp[order_notes]"
-		          rows="5"><?php echo $order->get_meta( 'mp_order_notes', '' ); ?></textarea>
+				  rows="5"><?php echo $order->get_meta( 'mp_order_notes', '' ); ?></textarea>
 		<?php
 	}
 
@@ -469,7 +473,7 @@ class MP_Orders_Admin {
 				<option value=""><?php _e( 'Select One', 'mp' ); ?></option>
 				<?php foreach ( $carriers as $val => $label ) : ?>
 					<option data-original="<?php echo isset( $custom_carriers[ $val ] ) ? 1 : 0 ?>"
-					        value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
+							value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
 				<?php endforeach; ?>
 			</select>
 			<a class="mp-hide mp-remove-custom-carrier" href="#"><?php _e( "Remove", "mp" ) ?></a>
@@ -478,13 +482,13 @@ class MP_Orders_Admin {
 			<div class="mp-order-custom-shipping-method mp-hide">
 				<strong><?php _e( 'Method', 'mp' ); ?>:</strong><br/>
 				<input type="text" name="mp[tracking_info][custom_method]"
-				       placeholder="<?php _e( 'Method Name', 'mp' ); ?>" value="" style="width:100%"/>
+					   placeholder="<?php _e( 'Method Name', 'mp' ); ?>" value="" style="width:100%"/>
 				<br/>
 			</div>
 			<strong><?php _e( 'Tracking Number', 'mp' ); ?>:</strong><br/>
 			<input type="text" name="mp[tracking_info][tracking_num]"
-			       placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"
-			       value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%"/>
+				   placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"
+				   value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%"/>
 		</div>
 		<?php
 	}
@@ -579,9 +583,9 @@ class MP_Orders_Admin {
 								<!-- end mp_cart_item_content -->
 								<div class="mp_cart_item_content mp_cart_item_content-price"><!-- MP Product Price -->
 									<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope=""
-									     itemprop="offers">
+										 itemprop="offers">
 									<span class="mp_product_price-normal"
-									      itemprop="price"><?php echo mp_format_currency( '', $item['price'] ) ?></span>
+										  itemprop="price"><?php echo mp_format_currency( '', $item['price'] ) ?></span>
 									</div>
 									<!-- end mp_product_price -->
 								</div>
@@ -1015,7 +1019,7 @@ class MP_Orders_Admin {
 				$html .= '
 					<div style="display:none">
 						<div id="mp-customer-info-lb-' . $order->ID . '" class="mp-customer-info-lb" style="padding:10px 30px 30px;">' .
-				         $order->get_addresses() . '
+						 $order->get_addresses() . '
 						</div>
 					</div>';
 				break;
@@ -1086,6 +1090,65 @@ class MP_Orders_Admin {
 		echo $html;
 	}
 
+	/**
+	 * Modify the join of the search query in admin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $pagenow, $wpdb
+	 *
+	 * @param string $join the join of the current querry
+	 */
+	public function orders_search_join ( $join ){
+		global $pagenow, $wpdb;
+
+		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+			$join .= " LEFT JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id ";
+		}
+
+		return $join;
+	}
+
+	/**
+	 * Modify the where of the search query in admin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $pagenow, $wpdb
+	 *
+	 * @param string $where the where of the current querry
+	 */
+	public function orders_search_where( $where ){
+		global $pagenow, $wpdb;
+
+		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+			$where = preg_replace(
+				"/\(\s*{$wpdb->posts}.post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
+				"({$wpdb->posts}.post_title LIKE $1) OR ({$wpdb->postmeta}.meta_value LIKE $1)", $where
+			);
+		}
+
+		return $where;
+	}
+
+	/**
+	 * Modify the groupby of the search query in admin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $pagenow, $wpdb
+	 *
+	 * @param string $groupby the groupby of the current querry
+	 */
+	public function orders_search_groupby( $groupby ){
+		global $pagenow, $wpdb;
+
+		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+			$groupby = "{$wpdb->posts}.ID";
+		}
+
+		return $groupby;
+	}
 }
 
 MP_Orders_Admin::get_instance();

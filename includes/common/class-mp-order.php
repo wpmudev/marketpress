@@ -623,9 +623,14 @@ class MP_Order {
 			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
-
+			
+			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
+			
 			// Country dropdown
-			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
+			if( ! is_array( $allowed_countries ) ) {
+				$allowed_countries = explode( ',', $allowed_countries );
+			}
+			
 			$country_options   = '';
 
 			if ( mp_all_countries_allowed() ) {
@@ -1019,10 +1024,10 @@ class MP_Order {
 		$this->_get_post();
 
 		$items = $cart->get_items_as_objects();
-		foreach ( $items as &$item ) {
+		foreach ( $items as &$_item ) {
 			/* make sure price is saved to product object so when retrieved later the
 			  correct price is returned */
-			$item->get_price();
+			$_item->get_price();
 		}
 
 		// Save cart info
@@ -1268,7 +1273,7 @@ class MP_Order {
 	public function tracking_url( $echo = true ) {
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
 
-		if ( did_action( 'mp_order/new_order' ) ) {
+		if ( ! empty( $this->_post ) && property_exists( $this->_post, 'post_author' ) && empty( $this->_post->post_author ) ) {
 			// Show create-account lightbox after checking out
 			$url .= '#mp-create-account-lightbox';
 		}

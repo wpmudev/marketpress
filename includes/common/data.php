@@ -33,6 +33,7 @@ $this->default_settings = array(
 		'tax_shipping'			 => 1,
 		'tax_inclusive'			 => 0,
 		'include_tax'			 => 1,
+		'tax_label'				 => 1,
 		'tax_digital'			 => 1,
 		'downloadable_address'	 => 0
 	),
