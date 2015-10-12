@@ -773,7 +773,7 @@ if ( ! function_exists( 'mp_buy_button' ) ) :
 			return;
 		}
 		
-		$button  = $product->buy_button( false, $context, array(), true );
+		$button  = $product->buy_button( false, $context, array(), true, true );
 
 		if ( $echo ) {
 			echo $button;
