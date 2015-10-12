@@ -480,6 +480,206 @@ class MP_Coupon {
 
 		return false;
 	}
+	
+	/**
+	 * Check if coupon exist
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_exist() {
+		if ( ! $this->exists() ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if coupon is active
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_active() {
+		if ( $this->get_meta( 'status', 0 ) != 'active' ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if coupon min amount is met
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_min_amount() {
+		$total = mp_cart()->total();
+		if ( ! empty ( $this->get_meta( 'min_amount', '' ) ) && $total < $this->get_meta( 'min_amount', 0 ) ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if coupon max amount is met
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_max_amount() {
+		$total = mp_cart()->total();
+		if ( ! empty ( $this->get_meta( 'max_amount', '' ) ) && $total > $this->get_meta( 'max_amount', 0 ) ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if coupon allow special products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_exclude_specials() {
+		if ( $this->get_meta( 'exclude_specials', false ) && $this->cart_product_on_sale() == true ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check for coupon max uses
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_remaining_uses() {
+		if ( $this->remaining_uses( false, true ) == 0 ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if start date is met
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_startDate() {
+		$now      = time();
+		if ( $now < strtotime( $this->get_meta( 'start_date', 0, false ) ) ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if start date is met
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_endDate() {
+		$now      = time();
+		if ( $this->get_meta( 'has_end_date' ) && ( $now > strtotime( $this->get_meta( 'end_date', 0, false ) ) ) ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if applicable products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_products() {
+		if ( array() == $this->get_products( true ) ) {
+			return false;
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if valid user
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_valid_user() {
+		if ( $this->get_meta( 'applies_to' ) == 'user' ) {
+			$user = $this->get_meta( 'user' );
+
+			if ( !in_array( get_current_user_id(), $user ) ) {
+				return false;
+			}
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if coupon can be combined
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_combined() {
+		if ( ! $this->get_meta( 'can_be_combined' ) ) {
+			$applied = mp_coupons_addon()->get_applied();
+
+			if ( count( $applied ) == 1 ) {
+				return false;
+			}
+		}
+		
+		return true;
+	} 
+	
+	/**
+	 * Check if coupon user max uses
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	 
+	public function is_coupon_user_uses() {
+		return true;
+	} 
 
 	/**
 	 * Check if coupon is valid
@@ -489,50 +689,24 @@ class MP_Coupon {
 	 * @return bool
 	 */
 	public function is_valid( $action = '' ) {
-		$now      = time();
-		$is_valid = true;
-		$total = mp_cart()->total();
-		
-		if ( ! $this->exists() ) {
-			$is_valid = false;
-		} elseif ( $this->get_meta( 'status', 0 ) != 'active' ) {
-			$is_valid = false;
-		} elseif ( ! empty ( $this->get_meta( 'min_amount', '' ) ) && $total < $this->get_meta( 'min_amount', 0 ) ) {
-			$is_valid = false;
-		} elseif ( ! empty ( $this->get_meta( 'max_amount', '' ) ) && $total > $this->get_meta( 'max_amount', 0 ) ) {
-			$is_valid = false;	
-		} elseif ( $this->get_meta( 'exclude_specials', false ) && $this->cart_product_on_sale() == true ) {
-			$is_valid = false;
-		} elseif ( $this->remaining_uses( false, true ) == 0 ) {
-			$is_valid = false;
-		} elseif ( $now < strtotime( $this->get_meta( 'start_date', 0, false ) ) ) {
-			$is_valid = false;
-		} elseif ( $this->get_meta( 'has_end_date' ) && ( $now > strtotime( $this->get_meta( 'end_date', 0, false ) ) ) ) {
-			$is_valid = false;
-		} elseif ( array() == $this->get_products( true ) ) {
-			$is_valid = false;
+		if( $this->is_coupon_exist() &&
+			$this->is_coupon_active() &&
+			$this->is_coupon_min_amount() &&
+			$this->is_coupon_max_amount() &&
+			$this->is_coupon_exclude_specials() &&
+			$this->is_coupon_remaining_uses() &&
+			$this->is_coupon_startDate() &&
+			$this->is_coupon_endDate() &&
+			$this->is_coupon_products() &&
+			$this->is_coupon_valid_user() &&
+			$this->is_coupon_valid_user() &&
+			$this->is_coupon_combined() &&
+			$this->is_coupon_user_uses() ) 
+		{
+			$is_valid = true;	
 		} else {
-			if( $action != 'remove_item' ) {
-				if ( $this->get_meta( 'applies_to' ) == 'user' ) {
-					$user = $this->get_meta( 'user' );
-
-					if ( !in_array( get_current_user_id(), $user ) ) {
-						$is_valid = false;
-					}
-				}
-
-				if ( ! $this->get_meta( 'can_be_combined' ) ) {
-					$applied = mp_coupons_addon()->get_applied();
-
-					if ( count( $applied ) == 1 ) {
-						$is_valid = false;
-					}
-				} else {
-					//! TODO: coupon can be applied with other coupons
-				}
-			}
+			$is_valid = false;
 		}
-
 		/**
 		 * Filter is coupon is valid
 		 *
