@@ -341,7 +341,7 @@ class MP_Public {
 		//Display styles for all pages
 		
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
-		wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
@@ -378,7 +378,7 @@ class MP_Public {
 		*/
 // JS
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
-		wp_register_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
+		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array(
 			'jquery-ui-tooltip',
