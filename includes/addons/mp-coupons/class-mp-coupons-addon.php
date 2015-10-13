@@ -398,7 +398,7 @@ class MP_Coupons_Addon {
 			$total_pre = $tax_amount;
 		}
 
-		return $tax_amount;
+		return $total_pre;
 	}
 
 	/**
@@ -795,13 +795,28 @@ class MP_Coupons_Addon {
 		$actions->add_field( 'radio_group', array(
 			'name'          => 'apply_type',
 			'label'         => array( 'text' => __( 'Apply to?', 'mp' ) ),
-			'default_value' => 'item',
+			'default_value' => 'order',
 			'options'       => array(
 				//'item'     => __( 'Apply to each applicable item and quantity ordered', 'mp' ),
 				//'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
-				'order'		 => __( 'Order (with shipping)', 'mp' ),
-				'cart'		 => __( 'Cart (without shipping)', 'mp' ),
-				'products'		 => __( 'Applicable products', 'mp' ),
+				'order'		 => __( 'Order', 'mp' ),
+				'products'	 => __( 'Applicable products', 'mp' ),
+			),
+		) );
+		$actions->add_field( 'radio_group', array(
+			'name'          => 'apply_type_product',
+			'label'         => array( 'text' => __( 'Applicable products limit?', 'mp' ) ),
+			'default_value' => 'any',
+			'options'       => array(
+				//'item'     => __( 'Apply to each applicable item and quantity ordered', 'mp' ),
+				//'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
+				'any'	 => __( 'Any Quantity', 'mp' ),
+				'once'		 => __( 'Once', 'mp' ),
+			),
+			'conditional' => array(
+				'name'   => 'apply_type',
+				'value'  => 'products',
+				'action' => 'show',
 			),
 		) );
 		$actions->add_field( 'checkbox', array(
