@@ -552,6 +552,23 @@ class MP_Installer {
 			$result = $wpdb->query( "ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`" );
 		}
 	}
+	
+	/**
+	 * Add post_status column to $wpdb->mp_products table
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 */
+	public function add_post_status_column() {
+		global $wpdb;
+
+		$result = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->base_prefix}mp_products LIKE 'post_status'" );
+
+		if ( $result == 0 ) {
+			$result = $wpdb->query( "ALTER TABLE {$wpdb->base_prefix}mp_products ADD `post_status` varchar(20) NOT NULL DEFAULT 'publish' AFTER `post_permalink`" );
+		}
+	}
 
 	/**
 	 * Display the db update page
@@ -654,7 +671,10 @@ class MP_Installer {
 		$old_version   = get_option( 'mp_version' );
 		$force_upgrade = mp_get_get_value( 'force_upgrade', 0 );
 		$force_version = mp_get_get_value( 'force_version', false );
-
+		
+		// Add "post_status" to $wpdb->mp_products table
+		$this->add_post_status_column();
+		
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
 			return;
 		}
