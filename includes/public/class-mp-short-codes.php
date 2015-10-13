@@ -96,7 +96,7 @@ class MP_Short_Codes {
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
-		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'select2' ), MP_VERSION, true );
+		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'mp-select2' ), MP_VERSION, true );
 
 // Get product category links
 		$terms	 = get_terms( 'product_category' );

@@ -384,7 +384,7 @@ class MP_Public {
 			'jquery-ui-tooltip',
 			'colorbox',
 			'hover-intent',
-			'select2'
+			'mp-select2'
 		), MP_VERSION );
 
 // Get product category links
