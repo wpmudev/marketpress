@@ -99,8 +99,9 @@ class MP_Coupons_Addon {
 			add_action( 'mp_cart/after_remove_item', array( &$this, 'check_items_in_cart' ), 10 );
 			add_action( 'mp_order/new_order', array( &$this, 'process_new_order' ), 10, 1 );
 			add_action( 'mp_cart/before_remove_item', array( &$this, 'check_coupons' ), 10, 2 );
-
-			add_filter( 'mp_coupon_total_value', array( &$this, 'max_discount' ), 10, 1 );
+			
+			//This filter is returning wrong total coupon value
+			//add_filter( 'mp_coupon_total_value', array( &$this, 'max_discount' ), 10, 1 );
 		}
 
 		if ( is_admin() ) {
@@ -313,14 +314,14 @@ class MP_Coupons_Addon {
 		$html .= '
 			<div class="mp_cart_resume_item mp_cart_resume_item-coupons">
 				<span class="mp_cart_resume_item_label">' . __( 'Coupon Discounts', 'mp' ) . '</span>
-				<span class="mp_cart_resume_item_amount mp_cart_resume_item_amount-total">-' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
+				<span class="mp_cart_resume_item_amount mp_cart_resume_item_amount-total">' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
 				<ul class="mp_cart_resume_coupons_list">';
 
 		foreach ( $coupons as $coupon ) {
 			$html .= '
 					<li class="mp_cart_coupon">
 						<span class="mp_cart_resume_item_label">' . $coupon->post_title . ( ( $cart->is_editable ) ? ' <a class="mp_cart_coupon_remove_item" href="javascript:mp_coupons.remove(' . $coupon->ID . ', ' . $cart->get_blog_id() . ');">(' . __( 'Remove', 'mp' ) . ')</a>' : '' ) . '</span>
-						<span class="mp_cart_resume_item_amount">-' . $coupon->discount_amt( false ) . '</span>
+						<span class="mp_cart_resume_item_amount">' . $coupon->discount_amt( false ) . '</span>
 					</li><!-- end mp_cart_coupon -->';
 		}
 
