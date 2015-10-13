@@ -323,7 +323,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
-			'desc' => sprintf( __( '<ol><li>Set the "Return Method" within <a target="_blank" href="https://www.2checkout.com/sandbox/acct/detail_company_info">Site Management</a> to <strong>Header Redirect</strong> and set the "Return URL" to <strong>%s</strong></li><li>Set your <a target="https://www.2checkout.com/sandbox/notifications/">notifications url</a> to <strong>%s</strong></li></ol>', 'mp' ), $this->return_url, $this->ipn_url ),
+			'desc' => sprintf( __( '<ol><li>Set the "Return Method" within <a target="_blank" href="https://sandbox.2checkout.com/sandbox/acct/detail_company_info">Site Management</a> to <strong>Header Redirect</strong> and set the "Return URL" to <strong>%s</strong></li><li>Set your <a target="https://www.2checkout.com/sandbox/notifications/">notifications url</a> to <strong>%s</strong></li></ol>', 'mp' ), $this->return_url, $this->ipn_url ),
 			'conditional' => array(
 				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
 				'value' => 1,

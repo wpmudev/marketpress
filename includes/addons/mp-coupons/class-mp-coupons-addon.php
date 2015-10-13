@@ -1025,15 +1025,18 @@ class MP_Coupons_Addon {
 	 * @return array
 	 */
 	public function product_price( $price, $product ) {
+		$action = mp_get_request_value( 'action' );
+
 		if (
 			mp_is_shop_page( 'cart' ) ||
 			mp_is_shop_page( 'checkout' ) ||
 			! empty( $_POST['is_cart_page'] ) || 
-			( ! empty( $_GET['action'] ) && ( 
-				$_GET['action'] === 'mp_process_checkout' || 
-				$_GET['action'] === 'mp_update_checkout_data' || 
-				$_GET['action'] === 'mp_coupons_apply' || 
-				$_GET['action'] === 'mp_coupons_remove'
+			( ! empty( $action ) && (
+				strpos( $action, 'mp_process_checkout_return_') !== false ||
+				$action === 'mp_process_checkout' || 
+				$action === 'mp_update_checkout_data' || 
+				$action === 'mp_coupons_apply' || 
+				$action === 'mp_coupons_remove'
 			) )
 		) {
 			$coupons = $this->get_applied_as_objects();
