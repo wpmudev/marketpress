@@ -562,11 +562,15 @@ class MP_Installer {
 	 */
 	public function add_post_status_column() {
 		global $wpdb;
+		
+		$table_product = $wpdb->base_prefix . 'mp_products';
 
-		$result = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->base_prefix}mp_products LIKE 'post_status'" );
+		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_product ) ) == $table_product ) {
+			$result = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->base_prefix}mp_products LIKE 'post_status'" );
 
-		if ( $result == 0 ) {
-			$result = $wpdb->query( "ALTER TABLE {$wpdb->base_prefix}mp_products ADD `post_status` varchar(20) NOT NULL DEFAULT 'publish' AFTER `post_permalink`" );
+			if ( $result == 0 ) {
+				$result = $wpdb->query( "ALTER TABLE {$wpdb->base_prefix}mp_products ADD `post_status` varchar(20) NOT NULL DEFAULT 'publish' AFTER `post_permalink`" );
+			}
 		}
 	}
 
