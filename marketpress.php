@@ -416,7 +416,7 @@ class Marketpress {
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-tag-cloud.php' ) );
 
 		//Multisite Widgets
-		if( is_multisite() ) {
+		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
 			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
 			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
 			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-categories.php' ) );
