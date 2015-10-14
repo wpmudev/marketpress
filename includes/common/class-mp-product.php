@@ -866,9 +866,10 @@ class MP_Product {
 			return $price;
 		}
 
+		$charge_tax = $this->get_meta( 'charge_tax' );
 		$rate = $this->get_meta( 'special_tax_rate' );
 
-		if ( empty( $rate ) ) {
+		if ( empty( $charge_tax ) ) {
 			$rate = mp_tax_rate();
 		} else {
 			if ( false !== strpos( $rate, '%' ) ) {
