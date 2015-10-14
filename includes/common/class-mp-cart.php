@@ -579,7 +579,27 @@ class MP_Cart {
 
 		return apply_filters( 'mp_cart/get_line_item', $html, $product, $this );
 	}
-
+	
+	/**
+	 * Check if all digital products to hide shipping estimate
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 */
+	
+	public function only_digital() {
+		$products = $this->get_items_as_objects();
+		
+		foreach ( $products as $product ) {
+			if( ! $product->is_download() ) {
+				return false;
+			}
+		}
+	
+		return true;
+	}
+	
 	/**
 	 * Display cart meta html
 	 *
@@ -640,13 +660,18 @@ class MP_Cart {
 		 * @param MP_Cart The current cart object.
 		 */
 		$html .= apply_filters( 'mp_cart/cart_meta/product_total', $line, $this );
+		
+		$shipping_line = '';
+		
+		if( ! $this->only_digital() && $this->is_shipping_total() ) {
 
-		$line = '
+			$shipping_line .= '
 				<div class="mp_cart_resume_item mp_cart_resume_item-shipping-total">
 					<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping' ) ) . '</span>
 					<span class="mp_cart_resume_item_amount">' . $this->shipping_total( true ) . '</span>
 				</div><!-- end mp_cart_resume_item-shipping-total -->';
-
+		}
+		
 		/**
 		 * Filter the shipping total html
 		 *
@@ -655,7 +680,7 @@ class MP_Cart {
 		 * @param string The current shipping total html.
 		 * @param MP_Cart The current cart object.
 		 */
-		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $line, $this );
+		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $shipping_line, $this );
 
 		if ( 0 < $this->tax_total( false, true ) ) {
 			$line = '
@@ -1725,6 +1750,22 @@ class MP_Cart {
 		$shipping_tax = (float) apply_filters( 'mp_cart/shipping_tax_amt', $shipping_tax, $shipping_price, $this );
 
 		return ( $format ) ? mp_format_currency( '', $shipping_tax ) : $shipping_tax;
+	}
+	
+	/**
+	 * Check if shipping price
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return bool
+	 */
+	
+	public function is_shipping_total() {
+		if( empty( $this->shipping_total() ) || $this->shipping_total() ==  '&mdash;' ) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
