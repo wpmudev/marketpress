@@ -158,6 +158,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		foreach ( $types as $type => $label ) {
 			$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
 			$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
+			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->company_name" ) . "<br />\n";
 			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address1" ) . "<br />\n";
 
 			if ( $order->get_meta( "mp_{$type}_info->address2" ) ) {

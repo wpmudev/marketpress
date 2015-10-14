@@ -298,7 +298,6 @@ class MP_Order {
 		$msg .= __( 'ORDERINFOSKU<br /><br />', 'mp' );
 		$msg .= __( 'SHIPPINGINFO<br /><br />', 'mp' );
 		$msg .= __( 'PAYMENTINFO<br /><br />', 'mp' );
-		$msg .= __( 'You can manage this order here: %s', 'mp' );
 
 		$subject = mp_filter_email( $this, $subject );
 
@@ -660,6 +659,10 @@ class MP_Order {
 					<tr>
 						<th scope="row">' . __( 'Last Name', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[last_name]" value="' . $this->get_meta( "mp_{$type}_info->last_name", '' ) . '" /></td>
+					</tr>
+					<tr>
+						<th scope="row">' . __( 'Company', 'mp' ) . '</th>
+						<td><input type="text" name="' . $prefix . '[company_name]" value="' . $this->get_meta( "mp_{$type}_info->company_name", '' ) . '" /></td>
 					</tr>
 					<tr>
 						<th scope="row">' . __( 'Address 1', 'mp' ) . '</th>

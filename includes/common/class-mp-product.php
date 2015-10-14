@@ -366,7 +366,7 @@ class MP_Product {
 		$all_atts = $product->get_attributes();
 
 		foreach ( $_POST as $key => $val ) {
-			if ( false !== strpos( $key, $product_atts::SLUGBASE ) && ! empty( $val ) ) {
+			if ( false !== strpos( $key, MP_Product_Attributes::SLUGBASE ) && ! empty( $val ) ) {
 				$taxonomies[]       = $key;
 				$attributes[ $key ] = $val;
 			}
@@ -1258,6 +1258,8 @@ class MP_Product {
 			} else {
 				$string = '<span class="inclusve_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
 			}
+		} elseif( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+			$string = '<span class="exclusive_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
 		}
 		
 		if ( $echo ) {
@@ -2145,7 +2147,7 @@ class MP_Product {
 			FROM {$wpdb->term_relationships} AS t1
 			INNER JOIN {$wpdb->term_taxonomy} AS t2 ON t1.term_taxonomy_id = t2.term_taxonomy_id
 			WHERE t1.object_id IN (" . implode( ',', $ids ) . ")
-			AND t2.taxonomy LIKE '" . $mp_product_atts::SLUGBASE . "%'"
+			AND t2.taxonomy LIKE '" . MP_Product_Attributes::SLUGBASE . "%'"
 		);
 
 		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';

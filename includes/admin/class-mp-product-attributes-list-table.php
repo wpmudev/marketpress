@@ -43,7 +43,7 @@ class MP_Product_Attributes_List_Table extends WP_List_Table {
 			$data[] = array(
 				'ID' => $att->attribute_id,
 				'name' => $att->attribute_name,
-				'slug' => $mp_product_atts::SLUGBASE . $att->attribute_id,
+				'slug' => MP_Product_Attributes::SLUGBASE . $att->attribute_id,
 			);
 		}
 		
