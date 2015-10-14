@@ -1257,6 +1257,8 @@ class MP_Product {
 			} else {
 				$string = '<span class="inclusve_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
 			}
+		} elseif( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+			$string = '<span class="exclusive_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
 		}
 		
 		if ( $echo ) {
