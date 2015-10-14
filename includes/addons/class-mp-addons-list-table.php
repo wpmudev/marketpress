@@ -50,6 +50,10 @@ class MP_Addons_List_Table extends WP_List_Table {
 
 			$status = apply_filters( 'mp_addon_status_column_data', $status, $addon );
 
+			if ( $addon->class == 'MP_Prosites_Addon' ) {
+				continue;
+			}
+
 			$data[] = array(
 				'ID' => $addon->class,
 				'label' => $addon->label,

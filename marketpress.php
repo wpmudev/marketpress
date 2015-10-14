@@ -562,7 +562,11 @@ class Marketpress {
 				'path'  => mp_plugin_dir( 'includes/addons/mp-prosites/class-mp-prosites-addon.php' ),
 			) );
 			//auto assign
-			if ( mp_addons()->is_addon_enabled( 'MP_Prosites_Addon' ) == false ) {
+			if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+				require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+			}
+
+			if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_addons()->is_addon_enabled( 'MP_Prosites_Addon' ) == false ) {
 				$enabled   = mp_get_setting( 'addons', array() );
 				$enabled[] = 'MP_Prosites_Addon';
 				mp_addons()->enable( $enabled );
