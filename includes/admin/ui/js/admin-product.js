@@ -572,20 +572,11 @@ jQuery( document ).ready( function( $ ) {
         } );
         if ( $( '.check-column-box' ).length == 0 ) {
             save_inline_post_data( $( '[name="post_ID"]' ).val( ), 'delete_variations', '', '' );
-			/*
-			 * Preventing bulk variations from delete
-			 *
-            if ( $( '#original_publish' ).val( ) == 'Publish' ) {
-				$( '#publish' ).removeAttr( 'dasabled' );
-                $( '#publish' ).click( );
-            }
-            if ( $( '#original_publish' ).val( ) == 'Update' ) {
-                $( '#save-post' ).removeAttr( 'dasabled' );
-                $( '#save-post' ).click( );
-            }
-			*/
+			setInterval(function(){ 
+				$( '#publish' ).removeAttr( 'disabled' );
+				$( '#publish' ).click( );
+			}, 500);
         }
-
         return false;
        
     } )
