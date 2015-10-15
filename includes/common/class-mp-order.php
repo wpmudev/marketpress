@@ -294,7 +294,7 @@ class MP_Order {
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg .= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
+		$msg = __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
 		$msg .= __( 'ORDERINFOSKU<br /><br />', 'mp' );
 		$msg .= __( 'SHIPPINGINFO<br /><br />', 'mp' );
 		$msg .= __( 'PAYMENTINFO<br /><br />', 'mp' );
@@ -613,6 +613,7 @@ class MP_Order {
 		if ( ! $editable ) {
 			$html = '' .
 			        $this->get_name( $type ) . '<br />' .
+					( ( $company_name = $this->get_meta( "mp_{$type}_info->company_name", '' ) ) ? $company_name . '<br />' : '' ) .
 			        $this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
 			        ( ( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
 			        ( ( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .

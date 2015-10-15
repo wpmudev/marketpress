@@ -409,14 +409,25 @@ class Marketpress {
 	}
 
 	function load_widgets() {
-
+		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+		}
+		if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
+			function mp_get_plugin_slug() {
+				if ( MP_LITE ) {
+					return 'wordpress-ecommerce/marketpress.php';
+				} else {
+					return 'marketpress/marketpress.php';
+				}
+			}
+		}
 		require_once( $this->plugin_dir( 'includes/admin/widgets/cart.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/categories.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-tag-cloud.php' ) );
 
 		//Multisite Widgets
-		if ( is_multisite() ) {
+		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
 			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
 			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
 			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-categories.php' ) );
