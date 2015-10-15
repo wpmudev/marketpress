@@ -115,6 +115,10 @@ $this->default_settings = array(
 	),
 	'store_email'				 => get_option( "admin_email" ),
 	'email'						 => array(
+		'admin_order'	 => array(
+			'subject'	 => __( 'New Order Notification: ORDERID', 'mp' ),
+			'text'	 	 => __( 'A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n', 'mp' ),
+		),
 		'new_order'		 => array(
 			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
 			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us. \n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO \n\n Shipping Information: \n SHIPPINGINFO \n\n Payment Information: \n PAYMENTINFO \n\n ORDERNOTES \n\n You can track the latest status of your order here: TRACKINGURL \n\n Thanks again!", 'mp'

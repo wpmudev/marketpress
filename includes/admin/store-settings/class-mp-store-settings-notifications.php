@@ -42,9 +42,9 @@ class MP_Store_Settings_Notifications {
 	 */
 	public function init_metaboxes() {
 		$metabox = new WPMUDEV_Metabox(array(
-			'id' => 'mp-settings-notifications',
+			'id' => 'mp-admin-settings-notifications',
 			'page_slugs' => array('store-settings-notifications', 'store-settings_page_store-settings-notifications'),
-			'title' => __('Notification Settings', 'mp'),
+			'title' => __('Admin Notification Settings', 'mp'),
 			'option_name' => 'mp_settings',
 		));
 		$metabox->add_field('text', array(
@@ -54,7 +54,40 @@ class MP_Store_Settings_Notifications {
 				'email' => 1,
 			),
 		));
+		
 		$new_order = $metabox->add_field('complex', array(
+			'name' => 'email[admin_order]',
+			'label' => array('text' => __('New Order', 'mp')),
+			'layout' => 'rows',
+		));
+		
+		if ( $new_order instanceof WPMUDEV_Field ) {
+			$new_order->add_field('text', array(
+				'name' => 'subject',
+				'label' => array('text' => __('Subject', 'mp')),
+				'validation' => array(
+					'required' => true,
+				),
+				'default_value' => __( 'New Order Notification: ORDERID', 'mp' )
+			));
+			$new_order->add_field('textarea', array(
+				'name' => 'text',
+				'label' => array('text' => __('Text', 'mp')),
+				'custom' => array('rows' => 15),
+				'validation' => array(
+					'required' => true,
+				),
+				'default_value' => __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ),
+			));
+		}
+		
+		$customer_metabox = new WPMUDEV_Metabox(array(
+			'id' => 'mp-customer-settings-notifications',
+			'page_slugs' => array('store-settings-notifications', 'store-settings_page_store-settings-notifications'),
+			'title' => __('Customer Notification Settings', 'mp'),
+			'option_name' => 'mp_settings',
+		));
+		$new_order = $customer_metabox->add_field('complex', array(
 			'name' => 'email[new_order]',
 			'label' => array('text' => __('New Order', 'mp')),
 			'layout' => 'rows',
@@ -78,7 +111,7 @@ class MP_Store_Settings_Notifications {
 			));
 		}
 		
-		$order_shipped = $metabox->add_field('complex', array(
+		$order_shipped = $customer_metabox->add_field('complex', array(
 			'name' => 'email[order_shipped]',
 			'label' => array('text' => __('Order Shipped', 'mp')),
 			'layout' => 'rows',
