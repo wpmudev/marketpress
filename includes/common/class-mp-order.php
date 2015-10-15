@@ -514,8 +514,7 @@ class MP_Order {
 						<!-- end mp_cart_item_content -->
 						<div class="mp_cart_item_content mp_cart_item_content-title">
 							<h2 class="mp_cart_item_title">
-								<a target="_blank"
-								   href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
+								<a href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
 							</h2>
 						</div>
 						<!-- end mp_cart_item_content -->
