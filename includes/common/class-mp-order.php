@@ -292,9 +292,9 @@ class MP_Order {
 		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
 		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 
-		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->admin_order->subject' ) ) );
-		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->admin_order->text' ) ) ) );
-		
+		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->admin_order->subject', __( 'New Order Notification: ORDERID', 'mp' ) ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->admin_order->text', __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ) ) ) ) );
+
 		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $this );
 
 		/**
