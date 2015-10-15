@@ -80,7 +80,7 @@ $this->default_settings = array(
 	'product_img_size'			 => 'medium',
 	'show_lightbox'				 => 1,
 	'disable_large_image'		 => 0,
-	'list_view'					 => 'grid',
+	'list_view'					 => 'list',
 	'list_button_type'			 => 'addcart',
 	'show_thumbnail'			 => 1,
 	'list_img_size'				 => 'thumbnail',
@@ -136,7 +136,7 @@ $this->default_settings = array(
 		'relate_by'		 => 'both',
 		'simple_list'	 => 0,
 		'show_limit'	 => 3,
-		'view'			 => 'grid',
+		'view'			 => 'list',
 	),
 );
 
