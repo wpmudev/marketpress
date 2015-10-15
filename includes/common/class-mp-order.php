@@ -294,7 +294,7 @@ class MP_Order {
 
 		// Send message to admin
 		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg .= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
+		$msg = __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
 		$msg .= __( 'ORDERINFOSKU<br /><br />', 'mp' );
 		$msg .= __( 'SHIPPINGINFO<br /><br />', 'mp' );
 		$msg .= __( 'PAYMENTINFO<br /><br />', 'mp' );
