@@ -1761,7 +1761,7 @@ class MP_Cart {
 	 */
 	
 	public function is_shipping_total() {
-		if( empty( $this->shipping_total() ) || $this->shipping_total() ==  '&mdash;' ) {
+		if( $this->shipping_total() != '' || $this->shipping_total() ==  '&mdash;' ) {
 			return false;
 		}
 		
