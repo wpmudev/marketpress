@@ -219,7 +219,13 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		$items = $cart->get_items_as_objects();
 		
 		foreach ( $items as $item ) {
-			$price = $item->get_price( 'lowest' );
+			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
+				$price = round( $item->before_tax_price(), 2 );
+			}
+			else {
+				$price = $item->get_price( 'lowest' );
+			}
+			
 			$total += ($price * $item->qty);
 			
 			$prefix = 'li_' . $counter;
@@ -252,7 +258,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		}
 
 		//tax line
-		if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
+		// if ( ! mp_get_setting( 'tax->tax_inclusive' ) ) {
 			$tax_price = $cart->tax_total( false );
 			$prefix = 'li_' . $counter;
 			$params["{$prefix}_product_id"] = 'taxes';
@@ -262,9 +268,12 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			
 			$counter += 1;
 			$total += $tax_price;
-		}
+		// }
 
 		$params['total'] = $total;
+
+		// print_r( $params );
+		// die;
 		
 		$url .= '?' . http_build_query( $params );
 		
