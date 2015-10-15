@@ -88,6 +88,7 @@ $this->default_settings = array(
 	'show_filters'				 => 1,
 	'order'						 => 'DESC',
 	'show_purchase_breadcrumbs'	 => 0,
+	'email_registration_email'	 => 0,
 	'shipping'					 => array(
 		'allowed_countries'	 => array( 'all_countries' ),
 		'method'			 => 'flat-rate',

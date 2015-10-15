@@ -134,6 +134,12 @@ class MP_Store_Settings_Notifications {
 				),
 			));
 		}		
+		
+		$customer_metabox->add_field('checkbox', array(
+			'name' => 'email_registration_email',
+			'message' => __('Yes', 'mp'),
+			'label' => array( 'text' => __('Notification to registration instead of billing email?', 'mp')),
+		));
 	}
 }
 

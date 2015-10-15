@@ -227,14 +227,25 @@ class MP_Order {
 	 * @param string $msg The email message text.
 	 */
 	protected function _send_email_to_buyers( $subject, $msg, $attachments = array() ) {
-		$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
-		$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
+		$registration_email = mp_get_setting( 'email_registration_email', 0 );
+		$current_user = wp_get_current_user();
 
-		mp_send_email( $billing_email, $subject, $msg, $attachments );
+		if( $registration_email && $current_user->user_email ) {
+	
+			mp_send_email( $current_user->user_email, $subject, $msg, $attachments );
+			
+		} else {
+			
+			$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
+			$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
 
-		if ( $billing_email != $shipping_email ) {
-			// Billing email is different than shipping email so let's send an email to the shipping email too
-			mp_send_email( $shipping_email, $subject, $msg, $attachments );
+			mp_send_email( $billing_email, $subject, $msg, $attachments );
+
+			if ( $billing_email != $shipping_email ) {
+				// Billing email is different than shipping email so let's send an email to the shipping email too
+				mp_send_email( $shipping_email, $subject, $msg, $attachments );
+			}
+			
 		}
 	}
 
