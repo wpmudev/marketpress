@@ -332,6 +332,7 @@ class MP_Store_Settings_Presentation {
 			'desc'        => __( 'Settings related to the display of product lists/grids.', 'mp' ),
 			'option_name' => 'mp_settings',
 		) );
+
 		$metabox->add_field( 'radio_group', array(
 			'name'    => 'list_view',
 			'label'   => array( 'text' => __( 'Product Layout', 'mp' ) ),
@@ -339,6 +340,7 @@ class MP_Store_Settings_Presentation {
 				'list' => __( 'Display as list', 'mp' ),
 				'grid' => __( 'Display as grid', 'mp' ),
 			),
+			'default_value' => 'list',
 		) );
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'per_row',

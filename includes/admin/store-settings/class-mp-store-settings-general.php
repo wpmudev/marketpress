@@ -63,7 +63,6 @@ class MP_Store_Settings_General {
 		//cleanup table rates if a table removed
 		add_action( 'wp_loaded', array( &$this, 'cleanup_tax_tables' ) );
 
-
 		foreach ( mp()->canadian_provinces as $key => $value ) {
 			add_filter( 'wpmudev_field/format_value/tax[canada_rate][' . $key . ']', array(
 				&$this,
@@ -601,6 +600,18 @@ class MP_Store_Settings_General {
 			//'desc'    => __( 'Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp' ),
 			'message' => __( 'Yes', 'mp' ),
 		) );
+		$metabox->add_field( 'checkbox', array(
+			'name'          => 'tax[tax_label]',
+			'label'         => array( 'text' => __( 'Display tax label?', 'mp' ) ),
+			'desc'          => __( 'Enabling this option will display label `excl. tax` or `incl. tax` after price', 'mp' ),
+			'default_value' => 1,
+			'conditional'   => array(
+				'name'   => 'tax[tax_enable]',
+				'value'  => 1,
+				'action' => 'show',
+			),
+		) );
+
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'tax[set_price_with_tax]',
 			'label'         => array( 'text' => __( 'Set prices with tax', 'mp' ) ),
@@ -741,35 +752,44 @@ class MP_Store_Settings_General {
 				$repeater->add_sub_field( 'text', array(
 					'name'          => 'country_code',
 					'label'         => array( 'text' => __( 'Country Code', 'mp' ) ),
-					'default_value' => '*'
+					'default_value' => '*',
+					'class'         => 'tax_field'
 				) );
 				$repeater->add_sub_field( 'text', array(
 					'name'          => 'state_code',
 					'label'         => array( 'text' => __( 'State Code', 'mp' ) ),
-					'default_value' => '*'
+					'default_value' => '*',
+					'class'         => 'tax_field'
 				) );
 				$repeater->add_sub_field( 'text', array(
 					'name'          => 'city',
 					'label'         => array( 'text' => __( 'City Code', 'mp' ) ),
-					'default_value' => '*'
+					'default_value' => '*',
+					'class'         => 'tax_field'
 				) );
 				$repeater->add_sub_field( 'text', array(
 					'name'          => 'zip',
 					'label'         => array( 'text' => __( 'Postal Code', 'mp' ) ),
-					'default_value' => '*'
+					'default_value' => '*',
+					'class'         => 'tax_field'
 				) );
 				$repeater->add_sub_field( 'text', array(
 					'name'          => 'rate',
 					'label'         => array( 'text' => __( 'Rate', 'mp' ) ),
-					'default_value' => '0'
+					'default_value' => '0',
+					'class'         => 'tax_field tax_rate'
 				) );
 				$repeater->add_sub_field( 'text', array(
-					'name'  => 'display_name',
-					'label' => array( 'text' => __( 'Display Name', 'mp' ) ),
+					'name'          => 'display_name',
+					'label'         => array( 'text' => __( 'Display Name', 'mp' ) ),
+					'default_value' => __( "Tax", "mp" ),
+					'class'         => 'tax_field'
 				) );
 				$repeater->add_sub_field( 'text', array(
-					'name'  => 'priority',
-					'label' => array( 'text' => __( 'Priority', 'mp' ) ),
+					'name'          => 'priority',
+					'label'         => array( 'text' => __( 'Priority', 'mp' ) ),
+					'default_value' => 1,
+					'class'         => 'tax_field'
 				) );
 				$repeater->add_sub_field( 'checkbox', array(
 					'name'  => 'compound',
@@ -870,8 +890,16 @@ class MP_Store_Settings_General {
 				$('textarea[name="tax[tax_tables]"]').html('').textext({
 					plugins: 'tags autocomplete',
 					tagsItems:<?php echo $content ?>
-
 				});
+
+				$('.tax_field').each(function () {
+					if ($(this).val().length == 0) {
+						$(this).val($(this).data('default-value'));
+						if ($(this).hasClass('tax_rate')) {
+							$(this).val(0);
+						}
+					}
+				})
 			})
 		</script>
 		<?php

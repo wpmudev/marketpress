@@ -233,7 +233,14 @@ class MP_Ajax {
 							<fieldset id="fieldset_charge_tax" class="has_area">
 								<div class="wpmudev-field-desc"><?php _e( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ); ?></div>
 								<?php _e( 'Special Tax Rate', 'mp' ); ?>
-								<input placeholder="<?php esc_attr_e( 'Tax Rate', 'mp' ); ?>" type="text" class="mp-numeric" name="special_tax_rate" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); ?>">
+								<!--<input placeholder="<?php /*esc_attr_e( 'Tax Rate', 'mp' ); */?>" type="text" class="mp-numeric" name="special_tax_rate" value="<?php /*echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); */?>">-->
+								<select name="special_tax_rate">
+									<?php foreach ( mp_tax()->get_table_rates() as $key => $val ): ?>
+										<option <?php echo selected($key, MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ) ?>
+											value="<?php echo $key ?>"><?php echo $val ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
 								<br>
 							</fieldset>
 						</div>

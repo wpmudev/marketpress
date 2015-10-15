@@ -51,8 +51,16 @@ class MP_Taxes {
 	}
 
 
-	public function find_rates( $table_rate, $is_shipping = false ) {
-		$address = $this->get_tax_address();
+	public function find_rates( $table_rate, $is_shipping = false, $is_digital = false ) {
+		if ( ! mp_get_setting( 'tax->tax_enable', 1 ) ) {
+			return array();
+		}
+
+		if ( $is_digital && mp_get_setting( 'tax->tax_digital' ) == 0 ) {
+			return array();
+		}
+
+		$address = $this->get_tax_address( $is_digital );
 		if ( strlen( $address['country'] ) == 0 ) {
 			return array();
 		}
@@ -155,25 +163,35 @@ class MP_Taxes {
 		//first we will need to check session
 		$address_session = mp_get_session_value( 'mp_billing_info', null );
 		$address         = get_user_meta( get_current_user_id(), 'mp_billing_info', true );
-		if ( ! is_array( $address ) ) {
-			$address = array(
-				'country' => '',
-				'state'   => '',
-				'city'    => '',
-				'zip'     => '',
-			);
-		}
 
 		if ( is_array( $address_session ) ) {
 			$address = wp_parse_args( $address_session, $address );
 		}
 
+		if ( ! isset( $address['country'] ) ) {
+			$address = wp_parse_args( $address, array(
+				'country' => '',
+				'state'   => '',
+				'city'    => '',
+				'zip'     => '',
+			) );
+		}
+
 		return $address;
 	}
 
-	public function get_tax_address() {
-		$address_type = mp_get_setting( 'tax->tax_calculate_based' );
-		$address      = array(
+	public function get_tax_address( $is_digital = false ) {
+		if ( $is_digital ) {
+			$address_type = mp_get_setting( 'tax->tax_dp_calculate_based' );
+		} else {
+			$address_type = mp_get_setting( 'tax->tax_calculate_based' );
+		}
+
+		if ( mp_cart()->is_download_only() ) {
+			return $this->get_store_address();
+		}
+
+		$address = array(
 			'country' => '',
 			'state'   => '',
 			'city'    => '',
@@ -197,17 +215,18 @@ class MP_Taxes {
 	public function get_shipping_address() {
 		$address_session = mp_get_session_value( 'mp_shipping_info', null );
 		$address         = get_user_meta( get_current_user_id(), 'mp_shipping_info', true );
-		if ( ! is_array( $address ) ) {
-			$address = array(
+
+		if ( is_array( $address_session ) ) {
+			$address = wp_parse_args( $address_session, $address );
+		}
+
+		if ( ! isset( $address['country'] ) ) {
+			$address = wp_parse_args( $address, array(
 				'country' => '',
 				'state'   => '',
 				'city'    => '',
 				'zip'     => '',
-			);
-		}
-
-		if ( is_array( $address_session ) ) {
-			$address = wp_parse_args( $address_session, $address );
+			) );
 		}
 
 		return $address;
@@ -288,13 +307,21 @@ class MP_Taxes {
 	 *
 	 * @return mixed
 	 */
-	public function product_price_with_tax( $price, $table_rate = 'standard', $context = '' ) {
+	public function product_price_with_tax( $price, $table_rate = 'standard', $context = '', $is_digital = false ) {
+		if ( ! mp_get_setting( 'tax->tax_enable', 0 ) ) {
+			return $price;
+		}
+
+		if ( $is_digital && mp_get_setting( 'tax->tax_digital' ) == 0 ) {
+			return $price;
+		}
+
 		$inclusive = false;
 		if ( mp_get_setting( 'tax->set_price_with_tax' ) == 'inclusive' ) {
 			$inclusive = true;
 		}
 
-		$address       = $this->get_tax_address();
+		$address       = $this->get_tax_address( $is_digital );
 		$applied_rates = $this->find_matched_rate_taxes( $address['country'], $address['state'], $address['city'], $address['zip'], $table_rate );
 
 		if ( $context == 'cart' ) {
@@ -302,7 +329,6 @@ class MP_Taxes {
 		} else {
 			$mode = mp_get_setting( 'tax->show_price_with_tax' );
 		}
-
 		$taxes = array();
 		if ( $inclusive && $mode == 'inclusive' ) {
 			return $price;
@@ -321,6 +347,25 @@ class MP_Taxes {
 		$new_price = ( $inclusive == true ) ? $price - $taxes : $price + $taxes;
 
 		return round( $new_price, 2 );
+	}
+
+	public function get_product_original_price( $price, $table_rate = 'standard' ) {
+		$inclusive = false;
+		if ( mp_get_setting( 'tax->set_price_with_tax' ) == 'inclusive' ) {
+			$inclusive = true;
+		}
+		if ( $inclusive == false ) {
+			return $price;
+		}
+
+		$address       = $this->get_tax_address();
+		$applied_rates = $this->find_matched_rate_taxes( $address['country'], $address['state'], $address['city'], $address['zip'], $table_rate );
+
+		$taxes = $this->calc_inclusive_taxes( $price, $applied_rates );
+
+		$price_without_tax = $price - array_sum( $taxes );
+
+		return round( $price_without_tax, 2 );
 	}
 
 	/**
@@ -344,6 +389,44 @@ class MP_Taxes {
 
 	public function get_table_data() {
 		return mp_get_setting( 'tax->tables_data' );
+	}
+
+	public function find_product_table_rate( $product ) {
+		if ( is_int( $product ) ) {
+			$product = new MP_Product( $product );
+		}
+
+		if ( get_post_meta( $product->ID, 'charge_tax', true ) ) {
+			$table = get_post_meta( $product->ID, 'special_tax_rate', true );
+		}
+
+		if ( ! isset( $table ) || empty( $table ) ) {
+			if ( $product->is_download() ) {
+				$table = mp_get_setting( 'tax->dp_tax_rate', 'standard' );
+			} else {
+				$table = 'standard';
+			}
+		}
+
+		return $table;
+	}
+
+	public function get_tax_label( $context = '', $is_digital ) {
+		if ( $is_digital && mp_get_setting( 'tax->tax_digital' ) == 0 ) {
+			return '';
+		}
+
+		if ( $context == 'cart' ) {
+			$mode = mp_get_setting( 'tax->cart_price_with_tax' );
+		} else {
+			$mode = mp_get_setting( 'tax->show_price_with_tax' );
+		}
+
+		if ( $mode == 'exclusive' ) {
+			return __( '(excl. tax)', 'mp' );
+		} else {
+			return __( '(incl. tax)', 'mp' );
+		}
 	}
 }
 

@@ -1145,28 +1145,31 @@ class MP_Product {
 	 */
 	public function display_price( $echo = true, $context = '' ) {
 		$price   = $this->get_price();
-
+		//we will need to check if we include the price with tax or exclusive
+		$table = mp_tax()->find_product_table_rate($this);
+		$price['lowest']  = mp_tax()->product_price_with_tax( $price['lowest'], $table, $context, $this->is_download() );
+		$price['highest'] = mp_tax()->product_price_with_tax( $price['highest'], $table, $context, $this->is_download() );
 
 		$snippet = '<!-- MP Product Price --><div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 
 		if ( $this->has_variations() ) {
 			// Get price range
 			if ( $price['lowest'] != $price['highest'] ) {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ) . ' - ' . mp_format_currency( '', $this->add_price_tax( $price['highest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price['lowest'] ) . ' - ' . mp_format_currency( '', $price['highest'] ) . '</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price['lowest'] ) . '</span>';
 			}
 		} elseif ( $this->on_sale() ) {
-			$amt_off = mp_format_currency( '', ( $this->add_price_tax( $price['highest'] ) - $this->add_price_tax( $price['lowest'] ) ) * $this->qty ) . $this->display_tax_string( false );
+			$amt_off = mp_format_currency( '', ( $price['highest'] - $price['lowest'] ) * $this->qty );
 
 			if ( $this->qty > 1 ) {
-				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', $this->add_price_tax( ( $price['lowest'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
-				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $this->add_price_tax( $price['sale']['amount'] ) ) ) . ') ' . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ( $price['lowest'] * $this->qty ) ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price['sale']['amount'] ) ) . ')</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $this->add_price_tax( $price['sale']['amount'] ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $price['sale']['amount'] ) . '</span>';
 			}
 
-			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->add_price_tax( ( $price['regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', ( $price['regular'] * $this->qty ) ) . '</span>';
 
 			/* if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
 			  $snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
@@ -1175,11 +1178,15 @@ class MP_Product {
 			  } */
 		} else {
 			if ( $this->qty > 1 ) {
-				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', $this->add_price_tax( ( $price['lowest'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
-				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ) ) . ') ' . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ( $price['lowest'] * $this->qty ) ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price['lowest'] ) ) . ')</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $this->add_price_tax( $price['lowest'] ) ). $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $price['lowest'] ) . '</span>';
 			}
+		}
+
+		if ( mp_get_setting( 'tax->tax_label', 1 ) ) {
+			$snippet .= '<span class="exclusive_tax">' . mp_tax()->get_tax_label( $context, $this->is_download() ) . '</span>';
 		}
 
 		$snippet .= '</div><!-- end mp_product_price -->';
@@ -1201,7 +1208,7 @@ class MP_Product {
 			return $snippet;
 		}
 	}
-	
+
 	/**
 	 * Add tax to the product price
 	 *
@@ -1214,16 +1221,16 @@ class MP_Product {
 		$tax_rate = mp_get_setting( 'tax->rate', '' );
 		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
-		
+
 		if(! empty( $tax_rate ) ) {
 			if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
 				$price = $price + ($price * $tax_rate);
 			}
 		}
-		
+
 		return $price;
 	}
-	
+
 	/**
 	 * Display (tax incl.) or (tax excl.)
 	 *
@@ -1242,7 +1249,7 @@ class MP_Product {
 		} elseif( $tax_inclusive == 1 ) {
 			$string = '<span class="inclusve_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
 		}
-		
+
 		if ( $echo ) {
 			echo $string;
 		} else {
@@ -1493,28 +1500,28 @@ class MP_Product {
 			$query_args['post__in'] = $related_specified_products;
 		}
 		// Else, try to see if there are some category and/or tag related products for this item
-		else { 
+		else {
 			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 			$count   = 0;
 
 			if ( 'category' != $relate_by ) {
 				$terms                     = get_the_terms( $post_id, 'product_tag' );
 				$ids                       = isset( $terms ) && is_array( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
-				
+
 				// If the product has some tags, add these to the Query
 				if ( !empty( $ids ) ) {
 					$query_args['tax_query'][] = array(
 						'taxonomy' => 'product_tag',
 						'terms'    => $ids,
 					);
-					$count ++;					
+					$count ++;
 				}
 			}
 
 			if ( 'tags' != $relate_by ) {
 				$terms                     = get_the_terms( $post_id, 'product_category' );
 				$ids                       = isset( $terms ) && is_array( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
-				
+
 				// If the product has some categories, add these to the Query
 				if ( !empty( $ids ) ) {
 					$query_args['tax_query'][] = array(
@@ -1528,7 +1535,7 @@ class MP_Product {
 			if ( $count > 1 ) {
 				$query_args['tax_query']['relation'] = 'AND';
 			}
-			
+
 			// There are no related products
 			if ( $count === 0 ) {
 				if ( $return_bool ) {

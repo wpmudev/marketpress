@@ -524,7 +524,7 @@ class MP_Cart {
 					break;
 
 				case 'price' :
-					$column_html = $product->display_price( false );
+					$column_html = $product->display_price( false, 'cart' );
 					break;
 
 				case 'qty' :
@@ -660,7 +660,8 @@ class MP_Cart {
 			$line = '
 					<div class="mp_cart_resume_item mp_cart_resume_item-estimated-tax">
 						<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</span>
-						<span class="mp_cart_resume_item_amount">' . $this->tax_total( true, true ) . '</span>
+						<span class="mp_cart_resume_item_amount mp_tooltip">' . $this->tax_total( true, true ) . '</span>
+						<div class="mp_tooltip_content">blah blah</div>
 					</div><!-- end mp_cart_resume_item-estimated-tax -->';
 
 			/**
@@ -1538,6 +1539,8 @@ class MP_Cart {
 			$blog_ids                         = $this->get_blog_ids();
 			$this->_total['product_original'] = 0;
 
+			$taxes = 0;
+
 			while ( 1 ) {
 				if ( $this->is_global ) {
 					$blog_id = array_shift( $blog_ids );
@@ -1554,6 +1557,8 @@ class MP_Cart {
 						$price = $price['lowest'];
 					}
 					$item_subtotal = ( $price * $item->qty );
+					$table = mp_tax()->find_product_table_rate($item);
+					$item_subtotal = mp_tax()->product_price_with_tax( $item_subtotal, $table, 'cart', $item->is_download() );
 					$total += $item_subtotal;
 				}
 
@@ -1671,6 +1676,24 @@ class MP_Cart {
 		}
 	}
 
+	public function shipping_tax_total( $format = false ) {
+		$shipping_tax   = 0;
+		$shipping_price = $this->shipping_total();
+		//get the way we calc
+
+		$table     = mp_get_setting( 'tax->shipping_tax_rate', 'standard' );
+		$rates     = mp_tax()->find_rates( $table, true );
+		$inclusive = false;
+		if ( mp_get_setting( 'tax->set_price_with_tax' ) == 'inclusive' ) {
+			$inclusive = true;
+		}
+
+		$shipping_tax = mp_tax()->calculate( $shipping_price, $inclusive, $rates );
+		$shipping_tax = (float) apply_filters( 'mp_cart/shipping_tax_amt', array_sum( $shipping_tax ), $shipping_price, $this );
+
+		return ( $format ) ? mp_format_currency( '', $shipping_tax ) : $shipping_tax;
+	}
+
 	/**
 	 * Get the amount of tax applied to the shipping total
 	 *
@@ -1681,7 +1704,7 @@ class MP_Cart {
 	 *
 	 * @return float/string
 	 */
-	public function shipping_tax_total( $format = false ) {
+	public function _shipping_tax_total( $format = false ) {
 		$shipping_tax   = 0;
 		$shipping_price = $this->shipping_total();
 
@@ -1850,6 +1873,73 @@ class MP_Cart {
 	}
 
 	/**
+	 * @param bool|false $format
+	 * @param bool|false $estimate
+	 * @param bool|true $include_shipping_tax
+	 */
+	public function tax_total( $format = false, $estimate = false, $include_shipping_tax = true ) {
+		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
+			$blog_ids = $this->get_blog_ids();
+
+			$tax_amt = 0;
+
+			while ( 1 ) {
+				$total = 0;
+
+				if ( $this->is_global ) {
+					$blog_id = array_shift( $blog_ids );
+					$this->set_id( $blog_id );
+				}
+
+				$items = $this->get_items_as_objects();
+				foreach ( $items as $item ) {
+					$table      = mp_tax()->find_product_table_rate( $item );
+					$rates      = mp_tax()->find_rates( $table, false, $item->is_download() );
+					$item_price = $item->get_price( 'lowest' );
+					if ( mp_get_setting( 'tax->set_price_with_tax' ) == 'inclusive' ) {
+						$total += array_sum( mp_tax()->calculate( $item_price, true, $rates ) );
+					} else {
+						$total += array_sum( mp_tax()->calculate( $item_price, false, $rates ) );
+					}
+				}
+
+				if ( $include_shipping_tax ) {
+					$total += $this->shipping_tax_total( false );
+				}
+
+				$tax_amt += $total;
+
+				/**
+				 * Filter the tax price
+				 *
+				 * @since 3.0
+				 *
+				 * @param float $tax_amt The calculated tax price.
+				 * @param float $total The cart total.
+				 * @param MP_Cart $this The current cart object.
+				 * @param string $country The user's country.
+				 * @param string $state $the user's state/province.
+				 */
+				$tax_amt = apply_filters( 'mp_tax_price', $tax_amt, $total, $this );
+				$tax_amt = apply_filters( 'mp_cart/tax_total', $tax_amt, $total, $this );
+
+				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+					$this->reset_id();
+					break;
+				}
+			}
+			$this->_total['tax'] = $tax_amt;
+		}
+
+		$tax_total = mp_arr_get_value( 'tax', $this->_total, 0 );
+		if ( $format ) {
+			return mp_format_currency( '', $tax_total );
+		} else {
+			return round( $tax_total, 2 );
+		}
+	}
+
+	/**
 	 * Get the calculated price for taxes based on a bunch of foreign tax laws.
 	 *
 	 * @access public
@@ -1859,11 +1949,10 @@ class MP_Cart {
 	 *
 	 * @return string/float
 	 */
-	public function tax_total( $format = false, $estimate = false ) {
+	public function _tax_total( $format = false, $estimate = false, $include_shipping_tax = true ) {
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
-			$include_shipping_tax = mp_get_setting( 'tax->tax_shipping' );
-		
+
 			//get address
 			$state   = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
@@ -1980,18 +2069,8 @@ class MP_Cart {
 			 * @param array An array containing all of the applicable cart subtotals (e.g. tax, shipping, etc)
 			 * @param MP_Cart The current cart object.
 			 */
-			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-				$pre_total = $this->product_total();
-				$tax_rate  = mp_tax_rate();
-				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
-				
-				$shipping_pre_total = $this->shipping_total();
-				if( mp_get_setting( 'tax->tax_shipping' ) ) {
-					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();
-				}
-				
-				//Shipping price should be added after products price calculation
-				$total     = $total + $shipping_pre_total;
+			if ( mp_get_setting( 'tax->set_price_with_tax' ) == 'inclusive' ) {
+				$total = $this->product_total() + $this->shipping_total();
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
@@ -2099,6 +2178,7 @@ class MP_Cart {
 
 			foreach ( $items as $id => $qty ) {
 				$product = new MP_Product( $id );
+				$table   = get_post_meta( $id, 'special_tax_rate', true );
 				if ( ! $product->is_variation() ) {
 					$data[ $id ][] = array(
 						'name'             => $product->title( false ),
@@ -2106,7 +2186,7 @@ class MP_Cart {
 						'price'            => $product->get_price( 'lowest' ),
 						'quantity'         => $product->qty,
 						'download'         => $product->is_download(),
-						'before_tax_price' => $product->before_tax_price()
+						'before_tax_price' => mp_tax()->get_product_original_price( $product->get_price( 'lowest' ), $table )
 					);
 				} else {
 					$product_id                 = $product->post_parent;
@@ -2117,7 +2197,7 @@ class MP_Cart {
 						'price'            => $product->get_price( 'lowest' ),
 						'quantity'         => $product->qty,
 						'download'         => $product->is_download(),
-						'before_tax_price' => $product->before_tax_price()
+						'before_tax_price' => mp_tax()->get_product_original_price( $product->get_price( 'lowest' ), $table )
 					);
 				}
 			}

@@ -1037,6 +1037,10 @@ class MP_Order {
 
 		// Update user shipping billing info
 		if ( $user_id ) {
+			//we need to merge the data in case digital product
+			$billing_info  = wp_parse_args( $billing_info, get_user_meta( $user_id, 'mp_billing_info', true ) );
+			$shipping_info = wp_parse_args( $shipping_info, get_user_meta( $user_id, 'mp_shipping_info', true ) );
+
 			if ( get_user_meta( $user_id, 'mp_billing_info' ) ) {
 				update_user_meta( $user_id, 'mp_billing_info', $billing_info );
 				update_user_meta( $user_id, 'mp_shipping_info', $shipping_info );
