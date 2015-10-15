@@ -292,27 +292,10 @@ class MP_Order {
 		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
 		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 
-		// Send message to admin
-		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg = __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
-		$msg .= __( 'ORDERINFOSKU<br /><br />', 'mp' );
-		$msg .= __( 'SHIPPINGINFO<br /><br />', 'mp' );
-		$msg .= __( 'PAYMENTINFO<br /><br />', 'mp' );
-
-		$subject = mp_filter_email( $this, $subject );
-
-		/**
-		 * Filter the admin order notification subject
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $subject
-		 * @param MP_Order $this
-		 */
+		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->admin_order->subject' ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->admin_order->text' ) ) ) );
+		
 		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $this );
-
-		$msg = mp_filter_email( $this, $msg, true );
-		//$msg = sprintf( $msg, admin_url( 'post.php?post=' . $this->ID . '&action=edit' ) );
 
 		/**
 		 * Filter the admin order notification message
