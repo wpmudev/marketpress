@@ -645,9 +645,10 @@ class MP_Multisite {
 			} else {
 				$allowed                = mp_get_network_setting( 'allowed_gateways' );
 				$allowed['free_orders'] = 'full';//Always allow and activate it automatically later if needed
+
 				if ( is_array( $allowed ) ) {
 					foreach ( $gateways as $code => $gateway ) {
-						if ( isset( $allowed[ $code ] ) && 'full' != $allowed[ $code ] ) {
+						if ( isset( $allowed[ $code ] ) && 'none' == $allowed[ $code ] ) {
 							unset( $gateways[ $code ] );
 						}
 					}
