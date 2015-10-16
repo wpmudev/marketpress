@@ -339,6 +339,7 @@ class MP_Store_Settings_Presentation {
 				'list' => __( 'Display as list', 'mp' ),
 				'grid' => __( 'Display as grid', 'mp' ),
 			),
+			'default_value' => 'list',
 		) );
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'per_row',
@@ -451,6 +452,7 @@ class MP_Store_Settings_Presentation {
 				'alignleft'  => __( 'Left', 'mp' ),
 				'alignright' => __( 'Right', 'mp' ),
 			),
+			'default_value' => 'alignleft',
 			'conditional' => array(
 				'operator' => 'AND',
 				'action'   => 'show',
@@ -597,6 +599,7 @@ class MP_Store_Settings_Presentation {
 				'list' => __( 'Display as list', 'mp' ),
 				'grid' => __( 'Display as grid', 'mp' ),
 			),
+			'default_value' => 'list',
 			'conditional' => array(
 				'name'   => 'related_products[show]',
 				'value'  => '1',
@@ -734,10 +737,11 @@ class MP_Store_Settings_Presentation {
 			'label'       => array( 'text' => __( 'Image Alignment', 'mp' ) ),
 			'options'     => array(
 				//'alignnone'		 => __( 'None', 'mp' ),
-				'aligncenter' => __( 'Center', 'mp' ),
 				'alignleft'   => __( 'Left', 'mp' ),
+				'aligncenter' => __( 'Center', 'mp' ),
 				'alignright'  => __( 'Right', 'mp' ),
 			),
+			'default_value' => 'alignleft',
 			'conditional' => array(
 				'name'   => 'show_img',
 				'value'  => '1',

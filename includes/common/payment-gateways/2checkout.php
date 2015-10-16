@@ -220,6 +220,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		
 		foreach ( $items as $item ) {
 			$price = $item->get_price( 'lowest' );
+			
 			$total += ($price * $item->qty);
 			
 			$prefix = 'li_' . $counter;

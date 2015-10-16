@@ -227,14 +227,25 @@ class MP_Order {
 	 * @param string $msg The email message text.
 	 */
 	protected function _send_email_to_buyers( $subject, $msg, $attachments = array() ) {
-		$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
-		$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
+		$registration_email = mp_get_setting( 'email_registration_email', 0 );
+		$current_user = wp_get_current_user();
 
-		mp_send_email( $billing_email, $subject, $msg, $attachments );
+		if( $registration_email && $current_user->user_email ) {
+	
+			mp_send_email( $current_user->user_email, $subject, $msg, $attachments );
+			
+		} else {
+			
+			$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
+			$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
 
-		if ( $billing_email != $shipping_email ) {
-			// Billing email is different than shipping email so let's send an email to the shipping email too
-			mp_send_email( $shipping_email, $subject, $msg, $attachments );
+			mp_send_email( $billing_email, $subject, $msg, $attachments );
+
+			if ( $billing_email != $shipping_email ) {
+				// Billing email is different than shipping email so let's send an email to the shipping email too
+				mp_send_email( $shipping_email, $subject, $msg, $attachments );
+			}
+			
 		}
 	}
 
@@ -292,27 +303,10 @@ class MP_Order {
 		$attachments = apply_filters( 'mp_order/sendmail_attachments', array(), $this, 'new_order_client' );
 		$this->_send_email_to_buyers( $subject, $msg, $attachments );
 
-		// Send message to admin
-		$subject = __( 'New Order Notification: ORDERID', 'mp' );
-		$msg .= __( 'A new order (ORDERID) was created in your store:<br /><br />', 'mp' );
-		$msg .= __( 'ORDERINFOSKU<br /><br />', 'mp' );
-		$msg .= __( 'SHIPPINGINFO<br /><br />', 'mp' );
-		$msg .= __( 'PAYMENTINFO<br /><br />', 'mp' );
+		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->admin_order->subject', __( 'New Order Notification: ORDERID', 'mp' ) ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->admin_order->text', __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ) ) ) ) );
 
-		$subject = mp_filter_email( $this, $subject );
-
-		/**
-		 * Filter the admin order notification subject
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $subject
-		 * @param MP_Order $this
-		 */
 		$subject = apply_filters( 'mp_order_notification_admin_subject', $subject, $this );
-
-		$msg = mp_filter_email( $this, $msg, true );
-		//$msg = sprintf( $msg, admin_url( 'post.php?post=' . $this->ID . '&action=edit' ) );
 
 		/**
 		 * Filter the admin order notification message
@@ -520,8 +514,7 @@ class MP_Order {
 						<!-- end mp_cart_item_content -->
 						<div class="mp_cart_item_content mp_cart_item_content-title">
 							<h2 class="mp_cart_item_title">
-								<a target="_blank"
-								   href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
+								<a href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
 							</h2>
 						</div>
 						<!-- end mp_cart_item_content -->
@@ -613,6 +606,7 @@ class MP_Order {
 		if ( ! $editable ) {
 			$html = '' .
 			        $this->get_name( $type ) . '<br />' .
+					( ( $company_name = $this->get_meta( "mp_{$type}_info->company_name", '' ) ) ? $company_name . '<br />' : '' ) .
 			        $this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
 			        ( ( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
 			        ( ( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
