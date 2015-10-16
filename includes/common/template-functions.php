@@ -2412,7 +2412,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 				}
 			} else {
 				$return .= '<div class="mp_single_product_images">';
-				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, 'single', $size, $image_alignment );
+				$return .= ( $variation ) ? $variation->image( false, 'single', $size, $image_alignment ) : $product->image( false, 'single', $size, $image_alignment );
 				$return .= '</div><!-- end mp_single_product_images -->';
 			}
 		}
