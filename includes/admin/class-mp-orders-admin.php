@@ -300,10 +300,16 @@ class MP_Orders_Admin {
 			&$this,
 			'meta_box_payment_info'
 		), 'mp_order', 'side', 'core' );
-		add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array(
-			&$this,
-			'meta_box_shipping_info'
-		), 'mp_order', 'side', 'core' );
+		
+		$order = new MP_Order( $this );
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		if ( ! $cart->is_download_only() ) {
+			add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array(
+				&$this,
+				'meta_box_shipping_info'
+			), 'mp_order', 'side', 'core' );
+		}
 	}
 
 	/**
@@ -492,7 +498,7 @@ class MP_Orders_Admin {
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br/>
 			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
-		<?php if( $shipping_tax_total && $shipping_tax_total != '&mdash;' ) { ?>		
+		<?php if( $shipping_tax_total && $shipping_tax_total != '&mdash;' && mp_get_setting( 'tax->tax_shipping' )) { ?>		
 		<div class="misc-pub-section"><strong><?php _e( 'Shipping Tax', 'mp' ); ?>
 				:</strong><br/><?php echo $shipping_tax_total; ?></div>		
 		<?php } ?>	
@@ -1067,8 +1073,15 @@ class MP_Orders_Admin {
 
 			//! Order Shipping
 			case 'mp_orders_shipping' :
-				$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
-				$html .= mp_format_currency( '', $shipping );
+				$cart = $order->get_meta( 'mp_cart_info' );
+				
+				if ( $cart->is_download_only() ) {
+					$html .= '&mdash;';
+				} else {
+					$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
+					$html .= mp_format_currency( '', $shipping );
+				}
+				
 				break;
 
 			//! Order Tax
