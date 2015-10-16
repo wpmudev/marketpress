@@ -516,6 +516,11 @@ class MP_Order {
 							<h2 class="mp_cart_item_title">
 								<a href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
 							</h2>
+							<?php 
+							if ( $product->is_download() && mp_is_shop_page( 'order_status' ) ) {
+								echo '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
+							}
+							?>
 						</div>
 						<!-- end mp_cart_item_content -->
 						<div class="mp_cart_item_content mp_cart_item_content-price"><!-- MP Product Price -->
