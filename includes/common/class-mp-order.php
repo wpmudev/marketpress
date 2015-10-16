@@ -602,9 +602,17 @@ class MP_Order {
 	 *
 	 * @return string
 	 */
-	public function get_address( $type, $editable = false ) {
+	public function get_address( $type, $editable = false, $product_type = false ) {
 		if ( ! $editable ) {
-			$html = '' .
+			
+			if( $product_type == 'digital' ) {
+				$html = '' .
+			        $this->get_name( $type ) . '<br />' .
+					( ( $company_name = $this->get_meta( "mp_{$type}_info->company_name", '' ) ) ? $company_name . '<br />' : '' ) .
+			        ( ( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
+			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+			} else {
+				$html = '' .
 			        $this->get_name( $type ) . '<br />' .
 					( ( $company_name = $this->get_meta( "mp_{$type}_info->company_name", '' ) ) ? $company_name . '<br />' : '' ) .
 			        $this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
@@ -614,6 +622,7 @@ class MP_Order {
 			        ( ( $zip = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
 			        ( ( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
 			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+			}
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
 			
@@ -643,8 +652,10 @@ class MP_Order {
 					$state_options .= '<option value="' . $key . '" ' . selected( $key, $this->get_meta( "mp_{$type}_info->state", '' ), false ) . '>' . $val . '</option>' . "\n";
 				}
 			}
+			
+			$html = '';
 
-			$html = '
+			$html .= '
 				<table class="form-table">
 					<tr>
 						<th scope="row">' . __( 'First Name', 'mp' ) . '</th>
@@ -657,7 +668,9 @@ class MP_Order {
 					<tr>
 						<th scope="row">' . __( 'Company', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[company_name]" value="' . $this->get_meta( "mp_{$type}_info->company_name", '' ) . '" /></td>
-					</tr>
+					</tr>';
+			if( $product_type != 'digital' ) {		
+				$html .= '		
 					<tr>
 						<th scope="row">' . __( 'Address 1', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[address1]" value="' . $this->get_meta( "mp_{$type}_info->address1", '' ) . '" /></td>
@@ -670,27 +683,31 @@ class MP_Order {
 						<th scope="row">' . __( 'City', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[city]" value="' . $this->get_meta( "mp_{$type}_info->city", '' ) . '" /></td>
 					</tr>';
+			
+				if ( is_array( $states ) ) {
+					$html .= '
+						<tr>
+							<th scope="row">' . __( 'State', 'mp' ) . '</th>
+							<td>
+								<select class="mp-select2" name="' . $prefix . '[state]" style="width:100%">' . $state_options . '</select>
+								<img src="' . admin_url( 'images/wpspin_light.gif' ) . '" alt="" style="display:none">
+							</td>
+						</tr>';
+				}
 
-			if ( is_array( $states ) ) {
 				$html .= '
-					<tr>
-						<th scope="row">' . __( 'State', 'mp' ) . '</th>
-						<td>
-							<select class="mp-select2" name="' . $prefix . '[state]" style="width:100%">' . $state_options . '</select>
-							<img src="' . admin_url( 'images/wpspin_light.gif' ) . '" alt="" style="display:none">
-						</td>
-					</tr>';
+						<tr>
+							<th scope="row">' . mp_get_setting( 'zip_label' ) . '</th>
+							<td><input type="text" name="' . $prefix . '[zip]" value="' . $this->get_meta( "mp_{$type}_info->zip", '' ) . '"></td>
+						</tr>
+						<tr>
+							<th scope="row">' . __( 'Country', 'mp' ) . '</th>
+							<td><select class="mp-select2" name="' . $prefix . '[country]" style="width:100%">' . $country_options . '</select></td>
+						</tr>';
+					
 			}
-
-			$html .= '
-					<tr>
-						<th scope="row">' . mp_get_setting( 'zip_label' ) . '</th>
-						<td><input type="text" name="' . $prefix . '[zip]" value="' . $this->get_meta( "mp_{$type}_info->zip", '' ) . '"></td>
-					</tr>
-					<tr>
-						<th scope="row">' . __( 'Country', 'mp' ) . '</th>
-						<td><select class="mp-select2" name="' . $prefix . '[country]" style="width:100%">' . $country_options . '</select></td>
-					</tr>
+			
+			$html .= '		
 					<tr>
 						<th scope="row">' . __( 'Phone', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[phone]" value="' . $this->get_meta( "mp_{$type}_info->phone", '' ) . '"></td>
@@ -731,14 +748,23 @@ class MP_Order {
 	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
 	 */
 	public function get_addresses( $editable = false ) {
-		$html = '
-			<div class="mp_customer_address">
+		
+		$html = '<div class="mp_customer_address">';
+		
+		if ( $this->get_cart()->is_download_only() && ! mp_get_setting( 'tax->downloadable_billing_address' ) ) {
+			$html .= '
+				<div class="mp_content_col mp_content_col-one-half">
+					<h4 class="mp_sub_title">' . __( 'Contact Address', 'mp' ) . '</h4>' .
+					$this->get_address( 'billing', $editable, 'digital' ) .
+					'</div>';
+		} else {
+			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Billing Address', 'mp' ) . '</h4>' .
-		        $this->get_address( 'billing', $editable ) .
-		        ( ( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '' ) . '
-				</div>';
-
+					$this->get_address( 'billing', $editable ) .
+					( ( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '' ) . '
+					</div>';
+		}
 		if ( ! $this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
 			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">

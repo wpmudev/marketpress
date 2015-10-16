@@ -540,8 +540,14 @@ class MP_Store_Settings_General {
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'tax[downloadable_address]',
-			'label'		 => array( 'text' => __( 'Collect Address on Downloadable Only Cart?', 'mp' ) ),
+			'label'		 => array( 'text' => __( 'Collect Shipping Address on Downloadable Only Cart?', 'mp' ) ),
 			'desc'		 => __( 'If you need to tax downloadable products and don\'t want to default to the rates to your base location, enable this to always collect the shipping address. ', 'mp' ),
+			'message'	 => __( 'Yes', 'mp' ),
+		) );
+		$metabox->add_field( 'checkbox', array(
+			'name'		 => 'tax[downloadable_billing_address]',
+			'label'		 => array( 'text' => __( 'Collect Billing Address on Downloadable Only Cart?', 'mp' ) ),
+			'desc'		 => __( 'If disabled only Name and Email will be collected. ', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
 	}
