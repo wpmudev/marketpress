@@ -94,7 +94,6 @@ class MP_Taxes {
 			}
 
 			$amount = $price * ( $ar['rate'] / 100 );
-
 			$amount = apply_filters( 'mp/taxes_tax_amount', $amount, $price, $key, $ar, $applied_rates );
 
 			if ( ! isset( $taxes[ $key ] ) ) {
@@ -103,6 +102,7 @@ class MP_Taxes {
 				$taxes[ $key ] += $amount;
 			}
 		}
+
 		$price_with_tax_pre_compound = (float) $price + (float) array_sum( $taxes );
 
 		foreach ( $applied_rates as $key => $ar ) {
@@ -118,11 +118,6 @@ class MP_Taxes {
 			} else {
 				$taxes[ $key ] += $amount;
 			}
-		}
-
-		//round
-		foreach ( $taxes as $key => $tax ) {
-			$taxes[ $key ] = round( $tax, 2 );
 		}
 
 		return $taxes;
