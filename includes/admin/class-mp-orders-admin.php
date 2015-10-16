@@ -314,6 +314,19 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_payment_info( $post ) {
 		$order = new MP_Order( $post );
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+
+		if ( $cart instanceof MP_Cart ) {
+			$tax_total      = $cart->tax_total( true );
+			$shipping_total = $cart->shipping_total( true );
+			$product_total  = $cart->product_original_total( true );
+		} else {
+			$tax_total      = mp_format_currency( $currency, $order->get_meta( 'mp_tax_total', 0 ) );
+			$shipping_total = mp_format_currency( $currency, $order->get_meta( 'mp_shipping_total', 0 ) );
+			$product_total  = mp_format_currency( $currency, $order->get_meta( 'mp_order_total', 0 ) );
+		}
+
 		?>
 		<div class="misc-pub-section"><strong><?php _e( 'Gateway', 'mp' ); ?>
 				:</strong><br/><?php echo $order->get_meta( 'mp_payment_info->gateway_private_name' ); ?></div>
@@ -321,6 +334,16 @@ class MP_Orders_Admin {
 				:</strong><br/><?php echo $order->get_meta( 'mp_payment_info->method' ); ?></div>
 		<div class="misc-pub-section"><strong><?php _e( 'Transaction ID', 'mp' ); ?>
 				:</strong><br/><?php echo $order->get_meta( 'mp_payment_info->transaction_id' ); ?></div>
+		<div class="misc-pub-section"><strong><?php _e( 'Products Total', 'mp' ); ?>
+				:</strong><br/><?php echo $product_total; ?></div>
+		<?php if( $tax_total && $tax_total != '&mdash;' ) { ?>
+		<div class="misc-pub-section"><strong><?php _e( 'Taxes Total', 'mp' ); ?>
+				:</strong><br/><?php echo $tax_total; ?></div>	
+		<?php } ?>
+		<?php if( $shipping_total && $shipping_total != '&mdash;' ) { ?>		
+		<div class="misc-pub-section"><strong><?php _e( 'Shipping Total', 'mp' ); ?>
+				:</strong><br/><?php echo $shipping_total; ?></div>		
+		<?php } ?>		
 		<div class="misc-pub-section" style="background:#f5f5f5;border-top:1px solid #ddd;">
 			<strong><?php _e( 'Payment Total', 'mp' ); ?>
 				:</strong><br/><?php echo mp_format_currency( '', $order->get_meta( 'mp_payment_info->total' ) ); ?>
@@ -456,11 +479,23 @@ class MP_Orders_Admin {
 		$carriers = apply_filters( 'mp_shipping_carriers_array', array_merge( $carriers, $custom_carriers ) );
 
 		wp_nonce_field( 'mp_save_shipping_info', 'mp_save_shipping_info_nonce' );
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		$shipping_tax_total = '';
+		
+		if ( $cart instanceof MP_Cart ) {
+			$shipping_tax_total = $cart->shipping_tax_total( true );
+		}
 		?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br/>
 			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
+		<?php if( $shipping_tax_total && $shipping_tax_total != '&mdash;' ) { ?>		
+		<div class="misc-pub-section"><strong><?php _e( 'Shipping Tax', 'mp' ); ?>
+				:</strong><br/><?php echo $shipping_tax_total; ?></div>		
+		<?php } ?>	
 		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
 			<div class="misc-pub-section">
 				<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br/>
