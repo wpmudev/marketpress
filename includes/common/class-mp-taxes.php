@@ -120,6 +120,11 @@ class MP_Taxes {
 			}
 		}
 
+		//round
+		foreach ( $taxes as $key => $tax ) {
+			$taxes[ $key ] = round( $tax, 2 );
+		}
+
 		return $taxes;
 	}
 
@@ -245,7 +250,8 @@ class MP_Taxes {
 	 */
 	public function find_matched_rate_taxes( $country, $state, $city, $postal, $table_rate ) {
 		//we got the address, now get the data table
-		$data  = $this->get_table_data();
+		$data = $this->get_table_data();
+
 		$rates = isset( $data[ $table_rate ] ) ? $data[ $table_rate ] : array();
 		//got the rates, now lookup with the address
 		$applied_rates = array();
@@ -387,10 +393,18 @@ class MP_Taxes {
 		return $data;
 	}
 
+	/**
+	 * @return mixed|void
+	 */
 	public function get_table_data() {
 		return mp_get_setting( 'tax->tables_data' );
 	}
 
+	/**
+	 * @param $product
+	 *
+	 * @return mixed|string|void
+	 */
 	public function find_product_table_rate( $product ) {
 		if ( is_int( $product ) ) {
 			$product = new MP_Product( $product );
