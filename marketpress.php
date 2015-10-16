@@ -565,10 +565,10 @@ class Marketpress {
 			if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
 				require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 			}
-
-			if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_addons()->is_addon_enabled( 'MP_Prosites_Addon' ) == false ) {
-				$enabled   = mp_get_setting( 'addons', array() );
+			$enabled = mp_get_setting( 'addons', array() );
+			if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && ! in_array( 'MP_Prosites_Addon', $enabled ) ) {
 				$enabled[] = 'MP_Prosites_Addon';
+				$enabled   = array_unique( $enabled );
 				mp_addons()->enable( $enabled );
 			}
 		}
