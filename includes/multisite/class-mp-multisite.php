@@ -78,6 +78,50 @@ class MP_Multisite {
 		add_filter( 'the_content', array( &$this, 'taxonomy_output' ) );
 
 		add_action( 'wp_enqueue_scripts', array( &$this, 'load_scripts' ), 11 );
+
+		add_action( 'wpmu_new_blog', array( &$this, 'wpmu_new_blog' ) );
+		add_action( 'admin_init', array( &$this, 'redirect_to_wizard_subsite' ) );
+	}
+
+	public function redirect_to_wizard_subsite() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		if ( get_current_blog_id() == 1 ) {
+			return;
+		}
+
+		if ( get_option( 'mp_subsite_need_redirect', 0 ) == 0 ) {
+			return;
+		}
+
+		$screen = mp_get_current_screen();
+
+		if ( $screen->id == 'store-settings_page_store-setup-wizard' ) {
+			//user already inside this first time, return
+			update_option( 'mp_subsite_need_redirect', 0 );
+			return;
+		}
+
+		$ids  = array(
+			'product',
+			'edit-product',
+			'edit-mp_order',
+			'toplevel_page_store-settings'
+		);
+		$base = 'store-settings_page';
+		if ( ( in_array( $screen->id, $ids ) || strpos( $screen->id, $base ) === 0 ) ) {
+			update_option( 'mp_subsite_need_redirect', 0 );
+			wp_redirect( admin_url( 'admin.php?page=store-setup-wizard' ) );
+			exit;
+		}
+	}
+
+	public function wpmu_new_blog( $blog_id ) {
+		switch_to_blog( $blog_id );
+		update_option( 'mp_subsite_need_redirect', 1 );
+		restore_current_blog();
 	}
 
 	public function load_scripts() {
@@ -273,7 +317,7 @@ class MP_Multisite {
 			'post_date_gmt'     => $post->post_date_gmt,
 			'post_modified'     => $post->post_modified,
 			'post_modified_gmt' => $post->post_modified_gmt,
-			'post_status'		=> $post->post_status,
+			'post_status'       => $post->post_status,
 			'price'             => $product->get_price( 'lowest' ),
 			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
@@ -287,7 +331,7 @@ class MP_Multisite {
 		$blog_public = get_blog_status( $blog_id, 'public' );
 		$product     = new MP_Product( $post->ID );
 		$index       = $this->find_index( $blog_id, $post->ID );
-		
+
 		if ( ! $index ) {
 			return false;
 		}
@@ -304,7 +348,7 @@ class MP_Multisite {
 			'post_date_gmt'     => $post->post_date_gmt,
 			'post_modified'     => $post->post_modified,
 			'post_modified_gmt' => $post->post_modified_gmt,
-			'post_status'		=> $post->post_status,
+			'post_status'       => $post->post_status,
 			'price'             => $product->get_price( 'lowest' ),
 			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
