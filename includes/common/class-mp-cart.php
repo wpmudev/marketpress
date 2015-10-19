@@ -905,8 +905,8 @@ class MP_Cart {
 					<section id="mp-cart-meta" class="mp_cart_meta">' .
 			         $this->cart_meta( false, $editable );
 
-			$button_text     = __( 'Submit Order' );
-			$button_alt_text = __( 'Continue &raquo;' );
+			$button_text     = __( 'Submit Order', 'mp' );
+			$button_alt_text = __( 'Continue &raquo;', 'mp' );
 
 			if ( get_query_var( 'mp_confirm_order_step' ) ) {
 				$tooltip_text = __( '<strong>You are about to submit your order!</strong><br />Please review your order details before continuing. You will be charged immediately upon clicking "Submit Order".', 'mp' );
