@@ -18,6 +18,7 @@ $this->defaults = array(
 		'tag'		 => NULL,
 		'list_view'	 => NULL,
 		'filters'	 => NULL,
+		'limit'		 => NULL,
 	),
 );
 
