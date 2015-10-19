@@ -188,6 +188,11 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 				$query['orderby'] = mp_get_setting( 'order_by' );
 			}
 		}
+		
+		if ( ! is_null( $args['limit'] ) ) {
+			$query['posts_per_page'] = intval( $args['limit'] );
+			$args['nopaging'] 		 = true;
+		}
 
 		if ( ! is_null( $args['category'] ) ) {
 			$query['taxonomy'] = 'product_category';
