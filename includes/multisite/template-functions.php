@@ -142,11 +142,14 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 // Figure out page
 
 			if ( ! is_null( $args['page'] ) ) {
-				$query['paged'] = intval( $args['page'] );
+				$query['paged']  = intval( $args['page'] );
+				$query['offset'] = ( $query['paged'] - 1 ) * $query['posts_per_page'];
 			} elseif ( get_query_var( 'paged' ) != '' ) {
-				$query['paged'] = $args['page'] = intval( get_query_var( 'paged' ) );
+				$query['paged']  = $args['page'] = intval( get_query_var( 'paged' ) );
+				$query['offset'] = ( $query['paged'] - 1 ) * $query['posts_per_page'];
 			} else {
-				$query['paged'] = 1;
+				$query['paged']  = 1;
+				$query['offset'] = 0;
 			}
 
 // Get order by
@@ -259,7 +262,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		$paging = "";
 		if ( mp_arr_get_value( 'posts_per_page', $query, 0 ) > 0 ) {
 			$limit  = mp_arr_get_value( 'posts_per_page', $query, 0 );
-			$offset = mp_arr_get_value( 'paged', $query ) - 1;
+			$offset = mp_arr_get_value( 'offset', $query );
 			$paging = " LIMIT $offset,$limit";
 		}
 
