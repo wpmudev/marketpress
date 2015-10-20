@@ -1,0 +1,23 @@
+
+label {
+	width: 50%;
+	display: inline-block;
+}
+
+.mp-checkboxes label {
+	float: left;
+}
+
+#response li {
+	border-color: #DFDFDF;
+	border-style: solid;
+	border-width: 0 0 1px;
+	display: block;
+	float: none;
+}
+#response span {
+	float: none;
+}
+#response span.error {
+	color: red;
+}
