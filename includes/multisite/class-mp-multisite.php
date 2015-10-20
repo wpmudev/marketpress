@@ -62,7 +62,7 @@ class MP_Multisite {
 		add_filter( 'mp_gateway_api/get_gateways', array( &$this, 'get_gateways' ) );
 		
 		$settings = get_site_option( 'mp_network_settings', array() );
-		if ( ( isset($settings['main_blog']) && $this->is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
+		if ( ( isset($settings['main_blog']) && mp_is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
 			//shortcode
 			add_shortcode( 'mp_list_global_products', array( &$this, 'mp_list_global_products_sc' ) );
 			add_shortcode( 'mp_global_categories_list', array( &$this, 'mp_global_categories_list_sc' ) );
