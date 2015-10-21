@@ -74,6 +74,7 @@ class MP_Store_Settings_General {
 		$this->init_location_settings();
 		$this->init_tax_settings();
 		$this->init_currency_settings();
+		$this->init_digital_settings();
 		$this->init_download_settings();
 		$this->init_misc_settings();
 		$this->init_advanced_settings();
@@ -282,12 +283,6 @@ class MP_Store_Settings_General {
 			'name'	 => 'use_alt_download_method',
 			'label'	 => array( 'text' => __( 'Use Alternative Download Method?', 'mp' ) ),
 			'desc'	 => __( 'If you\'re having issues downloading large files and have worked with your hosting provider to increase your memory limits, try enabling this - just keep in mind, it\'s not as secure!', 'mp' ),
-		) );
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'download_order_limit',
-			'label'		 => array( 'text' => __( 'Limit Digital Products Per-order?', 'mp' ) ),
-			'desc'		 => __( 'This will prevent multiples of the same downloadable product form being added to the cart.', 'mp' ),
-			'message'	 => __( 'Yes', 'mp' ),
 		) );
 	}
 
@@ -534,22 +529,59 @@ class MP_Store_Settings_General {
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'		 => 'tax[tax_digital]',
-			'label'		 => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
+			'label'		 => array( 'text' => __( 'Apply Tax to Digital Products?', 'mp' ) ),
 			'desc'		 => __( 'Please see your local tax laws. Note if this is enabled and a downloadable only cart, rates will be the default for your base location.', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'tax[tax_based]',
+			'label'			 => array( 'text' => __( 'Tax based on?', 'mp' ) ),
+			'default_value'	 => 'store_tax',
+			'orientation'	 => 'horizontal',
+			'options'		 => array(
+				'store_tax'	 => __( 'Apply tax based on store location', 'mp' ),
+				'user_tax'	 => __( 'Apply tax based on customer location', 'mp' ),
+			),
+			'conditional' => array(
+				'name'   => 'tax[tax_digital]',
+				'value'  => '1',
+				'action' => 'show',
+			),
+		) );
+	}
+	
+	/**
+	 * Init digital products settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_digital_settings() {
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'			 => 'mp-settings-general-digital',
+			'page_slugs'	 => array( 'store-settings', 'toplevel_page_store-settings' ),
+			'title'			 => __( 'Digital Settings', 'mp' ),
+			'option_name'	 => 'mp_settings',
+		) );
+		
 		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'tax[downloadable_address]',
-			'label'		 => array( 'text' => __( 'Collect Shipping Address on Downloadable Only Cart?', 'mp' ) ),
-			'desc'		 => __( 'If you need to tax downloadable products and don\'t want to default to the rates to your base location, enable this to always collect the shipping address. ', 'mp' ),
+			'name'		 => 'download_order_limit',
+			'label'		 => array( 'text' => __( 'Limit Digital Products Per-order?', 'mp' ) ),
+			'desc'		 => __( 'This will prevent multiples of the same downloadable product form being added to the cart.', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'tax[downloadable_billing_address]',
-			'label'		 => array( 'text' => __( 'Collect Billing Address on Downloadable Only Cart?', 'mp' ) ),
-			'desc'		 => __( 'If disabled only Name and Email will be collected. ', 'mp' ),
-			'message'	 => __( 'Yes', 'mp' ),
+		
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'details_collection',
+			'label'			 => array( 'text' => __( 'Details Collection', 'mp' ) ),
+			'default_value'	 => 'full',
+			'orientation'	 => 'horizontal',
+			'options'		 => array(
+				'full'		 => __( 'Full billing info', 'mp' ),
+				'contact'		 => __( 'Only contact details', 'mp' ),
+			),
 		) );
+		
 	}
 
 	/**
