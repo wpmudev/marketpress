@@ -85,7 +85,9 @@ class MP_Order {
 			} elseif ( is_numeric( $order ) ) {
 				$this->ID = $order;
 			} else {
-				$this->_order_id = $order;
+				if( ! is_object( $order ) ) {
+					$this->_order_id = $order;
+				}
 			}
 
 			$this->_get_post();
