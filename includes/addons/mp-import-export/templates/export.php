@@ -25,26 +25,40 @@
 					<div class="inside">
 						<div class="setting-panel">
 							<p class="mp-text">
+								<label for="products-file-name">
+									<span><?php _e( 'Define the filename for the export:', 'mp' ); ?></span>
+									<input type="text" name="products-file-name" id="products-file-name" value="mp-products-export" size="40" />
+									<span class="mp-helper"><?php _e( 'Allowed to use dynamic values: %%timestamp%%, %%month%% and %%date%%', 'mp' ); ?></span>
+								</label>
+							</p>
+							<p class="mp-text">
 								<label for="products-limit">
-									<span><?php _e( 'Limit the number of products to export (0 for all products):', 'mp' ); ?></span>
-									<input type="text" name="products-limit" id="products-limit" value="0" size="10" />
+									<span><?php _e( 'Limit the number of products to export (-1 for all products):', 'mp' ); ?></span>
+									<input type="text" name="products-limit" id="products-limit" value="-1" size="10" />
 								</label>
 							</p>
 							<p class="mp-text">
 								<label for="products-offset">
-									<span><?php _e( 'Offset:', 'mp' ); ?></span>
+									<span><?php _e( 'Offset: (Applied only if limit is different than -1.)', 'mp' ); ?></span>
 									<input type="text" name="products-offset" id="products-offset" value="0" size="10" />
 								</label>
 							</p>
+							<p class="mp-label">
+								<?php _e( 'Which fields/columns do you want to export?', 'mp' ); ?>
+							</p>
 							<p class="mp-checkboxes">
-								<label for="products-columns-title">
-									<input type="checkbox" name="products-columns[title]" id="products-columns-title" checked="checked" />
-									<span><?php _e( 'Title', 'mp' ); ?></span>
+								<?php
+									foreach ( $this->products_columns as $key => $value ) {
+										if( ! $value['required'] ) {
+											?>
+								<label for="products-columns-<?php echo $key; ?>">
+									<input type="checkbox" name="products-columns[<?php echo $key; ?>]" id="products-columns-<?php echo $key; ?>" checked="checked" />
+									<span><?php echo $value['name']; ?></span>
 								</label>
-								<label for="products-columns-description">
-									<input type="checkbox" name="products-columns[description]" id="products-columns-description" checked="checked" />
-									<span><?php _e( 'Description', 'mp' ); ?></span>
-								</label>
+											<?php
+										}
+									}
+								?>
 							</p>
 							<p class="mp-textarea">
 								<label for="products-custom-fields">
@@ -100,8 +114,8 @@
 			<input type="submit" value="<?php _e( 'Export', 'mp' ); ?>" class="mp-button mp-submit button-primary" />
 		</p>
 		<ul id="response">
-			<?php foreach( $messages as $message ) : ?>
-				<li><?php print $message; ?></li>
+			<?php foreach( $this->messages as $message ) : ?>
+				<li><?php echo $message; ?></li>
 			<?php endforeach; ?>
 		</ul>
 	</form>
