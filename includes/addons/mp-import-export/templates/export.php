@@ -87,14 +87,6 @@
 								<?php _e( 'Choose CSV Data file', 'mp' ); ?>
 								<input type="file" name="datafile" size="40" \>
 							</p>
-							<!--<p>
-								<?php _e( 'CSV field separator', 'mp' ); ?>
-								<input type="text" name="field_separator" size="40" \>
-							</p>
-							<p>
-								<?php _e( 'CSV text separator', 'mp' ); ?>
-								<input type="text" name="text_separator" size="40" \>
-							</p>-->
 						</div>
 					</div>
 				</div>
