@@ -244,14 +244,14 @@ class MP_Public {
 	 * @filter the_title
 	 * @return string
 	 */
-	public function hide_single_product_title( $title ) {
-		if ( in_the_loop() && is_main_query() ) {
-			$title = '';
-		}
+	public function hide_single_product_title( $title, $id = false, $is_nav = false ) {
+		if ( in_the_loop() && is_main_query() && !$is_nav ) {
+            $title = '';
+        }
 
-		return $title;
+        return $title;
 	}
-
+	
 	/**
 	 * Check if the current page is a store page
 	 *
@@ -472,7 +472,7 @@ class MP_Public {
 				}
 
 				if ( $ok ) {
-					add_filter( 'the_title', array( &$this, 'hide_single_product_title' ) );
+					add_filter( 'the_title', array( &$this, 'hide_single_product_title' ), 10, 3 );
 					add_filter( 'the_content', array( &$this, 'single_product_content' ) );
 				}
 			} else {
