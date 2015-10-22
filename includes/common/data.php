@@ -36,9 +36,10 @@ $this->default_settings = array(
 		'include_tax'			 => 1,
 		'tax_label'				 => 1,
 		'tax_digital'			 => 1,
-		'downloadable_address'	 => 0
+		'tax_based'				 => 'store_tax',
 	),
 	'currency'					 => 'USD',
+	'details_collection'		 => 'full',
 	'curr_symbol_position'		 => 1,
 	'curr_decimal'				 => 1,
 	'disable_cart'				 => 0,

@@ -85,7 +85,9 @@ class MP_Order {
 			} elseif ( is_numeric( $order ) ) {
 				$this->ID = $order;
 			} else {
-				$this->_order_id = $order;
+				if( ! is_object( $order ) ) {
+					$this->_order_id = $order;
+				}
 			}
 
 			$this->_get_post();
@@ -756,10 +758,10 @@ class MP_Order {
 		
 		$html = '<div class="mp_customer_address">';
 		
-		if ( $this->get_cart()->is_download_only() && ! mp_get_setting( 'tax->downloadable_billing_address' ) ) {
+		if ( $this->get_cart()->is_download_only() && mp_get_setting( 'details_collection' ) == "contact" ) {
 			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
-					<h4 class="mp_sub_title">' . __( 'Contact Address', 'mp' ) . '</h4>' .
+					<h4 class="mp_sub_title">' . __( 'Contact Details', 'mp' ) . '</h4>' .
 					$this->get_address( 'billing', $editable, 'digital' ) .
 					'</div>';
 		} else {
@@ -770,7 +772,7 @@ class MP_Order {
 					( ( $editable ) ? '<p><a class="button" id="mp-order-copy-billing-address" href="javascript:;">' . __( 'Copy billing address to shipping address', 'mp' ) . '</a>' : '' ) . '
 					</div>';
 		}
-		if ( ! $this->get_cart()->is_download_only() || mp_get_setting( 'tax->downloadable_address' ) ) {
+		if ( ! $this->get_cart()->is_download_only() ) {
 			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
 					<h4 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h4>' .
@@ -916,12 +918,16 @@ class MP_Order {
 			<div class="mp_tooltip_content_item">
 				<div class="mp_tooltip_content_item_label">' . __( 'Taxes:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
 				<div class="mp_tooltip_content_item_value">' . $tax_total . '</div><!-- end mp_tooltip_content_item_value -->
-			</div><!-- end mp_tooltip_content_item -->
-			<div class="mp_tooltip_content_item">
-				<div class="mp_tooltip_content_item_label">' . __( 'Shipping:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
-				<div class="mp_tooltip_content_item_value">' . $shipping_total . '</div><!-- end mp_tooltip_content_item_value -->
-			</div><!-- end mp_tooltip_content_item -->
-		';
+			</div><!-- end mp_tooltip_content_item -->';
+		
+		if( ! $this->get_cart()->is_download_only() ) {
+			$tooltip_content .= '	
+				<div class="mp_tooltip_content_item">
+					<div class="mp_tooltip_content_item_label">' . __( 'Shipping:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
+					<div class="mp_tooltip_content_item_value">' . $shipping_total . '</div><!-- end mp_tooltip_content_item_value -->
+				</div><!-- end mp_tooltip_content_item -->
+			';
+		}
 
 		/**
 		 * Filter the order total tooltip content

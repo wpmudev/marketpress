@@ -110,7 +110,7 @@ var mp_cart = { };
         $( '.mp-shortcode-wrap' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
 
 		//We should loop through each form else jQuery validation is passing wrong form ID
-		$( '.mp_buy_button' ).each(function(){
+		$( '.mp-shortcode-wrap' ).find( '.mp_buy_button' ).each(function(){
 			$(this).on( 'mp_cart/before_add_item', function( e, item, qty ) {
 				marketpress.loadingOverlay( 'show' );
 			} )
@@ -128,7 +128,7 @@ var mp_cart = { };
      */
     mp_cart.initSingleProductListeners = function() {
         $( '#mp-single-product' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-        $( '#mp-single-product' ).find( '.mp_form-buy-product' )
+        $( '#mp-single-product' ).find( '.mp_form-buy-product' ).not('.mp_no_single, .mp_buy_button')
             .on( 'mp_cart/before_add_item', function( e, item, qty ) {
                 marketpress.loadingOverlay( 'show' );
             } )
@@ -136,7 +136,16 @@ var mp_cart = { };
                 marketpress.loadingOverlay( 'hide' );
             } )
             .validate( this.productFormValidationArgs );
-	
+			
+		 $( '#mp-single-product' ).find( '.mp_no_single' ).not( '.mp_buy_button' ).each(function(){
+            $(this).on( 'mp_cart/before_add_item', function( e, item, qty ) {
+                marketpress.loadingOverlay( 'show' );
+            } )
+            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+                marketpress.loadingOverlay( 'hide' );
+            } )
+            .validate( this.productFormValidationArgs );	
+		});
     };
 
     /**

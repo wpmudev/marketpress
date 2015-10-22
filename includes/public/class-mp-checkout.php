@@ -78,7 +78,7 @@ class MP_Checkout {
 		$is_download_only	 = $cart->is_download_only();
 		$this->_sections	 = apply_filters( 'mp_checkout/sections_array', array(
 			'login-register'			 => __( 'Login/Register', 'mp' ),
-			'billing-shipping-address'	 => (!mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) ? __( 'Billing/Shipping Address', 'mp' ) : __( 'Billing', 'mp' ),
+			'billing-shipping-address'	 => ( !mp()->download_only_cart( mp_cart() ) ) ? __( 'Billing/Shipping Address', 'mp' ) : __( 'Billing Information', 'mp' ),
 			'shipping'					 => __( 'Shipping Method', 'mp' ),
 			'order-review-payment'		 => __( 'Review Order/Payment', 'mp' ),
 		) );
@@ -267,8 +267,8 @@ class MP_Checkout {
 				'class' => 'mp_form_input',
 			),
 		);
-		
-		if ( mp()->download_only_cart( mp_cart() ) && ! mp_get_setting( 'tax->downloadable_billing_address' ) ) {
+
+		if ( mp()->download_only_cart( mp_cart() ) && mp_get_setting( 'details_collection' ) == "contact" ) {
 			$address_fields = array(
 				array(
 					'type'		 => 'complex',
@@ -1057,7 +1057,7 @@ class MP_Checkout {
 		$cart				 = mp_cart();
 		$is_download_only	 = $cart->is_download_only();
 
-		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
+		if ( !mp()->download_only_cart( mp_cart() ) ) {
 			$html .= '
 					<div class="mp_checkout_field mp_checkout_checkbox">
 						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . '> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
@@ -1182,7 +1182,7 @@ class MP_Checkout {
 		$this->address_fields( 'billing', true ) . '
 			</div><!-- end mp_checkout_column -->';
 
-		if ( !mp()->download_only_cart( mp_cart() ) || mp_get_setting( 'tax->downloadable_address' ) ) {
+		if ( !mp()->download_only_cart( mp_cart() ) ) {
 			$html .= '
 				<div class="mp_checkout_column">
 					<h3 class="mp_sub_title">' . __( 'Shipping Address', 'mp' ) . '</h3>' .
