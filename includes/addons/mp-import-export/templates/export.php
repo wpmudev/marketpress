@@ -1,5 +1,10 @@
 <div class="wrap theme-options">
 	<h2><?php _e( 'MarketPress Export', 'mp' ); ?></h2><br />
+	<ul id="response">
+		<?php foreach( $this->messages as $message ) : ?>
+			<li><?php echo $message; ?></li>
+		<?php endforeach; ?>
+	</ul>
 	<form action="tools.php?page=marketpress_export" method="post">
 		<p class="mp-select">
 			<label for="export-types">
@@ -113,10 +118,5 @@
 		<p class="submit">
 			<input type="submit" value="<?php _e( 'Export', 'mp' ); ?>" class="mp-button mp-submit button-primary" />
 		</p>
-		<ul id="response">
-			<?php foreach( $this->messages as $message ) : ?>
-				<li><?php echo $message; ?></li>
-			<?php endforeach; ?>
-		</ul>
 	</form>
 </div>
