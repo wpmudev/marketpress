@@ -404,11 +404,11 @@ class Mp_Export {
 
 		fclose( $handle );
 
+		$this->messages[] = sprintf( __( 'There are %s columns in the products csv file.', 'mp' ), count( $column_headings ) );
+		$this->messages[] = sprintf( _n( '%s product was exported.', '%s products were exported.', $products_count, 'mp' ), $products_count );
 		if( $direct_download ) {
 			$this->messages[] = sprintf( __( '<a href="%s" class="button-primary">Click to download your CSV file.</a>', 'mp' ), $fileurl );
 		}
-		$this->messages[] = sprintf( __( 'There are %s columns in the products csv file.', 'mp' ), count( $column_headings ) );
-		$this->messages[] = sprintf( _n( '%s product was exported.', '%s products were exported.', $products_count, 'mp' ), $products_count );
 
 		return $filepath;
 		
@@ -475,7 +475,7 @@ class Mp_Export {
 
 		$orders_query = array(
 			'post_type'		 => array( 'mp_order' ),
-			'post_status'	 => get_post_stati( array( 'post_type' => 'mp_order' ), 'names' ),
+			'post_status'	 => array_keys( mp_get_request_value( 'orders-stati' ) ),
 			'posts_per_page' => mp_get_request_value( 'orders-limit', -1 ),
 			'offset'         => mp_get_request_value( 'orders-offset', 0 ),
 			'order'          => 'ASC',
@@ -530,11 +530,11 @@ class Mp_Export {
 
 		fclose( $handle );
 
+		$this->messages[] = sprintf( __( 'There are %s columns in the orders csv file.', 'mp' ), count( $column_headings ) );
+		$this->messages[] = sprintf( _n( '%s order was exported.', '%s orders were exported.', $orders_count, 'mp' ), $orders_count );
 		if( $direct_download ) {
 			$this->messages[] = sprintf( __( '<a href="%s" class="button-primary">Click to download your CSV file.</a>', 'mp' ), $fileurl );
 		}
-		$this->messages[] = sprintf( __( 'There are %s columns in the orders csv file.', 'mp' ), count( $column_headings ) );
-		$this->messages[] = sprintf( _n( '%s order was exported.', '%s orders were exported.', $orders_count, 'mp' ), $orders_count );
 
 		return $filepath;
 		
