@@ -3,15 +3,20 @@
 
 	$( function() {
 
-		var $tabs = $( '#export-tabs' ),
-			$productsTab = $tabs.find( '.tab-products' ),
-			$ordersTab = $tabs.find( '.tab-orders' ),
-			$customersTab = $tabs.find( '.tab-customers' ),
-			$exportTypes = $( '#export-types' ),
-			$submitBtn = $( '.mp-submit' ),
-			$nextBtn = $( '.mp-next' ),
-			$prevBtn = $( '.mp-prev' )
+		var $tabs             = $( '#export-tabs' ),
+			$productsTab      = $tabs.find( '.tab-products' ),
+			$ordersTab        = $tabs.find( '.tab-orders' ),
+			$customersTab     = $tabs.find( '.tab-customers' ),
+			$exportTypes      = $( '#export-types' ),
+			$submitBtn        = $( '.mp-submit' ),
+			$nextBtn          = $( '.mp-next' ),
+			$prevBtn          = $( '.mp-prev' ),
+			$thickboxLauncher = $( '#thickbox-launcher' )
 		;
+
+		$( window ).load( function() {
+			$thickboxLauncher.click();
+		} );
 
 		$tabs.tabs();
 
