@@ -230,6 +230,7 @@ class Marketpress {
 				'with_front' => false
 			),
 			'query_var'          => true,
+			'can_export'         => false,
 			'supports'           => array(
 				'title',
 				'editor',
@@ -268,6 +269,7 @@ class Marketpress {
 			'hierarchical'    => false,
 			'rewrite'         => false,
 			'query_var'       => false,
+			'can_export'      => false,
 			'supports'        => array( '' ),
 		) ) );
 
