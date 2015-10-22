@@ -7,7 +7,7 @@ var mp_checkout;
 	 * @since 3.0
 	 */
 	 
-	$.widget.bridge('uitooltip', $.ui.tooltip);
+	$.widget.bridge('mptooltip', $.ui.tooltip);
 	
     mp_checkout = {
         /**
@@ -170,7 +170,7 @@ var mp_checkout;
          * @param jQuery $in The jquery object being transitioned TO
          */
         changeStep: function( $out, $in ) {
-            $out.find( '.mp_tooltip' ).uitooltip( 'close' );
+            $out.find( '.mp_tooltip' ).mptooltip( 'close' );
             $out.find( '.mp_checkout_section_content' ).slideUp( 500, function() {
                 $out.removeClass( 'current' );
                 $in.find( '.mp_checkout_section_content' ).slideDown( 500, function() {
@@ -238,7 +238,7 @@ var mp_checkout;
                 unhighlight: function( element, errorClass, validClass ) {
                     var $tip = $( element ).siblings( '.mp_tooltip' );
                     if ( $tip.length > 0 ) {
-                        $tip.uitooltip( 'close' );
+                        $tip.mptooltip( 'close' );
                     }
 
                     $( element ).removeClass( 'mp_form_input_error' ).prev( 'label' ).removeClass( 'mp_form_label_error' );
@@ -294,13 +294,13 @@ var mp_checkout;
                                 } else {
                                     $btn.ajaxLoading( 'hide' );
                                     $email.before( '<a id="mp-login-tooltip"></a>' );
-                                    $( '#mp-login-tooltip' ).uitooltip( {
+                                    $( '#mp-login-tooltip' ).mptooltip( {
                                         items: '#mp-login-tooltip',
                                         content: resp.data.message,
                                         tooltipClass: "error",
                                         open: function( event, ui ) {
                                             setTimeout( function() {
-                                                $( '#mp-login-tooltip' ).uitooltip( 'destroy' );
+                                                $( '#mp-login-tooltip' ).mptooltip( 'destroy' );
                                             }, 4000 );
                                         },
                                         position: {
@@ -310,7 +310,7 @@ var mp_checkout;
                                         },
                                         show: 300,
                                         hide: 300
-                                    } ).uitooltip( 'open' );
+                                    } ).mptooltip( 'open' );
                                 }
                             } );
                         } else {
@@ -341,7 +341,7 @@ var mp_checkout;
                         if ( $tip.length == 0 ) {
                             $input.after( '<div class="mp_tooltip" />' );
                             $tip = $input.siblings( '.mp_tooltip' );
-                            $tip.uniqueId().uitooltip( {
+                            $tip.uniqueId().mptooltip( {
                                 content: "",
                                 items: "#" + $tip.attr( 'id' ),
                                 tooltipClass: "error",
@@ -350,8 +350,8 @@ var mp_checkout;
                             } );
                         }
 
-                        $tip.uitooltip( 'option', 'content', message );
-                        $tip.uitooltip( 'option', 'position', {
+                        $tip.mptooltip( 'option', 'content', message );
+                        $tip.mptooltip( 'option', 'position', {
                             of: $input,
                             my: "center bottom-10",
                             at: "center top"
@@ -364,7 +364,7 @@ var mp_checkout;
                         } );
 
                         $input.on( 'blur', function() {
-                            $tip.uitooltip( 'close' );
+                            $tip.mptooltip( 'close' );
                         } );
                     } );
 

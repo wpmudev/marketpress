@@ -5,7 +5,7 @@
 	 * @since 3.0
 	 */
 	 
-	$.widget.bridge('uitooltip', $.ui.tooltip);
+	$.widget.bridge('mptooltip', $.ui.tooltip);
     
 	/**
      * Apply a coupon code to the cart
@@ -79,9 +79,9 @@ var mp_coupons = { };
                         marketpress.initSelect2();
                     } else {
                         $( '#mp-coupon-tooltip-' + storeID )
-                            .uitooltip( 'option', 'content', resp.data.message )
-                            .uitooltip( 'option', 'tooltipClass', 'error' )
-                            .uitooltip( 'open' );
+                            .mptooltip( 'option', 'content', resp.data.message )
+                            .mptooltip( 'option', 'tooltipClass', 'error' )
+                            .mptooltip( 'open' );
                     }
                 } );
         },
@@ -99,7 +99,7 @@ var mp_coupons = { };
 
                 // Create tooltip for future use
                 $couponCode.before( '<div id="' + tipID + '" />' );
-                $( '#' + tipID ).uitooltip( {
+                $( '#' + tipID ).mptooltip( {
                     items: "#" + tipID,
                     tooltipClass: "error",
                     content: "",
@@ -118,23 +118,23 @@ var mp_coupons = { };
                     .on( 'click', 'button', function( e ) {
                         var couponCode = $couponCode.val().toUpperCase().replace( /[^A-Z0-9]/g, '' );
 
-                        $tooltip.uitooltip( 'close' );
+                        $tooltip.mptooltip( 'close' );
 
                         if ( couponCode.length > 0 ) {
                             mp_cart.applyCoupon( couponCode, storeID, $couponForm );
                         } else {
                             $tooltip
-                                .uitooltip( 'option', 'content', mp_coupons_i18n.messages.required )
-                                .uitooltip( 'option', 'tooltipClass', 'error' )
-                                .uitooltip( 'open' );
+                                .mptooltip( 'option', 'content', mp_coupons_i18n.messages.required )
+                                .mptooltip( 'option', 'tooltipClass', 'error' )
+                                .mptooltip( 'open' );
                         }
                     } )
                     // An error occurred when applying coupon
                     .on( 'mp_cart/apply_coupon/error', function( e, message ) {
                         $tooltip
-                            .uitooltip( 'option', 'content', message )
-                            .uitooltip( 'option', 'tooltipClass', 'error' )
-                            .uitooltip( 'open' );
+                            .mptooltip( 'option', 'content', message )
+                            .mptooltip( 'option', 'tooltipClass', 'error' )
+                            .mptooltip( 'open' );
                     } )
                     // Coupon was applied successfully
                     .on( 'mp_cart/apply_coupon/success', function( e, data ) {
@@ -148,13 +148,13 @@ var mp_coupons = { };
                         $tooltip
                             .on( 'tooltipopen.mp_coupons', function( e, ui ) {
                                 setTimeout( function() {
-                                    $tooltip.uitooltip( 'close' );
+                                    $tooltip.mptooltip( 'close' );
                                     $tooltip.off( 'tooltipopen.mp_coupons' );
                                 }, 4000 );
                             } )
-                            .uitooltip( 'option', 'content', mp_coupons_i18n.messages.added )
-                            .uitooltip( 'option', 'tooltipClass', 'success' )
-                            .uitooltip( 'open' );
+                            .mptooltip( 'option', 'content', mp_coupons_i18n.messages.added )
+                            .mptooltip( 'option', 'tooltipClass', 'success' )
+                            .mptooltip( 'open' );
                     } );
             } );
         }
