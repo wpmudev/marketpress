@@ -19,6 +19,12 @@
 		} );
 
 		$tabs.tabs();
+		
+		// Disabled Customers Tab and option
+		$tabs.tabs({
+			disabled: [ 2 ]
+		});
+		$exportTypes.find( '[value="customers"]' ).attr( 'disabled', 'disabled' );
 
 		$submitBtn.hide();
 
@@ -87,8 +93,11 @@
 					$prevBtn.hide();
 					break;
 				case 1:
-					$submitBtn.hide();
-					$nextBtn.show();
+					// $submitBtn.hide();
+					// $nextBtn.show();
+					// $prevBtn.show();
+					$submitBtn.show();
+					$nextBtn.hide();
 					$prevBtn.show();
 					break;
 				case 2:
