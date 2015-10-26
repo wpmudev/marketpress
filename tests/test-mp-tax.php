@@ -57,9 +57,9 @@ class Test_MP_Tax extends WP_UnitTestCase {
 		//tax inclusive the price, and we will show the price without tax
 		/**
 		 * this doesn't having compound, the tax sum is 19% = 0.19
-		 * 11.67/(1.19) = 9.8
+		 * 11.67/(1.19) = 9.81
 		 */
-		$this->assertEquals( 9.8, $tax );
+		$this->assertEquals( 9.81, $tax );
 		//====================== CASE 3 ===========================
 		$data = $this->generate_tax_table( 3 );
 		mp_update_setting( 'tax->tables_data', $data );
@@ -97,8 +97,71 @@ class Test_MP_Tax extends WP_UnitTestCase {
 	 * Table having 2 row, all normal
 	 * Table having 2 row, one normal, 1 compound
 	 */
-	function tax_product_exclusive() {
+	function test_tax_product_exclusive() {
 		//we need to init a test data for tax
+		//we need to init a test data for tax
+		$data = $this->generate_tax_table( 1 );
+		//update some data
+		mp_update_setting( 'tax->tables_data', $data );
+		mp_update_setting( 'tax->tax_calculate_based', 'store_address' );
+		mp_update_setting( 'base_country', 'US' );
+		mp_update_setting( 'base_province', 'IN' );
+		mp_update_setting( 'base_zip', '47150' );
+		mp_update_setting( 'tax->set_price_with_tax', 'exclusive' );
+
+		$price = 11.67;
+		//tax is disable
+		mp_update_setting( 'tax->tax_enable', 0 );
+		$tax = mp_tax()->product_price_with_tax( $price );
+		$this->assertEquals( $price, $tax );
+		mp_update_setting( 'tax->tax_enable', 1 );
+		mp_update_setting( 'tax->show_price_with_tax', 'exclusive' );
+		$tax = mp_tax()->product_price_with_tax( $price );
+		//tax exlcusive, and we display exclusive, mean tax = price
+		$this->assertEquals( $price, $tax );
+		mp_update_setting( 'tax->show_price_with_tax', 'inclusive' );
+		//tax exclusive, and we display inclusive, which mean price = price+tax
+		$tax = mp_tax()->product_price_with_tax( $price );
+		/**
+		 * Tis having 5% compound, 13 and 10% normal
+		 * 11.67 + (11.67*0.23) = 14.3541
+		 * 14.3541 + (14.3541*0.05) = 15.07
+		 */
+		$this->assertEquals( 15.07, $tax );
+		//====================== CASE 2 ===========================
+		$data = $this->generate_tax_table( 2 );
+		mp_update_setting( 'tax->tables_data', $data );
+		mp_update_setting( 'tax->show_price_with_tax', 'inclusive' );
+		$tax = mp_tax()->product_price_with_tax( $price );
+		//tax inclusive the price, and we will show the price without tax
+		/**
+		 * this doesn't having compound, the tax sum is 19% = 0.19
+		 * 11.67 + (11.67*0.19) = 13.89
+		 */
+		$this->assertEquals( 13.89, $tax );
+		//====================== CASE 3 ===========================
+		$data = $this->generate_tax_table( 3 );
+		mp_update_setting( 'tax->tables_data', $data );
+		mp_update_setting( 'tax->show_price_with_tax', 'inclusive' );
+		$tax = mp_tax()->product_price_with_tax( $price );
+		//tax inclusive the price, and we will show the price without tax
+		/**
+		 * this having 8% compound, and 16% VAT
+		 * 11.67 + (11.67*0.16) = 13.5372
+		 * 13.5372 + (13.5372*0.08) = 14.62
+		 */
+		$this->assertEquals( 14.62, $tax );
+		//====================== CASE 4 ===========================
+		$data = $this->generate_tax_table( 4 );
+		mp_update_setting( 'tax->tables_data', $data );
+		mp_update_setting( 'tax->show_price_with_tax', 'inclusive' );
+		$tax = mp_tax()->product_price_with_tax( $price );
+		//tax inclusive the price, and we will show the price without tax
+		/**
+		 * this having 33%
+		 * 11.67 + (11.67*0.33) = 15.52
+		 */
+		$this->assertEquals( 15.52, $tax );
 	}
 
 	function tax_cart_inclusive() {

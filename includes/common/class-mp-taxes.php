@@ -16,6 +16,8 @@ class MP_Taxes {
 
 	private static $_instance;
 
+	public $taxes_applied;
+
 	/**
 	 * Gets the single instance of the class
 	 *
@@ -101,6 +103,12 @@ class MP_Taxes {
 			} else {
 				$taxes[ $key ] += $amount;
 			}
+
+			$this->taxes_applied[$ar['display_name']] = array(
+				'name'        => $ar['display_name'],
+				'amount'      => $taxes[ $key ],
+				'is_compound' => $ar['compound']
+			);
 		}
 
 		$price_with_tax_pre_compound = (float) $price + (float) array_sum( $taxes );
@@ -118,6 +126,11 @@ class MP_Taxes {
 			} else {
 				$taxes[ $key ] += $amount;
 			}
+			$this->taxes_applied[] = array(
+				'name'        => $ar['display_name'],
+				'amount'      => $taxes[ $key ],
+				'is_compound' => $ar['compound']
+			);
 		}
 
 		return $taxes;
@@ -148,6 +161,13 @@ class MP_Taxes {
 		$non_tax_price      = $non_compound_price / ( 1 + $normal_rates );
 
 		return $this->calc_exclusive_taxes( $non_tax_price, $applied_rates );
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function get_taxes_applied() {
+		return $this->taxes_applied;
 	}
 
 	public function get_store_address() {

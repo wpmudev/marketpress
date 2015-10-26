@@ -657,11 +657,19 @@ class MP_Cart {
 		$html .= apply_filters( 'mp_cart/cart_meta/shipping_total', $line, $this );
 
 		if ( 0 < $this->tax_total( false, true ) ) {
+			//we will get the taxes amount
+			$applied_taxes = mp_tax()->get_taxes_applied();
+			$taxes_line    = '<p class="mp-secure-checkout-tooltip-text">';
+			foreach ( $applied_taxes as $line ) {
+				$taxes_line .= sprintf( '<span><strong>%s</strong>: %s</span><br/>', $line['name'], mp_format_currency( '', $line['amount'] ) );
+			}
+			$taxes_line .= '</p>';
+
 			$line = '
 					<div class="mp_cart_resume_item mp_cart_resume_item-estimated-tax">
 						<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? sprintf( __( 'Estimated %s', 'mp' ), mp_get_setting( 'tax->label' ) ) : mp_get_setting( 'tax->label' ) ) . '</span>
 						<span class="mp_cart_resume_item_amount mp_tooltip">' . $this->tax_total( true, true ) . '</span>
-						<div class="mp_tooltip_content">blah blah</div>
+						<div class="mp_tooltip_content">' . $taxes_line . '</div>
 					</div><!-- end mp_cart_resume_item-estimated-tax -->';
 
 			/**
@@ -941,7 +949,7 @@ class MP_Cart {
 			 * @param bool $editable Whether the cart is editable or not.
 			 */
 			$button_classes = apply_filters( 'mp_cart/checkout_button/classes', $button_classes, $editable );
-			
+
 			/**
 			 * Filter the Continue Shopping button classes
 			 *
@@ -955,10 +963,10 @@ class MP_Cart {
 				'mp_button-large',
 			);
 			$continue_shopping_button_classes = apply_filters( 'mp_cart/continue_shopping_button/classes', $continue_shopping_button_classes );
-	
+
 			// Continue shopping button
 			$html .= '
-					<a href="' . mp_store_page_url( 'products', false ) . '" class="' . implode( ' ', $continue_shopping_button_classes ) . '">' . __( 'Continue Shopping?', 'mp'  ) . '</a>';
+					<a href="' . mp_store_page_url( 'products', false ) . '" class="' . implode( ' ', $continue_shopping_button_classes ) . '">' . __( 'Continue Shopping?', 'mp' ) . '</a>';
 
 			if ( $editable ) {
 				$html .= '
@@ -1195,7 +1203,7 @@ class MP_Cart {
 			</div>
 			<div class="mp_mini_cart_content">';
 
-		$html .= $this->cart_products_html( null, $show_product_image, $show_product_price);
+		$html .= $this->cart_products_html( null, $show_product_image, $show_product_price );
 
 		$html .= '
 			</div><!-- end mp_mini_cart_content -->
@@ -1219,8 +1227,8 @@ class MP_Cart {
 	 * @access public
 	 *
 	 * @param string $context Cart context widget or floating.
-	 * @param bool   $show_product_image Display product image or not.
-	 * @param bool   $show_product_price Display product price or not.
+	 * @param bool $show_product_image Display product image or not.
+	 * @param bool $show_product_price Display product price or not.
 	 */
 	public function cart_products_html( $context = null, $show_product_image = true, $show_product_price = false ) {
 		$html = '';
@@ -1281,8 +1289,8 @@ class MP_Cart {
 	 *
 	 * @param int $item_id The product's ID.
 	 * @param int $qty The quantity of the product in the cart.
-	 * @param bool   $show_product_image Display product image or not.
-	 * @param bool   $show_product_price Display product price or not.
+	 * @param bool $show_product_image Display product image or not.
+	 * @param bool $show_product_price Display product price or not.
 	 */
 	public function floating_cart_line_item_html( $item_id, $qty, $show_product_image = true, $show_product_price = false ) {
 		$product = new MP_Product( $item_id );
@@ -1439,7 +1447,7 @@ class MP_Cart {
 			$items = $this->get_items();
 
 			foreach ( $items as $item_id => $qty ) {
-				$numitems += intval($qty);
+				$numitems += intval( $qty );
 			}
 
 			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
@@ -1557,7 +1565,7 @@ class MP_Cart {
 						$price = $price['lowest'];
 					}
 					$item_subtotal = ( $price * $item->qty );
-					$table = mp_tax()->find_product_table_rate($item);
+					$table         = mp_tax()->find_product_table_rate( $item );
 					$item_subtotal = mp_tax()->product_price_with_tax( $item_subtotal, $table, 'cart', $item->is_download() );
 					$total += $item_subtotal;
 				}
@@ -1995,7 +2003,7 @@ class MP_Cart {
 
 					if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
 						$special_total += $special_tax_amt * $item->qty;
-						
+
 					} else {
 						$total += $item->before_tax_price() * $item->qty;
 					}
