@@ -1,6 +1,6 @@
 <?php
 
-class Mp_Export {
+class MP_Export {
 	
 	public $products_columns = array();
 	public $orders_columns = array();
@@ -593,6 +593,6 @@ class Mp_Export {
 
 	} // END private function zip_it
 	
-} // END class Mp_Export
+} // END class MP_Export
 
-$Mp_Export = new Mp_Export();
+$MP_Export = new MP_Export();
