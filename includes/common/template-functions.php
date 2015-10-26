@@ -437,7 +437,7 @@ if ( ! function_exists( 'mp_cart_widget' ) ) :
 		$mini_cart .= apply_filters( 'mp_cart_widget_custom_text', $custom_text );
 
 		$cart_content .= '<div class="mp_cart_widget_content">';
-		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget', $args[ 'show_product_image' ], $args[ 'show_product_price' ]);
+		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget', $args[ 'show_product_image' ], $args[ 'show_product_qty' ], $args[ 'show_product_price' ]);
 		$cart_content .= '</div><!-- end .mp_cart_widget_content -->';
 
 		$mini_cart .= apply_filters( 'mp_cart_widget_content', $cart_content );
@@ -773,7 +773,7 @@ if ( ! function_exists( 'mp_buy_button' ) ) :
 			return;
 		}
 		
-		$button  = $product->buy_button( false, $context, array(), true );
+		$button  = $product->buy_button( false, $context, array(), true, true );
 
 		if ( $echo ) {
 			echo $button;
@@ -1465,13 +1465,21 @@ if ( ! function_exists( 'mp_get_user_address_part' ) ) :
 				}
 			}
 
-			$name       = mp_get_session_value( "mp_" . $type . "_info->name", mp_arr_get_value( 'name', $meta, '' ) );
+			$name       = mp_get_session_value( "mp_" . $type . "_info->name", $user->display_name );
 			$name_parts = explode( ' ', $name );
 
 			if ( 'first_name' == $what ) {
 				return mp_arr_get_value( '0', $name_parts, '' );
 			} else {
 				return mp_arr_get_value( '1', $name_parts, '' );
+			}
+			
+		} elseif( 'email' == $what ) {
+			$email = mp_get_session_value( "mp_" . $type . "_info->{$what}", mp_arr_get_value( $what, $meta, '' ) );
+			if ( ! empty( $email ) ) {
+				return $email;
+			} else {
+				return $user->user_email;
 			}
 		} else {
 			//echo 'type:'.$type;
@@ -2412,7 +2420,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 				}
 			} else {
 				$return .= '<div class="mp_single_product_images">';
-				$return .= ( $variation ) ? $variation->image( false, $image, $size, $image_alignment ) : $product->image( false, 'single', $size, $image_alignment );
+				$return .= ( $variation ) ? $variation->image( false, 'single', $size, $image_alignment ) : $product->image( false, 'single', $size, $image_alignment );
 				$return .= '</div><!-- end mp_single_product_images -->';
 			}
 		}

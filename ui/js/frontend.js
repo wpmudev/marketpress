@@ -38,6 +38,8 @@
 }( jQuery ) );
 var marketpress = { };
 ( function( $ ) {
+	
+	$.widget.bridge('mptooltip', $.ui.tooltip);
 
     function equal_height( obj ) {
         var $this = $( obj );
@@ -107,7 +109,7 @@ var marketpress = { };
          * @since 3.0
          */
         initToolTips: function( ) {
-            $( document ).tooltip( {
+            $( document ).mptooltip( {
                 "items": ".mp_tooltip-help, .mp_tooltip",
                 "content": function( ) {
                     var $this = $( this );
@@ -244,7 +246,7 @@ var marketpress = { };
                         if ( $tooltip.length == 0 ) {
                             $input.before( '<div class="mp_tooltip"></div>' );
                             $tooltip = $input.prev( '.mp_tooltip' );
-                            $tooltip.tooltip( {
+                            $tooltip.mptooltip( {
                                 items: ".mp_tooltip",
                                 tooltipClass: "error",
                                 position: {
@@ -257,8 +259,8 @@ var marketpress = { };
                             } );
                         }
 
-                        $tooltip.tooltip( 'option', 'content', resp.data.error_message );
-                        $tooltip.tooltip( 'open' );
+                        $tooltip.mptooltip( 'option', 'content', resp.data.error_message );
+                        $tooltip.mptooltip( 'open' );
                     }
                 } );
             } );

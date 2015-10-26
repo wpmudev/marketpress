@@ -563,7 +563,8 @@ jQuery( document ).ready( function( $ ) {
     } );
     //Delete controls
     jQuery( '.mp_popup_controls.mp_delete_controls a.delete-bulk-form' ).on( 'click', function( e ) {
-
+		e.preventDefault( );
+		
         parent.jQuery.colorbox.close( );
         $( '.check-column-box:checked' ).each( function( ) {
             $( this ).closest( 'tr' ).remove( );
@@ -571,20 +572,13 @@ jQuery( document ).ready( function( $ ) {
         } );
         if ( $( '.check-column-box' ).length == 0 ) {
             save_inline_post_data( $( '[name="post_ID"]' ).val( ), 'delete_variations', '', '' );
-            if ( $( '#original_publish' ).val( ) == 'Publish' ) {
-                $( '#save-post' ).removeAttr( 'dasabled' );
-                //alert('published click!');
-                $( '#save-post' ).click( );
-            }
-
-            if ( $( '#original_publish' ).val( ) == 'Update' ) {
-                $( '#publish' ).removeAttr( 'dasabled' );
-                $( '#publish' ).click( );
-            }
+			setInterval(function(){ 
+				$( '#publish' ).removeAttr( 'disabled' );
+				$( '#publish' ).click( );
+			}, 500);
         }
-
         return false;
-        e.preventDefault( );
+       
     } )
 
     /* Close thickbox window on link / cancel click */

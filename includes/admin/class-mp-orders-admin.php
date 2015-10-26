@@ -71,6 +71,10 @@ class MP_Orders_Admin {
 			&$this,
 			'export_order_form'
 		) );
+		//Add custom fields to orders search
+		add_filter( 'posts_join', array( &$this, 'orders_search_join' ) );
+		add_filter( 'posts_where', array( &$this, 'orders_search_where' ) );
+		add_filter( 'posts_groupby', array( &$this, 'orders_search_groupby' ) );
 	}
 
 	/**
@@ -296,10 +300,16 @@ class MP_Orders_Admin {
 			&$this,
 			'meta_box_payment_info'
 		), 'mp_order', 'side', 'core' );
-		add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array(
-			&$this,
-			'meta_box_shipping_info'
-		), 'mp_order', 'side', 'core' );
+		
+		$order = new MP_Order( $this );
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		if ( ! $cart->is_download_only() ) {
+			add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array(
+				&$this,
+				'meta_box_shipping_info'
+			), 'mp_order', 'side', 'core' );
+		}
 	}
 
 	/**
@@ -310,6 +320,19 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_payment_info( $post ) {
 		$order = new MP_Order( $post );
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+
+		if ( $cart instanceof MP_Cart ) {
+			$tax_total      = $cart->tax_total( true );
+			$shipping_total = $cart->shipping_total( true );
+			$product_total  = $cart->product_original_total( true );
+		} else {
+			$tax_total      = mp_format_currency( $currency, $order->get_meta( 'mp_tax_total', 0 ) );
+			$shipping_total = mp_format_currency( $currency, $order->get_meta( 'mp_shipping_total', 0 ) );
+			$product_total  = mp_format_currency( $currency, $order->get_meta( 'mp_order_total', 0 ) );
+		}
+
 		?>
 		<div class="misc-pub-section"><strong><?php _e( 'Gateway', 'mp' ); ?>
 				:</strong><br/><?php echo $order->get_meta( 'mp_payment_info->gateway_private_name' ); ?></div>
@@ -317,6 +340,16 @@ class MP_Orders_Admin {
 				:</strong><br/><?php echo $order->get_meta( 'mp_payment_info->method' ); ?></div>
 		<div class="misc-pub-section"><strong><?php _e( 'Transaction ID', 'mp' ); ?>
 				:</strong><br/><?php echo $order->get_meta( 'mp_payment_info->transaction_id' ); ?></div>
+		<div class="misc-pub-section"><strong><?php _e( 'Products Total', 'mp' ); ?>
+				:</strong><br/><?php echo $product_total; ?></div>
+		<?php if( $tax_total && $tax_total != '&mdash;' ) { ?>
+		<div class="misc-pub-section"><strong><?php _e( 'Taxes Total', 'mp' ); ?>
+				:</strong><br/><?php echo $tax_total; ?></div>	
+		<?php } ?>
+		<?php if( $shipping_total && $shipping_total != '&mdash;' ) { ?>		
+		<div class="misc-pub-section"><strong><?php _e( 'Shipping Total', 'mp' ); ?>
+				:</strong><br/><?php echo $shipping_total; ?></div>		
+		<?php } ?>		
 		<div class="misc-pub-section" style="background:#f5f5f5;border-top:1px solid #ddd;">
 			<strong><?php _e( 'Payment Total', 'mp' ); ?>
 				:</strong><br/><?php echo mp_format_currency( '', $order->get_meta( 'mp_payment_info->total' ) ); ?>
@@ -420,7 +453,7 @@ class MP_Orders_Admin {
 		wp_nonce_field( 'mp_save_order_notes', 'mp_save_order_notes_nonce' );
 		?>
 		<textarea class="widefat" name="mp[order_notes]"
-		          rows="5"><?php echo $order->get_meta( 'mp_order_notes', '' ); ?></textarea>
+				  rows="5"><?php echo $order->get_meta( 'mp_order_notes', '' ); ?></textarea>
 		<?php
 	}
 
@@ -452,11 +485,23 @@ class MP_Orders_Admin {
 		$carriers = apply_filters( 'mp_shipping_carriers_array', array_merge( $carriers, $custom_carriers ) );
 
 		wp_nonce_field( 'mp_save_shipping_info', 'mp_save_shipping_info_nonce' );
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		$shipping_tax_total = '';
+		
+		if ( $cart instanceof MP_Cart ) {
+			$shipping_tax_total = $cart->shipping_tax_total( true );
+		}
 		?>
 		<div class="misc-pub-section">
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br/>
 			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
+		<?php if( $shipping_tax_total && $shipping_tax_total != '&mdash;' && mp_get_setting( 'tax->tax_shipping' )) { ?>		
+		<div class="misc-pub-section"><strong><?php _e( 'Shipping Tax', 'mp' ); ?>
+				:</strong><br/><?php echo $shipping_tax_total; ?></div>		
+		<?php } ?>	
 		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
 			<div class="misc-pub-section">
 				<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br/>
@@ -469,7 +514,7 @@ class MP_Orders_Admin {
 				<option value=""><?php _e( 'Select One', 'mp' ); ?></option>
 				<?php foreach ( $carriers as $val => $label ) : ?>
 					<option data-original="<?php echo isset( $custom_carriers[ $val ] ) ? 1 : 0 ?>"
-					        value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
+							value="<?php echo $val; ?>" <?php selected( $val, $order->get_meta( 'mp_shipping_info->method' ) ); ?>><?php echo $label; ?></option>
 				<?php endforeach; ?>
 			</select>
 			<a class="mp-hide mp-remove-custom-carrier" href="#"><?php _e( "Remove", "mp" ) ?></a>
@@ -478,13 +523,13 @@ class MP_Orders_Admin {
 			<div class="mp-order-custom-shipping-method mp-hide">
 				<strong><?php _e( 'Method', 'mp' ); ?>:</strong><br/>
 				<input type="text" name="mp[tracking_info][custom_method]"
-				       placeholder="<?php _e( 'Method Name', 'mp' ); ?>" value="" style="width:100%"/>
+					   placeholder="<?php _e( 'Method Name', 'mp' ); ?>" value="" style="width:100%"/>
 				<br/>
 			</div>
 			<strong><?php _e( 'Tracking Number', 'mp' ); ?>:</strong><br/>
 			<input type="text" name="mp[tracking_info][tracking_num]"
-			       placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"
-			       value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%"/>
+				   placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"
+				   value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_num' ); ?>" style="width:100%"/>
 		</div>
 		<?php
 	}
@@ -579,9 +624,9 @@ class MP_Orders_Admin {
 								<!-- end mp_cart_item_content -->
 								<div class="mp_cart_item_content mp_cart_item_content-price"><!-- MP Product Price -->
 									<div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope=""
-									     itemprop="offers">
+										 itemprop="offers">
 									<span class="mp_product_price-normal"
-									      itemprop="price"><?php echo mp_format_currency( '', $item['price'] ) ?></span>
+										  itemprop="price"><?php echo mp_format_currency( '', $item['price'] ) ?></span>
 									</div>
 									<!-- end mp_product_price -->
 								</div>
@@ -1015,7 +1060,7 @@ class MP_Orders_Admin {
 				$html .= '
 					<div style="display:none">
 						<div id="mp-customer-info-lb-' . $order->ID . '" class="mp-customer-info-lb" style="padding:10px 30px 30px;">' .
-				         $order->get_addresses() . '
+						 $order->get_addresses() . '
 						</div>
 					</div>';
 				break;
@@ -1028,8 +1073,15 @@ class MP_Orders_Admin {
 
 			//! Order Shipping
 			case 'mp_orders_shipping' :
-				$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
-				$html .= mp_format_currency( '', $shipping );
+				$cart = $order->get_meta( 'mp_cart_info' );
+				
+				if ( $cart->is_download_only() ) {
+					$html .= '&mdash;';
+				} else {
+					$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
+					$html .= mp_format_currency( '', $shipping );
+				}
+				
 				break;
 
 			//! Order Tax
@@ -1086,6 +1138,65 @@ class MP_Orders_Admin {
 		echo $html;
 	}
 
+	/**
+	 * Modify the join of the search query in admin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $pagenow, $wpdb
+	 *
+	 * @param string $join the join of the current querry
+	 */
+	public function orders_search_join ( $join ){
+		global $pagenow, $wpdb;
+
+		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+			$join .= " LEFT JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id ";
+		}
+
+		return $join;
+	}
+
+	/**
+	 * Modify the where of the search query in admin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $pagenow, $wpdb
+	 *
+	 * @param string $where the where of the current querry
+	 */
+	public function orders_search_where( $where ){
+		global $pagenow, $wpdb;
+
+		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+			$where = preg_replace(
+				"/\(\s*{$wpdb->posts}.post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
+				"({$wpdb->posts}.post_title LIKE $1) OR ({$wpdb->postmeta}.meta_value LIKE $1)", $where
+			);
+		}
+
+		return $where;
+	}
+
+	/**
+	 * Modify the groupby of the search query in admin
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $pagenow, $wpdb
+	 *
+	 * @param string $groupby the groupby of the current querry
+	 */
+	public function orders_search_groupby( $groupby ){
+		global $pagenow, $wpdb;
+
+		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+			$groupby = "{$wpdb->posts}.ID";
+		}
+
+		return $groupby;
+	}
 }
 
 MP_Orders_Admin::get_instance();

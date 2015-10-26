@@ -95,6 +95,7 @@ class MP_Coupons_Addon {
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_css_frontend' ) );
 			add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_js_frontend' ), 25 );
 			add_action( 'mp_cart/after_empty_cart', array( &$this, 'remove_all_coupons' ), 10, 1 );
+			add_action( 'mp_cart/after_remove_item', array( &$this, 'check_items_in_cart' ), 10 );
 			add_action( 'mp_order/new_order', array( &$this, 'process_new_order' ), 10, 1 );
 			add_action( 'mp_cart/before_remove_item', array( &$this, 'check_coupons' ), 10, 2 );
 
@@ -311,14 +312,14 @@ class MP_Coupons_Addon {
 		$html .= '
 			<div class="mp_cart_resume_item mp_cart_resume_item-coupons">
 				<span class="mp_cart_resume_item_label">' . __( 'Coupon Discounts', 'mp' ) . '</span>
-				<span class="mp_cart_resume_item_amount">' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
+				<span class="mp_cart_resume_item_amount mp_cart_resume_item_amount-total">-' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
 				<ul class="mp_cart_resume_coupons_list">';
 
 		foreach ( $coupons as $coupon ) {
 			$html .= '
 					<li class="mp_cart_coupon">
 						<span class="mp_cart_resume_item_label">' . $coupon->post_title . ( ( $cart->is_editable ) ? ' <a class="mp_cart_coupon_remove_item" href="javascript:mp_coupons.remove(' . $coupon->ID . ', ' . $cart->get_blog_id() . ');">(' . __( 'Remove', 'mp' ) . ')</a>' : '' ) . '</span>
-						<span class="mp_cart_resume_item_amount">' . $coupon->discount_amt( false ) . '</span>
+						<span class="mp_cart_resume_item_amount">-' . $coupon->discount_amt( false ) . '</span>
 					</li><!-- end mp_cart_coupon -->';
 		}
 
@@ -981,6 +982,20 @@ class MP_Coupons_Addon {
 	}
 
 	/**
+	 * Check items in cart. If cart is empty, remove all coupons
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function check_items_in_cart() {
+		$cart = mp_cart();
+
+		if( ! $cart->has_items() ) {
+			$this->remove_all_coupons();
+		}
+	}
+
+	/**
 	 * Remove a given coupon
 	 *
 	 * @since 3.0
@@ -1010,17 +1025,32 @@ class MP_Coupons_Addon {
 	 * @return array
 	 */
 	public function product_price( $price, $product ) {
-		$coupons = $this->get_applied_as_objects();
+		$action = mp_get_request_value( 'action' );
 
-		foreach ( $coupons as $coupon ) {
-			$products = $coupon->get_products( true );
-			if ( in_array( $product->ID, $products ) ) {
-				$price['before_coupon'] = $price['lowest'];
+		if (
+			mp_is_shop_page( 'cart' ) ||
+			mp_is_shop_page( 'checkout' ) ||
+			! empty( $_POST['is_cart_page'] ) || 
+			( ! empty( $action ) && (
+				strpos( $action, 'mp_process_checkout_return_') !== false ||
+				$action === 'mp_process_checkout' || 
+				$action === 'mp_update_checkout_data' || 
+				$action === 'mp_coupons_apply' || 
+				$action === 'mp_coupons_remove'
+			) )
+		) {
+			$coupons = $this->get_applied_as_objects();
 
-				if ( $coupon->get_meta( 'discount_type' ) == 'item' ) {
-					$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $coupon->get_price( $price['lowest'] );
-				} else {
-					$price['coupon'] = $coupon->get_price( $price['lowest'] );
+			foreach ( $coupons as $coupon ) {
+				$products = $coupon->get_products( true );
+				if ( in_array( $product->ID, $products ) ) {
+					$price['before_coupon'] = $price['lowest'];
+
+					if ( $coupon->get_meta( 'discount_type' ) == 'item' ) {
+						$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $coupon->get_price( $price['lowest'] );
+					} else {
+						$price['coupon'] = $coupon->get_price( $price['lowest'] );
+					}
 				}
 			}
 		}

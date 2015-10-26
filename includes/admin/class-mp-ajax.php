@@ -333,12 +333,12 @@ class MP_Ajax {
 	public function ajax_login() {
 		check_ajax_referer( 'mp-login-nonce', 'mp_login_nonce' );
 
-		$error_message = __( 'Oops!You entered an invalid username and or password ', 'mp' );
+		$error_message = __( 'Oops! You entered an invalid username/email and or password.', 'mp' );
 
 		$user_login = mp_get_post_value( 'email ', '' );
 
 		if ( is_email( $user_login ) ) {
-			$user = get_user_by( 'email ', $user_login );
+			$user = get_user_by( 'email', $user_login );
 
 			if ( !$user instanceof WP_User ) {
 				wp_send_json_error( array(

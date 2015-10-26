@@ -44,10 +44,14 @@ class MP_Admin {
 
 		add_action( 'admin_head', array( &$this, 'admin_head' ) );
 		//add a notice for deprecated gateway
-		if(get_option('mp_deprecated_gateway_notice_showed')!=1){
-		add_action( 'admin_notices', array(&$this,'deprecated_gateway_notice') );
-		add_action('admin_footer',array(&$this,'print_deprecated_notice_scripts'));
-		add_action('wp_ajax_mp_dismissed_deprecated_message',array(&$this,'dismissed_deprecated_messag'));
+		if(get_option( 'mp_deprecated_gateway_notice_showed' ) != 1 ){
+			add_action( 'admin_notices', array( &$this, 'deprecated_gateway_notice' ) );
+			add_action( 'admin_footer', array( &$this, 'print_deprecated_notice_scripts' ) );
+			add_action( 'wp_ajax_mp_dismissed_deprecated_message', array( &$this, 'dismissed_deprecated_messag' ) );
+		}
+		
+		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) || (isset( $_GET[ 'quick_setup_step' ] )) ) {
+			add_action( 'admin_notices', array( &$this, 'display_quick_setup_notice' ) );
 		}
 	}
 
@@ -57,6 +61,20 @@ class MP_Admin {
 		}
 		update_option('mp_deprecated_gateway_notice_showed',1);
 
+	}
+	
+	public function display_quick_setup_notice() {
+		?>
+		<div id="message" class="update-nag">
+			<p>
+				<?php _e( '<strong>MarketPress setup is not complete!</strong> Once you\'ve completed this quick setup wizard you\'ll have a fully working online store - exciting! ', 'mp' ); ?>
+			</p>
+			<p>
+				<?php printf( __( '<a class="button button-primary" href="%s">Run setup wizard</a>', 'mp' ), admin_url( 'admin.php?page=store-setup-wizard' ) ); ?>
+				<a class="button button-secondary" href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '2' ), 'admin.php' ) ); ?>"><?php _e( 'Skip this step, I\'ll do this manually', 'mp' ); ?></a>
+			</p>
+		</div>
+		<?php
 	}
 
 	public function deprecated_gateway_notice(){

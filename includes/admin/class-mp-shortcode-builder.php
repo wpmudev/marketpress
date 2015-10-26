@@ -156,6 +156,20 @@ class MP_Shortcode_Builder {
 			// Only continue if a tinymce editor exists on the current page
 			return;
 		}
+		
+		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+		}
+		
+		if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
+			function mp_get_plugin_slug() {
+				if ( MP_LITE ) {
+					return 'wordpress-ecommerce/marketpress.php';
+				} else {
+					return 'marketpress/marketpress.php';
+				}
+			}
+		}
 
 		$shortcodes = array(
 			'mp_tag_cloud'			 => __( 'Display a cloud or list of your product tags.', 'mp' ),
@@ -171,12 +185,27 @@ class MP_Shortcode_Builder {
 			'mp_product_sku'		 => __( 'Display the product SKU number(s).', 'mp' ),
 			'mp_product_stock'		 => __( 'Display the product stock.', 'mp' ),
 			'mp_product_meta'		 => __( 'Display the full product meta box with price and buy now/add to cart button.', 'mp' ),
+			'mp_cart_widget'		 => __( 'Display the cart widget.', 'mp' ),
 			'mp_cart_link'			 => __( 'Display a link or url to the current shopping cart page.', 'mp' ),
 			'mp_store_link'			 => __( 'Display a link or url to the current store page.', 'mp' ),
 			'mp_products_link'		 => __( 'Display a link or url to the current products list page.', 'mp' ),
 			'mp_orderstatus_link'	 => __( 'Display a link or url to the order status page.', 'mp' ),
 			'mp_store_navigation'	 => __( 'Display a list of links to your store pages.', 'mp' ),
 		);
+		
+		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
+			$settings = get_site_option( 'mp_network_settings' );
+			if ( ( isset($settings['main_blog']) && mp_is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
+				$mu_shortcodes = array(
+					'mp_list_global_products'	  => __( 'Display a list or grid  of your global products.', 'mp' ),
+					'mp_global_categories_list'   => __( 'Display a list of your global categories.', 'mp' ),
+					'mp_global_tag_cloud'		  => __( 'Display a cloud or list of your global product tags.', 'mp' ),
+				);
+				
+				$shortcodes = array_merge($shortcodes, $mu_shortcodes);
+			}
+		}
+		
 		?>
 		<div id="mp-shortcode-builder" style="display:none">
 			<form id="mp-shortcode-builder-form">
@@ -304,7 +333,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
-					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						foreach ( $this->_product_cats as $cat ) {
 							if ( isset( $cat ) ) {
@@ -320,7 +349,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Only include these categories.', 'mp' ); ?></span></span> include</th>
 				<td>
-					<select name="include" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="include" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						foreach ( $this->_product_cats as $cat ) :
 							if ( isset( $cat ) ) {
@@ -334,7 +363,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude category-tree from the results. The parameter include must be empty. If the hierarchical parameter is true, then use exclude instead of exclude_tree.', 'mp' ); ?></span></span> exclude_tree</th>
 				<td>
-					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude_tree" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php foreach ( $this->_product_cats as $cat ) : ?>
 							<option value="<?php echo esc_attr( isset( $cat->term_id ) ? $cat->term_id : ''  ); ?>"><?php echo isset( $cat->name ) ? $cat->name : ''; ?></option>
 						<?php endforeach; ?>
@@ -460,7 +489,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude one or more categories from the results. The parameter include must be empty.', 'mp' ); ?></span></span> exclude</th>
 				<td>
-					<select name="exclude" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						$cats = get_categories( array(
 							'hide_empty' => 0,
@@ -477,7 +506,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Exclude category-tree from the results. The parameter include must be empty. If the hierarchical parameter is true, then use exclude instead of exclude_tree.', 'mp' ); ?></span></span> exclude_tree</th>
 				<td>
-					<select name="exclude_tree" class="chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
+					<select name="exclude_tree" class="mp-chosen-select" data-placeholder="<?php _e( 'Select Categories', 'mp' ); ?>" multiple>
 						<?php
 						$cats = get_categories( array(
 							'hide_empty' => 0,
@@ -747,7 +776,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product category.', 'mp' ); ?></span></span> category</th>
 				<td>
-					<select name="category" data-default="" class="chosen-select">
+					<select name="category" data-default="" class="mp-chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_cats as $term ) : ?>
 							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
@@ -758,7 +787,7 @@ class MP_Shortcode_Builder {
 			<tr>
 				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product tag.', 'mp' ); ?></span></span> tag</th>
 				<td>
-					<select name="tag" data-default="" class="chosen-select">
+					<select name="tag" data-default="" class="mp-chosen-select">
 						<option value=""><?php _e( 'None', 'mp' ); ?></option>
 						<?php foreach ( $this->_product_tags as $term ) : ?>
 							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
@@ -1000,6 +1029,55 @@ class MP_Shortcode_Builder {
 	}
 
 	/**
+	 * Displays the [mp_cart_widget] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_cart_widget_attributes() {
+		?>
+		<table id="mp-cart-widget-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The title of the cart.', 'mp' ); ?></span></span> title</th>
+				<td>
+					<input type="text" name="title" data-default="" value="" />
+				</td>
+			</tr>			
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The text displayed before the cart.', 'mp' ); ?></span></span> custom_text</th>
+				<td>
+					<input type="text" name="custom_text" data-default="" value="" />
+				</td>
+			</tr>			
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product image.', 'mp' ); ?></span></span> show_product_image</th>
+				<td>
+					<input type="checkbox" name="show_product_image" data-default="1" value="1" checked />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product quantity.', 'mp' ); ?></span></span> show_product_qty</th>
+				<td>
+					<input type="checkbox" name="show_product_qty" data-default="1" value="1" checked />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to show or hide the product price.', 'mp' ); ?></span></span> show_product_price</th>
+				<td>
+					<input type="checkbox" name="show_product_price" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to display the cart only on store pages or not.', 'mp' ); ?></span></span> only_store_pages</th>
+				<td>
+					<input type="checkbox" name="only_store_pages" value="1" />
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+
+	/**
 	 * Displays the [mp_cart_link] short code attributes
 	 *
 	 * @since 3.0
@@ -1073,6 +1151,179 @@ class MP_Shortcode_Builder {
 		</table>
 		<?php
 	}
+	
+	/**
+	 * Displays the [mp_list_global_products] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_list_global_products_attributes() {
+		?>
+		<table id="mp-list-global-products-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to paginate the product list. This is useful to only show a subset.', 'mp' ); ?></span></span> paginate</th>
+				<td>
+					<input type="checkbox" name="paginate" data-default="<?php echo esc_attr( mp_get_setting( 'paginate' ) ); ?>" value="1" <?php checked( 1, mp_get_setting( 'paginate' ) ); ?> />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The page number to display in the product list if "paginate" is set to true.', 'mp' ); ?></span></span> page</th>
+				<td>
+					<input type="text" name="page" data-default="1" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'How many products to display in the product list if "paginate" is set to true.', 'mp' ); ?></span></span> per_page</th>
+				<td>
+					<input type="text" name="per_page" data-default="<?php echo esc_attr( mp_get_setting( 'per_page' ) ); ?>" value="<?php echo esc_attr( mp_get_setting( 'per_page' ) ); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'How many products to display in the product list if "paginate" is set to false.', 'mp' ); ?></span></span> limit</th>
+				<td>
+					<input type="text" name="limit" data-default="<?php echo esc_attr( mp_get_setting( 'limit' ) ); ?>" value="<?php echo esc_attr( mp_get_setting( 'limit' ) ); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'What field to order products by.', 'mp' ); ?></span></span> order_by</th>
+				<td>
+					<select name="order_by" data-default="<?php echo esc_attr( mp_get_setting( 'order_by' ) ); ?>">
+						<?php
+						$data = array(
+							'title'	 => __( 'Product Name', 'mp' ),
+							'date'	 => __( 'Publish Date', 'mp' ),
+							'ID'	 => __( 'Product ID', 'mp' ),
+							'author' => __( 'Product Author', 'mp' ),
+							'sales'	 => __( 'Number of Sales', 'mp' ),
+							'price'	 => __( 'Product Price', 'mp' ),
+							'rand'	 => __( 'Random', 'mp' ),
+						);
+
+						foreach ( $data as $value => $label ) :
+							?>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, mp_get_setting( 'order_by' ) ); ?>><?php echo $label; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Direction to order products by.', 'mp' ); ?></span></span> order</th>
+				<td>
+					<label><input type="radio" name="order" data-default="<?php echo esc_attr( mp_get_setting( 'order' ) ); ?>" value="ASC" <?php checked( 'ASC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Ascending', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="order" data-default="<?php echo esc_attr( mp_get_setting( 'order' ) ); ?>" value="DESC" <?php checked( 'DESC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Descending', 'mp' ); ?></label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product category.', 'mp' ); ?></span></span> category</th>
+				<td>
+					<select name="category" data-default="" class="mp-chosen-select">
+						<option value=""><?php _e( 'None', 'mp' ); ?></option>
+						<?php foreach ( $this->_product_cats as $term ) : ?>
+							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product tag.', 'mp' ); ?></span></span> tag</th>
+				<td>
+					<select name="tag" data-default="" class="mp-chosen-select">
+						<option value=""><?php _e( 'None', 'mp' ); ?></option>
+						<?php foreach ( $this->_product_tags as $term ) : ?>
+							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'If checked, products will be displayed as a list - otherwise products will be displayed as a grid.', 'mp' ); ?></span></span> list_view</th>
+				<td>
+					<input type="checkbox" name="list_view" data-default="<?php echo esc_attr( ( mp_get_setting( 'list_view' ) == 'list' ) ? 1 : 0  ); ?>" value="1" <?php checked( 'list', mp_get_setting( 'list_view' ) ); ?> />
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+	
+	/**
+	 * Displays the [mp_global_categories_list] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_global_categories_list_attributes() {
+		?>
+		<table id="mp-global-categories-list-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Sort categories alphabetically, by unique Category ID, or by the count of posts in that Category.', 'mp' ); ?></span></span> orderby</th>
+				<td>
+					<select name="orderby" data-default="name">
+						<?php foreach ( array( 'ID', 'name', 'slug', 'count', 'term_group' ) as $value ) : ?>
+							<option <?php selected( $value, 'name' ); ?>><?php echo $value; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Sort order for categories (either ascending or descending).', 'mp' ); ?></span></span> order</th>
+				<td>
+					<select name="order" data-default="ASC">
+						<?php foreach ( array( 'ASC', 'DESC' ) as $value ) : ?>
+							<option <?php selected( $value, 'ASC' ); ?>><?php echo $value; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Toggles the display of the current count of posts in each category.', 'mp' ); ?></span></span> show_count</th>
+				<td>
+					<input type="checkbox" name="show_count" data-default="" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Sets the number of Categories to display. This causes the SQL LIMIT value to be defined.', 'mp' ); ?></span></span> number</th>
+				<td>
+					<input type="text" name="limit" data-default="" value="" />
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
+	
+	/**
+	 * Displays the [mp_global_categories_list] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_global_tag_cloud_attributes() {
+		?>
+		<table id="mp-global-tag-cloud-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Order of the tags.', 'mp' ); ?></span></span> orderby</th>
+				<td>
+					<label for="mp-tag-cloud-orderby-name"><input type="radio" name="orderby" id="mp-tag-cloud-orderby-name" data-default="name" value="name" checked /> <?php _e( 'Name', 'mp' ); ?></label><br />
+					<label for="mp-tag-cloud-orderby-count"><input type="radio" name="orderby" id="mp-tag-cloud-orderby-count" data-default="count" value="count" /> <?php _e( 'Count', 'mp' ); ?></label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Sort order.', 'mp' ); ?></span></span> order</th>
+				<td>
+					<label for="mp-tag-cloud-order-asc"><input type="radio" name="order" id="mp-tag-cloud-order-asc" data-default="ASC" value="ASC" checked /> <?php _e( 'Ascending', 'mp' ); ?></label><br />
+					<label for="mp-tag-cloud-order-desc"><input type="radio" name="order" id="mp-tag-cloud-order-desc" data-default="ASC" value="DESC" /> <?php _e( 'Descending', 'mp' ); ?></label><br />
+					<label for="mp-tag-cloud-order-rand"><input type="radio" name="order" id="mp-tag-cloud-order-rand" data-default="RAND" value="RAND" /> <?php _e( 'Random', 'mp' ); ?></label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Sets the number of Tags to display. This causes the SQL LIMIT value to be defined.', 'mp' ); ?></span></span> number</th>
+				<td>
+					<input type="text" name="limit" data-default="" value="" />
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
 
 	/**
 	 * Displays the short code builder submit/reset buttons
@@ -1114,13 +1365,13 @@ class MP_Shortcode_Builder {
 			|| $page == 'store-settings-addons'
 			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
 			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' || $_GET['post_type'] == 'page') ) 
-			|| ( isset( $screenpage->post_type ) && ($screenpage->post_type == "post" || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon" || $screenpage->post_type == "page") ) )  {
+			|| ( isset( $screenpage->post_type ) && ( $screenpage->post_type == "product" || $screenpage->post_type == "post" || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon" || $screenpage->post_type == "page") ) )  {
 
 			wp_enqueue_style( 'colorbox', mp_plugin_url( 'includes/admin/ui/colorbox/colorbox.css' ), false, MP_VERSION );
 			wp_enqueue_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), false, MP_VERSION );
 
-			wp_enqueue_style( 'select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
-			wp_enqueue_script( 'select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
+			wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
+			wp_enqueue_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), false, MP_VERSION );
 
 			wp_enqueue_script( 'mp-shortcode-builder', mp_plugin_url( 'includes/admin/ui/js/shortcode-builder.js', array( 'colorbox', 'chosen' ), MP_VERSION ) );
 			wp_localize_script( 'mp-shortcode-builder', 'MP_ShortCode_Builder', array(

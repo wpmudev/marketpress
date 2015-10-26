@@ -25,8 +25,8 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	var $skip_form = true;
 	//credit card vars
 	var $API_Username, $API_Password, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
-  //if the gateway uses the order confirmation step during checkout (e.g. PayPal)
-  var $use_confirmation_step = true;
+	//if the gateway uses the order confirmation step during checkout (e.g. PayPal)
+	var $use_confirmation_step = false;
 	
 	/**
 	 * Refers to the gateways currencies
@@ -220,6 +220,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		
 		foreach ( $items as $item ) {
 			$price = $item->get_price( 'lowest' );
+			
 			$total += ($price * $item->qty);
 			
 			$prefix = 'li_' . $counter;
@@ -230,7 +231,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			$params["{$prefix}_price"] = $price;
 			$params["{$prefix}_type"] = 'product';
 			
-			if ( $data['download'] ) {
+			if ( $item->get_meta( 'download', $item->ID ) ) {
 				$params["{$prefix}_tangible"] = 'N';
 			} else {
 				$params["{$prefix}_tangible"] = 'Y';
@@ -278,7 +279,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 	 */
 	function process_checkout_return() {
 		$timestamp = time();
-		$total = round( mp_get_request_value( 'total' ), 2 );
+		$total = number_format( round( mp_get_request_value( 'total' ), 2 ), 2, '.', '');
 		$order_num = mp_get_request_value( 'order_number' );
 		$mp_order_num = mp_get_request_value( 'merchant_order_id' );
 		$hash = strtoupper( md5( $this->API_Password . $this->API_Username . $order_num . $total ) );
@@ -298,14 +299,14 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 				'method' => __( 'Credit Card', 'mp' ),
 			);
 			 
-			 $order = new MP_Order( $mp_order_num );
-			 $order->save( array(
+			$order = new MP_Order( $mp_order_num );
+			$order->save( array(
 				'cart' => mp_cart(),
 				'payment_info' => $payment_info,
 				'paid' => true,
-			 ) );
+			) );
 			 
-			 wp_redirect( $order->tracking_url( false ) );
+			wp_redirect( $order->tracking_url( false ) );
 		}
 		
 		die;
@@ -323,7 +324,7 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 			'page_slugs' => array('store-settings-payments', 'store-settings_page_store-settings-payments'),
 			'title' => sprintf(__('%s Settings', 'mp'), $this->admin_name),
 			'option_name' => 'mp_settings',
-			'desc' => sprintf( __( '<ol><li>Set the "Return Method" within <a target="_blank" href="https://www.2checkout.com/sandbox/acct/detail_company_info">Site Management</a> to <strong>Header Redirect</strong> and set the "Return URL" to <strong>%s</strong></li><li>Set your <a target="https://www.2checkout.com/sandbox/notifications/">notifications url</a> to <strong>%s</strong></li></ol>', 'mp' ), $this->return_url, $this->ipn_url ),
+			'desc' => sprintf( __( '<ol><li>Set the "Return Method" within <a target="_blank" href="https://sandbox.2checkout.com/sandbox/acct/detail_company_info">Site Management</a> to <strong>Header Redirect</strong> and set the "Return URL" to <strong>%s</strong></li><li>Set your <a target="https://www.2checkout.com/sandbox/notifications/">notifications url</a> to <strong>%s</strong></li></ol>', 'mp' ), $this->return_url, $this->ipn_url ),
 			'conditional' => array(
 				'name' => 'gateways[allowed][' . $this->plugin_name . ']',
 				'value' => 1,
@@ -428,7 +429,6 @@ class MP_Gateway_2Checkout extends MP_Gateway_API {
 		
 		exit;
 	}
-
 }
 
 //register payment gateway plugin

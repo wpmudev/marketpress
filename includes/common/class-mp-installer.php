@@ -309,6 +309,7 @@ class MP_Installer {
 		$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
 
 		if ( is_array( $old_value ) ) {
+			$old_value = array_filter( $old_value );
 			$old_value = array_shift( $old_value );
 		}
 
@@ -323,7 +324,7 @@ class MP_Installer {
 
 		if ( $old_post_meta_name == 'mp_shipping' ) {
 			$old_value = get_post_meta( $post_id, $old_post_meta_name, true );
-			if ( isset( $old_value ) && is_array( $old_value ) ) {
+			if ( isset( $old_value ) && is_array( $old_value ) && count( $old_value ) ) {
 				$old_value = $old_value['extra_cost'];
 			} else {
 				$old_value = 0;
@@ -365,7 +366,7 @@ class MP_Installer {
 		$per_page = 20;
 		//get the total first
 		$total_count = wp_count_posts( MP_Product::get_post_type() );
-		$total_count = $total_count->publish + $total_count->draft + $total_count->private;
+		$total_count = $total_count->publish + $total_count->draft + $total_count->private + $total_count->pending;
 
 		$query = new WP_Query( array(
 			'cache_results'          => false,
@@ -383,6 +384,7 @@ class MP_Installer {
 			$post_id = get_the_ID();
 
 			$variations = get_post_meta( $post_id, 'mp_var_name', true );
+			//var_dump( $post_id );
 			if ( $variations && is_array( $variations ) && $update_fix_needed == true ) {//need update since it used mp_var_name post meta which is not used in the 3.0 version
 				if ( count( $variations ) > 1 ) {
 					//It's a variation product
@@ -408,7 +410,6 @@ class MP_Installer {
 					$this->product_variations_transition( $post_id, $product_type );
 				} else {
 					//It's single/regular/non-variant product
-
 					$post_thumbnail = get_post_thumbnail_id( $post_id );
 					if ( is_numeric( $post_thumbnail ) ) {
 						update_post_meta( $post_id, 'mp_product_images', $post_thumbnail );
@@ -551,6 +552,27 @@ class MP_Installer {
 			$result = $wpdb->query( "ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`" );
 		}
 	}
+	
+	/**
+	 * Add post_status column to $wpdb->mp_products table
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 */
+	public function add_post_status_column() {
+		global $wpdb;
+		
+		$table_product = $wpdb->base_prefix . 'mp_products';
+
+		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_product ) ) == $table_product ) {
+			$result = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->base_prefix}mp_products LIKE 'post_status'" );
+
+			if ( $result == 0 ) {
+				$result = $wpdb->query( "ALTER TABLE {$wpdb->base_prefix}mp_products ADD `post_status` varchar(20) NOT NULL DEFAULT 'publish' AFTER `post_permalink`" );
+			}
+		}
+	}
 
 	/**
 	 * Display the db update page
@@ -653,7 +675,10 @@ class MP_Installer {
 		$old_version   = get_option( 'mp_version' );
 		$force_upgrade = mp_get_get_value( 'force_upgrade', 0 );
 		$force_version = mp_get_get_value( 'force_version', false );
-
+		
+		// Add "post_status" to $wpdb->mp_products table
+		$this->add_post_status_column();
+		
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
 			return;
 		}
