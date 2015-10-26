@@ -343,6 +343,7 @@ class MP_Taxes {
 		}
 
 		$address       = $this->get_tax_address( $is_digital );
+
 		$applied_rates = $this->find_matched_rate_taxes( $address['country'], $address['state'], $address['city'], $address['zip'], $table_rate );
 
 		if ( $context == 'cart' ) {
@@ -350,6 +351,7 @@ class MP_Taxes {
 		} else {
 			$mode = mp_get_setting( 'tax->show_price_with_tax' );
 		}
+
 		$taxes = array();
 		if ( $inclusive && $mode == 'inclusive' ) {
 			return $price;

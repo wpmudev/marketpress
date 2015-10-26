@@ -119,150 +119,6 @@ class MP_Product {
 		$product_id = mp_get_get_value( 'product_id' );
 		$product    = new MP_Product( $product_id );
 
-		/* $image	 = 'single';
-		  $title	 = true;
-		  $content = 'full';
-		  $meta	 = true;
-
-		  if ( !$product->exists() ) {
-		  die( __( 'The product specified could not be found', 'mp' ) );
-		  }
-
-		  $variation = false;
-
-		  if ( $variation_id = $product->ID ) {
-		  $variation = new MP_Product( $variation_id );
-		  if ( !$variation->exists() ) {
-		  $variation = false;
-		  }
-		  }
-
-		  $has_image = false;
-		  if ( !$product->has_variations() ) {
-		  $values = get_post_meta( $product->ID, 'mp_product_images', true );
-		  if ( $values ) {
-		  $has_image = true;
-		  }
-		  } else {
-		  $post_thumbnail_id = get_post_thumbnail_id( $product->ID );
-		  if ( $post_thumbnail_id ) {
-		  $has_image = true;
-		  }
-		  }
-
-		  $image_alignment = mp_get_setting( 'image_alignment_single' );
-		  ?>
-		  <!-- MP Product Lightbox -->
-		  <?php
-		  $return			 = '
-		  <!-- MP Single Product -->
-		  <section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
-		  <div class="mp_product mp_single_product' . ($has_image ? ' mp_single_product-has-image mp_single_product-image-' . (!empty( $image_alignment ) ? $image_alignment : 'aligncenter') . '' : '') . ($product->has_variations() ? ' mp_single_product-has-variations' : '') . '">';
-
-		  $content = 'full';
-		  $values	 = get_post_meta( $product->ID, 'mp_product_images', true );
-
-		  if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
-		  $size = array( mp_get_setting( 'list_img_size_custom->width' ), mp_get_setting( 'list_img_size_custom->height' ) );
-		  } else {
-		  $size = mp_get_setting( 'list_img_size' );
-		  }
-
-		  if ( !$product->has_variations() ) {
-
-
-		  if ( $values ) {
-		  $return .= '<div class="mp_single_product_images">';
-
-		  $return .= "<script>
-		  jQuery(document).ready(function() {
-		  jQuery('#mp-product-gallery').lightSlider({
-		  gallery:true,
-		  item:1,
-		  loop:true,
-		  thumbItem:5,
-		  slideMargin:0,
-		  enableDrag: true,
-		  currentPagerPosition:'left',
-		  onSliderLoad: function(el) {
-		  el.lightGallery({
-		  selector: '#mp-product-gallery .lslide'
-		  });
-		  }
-		  });
-		  });
-		  </script>";
-
-		  $return .= '<ul id="mp-product-gallery" class="mp_product_gallery">';
-
-		  $values = explode( ',', $values );
-
-		  foreach ( $values as $value ) {
-		  $img_url = wp_get_attachment_image_src( $value, $size );
-		  $return .= '<li data-thumb="' . $img_url[ 0 ] . '" data-src ="' . $img_url[ 0 ] . '"><img src="' . $img_url[ 0 ] . '"></li>';
-		  }
-
-		  $return .= '</ul><!-- end mp_product_gallery -->';
-
-		  $return .= '</div><!-- end mp_single_product_images -->';
-		  }
-		  } else {
-		  $return .= '<div class="mp_single_product_images">';
-		  $return .= ( $variation ) ? $variation->image( false, $image ) : $product->image( false, $image );
-		  $return .= '</div><!-- end mp_single_product_images -->';
-		  }
-
-		  $return .= '<div class="mp_single_product_details">';
-
-		  $return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
-
-		  $return .= '<div class="mp_product_meta">';
-
-		  if ( $title ) {
-		  $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-		  }
-
-		  // Price
-		  $return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
-
-		  // Excerpt
-		  if ( !$variation ) {
-		  $return .= '<div class="mp_product_excerpt">';
-		  $return .= mp_get_the_excerpt( $product_id, apply_filters( 'mp_get_the_excerpt_length', 18 ) );
-		  $return .= '</div><!-- end mp_product_excerpt -->';
-		  } else {
-		  $return .= '<div class="mp_product_excerpt mp_product_excerpt-variation">';
-		  $return .= mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true );
-		  $return .= '</div><!-- end mp_product_excerpt -->';
-		  }
-
-		  $return .= '</div><!-- end mp_product_meta-->';
-
-		  // Callout
-		  $return .= '<div class="mp_product_callout">';
-
-		  // Button
-		  $selected_atts = array();
-
-		  if ( $variation ) {
-		  $atts = $variation->get_attributes();
-		  foreach ( $atts as $slug => $att ) {
-		  $selected_atts[ $slug ] = key( $att[ 'terms' ] );
-		  }
-		  }
-
-		  $return .= $product->buy_button( false, 'single', $selected_atts );
-
-		  $return .= '</div><!-- end mp_product_callout-->';
-
-		  $return .= '</div><!-- end mp_single_product_details-->';
-
-		  $return .= '
-		  </div><!-- end mp_product/mp_single_product -->
-		  </section><!-- end mp-single-product -->';
-		  echo $return;
-
-		 */
 		?>
 		<?php if ( 0 == 0 ) { ?>
 			<?php ob_start(); ?>
@@ -866,10 +722,9 @@ class MP_Product {
 			return $price;
 		}
 
-		$charge_tax = $this->get_meta( 'charge_tax' );
 		$rate = $this->get_meta( 'special_tax_rate' );
 
-		if ( empty( $charge_tax ) ) {
+		if ( empty( $rate ) ) {
 			$rate = mp_tax_rate();
 		} else {
 			if ( false !== strpos( $rate, '%' ) ) {
@@ -1156,21 +1011,21 @@ class MP_Product {
 		if ( $this->has_variations() ) {
 			// Get price range
 			if ( $price['lowest'] != $price['highest'] ) {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . ' - ' . mp_format_currency( '', $this->manage_price_tax( $price['highest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price['lowest'] ) . ' - ' . mp_format_currency( '', $price['highest'] ) . '</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $price['lowest'] ) . '</span>';
 			}
 		} elseif ( $this->on_sale() ) {
-			$amt_off = mp_format_currency( '', ( $this->manage_price_tax( $price['highest'] ) - $this->manage_price_tax( $price['lowest'] ) ) * $this->qty ) . $this->display_tax_string( false );
+			$amt_off = mp_format_currency( '', ( $price['highest'] - $price['lowest'] ) * $this->qty );
 
 			if ( $this->qty > 1 ) {
-				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', $this->manage_price_tax( ( $price['lowest'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
-				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $this->manage_price_tax( $price['sale']['amount'] ) ) ) . ') ' . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ( $price['lowest'] * $this->qty ) ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price['sale']['amount'] ) ) . ')</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $this->manage_price_tax( $price['sale']['amount'] ) ) . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-sale" itemprop="price">' . mp_format_currency( '', $price['sale']['amount'] ) . '</span>';
 			}
 
-			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( ( $price['regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+			$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', ( $price['regular'] * $this->qty ) ) . '</span>';
 
 			/* if ( ($end_date	 = $price[ 'sale' ][ 'end_date' ]) && ($days_left	 = $price[ 'sale' ][ 'days_left' ]) ) {
 			  $snippet .= '<strong class="mp_savings_amt">' . sprintf( __( 'You Save: %s', 'mp' ), $amt_off ) . sprintf( _n( ' - only 1 day left!', ' - only %s days left!', $days_left, 'mp' ), $days_left ) . '</strong>';
@@ -1179,10 +1034,10 @@ class MP_Product {
 			  } */
 		} else {
 			if ( $this->qty > 1 ) {
-				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', $this->manage_price_tax( ( $price['lowest'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
-				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) ) . ') ' . $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-extended">' . mp_format_currency( '', ( $price['lowest'] * $this->qty ) ) . '</span>';
+				$snippet .= '<span class="mp_product_price-each" itemprop="price">(' . sprintf( __( '%s each', 'mp' ), mp_format_currency( '', $price['lowest'] ) ) . ')</span>';
 			} else {
-				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ). $this->display_tax_string( false ) . '</span>';
+				$snippet .= '<span class="mp_product_price-normal" itemprop="price">' . mp_format_currency( '', $price['lowest'] ) . '</span>';
 			}
 		}
 
