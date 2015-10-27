@@ -1,0 +1,3 @@
+.agignore
+.jshintrc
+node_modules

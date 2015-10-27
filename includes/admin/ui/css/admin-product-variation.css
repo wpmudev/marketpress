@@ -1,0 +1,15 @@
+.add-new-h2{
+    display: none;
+}
+
+#submitdiv .handlediv,
+#minor-publishing,
+#delete-action,
+#wpbody-content .wrap h2,
+a[href='post_type=mp_product_variation']{
+    display: none;
+}
+
+#poststuff #post-body.columns-2 #side-sortables{
+    margin-top: 26px;
+}

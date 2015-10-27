@@ -1,0 +1,121 @@
+.wrap .add-new-h2 {
+	display: none;
+}
+
+.widefat .column-mp_orders_status,
+.widefat .column-mp_orders_items {
+	text-align: center;
+	width: 50px;
+}
+	
+.widefat td.mp_orders_status {
+	overflow: visible;
+}
+
+	
+.mp_order_status {
+	position: relative;
+
+	img {
+		display: none;
+		margin: 2px 0;
+	}
+
+	.mp_order_status_menu {
+		position: absolute;
+			top: -10px;
+			left: 40px;
+			z-index: 10;
+		background: #fff;
+		border: 1px solid #ccc;
+			-webkit-box-shadow: 0 0 5px rgba(0, 0, 0, .2);
+		box-shadow: 0 0 5px rgba(0, 0, 0, .2);
+		display: none;
+		margin: 0;
+		padding: 10px;
+		white-space: nowrap;
+		text-align: left;
+
+		a,
+		span {
+			display: block;
+			line-height: 1;
+			margin: 0;
+			padding: 5px 8px;
+		}
+
+		span {
+			color: #999;
+		}
+
+		li {
+			position: relative;
+			display: inline-block;
+			margin: 0;
+			padding: 0;
+
+			&.current span {
+				color: #999;
+			}
+
+			&:before {
+				position: absolute;
+					top: 1px;
+					left: -4px;
+				color: #ccc;
+				content: "|";
+			}
+
+			&:first-child:before,
+			&:first-child + li:before {
+				display: none;
+			}
+		}
+	}
+
+	&:hover .mp_order_status_menu {
+		display: block;
+	}
+}
+		
+div.mp_order_status {
+	&:before {
+		display: inline-block;
+		font: 400 20px/1 dashicons;
+		-webkit-font-smoothing: antialiased;
+	}
+	
+	&.loading {
+		img {
+			display: inline-block;
+		}
+	
+		&:before {
+			display: none;
+		}
+	}
+	
+	&.order_received:before {
+		content: "\f154";
+	}
+	
+	&.order_paid:before {
+		content: "\f459";
+	}
+	
+	&.order_shipped:before,
+	&.order_closed:before {
+		content: "\f155";
+	}
+}
+		
+#post-body-content {
+	display: none;
+}
+
+#mp-order-history-metabox .inside,
+#mp-order-payment-info-metabox .inside,
+#mp-order-actions-metabox .inside,
+#mp-order-shipping-info-metabox .inside {
+	padding: 0;
+}

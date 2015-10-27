@@ -1,0 +1,176 @@
+.store-management-left,
+.store-management-right{
+    width: 50%;
+    float: left;
+    margin-top: 0px;
+}
+
+.store-management ul span{
+    font-weight: bold;
+    color: #000;
+}
+
+#mp_store_management p:first-child span,
+#mp_store_report p:first-child span{
+    font-weight: bold;
+}
+
+.mp-dashboard-section-title{
+    font-weight: bold;
+    color: #000;
+    display: block;
+}
+
+.mp-dashboard-stats-wrapper{
+    border: 1px solid #ccc;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    float: left;
+    width: 100%;
+}
+
+.mp-dashboard-square{
+    text-align: center;
+    float: left;
+    width: 45.8%;
+    padding: 2%;
+}
+
+.mp-dashboard-square:first-child{
+    border-bottom: 1px inset #ccc;
+    border-right: 1px inset #ccc;
+}
+
+.mp-dashboard-square:nth-child(2){
+    border-bottom: 1px inset #ccc;
+}
+
+.mp-dashboard-square:nth-child(3){
+    border-right: 1px inset #ccc;
+}
+
+.mp-dashboard-square-title{
+    text-transform: uppercase;
+    color: #ccc;
+    font-size: 11px;
+    display: block;
+}
+
+.mp-dashboard-square-footer{
+    color: #ccc;
+    font-size: 10px;
+    display: block;
+}
+
+.mp-dashboard-square-amount{
+    color: #000;
+    font-size: 22px;
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.mp-dashboard-section-stock-orders{
+    float: left;
+    width: 33%;
+    text-align: center;
+}
+
+.mp-dashboard-stock-orders-title{
+    color: #0073aa;
+    font-size: 20px;
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: normal;
+    margin-top: 20px;
+}
+
+.mp-dashboard-stock-orders-subtitle{
+    color: #ccc;
+    font-size: 13px;
+    display: block;
+}
+
+#mp_low_stock .mp_low_stock_red{
+    color: red;
+}
+
+#mp_low_stock .mp_low_stock_yellow{
+    color: #ff6600;
+}
+
+/* Editable Fields */
+
+.field_editable{
+    position: relative;
+}
+
+.original_value{
+    min-width: 50px;
+}
+
+.mp-inline-edit-hover{
+
+}
+
+.inline-edit-icon{
+    margin-left: 5px;
+}
+
+input.mp_inline_temp_value{
+    line-height: 1 !important;
+    padding: 5px !important;
+    width: 80% !important;
+    max-width: 100px !important;
+    position: absolute;
+    top: 1px;
+    margin-left: -6px;
+    font-size: 13px;
+}
+
+.mp_hidden_content{
+    display: none;
+}
+
+.mp_dashboard_widget_inventory_threshhold_wrap{
+    margin-top: 10px;
+}
+
+#mp_dashboard_widget_inventory_threshhold{
+    margin-top: 5px;
+}
+
+.mp_dashboard_widget_inventory_threshhold_message{
+    padding-top: 3px;
+    display: inline-block;
+}
+
+.mp_ajax_response{
+    display: inline-block;
+    padding-top: 3px;
+    padding-left: 5px;
+}
+
+.mp_ajax_response_success{
+    color: green;
+}
+
+.mp_ajax_response_fail{
+    color: red;
+}
+
+.mp-dashboard-widget-low-stock-wrap-overlay{
+    position: absolute;
+    width: 96.8%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 999;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    display: none;
+}
