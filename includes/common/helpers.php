@@ -107,7 +107,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 
 				$order_info .= "<tr>
 <td>" . $item->title( false ) . ( ( $download_link ) ? '<br />' . $download_link : '' ) . '</td>
-<td>' . $item->get_meta( 'sku', '' ) . '</td>
+<td>' . $item->get_meta( 'sku', '&mdash;' ) . '</td>
 <td align="right">' . number_format_i18n( $item->qty ) . '</td>
 <td align="right">' . mp_format_currency( $currency, $item->get_price( 'lowest' ) ) . '</td>
 <td align="right">' . mp_format_currency( $currency, $price ) . '</td>
@@ -128,7 +128,9 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 
 		// Shipping line
 		if ( $shipping_total = $order->get_meta( 'mp_shipping_total' ) ) {
-			$order_info .= '<strong>' . __( 'Shipping:', 'mp' ) . '</strong> ' . ( ( 0 == $shipping_total ) ? __( 'FREE', 'mp' ) : mp_format_currency( $currency, $shipping_total ) ) . "<br />\n";
+			if( !mp()->download_only_cart( mp_cart() ) ) {
+				$order_info .= '<strong>' . __( 'Shipping:', 'mp' ) . '</strong> ' . ( ( 0 == $shipping_total ) ? __( 'FREE', 'mp' ) : mp_format_currency( $currency, $shipping_total ) ) . "<br />\n";
+			}
 		}
 
 		// Tax line
@@ -156,23 +158,25 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		}
 
 		foreach ( $types as $type => $label ) {
-			$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
-			$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
-			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->company_name" ) . "<br />\n";
-			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address1" ) . "<br />\n";
+			if( $type != "shipping" || !mp()->download_only_cart( mp_cart() ) ) {
+				$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
+				$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->company_name" ) . "<br />\n";
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address1" ) . "<br />\n";
 
-			if ( $order->get_meta( "mp_{$type}_info->address2" ) ) {
-				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address2" ) . "<br />\n";
+				if ( $order->get_meta( "mp_{$type}_info->address2" ) ) {
+					$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address2" ) . "<br />\n";
+				}
+
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $order->get_meta( "mp_{$type}_info->state" ) . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $order->get_meta( "mp_{$type}_info->country" ) . "<br /><br />\n";
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
+
+				if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
+					$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->phone" ) . "<br />\n";
+				}
+
+				$shipping_billing_info .= '</td>';
 			}
-
-			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $order->get_meta( "mp_{$type}_info->state" ) . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $order->get_meta( "mp_{$type}_info->country" ) . "<br /><br />\n";
-			$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
-
-			if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
-				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->phone" ) . "<br />\n";
-			}
-
-			$shipping_billing_info .= '</td>';
 		}
 
 		$shipping_billing_info .= '</tr></table><br /><br />';
