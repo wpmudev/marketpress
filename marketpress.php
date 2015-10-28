@@ -38,6 +38,7 @@ class Marketpress {
 	 * @access public
 	 * @var array
 	 */
+ 
 	var $post_types = array( 'mp_product', 'product', 'mp_product_variation' );
 
 	/**
@@ -116,6 +117,7 @@ class Marketpress {
 	 *
 	 * @return string
 	 */
+	 
 	public function plugin_url( $path = '' ) {
 		return $this->_plugin_url . ltrim( $path, '/' );
 	}
@@ -485,7 +487,6 @@ class Marketpress {
 
 // Install - Add pages button
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
-
 			$this->create_pages();
 
 // We no longer need to install pages
@@ -701,6 +702,7 @@ class Marketpress {
 	 * @access public
 	 * @action init
 	 */
+
 	public function maybe_flush_rewrites() {
 		$flush_rewrites = get_option( 'mp_flush_rewrites_30', true );
 

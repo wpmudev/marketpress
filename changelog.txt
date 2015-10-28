@@ -3,7 +3,98 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 
 Change Log:
 ----------------------------------------------------------------------
+
+2.9.6.2
 ----------------------------------------------------------------------
+- Fixed issue with collecting billing address for digital products (when "Collect Address on Downloadable Only Cart" is checked and shipping method is not set) 
+
+2.9.6.1
+----------------------------------------------------------------------
+- Fixed issue with Statistics dashboard widget (not showing right previous month)
+
+2.9.6
+----------------------------------------------------------------------
+- Fixed: South Africa should require zip code during checkout
+- Fixed: PHP warnings when using Ultimatum theme
+- Fixed: 2Checkout doubling price after being redirected
+- Fixed: infinite loop bug in Authorize.net gateway
+- Fixed: order-by dropdown doesn't always show default value from presentation settings
+- Added: Updated 2Checkout gateway to latest API
+
+2.9.5.9
+----------------------------------------------------------------------
+- Fixed: Fedex displaying all available services at checkout instead of only the services selected
+- Fixed: PayPal Express is only applying coupon to one item
+
+2.9.5.8
+----------------------------------------------------------------------
+- Added: products are no longer set to "draft" status when using the "hide out of stock products" setting -- instead they're now set to a status of "out_of_stock"
+- Fixed: tax being charged on shipping even if tax shouldn't be charged
+- Fixed: download url incorrect in order confirmation email for products being transitioned to a draft status due to "hide out of stock products" setting
+- Fixed: user can't download purchased files when product is out of stock
+- Fixed: bug with pagination when using [mp_list_global_products] on front page
+
+2.9.5.7
+----------------------------------------------------------------------
+- Fixed: Paymill gateway is using SSL v3 which is suspectible to POODLE vulnerability
+
+2.9.5.6
+----------------------------------------------------------------------
+- Fixed: products being set to draft status after being ordered
+
+2.9.5.5
+----------------------------------------------------------------------
+- Added: "mp_imported_products_post_status" filter - gives the ability to set the post status of imported products
+- Fixed: when importing products via CSV and products have the same featured image only the first product attaches the image
+- Fixed: when using embedded Stripe checkout form the selected currency isn't being reflected in the payment form
+- Fixed: bug with mp_list_products short code and pagination
+- Fixed: bug with tax calculations due to over-rounding
+- Fixed: bug with PayPal Express gateway when tax shipping is enabled
+- Fixed: bug with automatic emails some times not being RFC5322 compliant due to line length
+
+2.9.5.4
+----------------------------------------------------------------------
+- Fixed: Shipping tax not being calculated correctly when using tax-inclusive pricing
+- Fixed: Out of stock products are still showing when "Hide out of stock items" is enabled
+- Fixed: Extra title showing above the default product image in grid view
+- Fixed: Pinterest pin-it button doesn't open in new window/tab
+- Fixed: Store menu items regenerate themselves after being deleted
+
+2.9.5.3
+----------------------------------------------------------------------
+- Fixed: Invalid measurement errors when using UPS shipping and a base country that uses the metric system http://wp.mu/a5s
+- Fixed: Incorrect First-class Mail Parcel rates being returned when using USPS shipping
+- Fixed: PHP warnings with wp_title_output()
+- Fixed: PHP errors in PIN gateway
+- Fixed: Nav Menu items classes not being applied correctly
+- Fixed: Bug with pagination when displaying products from a given category using [mp_list_products] short code
+
+2.9.5.2
+----------------------------------------------------------------------
+- Added: BN codes to PayPal gateways
+
+2.9.5.1
+----------------------------------------------------------------------
+- Added: UPS shipping gateway now allows admin to choose the appropriate pickup type allowing for more accurate rate requests
+- Fixed: When using global product list the "buy now" button adds the item to a cart that doesn't exist http://wp.mu/a2i
+- Fixed: Shipping costs are being calculated but are not applying when order is processed http://wp.mu/a2h
+- Fixed: Unable to deselect shipping options in Fedex shipping gateway settings http://wp.mu/a0s
+- Fixed: Unable to deselect "use default embedded form" in Stripe gateway settings http://wp.mu/a0t
+- Fixed: Unable to deselect checkboxes in Bitpay gateway settings
+- Fixed: Extra characters at end of admin order notification email http://wp.mu/a0u
+
+2.9.5
+----------------------------------------------------------------------
+- Fixed: When using global cart admin some times loses the ability to change shipping methods
+
+2.9.4.9
+----------------------------------------------------------------------
+- Fixed: File download issue that some users were reporting
+- Fixed: Conflicts with Ultimatum theme http://wp.mu/9tt
+- Fixed: Global Product Widget is showing a description under each product even when "content to show" is set to none http://wp.mu/9u8 
+- Fixed: Shipping not being calculated correctly when using global cart and multiple shipping methods http://wp.mu/a0a
+- Fixed: Issue with shipping/billing fields displaying incorrect values in admin http://wp.mu/a0b
+- Fixed: Double escaping in global product list widget title http://wp.mu/a0e
 
 3.0.0.6
 ----------------------------------------------------------------------
