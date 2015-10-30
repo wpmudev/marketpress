@@ -563,6 +563,11 @@ class MP_Checkout {
 	 * @access protected
 	 */
 	protected function _ajax_register_account() {
+		
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
 
 		$data = (array) mp_get_post_value( 'account', array() );
 		
