@@ -304,7 +304,7 @@ class MP_Store_Settings_Taxes {
 				'inclusive' => __( 'Inclusive', 'mp' ),
 				'exclusive' => __( 'Exclusive', 'mp' ),
 			),
-			'desc'          => 'Choose how you want to display prices of products on store. <strong>Inclusive:</strong> eg. if your price is 100 and your tax 20, your price will be 120 <strong>Exclusive:</strong> eg: if your price is 100 and your tax 20, your price will be 100',
+			'desc'          => 'Choose how you want to display prices of products on store.',
 			'default_value' => 'inclusive',
 			'conditional'   => array(
 				'name'   => 'tax[tax_enable]',

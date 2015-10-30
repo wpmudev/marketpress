@@ -107,9 +107,9 @@ class MP_Store_Settings_Admin {
 
 		add_menu_page( __( 'Store Settings', 'mp' ), __( 'Store Settings', 'mp' ), $cap, 'store-settings', create_function( '', '' ), ( version_compare( $wp_version, '3.8', '>=' ) ) ? 'dashicons-admin-settings' : mp_plugin_url( 'ui/images/marketpress-icon.png' ), '99.33' );
 		add_submenu_page( 'store-settings', __( 'Store Settings: General', 'mp' ), __( 'General', 'mp' ), $cap, 'store-settings', array( &$this, 'display_settings_form' ) );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Taxes', 'mp' ), __( 'Taxes', 'mp' ), $cap, 'store-settings-taxes', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Presentation', 'mp' ), __( 'Presentation', 'mp' ), $cap, 'store-settings-presentation', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Notifications', 'mp' ), __( 'Notifications', 'mp' ), $cap, 'store-settings-notifications', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Taxes', 'mp' ), __( 'Taxes', 'mp' ), $cap, 'store-settings-taxes', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Shipping', 'mp' ), __( 'Shipping', 'mp' ), $cap, 'store-settings-shipping', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Payments', 'mp' ), __( 'Payments', 'mp' ), $cap, 'store-settings-payments', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Attributes', 'mp' ), __( 'Product Attributes', 'mp' ), $cap, 'store-settings-productattributes', array( 'MP_Product_Attributes_Admin', 'display_product_attributes' ) );

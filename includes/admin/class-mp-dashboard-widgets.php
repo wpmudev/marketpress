@@ -310,9 +310,9 @@ class MP_Dashboard_Widgets {
 			</ul>
 			<ul class="store-management-right">
 				<li><span><?php _e( 'Configure', 'mp' ); ?></span></li>
-				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-taxes' ); ?>"><?php _e( 'Taxes', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-presentation' ); ?>"><?php _e( 'Presentation', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-notifications' ); ?>"><?php _e( 'Email Notifications', 'mp' ); ?></a></li>
+				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-taxes' ); ?>"><?php _e( 'Taxes', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-shipping' ); ?>"><?php _e( 'Shipping Rates', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-payments' ); ?>"><?php _e( 'Payment Gateways', 'mp' ); ?></a></li>
 				<li><a href="<?php echo admin_url( 'admin.php?page=store-settings-capabilities' ); ?>"><?php _e( 'User Capabilities', 'mp' ); ?></a></li>
