@@ -410,7 +410,7 @@ class MP_Ajax {
 	 * @access wp_ajax_nopriv_mp_check_if_username_exists
 	 */
 	public function check_if_username_exists() {
-		if ( username_exists( mp_get_request_value( 'username', '' ) ) ) {
+		if ( username_exists( mp_get_request_value( 'account_username', '' ) ) ) {
 			die( 'false' );
 		}
 
