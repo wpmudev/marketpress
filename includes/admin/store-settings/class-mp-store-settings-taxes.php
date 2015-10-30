@@ -178,14 +178,15 @@ class MP_Store_Settings_Taxes {
 		) );
 		$metabox->add_field( 'checkbox', array(
 			'name'    => 'tax[tax_shipping]',
-			'label'   => array( 'text' => __( 'Apply Tax To Shipping Fees?', 'mp' ) ),
+			'label'   => array( 'text' => __( 'Apply Tax to Shipping?', 'mp' ) ),
 			'desc'    => __( 'Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp' ),
 			'message' => __( 'Yes', 'mp' ),
+			'default_value' => 'true'
 		) );
 		$options = mp_tax()->get_table_rates();
 		$metabox->add_field( 'advanced_select', array(
 			'name'          => 'tax[shipping_tax_rate]',
-			'label'         => array( 'text' => __( "Shipping Tax", "mp" ) ),
+			'label'         => array( 'text' => __( "Shipping Tax table", "mp" ) ),
 			'width'         => 'element',
 			'conditional'   => array(
 				'name'   => 'tax[tax_shipping]',
@@ -213,14 +214,15 @@ class MP_Store_Settings_Taxes {
 
 		$metabox->add_field( 'checkbox', array(
 			'name'    => 'tax[tax_digital]',
-			'label'   => array( 'text' => __( 'Apply Tax to Downloadable Products?', 'mp' ) ),
+			'label'   => array( 'text' => __( 'Apply Tax to Digital Products?', 'mp' ) ),
 			'desc'    => __( 'Please see your local tax laws. Note if this is disable and a downloadable only cart, only collect name and email.', 'mp' ),
 			'message' => __( 'Yes', 'mp' ),
+			'default_value' => 'true'
 		) );
 		$options = mp_tax()->get_table_rates();
 		$metabox->add_field( 'advanced_select', array(
 			'name'        => 'tax[dp_tax_rate]',
-			'label'       => array( 'text' => __( "Digital Products Tax", "mp" ) ),
+			'label'       => array( 'text' => __( "Digital Products Tax table", "mp" ) ),
 			'width'       => 'element',
 			'conditional' => array(
 				'name'   => 'tax[tax_digital]',
@@ -232,7 +234,7 @@ class MP_Store_Settings_Taxes {
 		) );
 		$metabox->add_field( 'advanced_select', array(
 			'name'          => 'tax[tax_dp_calculate_based]',
-			'label'         => array( 'text' => __( "Calculate Digital Product Tax Based On", "mp" ) ),
+			'label'         => array( 'text' => __( "Calculate Digital Product Tax based on", "mp" ) ),
 			'width'         => 'element',
 			'conditional'   => array(
 				'name'   => 'tax[tax_digital]',
@@ -241,7 +243,7 @@ class MP_Store_Settings_Taxes {
 			),
 			'multiple'      => false,
 			'options'       => array(
-				'billing_address' => __( "Invoice Address", "mp" ),
+				'billing_address' => __( "Customer Billing Address", "mp" ),
 				'store_address'   => __( "Store Address", "mp" )
 			),
 			'default_value' => mp_get_setting( 'tax->tax_calculate_based' )
@@ -281,13 +283,13 @@ class MP_Store_Settings_Taxes {
 
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'tax[set_price_with_tax]',
-			'label'         => array( 'text' => __( 'Set prices with tax', 'mp' ) ),
+			'label'         => array( 'text' => __( 'Enter prices with Tax', 'mp' ) ),
 			'options'       => array(
 				'inclusive' => __( 'Inclusive', 'mp' ),
 				'exclusive' => __( 'Exclusive', 'mp' ),
 			),
-			'default_value' => 'exclusive',
-			'desc'          => 'blah blah',
+			'default_value' => 'inclusive',
+			'desc'          => 'Choose how you want to enter prices for products.',
 			'conditional'   => array(
 				'name'   => 'tax[tax_enable]',
 				'value'  => 1,
@@ -297,13 +299,13 @@ class MP_Store_Settings_Taxes {
 
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'tax[show_price_with_tax]',
-			'label'         => array( 'text' => __( 'Show prices with tax', 'mp' ) ),
+			'label'         => array( 'text' => __( 'Show prices with Tax', 'mp' ) ),
 			'options'       => array(
 				'inclusive' => __( 'Inclusive', 'mp' ),
 				'exclusive' => __( 'Exclusive', 'mp' ),
 			),
-			'desc'          => 'blah blah',
-			'default_value' => 'exclusive',
+			'desc'          => 'Choose how you want to display prices of products on store. <strong>Inclusive:</strong> eg. if your price is 100 and your tax 20, your price will be 120 <strong>Exclusive:</strong> eg: if your price is 100 and your tax 20, your price will be 100',
+			'default_value' => 'inclusive',
 			'conditional'   => array(
 				'name'   => 'tax[tax_enable]',
 				'value'  => 1,
@@ -317,8 +319,8 @@ class MP_Store_Settings_Taxes {
 				'inclusive' => __( 'Inclusive', 'mp' ),
 				'exclusive' => __( 'Exclusive', 'mp' ),
 			),
-			'desc'          => 'blah blah',
-			'default_value' => 'exclusive',
+			'desc'          => 'Choose if you want to show prices on cart/mini-cart with tax inclusive or exclusive',
+			'default_value' => 'inclusive',
 			'conditional'   => array(
 				'name'   => 'tax[tax_enable]',
 				'value'  => 1,
@@ -327,7 +329,7 @@ class MP_Store_Settings_Taxes {
 		) );
 		$metabox->add_field( 'advanced_select', array(
 			'name'          => 'tax[tax_calculate_based]',
-			'label'         => array( 'text' => __( "Calculate Tax Based On", "mp" ) ),
+			'label'         => array( 'text' => __( "Calculate Tax based on", "mp" ) ),
 			'width'         => 'element',
 			'conditional'   => array(
 				'name'   => 'tax[tax_enable]',
@@ -337,7 +339,7 @@ class MP_Store_Settings_Taxes {
 			'multiple'      => false,
 			'options'       => array(
 				'shipping_address' => __( "Customer Shipping Address", "mp" ),
-				'billing_address'  => __( "Invoice Address", "mp" ),
+				'billing_address'  => __( "Customer Billing Address", "mp" ),
 				'store_address'    => __( "Store Address", "mp" )
 			),
 			'default_value' => 'store_address'
@@ -348,7 +350,8 @@ class MP_Store_Settings_Taxes {
 		$metabox->add_field( 'textarea', array(
 			'name'        => 'tax[tax_tables]',
 			'placeholder' => __( 'Add new taxes table', 'mp' ),
-			'label'       => array( 'text' => __( 'Addition Taxes Table', 'mp' ) ),
+			'label'       => array( 'text' => __( 'Additional Taxes tables', 'mp' ) ),
+			'desc'         => 'You should save your settings before you are able to edit tables',
 			'width'       => '100%',
 			'conditional' => array(
 				'name'   => 'tax[tax_enable]',
