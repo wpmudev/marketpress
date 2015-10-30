@@ -422,78 +422,6 @@ var marketpress = { };
             return obj;
         },
         /**
-         * Init create account lightbox listeners
-         *
-         * @since 3.0
-         */
-        initCreateAccountLightboxListeners: function( ) {
-            var $lb = $( '#mp-create-account-form' );
-            var $emailLabel = $( 'label[for="mp-create-account-email"]' );
-            var $emailInput = $( '#mp-create-account-email' );
-            var $submitButton = $lb.find( '.mp_button-create-account' );
-            if ( '#mp-create-account-lightbox' != window.location.hash || 0 == $lb.length ) {
-                // Bail
-                return false;
-            }
-
-            $( document ).ajaxSend( function( evt, jqxhr, settings ) {
-                if ( settings.url.indexOf( 'action=mp_check_if_email_exists' ) < 0 ) {
-                    return;
-                }
-
-                if ( $emailLabel.find( '.mp-loading-placeholder' ).length == 0 ) {
-                    $emailLabel.append( '<span class="mp-loading-placeholder"></span>' );
-                }
-
-                $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'show' );
-                $emailInput.prop( 'disabled', true );
-                $submitButton.prop( 'disabled', true );
-            } );
-            $( document ).ajaxComplete( function( evt, jqxhr, settings ) {
-                if ( settings.url.indexOf( 'action=mp_check_if_email_exists' ) < 0 ) {
-                    return;
-                }
-
-                $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'hide' );
-                $emailInput.prop( 'disabled', false );
-                $submitButton.prop( 'disabled', false );
-            } );
-            //$lb.find( 'form' ).validate( {
-	        $lb.validate( {
-                highlight: function( ) {
-                    setTimeout( function( ) {
-                        $.colorbox.resize( );
-                    }, 100 )
-                },
-                onkeyup: false, // don't validate on keyup as this will send ajax requests on every key stroke!
-                submitHandler: function( form ) {
-                    var $form = $( form );
-                    marketpress.loadingOverlay( 'show' );
-                    $.post( $form.attr( 'action' ), $form.serialize( ) ).done( function( resp ) {
-                        if ( resp.success ) {
-                            window.location.reload( );
-                        } else {
-                            marketpress.loadingOverlay( 'hide' );
-                            alert( resp.data.message );
-                        }
-                    } );
-                },
-                unhighlight: function( ) {
-                    setTimeout( function( ) {
-                        $.colorbox.resize( );
-                    }, 100 )
-                }
-            } );
-            $.colorbox( {
-                close: "x",
-                escKey: false,
-                href: $lb,
-                inline: true,
-                overlayClose: false,
-                width: 450
-            } );
-        },
-        /**
          * Initialize global product filters/pagination
          *
          * @since 3.0
@@ -545,7 +473,6 @@ jQuery( document ).ready( function( ) {
     marketpress.initOrderLookup( );
     marketpress.initImageLightbox( );
     marketpress.initProductFiltersPagination( );
-    marketpress.initCreateAccountLightboxListeners( );
     marketpress.initGlobalProductFiltersPagination();
     marketpress.getViewportSize();
 } );
