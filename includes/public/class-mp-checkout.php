@@ -570,6 +570,8 @@ class MP_Checkout {
 		$account_username 		  = mp_get_post_value( 'account_username' );
 		$account_password 		  = mp_get_post_value( 'account_password' );
 		$account_email 			  = mp_get_post_value( 'billing->email' );
+		$first_name				  = mp_get_post_value( 'billing->first_name' ); 
+		$last_name				  = mp_get_post_value( 'billing->last_name' ); 
 		
 
 		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
@@ -579,8 +581,8 @@ class MP_Checkout {
 					'user_login' => $account_username,
 					'user_email' => $account_email,
 					'user_pass'  => $account_password,
-					'first_name' => '',
-					'last_name'  => '',
+					'first_name' => $first_name,
+					'last_name'  => $last_name,
 					'role'       => 'subscriber'
 				);
 
