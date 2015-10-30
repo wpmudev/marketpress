@@ -1357,6 +1357,7 @@ class MP_Shortcode_Builder {
 
 		if ( $page == 'store-settings' 
 			|| $page == 'store-settings-presentation' 
+			|| $page == 'store-settings-taxes' 
 			|| $page == 'store-settings-notifications' 
 			|| $page == 'store-settings-shipping' 
 			|| $page == 'store-settings-payments' 

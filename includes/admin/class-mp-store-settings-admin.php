@@ -54,6 +54,7 @@ class MP_Store_Settings_Admin {
 		} else {
 			$screen_ids = array(
 				'toplevel_page_store-settings',
+				'store-settings_page_store-settings-taxes',
 				'store-settings_page_store-settings-presentation',
 				'store-settings_page_store-settings-notifications',
 				'store-settings_page_store-settings-shipping',
@@ -106,6 +107,7 @@ class MP_Store_Settings_Admin {
 
 		add_menu_page( __( 'Store Settings', 'mp' ), __( 'Store Settings', 'mp' ), $cap, 'store-settings', create_function( '', '' ), ( version_compare( $wp_version, '3.8', '>=' ) ) ? 'dashicons-admin-settings' : mp_plugin_url( 'ui/images/marketpress-icon.png' ), '99.33' );
 		add_submenu_page( 'store-settings', __( 'Store Settings: General', 'mp' ), __( 'General', 'mp' ), $cap, 'store-settings', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Taxes', 'mp' ), __( 'Taxes', 'mp' ), $cap, 'store-settings-taxes', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Presentation', 'mp' ), __( 'Presentation', 'mp' ), $cap, 'store-settings-presentation', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Notifications', 'mp' ), __( 'Notifications', 'mp' ), $cap, 'store-settings-notifications', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Shipping', 'mp' ), __( 'Shipping', 'mp' ), $cap, 'store-settings-shipping', array( &$this, 'display_settings_form' ) );
@@ -124,6 +126,7 @@ class MP_Store_Settings_Admin {
 
 		if ( !WPMUDEV_REMOVE_BRANDING ) {
 			add_action( 'load-toplevel_page_store-settings', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-settings-taxes', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-presentation', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-notifications', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-shipping', array( &$this, 'add_help_tab' ) );
@@ -214,7 +217,11 @@ class MP_Store_Settings_Admin {
 			case 'store-settings_page_store-settings-presentation' :
 				$title .= __( 'Presentation', 'mp' );
 				break;
-
+			
+			case 'store-settings_page_store-settings-taxes' :
+				$title .= __( 'Taxes', 'mp' );
+				break;			
+			
 			case 'store-settings_page_store-settings-notifications' :
 				$title .= __( 'Notifications', 'mp' );
 				break;
