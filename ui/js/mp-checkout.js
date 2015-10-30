@@ -17,6 +17,7 @@ var mp_checkout;
          */
         initListeners: function() {
             this.initShippingAddressListeners();
+			this.initAccountRegistrationListeners();
             this.initPaymentOptionListeners();
             this.initUpdateStateFieldListeners();
             this.initCardValidation();
@@ -476,6 +477,32 @@ var mp_checkout;
                 } );
             }
         },
+		/**
+         * Enable/disable registration fields
+         *
+         * @since 3.0
+         */
+        toggleRegistrationFields: function() {
+            var $cb = $( 'input[name="enable_registration_form"]' );
+            var $account_container = $( '#mp-checkout-column-registration' );
+
+            if ( $cb.prop( 'checked' ) ) {
+                $account_container.fadeIn( 500 );
+            } else {
+                $account_container.fadeOut( 500 );
+            }
+		},
+		/**
+         * Initialize events related to registration fields
+         *
+         * @since 3.0
+         */
+        initAccountRegistrationListeners: function() {
+            var $enableRegistration = $( 'input[name="enable_registration_form"]' );
+
+            // Enable account registration fields
+            $enableRegistration.change( mp_checkout.toggleRegistrationFields );
+        },
         /**
          * Initialize events related to shipping address fields
          *
@@ -559,5 +586,6 @@ jQuery( document ).ready( function( $ ) {
     mp_checkout.showForm();
     mp_checkout.initListeners();
     mp_checkout.toggleShippingAddressFields();
+	mp_checkout.toggleRegistrationFields();
     mp_checkout.triggerStepChange();
 } );

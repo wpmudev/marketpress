@@ -1036,6 +1036,47 @@ class MP_Checkout {
 	public function has_errors( $context = 'general' ) {
 		return ( mp_arr_get_value( $context, $this->_errors ) ) ? true : false;
 	}
+	
+	/**
+	 * Toggleable registration form on checkout
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function register_toggle_form(  ) {
+		
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
+		
+		$html = '';
+		$html .= '
+			<div class="mp_checkout_field mp_checkout_checkbox">
+				<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_registration_form" value="1" autocomplete="off"> <span>' . __( 'Register as customer?', 'mp' ) . '</span></label>
+			</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
+		';
+		
+			$html .= '
+				<div id="mp-checkout-column-registration" style="display:none">
+					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
+					
+			$html .= '<div class="mp_checkout_field mp_checkout_column">
+					<label class="mp_form_label">' . __( 'Username', 'mp' ) . '</label>	
+				    <input type="text" name="account[username]"></input>
+				  </div><!-- end mp_checkout_field -->';
+			
+			$html .= '<div class="mp_checkout_field mp_checkout_column">
+					<label class="mp_form_label">' . __( 'Password', 'mp' ) . '</label>	
+				    <input type="password" name="account[password]"></input>
+				  </div><!-- end mp_checkout_field -->';			
+				  
+			$html .= '
+				</div>';		
+		
+		return $html;
+	}
 
 	/**
 	 * Display the billing/shipping address section
@@ -1079,8 +1120,12 @@ class MP_Checkout {
 		}
 
 		$html .= '
-
-				</div><!-- end mp-checkout-column-shipping-info -->
+				</div><!-- end mp-checkout-column-shipping-info -->';
+				
+		//Checkout registration form
+		$html .= $this->register_toggle_form();
+			
+		$html .= '	
 			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
