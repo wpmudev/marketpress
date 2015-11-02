@@ -1110,7 +1110,7 @@ class MP_Checkout {
 		';
 		
 			$html .= '
-				<div id="mp-checkout-column-registration" style="display:none">
+				<div id="mp-checkout-column-registration" style="display:none" class="mp_checkout_column_section">
 					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
 					
 			$html .= '<div class="mp_checkout_field mp_checkout_column">
