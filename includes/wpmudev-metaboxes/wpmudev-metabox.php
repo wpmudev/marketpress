@@ -281,6 +281,7 @@ class WPMUDEV_Metabox {
 			'hook'               => 'wpmudev_metabox/render_settings_metaboxes',
 			'show_submit_button' => true,
 			'ajax_save'          => false,
+			'hook_inside'        => false,
 			'submit_button_text' => __( 'Save Changes', 'wpmudev_metaboxes' ),
 		), $args );
 
@@ -757,7 +758,7 @@ class WPMUDEV_Metabox {
 				$atts .= ' ' . $name . '="' . esc_attr( $val ) . '"';
 			}
 
-		if ( self::$did_metabox_count == 0 ) :
+		if ( self::$did_metabox_count == 0 && $this->args['hook_inside'] == false ) :
 			?>
 			<div id="poststuff">
 			<div class="meta-box-sortables <?php echo esc_attr( get_current_screen()->id ); ?>">
@@ -834,7 +835,7 @@ class WPMUDEV_Metabox {
 			</div>
 			<?php
 			$this->after_settings_metabox();
-			if ( $this->args['show_submit_button'] ) :
+			if ( $this->args['show_submit_button'] && $this->args['hook_inside'] == false ) :
 				?>
 				<p class="submit">
 					<input class="button-primary" type="submit" name="submit_settings"
@@ -1100,7 +1101,7 @@ class WPMUDEV_Metabox {
 
 			if ( $this->is_active == false && $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['post_ID'] ) && $_POST['post_ID'] != 0 && $_POST['action'] == 'editpost' ) {
 				$post_post_id = $_POST['post_ID'];
-				if (!is_object($post) || ( isset( $post->ID ) && $post_post_id != $post->ID ) )  {
+				if ( ! is_object( $post ) || ( isset( $post->ID ) && $post_post_id != $post->ID ) ) {
 					$actual_post = get_post( $post_post_id );
 					if ( is_object( $actual_post ) && $actual_post->post_type == $this->args['post_type'] ) {
 						$this->is_active = true;

@@ -1,4 +1,5 @@
 <?php
+
 class MP_Store_Settings_Taxes {
 
 	/**
@@ -64,7 +65,7 @@ class MP_Store_Settings_Taxes {
 		$this->init_shipping_tax_settings();
 		$this->init_digital_tax_settings();
 	}
-	
+
 	/**
 	 * We will remove the data of a table if a tax table removed
 	 */
@@ -167,7 +168,7 @@ class MP_Store_Settings_Taxes {
 	public function init_shipping_tax_settings() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'          => 'mp-settings-shipping-tax',
-			'page_slugs'  => array('store-settings-taxes', 'store-settings_page_store-settings-taxes'),
+			'page_slugs'  => array( 'store-settings-taxes', 'store-settings_page_store-settings-taxes' ),
 			'title'       => __( 'Shipping Tax Settings', 'mp' ),
 			'option_name' => 'mp_settings',
 			'conditional' => array(
@@ -177,10 +178,10 @@ class MP_Store_Settings_Taxes {
 			),
 		) );
 		$metabox->add_field( 'checkbox', array(
-			'name'    => 'tax[tax_shipping]',
-			'label'   => array( 'text' => __( 'Apply Tax to Shipping?', 'mp' ) ),
-			'desc'    => __( 'Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp' ),
-			'message' => __( 'Yes', 'mp' ),
+			'name'          => 'tax[tax_shipping]',
+			'label'         => array( 'text' => __( 'Apply Tax to Shipping?', 'mp' ) ),
+			'desc'          => __( 'Please see your local tax laws. Most areas charge tax on shipping fees.', 'mp' ),
+			'message'       => __( 'Yes', 'mp' ),
 			'default_value' => 'true'
 		) );
 		$options = mp_tax()->get_table_rates();
@@ -202,7 +203,7 @@ class MP_Store_Settings_Taxes {
 	public function init_digital_tax_settings() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'          => 'mp-settings-digital-tax',
-			'page_slugs'  => array('store-settings-taxes', 'store-settings_page_store-settings-taxes'),
+			'page_slugs'  => array( 'store-settings-taxes', 'store-settings_page_store-settings-taxes' ),
 			'title'       => __( 'Digital Tax Settings', 'mp' ),
 			'option_name' => 'mp_settings',
 			'conditional' => array(
@@ -213,10 +214,10 @@ class MP_Store_Settings_Taxes {
 		) );
 
 		$metabox->add_field( 'checkbox', array(
-			'name'    => 'tax[tax_digital]',
-			'label'   => array( 'text' => __( 'Apply Tax to Digital Products?', 'mp' ) ),
-			'desc'    => __( 'Please see your local tax laws. Note if this is disable and a downloadable only cart, only collect name and email.', 'mp' ),
-			'message' => __( 'Yes', 'mp' ),
+			'name'          => 'tax[tax_digital]',
+			'label'         => array( 'text' => __( 'Apply Tax to Digital Products?', 'mp' ) ),
+			'desc'          => __( 'Please see your local tax laws. Note if this is disable and a downloadable only cart, only collect name and email.', 'mp' ),
+			'message'       => __( 'Yes', 'mp' ),
 			'default_value' => 'true'
 		) );
 		$options = mp_tax()->get_table_rates();
@@ -259,7 +260,7 @@ class MP_Store_Settings_Taxes {
 	public function init_tax_settings() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'          => 'mp-settings-general-tax',
-			'page_slugs'  => array('store-settings-taxes', 'store-settings_page_store-settings-taxes'),
+			'page_slugs'  => array( 'store-settings-taxes', 'store-settings_page_store-settings-taxes' ),
 			'title'       => __( 'Tax Settings', 'mp' ),
 			'option_name' => 'mp_settings',
 		) );
@@ -351,7 +352,7 @@ class MP_Store_Settings_Taxes {
 			'name'        => 'tax[tax_tables]',
 			'placeholder' => __( 'Add new taxes table', 'mp' ),
 			'label'       => array( 'text' => __( 'Additional Taxes tables', 'mp' ) ),
-			'desc'         => 'You should save your settings before you are able to edit tables',
+			'desc'        => 'You should save your settings before you are able to edit tables',
 			'width'       => '100%',
 			'conditional' => array(
 				'name'   => 'tax[tax_enable]',
@@ -394,10 +395,11 @@ class MP_Store_Settings_Taxes {
 			$name          = 'tax[tables_data][' . str_replace( '-', '_', $table['slug'] ) . ']';
 			$table_metabox = new WPMUDEV_Metabox( array(
 				'id'                 => 'mp-settings-general-tax-table-' . $table['slug'],
-				'page_slugs'  		 => array('store-settings-taxes', 'store-settings_page_store-settings-taxes'),
+				'page_slugs'         => array( 'store-settings-taxes', 'store-settings_page_store-settings-taxes' ),
 				'title'              => __( 'Tax Settings', 'mp' ),
 				'option_name'        => 'mp_settings',
 				'hook'               => 'wpmudev_tab_field_display_' . $table['slug'],
+				'hook_inside'        => true,
 				'show_submit_button' => false,
 				'conditional'        => array(
 					'name'   => 'tax[tax_enable]',
