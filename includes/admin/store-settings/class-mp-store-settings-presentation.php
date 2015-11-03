@@ -33,63 +33,7 @@ class MP_Store_Settings_Presentation {
 	 * @access private
 	 */
 	private function __construct() {
-		add_filter( 'wpmudev_field/after_field', array( &$this, 'display_create_page_button' ), 10, 2 );
-		add_action( 'wpmudev_field/print_scripts', array( &$this, 'create_store_page_js' ) );
-
-		if ( mp_get_get_value( 'page' ) == 'store-settings-presentation' ) {
-			add_action( 'init', array( &$this, 'init_metaboxes' ) );
-			add_action( 'wpmudev_metabox/after_settings_metabox_saved', array( &$this, 'link_store_pages' ) );
-		}
-	}
-
-	/**
-	 *
-	 * @param $wpmudev_metabox
-	 */
-	public function link_store_pages( $wpmudev_metabox ) {
-		if ( $wpmudev_metabox->args['id'] == 'mp-settings-presentation-pages-slugs' ) {
-			$pages = mp_get_post_value( 'pages' );
-			foreach ( $pages as $type => $page ) {
-				MP_Pages_Admin::get_instance()->save_store_page_value( $type, $page, false );
-			}
-		}
-	}
-
-	/**
-	 * Print scripts for creating store page
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wpmudev_field/print_scripts
-	 */
-	public function create_store_page_js( $field ) {
-		if ( $field->args['original_name'] !== 'pages[store]' ) {
-			return;
-		}
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function ($) {
-				$('.mp-create-page-button').click(function (e) {
-					e.preventDefault();
-
-					var $this = $(this),
-						$select = $this.siblings('[name^="pages"]');
-
-					$this.isWorking(true);
-
-					$.getJSON($this.attr('href'), function (resp) {
-						if (resp.success) {
-							$select.attr('data-select2-value', resp.data.select2_value).mp_select2('val', resp.data.post_id).trigger('change');
-							$this.isWorking(false).replaceWith(resp.data.button_html);
-						} else {
-							alert('<?php _e( 'An error occurred while creating the store page. Please try again.', 'mp' ); ?>');
-							$this.isWorking(false);
-						}
-					});
-				});
-			});
-		</script>
-		<?php
+		add_action( 'init', array( &$this, 'init_metaboxes' ) );
 	}
 
 	/**
@@ -100,11 +44,10 @@ class MP_Store_Settings_Presentation {
 	 */
 	public function init_metaboxes() {
 		$this->init_general_settings();
-		$this->init_product_page_settings();
-		$this->init_related_product_settings();
 		$this->init_product_list_settings();
+		$this->init_related_product_settings();
+		$this->init_product_page_settings();
 		$this->init_social_settings();
-		$this->init_store_pages_slugs_settings();
 		$this->init_miscellaneous_settings();
 	}
 
@@ -125,197 +68,34 @@ class MP_Store_Settings_Presentation {
 
 		return "{$width} x {$height} (" . ( ( $crop ) ? __( 'cropped', 'mp' ) : __( 'uncropped', 'mp' ) ) . ')';
 	}
-
+	
 	/**
-	 * Display "create page" button next to a given field
-	 *
-	 * @since 3.0
-	 * @access public
-	 * filter wpmudev_field/after_field
-	 */
-	public function display_create_page_button( $html, $field ) {
-		switch ( $field->args['original_name'] ) {
-			case 'pages[store]' :
-				$type = 'store';
-				break;
-
-			case 'pages[products]' :
-				$type = 'products';
-				break;
-
-			case 'pages[cart]' :
-				$type = 'cart';
-				break;
-
-			case 'pages[checkout]' :
-				$type = 'checkout';
-				break;
-
-			case 'pages[order_status]' :
-				$type = 'order_status';
-				break;
-		}
-
-		if ( isset( $type ) ) {
-			if ( ( $post_id = mp_get_setting( "pages->$type" ) ) && get_post_status( $post_id ) !== false ) {
-				return '<a target="_blank" class="button mp-edit-page-button" href="' . add_query_arg( array(
-					'post'   => $post_id,
-					'action' => 'edit',
-				), get_admin_url( null, 'post.php' ) ) . '">' . __( 'Edit Page' ) . '</a>';
-			} else {
-				return '<a class="button mp-create-page-button" href="' . wp_nonce_url( get_admin_url( null, 'admin-ajax.php?action=mp_create_store_page&type=' . $type ), 'mp_create_store_page' ) . '">' . __( 'Create Page' ) . '</a>';
-			}
-		}
-
-		return $html;
-	}
-
-	/**
-	 * Init the store page/slugs settings
+	 * Init the general settings
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_store_pages_slugs_settings() {
+	public function init_general_settings() {
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'          => 'mp-settings-presentation-pages-slugs',
+			'id'          => 'mp-settings-presentation-general',
 			'page_slugs'  => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
-			'title'       => __( 'Store Pages', 'mp' ),
-			'option_name' => 'mp_settings',
-		) );
-		$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[store]',
-			'label'       => array( 'text' => __( 'Store Base', 'mp' ) ),
-			'desc'        => __( 'This page will be used as the root for your store.', 'mp' ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );
-		$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[products]',
-			'label'       => array( 'text' => __( 'Products List', 'mp' ) ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );
-		$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[cart]',
-			'label'       => array( 'text' => __( 'Shopping Cart', 'mp' ) ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );
-		$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[checkout]',
-			'label'       => array( 'text' => __( 'Checkout', 'mp' ) ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );
-		$metabox->add_field( 'post_select', array(
-			'name'        => 'pages[order_status]',
-			'label'       => array( 'text' => __( 'Order Status', 'mp' ) ),
-			'query'       => array( 'post_type' => 'page', 'orderby' => 'title', 'order' => 'ASC' ),
-			'placeholder' => __( 'Choose a Page', 'mp' ),
-			'validation'  => array(
-				'required' => true,
-			),
-		) );
-	}
-
-	/**
-	 * Init the product list settings
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function init_social_settings() {
-		$metabox = new WPMUDEV_Metabox( array(
-			'id'          => 'mp-settings-presentation-social',
-			'page_slugs'  => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
-			'title'       => __( 'Social Settings', 'mp' ),
+			'title'       => __( 'General Settings', 'mp' ),
 			'option_name' => 'mp_settings',
 		) );
 
-		$metabox->add_field( 'section', array(
-			'name'  => 'section_pinterest',
-			'title' => __( 'Pinterest', 'mp' ),
-		) );
-
 		$metabox->add_field( 'radio_group', array(
-			'name'          => 'social[pinterest][show_pinit_button]',
-			'label'         => array( 'text' => __( 'Show "Pin It" Button', 'mp' ) ),
-			'options'       => array(
-				'off'         => __( 'Off', 'mp' ),
-				'single_view' => __( 'Single View', 'mp' ),
-				'all_view'    => __( 'All View', 'mp' ),
-			),
-			'default_value' => 'off',
+			'name'    => 'store_theme',
+			'desc'    => sprintf( __( 'This option changes the built-in css styles for store pages. For a custom css style, save your css file with the <strong>/* MarketPress Style: Your CSS Theme Name Here */</strong> header line in the <strong>"%s"</strong> folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a target="_blank" href="%s">here &raquo;</a>.', 'mp' ), trailingslashit( WP_CONTENT_DIR ) . 'marketpress-styles/', mp_plugin_url( 'ui/themes/Theming_MarketPress.txt' ) ),
+			'label'   => array( 'text' => __( 'Store Style', 'mp' ) ),
+			'options' => mp_get_theme_list() + array( 'none' => __( 'None - Custom Theme Template', 'mp' ) ),
+			'width'   => '50%',
 		) );
-
-		$metabox->add_field( 'radio_group', array(
-			'name'    => 'social[pinterest][show_pin_count]',
-			'label'   => array( 'text' => __( 'Pin Count', 'mp' ) ),
-			'options' => array(
-				'none'   => __( 'None', 'mp' ),
-				'above'  => __( 'Above', 'mp' ),
-				'beside' => __( 'Beside', 'mp' ),
-			),
-		) );
-
-		$metabox->add_field( 'section', array(
-			'name'  => 'section_facebook',
-			'title' => __( 'Facebook', 'mp' ),
-		) );
-
-		$metabox->add_field( 'radio_group', array(
-			'name'          => 'social[facebook][show_facebook_like_button]',
-			'label'         => array( 'text' => __( 'Show Facebook Like Button', 'mp' ) ),
-			'options'       => array(
-				'off'         => __( 'Off', 'mp' ),
-				'single_view' => __( 'Single View', 'mp' ),
-				'all_view'    => __( 'All View', 'mp' ),
-			),
-			'default_value' => 'off',
-		) );
-
-		$metabox->add_field( 'radio_group', array(
-			'name'    => 'social[facebook][action]',
-			'label'   => array( 'text' => __( 'Action', 'mp' ) ),
-			'options' => array(
-				'like'      => __( 'Like', 'mp' ),
-				'recommend' => __( 'Recommend', 'mp' ),
-			),
-		) );
-
-		$metabox->add_field( 'checkbox', array(
-			'name'    => 'social[facebook][show_share]',
-			'label'   => array( 'text' => __( 'Show Share Button', 'mp' ) ),
-			'message' => __( 'Yes', 'mp' ),
-		) );
-
-		$metabox->add_field( 'section', array(
-			'name'  => 'section_twitter',
-			'title' => __( 'Twitter', 'mp' ),
-		) );
-
-		$metabox->add_field( 'radio_group', array(
-			'name'    => 'social[twitter][show_twitter_button]',
-			'label'   => array( 'text' => __( 'Show Twitter Button', 'mp' ) ),
-			'options' => array(
-				'off'         => __( 'Off', 'mp' ),
-				'single_view' => __( 'Single View', 'mp' ),
-				'all_view'    => __( 'All View', 'mp' ),
-			),
-		) );
+		/*$metabox->add_field( 'checkbox', array(
+			'name'		 => 'show_purchase_breadcrumbs',
+			'label'		 => array( 'text' => __( 'Show Breadcrumbs?', 'mp' ) ),
+			'message'	 => __( 'Yes', 'mp' ),
+			'desc'		 => __( 'Shows previous, current and next steps when a customer is checking out -- shown below the title.', 'mp' ),
+		) );*/
 	}
 
 	/**
@@ -533,26 +313,6 @@ class MP_Store_Settings_Presentation {
 		) );
 	}
 
-	public function init_miscellaneous_settings() {
-		$metabox = new WPMUDEV_Metabox( array(
-			'id'          => 'mp-settings-miscellaneous-product-list',
-			'page_slugs'  => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
-			'title'       => __( 'Miscellaneous Settings', 'mp' ),
-			'desc'        => __( '', 'mp' ),
-			'option_name' => 'mp_settings',
-		) );
-
-		$metabox->add_field( 'text', array(
-			'name'          => 'per_page_order_history',
-			'label'         => array( 'text' => __( 'Order Status Entries Per Page', 'mp' ) ),
-			'default_value' => get_option( 'posts_per_page' ),
-			'validation'    => array(
-				'required' => true,
-				'digits'   => 1,
-			),
-		) );
-	}
-
 	/**
 	 * Init the related product settings
 	 *
@@ -634,7 +394,7 @@ class MP_Store_Settings_Presentation {
 	}
 
 	/**
-	 * Init the general settings
+	 * Init the single product settings
 	 *
 	 * @since 3.0
 	 * @access public
@@ -784,34 +544,117 @@ class MP_Store_Settings_Presentation {
 			),
 		) );
 	}
-
+	
 	/**
-	 * Init the general settings
+	 * Init the social settings
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	public function init_general_settings() {
+	public function init_social_settings() {
 		$metabox = new WPMUDEV_Metabox( array(
-			'id'          => 'mp-settings-presentation-general',
+			'id'          => 'mp-settings-presentation-social',
 			'page_slugs'  => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
-			'title'       => __( 'General Settings', 'mp' ),
+			'title'       => __( 'Social Settings', 'mp' ),
 			'option_name' => 'mp_settings',
 		) );
 
-		$metabox->add_field( 'radio_group', array(
-			'name'    => 'store_theme',
-			'desc'    => sprintf( __( 'This option changes the built-in css styles for store pages. For a custom css style, save your css file with the <strong>/* MarketPress Style: Your CSS Theme Name Here */</strong> header line in the <strong>"%s"</strong> folder and it will appear in this list so you may select it. You can also select "None" and create custom theme templates and css to make your own completely unique store design. More information on that <a target="_blank" href="%s">here &raquo;</a>.', 'mp' ), trailingslashit( WP_CONTENT_DIR ) . 'marketpress-styles/', mp_plugin_url( 'ui/themes/Theming_MarketPress.txt' ) ),
-			'label'   => array( 'text' => __( 'Store Style', 'mp' ) ),
-			'options' => mp_get_theme_list() + array( 'none' => __( 'None - Custom Theme Template', 'mp' ) ),
-			'width'   => '50%',
+		$metabox->add_field( 'section', array(
+			'name'  => 'section_pinterest',
+			'title' => __( 'Pinterest', 'mp' ),
 		) );
-		/*$metabox->add_field( 'checkbox', array(
-			'name'		 => 'show_purchase_breadcrumbs',
-			'label'		 => array( 'text' => __( 'Show Breadcrumbs?', 'mp' ) ),
-			'message'	 => __( 'Yes', 'mp' ),
-			'desc'		 => __( 'Shows previous, current and next steps when a customer is checking out -- shown below the title.', 'mp' ),
-		) );*/
+
+		$metabox->add_field( 'radio_group', array(
+			'name'          => 'social[pinterest][show_pinit_button]',
+			'label'         => array( 'text' => __( 'Show "Pin It" Button', 'mp' ) ),
+			'options'       => array(
+				'off'         => __( 'Off', 'mp' ),
+				'single_view' => __( 'Single View', 'mp' ),
+				'all_view'    => __( 'All View', 'mp' ),
+			),
+			'default_value' => 'off',
+		) );
+
+		$metabox->add_field( 'radio_group', array(
+			'name'    => 'social[pinterest][show_pin_count]',
+			'label'   => array( 'text' => __( 'Pin Count', 'mp' ) ),
+			'options' => array(
+				'none'   => __( 'None', 'mp' ),
+				'above'  => __( 'Above', 'mp' ),
+				'beside' => __( 'Beside', 'mp' ),
+			),
+		) );
+
+		$metabox->add_field( 'section', array(
+			'name'  => 'section_facebook',
+			'title' => __( 'Facebook', 'mp' ),
+		) );
+
+		$metabox->add_field( 'radio_group', array(
+			'name'          => 'social[facebook][show_facebook_like_button]',
+			'label'         => array( 'text' => __( 'Show Facebook Like Button', 'mp' ) ),
+			'options'       => array(
+				'off'         => __( 'Off', 'mp' ),
+				'single_view' => __( 'Single View', 'mp' ),
+				'all_view'    => __( 'All View', 'mp' ),
+			),
+			'default_value' => 'off',
+		) );
+
+		$metabox->add_field( 'radio_group', array(
+			'name'    => 'social[facebook][action]',
+			'label'   => array( 'text' => __( 'Action', 'mp' ) ),
+			'options' => array(
+				'like'      => __( 'Like', 'mp' ),
+				'recommend' => __( 'Recommend', 'mp' ),
+			),
+		) );
+
+		$metabox->add_field( 'checkbox', array(
+			'name'    => 'social[facebook][show_share]',
+			'label'   => array( 'text' => __( 'Show Share Button', 'mp' ) ),
+			'message' => __( 'Yes', 'mp' ),
+		) );
+
+		$metabox->add_field( 'section', array(
+			'name'  => 'section_twitter',
+			'title' => __( 'Twitter', 'mp' ),
+		) );
+
+		$metabox->add_field( 'radio_group', array(
+			'name'    => 'social[twitter][show_twitter_button]',
+			'label'   => array( 'text' => __( 'Show Twitter Button', 'mp' ) ),
+			'options' => array(
+				'off'         => __( 'Off', 'mp' ),
+				'single_view' => __( 'Single View', 'mp' ),
+				'all_view'    => __( 'All View', 'mp' ),
+			),
+		) );
+	}
+	
+	/**
+	 * Init the miscellaneous settings
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function init_miscellaneous_settings() {
+		$metabox = new WPMUDEV_Metabox( array(
+			'id'          => 'mp-settings-miscellaneous-product-list',
+			'page_slugs'  => array( 'store-settings-presentation', 'store-settings_page_store-settings-presentation' ),
+			'title'       => __( 'Miscellaneous Settings', 'mp' ),
+			'option_name' => 'mp_settings',
+		) );
+
+		$metabox->add_field( 'text', array(
+			'name'          => 'per_page_order_history',
+			'label'         => array( 'text' => __( 'Order Status Entries Per Page', 'mp' ) ),
+			'default_value' => get_option( 'posts_per_page' ),
+			'validation'    => array(
+				'required' => true,
+				'digits'   => 1,
+			),
+		) );
 	}
 
 }

@@ -54,12 +54,14 @@ class MP_Store_Settings_Admin {
 		} else {
 			$screen_ids = array(
 				'toplevel_page_store-settings',
-				'store-settings_page_store-settings-presentation',
-				'store-settings_page_store-settings-notifications',
-				'store-settings_page_store-settings-shipping',
+				'store-settings_page_store-settings-cart-checkout',
+				'store-settings_page_store-settings-products',
 				'store-settings_page_store-settings-payments',
+				'store-settings_page_store-settings-shipping',
+				'store-settings_page_store-settings-presentation',
 				'store-settings_page_store-settings-importers',
 				'store-settings_page_store-settings-exporters',
+				'store-settings_page_store-settings-notifications',
 				'store-settings_page_store-settings-capabilities',
 				'store-settings_page_store-setup-wizard',
 			);
@@ -106,13 +108,15 @@ class MP_Store_Settings_Admin {
 
 		add_menu_page( __( 'Store Settings', 'mp' ), __( 'Store Settings', 'mp' ), $cap, 'store-settings', create_function( '', '' ), ( version_compare( $wp_version, '3.8', '>=' ) ) ? 'dashicons-admin-settings' : mp_plugin_url( 'ui/images/marketpress-icon.png' ), '99.33' );
 		add_submenu_page( 'store-settings', __( 'Store Settings: General', 'mp' ), __( 'General', 'mp' ), $cap, 'store-settings', array( &$this, 'display_settings_form' ) );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Presentation', 'mp' ), __( 'Presentation', 'mp' ), $cap, 'store-settings-presentation', array( &$this, 'display_settings_form' ) );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Notifications', 'mp' ), __( 'Notifications', 'mp' ), $cap, 'store-settings-notifications', array( &$this, 'display_settings_form' ) );
-		add_submenu_page( 'store-settings', __( 'Store Settings: Shipping', 'mp' ), __( 'Shipping', 'mp' ), $cap, 'store-settings-shipping', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Cart/Checkout', 'mp' ), __( 'Cart/Checkout', 'mp' ), $cap, 'store-settings-cart-checkout', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Products', 'mp' ), __( 'Products', 'mp' ), $cap, 'store-settings-products', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Payments', 'mp' ), __( 'Payments', 'mp' ), $cap, 'store-settings-payments', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Shipping', 'mp' ), __( 'Shipping', 'mp' ), $cap, 'store-settings-shipping', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Presentation', 'mp' ), __( 'Presentation', 'mp' ), $cap, 'store-settings-presentation', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Attributes', 'mp' ), __( 'Product Attributes', 'mp' ), $cap, 'store-settings-productattributes', array( 'MP_Product_Attributes_Admin', 'display_product_attributes' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Categories', 'mp' ), __( 'Product Categories', 'mp' ), apply_filters( 'mp_manage_product_categories_cap', 'manage_product_categories' ), 'edit-tags.php?taxonomy=product_category&post_type=' . MP_Product::get_post_type() );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Tags', 'mp' ), __( 'Product Tags', 'mp' ), apply_filters( 'mp_manage_product_tags_cap', 'manage_product_tags' ), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type() );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Notifications', 'mp' ), __( 'Notifications', 'mp' ), $cap, 'store-settings-notifications', array( &$this, 'display_settings_form' ) );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Capabilities', 'mp' ), __( 'User Capabilities', 'mp' ), $cap, 'store-settings-capabilities', array( &$this, 'display_settings_form' ) );
 		//add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 		//add_submenu_page('store-settings', __('Store Settings: Exporters', 'mp'), __('Exporters', 'mp'), $cap, 'store-settings-exporters', false);		
@@ -124,16 +128,18 @@ class MP_Store_Settings_Admin {
 
 		if ( !WPMUDEV_REMOVE_BRANDING ) {
 			add_action( 'load-toplevel_page_store-settings', array( &$this, 'add_help_tab' ) );
-			add_action( 'store-settings_page_store-settings-presentation', array( &$this, 'add_help_tab' ) );
-			add_action( 'store-settings_page_store-settings-notifications', array( &$this, 'add_help_tab' ) );
-			add_action( 'store-settings_page_store-settings-shipping', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-settings-cart-checkout', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-settings-products', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-payments', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-settings-shipping', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-settings-presentation', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-product-attributes', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-settings-notifications', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-capabilities', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-importers', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-exporters', array( &$this, 'add_help_tab' ) );
-			add_action( 'store-settings_page_store-setup-wizard', array( &$this, 'add_help_tab' ) );
 			add_action( 'store-settings_page_store-settings-addons', array( &$this, 'add_help_tab' ) );
+			add_action( 'store-settings_page_store-setup-wizard', array( &$this, 'add_help_tab' ) );
 		}
 	}
 
@@ -214,17 +220,21 @@ class MP_Store_Settings_Admin {
 			case 'store-settings_page_store-settings-presentation' :
 				$title .= __( 'Presentation', 'mp' );
 				break;
+				
+			case 'store-settings_page_store-settings-cart-checkout' :
+				$title .= __( 'Cart/Checkout', 'mp' );
+				break;
 
-			case 'store-settings_page_store-settings-notifications' :
-				$title .= __( 'Notifications', 'mp' );
+			case 'store-settings_page_store-settings-products' :
+				$title .= __( 'Products', 'mp' );
+				break;
+				
+			case 'store-settings_page_store-settings-payments' :
+				$title .= __( 'Payments', 'mp' );
 				break;
 
 			case 'store-settings_page_store-settings-shipping' :
 				$title .= __( 'Shipping', 'mp' );
-				break;
-
-			case 'store-settings_page_store-settings-payments' :
-				$title .= __( 'Payments', 'mp' );
 				break;
 
 			case 'store-settings_page_store-settings-shortcodes' :
@@ -241,6 +251,10 @@ class MP_Store_Settings_Admin {
 
 			case 'store-settings_page_store-settings-productattributes' :
 				$title = ( mp_get_get_value( 'action' ) == 'mp_add_product_attribute' ) ? __( 'Add Product Attribute', 'mp' ) : sprintf( __( 'Edit Product Attribute %s', 'mp' ), '<a class="add-new-h2" href="' . admin_url( 'admin.php?page=store-settings-productattributes&amp;action=mp_add_product_attribute' ) . '">' . __( 'Add Attribute', 'mp' ) . '</a>' );
+				break;
+				
+			case 'store-settings_page_store-settings-notifications' :
+				$title .= __( 'Notifications', 'mp' );
 				break;
 
 			case 'store-settings_page_store-settings-capabilities' :
