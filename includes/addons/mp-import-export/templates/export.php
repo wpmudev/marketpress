@@ -1,3 +1,4 @@
+
 <div class="wrap theme-options">
 	<h2><?php _e( 'MarketPress Export', 'mp' ); ?></h2><br />
 	
@@ -13,7 +14,8 @@
 		<a href="#TB_inline?width=600&height=250&inlineId=response-wrapper" title="<?php _e( 'MarketPress Export Report', 'mp' ); ?>" id="thickbox-launcher" class="thickbox button-primary"><?php _e( 'MarketPress Export Report', 'mp' ); ?></a>
 	<?php endif; ?>
 
-	<form action="tools.php?page=marketpress_export" method="post">
+	<form action="edit.php?post_type=<?php echo MP_Product::get_post_type(); ?>&page=marketpress_export" method="post">
+		<input type="hidden" name="action" value="process" />
 		<p class="mp-select">
 			<label for="export-types">
 				<span><?php _e( 'What do you want to export:', 'mp' ); ?></span>
@@ -25,7 +27,6 @@
 				</select>
 			</label>
 		</p>
-		<input type="hidden" name="action" value="process" />
 		<div id="export-tabs">
 			<ul>
 				<li class="tab-products"><a href="#tab-products"><?php _e( 'Products', 'mp' ); ?></a></li>

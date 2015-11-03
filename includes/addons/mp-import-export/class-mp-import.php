@@ -1,157 +1,552 @@
 <?php
 
 class MP_Import {
-    
-    public $columns = array(
-        'ID',
-        'Titre',
-        'Nom du Jardin Associé (si PDV)',
-        'Type (Jardin ou PDV)',
-        'Description',
-        'Adresse',
-        'CP',
-        'Ville',
-        'URL du Site',
-    );
-    
-    /**
-     * Construct the plugin object
-     */
-    public function __construct() {
-        // register actions
-        add_action( 'admin_menu', array( &$this, 'add_menu' ) );
-    } // END public function __construct
+	
+	// public $products_columns  = array();
+	// public $orders_columns    = array();
+	// public $customers_columns = array();
+	public $messages          = array();
+	public $errors            = false;
 
-    /**
-    * Create an Nivo Lightbox menu entry in "Tools" called "Nivo Lightbox"
-    * 
-    */
-    public function add_menu() {
-        
-        $managment_page = add_management_page( 
-            __( 'MarketPress Import', 'mp' ), 
-            __( 'MarketPress Import', 'mp' ), 
-            'manage_options', 
-            'marketpress_import', 
-            array( &$this, 'tools_page' ) 
-        );
-        
-        add_action( 'admin_head-' . $managment_page, array( &$this, 'admin_header' ) );
-        
-    } // END public function add_menu
+	private $managment_page;
+	
+	/**
+	 * Construct the plugin object
+	 */
+	public function __construct() {
 
-    /**
-    * Add Style to the acm admin page
-    */
-    public function admin_header() {             
-        ?>
-            <style type="text/css">
-                #response li {
-                    border-color: #DFDFDF;
-                    border-style: solid;
-                    border-width: 0 0 1px;
-                    display: block;
-                    float: none;
-                }
-                #response span {
-                    float: none;
-                }
-                #response span.error {
-                    color: red;
-                }
-            </style>
-        <?php
-    } // END public function admin_header
+		// $this->products_columns = mp_get_products_csv_columns();
+		// $this->orders_columns   = mp_get_orders_csv_columns();
+		// $this->customers_columns = mp_get_customers_csv_columns();
+		
+		// register actions
+		add_action( 'admin_menu', array( &$this, 'add_menu' ) );
 
-    /**
-    * Display a tools page
-    */
-    public function tools_page() {
-        
-        if( isset( $_POST[ 'action' ] ) && $_POST[ 'action' ] == 'process' )
-            $messages = $this->parse_csv(); 
-        else
-            $messages = array();
+	} // END public function __construct
 
-        // Render the tools template
-        include mp_plugin_dir( 'includes/addons/mp-import-export/templates/import.php' );
-        
-    } // END public function tools_page
+	/**
+	* Create an Nivo Lightbox menu entry in "Tools" called "Nivo Lightbox"
+	* 
+	*/
+	public function add_menu() {
+		
+		$this->managment_page = add_submenu_page( 
+			'edit.php?post_type=' . MP_Product::get_post_type(),
+			__( 'MarketPress Import', 'mp' ), 
+			__( 'MarketPress Import', 'mp' ), 
+			'manage_options', 
+			'marketpress_import', 
+			array( &$this, 'tools_page' ) 
+		);
+		
+		add_action( 'admin_enqueue_scripts', array( &$this, 'admin_enqueue_scripts' ) ); 
+		
+	} // END public function add_menu
 
-    /**
-    * Parse CSV FILE
-    */
-    public function parse_csv() {
+	/**
+	* Add Style ans Script to the export page
+	*/
+	public function admin_enqueue_scripts( $hook ) {
 
-        //$field_separator = isset( $_POST['field_separator'] ) && !empty( $_POST['field_separator'] ) ? trim( $_POST['field_separator'] ) : ';';
-        $field_separator = ';';
-        //$text_separator = isset( $_POST['text_separator'] ) && !empty( $_POST['text_separator'] ) ? trim( $_POST['text_separator'] ) : '"';
-        $text_separator = '"';
-        $datafile = $_FILES['datafile'];
-        $messages = array();
-        
-        if ( $datafile['error'] != UPLOAD_ERR_OK || !is_uploaded_file( $datafile['tmp_name'] ) )
-            $messages[] = __( '<span class="error">Please choose a data file to upload.</span>', 'mp' );
-        else {
-            $handle = fopen( $datafile['tmp_name'], 'r' );
-            
-            $row = 0;
-            
-            while ( ( $datas = fgetcsv( $handle, 4096, $field_separator, $text_separator ) ) !== false ) {
-                
-                if( $row > 0 && count( $datas ) == count( $this->columns ) ) {
-                    
-                    $ID = mp_sanitize_data( $datas[0], 'int' );
-                    $title = mp_sanitize_data( $datas[1] );
-                    $associated_garden = mp_sanitize_data( $datas[2] );
-                    $type = mp_sanitize_data( $datas[3] );
-                    $description = mp_sanitize_data( $datas[4] );
-                    $address = mp_sanitize_data( $datas[5] );
-                    $zipcode = mp_sanitize_data( $datas[6] );
-                    $town = mp_sanitize_data( $datas[7] );
-                    $url = mp_sanitize_data( $datas[8], 'url' );
+		if( $this->managment_page !== $hook ) return;
 
-                    if ( empty( $ID ) )
-                        $messages[] = mp_get_error( $this->columns[0], $row + 1 );
-                    elseif ( empty( $title ) )
-                        $messages[] = mp_get_error( $this->columns[1], $row + 1 );
-                    elseif ( empty( $type ) )
-                        $messages[] = mp_get_error( $this->columns[3], $row + 1 );
-                    elseif ( empty( $description ) )
-                        $messages[] = mp_get_error( $this->columns[4], $row + 1 );
-                    elseif ( empty( $address ) )
-                        $messages[] = mp_get_error( $this->columns[5], $row + 1 );
-                    elseif ( empty( $zipcode ) )
-                        $messages[] = mp_get_error( $this->columns[6], $row + 1 );
-                    elseif ( empty( $town ) )
-                        $messages[] = mp_get_error( $this->columns[7], $row + 1 );
-                    elseif ( empty( $url ) )
-                        $messages[] = mp_get_error( $this->columns[6], $row + 1 );
-                    else
-                        $messages[] = mp_add_external_garden( $ID, $title, $associated_garden, $type, $description, $address, $zipcode, $town, $url, $gmap_api_key );
-                    
-                } 
-                elseif( count( $datas ) != count( $this->columns ) ) {
-                    $messages[] = sprintf( __( '<span class="error">Your csv structure is not correct.<br />Wrong number of datas in row %1$d.</span>', 'mp' ), ( $row + 1 ) );
-                    break;                
-                }
-                // 1ère ligne (en-tête)
-                else
-                    // Pour chaque colonne, on vérifie que le nom est bon
-                    foreach( $datas as $key => $data )
-                        if( mp_sanitize_data( $data ) != $this->columns[$key] ) {
-                            $messages[] = sprintf( __( '<span class="error">Your csv structure is not correct.<br />Unknown column "%1$s".</span>', 'mp' ), mp_sanitize_data( $data ) );
-                            break 2;
-                        }
-                
-                $row++;
-            }
-        }
-        
-        return $messages;        
-        
-    } // END public function parse_csv
-    
+		wp_enqueue_style( 'jquery-ui-structure', mp_plugin_url( 'includes/addons/mp-import-export/ui/css/jquery-ui.structure.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'jquery-ui-theme', mp_plugin_url( 'includes/addons/mp-import-export/ui/css/jquery-ui.theme.css' ), array( 'jquery-ui-structure' ), MP_VERSION );
+		wp_enqueue_style( 'mp-import', mp_plugin_url( 'includes/addons/mp-import-export/ui/css/mp-import.css' ), array( 'jquery-ui-theme' ), MP_VERSION );
+		wp_enqueue_script( 'jquery-ui' );
+		wp_enqueue_script( 'jquery-ui-core' );
+		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_enqueue_script( 'mp-import', mp_plugin_url( 'includes/addons/mp-import-export/ui/js/mp-import.js' ), array( 'jquery-ui-tabs' ), MP_VERSION );
+
+	} // END public function admin_enqueue_scripts
+
+	/**
+	* Display a tools page
+	*/
+	public function tools_page() {
+
+		$action = mp_get_request_value( 'action' );
+		$types  = mp_get_request_value( 'import-types' );
+		$from   = mp_get_request_value( 'import-from' );
+
+		if( $action === 'process' ) {
+			$import_datas = "import_{$from}_{$types}_datas";
+			$this->$import_datas();
+			
+			// if( ! $this->errors ) {
+			// 	$import = "import_{$from}_{$types}";
+
+			// 	$this->$import();
+			// }
+		}
+
+		// Render the tools template
+		include mp_plugin_dir( 'includes/addons/mp-import-export/templates/import.php' );
+		
+	} // END public function tools_page
+
+	/**
+	* Import 3.0 Products Fields from CSV File
+	*/
+	private function import_30_products_datas() {
+		
+		$this->import_30_datas( mp_get_products_csv_columns() );
+
+	} // END private function import_30_products_datas
+
+	/**
+	* Import 2.9 Products Fields from CSV File
+	*/
+	private function import_29_products_datas() {
+		
+		$columns         = mp_get_29_products_csv_columns();
+		$field_separator = ! empty( $_POST['field-separator'] ) ? stripslashes( trim( $_POST['field-separator'] ) ) : ',';
+		$text_separator  = ! empty( $_POST['text-separator'] ) ? stripslashes( trim( $_POST['text-separator'] ) ) : '"';
+		$datafile        = $_FILES['datafile'];
+		
+		if ( $datafile['error'] !== UPLOAD_ERR_OK || ! is_uploaded_file( $datafile['tmp_name'] ) ) {
+			$this->messages[] = sprintf( '<span class="error">%s</span>', __( 'Please choose a data file to upload.', 'mp' ) );
+		}
+		else {
+			$handle      = fopen( $datafile['tmp_name'], 'r' );
+			$row         = 0;
+			$new_columns = array();
+
+			while ( ( $datas = fgetcsv( $handle, 0, $field_separator, $text_separator ) ) !== false ) {
+				
+				if( $row === 0 ) {
+					// Verify that each required column exists in the csv
+					foreach( $columns as $key => $data ) {
+						if( $data['required'] && ! in_array( $key, $datas ) ) {
+							$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Column is missing: "%s".', 'mp' ), $key ) );
+							break 2;
+						}
+					}
+
+					// Register new Products Columns
+					foreach( $datas as $key => $data ) {
+						$data = trim( $data );
+
+						if( 
+							array_key_exists( $data, $columns ) &&
+							$columns[ $data ]['required']
+						) {
+							$new_columns[ $key ] = array(
+								'required' => true,
+								'name'     => $data,
+							);
+						}
+						else {
+							$new_columns[ $key ] = array(
+								'required' => false,
+								'name'     => $data,
+							);
+						}
+					}
+				}
+				elseif( count( $datas ) !== count( $new_columns ) ) {
+					$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Wrong number of datas in row %s.', 'mp' ), ( $row + 1 ) ) );
+					break;
+				}
+				else {
+					$required = array();
+					$metas    = array();
+					$tags     = array();
+					$cats     = array();
+					foreach ( $datas as $key => $value ) {
+						$value = trim( $value );
+
+						if( $new_columns[ $key ]['required'] ) {
+							$required[ $columns[ $new_columns[ $key ]['name'] ]['3.0_name'] ] = $value;
+							// $required[ $new_columns[ $key ]['name'] ] = $value;
+						}
+						else {
+							if( array_key_exists( $new_columns[ $key ]['name'], $columns ) ) {
+								foreach ( (array) $columns[ $new_columns[ $key ]['name'] ]['3.0_name'] as $value1 ) {
+									$metas[ $value1 ] = $value;
+
+									switch ( $value1 ) {
+										case 'sale_price_amount':
+											$metas['sale_price'] = array (
+												0 => 'sale_price_amount',
+												1 => 'sale_price_start_date',
+												2 => 'sale_price_end_date',
+											);
+											$metas['_sale_price'] = 'WPMUDEV_Field_Complex';
+											break;
+										
+										case 'external_url':
+											if( ! empty( $value ) ) {											
+												$metas['product_type'] = 'external';
+												$metas['_product_type'] = 'WPMUDEV_Field_Select';
+											}
+											break;
+										
+										case 'tags':
+											$tags = explode( ',', $value );
+											break;
+										
+										case 'categories':
+											$cats = explode( ',', $value );
+											break;
+										
+										case 'inv_inventory':
+											$metas['inv'] = array (
+												0 => 'inv_inventory',
+												1 => 'inv_out_of_stock_purchase',
+											);
+											$metas['_inv'] = 'WPMUDEV_Field_Complex';
+											break;
+										
+										case 'file_url':
+											if( ! empty( $value ) ) {											
+												$url        = $value;
+												$tmp        = download_url( $url );
+												$file_array = array(
+													'name'     => basename( $url ),
+													'tmp_name' => $tmp
+												);
+
+												// Check for download errors
+												if ( is_wp_error( $tmp ) ) {
+													@unlink( $file_array[ 'tmp_name' ] );
+													$this->messages[] = $tmp->get_error_message();
+													break;
+												}
+
+												$id = media_handle_sideload( $file_array, 0 );
+												// Check for handle sideload errors.
+												if ( is_wp_error( $id ) ) {
+													@unlink( $file_array['tmp_name'] );
+													$this->messages[] = $id->get_error_message();
+													break;
+												}
+
+												$metas['product_type']  = 'digital';
+												$metas['_product_type'] = 'WPMUDEV_Field_Select';
+												$metas['file_url']      = wp_get_attachment_url( $id );
+											}
+											break;
+										
+										case 'mp_product_images':
+											if( ! empty( $value ) ) {											
+												$url        = $value;
+												$tmp        = download_url( $url );
+												$file_array = array(
+													'name'     => basename( $url ),
+													'tmp_name' => $tmp
+												);
+
+												// Check for download errors
+												if ( is_wp_error( $tmp ) ) {
+													@unlink( $file_array[ 'tmp_name' ] );
+													$this->messages[] = $tmp->get_error_message();
+													break;
+												}
+
+												$id = media_handle_sideload( $file_array, 0 );
+												// Check for handle sideload errors.
+												if ( is_wp_error( $id ) ) {
+													@unlink( $file_array['tmp_name'] );
+													$this->messages[] = $id->get_error_message();
+													break;
+												}
+
+												$metas['mp_product_images'] = $id;
+											}
+											break;
+									}
+								}
+
+								$wpmu_dev_api_val = (array) $columns[ $new_columns[ $key ]['name'] ]['WPMU_DEV_API_VAL'];
+								foreach ( (array) $columns[ $new_columns[ $key ]['name'] ]['WPMU_DEV_API_NAME'] as $key2 => $value2 ) {
+									if( ! empty( $value2 ) ) {
+										$metas[ $value2 ] = $wpmu_dev_api_val[ $key2 ];
+									}
+								}
+							}
+							else {
+								$metas[ $new_columns[ $key ]['name'] ] = $value;
+							}
+						}
+					}
+
+					$this->messages[] = mp_ie_add_29_post( $required, $metas, $cats, $tags );
+				}
+				
+				$row++;
+			}
+		}
+
+	} // END private function import_30_products_datas
+
+	/**
+	* Import 3.0 Orders Fields from CSV File
+	*/
+	private function import_30_orders_datas() {
+		
+		$this->import_30_datas( mp_get_orders_csv_columns() );
+
+	} // END private function import_30_orders_datas
+
+	/**
+	* Import 3.0 Datas from CSV File
+	*/
+	private function import_30_datas( $columns ) {
+		
+		$field_separator = ! empty( $_POST['field-separator'] ) ? stripslashes( trim( $_POST['field-separator'] ) ) : ',';
+		$text_separator  = ! empty( $_POST['text-separator'] ) ? stripslashes( trim( $_POST['text-separator'] ) ) : '"';
+		$datafile        = $_FILES['datafile'];
+		
+		if ( $datafile['error'] !== UPLOAD_ERR_OK || ! is_uploaded_file( $datafile['tmp_name'] ) ) {
+			$this->messages[] = sprintf( '<span class="error">%s</span>', __( 'Please choose a data file to upload.', 'mp' ) );
+		}
+		else {
+			$handle      = fopen( $datafile['tmp_name'], 'r' );
+			$row         = 0;
+			$new_columns = array();
+
+			while ( ( $datas = fgetcsv( $handle, 0, $field_separator, $text_separator ) ) !== false ) {
+				
+				if( $row === 0 ) {
+					// Verify that each required column exists in the csv
+					foreach( $columns as $key => $data ) {
+						if( $data['required'] && ! in_array( $key, $datas ) ) {
+							$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Column is missing: "%s".', 'mp' ), $key ) );
+							break 2;
+						}
+					}
+
+					// Register new Products Columns
+					foreach( $datas as $key => $data ) {
+						$data = trim( $data );
+
+						if( 
+							array_key_exists( $data, $columns ) &&
+							$columns[ $data ]['required']
+						) {
+							$new_columns[ $key ] = array(
+								'required' => true,
+								'name'     => $data,
+							);								
+						}
+						else {
+							$new_columns[ $key ] = array(
+								'required' => false,
+								'name'     => $data,
+							);
+						}
+
+						// if( 
+						// 	array_key_exists( $data, $columns )
+						// ) {
+						// 	$this->messages[] = sprintf( __( '%s key exists', 'mp' ), $data );
+						// 	if( $columns[ $data ]['required'] ) {
+						// 		$new_columns[ $key ] = array(
+						// 			'required' => true,
+						// 			'name'     => $data,
+						// 		);								
+						// 	} else {
+						// 		$new_columns[ $key ] = array(
+						// 			'required' => false,
+						// 			'name'     => $data,
+						// 		);								
+						// 	}
+						// }
+						// else if ( 
+						// 	! empty( $columns[ ltrim( $data, '_' ) ] ) && 
+						// 	$columns[ ltrim( $data, '_' ) ]['WPMU_DEV_API_NAME'] === $data
+						// ) {
+						// 	$this->messages[] = sprintf( __( '%s key is a "WPMU_DEV_API" column', 'mp' ), $data );
+						// 	$new_columns[ $key ] = array(
+						// 		'required' => false,
+						// 		'name'     => $data,
+						// 	);
+						// }
+						// else {
+						// 	$this->messages[] = sprintf( __( '%s key is a custom column', 'mp' ), $data );
+						// 	$new_columns[ $key ] = array(
+						// 		'required' => false,
+						// 		'name'     => $data,
+						// 	);
+						// }
+					}
+				}
+				elseif( count( $datas ) !== count( $new_columns ) ) {
+					$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Wrong number of datas in row %s.', 'mp' ), ( $row + 1 ) ) );
+					break;
+				}
+				else {
+					$required = array();
+					$metas    = array();
+					$tags     = array();
+					$cats     = array();
+					foreach ( $datas as $key => $value ) {
+						if( $new_columns[ $key ]['required'] ) {
+							$required[ $new_columns[ $key ]['name'] ] = $value;
+						}
+						else {
+							if( array_key_exists( $new_columns[ $key ]['name'], $columns ) ) {
+								switch ( $new_columns[ $key ]['name'] ) {
+									case 'tags':
+										$tags = explode( ',', $value );
+										break;
+									
+									case 'categories':
+										$cats = explode( ',', $value );
+										break;
+
+									case 'file_url':
+										if( ! empty( $value ) ) {											
+											$url        = $value;
+											$tmp        = download_url( $url );
+											$file_array = array(
+												'name'     => basename( $url ),
+												'tmp_name' => $tmp
+											);
+
+											// Check for download errors
+											if ( is_wp_error( $tmp ) ) {
+												@unlink( $file_array[ 'tmp_name' ] );
+												$this->messages[] = $tmp->get_error_message();
+												break;
+											}
+
+											$id = media_handle_sideload( $file_array, 0 );
+											// Check for handle sideload errors.
+											if ( is_wp_error( $id ) ) {
+												@unlink( $file_array['tmp_name'] );
+												$this->messages[] = $id->get_error_message();
+												break;
+											}
+
+											$metas[ $new_columns[ $key ]['name'] ] = wp_get_attachment_url( $id );
+										}
+										break;
+									
+									case 'mp_product_images':
+										if( ! empty( $value ) ) {
+											$product_images = array();
+											
+											foreach ( explode( ',', $value ) as $url ) {
+												$tmp        = download_url( $url );
+												$file_array = array(
+													'name'     => basename( $url ),
+													'tmp_name' => $tmp
+												);
+
+												// Check for download errors
+												if ( is_wp_error( $tmp ) ) {
+													@unlink( $file_array[ 'tmp_name' ] );
+													$this->messages[] = $tmp->get_error_message();
+													break;
+												}
+
+												$id = media_handle_sideload( $file_array, 0 );
+												// Check for handle sideload errors.
+												if ( is_wp_error( $id ) ) {
+													@unlink( $file_array['tmp_name'] );
+													$this->messages[] = $id->get_error_message();
+													break;
+												}
+
+												$product_images[] = $id;
+											}											
+											$metas[ $new_columns[ $key ]['name'] ] = implode( ',', $product_images );
+										}
+										break;
+
+									default:
+										$metas[ $new_columns[ $key ]['name'] ] = $value;
+										break;
+								}
+							}
+							else {
+								$metas[ $new_columns[ $key ]['name'] ] = $value;							
+							}
+						}
+					}
+
+					$this->messages[] = mp_ie_add_post( $required, $metas, $cats, $tags );
+				}
+				
+				$row++;
+			}
+		}
+
+	} // END private function import_30_datas
+
+	/**
+	* Parse CSV FILE
+	*/
+	public function parse_csv() {
+
+		$field_separator = ! empty( $_POST['field-separator'] ) ? trim( $_POST['field-separator'] ) : ',';
+		$text_separator = ! empty( $_POST['text-separator'] ) ? trim( $_POST['text-separator'] ) : '"';
+		$datafile = $_FILES['datafile'];
+		
+		if ( $datafile['error'] !== UPLOAD_ERR_OK || ! is_uploaded_file( $datafile['tmp_name'] ) ) {
+			$this->messages[] = sprintf( '<span class="error">%s</span>', __( 'Please choose a data file to upload.', 'mp' ) );
+		}
+		else {
+			$handle = fopen( $datafile['tmp_name'], 'r' );
+			
+			$row = 0;
+			
+			while ( ( $datas = fgetcsv( $handle, 4096, $field_separator, $text_separator ) ) !== false ) {
+				
+				if( $row > 0 && count( $datas ) == count( $this->columns ) ) {
+					
+					$ID = mp_sanitize_data( $datas[0], 'int' );
+					$title = mp_sanitize_data( $datas[1] );
+					$associated_garden = mp_sanitize_data( $datas[2] );
+					$type = mp_sanitize_data( $datas[3] );
+					$description = mp_sanitize_data( $datas[4] );
+					$address = mp_sanitize_data( $datas[5] );
+					$zipcode = mp_sanitize_data( $datas[6] );
+					$town = mp_sanitize_data( $datas[7] );
+					$url = mp_sanitize_data( $datas[8], 'url' );
+
+					if ( empty( $ID ) )
+						$this->messages[] = mp_get_error( $this->columns[0], $row + 1 );
+					elseif ( empty( $title ) )
+						$this->messages[] = mp_get_error( $this->columns[1], $row + 1 );
+					elseif ( empty( $type ) )
+						$this->messages[] = mp_get_error( $this->columns[3], $row + 1 );
+					elseif ( empty( $description ) )
+						$this->messages[] = mp_get_error( $this->columns[4], $row + 1 );
+					elseif ( empty( $address ) )
+						$this->messages[] = mp_get_error( $this->columns[5], $row + 1 );
+					elseif ( empty( $zipcode ) )
+						$this->messages[] = mp_get_error( $this->columns[6], $row + 1 );
+					elseif ( empty( $town ) )
+						$this->messages[] = mp_get_error( $this->columns[7], $row + 1 );
+					elseif ( empty( $url ) )
+						$this->messages[] = mp_get_error( $this->columns[6], $row + 1 );
+					else
+						$this->messages[] = mp_add_external_garden( $ID, $title, $associated_garden, $type, $description, $address, $zipcode, $town, $url, $gmap_api_key );
+					
+				} 
+				elseif( count( $datas ) != count( $this->columns ) ) {
+					$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Wrong number of datas in row %s.', 'mp' ), ( $row + 1 ) ) );
+					break;                
+				}
+				// 1ère ligne (en-tête)
+				else {					
+					// Pour chaque colonne, on vérifie que le nom est bon
+					foreach( $datas as $key => $data ) {						
+						if( mp_sanitize_data( $data ) != $this->columns[$key] ) {
+							$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Unknown column "%s".', 'mp' ), mp_sanitize_data( $data ) ) );
+						}
+					}
+				}
+				
+				$row++;
+			}
+		}
+		
+	} // END public function parse_csv
+	
 } // END class MP_Import
 
 $MP_Import = new MP_Import();

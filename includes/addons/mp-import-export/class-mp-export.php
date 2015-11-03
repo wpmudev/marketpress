@@ -2,11 +2,11 @@
 
 class MP_Export {
 	
-	public $products_columns = array();
-	public $orders_columns = array();
+	public $products_columns  = array();
+	public $orders_columns    = array();
 	public $customers_columns = array();
-	public $messages = array();
-	public $errors = false;
+	public $messages          = array();
+	public $errors            = false;
 
 	private $managment_page;
 	
@@ -15,9 +15,9 @@ class MP_Export {
 	 */
 	public function __construct() {
 
-		$this->products_columns = $this->get_products_columns();
-		$this->orders_columns = $this->get_orders_columns();
-		// $this->customers_columns = $this->get_customers_columns();
+		$this->products_columns = mp_get_products_csv_columns();
+		$this->orders_columns   = mp_get_orders_csv_columns();
+		// $this->customers_columns = mp_get_customers_csv_columns();
 
 		// register actions
 		add_action( 'admin_menu', array( &$this, 'add_menu' ) );
@@ -25,125 +25,12 @@ class MP_Export {
 	} // END public function __construct
 
 	/**
-	* Get Products columns to export
-	*/
-	public function get_products_columns() {
-		
-		return array(
-			'ID'                         => array( 'name' => __( 'ID', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_author'                => array( 'name' => __( 'Post Author', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_date'                  => array( 'name' => __( 'Post Date', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_date_gmt'              => array( 'name' => __( 'Post Date GMT', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_content'               => array( 'name' => __( 'Post Content', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_title'                 => array( 'name' => __( 'Post Title', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_excerpt'               => array( 'name' => __( 'Post Excerpt', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_status'                => array( 'name' => __( 'Post Status', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'comment_status'             => array( 'name' => __( 'Comment Status', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'ping_status'                => array( 'name' => __( 'Ping Status', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_password'              => array( 'name' => __( 'Post Password', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_name'                  => array( 'name' => __( 'Post Name', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'to_ping'                    => array( 'name' => __( 'To Ping', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'pinged'                     => array( 'name' => __( 'Pinged', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_modified'              => array( 'name' => __( 'Post Modified', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_modified_gmt'          => array( 'name' => __( 'Post Modified GMT', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_content_filtered'      => array( 'name' => __( 'Post Content Filtered', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_parent'                => array( 'name' => __( 'Post Parent', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'guid'                       => array( 'name' => __( 'GUID', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'menu_order'                 => array( 'name' => __( 'Menu Order', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_type'                  => array( 'name' => __( 'Post Type', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_mime_type'             => array( 'name' => __( 'Post Mime Type', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'comment_count'              => array( 'name' => __( 'Comment Count', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'_edit_last'                 => array( 'name' => __( 'Edit Last', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'_edit_lock'                 => array( 'name' => __( 'Edit Lock', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'_thumbnail_id'              => array( 'name' => __( 'Thumbnail ID', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'charge_shipping'            => array( 'name' => __( 'Charge Shipping', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_charge_shipping' ),
-			'charge_tax'                 => array( 'name' => __( 'Charge Tax', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_charge_tax' ),
-			'external_url'               => array( 'name' => __( 'External URL', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_external_url' ),
-			'file_url'                   => array( 'name' => __( 'File URL', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_file_url' ),
-			'has_sale'                   => array( 'name' => __( 'Has Sale', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_has_sale' ),
-			'has_variation'              => array( 'name' => __( 'Has Variation', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_has_variation' ),
-			'inv'                        => array( 'name' => __( 'Inv', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_inv' ),
-			'inv_inventory'              => array( 'name' => __( 'Inv Inventory', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_inv_inventory' ),
-			'inv_out_of_stock_purchase'  => array( 'name' => __( 'Inv Out Of Stock Purchase', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_inv_out_of_stock_purchase' ),
-			'inventory'                  => array( 'name' => __( 'Inventory', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'inventory_tracking'         => array( 'name' => __( 'Inventory Tracking', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_inventory_tracking' ),
-			'mp_product_images'          => array( 'name' => __( 'MP Product Images', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_sales_count'             => array( 'name' => __( 'MP Sales Count', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'per_order_limit'            => array( 'name' => __( 'Per Order Limit', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_per_order_limit' ),
-			'product_images'             => array( 'name' => __( 'Product Images', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_product_images' ),
-			'product_type'               => array( 'name' => __( 'Product Type', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_product_type' ),
-			'regular_price'              => array( 'name' => __( 'Regular Price', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_regular_price' ),
-			'related_products'           => array( 'name' => __( 'Related Products', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_related_products' ),
-			'sale_price'                 => array( 'name' => __( 'Sale Price', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_sale_price' ),
-			'sale_price_amount'          => array( 'name' => __( 'Sale Price Amount', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_sale_price_amount' ),
-			'sale_price_end_date'        => array( 'name' => __( 'Sale Price End Date', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_sale_price_end_date' ),
-			'sale_price_start_date'      => array( 'name' => __( 'Sale Price Start Date', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_sale_price_start_date' ),
-			'sku'                        => array( 'name' => __( 'SKU', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_sku' ),
-			'special_tax_rate'           => array( 'name' => __( 'Special Tax Rate', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_special_tax_rate' ),
-			'variations_module'          => array( 'name' => __( 'Variation Module', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_variations_module' ),
-			'weight'                     => array( 'name' => __( 'Weight', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight' ),
-			'weight_extra_shipping_cost' => array( 'name' => __( 'Weight Extra Shipping Cost', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_extra_shipping_cost' ),
-			'weight_pounds'              => array( 'name' => __( 'Weight Pounds', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_pounds' ),
-			'weight_ounces'              => array( 'name' => __( 'Weight Ounces', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_ounces' ),
-		); 
-		
-	} // END public function get_products_columns
-
-	/**
-	* Get Orders columns to export
-	*/
-	public function get_orders_columns() {
-		
-		return array(
-			'ID'                         => array( 'name' => __( 'ID', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_author'                => array( 'name' => __( 'Post Author', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_date'                  => array( 'name' => __( 'Post Date', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_date_gmt'              => array( 'name' => __( 'Post Date GMT', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_content'               => array( 'name' => __( 'Post Content', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_title'                 => array( 'name' => __( 'Post Title', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_excerpt'               => array( 'name' => __( 'Post Excerpt', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_status'                => array( 'name' => __( 'Post Status', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'comment_status'             => array( 'name' => __( 'Comment Status', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'ping_status'                => array( 'name' => __( 'Ping Status', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_password'              => array( 'name' => __( 'Post Password', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_name'                  => array( 'name' => __( 'Post Name', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'to_ping'                    => array( 'name' => __( 'To Ping', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'pinged'                     => array( 'name' => __( 'Pinged', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_modified'              => array( 'name' => __( 'Post Modified', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_modified_gmt'          => array( 'name' => __( 'Post Modified GMT', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_content_filtered'      => array( 'name' => __( 'Post Content Filtered', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_parent'                => array( 'name' => __( 'Post Parent', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'guid'                       => array( 'name' => __( 'GUID', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'menu_order'                 => array( 'name' => __( 'Menu Order', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_type'                  => array( 'name' => __( 'Post Type', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'post_mime_type'             => array( 'name' => __( 'Post Mime Type', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'comment_count'              => array( 'name' => __( 'Comment Count', 'mp' ), 'required' => true, 'WPMU_DEV_API_NAME' => '' ),
-			'_edit_last'                 => array( 'name' => __( 'Edit Last', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'_edit_lock'                 => array( 'name' => __( 'Edit Lock', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_paid_time'               => array( 'name' => __( 'Paid Time', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_cart_info'               => array( 'name' => __( 'Cart Info', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_cart_items'              => array( 'name' => __( 'Cart Items', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_shipping_info'           => array( 'name' => __( 'Shipping Info', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_billing_info'            => array( 'name' => __( 'Billing Info', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_payment_info'            => array( 'name' => __( 'Payment Info', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_order_total'             => array( 'name' => __( 'Order Total', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_shipping_total'          => array( 'name' => __( 'Shipping Total', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_shipping_tax'            => array( 'name' => __( 'Shipping Tax', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_tax_total'               => array( 'name' => __( 'Tax Total', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_tax_inclusive'           => array( 'name' => __( 'Tax Inclusive', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_tax_shipping'            => array( 'name' => __( 'Tax Shipping', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_order_items'             => array( 'name' => __( 'Order Items', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-			'mp_received_time'           => array( 'name' => __( 'Received Time', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '' ),
-		); 
-
-	} // END public function get_orders_columns
-
-	/**
 	* Create MarketPress Export tools entry
 	*/
 	public function add_menu() {
 		
-		$this->managment_page = add_management_page( 
+		$this->managment_page = add_submenu_page( 
+			'edit.php?post_type=' . MP_Product::get_post_type(),
 			__( 'MarketPress Export', 'mp' ), 
 			__( 'MarketPress Export', 'mp' ), 
 			'manage_options', 
@@ -178,49 +65,18 @@ class MP_Export {
 	public function tools_page() {
 
 		$action = mp_get_request_value( 'action' );
-		$types = mp_get_request_value( 'export-types' );
+		$types  = mp_get_request_value( 'export-types' );
 
 		if( $action === 'process' ) {
-			switch ( $types ) {
-				case 'products':
-					$this->check_products_datas();
+			$check_datas = "check_{$types}_datas";
 
-					if( ! $this->errors ) {
-						$this->build_products_csv();
-					}
-					break;
+			$this->$check_datas();
 
-				case 'orders':
-					$this->check_orders_datas();
+			if( ! $this->errors ) {
+				$build_csv = "build_{$types}_csv";
 
-					if( ! $this->errors ) {
-						$this->build_orders_csv();
-					}
-					break;
-
-				case 'customers':
-					$this->check_customers_datas();
-
-					if( ! $this->errors ) {
-						$this->build_customers_csv();
-					}
-					break;
-
-				case 'all':
-				default:
-					$this->check_products_datas();
-					$this->check_orders_datas();
-					// $this->check_customers_datas();
-
-					if( ! $this->errors ) {
-						$products_file  = $this->build_products_csv( false );
-						$orders_file    = $this->build_orders_csv( false );
-						// $customers_file =  $this->build_customers_csv( false );
-
-						$this->zip_it( array( $products_file, $orders_file/*, $customers_file*/ ), 'mp-export-all.zip' );
-					}
-					break;
-			}			
+				$this->$build_csv();
+			}
 		}
 
 		// Render the tools template
@@ -247,6 +103,17 @@ class MP_Export {
 		include mp_plugin_dir( 'includes/addons/mp-import-export/templates/export-orders.php' );
 		
 	} // END public function orders_export_view
+
+	/**
+	* Prepare all Fields for CSV File
+	*/
+	private function check_all_datas() {
+		
+		$this->check_products_datas();
+		$this->check_orders_datas();
+		// $this->check_customers_datas();
+
+	} // END private function check_all_datas
 
 	/**
 	* Prepare Products Fields for CSV File
@@ -287,6 +154,39 @@ class MP_Export {
 		// }
 
 	} // END private function check_products_datas
+
+	/**
+	* Prepare Customers Fields for CSV File
+	*/
+	private function check_customers_datas() {
+		
+		// $limit  = (int) mp_get_request_value( 'products-limit', 0 );
+		// $offset = (int) mp_get_request_value( 'products-offset', 0 );
+
+		// if( ! is_integer( $limit ) ) {
+		// 	$this->messages[] = __( 'The products Limit should be an integer greater than -1.' );
+		// 	$this->errors     = true;
+		// }
+
+		// if( ! is_integer( $offset ) ) {
+		// 	$this->messages[] = __( 'The products Offset should be an integer greater than 0.' );
+		// 	$this->errors     = true;
+		// }
+
+	} // END private function check_products_datas
+
+	/**
+	* Build All CSV Files
+	*/
+	private function build_all_csv() {
+
+		$products_file  = $this->build_products_csv( false );
+		$orders_file    = $this->build_orders_csv( false );
+		// $customers_file =  $this->build_customers_csv( false );
+
+		$this->zip_it( array( $products_file, $orders_file/*, $customers_file*/ ), 'mp-export-all.zip' );
+
+	} // END private function build_all_csv
 
 	/**
 	* Build Products CSV File
@@ -371,14 +271,37 @@ class MP_Export {
 					} else {
 						// if column is checked by user
 						if( ! empty( $products_columns[ $key ] ) ) {
-							$meta   = get_post_meta( $products_query->post->ID, $key, true );
-							$line[] = maybe_serialize( $meta );
+							switch ( $key ) {
+								case 'tags':
+									$tags = wp_get_object_terms( $products_query->post->ID, 'product_tag', array( 'fields' => 'names' ) );
+									$line[] = implode( ',', $tags );
+									break;
 
-							// if column has a WPMU_DEV_API_NAME
-							if( ! empty( $field['WPMU_DEV_API_NAME'] ) ) {
-								$meta   = get_post_meta( $products_query->post->ID, $field['WPMU_DEV_API_NAME'], true );
-								$line[] = maybe_serialize( $meta );
+								case 'categories':
+									$categories = wp_get_object_terms( $products_query->post->ID, 'product_category', array( 'fields' => 'names' ) );
+									$line[] = implode( ',', $categories );
+									break;
+
+								case 'mp_product_images':
+									$images = explode( ',', get_post_meta( $products_query->post->ID, $key, true ) );
+									foreach ( $images as $key1 => $id ) {
+										$images[ $key1 ] = wp_get_attachment_url( (int) trim( $id ) );
+									}
+									$line[] = implode( ',', $images );
+									break;
+								
+								default:
+									$meta   = get_post_meta( $products_query->post->ID, $key, true );
+									$line[] = maybe_serialize( $meta );
+
+									// if column has a WPMU_DEV_API_NAME
+									if( ! empty( $field['WPMU_DEV_API_NAME'] ) ) {
+										$meta   = get_post_meta( $products_query->post->ID, $field['WPMU_DEV_API_NAME'], true );
+										$line[] = maybe_serialize( $meta );
+									}
+									break;
 							}
+
 						}
 					}
 				}
@@ -407,7 +330,7 @@ class MP_Export {
 		$this->messages[] = sprintf( __( 'There are %s columns in the products csv file.', 'mp' ), count( $column_headings ) );
 		$this->messages[] = sprintf( _n( '%s product was exported.', '%s products were exported.', $products_count, 'mp' ), $products_count );
 		if( $direct_download ) {
-			$this->messages[] = sprintf( __( '<a href="%s" class="button-primary">Click to download your CSV file.</a>', 'mp' ), $fileurl );
+			$this->messages[] = sprintf( '<a href="%s" class="button-primary">%s</a>', $fileurl, __( 'Click to download your CSV file.', 'mp' ) );
 		}
 
 		return $filepath;
@@ -533,7 +456,7 @@ class MP_Export {
 		$this->messages[] = sprintf( __( 'There are %s columns in the orders csv file.', 'mp' ), count( $column_headings ) );
 		$this->messages[] = sprintf( _n( '%s order was exported.', '%s orders were exported.', $orders_count, 'mp' ), $orders_count );
 		if( $direct_download ) {
-			$this->messages[] = sprintf( __( '<a href="%s" class="button-primary">Click to download your CSV file.</a>', 'mp' ), $fileurl );
+			$this->messages[] = sprintf( '<a href="%s" class="button-primary">%s</a>', $fileurl, __( 'Click to download your CSV file.', 'wds' ) );
 		}
 
 		return $filepath;
@@ -581,7 +504,7 @@ class MP_Export {
 			//close the zip -- done!
 			$zip->close();
 
-			$this->messages[] = sprintf( __( '<a href="%s" class="button-primary">Click to download your ZIP file.</a>', 'mp' ), $fileurl );
+			$this->messages[] = sprintf( '<a href="%s" class="button-primary">%s</a>', $fileurl, __( 'Click to download your ZIP file.', 'mp' ) );
 			
 			//check to make sure the file exists
 			return file_exists( $filepath );
