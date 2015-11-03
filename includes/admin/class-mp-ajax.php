@@ -382,6 +382,12 @@ class MP_Ajax {
 		foreach ( $post_ids as $post_id ) {
 			update_post_meta( $post_id, 'regular_price', $price );
 			update_post_meta( $post_id, 'sale_price_amount', $sale_price );
+			
+			if( ! empty( $sale_price ) && $sale_price > 0 ) {
+				update_post_meta( $post_id, 'sort_price', $sale_price );
+			} else {
+				update_post_meta( $post_id, 'sort_price', $price );
+			}
 		}
 
 		die;
