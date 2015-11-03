@@ -2065,6 +2065,46 @@ class MP_Cart {
 		}
 
 	}
+	
+	/**
+	 * Get total tax for special products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	
+	public function total_special_tax( $format = false ) {
+		$tax_amt = 0;
+
+		$blog_ids = $this->get_blog_ids();
+
+		while ( 1 ) {
+			if ( $this->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				$this->set_id( $blog_id );
+			}
+
+			$items = $this->get_items_as_objects();
+
+			foreach ( $items as $item ) {
+				if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
+					$tax_amt += $special_tax_amt * $item->qty;
+				}	
+			}
+
+			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+				$this->reset_id();
+				break;
+			}
+		}
+
+		if ( $format ) {
+			return mp_format_currency( '', $tax_amt );
+		} else {
+			return round( $tax_amt, 2 );
+		}
+	}
 
 	/**
 	 * Get total
