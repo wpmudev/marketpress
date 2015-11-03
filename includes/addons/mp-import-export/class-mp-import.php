@@ -2,11 +2,8 @@
 
 class MP_Import {
 	
-	// public $products_columns  = array();
-	// public $orders_columns    = array();
-	// public $customers_columns = array();
-	public $messages          = array();
-	public $errors            = false;
+	public $messages = array();
+	public $errors   = false;
 
 	private $managment_page;
 	
@@ -14,10 +11,6 @@ class MP_Import {
 	 * Construct the plugin object
 	 */
 	public function __construct() {
-
-		// $this->products_columns = mp_get_products_csv_columns();
-		// $this->orders_columns   = mp_get_orders_csv_columns();
-		// $this->customers_columns = mp_get_customers_csv_columns();
 		
 		// register actions
 		add_action( 'admin_menu', array( &$this, 'add_menu' ) );
@@ -25,7 +18,7 @@ class MP_Import {
 	} // END public function __construct
 
 	/**
-	* Create an Nivo Lightbox menu entry in "Tools" called "Nivo Lightbox"
+	* Create menu entry
 	* 
 	*/
 	public function add_menu() {
@@ -50,12 +43,7 @@ class MP_Import {
 
 		if( $this->managment_page !== $hook ) return;
 
-		wp_enqueue_style( 'jquery-ui-structure', mp_plugin_url( 'includes/addons/mp-import-export/ui/css/jquery-ui.structure.css' ), false, MP_VERSION );
-		wp_enqueue_style( 'jquery-ui-theme', mp_plugin_url( 'includes/addons/mp-import-export/ui/css/jquery-ui.theme.css' ), array( 'jquery-ui-structure' ), MP_VERSION );
 		wp_enqueue_style( 'mp-import', mp_plugin_url( 'includes/addons/mp-import-export/ui/css/mp-import.css' ), array( 'jquery-ui-theme' ), MP_VERSION );
-		wp_enqueue_script( 'jquery-ui' );
-		wp_enqueue_script( 'jquery-ui-core' );
-		wp_enqueue_script( 'jquery-ui-tabs' );
 		wp_enqueue_script( 'mp-import', mp_plugin_url( 'includes/addons/mp-import-export/ui/js/mp-import.js' ), array( 'jquery-ui-tabs' ), MP_VERSION );
 
 	} // END public function admin_enqueue_scripts
@@ -278,7 +266,7 @@ class MP_Import {
 			}
 		}
 
-	} // END private function import_30_products_datas
+	} // END private function import_29_products_datas
 
 	/**
 	* Import 3.0 Orders Fields from CSV File
@@ -475,77 +463,6 @@ class MP_Import {
 		}
 
 	} // END private function import_30_datas
-
-	/**
-	* Parse CSV FILE
-	*/
-	public function parse_csv() {
-
-		$field_separator = ! empty( $_POST['field-separator'] ) ? trim( $_POST['field-separator'] ) : ',';
-		$text_separator = ! empty( $_POST['text-separator'] ) ? trim( $_POST['text-separator'] ) : '"';
-		$datafile = $_FILES['datafile'];
-		
-		if ( $datafile['error'] !== UPLOAD_ERR_OK || ! is_uploaded_file( $datafile['tmp_name'] ) ) {
-			$this->messages[] = sprintf( '<span class="error">%s</span>', __( 'Please choose a data file to upload.', 'mp' ) );
-		}
-		else {
-			$handle = fopen( $datafile['tmp_name'], 'r' );
-			
-			$row = 0;
-			
-			while ( ( $datas = fgetcsv( $handle, 4096, $field_separator, $text_separator ) ) !== false ) {
-				
-				if( $row > 0 && count( $datas ) == count( $this->columns ) ) {
-					
-					$ID = mp_sanitize_data( $datas[0], 'int' );
-					$title = mp_sanitize_data( $datas[1] );
-					$associated_garden = mp_sanitize_data( $datas[2] );
-					$type = mp_sanitize_data( $datas[3] );
-					$description = mp_sanitize_data( $datas[4] );
-					$address = mp_sanitize_data( $datas[5] );
-					$zipcode = mp_sanitize_data( $datas[6] );
-					$town = mp_sanitize_data( $datas[7] );
-					$url = mp_sanitize_data( $datas[8], 'url' );
-
-					if ( empty( $ID ) )
-						$this->messages[] = mp_get_error( $this->columns[0], $row + 1 );
-					elseif ( empty( $title ) )
-						$this->messages[] = mp_get_error( $this->columns[1], $row + 1 );
-					elseif ( empty( $type ) )
-						$this->messages[] = mp_get_error( $this->columns[3], $row + 1 );
-					elseif ( empty( $description ) )
-						$this->messages[] = mp_get_error( $this->columns[4], $row + 1 );
-					elseif ( empty( $address ) )
-						$this->messages[] = mp_get_error( $this->columns[5], $row + 1 );
-					elseif ( empty( $zipcode ) )
-						$this->messages[] = mp_get_error( $this->columns[6], $row + 1 );
-					elseif ( empty( $town ) )
-						$this->messages[] = mp_get_error( $this->columns[7], $row + 1 );
-					elseif ( empty( $url ) )
-						$this->messages[] = mp_get_error( $this->columns[6], $row + 1 );
-					else
-						$this->messages[] = mp_add_external_garden( $ID, $title, $associated_garden, $type, $description, $address, $zipcode, $town, $url, $gmap_api_key );
-					
-				} 
-				elseif( count( $datas ) != count( $this->columns ) ) {
-					$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Wrong number of datas in row %s.', 'mp' ), ( $row + 1 ) ) );
-					break;                
-				}
-				// 1ère ligne (en-tête)
-				else {					
-					// Pour chaque colonne, on vérifie que le nom est bon
-					foreach( $datas as $key => $data ) {						
-						if( mp_sanitize_data( $data ) != $this->columns[$key] ) {
-							$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Unknown column "%s".', 'mp' ), mp_sanitize_data( $data ) ) );
-						}
-					}
-				}
-				
-				$row++;
-			}
-		}
-		
-	} // END public function parse_csv
 	
 } // END class MP_Import
 
