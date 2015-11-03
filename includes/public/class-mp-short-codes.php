@@ -107,7 +107,7 @@ class MP_Short_Codes {
 
 // Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
-			'ajaxurl'		 => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'		 => mp_get_ajax_url(),
 			'loadingImage'	 => mp_plugin_url( 'ui/images/loading.gif' ),
 			'productsURL'	 => mp_store_page_url( 'products', false ),
 			'productCats'	 => $cats,
@@ -125,7 +125,7 @@ class MP_Short_Codes {
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'                  => mp_get_ajax_url(),
 			'ajax_loader'              => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
 			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order.', 'mp' ),
 			'is_cart_page'             => mp_is_shop_page( 'cart' )
