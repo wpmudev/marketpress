@@ -293,7 +293,7 @@ class MP_Product {
 
 							<form id="mp-product-options-callout-form"
 							      class="mp_form mp_form-mp-product-options-callout" method="post"
-							      data-ajax-url="<?php echo admin_url( 'admin-ajax.php?action=mp_update_cart' ); ?>"
+							      data-ajax-url="<?php echo mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' ); ?>"
 							      action="<?php echo get_permalink( mp_get_setting( 'pages->cart' ) ); ?>">
 								<input type="hidden" name="product_id" value="<?php echo $product->ID; ?>">
 								<input type="hidden" name="product_qty_changed" value="0">
@@ -898,7 +898,7 @@ class MP_Product {
 		if ( $this->get_meta( 'product_type' ) == 'external' && ( $url = $this->get_meta( 'external_url' ) ) ) {
 			$button = '<a class="mp_link-buynow" href="' . esc_url( $url ) . '">' . __( 'Buy Now &raquo;', 'mp' ) . '</a>';
 		} elseif ( ! mp_get_setting( 'disable_cart' ) ) {
-			$button = '<form id="mp-buy-product-' . $this->ID . '-form" class="mp_form mp_form-buy-product ' . ( $no_single ? 'mp_no_single' : '' ) . ' ' . ( $mp_buy_button ? 'mp_buy_button' : '' ) . '" method="post" data-ajax-url="' . admin_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
+			$button = '<form id="mp-buy-product-' . $this->ID . '-form" class="mp_form mp_form-buy-product ' . ( $no_single ? 'mp_no_single' : '' ) . ' ' . ( $mp_buy_button ? 'mp_buy_button' : '' ) . '" method="post" data-ajax-url="' . mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' ) . '" action="' . mp_cart_link( false, true ) . '">';
 
 			if ( ! $this->in_stock() ) {
 				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';
