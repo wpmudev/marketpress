@@ -492,7 +492,10 @@ class MP_Export {
 		if( count( $valid_files ) ) {
 			//create the archive
 			$zip = new ZipArchive();
-			if( $zip->open( $filepath, $overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE ) !== true ) {
+			
+			$error = $zip->open( $filepath, $overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE );
+			if( $error !== true ) {
+				$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), $error );
 				return false;
 			}
 
