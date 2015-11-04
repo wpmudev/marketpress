@@ -2089,7 +2089,9 @@ class MP_Cart {
 
 			foreach ( $items as $item ) {
 				if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
-					$tax_amt += $special_tax_amt * $item->qty;
+					$original_tax = $item->get_price( 'lowest' ) - ( $item->get_price( 'lowest' ) / ( 1 + mp_tax_rate() ) );
+					$tax = $original_tax - $special_tax_amt;
+					$tax_amt += $tax * $item->qty;
 				}	
 			}
 
@@ -2141,7 +2143,7 @@ class MP_Cart {
 				}
 
 				//Shipping price should be added after products price calculation
-				$total     = $total + $shipping_pre_total + $this->total_tax_digital_inclusive();
+				$total     = $total + $shipping_pre_total + $this->total_tax_digital_inclusive() + $this->total_special_tax();
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
