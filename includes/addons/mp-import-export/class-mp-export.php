@@ -493,9 +493,46 @@ class MP_Export {
 			//create the archive
 			$zip = new ZipArchive();
 			
-			$error = $zip->open( $filepath, $overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE );
-			if( $error !== true ) {
-				$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), $error );
+			$result = $zip->open( $filepath, $overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE );
+
+			if( $result !== true ) {
+				switch( $result ){
+					case ZipArchive::ER_EXISTS: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'File already exists.', 'mp' ) );
+						break;
+
+					case ZipArchive::ER_INCONS: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'Zip archive inconsistent.', 'mp' ) );
+						break;
+						
+					case ZipArchive::ER_MEMORY: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'Malloc failure.', 'mp' ) );
+						break;
+						
+					case ZipArchive::ER_NOENT: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'No such file.', 'mp' ) );
+						break;
+						
+					case ZipArchive::ER_NOZIP: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'Not a zip archive.', 'mp' ) );
+						break;
+						
+					case ZipArchive::ER_OPEN: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'Can\'t open file.', 'mp' ) );
+						break;
+						
+					case ZipArchive::ER_READ: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'Read error.', 'mp' ) );
+						break;
+						
+					case ZipArchive::ER_SEEK: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), __( 'Seek error.', 'mp' ) );
+						break;
+					
+					default: 
+						$this->messages[] = sprintf( __( 'Could not create the zip file: %s', 'mp' ), sprintf( __( 'Unknow (Code %s)', 'mp' ), $result ) );
+						break;
+				}
 				return false;
 			}
 
