@@ -7,6 +7,8 @@ class MP_Export {
 	public $customers_columns = array();
 	public $messages          = array();
 	public $errors            = false;
+	public $upload_path       = '';
+	public $upload_url        = '';
 
 	private $managment_page;
 	
@@ -18,6 +20,14 @@ class MP_Export {
 		$this->products_columns = mp_get_products_csv_columns();
 		$this->orders_columns   = mp_get_orders_csv_columns();
 		// $this->customers_columns = mp_get_customers_csv_columns();
+
+		$upload_dir        = wp_upload_dir();
+		$this->upload_path = $upload_dir['basedir'] . '/marketpress/';
+		$this->upload_url  = $upload_dir['baseurl'] . '/marketpress/';
+
+		if( ! file_exists( $this->upload_path ) ) {
+			wp_mkdir_p( $this->upload_path );
+		}
 
 		// register actions
 		add_action( 'admin_menu', array( &$this, 'add_menu' ) );
@@ -209,8 +219,8 @@ class MP_Export {
 
 		$filename         = mp_get_request_value( 'products-file-name', 'mp-products-export' );
 		$filename         = trim( str_replace( $filename_search, $filename_replace, $filename ) ) . '.csv';
-		$filepath         = plugin_dir_path( __FILE__ ) . 'files/' . $filename;
-		$fileurl          = plugin_dir_url( __FILE__ ) . 'files/' . $filename;
+		$filepath         = $this->upload_path . $filename;
+		$fileurl          = $this->upload_url . $filename;
 		$products_columns = mp_get_request_value( 'products-columns', array() );
 		$custom_fields    = explode( "\n", mp_get_request_value( 'products-custom-fields', '' ) );
 
@@ -358,8 +368,8 @@ class MP_Export {
 
 		$filename       = mp_get_request_value( 'orders-file-name', 'mp-orders-export' );
 		$filename       = trim( str_replace( $filename_search, $filename_replace, $filename ) ) . '.csv';
-		$filepath       = plugin_dir_path( __FILE__ ) . 'files/' . $filename;
-		$fileurl        = plugin_dir_url( __FILE__ ) . 'files/' . $filename;
+		$filepath       = $this->upload_path . $filename;
+		$fileurl        = $this->upload_url . $filename;
 		$orders_columns = mp_get_request_value( 'orders-columns', array() );
 		$custom_fields  = explode( "\n", mp_get_request_value( 'orders-custom-fields', '' ) );
 
@@ -468,8 +478,8 @@ class MP_Export {
 	 */
 	private function zip_it( $files = array(), $filename = '', $overwrite = true ) {
 		
-		$filepath = plugin_dir_path( __FILE__ ) . 'files/' . $filename;
-		$fileurl  = plugin_dir_url( __FILE__ ) . 'files/' . $filename;
+		$filepath = $this->upload_path . $filename;
+		$fileurl  = $this->upload_url . $filename;
 
 		//if the zip file already exists and overwrite is false, return false
 		if( file_exists( $filepath ) && !$overwrite ) { return false; }
@@ -538,7 +548,7 @@ class MP_Export {
 
 			//add the files
 			foreach( $valid_files as $file ) {
-				$zip->addFile( $file,  str_replace( plugin_dir_path( __FILE__ ) . 'files/', '', $file ) );
+				$zip->addFile( $file,  str_replace( $this->upload_path, '', $file ) );
 			}
 			
 			//close the zip -- done!
