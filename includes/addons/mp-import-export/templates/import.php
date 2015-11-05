@@ -5,17 +5,21 @@
 	<?php if ( ! empty( $this->messages ) ): ?>	
 		<?php add_thickbox(); ?>
 		<div id="response-wrapper" style="display:none;">
-			<ul id="response">
+			<ul id="response-top">
 				<?php foreach( $this->messages as $message ) : ?>
 					<li><?php echo $message; ?></li>
 				<?php endforeach; ?>
 			</ul>
+			<ol id="response-bottom" reversed="true"></ol>
+			<div id="progress-bar"></div>
 		</div>
 		<a href="#TB_inline?width=600&height=250&inlineId=response-wrapper" title="<?php _e( 'MarketPress Import Report', 'mp' ); ?>" id="thickbox-launcher" class="thickbox button-primary"><?php _e( 'MarketPress Import Report', 'mp' ); ?></a><br /><br />
 	<?php endif; ?>
 
 	<form action="edit.php?post_type=<?php echo MP_Product::get_post_type(); ?>&page=marketpress_import" method="post" enctype="multipart/form-data">
 		<input type="hidden" name="action" value="process" />
+		<input type="hidden" id="file_path" name="file_path" value="<?php echo $this->uploaded_file; ?>" />
+		<input type="hidden" id="lines_count" name="lines_count" value="<?php echo $this->lines_count; ?>" />
 		<div class="postbox metabox-holder">
 			<h3 class="hndle"><?php _e( 'MarketPress Import', 'mp' ); ?></h3>
 			<div class="inside">

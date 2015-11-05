@@ -8,16 +8,35 @@ label {
 	float: left;
 }
 
-#response li {
+#response-top li,
+#response-bottom li {
 	border-color: #DFDFDF;
 	border-style: solid;
 	border-width: 0 0 1px;
-	display: block;
 	float: none;
 }
-#response span {
+
+#response-top span,
+#response-bottom span {
 	float: none;
 }
-#response span.error {
+
+#response-top span.error,
+#response-bottom span.error {
 	color: red;
+}
+
+#response-bottom span.error {
+	color: red;
+}
+
+#progress-bar {
+	position: absolute;
+	bottom: -50px;
+	left:0;
+	right: 0;
+}
+
+.ui-progressbar-value {
+	height: 40px;
 }
