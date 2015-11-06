@@ -30,7 +30,7 @@
 							<select type="text" name="import-from" id="import-from">
 								<option value="30"><?php _e( 'MarketPress 3.0', 'mp' ); ?></option>
 								<option value="29"><?php _e( 'MarketPress 2.9', 'mp' ); ?></option>
-								<option value="woo"><?php _e( 'WooCommerce', 'mp' ); ?></option>
+								<!-- <option value="woo"><?php _e( 'WooCommerce', 'mp' ); ?></option> -->
 							</select>
 						</label>
 					</p>
@@ -40,7 +40,7 @@
 							<select type="text" name="import-types" id="import-types">
 								<option value="products"><?php _e( 'Products', 'mp' ); ?></option>
 								<option value="orders"><?php _e( 'Orders', 'mp' ); ?></option>
-								<option value="customers"><?php _e( 'Customers', 'mp' ); ?></option>
+								<!-- <option value="customers"><?php _e( 'Customers', 'mp' ); ?></option> -->
 							</select>
 						</label>
 					</p>
