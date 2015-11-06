@@ -956,7 +956,7 @@ class MP_Products_Screen {
 					} else {
 						if ( $value_type == 'inventory' ) {
 							update_post_meta( $post_id, 'inv_inventory', sanitize_text_field( $value ) );
-						}
+						}							
 
 						if ( $value_type == 'sale_price_amount' ) {//exeption when saving sale price amount
 							if ( is_numeric( $value ) ) {
@@ -969,6 +969,15 @@ class MP_Products_Screen {
 						} else {
 							update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
 						}
+						
+						$parent_id = wp_get_post_parent_id( $post_id );
+						$product   = new MP_Product( $post_id );
+						$price 	   = $product->get_price();
+						
+						if( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
+							update_post_meta( $parent_id, 'sort_price', sanitize_text_field( $price['lowest'] ) );
+						}
+						
 					}
 			}
 
