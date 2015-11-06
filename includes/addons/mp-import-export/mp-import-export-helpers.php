@@ -302,9 +302,11 @@ function mp_ie_get_admin_id() {
 	) );
 	$users = $users_query->get_results();
 
-	if( isset( $users[0] ) )
+	if( isset( $users[0] ) ) {
 		return $users[0]->ID;
-	else
+	}
+	else {
 		return 0;
+	}
 	
 }

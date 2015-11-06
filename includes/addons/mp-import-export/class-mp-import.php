@@ -328,9 +328,9 @@ class MP_Import {
 	/**
 	* Import 3.0 Orders Fields from CSV File
 	*/
-	private function import_30_orders_datas() {
+	private function import_30_orders_datas( $file_path, $line ) {
 		
-		$this->import_30_datas( mp_get_orders_csv_columns() );
+		$this->import_30_datas(  $file_path, $line, mp_get_orders_csv_columns() );
 
 	} // END private function import_30_orders_datas
 
@@ -379,40 +379,6 @@ class MP_Import {
 							'name'     => $data,
 						);
 					}
-
-					// if( 
-					// 	array_key_exists( $data, $columns )
-					// ) {
-					// 	$this->messages[] = sprintf( __( '%s key exists', 'mp' ), $data );
-					// 	if( $columns[ $data ]['required'] ) {
-					// 		$new_columns[ $key ] = array(
-					// 			'required' => true,
-					// 			'name'     => $data,
-					// 		);								
-					// 	} else {
-					// 		$new_columns[ $key ] = array(
-					// 			'required' => false,
-					// 			'name'     => $data,
-					// 		);								
-					// 	}
-					// }
-					// else if ( 
-					// 	! empty( $columns[ ltrim( $data, '_' ) ] ) && 
-					// 	$columns[ ltrim( $data, '_' ) ]['WPMU_DEV_API_NAME'] === $data
-					// ) {
-					// 	$this->messages[] = sprintf( __( '%s key is a "WPMU_DEV_API" column', 'mp' ), $data );
-					// 	$new_columns[ $key ] = array(
-					// 		'required' => false,
-					// 		'name'     => $data,
-					// 	);
-					// }
-					// else {
-					// 	$this->messages[] = sprintf( __( '%s key is a custom column', 'mp' ), $data );
-					// 	$new_columns[ $key ] = array(
-					// 		'required' => false,
-					// 		'name'     => $data,
-					// 	);
-					// }
 					
 					$count_datas = count( $datas );
 				}
