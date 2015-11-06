@@ -134,12 +134,14 @@ class MP_Public {
 		}
 
 		$order_id = get_query_var( 'mp_order_id' );
-		$order = new MP_Order( $order_id );
-		if ( ! $order->exists() )
+		$order    = new MP_Order( $order_id );
+		if ( ! $order->exists() ) {
 			return;
+		}
 
-		if ( $order->post_author != 0 )
+		if ( $order->post_author != 0 ) {
 			return;
+		}
 
 		ob_start();
 
@@ -148,45 +150,66 @@ class MP_Public {
 
 			<h2 class="mp_title"><?php _e( 'Create Account', 'mp' ); ?></h2>
 
-			<form id="mp-create-account-form" class="mp_form mp_form-create-account" action="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_create_account' ) ); ?>" method="post">
+			<form id="mp-create-account-form" class="mp_form mp_form-create-account"
+			      action="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_create_account' ) ); ?>"
+			      method="post">
 				<?php wp_nonce_field( 'mp_create_account-' . $order_id, 'mp_create_account_nonce' ); ?>
 				<div class="mp_form_field">
-					<label for="mp-create-account-name-first" class="mp_form_label"><?php _e( 'Username:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-username" type="text" name="username" data-rule-required="true" data-rule-remote="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ); ?>" data-msg-remote="<?php esc_attr_e( 'An account with this username already exists', 'mp' ); ?>">
+					<label for="mp-create-account-name-first" class="mp_form_label"><?php _e( 'Username:', 'mp' ); ?>
+						<span class="mp-field-required">*</span></label>
+					<input class="mp_form_input" id="mp-create-account-username" type="text" name="username"
+					       data-rule-required="true"
+					       data-rule-remote="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ); ?>"
+					       data-msg-remote="<?php esc_attr_e( 'An account with this username already exists', 'mp' ); ?>">
 				</div>
 
 				<div class="mp_form_field">
-					<label for="mp-create-account-name-first" class="mp_form_label"><?php _e( 'First Name:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-name-first" type="text" name="name_first" data-rule-required="true">
+					<label for="mp-create-account-name-first" class="mp_form_label"><?php _e( 'First Name:', 'mp' ); ?>
+						<span class="mp-field-required">*</span></label>
+					<input class="mp_form_input" id="mp-create-account-name-first" type="text" name="name_first"
+					       data-rule-required="true">
 				</div>
 
 				<div class="mp_form_field">
-					<label for="mp-create-account-name-last" class="mp_form_label"><?php _e( 'Last Name:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-name-last" type="text" name="name_last" data-rule-required="true">
+					<label for="mp-create-account-name-last" class="mp_form_label"><?php _e( 'Last Name:', 'mp' ); ?>
+						<span class="mp-field-required">*</span></label>
+					<input class="mp_form_input" id="mp-create-account-name-last" type="text" name="name_last"
+					       data-rule-required="true">
 				</div>
 
 				<div class="mp_form_field">
-					<label for="mp-create-account-email" class="mp_form_label"><?php _e( 'Email:', 'mp' ); ?>'<span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-email" type="email" name="email" data-rule-required="true" data-rule-email="true" data-rule-remote="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_email_exists' ) ); ?>" data-msg-remote="<?php esc_attr_e( 'An account with this email address already exists', 'mp' ); ?>">
+					<label for="mp-create-account-email" class="mp_form_label"><?php _e( 'Email:', 'mp' ); ?>'<span
+							class="mp-field-required">*</span></label>
+					<input class="mp_form_input" id="mp-create-account-email" type="email" name="email"
+					       data-rule-required="true" data-rule-email="true"
+					       data-rule-remote="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_email_exists' ) ); ?>"
+					       data-msg-remote="<?php esc_attr_e( 'An account with this email address already exists', 'mp' ); ?>">
 				</div>
 
 				<div class="mp_form_field">
-					<label for="mp-create-account-password1" class="mp_form_label"><?php _e( 'Password:', 'mp' ); ?>'<span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-password1" type="password" name="password1" data-rule-required="true">
+					<label for="mp-create-account-password1" class="mp_form_label"><?php _e( 'Password:', 'mp' ); ?>
+						'<span class="mp-field-required">*</span></label>
+					<input class="mp_form_input" id="mp-create-account-password1" type="password" name="password1"
+					       data-rule-required="true">
 				</div>
 
 				<div class="mp_form_field">
-					<label for="mp-create-account-password2" class="mp_form_label"><?php _e( 'Re-enter Password:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-password2" type="password" name="password2" data-rule-required="true" data-rule-equalTo="#mp-create-account-password1" data-msg-equalTo="<?php esc_attr_e( 'Passwords do not match!', 'mp' ); ?>">
+					<label for="mp-create-account-password2"
+					       class="mp_form_label"><?php _e( 'Re-enter Password:', 'mp' ); ?><span
+							class="mp-field-required">*</span></label>
+					<input class="mp_form_input" id="mp-create-account-password2" type="password" name="password2"
+					       data-rule-required="true" data-rule-equalTo="#mp-create-account-password1"
+					       data-msg-equalTo="<?php esc_attr_e( 'Passwords do not match!', 'mp' ); ?>">
 				</div>
 
 				<?php do_action( 'mp_public/create_account_lightbox_form', $order_id ); ?>
 
 				<div class="mp_form_callout">
-					<button type="submit" class="mp_button mp_button-alt mp_button-create-account"><?php _e( 'Create Account', 'mp' ); ?></button>
+					<button type="submit"
+					        class="mp_button mp_button-alt mp_button-create-account"><?php _e( 'Create Account', 'mp' ); ?></button>
 				</div>
 				<input type="hidden" name="order_id" value="<?php echo esc_attr( $order_id ); ?>"/>
-				<input type="hidden" name="mp-submit-check" value="1" />
+				<input type="hidden" name="mp-submit-check" value="1"/>
 			</form>
 		</div><!-- end mp-create-account-lightbox -->';
 		<?php
@@ -245,13 +268,13 @@ class MP_Public {
 	 * @return string
 	 */
 	public function hide_single_product_title( $title, $id = false, $is_nav = false ) {
-		if ( in_the_loop() && is_main_query() && !$is_nav ) {
-            $title = '';
-        }
+		if ( in_the_loop() && is_main_query() && ! $is_nav ) {
+			$title = '';
+		}
 
-        return $title;
+		return $title;
 	}
-	
+
 	/**
 	 * Check if the current page is a store page
 	 *
@@ -329,30 +352,30 @@ class MP_Public {
 			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
 		}
 	}
-	
+
 	/**
 	 * Enqueue frontend styles and scripts
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	 
+
 	public function frontend_styles() {
 		//Display styles for all pages
-		
+
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
-		
+
 		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
 			$theme_url = mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' );
 		} else {
 			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
 		}
 		wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
-		
+
 	}
 
 	/**
@@ -369,7 +392,7 @@ class MP_Public {
 			wp_enqueue_script( 'lightgallery', mp_plugin_url( 'ui/lightgallery/js/lightgallery.js' ), array( 'jquery' ), MP_VERSION );
 			wp_enqueue_style( 'lightgallery', mp_plugin_url( 'ui/lightgallery/css/lightgallery.css' ), array(), MP_VERSION );
 		}
-		
+
 		/*
 		 * Comment this to allow scripts to load on all pages for Global products widget
 		if ( ! $this->is_store_page() ) {
@@ -393,10 +416,8 @@ class MP_Public {
 		foreach ( $terms as $term ) {
 			$cats[ $term->term_id ] = get_term_link( $term );
 		}
-
-// Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
-			'ajaxurl'      => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'      => mp_get_ajax_url(),
 			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
 			'productsURL'  => mp_store_page_url( 'products', false ),
 			'productCats'  => $cats,
