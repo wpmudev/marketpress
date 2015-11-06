@@ -20,6 +20,7 @@
 		<input type="hidden" name="action" value="process" />
 		<input type="hidden" id="file_path" name="file_path" value="<?php echo $this->uploaded_file; ?>" />
 		<input type="hidden" id="lines_count" name="lines_count" value="<?php echo $this->lines_count; ?>" />
+		<input type="hidden" id="items_by_step" name="items_by_step" value="<?php echo $this->items_by_step; ?>" />
 		<div class="postbox metabox-holder">
 			<h3 class="hndle"><?php _e( 'MarketPress Import', 'mp' ); ?></h3>
 			<div class="inside">
@@ -28,9 +29,18 @@
 						<label for="import-from">
 							<span><?php _e( 'Import from:', 'mp' ); ?></span>
 							<select type="text" name="import-from" id="import-from">
-								<option value="30"><?php _e( 'MarketPress 3.0', 'mp' ); ?></option>
-								<option value="29"><?php _e( 'MarketPress 2.9', 'mp' ); ?></option>
+								<option value="mp"><?php _e( 'MarketPress', 'mp' ); ?></option>
 								<!-- <option value="woo"><?php _e( 'WooCommerce', 'mp' ); ?></option> -->
+							</select>
+						</label>
+					</p>
+					<p class="mp-select">
+						<label for="import-version">
+							<span><?php _e( 'Plugin Version:', 'mp' ); ?></span>
+							<select type="text" name="import-version" id="import-version">
+								<option class="mp" value="30"><?php _e( '3.0', 'mp' ); ?></option>
+								<option class="mp" value="29"><?php _e( '2.9', 'mp' ); ?></option>
+								<option class="woo" value="woo24"><?php _e( '2.4', 'mp' ); ?></option>
 							</select>
 						</label>
 					</p>
@@ -60,6 +70,12 @@
 						<label for="text-separator">
 							<span><?php _e( 'CSV text separator', 'mp' ); ?></span>
 							<input type="text" id="text-separator" name="text-separator" value='"' size="5" />
+						</label>					
+					</p>
+					<p class="mp-text">
+						<label for="items-by-step">
+							<span><?php _e( 'How many items do you want to import by step?', 'mp' ); ?></span>
+							<input type="text" id="items-by-step" name="items-by-step" value='10' size="5" />
 						</label>					
 					</p>
 				</div>

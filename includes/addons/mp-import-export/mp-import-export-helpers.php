@@ -146,23 +146,23 @@ function mp_get_orders_csv_columns() {
 */
 function mp_ie_add_post( $required, $metas, $cats, $tags ) {
 	
-	$product = get_post( $required['ID'] );
+	$post = get_post( $required['ID'] );
 	
-	if( empty( $product ) ) {
+	if( empty( $post ) ) {
 		// Define import ID
 		$required['import_id'] = $required['ID'];
 		unset( $required['ID'] );
 		// To ensure the author ID exists, use the administrator as author
 		$required['post_author'] = mp_ie_get_admin_id();
 
-		$product_id = wp_insert_post( $required, true );
+		$post_id = wp_insert_post( $required, true );
 
-		if( ! is_wp_error( $product_id ) ) {			
+		if( ! is_wp_error( $post_id ) ) {			
 			foreach( $metas as $key => $meta ) {
-				update_post_meta( $product_id, $key, maybe_unserialize( $meta ) );
+				update_post_meta( $post_id, $key, maybe_unserialize( $meta ) );
 			}
 
-			$product_cats = array();
+			$post_cats = array();
 			foreach ( $cats as $cat ) {
 				$cat = trim( $cat );
 
@@ -177,12 +177,12 @@ function mp_ie_add_post( $required, $metas, $cats, $tags ) {
 						}
 					}
 
-					$product_cats[] = (int) $term['term_id'];
+					$post_cats[] = (int) $term['term_id'];
 				}
 			}
-			wp_set_object_terms( $product_id, $product_cats, 'product_category' );
+			wp_set_object_terms( $post_id, $post_cats, 'product_category' );
 
-			$product_tags = array();
+			$post_tags = array();
 			foreach ( $tags as $tag ) {
 				$tag = trim( $tag );
 
@@ -197,17 +197,17 @@ function mp_ie_add_post( $required, $metas, $cats, $tags ) {
 						}
 					}
 
-					$product_tags[] = (int) $term['term_id'];
+					$post_tags[] = (int) $term['term_id'];
 				}
 			}
-			wp_set_object_terms( $product_id, $product_tags, 'product_tag' );
+			wp_set_object_terms( $post_id, $post_tags, 'product_tag' );
 
-			$product_link = sprintf( '<a title="%s" href="%s">%s</a>', sprintf( __( 'Edit %s', 'mp' ), esc_attr( $required[ 'post_title' ] ) ), get_edit_post_link( $product_id ), $required[ 'post_title' ] );
+			$post_link = sprintf( '<a title="%s" href="%s">%s</a>', sprintf( __( 'Edit %s', 'mp' ), esc_attr( $required[ 'post_title' ] ) ), get_edit_post_link( $post_id ), $required[ 'post_title' ] );
 			
-			$message = sprintf( __( 'Post "%s" (%s) created.', 'mp' ), $product_link, $product_id );
+			$message = sprintf( __( 'Post "%s" (%s) created.', 'mp' ), $post_link, $post_id );
 		}
 		else {
-			$message = sprintf( '<span class="error">%s</span>', sprintf( __( 'Post ID "%s" not created: %s', 'mp' ), $required['ID'], $product_id->get_error_message() ) );
+			$message = sprintf( '<span class="error">%s</span>', sprintf( __( 'Post ID "%s" not created: %s', 'mp' ), $required['ID'], $post_id->get_error_message() ) );
 		}
 	}
 	else {

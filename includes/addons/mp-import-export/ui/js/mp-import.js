@@ -6,6 +6,9 @@
 		var $thickboxLauncher = $( '#thickbox-launcher' ),
 			file_path         = $( '#file_path' ).val(),
 			lines_count       = $( '#lines_count' ).val(),
+			items_by_step     = parseInt( $( '#items_by_step' ).val() ),
+			$import_from      = $( '#import-from' ),
+			$import_version   = $( '#import-version' ),
 			import_datas      = function ( datas ) {
 				$.post( mp_import_i18n.ajaxUrl, datas, function( response ) {
 
@@ -16,7 +19,7 @@
 					} );
 
 					$( '#progress-bar' ).show().progressbar( {
-						value: ( ( parseInt( response.line ) - 1 ) / parseInt( lines_count ) ) * 100
+						value: ( ( ( parseInt( response.step ) - 1 ) * items_by_step ) / parseInt( lines_count ) ) * 100
 					} );
 
 					if( ! response.done ) {
@@ -25,13 +28,20 @@
 							file_path: file_path,
 							type: mp_import_i18n.type,
 							from: mp_import_i18n.from,
-							line: response.line
+							step: response.step,
+							items_by_step: items_by_step
 						} );
 					}
 
 				} );
 			}
 		;
+
+		$import_from.on( 'change', function() {
+			$import_version.find( 'option' ).hide();
+			$import_version.find( 'option.' + $( this ).val() ).show();
+			$import_version.find( 'option.' + $( this ).val() ).eq(0).attr( 'selected', 'selected' );
+		} ).trigger( 'change' );
 
 		$( window ).load( function() {
 			$thickboxLauncher.click();
@@ -43,7 +53,8 @@
 				file_path: file_path,
 				type: mp_import_i18n.type,
 				from: mp_import_i18n.from,
-				line: 1
+				step: 1,
+				items_by_step: items_by_step
 			} );
 		}
 

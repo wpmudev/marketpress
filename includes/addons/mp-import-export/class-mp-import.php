@@ -6,6 +6,7 @@ class MP_Import {
 	public $errors        = false;
 	public $uploaded_file = '';
 	public $lines_count   = 0;
+	public $items_by_step = 0;
 	public $done          = false;
 
 	private $managment_page;
@@ -50,19 +51,20 @@ class MP_Import {
 	*/
 	public function ajax_import_datas() {
 		
-		$file_path   = mp_get_request_value( 'file_path' );
-		$line        = (int) mp_get_request_value( 'line' );
-		$type        = mp_get_request_value( 'type' );
-		$from        = mp_get_request_value( 'from' );
+		$file_path     = mp_get_request_value( 'file_path' );
+		$type          = mp_get_request_value( 'type' );
+		$from          = mp_get_request_value( 'from' );
+		$step          = (int) mp_get_request_value( 'step' );
+		$items_by_step = (int) mp_get_request_value( 'items_by_step' );
 
 		$import_datas = "import_{$from}_{$type}_datas";
-		$this->$import_datas( $file_path, $line );
+		$this->$import_datas( $file_path, $step, $items_by_step );
 
 		die( json_encode( array(
 			'file_path' => $file_path,
-			'messages' => $this->done ? array( __( 'Import is over.', 'mp' ) ) : $this->messages,
-			'line'     => $line + 1,
-			'done'     => $this->done,
+			'messages'  => $this->done ? array( __( 'Import is over.', 'mp' ) ) : $this->messages,
+			'step'      => $step + 1,
+			'done'      => $this->done,
 		) ) );
 		
 	} // END public function ajax_import_datas
@@ -84,8 +86,7 @@ class MP_Import {
 		wp_localize_script( 'mp-import', 'mp_import_i18n', array(
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'type'    => mp_get_request_value( 'import-types' ),
-			'from'    => mp_get_request_value( 'import-from' ),
-			'line'    => mp_get_request_value( 'import-from' ),
+			'from'    => mp_get_request_value( 'import-version' ),
 		) );
 
 	} // END public function admin_enqueue_scripts
@@ -96,13 +97,19 @@ class MP_Import {
 	public function tools_page() {
 
 		$action = mp_get_request_value( 'action' );
-		$type   = mp_get_request_value( 'import-types' );
-		$from   = mp_get_request_value( 'import-from' );
 
 		if( $action === 'process' ) {
-			$import_datas = "import_{$from}_{$type}_datas";
+			$type                = mp_get_request_value( 'import-types' );
+			$from                = mp_get_request_value( 'import-version' );
+			$import_datas        = "import_{$from}_{$type}_datas";
+			$this->items_by_step = (int) mp_get_request_value( 'items-by-step' );
+
+			if( empty( $this->items_by_step ) || $this->items_by_step <= 0 ) {
+				$this->items_by_step = 1;
+			}
+
 			$this->upload_file();
-			$this->$import_datas( $this->uploaded_file, 0 );
+			$this->$import_datas( $this->uploaded_file, 0, 1 );
 			
 			// if( ! $this->errors ) {
 			// 	$import = "import_{$from}_{$type}";
@@ -119,16 +126,16 @@ class MP_Import {
 	/**
 	* Import 3.0 Products Fields from CSV File
 	*/
-	private function import_30_products_datas( $file_path, $line ) {
+	private function import_30_products_datas( $file_path, $step, $items_by_step ) {
 		
-		$this->import_30_datas( $file_path, $line, mp_get_products_csv_columns() );
+		$this->import_30_datas( $file_path, $step, $items_by_step, mp_get_products_csv_columns() );
 
 	} // END private function import_30_products_datas
 
 	/**
 	* Import 2.9 Products Fields from CSV File
 	*/
-	private function import_29_products_datas( $file_path, $line ) {
+	private function import_29_products_datas( $file_path, $step, $items_by_step ) {
 		
 		if( ! $file_path ) {
 			return false;
@@ -139,6 +146,7 @@ class MP_Import {
 		$text_separator  = ! empty( $_POST['text-separator'] ) ? stripslashes( trim( $_POST['text-separator'] ) ) : '"';
 		$handle          = fopen( $file_path, 'r' );
 		$row             = 0;
+		$count_datas     = 0;
 		$new_columns     = array();
 
 		while ( ( $datas = fgetcsv( $handle, 0, $field_separator, $text_separator ) ) !== false ) {
@@ -175,11 +183,18 @@ class MP_Import {
 					
 				$count_datas = count( $datas );
 			}
-			elseif( $line === $row && count( $datas ) !== count( $new_columns ) ) {
+			elseif( 
+				( ( $step - 1 ) * $items_by_step ) + 1 <= $row && 
+				( $step * $items_by_step + 1 ) > $row && 
+				count( $datas ) !== count( $new_columns ) 
+			) {
 				$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Wrong number of datas in row %s.', 'mp' ), ( $row + 1 ) ) );
 				break;
 			}
-			elseif( $line === $row ) {
+			elseif( 
+				( ( $step - 1 ) * $items_by_step ) + 1 <= $row && 
+				( $step * $items_by_step + 1 ) > $row
+			) {
 				$required = array();
 				$metas    = array();
 				$tags     = array();
@@ -303,7 +318,10 @@ class MP_Import {
 				}
 
 				$this->messages[] = mp_ie_add_29_post( $required, $metas, $cats, $tags );
-				return;
+
+				if( ( $step * $items_by_step + 1 ) <= $row ) {
+					return;
+				}
 			}
 			
 			$row++;
@@ -311,33 +329,36 @@ class MP_Import {
 
 		fclose( $handle );
 
-		if( $line === 0 ) {
+		if( $step === 0 && $row > 1  ) {
 			$this->lines_count = $row - 1;
 			$this->messages[]  = sprintf( __( 'There is %s fields on %s posts to process in your CSV.', 'mp' ), $count_datas, $this->lines_count );
 			return;
 		}
-
-		if( $line >= $row ) {
-			$this->done = true;
+		elseif( $row === 1 ) {
+			$this->messages[] = sprintf( '<span class="error">%s</span>', __( 'Your CSV does not contain any items to import.', 'mp' ) );
+			$this->done       = true;
+			return;
 		}
 
-		return;
+		if( ( ( $step - 1 ) * $items_by_step ) >= $row ) {
+			$this->done = true;
+		}
 
 	} // END private function import_29_products_datas
 
 	/**
 	* Import 3.0 Orders Fields from CSV File
 	*/
-	private function import_30_orders_datas( $file_path, $line ) {
+	private function import_30_orders_datas( $file_path, $step, $items_by_step ) {
 		
-		$this->import_30_datas(  $file_path, $line, mp_get_orders_csv_columns() );
+		$this->import_30_datas(  $file_path, $step, $items_by_step, mp_get_orders_csv_columns() );
 
 	} // END private function import_30_orders_datas
 
 	/**
 	* Import 3.0 Datas from CSV File
 	*/
-	private function import_30_datas( $file_path, $line, $columns ) {
+	private function import_30_datas( $file_path, $step, $items_by_step, $columns ) {
 
 		if( ! $file_path ) {
 			return false;
@@ -347,6 +368,7 @@ class MP_Import {
 		$text_separator  = ! empty( $_POST['text-separator'] ) ? stripslashes( trim( $_POST['text-separator'] ) ) : '"';
 		$handle          = fopen( $file_path, 'r' );
 		$row             = 0;
+		$count_datas     = 0;
 		$new_columns     = array();
 
 		while ( ( $datas = fgetcsv( $handle, 0, $field_separator, $text_separator ) ) !== false ) {
@@ -383,11 +405,18 @@ class MP_Import {
 					$count_datas = count( $datas );
 				}
 			}
-			elseif( $line === $row && count( $datas ) !== count( $new_columns ) ) {
+			elseif( 
+				( ( $step - 1 ) * $items_by_step ) + 1 <= $row && 
+				( $step * $items_by_step + 1 ) > $row && 
+				count( $datas ) !== count( $new_columns ) 
+			) {
 				$this->messages[] = sprintf( '<span class="error">%s<br />%s</span>', __( 'Your csv structure is not correct.', 'mp' ), sprintf( __( 'Wrong number of datas in row %s.', 'mp' ), ( $row + 1 ) ) );
 				break;
 			}
-			elseif( $line === $row ) {
+			elseif( 
+				( ( $step - 1 ) * $items_by_step ) + 1 <= $row && 
+				( $step * $items_by_step + 1 ) > $row
+			) {
 				$required = array();
 				$metas    = array();
 				$tags     = array();
@@ -479,7 +508,10 @@ class MP_Import {
 				}
 
 				$this->messages[] = mp_ie_add_post( $required, $metas, $cats, $tags );
-				return;
+
+				if( ( $step * $items_by_step + 1 ) <= $row ) {
+					return;
+				}
 			}
 			
 			$row++;
@@ -487,17 +519,20 @@ class MP_Import {
 
 		fclose( $handle );
 
-		if( $line === 0 ) {
+		if( $step === 0 && $row > 1 ) {
 			$this->lines_count = $row - 1;
 			$this->messages[]  = sprintf( __( 'There is %s fields on %s posts to process in your CSV.', 'mp' ), $count_datas, $this->lines_count );
 			return;
 		}
-
-		if( $line >= $row ) {
-			$this->done = true;
+		elseif( $row === 1 ) {
+			$this->messages[] = sprintf( '<span class="error">%s</span>', __( 'Your CSV does not contain any items to import.', 'mp' ) );
+			$this->done       = true;
+			return;
 		}
 
-		return;
+		if( ( ( $step - 1 ) * $items_by_step ) >= $row ) {
+			$this->done = true;
+		}
 
 	} // END private function import_30_datas
 
