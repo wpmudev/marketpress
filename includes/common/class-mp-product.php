@@ -1215,17 +1215,36 @@ class MP_Product {
 		$tax_rate = mp_get_setting( 'tax->rate', '' );
 		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
+		$special_tax = get_post_meta( $this->ID, 'charge_tax', true );
+		$special_fixed_tax = false;
 		
-		if(! empty( $tax_rate ) ) {
-			//Price with Tax added
-			if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
-				$price = $price + ($price * $tax_rate);
+		if( ! empty( $tax_rate ) ) {
+			//Set tax rate to special tax
+			if( $special_tax ) {
+				$tax_rate = get_post_meta( $this->ID, 'special_tax_rate', true );
+				if( substr( $tax_rate, -1 ) == '%' ) {
+					$tax_rate = rtrim( $tax_rate, "%" ) / 100;
+				} else {
+					$special_fixed_tax = true;
+				}
+			} else {
+				$tax_rate = mp_get_setting( 'tax->rate', '' );
 			}
-			//Price with Tax excluded
-			if( $tax_inclusive == 1 && $include_tax_to_price != 1) {
-				//$taxDivisor = 1 + ($tax_rate / 100);
-				$taxDivisor = 1 + $tax_rate;
-				$price = $price / $taxDivisor;
+			
+			if ( mp_get_setting( 'tax->tax_digital' ) && ! $this->is_download() ) {
+				//Price with Tax added
+				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+					if( $special_fixed_tax ) {
+						$price = $price + $tax_rate;
+					} else {
+						$price = $price + ($price * $tax_rate);
+					}
+				}
+				//Price with Tax excluded
+				if( $tax_inclusive == 1 && $include_tax_to_price != 1) {
+					$taxDivisor = 1 + $tax_rate;
+					$price = $price / $taxDivisor;
+				}
 			}
 		}
 		
