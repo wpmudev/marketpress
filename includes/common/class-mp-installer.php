@@ -456,6 +456,9 @@ class MP_Installer {
 
 				//Update sales count
 				$this->update_sales_count( $post_id );
+				
+				//Update sort_price
+				$this->update_sort_price( $post_id );
 
 			} else {//update for 3.0 and 3.0.0.1
 				$post_thumbnail = get_post_thumbnail_id( $post_id );
@@ -465,6 +468,9 @@ class MP_Installer {
 
 				//Update sales count
 				$this->update_sales_count( $post_id );
+				
+				//Update sort_price
+				$this->update_sort_price( $post_id );
 			}
 
 			do_action( 'mp_update/product', $post_id );
@@ -533,6 +539,27 @@ class MP_Installer {
 
 		if ( $sales_count == "" ) {
 			update_post_meta( $post_id, 'mp_sales_count', 0 );
+		}
+	}
+	
+	/**
+	 * Update sort_price if undefined
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function update_sort_price( $post_id ) {
+		$regular_price = get_post_meta( $post_id, 'regular_price', true );
+		$sale_price_amount = get_post_meta( $post_id, 'sale_price_amount', true );
+		$has_sale = get_post_meta( $post_id, 'has_sale', true );
+		$sort_price = get_post_meta( $post_id, 'sort_price', true );
+		
+		if( $sort_price == "" ) {
+			if( ! empty( $sale_price_amount ) && $sale_price_amount > 0 && ! empty( $has_sale ) ) {
+				update_post_meta( $post_id, 'sort_price', $sale_price_amount );
+			} else {
+				update_post_meta( $post_id, 'sort_price', $regular_price );
+			}
 		}
 	}
 
