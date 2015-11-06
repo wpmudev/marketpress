@@ -39,6 +39,7 @@ label {
 
 .ui-progressbar-value {
 	height: 40px;
+	min-width: 1px;
 }
 
 br {

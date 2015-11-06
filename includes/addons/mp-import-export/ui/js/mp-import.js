@@ -59,7 +59,7 @@
 			} );
 
 			$progress_bar.progressbar( {
-				value: 1
+				value: 0.0001
 			} );
 		}
 
