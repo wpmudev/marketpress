@@ -431,6 +431,14 @@ class MP_Export {
 						// if column is checked by user
 						if( ! empty( $orders_columns[ $key ] ) ) {
 							$meta   = get_post_meta( $orders_query->post->ID, $key, true );
+							// Ensure that cart items are not linked to the export site
+							if( 'mp_cart_items' === $key ) {
+								foreach( $meta as $item_id => $item ) {
+									foreach ( $item as $key1 => $item_datas ) {
+										$meta[ $item_id ][ $key1 ]['url'] = str_replace( home_url(), '', $meta[ $item_id ][ $key1 ]['url'] );
+									}
+								}
+							}
 							$line[] = maybe_serialize( $meta );
 
 							// if column has a WPMU_DEV_API_NAME
