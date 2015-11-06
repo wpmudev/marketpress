@@ -533,6 +533,7 @@ class MP_Store_Settings_General {
 			'desc'		 => __( 'Please see your local tax laws. Note if this is enabled and a downloadable only cart, rates will be the default for your base location.', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
+		/*
 		$metabox->add_field( 'radio_group', array(
 			'name'			 => 'tax[tax_based]',
 			'label'			 => array( 'text' => __( 'Tax based on?', 'mp' ) ),
@@ -548,6 +549,7 @@ class MP_Store_Settings_General {
 				'action' => 'show',
 			),
 		) );
+		*/
 	}
 	
 	/**
