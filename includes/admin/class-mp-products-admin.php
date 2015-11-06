@@ -224,6 +224,16 @@ class MP_Products_Screen {
 		$price      = mp_get_post_value( 'product_price', '' );
 		$sale_price = mp_get_post_value( 'product_sale_price', '' );
 
+		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+		$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+		$has_sale		  = mp_get_post_value( 'has_sale', '');
+	
+		if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+			update_post_meta( $post_id, 'sort_price', $sale_price_array );
+		} else {
+			update_post_meta( $post_id, 'sort_price', $regular_price );
+		}
+
 		update_post_meta( $post_id, 'regular_price', $price );
 		update_post_meta( $post_id, 'sale_price_amount', $sale_price );
 
@@ -806,6 +816,16 @@ class MP_Products_Screen {
 			  );
 			  echo json_encode( $response_array );
 			  exit; */
+			  
+			$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+			$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+			$has_sale		  = mp_get_post_value( 'has_sale', '');
+		
+			if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+				update_post_meta( $post_id, 'sort_price', $sale_price_array );
+			} else {
+				update_post_meta( $post_id, 'sort_price', $regular_price );
+			}  
 
 			$meta_array_values = array(
 				'sku'                        => mp_get_post_value( 'sku' ),
@@ -1103,6 +1123,16 @@ class MP_Products_Screen {
 					'special_tax_rate'           => mp_get_post_value( 'special_tax_rate' ),
 //'description'				 => mp_get_post_value( 'content' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id, $_POST );
+				
+				$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+				$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+				$has_sale		  = mp_get_post_value( 'has_sale', '');
+			
+				if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+					update_post_meta( $post_id, 'sort_price', $sale_price_array );
+				} else {
+					update_post_meta( $post_id, 'sort_price', $regular_price );
+				}
 
 
 				/* Add default post metas for variation */
