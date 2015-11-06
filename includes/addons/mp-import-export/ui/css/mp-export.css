@@ -21,3 +21,7 @@ label {
 #response span.error {
 	color: red;
 }
+
+br {
+	clear: both;
+}

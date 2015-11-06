@@ -194,7 +194,24 @@ class MP_Export {
 		$orders_file    = $this->build_orders_csv( false );
 		// $customers_file =  $this->build_customers_csv( false );
 
-		$this->zip_it( array( $products_file, $orders_file/*, $customers_file*/ ), 'mp-export-all.zip' );
+		$filename_search = array(
+			'.zip',
+			'%%timestamp%%',
+			'%%month%%',
+			'%%date%%',
+		);
+
+		$filename_replace = array(
+			'',
+			time(),
+			date( 'm' ),
+			date( 'Y-m-d' ),
+		);
+		
+		$filename = mp_get_request_value( 'zip-file-name', 'mp-export-all' );
+		$filename = trim( str_replace( $filename_search, $filename_replace, $filename ) ) . '.zip';
+
+		$this->zip_it( array( $products_file, $orders_file/*, $customers_file*/ ), $filename );
 
 	} // END private function build_all_csv
 
@@ -264,6 +281,18 @@ class MP_Export {
 			'offset'         => mp_get_request_value( 'products-offset', 0 ),
 			'order'          => 'ASC',
 		);
+
+		$product_types = array_keys( mp_get_request_value( 'product-types', array() ) );
+		if( ! empty( $product_types ) ) {
+			$products_query['meta_query'] = array(
+				array(
+					'key'     => 'product_type',
+					'value'   => $product_types,
+					'compare' => 'IN',
+				),
+			);
+		}
+
 		$products_query = new WP_Query( $products_query );
 
 		$products_count = 0;
@@ -408,7 +437,7 @@ class MP_Export {
 
 		$orders_query = array(
 			'post_type'		 => array( 'mp_order' ),
-			'post_status'	 => array_keys( mp_get_request_value( 'orders-stati' ) ),
+			'post_status'	 => array_keys( mp_get_request_value( 'orders-stati', array() ) ),
 			'posts_per_page' => mp_get_request_value( 'orders-limit', -1 ),
 			'offset'         => mp_get_request_value( 'orders-offset', 0 ),
 			'order'          => 'ASC',

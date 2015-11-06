@@ -3,15 +3,18 @@
 
 	$( function() {
 
-		var $tabs             = $( '#export-tabs' ),
-			$productsTab      = $tabs.find( '.tab-products' ),
-			$ordersTab        = $tabs.find( '.tab-orders' ),
-			$customersTab     = $tabs.find( '.tab-customers' ),
-			$exportTypes      = $( '#export-types' ),
-			$submitBtn        = $( '.mp-submit' ),
-			$nextBtn          = $( '.mp-next' ),
-			$prevBtn          = $( '.mp-prev' ),
-			$thickboxLauncher = $( '#thickbox-launcher' )
+		var $tabs               = $( '#export-tabs' ),
+			$productsTab        = $tabs.find( '.tab-products' ),
+			$ordersTab          = $tabs.find( '.tab-orders' ),
+			$customersTab       = $tabs.find( '.tab-customers' ),
+			$exportTypes        = $( '#export-types' ),
+			$submitBtn          = $( '.mp-submit' ),
+			$nextBtn            = $( '.mp-next' ),
+			$prevBtn            = $( '.mp-prev' ),
+			$thickboxLauncher   = $( '#thickbox-launcher' ),
+			$zipFileNameWrapper = $( '#zip-file-name-wrapper' ),
+			$productsColumnsAll = $( '#products-columns-all' ),
+			$ordersColumnsAll   = $( '#orders-columns-all' )
 		;
 
 		$( window ).load( function() {
@@ -40,6 +43,7 @@
 					$prevBtn.hide();
 					$nextBtn.show();
 					$submitBtn.hide();
+					$zipFileNameWrapper.show();
 					break;
 				case 'products':
 					$tabs.tabs( 'option', 'active', 0 );
@@ -49,6 +53,7 @@
 					$submitBtn.show();
 					$prevBtn.hide();
 					$nextBtn.hide();
+					$zipFileNameWrapper.hide();
 					break;
 				case 'orders':
 					$tabs.tabs( 'option', 'active', 1 );
@@ -58,6 +63,7 @@
 					$submitBtn.show();
 					$prevBtn.hide();
 					$nextBtn.hide();
+					$zipFileNameWrapper.hide();
 					break;
 				case 'customers':
 					$tabs.tabs( 'option', 'active', 2 );
@@ -67,6 +73,7 @@
 					$submitBtn.show();
 					$prevBtn.hide();
 					$nextBtn.hide();
+					$zipFileNameWrapper.hide();
 					break;
 			}
 		} );
@@ -105,6 +112,24 @@
 					$nextBtn.hide();
 					$prevBtn.show();
 					break;
+			}
+		} );
+
+		$productsColumnsAll.change( function() {
+			if( $( this ).attr( 'checked' ) === 'checked' ) {
+				$( '[id^="products-columns-"]' ).attr( 'checked', 'checked' );
+			} 
+			else {
+				$( '[id^="products-columns-"]' ).removeAttr( 'checked' );
+			}
+		} );
+
+		$ordersColumnsAll.change( function() {
+			if( $( this ).attr( 'checked' ) === 'checked' ) {
+				$( '[id^="orders-columns-"]' ).attr( 'checked', 'checked' );
+			} 
+			else {
+				$( '[id^="orders-columns-"]' ).removeAttr( 'checked' );
 			}
 		} );
 

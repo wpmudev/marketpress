@@ -26,7 +26,7 @@
 					</label>
 								<?php
 						}
-					?>
+					?><br />
 				</p>
 				<p class="mp-text">
 					<label for="orders-limit">
@@ -44,6 +44,10 @@
 					<?php _e( 'Which fields/columns do you want to export?', 'mp' ); ?>
 				</p>
 				<p class="mp-checkboxes">
+					<label for="orders-columns-all">
+						<input type="checkbox" id="orders-columns-all" checked="checked" value="1" />
+						<span><?php _e( 'Select All/None' ); ?></span>
+					</label><br />
 					<?php
 						foreach ( $this->orders_columns as $key => $value ) {
 							if( ! $value['required'] ) {
@@ -55,7 +59,7 @@
 								<?php
 							}
 						}
-					?>
+					?><br />
 				</p>
 				<p class="mp-textarea">
 					<label for="orders-custom-fields">

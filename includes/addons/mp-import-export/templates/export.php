@@ -27,6 +27,13 @@
 				</select>
 			</label>
 		</p>
+		<p class="mp-text" id="zip-file-name-wrapper">
+			<label for="zip-file-name">
+				<span><?php _e( 'Define the filename for the Zip file:', 'mp' ); ?></span>
+				<input type="text" name="zip-file-name" id="zip-file-name" value="mp-export-all" size="40" />
+				<span class="mp-helper"><?php _e( 'Allowed to use dynamic values: %%timestamp%%, %%month%% and %%date%%', 'mp' ); ?></span>
+			</label>
+		</p>
 		<div id="export-tabs">
 			<ul>
 				<li class="tab-products"><a href="#tab-products"><?php _e( 'Products', 'mp' ); ?></a></li>

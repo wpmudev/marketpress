@@ -199,6 +199,10 @@ class MP_Import {
 				$metas    = array();
 				$tags     = array();
 				$cats     = array();
+
+				$metas['product_type']  = 'physical';
+				$metas['_product_type'] = 'WPMUDEV_Field_Select';
+
 				foreach ( $datas as $key => $value ) {
 					$value = trim( $value );
 
@@ -219,6 +223,10 @@ class MP_Import {
 											2 => 'sale_price_end_date',
 										);
 										$metas['_sale_price'] = 'WPMUDEV_Field_Complex';
+										if( ! empty( $value ) ) {											
+											$metas['has_sale'] = 1;
+											$metas['_has_sale'] = 'WPMUDEV_Field_Checkbox';
+										}
 										break;
 									
 									case 'external_url':
@@ -237,11 +245,22 @@ class MP_Import {
 										break;
 									
 									case 'inv_inventory':
+										if( ! empty( $value ) ) {											
+											$metas['inventory_tracking'] = 1;
+											$metas['_inventory_tracking'] = 'WPMUDEV_Field_Checkbox';
+										}
 										$metas['inv'] = array (
 											0 => 'inv_inventory',
 											1 => 'inv_out_of_stock_purchase',
 										);
 										$metas['_inv'] = 'WPMUDEV_Field_Complex';
+										break;
+									
+									case 'weight_extra_shipping_cost':
+										if( ! empty( $value ) ) {											
+											$metas['charge_shipping'] = 1;
+											$metas['_charge_shipping'] = 'WPMUDEV_Field_Checkbox';
+										}
 										break;
 									
 									case 'file_url':
@@ -421,6 +440,7 @@ class MP_Import {
 				$metas    = array();
 				$tags     = array();
 				$cats     = array();
+
 				foreach ( $datas as $key => $value ) {
 					if( $new_columns[ $key ]['required'] ) {
 						$required[ $new_columns[ $key ]['name'] ] = $value;

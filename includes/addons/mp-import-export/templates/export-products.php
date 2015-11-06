@@ -11,6 +11,27 @@
 						<span class="mp-helper"><?php _e( 'Allowed to use dynamic values: %%timestamp%%, %%month%% and %%date%%', 'mp' ); ?></span>
 					</label>
 				</p>
+				<p class="mp-label">
+					<?php _e( 'Which product types do you want to export?', 'mp' ); ?>
+				</p>
+				<p class="mp-checkboxes">
+					<?php
+						$product_types = array(
+							'physical',
+							'digital',
+							'external',
+						);
+
+						foreach ( $product_types as $type ) {
+								?>
+					<label for="product-types-<?php echo $type; ?>">
+						<input type="checkbox" name="product-types[<?php echo $type; ?>]" id="product-types-<?php echo $type; ?>" checked="checked" value="1" />
+						<span><?php echo ucfirst( $type ); ?></span>
+					</label>
+								<?php
+						}
+					?><br />
+				</p>
 				<p class="mp-text">
 					<label for="products-limit">
 						<span><?php _e( 'Limit the number of products to export (-1 for all products):', 'mp' ); ?></span>
@@ -27,6 +48,10 @@
 					<?php _e( 'Which fields/columns do you want to export?', 'mp' ); ?>
 				</p>
 				<p class="mp-checkboxes">
+					<label for="products-columns-all">
+						<input type="checkbox" id="products-columns-all" checked="checked" value="1" />
+						<span><?php _e( 'Select All/None' ); ?></span>
+					</label><br />
 					<?php
 						foreach ( $this->products_columns as $key => $value ) {
 							if( ! $value['required'] ) {

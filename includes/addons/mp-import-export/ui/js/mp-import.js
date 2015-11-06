@@ -9,6 +9,7 @@
 			items_by_step     = parseInt( $( '#items_by_step' ).val() ),
 			$import_from      = $( '#import-from' ),
 			$import_version   = $( '#import-version' ),
+			$progress_bar     = $( '#progress-bar' ),
 			import_datas      = function ( datas ) {
 				$.post( mp_import_i18n.ajaxUrl, datas, function( response ) {
 
@@ -18,7 +19,7 @@
 						$( '#TB_window #response-bottom' ).prepend( '<li>' + response.messages[i] + '</li>' );
 					} );
 
-					$( '#progress-bar' ).show().progressbar( {
+					$progress_bar.progressbar( {
 						value: ( ( ( parseInt( response.step ) - 1 ) * items_by_step ) / parseInt( lines_count ) ) * 100
 					} );
 
@@ -56,9 +57,11 @@
 				step: 1,
 				items_by_step: items_by_step
 			} );
-		}
 
-		$( '#progress-bar' ).hide();
+			$progress_bar.progressbar( {
+				value: 1
+			} );
+		}
 
 	} );
 
