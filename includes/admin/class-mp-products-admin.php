@@ -823,6 +823,9 @@ class MP_Products_Screen {
 				'weight_pounds'              => mp_get_post_value( 'weight->pounds' ),
 				'weight_ounces'              => mp_get_post_value( 'weight->ounces' ),
 				'weight'                     => '',
+				'dimensions_width'           => mp_get_post_value( 'dimensions->width' ),
+				'dimensions_height'          => mp_get_post_value( 'dimensions->height' ),
+				'dimensions_length'          => mp_get_post_value( 'dimensions->length' ),
 				'charge_shipping'            => $this->on_to_val( mp_get_post_value( 'charge_shipping' ) ),
 				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
 				'charge_tax'                 => $this->on_to_val( mp_get_post_value( 'charge_tax' ) ),
@@ -1096,6 +1099,9 @@ class MP_Products_Screen {
 					'weight_pounds'              => mp_get_post_value( 'weight->pounds' ),
 					'weight_ounces'              => mp_get_post_value( 'weight->ounces' ),
 					'weight'                     => '', //array - to do
+					'dimensions_width'           => mp_get_post_value( 'dimensions->width' ),
+					'dimensions_height'          => mp_get_post_value( 'dimensions->height' ),
+					'dimensions_length'          => mp_get_post_value( 'dimensions->length' ),
 					'charge_shipping'            => mp_get_post_value( 'charge_shipping' ),
 					'charge_tax'                 => mp_get_post_value( 'charge_tax' ),
 					'has_sale'                   => mp_get_post_value( 'has_sale' ),
@@ -1484,6 +1490,47 @@ WHERE $delete_where"
 					'validation'    => array(
 						'number' => true,
 						'min'    => 0,
+					),
+				) ) );
+			}
+
+			$dimensions = $metabox->add_field( 'complex', apply_filters( 'mp_add_field_array_dimensions', array(
+				'name'        => 'dimensions',
+				'label'       => array( 'text' => __( 'Dimensions', 'mp' ) ),
+				'conditional' => array(
+					'name'   => 'charge_shipping',
+					'value'  => 1,
+					'action' => 'show',
+				),
+				'custom'      => array(
+					'label_position' => 'up',
+					'label_type'     => 'standard'
+				),
+				'class'       => 'mp-product-shipping-holder mp-special-box'
+			) ) );
+
+			if ( $dimensions instanceof WPMUDEV_Field ) {
+				$unit = 'metric' == mp_get_setting( 'shipping->system' ) ? __( 'cm', 'mp' ) : __( 'in', 'mp' );
+
+				$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_width', array(
+					'name'       => 'width',
+					'label'      => array( 'text' => sprintf( __( 'Width (%s)', 'mp' ), $unit ) ),
+					'validation' => array(
+						'number' => true,
+					),
+				) ) );
+				$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_height', array(
+					'name'       => 'height',
+					'label'      => array( 'text' => sprintf( __( 'Height (%s)', 'mp' ), $unit ) ),
+					'validation' => array(
+						'number' => true,
+					),
+				) ) );
+				$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_length', array(
+					'name'       => 'length',
+					'label'      => array( 'text' => sprintf( __( 'Length (%s)', 'mp' ), $unit ) ),
+					'validation' => array(
+						'number' => true,
 					),
 				) ) );
 			}
@@ -1913,6 +1960,44 @@ WHERE $delete_where"
 			) ) );
 		}
 
+		$dimensions = $metabox->add_field( 'complex', apply_filters( 'mp_add_field_array_dimensions', array(
+			'name'        => 'dimensions',
+			'label'       => array( 'text' => __( 'Dimensions', 'mp' ) ),
+			'conditional' => array(
+				'name'   => 'product_type',
+				'value'  => 'physical',
+				'action' => 'show',
+			),
+		) ) );
+
+		if ( $dimensions instanceof WPMUDEV_Field ) {
+			$unit = 'metric' == mp_get_setting( 'shipping->system' ) ? __( 'cm', 'mp' ) : __( 'in', 'mp' );
+
+			$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_width', array(
+				'name'       => 'width',
+				'label'      => array( 'text' => sprintf( __( 'Width (%s)', 'mp' ), $unit ) ),
+				'validation' => array(
+					'digits' => true,
+				),
+			) ) );
+
+			$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_height', array(
+				'name'       => 'height',
+				'label'      => array( 'text' => sprintf( __( 'Height (%s)', 'mp' ), $unit ) ),
+				'validation' => array(
+					'digits' => true,
+				),
+			) ) );
+
+			$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_length', array(
+				'name'       => 'length',
+				'label'      => array( 'text' => sprintf( __( 'Length (%s)', 'mp' ), $unit ) ),
+				'validation' => array(
+					'digits' => true,
+				),
+			) ) );
+		}
+
 		$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_extra_shipping_cost', array(
 			'name'          => 'extra_shipping_cost',
 			'label'         => array( 'text' => __( 'Extra Shipping Cost', 'mp' ) ),
@@ -2154,6 +2239,45 @@ WHERE $delete_where"
 			$weight->add_field( 'text', apply_filters( 'mp_add_field_array_ounces', array(
 				'name'       => 'ounces',
 				'label'      => array( 'text' => __( 'Ounces', 'mp' ) ),
+				'validation' => array(
+					'digits' => true,
+					'min'    => 0,
+				),
+			) ) );
+
+			$dimensions = $repeater->add_sub_field( 'complex', apply_filters( 'mp_add_sub_field_array_dimensions', array(
+				'name'        => 'dimensions',
+				'label'       => array( 'text' => __( 'Dimensions', 'mp' ) ),
+				'conditional' => array(
+					'name'   => 'product_type',
+					'value'  => 'physical',
+					'action' => 'show',
+				),
+			) ) );
+
+			$unit = 'metric' == mp_get_setting( 'shipping->system' ) ? __( 'cm', 'mp' ) : __( 'in', 'mp' );
+
+			$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_width', array(
+				'name'       => 'width',
+				'label'      => array( 'text' => sprintf( __( 'Width (%s)', 'mp' ), $unit ) ),
+				'validation' => array(
+					'digits' => true,
+					'min'    => 0,
+				),
+			) ) );
+
+			$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_height', array(
+				'name'       => 'height',
+				'label'      => array( 'text' => sprintf( __( 'Height (%s)', 'mp' ), $unit ) ),
+				'validation' => array(
+					'digits' => true,
+					'min'    => 0,
+				),
+			) ) );
+
+			$dimensions->add_field( 'text', apply_filters( 'mp_add_field_array_length', array(
+				'name'       => 'length',
+				'label'      => array( 'text' => sprintf( __( 'Length (%s)', 'mp' ), $unit ) ),
 				'validation' => array(
 					'digits' => true,
 					'min'    => 0,

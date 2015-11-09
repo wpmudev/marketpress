@@ -262,6 +262,16 @@ class MP_Ajax {
 								?>
 								<?php _e( 'Extra Shipping Cost (if applicable)', 'mp' ); ?> <input class="mp-numeric" name="weight[extra_shipping_cost]" type="text" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'weight_extra_shipping_cost' ) ); ?>">
 							</fieldset>
+							<fieldset id="fieldset_has_sale" class="has_area">
+								<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products  ?>
+									<?php $unit = 'metric' == mp_get_setting( 'shipping->system' ) ? __( 'cm', 'mp' ) : __( 'in', 'mp' ) ?>
+									<?php printf( __( 'Width (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="dimensions[width]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'dimensions_width' ) ); ?>"><br>
+									<?php printf( __( 'Height (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="dimensions[height]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'dimensions_height' ) ); ?>"><br>
+									<?php printf( __( 'Length (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="dimensions[length]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'dimensions_length' ) ); ?>"><br>
+									<?php
+								}
+								?>
+							</fieldset>
 						</div>
 						<?php do_action( 'mp_variation_popup_after_shipping' ); ?>
 					<?php } ?>

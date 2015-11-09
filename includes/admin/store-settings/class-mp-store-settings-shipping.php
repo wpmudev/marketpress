@@ -162,8 +162,8 @@ class MP_Store_Settings_Shipping {
 			'name'			 => 'shipping[system]',
 			'label'			 => array( 'text' => __( 'Measurement System', 'mp' ) ),
 			'options'		 => array(
-				'english'	 => __( 'Pounds', 'mp' ),
-				'metric'	 => __( 'Kilograms', 'mp' ),
+				'english'	 => __( 'Pounds / Inches', 'mp' ),
+				'metric'	 => __( 'Kilograms / Centimeters', 'mp' ),
 			),
 			'default_value'	 => 'english',
 		) );

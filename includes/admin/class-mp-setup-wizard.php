@@ -537,8 +537,8 @@ class MP_Setup_Wizard {
 			$metabox->add_field( 'radio_group', array(
 				'name'          => 'shipping[system]',
 				'options'       => array(
-					'english' => __( 'Pounds', 'mp' ),
-					'metric'  => __( 'Kilograms', 'mp' ),
+					'english' => __( 'Pounds / Inches', 'mp' ),
+					'metric'  => __( 'Kilograms / Centimeters', 'mp' ),
 				),
 				'default_value' => 'english',
 			) );
