@@ -265,9 +265,9 @@ class MP_Ajax {
 							<fieldset id="fieldset_has_sale" class="has_area">
 								<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products  ?>
 									<?php $unit = 'metric' == mp_get_setting( 'shipping->system' ) ? __( 'cm', 'mp' ) : __( 'in', 'mp' ) ?>
-									<?php printf( __( 'Width (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="dimensions[width]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'dimensions_width' ) ); ?>"><br>
-									<?php printf( __( 'Height (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="dimensions[height]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'dimensions_height' ) ); ?>"><br>
-									<?php printf( __( 'Length (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="dimensions[length]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'dimensions_length' ) ); ?>"><br>
+									<?php printf( __( 'Width (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="size[width]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'size_width' ) ); ?>"><br>
+									<?php printf( __( 'Height (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="size[height]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'size_height' ) ); ?>"><br>
+									<?php printf( __( 'Length (%s):', 'mp' ), $unit ); ?> <input placeholder="" type="text" name="size[length]" class="mp-numeric" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'size_length' ) ); ?>"><br>
 									<?php
 								}
 								?>
