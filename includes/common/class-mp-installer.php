@@ -456,9 +456,6 @@ class MP_Installer {
 
 				//Update sales count
 				$this->update_sales_count( $post_id );
-				
-				//Update sort_price
-				$this->update_sort_price( $post_id );
 
 			} else {//update for 3.0 and 3.0.0.1
 				$post_thumbnail = get_post_thumbnail_id( $post_id );
@@ -468,9 +465,7 @@ class MP_Installer {
 
 				//Update sales count
 				$this->update_sales_count( $post_id );
-				
-				//Update sort_price
-				$this->update_sort_price( $post_id );
+
 			}
 
 			do_action( 'mp_update/product', $post_id );
@@ -539,27 +534,6 @@ class MP_Installer {
 
 		if ( $sales_count == "" ) {
 			update_post_meta( $post_id, 'mp_sales_count', 0 );
-		}
-	}
-	
-	/**
-	 * Update sort_price if undefined
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function update_sort_price( $post_id ) {
-		$regular_price = get_post_meta( $post_id, 'regular_price', true );
-		$sale_price_amount = get_post_meta( $post_id, 'sale_price_amount', true );
-		$has_sale = get_post_meta( $post_id, 'has_sale', true );
-		$sort_price = get_post_meta( $post_id, 'sort_price', true );
-		
-		if( $sort_price == "" ) {
-			if( ! empty( $sale_price_amount ) && $sale_price_amount > 0 && ! empty( $has_sale ) ) {
-				update_post_meta( $post_id, 'sort_price', $sale_price_amount );
-			} else {
-				update_post_meta( $post_id, 'sort_price', $regular_price );
-			}
 		}
 	}
 
@@ -711,11 +685,13 @@ class MP_Installer {
 		}
 
 		$old_settings = get_option( 'mp_settings', array() );
+		
 
 		// Filter default settings
 		$default_settings = apply_filters( 'mp_default_settings', mp()->default_settings );
 		$settings         = array_replace_recursive( $default_settings, $old_settings );
-
+		
+		
 		// Only run the follow scripts if this not a fresh install
 		if ( ! empty( $old_version ) ) {
 			//2.1.4 update
@@ -731,6 +707,11 @@ class MP_Installer {
 			//3.0 update
 			if ( version_compare( $old_version, '3.0.0.2', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.2', '<' ) ) ) {
 				$settings = $this->update_3000( $settings );
+			}
+			
+			//3.0 update
+			if ( version_compare( $old_version, '3.0.0.7', '<=' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.7', '<=' ) ) ) {
+				$settings = $this->update_3007( $settings );
 			}
 		}
 
@@ -1213,6 +1194,54 @@ class MP_Installer {
 				}
 			}
 		}
+
+		return $settings;
+	}
+	
+	/**
+	 * Update sort_price if silently on version check
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	
+	public function update_sort_price( $settings ) {
+		ini_set( 'max_execution_time', 0 );
+		set_time_limit( 0 );
+
+		$total_count = wp_count_posts( MP_Product::get_post_type() );
+
+		$query = new WP_Query( array(
+			'cache_results'          => false,
+			'update_post_term_cache' => false,
+			'post_type'              => MP_Product::get_post_type(),
+		) );
+
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$post_id = get_the_ID();
+			
+			$product  = new MP_Product( $post_id );
+			$price    = $product->get_price();
+			
+			if( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
+				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['lowest'] ) );
+			} else {
+				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['regular'] ) );
+			}
+		}
+	}
+
+	/**
+	 * Runs on 3.0.0.7 update.
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param array $settings
+	 */
+	public function update_3007( $settings ) {
+		$this->update_sort_price( $settings );
 
 		return $settings;
 	}
