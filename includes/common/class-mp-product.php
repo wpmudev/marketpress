@@ -1246,6 +1246,17 @@ class MP_Product {
 					$price = $price / $taxDivisor;
 				}
 			}
+			
+			//Calculate price when special price & download product
+			if ( ! empty( $special_tax ) && $this->is_download() ) {
+				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+					if( $special_fixed_tax ) {
+						$price = $price + $tax_rate;
+					} else {
+						$price = $price + ($price * $tax_rate);
+					}
+				}
+			}
 		}
 		
 		return $price;
