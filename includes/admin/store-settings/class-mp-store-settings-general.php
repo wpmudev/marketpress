@@ -576,7 +576,7 @@ class MP_Store_Settings_General {
 		$metabox->add_field( 'radio_group', array(
 			'name'			 => 'details_collection',
 			'label'			 => array( 'text' => __( 'Details Collection', 'mp' ) ),
-			'default_value'	 => 'full',
+			'default_value'	 => 'contact',
 			'orientation'	 => 'horizontal',
 			'options'		 => array(
 				'full'		 => __( 'Full billing info', 'mp' ),
