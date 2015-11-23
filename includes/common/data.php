@@ -39,7 +39,7 @@ $this->default_settings = array(
 		'tax_based'				 => 'store_tax',
 	),
 	'currency'					 => 'USD',
-	'details_collection'		 => 'full',
+	'details_collection'		 => 'contact',
 	'curr_symbol_position'		 => 1,
 	'curr_decimal'				 => 1,
 	'disable_cart'				 => 0,
