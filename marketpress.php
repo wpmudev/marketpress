@@ -441,7 +441,7 @@ class Marketpress {
 
 		//Multisite Widgets
 		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
-			$settings = get_site_option( 'mp_network_settings' );
+			$settings = get_site_option( 'mp_network_settings', array() );
 			if ( ( isset($settings['main_blog']) && mp_is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
 				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
 				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );

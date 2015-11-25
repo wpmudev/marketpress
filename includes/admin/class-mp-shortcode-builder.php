@@ -194,7 +194,7 @@ class MP_Shortcode_Builder {
 		);
 		
 		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
-			$settings = get_site_option( 'mp_network_settings' );
+			$settings = get_site_option( 'mp_network_settings', array() );
 			if ( ( isset($settings['main_blog']) && mp_is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
 				$mu_shortcodes = array(
 					'mp_list_global_products'	  => __( 'Display a list or grid  of your global products.', 'mp' ),
