@@ -841,6 +841,11 @@ if ( ! function_exists( 'mp_arr_get_value' ) ) :
 	 * @return mixed
 	 */
 	function mp_arr_get_value( $key, $array, $default = false ) {
+		//Check if key is string, else return default
+		if( ! is_string( $key ) ) {
+			return $default;
+		}
+		
 		$keys  = explode( '->', $key );
 		$keys  = array_map( 'trim', $keys );
 		$value = mp_arr_search( $array, $key );
@@ -1024,6 +1029,11 @@ if ( ! function_exists( 'mp_arr_search' ) ) :
 	 * @return mixed
 	 */
 	function mp_arr_search( $array, $path ) {
+		//Check if string, else return false
+		if( ! is_string( $path ) ) {
+			return false;
+		}
+		
 		$keys = explode( '->', $path );
 		$keys = array_map( 'trim', $keys );
 
