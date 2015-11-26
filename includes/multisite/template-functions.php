@@ -800,13 +800,18 @@ endif;
 if ( ! function_exists( '_mp_global_categories_list' ) ) {
 
 	function _mp_global_categories_list( $results, $taxonomy ) {
-		$html = '<ul id="mp_category_list">';
-		foreach ( $results as $row ) {
-			$html .= '<li class="cat-item cat-item-' . $row->term_id . '">
-			<a href="' . mp_global_taxonomy_url( $row->slug, $taxonomy ) . '">' . $row->name . '</a>
-			</li>';
+		$html = '';
+		if( ! empty( $results ) ) {
+			$html .= '<ul id="mp_category_list">';
+			foreach ( $results as $row ) {
+				$html .= '<li class="cat-item cat-item-' . $row->term_id . '">
+				<a href="' . mp_global_taxonomy_url( $row->slug, $taxonomy ) . '">' . $row->name . '</a>
+				</li>';
+			}
+			$html .= '</ul>';
+		} else {
+			$html .= '<div id="mp_category_list">' . __( 'No Categories', 'mp' ) . '</div>';
 		}
-		$html .= '</ul>';
 
 		return $html;
 	}
@@ -817,8 +822,12 @@ if ( ! function_exists( '_mp_global_tags_cloud' ) ) {
 
 	function _mp_global_tags_cloud( $results, $taxonomy ) {
 		$html = '<div id="mp_tag_cloud">';
-		foreach ( $results as $row ) {
-			$html .= '<a href="' . mp_global_taxonomy_url( $row->slug, $taxonomy ) . '" class="tag-link tag-link-' . $row->term_id . '" title="">' . $row->name . '</a> ';
+		if( ! empty( $results ) ) {
+			foreach ( $results as $row ) {
+				$html .= '<a href="' . mp_global_taxonomy_url( $row->slug, $taxonomy ) . '" class="tag-link tag-link-' . $row->term_id . '" title="">' . $row->name . '</a> ';
+			}
+		} else {
+			$html .= __( 'No Tags', 'mp' );
 		}
 		$html .= '</div>';
 

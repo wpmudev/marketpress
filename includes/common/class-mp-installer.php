@@ -368,6 +368,14 @@ class MP_Installer {
 		$total_count = wp_count_posts( MP_Product::get_post_type() );
 		$total_count = $total_count->publish + $total_count->draft + $total_count->private + $total_count->pending;
 
+		if ( $total_count == 0 ) {
+			//nothing to update here
+			wp_send_json_success( array(
+				'is_done' => true,
+				'updated' => 100
+			) );
+		}
+
 		$query = new WP_Query( array(
 			'cache_results'          => false,
 			'update_post_term_cache' => false,
@@ -553,7 +561,7 @@ class MP_Installer {
 			$result = $wpdb->query( "ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`" );
 		}
 	}
-	
+
 	/**
 	 * Add post_status column to $wpdb->mp_products table
 	 *
@@ -563,7 +571,7 @@ class MP_Installer {
 	 */
 	public function add_post_status_column() {
 		global $wpdb;
-		
+
 		$table_product = $wpdb->base_prefix . 'mp_products';
 
 		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_product ) ) == $table_product ) {
@@ -676,10 +684,10 @@ class MP_Installer {
 		$old_version   = get_option( 'mp_version' );
 		$force_upgrade = mp_get_get_value( 'force_upgrade', 0 );
 		$force_version = mp_get_get_value( 'force_version', false );
-		
+
 		// Add "post_status" to $wpdb->mp_products table
 		$this->add_post_status_column();
-		
+
 		//If current MP version equals to old version skip importer
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
 			return;

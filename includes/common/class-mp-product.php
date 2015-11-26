@@ -946,16 +946,9 @@ class MP_Product {
 	 */
 	public function content( $echo = true ) {
 		$content = $this->_post->post_content;
-
+		
 		if ( $this->has_variations() || $this->is_variation() ) {
-
-			$content = get_the_content( $this->ID ); //get_post_meta( $variation_id, 'description', true );
-
-			$parent_post_id = wp_get_post_parent_id( $this->ID );
-			$parent_post    = get_post( $parent_post_id );
-			if ( ! empty( $parent_post->post_content ) && ( $parent_post->post_content !== $content ) ) {
-				$content = $parent_post->post_content . "\r\n" . $content;
-			}
+			$content = $this->get_variation()->post_content;
 		}
 
 		$content = apply_filters( 'the_content', $content );
@@ -1244,6 +1237,17 @@ class MP_Product {
 				if( $tax_inclusive == 1 && $include_tax_to_price != 1) {
 					$taxDivisor = 1 + $tax_rate;
 					$price = $price / $taxDivisor;
+				}
+			}
+			
+			//Calculate price when special price & download product
+			if ( ! empty( $special_tax ) && $this->is_download() ) {
+				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
+					if( $special_fixed_tax ) {
+						$price = $price + $tax_rate;
+					} else {
+						$price = $price + ($price * $tax_rate);
+					}
 				}
 			}
 		}
