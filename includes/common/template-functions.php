@@ -2003,7 +2003,7 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 
 		if ( ! mp_doing_ajax() ) {
 			$per_page = ( is_null( $args['per_page'] ) ) ? null : $args['per_page'];
-			$content .= ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) ? mp_products_filter( false, $per_page, $custom_query ) : '';
+			$content .= ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] || $args['filters'] && 1 != mp_get_setting( 'show_filters' ) ) ? mp_products_filter( false, $per_page, $custom_query ) : '';
 		}
 
 		$content .= '<!-- MP Product List --><section id="mp-products" class="hfeed mp_products mp_products-' . $layout_type . '">';
