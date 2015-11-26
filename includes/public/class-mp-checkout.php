@@ -1246,7 +1246,7 @@ class MP_Checkout {
 				$html .= '<div class="mp_checkout_column">
 					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
 					<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-					<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
+					<p><button type="button" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
 				</div><!-- end mp_checkout_column -->';
 			}
 		}
