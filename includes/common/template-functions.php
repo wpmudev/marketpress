@@ -1961,7 +1961,7 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 // Get order by
 			if ( ! is_null( $args['order_by'] ) ) {
 				if ( 'price' == $args['order_by'] ) {
-					$query['meta_key'] = 'regular_price';
+					$query['meta_key'] = 'sort_price';
 					$query['orderby']  = 'meta_value_num';
 				} else if ( 'sales' == $args['order_by'] ) {
 					$query['meta_key'] = 'mp_sales_count';
@@ -1970,7 +1970,7 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 					$query['orderby'] = $args['order_by'];
 				}
 			} elseif ( 'price' == mp_get_setting( 'order_by' ) ) {
-				$query['meta_key'] = 'regular_price';
+				$query['meta_key'] = 'sort_price';
 				$query['orderby']  = 'meta_value_num';
 			} elseif ( 'sales' == mp_get_setting( 'order_by' ) ) {
 				$query['meta_key'] = 'mp_sales_count';

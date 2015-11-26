@@ -946,16 +946,9 @@ class MP_Product {
 	 */
 	public function content( $echo = true ) {
 		$content = $this->_post->post_content;
-
+		
 		if ( $this->has_variations() || $this->is_variation() ) {
-
-			$content = get_the_content( $this->ID ); //get_post_meta( $variation_id, 'description', true );
-
-			$parent_post_id = wp_get_post_parent_id( $this->ID );
-			$parent_post    = get_post( $parent_post_id );
-			if ( ! empty( $parent_post->post_content ) && ( $parent_post->post_content !== $content ) ) {
-				$content = $parent_post->post_content . "\r\n" . $content;
-			}
+			$content = $this->get_variation()->post_content;
 		}
 
 		$content = apply_filters( 'the_content', $content );

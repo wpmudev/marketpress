@@ -368,6 +368,14 @@ class MP_Installer {
 		$total_count = wp_count_posts( MP_Product::get_post_type() );
 		$total_count = $total_count->publish + $total_count->draft + $total_count->private + $total_count->pending;
 
+		if ( $total_count == 0 ) {
+			//nothing to update here
+			wp_send_json_success( array(
+				'is_done' => true,
+				'updated' => 100
+			) );
+		}
+
 		$query = new WP_Query( array(
 			'cache_results'          => false,
 			'update_post_term_cache' => false,
@@ -465,6 +473,7 @@ class MP_Installer {
 
 				//Update sales count
 				$this->update_sales_count( $post_id );
+
 			}
 
 			do_action( 'mp_update/product', $post_id );
@@ -552,7 +561,7 @@ class MP_Installer {
 			$result = $wpdb->query( "ALTER TABLE $wpdb->terms ADD `term_order` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `term_group`" );
 		}
 	}
-	
+
 	/**
 	 * Add post_status column to $wpdb->mp_products table
 	 *
@@ -562,7 +571,7 @@ class MP_Installer {
 	 */
 	public function add_post_status_column() {
 		global $wpdb;
-		
+
 		$table_product = $wpdb->base_prefix . 'mp_products';
 
 		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_product ) ) == $table_product ) {
@@ -675,20 +684,23 @@ class MP_Installer {
 		$old_version   = get_option( 'mp_version' );
 		$force_upgrade = mp_get_get_value( 'force_upgrade', 0 );
 		$force_version = mp_get_get_value( 'force_version', false );
-		
+
 		// Add "post_status" to $wpdb->mp_products table
 		$this->add_post_status_column();
-		
+
+		//If current MP version equals to old version skip importer
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
 			return;
 		}
 
 		$old_settings = get_option( 'mp_settings', array() );
+		
 
 		// Filter default settings
 		$default_settings = apply_filters( 'mp_default_settings', mp()->default_settings );
 		$settings         = array_replace_recursive( $default_settings, $old_settings );
-
+		
+		
 		// Only run the follow scripts if this not a fresh install
 		if ( ! empty( $old_version ) ) {
 			//2.1.4 update
@@ -704,6 +716,11 @@ class MP_Installer {
 			//3.0 update
 			if ( version_compare( $old_version, '3.0.0.2', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.2', '<' ) ) ) {
 				$settings = $this->update_3000( $settings );
+			}
+			
+			//3.0 update
+			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
+				$settings = $this->update_3007( $settings );
 			}
 		}
 
@@ -1186,6 +1203,54 @@ class MP_Installer {
 				}
 			}
 		}
+
+		return $settings;
+	}
+	
+	/**
+	 * Update sort_price if silently on version check
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	
+	public function update_sort_price( $settings ) {
+		ini_set( 'max_execution_time', 0 );
+		set_time_limit( 0 );
+
+		$total_count = wp_count_posts( MP_Product::get_post_type() );
+
+		$query = new WP_Query( array(
+			'cache_results'          => false,
+			'update_post_term_cache' => false,
+			'post_type'              => MP_Product::get_post_type(),
+		) );
+
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			$post_id = get_the_ID();
+			
+			$product  = new MP_Product( $post_id );
+			$price    = $product->get_price();
+			
+			if( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
+				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['lowest'] ) );
+			} else {
+				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['regular'] ) );
+			}
+		}
+	}
+
+	/**
+	 * Runs on 3.0.0.7 update.
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param array $settings
+	 */
+	public function update_3007( $settings ) {
+		$this->update_sort_price( $settings );
 
 		return $settings;
 	}
