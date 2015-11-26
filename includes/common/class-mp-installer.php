@@ -680,6 +680,7 @@ class MP_Installer {
 		// Add "post_status" to $wpdb->mp_products table
 		$this->add_post_status_column();
 		
+		//If current MP version equals to old version skip importer
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
 			return;
 		}
@@ -710,7 +711,7 @@ class MP_Installer {
 			}
 			
 			//3.0 update
-			if ( version_compare( $old_version, '3.0.0.7', '<=' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.7', '<=' ) ) ) {
+			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
 				$settings = $this->update_3007( $settings );
 			}
 		}
