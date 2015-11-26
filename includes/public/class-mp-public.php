@@ -374,7 +374,9 @@ class MP_Public {
 			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
 		}
 
-		wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
+		if( ! empty($theme_url) ){
+			wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
+		}
 
 	}
 
