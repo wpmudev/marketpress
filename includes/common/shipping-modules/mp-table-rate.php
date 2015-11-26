@@ -1,4 +1,7 @@
 <?php
+if( ! defined('MP_TABLE_RATE_SHIPPING_INCLUDE_DOWNLOADS') ){
+	define('MP_TABLE_RATE_SHIPPING_INCLUDE_DOWNLOADS', false);
+}
 
 class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	//build of the plugin
@@ -243,6 +246,9 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		* @return float $price
 		*/
 	function calculate_shipping( $price, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option ) {
+		if( ! MP_TABLE_RATE_SHIPPING_INCLUDE_DOWNLOADS ){
+			$total = $cart->product_tangible_total(false);
+		}
 		$rates = $this->get_rates();
 		$base_country = mp_get_setting( 'base_country' );
 

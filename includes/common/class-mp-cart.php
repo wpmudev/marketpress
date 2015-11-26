@@ -193,12 +193,7 @@ class MP_Cart {
 		if ( 'mp_order' == get_current_screen()->post_type && ( 'post.php' == $hook || 'edit.php' == $hook ) ) {
 			wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), false, MP_VERSION );
 			wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
-
-			if ( mp_get_setting( 'store_theme' ) == 'default' ) {
-				wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
-			} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
-				wp_enqueue_style( 'mp-theme', content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
-			}
+			wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
 		}
 	}
 
@@ -1565,6 +1560,51 @@ class MP_Cart {
 		}
 
 		$total = mp_arr_get_value( 'product', $this->_total );
+
+		if ( $format ) {
+			return mp_format_currency( '', $total );
+		} else {
+			return (float) round( $total, 2 );
+		}
+	}
+
+	/**
+	 * Get the total price for tangible products.
+	 *
+	 * @since 3.0.8
+	 * @access public
+	 *
+	 * @param bool $format Optional, whether to format the value or not. Defaults to false.
+	 *
+	 * @return float/string
+	 */
+	public function product_tangible_total( $format = false ) {
+		$total                   = 0;
+		$blog_ids                = $this->get_blog_ids();
+		$this->_total['product'] = 0;
+
+		while ( 1 ) {
+			if ( $this->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				$this->set_id( $blog_id );
+			}
+
+			$items = $this->get_items_as_objects();
+
+			foreach ( $items as $item ) {
+				if( $item->is_download() ){
+					continue;
+				}
+				$price         = $item->get_price( 'lowest' );
+				$item_subtotal = ( $price * $item->qty );
+				$total += $item_subtotal;
+			}
+
+			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+				$this->reset_id();
+				break;
+			}
+		}
 
 		if ( $format ) {
 			return mp_format_currency( '', $total );
