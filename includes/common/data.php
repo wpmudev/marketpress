@@ -120,7 +120,7 @@ $this->default_settings = array(
 	'email'						 => array(
 		'admin_order'	 => array(
 			'subject'	 => __( 'New Order Notification: ORDERID', 'mp' ),
-			'text'	 	 => __( 'A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n', 'mp' ),
+			'text'	 	 => __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ),
 		),
 		'new_order'		 => array(
 			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
