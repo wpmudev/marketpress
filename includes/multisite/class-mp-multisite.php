@@ -441,7 +441,8 @@ class MP_Multisite {
 	 */
 	public function index_content() {
 		$this->maybe_create_ms_tables();
-
+		//Delete all records on mp_terms table to fix issue with deleted categories / tags still exist
+		$this->truncate_index_table();
 		$blogs = wp_get_sites();
 		$count = 0;
 		foreach ( $blogs as $blog ) {
@@ -671,6 +672,18 @@ class MP_Multisite {
 		$table3 = $wpdb->base_prefix . 'mp_term_relationships';
 
 		$wpdb->query( "DROP TABLE IF EXISTS $table1, $table2, $table3" );
+	}
+	
+	/**
+	 * Truncate index table
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @global $wpdb
+	 */
+	public function truncate_index_table() {
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->base_prefix}mp_terms WHERE type = 'product_category' OR type = 'product_tag' " );
 	}
 
 	/**
