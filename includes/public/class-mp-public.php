@@ -374,7 +374,7 @@ class MP_Public {
 		}
 
 		if( ! empty($theme_url) ){
-			wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
+			wp_enqueue_style( 'mp-theme', $theme_url, array(), MP_VERSION );
 		}
 
 	}
