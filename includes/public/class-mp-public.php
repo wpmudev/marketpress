@@ -137,13 +137,13 @@ class MP_Public {
 	 * @return string
 	 */
 	public function hide_single_product_title( $title, $id = false, $is_nav = false ) {
-		if ( in_the_loop() && is_main_query() && !$is_nav ) {
-            $title = '';
-        }
+		if ( in_the_loop() && is_main_query() && ! $is_nav ) {
+			$title = '';
+		}
 
-        return $title;
+		return $title;
 	}
-	
+
 	/**
 	 * Check if the current page is a store page
 	 *
@@ -221,30 +221,30 @@ class MP_Public {
 			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
 		}
 	}
-	
+
 	/**
 	 * Enqueue frontend styles and scripts
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	 
+
 	public function frontend_styles() {
 		//Display styles for all pages
-		
+
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
-		
+
 		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
 			$theme_url = mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' );
 		} else {
 			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
 		}
 		wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
-		
+
 	}
 
 	/**
@@ -261,7 +261,7 @@ class MP_Public {
 			wp_enqueue_script( 'lightgallery', mp_plugin_url( 'ui/lightgallery/js/lightgallery.js' ), array( 'jquery' ), MP_VERSION );
 			wp_enqueue_style( 'lightgallery', mp_plugin_url( 'ui/lightgallery/css/lightgallery.css' ), array(), MP_VERSION );
 		}
-		
+
 		/*
 		 * Comment this to allow scripts to load on all pages for Global products widget
 		if ( ! $this->is_store_page() ) {
@@ -285,10 +285,8 @@ class MP_Public {
 		foreach ( $terms as $term ) {
 			$cats[ $term->term_id ] = get_term_link( $term );
 		}
-
-// Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
-			'ajaxurl'      => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'      => mp_get_ajax_url(),
 			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
 			'productsURL'  => mp_store_page_url( 'products', false ),
 			'productCats'  => $cats,

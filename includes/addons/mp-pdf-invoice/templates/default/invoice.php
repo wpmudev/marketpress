@@ -66,10 +66,12 @@
 				<strong><?php _e( "Billing Address", "mp" ) ?></strong><br>
 				{{billing}}
 			</td>
-			<td>
-				<strong><?php _e( "Shipping Address", "mp" ) ?></strong><br>
-				{{shipping}}
-			</td>
+			<?php if ( $show_shipping == true ): ?>
+				<td>
+					<strong><?php _e( "Shipping Address", "mp" ) ?></strong><br>
+					{{shipping}}
+				</td>
+			<?php endif; ?>
 		</tr>
 	</table>
 

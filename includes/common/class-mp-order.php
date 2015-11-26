@@ -410,6 +410,9 @@ class MP_Order {
 
 			case 'order_paid' :
 				add_post_meta( $this->ID, 'mp_paid_time', time(), true );
+				if ( $this->get_cart()->is_download_only() ) {
+					$this->_send_shipment_notification();
+				}
 				break;
 
 			case 'order_shipped' :
@@ -433,7 +436,7 @@ class MP_Order {
 				return false;
 				break;
 		}
-
+		
 		/**
 		 * Fires when an order status is updated
 		 *

@@ -1173,7 +1173,7 @@ class MP_Cart {
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'                  => mp_get_ajax_url(),
 			'ajax_loader'              => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
 			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order.', 'mp' ),
 			'is_cart_page'             => mp_is_shop_page( 'cart' )
@@ -2015,6 +2015,98 @@ class MP_Cart {
 			return round( $tax_total, 2 );
 		}
 	}
+	
+	/**
+	 * Get total tax for DP
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	 
+	 public function total_tax_digital_inclusive( $format = false ) {
+		$tax_amt = 0;
+
+		$blog_ids = $this->get_blog_ids();
+		
+		if( ! mp_get_setting( 'tax->tax_digital' ) ) {
+
+			while ( 1 ) {
+				$total = $special_total = 0;
+
+				if ( $this->is_global ) {
+					$blog_id = array_shift( $blog_ids );
+					$this->set_id( $blog_id );
+				}
+
+				$items = $this->get_items_as_objects();
+
+				foreach ( $items as $item ) {
+					if ( $item->is_download() ) {
+						$total += $item->before_tax_price() * $item->qty;
+					}
+				}
+
+				// Calculate regular tax
+				$tax_amt += ( $total * mp_tax_rate() );
+
+				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+					$this->reset_id();
+					break;
+				}
+			}
+		
+		}
+
+		if ( $format ) {
+			return mp_format_currency( '', $tax_amt );
+		} else {
+			return round( $tax_amt, 2 );
+		}
+
+	}
+	
+	/**
+	 * Get total tax for special products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+	
+	public function total_special_tax( $format = false ) {
+		$tax_amt = 0;
+
+		$blog_ids = $this->get_blog_ids();
+
+		while ( 1 ) {
+			if ( $this->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				$this->set_id( $blog_id );
+			}
+
+			$items = $this->get_items_as_objects();
+
+			foreach ( $items as $item ) {
+				if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
+					$original_tax = $item->get_price( 'lowest' ) - ( $item->get_price( 'lowest' ) / ( 1 + mp_tax_rate() ) );
+					$tax = $original_tax - $special_tax_amt;
+					$tax_amt += $tax * $item->qty;
+				}	
+			}
+
+			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+				$this->reset_id();
+				break;
+			}
+		}
+
+		if ( $format ) {
+			return mp_format_currency( '', $tax_amt );
+		} else {
+			return round( $tax_amt, 2 );
+		}
+	}
 
 	/**
 	 * Get total
@@ -2039,6 +2131,7 @@ class MP_Cart {
 			 * @param array An array containing all of the applicable cart subtotals (e.g. tax, shipping, etc)
 			 * @param MP_Cart The current cart object.
 			 */
+
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
@@ -2048,9 +2141,9 @@ class MP_Cart {
 				if( mp_get_setting( 'tax->tax_shipping' ) ) {
 					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();
 				}
-				
+
 				//Shipping price should be added after products price calculation
-				$total     = $total + $shipping_pre_total;
+				$total     = $total + $shipping_pre_total + $this->total_tax_digital_inclusive() + $this->total_special_tax();
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );

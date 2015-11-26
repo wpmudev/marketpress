@@ -524,6 +524,13 @@ class MP_Store_Settings_Presentation {
 				'ASC'  => __( 'Ascending', 'mp' ),
 			),
 		) );
+		$metabox->add_field( 'checkbox', array(
+			'name'    => 'hide_products_filter',
+			'label'   => array( 'text' => __( 'Hide Products Filter?', 'mp' ) ),
+			'message' => __( 'Yes', 'mp' ),
+			'desc'    => __( 'If enabled, users won\'t be able to filter products per category and/or to order by release date/name/price.', 'mp' ),
+			'default_value' => 0
+		) );
 	}
 
 	public function init_miscellaneous_settings() {
