@@ -323,6 +323,10 @@ var mp_checkout;
                                     $( '#' + index ).find( '.mp_checkout_section_content' ).html( value );
                                 } );
 
+                                if( resp.data.mp_checkout_nonce ){
+                                    $( "input#mp_checkout_nonce" ).replaceWith( resp.data.mp_checkout_nonce );
+                                }
+
                                 mp_checkout.initCardValidation();
                                 marketpress.loadingOverlay( 'hide' );
                                 mp_checkout.nextStep();

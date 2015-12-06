@@ -596,13 +596,22 @@ class MP_Checkout {
 				$user_id = wp_insert_user( $args );
 
 				if ( ! is_wp_error( $user_id ) ) {
+					add_action( 'set_logged_in_cookie', array($this, 'force_logged_in_cookie'), 5, 10 );
 					$user_signon = wp_signon( array(
 						'user_login'    => $account_username,
 						'user_password' => $account_password,
 						'remember'      => true,
 					), false );
+
+
 				}
 			}
+		}
+	}
+
+	public function force_logged_in_cookie( $logged_in_cookie, $expire, $expiration, $user_id, $scheme ){
+		if ( is_user_logged_in() ) {
+			$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie; // Set cookie immediately after ajax registration to be used in nonce generation.
 		}
 	}
 
@@ -621,6 +630,7 @@ class MP_Checkout {
 		$sections = array(
 			'mp-checkout-section-shipping'				 => $this->section_shipping(),
 			'mp-checkout-section-order-review-payment'	 => $this->section_order_review_payment(),
+			'mp_checkout_nonce'							 => wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', false, false ),
 		);
 
 		wp_send_json_success( $sections );
