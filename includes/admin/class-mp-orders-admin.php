@@ -1073,8 +1073,8 @@ class MP_Orders_Admin {
 
 			//! Order Shipping
 			case 'mp_orders_shipping' :
-				$cart = $order->get_meta( 'mp_cart_info' );
-				
+				$cart = $order->get_cart();
+
 				if ( $cart->is_download_only() ) {
 					$html .= '&mdash;';
 				} else {
