@@ -2333,6 +2333,13 @@ class MP_Cart {
 	}
 
 	/**
+	 * Reset cart total.
+	 */
+	public function update_total( $value ){
+		$this->_total = (array) $value;
+	}
+
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
