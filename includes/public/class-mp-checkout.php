@@ -610,9 +610,8 @@ class MP_Checkout {
 	}
 
 	public function force_logged_in_cookie( $logged_in_cookie, $expire, $expiration, $user_id, $scheme ){
-		if ( is_user_logged_in() ) {
-			$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie; // Set cookie immediately after ajax registration to be used in nonce generation.
-		}
+		wp_set_current_user( $user_id ); // Force current user to be used in nonce generation.
+		$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie; // Set cookie immediately after ajax registration to be used in nonce generation.
 	}
 
 	/**
