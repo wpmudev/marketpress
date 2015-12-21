@@ -550,7 +550,15 @@ class MP_Orders_Admin {
 			$billing_address = array();
 			//we need to link this order to right user
 			global $wpdb;
-			$sql     = "SELECT * FROM " . $wpdb->usermeta . " WHERE meta_key='mp_order_history'";
+
+			if (is_multisite()) {
+				global $blog_id;
+				$meta_id = 'mp_order_history_' . $blog_id;
+			} else {
+				$meta_id = 'mp_order_history';
+			}
+
+			$sql     = "SELECT * FROM " . $wpdb->usermeta . " WHERE meta_key='" .$meta_id. "'";
 			$results = $wpdb->get_results( $sql );
 			$user_id = 0;
 			foreach ( $results as $res ) {
@@ -567,7 +575,13 @@ class MP_Orders_Admin {
 
 			if ( $user_id != 0 ) {
 				//we have the user, try to find & link
-				$billings = get_user_meta( $post->post_author, 'mp_billing_info', true );
+				$billings = get_user_meta( $user_id, 'mp_billing_info', true );
+			} else {
+				//this case, the user checkout as guest
+				$billings = get_post_meta( $post->ID, 'mp_shipping_info', true );
+			}
+
+			if( is_array($billings) ){
 				foreach ( $billings as $key => $val ) {
 					if ( $key == 'name' ) {
 						$full_name = explode( ' ', $val );
@@ -580,10 +594,8 @@ class MP_Orders_Admin {
 					$billing_address[ $key ] = $val;
 				}
 				$order->update_meta( 'mp_billing_info', $billing_address );
-			} else {
-				//this case, the user checkout as guest
-
 			}
+
 		}
 
 		echo $order->get_addresses( true );
