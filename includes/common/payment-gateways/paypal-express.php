@@ -965,10 +965,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 */
 	function process_ipn_return() {
 		$payment_status = mp_get_post_value( 'payment_status' );
-		$txn_type       = mp_get_post_value( 'txn_type' );
 		$invoice        = mp_get_post_value( 'invoice' );
 
-		if ( empty( $payment_status ) || empty( $txn_type ) || empty( $invoice ) ) {
+		if ( empty( $payment_status ) || empty( $invoice ) ) {
 			header( 'Status: 404 Not Found' );
 			echo 'Error: Missing POST variables. Identification is not possible.';
 			exit;
