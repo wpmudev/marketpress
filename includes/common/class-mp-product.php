@@ -946,10 +946,17 @@ class MP_Product {
 	 */
 	public function content( $echo = true ) {
 		$content = $this->_post->post_content;
-		
-		if ( $this->has_variations() || $this->is_variation() ) {
-			$content = $this->get_variation()->post_content;
+
+		if ( empty( $content ) && $this->is_variation() ) {
+			$parent = new MP_Product( $this->post_parent );
+			$content = $parent->post_content;
 		}
+
+		// $content = $this->_post->post_content;
+		
+		// if ( $this->has_variations() || $this->is_variation() ) {
+		// 	$content = $this->get_variation()->post_content;
+		// }
 
 		$content = apply_filters( 'the_content', $content );
 
