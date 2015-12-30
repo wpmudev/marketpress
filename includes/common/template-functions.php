@@ -2333,7 +2333,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 
 		$return = '
 			<!-- MP Single Product -->
-			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
+			<section id="mp-single-product-' . $product->ID . '" class="mp-single-product" itemscope itemtype="http://schema.org/Product">
 				<div class="mp_product mp_single_product' . ( $has_image ? ' mp_single_product-has-image mp_single_product-image-' . ( ! empty( $image_alignment ) ? $image_alignment : 'aligncenter' ) . '' : '' ) . ( $product->has_variations() ? ' mp_single_product-has-variations' : '' ) . '">';
 
 		$values = get_post_meta( $product->ID, 'mp_product_images', true );

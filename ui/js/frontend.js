@@ -274,7 +274,8 @@ var marketpress = { };
 
             $( 'body' ).on( 'click', '.mp_product_meta a.more-link', function( e ) {
                 e.preventDefault( );
-                $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
+                // $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
+                $( '.mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
                 $( 'html, body' ).animate( {
                     scrollTop: $( "a.mp_product_tab_label_link.mp-product-overview" ).offset( ).top - 30
                 }, 500 );
