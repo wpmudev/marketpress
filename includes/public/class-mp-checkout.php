@@ -555,6 +555,64 @@ class MP_Checkout {
 			),
 		) );
 	}
+	
+	/**
+	 * Update shipping section
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _ajax_register_account() {
+		
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
+
+		$data = (array) mp_get_post_value( 'account', array() );
+		
+		$enable_registration_form = mp_get_post_value( 'enable_registration_form' );
+		$account_username 		  = mp_get_post_value( 'account_username' );
+		$account_password 		  = mp_get_post_value( 'account_password' );
+		$account_email 			  = mp_get_post_value( 'billing->email' );
+		$first_name				  = mp_get_post_value( 'billing->first_name' ); 
+		$last_name				  = mp_get_post_value( 'billing->last_name' ); 
+		
+
+		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
+			
+			if( $enable_registration_form && $account_username && $account_password && $account_email  ) {
+				$args = array(
+					'user_login' => $account_username,
+					'user_email' => $account_email,
+					'user_pass'  => $account_password,
+					'first_name' => $first_name,
+					'last_name'  => $last_name,
+					'role'       => 'subscriber'
+				);
+
+				$args = apply_filters( 'mp_register_user', $args );
+
+				$user_id = wp_insert_user( $args );
+
+				if ( ! is_wp_error( $user_id ) ) {
+					add_action( 'set_logged_in_cookie', array($this, 'force_logged_in_cookie'), 5, 10 );
+					$user_signon = wp_signon( array(
+						'user_login'    => $account_username,
+						'user_password' => $account_password,
+						'remember'      => true,
+					), false );
+
+
+				}
+			}
+		}
+	}
+
+	public function force_logged_in_cookie( $logged_in_cookie, $expire, $expiration, $user_id, $scheme ){
+		wp_set_current_user( $user_id ); // Force current user to be used in nonce generation.
+		$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie; // Set cookie immediately after ajax registration to be used in nonce generation.
+	}
 
 	/**
 	 * Update checkout data
@@ -566,10 +624,12 @@ class MP_Checkout {
 	public function ajax_update_checkout_data() {
 		$this->_update_shipping_section();
 		$this->_update_order_review_payment_section();
+		$this->_ajax_register_account();
 
 		$sections = array(
 			'mp-checkout-section-shipping'				 => $this->section_shipping(),
 			'mp-checkout-section-order-review-payment'	 => $this->section_order_review_payment(),
+			'mp_checkout_nonce'							 => wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', false, false ),
 		);
 
 		wp_send_json_success( $sections );
@@ -1036,6 +1096,46 @@ class MP_Checkout {
 	public function has_errors( $context = 'general' ) {
 		return ( mp_arr_get_value( $context, $this->_errors ) ) ? true : false;
 	}
+	
+	/**
+	 * Toggleable registration form on checkout
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function register_toggle_form(  ) {
+		
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
+		
+		$html = '';
+		$html .= '
+			<div class="mp_checkout_field mp_checkout_checkbox">
+				<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_registration_form" value="1" autocomplete="off"> <span>' . __( 'Register as customer?', 'mp' ) . '</span></label>
+			</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
+		';
+		
+			$html .= '
+				<div id="mp-checkout-column-registration" style="display:none" class="mp_checkout_column_section">
+					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
+					
+			$html .= '<div class="mp_checkout_field mp_checkout_column">
+					<label class="mp_form_label">' . __( 'Username', 'mp' ) . '</label>	
+				    <input type="text" name="account_username" id="mp_account_username" data-rule-remote="' . esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ) . '" data-msg-remote="' . __( 'An account with this username already exists', 'mp' ) . '"></input>
+				  </div><!-- end mp_checkout_field -->';
+			
+			$html .= '<div class="mp_checkout_field mp_checkout_column">
+					<label class="mp_form_label">' . __( 'Password', 'mp' ) . '</label>	
+				    <input type="password" name="account_password"></input>
+				  </div><!-- end mp_checkout_field -->';			
+			$html .= wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce' ) . '
+				</div>';		
+		
+		return $html;
+	}
 
 	/**
 	 * Display the billing/shipping address section
@@ -1079,8 +1179,12 @@ class MP_Checkout {
 		}
 
 		$html .= '
-
-				</div><!-- end mp-checkout-column-shipping-info -->
+				</div><!-- end mp-checkout-column-shipping-info -->';
+				
+		//Checkout registration form
+		$html .= $this->register_toggle_form();
+			
+		$html .= '	
 			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
@@ -1151,7 +1255,7 @@ class MP_Checkout {
 				$html .= '<div class="mp_checkout_column">
 					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
 					<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-					<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
+					<p><button type="button" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
 				</div><!-- end mp_checkout_column -->';
 			}
 		}
