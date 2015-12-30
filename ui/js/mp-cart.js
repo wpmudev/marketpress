@@ -220,7 +220,7 @@ var mp_cart = { };
 
         $form = $this.closest( 'form' );
 
-        $container = ( $( '#colorbox' ).is( ':visible' ) ) ? $form : $( '#mp-single-product' );
+        $container = ( $( '#colorbox' ).is( ':visible' ) ) ? $form : $this.closest( '.mp-single-product' );
         $qtyChanged = $form.find( 'input[name="product_qty_changed"]' );
         url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 
