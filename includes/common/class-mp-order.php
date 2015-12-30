@@ -812,6 +812,7 @@ class MP_Order {
 
 		if ( ! $cart instanceof MP_Cart ) {
 			$cart = $this->_convert_legacy_cart( $cart );
+			$this->update_meta('mp_cart_info', $cart);
 		}
 
 		return apply_filters( 'mp_order/get_cart', $cart, $this );
