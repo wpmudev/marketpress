@@ -397,6 +397,10 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	 * return array $shipping_options
 	 */
 	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
+
+		add_filter( 'mp_list_shipping_options', array( $this, 'after_mp_shipping_options') );
+		add_filter( 'mp_checkout_step_link', array( $this, 'checkout_step_link_handler') );
+
 		if ( $this->_crc_ok() && false !== ( $shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ) ) {
 			if ( ! empty( $shipping_options ) ) {
 				// CRC is ok - just return the shipping options already stored in session
@@ -471,6 +475,40 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 		}
 
 		return $shipping_options;
+	}
+
+	/**
+	 *  Filter when to display the next step button.
+	 *
+	 * @param $link
+	 * @param $what
+	 * @param $section
+	 * @param $step_number
+	 */
+	function checkout_step_link_handler( $link, $what, $section, $step_number ){
+		if ( $this->_crc_ok() && false !== ( $shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ) ) {
+			if ( empty( $shipping_options ) ) {
+				return '';
+			}
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Add output after shipping options in checkout steps.
+	 *
+	 * @param $html
+	 * @param $options
+	 */
+	function after_mp_shipping_options( $html, $options ){
+		if( empty( $options) ){
+			$html .= '<span class="mp_usps_after_shipping_options no_options_available">';
+			$html .= __( 'There are no shipping services available for this type of package in your location.', 'mp' );
+			$html .= '</span>';
+		}
+
+		return $html;
 	}
 
 	function calculate_packages() {

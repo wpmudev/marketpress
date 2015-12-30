@@ -227,6 +227,9 @@ var mp_checkout;
 
             // Validate form
             $checkout.validate( {
+                rules: {
+                    shipping_method: "required",
+                },
                 onkeyup: false,
                 onclick: false,
                 ignore: function( index, element ) {

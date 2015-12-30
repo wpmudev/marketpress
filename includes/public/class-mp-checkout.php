@@ -862,30 +862,31 @@ class MP_Checkout {
 	 * @param string $what Either "prev" or "next".
 	 * @return string
 	 */
-	public function step_link( $what ) {
+	public function step_link( $what, $section = false ) {
 		$hash	 = $this->url_hash( $what );
 		$text	 = '';
 		$classes = array( 'mp_button', "mp_button-checkout-{$what}-step" );
+		$link = false;
 
 		switch ( $what ) {
 			case 'prev' :
 				if ( 1 === $this->_stepnum ) {
-					return false;
+					break;
 				}
 
 				$text		 = __( '&laquo; Previous Step', 'mp' );
 				$classes[]	 = 'mp_button-secondary';
-				return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
+				$link = '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
 				break;
 
 			case 'next' :
 				$text		 = __( 'Next Step &raquo;', 'mp' );
 				$classes[]	 = 'mp_button-medium';
-				return '<button class="' . implode( ' ', $classes ) . '" type="submit">' . $text . '</button>';
+				$link = '<button class="' . implode( ' ', $classes ) . '" type="submit">' . $text . '</button>';
 				break;
 		}
 
-		return false;
+		return apply_filters( 'mp_checkout_step_link', $link, $what, $section, $this->_stepnum );
 	}
 
 	/**
@@ -1257,8 +1258,8 @@ class MP_Checkout {
 
 		$html .= '
 						<div class="mp_checkout_buttons">' .
-		$this->step_link( 'prev' ) .
-		$this->step_link( 'next' ) . '
+		$this->step_link( 'prev', 'shipping' ) .
+		$this->step_link( 'next', 'shipping' ) . '
 						</div><!-- end mp_checkout_buttons -->';
 
 
