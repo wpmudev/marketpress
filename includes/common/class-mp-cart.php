@@ -135,36 +135,16 @@ class MP_Cart {
 	 */
 	public function add_item( $item_id, $qty = 1 ) {
 		$cart_updated = true;
+		$product      = new MP_Product( $item_id );
+		$max          = $product->max_product_quantity( $item_id, true );
+		$in_cart      = $this->has_item( $item_id );
 
-		if ( $in_cart = $this->has_item( $item_id ) ) {
-			$product = new MP_Product( $item_id );
-			if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
-				$qty = 1;
-			} else {
-
-				$max             = $product->max_product_quantity( false, true );
-				$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
-
-				if ( is_numeric( $max ) ) {
-					if ( $max >= ( $qty + $in_cart ) ) {
-						$qty += $in_cart;
-						$cart_updated = true;
-					} else {
-						$qty          = $max;
-						$cart_updated = false;
-					}
-				} else {
-					$qty += $in_cart;
-					$cart_updated = true;
-				}
-			}
+		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+			$qty = 1;
 		} else {
-			$product = new MP_Product( $item_id );
-			$max     = $product->max_product_quantity( $item_id, true );
-
-			$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
 			if ( is_numeric( $max ) ) {
-				if ( $max >= ( $qty ) ) {
+				if ( $max >= ( $qty + $in_cart ) ) {
+					$qty += $in_cart;
 					$cart_updated = true;
 				} else {
 					$qty          = $max;
@@ -1179,7 +1159,7 @@ class MP_Cart {
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
 			'ajaxurl'                  => mp_get_ajax_url(),
 			'ajax_loader'              => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
-			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order.', 'mp' ),
+			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order or you have reached the stock limit.', 'mp' ),
 			'is_cart_page'             => mp_is_shop_page( 'cart' )
 		) );
 	}
@@ -1585,6 +1565,7 @@ class MP_Cart {
 	public function product_tangible_total( $format = false ) {
 		$total                   = 0;
 		$blog_ids                = $this->get_blog_ids();
+		$this->_total['product'] = 0;
 
 		while ( 1 ) {
 			if ( $this->is_global ) {
@@ -2329,13 +2310,6 @@ class MP_Cart {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Reset cart total.
-	 */
-	public function update_total( $value ){
-		$this->_total = (array) $value;
 	}
 
 	/**
