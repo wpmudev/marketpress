@@ -297,6 +297,17 @@ var mp_cart = { };
                     alert( resp.data.out_of_stock );
                     $form.find( 'input[name="product_quantity"]' ).val( resp.data.qty_in_stock );
                 }
+                
+                $( '[name^="product_attr_"].mp_select2' ).mp_select2( {
+                    "dropdownCssClass": "mp_select2",
+                    "dropdownAutoWidth": 1,
+                    "minimumResultsForSearch": -1   // hide the search box
+                } );
+
+                $( '[name^="product_attr_"].mp_select2_search' ).mp_select2( {
+                    "dropdownCssClass": "mp_select2",
+                    "dropdownAutoWidth": 1
+                } );
 
                 $.colorbox.resize();
             }
