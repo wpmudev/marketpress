@@ -221,6 +221,7 @@ var mp_cart = { };
         $form = $this.closest( 'form' );
 
         $container = ( $( '#colorbox' ).is( ':visible' ) ) ? $form : $this.closest( '.mp-single-product' );
+		$meta_container = $this.closest( '.mp_product' );
         $qtyChanged = $form.find( 'input[name="product_qty_changed"]' );
         url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 
@@ -259,6 +260,8 @@ var mp_cart = { };
                             maxHeight: "90%",
                             close: "&times;"
                         } );
+						
+						$( '.mp_product_options_thumb' ).attr('src', resp.data.image);
                     } else {
                         $container.find('.mp_product_image_single').attr('src', resp.data.image);
                         $container.find('.mp_product_image_link').attr('href', resp.data.image_full);
@@ -276,7 +279,7 @@ var mp_cart = { };
                 }
 
                 //if ( resp.data.excerpt ) {
-                $container.find( '.mp_product_excerpt' ).html( resp.data.excerpt );
+                $meta_container.find( '.mp_product_excerpt' ).html( resp.data.excerpt );
                 //}
 
                 if ( resp.data.price ) {
