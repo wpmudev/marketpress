@@ -796,9 +796,12 @@ class MP_Shortcode_Builder {
 				</td>
 			</tr>
 			<tr>
-				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'If checked, products will be displayed as a list - otherwise products will be displayed as a grid.', 'mp' ); ?></span></span> list_view</th>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Products will be displayed as list or grid.', 'mp' ); ?></span></span> list_view</th>
 				<td>
-					<input type="checkbox" name="list_view" data-default="<?php echo esc_attr( ( mp_get_setting( 'list_view' ) == 'list' ) ? 1 : 0  ); ?>" value="1" <?php checked( 'list', mp_get_setting( 'list_view' ) ); ?> />
+					<select name="list_view" data-default="" class="mp-chosen-select">
+						<option value="1" <?php echo esc_attr( ( mp_get_setting( 'list_view' ) == '1' ) ? 'selected="selected"' : ''  ); ?>><?php _e( 'List', 'mp' ); ?></option>
+						<option value="0" <?php echo esc_attr( ( mp_get_setting( 'list_view' ) == '0' ) ? 'selected="selected"' : ''  ); ?>><?php _e( 'Grid', 'mp' ); ?></option>
+					</select>
 				</td>
 			</tr>
 			<tr>
