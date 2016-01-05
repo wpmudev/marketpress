@@ -1154,7 +1154,7 @@ class MP_Products_Screen {
 
 				foreach ( $variation_terms as $variation_term ) {
 					$variation_term_vals = explode( '=', $variation_term );
-					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[1], $variation_term_vals[0], true ), $variation_term_vals[0], true );
+					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[1], $variation_term_vals[0], false ), $variation_term_vals[0], true );
 				}
 
 				$combination_num ++;
