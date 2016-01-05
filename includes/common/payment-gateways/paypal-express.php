@@ -436,8 +436,10 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 				$i ++;
 			}
-
-			$vcart->update_total( array() );// Reset in order to prevent issue caused by cart subtotals being pre-set to 0.
+			
+			if( function_exists( $vcart->update_total ) ) {
+				$vcart->update_total( array() );// Reset in order to prevent issue caused by cart subtotals being pre-set to 0.
+			}
 
 			$request["PAYMENTREQUEST_{$index}_ITEMAMT"] = (float) $vcart->product_total( false ); //items subtotal
 
@@ -852,6 +854,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			// Buyer has already setup payment with PayPal - process order
 			$error    = false;
 			$response = $this->_do_express_checkout_payment( $token, $payer_id );
+
 			if ( ! is_wp_error( $response ) ) {
 				if ( 'Success' == mp_arr_get_value( 'ACK', $response ) || 'SuccessWithWarning' == mp_arr_get_value( 'ACK', $response ) ) {
 					$blog_id      = get_current_blog_id();
