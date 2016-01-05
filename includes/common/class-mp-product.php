@@ -630,9 +630,9 @@ class MP_Product {
 		} else {
 
 			if ( is_numeric( $per_order_limit ) ) {
-				$max = 'max="' . esc_attr( $per_order_limit ) . '"';
+				$max = 'max="' . esc_attr( $per_order_limit ) . '" data-msg-max="' . __( 'This product has an order limit of {0}.', 'mp' ) . '"';
 			} else {
-				$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '"';
+				$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
 			}
 
 			$cart_items = mp_cart()->get_all_items();
@@ -644,13 +644,13 @@ class MP_Product {
 						$max_product_quantity = $per_order_limit - $cart_quantity;
 						if ( $max_product_quantity == 0 ) {
 							$product_quantity = 0;
-							$max              = 'max="' . esc_attr( $max_product_quantity ) . '"';
+							$max              = 'max="' . esc_attr( $max_product_quantity ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
 							$disabled         = 'disabled';
 						} else {
-							$max = 'max="' . esc_attr( $max_product_quantity ) . '"';
+							$max = 'max="' . esc_attr( $max_product_quantity ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
 						}
 					} else {
-						$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '"';
+						$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
 					}
 				}
 			}
