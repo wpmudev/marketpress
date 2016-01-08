@@ -317,22 +317,16 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 	 */
 	function process_ipn_return() {
 
-		$message_body = $_SERVER[ 'HTTP_USER_AGENT' ] . '<br />';
-
 		foreach ( $_POST as $key => $value ) {
 			$message .= "Field " . htmlspecialchars( $key ) . " = " . htmlspecialchars( $value ) . "<br>";
 		}
 
-		$message_body = $message_body . '' . $message;
-		wp_mail( 'marko.ic@gmail.com', 'ipn triggered', 'test' );
-		wp_mail( 'marko.ic@gmail.com', 'IPN STATUS', $message_body );
 		
 		$order_id	 = mp_get_get_value( 'order_id' );
 		$order		 = new MP_Order( $order_id );
 		$order->log_ipn_status( __( 'Skrill IPN message received.', 'mp' ) );
 
 		if ( $_SERVER[ 'HTTP_USER_AGENT' ] != 'Moneybookers Merchant Payment Agent' ) {
-			wp_mail( 'marko.ic@gmail.com', '(Code: WA)', 'Invalid request (Code: WA)' );
 			header( 'HTTP/1.0 403 Forbidden' );
 			exit( 'Invalid request (Code: WA)' );
 		}
@@ -429,7 +423,6 @@ class MP_Gateway_Skrill extends MP_Gateway_API {
 			header( 'HTTP/1.0 200 OK' );
 			exit( 'Successfully recieved!' );
 		} else {
-			wp_mail( 'marko.ic@gmail.com', '(Code: TID)', 'Invalid request (Code: TID)' );
 			header( 'HTTP/1.0 403 Forbidden' );
 			exit( 'Invalid request (Code: TID)' );
 		}
