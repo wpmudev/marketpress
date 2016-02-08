@@ -304,7 +304,7 @@ class MP_Orders_Admin {
 		$order = new MP_Order( $this );
 		$cart = $order->get_meta( 'mp_cart_info' );
 		
-		if ( ! $cart->is_download_only() ) {
+		if ( is_object( $cart ) && ! $cart->is_download_only() ) {
 			add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array(
 				&$this,
 				'meta_box_shipping_info'
@@ -1087,7 +1087,7 @@ class MP_Orders_Admin {
 			case 'mp_orders_shipping' :
 				$cart = $order->get_cart();
 
-				if ( $cart->is_download_only() ) {
+				if ( is_object( $cart ) && $cart->is_download_only() ) {
 					$html .= '&mdash;';
 				} else {
 					$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
