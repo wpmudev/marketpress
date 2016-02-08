@@ -2917,8 +2917,10 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	if ( $variation ) {
 		$parent_post_id = wp_get_post_parent_id( $id );
 		$parent_post    = get_post( $parent_post_id );
-		if ( ! empty( $parent_post->post_content ) ) {
-			$excerpt = $parent_post->post_content . "\r\n" . $excerpt;
+		if ( ! empty( $parent_post->post_excerpt ) ) {
+			$excerpt = $parent_post->post_excerpt;
+		} else {
+			$excerpt = $parent_post->post_content;
 		}
 	}
 
