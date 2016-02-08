@@ -276,7 +276,8 @@ class Marketpress {
 //! Register product_variation post type
 		register_post_type( MP_Product::get_variations_post_type(), array(
 			'public'             => false,
-			'show_ui'            => false,
+			'show_ui'            => true,
+			'show_in_nav_menus'	 => false,
 			'publicly_queryable' => true,
 			'hierarchical'       => true,
 			'rewrite'            => false,
