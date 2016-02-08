@@ -109,26 +109,28 @@ class MP_Order {
 	protected function _convert_legacy_cart( $items ) {
 		$cart = new MP_Cart( false );
 
-		foreach ( $items as $product_id => $variations ) {
-			foreach ( $variations as $variation_id => $product ) {
-				$item = new MP_Product( $product_id );
-				$item->set_price( array(
-					'regular' => (float) $product['price'],
-					'lowest'  => (float) $product['price'],
-					'highest' => (float) $product['price'],
-					'sale'    => array(
-						'amount'     => false,
-						'start_date' => false,
-						'end_date'   => false,
-						'days_left'  => false,
-					),
-				) );
+		if( !empty($items) && ( is_array($items) || is_object($items) ) ){
+			foreach ( $items as $product_id => $variations ) {
+				foreach ( $variations as $variation_id => $product ) {
+					$item = new MP_Product( $product_id );
+					$item->set_price( array(
+						'regular' => (float) $product['price'],
+						'lowest'  => (float) $product['price'],
+						'highest' => (float) $product['price'],
+						'sale'    => array(
+							'amount'     => false,
+							'start_date' => false,
+							'end_date'   => false,
+							'days_left'  => false,
+						),
+					) );
 
-				if ( isset( $product['download'] ) ) {
-					$cart->download_count[ $product_id ] = mp_arr_get_value( 'download->downloaded', $product, 0 );
+					if ( isset( $product['download'] ) ) {
+						$cart->download_count[ $product_id ] = mp_arr_get_value( 'download->downloaded', $product, 0 );
+					}
+
+					$cart->add_item( $product_id, $product['quantity'] );
 				}
-
-				$cart->add_item( $product_id, $product['quantity'] );
 			}
 		}
 
