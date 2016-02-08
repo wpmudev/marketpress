@@ -957,15 +957,16 @@ class MP_Coupons_Addon {
 				'delete_post'         => 'delete_mp_coupon',
 				'read_post'           => 'read_mp_coupon',
 			),
-			'map_meta_cap'       => true,
-			'public'             => true,
-			'show_ui'            => true,
-			'show_in_menu'       => false,
-			'hierarchical'       => false,
-			'rewrite'            => false,
-			'query_var'          => false,
-			'supports'           => array( '' ),
-			'publicly_queryable' => true,
+			'map_meta_cap'        => true,
+			'public'              => true,
+			'show_ui'             => true,
+			'show_in_menu'        => false,
+			'hierarchical'        => false,
+			'rewrite'             => false,
+			'query_var'           => false,
+			'supports'            => array( '' ),
+			'publicly_queryable'  => true,
+			'exclude_from_search' => true
 		) );
 	}
 
