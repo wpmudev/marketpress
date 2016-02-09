@@ -1401,6 +1401,162 @@ class MP_Checkout {
 
 		return '#' . $slug;
 	}
+	
+	/**
+	 * Returns the js needed to record ecommerce transactions.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @param string $what Either "prev" or "next".
+	 * @return string
+	 */
+
+	public function create_ga_ecommerce( $order ) {
+
+		if ( !is_object( $order ) )
+			return false;
+
+		//so that certain products can be excluded from tracking
+		$order = apply_filters( 'mp_ga_ecommerce', $order );
+
+		if ( $this->get_setting( 'ga_ecommerce' ) == 'old' ) {
+
+			$js = '<script type="text/javascript">
+try{
+ pageTracker._addTrans(
+		"' . esc_js( $order->post_title ) . '",							 // order ID - required
+		"' . esc_js( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
+		"' . $order->mp_order_total . '",								 // total - required
+		"' . $order->mp_tax_total . '",									 // tax
+		"' . $order->mp_shipping_total . '",							 // shipping
+		"' . esc_js( $order->mp_shipping_info[ 'city' ] ) . '",		// city
+		"' . esc_js( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
+		"' . esc_js( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+	);';
+
+			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
+				foreach ( $order->mp_cart_info as $product_id => $variations ) {
+					foreach ( $variations as $variation => $data ) {
+						$sku = !empty( $data[ 'SKU' ] ) ? esc_js( $data[ 'SKU' ] ) : $product_id;
+						$js .= 'pageTracker._addItem(
+				"' . esc_js( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+				"' . $sku . '",									 // SKU/code - required
+				"' . esc_js( $data[ 'name' ] ) . '",		// product name
+				"' . $data[ 'price' ] . '",						// unit price - required
+				"' . $data[ 'quantity' ] . '"					 // quantity - required
+			);';
+					}
+				}
+			}
+			$js .= 'pageTracker._trackTrans(); //submits transaction to the Analytics servers
+} catch(err) {}
+</script>
+';
+		} else if ( $this->get_setting( 'ga_ecommerce' ) == 'new' ) {
+
+			$js = '<script type="text/javascript">
+	_gaq.push(["_addTrans",
+		"' . esc_attr( $order->post_title ) . '",						 // order ID - required
+		"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",				 // affiliation or store name
+		"' . $order->mp_order_total . '",								 // total - required
+		"' . $order->mp_tax_total . '",									 // tax
+		"' . $order->mp_shipping_total . '",							 // shipping
+		"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",	 // city
+		"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",	 // state or province
+		"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+	]);';
+
+			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
+				foreach ( $order->mp_cart_info as $product_id => $variations ) {
+					foreach ( $variations as $variation => $data ) {
+						$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+						$js .= '_gaq.push(["_addItem",
+				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+				"' . $sku . '",									 // SKU/code - required
+				"' . esc_attr( $data[ 'name' ] ) . '",			// product name
+				"",												// category
+				"' . $data[ 'price' ] . '",						// unit price - required
+				"' . $data[ 'quantity' ] . '"					 // quantity - required
+			]);';
+					}
+				}
+			}
+			$js .= '_gaq.push(["_trackTrans"]);
+</script>
+';
+
+			//add info for subblog if our GA plugin is installed
+			if ( class_exists( 'Google_Analytics_Async' ) ) {
+
+				$js = '<script type="text/javascript">
+		_gaq.push(["b._addTrans",
+			"' . esc_attr( $order->post_title ) . '",							 // order ID - required
+			"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
+			"' . $order->mp_order_total . '",									 // total - required
+			"' . $order->mp_tax_total . '",									 // tax
+			"' . $order->mp_shipping_total . '",								 // shipping
+			"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",		// city
+			"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
+			"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+		]);';
+
+				if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
+					foreach ( $order->mp_cart_info as $product_id => $variations ) {
+						foreach ( $variations as $variation => $data ) {
+							$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+							$js .= '_gaq.push(["b._addItem",
+					"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+					"' . $sku . '",									 // SKU/code - required
+					"' . esc_attr( $data[ 'name' ] ) . '",			// product name
+					"",												// category
+					"' . $data[ 'price' ] . '",						// unit price - required
+					"' . $data[ 'quantity' ] . '"					 // quantity - required
+				]);';
+						}
+					}
+				}
+				$js .= '_gaq.push(["b._trackTrans"]);
+	</script>
+	';
+			}
+		} else if ( $this->get_setting( 'ga_ecommerce' ) == 'universal' ) {
+			// add the UA code
+
+			$js = '<script type="text/javascript">
+		ga("require", "ecommerce", "ecommerce.js");
+		ga("ecommerce:addTransaction", {
+				"id": "' . esc_attr( $order->post_title ) . '",						// Transaction ID. Required.
+				"affiliation": "' . esc_attr( get_bloginfo( 'blogname' ) ) . '",	// Affiliation or store name.
+				"revenue": "' . $order->mp_order_total . '",						// Grand Total.
+				"shipping": "' . $order->mp_shipping_total . '",					// Shipping.
+				"tax": "' . $order->mp_tax_total . '"							 		// Tax.
+			});';
+			//loop the items
+			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
+				foreach ( $order->mp_cart_info as $product_id => $variations ) {
+					foreach ( $variations as $variation => $data ) {
+						$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+						$js .= 'ga("ecommerce:addItem", {
+									 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
+									 "name": "' . esc_attr( $data[ 'name' ] ) . '",	 // Product name. Required.
+									 "sku": "' . $sku . '",								// SKU/code.
+									 "category": "",			 					// Category or variation.
+									 "price": "' . $data[ 'price' ] . '",				 // Unit price.
+									 "quantity": "' . $data[ 'quantity' ] . '"		 // Quantity.
+								});';
+					}
+				}
+			}
+
+			$js .='ga("ecommerce:send");</script>';
+		}
+
+		//add to footer
+		if ( !empty( $js ) ) {
+			$function = "echo '$js';";
+			add_action( 'wp_footer', create_function( '', $function ), 99999 );
+		}
+	}
 
 }
 
