@@ -1,4 +1,5 @@
 <?php
+if( !defined('MP_EMAIL_USE_BILLIG_NAME')) define('MP_EMAIL_USE_BILLIG_NAME', false);
 
 if ( ! function_exists( 'mp' ) ) :
 
@@ -233,9 +234,11 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		// Tracking URL
 		$tracking_url = $order->tracking_url( false );
 
+		$customer_name = MP_EMAIL_USE_BILLIG_NAME ? $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) : $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' );
+
 		// Setup search/replace
 		$search_replace = array(
-			'CUSTOMERNAME' => $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ),
+			'CUSTOMERNAME' => $customer_name,
 			'ORDERID'      => $order->get_id(),
 			'ORDERINFOSKU' => $order_info,
 			'ORDERINFO'    => $order_info,
