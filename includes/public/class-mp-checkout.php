@@ -1407,19 +1407,20 @@ class MP_Checkout {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param string $what Either "prev" or "next".
 	 * @return string
 	 */
 
-	public function create_ga_ecommerce( $order ) {
-
-		if ( !is_object( $order ) )
+	public function create_ga_ecommerce( $order_id ) {
+		$order = new MP_Order( $order_id );
+		//if order not exist, just return false
+		if ( $order->exists() == false ) {
 			return false;
-
+		}
+		
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
 
-		if ( $this->get_setting( 'ga_ecommerce' ) == 'old' ) {
+		if ( mp_get_setting( 'ga_ecommerce' ) == 'old' ) {
 
 			$js = '<script type="text/javascript">
 try{
@@ -1452,7 +1453,7 @@ try{
 } catch(err) {}
 </script>
 ';
-		} else if ( $this->get_setting( 'ga_ecommerce' ) == 'new' ) {
+		} else if ( mp_get_setting( 'ga_ecommerce' ) == 'new' ) {
 
 			$js = '<script type="text/javascript">
 	_gaq.push(["_addTrans",
@@ -1519,7 +1520,7 @@ try{
 	</script>
 	';
 			}
-		} else if ( $this->get_setting( 'ga_ecommerce' ) == 'universal' ) {
+		} else if ( mp_get_setting( 'ga_ecommerce' ) == 'universal' ) {
 			// add the UA code
 
 			$js = '<script type="text/javascript">

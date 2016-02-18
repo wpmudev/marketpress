@@ -968,6 +968,8 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$html = apply_filters( 'mp_order/header', $html, $this );
+		
+		mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
 
 		if ( $echo ) {
 			echo $html;
