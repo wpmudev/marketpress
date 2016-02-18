@@ -1430,9 +1430,9 @@ try{
 		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
 		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
 		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
-		"' . esc_js( $order->mp_shipping_info[ 'city' ] ) . '",		// city
-		"' . esc_js( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
-		"' . esc_js( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 	);';
 
 			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
@@ -1462,9 +1462,9 @@ try{
 		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
 		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
 		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
-		"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",	 // city
-		"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",	 // state or province
-		"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 	]);';
 
 			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
@@ -1496,9 +1496,9 @@ try{
 			"' . $order->get_meta( 'mp_order_total' ) . '",									 // total - required
 			"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
 			"' . $order->get_meta( 'mp_shipping_total' ) . '",								 // shipping
-			"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",		// city
-			"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
-			"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 		]);';
 
 				if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
