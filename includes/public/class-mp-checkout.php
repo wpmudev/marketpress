@@ -1427,9 +1427,9 @@ try{
  pageTracker._addTrans(
 		"' . esc_js( $order->post_title ) . '",							 // order ID - required
 		"' . esc_js( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
-		"' . $order->mp_order_total . '",								 // total - required
-		"' . $order->mp_tax_total . '",									 // tax
-		"' . $order->mp_shipping_total . '",							 // shipping
+		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
+		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
 		"' . esc_js( $order->mp_shipping_info[ 'city' ] ) . '",		// city
 		"' . esc_js( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
 		"' . esc_js( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
@@ -1459,9 +1459,9 @@ try{
 	_gaq.push(["_addTrans",
 		"' . esc_attr( $order->post_title ) . '",						 // order ID - required
 		"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",				 // affiliation or store name
-		"' . $order->mp_order_total . '",								 // total - required
-		"' . $order->mp_tax_total . '",									 // tax
-		"' . $order->mp_shipping_total . '",							 // shipping
+		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
+		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
 		"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",	 // city
 		"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",	 // state or province
 		"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
@@ -1493,9 +1493,9 @@ try{
 		_gaq.push(["b._addTrans",
 			"' . esc_attr( $order->post_title ) . '",							 // order ID - required
 			"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
-			"' . $order->mp_order_total . '",									 // total - required
-			"' . $order->mp_tax_total . '",									 // tax
-			"' . $order->mp_shipping_total . '",								 // shipping
+			"' . $order->get_meta( 'mp_order_total' ) . '",									 // total - required
+			"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+			"' . $order->get_meta( 'mp_shipping_total' ) . '",								 // shipping
 			"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",		// city
 			"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
 			"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
@@ -1528,9 +1528,9 @@ try{
 		ga("ecommerce:addTransaction", {
 				"id": "' . esc_attr( $order->post_title ) . '",						// Transaction ID. Required.
 				"affiliation": "' . esc_attr( get_bloginfo( 'blogname' ) ) . '",	// Affiliation or store name.
-				"revenue": "' . $order->mp_order_total . '",						// Grand Total.
-				"shipping": "' . $order->mp_shipping_total . '",					// Shipping.
-				"tax": "' . $order->mp_tax_total . '"							 		// Tax.
+				"revenue": "' . $order->get_meta( 'mp_order_total' ) . '",						// Grand Total.
+				"shipping": "' . $order->get_meta( 'mp_shipping_total' ) . '",					// Shipping.
+				"tax": "' . $order->get_meta( 'mp_tax_total' ) . '"							 		// Tax.
 			});';
 			//loop the items
 			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
