@@ -1419,7 +1419,11 @@ class MP_Checkout {
 		
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
-
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		$products = $cart->get_items_as_objects();
+		
 		if ( mp_get_setting( 'ga_ecommerce' ) == 'old' ) {
 
 			$js = '<script type="text/javascript">
@@ -1435,19 +1439,16 @@ try{
 		"' . esc_js( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 	);';
 
-			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-				foreach ( $order->mp_cart_info as $product_id => $variations ) {
-					foreach ( $variations as $variation => $data ) {
-						$sku = !empty( $data[ 'SKU' ] ) ? esc_js( $data[ 'SKU' ] ) : $product_id;
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 						$js .= 'pageTracker._addItem(
-				"' . esc_js( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 				"' . $sku . '",									 // SKU/code - required
-				"' . esc_js( $data[ 'name' ] ) . '",		// product name
-				"' . $data[ 'price' ] . '",						// unit price - required
-				"' . $data[ 'quantity' ] . '"					 // quantity - required
+				"' . esc_attr( $product->title( false ) ) . '",			// product name
+				"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+				"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
 			);';
-					}
-				}
 			}
 			$js .= 'pageTracker._trackTrans(); //submits transaction to the Analytics servers
 } catch(err) {}
@@ -1467,20 +1468,17 @@ try{
 		"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 	]);';
 
-			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-				foreach ( $order->mp_cart_info as $product_id => $variations ) {
-					foreach ( $variations as $variation => $data ) {
-						$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 						$js .= '_gaq.push(["_addItem",
 				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 				"' . $sku . '",									 // SKU/code - required
-				"' . esc_attr( $data[ 'name' ] ) . '",			// product name
+				"' . esc_attr( $product->title( false ) ) . '",			// product name
 				"",												// category
-				"' . $data[ 'price' ] . '",						// unit price - required
-				"' . $data[ 'quantity' ] . '"					 // quantity - required
+				"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+				"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
 			]);';
-					}
-				}
 			}
 			$js .= '_gaq.push(["_trackTrans"]);
 </script>
@@ -1501,20 +1499,17 @@ try{
 			"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 		]);';
 
-				if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-					foreach ( $order->mp_cart_info as $product_id => $variations ) {
-						foreach ( $variations as $variation => $data ) {
-							$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+				foreach ( $products as $product ) {
+					$product = new MP_Product( $product->ID );
+					$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 							$js .= '_gaq.push(["b._addItem",
 					"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 					"' . $sku . '",									 // SKU/code - required
-					"' . esc_attr( $data[ 'name' ] ) . '",			// product name
+					"' . esc_attr( $product->title( false ) ) . '",			// product name
 					"",												// category
-					"' . $data[ 'price' ] . '",						// unit price - required
-					"' . $data[ 'quantity' ] . '"					 // quantity - required
+					"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+					"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
 				]);';
-						}
-					}
 				}
 				$js .= '_gaq.push(["b._trackTrans"]);
 	</script>
@@ -1533,20 +1528,19 @@ try{
 				"tax": "' . $order->get_meta( 'mp_tax_total' ) . '"							 		// Tax.
 			});';
 			//loop the items
-			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-				foreach ( $order->mp_cart_info as $product_id => $variations ) {
-					foreach ( $variations as $variation => $data ) {
-						$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
-						$js .= 'ga("ecommerce:addItem", {
-									 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
-									 "name": "' . esc_attr( $data[ 'name' ] ) . '",	 // Product name. Required.
-									 "sku": "' . $sku . '",								// SKU/code.
-									 "category": "",			 					// Category or variation.
-									 "price": "' . $data[ 'price' ] . '",				 // Unit price.
-									 "quantity": "' . $data[ 'quantity' ] . '"		 // Quantity.
-								});';
-					}
-				}
+			
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				
+				$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+				$js .= 'ga("ecommerce:addItem", {
+					 "id": "' . esc_attr( $product->ID ) . '", // Transaction ID. Required.
+					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
+					 "sku": "' . $sku . '",								// SKU/code.
+					 "category": "",			 					// Category or variation.
+					 "price": "' . $product->get_price( 'lowest' ) . '",				 // Unit price.
+					 "quantity": "' . $cart->get_item_qty( $product->ID ) . '"		 // Quantity.
+				});';
 			}
 
 			$js .='ga("ecommerce:send");</script>';
