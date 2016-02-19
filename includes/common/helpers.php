@@ -180,17 +180,28 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		}
 
 		$shipping_billing_info .= '</tr></table><br /><br />';
+		
+		$custom_carriers = mp_get_setting( 'shipping->custom_method', array() );
+		$method = $order->get_meta( 'mp_shipping_info->method' );
+		
+		if( isset( $custom_carriers[ $method ] ) && !empty( $custom_carriers[ $method ] ) ) {
+			$carrier = $custom_carriers[ $method ];
+		} else {
+			$carrier = $method;
+		}
 
 		// If actually shipped show method, else customer's shipping choice.
 		if ( $order->get_meta( 'mp_shipping_info->method' ) && $order->get_meta( 'mp_shipping_info->method' != 'other' ) ) {
-			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $order->get_meta( 'mp_shipping_info->method' );
+			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $carrier;
 			// If using calculated shipping, show the carrier and shipping option selected
 		} elseif ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) {
 			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option' );
+		} else {
+			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $carrier;
 		}
 
 		if ( $order->get_meta( 'mp_shipping_info->tracking_num' ) ) {
-			$shipping_billing_info .= "<br /><strong>" . __( 'Tracking Number:', 'mp' ) . ':</strong> ' . $order->get_meta( 'mp_shipping_info->tracking_num' );
+			$shipping_billing_info .= "<br /><strong>" . __( 'Tracking Number:', 'mp' ) . '</strong> ' . $order->get_meta( 'mp_shipping_info->tracking_num' );
 		}
 
 		// Special Instructions
