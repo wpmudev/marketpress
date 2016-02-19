@@ -1534,6 +1534,7 @@ class MP_Cart {
 				 * @param MP_Cart The current cart object.
 				 * @param array The current cart items.
 				 */
+
 				$this->_total['product'] += (float) apply_filters( 'mp_cart/product_total', $total, $items );
 
 				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
@@ -1565,7 +1566,6 @@ class MP_Cart {
 	public function product_tangible_total( $format = false ) {
 		$total                   = 0;
 		$blog_ids                = $this->get_blog_ids();
-		$this->_total['product'] = 0;
 
 		while ( 1 ) {
 			if ( $this->is_global ) {
