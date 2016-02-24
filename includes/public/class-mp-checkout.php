@@ -1441,7 +1441,8 @@ try{
 
 			foreach ( $products as $product ) {
 				$product = new MP_Product( $product->ID );
-				$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 						$js .= 'pageTracker._addItem(
 				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 				"' . $sku . '",									 // SKU/code - required
@@ -1470,7 +1471,8 @@ try{
 
 			foreach ( $products as $product ) {
 				$product = new MP_Product( $product->ID );
-				$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 						$js .= '_gaq.push(["_addItem",
 				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 				"' . $sku . '",									 // SKU/code - required
@@ -1501,7 +1503,8 @@ try{
 
 				foreach ( $products as $product ) {
 					$product = new MP_Product( $product->ID );
-					$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+					$meta = $product->get_meta( 'sku' );
+					$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 							$js .= '_gaq.push(["b._addItem",
 					"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 					"' . $sku . '",									 // SKU/code - required
@@ -1532,7 +1535,8 @@ try{
 			foreach ( $products as $product ) {
 				$product = new MP_Product( $product->ID );
 				
-				$sku = !empty( $product->get_meta( 'sku' ) ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 				$js .= 'ga("ecommerce:addItem", {
 					 "id": "' . esc_attr( $product->ID ) . '", // Transaction ID. Required.
 					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
