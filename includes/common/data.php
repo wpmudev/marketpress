@@ -590,6 +590,7 @@ $this->uk_counties = array(
 	'Leicestershire'				 => 'Leicestershire',
 	'Lincolnshire'					 => 'Lincolnshire',
 	'Londonderry'					 => 'Londonderry',
+    'Merseyside'                     => 'Merseyside',
 	'Merthyr Tydfil'				 => 'Merthyr Tydfil',
 	'Middlesex'						 => 'Middlesex',
 	'Midlothian/Edinburghshire'		 => 'Midlothian/Edinburghshire',
