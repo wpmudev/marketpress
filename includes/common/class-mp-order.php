@@ -235,11 +235,11 @@ class MP_Order {
 		$current_user = wp_get_current_user();
 
 		if( $registration_email && $current_user->user_email ) {
-	
+
 			mp_send_email( $current_user->user_email, $subject, $msg, $attachments );
-			
+
 		} else {
-			
+
 			$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
 			$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
 
@@ -249,7 +249,7 @@ class MP_Order {
 				// Billing email is different than shipping email so let's send an email to the shipping email too
 				mp_send_email( $shipping_email, $subject, $msg, $attachments );
 			}
-			
+
 		}
 	}
 
@@ -391,7 +391,7 @@ class MP_Order {
 	 * @param string $status The new order status.
 	 * @param bool $update_post Whether to update the post status or not.
 	 */
-	public function change_status( $status, $update_post = false ) {
+	public function change_status( $status, $update_post = false, $old_status = "" ) {
 		$cache_key = 'order_status_changed_' . $status . '_' . $this->ID;
 		if ( wp_cache_get( $cache_key, 'mp_order' ) ) {
 			// Order status already updated - bail
@@ -404,6 +404,13 @@ class MP_Order {
 		if ( false === strpos( $status, 'order_' ) && 'trash' != $status ) {
 			$status = 'order_' . $status;
 		}
+
+		// Increase sale if order come from trash
+		// Check if order was trashed after the 'decrease_sales' fix
+		// Prevent old trashed sales from being increased when restoring the order
+		$sales_decreased = get_post_meta( $this->ID, 'mp_sales_decreased', true );
+		if( $old_status == 'trash' && $sales_decreased == '1' )
+			$this->increase_sales();
 
 		switch ( $status ) {
 			case 'order_received' :
@@ -430,6 +437,8 @@ class MP_Order {
 
 			case 'trash' :
 				add_post_meta( $this->ID, 'mp_trashed_time', time(), true );
+				update_post_meta( $this->ID, 'mp_sales_decreased' , 1 , true );
+				$this->decrease_sales();
 				$action = 'mp_order_trashed';
 				break;
 
@@ -438,7 +447,7 @@ class MP_Order {
 				return false;
 				break;
 		}
-		
+
 		/**
 		 * Fires when an order status is updated
 		 *
@@ -523,7 +532,7 @@ class MP_Order {
 							<h2 class="mp_cart_item_title">
 								<a href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
 							</h2>
-							<?php 
+							<?php
 							if ( $product->is_download() && mp_is_shop_page( 'order_status' ) ) {
 								echo '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
 							}
@@ -616,7 +625,7 @@ class MP_Order {
 	 */
 	public function get_address( $type, $editable = false, $product_type = false ) {
 		if ( ! $editable ) {
-			
+
 			if( $product_type == 'digital' ) {
 				$html = '' .
 			        $this->get_name( $type ) . '<br />' .
@@ -637,14 +646,14 @@ class MP_Order {
 			}
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
-			
+
 			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
-			
+
 			// Country dropdown
 			if( ! is_array( $allowed_countries ) ) {
 				$allowed_countries = explode( ',', $allowed_countries );
 			}
-			
+
 			$country_options   = '';
 
 			if ( mp_all_countries_allowed() ) {
@@ -664,7 +673,7 @@ class MP_Order {
 					$state_options .= '<option value="' . $key . '" ' . selected( $key, $this->get_meta( "mp_{$type}_info->state", '' ), false ) . '>' . $val . '</option>' . "\n";
 				}
 			}
-			
+
 			$html = '';
 
 			$html .= '
@@ -681,8 +690,8 @@ class MP_Order {
 						<th scope="row">' . __( 'Company', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[company_name]" value="' . $this->get_meta( "mp_{$type}_info->company_name", '' ) . '" /></td>
 					</tr>';
-			if( $product_type != 'digital' ) {		
-				$html .= '		
+			if( $product_type != 'digital' ) {
+				$html .= '
 					<tr>
 						<th scope="row">' . __( 'Address 1', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[address1]" value="' . $this->get_meta( "mp_{$type}_info->address1", '' ) . '" /></td>
@@ -695,7 +704,7 @@ class MP_Order {
 						<th scope="row">' . __( 'City', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[city]" value="' . $this->get_meta( "mp_{$type}_info->city", '' ) . '" /></td>
 					</tr>';
-			
+
 				if ( is_array( $states ) ) {
 					$html .= '
 						<tr>
@@ -716,10 +725,10 @@ class MP_Order {
 							<th scope="row">' . __( 'Country', 'mp' ) . '</th>
 							<td><select class="mp-select2" name="' . $prefix . '[country]" style="width:100%">' . $country_options . '</select></td>
 						</tr>';
-					
+
 			}
-			
-			$html .= '		
+
+			$html .= '
 					<tr>
 						<th scope="row">' . __( 'Phone', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[phone]" value="' . $this->get_meta( "mp_{$type}_info->phone", '' ) . '"></td>
@@ -760,9 +769,9 @@ class MP_Order {
 	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
 	 */
 	public function get_addresses( $editable = false ) {
-		
+
 		$html = '<div class="mp_customer_address">';
-		
+
 		if ( $this->get_cart()->is_download_only() && mp_get_setting( 'details_collection' ) == "contact" ) {
 			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
@@ -925,9 +934,9 @@ class MP_Order {
 				<div class="mp_tooltip_content_item_label">' . __( 'Taxes:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
 				<div class="mp_tooltip_content_item_value">' . $tax_total . '</div><!-- end mp_tooltip_content_item_value -->
 			</div><!-- end mp_tooltip_content_item -->';
-		
+
 		if( ! $this->get_cart()->is_download_only() ) {
-			$tooltip_content .= '	
+			$tooltip_content .= '
 				<div class="mp_tooltip_content_item">
 					<div class="mp_tooltip_content_item_label">' . __( 'Shipping:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
 					<div class="mp_tooltip_content_item_value">' . $shipping_total . '</div><!-- end mp_tooltip_content_item_value -->
@@ -968,7 +977,7 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$html = apply_filters( 'mp_order/header', $html, $this );
-		
+
 		mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
 
 		if ( $echo ) {
@@ -1240,6 +1249,42 @@ class MP_Order {
 
 		// Cache the ID for later use
 		wp_cache_set( 'order_object', $this, 'mp' );
+	}
+
+	/**
+	 * Decrease Sales
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 */
+	public function decrease_sales(  ) {
+		$items = $this->get_cart()->get_items_as_objects();
+
+		foreach ( $items as $item ) {
+			// Decrease sales count
+			$count = $item->get_meta( 'mp_sales_count', 0 );
+			$count = ($count - $item->qty > 0) ? $count - $item->qty : 0   ;
+			update_post_meta( $item->ID, 'mp_sales_count', $count );
+		}
+	}
+
+	/**
+	 * Increase Sales
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 */
+	public function increase_sales(  ) {
+		$items = $this->get_cart()->get_items_as_objects();
+
+		foreach ( $items as $item ) {
+			// Decrease sales count
+			$count = $item->get_meta( 'mp_sales_count', 0 );
+			$count += $item->qty;
+			update_post_meta( $item->ID, 'mp_sales_count', $count );
+		}
 	}
 
 	/**
