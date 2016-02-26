@@ -278,6 +278,7 @@ class Marketpress {
 			'public'             => false,
 			'show_ui'            => true,
 			'show_in_nav_menus'	 => false,
+			'show_in_admin_bar'  => false,
 			'publicly_queryable' => true,
 			'hierarchical'       => true,
 			'rewrite'            => false,
