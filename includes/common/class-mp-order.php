@@ -332,8 +332,27 @@ class MP_Order {
 	 * @access protected
 	 */
 	protected function _send_shipment_notification() {
-		$subject = stripslashes( mp_get_setting( 'email->order_shipped->subject' ) );
-		$msg     = nl2br( stripslashes( mp_get_setting( 'email->order_shipped->text' ) ) );
+
+		// We can't rely on cart's is_digital_only() because we have three scenarios here
+		$has_downloads = $has_physical = false;
+		$items = $this->get_cart()->get_items_as_objects();
+		foreach ( $items as $product ) {
+			if( $product->is_download() ) {
+				$has_downloads = true;
+			} else {
+				$has_physical = true;
+			}
+		}
+
+		$notification_kind = 'order_shipped';
+		if($has_downloads && $has_physical) {
+			$notification_kind = 'order_shipped_mixed';
+		} else if( $has_downloads ) {
+			$notification_kind = 'order_shipped_downloads';
+		}
+
+		$subject = stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) );
+		$msg     = nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) );
 
 		if ( has_filter( 'mp_shipped_order_notification_subject' ) ) {
 			trigger_error( 'The <strong>mp_shipped_order_notification_subject</strong> hook has been replaced with <strong>mp_order/shipment_notification_subject</strong> as of MP 3.0', E_USER_ERROR );

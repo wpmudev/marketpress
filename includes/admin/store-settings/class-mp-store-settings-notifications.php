@@ -134,6 +134,54 @@ class MP_Store_Settings_Notifications {
 				),
 			));
 		}		
+
+		$order_shipped_downloads = $customer_metabox->add_field( 'complex', array(
+			'name' => 'email[order_shipped_downloads]',
+			'label' => array( 'text' => __( 'Order Shipped - Digital downloads only orders', 'mp' ) ),
+			'layout' => 'rows',
+		) );
+		
+		if ( $order_shipped_downloads instanceof WPMUDEV_Field ) {
+			$order_shipped_downloads->add_field( 'text', array(
+				'name' => 'subject',
+				'label' => array( 'text' => __( 'Subject', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+				),
+			) );
+			$order_shipped_downloads->add_field( 'textarea', array(
+				'name' => 'text',
+				'label' => array( 'text' => __( 'Text', 'mp' ) ),
+				'custom' => array( 'rows' => 15 ),
+				'validation' => array(
+					'required' => true,
+				),
+			) );
+		}
+
+		$order_shipped_mixed = $customer_metabox->add_field( 'complex', array(
+			'name' => 'email[order_shipped_mixed]',
+			'label' => array( 'text' => __( 'Order Shipped - Mixed orders (with both digital and physical products)', 'mp' ) ),
+			'layout' => 'rows',
+		) );
+		
+		if ( $order_shipped_mixed instanceof WPMUDEV_Field ) {
+			$order_shipped_mixed->add_field( 'text', array(
+				'name' => 'subject',
+				'label' => array( 'text' => __( 'Subject', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+				),
+			) );
+			$order_shipped_mixed->add_field( 'textarea', array(
+				'name' => 'text',
+				'label' => array( 'text' => __( 'Text', 'mp' ) ),
+				'custom' => array( 'rows' => 15 ),
+				'validation' => array(
+					'required' => true,
+				),
+			) );
+		}
 		
 		$customer_metabox->add_field('checkbox', array(
 			'name' => 'email_registration_email',
