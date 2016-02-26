@@ -128,7 +128,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 
 		// Billing Info
 		$payment->setParameter("x_card_code", mp_get_post_value( 'mp_cc_cvc' ) );
-		$payment->setParameter("x_exp_date ", mp_get_post_value( 'mp_cc_exp' ) );
+		$payment->setParameter("x_exp_date ", str_replace( array( ' ', '/' ), '', mp_get_post_value( 'mp_cc_exp' ) ) );
 		$payment->setParameter("x_amount", $cart->total( false ) );
 		$payment->setParameter("x_currency_code", $this->currencyCode);
 
