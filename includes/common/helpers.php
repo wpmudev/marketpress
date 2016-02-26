@@ -227,7 +227,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 
 		$payment_info .= '<strong>' . __( 'Payment Total:', 'mp' ) . '</strong> ' . mp_format_currency( $currency, $order->get_meta( 'mp_payment_info->total' ) ) . "<br /><br />\n";
 
-		if ( $order->post_status == 'order_paid' ) {
+		if ( $order->post_status == 'order_paid' || $order->post_status == 'order_shipped' ) {
 			$payment_info .= __( 'Your payment for this order is complete.', 'mp' );
 		} else {
 			$payment_info .= __( 'Your payment for this order is not yet complete. Here is the latest status:', 'mp' ) . "\n";
