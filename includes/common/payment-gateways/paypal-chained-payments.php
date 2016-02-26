@@ -686,7 +686,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$response = wp_remote_post( $this->API_Endpoint . $methodName, $args );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
-			mp()->cart_checkout_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
+			mp_checkout()->add_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
 
 			return false;
 		} else {
