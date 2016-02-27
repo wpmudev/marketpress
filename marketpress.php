@@ -395,7 +395,7 @@ class Marketpress {
 	}
 
 	function add_menu_items() {
-		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
+		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=' . MP_Product::get_post_type() );
 	}
 
 	function localization() {
