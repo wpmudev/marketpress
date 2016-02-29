@@ -2126,8 +2126,8 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 			} else {
 				$order = new MP_Order( $order_id );
 				if ( $order->exists() ) {
-					//only owner can see
-					if ( $order->post_author != get_current_user_id() ) {
+					//only owner and store admins can see
+					if ( $order->post_author != get_current_user_id() && !current_user_can( apply_filters( 'mp_store_settings_cap', 'read_store_order' ) ) ) {
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 					} else {
 						$html .= $order->details( false );
