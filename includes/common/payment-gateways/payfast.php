@@ -177,7 +177,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
 
         //loop through cart items
         if (!is_array($cart) || count($cart) == 0) {
-            retrun;
+            return;
         }
         $totals = array();
 
