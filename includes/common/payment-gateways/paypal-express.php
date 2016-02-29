@@ -436,8 +436,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 				$i ++;
 			}
-			
-			if( function_exists( $vcart->update_total ) ) {
+
+			if( method_exists( $vcart, 'update_total' ) ) {
 				$vcart->update_total( array() );// Reset in order to prevent issue caused by cart subtotals being pre-set to 0.
 			}
 
