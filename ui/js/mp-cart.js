@@ -451,13 +451,46 @@ var mp_cart = { };
                     if ( $lineItem.siblings( '.mp_cart_item' ).length == 0 && $lineItem.closest( '.mp_cart_store' ).length > 0 ) {
                         $lineItem.closest( '.mp_cart_store' ).remove();
                     } else {
-                        $lineItem.remove();
+                        $lineItem.after( resp.data.cart_item_line ).remove();
                     }
 
                     $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
 
                     marketpress.loadingOverlay( 'hide' );
                 }
+            }
+            $( window ).trigger( 'resize' );
+        } );
+    }
+
+    /**
+     * Undo Remove an item from the shopping cart
+     *
+     * @since 3.0
+     * @param int itemId The item ID to remove.
+     */
+    mp_cart.undoRemoveItem = function( itemId ) {
+        if ( itemId === undefined ) {
+            return false;
+        }
+
+        itemId = itemId.toString();
+
+        var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
+        var data = {
+            "product": itemId,
+            "cart_action": "undo_remove_item",
+            "is_cart_page": mp_cart_i18n.is_cart_page
+        };
+
+        marketpress.loadingOverlay( 'show' );
+
+        $.post( url, data ).done( function( resp ) {
+            if ( resp.success ) {
+                var $lineItem = $( '#mp-cart-item-' + itemId.escapeSelector() );
+                $lineItem.after( resp.data.cart_item_line ).remove();
+                $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
+                marketpress.loadingOverlay( 'hide' );
             }
             $( window ).trigger( 'resize' );
         } );
