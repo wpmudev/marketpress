@@ -482,15 +482,25 @@ class MP_Product {
 	 * @uses $post
 	 *
 	 * @param int /object/WP_Post $product Optional if in the loop.
+	 * @param int $blog_id Optional to use when global cart
 	 */
-	public function __construct( $product = null ) {
+	public function __construct( $product = null , $blog_id = null ) {
 		if ( is_null( $product ) && in_the_loop() ) {
 			global $post;
 			$product = $post;
 		}
 
+		if ( !is_null( $blog_id ) ) {
+			$current_blog_id = get_current_blog_id();
+			switch_to_blog( $blog_id );
+		}
+
 		$this->_get_post( $product );
 		$this->_set_content_tabs( $this );
+
+		if ( !is_null( $blog_id ) ) {
+			switch_to_blog( $current_blog_id );
+		}		
 	}
 
 	/**
