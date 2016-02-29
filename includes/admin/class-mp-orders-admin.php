@@ -216,7 +216,7 @@ class MP_Orders_Admin {
 
 	public function delete_post_hook( $post_id ) {
 		do_action( 'mp_product_deleted', $post_id );
-		
+
 		$user_id = get_current_user_id();
 
 		if ( ! $user_id ) 	return;
@@ -231,9 +231,9 @@ class MP_Orders_Admin {
 		$orders = (array) get_user_meta( $user_id, $order_history_key, true );
 
 		foreach ( $orders as $key => $order ) {
-			if ( ! empty( $order['id'] ) && $post_id === $order['id'] ) {			
+			if ( ! empty( $order['id'] ) && $post_id === $order['id'] ) {
 				unset( $orders[ $key ] );
-				break;					
+				break;
 			}
 		}
 
@@ -300,10 +300,10 @@ class MP_Orders_Admin {
 			&$this,
 			'meta_box_payment_info'
 		), 'mp_order', 'side', 'core' );
-		
+
 		$order = new MP_Order( $this );
 		$cart = $order->get_meta( 'mp_cart_info' );
-		
+
 		if ( is_object( $cart ) && ! $cart->is_download_only() ) {
 			add_meta_box( 'mp-order-shipping-info-metabox', __( 'Shipping Info', 'mp' ), array(
 				&$this,
@@ -320,7 +320,7 @@ class MP_Orders_Admin {
 	 */
 	public function meta_box_payment_info( $post ) {
 		$order = new MP_Order( $post );
-		
+
 		$cart = $order->get_meta( 'mp_cart_info' );
 
 		if ( $cart instanceof MP_Cart ) {
@@ -344,12 +344,12 @@ class MP_Orders_Admin {
 				:</strong><br/><?php echo $product_total; ?></div>
 		<?php if( $tax_total && $tax_total != '&mdash;' ) { ?>
 		<div class="misc-pub-section"><strong><?php _e( 'Taxes Total', 'mp' ); ?>
-				:</strong><br/><?php echo $tax_total; ?></div>	
+				:</strong><br/><?php echo $tax_total; ?></div>
 		<?php } ?>
-		<?php if( $shipping_total && $shipping_total != '&mdash;' ) { ?>		
+		<?php if( $shipping_total && $shipping_total != '&mdash;' ) { ?>
 		<div class="misc-pub-section"><strong><?php _e( 'Shipping Total', 'mp' ); ?>
-				:</strong><br/><?php echo $shipping_total; ?></div>		
-		<?php } ?>		
+				:</strong><br/><?php echo $shipping_total; ?></div>
+		<?php } ?>
 		<div class="misc-pub-section" style="background:#f5f5f5;border-top:1px solid #ddd;">
 			<strong><?php _e( 'Payment Total', 'mp' ); ?>
 				:</strong><br/><?php echo mp_format_currency( '', $order->get_meta( 'mp_payment_info->total' ) ); ?>
@@ -485,11 +485,11 @@ class MP_Orders_Admin {
 		$carriers = apply_filters( 'mp_shipping_carriers_array', array_merge( $carriers, $custom_carriers ) );
 
 		wp_nonce_field( 'mp_save_shipping_info', 'mp_save_shipping_info_nonce' );
-		
+
 		$cart = $order->get_meta( 'mp_cart_info' );
-		
+
 		$shipping_tax_total = '';
-		
+
 		if ( $cart instanceof MP_Cart ) {
 			$shipping_tax_total = $cart->shipping_tax_total( true );
 		}
@@ -498,10 +498,10 @@ class MP_Orders_Admin {
 			<strong><?php _e( 'Amount Collected', 'mp' ); ?>:</strong><br/>
 			<?php echo mp_format_currency( '', $order->get_meta( 'mp_shipping_total', 0 ) ); ?>
 		</div>
-		<?php if( $shipping_tax_total && $shipping_tax_total != '&mdash;' && mp_get_setting( 'tax->tax_shipping' )) { ?>		
+		<?php if( $shipping_tax_total && $shipping_tax_total != '&mdash;' && mp_get_setting( 'tax->tax_shipping' )) { ?>
 		<div class="misc-pub-section"><strong><?php _e( 'Shipping Tax', 'mp' ); ?>
-				:</strong><br/><?php echo $shipping_tax_total; ?></div>		
-		<?php } ?>	
+				:</strong><br/><?php echo $shipping_tax_total; ?></div>
+		<?php } ?>
 		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
 			<div class="misc-pub-section">
 				<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br/>
@@ -696,14 +696,21 @@ class MP_Orders_Admin {
 		$wp_list_table = _get_list_table( 'WP_Posts_List_Table' );
 		$action        = $wp_list_table->current_action();
 
+
 		$posts         = mp_get_get_value( 'post', array() );
+
+		if ( 'untrash' == $action ) {
+			$posts         = explode( ',' , mp_get_get_value( 'ids', array() ) );
+		}
+
 		$valid_actions = array(
 			'order_received',
 			'order_paid',
 			'order_shipped',
 			'order_closed',
 			'trash',
-			'delete_all'
+			'delete_all',
+			'untrash'
 		);
 		$pagenum       = $wp_list_table->get_pagenum();
 
@@ -749,10 +756,23 @@ class MP_Orders_Admin {
 				wp_delete_post( $post->ID, true );
 			}
 		} else {
+
 			foreach ( $posts as $post_id ) {
+				$post_status = $action;
+				//if bulk action is untrash then restore the last status before trash
+				if ( 'untrash' == $action ) {
+
+					$order = new MP_Order( $post_id );
+
+					//Get the last order status before trash
+					$post_status = get_post_meta( $post_id, '_wp_trash_meta_status', true );
+					if( ! $post_status )
+						$post_status = 'order_received';
+				}
+
 				wp_update_post( array(
 					'ID'          => $post_id,
-					'post_status' => $action
+					'post_status' => $post_status
 				) );
 			}
 
@@ -818,7 +838,7 @@ class MP_Orders_Admin {
 		}
 
 		$order = new MP_Order( $post );
-		$order->change_status( $new_status, false );
+		$order->change_status( $new_status, false, $old_status );
 	}
 
 	/**
@@ -1093,7 +1113,7 @@ class MP_Orders_Admin {
 					$shipping = get_post_meta( $post_id, 'mp_shipping_total', true );
 					$html .= mp_format_currency( '', $shipping );
 				}
-				
+
 				break;
 
 			//! Order Tax
@@ -1162,7 +1182,7 @@ class MP_Orders_Admin {
 	public function orders_search_join ( $join ){
 		global $pagenow, $wpdb;
 
-		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+		if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] )  && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {
 			$join .= " LEFT JOIN {$wpdb->postmeta} ON {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id ";
 		}
 
@@ -1181,7 +1201,7 @@ class MP_Orders_Admin {
 	public function orders_search_where( $where ){
 		global $pagenow, $wpdb;
 
-		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+		if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {
 			$where = preg_replace(
 				"/\(\s*{$wpdb->posts}.post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
 				"({$wpdb->posts}.post_title LIKE $1) OR ({$wpdb->postmeta}.meta_value LIKE $1)", $where
@@ -1203,7 +1223,7 @@ class MP_Orders_Admin {
 	public function orders_search_groupby( $groupby ){
 		global $pagenow, $wpdb;
 
-		if ( $pagenow === 'edit.php' && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {    
+		if ( $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'mp_order' && ! empty( $_GET['s'] ) ) {
 			$groupby = "{$wpdb->posts}.ID";
 		}
 

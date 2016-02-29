@@ -278,6 +278,7 @@ class Marketpress {
 			'public'             => false,
 			'show_ui'            => true,
 			'show_in_nav_menus'	 => false,
+			'show_in_admin_bar'  => false,
 			'publicly_queryable' => true,
 			'hierarchical'       => true,
 			'rewrite'            => false,
@@ -490,11 +491,14 @@ class Marketpress {
 	function mp_product_variation_metaboxes() {
 		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : ( isset( $_POST['post_ID'] ) ? (int) $_POST['post_ID'] : '' );
 		if ( $post_id !== '' ) {
+			ob_start();
 			$variation_title = get_post_meta( $post_id, 'name', true );
 			?>
 			<input type="hidden" name="variation_title" id="variation_title"
 			       value="<?php echo esc_attr( $variation_title ); ?>"/>
 			<?php
+			
+			return ob_get_clean();
 		}
 	}
 

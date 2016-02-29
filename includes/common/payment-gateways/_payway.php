@@ -8,28 +8,28 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'payway';
-  
+
   //name of your gateway, for the admin side.
   var $admin_name = 'payway';
-  
+
   //public name of your gateway, for lists and such.
   var $public_name = 'payway';
-  
+
   //url for an image for your checkout method. Displayed on method form
   var $method_img_url = '';
 
   //url for an submit button image for your checkout method. Displayed on checkout form if set
   var $method_button_img_url = '';
-  
+
   //whether or not ssl is needed for checkout page
   var $force_ssl = true;
-  
+
   //always contains the url to send payment notifications to if needed by your gateway. Populated by the parent class
   var $ipn_url;
-  
+
 	//whether if this is the only enabled gateway it can skip the payment_form step
   var $skip_form = true;
-  
+
   /****** Below are the public methods you may overwrite via a plugin ******/
 
   /**
@@ -46,9 +46,9 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$this->returnURL = mp_checkout_step_url('confirm-checkout');
 		$this->cancelURL = mp_checkout_step_url('checkout') . "?cancel=1";
 		$this->errorURL	= mp_checkout_step_url('checkout') . "?err=1";
-		
+
 	}
-	
+
   /**
    * Return fields you need to add to the payment screen, like your credit card info fields
    *
@@ -59,12 +59,12 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		if (isset($_GET['cancel']))
 			echo '<div class="mp_checkout_error">' . __('Your PayWay transaction has been canceled.', 'mp') . '</div>';
   }
-  
+
   /**
    * Use this to process any fields you added. Use the $_POST global,
    *  and be sure to save it to both the $_SESSION and usermeta if logged in.
    *  DO NOT save credit card details to usermeta as it's not PCI compliant.
-   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
+   *  Call mp_checkout()->add_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
@@ -80,13 +80,13 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$parameters['payment_reference'] = $order_id;
 		$parameters['payment_reference_change'] = 'false';
 		$parameters['surcharge_rates'] = 'VI/MC=0.0,AX=1.5,DC=1.5';
-		
+
 		$i = 1;
 		$coupon_code = mp()->get_coupon_code();
-		
+
 		foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$price = mp()->coupon_value_product($coupon_code, $data['price'], $product_id);			
+				$price = mp()->coupon_value_product($coupon_code, $data['price'], $product_id);
 				$items[] = array(
 					'itemNumber'.$i => $data['SKU'], // Article number
 					'itemDescription'.$i => $data['name'], // Description
@@ -108,7 +108,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
     if ( ($shipping_price = mp()->shipping_price(false)) !== false ) {
 			$total += $shipping_price;
 			$shipping_tax = (mp()->shipping_tax_price($shipping_price) - $shipping_price);
-			
+
 			$parameters["Shipping"] = '1,'.$shipping_price;
 			//Add shipping as separate product
 			$items[] = array(
@@ -124,23 +124,23 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
     if ( ! mp_get_setting('tax->tax_inclusive') ) {
     	$tax_price = (mp()->tax_price(false) + $shipping_tax);
 			$total += $tax_price;
-			
+
 			if ( ! empty($tax_price) )
 				$parameters["Tax"] = '1,'.$tax_price;
-				
+
 			//Add tax as separate product
 			$items[] = array(
 				'itemNumber'.$i => '99999999', // Product number
 				'itemDescription'.$i => __('Tax', 'mp'), // Description
 				'itemQuantity'.$i => 1, // Quantity
 				'itemPrice'.$i => round($tax_price*100)  // Product price in cents
-			);			
+			);
     }
-    				
+
 		$total = round($total * 100);
 
 		// Hand-off to the PayWay payment page
-		
+
 		$token 			= getToken( $parameters );
 		$payWayBaseUrl 	= 'https://www.payway.com.au/';
 		if ( $TAILORED )
@@ -152,13 +152,13 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 			{
 				$handOffUrl = $payWayBaseUrl . "MakePayment?";
 			}
-			
-			
+
+
 		//setup transients for ipn in case checkout doesn't redirect (ipn should come within 12 hrs!)
 		set_transient('mp_order_'. $order_id . '_cart', $cart, 60*60*12);
 		set_transient('mp_order_'. $order_id . '_shipping', $shipping_info, 60*60*12);
 		set_transient('mp_order_'. $order_id . '_userid', $current_user->ID, 60*60*12);
-		
+
 		$handOffUrl = $handOffUrl . "biller_code=" .
 		$parameters['biller_code'] . "&token=" . urlencode( $token );
 		debugLog( "Hand-off URL: " . $handOffUrl );
@@ -166,7 +166,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		wp_redirect($handOffUrl);
 		exit;
   }
-  
+
   /**
    * Return the chosen payment details here for final confirmation. You probably don't need
    *  to post anything in the form as it should be in your $_SESSION var already.
@@ -216,11 +216,11 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 	 */
 	function process_payment( $cart, $billing_info, $shipping_info ) {
 	}
-	
+
   /**
    * Runs before page load incase you need to run any scripts before loading the success message page
    */
-	function order_confirmation($order) { 
+	function order_confirmation($order) {
   }
 	/**
    * Filters the order confirmation email message body. You may want to append something to
@@ -231,7 +231,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 	function order_confirmation_email($msg, $order) {
     return $msg;
   }
-  
+
   /**
    * Return any html you want to show on the confirmation screen after checkout. This
    * should be a payment details box and message.
@@ -241,7 +241,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 	function order_confirmation_msg($content, $order) {
     return $content;
   }
-  
+
   /**
    * Initialize the settings metabox
    *
@@ -305,7 +305,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 			),
 		));
   }
-  
+
 	/**
    * Use to handle any payment returns to the ipn_url. Do not display anything here. If you encounter errors
    *  return the proper headers. Exits after.
@@ -318,13 +318,13 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 		$data			=	$encryptionKey .' : '. $encryptedParametersText.' : '. $signatureText;
 		foreach($parameters as $key=>$value)
 		{
-			$data	.= $key.'	=>'.$value.'\r'; 	
+			$data	.= $key.'	=>'.$value.'\r';
 		}
 		$myFile	 = "ipnpostadata.txt";
 		$fh		 = fopen($myFile, 'w') or die("can't open file");
 		fwrite($fh, $data);
 		fclose($fh);
-		
+
 		if (empty($parameters)) {
 			header('HTTP/1.0 403 Forbidden');
 			exit('We were unable to authenticate the request');
@@ -340,7 +340,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 			$payment_info['gateway_public_name'] 	= $this->public_name;
 			$payment_info['gateway_private_name'] 	= $this->admin_name;
 			$payment_info['method'] 				= isset($parameters['card_type']) ? $parameters['card_type'] : __('PayWay balance, Credit Card, or Instant Transfer', 'mp');
-			$payment_info['transaction_id'] 		= $parameters['payment_number']; 
+			$payment_info['transaction_id'] 		= $parameters['payment_number'];
 			$timestamp 	= time();
 			$order_id 	= $parameters['payment_number'];
 			//setup status
@@ -349,36 +349,36 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 				$status = __('Processed - The payment has been completed, and the funds have been added successfully to your Moneybookers account balance.', 'mp');
 				$create_order = true;
 				$paid = true;
-				break;				
+				break;
 				case '1':
 				$status = __('Cancelled - The payment was cancelled manually by the sender in their online account history or was auto-cancelled after 14 days pending.', 'mp');
 				$create_order = false;
 				$paid = false;
 				break;
-				
+
 				case '2':
 				$status = __('Failed - A payment was rejected due to an error.', 'mp');
 				$create_order = false;
 				$paid = false;
 				break;
-				
+
 				case '3':
 				$status = __('Rejected - A payment was rejected.', 'mp');
 				$create_order = false;
 				$paid = false;
 				break;
-				
+
 				default:
 				// case: various error cases
 				$create_order = false;
 				$paid = false;
 			}
-			
+
 			//status's are stored as an array with unix timestamp as key
 			$payment_info['status'][$timestamp] = $status;
 			$payment_info['total'] 				= $payment_amount['amount'];
 			$payment_info['currency'] 			= '$';
-			
+
 			if (mp()->get_order($order_id)) {
 				mp()->update_order_payment_status($order_id, $status, $paid);
 			} else if ($create_order) {
@@ -387,7 +387,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 				$shipping_info = get_transient('mp_order_' . $order_id . '_shipping');
 				$user_id = get_transient('mp_order_' . $order_id . '_userid');
 				$success = mp()->create_order($order_id, $cart, $shipping_info, $payment_info, $paid, $user_id);
-				
+
 				//if successful delete transients
 				if ($success) {
 					delete_transient('mp_order_' . $order_id . '_cart');
@@ -395,7 +395,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 					delete_transient('mp_order_' . $order_id . '_userid');
 				}
 			}
-			
+
 			//if we get this far return success so ipns don't get resent
 			header('HTTP/1.0 200 OK');
 			exit('Successfully recieved!');
@@ -408,8 +408,8 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 
 function getToken( $parameters ) {
 	$payWayUrl = 'https://www.payway.com.au/';
-	
-	
+
+
 	// Build the parameters string to pass to PayWay
 	$parametersString = '';
 	$init = true;
@@ -422,10 +422,10 @@ function getToken( $parameters ) {
 		else
 		{
 			$parametersString = $parametersString . '&';
-		}  
+		}
 		$parametersString = $parametersString . urlencode($paramName) . '=' . urlencode($paramValue);
 	}
-	
+
 
 	$args	=	array();
 	$args['body'] = $parametersString;
@@ -436,12 +436,12 @@ function getToken( $parameters ) {
 	$args['body'] 			= $parameters;
 	$response			=	wp_remote_post( $payWayUrl . "RequestToken", $args);
 	$responseText		=	$response["body"];
-	
+
 	debugLog( "Token Request POST: " . $parametersString );
 
-	
+
 	debugLog( "Token Response: " . $responseText );
-	
+
 	// Split the response into parameters
 	$responseParameterArray = explode( "&", $responseText );
 	$responseParameters 	= array();
@@ -450,11 +450,11 @@ function getToken( $parameters ) {
 		list( $paramName, $paramValue ) = explode( "=", $responseParameter, 2 );
 		$responseParameters[ $paramName ] = $paramValue;
 	}
-	
+
 	if ( array_key_exists( 'error', $responseParameters ) )
 	{
 		trigger_error( "Error getting token: " . $responseParameters['error'] );
-	}        
+	}
 	else
 	{
 		return $responseParameters['token'];
@@ -467,8 +467,8 @@ function debugLog( $message ) {
 	list($usec, $sec) = explode(" ", microtime());
 	$dtime = date( "Y-m-d H:i:s." . sprintf( "%03d", (int)(1000 * $usec) ), $sec );
 	$filename = $logDir . "/" . "net_" . date( "Ymd" ) . ".log";
-	$fp = fopen( $filename, "a" ); 
-	fputs( $fp, $dtime . ' ' . $message . "\r\n" ); 
+	$fp = fopen( $filename, "a" );
+	fputs( $fp, $dtime . ' ' . $message . "\r\n" );
 	fclose( $fp );
 }
 

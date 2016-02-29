@@ -131,6 +131,16 @@ $this->default_settings = array(
 			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
 			'text'		 => __( "Dear CUSTOMERNAME,\n Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
 			),
+		),
+		'order_shipped_downloads'	 => array(
+			'subject'	 => __( 'Your Order Is Ready To Be Downloaded! (ORDERID)', 'mp' ),
+			'text'		 => __( "Dear CUSTOMERNAME,\n Your order is now available to download! Please refer to your Order ID (ORDERID) whenever contacting us.\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n Thanks again!", 'mp'
+			),
+		),
+		'order_shipped_mixed'	 => array(
+			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
+			'text'		 => __( "Dear CUSTOMERNAME,\n Your order has been shipped! Also, digital downloads included in your order are now ready to be downloaded. Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			),
 		) ),
 	'social'					 => array(
 		'pinterest' => array(
@@ -590,6 +600,7 @@ $this->uk_counties = array(
 	'Leicestershire'				 => 'Leicestershire',
 	'Lincolnshire'					 => 'Lincolnshire',
 	'Londonderry'					 => 'Londonderry',
+	'Merseyside'					 => 'Merseyside',
 	'Merthyr Tydfil'				 => 'Merthyr Tydfil',
 	'Middlesex'						 => 'Middlesex',
 	'Midlothian/Edinburghshire'		 => 'Midlothian/Edinburghshire',

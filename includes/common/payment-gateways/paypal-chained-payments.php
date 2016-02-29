@@ -679,12 +679,14 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$args['body']       = $nvpStr . '&requestEnvelope.errorLanguage=en_US';
 		$args['sslverify']  = false;
 		$args['timeout']    = 60;
+		// Paypals sandbox stopped supporting HTTP 1.0 and only supports HTTP 1.1
+		$args['httpversion']    = '1.1';
 
 		//use built in WP http class to work with most server setups
 		$response = wp_remote_post( $this->API_Endpoint . $methodName, $args );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
-			mp()->cart_checkout_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
+			mp_checkout()->add_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
 
 			return false;
 		} else {
