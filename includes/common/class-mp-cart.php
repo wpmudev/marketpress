@@ -463,8 +463,12 @@ class MP_Cart {
 	 * @return array
 	 */
 	public function get_items() {
-		$items = mp_arr_get_value( $this->_id, $this->_items, array() );
+		$items = array();
 
+		if ( is_int( $this->_id ) ) {
+			$items = mp_arr_get_value( $this->_id, $this->_items, array() );
+		}
+		
 		return (array) $items;
 	}
 
