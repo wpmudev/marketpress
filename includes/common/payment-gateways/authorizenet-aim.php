@@ -202,7 +202,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			exit;
 		} else {
 			$error = $payment->getResponseText();
-			mp_checkout()->add_error( sprintf( __( 'There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp'), $error, mp_store_page_url( 'checkout', false ) ), 'order-review-payment' );
+			mp_checkout()->add_error( sprintf( __( 'There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp'), $error, mp_store_page_url( 'checkout', false ) ), 'order-review-payment' , false );
 		}
 	}
 
