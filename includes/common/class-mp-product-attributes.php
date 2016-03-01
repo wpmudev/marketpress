@@ -216,6 +216,10 @@ class MP_Product_Attributes {
 	public function sort( $attributes, $grouping = true ) {
 		$groups = array();
 		
+		// Fix wrong taxonomy bug
+		if ( is_wp_error( $attributes ) ){
+			return array();
+		}
 		// Put attributes into groups by taxonomy
 		foreach ( $attributes as $attribute ) {
 			$groups[$attribute->taxonomy][] = $attribute;
