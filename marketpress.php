@@ -266,6 +266,7 @@ class Marketpress {
 			'show_ui'         => true,
 			'show_in_menu'    => false,
 			'capability_type' => array( 'store_order', 'store_orders' ),
+			'capabilities'    => array( 'create_posts' => 'do_not_allow' ), // Temporarily disable creating order from admin
 			'map_meta_cap'    => true,
 			'hierarchical'    => false,
 			'rewrite'         => false,
