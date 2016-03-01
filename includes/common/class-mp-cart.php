@@ -255,6 +255,11 @@ class MP_Cart {
 			}
 		}
 
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			list( $blog_id, $item_id ) = explode( '.', $item_id );
+			$this->set_id( intval( $blog_id ) );
+		}
+
 		if ( mp_get_post_value( 'cart_action' ) != 'empty_cart' && is_null( $item_id ) ) {
 			wp_send_json_error();
 		}
@@ -276,7 +281,7 @@ class MP_Cart {
 
 			case 'update_item' :
 				$this->update_item( $item_id, $qty );
-				$product      = new MP_Product( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );			
 				$product->qty = $qty;
 				wp_send_json_success( array(
 					'product'  => array( $item_id => $this->get_line_item( $product ) ),
@@ -285,9 +290,9 @@ class MP_Cart {
 				break;
 
 			case 'remove_item' :
+
 				$this->remove_item( $item_id );
-				$product      = new MP_Product( $item_id );
-				wp_send_json_success( array(
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );							wp_send_json_success( array(
 					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
 					'cart_item_line'  	=> $this->get_line_removed_item( $product ),
 					'cartmeta'   		=> $this->cart_meta( false ),
@@ -297,7 +302,7 @@ class MP_Cart {
 
 			case 'undo_remove_item' :
 				$this->add_item( $item_id );
-				$product      = new MP_Product( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
 					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
 					'cart_item_line'  	=> $this->get_line_item( $product ),
@@ -312,6 +317,10 @@ class MP_Cart {
 					'item_count' => 0,
 				) );
 				break;
+		}
+
+		if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+			$this->reset_id();
 		}
 
 		wp_send_json_error();
@@ -1682,7 +1691,7 @@ class MP_Cart {
 	public function remove_item( $item_id ) {
 		if ( $this->_is_global_item_id( $item_id ) ) {
 			list( $blog_id, $item_id ) = explode( '.', $item_id );
-			$this->set_id( $blog_id );
+			$this->set_id( intval( $blog_id ) );
 		}
 
 		if ( mp_arr_get_value( $this->_id . '->' . $item_id, $this->_items ) ) {
@@ -1711,8 +1720,10 @@ class MP_Cart {
 			 */
 			do_action( 'mp_cart/after_remove_item', $item_id, $this->_id );
 		}
-
-		$this->reset_id();
+		
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			$this->reset_id();
+		}			
 	}
 
 	/**
