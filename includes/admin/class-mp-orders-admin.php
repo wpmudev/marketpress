@@ -48,7 +48,7 @@ class MP_Orders_Admin {
 		add_action( 'save_post', array( &$this, 'post_status_hook' ), 10, 3 );
 		add_action( 'delete_post', array( &$this, 'delete_post_hook' ) );
 		//perform some actions when order status changes
-		add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 );
+		//add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 ); // Let's comment this, seems useless. This hook gets executed before "save_meta_boxes" so it's sending the shipping notification without shipment information
 		//add menu items
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 		//change the "enter title here" text
