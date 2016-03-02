@@ -101,7 +101,7 @@ class MP_Cart {
 	public $is_editable = true;
 
 	/*	 * Refers to the number of times products have been downloaded
-	 * 
+	 *
 	 *
 	 * @since 3.0
 	 * @access public
@@ -172,7 +172,7 @@ class MP_Cart {
 	public function admin_enqueue_styles_scripts( $hook ) {
 		if ( 'mp_order' == get_current_screen()->post_type && ( 'post.php' == $hook || 'edit.php' == $hook ) ) {
 			wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
-			
+
 			if ( mp_get_setting( 'store_theme' ) == 'default' ) {
 				wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
 			} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
@@ -255,6 +255,11 @@ class MP_Cart {
 			}
 		}
 
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			list( $blog_id, $item_id ) = explode( '.', $item_id );
+			$this->set_id( intval( $blog_id ) );
+		}
+
 		if ( mp_get_post_value( 'cart_action' ) != 'empty_cart' && is_null( $item_id ) ) {
 			wp_send_json_error();
 		}
@@ -276,7 +281,7 @@ class MP_Cart {
 
 			case 'update_item' :
 				$this->update_item( $item_id, $qty );
-				$product      = new MP_Product( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );			
 				$product->qty = $qty;
 				wp_send_json_success( array(
 					'product'  => array( $item_id => $this->get_line_item( $product ) ),
@@ -285,10 +290,24 @@ class MP_Cart {
 				break;
 
 			case 'remove_item' :
+
 				$this->remove_item( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );							wp_send_json_success( array(
+					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
+					'cart_item_line'  	=> $this->get_line_removed_item( $product ),
+					'cartmeta'   		=> $this->cart_meta( false ),
+					'item_count' 		=> $this->item_count( false, false ),
+				) );
+				break;
+
+			case 'undo_remove_item' :
+				$this->add_item( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
-					'cartmeta'   => $this->cart_meta( false ),
-					'item_count' => $this->item_count( false, false ),
+					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
+					'cart_item_line'  	=> $this->get_line_item( $product ),
+					'cartmeta'   		=> $this->cart_meta( false ),
+					'item_count' 		=> $this->item_count( false, false ),
 				) );
 				break;
 
@@ -298,6 +317,10 @@ class MP_Cart {
 					'item_count' => 0,
 				) );
 				break;
+		}
+
+		if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+			$this->reset_id();
 		}
 
 		wp_send_json_error();
@@ -563,7 +586,7 @@ class MP_Cart {
 
 		return apply_filters( 'mp_cart/get_line_item', $html, $product, $this );
 	}
-	
+
 	/**
 	 * Check if all digital products to hide shipping estimate
 	 *
@@ -571,19 +594,19 @@ class MP_Cart {
 	 * @access public
 	 *
 	 */
-	
+
 	public function only_digital() {
 		$products = $this->get_items_as_objects();
-		
+
 		foreach ( $products as $product ) {
 			if( ! $product->is_download() ) {
 				return false;
 			}
 		}
-	
+
 		return true;
 	}
-	
+
 	/**
 	 * Display cart meta html
 	 *
@@ -644,9 +667,9 @@ class MP_Cart {
 		 * @param MP_Cart The current cart object.
 		 */
 		$html .= apply_filters( 'mp_cart/cart_meta/product_total', $line, $this );
-		
+
 		$shipping_line = '';
-		
+
 		if( ! $this->only_digital() && $this->is_shipping_total() ) {
 
 			$shipping_line .= '
@@ -655,7 +678,7 @@ class MP_Cart {
 					<span class="mp_cart_resume_item_amount">' . $this->shipping_total( true ) . '</span>
 				</div><!-- end mp_cart_resume_item-shipping-total -->';
 		}
-		
+
 		/**
 		 * Filter the shipping total html
 		 *
@@ -950,7 +973,7 @@ class MP_Cart {
 			 * @param bool $editable Whether the cart is editable or not.
 			 */
 			$button_classes = apply_filters( 'mp_cart/checkout_button/classes', $button_classes, $editable );
-			
+
 			/**
 			 * Filter the Continue Shopping button classes
 			 *
@@ -964,7 +987,7 @@ class MP_Cart {
 				'mp_button-large',
 			);
 			$continue_shopping_button_classes = apply_filters( 'mp_cart/continue_shopping_button/classes', $continue_shopping_button_classes );
-	
+
 			// Continue shopping button
 			$html .= '
 					<a href="' . mp_store_page_url( 'products', false ) . '" class="' . implode( ' ', $continue_shopping_button_classes ) . '">' . __( 'Continue Shopping?', 'mp'  ) . '</a>';
@@ -1299,7 +1322,7 @@ class MP_Cart {
 	 */
 	public function floating_cart_line_item_html( $item_id, $qty, $show_product_image = true, $show_product_qty = true, $show_product_price = false ) {
 		$product = new MP_Product( $item_id );
-		
+
 		$classes = array(
 			'mp_mini_cart_item',
 			$show_product_image ? 'mp_mini_cart_item-has-image' : '',
@@ -1668,7 +1691,7 @@ class MP_Cart {
 	public function remove_item( $item_id ) {
 		if ( $this->_is_global_item_id( $item_id ) ) {
 			list( $blog_id, $item_id ) = explode( '.', $item_id );
-			$this->set_id( $blog_id );
+			$this->set_id( intval( $blog_id ) );
 		}
 
 		if ( mp_arr_get_value( $this->_id . '->' . $item_id, $this->_items ) ) {
@@ -1697,8 +1720,100 @@ class MP_Cart {
 			 */
 			do_action( 'mp_cart/after_remove_item', $item_id, $this->_id );
 		}
+		
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			$this->reset_id();
+		}			
+	}
 
-		$this->reset_id();
+	/**
+	 * Get removed cart line item html
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param MP_Product /int $product The product to get the html for.
+	 *
+	 * @return string
+	 */
+	public function get_line_removed_item( $product ) {
+		if ( ! $product instanceof MP_Product ) {
+			$product = new MP_Product( $product );
+		}
+
+		$id = ( $this->is_global ) ? $product->global_id() : $product->ID;
+
+		/**
+		 * Filter cart removed item columns array
+		 *
+		 * @since 3.0
+		 *
+		 * @param array The cart removed item columns array.
+		 */
+		$cart_columns = (array) apply_filters( 'mp_cart/cart_removed_item_columns_array', array(
+			'thumb',
+			'title',
+			'empty',
+			'qty'
+		) );
+		$html = '
+			<div class="mp_cart_item mp_cart_removed_item" id="mp-cart-item-' . $id . '">';
+
+		foreach ( $cart_columns as $column ) {
+			$html .= '
+				<div class="mp_cart_item_content mp_cart_item_content-' . $column . '">';
+
+			switch ( $column ) {
+				case 'thumb' :
+					$column_html = $product->image_custom( false, 75 );
+					break;
+
+				case 'title' :
+					$column_html = '<small  class="mp_cart_deleted_item_title">' . sprintf( '<a href="%s">%s</a>', $product->url( false ), $product->title( false ) ) . ' ' .  __( 'was removed from Shopping Cart', 'mp' ) . '</small >';
+
+					break;
+				case 'qty' :
+					if ( $this->is_editable ) {
+						$column_html .= '
+						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.undoRemoveItem(' . $id . ')">' . __( 'Add again', 'mp' ) . '</a>';
+					} else {
+						$column_html = $product->qty;
+					}
+					break;
+				default:
+					$column_html = '';
+					break;
+			}
+
+			/**
+			 * Filter the column html
+			 *
+			 * @since 3.0
+			 *
+			 * @param string The current column html.
+			 * @param string The current column slug.
+			 * @param MP_Product The current product.
+			 * @param MP_Cart The current cart object.
+			 */
+			$html .= apply_filters( 'mp_cart/column_html', $column_html, $column, $product, $this );
+
+			$html .= '
+				</div><!-- end mp_cart_item_content -->';
+		}
+
+		$html .= '</div><!-- end mp_cart_item -->';
+
+		/**
+		 * Filter the line removed item html
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $html The current line html.
+		 * @param MP_Product $product The current product object.
+		 * @param MP_Cart $this The current cart object.
+		 */
+
+		return apply_filters( 'mp_cart/get_line_removed_item', $html, $product, $this );
 	}
 
 	/**
@@ -1780,7 +1895,7 @@ class MP_Cart {
 
 		return ( $format ) ? mp_format_currency( '', $shipping_tax ) : $shipping_tax;
 	}
-	
+
 	/**
 	 * Check if shipping price
 	 *
@@ -1788,12 +1903,12 @@ class MP_Cart {
 	 * @access public
 	 * @return bool
 	 */
-	
+
 	public function is_shipping_total() {
 		if( $this->shipping_total() == '' || $this->shipping_total() ==  '&mdash;' ) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -1951,7 +2066,7 @@ class MP_Cart {
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
 			$include_shipping_tax = mp_get_setting( 'tax->tax_shipping' );
-		
+
 			//get address
 			$state   = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
@@ -1994,7 +2109,7 @@ class MP_Cart {
 
 					if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
 						$special_total += $special_tax_amt * $item->qty;
-						
+
 					} else {
 						$total += $item->before_tax_price() * $item->qty;
 					}
@@ -2044,7 +2159,7 @@ class MP_Cart {
 			return round( $tax_total, 2 );
 		}
 	}
-	
+
 	/**
 	 * Get total tax for DP
 	 *
@@ -2052,12 +2167,12 @@ class MP_Cart {
 	 * @access public
 	 * @return float
 	 */
-	 
+
 	 public function total_tax_digital_inclusive( $format = false ) {
 		$tax_amt = 0;
 
 		$blog_ids = $this->get_blog_ids();
-		
+
 		if( ! mp_get_setting( 'tax->tax_digital' ) ) {
 
 			while ( 1 ) {
@@ -2084,7 +2199,7 @@ class MP_Cart {
 					break;
 				}
 			}
-		
+
 		}
 
 		if ( $format ) {
@@ -2094,7 +2209,7 @@ class MP_Cart {
 		}
 
 	}
-	
+
 	/**
 	 * Get total tax for special products
 	 *
@@ -2102,7 +2217,7 @@ class MP_Cart {
 	 * @access public
 	 * @return float
 	 */
-	
+
 	public function total_special_tax( $format = false ) {
 		$tax_amt = 0;
 
@@ -2121,7 +2236,7 @@ class MP_Cart {
 					$original_tax = $item->get_price( 'lowest' ) - ( $item->get_price( 'lowest' ) / ( 1 + mp_tax_rate() ) );
 					$tax = $original_tax - $special_tax_amt;
 					$tax_amt += $tax * $item->qty;
-				}	
+				}
 			}
 
 			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
@@ -2165,7 +2280,7 @@ class MP_Cart {
 				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
 				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
-				
+
 				$shipping_pre_total = $this->shipping_total();
 				if( mp_get_setting( 'tax->tax_shipping' ) ) {
 					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();

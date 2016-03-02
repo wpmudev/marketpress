@@ -117,7 +117,7 @@ class MP_Admin {
 	}
 
 	function admin_head() {
-		if ( 'mp_order' == get_post_type() ) {
+		if ( 'mp_order' == get_current_screen()->post_type ) {
 			echo '<style type="text/css">
     .page-title-action {display:none;}
     </style>';

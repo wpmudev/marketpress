@@ -1,29 +1,29 @@
 <?php
 /**
  * payfast.php
- * 
+ *
  * MarketPress PayFast Gateway Plugin
  *
  * Copyright (c) 2013 PayFast (Pty) Ltd
- * 
+ *
  * LICENSE:
- * 
+ *
  * This payment module is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This payment module is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
  * License for more details.
- * 
+ *
  *
  * @version v2.0
- * 
+ *
  * @author Jonathan Page
  * @since v1.0
- * 
+ *
  * @author  Ron Darby ron.darby@payfast.co.za
  * @since 2.0
  * @date    2013-07-04
@@ -122,7 +122,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
         global $mp;
         if (isset($_GET['cancel']))
             echo '<div class="mp_checkout_error">' . __('Your PayFast transaction has been canceled.',
-                'mp') . '</div>';      
+                'mp') . '</div>';
     }
 
     /**
@@ -149,7 +149,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
      */
     function confirm_payment_form($cart, $shipping_info) {
         global $mp;
-        
+
     }
 
     /**
@@ -164,7 +164,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
      */
     function process_payment($cart, $billing_info, $shipping_info) {
         global $mp;
-        require_once ('payfast_common.inc');        
+        require_once ('payfast_common.inc');
         $order_id = $_SESSION['mp_order'];
         $shipping_info = $_SESSION['mp_shipping_info'];
         $pfAmount = 0;
@@ -177,7 +177,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
 
         //loop through cart items
         if (!is_array($cart) || count($cart) == 0) {
-            continue;
+            return;
         }
         $totals = array();
 
@@ -207,10 +207,10 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
 
         // Construct variables for post
         $data = array(
-            'merchant_id' => $this->pfMerchantId, 
+            'merchant_id' => $this->pfMerchantId,
             'merchant_key' => $this->pfMerchantKey,
-            'return_url' => $this->returnURL, 
-            'cancel_url' => $this->cancelURL, 
+            'return_url' => $this->returnURL,
+            'cancel_url' => $this->cancelURL,
             'notify_url' => $this->ipn_url . "/?itn_request=true", // Item details
             'm_payment_id' => $order_id,
             'amount' => number_format(sprintf("%01.2f", $pfAmount), 2, '.', ''),
@@ -224,7 +224,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
             }
         }
 
-        
+
         if( !empty( $this->passphrase ) && !$this->test_mode )
         {
             $getString .= $pfOutputSig.'passphrase='.urlencode( $this->passphrase );
@@ -235,7 +235,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
             $getString .= substr( $pfOutputSig, 0, -1 );
         }
 
-        
+
         $pfOutput = $pfOutputSig .'signature='.md5($getString);
 
         // Create the order
@@ -245,11 +245,11 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
         $payment_info['total'] = $pfAmount;
         $payment_info['currency'] = $this->currencyCode;
         $payment_info['method'] = "PayFast";
-        
+
         $paid = false;
 
         $order = $mp->create_order($order_id, $mp->get_cart_contents(), $_SESSION['mp_shipping_info'], $payment_info, $paid);
-        
+
         // Send to PayFast (GET)
         header("Location: " . $this->payfastURL . "?" . $pfOutput);
         exit(0);
@@ -273,7 +273,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
      */
     function order_confirmation_msg($content, $order) {
         global $mp;
-        
+
         if ($order->post_status == 'order_received') {
           $content .= '<p>' . sprintf(__('Your payment via PayFast for this order totaling %s is not yet complete. Here is the latest status:', 'mp'), mp_format_currency('', $order->mp_payment_info['total'])) . '</p>';
             $statuses = $order->mp_payment_info['status'];
@@ -313,11 +313,11 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
                     <select name="mp[gateways][payfast][mode]">
                         <option value="test"<?php selected($mp->get_setting('gateways->payfast->mode'), 'test') ?>><?php _e('Test', 'mp') ?></option>
                         <option value="live"<?php selected($mp->get_setting('gateways->payfast->mode'), 'live') ?>><?php _e('Live', 'mp') ?></option>
-                        
+
                     </select>
                 </td>
             </tr>
-            <tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : '';?>> 
+            <tr<?php echo ($mp->global_cart) ? ' style="display:none;"' : '';?>>
                 <th scope="row"><?php _e('PayFast Merchant Credentials', 'mp') ?></th>
                 <td>
                     <span class="description"><?php _e('You can find your credentials on your integration page.', 'mp')?></span>
@@ -374,33 +374,33 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
             define('PF_DEBUG', false);
         else
             define('PF_DEBUG', true);
-        
+
         $pfError = false;
         $pfErrMsg = '';
         $pfDone = false;
         $pfData = array();
         $pfHost = ( $this->test_mode ? 'www' : 'sandbox') . '.payfast.co.za';
         $pfOrderId = '';
-        $pfParamString = '';      
-       
-        
+        $pfParamString = '';
+
+
         pflog('PayFast ITN call received');
-        
+
         //// Notify PayFast that information has been received
         if (!$pfError && !$pfDone) {
             header('HTTP/1.0 200 OK');
             flush();
         }
-        
+
         //// Get data sent by PayFast
         if (!$pfError && !$pfDone) {
             pflog('Get posted data');
-        
+
             // Posted variables from ITN
             $pfData = pfGetData();
-        
+
             pflog('PayFast Data: ' . print_r($pfData, true));
-        
+
             if ($pfData === false) {
                 $pfError = true;
                 $pfErrMsg = PF_ERR_BAD_ACCESS;
@@ -413,7 +413,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
             pflog('Verify security signature');
 
             $pfPassPhrase = !empty( $this->passphrase ) && !$this->test_mode ? $this->passphrase : null;
-        
+
             // If signature different, log for debugging
             if (!pfValidSignature($pfData, $pfParamString, $pfPassPhrase ) )
             {
@@ -421,27 +421,27 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
                 $pfErrMsg = PF_ERR_INVALID_SIGNATURE;
             }
         }
-        
+
         //// Verify source IP (If not in debug mode)
         if (!$pfError && !$pfDone && !PF_DEBUG)
         {
             pflog('Verify source IP');
-        
+
             if (!pfValidIP($_SERVER['REMOTE_ADDR']))
             {
                 $pfError = true;
                 $pfErrMsg = PF_ERR_BAD_SOURCE_IP;
             }
         }
-        
+
         //// Get internal order and verify it hasn't already been processed
         if( !$pfError && !$pfDone ) {
             // Get order data
             $pfOrderId = $pfData['m_payment_id'];
             $order = $mp->get_order($pfOrderId);
-            
+
             pflog( "Purchase:\n". print_r( $order, true )  );
-            
+
             // Check if order has already been processed
             // It has been "processed" if it has a status above "Order Received"
             if( $purchase['processed'] > get_option( 'payfast_pending_status' ) ) {
@@ -449,14 +449,14 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
                 $pfDone = true;
             }
         }
-        
+
         //// Verify data received
         if (!$pfError)
         {
             pflog('Verify data received');
-        
+
             $pfValid = pfValidData($pfHost, $pfParamString);
-        
+
             if (!$pfValid)
             {
                 $pfError = true;
@@ -468,7 +468,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
         if (!$pfError && !$pfDone)
         {
             pflog('Check data against internal order');
-        
+
             // Check order amount
             $detailstr = "";
             $i = 0;
@@ -480,38 +480,38 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
                 }
             }
             $total = array_sum($totals);
-        
+
             //coupon line
             if ($coupon = $mp->coupon_value($mp->get_coupon_code(), $total))
             {
                 $total = $coupon['new_total'];
             }
-        
+
             //shipping line
             if (($shipping_price = $mp->shipping_price(false)) !== false)
             {
                 $total = $total + $shipping_price;
             }
-        
+
             //tax line
             if (($tax_price = $mp->tax_price(false)) !== false)
             {
                 $total = $total + $tax_price;
             }
-        
-        
+
+
             if (!pfAmountsEqual($pfData['amount_gross'], $order->mp_order_total))
             {
                 $pfError = true;
                 $pfErrMsg = PF_ERR_AMOUNT_MISMATCH . "PF:{$pfData['amount_gross']} vs Calc:{$total} vs {$order->mp_order_total}";
             }
         }
-        
+
         //// Check status and update order
         if (!$pfError && !$pfDone)
         {
             pflog('Check status and update order');
-        
+
             switch ($pfData['payment_status'])
             {
                 case 'COMPLETE':
@@ -525,7 +525,7 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
                     update_post_meta($order->ID, 'mp_payment_info', $payment_info);
                     $mp->update_order_payment_status($pfOrderId, $status, true);  //new
                     break;
-        
+
                 case 'FAILED':
                     pflog('- Failed');
                     $status = __("The payment has failed. This happens only if the payment was made from your customer's bank account.", 'mp');
@@ -533,30 +533,30 @@ class MP_Gateway_PayFast extends MP_Gateway_API {
 
                     // Need to wait for "Completed" before processing
                     break;
-        
+
                 case 'PENDING':
                     pflog('- Pending');
                     $status = __('The payment is pending.', 'mp');
                     $paid = false;
-        
+
                     // Need to wait for "Completed" before processing
                     break;
-        
+
                 default:
                     // If unknown status, do nothing (safest course of action)
                     break;
             }
-        
+
             $status = $_POST['payment_status'] . ': ' . $status;
         }
-        
-        
+
+
         // If an error occurred
         if ($pfError)
         {
             pflog('Error occurred: ' . $pfErrMsg);
         }
-        
+
         // Close log
         pflog('', true);
         exit();
