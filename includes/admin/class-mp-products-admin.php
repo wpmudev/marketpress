@@ -1057,16 +1057,17 @@ class MP_Products_Screen {
 				$variations_data      = explode( ',', $variation_values_row );
 
 				global $variations_single_data;
+
+				function term_object_array_filter ( $e ) {
+					global $variations_single_data;
+
+						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
+				}				
+
 				foreach ( $variations_data as $variations_single_data ) {
 
 					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
-					$term_object = array_filter(
-						$terms, function ( $e ) {
-						global $variations_single_data;
-
-						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
-					}
-					);
+					$term_object = array_filter( $terms, 'term_object_array_filter' );
 
 					reset( $term_object );
 					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
@@ -2308,11 +2309,11 @@ WHERE $delete_where"
 	 */
 	function remove_metaboxes() {
 		if ( apply_filters( 'mp_remove_excerpt_meta_box', false ) ) {
-			remove_meta_box( 'postexcerpt', 'product', 'normal' );
+			remove_meta_box( 'postexcerpt', MP_Product::get_post_type(), 'normal' );
 		}
 
 		if ( apply_filters( 'mp_remove_author_meta_box', true ) ) {
-			remove_meta_box( 'authordiv', 'product', 'normal' );
+			remove_meta_box( 'authordiv', MP_Product::get_post_type(), 'normal' );
 		}
 	}
 
