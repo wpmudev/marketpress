@@ -482,9 +482,13 @@ class MP_Checkout {
 	 * @access public
 	 * @param string $msg The error message.
 	 * @param string $context The context of the error message.
+	 * @param bool $add_slashes Add slashes to prevent double quotes from causing errors.
 	 */
-	public function add_error( $msg, $context = 'general' ) {
-		$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+	public function add_error( $msg, $context = 'general' , $add_slashes = true ) {
+		if ( $add_slashes ){
+			$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+		}
+		
 
 		if ( !isset( $this->_errors[ $context ] ) ) {
 			$this->_errors[ $context ] = array();

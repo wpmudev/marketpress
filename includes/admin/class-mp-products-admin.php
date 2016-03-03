@@ -1057,16 +1057,19 @@ class MP_Products_Screen {
 				$variations_data      = explode( ',', $variation_values_row );
 
 				global $variations_single_data;
-				foreach ( $variations_data as $variations_single_data ) {
 
-					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
-					$term_object = array_filter(
-						$terms, function ( $e ) {
+				if( !function_exists( 'term_object_array_filter' ) ){
+					function term_object_array_filter ( $e ) {
 						global $variations_single_data;
 
 						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
 					}
-					);
+				}			
+
+				foreach ( $variations_data as $variations_single_data ) {
+
+					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
+					$term_object = array_filter( $terms, 'term_object_array_filter' );
 
 					reset( $term_object );
 					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
