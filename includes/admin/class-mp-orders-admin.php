@@ -502,7 +502,7 @@ class MP_Orders_Admin {
 		<div class="misc-pub-section"><strong><?php _e( 'Shipping Tax', 'mp' ); ?>
 				:</strong><br/><?php echo $shipping_tax_total; ?></div>
 		<?php } ?>
-		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) : ?>
+		<?php if ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) && !is_array($order->get_meta( 'mp_shipping_info->shipping_option' ) ) ) : ?>
 			<div class="misc-pub-section">
 				<strong><?php _e( 'Method Paid For', 'mp' ); ?>:</strong><br/>
 				<?php echo strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option', '' ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option', '' ) ); ?>

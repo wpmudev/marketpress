@@ -682,6 +682,12 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		// Paypals sandbox stopped supporting HTTP 1.0 and only supports HTTP 1.1
 		$args['httpversion']    = '1.1';
 
+		//allow easy debugging
+		if ( defined( "MP_DEBUG_API_$methodName" ) ) {
+			var_dump( $args );
+			die;
+		}
+
 		//use built in WP http class to work with most server setups
 		$response = wp_remote_post( $this->API_Endpoint . $methodName, $args );
 

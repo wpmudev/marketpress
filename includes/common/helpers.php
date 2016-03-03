@@ -194,7 +194,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		if ( $order->get_meta( 'mp_shipping_info->method' ) && $order->get_meta( 'mp_shipping_info->method' != 'other' ) ) {
 			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $carrier;
 			// If using calculated shipping, show the carrier and shipping option selected
-		} elseif ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) ) {
+		} elseif ( $order->get_meta( 'mp_shipping_info->shipping_sub_option' ) &&  !is_array( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) ) {
 			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . strtoupper( $order->get_meta( 'mp_shipping_info->shipping_option' ) ) . ' ' . $order->get_meta( 'mp_shipping_info->shipping_sub_option' );
 		} else {
 			$shipping_billing_info .= '<strong>' . __( 'Shipping Method:', 'mp' ) . '</strong> ' . $carrier;
