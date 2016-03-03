@@ -1058,11 +1058,13 @@ class MP_Products_Screen {
 
 				global $variations_single_data;
 
-				function term_object_array_filter ( $e ) {
-					global $variations_single_data;
+				if( !function_exists( 'term_object_array_filter' ) ){
+					function term_object_array_filter ( $e ) {
+						global $variations_single_data;
 
 						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
-				}				
+					}
+				}			
 
 				foreach ( $variations_data as $variations_single_data ) {
 
