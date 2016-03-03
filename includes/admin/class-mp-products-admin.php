@@ -2309,11 +2309,11 @@ WHERE $delete_where"
 	 */
 	function remove_metaboxes() {
 		if ( apply_filters( 'mp_remove_excerpt_meta_box', false ) ) {
-			remove_meta_box( 'postexcerpt', 'product', 'normal' );
+			remove_meta_box( 'postexcerpt', MP_Product::get_post_type(), 'normal' );
 		}
 
 		if ( apply_filters( 'mp_remove_author_meta_box', true ) ) {
-			remove_meta_box( 'authordiv', 'product', 'normal' );
+			remove_meta_box( 'authordiv', MP_Product::get_post_type(), 'normal' );
 		}
 	}
 

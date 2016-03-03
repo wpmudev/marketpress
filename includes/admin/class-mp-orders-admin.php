@@ -152,13 +152,6 @@ class MP_Orders_Admin {
 					mp_update_setting( 'shipping->custom_method', $custom_shipping_method );
 				}
 			}
-
-			// update status to shipped?
-			if ( 'shipped' != $order->post_status && 'shipped' == mp_get_post_value( 'post_status' ) ) {
-				remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
-				$order->change_status( 'order_shipped', true );
-				add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
-			}
 		}
 	}
 
@@ -837,8 +830,10 @@ class MP_Orders_Admin {
 			// this isn't an order - bail
 		}
 
+		$this->save_meta_boxes($post->ID);
+
 		$order = new MP_Order( $post );
-		$order->change_status( $new_status, false, $old_status );
+		$order->change_status( $new_status, true, $old_status );
 	}
 
 	/**
