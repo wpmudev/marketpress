@@ -48,7 +48,7 @@ class MP_Orders_Admin {
 		add_action( 'save_post', array( &$this, 'post_status_hook' ), 10, 3 );
 		add_action( 'delete_post', array( &$this, 'delete_post_hook' ) );
 		//perform some actions when order status changes
-		//add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 ); // Let's comment this, seems useless. This hook gets executed before "save_meta_boxes" so it's sending the shipping notification without shipment information
+		add_action( 'transition_post_status', array( &$this, 'change_order_status' ), 10, 3 );
 		//add menu items
 		add_action( 'admin_menu', array( &$this, 'add_menu_items' ), 9 );
 		//change the "enter title here" text
@@ -151,13 +151,6 @@ class MP_Orders_Admin {
 					$custom_shipping_method[ $shipment_method ] = $method_name;
 					mp_update_setting( 'shipping->custom_method', $custom_shipping_method );
 				}
-			}
-
-			// update status to shipped?
-			if ( 'shipped' != $order->post_status && 'shipped' == mp_get_post_value( 'post_status' ) ) {
-				remove_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
-				$order->change_status( 'order_shipped', true );
-				add_action( 'save_post', array( &$this, 'save_meta_boxes' ) );
 			}
 		}
 	}
@@ -837,8 +830,10 @@ class MP_Orders_Admin {
 			// this isn't an order - bail
 		}
 
+		$this->save_meta_boxes($post->ID);
+
 		$order = new MP_Order( $post );
-		$order->change_status( $new_status, false, $old_status );
+		$order->change_status( $new_status, true, $old_status );
 	}
 
 	/**
