@@ -2689,6 +2689,8 @@ class MP_Product {
 			$this->_exists = false;
 		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != MP_Product::get_variations_post_type() ) {
 			$this->_exists = false;
+		} elseif ( $this->_post->post_type == MP_Product::get_variations_post_type() && FALSE === get_post_status( $this->_post->post_parent ) ) { // Check if variations parent exist
+			$this->_exists = false;
 		} else {
 			$this->_exists = true;
 			$this->ID      = $this->_post->ID;
