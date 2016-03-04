@@ -477,7 +477,7 @@ class MP_Cart {
 	public function get_items() {
 		$items = array();
 
-		if ( is_int( $this->_id ) ) {
+		if ( !is_array( $this->_id ) ) {
 			$items = mp_arr_get_value( $this->_id, $this->_items, array() );
 		}
 		
