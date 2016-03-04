@@ -292,7 +292,8 @@ class MP_Cart {
 			case 'remove_item' :
 
 				$this->remove_item( $item_id );
-				$product      = new MP_Product( $item_id, $this->get_blog_id() );							wp_send_json_success( array(
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
+				wp_send_json_success( array(
 					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
 					'cart_item_line'  	=> $this->get_line_removed_item( $product ),
 					'cartmeta'   		=> $this->cart_meta( false ),
