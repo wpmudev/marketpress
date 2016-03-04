@@ -292,7 +292,8 @@ class MP_Cart {
 			case 'remove_item' :
 
 				$this->remove_item( $item_id );
-				$product      = new MP_Product( $item_id, $this->get_blog_id() );							wp_send_json_success( array(
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
+				wp_send_json_success( array(
 					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
 					'cart_item_line'  	=> $this->get_line_removed_item( $product ),
 					'cartmeta'   		=> $this->cart_meta( false ),
@@ -1975,6 +1976,7 @@ class MP_Cart {
 					$price = 0;
 				} else if ( mp_get_setting( 'shipping->method' ) == 'calculated' && $selected_option ) {
 					//shipping plugins tie into this to calculate their shipping cost
+					var_dump('mp_calculate_shipping_' . $selected_option);exit;
 					$price = (float) apply_filters( 'mp_calculate_shipping_' . $selected_option, 0, $total, $cart, $address1, $address2, $city, $state, $zip, $country, $selected_option );
 				} else {
 					//shipping plugins tie into this to calculate their shipping cost
