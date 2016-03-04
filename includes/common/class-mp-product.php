@@ -704,6 +704,25 @@ class MP_Product {
 	}
 
 	/**
+	 * Get a parent product if product is a variation
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @return false/MP_Product
+	 */
+	public function get_parent() {
+		if ( is_null( $this->_post ) ) {
+			return false;
+		}
+		if ( is_null( $this->_post->post_parent ) ) {
+			return false;
+		}
+
+		return new MP_Product( $this->_post->post_parent );
+	}	
+
+	/**
 	 * Get a specific variation by it's index
 	 *
 	 * @since 3.0
