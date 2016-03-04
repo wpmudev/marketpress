@@ -292,7 +292,8 @@ class MP_Cart {
 			case 'remove_item' :
 
 				$this->remove_item( $item_id );
-				$product      = new MP_Product( $item_id, $this->get_blog_id() );							wp_send_json_success( array(
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
+				wp_send_json_success( array(
 					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
 					'cart_item_line'  	=> $this->get_line_removed_item( $product ),
 					'cartmeta'   		=> $this->cart_meta( false ),
@@ -378,7 +379,18 @@ class MP_Cart {
 		$this->_items     = array( $this->_id => array() );
 
 		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
-			$this->_items = unserialize( $cart_cookie );
+			// Clean cookie from none product items
+			$cart_cookie_items = unserialize( $cart_cookie );		
+			foreach ( $cart_cookie_items as $blog_id => $blog_items ) {
+				foreach ( $blog_items as $item => $qty ) {
+					$product = new MP_Product( $item , $blog_id );
+			 		if ( !$product->exists() ) {
+						unset( $cart_cookie_items[ $blog_id ][ $item ] );
+			 		}
+				}
+			}
+
+			$this->_items = $cart_cookie_items;
 		}
 	}
 
@@ -1546,6 +1558,8 @@ class MP_Cart {
 
 				$items = $this->get_items_as_objects();
 
+				$total = 0;
+				
 				foreach ( $items as $item ) {
 					$price         = $item->get_price( 'lowest' );
 					$item_subtotal = ( $price * $item->qty );
@@ -1601,7 +1615,9 @@ class MP_Cart {
 			}
 
 			$items = $this->get_items_as_objects();
-
+			
+			$total = 0;
+			
 			foreach ( $items as $item ) {
 				if( $item->is_download() ){
 					continue;
@@ -1644,6 +1660,8 @@ class MP_Cart {
 				}
 
 				$items = $this->get_items_as_objects();
+
+				$total = 0;
 
 				foreach ( $items as $item ) {
 					$price = $item->get_price();
@@ -2101,6 +2119,8 @@ class MP_Cart {
 
 				$items = $this->get_items_as_objects();
 
+				$total = 0;
+
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
 					if ( $item->is_download() && $item->special_tax_amt() ) {
@@ -2189,6 +2209,8 @@ class MP_Cart {
 
 				$items = $this->get_items_as_objects();
 
+				$total = 0;
+
 				foreach ( $items as $item ) {
 					if ( $item->is_download() ) {
 						$total += $item->before_tax_price() * $item->qty;
@@ -2234,6 +2256,8 @@ class MP_Cart {
 			}
 
 			$items = $this->get_items_as_objects();
+
+			$total = 0;
 
 			foreach ( $items as $item ) {
 				if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {

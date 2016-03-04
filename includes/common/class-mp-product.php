@@ -490,7 +490,7 @@ class MP_Product {
 			$product = $post;
 		}
 
-		if ( !is_null( $blog_id ) ) {
+		if ( !is_null( $blog_id ) && is_multisite() ) {
 			$current_blog_id = get_current_blog_id();
 			switch_to_blog( $blog_id );
 		}
@@ -498,7 +498,7 @@ class MP_Product {
 		$this->_get_post( $product );
 		$this->_set_content_tabs( $this );
 
-		if ( !is_null( $blog_id ) ) {
+		if ( !is_null( $blog_id ) && is_multisite() ) {
 			switch_to_blog( $current_blog_id );
 		}		
 	}
@@ -2688,6 +2688,8 @@ class MP_Product {
 		if ( is_null( $this->_post ) ) {
 			$this->_exists = false;
 		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != MP_Product::get_variations_post_type() ) {
+			$this->_exists = false;
+		} elseif ( $this->_post->post_type == MP_Product::get_variations_post_type() && FALSE === get_post_status( $this->_post->post_parent ) ) { // Check if variations parent exist
 			$this->_exists = false;
 		} else {
 			$this->_exists = true;
