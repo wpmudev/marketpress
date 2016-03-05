@@ -76,7 +76,7 @@
 						}
 					}
 				} );
-			} );			
+			} ).change();
 		};
 		
 		var initCustomerInfoLightbox = function() {
