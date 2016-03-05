@@ -913,10 +913,12 @@ class MP_Order {
 
 		// Cart
 		$cart = $this->get_meta( 'mp_cart_info' );
+		$is_download_only = false;
 
 		if ( $cart instanceof MP_Cart ) {
 			$tax_total      = $cart->tax_total( true );
 			$shipping_total = $cart->shipping_total( true );
+			$is_download_only = $cart->is_download_only();
 		} else {
 			$tax_total      = mp_format_currency( $currency, $this->get_meta( 'mp_tax_total', 0 ) );
 			$shipping_total = mp_format_currency( $currency, $this->get_meta( 'mp_shipping_total', 0 ) );
@@ -933,7 +935,12 @@ class MP_Order {
 		$status_extra = '';
 		switch ( $this->_post->post_status ) {
 			case 'order_shipped' :
-				$status = __( 'Shipped', 'mp' );
+				if( $is_download_only ) {
+					$status = __( 'Finished', 'mp' );
+				} else {
+					$status = __( 'Shipped', 'mp' );
+				}
+				
 				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
 					$status = $this->tracking_link( false );
 				}
