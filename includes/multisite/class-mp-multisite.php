@@ -863,7 +863,12 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function product_url( $url, $product ) {
-		return trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
+		if ( $product->is_variation() && $product->get_parent() !== false ) {
+			$url = trailingslashit( mp_store_page_url( 'products', false ) . $product->get_parent()->post_name ) . 'variation/' . $product->ID;
+		} else {
+			$url = trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
+		}
+		return $url ;
 	}
 
 	/**
