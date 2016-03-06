@@ -181,7 +181,7 @@ class MP_Multisite {
 			$new_rules[ $uri . '/([^/]+)/?' ]              = 'index.php?pagename=' . $uri . '&mp_global_tag=$matches[1]';
 		}
 
-		return $rewrite_rules + $new_rules;
+		return $new_rules + $rewrite_rules;
 	}
 
 	public function add_query_vars( $vars ) {
