@@ -260,8 +260,27 @@ class MP_Order {
 	 * @access public
 	 */
 	protected function _send_new_order_notifications() {
-		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->new_order->subject' ) ) );
-		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->text' ) ) ) );
+
+		// We can't rely on cart's is_digital_only() because we have three scenarios here
+		$has_downloads = $has_physical = false;
+		$items = $this->get_cart()->get_items_as_objects();
+		foreach ( $items as $product ) {
+			if( $product->is_download() ) {
+				$has_downloads = true;
+			} else {
+				$has_physical = true;
+			}
+		}
+
+		$notification_kind = 'new_order';
+		if($has_downloads && $has_physical) {
+			$notification_kind = 'new_order_mixed';
+		} else if( $has_downloads ) {
+			$notification_kind = 'new_order_downloads';
+		}
+
+		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) ) );
 
 		if ( has_filter( 'mp_order_notification_subject' ) ) {
 			//trigger_error( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0', E_USER_ERROR );

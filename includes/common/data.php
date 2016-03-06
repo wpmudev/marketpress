@@ -124,7 +124,17 @@ $this->default_settings = array(
 		),
 		'new_order'		 => array(
 			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
-			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information: \n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information: \n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n Thanks again!", 'mp'
+			),
+		),
+		'new_order_downloads'		 => array(
+			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received and your digital goods are ready to be downloaded. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n Thanks again!", 'mp'
+			),
+		),
+		'new_order_mixed'		 => array(
+			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, your digital goods are ready to be downloaded and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information: \n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
 			),
 		),
 		'order_shipped'	 => array(
