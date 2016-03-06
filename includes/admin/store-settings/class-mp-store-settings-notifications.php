@@ -89,6 +89,7 @@ class MP_Store_Settings_Notifications {
 		$new_order_section = $customer_metabox->add_field('section', array(
 			'name' => 'new_order_section',
 			'title' => __('New Order', 'mp'),
+			'subtitle' => __('These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.<br/>For orders placed with manual payment, emails set here will be overriden by the one configured in manual payments settings, under payments settings page', 'mp'),
 			'before_field' => '<div id="new_order_tabs_wrapper">',
 		));
 
@@ -204,6 +205,7 @@ class MP_Store_Settings_Notifications {
 		$order_shipped_section = $customer_metabox->add_field('section', array(
 			'name' => 'order_shipped_section',
 			'title' => __('Order Shipped', 'mp'),
+			'subtitle' => __('These codes will be replaced with order details: CUSTOMERNAME, ORDERID, ORDERINFO, SHIPPINGINFO, PAYMENTINFO, TOTAL, TRACKINGURL. No HTML allowed.', 'mp'),
 			'before_field' => '<div id="order_shipped_tabs_wrapper">',
 		));
 
