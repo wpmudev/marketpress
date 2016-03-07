@@ -2465,9 +2465,9 @@ class MP_Cart {
 	 */
 	public function __construct( $use_cookies = true ) {
 		$this->_use_cookies = $use_cookies;
-
+		$this->set_id( get_current_blog_id() ); // we need the id for virtual carts too (without cookies)
+		
 		if ( $this->_use_cookies ) {
-			$this->set_id( get_current_blog_id() );
 			$this->_get_cart_cookie();
 		}
 

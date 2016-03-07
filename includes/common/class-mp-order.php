@@ -260,8 +260,27 @@ class MP_Order {
 	 * @access public
 	 */
 	protected function _send_new_order_notifications() {
-		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->new_order->subject' ) ) );
-		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->text' ) ) ) );
+
+		// We can't rely on cart's is_digital_only() because we have three scenarios here
+		$has_downloads = $has_physical = false;
+		$items = $this->get_cart()->get_items_as_objects();
+		foreach ( $items as $product ) {
+			if( $product->is_download() ) {
+				$has_downloads = true;
+			} else {
+				$has_physical = true;
+			}
+		}
+
+		$notification_kind = 'new_order';
+		if($has_downloads && $has_physical) {
+			$notification_kind = 'new_order_mixed';
+		} else if( $has_downloads ) {
+			$notification_kind = 'new_order_downloads';
+		}
+
+		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) ) );
 
 		if ( has_filter( 'mp_order_notification_subject' ) ) {
 			//trigger_error( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0', E_USER_ERROR );
@@ -913,10 +932,12 @@ class MP_Order {
 
 		// Cart
 		$cart = $this->get_meta( 'mp_cart_info' );
+		$is_download_only = false;
 
 		if ( $cart instanceof MP_Cart ) {
 			$tax_total      = $cart->tax_total( true );
 			$shipping_total = $cart->shipping_total( true );
+			$is_download_only = $cart->is_download_only();
 		} else {
 			$tax_total      = mp_format_currency( $currency, $this->get_meta( 'mp_tax_total', 0 ) );
 			$shipping_total = mp_format_currency( $currency, $this->get_meta( 'mp_shipping_total', 0 ) );
@@ -933,7 +954,12 @@ class MP_Order {
 		$status_extra = '';
 		switch ( $this->_post->post_status ) {
 			case 'order_shipped' :
-				$status = __( 'Shipped', 'mp' );
+				if( $is_download_only ) {
+					$status = __( 'Finished', 'mp' );
+				} else {
+					$status = __( 'Shipped', 'mp' );
+				}
+				
 				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
 					$status = $this->tracking_link( false );
 				}
