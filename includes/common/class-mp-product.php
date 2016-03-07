@@ -2753,8 +2753,10 @@ class MP_Product {
 			 */
 			$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
 
-			// Make sure product overview tab is always at the beginning
-			$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+			// Make sure product overview tab is always at the beginning if not empty
+			if($product->content( false ) !== ''){
+				$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+			}
 
 			$this->content_tabs = $tabs;
 		}
