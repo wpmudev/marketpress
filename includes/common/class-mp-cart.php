@@ -2307,7 +2307,11 @@ class MP_Cart {
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
-				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
+				$pre_tax_total =  $pre_total / ( 1 + $tax_rate );
+				$total = $pre_tax_total + $this->tax_total() + $this->total_tax_digital_inclusive() + $this->total_special_tax();
+
+				// There will be oftenly rounding errors
+				$rounding_error = $total - $pre_total;
 
 				$shipping_pre_total = $this->shipping_total();
 				if( mp_get_setting( 'tax->tax_shipping' ) ) {
@@ -2315,7 +2319,9 @@ class MP_Cart {
 				}
 
 				//Shipping price should be added after products price calculation
-				$total     = $total + $shipping_pre_total + $this->total_tax_digital_inclusive() + $this->total_special_tax();
+				$total = $total + $shipping_pre_total;
+				//Fix the rounding error, if there is
+				$total -= $rounding_error;
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
