@@ -2308,6 +2308,9 @@ class MP_Cart {
 				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
 				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
+				// Truncate to 2 decimal places. round() does not work here as we could get
+				// numbers like 215.51724137931034 rounded up to 215.52 instead of 215.51
+				$total = floor($total * 100) / 100;
 
 				$shipping_pre_total = $this->shipping_total();
 				if( mp_get_setting( 'tax->tax_shipping' ) ) {
