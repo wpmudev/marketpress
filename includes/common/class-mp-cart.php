@@ -1545,6 +1545,11 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function product_total( $format = false ) {
+		
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'product', $this->_total ) ) {
 			$total                   = 0;
 			$blog_ids                = $this->get_blog_ids();
@@ -1605,6 +1610,11 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function product_tangible_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		$total                   = 0;
 		$blog_ids                = $this->get_blog_ids();
 
@@ -1648,6 +1658,11 @@ class MP_Cart {
 	 * @return float|string
 	 */
 	public function product_original_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'product_original', $this->_total ) ) {
 			$total                            = 0;
 			$blog_ids                         = $this->get_blog_ids();
@@ -2085,6 +2100,11 @@ class MP_Cart {
 	 * @return string/float
 	 */
 	public function tax_total( $format = false, $estimate = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
 			$include_shipping_tax = mp_get_setting( 'tax->tax_shipping' );
@@ -2193,6 +2213,11 @@ class MP_Cart {
 	 */
 
 	 public function total_tax_digital_inclusive( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		$tax_amt = 0;
 
 		$blog_ids = $this->get_blog_ids();
@@ -2245,6 +2270,11 @@ class MP_Cart {
 	 */
 
 	public function total_special_tax( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+		
 		$tax_amt = 0;
 
 		$blog_ids = $this->get_blog_ids();
