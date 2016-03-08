@@ -704,6 +704,25 @@ class MP_Product {
 	}
 
 	/**
+	 * Get a parent product if product is a variation
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @return false/MP_Product
+	 */
+	public function get_parent() {
+		if ( is_null( $this->_post ) ) {
+			return false;
+		}
+		if ( is_null( $this->_post->post_parent ) ) {
+			return false;
+		}
+
+		return new MP_Product( $this->_post->post_parent );
+	}	
+
+	/**
 	 * Get a specific variation by it's index
 	 *
 	 * @since 3.0
@@ -2734,8 +2753,10 @@ class MP_Product {
 			 */
 			$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
 
-			// Make sure product overview tab is always at the beginning
-			$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+			// Make sure product overview tab is always at the beginning if not empty
+			if($product->content( false ) !== ''){
+				$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+			}
 
 			$this->content_tabs = $tabs;
 		}
