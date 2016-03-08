@@ -457,14 +457,18 @@ class MP_Order {
 
 			case 'order_paid' :
 				add_post_meta( $this->ID, 'mp_paid_time', time(), true );
-				if ( $this->get_cart()->is_download_only() ) {
+				// As soon as a downloads-only order is paid... its "shipped"
+				if ( $this->get_cart()->is_download_only() && $old_status != 'order_shipped' ) {
 					$this->_send_shipment_notification();
 				}
 				break;
 
 			case 'order_shipped' :
 				add_post_meta( $this->ID, 'mp_shipped_time', time(), true );
-				if ( ! $this->get_cart()->is_download_only() ) {
+				// Downloads-only orders should not reach the "order_shipped", but if it does (manually set) then
+				// we must send the shipped notification only if the previous state is different than "order_paid",
+				// because that's the default last-state for download orders and a notification should be sent before
+				if ( ! $this->get_cart()->is_download_only() || $old_status != 'order_paid' ) {
 					$this->_send_shipment_notification();
 				}
 				break;
