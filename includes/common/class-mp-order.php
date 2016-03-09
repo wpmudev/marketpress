@@ -1420,6 +1420,13 @@ class MP_Order {
 	public function tracking_url( $echo = true ) {
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
 
+		$user_id = get_current_user_id();
+
+		// Append the email to the tracking URL for orders made by guest users (hashed so it's not sent directly in the URL)
+		if( 0 === $this->_post->post_author ) {
+			$url .= md5( $this->get_meta( 'mp_billing_info->email', '' ) );
+		}
+
 		/**
 		 * Filter the tracking URL
 		 *

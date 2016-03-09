@@ -2113,6 +2113,7 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 		$args = array_replace_recursive( array(
 			'echo'     => false,
 			'order_id' => get_query_var( 'mp_order_id', null ),
+			'guest_email' => get_query_var( 'mp_guest_email', null ),
 		), $args );
 
 		extract( $args );
@@ -2138,29 +2139,37 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 				}
 			}
 		} else {
-			//we will try to find the order by history cookie, separate code for prevent conflict later
-			//$orders = mp_get_cookie_value( 'mp_order_history', array() );
 			if ( ! is_null( $order_id ) ) {
-				$orders = mp_get_order_history();
-				if ( is_array( $orders ) ) {
+				if( ! is_null ( $guest_email ) ) {
+					// If email and order provided matches, show the order status page
 					$order = new MP_Order( $order_id );
-					if ( $order->exists() ) {
-						$found = false;
-						foreach ( $orders as $key => $val ) {
-							if ( $val['id'] == $order->ID ) {
-								//this order belonged to this user
-								$found = true;
-								break;
+					if ( $order->exists() && ( md5( $order->get_meta( 'mp_billing_info->email', '' ) ) == $guest_email || md5( $order->get_meta( 'mp_shipping_info->email', '' ) ) == $guest_email ) ) {
+						$html .= $order->details( false );
+					} else {
+						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+					}
+				} else {
+					// Get order from logged in user account or from cookie if logged out
+					$orders = mp_get_order_history();
+					if ( is_array( $orders ) ) {
+						$order = new MP_Order( $order_id );
+						if ( $order->exists() ) {
+							$found = false;
+							foreach ( $orders as $key => $val ) {
+								if ( $val['id'] == $order->ID ) {
+									//this order belonged to this user
+									$found = true;
+									break;
+								}
 							}
-						}
-						if ( $found == true ) {
-							$html .= $order->details( false );
+							if ( $found == true ) {
+								$html .= $order->details( false );
+							} else {
+								$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+							}
 						} else {
 							$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 						}
-					} else {
-						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						$html .= _mp_order_status_overview();
 					}
 				}
 			}
