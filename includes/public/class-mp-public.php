@@ -389,11 +389,9 @@ class MP_Public {
 		global $wp_query;
 
 		switch ( get_query_var( 'taxonomy' ) ) {
-			case 'product_category' :
-			case 'product_tag' :
-				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 
 			case 'product_category' :
+				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 				$template = locate_template( array(
 					'mp_category-' . get_query_var( 'taxonomy' ) . '.php',
 					'mp_category-' . $term->term_id . '.php',
@@ -407,6 +405,7 @@ class MP_Public {
 				break;
 
 			case 'product_tag' :
+				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 				$template = locate_template( array(
 					'mp_tag-' . get_query_var( 'taxonomy' ) . '.php',
 					'mp_tag-' . $term->term_id . '.php',
