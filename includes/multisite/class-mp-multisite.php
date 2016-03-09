@@ -328,8 +328,8 @@ class MP_Multisite {
 			'price'             => $product->get_price( 'lowest' ),
 			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
-		$index_id     = $wpdb->insert( $wpdb->base_prefix . 'mp_products', $product_data );
-
+		$wpdb->insert( $wpdb->base_prefix . 'mp_products', $product_data );
+		$index_id = $wpdb->insert_id;
 		return $index_id;
 	}
 
@@ -388,11 +388,12 @@ class MP_Multisite {
 			$exist = mp_global_term_exist( $term->slug, $term->taxonomy );
 			if ( ! is_object( $exist ) ) {
 				//term not exists, just create
-				$term_id = $wpdb->insert( $wpdb->base_prefix . 'mp_terms', array(
+				$wpdb->insert( $wpdb->base_prefix . 'mp_terms', array(
 					'name' => $term->name,
 					'slug' => $term->slug,
 					'type' => $term->taxonomy
 				) );
+				$term_id = $wpdb->insert_id;
 			} else {
 				$term_id = $exist->term_id;
 			}
