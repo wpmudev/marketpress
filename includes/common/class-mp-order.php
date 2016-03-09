@@ -1139,6 +1139,8 @@ class MP_Order {
 		add_post_meta( $this->ID, 'mp_billing_info', $billing_info, true );
 		// Save payment info
 		add_post_meta( $this->ID, 'mp_payment_info', $payment_info, true );
+		// Save kind of user, because author_id is reset in subsecuent order edits
+		add_post_meta( $this->ID, 'mp_user_kind', ( 0 === get_current_user_id() ? 'guest' : 'registered' ) , true );
 
 		// Update user shipping billing info
 		if ( $user_id ) {
@@ -1423,7 +1425,7 @@ class MP_Order {
 		$user_id = get_current_user_id();
 
 		// Append the email to the tracking URL for orders made by guest users (hashed so it's not sent directly in the URL)
-		if( 0 === $this->_post->post_author ) {
+		if( 'guest' === $this->get_meta( 'mp_user_kind', '' ) ) {
 			$url .= md5( $this->get_meta( 'mp_billing_info->email', '' ) );
 		}
 
