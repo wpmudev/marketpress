@@ -377,7 +377,7 @@ class MP_Multisite {
 			return;
 		}
 
-		$index_id = $indexer->id;
+		$index_id = $indexer->post_id;
 
 		$terms      = wp_get_object_terms( $post->ID, array( 'product_category', 'product_tag' ) );
 		$while_list = array();
