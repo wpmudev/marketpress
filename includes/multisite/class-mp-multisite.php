@@ -146,6 +146,8 @@ class MP_Multisite {
 			return $content;
 		}
 
+		remove_filter( 'the_content', array( &$this, 'taxonomy_output' ) );
+
 		$type     = '';
 		$taxonomy = '';
 		if ( get_the_ID() == mp_get_network_setting( 'pages->network_categories' ) ) {
