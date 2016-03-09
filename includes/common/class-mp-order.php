@@ -1343,35 +1343,40 @@ class MP_Order {
 	public function tracking_link( $echo = true ) {
 		$tracking_number = esc_attr( $this->get_meta( 'mp_shipping_info->tracking_num' ) );
 		$method          = $this->get_meta( 'mp_shipping_info->method' );
+		$tracking_link	 = $this->get_meta( 'mp_shipping_info->tracking_link' );
 
-		switch ( strtoupper( $method ) ) {
-			case 'UPS' :
-				$url = 'http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=' . $tracking_number . '&track.x=0&track.y=0';
-				break;
+		if( ! empty( $tracking_link ) ) {
+			$url =  $tracking_link;
+		} else {
+			switch ( strtoupper( $method ) ) {
+				case 'UPS' :
+					$url = 'http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=' . $tracking_number . '&track.x=0&track.y=0';
+					break;
 
-			case 'FedEx' :
-				$url = 'http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers=' . $tracking_number;
-				break;
+				case 'FedEx' :
+					$url = 'http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers=' . $tracking_number;
+					break;
 
-			case 'USPS' :
-				$url = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' . $tracking_number;
-				break;
+				case 'USPS' :
+					$url = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' . $tracking_number;
+					break;
 
-			case 'DHL' :
-				$url = 'http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB=' . $tracking_number;
-				break;
+				case 'DHL' :
+					$url = 'http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB=' . $tracking_number;
+					break;
 
-			default :
-				/**
-				 * Filter the tracking link for methods that don't exists
-				 *
-				 * @since 3.0
-				 *
-				 * @param string $tracking_number
-				 * @param string $method
-				 */
-				$url = apply_filters( 'mp_shipping_tracking_link', $tracking_number, $method );
-				break;
+				default :
+					/**
+					 * Filter the tracking link for methods that don't exists
+					 *
+					 * @since 3.0
+					 *
+					 * @param string $tracking_number
+					 * @param string $method
+					 */
+					$url = apply_filters( 'mp_shipping_tracking_link', $tracking_number, $method );
+					break;
+			}
 		}
 
 		/**
@@ -1385,7 +1390,13 @@ class MP_Order {
 		 */
 		$url = apply_filters( 'mp_order/tracking_link', $url, $tracking_number, $method );
 
-		$link = '<a target="_blank" href="' . $url . '">' . __( 'Shipped: Track Shipment', 'mp' ) . '</a>';
+		// At this point, if method is custom and $url was empty and no filters has been added then $url should be equal at $tracking_number 
+
+		if( $url == $tracking_number ) {
+			$link = '<span>' . sprintf(__( 'Shipped: tracking code: %s', 'mp' ), $tracking_number ) . '</a>';
+		} else {
+			$link = '<a target="_blank" href="' . $url . '">' . __( 'Shipped: Track Shipment', 'mp' ) . '</a>';
+		}
 
 		if ( $echo ) {
 			echo $link;

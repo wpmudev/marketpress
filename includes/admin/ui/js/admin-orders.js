@@ -105,6 +105,13 @@
 				} else {
 					$('.mp-remove-custom-carrier').addClass('mp-hide');
 				}
+
+				if ($(this).val() == 'other' || option.data('original') == 1) {
+					$('.mp-order-custom-tracking-link').removeClass('mp-hide');
+				} else {
+					$('.mp-order-custom-tracking-link').addClass('mp-hide');						
+				}	
+
 			}).change();
 		};
 
