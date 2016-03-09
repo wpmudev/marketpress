@@ -223,7 +223,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		$group = "";
 		
 		if ( ! empty( $args['category'] ) || ! empty( $args['tag'] ) ) {
-			$join .= " INNER JOIN {$wpdb->base_prefix}mp_term_relationships rel ON rel.post_id = products.id";
+			$join .= " INNER JOIN {$wpdb->base_prefix}mp_term_relationships rel ON rel.post_id = products.post_id";
 			$join .= " INNER JOIN {$wpdb->base_prefix}mp_terms terms ON terms.term_id = rel.term_id";
 			
 			if( ! empty( $args['category'] ) ) {
