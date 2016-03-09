@@ -724,11 +724,11 @@ class Marketpress {
 	 */
 
 	public function maybe_flush_rewrites() {
-		$flush_rewrites = get_option( 'mp_flush_rewrites_30', true );
+		$flush_rewrites = get_option( 'mp_flush_rewrites_30', 1 );
 
-		if ( $flush_rewrites == true ) {
+		if ( $flush_rewrites == 1 ) {
 			flush_rewrite_rules();
-			update_option( 'mp_flush_rewrites_30', false );
+			update_option( 'mp_flush_rewrites_30', 0 );
 		}
 	}
 
