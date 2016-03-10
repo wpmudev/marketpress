@@ -223,8 +223,9 @@ class MP_Checkout {
 			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		}
 
+		$all_countries		 = mp_countries();
+
 		if ( mp_all_countries_allowed() ) {
-			$all_countries		 = mp()->countries;
 			$allowed_countries	 = array_keys( $all_countries );
 		}
 
@@ -233,7 +234,7 @@ class MP_Checkout {
 		//$countries[''] = __('Select One', 'mp');
 
 		foreach ( $allowed_countries as $_country ) {
-			$countries[ $_country ] = mp()->countries[ $_country ];
+			$countries[ $_country ] = $all_countries[ $_country ];
 		}
 
 		// State/zip fields
