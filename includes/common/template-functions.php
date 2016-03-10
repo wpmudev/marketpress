@@ -2150,29 +2150,10 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 					}
 				} else {
-					// Get order from logged in user account or from cookie if logged out
-					$orders = mp_get_order_history();
-					if ( is_array( $orders ) ) {
-						$order = new MP_Order( $order_id );
-						if ( $order->exists() ) {
-							$found = false;
-							foreach ( $orders as $key => $val ) {
-								if ( $val['id'] == $order->ID ) {
-									//this order belonged to this user
-									$found = true;
-									break;
-								}
-							}
-							if ( $found == true ) {
-								$html .= $order->details( false );
-							} else {
-								$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-							}
-						} else {
-							$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						}
-					}
+					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 				}
+			} else {
+				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 			}
 		}
 
