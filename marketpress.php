@@ -663,7 +663,8 @@ class Marketpress {
 			//$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 			//this rules match the default page rules, so we have to inject it before the page
 			$rewrite_rules = array_merge( array(
-				$uri . '/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]'
+				$uri . '/([^/]+)/?$' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]',
+				$uri . '/([^/]+)/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]&mp_guest_email=$matches[2]'
 			), $rewrite_rules );
 		}
 
@@ -690,6 +691,7 @@ class Marketpress {
 		$vars[] = 'mp_variation_id';
 		$vars[] = 'mp_order_id';
 		$vars[] = 'mp_confirm_order_step';
+		$vars[] = 'mp_guest_email';
 
 		return $vars;
 	}
