@@ -388,6 +388,29 @@ if ( ! function_exists( 'mp_checkout' ) ) :
 
 endif;
 
+if ( ! function_exists( 'mp_countries' ) ) :
+
+	/**
+	 * Gets the whole country list
+	 *
+	 * @since 3.0
+	 * @return array
+	 */
+	function mp_countries() {
+		$countries = mp()->countries;
+
+		/**
+		 * Filter the all countries list
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $countries The default countries.
+		 */
+		return apply_filters( 'mp_countries', $countries );		
+	}
+
+endif;
+
 
 if ( ! function_exists( 'mp_country_list' ) ) :
 
@@ -399,7 +422,7 @@ if ( ! function_exists( 'mp_country_list' ) ) :
 	 */
 	function mp_country_list() {
 		$sorted    = array();
-		$countries = mp()->countries;
+		$countries = mp_countries();
 
 		foreach ( $countries as $code => $country ) {
 			if ( ! in_array( $code, mp()->popular_countries ) ) {

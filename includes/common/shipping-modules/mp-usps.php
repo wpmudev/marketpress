@@ -759,7 +759,8 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 		//$package->appendChild($gxg);
 
 		$package->appendChild( $dom->createElement( 'ValueOfContents', $total ) );  //For insurance?
-		$package->appendChild( $dom->createElement( 'Country', mp()->countries[ $this->country ] ) );
+		$countries = mp_countries();		
+		$package->appendChild( $dom->createElement( 'Country', $countries[ $this->country ] ) );
 
 		// If greater than 12" it's a LARGE parcel otherwise REGULAR
 		$this->size = ( $this->pkg_dims[2] > 12 ) ? 'LARGE' : 'REGULAR';
