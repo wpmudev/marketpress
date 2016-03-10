@@ -128,7 +128,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 
 		// Shipping line
 		if ( $shipping_total = $order->get_meta( 'mp_shipping_total' ) ) {
-			if( !mp()->download_only_cart( mp_cart() ) ) {
+			if( ! mp_cart()->is_download_only()  ) {
 				$order_info .= '<strong>' . __( 'Shipping:', 'mp' ) . '</strong> ' . ( ( 0 == $shipping_total ) ? __( 'FREE', 'mp' ) : mp_format_currency( $currency, $shipping_total ) ) . "<br />\n";
 			}
 		}
