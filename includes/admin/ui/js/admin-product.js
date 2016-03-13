@@ -830,5 +830,40 @@ jQuery( document ).ready( function( $ ) {
             e.preventDefault( );
         }
     } );
+    
+    $target = $('#mp-product-price-inventory-variants-metabox');
+    $target.on('input', 'input', function() {
+        var price = parseFloat( $target.find("input[name='regular_price']").val() );
+        var sale_price = parseFloat( $target.find("input[name='sale_price\\[amount\\]']").val() );
+        var percentage_discount = parseFloat( $target.find("input[name='sale_price\\[percentage\\]']").val() );
+
+        switch($(this).attr('name')) {
+            case 'regular_price':
+                var new_percentage = ( 100 - ( ( 100 / price ) * sale_price ) );
+                if(isFinite(new_percentage) && new_percentage >= 0.0) {
+                    $target.find("input[name='sale_price\\[percentage\\]']").val( new_percentage.toFixed(2) );
+                }else{
+                    $target.find("input[name='sale_price\\[percentage\\]']").val( '' );
+                }
+                break;
+            case 'sale_price[amount]':
+                var new_percentage = ( 100 - ( ( 100 / price ) * sale_price ) );
+                if(isFinite(new_percentage) && new_percentage >= 0.0) {
+                    $target.find("input[name='sale_price\\[percentage\\]']").val( new_percentage.toFixed(2) );
+                }else{
+                    $target.find("input[name='sale_price\\[percentage\\]']").val( '' );
+                }
+                break;
+            case 'sale_price[percentage]':
+                var new_sale_price = price - ( ( price / 100 ) * percentage_discount );
+                if(isFinite(new_sale_price) && new_sale_price <= price && new_sale_price > 0) {
+                    $target.find("input[name='sale_price\\[amount\\]']").val( new_sale_price.toFixed(2) );
+                }else{
+                    $target.find("input[name='sale_price\\[amount\\]']").val( '' );
+                }
+                break;
+        }
+    });
+    $target.find("input[name='regular_price']").trigger('input');
 
 } );
