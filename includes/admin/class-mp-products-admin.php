@@ -223,6 +223,9 @@ class MP_Products_Screen {
 
 		$price      = mp_get_post_value( 'product_price', '' );
 		$sale_price = mp_get_post_value( 'product_sale_price', '' );
+		
+		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$sale_price = filter_var( $sale_price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
 
 		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
 		$regular_price 	  = mp_get_post_value( 'regular_price', '' );
