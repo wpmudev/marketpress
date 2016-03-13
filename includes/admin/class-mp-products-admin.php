@@ -459,7 +459,7 @@ class MP_Products_Screen {
 							if( $product->on_sale() ) {
 								echo '<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
 								<em class="alignleft inline-edit-or"> –'. __( 'OR', 'mp' ) .'– </em>
-								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="" /></span>
+								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="' . $price['sale']['percentage'] . '" /></span>
 								<em class="alignleft inline-edit-or"> '. __( '% discount', 'mp' ) .' </em>';
 							}
 							echo '
@@ -1415,6 +1415,15 @@ WHERE $delete_where"
 						'number' => true,
 						'min'    => 0,
 						//'lessthan'	 => '[name*="regular_price"]'
+					),
+				) ) );
+				$sale_price->add_field( 'text', apply_filters( 'mp_add_field_array_percentage', array(
+					'name'       => 'percentage',
+					'label'      => array( 'text' => __( '% discount', 'mp' ) ),
+					'validation' => array(
+						'number' => true,
+						'min'    => 1,
+						'max'    => 99,
 					),
 				) ) );
 				$sale_price->add_field( 'datepicker', apply_filters( 'mp_add_field_array_start_date', array(
