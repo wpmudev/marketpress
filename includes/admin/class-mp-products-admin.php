@@ -64,6 +64,7 @@ class MP_Products_Screen {
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
+		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );		
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 // Product attributes save/get value
@@ -163,6 +164,35 @@ class MP_Products_Screen {
 		</script>
 		<?php
 	}
+
+		
+	/**
+	 * Set mp_flush_rewrites_30 to 1 after saving/publishing new product.
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+
+	public function force_flush_rewrites($post_id, $post) {
+		if ( empty( $_POST ) ) {
+			return $post_id;
+		}
+
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+
+		if ( wp_is_post_revision( $post ) ) {
+			return $post_id;
+		}
+
+		if ( $post->post_type != MP_Product::get_post_type() ) {
+			return $post_id;
+		}
+
+		update_option( 'mp_flush_rewrites_30', 1 );
+	}
+
 
 	public function save_post_quantity_fix( $post_id, $post ) {
 		if ( empty( $_POST ) ) {
