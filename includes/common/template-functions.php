@@ -2754,39 +2754,37 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[2] . '</option>';
 		}
 
-		$hideProductsFilter = mp_get_setting( 'hide_products_filter' );
-		if ( $hideProductsFilter != 1 ) {
 
-			$return = '
-			<a id="mp-product-top"></a>
-			<!-- Products Filter -->
-			<section class="mp_products_filter">
-				<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
+		$return = '
+		<a id="mp-product-top"></a>
+		<!-- Products Filter -->
+		<section class="mp_products_filter">
+			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
+			
+				<div class="mp_form_fields">
+					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+						<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
+						' . $terms . '
+					</div><!-- mp_listing_products_category -->
+
+					<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
+						<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
+						<select id="mp_sort_orderby" class="mp_select2" name="order">
+							' . $options_html . '
+						</select>
+					</div><!-- mp_products_filter_orderby -->
+				</div>
 				
-					<div class="mp_form_fields">
-						<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-							<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
-							' . $terms . '
-						</div><!-- mp_listing_products_category -->
-	
-						<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
-							<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
-							<select id="mp_sort_orderby" class="mp_select2" name="order">
-								' . $options_html . '
-							</select>
-						</div><!-- mp_products_filter_orderby -->
-					</div>
-					
-					' . ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
-					<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
-				
-				</form><!-- mp_products_filter_form -->
-			</section><!-- end mp_products_filter -->
-			';
+				' . ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
+				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
+			
+			</form><!-- mp_products_filter_form -->
+		</section><!-- end mp_products_filter -->
+		';
 
-			return apply_filters( 'mp_products_filter', $return );
+		return apply_filters( 'mp_products_filter', $return );
 
-		}
+
 	}
 
 endif;
