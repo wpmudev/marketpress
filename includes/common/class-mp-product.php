@@ -1386,6 +1386,17 @@ class MP_Product {
 	}
 
 	/**
+	 * Determine if product is featured
+	 *
+	 * @since 3.0.0.8
+	 * @access public
+	 * @return bool
+	 */
+	public function is_featured() {
+		return $this->get_meta( 'featured' );
+	}
+
+	/**
 	 * Determine if product is on sale
 	 *
 	 * @since 3.0
