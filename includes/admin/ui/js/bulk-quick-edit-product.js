@@ -21,6 +21,42 @@
 				$target = $('#quick-edit-col-product-price').find('.inline-edit-col');
 		
 		$target.html($content.html());
+
+		$target.on('input', 'input', function() {
+			var price = parseFloat( $target.find("input[name='product_price']").val() );
+			var sale_price = parseFloat( $target.find("input[name='product_sale_price']").val() );
+			var percentage_discount = parseFloat( $target.find("input[name='product_sale_percentage_discount']").val() );
+
+			switch($(this).attr('name')) {
+				case 'product_price':
+					var new_percentage = ( 100 - ( ( 100 / price ) * sale_price ) );
+					if(isFinite(new_percentage) && new_percentage >= 0.0) {
+						$target.find("input[name='product_sale_percentage_discount']").val( new_percentage.toFixed(2) );
+					}else{
+						$target.find("input[name='product_sale_percentage_discount']").val( '' );
+					}
+					break;
+				case 'product_sale_price':
+					var new_percentage = ( 100 - ( ( 100 / price ) * sale_price ) );
+					if(isFinite(new_percentage) && new_percentage >= 0.0) {
+						$target.find("input[name='product_sale_percentage_discount']").val( new_percentage.toFixed(2) );
+					}else{
+						$target.find("input[name='product_sale_percentage_discount']").val( '' );
+					}
+					break;
+				case 'product_sale_percentage_discount':
+					var new_sale_price = price - ( ( price / 100 ) * percentage_discount );
+					if(isFinite(new_sale_price) && new_sale_price <= price && new_sale_price > 0) {
+						$target.find("input[name='product_sale_price']").val( new_sale_price.toFixed(2) );
+					}else{
+						$target.find("input[name='product_sale_price']").val( '' );
+					}
+					break;
+			}
+		});
+		
+		$target.find("input[name='product_price']").trigger('input');
+
 	}
 	
 	$('#the-list').on('click', '#bulk_edit', function(e){
