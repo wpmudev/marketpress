@@ -146,6 +146,11 @@ class MP_Checkout {
 
 		$data = (array) mp_get_post_value( 'billing', array() );
 
+		// Force state to empty if not set by user to ensure that old state value will be deleted
+		if( !isset( $data['state'] ) ) {
+			$data['state'] = '';
+		}
+
 		foreach ( $data as $key => $value ) {
 			$value = trim( $value );
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
@@ -156,6 +161,11 @@ class MP_Checkout {
 
 		if ( $enable_shipping_address ) {
 			$data = (array) mp_get_post_value( 'shipping', array() );
+
+			// Force state to empty if not set by user to ensure that old state value will be deleted
+			if( !isset( $data['state'] ) ) {
+				$data['state'] = '';
+			}
 
 			foreach ( $data as $key => $value ) {
 				$value = trim( $value );

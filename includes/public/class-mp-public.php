@@ -728,6 +728,9 @@ class MP_Public {
 			return $content;
 		}
 
+// Should only run once, prevent infinite loops
+		remove_filter( 'the_content', array( &$this, 'taxonomy_content' ) );
+
 // don't remove post thumbnails from products
 		remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );
 
