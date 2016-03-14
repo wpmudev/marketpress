@@ -509,7 +509,7 @@ if ( ! function_exists( '_mp_order_status_overview' ) ) :
 	 */
 	function _mp_order_status_overview() {
 		$history        = array_filter( mp_get_order_history() );
-		$page           = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+		$page           = get_query_var( 'mp_status_pagenumber', 1 );
 		$per_page_value = mp_get_setting( 'per_page_order_history' );
 		$per_page       = isset( $per_page_value ) ? $per_page_value : get_option( 'posts_per_page' );
 		$offset         = ( $page - 1 ) * $per_page;
@@ -2130,6 +2130,7 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 					//only owner and store admins can see
 					if ( $order->post_author != get_current_user_id() && !current_user_can( apply_filters( 'mp_store_settings_cap', 'read_store_order' ) ) ) {
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+						$html .= _mp_order_status_overview();
 					} else {
 						$html .= $order->details( false );
 					}
@@ -2149,29 +2150,10 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 					}
 				} else {
-					// Get order from logged in user account or from cookie if logged out
-					$orders = mp_get_order_history();
-					if ( is_array( $orders ) ) {
-						$order = new MP_Order( $order_id );
-						if ( $order->exists() ) {
-							$found = false;
-							foreach ( $orders as $key => $val ) {
-								if ( $val['id'] == $order->ID ) {
-									//this order belonged to this user
-									$found = true;
-									break;
-								}
-							}
-							if ( $found == true ) {
-								$html .= $order->details( false );
-							} else {
-								$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-							}
-						} else {
-							$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						}
-					}
+					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 				}
+			} else {
+				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 			}
 		}
 
