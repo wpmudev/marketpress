@@ -271,11 +271,12 @@ class MP_Cart {
 		switch ( mp_get_post_value( 'cart_action' ) ) {
 			case 'add_item' :
 				$cart_updated = $this->add_item( $item_id, $qty );
-				//wp_send_json_success( $this->floating_cart_html() );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
-					'minicart'     => $this->floating_cart_html(),
-					'widgetcart'   => $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
-					'cart_updated' => $cart_updated,
+					'minicart'     		=> $this->floating_cart_html(),
+					'widgetcart'  		=> $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
+					'cart_updated'		=> $cart_updated,
+					'product_input'     => $product->attribute_input_fields(),
 				) );
 				break;
 
