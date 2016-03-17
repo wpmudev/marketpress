@@ -469,6 +469,14 @@ tr.variation_row_color_20 .text-core .text-wrap .text-tags .text-tag .text-butto
     margin: 1px 3px 1px 0px;
 }
 
+tr .set-default{
+	color: #BBB;
+}
+
+tr.default .set-default{
+	color: #0073aa;
+}
+
 .select_attributes_filter{
     margin-top:10px;
     margin-bottom: 10px;

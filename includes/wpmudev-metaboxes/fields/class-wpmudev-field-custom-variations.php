@@ -142,9 +142,9 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 								<?php _e( 'Sales', 'mp' ); ?>
 							</th>
 
-																																																				<!--<th scope="col" id="variation_content" class="manage-column">
+							<!--<th scope="col" id="variation_content" class="manage-column">
 							<?php _e( 'Variation Content', 'mp' ); ?>
-																																																				</th>-->
+							</th>-->
 
 							<th scope="col" id="more" class="manage-column">
 								<?php _e( 'More', 'mp' ); ?>
@@ -155,8 +155,10 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 					<tbody id="the-list">
 						<?php
 						$style = '';
+						$default_variation = get_post_meta( $post_id, 'default_variation', true ) ;
 						foreach ( $children as $child ) {
 							$style = ( isset( $style ) && 'alternate' == $style ) ? '' : 'alternate';
+							$style .= ( $default_variation == $child->ID ) ? ' default' : '';
 							?>
 							<tr id="post-<?php echo $child->ID; ?>" data-id="<?php echo esc_attr( $child->ID ); ?>" class="hentry <?php echo $style; ?>">
 								<th scope="row" class="check-column">
@@ -248,14 +250,12 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 										?>
 									</span>
 								</td>
-
-
-																																																						<!--<td class="">
-																																																						<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>
-																																																						</td>-->
-
+								<!--<td class="">
+								<a target="_blank" href="<?php echo admin_url( 'post.php?post=' . $child->ID . '&action=edit' ) ?>"><?php _e( 'Edit', 'mp' ); ?></a>
+								</td>-->
 								<td class="field_more">
 									<a class="colorbox-link cboxElement open_ajax" href="" data-popup-id="<?php echo esc_attr( $child->ID ); ?>"><i class="fa fa-th-large"></i></a>
+									<a class="set-default" title="<?php esc_attr_e( 'Set as default variation.', 'mp' ) ?>" href="#" data-child-id="<?php echo esc_attr( $child->ID ); ?>" data-post-id="<?php echo esc_attr( $post_id ); ?>"><i class="fa fa-asterisk"></i></a>
 									<span class="hidden variation_name"><?php echo get_post_meta( $child->ID, 'name', true ); ?></span>
 								</td>
 							</tr>
