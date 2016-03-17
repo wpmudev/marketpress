@@ -131,7 +131,9 @@ class MP_Orders_Admin {
 		$tracking_num    = trim( mp_get_post_value( 'mp->tracking_info->tracking_num', '' ) );
 		$shipment_method = trim( mp_get_post_value( 'mp->tracking_info->shipping_method', '' ) );
 		$custom_method   = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
-		//check for the custom shipping method here
+		$tracking_link   = trim( mp_get_post_value( 'mp->tracking_info->tracking_link' ) );
+
+		// check for the custom shipping method here
 		if ( $shipment_method == 'other' && ! empty( $custom_method ) ) {
 			//so if shippin method = custom, & user provided a new method name, we will use tht method name
 			$method_name     = trim( mp_get_post_value( 'mp->tracking_info->custom_method' ) );
@@ -153,6 +155,17 @@ class MP_Orders_Admin {
 				}
 			}
 		}
+
+		// Save tracking_link only if shipement method is custom and tracking_link not empty
+		// Remove tracking_link if not
+		$custom_carriers = mp_get_setting( 'shipping->custom_method', array() );
+
+		if( ! empty( $tracking_link ) && ( isset( $custom_carriers[ $shipment_method ] ) || $shipment_method == 'other' ) ) {
+			$order->update_meta( 'mp_shipping_info->tracking_link', $tracking_link );
+		} else {
+			$order->update_meta( 'mp_shipping_info->tracking_link', '' );
+		}
+
 	}
 
 	/**
@@ -517,8 +530,14 @@ class MP_Orders_Admin {
 				<strong><?php _e( 'Method', 'mp' ); ?>:</strong><br/>
 				<input type="text" name="mp[tracking_info][custom_method]"
 					   placeholder="<?php _e( 'Method Name', 'mp' ); ?>" value="" style="width:100%"/>
-				<br/>
+				<br/><br/>
 			</div>
+			<div class="mp-order-custom-tracking-link mp-hide">
+				<strong><?php _e( 'Tracking Link', 'mp' ); ?>:</strong><br/>
+				<input type="text" name="mp[tracking_info][tracking_link]"
+					   placeholder="<?php _e( 'Tracking Link', 'mp' ); ?>" value="<?php echo $order->get_meta( 'mp_shipping_info->tracking_link' ); ?>" style="width:100%"/>
+				<br/><br/>
+			</div>			
 			<strong><?php _e( 'Tracking Number', 'mp' ); ?>:</strong><br/>
 			<input type="text" name="mp[tracking_info][tracking_num]"
 				   placeholder="<?php _e( 'Tracking Number', 'mp' ); ?>"

@@ -146,6 +146,11 @@ class MP_Checkout {
 
 		$data = (array) mp_get_post_value( 'billing', array() );
 
+		// Force state to empty if not set by user to ensure that old state value will be deleted
+		if( !isset( $data['state'] ) ) {
+			$data['state'] = '';
+		}
+
 		foreach ( $data as $key => $value ) {
 			$value = trim( $value );
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
@@ -156,6 +161,11 @@ class MP_Checkout {
 
 		if ( $enable_shipping_address ) {
 			$data = (array) mp_get_post_value( 'shipping', array() );
+
+			// Force state to empty if not set by user to ensure that old state value will be deleted
+			if( !isset( $data['state'] ) ) {
+				$data['state'] = '';
+			}
 
 			foreach ( $data as $key => $value ) {
 				$value = trim( $value );
@@ -223,8 +233,9 @@ class MP_Checkout {
 			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		}
 
+		$all_countries		 = mp_countries();
+
 		if ( mp_all_countries_allowed() ) {
-			$all_countries		 = mp()->countries;
 			$allowed_countries	 = array_keys( $all_countries );
 		}
 
@@ -233,7 +244,7 @@ class MP_Checkout {
 		//$countries[''] = __('Select One', 'mp');
 
 		foreach ( $allowed_countries as $_country ) {
-			$countries[ $_country ] = mp()->countries[ $_country ];
+			$countries[ $_country ] = $all_countries[ $_country ];
 		}
 
 		// State/zip fields

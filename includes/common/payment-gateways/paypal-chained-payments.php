@@ -166,15 +166,18 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			$this->RedirectToPayPal( $paykey );
 		} else { //whoops, error
 
+			$error = "";
 			for ( $i = 0; $i <= 5; $i ++ ) { //print the first 5 errors
 				if ( isset( $result["error($i)_message"] ) ) {
 					$error .= "<li>{$result[ "error($i)_errorId" ]} - {$result[ "error($i)_message" ]}</li>";
 				}
 			}
-			$error = '<br /><ul>' . $error . '</ul>';
-			echo $error;
-			exit;
-			mp_checkout()->add_error( __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) . $error );
+
+			if( empty( $error ) ){
+				mp_checkout()->add_error( '<li>' . __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) . '</li>' , 'order-review-payment' );
+			} else {
+				mp_checkout()->add_error( $error , 'order-review-payment' );
+			}
 
 			return false;
 		}

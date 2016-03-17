@@ -110,7 +110,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	 * @filter mp_order/confirmation_text/manual_payments
 	 */
 	function order_confirmation_text( $content, $order ) {
-		return $content . wpautop( str_replace( 'TOTAL', mp_format_currency( $order->get_meta( 'mp_payment_info->currency' ), $order->get_meta( 'mp_payment_info->total' ) ), $this->get_setting( 'confirmation' ) ) );
+		return $content . wpautop( str_replace( array( 'TOTAL', 'ORDERID' ), array( mp_format_currency( $order->get_meta( 'mp_payment_info->currency' ), $order->get_meta( 'mp_payment_info->total' ) ) , $order->get_id() ), $this->get_setting( 'confirmation' ) ) );
 	}
 
 	/**
@@ -147,7 +147,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 		$metabox->add_field( 'wysiwyg', array(
 			'name'	 => $this->get_field_name( 'confirmation' ),
 			'label'	 => array( 'text' => __( 'Confirmation User Instructions', 'mp' ) ),
-			'desc'	 => __( 'These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total.', 'mp' ),
+			'desc'	 => __( 'These are the manual payment instructions to display on the order confirmation screen. TOTAL will be replaced with the order total and ORDERID will be replaced with Order ID.', 'mp' ),
 		) );
 		$metabox->add_field( 'textarea', array(
 			'name'			 => $this->get_field_name( 'email' ),

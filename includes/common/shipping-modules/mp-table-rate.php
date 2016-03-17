@@ -291,7 +291,7 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 		break;
 
 		default:
-			if ( in_array( $country, mp()->eu_countries ) ) {
+			if ( in_array( $base_country, mp()->eu_countries ) ) {
 				//in european union
 				if ( $base_country == $country ) {
 					$price = mp_arr_get_value( 'in_country', $rate, 0 );

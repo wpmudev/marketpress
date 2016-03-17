@@ -509,7 +509,7 @@ if ( ! function_exists( '_mp_order_status_overview' ) ) :
 	 */
 	function _mp_order_status_overview() {
 		$history        = array_filter( mp_get_order_history() );
-		$page           = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+		$page           = get_query_var( 'mp_status_pagenumber', 1 );
 		$per_page_value = mp_get_setting( 'per_page_order_history' );
 		$per_page       = isset( $per_page_value ) ? $per_page_value : get_option( 'posts_per_page' );
 		$offset         = ( $page - 1 ) * $per_page;
@@ -2113,6 +2113,7 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 		$args = array_replace_recursive( array(
 			'echo'     => false,
 			'order_id' => get_query_var( 'mp_order_id', null ),
+			'guest_email' => get_query_var( 'mp_guest_email', null ),
 		), $args );
 
 		extract( $args );
@@ -2129,6 +2130,7 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 					//only owner and store admins can see
 					if ( $order->post_author != get_current_user_id() && !current_user_can( apply_filters( 'mp_store_settings_cap', 'read_store_order' ) ) ) {
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+						$html .= _mp_order_status_overview();
 					} else {
 						$html .= $order->details( false );
 					}
@@ -2138,31 +2140,20 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 				}
 			}
 		} else {
-			//we will try to find the order by history cookie, separate code for prevent conflict later
-			//$orders = mp_get_cookie_value( 'mp_order_history', array() );
 			if ( ! is_null( $order_id ) ) {
-				$orders = mp_get_order_history();
-				if ( is_array( $orders ) ) {
+				if( ! is_null ( $guest_email ) ) {
+					// If email and order provided matches, show the order status page
 					$order = new MP_Order( $order_id );
-					if ( $order->exists() ) {
-						$found = false;
-						foreach ( $orders as $key => $val ) {
-							if ( $val['id'] == $order->ID ) {
-								//this order belonged to this user
-								$found = true;
-								break;
-							}
-						}
-						if ( $found == true ) {
-							$html .= $order->details( false );
-						} else {
-							$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						}
+					if ( $order->exists() && ( md5( $order->get_meta( 'mp_billing_info->email', '' ) ) == $guest_email || md5( $order->get_meta( 'mp_shipping_info->email', '' ) ) == $guest_email ) ) {
+						$html .= $order->details( false );
 					} else {
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						$html .= _mp_order_status_overview();
 					}
+				} else {
+					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 				}
+			} else {
+				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 			}
 		}
 
@@ -2763,39 +2754,37 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[2] . '</option>';
 		}
 
-		$hideProductsFilter = mp_get_setting( 'hide_products_filter' );
-		if ( $hideProductsFilter != 1 ) {
 
-			$return = '
-			<a id="mp-product-top"></a>
-			<!-- Products Filter -->
-			<section class="mp_products_filter">
-				<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
+		$return = '
+		<a id="mp-product-top"></a>
+		<!-- Products Filter -->
+		<section class="mp_products_filter">
+			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
+			
+				<div class="mp_form_fields">
+					<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
+						<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
+						' . $terms . '
+					</div><!-- mp_listing_products_category -->
+
+					<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
+						<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
+						<select id="mp_sort_orderby" class="mp_select2" name="order">
+							' . $options_html . '
+						</select>
+					</div><!-- mp_products_filter_orderby -->
+				</div>
 				
-					<div class="mp_form_fields">
-						<div class="mp_form_field mp_products_filter_field mp_products_filter_category" data-placeholder="' . __( 'Product Category', 'mp' ) . '">
-							<label for="mp_product_category" class="mp_form_label">' . __( 'Category', 'mp' ) . '</label>
-							' . $terms . '
-						</div><!-- mp_listing_products_category -->
-	
-						<div class="mp_form_field mp_products_filter_field mp_products_filter_orderby">
-							<label for="mp_sort_orderby" class="mp_form_label">' . __( 'Order By', 'mp' ) . '</label>
-							<select id="mp_sort_orderby" class="mp_select2" name="order">
-								' . $options_html . '
-							</select>
-						</div><!-- mp_products_filter_orderby -->
-					</div>
-					
-					' . ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
-					<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
-				
-				</form><!-- mp_products_filter_form -->
-			</section><!-- end mp_products_filter -->
-			';
+				' . ( ( is_null( $per_page ) ) ? '' : '<input type="hidden" name="per_page" value="' . $per_page . '">' ) . '
+				<input type="hidden" name="page" value="' . max( get_query_var( 'paged' ), 1 ) . '">
+			
+			</form><!-- mp_products_filter_form -->
+		</section><!-- end mp_products_filter -->
+		';
 
-			return apply_filters( 'mp_products_filter', $return );
+		return apply_filters( 'mp_products_filter', $return );
 
-		}
+
 	}
 
 endif;

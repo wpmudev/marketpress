@@ -98,7 +98,7 @@ class MP_Store_Settings_General {
 		$old_product_post_type = $new_product_post_type == 'mp_product' ? 'product' : 'mp_product';
 
 		// Check if there is at least 1 product with the old post type
-		$check = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s WHERE post_type = %s', $wpdb->posts, $old_product_post_type ), ARRAY_A );
+		$check = $wpdb->get_results( "SELECT * FROM {$wpdb->posts} WHERE post_type = '{$old_product_post_type}'", ARRAY_A );
 		if ( null === $check ) {
 			return;
 		}
@@ -587,7 +587,7 @@ class MP_Store_Settings_General {
 			'placeholder'	 => __( 'Select a Country', 'mp' ),
 			'multiple'		 => false,
 			'label'			 => array( 'text' => __( 'Base Country', 'mp' ) ),
-			'options'		 => array( '' => __( 'Select A Country' ) ) + mp()->countries,
+			'options'		 => array( '' => __( 'Select A Country' ) ) + mp_countries(),
 			'width'			 => 'element',
 			'validation'	 => array(
 				'required' => true,

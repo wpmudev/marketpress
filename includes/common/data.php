@@ -124,22 +124,33 @@ $this->default_settings = array(
 		),
 		'new_order'		 => array(
 			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
-			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information: \n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information: \n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n
+You can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
+			),
+		),
+		'new_order_downloads'		 => array(
+			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\nYour order has been received and your digital goods are ready to be downloaded. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
+			),
+		),
+		'new_order_mixed'		 => array(
+			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\nYour order has been received, your digital goods are ready to be downloaded and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
 			),
 		),
 		'order_shipped'	 => array(
 			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
-			'text'		 => __( "Dear CUSTOMERNAME,\n Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			'text'		 => __( "Dear CUSTOMERNAME,\nYour order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
 			),
 		),
 		'order_shipped_downloads'	 => array(
 			'subject'	 => __( 'Your Order Is Ready To Be Downloaded! (ORDERID)', 'mp' ),
-			'text'		 => __( "Dear CUSTOMERNAME,\n Your order is now available to download! Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			'text'		 => __( "Dear CUSTOMERNAME,\nYour order is now available to download! Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
 			),
 		),
 		'order_shipped_mixed'	 => array(
 			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
-			'text'		 => __( "Dear CUSTOMERNAME,\n Your order has been shipped! Also, digital downloads included in your order are now ready to be downloaded. Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n\n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			'text'		 => __( "Dear CUSTOMERNAME,\nYour order has been shipped! Also, digital downloads included in your order are now ready to be downloaded. Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
 			),
 		) ),
 	'social'					 => array(
@@ -260,6 +271,7 @@ $this->countries = array(
 	'GP' => 'Guadeloupe',
 	'GU' => 'Guam',
 	'GT' => 'Guatemala',
+	'GG' => 'Guernsey',
 	'GN' => 'Guinea',
 	'GW' => 'Guinea-Bissau',
 	'GY' => 'Guyana',
@@ -275,10 +287,12 @@ $this->countries = array(
 	'IR' => 'Iran (Islamic Republic Of)',
 	'IQ' => 'Iraq',
 	'IE' => 'Ireland',
+	'IM' => 'Isle Of Man',
 	'IL' => 'Israel',
 	'IT' => 'Italy',
 	'JM' => 'Jamaica',
 	'JP' => 'Japan',
+	'JE' => 'Jersey',
 	'JO' => 'Jordan',
 	'KZ' => 'Kazakhstan',
 	'KE' => 'Kenya',

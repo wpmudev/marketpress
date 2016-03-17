@@ -271,11 +271,12 @@ class MP_Cart {
 		switch ( mp_get_post_value( 'cart_action' ) ) {
 			case 'add_item' :
 				$cart_updated = $this->add_item( $item_id, $qty );
-				//wp_send_json_success( $this->floating_cart_html() );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
-					'minicart'     => $this->floating_cart_html(),
-					'widgetcart'   => $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
-					'cart_updated' => $cart_updated,
+					'minicart'     		=> $this->floating_cart_html(),
+					'widgetcart'  		=> $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
+					'cart_updated'		=> $cart_updated,
+					'product_input'     => $product->attribute_input_fields(),
 				) );
 				break;
 
@@ -1545,6 +1546,11 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function product_total( $format = false ) {
+		
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'product', $this->_total ) ) {
 			$total                   = 0;
 			$blog_ids                = $this->get_blog_ids();
@@ -1605,6 +1611,11 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function product_tangible_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		$total                   = 0;
 		$blog_ids                = $this->get_blog_ids();
 
@@ -1648,6 +1659,11 @@ class MP_Cart {
 	 * @return float|string
 	 */
 	public function product_original_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'product_original', $this->_total ) ) {
 			$total                            = 0;
 			$blog_ids                         = $this->get_blog_ids();
@@ -2085,6 +2101,11 @@ class MP_Cart {
 	 * @return string/float
 	 */
 	public function tax_total( $format = false, $estimate = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
 			$include_shipping_tax = mp_get_setting( 'tax->tax_shipping' );
@@ -2193,6 +2214,11 @@ class MP_Cart {
 	 */
 
 	 public function total_tax_digital_inclusive( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		$tax_amt = 0;
 
 		$blog_ids = $this->get_blog_ids();
@@ -2245,6 +2271,11 @@ class MP_Cart {
 	 */
 
 	public function total_special_tax( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+		
 		$tax_amt = 0;
 
 		$blog_ids = $this->get_blog_ids();
@@ -2307,7 +2338,11 @@ class MP_Cart {
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
-				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
+				$pre_tax_total =  $pre_total / ( 1 + $tax_rate );
+				$total = $pre_tax_total + $this->tax_total() + $this->total_tax_digital_inclusive() + $this->total_special_tax();
+
+				// There will be oftenly rounding errors
+				$rounding_error = $total - $pre_total;
 
 				$shipping_pre_total = $this->shipping_total();
 				if( mp_get_setting( 'tax->tax_shipping' ) ) {
@@ -2315,7 +2350,9 @@ class MP_Cart {
 				}
 
 				//Shipping price should be added after products price calculation
-				$total     = $total + $shipping_pre_total + $this->total_tax_digital_inclusive() + $this->total_special_tax();
+				$total = $total + $shipping_pre_total;
+				//Fix the rounding error, if there is
+				$total -= $rounding_error;
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
@@ -2465,9 +2502,9 @@ class MP_Cart {
 	 */
 	public function __construct( $use_cookies = true ) {
 		$this->_use_cookies = $use_cookies;
-
+		$this->set_id( get_current_blog_id() ); // we need the id for virtual carts too (without cookies)
+		
 		if ( $this->_use_cookies ) {
-			$this->set_id( get_current_blog_id() );
 			$this->_get_cart_cookie();
 		}
 

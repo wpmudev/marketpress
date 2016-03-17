@@ -64,6 +64,7 @@ class MP_Products_Screen {
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
+		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );		
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 // Product attributes save/get value
@@ -164,6 +165,35 @@ class MP_Products_Screen {
 		<?php
 	}
 
+		
+	/**
+	 * Set mp_flush_rewrites_30 to 1 after saving/publishing new product.
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+
+	public function force_flush_rewrites($post_id, $post) {
+		if ( empty( $_POST ) ) {
+			return $post_id;
+		}
+
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+
+		if ( wp_is_post_revision( $post ) ) {
+			return $post_id;
+		}
+
+		if ( $post->post_type != MP_Product::get_post_type() ) {
+			return $post_id;
+		}
+
+		update_option( 'mp_flush_rewrites_30', 1 );
+	}
+
+
 	public function save_post_quantity_fix( $post_id, $post ) {
 		if ( empty( $_POST ) ) {
 			return $post_id;
@@ -221,8 +251,9 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 
-		$price      = mp_get_post_value( 'product_price', '' );
-		$sale_price = mp_get_post_value( 'product_sale_price', '' );
+		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$sale_price = filter_var( $sale_price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$featured   = mp_get_post_value( 'featured' );
 
 		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
 		$regular_price 	  = mp_get_post_value( 'regular_price', '' );
@@ -234,6 +265,7 @@ class MP_Products_Screen {
 			update_post_meta( $post_id, 'sort_price', $regular_price );
 		}
 
+		update_post_meta( $post_id, 'featured', empty( $featured ) ? 0 : 1 );
 		update_post_meta( $post_id, 'regular_price', $price );
 		update_post_meta( $post_id, 'sale_price_amount', $sale_price );
 
@@ -333,6 +365,7 @@ class MP_Products_Screen {
 			'cb'                        => '<input type="checkbox" />',
 			'title'                     => __( 'Product Name', 'mp' ),
 			'product_variations'        => __( 'Variations', 'mp' ),
+			'featured'                  => __( 'Featured', 'mp' ),
 			'product_sku'               => __( 'SKU', 'mp' ),
 			'product_price'             => __( 'Price', 'mp' ),
 			'product_stock'             => __( 'Stock', 'mp' ),
@@ -387,6 +420,9 @@ class MP_Products_Screen {
 				}
 
 				echo $image;
+				break;
+			case 'featured' :
+				echo $product->is_featured() ? __( 'True', 'mp' ) : __( 'False', 'mp' );
 				break;
 			case 'product_variations' :
 				if ( $product->has_variations() ) {
@@ -448,16 +484,31 @@ class MP_Products_Screen {
 				}
 
 				echo $prices;
-				if ( ! $product->has_variations() ) {
-					echo '
-					<div style="display:none">
-						<div id="quick-edit-product-content-' . $post_id . '">
-							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>
-							<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
-							<input type="hidden" name="quick_edit_product_nonce" value="' . wp_create_nonce( 'quick_edit_product' ) . '" />
+				echo '
+				<div style="display:none">
+					<div id="quick-edit-product-content-' . $post_id . '">';
+						if ( ! $product->has_variations() ) {
+							echo '
+							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>';
+							if( $product->on_sale() ) {
+								echo '<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
+								<em class="alignleft inline-edit-or"> –'. __( 'OR', 'mp' ) .'– </em>
+								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="' . $price['sale']['percentage'] . '" /></span>
+								<em class="alignleft inline-edit-or"> '. __( '% discount', 'mp' ) .' </em>';
+							}
+							echo '
+							<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>';
+						}
+						echo '
+						<div class="inline-edit-group">
+							<label class="alignleft"><span class="title">' . __( 'Featured', 'mp' ) . '</span><input type="checkbox" name="featured" value="featured" '. ( $product->is_featured() ? 'checked' : '' ) .'></label>
 						</div>
-					</div>';
-				}
+						<input type="hidden" name="quick_edit_product_nonce" value="' . wp_create_nonce( 'quick_edit_product' ) . '" />
+					</div>
+				</div>';
+				
+					
+				
 				break;
 
 			case 'product_stock' :
@@ -508,6 +559,7 @@ class MP_Products_Screen {
 //$this->init_product_details_metabox();
 //$this->init_variations_metabox();
 		$this->init_related_products_metabox();
+		$this->init_featured_product_metabox();
 	}
 
 	/**
@@ -1286,6 +1338,26 @@ WHERE $delete_where"
 	}
 
 	/**
+	 * Initializes the featured product metabox
+	 *
+	 * @since 3.0.0.8
+	 * @access public
+	 */
+	public function init_featured_product_metabox() {
+		$metabox = new WPMUDEV_Metabox( apply_filters( 'mp_metabox_array_mp-featured_product-metabox', array(
+			'id'        => 'mp-featured-product-metabox',
+			'title'     => __( 'Featured Product', 'mp' ),
+			'post_type' => MP_Product::get_post_type(),
+			'context'   => 'side',
+		) ) );
+
+		$metabox->add_field( 'checkbox', apply_filters( 'mp_add_field_array_featured', array(
+			'name'    => 'featured',
+			'message' => __( 'Is Featured?', 'mp' ),
+		) ) );
+	}
+
+	/**
 	 * Initializes the product type metabox
 	 *
 	 * @since 3.0
@@ -1406,6 +1478,15 @@ WHERE $delete_where"
 						'number' => true,
 						'min'    => 0,
 						//'lessthan'	 => '[name*="regular_price"]'
+					),
+				) ) );
+				$sale_price->add_field( 'text', apply_filters( 'mp_add_field_array_percentage', array(
+					'name'       => 'percentage',
+					'label'      => array( 'text' => __( '% discount', 'mp' ) ),
+					'validation' => array(
+						'number' => true,
+						'min'    => 1,
+						'max'    => 99,
 					),
 				) ) );
 				$sale_price->add_field( 'datepicker', apply_filters( 'mp_add_field_array_start_date', array(
