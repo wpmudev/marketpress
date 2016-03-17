@@ -251,8 +251,8 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 
-		$price      = mp_get_post_value( 'product_price', '' );
-		$sale_price = mp_get_post_value( 'product_sale_price', '' );
+		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$sale_price = filter_var( $sale_price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
 		$featured   = mp_get_post_value( 'featured' );
 
 		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
@@ -489,7 +489,14 @@ class MP_Products_Screen {
 					<div id="quick-edit-product-content-' . $post_id . '">';
 						if ( ! $product->has_variations() ) {
 							echo '
-							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>
+							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>';
+							if( $product->on_sale() ) {
+								echo '<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
+								<em class="alignleft inline-edit-or"> –'. __( 'OR', 'mp' ) .'– </em>
+								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="' . $price['sale']['percentage'] . '" /></span>
+								<em class="alignleft inline-edit-or"> '. __( '% discount', 'mp' ) .' </em>';
+							}
+							echo '
 							<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>';
 						}
 						echo '
@@ -1471,6 +1478,15 @@ WHERE $delete_where"
 						'number' => true,
 						'min'    => 0,
 						//'lessthan'	 => '[name*="regular_price"]'
+					),
+				) ) );
+				$sale_price->add_field( 'text', apply_filters( 'mp_add_field_array_percentage', array(
+					'name'       => 'percentage',
+					'label'      => array( 'text' => __( '% discount', 'mp' ) ),
+					'validation' => array(
+						'number' => true,
+						'min'    => 1,
+						'max'    => 99,
 					),
 				) ) );
 				$sale_price->add_field( 'datepicker', apply_filters( 'mp_add_field_array_start_date', array(
