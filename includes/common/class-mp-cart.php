@@ -1565,7 +1565,6 @@ class MP_Cart {
 	public function product_tangible_total( $format = false ) {
 		$total                   = 0;
 		$blog_ids                = $this->get_blog_ids();
-		$this->_total['product'] = 0;
 
 		while ( 1 ) {
 			if ( $this->is_global ) {
