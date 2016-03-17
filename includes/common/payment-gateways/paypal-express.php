@@ -407,7 +407,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOSTREET' ]      = $this->trim_name( mp_arr_get_value( 'address1', $shipping_info, '' ), 100 );
 				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOSTREET2' ]     = $this->trim_name( mp_arr_get_value( 'address2', $shipping_info, '' ), 100 );
 				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOCITY' ]        = $this->trim_name( mp_arr_get_value( 'city', $shipping_info, '' ), 40 );
-				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOSTATE' ]       = $this->trim_name( mp_arr_get_value( 'state', $shipping_info, '' ), 40 );
+				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOSTATE' ]       = $this->trim_name( mp_arr_get_value( 'state', $shipping_info, mp_arr_get_value( 'city', $shipping_info, 'No State' ) ), 40 );
 				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOZIP' ]         = $this->trim_name( mp_arr_get_value( 'zip', $shipping_info, '' ), 20 );
 				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOCOUNTRYCODE' ] = $this->trim_name( mp_arr_get_value( 'country', $shipping_info, '' ), 2 );
 				$request[ 'PAYMENTREQUEST_' . $index . '_SHIPTOPHONENUM' ]    = $this->trim_name( mp_arr_get_value( 'phone', $shipping_info, '' ), 20 );
@@ -436,8 +436,8 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 				$i ++;
 			}
-			
-			if( function_exists( $vcart->update_total ) ) {
+
+			if( method_exists( $vcart, 'update_total' ) ) {
 				$vcart->update_total( array() );// Reset in order to prevent issue caused by cart subtotals being pre-set to 0.
 			}
 

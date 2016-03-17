@@ -25,7 +25,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 	var $private_key = '';
 	//api url
 	var $api_url = '';
-	
+
   var $currency = '';
 	//Transaction Speed for bitpay
 	var $transactionSpeed = '';
@@ -43,7 +43,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		$this->fullNotifications = $this->get_setting('fullNotifications');
 		$this->api_url = $this->get_setting('testMode') ? 'https://test.bitpay.com' : 'https://www.bitpay.com';
 	}
-	
+
   /**
    * Updates the gateway settings
    *
@@ -56,11 +56,11 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		if ( ! $this->get_setting('transactionSpeed') ) {
 			mp_push_to_array($settings, 'gateways->bitpay->transactionSpeed', 'high');
 		}
-		
+
 		if ( ! $this->get_setting('redirectMessage') ) {
 			mp_push_to_array($settings, 'gateways->bitpay->redirectMessage', __('You will be redirected to <a href="http://bitpay.com" title="">bitpay.com</a>, for bitcoin payment. It is completely safe.', 'mp'));
 		}
-		
+
 		return $settings;
 	}
 
@@ -81,7 +81,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		$order_id = $order->get_id();
 		$notificationURL = $this->ipn_url;
 		$fullNotifications = ( 'yes' == $this->fullNotifications );
-		
+
 		//Create Invoice and redirect to bitpay
 		$options = array(
 			'apiKey' => $this->private_key,
@@ -114,7 +114,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 					$bitpay_error_messages .= '<li>' . $error_field . ' => ' . $error_message . '</li>';
 				}
 			}
-			
+
 			mp_checkout()->add_error( $bitpay_error_messages, 'order-review-payment' );
 		} else {
 			//Invoice obtained
@@ -157,10 +157,10 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			'confirmed',
 			'complete'
 		);
-		
+
 		if ( in_array( $invoice->status, $status ) ) {
 			$timestamp = time();
-			
+
       //setup our payment details
       $payment_info = array();
 			$payment_info['gateway_public_name'] = $this->public_name;
@@ -170,20 +170,20 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			$payment_info['total'] = $invoice->price;
 			$payment_info['total_btc'] = $invoice->btcPrice;
 			$payment_info['currency'] = $invoice->currency;
-                        
+
 			if ( $invoice->status == 'complete' ) {
 				$payment_info['status'][ $timestamp ] = sprintf( __( '%s - The payment request has been processed - %s', 'mp' ), $invoice->status, $invoice->status );
 			} else {
 				$payment_info['status'][ $timestamp ] = sprintf( __( '%s - The payment request is under process. Bitpay invoice status - %s', 'mp' ), 'pending', $invoice->status );
 			}
-		
+
 			$order = new MP_Order( mp_get_session_value ('mp_order' ) );
 			$order->save( array(
 				'paid' => true,
 				'payment_info' => $payment_info,
 				'cart' => mp_cart(),
 			) );
-			
+
 			wp_redirect( $order->tracking_url( false ) );
 			exit;
 		} else {
@@ -202,7 +202,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 					$message = 'There was an error processing payment at ' . $bitpay->public_name . ', please reorder.';
 					break;
 			}
-			
+
 			mp_checkout()->add_error( $message, 'order-review-payment' );
 		}
 	}
@@ -291,7 +291,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 
 		//Check order Id for obtained Invoice
 		if ( $_SESSION['mp_order'] != $invoice->posData ) {
-			mp()->cart_checkout_error( __( 'Incorrect order invoice, please contact site administrator', 'mp' ) );
+			mp_checkout()->add_error( __( 'Incorrect order invoice, please contact site administrator', 'mp' ) );
 			wp_redirect( mp_checkout_step_url( 'confirm-checkout' ) );
 			exit;
 		}
@@ -302,7 +302,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			exit;
 		}
 	}
-	
+
 	/**
    * Use to handle any payment returns to the ipn_url. Do not display anything here. If you encounter errors
    * return the proper headers. Exits after.
@@ -313,7 +313,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			$this->bitpay_log( 'Untracked Order, due to gateway inactivation' );
 			exit;
 		}
-		
+
 		$private_key = $this->get_setting( 'private_key' );
 		$response = $this->bitpay_verify_notification( $private_key );
 
@@ -324,7 +324,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			$this->update_bitpay_payment_status( $orderId, $response['status'] );
 		}
 	}
-	
+
 	/**
 	 * Send POST request to bitpay.com api
 	 * @global type $mp
@@ -350,7 +350,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		if ( $this->get_setting( 'debugging' ) ) {
 			$this->bitpay_log( $response );
 		}
-		
+
 		return $response;
 	}
 
@@ -371,7 +371,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 	function bitpay_create_invoice( $orderId, $price, $posData, $options = array() ) {
 		$pos = array( 'posData' => $posData );
 		$pos['hash'] = crypt( serialize( $posData ), $options['apiKey'] );
-		
+
 		$options['posData'] = json_encode( $pos );
 		$options['orderID'] = $orderId;
 		$options['price']   = $price;
@@ -398,7 +398,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 			'buyerEmail',
 			'buyerPhone',
 		);
-		
+
 		foreach ( $postOptions as $o ) {
 			if ( array_key_exists( $o, $options ) ) {
 				$post[ $o ] = $options[ $o ];
@@ -416,7 +416,7 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 
 		return $response;
 	}
-	
+
 	/**
 	 * Verify the recieved invoice against the hash recieved in posData
 	 * @param type $apiKey
@@ -426,12 +426,12 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 		if ( ! $apiKey ) {
 			return;
 		}
-		
+
 		$post = file_get_contents( "php://input" );
 		if ( ! $post ) {
 			return array( 'error' => 'No post data' );
 		}
-		
+
 		$json = json_decode( $post, true );
 		if ( is_string( $json ) ) {
 			return array( 'error' => $json );
@@ -455,13 +455,13 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 	 * Get bitpay invoice using GET method
 	 * @param $invoiceid, obtained from bitpay_create_invoice
 	 * @param bitpay api key, default false
-	 * 
+	 *
 	 */
 	function bitpay_get_invoice( $invoiceId, $apiKey = false ) {
 		if ( ! $apiKey ) {
 			return false;
 		}
-		
+
 		$params = array(
 			'body'       => '',
 			'method'     => 'GET',
@@ -511,32 +511,32 @@ class MP_Gateway_Bitpay extends MP_Gateway_API {
 	*/
 	function update_bitpay_payment_status( $orderId, $invoice_status ) {
 		$order = new MP_Order( $orderId );
-		
+
 		switch ( $invoice_status ) {
 			case 'paid':
 				$status = sprintf( __( '%s - The payment request is under process. Bitpay invoice status - %s', 'mp' ), 'pending', $invoice_status );
 				$order->log_ipn_status( $status );
 				break;
-				
+
 			case 'confirmed':
 				$status = sprintf( __( '%s - The payment request is under process. Bitpay invoice status - %s', 'mp' ), 'pending', $invoice_status );
 				$order->log_ipn_status( $status );
 				break;
-				
+
 			case 'complete':
 				$status = sprintf( __( '%s - The payment request has been processed - %s', 'mp' ), $invoice_status, $invoice_status );
 				$order->log_ipn_status( $status );
-				
+
 				if ( $order->post_status != 'order_paid' ) {
 					$order->change_status( 'paid' );
 				}
 			break;
-				
+
 			case 'invalid':
 				$status = sprintf( __( '%s - The payment not credited in merchants bitpay account, action required. Bitpay invoice status  - %s', 'mp' ), 'error', $invoice_status );
 				$order->log_ipn_status( $status );
 			break;
-				
+
 			case 'expired':
 				$status = sprintf( __( '%s - The payment request expired, - %s', 'mp' ), 'cancelled', $invoice_status );
 				$order->log_ipn_status( $status );

@@ -266,6 +266,7 @@ class Marketpress {
 			'show_ui'         => true,
 			'show_in_menu'    => false,
 			'capability_type' => array( 'store_order', 'store_orders' ),
+			'capabilities'    => array( 'create_posts' => 'do_not_allow' ), // Temporarily disable creating order from admin
 			'map_meta_cap'    => true,
 			'hierarchical'    => false,
 			'rewrite'         => false,
@@ -278,6 +279,7 @@ class Marketpress {
 			'public'             => false,
 			'show_ui'            => true,
 			'show_in_nav_menus'	 => false,
+			'show_in_admin_bar'  => false,
 			'publicly_queryable' => true,
 			'hierarchical'       => true,
 			'rewrite'            => false,
@@ -394,7 +396,7 @@ class Marketpress {
 	}
 
 	function add_menu_items() {
-		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
+		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=' . MP_Product::get_post_type() );
 	}
 
 	function localization() {
@@ -490,11 +492,14 @@ class Marketpress {
 	function mp_product_variation_metaboxes() {
 		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : ( isset( $_POST['post_ID'] ) ? (int) $_POST['post_ID'] : '' );
 		if ( $post_id !== '' ) {
+			ob_start();
 			$variation_title = get_post_meta( $post_id, 'name', true );
 			?>
 			<input type="hidden" name="variation_title" id="variation_title"
 			       value="<?php echo esc_attr( $variation_title ); ?>"/>
 			<?php
+			
+			return ob_get_clean();
 		}
 	}
 
@@ -658,7 +663,9 @@ class Marketpress {
 			//$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 			//this rules match the default page rules, so we have to inject it before the page
 			$rewrite_rules = array_merge( array(
-				$uri . '/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]'
+				$uri . '/([^/]+)/?$' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]',
+				$uri . '/page/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_status_pagenumber=$matches[1]',
+				$uri . '/([^/]+)/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]&mp_guest_email=$matches[2]',
 			), $rewrite_rules );
 		}
 
@@ -685,6 +692,8 @@ class Marketpress {
 		$vars[] = 'mp_variation_id';
 		$vars[] = 'mp_order_id';
 		$vars[] = 'mp_confirm_order_step';
+		$vars[] = 'mp_guest_email';
+		$vars[] = 'mp_status_pagenumber';
 
 		return $vars;
 	}
@@ -719,11 +728,11 @@ class Marketpress {
 	 */
 
 	public function maybe_flush_rewrites() {
-		$flush_rewrites = get_option( 'mp_flush_rewrites_30', true );
+		$flush_rewrites = get_option( 'mp_flush_rewrites_30', 1 );
 
-		if ( $flush_rewrites == true ) {
+		if ( $flush_rewrites == 1 ) {
 			flush_rewrite_rules();
-			update_option( 'mp_flush_rewrites_30', false );
+			update_option( 'mp_flush_rewrites_30', 0 );
 		}
 	}
 

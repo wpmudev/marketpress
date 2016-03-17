@@ -3,7 +3,7 @@
 class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 	//build of the gateway plugin
 	var $build = 2;
-	
+
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
   var $plugin_name = 'payflow';
 
@@ -30,7 +30,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 
   //credit card vars
   var $API_Username, $API_Vendor, $API_Partner, $API_Password, $SandboxFlag, $returnURL, $cancelURL, $API_Endpoint, $version, $currencyCode, $locale;
-  
+
   /**
    * Gateway currencies
    *
@@ -54,7 +54,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
    */
   function on_creation() {
 	  require_once mp_plugin_dir( 'includes/common/payment-gateways/payflow/class-mp-gateway-worker-payflow.php' );
-	  
+
     //set names here to be able to translate
     $this->admin_name = __('PayPal Payflow Pro', 'mp');
     $this->public_name = __('Credit Card', 'mp');
@@ -68,7 +68,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
     $this->API_Password = $this->get_setting('api_credentials->password');
     $this->currencyCode = $this->get_setting('currency');
     $this->locale = $this->get_setting('locale');
-    
+
     //set api urls
     if ( $this->get_setting('mode') == 'sandbox')	{
       $this->API_Endpoint = "https://pilot-payflowpro.paypal.com";
@@ -76,7 +76,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
       $this->API_Endpoint = "https://payflowpro.paypal.com";
     }
   }
-  
+
   /**
    * Updates the gateway settings
    *
@@ -90,22 +90,22 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->user', $val);
 	  	unset($settings['gateways']['payflow']['api_user']);
   	}
-  	
+
   	if ( $val = $this->get_setting('api_vendor') ) {
 	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->vendor', $val);
 	  	unset($settings['gateways']['payflow']['api_vendor']);
   	}
-  	
+
   	if ( $val = $this->get_setting('api_partner') ) {
 	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->partner', $val);
 	  	unset($settings['gateways']['payflow']['api_partner']);
   	}
-  	
+
   	if ( $val = $this->get_setting('api_pwd') ) {
 	  	mp_push_to_array($settings, 'gateways->payflow->api_credentials->password', $val);
 	  	unset($settings['gateways']['payflow']['api_pwd']);
   	}
-  	
+
   	return $settings;
   }
 
@@ -161,7 +161,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
    * Use this to process any fields you added. Use the $_POST global,
    *  and be sure to save it to both the $_SESSION and usermeta if logged in.
    *  DO NOT save credit card details to usermeta as it's not PCI compliant.
-   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
+   *  Call mp_checkout()->add_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
@@ -169,25 +169,25 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
    */
   function process_payment_form($cart, $shipping_info) {
     if ( ! is_email(mp_get_post_value('email', '')) )
-      mp()->cart_checkout_error('Please enter a valid Email Address.', 'email');
+      mp_checkout()->add_error('Please enter a valid Email Address.', 'email');
 
     if ( ! mp_get_post_value('name') )
-      mp()->cart_checkout_error('Please enter your Full Name.', 'name');
+      mp_checkout()->add_error('Please enter your Full Name.', 'name');
 
     if ( mp_get_post_value('address1') )
-      mp()->cart_checkout_error('Please enter your Street Address.', 'address1');
+      mp_checkout()->add_error('Please enter your Street Address.', 'address1');
 
     if ( ! mp_get_post_value('city') )
-      mp()->cart_checkout_error('Please enter your City.', 'city');
+      mp_checkout()->add_error('Please enter your City.', 'city');
 
     if ((mp_get_post_value('country') == 'US' || mp_get_post_value('country') == 'CA') && empty($_POST['state']))
-      mp()->cart_checkout_error('Please enter your State/Province/Region.', 'state');
+      mp_checkout()->add_error('Please enter your State/Province/Region.', 'state');
 
     if ( ! mp()->is_valid_zip(mp_get_post_value('zip'), mp_get_post_value('country')) )
-      mp()->cart_checkout_error('Please enter a valid Zip/Postal Code.', 'zip');
+      mp_checkout()->add_error('Please enter a valid Zip/Postal Code.', 'zip');
 
     if ( empty($_POST['country']) || strlen(mp_get_post_value('country', '')) != 2 )
-      mp()->cart_checkout_error('Please enter your Country.', 'country');
+      mp_checkout()->add_error('Please enter your Country.', 'country');
 
     //for checkout plugins
     do_action('mp_billing_process');
@@ -210,18 +210,18 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
       update_user_meta($current_user->ID, 'mp_billing_info', $_SESSION['mp_billing_info']);
 
     if (!isset($_POST['exp_month']) || !isset($_POST['exp_year']) || empty($_POST['exp_month']) || empty($_POST['exp_year'])) {
-      mp()->cart_checkout_error( __('Please select your credit card expiration date.', 'mp'), 'exp');
+      mp_checkout()->add_error( __('Please select your credit card expiration date.', 'mp'), 'exp');
     }
 
     if (!isset($_POST['card_code']) || empty($_POST['card_code'])) {
-      mp()->cart_checkout_error( __('Please enter your credit card security code', 'mp'), 'card_code');
+      mp_checkout()->add_error( __('Please enter your credit card security code', 'mp'), 'card_code');
     }
 
     if (!isset($_POST['card_num']) || empty($_POST['card_num'])) {
-      mp()->cart_checkout_error( __('Please enter your credit card number', 'mp'), 'card_num');
+      mp_checkout()->add_error( __('Please enter your credit card number', 'mp'), 'card_num');
     } else {
       if ($this->_get_card_type($_POST['card_num']) == "") {
-        mp()->cart_checkout_error( __('Please enter a valid credit card number', 'mp'), 'card_num');
+        mp_checkout()->add_error( __('Please enter a valid credit card number', 'mp'), 'card_num');
       }
     }
 
@@ -230,7 +230,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
         ($this->_get_card_type($_POST['card_num']) == "American Express" && strlen($_POST['card_code']) != 4) ||
         ($this->_get_card_type($_POST['card_num']) != "American Express" && strlen($_POST['card_code']) != 3)
         ) {
-        mp()->cart_checkout_error(__('Please enter a valid credit card security code', 'mp'), 'card_code');
+        mp_checkout()->add_error(__('Please enter a valid credit card security code', 'mp'), 'card_code');
       }
     }
 
@@ -274,9 +274,9 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 		$exp = array_map( 'trim', explode( '/', mp_get_post_value( 'mp_cc_exp', '' ) ) );
 		$total = $cart->total( false );
 		$order = new MP_Order();
-		
+
     $payment = new MP_Gateway_Worker_Payflow( $this->API_Endpoint );
-    
+
     $payment->transaction( mp_get_post_value( 'mp_cc_num' ) );
     $payment->setParameter( 'EXPDATE', $exp[0] . substr( $exp[1], -2 ) );
     $payment->setParameter( 'CVV2', mp_get_post_value( 'mp_cc_cvc' ) );
@@ -311,26 +311,26 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
     $payment->setParameter( 'COUNTRY', mp_arr_get_value( 'country', $billing_info, '' ) );
     $payment->setParameter( 'ZIP', mp_arr_get_value( 'zip', $billing_info, '' ) );
     $payment->setParameter( 'EMAIL', mp_arr_get_value( 'email', $billing_info, '' ) );
-    
+
     // Shipping Info
     $address = mp_arr_get_value( 'address1', $shipping_info, '' );
     if ( $address2 = mp_arr_get_value( 'address2', $shipping_info ) ) {
       $address .= "\n" . $address2;
     }
-    
+
 		$payment->setParameter( 'SHIPTOFIRSTNAME', mp_arr_get_value( 'first_name', $shipping_info, '' ) );
 		$payment->setParameter( 'SHIPTOLASTNAME', mp_arr_get_value( 'last_name', $shipping_info, '' ) );
-		$payment->setParameter( 'SHIPTOSTREET', $address );    		
+		$payment->setParameter( 'SHIPTOSTREET', $address );
 		$payment->setParameter( 'SHIPTOCITY', mp_arr_get_value( 'city', $shipping_info, '' ) );
 		$payment->setParameter( 'SHIPTOSTATE', mp_arr_get_value( 'state', $shipping_info, '' ) );
 		$payment->setParameter( 'SHIPTOCOUNTRY', mp_arr_get_value( 'country', $shipping_info, '' ) );
 		$payment->setParameter( 'SHIPTOZIP', mp_arr_get_value( 'zip', $shipping_info, '' ) );
- 
+
 		// IP Address
     $payment->setParameter( 'CLIENTIP', $_SERVER['REMOTE_ADDR'] );
 
     $payment->process();
-    
+
     if ( is_wp_error( $payment ) ) {
 	    mp_checkout()->add_error( $payment->get_error_message(), 'order-review-payment' );
 	    return;
@@ -354,7 +354,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 	    	'payment_info' => $payment_info,
 	    	'paid' => ( $payment->isHeldForReview() ) ? false : true,
       ) );
-      
+
       wp_redirect( $order->tracking_url( false ) );
       exit;
     } else {
@@ -395,7 +395,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 			'name' => $this->get_field_name('api_credentials'),
 			'label' => array('text' => __('Gateway Credentials', 'mp')),
 		));
-		
+
 		if ( $creds instanceof WPMUDEV_Field ) {
 			$creds->add_field('text', array(
 				'name' => 'user',
@@ -426,7 +426,7 @@ class MP_Gateway_PayPal_Payflow extends MP_Gateway_API {
 				),
 			));
 		}
-		
+
 		$metabox->add_field('advanced_select', array(
 			'name' => $this->get_field_name('currency'),
 			'label' => array('text' => __('Currency', 'mp')),

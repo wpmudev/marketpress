@@ -50,7 +50,7 @@ class MP_Admin {
 			add_action( 'wp_ajax_mp_dismissed_deprecated_message', array( &$this, 'dismissed_deprecated_messag' ) );
 		}
 		
-		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) || (isset( $_GET[ 'quick_setup_step' ] )) ) {
+		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) && ( ( isset( $_GET[ 'quick_setup_step' ]) && $_GET[ 'quick_setup_step' ] != 3 ) || !isset( $_GET[ 'quick_setup_step' ] ) ) ) {
 			add_action( 'admin_notices', array( &$this, 'display_quick_setup_notice' ) );
 		}
 	}
@@ -117,7 +117,7 @@ class MP_Admin {
 	}
 
 	function admin_head() {
-		if ( 'mp_order' == get_post_type() ) {
+		if ( 'mp_order' == get_current_screen()->post_type ) {
 			echo '<style type="text/css">
     .page-title-action {display:none;}
     </style>';

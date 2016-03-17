@@ -389,11 +389,9 @@ class MP_Public {
 		global $wp_query;
 
 		switch ( get_query_var( 'taxonomy' ) ) {
-			case 'product_category' :
-			case 'product_tag' :
-				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 
 			case 'product_category' :
+				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 				$template = locate_template( array(
 					'mp_category-' . get_query_var( 'taxonomy' ) . '.php',
 					'mp_category-' . $term->term_id . '.php',
@@ -407,6 +405,7 @@ class MP_Public {
 				break;
 
 			case 'product_tag' :
+				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 				$template = locate_template( array(
 					'mp_tag-' . get_query_var( 'taxonomy' ) . '.php',
 					'mp_tag-' . $term->term_id . '.php',
@@ -728,6 +727,9 @@ class MP_Public {
 		if ( ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
+
+// Should only run once, prevent infinite loops
+		remove_filter( 'the_content', array( &$this, 'taxonomy_content' ) );
 
 // don't remove post thumbnails from products
 		remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );

@@ -235,11 +235,11 @@ class MP_Order {
 		$current_user = wp_get_current_user();
 
 		if( $registration_email && $current_user->user_email ) {
-	
+
 			mp_send_email( $current_user->user_email, $subject, $msg, $attachments );
-			
+
 		} else {
-			
+
 			$billing_email  = $this->get_meta( 'mp_billing_info->email', '' );
 			$shipping_email = $this->get_meta( 'mp_shipping_info->email', '' );
 
@@ -250,7 +250,7 @@ class MP_Order {
 				// Billing email is different than shipping email so let's send an email to the shipping email too
 				mp_send_email( $shipping_email, $subject, $msg, $attachments );
 			}
-			
+
 		}
 	}
 
@@ -261,8 +261,27 @@ class MP_Order {
 	 * @access public
 	 */
 	protected function _send_new_order_notifications() {
-		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->new_order->subject' ) ) );
-		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->new_order->text' ) ) ) );
+
+		// We can't rely on cart's is_digital_only() because we have three scenarios here
+		$has_downloads = $has_physical = false;
+		$items = $this->get_cart()->get_items_as_objects();
+		foreach ( $items as $product ) {
+			if( $product->is_download() ) {
+				$has_downloads = true;
+			} else {
+				$has_physical = true;
+			}
+		}
+
+		$notification_kind = 'new_order';
+		if($has_downloads && $has_physical) {
+			$notification_kind = 'new_order_mixed';
+		} else if( $has_downloads ) {
+			$notification_kind = 'new_order_downloads';
+		}
+
+		$subject = mp_filter_email( $this, stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) ) );
+		$msg     = mp_filter_email( $this, nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) ) );
 
 		if ( has_filter( 'mp_order_notification_subject' ) ) {
 			//trigger_error( 'The <strong>mp_order_notification_subject</strong> hook has been replaced with <strong>mp_order/notification_subject</strong> as of MP 3.0', E_USER_ERROR );
@@ -333,8 +352,27 @@ class MP_Order {
 	 * @access protected
 	 */
 	protected function _send_shipment_notification() {
-		$subject = stripslashes( mp_get_setting( 'email->order_shipped->subject' ) );
-		$msg     = nl2br( stripslashes( mp_get_setting( 'email->order_shipped->text' ) ) );
+
+		// We can't rely on cart's is_digital_only() because we have three scenarios here
+		$has_downloads = $has_physical = false;
+		$items = $this->get_cart()->get_items_as_objects();
+		foreach ( $items as $product ) {
+			if( $product->is_download() ) {
+				$has_downloads = true;
+			} else {
+				$has_physical = true;
+			}
+		}
+
+		$notification_kind = 'order_shipped';
+		if($has_downloads && $has_physical) {
+			$notification_kind = 'order_shipped_mixed';
+		} else if( $has_downloads ) {
+			$notification_kind = 'order_shipped_downloads';
+		}
+
+		$subject = stripslashes( mp_get_setting( 'email->'.$notification_kind.'->subject' ) );
+		$msg     = nl2br( stripslashes( mp_get_setting( 'email->'.$notification_kind.'->text' ) ) );
 
 		if ( has_filter( 'mp_shipped_order_notification_subject' ) ) {
 			trigger_error( 'The <strong>mp_shipped_order_notification_subject</strong> hook has been replaced with <strong>mp_order/shipment_notification_subject</strong> as of MP 3.0', E_USER_ERROR );
@@ -392,7 +430,7 @@ class MP_Order {
 	 * @param string $status The new order status.
 	 * @param bool $update_post Whether to update the post status or not.
 	 */
-	public function change_status( $status, $update_post = false ) {
+	public function change_status( $status, $update_post = false, $old_status = "" ) {
 		$cache_key = 'order_status_changed_' . $status . '_' . $this->ID;
 		if ( wp_cache_get( $cache_key, 'mp_order' ) ) {
 			// Order status already updated - bail
@@ -406,6 +444,13 @@ class MP_Order {
 			$status = 'order_' . $status;
 		}
 
+		// Increase sale if order come from trash
+		// Check if order was trashed after the 'decrease_sales' fix
+		// Prevent old trashed sales from being increased when restoring the order
+		$sales_decreased = get_post_meta( $this->ID, 'mp_sales_decreased', true );
+		if( $old_status == 'trash' && $sales_decreased == '1' )
+			$this->increase_sales();
+
 		switch ( $status ) {
 			case 'order_received' :
 				add_post_meta( $this->ID, 'mp_received_time', time(), true );
@@ -413,14 +458,18 @@ class MP_Order {
 
 			case 'order_paid' :
 				add_post_meta( $this->ID, 'mp_paid_time', time(), true );
-				if ( $this->get_cart()->is_download_only() ) {
+				// As soon as a downloads-only order is paid... its "shipped"
+				if ( $this->get_cart()->is_download_only() && $old_status != 'order_shipped' ) {
 					$this->_send_shipment_notification();
 				}
 				break;
 
 			case 'order_shipped' :
 				add_post_meta( $this->ID, 'mp_shipped_time', time(), true );
-				if ( ! $this->get_cart()->is_download_only() ) {
+				// Downloads-only orders should not reach the "order_shipped", but if it does (manually set) then
+				// we must send the shipped notification only if the previous state is different than "order_paid",
+				// because that's the default last-state for download orders and a notification should be sent before
+				if ( ! $this->get_cart()->is_download_only() || $old_status != 'order_paid' ) {
 					$this->_send_shipment_notification();
 				}
 				break;
@@ -431,6 +480,8 @@ class MP_Order {
 
 			case 'trash' :
 				add_post_meta( $this->ID, 'mp_trashed_time', time(), true );
+				update_post_meta( $this->ID, 'mp_sales_decreased' , 1 , true );
+				$this->decrease_sales();
 				$action = 'mp_order_trashed';
 				break;
 
@@ -439,7 +490,7 @@ class MP_Order {
 				return false;
 				break;
 		}
-		
+
 		/**
 		 * Fires when an order status is updated
 		 *
@@ -618,7 +669,7 @@ class MP_Order {
 	 */
 	public function get_address( $type, $editable = false, $product_type = false ) {
 		if ( ! $editable ) {
-			
+
 			if( $product_type == 'digital' ) {
 				$html = '' .
 			        $this->get_name( $type ) . '<br />' .
@@ -639,23 +690,24 @@ class MP_Order {
 			}
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
-			
+
 			$allowed_countries = mp_get_setting( 'shipping->allowed_countries', '' );
-			
+
 			// Country dropdown
 			if( ! is_array( $allowed_countries ) ) {
 				$allowed_countries = explode( ',', $allowed_countries );
 			}
-			
+
 			$country_options   = '';
 
+			$all_countries     = mp_countries();
+
 			if ( mp_all_countries_allowed() ) {
-				$all_countries     = mp()->countries;
 				$allowed_countries = array_keys( $all_countries );
 			}
 
 			foreach ( $allowed_countries as $country ) {
-				$country_options .= '<option value="' . $country . '" ' . selected( $country, $this->get_meta( "mp_{$type}_info->country", '' ), false ) . '>' . mp()->countries[ $country ] . '</option>' . "\n";
+				$country_options .= '<option value="' . $country . '" ' . selected( $country, $this->get_meta( "mp_{$type}_info->country", '' ), false ) . '>' . $all_countries[ $country ] . '</option>' . "\n";
 			}
 
 			// State dropdown
@@ -666,7 +718,7 @@ class MP_Order {
 					$state_options .= '<option value="' . $key . '" ' . selected( $key, $this->get_meta( "mp_{$type}_info->state", '' ), false ) . '>' . $val . '</option>' . "\n";
 				}
 			}
-			
+
 			$html = '';
 
 			$html .= '
@@ -683,8 +735,8 @@ class MP_Order {
 						<th scope="row">' . __( 'Company', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[company_name]" value="' . $this->get_meta( "mp_{$type}_info->company_name", '' ) . '" /></td>
 					</tr>';
-			if( $product_type != 'digital' ) {		
-				$html .= '		
+			if( $product_type != 'digital' ) {
+				$html .= '
 					<tr>
 						<th scope="row">' . __( 'Address 1', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[address1]" value="' . $this->get_meta( "mp_{$type}_info->address1", '' ) . '" /></td>
@@ -697,7 +749,7 @@ class MP_Order {
 						<th scope="row">' . __( 'City', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[city]" value="' . $this->get_meta( "mp_{$type}_info->city", '' ) . '" /></td>
 					</tr>';
-			
+
 				if ( is_array( $states ) ) {
 					$html .= '
 						<tr>
@@ -718,10 +770,10 @@ class MP_Order {
 							<th scope="row">' . __( 'Country', 'mp' ) . '</th>
 							<td><select class="mp-select2" name="' . $prefix . '[country]" style="width:100%">' . $country_options . '</select></td>
 						</tr>';
-					
+
 			}
-			
-			$html .= '		
+
+			$html .= '
 					<tr>
 						<th scope="row">' . __( 'Phone', 'mp' ) . '</th>
 						<td><input type="text" name="' . $prefix . '[phone]" value="' . $this->get_meta( "mp_{$type}_info->phone", '' ) . '"></td>
@@ -762,9 +814,9 @@ class MP_Order {
 	 * @param bool $editable Optional, whether the address fields should be editable. Defaults to false.
 	 */
 	public function get_addresses( $editable = false ) {
-		
+
 		$html = '<div class="mp_customer_address">';
-		
+
 		if ( $this->get_cart()->is_download_only() && mp_get_setting( 'details_collection' ) == "contact" ) {
 			$html .= '
 				<div class="mp_content_col mp_content_col-one-half">
@@ -887,10 +939,12 @@ class MP_Order {
 
 		// Cart
 		$cart = $this->get_meta( 'mp_cart_info' );
+		$is_download_only = false;
 
 		if ( $cart instanceof MP_Cart ) {
 			$tax_total      = $cart->tax_total( true );
 			$shipping_total = $cart->shipping_total( true );
+			$is_download_only = $cart->is_download_only();
 		} else {
 			$tax_total      = mp_format_currency( $currency, $this->get_meta( 'mp_tax_total', 0 ) );
 			$shipping_total = mp_format_currency( $currency, $this->get_meta( 'mp_shipping_total', 0 ) );
@@ -907,7 +961,12 @@ class MP_Order {
 		$status_extra = '';
 		switch ( $this->_post->post_status ) {
 			case 'order_shipped' :
-				$status = __( 'Shipped', 'mp' );
+				if( $is_download_only ) {
+					$status = __( 'Finished', 'mp' );
+				} else {
+					$status = __( 'Shipped', 'mp' );
+				}
+				
 				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
 					$status = $this->tracking_link( false );
 				}
@@ -927,9 +986,9 @@ class MP_Order {
 				<div class="mp_tooltip_content_item_label">' . __( 'Taxes:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
 				<div class="mp_tooltip_content_item_value">' . $tax_total . '</div><!-- end mp_tooltip_content_item_value -->
 			</div><!-- end mp_tooltip_content_item -->';
-		
+
 		if( ! $this->get_cart()->is_download_only() ) {
-			$tooltip_content .= '	
+			$tooltip_content .= '
 				<div class="mp_tooltip_content_item">
 					<div class="mp_tooltip_content_item_label">' . __( 'Shipping:', 'mp' ) . '</div><!-- end mp_tooltip_content_item_label -->
 					<div class="mp_tooltip_content_item_value">' . $shipping_total . '</div><!-- end mp_tooltip_content_item_value -->
@@ -970,6 +1029,8 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$html = apply_filters( 'mp_order/header', $html, $this );
+
+		mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
 
 		if ( $echo ) {
 			echo $html;
@@ -1081,6 +1142,8 @@ class MP_Order {
 		add_post_meta( $this->ID, 'mp_billing_info', $billing_info, true );
 		// Save payment info
 		add_post_meta( $this->ID, 'mp_payment_info', $payment_info, true );
+		// Save kind of user, because author_id is reset in subsecuent order edits
+		add_post_meta( $this->ID, 'mp_user_kind', ( 0 === get_current_user_id() ? 'guest' : 'registered' ) , true );
 
 		// Update user shipping billing info
 		if ( $user_id ) {
@@ -1243,6 +1306,42 @@ class MP_Order {
 	}
 
 	/**
+	 * Decrease Sales
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 */
+	public function decrease_sales(  ) {
+		$items = $this->get_cart()->get_items_as_objects();
+
+		foreach ( $items as $item ) {
+			// Decrease sales count
+			$count = $item->get_meta( 'mp_sales_count', 0 );
+			$count = ($count - $item->qty > 0) ? $count - $item->qty : 0   ;
+			update_post_meta( $item->ID, 'mp_sales_count', $count );
+		}
+	}
+
+	/**
+	 * Increase Sales
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 */
+	public function increase_sales(  ) {
+		$items = $this->get_cart()->get_items_as_objects();
+
+		foreach ( $items as $item ) {
+			// Decrease sales count
+			$count = $item->get_meta( 'mp_sales_count', 0 );
+			$count += $item->qty;
+			update_post_meta( $item->ID, 'mp_sales_count', $count );
+		}
+	}
+
+	/**
 	 * Get the order's shipment tracking url
 	 *
 	 * @since 3.0
@@ -1253,35 +1352,40 @@ class MP_Order {
 	public function tracking_link( $echo = true ) {
 		$tracking_number = esc_attr( $this->get_meta( 'mp_shipping_info->tracking_num' ) );
 		$method          = $this->get_meta( 'mp_shipping_info->method' );
+		$tracking_link	 = $this->get_meta( 'mp_shipping_info->tracking_link' );
 
-		switch ( strtoupper( $method ) ) {
-			case 'UPS' :
-				$url = 'http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=' . $tracking_number . '&track.x=0&track.y=0';
-				break;
+		if( ! empty( $tracking_link ) ) {
+			$url =  $tracking_link;
+		} else {
+			switch ( strtoupper( $method ) ) {
+				case 'UPS' :
+					$url = 'http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=' . $tracking_number . '&track.x=0&track.y=0';
+					break;
 
-			case 'FedEx' :
-				$url = 'http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers=' . $tracking_number;
-				break;
+				case 'FedEx' :
+					$url = 'http://www.fedex.com/Tracking?language=english&cntry_code=us&tracknumbers=' . $tracking_number;
+					break;
 
-			case 'USPS' :
-				$url = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' . $tracking_number;
-				break;
+				case 'USPS' :
+					$url = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' . $tracking_number;
+					break;
 
-			case 'DHL' :
-				$url = 'http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB=' . $tracking_number;
-				break;
+				case 'DHL' :
+					$url = 'http://www.dhl.com/content/g0/en/express/tracking.shtml?brand=DHL&AWB=' . $tracking_number;
+					break;
 
-			default :
-				/**
-				 * Filter the tracking link for methods that don't exists
-				 *
-				 * @since 3.0
-				 *
-				 * @param string $tracking_number
-				 * @param string $method
-				 */
-				$url = apply_filters( 'mp_shipping_tracking_link', $tracking_number, $method );
-				break;
+				default :
+					/**
+					 * Filter the tracking link for methods that don't exists
+					 *
+					 * @since 3.0
+					 *
+					 * @param string $tracking_number
+					 * @param string $method
+					 */
+					$url = apply_filters( 'mp_shipping_tracking_link', $tracking_number, $method );
+					break;
+			}
 		}
 
 		/**
@@ -1295,7 +1399,13 @@ class MP_Order {
 		 */
 		$url = apply_filters( 'mp_order/tracking_link', $url, $tracking_number, $method );
 
-		$link = '<a target="_blank" href="' . $url . '">' . __( 'Shipped: Track Shipment', 'mp' ) . '</a>';
+		// At this point, if method is custom and $url was empty and no filters has been added then $url should be equal at $tracking_number 
+
+		if( $url == $tracking_number ) {
+			$link = '<span>' . sprintf(__( 'Shipped: tracking code: %s', 'mp' ), $tracking_number ) . '</a>';
+		} else {
+			$link = '<a target="_blank" href="' . $url . '">' . __( 'Shipped: Track Shipment', 'mp' ) . '</a>';
+		}
 
 		if ( $echo ) {
 			echo $link;
@@ -1314,6 +1424,13 @@ class MP_Order {
 	 */
 	public function tracking_url( $echo = true ) {
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
+
+		$user_id = get_current_user_id();
+
+		// Append the email to the tracking URL for orders made by guest users (hashed so it's not sent directly in the URL)
+		if( 'guest' === $this->get_meta( 'mp_user_kind', '' ) ) {
+			$url .= md5( $this->get_meta( 'mp_billing_info->email', '' ) );
+		}
 
 		/**
 		 * Filter the tracking URL

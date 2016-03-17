@@ -482,15 +482,25 @@ class MP_Product {
 	 * @uses $post
 	 *
 	 * @param int /object/WP_Post $product Optional if in the loop.
+	 * @param int $blog_id Optional to use when global cart
 	 */
-	public function __construct( $product = null ) {
+	public function __construct( $product = null , $blog_id = null ) {
 		if ( is_null( $product ) && in_the_loop() ) {
 			global $post;
 			$product = $post;
 		}
 
+		if ( !is_null( $blog_id ) && is_multisite() ) {
+			$current_blog_id = get_current_blog_id();
+			switch_to_blog( $blog_id );
+		}
+
 		$this->_get_post( $product );
 		$this->_set_content_tabs( $this );
+
+		if ( !is_null( $blog_id ) && is_multisite() ) {
+			switch_to_blog( $current_blog_id );
+		}		
 	}
 
 	/**
@@ -518,48 +528,64 @@ class MP_Product {
 		return $html;
 	}
 
-	public function max_product_quantity( $product_id = false, $without_cart_quantity = false ) {
+	/**
+	 * Return the maximum product qty allowed to add to the cart
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param int $product_id Optional
+	 * @param bool $without_cart_quantity Optional, the attributes that should be selected by default.
+	 * @param bool $return_reason Optional, if true, it will return an array containing the qty allowed and reason of limitation
+	 *
+	 * @return int/array
+	 */
+	public function max_product_quantity( $product_id = null, $without_cart_quantity = false , $return_reason = false ) {
 
-		$id         = $product_id ? $product_id : $this->ID;
-		$cart_items = mp_cart()->get_all_items();
+		$id						= $product_id ? $product_id : $this->ID;
+		$cart_items				= mp_cart()->get_all_items();
+		$max					= 100;
+		$cart_quantity			= 0;
+		$per_order_limit		= intval(get_post_meta( $id, 'per_order_limit', true ));
+		$inventory				= get_post_meta( $id, 'inventory', true );
+		$inventory_tracking    	= get_post_meta( $id, 'inventory_tracking', true );
+		$out_of_stock_purchase 	= get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+		$reason = "order";
 
-		$max = apply_filters( 'mp_cart/max_product_order_default', 100 );
+		/**
+		 * Filter default max product order limit
+		 *
+		 * @since 3.0
+		 *
+		 * @param int $max
+		 */
+		$max = apply_filters( 'mp_cart/max_product_order_default', $max );
 
-		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
-		$per_order_limit = (int) $per_order_limit;
-		if ( isset( $cart_items[ get_current_blog_id() ][ $id ] ) ) {
+		if ( !$without_cart_quantity && isset( $cart_items[ get_current_blog_id() ][ $id ] ) ) {
 			$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $id ];
-		} else {
-			$cart_quantity = 0;
 		}
 
-		$inventory             = get_post_meta( $id, 'inventory', true );
-		$inventory_tracking    = get_post_meta( $id, 'inventory_tracking', true );
-		$out_of_stock_purchase = get_post_meta( $id, 'inv_out_of_stock_purchase', true );
-
-		if ( $inventory_tracking && $out_of_stock_purchase !== '1' ) {
-			if ( $without_cart_quantity ) {
+		if ( is_numeric($inventory) && $inventory_tracking && $out_of_stock_purchase !== '1' ) {
 				$max = $inventory;
-			} else {
-				$max = $inventory - $cart_quantity;
-			}
+				$reason = "inventory";
 		}
 
-		$per_order_limit = get_post_meta( $id, 'per_order_limit', true );
-
-		if ( is_numeric( $per_order_limit ) ) {
-			if ( $per_order_limit >= $max ) {
-				//max is max, not the per order limit
-			} else {
-				$max = $per_order_limit;
-			}
+		if ( is_numeric( $per_order_limit ) && $per_order_limit > 0 && ( $per_order_limit < $inventory || !is_numeric($inventory) ) ) {
+			$max = $per_order_limit;
+			$reason = "order";
 		}
+
+		$max = $max - $cart_quantity;
 
 		if ( $max < 0 ) {
 			$max = 0;
 		}
 
-		return $max;
+		if ( $return_reason ) {
+			return array( 'qty' => $max , 'reason' => $reason );
+		}
+
+		return (int) $max;
 	}
 
 	/**
@@ -612,64 +638,14 @@ class MP_Product {
 
 		$input_id = 'mp_product_options_att_quantity';
 
-		$product = new MP_Product( $this->ID );
-
-		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
-			$disabled = 'disabled';
-		} else {
-			$disabled = '';
-		}
-
-		$per_order_limit = get_post_meta( $this->ID, 'per_order_limit', true );
-
-		$max              = '';
-		$product_quantity = 1;
-
-		if ( $product->has_variations() ) {
-
-		} else {
-
-			if ( is_numeric( $per_order_limit ) ) {
-				$max = 'max="' . esc_attr( $per_order_limit ) . '" data-msg-max="' . __( 'This product has an order limit of {0}.', 'mp' ) . '"';
-			} else {
-				$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
-			}
-
-			$cart_items = mp_cart()->get_all_items();
-
-			if ( isset( $cart_items[ get_current_blog_id() ] ) ) {
-				if ( isset( $cart_items[ get_current_blog_id() ][ $this->ID ] ) ) {//item is located in the cart
-					$cart_quantity = $cart_items[ get_current_blog_id() ][ $this->ID ];
-					if ( is_numeric( $per_order_limit ) ) {
-						$max_product_quantity = $per_order_limit - $cart_quantity;
-						if ( $max_product_quantity == 0 ) {
-							$product_quantity = 0;
-							$max              = 'max="' . esc_attr( $max_product_quantity ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
-							$disabled         = 'disabled';
-						} else {
-							$max = 'max="' . esc_attr( $max_product_quantity ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
-						}
-					} else {
-						$max = 'max="' . esc_attr( $this->max_product_quantity() ) . '" data-msg-max="' . __( 'We&lsquo;re sorry, we only have {0} of this item in stock right now.', 'mp' ) . '"';
-					}
-				}
-			}
-		}
-
-		if ( $this->max_product_quantity() == 0 ) {
-			$min_value        = 0;
-			$product_quantity = 0;
-			$disabled         = 'disabled';
-		} else {
-			$min_value = 1;
-		}
+		
 
 		$html .= '
 				<div class="mp_product_options_att"' . ( ( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"' ) . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
 						<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"></label>
-						<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>
+						'. $this->attribute_input_fields() .'
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
 			</div><!-- end mp_product_options_atts -->';
@@ -692,6 +668,70 @@ class MP_Product {
 			return $html;
 		}
 	}
+
+	public function attribute_input_fields() {
+		$product = new MP_Product( $this->ID );
+
+		$input_id = 'mp_product_options_att_quantity';
+
+		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+			$disabled = 'disabled';
+		} else {
+			$disabled = '';
+		}
+
+		$per_order_limit = get_post_meta( $this->ID, 'per_order_limit', true );
+
+		$max              = '';
+		$product_quantity = 1;
+		$min_value = 1;
+
+		if ( $product->has_variations() ) {
+
+		} else {
+
+			$max_max = $this->max_product_quantity( $this->ID, true );
+			extract($this->max_product_quantity( $this->ID, false, true ), EXTR_PREFIX_ALL, "max");
+
+			$max = 'max="' . esc_attr( $max_qty ) . '" ';
+
+			$max .= ( $max_reason == 'inventory' ) ? 'data-msg-max="' . sprintf( __( 'We&lsquo;re sorry, we only have %d of this item in stock right now.', 'mp' ), $max_max ) : 'data-msg-max="' . sprintf ( __( 'This product has an order limit of %d.', 'mp' ), $max_max );
+
+			if( $max_max !== $max_qty ) {
+				$max .= " " . __('You can only add {0} to cart.', 'mp');
+			}
+
+			$max .= '"';
+
+			if ( $max_qty == 0 ) {
+				$min_value        = 0;
+				$product_quantity = 0;
+				$disabled         = 'disabled';
+			} 
+
+		}
+
+		return '<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>';
+	}
+
+	/**
+	 * Get a parent product if product is a variation
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @return false/MP_Product
+	 */
+	public function get_parent() {
+		if ( is_null( $this->_post ) ) {
+			return false;
+		}
+		if ( is_null( $this->_post->post_parent ) ) {
+			return false;
+		}
+
+		return new MP_Product( $this->_post->post_parent );
+	}	
 
 	/**
 	 * Get a specific variation by it's index
@@ -953,7 +993,7 @@ class MP_Product {
 		}
 
 		// $content = $this->_post->post_content;
-		
+
 		// if ( $this->has_variations() || $this->is_variation() ) {
 		// 	$content = $this->get_variation()->post_content;
 		// }
@@ -1151,11 +1191,28 @@ class MP_Product {
 		$snippet = '<!-- MP Product Price --><div class="mp_product_price" itemtype="http://schema.org/Offer" itemscope="" itemprop="offers">';
 
 		if ( $this->has_variations() ) {
-			// Get price range
-			if ( $price['lowest'] != $price['highest'] ) {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . ' - ' . mp_format_currency( '', $this->manage_price_tax( $price['highest'] ) ) . $this->display_tax_string( false ) . '</span>';
-			} else {
-				$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . $this->display_tax_string( false ) . '</span>';
+			if ( $this->on_sale() ) {
+				// Get price range
+				if ( $price['lowest'] != $price['highest'] ) {
+					$snippet .= '<span class="mp_product_price-sale">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . ' - ' . mp_format_currency( '', $this->manage_price_tax( $price['highest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				} else {
+					$snippet .= '<span class="mp_product_price-sale">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				}
+				// Get sale price range
+				if ( $price['lowest_regular'] != $price['highest_regular'] ) {
+					$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest_regular'] ) ) . ' - ' . mp_format_currency( '', $this->manage_price_tax( $price['highest_regular'] ) ) . $this->display_tax_string( false ) . '</span>';
+				} else {
+					$snippet .= '<span class="mp_product_price-normal mp_strikeout">' . mp_format_currency( '', $this->manage_price_tax( ( $price['regular'] * $this->qty ) ) ) . $this->display_tax_string( false ) . '</span>';
+				}
+
+			}
+			else{
+				// Get price range
+				if ( $price['lowest'] != $price['highest'] ) {
+					$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . ' - ' . mp_format_currency( '', $this->manage_price_tax( $price['highest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				} else {
+					$snippet .= '<span class="mp_product_price-normal">' . mp_format_currency( '', $this->manage_price_tax( $price['lowest'] ) ) . $this->display_tax_string( false ) . '</span>';
+				}
 			}
 		} elseif ( $this->on_sale() ) {
 			$amt_off = mp_format_currency( '', ( $this->manage_price_tax( $price['highest'] ) - $this->manage_price_tax( $price['lowest'] ) ) * $this->qty ) . $this->display_tax_string( false );
@@ -1202,7 +1259,7 @@ class MP_Product {
 			return $snippet;
 		}
 	}
-	
+
 	/**
 	 * Add tax to the product price
 	 *
@@ -1217,7 +1274,7 @@ class MP_Product {
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
 		$special_tax = get_post_meta( $this->ID, 'charge_tax', true );
 		$special_fixed_tax = false;
-		
+
 		if( ! empty( $tax_rate ) ) {
 			//Set tax rate to special tax
 			if( $special_tax ) {
@@ -1230,7 +1287,7 @@ class MP_Product {
 			} else {
 				$tax_rate = mp_get_setting( 'tax->rate', '' );
 			}
-			
+
 			if ( mp_get_setting( 'tax->tax_digital' ) && ! $this->is_download() ) {
 				//Price with Tax added
 				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
@@ -1246,7 +1303,7 @@ class MP_Product {
 					$price = $price / $taxDivisor;
 				}
 			}
-			
+
 			//Calculate price when special price & download product
 			if ( ! empty( $special_tax ) && $this->is_download() ) {
 				if( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
@@ -1258,10 +1315,10 @@ class MP_Product {
 				}
 			}
 		}
-		
+
 		return $price;
 	}
-	
+
 	/**
 	 * Display (tax incl.) or (tax excl.)
 	 *
@@ -1275,11 +1332,11 @@ class MP_Product {
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
 		$tax_label = mp_get_setting( 'tax->tax_label', 0 );
 		$string = '';
-		
+
 		if( $tax_label != 1) {
 			return $string;
 		}
-		
+
 		if( $tax_inclusive != 1 && $include_tax_to_price != 1 ) {
 			$string = '<span class="exclusive_tax"> ' . __('(tax excl.)', 'mp') . '</span>';
 		} elseif( $tax_inclusive == 1 ) {
@@ -1291,7 +1348,7 @@ class MP_Product {
 		} elseif( $tax_inclusive != 1 && $include_tax_to_price == 1 ) {
 			$string = '<span class="exclusive_tax"> ' . __('(tax incl.)', 'mp') . '</span>';
 		}
-		
+
 		if ( $echo ) {
 			echo $string;
 		} else {
@@ -1340,6 +1397,17 @@ class MP_Product {
 	}
 
 	/**
+	 * Determine if product is featured
+	 *
+	 * @since 3.0.0.8
+	 * @access public
+	 * @return bool
+	 */
+	public function is_featured() {
+		return $this->get_meta( 'featured' );
+	}
+
+	/**
 	 * Determine if product is on sale
 	 *
 	 * @since 3.0
@@ -1355,16 +1423,24 @@ class MP_Product {
 		$sale_price = $this->get_meta( 'sale_price_amount' );
 		$on_sale    = false;
 
-		if ( $has_sale && $sale_price ) {
-			$start_date = $this->get_meta( 'sale_price_start_date', false, true );
-			$end_date   = $this->get_meta( 'sale_price_end_date', false, true );
-			$time       = current_time( 'Y-m-d' );
-			$on_sale    = true;
+		//If product is parent and has at least one sale variation then product is on sale
+		if( $this->has_variations() ){
+			$variations = $this->get_variations();
+			foreach ($variations as $variation) {
+				$on_sale |= $variation->on_sale();
+			}
+		}else{
+			if ( $has_sale && $sale_price ) {
+				$start_date = $this->get_meta( 'sale_price_start_date', false, true );
+				$end_date   = $this->get_meta( 'sale_price_end_date', false, true );
+				$time       = current_time( 'Y-m-d' );
+				$on_sale    = true;
 
-			if ( $start_date && $time < $start_date ) {
-				$on_sale = false;
-			} elseif ( $end_date && $time > $end_date ) {
-				$on_sale = false;
+				if ( $start_date && $time < $start_date ) {
+					$on_sale = false;
+				} elseif ( $end_date && $time > $end_date ) {
+					$on_sale = false;
+				}
 			}
 		}
 
@@ -1417,15 +1493,22 @@ class MP_Product {
 		if ( $this->has_variations() ) {
 			$variations = $this->get_variations();
 			$prices     = array();
+			$variations_prices    = array();
 
 			foreach ( $variations as $variation ) {
 				$price = $variation->get_price();
 
 				if ( $variation->on_sale() ) {
 					$prices[] = $price['sale']['amount'];
+					$variations_prices[] = $price['regular'];
 				} else {
 					$prices[] = $price['regular'];
 				}
+			}
+
+			if( !empty($variations_prices) ) {
+				$price['lowest_regular']  = (float) min( $variations_prices );
+				$price['highest_regular'] = (float) max( $variations_prices );
 			}
 
 			$price['lowest']  = (float) min( $prices );
@@ -1542,28 +1625,28 @@ class MP_Product {
 			$query_args['post__in'] = $related_specified_products;
 		}
 		// Else, try to see if there are some category and/or tag related products for this item
-		else { 
+		else {
 			$post_id = ( $this->is_variation() ) ? $this->_post->post_parent : $this->ID;
 			$count   = 0;
 
 			if ( 'category' != $relate_by ) {
 				$terms                     = get_the_terms( $post_id, 'product_tag' );
 				$ids                       = isset( $terms ) && is_array( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
-				
+
 				// If the product has some tags, add these to the Query
 				if ( !empty( $ids ) ) {
 					$query_args['tax_query'][] = array(
 						'taxonomy' => 'product_tag',
 						'terms'    => $ids,
 					);
-					$count ++;					
+					$count ++;
 				}
 			}
 
 			if ( 'tags' != $relate_by ) {
 				$terms                     = get_the_terms( $post_id, 'product_category' );
 				$ids                       = isset( $terms ) && is_array( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'term_id' ) : array();
-				
+
 				// If the product has some categories, add these to the Query
 				if ( !empty( $ids ) ) {
 					$query_args['tax_query'][] = array(
@@ -1577,7 +1660,7 @@ class MP_Product {
 			if ( $count > 1 ) {
 				$query_args['tax_query']['relation'] = 'AND';
 			}
-			
+
 			// There are no related products
 			if ( $count === 0 ) {
 				if ( $return_bool ) {
@@ -2647,6 +2730,8 @@ class MP_Product {
 			$this->_exists = false;
 		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != MP_Product::get_variations_post_type() ) {
 			$this->_exists = false;
+		} elseif ( $this->_post->post_type == MP_Product::get_variations_post_type() && FALSE === get_post_status( $this->_post->post_parent ) ) { // Check if variations parent exist
+			$this->_exists = false;
 		} else {
 			$this->_exists = true;
 			$this->ID      = $this->_post->ID;
@@ -2690,8 +2775,10 @@ class MP_Product {
 			 */
 			$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
 
-			// Make sure product overview tab is always at the beginning
-			$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+			// Make sure product overview tab is always at the beginning if not empty
+			if($product->content( false ) !== ''){
+				$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
+			}
 
 			$this->content_tabs = $tabs;
 		}

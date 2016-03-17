@@ -58,7 +58,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
    * Use this to process any fields you added. Use the $_POST global,
    *  and be sure to save it to both the $_SESSION and usermeta if logged in.
    *  DO NOT save credit card details to usermeta as it's not PCI compliant.
-   *  Call mp()->cart_checkout_error($msg, $context); to handle errors. If no errors
+   *  Call mp_checkout()->add_error($msg, $context); to handle errors. If no errors
    *  it will redirect to the next step.
    *
    * @param array $cart. Contains the cart contents for the current blog, global cart if mp()->global_cart is true
@@ -93,10 +93,10 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 
     $totals = array();
     $coupon_code = mp()->get_coupon_code();
-    
+
     foreach ($cart as $product_id => $variations) {
 			foreach ($variations as $data) {
-				$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);			
+				$price = mp()->coupon_value_product($coupon_code, $data['price'] * $data['quantity'], $product_id);
       	$totals[] = $price;
       }
     }
@@ -114,15 +114,15 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
     	$tax_price = (mp()->tax_price(false) + $shipping_tax);
 			$total += $tax_price;
     }
-				
+
 	  //get CubePoints user
 	  $uid = cp_currentUser();
 	  //test for CubePoints amount
 	  if ( cp_getPoints ( cp_currentUser() ) >= $total ) {
-						
+
 			//subtract $total from user's CubePoints
 			cp_points( 'custom', $uid, -$total, sprintf(__('%s Store Purchase', 'mp'), get_bloginfo('name')) );
-			
+
 			//create MarketPress order
 			$order_id = mp()->generate_order_id();
 			$payment_info['gateway_public_name'] = $this->public_name;
@@ -137,7 +137,7 @@ class MP_Gateway_CubePoints extends MP_Gateway_API {
 			$result = mp()->create_order($order_id, $cart, $shipping_info, $payment_info, $paid);
 	  } else {
 		//insuffient CubePoints
-		mp()->cart_checkout_error( sprintf(__('Sorry, but you do not appear to have enough points to complete this purchase!', 'mp'), mp_checkout_step_url('checkout')) );
+		mp_checkout()->add_error( sprintf(__('Sorry, but you do not appear to have enough points to complete this purchase!', 'mp'), mp_checkout_step_url('checkout')) );
 	}
   }
 

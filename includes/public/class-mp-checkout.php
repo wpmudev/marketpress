@@ -146,6 +146,11 @@ class MP_Checkout {
 
 		$data = (array) mp_get_post_value( 'billing', array() );
 
+		// Force state to empty if not set by user to ensure that old state value will be deleted
+		if( !isset( $data['state'] ) ) {
+			$data['state'] = '';
+		}
+
 		foreach ( $data as $key => $value ) {
 			$value = trim( $value );
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
@@ -156,6 +161,11 @@ class MP_Checkout {
 
 		if ( $enable_shipping_address ) {
 			$data = (array) mp_get_post_value( 'shipping', array() );
+
+			// Force state to empty if not set by user to ensure that old state value will be deleted
+			if( !isset( $data['state'] ) ) {
+				$data['state'] = '';
+			}
 
 			foreach ( $data as $key => $value ) {
 				$value = trim( $value );
@@ -223,8 +233,9 @@ class MP_Checkout {
 			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		}
 
+		$all_countries		 = mp_countries();
+
 		if ( mp_all_countries_allowed() ) {
-			$all_countries		 = mp()->countries;
 			$allowed_countries	 = array_keys( $all_countries );
 		}
 
@@ -233,7 +244,7 @@ class MP_Checkout {
 		//$countries[''] = __('Select One', 'mp');
 
 		foreach ( $allowed_countries as $_country ) {
-			$countries[ $_country ] = mp()->countries[ $_country ];
+			$countries[ $_country ] = $all_countries[ $_country ];
 		}
 
 		// State/zip fields
@@ -482,9 +493,13 @@ class MP_Checkout {
 	 * @access public
 	 * @param string $msg The error message.
 	 * @param string $context The context of the error message.
+	 * @param bool $add_slashes Add slashes to prevent double quotes from causing errors.
 	 */
-	public function add_error( $msg, $context = 'general' ) {
-		$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+	public function add_error( $msg, $context = 'general' , $add_slashes = true ) {
+		if ( $add_slashes ){
+			$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+		}
+		
 
 		if ( !isset( $this->_errors[ $context ] ) ) {
 			$this->_errors[ $context ] = array();
@@ -1407,79 +1422,80 @@ class MP_Checkout {
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @param string $what Either "prev" or "next".
 	 * @return string
 	 */
 
-	public function create_ga_ecommerce( $order ) {
-
-		if ( !is_object( $order ) )
+	public function create_ga_ecommerce( $order_id ) {
+		$order = new MP_Order( $order_id );
+		//if order not exist, just return false
+		if ( $order->exists() == false ) {
 			return false;
-
+		}
+		
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
-
-		if ( $this->get_setting( 'ga_ecommerce' ) == 'old' ) {
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		$products = $cart->get_items_as_objects();
+		
+		if ( mp_get_setting( 'ga_ecommerce' ) == 'old' ) {
 
 			$js = '<script type="text/javascript">
 try{
  pageTracker._addTrans(
 		"' . esc_js( $order->post_title ) . '",							 // order ID - required
 		"' . esc_js( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
-		"' . $order->mp_order_total . '",								 // total - required
-		"' . $order->mp_tax_total . '",									 // tax
-		"' . $order->mp_shipping_total . '",							 // shipping
-		"' . esc_js( $order->mp_shipping_info[ 'city' ] ) . '",		// city
-		"' . esc_js( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
-		"' . esc_js( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
+		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 	);';
 
-			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-				foreach ( $order->mp_cart_info as $product_id => $variations ) {
-					foreach ( $variations as $variation => $data ) {
-						$sku = !empty( $data[ 'SKU' ] ) ? esc_js( $data[ 'SKU' ] ) : $product_id;
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 						$js .= 'pageTracker._addItem(
-				"' . esc_js( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 				"' . $sku . '",									 // SKU/code - required
-				"' . esc_js( $data[ 'name' ] ) . '",		// product name
-				"' . $data[ 'price' ] . '",						// unit price - required
-				"' . $data[ 'quantity' ] . '"					 // quantity - required
+				"' . esc_attr( $product->title( false ) ) . '",			// product name
+				"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+				"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
 			);';
-					}
-				}
 			}
 			$js .= 'pageTracker._trackTrans(); //submits transaction to the Analytics servers
 } catch(err) {}
 </script>
 ';
-		} else if ( $this->get_setting( 'ga_ecommerce' ) == 'new' ) {
+		} else if ( mp_get_setting( 'ga_ecommerce' ) == 'new' ) {
 
 			$js = '<script type="text/javascript">
 	_gaq.push(["_addTrans",
 		"' . esc_attr( $order->post_title ) . '",						 // order ID - required
 		"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",				 // affiliation or store name
-		"' . $order->mp_order_total . '",								 // total - required
-		"' . $order->mp_tax_total . '",									 // tax
-		"' . $order->mp_shipping_total . '",							 // shipping
-		"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",	 // city
-		"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",	 // state or province
-		"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
+		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 	]);';
 
-			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-				foreach ( $order->mp_cart_info as $product_id => $variations ) {
-					foreach ( $variations as $variation => $data ) {
-						$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 						$js .= '_gaq.push(["_addItem",
 				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 				"' . $sku . '",									 // SKU/code - required
-				"' . esc_attr( $data[ 'name' ] ) . '",			// product name
+				"' . esc_attr( $product->title( false ) ) . '",			// product name
 				"",												// category
-				"' . $data[ 'price' ] . '",						// unit price - required
-				"' . $data[ 'quantity' ] . '"					 // quantity - required
+				"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+				"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
 			]);';
-					}
-				}
 			}
 			$js .= '_gaq.push(["_trackTrans"]);
 </script>
@@ -1492,34 +1508,32 @@ try{
 		_gaq.push(["b._addTrans",
 			"' . esc_attr( $order->post_title ) . '",							 // order ID - required
 			"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
-			"' . $order->mp_order_total . '",									 // total - required
-			"' . $order->mp_tax_total . '",									 // tax
-			"' . $order->mp_shipping_total . '",								 // shipping
-			"' . esc_attr( $order->mp_shipping_info[ 'city' ] ) . '",		// city
-			"' . esc_attr( $order->mp_shipping_info[ 'state' ] ) . '",		 // state or province
-			"' . esc_attr( $order->mp_shipping_info[ 'country' ] ) . '"	 // country
+			"' . $order->get_meta( 'mp_order_total' ) . '",									 // total - required
+			"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+			"' . $order->get_meta( 'mp_shipping_total' ) . '",								 // shipping
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
 		]);';
 
-				if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-					foreach ( $order->mp_cart_info as $product_id => $variations ) {
-						foreach ( $variations as $variation => $data ) {
-							$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
+				foreach ( $products as $product ) {
+					$product = new MP_Product( $product->ID );
+					$meta = $product->get_meta( 'sku' );
+					$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 							$js .= '_gaq.push(["b._addItem",
 					"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
 					"' . $sku . '",									 // SKU/code - required
-					"' . esc_attr( $data[ 'name' ] ) . '",			// product name
+					"' . esc_attr( $product->title( false ) ) . '",			// product name
 					"",												// category
-					"' . $data[ 'price' ] . '",						// unit price - required
-					"' . $data[ 'quantity' ] . '"					 // quantity - required
+					"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+					"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
 				]);';
-						}
-					}
 				}
 				$js .= '_gaq.push(["b._trackTrans"]);
 	</script>
 	';
 			}
-		} else if ( $this->get_setting( 'ga_ecommerce' ) == 'universal' ) {
+		} else if ( mp_get_setting( 'ga_ecommerce' ) == 'universal' ) {
 			// add the UA code
 
 			$js = '<script type="text/javascript">
@@ -1527,25 +1541,25 @@ try{
 		ga("ecommerce:addTransaction", {
 				"id": "' . esc_attr( $order->post_title ) . '",						// Transaction ID. Required.
 				"affiliation": "' . esc_attr( get_bloginfo( 'blogname' ) ) . '",	// Affiliation or store name.
-				"revenue": "' . $order->mp_order_total . '",						// Grand Total.
-				"shipping": "' . $order->mp_shipping_total . '",					// Shipping.
-				"tax": "' . $order->mp_tax_total . '"							 		// Tax.
+				"revenue": "' . $order->get_meta( 'mp_order_total' ) . '",						// Grand Total.
+				"shipping": "' . $order->get_meta( 'mp_shipping_total' ) . '",					// Shipping.
+				"tax": "' . $order->get_meta( 'mp_tax_total' ) . '"							 		// Tax.
 			});';
 			//loop the items
-			if ( is_array( $order->mp_cart_info ) && count( $order->mp_cart_info ) ) {
-				foreach ( $order->mp_cart_info as $product_id => $variations ) {
-					foreach ( $variations as $variation => $data ) {
-						$sku = !empty( $data[ 'SKU' ] ) ? esc_attr( $data[ 'SKU' ] ) : $product_id;
-						$js .= 'ga("ecommerce:addItem", {
-									 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
-									 "name": "' . esc_attr( $data[ 'name' ] ) . '",	 // Product name. Required.
-									 "sku": "' . $sku . '",								// SKU/code.
-									 "category": "",			 					// Category or variation.
-									 "price": "' . $data[ 'price' ] . '",				 // Unit price.
-									 "quantity": "' . $data[ 'quantity' ] . '"		 // Quantity.
-								});';
-					}
-				}
+			
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+				$js .= 'ga("ecommerce:addItem", {
+					 "id": "' . esc_attr( $product->ID ) . '", // Transaction ID. Required.
+					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
+					 "sku": "' . $sku . '",								// SKU/code.
+					 "category": "",			 					// Category or variation.
+					 "price": "' . $product->get_price( 'lowest' ) . '",				 // Unit price.
+					 "quantity": "' . $cart->get_item_qty( $product->ID ) . '"		 // Quantity.
+				});';
 			}
 
 			$js .='ga("ecommerce:send");</script>';
