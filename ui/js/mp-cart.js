@@ -599,6 +599,12 @@ var mp_cart = { };
     };
 }( jQuery ) );
 
+jQuery( document ).on( 'cbox_cleanup', function() {
+	if ( typeof jQuery('.mp_select2').mp_select2 !== 'undefined' ) {
+		jQuery('.mp_select2').mp_select2('close');
+	}
+} );
+
 jQuery( document ).on( 'cbox_complete', function() {
     jQuery.colorbox.resize();
     mp_cart.initCboxListeners();
