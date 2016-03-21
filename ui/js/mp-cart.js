@@ -131,6 +131,7 @@ var mp_cart = { };
 
         $( '.mp-single-product' ).each( function() {
             $(this).on( 'change', '[name^="product_attr_"]', me.updateProductAttributes );
+            $(this).on( 'input', '[name^="product_quantity"]', me.checkProductQuantity );
 
             $(this).find( '.mp_form-buy-product' ).not('.mp_no_single, .mp_buy_button')
                 .on( 'mp_cart/before_add_item', function( e, item, qty ) {
@@ -241,7 +242,6 @@ var mp_cart = { };
 
             if ( resp.success ) {
 
-                //console.log( resp.data );
                 if (resp.data.image) {
                     if ($container.find('.mp_product_image_link').size() == 0) {
                         $('.mp_single_product_images').html(
@@ -317,6 +317,22 @@ var mp_cart = { };
         } );
     };
 
+	/**
+     * Update product quantity
+     *
+     * @since 3.0
+     */
+    mp_cart.checkProductQuantity = function() {
+    	var $this = $( this );
+
+    	if( $this.attr( 'max' ) > 0 && parseInt( $this.val() ) > parseInt( $this.attr( 'max' ) ) ) { 
+    		$this.trigger('blur');
+    		// Delay before fixing input value to give time to validator to process.
+    		setTimeout(function(){$this.val($this.attr( 'max' ))}, 50);
+    	}
+    }
+
+
     /**
      * Initialize product options lightbox for variable products
      *
@@ -355,6 +371,7 @@ var mp_cart = { };
      * @param int qty The quantity to add to the cart. Optional.
      */
     mp_cart.addItem = function( $form, item, qty ) {
+
         if ( item === undefined || typeof ( $form ) !== 'object' ) {
             return false;
         }
@@ -402,6 +419,7 @@ var mp_cart = { };
 
                     mp_cart.update( resp.data.minicart );
 					mp_cart.update_widget( resp.data.widgetcart );
+					mp_cart.update_product_input( resp.data.product_input, $form );
 
 					//Init button listeners when ajax loaded
 					mp_cart.initCartButtonListeners();
@@ -536,6 +554,16 @@ var mp_cart = { };
     mp_cart.update_widget = function( html ) {
         $( '.mp_cart_widget_content' ).html( html );
     };
+
+	/**
+     * Update the product qty input
+     *
+     * @since 3.0
+     * @param string html The product qty input.
+     */
+    mp_cart.update_product_input = function( html, $form ) {
+    	$form.find( '[name="product_quantity"]' ).after( html ).remove();
+    };    
 
     /**
      * Update an item's qty
