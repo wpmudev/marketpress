@@ -262,8 +262,6 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 			$search_replace = array_map( create_function( '$a', 'return str_replace("%","%%",$a);' ), $search_replace );
 		}
 
-		// Replace newlines from textarea with HTML tags
-		$text = str_replace( "\n", '<br />', $text );
 		// Replace codes
 		$text = str_replace( array_keys( $search_replace ), array_values( $search_replace ), $text );
 
