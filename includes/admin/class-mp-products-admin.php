@@ -496,8 +496,6 @@ class MP_Products_Screen {
 								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="' . $price['sale']['percentage'] . '" /></span>
 								<em class="alignleft inline-edit-or"> '. __( '% discount', 'mp' ) .' </em>';
 							}
-							echo '
-							<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>';
 						}
 						echo '
 						<div class="inline-edit-group">
