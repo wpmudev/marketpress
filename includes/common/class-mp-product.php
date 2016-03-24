@@ -21,6 +21,15 @@ class MP_Product {
 	var $qty = 1;
 
 	/**
+	 * Refers to the product default variation.
+	 *
+	 * @since 3.0
+	 * @access protected
+	 * @var array
+	 */
+	protected $_default_variation = null;	
+
+	/**
 	 * Refers to the product's variations.
 	 *
 	 * @since 3.0
@@ -726,7 +735,7 @@ class MP_Product {
 		if ( is_null( $this->_post ) ) {
 			return false;
 		}
-		if ( is_null( $this->_post->post_parent ) ) {
+		if ( is_null( $this->_post->post_parent )|| $this->_post->post_parent == 0 ) {
 			return false;
 		}
 
@@ -746,6 +755,59 @@ class MP_Product {
 
 		return mp_arr_get_value( $index, $variations );
 	}
+
+	/**
+	 * Get product default variation
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return false/MP_Product An MP_Product objects.
+	 */
+	public function get_default_variation() {
+		if( ! $this->has_variations() ){
+			return false;
+		}
+
+		if ( ! is_null( $this->_default_variation ) ) {
+			return $this->_default_variation;
+		}		
+
+		return $this->set_default_variation();
+	}	
+
+	/**
+	 * Set product default variation
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return false/MP_Product An MP_Product objects. 
+	 */
+	public function set_default_variation() {
+		if( ! $this->has_variations() ){
+			return false;
+		}
+
+		if ( ! is_null( $this->_default_variation ) ) {
+			return $this->_default_variation;
+		}		
+
+		$default_variation = intval( $this->get_meta( 'default_variation', false ) );
+
+		if ( ! is_null( $this->_variation_ids ) && $default_variation ) {
+			$index = array_search( $default_variation,  $this->_variation_ids );
+			if( $index && isset( $this->_variations[$index] ) ){
+				$this->_default_variation = $this->_variations[ $index ];
+				if( $index !== 0){
+					unset($this->_variations[ $index ]);
+					array_unshift($this->_variations, $this->_default_variation);
+					unset($this->_variation_ids[ $index ]);					
+					array_unshift($this->_variation_ids, $default_variation);
+				}
+			}
+		}
+
+		return $this->_default_variation;
+	}		
 
 	/**
 	 * Get product variation ids
@@ -777,17 +839,43 @@ class MP_Product {
 		}
 
 		$this->_variations = array();
+
+		if ( $this->get_parent() != false ) {
+			return $this->_variations;
+		}
+
 		if ( ! $this->get_meta( 'has_variations' ) ) {
 			return $this->_variations;
 		}
 
-		$query = new WP_Query( array(
+		/* $args = array(
+			'post_type'      => MP_Product::get_variations_post_type(),
+			'posts_per_page' => - 1,
+			'orderby'        => 'meta_value',
+			'order'          => 'DESC',
+			'post_parent'    => $this->ID,
+			'meta_query' => array(
+				'relation' => 'OR',
+				array( 
+					'key'=>'default_variation_time',
+					'compare' => 'EXISTS'           
+				),
+				array( 
+					'key'=>'default_variation_time',
+					'compare' => 'NOT EXISTS'           
+				)
+			),
+		);*/
+
+		$args = array(
 			'post_type'      => MP_Product::get_variations_post_type(),
 			'posts_per_page' => - 1,
 			'orderby'        => 'menu_order',
 			'order'          => 'ASC',
 			'post_parent'    => $this->ID,
-		) );
+		);
+
+		$query = new WP_Query( $args );
 
 		$this->_variation_ids = array();
 
@@ -795,6 +883,9 @@ class MP_Product {
 			$this->_variations[]    = $variation = new MP_Product();
 			$this->_variation_ids[] = $variation->ID;
 		endwhile;
+
+		// Resort _variations && _variation_ids arrays by putting default variation on the top.
+		$this->set_default_variation();
 
 		wp_reset_postdata();
 

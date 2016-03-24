@@ -1001,7 +1001,9 @@ class MP_Products_Screen {
 						update_post_meta( $post_id, 'name', sanitize_text_field( $variation_name ) );
 					}
 					break;
-
+				case 'default_variation':
+					update_post_meta( $post_id, $value_type, $value );
+					break;
 				default:
 					if ( $value_type == '_thumbnail_id' && $value == '' ) {
 						delete_post_meta( $post_id, '_thumbnail_id' );
