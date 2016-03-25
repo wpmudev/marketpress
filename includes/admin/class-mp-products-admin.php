@@ -251,6 +251,9 @@ class MP_Products_Screen {
 			return $post_id;
 		}
 
+		$price      = mp_get_post_value( 'product_price', '' );
+		$sale_price = mp_get_post_value( 'product_sale_price', '' );
+
 		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
 		$sale_price = filter_var( $sale_price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
 		$featured   = mp_get_post_value( 'featured' );
@@ -496,8 +499,6 @@ class MP_Products_Screen {
 								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="' . $price['sale']['percentage'] . '" /></span>
 								<em class="alignleft inline-edit-or"> '. __( '% discount', 'mp' ) .' </em>';
 							}
-							echo '
-							<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>';
 						}
 						echo '
 						<div class="inline-edit-group">

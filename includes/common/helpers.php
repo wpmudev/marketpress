@@ -247,6 +247,9 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 
 		$customer_name = MP_EMAIL_USE_BILLIG_NAME ? $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) : $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' );
 
+		// If we don't have shipping name (for example on digital download only orders), lets use the name on the billing info
+		if( empty( $customer_name ) ) $customer_name = trim( $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) );
+
 		// Setup search/replace
 		$search_replace = array(
 			'CUSTOMERNAME' => $customer_name,
@@ -265,8 +268,6 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 			$search_replace = array_map( create_function( '$a', 'return str_replace("%","%%",$a);' ), $search_replace );
 		}
 
-		// Replace newlines from textarea with HTML tags
-		$text = str_replace( "\n", '<br />', $text );
 		// Replace codes
 		$text = str_replace( array_keys( $search_replace ), array_values( $search_replace ), $text );
 
