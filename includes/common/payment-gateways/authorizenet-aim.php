@@ -65,7 +65,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			$this->API_Endpoint = "https://test.authorize.net/gateway/transact.dll";
 			$this->force_ssl = false;
 		} else {
-			$this->API_Endpoint = "https://secure.authorize.net/gateway/transact.dll";
+			$this->API_Endpoint = "https://secure2.authorize.net/gateway/transact.dll";
 		}
 	}
 
