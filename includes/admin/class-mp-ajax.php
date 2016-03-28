@@ -214,7 +214,8 @@ class MP_Ajax {
 							<span><?php _e( 'Set up a Sale for this Product', 'mp' ); ?></span>
 						</label>
 						<fieldset id="fieldset_has_sale" class="has_area">
-							<?php _e( 'Price:', 'mp' ); ?> <input placeholder="<?php esc_attr_e( 'Enter Sale Price', 'mp' ); ?>" type="text" class="mp-numeric mp-required" name="sale_price[amount]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_amount' ) ); ?>"><span class="required">*</span><br>
+							<?php _e( 'Price', 'mp' ); ?><span class="required">*</span><input placeholder="<?php esc_attr_e( 'Enter Sale Price', 'mp' ); ?>" type="text" class="mp-numeric mp-required" name="sale_price[amount]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_amount' ) ); ?>"><br>
+							<?php _e( 'Percentage Discount', 'mp' ); ?><span class="required">*</span><input placeholder="" type="text" class="mp-numeric mp-required" name="sale_price[percentage]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_percentage' ) ); ?>"><br>
 							<?php _e( 'Start Date (if applicable)', 'mp' ); ?> <input name="sale_price[start_date]" type="text" class="mp-date" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_start_date' ) ); ?>"><br>
 							<?php _e( 'End Date (if applicable)', 'mp' ); ?> <input name="sale_price[end_date]" type="text" class="mp-date" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_end_date' ) ); ?>">
 						</fieldset>
