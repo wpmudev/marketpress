@@ -156,7 +156,9 @@ class MP_Cart {
 			}
 		}
 
-		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
+		if( $qty > 0 ) {
+			mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
+		}
 		$this->_update_cart_cookie();
 
 		return $cart_updated;
