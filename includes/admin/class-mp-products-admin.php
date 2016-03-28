@@ -891,6 +891,7 @@ class MP_Products_Screen {
 				'regular_price'              => mp_get_post_value( 'regular_price' ),
 				'has_sale'                   => $this->on_to_val( mp_get_post_value( 'has_sale' ) ),
 				'sale_price_amount'          => mp_get_post_value( 'sale_price->amount' ),
+				'sale_price_percentage'          => mp_get_post_value( 'sale_price->percentage' ),
 				'sale_price_start_date'      => mp_get_post_value( 'sale_price->start_date' ),
 				'sale_price_end_date'        => mp_get_post_value( 'sale_price->end_date' ),
 				'weight_pounds'              => mp_get_post_value( 'weight->pounds' ),
