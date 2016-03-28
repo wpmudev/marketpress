@@ -594,6 +594,12 @@ class MP_Store_Settings_General {
 			),
 		) );
 
+		$countries_with_states = array();
+		foreach ( mp_countries() as $code => $country ) {
+			if( property_exists( mp(), $code.'_provinces' ) ) {
+				$countries_with_states[] = $code;
+			}
+		}
 		$states = mp_get_states( mp_get_setting( 'base_country' ) );
 		$metabox->add_field( 'advanced_select', array(
 			'name'			 => 'base_province',
@@ -604,13 +610,15 @@ class MP_Store_Settings_General {
 			'width'			 => 'element',
 			'conditional'	 => array(
 				'name'	 => 'base_country',
-				'value'	 => array( 'US', 'CA', 'GB', 'AU' ),
+				'value'	 => $countries_with_states,
 				'action' => 'show',
 			),
 			'validation'	 => array(
 				'required' => true,
 			),
 		) );
+
+		$countries_without_postcode = array_keys( mp()->countries_no_postcode );
 		$metabox->add_field( 'text', array(
 			'name'			 => 'base_zip',
 			'label'			 => array( 'text' => __( 'Base Zip/Postal Code', 'mp' ) ),
@@ -620,8 +628,8 @@ class MP_Store_Settings_General {
 			),
 			'conditional'	 => array(
 				'name'	 => 'base_country',
-				'value'	 => array( 'US', 'CA', 'GB', 'AU', 'UM', 'AS', 'FM', 'GU', 'MH', 'MP', 'PW', 'PR', 'PI' ),
-				'action' => 'show',
+				'value'	 => $countries_without_postcode,
+				'action' => 'hide',
 			),
 			'validation'	 => array(
 				'required' => true,
