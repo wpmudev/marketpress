@@ -72,7 +72,7 @@ class MarketPress_Product_List extends WP_Widget {
 		parse_str( $query_string, $query_array );
 
 		//set to show only featured products, if configured to
-		if ( $instance[ 'show_only_featured' ] && (bool) $instance[ 'show_only_featured' ] == true ) {
+		if ( isset( $instance[ 'show_only_featured' ] ) && (bool) $instance[ 'show_only_featured' ] == true ) {
 			//the meta_query must be a nested array, that's why we needed an array instead of a query string
 			$query_array = array_merge( $query_array, array(
 				'meta_query' => array(
