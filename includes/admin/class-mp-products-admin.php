@@ -425,7 +425,7 @@ class MP_Products_Screen {
 				echo $image;
 				break;
 			case 'featured' :
-				echo $product->is_featured() ? __( 'True', 'mp' ) : __( 'False', 'mp' );
+				echo $product->is_featured() ? __( 'Yes', 'mp' ) : __( 'No', 'mp' );
 				break;
 			case 'product_variations' :
 				if ( $product->has_variations() ) {
