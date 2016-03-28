@@ -2343,14 +2343,9 @@ class MP_Cart {
 
 				// There will be oftenly rounding errors
 				$rounding_error = $total - $pre_total;
-
-				$shipping_pre_total = $this->shipping_total();
-				if( mp_get_setting( 'tax->tax_shipping' ) ) {
-					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();
-				}
-
+				
 				//Shipping price should be added after products price calculation
-				$total = $total + $shipping_pre_total;
+				$total = $total + $this->shipping_total();
 				//Fix the rounding error, if there is
 				$total -= $rounding_error;
 			}
