@@ -1503,18 +1503,9 @@ if ( ! function_exists( 'mp_get_states' ) ) :
 	 */
 	function mp_get_states( $country ) {
 		$list = false;
-		switch ( $country ) {
-			case 'US' :
-				$list = mp()->usa_states;
-				break;
-
-			case 'CA' :
-				$list = mp()->canadian_provinces;
-				break;
-
-			case 'AU' :
-				$list = mp()->australian_states;
-				break;
+		$property = $country.'_provinces';
+		if ( property_exists( mp(), $property ) ) {
+			$list = mp()->$property;
 		}
 
 		/**
