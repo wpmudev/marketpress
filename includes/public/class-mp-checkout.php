@@ -1192,10 +1192,10 @@ class MP_Checkout {
 
 		// If has special instructions
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
-			$html .= '<div class="mp_checkout_field">
+			$html .= '<div id="mp-checkout-column-special-instructions" class="mp_checkout_column fullwidth"><div class="mp_checkout_field">
 					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
 				    <textarea name="shipping[special_instructions]"></textarea>
-				  </div><!-- end mp_checkout_field -->';
+				  </div><!-- end mp_checkout_field --></div><!-- end mp-checkout-column-special-instructions -->';
 		}
 				
 		//Checkout registration form
