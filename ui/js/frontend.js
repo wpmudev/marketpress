@@ -124,7 +124,8 @@ var marketpress = { };
                     "at": "center top"
                 },
                 "hide": 300,
-                "show": 300
+                "show": 300,
+                "tooltipClass": "mp_tooltip-opened"
             } );
         },
         /**
