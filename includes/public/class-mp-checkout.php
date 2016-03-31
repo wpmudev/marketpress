@@ -1187,15 +1187,16 @@ class MP_Checkout {
 					<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
 		$this->address_fields( 'shipping' ) . '';
 
-		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
-			$html .= '<div class="mp_checkout_field">
-					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
-				    <textarea name="shipping[special_instructions]"></textarea>
-				  </div><!-- end mp_checkout_field -->';
-		}
-
 		$html .= '
 				</div><!-- end mp-checkout-column-shipping-info -->';
+
+		// If has special instructions
+		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
+			$html .= '<div id="mp-checkout-column-special-instructions" class="mp_checkout_column fullwidth"><div class="mp_checkout_field">
+					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
+				    <textarea name="shipping[special_instructions]"></textarea>
+				  </div><!-- end mp_checkout_field --></div><!-- end mp-checkout-column-special-instructions -->';
+		}
 				
 		//Checkout registration form
 		$html .= $this->register_toggle_form();

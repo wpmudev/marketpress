@@ -615,8 +615,10 @@ class MP_Order {
 				<div class="mp_order_details">
 					<div class="mp_order">' .
 		        $this->header( false ) .
-		        '</div><!-- end mp_order -->' .
-		        $confirmation_text . '
+		        '</div><!-- end mp_order -->
+		        <div class="mp_order_confirmation_text">' .
+		        	$confirmation_text .
+		        '</div><!-- end mp_order_confirmation_text -->
 					<div class="mp_order_cart">' .
 		        $cart_contents . '
 					</div><!-- end mp_order_cart -->

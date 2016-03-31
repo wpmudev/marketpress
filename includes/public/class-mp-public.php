@@ -42,14 +42,14 @@ class MP_Public {
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
 		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
 
-// Template Stuff
+		// Template Stuff
 		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
 		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
 		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
 
 		add_action( 'pre_get_posts', array( &$this, 'custom_taxonomy_limit_posts' ) );
 
-//Downloads
+		//Downloads
 		add_action( 'pre_get_posts', array( &$this, 'include_out_of_stock_products_for_downloads' ) );
 		add_filter( 'posts_results', array( &$this, 'set_publish_status_for_out_of_stock_product_downloads' ), 10, 2 );
 		add_action( 'template_redirect', array( &$this, 'maybe_serve_download' ) );
@@ -61,7 +61,7 @@ class MP_Public {
 
 		$post_type = MP_Product::get_post_type();
 		$settings  = get_option( 'mp_settings' );
-//Add global .mp class on all MarketPress pages
+		//Add global .mp class on all MarketPress pages
 		if (
 			is_singular( $post_type ) ||
 			get_post_type() == $post_type ||
@@ -72,15 +72,15 @@ class MP_Public {
 			$classes[] = 'mp';
 		}
 
-//Add class for mp singles
+		//Add class for mp singles
 		if ( is_singular( $post_type ) ) {
 			$classes[] = 'mp-single';
 		}
-//Add class for mp category page
+		//Add class for mp category page
 		if ( is_archive( $post_type ) && is_tax( array( 'product_category' ) ) ) {
 			$classes[] = 'mp-category';
 		}
-//Add class for mp tag pages
+		//Add class for mp tag pages
 		if ( is_archive( $post_type ) && is_tax( array( 'product_tag' ) ) ) {
 			$classes[] = 'mp-tag';
 		}
@@ -232,7 +232,7 @@ class MP_Public {
 	public function frontend_styles() {
 		//Display styles for all pages
 
-		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
+		wp_enqueue_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
@@ -269,7 +269,8 @@ class MP_Public {
 			return;
 		}
 		*/
-// JS
+		
+		// JS
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
@@ -280,7 +281,7 @@ class MP_Public {
 			'mp-select2'
 		), MP_VERSION );
 
-// Get product category links
+		// Get product category links
 		$terms = get_terms( 'product_category' );
 		$cats  = array();
 		foreach ( $terms as $term ) {
