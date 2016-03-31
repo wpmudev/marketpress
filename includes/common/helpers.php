@@ -244,9 +244,14 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		// Tracking URL
 		$tracking_url = $order->tracking_url( false );
 
+		$customer_name = trim( $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ) );
+
+		// If we don't have shipping name (for example on digital download only orders), lets use the name on the billing info
+		if( empty( $customer_name ) ) $customer_name = trim( $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) );
+
 		// Setup search/replace
 		$search_replace = array(
-			'CUSTOMERNAME' => $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ),
+			'CUSTOMERNAME' => $customer_name,
 			'ORDERID'      => $order->get_id(),
 			'ORDERINFOSKU' => $order_info,
 			'ORDERINFO'    => $order_info,
@@ -262,8 +267,6 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 			$search_replace = array_map( create_function( '$a', 'return str_replace("%","%%",$a);' ), $search_replace );
 		}
 
-		// Replace newlines from textarea with HTML tags
-		$text = str_replace( "\n", '<br />', $text );
 		// Replace codes
 		$text = str_replace( array_keys( $search_replace ), array_values( $search_replace ), $text );
 
@@ -480,26 +483,21 @@ if ( ! function_exists( 'mp_get_states' ) ) :
 	 */
 	function mp_get_states( $country ) {
 		$list = array();
-
-		switch ( $country ) {
-			case 'US' :
-				$list = mp()->usa_states;
-				break;
-
-			case 'CA' :
-				$list = mp()->canadian_provinces;
-				break;
-
-			case 'GB' :
-				$list = mp()->uk_counties;
-				break;
-
-			case 'AU' :
-				$list = mp()->australian_states;
-				break;
+		$property = $country.'_provinces';
+		if ( property_exists( mp(), $property ) ) {
+			$list = mp()->$property;
 		}
 
-		return $list;
+		/**
+		 * Filter the state/province list
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $list The current state/province list.
+		 * @param string $country The current country.
+		 */
+
+		return apply_filters( 'mp_get_states', $list, $country );
 	}
 
 endif;

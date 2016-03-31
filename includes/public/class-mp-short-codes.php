@@ -36,6 +36,7 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_tag_cloud', array( &$this, 'mp_tag_cloud_sc' ) );
 		add_shortcode( 'mp_list_categories', array( &$this, 'mp_list_categories_sc' ) );
 		add_shortcode( 'mp_dropdown_categories', array( &$this, 'mp_dropdown_categories_sc' ) );
+		add_shortcode( 'mp_featured_products', array( &$this, 'mp_featured_products_sc' ) );
 		add_shortcode( 'mp_popular_products', array( &$this, 'mp_popular_products_sc' ) );
 		add_shortcode( 'mp_related_products', array( &$this, 'mp_related_products_sc' ) );
 		add_shortcode( 'mp_list_products', array( &$this, 'mp_list_products_sc' ) );
@@ -328,6 +329,23 @@ class MP_Short_Codes {
 		$this->shortcodes_frontend_styles_scripts();
 		$atts = $this->_parse_atts( $atts );
 		return mp_dropdown_categories( false, $atts );
+	}
+
+	/**
+	 * Displays a list of featured products
+	 *
+	 * @param int num Optional, max number of products to display. Defaults to 5
+	 */
+	function mp_featured_products_sc( $atts ) {
+		$this->shortcodes_frontend_styles_scripts();
+		$atts	 = shortcode_atts( array(
+			'number' => 5,
+		), $atts );
+		$atts	 = $this->_parse_atts( $atts );
+
+		extract( $atts );
+
+		return mp_featured_products( false, $number );
 	}
 
 	/**

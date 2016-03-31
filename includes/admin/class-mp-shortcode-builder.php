@@ -175,6 +175,7 @@ class MP_Shortcode_Builder {
 			'mp_tag_cloud'			 => __( 'Display a cloud or list of your product tags.', 'mp' ),
 			'mp_list_categories'	 => __( 'Display an HTML list of your product categories.', 'mp' ),
 			'mp_dropdown_categories' => __( 'Display an HTML dropdown of your product categories.', 'mp' ),
+			'mp_featured_products'	 => __( 'Display a list of featured products.', 'mp' ),
 			'mp_popular_products'	 => __( 'Display a list of popular products ordered by sales.', 'mp' ),
 			'mp_related_products'	 => __( 'Display products related to the one being viewed.', 'mp' ),
 			'mp_list_products'		 => __( 'Display a list of products according to preference.', 'mp' ),
@@ -648,6 +649,26 @@ class MP_Shortcode_Builder {
 		</table>
 		<?php
 	}
+
+	/**
+	 * Displays the [mp_featured_products] short code attributes
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function display_mp_featured_products_attributes() {
+		?>
+		<table id="mp-featured-products-shortcode" class="form-table" style="display:none">
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The maximum number of products to display', 'mp' ); ?></span></span> number</th>
+				<td>
+					<input type="text" name="number" data-default="5" value="5" />
+				</td>
+			</tr>
+		</table>	
+		<?php
+	}
+
 
 	/**
 	 * Displays the [mp_popular_products] short code attributes

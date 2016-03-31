@@ -505,14 +505,14 @@ class Marketpress {
 
 	function install_actions() {
 
-// Install - Add pages button
+		// Install - Add pages button
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
 			$this->create_pages();
 
-// We no longer need to install pages
+			// We no longer need to install pages
 			update_option( 'mp_needs_pages', 0 );
 
-// Settings redirect
+			// Settings redirect
 			wp_redirect( admin_url( 'admin.php?page=store-setup-wizard&quick_setup_step=2&mp_pages_created' ) );
 			exit;
 		}
@@ -520,7 +520,7 @@ class Marketpress {
 
 	function create_pages() {
 		$page_store_id = mp_create_store_page( 'store' );
-//mp_create_store_page('network_store_page');
+		//mp_create_store_page('network_store_page');
 		$page_products_id     = mp_create_store_page( 'products' );
 		$page_cart_id         = mp_create_store_page( 'cart' );
 		$page_checkout_id     = mp_create_store_page( 'checkout' );

@@ -479,7 +479,7 @@ class MP_Setup_Wizard {
 			) );
 
 			// Create field for each canadian province
-			foreach ( mp()->canadian_provinces as $key => $label ) {
+			foreach ( mp()->CA_provinces as $key => $label ) {
 				$metabox->add_field( 'text', array(
 					'name'        => 'tax[canada_rate][' . $key . ']',
 					'desc'        => '<a target="_blank" href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada">' . __( 'Current Rates', 'mp' ) . '</a>',

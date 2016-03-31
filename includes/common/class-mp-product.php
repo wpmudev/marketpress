@@ -1099,6 +1099,25 @@ class MP_Product {
 	}
 
 	/**
+	 * Check if the product has content
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @return bool
+	 */
+	public function has_content() {
+		$content = $this->_post->post_content;
+
+		if ( empty( $content ) && $this->is_variation() ) {
+			$parent = new MP_Product( $this->post_parent );
+			$content = $parent->post_content;
+		}
+
+		return ! empty( $content );
+	}	
+
+	/**
 	 * Get the product's excerpt
 	 *
 	 * @since 3.0
@@ -2867,7 +2886,7 @@ class MP_Product {
 			$tabs = (array) apply_filters( 'mp_product/content_tabs_array', $tabs, $this );
 
 			// Make sure product overview tab is always at the beginning if not empty
-			if($product->content( false ) !== ''){
+			if( $product->has_content() ){
 				$tabs = array( 'mp-product-overview' => __( 'Description', 'mp' ) ) + $tabs;
 			}
 
