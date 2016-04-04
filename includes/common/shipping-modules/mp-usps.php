@@ -398,8 +398,8 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	 */
 	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
 
-		add_filter( 'mp_list_shipping_options', array( $this, 'after_mp_shipping_options') );
-		add_filter( 'mp_checkout_step_link', array( $this, 'checkout_step_link_handler') );
+		add_filter( 'mp_list_shipping_options', array( $this, 'after_mp_shipping_options'), 10, 2 );
+		add_filter( 'mp_checkout_step_link', array( $this, 'checkout_step_link_handler'), 10, 4 );
 
 		if ( $this->_crc_ok() && false !== ( $shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ) ) {
 			if ( ! empty( $shipping_options ) ) {
