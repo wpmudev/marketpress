@@ -2441,6 +2441,12 @@ class MP_Cart {
 			$cookie_domain = get_blog_details( mp_main_site_id() )->domain;
 		}
 
+		// If Domain Mapping is active and is_mapped_domain then restore $cookie_domain to current url
+		// Global cookie will be updated by subdomain ajax call
+		if( class_exists( 'domain_map' ) && domain_map::utils()->is_mapped_domain() ) {
+			$cookie_domain = COOKIE_DOMAIN;
+		}
+
 		setcookie( $this->_cookie_id, serialize( $this->_items ), $expire, '/', $cookie_domain );
 	}
 

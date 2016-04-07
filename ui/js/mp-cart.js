@@ -9,6 +9,8 @@ String.prototype.escapeSelector = function() {
 
 var mp_cart = { };
 
+var productListListenersInitiated = false;
+
 ( function( $ ) {
 
     /**
@@ -44,6 +46,11 @@ var mp_cart = { };
             }
 
             marketpress.loadingOverlay( 'show' );
+
+			if( $form.attr( 'data-listlisteners-init' ) !== 'true' ) {
+				$form.attr( 'data-listlisteners-init', 'true' );
+				mp_cart.initCartDMListeners( $form );
+			}  
             mp_cart.addItem( $form, item, qty );
         }
     };
@@ -66,30 +73,35 @@ var mp_cart = { };
     mp_cart.initProductListListeners = function() {
         $( '#mp-products, .mp-multiple-products' ).on( 'submit', '.mp_form-buy-product', function( e ) {
             e.preventDefault();
-            $( '.mp_ajax_loader' ).remove();
-
             var $this = $( this );
 
-            $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
-                $this.addClass( 'invisible' );
-                //$( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
-                if ( $( ".mp_ajax_loader" ).length ) {
+			if( $this.attr( 'data-listlisteners-init' ) !== 'true' ){
+				$this.attr( 'data-listlisteners-init', 'true' );
+				$( '.mp_ajax_loader' ).remove();
 
-                } else {
-                    $( mp_cart_i18n.ajax_loader ).insertAfter( $this ).show();
-                }
-                //marketpress.loadingOverlay( 'show' );
-            } );
+	            $this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
 
-            $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                $this.removeClass( 'invisible' );//.next( '.mp_ajax_loader' ).remove();
-                $( '.mp_ajax_loader' ).remove();
-                //marketpress.loadingOverlay( 'hide' );
-            } );
+	                $this.addClass( 'invisible' );
+	                //$( 'body' ).children( '.mp_ajax_loader' ).clone().insertAfter( $this ).show();
+	                if ( $( ".mp_ajax_loader" ).length ) {
 
-            mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
+	                } else {
+	                    $( mp_cart_i18n.ajax_loader ).insertAfter( $this ).show();
+	                }
+	                //marketpress.loadingOverlay( 'show' );
+	            } );
+
+	            $this.on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+	                $this.removeClass( 'invisible' );//.next( '.mp_ajax_loader' ).remove();
+	                $( '.mp_ajax_loader' ).remove();
+	                //marketpress.loadingOverlay( 'hide' );
+	            } );
+	            mp_cart.initCartDMListeners( $this );
+			}
+			mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
         } );
     };
+    	
 
 	/**
      * Initialize cart buttons listeners
@@ -171,6 +183,105 @@ var mp_cart = { };
     };
 
     /**
+     * Add cart domain mapping listeners
+     *
+     * @since 3.0
+     */
+    mp_cart.initCartDMListeners = function( $form = false ) {
+        // If mp_dm.mp_dm_admin_url exist then it's multisite and domain mapping active
+        if( typeof( mp_dm ) !== 'undefined' ) {
+        	
+        	var $this = ($form) ? $form : $(document);
+			var url = mp_dm.mp_dm_admin_url;
+
+			if($form){
+				// Add item to original domain cart
+				$this.on( 'mp_cart/before_add_item', function( e, item, qty ) {
+		    		 $.ajaxq( 'addtocart', {
+						xhrFields: {
+					     	 withCredentials: true
+					   	},
+					  	"data": {
+			                "product": item,
+			                "qty": qty,
+			                "cart_action": "add_item",
+			                "is_cart_page": mp_cart_i18n.is_cart_page
+			            },
+			            "type": "POST",
+			            "url": url,
+			        } );
+		    	} );
+			}
+
+        	// Undo remove item to original domain cart
+				$this.on( 'mp_cart/before_undo_remove_item', function( e, item ) {
+		    		 $.ajaxq( 'addtocart', {
+						xhrFields: {
+					     	 withCredentials: true
+					   	},
+					  	"data": {
+			                "product": item,
+			                "cart_action": "undo_remove_item",
+			                "is_cart_page": mp_cart_i18n.is_cart_page
+			            },
+			            "type": "POST",
+			            "url": url,
+			        } );
+		    	} );
+
+        	// Remove item from original domain cart
+			$this.on( 'mp_cart/before_remove_item', function( e, item ) {
+	    		 $.ajax( {
+					xhrFields: {
+				     	 withCredentials: true
+				   	},
+				  	"data": {
+		                "product": item,
+		                "cart_action": "remove_item",
+		                "is_cart_page": mp_cart_i18n.is_cart_page
+		            },
+		            "type": "POST",
+		            "url": url,
+		        } );				
+	    	} );
+
+			// update item qty on original domain
+			$this.on( 'mp_cart/before_update_item_qty', function( e, item, qty ) {
+	    		 $.ajaxq( 'addtocart', {
+					xhrFields: {
+				     	 withCredentials: true
+				   	},
+				  	"data": {
+		                "product": item,
+		                "qty": qty,
+		                "cart_action": "update_item",
+		                "is_cart_page": mp_cart_i18n.is_cart_page
+		            },
+		            "type": "POST",
+		            "url": mp_dm.mp_dm_admin_url,
+		        } );
+	    	} );
+
+			// Empty cart on original domain
+			$this.on( 'mp_cart/after_empty_cart', function( e, item, qty ) {
+	    		 $.ajaxq( 'addtocart', {
+					xhrFields: {
+				     	 withCredentials: true
+				   	},
+				  	"data": {
+		                "product": item,
+		                "qty": qty,
+		                "cart_action": "empty_cart",
+		                "is_cart_page": mp_cart_i18n.is_cart_page
+		            },
+		            "type": "POST",
+		            "url": mp_dm.mp_dm_admin_url,
+		        } );
+	    	} );	    	
+    	} 			
+    };
+
+    /**
      * Initialize cart listeners
      *
      * @since 3.0
@@ -182,6 +293,7 @@ var mp_cart = { };
         mp_cart.initCartFormListeners();
         mp_cart.initProductOptionsLightbox();
 		mp_cart.initCartButtonListeners();
+		mp_cart.initCartDMListeners();
     };
 
     /**
@@ -458,7 +570,9 @@ var mp_cart = { };
         };
 
         marketpress.loadingOverlay( 'show' );
-
+		
+		$( document ).trigger( 'mp_cart/before_remove_item', itemId );
+		
         $.post( url, data ).done( function( resp ) {
             if ( resp.success ) {
                 if ( resp.data.item_count == 0 ) {
@@ -503,6 +617,8 @@ var mp_cart = { };
 
         marketpress.loadingOverlay( 'show' );
 
+		$( document ).trigger( 'mp_cart/before_undo_remove_item', itemId );
+
         $.post( url, data ).done( function( resp ) {
             if ( resp.success ) {
                 var $lineItem = $( '#mp-cart-item-' + itemId.escapeSelector() );
@@ -524,6 +640,8 @@ var mp_cart = { };
         var data = {
             "cart_action": "empty_cart"
         };
+
+		$( document ).trigger( 'mp_cart/after_empty_cart' );
 
         $.post( url, data ).done( function( resp ) {
             if ( resp.success ) {
@@ -587,6 +705,8 @@ var mp_cart = { };
         }
 
         marketpress.loadingOverlay( 'show' );
+
+        $( document ).trigger( 'mp_cart/before_update_item_qty', [ itemId, qty ] );
 
         $.post( url, data ).done( function( resp ) {
             marketpress.loadingOverlay( 'hide' );

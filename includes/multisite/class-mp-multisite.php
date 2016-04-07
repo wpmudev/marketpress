@@ -139,6 +139,15 @@ class MP_Multisite {
 			'cat_urls' => $cat_urls,
 			'cat_url'  => get_permalink( mp_get_network_setting( 'pages->networks_categories' ) )
 		) );
+
+		if( class_exists( 'domain_map' ) && domain_map::utils()->is_mapped_domain() ){
+			$admin_url = mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' );
+			$mapped_domain = domain_map::utils()->get_mapped_domain();
+			$admin_url = str_replace( domain_map::utils()->get_mapped_domain(), get_blog_details()->domain , $admin_url );
+			wp_localize_script( 'mp-cart', 'mp_dm', array(
+			'mp_dm_admin_url'  =>$admin_url
+			) );
+		}
 	}
 
 	public function taxonomy_output( $content ) {
