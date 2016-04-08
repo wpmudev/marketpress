@@ -141,12 +141,23 @@ class MP_Multisite {
 		) );
 
 		if( class_exists( 'domain_map' ) && domain_map::utils()->is_mapped_domain() ){
-			$admin_url = mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' );
+			$update_cart_admin_url = mp_get_ajax_url( 'admin-ajax.php?action=mp_update_cart' );
 			$mapped_domain = domain_map::utils()->get_mapped_domain();
-			$admin_url = str_replace( domain_map::utils()->get_mapped_domain(), get_blog_details()->domain , $admin_url );
-			wp_localize_script( 'mp-cart', 'mp_dm', array(
-			'mp_dm_admin_url'  =>$admin_url
-			) );
+			$update_cart_admin_url = str_replace( $mapped_domain, get_blog_details()->domain , $update_cart_admin_url );
+
+			$localize_data = array(
+				'update_cart_admin_url'  =>$update_cart_admin_url
+			);
+
+			if( mp_cart()->is_global ){
+				$get_cart_admin_url = mp_get_ajax_url( 'admin-ajax.php?action=mp_get_cart' );
+				$get_cart_admin_url = str_replace( $mapped_domain, get_blog_details()->domain , $get_cart_admin_url );				
+				$set_cart_admin_url = mp_get_ajax_url( 'admin-ajax.php?action=mp_set_cart' );
+				$localize_data[ 'get_cart_admin_url' ] = $get_cart_admin_url;
+				$localize_data[ 'set_cart_admin_url' ] = $set_cart_admin_url;
+			}
+
+			wp_localize_script( 'mp-cart', 'mp_dm', $localize_data );
 		}
 	}
 

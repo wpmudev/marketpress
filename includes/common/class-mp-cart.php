@@ -398,6 +398,31 @@ class MP_Cart {
 	}
 
 	/**
+	 * Get JSON format of cart cookie
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @return json object
+	 */
+	public function get_cart_cookie_json() {
+		$cart_cookie = '';
+
+		if ( ! $this->_use_cookies ) {
+			// Not using cookies - bail
+			return json_encode($cart_cookie);
+		}
+
+		$this->_cookie_id = 'mp_globalcart_' . COOKIEHASH;
+
+		if ( $cart_cookie_ = mp_get_cookie_value( $this->_cookie_id ) ) {
+			$cart_cookie = $cart_cookie_;
+		}
+
+		return json_encode($cart_cookie);
+	}	
+
+	/**
 	 * Check if a given item ID is a global item ID
 	 *
 	 * @since 3.0
@@ -562,13 +587,13 @@ class MP_Cart {
 							$column_html = $this->dropdown_quantity( array(
 								'echo'     => false,
 								'class'    => 'mp_select2',
-								'name'     => 'mp_cart_item-qty[' . $product->ID . ']',
+								'name'     => $this->is_global ? 'mp_cart_item-qty[' . $this->_id . '.' . $product->ID . ']' : 'mp_cart_item-qty[' . $product->ID . ']',
 								'selected' => $product->qty,
-								'id'       => $product->ID
+								'id'       => $this->is_global ? $this->_id . '.' . $product->ID  : $product->ID
 							) );
 						}
 						$column_html .= '
-						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.removeItem(' . $id . ')">' . __( 'Remove', 'mp' ) . '</a>';
+						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.removeItem(\'' . $id . '\')">' . __( 'Remove', 'mp' ) . '</a>';
 					} else {
 						$column_html = $product->qty;
 					}
@@ -1815,7 +1840,7 @@ class MP_Cart {
 				case 'qty' :
 					if ( $this->is_editable ) {
 						$column_html .= '
-						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.undoRemoveItem(' . $id . ')">' . __( 'Add again', 'mp' ) . '</a>';
+						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.undoRemoveItem(\'' . $id . '\')">' . __( 'Add again', 'mp' ) . '</a>';
 					} else {
 						$column_html = $product->qty;
 					}
@@ -2376,15 +2401,24 @@ class MP_Cart {
 	 * @param int $qty The qty to update the item to.
 	 */
 	public function update_item( $item_id, $qty ) {
-		$product = new MP_Product( $item_id );
+		$blog_id = get_current_blog_id();
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			list( $blog_id, $item_id ) = explode( '.', $item_id );
+			$this->set_id( intval( $blog_id ) );
+		}
+
+		$product = new MP_Product( $item_id, $blog_id );
 		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
 			$qty = 1;
 		}
 
 		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
 		$this->_update_cart_cookie();
-	}
 
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			$this->reset_id();
+		}					
+	}
 	/**
 	 * Alert about unavailable items or stock issues
 	 *
@@ -2525,7 +2559,6 @@ class MP_Cart {
 		add_action( 'wp_ajax_mp_update_cart', array( &$this, 'ajax_update_cart' ) );
 		add_action( 'wp_ajax_nopriv_mp_update_cart', array( &$this, 'ajax_update_cart' ) );
 	}
-
 }
 
 $GLOBALS['mp_cart'] = MP_Cart::get_instance();
