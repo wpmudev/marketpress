@@ -330,6 +330,77 @@ class MP_Cart {
 		wp_send_json_error();
 	}
 
+
+	/**
+	 * Get the cart on JSON format (ajax)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_get_cart, wp_ajax_nopriv_mp_get_cart
+	 */
+	public function ajax_get_cart() {
+
+		$cart_cookie = '';
+
+		if ( ! $this->_use_cookies ) {
+			// Not using cookies - bail
+			wp_send_json_error();
+		}
+
+		$this->_cookie_id = 'mp_globalcart_' . COOKIEHASH;
+
+		$cart_cookie = mp_get_cookie_value( $this->_cookie_id );
+
+		wp_send_json_success( array( 'cart' => $cart_cookie ) );
+
+		wp_send_json_error();
+	}
+
+	/**
+	 * Set the cart from JSON format (ajax)
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action wp_ajax_mp_set_cart, wp_ajax_nopriv_mp_set_cart
+	 */
+	public function ajax_set_cart() {
+
+		if ( ! $this->_use_cookies ) {
+			// Not using cookies - bail
+			wp_send_json_error();
+		}
+
+		$cart_cookie = mp_get_post_value( 'cart', null );
+
+		$this->_items     = array( $this->_id => array() );
+
+		if ( isset( $cart_cookie ) && !empty( $cart_cookie ) ) {
+
+		$cart_cookie = html_entity_decode( stripslashes( $cart_cookie ) );
+			$cart_cookie_items = unserialize( $cart_cookie );
+			if( $cart_cookie_items ){
+				foreach ( $cart_cookie_items as $blog_id => $blog_items ) {
+					foreach ( $blog_items as $item => $qty ) {
+						$product = new MP_Product( $item , $blog_id );
+				 		if ( !$product->exists() ) {
+							unset( $cart_cookie_items[ $blog_id ][ $item ] );
+				 		}
+					}
+				}
+			}
+			$this->_items = $cart_cookie_items;
+		}
+
+		$this->_update_cart_cookie();
+
+		wp_send_json_success( array(
+			'minicart'     		=> $this->floating_cart_html(),
+			'widgetcart'  		=> $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ) ) );
+
+		wp_send_json_error();
+	}	
+
+
 	/**
 	 * Convert an array of items to an array of MP_Product objects
 	 *
@@ -397,30 +468,6 @@ class MP_Cart {
 		}
 	}
 
-	/**
-	 * Get JSON format of cart cookie
-	 *
-	 * @since 3.0
-	 * @access public
-	 *
-	 * @return json object
-	 */
-	public function get_cart_cookie_json() {
-		$cart_cookie = '';
-
-		if ( ! $this->_use_cookies ) {
-			// Not using cookies - bail
-			return json_encode($cart_cookie);
-		}
-
-		$this->_cookie_id = 'mp_globalcart_' . COOKIEHASH;
-
-		if ( $cart_cookie_ = mp_get_cookie_value( $this->_cookie_id ) ) {
-			$cart_cookie = $cart_cookie_;
-		}
-
-		return json_encode($cart_cookie);
-	}	
 
 	/**
 	 * Check if a given item ID is a global item ID
@@ -2558,6 +2605,14 @@ class MP_Cart {
 		// Ajax hooks
 		add_action( 'wp_ajax_mp_update_cart', array( &$this, 'ajax_update_cart' ) );
 		add_action( 'wp_ajax_nopriv_mp_update_cart', array( &$this, 'ajax_update_cart' ) );
+		
+		// DM compatibility Ajax hooks
+		if( class_exists( 'domain_map' ) && mp_get_network_setting( 'global_cart' ) ){
+			add_action( 'wp_ajax_mp_get_cart', array( &$this, 'ajax_get_cart' ) );
+			add_action( 'wp_ajax_nopriv_mp_get_cart', array( &$this, 'ajax_get_cart' ) );
+			add_action( 'wp_ajax_mp_set_cart', array( &$this, 'ajax_set_cart' ) );
+			add_action( 'wp_ajax_nopriv_mp_set_cart', array( &$this, 'ajax_set_cart' ) );
+		}
 	}
 }
 

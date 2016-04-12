@@ -296,7 +296,26 @@ var productListListenersInitiated = false;
 				},
 	            "type": "POST",
 	            "url": mp_dm.get_cart_admin_url,
-		    } ).done(function(data) {
+  				"dataType": "json",
+		    } ).done( function( resp ) {
+		    	if( resp.success ){
+		    		//resp.data.cart = JSON.parse( resp.data.cart.replace(/&quot;/g,'"') );
+					$.ajax( {
+						xhrFields: {
+							withCredentials: true
+						},
+			            "type": "POST",
+			            "data": resp.data,
+			            "url": mp_dm.set_cart_admin_url,
+			            "processData ": false,
+			            "dataType": "json",
+				    } ).done( function( resp ) {
+		                if ( resp.success ) {
+		                    mp_cart.update( resp.data.minicart );
+							mp_cart.update_widget( resp.data.widgetcart );
+		                }				    	
+					} );
+		    	}
 		    } );
     	}
     };
