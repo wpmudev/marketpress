@@ -483,26 +483,21 @@ if ( ! function_exists( 'mp_get_states' ) ) :
 	 */
 	function mp_get_states( $country ) {
 		$list = array();
-
-		switch ( $country ) {
-			case 'US' :
-				$list = mp()->usa_states;
-				break;
-
-			case 'CA' :
-				$list = mp()->canadian_provinces;
-				break;
-
-			case 'GB' :
-				$list = mp()->uk_counties;
-				break;
-
-			case 'AU' :
-				$list = mp()->australian_states;
-				break;
+		$property = $country.'_provinces';
+		if ( property_exists( mp(), $property ) ) {
+			$list = mp()->$property;
 		}
 
-		return $list;
+		/**
+		 * Filter the state/province list
+		 *
+		 * @since 3.0
+		 *
+		 * @param array $list The current state/province list.
+		 * @param string $country The current country.
+		 */
+
+		return apply_filters( 'mp_get_states', $list, $country );
 	}
 
 endif;

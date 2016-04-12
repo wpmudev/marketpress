@@ -156,7 +156,9 @@ class MP_Cart {
 			}
 		}
 
-		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
+		if( $qty > 0 ) {
+			mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
+		}
 		$this->_update_cart_cookie();
 
 		return $cart_updated;
@@ -2343,14 +2345,9 @@ class MP_Cart {
 
 				// There will be oftenly rounding errors
 				$rounding_error = $total - $pre_total;
-
-				$shipping_pre_total = $this->shipping_total();
-				if( mp_get_setting( 'tax->tax_shipping' ) ) {
-					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();
-				}
-
+				
 				//Shipping price should be added after products price calculation
-				$total = $total + $shipping_pre_total;
+				$total = $total + $this->shipping_total();
 				//Fix the rounding error, if there is
 				$total -= $rounding_error;
 			}
