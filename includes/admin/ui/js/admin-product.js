@@ -109,6 +109,11 @@ jQuery( document ).ready( function( $ ) {
             $( this ).parent( ).find( '.mp-variation-attribute-name' ).show( );
         } else {
             $( this ).parent( ).find( '.mp-variation-attribute-name' ).hide( );
+            var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
+            var variation_tags = $( this ).find( ':selected' ).attr( 'data-tags' );
+            if( variation_tags !== "" && $variation_tags_textarea.val() === "" ) {
+            	$variation_tags_textarea.textext()[0].tags().addTags( variation_tags.split( ',' ) );
+            }
         }
     } );
 
