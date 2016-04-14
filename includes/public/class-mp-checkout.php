@@ -1554,7 +1554,7 @@ try{
 				$meta = $product->get_meta( 'sku' );
 				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 				$js .= 'ga("ecommerce:addItem", {
-					 "id": "' . esc_attr( $product->ID ) . '", // Transaction ID. Required.
+					 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
 					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
 					 "sku": "' . $sku . '",								// SKU/code.
 					 "category": "",			 					// Category or variation.
