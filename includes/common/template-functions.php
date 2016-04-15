@@ -219,7 +219,7 @@ if ( ! function_exists( 'mp_orderstatus_link' ) ) :
 
 endif;
 
-if ( ! function_exists( 'mp_product_link' ) ) :
+if ( ! function_exists( 'mp_products_link' ) ) :
 
 	/**
 	 * Echos the current product list link.
