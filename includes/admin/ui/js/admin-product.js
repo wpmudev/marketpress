@@ -906,4 +906,31 @@ jQuery( document ).ready( function( $ ) {
     });
     $target.find("input[name='regular_price']").trigger('input');
 
+    // Set default variant action
+    $('#mp-product-price-inventory-variants-metabox').on('click', 'tr:not(".default") a.set-default', function(event) {
+    	event.preventDefault();
+    	$this = $( this );
+    	post_id = $this.attr('data-post-id');
+    	meta_name = 'default_variation';
+    	meta_value = $this.attr('data-child-id');
+    	var data = {
+            action: 'save_inline_post_data',
+            post_id: post_id,
+            meta_name: meta_name,
+            meta_value: meta_value,
+            ajax_nonce: mp_product_admin_i18n.ajax_nonce
+        }
+
+		$this.children('.fa').addClass('fa-pulse');
+		$.post(
+			mp_product_admin_i18n.ajaxurl, 
+			data
+		).done( function( data, status ) {
+			$this.children('.fa').removeClass('fa-pulse');
+			if ( status == 'success' ) {
+				$this.parents('tr').addClass('default').siblings('tr').removeClass('default');
+			}
+		});
+    });
+
 } );
