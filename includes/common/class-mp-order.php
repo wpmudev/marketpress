@@ -97,7 +97,7 @@ class MP_Order {
 	}
 
 	/**
-	 * Convert legacy cart info from orders crated in < 3.0
+	 * Convert legacy cart info from orders created in < 3.0
 	 *
 	 * @since 3.0
 	 * @access protected
@@ -562,8 +562,8 @@ class MP_Order {
 		?>
 		<?php if ( is_array( $cart ) ): ?>
 			<?php foreach ( $cart as $product_id => $items ): ?>
-				<?php foreach ( $items as $item ): ?>
-					<?php $product = new MP_Product( $product_id ); ?>
+				<?php foreach ( $items as $variation_id => $item ): ?>
+					<?php $product = ( $variation_id != 0 ) ?  new MP_Product( $variation_id ) : new MP_Product( $product_id );?>
 					<div class="mp_cart_item" id="mp-cart-item-104">
 						<div class="mp_cart_item_content mp_cart_item_content-thumb"><img
 								src="<?php echo $product->image_url( false ) ?>"
