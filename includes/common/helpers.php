@@ -1448,3 +1448,32 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 if ( ! function_exists( 'mp_get_the_thumbnail' ) ) {
 
 }
+
+if (! function_exists( 'mp_array_column' ) ) {
+    function mp_array_column( array $input, $columnKey, $indexKey = null ) {
+    	
+    	if( function_exists( 'array_column' ) ){
+    		return array_column( $input, $columnKey, $indexKey );
+    	}
+
+        $array = array();
+        foreach ( $input as $value ) {
+            if ( ! isset( $value[$columnKey] ) ) {
+                return false;
+            }
+            if ( is_null( $indexKey ) ) {
+                $array[] = $value[$columnKey];
+            }
+            else {
+                if ( ! isset( $value[$indexKey] ) ) {
+                    return false;
+                }
+                if ( ! is_scalar( $value[$indexKey] ) ) {
+                    return false;
+                }
+                $array[$value[$indexKey]] = $value[$columnKey];
+            }
+        }
+        return $array;
+    }
+}
