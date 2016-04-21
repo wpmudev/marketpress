@@ -1034,8 +1034,13 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$html = apply_filters( 'mp_order/header', $html, $this );
+		
+		$tracked = $this->get_meta( 'mp_ga_tracked' );
 
-		mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
+		if( !$tracked ) {
+			mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
+			add_post_meta( $this->ID, 'mp_ga_tracked', true, true );
+		}
 
 		if ( $echo ) {
 			echo $html;
