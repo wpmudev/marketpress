@@ -1432,7 +1432,7 @@ class MP_Checkout {
 		if ( $order->exists() == false ) {
 			return false;
 		}
-		
+
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
 		
@@ -1568,8 +1568,7 @@ try{
 
 		//add to footer
 		if ( !empty( $js ) ) {
-			$function = "echo '$js';";
-			add_action( 'wp_footer', create_function( '', $function ), 99999 );
+			echo $js;
 		}
 	}
 
