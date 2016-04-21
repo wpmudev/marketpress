@@ -163,7 +163,7 @@ class MP_Product_Attributes_Admin {
 			<?php foreach ( $product_attributes as $product_attribute ) {
 				$tags = '';
 				if( $attribute_terms = MP_Product_Attributes_Admin::get_product_attribute_terms( $product_attribute->attribute_id ) ){
-					$tags = array_column( $attribute_terms, 'name' );
+					$tags = mp_array_column( $attribute_terms, 'name' );
 					$tags = implode( ',', $tags );
 				}
 
