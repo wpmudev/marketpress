@@ -855,6 +855,11 @@ class MP_Checkout {
 			$atts .= " {$key}={$val}";
 		}
 
+		// Convert Counrty/State abbreviation when value_only
+		if( mp_arr_get_value( 'value_only', $field ) && in_array( mp_arr_get_value( 'name', $field, '' ), array( 'billing[country]' , 'billing[state]', 'shipping[country]' , 'shipping[state]' ) ) ){
+			$field['value'] = $field['options'][$field['value']];
+		}
+
 		switch ( mp_arr_get_value( 'type', $field, '' ) ) {
 			case 'text' :
 			case 'password' :
