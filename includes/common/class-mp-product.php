@@ -1205,7 +1205,7 @@ class MP_Product {
 		$index = 0;
 		foreach ( $this->content_tabs as $slug => $label ) {
 			$html .= '
-				<li class="mp_product_tab_label' . ( ( $index == 0 ) ? ' current' : '' ) . '"><a class="mp_product_tab_label_link ' . esc_attr( $slug ) . '" href="#' . esc_attr( $slug ) . '">' . $label . '</a></li>';
+				<li class="mp_product_tab_label' . ( ( $index == 0 ) ? ' current' : '' ) . '"><a class="mp_product_tab_label_link ' . esc_attr( $slug ) . '" href="#' . esc_attr( $slug ) . '-' . $this->ID . '">' . $label . '</a></li>';
 			$index ++;
 		}
 
