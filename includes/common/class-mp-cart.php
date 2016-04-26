@@ -2116,7 +2116,7 @@ class MP_Cart {
 			$state   = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
 
-			if ( $estimate ) {
+			if ( $estimate || ( $this->only_digital() && mp_get_setting( 'details_collection' ) == 'contact' ) ) {
 				if ( empty( $country ) ) {
 					$country = mp_get_setting( 'base_country' );
 				}

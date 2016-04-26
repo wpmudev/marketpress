@@ -97,7 +97,7 @@ class MP_Order {
 	}
 
 	/**
-	 * Convert legacy cart info from orders crated in < 3.0
+	 * Convert legacy cart info from orders created in < 3.0
 	 *
 	 * @since 3.0
 	 * @access protected
@@ -562,8 +562,8 @@ class MP_Order {
 		?>
 		<?php if ( is_array( $cart ) ): ?>
 			<?php foreach ( $cart as $product_id => $items ): ?>
-				<?php foreach ( $items as $item ): ?>
-					<?php $product = new MP_Product( $product_id ); ?>
+				<?php foreach ( $items as $variation_id => $item ): ?>
+					<?php $product = ( $variation_id != 0 ) ?  new MP_Product( $variation_id ) : new MP_Product( $product_id );?>
 					<div class="mp_cart_item" id="mp-cart-item-104">
 						<div class="mp_cart_item_content mp_cart_item_content-thumb"><img
 								src="<?php echo $product->image_url( false ) ?>"
@@ -673,6 +673,9 @@ class MP_Order {
 	 * @return string
 	 */
 	public function get_address( $type, $editable = false, $product_type = false ) {
+		$states        = mp_get_states( $this->get_meta( "mp_{$type}_info->country" ) );
+		$all_countries = mp_countries();
+
 		if ( ! $editable ) {
 
 			if( $product_type == 'digital' ) {
@@ -688,8 +691,9 @@ class MP_Order {
 			        $this->get_meta( "mp_{$type}_info->address1", '' ) . '<br />' .
 			        ( ( $address2 = $this->get_meta( "mp_{$type}_info->address2", '' ) ) ? $address2 . '<br />' : '' ) .
 			        ( ( $city = $this->get_meta( "mp_{$type}_info->city", '' ) ) ? $city : '' ) .
-			        ( ( $state = $this->get_meta( "mp_{$type}_info->state", '' ) ) ? ', ' . $state . ' ' : ', ' ) .
+			        ( ( ( $state = $this->get_meta( "mp_{$type}_info->state", '' ) ) && is_array( $states ) && isset( $states[$state] ) ) ? ', ' . $states[$state] . ' ' : ', ' ) .
 			        ( ( $zip = $this->get_meta( "mp_{$type}_info->zip", '' ) ) ? $zip . '<br />' : '' ) .
+					( ( ( $country = $this->get_meta( "mp_{$type}_info->country", '' ) ) && is_array( $all_countries ) && isset( $all_countries[$country] ) ) ? $all_countries[$country] . '<br />' : '' ) .
 			        ( ( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
 			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
 			}
@@ -705,8 +709,6 @@ class MP_Order {
 
 			$country_options   = '';
 
-			$all_countries     = mp_countries();
-
 			if ( mp_all_countries_allowed() ) {
 				$allowed_countries = array_keys( $all_countries );
 			}
@@ -716,7 +718,6 @@ class MP_Order {
 			}
 
 			// State dropdown
-			$states        = mp_get_states( $this->get_meta( "mp_{$type}_info->country" ) );
 			$state_options = '';
 			if ( is_array( $states ) ) {
 				foreach ( $states as $key => $val ) {
@@ -1034,8 +1035,13 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$html = apply_filters( 'mp_order/header', $html, $this );
+		
+		$tracked = $this->get_meta( 'mp_ga_tracked' );
 
-		mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
+		if( !$tracked ) {
+			mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
+			add_post_meta( $this->ID, 'mp_ga_tracked', true, true );
+		}
 
 		if ( $echo ) {
 			echo $html;

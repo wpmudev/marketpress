@@ -219,7 +219,7 @@ if ( ! function_exists( 'mp_orderstatus_link' ) ) :
 
 endif;
 
-if ( ! function_exists( 'mp_product_link' ) ) :
+if ( ! function_exists( 'mp_products_link' ) ) :
 
 	/**
 	 * Echos the current product list link.
@@ -1714,7 +1714,7 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 
 			case 'CA':
 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
-				if ( $country == 'CA' && array_key_exists( $state, mp()->canadian_provinces ) ) {
+				if ( $country == 'CA' && array_key_exists( $state, mp()->CA_provinces ) ) {
 					if ( $_tax_rate = mp_get_setting( "tax->canada_rate->$state" ) ) {
 						$tax_rate = (float) $_tax_rate;
 					}
@@ -2539,7 +2539,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 
 		if ( ! empty( $content ) ) {
 			$return .= '
-<div id="mp-product-overview" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
+<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
 
 			$return .= '
 <div itemprop="description" class="mp_product_tab_content_text">';
@@ -2572,7 +2572,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							$layout_type = $args['list_view'] ? 'list' : 'grid';
 						}
 						$return .= '
-						<div id="mp-related-products" class="mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
+						<div id="mp-related-products-' . $product->ID . '" class="mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
 							<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
 						</div><!-- end mp-related-products -->';
 					}
@@ -2590,7 +2590,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
 
 					$return .= '
-					<div id="' . esc_attr( $slug ) . '" class="mp_product_tab_content mp_product_tab_content-html" style="display:none">
+					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-html" style="display:none">
 						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
 					</div><!-- end ' . esc_attr( $slug ) . ' -->';
 					break;

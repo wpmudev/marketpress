@@ -855,6 +855,11 @@ class MP_Checkout {
 			$atts .= " {$key}={$val}";
 		}
 
+		// Convert Counrty/State abbreviation when value_only
+		if( mp_arr_get_value( 'value_only', $field ) && in_array( mp_arr_get_value( 'name', $field, '' ), array( 'billing[country]' , 'billing[state]', 'shipping[country]' , 'shipping[state]' ) ) ){
+			$field['value'] = $field['options'][$field['value']];
+		}
+
 		switch ( mp_arr_get_value( 'type', $field, '' ) ) {
 			case 'text' :
 			case 'password' :
@@ -1432,7 +1437,7 @@ class MP_Checkout {
 		if ( $order->exists() == false ) {
 			return false;
 		}
-		
+
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
 		
@@ -1554,7 +1559,7 @@ try{
 				$meta = $product->get_meta( 'sku' );
 				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 				$js .= 'ga("ecommerce:addItem", {
-					 "id": "' . esc_attr( $product->ID ) . '", // Transaction ID. Required.
+					 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
 					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
 					 "sku": "' . $sku . '",								// SKU/code.
 					 "category": "",			 					// Category or variation.
@@ -1568,8 +1573,7 @@ try{
 
 		//add to footer
 		if ( !empty( $js ) ) {
-			$function = "echo '$js';";
-			add_action( 'wp_footer', create_function( '', $function ), 99999 );
+			echo $js;
 		}
 	}
 

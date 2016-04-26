@@ -469,6 +469,24 @@ tr.variation_row_color_20 .text-core .text-wrap .text-tags .text-tag .text-butto
     margin: 1px 3px 1px 0px;
 }
 
+tr .set-default{
+	color: #BBB;
+}
+
+tr.default .set-default{
+	color: #0073aa;
+}
+
+td.field_more,
+td.field_default_variation {
+    text-align: center;
+}
+
+.mp_variations_table_box .manage-column,
+.mp_variations_table_box .hentry td {
+    text-align: center;
+}
+
 .select_attributes_filter{
     margin-top:10px;
     margin-bottom: 10px;
