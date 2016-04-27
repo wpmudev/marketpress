@@ -1977,6 +1977,14 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 			$query['order'] = $args['order'];
 		}
 
+// Filter by featured
+		if ( (bool) $args['featured'] ) {
+			$query['meta_query'][]     = array(
+				'key'     => 'featured',
+				'value'   => '1',
+				'compare' => '=',
+			);
+		}
 
 // The Query
 		//var_dump($query);
@@ -2188,40 +2196,30 @@ if ( ! function_exists( 'mp_featured_products' ) ) :
 	 *
 	 * @since 3.0
 	 *
+	 * @uses mp_list_products()
+	 *
 	 * @param bool $echo Optional, whether to echo or return
-	 * @param int $num Optional, max number of products to display. Defaults to 5
+	 * @param bool $paginate Optional, whether to paginate
+	 * @param int $page Optional, The page number to display in the product list if $paginate is set to true.
+	 * @param int $per_page Optional, How many products to display in the product list if $paginate is set to true.
+	 * @param string $order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
+	 * @param string $order Optional, Direction to order products by. Can be: DESC, ASC
+	 * @param string $category Optional, limit to a product category
+	 * @param string $tag Optional, limit to a product tag
+	 * @param bool $list_view Optional, show as list. Default to presentation settings
+	 * @param bool $filters Optional, show filters
 	 */
-	function mp_featured_products( $echo = true, $num = 5 ) {
-		$num          = (int) $num;
-		$custom_query = new WP_Query( array(
-			'post_type'      => MP_Product::get_post_type(),
-			'post_status'    => 'publish',
-			'posts_per_page' => $num,
-			'meta_query'     => array(
-				array(
-					'key'     => 'featured',
-					'value'   => '1',
-					'compare' => '=',
-				),
-			),
-		) );
+	function mp_featured_products() {
+		$func_args        = func_get_args();
+		$args             = mp_parse_args( $func_args, mp()->defaults['list_products'] );
+		$echo = $args['echo'];
 
-		$content = '
-			<ul id="mp_featured_products">';
-
-		if ( $custom_query->have_posts() ) {
-			while ( $custom_query->have_posts() ) : $custom_query->the_post();
-				$content .= '
-				<li><a href="' . get_permalink() . '">' . get_the_title() . '</a></li>';
-			endwhile;
-			wp_reset_postdata();
-		} else {
-			$content .= '
-				<li>' . __( 'No Products', 'mp' ) . '</li>';
-		}
-
-		$content .= '
-			</ul>';
+		// force echo to false to get content from mp_list_products()
+		// force featured to true to filter only featured in mp_list_products()
+		$args['echo'] 	  = false;
+		$args['nopaging'] = false;
+		$args['featured'] = true;		
+		$content = mp_list_products($args);
 
 		/**
 		 * Filter the featured products html
@@ -2229,9 +2227,10 @@ if ( ! function_exists( 'mp_featured_products' ) ) :
 		 * @since 3.0
 		 *
 		 * @param string $content The current HTML markup.
-		 * @param int $num The number of products to display.
-		 */
-		$content = apply_filters( 'mp_featured_products', $content, $num );
+		 * @param array $args mp_featured_products short code attributes.
+		*/
+		$content = apply_filters( 'mp_featured_products', $content, $args );
+
 
 		if ( $echo ) {
 			echo $content;
