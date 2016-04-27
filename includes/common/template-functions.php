@@ -2349,6 +2349,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 		$fb      = $product->facebook_like_button( 'single_view' );
 		$twitter = $product->twitter_button( 'single_view' );
 
+		$display_description = ( ! empty( $content ) && (bool) $content );
+
 		$has_image = false;
 		if ( ! $product->has_variations() ) {
 			$values = get_post_meta( $product->ID, 'mp_product_images', true );
@@ -2483,7 +2485,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
 
-			if ( mp_get_setting( 'show_single_excerpt' ) == 1 ) {
+			if ( mp_get_setting( 'show_single_excerpt' ) == 1  && $display_description ) {
 				// Excerpt
 				if ( ! $variation ) {
 					$return .= '<div class="mp_product_excerpt">';
@@ -2535,9 +2537,16 @@ if ( ! function_exists( 'mp_product' ) ) {
 		}
 
 		$return .= '<div class="mp_single_product_extra">';
+
+		if( ! $display_description && isset( $product->content_tabs[ 'mp-product-overview' ] ) ){
+			unset( $product->content_tabs[ 'mp-product-overview' ] );
+		}
+
 		$return .= $product->content_tab_labels( false );
 
-		if ( ! empty( $content ) ) {
+		$index = 0;
+
+		if( $display_description ){
 			$return .= '
 <div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
 
@@ -2553,11 +2562,12 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '
 </div><!-- end mp_product_tab_content_text -->
 </div><!-- end mp-product-overview -->';
+			$index++;
 		}
 
 
 		// Remove overview tab as it's already been manually output above
-		array_shift( $product->content_tabs );
+		unset( $product->content_tabs[ 'mp-product-overview' ] );
 
 		$func_args = func_get_args();
 		$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
@@ -2572,7 +2582,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							$layout_type = $args['list_view'] ? 'list' : 'grid';
 						}
 						$return .= '
-						<div id="mp-related-products-' . $product->ID . '" class="mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
+						<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
 							<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
 						</div><!-- end mp-related-products -->';
 					}
@@ -2590,11 +2600,12 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
 
 					$return .= '
-					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-html" style="display:none">
+					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
 						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
 					</div><!-- end ' . esc_attr( $slug ) . ' -->';
 					break;
 			}
+			$index++;
 		}
 		$return .= '</div><!-- end mp_single_product_extra -->';
 
