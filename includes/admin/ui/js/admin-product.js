@@ -864,8 +864,9 @@ jQuery( document ).ready( function( $ ) {
                 }
                 if ( $( '#new_variation' ).val( ) == 'yes' ) {
                     //window.opener.location.reload( false );
-                    parent.location.reload( )
                 }
+                // reload page on both new variation and update variation, as there's no way to dinamically update the variations table
+                parent.location.reload( );
             }
 
             if ( status == 'success' ) {
