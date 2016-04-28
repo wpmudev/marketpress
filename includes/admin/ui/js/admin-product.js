@@ -802,20 +802,11 @@ jQuery( document ).ready( function( $ ) {
             }
         });
         $target.find("input[name='regular_price']").trigger('input');
-    } );
-    $( '.has_controller' ).live( 'change', function( ) {
-        var parent_holder = $( this ).closest( '.fieldset_check' );
-        var controller = $( this );
-        if ( controller.is( ':checked' ) ) {
-            parent_holder.find( '.has_area' ).show( );
-        } else {
-            parent_holder.find( '.has_area' ).hide( );
-        }
-    } );
-    $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'change', function( e ) {
-        // Setup form validation on the #register-form element
 
         $( "#variation_popup" ).validate( {
+            messages: {
+                required: mp_product_admin_i18n.message_input_required
+            }
         } );
         $( '.mp-numeric' ).each( function( ) {
             $( this ).rules( 'add', {
@@ -833,9 +824,32 @@ jQuery( document ).ready( function( $ ) {
                 }
             } );
         } );
+
+        $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'keypress change', function( e ) {
+        
+            $( '#save-variation-popup-data' ).toggleClass( "disabled", !$( 'form#variation_popup' ).valid() );
+        
+        } );
+
     } );
+    
+    $( '.has_controller' ).live( 'change', function( ) {
+        var parent_holder = $( this ).closest( '.fieldset_check' );
+        var controller = $( this );
+        if ( controller.is( ':checked' ) ) {
+            parent_holder.find( '.has_area' ).show( );
+        } else {
+            parent_holder.find( '.has_area' ).hide( );
+        }
+    } );
+    
     $( '#save-variation-popup-data, .variation_description_button' ).live( 'click', function( e ) {
         var form = $( 'form#variation_popup' );
+        if( !form.valid() ) {
+            e.preventDefault( );
+            return;
+        }
+
         $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
         $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
         $.post(
@@ -853,8 +867,9 @@ jQuery( document ).ready( function( $ ) {
                 }
                 if ( $( '#new_variation' ).val( ) == 'yes' ) {
                     //window.opener.location.reload( false );
-                    parent.location.reload( )
                 }
+                // reload page on both new variation and update variation, as there's no way to dinamically update the variations table
+                parent.location.reload( );
             }
 
             if ( status == 'success' ) {

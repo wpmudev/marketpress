@@ -2111,7 +2111,7 @@ class MP_Product {
 				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>'; //
 
 		if ( $link ) {
-			$snippet .= '<a rel="lightbox enclosure" id="mp-product-image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
+			$snippet .= '<a rel="enclosure" id="mp-product-image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
 		} else {
 			$snippet .= $image;
 		}
