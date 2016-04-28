@@ -804,6 +804,9 @@ jQuery( document ).ready( function( $ ) {
         $target.find("input[name='regular_price']").trigger('input');
 
         $( "#variation_popup" ).validate( {
+            messages: {
+                required: mp_product_admin_i18n.message_input_required
+            }
         } );
         $( '.mp-numeric' ).each( function( ) {
             $( this ).rules( 'add', {
