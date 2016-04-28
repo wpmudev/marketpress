@@ -2161,7 +2161,7 @@ class MP_Product {
 			$img_url = array_shift( $img_src );
 		}
 
-		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' ) ) {
+		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' , 1 ) ) {
 			/**
 			 * Filter the default image url
 			 *
