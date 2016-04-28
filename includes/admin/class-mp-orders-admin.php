@@ -708,6 +708,9 @@ class MP_Orders_Admin {
 		$wp_list_table = _get_list_table( 'WP_Posts_List_Table' );
 		$action        = $wp_list_table->current_action();
 
+		if( ( 'delete_all' == $action ) && ! current_user_can( get_post_type_object( get_current_screen()->post_type )->cap->delete_others_posts ) ){
+			return;
+		}
 
 		$posts         = mp_get_get_value( 'post', array() );
 

@@ -660,12 +660,91 @@ class MP_Shortcode_Builder {
 		?>
 		<table id="mp-featured-products-shortcode" class="form-table" style="display:none">
 			<tr>
-				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The maximum number of products to display', 'mp' ); ?></span></span> number</th>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether to paginate the product list. This is useful to only show a subset.', 'mp' ); ?></span></span> paginate</th>
 				<td>
-					<input type="text" name="number" data-default="5" value="5" />
+					<input type="checkbox" name="paginate" data-default="<?php echo esc_attr( mp_get_setting( 'paginate' ) ); ?>" value="1" <?php checked( 1, mp_get_setting( 'paginate' ) ); ?> />
 				</td>
 			</tr>
-		</table>	
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'The page number to display in the product list if "paginate" is set to true.', 'mp' ); ?></span></span> page</th>
+				<td>
+					<input type="text" name="page" data-default="1" value="1" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'How many products to display in the product list if "paginate" is set to true.', 'mp' ); ?></span></span> per_page</th>
+				<td>
+					<input type="text" name="per_page" data-default="<?php echo esc_attr( mp_get_setting( 'per_page' ) ); ?>" value="<?php echo esc_attr( mp_get_setting( 'per_page' ) ); ?>" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'What field to order products by.', 'mp' ); ?></span></span> order_by</th>
+				<td>
+					<select name="order_by" data-default="<?php echo esc_attr( mp_get_setting( 'order_by' ) ); ?>">
+						<?php
+						$data = array(
+							'title'	 => __( 'Product Name', 'mp' ),
+							'date'	 => __( 'Publish Date', 'mp' ),
+							'ID'	 => __( 'Product ID', 'mp' ),
+							'author' => __( 'Product Author', 'mp' ),
+							'sales'	 => __( 'Number of Sales', 'mp' ),
+							'price'	 => __( 'Product Price', 'mp' ),
+							'rand'	 => __( 'Random', 'mp' ),
+						);
+
+						foreach ( $data as $value => $label ) :
+							?>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, mp_get_setting( 'order_by' ) ); ?>><?php echo $label; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Direction to order products by.', 'mp' ); ?></span></span> order</th>
+				<td>
+					<label><input type="radio" name="order" data-default="<?php echo esc_attr( mp_get_setting( 'order' ) ); ?>" value="ASC" <?php checked( 'ASC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Ascending', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="order" data-default="<?php echo esc_attr( mp_get_setting( 'order' ) ); ?>" value="DESC" <?php checked( 'DESC', mp_get_setting( 'order' ) ); ?> /> <?php _e( 'Descending', 'mp' ); ?></label>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product category.', 'mp' ); ?></span></span> category</th>
+				<td>
+					<select name="category" data-default="" class="mp-chosen-select">
+						<option value=""><?php _e( 'None', 'mp' ); ?></option>
+						<?php foreach ( $this->_product_cats as $term ) : ?>
+							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Limits list to a specific product tag.', 'mp' ); ?></span></span> tag</th>
+				<td>
+					<select name="tag" data-default="" class="mp-chosen-select">
+						<option value=""><?php _e( 'None', 'mp' ); ?></option>
+						<?php foreach ( $this->_product_tags as $term ) : ?>
+							<option value="<?php echo esc_attr( isset( $term->slug ) ? $term->slug : ''  ); ?>"><?php echo isset( $term->name ) ? $term->name : ''; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Products will be displayed as list or grid.', 'mp' ); ?></span></span> list_view</th>
+				<td>
+					<select name="list_view" data-default="" class="mp-chosen-select">
+						<option value="1" <?php echo esc_attr( ( mp_get_setting( 'list_view' ) == '1' ) ? 'selected="selected"' : ''  ); ?>><?php _e( 'List', 'mp' ); ?></option>
+						<option value="0" <?php echo esc_attr( ( mp_get_setting( 'list_view' ) == '0' ) ? 'selected="selected"' : ''  ); ?>><?php _e( 'Grid', 'mp' ); ?></option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><span class="mp-tooltip dashicons dashicons-editor-help"><span><?php _e( 'Whether or not to show the product filters.', 'mp' ); ?></span></span> filters</th>
+				<td>
+					<label><input type="radio" name="filters" data-default="<?php echo esc_attr( mp_get_setting( 'show_filters' ) ); ?>" value="1" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> /> <?php _e( 'Show', 'mp' ); ?></label> &nbsp; &nbsp;
+					<label><input type="radio" name="filters" data-default="<?php echo esc_attr( mp_get_setting( 'show_filters' ) ); ?>" value="0" <?php checked( '1', mp_get_setting( 'show_filters' ) ); ?> /> <?php _e( 'Hide', 'mp' ); ?></label>
+				</td>
+			</tr>
+		</table>
 		<?php
 	}
 

@@ -334,18 +334,25 @@ class MP_Short_Codes {
 	/**
 	 * Displays a list of featured products
 	 *
-	 * @param int num Optional, max number of products to display. Defaults to 5
+	 * @param bool paginate Optional, whether to paginate
+	 * @param int page Optional, The page number to display in the product list if paginate is set to true.
+	 * @param int per_page Optional, How many products to display in the product list if $paginate is set to true.
+	 * @param string order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
+	 * @param string order Optional, Direction to order products by. Can be: DESC, ASC
+	 * @param string category Optional, limit to a product category
+	 * @param string tag Optional, limit to a product tag
+	 * @param bool list_view Optional, show as list. Grid default
+	 * @param bool filters Optional, show filters
 	 */
 	function mp_featured_products_sc( $atts ) {
+		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts	 = shortcode_atts( array(
-			'number' => 5,
-		), $atts );
-		$atts	 = $this->_parse_atts( $atts );
+		$atts[ 'echo' ]	 = false;
+		$atts[ 'featured' ]	 = true;
+		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
+		$args			 = $this->_parse_atts( $args );
 
-		extract( $atts );
-
-		return mp_featured_products( false, $number );
+		return mp_featured_products( $args );
 	}
 
 	/**
