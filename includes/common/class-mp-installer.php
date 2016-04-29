@@ -261,6 +261,14 @@ class MP_Installer {
 					update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
 				}
 
+				/* Set parent thumbnail as default thumbnail for the variation */
+				$post_thumbnail = get_post_thumbnail_id( $post_id );
+				$variation_thumbnail = get_post_thumbnail_id( $variation_id );
+				if ( is_numeric( $post_thumbnail ) && ! is_numeric( $variation_thumbnail ) ) {
+					update_post_meta( $variation_id, 'mp_product_images', $post_thumbnail );
+					set_post_thumbnail( $variation_id, $post_thumbnail );
+				}
+
 				/* Add post terms for the variation */
 				$variation_terms = explode( '|', $combination );
 				foreach ( $variation_terms as $variation_term ) {
