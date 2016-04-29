@@ -449,7 +449,7 @@ class MP_Product {
 		foreach ($attributes_including_others as $attr_name => $attr_value) {
 			if( isset( $filtered_terms[$attr_name] ) ){
 				if( !in_array( $attr_value, array_keys( $filtered_terms[$attr_name] ) ) ){
-						$attributes_including_others[$attr_name] = array_keys( $filtered_terms[$attr_name] )[0].'';
+						$attributes_including_others[$attr_name] = reset( array_keys( $filtered_terms[$attr_name] ) ) . '';
 				}
 			}
 		}
