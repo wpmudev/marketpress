@@ -1205,7 +1205,7 @@ class MP_Product {
 		$index = 0;
 		foreach ( $this->content_tabs as $slug => $label ) {
 			$html .= '
-				<li class="mp_product_tab_label' . ( ( $index == 0 ) ? ' current' : '' ) . '"><a class="mp_product_tab_label_link ' . esc_attr( $slug ) . '" href="#' . esc_attr( $slug ) . '">' . $label . '</a></li>';
+				<li class="mp_product_tab_label' . ( ( $index == 0 ) ? ' current' : '' ) . '"><a class="mp_product_tab_label_link ' . esc_attr( $slug ) . '" href="#' . esc_attr( $slug ) . '-' . $this->ID . '">' . $label . '</a></li>';
 			$index ++;
 		}
 
@@ -2111,7 +2111,7 @@ class MP_Product {
 				<div style="display:none"><span class="fn">' . get_the_title( get_post_thumbnail_id() ) . '</span></div>'; //
 
 		if ( $link ) {
-			$snippet .= '<a rel="lightbox enclosure" id="mp-product-image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
+			$snippet .= '<a rel="enclosure" id="mp-product-image-' . $post_id . '"' . $link_class . ' href="' . $link . '">' . $image . '</a>';
 		} else {
 			$snippet .= $image;
 		}
@@ -2161,7 +2161,7 @@ class MP_Product {
 			$img_url = array_shift( $img_src );
 		}
 
-		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' ) ) {
+		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' , 1 ) ) {
 			/**
 			 * Filter the default image url
 			 *

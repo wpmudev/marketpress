@@ -1714,7 +1714,7 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 
 			case 'CA':
 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
-				if ( $country == 'CA' && array_key_exists( $state, mp()->canadian_provinces ) ) {
+				if ( $country == 'CA' && array_key_exists( $state, mp()->CA_provinces ) ) {
 					if ( $_tax_rate = mp_get_setting( "tax->canada_rate->$state" ) ) {
 						$tax_rate = (float) $_tax_rate;
 					}
@@ -1977,6 +1977,14 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 			$query['order'] = $args['order'];
 		}
 
+// Filter by featured
+		if ( (bool) $args['featured'] ) {
+			$query['meta_query'][]     = array(
+				'key'     => 'featured',
+				'value'   => '1',
+				'compare' => '=',
+			);
+		}
 
 // The Query
 		//var_dump($query);
@@ -2188,40 +2196,30 @@ if ( ! function_exists( 'mp_featured_products' ) ) :
 	 *
 	 * @since 3.0
 	 *
+	 * @uses mp_list_products()
+	 *
 	 * @param bool $echo Optional, whether to echo or return
-	 * @param int $num Optional, max number of products to display. Defaults to 5
+	 * @param bool $paginate Optional, whether to paginate
+	 * @param int $page Optional, The page number to display in the product list if $paginate is set to true.
+	 * @param int $per_page Optional, How many products to display in the product list if $paginate is set to true.
+	 * @param string $order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
+	 * @param string $order Optional, Direction to order products by. Can be: DESC, ASC
+	 * @param string $category Optional, limit to a product category
+	 * @param string $tag Optional, limit to a product tag
+	 * @param bool $list_view Optional, show as list. Default to presentation settings
+	 * @param bool $filters Optional, show filters
 	 */
-	function mp_featured_products( $echo = true, $num = 5 ) {
-		$num          = (int) $num;
-		$custom_query = new WP_Query( array(
-			'post_type'      => MP_Product::get_post_type(),
-			'post_status'    => 'publish',
-			'posts_per_page' => $num,
-			'meta_query'     => array(
-				array(
-					'key'     => 'featured',
-					'value'   => '1',
-					'compare' => '=',
-				),
-			),
-		) );
+	function mp_featured_products() {
+		$func_args        = func_get_args();
+		$args             = mp_parse_args( $func_args, mp()->defaults['list_products'] );
+		$echo = $args['echo'];
 
-		$content = '
-			<ul id="mp_featured_products">';
-
-		if ( $custom_query->have_posts() ) {
-			while ( $custom_query->have_posts() ) : $custom_query->the_post();
-				$content .= '
-				<li><a href="' . get_permalink() . '">' . get_the_title() . '</a></li>';
-			endwhile;
-			wp_reset_postdata();
-		} else {
-			$content .= '
-				<li>' . __( 'No Products', 'mp' ) . '</li>';
-		}
-
-		$content .= '
-			</ul>';
+		// force echo to false to get content from mp_list_products()
+		// force featured to true to filter only featured in mp_list_products()
+		$args['echo'] 	  = false;
+		$args['nopaging'] = false;
+		$args['featured'] = true;		
+		$content = mp_list_products($args);
 
 		/**
 		 * Filter the featured products html
@@ -2229,9 +2227,10 @@ if ( ! function_exists( 'mp_featured_products' ) ) :
 		 * @since 3.0
 		 *
 		 * @param string $content The current HTML markup.
-		 * @param int $num The number of products to display.
-		 */
-		$content = apply_filters( 'mp_featured_products', $content, $num );
+		 * @param array $args mp_featured_products short code attributes.
+		*/
+		$content = apply_filters( 'mp_featured_products', $content, $args );
+
 
 		if ( $echo ) {
 			echo $content;
@@ -2348,6 +2347,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 		$pinit   = $product->pinit_button( 'single_view' );
 		$fb      = $product->facebook_like_button( 'single_view' );
 		$twitter = $product->twitter_button( 'single_view' );
+
+		$display_description = ( ! empty( $content ) && (bool) $content );
 
 		$has_image = false;
 		if ( ! $product->has_variations() ) {
@@ -2483,7 +2484,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
 
-			if ( mp_get_setting( 'show_single_excerpt' ) == 1 ) {
+			if ( mp_get_setting( 'show_single_excerpt' ) == 1  && $display_description ) {
 				// Excerpt
 				if ( ! $variation ) {
 					$return .= '<div class="mp_product_excerpt">';
@@ -2535,11 +2536,18 @@ if ( ! function_exists( 'mp_product' ) ) {
 		}
 
 		$return .= '<div class="mp_single_product_extra">';
+
+		if( ! $display_description && isset( $product->content_tabs[ 'mp-product-overview' ] ) ){
+			unset( $product->content_tabs[ 'mp-product-overview' ] );
+		}
+
 		$return .= $product->content_tab_labels( false );
 
-		if ( ! empty( $content ) ) {
+		$index = 0;
+
+		if( $display_description ){
 			$return .= '
-<div id="mp-product-overview" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
+<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
 
 			$return .= '
 <div itemprop="description" class="mp_product_tab_content_text">';
@@ -2553,11 +2561,12 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '
 </div><!-- end mp_product_tab_content_text -->
 </div><!-- end mp-product-overview -->';
+			$index++;
 		}
 
 
 		// Remove overview tab as it's already been manually output above
-		array_shift( $product->content_tabs );
+		unset( $product->content_tabs[ 'mp-product-overview' ] );
 
 		$func_args = func_get_args();
 		$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
@@ -2572,7 +2581,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							$layout_type = $args['list_view'] ? 'list' : 'grid';
 						}
 						$return .= '
-						<div id="mp-related-products" class="mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
+						<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
 							<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
 						</div><!-- end mp-related-products -->';
 					}
@@ -2590,11 +2599,12 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
 
 					$return .= '
-					<div id="' . esc_attr( $slug ) . '" class="mp_product_tab_content mp_product_tab_content-html" style="display:none">
+					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
 						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
 					</div><!-- end ' . esc_attr( $slug ) . ' -->';
 					break;
 			}
+			$index++;
 		}
 		$return .= '</div><!-- end mp_single_product_extra -->';
 

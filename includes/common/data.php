@@ -19,6 +19,7 @@ $this->defaults = array(
 		'list_view'	 => NULL,
 		'filters'	 => NULL,
 		'limit'		 => NULL,
+		'featured'	 => false,
 	),
 );
 
