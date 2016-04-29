@@ -168,7 +168,7 @@ class MP_Ajax {
 					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
 						<div class="mp-product-field-100 mp-variation-field mp-product-field-last">
 							<div class="wpmudev-field-label"><?php _e( 'Limit Per Order', 'mp' ); ?><span class="required">*</span></div>
-							<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-blank-bg mp-numeric mp-required" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
+							<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-blank-bg mp-numeric" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
 						</div>
 					<?php } ?>
 					<?php do_action( 'mp_variation_popup_after_order_limit' ); ?>
