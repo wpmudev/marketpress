@@ -769,6 +769,15 @@ jQuery( document ).ready( function( $ ) {
         } );
 
         $target = $('#variation_popup');
+
+        // Set a 10% discount automatically and avoid validation messages
+        $target.on( 'change', 'input[name="has_sale"]', function() {
+            if( $( this ).is( ":checked" ) && !isFinite( percentage_discount ) ) {
+                var percentage_discount = parseFloat( $target.find("input[name='sale_price\\[percentage\\]']").val() );
+                $target.find("input[name='sale_price\\[percentage\\]']").val( '10' ).trigger("input");
+            }
+        });
+
         $target.on('input', 'input', function() {
             var price = parseFloat( $target.find("input[name='regular_price']").val() );
             var sale_price = parseFloat( $target.find("input[name='sale_price\\[amount\\]']").val() );
