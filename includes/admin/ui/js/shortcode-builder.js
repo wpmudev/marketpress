@@ -64,6 +64,10 @@
 				if ( $this.is(':radio') || $this.is(':checkbox') ) {
 					if ( $this.is(':checked') ) {
 						atts += ' ' + $this.attr('name') + '="' + $this.val() + '"';
+					} else {
+						if( $this.val() === "1" ){
+							atts += ' ' + $this.attr('name') + '="0"';
+						}	
 					}
 				} else {
 					atts += ' ' + $this.attr('name') + '="' + $this.val() + '"';
