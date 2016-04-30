@@ -280,8 +280,19 @@ jQuery( document ).ready( function( $ ) {
                     $( this ).parent( ).find( '.currency' ).show();
                     connectWith.val( $( this ).val( ) ).change( );
                     if ( data_type == 'number' ) {
-                        var numeric_value = $( this ).val( );
-                        numeric_value = numeric_value.replace( ",", "." );
+                        var numeric_value = $( this ).val( ).trim( );
+                        numeric_value = numeric_value.replace( ",", "." ); //convert comma to dot
+
+                        // If the user enters a percentage, calculate the sale price
+                        if( data_meta == 'sale_price_amount' && numeric_value.indexOf('%') == numeric_value.length -1 && parseFloat( numeric_value ) <= 100 ) {
+                            numeric_value = parseFloat( numeric_value );
+                            var original_value = parseFloat( elem.closest( 'tr' ).find( 'span.original_value[data-meta="regular_price"]' ).html( ) );
+                            numeric_value = original_value - ( ( numeric_value / 100 ) * original_value );
+                            numeric_value = '' + numeric_value;
+                        }
+
+                        numeric_value = numeric_value.replace( /[^\d.-]/g, '' ); //remove any non numeric value
+
                         if ( $.isNumeric( numeric_value ) ) {
                             elem.text( numeric_value );
                         } else {
