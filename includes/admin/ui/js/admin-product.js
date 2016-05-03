@@ -845,7 +845,7 @@ jQuery( document ).ready( function( $ ) {
             } );
         } );
 
-        $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'keypress change', function( e ) {
+        $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'keypress', function( e ) {
         
             $( '#save-variation-popup-data' ).toggleClass( "disabled", !$( 'form#variation_popup' ).valid() );
         
@@ -860,7 +860,9 @@ jQuery( document ).ready( function( $ ) {
             parent_holder.find( '.has_area' ).show( );
         } else {
             parent_holder.find( '.has_area' ).hide( );
+            if( controller.attr( 'name' ) == 'has_per_order_limit' ) $( "#per_order_limit" ).val( '' );
         }
+
     } );
     
     $( '#save-variation-popup-data, .variation_description_button' ).live( 'click', function( e ) {
