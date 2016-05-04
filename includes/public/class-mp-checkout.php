@@ -856,7 +856,7 @@ class MP_Checkout {
 		}
 
 		// Convert Counrty/State abbreviation when value_only
-		if( mp_arr_get_value( 'value_only', $field ) && in_array( mp_arr_get_value( 'name', $field, '' ), array( 'billing[country]' , 'billing[state]', 'shipping[country]' , 'shipping[state]' ) ) ){
+		if( mp_arr_get_value( 'value_only', $field ) && in_array( mp_arr_get_value( 'name', $field, '' ), array( 'billing[country]' , 'billing[state]', 'shipping[country]' , 'shipping[state]' ) ) && isset( $field['options'][$field['value']] ) ){
 			$field['value'] = $field['options'][$field['value']];
 		}
 
