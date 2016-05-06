@@ -165,14 +165,6 @@ class MP_Ajax {
 					</div>
 					<?php do_action( 'mp_variation_popup_after_sku_and_price' ); ?>
 
-					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
-						<div class="mp-product-field-100 mp-variation-field mp-product-field-last">
-							<div class="wpmudev-field-label"><?php _e( 'Limit Per Order', 'mp' ); ?><span class="required">*</span></div>
-							<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-blank-bg mp-numeric mp-required" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
-						</div>
-					<?php } ?>
-					<?php do_action( 'mp_variation_popup_after_order_limit' ); ?>
-
 					<?php if ( $product_type == 'external' ) {//show these fields only for External URL Products ?>
 						<div class="mp-product-field-100 mp-variation-field">
 							<div class="wpmudev-field-label"><?php _e( 'External Product URL', 'mp' ); ?><span class="required">*</span></div>
@@ -204,6 +196,20 @@ class MP_Ajax {
 						</div>
 					<?php } ?>
 					<?php do_action( 'mp_variation_popup_after_attributes' ); ?>
+
+					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
+						<div class="fieldset_check">
+							<label>
+								<input type="checkbox" name="has_per_order_limit" class="has_controller" <?php checked( true, intval( MP_Product::get_variation_meta( $variation_id, 'per_order_limit', 0 ) ) > 0, true ); ?>>
+								<span><?php _e( 'Limit the Amount of Items per Order', 'mp' ); ?></span>
+							</label>
+							<fieldset id="fieldset_has_per_order_limit" class="has_area">
+								<div class="wpmudev-field-label"><?php _e( 'Limit Per Order', 'mp' ); ?><span class="required">*</span></div>
+								<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-numeric" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
+							</fieldset>
+						</div>
+					<?php } ?>
+					<?php do_action( 'mp_variation_popup_after_order_limit' ); ?>
 
 					<div class="fieldset_check">
 						<?php

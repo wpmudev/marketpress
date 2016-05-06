@@ -280,8 +280,19 @@ jQuery( document ).ready( function( $ ) {
                     $( this ).parent( ).find( '.currency' ).show();
                     connectWith.val( $( this ).val( ) ).change( );
                     if ( data_type == 'number' ) {
-                        var numeric_value = $( this ).val( );
-                        numeric_value = numeric_value.replace( ",", "." );
+                        var numeric_value = $( this ).val( ).trim( );
+                        numeric_value = numeric_value.replace( ",", "." ); //convert comma to dot
+
+                        // If the user enters a percentage, calculate the sale price
+                        if( data_meta == 'sale_price_amount' && numeric_value.indexOf('%') == numeric_value.length -1 && parseFloat( numeric_value ) <= 100 ) {
+                            numeric_value = parseFloat( numeric_value );
+                            var original_value = parseFloat( elem.closest( 'tr' ).find( 'span.original_value[data-meta="regular_price"]' ).html( ) );
+                            numeric_value = original_value - ( ( numeric_value / 100 ) * original_value );
+                            numeric_value = '' + numeric_value;
+                        }
+
+                        numeric_value = numeric_value.replace( /[^\d.-]/g, '' ); //remove any non numeric value
+
                         if ( $.isNumeric( numeric_value ) ) {
                             elem.text( numeric_value );
                         } else {
@@ -769,6 +780,15 @@ jQuery( document ).ready( function( $ ) {
         } );
 
         $target = $('#variation_popup');
+
+        // Set a 10% discount automatically and avoid validation messages
+        //$target.on( 'change', 'input[name="has_sale"]', function() {
+        //    if( $( this ).is( ":checked" ) && !isFinite( percentage_discount ) ) {
+        //        var percentage_discount = parseFloat( $target.find("input[name='sale_price\\[percentage\\]']").val() );
+        //        $target.find("input[name='sale_price\\[percentage\\]']").val( '10' ).trigger("input");
+        //    }
+        //});
+
         $target.on('input', 'input', function() {
             var price = parseFloat( $target.find("input[name='regular_price']").val() );
             var sale_price = parseFloat( $target.find("input[name='sale_price\\[amount\\]']").val() );
@@ -825,7 +845,7 @@ jQuery( document ).ready( function( $ ) {
             } );
         } );
 
-        $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'keypress change', function( e ) {
+        $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'keypress', function( e ) {
         
             $( '#save-variation-popup-data' ).toggleClass( "disabled", !$( 'form#variation_popup' ).valid() );
         
@@ -840,7 +860,9 @@ jQuery( document ).ready( function( $ ) {
             parent_holder.find( '.has_area' ).show( );
         } else {
             parent_holder.find( '.has_area' ).hide( );
+            if( controller.attr( 'name' ) == 'has_per_order_limit' ) $( "#per_order_limit" ).val( '' );
         }
+
     } );
     
     $( '#save-variation-popup-data, .variation_description_button' ).live( 'click', function( e ) {
