@@ -113,9 +113,10 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 <td align="right">' . mp_format_currency( $currency, $price ) . '</td>
 </tr>' . "\n";
 			}
+
+			$order_info .= "</table><br /><br />";
 		}
 
-		$order_info .= "</table><br /><br />";
 
 		// Coupon lines
 		if ( $coupons = $order->get_meta( 'mp_discount_info' ) ) {
