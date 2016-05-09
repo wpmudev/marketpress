@@ -212,8 +212,9 @@ class MP_Products_Screen {
 		}
 
 		$quantity = mp_get_post_value( 'inv->inventory', '' );
-
-		update_post_meta( $post_id, 'inventory', $quantity );
+		if( !empty( $quantity ) ){
+			update_post_meta( $post_id, 'inventory', $quantity );
+		}
 
 		//Check if sales count is empty string and set to 0
 		$sale_count = get_post_meta( $post_id, 'mp_sales_count', true );
