@@ -685,6 +685,7 @@ class MP_Product {
 		$max              = '';
 		$product_quantity = ( $qty ) ? $qty : 1;
 		$min_value = 1;
+		$disabled = '';
 
 		if ( $product->has_variations() ) {
 
@@ -1131,6 +1132,10 @@ class MP_Product {
 	 * @return bool
 	 */
 	public function has_content() {
+		if( !isset( $this->_post ) ){
+			return false;
+		}
+		
 		$content = $this->_post->post_content;
 
 		if ( empty( $content ) && $this->is_variation() ) {
