@@ -520,6 +520,10 @@ select.mp_product_attributes_select {
     width: 100%;
 }
 
+.button.mp-variation-add-all {
+    margin-top: 7px;
+}
+
 textarea.variation_values {
     margin-top: 7px;
     width: 100%;

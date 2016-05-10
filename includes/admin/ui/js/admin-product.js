@@ -104,18 +104,41 @@ jQuery( document ).ready( function( $ ) {
         $( this ).repeatable_fields( );
     } );
 
-    $( '.mp_product_attributes_select' ).live( 'change', function( ) {
-        if ( $( this ).val( ) == '-1' ) {
-            $( this ).parent( ).find( '.mp-variation-attribute-name' ).show( );
-        } else {
-            $( this ).parent( ).find( '.mp-variation-attribute-name' ).hide( );
-            var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
-            var variation_tags = $( this ).find( ':selected' ).attr( 'data-tags' );
-            if( variation_tags !== "" && $variation_tags_textarea.val() === "" ) {
-            	$variation_tags_textarea.textext()[0].tags().addTags( variation_tags.split( ',' ) );
-            }
-        }
-    } );
+	$( '.mp-variation-add-all' ).live( 'click', function( e ) {
+		e.preventDefault();
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
+		var variation_tags = $( this ).parents( '.variation-row' ).find( '.mp_product_attributes_select option:selected' ).attr( 'data-tags' );
+		if( variation_tags !== "" && $variation_tags_textarea.val() === "" ) {
+			$variation_tags_textarea.textext()[0].tags().addTags( variation_tags.split( ',' ) );
+		}		
+	} );
+
+	$( '.mp_product_attributes_select' ).live( 'change', function( ) {
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
+		$variation_tags_textarea.textext()[0].input().unbind('getSuggestions');
+		if ( $( this ).val( ) == '-1' ) {
+			$( this ).parent( ).find( '.mp-variation-attribute-name' ).show( );
+			$( this ).parent( ).find( '.mp-variation-add-all' ).hide( );
+		} else {
+			var variation_tags = $( this ).find( ':selected' ).attr( 'data-tags' );			
+			$( this ).parent( ).find( '.mp-variation-attribute-name' ).hide( );
+			if( variation_tags !== "" ) {
+				$( this ).parent( ).find( '.mp-variation-add-all' ).show( );				
+				var variation_tags_array = variation_tags.split( ',' );
+				$variation_tags_textarea.textext()[0].input().bind('getSuggestions', function(e, data) {
+				    var textext = $(e.target).textext()[0],
+				        query = (data ? data.query : '') || '',
+				        suggestions = jQuery.grep(variation_tags_array, function( n, i ) {
+							return $.inArray(n, textext.tags()._formData) === -1;
+						});
+				    $(this).trigger(
+				        'setSuggestions',
+				        { result : textext.itemManager().filter(suggestions, query) }
+				    );
+				});
+			}
+		}
+	} );
 
     $( '.select_attributes_filter a' ).live( 'click', function( event ) {
         $( '.select_attributes_filter a' ).removeClass( 'selected' );
