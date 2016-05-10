@@ -331,7 +331,7 @@ class WPMUDEV_Field_Variations extends WPMUDEV_Field {
 											$product_taxonomies = MP_Product_Attributes_Admin::get_product_attributes_select( 'product_attributes_categories[]', 'id' );
 											?>
 											<!--<span class="variation_create_new_title"><?php _e( 'Or create new variation', 'mp' ); ?></span>-->
-
+											<a href="#" class="mp-variation-add-all button button-primary" style="display: none;"><?php _e( 'Add all values', 'mp' ); ?></a>
 											<input type="text" class="mp-variation-attribute-name" placeholder="<?php esc_attr_e( __( 'Type variation name', 'mp' ) ); ?>" name="variation_names[]" />
 										</div>
 
