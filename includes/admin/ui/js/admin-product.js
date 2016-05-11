@@ -347,6 +347,16 @@ jQuery( document ).ready( function( $ ) {
         }
         e.preventDefault( );
     } );
+    $( '.mp_variations_table_box [name="selected_variation[]"]' ).live('keydown', function( e ) {
+		if ( e.keyCode == 9 ) {
+			e.preventDefault( );
+			var parentContainer = $( this ).parent( 'th' );
+			var nextContainer = $( this ).parent( 'th' ).next().next( 'td.field_editable' );
+			nextContainer.find( '.original_value' ).trigger( 'click' );
+			
+           $( this ).blur( );
+        }
+    });
 	$( ".mp_inline_temp_value" ).live( 'keydown', function( e ) {
 		if ( e.keyCode == 9 ) {
 			e.preventDefault( );
