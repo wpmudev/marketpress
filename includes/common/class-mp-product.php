@@ -438,7 +438,7 @@ class MP_Product {
 			$index             = 0;
 			$terms             = $product_atts->sort( $terms, false );
 			foreach ( $terms as $term ) {
-				$checked  = ( mp_get_post_value( $tax_slug ) == $term->term_id ) ? true : false;
+				$checked  = ( mp_get_post_value( $tax_slug ) == $term->term_id || mp_get_post_value( 'other_' . $tax_slug ) == $term->term_id ) ? true : false;
 				$required = ( $index == 0 ) ? true : false;
 				$json[ $tax_slug ] .= self::attribute_option( $term->term_id, $term->name, $tax_slug, $required, $checked );
 				$index ++;
@@ -604,7 +604,38 @@ class MP_Product {
 	 * @param array $selected_atts Optional, the attributes that should be selected by default.
 	 */
 	public function attribute_fields( $echo = true, $selected_atts = array() ) {
+		$product_atts = MP_Product_Attributes::get_instance();
+		$filtered_atts = $filtered_terms = array();
+
 		$atts = $this->get_attributes();
+
+		if( !empty( $selected_atts ) ) {
+			// Get variations with only first attributes forced
+			$first_att = array_slice($selected_atts, 0, 1 );
+			$variations = $this->get_variations_by_attributes( $first_att );
+
+			// Filter out taxonomies that already have values and are still valid
+			foreach ( $atts as $att ) {
+				$slug = $product_atts->generate_slug( $att['id'] );
+				$filtered_atts[] = $slug;
+			}
+
+			// Make sure all attribute terms are unique and in stock
+			if ( count( $variations ) > 0 ) {
+				foreach ( $variations as $variation ) {
+					foreach ( $filtered_atts as $tax_slug ) {
+						$terms = get_the_terms( $variation->ID, $tax_slug );
+						if( ! empty( $terms ) ) {
+							foreach ( $terms as $term ) {
+								if ( $variation->in_stock( ) ) {
+									$filtered_terms[ $tax_slug ][ $term->term_id ] = $term;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 
 		$html = '
 			<div class="mp_product_options_atts">';
@@ -627,13 +658,14 @@ class MP_Product {
 						<select id="mp_' . $slug . '" name="' . $slug . '" class="mp_select2 required" autocomplete="off">
 							<option value="">' . $default_option_label . '</option>';
 
-
 			$index = 0;
 			foreach ( $att['terms'] as $term_id => $term_name ) {
-				$required = ( $index == 0 );
-				$checked  = ( $term_id == mp_arr_get_value( $slug, $selected_atts ) );
-				$html .= $this->attribute_option( $term_id, $term_name, $slug, $required, $checked );
-				$index ++;
+				if( empty( $selected_atts ) || isset( $filtered_terms[ $slug ][ $term_id ] ) || array_search( $slug, array_keys( $atts) ) == 0  ){
+					$required = ( $index == 0 );
+					$checked  = ( $term_id == mp_arr_get_value( $slug, $selected_atts ) );
+					$html .= $this->attribute_option( $term_id, $term_name, $slug, $required, $checked );
+					$index ++;
+				}
 			}
 
 			$html .= '
