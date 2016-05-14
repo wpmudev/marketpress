@@ -1184,17 +1184,19 @@ class MP_Checkout {
 						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . '> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
 					</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
 				';
-		}
+		
+			$html .= '
+				</div><!-- end mp-checkout-column-billing-info -->
+					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
+						<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
+			$this->address_fields( 'shipping' ) . '';
+		
+		
 
-		$html .= '
-			</div><!-- end mp-checkout-column-billing-info -->
-				<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
-					<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
-		$this->address_fields( 'shipping' ) . '';
-
-		$html .= '
+			$html .= '
 				</div><!-- end mp-checkout-column-shipping-info -->';
-
+		}
+		
 		// If has special instructions
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
 			$html .= '<div id="mp-checkout-column-special-instructions" class="mp_checkout_column fullwidth"><div class="mp_checkout_field">
