@@ -441,7 +441,8 @@ var mp_cart = { };
                     mp_cart.update( resp.data.minicart );
 					mp_cart.update_widget( resp.data.widgetcart );
 					mp_cart.update_product_input( resp.data.product_input, $form );
-
+					mp_cart.update_product_buttons( resp.data.out_of_stock, $form );
+					
 					//Init button listeners when ajax loaded
 					mp_cart.initCartButtonListeners();
 
@@ -585,6 +586,21 @@ var mp_cart = { };
     mp_cart.update_product_input = function( html, $form ) {
     	$form.find( '#mp_product_options_att_quantity-error' ).remove();
     	$form.find( '[name="product_quantity"]' ).after( html ).remove();
+    };
+
+     /**
+     * Update the product add to cart button
+     *
+     * @since 3.0
+     * @param bool is the product out of stock.
+     */
+    mp_cart.update_product_buttons = function( out_of_stock, $form ) {
+		if( out_of_stock === true ) {
+			$form.find( '.mp_button' ).attr( 'disabled' , true );
+		}
+		else {
+			$form.find( '.mp_button' ).attr( 'disabled' , false );
+		}
     };    
 
     /**

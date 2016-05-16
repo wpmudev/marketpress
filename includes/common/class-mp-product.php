@@ -1092,22 +1092,25 @@ class MP_Product {
 				$button .= '<span class="mp_no_stock">' . __( 'Out of Stock', 'mp' ) . '</span>';
 			} else {
 				$button .= '<input type="hidden" name="product_id" value="' . $this->ID . '">';
-
+				$disabled = '';
+				if( !$this->in_stock( 1, true ) ){
+					$disabled	  = 'disabled';
+				}
 				if ( $context == 'list' ) {
 					if ( $this->has_variations() ) {
 						$button .= '<a class="mp_button mp_link-buynow mp_button-has_variations" data-href="' . admin_url( 'admin-ajax.php?action=mp_product_get_variations_lightbox&amp;product_id=' . $this->ID ) . '" href="' . $this->url( false ) . '">' . __( 'Choose Options', 'mp' ) . '</a>';
 					} else if ( mp_get_setting( 'list_button_type' ) == 'addcart' ) {
-						$button .= '<button class="mp_button mp_button-addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
+						$button .= '<button ' . $disabled . ' class="mp_button mp_button-addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
 					} else if ( mp_get_setting( 'list_button_type' ) == 'buynow' ) {
-						$button .= '<button class="mp_button mp_button-buynow" type="submit" name="buynow">' . __( 'Buy Now', 'mp' ) . '</button>';
+						$button .= '<button ' . $disabled . ' class="mp_button mp_button-buynow" type="submit" name="buynow">' . __( 'Buy Now', 'mp' ) . '</button>';
 					}
 				} else {
 					$button .= $this->attribute_fields( false, $selected_atts );
 
 					if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) {
-						$button .= '<button class="mp_button mp_button-addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
+						$button .= '<button ' . $disabled . ' class="mp_button mp_button-addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
 					} else if ( mp_get_setting( 'product_button_type' ) == 'buynow' ) {
-						$button .= '<button class="mp_button mp_button-buynow" type="submit" name="buynow">' . __( 'Buy Now', 'mp' ) . '</button>';
+						$button .= '<button ' . $disabled . ' class="mp_button mp_button-buynow" type="submit" name="buynow">' . __( 'Buy Now', 'mp' ) . '</button>';
 					}
 				}
 			}
@@ -2262,8 +2265,17 @@ class MP_Product {
 	 *
 	 * @return bool
 	 */
-	public function in_stock( $qty = 1 ) {
+	public function in_stock( $qty = 1, $include_cart = false ) {
 		$has_stock = false;
+
+		if( $include_cart ) {
+			$cart_quantity = $qty;
+			$cart_items	= mp_cart()->get_all_items();
+			if ( isset( $cart_items[ get_current_blog_id() ][ $this->ID ] ) ) {
+				$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $this->ID ];
+			}
+			$qty = $cart_quantity + 1;
+		}
 
 		if ( $this->is_variation() ) {
 			$out_of_stock_purchase = $this->get_meta( 'inv_out_of_stock_purchase' );

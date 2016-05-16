@@ -279,6 +279,7 @@ class MP_Cart {
 					'widgetcart'  		=> $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
 					'cart_updated'		=> $cart_updated,
 					'product_input'     => $product->attribute_input_fields(),
+					'out_of_stock'     => $product->in_stock( $qty ),
 				) );
 				break;
 
