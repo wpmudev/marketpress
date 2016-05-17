@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.0.0.8\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2016-05-16 17:44:16+00:00\n"
+"POT-Creation-Date: 2016-05-17 10:44:22+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +30,7 @@ msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:21
 #: includes/admin/class-mp-products-admin.php:2186
-#: includes/common/class-mp-product.php:2963
+#: includes/common/class-mp-product.php:2972
 msgid "Description"
 msgstr ""
 
@@ -559,7 +559,7 @@ msgstr ""
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:87
 #: includes/admin/class-mp-products-admin.php:1647
 #: includes/common/class-mp-cart.php:1370
-#: includes/common/class-mp-product.php:683
+#: includes/common/class-mp-product.php:682
 msgid "Quantity"
 msgstr ""
 
@@ -1572,7 +1572,7 @@ msgid "Changes saved successfully"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1327
-#: includes/common/class-mp-product.php:2947
+#: includes/common/class-mp-product.php:2956
 msgid "Related Products"
 msgstr ""
 
@@ -4049,14 +4049,14 @@ msgid "Shipped: Track Shipment"
 msgstr ""
 
 #: includes/common/class-mp-product.php:313
-#: includes/common/class-mp-product.php:1103
-#: includes/common/class-mp-product.php:1111
+#: includes/common/class-mp-product.php:1112
+#: includes/common/class-mp-product.php:1120
 msgid "Add To Cart"
 msgstr ""
 
 #: includes/common/class-mp-product.php:317
-#: includes/common/class-mp-product.php:1105
-#: includes/common/class-mp-product.php:1113
+#: includes/common/class-mp-product.php:1114
+#: includes/common/class-mp-product.php:1122
 #: includes/multisite/template-functions.php:579
 msgid "Buy Now"
 msgstr ""
@@ -4075,87 +4075,87 @@ msgstr ""
 msgid "This product has an order limit of %d."
 msgstr ""
 
-#: includes/common/class-mp-product.php:755
+#: includes/common/class-mp-product.php:759
 msgid "You can only add {0} to cart."
 msgstr ""
 
-#: includes/common/class-mp-product.php:758
+#: includes/common/class-mp-product.php:762
 msgid "You can not add more items to cart."
 msgstr ""
 
-#: includes/common/class-mp-product.php:1087
+#: includes/common/class-mp-product.php:1096
 #: includes/multisite/template-functions.php:731
 msgid "Buy Now &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1092
+#: includes/common/class-mp-product.php:1101
 msgid "Out of Stock"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1101
+#: includes/common/class-mp-product.php:1110
 msgid "Choose Options"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1197
+#: includes/common/class-mp-product.php:1206
 msgid "More Info &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1396
-#: includes/common/class-mp-product.php:1411
+#: includes/common/class-mp-product.php:1405
+#: includes/common/class-mp-product.php:1420
 msgid "%s each"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1515
-#: includes/common/class-mp-product.php:1518
+#: includes/common/class-mp-product.php:1524
+#: includes/common/class-mp-product.php:1527
 msgid "(tax excl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1520
-#: includes/common/class-mp-product.php:1523
+#: includes/common/class-mp-product.php:1529
+#: includes/common/class-mp-product.php:1532
 msgid "(tax incl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1873
+#: includes/common/class-mp-product.php:1882
 msgid ""
 "<p class=\"mp_related_products_empty_message\">There are no related "
 "products for this item.</p>"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2104
+#: includes/common/class-mp-product.php:2113
 msgid "View Larger Image &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2366
+#: includes/common/class-mp-product.php:2375
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2367
+#: includes/common/class-mp-product.php:2376
 msgid ""
 "This message is being sent to notify you of low stock of a product in your "
 "online store according to your preferences.<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2369
+#: includes/common/class-mp-product.php:2378
 msgid "Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2370
+#: includes/common/class-mp-product.php:2379
 msgid "Current Inventory: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2371
+#: includes/common/class-mp-product.php:2380
 msgid "Link: %s<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2373
+#: includes/common/class-mp-product.php:2382
 msgid "Edit Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2374
+#: includes/common/class-mp-product.php:2383
 msgid "Notification Preferences: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2745
+#: includes/common/class-mp-product.php:2754
 msgid "Tweet"
 msgstr ""
 
