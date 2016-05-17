@@ -585,7 +585,10 @@ var mp_cart = { };
      */
     mp_cart.update_product_input = function( html, $form ) {
     	$form.find( '#mp_product_options_att_quantity-error' ).remove();
-    	$form.find( '[name="product_quantity"]' ).after( html ).remove();
+        if ( $( html ).is('label') ){
+            $form.find( '[name="product_quantity"]' ).prev( 'label' ).remove();
+        }
+        $form.find( '[name="product_quantity"]' ).after( html ).remove();
     };
 
      /**

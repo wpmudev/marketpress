@@ -676,14 +676,13 @@ class MP_Product {
 
 		$input_id = 'mp_product_options_att_quantity';
 
-		
-
+	
 		$html .= '
 				<div class="mp_product_options_att"' . ( ( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"' ) . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
-						<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"></label>
-						'. $this->attribute_input_fields() .'
+						
+						'. $this->attribute_input_fields( false, false) .'
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
 			</div><!-- end mp_product_options_atts -->';
@@ -714,10 +713,11 @@ class MP_Product {
 
 		$per_order_limit = get_post_meta( $this->ID, 'per_order_limit', true );
 
-		$max              = '';
-		$product_quantity = ( $qty ) ? $qty : 1;
-		$min_value = 1;
-		$disabled = '';
+		$max              	= '';
+		$product_quantity 	= ( $qty ) ? $qty : 1;
+		$min_value 			= 1;
+		$disabled 			= '';
+		$error				= '';
 
 		if ( $product->has_variations() ) {
 
@@ -748,16 +748,22 @@ class MP_Product {
 			 */
 			$order_limit_msg = apply_filters( 'mp_product/order_limit_alert', sprintf ( __( 'This product has an order limit of %d.', 'mp' ), $max_max ), $product );
 
-			$max .= ( $max_reason == 'inventory' ) ? 'data-msg-max="' . $out_of_stock_msg : 'data-msg-max="' . $order_limit_msg;
+			$max_msg = ( $max_reason == 'inventory' ) ? $out_of_stock_msg : $order_limit_msg;
+
+			$max .= 'data-msg-max="' . $max_msg;
+
+			$max_msg_2 = "";
 
 			if( $max_max !== $max_qty ) {
 				if( $max_qty > 0 ){
-					$max .= " " . __('You can only add {0} to cart.', 'mp');
+					$max_msg_2 = " " . __('You can only add {0} to cart.', 'mp');
 				}
 				else {
-					$max .= " " . __('You can not add more items to cart.', 'mp');
+					$max_msg_2 = " " . __('You can not add more items to cart.', 'mp');
 				}
 			}
+
+			$max .= $max_msg_2;
 
 			$max .= '"';
 
@@ -769,9 +775,12 @@ class MP_Product {
 				}
 			} 
 
+			if( (! mp_doing_ajax() && ! $product->in_stock( 1, true ) ) || $max_qty == 0 ){
+				$error = '<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"><span id="mp_product_options_att_quantity-error" class="mp_form_input_error">' . $max_msg . $max_msg_2 . '</span></label>';
+			}
 		}
 
-		return '<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>';
+		return $error . '<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>';
 	}
 
 	/**
