@@ -4,6 +4,46 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.0.0.8
+----------------------------------------------------------------------
+- Fixed: Instructions field not showing when shipping and billing address were different
+- Fixed: Various issues with product description
+- Fixed: Compatibility with ACF
+- Fixed: Compatibility with PHP 5.2 and PHP 7
+- Fixed: States/Countries/Regions not should for most Countries
+- Fixed: Various issues with total cart & taxes
+- Fixed: Issues with Cart not working/redirecting using MP Product shortcode
+- Fixed: Product images with variations not working properly
+- Fixed: Various issues with Product Inventory feature
+- Fixed: Coupons codes showing on search results page
+- Fixed: Update sales when order is cancelled, deleted, etc
+- Fixed: Various issues with orders on admin
+- Fixed: Issue with order status when track inventory is enabled
+- Fixed: Various issues with products with variations
+- Fixed: Some countries required states to be filled to complete the checkout
+- Fixed: MP Product shortcode not hiding meta when meta='0'
+- Fixed: Various issues with payments gateways- Fixed: Various issues with shipping methods
+- Fixed: Google Analytics not tracking purchases
+- Fixed: Products filter setting override (global vs shortcode)
+- Fixed: Product Thumbnails not showing on certain pages (E.g. Order Status)
+- Fixed: Various issues with global store & cart
+- Fixed: Various issues with coupons
+- Fixed: Fixed some reported issues with upgrading from MP 2.9.6.2 to 3.0.0.7
+- Fixed: Various issues with notification emails
+- Fixed: Issue that breaks MP after changing the Post Type
+- Fixed: Issue wthat don't allow to download from external site (Digital Product)
+- Tweaked: Added new States/Provinces/Regions
+- Tweaked: Global improvements on UX/UI
+- Tweaked: New way for customers to signup during checkout process
+- Tweaked: Choose default variation on product edit page
+- Tweaked: Add sale price as percentage or fixed amount
+- Tweaked: Added the shortcode ORDERID to manual payments metabox
+- Tweaked: Added new option to set products as featured as list them using MP Shortcode
+- Tweaked: Update the API request URL for authorize.net to new Akamai hosted server as recommended by authorize.net
+- Localization: Updated language file (.pot)
+- Localization: Validation messages are now traslate ready
+- Other global fixes and tweaks
+
 3.0.0.7
 ----------------------------------------------------------------------
 - Fixed: Issue with PDF Invoice add-on after complete order
