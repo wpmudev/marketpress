@@ -341,6 +341,12 @@ class MP_Setup_Wizard {
 
 			$states = mp_get_states( mp_get_setting( 'base_country' ) );
 
+			$countries_with_states = array();
+			foreach ( mp_countries() as $code => $country ) {
+				if( property_exists( mp(), $code.'_provinces' ) ) {
+					$countries_with_states[] = $code;
+				}
+			}
 			$metabox->add_field( 'advanced_select', array(
 				'name'        => 'base_province',
 				'placeholder' => __( 'Select a State/Province/Region', 'mp' ),
@@ -350,7 +356,7 @@ class MP_Setup_Wizard {
 				'width'       => 'element',
 				'conditional' => array(
 					'name'   => 'base_country',
-					'value'  => array( 'US', 'CA', 'GB', 'AU' ),
+					'value'	 => $countries_with_states,
 					'action' => 'show',
 				),
 				'validation'  => array(
