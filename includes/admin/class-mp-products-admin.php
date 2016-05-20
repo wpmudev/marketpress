@@ -64,7 +64,9 @@ class MP_Products_Screen {
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
-		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );		
+		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );
+		//add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 1 );
+		add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 2 );	
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 // Product attributes save/get value
@@ -294,6 +296,38 @@ class MP_Products_Screen {
 	}
 
 	/**
+	 * Purge variations transient after post update
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action save_post
+	 */
+	public function maybe_purge_variations_transient( $meta_id, $post_id ){
+		$post = get_post( $post_id );
+		
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+
+		if ( wp_is_post_revision( $post ) ) {
+			return $post_id;
+		}
+
+		if ( $post->post_type != MP_Product::get_post_type() && $post->post_type != MP_Product::get_variations_post_type() ) {
+			return $post_id;
+		}
+
+		$product = new MP_Product( $post_id );
+
+		if ( $product->is_variation() ) {
+			$parent = new MP_Product( $product->post_parent );
+			$post_id = $parent->ID;
+		}
+
+		delete_transient( 'mp_get_variations_'.$post_id );
+	}
+
+	/**
 	 * Enqueue quick/bulk edit script
 	 *
 	 * @since 3.0
@@ -469,7 +503,6 @@ class MP_Products_Screen {
 					}
 					/* foreach ( $variations as $variation ) {
 					  $price = $prices->get_price();
-					  var_dump($price);
 					  if ( $variation->on_sale() ) {
 					  //$prices[] = '<strike>' . mp_format_currency( '', $price[ 'regular' ] ) . '</strike> ' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] );
 					  } else {

@@ -907,43 +907,34 @@ class MP_Product {
 		if ( ! $this->get_meta( 'has_variations' ) ) {
 			return $this->_variations;
 		}
+		$identifier = $this->ID;
+		$transient_key = 'mp-get-variations-' . $identifier;
+	
+		if ( false === ( $this->_variations = get_transient( $transient_key ) ) ) {
+			$args = array(
+				'post_type'      => MP_Product::get_variations_post_type(),
+				'posts_per_page' => - 1,
+				'orderby'        => 'menu_order',
+				'order'          => 'ASC',
+				'post_parent'    => $this->ID,
+			);
 
-		/* $args = array(
-			'post_type'      => MP_Product::get_variations_post_type(),
-			'posts_per_page' => - 1,
-			'orderby'        => 'meta_value',
-			'order'          => 'DESC',
-			'post_parent'    => $this->ID,
-			'meta_query' => array(
-				'relation' => 'OR',
-				array( 
-					'key'=>'default_variation_time',
-					'compare' => 'EXISTS'           
-				),
-				array( 
-					'key'=>'default_variation_time',
-					'compare' => 'NOT EXISTS'           
-				)
-			),
-		);*/
+			$query = new WP_Query( $args );
 
-		$args = array(
-			'post_type'      => MP_Product::get_variations_post_type(),
-			'posts_per_page' => - 1,
-			'orderby'        => 'menu_order',
-			'order'          => 'ASC',
-			'post_parent'    => $this->ID,
-		);
+			$this->_variation_ids = array();
 
-		$query = new WP_Query( $args );
+			while ( $query->have_posts() ) : $query->the_post();
+				$this->_variations[]    = $variation = new MP_Product();
+			endwhile;
 
-		$this->_variation_ids = array();
+			set_transient( 'mp-get-variations-'.$this->ID , $this->_variations, 12 * 60 * 60 );
+		}
 
-		while ( $query->have_posts() ) : $query->the_post();
-			$this->_variations[]    = $variation = new MP_Product();
+		foreach ($this->_variations as $variation) {
 			$this->_variation_ids[] = $variation->ID;
-		endwhile;
+		}
 
+		update_meta_cache( 'post', $this->_variation_ids );
 		// Resort _variations && _variation_ids arrays by putting default variation on the top.
 		$this->set_default_variation();
 
@@ -964,11 +955,12 @@ class MP_Product {
 	 * @return array/MP_Product
 	 */
 	public function get_variations_by_attributes( $attributes, $index = null ) {
-		$cache_key = 'get_variations_by_attributes_' . $this->ID;
+		$identifier = $this->ID;
+		$cache_key = 'mp-get-variations-by-attributes-' . $identifier;
 		
 		// Add attributes names to cache key to make it unqiue
 		foreach ( $attributes as $attribute_key	 => $attribute_value ) {
-			$cache_key .= '_' . $attribute_key;
+			$cache_key .= '-' . $attribute_key;
 		}
 
 		$cache     = wp_cache_get( $cache_key, 'mp_product' );
@@ -1859,7 +1851,13 @@ class MP_Product {
 			}
 		}
 
-		$product_query = new WP_Query( $query_args );
+		$identifier = md5( maybe_serialize( $query_args ) );
+		$cache_key = 'mp-related-products-' . $identifier;
+
+		if ( false === ( $product_query = wp_cache_get( $cache_key, 'mp_product' ) ) ) {
+			$product_query = new WP_Query( $query_args );
+			wp_cache_set( $cache_key, $product_query, 'mp_product' );
+		}
 
 		if ( $product_query->have_posts() ) {
 			if ( $return_bool ) {
@@ -2920,7 +2918,7 @@ class MP_Product {
 
 		if ( is_null( $this->_post ) ) {
 			$this->_exists = false;
-		} elseif ( $this->_post->post_type != self::get_post_type() && $this->_post->post_type != MP_Product::get_variations_post_type() ) {
+		} elseif ( get_post_status ( $this->_post->ID ) != 'publish' && $this->_post->post_type != self::get_post_type() && $this->_post->post_type != MP_Product::get_variations_post_type() ) {
 			$this->_exists = false;
 		} elseif ( $this->_post->post_type == MP_Product::get_variations_post_type() && FALSE === get_post_status( $this->_post->post_parent ) ) { // Check if variations parent exist
 			$this->_exists = false;
