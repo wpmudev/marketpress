@@ -1933,9 +1933,23 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 				$query['paged'] = $args['page'] = intval( get_query_var( 'page' ) );
 			}
 
-			//Get session values for order and order_by
+			/*//Get session values for order and order_by
 			if ( session_id() == '' ) {
-				@session_start();
+				if (version_compare(phpversion(), '5.4.0', '<')) {
+				     if(session_id() == '') {
+				        @session_start();
+				     }
+				 }
+				 else
+				 {
+				    if (session_status() == PHP_SESSION_NONE) {
+				        @session_start();
+				    }
+				 }
+			}*/
+
+			if( !isset( $_SESSION ) ){
+				$_SESSION = array();
 			}
 
 			$order_by = isset( $_SESSION['mp_product_list_order_by'] ) ? $_SESSION['mp_product_list_order_by'] : '';
@@ -2784,8 +2798,8 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 			'hierarchical'     => true
 		) );
 
-		if ( session_id() == '' ) {
-			session_start();
+		if( !isset( $_SESSION ) ){
+			$_SESSION = array();
 		}
 
 		if ( $query instanceof WP_Query ) {
