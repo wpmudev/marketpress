@@ -1,5 +1,5 @@
 Plugin Name: MarketPress
-Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub)
+Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
@@ -10,7 +10,7 @@ Change Log:
 - Fixed: Various issues with product description
 - Fixed: Compatibility with ACF
 - Fixed: Compatibility with PHP 5.2 and PHP 7
-- Fixed: States/Countries/Regions not should for most Countries
+- Fixed: States/Countries/Regions not shown for most Countries
 - Fixed: Various issues with total cart & taxes
 - Fixed: Issues with Cart not working/redirecting using MP Product shortcode
 - Fixed: Product images with variations not working properly
@@ -22,7 +22,8 @@ Change Log:
 - Fixed: Various issues with products with variations
 - Fixed: Some countries required states to be filled to complete the checkout
 - Fixed: MP Product shortcode not hiding meta when meta='0'
-- Fixed: Various issues with payments gateways- Fixed: Various issues with shipping methods
+- Fixed: Various issues with payments gateways
+- Fixed: Various issues with shipping methods
 - Fixed: Google Analytics not tracking purchases
 - Fixed: Products filter setting override (global vs shortcode)
 - Fixed: Product Thumbnails not showing on certain pages (E.g. Order Status)
