@@ -1145,16 +1145,16 @@ class MP_Order {
 		}
 
 		// Save cart info
-		add_post_meta( $this->ID, 'mp_cart_info', $cart, true );
-		add_post_meta( $this->ID, 'mp_cart_items', $cart->export_to_array(), true );
+		update_post_meta( $this->ID, 'mp_cart_info', $cart );
+		update_post_meta( $this->ID, 'mp_cart_items', $cart->export_to_array() );
 		// Save shipping info
-		add_post_meta( $this->ID, 'mp_shipping_info', $shipping_info, true );
+		update_post_meta( $this->ID, 'mp_shipping_info', $shipping_info );
 		// Save billing info
-		add_post_meta( $this->ID, 'mp_billing_info', $billing_info, true );
+		update_post_meta( $this->ID, 'mp_billing_info', $billing_info );
 		// Save payment info
-		add_post_meta( $this->ID, 'mp_payment_info', $payment_info, true );
+		update_post_meta( $this->ID, 'mp_payment_info', $payment_info );
 		// Save kind of user, because author_id is reset in subsecuent order edits
-		add_post_meta( $this->ID, 'mp_user_kind', ( 0 === get_current_user_id() ? 'guest' : 'registered' ) , true );
+		update_post_meta( $this->ID, 'mp_user_kind', ( 0 === get_current_user_id() ? 'guest' : 'registered' ) );
 
 		// Update user shipping billing info
 		if ( $user_id ) {
@@ -1225,22 +1225,22 @@ class MP_Order {
 		}
 
 		// Payment info
-		add_post_meta( $this->ID, 'mp_order_total', mp_arr_get_value( 'total', $payment_info ), true );
+		update_post_meta( $this->ID, 'mp_order_total', mp_arr_get_value( 'total', $payment_info ) );
 
 		// Shipping totals
-		add_post_meta( $this->ID, 'mp_shipping_total', $shipping_total, true );
+		update_post_meta( $this->ID, 'mp_shipping_total', $shipping_total );
 
 		// Taxes
-		add_post_meta( $this->ID, 'mp_shipping_tax', $shipping_tax_total, true );
-		add_post_meta( $this->ID, 'mp_tax_total', $tax_total, true );
-		add_post_meta( $this->ID, 'mp_tax_inclusive', mp_get_setting( 'tax->tax_inclusive' ), true );
-		add_post_meta( $this->ID, 'mp_tax_shipping', mp_get_setting( 'tax->tax_shipping' ), true );
+		update_post_meta( $this->ID, 'mp_shipping_tax', $shipping_tax_total );
+		update_post_meta( $this->ID, 'mp_tax_total', $tax_total );
+		update_post_meta( $this->ID, 'mp_tax_inclusive', mp_get_setting( 'tax->tax_inclusive' ) );
+		update_post_meta( $this->ID, 'mp_tax_shipping', mp_get_setting( 'tax->tax_shipping' ) );
 
 		// Number of items ordered
-		add_post_meta( $this->ID, 'mp_order_items', $item_count, true );
+		update_post_meta( $this->ID, 'mp_order_items', $item_count );
 
 		// Order time
-		add_post_meta( $this->ID, 'mp_received_time', time(), true );
+		update_post_meta( $this->ID, 'mp_received_time', time() );
 
 		// If applicable, update order status to paid
 		if ( $paid ) {
