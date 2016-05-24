@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.0.0.8\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2016-05-17 10:44:22+00:00\n"
+"POT-Creation-Date: 2016-05-18 12:40:53+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -219,11 +219,11 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:678
 #: includes/admin/class-mp-products-admin.php:429
-#: includes/admin/class-mp-setup-wizard.php:506
-#: includes/admin/class-mp-setup-wizard.php:512
-#: includes/admin/class-mp-setup-wizard.php:518
-#: includes/admin/class-mp-setup-wizard.php:524
-#: includes/admin/class-mp-setup-wizard.php:558
+#: includes/admin/class-mp-setup-wizard.php:513
+#: includes/admin/class-mp-setup-wizard.php:519
+#: includes/admin/class-mp-setup-wizard.php:525
+#: includes/admin/class-mp-setup-wizard.php:531
+#: includes/admin/class-mp-setup-wizard.php:565
 #: includes/admin/store-settings/class-mp-store-settings-general.php:232
 #: includes/admin/store-settings/class-mp-store-settings-general.php:299
 #: includes/admin/store-settings/class-mp-store-settings-general.php:305
@@ -1104,7 +1104,7 @@ msgid "Shipping Rates"
 msgstr ""
 
 #: includes/admin/class-mp-dashboard-widgets.php:316
-#: includes/admin/class-mp-setup-wizard.php:625
+#: includes/admin/class-mp-setup-wizard.php:632
 #: includes/admin/store-settings/class-mp-store-settings-payments.php:50
 msgid "Payment Gateways"
 msgstr ""
@@ -1344,7 +1344,7 @@ msgid "Store Page Settings"
 msgstr ""
 
 #: includes/admin/class-mp-pages-admin.php:57
-#: includes/admin/class-mp-setup-wizard.php:410
+#: includes/admin/class-mp-setup-wizard.php:417
 #: includes/admin/class-mp-shortcode-builder.php:713
 #: includes/admin/class-mp-shortcode-builder.php:724
 #: includes/admin/class-mp-shortcode-builder.php:880
@@ -1543,7 +1543,7 @@ msgid "Img"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:429
-#: includes/admin/class-mp-setup-wizard.php:559
+#: includes/admin/class-mp-setup-wizard.php:566
 #: includes/common/payment-gateways/authorizenet-aim.php:291
 #: includes/common/payment-gateways/authorizenet-aim.php:326
 #: includes/common/payment-gateways/payfast.php:347
@@ -1643,7 +1643,7 @@ msgid "Weight"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1586
-#: includes/admin/class-mp-setup-wizard.php:541
+#: includes/admin/class-mp-setup-wizard.php:548
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:166
 #: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 msgid "Kilograms"
@@ -1652,7 +1652,7 @@ msgstr ""
 #: includes/admin/class-mp-products-admin.php:1594
 #: includes/admin/class-mp-products-admin.php:2029
 #: includes/admin/class-mp-products-admin.php:2275
-#: includes/admin/class-mp-setup-wizard.php:540
+#: includes/admin/class-mp-setup-wizard.php:547
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:165
 #: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 #: includes/common/shipping-modules/class-mp-shipping-api.php:227
@@ -1839,182 +1839,182 @@ msgstr ""
 msgid "Select A Country"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:346
+#: includes/admin/class-mp-setup-wizard.php:352
 #: includes/admin/store-settings/class-mp-store-settings-general.php:606
 msgid "Select a State/Province/Region"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:348
+#: includes/admin/class-mp-setup-wizard.php:354
 #: includes/admin/store-settings/class-mp-store-settings-general.php:608
 msgid "Base State/Province/Region"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:363
+#: includes/admin/class-mp-setup-wizard.php:370
 #: includes/admin/store-settings/class-mp-store-settings-general.php:624
 msgid "Base Zip/Postal Code"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:380
+#: includes/admin/class-mp-setup-wizard.php:387
 #: includes/admin/store-settings/class-mp-store-settings-general.php:640
 msgid "Zip/Postal Code Label"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:394
+#: includes/admin/class-mp-setup-wizard.php:401
 msgid "Countries"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:402
+#: includes/admin/class-mp-setup-wizard.php:409
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:101
 msgid "Target Countries"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:403
+#: includes/admin/class-mp-setup-wizard.php:410
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:102
 msgid "These are the countries that you will ship to."
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:404
-#: includes/admin/class-mp-setup-wizard.php:406
+#: includes/admin/class-mp-setup-wizard.php:411
+#: includes/admin/class-mp-setup-wizard.php:413
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:103
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:104
 msgid "All Countries"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:407
+#: includes/admin/class-mp-setup-wizard.php:414
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:105
 msgid "Choose Countries"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:411
+#: includes/admin/class-mp-setup-wizard.php:418
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:109
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:93
 msgid "All"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:412
+#: includes/admin/class-mp-setup-wizard.php:419
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:110
 msgid "EU"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:424
+#: includes/admin/class-mp-setup-wizard.php:431
 #: includes/admin/store-settings/class-mp-store-settings-general.php:381
 msgid "Currency Settings"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:429
-#: includes/admin/class-mp-setup-wizard.php:437
+#: includes/admin/class-mp-setup-wizard.php:436
+#: includes/admin/class-mp-setup-wizard.php:444
 #: includes/admin/store-settings/class-mp-store-settings-general.php:386
 #: includes/admin/store-settings/class-mp-store-settings-general.php:394
 msgid "Select a Currency"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:439
+#: includes/admin/class-mp-setup-wizard.php:446
 #: includes/admin/store-settings/class-mp-store-settings-general.php:396
 msgid "Store Currency"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:445
+#: includes/admin/class-mp-setup-wizard.php:452
 #: includes/admin/store-settings/class-mp-store-settings-general.php:403
 msgid "Currency Symbol Position"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:461
+#: includes/admin/class-mp-setup-wizard.php:468
 #: includes/admin/store-settings/class-mp-store-settings-general.php:449
 msgid "Tax Settings"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:467
+#: includes/admin/class-mp-setup-wizard.php:474
 msgid "Default Tax Rate"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:485
+#: includes/admin/class-mp-setup-wizard.php:492
 #: includes/admin/store-settings/class-mp-store-settings-general.php:471
 msgid "Current Rates"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:486
+#: includes/admin/class-mp-setup-wizard.php:493
 #: includes/admin/store-settings/class-mp-store-settings-general.php:472
 msgid "%s Tax Rate"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:499
+#: includes/admin/class-mp-setup-wizard.php:506
 #: includes/admin/store-settings/class-mp-store-settings-general.php:485
 msgid "Tax Label"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:501
+#: includes/admin/class-mp-setup-wizard.php:508
 msgid "I.e. Taxes, VAT, GST, etc"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:505
+#: includes/admin/class-mp-setup-wizard.php:512
 #: includes/admin/store-settings/class-mp-store-settings-general.php:491
 msgid "Apply Tax To Shipping Fees?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:511
+#: includes/admin/class-mp-setup-wizard.php:518
 #: includes/admin/store-settings/class-mp-store-settings-general.php:497
 msgid "Enter Prices Inclusive of Tax?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:517
+#: includes/admin/class-mp-setup-wizard.php:524
 #: includes/admin/store-settings/class-mp-store-settings-general.php:503
 msgid "Show Price + Tax?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:523
+#: includes/admin/class-mp-setup-wizard.php:530
 msgid "Apply Tax to Downloadable Products?"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:533
-#: includes/admin/class-mp-setup-wizard.php:569
+#: includes/admin/class-mp-setup-wizard.php:540
+#: includes/admin/class-mp-setup-wizard.php:576
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:163
 msgid "Measurement System"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:562
+#: includes/admin/class-mp-setup-wizard.php:569
 msgid "I want to charge shipping"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:576
+#: includes/admin/class-mp-setup-wizard.php:583
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:115
 msgid "No Shipping"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:590
+#: includes/admin/class-mp-setup-wizard.php:597
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:129
 msgid "Calculated Options"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:595
+#: includes/admin/class-mp-setup-wizard.php:602
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:134
 #: includes/public/class-mp-checkout.php:82
 msgid "Shipping Method"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:610
+#: includes/admin/class-mp-setup-wizard.php:617
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:149
 msgid "Select Shipping Options"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:611
+#: includes/admin/class-mp-setup-wizard.php:618
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:150
 msgid ""
 "Select which calculated shipping methods the customer will be able to "
 "choose from."
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:637
-#: includes/admin/class-mp-setup-wizard.php:643
+#: includes/admin/class-mp-setup-wizard.php:644
+#: includes/admin/class-mp-setup-wizard.php:650
 msgid "Other Gateways"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:642
+#: includes/admin/class-mp-setup-wizard.php:649
 #: includes/common/payment-gateways/manual-payments.php:35
 #: includes/common/payment-gateways/manual-payments.php:36
 msgid "Manual Payment"
 msgstr ""
 
-#: includes/admin/class-mp-setup-wizard.php:649
+#: includes/admin/class-mp-setup-wizard.php:656
 msgid "Setup your payment gateway"
 msgstr ""
 
