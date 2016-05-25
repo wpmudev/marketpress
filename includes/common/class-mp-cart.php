@@ -1124,6 +1124,8 @@ class MP_Cart {
 			}
 		}
 
+		var_dump( $max );
+
 		// Build select field attributes
 		$attributes = mp_array_to_attributes( compact( 'name', 'class', 'id' ) );
 
