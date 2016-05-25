@@ -907,9 +907,11 @@ class MP_Product {
 		if ( ! $this->get_meta( 'has_variations' ) ) {
 			return $this->_variations;
 		}
+
 		$identifier = $this->ID;
 		$transient_key = 'mp-get-variations-' . $identifier;
 	
+		//Check if variations data exist on transient, if not do the query and save result on transient
 		if ( false === ( $this->_variations = get_transient( $transient_key ) ) ) {
 			$args = array(
 				'post_type'      => MP_Product::get_variations_post_type(),
@@ -927,6 +929,7 @@ class MP_Product {
 				$this->_variations[]    = $variation = new MP_Product();
 			endwhile;
 
+			//Save variations data on a transient, transient key is 'mp-get-variations-{product_id}'
 			set_transient( 'mp-get-variations-'.$this->ID , $this->_variations, 12 * 60 * 60 );
 		}
 
@@ -934,7 +937,11 @@ class MP_Product {
 			$this->_variation_ids[] = $variation->ID;
 		}
 
+		//WP will do an update_meta_cache query for each variations,
+		//to avoid that, we pre-do a update_meta_cache for all variations in only one query.
+		//
 		update_meta_cache( 'post', $this->_variation_ids );
+
 		// Resort _variations && _variation_ids arrays by putting default variation on the top.
 		$this->set_default_variation();
 
@@ -963,6 +970,7 @@ class MP_Product {
 			$cache_key .= '-' . $attribute_key;
 		}
 
+		//Check if data exist on cache, if not do the query and cache results
 		$cache     = wp_cache_get( $cache_key, 'mp_product' );
 		if ( false !== $cache ) {
 			if ( is_null( $index ) ) {
@@ -1851,9 +1859,11 @@ class MP_Product {
 			}
 		}
 
+		//Serialize $query_args to create a unqiue cache key for each related-products query
 		$identifier = md5( maybe_serialize( $query_args ) );
 		$cache_key = 'mp-related-products-' . $identifier;
 
+		//Check if data exist on cache, if not do the query and cache results
 		if ( false === ( $product_query = wp_cache_get( $cache_key, 'mp_product' ) ) ) {
 			$product_query = new WP_Query( $query_args );
 			wp_cache_set( $cache_key, $product_query, 'mp_product' );

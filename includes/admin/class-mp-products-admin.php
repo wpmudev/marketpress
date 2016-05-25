@@ -65,7 +65,6 @@ class MP_Products_Screen {
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );
-		//add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 1 );
 		add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 2 );	
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
