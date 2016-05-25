@@ -1193,9 +1193,10 @@ class MP_Checkout {
 		
 		
 
-			$html .= '
-				</div><!-- end mp-checkout-column-shipping-info -->';
 		}
+
+		$html .= '
+				</div><!-- end mp-checkout-column-shipping-info -->';
 		
 		// If has special instructions
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
