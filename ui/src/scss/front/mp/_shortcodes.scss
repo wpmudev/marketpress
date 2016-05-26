@@ -1,0 +1,26 @@
+//== Shortcodes
+//
+
+// Cart
+.mp_cart {
+	
+	// Widget
+	&_widget {
+		
+		
+		.mp_mini_cart {
+			
+			// Cart Item (individual)
+			&_item {
+				
+				&-title {
+					margin: 0;
+				}
+			}
+			
+		}
+		
+		
+	}
+	
+}

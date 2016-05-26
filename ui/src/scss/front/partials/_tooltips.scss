@@ -1,0 +1,81 @@
+//== Tooltips
+//
+
+// General
+.mp_tooltip {
+	
+	// Content
+	&_content {
+		@include j-cf();
+		
+		* {
+			display: none;
+		}
+		
+		// Items (eg: used on order history)
+		&_item {
+			overflow: hidden;
+			
+			// Label
+			&_label {
+				font-weight: 700;
+				float: left;
+			}
+			
+			// Value
+			&_value {
+				float: right;
+			}
+		} 
+	}
+	
+	// Help
+	&-help {
+		background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAATlBMVEUAAAA6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUo6QUr5gQjpAAAAGXRSTlMAZMepIk9/hXnh6Fv4OY0wHAmflRRt2Sq2TtXGYAAAAKFJREFUeAE1j1u2wyAMAx0w75B30s7+N1pze6svS8zBlgztt6vVTbv8awJ3HA6mr184e4gx9JNl+Jv2sld4tA1m59wgiDS4DnaJaGVW3SRQlCzlHQaPkwG6R0hx+LoaS07zL9jGcguQ6u03O2F4wrvYFTrb+MdVJclFXGEWsfiVuEQSvRfKQ+nBtpo899q8b2vm+JZJ4HP2EH919SxQFh3zB75/DMLRo2MXAAAAAElFTkSuQmCC) no-repeat;
+		display: inline-block;
+		height: 16px;
+		overflow: hidden;
+		text-indent: -9999px;
+		vertical-align: middle;
+		width: 16px;
+	}
+	
+}
+
+// UI
+.mp {
+	.ui-tooltip {
+		border: 1px solid transparent;
+		box-shadow: none;
+		padding: $space--m;
+		position: relative;
+		
+		&:before,
+		&:after {
+			border: solid transparent;
+			content: "";
+			height: 0;
+			left: 50%;
+			pointer-events: none;
+			position: absolute;
+			top: 100%;
+			width: 0;
+		}
+		
+		&:after {
+			border-width: 8px;
+			margin-left: -8px;
+		}
+		
+		&:before {
+			border-width: 11px;
+			margin-left: -11px;
+		}
+			
+		p {
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+}

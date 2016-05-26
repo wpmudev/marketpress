@@ -1,0 +1,44 @@
+//== Layout
+//
+
+// Content Grid
+.mp_content {
+	
+	// Cols
+	&_col {
+		display: block;
+		margin-top: $space;
+		width: 100%;
+		
+		&:first-child {
+			margin-top: 0;
+		}
+		
+		@include bp(desktop) {
+			margin-top: 0;
+		}
+		
+		// One Half
+		&-one-half {
+			@include bp(desktop) {
+				@include j-column(1/2);
+			}
+		}
+		
+		// One Third
+		&-one-third {
+			@include bp(desktop) {
+				@include j-column(1/3);
+			}
+		}
+		
+		// Two Thirds
+		&-two-thirds {
+			@include bp(desktop) {
+				@include j-column(2/3);
+			}
+		}
+		
+	}
+	
+}

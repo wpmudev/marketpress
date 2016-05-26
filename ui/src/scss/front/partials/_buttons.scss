@@ -1,0 +1,22 @@
+//== Buttons
+//
+
+a.mp_button,
+button.mp_button {
+	display: block;
+	padding: $space--s $space--m;
+	text-align: center;
+	text-decoration: none;
+	text-transform: none;
+	transition: all .4s;
+	width: 100%;
+	
+	@include bp(tablet) {
+		display: inline-block;
+		width: auto;
+	}
+	
+	&-widget-cart {
+		padding: $space--xs $space--s;
+	}
+}

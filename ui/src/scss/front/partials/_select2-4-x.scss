@@ -1,0 +1,67 @@
+// Select2 4.x
+.select2 {
+	
+	// Container
+	&-container {
+	
+		// Selection
+		.select2-selection {
+			&.mp_select2,
+			&.mp_select2_search {
+				border-radius: 0;
+				height: $space;
+				
+				.select2-selection {
+					&__rendered {
+						line-height: $space;
+						padding: 0 ($space--s * 2) 0 $space--s;
+					}
+					&__arrow {
+						height: $space;
+						top: 0;
+						
+						b {
+							margin-left: -5px;
+						}
+					}
+				}
+			}
+		}
+		
+		// Dropdown
+		.select2-dropdown {
+			&.mp_select2-dropdown {
+				
+				// Results
+				.select2-results {
+					
+					// Options
+					&__options {
+						margin: $space--xs;
+					}
+					
+					// Option
+					&__option {
+						padding: $space--xs;
+					}
+					
+				}
+				
+				// Search
+				.select2-search {
+					&--dropdown {
+						padding: 0;
+						margin: $space--xs;
+					}
+					&__field {
+						display: block;
+						padding: $space--xs;
+					}
+				}
+				
+			}
+		}
+		
+	}
+	
+}

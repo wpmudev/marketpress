@@ -1,0 +1,83 @@
+//== Order History/Status
+//
+
+// Order Search
+// Order Search
+.mp_form {
+	&-order-lookup {
+		border-top: 1px solid transparent;
+		margin-bottom: $space--m;
+		padding-top: $space;
+		position: relative;
+	}
+}
+
+// Orders Results
+.mp_orders {
+	
+	// Results / List
+	&-list {
+		border-top: 1px solid transparent;
+		padding-top: $space;
+		
+		.mp_order_details {
+			margin-bottom: $space;
+		}
+		
+	}
+	
+	// Order Result/Item (individual)
+	.mp_order {
+		border: 1px solid transparent;
+		border-top: none;
+		padding: $space;
+		
+		&:first-of-type {
+			border-top: 1px solid transparent;
+		}
+		
+		&_head {
+			margin: 0 0 $space--m;
+		}
+	}
+
+	// Order Confirmation Text
+	.mp_order_confirmation_text {
+		border: 1px solid transparent;
+		margin-top: $space;
+		padding: $space;
+
+		> p {
+			margin-bottom: $space--m;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	
+	// Order Detail: Cart
+	.mp_order_cart {
+		border-top: 1px solid transparent;
+		margin-top: $space;
+		padding-top: $space;
+	}
+	
+	// Order Detail: Address
+	.mp_order_address {
+		border-top: 1px solid transparent;
+		margin-top: $space;
+		padding-top: $space;
+	}
+	
+	// Orders Addons: Invoice
+	&_invoice {
+		@include j-cf();
+		margin: $space--m 0;
+		
+		.button {
+			@extend .mp_button;
+		}
+	}
+	
+}
