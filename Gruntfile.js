@@ -6,6 +6,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-sass');
 	grunt.loadNpmTasks('grunt-wp-i18n');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 	grunt.initConfig({
 
@@ -77,6 +79,32 @@ module.exports = function(grunt) {
 				tasks: ['sass:frontdev']
 			}
 		},
+		
+		// Concat
+		concat: {
+			options: {
+				separator: ';',
+			},
+			basic: {
+				src: ['ui/js/jquery.*.js'],
+				dest: 'ui/js/mp-jquery-plugins.min.js',
+			},
+			extras: {
+				src: ['ui/js/mp.*.js'],
+				dest: 'ui/js/mp.js',
+			},
+		},
+		
+		uglify: {
+			basic: {
+				options: {
+					mangle: false
+				},
+				files: {
+					'ui/js/mp.min.js': ['ui/js/mp.js']
+				}
+			}
+		}
 
 	});
 
