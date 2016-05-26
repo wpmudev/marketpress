@@ -1,0 +1,26 @@
+//== Global Variables
+//
+
+//** Modules **//
+$color--facebook: #3b5998;
+$color--google-plus: #d34836;
+$color--instagram: #517fa4;
+$color--linkedin: #007bb6;
+$color--pinterest: #cb2027;
+$color--twitter: #00aced;
+$color--tumblr: #32506d;
+$color--youtube: #bb0000;
+
+//== Breakpoints
+//
+
+// Default Values
+$phone: 480px;
+$tablet: 768px;
+$desktop: 992px;
+$large-desktop: 1200px;
+
+// To be used with MQ min-width and max-width
+$phone--max: ($tablet - 1);
+$tablet--max: ($desktop - 1);
+$desktop--max: ($large-desktop - 1);

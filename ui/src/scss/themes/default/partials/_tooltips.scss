@@ -1,0 +1,50 @@
+//== Tooltips
+//
+
+// UI
+.mp {
+	.ui-tooltip {
+		background: $color--light;
+		border-color: $color--light-gray;
+		color: $color;
+		font-size: $font__size;
+		
+		&:after {
+			border-top-color: $color--light;
+		}
+		
+		&:before {
+			border-top-color: $color--light-gray;
+		}
+		
+		// Error
+		&.error {
+			background: lighten($color--error, 20%);
+			border: 2px solid $color--error;
+			color: darken($color--error, 20%);
+			
+			&:after {
+				border-top-color: lighten($color--error, 20%);
+			}
+			
+			&:before {
+				border-top-color: $color--error;
+			}
+		}
+		
+		// Success
+		&.success {
+			background: lighten($color--success, 20%);
+			border: 2px solid $color--success;
+			color: darken($color--success, 20%);
+			
+			&:after {
+				border-top-color: lighten($color--success, 20%);
+			}
+			
+			&:before {
+				border-top-color: $color--success;
+			}
+		}
+	}
+}

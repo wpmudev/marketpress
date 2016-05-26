@@ -33,6 +33,9 @@ module.exports = function(grunt) {
             },
             frontprod: {
                 src: '<%= project.fcss %>/marketpress.css'
+            },
+            themeprod: {
+                src: '<%= project.tcss %>/default.css'
             }
         },
 
@@ -57,7 +60,27 @@ module.exports = function(grunt) {
 					outputStyle: 'compressed',
 					imagePath: 'images/'
 				}
-			}
+			},
+			themedev: {
+				files: {
+					'<%= project.tcss %>/default.css': '<%= project.tscss %>/default.scss'
+				},
+				options: {
+					sourceMap: true,
+					outputStyle: 'expanded',
+					imagePath: 'images/'
+				}
+			},
+			themeprod: {
+				files: {
+					'<%= project.tcss %>/default.css': '<%= project.tscss %>/default.scss'
+				},
+				options: {
+					sourceMap: false,
+					outputStyle: 'compressed',
+					imagePath: 'images/'
+				}
+			},
 		},
 
 		// Make POT
@@ -74,25 +97,31 @@ module.exports = function(grunt) {
 		watch: {
 			sass: {
 				files: '<%= project.src %>/scss/{,*/}*.{scss,sass}',
-				tasks: ['sass:frontdev']
+				tasks: ['sass:frontdev', 'sass:themedev']
 			}
 		},
 
 	});
 
-	// Grunt default task (run `grunt`)
+	// Grunt default task (used for dev)
 	grunt.registerTask('default', [
 		'watch'
 	]);
 
+	// Grunt task to compress CSS files
 	grunt.registerTask('ccss', [
 		'sass:frontprod',
-		'postcss:frontprod'
+		'postcss:frontprod',
+		'sass:themeprod',
+		'postcss:themeprod'
 	]);
 
+	// Grun task to prepare MP to release (styles, js & pot)
 	grunt.registerTask('release', [
 		'sass:frontprod',
 		'postcss:frontprod',
+		'sass:themeprod',
+		'postcss:themeprod',
 		'makepot'
 	]);
 

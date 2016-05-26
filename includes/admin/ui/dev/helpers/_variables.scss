@@ -1,0 +1,36 @@
+//== Variables
+//
+
+// Colors
+$color: #5a6773;
+$color--light: #a4acb4;
+$color--dark: #23282d;
+$color--gray: #cbcbcb;
+//$color--dark-gray: #cbcdcf;
+$color--light-gray: #e4e7e9;
+$color--error: #c0392b;
+$color--success: #27AE60;
+
+//== Spaces (margins, paddings)
+//
+$space: 20px;
+$space--l: 40px;
+$space--m: 15px;
+$space--s: 10px;
+$space--xs: 5px;
+
+// Typography
+//$font__size: 12px;
+//$font__size--l: 13px;
+//$font__size--xl: 16px;
+$font__size: 14px;
+$font__size--l: 16px;
+$font__size--xl: 22px;
+
+//== Breakpoints
+//
+
+// Default Values
+$small: 600px;
+$medium: 784px;
+$large: 960px;
