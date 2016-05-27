@@ -33,7 +33,7 @@
         font: 12px/1.3 Verdana, Geneva, sans-serif;
         padding: 20px;
         text-align: left;
-        width: 255px
+        width: 255px;
 
         &:before {
             position: absolute;
@@ -46,7 +46,7 @@
             font-size: 0;
             line-height: 0;
             margin-top: -12px;
-            width: 0
+            width: 0;
         }
     }
 
@@ -58,18 +58,18 @@
         display: block;
         line-height: 1;
         padding: 5px;
-        text-decoration: none
+        text-decoration: none;
     }
 }
 
 .mp-store-page-slug {
     display: inline-block;
-    margin-right: 5px
+    margin-right: 5px;
 }
 
 #mp-coupon-form td,
 #mp-coupon-form th {
-    vertical-align: top
+    vertical-align: top;
 }
 
 // Shortcode Builder Form
@@ -95,7 +95,7 @@
 
 .mp-wrap .mp-settings-title {
     margin: 0;
-    padding-bottom: 30px
+    padding-bottom: 30px;
 }
 
 .mp-wrap .mp-help-icon {
@@ -105,27 +105,27 @@
     margin: -6px -10px 0 0;
     outline: 0;
     text-decoration: none;
-    vertical-align: top
+    vertical-align: top;
 }
 
 .mp-wrap .mp-help-icon:before {
-    content: "\f223"
+    content: "\f223";
 }
 
 .mp-wrap .mp-help-text {
-    display: none
+    display: none;
 }
 
 .mp-wrap .form-table td,
 .mp-wrap .form-table th {
-    vertical-align: top
+    vertical-align: top;
 }
 
 .mp-wrap .mp-tabs {
     float: left;
     margin: 0;
     padding: 0;
-    width: 150px
+    width: 150px;
 }
 
 .mp-wrap .mp-tab {
@@ -135,12 +135,12 @@
     border-radius: 4px 0 0 4px;
     border-width: 1px 0 1px 1px;
     font-weight: 700;
-    text-transform: uppercase
+    text-transform: uppercase;
 }
 
 .mp-wrap .mp-tab.active {
     background: #fff;
-    border-color: #ccc
+    border-color: #ccc;
 }
 
 .mp-wrap .mp-tab.active:after {
@@ -153,28 +153,28 @@
     display: block;
     font-size: 0;
     line-height: 0;
-    width: 1px
+    width: 1px;
 }
 
 .mp-wrap .mp-tab.active .mp-tab-link {
-    color: #222
+    color: #222;
 }
 
 .mp-wrap .mp-tab-link {
     display: block;
     padding: 8px 15px;
-    text-decoration: none
+    text-decoration: none;
 }
 
 .mp-wrap .mp-postbox {
     border-top: 2px dotted #ccc;
     margin-top: 20px;
-    padding-top: 20px
+    padding-top: 20px;
 }
 
 .mp-wrap .mp-postbox .hndle {
     position: relative;
-    cursor: pointer
+    cursor: pointer;
 }
 
 .mp-wrap .mp-postbox .hndle:after {
@@ -182,42 +182,42 @@
     top: 0;
     right: 0;
     content: "\f460";
-    font: normal normal 100%/1 dashicons
+    font: normal normal 100%/1 'dashicons';
 }
 
 .mp-wrap .mp-postbox.closed .hndle:after {
-    content: "\f132"
+    content: "\f132";
 }
 
 .mp-wrap .mp-postbox.closed .inside {
-    display: none
+    display: none;
 }
 
 .mp-wrap .mp-postbox:first-child {
     border-top: 0;
     margin-top: 0;
-    padding-top: 0
+    padding-top: 0;
 }
 
 .mp-wrap .mp-description {
-    width: 65%
+    width: 65%;
 }
 
 .mp-wrap .mp-column {
     clear: left;
     display: block;
     float: left;
-    padding-bottom: 10px
+    padding-bottom: 10px;
 }
 
 .mp-wrap .mp-column.last {
     clear: right;
-    margin-left: 30px
+    margin-left: 30px;
 }
 
 .mp-wrap .mp-label {
     display: block;
-    padding-bottom: 5px
+    padding-bottom: 5px;
 }
 
 .mp-wrap .mp-theme-preview {
@@ -230,19 +230,19 @@
     min-width: 425px;
     padding: 15px;
     text-decoration: none;
-    width: 100%
+    width: 100%;
 }
 
 .mp-wrap .mp-theme-preview h4 {
     margin-top: 0;
-    padding: 0
+    padding: 0;
 }
 
 .mp-wrap .mp-theme-preview img {
     background: #fff;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     float: left;
-    padding: 5px
+    padding: 5px;
 }
 
 .mp-wrap .mp-theme-preview p {
@@ -250,25 +250,25 @@
     overflow: hidden;
     margin: 1em 0 0;
     padding: 0 0 0 25px;
-    width: 215px
+    width: 215px;
 }
 
 .mp-wrap .mp-theme-preview p:first-child {
-    margin: 0
+    margin: 0;
 }
 
 .mp-wrap .mp-theme-preview:hover {
     background: #fafafa;
     border-color: #ccc;
-    box-shadow: 0 1px 0 #fff inset, 0 1px 0 rgba(0, 0, 0, 0.15)
+    box-shadow: 0 1px 0 #fff inset, 0 1px 0 rgba(0, 0, 0, 0.15);
 }
 
 .mp-wrap .mp-theme-preview:first-child {
-    margin-top: -16px
+    margin-top: -16px;
 }
 
 .mp-wrap .mp-theme-preview.last {
-    margin-bottom: 0
+    margin-bottom: 0;
 }
 
 #cboxContent #cboxClose{
