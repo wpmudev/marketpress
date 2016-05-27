@@ -1,0 +1,54 @@
+//== Shortcodes
+//
+
+// Cart
+.mp_cart {
+	
+	// Widget
+	&_widget {
+		
+		
+		.mp_mini_cart {
+			
+			// Cart Item (individual)
+			&_item {
+				margin-top: 0;
+				
+				&-link {
+					border: 1px solid $color--gray;
+					border-bottom-color: transparent;
+					
+					&:hover {
+						border-bottom: 1px solid $color--gray; // Override Twenty Fifteen border-bottom: 0;
+					}
+				}
+				
+				&:nth-child(even) {
+					.mp_mini_cart_item-link {
+						background: $color--light-gray;
+					}
+				}
+				
+				&:nth-child(odd) {
+					.mp_mini_cart_item-link {
+						background: lighten($color--light-gray, 2%);
+					}
+				}
+				
+				&:last-child {
+					.mp_mini_cart_item-link {
+						border-bottom-color: $color--gray;
+					}
+				}
+				
+				&-title {
+					font-size: $font__size--m;
+				}
+			}
+			
+		}
+		
+		
+	}
+	
+}

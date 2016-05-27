@@ -1,0 +1,28 @@
+//== Global
+//
+
+// Clearfix
+.cf {
+	&:after {
+	    content: "";
+	    display: table;
+	    clear: both;
+	  }
+}
+
+// Responsive Helpers
+.hide-to-large {
+	@include bp(desktop-large) {
+		display: none;
+	}
+}
+.hide-to-desktop {
+	@include bp(desktop) {
+		display: none;
+	}
+}
+
+// Invisible
+.invisible {
+	opacity: 0;
+}

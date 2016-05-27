@@ -1,0 +1,36 @@
+//== Theme Variables
+//
+
+// Colors
+$color: #333;
+$color--light: #fff;
+$color--dark: #666;
+$color--gray: #ddd;
+$color--light-gray: #eee;
+$color--error: #c0392b;
+$color--success: #27AE60;
+$color--warning: #E67E22;
+$color--info: #2980b9;
+
+// Typography
+$font__size: 16px;
+$font__size--xl: floor(($font__size * 1.3)); // ~20px
+$font__size--l: floor(($font__size * 1.15)); // ~18px
+$font__size--m: ceil(($font__size * 0.85)); // ~14px
+$font__size--s: ceil(($font__size * 0.7)); // ~12px
+
+//** Headings **/
+$font__size--h1: ceil(($font__size * 2.6)); // ~42px
+$font__size--h2: floor(($font__size * 1.9)); // ~30px
+$font__size--h3: floor(($font__size * 1.65)); // ~26px
+$font__size--h4: ceil(($font__size * 1.35)); // ~22px
+$font__size--h5: floor(($font__size * 1.15)); // ~18px
+$font__size--h6: $font__size; // ~16px
+
+// Spaces
+$space: 30px;
+$space--xl: 60px;
+$space--l: 45px;
+$space--m: 15px;
+$space--s: 10px;
+$space--xs: 5px;

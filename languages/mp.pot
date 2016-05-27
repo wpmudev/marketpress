@@ -3,15 +3,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.0.0.8\n"
-"Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2016-05-18 12:40:53+00:00\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
+"POT-Creation-Date: 2016-05-26 10:35:47+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"X-Generator: grunt-wp-i18n 0.4.9\n"
+"X-Generator: grunt-wp-i18n 0.5.4\n"
 
 #: includes/addons/class-mp-addons-list-table.php:20
 #: includes/admin/class-mp-product-attributes-admin.php:129
@@ -530,14 +530,14 @@ msgstr ""
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:66
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:66
 #: includes/common/class-mp-order.php:835 includes/common/helpers.php:152
-#: includes/public/class-mp-checkout.php:1309
+#: includes/public/class-mp-checkout.php:1310
 msgid "Billing Address"
 msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:71
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:71
 #: includes/common/class-mp-order.php:843 includes/common/helpers.php:153
-#: includes/public/class-mp-checkout.php:1316
+#: includes/public/class-mp-checkout.php:1317
 msgid "Shipping Address"
 msgstr ""
 
@@ -4000,7 +4000,7 @@ msgid "Email"
 msgstr ""
 
 #: includes/common/class-mp-order.php:793
-#: includes/public/class-mp-checkout.php:1203
+#: includes/public/class-mp-checkout.php:1204
 msgid "Special Instructions"
 msgstr ""
 
@@ -4242,7 +4242,7 @@ msgid ""
 "\n"
 " ORDERNOTES\n"
 "\n"
-"\r\n"
+"\n"
 "You can track the latest status of your order here: TRACKINGURL\n"
 "\n"
 "Thanks again!"
@@ -4889,7 +4889,7 @@ msgstr ""
 #: includes/common/payment-gateways/paypal-payflow.php:423
 #: includes/common/shipping-modules/mp-ups.php:158
 #: includes/public/class-mp-checkout.php:1152
-#: includes/public/class-mp-checkout.php:1272
+#: includes/public/class-mp-checkout.php:1273
 msgid "Password"
 msgstr ""
 
@@ -8082,7 +8082,7 @@ msgid "[mp_global_tag_cloud]"
 msgstr ""
 
 #: includes/common/template-functions.php:906
-#: includes/public/class-mp-checkout.php:1322
+#: includes/public/class-mp-checkout.php:1323
 msgid "Cart"
 msgstr ""
 
@@ -8423,33 +8423,33 @@ msgstr ""
 msgid "Shipping address different than billing?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1265
+#: includes/public/class-mp-checkout.php:1266
 msgid "Have an account?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1266
+#: includes/public/class-mp-checkout.php:1267
 msgid "Sign in to speed up the checkout process."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1268
+#: includes/public/class-mp-checkout.php:1269
 msgid "E-Mail Address/Username"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1275
+#: includes/public/class-mp-checkout.php:1276
 msgid "Login"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1280
+#: includes/public/class-mp-checkout.php:1281
 msgid "First-time customer?"
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1281
+#: includes/public/class-mp-checkout.php:1282
 msgid ""
 "Proceed to checkout and you'll have an opportunity to create an account at "
 "the end."
 msgstr ""
 
-#: includes/public/class-mp-checkout.php:1282
+#: includes/public/class-mp-checkout.php:1283
 msgid "Continue as Guest"
 msgstr ""
 

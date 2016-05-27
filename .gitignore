@@ -2,4 +2,3 @@
 .jshintrc
 node_modules
 package-plugin
-config.codekit

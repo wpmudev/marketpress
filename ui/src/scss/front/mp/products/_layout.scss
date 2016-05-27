@@ -1,0 +1,163 @@
+//== Layout
+//
+
+// Products Layout: List
+.mp_products-list {
+	
+	.mp_product {
+		
+		// If product has images or product variations
+		&-has-image {
+			
+			// Image align: none or center
+			&.mp_product-image-aligncenter {
+				
+				// Product Images
+				.mp_product_images {
+					@include j-span(1);
+				}
+				
+				// Product Content
+				.mp_product_details {
+					@include j-span(1);
+				}
+				
+			}
+			
+			// Image align: left
+			&.mp_product-image-alignleft {
+				
+				// Product Images
+				.mp_product_images {
+					//@include stack();
+					
+					@include bp(desktop) {
+						//@include unstack();
+						@include j-column(.3);
+					}
+				}
+				
+				// Product Content
+				.mp_product_details {
+					//@include stack();
+					
+					@include bp(desktop) {
+						//@include unstack();
+						@include j-column(.7, $cycle: 2);
+					}
+				}
+				
+			}
+			
+			// Image align: right
+			&.mp_product-image-alignright {
+				
+				// Product Images
+				.mp_product_images {
+					//@include stack();
+					
+					@include bp(desktop) {
+						//@include unstack();
+						@include j-column(.3);
+						@include j-shift(.7);
+					}
+				}
+				
+				// Product Content
+				.mp_product_details {
+					@include j-stack();
+					
+					@include bp(desktop) {
+						//@include unstack();
+						@include j-column(.7, $cycle: 2);
+						@include j-shift(-.3);
+					}
+				}
+				
+			}
+			
+		}
+		
+		// Extra
+		&_extra {
+			@include j-span(1);
+		}
+		
+	}
+	
+}
+
+// Products Layout: Grid
+.mp_products-grid {
+	
+	// Product
+	.mp_product {
+		
+		// Item
+		&_item {
+			display: block;
+			width: 100%;
+			
+			// 1 Product
+			&-col-1 {
+				//@include stack();
+				//margin-bottom: $space;
+			}
+			
+			// 2 Products
+			&-col-2 {
+				//@include stack();
+				//margin-bottom: $space;
+				
+				@include bp(tablet) {
+					//@include unstack();
+					@include j-column(1/2, $cycle: 2);
+				}
+			}
+			
+			// 3 Products
+			&-col-3 {
+				//@include stack();
+				//margin-bottom: $space;
+				
+				@include bp(desktop) {
+					//@include unstack();
+					@include j-column(1/3, $cycle: 3);
+				}
+			}
+			
+			// 4 Products
+			&-col-4 {
+				//@include stack();
+				//margin-bottom: $space;
+				
+				@include bp(tablet) {
+					//@include unstack();
+					@include j-column(2/4, $cycle: 2);
+				}
+				
+				@include bp(desktop) {
+					@include j-column(1/4, $cycle: 4);
+				}
+			}
+			
+		}
+		
+	}
+	
+}
+
+// Products Layout: Lightbox
+.mp_product_options {
+	
+	// Meta
+	&_meta {
+		margin: $space--m 0 0;
+	}
+	
+	// Excerpt
+	&_excerpt {
+		margin-bottom: $space--m;
+	}
+	
+}

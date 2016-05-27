@@ -1,0 +1,162 @@
+//== Forms
+//
+
+// MP Form
+.mp_form {
+	
+	// Content
+	&_content {
+		> h2 {
+			font-size: $font__size--h2;
+		}
+		
+		> p {
+			font-size: $font__size--l;
+		}
+	}
+	
+}
+
+// Labels
+.mp_form_label {
+	font-size: $font__size;
+}
+
+// Inputs
+input.mp_form_input,
+textarea.mp_form_input {
+	background-color: $color--light-gray;
+	border: 1px solid $color--gray;
+	color: $color;
+	font-size: $font__size;
+	line-height: 1.5em;
+	//padding: 12px $space--m;
+	text-transform: none;
+	
+	&:focus {
+		background-color: $color--light;
+	}
+	
+	// Error
+	&_error {
+		border-color: $color--error;
+		
+		~ label.error {
+			color: $color--error;
+			font-size: $font__size--m;
+		}
+	}
+}
+
+// Checkboxs
+.mp_form_checkbox {
+	~ span {
+		font-size: $font__size--m;
+	}
+}
+
+// Help Text
+.mp_form_help-text {
+	font-size: $font__size--m;
+	font-style: italic;
+}
+
+// Required Field
+.mp_field_required {
+	color: $color--error;
+	font-size: $font__size--m;
+}
+
+// Add to cart product variations errors
+.mp_product_options_att_label {
+	.mp_form_input_error {
+		color: $color--error;
+		font-size: $font__size--m;
+	}
+}
+
+// Select2 3.5.x
+div.mp_select2,
+div.mp_select2_search {
+		
+	.select2-choice {
+		background: $color--light;
+		border-color: $color--gray;
+		color: $color;
+		font-size: $font__size;
+		
+		&:hover {
+			border-bottom: 1px solid $color--gray;
+		}
+		
+		.select2-arrow {
+			background: $color--light-gray;
+			border-left-color: $color--gray;
+		}
+		
+	}
+	
+	// Open
+	&.select2-dropdown-open {
+		
+		.select2-choice {
+			background: $color--gray;
+			
+			.select2-arrow {
+				border-left: 1px solid $color--gray;
+			}
+		}
+		
+		&.select2-drop-above {
+			.select2-choice {
+				background: $color--gray;
+				border-color: $color--gray;
+			}
+		}
+		
+	}
+	
+	// Select2 Search
+	.select2-search {
+		input {
+			background: url('../select2/select2.png') no-repeat 100% -22px, $color--light-gray;
+			font-size: $font__size--m;
+		}
+	}
+	
+	// Dropdown (results)
+	&.select2-drop {
+		&-active {
+			border-color: $color--gray;
+		}
+		
+		&.select2-drop-above.select2-drop-active {
+			border-top-color: $color--gray;
+			border-bottom: 1px solid $color--gray;
+		}
+	}
+	&.select2-drop-auto-width {
+		border-top-color: $color--gray;
+	}
+	ul.select2-results {
+		font-size: $font__size--m;
+		
+		.select2-highlighted {
+			background: $color--gray;
+			color: $color;
+		}
+	}
+
+	// Errors
+	&.mp_form_input_error {
+		.select2-choice {
+			border-color: $color--error;
+		}
+		
+		~ label.error {
+			color: $color--error;
+			font-size: $font__size--m;
+		}
+	}
+	
+}
