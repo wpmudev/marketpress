@@ -318,7 +318,7 @@ class MP_Admin {
 
 		$quick_setup = mp_get_get_value( 'quick_setup_step' );
 		if ( isset( $quick_setup ) ) {
-			wp_enqueue_style( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/css/quick-setup.css' ), array(), MP_VERSION );
+			//wp_enqueue_style( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/css/quick-setup.css' ), array(), MP_VERSION );
 			wp_enqueue_script( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/js/quick-setup.js' ), array( 'jquery' ), MP_VERSION );
 			wp_enqueue_script( 'jquery-ui-tabs' );
 		}

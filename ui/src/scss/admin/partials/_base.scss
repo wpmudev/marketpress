@@ -1,0 +1,57 @@
+//== Base
+//
+
+// Links
+a {
+	&:focus,
+	&:hover {
+		box-shadow: none;
+		outline: none;
+	}
+	
+	// Links
+	&.mp_link {
+		transition: color .4s ease-in-out;
+		
+		// Skip Step
+		&-skip-step {
+			color: $color--light;
+			display: inline-block;
+			@include fontSize($font__size);
+			line-height: em(20px, $font__size);
+			text-decoration: none;	
+			
+			&:hover,
+			&:focus {
+				color: $color--dark;
+			}
+		}
+		
+	}
+}
+
+// Content
+.mp_content {
+	@include j-cf();
+}
+
+// Callout
+.mp_callout {
+	@include j-cf();
+	margin-top: 50px;
+	
+	@include bp(large) {
+		margin-top: 100px;
+	}
+}
+
+// Skip Step
+.mp_skip_step {
+	margin-top: $space--l;
+}
+
+// Images
+.mp_image {
+	height: auto;
+	max-width: 100%;
+}
