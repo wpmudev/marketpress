@@ -36,10 +36,16 @@ class MP_Addons_List_Table extends WP_List_Table {
 	}
 	
 	function get_data() {
-		$data = array();
 		$addons = MP_Addons::get_instance()->get_registered();
+
+		$data = array();
 				
 		foreach ( $addons as $addon ) {
+
+			if ( false === file_exists( $addon->path ) ) {
+				continue;
+			}
+
 			if ( MP_Addons::get_instance()->is_addon_enabled($addon->class) ) {
 				$enabled = true;
 				$status = '<a class="button mp-enable-disable-addon" title="' . __('Disable add-on', 'mp') . '" href="#"><span class="mp-addon-status enabled"></span>' . __('Enabled', 'mp') . '</a>';
