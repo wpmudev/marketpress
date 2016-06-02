@@ -979,7 +979,11 @@ class MP_Order {
 				break;
 
 			case 'order_paid' :
-				$status = __( 'In Process', 'mp' );
+				if( $is_download_only ) {
+					$status = __( 'Finished', 'mp' );
+				} else {
+					$status = __( 'In Process', 'mp' );
+				}			
 				break;
 
 			case 'order_closed' :
