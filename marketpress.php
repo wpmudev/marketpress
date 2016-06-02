@@ -679,7 +679,7 @@ class Marketpress {
 			), $rewrite_rules );
 		}
 
-		return $rewrite_rules + $new_rules;
+		return $new_rules + $rewrite_rules;
 	}
 
 	/**
