@@ -106,11 +106,15 @@ jQuery( document ).ready( function( $ ) {
 
 	$( '.mp-variation-add-all' ).live( 'click', function( e ) {
 		e.preventDefault();
-		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
-		var variation_tags = $( this ).parents( '.variation-row' ).find( '.mp_product_attributes_select option:selected' ).attr( 'data-tags' );
-		if( variation_tags !== "" && $variation_tags_textarea.val() === "" ) {
-			$variation_tags_textarea.textext()[0].tags().addTags( variation_tags.split( ',' ) );
-		}		
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' ),
+		variation_tags = $( this ).parents( '.variation-row' ).find( '.mp_product_attributes_select option:selected' ).attr( 'data-tags' ),
+		variation_tags_array = variation_tags.split( ',' ),
+		existing_tags = $variation_tags_textarea.textext()[0].tags()._formData,
+		all_tags = jQuery.grep(variation_tags_array, function( n, i ) {
+			return $.inArray(n, existing_tags) === -1;
+		});
+
+		$variation_tags_textarea.textext()[0].tags().addTags( all_tags );
 	} );
 
 	$( '.mp_product_attributes_select' ).live( 'change', function( ) {
@@ -128,8 +132,9 @@ jQuery( document ).ready( function( $ ) {
 				$variation_tags_textarea.textext()[0].input().bind('getSuggestions', function(e, data) {
 				    var textext = $(e.target).textext()[0],
 				        query = (data ? data.query : '') || '',
+						existing_tags =textext.tags()._formData,
 				        suggestions = jQuery.grep(variation_tags_array, function( n, i ) {
-							return $.inArray(n, textext.tags()._formData) === -1;
+							return $.inArray(n, existing_tags) === -1;
 						});
 				    $(this).trigger(
 				        'setSuggestions',
