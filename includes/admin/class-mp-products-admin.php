@@ -1113,6 +1113,10 @@ class MP_Products_Screen {
 			return;
 		}
 
+		if ( ! current_user_can( 'edit_products' ) )
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+
+
 		$variation_names     = mp_get_post_value( 'product_attributes_categories', array() );
 		$new_variation_names = mp_get_post_value( 'variation_names', array() );
 		$variation_values    = mp_get_post_value( 'variation_values', array() );
