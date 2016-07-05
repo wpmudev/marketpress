@@ -2165,8 +2165,6 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 				} else {
 					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 				}
-			} else {
-				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 			}
 		}
 
