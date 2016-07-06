@@ -1395,30 +1395,14 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 		$image = wp_get_image_editor( $img_path );
 
 		if ( ! is_wp_error( $image ) ) {
-			$size_data = array();
 			if ( is_array( $size ) ) {
 				$size_data = $size;
 			} else {
-				switch ( $size ) {
-					case 'thumbnail':
-						$size_data = array(
-							150,
-							150
-						);
-						break;
-					case 'medium':
-						$size_data = array(
-							300,
-							300
-						);
-						break;
-					case 'large':
-						$size_data = array(
-							1024,
-							1024
-						);
-						break;
-				}
+				// Get the image sizes from options
+				$size_data = array(
+					get_option( $size . '_size_w' ),
+					get_option( $size . '_size_h' ),
+				);
 			}
 			//build the path name, and try to check if
 			$filename_data = pathinfo( $image_url );
