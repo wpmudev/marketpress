@@ -171,7 +171,7 @@ class MP_Shipping_Weight_Rate extends MP_Shipping_API {
 					),
 				) );
 				
-				if ( 'US' == mp_get_setting( 'base_country') ) {
+				if ( 'US' !== mp_get_setting( 'base_country') ) {
 					$layers->add_sub_field( 'text', array(
 						'name' => 'usa',
 						'label' => array( 'text' => __( 'United States', 'mp' ) ),
