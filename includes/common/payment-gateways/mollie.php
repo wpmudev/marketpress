@@ -144,25 +144,10 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 				),
 			) );
 
-			$payment_info = array(
-				'gateway_public_name'	 => $this->public_name,
-				'gateway_private_name'	 => $this->admin_name,
-				'method'				 => __( 'Mollie', 'mp' ),
-				'transaction_id'		 => $payment->id,
-				'status'				 => array(
-					$timestamp => __( 'The payment request is under process', 'mp' ),
-				),
-				'total'					 => $cart->total(),
-				'currency'				 => $this->currency,
-			);
-
-			$order->save( array(
-				'cart'			 => $cart,
-				'payment_info'	 => $payment_info,
-				'billing_info'	 => $billing_info,
-				'shipping_info'	 => $shipping_info,
-				'paid'			 => false
-			) );
+			mp_update_session_value( 'transaction_id', $payment->id );
+			mp_update_session_value( 'billing_info', $billing_info );
+			mp_update_session_value( 'shipping_info', $shipping_info );
+			mp_update_session_value( 'cart', $cart );
 
 			wp_redirect( $payment->getPaymentUrl() );
 			exit;
@@ -185,8 +170,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 		}
 
 		$order			 = new MP_Order( $order_id );
-		$transaction_id	 = $order->get_meta( 'mp_payment_info->transaction_id' );
-
+		$transaction_id	 = mp_get_session_value( 'transaction_id' );
 
 		if ( isset( $transaction_id ) ) {
 
@@ -194,13 +178,52 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 
 			$payment = $this->mollie->payments->get( $transaction_id );
 
-			if ( $payment->isPaid() == TRUE ) {
+			/**
+			 * Mollie gateway use some payment methods that can take delays to confirm payment.
+			 * We can assume the order as received if payment is paid or is still open
+			 */
+			if ( $payment->isPaid() == TRUE || $payment->isOpen() == TRUE ) {
+
+				$billing_info	 = mp_get_session_value( 'billing_info' );
+				$shipping_info	 = mp_get_session_value( 'shipping_info' );
+				$cart	 		 = mp_get_session_value( 'cart' );
+
+				$payment_info = array(
+				'gateway_public_name'	 => $this->public_name,
+					'gateway_private_name'	 => $this->admin_name,
+					'method'				 => __( 'Mollie', 'mp' ),
+					'transaction_id'		 => $payment->id,
+					'status'				 => array(
+						$timestamp => __( 'The payment request is under process', 'mp' ),
+					),
+					'total'					 => $cart->total(),
+					'currency'				 => $this->currency,
+				);
+
+				$order->save( array(
+					'cart'			 => $cart,
+					'payment_info'	 => $payment_info,
+					'billing_info'	 => $billing_info,
+					'shipping_info'	 => $shipping_info,
+					'paid'			 => false
+				) );
 
 				$status = __( 'The order has been received', 'mp' );
 				$order->log_ipn_status( $payment_status . ': ' . $status );
-				$order->change_status( 'paid', true );
+
+				if ( $payment->isPaid() ){
+					$order->change_status( 'paid', true );
+				}
+
 			} elseif ( $payment->isOpen() == FALSE ) {
-				//do nothing, it's not paid yet
+				/**
+				* The payment isn't paid and isn't open anymore.
+				* We can assume it was aborted.
+				* We delete the order and redirct the user again to checkout page.
+				*/
+			
+				wp_redirect( mp_store_page_url( 'checkout', false ) );
+			    die;
 			}
 		}
 

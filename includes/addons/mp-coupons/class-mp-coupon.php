@@ -319,13 +319,14 @@ class MP_Coupon {
 				$coupon_terms = $this->get_meta( 'category' );
 
 				foreach ( $cart_products as $product ) {
-					$terms = get_the_terms( $product->ID, 'product_category' );
 
 					$product_id = $product->ID;
 
 					if ( $product->is_variation() ) {
 						$product_id = $product->post_parent;
 					}
+
+					$terms = get_the_terms( $product_id, 'product_category' );
 
 					if ( is_array( $terms ) ) {
 						foreach ( $terms as $term ) {

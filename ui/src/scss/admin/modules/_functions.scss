@@ -1,0 +1,24 @@
+//== Functions
+//
+
+$browser-context: 16;
+
+// Function for converting a px based font-size to rem.
+@function calculateRem($size) {
+  $remSize: $size / 16px;
+  //Default font size on html element is 100%, equivalent to 16px;
+  @return #{$remSize}rem;
+}
+
+// Function for converting a px based value to em.
+@function em($size, $context: $browser-context) {
+  @if (unitless($size)) {
+    $size: $size * 1px;
+  }
+
+  @if (unitless($context)) {
+    $context: $context * 1px;
+  }
+
+  @return $size / $context * 1em;
+}

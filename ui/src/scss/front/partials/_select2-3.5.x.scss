@@ -1,0 +1,90 @@
+// Select2 3.5.x
+div.mp_select2,
+div.mp_select2_search {
+		
+	.select2-choice {
+		border-radius: 0;
+		box-shadow: none;
+		height: $space;
+		line-height: $space;
+		padding: 0 0 0 $space--s;
+		//text-transform: capitalize;
+		
+		> .select2-chosen {
+			margin-right: 35px;
+		}
+		
+		.select2-arrow {
+			border-radius: 0;
+			width: 20px;
+			
+			b {
+				background-position: 1px 2px;
+			}
+		}
+		
+	}
+	
+	// Active
+	&-active {
+		
+		.select2-choice {
+			box-shadow: none;
+		}
+		
+	}
+	
+	// Open
+	&.select2-dropdown-open {
+		
+		.select2-choice {
+			.select2-arrow {
+				b {
+					background-position: -16px 2px;
+				}
+			}
+		}
+		
+	}
+	
+	// Select2 Search
+	.select2-search {
+		display: block;
+		
+		input {
+			background: url('../select2/select2.png') no-repeat 100% -22px;
+			box-shadow: none;
+			display: block;
+			padding: $space--xs 20px $space--xs $space--xs;
+		}
+	}
+	
+	// Dropdown (results)
+	&.select2-drop {
+		box-shadow: none;
+		
+		&.select2-drop-above {
+			box-shadow: none;
+		}
+	}
+	&.select2-drop-auto-width {
+		.select2-search {
+			padding: $space--xs;
+		}
+	}
+	ul.select2-results {
+		margin: $space--xs;
+		padding: 0;
+		//text-transform: capitalize;
+		
+		.select2-result-label {
+			padding: $space--xs;
+		}
+		
+		.select2-result-selectable .select2-match,
+		.select2-result-unselectable .select2-match {
+			text-decoration: none;
+		}
+	}
+	
+}

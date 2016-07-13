@@ -279,6 +279,7 @@ class MP_Cart {
 					'widgetcart'  		=> $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
 					'cart_updated'		=> $cart_updated,
 					'product_input'     => $product->attribute_input_fields(),
+					'out_of_stock'     	=> !$product->in_stock( $qty, true ),
 				) );
 				break;
 
@@ -1076,13 +1077,25 @@ class MP_Cart {
 		 *
 		 * @param int The default maximum.
 		 */
-		$max = apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
 
 		$id = (int) $args['id'];
 
-		$inventory             = get_post_meta( $id, 'inventory', true );
-		$inventory_tracking    = get_post_meta( $id, 'inventory_tracking', true );
-		$out_of_stock_purchase = get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+		$product 			   	= new MP_Product( $id  );
+		$inventory             	= get_post_meta( $id, 'inventory', true );
+		$inventory_tracking    	= get_post_meta( $id, 'inventory_tracking', true );
+		$out_of_stock_purchase 	= get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+
+		$max  					= $product->max_product_quantity( $product->ID, true );
+
+		/**
+		 * Filter drop down maximum qty, by default it's 10
+		 *
+		 * @since 3.0
+		 *
+		 * @param int max qty to display on dropdown
+		 */
+
+		$max_dropdown 			= apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
 
 
 		if ( $inventory_tracking && $out_of_stock_purchase !== '1' ) {
@@ -1121,7 +1134,7 @@ class MP_Cart {
 			$max = $selected;
 		}
 
-		for ( $i = 1; $i <= $max; $i ++ ) {
+		for ( $i = 1; $i <= $max_dropdown; $i ++ ) {
 			$html .= '
 				<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
 		}
@@ -2116,7 +2129,7 @@ class MP_Cart {
 			$state   = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
 
-			if ( $estimate ) {
+			if ( $estimate || ( $this->only_digital() && mp_get_setting( 'details_collection' ) == 'contact' ) ) {
 				if ( empty( $country ) ) {
 					$country = mp_get_setting( 'base_country' );
 				}

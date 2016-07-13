@@ -1,0 +1,35 @@
+// Variables
+
+// Colors
+$color: #333;
+$color--light: #fff;
+$color--dark: #666;
+$color--gray: #ddd;
+$color--light-gray: #eee;
+$color--error: #c0392b;
+$color--success: #27AE60;
+$color--warning: #E67E22;
+$color--info: #2980b9;
+
+//== Spaces (margins, paddings)
+//
+$space: 30px;
+$space--xl: 60px;
+$space--l: 45px;
+$space--m: 15px;
+$space--s: 10px;
+$space--xs: 5px;
+
+//== Breakpoints
+//
+
+// Default Values
+$phone: 480px;
+$tablet: 768px;
+$desktop: 992px;
+$large-desktop: 1200px;
+
+// To be used with MQ min-width and max-width
+$phone--max: ($tablet - 1);
+$tablet--max: ($desktop - 1);
+$desktop--max: ($large-desktop - 1);

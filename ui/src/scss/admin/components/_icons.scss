@@ -1,0 +1,41 @@
+//== Icons
+//
+
+.mp_icon {
+	
+	&-inline {
+		display: inline-block;
+	}
+	
+	&-stack {
+		margin-bottom: $space;
+	}
+	
+	&-big {
+		font-size: 60px;
+		height: 60px;
+		line-height: 60px;
+		width: 60px;
+	}
+	
+	&-gray {
+		color: $color--gray;
+	}
+	
+	&-rounded {
+		background-color: #76818b;
+		border-radius: 4px;
+		color: #52d289;
+		height: 24px;
+		margin-right: $space--xs;
+		padding: 3px;
+		width: 24px;
+		
+		&:before {
+			font-size: 18px;
+			height: 18px;
+			line-height: 18px;
+			width: 18px;
+		}
+	}
+}

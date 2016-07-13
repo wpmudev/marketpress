@@ -1,0 +1,206 @@
+//== Forms
+//
+
+// MP Form
+.mp_form {
+	@include j-cf();
+	
+	// Content
+	&_content {
+		> h2 {
+			margin: 0 0 $space;
+		}
+		
+		> p {
+			margin: 0 0 $space--s;
+		}
+	}
+}
+
+// Fields
+.mp_form_field {
+	@include j-span(1);
+}
+
+.mp_form_fields {
+	//@include cf();
+	
+	.mp_form_field {
+		@include j-column(1/2, $cycle: 2);
+	}
+}
+
+// Labels
+.mp_form_label {
+	display: block;
+	margin-bottom: $space--xs;
+}
+
+// Inputs
+input.mp_form_input,
+textarea.mp_form_input {
+	box-sizing: border-box;
+	display: inline-block;
+	//line-height: 1.5em;
+	//padding: 8px $space--m;
+	padding: 11px $space--m;
+	transition: all .4s;
+	width: 100%;
+	
+	&:focus {
+		outline: none;
+	}
+	
+	// Error
+	&_error {
+		~ label.error {
+			display: block;
+		}
+	}
+}
+// Help Text
+.mp_form_help-text {
+	display: block;
+}
+// Add to cart product variations errors
+.mp_product_options_att_label {
+	.mp_form_input_error {
+		display: block;
+	}
+}
+
+// Form Groups
+.mp_form_group {
+	
+	@include bp(desktop) {
+		border-collapse: separate;
+		display: table;
+		
+		&_input,
+		&_btn {
+			box-sizing: border-box;
+			display: table-cell;
+			vertical-align: middle;
+			
+			input,
+			button {
+				vertical-align: middle;
+			}
+		}
+		
+		&_input {
+			width: 100%;
+		}
+		
+		&_btn {
+			padding-left: $space--m;
+			position: relative;
+			width: 1%;
+			white-space: nowrap;
+			
+			.mp_button {
+				position: relative;
+			}
+		}
+		
+	}
+    
+}
+
+// Select2 3.5.x
+div.mp_select2,
+div.mp_select2_search {
+		
+	.select2-choice {
+		border-radius: 0;
+		box-shadow: none;
+		height: $space;
+		line-height: $space;
+		padding: 0 0 0 $space--s;
+		//text-transform: capitalize;
+		
+		> .select2-chosen {
+			margin-right: 35px;
+		}
+		
+		.select2-arrow {
+			border-radius: 0;
+			width: 20px;
+			
+			b {
+				background-position: 1px 2px;
+			}
+		}
+		
+	}
+	
+	// Active
+	&-active {
+		
+		.select2-choice {
+			box-shadow: none;
+		}
+		
+	}
+	
+	// Open
+	&.select2-dropdown-open {
+		
+		.select2-choice {
+			.select2-arrow {
+				b {
+					background-position: -16px 2px;
+				}
+			}
+		}
+		
+	}
+	
+	// Select2 Search
+	.select2-search {
+		display: block;
+		
+		input {
+			background: url('../select2/select2.png') no-repeat 100% -22px;
+			box-shadow: none;
+			display: block;
+			padding: $space--xs 20px $space--xs $space--xs;
+		}
+	}
+	
+	// Dropdown (results)
+	&.select2-drop {
+		box-shadow: none;
+		
+		&.select2-drop-above {
+			box-shadow: none;
+		}
+	}
+	&.select2-drop-auto-width {
+		.select2-search {
+			padding: $space--xs;
+		}
+	}
+	ul.select2-results {
+		margin: $space--xs;
+		padding: 0;
+		//text-transform: capitalize;
+		
+		.select2-result-label {
+			padding: $space--xs;
+		}
+		
+		.select2-result-selectable .select2-match,
+		.select2-result-unselectable .select2-match {
+			text-decoration: none;
+		}
+	}
+
+	// Errors
+	&.mp_form_input_error {
+		~ label.error {
+			display: block;
+		}
+	}
+	
+}

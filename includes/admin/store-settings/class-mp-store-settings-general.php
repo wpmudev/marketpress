@@ -457,11 +457,11 @@ class MP_Store_Settings_General {
 			'validation'	 => array(
 				'number' => true,
 			),
-			'conditional'	 => array(
+			/*'conditional'	 => array(
 				'name'	 => 'base_country',
 				'value'	 => 'CA',
 				'action' => 'hide',
-			),
+			),*/
 		) );
 
 		// Create field for each canadian province

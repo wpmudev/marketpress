@@ -855,6 +855,11 @@ class MP_Checkout {
 			$atts .= " {$key}={$val}";
 		}
 
+		// Convert Counrty/State abbreviation when value_only
+		if( mp_arr_get_value( 'value_only', $field ) && in_array( mp_arr_get_value( 'name', $field, '' ), array( 'billing[country]' , 'billing[state]', 'shipping[country]' , 'shipping[state]' ) ) && isset( $field['options'][$field['value']] ) ){
+			$field['value'] = $field['options'][$field['value']];
+		}
+
 		switch ( mp_arr_get_value( 'type', $field, '' ) ) {
 			case 'text' :
 			case 'password' :
@@ -1179,17 +1184,20 @@ class MP_Checkout {
 						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . '> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
 					</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
 				';
+		
+			$html .= '
+				</div><!-- end mp-checkout-column-billing-info -->
+					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
+						<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
+			$this->address_fields( 'shipping' ) . '';
+		
+		
+
 		}
 
 		$html .= '
-			</div><!-- end mp-checkout-column-billing-info -->
-				<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
-					<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
-		$this->address_fields( 'shipping' ) . '';
-
-		$html .= '
 				</div><!-- end mp-checkout-column-shipping-info -->';
-
+		
 		// If has special instructions
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
 			$html .= '<div id="mp-checkout-column-special-instructions" class="mp_checkout_column fullwidth"><div class="mp_checkout_field">
@@ -1432,7 +1440,7 @@ class MP_Checkout {
 		if ( $order->exists() == false ) {
 			return false;
 		}
-		
+
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
 		
@@ -1554,7 +1562,7 @@ try{
 				$meta = $product->get_meta( 'sku' );
 				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 				$js .= 'ga("ecommerce:addItem", {
-					 "id": "' . esc_attr( $product->ID ) . '", // Transaction ID. Required.
+					 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
 					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
 					 "sku": "' . $sku . '",								// SKU/code.
 					 "category": "",			 					// Category or variation.
@@ -1568,8 +1576,7 @@ try{
 
 		//add to footer
 		if ( !empty( $js ) ) {
-			$function = "echo '$js';";
-			add_action( 'wp_footer', create_function( '', $function ), 99999 );
+			echo $js;
 		}
 	}
 

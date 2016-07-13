@@ -1,0 +1,235 @@
+//== Cart Page (/cart)
+//
+
+// MP Cart
+.mp_cart {
+	
+	// Empty
+	&_empty {
+		margin-bottom: $space;
+		
+		&_message {
+			margin-bottom: 0;
+		}
+	}
+	
+	// Item
+	&_item {
+		border: 1px solid transparent;
+		border-bottom: none;
+		display: table;
+		width: 100%;
+		
+		&:last-child {
+			border-bottom: 1px solid transparent;
+		}
+		
+		&_content {
+			display: table-cell;
+			padding: $space--m;
+			vertical-align: top;
+			
+			// Generic
+			h2.mp_cart_item_title,
+			p {
+				line-height: 1.2em;
+				margin: 0;
+			}
+			
+			// Thumbnail
+			&-thumb {
+				display: none;
+				
+				@include bp(tablet) {
+					display: table-cell;
+					padding: $space--m 0;
+					width: 15%;
+				}
+				
+				img {
+					display: block;
+					height: auto;
+					margin: auto;
+					max-width: 100%;
+				}
+			}
+			
+			// Title
+			&-title {
+				width: 60%;
+				
+				@include bp(tablet) {
+					width: 45%;
+				}
+			
+				a {
+					border-bottom: none;
+					text-decoration: none;
+				}
+			}
+			
+			// Price
+			&-price {
+				text-align: center;
+				width: 20%;
+				
+				.mp_product_price {
+					margin: 0;
+					
+					&-normal,
+					&-sale,
+					&-extended,
+					&-each {
+						display: block;
+						margin: 0;
+					}
+				}
+			}
+			
+			// Qty
+			&-qty {
+				width: 20%;
+				
+				.mp_select2 {
+					width: 75px;
+				}
+			}
+			
+			// Remove Item
+			.mp_cart_item_remove_item {
+				border-bottom: 1px solid transparent;
+				display: block;
+				margin-top: $space--xs;
+			}
+		}
+
+	}
+	
+	// Before Cart
+	&_before {}
+	
+	// After Cart
+	&_after {
+		margin: $space 0 0;
+	}
+	
+}
+
+// Cart Coupon
+.mp_coupon {
+	// Coupon Form
+	&_form {
+		p {
+			display: block;
+			margin: $space--s 0 0;
+			text-align: center;
+			
+			@include bp(desktop) {
+				text-align: left;
+			}
+		}
+	}
+}
+
+// Cart Meta
+.mp_cart_meta {
+	@include j-cf();
+	margin: $space 0 0;
+	position: relative;
+	text-align: center;
+	
+	// Cart Buttons
+	.mp_button {
+		
+		// Continue Shopping
+		&-continue-shopping {
+			margin-top: $space;
+			
+			@include bp(desktop) {
+				float: left;
+			}
+		}
+		
+		// Checkout Button
+		&-checkout {
+			margin-top: $space;
+			//width: 100%;
+			
+			&:hover,
+			&:focus {
+				background: transparent;
+			}
+			
+			@include bp(desktop) {
+				float: right;
+			}
+		}
+
+	}
+}
+
+// Cart Resume
+.mp_cart_resume {
+	border: 1px solid transparent;
+	width: 100%;
+	
+	// Head
+	&_head {
+		padding: $space--m;
+			
+		@include bp(tablet) {
+			text-align: left;
+		}
+		
+		.mp_sub_title {
+			margin: 0;
+		}
+	}
+	
+	// Item
+	&_item {
+		@include j-cf();
+		padding: $space--s $space--m;
+		overflow: hidden;
+			
+		// Label
+		&_label {
+			float: left;
+		}
+		
+		// Content
+		&_amount {
+			display: block;
+			float: right;
+			max-width: 150px;
+			text-align: right;
+			//width: 90px;
+			width: 100%;
+		}
+		
+		// Coupons
+		.mp_cart_resume_coupons_list {
+			clear: both;
+			list-style: none;
+			margin: 0 0 0 $space--m;
+			overflow: hidden;
+		}
+		.mp_cart_coupon {
+			display: block;
+			overflow: hidden;
+			margin-top: $space--xs;
+		}
+		
+		// Total Order
+		&-order-total {
+			border-top: 1px solid transparent;
+		}
+		
+	}
+	
+	/*@include bp(desktop) {
+		float: left;
+		width: 65%;
+	}*/
+
+}

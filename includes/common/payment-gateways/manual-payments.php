@@ -48,7 +48,7 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 	 * @param array $shipping_info. Contains shipping info and email in case you need it
 	 */
 	public function payment_form( $cart, $shipping_info ) {
-		return do_shortcode( $this->get_setting( 'instruction' ) );
+		return do_shortcode( wpautop($this->get_setting( 'instruction' )) );
 	}
 
 	/**

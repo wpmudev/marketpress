@@ -1,0 +1,189 @@
+//== Cart Page (/cart)
+//
+
+// MP Cart
+.mp_cart {
+	
+	// Empty
+	&_empty {
+		background: lighten($color--info, 20%);
+		border: 2px solid $color--info;
+		color: darken($color--info, 20%);
+		padding: $space--m;
+		
+		&_message {
+			font-size: $font__size;
+			margin-bottom: 0;
+			
+			a {
+				border-bottom: none;
+				color: $color--light;
+				
+				&:hover,
+				&:focus {
+					color: darken($color--info, 20%);
+				}
+			}
+		}
+	}
+	
+	// Item
+	&_item {
+		border-color: $color--gray;
+		
+		&:nth-child(even) {
+			background: $color--light-gray;
+		}
+		
+		&:nth-child(odd) {
+			background: lighten($color--light-gray, 2%);
+		}
+		
+		&:last-child {
+			border-bottom-color: $color--gray;
+		}
+		
+		// Content
+		&_content {
+			
+			// Generic
+			h2.mp_cart_item_title,
+			p {
+				font-size: $font__size--l;
+			}
+			
+			// Title
+			&-title {}
+			
+			// Price
+			&-price {
+				
+				.mp_product_price {
+					font-size: $font__size--l;
+					line-height: 1.2em;
+					
+					&-each {
+						font-size: $font__size--m;
+					}
+					
+					&-extended,
+					&-sale {
+						~ .mp_product_price-normal {
+							color: $color--error;
+							font-size: $font__size--m;
+						}
+					}
+				}
+				
+			}
+			
+			// Qty
+			&-qty {
+				// font-size: $font__size;
+				line-height: 1.2em;
+			}
+			
+			// Remove Item
+			.mp_cart_item_remove_item {
+				font-size: $font__size--s;
+			}
+		}
+	}
+	
+	// Before Cart
+	&_before {}
+	
+	// After Cart
+	&_after {}
+	
+}
+
+// Cart Coupon
+.mp_coupon {
+	// Coupon Form
+	&_form {
+		background: $color--light-gray;
+		border: 1px solid $color--gray;
+		overflow: hidden;
+		padding: $space--m;
+		
+		p {
+			font-size: $font__size--m;
+		}
+		
+		input[name^="mp_cart_coupon"] {
+			background: $color--light;
+			
+			&:focus {
+				background: $color--gray;
+			}
+		}
+		
+	}
+
+}
+
+// Cart Meta
+.mp_cart_meta {
+	
+	// Cart Buttons
+	.mp_button {
+		
+		// Continue Shopping
+		&-continue-shopping {
+			&:hover,
+			&:focus {
+				border-bottom: 	2px solid $color; // Override default twentyfifteen border-bottom: none
+			}
+		}
+	}
+	
+}
+
+// Cart Resume
+.mp_cart_resume {
+	border-color: $color--gray;
+	
+	// Head
+	&_head {
+		background-color: $color;
+		
+		.mp_sub_title {
+			color: $color--light;
+			font-weight: 700;
+		}
+	}
+	
+	// Item
+	&_item {
+		font-size: $font__size;
+		
+		// Coupons
+		&-coupons {
+			.mp_cart_resume_item_amount {
+				//color: $color--success;
+				
+				&-total {
+					color: $color--success;
+				}
+			}
+			.mp_cart_coupon {
+				font-size: $font__size--s;
+				
+				.mp_cart_resume_item_label {
+					color: $color--dark;
+				}
+			}
+			.mp_cart_coupon_remove_item {
+				border-bottom: none;
+				color: $color--error;
+			}
+		}
+		
+		// Total Order
+		&-order-total {
+			border-top-color: $color--gray;
+			font-size: $font__size--xl;
+		}
+	}
+}

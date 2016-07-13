@@ -1,0 +1,49 @@
+//== Mixins
+//
+
+// Mixin that will include the fall back px declaration as well as the calculated rem value.
+@mixin fontSize($size) {
+  font-size: $size;
+  font-size: calculateRem($size);
+}
+
+// Breakpoints
+@mixin bp($point) {
+	
+	@if $point == small {
+		@media only screen and (min-width: $small) { 
+			@content;
+		}
+	}
+	
+	@if $point == small-max {
+		@media only screen and (max-width: $small) { 
+			@content;
+		}
+	}
+	
+	@if $point == medium {
+		@media only screen and (min-width: $medium) { 
+			@content;
+		}
+	}
+	
+	@if $point == medium-min-max {
+		@media only screen and (min-width: $medium) and (max-width: ($large - 1)) { 
+			@content;
+		}
+	}
+	
+	@if $point == medium-max {
+		@media only screen and (max-width: $medium) { 
+			@content;
+		}
+	}
+	
+	@if $point == large {
+		@media only screen and (min-width: $large) { 
+			@content;
+		}
+	}
+	
+}

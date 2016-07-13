@@ -113,9 +113,10 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 <td align="right">' . mp_format_currency( $currency, $price ) . '</td>
 </tr>' . "\n";
 			}
+
+			$order_info .= "</table><br /><br />";
 		}
 
-		$order_info .= "</table><br /><br />";
 
 		// Coupon lines
 		if ( $coupons = $order->get_meta( 'mp_discount_info' ) ) {
@@ -156,8 +157,10 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 			$shipping_billing_info .= '<td align="left"><h3>' . __( 'Shipping', 'mp' ) . '</h3>' . __( 'No shipping required for this order.', 'mp' ) . '</td>';
 			$type = array( 'billing' => __( 'Billing', 'mp' ) );
 		}
-
+		$all_countries = mp_countries();
 		foreach ( $types as $type => $label ) {
+			$states = mp_get_states( $order->get_meta( "mp_{$type}_info->country" ) );
+
 			if( $type != "shipping" || !mp()->download_only_cart( mp_cart() ) ) {
 				$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
 				$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
@@ -168,7 +171,15 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 					$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->address2" ) . "<br />\n";
 				}
 
-				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $order->get_meta( "mp_{$type}_info->state" ) . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $order->get_meta( "mp_{$type}_info->country" ) . "<br /><br />\n";
+				if( ( ( $state = $order->get_meta( "mp_{$type}_info->state", '' ) ) && is_array( $states ) && isset( $states[$state] ) ) ){
+					$state = $states[$state];
+				}
+
+				if( ( ( $country = $order->get_meta( "mp_{$type}_info->country", '' ) ) && is_array( $all_countries ) && isset( $all_countries[$country] ) ) ){
+					$country = $all_countries[$country];
+				}				
+
+				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $state . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $country . "<br /><br />\n";
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
 
 				if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
@@ -1447,4 +1458,33 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 
 if ( ! function_exists( 'mp_get_the_thumbnail' ) ) {
 
+}
+
+if (! function_exists( 'mp_array_column' ) ) {
+    function mp_array_column( array $input, $columnKey, $indexKey = null ) {
+    	
+    	if( function_exists( 'array_column' ) ){
+    		return array_column( $input, $columnKey, $indexKey );
+    	}
+
+        $array = array();
+        foreach ( $input as $value ) {
+            if ( ! isset( $value[$columnKey] ) ) {
+                return false;
+            }
+            if ( is_null( $indexKey ) ) {
+                $array[] = $value[$columnKey];
+            }
+            else {
+                if ( ! isset( $value[$indexKey] ) ) {
+                    return false;
+                }
+                if ( ! is_scalar( $value[$indexKey] ) ) {
+                    return false;
+                }
+                $array[$value[$indexKey]] = $value[$columnKey];
+            }
+        }
+        return $array;
+    }
 }

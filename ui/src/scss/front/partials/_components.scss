@@ -1,0 +1,312 @@
+//== Components
+//
+
+// Products Filter
+#mp-products-filter-form {}
+
+// Pagination (products,order history,etc..
+.mp_listings_nav {
+	padding: $space;
+	text-align: center;
+	width: 100%;
+	
+	.page-numbers {
+		border: 1px solid transparent;
+		display: inline-block;
+		margin-top: 1px;
+		padding: 8px $space--m;
+		
+		&.prev,
+		&.next {
+			border: 2px solid transparent;
+			margin-top: 0;
+		}
+		
+		&.prev {
+			float: left;
+		}
+		
+		&.next {
+			float: right;
+		}
+	}	
+}
+
+// Mini Cart (floating/side)
+.mp_mini_cart {
+	max-width: 250px;
+	position: fixed;
+	right: 0;
+	top: 50px;
+	z-index: 500;
+	
+	// Cart Tab/Ribbon
+	&_ribbon {
+		cursor: pointer;
+		display: block;
+		//line-height: $font__size--xl;
+		margin-right: -100px;
+		padding: $space--s $space--m $space--s $space--l;
+		position: relative;
+		transition: all .4s;
+		width: 180px;
+		
+		@include bp(tablet) {
+			margin-right: -45px;
+		}
+		
+		&:before {
+			content: "\f174";
+			display: block;
+			font-family: 'dashicons';
+			
+			margin-top: -10px;
+			position: absolute;
+			top: 50%;
+			
+			// Frontend.css override
+			background: transparent;
+			left: $space--m;
+		}
+	}
+	
+	// Cart Total
+	&_total {
+		display: none;
+		float: right;
+		opacity: 0;
+		transition: opacity .4s;
+	}
+	
+	// Cart Count
+	&_count {
+		display: inline-block;
+		position: relative;
+		
+		&:before {
+			content: "(";
+		}
+		
+		&:after {
+			content: ")";
+		}
+		
+		@include bp(tablet) {
+			&:before,
+			&:after {
+				content: "";
+			}
+		}
+		
+		// Count Title
+		&-title {
+			display: none;
+			margin-left: $space--xs;
+			
+			@include bp(tablet) {
+				display: inline-block;
+			}
+		}
+	}
+	
+	// Cart Contents
+	&_content {
+		@include j-cf();
+		display: none;
+		opacity: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
+		padding: $space--m 0;
+		position: absolute;
+		right: 0;
+		text-align: center;
+		transition: opacity .4s;
+		width: 250px;
+	}
+	
+	// Cart Items
+	&_items {
+		@include j-cf();
+		list-style: none;
+		margin: 0;
+		padding: 0;	
+		
+		// Empty Cart
+		&-empty {
+			padding: 0 $space;
+			text-align: center;
+			
+			p {
+				margin: $space--m 0 0;
+				
+				&:first-child {
+					margin-top: 0;
+				}
+			}
+		}
+		
+	}
+	
+	// Cart Item (individual)
+	&_item {
+		@include j-cf();
+		margin: $space--s 0 0;
+		text-align: left;
+		
+		&:first-child {
+			margin-top: 0;
+		}
+		
+		&-link {
+			@include j-cf();
+			display: block;
+			overflow: hidden;
+			padding: $space--m;
+			text-decoration: none;
+			transition: background-color .4s;
+			width: 100%;
+			
+			&:hover {
+				background-color: $color--light-gray;
+			}
+		}
+		
+		&-content {
+			overflow: hidden;
+			width: 100%;
+		}
+		
+		&-title {
+			margin: 0;
+			padding: 0;
+			text-align: left;
+			//transition: color .4s;
+		}
+		
+		&-attribute {
+			display: table;
+			width: 100%;
+			
+			> em,
+			> strong {
+				display: table-cell;
+				font-style: normal;
+				font-weight: 400;
+				vertical-align: top;
+				width: 50%;
+			}
+			
+			> em {
+				padding-left: $space--xs;
+			}
+		}
+		
+		// Has Image
+		&-has-image {
+			
+			.hmedia {
+				float: left;
+				height: 50px;
+				margin-right: $space--m;
+				max-width: 50px;
+				width: 25%;
+				
+				img {
+					height: auto;
+					max-width: 100%;
+				}
+			}
+			
+			.mp_mini_cart_item-content {
+				float: left;
+				max-width: 150px;
+				width: 75%;
+			}
+		}
+	}
+	
+	// Cart on hover
+	&.in-transition {
+		
+		.mp_mini_cart_ribbon {
+			margin-right: 0;
+			width: 250px;
+		}
+		
+		@include bp(phone) {
+			.mp_mini_cart {
+					
+				// Count Qty
+				&_count {
+					
+					// Count Title
+					&-title {
+						display: inline-block;
+					}
+					
+				}
+			}
+		}
+		
+		.mp_mini_cart_total {
+			display: inline-block;
+		}
+		.mp_mini_cart_content {
+			display: block;
+		}
+	}
+	
+	&.visible {
+		.mp_mini_cart_total,
+		.mp_mini_cart_content {
+			opacity: 1;
+		}
+	}
+	
+}
+// Mini-Cart Button
+a.mp_button-mini-cart {}
+
+// Create Account (lightbox)
+#mp-create-account-lightbox {
+	display: none;
+	//text-align: center;
+}
+// Create Account (form)
+#mp-create-account-form {	
+	.mp_form_field {
+		margin-bottom: $space--m;
+		
+		&:last-of-type {
+			margin-bottom: 0;
+		}
+	}
+	.mp_form_input {
+		~ label {
+			margin-top: $space--xs;
+		}
+	}
+	
+	.mp_title {
+		margin-bottom: $space;
+	}
+	
+	.mp_form_callout {
+		clear: both;
+		text-align: center;
+	}
+	
+	.mp_button {
+		margin-top: $space--m;
+	}
+}
+
+// Customer Data
+.mp_customer {
+	
+	// Address
+	&_address {
+		@include j-cf();
+	}
+	
+}

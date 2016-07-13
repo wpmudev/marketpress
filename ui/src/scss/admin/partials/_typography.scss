@@ -1,0 +1,32 @@
+//== Typography
+//
+
+#mp-quick-setup-wizard {
+	
+	// Headings
+	h3 {
+		&.mp_title {
+			@include fontSize($font__size--xl);
+			line-height: em(18px, $font__size--xl);
+			margin: 0 0 $space;
+			padding: 0;
+		}
+	}
+	
+	// Paragraph
+	p {
+		color: $color;
+		@include fontSize($font__size);
+		line-height: em(20px, $font__size);
+		margin: 0 0 $space;
+		padding: 0;
+	}
+	
+	// Content
+	.mp_content {
+		p:last-of-type {
+			margin-bottom: 0;
+		}
+	}
+		
+}

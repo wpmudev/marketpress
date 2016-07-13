@@ -1,0 +1,17 @@
+//== Base
+//
+
+// Typo
+h1,
+h2,
+h3,
+h4 {
+	&.mp_title {
+		font-size: $font__size--h2;
+		line-height: 1.5em;
+	}
+	&.mp_sub_title {
+		font-size: $font__size--h4;
+		line-height: 1.5em;
+	}
+}

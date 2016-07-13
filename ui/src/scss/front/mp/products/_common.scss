@@ -1,0 +1,157 @@
+//== Common
+//
+
+// MP Product
+.mp_product {
+	@include j-cf();
+		
+	// Product Images
+	&_images {
+		display: block;
+		width: 100%;
+	}
+	
+	// Product Details/Content
+	&_details {
+		//@include span(1);
+		display: block;
+		width: 100%;
+	}
+	
+	// Product Gallery
+	&_gallery {
+		list-style: none;
+		
+		&.lightSlider {
+			list-style: none;
+			margin: 0;
+			
+			li {
+				margin: 0;
+			}
+			
+			img {
+				height: auto;
+				max-width: 100%;
+				width: 100%;
+			}
+			
+		}
+	}
+	// Gallery Arrows
+	.lSAction {
+		a {
+			border-bottom: 0;
+		}
+	}
+	// Gallery Thumbs/Pagination
+	.lSPager.lSGallery {
+		
+		li {
+			margin: 0;
+			opacity: 0.5;
+			transition: opacity .4s;
+			
+			&.active,
+			&:hover {
+				border-radius: 0;
+				opacity: 1;
+			}
+		}
+	}
+	
+	// Product Name
+	.mp_product_name {
+		margin: 0 0 $space--m;
+				
+		a {
+			border-bottom: none;
+		}
+	}
+	
+	// Product Price
+	&_price {
+		display: block;
+		margin: 0 0 $space--m;
+		
+		&-sale,
+		&-normal {
+			//display: block;
+			display: inline-block;
+		}
+		
+		// Sale Price
+		&-sale {
+			margin-right: $space--m;
+		}
+	}
+	
+	// Product Excerpt
+	&_excerpt {
+		display: block;
+		//margin: 0 0 $space--m;
+		
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+	
+	// Product Categories
+	&_categories {
+		display: block;
+		margin: $space--m 0 0;
+	}
+	
+	// Product Callout
+	&_callout {
+		margin: $space--m 0;
+		position: relative;
+	}
+	
+	// Product Tags
+	&_tags {
+		display: block;
+		margin: $space--m 0 0;
+	}
+	
+	// Buy Form
+	/*.mp_form-buy-product {
+		display: block;
+		//margin: 0 0 $space--m;
+	}*/
+	
+}
+
+// Social Shares
+#fb-root {
+	display: inline-block;
+}
+.mp_social_shares {
+	@include j-cf();
+	display: block;
+	//margin: 0 0 $space--m;
+	
+	.mp_pin_button {
+		border: none;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	
+	iframe {
+		margin: 0;
+		vertical-align: middle;
+	}
+
+	.fb_iframe_widget {
+		> span {
+			vertical-align: middle !important;
+		}
+		iframe {
+			max-width: none;
+		}
+	}
+	.twitter-share-button {
+		display: inline-block;
+		position: relative !important;
+	}	
+}

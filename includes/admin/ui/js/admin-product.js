@@ -104,13 +104,46 @@ jQuery( document ).ready( function( $ ) {
         $( this ).repeatable_fields( );
     } );
 
-    $( '.mp_product_attributes_select' ).live( 'change', function( ) {
-        if ( $( this ).val( ) == '-1' ) {
-            $( this ).parent( ).find( '.mp-variation-attribute-name' ).show( );
-        } else {
-            $( this ).parent( ).find( '.mp-variation-attribute-name' ).hide( );
-        }
-    } );
+	$( '.mp-variation-add-all' ).live( 'click', function( e ) {
+		e.preventDefault();
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' ),
+		variation_tags = $( this ).parents( '.variation-row' ).find( '.mp_product_attributes_select option:selected' ).attr( 'data-tags' ),
+		variation_tags_array = variation_tags.split( ',' ),
+		existing_tags = $variation_tags_textarea.textext()[0].tags()._formData,
+		all_tags = jQuery.grep(variation_tags_array, function( n, i ) {
+			return $.inArray(n, existing_tags) === -1;
+		});
+
+		$variation_tags_textarea.textext()[0].tags().addTags( all_tags );
+	} );
+
+	$( '.mp_product_attributes_select' ).live( 'change', function( ) {
+		var $variation_tags_textarea = $( this ).parents( '.variation-row' ).find( 'textarea.variation_values' );
+		$variation_tags_textarea.textext()[0].input().unbind('getSuggestions');
+		if ( $( this ).val( ) == '-1' ) {
+			$( this ).parent( ).find( '.mp-variation-attribute-name' ).show( );
+			$( this ).parent( ).find( '.mp-variation-add-all' ).hide( );
+		} else {
+			var variation_tags = $( this ).find( ':selected' ).attr( 'data-tags' );			
+			$( this ).parent( ).find( '.mp-variation-attribute-name' ).hide( );
+			if( variation_tags !== "" ) {
+				$( this ).parent( ).find( '.mp-variation-add-all' ).show( );				
+				var variation_tags_array = variation_tags.split( ',' );
+				$variation_tags_textarea.textext()[0].input().bind('getSuggestions', function(e, data) {
+				    var textext = $(e.target).textext()[0],
+				        query = (data ? data.query : '') || '',
+						existing_tags =textext.tags()._formData,
+				        suggestions = jQuery.grep(variation_tags_array, function( n, i ) {
+							return $.inArray(n, existing_tags) === -1;
+						});
+				    $(this).trigger(
+				        'setSuggestions',
+				        { result : textext.itemManager().filter(suggestions, query) }
+				    );
+				});
+			}
+		}
+	} );
 
     $( '.select_attributes_filter a' ).live( 'click', function( event ) {
         $( '.select_attributes_filter a' ).removeClass( 'selected' );
@@ -275,8 +308,19 @@ jQuery( document ).ready( function( $ ) {
                     $( this ).parent( ).find( '.currency' ).show();
                     connectWith.val( $( this ).val( ) ).change( );
                     if ( data_type == 'number' ) {
-                        var numeric_value = $( this ).val( );
-                        numeric_value = numeric_value.replace( ",", "." );
+                        var numeric_value = $( this ).val( ).trim( );
+                        numeric_value = numeric_value.replace( ",", "." ); //convert comma to dot
+
+                        // If the user enters a percentage, calculate the sale price
+                        if( data_meta == 'sale_price_amount' && numeric_value.indexOf('%') == numeric_value.length -1 && parseFloat( numeric_value ) <= 100 ) {
+                            numeric_value = parseFloat( numeric_value );
+                            var original_value = parseFloat( elem.closest( 'tr' ).find( 'span.original_value[data-meta="regular_price"]' ).html( ) );
+                            numeric_value = original_value - ( ( numeric_value / 100 ) * original_value );
+                            numeric_value = '' + numeric_value;
+                        }
+
+                        numeric_value = numeric_value.replace( /[^\d.-]/g, '' ); //remove any non numeric value
+
                         if ( $.isNumeric( numeric_value ) ) {
                             elem.text( numeric_value );
                         } else {
@@ -331,6 +375,16 @@ jQuery( document ).ready( function( $ ) {
         }
         e.preventDefault( );
     } );
+    $( '.mp_variations_table_box [name="selected_variation[]"]' ).live('keydown', function( e ) {
+		if ( e.keyCode == 9 ) {
+			e.preventDefault( );
+			var parentContainer = $( this ).parent( 'th' );
+			var nextContainer = $( this ).parent( 'th' ).next().next( 'td.field_editable' );
+			nextContainer.find( '.original_value' ).trigger( 'click' );
+			
+           $( this ).blur( );
+        }
+    });
 	$( ".mp_inline_temp_value" ).live( 'keydown', function( e ) {
 		if ( e.keyCode == 9 ) {
 			e.preventDefault( );
@@ -764,6 +818,15 @@ jQuery( document ).ready( function( $ ) {
         } );
 
         $target = $('#variation_popup');
+
+        // Set a 10% discount automatically and avoid validation messages
+        //$target.on( 'change', 'input[name="has_sale"]', function() {
+        //    if( $( this ).is( ":checked" ) && !isFinite( percentage_discount ) ) {
+        //        var percentage_discount = parseFloat( $target.find("input[name='sale_price\\[percentage\\]']").val() );
+        //        $target.find("input[name='sale_price\\[percentage\\]']").val( '10' ).trigger("input");
+        //    }
+        //});
+
         $target.on('input', 'input', function() {
             var price = parseFloat( $target.find("input[name='regular_price']").val() );
             var sale_price = parseFloat( $target.find("input[name='sale_price\\[amount\\]']").val() );
@@ -797,20 +860,11 @@ jQuery( document ).ready( function( $ ) {
             }
         });
         $target.find("input[name='regular_price']").trigger('input');
-    } );
-    $( '.has_controller' ).live( 'change', function( ) {
-        var parent_holder = $( this ).closest( '.fieldset_check' );
-        var controller = $( this );
-        if ( controller.is( ':checked' ) ) {
-            parent_holder.find( '.has_area' ).show( );
-        } else {
-            parent_holder.find( '.has_area' ).hide( );
-        }
-    } );
-    $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'change', function( e ) {
-        // Setup form validation on the #register-form element
 
         $( "#variation_popup" ).validate( {
+            messages: {
+                required: mp_product_admin_i18n.message_input_required
+            }
         } );
         $( '.mp-numeric' ).each( function( ) {
             $( this ).rules( 'add', {
@@ -828,9 +882,34 @@ jQuery( document ).ready( function( $ ) {
                 }
             } );
         } );
+
+        $( '#variation_popup input, #variation_popup textarea, #variation_popup select' ).live( 'keypress', function( e ) {
+        
+            $( '#save-variation-popup-data' ).toggleClass( "disabled", !$( 'form#variation_popup' ).valid() );
+        
+        } );
+
     } );
+    
+    $( '.has_controller' ).live( 'change', function( ) {
+        var parent_holder = $( this ).closest( '.fieldset_check' );
+        var controller = $( this );
+        if ( controller.is( ':checked' ) ) {
+            parent_holder.find( '.has_area' ).show( );
+        } else {
+            parent_holder.find( '.has_area' ).hide( );
+            if( controller.attr( 'name' ) == 'has_per_order_limit' ) $( "#per_order_limit" ).val( '' );
+        }
+
+    } );
+    
     $( '#save-variation-popup-data, .variation_description_button' ).live( 'click', function( e ) {
         var form = $( 'form#variation_popup' );
+        if( !form.valid() ) {
+            e.preventDefault( );
+            return;
+        }
+
         $( '.mp_ajax_response' ).attr( 'class', 'mp_ajax_response' );
         $( '.mp_ajax_response' ).html( mp_product_admin_i18n.saving_message );
         $.post(
@@ -848,8 +927,9 @@ jQuery( document ).ready( function( $ ) {
                 }
                 if ( $( '#new_variation' ).val( ) == 'yes' ) {
                     //window.opener.location.reload( false );
-                    parent.location.reload( )
                 }
+                // reload page on both new variation and update variation, as there's no way to dinamically update the variations table
+                parent.location.reload( );
             }
 
             if ( status == 'success' ) {
@@ -900,5 +980,32 @@ jQuery( document ).ready( function( $ ) {
         }
     });
     $target.find("input[name='regular_price']").trigger('input');
+
+    // Set default variant action
+    $('#mp-product-price-inventory-variants-metabox').on('click', 'tr:not(".default") a.set-default', function(event) {
+    	event.preventDefault();
+    	$this = $( this );
+    	post_id = $this.attr('data-post-id');
+    	meta_name = 'default_variation';
+    	meta_value = $this.attr('data-child-id');
+    	var data = {
+            action: 'save_inline_post_data',
+            post_id: post_id,
+            meta_name: meta_name,
+            meta_value: meta_value,
+            ajax_nonce: mp_product_admin_i18n.ajax_nonce
+        }
+
+		$this.children('.fa').addClass('fa-pulse');
+		$.post(
+			mp_product_admin_i18n.ajaxurl, 
+			data
+		).done( function( data, status ) {
+			$this.children('.fa').removeClass('fa-pulse');
+			if ( status == 'success' ) {
+				$this.parents('tr').addClass('default').siblings('tr').removeClass('default');
+			}
+		});
+    });
 
 } );

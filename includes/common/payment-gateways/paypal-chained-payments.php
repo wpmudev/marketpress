@@ -638,7 +638,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$base_total = $cart->product_total( false );
 
 		//calculate fees / get fees only for base price (excluding taxes and shipping)
-		$percentage = $this->get_network_setting( 'percentage', 0 );
+		$percentage = $this->get_network_setting( 'percentage', 0.01 );
 		$fee        = round( $percentage * 0.01 * $base_total, 2 );
 
 		$nvpstr .= "&receiverList.receiver(0).email=" . urlencode( $this->get_setting( 'email' ) );
@@ -773,11 +773,11 @@ if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && ! mp_cart()->is_glo
 			'desc'          => __( 'Enter a percentage of all store sales to collect as a fee. Decimals allowed.', 'mp' ),
 			'custom'        => array( 'style' => 'width:60px' ),
 			'before_field'  => '',
-			'default_value' => '0.00',
+			'default_value' => '0.01',
 			'validation'    => array(
 				'required' => true,
 				'number'   => true,
-				'min'      => 0,
+				'min'      => 0.01,
 			),
 		) );
 

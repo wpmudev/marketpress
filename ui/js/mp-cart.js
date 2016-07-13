@@ -227,7 +227,20 @@ var mp_cart = { };
         url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 
         marketpress.loadingOverlay( 'show' );
-        $this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
+        
+        var form_data = $form.serializeArray();
+
+        // Change siblings attr name to "other_'attr_name'" instead of just not sending them
+        // Used to get the current variation selected and check it's stock
+        
+        //$this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
+
+        $this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).each(function(i, el) {
+        	$(form_data).each(function(j, el2) {
+        		el2.name === $(el).attr( 'name' ) && ( form_data[j]['name'] = 'other_' + form_data[j]['name'] ) ;
+        	});
+        });
+
         //the this contex is product attributes select, there's no radio situation, so comment those value for now
         /*if ( !$this.is( ':radio' ) ) {
          $qtyChanged.val( '1' );
@@ -235,7 +248,7 @@ var mp_cart = { };
          $qtyChanged.val( '0' );
          }*/
 
-        $.post( url, $form.serialize() ).done( function( resp ) {
+        $.post( url, jQuery.param( form_data ) ).done( function( resp ) {
 
             marketpress.loadingOverlay( 'hide' );
             marketpress.ajaxEvent( 'mp_cart/after_update_product_attributes', resp );
@@ -284,6 +297,14 @@ var mp_cart = { };
 
                 if ( resp.data.price ) {
                     $container.find( '.mp_product_price' ).replaceWith( resp.data.price );
+                }
+
+                if ( resp.data.product_input ) {
+    				$container.find( '#mp_product_options_att_quantity-error' ).remove();
+					$container.find( '#mp_product_options_att_quantity' ).replaceWith( resp.data.product_input );
+						if ( typeof( resp.data.in_stock ) !== 'undefined' ) {
+                			$container.find( '#mp_product_options_att_quantity' ).trigger('blur');
+                		}    
                 }
 
                 $.each( resp.data, function( index, value ) {
@@ -420,7 +441,8 @@ var mp_cart = { };
                     mp_cart.update( resp.data.minicart );
 					mp_cart.update_widget( resp.data.widgetcart );
 					mp_cart.update_product_input( resp.data.product_input, $form );
-
+					mp_cart.update_product_buttons( resp.data.out_of_stock, $form );
+					
 					//Init button listeners when ajax loaded
 					mp_cart.initCartButtonListeners();
 
@@ -562,7 +584,26 @@ var mp_cart = { };
      * @param string html The product qty input.
      */
     mp_cart.update_product_input = function( html, $form ) {
-    	$form.find( '[name="product_quantity"]' ).after( html ).remove();
+    	$form.find( '#mp_product_options_att_quantity-error' ).remove();
+        if ( $( html ).is('label') ){
+            $form.find( '[name="product_quantity"]' ).prev( 'label' ).remove();
+        }
+        $form.find( '[name="product_quantity"]' ).after( html ).remove();
+    };
+
+     /**
+     * Update the product add to cart button
+     *
+     * @since 3.0
+     * @param bool is the product out of stock.
+     */
+    mp_cart.update_product_buttons = function( out_of_stock, $form ) {
+		if( out_of_stock === true ) {
+			$form.find( '.mp_button' ).attr( 'disabled' , true );
+		}
+		else {
+			$form.find( '.mp_button' ).attr( 'disabled' , false );
+		}
     };    
 
     /**
