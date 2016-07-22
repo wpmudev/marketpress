@@ -152,7 +152,7 @@ class MP_Checkout {
 		}
 
 		foreach ( $data as $key => $value ) {
-			$value = trim( $value );
+			$value = sanitize_text_field( trim( $value ) );
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
 		}
 
