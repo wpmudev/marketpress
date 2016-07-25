@@ -285,7 +285,7 @@ class MP_Cart {
 
 			case 'update_item' :
 				$this->update_item( $item_id, $qty );
-				$product      = new MP_Product( $item_id, $this->get_blog_id() );			
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				$product->qty = $qty;
 				wp_send_json_success( array(
 					'product'  => array( $item_id => $this->get_line_item( $product ) ),
@@ -384,7 +384,7 @@ class MP_Cart {
 
 		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
 			// Clean cookie from none product items
-			$cart_cookie_items = unserialize( $cart_cookie );		
+			$cart_cookie_items = unserialize( $cart_cookie );
 			foreach ( $cart_cookie_items as $blog_id => $blog_items ) {
 				foreach ( $blog_items as $item => $qty ) {
 					$product = new MP_Product( $item , $blog_id );
@@ -484,7 +484,7 @@ class MP_Cart {
 		if ( !is_array( $this->_id ) ) {
 			$items = mp_arr_get_value( $this->_id, $this->_items, array() );
 		}
-		
+
 		return (array) $items;
 	}
 
@@ -1095,7 +1095,8 @@ class MP_Cart {
 		 * @param int max qty to display on dropdown
 		 */
 
-		$max_dropdown 			= apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
+		//Adding the $id so we can change max quantity depending on product. Usefull for migrations like Appointments+ ;)
+		$max_dropdown 			= apply_filters( 'mp_cart/quantity_dropdown/max_default', 10, $id );
 
 
 		if ( $inventory_tracking && $out_of_stock_purchase !== '1' ) {
@@ -1127,19 +1128,22 @@ class MP_Cart {
 		// Build select field attributes
 		$attributes = mp_array_to_attributes( compact( 'name', 'class', 'id' ) );
 
-		$html = '
-			<select' . $attributes . '>';
-
-		if ( $selected >= $max ) {
-			$max = $selected;
-		}
-
-		for ( $i = 1; $i <= $max_dropdown; $i ++ ) {
+		if( $max_dropdown > 1 ){
+			$html = '
+				<select' . $attributes . '>';
+	
+			if ( $selected >= $max ) {
+				$max = $selected;
+			}
+	
+			for ( $i = 1; $i <= $max_dropdown; $i ++ ) {
+				$html .= '
+					<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
+			}
 			$html .= '
-				<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
+				</select>';
 		}
-		$html .= '
-			</select>';
+		else $html .= '<span class="item-quantity one-allowed">1</span>';
 
 		if ( $echo ) {
 			echo $html;
@@ -1561,7 +1565,7 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function product_total( $format = false ) {
-		
+
 		if( !$this->has_items() ){
 			return (float) 0;
 		}
@@ -1580,7 +1584,7 @@ class MP_Cart {
 				$items = $this->get_items_as_objects();
 
 				$total = 0;
-				
+
 				foreach ( $items as $item ) {
 					$price         = $item->get_price( 'lowest' );
 					$item_subtotal = ( $price * $item->qty );
@@ -1641,9 +1645,9 @@ class MP_Cart {
 			}
 
 			$items = $this->get_items_as_objects();
-			
+
 			$total = 0;
-			
+
 			foreach ( $items as $item ) {
 				if( $item->is_download() ){
 					continue;
@@ -1773,10 +1777,10 @@ class MP_Cart {
 			 */
 			do_action( 'mp_cart/after_remove_item', $item_id, $this->_id );
 		}
-		
+
 		if ( $this->_is_global_item_id( $item_id ) ) {
 			$this->reset_id();
-		}			
+		}
 	}
 
 	/**
@@ -2290,7 +2294,7 @@ class MP_Cart {
 		if( !$this->has_items() ){
 			return (float) 0;
 		}
-		
+
 		$tax_amt = 0;
 
 		$blog_ids = $this->get_blog_ids();
@@ -2358,7 +2362,7 @@ class MP_Cart {
 
 				// There will be oftenly rounding errors
 				$rounding_error = $total - $pre_total;
-				
+
 				//Shipping price should be added after products price calculation
 				$total = $total + $this->shipping_total();
 				//Fix the rounding error, if there is
@@ -2513,7 +2517,7 @@ class MP_Cart {
 	public function __construct( $use_cookies = true ) {
 		$this->_use_cookies = $use_cookies;
 		$this->set_id( get_current_blog_id() ); // we need the id for virtual carts too (without cookies)
-		
+
 		if ( $this->_use_cookies ) {
 			$this->_get_cart_cookie();
 		}
