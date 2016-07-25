@@ -1127,6 +1127,7 @@ class MP_Cart {
 
 		// Build select field attributes
 		$attributes = mp_array_to_attributes( compact( 'name', 'class', 'id' ) );
+		$html = '';
 
 		if( $max_dropdown > 1 ){
 			$html = '
