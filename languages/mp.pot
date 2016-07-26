@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.1\n"
+"Project-Id-Version: MarketPress 3.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2016-06-06 09:14:34+00:00\n"
+"POT-Creation-Date: 2016-07-26 09:05:50+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,7 +16,7 @@ msgstr ""
 #: includes/addons/class-mp-addons-list-table.php:20
 #: includes/admin/class-mp-product-attributes-admin.php:129
 #: includes/admin/class-mp-product-attributes-list-table.php:22
-#: includes/admin/class-mp-products-admin.php:2154
+#: includes/admin/class-mp-products-admin.php:2158
 #: includes/admin/class-mp-shortcode-builder.php:625
 #: includes/admin/class-mp-shortcode-builder.php:1412
 #: includes/admin/widgets/ms-global-categories.php:70
@@ -29,7 +29,7 @@ msgid "Name"
 msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:21
-#: includes/admin/class-mp-products-admin.php:2218
+#: includes/admin/class-mp-products-admin.php:2222
 #: includes/common/class-mp-product.php:2980
 msgid "Description"
 msgstr ""
@@ -82,7 +82,7 @@ msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupon.php:477
 #: includes/admin/class-mp-ajax.php:208
-#: includes/admin/class-mp-products-admin.php:1474
+#: includes/admin/class-mp-products-admin.php:1478
 msgid "Unlimited"
 msgstr ""
 
@@ -209,7 +209,7 @@ msgid "Select Category"
 msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:672
-#: includes/admin/class-mp-products-admin.php:2281
+#: includes/admin/class-mp-products-admin.php:2285
 msgid "Start Date"
 msgstr ""
 
@@ -486,8 +486,8 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:214
 #: includes/admin/class-mp-orders-admin.php:1012
-#: includes/admin/class-mp-products-admin.php:1896
-#: includes/admin/class-mp-products-admin.php:2136
+#: includes/admin/class-mp-products-admin.php:1900
+#: includes/admin/class-mp-products-admin.php:2140
 #: includes/admin/class-mp-store-settings-admin.php:111
 #: includes/admin/class-mp-store-settings-admin.php:223
 #: includes/common/class-mp-cart.php:697 includes/common/helpers.php:157
@@ -557,7 +557,7 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/templates/default/invoice.php:84
 #: includes/addons/mp-pdf-invoice/templates/default/packing.php:87
-#: includes/admin/class-mp-products-admin.php:1679
+#: includes/admin/class-mp-products-admin.php:1683
 #: includes/common/class-mp-cart.php:1382
 #: includes/common/class-mp-product.php:682
 msgid "Quantity"
@@ -568,12 +568,12 @@ msgstr ""
 #: includes/admin/class-mp-products-admin.php:379
 #: includes/admin/class-mp-products-admin.php:407
 #: includes/admin/class-mp-products-admin.php:528
-#: includes/admin/class-mp-products-admin.php:1461
-#: includes/admin/class-mp-products-admin.php:1511
-#: includes/admin/class-mp-products-admin.php:1888
-#: includes/admin/class-mp-products-admin.php:1997
-#: includes/admin/class-mp-products-admin.php:2128
-#: includes/admin/class-mp-products-admin.php:2268
+#: includes/admin/class-mp-products-admin.php:1465
+#: includes/admin/class-mp-products-admin.php:1515
+#: includes/admin/class-mp-products-admin.php:1892
+#: includes/admin/class-mp-products-admin.php:2001
+#: includes/admin/class-mp-products-admin.php:2132
+#: includes/admin/class-mp-products-admin.php:2272
 #: includes/common/class-mp-cart.php:1388 includes/common/helpers.php:95
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:130
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:276
@@ -765,8 +765,8 @@ msgstr ""
 
 #: includes/admin/class-mp-ajax.php:160
 #: includes/admin/class-mp-products-admin.php:406
-#: includes/admin/class-mp-products-admin.php:1910
-#: includes/admin/class-mp-products-admin.php:2162
+#: includes/admin/class-mp-products-admin.php:1914
+#: includes/admin/class-mp-products-admin.php:2166
 msgid "SKU"
 msgstr ""
 
@@ -775,12 +775,12 @@ msgid "(Stock Keeping Unit)"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:161
-#: includes/admin/class-mp-products-admin.php:1454
+#: includes/admin/class-mp-products-admin.php:1458
 msgid "Enter SKU"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:164
-#: includes/admin/class-mp-products-admin.php:1462
+#: includes/admin/class-mp-products-admin.php:1466
 msgid "Enter Price"
 msgstr ""
 
@@ -793,9 +793,9 @@ msgid "http://"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:178
-#: includes/admin/class-mp-products-admin.php:1760
-#: includes/admin/class-mp-products-admin.php:1948
-#: includes/admin/class-mp-products-admin.php:2205
+#: includes/admin/class-mp-products-admin.php:1764
+#: includes/admin/class-mp-products-admin.php:1952
+#: includes/admin/class-mp-products-admin.php:2209
 msgid "File URL"
 msgstr ""
 
@@ -816,12 +816,12 @@ msgid "Limit Per Order"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:220
-#: includes/admin/class-mp-products-admin.php:1489
+#: includes/admin/class-mp-products-admin.php:1493
 msgid "Set up a Sale for this Product"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:223
-#: includes/admin/class-mp-products-admin.php:1510
+#: includes/admin/class-mp-products-admin.php:1514
 msgid "Enter Sale Price"
 msgstr ""
 
@@ -830,26 +830,26 @@ msgid "Percentage Discount"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:225
-#: includes/admin/class-mp-products-admin.php:1531
-#: includes/admin/class-mp-products-admin.php:2010
+#: includes/admin/class-mp-products-admin.php:1535
+#: includes/admin/class-mp-products-admin.php:2014
 msgid "Start Date (if applicable)"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:226
-#: includes/admin/class-mp-products-admin.php:1535
-#: includes/admin/class-mp-products-admin.php:2015
-#: includes/admin/class-mp-products-admin.php:2286
+#: includes/admin/class-mp-products-admin.php:1539
+#: includes/admin/class-mp-products-admin.php:2019
+#: includes/admin/class-mp-products-admin.php:2290
 msgid "End Date (if applicable)"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:238
-#: includes/admin/class-mp-products-admin.php:1541
+#: includes/admin/class-mp-products-admin.php:1545
 msgid "Charge Taxes (Special Rate)"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:241
-#: includes/admin/class-mp-products-admin.php:1567
-#: includes/admin/class-mp-products-admin.php:2030
+#: includes/admin/class-mp-products-admin.php:1571
+#: includes/admin/class-mp-products-admin.php:2034
 msgid ""
 "If you would like this product to use a special tax rate, enter it here. If "
 "you omit the \"%\" symbol the rate will be calculated as a fixed amount for "
@@ -857,20 +857,20 @@ msgid ""
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:242
-#: includes/admin/class-mp-products-admin.php:1564
-#: includes/admin/class-mp-products-admin.php:2028
-#: includes/admin/class-mp-products-admin.php:2346
+#: includes/admin/class-mp-products-admin.php:1568
+#: includes/admin/class-mp-products-admin.php:2032
+#: includes/admin/class-mp-products-admin.php:2350
 msgid "Special Tax Rate"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:243
-#: includes/admin/class-mp-products-admin.php:1565
+#: includes/admin/class-mp-products-admin.php:1569
 #: includes/admin/store-settings/class-mp-store-settings-general.php:454
 msgid "Tax Rate"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:257
-#: includes/admin/class-mp-products-admin.php:1591
+#: includes/admin/class-mp-products-admin.php:1595
 msgid "Charge Shipping"
 msgstr ""
 
@@ -891,7 +891,7 @@ msgid "Extra Shipping Cost (if applicable)"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:283
-#: includes/admin/class-mp-products-admin.php:1653
+#: includes/admin/class-mp-products-admin.php:1657
 msgid "Track Product Inventory"
 msgstr ""
 
@@ -900,7 +900,7 @@ msgid "Quantity:"
 msgstr ""
 
 #: includes/admin/class-mp-ajax.php:287
-#: includes/admin/class-mp-products-admin.php:1704
+#: includes/admin/class-mp-products-admin.php:1708
 msgid "Allow this product to be purchased even if it's out of stock"
 msgstr ""
 
@@ -1123,6 +1123,7 @@ msgid "Add Pages to Menu"
 msgstr ""
 
 #: includes/admin/class-mp-exporter-orders.php:15
+#: includes/admin/class-mp-products-admin.php:1117
 msgid "Cheatin&#8217; uh?"
 msgstr ""
 
@@ -1515,16 +1516,16 @@ msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:383
 #: includes/admin/class-mp-products-admin.php:530
-#: includes/admin/class-mp-products-admin.php:1494
-#: includes/admin/class-mp-products-admin.php:1991
+#: includes/admin/class-mp-products-admin.php:1498
+#: includes/admin/class-mp-products-admin.php:1995
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-variations.php:134
 msgid "Sale Price"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:404
-#: includes/admin/class-mp-products-admin.php:1735
-#: includes/admin/class-mp-products-admin.php:1747
-#: includes/admin/class-mp-products-admin.php:2101
+#: includes/admin/class-mp-products-admin.php:1739
+#: includes/admin/class-mp-products-admin.php:1751
+#: includes/admin/class-mp-products-admin.php:2105
 msgid "Variations"
 msgstr ""
 
@@ -1555,7 +1556,7 @@ msgid "OR"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:533
-#: includes/admin/class-mp-products-admin.php:1522
+#: includes/admin/class-mp-products-admin.php:1526
 msgid "% discount"
 msgstr ""
 
@@ -1571,87 +1572,87 @@ msgstr ""
 msgid "Changes saved successfully"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1359
+#: includes/admin/class-mp-products-admin.php:1363
 #: includes/common/class-mp-product.php:2964
 msgid "Related Products"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1362
+#: includes/admin/class-mp-products-admin.php:1366
 msgid ""
 "If you would like, you can choose specific related products instead of "
 "using the ones generated by MarketPress"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1368
+#: includes/admin/class-mp-products-admin.php:1372
 msgid "Choose Products"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1386
+#: includes/admin/class-mp-products-admin.php:1390
 msgid "Featured Product"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1393
+#: includes/admin/class-mp-products-admin.php:1397
 msgid "Is Featured?"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1406
+#: includes/admin/class-mp-products-admin.php:1410
 msgid "Product Kind %1$s(Physical Product, Digital, etc)%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1412
+#: includes/admin/class-mp-products-admin.php:1416
 msgid "Physical / Tangible Product"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1413
+#: includes/admin/class-mp-products-admin.php:1417
 msgid "Digital Download"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1422
+#: includes/admin/class-mp-products-admin.php:1426
 msgid "External / Affiliate Link"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1445
+#: includes/admin/class-mp-products-admin.php:1449
 msgid "Product Variations"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1445
+#: includes/admin/class-mp-products-admin.php:1449
 msgid ""
 "%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and "
 "create Product Variants (if appropriate for your product).%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1455
+#: includes/admin/class-mp-products-admin.php:1459
 msgid "SKU %1$s(Stock Keeping Unit)%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1473
+#: includes/admin/class-mp-products-admin.php:1477
 msgid ""
 "Limit Per Order %1$s(limit the number of the item a shopper can buy per "
 "order)%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1578
-#: includes/admin/class-mp-products-admin.php:2036
-#: includes/admin/class-mp-products-admin.php:2354
+#: includes/admin/class-mp-products-admin.php:1582
+#: includes/admin/class-mp-products-admin.php:2040
+#: includes/admin/class-mp-products-admin.php:2358
 msgid "Please enter a valid tax rate"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1601
-#: includes/admin/class-mp-products-admin.php:2050
-#: includes/admin/class-mp-products-admin.php:2297
+#: includes/admin/class-mp-products-admin.php:1605
+#: includes/admin/class-mp-products-admin.php:2054
+#: includes/admin/class-mp-products-admin.php:2301
 msgid "Weight"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1618
+#: includes/admin/class-mp-products-admin.php:1622
 #: includes/admin/class-mp-setup-wizard.php:548
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:166
 #: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
 msgid "Kilograms"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1626
-#: includes/admin/class-mp-products-admin.php:2061
-#: includes/admin/class-mp-products-admin.php:2307
+#: includes/admin/class-mp-products-admin.php:1630
+#: includes/admin/class-mp-products-admin.php:2065
+#: includes/admin/class-mp-products-admin.php:2311
 #: includes/admin/class-mp-setup-wizard.php:547
 #: includes/admin/store-settings/class-mp-store-settings-shipping.php:165
 #: includes/common/shipping-modules/class-mp-shipping-api-calculated.php:146
@@ -1659,100 +1660,100 @@ msgstr ""
 msgid "Pounds"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1633
-#: includes/admin/class-mp-products-admin.php:2069
-#: includes/admin/class-mp-products-admin.php:2316
+#: includes/admin/class-mp-products-admin.php:1637
+#: includes/admin/class-mp-products-admin.php:2073
+#: includes/admin/class-mp-products-admin.php:2320
 #: includes/common/shipping-modules/class-mp-shipping-api.php:228
 msgid "Ounces"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1642
+#: includes/admin/class-mp-products-admin.php:1646
 msgid "Extra Shipping Cost %1$s(if applicable)%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1717
+#: includes/admin/class-mp-products-admin.php:1721
 msgid "This is a unique product without variations"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1718
+#: includes/admin/class-mp-products-admin.php:1722
 msgid "This product has a multiple variations %1$s(e.g. Multiple colors, sizes)%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1746
+#: includes/admin/class-mp-products-admin.php:1750
 msgid "%3$sAdd variations for%2$s %1$sProduct%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1748
+#: includes/admin/class-mp-products-admin.php:1752
 msgid ""
 "Add variations for this product. e.g. If you are selling t-shirts, you can "
 "create Color & Size variations"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1780
+#: includes/admin/class-mp-products-admin.php:1784
 msgid "External Link"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1809
+#: includes/admin/class-mp-products-admin.php:1813
 msgid ""
 "%1$sProduct Images%2$s %3$sAdd images of the product. The first image on "
 "the list is the featured image for this product (you can reorder images on "
 "the list)%2$s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1869
+#: includes/admin/class-mp-products-admin.php:1873
 msgid "Product Details"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1883
-#: includes/admin/class-mp-products-admin.php:2123
+#: includes/admin/class-mp-products-admin.php:1887
+#: includes/admin/class-mp-products-admin.php:2127
 #: includes/admin/class-mp-store-settings-admin.php:108
 #: includes/admin/class-mp-store-settings-admin.php:255
 msgid "General"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1892
-#: includes/admin/class-mp-products-admin.php:2132 includes/common/data.php:34
+#: includes/admin/class-mp-products-admin.php:1896
+#: includes/admin/class-mp-products-admin.php:2136 includes/common/data.php:34
 #: includes/common/helpers.php:139
 msgid "Taxes"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1915
-#: includes/admin/class-mp-products-admin.php:2172
+#: includes/admin/class-mp-products-admin.php:1919
+#: includes/admin/class-mp-products-admin.php:2176
 msgid "Track Inventory?"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1925
-#: includes/admin/class-mp-products-admin.php:2182
+#: includes/admin/class-mp-products-admin.php:1929
+#: includes/admin/class-mp-products-admin.php:2186
 msgid "Inventory Count"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1926
-#: includes/admin/class-mp-products-admin.php:2183
+#: includes/admin/class-mp-products-admin.php:1930
+#: includes/admin/class-mp-products-admin.php:2187
 msgid "Enter the quantity that you have available to sell."
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1961
-#: includes/admin/class-mp-products-admin.php:2224
+#: includes/admin/class-mp-products-admin.php:1965
+#: includes/admin/class-mp-products-admin.php:2228
 msgid "External URL"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1981
-#: includes/admin/class-mp-products-admin.php:2244
+#: includes/admin/class-mp-products-admin.php:1985
+#: includes/admin/class-mp-products-admin.php:2248
 msgid "Regular Price"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:1999
-#: includes/admin/class-mp-products-admin.php:2270
+#: includes/admin/class-mp-products-admin.php:2003
+#: includes/admin/class-mp-products-admin.php:2274
 msgid "Value must be less than regular price"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2078
-#: includes/admin/class-mp-products-admin.php:2325
+#: includes/admin/class-mp-products-admin.php:2082
+#: includes/admin/class-mp-products-admin.php:2329
 #: includes/common/shipping-modules/class-mp-shipping-api.php:507
 msgid "Extra Shipping Cost"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2104
+#: includes/admin/class-mp-products-admin.php:2108
 msgid ""
 "Create your product variations here. You can reorder variations by using "
 "the number to left of each variation, or delete one by clicking the \"x\" "
@@ -1761,37 +1762,37 @@ msgid ""
 "from this variation will be used in product listings.</strong>"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2115
+#: includes/admin/class-mp-products-admin.php:2119
 msgid "Add Variation"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2140
+#: includes/admin/class-mp-products-admin.php:2144
 #: includes/admin/class-mp-shortcode-builder.php:223
 msgid "Attributes"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2167
+#: includes/admin/class-mp-products-admin.php:2171
 msgid "Image"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2219
+#: includes/admin/class-mp-products-admin.php:2223
 msgid ""
 "If you would like the description to be different than the main product "
 "enter it here."
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2258
+#: includes/admin/class-mp-products-admin.php:2262
 msgid "Sale Price (if applicable)"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2347
+#: includes/admin/class-mp-products-admin.php:2351
 msgid ""
 "If you would like this variation to use a special tax rate, enter it here. "
 "If you omit the \"%\" symbol the rate will be calculated as a fixed amount "
 "for each of this product in the user's cart."
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2364
+#: includes/admin/class-mp-products-admin.php:2368
 msgid ""
 "Each product variation needs to have product attributes assigned to it so "
 "the system knows how to differentiate one product variation from the other. "
@@ -1799,11 +1800,11 @@ msgid ""
 "before choosing any attributes."
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2378
+#: includes/admin/class-mp-products-admin.php:2382
 msgid "Select a %s"
 msgstr ""
 
-#: includes/admin/class-mp-products-admin.php:2417
+#: includes/admin/class-mp-products-admin.php:2421
 msgid "Enter your product name here"
 msgstr ""
 
