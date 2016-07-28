@@ -323,7 +323,7 @@ class MP_Products_Screen {
 			$post_id = $parent->ID;
 		}
 
-		delete_transient( 'mp_get_variations_'.$post_id );
+		delete_transient( 'mp-get-variations-'.$post_id );
 	}
 
 	/**
