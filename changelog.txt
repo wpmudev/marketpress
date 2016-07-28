@@ -4,13 +4,19 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.1.1
+----------------------------------------------------------------------
+
+- Security: Fix XSS Vulnerability
+- Localization: Updated language file (.pot)
+
 3.1
 ----------------------------------------------------------------------
 
 - Fixed: Various issues with Mollie gateway
 - Fixed: Fix checkout problems with Digital Products
 - Fixed: Cart product links returning 404
-- Fixed: Order confirmation email with Stripe
+- Fixed: Order confirmation email with Stripe gateway
 - Tweaked: UX improvements on product variations
 - Tweaked: Performance improvements (variations)
 - Localization: Updated language file (.pot)
