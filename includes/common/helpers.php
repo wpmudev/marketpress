@@ -1,4 +1,5 @@
 <?php
+if( !defined('MP_EMAIL_USE_BILLIG_NAME')) define('MP_EMAIL_USE_BILLIG_NAME', false);
 
 if ( ! function_exists( 'mp' ) ) :
 
@@ -255,7 +256,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		// Tracking URL
 		$tracking_url = $order->tracking_url( false );
 
-		$customer_name = trim( $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ) );
+		$customer_name = MP_EMAIL_USE_BILLIG_NAME ? $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) : $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' );
 
 		// If we don't have shipping name (for example on digital download only orders), lets use the name on the billing info
 		if( empty( $customer_name ) ) $customer_name = trim( $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) );

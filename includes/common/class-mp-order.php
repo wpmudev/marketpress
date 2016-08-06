@@ -245,7 +245,8 @@ class MP_Order {
 
 			mp_send_email( $billing_email, $subject, $msg, $attachments );
 
-			if ( $billing_email != $shipping_email ) {
+			$send_shipping_email = apply_filters( 'mp_order/send_shipping_email', $billing_email != $shipping_email, $billing_email, $shipping_email );
+			if ( $send_shipping_email ) {
 				// Billing email is different than shipping email so let's send an email to the shipping email too
 				mp_send_email( $shipping_email, $subject, $msg, $attachments );
 			}
@@ -575,7 +576,8 @@ class MP_Order {
 								<a href="<?php echo $item['url'] ?>"><?php echo $item['name'] ?></a>
 							</h2>
 							<?php
-							if ( $product->is_download() && mp_is_shop_page( 'order_status' ) ) {
+							$print_download_link = apply_filters( 'mp_order/print_download_link', $product->is_download() && mp_is_shop_page( 'order_status' ), $product, $product_id );
+							if ( $print_download_link ) {
 								echo '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
 							}
 							?>
