@@ -2286,12 +2286,12 @@ class MP_Product {
 		$has_stock = false;
 
 		if( $include_cart ) {
-			$cart_quantity = $qty;
+			$cart_quantity = 0;
 			$cart_items	= mp_cart()->get_all_items();
 			if ( isset( $cart_items[ get_current_blog_id() ][ $this->ID ] ) ) {
 				$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $this->ID ];
 			}
-			$qty = $cart_quantity + 1;
+			$qty = $cart_quantity + $qty;
 		}
 
 		if ( $this->is_variation() ) {
