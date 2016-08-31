@@ -469,7 +469,7 @@ class MP_Product {
 
 			$json['excerpt'] = mp_get_the_excerpt( $selected_variation->ID, 18 );
 
-			$json['price'] = $variation->display_price( false );
+			$json['price'] = $selected_variation->display_price( false );
 		}
 
 		wp_send_json_success( $json );
