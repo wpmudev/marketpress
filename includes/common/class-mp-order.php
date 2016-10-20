@@ -974,7 +974,7 @@ class MP_Order {
 				} else {
 					$status = __( 'Shipped', 'mp' );
 				}
-				
+
 				if ( $tracking_num = $this->get_meta( 'mp_shipping_info->tracking_num' ) ) {
 					$status = $this->tracking_link( false );
 				}
@@ -985,7 +985,7 @@ class MP_Order {
 					$status = __( 'Finished', 'mp' );
 				} else {
 					$status = __( 'In Process', 'mp' );
-				}			
+				}
 				break;
 
 			case 'order_closed' :
@@ -1041,7 +1041,7 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$html = apply_filters( 'mp_order/header', $html, $this );
-		
+
 		$tracked = $this->get_meta( 'mp_ga_tracked' );
 
 		if( !$tracked ) {
@@ -1200,7 +1200,7 @@ class MP_Order {
 				if ( mp_get_setting( 'inventory_remove' ) && $new_stock <= 0 ) {
 					// Flag product as out of stock - @version 2.9.5.8
 					wp_update_post( array(
-						'ID'          => $this->ID,
+						'ID'          => $item->ID,
 						'post_status' => 'out_of_stock'
 					) );
 				}
@@ -1416,7 +1416,7 @@ class MP_Order {
 		 */
 		$url = apply_filters( 'mp_order/tracking_link', $url, $tracking_number, $method );
 
-		// At this point, if method is custom and $url was empty and no filters has been added then $url should be equal at $tracking_number 
+		// At this point, if method is custom and $url was empty and no filters has been added then $url should be equal at $tracking_number
 
 		if( $url == $tracking_number ) {
 			$link = '<span>' . sprintf(__( 'Shipped: tracking code: %s', 'mp' ), $tracking_number ) . '</a>';
