@@ -8,7 +8,7 @@ if ( is_multisite() ) {
 //Product tags cloud
 	class MarketPress_Global_Category_List_Widget extends WP_Widget {
 
-		function MarketPress_Global_Category_List_Widget() {
+		function __construct() {
 			$widget_ops = array( 'classname'   => 'mp_global_category_list_widget',
 			                     'description' => __( "Displays a network-wide HTML list of product categories from network MarketPress stores." )
 			);
