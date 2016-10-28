@@ -64,6 +64,17 @@ class MP_Admin_Multisite {
 				'force_check_global_gateway'
 			), 10, 4 );
 		}
+		//On blog status change update blog_public status
+		add_action( 'activate_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'make_ham_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'unarchive_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'make_undelete_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'activate_blog', array( $this, 'set_blog_public_global_products' ) );
+		
+		add_action( 'delete_blog', array( $this, 'unset_blog_public_global_products' ) );
+		add_action( 'deactivate_blog', array( $this, 'unset_blog_public_global_products' ) );
+		add_action( 'archive_blog', array( $this, 'unset_blog_public_global_products' ) );
+		add_action( 'make_spam_blog', array( $this, 'unset_blog_public_global_products' ) );
 	}
 	
 	/**
@@ -541,6 +552,62 @@ class MP_Admin_Multisite {
 				trigger_error( 'Error! MP_Admin_Multisite doesn\'t have a ' . $method . ' method.', E_USER_ERROR );
 				break;
 		}
+	}
+
+	/**
+	 * Update blog_public state to 1 on blog status change
+	 *
+	 * @since 3.1.2
+	 * @access public
+	 * 
+	 */
+	public function set_blog_public_global_products( $blog_id ){
+
+		if( is_integer( $blog_id ) ){
+
+			global $wpdb;
+
+			$global_products_table = "{$wpdb->base_prefix}mp_products";
+
+			$wpdb->update( $global_products_table,
+				array(
+					'blog_public' => 1
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+
+		}
+
+	}
+
+	/**
+	 * Update blog_public state to 0 on blog status change	 
+	 */
+	public function unset_blog_public_global_products( $blog_id ){
+
+		if( is_integer( $blog_id ) ){
+
+			global $wpdb;
+
+			$global_products_table = "{$wpdb->base_prefix}mp_products";
+
+			$wpdb->update( $global_products_table,
+				array(
+					'blog_public' => 0
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+
+		}
+
 	}
 
 }

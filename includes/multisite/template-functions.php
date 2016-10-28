@@ -219,7 +219,7 @@ if ( ! function_exists( 'mp_global_list_products' ) ) {
 		//build SQL
 		$sql   = "SELECT SQL_CALC_FOUND_ROWS products.* FROM {$wpdb->base_prefix}mp_products products";
 		$join  = "";
-		$where = " WHERE post_status = 'publish'";
+		$where = " WHERE post_status = 'publish' AND blog_public = 1";
 		$group = "";
 		
 		if ( ! empty( $args['category'] ) || ! empty( $args['tag'] ) ) {
