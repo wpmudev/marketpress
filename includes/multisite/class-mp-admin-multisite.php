@@ -568,10 +568,22 @@ class MP_Admin_Multisite {
 			global $wpdb;
 
 			$global_products_table = "{$wpdb->base_prefix}mp_products";
+			$global_term_relationships_table = "{$wpdb->base_prefix}mp_term_relationships";
 
 			$wpdb->update( $global_products_table,
 				array(
 					'blog_public' => 1
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+			
+			$wpdb->update( $global_term_relationships_table,
+				array(
+					'public' => 1
 				),
 				array(
 					'blog_id' => $blog_id
@@ -594,10 +606,22 @@ class MP_Admin_Multisite {
 			global $wpdb;
 
 			$global_products_table = "{$wpdb->base_prefix}mp_products";
+			$global_term_relationships_table = "{$wpdb->base_prefix}mp_term_relationships";
 
 			$wpdb->update( $global_products_table,
 				array(
 					'blog_public' => 0
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+			
+			$wpdb->update( $global_term_relationships_table,
+				array(
+					'public' => 0
 				),
 				array(
 					'blog_id' => $blog_id

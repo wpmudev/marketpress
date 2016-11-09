@@ -780,9 +780,12 @@ if ( ! function_exists( 'mp_global_taxonomy_list' ) ) :
 		extract( $atts );
 
 		//build the sql
-		$sql     = $wpdb->prepare( "SELECT * FROM {$wpdb->base_prefix}mp_terms WHERE `type`=%s", $taxonomy );
+		$sql     = $wpdb->prepare( "SELECT t.* FROM {$wpdb->base_prefix}mp_terms AS t 
+			LEFT JOIN {$wpdb->base_prefix}mp_term_relationships AS r ON t.term_id = r.term_id
+			WHERE `type`=%s AND r.public = 1 
+			GROUP BY t.term_id HAVING COUNT(r.term_id) > 0", $taxonomy );
 		$results = $wpdb->get_results( $sql );
-
+		
 		if ( $taxonomy == 'product_tag' ) {
 			$html = _mp_global_tags_cloud( $results, $taxonomy );
 		} else {
