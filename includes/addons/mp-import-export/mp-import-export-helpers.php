@@ -62,6 +62,7 @@ function mp_get_products_csv_columns() {
 		'weight_extra_shipping_cost' => array( 'name' => __( 'Weight Extra Shipping Cost', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_extra_shipping_cost' ),
 		'weight_pounds'              => array( 'name' => __( 'Weight Pounds', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_pounds' ),
 		'weight_ounces'              => array( 'name' => __( 'Weight Ounces', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_ounces' ),
+		'featured'              	 => array( 'name' => __( 'Featured Product', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_featured' ),
 	); 
 	
 } // END function mp_get_products_csv_columns
