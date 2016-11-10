@@ -612,9 +612,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					'email'    => true,
 				),
 			) );
-		} else {
-			$this->common_metabox_fields( $metabox );
 		}
+		
+		$this->common_metabox_fields( $metabox );
 	}
 
 	/**
