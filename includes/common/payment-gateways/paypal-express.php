@@ -383,7 +383,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 			if ( $cart->is_global ) {
 				//check if the current merchant don't have email setting, we bypass
-				$merchant_email = mp_get_setting( 'gateways->paypal_express->merchant_email' );
+				$merchant_email = mp_get_network_setting( 'gateways' )['paypal_express']['merchant_email'];
 				$merchant_email = trim( $merchant_email );
 				if ( empty( $merchant_email ) || strlen( $merchant_email ) == 0 ) {
 					continue;
