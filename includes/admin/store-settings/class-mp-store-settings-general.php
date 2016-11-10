@@ -51,14 +51,13 @@ class MP_Store_Settings_General {
 	private function __construct() {
 		add_action( 'wpmudev_field/print_scripts/base_country', array( &$this, 'update_states_dropdown' ) );
 		add_action( 'wpmudev_field/print_scripts/currency', array( &$this, 'update_currency_symbol' ) );
-		add_action( 'wpmudev_field/print_scripts/product_post_type', array( &$this, 'product_post_type_alert' ) );
 		add_action( 'wpmudev_metabox/after_settings_metabox_saved', array( &$this, 'update_product_post_type' ) );
 		add_action( 'init', array( &$this, 'init_metaboxes' ) );
 
 		add_filter( 'wpmudev_field/format_value/tax[rate]', array( &$this, 'format_tax_rate_value' ), 10, 2 );
 		add_filter( 'wpmudev_field/sanitize_for_db/tax[rate]', array( &$this, 'save_tax_rate_value' ), 10, 3 );
 
-		foreach ( mp()->canadian_provinces as $key => $value ) {
+		foreach ( mp()->CA_provinces as $key => $value ) {
 			add_filter( 'wpmudev_field/format_value/tax[canada_rate][' . $key . ']', array( &$this, 'format_tax_rate_value' ), 10, 2 );
 			add_filter( 'wpmudev_field/sanitize_for_db/tax[canada_rate][' . $key . ']', array( &$this, 'save_tax_rate_value' ), 10, 3 );
 		}
@@ -91,39 +90,21 @@ class MP_Store_Settings_General {
 	public function update_product_post_type( $metabox ) {
 		global $wpdb;
 
-		if ( $metabox->args[ 'id' ] != 'mp-settings-general-advanced-settings' || mp_get_setting( 'product_post_type' ) != 'mp_product' ) {
+		if ( $metabox->args[ 'id' ] != 'mp-settings-general-advanced-settings' ) {
 			return;
 		}
 
-		$wpdb->update( $wpdb->posts, array( 'post_type' => 'mp_product' ), array( 'post_type' => 'product' ) );
+		$new_product_post_type = mp_get_setting( 'product_post_type' );
+		$old_product_post_type = $new_product_post_type == 'mp_product' ? 'product' : 'mp_product';
+
+		// Check if there is at least 1 product with the old post type
+		$check = $wpdb->get_results( "SELECT * FROM {$wpdb->posts} WHERE post_type = '{$old_product_post_type}'", ARRAY_A );
+		if ( null === $check ) {
+			return;
+		}
+
+		$wpdb->update( $wpdb->posts, array( 'post_type' => $new_product_post_type ), array( 'post_type' => $old_product_post_type ) );
 		update_option( 'mp_flush_rewrites', 1 );
-	}
-
-	/**
-	 * Print javascript for displaying an alert when checking the "change product post type" field
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wpmudev_field/print_scripts/product_post_type
-	 */
-	public function product_post_type_alert() {
-		?>
-		<script type="text/javascript">
-			jQuery( document ).ready( function( $ ) {
-				$( 'input[name="product_post_type"]' ).change( function() {
-					var $this = $( this );
-
-					if ( $this.is( ':checked' ) ) {
-						var response = confirm( "<?php _e( 'IMPORTANT! Enabling this setting is permanent!\n\nAre you sure you want to continue?', 'mp' ); ?>" );
-
-						if ( !response ) {
-							$this.prop( 'checked', false );
-						}
-					}
-				} );
-			} );
-		</script>
-		<?php
 	}
 
 	/**
@@ -237,22 +218,24 @@ class MP_Store_Settings_General {
 	 * @access public
 	 */
 	public function init_advanced_settings() {
-		if ( MP_Product::get_post_type() == 'mp_product' ) {
-			return;
-		}
-
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'			 => 'mp-settings-general-advanced-settings',
 			'page_slugs'	 => array( 'store-settings', 'toplevel_page_store-settings' ),
 			'title'			 => __( 'Advanced Settings', 'mp' ),
 			'option_name'	 => 'mp_settings',
 		) );
-		$metabox->add_field( 'checkbox', array(
-			'name'		 => 'product_post_type',
-			'label'		 => array( 'text' => __( 'Change product post type', 'mp' ) ),
-			'desc'		 => __( 'If you are experiencing conflicts with other e-commerce plugins enable this setting. This will change the internal post type of all your products from "product" to "mp_product". <strong>Please note that enabling this option may break 3rd party themes or plugins.</strong>', 'mp' ),
+
+		$metabox->add_field( 'radio_group', array(
+			'name'			 => 'product_post_type',
+			'label'			 => array( 'text' => __( 'Change product post type', 'mp' ) ),
+			'desc'		 => __( 'If you are experiencing conflicts with other e-commerce plugins change this setting. This will change the internal post type of all your products. <strong>Please note that changing this option may break 3rd party themes or plugins.</strong>', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
-			'value'		 => 'mp_product',
+			'default_value'	 => 'product',
+			'orientation'	 => 'horizontal',
+			'options'		 => array(
+				'product'	 => __( 'product (default)', 'mp' ),
+				'mp_product'	 => 'mp_product',
+			),
 		) );
 	}
 
@@ -474,15 +457,15 @@ class MP_Store_Settings_General {
 			'validation'	 => array(
 				'number' => true,
 			),
-			'conditional'	 => array(
+			/*'conditional'	 => array(
 				'name'	 => 'base_country',
 				'value'	 => 'CA',
 				'action' => 'hide',
-			),
+			),*/
 		) );
 
 		// Create field for each canadian province
-		foreach ( mp()->canadian_provinces as $key => $label ) {
+		foreach ( mp()->CA_provinces as $key => $label ) {
 			$metabox->add_field( 'text', array(
 				'name'			 => 'tax[canada_rate][' . $key . ']',
 				'desc'			 => '<a target="_blank" href="http://en.wikipedia.org/wiki/Sales_taxes_in_Canada">' . __( 'Current Rates', 'mp' ) . '</a>',
@@ -533,6 +516,7 @@ class MP_Store_Settings_General {
 			'desc'		 => __( 'Please see your local tax laws. Note if this is enabled and a downloadable only cart, rates will be the default for your base location.', 'mp' ),
 			'message'	 => __( 'Yes', 'mp' ),
 		) );
+		/*
 		$metabox->add_field( 'radio_group', array(
 			'name'			 => 'tax[tax_based]',
 			'label'			 => array( 'text' => __( 'Tax based on?', 'mp' ) ),
@@ -548,6 +532,7 @@ class MP_Store_Settings_General {
 				'action' => 'show',
 			),
 		) );
+		*/
 	}
 	
 	/**
@@ -574,7 +559,7 @@ class MP_Store_Settings_General {
 		$metabox->add_field( 'radio_group', array(
 			'name'			 => 'details_collection',
 			'label'			 => array( 'text' => __( 'Details Collection', 'mp' ) ),
-			'default_value'	 => 'full',
+			'default_value'	 => 'contact',
 			'orientation'	 => 'horizontal',
 			'options'		 => array(
 				'full'		 => __( 'Full billing info', 'mp' ),
@@ -602,13 +587,19 @@ class MP_Store_Settings_General {
 			'placeholder'	 => __( 'Select a Country', 'mp' ),
 			'multiple'		 => false,
 			'label'			 => array( 'text' => __( 'Base Country', 'mp' ) ),
-			'options'		 => array( '' => __( 'Select A Country' ) ) + mp()->countries,
+			'options'		 => array( '' => __( 'Select A Country' ) ) + mp_countries(),
 			'width'			 => 'element',
 			'validation'	 => array(
 				'required' => true,
 			),
 		) );
 
+		$countries_with_states = array();
+		foreach ( mp_countries() as $code => $country ) {
+			if( property_exists( mp(), $code.'_provinces' ) ) {
+				$countries_with_states[] = $code;
+			}
+		}
 		$states = mp_get_states( mp_get_setting( 'base_country' ) );
 		$metabox->add_field( 'advanced_select', array(
 			'name'			 => 'base_province',
@@ -619,13 +610,15 @@ class MP_Store_Settings_General {
 			'width'			 => 'element',
 			'conditional'	 => array(
 				'name'	 => 'base_country',
-				'value'	 => array( 'US', 'CA', 'GB', 'AU' ),
+				'value'	 => $countries_with_states,
 				'action' => 'show',
 			),
 			'validation'	 => array(
 				'required' => true,
 			),
 		) );
+
+		$countries_without_postcode = array_keys( mp()->countries_no_postcode );
 		$metabox->add_field( 'text', array(
 			'name'			 => 'base_zip',
 			'label'			 => array( 'text' => __( 'Base Zip/Postal Code', 'mp' ) ),
@@ -635,8 +628,8 @@ class MP_Store_Settings_General {
 			),
 			'conditional'	 => array(
 				'name'	 => 'base_country',
-				'value'	 => array( 'US', 'CA', 'GB', 'AU', 'UM', 'AS', 'FM', 'GU', 'MH', 'MP', 'PW', 'PR', 'PI' ),
-				'action' => 'show',
+				'value'	 => $countries_without_postcode,
+				'action' => 'hide',
 			),
 			'validation'	 => array(
 				'required' => true,

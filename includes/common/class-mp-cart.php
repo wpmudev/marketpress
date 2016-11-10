@@ -101,7 +101,7 @@ class MP_Cart {
 	public $is_editable = true;
 
 	/*	 * Refers to the number of times products have been downloaded
-	 * 
+	 *
 	 *
 	 * @since 3.0
 	 * @access public
@@ -135,36 +135,16 @@ class MP_Cart {
 	 */
 	public function add_item( $item_id, $qty = 1 ) {
 		$cart_updated = true;
+		$product      = new MP_Product( $item_id );
+		$max          = $product->max_product_quantity( $item_id, true );
+		$in_cart      = $this->has_item( $item_id );
 
-		if ( $in_cart = $this->has_item( $item_id ) ) {
-			$product = new MP_Product( $item_id );
-			if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
-				$qty = 1;
-			} else {
-
-				$max             = $product->max_product_quantity( false, true );
-				$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
-
-				if ( is_numeric( $max ) ) {
-					if ( $max >= ( $qty + $in_cart ) ) {
-						$qty += $in_cart;
-						$cart_updated = true;
-					} else {
-						$qty          = $max;
-						$cart_updated = false;
-					}
-				} else {
-					$qty += $in_cart;
-					$cart_updated = true;
-				}
-			}
+		if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+			$qty = 1;
 		} else {
-			$product = new MP_Product( $item_id );
-			$max     = $product->max_product_quantity( $item_id, true );
-
-			$per_order_limit = get_post_meta( $item_id, 'per_order_limit', true );
 			if ( is_numeric( $max ) ) {
-				if ( $max >= ( $qty ) ) {
+				if ( $max >= ( $qty + $in_cart ) ) {
+					$qty += $in_cart;
 					$cart_updated = true;
 				} else {
 					$qty          = $max;
@@ -176,7 +156,9 @@ class MP_Cart {
 			}
 		}
 
-		mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
+		if( $qty > 0 ) {
+			mp_push_to_array( $this->_items, $this->_id . '->' . $item_id, $qty );
+		}
 		$this->_update_cart_cookie();
 
 		return $cart_updated;
@@ -191,9 +173,13 @@ class MP_Cart {
 	 */
 	public function admin_enqueue_styles_scripts( $hook ) {
 		if ( 'mp_order' == get_current_screen()->post_type && ( 'post.php' == $hook || 'edit.php' == $hook ) ) {
-			wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), false, MP_VERSION );
 			wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
-			wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
+
+			if ( mp_get_setting( 'store_theme' ) == 'default' ) {
+				wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
+			} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
+				wp_enqueue_style( 'mp-theme', content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
+			}
 		}
 	}
 
@@ -271,6 +257,11 @@ class MP_Cart {
 			}
 		}
 
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			list( $blog_id, $item_id ) = explode( '.', $item_id );
+			$this->set_id( intval( $blog_id ) );
+		}
+
 		if ( mp_get_post_value( 'cart_action' ) != 'empty_cart' && is_null( $item_id ) ) {
 			wp_send_json_error();
 		}
@@ -282,17 +273,19 @@ class MP_Cart {
 		switch ( mp_get_post_value( 'cart_action' ) ) {
 			case 'add_item' :
 				$cart_updated = $this->add_item( $item_id, $qty );
-				//wp_send_json_success( $this->floating_cart_html() );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
-					'minicart'     => $this->floating_cart_html(),
-					'widgetcart'   => $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
-					'cart_updated' => $cart_updated,
+					'minicart'     		=> $this->floating_cart_html(),
+					'widgetcart'  		=> $this->cart_products_html( 'widget', $show_product_image, $show_product_qty, $show_product_price ),
+					'cart_updated'		=> $cart_updated,
+					'product_input'     => $product->attribute_input_fields(),
+					'out_of_stock'     	=> !$product->in_stock( $qty, true ),
 				) );
 				break;
 
 			case 'update_item' :
 				$this->update_item( $item_id, $qty );
-				$product      = new MP_Product( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				$product->qty = $qty;
 				wp_send_json_success( array(
 					'product'  => array( $item_id => $this->get_line_item( $product ) ),
@@ -301,10 +294,25 @@ class MP_Cart {
 				break;
 
 			case 'remove_item' :
+
 				$this->remove_item( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
 				wp_send_json_success( array(
-					'cartmeta'   => $this->cart_meta( false ),
-					'item_count' => $this->item_count( false, false ),
+					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
+					'cart_item_line'  	=> $this->get_line_removed_item( $product ),
+					'cartmeta'   		=> $this->cart_meta( false ),
+					'item_count' 		=> $this->item_count( false, false ),
+				) );
+				break;
+
+			case 'undo_remove_item' :
+				$this->add_item( $item_id );
+				$product      = new MP_Product( $item_id, $this->get_blog_id() );
+				wp_send_json_success( array(
+					'product'  			=> array( $item_id => $this->get_line_item( $product ) ),
+					'cart_item_line'  	=> $this->get_line_item( $product ),
+					'cartmeta'   		=> $this->cart_meta( false ),
+					'item_count' 		=> $this->item_count( false, false ),
 				) );
 				break;
 
@@ -314,6 +322,10 @@ class MP_Cart {
 					'item_count' => 0,
 				) );
 				break;
+		}
+
+		if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+			$this->reset_id();
 		}
 
 		wp_send_json_error();
@@ -371,7 +383,18 @@ class MP_Cart {
 		$this->_items     = array( $this->_id => array() );
 
 		if ( $cart_cookie = mp_get_cookie_value( $this->_cookie_id ) ) {
-			$this->_items = unserialize( $cart_cookie );
+			// Clean cookie from none product items
+			$cart_cookie_items = unserialize( $cart_cookie );
+			foreach ( $cart_cookie_items as $blog_id => $blog_items ) {
+				foreach ( $blog_items as $item => $qty ) {
+					$product = new MP_Product( $item , $blog_id );
+			 		if ( !$product->exists() ) {
+						unset( $cart_cookie_items[ $blog_id ][ $item ] );
+			 		}
+				}
+			}
+
+			$this->_items = $cart_cookie_items;
 		}
 	}
 
@@ -456,7 +479,11 @@ class MP_Cart {
 	 * @return array
 	 */
 	public function get_items() {
-		$items = mp_arr_get_value( $this->_id, $this->_items, array() );
+		$items = array();
+
+		if ( !is_array( $this->_id ) ) {
+			$items = mp_arr_get_value( $this->_id, $this->_items, array() );
+		}
 
 		return (array) $items;
 	}
@@ -579,7 +606,7 @@ class MP_Cart {
 
 		return apply_filters( 'mp_cart/get_line_item', $html, $product, $this );
 	}
-	
+
 	/**
 	 * Check if all digital products to hide shipping estimate
 	 *
@@ -587,19 +614,19 @@ class MP_Cart {
 	 * @access public
 	 *
 	 */
-	
+
 	public function only_digital() {
 		$products = $this->get_items_as_objects();
-		
+
 		foreach ( $products as $product ) {
 			if( ! $product->is_download() ) {
 				return false;
 			}
 		}
-	
+
 		return true;
 	}
-	
+
 	/**
 	 * Display cart meta html
 	 *
@@ -660,9 +687,9 @@ class MP_Cart {
 		 * @param MP_Cart The current cart object.
 		 */
 		$html .= apply_filters( 'mp_cart/cart_meta/product_total', $line, $this );
-		
+
 		$shipping_line = '';
-		
+
 		if( ! $this->only_digital() && $this->is_shipping_total() ) {
 
 			$shipping_line .= '
@@ -671,7 +698,7 @@ class MP_Cart {
 					<span class="mp_cart_resume_item_amount">' . $this->shipping_total( true ) . '</span>
 				</div><!-- end mp_cart_resume_item-shipping-total -->';
 		}
-		
+
 		/**
 		 * Filter the shipping total html
 		 *
@@ -966,7 +993,7 @@ class MP_Cart {
 			 * @param bool $editable Whether the cart is editable or not.
 			 */
 			$button_classes = apply_filters( 'mp_cart/checkout_button/classes', $button_classes, $editable );
-			
+
 			/**
 			 * Filter the Continue Shopping button classes
 			 *
@@ -980,7 +1007,7 @@ class MP_Cart {
 				'mp_button-large',
 			);
 			$continue_shopping_button_classes = apply_filters( 'mp_cart/continue_shopping_button/classes', $continue_shopping_button_classes );
-	
+
 			// Continue shopping button
 			$html .= '
 					<a href="' . mp_store_page_url( 'products', false ) . '" class="' . implode( ' ', $continue_shopping_button_classes ) . '">' . __( 'Continue Shopping?', 'mp'  ) . '</a>';
@@ -1050,13 +1077,26 @@ class MP_Cart {
 		 *
 		 * @param int The default maximum.
 		 */
-		$max = apply_filters( 'mp_cart/quantity_dropdown/max_default', 10 );
 
 		$id = (int) $args['id'];
 
-		$inventory             = get_post_meta( $id, 'inventory', true );
-		$inventory_tracking    = get_post_meta( $id, 'inventory_tracking', true );
-		$out_of_stock_purchase = get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+		$product 			   	= new MP_Product( $id  );
+		$inventory             	= get_post_meta( $id, 'inventory', true );
+		$inventory_tracking    	= get_post_meta( $id, 'inventory_tracking', true );
+		$out_of_stock_purchase 	= get_post_meta( $id, 'inv_out_of_stock_purchase', true );
+
+		$max  					= $product->max_product_quantity( $product->ID, true );
+
+		/**
+		 * Filter drop down maximum qty, by default it's 10
+		 *
+		 * @since 3.0
+		 *
+		 * @param int max qty to display on dropdown
+		 */
+
+		//Adding the $id so we can change max quantity depending on product. Usefull for migrations like Appointments+ ;)
+		$max_dropdown 			= apply_filters( 'mp_cart/quantity_dropdown/max_default', 10, $id );
 
 
 		if ( $inventory_tracking && $out_of_stock_purchase !== '1' ) {
@@ -1087,20 +1127,24 @@ class MP_Cart {
 
 		// Build select field attributes
 		$attributes = mp_array_to_attributes( compact( 'name', 'class', 'id' ) );
+		$html = '';
 
-		$html = '
-			<select' . $attributes . '>';
-
-		if ( $selected >= $max ) {
-			$max = $selected;
-		}
-
-		for ( $i = 1; $i <= $max; $i ++ ) {
+		if( $max_dropdown > 1 ){
+			$html = '
+				<select' . $attributes . '>';
+	
+			if ( $selected >= $max ) {
+				$max = $selected;
+			}
+	
+			for ( $i = 1; $i <= $max_dropdown; $i ++ ) {
+				$html .= '
+					<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
+			}
 			$html .= '
-				<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
+				</select>';
 		}
-		$html .= '
-			</select>';
+		else $html .= '<span class="item-quantity one-allowed">1</span>';
 
 		if ( $echo ) {
 			echo $html;
@@ -1173,9 +1217,9 @@ class MP_Cart {
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'                  => mp_get_ajax_url(),
 			'ajax_loader'              => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
-			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order.', 'mp' ),
+			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order or you have reached the stock limit.', 'mp' ),
 			'is_cart_page'             => mp_is_shop_page( 'cart' )
 		) );
 	}
@@ -1315,7 +1359,7 @@ class MP_Cart {
 	 */
 	public function floating_cart_line_item_html( $item_id, $qty, $show_product_image = true, $show_product_qty = true, $show_product_price = false ) {
 		$product = new MP_Product( $item_id );
-		
+
 		$classes = array(
 			'mp_mini_cart_item',
 			$show_product_image ? 'mp_mini_cart_item-has-image' : '',
@@ -1522,6 +1566,11 @@ class MP_Cart {
 	 * @return float/string
 	 */
 	public function product_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'product', $this->_total ) ) {
 			$total                   = 0;
 			$blog_ids                = $this->get_blog_ids();
@@ -1534,6 +1583,8 @@ class MP_Cart {
 				}
 
 				$items = $this->get_items_as_objects();
+
+				$total = 0;
 
 				foreach ( $items as $item ) {
 					$price         = $item->get_price( 'lowest' );
@@ -1550,6 +1601,7 @@ class MP_Cart {
 				 * @param MP_Cart The current cart object.
 				 * @param array The current cart items.
 				 */
+
 				$this->_total['product'] += (float) apply_filters( 'mp_cart/product_total', $total, $items );
 
 				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
@@ -1569,6 +1621,57 @@ class MP_Cart {
 	}
 
 	/**
+	 * Get the total price for tangible products.
+	 *
+	 * @since 3.0.8
+	 * @access public
+	 *
+	 * @param bool $format Optional, whether to format the value or not. Defaults to false.
+	 *
+	 * @return float/string
+	 */
+	public function product_tangible_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
+		$total                   = 0;
+		$blog_ids                = $this->get_blog_ids();
+
+		while ( 1 ) {
+			if ( $this->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				$this->set_id( $blog_id );
+			}
+
+			$items = $this->get_items_as_objects();
+
+			$total = 0;
+
+			foreach ( $items as $item ) {
+				if( $item->is_download() ){
+					continue;
+				}
+				$price         = $item->get_price( 'lowest' );
+				$item_subtotal = ( $price * $item->qty );
+				$total += $item_subtotal;
+			}
+
+			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+				$this->reset_id();
+				break;
+			}
+		}
+
+		if ( $format ) {
+			return mp_format_currency( '', $total );
+		} else {
+			return (float) round( $total, 2 );
+		}
+	}
+
+	/**
 	 * This is original product without coupon effect
 	 *
 	 * @param bool|false $format
@@ -1576,6 +1679,11 @@ class MP_Cart {
 	 * @return float|string
 	 */
 	public function product_original_total( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'product_original', $this->_total ) ) {
 			$total                            = 0;
 			$blog_ids                         = $this->get_blog_ids();
@@ -1588,6 +1696,8 @@ class MP_Cart {
 				}
 
 				$items = $this->get_items_as_objects();
+
+				$total = 0;
 
 				foreach ( $items as $item ) {
 					$price = $item->get_price();
@@ -1639,7 +1749,7 @@ class MP_Cart {
 	public function remove_item( $item_id ) {
 		if ( $this->_is_global_item_id( $item_id ) ) {
 			list( $blog_id, $item_id ) = explode( '.', $item_id );
-			$this->set_id( $blog_id );
+			$this->set_id( intval( $blog_id ) );
 		}
 
 		if ( mp_arr_get_value( $this->_id . '->' . $item_id, $this->_items ) ) {
@@ -1669,7 +1779,99 @@ class MP_Cart {
 			do_action( 'mp_cart/after_remove_item', $item_id, $this->_id );
 		}
 
-		$this->reset_id();
+		if ( $this->_is_global_item_id( $item_id ) ) {
+			$this->reset_id();
+		}
+	}
+
+	/**
+	 * Get removed cart line item html
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param MP_Product /int $product The product to get the html for.
+	 *
+	 * @return string
+	 */
+	public function get_line_removed_item( $product ) {
+		if ( ! $product instanceof MP_Product ) {
+			$product = new MP_Product( $product );
+		}
+
+		$id = ( $this->is_global ) ? $product->global_id() : $product->ID;
+
+		/**
+		 * Filter cart removed item columns array
+		 *
+		 * @since 3.0
+		 *
+		 * @param array The cart removed item columns array.
+		 */
+		$cart_columns = (array) apply_filters( 'mp_cart/cart_removed_item_columns_array', array(
+			'thumb',
+			'title',
+			'empty',
+			'qty'
+		) );
+		$html = '
+			<div class="mp_cart_item mp_cart_removed_item" id="mp-cart-item-' . $id . '">';
+
+		foreach ( $cart_columns as $column ) {
+			$html .= '
+				<div class="mp_cart_item_content mp_cart_item_content-' . $column . '">';
+
+			switch ( $column ) {
+				case 'thumb' :
+					$column_html = $product->image_custom( false, 75 );
+					break;
+
+				case 'title' :
+					$column_html = '<small  class="mp_cart_deleted_item_title">' . sprintf( '<a href="%s">%s</a>', $product->url( false ), $product->title( false ) ) . ' ' .  __( 'was removed from Shopping Cart', 'mp' ) . '</small >';
+
+					break;
+				case 'qty' :
+					if ( $this->is_editable ) {
+						$column_html .= '
+						<a class="mp_cart_item_remove_item" href="javascript:mp_cart.undoRemoveItem(' . $id . ')">' . __( 'Add again', 'mp' ) . '</a>';
+					} else {
+						$column_html = $product->qty;
+					}
+					break;
+				default:
+					$column_html = '';
+					break;
+			}
+
+			/**
+			 * Filter the column html
+			 *
+			 * @since 3.0
+			 *
+			 * @param string The current column html.
+			 * @param string The current column slug.
+			 * @param MP_Product The current product.
+			 * @param MP_Cart The current cart object.
+			 */
+			$html .= apply_filters( 'mp_cart/column_html', $column_html, $column, $product, $this );
+
+			$html .= '
+				</div><!-- end mp_cart_item_content -->';
+		}
+
+		$html .= '</div><!-- end mp_cart_item -->';
+
+		/**
+		 * Filter the line removed item html
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $html The current line html.
+		 * @param MP_Product $product The current product object.
+		 * @param MP_Cart $this The current cart object.
+		 */
+
+		return apply_filters( 'mp_cart/get_line_removed_item', $html, $product, $this );
 	}
 
 	/**
@@ -1751,7 +1953,7 @@ class MP_Cart {
 
 		return ( $format ) ? mp_format_currency( '', $shipping_tax ) : $shipping_tax;
 	}
-	
+
 	/**
 	 * Check if shipping price
 	 *
@@ -1759,12 +1961,12 @@ class MP_Cart {
 	 * @access public
 	 * @return bool
 	 */
-	
+
 	public function is_shipping_total() {
 		if( $this->shipping_total() == '' || $this->shipping_total() ==  '&mdash;' ) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -1919,15 +2121,20 @@ class MP_Cart {
 	 * @return string/float
 	 */
 	public function tax_total( $format = false, $estimate = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
 		if ( false === mp_arr_get_value( 'tax', $this->_total ) ) {
 			$tax_amt = 0;
 			$include_shipping_tax = mp_get_setting( 'tax->tax_shipping' );
-		
+
 			//get address
 			$state   = mp_get_user_address_part( 'state', 'shipping' );
 			$country = mp_get_user_address_part( 'country', 'shipping' );
 
-			if ( $estimate ) {
+			if ( $estimate || ( $this->only_digital() && mp_get_setting( 'details_collection' ) == 'contact' ) ) {
 				if ( empty( $country ) ) {
 					$country = mp_get_setting( 'base_country' );
 				}
@@ -1953,6 +2160,8 @@ class MP_Cart {
 
 				$items = $this->get_items_as_objects();
 
+				$total = 0;
+
 				foreach ( $items as $item ) {
 					// If not taxing digital goods, skip them completely
 					if ( $item->is_download() && $item->special_tax_amt() ) {
@@ -1965,7 +2174,7 @@ class MP_Cart {
 
 					if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
 						$special_total += $special_tax_amt * $item->qty;
-						
+
 					} else {
 						$total += $item->before_tax_price() * $item->qty;
 					}
@@ -2017,6 +2226,112 @@ class MP_Cart {
 	}
 
 	/**
+	 * Get total tax for DP
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+
+	 public function total_tax_digital_inclusive( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
+		$tax_amt = 0;
+
+		$blog_ids = $this->get_blog_ids();
+
+		if( ! mp_get_setting( 'tax->tax_digital' ) ) {
+
+			while ( 1 ) {
+				$total = $special_total = 0;
+
+				if ( $this->is_global ) {
+					$blog_id = array_shift( $blog_ids );
+					$this->set_id( $blog_id );
+				}
+
+				$items = $this->get_items_as_objects();
+
+				$total = 0;
+
+				foreach ( $items as $item ) {
+					if ( $item->is_download() ) {
+						$total += $item->before_tax_price() * $item->qty;
+					}
+				}
+
+				// Calculate regular tax
+				$tax_amt += ( $total * mp_tax_rate() );
+
+				if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+					$this->reset_id();
+					break;
+				}
+			}
+
+		}
+
+		if ( $format ) {
+			return mp_format_currency( '', $tax_amt );
+		} else {
+			return round( $tax_amt, 2 );
+		}
+
+	}
+
+	/**
+	 * Get total tax for special products
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return float
+	 */
+
+	public function total_special_tax( $format = false ) {
+
+		if( !$this->has_items() ){
+			return (float) 0;
+		}
+
+		$tax_amt = 0;
+
+		$blog_ids = $this->get_blog_ids();
+
+		while ( 1 ) {
+			if ( $this->is_global ) {
+				$blog_id = array_shift( $blog_ids );
+				$this->set_id( $blog_id );
+			}
+
+			$items = $this->get_items_as_objects();
+
+			$total = 0;
+
+			foreach ( $items as $item ) {
+				if ( ( $special_tax_amt = $item->special_tax_amt() ) !== false ) {
+					$original_tax = $item->get_price( 'lowest' ) - ( $item->get_price( 'lowest' ) / ( 1 + mp_tax_rate() ) );
+					$tax = $original_tax - $special_tax_amt;
+					$tax_amt += $tax * $item->qty;
+				}
+			}
+
+			if ( ( $this->is_global && false === current( $blog_ids ) ) || ! $this->is_global ) {
+				$this->reset_id();
+				break;
+			}
+		}
+
+		if ( $format ) {
+			return mp_format_currency( '', $tax_amt );
+		} else {
+			return round( $tax_amt, 2 );
+		}
+	}
+
+	/**
 	 * Get total
 	 *
 	 * @since 3.0
@@ -2039,18 +2354,20 @@ class MP_Cart {
 			 * @param array An array containing all of the applicable cart subtotals (e.g. tax, shipping, etc)
 			 * @param MP_Cart The current cart object.
 			 */
+
 			if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
 				$pre_total = $this->product_total();
 				$tax_rate  = mp_tax_rate();
-				$total     = $pre_total / ( 1 + $tax_rate ) + $this->tax_total();
-				
-				$shipping_pre_total = $this->shipping_total();
-				if( mp_get_setting( 'tax->tax_shipping' ) ) {
-					$shipping_pre_total = $shipping_pre_total - $this->shipping_tax_total();
-				}
-				
+				$pre_tax_total =  $pre_total / ( 1 + $tax_rate );
+				$total = $pre_tax_total + $this->tax_total() + $this->total_tax_digital_inclusive() + $this->total_special_tax();
+
+				// There will be oftenly rounding errors
+				$rounding_error = $total - $pre_total;
+
 				//Shipping price should be added after products price calculation
-				$total     = $total + $shipping_pre_total;
+				$total = $total + $this->shipping_total();
+				//Fix the rounding error, if there is
+				$total -= $rounding_error;
 			}
 
 			$total = apply_filters( 'mp_cart/total', $total, $this->_total, $this );
@@ -2200,9 +2517,9 @@ class MP_Cart {
 	 */
 	public function __construct( $use_cookies = true ) {
 		$this->_use_cookies = $use_cookies;
+		$this->set_id( get_current_blog_id() ); // we need the id for virtual carts too (without cookies)
 
 		if ( $this->_use_cookies ) {
-			$this->set_id( get_current_blog_id() );
 			$this->_get_cart_cookie();
 		}
 

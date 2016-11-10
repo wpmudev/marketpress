@@ -1,0 +1,120 @@
+//== Order History/Status
+//
+
+// Order Search
+.mp_form {
+	&-order-lookup {
+		border-top-color: $color--gray;
+	}
+}
+
+// Orders Results
+.mp_orders {
+	
+	// Results / List
+	&-list {
+		border-top-color: $color--gray;
+		
+		.mp_order_details {
+			margin-bottom: $space;
+		}
+		
+	}
+	
+	// Order Result/Item (individual)
+	.mp_order {
+		border-color: $color--gray;
+		
+		&:nth-child(even) {
+			background: $color--light-gray;
+		}
+		
+		&:nth-child(odd) {
+			background: lighten($color--light-gray, 2%);
+		}
+		
+		&:first-of-type {
+			border-top-color: $color--gray;
+		}
+		
+		&_head {
+			font-size: $font__size--h4;
+		}
+		
+		// Detail
+		&_detail {
+			@include j-cf();
+			background: $color--light;
+			border: 1px solid $color--gray;;
+			font-size: $font__size--m;
+			padding: $space--m;
+			position: relative;
+			text-align: center;
+			
+			&_item {
+				@include j-stack();
+				margin-bottom: $space--m;
+				
+				&:last-child {
+					margin-bottom: 0;
+				}
+
+				@include bp(desktop) {
+					@include j-unstack();
+					@include j-column(1/3);
+					margin-bottom: 0;
+				}
+				
+				h5 {
+					display: block;
+					font-size: $font__size;
+					margin: 0 0 $space--xs;
+					text-transform: uppercase;
+				}
+			}
+		}
+	}
+
+	// Order Confirmation Text
+	.mp_order_confirmation_text {
+		background-color: $color--info;
+		border-color: darken($color--info, 10%);
+		color: $color--light;
+
+		> p {
+			margin-bottom: $space--m;
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+	
+	// Order Detail: Cart
+	.mp_order_cart {
+		border-top-color: $color--gray;
+	}
+	
+	// Order Detaul: Address
+	.mp_order_address {
+		border-top-color: $color--gray
+	}
+	
+	// Orders Addons: Invoice
+	&_invoice {
+		a.button {
+			@extend .mp_button;
+			@extend .mp_button-alt;
+			background: #e74c3c;
+			//border-color: darken(#e74c3c, 20%);
+			
+			&:hover,
+			&:focus {
+				//background-color: darken($color, 20%);
+				background: darken(#e74c3c, 20%);
+				border-bottom: 2px solid darken(#e74c3c, 20%);
+			}
+		}
+	}
+	
+}

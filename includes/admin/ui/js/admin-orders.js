@@ -26,8 +26,8 @@
 					var name = $this.attr( 'name' );
 					var targetName = name.replace( 'billing_info', 'shipping_info' );
 					var $targetField = $( '[name="' + targetName + '"]' );
-					
-					$targetField.val( $this.val() );
+
+					$targetField.is('select') && $targetField.html($this.html()) && $targetField.val( $this.val() ) && $targetField.trigger("change") || $targetField.val( $this.val() );
 				} );
 			} );
 		};
@@ -57,6 +57,8 @@
 					type : type
 				}
 				
+				var old_value = $target.val();
+
 				$target.mp_select2( 'destroy' ).hide().next( 'img' ).show();
 				$this.mp_select2( 'disable' );
 						
@@ -67,13 +69,14 @@
 						if ( resp.data.states ) {
 							$target.html( resp.data.states ).show().next( 'img' ).hide();
 							$target.closest( 'tr' ).show();
+							$target.val(old_value);
 							initSelect2Fields();
 						} else {
 							$target.closest( 'tr' ).hide();
 						}
 					}
 				} );
-			} );			
+			} ).change();
 		};
 		
 		var initCustomerInfoLightbox = function() {
@@ -102,6 +105,13 @@
 				} else {
 					$('.mp-remove-custom-carrier').addClass('mp-hide');
 				}
+
+				if ($(this).val() == 'other' || option.data('original') == 1) {
+					$('.mp-order-custom-tracking-link').removeClass('mp-hide');
+				} else {
+					$('.mp-order-custom-tracking-link').addClass('mp-hide');						
+				}	
+
 			}).change();
 		};
 

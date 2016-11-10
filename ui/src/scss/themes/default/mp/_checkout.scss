@@ -1,0 +1,81 @@
+//== Checkout
+//
+
+// General
+.mp_checkout {
+	
+	// Checkout Sections
+	&_section {
+		border-bottom-color: $color--gray;
+		
+		// Heading
+		.mp_checkout_section_heading {
+			font-size: $font__size--h2;
+		}
+		
+		// Checkout Section Numbers
+		.mp_checkout_step_num {
+			background-color: $color;
+			color: $color--light;
+		}
+		
+		// Errors
+		&_errors {
+			background: lighten($color--error, 20%);
+			border: 2px solid $color--error;
+			color: darken($color--error, 20%);
+			
+			p {
+				font-size: $font__size;
+				
+				span {
+					color: $color--error;
+				}
+			}
+		}
+		
+		// Content
+		&_content {
+			p {
+				font-size: $font__size--l;
+			}
+		}
+		
+		// Review: Payment
+		&-order-review-payment {
+			.mp_checkout_field {
+				font-size: $font__size;
+			}
+		}
+	}
+	
+	// Checkout Buttons
+	&_buttons {
+		
+		.mp_button {
+			
+			&-checkout-prev-step {
+				
+				&:hover,
+				&:focus {
+					border-bottom: 2px solid $color;
+				}
+			}
+		}
+
+	}
+	
+	// Payment Options
+	.mp_gateway_form {
+		color: $color--warning;
+		font-size: $font__size--m;
+		
+		.mp_form_label {
+			color: $color;
+		}
+	}
+	
+}
+
+// Checkout Form
+#mp-checkout-form {}

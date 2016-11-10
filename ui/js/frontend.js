@@ -1,15 +1,4 @@
 ( function( $ ) {
-    $.fn.equalHeights = function( ) {
-        var maxHeight = 0;
-        this.each( function( ) {
-            maxHeight = Math.max( $( this ).height( ), maxHeight );
-        } );
-        return this.each( function( ) {
-            $( this ).height( maxHeight );
-        } );
-    }
-}( jQuery ) );
-( function( $ ) {
     /**
      * Preload loading icon
      *
@@ -40,41 +29,6 @@ var marketpress = { };
 ( function( $ ) {
 	
 	$.widget.bridge('mptooltip', $.ui.tooltip);
-
-    function equal_height( obj ) {
-        var $this = $( obj );
-        $this.equalHeights();
-        //$this.find( '.mp_product_name' ).equalHeights();
-        //$this.find( '.mp_product_meta' ).equalHeights();
-        //$this.find( '.mp_product_details' ).equalHeights();
-        //$this.find( '.mp_product' ).equalHeights();
-        //$this.find( '.mp_product_name' ).equalHeights();
-        //$this.find( '.mp_product_meta' ).equalHeights();
-        //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
-        //$this.find( '.hmedia' ).equalHeights();
-    }
-
-    $( window ).resize( function( ) {
-        $( '#mp-products.mp_products-grid' ).each( function( ) {
-            var $this = $( this );
-            //$this.find( '.mp_product_name' ).equalHeights();
-            $this.find( '.mp_product_meta' ).equalHeights();
-            //$this.find( '.mp_product_details' ).equalHeights();
-            //$this.find( '.mp_product' ).equalHeights();
-            //$this.find( '.mp_product_name' ).equalHeights();
-            //$this.find( '.mp_product_meta' ).equalHeights();
-            //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
-            //$this.find( '.hmedia' ).equalHeights();
-        } );
-
-        $( '#mp-related-products .mp_products-grid .mp_product_meta' ).each( function( ) {
-            //equal_height( $( this ) );
-            var $this = $( this );
-            $this.find( '.mp_product_meta' ).equalHeights();
-        } );
-
-    } );
-
 
     marketpress = {
         /**
@@ -124,31 +78,8 @@ var marketpress = { };
                     "at": "center top"
                 },
                 "hide": 300,
-                "show": 300
-            } );
-        },
-        /**
-         * Make each product in a product grid row the same height
-         *
-         * @since 3.0
-         */
-        equalizeProductGrid: function( ) {
-            $( '#mp-products.mp_products-grid' ).each( function( ) {
-                var $this = $( this );
-                //$this.find( '.mp_product_name' ).equalHeights();
-                $this.find( '.mp_product_meta' ).equalHeights();
-                //$this.find( '.mp_product_details' ).equalHeights();
-                //$this.find( '.mp_product' ).equalHeights();
-                //$this.find( '.mp_product_name' ).equalHeights();
-                //$this.find( '.mp_product_meta' ).equalHeights();
-                //$this.find( '.mp_form-buy-product' ).addClass( 'sticky' );
-                //$this.find( '.hmedia' ).equalHeights();
-            } );
-
-            $( '#mp-related-products .mp_products-grid' ).each( function( ) {
-                var $this = $( this );
-                $this.find( '.mp_product_meta' ).equalHeights();
-                //$this.equalHeights();
+                "show": 300,
+                "tooltipClass": "mp_tooltip-opened"
             } );
         },
         getViewportSize: function() {
@@ -274,7 +205,8 @@ var marketpress = { };
 
             $( 'body' ).on( 'click', '.mp_product_meta a.more-link', function( e ) {
                 e.preventDefault( );
-                $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
+                // $( '#mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
+                $( '.mp-single-product a.mp_product_tab_label_link.mp-product-overview' ).click( );
                 $( 'html, body' ).animate( {
                     scrollTop: $( "a.mp_product_tab_label_link.mp-product-overview" ).offset( ).top - 30
                 }, 500 );
@@ -422,78 +354,6 @@ var marketpress = { };
             return obj;
         },
         /**
-         * Init create account lightbox listeners
-         *
-         * @since 3.0
-         */
-        initCreateAccountLightboxListeners: function( ) {
-            var $lb = $( '#mp-create-account-form' );
-            var $emailLabel = $( 'label[for="mp-create-account-email"]' );
-            var $emailInput = $( '#mp-create-account-email' );
-            var $submitButton = $lb.find( '.mp_button-create-account' );
-            if ( '#mp-create-account-lightbox' != window.location.hash || 0 == $lb.length ) {
-                // Bail
-                return false;
-            }
-
-            $( document ).ajaxSend( function( evt, jqxhr, settings ) {
-                if ( settings.url.indexOf( 'action=mp_check_if_email_exists' ) < 0 ) {
-                    return;
-                }
-
-                if ( $emailLabel.find( '.mp-loading-placeholder' ).length == 0 ) {
-                    $emailLabel.append( '<span class="mp-loading-placeholder"></span>' );
-                }
-
-                $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'show' );
-                $emailInput.prop( 'disabled', true );
-                $submitButton.prop( 'disabled', true );
-            } );
-            $( document ).ajaxComplete( function( evt, jqxhr, settings ) {
-                if ( settings.url.indexOf( 'action=mp_check_if_email_exists' ) < 0 ) {
-                    return;
-                }
-
-                $emailLabel.find( '.mp-loading-placeholder' ).ajaxLoading( 'hide' );
-                $emailInput.prop( 'disabled', false );
-                $submitButton.prop( 'disabled', false );
-            } );
-            //$lb.find( 'form' ).validate( {
-	        $lb.validate( {
-                highlight: function( ) {
-                    setTimeout( function( ) {
-                        $.colorbox.resize( );
-                    }, 100 )
-                },
-                onkeyup: false, // don't validate on keyup as this will send ajax requests on every key stroke!
-                submitHandler: function( form ) {
-                    var $form = $( form );
-                    marketpress.loadingOverlay( 'show' );
-                    $.post( $form.attr( 'action' ), $form.serialize( ) ).done( function( resp ) {
-                        if ( resp.success ) {
-                            window.location.reload( );
-                        } else {
-                            marketpress.loadingOverlay( 'hide' );
-                            alert( resp.data.message );
-                        }
-                    } );
-                },
-                unhighlight: function( ) {
-                    setTimeout( function( ) {
-                        $.colorbox.resize( );
-                    }, 100 )
-                }
-            } );
-            $.colorbox( {
-                close: "x",
-                escKey: false,
-                href: $lb,
-                inline: true,
-                overlayClose: false,
-                width: 450
-            } );
-        },
-        /**
          * Initialize global product filters/pagination
          *
          * @since 3.0
@@ -545,11 +405,6 @@ jQuery( document ).ready( function( ) {
     marketpress.initOrderLookup( );
     marketpress.initImageLightbox( );
     marketpress.initProductFiltersPagination( );
-    marketpress.initCreateAccountLightboxListeners( );
     marketpress.initGlobalProductFiltersPagination();
     marketpress.getViewportSize();
 } );
-window.onload = function( ) {
-    marketpress.equalizeProductGrid( );
-    //marketpress.getViewportSize();
-}

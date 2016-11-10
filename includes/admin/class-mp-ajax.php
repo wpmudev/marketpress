@@ -165,14 +165,6 @@ class MP_Ajax {
 					</div>
 					<?php do_action( 'mp_variation_popup_after_sku_and_price' ); ?>
 
-					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
-						<div class="mp-product-field-100 mp-variation-field mp-product-field-last">
-							<div class="wpmudev-field-label"><?php _e( 'Limit Per Order', 'mp' ); ?><span class="required">*</span></div>
-							<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-blank-bg mp-numeric mp-required" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
-						</div>
-					<?php } ?>
-					<?php do_action( 'mp_variation_popup_after_order_limit' ); ?>
-
 					<?php if ( $product_type == 'external' ) {//show these fields only for External URL Products ?>
 						<div class="mp-product-field-100 mp-variation-field">
 							<div class="wpmudev-field-label"><?php _e( 'External Product URL', 'mp' ); ?><span class="required">*</span></div>
@@ -205,6 +197,20 @@ class MP_Ajax {
 					<?php } ?>
 					<?php do_action( 'mp_variation_popup_after_attributes' ); ?>
 
+					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
+						<div class="fieldset_check">
+							<label>
+								<input type="checkbox" name="has_per_order_limit" class="has_controller" <?php checked( true, intval( MP_Product::get_variation_meta( $variation_id, 'per_order_limit', 0 ) ) > 0, true ); ?>>
+								<span><?php _e( 'Limit the Amount of Items per Order', 'mp' ); ?></span>
+							</label>
+							<fieldset id="fieldset_has_per_order_limit" class="has_area">
+								<div class="wpmudev-field-label"><?php _e( 'Limit Per Order', 'mp' ); ?><span class="required">*</span></div>
+								<input type="text" name="per_order_limit" id="per_order_limit" class="mp-product-field-98 mp-numeric" placeholder="<?php esc_attr_e( 'Unlimited', 'mp' ); ?>" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'per_order_limit' ) ); ?>">
+							</fieldset>
+						</div>
+					<?php } ?>
+					<?php do_action( 'mp_variation_popup_after_order_limit' ); ?>
+
 					<div class="fieldset_check">
 						<?php
 						$has_sale = MP_Product::get_variation_meta( $variation_id, 'has_sale', 0 );
@@ -214,7 +220,8 @@ class MP_Ajax {
 							<span><?php _e( 'Set up a Sale for this Product', 'mp' ); ?></span>
 						</label>
 						<fieldset id="fieldset_has_sale" class="has_area">
-							<?php _e( 'Price:', 'mp' ); ?> <input placeholder="<?php esc_attr_e( 'Enter Sale Price', 'mp' ); ?>" type="text" class="mp-numeric mp-required" name="sale_price[amount]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_amount' ) ); ?>"><span class="required">*</span><br>
+							<?php _e( 'Price', 'mp' ); ?><span class="required">*</span><input placeholder="<?php esc_attr_e( 'Enter Sale Price', 'mp' ); ?>" type="text" class="mp-numeric mp-required" name="sale_price[amount]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_amount' ) ); ?>"><br>
+							<?php _e( 'Percentage Discount', 'mp' ); ?><span class="required">*</span><input placeholder="" type="text" class="mp-numeric mp-required" name="sale_price[percentage]" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_percentage' ) ); ?>"><br>
 							<?php _e( 'Start Date (if applicable)', 'mp' ); ?> <input name="sale_price[start_date]" type="text" class="mp-date" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_start_date' ) ); ?>"><br>
 							<?php _e( 'End Date (if applicable)', 'mp' ); ?> <input name="sale_price[end_date]" type="text" class="mp-date" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'sale_price_end_date' ) ); ?>">
 						</fieldset>
@@ -233,7 +240,7 @@ class MP_Ajax {
 							<fieldset id="fieldset_charge_tax" class="has_area">
 								<div class="wpmudev-field-desc"><?php _e( 'If you would like this product to use a special tax rate, enter it here. If you omit the "%" symbol the rate will be calculated as a fixed amount for each of this product in the user\'s cart.', 'mp' ); ?></div>
 								<?php _e( 'Special Tax Rate', 'mp' ); ?>
-								<input placeholder="<?php esc_attr_e( 'Tax Rate', 'mp' ); ?>" type="text" class="mp-numeric" name="special_tax_rate" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); ?>">
+								<input placeholder="<?php esc_attr_e( 'Tax Rate', 'mp' ); ?>" type="text" name="special_tax_rate" value="<?php echo esc_attr( MP_Product::get_variation_meta( $variation_id, 'special_tax_rate' ) ); ?>">
 								<br>
 							</fieldset>
 						</div>
@@ -382,6 +389,12 @@ class MP_Ajax {
 		foreach ( $post_ids as $post_id ) {
 			update_post_meta( $post_id, 'regular_price', $price );
 			update_post_meta( $post_id, 'sale_price_amount', $sale_price );
+			
+			if( ! empty( $sale_price ) && $sale_price > 0 ) {
+				update_post_meta( $post_id, 'sort_price', $sale_price );
+			} else {
+				update_post_meta( $post_id, 'sort_price', $price );
+			}
 		}
 
 		die;
@@ -410,65 +423,11 @@ class MP_Ajax {
 	 * @access wp_ajax_nopriv_mp_check_if_username_exists
 	 */
 	public function check_if_username_exists() {
-		if ( username_exists( mp_get_request_value( 'username', '' ) ) ) {
+		if ( username_exists( mp_get_request_value( 'account_username', '' ) ) ) {
 			die( 'false' );
 		}
 
 		die( 'true' );
-	}
-
-	/**
-	 * Create account
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_ajax_nopriv_mp_create_account
-	 */
-	public function create_account() {
-		$mp_submit_check = mp_get_post_value( 'mp-submit-check' );
-
-		if ( isset( $mp_submit_check ) && $mp_submit_check == '1' ) {
-			$order_id = mp_get_post_value( 'order_id', 0 );
-
-			check_ajax_referer( 'mp_create_account-' . $order_id, 'mp_create_account_nonce' );
-
-			$args = array(
-				'user_login' => mp_get_post_value( 'username' ),
-				'user_email' => mp_get_post_value( 'email' ),
-				'user_pass'  => mp_get_post_value( 'password1' ),
-				'first_name' => mp_get_post_value( 'name_first' ),
-				'last_name'  => mp_get_post_value( 'name_last' ),
-				'role'       => 'subscriber'
-			);
-
-			$args = apply_filters( 'mp_register_user', $args, $order_id );
-
-			$user_id = wp_insert_user( $args );
-
-			if ( ! is_wp_error( $user_id ) ) {
-				$user_signon = wp_signon( array(
-					'user_login'    => mp_get_post_value( 'username' ),
-					'user_password' => mp_get_post_value( 'password1' ),
-					'remember'      => true,
-				), false );
-
-				if ( $order_id != 0 ) {
-					$order = new MP_Order( $order_id );
-					if ( $order->exists() && $order->post_author == 0 ) {
-						//assign this order to this user
-						$post              = get_post( $order->ID );
-						$post->post_author = $user_id;
-						wp_update_post( $post->to_array() );
-					}
-				}
-
-				wp_send_json_success();
-			}
-		}
-
-		wp_send_json_error( array(
-			'message' => __( 'Oops!An unknown error occurred while creating your account. Please try again.', 'mp' ),
-		) );
 	}
 
 	/**

@@ -3,3 +3,5 @@
 node_modules
 includes/addons/mp-import-export/files/*
 !includes/addons/mp-import-export/files/index.php
+package-plugin
+.idea

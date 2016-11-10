@@ -146,6 +146,8 @@ class MP_Multisite {
 			return $content;
 		}
 
+		remove_filter( 'the_content', array( &$this, 'taxonomy_output' ) );
+
 		$type     = '';
 		$taxonomy = '';
 		if ( get_the_ID() == mp_get_network_setting( 'pages->network_categories' ) ) {
@@ -181,7 +183,7 @@ class MP_Multisite {
 			$new_rules[ $uri . '/([^/]+)/?' ]              = 'index.php?pagename=' . $uri . '&mp_global_tag=$matches[1]';
 		}
 
-		return $rewrite_rules + $new_rules;
+		return $new_rules + $rewrite_rules;
 	}
 
 	public function add_query_vars( $vars ) {
@@ -326,8 +328,8 @@ class MP_Multisite {
 			'price'             => $product->get_price( 'lowest' ),
 			'sales_count'       => $product->get_meta( 'mp_sales_count' )
 		);
-		$index_id     = $wpdb->insert( $wpdb->base_prefix . 'mp_products', $product_data );
-
+		$wpdb->insert( $wpdb->base_prefix . 'mp_products', $product_data );
+		$index_id = $wpdb->insert_id;
 		return $index_id;
 	}
 
@@ -386,11 +388,12 @@ class MP_Multisite {
 			$exist = mp_global_term_exist( $term->slug, $term->taxonomy );
 			if ( ! is_object( $exist ) ) {
 				//term not exists, just create
-				$term_id = $wpdb->insert( $wpdb->base_prefix . 'mp_terms', array(
+				$wpdb->insert( $wpdb->base_prefix . 'mp_terms', array(
 					'name' => $term->name,
 					'slug' => $term->slug,
 					'type' => $term->taxonomy
 				) );
+				$term_id = $wpdb->insert_id;
 			} else {
 				$term_id = $exist->term_id;
 			}
@@ -441,7 +444,8 @@ class MP_Multisite {
 	 */
 	public function index_content() {
 		$this->maybe_create_ms_tables();
-
+		//Delete all records on mp_terms table to fix issue with deleted categories / tags still exist
+		$this->truncate_index_table();
 		$blogs = wp_get_sites();
 		$count = 0;
 		foreach ( $blogs as $blog ) {
@@ -672,6 +676,18 @@ class MP_Multisite {
 
 		$wpdb->query( "DROP TABLE IF EXISTS $table1, $table2, $table3" );
 	}
+	
+	/**
+	 * Truncate index table
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @global $wpdb
+	 */
+	public function truncate_index_table() {
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->base_prefix}mp_terms WHERE type = 'product_category' OR type = 'product_tag' " );
+	}
 
 	/**
 	 * Filter out gateways that aren't allowed according to network admin settings
@@ -850,7 +866,12 @@ class MP_Multisite {
 	 * @access public
 	 */
 	public function product_url( $url, $product ) {
-		return trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
+		if ( $product->is_variation() && $product->get_parent() !== false ) {
+			$url = trailingslashit( mp_store_page_url( 'products', false ) . $product->get_parent()->post_name ) . 'variation/' . $product->ID;
+		} else {
+			$url = trailingslashit( mp_store_page_url( 'products', false ) . $product->post_name );
+		}
+		return $url ;
 	}
 
 	/**

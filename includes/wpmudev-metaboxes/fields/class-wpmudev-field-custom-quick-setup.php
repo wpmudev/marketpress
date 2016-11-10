@@ -37,7 +37,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 			?>
 			<div class="mp_quick_setup_step mp_quick_setup_step-1">
 				<div class="mp_content">
-					<img class="mp_quick_setup_image-welcome mp_image" src="<?php echo plugins_url( 'marketpress/includes/admin/ui/images/mp_quick_setup-welcome.png' ); ?>" alt="MarketPress - Quick Setup" height="158" width="158">
+					<img class="mp_quick_setup_image-welcome mp_image" src="<?php echo mp_plugin_url( 'includes/admin/ui/images/mp_quick_setup-welcome.png' ); ?>" alt="<?php _e('MarketPress - Quick Setup', 'mp'); ?>" height="158" width="158">
 					<h3 class="mp_title"><?php _e( 'Welcome to MarketPress - Quick Setup', 'mp' ); ?></h3>
 					<p><?php _e( 'MarketPress adds a full online store to your website, with heaps of configuration options and addons <br>to suit your needs. It\'s really easy to get going, and only takes a few minutes to setup!', 'mp' ); ?></p>
 					<!--<p><?php // _e( 'MarketPress adds a full online store to your website. It\'s really easy to get gogin, and only takes a few minutes to setup!', 'mp' );        ?></p>-->
@@ -50,7 +50,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 					</div><!-- end mp_callout -->
 
 					<div class="mp_skip_step">
-						<a class="mp_link mp_link-skip-step" href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '2' ), 'admin.php' ) ); ?>"><?php _e( 'Skip this step, I\'ll do this manually', 'mp' ); ?></a>
+						<a class="mp_link mp_link-skip-step" href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => 'skip' ), 'admin.php' ) ); ?>"><?php _e( 'Skip this step, I\'ll do this manually', 'mp' ); ?></a>
 					</div><!-- end mp_skip_step -->
 				<?php } else {
 					?>
@@ -170,7 +170,13 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 			</div><!-- end mp_quick_setup_content_step-2 -->
 			<?php
 		} else {//Final Step
-			update_option( 'mp_needs_quick_setup', 0 );
+
+			// If Skip
+			if( $quick_setup_step == 'skip' ) {
+				update_option( 'mp_needs_quick_setup', 'skip' );
+			} else {
+				update_option( 'mp_needs_quick_setup', 0 );
+			}
 			?>
 			<div class="mp_quick_setup_step mp_quick_setup_step-3">
 				<div class="mp_content">

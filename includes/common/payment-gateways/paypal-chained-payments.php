@@ -166,15 +166,18 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 			$this->RedirectToPayPal( $paykey );
 		} else { //whoops, error
 
+			$error = "";
 			for ( $i = 0; $i <= 5; $i ++ ) { //print the first 5 errors
 				if ( isset( $result["error($i)_message"] ) ) {
 					$error .= "<li>{$result[ "error($i)_errorId" ]} - {$result[ "error($i)_message" ]}</li>";
 				}
 			}
-			$error = '<br /><ul>' . $error . '</ul>';
-			echo $error;
-			exit;
-			mp_checkout()->add_error( __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) . $error );
+
+			if( empty( $error ) ){
+				mp_checkout()->add_error( '<li>' . __( 'There was a problem connecting to PayPal to setup your purchase. Please try again.', 'mp' ) . '</li>' , 'order-review-payment' );
+			} else {
+				mp_checkout()->add_error( $error , 'order-review-payment' );
+			}
 
 			return false;
 		}
@@ -635,7 +638,7 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$base_total = $cart->product_total( false );
 
 		//calculate fees / get fees only for base price (excluding taxes and shipping)
-		$percentage = $this->get_network_setting( 'percentage', 0 );
+		$percentage = $this->get_network_setting( 'percentage', 0.01 );
 		$fee        = round( $percentage * 0.01 * $base_total, 2 );
 
 		$nvpstr .= "&receiverList.receiver(0).email=" . urlencode( $this->get_setting( 'email' ) );
@@ -679,12 +682,20 @@ class MP_Gateway_Paypal_Chained_Payments extends MP_Gateway_API {
 		$args['body']       = $nvpStr . '&requestEnvelope.errorLanguage=en_US';
 		$args['sslverify']  = false;
 		$args['timeout']    = 60;
+		// Paypals sandbox stopped supporting HTTP 1.0 and only supports HTTP 1.1
+		$args['httpversion']    = '1.1';
+
+		//allow easy debugging
+		if ( defined( "MP_DEBUG_API_$methodName" ) ) {
+			var_dump( $args );
+			die;
+		}
 
 		//use built in WP http class to work with most server setups
 		$response = wp_remote_post( $this->API_Endpoint . $methodName, $args );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
-			mp()->cart_checkout_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
+			mp_checkout()->add_error( __( 'There was a problem connecting to PayPal. Please try again.', 'mp' ) );
 
 			return false;
 		} else {
@@ -762,11 +773,11 @@ if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && ! mp_cart()->is_glo
 			'desc'          => __( 'Enter a percentage of all store sales to collect as a fee. Decimals allowed.', 'mp' ),
 			'custom'        => array( 'style' => 'width:60px' ),
 			'before_field'  => '',
-			'default_value' => '0.00',
+			'default_value' => '0.01',
 			'validation'    => array(
 				'required' => true,
 				'number'   => true,
-				'min'      => 0,
+				'min'      => 0.01,
 			),
 		) );
 

@@ -161,8 +161,14 @@ class MP_Product_Attributes_Admin {
 		<select name="<?php echo $name; ?>" <?php if ( !empty( $id ) ) { ?>id="<?php echo $id; ?>"<?php } ?> class="<?php echo $class; ?>">
 			<option value="-1"><?php _e( '- Create New Variation -', 'mp' ); ?></option>
 			<?php foreach ( $product_attributes as $product_attribute ) {
+				$tags = '';
+				if( $attribute_terms = MP_Product_Attributes_Admin::get_product_attribute_terms( $product_attribute->attribute_id ) ){
+					$tags = mp_array_column( $attribute_terms, 'name' );
+					$tags = implode( ',', $tags );
+				}
+
 				?>
-				<option value="<?php
+				<option data-tags='<?php echo $tags ?>' value="<?php
 				if ( $value_type == 'id' ) {
 					echo $product_attribute->attribute_id;
 				} else {
@@ -186,6 +192,45 @@ class MP_Product_Attributes_Admin {
 		}
 		return 'variation_color_' . $attribute_id;
 	}
+
+
+/**
+	 * Gets the product attribute terms
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public static function get_product_attribute_terms( $attribute_id ) {
+
+		if( !isset( $attribute_id ) || empty( $attribute_id ) || !is_numeric( $attribute_id ) ){
+			return false; 
+		}
+
+		global $wpdb;
+
+		$product_atts	 = MP_Product_Attributes::get_instance();
+		$attribute_slug	 = $product_atts->generate_slug( $attribute_id );
+		$terms			 = get_terms( $attribute_slug, array( 'hide_empty' => false ) );
+		$value			 = array();
+
+		if( empty( $terms ) || !is_array( $terms ) ){
+			return false;
+		}
+
+		// Sort terms by term order
+		$product_atts->sort_terms_by_custom_order( $terms );
+
+		foreach ( $terms as $term ) {
+			$value[] = array(
+				'ID'	 => $term->term_id,
+				'name'	 => $term->name,
+				'slug'	 => $term->slug,
+			);
+		}
+
+		return $value;
+	}	
 
 	/**
 	 * Gets the product attribute terms

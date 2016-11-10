@@ -41,16 +41,15 @@ class MP_Public {
 		add_action( 'wp_enqueue_scripts', array( &$this, 'frontend_styles' ) );
 		add_filter( 'comments_open', array( &$this, 'disable_comments_on_store_pages' ), 10, 2 );
 		add_action( 'wp', array( &$this, 'maybe_start_session' ) );
-		add_action( 'wp_footer', array( &$this, 'create_account_lightbox_html' ), 20 );
 
-// Template Stuff
+		// Template Stuff
 		add_filter( 'taxonomy_template', array( &$this, 'load_taxonomy_template' ) );
 		add_filter( 'single_template', array( &$this, 'load_single_product_template' ) );
 		add_filter( 'page_template', array( &$this, 'load_page_template' ) );
 
 		add_action( 'pre_get_posts', array( &$this, 'custom_taxonomy_limit_posts' ) );
 
-//Downloads
+		//Downloads
 		add_action( 'pre_get_posts', array( &$this, 'include_out_of_stock_products_for_downloads' ) );
 		add_filter( 'posts_results', array( &$this, 'set_publish_status_for_out_of_stock_product_downloads' ), 10, 2 );
 		add_action( 'template_redirect', array( &$this, 'maybe_serve_download' ) );
@@ -62,7 +61,7 @@ class MP_Public {
 
 		$post_type = MP_Product::get_post_type();
 		$settings  = get_option( 'mp_settings' );
-//Add global .mp class on all MarketPress pages
+		//Add global .mp class on all MarketPress pages
 		if (
 			is_singular( $post_type ) ||
 			get_post_type() == $post_type ||
@@ -73,15 +72,15 @@ class MP_Public {
 			$classes[] = 'mp';
 		}
 
-//Add class for mp singles
+		//Add class for mp singles
 		if ( is_singular( $post_type ) ) {
 			$classes[] = 'mp-single';
 		}
-//Add class for mp category page
+		//Add class for mp category page
 		if ( is_archive( $post_type ) && is_tax( array( 'product_category' ) ) ) {
 			$classes[] = 'mp-category';
 		}
-//Add class for mp tag pages
+		//Add class for mp tag pages
 		if ( is_archive( $post_type ) && is_tax( array( 'product_tag' ) ) ) {
 			$classes[] = 'mp-tag';
 		}
@@ -100,113 +99,6 @@ class MP_Public {
 
 
 		return $classes;
-	}
-
-	/**
-	 * Output the html for the "create account" lightbox
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @action wp_footer
-	 *
-	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
-	 */
-	public function create_account_lightbox_html( $echo = true ) {
-		if ( is_user_logged_in() ) {
-// Bail - user is logged in (e.g. already has an account)
-			return false;
-		}
-
-		if ( 'wp_footer' == current_filter() ) {
-			$echo = true;
-		}
-
-		//we only display this lightbox in order status page, after checkout if user doesn't have account
-		$order_status_id = mp_get_setting( 'pages->order_status' );
-		if ( ! $order_status_id ) {
-			//this page still not created, bail
-			return false;
-		}
-
-		if ( get_the_ID() != $order_status_id ) {
-			//not the page we want
-			return false;
-		}
-
-		$order_id = get_query_var( 'mp_order_id' );
-		$order = new MP_Order( $order_id );
-		if ( ! $order->exists() )
-			return;
-
-		if ( $order->post_author != 0 )
-			return;
-
-		ob_start();
-
-		?>
-		<div id="mp-create-account-lightbox" class="mp_lightbox mp_create_account">
-
-			<h2 class="mp_title"><?php _e( 'Create Account', 'mp' ); ?></h2>
-
-			<form id="mp-create-account-form" class="mp_form mp_form-create-account" action="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_create_account' ) ); ?>" method="post">
-				<?php wp_nonce_field( 'mp_create_account-' . $order_id, 'mp_create_account_nonce' ); ?>
-				<div class="mp_form_field">
-					<label for="mp-create-account-name-first" class="mp_form_label"><?php _e( 'Username:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-username" type="text" name="username" data-rule-required="true" data-rule-remote="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ); ?>" data-msg-remote="<?php esc_attr_e( 'An account with this username already exists', 'mp' ); ?>">
-				</div>
-
-				<div class="mp_form_field">
-					<label for="mp-create-account-name-first" class="mp_form_label"><?php _e( 'First Name:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-name-first" type="text" name="name_first" data-rule-required="true">
-				</div>
-
-				<div class="mp_form_field">
-					<label for="mp-create-account-name-last" class="mp_form_label"><?php _e( 'Last Name:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-name-last" type="text" name="name_last" data-rule-required="true">
-				</div>
-
-				<div class="mp_form_field">
-					<label for="mp-create-account-email" class="mp_form_label"><?php _e( 'Email:', 'mp' ); ?>'<span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-email" type="email" name="email" data-rule-required="true" data-rule-email="true" data-rule-remote="<?php echo esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_email_exists' ) ); ?>" data-msg-remote="<?php esc_attr_e( 'An account with this email address already exists', 'mp' ); ?>">
-				</div>
-
-				<div class="mp_form_field">
-					<label for="mp-create-account-password1" class="mp_form_label"><?php _e( 'Password:', 'mp' ); ?>'<span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-password1" type="password" name="password1" data-rule-required="true">
-				</div>
-
-				<div class="mp_form_field">
-					<label for="mp-create-account-password2" class="mp_form_label"><?php _e( 'Re-enter Password:', 'mp' ); ?><span class="mp-field-required">*</span></label>
-					<input class="mp_form_input" id="mp-create-account-password2" type="password" name="password2" data-rule-required="true" data-rule-equalTo="#mp-create-account-password1" data-msg-equalTo="<?php esc_attr_e( 'Passwords do not match!', 'mp' ); ?>">
-				</div>
-
-				<?php do_action( 'mp_public/create_account_lightbox_form', $order_id ); ?>
-
-				<div class="mp_form_callout">
-					<button type="submit" class="mp_button mp_button-alt mp_button-create-account"><?php _e( 'Create Account', 'mp' ); ?></button>
-				</div>
-				<input type="hidden" name="order_id" value="<?php echo esc_attr( $order_id ); ?>"/>
-				<input type="hidden" name="mp-submit-check" value="1" />
-			</form>
-		</div><!-- end mp-create-account-lightbox -->';
-		<?php
-
-		$html = ob_get_clean();
-
-		/**
-		 * Filter the "create account" lightbox html
-		 *
-		 * @since 3.0
-		 *
-		 * @param string $html The current html.
-		 */
-		$html = apply_filters( 'mp_public/create_account_lightbox_html', $html );
-
-		if ( $echo ) {
-			echo $html;
-		} else {
-			return $html;
-		}
 	}
 
 	/**
@@ -245,13 +137,13 @@ class MP_Public {
 	 * @return string
 	 */
 	public function hide_single_product_title( $title, $id = false, $is_nav = false ) {
-		if ( in_the_loop() && is_main_query() && !$is_nav ) {
-            $title = '';
-        }
+		if ( in_the_loop() && is_main_query() && ! $is_nav ) {
+			$title = '';
+		}
 
-        return $title;
+		return $title;
 	}
-	
+
 	/**
 	 * Check if the current page is a store page
 	 *
@@ -329,30 +221,31 @@ class MP_Public {
 			$query->set( 'post_status', array( 'out_of_stock', 'publish' ) );
 		}
 	}
-	
+
 	/**
 	 * Enqueue frontend styles and scripts
 	 *
 	 * @since 3.0
 	 * @access public
 	 */
-	 
+
 	public function frontend_styles() {
 		//Display styles for all pages
-		
-		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
+
+		wp_enqueue_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
-		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
 
-		
 		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
 			$theme_url = mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' );
-		} else {
+		} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
 			$theme_url = content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' );
 		}
-		wp_enqueue_style( 'mp-theme', $theme_url, array( 'mp-frontend' ), MP_VERSION );
-		
+
+		if( ! empty($theme_url) ){
+			wp_enqueue_style( 'mp-theme', $theme_url, array(), MP_VERSION );
+		}
+
 	}
 
 	/**
@@ -369,14 +262,15 @@ class MP_Public {
 			wp_enqueue_script( 'lightgallery', mp_plugin_url( 'ui/lightgallery/js/lightgallery.js' ), array( 'jquery' ), MP_VERSION );
 			wp_enqueue_style( 'lightgallery', mp_plugin_url( 'ui/lightgallery/css/lightgallery.css' ), array(), MP_VERSION );
 		}
-		
+
 		/*
 		 * Comment this to allow scripts to load on all pages for Global products widget
 		if ( ! $this->is_store_page() ) {
 			return;
 		}
 		*/
-// JS
+		
+		// JS
 		wp_register_script( 'hover-intent', mp_plugin_url( 'ui/js/hoverintent.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
@@ -386,17 +280,21 @@ class MP_Public {
 			'hover-intent',
 			'mp-select2'
 		), MP_VERSION );
-
-// Get product category links
+		
+		$grid_with_js = apply_filters('mp-do_grid_with_js', true);
+		
+		if ( $grid_with_js == "true" ) {
+			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array('jquery'), MP_VERSION );
+		}
+		
+		// Get product category links
 		$terms = get_terms( 'product_category' );
 		$cats  = array();
 		foreach ( $terms as $term ) {
 			$cats[ $term->term_id ] = get_term_link( $term );
 		}
-
-// Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
-			'ajaxurl'      => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'      => mp_get_ajax_url(),
 			'loadingImage' => mp_plugin_url( 'ui/images/loading.gif' ),
 			'productsURL'  => mp_store_page_url( 'products', false ),
 			'productCats'  => $cats,
@@ -498,11 +396,9 @@ class MP_Public {
 		global $wp_query;
 
 		switch ( get_query_var( 'taxonomy' ) ) {
-			case 'product_category' :
-			case 'product_tag' :
-				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 
 			case 'product_category' :
+				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 				$template = locate_template( array(
 					'mp_category-' . get_query_var( 'taxonomy' ) . '.php',
 					'mp_category-' . $term->term_id . '.php',
@@ -516,6 +412,7 @@ class MP_Public {
 				break;
 
 			case 'product_tag' :
+				$term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 				$template = locate_template( array(
 					'mp_tag-' . get_query_var( 'taxonomy' ) . '.php',
 					'mp_tag-' . $term->term_id . '.php',
@@ -837,6 +734,9 @@ class MP_Public {
 		if ( ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
+
+// Should only run once, prevent infinite loops
+		remove_filter( 'the_content', array( &$this, 'taxonomy_content' ) );
 
 // don't remove post thumbnails from products
 		remove_filter( 'get_post_metadata', array( &$this, 'remove_product_post_thumbnail' ), 999 );

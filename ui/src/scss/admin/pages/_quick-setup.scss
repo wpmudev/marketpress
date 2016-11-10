@@ -1,0 +1,354 @@
+//== Quick Setup
+//
+
+// Quick Setup Tabs
+.mp_quick_setup_tabs {
+	@include j-cf();
+	//border-top: 1px solid $color--dark-gray;
+	
+	// Tabs
+	.mp_tabs {
+		
+		// Labels
+		&_labels {
+			font-size: 0;
+			margin: 0;
+			padding: 0;
+		}
+		
+		// Content
+		&_content {
+			@include j-cf();
+			//margin-top: 100px;
+		}
+		
+	}
+	
+	// Tab
+	.mp_tab {
+		@include j-cf();
+		
+		// Label
+		&_label {
+			background: $color--light-gray;
+			border: 1px solid transparent;
+			//border-top-color: transparent;
+			//border-right-color: transparent;
+			border-bottom-color: $color--gray;
+			//border-left-color: transparent;
+			display: block;
+			@include fontSize($font__size);
+			//line-height: em(26px, $font__size);
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			
+			&:first-child {
+				border-top-color: $color--gray;
+			}
+			
+			@include bp(medium) {
+				//background: red;
+				border-top-color: $color--gray;
+				//border-bottom: 1px solid $color--gray;
+				border-left-color: $color--gray;
+				display: inline-block;
+				//width: 33.33%;
+				width: 25%;
+				
+				&:first-child {
+					border-left: none;
+				}
+			}
+			
+			&_link {
+				//background: $color--light-gray;
+				color: $color;
+				display: block;
+				padding: $space 0;
+				text-decoration: none;
+			}
+			
+			&.ui-tabs-active {
+				background: #fff;
+				
+				@include bp(medium) {
+					//border-bottom-color: transparent;
+				}
+				
+				.mp_tab_label_link {
+					color: $color--dark;
+				}
+			}
+		}
+		
+		// Content
+		&_content {
+			@include j-cf();
+			//margin-top: $space--l;
+			text-align: left;
+			padding: 50px 10%;
+			
+			@include bp(small) {
+				padding-right: 13%;
+				padding-left: 13%;
+			}
+			
+			@include bp(medium) {
+				padding: 100px 15%;
+			}
+			
+			@include bp(large) {}
+			
+			&_block {
+				margin-top: $space;
+				
+				&:first-child {
+					margin-top: 0;
+				}
+			}
+			
+			&_details {
+				display: none;
+				margin-top: $space--m;
+			}
+		}
+		
+		// Seperator
+		&_sep {
+			background-color: $color--light-gray;
+			display: block;
+			height: 1px;
+			margin: $space--s auto 0;
+			width: 100%;
+		}
+		
+		// Navigation
+		&_navigation {
+			@include j-cf();
+			border-top: 1px solid $color--light-gray;
+			padding: $space;
+		}
+		
+	}
+}
+
+// General
+#mp-quick-setup-wizard {
+	padding: 0;
+	
+	* {
+		box-sizing: border-box;
+	}
+
+	// Inherit from admin.css
+	&.postbox {
+		&.wpmudev-postbox {
+			.handlediv,
+			h3.hndle {
+				display: none;
+			}
+			
+			.inside {
+				.wpmudev-field {
+					padding: 0;
+					
+					&.shaded {
+						background: transparent;
+					}
+				}
+				.wpmudev-subfield-group-wrap {
+					background: transparent;
+					box-shadow: none;
+				}
+				.wpmudev-subfield-delete-group {
+					position: relative;
+				}
+			}
+		}
+	}
+
+	// Tabs
+	.mp_tab {
+		
+		// Content
+		&_content {
+			
+			// Fields
+			.wpmudev-field {
+				margin-top: $space;
+				
+				&:first-child {
+					margin-top: 0;
+				}
+			}
+			
+			p {
+				//line-height: em(20px, $font__size);
+				//margin-bottom: $space--s;
+				margin-bottom: $space--s;
+			}
+			
+			p.mp_tab_content_label,
+			.wpmudev-field-label {
+				color: $color--dark;
+				font-family: 'Open Sans', Arial, sans-serif;
+				@include fontSize($font__size--l);
+				font-weight: 600;
+				line-height: em(20px, $font__size);
+				margin-bottom: $space--s;
+			}
+			.wpmudev-field-desc,
+			.wpmudev-metabox-desc {
+				color: $color;
+				font-family: 'Open Sans', Arial, sans-serif;
+				@include fontSize($font__size);
+				line-height: em(20px, $font__size);
+				margin: 0 0 $space--s;
+				padding: 0;
+			}
+		}
+	}
+	
+	// Override WP/WPMU DEV
+	.mp_quick_setup {
+		padding: 0;
+	}
+}
+
+// Inherit from admin.css
+.store-settings_page_store-setup-wizard {
+    p.submit {
+	    display: none;
+    }
+}
+
+// Steps Content
+.mp_quick_setup_step {
+	padding: 100px 15%;
+	text-align: center;
+	
+	// Step Content with Tabs
+	&-has-tabs {
+		padding: 0;
+		
+		.mp_content {
+			padding: 50px 15%;
+			
+			&-tabs {
+				padding: 0;
+			}
+		}
+	}
+	
+	// Step 1
+	&-1 {
+		
+		// Content
+		.mp_quick_setup_image-welcome {
+			margin-bottom: $space--l;
+		}
+		
+		// Callout
+		.mp_callout {
+			margin-top: $space--l;
+		}
+		
+	}
+	
+	// Step 3
+	&-3 {
+		
+		@include bp(large) {
+			// Callout
+			.mp_callout {
+				padding: 0 15%;
+			}
+		}
+		
+		// Buttons
+		.mp_button {
+			&-add-product,
+			&-configure-store {
+				margin-top: $space;
+			}
+		}
+		
+	}
+}
+
+// Shipping Tab
+#mp-quick-setup-is-wizard-shipping {
+	
+	.inside {
+		
+		// Fields
+		.wpmudev-field-label {
+			color: $color;
+			@include fontSize($font__size);
+			font-weight: 400;	
+			line-height: em(20px, $font__size);
+			margin: 0 0 $space--m;
+			padding: 0;
+		}
+		
+	}
+	
+}
+#mp-content-shipping {
+		
+	.inside {
+		
+		// Fields
+		.wpmudev-fields {
+			
+			.wpmudev-field {
+				&.wpmudev-field-has-conditional {
+					background-color: #f9f9f9;
+					border-radius: 5px;
+					padding: $space--m;
+				}
+			}
+			
+		}
+		
+	}
+
+	.wpmudev-metabox-has-conditional {
+		background-color: #f9f9f9;
+		border-radius: 5px;
+		margin-top: $space--m;
+		padding: $space--m;
+		
+		.wpmudev-subfields {
+			border-color: $color--light-gray;
+			box-shadow: none;
+		}
+	}
+
+}
+
+// Payment Gateway Tab
+#mp-quick-setup-tab-payment-gateway {
+	
+	.mp_tab_content_details-payment-gateway {
+		
+		.postbox.wpmudev-postbox {
+			margin-top: $space;
+			margin-bottom: 0;
+			
+			h3.hndle {
+				display: block;
+				padding: $space--s $space--m;
+			}
+			.handlediv {
+				display: block;
+			}
+			
+			.inside {
+				padding: $space--m;
+			}
+		}
+	}
+	
+}

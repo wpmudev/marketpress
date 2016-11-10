@@ -1,0 +1,17 @@
+//== Buttons
+//
+
+.mp_button {
+	
+	// Tabs Navigation Buttons
+	&_tab_nav {
+		&-prev {
+			float: left;
+		}
+		&-next,
+		&-finish {
+			float: right;
+		}
+	}
+	
+}

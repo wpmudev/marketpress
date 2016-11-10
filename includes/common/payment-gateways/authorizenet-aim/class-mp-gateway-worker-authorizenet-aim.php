@@ -9,11 +9,12 @@ class MP_Gateway_Worker_AuthorizeNet_AIM {
 	var $approved = false;
 	var $declined = false;
 	var $held_for_review = false;
+	var $plugin_name = 'authorize';
 	var $error = true;
 	var $method = "";
 	var $fields;
 	var $response;
-	var $instance = 0;
+	var $instances = 0;
 
 	function __construct( $url, $delim_data, $delim_char, $encap_char, $gw_username, $gw_tran_key, $gw_test_mode ) {
 		if ( $this->instances > 0 ) {
@@ -45,7 +46,7 @@ class MP_Gateway_Worker_AuthorizeNet_AIM {
 		//replace encoded characters with their non-encoded versions
 		$search = array('&#8230;', '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8226;', '&#8211;', '&#8212;');
 		$replace = array('...', "'", "'", '"', '"', '•', '-', '-');
-		$str = str_replace($find, $replace, $str);
+		$str = str_replace($search, $replace, $str);
 		
 		//remove all other entities
 		$str = preg_replace("/&.{0,}?;/", '', $str);

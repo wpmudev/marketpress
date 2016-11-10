@@ -1,0 +1,283 @@
+//== Single
+//
+
+// Single Product Grid
+.mp_single_product {
+	@include j-cf();
+
+	// Product Images
+	&_images {
+		display: block;
+		width: 100%;
+	}
+	
+	// Product Details/Content
+	&_details {
+		//@include span(1);
+		display: block;
+		width: 100%;
+	}
+	
+	// If product has variations but no images
+	&-has-variations {
+		
+		// Product Images
+		.mp_single_product_images {
+			//@include stack();
+			
+			@include bp(desktop) {
+				//@include unstack();
+				@include j-column(.5);
+			}
+		}
+		
+		// Product Content
+		.mp_single_product_details {
+			//@include stack();
+			
+			@include bp(desktop) {
+				//@include unstack();
+				@include j-column(.5, $cycle: 2);
+			}
+		}
+		
+	}
+	
+	// If product has images
+	&-has-image {
+		
+		// Image align: none or center
+		&.mp_single_product-image-aligncenter {
+			
+			// Product Images
+			.mp_single_product_images {
+				@include j-span(1);
+			}
+						
+			// Product Content
+			.mp_single_product_details {
+				@include j-span(1);
+			}
+			
+		}
+		
+		// Image align: left
+		&.mp_single_product-image-alignleft {
+			
+			// Product Images
+			.mp_single_product_images {
+				//@include stack();
+				
+				@include bp(desktop) {
+					//@include unstack();
+					@include j-column(.5);
+				}
+			}
+			
+			// Product Content
+			.mp_single_product_details {
+				//@include stack();
+				
+				@include bp(desktop) {
+					//@include unstack();
+					@include j-column(.5, $cycle: 2);
+				}
+			}
+			
+		}
+		
+		// Image align: right
+		&.mp_single_product-image-alignright {
+			
+			// Product Images
+			.mp_single_product_images {
+				//@include stack();
+				
+				@include bp(desktop) {
+					//@include unstack();
+					@include j-column(.5);
+					@include j-shift(.5);
+				}
+			}
+			
+			// Product Content
+			.mp_single_product_details {
+				//@include stack();
+				
+				@include bp(desktop) {
+					//@include unstack();
+					@include j-column(.5, $cycle: 2);
+					@include j-shift(-.5);
+				}
+			}
+			
+		}
+		
+	}
+	
+	// Extra (tabs, etc..)
+	&_extra {
+		@include j-span(1);
+		margin-top: $space;
+		position: relative;
+	}
+
+}
+
+// Single Product Grid (Extra)
+.mp_single_product {
+	
+	.mp_product_image_link {
+		border-bottom: none;
+		//display: inline-block;
+		display: block;
+	}
+	
+	.mp_product_image_single {
+		//display: inline-block;
+		height: auto;
+		max-width: 100%;
+		width: 100%;
+	}
+		
+	// Has image
+	&-has-image {
+		
+		// Product Details
+		> .mp_single_product_details {
+			margin-top: $space;
+			
+			@include bp(desktop) {
+				margin-top: 0;
+			}
+		}
+
+	}
+	
+	// Image Align
+	&-image {
+		&-aligncenter {
+			
+			.mp_product_gallery {
+				text-align: center;
+			}
+			// Product Gallery
+			.lSPager.lSGallery {
+				margin: $space--m auto 0;
+			}
+
+			
+			// Content/Details
+			> .mp_single_product_details {
+				@include bp(desktop) {
+					margin-top: $space;
+				}
+			}
+			
+		}
+	}
+	
+}
+
+// Single Product Elements
+.mp_product {
+		
+	// Product Variations
+	&_options_atts {
+		@include j-cf();	
+		margin-bottom: $space--m;
+	}
+	&_options_att {
+		@include j-cf();
+		margin-bottom: $space--m;
+		
+		&:last-of-type {
+			margin-bottom: 0;
+		}
+		
+		// Select2
+		.select2-container {
+				
+			.select2-choice {
+				height: 40px;
+				line-height: 40px;
+				
+				.select2-arrow {
+					b {
+						background-position: 1px 6px;
+					}
+				}
+			}
+		}
+		// Select2 Open
+		.select2-dropdown-open {
+			
+			.select2-choice {
+				
+				.select2-arrow {
+					b {
+						background-position: -16px 6px;
+					}
+				}
+			}
+			
+		}
+		
+		// Qty
+		.mp_form_input-qty {
+			max-width: ($space--l * 2);
+			padding: 8px $space--m;
+			width: 100%;
+		}
+		
+	}
+
+	// Buy Form: Labels
+	&_options_att_label {
+		display: block;
+		margin: 0 0 $space--xs;
+	}
+	&_options_att_input_label {
+		margin: 0;
+	}
+	
+	// Tabs
+	.mp_product_tab_labels {
+		@include j-cf();
+		list-style: none;
+		margin: 0 0 $space--m;
+		padding: 0;
+	}
+	.mp_product_tab_label {
+		float: left;
+		margin: 0 $space--m 0 0;
+		
+		&:last-child {
+			margin-right: 0;
+		}
+		
+		a {
+			display: block;
+			border-bottom: none;
+			padding: $space--xs $space--m;
+			text-decoration: none;
+			
+			&:focus {
+				outline: 0;
+			}
+		}
+	}
+	.mp_product_tab_content {
+		@include j-cf();
+		opacity: 0;
+		position: absolute;
+		z-index: -1;
+		
+		&-current {
+			opacity: 1;
+			position: relative;
+			transition: opacity .4s ease-in-out;
+			z-index: 100;
+		}
+	}
+}

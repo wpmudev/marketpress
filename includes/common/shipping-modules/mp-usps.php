@@ -165,7 +165,7 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 				'store-setup-wizard'
 			),
 			'title'       => sprintf( __( '%s Settings', 'mp' ), $this->public_name ),
-			'desc'        => __( 'Using this USPS Shipping calculator requires requesting an Ecommerce API Username and Password. Get your free set of credentials <a target="_blank" href="https://secure.shippingapis.com/registration/">here &raquo;</a>. The password is no longer used for the API, just the username which you should enter below. The USPS test site has not yet been updated and currently doesn\'t work - you should just request activating your credentials with USPS and go live.', 'mp' ),
+			'desc'        => __( 'Using this USPS Shipping calculator requires requesting an Ecommerce API Username and Password. Get your free set of credentials <a target="_blank" href="https://registration.shippingapis.com/">here &raquo;</a>. The password is no longer used for the API, just the username which you should enter below. The USPS test site has not yet been updated and currently doesn\'t work - you should just request activating your credentials with USPS and go live.', 'mp' ),
 			'option_name' => 'mp_settings',
 			'conditional' => array(
 				'operator' => 'AND',
@@ -397,6 +397,10 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 	 * return array $shipping_options
 	 */
 	function shipping_options( $cart, $address1, $address2, $city, $state, $zip, $country ) {
+
+		add_filter( 'mp_list_shipping_options', array( $this, 'after_mp_shipping_options'), 10, 2 );
+		add_filter( 'mp_checkout_step_link', array( $this, 'checkout_step_link_handler'), 10, 4 );
+
 		if ( $this->_crc_ok() && false !== ( $shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ) ) {
 			if ( ! empty( $shipping_options ) ) {
 				// CRC is ok - just return the shipping options already stored in session
@@ -471,6 +475,40 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 		}
 
 		return $shipping_options;
+	}
+
+	/**
+	 *  Filter when to display the next step button.
+	 *
+	 * @param $link
+	 * @param $what
+	 * @param $section
+	 * @param $step_number
+	 */
+	function checkout_step_link_handler( $link, $what, $section, $step_number ){
+		if ( $this->_crc_ok() && false !== ( $shipping_options = mp_get_session_value( 'mp_shipping_options->' . $this->plugin_name ) ) ) {
+			if ( empty( $shipping_options ) ) {
+				return '';
+			}
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Add output after shipping options in checkout steps.
+	 *
+	 * @param $html
+	 * @param $options
+	 */
+	function after_mp_shipping_options( $html, $options ){
+		if( empty( $options) ){
+			$html .= '<span class="mp_usps_after_shipping_options no_options_available">';
+			$html .= __( 'There are no shipping services available for this type of package in your location.', 'mp' );
+			$html .= '</span>';
+		}
+
+		return $html;
 	}
 
 	function calculate_packages() {
@@ -721,7 +759,8 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 		//$package->appendChild($gxg);
 
 		$package->appendChild( $dom->createElement( 'ValueOfContents', $total ) );  //For insurance?
-		$package->appendChild( $dom->createElement( 'Country', mp()->countries[ $this->country ] ) );
+		$countries = mp_countries();		
+		$package->appendChild( $dom->createElement( 'Country', $countries[ $this->country ] ) );
 
 		// If greater than 12" it's a LARGE parcel otherwise REGULAR
 		$this->size = ( $this->pkg_dims[2] > 12 ) ? 'LARGE' : 'REGULAR';

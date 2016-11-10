@@ -146,8 +146,13 @@ class MP_Checkout {
 
 		$data = (array) mp_get_post_value( 'billing', array() );
 
+		// Force state to empty if not set by user to ensure that old state value will be deleted
+		if( !isset( $data['state'] ) ) {
+			$data['state'] = '';
+		}
+
 		foreach ( $data as $key => $value ) {
-			$value = trim( $value );
+			$value = sanitize_text_field( trim( $value ) );
 			mp_update_session_value( "mp_billing_info->{$key}", $value );
 		}
 
@@ -156,6 +161,11 @@ class MP_Checkout {
 
 		if ( $enable_shipping_address ) {
 			$data = (array) mp_get_post_value( 'shipping', array() );
+
+			// Force state to empty if not set by user to ensure that old state value will be deleted
+			if( !isset( $data['state'] ) ) {
+				$data['state'] = '';
+			}
 
 			foreach ( $data as $key => $value ) {
 				$value = trim( $value );
@@ -223,8 +233,9 @@ class MP_Checkout {
 			$allowed_countries = explode( ',', mp_get_setting( 'shipping->allowed_countries', '' ) );
 		}
 
+		$all_countries		 = mp_countries();
+
 		if ( mp_all_countries_allowed() ) {
-			$all_countries		 = mp()->countries;
 			$allowed_countries	 = array_keys( $all_countries );
 		}
 
@@ -233,7 +244,7 @@ class MP_Checkout {
 		//$countries[''] = __('Select One', 'mp');
 
 		foreach ( $allowed_countries as $_country ) {
-			$countries[ $_country ] = mp()->countries[ $_country ];
+			$countries[ $_country ] = $all_countries[ $_country ];
 		}
 
 		// State/zip fields
@@ -482,9 +493,13 @@ class MP_Checkout {
 	 * @access public
 	 * @param string $msg The error message.
 	 * @param string $context The context of the error message.
+	 * @param bool $add_slashes Add slashes to prevent double quotes from causing errors.
 	 */
-	public function add_error( $msg, $context = 'general' ) {
-		$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+	public function add_error( $msg, $context = 'general' , $add_slashes = true ) {
+		if ( $add_slashes ){
+			$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
+		}
+		
 
 		if ( !isset( $this->_errors[ $context ] ) ) {
 			$this->_errors[ $context ] = array();
@@ -555,6 +570,64 @@ class MP_Checkout {
 			),
 		) );
 	}
+	
+	/**
+	 * Update shipping section
+	 *
+	 * @since 3.0
+	 * @access protected
+	 */
+	protected function _ajax_register_account() {
+		
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
+
+		$data = (array) mp_get_post_value( 'account', array() );
+		
+		$enable_registration_form = mp_get_post_value( 'enable_registration_form' );
+		$account_username 		  = mp_get_post_value( 'account_username' );
+		$account_password 		  = mp_get_post_value( 'account_password' );
+		$account_email 			  = mp_get_post_value( 'billing->email' );
+		$first_name				  = mp_get_post_value( 'billing->first_name' ); 
+		$last_name				  = mp_get_post_value( 'billing->last_name' ); 
+		
+
+		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
+			
+			if( $enable_registration_form && $account_username && $account_password && $account_email  ) {
+				$args = array(
+					'user_login' => $account_username,
+					'user_email' => $account_email,
+					'user_pass'  => $account_password,
+					'first_name' => $first_name,
+					'last_name'  => $last_name,
+					'role'       => 'subscriber'
+				);
+
+				$args = apply_filters( 'mp_register_user', $args );
+
+				$user_id = wp_insert_user( $args );
+
+				if ( ! is_wp_error( $user_id ) ) {
+					add_action( 'set_logged_in_cookie', array($this, 'force_logged_in_cookie'), 5, 10 );
+					$user_signon = wp_signon( array(
+						'user_login'    => $account_username,
+						'user_password' => $account_password,
+						'remember'      => true,
+					), false );
+
+
+				}
+			}
+		}
+	}
+
+	public function force_logged_in_cookie( $logged_in_cookie, $expire, $expiration, $user_id, $scheme ){
+		wp_set_current_user( $user_id ); // Force current user to be used in nonce generation.
+		$_COOKIE[LOGGED_IN_COOKIE] = $logged_in_cookie; // Set cookie immediately after ajax registration to be used in nonce generation.
+	}
 
 	/**
 	 * Update checkout data
@@ -566,10 +639,12 @@ class MP_Checkout {
 	public function ajax_update_checkout_data() {
 		$this->_update_shipping_section();
 		$this->_update_order_review_payment_section();
+		$this->_ajax_register_account();
 
 		$sections = array(
 			'mp-checkout-section-shipping'				 => $this->section_shipping(),
 			'mp-checkout-section-order-review-payment'	 => $this->section_order_review_payment(),
+			'mp_checkout_nonce'							 => wp_nonce_field( 'mp_process_checkout', 'mp_checkout_nonce', false, false ),
 		);
 
 		wp_send_json_success( $sections );
@@ -597,9 +672,9 @@ class MP_Checkout {
 
 		if ( !mp_cart()->has_items() ) {
 		if ( $disable_cart == '1' ) {
-				return __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">The cart is disabled.</p></<div><!-- end mp_cart_empty -->', 'mp' );
+				return __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">The cart is disabled.</p></div><!-- end mp_cart_empty -->', 'mp' );
 			} else {
-				return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></<div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
+				return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
 			}
 
 		}
@@ -780,6 +855,11 @@ class MP_Checkout {
 			$atts .= " {$key}={$val}";
 		}
 
+		// Convert Counrty/State abbreviation when value_only
+		if( mp_arr_get_value( 'value_only', $field ) && in_array( mp_arr_get_value( 'name', $field, '' ), array( 'billing[country]' , 'billing[state]', 'shipping[country]' , 'shipping[state]' ) ) && isset( $field['options'][$field['value']] ) ){
+			$field['value'] = $field['options'][$field['value']];
+		}
+
 		switch ( mp_arr_get_value( 'type', $field, '' ) ) {
 			case 'text' :
 			case 'password' :
@@ -862,30 +942,31 @@ class MP_Checkout {
 	 * @param string $what Either "prev" or "next".
 	 * @return string
 	 */
-	public function step_link( $what ) {
+	public function step_link( $what, $section = false ) {
 		$hash	 = $this->url_hash( $what );
 		$text	 = '';
 		$classes = array( 'mp_button', "mp_button-checkout-{$what}-step" );
+		$link = false;
 
 		switch ( $what ) {
 			case 'prev' :
 				if ( 1 === $this->_stepnum ) {
-					return false;
+					break;
 				}
 
 				$text		 = __( '&laquo; Previous Step', 'mp' );
 				$classes[]	 = 'mp_button-secondary';
-				return '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
+				$link = '<a class="' . implode( ' ', $classes ) . '" href="' . $hash . '">' . $text . '</a>';
 				break;
 
 			case 'next' :
 				$text		 = __( 'Next Step &raquo;', 'mp' );
 				$classes[]	 = 'mp_button-medium';
-				return '<button class="' . implode( ' ', $classes ) . '" type="submit">' . $text . '</button>';
+				$link = '<button class="' . implode( ' ', $classes ) . '" type="submit">' . $text . '</button>';
 				break;
 		}
 
-		return false;
+		return apply_filters( 'mp_checkout_step_link', $link, $what, $section, $this->_stepnum );
 	}
 
 	/**
@@ -1036,6 +1117,46 @@ class MP_Checkout {
 	public function has_errors( $context = 'general' ) {
 		return ( mp_arr_get_value( $context, $this->_errors ) ) ? true : false;
 	}
+	
+	/**
+	 * Toggleable registration form on checkout
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+	public function register_toggle_form(  ) {
+		
+		if ( is_user_logged_in() ) {
+			// Bail - user is logged in (e.g. already has an account)
+			return false;
+		}
+		
+		$html = '';
+		$html .= '
+			<div class="mp_checkout_field mp_checkout_checkbox">
+				<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_registration_form" value="1" autocomplete="off"> <span>' . __( 'Register as customer?', 'mp' ) . '</span></label>
+			</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
+		';
+		
+			$html .= '
+				<div id="mp-checkout-column-registration" style="display:none" class="mp_checkout_column_section">
+					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
+					
+			$html .= '<div class="mp_checkout_field mp_checkout_column">
+					<label class="mp_form_label">' . __( 'Username', 'mp' ) . '</label>	
+				    <input type="text" name="account_username" id="mp_account_username" data-rule-remote="' . esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ) . '" data-msg-remote="' . __( 'An account with this username already exists', 'mp' ) . '"></input>
+				  </div><!-- end mp_checkout_field -->';
+			
+			$html .= '<div class="mp_checkout_field mp_checkout_column">
+					<label class="mp_form_label">' . __( 'Password', 'mp' ) . '</label>	
+				    <input type="password" name="account_password"></input>
+				  </div><!-- end mp_checkout_field -->';			
+			$html .= wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce' ) . '
+				</div>';		
+		
+		return $html;
+	}
 
 	/**
 	 * Display the billing/shipping address section
@@ -1063,24 +1184,32 @@ class MP_Checkout {
 						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . '> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
 					</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
 				';
+		
+			$html .= '
+				</div><!-- end mp-checkout-column-billing-info -->
+					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
+						<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
+			$this->address_fields( 'shipping' ) . '';
+		
+		
+
 		}
 
 		$html .= '
-			</div><!-- end mp-checkout-column-billing-info -->
-				<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
-					<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
-		$this->address_fields( 'shipping' ) . '';
-
+				</div><!-- end mp-checkout-column-shipping-info -->';
+		
+		// If has special instructions
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
-			$html .= '<div class="mp_checkout_field">
+			$html .= '<div id="mp-checkout-column-special-instructions" class="mp_checkout_column fullwidth"><div class="mp_checkout_field">
 					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
 				    <textarea name="shipping[special_instructions]"></textarea>
-				  </div><!-- end mp_checkout_field -->';
+				  </div><!-- end mp_checkout_field --></div><!-- end mp-checkout-column-special-instructions -->';
 		}
-
-		$html .= '
-
-				</div><!-- end mp-checkout-column-shipping-info -->
+				
+		//Checkout registration form
+		$html .= $this->register_toggle_form();
+			
+		$html .= '	
 			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
@@ -1151,7 +1280,7 @@ class MP_Checkout {
 				$html .= '<div class="mp_checkout_column">
 					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
 					<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
-					<p><button type="submit" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
+					<p><button type="button" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
 				</div><!-- end mp_checkout_column -->';
 			}
 		}
@@ -1257,8 +1386,8 @@ class MP_Checkout {
 
 		$html .= '
 						<div class="mp_checkout_buttons">' .
-		$this->step_link( 'prev' ) .
-		$this->step_link( 'next' ) . '
+		$this->step_link( 'prev', 'shipping' ) .
+		$this->step_link( 'next', 'shipping' ) . '
 						</div><!-- end mp_checkout_buttons -->';
 
 
@@ -1295,6 +1424,160 @@ class MP_Checkout {
 		}
 
 		return '#' . $slug;
+	}
+	
+	/**
+	 * Returns the js needed to record ecommerce transactions.
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @return string
+	 */
+
+	public function create_ga_ecommerce( $order_id ) {
+		$order = new MP_Order( $order_id );
+		//if order not exist, just return false
+		if ( $order->exists() == false ) {
+			return false;
+		}
+
+		//so that certain products can be excluded from tracking
+		$order = apply_filters( 'mp_ga_ecommerce', $order );
+		
+		$cart = $order->get_meta( 'mp_cart_info' );
+		
+		$products = $cart->get_items_as_objects();
+		
+		if ( mp_get_setting( 'ga_ecommerce' ) == 'old' ) {
+
+			$js = '<script type="text/javascript">
+try{
+ pageTracker._addTrans(
+		"' . esc_js( $order->post_title ) . '",							 // order ID - required
+		"' . esc_js( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
+		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
+		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+		"' . esc_js( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
+	);';
+
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+						$js .= 'pageTracker._addItem(
+				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+				"' . $sku . '",									 // SKU/code - required
+				"' . esc_attr( $product->title( false ) ) . '",			// product name
+				"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+				"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
+			);';
+			}
+			$js .= 'pageTracker._trackTrans(); //submits transaction to the Analytics servers
+} catch(err) {}
+</script>
+';
+		} else if ( mp_get_setting( 'ga_ecommerce' ) == 'new' ) {
+
+			$js = '<script type="text/javascript">
+	_gaq.push(["_addTrans",
+		"' . esc_attr( $order->post_title ) . '",						 // order ID - required
+		"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",				 // affiliation or store name
+		"' . $order->get_meta( 'mp_order_total' ) . '",								 // total - required
+		"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+		"' . $order->get_meta( 'mp_shipping_total' ) . '",							 // shipping
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+		"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
+	]);';
+
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+						$js .= '_gaq.push(["_addItem",
+				"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+				"' . $sku . '",									 // SKU/code - required
+				"' . esc_attr( $product->title( false ) ) . '",			// product name
+				"",												// category
+				"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+				"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
+			]);';
+			}
+			$js .= '_gaq.push(["_trackTrans"]);
+</script>
+';
+
+			//add info for subblog if our GA plugin is installed
+			if ( class_exists( 'Google_Analytics_Async' ) ) {
+
+				$js = '<script type="text/javascript">
+		_gaq.push(["b._addTrans",
+			"' . esc_attr( $order->post_title ) . '",							 // order ID - required
+			"' . esc_attr( get_bloginfo( 'blogname' ) ) . '",					 // affiliation or store name
+			"' . $order->get_meta( 'mp_order_total' ) . '",									 // total - required
+			"' . $order->get_meta( 'mp_tax_total' ) . '",									 // tax
+			"' . $order->get_meta( 'mp_shipping_total' ) . '",								 // shipping
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->city' ) ) . '",		// city
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->state' ) ) . '",		 // state or province
+			"' . esc_attr( $order->get_meta( 'mp_shipping_info->country' ) ) . '"	 // country
+		]);';
+
+				foreach ( $products as $product ) {
+					$product = new MP_Product( $product->ID );
+					$meta = $product->get_meta( 'sku' );
+					$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+							$js .= '_gaq.push(["b._addItem",
+					"' . esc_attr( $order->post_title ) . '", // order ID - necessary to associate item with transaction
+					"' . $sku . '",									 // SKU/code - required
+					"' . esc_attr( $product->title( false ) ) . '",			// product name
+					"",												// category
+					"' . $product->get_price( 'lowest' ) . '",						// unit price - required
+					"' . $cart->get_item_qty( $product->ID ) . '"					 // quantity - required
+				]);';
+				}
+				$js .= '_gaq.push(["b._trackTrans"]);
+	</script>
+	';
+			}
+		} else if ( mp_get_setting( 'ga_ecommerce' ) == 'universal' ) {
+			// add the UA code
+
+			$js = '<script type="text/javascript">
+		ga("require", "ecommerce", "ecommerce.js");
+		ga("ecommerce:addTransaction", {
+				"id": "' . esc_attr( $order->post_title ) . '",						// Transaction ID. Required.
+				"affiliation": "' . esc_attr( get_bloginfo( 'blogname' ) ) . '",	// Affiliation or store name.
+				"revenue": "' . $order->get_meta( 'mp_order_total' ) . '",						// Grand Total.
+				"shipping": "' . $order->get_meta( 'mp_shipping_total' ) . '",					// Shipping.
+				"tax": "' . $order->get_meta( 'mp_tax_total' ) . '"							 		// Tax.
+			});';
+			//loop the items
+			
+			foreach ( $products as $product ) {
+				$product = new MP_Product( $product->ID );
+				
+				$meta = $product->get_meta( 'sku' );
+				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
+				$js .= 'ga("ecommerce:addItem", {
+					 "id": "' . esc_attr( $order->post_title ) . '", // Transaction ID. Required.
+					 "name": "' . esc_attr( $product->title( false ) ) . '",	 // Product name. Required.
+					 "sku": "' . $sku . '",								// SKU/code.
+					 "category": "",			 					// Category or variation.
+					 "price": "' . $product->get_price( 'lowest' ) . '",				 // Unit price.
+					 "quantity": "' . $cart->get_item_qty( $product->ID ) . '"		 // Quantity.
+				});';
+			}
+
+			$js .='ga("ecommerce:send");</script>';
+		}
+
+		//add to footer
+		if ( !empty( $js ) ) {
+			echo $js;
+		}
 	}
 
 }

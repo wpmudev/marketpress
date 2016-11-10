@@ -49,6 +49,8 @@ class MarketPress_Product_List extends WP_Widget {
 				$order_by_query	 = '&meta_key=mp_price_sort&orderby=meta_value_num';
 			else if ( $instance[ 'order_by' ] == 'sales' )
 				$order_by_query	 = '&meta_key=mp_sales_count&orderby=meta_value_num';
+			else if ( $instance[ 'order_by' ] == 'featured' )
+				$order_by_query	 = '&meta_key=featured&orderby=meta_value_num';
 			else
 				$order_by_query	 = '&orderby=' . $instance[ 'order_by' ];
 		} else {
@@ -62,8 +64,29 @@ class MarketPress_Product_List extends WP_Widget {
 			$order_query = '&orderby=DESC';
 		}
 
+		$query_string = 'post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query;
+
+		$query_array = array();
+
+		//Convert the query string to array so we can merge it later
+		parse_str( $query_string, $query_array );
+
+		//set to show only featured products, if configured to
+		if ( isset( $instance[ 'show_only_featured' ] ) && (bool) $instance[ 'show_only_featured' ] == true ) {
+			//the meta_query must be a nested array, that's why we needed an array instead of a query string
+			$query_array = array_merge( $query_array, array(
+				'meta_query' => array(
+					array(
+						'key'     => 'featured',
+						'value'   => '1',
+						'compare' => '=',
+					),
+				),
+			));
+		}
+
 		//The Query
-		$custom_query = new WP_Query( 'post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query );
+		$custom_query = new WP_Query( $query_array );
 
 		//do we have products?
 		if ( $custom_query->have_posts() ) {
@@ -134,6 +157,7 @@ class MarketPress_Product_List extends WP_Widget {
 		$instance[ 'taxonomy_type' ] = $new_instance[ 'taxonomy_type' ];
 		$instance[ 'taxonomy' ]		 = ($new_instance[ 'taxonomy_type' ]) ? sanitize_title( $new_instance[ 'taxonomy' ] ) : '';
 
+		$instance[ 'show_only_featured' ]			 = !empty( $new_instance[ 'show_only_featured' ] ) ? 1 : 0;
 		$instance[ 'show_thumbnail' ]				 = !empty( $new_instance[ 'show_thumbnail' ] ) ? 1 : 0;
 		$instance[ 'size' ]							 = !empty( $new_instance[ 'size' ] ) ? intval( $new_instance[ 'size' ] ) : 50;
 		$instance[ 'show_excerpt' ]					 = !empty( $new_instance[ 'show_excerpt' ] ) ? 1 : 0;
@@ -157,6 +181,7 @@ class MarketPress_Product_List extends WP_Widget {
 		$taxonomy_type	 = isset( $instance[ 'taxonomy_type' ] ) ? $instance[ 'taxonomy_type' ] : '';
 		$taxonomy		 = isset( $instance[ 'taxonomy' ] ) ? $instance[ 'taxonomy' ] : '';
 
+		$show_only_featured = isset ( $instance[ 'show_only_featured' ] ) ? (bool) $instance[ 'show_only_featured' ] : false;
 		$show_thumbnail	 = isset( $instance[ 'show_thumbnail' ] ) ? (bool) $instance[ 'show_thumbnail' ] : false;
 		$size			 = !empty( $instance[ 'size' ] ) ? intval( $instance[ 'size' ] ) : 50;
 		$show_excerpt	 = isset( $instance[ 'show_excerpt' ] ) ? (bool) $instance[ 'show_excerpt' ] : false;
@@ -186,6 +211,7 @@ class MarketPress_Product_List extends WP_Widget {
 				<option value="author"<?php selected( $order_by, 'author' ) ?>><?php _e( 'Product Author', 'mp' ) ?></option>
 				<option value="sales"<?php selected( $order_by, 'sales' ) ?>><?php _e( 'Number of Sales', 'mp' ) ?></option>
 				<option value="price"<?php selected( $order_by, 'price' ) ?>><?php _e( 'Product Price', 'mp' ) ?></option>
+				<option value="featured"<?php selected( $order_by, 'featured' ) ?>><?php _e( 'Featured', 'mp' ) ?></option>
 				<option value="rand"<?php selected( $order_by, 'rand' ) ?>><?php _e( 'Random', 'mp' ) ?></option>
 			</select><br />
 			<label><input value="DESC" name="<?php echo $this->get_field_name( 'order' ); ?>" type="radio"<?php checked( $order, 'DESC' ) ?> /> <?php _e( 'Descending', 'mp' ) ?></label>
@@ -202,7 +228,9 @@ class MarketPress_Product_List extends WP_Widget {
 		</p>
 
 		<h3><?php _e( 'Display Settings', 'mp' ); ?></h3>
-		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_thumbnail' ); ?>" name="<?php echo $this->get_field_name( 'show_thumbnail' ); ?>"<?php checked( $show_thumbnail ); ?> />
+		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_only_featured' ); ?>" name="<?php echo $this->get_field_name( 'show_only_featured' ); ?>"<?php checked( $show_only_featured ); ?> />
+			<label for="<?php echo $this->get_field_id( 'show_only_featured' ); ?>"><?php _e( 'Show Only Featured Products', 'mp' ); ?></label><br />
+			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'show_thumbnail' ); ?>" name="<?php echo $this->get_field_name( 'show_thumbnail' ); ?>"<?php checked( $show_thumbnail ); ?> />
 			<label for="<?php echo $this->get_field_id( 'show_thumbnail' ); ?>"><?php _e( 'Show Thumbnail', 'mp' ); ?></label><br />
 			<label for="<?php echo $this->get_field_id( 'size' ); ?>"><?php _e( 'Thumbnail Size:', 'mp' ) ?> <input id="<?php echo $this->get_field_id( 'size' ); ?>" name="<?php echo $this->get_field_name( 'size' ); ?>" type="text" size="3" value="<?php echo $size; ?>" /></label></p>
 

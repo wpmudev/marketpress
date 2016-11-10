@@ -1,0 +1,97 @@
+//== Listings
+//
+
+// Products
+.mp_products {
+	
+	// Products / Items
+	&_items {
+		border-bottom-color: $color--light-gray;
+	}
+	
+	// Product
+	.mp_product {
+		
+		// Item
+		&_item {
+			border-top-color: $color--light-gray;
+		}
+		
+	}
+	
+	// List
+	&-list {
+		
+		// Product
+		.mp_product {
+			
+			// Product Buy Form
+			.mp_button {
+				@include bp(desktop) {
+					font-size: $font__size--m;
+				}
+			}
+			
+		}
+		
+	}
+	
+	// Grid
+	&-grid {
+		
+		// Product
+		.mp_product {
+			
+			// Item
+			&_item {
+				
+				// 2 Products Per row
+				&-col-2 {
+
+					.mp_sale_price {
+						~ .mp_normal_price {
+							@include bp(desktop) {
+								font-size: $font__size--m;
+							}
+						}
+					}
+					
+				}
+
+				// 3 and 4 Products Per row
+				&-col-3,
+				&-col-4 {
+					
+					// Product Excerpt
+					.mp_product_excerpt {
+						
+						@include bp(desktop) {
+							font-size: $font__size;
+						}
+					}
+					
+					// Product Price
+					.mp_sale_price {
+						~ .mp_normal_price {
+							@include bp(desktop) {
+								font-size: $font__size--m;
+							}
+						}
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	// Related
+	&-related {
+		.mp_related_products_empty_message {
+			font-size: $font__size;
+		}
+	}
+	
+}

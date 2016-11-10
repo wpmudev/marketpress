@@ -64,6 +64,8 @@ class MP_Products_Screen {
 		add_action( 'admin_print_scripts-edit.php', array( &$this, 'enqueue_bulk_quick_edit_js' ) );
 		add_action( 'save_post', array( &$this, 'save_quick_edit' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
+		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );
+		add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 2 );	
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 // Product attributes save/get value
@@ -164,6 +166,35 @@ class MP_Products_Screen {
 		<?php
 	}
 
+		
+	/**
+	 * Set mp_flush_rewrites_30 to 1 after saving/publishing new product.
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+
+	public function force_flush_rewrites($post_id, $post) {
+		if ( empty( $_POST ) ) {
+			return $post_id;
+		}
+
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+
+		if ( wp_is_post_revision( $post ) ) {
+			return $post_id;
+		}
+
+		if ( $post->post_type != MP_Product::get_post_type() ) {
+			return $post_id;
+		}
+
+		update_option( 'mp_flush_rewrites_30', 1 );
+	}
+
+
 	public function save_post_quantity_fix( $post_id, $post ) {
 		if ( empty( $_POST ) ) {
 			return $post_id;
@@ -182,8 +213,9 @@ class MP_Products_Screen {
 		}
 
 		$quantity = mp_get_post_value( 'inv->inventory', '' );
-
-		update_post_meta( $post_id, 'inventory', $quantity );
+		if( is_numeric( $quantity ) ){
+			update_post_meta( $post_id, 'inventory', (int)$quantity );
+		}
 
 		//Check if sales count is empty string and set to 0
 		$sale_count = get_post_meta( $post_id, 'mp_sales_count', true );
@@ -224,6 +256,21 @@ class MP_Products_Screen {
 		$price      = mp_get_post_value( 'product_price', '' );
 		$sale_price = mp_get_post_value( 'product_sale_price', '' );
 
+		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$sale_price = filter_var( $sale_price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
+		$featured   = mp_get_post_value( 'featured' );
+
+		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+		$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+		$has_sale		  = mp_get_post_value( 'has_sale', '');
+	
+		if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+			update_post_meta( $post_id, 'sort_price', $sale_price_array );
+		} else {
+			update_post_meta( $post_id, 'sort_price', $regular_price );
+		}
+
+		update_post_meta( $post_id, 'featured', empty( $featured ) ? 0 : 1 );
 		update_post_meta( $post_id, 'regular_price', $price );
 		update_post_meta( $post_id, 'sale_price_amount', $sale_price );
 
@@ -245,6 +292,38 @@ class MP_Products_Screen {
 				delete_post_meta( $post_id, '_thumbnail_id' );
 			}
 		}
+	}
+
+	/**
+	 * Purge variations transient after post update
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @action save_post
+	 */
+	public function maybe_purge_variations_transient( $meta_id, $post_id ){
+		$post = get_post( $post_id );
+		
+		if ( mp_doing_autosave() ) {
+			return $post_id;
+		}
+
+		if ( wp_is_post_revision( $post ) ) {
+			return $post_id;
+		}
+
+		if ( $post->post_type != MP_Product::get_post_type() && $post->post_type != MP_Product::get_variations_post_type() ) {
+			return $post_id;
+		}
+
+		$product = new MP_Product( $post_id );
+
+		if ( $product->is_variation() ) {
+			$parent = new MP_Product( $product->post_parent );
+			$post_id = $parent->ID;
+		}
+
+		delete_transient( 'mp-get-variations-'.$post_id );
 	}
 
 	/**
@@ -323,6 +402,7 @@ class MP_Products_Screen {
 			'cb'                        => '<input type="checkbox" />',
 			'title'                     => __( 'Product Name', 'mp' ),
 			'product_variations'        => __( 'Variations', 'mp' ),
+			'featured'                  => __( 'Featured', 'mp' ),
 			'product_sku'               => __( 'SKU', 'mp' ),
 			'product_price'             => __( 'Price', 'mp' ),
 			'product_stock'             => __( 'Stock', 'mp' ),
@@ -378,6 +458,9 @@ class MP_Products_Screen {
 
 				echo $image;
 				break;
+			case 'featured' :
+				echo $product->is_featured() ? __( 'Yes', 'mp' ) : __( 'No', 'mp' );
+				break;
 			case 'product_variations' :
 				if ( $product->has_variations() ) {
 					$names = array();
@@ -419,7 +502,6 @@ class MP_Products_Screen {
 					}
 					/* foreach ( $variations as $variation ) {
 					  $price = $prices->get_price();
-					  var_dump($price);
 					  if ( $variation->on_sale() ) {
 					  //$prices[] = '<strike>' . mp_format_currency( '', $price[ 'regular' ] ) . '</strike> ' . mp_format_currency( '', $price[ 'sale' ][ 'amount' ] );
 					  } else {
@@ -438,16 +520,29 @@ class MP_Products_Screen {
 				}
 
 				echo $prices;
-				if ( ! $product->has_variations() ) {
-					echo '
-					<div style="display:none">
-						<div id="quick-edit-product-content-' . $post_id . '">
-							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>
-							<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
-							<input type="hidden" name="quick_edit_product_nonce" value="' . wp_create_nonce( 'quick_edit_product' ) . '" />
+				echo '
+				<div style="display:none">
+					<div id="quick-edit-product-content-' . $post_id . '">';
+						if ( ! $product->has_variations() ) {
+							echo '
+							<label class="alignleft"><span class="title">' . __( 'Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_price" style="width:100px" value="' . $price['regular'] . '" /></span></label>';
+							if( $product->on_sale() ) {
+								echo '<label class="alignleft" style="margin-left:15px"><span class="title">' . __( 'Sale Price', 'mp' ) . '</span><span class="input-text-wrap"><input type="text" name="product_sale_price" style="width:100px" value="' . $price['sale']['amount'] . '" /></span></label>
+								<em class="alignleft inline-edit-or"> –'. __( 'OR', 'mp' ) .'– </em>
+								<span class="alignleft inline-edit-or input-text-wrap"><input type="text" name="product_sale_percentage_discount" style="width:60px" value="' . $price['sale']['percentage'] . '" /></span>
+								<em class="alignleft inline-edit-or"> '. __( '% discount', 'mp' ) .' </em>';
+							}
+						}
+						echo '
+						<div class="inline-edit-group">
+							<label class="alignleft"><span class="title">' . __( 'Featured', 'mp' ) . '</span><input type="checkbox" name="featured" value="featured" '. ( $product->is_featured() ? 'checked' : '' ) .'></label>
 						</div>
-					</div>';
-				}
+						<input type="hidden" name="quick_edit_product_nonce" value="' . wp_create_nonce( 'quick_edit_product' ) . '" />
+					</div>
+				</div>';
+				
+					
+				
 				break;
 
 			case 'product_stock' :
@@ -498,6 +593,7 @@ class MP_Products_Screen {
 //$this->init_product_details_metabox();
 //$this->init_variations_metabox();
 		$this->init_related_products_metabox();
+		$this->init_featured_product_metabox();
 	}
 
 	/**
@@ -806,6 +902,16 @@ class MP_Products_Screen {
 			  );
 			  echo json_encode( $response_array );
 			  exit; */
+			  
+			$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+			$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+			$has_sale		  = mp_get_post_value( 'has_sale', '');
+		
+			if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+				update_post_meta( $post_id, 'sort_price', $sale_price_array );
+			} else {
+				update_post_meta( $post_id, 'sort_price', $regular_price );
+			}  
 
 			$meta_array_values = array(
 				'sku'                        => mp_get_post_value( 'sku' ),
@@ -818,6 +924,7 @@ class MP_Products_Screen {
 				'regular_price'              => mp_get_post_value( 'regular_price' ),
 				'has_sale'                   => $this->on_to_val( mp_get_post_value( 'has_sale' ) ),
 				'sale_price_amount'          => mp_get_post_value( 'sale_price->amount' ),
+				'sale_price_percentage'          => mp_get_post_value( 'sale_price->percentage' ),
 				'sale_price_start_date'      => mp_get_post_value( 'sale_price->start_date' ),
 				'sale_price_end_date'        => mp_get_post_value( 'sale_price->end_date' ),
 				'weight_pounds'              => mp_get_post_value( 'weight->pounds' ),
@@ -929,14 +1036,16 @@ class MP_Products_Screen {
 						update_post_meta( $post_id, 'name', sanitize_text_field( $variation_name ) );
 					}
 					break;
-
+				case 'default_variation':
+					update_post_meta( $post_id, $value_type, $value );
+					break;
 				default:
 					if ( $value_type == '_thumbnail_id' && $value == '' ) {
 						delete_post_meta( $post_id, '_thumbnail_id' );
 					} else {
 						if ( $value_type == 'inventory' ) {
 							update_post_meta( $post_id, 'inv_inventory', sanitize_text_field( $value ) );
-						}
+						}							
 
 						if ( $value_type == 'sale_price_amount' ) {//exeption when saving sale price amount
 							if ( is_numeric( $value ) ) {
@@ -949,6 +1058,15 @@ class MP_Products_Screen {
 						} else {
 							update_post_meta( $post_id, $value_type, sanitize_text_field( $value ) );
 						}
+						
+						$parent_id = wp_get_post_parent_id( $post_id );
+						$product   = new MP_Product( $post_id );
+						$price 	   = $product->get_price();
+						
+						if( isset( $price['lowest'] ) && ! empty( $price['lowest'] ) ) {
+							update_post_meta( $parent_id, 'sort_price', sanitize_text_field( $price['lowest'] ) );
+						}
+						
 					}
 			}
 
@@ -995,6 +1113,10 @@ class MP_Products_Screen {
 			return;
 		}
 
+		if ( ! current_user_can( 'edit_products' ) )
+			wp_die( __( 'Cheatin&#8217; uh?' ) );
+
+
 		$variation_names     = mp_get_post_value( 'product_attributes_categories', array() );
 		$new_variation_names = mp_get_post_value( 'variation_names', array() );
 		$variation_values    = mp_get_post_value( 'variation_values', array() );
@@ -1028,16 +1150,19 @@ class MP_Products_Screen {
 				$variations_data      = explode( ',', $variation_values_row );
 
 				global $variations_single_data;
-				foreach ( $variations_data as $variations_single_data ) {
 
-					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
-					$term_object = array_filter(
-						$terms, function ( $e ) {
+				if( !function_exists( 'term_object_array_filter' ) ){
+					function term_object_array_filter ( $e ) {
 						global $variations_single_data;
 
 						return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
 					}
-					);
+				}			
+
+				foreach ( $variations_data as $variations_single_data ) {
+
+					/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
+					$term_object = array_filter( $terms, 'term_object_array_filter' );
 
 					reset( $term_object );
 					$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
@@ -1103,6 +1228,16 @@ class MP_Products_Screen {
 					'special_tax_rate'           => mp_get_post_value( 'special_tax_rate' ),
 //'description'				 => mp_get_post_value( 'content' ),
 				), mp_get_post_value( 'post_ID' ), $variation_id, $_POST );
+				
+				$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+				$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+				$has_sale		  = mp_get_post_value( 'has_sale', '');
+			
+				if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
+					update_post_meta( $post_id, 'sort_price', $sale_price_array );
+				} else {
+					update_post_meta( $post_id, 'sort_price', $regular_price );
+				}
 
 
 				/* Add default post metas for variation */
@@ -1115,7 +1250,7 @@ class MP_Products_Screen {
 
 				foreach ( $variation_terms as $variation_term ) {
 					$variation_term_vals = explode( '=', $variation_term );
-					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[1], $variation_term_vals[0], true ), $variation_term_vals[0], true );
+					wp_set_post_terms( $variation_id, $this->term_id( $variation_term_vals[1], $variation_term_vals[0], false ), $variation_term_vals[0], true );
 				}
 
 				$combination_num ++;
@@ -1244,6 +1379,26 @@ WHERE $delete_where"
 	}
 
 	/**
+	 * Initializes the featured product metabox
+	 *
+	 * @since 3.0.0.8
+	 * @access public
+	 */
+	public function init_featured_product_metabox() {
+		$metabox = new WPMUDEV_Metabox( apply_filters( 'mp_metabox_array_mp-featured_product-metabox', array(
+			'id'        => 'mp-featured-product-metabox',
+			'title'     => __( 'Featured Product', 'mp' ),
+			'post_type' => MP_Product::get_post_type(),
+			'context'   => 'side',
+		) ) );
+
+		$metabox->add_field( 'checkbox', apply_filters( 'mp_add_field_array_featured', array(
+			'name'    => 'featured',
+			'message' => __( 'Is Featured?', 'mp' ),
+		) ) );
+	}
+
+	/**
 	 * Initializes the product type metabox
 	 *
 	 * @since 3.0
@@ -1364,6 +1519,15 @@ WHERE $delete_where"
 						'number' => true,
 						'min'    => 0,
 						//'lessthan'	 => '[name*="regular_price"]'
+					),
+				) ) );
+				$sale_price->add_field( 'text', apply_filters( 'mp_add_field_array_percentage', array(
+					'name'       => 'percentage',
+					'label'      => array( 'text' => __( '% discount', 'mp' ) ),
+					'validation' => array(
+						'number' => true,
+						'min'    => 1,
+						'max'    => 99,
 					),
 				) ) );
 				$sale_price->add_field( 'datepicker', apply_filters( 'mp_add_field_array_start_date', array(
@@ -2269,11 +2433,11 @@ WHERE $delete_where"
 	 */
 	function remove_metaboxes() {
 		if ( apply_filters( 'mp_remove_excerpt_meta_box', false ) ) {
-			remove_meta_box( 'postexcerpt', 'product', 'normal' );
+			remove_meta_box( 'postexcerpt', MP_Product::get_post_type(), 'normal' );
 		}
 
 		if ( apply_filters( 'mp_remove_author_meta_box', true ) ) {
-			remove_meta_box( 'authordiv', 'product', 'normal' );
+			remove_meta_box( 'authordiv', MP_Product::get_post_type(), 'normal' );
 		}
 	}
 

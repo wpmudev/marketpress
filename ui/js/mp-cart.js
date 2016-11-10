@@ -90,7 +90,7 @@ var mp_cart = { };
             mp_cart.addItem( $this, $this.find( '[name="product_id"]' ).val() );
         } );
     };
-	
+
 	/**
      * Initialize cart buttons listeners
      *
@@ -102,11 +102,11 @@ var mp_cart = { };
             mp_cart.emptyCart();
         } );
     };
-	
+
 
     mp_cart.initShortcodeProductListeners = function() {
 		var me = this;
-		
+
         $( '.mp-shortcode-wrap' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
 
 		//We should loop through each form else jQuery validation is passing wrong form ID
@@ -119,7 +119,7 @@ var mp_cart = { };
 			} )
 			.validate(me.productFormValidationArgs);
 		});
-		
+
     };
     /**
      * Initalize single product listeners
@@ -127,25 +127,31 @@ var mp_cart = { };
      * @since 3.0
      */
     mp_cart.initSingleProductListeners = function() {
-        $( '#mp-single-product' ).on( 'change', '[name^="product_attr_"]', this.updateProductAttributes );
-        $( '#mp-single-product' ).find( '.mp_form-buy-product' ).not('.mp_no_single, .mp_buy_button')
-            .on( 'mp_cart/before_add_item', function( e, item, qty ) {
-                marketpress.loadingOverlay( 'show' );
-            } )
-            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                marketpress.loadingOverlay( 'hide' );
-            } )
-            .validate( this.productFormValidationArgs );
-			
-		 $( '#mp-single-product' ).find( '.mp_no_single' ).not( '.mp_buy_button' ).each(function(){
-            $(this).on( 'mp_cart/before_add_item', function( e, item, qty ) {
-                marketpress.loadingOverlay( 'show' );
-            } )
-            .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
-                marketpress.loadingOverlay( 'hide' );
-            } )
-            .validate( this.productFormValidationArgs );	
-		});
+        var me = this;
+
+        $( '.mp-single-product' ).each( function() {
+            $(this).on( 'change', '[name^="product_attr_"]', me.updateProductAttributes );
+            $(this).on( 'input', '[name^="product_quantity"]', me.checkProductQuantity );
+
+            $(this).find( '.mp_form-buy-product' ).not('.mp_no_single, .mp_buy_button')
+                .on( 'mp_cart/before_add_item', function( e, item, qty ) {
+                    marketpress.loadingOverlay( 'show' );
+                } )
+                .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+                    marketpress.loadingOverlay( 'hide' );
+                } )
+                .validate( me.productFormValidationArgs );
+
+            $(this).find( '.mp_no_single' ).not( '.mp_buy_button' ).each( function() {
+                $(this).on( 'mp_cart/before_add_item', function( e, item, qty ) {
+                    marketpress.loadingOverlay( 'show' );
+                } )
+                .on( 'mp_cart/after_add_item', function( e, resp, item, qty ) {
+                    marketpress.loadingOverlay( 'hide' );
+                } )
+                .validate( me.productFormValidationArgs );
+            } );
+		} );
     };
 
     /**
@@ -215,12 +221,26 @@ var mp_cart = { };
 
         $form = $this.closest( 'form' );
 
-        $container = ( $( '#colorbox' ).is( ':visible' ) ) ? $form : $( '#mp-single-product' );
+        $container = ( $( '#colorbox' ).is( ':visible' ) ) ? $form : $this.closest( '.mp-single-product' );
+		$meta_container = $this.closest( '.mp_product' );
         $qtyChanged = $form.find( 'input[name="product_qty_changed"]' );
         url = mp_cart_i18n.ajaxurl + '?action=mp_product_update_attributes';
 
         marketpress.loadingOverlay( 'show' );
-        $this.closest( '.mp_product_options_att' ).nextAll( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
+        
+        var form_data = $form.serializeArray();
+
+        // Change siblings attr name to "other_'attr_name'" instead of just not sending them
+        // Used to get the current variation selected and check it's stock
+        
+        //$this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).val( '' );
+
+        $this.parents( '.mp_product_options_att' ).siblings( '.mp_product_options_att' ).find( '[name^="product_attr_"]' ).each(function(i, el) {
+        	$(form_data).each(function(j, el2) {
+        		el2.name === $(el).attr( 'name' ) && ( form_data[j]['name'] = 'other_' + form_data[j]['name'] ) ;
+        	});
+        });
+
         //the this contex is product attributes select, there's no radio situation, so comment those value for now
         /*if ( !$this.is( ':radio' ) ) {
          $qtyChanged.val( '1' );
@@ -228,14 +248,13 @@ var mp_cart = { };
          $qtyChanged.val( '0' );
          }*/
 
-        $.post( url, $form.serialize() ).done( function( resp ) {
+        $.post( url, jQuery.param( form_data ) ).done( function( resp ) {
 
             marketpress.loadingOverlay( 'hide' );
             marketpress.ajaxEvent( 'mp_cart/after_update_product_attributes', resp );
 
             if ( resp.success ) {
 
-                //console.log( resp.data );
                 if (resp.data.image) {
                     if ($container.find('.mp_product_image_link').size() == 0) {
                         $('.mp_single_product_images').html(
@@ -254,6 +273,8 @@ var mp_cart = { };
                             maxHeight: "90%",
                             close: "&times;"
                         } );
+
+						$( '.mp_product_options_thumb' ).attr('src', resp.data.image);
                     } else {
                         $container.find('.mp_product_image_single').attr('src', resp.data.image);
                         $container.find('.mp_product_image_link').attr('href', resp.data.image_full);
@@ -271,11 +292,19 @@ var mp_cart = { };
                 }
 
                 //if ( resp.data.excerpt ) {
-                $container.find( '.mp_product_excerpt' ).html( resp.data.excerpt );
+                $meta_container.find( '.mp_product_excerpt' ).html( resp.data.excerpt );
                 //}
 
                 if ( resp.data.price ) {
                     $container.find( '.mp_product_price' ).replaceWith( resp.data.price );
+                }
+
+                if ( resp.data.product_input ) {
+    				$container.find( '#mp_product_options_att_quantity-error' ).remove();
+					$container.find( '#mp_product_options_att_quantity' ).replaceWith( resp.data.product_input );
+						if ( typeof( resp.data.in_stock ) !== 'undefined' ) {
+                			$container.find( '#mp_product_options_att_quantity' ).trigger('blur');
+                		}    
                 }
 
                 $.each( resp.data, function( index, value ) {
@@ -293,10 +322,37 @@ var mp_cart = { };
                     $form.find( 'input[name="product_quantity"]' ).val( resp.data.qty_in_stock );
                 }
 
+                $( '[name^="product_attr_"].mp_select2' ).mp_select2( {
+                    "dropdownCssClass": "mp_select2",
+                    "dropdownAutoWidth": 1,
+                    "minimumResultsForSearch": -1   // hide the search box
+                } );
+
+                $( '[name^="product_attr_"].mp_select2_search' ).mp_select2( {
+                    "dropdownCssClass": "mp_select2",
+                    "dropdownAutoWidth": 1
+                } );
+
                 $.colorbox.resize();
             }
         } );
     };
+
+	/**
+     * Update product quantity
+     *
+     * @since 3.0
+     */
+    mp_cart.checkProductQuantity = function() {
+    	var $this = $( this );
+
+    	if( $this.attr( 'max' ) > 0 && parseInt( $this.val() ) > parseInt( $this.attr( 'max' ) ) ) { 
+    		$this.trigger('blur');
+    		// Delay before fixing input value to give time to validator to process.
+    		setTimeout(function(){$this.val($this.attr( 'max' ))}, 50);
+    	}
+    }
+
 
     /**
      * Initialize product options lightbox for variable products
@@ -336,6 +392,7 @@ var mp_cart = { };
      * @param int qty The quantity to add to the cart. Optional.
      */
     mp_cart.addItem = function( $form, item, qty ) {
+
         if ( item === undefined || typeof ( $form ) !== 'object' ) {
             return false;
         }
@@ -383,10 +440,12 @@ var mp_cart = { };
 
                     mp_cart.update( resp.data.minicart );
 					mp_cart.update_widget( resp.data.widgetcart );
+					mp_cart.update_product_input( resp.data.product_input, $form );
+					mp_cart.update_product_buttons( resp.data.out_of_stock, $form );
 					
 					//Init button listeners when ajax loaded
 					mp_cart.initCartButtonListeners();
-					
+
                     $form.get( 0 ).reset();
 
                     setTimeout( function() {
@@ -432,7 +491,7 @@ var mp_cart = { };
                     if ( $lineItem.siblings( '.mp_cart_item' ).length == 0 && $lineItem.closest( '.mp_cart_store' ).length > 0 ) {
                         $lineItem.closest( '.mp_cart_store' ).remove();
                     } else {
-                        $lineItem.remove();
+                        $lineItem.after( resp.data.cart_item_line ).remove();
                     }
 
                     $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
@@ -443,7 +502,40 @@ var mp_cart = { };
             $( window ).trigger( 'resize' );
         } );
     }
-	
+
+    /**
+     * Undo Remove an item from the shopping cart
+     *
+     * @since 3.0
+     * @param int itemId The item ID to remove.
+     */
+    mp_cart.undoRemoveItem = function( itemId ) {
+        if ( itemId === undefined ) {
+            return false;
+        }
+
+        itemId = itemId.toString();
+
+        var url = mp_cart_i18n.ajaxurl + '?action=mp_update_cart';
+        var data = {
+            "product": itemId,
+            "cart_action": "undo_remove_item",
+            "is_cart_page": mp_cart_i18n.is_cart_page
+        };
+
+        marketpress.loadingOverlay( 'show' );
+
+        $.post( url, data ).done( function( resp ) {
+            if ( resp.success ) {
+                var $lineItem = $( '#mp-cart-item-' + itemId.escapeSelector() );
+                $lineItem.after( resp.data.cart_item_line ).remove();
+                $( '#mp-cart-resume' ).replaceWith( resp.data.cartmeta );
+                marketpress.loadingOverlay( 'hide' );
+            }
+            $( window ).trigger( 'resize' );
+        } );
+    }
+
 	/**
      * Remove all items from the shopping cart
      *
@@ -474,7 +566,7 @@ var mp_cart = { };
         $( '#mp-floating-cart' ).replaceWith( html );
         this.initCartAnimation();
     };
-	
+
 	/**
      * Update the cart widget html
      *
@@ -484,6 +576,35 @@ var mp_cart = { };
     mp_cart.update_widget = function( html ) {
         $( '.mp_cart_widget_content' ).html( html );
     };
+
+	/**
+     * Update the product qty input
+     *
+     * @since 3.0
+     * @param string html The product qty input.
+     */
+    mp_cart.update_product_input = function( html, $form ) {
+    	$form.find( '#mp_product_options_att_quantity-error' ).remove();
+        if ( $( html ).is('label') ){
+            $form.find( '[name="product_quantity"]' ).prev( 'label' ).remove();
+        }
+        $form.find( '[name="product_quantity"]' ).after( html ).remove();
+    };
+
+     /**
+     * Update the product add to cart button
+     *
+     * @since 3.0
+     * @param bool is the product out of stock.
+     */
+    mp_cart.update_product_buttons = function( out_of_stock, $form ) {
+		if( out_of_stock === true ) {
+			$form.find( '.mp_button' ).attr( 'disabled' , true );
+		}
+		else {
+			$form.find( '.mp_button' ).attr( 'disabled' , false );
+		}
+    };    
 
     /**
      * Update an item's qty
@@ -546,6 +667,12 @@ var mp_cart = { };
         } );
     };
 }( jQuery ) );
+
+jQuery( document ).on( 'cbox_cleanup', function() {
+	if ( typeof jQuery('.mp_select2').mp_select2 !== 'undefined' ) {
+		jQuery('.mp_select2').mp_select2('close');
+	}
+} );
 
 jQuery( document ).on( 'cbox_complete', function() {
     jQuery.colorbox.resize();

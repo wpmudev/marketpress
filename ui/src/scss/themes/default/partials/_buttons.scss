@@ -1,0 +1,73 @@
+//== Buttons
+//
+a.mp_button,
+button.mp_button {
+	//background-color: transparent;
+	background: transparent;
+	border: 2px solid $color;
+	color: $color;
+	font-size: $font__size;
+	font-weight: 700;
+	line-height: 1.5em;
+	//width: 100%;
+	
+	&:hover,
+	&:focus {
+		background-color: $color;
+		color: $color--light;
+	}
+	
+	// Alt / Variations Button
+	&-alt,
+	&-has_variations {
+		//background-color: $color;
+		background: $color;
+		//border-color: darken($color, 20%);
+		border-color: transparent;
+		//border-bottom: 2px solid transparent;
+		color: $color--light;
+		
+		&:hover,
+		&:focus {
+			//background-color: darken($color, 20%);
+			background: darken($color, 20%);
+			border-bottom: 2px solid darken($color, 20%);
+		}
+	}
+	
+	// Checkout Button
+	&-checkout {
+		background-color: $color--success;
+		border-color: darken($color--success, 10%);
+		border-bottom: 2px solid darken($color--success, 10%);
+		color: $color--light;
+		
+		&:hover,
+		&:focus {
+			background-color: transparent;
+			border-bottom: 2px solid darken($color--success, 10%);
+			color: $color--success;
+		}
+	}
+	
+	// Remove Button
+	&-remove {
+		background-color: $color--error;
+		border-color: darken($color--error, 10%);
+		border-bottom: 2px solid darken($color--error, 10%);
+		color: $color--light;
+		
+		&:hover,
+		&:focus {
+			background-color: transparent;
+			border-bottom: 2px solid darken($color--error, 10%);
+			color: $color--error;
+		}
+	}
+	
+	// Widget Buttons
+	&-widget-cart {
+		font-size: $font__size--s;
+	}
+
+}

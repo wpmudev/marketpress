@@ -614,13 +614,35 @@ class WPMUDEV_Metabox {
 	 * @access public
 	 */
 	public function admin_enqueue_scripts() {
-		wp_register_script( 'jquery-validate', $this->class_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), '1.12' );
-		wp_register_script( 'jquery-validate-methods', $this->class_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), '1.12' );
-		wp_enqueue_script( 'wpmudev-metaboxes-admin', $this->class_url( 'ui/js/admin.js' ), array(
-			'jquery-validate-methods',
-			'jquery-ui-position',
-			'jquery-effects-highlight'
-		), WPMUDEV_METABOX_VERSION, true );
+		if ( isset( $_GET['page'] ) ) {
+			$page = isset( $_GET['page'] );
+		} else {
+			$page = '';
+		}
+		
+		//Load MP validation only on MP pages
+		$screenpage = get_current_screen();
+
+		if ( $page == 'store-settings' 
+			|| $page == 'store-settings-presentation' 
+			|| $page == 'store-settings-notifications' 
+			|| $page == 'store-settings-shipping' 
+			|| $page == 'store-settings-payments' 
+			|| $page == 'store-settings-productattributes' 
+			|| $page == 'store-settings-capabilities'
+			|| $page == 'store-settings-addons'
+			|| ( isset( $_GET['taxonomy'] ) && ($_GET['taxonomy'] == 'product_category' || $_GET['taxonomy'] == 'product_tag') )
+			|| ( isset( $_GET['post_type'] ) && ($_GET['post_type'] == 'mp_coupon' || $_GET['post_type'] == 'mp_order' || $_GET['post_type'] == 'product' ) ) 
+			|| ( isset( $screenpage->post_type ) && ( $screenpage->post_type == MP_Product::get_post_type() || $screenpage->post_type == "mp_order" || $screenpage->post_type == "mp_coupon") ) )  {
+			
+				wp_register_script( 'jquery-validate', $this->class_url( 'ui/js/jquery.validate.min.js' ), array( 'jquery' ), '1.12' );
+				wp_register_script( 'jquery-validate-methods', $this->class_url( 'ui/js/jquery.validate.methods.min.js' ), array( 'jquery-validate' ), '1.12' );
+				wp_enqueue_script( 'wpmudev-metaboxes-admin', $this->class_url( 'ui/js/admin.js' ), array(
+					'jquery-validate-methods',
+					'jquery-ui-position',
+					'jquery-effects-highlight'
+				), WPMUDEV_METABOX_VERSION, true );
+		}
 
 		$messages = array(
 			'alphanumeric_error_msg' => __( 'Please enter only letters and numbers', 'wpmudev_metaboxes' ),

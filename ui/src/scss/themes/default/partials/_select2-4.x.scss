@@ -1,0 +1,98 @@
+// Select2 4.x
+.select2 {
+	
+	// Container
+	&-container {
+		
+		// Selection
+		.select2-selection {
+			&.mp_select2,
+			&.mp_select2_search {
+				background: $color--light;
+				border-color: $color--gray;
+				color: $color;
+				font-size: $font__size;
+				
+				.select2-selection {
+					&__arrow {
+						b {
+							border-top-color: $color;
+						}
+					}
+				}
+				
+			}
+		}
+		
+		// Open
+		&--open {
+			
+			// Selection
+			.select2-selection {
+				&.mp_select2,
+				&.mp_select2_search {
+					background: $color--gray;
+					//border-bottom-color: transparent;
+					
+					.select2-selection {
+						&__arrow {
+							b {
+								border-top-color: transparent;
+								border-bottom-color: $color;
+							}
+						}
+					}
+					
+				}
+			}
+			
+			.select2-dropdown {
+				&--below {
+					border-top: 1px solid $color--gray;
+				}
+				&--above {
+					border-bottom: 1px solid $color--gray;
+				}
+			}
+			
+		}
+		
+		// Dropdown
+		.select2-dropdown {
+			&.mp_select2-dropdown {
+				border-color: $color--gray;
+				
+				// Results
+				.select2-results {
+					
+					// Options
+					&__options {
+						font-size: $font__size--m;
+					}
+					
+					// Option
+					&__option {
+						font-size: $font__size--m;
+						
+						&--highlighted {
+							background: $color--gray;
+							color: $color;
+						}
+					}
+					
+				}
+				
+				// Search
+				.select2-search {
+					&__field {
+						font-size: $font__size--m;
+					}
+				}
+				
+			}
+		}
+		
+		
+	}
+	
+}

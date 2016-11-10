@@ -36,6 +36,7 @@ class MP_Short_Codes {
 		add_shortcode( 'mp_tag_cloud', array( &$this, 'mp_tag_cloud_sc' ) );
 		add_shortcode( 'mp_list_categories', array( &$this, 'mp_list_categories_sc' ) );
 		add_shortcode( 'mp_dropdown_categories', array( &$this, 'mp_dropdown_categories_sc' ) );
+		add_shortcode( 'mp_featured_products', array( &$this, 'mp_featured_products_sc' ) );
 		add_shortcode( 'mp_popular_products', array( &$this, 'mp_popular_products_sc' ) );
 		add_shortcode( 'mp_related_products', array( &$this, 'mp_related_products_sc' ) );
 		add_shortcode( 'mp_list_products', array( &$this, 'mp_list_products_sc' ) );
@@ -87,9 +88,14 @@ class MP_Short_Codes {
 		wp_enqueue_style( 'lightgallery', mp_plugin_url( 'ui/lightgallery/css/lightgallery.css' ), array(), MP_VERSION );
 // CSS
 		wp_register_style( 'jquery-ui', mp_plugin_url( 'ui/css/jquery-ui.min.css' ), false, MP_VERSION );
-		wp_enqueue_style( 'mp-frontend', mp_plugin_url( 'ui/css/frontend.css' ), array( 'jquery-ui' ), MP_VERSION );
 		wp_enqueue_style( 'mp-base', mp_plugin_url( 'ui/css/marketpress.css' ), false, MP_VERSION );
-		wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array( 'mp-frontend' ), MP_VERSION );
+
+		if ( mp_get_setting( 'store_theme' ) == 'default' ) {
+			wp_enqueue_style( 'mp-theme', mp_plugin_url( 'ui/themes/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
+		} elseif ( mp_get_setting( 'store_theme' ) != 'none' ){
+			wp_enqueue_style( 'mp-theme', content_url( 'marketpress-styles/' . mp_get_setting( 'store_theme' ) . '.css' ), array(), MP_VERSION );
+		}
+
 		wp_enqueue_style( 'mp-select2', mp_plugin_url( 'ui/select2/select2.css' ), false, MP_VERSION );
 
 // JS
@@ -97,6 +103,12 @@ class MP_Short_Codes {
 		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'mp-select2' ), MP_VERSION, true );
+		
+		$grid_with_js = apply_filters('mp-do_grid_with_js', true);
+		
+		if ( $grid_with_js == "true" ) {
+			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array('jquery'), MP_VERSION );
+		}
 
 // Get product category links
 		$terms	 = get_terms( 'product_category' );
@@ -107,7 +119,7 @@ class MP_Short_Codes {
 
 // Localize js
 		wp_localize_script( 'mp-frontend', 'mp_i18n', array(
-			'ajaxurl'		 => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'		 => mp_get_ajax_url(),
 			'loadingImage'	 => mp_plugin_url( 'ui/images/loading.gif' ),
 			'productsURL'	 => mp_store_page_url( 'products', false ),
 			'productCats'	 => $cats,
@@ -125,9 +137,9 @@ class MP_Short_Codes {
 
 		// Localize scripts
 		wp_localize_script( 'mp-cart', 'mp_cart_i18n', array(
-			'ajaxurl'                  => admin_url( 'admin-ajax.php' ),
+			'ajaxurl'                  => mp_get_ajax_url(),
 			'ajax_loader'              => '<span class="mp_ajax_loader"><img src="' . mp_plugin_url( 'ui/images/ajax-loader.gif' ) . '" alt=""> ' . __( 'Adding...', 'mp' ) . '</span>',
-			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order.', 'mp' ),
+			'cart_updated_error_limit' => __( 'Cart update notice: this item has a limit per order or you have reached the stock limit.', 'mp' ),
 			'is_cart_page'             => mp_is_shop_page( 'cart' )
 		) );
 	}
@@ -323,6 +335,30 @@ class MP_Short_Codes {
 		$this->shortcodes_frontend_styles_scripts();
 		$atts = $this->_parse_atts( $atts );
 		return mp_dropdown_categories( false, $atts );
+	}
+
+	/**
+	 * Displays a list of featured products
+	 *
+	 * @param bool paginate Optional, whether to paginate
+	 * @param int page Optional, The page number to display in the product list if paginate is set to true.
+	 * @param int per_page Optional, How many products to display in the product list if $paginate is set to true.
+	 * @param string order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
+	 * @param string order Optional, Direction to order products by. Can be: DESC, ASC
+	 * @param string category Optional, limit to a product category
+	 * @param string tag Optional, limit to a product tag
+	 * @param bool list_view Optional, show as list. Grid default
+	 * @param bool filters Optional, show filters
+	 */
+	function mp_featured_products_sc( $atts ) {
+		$this->cart_needed();
+		$this->shortcodes_frontend_styles_scripts();
+		$atts[ 'echo' ]	 = false;
+		$atts[ 'featured' ]	 = true;
+		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
+		$args			 = $this->_parse_atts( $args );
+
+		return mp_featured_products( $args );
 	}
 
 	/**

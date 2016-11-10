@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 3.0.0.6
+Version: 3.1.1
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -24,10 +24,10 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
-Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub)
+Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
  */
 
-define( 'MP_VERSION', '3.0.0.6' );
+define( 'MP_VERSION', '3.1.1' );
 
 class Marketpress {
 
@@ -38,6 +38,7 @@ class Marketpress {
 	 * @access public
 	 * @var array
 	 */
+ 
 	var $post_types = array( 'mp_product', 'product', 'mp_product_variation' );
 
 	/**
@@ -116,6 +117,7 @@ class Marketpress {
 	 *
 	 * @return string
 	 */
+	 
 	public function plugin_url( $path = '' ) {
 		return $this->_plugin_url . ltrim( $path, '/' );
 	}
@@ -265,6 +267,7 @@ class Marketpress {
 			'show_ui'         => true,
 			'show_in_menu'    => false,
 			'capability_type' => array( 'store_order', 'store_orders' ),
+			'capabilities'    => array( 'create_posts' => 'do_not_allow' ), // Temporarily disable creating order from admin
 			'map_meta_cap'    => true,
 			'hierarchical'    => false,
 			'rewrite'         => false,
@@ -276,7 +279,10 @@ class Marketpress {
 //! Register product_variation post type
 		register_post_type( MP_Product::get_variations_post_type(), array(
 			'public'             => false,
-			'show_ui'            => false,
+			'show_ui'            => true,
+			'show_in_nav_menus'	 => false,
+			'show_in_menu'		 => false,
+			'show_in_admin_bar'  => false,
 			'publicly_queryable' => true,
 			'hierarchical'       => true,
 			'rewrite'            => false,
@@ -393,7 +399,7 @@ class Marketpress {
 	}
 
 	function add_menu_items() {
-		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=product' );
+		add_submenu_page( 'edit.php?post_type=' . MP_Product::get_post_type(), __( 'Add a Product', 'mp' ), __( 'Add a Product', 'mp' ), apply_filters( 'mp_add_new_product_capability', 'manage_options' ), 'post-new.php?post_type=' . MP_Product::get_post_type() );
 	}
 
 	function localization() {
@@ -423,6 +429,17 @@ class Marketpress {
 				}
 			}
 		}
+		if ( ! function_exists( 'mp_is_main_site' ) ) {
+			function mp_is_main_site() {
+				global $wpdb;
+
+				if ( MP_ROOT_BLOG !== false ) {
+					return $wpdb->blogid == MP_ROOT_BLOG;
+				} else {
+					return is_main_site();
+				}
+			}
+		}
 		require_once( $this->plugin_dir( 'includes/admin/widgets/cart.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/categories.php' ) );
 		require_once( $this->plugin_dir( 'includes/admin/widgets/product-list.php' ) );
@@ -430,9 +447,12 @@ class Marketpress {
 
 		//Multisite Widgets
 		if ( is_multisite() && is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
-			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
-			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
-			require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-categories.php' ) );
+			$settings = get_site_option( 'mp_network_settings', array() );
+			if ( ( isset($settings['main_blog']) && mp_is_main_site() ) || isset($settings['main_blog']) && !$settings['main_blog'] ) {
+				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-product-list.php' ) );
+				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-tag-cloud.php' ) );
+				require_once( $this->plugin_dir( 'includes/admin/widgets/ms-global-categories.php' ) );
+			}
 		}
 	}
 
@@ -475,25 +495,27 @@ class Marketpress {
 	function mp_product_variation_metaboxes() {
 		$post_id = isset( $_GET['post'] ) ? (int) $_GET['post'] : ( isset( $_POST['post_ID'] ) ? (int) $_POST['post_ID'] : '' );
 		if ( $post_id !== '' ) {
+			ob_start();
 			$variation_title = get_post_meta( $post_id, 'name', true );
 			?>
 			<input type="hidden" name="variation_title" id="variation_title"
 			       value="<?php echo esc_attr( $variation_title ); ?>"/>
 			<?php
+			
+			return ob_get_clean();
 		}
 	}
 
 	function install_actions() {
 
-// Install - Add pages button
+		// Install - Add pages button
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
-
 			$this->create_pages();
 
-// We no longer need to install pages
+			// We no longer need to install pages
 			update_option( 'mp_needs_pages', 0 );
 
-// Settings redirect
+			// Settings redirect
 			wp_redirect( admin_url( 'admin.php?page=store-setup-wizard&quick_setup_step=2&mp_pages_created' ) );
 			exit;
 		}
@@ -501,7 +523,7 @@ class Marketpress {
 
 	function create_pages() {
 		$page_store_id = mp_create_store_page( 'store' );
-//mp_create_store_page('network_store_page');
+		//mp_create_store_page('network_store_page');
 		$page_products_id     = mp_create_store_page( 'products' );
 		$page_cart_id         = mp_create_store_page( 'cart' );
 		$page_checkout_id     = mp_create_store_page( 'checkout' );
@@ -652,7 +674,9 @@ class Marketpress {
 			//$new_rules[ $uri . '/([^/]+)/?' ] = 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]';
 			//this rules match the default page rules, so we have to inject it before the page
 			$rewrite_rules = array_merge( array(
-				$uri . '/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]'
+				$uri . '/([^/]+)/?$' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]',
+				$uri . '/page/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_status_pagenumber=$matches[1]',
+				$uri . '/([^/]+)/([^/]+)/?' => 'index.php?pagename=' . $uri . '&mp_order_id=$matches[1]&mp_guest_email=$matches[2]',
 			), $rewrite_rules );
 		}
 
@@ -665,7 +689,7 @@ class Marketpress {
 			), $rewrite_rules );
 		}
 
-		return $rewrite_rules + $new_rules;
+		return $new_rules + $rewrite_rules;
 	}
 
 	/**
@@ -679,6 +703,8 @@ class Marketpress {
 		$vars[] = 'mp_variation_id';
 		$vars[] = 'mp_order_id';
 		$vars[] = 'mp_confirm_order_step';
+		$vars[] = 'mp_guest_email';
+		$vars[] = 'mp_status_pagenumber';
 
 		return $vars;
 	}
@@ -711,12 +737,13 @@ class Marketpress {
 	 * @access public
 	 * @action init
 	 */
-	public function maybe_flush_rewrites() {
-		$flush_rewrites = get_option( 'mp_flush_rewrites_30', true );
 
-		if ( $flush_rewrites == true ) {
+	public function maybe_flush_rewrites() {
+		$flush_rewrites = get_option( 'mp_flush_rewrites_30', 1 );
+
+		if ( $flush_rewrites == 1 ) {
 			flush_rewrite_rules();
-			update_option( 'mp_flush_rewrites_30', false );
+			update_option( 'mp_flush_rewrites_30', 0 );
 		}
 	}
 

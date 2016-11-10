@@ -19,6 +19,7 @@ $this->defaults = array(
 		'list_view'	 => NULL,
 		'filters'	 => NULL,
 		'limit'		 => NULL,
+		'featured'	 => false,
 	),
 );
 
@@ -39,7 +40,7 @@ $this->default_settings = array(
 		'tax_based'				 => 'store_tax',
 	),
 	'currency'					 => 'USD',
-	'details_collection'		 => 'full',
+	'details_collection'		 => 'contact',
 	'curr_symbol_position'		 => 1,
 	'curr_decimal'				 => 1,
 	'disable_cart'				 => 0,
@@ -120,16 +121,37 @@ $this->default_settings = array(
 	'email'						 => array(
 		'admin_order'	 => array(
 			'subject'	 => __( 'New Order Notification: ORDERID', 'mp' ),
-			'text'	 	 => __( 'A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n', 'mp' ),
+			'text'	 	 => __( "A new order (ORDERID) was created in your store:\n\n ORDERINFOSKU\n\n SHIPPINGINFO\n\n PAYMENTINFO\n\n", 'mp' ),
 		),
 		'new_order'		 => array(
 			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
-			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us. \n Here is a confirmation of your order details:\n\n Order Information:\n ORDERINFO \n\n Shipping Information: \n SHIPPINGINFO \n\n Payment Information: \n PAYMENTINFO \n\n ORDERNOTES \n\n You can track the latest status of your order here: TRACKINGURL \n\n Thanks again!", 'mp'
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\n Your order has been received, and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information: \n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n
+You can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
+			),
+		),
+		'new_order_downloads'		 => array(
+			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\nYour order has been received and your digital goods are ready to be downloaded. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
+			),
+		),
+		'new_order_mixed'		 => array(
+			'subject'	 => __( 'Your Order Confirmation (ORDERID)', 'mp' ),
+			'text'		 => __( "Thank you for your order CUSTOMERNAME!\n\nYour order has been received, your digital goods are ready to be downloaded and any items to be shipped will be processed as soon as possible. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
 			),
 		),
 		'order_shipped'	 => array(
 			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
-			'text'		 => __( "Dear CUSTOMERNAME,\n Your order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\n You can track the latest status of your order here: TRACKINGURL\n\n Thanks again!", 'mp'
+			'text'		 => __( "Dear CUSTOMERNAME,\nYour order has been shipped! Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
+			),
+		),
+		'order_shipped_downloads'	 => array(
+			'subject'	 => __( 'Your Order Is Ready To Be Downloaded! (ORDERID)', 'mp' ),
+			'text'		 => __( "Dear CUSTOMERNAME,\nYour order is now available to download! Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
+			),
+		),
+		'order_shipped_mixed'	 => array(
+			'subject'	 => __( 'Your Order Has Been Shipped! (ORDERID)', 'mp' ),
+			'text'		 => __( "Dear CUSTOMERNAME,\nYour order has been shipped! Also, digital downloads included in your order are now ready to be downloaded. Depending on the shipping method and your location it should be arriving shortly. Please refer to your Order ID (ORDERID) whenever contacting us.\n\nHere is a confirmation of your order details:\n\n Order Information:\n ORDERINFO\n\n Shipping Information:\n SHIPPINGINFO\n\n Payment Information:\n PAYMENTINFO\n\n ORDERNOTES\n\nYou can track the latest status of your order here: TRACKINGURL\n\nThanks again!", 'mp'
 			),
 		) ),
 	'social'					 => array(
@@ -234,7 +256,7 @@ $this->countries = array(
 	'FJ' => 'Fiji',
 	'FI' => 'Finland',
 	'FR' => 'France',
-	'FX' => 'France, Metropolitan',
+	'FX' => 'France, Metropolitan', //Is this needed? metropolitan france provinces are mixed in FR's province array
 	'GF' => 'French Guiana',
 	'PF' => 'French Polynesia',
 	'TF' => 'French Southern Territories',
@@ -250,6 +272,7 @@ $this->countries = array(
 	'GP' => 'Guadeloupe',
 	'GU' => 'Guam',
 	'GT' => 'Guatemala',
+	'GG' => 'Guernsey',
 	'GN' => 'Guinea',
 	'GW' => 'Guinea-Bissau',
 	'GY' => 'Guyana',
@@ -265,10 +288,12 @@ $this->countries = array(
 	'IR' => 'Iran (Islamic Republic Of)',
 	'IQ' => 'Iraq',
 	'IE' => 'Ireland',
+	'IM' => 'Isle Of Man',
 	'IL' => 'Israel',
 	'IT' => 'Italy',
 	'JM' => 'Jamaica',
 	'JP' => 'Japan',
+	'JE' => 'Jersey',
 	'JO' => 'Jordan',
 	'KZ' => 'Kazakhstan',
 	'KE' => 'Kenya',
@@ -473,7 +498,7 @@ $this->countries_no_postcode = array(
 );
 
 //USA states list
-$this->usa_states = array(
+$this->US_provinces = array(
 	'AL' => 'Alabama',
 	'AK' => 'Alaska',
 	'AZ' => 'Arizona',
@@ -531,7 +556,7 @@ $this->usa_states = array(
 );
 
 //UK counties/provinces
-$this->uk_counties = array(
+$this->GB_provinces = array(
 	'Aberdeenshire'					 => 'Aberdeenshire',
 	'Angus/Forfarshire'				 => 'Angus/Forfarshire',
 	'Antrim'						 => 'Antrim',
@@ -590,6 +615,7 @@ $this->uk_counties = array(
 	'Leicestershire'				 => 'Leicestershire',
 	'Lincolnshire'					 => 'Lincolnshire',
 	'Londonderry'					 => 'Londonderry',
+	'Merseyside'					 => 'Merseyside',
 	'Merthyr Tydfil'				 => 'Merthyr Tydfil',
 	'Middlesex'						 => 'Middlesex',
 	'Midlothian/Edinburghshire'		 => 'Midlothian/Edinburghshire',
@@ -640,7 +666,7 @@ $this->uk_counties = array(
 );
 
 //Australian states
-$this->australian_states = array(
+$this->AU_provinces = array(
 	'NSW'	 => 'New South Wales',
 	'VIC'	 => 'Victoria',
 	'QLD'	 => 'Queensland',
@@ -652,7 +678,7 @@ $this->australian_states = array(
 );
 
 //Canadian provinces
-$this->canadian_provinces = array(
+$this->CA_provinces = array(
 	'BC' => 'British Columbia',
 	'ON' => 'Ontario',
 	'NL' => 'Newfoundland and Labrador',
@@ -668,7 +694,8 @@ $this->canadian_provinces = array(
 	'YT' => 'Yukon Territory'
 );
 
-$this->afganistan_regions = array(
+//Afghanistan
+$this->AF_provinces = array(
 	'BDS'	 => 'Badakhshan',
 	'BDG'	 => 'Badghis',
 	'BGL'	 => 'Baghlan',
@@ -703,7 +730,8 @@ $this->afganistan_regions = array(
 	'ZAB'	 => 'Zabol'
 );
 
-$this->albania_regions = array(
+//Albania
+$this->AL_provinces = array(
 	'1'	 => 'Berat county',
 	'2'	 => 'Durres county',
 	'3'	 => 'Elbasan county',
@@ -718,7 +746,8 @@ $this->albania_regions = array(
 	'12' => 'Vlore county'
 );
 
-$this->algeria_region = array(
+//Algeria
+$this->DZ_provinces = array(
 	'ADRAR'				 => 'Adrar',
 	'AIN TEMOUCHENT'	 => 'Ain Temouchent',
 	'ALGIERS'			 => 'Algiers',
@@ -766,7 +795,8 @@ $this->algeria_region = array(
 	'RELIZANE'			 => 'Relizane'
 );
 
-$this->andorra_regions = array(
+//Andorra
+$this->AD_provinces = array(
 	'CA' => 'Canillo',
 	'EN' => 'Encamp',
 	'MA' => 'La Massana',
@@ -776,7 +806,8 @@ $this->andorra_regions = array(
 	'EE' => 'Escaldes Engordany'
 );
 
-$this->angola_regions = array(
+//Angola
+$this->AO_provinces = array(
 	'BGO'	 => 'Bengo',
 	'BGU'	 => 'Benguela',
 	'BIE'	 => 'Bie',
@@ -797,7 +828,8 @@ $this->angola_regions = array(
 	'ZAI'	 => 'Zaire'
 );
 
-$this->anguilla_regions = array(
+//Anguilla
+$this->AI_provinces = array(
 	'BP' => 'Blowing Point',
 	'EE' => 'East End',
 	'GH' => 'George Hill',
@@ -814,7 +846,8 @@ $this->anguilla_regions = array(
 	'WE' => 'West End (including Long Bay)'
 );
 
-$this->antigua_barbuda_regions = array(
+//Antigua and barbuda
+$this->AG_provinces = array(
 	'GE' => 'St. George',
 	'JO' => 'St. John',
 	'MA' => 'St. Mary',
@@ -825,7 +858,8 @@ $this->antigua_barbuda_regions = array(
 	'PH' => 'St. Philip'
 );
 
-$this->argentina_regions = array(
+//Argentina
+$this->AR_provinces = array(
 	'A'	 => 'Salta',
 	'B'	 => 'Buenos Aires Province',
 	'C'	 => 'Capital Federal',
@@ -852,7 +886,8 @@ $this->argentina_regions = array(
 	'Z'	 => 'Santa Cruz'
 );
 
-$this->armenia_regions = array(
+//Armenia
+$this->AM_provinces = array(
 	'AG' => 'Araqacotn',
 	'AR' => 'Ararat',
 	'AV' => 'Armavir',
@@ -866,7 +901,8 @@ $this->armenia_regions = array(
 	'VD' => 'Vayoc Jor'
 );
 
-$this->austria_regions = array(
+//Austria
+$this->AT_provinces = array(
 	'BUR'	 => 'Burgenland',
 	'KAR'	 => 'Kärnten',
 	'NOS'	 => 'Niederöesterreich',
@@ -878,7 +914,8 @@ $this->austria_regions = array(
 	'WIE'	 => 'Wien'
 );
 
-$this->ajerbaijan_regions = array(
+//Azerbaijan
+$this->AZ_provinces = array(
 	'ABS'	 => 'Absheron',
 	'AGM'	 => 'Aghdam',
 	'AGS'	 => 'Aghdash',
@@ -958,7 +995,8 @@ $this->ajerbaijan_regions = array(
 	'ZAR'	 => 'Zerdab'
 );
 
-$this->bahamas_regions = array(
+//Bahamas
+$this->BS_provinces = array(
 	'AC' => 'Acklins and Crooked Islands',
 	'BI' => 'Bimini',
 	'CI' => 'Cat Island',
@@ -982,7 +1020,8 @@ $this->bahamas_regions = array(
 	'SP' => 'Sandy Point'
 );
 
-$this->bahrain_regions = array(
+//Bahrain
+$this->BH_provinces = array(
 	'BH-13'	 => 'Al Manamah',
 	'BH-14'	 => 'Al Janubiyah',
 	'BH-15'	 => 'Al Muharraq',
@@ -990,7 +1029,8 @@ $this->bahrain_regions = array(
 	'BH-17'	 => 'Ash Shamaliyah'
 );
 
-$this->bangladesh_regions = array(
+//Bangladesh
+$this->BD_provinces = array(
 	'1'	 => 'Barisal',
 	'2'	 => 'Chittagong',
 	'3'	 => 'Dhaka',
@@ -999,7 +1039,8 @@ $this->bangladesh_regions = array(
 	'6'	 => 'Sylhet'
 );
 
-$this->barbados_regions = array(
+//Barbados
+$this->BB_provinces = array(
 	'01' => 'Christ Church',
 	'02' => 'Saint Andrew',
 	'03' => 'Saint George',
@@ -1013,7 +1054,8 @@ $this->barbados_regions = array(
 	'11' => 'Saint Thomas'
 );
 
-$this->belarus_regions = array(
+//Belarus
+$this->BY_provinces = array(
 	'BR' => 'Brest',
 	'HO' => 'Homyel',
 	'HM' => 'Horad Minsk',
@@ -1023,7 +1065,8 @@ $this->belarus_regions = array(
 	'VI' => 'Vitsyebsk'
 );
 
-$this->belgium_regions = array(
+//Belgium
+$this->BE_provinces = array(
 	'VWV'	 => 'West-Vlaanderen',
 	'VOV'	 => 'Oost-Vlaanderen',
 	'VAN'	 => 'Antwerpen',
@@ -1037,7 +1080,8 @@ $this->belgium_regions = array(
 	'WLX'	 => 'Luxembourg'
 );
 
-$this->belize_regions = array(
+//Belize
+$this->BZ_provinces = array(
 	'BZ'	 => 'Belize',
 	'CY'	 => 'Cayo',
 	'CZL'	 => 'Corozal',
@@ -1046,7 +1090,8 @@ $this->belize_regions = array(
 	'TOL'	 => 'Toledo'
 );
 
-$this->benin_regions = array(
+//Benin
+$this->BJ_provinces = array(
 	'AL' => 'Alibori',
 	'AK' => 'Atacora',
 	'AQ' => 'Atlantique',
@@ -1061,7 +1106,8 @@ $this->benin_regions = array(
 	'ZO' => 'Zou'
 );
 
-$this->bermuda_regions = array(
+//Bermuda
+$this->BM_provinces = array(
 	'DEV'	 => 'Devonshire',
 	'HAM'	 => 'Hamilton',
 	'HA'	 => 'Hamilton Municipality',
@@ -1075,7 +1121,8 @@ $this->bermuda_regions = array(
 	'WAR'	 => 'Warwick'
 );
 
-$this->bhutan_regions = array(
+//Bhutan
+$this->BT_provinces = array(
 	'GA' => 'Gasa',
 	'TY' => 'Tashi Yangtse',
 	'11' => 'Paro',
@@ -1098,7 +1145,8 @@ $this->bhutan_regions = array(
 	'45' => 'Samdrup Jongkhar'
 );
 
-$this->bolivia_regions = array(
+//Bolivia
+$this->BO_provinces = array(
 	'BO-C'	 => 'Cochabamba',
 	'BO-H'	 => 'Chuquisaca',
 	'BO-B'	 => 'El Beni',
@@ -1110,7 +1158,8 @@ $this->bolivia_regions = array(
 	'BO-T'	 => 'Tarija'
 );
 
-$this->bosnia_herzegoniva_regions = array(
+//Bosnia and herzegowina
+$this->BA_provinces = array(
 	'BIH'	 => 'Federacija Bosna i Hercegovina',
 	'SRP'	 => 'Republika Srpska',
 	'05'	 => 'Bosansko-Podrinjski Kanton',
@@ -1125,7 +1174,8 @@ $this->bosnia_herzegoniva_regions = array(
 	'04'	 => 'Zenicko-Dobojski Kanton'
 );
 
-$this->botswana_regions = array(
+//Botswana
+$this->BW_provinces = array(
 	'CE' => 'Central',
 	'GH' => 'Ghanzi',
 	'KG' => 'Kgalagadi',
@@ -1137,7 +1187,8 @@ $this->botswana_regions = array(
 	'SO' => 'Southern'
 );
 
-$this->brazil_regions = array(
+//Brazil
+$this->BR_provinces = array(
 	'AC' => 'Acre',
 	'AL' => 'Alagoas',
 	'AP' => 'Amapá',
@@ -1167,14 +1218,16 @@ $this->brazil_regions = array(
 	'TO' => 'Tocantins'
 );
 
-$this->brunei_darussalam_regions = array(
+//Brunei darussalam
+$this->BN_provinces = array(
 	'BN-BE'	 => 'Belait',
 	'BN-BM'	 => 'Brunei-Muara',
 	'BN-TE'	 => 'Temburong',
 	'BN-TU'	 => 'Tutong'
 );
 
-$this->burkina_faso_regions = array(
+//Burkina faso
+$this->BF_provinces = array(
 	'BAL'	 => 'Bale',
 	'BAM'	 => 'Bam',
 	'BAN'	 => 'Banwa',
@@ -1222,7 +1275,8 @@ $this->burkina_faso_regions = array(
 	'ZOU'	 => 'Zoundweogo'
 );
 
-$this->burundi_regions = array(
+//Burundi
+$this->BI_provinces = array(
 	'BB' => 'Bubanza',
 	'BM' => 'Bujumbura Mairie',
 	'BJ' => 'Bujumbura Rural',
@@ -1242,7 +1296,8 @@ $this->burundi_regions = array(
 	'RY' => 'Ruyigi'
 );
 
-$this->cambodia_regions = array(
+//Cambodia
+$this->KH_provinces = array(
 	'2'	 => 'Baat Dambang',
 	'1'	 => 'Banteay Mean Chey',
 	'1'	 => 'Banteay Meanchey',
@@ -1284,7 +1339,8 @@ $this->cambodia_regions = array(
 	'21' => 'Takev'
 );
 
-$this->cameroon_regions = array(
+//Cameroon
+$this->CM_provinces = array(
 	'CM-AD'	 => 'Adamaoua',
 	'CM-CE'	 => 'Centre',
 	'CM-ES'	 => 'Est',
@@ -1297,7 +1353,8 @@ $this->cameroon_regions = array(
 	'CM-SW'	 => 'Sud-Ouest'
 );
 
-$this->cape_verde_regions = array(
+//Cape verde
+$this->CV_provinces = array(
 	'BV' => 'Boa Vista',
 	'BR' => 'Brava',
 	'MA' => 'Maio',
@@ -1322,7 +1379,8 @@ $this->cape_verde_regions = array(
 	'TS' => 'Tarrafal de Sao Nicolau'
 );
 
-$this->cayman_islands_regions = array(
+//Cayman islands
+$this->KY_provinces = array(
 	'BT' => 'Bodden Town',
 	'CB' => 'Cayman Brac',
 	'EE' => 'East End',
@@ -1332,7 +1390,8 @@ $this->cayman_islands_regions = array(
 	'WB' => 'West Bay'
 );
 
-$this->central_african_republic_regions = array(
+//Central African Republic
+$this->CF_provinces = array(
 	'BB'	 => 'Bamingui-Bangoran',
 	'BGF'	 => 'Bangui',
 	'BK'	 => 'Basse-Kotto',
@@ -1352,7 +1411,8 @@ $this->central_african_republic_regions = array(
 	'VK'	 => 'Vakaga'
 );
 
-$this->chad_regions = array(
+//Chad
+$this->TD_provinces = array(
 	'KA'	 => 'Barh el Ghazel',
 	'BA'	 => 'Batha',
 	'BET'	 => 'Borkou',
@@ -1377,7 +1437,8 @@ $this->chad_regions = array(
 	'WF'	 => 'Wadi Fira'
 );
 
-$this->chile_regions = array(
+//Chile
+$this->CL_provinces = array(
 	'TA' => 'Tarapaca',
 	'AN' => 'Antofagasta',
 	'AT' => 'Atacama',
@@ -1395,7 +1456,8 @@ $this->chile_regions = array(
 	'AR' => 'Arica'
 );
 
-$this->china_regions = array(
+//China
+$this->CN_provinces = array(
 	'京'	 => '北京',
 	'沪'	 => '上海',
 	'津'	 => '天津',
@@ -1432,7 +1494,8 @@ $this->china_regions = array(
 	'台'	 => '台湾'
 );
 
-$this->colombia_regions = array(
+//Colombia
+$this->CO_provinces = array(
 	'AMA'	 => 'Amazonas',
 	'ANT'	 => 'Antioquia',
 	'ARA'	 => 'Arauca',
@@ -1467,13 +1530,15 @@ $this->colombia_regions = array(
 	'VID'	 => 'Vichada'
 );
 
-$this->comoros_regions = array(
+//Comoros
+$this->KM_provinces = array(
 	'A'	 => 'Anjouan',
 	'G'	 => 'Grande Comore',
 	'M'	 => 'Moheli'
 );
 
-$this->congo_regions = array(
+//Congo
+$this->CG_provinces = array(
 	'11'	 => 'Bouenza',
 	'BZV'	 => 'Brazzaville',
 	'8'		 => 'Cuvette',
@@ -1487,7 +1552,8 @@ $this->congo_regions = array(
 	'13'	 => 'Sangha'
 );
 
-$this->congo_democratic_republic_regions = array(
+//Congo, the democratic republic of
+$this->CD_provinces = array(
 	'CD-KN'	 => 'Kinshasa',
 	'CD-BN'	 => 'Bandundu',
 	'CD-BC'	 => 'Bas-Congo',
@@ -1501,7 +1567,8 @@ $this->congo_democratic_republic_regions = array(
 	'CD-SK'	 => 'Sud-Kivu'
 );
 
-$this->costa_rica_regions = array(
+//Costa rica
+$this->CR_provinces = array(
 	'AL' => 'Alajuela',
 	'CA' => 'Cartago',
 	'GU' => 'Guanacaste',
@@ -1511,7 +1578,8 @@ $this->costa_rica_regions = array(
 	'SJ' => 'San José'
 );
 
-$this->croatia_regions = array(
+//Croatia
+$this->HR_provinces = array(
 	'01' => 'Zagreb county',
 	'02' => 'Krapina-Zagorje county',
 	'03' => 'Sisak-Moslavina county',
@@ -1535,7 +1603,8 @@ $this->croatia_regions = array(
 	'21' => 'Zagreb'
 );
 
-$this->cuba_regions = array(
+//Cuba
+$this->CU_provinces = array(
 	'01' => 'Pinar del Rio',
 	'02' => 'La Habana',
 	'03' => 'Ciudad de la Habana',
@@ -1553,7 +1622,8 @@ $this->cuba_regions = array(
 	'99' => 'Isla de la Juventud'
 );
 
-$this->cyprus_regions = array(
+//Cyprus
+$this->CY_provinces = array(
 	'04' => 'Famagusta',
 	'06' => 'Kyrenia',
 	'03' => 'Larnaca',
@@ -1562,7 +1632,8 @@ $this->cyprus_regions = array(
 	'05' => 'Paphos'
 );
 
-$this->czech_republic_regions = array(
+// Czech republic
+$this->CZ_provinces = array(
 	'PHA'	 => 'Praha',
 	'STC'	 => 'Středočeský kraj',
 	'JHC'	 => 'Jihočeský kraj',
@@ -1579,8 +1650,8 @@ $this->czech_republic_regions = array(
 	'MSK'	 => 'Moravskoslezský kraj'
 );
 
-
-$this->denmark_regions = array(
+//Denmark
+$this->DK_provinces = array(
 	'DK-84'	 => 'Hovedstaden',
 	'DK-82'	 => 'Midtjylland',
 	'DK-81'	 => 'Nordjylland',
@@ -1588,7 +1659,8 @@ $this->denmark_regions = array(
 	'DK-83'	 => 'Syddanmark'
 );
 
-$this->djibouti_regions = array(
+//Djibouti
+$this->DJ_provinces = array(
 	'AS' => 'Ali Sabieh',
 	'AR' => 'Arta',
 	'DI' => 'Dikhil',
@@ -1597,7 +1669,8 @@ $this->djibouti_regions = array(
 	'TA' => 'Tadjourah'
 );
 
-$this->dominica_regions = array(
+//Dominica
+$this->DM_provinces = array(
 	'02' => 'Saint Andrew',
 	'03' => 'Saint David',
 	'04' => 'Saint George',
@@ -1610,7 +1683,8 @@ $this->dominica_regions = array(
 	'11' => 'Saint Peter'
 );
 
-$this->dominican_republic_regions = array(
+//Dominican republic
+$this->DO_provinces = array(
 	'DN' => 'Distrito Nacional',
 	'AZ' => 'Azua',
 	'BC' => 'Baoruco',
@@ -1645,7 +1719,8 @@ $this->dominican_republic_regions = array(
 	'VA' => 'Valverde'
 );
 
-$this->ecuador_regions = array(
+//Ecuador
+$this->EC_provinces = array(
 	'A'	 => 'Azuay',
 	'B'	 => 'Bolivar',
 	'F'	 => 'Canar',
@@ -1670,7 +1745,8 @@ $this->ecuador_regions = array(
 	'Z'	 => 'Zamora-Chichipe'
 );
 
-$this->egypt_regions = array(
+//Egypt
+$this->EG_provinces = array(
 	'MUH'	 => 'مرسى مطروح',
 	'ALX'	 => 'الاسكندرية',
 	'WAD'	 => 'الوادي الجديد',
@@ -1700,7 +1776,8 @@ $this->egypt_regions = array(
 	'CAI'	 => 'القاهرة'
 );
 
-$this->el_salvador_regions = array(
+//El salvador
+$this->SV_provinces = array(
 	'AH' => 'Ahuachapan',
 	'CA' => 'Cabanas',
 	'CH' => 'Chalatenango',
@@ -1717,7 +1794,8 @@ $this->el_salvador_regions = array(
 	'US' => 'Usulutan'
 );
 
-$this->equitorial_guinea_regions = array(
+//Equatorial guinea
+$this->GQ_provinces = array(
 	'GQ-AN'	 => 'Annobon',
 	'GQ-BN'	 => 'Bioko Norte',
 	'GQ-BS'	 => 'Bioko Sur',
@@ -1727,7 +1805,8 @@ $this->equitorial_guinea_regions = array(
 	'GQ-WN'	 => 'Wele-Nzas'
 );
 
-$this->eritrea_regions = array(
+//Eritrea
+$this->ER_provinces = array(
 	'AN' => 'Anseba',
 	'DU' => 'Debub',
 	'DK' => 'Debubawi Keyih Bahri',
@@ -1736,7 +1815,8 @@ $this->eritrea_regions = array(
 	'Sk' => 'Semenawi Keyih Bahri'
 );
 
-$this->estonia_regions = array(
+//Estonia
+$this->EE_provinces = array(
 	'37' => 'Harjumaa',
 	'39' => 'Hiiumaa',
 	'44' => 'Ida-Virumaa',
@@ -1754,7 +1834,8 @@ $this->estonia_regions = array(
 	'86' => 'Võrumaa'
 );
 
-$this->ethiopia_regions = array(
+//Ethiopia
+$this->ET_provinces = array(
 	'ET-AA'	 => 'Addis Ababa',
 	'ET-DD'	 => 'Dire Dawa',
 	'ET-AF'	 => 'Afar',
@@ -1768,7 +1849,8 @@ $this->ethiopia_regions = array(
 	'ET-SN'	 => 'Southern Nations, Nationalities and Peoples'
 );
 
-$this->faroe_islands_regions = array(
+//Faroe islands
+$this->FO_provinces = array(
 	'NO' => 'Norderoerne',
 	'OS' => 'Ostero',
 	'SA' => 'Sando',
@@ -1778,7 +1860,8 @@ $this->faroe_islands_regions = array(
 	'VG' => 'Vago'
 );
 
-$this->fiji_islands_regions = array(
+//Fiji islands
+$this->FJ_provinces = array(
 	'BA' => 'Ba',
 	'BU' => 'Bua',
 	'Ck' => 'Cakaudrove',
@@ -1796,7 +1879,8 @@ $this->fiji_islands_regions = array(
 	'TL' => 'Tailevu'
 );
 
-$this->france_regions = array(
+//France
+$this->FR_provinces = array(
 	'FR-01'	 => 'Ain',
 	'FR-02'	 => 'Aisne',
 	'FR-03'	 => 'Allier',
@@ -1901,7 +1985,8 @@ $this->france_regions = array(
 	'FR-WF'	 => 'Wallis and Futuna'
 );
 
-$this->gabon_regions = array(
+//Gabon
+$this->GA_provinces = array(
 	'1'	 => 'Estuaire',
 	'2'	 => 'Haut-Ogooue',
 	'3'	 => 'Moyen-Ogooue',
@@ -1913,7 +1998,8 @@ $this->gabon_regions = array(
 	'9'	 => 'Woleu-Ntem'
 );
 
-$this->georgia_regions = array(
+//Georgia
+$this->GE_provinces = array(
 	'AB' => 'Abkhazia',
 	'AJ' => 'Ajaria',
 	'GU' => 'Guria',
@@ -1928,7 +2014,8 @@ $this->georgia_regions = array(
 	'TB' => 'T‌’bilisi'
 );
 
-$this->germany_regions = array(
+//Germany
+$this->DE_provinces = array(
 	'BAW'	 => 'Baden-Württemberg',
 	'BAY'	 => 'Bayern',
 	'BER'	 => 'Berlin',
@@ -1947,7 +2034,8 @@ $this->germany_regions = array(
 	'THE'	 => 'Thüringen'
 );
 
-$this->ghana_regions = array(
+//Ghana
+$this->GH_provinces = array(
 	'GH-AH'	 => 'Ashanti',
 	'GH-BA'	 => 'Brong-Ahafo',
 	'GH-CP'	 => 'Central',
@@ -1960,7 +2048,8 @@ $this->ghana_regions = array(
 	'GH-WP'	 => 'Western'
 );
 
-$this->greece_regions = array(
+//Greece
+$this->GR_provinces = array(
 	'ATT'	 => 'Αττική',
 	'AIT'	 => 'Αιτωλοακαρνανία',
 	'ARG'	 => 'Αργολίδα',
@@ -2014,7 +2103,8 @@ $this->greece_regions = array(
 	'HIO'	 => 'Χίος'
 );
 
-$this->greenland_regions = array(
+//Greenland
+$this->GL_provinces = array(
 	'NK' => 'Nuuk',
 	'NQ' => 'Nuussuaq',
 	'KQ' => 'Kangerlussuaq',
@@ -2049,7 +2139,8 @@ $this->greenland_regions = array(
 	'SS' => 'Slædepatruljen Sirius'
 );
 
-$this->guatemala_regions = array(
+//Guatemala
+$this->GT_provinces = array(
 	'AV' => 'Alta Verapaz',
 	'BV' => 'Baja Verapaz',
 	'CM' => 'Chimaltenango',
@@ -2074,7 +2165,8 @@ $this->guatemala_regions = array(
 	'ZA' => 'Zacapa'
 );
 
-$this->guinea_regions = array(
+//Guinea
+$this->GN_provinces = array(
 	'GN-BE'	 => 'Beyla',
 	'GN-BF'	 => 'Boffa',
 	'GN-BK'	 => 'Boké',
@@ -2110,7 +2202,8 @@ $this->guinea_regions = array(
 	'GN-YO'	 => 'Yomou'
 );
 
-$this->guinea_bissau_regions = array(
+//Guinea bissau
+$this->GW_provinces = array(
 	'GW-BS'	 => 'Bissau',
 	'GW-BA'	 => 'Bafatá',
 	'GW-BM'	 => 'Biombo',
@@ -2122,7 +2215,8 @@ $this->guinea_bissau_regions = array(
 	'GW-TO'	 => 'Tombali'
 );
 
-$this->guyana_regions = array(
+//Guyana
+$this->GY_provinces = array(
 	'GY-BA'	 => 'Barima-Waini',
 	'GY-CU'	 => 'Cuyuni-Mazaruni',
 	'GY-DE'	 => 'Demerara-Mahaica',
@@ -2135,7 +2229,8 @@ $this->guyana_regions = array(
 	'GY-UT'	 => 'Upper Takutu-Upper Essequibo'
 );
 
-$this->haiti_regions = array(
+//Haiti
+$this->HT_provinces = array(
 	'HT-AR'	 => 'Artibonite',
 	'HT-CE'	 => 'Centre',
 	'HT-GA'	 => 'Grande-Anse',
@@ -2148,7 +2243,8 @@ $this->haiti_regions = array(
 	'HT-SE'	 => 'Sud-Est'
 );
 
-$this->honduras_regions = array(
+//Honduras
+$this->HN_provinces = array(
 	'HN-AT'	 => 'Atlántida',
 	'HN-CL'	 => 'Colón',
 	'HN-CM'	 => 'Comayagua',
@@ -2169,12 +2265,14 @@ $this->honduras_regions = array(
 	'HN-YO'	 => 'Yoro'
 );
 
-$this->hong_kong_regions = array(
+//Hong kong
+$this->HK_provinces = array(
 	'HK' => 'Hong Kong',
 	'NT' => 'New Territories'
 );
 
-$this->hungary_regions = array(
+//Hungary
+$this->HU_provinces = array(
 	'BUD'	 => 'Budapest',
 	'BAR'	 => 'Baranya',
 	'BKK'	 => 'Bács-Kiskun',
@@ -2197,7 +2295,8 @@ $this->hungary_regions = array(
 	'ZAL'	 => 'Zala'
 );
 
-$this->iceland_regions = array(
+//Iceland
+$this->IS_provinces = array(
 	'IS-7'	 => 'Austurland',
 	'IS-1'	 => 'Höfuðborgarsvæði utan Reykjavíkur',
 	'IS-6'	 => 'Norðurland eystra',
@@ -2209,7 +2308,8 @@ $this->iceland_regions = array(
 	'IS-3'	 => 'Vesturland'
 );
 
-$this->india_regions = array(
+//India
+$this->IN_provinces = array(
 	'AN' => 'Andaman and Nicobar',
 	'AP' => 'Andhra Pradesh',
 	'AR' => 'Arunachal Pradesh',
@@ -2247,7 +2347,8 @@ $this->india_regions = array(
 	'WB' => 'West Bengal'
 );
 
-$this->indonesia_regions = array(
+//Indonesia
+$this->ID_provinces = array(
 	'NAD'		 => 'Nanggroe Aceh Darussalam',
 	'Sumut'		 => 'Sumatera Utara',
 	'Sumbar'	 => 'Sumatera Barat',
@@ -2283,7 +2384,8 @@ $this->indonesia_regions = array(
 	'Irjabar'	 => 'Irian Jaya Barat'
 );
 
-$this->iran_regions = array(
+//Iran
+$this->IR_provinces = array(
 	'AS' => 'آذربایجان شرقی',
 	'AG' => 'آذربایجان غربی',
 	'AR' => 'اردبیل',
@@ -2316,7 +2418,8 @@ $this->iran_regions = array(
 	'YZ' => 'یزد'
 );
 
-$this->iraq_regions = array(
+//Iraq
+$this->IQ_provinces = array(
 	'IQ-AN'	 => 'Al Anbār',
 	'IQ-BA'	 => 'Al Başrah',
 	'IQ-MU'	 => 'Al Muthanná',
@@ -2337,7 +2440,8 @@ $this->iraq_regions = array(
 	'IQ-WA'	 => 'Wāsiţ'
 );
 
-$this->ireland_regions = array(
+//Ireland
+$this->IE_provinces = array(
 	'CARLOW'	 => 'Co. Carlow',
 	'CAVAN'		 => 'Co. Cavan',
 	'CLARE'		 => 'Co. Clare',
@@ -2366,7 +2470,8 @@ $this->ireland_regions = array(
 	'WICKLOW'	 => 'Co. Wicklow'
 );
 
-$this->israel_regions = array(
+//Israel
+$this->IL_provinces = array(
 	'BS' => 'Be‌’er Sheva',
 	'BH' => 'Bika‌’at Hayarden',
 	'EA' => 'Eilat and Arava',
@@ -2380,7 +2485,8 @@ $this->israel_regions = array(
 	'TA' => 'Tel Aviv (Gosh Dan)'
 );
 
-$this->italy_regions = array(
+//Italy
+$this->IT_provinces = array(
 	'AG'	 => 'Agrigento',
 	'AL'	 => 'Alessandria',
 	'AN'	 => 'Ancona',
@@ -2495,7 +2601,8 @@ $this->italy_regions = array(
 	'CTV'	 => 'Città del Vaticano'
 );
 
-$this->jamaica_regions = array(
+//Jamaica
+$this->JM_provinces = array(
 	'JM-13'	 => 'Clarendon',
 	'JM-09'	 => 'Hanover',
 	'JM-01'	 => 'Kingston',
@@ -2512,7 +2619,8 @@ $this->jamaica_regions = array(
 	'JM-10'	 => 'Westmoreland'
 );
 
-$this->japan_regions = array(
+//Japan
+$this->JP_provinces = array(
 	'01' => '北海道',
 	'02' => '青森県',
 	'03' => '岩手県',
@@ -2562,7 +2670,8 @@ $this->japan_regions = array(
 	'47' => '沖縄県'
 );
 
-$this->jorda_regions = array(
+//Jordan
+$this->JO_provinces = array(
 	'JO-AJ'	 => '‌’Ajlūn',
 	'JO-AQ'	 => 'Al ‌’Aqaba',
 	'JO-BA'	 => 'Al Balqā‌’',
@@ -2577,7 +2686,8 @@ $this->jorda_regions = array(
 	'JO-MD'	 => 'Mādaba'
 );
 
-$this->kazakhstan_regions = array(
+//Kazakhstan
+$this->KZ_provinces = array(
 	'ALA'	 => 'Алматы',
 	'TSE'	 => 'Астана',
 	'AKM'	 => 'Акмолинская область',
@@ -2596,7 +2706,8 @@ $this->kazakhstan_regions = array(
 	'SKZ'	 => 'Южно-Казахстанская область'
 );
 
-$this->kenya_regions = array(
+//Kenya
+$this->KE_provinces = array(
 	'700'	 => 'Bonde la Ufa',
 	'200'	 => 'Central',
 	'300'	 => 'Coast',
@@ -2613,13 +2724,15 @@ $this->kenya_regions = array(
 	'800'	 => 'Western'
 );
 
-$this->kiribati_regions = array(
+//Kiribati
+$this->KI_provinces = array(
 	'KI-G'	 => 'Gilbert Islands',
 	'KI-L'	 => 'Line Islands',
 	'KI-P'	 => 'Phoenix Islands'
 );
 
-$this->korea_democratic_peoples_republic_regions = array(
+//Korea, democratic people's republic of
+$this->KP_provinces = array(
 	'KP-01'	 => 'P’yŏngyang',
 	'KP-13'	 => 'Nasŏn (Najin-Sŏnbong',
 	'KP-02'	 => 'P’yŏngan-namdo',
@@ -2633,7 +2746,8 @@ $this->korea_democratic_peoples_republic_regions = array(
 	'KP-10'	 => 'Yanggang-do'
 );
 
-$this->korea_republic_regions = array(
+//Korea, republic of
+$this->KR_provinces = array(
 	'CO' => 'Ch‌’ungch‌’ong-bukto',
 	'CH' => 'Ch‌’ungch‌’ong-namdo',
 	'CD' => 'Cheju-do',
@@ -2651,7 +2765,8 @@ $this->korea_republic_regions = array(
 	'TG' => 'Taejon-gwangyoksi'
 );
 
-$this->kuwait_regions = array(
+//Kuwait
+$this->KW_provinces = array(
 	'KW-AH'	 => 'Al Aḩmadi',
 	'KW-FA'	 => 'Al Farwānīyah',
 	'KW-JA'	 => 'Al Jahrah',
@@ -2660,7 +2775,8 @@ $this->kuwait_regions = array(
 	'KW-MU'	 => 'Mubārak al Kabīr'
 );
 
-$this->kyrgyzstan_regions = array(
+//Kyrgyzstan
+$this->KG_provinces = array(
 	'KG-GB'	 => 'Bishkek',
 	'KG-B'	 => 'Batken',
 	'KG-C'	 => 'Chü',
@@ -2671,7 +2787,8 @@ $this->kyrgyzstan_regions = array(
 	'KG-Y'	 => 'Ysyk-Köl'
 );
 
-$this->laos_regions = array(
+//Lao people's democratic republic of
+$this->LA_provinces = array(
 	'LA-VT'	 => 'Vientiane',
 	'LA-AT'	 => 'Attapu [Attopeu]',
 	'LA-BK'	 => 'Bokè',
@@ -2692,7 +2809,8 @@ $this->laos_regions = array(
 	'LA-XN'	 => 'Xaisômbou'
 );
 
-$this->latvia_regions = array(
+//Latvia
+$this->LV_regions = array(
 	'AI'	 => 'Aizkraukles rajons',
 	'AL'	 => 'Alūksnes rajons',
 	'BL'	 => 'Balvu rajons',
@@ -2728,7 +2846,8 @@ $this->latvia_regions = array(
 	'VE'	 => 'Ventspils rajons'
 );
 
-$this->lebanon_regions = array(
+//Lebanon
+$this->LB_provinces = array(
 	'LB-AK'	 => 'Aakkâr',
 	'LB-BH'	 => 'Baalbek-Hermel',
 	'LB-BI'	 => 'Beqaa',
@@ -2739,7 +2858,8 @@ $this->lebanon_regions = array(
 	'LB-NA'	 => 'Nabatîyé'
 );
 
-$this->lesotho_regions = array(
+//Lesotho
+$this->LS_provinces = array(
 	'LS-D'	 => 'Berea',
 	'LS-B'	 => 'Butha-Buthe',
 	'LS-C'	 => 'Leribe',
@@ -2752,7 +2872,8 @@ $this->lesotho_regions = array(
 	'LS-K'	 => 'Thaba-Tseka'
 );
 
-$this->liberia_regions = array(
+//Liberia
+$this->LR_provinces = array(
 	'LR-BM'	 => 'Bomi',
 	'LR-BG'	 => 'Bong',
 	'LR-GP'	 => 'Gbarpolu',
@@ -2770,7 +2891,8 @@ $this->liberia_regions = array(
 	'LR-SI'	 => 'Sinoe'
 );
 
-$this->libya_regions = array(
+//Libya
+$this->LY_provinces = array(
 	'LY-BU'	 => 'Al Buţnān',
 	'LY-JA'	 => 'Al Jabal al Akhḑar',
 	'LY-JG'	 => 'Al Jabal al Gharbī',
@@ -2795,7 +2917,8 @@ $this->libya_regions = array(
 	'LY-WS'	 => 'Wādī ash Shāţiʾ'
 );
 
-$this->liechtenstein_regions = array(
+//Liechtenstein
+$this->LI_provinces = array(
 	'LI-01'	 => 'Balzers',
 	'LI-02'	 => 'Eschen',
 	'LI-03'	 => 'Gamprin',
@@ -2809,7 +2932,8 @@ $this->liechtenstein_regions = array(
 	'LI-11'	 => 'Vaduz'
 );
 
-$this->lithuania_regions = array(
+//Lithuania
+$this->LT_provinces = array(
 	'AK'	 => 'Akmenės rajonas',
 	'AL'	 => 'Alytaus rajonas',
 	'AN'	 => 'Anykščių rajonas',
@@ -2855,7 +2979,8 @@ $this->lithuania_regions = array(
 	'ZAR'	 => 'Zarasų rajonas'
 );
 
-$this->macedonia_fyrom_regions = array(
+//Macedonia
+$this->MK_provinces = array(
 	'01' => 'Aerodrom',
 	'02' => 'Aracinovo',
 	'03' => 'Berovo',
@@ -2941,7 +3066,8 @@ $this->macedonia_fyrom_regions = array(
 	'33' => 'Zrnovci'
 );
 
-$this->madagascar_regions = array(
+//Madagascar
+$this->MG_provinces = array(
 	'MG-T'	 => 'Antananarivo',
 	'MG-D'	 => 'Antsiranana',
 	'MG-F'	 => 'Fianarantsoa',
@@ -2950,7 +3076,8 @@ $this->madagascar_regions = array(
 	'MG-U'	 => 'Toliara'
 );
 
-$this->malawi_regions = array(
+//Malawi
+$this->MW_provinces = array(
 	'MW-BA'	 => 'Balaka',
 	'MW-BL'	 => 'Blantyre',
 	'MW-CK'	 => 'Chikwawa',
@@ -2981,7 +3108,8 @@ $this->malawi_regions = array(
 	'MW-ZO'	 => 'Zomba'
 );
 
-$this->malaysia_regions = array(
+//Malaysia
+$this->MY_provinces = array(
 	'JHR'	 => 'Johor',
 	'KDH'	 => 'Kedah',
 	'KTN'	 => 'Kelantan',
@@ -3000,7 +3128,8 @@ $this->malaysia_regions = array(
 	'PJY'	 => 'Putrajaya'
 );
 
-$this->maldives_regions = array(
+//Maldives
+$this->MV_provinces = array(
 	'MV-MLE' => 'Male',
 	'MV-02'	 => 'Alif',
 	'MV-20'	 => 'Baa',
@@ -3023,7 +3152,8 @@ $this->maldives_regions = array(
 	'MV-04'	 => 'Vaavu'
 );
 
-$this->mali_regions = array(
+//Mali
+$this->ML_provinces = array(
 	'ML-BKO' => 'Bamako',
 	'ML-7'	 => 'Gao',
 	'ML-1'	 => 'Kayes',
@@ -3035,7 +3165,8 @@ $this->mali_regions = array(
 	'ML-6'	 => 'Tombouctou'
 );
 
-$this->malta_regions = array(
+//Malta
+$this->MT_provinces = array(
 	'01' => 'Attard',
 	'02' => 'Balzan',
 	'03' => 'Birqu',
@@ -3113,7 +3244,8 @@ $this->malta_regions = array(
 	'68' => 'Zurrieg'
 );
 
-$this->marshal_islands_regions = array(
+//Marshall islands
+$this->MH_provinces = array(
 	'MH-ALL' => 'Ailinglaplap',
 	'MH-ALK' => 'Ailuk',
 	'MH-ARN' => 'Arno',
@@ -3140,7 +3272,8 @@ $this->marshal_islands_regions = array(
 	'MH-WTJ' => 'Wotje'
 );
 
-$this->mauritania_regions = array(
+//Mauritania
+$this->MR_provinces = array(
 	'MR-NKC' => 'Nouakchott',
 	'MR-07'	 => 'Adrar',
 	'MR-03'	 => 'Assaba',
@@ -3156,7 +3289,8 @@ $this->mauritania_regions = array(
 	'MR-06'	 => 'Trarza'
 );
 
-$this->mauritius_regions = array(
+//Mauritius
+$this->MU_provinces = array(
 	'AG' => 'Agalega Islands',
 	'BR' => 'Beau Bassin-Rose',
 	'BL' => 'Black River',
@@ -3177,7 +3311,8 @@ $this->mauritius_regions = array(
 	'VP' => 'Vacoas-Phoenix'
 );
 
-$this->mexica_regions = array(
+//Mexico
+$this->MX_provinces = array(
 	'AGS'	 => 'Aguascalientes',
 	'BC'	 => 'Baja California',
 	'BCS'	 => 'Baja California Sur',
@@ -3212,14 +3347,16 @@ $this->mexica_regions = array(
 	'ZAC'	 => 'Zacatecas'
 );
 
-$this->micronesia_regions = array(
+//Micronesia
+$this->FM_provinces = array(
 	'FM-TRK' => 'Chuuk',
 	'FM-KSA' => 'Kosrae',
 	'FM-PNI' => 'Pohnpei',
 	'FM-YAP' => 'Yap'
 );
 
-$this->moldova_regions = array(
+//Moldova
+$this->MD_provinces = array(
 	'GA' => 'Găgăuzia, Unitatea teritorială autonomă (UTAG)',
 	'BA' => 'Bălţi',
 	'BD' => 'Tighina',
@@ -3259,7 +3396,8 @@ $this->moldova_regions = array(
 	'SN' => 'Stînga Nistrului, unitatea teritorială din'
 );
 
-$this->mongolia_regions = array(
+//Mongolia
+$this->MN_provinces = array(
 	'MN-1'	 => 'Ulaanbaatar',
 	'MN-073' => 'Arhangay',
 	'MN-069' => 'Bayanhongor',
@@ -3284,7 +3422,8 @@ $this->mongolia_regions = array(
 	'MN-046' => 'Uvs'
 );
 
-$this->montenegro_regions = array(
+//Montenegro
+$this->ME_provinces = array(
 	'01' => 'Andrijevica',
 	'02' => 'Bar',
 	'03' => 'Berane',
@@ -3308,7 +3447,8 @@ $this->montenegro_regions = array(
 	'21' => 'Zabljak'
 );
 
-$this->morocco_regions = array(
+//Morocco
+$this->MA_provinces = array(
 	'09'	 => 'Chaouia-Ouardigha',
 	'10'	 => 'Doukkala-Abda',
 	'05'	 => 'Fes-Boulemane',
@@ -3379,7 +3519,8 @@ $this->morocco_regions = array(
 	'OUD'	 => 'Oued ed Dahab'
 );
 
-$this->mozambiqie_regions = array(
+//Mozambique
+$this->MZ_provinces = array(
 	'POL'	 => 'Cabo Delgado',
 	'VJB'	 => 'Gaza',
 	'INH'	 => 'Inhambane',
@@ -3392,7 +3533,8 @@ $this->mozambiqie_regions = array(
 	'UEL'	 => 'Zambezia'
 );
 
-$this->myanmar_regions = array(
+//Myanmar
+$this->MM_provinces = array(
 	'07' => 'Ayeyarwady',
 	'02' => 'Bago',
 	'14' => 'Chin',
@@ -3409,7 +3551,8 @@ $this->myanmar_regions = array(
 	'06' => 'Yangon'
 );
 
-$this->namimbia_regions = array(
+//Namibia
+$this->NA_provinces = array(
 	'NA-CA'	 => 'Caprivi',
 	'NA-ER'	 => 'Erongo',
 	'NA-HA'	 => 'Hardap',
@@ -3425,7 +3568,8 @@ $this->namimbia_regions = array(
 	'NA-OD'	 => 'Otjozondjupa'
 );
 
-$this->nauru_regions = array(
+//Nauru
+$this->NR_provinces = array(
 	'NR-01'	 => 'Aiwo',
 	'NR-02'	 => 'Anabar',
 	'NR-03'	 => 'Anetan',
@@ -3442,7 +3586,8 @@ $this->nauru_regions = array(
 	'NR-14'	 => 'Yaren'
 );
 
-$this->nepal_regions = array(
+//Nepal
+$this->NP_provinces = array(
 	'2'	 => 'Madhya Pashchimanchal',
 	'1'	 => 'Madhyamanchal',
 	'3'	 => 'Pashchimanchal',
@@ -3465,7 +3610,8 @@ $this->nepal_regions = array(
 	'SE' => 'Seti'
 );
 
-$this->netherlands_regions = array(
+//Netherlands
+$this->NL_provinces = array(
 	'ZHL'	 => 'Zuid-Holland',
 	'NHL'	 => 'Noord-Holland',
 	'NBR'	 => 'Noord-Brabant',
@@ -3480,7 +3626,8 @@ $this->netherlands_regions = array(
 	'FLD'	 => 'Flevoland'
 );
 
-$this->new_zealand_regions = array(
+//New zealand
+$this->NZ_provinces = array(
 	'AUK'	 => 'Auckland',
 	'BOP'	 => 'Bay of Plenty',
 	'CAN'	 => 'Canterbury',
@@ -3502,7 +3649,8 @@ $this->new_zealand_regions = array(
 	'WTC'	 => 'West Coast'
 );
 
-$this->nicaragua_regions = array(
+//Nicaragua
+$this->NI_provinces = array(
 	'AN' => 'Atlantico Norte',
 	'AS' => 'Atlantico Sur',
 	'BO' => 'Boaco',
@@ -3522,7 +3670,8 @@ $this->nicaragua_regions = array(
 	'RI' => 'Rivas'
 );
 
-$this->niger_regions = array(
+//Niger
+$this->NE_provinces = array(
 	'NE-8'	 => 'Niamey',
 	'NE-1'	 => 'Agadez',
 	'NE-2'	 => 'Diffa',
@@ -3533,7 +3682,8 @@ $this->niger_regions = array(
 	'NE-7'	 => 'Zinder'
 );
 
-$this->nigeria_regions = array(
+//Nigeria
+$this->NG_provinces = array(
 	'AB' => 'Abia',
 	'AD' => 'Adamawa',
 	'AK' => 'Akwa Ibom',
@@ -3573,7 +3723,8 @@ $this->nigeria_regions = array(
 	'ZM' => 'Zamfara'
 );
 
-$this->norway_regions = array(
+//Norway
+$this->NO_provinces = array(
 	'AK' => 'Akershus',
 	'AA' => 'Aust-Agder',
 	'BU' => 'Buskerud',
@@ -3596,7 +3747,8 @@ $this->norway_regions = array(
 	'VF' => 'Vestfold'
 );
 
-$this->oman_regions = array(
+//Oman
+$this->OM_provinces = array(
 	'BA' => 'Al Batinah',
 	'DA' => 'Ad Dakhiliyah',
 	'JA' => 'Al Janubiyah',
@@ -3607,14 +3759,16 @@ $this->oman_regions = array(
 	'ZA' => 'Az Zahirah'
 );
 
-$this->pakistan_regions = array(
+//Pakistan
+$this->PK_provinces = array(
 	'PB' => 'Punjab',
 	'SN' => 'Sindh',
 	'BL' => 'Balochistan',
 	'NW' => 'N.W.F.P'
 );
 
-$this->palau_regions = array(
+//Palau
+$this->PW_provinces = array(
 	'PW-002' => 'Aimeliik',
 	'PW-004' => 'Airai',
 	'PW-010' => 'Angaur',
@@ -3633,7 +3787,8 @@ $this->palau_regions = array(
 	'PW-370' => 'Sonsorol'
 );
 
-$this->panama_regions = array(
+//Panama
+$this->PA_provinces = array(
 	'1'	 => 'Bocas del Toro',
 	'4'	 => 'Chiriqui',
 	'2'	 => 'Cocle',
@@ -3646,7 +3801,8 @@ $this->panama_regions = array(
 	'9'	 => 'Veraguas'
 );
 
-$this->papua_new_guinea_regions = array(
+//Papua new guinea
+$this->PG_provinces = array(
 	'CPM'	 => 'Central',
 	'CPK'	 => 'Chimbu',
 	'EHG'	 => 'Eastern Highlands',
@@ -3669,7 +3825,8 @@ $this->papua_new_guinea_regions = array(
 	'WBK'	 => 'West New Britain'
 );
 
-$this->paraguay_regions = array(
+//Paraguay
+$this->PY_provinces = array(
 	'PY-ASU' => 'Asunción',
 	'PY-16'	 => 'Alto Paraguay',
 	'PY-10'	 => 'Alto Paraná',
@@ -3690,7 +3847,8 @@ $this->paraguay_regions = array(
 	'PY-02'	 => 'San Pedro'
 );
 
-$this->peru_regions = array(
+//Peru
+$this->PE_provinces = array(
 	'AMA'	 => 'Amazonas',
 	'ANC'	 => 'Ancash',
 	'APU'	 => 'Apurímac',
@@ -3718,7 +3876,8 @@ $this->peru_regions = array(
 	'UCA'	 => 'Ucayali'
 );
 
-$this->philipines_regions = array(
+//Philipines
+$this->PH_provinces = array(
 	'ABR'	 => 'Abra',
 	'ANO'	 => 'Agusan del Norte',
 	'ASU'	 => 'Agusan del Sur',
@@ -3803,7 +3962,8 @@ $this->philipines_regions = array(
 	'ZSI'	 => 'Zamboanga Sibugay'
 );
 
-$this->poland_regions = array(
+//Poland
+$this->PL_provinces = array(
 	'DO' => 'Dolnośląskie',
 	'KP' => 'Kujawsko-Pomorskie',
 	'LO' => 'Łódzkie',
@@ -3822,7 +3982,8 @@ $this->poland_regions = array(
 	'ZA' => 'Zachodniopomorskie'
 );
 
-$this->portugal_regions = array(
+//Portugal
+$this->PT_provinces = array(
 	'AVE'	 => 'Aveiro',
 	'BEJ'	 => 'Beja',
 	'BRA'	 => 'Braga',
@@ -3845,7 +4006,8 @@ $this->portugal_regions = array(
 	'MAD'	 => 'Reg. Autónoma Madeira'
 );
 
-$this->qatar_regions = array(
+//Qatar
+$this->QA_provinces = array(
 	'QA-DA'	 => 'Ad Dawḩah',
 	'QA-GH'	 => 'Al Ghuwayrīyah',
 	'QA-JU'	 => 'Al Jumaylīyah',
@@ -3857,7 +4019,8 @@ $this->qatar_regions = array(
 	'QA-US'	 => 'Umm Şalāl'
 );
 
-$this->romania_regions = array(
+//Romania
+$this->RO_provinces = array(
 	'AB' => 'Alba',
 	'AR' => 'Arad',
 	'AG' => 'Arges',
@@ -3902,7 +4065,8 @@ $this->romania_regions = array(
 	'VN' => 'Vrancea'
 );
 
-$this->russian_federation_regions = array(
+//Russian federation
+$this->RU_provinces = array(
 	'AD'	 => 'Республика Адыгея',
 	'AL'	 => 'Республика Алтай',
 	'BA'	 => 'Республика Башкортостан',
@@ -3988,7 +4152,8 @@ $this->russian_federation_regions = array(
 	'ZAB'	 => 'Забайкальский край'
 );
 
-$this->rwanda_regions = array(
+//Rwanda
+$this->RW_provinces = array(
 	'RW-01'	 => 'Ville de Kigali',
 	'RW-02'	 => 'Est',
 	'RW-03'	 => 'Nord',
@@ -3996,7 +4161,8 @@ $this->rwanda_regions = array(
 	'RW-05'	 => 'Sud'
 );
 
-$this->saint_kitts_nevis_regions = array(
+//Saint Kitts and Nevis
+$this->KN_provinces = array(
 	'CCN'	 => 'Christ Church Nichola Town',
 	'ASP'	 => 'Saint Anne Sandy Point',
 	'GBA'	 => 'Saint George Basseterre',
@@ -4013,7 +4179,8 @@ $this->saint_kitts_nevis_regions = array(
 	'TPP'	 => 'Trinity Palmetto Point'
 );
 
-$this->saint_lucia_regions = array(
+//Saint lucia
+$this->LC_provinces = array(
 	'AR' => 'Anse-la-Raye',
 	'CA' => 'Castries',
 	'CH' => 'Choiseul',
@@ -4027,7 +4194,8 @@ $this->saint_lucia_regions = array(
 	'VF' => 'Vieux-Fort'
 );
 
-$this->saint_vincent_grenadines_regions = array(
+//Saint Vincent And The Grenadines
+$this->VC_provinces = array(
 	'VC-01'	 => 'Charlotte',
 	'VC-06'	 => 'Grenadines',
 	'VC-02'	 => 'Saint Andrew',
@@ -4036,7 +4204,8 @@ $this->saint_vincent_grenadines_regions = array(
 	'VC-05'	 => 'Saint Patrick'
 );
 
-$this->samoa_regions = array(
+//Samoa
+$this->WS_provinces = array(
 	'WS-AA'	 => 'A‌’ana',
 	'WS-AL'	 => 'Aiga-i-le-Tai',
 	'WS-AT'	 => 'Atua',
@@ -4050,7 +4219,8 @@ $this->samoa_regions = array(
 	'WS-VS'	 => 'Vaisigano'
 );
 
-$this->san_marino_regions = array(
+//San marino
+$this->SM_provinces = array(
 	'SM-01'	 => 'Acquaviva',
 	'SM-06'	 => 'Borgo Maggiore',
 	'SM-02'	 => 'Chiesanuova',
@@ -4062,12 +4232,14 @@ $this->san_marino_regions = array(
 	'SM-09'	 => 'Serravalle'
 );
 
-$this->sao_tome_regions = array(
+//Sao tome
+$this->ST_provinces = array(
 	'ST-P'	 => 'Príncipe',
 	'ST-S'	 => 'São Tomé'
 );
 
-$this->saudi_arabia_regions = array(
+//Saudi arabia
+$this->SA_provinces = array(
 	'ALBAHAH'			 => 'Al Bahah',
 	'NORTHERNBORDER'	 => 'Northern Border',
 	'ALJAWF'			 => 'Al Jawf',
@@ -4083,7 +4255,8 @@ $this->saudi_arabia_regions = array(
 	'JIZAN'				 => 'Jizan'
 );
 
-$this->senegal_regions = array(
+//Senegal
+$this->SN_provinces = array(
 	'DK' => 'Dakar',
 	'DB' => 'Diourbel',
 	'FK' => 'Fatick',
@@ -4097,7 +4270,8 @@ $this->senegal_regions = array(
 	'ZH' => 'Ziguinchor'
 );
 
-$this->serbia_regions = array(
+//Serbia
+$this->RS_provinces = array(
 	'00' => 'Beograd',
 	'14' => 'Bor',
 	'11' => 'Barnicevo',
@@ -4132,7 +4306,8 @@ $this->serbia_regions = array(
 	'05' => 'Zapadna Backa'
 );
 
-$this->seychelles_regions = array(
+//Seychelles
+$this->SC_provinces = array(
 	'01' => 'Anse aux Pins',
 	'02' => 'Anse Boileau',
 	'03' => 'Anse Etoile',
@@ -4158,14 +4333,16 @@ $this->seychelles_regions = array(
 	'23' => 'Takamaka'
 );
 
-$this->sierra_leone_regions = array(
+//Sierra leone
+$this->SL_provinces = array(
 	'SL-W'	 => 'Western Area (Freetown)',
 	'SL-E'	 => 'Eastern',
 	'SL-N'	 => 'Northern',
 	'SL-S'	 => 'Southern'
 );
 
-$this->singapore_regions = array(
+//Singapore
+$this->SG_provinces = array(
 	'SG-01'	 => 'Central Singapore',
 	'SG-02'	 => 'North East',
 	'SG-03'	 => 'North West',
@@ -4173,7 +4350,8 @@ $this->singapore_regions = array(
 	'SG-05'	 => 'South West'
 );
 
-$this->slovakia_regions = array(
+//Slovakia
+$this->SK_provinces = array(
 	'BC' => 'Banskobystricky kraj',
 	'BL' => 'Bratislavsky kraj',
 	'KI' => 'Kosicky kraj',
@@ -4184,7 +4362,8 @@ $this->slovakia_regions = array(
 	'ZI' => 'Zilinsky kraj'
 );
 
-$this->slovenia_regions = array(
+//Slovenia
+$this->SI_provinces = array(
 	'002'	 => 'Beltinci',
 	'148'	 => 'Benedikt',
 	'149'	 => 'Bistrica ob Sotli',
@@ -4380,7 +4559,8 @@ $this->slovenia_regions = array(
 	'193'	 => 'Zuzemberk'
 );
 
-$this->solomon_islands_regions = array(
+//Solomon islands
+$this->SB_provinces = array(
 	'SB-CT'	 => 'Capital Territory (Honiara)',
 	'SB-CE'	 => 'Central',
 	'SB-CH'	 => 'Choiseul',
@@ -4393,7 +4573,8 @@ $this->solomon_islands_regions = array(
 	'SB-WE'	 => 'Western'
 );
 
-$this->somalia_regions = array(
+//Somalia
+$this->SO_provinces = array(
 	'SO-AW'	 => 'Awdal',
 	'SO-BK'	 => 'Bakool',
 	'SO-BN'	 => 'Banaadir',
@@ -4414,7 +4595,8 @@ $this->somalia_regions = array(
 	'SO-WO'	 => 'Woqooyi Galbeed'
 );
 
-$this->south_africa_regions = array(
+//South africa
+$this->ZA_provinces = array(
 	'EC'	 => 'Eastern Cape',
 	'FS'	 => 'Free State',
 	'GT'	 => 'Gauteng',
@@ -4426,7 +4608,8 @@ $this->south_africa_regions = array(
 	'WC'	 => 'Western Cape'
 );
 
-$this->spain_regions = array(
+//Spain
+$this->ES_provinces = array(
 	'CA' => 'A Coruña',
 	'AL' => 'Álava',
 	'AB' => 'Albacete',
@@ -4481,7 +4664,8 @@ $this->spain_regions = array(
 	'ZR' => 'Zaragoza'
 );
 
-$this->sri_lanka_regions = array(
+//Sri lanka
+$this->LK_provinces = array(
 	'1'	 => 'Basnahira Palata',
 	'2'	 => 'Central Province',
 	'3'	 => 'Dakunu Palata',
@@ -4525,7 +4709,8 @@ $this->sri_lanka_regions = array(
 	'91' => 'Ratnapura'
 );
 
-$this->sudan_regions = array(
+//Sudan
+$this->SD_provinces = array(
 	'SD-23'	 => 'Ā\'ٰālī an Nīl',
 	'SD-26'	 => 'Al Baḩr al Aḩmar',
 	'SD-18'	 => 'Al Buḩayrāt',
@@ -4553,7 +4738,8 @@ $this->sudan_regions = array(
 	'SD-21'	 => 'Wārāb'
 );
 
-$this->suriname_regions = array(
+//Suriname
+$this->SR_provinces = array(
 	'BR' => 'Brokopondo',
 	'CM' => 'Commonwijne',
 	'CR' => 'Coronie',
@@ -4566,14 +4752,16 @@ $this->suriname_regions = array(
 	'WA' => 'Wanica'
 );
 
-$this->swaziland_regions = array(
+//Swaziland
+$this->SZ_provinces = array(
 	'SZ-HH'	 => 'Hhohho',
 	'SZ-LU'	 => 'Lubombo',
 	'SZ-MA'	 => 'Manzini',
 	'SZ-SH'	 => 'Shiselweni'
 );
 
-$this->sweden_regions = array(
+//Sweden
+$this->SE_provinces = array(
 	'BL' => 'Blekinge',
 	'DA' => 'Dalarna',
 	'GA' => 'Gavleborg',
@@ -4597,7 +4785,8 @@ $this->sweden_regions = array(
 	'VG' => 'Vastra Gotaland'
 );
 
-$this->switzerland_regions = array(
+//Switzerland
+$this->CH_provinces = array(
 	'AG' => 'Aargau',
 	'AI' => 'Appenzell Innerrhoden',
 	'AR' => 'Appenzell Ausserrhoden',
@@ -4626,7 +4815,8 @@ $this->switzerland_regions = array(
 	'ZH' => 'Zürich'
 );
 
-$this->syria_regions = array(
+//Syria
+$this->SY_provinces = array(
 	'SY-HA'	 => 'Al Hasakah',
 	'SY-LA'	 => 'Al Lādhiqīyah',
 	'SY-QU'	 => 'Al Qunayţirah',
@@ -4643,7 +4833,8 @@ $this->syria_regions = array(
 	'SY-TA'	 => 'Ţarţūs'
 );
 
-$this->taiwan_regions = array(
+//Taiwan
+$this->TW_provinces = array(
 	'01' => 'ChangHua County',
 	'02' => 'ChiaYi City',
 	'03' => 'ChiaYi County',
@@ -4698,13 +4889,15 @@ $this->taiwan_regions = array(
 	'52' => '高雄縣'
 );
 
-$this->tajikistan_regions = array(
+//Tajisistan
+$this->TJ_provinces = array(
 	'TJ-GB'	 => 'Gorno-Badakhshan',
 	'TJ-KT'	 => 'Khatlon',
 	'TJ-SU'	 => 'Sughd'
 );
 
-$this->tanzania_regions = array(
+//Tanzania
+$this->TZ_provinces = array(
 	'01' => 'Arusha',
 	'19' => 'Coast',
 	'02' => 'Dar es Salaam',
@@ -4739,7 +4932,8 @@ $this->tanzania_regions = array(
 	'15' => 'Zanzibar West'
 );
 
-$this->thailand_regions = array(
+//Thailand
+$this->TH_provinces = array(
 	'1'	 => 'กรุงเทพมหานคร',
 	'2'	 => 'นนทบุรี',
 	'3'	 => 'สมุทรปราการ',
@@ -4818,7 +5012,8 @@ $this->thailand_regions = array(
 	'76' => 'แม่ฮ่องสอน'
 );
 
-$this->togo_regions = array(
+//Togo
+$this->TG_provinces = array(
 	'TG-C'	 => 'Centre',
 	'TG-K'	 => 'Kara',
 	'TG-M'	 => 'Maritime (Région)',
@@ -4826,7 +5021,8 @@ $this->togo_regions = array(
 	'TG-S'	 => 'Savannes'
 );
 
-$this->tonga_regions = array(
+//Tonga
+$this->TO_provinces = array(
 	'TO-01'	 => '‌’Eua',
 	'TO-02'	 => 'Ha‌’apai',
 	'TO-03'	 => 'Niuas',
@@ -4834,7 +5030,8 @@ $this->tonga_regions = array(
 	'TO-05'	 => 'Vava‌’u'
 );
 
-$this->trinidad_tobago_regions = array(
+//Trinidad and tobago
+$this->TT_provinces = array(
 	'TT-CTT' => 'Couva-Tabaquite-Talparo',
 	'TT-DMN' => 'Diego Martin',
 	'TT-ETO' => 'Eastern Tobago',
@@ -4853,7 +5050,8 @@ $this->trinidad_tobago_regions = array(
 	'TT-SFO' => 'San Fernando'
 );
 
-$this->tunisia_regions = array(
+//Tunisia
+$this->TN_provinces = array(
 	'31' => 'Beja',
 	'13' => 'Ben Arous',
 	'23' => 'Bizerte',
@@ -4880,7 +5078,8 @@ $this->tunisia_regions = array(
 	'22' => 'Zaghouan'
 );
 
-$this->turkey_regions = array(
+//Turkey
+$this->TR_provinces = array(
 	'TR-01'	 => 'Adana',
 	'TR-02'	 => 'Adıyaman',
 	'TR-03'	 => 'Afyon',
@@ -4964,7 +5163,8 @@ $this->turkey_regions = array(
 	'TR-67'	 => 'Zonguldak'
 );
 
-$this->turkmenistan_regions = array(
+//Turkmenistan
+$this->TM_provinces = array(
 	'TM-A'	 => 'Ahal',
 	'TM-B'	 => 'Balkan',
 	'TM-D'	 => 'Daşoguz',
@@ -4973,7 +5173,8 @@ $this->turkmenistan_regions = array(
 	'TM-S'	 => 'Aşgabat'
 );
 
-$this->tuvalu_regions = array(
+//Tuvalu
+$this->TV_provinces = array(
 	'TV-FUN' => 'Funafuti',
 	'TV-NMG' => 'Nanumanga',
 	'TV-NMA' => 'Nanumea',
@@ -4984,7 +5185,8 @@ $this->tuvalu_regions = array(
 	'TV-VAI' => 'Vaitupu'
 );
 
-$this->uganda_regions = array(
+//Uganda
+$this->UG_provinces = array(
 	'UG-317' => 'Abim',
 	'UG-301' => 'Adjumani',
 	'UG-314' => 'Amolatar',
@@ -5067,7 +5269,8 @@ $this->uganda_regions = array(
 	'UG-313' => 'Yumbe'
 );
 
-$this->ukraine_regions = array(
+//Ukraine
+$this->UA_provinces = array(
 	'VN' => 'Вінницька область',
 	'LT' => 'Волинська область',
 	'DP' => 'Дніпропетровська область',
@@ -5094,7 +5297,8 @@ $this->ukraine_regions = array(
 	'CV' => 'Чернівецька область'
 );
 
-$this->united_arab_emirates_regions = array(
+//United arab emirates
+$this->AE_provinces = array(
 	'DXB'	 => 'Dubai',
 	'SHJ'	 => 'Sharjah',
 	'ABU'	 => 'Abu dhabi',
@@ -5103,7 +5307,8 @@ $this->united_arab_emirates_regions = array(
 	'Ala'	 => 'Al Ain'
 );
 
-$this->united_states_minor_outlying_islands_regions = array(
+//United states minor outlying islands
+$this->UM_provinces = array(
 	'UM-81'	 => 'Baker Island',
 	'UM-84'	 => 'Howland Island',
 	'UM-86'	 => 'Jarvis Island',
@@ -5115,7 +5320,8 @@ $this->united_states_minor_outlying_islands_regions = array(
 	'UM-79'	 => 'Wake Island'
 );
 
-$uruguay_regions = array(
+//Uruguay
+$this->UY_provinces = array(
 	'AR' => 'Artigas',
 	'CA' => 'Canelones',
 	'CL' => 'Cerro Largo',
@@ -5137,7 +5343,8 @@ $uruguay_regions = array(
 	'TT' => 'Treinta y Tres'
 );
 
-$this->uzbekistan_regions = array(
+//Uzbekistan
+$this->UZ_provinces = array(
 	'UZ-TK'	 => 'Toshkent',
 	'UZ-AN'	 => 'Andijon',
 	'UZ-BU'	 => 'Buxoro',
@@ -5154,7 +5361,8 @@ $this->uzbekistan_regions = array(
 	'UZ-QR'	 => 'Qoraqalpog‘iston Respublikasi'
 );
 
-$this->vanuatu_regions = array(
+//Vanatu
+$this->VU_provinces = array(
 	'VU-MAP' => 'Malampa',
 	'VU-PAM' => 'Pénama',
 	'VU-SAM' => 'Sanma',
@@ -5163,7 +5371,8 @@ $this->vanuatu_regions = array(
 	'VU-TOB' => 'Torba'
 );
 
-$this->venezuela_regions = array(
+//Venezuela
+$this->VE_provinces = array(
 	'AM' => 'Amazonas',
 	'AN' => 'Anzoátegui',
 	'AP' => 'Apure',
@@ -5191,7 +5400,8 @@ $this->venezuela_regions = array(
 	'ZU' => 'Zulia'
 );
 
-$this->vietnam_regions = array(
+//Vietnam
+$this->VN_provinces = array(
 	'AG' => 'An Giang',
 	'BV' => 'Ba Ria-Vung Tau',
 	'BK' => 'Bac Can',
@@ -5258,7 +5468,8 @@ $this->vietnam_regions = array(
 	'YB' => 'Yen Bai'
 );
 
-$this->yemen_regions = array(
+//Yemen
+$this->YE_provinces = array(
 	'YE-SA'	 => 'Şan‘ā‌’ [city]',
 	'YE-AB'	 => 'Abyān',
 	'YE-AD'	 => '‌’Adan',
@@ -5282,7 +5493,8 @@ $this->yemen_regions = array(
 	'YE-TA'	 => 'Tā‘izz'
 );
 
-$this->zambia_regions = array(
+//Zambia
+$this->ZM_provinces = array(
 	'ZM-02'	 => 'Central',
 	'ZM-08'	 => 'Copperbelt',
 	'ZM-03'	 => 'Eastern',
@@ -5294,7 +5506,8 @@ $this->zambia_regions = array(
 	'ZM-01'	 => 'Western'
 );
 
-$this->zimbabwe_regions = array(
+//Zimbabwe
+$this->ZW_provinces = array(
 	'BW'	 => 'Bulawayo',
 	'HR'	 => 'Harare',
 	'MC'	 => 'Manicaland',

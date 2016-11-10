@@ -219,7 +219,7 @@ if ( ! function_exists( 'mp_orderstatus_link' ) ) :
 
 endif;
 
-if ( ! function_exists( 'mp_product_link' ) ) :
+if ( ! function_exists( 'mp_products_link' ) ) :
 
 	/**
 	 * Echos the current product list link.
@@ -359,15 +359,15 @@ if ( ! function_exists( 'mp_number_format' ) ) {
 		} else {
 			$int_decimals = 2;
 		}
-		
+
 		$curr_decimal = mp_get_setting( 'curr_decimal', 1 );
-		
-		if( $curr_decimal == 1 ) {
+
+		if ( $curr_decimal == 1 ) {
 			$int_decimals = 2;
 		} else {
 			$int_decimals = 0;
 		}
-		
+
 		$decimals = apply_filters( 'mp_number_format_decimals', $int_decimals );
 
 		if ( $force_basic ) {
@@ -418,31 +418,31 @@ if ( ! function_exists( 'mp_cart_widget' ) ) :
 		$custom_text  = '';
 		$cart_content = '';
 
-		$mini_cart .= apply_filters( 'mp_cart_widget_before', '<div class="mp_cart_widget">');
+		$mini_cart .= apply_filters( 'mp_cart_widget_before', '<div class="mp_cart_widget">' );
 
-		if ( !empty( $args[ 'title' ] ) ) {
+		if ( ! empty( $args['title'] ) ) {
 			$title .= '<div class="mp_cart_widget_title">';
-			$title .= $args[ 'title' ]; 
+			$title .= $args['title'];
 			$title .= '</div><!-- end .mp_cart_widget_title -->';
 		};
 
 		$mini_cart .= apply_filters( 'mp_cart_widget_title', $title );
 
-		if ( !empty( $args[ 'custom_text' ] ) ) {
+		if ( ! empty( $args['custom_text'] ) ) {
 			$custom_text .= '<div class="mp_cart_widget_custom_text">';
-			$custom_text .= $args[ 'custom_text' ]; 
+			$custom_text .= $args['custom_text'];
 			$custom_text .= '</div><!-- end .mp_cart_widget_custom_text -->';
 		};
 
 		$mini_cart .= apply_filters( 'mp_cart_widget_custom_text', $custom_text );
 
 		$cart_content .= '<div class="mp_cart_widget_content">';
-		$cart_content .= MP_Cart::get_instance()->cart_products_html('widget', $args[ 'show_product_image' ], $args[ 'show_product_qty' ], $args[ 'show_product_price' ]);
+		$cart_content .= MP_Cart::get_instance()->cart_products_html( 'widget', $args['show_product_image'], $args['show_product_qty'], $args['show_product_price'] );
 		$cart_content .= '</div><!-- end .mp_cart_widget_content -->';
 
 		$mini_cart .= apply_filters( 'mp_cart_widget_content', $cart_content );
-		
-		$mini_cart .= apply_filters( 'mp_cart_widget_after', '</div><!-- end .mp_cart_widget -->');
+
+		$mini_cart .= apply_filters( 'mp_cart_widget_after', '</div><!-- end .mp_cart_widget -->' );
 
 		if ( $echo ) {
 			echo $mini_cart;
@@ -509,7 +509,7 @@ if ( ! function_exists( '_mp_order_status_overview' ) ) :
 	 */
 	function _mp_order_status_overview() {
 		$history        = array_filter( mp_get_order_history() );
-		$page           = max( 1, get_query_var( 'paged' ), get_query_var( 'page' ) );
+		$page           = get_query_var( 'mp_status_pagenumber', 1 );
 		$per_page_value = mp_get_setting( 'per_page_order_history' );
 		$per_page       = isset( $per_page_value ) ? $per_page_value : get_option( 'posts_per_page' );
 		$offset         = ( $page - 1 ) * $per_page;
@@ -772,8 +772,8 @@ if ( ! function_exists( 'mp_buy_button' ) ) :
 		if ( ! $product->exists() ) {
 			return;
 		}
-		
-		$button  = $product->buy_button( false, $context, array(), true, true );
+
+		$button = $product->buy_button( false, $context, array(), true, true );
 
 		if ( $echo ) {
 			echo $button;
@@ -1473,8 +1473,8 @@ if ( ! function_exists( 'mp_get_user_address_part' ) ) :
 			} else {
 				return mp_arr_get_value( '1', $name_parts, '' );
 			}
-			
-		} elseif( 'email' == $what ) {
+
+		} elseif ( 'email' == $what ) {
 			$email = mp_get_session_value( "mp_" . $type . "_info->{$what}", mp_arr_get_value( $what, $meta, '' ) );
 			if ( ! empty( $email ) ) {
 				return $email;
@@ -1503,18 +1503,9 @@ if ( ! function_exists( 'mp_get_states' ) ) :
 	 */
 	function mp_get_states( $country ) {
 		$list = false;
-		switch ( $country ) {
-			case 'US' :
-				$list = mp()->usa_states;
-				break;
-
-			case 'CA' :
-				$list = mp()->canadian_provinces;
-				break;
-
-			case 'AU' :
-				$list = mp()->australian_states;
-				break;
+		$property = $country.'_provinces';
+		if ( property_exists( mp(), $property ) ) {
+			$list = mp()->$property;
 		}
 
 		/**
@@ -1597,17 +1588,16 @@ if ( ! function_exists( 'mp_get_order_history' ) ) :
 
 		foreach ( $orders as $key => $order ) {
 			if ( ! empty( $key ) ) {
-				if ( ! empty( $order['id'] ) ) {			
+				if ( ! empty( $order['id'] ) ) {
 					$mp_order = get_post( $order['id'] );
 
 					// if order is deleted or trashed, unset it
 					if ( empty( $mp_order ) || 'trash' === $mp_order->post_status || 'auto-draft' === $mp_order->post_status ) {
-						unset( $orders[ $key ] );					
+						unset( $orders[ $key ] );
 					}
-				}				
-			}
-			else {
-				unset( $orders[ $key ] );			
+				}
+			} else {
+				unset( $orders[ $key ] );
 			}
 		}
 
@@ -1724,7 +1714,7 @@ if ( ! function_exists( 'mp_tax_rate' ) ) :
 
 			case 'CA':
 //Canada tax is for all orders in country, based on province shipped to. We're assuming the rate is a combination of GST/PST/etc.
-				if ( $country == 'CA' && array_key_exists( $state, mp()->canadian_provinces ) ) {
+				if ( $country == 'CA' && array_key_exists( $state, mp()->CA_provinces ) ) {
 					if ( $_tax_rate = mp_get_setting( "tax->canada_rate->$state" ) ) {
 						$tax_rate = (float) $_tax_rate;
 					}
@@ -1943,9 +1933,23 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 				$query['paged'] = $args['page'] = intval( get_query_var( 'page' ) );
 			}
 
-			//Get session values for order and order_by
+			/*//Get session values for order and order_by
 			if ( session_id() == '' ) {
-				@session_start();
+				if (version_compare(phpversion(), '5.4.0', '<')) {
+				     if(session_id() == '') {
+				        @session_start();
+				     }
+				 }
+				 else
+				 {
+				    if (session_status() == PHP_SESSION_NONE) {
+				        @session_start();
+				    }
+				 }
+			}*/
+
+			if( !isset( $_SESSION ) ){
+				$_SESSION = array();
 			}
 
 			$order_by = isset( $_SESSION['mp_product_list_order_by'] ) ? $_SESSION['mp_product_list_order_by'] : '';
@@ -1962,7 +1966,7 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 // Get order by
 			if ( ! is_null( $args['order_by'] ) ) {
 				if ( 'price' == $args['order_by'] ) {
-					$query['meta_key'] = 'regular_price';
+					$query['meta_key'] = 'sort_price';
 					$query['orderby']  = 'meta_value_num';
 				} else if ( 'sales' == $args['order_by'] ) {
 					$query['meta_key'] = 'mp_sales_count';
@@ -1971,7 +1975,7 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 					$query['orderby'] = $args['order_by'];
 				}
 			} elseif ( 'price' == mp_get_setting( 'order_by' ) ) {
-				$query['meta_key'] = 'regular_price';
+				$query['meta_key'] = 'sort_price';
 				$query['orderby']  = 'meta_value_num';
 			} elseif ( 'sales' == mp_get_setting( 'order_by' ) ) {
 				$query['meta_key'] = 'mp_sales_count';
@@ -1987,6 +1991,14 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 			$query['order'] = $args['order'];
 		}
 
+// Filter by featured
+		if ( (bool) $args['featured'] ) {
+			$query['meta_query'][]     = array(
+				'key'     => 'featured',
+				'value'   => '1',
+				'compare' => '=',
+			);
+		}
 
 // The Query
 		//var_dump($query);
@@ -2004,7 +2016,7 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 
 		if ( ! mp_doing_ajax() ) {
 			$per_page = ( is_null( $args['per_page'] ) ) ? null : $args['per_page'];
-			$content .= ( ( is_null( $args['filters'] ) && 1 == mp_get_setting( 'show_filters' ) ) || $args['filters'] ) ? mp_products_filter( false, $per_page, $custom_query ) : mp_products_filter( true, $per_page, $custom_query );
+			$content .= ( $args['filters'] || ( is_null( $args['filters'] ) && 1 != mp_get_setting( 'hide_products_filter' ) ) ) ? mp_products_filter( false, $per_page, $custom_query ) : '';
 		}
 
 		$content .= '<!-- MP Product List --><section id="mp-products" class="hfeed mp_products mp_products-' . $layout_type . '">';
@@ -2114,6 +2126,7 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 		$args = array_replace_recursive( array(
 			'echo'     => false,
 			'order_id' => get_query_var( 'mp_order_id', null ),
+			'guest_email' => get_query_var( 'mp_guest_email', null ),
 		), $args );
 
 		extract( $args );
@@ -2127,9 +2140,10 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 			} else {
 				$order = new MP_Order( $order_id );
 				if ( $order->exists() ) {
-					//only owner can see
-					if ( $order->post_author != get_current_user_id() ) {
+					//only owner and store admins can see
+					if ( $order->post_author != get_current_user_id() && !current_user_can( apply_filters( 'mp_store_settings_cap', 'read_store_order' ) ) ) {
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
+						$html .= _mp_order_status_overview();
 					} else {
 						$html .= $order->details( false );
 					}
@@ -2139,30 +2153,17 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 				}
 			}
 		} else {
-			//we will try to find the order by history cookie, separate code for prevent conflict later
-			//$orders = mp_get_cookie_value( 'mp_order_history', array() );
 			if ( ! is_null( $order_id ) ) {
-				$orders = mp_get_order_history();
-				if ( is_array( $orders ) ) {
+				if( ! is_null ( $guest_email ) ) {
+					// If email and order provided matches, show the order status page
 					$order = new MP_Order( $order_id );
-					if ( $order->exists() ) {
-						$found = false;
-						foreach ( $orders as $key => $val ) {
-							if ( $val['id'] == $order->ID ) {
-								//this order belonged to this user
-								$found = true;
-								break;
-							}
-						}
-						if ( $found == true ) {
-							$html .= $order->details( false );
-						} else {
-							$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						}
+					if ( $order->exists() && ( md5( $order->get_meta( 'mp_billing_info->email', '' ) ) == $guest_email || md5( $order->get_meta( 'mp_shipping_info->email', '' ) ) == $guest_email ) ) {
+						$html .= $order->details( false );
 					} else {
 						$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
-						$html .= _mp_order_status_overview();
 					}
+				} else {
+					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 				}
 			}
 		}
@@ -2195,6 +2196,58 @@ if ( ! function_exists( 'mp_pinit_button' ) ) :
 			echo $snippet;
 		} else {
 			return $snippet;
+		}
+	}
+
+endif;
+
+if ( ! function_exists( 'mp_featured_products' ) ) :
+
+	/**
+	 * Displays a list of popular products ordered by sales.
+	 *
+	 * @since 3.0
+	 *
+	 * @uses mp_list_products()
+	 *
+	 * @param bool $echo Optional, whether to echo or return
+	 * @param bool $paginate Optional, whether to paginate
+	 * @param int $page Optional, The page number to display in the product list if $paginate is set to true.
+	 * @param int $per_page Optional, How many products to display in the product list if $paginate is set to true.
+	 * @param string $order_by Optional, What field to order products by. Can be: title, date, ID, author, price, sales, rand
+	 * @param string $order Optional, Direction to order products by. Can be: DESC, ASC
+	 * @param string $category Optional, limit to a product category
+	 * @param string $tag Optional, limit to a product tag
+	 * @param bool $list_view Optional, show as list. Default to presentation settings
+	 * @param bool $filters Optional, show filters
+	 */
+	function mp_featured_products() {
+		$func_args        = func_get_args();
+		$args             = mp_parse_args( $func_args, mp()->defaults['list_products'] );
+		$echo = $args['echo'];
+
+		// force echo to false to get content from mp_list_products()
+		// force featured to true to filter only featured in mp_list_products()
+		$args['echo'] 	  = false;
+		$args['nopaging'] = false;
+		$args['featured'] = true;		
+		$content = mp_list_products($args);
+
+		/**
+		 * Filter the featured products html
+		 *
+		 * @since 3.0
+		 *
+		 * @param string $content The current HTML markup.
+		 * @param array $args mp_featured_products short code attributes.
+		*/
+		$content = apply_filters( 'mp_featured_products', $content, $args );
+
+
+		if ( $echo ) {
+			echo $content;
+		} else {
+			return $content;
 		}
 	}
 
@@ -2307,6 +2360,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 		$fb      = $product->facebook_like_button( 'single_view' );
 		$twitter = $product->twitter_button( 'single_view' );
 
+		$display_description = ( ! empty( $content ) && (bool) $content );
+
 		$has_image = false;
 		if ( ! $product->has_variations() ) {
 			$values = get_post_meta( $product->ID, 'mp_product_images', true );
@@ -2334,7 +2389,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 
 		$return = '
 			<!-- MP Single Product -->
-			<section id="mp-single-product" itemscope itemtype="http://schema.org/Product">
+			<section id="mp-single-product-' . $product->ID . '" class="mp-single-product" itemscope itemtype="http://schema.org/Product">
 				<div class="mp_product mp_single_product' . ( $has_image ? ' mp_single_product-has-image mp_single_product-image-' . ( ! empty( $image_alignment ) ? $image_alignment : 'aligncenter' ) . '' : '' ) . ( $product->has_variations() ? ' mp_single_product-has-variations' : '' ) . '">';
 
 		$values = get_post_meta( $product->ID, 'mp_product_images', true );
@@ -2387,7 +2442,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 
 					$values = explode( ',', $values );
 
-					if( $image != "single" ) {
+					if ( $image != "single" ) {
 						foreach ( $values as $value ) {
 
 							if ( preg_match( '/http:|https:/', $value ) ) {
@@ -2401,13 +2456,13 @@ if ( ! function_exists( 'mp_product' ) ) {
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
 						}
 					} else {
-						if( ! empty( $values[ 0 ] ) ) {
+						if ( ! empty( $values[0] ) ) {
 
-							if ( preg_match( '/http:|https:/', $values[ 0 ] ) ) {
-								$img_url = array( esc_url( $values[ 0 ] ) );
+							if ( preg_match( '/http:|https:/', $values[0] ) ) {
+								$img_url = array( esc_url( $values[0] ) );
 							} else {
-								$original_image = wp_get_attachment_image_src( $values[ 0 ], 'full' );
-								$img_url        = mp_resize_image( $values[ 0 ], $original_image[0], $size );
+								$original_image = wp_get_attachment_image_src( $values[0], 'full' );
+								$img_url        = mp_resize_image( $values[0], $original_image[0], $size );
 							}
 
 							$return .= '<li data-thumb="' . $img_url[0] . '" data-src ="' . $original_image[0] . '"><img src="' . $img_url[0] . '"></li>';
@@ -2441,7 +2496,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
 
-			if ( mp_get_setting( 'show_single_excerpt' ) == 1 ) {
+			if ( mp_get_setting( 'show_single_excerpt' ) == 1  && $display_description ) {
 				// Excerpt
 				if ( ! $variation ) {
 					$return .= '<div class="mp_product_excerpt">';
@@ -2474,7 +2529,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			}
 
 			$return .= $product->buy_button( false, 'single', $selected_atts );
-			
+
 			if ( mp_get_setting( 'show_single_tags' ) == 1 ) {
 				$return .= mp_tag_list( $product_id, '<div class="mp_product_tags">' . __( 'Tagged in ', 'mp' ), ', ', '</div>' );
 			}
@@ -2493,11 +2548,18 @@ if ( ! function_exists( 'mp_product' ) ) {
 		}
 
 		$return .= '<div class="mp_single_product_extra">';
+
+		if( ! $display_description && isset( $product->content_tabs[ 'mp-product-overview' ] ) ){
+			unset( $product->content_tabs[ 'mp-product-overview' ] );
+		}
+
 		$return .= $product->content_tab_labels( false );
 
-		if ( ! empty( $content ) ) {
+		$index = 0;
+
+		if( $display_description ){
 			$return .= '
-<div id="mp-product-overview" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
+<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
 
 			$return .= '
 <div itemprop="description" class="mp_product_tab_content_text">';
@@ -2511,11 +2573,12 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '
 </div><!-- end mp_product_tab_content_text -->
 </div><!-- end mp-product-overview -->';
+			$index++;
 		}
 
 
 		// Remove overview tab as it's already been manually output above
-		array_shift( $product->content_tabs );
+		unset( $product->content_tabs[ 'mp-product-overview' ] );
 
 		$func_args = func_get_args();
 		$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
@@ -2530,7 +2593,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 							$layout_type = $args['list_view'] ? 'list' : 'grid';
 						}
 						$return .= '
-						<div id="mp-related-products" class="mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
+						<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
 							<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
 						</div><!-- end mp-related-products -->';
 					}
@@ -2548,11 +2611,12 @@ if ( ! function_exists( 'mp_product' ) ) {
 					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
 
 					$return .= '
-					<div id="' . esc_attr( $slug ) . '" class="mp_product_tab_content mp_product_tab_content-html" style="display:none">
+					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
 						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
 					</div><!-- end ' . esc_attr( $slug ) . ' -->';
 					break;
 			}
+			$index++;
 		}
 		$return .= '</div><!-- end mp_single_product_extra -->';
 
@@ -2732,8 +2796,8 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 			'hierarchical'     => true
 		) );
 
-		if ( session_id() == '' ) {
-			session_start();
+		if( !isset( $_SESSION ) ){
+			$_SESSION = array();
 		}
 
 		if ( $query instanceof WP_Query ) {
@@ -2764,10 +2828,11 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 			$options_html .= '<option value="' . $value . '" ' . selected( $value, $current_order, false ) . '>' . $t[2] . '</option>';
 		}
 
+
 		$return = '
 		<a id="mp-product-top"></a>
 		<!-- Products Filter -->
-		<section class="mp_products_filter"' . ( ( $hidden ) ? ' style="display:none"' : '' ) . '>
+		<section class="mp_products_filter">
 			<form id="mp-products-filter-form" name="mp_products_filter_form" class="mp_form mp_form-products-filter" method="get">
 			
 				<div class="mp_form_fields">
@@ -2792,6 +2857,8 @@ if ( ! function_exists( 'mp_products_filter' ) ) :
 		';
 
 		return apply_filters( 'mp_products_filter', $return );
+
+
 	}
 
 endif;
@@ -2913,8 +2980,10 @@ function mp_get_the_excerpt( $id = false, $length = 55, $variation = false ) {
 	if ( $variation ) {
 		$parent_post_id = wp_get_post_parent_id( $id );
 		$parent_post    = get_post( $parent_post_id );
-		if ( ! empty( $parent_post->post_content ) ) {
-			$excerpt = $parent_post->post_content . "\r\n" . $excerpt;
+		if ( ! empty( $parent_post->post_excerpt ) ) {
+			$excerpt = $parent_post->post_excerpt;
+		} else {
+			$excerpt = $parent_post->post_content;
 		}
 	}
 
@@ -3042,10 +3111,11 @@ if ( ! function_exists( 'mp_tag_list' ) ) :
 	 */
 	function mp_tag_list( $product_id = false, $before = '', $sep = ', ', $after = '' ) {
 		$return = '';
-		$terms = get_the_term_list( $product_id, 'product_tag', $before, $sep, $after );
+		$terms  = get_the_term_list( $product_id, 'product_tag', $before, $sep, $after );
 		if ( $terms ) {
 			return $terms;
 		}
+
 		return apply_filters( 'mp_tag_list', $return, $product_id, $before, $sep, $after );
 	}
 endif;
@@ -3060,121 +3130,137 @@ if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
 	}
 }
 
-if (!function_exists('mp_product_title')) :
-/*
- * function mp_product_title
- * Displays a title of a single product according to preference
- *
- * @param bool $echo Optional, whether to echo or return
- * @param int $product_id the ID of the product to display
- * @param bool $link Whether to display title with or without a link
- * @param bool $formated Whether to display formated text (i.e h3 with a class) or not (just pure text)
- * @param string $html_tag title surrounding HTML tag (i.e. <h3>title</h3>)
- * @param string $css_class add custom css class to the title
- * @param string $microdata add additional information to HTML content which is more descriptive and suitable for search engines (learn more here http://schema.org/docs/gs.html)
- */
+if ( ! function_exists( 'mp_product_title' ) ) :
+	/*
+	 * function mp_product_title
+	 * Displays a title of a single product according to preference
+	 *
+	 * @param bool $echo Optional, whether to echo or return
+	 * @param int $product_id the ID of the product to display
+	 * @param bool $link Whether to display title with or without a link
+	 * @param bool $formated Whether to display formated text (i.e h3 with a class) or not (just pure text)
+	 * @param string $html_tag title surrounding HTML tag (i.e. <h3>title</h3>)
+	 * @param string $css_class add custom css class to the title
+	 * @param string $microdata add additional information to HTML content which is more descriptive and suitable for search engines (learn more here http://schema.org/docs/gs.html)
+	 */
 
-function mp_product_title($product_id, $echo = true, $link = false, $formated = true, $html_tag = 'h3', $css_class = 'mp_product_name', $microdata = 'itemprop="name"') {
-	global $mp;
+	function mp_product_title( $product_id, $echo = true, $link = false, $formated = true, $html_tag = 'h3', $css_class = 'mp_product_name', $microdata = 'itemprop="name"' ) {
+		global $mp;
 
-	$post = get_post($product_id);
+		$post = get_post( $product_id );
 
-	if ($link) {
-			$title = '<a href="' . get_permalink($post->ID) . '">' . $post->post_title . '</a>';
-	} else {
+		if ( $link ) {
+			$title = '<a href="' . get_permalink( $post->ID ) . '">' . $post->post_title . '</a>';
+		} else {
 			$title = $post->post_title;
-	}
+		}
 
-	if ($formated) {
+		if ( $formated ) {
 			$before_title = '<' . $html_tag . ' ' . $microdata . ' class="entry-title ' . $css_class . '">';
-			$after_title = '</' . $html_tag . '>';
-	} else {
+			$after_title  = '</' . $html_tag . '>';
+		} else {
 			$before_title = '<span class="entry-title">';
-			$after_title = '</span>';
-	}
+			$after_title  = '</span>';
+		}
 
-	$return = apply_filters('mp_product_title', $before_title . $title . $after_title, $product_id, $link, $formated, $html_tag, $css_class, $microdata);
+		$return = apply_filters( 'mp_product_title', $before_title . $title . $after_title, $product_id, $link, $formated, $html_tag, $css_class, $microdata );
 
-	if ($echo)
+		if ( $echo ) {
 			echo $return;
-	else
+		} else {
 			return $return;
-}
+		}
+	}
 endif;
 
 
-if (!function_exists('mp_product_description')) :
-/*
- * function mp_product_description
- * Displays a title of a single product according to preference
- *
- * @param bool $echo Optional, whether to echo or return
- * @param int $product_id the ID of the product to display
- * @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'
- * @param string $html_tag title surrounding HTML tag (i.e. <div>title</div>)
- * @param string $css_class add custom css class to the description
- * @param string $microdata add additional information to HTML content which is more descriptive and suitable for search engines (learn more here http://schema.org/docs/gs.html)
- */
+if ( ! function_exists( 'mp_product_description' ) ) :
+	/*
+	 * function mp_product_description
+	 * Displays a title of a single product according to preference
+	 *
+	 * @param bool $echo Optional, whether to echo or return
+	 * @param int $product_id the ID of the product to display
+	 * @param bool/string $content Whether and what type of content to display. Options are false, 'full', or 'excerpt'. Default 'full'
+	 * @param string $html_tag title surrounding HTML tag (i.e. <div>title</div>)
+	 * @param string $css_class add custom css class to the description
+	 * @param string $microdata add additional information to HTML content which is more descriptive and suitable for search engines (learn more here http://schema.org/docs/gs.html)
+	 */
 
-function mp_product_description($product_id, $echo = true, $content = 'full', $html_tag = true, $css_class = 'mp_product_content', $microdata = 'itemprop="description"') {
-	global $mp;
+	function mp_product_description( $product_id, $echo = true, $content = 'full', $html_tag = true, $css_class = 'mp_product_content', $microdata = 'itemprop="description"' ) {
+		global $mp;
 
-	$post = get_post($product_id);
-	$description = '';
+		$post        = get_post( $product_id );
+		$description = '';
 
-	if ($content == 'excerpt') {
+		if ( $content == 'excerpt' ) {
 			$description .= $post->post_excerpt;
-	} else {
-			$description .= apply_filters('the_content', $post->post_content);
-	}
+		} else {
+			$description .= apply_filters( 'the_content', $post->post_content );
+		}
 
-	if ($html_tag) {
+		if ( $html_tag ) {
 			$before_description = '<div ' . $microdata . ' class="' . $css_class . '">';
-			$after_description = '</div>';
-	} else {
+			$after_description  = '</div>';
+		} else {
 			$before_description = '';
-			$after_description = '';
-	}
+			$after_description  = '';
+		}
 
-	$return = apply_filters('mp_product_description', $before_description . $description . $after_description, $product_id, $content, $html_tag, $css_class, $microdata);
+		$return = apply_filters( 'mp_product_description', $before_description . $description . $after_description, $product_id, $content, $html_tag, $css_class, $microdata );
 
-	if ($echo)
+		if ( $echo ) {
 			echo $return;
-	else
+		} else {
 			return $return;
-}
+		}
+	}
 endif;
 
 
-if (!function_exists('mp_product_meta')) :
-/*
- * function mp_product_meta
- * Displays the product meta box
- *
- * @param bool $echo Optional, whether to echo or return
- * @param string $context Options are list or single
- * @param int $product_id The post_id for the product. Optional if in the loop
- * @param sting $label A label to prepend to the price. Defaults to "Price: "
- * @param string $html_tag title surrounding HTML tag (i.e. <div>title</div>)
- * @param string $css_class add custom css class to the description
- */
+if ( ! function_exists( 'mp_product_meta' ) ) :
+	/*
+	 * function mp_product_meta
+	 * Displays the product meta box
+	 *
+	 * @param bool $echo Optional, whether to echo or return
+	 * @param string $context Options are list or single
+	 * @param int $product_id The post_id for the product. Optional if in the loop
+	 * @param sting $label A label to prepend to the price. Defaults to "Price: "
+	 * @param string $html_tag title surrounding HTML tag (i.e. <div>title</div>)
+	 * @param string $css_class add custom css class to the description
+	 */
 
-function mp_product_meta($echo = true, $context = 'context', $label = true, $product_id = null, $html_tag = true, $css_class = 'mp_product_meta') {
+	function mp_product_meta( $echo = true, $context = 'context', $label = true, $product_id = null, $html_tag = true, $css_class = 'mp_product_meta' ) {
 
-	if ($html_tag) {
-			$content = '<div class="'.$css_class.'">';
-	}
-	$content .= mp_product_price(false, $product_id, $label);
-	$content .= mp_buy_button(false, $context, $product_id);
-	if ($html_tag) {
+		if ( $html_tag ) {
+			$content = '<div class="' . $css_class . '">';
+		}
+		$content .= mp_product_price( false, $product_id, $label );
+		$content .= mp_buy_button( false, $context, $product_id );
+		if ( $html_tag ) {
 			$content .= '</div>';
-	}
+		}
 
-	$content = apply_filters('mp_product_meta', $content, $context, $label, $product_id, $html_tag, $css_class);
+		$content = apply_filters( 'mp_product_meta', $content, $context, $label, $product_id, $html_tag, $css_class );
 
-	if ($echo)
+		if ( $echo ) {
 			echo $content;
-	else
+		} else {
 			return $content;
-}
+		}
+	}
 endif;
+
+if ( ! function_exists( 'mp_get_ajax_url' ) ) {
+	function mp_get_ajax_url( $path = 'admin-ajax.php' ) {
+		$ajax_url = admin_url( $path );
+		if ( ! is_ssl() && force_ssl_admin() ) {
+			//this case the frontend is non ssl, meanwhile backend is ssl, and that will make the cookies
+			//wrong, need to fix it
+			$ajax_url = admin_url( $path, 'http' );
+		}
+
+		return $ajax_url;
+	}
+}

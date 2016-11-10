@@ -1,0 +1,17 @@
+//== Forms
+//
+
+// Fields (checkboxes)
+.mp-quick-field {
+	
+	&-inline-block {
+		display: inline-block;
+		width: 100%;
+		
+		.wpmudev-field-label {
+			display: inline-block;
+			margin-right: $space--xs;
+		}
+	}
+	
+}

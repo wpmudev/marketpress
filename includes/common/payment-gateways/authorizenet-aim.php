@@ -65,7 +65,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			$this->API_Endpoint = "https://test.authorize.net/gateway/transact.dll";
 			$this->force_ssl = false;
 		} else {
-			$this->API_Endpoint = "https://secure.authorize.net/gateway/transact.dll";
+			$this->API_Endpoint = "https://secure2.authorize.net/gateway/transact.dll";
 		}
 	}
 
@@ -128,7 +128,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 
 		// Billing Info
 		$payment->setParameter("x_card_code", mp_get_post_value( 'mp_cc_cvc' ) );
-		$payment->setParameter("x_exp_date ", mp_get_post_value( 'mp_cc_exp' ) );
+		$payment->setParameter("x_exp_date ", str_replace( array( ' ', '/' ), '', mp_get_post_value( 'mp_cc_exp' ) ) );
 		$payment->setParameter("x_amount", $cart->total( false ) );
 		$payment->setParameter("x_currency_code", $this->currencyCode);
 
@@ -202,7 +202,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 			exit;
 		} else {
 			$error = $payment->getResponseText();
-			mp_checkout()->add_error( sprintf( __( 'There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp'), $error, mp_store_page_url( 'checkout', false ) ), 'order-review-payment' );
+			mp_checkout()->add_error( sprintf( __( 'There was a problem finalizing your purchase. %s Please <a href="%s">go back and try again</a>.', 'mp'), $error, mp_store_page_url( 'checkout', false ) ), 'order-review-payment' , false );
 		}
 	}
 

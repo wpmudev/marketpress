@@ -1,0 +1,73 @@
+// Select2 3.5.x
+div.mp_select2,
+div.mp_select2_search {
+		
+	.select2-choice {
+		background: $color--light;
+		border-color: $color--gray;
+		color: $color;
+		font-size: $font__size;
+		
+		&:hover {
+			border-bottom: 1px solid $color--gray;
+		}
+		
+		.select2-arrow {
+			background: $color--light-gray;
+			border-left-color: $color--gray;
+		}
+		
+	}
+	
+	// Open
+	&.select2-dropdown-open {
+		
+		.select2-choice {
+			background: $color--gray;
+			
+			.select2-arrow {
+				border-left: 1px solid $color--gray;
+			}
+		}
+		
+		&.select2-drop-above {
+			.select2-choice {
+				background: $color--gray;
+				border-color: $color--gray;
+			}
+		}
+		
+	}
+	
+	// Select2 Search
+	.select2-search {
+		input {
+			background: url('../select2/select2.png') no-repeat 100% -22px, $color--light-gray;
+			font-size: $font__size--m;
+		}
+	}
+	
+	// Dropdown (results)
+	&.select2-drop {
+		&-active {
+			border-color: $color--gray;
+		}
+		
+		&.select2-drop-above.select2-drop-active {
+			border-top-color: $color--gray;
+			border-bottom: 1px solid $color--gray;
+		}
+	}
+	&.select2-drop-auto-width {
+		border-top-color: $color--gray;
+	}
+	ul.select2-results {
+		font-size: $font__size--m;
+		
+		.select2-highlighted {
+			background: $color--gray;
+			color: $color;
+		}
+	}
+	
+}
