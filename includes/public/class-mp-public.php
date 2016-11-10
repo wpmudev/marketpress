@@ -280,7 +280,13 @@ class MP_Public {
 			'hover-intent',
 			'mp-select2'
 		), MP_VERSION );
-
+		
+		$grid_with_js = apply_filters('mp-do_grid_with_js', true);
+		
+		if ( $grid_with_js == "true" ) {
+			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array('jquery'), MP_VERSION );
+		}
+		
 		// Get product category links
 		$terms = get_terms( 'product_category' );
 		$cats  = array();
