@@ -58,12 +58,13 @@ function mp_get_products_csv_columns() {
 		'sku'                        => array( 'name' => __( 'SKU', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_sku' ),
 		'special_tax_rate'           => array( 'name' => __( 'Special Tax Rate', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_special_tax_rate' ),
 		'variations_module'          => array( 'name' => __( 'Variation Module', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_variations_module' ),
+		'name'						 => array( 'name' => __( 'Variation Title', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_name' ),
+		'mp_variable_attribute'		 => array( 'name' => __( 'Variation Attribute', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_mp_variable_attribute' ),
 		'weight'                     => array( 'name' => __( 'Weight', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight' ),
 		'weight_extra_shipping_cost' => array( 'name' => __( 'Weight Extra Shipping Cost', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_extra_shipping_cost' ),
 		'weight_pounds'              => array( 'name' => __( 'Weight Pounds', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_pounds' ),
 		'weight_ounces'              => array( 'name' => __( 'Weight Ounces', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_ounces' ),
 		'featured'              	 => array( 'name' => __( 'Featured Product', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_featured' ),
-		'name'						 => array( 'name' => __( 'Variation Title', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_name' ),
 	); 
 	
 } // END function mp_get_products_csv_columns

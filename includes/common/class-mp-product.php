@@ -1115,6 +1115,8 @@ class MP_Product {
 					}
 				} else {
 					$button .= $this->attribute_fields( false, $selected_atts );
+					
+					print_r($this->get_variation_attribute(1288));
 
 					if ( mp_get_setting( 'product_button_type' ) == 'addcart' ) {
 						$button .= '<button ' . $disabled . ' class="mp_button mp_button-addcart" type="submit" name="addcart">' . __( 'Add To Cart', 'mp' ) . '</button>';
@@ -2419,7 +2421,42 @@ class MP_Product {
 
 		return ( is_array( $terms ) ) ? array_shift( $terms ) : false;
 	}
+	
+	/**
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @uses $wpdb
+	 * @return string
+	 */
+	public function get_variation_attribute( $variation_id ) {
+		global $wpdb;
 
+		$mp_product_atts   = MP_Product_Attributes::get_instance();
+		$all_atts          = $mp_product_atts->get();
+		
+		// Get attribute for this variation
+		$attributes = $wpdb->get_col( "
+			SELECT DISTINCT t2.taxonomy
+			FROM {$wpdb->term_relationships} AS t1
+			INNER JOIN {$wpdb->term_taxonomy} AS t2 ON t1.term_taxonomy_id = t2.term_taxonomy_id
+			WHERE t1.object_id IN (" . $variation_id . ")
+			AND t2.taxonomy LIKE '" . MP_Product_Attributes::SLUGBASE . "%'"
+		);
+		
+		$terms        = wp_get_object_terms( $variation_id, array_values( $attributes ) );
+		$terms_sorted = $mp_product_atts->sort( $terms );
+		$names        = array();
+
+		foreach ( $terms_sorted as $tax_slug => $terms ) {
+			$tax_id = $mp_product_atts->get_id_from_slug( $tax_slug );
+			foreach ( $terms as $term ) {
+				if ( $att = $mp_product_atts->get_one( $tax_id ) ) {
+					return $att->attribute_name;
+				}
+			}
+		}
+	}
 	/**
 	 * Get the product attributes
 	 *

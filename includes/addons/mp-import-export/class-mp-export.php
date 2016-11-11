@@ -328,7 +328,7 @@ class MP_Export {
 									}
 									$line[] = implode( ',', $images );
 									break;
-								
+
 								default:
 									$meta   = get_post_meta( $products_query->post->ID, $key, true );
 									$line[] = maybe_serialize( $meta );
@@ -367,19 +367,28 @@ class MP_Export {
 							if( $field['required'] ) {
 								$line[] = $variation->$key;
 							} else {
-								if( $key == 'mp_product_images' ) {
-									$thumb_id = get_post_thumbnail_id( $variation->ID );
-									$image = wp_get_attachment_image_src( $thumb_id, 'full' );
-									$line[] = $image[0];
-								} else {
-									$meta   = get_post_meta( $variation->ID, $key, true );
-									$line[] = maybe_serialize( $meta );
+								switch ( $key ) {
+									case 'mp_variable_attribute':
+										$attribute = $product->get_variation_attribute( $variation->ID );
+										$line[] = $attribute;
+										break;
+
+									case 'mp_product_images':
+										$thumb_id = get_post_thumbnail_id( $variation->ID );
+										$image = wp_get_attachment_image_src( $thumb_id, 'full' );
+										$line[] = $image[0];
+										break;
 									
-									// if column has a WPMU_DEV_API_NAME
-									if( ! empty( $field['WPMU_DEV_API_NAME'] ) ) {
-										$meta   = get_post_meta( $variation->ID, $field['WPMU_DEV_API_NAME'], true );
+									default:
+										$meta   = get_post_meta( $variation->ID, $key, true );
 										$line[] = maybe_serialize( $meta );
-									}
+										
+										// if column has a WPMU_DEV_API_NAME
+										if( ! empty( $field['WPMU_DEV_API_NAME'] ) ) {
+											$meta   = get_post_meta( $variation->ID, $field['WPMU_DEV_API_NAME'], true );
+											$line[] = maybe_serialize( $meta );
+										}
+										break;
 								}
 							}	
 						}
