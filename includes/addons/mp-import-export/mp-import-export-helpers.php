@@ -147,7 +147,61 @@ function mp_get_orders_csv_columns() {
 * Add a post
 */
 function mp_ie_add_post( $required, $metas, $cats, $tags, $thumbnail_id ) {
+
+	if( isset( $required['post_parent'] ) && $required['post_parent'] != 0 ) {
+		// We have variation
+		return mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id );
+	} else {
+		// We have normal product, proceed...
+		return mp_ie_add_normal_product( $required, $metas, $cats, $tags, $thumbnail_id );
+	}
+}
+
+/**
+* Add a variation 3.0
+*/
+
+function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
+	$post = get_post( $required['ID'] );
 	
+	update_post_meta( $required['post_parent'], 'has_variations', 1 );
+	
+	if( empty( $post ) ) {
+		// Define import ID
+		$required['import_id'] = $required['ID'];
+		unset( $required['ID'] );
+		// To ensure the author ID exists, use the administrator as author
+		$required['post_author'] = mp_ie_get_admin_id();
+
+		$post_id = wp_insert_post( $required, true );
+
+		if( ! is_wp_error( $post_id ) ) {
+			foreach( $metas as $key => $meta ) {
+				update_post_meta( $post_id, $key, maybe_unserialize( $meta ) );
+
+				if( $key == "_thumbnail_id" ) {
+					set_post_thumbnail( $post_id, $thumbnail_id );
+				}
+				
+				update_post_meta( $required['post_parent'], 'has_variation', 1 );
+			}
+			$message = sprintf( __( 'Variation (%s) created.', 'mp' ), $post_id );
+		} else {
+			$message = sprintf( '<span class="error">%s</span>', sprintf( __( 'Variation ID "%s" not created: %s', 'mp' ), $required['ID'], $post_id->get_error_message() ) );
+		}
+	}
+	else {
+		$message = sprintf( '<span class="error">%s</span>', sprintf( __( 'A variation with ID="%s" already exists in your database and cannot be inserted.', 'mp' ), $required['ID'] ) );
+	}
+	
+	return $message;
+}
+
+/**
+* Add a normal 3.0 product
+*/
+
+function mp_ie_add_normal_product( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	$post = get_post( $required['ID'] );
 	
 	if( empty( $post ) ) {
@@ -221,7 +275,6 @@ function mp_ie_add_post( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	}
 	
 	return $message;
-	
 }
 
 /**
