@@ -374,6 +374,12 @@ class MP_Export {
 								} else {
 									$meta   = get_post_meta( $variation->ID, $key, true );
 									$line[] = maybe_serialize( $meta );
+									
+									// if column has a WPMU_DEV_API_NAME
+									if( ! empty( $field['WPMU_DEV_API_NAME'] ) ) {
+										$meta   = get_post_meta( $variation->ID, $field['WPMU_DEV_API_NAME'], true );
+										$line[] = maybe_serialize( $meta );
+									}
 								}
 							}	
 						}
