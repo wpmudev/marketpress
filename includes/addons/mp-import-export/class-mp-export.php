@@ -354,6 +354,34 @@ class MP_Export {
 
 				$fields_list[] = $line;
 
+				$product = new MP_Product( $products_query->post->ID );
+				
+				if ( $product->has_variations() ) {
+					$variations = $product->get_variations();
+					
+					foreach ( $variations as $variation ) {
+						$line = array();
+						
+						foreach ( $this->products_columns as $key => $field ) {
+							// If column is required 
+							if( $field['required'] ) {
+								$line[] = $variation->$key;
+							} else {
+								if( $key == 'mp_product_images' ) {
+									$thumb_id = get_post_thumbnail_id( $variation->ID );
+									$image = wp_get_attachment_image_src( $thumb_id, 'full' );
+									$line[] = $image[0];
+								} else {
+									$meta   = get_post_meta( $variation->ID, $key, true );
+									$line[] = maybe_serialize( $meta );
+								}
+							}	
+						}
+
+						$fields_list[] = $line;
+					}
+				}
+
 				$products_count++;
 			}
 		}

@@ -63,6 +63,7 @@ function mp_get_products_csv_columns() {
 		'weight_pounds'              => array( 'name' => __( 'Weight Pounds', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_pounds' ),
 		'weight_ounces'              => array( 'name' => __( 'Weight Ounces', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_weight_ounces' ),
 		'featured'              	 => array( 'name' => __( 'Featured Product', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_featured' ),
+		'name'						 => array( 'name' => __( 'Variation Title', 'mp' ), 'required' => false, 'WPMU_DEV_API_NAME' => '_name' ),
 	); 
 	
 } // END function mp_get_products_csv_columns
