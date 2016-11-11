@@ -146,7 +146,7 @@ function mp_get_orders_csv_columns() {
 /**
 * Add a post
 */
-function mp_ie_add_post( $required, $metas, $cats, $tags ) {
+function mp_ie_add_post( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	
 	$post = get_post( $required['ID'] );
 	
@@ -162,6 +162,10 @@ function mp_ie_add_post( $required, $metas, $cats, $tags ) {
 		if( ! is_wp_error( $post_id ) ) {			
 			foreach( $metas as $key => $meta ) {
 				update_post_meta( $post_id, $key, maybe_unserialize( $meta ) );
+
+				if( $key == "_thumbnail_id" ) {
+					set_post_thumbnail( $post_id, $thumbnail_id );
+				}
 			}
 
 			$post_cats = array();

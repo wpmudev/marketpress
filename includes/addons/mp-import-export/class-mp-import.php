@@ -436,10 +436,11 @@ class MP_Import {
 				( ( $step - 1 ) * $items_by_step ) + 1 <= $row && 
 				( $step * $items_by_step + 1 ) > $row
 			) {
-				$required = array();
-				$metas    = array();
-				$tags     = array();
-				$cats     = array();
+				$required 	  = array();
+				$metas    	  = array();
+				$tags     	  = array();
+				$cats     	  = array();
+				$thumbnail_id = null;
 
 				foreach ( $datas as $key => $value ) {
 					if( $new_columns[ $key ]['required'] ) {
@@ -487,6 +488,7 @@ class MP_Import {
 								case 'mp_product_images':
 									if( ! empty( $value ) ) {
 										$product_images = array();
+										$imageNumber = 1;
 										
 										foreach ( explode( ',', $value ) as $url ) {
 											$tmp        = download_url( $url );
@@ -509,6 +511,12 @@ class MP_Import {
 												$this->messages[] = $id->get_error_message();
 												break;
 											}
+											
+											if( $imageNumber == 1 ) {
+												$thumbnail_id = $id;
+											}
+											
+											$imageNumber++;
 
 											$product_images[] = $id;
 										}											
@@ -527,7 +535,7 @@ class MP_Import {
 					}
 				}
 
-				$this->messages[] = mp_ie_add_post( $required, $metas, $cats, $tags );
+				$this->messages[] = mp_ie_add_post( $required, $metas, $cats, $tags, $thumbnail_id );
 
 				if( ( $step * $items_by_step + 1 ) <= $row ) {
 					return;
