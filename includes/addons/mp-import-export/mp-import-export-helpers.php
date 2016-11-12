@@ -167,6 +167,8 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	
 	update_post_meta( $required['post_parent'], 'has_variations', 1 );
 	
+	MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $metas['mp_variable_attribute'], $metas['mp_variable_attribute'] );	
+	
 	if( empty( $post ) ) {
 		// Define import ID
 		$required['import_id'] = $required['ID'];
