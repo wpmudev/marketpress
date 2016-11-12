@@ -159,15 +159,99 @@ function mp_ie_add_post( $required, $metas, $cats, $tags, $thumbnail_id ) {
 }
 
 /**
+* Possible product combinations 3.0
+*/
+
+function mp_possible_product_combinations( $groups, $prefix = '' ) {
+	$result = array();
+	$group  = array_shift( $groups );
+	foreach ( $group as $selected ) {
+		if ( $groups ) {
+			$result = array_merge( $result, mp_possible_product_combinations( $groups, $prefix . $selected . '|' ) );
+		} else {
+			$result[] = $prefix . $selected;
+		}
+	}
+
+	return $result;
+}
+
+/**
+* Variation transient 3.0
+*/
+
+function mp_variation_transient( $requred, $metas ) {
+	$variation_name   = $metas['mp_variable_attribute'];
+	$variation_values = explode( ' ', $metas['name'] );
+	$data             = array();
+
+	$variation_name   = MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $variation_name, $variation_name ); //taxonomy name made of the prefix and attribute's ID
+
+	$args = array(
+		'orderby'      => 'name',
+		'hide_empty'   => false,
+		'fields'       => 'all',
+		'hierarchical' => true,
+	);
+
+	/* Get terms for the given taxonomy (variation name i.e. color, size etc) */
+	$terms = get_terms( array( $variation_name ), $args );
+
+	global $variations_single_data;
+
+	if( !function_exists( 'term_object_array_filter' ) ){
+		function term_object_array_filter ( $e ) {
+			global $variations_single_data;
+
+			return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
+		}
+	}			
+
+	foreach ( $variation_values as $variations_single_data ) {
+
+		/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
+		$term_object = array_filter( $terms, 'term_object_array_filter' );
+
+		reset( $term_object );
+		$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+		$data_original[ $i ][] = $variation_name . '=' . $variations_single_data;
+	}
+
+	$combinations          = mp_possible_product_combinations( $data );
+	$combinations_original = mp_possible_product_combinations( $data_original );
+
+	$combination_num   = 1;
+	$combination_index = 0;
+
+	foreach ( $combinations as $combination ) {
+		/* Add post terms for the variation */
+		$variation_terms = explode( '|', $combination );
+
+		foreach ( $variation_terms as $variation_term ) {
+			$variation_term_vals = explode( '=', $variation_term );
+			wp_set_post_terms( $requred['ID'], MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0], false ), $variation_term_vals[0], true );
+		}
+
+		$combination_num ++;
+		$combination_index ++;
+	}
+}
+
+/**
 * Add a variation 3.0
 */
 
 function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
+	
+	//wp_delete_post($required['ID']);
+	
 	$post = get_post( $required['ID'] );
 	
 	update_post_meta( $required['post_parent'], 'has_variations', 1 );
 	
-	MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $metas['mp_variable_attribute'], $metas['mp_variable_attribute'] );	
+	MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $metas['mp_variable_attribute'], $metas['mp_variable_attribute'] );
+
+	mp_variation_transient( $required, $metas );
 	
 	if( empty( $post ) ) {
 		// Define import ID
@@ -185,8 +269,6 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 				if( $key == "_thumbnail_id" ) {
 					set_post_thumbnail( $post_id, $thumbnail_id );
 				}
-				
-				update_post_meta( $required['post_parent'], 'has_variation', 1 );
 			}
 			$message = sprintf( __( 'Variation (%s) created.', 'mp' ), $post_id );
 		} else {
@@ -205,6 +287,8 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 */
 
 function mp_ie_add_normal_product( $required, $metas, $cats, $tags, $thumbnail_id ) {
+	//wp_delete_post($required['ID']);
+
 	$post = get_post( $required['ID'] );
 	
 	if( empty( $post ) ) {
