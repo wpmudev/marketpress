@@ -64,7 +64,9 @@ class MarketPress_Product_List extends WP_Widget {
 			$order_query = '&orderby=DESC';
 		}
 
-		$query_string = 'post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query;
+		// check for post type setting (patch for widget not working with "mp_product" type
+		$product_type = mp_get_setting( 'product_post_type' );
+		$query_string = 'post_type=' . $product_type . $taxonomy_query . $paginate_query . $order_by_query . $order_query;
 
 		$query_array = array();
 
