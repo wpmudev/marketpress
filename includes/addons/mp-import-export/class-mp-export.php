@@ -371,6 +371,13 @@ class MP_Export {
 									case 'mp_variable_attribute':
 										$attribute = $product->get_variation_attribute( $variation->ID );
 										$line[] = $attribute;
+										
+										// if column has a WPMU_DEV_API_NAME
+										if( ! empty( $field['WPMU_DEV_API_NAME'] ) ) {
+											$meta   = get_post_meta( $variation->ID, $field['WPMU_DEV_API_NAME'], true );
+											$line[] = maybe_serialize( $meta );
+										}
+										
 										break;
 
 									case 'mp_product_images':
