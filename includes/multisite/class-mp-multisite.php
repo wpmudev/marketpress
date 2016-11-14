@@ -45,7 +45,7 @@ class MP_Multisite {
 		if ( ! is_plugin_active_for_network( mp_get_plugin_slug() ) ) {
 			return;
 		}
-
+		
 		$this->maybe_install();
 		//we will need to register a post type use for index
 		if ( mp_get_network_setting( 'global_cart' ) ) {
@@ -398,13 +398,14 @@ class MP_Multisite {
 				$term_id = $exist->term_id;
 			}
 
-			$sql    = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_term_relationships WHERE post_id = %d AND term_id=%d",
-				$index_id, $term_id
+			$sql    = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->base_prefix}mp_term_relationships WHERE post_id = %d AND blog_id = %d AND term_id=%d",
+				$index_id, $blog_id, $term_id
 			);
 			$linked = $wpdb->get_var( $sql );
 			if ( ! $linked ) {
 				$wpdb->insert( $wpdb->base_prefix . 'mp_term_relationships', array(
 					'post_id' => $index_id,
+					'blog_id' => $blog_id,
 					'term_id' => $term_id
 				) );
 			}
@@ -427,6 +428,9 @@ class MP_Multisite {
 
 		$sql = $wpdb->prepare( "DELETE p.*, r.* FROM {$wpdb->base_prefix}mp_products p LEFT JOIN {$wpdb->base_prefix}mp_term_relationships r ON p.id = r.post_id WHERE p.site_id = {$wpdb->siteid} AND p.blog_id = {$blog_id} AND p.post_id = %d", $product_id );
 		$wpdb->query( $sql );
+
+		$sql_r = $wpdb->prepare( "DELETE FROM {$wpdb->base_prefix}mp_term_relationships WHERE post_id = %d and blog_id = %d", $product_id, $blog_id );		
+		$wpdb->query( $sql_r );
 	}
 
 	public function count() {
@@ -791,7 +795,9 @@ class MP_Multisite {
 		if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_relations ) ) == $table_relations ) {
 			$table_3 = "CREATE TABLE IF NOT EXISTS `{$wpdb->base_prefix}mp_term_relationships` (
 								`post_id` bigint(20) unsigned NOT NULL,
+								`blog_id` bigint(20) unsigned NOT NULL,
 								`term_id` bigint(20) unsigned NOT NULL,
+								`public`  boolean NOT NULL DEFAULT 1,
 								PRIMARY KEY ( `post_id` , `term_id` ),
 								KEY (`term_id`)
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
