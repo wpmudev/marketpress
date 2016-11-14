@@ -180,60 +180,158 @@ function mp_possible_product_combinations( $groups, $prefix = '' ) {
 * Variation transient 3.0
 */
 
-function mp_variation_transient( $requred, $metas ) {
-	$variation_name   = $metas['mp_variable_attribute'];
-	$variation_values = explode( ' ', $metas['name'] );
-	$data             = array();
+function mp_variation_transient( $variations ) {
 
-	$variation_name   = MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $variation_name, $variation_name ); //taxonomy name made of the prefix and attribute's ID
+	foreach($variations as $key => $var) {
+		
+		$post_id 		  = $key;
+		$variation_names  = array();
+		$variation_values = array();
+		
+		foreach($var as $variation) {
+			if( ! in_array( $variation['metas']['mp_variable_attribute'], $variation_names ) ) {
+				$variation_names[] = $variation['metas']['mp_variable_attribute'];
+			}
+			
+			$var_titles = explode(" ", $variation['metas']['name']);
+			
+			foreach($var_titles as $var_title) {
+				if( ! in_array( $var_title, $variation_values[ $variation['metas']['mp_variable_attribute'] ] ) ) {
+					$variation_values[ $variation['metas']['mp_variable_attribute'] ][] = $var_title;
+				}
+			}
+		}
+		
+		$data    = array();
+		
+		$i = 0;
 
-	$args = array(
-		'orderby'      => 'name',
-		'hide_empty'   => false,
-		'fields'       => 'all',
-		'hierarchical' => true,
-	);
+		foreach ( $variation_names as $key => $variation_name ) {
 
-	/* Get terms for the given taxonomy (variation name i.e. color, size etc) */
-	$terms = get_terms( array( $variation_name ), $args );
+			update_post_meta( $post_id, 'has_variations', 1 );
+			
+			$variation_name_original = $variation_name;
+			
+			$variation_name   = MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $variation_name, $variation_name ); //taxonomy name made of the prefix and attribute's ID
 
-	global $variations_single_data;
+			$args = array(
+				'orderby'      => 'name',
+				'hide_empty'   => false,
+				'fields'       => 'all',
+				'hierarchical' => true,
+			);
 
-	if( !function_exists( 'term_object_array_filter' ) ){
-		function term_object_array_filter ( $e ) {
+			/* Get terms for the given taxonomy (variation name i.e. color, size etc) */
+			$terms = get_terms( array( $variation_name ), $args );
+
 			global $variations_single_data;
 
-			return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
+			if( !function_exists( 'term_object_array_filter' ) ){
+				function term_object_array_filter ( $e ) {
+					global $variations_single_data;
+
+					return $e->slug == sanitize_key( trim( $variations_single_data ) ); //compare slug-like variation name against the existent ones in the db
+				}
+			}
+
+			$variation_values_row = $variation_values[ $variation_name_original ];
+
+			print_r($variation_values_row);
+
+			foreach ( $variation_values_row as $variations_single_data ) {
+
+				/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
+				$term_object = array_filter( $terms, 'term_object_array_filter' );
+
+				reset( $term_object );
+
+				if( ! empty( $term_object ) ) {
+					$data[ $i ][]          = $variation_name . '=' . $term_object[ key( $term_object ) ]->term_id; //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
+					$data_original[ $i ][] = $variation_name . '=' . $variations_single_data;
+				}				
+			}
+			
+			$i ++;
 		}
-	}			
 
-	foreach ( $variation_values as $variations_single_data ) {
+		$combinations          = mp_possible_product_combinations( $data );
+		$combinations_original = mp_possible_product_combinations( $data_original );
 
-		/* Check if the term ($variations_single_data ie red, blue, green etc) for the given taxonomy already exists */
-		$term_object = array_filter( $terms, 'term_object_array_filter' );
+		$combination_num   = 1;
+		$combination_index = 0;
+		
+		$post = get_post( $post_id );
 
-		reset( $term_object );
-		$data[ $i ][]          = $variation_name . '=' . ( ( ! empty( $term_object ) ) ? $term_object[ key( $term_object ) ]->term_id : $variations_single_data ); //add taxonomy + term_id (if exists), if not leave the name of the term we'll create later
-		$data_original[ $i ][] = $variation_name . '=' . $variations_single_data;
-	}
+		foreach ( $combinations as $combination ) {
 
-	$combinations          = mp_possible_product_combinations( $data );
-	$combinations_original = mp_possible_product_combinations( $data_original );
+			$variation_id = wp_insert_post( array(
+				'post_title'   => $post->post_title,
+				'post_content' => '', //mp_get_post_value( 'content' ),
+				'post_status'  => 'publish',
+				'post_type'    => MP_Product::get_variations_post_type(),
+				'post_parent'  => $post_id,
+			) );
 
-	$combination_num   = 1;
-	$combination_index = 0;
+			/* Make a variation name from the combination */
+			$variation_title_combinations = explode( '|', $combinations_original[ $combination_index ] );
 
-	foreach ( $combinations as $combination ) {
-		/* Add post terms for the variation */
-		$variation_terms = explode( '|', $combination );
+			$variation_name_title = '';
 
-		foreach ( $variation_terms as $variation_term ) {
-			$variation_term_vals = explode( '=', $variation_term );
-			wp_set_post_terms( $requred['ID'], MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0], false ), $variation_term_vals[0], true );
+			foreach ( $variation_title_combinations as $variation_title_combination ) {
+				$variation_name_title_array = explode( '=', $variation_title_combination );
+				$variation_name_title .= $variation_name_title_array[1] . ' ';
+			}
+
+			//$sku_post_val = mp_get_post_value( 'sku' );
+			//$sku          = isset( $sku_post_val ) && ! empty( $sku_post_val ) ? $sku_post_val . '-' . $combination_num : '';
+
+			$variation_metas = apply_filters( 'mp_variations_meta', array(
+				'name'                       => $variation_name_title, //mp_get_post_value( 'post_title' ),
+				/*
+				'sku'                        => $sku,
+				
+				'per_order_limit'            => mp_get_post_value( 'per_order_limit' ),
+				'inventory_tracking'         => mp_get_post_value( 'inventory_tracking' ),
+				'inventory'                  => mp_get_post_value( 'inventory->inventory' ),
+				'inv_out_of_stock_purchase'  => mp_get_post_value( 'inventory->out_of_stock_purchase' ),
+				'file_url'                   => '', //to do
+				'external_url'               => '', //to do
+				'regular_price'              => mp_get_post_value( 'regular_price' ),
+				'sale_price_amount'          => mp_get_post_value( 'sale_price->amount' ),
+				'sale_price_start_date'      => mp_get_post_value( 'sale_price->start_date' ),
+				'sale_price_end_date'        => mp_get_post_value( 'sale_price->end_date' ),
+				'sale_price'                 => '', //array - to do
+				'weight_pounds'              => mp_get_post_value( 'weight->pounds' ),
+				'weight_ounces'              => mp_get_post_value( 'weight->ounces' ),
+				'weight'                     => '', //array - to do
+				'charge_shipping'            => mp_get_post_value( 'charge_shipping' ),
+				'charge_tax'                 => mp_get_post_value( 'charge_tax' ),
+				'has_sale'                   => mp_get_post_value( 'has_sale' ),
+				'weight_extra_shipping_cost' => mp_get_post_value( 'weight->extra_shipping_cost' ),
+				'special_tax_rate'           => mp_get_post_value( 'special_tax_rate' ),
+				*/
+			), $post_id, $variation_id );
+			
+			//$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
+			//$regular_price 	  = mp_get_post_value( 'regular_price', '' );
+			//$has_sale		  = mp_get_post_value( 'has_sale', '');
+
+			/* Add default post metas for variation */
+			foreach ( $variation_metas as $meta_key => $meta_value ) {
+				update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
+			}
+
+			/* Add post terms for the variation */
+			$variation_terms = explode( '|', $combination );
+
+			foreach ( $variation_terms as $variation_term ) {
+				$variation_term_vals = explode( '=', $variation_term );
+				wp_set_post_terms( $variation_id, MP_Products_Screen::term_id( $variation_term_vals[1], $variation_term_vals[0], false ), $variation_term_vals[0], true );
+			}
+
+			$combination_num ++;
+			$combination_index ++;
 		}
-
-		$combination_num ++;
-		$combination_index ++;
 	}
 }
 
@@ -243,7 +341,12 @@ function mp_variation_transient( $requred, $metas ) {
 
 function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	
-	//wp_delete_post($required['ID']);
+	
+	wp_delete_post($required['ID']);
+	
+	return;
+	
+	/*
 	
 	$post = get_post( $required['ID'] );
 	
@@ -251,8 +354,6 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	
 	MP_Products_Screen::maybe_create_attribute( 'product_attr_' . $metas['mp_variable_attribute'], $metas['mp_variable_attribute'] );
 
-	mp_variation_transient( $required, $metas );
-	
 	if( empty( $post ) ) {
 		// Define import ID
 		$required['import_id'] = $required['ID'];
@@ -280,6 +381,8 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	}
 	
 	return $message;
+	
+	*/
 }
 
 /**
@@ -287,7 +390,7 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 */
 
 function mp_ie_add_normal_product( $required, $metas, $cats, $tags, $thumbnail_id ) {
-	//wp_delete_post($required['ID']);
+	wp_delete_post($required['ID']);
 
 	$post = get_post( $required['ID'] );
 	

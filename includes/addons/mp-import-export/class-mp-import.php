@@ -59,6 +59,8 @@ class MP_Import {
 
 		$import_datas = "import_{$from}_{$type}_datas";
 		$this->$import_datas( $file_path, $step, $items_by_step );
+		
+		mp_variation_transient( $this->variations );
 
 		die( json_encode( array(
 			'file_path' => $file_path,
@@ -536,6 +538,13 @@ class MP_Import {
 				}
 
 				$this->messages[] = mp_ie_add_post( $required, $metas, $cats, $tags, $thumbnail_id );
+
+				if( isset( $required['post_parent'] ) && $required['post_parent'] != 0 ) {
+					$this->variations[ $required['post_parent'] ][] = array(
+						'required' 	   => $required,
+						'metas'    	   => $metas
+					);
+				}
 
 				if( ( $step * $items_by_step + 1 ) <= $row ) {
 					return;
