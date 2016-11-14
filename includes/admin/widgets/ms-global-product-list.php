@@ -8,7 +8,7 @@ if ( is_multisite() ) {
 	//Product listing widget
 	class MarketPress_Global_Product_List extends WP_Widget {
 
-		function MarketPress_Global_Product_List() {
+		function __construct() {
 			$widget_ops = array(
 				'classname'   => 'mp_widget mp_global_product_list_widget',
 				'description' => __( 'Shows a customizable global list of products from network MarketPress stores.', 'mp' )
