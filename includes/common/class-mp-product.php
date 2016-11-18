@@ -2239,7 +2239,10 @@ class MP_Product {
 		if ( has_post_thumbnail( $post_id ) ) {
 			$img_id  = get_post_thumbnail_id( $id ? $id : $post_id );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
-			$img_url = array_shift( $img_src );
+
+			if( is_array( $img_url ) ) {
+				$img_url = array_shift( $img_src );
+			}
 		}
 
 		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' , 1 ) ) {
