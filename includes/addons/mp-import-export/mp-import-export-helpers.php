@@ -243,7 +243,8 @@ function mp_variation_transient( $requred, $metas ) {
 
 function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 	
-	//wp_delete_post($required['ID']);
+	// Make sure we remove existing post to prevent multiple same products
+	wp_delete_post($required['ID']);
 	
 	$post = get_post( $required['ID'] );
 	
@@ -287,7 +288,9 @@ function mp_ie_add_variation( $required, $metas, $cats, $tags, $thumbnail_id ) {
 */
 
 function mp_ie_add_normal_product( $required, $metas, $cats, $tags, $thumbnail_id ) {
-	//wp_delete_post($required['ID']);
+	
+	// Make sure we remove existing post to prevent multiple same products
+	wp_delete_post($required['ID']);
 
 	$post = get_post( $required['ID'] );
 	
