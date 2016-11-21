@@ -148,7 +148,11 @@ class MP_Product_Attributes_Admin {
 
 	public static function get_product_attributes() {
 		global $wpdb;
+		
 		$table_name	 = $wpdb->prefix . 'mp_product_attributes';
+		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+			return false;
+		}
 		$results	 = $wpdb->get_results( 'SELECT * FROM ' . $table_name, OBJECT );
 
 		return $results;
