@@ -86,8 +86,8 @@ class MP_Pages_Admin {
 		global $wpdb;
 		
 		// Delete existing meta keys from db that have the same value
-		$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page', 'meta_value' => $value));
-		
+		//$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page', 'meta_value' => $value));
+
 		update_post_meta($post_id, '_mp_store_page', $value);
 		if ( in_array( $value, array( 'network_store_page', 'network_categories', 'network_tags' ) ) ) {
 			mp_update_network_setting("pages->$value", $post_id);
