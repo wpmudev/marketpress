@@ -2486,12 +2486,13 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
-		if ( $meta ) {
-			$return .= '<div class="mp_product_meta">';
 
-			if ( $title ) {
-				$return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-			}
+                if ( $title ) {
+                        $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+                }
+
+                if ( $meta ) {
+                        $return .= '<div class="mp_product_meta">';
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
