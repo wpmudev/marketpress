@@ -1028,7 +1028,7 @@ class MP_Coupons_Addon {
 	public function product_price( $price, $product ) {
 		$action = mp_get_request_value( 'action' );
 
-		if (
+		/*if (
 			mp_is_shop_page( 'cart' ) ||
 			mp_is_shop_page( 'checkout' ) ||
 			! empty( $_POST['is_cart_page'] ) || 
@@ -1039,7 +1039,7 @@ class MP_Coupons_Addon {
 				$action === 'mp_coupons_apply' || 
 				$action === 'mp_coupons_remove'
 			) )
-		) {
+		) {*/
 			$coupons = $this->get_applied_as_objects();
 
 			foreach ( $coupons as $coupon ) {
@@ -1054,7 +1054,7 @@ class MP_Coupons_Addon {
 					}
 				}
 			}
-		}
+		//}
 
 		return $price;
 	}

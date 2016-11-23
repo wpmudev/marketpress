@@ -1274,6 +1274,7 @@ class MP_Checkout {
 						<input type="password" name="mp_login_password" class="mp_form_input">
 					</div><!-- end mp_checkout_field -->
 					<button id="mp-button-checkout-login" type="button" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
+                                        <p><a href="' . wp_lostpassword_url( get_permalink() ) . '" title="Lost Password">Lost Password</a>
 				</div><!-- end mp_checkout_column -->
 				';
 			if ( mp_get_setting( 'force_login' ) == false && ! is_user_logged_in() ) {
