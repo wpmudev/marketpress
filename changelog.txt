@@ -4,6 +4,21 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.1.2
+----------------------------------------------------------------------
+
+- Added: Upfront Compatibility
+- Fixed: 10400 - Order total is missing
+- Fixed: Allow coupon calculation on all pages, not only MP pages
+- Fixed: Product List widget not working with mp_product post type
+- Tweaked: Meta boxes in store pages are not saving changes
+- Tweaked: Adding forgot password link in checkout page login box
+- Tweaked: Paypal Express mode always sandbox
+- Tweaked: Removed second - sign from applied coupon
+- Tweaked: Bug with Free Shipping being applied to United States destinations
+- Security: Fix XSS Vulnerability
+- Localization: Updated language file (.pot)
+
 3.1.1
 ----------------------------------------------------------------------
 
