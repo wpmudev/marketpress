@@ -2240,7 +2240,7 @@ class MP_Product {
 			$img_id  = get_post_thumbnail_id( $id ? $id : $post_id );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
 
-			if( is_array( $img_url ) ) {
+			if( is_array( $img_src ) ) {
 				$img_url = array_shift( $img_src );
 			}
 		}
