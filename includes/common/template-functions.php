@@ -2348,14 +2348,6 @@ if ( ! function_exists( 'mp_product' ) ) {
 		$form_id = 'mp_buy_form_' . $product_id;
 
 		$variation = false;
-
-		if ( $variation_id = get_query_var( 'mp_variation_id' ) ) {
-			$variation = new MP_Product( $variation_id );
-			if ( ! $variation->exists() ) {
-				$variation = false;
-			}
-		}
-
 		$pinit   = $product->pinit_button( 'single_view' );
 		$fb      = $product->facebook_like_button( 'single_view' );
 		$twitter = $product->twitter_button( 'single_view' );
@@ -2369,6 +2361,16 @@ if ( ! function_exists( 'mp_product' ) ) {
 				$has_image = true;
 			}
 		} else {
+			$variation_id = intval( get_post_meta( $product->ID, 'default_variation', true ) );
+			if( get_query_var( 'mp_variation_id' ) != '' && is_numeric( get_query_var( 'mp_variation_id' ) ) ) $variation_id = get_query_var( 'mp_variation_id' );
+
+			if( is_numeric( $variation_id ) ){
+				$variation = new MP_Product( $variation_id );
+				if ( ! $variation->exists() ) {
+					$variation = false;
+				}
+			}
+
 			foreach ( $product->get_variation_ids() as $id ) {
 				$post_thumbnail_id = get_post_thumbnail_id( $id );
 				if ( $post_thumbnail_id ) {
