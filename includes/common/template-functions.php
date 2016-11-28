@@ -2000,6 +2000,33 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 			);
 		}
 
+                if( mp_get_setting( 'inventory_remove' ) )
+                {
+                        $query['meta_query'][] = array(
+                                array(
+                                        'relation' => 'OR',
+                                        array(
+                                                'key'     => 'inventory_tracking',
+                                                'value'   => '0',
+                                                'compare' => '=',
+                                        ),
+                                        array(
+                                                'relation' => 'OR',
+                                                array(
+                                                        'key'     => 'inv_out_of_stock_purchase',
+                                                        'value'   => '1',
+                                                        'compare' => '=',
+                                                ),
+                                                array(
+                                                        'key'     => 'inventory',
+                                                        'value'   => '0',
+                                                        'compare' => '>',
+                                                )
+                                        )
+                                )
+                        );
+                }
+
 // The Query
 		//var_dump($query);
 		$custom_query = new WP_Query( $query );

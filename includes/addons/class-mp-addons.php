@@ -182,7 +182,7 @@ class MP_Addons {
 		$this->_addons_enabled = mp_get_setting( 'addons', array() );
 		foreach ( $this->_addons_enabled as $addon ) {
 			if ( $addon_obj = mp_arr_get_value( $addon, $this->_addons ) ) {
-				require_once $addon_obj->path;
+				if( file_exists( $addon_obj->path ) ) require_once $addon_obj->path;
 			}
 		}
 	}
