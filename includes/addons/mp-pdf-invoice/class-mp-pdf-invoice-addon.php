@@ -171,7 +171,7 @@ class MP_PDF_Invoice_Addon {
 
 		$buttons =
 			'<section id="mp-pdf-invoice" class="mp_orders_invoice">' . MP_PDF_Invoice::show_button( $order->ID, MP_PDF_Invoice::PDF_INVOICE ) . '&nbsp;' .
-			'</section><!-- end mp-pdf-invoice->';
+			'</section><!-- end mp-pdf-invoice -->';
 
 		return $html . $buttons;
 	}
