@@ -1201,7 +1201,7 @@ class MP_Order {
 					// Flag product as out of stock - @version 2.9.5.8
 					wp_update_post( array(
 						'ID'          => $item->ID,
-						'post_status' => 'out_of_stock'
+						'post_status' => 'draft'
 					) );
 				}
 			}
