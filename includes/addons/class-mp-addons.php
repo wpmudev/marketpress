@@ -78,19 +78,23 @@ class MP_Addons {
 			$this->_addons_enabled[] = $addon;
 			$addon_obj = $this->get_addon( $addon );
 			
-			require_once $addon_obj->path;
-			
-			/**
-			 * Fires after an addon is enabled
-			 *
-			 * @since 3.0
-			 */
-			do_action( 'mp_addons/enable/' . $addon_obj->class );
+			if( file_exists( $addon_obj->path ) )
+                        {
+                                require_once $addon_obj->path;
+                                
+                                /**
+                                  * Fires after an addon is enabled
+                                  *
+                                  * @since 3.0
+                                  */
+                                do_action( 'mp_addons/enable/' . $addon_obj->class );
+
+                                array_unique( $this->_addons_enabled );
+
+                                mp_update_setting( 'addons', $this->_addons_enabled );
+                        }
 		}
 		
-		array_unique( $this->_addons_enabled );
-		
-		mp_update_setting( 'addons', $this->_addons_enabled );
 	}
 
 	/**
@@ -178,7 +182,7 @@ class MP_Addons {
 		$this->_addons_enabled = mp_get_setting( 'addons', array() );
 		foreach ( $this->_addons_enabled as $addon ) {
 			if ( $addon_obj = mp_arr_get_value( $addon, $this->_addons ) ) {
-				require_once $addon_obj->path;
+				if( file_exists( $addon_obj->path ) ) require_once $addon_obj->path;
 			}
 		}
 	}

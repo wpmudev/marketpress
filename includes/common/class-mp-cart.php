@@ -557,7 +557,7 @@ class MP_Cart {
 
 				case 'qty' :
 					if ( $this->is_editable ) {
-						if ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) {
+						if ( ( $product->is_download() && mp_get_setting( 'download_order_limit' ) == '1' ) || get_post_meta( $product->ID, 'mp_app_product', true ) == 1 || get_post_meta( $product->post_parent, 'mp_app_product', true ) ) {
 							$column_html = $product->qty;
 						} else {
 							$column_html = $this->dropdown_quantity( array(
