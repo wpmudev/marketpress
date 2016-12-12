@@ -1234,6 +1234,8 @@ class MP_Cart {
 	public function floating_cart_html() {
 
 		$disable_cart = mp_get_setting( 'disable_cart', 0 );
+		
+		$page_id = get_the_ID();
 
 		if ( mp_get_setting( 'disable_cart' ) == '1' || mp_get_setting( 'disable_minicart' ) == '1' ) {
 			return;
@@ -1249,7 +1251,7 @@ class MP_Cart {
 		if ( $cart_needed && ! mp_doing_ajax() ) {
 			//show floating cart
 		} else {
-			if ( ( ! mp_is_shop_page() || mp_is_shop_page( 'cart' ) || mp_is_shop_page( 'checkout' ) ) && ! mp_doing_ajax() ) {
+			if ( ( ! mp_is_shop_page( $page_id ) || mp_is_shop_page( 'cart' ) || mp_is_shop_page( 'checkout' ) ) && ! mp_doing_ajax() ) {
 				return;
 			}
 		}
