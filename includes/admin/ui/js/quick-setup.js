@@ -59,13 +59,8 @@ jQuery(document).ready(function ($) {
                 country: data
             },
             success: function (data) {
-                if (data.length > 0) {
-                    if ($('select[name="currency"] option[value=' + data + ']').size()) {
-                        $('select[name="currency"]').val(data).change();
-                    } else {
-                        $('select[name="currency"]').val('USD').change();
-                    }
-                }
+				// Reload page to update shipping methods
+				location.reload();
             }
         })
         //we also need to reload the shipping tab
