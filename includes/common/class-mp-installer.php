@@ -698,6 +698,9 @@ class MP_Installer {
 
 		// Add "post_status" to $wpdb->mp_products table
 		$this->add_post_status_column();
+		
+		// Create/update product attributes table
+		$this->create_product_attributes_table();
 
 		//If current MP version equals to old version skip importer
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
@@ -751,8 +754,6 @@ class MP_Installer {
 		$this->add_admin_store_caps();
 		// Add "term_order" to $wpdb->terms table
 		$this->add_term_order_column();
-		// Create/update product attributes table
-		$this->create_product_attributes_table();
 
 		// Only run these on first install
 		if ( empty( $old_settings ) ) {
@@ -785,7 +786,7 @@ class MP_Installer {
 		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name ) {
 			return;
 		}
-		$sql = "CREATE TABLE $table_name (
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
@@ -796,7 +797,7 @@ class MP_Installer {
 
 		// Create mp_product_attributes_terms table
 		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
-		$sql        = "CREATE TABLE $table_name (
+		$sql        = "CREATE TABLE IF NOT EXISTS $table_name (
 			attribute_id int(11) unsigned NOT NULL,
 			term_id bigint(20) unsigned NOT NULL,
 			PRIMARY KEY  (attribute_id, term_id)

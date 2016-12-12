@@ -981,6 +981,7 @@ class Marketpress {
 $GLOBALS['mp'] = Marketpress::get_instance();
 
 register_activation_hook( __FILE__, 'mp_plugin_activate' );
+register_uninstall_hook( __FILE__, 'mp_plugin_uninstall' );
 add_action( 'admin_init', 'mp_plugin_redirect', 1 );
 
 function mp_plugin_activate() {
@@ -991,6 +992,18 @@ function mp_plugin_activate() {
 	if ( get_option( 'mp_needs_quick_setup' ) == false ) {
 		add_option( 'mp_needs_quick_setup', 1 );
 	}
+}
+
+function mp_plugin_uninstall() {
+	global $wpdb;
+	
+	$table_attr = $wpdb->prefix . 'mp_product_attributes';
+	$sql_attr = "DROP TABLE IF EXISTS $table_attr;";
+    $wpdb->query( $sql_attr );
+
+	$table_attr_terms = $wpdb->prefix . 'mp_product_attributes_terms';
+	$sql_attr_terms = "DROP TABLE IF EXISTS $table_attr_terms;";
+    $wpdb->query( $sql_attr_terms );
 }
 
 function mp_plugin_redirect() {
