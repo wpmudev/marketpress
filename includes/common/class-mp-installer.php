@@ -910,9 +910,12 @@ class MP_Installer {
 	public function add_admin_store_caps() {
 		$role       = get_role( 'administrator' );
 		$store_caps = mp_get_store_caps();
-
-		foreach ( $store_caps as $cap ) {
-			$role->add_cap( $cap );
+		
+		// We've had few error reports that $role is not an object, lets check
+		if( is_object( $role ) ) {
+			foreach ( $store_caps as $cap ) {
+				$role->add_cap( $cap );
+			}
 		}
 	}
 
