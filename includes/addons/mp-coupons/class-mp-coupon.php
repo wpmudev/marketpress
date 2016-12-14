@@ -423,18 +423,12 @@ class MP_Coupon {
 					}
 				}
 
-				if ( ! $this->get_meta( 'can_be_combined' ) ) {
-					$applied = mp_coupons_addon()->get_applied();
-
-					if ( count( $applied ) == 1 ) {
-						$is_valid = false;
-					}
-				} else {
-					//! TODO: coupon can be applied with other coupons
+				if( ! $this->is_valid_for_combination() ) {
+					$is_valid = false;
 				}
 			}
 		}
-
+		
 		/**
 		 * Filter is coupon is valid
 		 *
@@ -446,6 +440,56 @@ class MP_Coupon {
 
 		return apply_filters( 'mp_coupon/is_valid', $is_valid, $this );
 	}
+	
+	/**
+	 * Check if coupon is valid for combination
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @return bool
+	 */
+	
+	public function is_valid_for_combination() {
+		$is_valid = true;
+		$applied_coupons = mp_coupons_addon()->get_applied_as_objects();
+		
+		// If we dont have any applied coupons, we can apply current one no matter what type it is
+		if( empty( $applied_coupons ) ) {
+			return true;
+		}
+		
+		// Check if coupon can be combined
+		if ( $this->get_meta( 'can_be_combined' ) ) {
+			$allowed_coupon_combos = $this->get_meta( 'allowed_coupon_combos' );
+
+			foreach ( $applied_coupons as $coupon ) {
+				$combinable = $coupon->get_meta( 'can_be_combined' );
+				
+				if( ! $combinable ) {
+					// Check if already applied coupon is in allowed_coupon_combos list
+					if( ! in_array( $coupon->ID, $allowed_coupon_combos )) {
+						$is_valid = false;
+					}
+				}
+			}
+		} else {
+			foreach ( $applied_coupons as $coupon ) {
+				$allowed_coupon_combos = $coupon->get_meta( 'allowed_coupon_combos' );
+
+				// Check if already applied coupon is in allowed_coupon_combos list
+				if( in_array( $this->ID, $allowed_coupon_combos )) {					
+					$is_valid = true;
+				} else {
+					return false;
+				}
+			}
+
+		}
+		
+		return $is_valid;	
+	}
+
 
 	/**
 	 * Display coupon meta value
