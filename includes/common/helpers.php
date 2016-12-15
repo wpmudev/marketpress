@@ -1357,6 +1357,10 @@ if ( ! function_exists( 'mp_get_store_caps' ) ) :
 
 			$pt = get_post_type_object( $pt_slug );
 			foreach ( $pt->cap as $cap ) {
+				if( $cap == "read" ) {
+					continue;
+				}
+				
 				$store_caps[ $cap ] = $cap;
 			}
 		}
