@@ -938,8 +938,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 									'shipping_tax_total' => $vcart->shipping_tax_total( false ),
 									'tax_total'          => $vcart->tax_total( false ),
 								) );
-								$tracking_url = $order->tracking_url( false );
+								$tracking_url = $order->tracking_url( false, $bid );
 							}
+
 							$index ++;
 						}
 						if ( ! empty( $order_id ) ) {
@@ -972,6 +973,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 						}
 					}
 					unset( $_SESSION['paypal_request'] );
+
 					wp_redirect( $tracking_url );
 					exit;
 				} else {
