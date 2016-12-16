@@ -589,13 +589,13 @@ class MP_Public {
 			$buffer    = '';
 			$filesize  = filesize( $tmp );
 			$length    = $filesize;
-			list( $fileext, $filetype ) = wp_check_filetype( $tmp );
+			@list( $fileext, $filetype ) = wp_check_filetype( $tmp );
 
 			if ( empty( $filetype ) ) {
 				$filetype = 'application/octet-stream';
 			}
 
-			ob_clean(); //kills any buffers set by other plugins
+			if ( ob_get_contents() ) ob_end_clean(); //kills any buffers set by other plugins
 
 			if ( isset( $_SERVER['HTTP_RANGE'] ) ) {
 //partial download headers
