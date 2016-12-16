@@ -179,8 +179,11 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 				if( ( ( $country = $order->get_meta( "mp_{$type}_info->country", '' ) ) && is_array( $all_countries ) && isset( $all_countries[$country] ) ) ){
 					$country = $all_countries[$country];
 				}				
-
-				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $state . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $country . "<br /><br />\n";
+				
+				if( ! empty( $order->get_meta( "mp_{$type}_info->city" ) ) && ! empty( $state ) &&  ! empty( $order->get_meta( "mp_{$type}_info->zip" ) ) && ! empty( $country ) ) {
+					$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $state . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $country . "<br /><br />\n";
+				}
+				
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
 
 				if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
