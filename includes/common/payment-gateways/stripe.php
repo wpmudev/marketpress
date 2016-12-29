@@ -350,6 +350,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			));
 			// create the charge on Stripe's servers - this will charge the user's card
 			$charge = Stripe_Charge::create( array(
+				'customer'		 => $customer->id,
 				'amount'		 => round( $total * 100 ), // amount in cents
 				'currency'		 => strtolower( $this->currency ),
 				'description'	 => sprintf( __( '%s Store Purchase - Order ID - %s, Email - %s', 'mp' ), get_bloginfo( 'name' ), $order_id, mp_get_user_address_part( 'email', 'billing' ) ),
