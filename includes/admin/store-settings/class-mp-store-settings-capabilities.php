@@ -38,6 +38,8 @@ class MP_Store_Settings_Capabilities {
 		$roles = get_editable_roles();
 		$caps = mp_get_store_caps();
 		
+		if( empty( $roles ) ) return;
+		
 		foreach ( $roles as $role_name => $role ) {
 			if ( $role_name == 'administrator' ) {
 				continue;
