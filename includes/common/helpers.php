@@ -162,7 +162,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		foreach ( $types as $type => $label ) {
 			$states = mp_get_states( $order->get_meta( "mp_{$type}_info->country" ) );
 
-			if( $type != "shipping" || !mp()->download_only_cart( mp_cart() ) ) {
+			if( $type != "shipping" || !$cart->is_download_only() ) {
 				$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
 				$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->company_name" ) . "<br />\n";
