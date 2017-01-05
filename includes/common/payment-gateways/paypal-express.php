@@ -32,7 +32,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	var $payment_action = 'Sale';
 
 	//paypal vars
-	var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $cancelURL, $API_Endpoint, $paypalURL, $version, $currencyCode, $locale;
+	var $API_Username, $API_Password, $API_Signature, $SandboxFlag, $cancelURL, $API_Endpoint, $paypalURL, $version, $currencyCode, $locale, $mode;
 
 	//use confirmation step
 	var $use_confirmation_step = true;
@@ -382,9 +382,19 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			}
 
 			if ( $cart->is_global ) {
+				
 				//check if the current merchant don't have email setting, we bypass
-				$merchant_email = mp_get_setting( 'gateways->paypal_express->merchant_email' );
-				$merchant_email = trim( $merchant_email );
+				$gateways = mp_get_network_setting( 'gateways' );
+				$merchant_email_network = trim( $gateways['paypal_express']['merchant_email'] );
+				
+				$gateways = mp_get_setting( 'gateways' );
+                $merchant_email = trim( $gateways['paypal_express']['merchant_email'] );
+				
+				// Subsite merchant_email empty use network setting
+				if( empty( $merchant_email ) ) {
+					$merchant_email = $merchant_email_network;
+				}
+
 				if ( empty( $merchant_email ) || strlen( $merchant_email ) == 0 ) {
 					continue;
 				}
@@ -488,8 +498,6 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		$this->method_img_url        = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&buttontype=ecmark&locale=' . get_locale();
 		$this->method_button_img_url = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image&locale=' . get_locale();
 
-		$mode = '';
-
 		if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_get_network_setting( 'global_cart' ) == 1 ) {
 			//global cart init
 			$this->API_Username  = $this->get_network_setting( 'api_credentials->username' );
@@ -499,7 +507,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$this->locale        = $this->get_network_setting( 'locale' );
 
 			//determine mode
-			$mode = $this->get_network_setting( 'mode' );
+			$this->mode = $this->get_network_setting( 'mode' );
 		} else {
 			$this->API_Username  = $this->get_setting( 'api_credentials->username' );
 			$this->API_Password  = $this->get_setting( 'api_credentials->password' );
@@ -508,20 +516,42 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			$this->locale        = $this->get_setting( 'locale' );
 
 			//determine mode
-			$mode = $this->get_setting( 'mode' );
+			$this->mode = $this->get_setting( 'mode' );
 		}
 		$this->cancelURL = add_query_arg( 'cancel', '1', mp_store_page_url( 'checkout', false ) );
 		$this->version   = '69.0'; //api version
 
 		// Set api urls
 
-		if ( $mode == 'sandbox' ) {
+		if ( $this->mode == 'sandbox' ) {
 			$this->API_Endpoint = "https://api-3t.sandbox.paypal.com/nvp";
 			$this->paypalURL    = "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=";
 		} else {
 			$this->API_Endpoint = "https://api-3t.paypal.com/nvp";
 			$this->paypalURL    = "https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=";
 		}
+		
+		add_filter( 'wpmudev_field/get_value/gateways[paypal_express][mode]', array(
+			&$this,
+			'force_check_mode'
+		), 10, 4 );
+	}
+	
+	/**
+	 * Force check the force_check_mode
+	 *
+	 * @since 3.0
+	 * @access public
+	 * @filter wpmudev_field/get_value/gateways[paypal_express][mode]
+	 */
+	public function force_check_mode( $value, $post_id, $raw, $field ) {
+		if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_get_network_setting( 'global_cart' ) == 1 ) {
+			$mode = $this->get_network_setting( 'mode' );
+		} else {
+			$mode = $this->get_setting( 'mode' );
+		}
+		
+		return $mode;
 	}
 
 	/**
@@ -536,6 +566,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	 */
 	function update( $settings ) {
 		if ( ( $api_user = $this->get_setting( 'api_user' ) ) && ( $api_pass = $this->get_setting( 'api_pass' ) ) && ( $api_sig = $this->get_setting( 'api_sig' ) ) ) {
+			// Update api mode
+			mp_push_to_array( $settings, 'gateways->paypal_express->mode', $api_mode );
+			
 			// Update api user
 			mp_push_to_array( $settings, 'gateways->paypal_express->api_credentials->username', $api_user );
 
@@ -579,6 +612,18 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 				),
 			),
 		) );
+		
+		if ( is_plugin_active_for_network( mp_get_plugin_slug() ) && mp_get_network_setting( 'global_cart' ) ) {
+			$metabox->add_field( 'text', array(
+				'name'       => $this->get_field_name( 'merchant_email' ),
+				'label'      => array( 'text' => __( 'Merchant Email', 'mp' ) ),
+				'validation' => array(
+					'required' => true,
+					'email'    => true,
+				),
+			) );
+		}
+		
 		$this->common_metabox_fields( $metabox );
 	}
 
@@ -629,6 +674,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 			'name'     => $this->get_field_name( 'locale' ),
 			'label'    => array( 'text' => __( 'Locale', 'mp' ) ),
 			'multiple' => false,
+			'site_option_name' => 'mp_network_settings',
 			'options'  => $this->locales,
 			'width'    => 'element',
 		) );
@@ -892,8 +938,9 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 									'shipping_tax_total' => $vcart->shipping_tax_total( false ),
 									'tax_total'          => $vcart->tax_total( false ),
 								) );
-								$tracking_url = $order->tracking_url( false );
+								$tracking_url = $order->tracking_url( false, $bid );
 							}
+
 							$index ++;
 						}
 						if ( ! empty( $order_id ) ) {
@@ -926,6 +973,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 						}
 					}
 					unset( $_SESSION['paypal_request'] );
+
 					wp_redirect( $tracking_url );
 					exit;
 				} else {

@@ -27,7 +27,7 @@ class MP_Product {
 	 * @access protected
 	 * @var array
 	 */
-	protected $_default_variation = null;	
+	protected $_default_variation = null;
 
 	/**
 	 * Refers to the product's variations.
@@ -443,7 +443,7 @@ class MP_Product {
 				$json[ $tax_slug ] .= self::attribute_option( $term->term_id, $term->name, $tax_slug, $required, $checked );
 				$index ++;
 			}
-		}	
+		}
 
 		//Attempt to get a unique product variation depending on user selection
 		foreach ($attributes_including_others as $attr_name => $attr_value) {
@@ -461,7 +461,7 @@ class MP_Product {
 			$json['product_input']	= $selected_variation->attribute_input_fields( true, $qty );
 			$json['in_stock']		= $selected_variation->in_stock( $qty );
 			$json['out_of_stock'] 	= false;
-		
+
 			$json['image'] = $selected_variation->image_url( false, null, 'single' );
 			$json['image_full'] = $selected_variation->image_url( false, 'full', 'single' );
 
@@ -469,7 +469,7 @@ class MP_Product {
 
 			$json['excerpt'] = mp_get_the_excerpt( $selected_variation->ID, 18 );
 
-			$json['price'] = $variation->display_price( false );
+			$json['price'] = $selected_variation->display_price( false );
 		}
 
 		wp_send_json_success( $json );
@@ -501,7 +501,7 @@ class MP_Product {
 
 		if ( !is_null( $blog_id ) && is_multisite() ) {
 			switch_to_blog( $current_blog_id );
-		}		
+		}
 	}
 
 	/**
@@ -676,12 +676,12 @@ class MP_Product {
 
 		$input_id = 'mp_product_options_att_quantity';
 
-	
+
 		$html .= '
 				<div class="mp_product_options_att"' . ( ( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"' ) . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
-						
+
 						'. $this->attribute_input_fields( false, false) .'
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
@@ -723,7 +723,7 @@ class MP_Product {
 
 		} else {
 
-			$max_max = $this->max_product_quantity( $this->ID, true );
+			$max_max = $this->max_product_quantity( $this->ID, false );
 			extract($this->max_product_quantity( $this->ID, false, true ), EXTR_PREFIX_ALL, "max");
 
 			$max = 'max="' . esc_attr( $max_qty ) . '" ';
@@ -773,7 +773,7 @@ class MP_Product {
 				if( !$is_variation ){
 					$disabled	  = 'disabled';
 				}
-			} 
+			}
 
 			if( (! mp_doing_ajax() && ! $product->in_stock( 1, true ) ) || $max_qty == 0 ){
 				$error = '<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"><span id="mp_product_options_att_quantity-error" class="mp_form_input_error">' . $max_msg . $max_msg_2 . '</span></label>';
@@ -800,7 +800,7 @@ class MP_Product {
 		}
 
 		return new MP_Product( $this->_post->post_parent );
-	}	
+	}
 
 	/**
 	 * Get a specific variation by it's index
@@ -830,17 +830,17 @@ class MP_Product {
 
 		if ( ! is_null( $this->_default_variation ) ) {
 			return $this->_default_variation;
-		}		
+		}
 
 		return $this->set_default_variation();
-	}	
+	}
 
 	/**
 	 * Set product default variation
 	 *
 	 * @since 3.0
 	 * @access public
-	 * @return false/MP_Product An MP_Product objects. 
+	 * @return false/MP_Product An MP_Product objects.
 	 */
 	public function set_default_variation() {
 		if( ! $this->has_variations() ){
@@ -849,7 +849,7 @@ class MP_Product {
 
 		if ( ! is_null( $this->_default_variation ) ) {
 			return $this->_default_variation;
-		}		
+		}
 
 		$default_variation = intval( $this->get_meta( 'default_variation', false ) );
 
@@ -860,14 +860,14 @@ class MP_Product {
 				if( $index !== 0){
 					unset($this->_variations[ $index ]);
 					array_unshift($this->_variations, $this->_default_variation);
-					unset($this->_variation_ids[ $index ]);					
+					unset($this->_variation_ids[ $index ]);
 					array_unshift($this->_variation_ids, $default_variation);
 				}
 			}
 		}
 
 		return $this->_default_variation;
-	}		
+	}
 
 	/**
 	 * Get product variation ids
@@ -910,7 +910,7 @@ class MP_Product {
 
 		$identifier = $this->ID;
 		$transient_key = 'mp-get-variations-' . $identifier;
-	
+
 		//Check if variations data exist on transient, if not do the query and save result on transient
 		if ( false === ( $this->_variations = get_transient( $transient_key ) ) ) {
 			$args = array(
@@ -964,7 +964,7 @@ class MP_Product {
 	public function get_variations_by_attributes( $attributes, $index = null ) {
 		$identifier = $this->ID;
 		$cache_key = 'mp-get-variations-by-attributes-' . $identifier;
-		
+
 		// Add attributes names to cache key to make it unqiue
 		foreach ( $attributes as $attribute_key	 => $attribute_value ) {
 			$cache_key .= '-' . $attribute_key;
@@ -1179,7 +1179,7 @@ class MP_Product {
 		if( !isset( $this->_post ) ){
 			return false;
 		}
-		
+
 		$content = $this->_post->post_content;
 
 		if ( empty( $content ) && $this->is_variation() ) {
@@ -1188,7 +1188,7 @@ class MP_Product {
 		}
 
 		return ! empty( $content );
-	}	
+	}
 
 	/**
 	 * Get the product's excerpt
@@ -2239,7 +2239,10 @@ class MP_Product {
 		if ( has_post_thumbnail( $post_id ) ) {
 			$img_id  = get_post_thumbnail_id( $id ? $id : $post_id );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
-			$img_url = array_shift( $img_src );
+
+			if( is_array( $img_src ) ) {
+				$img_url = array_shift( $img_src );
+			}
 		}
 
 		if ( empty( $img_url ) && mp_get_setting( 'show_thumbnail_placeholder' , 1 ) ) {
@@ -2286,12 +2289,12 @@ class MP_Product {
 		$has_stock = false;
 
 		if( $include_cart ) {
-			$cart_quantity = $qty;
+			$cart_quantity = 0;
 			$cart_items	= mp_cart()->get_all_items();
 			if ( isset( $cart_items[ get_current_blog_id() ][ $this->ID ] ) ) {
 				$cart_quantity = (int) $cart_items[ get_current_blog_id() ][ $this->ID ];
 			}
-			$qty = $cart_quantity + 1;
+			$qty = $cart_quantity + $qty;
 		}
 
 		if ( $this->is_variation() ) {

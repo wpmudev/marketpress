@@ -41,6 +41,8 @@ $this->default_settings = array(
 	),
 	'currency'					 => 'USD',
 	'details_collection'		 => 'contact',
+	'show_product_image'		 => 1,
+	'show_product_qty'			 => 1,
 	'curr_symbol_position'		 => 1,
 	'curr_decimal'				 => 1,
 	'disable_cart'				 => 0,

@@ -118,21 +118,21 @@ class MP_PDF_Invoice_Addon {
 		$files    = array();
 		switch ( $contex ) {
 			case 'new_order_client':
-				if ( isset( $attach['customer_new_order'] ) ) {
+				if ( isset( $attach['customer_new_order'] ) && $attach['customer_new_order'] ) {
 					$invoice = $gen->generate_pdf_file( $order->get_id(), MP_PDF_Invoice::PDF_INVOICE );
 					$packing = $gen->generate_pdf_file( $order->get_id(), MP_PDF_Invoice::PDF_SLIP );
 					$files   = array( $invoice, $packing );
 				}
 				break;
 			case 'new_order_admin':
-				if ( isset( $attach['admin_new_order'] ) ) {
+				if ( isset( $attach['admin_new_order'] ) && $attach['admin_new_order'] ) {
 					$invoice = $gen->generate_pdf_file( $order->get_id(), MP_PDF_Invoice::PDF_INVOICE );
 					$packing = $gen->generate_pdf_file( $order->get_id(), MP_PDF_Invoice::PDF_SLIP );
 					$files   = array( $invoice, $packing );
 				}
 				break;
 			case 'order_shipped_client':
-				if ( isset( $attach['customer_shipped_order'] ) ) {
+				if ( isset( $attach['customer_shipped_order'] ) && $attach['customer_shipped_order'] ) {
 					$invoice = $gen->generate_pdf_file( $order->get_id(), MP_PDF_Invoice::PDF_INVOICE );
 					$packing = $gen->generate_pdf_file( $order->get_id(), MP_PDF_Invoice::PDF_SLIP );
 					$files   = array( $invoice, $packing );
@@ -171,7 +171,7 @@ class MP_PDF_Invoice_Addon {
 
 		$buttons =
 			'<section id="mp-pdf-invoice" class="mp_orders_invoice">' . MP_PDF_Invoice::show_button( $order->ID, MP_PDF_Invoice::PDF_INVOICE ) . '&nbsp;' .
-			'</section><!-- end mp-pdf-invoice->';
+			'</section><!-- end mp-pdf-invoice -->';
 
 		return $html . $buttons;
 	}

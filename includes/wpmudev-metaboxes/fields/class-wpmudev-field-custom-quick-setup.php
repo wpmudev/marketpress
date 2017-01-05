@@ -50,7 +50,7 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 					</div><!-- end mp_callout -->
 
 					<div class="mp_skip_step">
-						<a class="mp_link mp_link-skip-step" href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => '2' ), 'admin.php' ) ); ?>"><?php _e( 'Skip this step, I\'ll do this manually', 'mp' ); ?></a>
+						<a class="mp_link mp_link-skip-step" href="<?php echo admin_url( add_query_arg( array( 'page' => 'store-setup-wizard', 'quick_setup_step' => 'skip' ), 'admin.php' ) ); ?>"><?php _e( 'Skip this step, I\'ll do this manually', 'mp' ); ?></a>
 					</div><!-- end mp_skip_step -->
 				<?php } else {
 					?>
@@ -170,7 +170,13 @@ class WPMUDEV_Field_Quick_Setup extends WPMUDEV_Field {
 			</div><!-- end mp_quick_setup_content_step-2 -->
 			<?php
 		} else {//Final Step
-			update_option( 'mp_needs_quick_setup', 0 );
+
+			// If Skip
+			if( $quick_setup_step == 'skip' ) {
+				update_option( 'mp_needs_quick_setup', 'skip' );
+			} else {
+				update_option( 'mp_needs_quick_setup', 0 );
+			}
 			?>
 			<div class="mp_quick_setup_step mp_quick_setup_step-3">
 				<div class="mp_content">

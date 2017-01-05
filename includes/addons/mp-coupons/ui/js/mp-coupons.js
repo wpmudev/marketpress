@@ -32,10 +32,10 @@
             }
         } )
             .done( function( resp ) {
-                if(resp.status==true) {
-                    $.each(resp.data.products, function (key, val) {
-                        var $item = $('#mp-cart-item-' + key);
-                        $item.replaceWith(val);
+                if( resp.success === true ) {
+                    $.each(resp.data.products, function ( key, val ) {
+                        var $item = $( '#mp-cart-item-' + key );
+                        $item.replaceWith( val );
                     });
                 }
                 marketpress.loadingOverlay( 'hide' );

@@ -668,7 +668,14 @@ class MP_Shipping_USPS extends MP_Shipping_API_Calculated {
 			}
 
 			$nodes = $xpath->query( '//postage[@classid="' . $this->services[ $service ]->code . '"]/rate' );
-			$rate  = floatval( $nodes->item( 0 )->textContent ) * $box_count;
+			
+			if( is_object( $nodes->item( 0 ) ) ) {
+				$nodeRate = $nodes->item( 0 )->textContent;
+			} else {
+				$nodeRate = 0;
+			}
+			
+			$rate  = floatval( $nodeRate * $box_count );
 
 			if ( $this->services[ $service ]->code == '0' ) {
 				/* First class mail returns 4 sub types (Stamped Letter, Parcel,

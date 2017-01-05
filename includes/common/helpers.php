@@ -1,4 +1,5 @@
 <?php
+if( !defined('MP_EMAIL_USE_BILLIG_NAME')) define('MP_EMAIL_USE_BILLIG_NAME', false);
 
 if ( ! function_exists( 'mp' ) ) :
 
@@ -161,7 +162,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		foreach ( $types as $type => $label ) {
 			$states = mp_get_states( $order->get_meta( "mp_{$type}_info->country" ) );
 
-			if( $type != "shipping" || !mp()->download_only_cart( mp_cart() ) ) {
+			if( $type != "shipping" || !$cart->is_download_only() ) {
 				$shipping_billing_info .= '<td><strong>' . $label . '</strong><br /><br />' . "\n";
 				$shipping_billing_info .= $order->get_name( $type ) . "<br />\n";
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->company_name" ) . "<br />\n";
@@ -178,8 +179,11 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 				if( ( ( $country = $order->get_meta( "mp_{$type}_info->country", '' ) ) && is_array( $all_countries ) && isset( $all_countries[$country] ) ) ){
 					$country = $all_countries[$country];
 				}				
-
-				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $state . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $country . "<br /><br />\n";
+				
+				if( ! empty( $order->get_meta( "mp_{$type}_info->city" ) ) && ! empty( $state ) &&  ! empty( $order->get_meta( "mp_{$type}_info->zip" ) ) && ! empty( $country ) ) {
+					$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->city" ) . ', ' . $state . ' ' . $order->get_meta( "mp_{$type}_info->zip" ) . ' ' . $country . "<br /><br />\n";
+				}
+				
 				$shipping_billing_info .= $order->get_meta( "mp_{$type}_info->email" ) . "<br />\n";
 
 				if ( $order->get_meta( "mp_{$type}_info->phone" ) ) {
@@ -255,7 +259,7 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		// Tracking URL
 		$tracking_url = $order->tracking_url( false );
 
-		$customer_name = trim( $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' ) );
+		$customer_name = MP_EMAIL_USE_BILLIG_NAME ? $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) : $order->get_meta( 'mp_shipping_info->first_name' ) . ' ' . $order->get_meta( 'mp_shipping_info->last_name' );
 
 		// If we don't have shipping name (for example on digital download only orders), lets use the name on the billing info
 		if( empty( $customer_name ) ) $customer_name = trim( $order->get_meta( 'mp_billing_info->first_name' ) . ' ' . $order->get_meta( 'mp_billing_info->last_name' ) );
@@ -1356,6 +1360,10 @@ if ( ! function_exists( 'mp_get_store_caps' ) ) :
 
 			$pt = get_post_type_object( $pt_slug );
 			foreach ( $pt->cap as $cap ) {
+				if( $cap == "read" ) {
+					continue;
+				}
+				
 				$store_caps[ $cap ] = $cap;
 			}
 		}
@@ -1395,30 +1403,14 @@ if ( ! function_exists( 'mp_resize_image' ) ) {
 		$image = wp_get_image_editor( $img_path );
 
 		if ( ! is_wp_error( $image ) ) {
-			$size_data = array();
 			if ( is_array( $size ) ) {
 				$size_data = $size;
 			} else {
-				switch ( $size ) {
-					case 'thumbnail':
-						$size_data = array(
-							150,
-							150
-						);
-						break;
-					case 'medium':
-						$size_data = array(
-							300,
-							300
-						);
-						break;
-					case 'large':
-						$size_data = array(
-							1024,
-							1024
-						);
-						break;
-				}
+				// Get the image sizes from options
+				$size_data = array(
+					get_option( $size . '_size_w' ),
+					get_option( $size . '_size_h' ),
+				);
 			}
 			//build the path name, and try to check if
 			$filename_data = pathinfo( $image_url );

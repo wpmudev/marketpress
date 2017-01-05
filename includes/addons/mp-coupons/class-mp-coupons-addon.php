@@ -312,14 +312,14 @@ class MP_Coupons_Addon {
 		$html .= '
 			<div class="mp_cart_resume_item mp_cart_resume_item-coupons">
 				<span class="mp_cart_resume_item_label">' . __( 'Coupon Discounts', 'mp' ) . '</span>
-				<span class="mp_cart_resume_item_amount mp_cart_resume_item_amount-total">-' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
+				<span class="mp_cart_resume_item_amount mp_cart_resume_item_amount-total">' . mp_format_currency( '', $this->get_total_discount_amt() ) . '</span>
 				<ul class="mp_cart_resume_coupons_list">';
 
 		foreach ( $coupons as $coupon ) {
 			$html .= '
 					<li class="mp_cart_coupon">
 						<span class="mp_cart_resume_item_label">' . $coupon->post_title . ( ( $cart->is_editable ) ? ' <a class="mp_cart_coupon_remove_item" href="javascript:mp_coupons.remove(' . $coupon->ID . ', ' . $cart->get_blog_id() . ');">(' . __( 'Remove', 'mp' ) . ')</a>' : '' ) . '</span>
-						<span class="mp_cart_resume_item_amount">-' . $coupon->discount_amt( false ) . '</span>
+						<span class="mp_cart_resume_item_amount">' . $coupon->discount_amt( false ) . '</span>
 					</li><!-- end mp_cart_coupon -->';
 		}
 
@@ -1028,7 +1028,7 @@ class MP_Coupons_Addon {
 	public function product_price( $price, $product ) {
 		$action = mp_get_request_value( 'action' );
 
-		if (
+		/*if (
 			mp_is_shop_page( 'cart' ) ||
 			mp_is_shop_page( 'checkout' ) ||
 			! empty( $_POST['is_cart_page'] ) || 
@@ -1039,22 +1039,42 @@ class MP_Coupons_Addon {
 				$action === 'mp_coupons_apply' || 
 				$action === 'mp_coupons_remove'
 			) )
-		) {
+		) {*/
 			$coupons = $this->get_applied_as_objects();
 
 			foreach ( $coupons as $coupon ) {
 				$products = $coupon->get_products( true );
 				if ( in_array( $product->ID, $products ) ) {
-					$price['before_coupon'] = $price['lowest'];
+					
+					// Do not change lowest price after each coupon (this change the product total)
+					if( ! isset( $price['before_coupon'] ) || empty( $price['before_coupon'] ) ) {
+						$price['before_coupon'] = $price['lowest'];
+					}
+					
+					// Get price after coupon
+					$coupon_discount = $coupon->get_price( $price['before_coupon'] );
+					$coupon_discount = $price['before_coupon'] - $coupon_discount;
+					
+					// Get amount of the coupon
+					$lowest = $price['before_coupon'] - $coupon_discount;
+					
+					// Check if we have another coupon
+					if( isset( $price['after_coupon'] ) && ! empty( $price['after_coupon'] ) ) {
+						// If we already have another coupon applied we just remove current coupon from the price instead of recalculating price
+						$price['after_coupon'] = $price['after_coupon'] - $coupon_discount;
+					} else {
+						// No coupon applied 
+						$price['after_coupon'] = $lowest;
+					}
 
 					if ( $coupon->get_meta( 'discount_type' ) == 'item' ) {
-						$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $coupon->get_price( $price['lowest'] );
+						$price['lowest'] = $price['coupon'] = $price['sale']['amount'] = $price['after_coupon'];
 					} else {
 						$price['coupon'] = $coupon->get_price( $price['lowest'] );
 					}
 				}
 			}
-		}
+		//}
 
 		return $price;
 	}

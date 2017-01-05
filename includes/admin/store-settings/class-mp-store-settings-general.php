@@ -72,7 +72,7 @@ class MP_Store_Settings_General {
 	public function init_metaboxes() {
 		$this->init_location_settings();
 		$this->init_tax_settings();
-		$this->init_currency_settings();
+		if( ! is_multisite() || ! mp_cart()->is_global ) $this->init_currency_settings();
 		$this->init_digital_settings();
 		$this->init_download_settings();
 		$this->init_misc_settings();

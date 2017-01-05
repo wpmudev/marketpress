@@ -66,6 +66,7 @@ class MP_Products_Screen {
 		add_action( 'save_post', array( &$this, 'save_post_quantity_fix' ), 10, 2 );
 		add_action( 'save_post', array( &$this, 'force_flush_rewrites' ), 10, 2 );
 		add_action( 'updated_postmeta', array( &$this, 'maybe_purge_variations_transient' ), 10, 2 );	
+		add_action( 'delete_post', array( $this, 'delete_variations' ), 10 );
 // Product screen scripts
 		add_action( 'in_admin_footer', array( &$this, 'toggle_product_attributes_js' ) );
 // Product attributes save/get value
@@ -213,8 +214,8 @@ class MP_Products_Screen {
 		}
 
 		$quantity = mp_get_post_value( 'inv->inventory', '' );
-		if( !empty( $quantity ) ){
-			update_post_meta( $post_id, 'inventory', $quantity );
+		if( is_numeric( $quantity ) ){
+			update_post_meta( $post_id, 'inventory', (int)$quantity );
 		}
 
 		//Check if sales count is empty string and set to 0
@@ -323,7 +324,28 @@ class MP_Products_Screen {
 			$post_id = $parent->ID;
 		}
 
-		delete_transient( 'mp_get_variations_'.$post_id );
+		delete_transient( 'mp-get-variations-'.$post_id );
+	}
+	
+	/**
+	 * Delete variations when deleteing a product
+	 *
+	 * @since 3.1.3
+	 * @access public
+	 * @action delete_post
+	 */
+	public function delete_variations( $post_id ){
+		$args = array(
+			'post_parent' => $post_id,
+	        	'post_type' => MP_Product::get_variations_post_type() 
+		);
+		$variations = get_posts( $args );
+
+	    	if( empty( $variations ) ) return;
+
+		foreach( $variations as $variation ){
+			wp_delete_post( $variation->ID, true ); // Skip trash and remove directly
+		}
 	}
 
 	/**

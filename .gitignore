@@ -2,3 +2,4 @@
 .jshintrc
 node_modules
 package-plugin
+.idea

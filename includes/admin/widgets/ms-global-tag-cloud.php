@@ -8,7 +8,7 @@ if ( is_multisite() ) {
 //Product tags cloud
 	class MarketPress_Global_Tag_Cloud_Widget extends WP_Widget {
 
-		function MarketPress_Global_Tag_Cloud_Widget() {
+		function __construct() {
 			$widget_ops = array( 'classname'   => 'mp_widget mp_global_tag_cloud_widget',
 			                     'description' => __( "Displays global most used product tags in cloud format from network MarketPress stores." )
 			);

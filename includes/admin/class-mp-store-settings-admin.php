@@ -118,7 +118,10 @@ class MP_Store_Settings_Admin {
 		//add_submenu_page('store-settings', __('Store Settings: Exporters', 'mp'), __('Exporters', 'mp'), $cap, 'store-settings-exporters', false);		
 		add_submenu_page( 'store-settings', __( 'Store Settings: Add Ons', 'mp' ), __( 'Add Ons', 'mp' ), $cap, 'store-settings-addons', array( MP_Store_Settings_Addons::get_instance(), 'display_settings' ) );
 
-		if ( get_option( 'mp_needs_quick_setup', 1 ) == 1 && current_user_can( 'manage_options' ) || (isset( $_GET[ 'quick_setup_step' ] )) ) {
+		$mp_needs_quick_setup = get_option( 'mp_needs_quick_setup', 1 );
+
+		// Show Quick Setup link even if admin have "Skipped" the setup
+		if ( $mp_needs_quick_setup == 'skip' || $mp_needs_quick_setup == 1 && current_user_can( 'manage_options' ) || (isset( $_GET[ 'quick_setup_step' ] )) ) {
 			add_submenu_page( 'store-settings', __( 'Quick Setup', 'mp' ), __( 'Quick Setup', 'mp' ), $cap, 'store-setup-wizard', array( &$this, 'display_settings_form' ) );
 		}
 

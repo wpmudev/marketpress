@@ -3,7 +3,7 @@
 //Product tags cloud
 class MarketPress_Shopping_Cart_Widget extends WP_Widget {
 
-	function MarketPress_Shopping_Cart_Widget() {
+	function __construct() {
 		$widget_ops = array( 'classname' => 'mp_widget mp_widget_cart', 'description' => __( 'Shows dynamic shopping cart contents along with a checkout button for your MarketPress store.', 'mp' ) );
 		parent::__construct( 'mp_cart_widget', __( 'Shopping Cart', 'mp' ), $widget_ops );
 	}
