@@ -351,7 +351,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 			// create the charge on Stripe's servers - this will charge the user's card
 			$charge = Stripe_Charge::create( array(
 				'customer'		 => $customer->id,
-				'amount'		 => round( $total * 100 ), // amount in cents
+				'amount'		 => $this->config_amount( $total ), // Check if a zero-decimal currency used
 				'currency'		 => strtolower( $this->currency ),
 				'description'	 => sprintf( __( '%s Store Purchase - Order ID - %s, Email - %s', 'mp' ), get_bloginfo( 'name' ), $order_id, mp_get_user_address_part( 'email', 'billing' ) ),
 			) );
@@ -393,6 +393,36 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 
 	function print_checkout_scripts() {
 		// Intentionally left blank
+	}
+
+	/**
+	* If zero decimal curreny selected stripe don't need to multiply by 100 to get cents.
+	* Source: https://support.stripe.com/questions/which-zero-decimal-currencies-does-stripe-support
+	*/
+	function config_amount( $total = false ){
+
+		if( ! $total ) return 0;
+		
+		$zero_decimal_currencies = array(
+			'BIF',
+			'CLP',
+			'DJF',
+			'GNF',
+			'JPY',
+			'KMF',
+			'KRW',
+			'MGA',
+			'PYG',
+			'RWF',
+			'VND',
+			'VUV',
+			'XAF',
+			'XOF',
+			'XPF'
+		);
+
+		return in_array( $this->currency, $zero_decimal_currencies ) ? $total : round( $total * 100 );
+
 	}
 
 }
