@@ -1151,6 +1151,11 @@ class MP_Order {
 			  correct price is returned */
 			$_item->get_price();
 		}
+		
+		$order_shipping = mp_get_post_value( 'shipping' );
+		if( isset( $order_shipping['special_instructions'] ) ){
+			$shipping_info['special_instructions'] = $order_shipping['special_instructions'];
+		}
 
 		// Save cart info
 		update_post_meta( $this->ID, 'mp_cart_info', $cart );

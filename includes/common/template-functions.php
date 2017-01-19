@@ -988,7 +988,17 @@ if ( ! function_exists( 'mp_format_currency' ) ) :
 			$currency = ( is_multisite() && mp_cart()->is_global ) ? mp_get_network_setting( 'global_currency', 'USD' ) : mp_get_setting( 'currency', 'USD' );
 		}
 		
-		$curr_symbol_position = ( is_multisite() && mp_cart()->is_global ) ? mp_get_network_setting( 'global_curr_symbol_position' ) : mp_get_setting( 'curr_symbol_position' );
+		$curr_symbol_position = mp_get_setting( 'curr_symbol_position' );
+
+		// If multisite use global currency symbol
+		if( is_multisite() && mp_cart()->is_global ) {
+			$global_currency = mp_get_network_setting( 'global_curr_symbol_position' );
+			
+			// Check if we have global currency symbol
+			if( ! empty( $global_currency ) ) {
+				$curr_symbol_position = $global_currency;
+			}
+		}
 
 // get the currency symbol
 		if ( $symbol = mp_arr_get_value( "$currency->1", $currencies ) ) {

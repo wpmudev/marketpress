@@ -160,6 +160,11 @@ class MP_Public {
 					'product_tag'
 				) ) );
 		} else {
+	
+			if( get_post_type( $page ) == MP_Product::get_post_type() ){
+				return true;
+			}
+
 			$page = (array) $page;
 
 			return ( in_array( get_post_meta( get_the_ID(), '_mp_store_page', true ), $page ) );
