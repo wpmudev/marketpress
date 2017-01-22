@@ -576,7 +576,7 @@ class MP_Product {
 				$reason = "inventory";
 		}
 
-		if ( is_numeric( $per_order_limit ) && $per_order_limit > 0 && ( $per_order_limit < $inventory || !is_numeric($inventory) ) ) {
+		if ( is_numeric( $per_order_limit ) && $per_order_limit > 0 && ( $per_order_limit < $inventory || !is_numeric( $inventory ) || $product->is_variation() ) ) {
 			$max = $per_order_limit;
 			$reason = "order";
 		}
