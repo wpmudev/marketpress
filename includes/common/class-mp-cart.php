@@ -1129,15 +1129,15 @@ class MP_Cart {
 		$attributes = mp_array_to_attributes( compact( 'name', 'class', 'id' ) );
 		$html = '';
 
-		if( $max_dropdown > 1 ){
+		if( $max_dropdown > 1 || $max > 1 ){
 			$html = '
 				<select' . $attributes . '>';
-	
+
 			if ( $selected >= $max ) {
 				$max = $selected;
 			}
-	
-			for ( $i = 1; $i <= $max_dropdown; $i ++ ) {
+
+			for ( $i = 1; $i <= $max; $i ++ ) {
 				$html .= '
 					<option value="' . $i . '" ' . selected( $i, $selected, false ) . '>' . number_format_i18n( $i, 0 ) . '</option>';
 			}
