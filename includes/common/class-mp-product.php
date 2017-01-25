@@ -1452,7 +1452,7 @@ class MP_Product {
 	 * @param double $price
 	 */
 	public function manage_price_tax( $price ) {
-		$tax_rate = mp_get_setting( 'tax->rate', '' );
+		$tax_rate = mp_tax_rate();
 		$tax_inclusive = mp_get_setting( 'tax->tax_inclusive', 0 );
 		$include_tax_to_price = mp_get_setting( 'tax->include_tax', 1 );
 		$special_tax = get_post_meta( $this->ID, 'charge_tax', true );
