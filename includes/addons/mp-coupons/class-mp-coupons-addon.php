@@ -587,7 +587,7 @@ class MP_Coupons_Addon {
 			'default_value' => 'item',
 			'options'       => array(
 				'item'     => __( 'Apply to each applicable item and quantity ordered', 'mp' ),
-				'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
+				//'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
 			),
 		) );
 		$metabox->add_field( 'checkbox', array(
@@ -1043,7 +1043,9 @@ class MP_Coupons_Addon {
 			$coupons = $this->get_applied_as_objects();
 
 			foreach ( $coupons as $coupon ) {
+				
 				$products = $coupon->get_products( true );
+
 				if ( in_array( $product->ID, $products ) ) {
 					
 					// Do not change lowest price after each coupon (this change the product total)
