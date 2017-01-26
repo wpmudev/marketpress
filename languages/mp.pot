@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-01-19 17:43:23+00:00\n"
+"POT-Creation-Date: 2017-01-26 20:09:33+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -145,10 +145,6 @@ msgstr ""
 msgid "Apply to each applicable item and quantity ordered"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:590
-msgid "Apply to each applicable item once per cart"
-msgstr ""
-
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:595
 msgid "Can this coupon be combined with other coupons?"
 msgstr ""
@@ -170,7 +166,7 @@ msgid "Max Uses"
 msgstr ""
 
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:623
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1119
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1121
 msgid "Applies To"
 msgstr ""
 
@@ -352,37 +348,37 @@ msgstr ""
 msgid "No Coupons found in Trash"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1114
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1116
 msgid "Code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1115
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1117
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice.php:208
 #: includes/admin/class-mp-orders-admin.php:1014
 msgid "Discount"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1116
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1118
 msgid "Used"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1117
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1119
 msgid "Remaining Uses"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1118
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1120
 msgid "Valid Dates"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1159
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1161
 msgid "No end"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1204
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1206
 msgid "Please enter a code"
 msgstr ""
 
-#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1205
+#: includes/addons/mp-coupons/class-mp-coupons-addon.php:1207
 msgid "Coupon added successfully"
 msgstr ""
 
@@ -5062,8 +5058,8 @@ msgstr ""
 msgid ""
 "You must login to Authorize.net merchant dashboard to obtain the API login "
 "ID and API transaction key. <a target=\"_blank\" "
-"href=\"http://www.authorize.net/support/merchant/wwhelp/wwhimpl/js/html/"
-"wwhelp.htm\">Instructions &raquo;</a>"
+"href=\"https://support.authorize.net/authkb/index?page=content&id=A576\">"
+"Instructions &raquo;</a>"
 msgstr ""
 
 #: includes/common/payment-gateways/authorizenet-aim.php:246
