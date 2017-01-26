@@ -4,6 +4,36 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2
+----------------------------------------------------------------------
+
+- Added: Option for user registration when force login used
+- Fixed: Broken digital products link
+- Fixed: Global cart prodcuts couldn't locate any orders
+- Fixed: Use subsite merchant_email in exist instead of global one
+- Fixed: Set default variation on single product page
+- Fixed: Product image not updating in variable products
+- Fixed: Out of stock product does not hide from product list
+- Fixed: Compatibility issues with Divi
+- Fixed: Cannot add new Attributes when product already have variations
+- Fixed: Remove all MP tables when plugin uninstalled
+- Fixed: Product price in cart not updated when coupon used
+- Fixed: USPS throwing PHP errors
+- Fixed: Wrong products list on email notification with global cart
+- Fixed: Use a global currency when global cart active
+- Fixed: Pass customer shipping info to Stripe
+- Fixed: Special instructions field not saved
+- Fixed: Variation product order limit always unlimited
+- Fixed: Tax always added to product price
+- Refactored: Multiple coupons usage
+- Tweaked: Delete variations when product deleted
+- Tweaked: Out of stock product set as draft
+- Tweaked: Quick setup doesn't recognize state change for shipping
+- Tweaked: MP displays mini cart on last updated or created page
+- Tweaked: Product image not displayed in mini cart
+- Tweaked: Check if a zero-currency is used when paying with Stripe
+- Localization: Updated language file (.pot)
+
 3.1.2
 ----------------------------------------------------------------------
 
