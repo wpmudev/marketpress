@@ -9,7 +9,7 @@ Change Log:
 
 - Added: Option for user registration when force login used
 - Fixed: Broken digital products link
-- Fixed: Global cart prodcuts couldn't locate any orders
+- Fixed: Global cart products couldn't locate any orders
 - Fixed: Use subsite merchant_email in exist instead of global one
 - Fixed: Set default variation on single product page
 - Fixed: Product image not updating in variable products
