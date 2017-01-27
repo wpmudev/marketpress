@@ -736,6 +736,11 @@ class MP_Installer {
 			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
 				$settings = $this->update_3007( $settings );
 			}
+
+			//3.0 update
+			if ( version_compare( $old_version, '3.1.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.1.3', '<' ) ) ) {
+				$settings = $this->update_312( $settings );
+			}
 		}
 
 		// Update settings
@@ -1223,6 +1228,29 @@ class MP_Installer {
 	}
 	
 	/**
+	 * Alter multisite table columns, add blog_id and public columns
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function alter_mp_term_relationships_table(){
+	
+		global $wpdb;
+
+		$term_relationships_table = "CREATE TABLE `{$wpdb->base_prefix}mp_term_relationships` (
+			`post_id` bigint(20) unsigned NOT NULL,
+			`blog_id` bigint(20) unsigned NOT NULL,
+			`term_id` bigint(20) unsigned NOT NULL,
+			`public` boolean NOT NULL DEFAULT 1,
+			PRIMARY KEY ( `post_id` , `term_id` ),
+			KEY (`term_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+
+		dbDelta( $term_relationships_table );
+
+	}	
+
+	/**
 	 * Update sort_price if silently on version check
 	 *
 	 * @since 3.0
@@ -1254,6 +1282,20 @@ class MP_Installer {
 				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['regular'] ) );
 			}
 		}
+	}
+
+	/**
+	 * Runs on 3.1.2 update.
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param array $settings
+	 */
+	public function update_312( $settings ) {
+		$this->alter_mp_term_relationships_table();
+
+		return $settings;
 	}
 
 	/**
