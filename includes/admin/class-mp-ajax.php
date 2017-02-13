@@ -412,7 +412,7 @@ class MP_Ajax {
 		$price		 = mp_get_post_value( 'price', '' );
 		$sale_price	 = mp_get_post_value( 'sale_price', '' );
 
-		if ( !is_array( $post_ids ) ) {
+		if ( !is_array( $post_ids ) || ! is_numeric( $price ) ) {
 			die;
 		}
 
