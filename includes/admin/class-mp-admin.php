@@ -149,24 +149,26 @@ class MP_Admin {
 		if ( MP_LITE ) {
 			return;
 		}
-
-		//! TODO: update screen ids for dash notices
-		global $wpmudev_notices;
-		$wpmudev_notices[] = array(
-			'id'		 => 144,
-			'name'		 => 'MarketPress',
-			'screens'	 => array(
-				'edit-product',
-				'edit-mp_product',
-				'product',
-				'mp_product',
-				'edit-product_category',
-				'edit-product_tag',
-				'settings_page_marketpress-ms-network'
-			)
-		);
-
-		require_once mp_plugin_dir( 'includes/admin/dash-notice/wpmudev-dash-notification.php' );
+		
+		//load dashboard notice
+		if ( file_exists( dirname( __FILE__ ) . '/includes/dash-notice/wpmudev-dash-notification.php' ) ) {
+			global $wpmudev_notices;
+			$wpmudev_notices[] = array(
+				'id'		 => 144,
+				'name'		 => 'MarketPress',
+				'screens'	 => array(
+					'edit-product',
+					'edit-mp_product',
+					'product',
+					'mp_product',
+					'edit-product_category',
+					'edit-product_tag',
+					'settings_page_marketpress-ms-network'
+				)
+			);
+			
+			include_once mp_plugin_dir( 'includes/admin/dash-notice/wpmudev-dash-notification.php' );
+		}
 	}
 
 	/**
