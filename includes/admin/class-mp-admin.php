@@ -151,7 +151,7 @@ class MP_Admin {
 		}
 		
 		//load dashboard notice
-		if ( file_exists( dirname( __FILE__ ) . '/includes/dash-notice/wpmudev-dash-notification.php' ) ) {
+		if ( file_exists( dirname( __FILE__ ) . '/includes/admin/dash-notice/wpmudev-dash-notification.php' ) ) {
 			global $wpmudev_notices;
 			$wpmudev_notices[] = array(
 				'id'		 => 144,
