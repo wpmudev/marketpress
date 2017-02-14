@@ -3168,10 +3168,10 @@ endif;
 
 if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
 	function mp_get_plugin_slug() {
-		if ( MP_LITE ) {
-			return 'wordpress-ecommerce/marketpress.php';
-		} else {
+		if ( file_exists( dirname( __FILE__ ) . '/includes/dash-notice/wpmudev-dash-notification.php' ) ) {
 			return 'marketpress/marketpress.php';
+		} else {
+			return 'wordpress-ecommerce/marketpress.php';
 		}
 	}
 }

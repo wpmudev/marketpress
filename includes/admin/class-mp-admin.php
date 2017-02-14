@@ -198,9 +198,7 @@ class MP_Admin {
 			?>
 			<div class="icon32"><img src="<?php echo mp_plugin_url( 'ui/images/download.png' ); ?>" /></div>
 			<h2><?php _e( 'Export Orders', 'mp' ); ?></h2>
-			<?php if ( defined( 'MP_LITE' ) ) { ?>
-				<a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e( 'Upgrade Now', 'mp' ); ?> &raquo;"><?php _e( 'Upgrade to enable CSV order exports &raquo;', 'mp' ); ?></a><br />
-			<?php } ?>
+
 			<form action="<?php echo admin_url( 'admin-ajax.php?action=mp-orders-export' ); ?>" method="post">
 				<?php
 				$months = $wpdb->get_results( $wpdb->prepare( "
@@ -241,7 +239,7 @@ class MP_Admin {
 					<option<?php selected( $status, 'order_shipped' ); ?> value="order_shipped"><?php _e( 'Shipped', 'mp' ); ?></option>
 					<option<?php selected( $status, 'order_closed' ); ?> value="order_closed"><?php _e( 'Closed', 'mp' ); ?></option>
 				</select>
-				<input type="submit" value="<?php _e( 'Download &raquo;', 'mp' ); ?>" name="export_orders" class="button-secondary"<?php echo defined( 'MP_LITE' ) ? ' disabled="disabled"' : ''; ?> />
+				<input type="submit" value="<?php _e( 'Download &raquo;', 'mp' ); ?>" name="export_orders" class="button-secondary" />
 			</form>
 
 
