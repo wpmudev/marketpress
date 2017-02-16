@@ -2613,7 +2613,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			if ( $content == 'excerpt' ) {
 				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
 			} else {
-				$return .= ( $variation ) ? $variation->content( false ) : $product->content( false );
+				$return .= ( !$product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
 			}
 
 			$return .= '
