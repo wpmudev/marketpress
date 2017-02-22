@@ -4,6 +4,13 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.2
+----------------------------------------------------------------------
+
+- Fixed: PHP 7.1 Compatibility
+- Tweaked: Bulk edit sets price to 0
+- Tweaked: Global currency option missing in Store Network Settings
+
 3.2.1
 ----------------------------------------------------------------------
 

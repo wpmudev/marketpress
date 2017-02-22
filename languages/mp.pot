@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2\n"
+"Project-Id-Version: MarketPress 3.2.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-01-26 20:09:33+00:00\n"
+"POT-Creation-Date: 2017-02-22 17:02:28+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -406,7 +406,7 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice-addon.php:195
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:798
-#: includes/multisite/class-mp-admin-multisite.php:171
+#: includes/multisite/class-mp-admin-multisite.php:172
 msgid "General Settings"
 msgstr ""
 
@@ -607,22 +607,14 @@ msgid ""
 "please setup a new payment gateway <a href=\"%s\">here</a>."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:181
+#: includes/admin/class-mp-admin.php:183
 msgid "MarketPress Instructions"
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:198
+#: includes/admin/class-mp-admin.php:200
 #: includes/admin/class-mp-exporter-orders.php:150
 #: includes/admin/class-mp-exporter-orders.php:178
 msgid "Export Orders"
-msgstr ""
-
-#: includes/admin/class-mp-admin.php:200
-msgid "Upgrade Now"
-msgstr ""
-
-#: includes/admin/class-mp-admin.php:200
-msgid "Upgrade to enable CSV order exports &raquo;"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:219
@@ -735,19 +727,19 @@ msgstr ""
 msgid "Please wait...saving in progress..."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:355
+#: includes/admin/class-mp-admin.php:354
 msgid "Custom field updated."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:356
+#: includes/admin/class-mp-admin.php:355
 msgid "Custom field deleted."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:360
+#: includes/admin/class-mp-admin.php:359
 msgid "Page saved."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:362
+#: includes/admin/class-mp-admin.php:361
 msgid "M j, Y @ G:i"
 msgstr ""
 
@@ -934,7 +926,7 @@ msgstr ""
 
 #: includes/admin/class-mp-ajax.php:482
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:164
-#: includes/multisite/class-mp-admin-multisite.php:589
+#: includes/multisite/class-mp-admin-multisite.php:584
 msgid "Edit Page"
 msgstr ""
 
@@ -1906,8 +1898,8 @@ msgstr ""
 #: includes/admin/class-mp-setup-wizard.php:444
 #: includes/admin/store-settings/class-mp-store-settings-general.php:386
 #: includes/admin/store-settings/class-mp-store-settings-general.php:394
-#: includes/multisite/class-mp-admin-multisite.php:203
-#: includes/multisite/class-mp-admin-multisite.php:211
+#: includes/multisite/class-mp-admin-multisite.php:204
+#: includes/multisite/class-mp-admin-multisite.php:212
 msgid "Select a Currency"
 msgstr ""
 
@@ -1918,7 +1910,7 @@ msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:452
 #: includes/admin/store-settings/class-mp-store-settings-general.php:403
-#: includes/multisite/class-mp-admin-multisite.php:226
+#: includes/multisite/class-mp-admin-multisite.php:221
 msgid "Currency Symbol Position"
 msgstr ""
 
@@ -2733,7 +2725,7 @@ msgstr ""
 #: includes/admin/class-mp-store-settings-admin.php:114
 #: includes/admin/widgets/categories.php:8
 #: includes/admin/widgets/categories.php:18
-#: includes/multisite/class-mp-admin-multisite.php:544
+#: includes/multisite/class-mp-admin-multisite.php:539
 msgid "Product Categories"
 msgstr ""
 
@@ -2743,7 +2735,7 @@ msgstr ""
 
 #: includes/admin/class-mp-store-settings-admin.php:115
 #: includes/admin/widgets/product-tag-cloud.php:46
-#: includes/multisite/class-mp-admin-multisite.php:553
+#: includes/multisite/class-mp-admin-multisite.php:548
 msgid "Product Tags"
 msgstr ""
 
@@ -3069,12 +3061,12 @@ msgid ""
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:416
-#: includes/multisite/class-mp-admin-multisite.php:239
+#: includes/multisite/class-mp-admin-multisite.php:234
 msgid "Price Format"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:429
-#: includes/multisite/class-mp-admin-multisite.php:252
+#: includes/multisite/class-mp-admin-multisite.php:247
 msgid "Show Decimal in Prices"
 msgstr ""
 
@@ -3253,7 +3245,7 @@ msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:85
 #: includes/multisite/class-mp-admin-multisite.php:121
-#: includes/multisite/class-mp-admin-multisite.php:625
+#: includes/multisite/class-mp-admin-multisite.php:620
 msgid "An error occurred while creating the store page. Please try again."
 msgstr ""
 
@@ -3266,7 +3258,7 @@ msgid "uncropped"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:166
-#: includes/multisite/class-mp-admin-multisite.php:591
+#: includes/multisite/class-mp-admin-multisite.php:586
 msgid "Create Page"
 msgstr ""
 
@@ -3283,9 +3275,9 @@ msgstr ""
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:209
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:218
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:227
-#: includes/multisite/class-mp-admin-multisite.php:537
-#: includes/multisite/class-mp-admin-multisite.php:546
-#: includes/multisite/class-mp-admin-multisite.php:555
+#: includes/multisite/class-mp-admin-multisite.php:532
+#: includes/multisite/class-mp-admin-multisite.php:541
+#: includes/multisite/class-mp-admin-multisite.php:550
 msgid "Choose a Page"
 msgstr ""
 
@@ -4517,46 +4509,46 @@ msgstr ""
 msgid "Billing"
 msgstr ""
 
-#: includes/common/helpers.php:210 includes/common/helpers.php:213
-#: includes/common/helpers.php:215
+#: includes/common/helpers.php:213 includes/common/helpers.php:216
+#: includes/common/helpers.php:218
 #: includes/common/shipping-modules/class-mp-shipping-api.php:406
 #: includes/common/shipping-modules/class-mp-shipping-api.php:428
 msgid "Shipping Method:"
 msgstr ""
 
-#: includes/common/helpers.php:219
+#: includes/common/helpers.php:222
 msgid "Tracking Number:"
 msgstr ""
 
-#: includes/common/helpers.php:224
+#: includes/common/helpers.php:227
 msgid "Special Instructions:"
 msgstr ""
 
-#: includes/common/helpers.php:229
+#: includes/common/helpers.php:232
 msgid "Order Notes:"
 msgstr ""
 
-#: includes/common/helpers.php:233
+#: includes/common/helpers.php:236
 msgid "Payment Method:"
 msgstr ""
 
-#: includes/common/helpers.php:236
+#: includes/common/helpers.php:239
 msgid "Payment Type:"
 msgstr ""
 
-#: includes/common/helpers.php:240
+#: includes/common/helpers.php:243
 msgid "Transaction ID:"
 msgstr ""
 
-#: includes/common/helpers.php:243
+#: includes/common/helpers.php:246
 msgid "Payment Total:"
 msgstr ""
 
-#: includes/common/helpers.php:246
+#: includes/common/helpers.php:249
 msgid "Your payment for this order is complete."
 msgstr ""
 
-#: includes/common/helpers.php:248
+#: includes/common/helpers.php:251
 msgid "Your payment for this order is not yet complete. Here is the latest status:"
 msgstr ""
 
@@ -8322,77 +8314,73 @@ msgstr ""
 msgid "Uncategorized"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:177
+#: includes/multisite/class-mp-admin-multisite.php:178
 msgid "Limit Global Widgets/Shortcodes To Main Blog?"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:181
+#: includes/multisite/class-mp-admin-multisite.php:182
 msgid "Enable Global Shopping Cart?"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:197
+#: includes/multisite/class-mp-admin-multisite.php:198
 msgid "Global Store Currency"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:213
+#: includes/multisite/class-mp-admin-multisite.php:214
 msgid "Global Currency"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:220
-msgid "Test one"
-msgstr ""
-
-#: includes/multisite/class-mp-admin-multisite.php:284
+#: includes/multisite/class-mp-admin-multisite.php:279
 msgid "%d products have been indexed in whole network"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:285
+#: includes/multisite/class-mp-admin-multisite.php:280
 msgid "Index Products"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:286
+#: includes/multisite/class-mp-admin-multisite.php:281
 msgid "Please hold on..."
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:290
+#: includes/multisite/class-mp-admin-multisite.php:285
 msgid "Product Indexer"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:341
+#: includes/multisite/class-mp-admin-multisite.php:336
 msgid "%d products get indexed"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:355
+#: includes/multisite/class-mp-admin-multisite.php:350
 msgid "Global Gateway"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:366
+#: includes/multisite/class-mp-admin-multisite.php:361
 msgid "Choose a Gateway"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:380
+#: includes/multisite/class-mp-admin-multisite.php:375
 msgid "Select a Gateway"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:395
+#: includes/multisite/class-mp-admin-multisite.php:390
 msgid "Gateway Permissions"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:406
-#: includes/multisite/class-mp-admin-multisite.php:452
+#: includes/multisite/class-mp-admin-multisite.php:401
+#: includes/multisite/class-mp-admin-multisite.php:447
 msgid "All Can Use"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:407
-#: includes/multisite/class-mp-admin-multisite.php:453
+#: includes/multisite/class-mp-admin-multisite.php:402
+#: includes/multisite/class-mp-admin-multisite.php:448
 msgid "No Access"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:443
+#: includes/multisite/class-mp-admin-multisite.php:438
 msgid "Theme Permissions"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:445
+#: includes/multisite/class-mp-admin-multisite.php:440
 msgid ""
 "Set theme access permissions for network stores. For a custom css theme, "
 "save your css file with the <strong>MarketPress Theme: NAME</strong> header "
@@ -8400,20 +8388,20 @@ msgid ""
 "in this list so you may select it."
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:483
-#: includes/multisite/class-mp-admin-multisite.php:499
+#: includes/multisite/class-mp-admin-multisite.php:478
+#: includes/multisite/class-mp-admin-multisite.php:494
 msgid "Store Network Settings"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:483
+#: includes/multisite/class-mp-admin-multisite.php:478
 msgid "Store Network"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:528
+#: includes/multisite/class-mp-admin-multisite.php:523
 msgid "Global Marketplace Pages"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:535
+#: includes/multisite/class-mp-admin-multisite.php:530
 msgid "Marketplace"
 msgstr ""
 
@@ -8622,15 +8610,15 @@ msgid ""
 "contact us for help."
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:403
+#: includes/public/class-mp-short-codes.php:417
 msgid "product_id must be defined"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:606
+#: includes/public/class-mp-short-codes.php:623
 msgid "Unlimited stock"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:609
+#: includes/public/class-mp-short-codes.php:626
 msgid "Only %s left in stock..."
 msgstr ""
 
