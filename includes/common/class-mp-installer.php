@@ -698,6 +698,9 @@ class MP_Installer {
 
 		// Add "post_status" to $wpdb->mp_products table
 		$this->add_post_status_column();
+		
+		// Create/update product attributes table
+		$this->create_product_attributes_table();
 
 		//If current MP version equals to old version skip importer
 		if ( $old_version == MP_VERSION && $force_upgrade == 0 ) {
@@ -733,6 +736,11 @@ class MP_Installer {
 			if ( version_compare( $old_version, '3.0.0.8', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.0.0.8', '<' ) ) ) {
 				$settings = $this->update_3007( $settings );
 			}
+
+			//3.0 update
+			if ( version_compare( $old_version, '3.1.3', '<' ) || ( $force_version !== false && version_compare( $force_version, '3.1.3', '<' ) ) ) {
+				$settings = $this->update_312( $settings );
+			}
 		}
 
 		// Update settings
@@ -751,8 +759,6 @@ class MP_Installer {
 		$this->add_admin_store_caps();
 		// Add "term_order" to $wpdb->terms table
 		$this->add_term_order_column();
-		// Create/update product attributes table
-		$this->create_product_attributes_table();
 
 		// Only run these on first install
 		if ( empty( $old_settings ) ) {
@@ -785,7 +791,7 @@ class MP_Installer {
 		if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name ) ) == $table_name ) {
 			return;
 		}
-		$sql = "CREATE TABLE $table_name (
+		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
 			attribute_id int(11) unsigned NOT NULL AUTO_INCREMENT,
 			attribute_name varchar(45) DEFAULT '',
 			attribute_terms_sort_by enum('ID','ALPHA','CUSTOM') DEFAULT NULL,
@@ -796,7 +802,7 @@ class MP_Installer {
 
 		// Create mp_product_attributes_terms table
 		$table_name = $wpdb->prefix . 'mp_product_attributes_terms';
-		$sql        = "CREATE TABLE $table_name (
+		$sql        = "CREATE TABLE IF NOT EXISTS $table_name (
 			attribute_id int(11) unsigned NOT NULL,
 			term_id bigint(20) unsigned NOT NULL,
 			PRIMARY KEY  (attribute_id, term_id)
@@ -909,9 +915,12 @@ class MP_Installer {
 	public function add_admin_store_caps() {
 		$role       = get_role( 'administrator' );
 		$store_caps = mp_get_store_caps();
-
-		foreach ( $store_caps as $cap ) {
-			$role->add_cap( $cap );
+		
+		// We've had few error reports that $role is not an object, lets check
+		if( is_object( $role ) ) {
+			foreach ( $store_caps as $cap ) {
+				$role->add_cap( $cap );
+			}
 		}
 	}
 
@@ -1219,6 +1228,29 @@ class MP_Installer {
 	}
 	
 	/**
+	 * Alter multisite table columns, add blog_id and public columns
+	 *
+	 * @since 3.0
+	 * @access public
+	 */
+	public function alter_mp_term_relationships_table(){
+	
+		global $wpdb;
+
+		$term_relationships_table = "CREATE TABLE `{$wpdb->base_prefix}mp_term_relationships` (
+			`post_id` bigint(20) unsigned NOT NULL,
+			`blog_id` bigint(20) unsigned NOT NULL,
+			`term_id` bigint(20) unsigned NOT NULL,
+			`public` boolean NOT NULL DEFAULT 1,
+			PRIMARY KEY ( `post_id` , `term_id` ),
+			KEY (`term_id`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+
+		dbDelta( $term_relationships_table );
+
+	}	
+
+	/**
 	 * Update sort_price if silently on version check
 	 *
 	 * @since 3.0
@@ -1250,6 +1282,20 @@ class MP_Installer {
 				update_post_meta( $post_id, 'sort_price', sanitize_text_field( $price['regular'] ) );
 			}
 		}
+	}
+
+	/**
+	 * Runs on 3.1.2 update.
+	 *
+	 * @since 3.0
+	 * @access public
+	 *
+	 * @param array $settings
+	 */
+	public function update_312( $settings ) {
+		$this->alter_mp_term_relationships_table();
+
+		return $settings;
 	}
 
 	/**

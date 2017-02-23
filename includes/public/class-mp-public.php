@@ -155,11 +155,16 @@ class MP_Public {
 	 */
 	function is_store_page( $page = null ) {
 		if ( is_null( $page ) ) {
-			return ( get_post_meta( get_the_ID(), '_mp_store_page', true ) !== '' || is_singular( MP_Product::get_post_type() ) || is_tax( array(
+			return ( get_post_meta( get_the_ID(), '_mp_store_page', true ) !== '' || get_post_meta( get_the_ID(), '_mp_store_page', true ) != 'none' || is_singular( MP_Product::get_post_type() ) || is_tax( array(
 					'product_category',
 					'product_tag'
 				) ) );
 		} else {
+	
+			if( get_post_type( $page ) == MP_Product::get_post_type() ){
+				return true;
+			}
+
 			$page = (array) $page;
 
 			return ( in_array( get_post_meta( get_the_ID(), '_mp_store_page', true ), $page ) );
@@ -280,7 +285,13 @@ class MP_Public {
 			'hover-intent',
 			'mp-select2'
 		), MP_VERSION );
-
+		
+		$grid_with_js = apply_filters('mp-do_grid_with_js', true);
+		
+		if ( $grid_with_js == "true" ) {
+			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array('jquery'), MP_VERSION );
+		}
+		
 		// Get product category links
 		$terms = get_terms( 'product_category' );
 		$cats  = array();
@@ -583,13 +594,13 @@ class MP_Public {
 			$buffer    = '';
 			$filesize  = filesize( $tmp );
 			$length    = $filesize;
-			list( $fileext, $filetype ) = wp_check_filetype( $tmp );
+			@list( $fileext, $filetype ) = wp_check_filetype( $tmp );
 
 			if ( empty( $filetype ) ) {
 				$filetype = 'application/octet-stream';
 			}
 
-			ob_clean(); //kills any buffers set by other plugins
+			if ( ob_get_contents() ) ob_end_clean(); //kills any buffers set by other plugins
 
 			if ( isset( $_SERVER['HTTP_RANGE'] ) ) {
 //partial download headers

@@ -237,7 +237,7 @@ class MP_Gateway_AuthorizeNet_AIM extends MP_Gateway_API {
 		$creds = $metabox->add_field('complex', array(
 			'name' => 'gateways[' . $this->plugin_name . '][api_credentials]',
 			'label' => array('text' => __('API Credentials', 'mp')),
-			'desc' => __('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="http://www.authorize.net/support/merchant/wwhelp/wwhimpl/js/html/wwhelp.htm">Instructions &raquo;</a>', 'mp'),
+			'desc' => __('You must login to Authorize.net merchant dashboard to obtain the API login ID and API transaction key. <a target="_blank" href="https://support.authorize.net/authkb/index?page=content&id=A576">Instructions &raquo;</a>', 'mp'),
 		));
 		
 		if ( $creds instanceof WPMUDEV_Field ) {

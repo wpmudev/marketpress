@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: MarketPress
-Version: 3.1.1
+Version: 3.2.2
 Plugin URI: https://premium.wpmudev.org/project/e-commerce/
 Description: The complete WordPress ecommerce plugin - works perfectly with BuddyPress and Multisite too to create a social marketplace, where you can take a percentage! Activate the plugin, adjust your settings then add some products to your store.
 Author: WPMU DEV
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 Plugin Authors: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonathan Cowher (Incsub), Ricardo Freitas (Incsub), Cvetan Cvetanov (Incsub), Julien Zerbib (Incsub), Sabri Bouchaala (Incsub), Emmanuel Laborin (Incsub)
  */
 
-define( 'MP_VERSION', '3.1.1' );
+define( 'MP_VERSION', '3.2.2' );
 
 class Marketpress {
 
@@ -420,10 +420,10 @@ class Marketpress {
 		}
 		if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
 			function mp_get_plugin_slug() {
-				if ( MP_LITE ) {
-					return 'wordpress-ecommerce/marketpress.php';
-				} else {
+				if ( file_exists( dirname( __FILE__ ) . '/includes/admin/dash-notice/wpmudev-dash-notification.php' ) ) {
 					return 'marketpress/marketpress.php';
+				} else {
+					return 'wordpress-ecommerce/marketpress.php';
 				}
 			}
 		}
@@ -981,6 +981,7 @@ class Marketpress {
 $GLOBALS['mp'] = Marketpress::get_instance();
 
 register_activation_hook( __FILE__, 'mp_plugin_activate' );
+register_uninstall_hook( __FILE__, 'mp_plugin_uninstall' );
 add_action( 'admin_init', 'mp_plugin_redirect', 1 );
 
 function mp_plugin_activate() {
@@ -991,6 +992,18 @@ function mp_plugin_activate() {
 	if ( get_option( 'mp_needs_quick_setup' ) == false ) {
 		add_option( 'mp_needs_quick_setup', 1 );
 	}
+}
+
+function mp_plugin_uninstall() {
+	global $wpdb;
+	
+	$table_attr = $wpdb->prefix . 'mp_product_attributes';
+	$sql_attr = "DROP TABLE IF EXISTS $table_attr;";
+    $wpdb->query( $sql_attr );
+
+	$table_attr_terms = $wpdb->prefix . 'mp_product_attributes_terms';
+	$sql_attr_terms = "DROP TABLE IF EXISTS $table_attr_terms;";
+    $wpdb->query( $sql_attr_terms );
 }
 
 function mp_plugin_redirect() {

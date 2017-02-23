@@ -161,7 +161,7 @@ class MP_Gateway_PayWay extends MP_Gateway_API {
 
 		$handOffUrl = $handOffUrl . "biller_code=" .
 		$parameters['biller_code'] . "&token=" . urlencode( $token );
-		debugLog( "Hand-off URL: " . $handOffUrl );
+		mp_debugLog( "Hand-off URL: " . $handOffUrl );
 		session_write_close();
 		wp_redirect($handOffUrl);
 		exit;
@@ -437,10 +437,10 @@ function getToken( $parameters ) {
 	$response			=	wp_remote_post( $payWayUrl . "RequestToken", $args);
 	$responseText		=	$response["body"];
 
-	debugLog( "Token Request POST: " . $parametersString );
+	mp_debugLog( "Token Request POST: " . $parametersString );
 
 
-	debugLog( "Token Response: " . $responseText );
+	mp_debugLog( "Token Response: " . $responseText );
 
 	// Split the response into parameters
 	$responseParameterArray = explode( "&", $responseText );
@@ -461,7 +461,7 @@ function getToken( $parameters ) {
 	}
 }
 
-function debugLog( $message ) {
+function mp_debugLog( $message ) {
 	return;
 	global $logDir;
 	list($usec, $sec) = explode(" ", microtime());

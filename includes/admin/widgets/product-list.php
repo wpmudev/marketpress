@@ -3,7 +3,7 @@
 //Product listing widget
 class MarketPress_Product_List extends WP_Widget {
 
-	function MarketPress_Product_List() {
+	function __construct() {
 		$widget_ops = array( 'classname' => 'mp_widget mp_widget_products_list', 'description' => __( 'Shows a customizable list of products from your MarketPress store.', 'mp' ) );
 		parent::__construct( 'mp_product_list_widget', __( 'Product List', 'mp' ), $widget_ops );
 	}
@@ -64,7 +64,10 @@ class MarketPress_Product_List extends WP_Widget {
 			$order_query = '&orderby=DESC';
 		}
 
-		$query_string = 'post_type=product' . $taxonomy_query . $paginate_query . $order_by_query . $order_query;
+		// check for post type setting (patch for widget not working with "mp_product" type
+                // Added by Adam, modified by Ash
+		$product_type = MP_Product::get_post_type();
+		$query_string = 'post_type=' . $product_type . $taxonomy_query . $paginate_query . $order_by_query . $order_query;
 
 		$query_array = array();
 

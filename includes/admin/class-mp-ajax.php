@@ -112,6 +112,7 @@ class MP_Ajax {
 				$children = get_children( $args, OBJECT );
 
 				$variation_attributes = array();
+				$variation_attributes_remaining = array();
 
 				$first_post_id = 0;
 
@@ -123,11 +124,23 @@ class MP_Ajax {
 					foreach ( $product_attributes as $product_attribute ) {
 						$product_attributes_array[ $product_attribute->attribute_id ] = $product_attribute->attribute_name;
 
-						$child_terms = get_the_terms( /* $variation_id */$first_post_id, 'product_attr_' . $product_attribute->attribute_id );
+						$child_terms = get_the_terms( /* $variation_id */$child->ID, 'product_attr_' . $product_attribute->attribute_id );
+						
 						if ( isset( $child_terms[ 0 ]->term_id ) && $child_terms[ 0 ]->name ) {
 							$variation_attributes[ $product_attribute->attribute_id ][ $child_terms[ 0 ]->term_id ] = array( $product_attribute->attribute_id, $child_terms[ 0 ]->name );
+
+							$used_taxonomy_ids[] = 'product_attr_' . $product_attribute->attribute_id;
+						}
+						else{	
+							$variation_attributes_remaining[ $product_attribute->attribute_id ][ $child_terms[ 0 ]->term_id ] = array( $product_attribute->attribute_id, $child_terms[ 0 ]->name );
 						}
 					}
+				}
+
+				foreach( $variation_attributes_remaining as $variation_attribute_remaining_key => $variation_attribute_remaining ){
+
+					if( in_array( 'product_attr_' . $variation_attribute_remaining_key, $used_taxonomy_ids ) ) unset( $variation_attributes_remaining[ $variation_attribute_remaining_key ] );
+
 				}
 				?>
 				<form name="variation_popup" id="variation_popup">
@@ -196,6 +209,23 @@ class MP_Ajax {
 						</div>
 					<?php } ?>
 					<?php do_action( 'mp_variation_popup_after_attributes' ); ?>
+
+					<?php if( is_array( $variation_attributes_remaining ) && ! empty( $variation_attributes_remaining ) ): ?>
+					<h3><?php _e( 'Unused Attributes', 'mp' ); ?></h3>
+					<?php					
+					foreach ( array_keys( $variation_attributes_remaining ) as $variation_attribute ) {
+						$child_term	 = get_the_terms( $variation_id, 'product_attr_' . $variation_attribute );
+						$child_term	 = isset( $child_term[ 0 ] ) ? $child_term[ 0 ] : '';
+						?>
+						<div class="mp-product-field-100 mp-variation-field">
+							<div class="wpmudev-field-label"><?php echo $product_attributes_array[ $variation_attribute ]; ?></div>
+							<input type="text" name="product_attr_<?php echo esc_attr( $variation_attribute ); ?>" id="product_attr_<?php echo esc_attr( $variation_attribute ); ?>" class="mp-not-required" placeholder="<?php
+							esc_attr_e( 'Enter ', 'mp' );
+							echo esc_attr( $product_attributes_array[ $variation_attribute ] );
+							?>" value="<?php echo is_object( $child_term ) ? esc_attr( $child_term->name ) : ''; ?>">
+						</div>
+					<?php } ?>
+					<?php endif; ?>
 
 					<?php if ( $product_type == 'physical' ) {//show these fields only for Physical Products ?>
 						<div class="fieldset_check">
@@ -382,7 +412,7 @@ class MP_Ajax {
 		$price		 = mp_get_post_value( 'price', '' );
 		$sale_price	 = mp_get_post_value( 'sale_price', '' );
 
-		if ( !is_array( $post_ids ) ) {
+		if ( !is_array( $post_ids ) || ! is_numeric( $price ) ) {
 			die;
 		}
 
@@ -577,19 +607,3 @@ class MP_Ajax {
 }
 
 MP_Ajax::get_instance();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

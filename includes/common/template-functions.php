@@ -361,6 +361,10 @@ if ( ! function_exists( 'mp_number_format' ) ) {
 		}
 
 		$curr_decimal = mp_get_setting( 'curr_decimal', 1 );
+		if( is_multisite() && mp_cart()->is_global ){
+			$curr_decimal = mp_get_network_setting( 'global_curr_decimal' ) == 'off' ? 0 : 1;
+		}
+		$price_format = ( is_multisite() && mp_cart()->is_global ) ? mp_get_network_setting( 'global_price_format' ) : mp_get_setting( 'price_format' );
 
 		if ( $curr_decimal == 1 ) {
 			$int_decimals = 2;
@@ -373,7 +377,7 @@ if ( ! function_exists( 'mp_number_format' ) ) {
 		if ( $force_basic ) {
 			$formatted = number_format( $amount, $int_decimals, $dec_point = ".", $thousands_sep = "" );
 		} else {
-			switch ( mp_get_setting( 'price_format' ) ) {
+			switch ( $price_format ) {
 				case 'us' :
 					$formatted = number_format( $amount, $decimals, $dec_point = ".", $thousands_sep = "," );
 					break;
@@ -981,7 +985,19 @@ if ( ! function_exists( 'mp_format_currency' ) ) :
 		$currencies = mp()->currencies;
 
 		if ( empty( $currency ) ) {
-			$currency = mp_get_setting( 'currency', 'USD' );
+			$currency = ( is_multisite() && mp_cart()->is_global ) ? mp_get_network_setting( 'global_currency', 'USD' ) : mp_get_setting( 'currency', 'USD' );
+		}
+		
+		$curr_symbol_position = mp_get_setting( 'curr_symbol_position' );
+
+		// If multisite use global currency symbol
+		if( is_multisite() && mp_cart()->is_global ) {
+			$global_currency = mp_get_network_setting( 'global_curr_symbol_position' );
+			
+			// Check if we have global currency symbol
+			if( ! empty( $global_currency ) ) {
+				$curr_symbol_position = $global_currency;
+			}
 		}
 
 // get the currency symbol
@@ -1055,7 +1071,7 @@ if ( ! function_exists( 'mp_format_currency' ) ) :
 				$currency_post = '';
 			}
 
-			switch ( mp_get_setting( 'curr_symbol_position' ) ) {
+			switch ( $curr_symbol_position ) {
 				case 1 :
 					$formatted = $negative_symbol . $currency_pre . $symbol . $currency_post . $price_pre . mp_number_format( $amount, $decimal_place, $force_basic ) . $price_post;
 					break;
@@ -2000,6 +2016,33 @@ if ( ! function_exists( 'mp_list_products' ) ) :
 			);
 		}
 
+                if( mp_get_setting( 'inventory_remove' ) )
+                {
+                        $query['meta_query'][] = array(
+                                array(
+                                        'relation' => 'OR',
+                                        array(
+                                                'key'     => 'inventory_tracking',
+                                                'value'   => '0',
+                                                'compare' => '=',
+                                        ),
+                                        array(
+                                                'relation' => 'OR',
+                                                array(
+                                                        'key'     => 'inv_out_of_stock_purchase',
+                                                        'value'   => '1',
+                                                        'compare' => '=',
+                                                ),
+                                                array(
+                                                        'key'     => 'inventory',
+                                                        'value'   => '0',
+                                                        'compare' => '>',
+                                                )
+                                        )
+                                )
+                        );
+                }
+
 // The Query
 		//var_dump($query);
 		$custom_query = new WP_Query( $query );
@@ -2165,8 +2208,6 @@ if ( ! function_exists( 'mp_order_status' ) ) :
 				} else {
 					$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 				}
-			} else {
-				$html .= __( 'Oops! We couldn\'t locate any orders matching that order number. Please verify the order number and try again.', 'mp' );
 			}
 		}
 
@@ -2350,14 +2391,6 @@ if ( ! function_exists( 'mp_product' ) ) {
 		$form_id = 'mp_buy_form_' . $product_id;
 
 		$variation = false;
-
-		if ( $variation_id = get_query_var( 'mp_variation_id' ) ) {
-			$variation = new MP_Product( $variation_id );
-			if ( ! $variation->exists() ) {
-				$variation = false;
-			}
-		}
-
 		$pinit   = $product->pinit_button( 'single_view' );
 		$fb      = $product->facebook_like_button( 'single_view' );
 		$twitter = $product->twitter_button( 'single_view' );
@@ -2371,6 +2404,16 @@ if ( ! function_exists( 'mp_product' ) ) {
 				$has_image = true;
 			}
 		} else {
+			$variation_id = intval( get_post_meta( $product->ID, 'default_variation', true ) );
+			if( get_query_var( 'mp_variation_id' ) != '' && is_numeric( get_query_var( 'mp_variation_id' ) ) ) $variation_id = get_query_var( 'mp_variation_id' );
+
+			if( is_numeric( $variation_id ) ){
+				$variation = new MP_Product( $variation_id );
+				if ( ! $variation->exists() ) {
+					$variation = false;
+				}
+			}
+
 			foreach ( $product->get_variation_ids() as $id ) {
 				$post_thumbnail_id = get_post_thumbnail_id( $id );
 				if ( $post_thumbnail_id ) {
@@ -2488,12 +2531,13 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
-		if ( $meta ) {
-			$return .= '<div class="mp_product_meta">';
 
-			if ( $title ) {
-				$return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-			}
+                if ( $title ) {
+                        $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
+                }
+
+                if ( $meta ) {
+                        $return .= '<div class="mp_product_meta">';
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
@@ -2569,7 +2613,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 			if ( $content == 'excerpt' ) {
 				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
 			} else {
-				$return .= ( $variation ) ? $variation->content( false ) : $product->content( false );
+				$return .= ( !$product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
 			}
 
 			$return .= '
@@ -3124,10 +3168,10 @@ endif;
 
 if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
 	function mp_get_plugin_slug() {
-		if ( MP_LITE ) {
-			return 'wordpress-ecommerce/marketpress.php';
-		} else {
+		if ( file_exists( dirname( __FILE__ ) . '/includes/admin/dash-notice/wpmudev-dash-notification.php' ) ) {
 			return 'marketpress/marketpress.php';
+		} else {
+			return 'wordpress-ecommerce/marketpress.php';
 		}
 	}
 }

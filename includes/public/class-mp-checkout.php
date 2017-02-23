@@ -586,6 +586,7 @@ class MP_Checkout {
 
 		$data = (array) mp_get_post_value( 'account', array() );
 		
+		$force_login 		      = mp_get_setting( 'force_login' );
 		$enable_registration_form = mp_get_post_value( 'enable_registration_form' );
 		$account_username 		  = mp_get_post_value( 'account_username' );
 		$account_password 		  = mp_get_post_value( 'account_password' );
@@ -596,7 +597,7 @@ class MP_Checkout {
 
 		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
 			
-			if( $enable_registration_form && $account_username && $account_password && $account_email  ) {
+			if( ( $enable_registration_form || $force_login ) && $account_username && $account_password && $account_email  ) {
 				$args = array(
 					'user_login' => $account_username,
 					'user_email' => $account_email,
@@ -664,7 +665,7 @@ class MP_Checkout {
 	public function display( $args = array() ) {
 		$args = array_replace_recursive( array(
 			'echo' => true,
-		), $args );
+		), (array) $args );
 		$this->_stepnum = 1;
 		extract( $args );
 
@@ -672,9 +673,9 @@ class MP_Checkout {
 
 		if ( !mp_cart()->has_items() ) {
 		if ( $disable_cart == '1' ) {
-				return __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">The cart is disabled.</p></<div><!-- end mp_cart_empty -->', 'mp' );
+				return __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">The cart is disabled.</p></div><!-- end mp_cart_empty -->', 'mp' );
 			} else {
-				return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></<div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
+				return sprintf( __( '<div class="mp_cart_empty"><h3 class="mp_sub_title">Oops!</h3><p class="mp_cart_empty_message">Looks like you haven\'t added anything your cart. <a href="%s">Let\'s go shopping!</a></p></div><!-- end mp_cart_empty -->', 'mp' ), mp_store_page_url( 'products', false ) );
 			}
 
 		}
@@ -1132,28 +1133,42 @@ class MP_Checkout {
 			return false;
 		}
 		
-		$html = '';
-		$html .= '
-			<div class="mp_checkout_field mp_checkout_checkbox">
-				<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_registration_form" value="1" autocomplete="off"> <span>' . __( 'Register as customer?', 'mp' ) . '</span></label>
-			</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
-		';
+		$required_fields = $required_labels = $html = '';
+
+		if ( mp_get_setting( 'force_login' ) == true ) {
+			$required_fields = 'data-rule-required="true" aria-required="true"';
+			$required_labels = '<span class="mp_field_required">*</span>';
+		}
 		
+		if ( mp_get_setting( 'force_login' ) == false ) {
+			$html .= '
+				<div class="mp_checkout_field mp_checkout_checkbox">
+					<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_registration_form" value="1" autocomplete="off"> <span>' . __( 'Register as customer?', 'mp' ) . '</span></label>
+				</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
+			';
+		}
+		
+		if ( mp_get_setting( 'force_login' ) == false ) {
 			$html .= '
 				<div id="mp-checkout-column-registration" style="display:none" class="mp_checkout_column_section">
 					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
-					
-			$html .= '<div class="mp_checkout_field mp_checkout_column">
-					<label class="mp_form_label">' . __( 'Username', 'mp' ) . '</label>	
-				    <input type="text" name="account_username" id="mp_account_username" data-rule-remote="' . esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ) . '" data-msg-remote="' . __( 'An account with this username already exists', 'mp' ) . '"></input>
-				  </div><!-- end mp_checkout_field -->';
-			
-			$html .= '<div class="mp_checkout_field mp_checkout_column">
-					<label class="mp_form_label">' . __( 'Password', 'mp' ) . '</label>	
-				    <input type="password" name="account_password"></input>
-				  </div><!-- end mp_checkout_field -->';			
-			$html .= wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce' ) . '
-				</div>';		
+		} else {
+			$html .= '
+				<div id="mp-checkout-column-registration-needed" class="mp_checkout_column_section">
+					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
+		}
+				
+		$html .= '<div class="mp_checkout_field mp_checkout_column">
+				<label class="mp_form_label">' . __( 'Username', 'mp' ) . ' ' . $required_labels . '</label>	
+				<input type="text" name="account_username" id="mp_account_username" ' . $required_fields . ' data-rule-remote="' . esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ) . '" data-msg-remote="' . __( 'An account with this username already exists', 'mp' ) . '"></input>
+			  </div><!-- end mp_checkout_field -->';
+		
+		$html .= '<div class="mp_checkout_field mp_checkout_column">
+				<label class="mp_form_label">' . __( 'Password', 'mp' ) . ' ' . $required_labels . '</label>	
+				<input type="password" name="account_password" ' . $required_fields . '></input>
+			  </div><!-- end mp_checkout_field -->';			
+		$html .= wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce' ) . '
+			</div>';		
 		
 		return $html;
 	}
@@ -1274,6 +1289,7 @@ class MP_Checkout {
 						<input type="password" name="mp_login_password" class="mp_form_input">
 					</div><!-- end mp_checkout_field -->
 					<button id="mp-button-checkout-login" type="button" class="mp_button mp_button-medium mp_button-checkout-login">' . __( 'Login', 'mp' ) . '</button>
+                                        <p><a href="' . wp_lostpassword_url( get_permalink() ) . '" title="Lost Password">Lost Password</a>
 				</div><!-- end mp_checkout_column -->
 				';
 			if ( mp_get_setting( 'force_login' ) == false && ! is_user_logged_in() ) {
@@ -1281,6 +1297,12 @@ class MP_Checkout {
 					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
 					<p>' . __( 'Proceed to checkout and you\'ll have an opportunity to create an account at the end.', 'mp' ) . '</p>
 					<p><button type="button" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue as Guest', 'mp' ) . '</button></p>
+				</div><!-- end mp_checkout_column -->';
+			} else {
+				$html .= '<div class="mp_checkout_column">
+					<h4 class="mp_sub_title">' . __( 'First-time customer?', 'mp' ) . '</h4>
+					<p>' . __( 'Proceed to checkout and create an account at the end.', 'mp' ) . '</p>
+					<p><button type="button" class="mp_button mp_button-medium mp_button-checkout-next-step mp_continue_as_guest">' . __( 'Continue', 'mp' ) . '</button></p>
 				</div><!-- end mp_checkout_column -->';
 			}
 		}

@@ -63,7 +63,20 @@ class MP_Admin_Multisite {
 				&$this,
 				'force_check_global_gateway'
 			), 10, 4 );
+			
+			add_filter('wpmudev_field/before_get_value', array(&$this, 'global_currency_options'), 10, 4);
 		}
+		//On blog status change update blog_public status
+		add_action( 'activate_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'make_ham_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'unarchive_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'make_undelete_blog', array( $this, 'set_blog_public_global_products' ) );
+		add_action( 'activate_blog', array( $this, 'set_blog_public_global_products' ) );
+		
+		add_action( 'delete_blog', array( $this, 'unset_blog_public_global_products' ) );
+		add_action( 'deactivate_blog', array( $this, 'unset_blog_public_global_products' ) );
+		add_action( 'archive_blog', array( $this, 'unset_blog_public_global_products' ) );
+		add_action( 'make_spam_blog', array( $this, 'unset_blog_public_global_products' ) );
 	}
 	
 	/**
@@ -142,6 +155,7 @@ class MP_Admin_Multisite {
 		$this->init_gateway_permissions_metabox();
 		$this->init_theme_permissions_metabox();
 		$this->init_network_pages();
+		$this->init_global_currency_metabox();
 		do_action( 'mp_multisite_init_metaboxes' );
 	}
 
@@ -167,6 +181,93 @@ class MP_Admin_Multisite {
 			'name'  => 'global_cart',
 			'label' => array( 'text' => __( 'Enable Global Shopping Cart?', 'mp' ) ),
 		) );
+	}
+	
+	/**
+	 * Display global currency information
+	 *
+	 * @since 3.1.3
+	 * @access public
+	 */
+	public function init_global_currency_metabox(){
+		if( mp_get_network_setting( 'global_cart' ) ){
+
+			$metabox = new WPMUDEV_Metabox( array(
+				'id'               => 'mp-global-store-currency',
+				'page_slugs'       => array( 'network-store-settings' ),
+				'title'            => __( 'Global Store Currency', 'mp' ),
+				'site_option_name' => 'mp_network_settings',
+				'order'            => 0,
+			) );
+
+			$currencies	 = mp()->currencies;
+			$options	 = array( '' => __( 'Select a Currency', 'mp' ) );
+
+			foreach ( $currencies as $key => $value ) {
+				$options[ $key ] = esc_attr( $value[ 0 ] ) . ' - ' . mp_format_currency( $key );
+			}
+
+			$metabox->add_field( 'advanced_select', array(
+				'name'			 => 'global_currency',
+				'placeholder'	 => __( 'Select a Currency', 'mp' ),
+				'multiple'		 => false,
+				'label'			 => array( 'text' => __( 'Global Currency', 'mp' ) ),
+				'options'		 => $options,
+				'width'			 => 'element',
+			) );
+
+			$metabox->add_field( 'radio_group', array(
+				'name'			 => 'global_curr_symbol_position',
+				'label'			 => array( 'text' => __( 'Currency Symbol Position', 'mp' ) ),
+				'default_value'	 => '1',
+				'orientation'	 => 'horizontal',
+				'options'		 => array(
+					'1'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_network_setting( 'global_currency', 'USD' ) ) . '</span>100',
+					'2'	 => '<span class="mp-currency-symbol">' . mp_format_currency( mp_get_network_setting( 'global_currency', 'USD' ) ) . '</span> 100',
+					'3'	 => '100<span class="mp-currency-symbol">' . mp_format_currency( mp_get_network_setting( 'global_currency', 'USD' ) ) . '</span>',
+					'4'	 => '100 <span class="mp-currency-symbol">' . mp_format_currency( mp_get_network_setting( 'global_currency', 'USD' ) ) . '</span>',
+				)
+			) );
+
+			$metabox->add_field( 'radio_group', array(
+				'name'			 => 'global_price_format',
+				'label'			 => array( 'text' => __( 'Price Format', 'mp' ) ),
+				'default_value'	 => 'en',
+				'orientation'	 => 'horizontal',
+				'options'		 => array(
+					'en'	 => '1,123.45',
+					'eu'	 => '1.123,45',
+					'frc'	 => '1 123,45',
+					'frd'	 => '1 123.45',
+				),
+			) );
+
+			$metabox->add_field( 'radio_group', array(
+				'name'			 => 'global_curr_decimal',
+				'label'			 => array( 'text' => __( 'Show Decimal in Prices', 'mp' ) ),
+				'default_value'	 => 'on',
+				'orientation'	 => 'horizontal',
+				'options'		 => array(
+					'off'	 => '100',
+					'on'	 => '100.00',
+				),
+			) );
+
+		}
+	}
+
+	/**
+	 * Fetch currency values
+	 */
+	public function global_currency_options( $value, $post_id, $raw, $field ){
+
+		$currency_global_options_indexers = array( 
+			'global_curr_symbol_position',
+			'global_price_format',
+			'global_curr_decimal'
+		);
+		
+		return in_array( $field->args['name'], $currency_global_options_indexers ) ? mp_get_network_setting( $field->args['name'] ) : $value;
 	}
 
 	/**
@@ -541,6 +642,86 @@ class MP_Admin_Multisite {
 				trigger_error( 'Error! MP_Admin_Multisite doesn\'t have a ' . $method . ' method.', E_USER_ERROR );
 				break;
 		}
+	}
+
+	/**
+	 * Update blog_public state to 1 on blog status change
+	 *
+	 * @since 3.1.2
+	 * @access public
+	 * 
+	 */
+	public function set_blog_public_global_products( $blog_id ){
+
+		if( is_integer( $blog_id ) ){
+
+			global $wpdb;
+
+			$global_products_table = "{$wpdb->base_prefix}mp_products";
+			$global_term_relationships_table = "{$wpdb->base_prefix}mp_term_relationships";
+
+			$wpdb->update( $global_products_table,
+				array(
+					'blog_public' => 1
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+			
+			$wpdb->update( $global_term_relationships_table,
+				array(
+					'public' => 1
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+
+		}
+
+	}
+
+	/**
+	 * Update blog_public state to 0 on blog status change	 
+	 */
+	public function unset_blog_public_global_products( $blog_id ){
+
+		if( is_integer( $blog_id ) ){
+
+			global $wpdb;
+
+			$global_products_table = "{$wpdb->base_prefix}mp_products";
+			$global_term_relationships_table = "{$wpdb->base_prefix}mp_term_relationships";
+
+			$wpdb->update( $global_products_table,
+				array(
+					'blog_public' => 0
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+			
+			$wpdb->update( $global_term_relationships_table,
+				array(
+					'public' => 0
+				),
+				array(
+					'blog_id' => $blog_id
+				),
+				array( '%d' ),
+				array( '%d' )
+			);
+
+		}
+
 	}
 
 }

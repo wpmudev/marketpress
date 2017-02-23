@@ -103,6 +103,12 @@ class MP_Short_Codes {
 		wp_register_script( 'mp-select2', mp_plugin_url( 'ui/select2/select2.min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_register_script( 'colorbox', mp_plugin_url( 'ui/js/jquery.colorbox-min.js' ), array( 'jquery' ), MP_VERSION, true );
 		wp_enqueue_script( 'mp-frontend', mp_plugin_url( 'ui/js/frontend.js' ), array( 'jquery-ui-tooltip', 'colorbox', 'hover-intent', 'mp-select2' ), MP_VERSION, true );
+		
+		$grid_with_js = apply_filters('mp-do_grid_with_js', true);
+		
+		if ( $grid_with_js == "true" ) {
+			wp_enqueue_script( 'mp-equal-height', mp_plugin_url( 'ui/js/mp-equal-height.js' ), array('jquery'), MP_VERSION );
+		}
 
 // Get product category links
 		$terms	 = get_terms( 'product_category' );
@@ -189,7 +195,10 @@ class MP_Short_Codes {
 	 */
 	public function mp_order_status_sc( $atts, $content = null ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ] = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		return mp_order_status( $atts );
 	}
 
@@ -201,7 +210,10 @@ class MP_Short_Codes {
 	 */
 	public function mp_checkout_sc( $atts, $content = null ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ] = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		return mp_checkout()->display( $atts );
 	}
 
@@ -213,7 +225,10 @@ class MP_Short_Codes {
 	 */
 	public function mp_cart_sc( $atts, $content = null ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ] = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		return MP_Cart::get_instance()->display( $atts );
 	}
 
@@ -347,8 +362,11 @@ class MP_Short_Codes {
 	function mp_featured_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]	 = false;
-		$atts[ 'featured' ]	 = true;
+		$atts = shortcode_atts( array(
+			'echo' => false,
+			'featured' => true
+		), $atts );
+
 		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
 		$args			 = $this->_parse_atts( $args );
 
@@ -384,8 +402,10 @@ class MP_Short_Codes {
 	function mp_related_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]		 = false;
-		//$args			 = shortcode_atts( mp()->defaults[ 'related_products' ], $atts );
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+
 		$args				 = $this->_parse_atts( $atts );
 		$related_products	 = '';
 
@@ -416,7 +436,10 @@ class MP_Short_Codes {
 	function mp_list_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]	 = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
 		$args			 = $this->_parse_atts( $args );
 
