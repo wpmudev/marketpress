@@ -2367,7 +2367,7 @@ class MP_Cart {
 				$rounding_error = $total - $pre_total;
 
 				//Shipping price should be added after products price calculation
-				$total = $total + $this->shipping_total();
+				$total = $total + (float) $this->shipping_total();
 				//Fix the rounding error, if there is
 				$total -= $rounding_error;
 			}
