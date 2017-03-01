@@ -620,6 +620,7 @@ $this->GB_provinces = array(
 	'Down'							 => 'Down',
 	'Dumfriesshire'					 => 'Dumfriesshire',
 	'Dunbartonshire/Dumbartonshire'	 => 'Dunbartonshire/Dumbartonshire',
+    'County Bristol'				 => 'County Bristol',
 	'County Durham'					 => 'County Durham',
 	'East Lothian/Haddingtonshire'	 => 'East Lothian/Haddingtonshire',
 	'Essex'							 => 'Essex',
