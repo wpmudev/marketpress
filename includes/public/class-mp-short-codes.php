@@ -362,13 +362,8 @@ class MP_Short_Codes {
 	function mp_featured_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts = shortcode_atts( array(
-			'echo' => false,
-			'featured' => true
-		), $atts );
-
-		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
-		$args			 = $this->_parse_atts( $args );
+		$args = shortcode_atts( mp()->defaults[ 'featured_list_products_sc' ], $atts );
+		$args = $this->_parse_atts( $args );
 
 		return mp_featured_products( $args );
 	}
@@ -436,12 +431,8 @@ class MP_Short_Codes {
 	function mp_list_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts = shortcode_atts( array(
-			'echo' => false
-		), $atts );
-		
-		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
-		$args			 = $this->_parse_atts( $args );
+		$args = shortcode_atts( mp()->defaults[ 'list_products_sc' ], $atts );
+		$args = $this->_parse_atts( $args );
 
 		return mp_list_products( $args );
 	}
@@ -466,6 +457,7 @@ class MP_Short_Codes {
 			'image'		 => 'single',
 			'meta'		 => true
 		), $atts );
+
 		$atts	 = $this->_parse_atts( $atts );
 
 		extract( $atts );
