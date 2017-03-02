@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2.2\n"
+"Project-Id-Version: MarketPress 3.2.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-02-22 17:02:28+00:00\n"
+"POT-Creation-Date: 2017-03-02 08:33:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -179,7 +179,7 @@ msgstr ""
 #: includes/admin/class-mp-shortcode-builder.php:793
 #: includes/admin/widgets/product-list.php:227
 #: includes/common/template-functions.php:886
-#: includes/common/template-functions.php:2886
+#: includes/common/template-functions.php:2889
 msgid "Category"
 msgstr ""
 
@@ -1704,7 +1704,7 @@ msgid "General"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1918
-#: includes/admin/class-mp-products-admin.php:2158 includes/common/data.php:34
+#: includes/admin/class-mp-products-admin.php:2158 includes/common/data.php:62
 #: includes/common/helpers.php:140
 msgid "Taxes"
 msgstr ""
@@ -4033,11 +4033,11 @@ msgid ""
 "class=\"button-primary\" href=\"%s\">Go to update page</a>"
 msgstr ""
 
-#: includes/common/class-mp-order.php:332 includes/common/data.php:125
+#: includes/common/class-mp-order.php:332 includes/common/data.php:153
 msgid "New Order Notification: ORDERID"
 msgstr ""
 
-#: includes/common/class-mp-order.php:333 includes/common/data.php:126
+#: includes/common/class-mp-order.php:333 includes/common/data.php:154
 msgid ""
 "A new order (ORDERID) was created in your store:\n"
 "\n"
@@ -4264,65 +4264,65 @@ msgstr ""
 msgid "Standard Table"
 msgstr ""
 
-#: includes/common/data.php:31
+#: includes/common/data.php:59
 msgid "Zip Code"
 msgstr ""
 
-#: includes/common/data.php:73
+#: includes/common/data.php:101
 #. Translators: change default slugs here
 msgid "store"
 msgstr ""
 
-#: includes/common/data.php:74
+#: includes/common/data.php:102
 msgid "products"
 msgstr ""
 
-#: includes/common/data.php:75
+#: includes/common/data.php:103
 msgid "shopping-cart"
 msgstr ""
 
-#: includes/common/data.php:76
+#: includes/common/data.php:104
 msgid "order-status"
 msgstr ""
 
-#: includes/common/data.php:77
+#: includes/common/data.php:105
 msgid "category"
 msgstr ""
 
-#: includes/common/data.php:78
+#: includes/common/data.php:106
 msgid "tag"
 msgstr ""
 
-#: includes/common/data.php:115
+#: includes/common/data.php:143
 msgid ""
 "<p>If you have any questions about your order please do not hesitate to "
 "contact us.</p>"
 msgstr ""
 
-#: includes/common/data.php:117
+#: includes/common/data.php:145
 msgid ""
 "<p>Please enter your shipping information in the form below to proceed with "
 "your order.</p>"
 msgstr ""
 
-#: includes/common/data.php:119
+#: includes/common/data.php:147
 msgid ""
 "<p>You are almost done! Please do a final review of your order to make sure "
 "everything is correct then click the \"Confirm Payment\" button.</p>"
 msgstr ""
 
-#: includes/common/data.php:120
+#: includes/common/data.php:148
 msgid ""
 "<p>Thank you for your order! We appreciate your business, and please come "
 "back often to check out our new products.</p>"
 msgstr ""
 
-#: includes/common/data.php:129 includes/common/data.php:135
-#: includes/common/data.php:140
+#: includes/common/data.php:157 includes/common/data.php:163
+#: includes/common/data.php:168
 msgid "Your Order Confirmation (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:130
+#: includes/common/data.php:158
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -4349,7 +4349,7 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:136
+#: includes/common/data.php:164
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -4371,7 +4371,7 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:141
+#: includes/common/data.php:169
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -4397,11 +4397,11 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:145 includes/common/data.php:155
+#: includes/common/data.php:173 includes/common/data.php:183
 msgid "Your Order Has Been Shipped! (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:146
+#: includes/common/data.php:174
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "Your order has been shipped! Depending on the shipping method and your "
@@ -4426,11 +4426,11 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:150
+#: includes/common/data.php:178
 msgid "Your Order Is Ready To Be Downloaded! (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:151
+#: includes/common/data.php:179
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "Your order is now available to download! Please refer to your Order ID "
@@ -4451,7 +4451,7 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:156
+#: includes/common/data.php:184
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "Your order has been shipped! Also, digital downloads included in your order "
@@ -8230,20 +8230,20 @@ msgid ""
 "verify the order number and try again."
 msgstr ""
 
-#: includes/common/template-functions.php:2559
+#: includes/common/template-functions.php:2561
 msgid "Categorized in "
 msgstr ""
 
-#: includes/common/template-functions.php:2580
+#: includes/common/template-functions.php:2582
 msgid "Tagged in "
 msgstr ""
 
-#: includes/common/template-functions.php:2780
+#: includes/common/template-functions.php:2783
 #: includes/multisite/template-functions.php:354
 msgid "Prev"
 msgstr ""
 
-#: includes/common/template-functions.php:2781
+#: includes/common/template-functions.php:2784
 #: includes/multisite/template-functions.php:355
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:97
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:114
@@ -8251,66 +8251,66 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: includes/common/template-functions.php:2837
+#: includes/common/template-functions.php:2840
 msgid "Show All"
 msgstr ""
 
-#: includes/common/template-functions.php:2860
+#: includes/common/template-functions.php:2863
 #: includes/multisite/template-functions.php:399
 msgid "Default"
 msgstr ""
 
-#: includes/common/template-functions.php:2861
+#: includes/common/template-functions.php:2864
 #: includes/multisite/template-functions.php:400
 msgid "Release Date (Latest to Oldest)"
 msgstr ""
 
-#: includes/common/template-functions.php:2862
+#: includes/common/template-functions.php:2865
 #: includes/multisite/template-functions.php:401
 msgid "Release Date (Oldest to Latest)"
 msgstr ""
 
-#: includes/common/template-functions.php:2863
+#: includes/common/template-functions.php:2866
 #: includes/multisite/template-functions.php:402
 msgid "Name (A-Z)"
 msgstr ""
 
-#: includes/common/template-functions.php:2864
+#: includes/common/template-functions.php:2867
 #: includes/multisite/template-functions.php:403
 msgid "Name (Z-A)"
 msgstr ""
 
-#: includes/common/template-functions.php:2865
+#: includes/common/template-functions.php:2868
 #: includes/multisite/template-functions.php:404
 msgid "Price (Low to High)"
 msgstr ""
 
-#: includes/common/template-functions.php:2866
+#: includes/common/template-functions.php:2869
 #: includes/multisite/template-functions.php:405
 msgid "Price (High to Low)"
 msgstr ""
 
-#: includes/common/template-functions.php:2867
+#: includes/common/template-functions.php:2870
 #: includes/multisite/template-functions.php:406
 msgid "Popularity (Most Popular - Least Popular)"
 msgstr ""
 
-#: includes/common/template-functions.php:2868
+#: includes/common/template-functions.php:2871
 #: includes/multisite/template-functions.php:407
 msgid "Popularity (Least Popular - Most Popular)"
 msgstr ""
 
-#: includes/common/template-functions.php:2885
+#: includes/common/template-functions.php:2888
 #: includes/multisite/template-functions.php:449
 msgid "Product Category"
 msgstr ""
 
-#: includes/common/template-functions.php:2891
+#: includes/common/template-functions.php:2894
 #: includes/multisite/template-functions.php:448
 msgid "Order By"
 msgstr ""
 
-#: includes/common/template-functions.php:3141
+#: includes/common/template-functions.php:3144
 msgid "Uncategorized"
 msgstr ""
 
@@ -8610,15 +8610,15 @@ msgid ""
 "contact us for help."
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:417
+#: includes/public/class-mp-short-codes.php:412
 msgid "product_id must be defined"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:623
+#: includes/public/class-mp-short-codes.php:615
 msgid "Unlimited stock"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:626
+#: includes/public/class-mp-short-codes.php:618
 msgid "Only %s left in stock..."
 msgstr ""
 

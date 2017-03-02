@@ -4,6 +4,13 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.3
+----------------------------------------------------------------------
+
+- Fixed: Product shortcode attributes not applied
+- Fixed: HTML tags stripped from product description
+- Tweaked: Added county Bristol for UK provinces
+
 3.2.2
 ----------------------------------------------------------------------
 
