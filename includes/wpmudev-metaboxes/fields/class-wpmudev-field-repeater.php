@@ -223,7 +223,7 @@ class WPMUDEV_Field_Repeater extends WPMUDEV_Field {
 		$atts = '';
 		
 		if ( empty($data) ) {
-			$data[] = array(); // So we always show at least one row
+			$data = array(''); // So we always show at least one row
 		}
 		
 		foreach ( $this->args['custom'] as $key => $att ) {

@@ -149,24 +149,26 @@ class MP_Admin {
 		if ( MP_LITE ) {
 			return;
 		}
-
-		//! TODO: update screen ids for dash notices
-		global $wpmudev_notices;
-		$wpmudev_notices[] = array(
-			'id'		 => 144,
-			'name'		 => 'MarketPress',
-			'screens'	 => array(
-				'edit-product',
-				'edit-mp_product',
-				'product',
-				'mp_product',
-				'edit-product_category',
-				'edit-product_tag',
-				'settings_page_marketpress-ms-network'
-			)
-		);
-
-		require_once mp_plugin_dir( 'includes/admin/dash-notice/wpmudev-dash-notification.php' );
+		
+		//load dashboard notice
+		if ( file_exists( dirname( __FILE__ ) . '/includes/admin/dash-notice/wpmudev-dash-notification.php' ) ) {
+			global $wpmudev_notices;
+			$wpmudev_notices[] = array(
+				'id'		 => 144,
+				'name'		 => 'MarketPress',
+				'screens'	 => array(
+					'edit-product',
+					'edit-mp_product',
+					'product',
+					'mp_product',
+					'edit-product_category',
+					'edit-product_tag',
+					'settings_page_marketpress-ms-network'
+				)
+			);
+			
+			include_once mp_plugin_dir( 'includes/admin/dash-notice/wpmudev-dash-notification.php' );
+		}
 	}
 
 	/**
@@ -196,9 +198,7 @@ class MP_Admin {
 			?>
 			<div class="icon32"><img src="<?php echo mp_plugin_url( 'ui/images/download.png' ); ?>" /></div>
 			<h2><?php _e( 'Export Orders', 'mp' ); ?></h2>
-			<?php if ( defined( 'MP_LITE' ) ) { ?>
-				<a class="mp-pro-update" href="http://premium.wpmudev.org/project/e-commerce/" title="<?php _e( 'Upgrade Now', 'mp' ); ?> &raquo;"><?php _e( 'Upgrade to enable CSV order exports &raquo;', 'mp' ); ?></a><br />
-			<?php } ?>
+
 			<form action="<?php echo admin_url( 'admin-ajax.php?action=mp-orders-export' ); ?>" method="post">
 				<?php
 				$months = $wpdb->get_results( $wpdb->prepare( "
@@ -239,7 +239,7 @@ class MP_Admin {
 					<option<?php selected( $status, 'order_shipped' ); ?> value="order_shipped"><?php _e( 'Shipped', 'mp' ); ?></option>
 					<option<?php selected( $status, 'order_closed' ); ?> value="order_closed"><?php _e( 'Closed', 'mp' ); ?></option>
 				</select>
-				<input type="submit" value="<?php _e( 'Download &raquo;', 'mp' ); ?>" name="export_orders" class="button-secondary"<?php echo defined( 'MP_LITE' ) ? ' disabled="disabled"' : ''; ?> />
+				<input type="submit" value="<?php _e( 'Download &raquo;', 'mp' ); ?>" name="export_orders" class="button-secondary" />
 			</form>
 
 
@@ -319,8 +319,7 @@ class MP_Admin {
 		$quick_setup = mp_get_get_value( 'quick_setup_step' );
 		if ( isset( $quick_setup ) ) {
 			//wp_enqueue_style( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/css/quick-setup.css' ), array(), MP_VERSION );
-			wp_enqueue_script( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/js/quick-setup.js' ), array( 'jquery' ), MP_VERSION );
-			wp_enqueue_script( 'jquery-ui-tabs' );
+			wp_enqueue_script( 'mp-quick-setup', mp_plugin_url( 'includes/admin/ui/js/quick-setup.js' ), array( 'jquery', 'jquery-ui-tabs' ), MP_VERSION );
 		}
 
 		wp_enqueue_style( 'mp-admin', mp_plugin_url( 'includes/admin/ui/css/admin.css' ), array(), MP_VERSION );

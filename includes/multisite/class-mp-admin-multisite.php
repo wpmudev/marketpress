@@ -155,6 +155,7 @@ class MP_Admin_Multisite {
 		$this->init_gateway_permissions_metabox();
 		$this->init_theme_permissions_metabox();
 		$this->init_network_pages();
+		$this->init_global_currency_metabox();
 		do_action( 'mp_multisite_init_metaboxes' );
 	}
 
@@ -213,12 +214,6 @@ class MP_Admin_Multisite {
 				'label'			 => array( 'text' => __( 'Global Currency', 'mp' ) ),
 				'options'		 => $options,
 				'width'			 => 'element',
-			) );
-
-			$metabox->add_field( 'checkbox', array(
-				'name'			=> 'test1',
-				'label'			 => array( 'text' => __( 'Test one', 'mp' ) ),				
-				
 			) );
 
 			$metabox->add_field( 'radio_group', array(

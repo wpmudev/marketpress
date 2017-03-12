@@ -665,7 +665,7 @@ class MP_Checkout {
 	public function display( $args = array() ) {
 		$args = array_replace_recursive( array(
 			'echo' => true,
-		), $args );
+		), (array) $args );
 		$this->_stepnum = 1;
 		extract( $args );
 

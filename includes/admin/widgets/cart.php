@@ -14,7 +14,7 @@ class MarketPress_Shopping_Cart_Widget extends WP_Widget {
 		if ( get_query_var( 'pagename' ) == 'cart' )
 			return;
 
-		if ( $instance[ 'only_store_pages' ] && !mp_is_shop_page() )
+		if ( ( isset($instance[ 'only_store_pages' ]) && $instance[ 'only_store_pages' ] ) && !mp_is_shop_page() )
 			return;
 
 		$instance[ 'show_product_image' ] = !empty( $instance[ 'show_product_image' ] ) ? 1 : 0;

@@ -451,7 +451,7 @@ class MP_Coupons_Addon {
 
 		$cart = new MP_Cart();
 
-		$total = ( $cart->product_total() + $cart->tax_total() + $cart->shipping_total() );
+		$total = ( (float) $cart->product_total() + (float) $cart->tax_total() + (float) $cart->shipping_total() );
 
 		if ( abs( $discount_value ) >= $total ) {
 			$discount_value = - 1 * $total;

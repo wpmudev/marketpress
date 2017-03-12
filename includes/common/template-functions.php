@@ -2451,7 +2451,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 		$lightbox_code = '';
 		$show_lightbox = mp_get_setting( 'show_lightbox' );
 
-		if ( $show_lightbox == 1 ) {
+		if ( $show_lightbox == 1 && mp_get_setting( 'disable_large_image' ) != 1 ) {
 			$lightbox_code = "onSliderLoad: function(el) {
 											el.lightGallery({
 												selector: '#mp-product-gallery .lslide',
@@ -2460,6 +2460,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 											});
 										}";
 		}
+        
+        $lightbox_code = apply_filters( 'mp_single_product_image_lightbox', $lightbox_code );
 
 		if ( $image && $has_image ) {
 			if ( ! $product->has_variations() ) {
@@ -2613,7 +2615,8 @@ if ( ! function_exists( 'mp_product' ) ) {
 			if ( $content == 'excerpt' ) {
 				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
 			} else {
-				$return .= ( $variation ) ? $variation->content( false ) : $product->content( false );
+				$product_description = ( !$product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
+				$return .= apply_filters('the_content', $product_description);
 			}
 
 			$return .= '
@@ -3168,10 +3171,10 @@ endif;
 
 if ( ! function_exists( 'mp_get_plugin_slug' ) ) {
 	function mp_get_plugin_slug() {
-		if ( MP_LITE ) {
-			return 'wordpress-ecommerce/marketpress.php';
-		} else {
+		if ( file_exists( dirname( __FILE__ ) . '/includes/admin/dash-notice/wpmudev-dash-notification.php' ) ) {
 			return 'marketpress/marketpress.php';
+		} else {
+			return 'wordpress-ecommerce/marketpress.php';
 		}
 	}
 }

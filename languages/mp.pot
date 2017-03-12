@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the MarketPress package.
 msgid ""
 msgstr ""
-"Project-Id-Version: MarketPress 3.2\n"
+"Project-Id-Version: MarketPress 3.2.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-01-26 20:09:33+00:00\n"
+"POT-Creation-Date: 2017-03-02 08:33:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -179,7 +179,7 @@ msgstr ""
 #: includes/admin/class-mp-shortcode-builder.php:793
 #: includes/admin/widgets/product-list.php:227
 #: includes/common/template-functions.php:886
-#: includes/common/template-functions.php:2886
+#: includes/common/template-functions.php:2889
 msgid "Category"
 msgstr ""
 
@@ -406,7 +406,7 @@ msgstr ""
 
 #: includes/addons/mp-pdf-invoice/class-mp-pdf-invoice-addon.php:195
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:798
-#: includes/multisite/class-mp-admin-multisite.php:171
+#: includes/multisite/class-mp-admin-multisite.php:172
 msgid "General Settings"
 msgstr ""
 
@@ -607,22 +607,14 @@ msgid ""
 "please setup a new payment gateway <a href=\"%s\">here</a>."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:181
+#: includes/admin/class-mp-admin.php:183
 msgid "MarketPress Instructions"
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:198
+#: includes/admin/class-mp-admin.php:200
 #: includes/admin/class-mp-exporter-orders.php:150
 #: includes/admin/class-mp-exporter-orders.php:178
 msgid "Export Orders"
-msgstr ""
-
-#: includes/admin/class-mp-admin.php:200
-msgid "Upgrade Now"
-msgstr ""
-
-#: includes/admin/class-mp-admin.php:200
-msgid "Upgrade to enable CSV order exports &raquo;"
 msgstr ""
 
 #: includes/admin/class-mp-admin.php:219
@@ -735,19 +727,19 @@ msgstr ""
 msgid "Please wait...saving in progress..."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:355
+#: includes/admin/class-mp-admin.php:354
 msgid "Custom field updated."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:356
+#: includes/admin/class-mp-admin.php:355
 msgid "Custom field deleted."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:360
+#: includes/admin/class-mp-admin.php:359
 msgid "Page saved."
 msgstr ""
 
-#: includes/admin/class-mp-admin.php:362
+#: includes/admin/class-mp-admin.php:361
 msgid "M j, Y @ G:i"
 msgstr ""
 
@@ -934,7 +926,7 @@ msgstr ""
 
 #: includes/admin/class-mp-ajax.php:482
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:164
-#: includes/multisite/class-mp-admin-multisite.php:589
+#: includes/multisite/class-mp-admin-multisite.php:584
 msgid "Edit Page"
 msgstr ""
 
@@ -1712,7 +1704,7 @@ msgid "General"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1918
-#: includes/admin/class-mp-products-admin.php:2158 includes/common/data.php:34
+#: includes/admin/class-mp-products-admin.php:2158 includes/common/data.php:62
 #: includes/common/helpers.php:140
 msgid "Taxes"
 msgstr ""
@@ -1906,8 +1898,8 @@ msgstr ""
 #: includes/admin/class-mp-setup-wizard.php:444
 #: includes/admin/store-settings/class-mp-store-settings-general.php:386
 #: includes/admin/store-settings/class-mp-store-settings-general.php:394
-#: includes/multisite/class-mp-admin-multisite.php:203
-#: includes/multisite/class-mp-admin-multisite.php:211
+#: includes/multisite/class-mp-admin-multisite.php:204
+#: includes/multisite/class-mp-admin-multisite.php:212
 msgid "Select a Currency"
 msgstr ""
 
@@ -1918,7 +1910,7 @@ msgstr ""
 
 #: includes/admin/class-mp-setup-wizard.php:452
 #: includes/admin/store-settings/class-mp-store-settings-general.php:403
-#: includes/multisite/class-mp-admin-multisite.php:226
+#: includes/multisite/class-mp-admin-multisite.php:221
 msgid "Currency Symbol Position"
 msgstr ""
 
@@ -2733,7 +2725,7 @@ msgstr ""
 #: includes/admin/class-mp-store-settings-admin.php:114
 #: includes/admin/widgets/categories.php:8
 #: includes/admin/widgets/categories.php:18
-#: includes/multisite/class-mp-admin-multisite.php:544
+#: includes/multisite/class-mp-admin-multisite.php:539
 msgid "Product Categories"
 msgstr ""
 
@@ -2743,7 +2735,7 @@ msgstr ""
 
 #: includes/admin/class-mp-store-settings-admin.php:115
 #: includes/admin/widgets/product-tag-cloud.php:46
-#: includes/multisite/class-mp-admin-multisite.php:553
+#: includes/multisite/class-mp-admin-multisite.php:548
 msgid "Product Tags"
 msgstr ""
 
@@ -3069,12 +3061,12 @@ msgid ""
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:416
-#: includes/multisite/class-mp-admin-multisite.php:239
+#: includes/multisite/class-mp-admin-multisite.php:234
 msgid "Price Format"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-general.php:429
-#: includes/multisite/class-mp-admin-multisite.php:252
+#: includes/multisite/class-mp-admin-multisite.php:247
 msgid "Show Decimal in Prices"
 msgstr ""
 
@@ -3253,7 +3245,7 @@ msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:85
 #: includes/multisite/class-mp-admin-multisite.php:121
-#: includes/multisite/class-mp-admin-multisite.php:625
+#: includes/multisite/class-mp-admin-multisite.php:620
 msgid "An error occurred while creating the store page. Please try again."
 msgstr ""
 
@@ -3266,7 +3258,7 @@ msgid "uncropped"
 msgstr ""
 
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:166
-#: includes/multisite/class-mp-admin-multisite.php:591
+#: includes/multisite/class-mp-admin-multisite.php:586
 msgid "Create Page"
 msgstr ""
 
@@ -3283,9 +3275,9 @@ msgstr ""
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:209
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:218
 #: includes/admin/store-settings/class-mp-store-settings-presentation.php:227
-#: includes/multisite/class-mp-admin-multisite.php:537
-#: includes/multisite/class-mp-admin-multisite.php:546
-#: includes/multisite/class-mp-admin-multisite.php:555
+#: includes/multisite/class-mp-admin-multisite.php:532
+#: includes/multisite/class-mp-admin-multisite.php:541
+#: includes/multisite/class-mp-admin-multisite.php:550
 msgid "Choose a Page"
 msgstr ""
 
@@ -4041,11 +4033,11 @@ msgid ""
 "class=\"button-primary\" href=\"%s\">Go to update page</a>"
 msgstr ""
 
-#: includes/common/class-mp-order.php:332 includes/common/data.php:125
+#: includes/common/class-mp-order.php:332 includes/common/data.php:153
 msgid "New Order Notification: ORDERID"
 msgstr ""
 
-#: includes/common/class-mp-order.php:333 includes/common/data.php:126
+#: includes/common/class-mp-order.php:333 includes/common/data.php:154
 msgid ""
 "A new order (ORDERID) was created in your store:\n"
 "\n"
@@ -4272,65 +4264,65 @@ msgstr ""
 msgid "Standard Table"
 msgstr ""
 
-#: includes/common/data.php:31
+#: includes/common/data.php:59
 msgid "Zip Code"
 msgstr ""
 
-#: includes/common/data.php:73
+#: includes/common/data.php:101
 #. Translators: change default slugs here
 msgid "store"
 msgstr ""
 
-#: includes/common/data.php:74
+#: includes/common/data.php:102
 msgid "products"
 msgstr ""
 
-#: includes/common/data.php:75
+#: includes/common/data.php:103
 msgid "shopping-cart"
 msgstr ""
 
-#: includes/common/data.php:76
+#: includes/common/data.php:104
 msgid "order-status"
 msgstr ""
 
-#: includes/common/data.php:77
+#: includes/common/data.php:105
 msgid "category"
 msgstr ""
 
-#: includes/common/data.php:78
+#: includes/common/data.php:106
 msgid "tag"
 msgstr ""
 
-#: includes/common/data.php:115
+#: includes/common/data.php:143
 msgid ""
 "<p>If you have any questions about your order please do not hesitate to "
 "contact us.</p>"
 msgstr ""
 
-#: includes/common/data.php:117
+#: includes/common/data.php:145
 msgid ""
 "<p>Please enter your shipping information in the form below to proceed with "
 "your order.</p>"
 msgstr ""
 
-#: includes/common/data.php:119
+#: includes/common/data.php:147
 msgid ""
 "<p>You are almost done! Please do a final review of your order to make sure "
 "everything is correct then click the \"Confirm Payment\" button.</p>"
 msgstr ""
 
-#: includes/common/data.php:120
+#: includes/common/data.php:148
 msgid ""
 "<p>Thank you for your order! We appreciate your business, and please come "
 "back often to check out our new products.</p>"
 msgstr ""
 
-#: includes/common/data.php:129 includes/common/data.php:135
-#: includes/common/data.php:140
+#: includes/common/data.php:157 includes/common/data.php:163
+#: includes/common/data.php:168
 msgid "Your Order Confirmation (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:130
+#: includes/common/data.php:158
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -4357,7 +4349,7 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:136
+#: includes/common/data.php:164
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -4379,7 +4371,7 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:141
+#: includes/common/data.php:169
 msgid ""
 "Thank you for your order CUSTOMERNAME!\n"
 "\n"
@@ -4405,11 +4397,11 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:145 includes/common/data.php:155
+#: includes/common/data.php:173 includes/common/data.php:183
 msgid "Your Order Has Been Shipped! (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:146
+#: includes/common/data.php:174
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "Your order has been shipped! Depending on the shipping method and your "
@@ -4434,11 +4426,11 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:150
+#: includes/common/data.php:178
 msgid "Your Order Is Ready To Be Downloaded! (ORDERID)"
 msgstr ""
 
-#: includes/common/data.php:151
+#: includes/common/data.php:179
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "Your order is now available to download! Please refer to your Order ID "
@@ -4459,7 +4451,7 @@ msgid ""
 "Thanks again!"
 msgstr ""
 
-#: includes/common/data.php:156
+#: includes/common/data.php:184
 msgid ""
 "Dear CUSTOMERNAME,\n"
 "Your order has been shipped! Also, digital downloads included in your order "
@@ -4517,46 +4509,46 @@ msgstr ""
 msgid "Billing"
 msgstr ""
 
-#: includes/common/helpers.php:210 includes/common/helpers.php:213
-#: includes/common/helpers.php:215
+#: includes/common/helpers.php:213 includes/common/helpers.php:216
+#: includes/common/helpers.php:218
 #: includes/common/shipping-modules/class-mp-shipping-api.php:406
 #: includes/common/shipping-modules/class-mp-shipping-api.php:428
 msgid "Shipping Method:"
 msgstr ""
 
-#: includes/common/helpers.php:219
+#: includes/common/helpers.php:222
 msgid "Tracking Number:"
 msgstr ""
 
-#: includes/common/helpers.php:224
+#: includes/common/helpers.php:227
 msgid "Special Instructions:"
 msgstr ""
 
-#: includes/common/helpers.php:229
+#: includes/common/helpers.php:232
 msgid "Order Notes:"
 msgstr ""
 
-#: includes/common/helpers.php:233
+#: includes/common/helpers.php:236
 msgid "Payment Method:"
 msgstr ""
 
-#: includes/common/helpers.php:236
+#: includes/common/helpers.php:239
 msgid "Payment Type:"
 msgstr ""
 
-#: includes/common/helpers.php:240
+#: includes/common/helpers.php:243
 msgid "Transaction ID:"
 msgstr ""
 
-#: includes/common/helpers.php:243
+#: includes/common/helpers.php:246
 msgid "Payment Total:"
 msgstr ""
 
-#: includes/common/helpers.php:246
+#: includes/common/helpers.php:249
 msgid "Your payment for this order is complete."
 msgstr ""
 
-#: includes/common/helpers.php:248
+#: includes/common/helpers.php:251
 msgid "Your payment for this order is not yet complete. Here is the latest status:"
 msgstr ""
 
@@ -8238,20 +8230,20 @@ msgid ""
 "verify the order number and try again."
 msgstr ""
 
-#: includes/common/template-functions.php:2559
+#: includes/common/template-functions.php:2561
 msgid "Categorized in "
 msgstr ""
 
-#: includes/common/template-functions.php:2580
+#: includes/common/template-functions.php:2582
 msgid "Tagged in "
 msgstr ""
 
-#: includes/common/template-functions.php:2780
+#: includes/common/template-functions.php:2783
 #: includes/multisite/template-functions.php:354
 msgid "Prev"
 msgstr ""
 
-#: includes/common/template-functions.php:2781
+#: includes/common/template-functions.php:2784
 #: includes/multisite/template-functions.php:355
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:97
 #: includes/wpmudev-metaboxes/fields/class-wpmudev-field-custom-quick-setup.php:114
@@ -8259,140 +8251,136 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: includes/common/template-functions.php:2837
+#: includes/common/template-functions.php:2840
 msgid "Show All"
 msgstr ""
 
-#: includes/common/template-functions.php:2860
+#: includes/common/template-functions.php:2863
 #: includes/multisite/template-functions.php:399
 msgid "Default"
 msgstr ""
 
-#: includes/common/template-functions.php:2861
+#: includes/common/template-functions.php:2864
 #: includes/multisite/template-functions.php:400
 msgid "Release Date (Latest to Oldest)"
 msgstr ""
 
-#: includes/common/template-functions.php:2862
+#: includes/common/template-functions.php:2865
 #: includes/multisite/template-functions.php:401
 msgid "Release Date (Oldest to Latest)"
 msgstr ""
 
-#: includes/common/template-functions.php:2863
+#: includes/common/template-functions.php:2866
 #: includes/multisite/template-functions.php:402
 msgid "Name (A-Z)"
 msgstr ""
 
-#: includes/common/template-functions.php:2864
+#: includes/common/template-functions.php:2867
 #: includes/multisite/template-functions.php:403
 msgid "Name (Z-A)"
 msgstr ""
 
-#: includes/common/template-functions.php:2865
+#: includes/common/template-functions.php:2868
 #: includes/multisite/template-functions.php:404
 msgid "Price (Low to High)"
 msgstr ""
 
-#: includes/common/template-functions.php:2866
+#: includes/common/template-functions.php:2869
 #: includes/multisite/template-functions.php:405
 msgid "Price (High to Low)"
 msgstr ""
 
-#: includes/common/template-functions.php:2867
+#: includes/common/template-functions.php:2870
 #: includes/multisite/template-functions.php:406
 msgid "Popularity (Most Popular - Least Popular)"
 msgstr ""
 
-#: includes/common/template-functions.php:2868
+#: includes/common/template-functions.php:2871
 #: includes/multisite/template-functions.php:407
 msgid "Popularity (Least Popular - Most Popular)"
 msgstr ""
 
-#: includes/common/template-functions.php:2885
+#: includes/common/template-functions.php:2888
 #: includes/multisite/template-functions.php:449
 msgid "Product Category"
 msgstr ""
 
-#: includes/common/template-functions.php:2891
+#: includes/common/template-functions.php:2894
 #: includes/multisite/template-functions.php:448
 msgid "Order By"
 msgstr ""
 
-#: includes/common/template-functions.php:3141
+#: includes/common/template-functions.php:3144
 msgid "Uncategorized"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:177
+#: includes/multisite/class-mp-admin-multisite.php:178
 msgid "Limit Global Widgets/Shortcodes To Main Blog?"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:181
+#: includes/multisite/class-mp-admin-multisite.php:182
 msgid "Enable Global Shopping Cart?"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:197
+#: includes/multisite/class-mp-admin-multisite.php:198
 msgid "Global Store Currency"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:213
+#: includes/multisite/class-mp-admin-multisite.php:214
 msgid "Global Currency"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:220
-msgid "Test one"
-msgstr ""
-
-#: includes/multisite/class-mp-admin-multisite.php:284
+#: includes/multisite/class-mp-admin-multisite.php:279
 msgid "%d products have been indexed in whole network"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:285
+#: includes/multisite/class-mp-admin-multisite.php:280
 msgid "Index Products"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:286
+#: includes/multisite/class-mp-admin-multisite.php:281
 msgid "Please hold on..."
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:290
+#: includes/multisite/class-mp-admin-multisite.php:285
 msgid "Product Indexer"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:341
+#: includes/multisite/class-mp-admin-multisite.php:336
 msgid "%d products get indexed"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:355
+#: includes/multisite/class-mp-admin-multisite.php:350
 msgid "Global Gateway"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:366
+#: includes/multisite/class-mp-admin-multisite.php:361
 msgid "Choose a Gateway"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:380
+#: includes/multisite/class-mp-admin-multisite.php:375
 msgid "Select a Gateway"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:395
+#: includes/multisite/class-mp-admin-multisite.php:390
 msgid "Gateway Permissions"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:406
-#: includes/multisite/class-mp-admin-multisite.php:452
+#: includes/multisite/class-mp-admin-multisite.php:401
+#: includes/multisite/class-mp-admin-multisite.php:447
 msgid "All Can Use"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:407
-#: includes/multisite/class-mp-admin-multisite.php:453
+#: includes/multisite/class-mp-admin-multisite.php:402
+#: includes/multisite/class-mp-admin-multisite.php:448
 msgid "No Access"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:443
+#: includes/multisite/class-mp-admin-multisite.php:438
 msgid "Theme Permissions"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:445
+#: includes/multisite/class-mp-admin-multisite.php:440
 msgid ""
 "Set theme access permissions for network stores. For a custom css theme, "
 "save your css file with the <strong>MarketPress Theme: NAME</strong> header "
@@ -8400,20 +8388,20 @@ msgid ""
 "in this list so you may select it."
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:483
-#: includes/multisite/class-mp-admin-multisite.php:499
+#: includes/multisite/class-mp-admin-multisite.php:478
+#: includes/multisite/class-mp-admin-multisite.php:494
 msgid "Store Network Settings"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:483
+#: includes/multisite/class-mp-admin-multisite.php:478
 msgid "Store Network"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:528
+#: includes/multisite/class-mp-admin-multisite.php:523
 msgid "Global Marketplace Pages"
 msgstr ""
 
-#: includes/multisite/class-mp-admin-multisite.php:535
+#: includes/multisite/class-mp-admin-multisite.php:530
 msgid "Marketplace"
 msgstr ""
 
@@ -8622,15 +8610,15 @@ msgid ""
 "contact us for help."
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:403
+#: includes/public/class-mp-short-codes.php:412
 msgid "product_id must be defined"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:606
+#: includes/public/class-mp-short-codes.php:615
 msgid "Unlimited stock"
 msgstr ""
 
-#: includes/public/class-mp-short-codes.php:609
+#: includes/public/class-mp-short-codes.php:618
 msgid "Only %s left in stock..."
 msgstr ""
 

@@ -195,7 +195,10 @@ class MP_Short_Codes {
 	 */
 	public function mp_order_status_sc( $atts, $content = null ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ] = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		return mp_order_status( $atts );
 	}
 
@@ -207,7 +210,10 @@ class MP_Short_Codes {
 	 */
 	public function mp_checkout_sc( $atts, $content = null ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ] = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		return mp_checkout()->display( $atts );
 	}
 
@@ -219,7 +225,10 @@ class MP_Short_Codes {
 	 */
 	public function mp_cart_sc( $atts, $content = null ) {
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ] = false;
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+		
 		return MP_Cart::get_instance()->display( $atts );
 	}
 
@@ -353,10 +362,8 @@ class MP_Short_Codes {
 	function mp_featured_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]	 = false;
-		$atts[ 'featured' ]	 = true;
-		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
-		$args			 = $this->_parse_atts( $args );
+		$args = shortcode_atts( mp()->defaults[ 'featured_list_products_sc' ], $atts );
+		$args = $this->_parse_atts( $args );
 
 		return mp_featured_products( $args );
 	}
@@ -390,8 +397,10 @@ class MP_Short_Codes {
 	function mp_related_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]		 = false;
-		//$args			 = shortcode_atts( mp()->defaults[ 'related_products' ], $atts );
+		$atts = shortcode_atts( array(
+			'echo' => false
+		), $atts );
+
 		$args				 = $this->_parse_atts( $atts );
 		$related_products	 = '';
 
@@ -422,9 +431,8 @@ class MP_Short_Codes {
 	function mp_list_products_sc( $atts ) {
 		$this->cart_needed();
 		$this->shortcodes_frontend_styles_scripts();
-		$atts[ 'echo' ]	 = false;
-		$args			 = shortcode_atts( mp()->defaults[ 'list_products' ], $atts );
-		$args			 = $this->_parse_atts( $args );
+		$args = shortcode_atts( mp()->defaults[ 'list_products_sc' ], $atts );
+		$args = $this->_parse_atts( $args );
 
 		return mp_list_products( $args );
 	}
@@ -449,6 +457,7 @@ class MP_Short_Codes {
 			'image'		 => 'single',
 			'meta'		 => true
 		), $atts );
+
 		$atts	 = $this->_parse_atts( $atts );
 
 		extract( $atts );

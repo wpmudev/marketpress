@@ -781,7 +781,7 @@ class MP_Cart {
 			'echo'     => false,
 			'view'     => null,
 			'editable' => true,
-		), $args );
+		), (array) $args );
 
 		extract( $args );
 
@@ -1930,7 +1930,7 @@ class MP_Cart {
 	 */
 	public function shipping_tax_total( $format = false ) {
 		$shipping_tax   = 0;
-		$shipping_price = $this->shipping_total();
+		$shipping_price = (float) $this->shipping_total();
 
 		/* if ( mp_get_setting( 'tax->tax_shipping' ) && $shipping_price ) {
 		  if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
@@ -1940,7 +1940,7 @@ class MP_Cart {
 		  $shipping_tax	 = ($shipping_price * $tax_rate);
 		  }
 		  } */
-		$tax_rate     = mp_tax_rate();
+		$tax_rate     = (float) mp_tax_rate();
 		$shipping_tax = ( $shipping_price * $tax_rate );
 		/**
 		 * Filter the shipping tax amount
@@ -2345,7 +2345,7 @@ class MP_Cart {
 	 */
 	public function total( $format = false ) {
 		if ( false === mp_arr_get_value( 'total', $this->_total ) ) {
-			$total = ( $this->product_total() + $this->tax_total() + $this->shipping_total() );
+			$total = ( (float) $this->product_total() + (float) $this->tax_total() + (float) $this->shipping_total() );
 
 			/**
 			 * Filter the total
@@ -2367,7 +2367,7 @@ class MP_Cart {
 				$rounding_error = $total - $pre_total;
 
 				//Shipping price should be added after products price calculation
-				$total = $total + $this->shipping_total();
+				$total = $total + (float) $this->shipping_total();
 				//Fix the rounding error, if there is
 				$total -= $rounding_error;
 			}
