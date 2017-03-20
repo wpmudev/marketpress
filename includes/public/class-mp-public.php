@@ -154,13 +154,12 @@ class MP_Public {
 	 * @return bool
 	 */
 	function is_store_page( $page = null ) {
-		if ( is_null( $page ) ) {
-			return ( get_post_meta( get_the_ID(), '_mp_store_page', true ) !== '' || get_post_meta( get_the_ID(), '_mp_store_page', true ) != 'none' || is_singular( MP_Product::get_post_type() ) || is_tax( array(
+		if ( is_null( $page ) ) {			
+			return ( ( get_post_meta( get_the_ID(), '_mp_store_page', true ) !== '' && get_post_meta( get_the_ID(), '_mp_store_page', true ) != 'none' ) || is_singular( MP_Product::get_post_type() ) || is_tax( array(
 					'product_category',
 					'product_tag'
 				) ) );
 		} else {
-	
 			if( get_post_type( $page ) == MP_Product::get_post_type() ){
 				return true;
 			}
