@@ -618,6 +618,29 @@ class MP_Coupons_Addon {
 				'min'    => 0,
 			),
 		) );
+
+		//Allow for the user to define the minimum number of products the cart has to have
+		$metabox->add_field( 'checkbox', array(
+			'name'  => 'product_count_limited',
+			'label' => array( 'text' => __( 'Can this coupon be limited to a number of products in the cart?', 'mp' ) ),
+		) );
+		
+		$metabox->add_field( 'text', array(
+			'name'       => 'min_products',
+			'desc'       => __( 'Enter the minimum number of products in the cart that this coupon can be used.', 'mp' ),
+			'class'      => 'digits',
+			'label'      => array( 'text' => __( 'Mimimum number of products', 'mp' ) ),
+			'validation' => array(
+				'digits' => true,
+				'min'    => 0,
+			),
+			'conditional' => array(
+				'name'   => 'product_count_limited',
+				'value'  => '1',
+				'action' => 'show',
+			),
+		) );
+
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'applies_to',
 			'label'         => array( 'text' => __( 'Applies To', 'mp' ) ),

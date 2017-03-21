@@ -453,6 +453,9 @@ class MP_Coupon {
 		$now      = time();
 		$is_valid = true;
 
+		//Moved to variable as it will be used in many instances
+		$cart_products = $this->get_products( true ) ;
+
 		if ( ! $this->exists() ) {
 			$is_valid = false;
 		} elseif ( $this->remaining_uses( false, true ) == 0 ) {
@@ -461,9 +464,11 @@ class MP_Coupon {
 			$is_valid = false;
 		} elseif ( $this->get_meta( 'has_end_date' ) && ( $now > strtotime( $this->get_meta( 'end_date', 0, false ) ) ) ) {
 			$is_valid = false;
-		} elseif ( array() == $this->get_products( true ) ) {
+		} elseif ( array() == $cart_products) {
 			$is_valid = false;
-		} else {
+		}elseif(!$this->valid_for_number_of_products($cart_products)){
+			$is_valid = false;
+		}else {
 			if( $action != 'remove_item' ) {
 				if ( $this->get_meta( 'applies_to' ) == 'user' ) {
 					$user = $this->get_meta( 'user' );
@@ -581,6 +586,33 @@ class MP_Coupon {
 		} else {
 			return $remaining;
 		}
+	}
+
+	/**
+	 * Check if the number of products in the cart has met the minimum
+	 *
+	 * @access public
+	 * @param Array $cart_products - the products in the cart
+	 *
+	 * @return Boolean
+	 */
+	public function valid_for_number_of_products($cart_products = array()){
+		$product_limited  = $this->get_meta( 'product_count_limited' );
+		
+		if($product_limited){
+			$min_products  = $this->get_meta( 'min_products' );
+			if($min_products){
+				$min_products = (float) $min_products;
+				if(!empty($cart_products)){
+					if(count($cart_products) >= $min_products){
+						return true;
+					}else{
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
