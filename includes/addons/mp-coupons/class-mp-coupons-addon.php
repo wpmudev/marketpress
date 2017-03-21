@@ -667,35 +667,20 @@ class MP_Coupons_Addon {
 			),
 		) );
 		//Paul Kevin
-		//Condition to allow also category assigning to a user
-		$metabox->add_field( 'radio_group', array(
-			'name'          => 'user_category',
-			'label'         => array( 'text' => __( 'Limit usage to a category?', 'mp' ) ),
-			'default_value' => 'no',
-			'options'       => array(
-				'no' 	  => __( 'No', 'mp' ),
-				'yes'     => __( 'Yes', 'mp' ),
-				
-			),
-			'conditional' => array(
-				'name'   => 'applies_to',
-				'value'  => 'user',
-				'action' => 'show',
-			),
-		) );
-		
-		//Only show if condition is yes
-		$metabox->add_field( 'user_select', array(
-			'name'        => 'category',
+		//Allow also category assigning to a user
+		$metabox->add_field( 'taxonomy_select', array(
+			'name'        => 'user_category',
 			'multiple'    => true,
 			'placeholder' => __( 'Select Category', 'mp' ),
+			'desc'		  => __( 'Optionally limit the user to some categories', 'mp' ),
 			'taxonomy'    => 'product_category',
 			'label'       => array( 'text' => __( 'Category', 'mp' ) ),
 			'conditional' => array(
-				'name'   => 'user_category',
-				'value'  => 'yes',
-				'action' => 'show',
-			),
+				'name'   	=> 'applies_to',
+				'value'  	=> 'user',
+				'action' 	=> 'show',
+				'operator' 	=> 'AND',
+			)
 		) );
 		//End Condition
 		$metabox->add_field( 'datepicker', array(
