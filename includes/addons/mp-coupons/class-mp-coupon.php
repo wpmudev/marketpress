@@ -342,6 +342,56 @@ class MP_Coupon {
 					}
 				}
 				break;
+			case 'user':
+				//User coupon validation
+				//We first check if a category has been defined for the user
+				$coupon_terms = $this->get_meta( 'user_category' );
+				if (count($coupon_terms) > 0 && isset($coupon_terms[0]) && !empty($coupon_terms[0])) {					
+					
+					$products      = array();
+					$cart_products = mp_cart()->get_items_as_objects();
+
+					
+
+					foreach ( $cart_products as $product ) {
+
+						$product_id = $product->ID;
+
+						if ( $product->is_variation() ) {
+							$product_id = $product->post_parent;
+						}
+
+						$terms = get_the_terms( $product_id, 'product_category' );
+
+						if ( is_array( $terms ) ) {
+							foreach ( $terms as $term ) {
+								if ( in_array( (string) $term->term_id, $coupon_terms ) ) {
+									if ( $ids_only ) {
+										$products[] = $product->ID;
+									} else {
+										$key              = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+										$products[ $key ] = mp_cart()->get_line_item( $product );
+									}
+								}
+							}
+						}
+					}
+				}else{
+					//If not we have to return all the products for the default action to work
+					$products      = array();
+					$cart_products = mp_cart()->get_items_as_objects();
+
+					foreach ( $cart_products as $product ) {
+						//because this apply to all products inside cart, so we just apply to all
+						if ( $ids_only ) {
+							$products[] = $product->ID;
+						} else {
+							$key              = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+							$products[ $key ] = mp_cart()->get_line_item( $product );
+						}
+					}
+				}
+				break;
             default:
 			case 'all':
 				$products      = array();
