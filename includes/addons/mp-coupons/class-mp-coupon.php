@@ -468,6 +468,8 @@ class MP_Coupon {
 			$is_valid = false;
 		}elseif(!$this->valid_for_number_of_products($cart_products)){
 			$is_valid = false;
+		}elseif(!$this->valid_for_login()){
+			$is_valid = false;
 		}else {
 			if( $action != 'remove_item' ) {
 				if ( $this->get_meta( 'applies_to' ) == 'user' ) {
@@ -598,7 +600,7 @@ class MP_Coupon {
 	 */
 	public function valid_for_number_of_products($cart_products = array()){
 		$product_limited  = $this->get_meta( 'product_count_limited' );
-		
+
 		if($product_limited){
 			$min_products  = $this->get_meta( 'min_products' );
 			if($min_products){
@@ -612,6 +614,24 @@ class MP_Coupon {
 				}
 			}
 		}
+		
+		return true;
+	}
+
+	/**
+	 * Check if the coupon code is set to only allow logged in users to use it
+	 *
+	 * @access public
+	 *
+	 * @return Boolean
+	 */
+	public function valid_for_login(){
+		$require_login  = $this->get_meta( 'require_login' );
+
+		if($require_login === 'yes'){
+			return is_user_logged_in();
+		}
+
 		return true;
 	}
 

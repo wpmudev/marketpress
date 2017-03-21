@@ -641,6 +641,18 @@ class MP_Coupons_Addon {
 			),
 		) );
 
+		//Option to only allow logged in users to use this
+		$metabox->add_field( 'radio_group', array(
+			'name'          => 'require_login',
+			'label'         => array( 'text' => __( 'Require Login', 'mp' ) ),
+			'desc'			=> __( 'Should this coupon only be available to logged in users?', 'mp' ),
+			'default_value' => 'no',
+			'options'       => array(
+				'no'      => __( 'No', 'mp' ),
+				'yes' 	  => __( 'Yes', 'mp' )
+			),
+		) );
+
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'applies_to',
 			'label'         => array( 'text' => __( 'Applies To', 'mp' ) ),
@@ -1157,6 +1169,7 @@ class MP_Coupons_Addon {
 			'discount'    => __( 'Discount', 'mp' ),
 			'used'        => __( 'Used', 'mp' ),
 			'remaining'   => __( 'Remaining Uses', 'mp' ),
+			'req_login'   => __( 'Requires Login', 'mp' ),
 			'valid_dates' => __( 'Valid Dates', 'mp' ),
 			'applies_to'  => __( 'Applies To', 'mp' ),
 		);
@@ -1184,6 +1197,12 @@ class MP_Coupons_Addon {
 			//! Remaining Uses
 			case 'remaining' :
 				$coupon->remaining_uses();
+				break;
+				
+			//Check if login is required
+			case 'req_login' :
+				$require_login  = $coupon->get_meta( 'require_login' );
+				echo ucfirst($require_login);
 				break;
 
 			//! Used
