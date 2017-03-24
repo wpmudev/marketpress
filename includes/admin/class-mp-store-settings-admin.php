@@ -61,6 +61,7 @@ class MP_Store_Settings_Admin {
 				'store-settings_page_store-settings-importers',
 				'store-settings_page_store-settings-exporters',
 				'store-settings_page_store-settings-capabilities',
+				'store-settings_page_store-settings-import',
 				'store-settings_page_store-setup-wizard',
 			);
 
@@ -114,6 +115,7 @@ class MP_Store_Settings_Admin {
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Categories', 'mp' ), __( 'Product Categories', 'mp' ), apply_filters( 'mp_manage_product_categories_cap', 'manage_product_categories' ), 'edit-tags.php?taxonomy=product_category&post_type=' . MP_Product::get_post_type() );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Product Tags', 'mp' ), __( 'Product Tags', 'mp' ), apply_filters( 'mp_manage_product_tags_cap', 'manage_product_tags' ), 'edit-tags.php?taxonomy=product_tag&post_type=' . MP_Product::get_post_type() );
 		add_submenu_page( 'store-settings', __( 'Store Settings: Capabilities', 'mp' ), __( 'User Capabilities', 'mp' ), $cap, 'store-settings-capabilities', array( &$this, 'display_settings_form' ) );
+		add_submenu_page( 'store-settings', __( 'Store Settings: Import/Export', 'mp' ), __( 'Import/Export', 'mp' ), $cap, 'store-settings-import', array( MP_Store_Settings_Import::get_instance(), 'display_settings' ) );
 		//add_submenu_page('store-settings', __('Store Settings: Importers', 'mp'), __('Importers', 'mp'), $cap, 'store-settings-importers', false);
 		//add_submenu_page('store-settings', __('Store Settings: Exporters', 'mp'), __('Exporters', 'mp'), $cap, 'store-settings-exporters', false);		
 		add_submenu_page( 'store-settings', __( 'Store Settings: Add Ons', 'mp' ), __( 'Add Ons', 'mp' ), $cap, 'store-settings-addons', array( MP_Store_Settings_Addons::get_instance(), 'display_settings' ) );
@@ -249,6 +251,10 @@ class MP_Store_Settings_Admin {
 			case 'store-settings_page_store-settings-capabilities' :
 				$title .= __( 'Capabilities', 'mp' );
 				break;
+
+			case 'store-settings_page_store-settings-import' :
+	            $title .= __( 'Import/Export', 'mp' );
+	            break;
 
 			case 'store-settings_page_store-setup-wizard' :
 				$title = __( 'Quick Setup', 'mp' );
