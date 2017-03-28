@@ -89,13 +89,13 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 		// Order info
 		if ( count( $items ) > 0 ) {
 			$order_info = '<table width="100%">
-<tr>
-<th align="left">' . __( 'Item', 'mp' ) . '</th>
-<th align="left">' . __( 'Sku', 'mp' ) . '</th>
-<th align="right">' . __( 'Qty', 'mp' ) . '</th>
-<th align="right">' . __( 'Price', 'mp' ) . '</th>
-<th align="right">' . __( 'Total', 'mp' ) . '</th>
-</tr>';
+							<tr>
+							<th align="left">' . __( 'Item', 'mp' ) . '</th>
+							<th align="left">' . __( 'Sku', 'mp' ) . '</th>
+							<th align="right">' . __( 'Qty', 'mp' ) . '</th>
+							<th align="right">' . __( 'Price', 'mp' ) . '</th>
+							<th align="right">' . __( 'Total', 'mp' ) . '</th>
+							</tr>';
 
 			foreach ( $items as $item ) {
 				$price = ( $item->get_price( 'lowest' ) * $item->qty );
@@ -103,16 +103,22 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 				//show download link if set
 				$download_link = false;
 				if ( $order->post_status != 'order_received' && ( $download_url = $item->download_url( $order->get_id(), false ) ) ) {
-					$download_link = '<a href="' . $download_url . '">' . __( 'Download', 'mp' ) . '</a>';
+					if(is_array($download_url)){
+						foreach($download_url as $key => $value){
+							$download_link .= '<a target="_blank" href="' . $value . '">' . sprintf(__( 'Download %1$s', 'mp' ),($key+1)) . '</a><br/>';
+						}
+					}else{
+						$download_link = '<a href="' . $download_url . '">' . __( 'Download', 'mp' ) . '</a>';
+					}
 				}
 
 				$order_info .= "<tr>
-<td>" . $item->title( false ) . ( ( $download_link ) ? '<br />' . $download_link : '' ) . '</td>
-<td>' . $item->get_meta( 'sku', '&mdash;' ) . '</td>
-<td align="right">' . number_format_i18n( $item->qty ) . '</td>
-<td align="right">' . mp_format_currency( $currency, $item->get_price( 'lowest' ) ) . '</td>
-<td align="right">' . mp_format_currency( $currency, $price ) . '</td>
-</tr>' . "\n";
+								<td>" . $item->title( false ) . ( ( $download_link ) ? '<br />' . $download_link : '' ) . '</td>
+								<td>' . $item->get_meta( 'sku', '&mdash;' ) . '</td>
+								<td align="right">' . number_format_i18n( $item->qty ) . '</td>
+								<td align="right">' . mp_format_currency( $currency, $item->get_price( 'lowest' ) ) . '</td>
+								<td align="right">' . mp_format_currency( $currency, $price ) . '</td>
+								</tr>' . "\n";
 			}
 
 			$order_info .= "</table><br /><br />";
