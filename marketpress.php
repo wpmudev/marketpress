@@ -614,6 +614,15 @@ class Marketpress {
 			'has_settings' => true,
 		) );
 
+		//Multi File Addon
+		mp_register_addon( array(
+			'label'        => __( 'Multiple Downloads', 'mp' ),
+			'desc'         => __( 'Enable multiple downloads per product', 'mp' ),
+			'class'        => 'MP_Multi_File_Download_Addon',
+			'path'         => mp_plugin_dir( 'includes/addons/mp-multi-file-download/class-mp-multi-file-download-addon.php' ),
+			'has_settings' => false,
+		) );
+
 		/**
 		 * Fires after all internal addons have been registered
 		 *
