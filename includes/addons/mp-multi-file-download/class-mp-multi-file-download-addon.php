@@ -44,6 +44,9 @@ class MP_Multi_File_Download_Addon {
 	 */
 	private function __construct() {
         add_action( 'init', array( &$this, 'init' ) );
+
+        //Set the file type in for the product
+        add_filter('mp_product_file_url_type', array( &$this, 'file_type' ), 99,1);
     }
 
 
@@ -54,8 +57,21 @@ class MP_Multi_File_Download_Addon {
 	 * @access public
 	 */
 	public function init() {
-		
+
+        
 	}
+
+    /**
+     * Set the file type when Addon is enabled
+     *
+     * @since 3.2.4
+     * @param String $type - The current file type
+     *
+     * @return String
+     */
+    public function file_type($type){
+        return 'file_list';
+    }
 }
 
 if ( ! function_exists( 'mp_multi_file_download_addon' ) ) :

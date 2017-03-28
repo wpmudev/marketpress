@@ -1780,8 +1780,8 @@ WHERE $delete_where"
 				'class'       => 'mp_variations_box'
 			), $has_variations ) );
 		}
-
-		$metabox->add_field( 'file', apply_filters( 'mp_add_field_array_file_url', array(
+        
+		$metabox->add_field( apply_filters('mp_product_file_url_type','file'), apply_filters( 'mp_add_field_array_file_url', array(
 			'name'         => 'file_url',
 			'label'        => array( 'text' => __( 'File URL', 'mp' ) ),
 			//'placeholder'	 => __( 'Choose a file', 'mp' ),

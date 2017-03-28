@@ -856,3 +856,22 @@ textarea.variation_content_type_plain{
     font-size: 13px;
     text-transform: capitalize;
 }
+
+/**
+ * Multi file
+ */
+.mp_file_action {
+    line-height: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.mp_file_action.remove-file{
+    padding-left: 7px !important;
+}
+
+.mp_file_action .dashicons{
+    line-height: 1.5 !important;
+}
+
