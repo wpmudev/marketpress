@@ -13,45 +13,6 @@ if ( ! class_exists( 'MP_Store_Settings_Import' ) ) {
 // Load WordPress export API.
 require_once( ABSPATH . 'wp-admin/includes/export.php' );
 
-/**
- * Process import/export form actions
- */
-if ( ! empty( $_POST['mp-store-exporter'] ) ) { // Input var okay.
-	if ( ! current_user_can( 'export' ) ) {
-		return;
-	}
-
-	check_admin_referer( 'mp-store-export' );
-
-	// Export settings to a file if all the security checks pass.
-	if ( ! empty( $_POST['mp-store-export'] ) ) { // Input var okay.
-		MP_Store_Settings_Import::download_export();
-		die();
-	}
-
-	// Export products to a file if all the security checks pass.
-	if ( ! empty( $_POST['mp-store-export-products'] ) ) { // Input var okay.
-		$args['content'] = 'product';
-		export_wp( $args );
-		die();
-	}
-
-	// Import settings from a file.
-	if ( ! empty( $_POST['mp-store-import'] ) ) { // Input var okay.
-		// TODO: add warning message that data will be replaced.
-		if ( ! empty( $_POST['mp-store-settings-text'] ) ) { // Input var okay.
-			global $wpdb;
-			$settings = base64_decode( $_POST['mp-store-settings-text'] );
-
-			$wpdb->query( $wpdb->prepare( "
-				UPDATE $wpdb->options
-				SET option_value = %s
-				WHERE option_name = 'mp_settings'
-			", $settings ) );
-		}
-	}
-}
-
 class MP_Store_Settings_Import {
 	/**
 	 * Refers to a single instance of the class
@@ -84,6 +45,50 @@ class MP_Store_Settings_Import {
 			self::$_instance = new MP_Store_Settings_Import();
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * Process import/export form actions
+	 *
+	 * @since   3.2.3
+	 * @access  public
+	 */
+	public static function process_form() {
+		if ( ! empty( $_POST['mp-store-exporter'] ) ) { // Input var okay.
+			if ( ! current_user_can( 'manage-options' ) ) {
+				return;
+			}
+
+			check_admin_referer( 'mp-store-export' );
+
+			// Export settings to a file if all the security checks pass.
+			if ( ! empty( $_POST['mp-store-export'] ) ) { // Input var okay.
+				MP_Store_Settings_Import::download_export();
+				die();
+			}
+
+			// Export products to a file if all the security checks pass.
+			if ( ! empty( $_POST['mp-store-export-products'] ) ) { // Input var okay.
+				$args['content'] = 'product';
+				export_wp( $args );
+				die();
+			}
+
+			// Import settings from a file.
+			if ( ! empty( $_POST['mp-store-import'] ) ) { // Input var okay.
+				// TODO: add warning message that data will be replaced.
+				if ( ! empty( $_POST['mp-store-settings-text'] ) ) { // Input var okay.
+					global $wpdb;
+					$settings = base64_decode( $_POST['mp-store-settings-text'] );
+
+					$wpdb->query( $wpdb->prepare( "
+				UPDATE $wpdb->options
+				SET option_value = %s
+				WHERE option_name = 'mp_settings'
+			", $settings ) );
+				}
+			}
+		}
 	}
 
 	/**
@@ -214,18 +219,7 @@ class MP_Store_Settings_Import {
 	 * @access  public
 	 */
 	public function display_settings() {
-		//var_dump( get_option( 'mp_settings' ) );
-		//$option = unserialize( $this->get_settings() );
-		//update_option( 'mp_settings', $option );
-
-		$a = $this->get_settings();
-		$a = base64_encode( $a );
-		//var_dump( $a );
-
-		//var_dump( $a );
-		//$content = str_replace(' ', '&nbsp;', $this->get_settings());
-		//$a = nl2br( $content ;
-		//$a = base64_encode( nl2br( $content ) );
+		$options = base64_encode( $this->get_settings() );
 		?>
 		<form method="post" id="mp-export-form">
 			<?php wp_nonce_field( 'mp-store-export' ) ?>
@@ -235,8 +229,7 @@ class MP_Store_Settings_Import {
 			<p>
 				<?php esc_html_e( 'Use the text below to export to a new installation. Or paste in the new configuration to import.', 'mp' ); ?>
 			</p>
-			<!--<textarea title="mp-store-settings-text" name="mp-store-settings-text" cols="100" rows="10"><?php //echo esc_textarea( $this->get_settings() ); ?></textarea><br>-->
-			<textarea title="mp-store-settings-text" name="mp-store-settings-text" cols="100" rows="10"><?php echo esc_textarea($a); ?></textarea><br>
+			<textarea title="mp-store-settings-text" name="mp-store-settings-text" cols="100" rows="10"><?php echo esc_textarea( $options ); ?></textarea><br>
 
 			<input type="submit" class="button button-primary" name="mp-store-import" id="mp-store-import" value="<?php esc_attr_e( 'Import configuration', 'mp' ); ?>">
 			<input type="submit" class="button" name="mp-store-export" id="mp-store-export" value="<?php esc_attr_e( 'Export settings to file', 'mp' ); ?>">
