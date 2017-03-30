@@ -701,6 +701,9 @@ class MP_Order {
 			        ( ( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
 			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
 			}
+                        if ( $this->get_meta( 'mp_' . $type . '_info->special_instructions' ) ) {
+				$html .= wordwrap( $this->get_meta( "mp_{$type}_info->special_instructions" ) ) . '<br />';
+			}
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
 
@@ -1151,7 +1154,7 @@ class MP_Order {
 			  correct price is returned */
 			$_item->get_price();
 		}
-		
+
 		$order_shipping = mp_get_post_value( 'shipping' );
 		if( isset( $order_shipping['special_instructions'] ) ){
 			$shipping_info['special_instructions'] = $order_shipping['special_instructions'];
@@ -1447,12 +1450,12 @@ class MP_Order {
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function tracking_url( $echo = true, $blog_id = false ) {
-		
+
 		if( $blog_id !== false ) {
 			$current_blog_id = get_current_blog_id();
 			switch_to_blog( $blog_id );
 		}
-		
+
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
 
 		$user_id = get_current_user_id();
@@ -1482,7 +1485,7 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$url = apply_filters( 'mp_order/status_url', $url, $this );
-		
+
 		if( $blog_id !== false ) {
 			switch_to_blog( $current_blog_id );
 		}
