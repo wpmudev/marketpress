@@ -346,13 +346,12 @@ class MP_Coupon {
 				//User coupon validation
 				//We first check if a category has been defined for the user
 				$coupon_terms = $this->get_meta( 'user_category' );
-				if (count($coupon_terms) > 0 && isset( $coupon_terms[0] ) && !empty( $coupon_terms[0] )) {					
+
+				if ( count( $coupon_terms ) > 0 && isset( $coupon_terms[0] ) && !empty( $coupon_terms[0] )) {					
 					
 					$products      = array();
 					$cart_products = mp_cart()->get_items_as_objects();
-
 					
-
 					foreach ( $cart_products as $product ) {
 
 						$product_id = $product->ID;
