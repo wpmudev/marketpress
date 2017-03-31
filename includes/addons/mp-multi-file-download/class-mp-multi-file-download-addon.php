@@ -43,23 +43,10 @@ class MP_Multi_File_Download_Addon {
 	 * @access private
 	 */
 	private function __construct() {
-        add_action( 'init', array( &$this, 'init' ) );
-
         //Set the file type in for the product
         add_filter( 'mp_product_file_url_type', array( &$this, 'file_type' ), 99, 1 );
     }
 
-
-    /**
-	 * Initialize addon. All other actions lower than init called here
-	 *
-	 * @since 3.0
-	 * @access public
-	 */
-	public function init() {
-
-        
-	}
 
     /**
      * Set the file type when Addon is enabled

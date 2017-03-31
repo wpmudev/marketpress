@@ -27,12 +27,12 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	 */
 	public function on_creation( $args ) {
 		$this->args = array_replace_recursive(array(
-			'title' => __('Select the file that you would like to use.', 'wpmudev_metaboxes'),
-			'button_label' => __('Select File', 'wpmudev_metaboxes'),
+			'title'         => __('Select the file that you would like to use.', 'wpmudev_metaboxes'),
+			'button_label'  => __('Select File', 'wpmudev_metaboxes'),
 		), $args);
 		
-		$this->args['custom']['data-media-title'] = $this->args['title'];
-		$this->args['custom']['data-media-button-label'] = $this->args['button_label'];
+		$this->args['custom']['data-media-title']           = $this->args['title'];
+		$this->args['custom']['data-media-button-label']    = $this->args['button_label'];
 		$this->args['style'] .= ' width:60%;';
 	}
 
@@ -93,11 +93,11 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
                     var selection = frame.state().get('selection'),
                     id = $input.val();
             
-            if ( id.length ) {
-                var attachment = wp.media.attachment(id);
-                        attachment.fetch();
-                        selection.add(attachment ? [attachment] : []);
-            }
+                    if ( id.length ) {
+                        var attachment = wp.media.attachment(id);
+                                attachment.fetch();
+                                selection.add(attachment ? [attachment] : []);
+                    }
                 });
                 
                 frame.open();
@@ -135,16 +135,25 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	public function display( $post_id ) {
 		$values = $this->get_value($post_id);
 		$this->before_field(); 
+
+        //Set the name to be an array
         $this->args['name'] = $this->args['name'] . '[]'; ?>
         <div class="file-list">
             <?php
-            if(is_array($values)){
+
+            if( is_array( $values ) ){
+
                 $index = 0;
-                foreach($values as $key => $value){
-                    $classes = array('add','plus');
-                    if($index > 0){
-                        $classes = array('remove','minus');
+                foreach( $values as $key => $value ){
+
+                    //Button Classes
+                    //Add button classes by default
+                    $classes = array( 'add' , 'plus' );
+                    if( $index > 0 ){
+                        //Remove button classes for the other items
+                        $classes = array( 'remove' , 'minus' );
                     }
+                    
                     ?>
                     <div class="file">
                         <input type="text" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" /> <a class="button wpmudev-field-file-select" href="#"><?php _e('Select File', 'wpmudev_metaboxes'); ?></a><a href="#" class="button mp_file_action <?php echo $classes[0]; ?>-file"><span class="dashicons dashicons-<?php echo $classes[1]; ?>"></span></a>

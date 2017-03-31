@@ -586,7 +586,7 @@ class MP_Order {
 								
 								if( is_array( $download_url ) ){
 									//If we have more than one product file, we loop and add each to a new line
-									foreach($download_url as $key => $value){
+									foreach( $download_url as $key => $value ){
 										echo '<a target="_blank" href="' . $value . '">' . sprintf( __( 'Download %1$s', 'mp' ),( $key+1 ) ) . '</a><br/>';
 									}
 
