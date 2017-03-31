@@ -347,7 +347,7 @@ class MP_Coupon {
 				//We first check if a category has been defined for the user
 				$coupon_terms = $this->get_meta( 'user_category' );
 
-				if ( count( $coupon_terms ) > 0 && isset( $coupon_terms[0] ) && !empty( $coupon_terms[0] )) {					
+				if ( count( $coupon_terms ) > 0 && isset( $coupon_terms[0] ) && !empty( $coupon_terms[0] ) ) {					
 					
 					$products      = array();
 					$cart_products = mp_cart()->get_items_as_objects();
@@ -465,9 +465,9 @@ class MP_Coupon {
 			$is_valid = false;
 		} elseif ( array() == $cart_products) {
 			$is_valid = false;
-		}elseif(!$this->valid_for_number_of_products( $cart_products )){
+		}elseif( ! $this->valid_for_number_of_products( $cart_products ) ){
 			$is_valid = false;
-		}elseif(!$this->valid_for_login()){
+		}elseif( ! $this->valid_for_login() ){
 			$is_valid = false;
 		}else {
 			if( $action != 'remove_item' ) {
@@ -630,7 +630,7 @@ class MP_Coupon {
 	public function valid_for_login(){
 		$require_login  = $this->get_meta( 'require_login' );
 
-		if($require_login === 'yes'){
+		if( $require_login === 'yes' ){
 			return is_user_logged_in();
 		}
 
