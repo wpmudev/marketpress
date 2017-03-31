@@ -1557,17 +1557,21 @@ class MP_Product {
 
 			//Check if the download has many files
 			$files = $this->get_meta( 'file_url' );
-			if(is_array($files)){
-				if(count($files) > 0){
-					$file_urls = array();
-					$count = 1;
-					foreach($files as $file_url){
-						$single_url = add_query_arg( 'orderid', $order_id, $this->url( false , $count) );
-						$file_urls[] = $single_url;
+
+			if( is_array( $files ) ){
+
+				//If we have more than one produce file, add them to a list
+				if( count( $files ) > 0 ){
+					$file_urls 	= array();
+					$count 		= 1;
+					foreach( $files as $file_url ){
+						$single_url 	= add_query_arg( 'orderid', $order_id, $this->url( false , $count) );
+						$file_urls[] 	= $single_url;
 						$count++;
 					}
 					$url = $file_urls;
 				}
+
 			}
 			
 		}
@@ -2598,9 +2602,9 @@ class MP_Product {
 	 * @access public
 	 *
 	 * @param bool $echo
-	 * @param bool/integer $count
+	 * @param bool/integer $count - the current file count for multiple products
 	 */
-	public function url( $echo = true , $count = false) {
+	public function url( $echo = true , $count = false ) {
 		if ( $this->is_variation() ) {
 			$url = get_permalink( $this->_post->post_parent ) . 'variation/' . $this->ID;
 		} else {
@@ -2608,8 +2612,8 @@ class MP_Product {
 		}
 
 		//Add number of file in array if count is passed
-		if($count){
-			$url = add_query_arg( 'numb', $count, $url);
+		if( $count ){
+			$url = add_query_arg( 'numb', $count, $url );
 		}
 
 		/**

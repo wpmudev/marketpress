@@ -105,9 +105,12 @@ jQuery(document).ready(function($){
 	 */
 	public function display( $post_id ) {
 		$value = $this->get_value($post_id);
-		if(is_array($value) && count($value) > 0){
+
+		//Check if we have an array in our value and only return the first
+		if( is_array( $value ) && count( $value ) > 0 ){
 			$value = $value[0];
 		}
+		
 		$this->before_field(); ?>
 		<input type="text" <?php echo $this->parse_atts(); ?> value="<?php echo $value; ?>" /> <a class="button wpmudev-field-file-select" href="#"><?php _e('Select File', 'wpmudev_metaboxes'); ?></a>
 		<?php

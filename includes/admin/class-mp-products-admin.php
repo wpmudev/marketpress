@@ -1781,7 +1781,10 @@ WHERE $delete_where"
 			), $has_variations ) );
 		}
         
-		$metabox->add_field( apply_filters('mp_product_file_url_type','file'), apply_filters( 'mp_add_field_array_file_url', array(
+		//Modified: Added filter to allow for changing of the file type to multiple
+		//This is set when the multiple file type Addon is enabled
+		$metabox->add_field( apply_filters( 'mp_product_file_url_type','file' ), 
+			apply_filters( 'mp_add_field_array_file_url', array(
 			'name'         => 'file_url',
 			'label'        => array( 'text' => __( 'File URL', 'mp' ) ),
 			//'placeholder'	 => __( 'Choose a file', 'mp' ),
@@ -1799,7 +1802,8 @@ WHERE $delete_where"
 				),
 			),
 			'class'        => 'mp-product-field-50 mp-blank-bg'
-		) ) );
+			) 
+		) );
 
 		$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_external_url', array(
 			'name'         => 'external_url',

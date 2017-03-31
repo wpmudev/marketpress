@@ -103,10 +103,14 @@ if ( ! function_exists( 'mp_filter_email' ) ) :
 				//show download link if set
 				$download_link = false;
 				if ( $order->post_status != 'order_received' && ( $download_url = $item->download_url( $order->get_id(), false ) ) ) {
-					if(is_array($download_url)){
-						foreach($download_url as $key => $value){
-							$download_link .= '<a target="_blank" href="' . $value . '">' . sprintf(__( 'Download %1$s', 'mp' ),($key+1)) . '</a><br/>';
+					
+					//Handle multiple files
+					if( is_array( $download_url ) ){
+						//If we have more than one product file, we loop and add each to a new line
+						foreach( $download_url as $key => $value ){
+							$download_link .= '<a target="_blank" href="' . $value . '">' . sprintf( __( 'Download %1$s', 'mp' ),( $key+1 ) ) . '</a><br/>';
 						}
+						
 					}else{
 						$download_link = '<a href="' . $download_url . '">' . __( 'Download', 'mp' ) . '</a>';
 					}
