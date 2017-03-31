@@ -665,6 +665,7 @@ class MP_Coupons_Addon {
 				'user'     => __( 'User', 'mp' ),
 			),
 		) );
+
 		$metabox->add_field( 'post_select', array(
 			'name'        => 'product',
 			'validation'  => array( 'required' => true ),
@@ -678,6 +679,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
+
 		$metabox->add_field( 'taxonomy_select', array(
 			'name'        => 'category',
 			'validation'  => array( 'required' => true ),
@@ -691,6 +693,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
+
 		$metabox->add_field( 'user_select', array(
 			'name'        => 'user',
 			'validation'  => array( 'required' => true ),
@@ -701,6 +704,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
+		
 		//Paul Kevin
 		//Allow also category assigning to a user
 		$metabox->add_field( 'taxonomy_select', array(
@@ -718,17 +722,20 @@ class MP_Coupons_Addon {
 			)
 		) );
 		//End Condition
+
 		$metabox->add_field( 'datepicker', array(
 			'name'          => 'start_date',
 			'validation'    => array( 'required' => true ),
 			'label'         => array( 'text' => __( 'Start Date', 'mp' ) ),
 			'default_value' => date( 'Y-m-d' ),
 		) );
+
 		$metabox->add_field( 'checkbox', array(
 			'name'    => 'has_end_date',
 			'label'   => array( 'text' => __( 'Does coupon have an end date?', 'mp' ) ),
 			'message' => __( 'Yes', 'mp' ),
 		) );
+
 		$metabox->add_field( 'datepicker', array(
 			'name'        => 'end_date',
 			'label'       => array( 'text' => __( 'End Date', 'mp' ) ),
@@ -1202,7 +1209,7 @@ class MP_Coupons_Addon {
 			//Check if login is required
 			case 'req_login' :
 				$require_login  = $coupon->get_meta( 'require_login' );
-				echo ucfirst($require_login);
+				echo ucfirst( $require_login );
 				break;
 
 			//! Used

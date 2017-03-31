@@ -346,7 +346,7 @@ class MP_Coupon {
 				//User coupon validation
 				//We first check if a category has been defined for the user
 				$coupon_terms = $this->get_meta( 'user_category' );
-				if (count($coupon_terms) > 0 && isset($coupon_terms[0]) && !empty($coupon_terms[0])) {					
+				if (count($coupon_terms) > 0 && isset( $coupon_terms[0] ) && !empty( $coupon_terms[0] )) {					
 					
 					$products      = array();
 					$cart_products = mp_cart()->get_items_as_objects();
@@ -466,7 +466,7 @@ class MP_Coupon {
 			$is_valid = false;
 		} elseif ( array() == $cart_products) {
 			$is_valid = false;
-		}elseif(!$this->valid_for_number_of_products($cart_products)){
+		}elseif(!$this->valid_for_number_of_products( $cart_products )){
 			$is_valid = false;
 		}elseif(!$this->valid_for_login()){
 			$is_valid = false;
@@ -598,19 +598,22 @@ class MP_Coupon {
 	 *
 	 * @return Boolean
 	 */
-	public function valid_for_number_of_products($cart_products = array()){
+	public function valid_for_number_of_products( $cart_products = array() ){
 		$product_limited  = $this->get_meta( 'product_count_limited' );
 
-		if($product_limited){
+		if( $product_limited ){
 			$min_products  = $this->get_meta( 'min_products' );
-			if($min_products){
+
+			if( $min_products ){
 				$min_products = (float) $min_products;
-				if(!empty($cart_products)){
-					if(count($cart_products) >= $min_products){
+
+				if( !empty( $cart_products ) ){
+					if( count( $cart_products ) >= $min_products ){
 						return true;
 					}else{
 						return false;
 					}
+
 				}
 			}
 		}
