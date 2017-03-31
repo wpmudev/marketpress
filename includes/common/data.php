@@ -286,7 +286,6 @@ $this->countries = array(
 	'FJ' => 'Fiji',
 	'FI' => 'Finland',
 	'FR' => 'France',
-	'FX' => 'France, Metropolitan', //Is this needed? metropolitan france provinces are mixed in FR's province array
 	'GF' => 'French Guiana',
 	'PF' => 'French Polynesia',
 	'TF' => 'French Southern Territories',
