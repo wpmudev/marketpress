@@ -546,6 +546,7 @@ class MP_Cart {
 
 				case 'title' :
 					$column_html = '<h2 class="mp_cart_item_title">' . sprintf( '<a href="%s">%s</a>', $product->url( false ), $product->title( false ) ) . '</h2>';
+					
 					if ( ! $this->is_editable && $product->is_download() && mp_is_shop_page( 'order_status' ) ) {
 						//Handle multiple files
 						$download_url = $product->download_url( get_query_var( 'mp_order_id' ), false );

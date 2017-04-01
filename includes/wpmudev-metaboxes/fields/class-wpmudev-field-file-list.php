@@ -26,9 +26,9 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	 * }
 	 */
 	public function on_creation( $args ) {
-		$this->args = array_replace_recursive(array(
-			'title'         => __('Select the file that you would like to use.', 'wpmudev_metaboxes'),
-			'button_label'  => __('Select File', 'wpmudev_metaboxes'),
+        $this->args = array_replace_recursive(array(
+			'title'         => __( 'Select the file that you would like to use.', 'wpmudev_metaboxes' ),
+			'button_label'  => __( 'Select File', 'wpmudev_metaboxes' ),
 		), $args);
 		
 		$this->args['custom']['data-media-title']           = $this->args['title'];
@@ -47,7 +47,7 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 		
 		// 3.5 media gallery
 		if ( function_exists('wp_enqueue_media') && ! did_action('wp_enqueue_media') ) {
-			wp_enqueue_media();
+            wp_enqueue_media();
 		}
 	}
 
@@ -68,12 +68,12 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
                 e.preventDefault();
                 
                 var $this = $(this),
-                        $input = $this.siblings('input'),
-                        frame = wp.media({
-                            "title" : $input.attr('data-media-title'),
-                            "multiple" : false,
-                            "button" : { "text" : $input.attr('data-media-button-label') }
-                        });
+                    $input = $this.siblings('input'),
+                    frame = wp.media({
+                            "title"     : $input.attr('data-media-title'),
+                            "multiple"  : false,
+                            "button"    : { "text" : $input.attr('data-media-button-label') }
+                    });
                 
                 /*
                 * Send image data back to the calling field
@@ -95,8 +95,8 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
             
                     if ( id.length ) {
                         var attachment = wp.media.attachment(id);
-                                attachment.fetch();
-                                selection.add(attachment ? [attachment] : []);
+                        attachment.fetch();
+                        selection.add(attachment ? [attachment] : []);
                     }
                 });
                 
@@ -133,6 +133,7 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
+        
 		$values = $this->get_value($post_id);
 		$this->before_field(); 
 

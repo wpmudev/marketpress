@@ -858,7 +858,7 @@ textarea.variation_content_type_plain{
 }
 
 /**
- * Multi file
+ * Multi file action button CSS
  */
 .mp_file_action {
     line-height: 0 !important;
@@ -867,10 +867,15 @@ textarea.variation_content_type_plain{
     box-shadow: none !important;
 }
 
+/**
+ * Remove file CSS
+ */
 .mp_file_action.remove-file{
     padding-left: 7px !important;
 }
-
+/**
+ * Fix dash icon line height
+ */
 .mp_file_action .dashicons{
     line-height: 1.5 !important;
 }

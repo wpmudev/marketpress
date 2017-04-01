@@ -523,6 +523,8 @@ class MP_Public {
 
 		$url = $product->get_meta( 'file_url' );
 
+		//Total number of files in the product.
+		//By default 1
 		$total_files = 1;
 
 		//Current file number to append to file name
@@ -535,7 +537,7 @@ class MP_Public {
 			$file_number = $current_file;
 
 			if( is_array( $url ) ){
-				$total_files = count($url);
+				$total_files = count( $url );
 
 				if( isset( $url[$current_file -1] ) ){
 					$url = $url[$current_file -1]; //Set the URL to the index of the files

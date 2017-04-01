@@ -1552,6 +1552,7 @@ class MP_Product {
 	 */
 	public function download_url( $order_id, $echo = true ) {
 		$url = false;
+
 		if ( $this->is_download() ) {
 			$url = add_query_arg( 'orderid', $order_id, $this->url( false ) );
 
@@ -1562,6 +1563,7 @@ class MP_Product {
 
 				//If we have more than one produce file, add them to a list
 				if( count( $files ) > 0 ){
+
 					$file_urls 	= array();
 					$count 		= 1;
 					foreach( $files as $file_url ){
