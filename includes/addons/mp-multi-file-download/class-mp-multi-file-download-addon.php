@@ -37,7 +37,7 @@ class MP_Multi_File_Download_Addon {
 	}
 
 
-    /**
+	/**
 	 * Constructor function
 	 *
 	 * @since 3.0
@@ -57,9 +57,9 @@ class MP_Multi_File_Download_Addon {
      *
      * @return String
      */
-    public function file_type( $type ){
-        return 'file_list';
-    }
+	public function file_type( $type ){
+		return 'file_list';
+	}
 }
 
 if ( ! function_exists( 'mp_multi_file_download_addon' ) ) :
