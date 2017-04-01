@@ -31,9 +31,9 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 			'button_label'  => __( 'Select File', 'wpmudev_metaboxes' ),
 		), $args);
 		
-		$this->args['custom']['data-media-title']           = $this->args['title'];
-		$this->args['custom']['data-media-button-label']    = $this->args['button_label'];
-		$this->args['style'] .= ' width:60%;';
+		$this->args[ 'custom' ][ 'data-media-title' ]           = $this->args[ 'title' ];
+		$this->args[ 'custom' ][ 'data-media-button-label' ]    = $this->args[ 'button_label' ];
+		$this->args[ 'style' ] .= ' width:60%;';
 	}
 
 	/**
@@ -133,12 +133,12 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	 * @param int $post_id
 	 */
 	public function display( $post_id ) {
-        
+
 		$values = $this->get_value($post_id);
 		$this->before_field(); 
 
         //Set the name to be an array
-        $this->args['name'] = $this->args['name'] . '[]'; ?>
+        $this->args[ 'name' ] = $this->args[ 'name' ] . '[]'; ?>
         <div class="file-list">
             <?php
 

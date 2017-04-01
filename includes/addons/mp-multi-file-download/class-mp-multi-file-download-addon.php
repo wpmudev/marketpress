@@ -44,7 +44,7 @@ class MP_Multi_File_Download_Addon {
 	 * @access private
 	 */
 	private function __construct() {
-        //Set the file type in for the product
+		//Set the file type in for the product
 		add_filter( 'mp_product_file_url_type', array( &$this, 'file_type' ), 99, 1 );
     }
 
