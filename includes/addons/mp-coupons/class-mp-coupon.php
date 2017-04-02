@@ -342,6 +342,55 @@ class MP_Coupon {
 					}
 				}
 				break;
+			case 'user':
+				//User coupon validation
+				//We first check if a category has been defined for the user
+				$coupon_terms = $this->get_meta( 'user_category' );
+
+				if ( count( $coupon_terms ) > 0 && isset( $coupon_terms[0] ) && !empty( $coupon_terms[0] ) ) {					
+					
+					$products      = array();
+					$cart_products = mp_cart()->get_items_as_objects();
+					
+					foreach ( $cart_products as $product ) {
+
+						$product_id = $product->ID;
+
+						if ( $product->is_variation() ) {
+							$product_id = $product->post_parent;
+						}
+
+						$terms = get_the_terms( $product_id, 'product_category' );
+
+						if ( is_array( $terms ) ) {
+							foreach ( $terms as $term ) {
+								if ( in_array( (string) $term->term_id, $coupon_terms ) ) {
+									if ( $ids_only ) {
+										$products[] = $product->ID;
+									} else {
+										$key              = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+										$products[ $key ] = mp_cart()->get_line_item( $product );
+									}
+								}
+							}
+						}
+					}
+				}else{
+					//If not we have to return all the products for the default action to work
+					$products      = array();
+					$cart_products = mp_cart()->get_items_as_objects();
+
+					foreach ( $cart_products as $product ) {
+						//because this apply to all products inside cart, so we just apply to all
+						if ( $ids_only ) {
+							$products[] = $product->ID;
+						} else {
+							$key              = ( mp_cart()->is_global ) ? $product->global_id() : $product->ID;
+							$products[ $key ] = mp_cart()->get_line_item( $product );
+						}
+					}
+				}
+				break;
             default:
 			case 'all':
 				$products      = array();
@@ -403,6 +452,9 @@ class MP_Coupon {
 		$now      = time();
 		$is_valid = true;
 
+		//Moved to variable as it will be used in many instances
+		$cart_products = $this->get_products( true ) ;
+
 		if ( ! $this->exists() ) {
 			$is_valid = false;
 		} elseif ( $this->remaining_uses( false, true ) == 0 ) {
@@ -411,9 +463,13 @@ class MP_Coupon {
 			$is_valid = false;
 		} elseif ( $this->get_meta( 'has_end_date' ) && ( $now > strtotime( $this->get_meta( 'end_date', 0, false ) ) ) ) {
 			$is_valid = false;
-		} elseif ( array() == $this->get_products( true ) ) {
+		} elseif ( array() == $cart_products) {
 			$is_valid = false;
-		} else {
+		}elseif( ! $this->valid_for_number_of_products( $cart_products ) ){
+			$is_valid = false;
+		}elseif( ! $this->valid_for_login() ){
+			$is_valid = false;
+		}else {
 			if( $action != 'remove_item' ) {
 				if ( $this->get_meta( 'applies_to' ) == 'user' ) {
 					$user = $this->get_meta( 'user' );
@@ -531,6 +587,54 @@ class MP_Coupon {
 		} else {
 			return $remaining;
 		}
+	}
+
+	/**
+	 * Check if the number of products in the cart has met the minimum
+	 *
+	 * @access public
+	 * @param Array $cart_products - the products in the cart
+	 *
+	 * @return Boolean
+	 */
+	public function valid_for_number_of_products( $cart_products = array() ){
+		$product_limited  = $this->get_meta( 'product_count_limited' );
+
+		if( $product_limited ){
+			$min_products  = $this->get_meta( 'min_products' );
+
+			if( $min_products ){
+				$min_products = (float) $min_products;
+
+				if( !empty( $cart_products ) ){
+					if( count( $cart_products ) >= $min_products ){
+						return true;
+					}else{
+						return false;
+					}
+
+				}
+			}
+		}
+		
+		return true;
+	}
+
+	/**
+	 * Check if the coupon code is set to only allow logged in users to use it
+	 *
+	 * @access public
+	 *
+	 * @return Boolean
+	 */
+	public function valid_for_login(){
+		$require_login  = $this->get_meta( 'require_login' );
+
+		if( $require_login === 'yes' ){
+			return is_user_logged_in();
+		}
+
+		return true;
 	}
 
 	/**

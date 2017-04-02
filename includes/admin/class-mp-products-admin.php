@@ -255,6 +255,7 @@ class MP_Products_Screen {
 		}
 
 		$price      = mp_get_post_value( 'product_price', '' );
+		$action     = mp_get_post_value( 'action', '' );
 		$sale_price = mp_get_post_value( 'product_sale_price', '' );
 
 		$price = filter_var( $price, FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND );
@@ -264,11 +265,12 @@ class MP_Products_Screen {
 		$sale_price_array = mp_get_post_value( 'sale_price->amount', '' );
 		$regular_price 	  = mp_get_post_value( 'regular_price', '' );
 		$has_sale		  = mp_get_post_value( 'has_sale', '');
-	
+
 		if( ! empty( $sale_price_array ) && $sale_price_array > 0 && ! empty( $has_sale ) ) {
 			update_post_meta( $post_id, 'sort_price', $sale_price_array );
 		} else {
-			update_post_meta( $post_id, 'sort_price', $regular_price );
+                        $sort_price = ( 'inline-save' === $action ) ? $price : $regular_price;
+			update_post_meta( $post_id, 'sort_price', $sort_price );
 		}
 
 		update_post_meta( $post_id, 'featured', empty( $featured ) ? 0 : 1 );

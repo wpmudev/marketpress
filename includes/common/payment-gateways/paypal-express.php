@@ -97,6 +97,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 		'JP' => 'Japan',
 		'MX' => 'Mexico',
 		'NL' => 'Netherlands',
+		'NO' => 'Norway',
 		'NZ' => 'New Zealand',
 		'PL' => 'Poland',
 		'RU' => 'Russia',

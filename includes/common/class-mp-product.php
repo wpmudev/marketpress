@@ -2064,8 +2064,8 @@ class MP_Product {
 				}
 
 				//size
-				if ( intval( $size ) ) {
-					$size = array( intval( $size ), intval( $size ) );
+				if ( is_int( $size ) ) {
+					$size = array( $size, $size );
 				} else {
 					if ( mp_get_setting( 'list_img_size' ) == 'custom' ) {
 						$size = array(
@@ -2085,7 +2085,7 @@ class MP_Product {
 			case 'floating-cart' :
 				$img_classes = array( 'mp-floating-cart-item-image' );
 
-				if ( $size = intval( $size ) ) {
+				if ( is_int( $size ) ) {
 					$size = array( $size, $size );
 				} else {
 					$size = array( 50, 50 );
@@ -2095,8 +2095,8 @@ class MP_Product {
 			case 'single' :
 
 				// size
-				if ( intval( $size ) ) {
-					$size = array( intval( $size ), intval( $size ) );
+				if ( is_int( $size ) ) {
+					$size = array( $size, $size );
 				} else {
 					if ( mp_get_setting( 'product_img_size' ) == 'custom' ) {
 						$size = array(
@@ -2127,7 +2127,7 @@ class MP_Product {
 
 			case 'widget' :
 				//size
-				if ( $size = intval( $size ) ) {
+				if ( is_int( $size ) ) {
 					$size = array( $size, $size );
 				} else {
 					$size = array( 50, 50 );
