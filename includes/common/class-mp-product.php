@@ -541,10 +541,14 @@ class MP_Product {
 	 *
 	 * @return int/array
 	 */
-	public function max_product_quantity( $product_id = null, $without_cart_quantity = false , $return_reason = false ) {
+	public function max_product_quantity( $product_id = false, $without_cart_quantity = false , $return_reason = false ) {
 
-		$id						= $product_id ? $product_id : $this->ID;
-		$product 				= new MP_Product( $this->ID );
+		if( ! $product_id ){
+			$product_id = $this->ID;
+		}
+
+		$id						= $product_id;
+		$product 				= new MP_Product( $product_id );
 		$cart_items				= mp_cart()->get_all_items();
 		$max					= 100;
 		$cart_quantity			= 0;
@@ -620,9 +624,11 @@ class MP_Product {
 				$filtered_atts[] = $slug;
 			}
 
+			$selected_variation = false;
 			// Make sure all attribute terms are unique and in stock
 			if ( count( $variations ) > 0 ) {
 				foreach ( $variations as $variation ) {
+					$selected_variation = $variation;
 					foreach ( $filtered_atts as $tax_slug ) {
 						$terms = get_the_terms( $variation->ID, $tax_slug );
 						if( ! empty( $terms ) ) {
@@ -681,8 +687,7 @@ class MP_Product {
 				<div class="mp_product_options_att"' . ( ( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"' ) . '>
 					<strong class="mp_product_options_att_label">' . __( 'Quantity', 'mp' ) . '</strong>
 					<div class="mp_form_field mp_product_options_att_field">
-
-						'. $this->attribute_input_fields( false, false) .'
+						'. $this->attribute_input_fields( true, false, $selected_variation ) .'
 					</div><!-- end mp_product_options_att_field -->
 				</div><!-- end mp_product_options_att -->
 			</div><!-- end mp_product_options_atts -->';
@@ -706,12 +711,16 @@ class MP_Product {
 		}
 	}
 
-	public function attribute_input_fields( $is_variation = false, $qty = false ) {
-		$product = new MP_Product( $this->ID );
+	public function attribute_input_fields( $is_variation = false, $qty = false, $product = false ) {
+		if( ! $product ){
+			$product = new MP_Product( $this->ID );
+		}
+
+		$product_id = $product->ID;
 
 		$input_id = 'mp_product_options_att_quantity';
 
-		$per_order_limit = get_post_meta( $this->ID, 'per_order_limit', true );
+		$per_order_limit = get_post_meta( $product_id, 'per_order_limit', true );
 
 		$max              	= '';
 		$product_quantity 	= ( $qty ) ? $qty : 1;
@@ -719,66 +728,62 @@ class MP_Product {
 		$disabled 			= '';
 		$error				= '';
 
-		if ( $product->has_variations() ) {
+		$max_max = $this->max_product_quantity( $product_id, false, false );			
+		extract($this->max_product_quantity( $product_id, false, true ), EXTR_PREFIX_ALL, "max");
 
-		} else {
+		$max = 'max="' . esc_attr( $max_qty ) . '" ';
 
-			$max_max = $this->max_product_quantity( $this->ID, false );
-			extract($this->max_product_quantity( $this->ID, false, true ), EXTR_PREFIX_ALL, "max");
+		/**
+		 * Filter the out of stock alert message
+		 *
+		 * @since 3.0
+		 *
+		 * @param string The default message.
+		 * @param MP_Product The product that is out of stock.
+		 */
+		$out_of_stock_msg = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $max_max ), $product );
 
-			$max = 'max="' . esc_attr( $max_qty ) . '" ';
+		/**
+		 * Filter the order limit alert message
+		 *
+		 * @since 3.0
+		 *
+		 * @param string The default message.
+		 * @param MP_Product The product that is out of order limit.
+		 */
+		$order_limit_msg = apply_filters( 'mp_product/order_limit_alert', sprintf ( __( 'This product has an order limit of %d.', 'mp' ), $max_max ), $product );
 
-			/**
-			 * Filter the out of stock alert message
-			 *
-			 * @since 3.0
-			 *
-			 * @param string The default message.
-			 * @param MP_Product The product that is out of stock.
-			 */
-			$out_of_stock_msg = apply_filters( 'mp_product/out_of_stock_alert', sprintf( __( 'We\'re sorry, we only have %d of this item in stock right now.', 'mp' ), $max_max ), $product );
+		$max_msg = ( $max_reason == 'inventory' ) ? $out_of_stock_msg : $order_limit_msg;
 
-			/**
-			 * Filter the order limit alert message
-			 *
-			 * @since 3.0
-			 *
-			 * @param string The default message.
-			 * @param MP_Product The product that is out of order limit.
-			 */
-			$order_limit_msg = apply_filters( 'mp_product/order_limit_alert', sprintf ( __( 'This product has an order limit of %d.', 'mp' ), $max_max ), $product );
+		$max .= 'data-msg-max="' . $max_msg;
 
-			$max_msg = ( $max_reason == 'inventory' ) ? $out_of_stock_msg : $order_limit_msg;
+		$max_msg_2 = "";
 
-			$max .= 'data-msg-max="' . $max_msg;
-
-			$max_msg_2 = "";
-
-			if( $max_max !== $max_qty ) {
-				if( $max_qty > 0 ){
-					$max_msg_2 = " " . __('You can only add {0} to cart.', 'mp');
-				}
-				else {
-					$max_msg_2 = " " . __('You can not add more items to cart.', 'mp');
-				}
+		if( $max_max !== $max_qty ) {
+			if( $max_qty > 0 ){
+				$max_msg_2 = " " . __('You can only add {0} to cart.', 'mp');
 			}
-
-			$max .= $max_msg_2;
-
-			$max .= '"';
-
-			if ( $max_qty == 0 ) {
-				$min_value        = ( !$is_variation ) ? 0 : 1;
-				$product_quantity = ( $qty ) ? $qty : 0;
-				if( !$is_variation ){
-					$disabled	  = 'disabled';
-				}
-			}
-
-			if( (! mp_doing_ajax() && ! $product->in_stock( 1, true ) ) || $max_qty == 0 ){
-				$error = '<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"><span id="mp_product_options_att_quantity-error" class="mp_form_input_error">' . $max_msg . $max_msg_2 . '</span></label>';
+			else {
+				$max_msg_2 = " " . __('You can not add more items to cart.', 'mp');
 			}
 		}
+
+		$max .= $max_msg_2;
+
+		$max .= '"';
+
+		if ( $max_qty == 0 ) {
+			$min_value        = ( !$is_variation ) ? 0 : 1;
+			$product_quantity = ( $qty ) ? $qty : 0;
+			if( !$is_variation ){
+				$disabled	  = 'disabled';
+			}
+		}
+
+		if( (! mp_doing_ajax() && ! $product->in_stock( 1, true ) ) || $max_qty == 0 ){
+			$error = '<label class="mp_form_label mp_product_options_att_input_label" for="' . $input_id . '"><span id="mp_product_options_att_quantity-error" class="mp_form_input_error">' . $max_msg . $max_msg_2 . '</span></label>';
+		}
+		
 
 		return $error . '<input id="' . $input_id . '" class="mp_form_input mp_form_input-qty required digits" min="' . esc_attr( $min_value ) . '" ' . $max . ' type="number" name="product_quantity" value="' . $product_quantity . '" ' . $disabled . '>';
 	}
