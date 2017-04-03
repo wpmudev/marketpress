@@ -14,17 +14,17 @@
 class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 
     /**
-	 * Runs on creation of parent
-	 *
-	 * @since 1.0
-	 * @access public
-	 * @param array $args {
-	 *		Any array of arguments. Optional.
-	 *
-	 *		@type string $title The text that shows up in the header of the media lightbox. Optional.
-	 *		@type string $button_label The label of the send-to-editor button. Optional.
-	 * }
-	 */
+    * Runs on creation of parent
+    *
+    * @since 1.0
+    * @access public
+    * @param array $args {
+    *		Any array of arguments. Optional.
+    *
+    *		@type string $title The text that shows up in the header of the media lightbox. Optional.
+    *		@type string $button_label The label of the send-to-editor button. Optional.
+    * }
+    */
 	public function on_creation( $args ) {
         $this->args = array_replace_recursive(array(
 			'title'         => __( 'Select the file that you would like to use.', 'wpmudev_metaboxes' ),
@@ -36,12 +36,12 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 		$this->args[ 'style' ] .= ' width:60%;';
 	}
 
-	/**
-	 * Enqueues necessary field javascript.
-	 *
-	 * @since 1.0
-	 * @access public
-	 */
+    /**
+    * Enqueues necessary field javascript.
+    *
+    * @since 1.0
+    * @access public
+    */
 	public function enqueue_scripts() {
 		wp_enqueue_script('media-upload');
 		
@@ -52,11 +52,11 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	}
 
     /**
-	 * Print necessary field javascript.
-	 *
-	 * @since 3.2.4
-	 * @access public
-	 */
+    * Print necessary field javascript.
+    *
+    * @since 3.2.4
+    * @access public
+    */
 	public function print_scripts() {
         ?>
         <script type="text/javascript">
@@ -126,12 +126,12 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 
 
     /**
-	 * Displays the field.
-	 *
-	 * @since 1.0
-	 * @access public
-	 * @param int $post_id
-	 */
+    * Displays the field.
+    *
+    * @since 1.0
+    * @access public
+    * @param int $post_id
+    */
 	public function display( $post_id ) {
 
 		$values = $this->get_value($post_id);
@@ -142,7 +142,7 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
         <div class="file-list">
             <?php
 
-            if( is_array( $values ) ){
+            if ( is_array( $values ) ){
 
                 $index = 0;
                 foreach( $values as $key => $value ){
@@ -150,7 +150,7 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
                     //Button Classes
                     //Add button classes by default
                     $classes = array( 'add' , 'plus' );
-                    if( $index > 0 ){
+                    if ( $index > 0 ){
                         //Remove button classes for the other items
                         $classes = array( 'remove' , 'minus' );
                     }

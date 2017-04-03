@@ -2264,7 +2264,7 @@ class MP_Product {
 			$img_id  = get_post_thumbnail_id( $id ? $id : $post_id );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
 
-			if( is_array( $img_src ) ) {
+			if ( is_array( $img_src ) ) {
 				$img_url = array_shift( $img_src );
 			}
 		}
@@ -2614,7 +2614,7 @@ class MP_Product {
 		}
 
 		//Add number of file in array if count is passed
-		if( $count ){
+		if ( $count ){
 			$url = add_query_arg( 'numb', $count, $url );
 		}
 

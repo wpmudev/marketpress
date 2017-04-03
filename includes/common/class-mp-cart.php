@@ -551,13 +551,13 @@ class MP_Cart {
 						//Handle multiple files
 						$download_url = $product->download_url( get_query_var( 'mp_order_id' ), false );
 
-						if( is_array( $download_url ) ){
+						if ( is_array( $download_url ) ){
 							//If we have more than one product file, we loop and add each to a new line
-							foreach( $download_url as $key => $value ){
+							foreach ( $download_url as $key => $value ){
 								$column_html .= '<a target="_blank" href="' . $value . '">' . sprintf( __( 'Download %1$s', 'mp' ),( $key+1 ) ) . '</a><br/>';
 							}
 							
-						}else{
+						} else {
 							$column_html .= '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
 						}
 					}

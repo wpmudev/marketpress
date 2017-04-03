@@ -533,13 +533,13 @@ class MP_Public {
 		//Check if its part of the downloads
 		$current_file = mp_get_get_value( 'numb' );
 
-		if( $current_file && is_int( $current_file ) ) {
+		if ( $current_file && is_int( $current_file ) ) {
 			$file_number = $current_file;
 
-			if( is_array( $url ) ){
+			if ( is_array( $url ) ){
 				$total_files = count( $url );
 
-				if( isset( $url[$current_file -1] ) ){
+				if ( isset( $url[$current_file -1] ) ){
 					$url = $url[$current_file -1]; //Set the URL to the index of the files
 				}
 			}

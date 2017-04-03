@@ -11,22 +11,22 @@
 
 class MP_Multi_File_Download_Addon {
 
-    /**
-	 * Refers to a single instance of the class
-	 *
-	 * @since 3.0
-	 * @access private
-	 * @var object
-	 */
+	/**
+	* Refers to a single instance of the class
+	*
+	* @since 3.0
+	* @access private
+	* @var object
+	*/
 	private static $_instance = null;
 
 	/**
-	 * Gets the single instance of the class
-	 *
-	 * @since 3.0
-	 * @access public
-	 * @return object
-	 */
+	* Gets the single instance of the class
+	*
+	* @since 3.0
+	* @access public
+	* @return object
+	*/
 	public static function get_instance() {
 
 		if ( is_null( self::$_instance ) ) {
@@ -38,25 +38,25 @@ class MP_Multi_File_Download_Addon {
 
 
 	/**
-	 * Constructor function
-	 *
-	 * @since 3.0
-	 * @access private
-	 */
+	* Constructor function
+	*
+	* @since 3.0
+	* @access private
+	*/
 	private function __construct() {
 		//Set the file type in for the product
 		add_filter( 'mp_product_file_url_type', array( &$this, 'file_type' ), 99, 1 );
     }
 
 
-    /**
-     * Set the file type when Addon is enabled
-     *
-     * @since 3.2.4
-     * @param String $type - The current file type
-     *
-     * @return String
-     */
+	/**
+	* Set the file type when Addon is enabled
+	*
+	* @since 3.2.4
+	* @param String $type - The current file type
+	*
+	* @return String
+	*/
 	public function file_type( $type ){
 		return 'file_list';
 	}
@@ -65,11 +65,11 @@ class MP_Multi_File_Download_Addon {
 if ( ! function_exists( 'mp_multi_file_download_addon' ) ) :
 
 	/**
-	 * Get the MP_Multi_File_Download_Addon instance
-	 *
-	 * @since 3.2.4
-	 * @return MP_Multi_File_Download_Addon
-	 */
+	* Get the MP_Multi_File_Download_Addon instance
+	*
+	* @since 3.2.4
+	* @return MP_Multi_File_Download_Addon
+	*/
 	function mp_multi_file_download_addon() {
 
 		return MP_Multi_File_Download_Addon::get_instance();

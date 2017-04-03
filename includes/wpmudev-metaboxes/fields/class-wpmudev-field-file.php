@@ -107,7 +107,7 @@ jQuery(document).ready(function($){
 		$value = $this->get_value($post_id);
 
 		//Check if we have an array in our value and only return the first
-		if( is_array( $value ) && count( $value ) > 0 ){
+		if ( is_array( $value ) && count( $value ) > 0 ){
 			$value = $value[0];
 		}
 		
