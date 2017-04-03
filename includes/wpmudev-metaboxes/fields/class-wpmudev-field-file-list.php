@@ -25,7 +25,7 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 	 *		@type string $button_label The label of the send-to-editor button. Optional.
 	 * }
 	 */
-    public function on_creation( $args ) {
+	public function on_creation( $args ) {
         $this->args = array_replace_recursive(array(
 			'title'         => __( 'Select the file that you would like to use.', 'wpmudev_metaboxes' ),
 			'button_label'  => __( 'Select File', 'wpmudev_metaboxes' ),
