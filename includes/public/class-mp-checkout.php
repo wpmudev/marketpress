@@ -159,21 +159,25 @@ class MP_Checkout {
 		$enable_shipping_address = mp_get_post_value( 'enable_shipping_address' );
 		mp_update_session_value( 'enable_shipping_address', $enable_shipping_address );
 
-		if ( $enable_shipping_address ) {
-			$data = (array) mp_get_post_value( 'shipping', array() );
 
-			// Force state to empty if not set by user to ensure that old state value will be deleted
-			if( !isset( $data['state'] ) ) {
-				$data['state'] = '';
-			}
-
-			foreach ( $data as $key => $value ) {
-				$value = trim( $value );
-				mp_update_session_value( "mp_shipping_info->{$key}", $value );
-			}
-		} else {
+		if ( !$enable_shipping_address ) {
 			mp_update_session_value( 'mp_shipping_info', mp_get_session_value( 'mp_billing_info' ) );
 		}
+
+                //Save shipping info needs even if shipping info disabled for saving other fields (ex. 'special_instructions')
+                $data = (array) mp_get_post_value( 'shipping', array() );
+
+                if ( $data ) {
+                    // Force state to empty if not set by user to ensure that old state value will be deleted
+                    if( $enable_shipping_address && !isset( $data['state'] ) ) {
+                            $data['state'] = '';
+                    }
+
+                    foreach ( $data as $key => $value ) {
+                            $value = trim( $value );
+                            mp_update_session_value( "mp_shipping_info->{$key}", $value );
+                    }
+                }
 	}
 
 	/**
@@ -454,7 +458,7 @@ class MP_Checkout {
 					),
 				),
 			);
-		
+
 		}
 		/**
 		 * Filter the address fields array
@@ -499,7 +503,7 @@ class MP_Checkout {
 		if ( $add_slashes ){
 			$msg = str_replace( '"', '\"', $msg ); //prevent double quotes from causing errors.
 		}
-		
+
 
 		if ( !isset( $this->_errors[ $context ] ) ) {
 			$this->_errors[ $context ] = array();
@@ -570,7 +574,7 @@ class MP_Checkout {
 			),
 		) );
 	}
-	
+
 	/**
 	 * Update shipping section
 	 *
@@ -578,25 +582,25 @@ class MP_Checkout {
 	 * @access protected
 	 */
 	protected function _ajax_register_account() {
-		
+
 		if ( is_user_logged_in() ) {
 			// Bail - user is logged in (e.g. already has an account)
 			return false;
 		}
 
 		$data = (array) mp_get_post_value( 'account', array() );
-		
+
 		$force_login 		      = mp_get_setting( 'force_login' );
 		$enable_registration_form = mp_get_post_value( 'enable_registration_form' );
 		$account_username 		  = mp_get_post_value( 'account_username' );
 		$account_password 		  = mp_get_post_value( 'account_password' );
 		$account_email 			  = mp_get_post_value( 'billing->email' );
-		$first_name				  = mp_get_post_value( 'billing->first_name' ); 
-		$last_name				  = mp_get_post_value( 'billing->last_name' ); 
-		
+		$first_name				  = mp_get_post_value( 'billing->first_name' );
+		$last_name				  = mp_get_post_value( 'billing->last_name' );
+
 
 		if ( wp_verify_nonce( mp_get_post_value( 'mp_create_account_nonce' ), 'mp_create_account' ) ) {
-			
+
 			if( ( $enable_registration_form || $force_login ) && $account_username && $account_password && $account_email  ) {
 				$args = array(
 					'user_login' => $account_username,
@@ -1118,7 +1122,7 @@ class MP_Checkout {
 	public function has_errors( $context = 'general' ) {
 		return ( mp_arr_get_value( $context, $this->_errors ) ) ? true : false;
 	}
-	
+
 	/**
 	 * Toggleable registration form on checkout
 	 *
@@ -1127,19 +1131,19 @@ class MP_Checkout {
 	 * @return string
 	 */
 	public function register_toggle_form(  ) {
-		
+
 		if ( is_user_logged_in() ) {
 			// Bail - user is logged in (e.g. already has an account)
 			return false;
 		}
-		
+
 		$required_fields = $required_labels = $html = '';
 
 		if ( mp_get_setting( 'force_login' ) == true ) {
 			$required_fields = 'data-rule-required="true" aria-required="true"';
 			$required_labels = '<span class="mp_field_required">*</span>';
 		}
-		
+
 		if ( mp_get_setting( 'force_login' ) == false ) {
 			$html .= '
 				<div class="mp_checkout_field mp_checkout_checkbox">
@@ -1147,7 +1151,7 @@ class MP_Checkout {
 				</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
 			';
 		}
-		
+
 		if ( mp_get_setting( 'force_login' ) == false ) {
 			$html .= '
 				<div id="mp-checkout-column-registration" style="display:none" class="mp_checkout_column_section">
@@ -1157,19 +1161,19 @@ class MP_Checkout {
 				<div id="mp-checkout-column-registration-needed" class="mp_checkout_column_section">
 					<h3 class="mp_sub_title">' . __( 'Register account', 'mp' ) . '</h3>';
 		}
-				
+
 		$html .= '<div class="mp_checkout_field mp_checkout_column">
-				<label class="mp_form_label">' . __( 'Username', 'mp' ) . ' ' . $required_labels . '</label>	
+				<label class="mp_form_label">' . __( 'Username', 'mp' ) . ' ' . $required_labels . '</label>
 				<input type="text" name="account_username" id="mp_account_username" ' . $required_fields . ' data-rule-remote="' . esc_url( admin_url( 'admin-ajax.php?action=mp_check_if_username_exists' ) ) . '" data-msg-remote="' . __( 'An account with this username already exists', 'mp' ) . '"></input>
 			  </div><!-- end mp_checkout_field -->';
-		
+
 		$html .= '<div class="mp_checkout_field mp_checkout_column">
-				<label class="mp_form_label">' . __( 'Password', 'mp' ) . ' ' . $required_labels . '</label>	
+				<label class="mp_form_label">' . __( 'Password', 'mp' ) . ' ' . $required_labels . '</label>
 				<input type="password" name="account_password" ' . $required_fields . '></input>
-			  </div><!-- end mp_checkout_field -->';			
+			  </div><!-- end mp_checkout_field -->';
 		$html .= wp_nonce_field( 'mp_create_account', 'mp_create_account_nonce' ) . '
-			</div>';		
-		
+			</div>';
+
 		return $html;
 	}
 
@@ -1199,32 +1203,32 @@ class MP_Checkout {
 						<label class="mp_form_label"><input type="checkbox" class="mp_form_checkbox" name="enable_shipping_address" value="1" autocomplete="off" ' . checked( true, $enable_shipping_address, false ) . '> <span>' . __( 'Shipping address different than billing?', 'mp' ) . '</span></label>
 					</div><!-- end mp_checkout_field/mp_checkout_checkbox -->
 				';
-		
+
 			$html .= '
 				</div><!-- end mp-checkout-column-billing-info -->
 					<div id="mp-checkout-column-shipping-info" class="mp_checkout_column"' . (( $enable_shipping_address ) ? '' : ' style="display:none"') . '>
 						<h3 class="mp_sub_title">' . __( 'Shipping', 'mp' ) . '</h3>' .
 			$this->address_fields( 'shipping' ) . '';
-		
-		
+
+
 
 		}
 
 		$html .= '
 				</div><!-- end mp-checkout-column-shipping-info -->';
-		
+
 		// If has special instructions
 		if ( mp_get_setting( 'special_instructions' ) == '1' ) {
 			$html .= '<div id="mp-checkout-column-special-instructions" class="mp_checkout_column fullwidth"><div class="mp_checkout_field">
-					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>	
-				    <textarea name="shipping[special_instructions]"></textarea>
+					<label class="mp_form_label">' . __( 'Special Instructions', 'mp' ) . '</label>
+				    <textarea name="shipping[special_instructions]">' . mp_get_user_address_part( 'special_instructions', 'shipping' ) . '</textarea>
 				  </div><!-- end mp_checkout_field --></div><!-- end mp-checkout-column-special-instructions -->';
 		}
-				
+
 		//Checkout registration form
 		$html .= $this->register_toggle_form();
-			
-		$html .= '	
+
+		$html .= '
 			<div class="mp_checkout_buttons">' .
 		$this->step_link( 'prev' ) .
 		$this->step_link( 'next' ) . '
@@ -1447,7 +1451,7 @@ class MP_Checkout {
 
 		return '#' . $slug;
 	}
-	
+
 	/**
 	 * Returns the js needed to record ecommerce transactions.
 	 *
@@ -1465,11 +1469,11 @@ class MP_Checkout {
 
 		//so that certain products can be excluded from tracking
 		$order = apply_filters( 'mp_ga_ecommerce', $order );
-		
+
 		$cart = $order->get_meta( 'mp_cart_info' );
-		
+
 		$products = $cart->get_items_as_objects();
-		
+
 		if ( mp_get_setting( 'ga_ecommerce' ) == 'old' ) {
 
 			$js = '<script type="text/javascript">
@@ -1577,10 +1581,10 @@ try{
 				"tax": "' . $order->get_meta( 'mp_tax_total' ) . '"							 		// Tax.
 			});';
 			//loop the items
-			
+
 			foreach ( $products as $product ) {
 				$product = new MP_Product( $product->ID );
-				
+
 				$meta = $product->get_meta( 'sku' );
 				$sku = !empty( $meta ) ? esc_attr( $product->get_meta( 'sku' ) ) : $product->ID;
 				$js .= 'ga("ecommerce:addItem", {

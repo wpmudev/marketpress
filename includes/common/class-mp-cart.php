@@ -270,6 +270,9 @@ class MP_Cart {
 		$show_product_qty   = mp_get_setting( 'show_product_qty' ) == '1' ? true : false;
 		$show_product_price = mp_get_setting( 'show_product_price' ) == '1' ? true : false;
 
+                //clean special instructions field
+                mp_update_session_value( "mp_shipping_info->special_instructions", '' );
+                
 		switch ( mp_get_post_value( 'cart_action' ) ) {
 			case 'add_item' :
 				$cart_updated = $this->add_item( $item_id, $qty );
@@ -1234,7 +1237,7 @@ class MP_Cart {
 	public function floating_cart_html() {
 
 		$disable_cart = mp_get_setting( 'disable_cart', 0 );
-		
+
 		$page_id = get_the_ID();
 
 		if ( mp_get_setting( 'disable_cart' ) == '1' || mp_get_setting( 'disable_minicart' ) == '1' ) {
