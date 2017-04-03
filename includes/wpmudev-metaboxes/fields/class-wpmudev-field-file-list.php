@@ -122,7 +122,7 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
         </script>
         <?php
         parent::print_scripts();
-    }
+	}
 
 
 	/**
@@ -137,9 +137,9 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
 		$values = $this->get_value($post_id);
 		$this->before_field(); 
 
-        //Set the name to be an array
-        $this->args[ 'name' ] = $this->args[ 'name' ] . '[]'; ?>
-        <div class="file-list">
+		//Set the name to be an array
+		$this->args[ 'name' ] = $this->args[ 'name' ] . '[]'; ?>
+		<div class="file-list">
             <?php
 
             if ( is_array( $values ) ){
@@ -162,13 +162,13 @@ class WPMUDEV_Field_File_List extends WPMUDEV_Field {
                     <?php
                     $index++;
                 }
-            }else{
+            } else {
             ?>
             <div class="file">
 		        <input type="text" <?php echo $this->parse_atts(); ?> value="<?php echo $values; ?>" /> <a class="button wpmudev-field-file-select" href="#"><?php _e('Select File', 'wpmudev_metaboxes'); ?></a><a href="#" class="button mp_file_action add-file"><span class="dashicons dashicons-plus"></span></a>
             </div>
             <?php } ?>
-        </div>
+		</div>
 		<?php
 		$this->after_field();
 	}
