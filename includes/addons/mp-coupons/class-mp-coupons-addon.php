@@ -618,6 +618,41 @@ class MP_Coupons_Addon {
 				'min'    => 0,
 			),
 		) );
+
+		//Allow for the user to define the minimum number of products the cart has to have
+		$metabox->add_field( 'checkbox', array(
+			'name'  => 'product_count_limited',
+			'label' => array( 'text' => __( 'Can this coupon be limited to a number of products in the cart?', 'mp' ) ),
+		) );
+		
+		$metabox->add_field( 'text', array(
+			'name'       => 'min_products',
+			'desc'       => __( 'Enter the minimum number of products in the cart that this coupon can be used.', 'mp' ),
+			'class'      => 'digits',
+			'label'      => array( 'text' => __( 'Mimimum number of products', 'mp' ) ),
+			'validation' => array(
+				'digits' => true,
+				'min'    => 0,
+			),
+			'conditional' => array(
+				'name'   => 'product_count_limited',
+				'value'  => '1',
+				'action' => 'show',
+			),
+		) );
+
+		//Option to only allow logged in users to use this
+		$metabox->add_field( 'radio_group', array(
+			'name'          => 'require_login',
+			'label'         => array( 'text' => __( 'Require Login', 'mp' ) ),
+			'desc'			=> __( 'Should this coupon only be available to logged in users?', 'mp' ),
+			'default_value' => 'no',
+			'options'       => array(
+				'no'      => __( 'No', 'mp' ),
+				'yes' 	  => __( 'Yes', 'mp' )
+			),
+		) );
+
 		$metabox->add_field( 'radio_group', array(
 			'name'          => 'applies_to',
 			'label'         => array( 'text' => __( 'Applies To', 'mp' ) ),
@@ -630,6 +665,7 @@ class MP_Coupons_Addon {
 				'user'     => __( 'User', 'mp' ),
 			),
 		) );
+
 		$metabox->add_field( 'post_select', array(
 			'name'        => 'product',
 			'validation'  => array( 'required' => true ),
@@ -643,6 +679,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
+
 		$metabox->add_field( 'taxonomy_select', array(
 			'name'        => 'category',
 			'validation'  => array( 'required' => true ),
@@ -656,6 +693,7 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
+
 		$metabox->add_field( 'user_select', array(
 			'name'        => 'user',
 			'validation'  => array( 'required' => true ),
@@ -666,17 +704,38 @@ class MP_Coupons_Addon {
 				'action' => 'show',
 			),
 		) );
+		
+		//Paul Kevin
+		//Allow also category assigning to a user
+		$metabox->add_field( 'taxonomy_select', array(
+			'name'        => 'user_category',
+			'multiple'    => true,
+			'placeholder' => __( 'Select Category', 'mp' ),
+			'desc'		  => __( 'Optionally limit the user to some categories', 'mp' ),
+			'taxonomy'    => 'product_category',
+			'label'       => array( 'text' => __( 'Category', 'mp' ) ),
+			'conditional' => array(
+				'name'   	=> 'applies_to',
+				'value'  	=> 'user',
+				'action' 	=> 'show',
+				'operator' 	=> 'AND',
+			)
+		) );
+		//End Condition
+
 		$metabox->add_field( 'datepicker', array(
 			'name'          => 'start_date',
 			'validation'    => array( 'required' => true ),
 			'label'         => array( 'text' => __( 'Start Date', 'mp' ) ),
 			'default_value' => date( 'Y-m-d' ),
 		) );
+
 		$metabox->add_field( 'checkbox', array(
 			'name'    => 'has_end_date',
 			'label'   => array( 'text' => __( 'Does coupon have an end date?', 'mp' ) ),
 			'message' => __( 'Yes', 'mp' ),
 		) );
+
 		$metabox->add_field( 'datepicker', array(
 			'name'        => 'end_date',
 			'label'       => array( 'text' => __( 'End Date', 'mp' ) ),
@@ -1117,6 +1176,7 @@ class MP_Coupons_Addon {
 			'discount'    => __( 'Discount', 'mp' ),
 			'used'        => __( 'Used', 'mp' ),
 			'remaining'   => __( 'Remaining Uses', 'mp' ),
+			'req_login'   => __( 'Requires Login', 'mp' ),
 			'valid_dates' => __( 'Valid Dates', 'mp' ),
 			'applies_to'  => __( 'Applies To', 'mp' ),
 		);
@@ -1144,6 +1204,12 @@ class MP_Coupons_Addon {
 			//! Remaining Uses
 			case 'remaining' :
 				$coupon->remaining_uses();
+				break;
+				
+			//Check if login is required
+			case 'req_login' :
+				$require_login  = $coupon->get_meta( 'require_login' );
+				echo ucfirst( $require_login );
 				break;
 
 			//! Used
