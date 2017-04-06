@@ -9,7 +9,7 @@ class MP_Pages_Admin {
 	 * @var object
 	 */
 	private static $_instance = null;
-	
+
 	/**
 	 * Gets the single instance of the class
 	 *
@@ -23,7 +23,7 @@ class MP_Pages_Admin {
 		}
 		return self::$_instance;
 	}
-	
+
 	/**
 	 * Init edit-page metaboxes
 	 *
@@ -33,7 +33,7 @@ class MP_Pages_Admin {
 	public function init_metaboxes() {
 		$this->init_page_settings_metabox();
 	}
-	
+
 	/**
 	 * Init the
 	 *
@@ -45,14 +45,14 @@ class MP_Pages_Admin {
 			// Only admins can set store pages
 			return;
 		}
-		
+
 		$metabox = new WPMUDEV_Metabox(array(
 			'id' => 'mp-store-pages-metabox',
 			'post_type' => 'page',
 			'title' => __('Store Page Settings', 'mp'),
 			'context' => 'side',
 		));
-		
+
 		$options = array(
 			'none' => __('None', 'mp'),
 			'store' => __('Store Base', 'mp'),
@@ -61,7 +61,7 @@ class MP_Pages_Admin {
 			'checkout' => __('Checkout Page', 'mp'),
 			'order_status' => __('Order Status', 'mp'),
 		);
-		
+
 		if ( is_multisite() && mp_is_main_site() && is_super_admin() ) {
 			$options['network_store_page'] = __('Network Store Base', 'mp');
 		}
@@ -73,7 +73,7 @@ class MP_Pages_Admin {
 			'options' => $options,
 		));
 	}
-	
+
 	/**
 	 * Save the store_page field value
 	 *
@@ -84,7 +84,7 @@ class MP_Pages_Admin {
 	 */
 	public function save_store_page_value( $value, $post_id, $field ) {
 		global $wpdb;
-		
+
 		// Delete existing meta keys from db that have the same value
 		//$wpdb->delete($wpdb->postmeta, array('meta_key' => '_mp_store_page', 'meta_value' => $value));
 
@@ -94,10 +94,10 @@ class MP_Pages_Admin {
 		} else {
 			mp_update_setting("pages->$value", $post_id);
 		}
-		
-		return null; 
+
+		return null;
 	}
-	
+
 	/**
 	 * Get the store_page field value
 	 *
@@ -107,14 +107,14 @@ class MP_Pages_Admin {
 	 */
 	public function get_store_page_value( $value, $post_id, $raw, $field ) {
 		$meta_value = get_post_meta($post_id, '_mp_store_page', true);
-		
+
 		if ( $meta_value !== '' ) {
 			return $meta_value;
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Constructor
 	 *
