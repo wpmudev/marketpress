@@ -1495,7 +1495,7 @@ class MP_Cart {
 				}
 
 				if ( ! $product->is_download() ) {
-					$this->_is_download_only = false;
+					$this->_is_download_only = apply_filters( 'mp_cart/is_product_downloadable', true, $product );
 				}
 			}
 
