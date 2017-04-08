@@ -375,9 +375,11 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 					'cart'			 => $cart,
 					'payment_info'	 => $payment_info,
 					'billing_info'	 => $billing_info,
-					'shipping_info'	 => $shipping_info,
-					'paid'			 => true
+					'shipping_info'	 => $shipping_info
 				) );
+				
+				//In order to each the mp_order_order_paid
+				$order->change_status( 'order_paid' );
 			}
 		} catch ( Exception $e ) {
 			mp_checkout()->add_error( sprintf( __( 'There was an error processing your card - "%s". Please try again.', 'mp' ), $e->getMessage() ), 'general' );
