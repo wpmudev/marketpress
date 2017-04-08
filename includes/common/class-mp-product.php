@@ -1552,11 +1552,35 @@ class MP_Product {
 	 *
 	 * @param string $order_id The order ID for the download.
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
+	 *
+	 * @return String/Array - The url or an array of URLs if the product has multiple files
 	 */
 	public function download_url( $order_id, $echo = true ) {
 		$url = false;
+
 		if ( $this->is_download() ) {
 			$url = add_query_arg( 'orderid', $order_id, $this->url( false ) );
+
+			//Check if the download has many files
+			$files = $this->get_meta( 'file_url' );
+
+			if( is_array( $files ) ){
+
+				//If we have more than one produce file, add them to a list
+				if( count( $files ) > 0 ){
+
+					$file_urls 	= array();
+					$count 		= 1;
+					foreach( $files as $file_url ){
+						$single_url 	= add_query_arg( 'orderid', $order_id, $this->url( false , $count) );
+						$file_urls[] 	= $single_url;
+						$count++;
+					}
+					$url = $file_urls;
+				}
+
+			}
+			
 		}
 
 		/**
@@ -2245,7 +2269,7 @@ class MP_Product {
 			$img_id  = get_post_thumbnail_id( $id ? $id : $post_id );
 			$img_src = wp_get_attachment_image_src( $img_id, $size );
 
-			if( is_array( $img_src ) ) {
+			if ( is_array( $img_src ) ) {
 				$img_url = array_shift( $img_src );
 			}
 		}
@@ -2585,12 +2609,18 @@ class MP_Product {
 	 * @access public
 	 *
 	 * @param bool $echo
+	 * @param bool/integer $count - the current file count for multiple products
 	 */
-	public function url( $echo = true ) {
+	public function url( $echo = true , $count = false ) {
 		if ( $this->is_variation() ) {
 			$url = get_permalink( $this->_post->post_parent ) . 'variation/' . $this->ID;
 		} else {
 			$url = get_permalink( $this->ID );
+		}
+
+		//Add number of file in array if count is passed
+		if ( $count ){
+			$url = add_query_arg( 'numb', $count, $url );
 		}
 
 		/**

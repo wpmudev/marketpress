@@ -1829,26 +1829,30 @@ WHERE $delete_where"
 				'class'       => 'mp_variations_box'
 			), $has_variations ) );
 		}
-
-		$metabox->add_field( 'file', apply_filters( 'mp_add_field_array_file_url', array(
-			'name'         => 'file_url',
-			'label'        => array( 'text' => __( 'File URL', 'mp' ) ),
-			//'placeholder'	 => __( 'Choose a file', 'mp' ),
-			'button_label' => 'Select a file',
-			'conditional'  => array(
-				'action'   => 'show',
-				'operator' => 'AND',
-				array(
-					'name'  => 'product_type',
-					'value' => 'digital',
+        
+		//Modified: Added filter to allow for changing of the file type to multiple
+		//This is set when the multiple file type Addon is enabled
+		$metabox->add_field( apply_filters( 'mp_product_file_url_type','file' ), 
+			apply_filters( 'mp_add_field_array_file_url', array(
+				'name'         	=> 'file_url',
+				'label'        	=> array( 'text' => __( 'File URL', 'mp' ) ),
+				//'placeholder'	 => __( 'Choose a file', 'mp' ),
+				'button_label' 	=> 'Select a file',
+				'conditional'  	=> array(
+					'action'   	=> 'show',
+					'operator' 	=> 'AND',
+					array(
+						'name'  => 'product_type',
+						'value' => 'digital',
+					),
+					array(
+						'name'  => 'has_variation',
+						'value' => 'no',
+					),
 				),
-				array(
-					'name'  => 'has_variation',
-					'value' => 'no',
-				),
-			),
-			'class'        => 'mp-product-field-50 mp-blank-bg'
-		) ) );
+				'class'        	=> 'mp-product-field-50 mp-blank-bg'
+			)) 
+		);
 
 		$metabox->add_field( 'text', apply_filters( 'mp_add_field_array_external_url', array(
 			'name'         => 'external_url',
