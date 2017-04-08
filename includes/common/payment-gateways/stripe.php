@@ -378,7 +378,7 @@ class MP_Gateway_Stripe extends MP_Gateway_API {
 					'shipping_info'	 => $shipping_info
 				) );
 				
-				//In order to each the mp_order_order_paid
+				//In order to each the mp_order_order_paid action
 				$order->change_status( 'order_paid' );
 			}
 		} catch ( Exception $e ) {
