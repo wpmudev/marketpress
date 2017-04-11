@@ -56,11 +56,10 @@ class MP_Admin {
 	}
 
 	public function dismissed_deprecated_messag(){
-		if(!current_user_can('manage_options')){
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		update_option('mp_deprecated_gateway_notice_showed',1);
-
+		update_option( 'mp_deprecated_gateway_notice_showed' , 1 );
 	}
 	
 	public function display_quick_setup_notice() {
