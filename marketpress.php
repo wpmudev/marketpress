@@ -385,6 +385,8 @@ class Marketpress {
 
 		add_action( 'admin_init', array( &$this, 'variations_admin' ) );
 
+		add_action( 'admin_init', array(&$this, 'mp_admin_init') );
+
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
 
 		add_filter( 'post_thumbnail_html', array( &$this, 'post_thumbnail_html5' ), 10, 5 );
@@ -502,6 +504,39 @@ class Marketpress {
 
 			return ob_get_clean();
 		}
+	}
+
+	/**
+	 * Called from WordPress when the admin page init process is invoked.
+	 * @since 3.0
+	 *
+	 * @param none
+	 * @return unknown
+	 */
+
+	function mp_admin_init() {
+		if (is_multisite()) {
+			if (!is_super_admin()) return;
+			if (!is_network_admin()) return;
+		} else if (current_user_can( 'manage_store_settings' )) {
+			add_filter( 'plugin_action_links_'. basename( dirname( __FILE__ ) ) .'/'. basename( __FILE__ ),
+				array(&$this,'mp_plugin_settings_link') );
+		}
+	}
+
+	/**
+	 * Adds a 'settings' link on the plugin links
+	 * @since 3.0
+	 * @param array default links for this plugin.
+	 * @return array default links including Settings link
+	 */
+
+	function mp_plugin_settings_link( $links ) {
+		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=store-settings' ) ) . '">'
+			. __( 'Settings', 'marketpress' ) .'</a>';
+		array_unshift( $links, $settings_link );
+
+		return $links;
 	}
 
 	function install_actions() {
