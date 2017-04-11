@@ -580,7 +580,19 @@ class MP_Order {
 							<?php
 							$print_download_link = apply_filters( 'mp_order/print_download_link', $product->is_download() && mp_is_shop_page( 'order_status' ), $product, $product_id );
 							if ( $print_download_link ) {
-								echo '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
+
+								//Handle multiple files
+								$download_url = $product->download_url( get_query_var( 'mp_order_id' ), false );
+								
+								if ( is_array( $download_url ) ){
+									//If we have more than one product file, we loop and add each to a new line
+									foreach ( $download_url as $key => $value ){
+										echo '<a target="_blank" href="' . $value . '">' . sprintf( __( 'Download %1$s', 'mp' ),( $key+1 ) ) . '</a><br/>';
+									}
+
+								} else {
+									echo '<a target="_blank" href="' . $product->download_url( get_query_var( 'mp_order_id' ), false ) . '">' . __( 'Download', 'mp' ) . '</a>';
+								}
 							}
 							?>
 						</div>
@@ -700,6 +712,9 @@ class MP_Order {
 					( ( ( $country = $this->get_meta( "mp_{$type}_info->country", '' ) ) && is_array( $all_countries ) && isset( $all_countries[$country] ) ) ? $all_countries[$country] . '<br />' : '' ) .
 			        ( ( $phone = $this->get_meta( "mp_{$type}_info->phone", '' ) ) ? $phone . '<br />' : '' ) .
 			        ( ( $email = $this->get_meta( "mp_{$type}_info->email", '' ) ) ? '<a href="mailto:' . antispambot( $email ) . '">' . antispambot( $email ) . '</a><br />' : '' );
+			}
+                        if ( $this->get_meta( 'mp_' . $type . '_info->special_instructions' ) ) {
+				$html .= wordwrap( $this->get_meta( "mp_{$type}_info->special_instructions" ) ) . '<br />';
 			}
 		} else {
 			$prefix = 'mp[' . $type . '_info]';
@@ -1151,7 +1166,7 @@ class MP_Order {
 			  correct price is returned */
 			$_item->get_price();
 		}
-		
+
 		$order_shipping = mp_get_post_value( 'shipping' );
 		if( isset( $order_shipping['special_instructions'] ) ){
 			$shipping_info['special_instructions'] = $order_shipping['special_instructions'];
@@ -1447,12 +1462,12 @@ class MP_Order {
 	 * @param bool $echo Optional, whether to echo or return. Defaults to echo.
 	 */
 	public function tracking_url( $echo = true, $blog_id = false ) {
-		
+
 		if( $blog_id !== false ) {
 			$current_blog_id = get_current_blog_id();
 			switch_to_blog( $blog_id );
 		}
-		
+
 		$url = trailingslashit( mp_store_page_url( 'order_status', false ) . $this->get_id() );
 
 		$user_id = get_current_user_id();
@@ -1482,7 +1497,7 @@ class MP_Order {
 		 * @param MP_Order $this The current order object.
 		 */
 		$url = apply_filters( 'mp_order/status_url', $url, $this );
-		
+
 		if( $blog_id !== false ) {
 			switch_to_blog( $current_blog_id );
 		}

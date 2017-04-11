@@ -181,7 +181,8 @@ class MP_PDF_Invoice {
 
 
 		$email = '';
-
+		
+		$order_items  = $order->get_meta( 'mp_cart_items' );
 		$order_details = array();
 		$cart          = $order->get_cart();
 
@@ -194,10 +195,11 @@ class MP_PDF_Invoice {
 
 		if ( $type == self::PDF_INVOICE ) {
 
-			foreach ( $cart->get_items() as $key => $qty ) {
-				$product         = new MP_Product( $key );
-				$order_details[] = sprintf( '<tr><td>%s</td><td>%s</td><td>%s</td></tr>', $product->title( false ), $qty, mp_format_currency( '', $product->get_price( 'lowest' ) )//$product->display_price( false )
-				);
+			foreach ( $order_items as $product_id => $items ){
+				foreach ( $items as $item ){
+					$order_details[] = sprintf( '<tr><td>%s</td><td>%s</td><td>%s</td></tr>', $item['name'], $item['quantity'], mp_format_currency( '', $item['price'] )
+					);
+				}								
 			}
 			//times for the subtotal
 			$order_details[] = sprintf( '<tr><td class="no-bg">%s</td><td class="no-bg">%s</td><td>%s</td></tr>', '', __( "Subtotal", "mp" ), $cart->product_total( true ) );

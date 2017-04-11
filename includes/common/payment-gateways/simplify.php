@@ -191,6 +191,12 @@ class MP_Gateway_Simplify extends MP_Gateway_API {
 				wp_redirect( $order->tracking_url( false ) );
 				exit;
 			}
+			else{
+				$error_message = __( 'There was a problem finalizing your purchase. Please re-enter your credit card information and try again</a>', 'mp' );
+				$error_message = apply_filters( 'mp_gateway/simplify/error_message', $error_message );
+				mp_checkout()->add_error( $error_message, 'order-review-payment' );
+				return;
+			}
 		} catch ( Exception $e ) {
 			mp_checkout()->add_error( sprintf( __( 'There was an error processing your card: <strong>%s</strong>. Please re-enter your credit card info and try again</a>.', 'mp'), $e->getMessage() ), 'order-review-payment' );
 			return false;
