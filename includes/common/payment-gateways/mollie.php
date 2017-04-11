@@ -132,7 +132,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 		$order		 = new MP_Order();
 
 		$total = $cart->total( false );
-		
+
 		try {
 
 			$payment = $this->mollie->payments->create( array(
@@ -178,7 +178,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 
 			$payment = $this->mollie->payments->get( $transaction_id );
 
-			/**
+                        /**
 			 * Mollie gateway use some payment methods that can take delays to confirm payment.
 			 * We can assume the order as received if payment is paid or is still open
 			 */
@@ -187,6 +187,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 				$billing_info	 = mp_get_session_value( 'billing_info' );
 				$shipping_info	 = mp_get_session_value( 'shipping_info' );
 				$cart	 		 = mp_get_session_value( 'cart' );
+                                $timestamp	 = time();
 
 				$payment_info = array(
 				'gateway_public_name'	 => $this->public_name,
@@ -197,7 +198,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 						$timestamp => __( 'The payment request is under process', 'mp' ),
 					),
 					'total'					 => $cart->total(),
-					'currency'				 => $this->currency,
+					'currency'				 => $this->currencyCode,
 				);
 
 				$order->save( array(
@@ -209,7 +210,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 				) );
 
 				$status = __( 'The order has been received', 'mp' );
-				$order->log_ipn_status( $payment_status . ': ' . $status );
+				$order->log_ipn_status( $payment->status . ': ' . $status );
 
 				if ( $payment->isPaid() ){
 					$order->change_status( 'paid', true );
@@ -221,7 +222,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 				* We can assume it was aborted.
 				* We delete the order and redirct the user again to checkout page.
 				*/
-			
+
 				wp_redirect( mp_store_page_url( 'checkout', false ) );
 			    die;
 			}
@@ -235,7 +236,7 @@ class MP_Gateway_Mollie extends MP_Gateway_API {
 	 * INS and payment return
 	 */
 	function process_ipn_return() {
-		
+
 	}
 
 }

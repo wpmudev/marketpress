@@ -38,7 +38,7 @@ class Marketpress {
 	 * @access public
 	 * @var array
 	 */
- 
+
 	var $post_types = array( 'mp_product', 'product', 'mp_product_variation' );
 
 	/**
@@ -117,7 +117,7 @@ class Marketpress {
 	 *
 	 * @return string
 	 */
-	 
+
 	public function plugin_url( $path = '' ) {
 		return $this->_plugin_url . ltrim( $path, '/' );
 	}
@@ -353,7 +353,7 @@ class Marketpress {
 		require_once $this->plugin_dir( 'includes/common/constants.php' );
 
 // Includes
-		add_action( 'init', array( &$this, 'includes' ), 0 );
+		add_action( 'init', array( &$this, 'includes' ), -1 );
 
 // Load gateway/shipping plugins
 		add_action( 'init', array( &$this, 'load_plugins' ), 2 );
@@ -384,6 +384,8 @@ class Marketpress {
 		add_action( 'admin_init', array( &$this, 'install_actions' ) );
 
 		add_action( 'admin_init', array( &$this, 'variations_admin' ) );
+
+		add_action( 'admin_init', array(&$this, 'mp_admin_init') );
 
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
 
@@ -499,9 +501,42 @@ class Marketpress {
 			<input type="hidden" name="variation_title" id="variation_title"
 			       value="<?php echo esc_attr( $variation_title ); ?>"/>
 			<?php
-			
+
 			return ob_get_clean();
 		}
+	}
+
+	/**
+	 * Called from WordPress when the admin page init process is invoked.
+	 * @since 3.0
+	 *
+	 * @param none
+	 * @return unknown
+	 */
+
+	function mp_admin_init() {
+		if (is_multisite()) {
+			if (!is_super_admin()) return;
+			if (!is_network_admin()) return;
+		} else if (current_user_can( 'manage_store_settings' )) {
+			add_filter( 'plugin_action_links_'. basename( dirname( __FILE__ ) ) .'/'. basename( __FILE__ ),
+				array(&$this,'mp_plugin_settings_link') );
+		}
+	}
+
+	/**
+	 * Adds a 'settings' link on the plugin links
+	 * @since 3.0
+	 * @param array default links for this plugin.
+	 * @return array default links including Settings link
+	 */
+
+	function mp_plugin_settings_link( $links ) {
+		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=store-settings' ) ) . '">'
+			. __( 'Settings', 'marketpress' ) .'</a>';
+		array_unshift( $links, $settings_link );
+
+		return $links;
 	}
 
 	function install_actions() {
@@ -612,6 +647,15 @@ class Marketpress {
 			'class'        => 'MP_PDF_Invoice_Addon',
 			'path'         => mp_plugin_dir( 'includes/addons/mp-pdf-invoice/class-mp-pdf-invoice-addon.php' ),
 			'has_settings' => true,
+		) );
+
+		//Multi File Addon
+		mp_register_addon( array(
+			'label'        => __( 'Multiple Downloads', 'mp' ),
+			'desc'         => __( 'Enable multiple downloads per product', 'mp' ),
+			'class'        => 'MP_Multi_File_Download_Addon',
+			'path'         => mp_plugin_dir( 'includes/addons/mp-multi-file-download/class-mp-multi-file-download-addon.php' ),
+			'has_settings' => false,
 		) );
 
 		/**
@@ -996,7 +1040,7 @@ function mp_plugin_activate() {
 
 function mp_plugin_uninstall() {
 	global $wpdb;
-	
+
 	$table_attr = $wpdb->prefix . 'mp_product_attributes';
 	$sql_attr = "DROP TABLE IF EXISTS $table_attr;";
     $wpdb->query( $sql_attr );

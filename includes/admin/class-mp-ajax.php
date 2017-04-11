@@ -494,8 +494,16 @@ class MP_Ajax {
 		if ( $order_id = mp_get_post_value( 'order_id' ) ) {
 			$order = new MP_Order( $order_id );
 			if ( $order->exists() ) {
+
+				$redirect_url = trailingslashit( mp_store_page_url( 'order_status', false ) ) . $order->get_id();
+				
+				//non-logged in user
+				if ( $guest_email = mp_get_post_value( 'guest_email' ) ){
+					$redirect_url = trailingslashit( $redirect_url ) . md5( $guest_email );
+				}
+
 				wp_send_json_success( array(
-					'redirect_url' => trailingslashit( mp_store_page_url( 'order_status', false ) ) . $order->get_id(),
+					'redirect_url' => $redirect_url,
 				) );
 			}
 		}
