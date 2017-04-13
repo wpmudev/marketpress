@@ -4,6 +4,14 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.4
+----------------------------------------------------------------------
+
+- Added: Multi-file uploa field type
+- Added: Addon to enable product multiple files
+- Added: File list incase the product files are more than one
+- Refactored: Download code to cater for multiple files via a prameter
+
 3.2.3
 ----------------------------------------------------------------------
 
