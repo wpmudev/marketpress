@@ -1460,7 +1460,7 @@ class MP_Checkout {
 	 * @return string
 	 */
 
-	public function create_ga_ecommerce( $order_id ) {
+	public function create_ga_ecommerce( $order_id,  $echo = false ) {
 		$order = new MP_Order( $order_id );
 		//if order not exist, just return false
 		if ( $order->exists() == false ) {
@@ -1600,9 +1600,12 @@ try{
 			$js .='ga("ecommerce:send");</script>';
 		}
 
-		//add to footer
-		if ( !empty( $js ) ) {
+		//echo or return
+		if ( $echo ) {
 			echo $js;
+		}
+		else{
+			return $js;
 		}
 	}
 
