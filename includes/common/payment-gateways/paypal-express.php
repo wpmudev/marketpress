@@ -436,14 +436,16 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 					continue;
 				}
 
-				$vcart->add_item( $product_id, $quantity );
+				for( $q = 1; $q <= $quantity; $q++ ){
+					$request["L_PAYMENTREQUEST_{$index}_NAME{$i}-{$q}"]         = $this->trim_name( $item->title( false ) );
+					$request["L_PAYMENTREQUEST_{$index}_AMT{$i}-{$q}"]          = round( $price, 2 );
+					$request["L_PAYMENTREQUEST_{$index}_NUMBER{$i}-{$q}"]       = $item->get_meta( 'sku', '' );
+					$request["L_PAYMENTREQUEST_{$index}_QTY{$i}-{$q}"]          = $quantity;
+					$request["L_PAYMENTREQUEST_{$index}_ITEMURL{$i}-{$q}"]      = $item->url( false );
+					$request["L_PAYMENTREQUEST_{$index}_ITEMCATEGORY{$i}-{$q}"] = 'Physical';	
 
-				$request["L_PAYMENTREQUEST_{$index}_NAME{$i}"]         = $this->trim_name( $item->title( false ) );
-				$request["L_PAYMENTREQUEST_{$index}_AMT{$i}"]          = round( $price, 2 );
-				$request["L_PAYMENTREQUEST_{$index}_NUMBER{$i}"]       = $item->get_meta( 'sku', '' );
-				$request["L_PAYMENTREQUEST_{$index}_QTY{$i}"]          = $quantity;
-				$request["L_PAYMENTREQUEST_{$index}_ITEMURL{$i}"]      = $item->url( false );
-				$request["L_PAYMENTREQUEST_{$index}_ITEMCATEGORY{$i}"] = 'Physical';
+					$vcart->add_item( $product_id, 1 );
+				}
 
 				$i ++;
 			}
