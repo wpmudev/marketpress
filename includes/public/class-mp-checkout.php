@@ -643,6 +643,15 @@ class MP_Checkout {
 	 */
 	public function ajax_update_checkout_data() {
 		$this->_update_shipping_section();
+
+                $error_messages = $this->_validate_checkout_data();
+                if ( $error_messages ) {
+                    wp_send_json_error( array(
+                            'messages' => $error_messages,
+                            'count' => count( $error_messages ),
+                    ) );
+                }
+
 		$this->_update_order_review_payment_section();
 		$this->_ajax_register_account();
 
@@ -654,6 +663,27 @@ class MP_Checkout {
 
 		wp_send_json_success( $sections );
 	}
+
+
+        /**
+         * Validate checkout data
+         *
+         * @return array Return associative array where key - name of input field, value - error message
+         */
+        private function _validate_checkout_data() {
+            $messages = array();
+
+            $what = 'shipping';
+            $zip      = mp_get_user_address_part( 'zip', $what );
+            $country  = mp_get_user_address_part( 'country', $what );
+            if ( !mp_is_valid_zip( $zip, $country ) ) {
+                $key = mp_get_session_value( 'enable_shipping_address' ) ?'shipping[zip]' : 'billing[zip]';
+                $messages[ $key ] = __( 'Invalid Zip Code', 'mp' );
+            }
+
+            return $messages;
+        }
+
 
 	/**
 	 * Display checkout form
