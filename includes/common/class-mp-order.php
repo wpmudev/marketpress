@@ -1062,7 +1062,7 @@ class MP_Order {
 		$tracked = $this->get_meta( 'mp_ga_tracked' );
 
 		if( !$tracked ) {
-			mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
+			$html .= mp_checkout()->create_ga_ecommerce(get_query_var( 'mp_order_id' ));
 			add_post_meta( $this->ID, 'mp_ga_tracked', true, true );
 		}
 
