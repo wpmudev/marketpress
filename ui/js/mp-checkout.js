@@ -322,17 +322,24 @@ var mp_checkout;
                             marketpress.loadingOverlay( 'show' );
 
                             $.post( url, $form.serialize() ).done( function( resp ) {
-                                $.each( resp.data, function( index, value ) {
-                                    $( '#' + index ).find( '.mp_checkout_section_content' ).html( value );
-                                } );
+                                if ( resp.success ) {
+                                    $.each( resp.data, function( index, value ) {
+                                        $( '#' + index ).find( '.mp_checkout_section_content' ).html( value );
+                                    } );
 
-                                if( resp.data.mp_checkout_nonce ){
-                                    $( "input#mp_checkout_nonce" ).replaceWith( resp.data.mp_checkout_nonce );
+                                    if( resp.data.mp_checkout_nonce ){
+                                        $( "input#mp_checkout_nonce" ).replaceWith( resp.data.mp_checkout_nonce );
+                                    }
+
+                                    mp_checkout.initCardValidation();
+                                    marketpress.loadingOverlay( 'hide' );
+                                    mp_checkout.nextStep();
+                                } else {
+                                    $checkout.validate().showErrors( resp.data.messages );
+                                    mp_checkout.errorSummary( 'show', resp.data.count );
+                                    marketpress.loadingOverlay( 'hide' );
                                 }
 
-                                mp_checkout.initCardValidation();
-                                marketpress.loadingOverlay( 'hide' );
-                                mp_checkout.nextStep();
                             } );
                         }
                     }

@@ -87,7 +87,7 @@ class MP_Coupons_Addon {
 
 			add_filter( 'mp_product/get_price', array( &$this, 'product_price' ), 10, 2 );
 			add_filter( 'mp_cart/product_total', array( &$this, 'product_total' ), 10, 2 );
-			//add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
+			add_filter( 'mp_cart/total', array( &$this, 'cart_total' ), 10, 3 );
 
 			add_filter( 'mp_cart/tax_total', array( &$this, 'tax_total' ), 10, 3 );
 
@@ -339,21 +339,30 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function cart_total( $total, $_total, $cart ) {
+		
+		if( isset( $_total[ 'product_original' ] ) ){
+			$total = $_total[ 'product_original' ];
+		}
+		elseif( $cart instanceof MP_Cart ){
+			$total = $cart->product_original_total();
+		}
+
+		$coupon_discount = $this->get_total_discount_amt();		
+
 		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
 			$total = $total + ( - 1 * $total );
 		} else {
 			$total = $total + $this->get_total_discount_amt();
 		}
 
+		$total = ( $total + (float) $cart->tax_total() + (float) $cart->shipping_total() );
+
 		return floatval( $total );
 	}
 
-	public function tax_total( $tax_amount, $total, $obj ) {
+	public function tax_total( $tax_amount, $total, $cart ) {
 
-		$percent = $total / 100;
-		if ( $percent == 0 ) {
-			return $tax_amount;
-		}
+		$total = $cart->product_original_total() + $cart->shipping_total();
 
 		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
 			$total_pre = $total + ( - 1 * $total );
@@ -361,17 +370,12 @@ class MP_Coupons_Addon {
 			$total_pre = $total + $this->get_total_discount_amt();
 		}
 
-		$discount_value = ( $total - $total_pre );
+		$tax_rate   = mp_tax_rate();
+		$cart_price = $total_pre * ( 1 + $tax_rate );
 
-		$init_tax_percentage = $tax_amount / $percent;
+		$tax_amount = (float) $cart_price - (float) $total_pre;
 
-		$total_pre = $total_pre * ( $init_tax_percentage / 100 );
-
-		if ( mp_get_setting( 'tax->tax_inclusive' ) ) {
-			$total_pre = $tax_amount;
-		}
-
-		return $tax_amount;
+		return number_format( $tax_amount, 2 );
 	}
 
 	/**
@@ -587,7 +591,7 @@ class MP_Coupons_Addon {
 			'default_value' => 'item',
 			'options'       => array(
 				'item'     => __( 'Apply to each applicable item and quantity ordered', 'mp' ),
-				//'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
+				'subtotal' => __( 'Apply to each applicable item once per cart', 'mp' )
 			),
 		) );
 		$metabox->add_field( 'checkbox', array(
@@ -1149,12 +1153,9 @@ class MP_Coupons_Addon {
 	 * @return float
 	 */
 	public function product_total( $total, $items ) {
-		$total = 0;
-		foreach ( $items as $item ) {
-			$price = $item->get_price();
-			$total += ( mp_arr_get_value( 'coupon', $price, mp_arr_get_value( 'lowest', $price, 0 ) ) * $item->qty );
-		}
-
+		
+		$total = (float) mp_cart()->product_original_total() + (float) $this->get_total_discount_amt();	
+		
 		return (float) round( $total, 2 );
 	}
 
