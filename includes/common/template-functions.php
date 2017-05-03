@@ -2471,7 +2471,9 @@ if ( ! function_exists( 'mp_product' ) ) {
         
         $lightbox_code = apply_filters( 'mp_single_product_image_lightbox', $lightbox_code );
 
-		if ( $image && $has_image ) {
+		$post = get_post();
+
+		if ( $image && $has_image && ! post_password_required( $post ) ) {
 			if ( ! $product->has_variations() ) {
 
 				if ( $values ) {
@@ -2535,19 +2537,23 @@ if ( ! function_exists( 'mp_product' ) ) {
 			}
 		}
 
-		if ( $image ) {
+		if ( $image && ! post_password_required( $post ) ) {
 			$return .= '<div class="mp_single_product_details">';
 
 			$return .= '<span style="display:none" class="date updated">' . get_the_time( $product->ID ) . '</span>'; // mp_product_class(false, 'mp_product', $post->ID)
 		}
 
 
-                if ( $title ) {
-                        $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
-                }
+        if ( $title ) {
+                $return .= ' <h1 itemprop="name" class="mp_product_name entry-title"><a href="' . $product->url( false ) . '">' . $product->title( false ) . '</a></h1>';
 
-                if ( $meta ) {
-                        $return .= '<div class="mp_product_meta">';
+		        // If post password required and it doesn't match the cookie.
+		        if ( post_password_required( $post ) )
+			        $return .= get_the_password_form( $post );
+        }
+
+        if ( $meta && ! post_password_required( $post ) ) {
+                $return .= '<div class="mp_product_meta">';
 
 			// Price
 			$return .= ( $variation ) ? $variation->display_price( false ) : $product->display_price( false );
@@ -2599,83 +2605,85 @@ if ( ! function_exists( 'mp_product' ) ) {
 			$return .= '</div><!-- end mp_social_shares -->';
 		}
 
-		if ( $image ) {
+		if ( $image && ! post_password_required( $post ) ) {
 			$return .= '</div><!-- end mp_single_product_details-->';
 		}
 
-		$return .= '<div class="mp_single_product_extra">';
+		if ( ! post_password_required( $post ) ) {
+			$return .= '<div class="mp_single_product_extra">';
 
-		if( ! $display_description && isset( $product->content_tabs[ 'mp-product-overview' ] ) ){
-			unset( $product->content_tabs[ 'mp-product-overview' ] );
-		}
-
-		$return .= $product->content_tab_labels( false );
-
-		$index = 0;
-
-		if( $display_description ){
-			$return .= '
-<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
-
-			$return .= '
-<div itemprop="description" class="mp_product_tab_content_text">';
-
-			if ( $content == 'excerpt' ) {
-				$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
-			} else {
-				$product_description = ( !$product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
-				$return .= apply_filters('the_content', $product_description);
+			if ( ! $display_description && isset( $product->content_tabs['mp-product-overview'] ) ) {
+				unset( $product->content_tabs['mp-product-overview'] );
 			}
 
-			$return .= '
-</div><!-- end mp_product_tab_content_text -->
-</div><!-- end mp-product-overview -->';
-			$index++;
-		}
+			$return .= $product->content_tab_labels( false );
+
+			$index = 0;
+
+			if ( $display_description ) {
+				$return .= '
+	<div id="mp-product-overview' . '-' . $product->ID . '" class="mp_product_tab_content mp_product_tab_content-overview mp_product_tab_content-current">';
+
+				$return .= '
+	<div itemprop="description" class="mp_product_tab_content_text">';
+
+				if ( $content == 'excerpt' ) {
+					$return .= ( $variation ) ? mp_get_the_excerpt( $variation_id, apply_filters( 'mp_get_the_excerpt_length', 18 ), true ) : $product->excerpt();
+				} else {
+					$product_description = ( ! $product->post_content && $variation ) ? $product->get_variation()->post_content : $product->post_content;
+					$return              .= apply_filters( 'the_content', $product_description );
+				}
+
+				$return .= '
+	</div><!-- end mp_product_tab_content_text -->
+	</div><!-- end mp-product-overview -->';
+				$index ++;
+			}
 
 
-		// Remove overview tab as it's already been manually output above
-		unset( $product->content_tabs[ 'mp-product-overview' ] );
+			// Remove overview tab as it's already been manually output above
+			unset( $product->content_tabs['mp-product-overview'] );
 
-		$func_args = func_get_args();
-		$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
+			$func_args = func_get_args();
+			$args      = mp_parse_args( $func_args, mp()->defaults['list_products'] );
 
-		foreach ( $product->content_tabs as $slug => $label ) {
-			switch ( $slug ) {
-				case 'mp-related-products' :
-					$view = mp_get_setting( 'related_products->view' );
-					if ( mp_get_setting( 'related_products->show' ) ) {
-						$layout_type = mp_get_setting( 'list_view' );
-						if ( ! is_null( $args['list_view'] ) ) {
-							$layout_type = $args['list_view'] ? 'list' : 'grid';
+			foreach ( $product->content_tabs as $slug => $label ) {
+				switch ( $slug ) {
+					case 'mp-related-products' :
+						$view = mp_get_setting( 'related_products->view' );
+						if ( mp_get_setting( 'related_products->show' ) ) {
+							$layout_type = mp_get_setting( 'list_view' );
+							if ( ! is_null( $args['list_view'] ) ) {
+								$layout_type = $args['list_view'] ? 'list' : 'grid';
+							}
+							$return .= '
+							<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
+								<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
+							</div><!-- end mp-related-products -->';
 						}
+						break;
+
+					default :
+						/**
+						 * Filter the content tab html
+						 *
+						 * @since 3.0
+						 *
+						 * @param string
+						 * @param string $slug The tab slug.
+						 */
+						$tab = apply_filters( 'mp_content_tab_html', '', $slug );
+
 						$return .= '
-						<div id="mp-related-products-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp-multiple-products mp_product_tab_content mp_product_tab_content-related-products">
-							<div class="mp_product_tab_content_products mp_products mp_products-related ' . ( isset( $view ) ? 'mp_products-' . $view : 'mp_products-list' ) . '">' . $product->related_products() . ' </div>
-						</div><!-- end mp-related-products -->';
-					}
-					break;
-
-				default :
-					/**
-					 * Filter the content tab html
-					 *
-					 * @since 3.0
-					 *
-					 * @param string
-					 * @param string $slug The tab slug.
-					 */
-					$tab = apply_filters( 'mp_content_tab_html', '', $slug );
-
-					$return .= '
-					<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
-						<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
-					</div><!-- end ' . esc_attr( $slug ) . ' -->';
-					break;
+						<div id="' . esc_attr( $slug ) . '-' . $product->ID . '" class="' . ( ( $index == 0 ) ? 'mp_product_tab_content-current' : '' ) . ' mp_product_tab_content mp_product_tab_content-html" style="display:none">
+							<div class="mp_product_tab_content_html">' . $tab . '</div><!-- end mp_product_tab_content_html -->
+						</div><!-- end ' . esc_attr( $slug ) . ' -->';
+						break;
+				}
+				$index ++;
 			}
-			$index++;
+			$return .= '</div><!-- end mp_single_product_extra -->';
 		}
-		$return .= '</div><!-- end mp_single_product_extra -->';
 
 		$return .= '
 			
@@ -2701,6 +2709,7 @@ if ( ! function_exists( 'mp_product' ) ) {
 		} else {
 			return $return;
 		}
+
 	}
 
 }
