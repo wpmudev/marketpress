@@ -682,6 +682,9 @@ class MP_Product {
 
 		$input_id = 'mp_product_options_att_quantity';
 
+		if ( ! isset( $selected_variation ) ) {
+			$selected_variation = false;
+		}
 
 		$html .= '
 				<div class="mp_product_options_att"' . ( ( mp_get_setting( 'show_quantity' ) ) ? '' : ' style="display:none"' ) . '>
