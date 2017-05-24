@@ -258,12 +258,12 @@ var mp_checkout;
                     var $email = $form.find( '[name="mp_login_email"]' );
                     var $pass = $form.find( '[name="mp_login_password"]' );
 
-
                     if ( $form.valid() ) {
                         var checkout_as_guest = false;
                         if ($form.find('#is_checkout_as_guest').size() > 0) {
                             checkout_as_guest = true;
                         }
+
                         if ( $checkout.hasClass( 'last-step' ) ) {
                             var gateway = $( '[name="payment_method"]' ).filter( ':checked' ).val();
 
@@ -317,7 +317,12 @@ var mp_checkout;
                                     } ).mptooltip( 'open' );
                                 }
                             } );
+                        } else if ( $form.find('.mp_checkout_section-login-register').hasClass('current') ) {
+                            // continue as guest to billing/shipping address
+                            marketpress.loadingOverlay( 'hide' );
+                            mp_checkout.nextStep();
                         } else {
+                            // continue to review/order payment
                             var url = mp_i18n.ajaxurl + '?action=mp_update_checkout_data';
                             marketpress.loadingOverlay( 'show' );
 
