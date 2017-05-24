@@ -1,7 +1,7 @@
 var mp_checkout;
 
 ( function( $ ) {
-	
+
 	/**
 	 * Fix jqueryui * bootstrap tooltip conflict
 	 * @since 3.0
@@ -218,7 +218,7 @@ var mp_checkout;
             $checkout.find( '.mp_checkout_section_heading-link' ).on( 'click', function( e ) {
                 var $this = $( this );
                 var $section = $this.closest( '.mp_checkout_section' );
-                var $current = $section.nextAll( '.current' );
+                var $current = $('.mp_form-checkout').find('.current');
 
                 if ( $current.length > 0 ) {
                     // section is before the current step - ok to proceed
