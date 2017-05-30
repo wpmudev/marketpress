@@ -30,8 +30,8 @@ class MP_Store_Settings_Import {
 	 * @access  private
 	 */
 	private function __construct() {
-
-	}
+        add_action( 'init', array( $this, 'process_form' ) );
+    }
 
 	/**
 	 * Gets the single instance of the class
@@ -55,7 +55,7 @@ class MP_Store_Settings_Import {
 	 */
 	public static function process_form() {
 		if ( ! empty( $_POST['mp-store-exporter'] ) ) { // Input var okay.
-			if ( ! current_user_can( 'manage-options' ) ) {
+			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
 
@@ -69,7 +69,8 @@ class MP_Store_Settings_Import {
 
 			// Export products to a file if all the security checks pass.
 			if ( ! empty( $_POST['mp-store-export-products'] ) ) { // Input var okay.
-				$args['content'] = 'product';
+                $args['content'] = 'product';
+                $args = apply_filters( 'export_args', $args );
 				export_wp( $args );
 				die();
 			}
