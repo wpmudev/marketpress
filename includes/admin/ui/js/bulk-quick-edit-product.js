@@ -69,7 +69,7 @@
 		$bulk_row.find('#bulk-titles').children().each(function(){
 			post_ids.push($(this).attr('id').replace( /^(ttle)/i, ''));
 		});
-		
+
 		$.ajax({
 			"url" : ajaxurl,
 			"type" : "POST",
