@@ -12,7 +12,7 @@ class MP_Exporter_Orders {
 
 		//check permissions
 		if ( ! current_user_can( 'edit_others_orders' ) )
-			wp_die( __( 'Cheatin&#8217; uh?' ) );
+			wp_die( __( 'Cheatin&#8217; uh?', 'mp' ) );
 
 		$query = "SELECT ID, post_title, post_date, post_status FROM {$wpdb->posts} WHERE post_type = 'mp_order'";
 		$order_status = mp_get_post_value( 'order_status' );
@@ -154,7 +154,7 @@ class MP_Exporter_Orders {
 			<th scope="row"><?php _e( 'Order Date', 'mp' ); ?></th>
 			<td>
 				<select name="order_date">
-					<option value=""><?php _e( 'All Dates' ); ?>
+					<option value=""><?php _e( 'All Dates', 'mp' ); ?>
 					<?php foreach ( $months as $row ) :
 						$month = zeroise( $row->month, 2 );
 						$year = $row->year; ?>
@@ -167,7 +167,7 @@ class MP_Exporter_Orders {
 			<th scope="row"><?php _e( 'Order Status', 'mp' ); ?></th>
 			<td>
 				<select name="order_status">
-					<option value=""><?php _e( 'All Statuses' ); ?>
+					<option value=""><?php _e( 'All Statuses', 'mp' ); ?>
 					<?php foreach ( $statuses as $key => $status ) : ?>
 					<option value="<?php echo $key; ?>"><?php echo $status->label; ?></option>
 					<?php endforeach; ?>

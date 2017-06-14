@@ -567,7 +567,7 @@ class MP_Coupons_Addon {
 	public function init_metaboxes() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'        => 'mp-coupons-metabox',
-			'title'     => __( 'Coupon Settings' ),
+			'title'     => __( 'Coupon Settings', 'mp' ),
 			'post_type' => 'mp_coupon',
 			'context'   => 'normal',
 		) );
@@ -761,7 +761,7 @@ class MP_Coupons_Addon {
 	public function init_settings_metaboxes() {
 		$metabox = new WPMUDEV_Metabox( array(
 			'id'          => 'mp-coupons-settings-metabox',
-			'title'       => __( 'Coupons Settings' ),
+			'title'       => __( 'Coupons Settings', 'mp' ),
 			'page_slugs'  => array( 'store-settings-addons' ),
 			'option_name' => 'mp_settings',
 		) );

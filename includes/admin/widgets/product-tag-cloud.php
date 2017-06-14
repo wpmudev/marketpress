@@ -4,7 +4,7 @@
 class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 
 	function __construct() {
-		$widget_ops = array( 'classname' => 'widget_tag_cloud mp_widget mp_widget_tag_cloud', 'description' => __( "Your most used product tags in cloud format from your MarketPress store." ) );
+		$widget_ops = array( 'classname' => 'widget_tag_cloud mp_widget mp_widget_tag_cloud', 'description' => __( "Your most used product tags in cloud format from your MarketPress store.", 'mp' ) );
 		parent::__construct( 'mp_tag_cloud_widget', __( 'Product Tag Cloud', 'mp' ), $widget_ops );
 	}
 
@@ -46,7 +46,7 @@ class MarketPress_Tag_Cloud_Widget extends WP_Widget {
 		$instance			 = wp_parse_args( (array) $instance, array( 'title' => __( 'Product Tags', 'mp' ), 'only_store_pages' => 0 ) );
 		$only_store_pages	 = isset( $instance[ 'only_store_pages' ] ) ? (bool) $instance[ 'only_store_pages' ] : false;
 		?>
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ) ?></label>
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'mp' ) ?></label>
 			<input type="text" class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" value="<?php
 			if ( isset( $instance[ 'title' ] ) ) {
 				echo esc_attr( $instance[ 'title' ] );

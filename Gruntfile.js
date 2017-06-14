@@ -14,6 +14,7 @@ module.exports = function(grunt) {
 		'!package.json',
 		'!.gitignore',
 		'!.gitmodules',
+		'!deploy.sh',
 		'!tests/**',
 		'!tmp/**',
 		'!**/Gruntfile.js',
@@ -72,7 +73,9 @@ module.exports = function(grunt) {
 				src:  [
 					'**/*.php', // Include all files
 					'!node_modules/**', // Exclude node_modules/
+					'!tests/**', // Exclude tests/
 					'!includes/admin/dash-notice/**', // Exclude WPMU DEV Shared UI
+					'!includes/wpmudev-metaboxes/**', // Exclude WPMU DEV MetaBoxes
 					'!build/**' // Exclude WPMU DEV Shared UI
 				],
 				expand: true
@@ -250,7 +253,14 @@ module.exports = function(grunt) {
 	]);
 
 	grunt.registerTask('build', [
+		'clean',
 		'checktextdomain',
+		'sass:frontprod',
+		'postcss:frontprod',
+		'sass:themeprod',
+		'postcss:themeprod',
+		'sass:adminprod',
+		'postcss:adminprod',
 		'makepot',
 		'copy:main',
 		'compress:main'

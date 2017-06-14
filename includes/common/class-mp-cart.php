@@ -709,7 +709,7 @@ class MP_Cart {
 
 			$shipping_line .= '
 				<div class="mp_cart_resume_item mp_cart_resume_item-shipping-total">
-					<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping' ) ) . '</span>
+					<span class="mp_cart_resume_item_label">' . ( ( $this->is_editable ) ? __( 'Estimated Shipping', 'mp' ) : __( 'Shipping', 'mp' ) ) . '</span>
 					<span class="mp_cart_resume_item_amount">' . $this->shipping_total( true ) . '</span>
 				</div><!-- end mp_cart_resume_item-shipping-total -->';
 		}

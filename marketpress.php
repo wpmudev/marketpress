@@ -536,7 +536,7 @@ class Marketpress {
 
 	function mp_plugin_settings_link( $links ) {
 		$settings_link = '<a href="' . esc_url( admin_url( 'admin.php?page=store-settings' ) ) . '">'
-			. __( 'Settings', 'marketpress' ) .'</a>';
+			. __( 'Settings', 'mp' ) .'</a>';
 		array_unshift( $links, $settings_link );
 
 		return $links;

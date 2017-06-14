@@ -22,6 +22,6 @@
   "scripts": {
     "watch": "grunt watch",
     "release": "grunt release",
-    "build": "grunt clean && grunt build:main && grunt build:wporg"
+    "build": "grunt build:main"
   }
 }

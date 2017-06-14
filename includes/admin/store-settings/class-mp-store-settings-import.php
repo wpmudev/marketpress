@@ -144,8 +144,8 @@ class MP_Store_Settings_Import {
 					'<a href="%s" class="button-primary" aria-label="%s">%s</a>',
 					esc_url( $url ),
 					/* translators: %s: Importer name */
-					esc_attr( sprintf( __( 'Run %s' ), $importer_name ) ),
-					__( 'Run Importer' )
+					esc_attr( sprintf( __( 'Run %s', 'mp' ), $importer_name ) ),
+					__( 'Run Importer', 'mp' )
 				);
 
 				return $action;
@@ -165,13 +165,13 @@ class MP_Store_Settings_Import {
 					esc_attr( $importer ),
 					esc_attr( $importer_name ),
 					/* translators: %s: Importer name */
-					esc_attr( sprintf( __( 'Install %s' ), $importer_name ) ),
-					__( 'Install Now' )
+					esc_attr( sprintf( __( 'Install %s', 'mp' ), $importer_name ) ),
+					__( 'Install Now', 'mp' )
 				);
 			} else {
 				$action = sprintf(
 					/* translators: URL to wp-admin/import.php */
-					__( 'This importer is not installed. Please install importers from <a href="%s">the main site</a>.' ),
+					__( 'This importer is not installed. Please install importers from <a href="%s">the main site</a>.', 'mp' ),
 					get_admin_url( get_current_network_id(), 'import.php' )
 				);
 			}

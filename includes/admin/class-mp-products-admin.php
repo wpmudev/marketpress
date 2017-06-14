@@ -1186,7 +1186,7 @@ class MP_Products_Screen {
 		}
 
 		if ( ! current_user_can( 'edit_products' ) )
-			wp_die( __( 'Cheatin&#8217; uh?' ) );
+			wp_die( __( 'Cheatin&#8217; uh?', 'mp' ) );
 
 
 		$variation_names     = mp_get_post_value( 'product_attributes_categories', array() );
@@ -1517,7 +1517,7 @@ WHERE $delete_where"
 
 		$metabox = new WPMUDEV_Metabox( apply_filters( 'mp_metabox_array_mp-product-price-inventory-variants-metabox', array(
 			'id'        => 'mp-product-price-inventory-variants-metabox',
-			'title'     => $has_variations ? __( 'Product Variations' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
+			'title'     => $has_variations ? __( 'Product Variations', 'mp' ) : sprintf( __( '%1$sPrice, Inventory & Variants%2$s %3$sSet price, manage inventory and create Product Variants (if appropriate for your product).%2$s', 'mp' ), '<span class="mp_meta_section_title">', '</span>', '<span class="mp_meta_bellow_desc">' ),
 			'post_type' => MP_Product::get_post_type(),
 			'context'   => 'normal',
 		) ) );

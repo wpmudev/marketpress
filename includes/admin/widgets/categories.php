@@ -27,7 +27,7 @@ class MarketPress_Categories_Widget extends WP_Widget {
 		$cat_args = array( 'orderby' => 'name', 'show_count' => $c, 'hierarchical' => $h );
 
 		if ( $d ) {
-			$cat_args[ 'show_option_none' ]	 = __( 'Select Category' );
+			$cat_args[ 'show_option_none' ]	 = __( 'Select Category', 'mp' );
 			$cat_args[ 'taxonomy' ]			 = 'product_category';
 			$cat_args[ 'id' ]				 = 'mp_category_dropdown';
 			mp_dropdown_categories( true, $cat_args );
@@ -66,17 +66,17 @@ class MarketPress_Categories_Widget extends WP_Widget {
 		$dropdown			 = isset( $instance[ 'dropdown' ] ) ? (bool) $instance[ 'dropdown' ] : false;
 		$only_store_pages	 = isset( $instance[ 'only_store_pages' ] ) ? (bool) $instance[ 'only_store_pages' ] : false;
 		?>
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'mp' ); ?></label>
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" /></p>
 
 		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'dropdown' ); ?>" name="<?php echo $this->get_field_name( 'dropdown' ); ?>"<?php checked( $dropdown ); ?> />
-			<label for="<?php echo $this->get_field_id( 'dropdown' ); ?>"><?php _e( 'Show as dropdown' ); ?></label><br />
+			<label for="<?php echo $this->get_field_id( 'dropdown' ); ?>"><?php _e( 'Show as dropdown', 'mp' ); ?></label><br />
 
 			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'count' ); ?>" name="<?php echo $this->get_field_name( 'count' ); ?>"<?php checked( $count ); ?> />
 			<label for="<?php echo $this->get_field_id( 'count' ); ?>"><?php _e( 'Show product counts', 'mp' ); ?></label><br />
 
 			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'hierarchical' ); ?>" name="<?php echo $this->get_field_name( 'hierarchical' ); ?>"<?php checked( $hierarchical ); ?> />
-			<label for="<?php echo $this->get_field_id( 'hierarchical' ); ?>"><?php _e( 'Show hierarchy' ); ?></label></p>
+			<label for="<?php echo $this->get_field_id( 'hierarchical' ); ?>"><?php _e( 'Show hierarchy', 'mp' ); ?></label></p>
 
 		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'only_store_pages' ); ?>" name="<?php echo $this->get_field_name( 'only_store_pages' ); ?>"<?php checked( $only_store_pages ); ?> />
 			<label for="<?php echo $this->get_field_id( 'only_store_pages' ); ?>"><?php _e( 'Only show on store pages', 'mp' ); ?></label></p>
