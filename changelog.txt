@@ -4,6 +4,16 @@ Author: Marko Miljus (Incsub), Aaron Edwards (Incsub), Hoang Ngo (Incsub), Jonat
 Change Log:
 ----------------------------------------------------------------------
 
+3.2.5
+----------------------------------------------------------------------
+
+- Added: Password check for password-protected products
+- Fixed: When editing variable products, do not update price if it is not set
+- Fixed: Import/export functionality
+- Fixed: Checkout page (sections not opening, inability to continue checkout without inputing zip code, notices on checkout page)
+- Fixed: Removed warnings and notices on product page
+- Fixed: Various small bug fixes and improvements
+
 3.2.4
 ----------------------------------------------------------------------
 
