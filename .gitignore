@@ -3,6 +3,7 @@
 .DS_Store
 .idea
 npm-debug.log
+build/
 tmp/
 node_modules
 package-plugin
