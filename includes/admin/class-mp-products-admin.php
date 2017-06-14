@@ -102,7 +102,7 @@ class MP_Products_Screen {
 				'hierarchical'    => 1,
 				'show_count'      => 0,
 				'orderby'         => 'name',
-				'selected'        => $wp_query->query['cat'],
+				'selected'        => isset( $wp_query->query['cat'] ) ? $wp_query->query['cat'] : '',
 			);
 			wp_dropdown_categories( $dropdown_options );
 		}

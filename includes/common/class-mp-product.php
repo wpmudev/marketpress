@@ -1793,20 +1793,23 @@ class MP_Product {
 		return $price['lowest'];
 	}
 
-	/**
-	 * Get related products
-	 *
-	 * @since 3.0
-	 *
-	 * @param array $args {
-	 *        Optional, an array of arguments.
-	 *
-	 * @type string $relate_by Optional, how to relate the products - either category, tag, or both.
-	 * @type bool $echo Optional, echo or return.
-	 * @type int $limit . Optional, the number of products to retrieve.
-	 * @type string $view . Optional, how to display related products - either grid or list.
-	 * }
-	 */
+
+    /**
+     * Get related products
+     *
+     * @since 3.0
+     *
+     * @param array $args {
+     *        Optional, an array of arguments.
+     *
+     *        @type string $relate_by Optional, how to relate the products - either category, tag, or both.
+     *        @type bool $echo Optional, echo or return.
+     *        @type int $limit . Optional, the number of products to retrieve.
+     *        @type string $view . Optional, how to display related products - either grid or list.
+     * }
+     * @param bool $return_bool
+     * @return bool|mixed|string|void
+     */
 	public function related_products( $args = array(), $return_bool = false ) {
 		$html = '';
 		$args = array_replace_recursive( array(

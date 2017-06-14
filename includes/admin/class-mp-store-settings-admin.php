@@ -72,11 +72,6 @@ class MP_Store_Settings_Admin {
 			// Product attributes list.
 			add_action( 'store-settings_page_store-settings-productattributes', array( 'MP_Product_Attributes_Admin', 'display_product_attributes' ) );
 		}
-
-		// Add form processing to import/export page.
-		if ( ! empty( mp_get_post_value( 'mp-store-exporter' ) ) ) {
-			add_action( 'init', array( MP_Store_Settings_Import::get_instance(), 'process_form' ) );
-		}
 	}
 
 	/**
