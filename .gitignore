@@ -1,5 +1,8 @@
 .agignore
 .jshintrc
+.DS_Store
+.idea
+npm-debug.log
+tmp/
 node_modules
 package-plugin
-.idea
