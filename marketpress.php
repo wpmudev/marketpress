@@ -336,6 +336,9 @@ class Marketpress {
 
 		require_once $this->plugin_dir( 'includes/common/payment-gateways/class-mp-gateway-api.php' );
 		mp_include_dir( $this->plugin_dir( 'includes/common/payment-gateways' ) );
+        
+        do_action( 'marketpress/load_plugins/mp_include' );
+        
 		MP_Gateway_API::load_active_gateways();
 	}
 
