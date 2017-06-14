@@ -76,8 +76,8 @@ class MP_Exporter_Orders {
 							
 						if (!empty($data['SKU']))
 							$fields['items'] .= '[' . $data['SKU'] . '] ';
-						
-						$price = $this->coupon_value_product($fields['coupon_code'], $data['price'] * $data['quantity'], $product_id);
+
+						$price = mp()->coupon_value_product($fields['coupon_code'], $data['price'] * $data['quantity'], $product_id);
 						
 						$fields['items'] .= $data['name'] . ': ' . number_format_i18n($data['quantity']) . ' * ' . mp_number_format($price / $data['quantity'], 2) . ' ' . $order->mp_payment_info['currency'];
 					}
