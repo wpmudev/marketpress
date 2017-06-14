@@ -388,7 +388,7 @@ class Marketpress {
 
 		add_action( 'admin_init', array( &$this, 'variations_admin' ) );
 
-		add_action( 'admin_init', array(&$this, 'mp_admin_init') );
+		add_action( 'admin_init', array( &$this, 'mp_admin_init' ) );
 
 		add_action( 'template_redirect', array( &$this, 'redirect_variation_singles_to_products' ) );
 
@@ -543,7 +543,6 @@ class Marketpress {
 	}
 
 	function install_actions() {
-
 		// Install - Add pages button
 		if ( ! empty( $_GET['install_mp_pages'] ) ) {
 			$this->create_pages();
