@@ -152,11 +152,15 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 
 = 3.2.5 =
 * Added: Password check for password-protected products
+* Added: Settings link on the Plugins page
 * Fixed: When editing variable products, do not update price if it is not set
 * Fixed: Import/export functionality
 * Fixed: Checkout page (sections not opening, inability to continue checkout without inputing zip code, notices on checkout page)
+* Fixed: Coupons could not be applied to cart when date format was set to d/m/Y
+* Fixed: Issue with conversions not being tracked in Google Analytics
 * Fixed: Removed warnings and notices on product page
 * Fixed: Various small bug fixes and improvements
+* Changed: Simplify will now show message if the payment is declined
 
 = 3.2.4 =
 * Added: Multi-file uploa field type
