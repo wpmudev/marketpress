@@ -1,7 +1,7 @@
 {
   "name": "marketpress",
   "private": true,
-  "version": "3.2.5-beta1",
+  "version": "3.2.5-beta2",
   "main": "marketpress.php",
   "author": "WPMU DEV",
   "license": "GPL-2.0",
@@ -20,8 +20,8 @@
     "load-grunt-tasks": "^3.5.0"
   },
   "scripts": {
-    "watch": "grunt watch",
-    "release": "grunt release",
-    "build": "grunt build:main"
+    "watch": "clear && grunt watch",
+    "release": "clear && grunt release",
+    "build": "clear && grunt build:main"
   }
 }

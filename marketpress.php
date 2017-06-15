@@ -512,11 +512,7 @@ class Marketpress {
 	/**
 	 * Called from WordPress when the admin page init process is invoked.
 	 * @since 3.0
-	 *
-	 * @param none
-	 * @return unknown
 	 */
-
 	function mp_admin_init() {
 		if (is_multisite()) {
 			if (!is_super_admin()) return;
@@ -525,13 +521,15 @@ class Marketpress {
 			add_filter( 'plugin_action_links_'. basename( dirname( __FILE__ ) ) .'/'. basename( __FILE__ ),
 				array(&$this,'mp_plugin_settings_link') );
 		}
+
+		return;
 	}
 
 	/**
 	 * Adds a 'settings' link on the plugin links
 	 * @since 3.0
-	 * @param array default links for this plugin.
-	 * @return array default links including Settings link
+	 * @param array $links links for this plugin.
+	 * @return array $links links including Settings link
 	 */
 
 	function mp_plugin_settings_link( $links ) {
@@ -675,7 +673,9 @@ class Marketpress {
 	 * @since 3.0
 	 * @access public
 	 * @uses $wp_rewrite
+	 * @param $rewrite_rules
 	 * @filter rewrite_rules_array
+	 * @return array
 	 */
 	public function add_rewrite_rules( $rewrite_rules ) {
 		global $wp_rewrite;
@@ -733,7 +733,9 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param array $vars
 	 * @filter query_vars
+	 * @return array $vars
 	 */
 	public function add_query_vars( $vars ) {
 		$vars[] = 'mp_variation_id';
@@ -750,6 +752,8 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param $url
+	 * @param $post_id
 	 * @filter wp_get_attachment_url
 	 * @return string
 	 */
@@ -791,7 +795,12 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param $value
+	 * @param $user_id
+	 * @param $meta_key
+	 * @param $single
 	 * @filter get_user_metadata
+	 * @return array|mixed
 	 */
 	public function get_user_billing_info( $value, $user_id, $meta_key, $single ) {
 		if ( $meta_key != 'mp_billing_info' ) {
@@ -867,6 +876,9 @@ class Marketpress {
 	 *
 	 * @since 3.0
 	 * @access public
+	 * @param $method
+	 * @param $args
+	 * @return mixed
 	 */
 	public function __call( $method, $args ) {
 		switch ( $method ) {
