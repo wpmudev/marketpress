@@ -36,7 +36,7 @@ class MP_Store_Settings_Import {
 		add_filter( 'wp_import_terms', array( $this, 'process_taxonomies' ) );
 
 		// Process posts that are marked as duplicates
-		//add_filter( 'wp_import_existing_post', array( $this, 'process_duplicates' ), 10, 2 );
+		add_filter( 'wp_import_existing_post', array( $this, 'process_duplicates' ), 10, 2 );
 
 		// Process attributes for variable products
 		add_filter( 'wp_import_post_meta', array( $this, 'process_products' ), 10, 2 );
@@ -66,6 +66,7 @@ class MP_Store_Settings_Import {
 
 				// Add term to wp_terms
 				if ( taxonomy_exists( $taxonomy ) && ! term_exists( $term['term_name'], $taxonomy ) ) {
+					// TODO: do not make duplicates
 					wp_insert_term( $term['term_name'], $taxonomy );
 				}
 			} // End if().
@@ -84,12 +85,20 @@ class MP_Store_Settings_Import {
 	 * During import these posts will be treated as duplicates and not be imported. We need to manually add them
 	 * to the database.
 	 *
-	 * @since 3.2.5
-	 * @param int   $post_exists  Post ID, or 0 if post did not exist.
-	 * @param array $post         The post array to be inserted.
+	 * @since  3.2.5
+	 * @param  int   $post_exists  Post ID, or 0 if post did not exist.
+	 * @param  array $post         The post array to be inserted.
+	 * @return int   $post_exists  Post ID, or 0 if post did not exist.
 	 */
 	public function process_duplicates( $post_exists, $post ) {
-		var_dump( $post_exists );
+
+		if ( null === get_post( $post['post_id'] ) && 'mp_product_variation' === $post['post_type'] ) {
+			//var_dump( 'duplicate post: ' . $post_exists );
+			//var_dump( $post );
+			$post_exists = 0;
+		}
+
+		return $post_exists;
 	}
 
 	/**
