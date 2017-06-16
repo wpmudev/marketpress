@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.2.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-06-14 12:32:40+00:00\n"
+"POT-Creation-Date: 2017-06-15 06:23:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -76,7 +76,7 @@ msgid_plural "%s add-ons disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:539
+#: includes/addons/class-mp-addons-list-table.php:128 marketpress.php:537
 msgid "Settings"
 msgstr ""
 
@@ -327,7 +327,7 @@ msgstr ""
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:897
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:996
 #: includes/addons/mp-coupons/class-mp-coupons-addon.php:999
-#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:620
+#: includes/admin/class-mp-dashboard-widgets.php:305 marketpress.php:618
 msgid "Coupons"
 msgstr ""
 
@@ -3184,58 +3184,58 @@ msgstr ""
 msgid "Location Settings"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:147
+#: includes/admin/store-settings/class-mp-store-settings-import.php:146
 #. translators: %s: Importer name
 msgid "Run %s"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:148
+#: includes/admin/store-settings/class-mp-store-settings-import.php:147
 msgid "Run Importer"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:168
+#: includes/admin/store-settings/class-mp-store-settings-import.php:167
 #. translators: %s: Importer name
 msgid "Install %s"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:169
+#: includes/admin/store-settings/class-mp-store-settings-import.php:168
 msgid "Install Now"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:174
+#: includes/admin/store-settings/class-mp-store-settings-import.php:173
 #. translators: URL to wp-admin/import.php
 msgid ""
 "This importer is not installed. Please install importers from <a "
 "href=\"%s\">the main site</a>."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:229
+#: includes/admin/store-settings/class-mp-store-settings-import.php:226
 msgid "Import / Export Settings"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:231
+#: includes/admin/store-settings/class-mp-store-settings-import.php:228
 msgid ""
 "Use the text below to export to a new installation. Or paste in the new "
 "configuration to import."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:235
+#: includes/admin/store-settings/class-mp-store-settings-import.php:232
 msgid "Import configuration"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:236
+#: includes/admin/store-settings/class-mp-store-settings-import.php:233
 msgid "Export settings to file"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:237
+#: includes/admin/store-settings/class-mp-store-settings-import.php:234
 msgid "Import / Export Products"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:239
+#: includes/admin/store-settings/class-mp-store-settings-import.php:236
 msgid "The import process uses the WordPress importer plugin."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:242
+#: includes/admin/store-settings/class-mp-store-settings-import.php:239
 msgid "Export products to file"
 msgstr ""
 
@@ -9280,41 +9280,41 @@ msgstr[1] ""
 msgid "Add a Product"
 msgstr ""
 
-#: marketpress.php:591
+#: marketpress.php:589
 msgid "Your pages were created successfully."
 msgstr ""
 
-#: marketpress.php:601
+#: marketpress.php:599
 msgid ""
 "<strong>Welcome to %s</strong> &#8211; Install pages required by the plugin "
 "automatically."
 msgstr ""
 
-#: marketpress.php:605
+#: marketpress.php:603
 msgid "Install %s Pages"
 msgstr ""
 
-#: marketpress.php:621
+#: marketpress.php:619
 msgid "Offer and accept coupon codes"
 msgstr ""
 
-#: marketpress.php:629
+#: marketpress.php:627
 msgid "Pro Sites"
 msgstr ""
 
-#: marketpress.php:630
+#: marketpress.php:628
 msgid "Grant access to themes and gateways depending on the user's Pro Site level"
 msgstr ""
 
-#: marketpress.php:647
+#: marketpress.php:645
 msgid "Invoice PDF"
 msgstr ""
 
-#: marketpress.php:656
+#: marketpress.php:654
 msgid "Multiple Downloads"
 msgstr ""
 
-#: marketpress.php:657
+#: marketpress.php:655
 msgid "Enable multiple downloads per product"
 msgstr ""
 

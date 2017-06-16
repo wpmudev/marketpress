@@ -31,13 +31,101 @@ class MP_Store_Settings_Import {
 	 */
 	private function __construct() {
         add_action( 'init', array( $this, 'process_form' ) );
+
+        // Process variation terms
+		add_filter( 'wp_import_terms', array( $this, 'process_taxonomies' ) );
+
+		// Process posts that are marked as duplicates
+		//add_filter( 'wp_import_existing_post', array( $this, 'process_duplicates' ), 10, 2 );
+
+		// Process attributes for variable products
+		add_filter( 'wp_import_post_meta', array( $this, 'process_products' ), 10, 2 );
     }
+
+	/**
+	 * Hook into the import process to create missing taxonomies.
+	 *
+	 * Here we filter through all terms and see if WordPress has a registered taxonomy for the term. If there is
+	 * a taxonomy (usually there is one for tags and categories) - we pass it on to wordpress importer. If no
+	 * texonomy is found, that means it is an attribute for a variable product and we need to add it manually.
+	 *
+	 * @since  3.2.5
+	 * @param  array $terms  Array of WP_Term objects.
+	 * @return array $terms  Array of WP_Term objects.
+	 */
+	public function process_taxonomies( $terms ) {
+
+		foreach ( $terms as $term_key => $term ) {
+
+			if ( ! taxonomy_exists( $term['term_taxonomy'] ) ) {
+				// We will process this manually.
+				unset( $terms[ $term_key ] );
+
+				// Add taxonomy to wp_mp_product_attributes
+				$taxonomy = MP_Products_Screen::maybe_create_attribute( $term['term_taxonomy'], $term['term_taxonomy'] );
+
+				// Add term to wp_terms
+				if ( taxonomy_exists( $taxonomy ) && ! term_exists( $term['term_name'], $taxonomy ) ) {
+					wp_insert_term( $term['term_name'], $taxonomy );
+				}
+			} // End if().
+
+		} // End foreach().
+
+		// Everything else can be parsed by wordpress importer.
+		return $terms;
+
+	}
+
+	/**
+	 * Process duplicate entries.
+	 *
+	 * Market Press, when creating variations will create the posts in the database with the same name and data.
+	 * During import these posts will be treated as duplicates and not be imported. We need to manually add them
+	 * to the database.
+	 *
+	 * @since 3.2.5
+	 * @param int   $post_exists  Post ID, or 0 if post did not exist.
+	 * @param array $post         The post array to be inserted.
+	 */
+	public function process_duplicates( $post_exists, $post ) {
+		var_dump( $post_exists );
+	}
+
+	/**
+	 * Process attributes for variable products.
+	 *
+	 * @since  3.2.5
+	 * @param  array  $metakeys  Post meta data.
+	 * @param  int    $post_id   Post ID.
+	 * @return array
+	 */
+	public function process_products( $metakeys, $post_id ) {
+
+		foreach ( $metakeys as $meta ) {
+			if ( $meta['key'] == 'name' ) {
+
+				$taxonomies = get_taxonomies();
+				foreach ( $taxonomies as $tax_type_key => $taxonomy ) {
+					// If term object is returned, break out of loop. (Returns false if there's no object)
+					if ( $term_object = get_term_by( 'name', $meta['value'] , $taxonomy ) ) {
+						//var_dump( 'for product ' . $post_id . ' link term id ' . $term_object->term_id . ' with ' . $term_object->taxonomy );
+						wp_set_object_terms( $post_id, $term_object->term_id, $term_object->taxonomy );
+						break;
+					}
+				}
+
+			}
+		}
+
+		return $metakeys;
+
+	}
 
 	/**
 	 * Gets the single instance of the class
 	 *
 	 * @since   3.2.3
-	 * @access  public
 	 * @return  object
 	 */
 	public static function get_instance() {
@@ -51,7 +139,6 @@ class MP_Store_Settings_Import {
 	 * Process import/export form actions
 	 *
 	 * @since   3.2.3
-	 * @access  public
 	 */
 	public static function process_form() {
 		if ( ! empty( $_POST['mp-store-exporter'] ) ) { // Input var okay.
@@ -214,7 +301,6 @@ class MP_Store_Settings_Import {
 	 * Display import/export page
 	 *
 	 * @since   3.2.3
-	 * @access  public
 	 */
 	public function display_settings() {
 		$options = base64_encode( $this->get_settings() );
@@ -278,21 +364,10 @@ class MP_Store_Settings_Import {
 		 * Get the requested terms ready, empty unless posts filtered by category
 		 * or all content.
 		 */
-		$cats = $tags = $terms = array();
-
-		$categories = (array) get_categories( array( 'get' => 'all' ) );
-		$tags = (array) get_tags( array( 'get' => 'all' ) );
+		$terms = array();
 
 		$custom_taxonomies = get_taxonomies( array( '_builtin' => false ) );
 		$custom_terms = (array) get_terms( $custom_taxonomies, array( 'get' => 'all' ) );
-
-		// Put categories in order with no child going before its parent.
-		while ( $cat = array_shift( $categories ) ) {
-			if ( $cat->parent == 0 || isset( $cats[$cat->parent] ) )
-				$cats[$cat->term_id] = $cat;
-			else
-				$categories[] = $cat;
-		}
 
 		// Put terms in order with no child going before its parent.
 		while ( $t = array_shift( $custom_terms ) ) {
@@ -302,7 +377,7 @@ class MP_Store_Settings_Import {
 				$custom_terms[] = $t;
 		}
 
-		unset( $categories, $custom_taxonomies, $custom_terms );
+		unset( $custom_taxonomies, $custom_terms );
 
 /**
  * Wrap given string in XML CDATA tag.
@@ -336,62 +411,6 @@ function wxr_site_url() {
 	// WordPress (single site): the blog URL.
 	else
 		return get_bloginfo_rss( 'url' );
-}
-
-/**
- * Output a cat_name XML tag from a given category object
- *
- * @since 2.1.0
- *
- * @param object $category Category Object
- */
-function wxr_cat_name( $category ) {
-	if ( empty( $category->name ) )
-		return;
-
-	echo '<wp:cat_name>' . wxr_cdata( $category->name ) . "</wp:cat_name>\n";
-}
-
-/**
- * Output a category_description XML tag from a given category object
- *
- * @since 2.1.0
- *
- * @param object $category Category Object
- */
-function wxr_category_description( $category ) {
-	if ( empty( $category->description ) )
-		return;
-
-	echo '<wp:category_description>' . wxr_cdata( $category->description ) . "</wp:category_description>\n";
-}
-
-/**
- * Output a tag_name XML tag from a given tag object
- *
- * @since 2.3.0
- *
- * @param object $tag Tag Object
- */
-function wxr_tag_name( $tag ) {
-	if ( empty( $tag->name ) )
-		return;
-
-	echo '<wp:tag_name>' . wxr_cdata( $tag->name ) . "</wp:tag_name>\n";
-}
-
-/**
- * Output a tag_description XML tag from a given tag object
- *
- * @since 2.3.0
- *
- * @param object $tag Tag Object
- */
-function wxr_tag_description( $tag ) {
-	if ( empty( $tag->description ) )
-		return;
-
-	echo '<wp:tag_description>' . wxr_cdata( $tag->description ) . "</wp:tag_description>\n";
 }
 
 /**
@@ -492,6 +511,28 @@ function wxr_authors_list( array $post_ids = null ) {
 }
 
 /**
+ * Output list of market press product attributes in XML tag format
+ *
+ * @since 3.2.5
+ */
+/*
+function wxr_product_attributes() {
+	global $wpdb;
+
+	$attributes = $wpdb->get_results( 'SELECT * FROM ' . $wpdb->prefix . 'mp_product_attributes' );
+
+	foreach ( $attributes as $attr ) {
+		echo "\t<mp:attributes>";
+		echo '<mp:attribute_id>' . intval( $attr->attribute_id ) . '</mp:attribute_id>';
+		echo '<mp:attribute_name>' . wxr_cdata( $attr->attribute_name ) . '</mp:attribute_name>';
+		echo '<mp:attribute_terms_sort_by>' . wxr_cdata( $attr->attribute_terms_sort_by ) . '</mp:attribute_terms_sort_by>';
+		echo '<mp:attribute_terms_sort_order>' . wxr_cdata( $attr->attribute_terms_sort_order ) . '</mp:attribute_terms_sort_order>';
+		echo "</mp:attributes>\n";
+	}
+}
+*/
+
+/**
  * Output list of taxonomy terms, in XML tag format, associated with a post
  *
  * @since 2.3.0
@@ -522,26 +563,7 @@ function wxr_filter_postmeta( $return_me, $meta_key ) {
 }
 add_filter( 'wxr_export_skip_postmeta', 'wxr_filter_postmeta', 10, 2 );
 
-echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . "\" ?>\n";
-
-?>
-<!-- This is a WordPress eXtended RSS file generated by WordPress as an export of your site. -->
-<!-- It contains information about your site's posts, pages, comments, categories, and other content. -->
-<!-- You may use this file to transfer that content from one site to another. -->
-<!-- This file is not intended to serve as a complete backup of your site. -->
-
-<!-- To import this information into a WordPress site follow these steps: -->
-<!-- 1. Log in to that site as an administrator. -->
-<!-- 2. Go to Tools: Import in the WordPress admin panel. -->
-<!-- 3. Install the "WordPress" importer from the list. -->
-<!-- 4. Activate & Run Importer. -->
-<!-- 5. Upload this file using the form provided on that page. -->
-<!-- 6. You will first be asked to map the authors in this export file to users -->
-<!--    on the site. For each author, you may choose to map to an -->
-<!--    existing user on the site or to create a new user. -->
-<!-- 7. WordPress will then import each of the posts, pages, comments, categories, etc. -->
-<!--    contained in this file into your site. -->
-
+echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . "\" ?>\n"; ?>
 <?php the_generator( 'export' ); ?>
 <rss version="2.0"
 	 xmlns:excerpt="http://wordpress.org/export/<?php echo WXR_VERSION; ?>/excerpt/"
@@ -563,25 +585,6 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . "\" ?>\n";
 
 		<?php wxr_authors_list( $post_ids ); ?>
 
-		<?php foreach ( $cats as $c ) : ?>
-			<wp:category>
-				<wp:term_id><?php echo intval( $c->term_id ); ?></wp:term_id>
-				<wp:category_nicename><?php echo wxr_cdata( $c->slug ); ?></wp:category_nicename>
-				<wp:category_parent><?php echo wxr_cdata( $c->parent ? $cats[$c->parent]->slug : '' ); ?></wp:category_parent>
-				<?php wxr_cat_name( $c );
-				wxr_category_description( $c );
-				wxr_term_meta( $c ); ?>
-			</wp:category>
-		<?php endforeach; ?>
-		<?php foreach ( $tags as $t ) : ?>
-			<wp:tag>
-				<wp:term_id><?php echo intval( $t->term_id ); ?></wp:term_id>
-				<wp:tag_slug><?php echo wxr_cdata( $t->slug ); ?></wp:tag_slug>
-				<?php wxr_tag_name( $t );
-				wxr_tag_description( $t );
-				wxr_term_meta( $t ); ?>
-			</wp:tag>
-		<?php endforeach; ?>
 		<?php foreach ( $terms as $t ) : ?>
 			<wp:term>
 				<wp:term_id><?php echo wxr_cdata( $t->term_id ); ?></wp:term_id>
@@ -685,48 +688,6 @@ echo '<?xml version="1.0" encoding="' . get_bloginfo('charset') . "\" ?>\n";
 								<wp:meta_key><?php echo wxr_cdata( $meta->meta_key ); ?></wp:meta_key>
 								<wp:meta_value><?php echo wxr_cdata( $meta->meta_value ); ?></wp:meta_value>
 							</wp:postmeta>
-						<?php	endforeach;
-
-						$_comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved <> 'spam'", $post->ID ) );
-						$comments = array_map( 'get_comment', $_comments );
-						foreach ( $comments as $c ) : ?>
-							<wp:comment>
-								<wp:comment_id><?php echo intval( $c->comment_ID ); ?></wp:comment_id>
-								<wp:comment_author><?php echo wxr_cdata( $c->comment_author ); ?></wp:comment_author>
-								<wp:comment_author_email><?php echo wxr_cdata( $c->comment_author_email ); ?></wp:comment_author_email>
-								<wp:comment_author_url><?php echo esc_url_raw( $c->comment_author_url ); ?></wp:comment_author_url>
-								<wp:comment_author_IP><?php echo wxr_cdata( $c->comment_author_IP ); ?></wp:comment_author_IP>
-								<wp:comment_date><?php echo wxr_cdata( $c->comment_date ); ?></wp:comment_date>
-								<wp:comment_date_gmt><?php echo wxr_cdata( $c->comment_date_gmt ); ?></wp:comment_date_gmt>
-								<wp:comment_content><?php echo wxr_cdata( $c->comment_content ) ?></wp:comment_content>
-								<wp:comment_approved><?php echo wxr_cdata( $c->comment_approved ); ?></wp:comment_approved>
-								<wp:comment_type><?php echo wxr_cdata( $c->comment_type ); ?></wp:comment_type>
-								<wp:comment_parent><?php echo intval( $c->comment_parent ); ?></wp:comment_parent>
-								<wp:comment_user_id><?php echo intval( $c->user_id ); ?></wp:comment_user_id>
-								<?php		$c_meta = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->commentmeta WHERE comment_id = %d", $c->comment_ID ) );
-								foreach ( $c_meta as $meta ) :
-									/**
-									 * Filters whether to selectively skip comment meta used for WXR exports.
-									 *
-									 * Returning a truthy value to the filter will skip the current meta
-									 * object from being exported.
-									 *
-									 * @since 4.0.0
-									 *
-									 * @param bool   $skip     Whether to skip the current comment meta. Default false.
-									 * @param string $meta_key Current meta key.
-									 * @param object $meta     Current meta object.
-									 */
-									if ( apply_filters( 'wxr_export_skip_commentmeta', false, $meta->meta_key, $meta ) ) {
-										continue;
-									}
-									?>
-									<wp:commentmeta>
-										<wp:meta_key><?php echo wxr_cdata( $meta->meta_key ); ?></wp:meta_key>
-										<wp:meta_value><?php echo wxr_cdata( $meta->meta_value ); ?></wp:meta_value>
-									</wp:commentmeta>
-								<?php		endforeach; ?>
-							</wp:comment>
 						<?php	endforeach; ?>
 					</item>
 					<?php

@@ -920,10 +920,12 @@ class MP_Product {
 		$transient_key = 'mp-get-variations-' . $identifier;
 
 		//Check if variations data exist on transient, if not do the query and save result on transient
-		if ( false === ( $this->_variations = get_transient( $transient_key ) ) ) {
+		//if ( false === ( $this->_variations = get_transient( $transient_key ) ) ) {
+		if ( false == ( $this->_variations = get_transient( $transient_key ) ) ) {
+			$this->_variations = array();
 			$args = array(
 				'post_type'      => MP_Product::get_variations_post_type(),
-				'posts_per_page' => - 1,
+				'posts_per_page' => -1,
 				'orderby'        => 'menu_order',
 				'order'          => 'ASC',
 				'post_parent'    => $this->ID,
@@ -934,11 +936,11 @@ class MP_Product {
 			$this->_variation_ids = array();
 
 			while ( $query->have_posts() ) : $query->the_post();
-				$this->_variations[]    = $variation = new MP_Product();
+				$this->_variations[] = $variation = new MP_Product();
 			endwhile;
 
 			//Save variations data on a transient, transient key is 'mp-get-variations-{product_id}'
-			set_transient( 'mp-get-variations-'.$this->ID , $this->_variations, 12 * 60 * 60 );
+			set_transient('mp-get-variations-' . $this->ID, $this->_variations, 12 * 60 * 60);
 		}
 
 		foreach ($this->_variations as $variation) {
