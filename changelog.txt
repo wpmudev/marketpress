@@ -11,6 +11,7 @@ Change Log:
 - Added: Addon to enable product multiple files
 - Added: File list incase the product files are more than one
 - Refactored: Download code to cater for multiple files via a prameter
+- Updated: WePay Payment gateway to use the latest v3 API with the 'address.postal_code' attribute
 
 3.2.3
 ----------------------------------------------------------------------
