@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MarketPress 3.2.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/marketpress\n"
-"POT-Creation-Date: 2017-06-15 06:23:10+00:00\n"
+"POT-Creation-Date: 2017-06-19 06:13:54+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +30,7 @@ msgstr ""
 
 #: includes/addons/class-mp-addons-list-table.php:21
 #: includes/admin/class-mp-products-admin.php:2297
-#: includes/common/class-mp-product.php:3024
+#: includes/common/class-mp-product.php:3026
 msgid "Description"
 msgstr ""
 
@@ -1599,7 +1599,7 @@ msgid "Changes saved successfully"
 msgstr ""
 
 #: includes/admin/class-mp-products-admin.php:1434
-#: includes/common/class-mp-product.php:3008
+#: includes/common/class-mp-product.php:3010
 msgid "Related Products"
 msgstr ""
 
@@ -2777,15 +2777,6 @@ msgstr ""
 msgid "Store Settings: Capabilities"
 msgstr ""
 
-#: includes/admin/class-mp-store-settings-admin.php:118
-msgid "Store Settings: Import/Export"
-msgstr ""
-
-#: includes/admin/class-mp-store-settings-admin.php:118
-#: includes/admin/class-mp-store-settings-admin.php:256
-msgid "Import/Export"
-msgstr ""
-
 #: includes/admin/class-mp-store-settings-admin.php:121
 #: includes/admin/store-settings/class-mp-store-settings-addons.php:121
 msgid "Store Settings: Add Ons"
@@ -2826,6 +2817,10 @@ msgstr ""
 #: includes/admin/class-mp-store-settings-admin.php:252
 #: includes/admin/store-settings/class-mp-store-settings-capabilities.php:56
 msgid "Capabilities"
+msgstr ""
+
+#: includes/admin/class-mp-store-settings-admin.php:256
+msgid "Import/Export"
 msgstr ""
 
 #: includes/admin/dash-notice/wpmudev-dash-notification.php:223
@@ -3184,58 +3179,58 @@ msgstr ""
 msgid "Location Settings"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:146
+#: includes/admin/store-settings/class-mp-store-settings-import.php:242
 #. translators: %s: Importer name
 msgid "Run %s"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:147
+#: includes/admin/store-settings/class-mp-store-settings-import.php:243
 msgid "Run Importer"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:167
+#: includes/admin/store-settings/class-mp-store-settings-import.php:263
 #. translators: %s: Importer name
 msgid "Install %s"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:168
+#: includes/admin/store-settings/class-mp-store-settings-import.php:264
 msgid "Install Now"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:173
+#: includes/admin/store-settings/class-mp-store-settings-import.php:269
 #. translators: URL to wp-admin/import.php
 msgid ""
 "This importer is not installed. Please install importers from <a "
 "href=\"%s\">the main site</a>."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:226
+#: includes/admin/store-settings/class-mp-store-settings-import.php:321
 msgid "Import / Export Settings"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:228
+#: includes/admin/store-settings/class-mp-store-settings-import.php:323
 msgid ""
 "Use the text below to export to a new installation. Or paste in the new "
 "configuration to import."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:232
+#: includes/admin/store-settings/class-mp-store-settings-import.php:327
 msgid "Import configuration"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:233
+#: includes/admin/store-settings/class-mp-store-settings-import.php:328
 msgid "Export settings to file"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:234
+#: includes/admin/store-settings/class-mp-store-settings-import.php:329
 msgid "Import / Export Products"
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:236
+#: includes/admin/store-settings/class-mp-store-settings-import.php:331
 msgid "The import process uses the WordPress importer plugin."
 msgstr ""
 
-#: includes/admin/store-settings/class-mp-store-settings-import.php:239
+#: includes/admin/store-settings/class-mp-store-settings-import.php:334
 msgid "Export products to file"
 msgstr ""
 
@@ -4253,14 +4248,14 @@ msgid "Shipped: Track Shipment"
 msgstr ""
 
 #: includes/common/class-mp-product.php:313
-#: includes/common/class-mp-product.php:1120
-#: includes/common/class-mp-product.php:1128
+#: includes/common/class-mp-product.php:1122
+#: includes/common/class-mp-product.php:1130
 msgid "Add To Cart"
 msgstr ""
 
 #: includes/common/class-mp-product.php:317
-#: includes/common/class-mp-product.php:1122
-#: includes/common/class-mp-product.php:1130
+#: includes/common/class-mp-product.php:1124
+#: includes/common/class-mp-product.php:1132
 #: includes/multisite/template-functions.php:579
 msgid "Buy Now"
 msgstr ""
@@ -4287,79 +4282,79 @@ msgstr ""
 msgid "You can not add more items to cart."
 msgstr ""
 
-#: includes/common/class-mp-product.php:1104
+#: includes/common/class-mp-product.php:1106
 #: includes/multisite/template-functions.php:731
 msgid "Buy Now &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1109
+#: includes/common/class-mp-product.php:1111
 msgid "Out of Stock"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1118
+#: includes/common/class-mp-product.php:1120
 msgid "Choose Options"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1214
+#: includes/common/class-mp-product.php:1216
 msgid "More Info &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1413
-#: includes/common/class-mp-product.php:1428
+#: includes/common/class-mp-product.php:1415
+#: includes/common/class-mp-product.php:1430
 msgid "%s each"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1532
-#: includes/common/class-mp-product.php:1535
+#: includes/common/class-mp-product.php:1534
+#: includes/common/class-mp-product.php:1537
 msgid "(tax excl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1537
-#: includes/common/class-mp-product.php:1540
+#: includes/common/class-mp-product.php:1539
+#: includes/common/class-mp-product.php:1542
 msgid "(tax incl.)"
 msgstr ""
 
-#: includes/common/class-mp-product.php:1925
+#: includes/common/class-mp-product.php:1927
 msgid ""
 "<p class=\"mp_related_products_empty_message\">There are no related "
 "products for this item.</p>"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2156
+#: includes/common/class-mp-product.php:2158
 msgid "View Larger Image &raquo;"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2421
+#: includes/common/class-mp-product.php:2423
 msgid "Low Product Inventory Notification"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2422
+#: includes/common/class-mp-product.php:2424
 msgid ""
 "This message is being sent to notify you of low stock of a product in your "
 "online store according to your preferences.<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2424
+#: includes/common/class-mp-product.php:2426
 msgid "Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2425
+#: includes/common/class-mp-product.php:2427
 msgid "Current Inventory: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2426
+#: includes/common/class-mp-product.php:2428
 msgid "Link: %s<br /><br />"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2428
+#: includes/common/class-mp-product.php:2430
 msgid "Edit Product: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2429
+#: includes/common/class-mp-product.php:2431
 msgid "Notification Preferences: %s"
 msgstr ""
 
-#: includes/common/class-mp-product.php:2806
+#: includes/common/class-mp-product.php:2808
 msgid "Tweet"
 msgstr ""
 

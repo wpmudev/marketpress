@@ -110,7 +110,7 @@ class MP_Store_Settings_Import {
 	 * @return array
 	 */
 	public function process_products( $metakeys, $post_id ) {
-
+// TODO: value can consist of several keys
 		foreach ( $metakeys as $meta ) {
 			if ( $meta['key'] == 'name' ) {
 

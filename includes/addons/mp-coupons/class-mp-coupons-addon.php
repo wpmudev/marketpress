@@ -362,7 +362,7 @@ class MP_Coupons_Addon {
 
 	public function tax_total( $tax_amount, $total, $cart ) {
 
-		$total = $cart->product_original_total() + $cart->shipping_total();
+		$total = (int) $cart->product_original_total() + (int) $cart->shipping_total();
 
 		if ( abs( $this->get_total_discount_amt() ) >= $total ) {
 			$total_pre = $total + ( - 1 * $total );

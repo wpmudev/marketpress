@@ -154,7 +154,6 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Added: Password check for password-protected products
 * Added: Settings link on the Plugins page
 * Fixed: When editing variable products, do not update price if it is not set
-* Fixed: Import/export functionality
 * Fixed: Checkout page (sections not opening, inability to continue checkout without inputing zip code, notices on checkout page)
 * Fixed: Coupons could not be applied to cart when date format was set to d/m/Y
 * Fixed: Issue with conversions not being tracked in Google Analytics
