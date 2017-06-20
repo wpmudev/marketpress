@@ -157,6 +157,7 @@ We provide comprehensive and guaranteed support on the <a href='http://premium.w
 * Fixed: Checkout page (sections not opening, inability to continue checkout without inputing zip code, notices on checkout page)
 * Fixed: Coupons could not be applied to cart when date format was set to d/m/Y
 * Fixed: Issue with conversions not being tracked in Google Analytics
+* Fixed: Errors with WePay gateway
 * Fixed: Removed warnings and notices on product page
 * Fixed: Various small bug fixes and improvements
 * Changed: Simplify will now show message if the payment is declined
