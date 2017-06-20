@@ -54,7 +54,7 @@ class MP_Gateway_Wepay extends MP_Gateway_API {
 			return;
 		}
 
-		wp_enqueue_script( 'wepay-tokenization', 'https://static.wepay.com/min/js/tokenization.v2.js', array( 'jquery' ), $this->version, true );
+		wp_enqueue_script( 'wepay-tokenization', 'https://static.wepay.com/min/js/tokenization.3.latest.js', array( 'jquery' ), $this->version, true );
 		wp_enqueue_script( 'wepay-script', mp_plugin_url( 'includes/common/payment-gateways/wepay-files/wepay.js' ), array( 'wepay-tokenization' ), MP_VERSION, true );
 		wp_localize_script( 'wepay-script', 'wepay_script', array(
 			'mode' => $this->mode,
