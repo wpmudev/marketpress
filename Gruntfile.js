@@ -263,7 +263,9 @@ module.exports = function(grunt) {
 		'postcss:adminprod',
 		'makepot',
 		'copy:main',
-		'compress:main'
+		'compress:main',
+		'copy:wporg',
+		'compress:wporg'
 	]);
 
 };
